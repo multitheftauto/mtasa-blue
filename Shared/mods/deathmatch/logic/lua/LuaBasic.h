@@ -26,24 +26,24 @@ namespace lua
     // PopTrival should read a simple value of type T from the stack without extra type checks
     // If whatever is at that point in the stack is not convertible to T, the behavior is undefined
     template <typename T>
-    T PopPrimitive(lua_State* L, std::size_t& index);
+    inline T PopPrimitive(lua_State* L, std::size_t& index);
 
     // Push should push a value of type T to the Lua Stack
     // This will always increase the stack size by 1
-    void Push(lua_State* L, int value) { lua_pushnumber(L, value); }
-    void Push(lua_State* L, unsigned int value) { lua_pushnumber(L, value); }
-    void Push(lua_State* L, float value) { lua_pushnumber(L, value); }
-    void Push(lua_State* L, double value) { lua_pushnumber(L, value); }
+    inline void Push(lua_State* L, int value) { lua_pushnumber(L, value); }
+    inline void Push(lua_State* L, unsigned int value) { lua_pushnumber(L, value); }
+    inline void Push(lua_State* L, float value) { lua_pushnumber(L, value); }
+    inline void Push(lua_State* L, double value) { lua_pushnumber(L, value); }
 
-    void Push(lua_State* L, bool value) { lua_pushboolean(L, value); }
+    inline void Push(lua_State* L, bool value) { lua_pushboolean(L, value); }
 
-    void Push(lua_State* L, nullptr_t) { lua_pushnil(L); }
+    inline void Push(lua_State* L, nullptr_t) { lua_pushnil(L); }
 
-    void Push(lua_State* L, const std::string& value) { lua_pushlstring(L, value.data(), value.length()); }
+    inline void Push(lua_State* L, const std::string& value) { lua_pushlstring(L, value.data(), value.length()); }
 
-    void Push(lua_State* L, const std::string_view& value) { lua_pushlstring(L, value.data(), value.length()); }
+    inline void Push(lua_State* L, const std::string_view& value) { lua_pushlstring(L, value.data(), value.length()); }
 
-    void Push(lua_State* L, const CLuaArgument& arg)
+    inline void Push(lua_State* L, const CLuaArgument& arg)
     {
         if (arg.GetType() == LUA_TNONE)
         {
@@ -54,36 +54,36 @@ namespace lua
         arg.Push(L);
     }
 
-    void Push(lua_State* L, const CLuaArguments& args) { args.PushAsTable(L); }
+    inline void Push(lua_State* L, const CLuaArguments& args) { args.PushAsTable(L); }
 
-    void Push(lua_State* L, const CVector2D& value) { lua_pushvector(L, value); }
+    inline void Push(lua_State* L, const CVector2D& value) { lua_pushvector(L, value); }
 
-    void Push(lua_State* L, const CVector& value) { lua_pushvector(L, value); }
+    inline void Push(lua_State* L, const CVector& value) { lua_pushvector(L, value); }
 
-    void Push(lua_State* L, const CVector4D& value) { lua_pushvector(L, value); }
+    inline void Push(lua_State* L, const CVector4D& value) { lua_pushvector(L, value); }
 
-    void Push(lua_State* L, const CMatrix& value) { lua_pushmatrix(L, value); }
+    inline void Push(lua_State* L, const CMatrix& value) { lua_pushmatrix(L, value); }
 
     // Script entities
     #ifdef MTA_CLIENT
-    void Push(lua_State* L, const CClientEntity* value) { lua_pushelement(L, const_cast<CClientEntity*>(value)); }
+    inline void Push(lua_State* L, const CClientEntity* value) { lua_pushelement(L, const_cast<CClientEntity*>(value)); }
     #else
-    void Push(lua_State* L, const CElement* value) { lua_pushelement(L, const_cast<CElement*>(value)); }
-    void Push(lua_State* L, const CAccount* value) { lua_pushaccount(L, const_cast<CAccount*>(value)); }
-    void Push(lua_State* L, const CAccessControlList* value) { lua_pushacl(L, const_cast<CAccessControlList*>(value)); }
-    void Push(lua_State* L, const CAccessControlListGroup* value) { lua_pushaclgroup(L, const_cast<CAccessControlListGroup*>(value)); }
-    void Push(lua_State* L, const CBan* value) { lua_pushban(L, const_cast<CBan*>(value)); }
-    void Push(lua_State* L, const CTextDisplay* value) { lua_pushtextdisplay(L, const_cast<CTextDisplay*>(value)); }
-    void Push(lua_State* L, const CTextItem* value) { lua_pushtextitem(L, const_cast<CTextItem*>(value)); }
-    void Push(lua_State* L, const CDbJobData* value) { lua_pushquery(L, const_cast<CDbJobData*>(value)); }
+    inline void Push(lua_State* L, const CElement* value) { lua_pushelement(L, const_cast<CElement*>(value)); }
+    inline void Push(lua_State* L, const CAccount* value) { lua_pushaccount(L, const_cast<CAccount*>(value)); }
+    inline void Push(lua_State* L, const CAccessControlList* value) { lua_pushacl(L, const_cast<CAccessControlList*>(value)); }
+    inline void Push(lua_State* L, const CAccessControlListGroup* value) { lua_pushaclgroup(L, const_cast<CAccessControlListGroup*>(value)); }
+    inline void Push(lua_State* L, const CBan* value) { lua_pushban(L, const_cast<CBan*>(value)); }
+    inline void Push(lua_State* L, const CTextDisplay* value) { lua_pushtextdisplay(L, const_cast<CTextDisplay*>(value)); }
+    inline void Push(lua_State* L, const CTextItem* value) { lua_pushtextitem(L, const_cast<CTextItem*>(value)); }
+    inline void Push(lua_State* L, const CDbJobData* value) { lua_pushquery(L, const_cast<CDbJobData*>(value)); }
     #endif
-    void Push(lua_State* L, const CResource* value) { lua_pushresource(L, const_cast<CResource*>(value)); }
-    void Push(lua_State* L, const CXMLNode* value) { lua_pushxmlnode(L, const_cast<CXMLNode*>(value)); }
-    void Push(lua_State* L, const CLuaTimer* value) { lua_pushtimer(L, const_cast<CLuaTimer*>(value)); }
-    void Push(lua_State* L, const CLuaVector2D* value) { lua_pushvector(L, *value); }
-    void Push(lua_State* L, const CLuaVector3D* value) { lua_pushvector(L, *value); }
-    void Push(lua_State* L, const CLuaVector4D* value) { lua_pushvector(L, *value); }
-    void Push(lua_State* L, const CLuaMatrix* value) { lua_pushmatrix(L, *value); }
+    inline void Push(lua_State* L, const CResource* value) { lua_pushresource(L, const_cast<CResource*>(value)); }
+    inline void Push(lua_State* L, const CXMLNode* value) { lua_pushxmlnode(L, const_cast<CXMLNode*>(value)); }
+    inline void Push(lua_State* L, const CLuaTimer* value) { lua_pushtimer(L, const_cast<CLuaTimer*>(value)); }
+    inline void Push(lua_State* L, const CLuaVector2D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaVector3D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaVector4D* value) { lua_pushvector(L, *value); }
+    inline void Push(lua_State* L, const CLuaMatrix* value) { lua_pushmatrix(L, *value); }
 
     // Overload for enum types only
     template <typename T>
