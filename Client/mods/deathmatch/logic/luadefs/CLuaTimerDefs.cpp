@@ -14,12 +14,8 @@
 void CLuaTimerDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"setTimer", SetTimer},
-        {"killTimer", KillTimer},
-        {"resetTimer", ResetTimer},
-        {"getTimers", GetTimers},
-        {"isTimer", IsTimer},
-        {"getTimerDetails", GetTimerDetails},
+        {"setTimer", SetTimer},   {"killTimer", KillTimer}, {"resetTimer", ResetTimer},
+        {"getTimers", GetTimers}, {"isTimer", IsTimer},     {"getTimerDetails", GetTimerDetails},
     };
 
     // Add functions

@@ -388,7 +388,7 @@ int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bo
             }
             else
             {
-                pItem->SetFont(win->getFont()->getName().c_str()); // Reset font to the font of the item's parent (the gridlist)
+                pItem->SetFont(win->getFont()->getName().c_str());            // Reset font to the font of the item's parent (the gridlist)
                 pItem->SetDisabled(false);
 
                 if (GetColumnIndex(hColumn) == 0)
@@ -674,7 +674,7 @@ void CGUIGridList_Impl::SetSelectionMode(SelectionMode mode)
 
 SelectionMode CGUIGridList_Impl::GetSelectionMode()
 {
-    return (SelectionMode)reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSelectionMode();
+    return (SelectionMode) reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSelectionMode();
 }
 
 void CGUIGridList_Impl::GetVisibleRowRange(int& iFirst, int& iLast)

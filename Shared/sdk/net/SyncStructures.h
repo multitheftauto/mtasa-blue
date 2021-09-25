@@ -681,7 +681,6 @@ struct SVehiclePuresyncFlags : public ISyncStructure
     } data;
 };
 
-
 enum class eVehicleAimDirection : unsigned char
 {
     FORWARDS = 0,

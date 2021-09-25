@@ -127,7 +127,8 @@ public:
     virtual float GetDXFontHeight(float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
     virtual float GetDXCharacterWidth(char c, float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
     virtual float GetDXTextExtent(const char* szText, float fScale = 1.0f, ID3DXFont* pDXFont = NULL, bool bColorCoded = false) = 0;
-    virtual void GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f, ID3DXFont* pDXFont = nullptr, bool bWordBreak = false, bool bColorCoded = false) = 0;
+    virtual void  GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f,
+                                ID3DXFont* pDXFont = nullptr, bool bWordBreak = false, bool bColorCoded = false) = 0;
 
     virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont) = 0;
     virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality,
@@ -147,8 +148,8 @@ public:
     virtual void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI) = 0;
 
     virtual void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
-                                          float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bFlipUV = false, bool bUseFaceToward = false,
-                                          const CVector& vecFaceToward = CVector(), bool bPostGUI = false) = 0;
+                                          float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bFlipUV = false,
+                                          bool bUseFaceToward = false, const CVector& vecFaceToward = CVector(), bool bPostGUI = false) = 0;
 
     virtual void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false) = 0;
 
@@ -157,7 +158,8 @@ public:
 
     virtual void DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* wszText, float fScaleX,
                                   float fScaleY, unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded = false,
-                                  bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0, float fLineHeight = 0) = 0;
+                                  bool bSubPixelPositioning = false, float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0,
+                                  float fLineHeight = 0) = 0;
 
     virtual void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
     virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
@@ -165,14 +167,14 @@ public:
 
     virtual void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
     virtual void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
-                                             bool bPostGUI) = 0;
+                                               bool bPostGUI) = 0;
 
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
 
     virtual void DrawWiredSphere(CVector vecPosition, float fRadius, SColor color, float fLineWidth, int iterations) = 0;
 
-    virtual bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
+    virtual bool IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType) = 0;
 
     // Subsystems
     virtual CRenderItemManagerInterface* GetRenderItemManager() = 0;

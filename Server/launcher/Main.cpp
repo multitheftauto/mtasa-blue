@@ -25,7 +25,7 @@
 #include "MTAPlatform.h"
 #include "SharedUtil.h"
 #ifdef WIN32
-// Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
+    // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
 #else
 FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     if (Core.Load(LIB_CORE))
     {
         // Grab the entrypoint
-        typedef int(Main_t)(int, char* []);
+        typedef int(Main_t)(int, char*[]);
         Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>((long long)(Core.GetProcedureAddress("Run")));
         if (pfnEntryPoint)
         {

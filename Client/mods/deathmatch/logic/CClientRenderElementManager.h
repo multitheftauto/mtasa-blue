@@ -25,19 +25,19 @@ public:
     CClientRenderElementManager(CClientManager* pClientManager);
     ~CClientRenderElementManager();
 
-    CClientDxFont*             CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
-    CClientGuiFont*            CreateGuiFont(const SString& strFullFilePath, const SString& strUniqueName, uint uiSize);
-    CClientTexture*            CreateTexture(const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
-                                       uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
-                                       ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
-    CClientShader*             CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
-                                      bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
-    CClientRenderTarget*       CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel);
-    CClientScreenSource*       CreateScreenSource(uint uiSizeX, uint uiSizeY);
-    CClientWebBrowser*         CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
-    CClientVectorGraphic*      CreateVectorGraphic(uint width, uint height);
-    CClientTexture*            FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
-    void                       Remove(CClientRenderElement* pElement);
+    CClientDxFont*  CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
+    CClientGuiFont* CreateGuiFont(const SString& strFullFilePath, const SString& strUniqueName, uint uiSize);
+    CClientTexture* CreateTexture(const SString& strFullFilePath, const CPixels* pPixels = NULL, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
+                                  uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
+                                  ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
+    CClientShader* CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
+                                bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
+    CClientRenderTarget*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel);
+    CClientScreenSource*  CreateScreenSource(uint uiSizeX, uint uiSizeY);
+    CClientWebBrowser*    CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
+    CClientVectorGraphic* CreateVectorGraphic(uint width, uint height);
+    CClientTexture*       FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
+    void                  Remove(CClientRenderElement* pElement);
 
     uint GetDxFontCount() { return m_uiStatsDxFontCount; }
     uint GetGuiFontCount() { return m_uiStatsGuiFontCount; }

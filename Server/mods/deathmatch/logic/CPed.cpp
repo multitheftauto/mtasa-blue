@@ -462,7 +462,7 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         {
             case VEHICLEACTION_ENTERING:
             {
-                CVehicle* pVehicle = GetOccupiedVehicle();
+                CVehicle*     pVehicle = GetOccupiedVehicle();
                 unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
                 if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
@@ -474,7 +474,7 @@ void CPed::SetSyncer(CPlayer* pPlayer)
 
             case VEHICLEACTION_EXITING:
             {
-                CVehicle* pVehicle = GetOccupiedVehicle();
+                CVehicle*     pVehicle = GetOccupiedVehicle();
                 unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
                 if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))

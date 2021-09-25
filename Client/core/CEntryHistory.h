@@ -64,7 +64,8 @@ public:
     bool Empty() const { return m_entries.empty(); }
 
     // Return a specific entry from history
-    CEntryHistoryItem* Get(unsigned int index) {
+    CEntryHistoryItem* Get(unsigned int index)
+    {
         auto& iter = std::next(m_entries.begin(), index);
         if (iter != m_entries.end())
             return &(*iter);

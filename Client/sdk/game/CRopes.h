@@ -17,6 +17,6 @@ class CVector;
 class CRopes
 {
 public:
-    virtual int CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration = 4000) = 0;
+    virtual int  CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration = 4000) = 0;
     virtual void RemoveEntityRope(CEntitySAInterface* pObjectSA) = 0;
 };
