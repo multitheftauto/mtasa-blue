@@ -26,4 +26,11 @@ public:
 
     static CLuaMultiReturn<int, int> SVGGetSize(CClientVectorGraphic* pVectorGraphic);
     static bool                      SVGSetSize(CClientVectorGraphic* pVectorGraphic, int width, int height, std::optional<CLuaFunctionRef> luaFunctionRef);
+
+private:
+    static bool LoadFromData(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, std::string strRawData);
+    static bool LoadFromFile(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CScriptFile* pFile, std::string strPath, CResource* pParentResource);
+
+    static bool SetDocument(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode);
+    static bool SetSize(CClientVectorGraphic* pVectorGraphic, CVector2D size);
 };

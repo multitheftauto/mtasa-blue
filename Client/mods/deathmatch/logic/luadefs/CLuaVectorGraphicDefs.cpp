@@ -40,6 +40,81 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "SVG");
 }
 
+bool CLuaVectorGraphicDefs::LoadFromData(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, std::string strRawData)
+{
+    if (!luaVM || !pVectorGraphic)
+        return false;
+
+    if (!pVectorGraphic->LoadFromString(strRawData))
+    {
+        delete pVectorGraphic;
+
+        m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
+        return false;
+    }
+
+    return true;
+}
+
+bool CLuaVectorGraphicDefs::SetDocument(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
+{
+    if (!pVectorGraphic || !pXMLNode || !pXMLNode->IsValid())
+        return false;
+
+    pVectorGraphic->SetDocument(pXMLNode);
+}
+
+bool CLuaVectorGraphicDefs::LoadFromFile(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CScriptFile* pFile, std::string strPath,
+                                         CResource* pParentResource)
+{
+    if (!luaVM || !pVectorGraphic || !pFile || !pParentResource)
+        return false;
+
+    if (!pFile->Load(pParentResource, CScriptFile::MODE_READ))
+    {
+        delete pVectorGraphic;
+        delete pFile;
+
+        m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", strPath.c_str()));
+        return false;
+    }
+    else
+    {
+        SString strXmlData;
+        pFile->Read(pFile->GetSize(), strXmlData);
+
+        // We don't need the file handler anymore
+        delete pFile;
+
+        if (strXmlData.empty() || !pVectorGraphic->LoadFromString(strXmlData))
+        {
+            delete pVectorGraphic;
+
+            m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG file (check for XML syntax errors)");
+            return false;
+        }
+    }
+}
+
+bool CLuaVectorGraphicDefs::SetSize(CClientVectorGraphic* pVectorGraphic, CVector2D size)
+{
+    if (!pVectorGraphic)
+        return false;
+
+    CVectorGraphicItem* pVectorGraphicItem = pVectorGraphic->GetRenderItem();
+
+    if (!pVectorGraphicItem)
+        return false;
+
+    pVectorGraphicItem->Resize(size);
+
+    if ((int)pVectorGraphicItem->m_uiSizeX != size.fX || (int)pVectorGraphicItem->m_uiSizeY != size.fY)
+        return false;            // failed to resize
+
+    pVectorGraphic->GetDisplay()->Update();
+    return true;
+}
+
 CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData,
                                                        std::optional<CLuaFunctionRef> luaFunctionRef)
 {
@@ -75,24 +150,12 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 CLuaFunctionRef funcRef = luaFunctionRef.value();
 
                 CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                    [funcRef, pVectorGraphic, strRawData] {
-                        lua_State* luaVM = funcRef.GetLuaVM();
-                        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-
-                        if (!pLuaMain || !pVectorGraphic)
-                            return false;
-
-                        if (!pVectorGraphic->LoadFromString(strRawData))
-                        {
-                            delete pVectorGraphic;
-
-                            m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
-                            return false;
-                        }
-
-                        return true;
+                    [funcRef, pVectorGraphic, strRawData]
+                    {
+                        return LoadFromData(funcRef.GetLuaVM(), pVectorGraphic, strRawData);
                     },
-                    [funcRef](const bool didLoad) {
+                    [funcRef](const bool didLoad)
+                    {
                         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
                         if (pLuaMain)
                         {
@@ -104,11 +167,8 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             }
             else
             {
-                if (!pVectorGraphic->LoadFromString(pathOrRawData.value()))
+                if (!LoadFromData(luaVM, pVectorGraphic, pathOrRawData.value()))
                 {
-                    delete pVectorGraphic;
-
-                    m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
                     return false;
                 }
             }
@@ -129,43 +189,22 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                     std::string     path = pathOrRawData.value();
 
                     CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                        [funcRef, pFile, pVectorGraphic, path] {
+                        [funcRef, pFile, pVectorGraphic, path]
+                        {
                             lua_State* luaVM = funcRef.GetLuaVM();
 
+                            if (!luaVM)
+                                return false;
+
                             CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-                            CResource* pParentResource = pLuaMain->GetResource();
 
-                            if (!pLuaMain || !pParentResource || !pFile || !pVectorGraphic)
+                            if (!pLuaMain)
                                 return false;
 
-                            if (!pFile->Load(pParentResource, CScriptFile::MODE_READ))
-                            {
-                                delete pVectorGraphic;
-                                delete pFile;
-
-                                m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", path.c_str()));
-                                return false;
-                            }
-                            else
-                            {
-                                SString strXmlData;
-                                pFile->Read(pFile->GetSize(), strXmlData);
-
-                                // We don't need the file handler anymore
-                                delete pFile;
-
-                                if (strXmlData.empty() || !pVectorGraphic->LoadFromString(strXmlData))
-                                {
-                                    delete pVectorGraphic;
-
-                                    m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG file (check for XML syntax errors)");
-                                    return false;
-                                }
-                            }
-
-                            return true;
+                            return LoadFromFile(luaVM, pVectorGraphic, pFile, path, pLuaMain->GetResource());
                         },
-                        [funcRef](const bool isLoaded) {
+                        [funcRef](const bool isLoaded)
+                        {
                             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
                             if (pLuaMain)
                             {
@@ -177,29 +216,9 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 }
                 else
                 {
-                    if (!pFile->Load(pParentResource, CScriptFile::MODE_READ))
+                    if (!LoadFromFile(luaVM, pVectorGraphic, pFile, pathOrRawData.value(), pParentResource))
                     {
-                        delete pVectorGraphic;
-                        delete pFile;
-
-                        m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (file doesn't exist) [%s]", pathOrRawData.value().c_str()));
                         return false;
-                    }
-                    else
-                    {
-                        SString strXmlData;
-                        pFile->Read(pFile->GetSize(), strXmlData);
-
-                        // We don't need the file handler anymore
-                        delete pFile;
-
-                        if (strXmlData.empty() || !pVectorGraphic->LoadFromString(strXmlData))
-                        {
-                            delete pVectorGraphic;
-
-                            m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG file (check for XML syntax errors)");
-                            return false;
-                        }
                     }
                 }
             }
@@ -234,16 +253,12 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraph
         CLuaFunctionRef funcRef = luaFunctionRef.value();
 
         CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-            [funcRef, pVectorGraphic, pXMLNode] {
-                lua_State* luaVM = funcRef.GetLuaVM();
-                CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-
-                if (!pLuaMain || !pVectorGraphic)
-                    return false;
-
-                return pVectorGraphic->SetDocument(pXMLNode);
+            [pVectorGraphic, pXMLNode]
+            {
+                return SetDocument(pVectorGraphic, pXMLNode);
             },
-            [funcRef](const bool didLoad) {
+            [funcRef](const bool didLoad)
+            {
                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
                 if (pLuaMain)
                 {
@@ -256,7 +271,7 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraph
         return true;
     }
 
-    return pVectorGraphic->SetDocument(pXMLNode);
+    return SetDocument(pVectorGraphic, pXMLNode);
 }
 
 CLuaMultiReturn<int, int> CLuaVectorGraphicDefs::SVGGetSize(CClientVectorGraphic* pVectorGraphic)
@@ -272,29 +287,18 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
     if (width > 4096 || height > 4096)
         throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
 
-    CVectorGraphicItem* pVectorGraphicItem = pVectorGraphic->GetRenderItem();
+    CVector2D size = CVector2D(width, height);
 
     if (luaFunctionRef.has_value() && VERIFY_FUNCTION(luaFunctionRef.value()))
     {
         CLuaFunctionRef funcRef = luaFunctionRef.value();
 
-        CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-            [funcRef, pVectorGraphic, pVectorGraphicItem, width, height] {
-                lua_State* luaVM = funcRef.GetLuaVM();
-                CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-
-                if (!pLuaMain || !pVectorGraphic)
-                    return false;
-
-                pVectorGraphicItem->Resize(*new CVector2D(width, height));
-
-                if ((int)pVectorGraphicItem->m_uiSizeX != width || (int)pVectorGraphicItem->m_uiSizeY != height)
-                    return false;            // failed to resize
-
-                pVectorGraphic->GetDisplay()->Update();
-                return true;
+        CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>([pVectorGraphic, size]
+            {
+                return SetSize(pVectorGraphic, size);
             },
-            [funcRef](const bool didLoad) {
+            [funcRef](const bool didLoad)
+            {
                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
                 if (pLuaMain)
                 {
@@ -307,12 +311,5 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
         return true;
     }
 
-    pVectorGraphicItem->Resize(*new CVector2D(width, height));
-
-    if ((int)pVectorGraphicItem->m_uiSizeX != width || (int)pVectorGraphicItem->m_uiSizeY != height)
-        return false;            // failed to resize
-
-    pVectorGraphic->GetDisplay()->Update();
-
-    return true;
+    return SetSize(pVectorGraphic, size);
 }
