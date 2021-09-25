@@ -103,3 +103,15 @@ eefde6d95260aef53308baa7fb1e59cf24522cd9
 # Date:   Sat Sep 25 15:05:27 2021 +0300
 #
 # Run clang-format
+
+d5b9a56ac1d1d4c156ef80cd3ec5ed4fc2c65c33
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:56:03 2021 +0300
+#
+# Addendum to 25d9ba3: Run clang-format again
+
+8e3e3b8b351934b48f9b1c530aca33b1140ed6fc
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:56:40 2021 +0300
+#
+# Addendum to 25d9ba3: Fix build error
