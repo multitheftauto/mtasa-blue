@@ -126,7 +126,7 @@
 #else
     #define dassert(_Expression)     ((void)0)
     #ifdef WIN32
-        // This, along with RedirectedSetUnhandledExceptionFilter means we can get reports from all crashes with the correct crash address in the file name
+    // This, along with RedirectedSetUnhandledExceptionFilter means we can get reports from all crashes with the correct crash address in the file name
         #undef assert
         #define assert(_Expression) (void)( (!!(_Expression)) || ( *((int*)NULL) = 0) )
     #endif

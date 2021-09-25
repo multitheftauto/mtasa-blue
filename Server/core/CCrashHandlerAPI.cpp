@@ -46,11 +46,11 @@ static LPTOP_LEVEL_EXCEPTION_FILTER g_pfnOrigFilt = NULL;
 // The exception handler
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
-    /*//////////////////////////////////////////////////////////////////////
-                                Destructor Class
-    //////////////////////////////////////////////////////////////////////*/
-    // See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
-    // Turn off warning : initializers put in library initialization area
+/*//////////////////////////////////////////////////////////////////////
+                            Destructor Class
+//////////////////////////////////////////////////////////////////////*/
+// See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
+// Turn off warning : initializers put in library initialization area
 #pragma warning (disable : 4073)
 #pragma init_seg(lib)
 class CleanUpCrashHandler

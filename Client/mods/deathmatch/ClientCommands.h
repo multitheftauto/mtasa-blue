@@ -46,7 +46,7 @@ void COMMAND_ServerInfo(const char* szCmdLine);
 // DISABLE THESE BEFORE RELEASE
 #ifdef MTA_DEBUG
 void COMMAND_ShowSyncData(const char* szCmdLine);
-    // void COMMAND_DumpPlayers            ( const char* szCmdLine );
+// void COMMAND_DumpPlayers            ( const char* szCmdLine );
 #endif
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
