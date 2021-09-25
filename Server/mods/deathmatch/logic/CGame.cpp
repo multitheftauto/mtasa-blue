@@ -1205,6 +1205,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PLAYER_RESOURCE_START:
+        {
+            Packet_PlayerResourceStart(static_cast<CPlayerResourceStartPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1523,6 +1529,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
+    m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -4008,6 +4015,21 @@ void CGame::Packet_DiscordJoin(CDiscordJoinPacket& Packet)
         Arguments.PushBoolean(false);
         Arguments.PushString(Packet.GetSecret());
         pPlayer->CallEvent("onPlayerDiscordJoin", Arguments, NULL);
+    }
+}
+
+void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (pPlayer)
+    {
+        CResource* pResource = Packet.GetResource();
+        if (pResource)
+        {
+            CLuaArguments Arguments;
+            Arguments.PushResource(pResource);
+            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
+        }
     }
 }
 

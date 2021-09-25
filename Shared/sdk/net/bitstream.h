@@ -468,6 +468,10 @@ enum class eBitStreamVersion : unsigned short
     // Implement messageType parameter to onClientChatMessage (#1020)
     // 2021-05-15 0x74
     OnClientChatMessage_MessageType,
+    
+    // Add serverside event "onPlayerResourceStart" (#2150)
+    // 2021-08-30 0x75
+    OnPlayerResourceStart,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

@@ -11,10 +11,10 @@
 #include "CWebCore.h"
 #include "CWebView.h"
 #include "CWebsiteRequests.h"
-#include <cef3/include/cef_app.h>
-#include <cef3/include/cef_browser.h>
-#include <cef3/include/cef_sandbox_win.h>
-#include <cef3/include/cef_parser.h>
+#include <cef3/cef/include/cef_app.h>
+#include <cef3/cef/include/cef_browser.h>
+#include <cef3/cef/include/cef_sandbox_win.h>
+#include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
 
