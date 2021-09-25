@@ -150,8 +150,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 CLuaFunctionRef funcRef = luaFunctionRef.value();
 
                 CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                    [funcRef, pVectorGraphic, strRawData]
-                    {
+                    [funcRef, pVectorGraphic, strRawData] {
                         return LoadFromData(funcRef.GetLuaVM(), pVectorGraphic, strRawData);
                     },
                     [funcRef](const bool didLoad)
@@ -189,8 +188,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                     std::string     path = pathOrRawData.value();
 
                     CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                        [funcRef, pFile, pVectorGraphic, path]
-                        {
+                        [funcRef, pFile, pVectorGraphic, path] {
                             lua_State* luaVM = funcRef.GetLuaVM();
 
                             if (!luaVM)
@@ -253,8 +251,7 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraph
         CLuaFunctionRef funcRef = luaFunctionRef.value();
 
         CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-            [pVectorGraphic, pXMLNode]
-            {
+            [pVectorGraphic, pXMLNode] {
                 return SetDocument(pVectorGraphic, pXMLNode);
             },
             [funcRef](const bool didLoad)
@@ -293,8 +290,8 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
     {
         CLuaFunctionRef funcRef = luaFunctionRef.value();
 
-        CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>([pVectorGraphic, size]
-            {
+        CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+            [pVectorGraphic, size] {
                 return SetSize(pVectorGraphic, size);
             },
             [funcRef](const bool didLoad)
