@@ -4112,7 +4112,6 @@ void CClientPed::StreamIn(bool bInstantly)
         NotifyCreate();
         return;
     }
-#if 0
     // We need to create now?
     if ( bInstantly )
     {
@@ -4126,7 +4125,6 @@ void CClientPed::StreamIn(bool bInstantly)
         else NotifyUnableToCreate ();
     }
     else
-#endif
     {
         // Request it
         if (!m_pPlayerPed && m_pRequester->Request(static_cast<unsigned short>(m_ulModel), this))
