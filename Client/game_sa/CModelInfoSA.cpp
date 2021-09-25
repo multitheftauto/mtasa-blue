@@ -1555,7 +1555,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         if (!m_pOriginalColModelInterface)
         {
             m_pOriginalColModelInterface = m_pInterface->pColModel;
-            m_originalFlags = m_pInterface->usFlags;
+            m_originalFlags = GetOriginalFlags();
         }
 
         // Apply some low-level hacks
