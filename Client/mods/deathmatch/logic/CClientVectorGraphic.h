@@ -11,7 +11,8 @@
 
 #include "CClientVectorGraphicDisplay.h"
 
-namespace lunasvg {
+namespace lunasvg
+{
     class Document;
 }
 
@@ -29,27 +30,28 @@ public:
 
     bool LoadFromString(std::string strData);
 
-    eClientEntityType    GetType()       const { return CCLIENTVECTORGRAPHIC; }
-    CVectorGraphicItem*  GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
+    eClientEntityType   GetType() const { return CCLIENTVECTORGRAPHIC; }
+    CVectorGraphicItem* GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
 
-    lunasvg::Document*   GetSVGDocument() const { return m_pSVGDocument.get(); }
-    CXMLNode*            GetXMLDocument() const { return m_pXMLDocument; }
+    lunasvg::Document* GetSVGDocument() const { return m_pSVGDocument.get(); }
+    CXMLNode*          GetXMLDocument() const { return m_pXMLDocument; }
 
     CClientVectorGraphicDisplay* GetDisplay() const { return m_pVectorGraphicDisplay.get(); }
 
     bool IsDisplayCleared() const { return m_pVectorGraphicDisplay->IsCleared(); }
-    bool IsDestroyed()      const { return m_bIsDestroyed; }
+    bool IsDestroyed() const { return m_bIsDestroyed; }
 
     bool SetDocument(CXMLNode* node);
+
 private:
-    CResource*                                     m_pResource = nullptr;
-    CClientManager*                                m_pManager;
+    CResource*      m_pResource = nullptr;
+    CClientManager* m_pManager;
 
-    std::unique_ptr<lunasvg::Document>             m_pSVGDocument = nullptr;
-    std::unique_ptr<SXMLString>                    m_pXMLString   = nullptr;
-    CXMLNode*                                      m_pXMLDocument = nullptr;
+    std::unique_ptr<lunasvg::Document> m_pSVGDocument = nullptr;
+    std::unique_ptr<SXMLString>        m_pXMLString = nullptr;
+    CXMLNode*                          m_pXMLDocument = nullptr;
 
-    std::unique_ptr<CClientVectorGraphicDisplay>   m_pVectorGraphicDisplay;
+    std::unique_ptr<CClientVectorGraphicDisplay> m_pVectorGraphicDisplay;
 
-    bool  m_bIsDestroyed = false;
+    bool m_bIsDestroyed = false;
 };

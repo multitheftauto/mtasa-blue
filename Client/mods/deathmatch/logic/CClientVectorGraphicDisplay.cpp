@@ -14,7 +14,8 @@
 
 using namespace lunasvg;
 
-CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID) : CClientDisplay(pDisplayManager, ID)
+CClientVectorGraphicDisplay::CClientVectorGraphicDisplay(CClientDisplayManager* pDisplayManager, CClientVectorGraphic* pVectorGraphic, int ID)
+    : CClientDisplay(pDisplayManager, ID)
 {
     m_pVectorGraphic = pVectorGraphic;
     m_bVisible = true;
@@ -34,7 +35,7 @@ void CClientVectorGraphicDisplay::Render()
         {
             ClearTexture();
         }
-            
+
         return;
     }
     else
@@ -49,8 +50,6 @@ void CClientVectorGraphicDisplay::Render()
         UpdateTexture();
 }
 
-
-
 void CClientVectorGraphicDisplay::UpdateTexture()
 {
     if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
@@ -58,7 +57,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
 
     Document* svgDocument = m_pVectorGraphic->GetSVGDocument();
 
-    if(svgDocument == nullptr)
+    if (svgDocument == nullptr)
         return;
 
     CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
@@ -87,7 +86,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
 
     for (int y = 0; y < bitmap.height(); ++y)
     {
-        memcpy(surfaceData, sourceData, bitmap.width() * 4);  // 4 bytes per pixel
+        memcpy(surfaceData, sourceData, bitmap.width() * 4);            // 4 bytes per pixel
 
         // advance row pointers
         sourceData += bitmap.stride();
@@ -110,7 +109,7 @@ void CClientVectorGraphicDisplay::ClearTexture()
     if (!pVectorGraphicItem)
         return;
 
-    IDirect3DSurface9*  surface = pVectorGraphicItem->m_pD3DRenderTargetSurface;
+    IDirect3DSurface9* surface = pVectorGraphicItem->m_pD3DRenderTargetSurface;
 
     if (!surface)
         return;

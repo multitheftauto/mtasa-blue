@@ -33,6 +33,7 @@ public:
     bool HasUpdated() const { return m_bHasUpdated; }
 
     void Update();
+
 private:
     CClientVectorGraphic* m_pVectorGraphic;
 

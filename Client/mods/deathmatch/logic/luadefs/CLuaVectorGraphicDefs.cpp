@@ -13,7 +13,7 @@
 
 void CLuaVectorGraphicDefs::LoadFunctions()
 {
-   constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"svgCreate", ArgumentParser<SVGCreate>},
         {"svgGetDocumentXML", ArgumentParser<SVGGetDocumentXML>},
         {"svgSetDocumentXML", ArgumentParser<SVGSetDocumentXML>},
@@ -40,7 +40,8 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "SVG");
 }
 
-CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData, std::optional<CLuaFunctionRef> luaFunctionRef)
+CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData,
+                                                       std::optional<CLuaFunctionRef> luaFunctionRef)
 {
     if (size.fX <= 0 || size.fY <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
@@ -51,7 +52,8 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     CLuaMain&  pLuaMain = lua_getownercluamain(luaVM);
     CResource* pParentResource = pLuaMain.GetResource();
 
-    CClientVectorGraphic* pVectorGraphic = g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
+    CClientVectorGraphic* pVectorGraphic =
+        g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
 
     if (!pVectorGraphic)
         return false;
@@ -59,7 +61,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
     if (pathOrRawData.has_value())
     {
         std::string& strRawData = pathOrRawData.value();
-        std::size_t szCharPos = strRawData.find_first_not_of(" \t\n\r\f\v", 0);
+        std::size_t  szCharPos = strRawData.find_first_not_of(" \t\n\r\f\v", 0);
 
         char charAuto = 0;
 
@@ -74,33 +76,31 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
                 CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
                     [funcRef, pVectorGraphic, strRawData] {
+                        lua_State* luaVM = funcRef.GetLuaVM();
+                        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
-                    lua_State* luaVM = funcRef.GetLuaVM();
-                    CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                        if (!pLuaMain || !pVectorGraphic)
+                            return false;
 
-                    if (!pLuaMain || !pVectorGraphic)
-                        return false;
+                        if (!pVectorGraphic->LoadFromString(strRawData))
+                        {
+                            delete pVectorGraphic;
 
-                    if (!pVectorGraphic->LoadFromString(strRawData))
-                    {
-                        delete pVectorGraphic;
+                            m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
+                            return false;
+                        }
 
-                        m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
-                        return false;
-                    }
-
-                    return true;
-
-                },
-                [funcRef](const bool didLoad) {
-                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
-                    if (pLuaMain)
-                    {
-                        CLuaArguments arguments;
-                        arguments.PushBoolean(didLoad);
-                        arguments.Call(pLuaMain, funcRef);
-                    }
-                });
+                        return true;
+                    },
+                    [funcRef](const bool didLoad) {
+                        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
+                        if (pLuaMain)
+                        {
+                            CLuaArguments arguments;
+                            arguments.PushBoolean(didLoad);
+                            arguments.Call(pLuaMain, funcRef);
+                        }
+                    });
             }
             else
             {
@@ -164,17 +164,16 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                             }
 
                             return true;
-
-                    },
-                    [funcRef](const bool isLoaded) {
-                        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
-                        if (pLuaMain)
-                        {
-                            CLuaArguments arguments;
-                            arguments.PushBoolean(isLoaded);
-                            arguments.Call(pLuaMain, funcRef);
-                        }
-                    });
+                        },
+                        [funcRef](const bool isLoaded) {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+                                arguments.PushBoolean(isLoaded);
+                                arguments.Call(pLuaMain, funcRef);
+                            }
+                        });
                 }
                 else
                 {
@@ -213,7 +212,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             }
         }
     }
-  
+
     // Make our element a child of the resource's file root
     pVectorGraphic->SetParent(pParentResource->GetResourceDynamicEntity());
 
@@ -236,25 +235,23 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraph
 
         CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
             [funcRef, pVectorGraphic, pXMLNode] {
+                lua_State* luaVM = funcRef.GetLuaVM();
+                CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
-            lua_State* luaVM = funcRef.GetLuaVM();
-            CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                if (!pLuaMain || !pVectorGraphic)
+                    return false;
 
-            if (!pLuaMain || !pVectorGraphic)
-                return false;
-
-            return pVectorGraphic->SetDocument(pXMLNode);
-
-        },
-        [funcRef](const bool didLoad) {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
-            if (pLuaMain)
-            {
-                CLuaArguments arguments;
-                arguments.PushBoolean(didLoad);
-                arguments.Call(pLuaMain, funcRef);
-            }
-        });
+                return pVectorGraphic->SetDocument(pXMLNode);
+            },
+            [funcRef](const bool didLoad) {
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
+                if (pLuaMain)
+                {
+                    CLuaArguments arguments;
+                    arguments.PushBoolean(didLoad);
+                    arguments.Call(pLuaMain, funcRef);
+                }
+            });
 
         return true;
     }
@@ -272,7 +269,7 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
     if (width <= 0 || height <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
-   if (width > 4096 || height > 4096)
+    if (width > 4096 || height > 4096)
         throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
 
     CVectorGraphicItem* pVectorGraphicItem = pVectorGraphic->GetRenderItem();
@@ -283,30 +280,29 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
 
         CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
             [funcRef, pVectorGraphic, pVectorGraphicItem, width, height] {
+                lua_State* luaVM = funcRef.GetLuaVM();
+                CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
-            lua_State* luaVM = funcRef.GetLuaVM();
-            CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                if (!pLuaMain || !pVectorGraphic)
+                    return false;
 
-            if (!pLuaMain || !pVectorGraphic)
-                return false;
+                pVectorGraphicItem->Resize(*new CVector2D(width, height));
 
-            pVectorGraphicItem->Resize(*new CVector2D(width, height));
+                if ((int)pVectorGraphicItem->m_uiSizeX != width || (int)pVectorGraphicItem->m_uiSizeY != height)
+                    return false;            // failed to resize
 
-            if ((int)pVectorGraphicItem->m_uiSizeX != width || (int)pVectorGraphicItem->m_uiSizeY != height)
-                return false; // failed to resize
-
-            pVectorGraphic->GetDisplay()->Update();
-            return true;
-        },
-        [funcRef](const bool didLoad) {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
-            if (pLuaMain)
-            {
-                CLuaArguments arguments;
-                arguments.PushBoolean(didLoad);
-                arguments.Call(pLuaMain, funcRef);
-            }
-        });
+                pVectorGraphic->GetDisplay()->Update();
+                return true;
+            },
+            [funcRef](const bool didLoad) {
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
+                if (pLuaMain)
+                {
+                    CLuaArguments arguments;
+                    arguments.PushBoolean(didLoad);
+                    arguments.Call(pLuaMain, funcRef);
+                }
+            });
 
         return true;
     }
@@ -314,7 +310,7 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int
     pVectorGraphicItem->Resize(*new CVector2D(width, height));
 
     if ((int)pVectorGraphicItem->m_uiSizeX != width || (int)pVectorGraphicItem->m_uiSizeY != height)
-        return false; // failed to resize
+        return false;            // failed to resize
 
     pVectorGraphic->GetDisplay()->Update();
 

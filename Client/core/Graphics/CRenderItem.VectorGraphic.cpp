@@ -117,7 +117,6 @@ void CVectorGraphicItem::CreateUnderlyingData()
     m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage(m_pD3DRenderTargetSurface);
 }
 
-
 ////////////////////////////////////////////////////////////////
 //
 // CVectorGraphicItem::ReleaseUnderlyingData

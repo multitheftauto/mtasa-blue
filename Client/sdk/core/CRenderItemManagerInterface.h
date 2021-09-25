@@ -167,19 +167,19 @@ public:
     virtual SShaderItemLayers*  GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData) = 0;
     virtual bool                ApplyShaderItemToWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity,
                                                               bool bAppendLayers) = 0;
-    virtual bool                    RemoveShaderItemFromWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity) = 0;
-    virtual void                    RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
-    virtual void                    GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, ushort usModelID) = 0;
-    virtual eDxTestMode             GetTestMode() = 0;
-    virtual void                    SetTestMode(eDxTestMode testMode) = 0;
-    virtual void                    GetDxStatus(SDxStatus& outStatus) = 0;
-    virtual CEffectCloner*          GetEffectCloner() = 0;
-    virtual void                    PreDrawWorld() = 0;
-    virtual void                    SetDepthBufferFormat(ERenderFormat depthBufferFormat) = 0;
-    virtual ERenderFormat           GetDepthBufferFormat() = 0;
-    virtual void                    SaveReadableDepthBuffer() = 0;
-    virtual void                    FlushNonAARenderTarget() = 0;
-    virtual void                    HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
+    virtual bool           RemoveShaderItemFromWorldTexture(CShaderItem* pShaderItem, const SString& strTextureNameMatch, CClientEntityBase* pClientEntity) = 0;
+    virtual void           RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
+    virtual void           GetVisibleTextureNames(std::vector<SString>& outNameList, const SString& strTextureNameMatch, ushort usModelID) = 0;
+    virtual eDxTestMode    GetTestMode() = 0;
+    virtual void           SetTestMode(eDxTestMode testMode) = 0;
+    virtual void           GetDxStatus(SDxStatus& outStatus) = 0;
+    virtual CEffectCloner* GetEffectCloner() = 0;
+    virtual void           PreDrawWorld() = 0;
+    virtual void           SetDepthBufferFormat(ERenderFormat depthBufferFormat) = 0;
+    virtual ERenderFormat  GetDepthBufferFormat() = 0;
+    virtual void           SaveReadableDepthBuffer() = 0;
+    virtual void           FlushNonAARenderTarget() = 0;
+    virtual void           HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                              int Filter) = 0;
 };
 
