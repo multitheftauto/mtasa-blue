@@ -150,8 +150,8 @@ public:
     unsigned int bIsPedDieAnimPlaying : 1;            // is ped die animation finished so can dead now
     unsigned int bStayInSamePlace : 1;                // when set, ped stays put
     unsigned int
-                 bKindaStayInSamePlace : 1;            // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
-    unsigned int bBeingChasedByPolice : 1;             // use nodes for routefind
+        bKindaStayInSamePlace : 1;                    // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
+    unsigned int bBeingChasedByPolice : 1;            // use nodes for routefind
 
     unsigned int bNotAllowedToDuck : 1;              // Is this ped allowed to duck at all?
     unsigned int bCrouchWhenShooting : 1;            // duck behind cars etc
@@ -454,8 +454,8 @@ public:
     virtual int GetCustomMoveAnim();
     bool        IsDoingGangDriveby();
 
-    CPedIKSAInterface* GetPedIKInterface() { return &reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedIK;}
-    void*              GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
-    std::unique_ptr<CPedIK> GetPedIK() {return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
-    static void StaticSetHooks();
+    CPedIKSAInterface*      GetPedIKInterface() { return &reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedIK; }
+    void*                   GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
+    std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
+    static void             StaticSetHooks();
 };

@@ -67,7 +67,6 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     FUNC_AddPedModel                0x4c67a0
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
 
-
 class CBaseModelInfoSAInterface;
 class CModelInfoSAInterface
 {
@@ -77,7 +76,7 @@ public:
     static CBaseModelInfoSAInterface*  GetModelInfo(int index) { return ms_modelInfoPtrs[index]; }
 };
 
-    /**
+/**
  * \todo Fill this class with info from R*
  */
 class CBaseModelInfo_SA_VTBL
@@ -246,8 +245,7 @@ class CVehicleModelVisualInfoSAInterface            // Not sure about this name.
 {
 public:
     CVector vecDummies[15];
-    char m_sUpgrade[18];
-
+    char    m_sUpgrade[18];
 };
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -274,7 +272,7 @@ public:
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
     char                                pad3[464];
-    char                                pDirtMaterial[64]; // *RwMaterial
+    char                                pDirtMaterial[64];            // *RwMaterial
     char                                pad4[64];
     char                                primColors[8];
     char                                secondColors[8];
@@ -424,10 +422,10 @@ public:
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void MakePedModel(char* szTexture);
-    void MakeObjectModel(ushort usBaseModelID);
-    void MakeVehicleAutomobile(ushort usBaseModelID);
-    void DeallocateModel(void);
+    void         MakePedModel(char* szTexture);
+    void         MakeObjectModel(ushort usBaseModelID);
+    void         MakeVehicleAutomobile(ushort usBaseModelID);
+    void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }

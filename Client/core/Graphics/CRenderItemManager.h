@@ -22,14 +22,14 @@ public:
     ~CRenderItemManager();
 
     // CRenderItemManagerInterface
-    virtual void          DoPulse();
-    virtual CDxFontItem*  CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
-    virtual CGuiFontItem* CreateGuiFont(const SString& strFullFilePath, const SString& strFontName, uint uiSize);
-    virtual CTextureItem* CreateTexture(const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
-                                        uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
-                                        ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
-    virtual CShaderItem*  CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
-                                       bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
+    virtual void               DoPulse();
+    virtual CDxFontItem*       CreateDxFont(const SString& strFullFilePath, uint uiSize, bool bBold, DWORD ulQuality = DEFAULT_QUALITY);
+    virtual CGuiFontItem*      CreateGuiFont(const SString& strFullFilePath, const SString& strFontName, uint uiSize);
+    virtual CTextureItem*      CreateTexture(const SString& strFullFilePath, const CPixels* pPixels, bool bMipMaps = true, uint uiSizeX = RDEFAULT,
+                                             uint uiSizeY = RDEFAULT, ERenderFormat format = RFORMAT_UNKNOWN, ETextureAddress textureAddress = TADDRESS_WRAP,
+                                             ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
+    virtual CShaderItem*       CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
+                                            float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
     virtual CRenderTargetItem* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false);
     virtual CScreenSourceItem* CreateScreenSource(uint uiSizeX, uint uiSizeY);
     virtual CWebBrowserItem*   CreateWebBrowser(uint uiSizeX, uint uiSizeY);

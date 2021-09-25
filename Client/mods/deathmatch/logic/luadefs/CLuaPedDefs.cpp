@@ -1022,8 +1022,7 @@ bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entit
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::variant<bool, std::array<std::array<float, 4>, 4>>
-CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
@@ -2370,7 +2369,7 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
 bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
 {
     CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
-    bool bPassenger = bOptPassenger.value_or(false);
+    bool            bPassenger = bOptPassenger.value_or(false);
     return pPed->EnterVehicle(pVehicle, bPassenger);
 }
 
