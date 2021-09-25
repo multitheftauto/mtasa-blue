@@ -13,7 +13,6 @@
 #include <deque>
 #include "SharedUtil.IntTypes.h"
 
-
 template <class T>
 class CDuplicateLineFilter
 {

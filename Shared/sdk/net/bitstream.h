@@ -225,7 +225,7 @@ public:
     }
 
     // Write a string (incl. ushort size header)
-    template<typename SizeType = unsigned short>
+    template <typename SizeType = unsigned short>
     void WriteString(const std::string& value)
     {
         // Write the length
@@ -237,7 +237,7 @@ public:
     }
 
     // Read a string (incl. ushort size header)
-    template<typename SizeType = unsigned short>
+    template <typename SizeType = unsigned short>
     bool ReadString(std::string& result)
     {
         result = "";
@@ -468,7 +468,7 @@ enum class eBitStreamVersion : unsigned short
     // Implement messageType parameter to onClientChatMessage (#1020)
     // 2021-05-15 0x74
     OnClientChatMessage_MessageType,
-    
+
     // Add serverside event "onPlayerResourceStart" (#2150)
     // 2021-08-30 0x75
     OnPlayerResourceStart,
@@ -489,12 +489,10 @@ protected:
     virtual ~NetBitStreamInterface() { DEBUG_DESTROY_COUNT("NetBitStreamInterface"); }
 
 public:
-    virtual operator NetBitStreamInterface&() { return *this; }
+    virtual                operator NetBitStreamInterface&() { return *this; }
     virtual unsigned short Version() const = 0;
 
-    bool Can(eBitStreamVersion query) {
-        return static_cast<eBitStreamVersion>(Version()) >= query;
-    }
+    bool Can(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(Version()) >= query; }
 };
 
 // Interface for all sync structures
