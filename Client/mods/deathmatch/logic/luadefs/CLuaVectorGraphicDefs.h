@@ -18,7 +18,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    static CClientVectorGraphic* SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData, std::optional<CLuaFunctionRef> funcRef);
+    static CClientVectorGraphic* SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData,
+                                           std::optional<CLuaFunctionRef> luaFunctionRef);
 
     static CXMLNode* SVGGetDocumentXML(CClientVectorGraphic* pVectorGraphic);
     static bool      SVGSetDocumentXML(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode, std::optional<CLuaFunctionRef> luaFunctionRef);
