@@ -30,7 +30,7 @@ SString& SString::vFormat(const char* szFormat, va_list vl)
     {
         iRequiredCapacity = _vscprintf(szFormat, vlLocal);
     }
-    __except (1 /* EXCEPTION_EXECUTE_HANDLER */ )
+    __except (1 /* EXCEPTION_EXECUTE_HANDLER */)
     {
         // Clean up and indicate problem
         OnFormatException(szFormat);

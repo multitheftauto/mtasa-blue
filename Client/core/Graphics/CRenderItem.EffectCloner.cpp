@@ -31,13 +31,10 @@ CEffectCloner::CEffectCloner(CRenderItemManager* pManager)
 //
 //
 ////////////////////////////////////////////////////////////////
-CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-    bool bDebug, const EffectMacroList& macros)
+CEffectWrap* CEffectCloner::CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
+                                            const EffectMacroList& macros)
 {
-    SEffectInvariant invariant{
-        ConformPathForSorting(strFile),
-        macros
-    };
+    SEffectInvariant invariant{ConformPathForSorting(strFile), macros};
 
     // Do we have a match with the initial path
     CEffectTemplate* pEffectTemplate = MapFindRef(m_ValidMap, invariant);

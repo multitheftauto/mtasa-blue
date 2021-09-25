@@ -1106,6 +1106,8 @@ bool CResource::CreateVM(bool bEnableOOP)
         return false;
 
     m_pVM->SetScriptName(m_strResourceName.c_str());
+    m_pVM->LoadEmbeddedScripts();
+    m_pVM->RegisterModuleFunctions();
     return true;
 }
 
@@ -1155,6 +1157,8 @@ void CResource::DisplayInfo()            // duplicated for HTML
 
             for (CResource* pDependent : m_Dependents)
                 CLogger::LogPrintf("  %s\n", pDependent->GetName().c_str());
+
+            break;
         }
         case EResourceState::Stopping:
         {

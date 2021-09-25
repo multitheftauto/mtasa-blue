@@ -14,7 +14,6 @@
 #include <game/CModelInfo.h>
 #include <game/Common.h>
 
-#include "CColModelSA.h"
 #include "CRenderWareSA.h"
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
@@ -64,10 +63,8 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
 #define     FUNC_CVehicleStructure_delete   0x4C9580
 
-#define     FUNC_SetColModel                0x4C4BC0
 #define     FUNC_AddPedModel                0x4c67a0
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
-
 
 class CBaseModelInfoSAInterface;
 class CModelInfoSAInterface
@@ -78,7 +75,7 @@ public:
     static CBaseModelInfoSAInterface*  GetModelInfo(int index) { return ms_modelInfoPtrs[index]; }
 };
 
-    /**
+/**
  * \todo Fill this class with info from R*
  */
 class CBaseModelInfo_SA_VTBL
@@ -258,8 +255,7 @@ class CVehicleModelVisualInfoSAInterface            // Not sure about this name.
 {
 public:
     CVector vecDummies[15];
-    char m_sUpgrade[18];
-
+    char    m_sUpgrade[18];
 };
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -286,7 +282,7 @@ public:
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
     char                                pad3[464];
-    char                                pDirtMaterial[64]; // *RwMaterial
+    char                                pDirtMaterial[64];            // *RwMaterial
     char                                pad4[64];
     char                                primColors[8];
     char                                secondColors[8];
@@ -318,6 +314,7 @@ protected:
     DWORD                                                                        m_dwPendingInterfaceRef;
     CColModel*                                                                   m_pCustomColModel;
     CColModelSAInterface*                                                        m_pOriginalColModelInterface;
+    std::uint16_t                                                                m_originalFlags = 0;
     RpClump*                                                                     m_pCustomClump;
     static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
@@ -332,7 +329,6 @@ protected:
 
 public:
     CModelInfoSA();
-    CModelInfoSA(DWORD dwModelID);
 
     CBaseModelInfoSAInterface* GetInterface();
     CPedModelInfoSAInterface*  GetPedModelInfoInterface() { return reinterpret_cast<CPedModelInfoSAInterface*>(GetInterface()); }
@@ -426,21 +422,27 @@ public:
     void SetVoice(const char* szVoiceType, const char* szVoice);
 
     // Custom collision related functions
-    void SetCustomModel(RpClump* pClump);
-    void RestoreOriginalModel();
-    void SetColModel(CColModel* pColModel);
-    void RestoreColModel();
-    void MakeCustomModel();
+    void SetCustomModel(RpClump* pClump) override;
+    void RestoreOriginalModel() override;
+    void SetColModel(CColModel* pColModel) override;
+    void RestoreColModel() override;
+    void MakeCustomModel() override;
+
+    // Increases the collision slot reference counter for the original collision model
+    void AddColRef() override;
+
+    // Decreases the collision slot reference counter for the original collision model
+    void RemoveColRef() override;
 
     void SetModelID(DWORD dwModelID) { m_dwModelID = dwModelID; }
 
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void MakePedModel(char* szTexture);
-    void MakeObjectModel(ushort usBaseModelID);
-    void MakeVehicleAutomobile(ushort usBaseModelID);
-    void DeallocateModel(void);
+    void         MakePedModel(char* szTexture);
+    void         MakeObjectModel(ushort usBaseModelID);
+    void         MakeVehicleAutomobile(ushort usBaseModelID);
+    void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }

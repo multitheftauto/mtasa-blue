@@ -1096,7 +1096,7 @@ bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break; // This should not be possible, but you never know
+                break;            // This should not be possible, but you never know
         }
 
         return false;
@@ -1307,10 +1307,13 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     unsigned char ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
 
-    CLuaArguments Arguments;
-    Arguments.PushNumber(ucOldInterior);
-    Arguments.PushNumber(ucInterior);
-    CallEvent("onClientElementInteriorChange", Arguments, true);
+    if (ucOldInterior != ucInterior)
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(ucOldInterior);
+        Arguments.PushNumber(ucInterior);
+        CallEvent("onClientElementInteriorChange", Arguments, true);
+    }
 }
 
 bool CClientEntity::IsOnScreen()

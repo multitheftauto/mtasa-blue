@@ -40,7 +40,6 @@ struct SAclRequest;
 #include "CBox.h"
 #include "CMatrix.h"
 #include "net/Packets.h"
-#include "net/rpc_enums.h"
 #include "Enums.h"
 #include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
@@ -96,7 +95,6 @@ struct SAclRequest;
 #include "packets/CResourceStopPacket.h"
 #include "packets/CResourceClientScriptsPacket.h"
 #include "packets/CReturnSyncPacket.h"
-#include "packets/CServerRPCControlPacket.h"
 #include "packets/CServerTextItemPacket.h"
 #include "packets/CUpdateInfoPacket.h"
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"
@@ -114,6 +112,7 @@ struct SAclRequest;
 #include "packets/CVoiceEndPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CDiscordJoinPacket.h"
+#include "packets/CPlayerResourceStartPacket.h"
 
 // has to be included early to prevent "unknown type name 'CRemoteCall'" in CLuaFunctionParser.h
 #include "CRemoteCalls.h"
@@ -159,7 +158,6 @@ struct SAclRequest;
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
 #include "lua/CLuaTimer.h"
-#include "lua/CLuaFunctionDefs.h"
 #include "lua/CLuaModuleManager.h"
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"

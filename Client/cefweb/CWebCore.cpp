@@ -11,10 +11,10 @@
 #include "CWebCore.h"
 #include "CWebView.h"
 #include "CWebsiteRequests.h"
-#include <cef3/include/cef_app.h>
-#include <cef3/include/cef_browser.h>
-#include <cef3/include/cef_sandbox_win.h>
-#include <cef3/include/cef_parser.h>
+#include <cef3/cef/include/cef_app.h>
+#include <cef3/cef/include/cef_browser.h>
+#include <cef3/cef/include/cef_sandbox_win.h>
+#include <cef3/cef/include/cef_parser.h>
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
 
@@ -72,6 +72,7 @@ bool CWebCore::Initialise()
     CefString(&settings.browser_subprocess_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\CEFLauncher_d.exe")));
 #endif
     CefString(&settings.resources_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF")));
+    CefString(&settings.cache_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cache")));
     CefString(&settings.locales_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\locales")));
     CefString(&settings.log_file).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cefdebug.txt")));
 #ifdef MTA_DEBUG
@@ -108,8 +109,8 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
     if (pWebView)
     {
         // Ensure that no attached events or tasks are in the queue
-        RemoveWebViewEvents(pWebView);
-        RemoveWebViewTasks(pWebView);
+        RemoveWebViewEvents(pWebView.get());
+        RemoveWebViewTasks(pWebView.get());
 
         m_WebViews.remove(pWebView);
         // pWebView->Release(); // Do not release since other references get corrupted then
@@ -253,7 +254,8 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com", "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
+    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
+                                          "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
     for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
     {
@@ -328,9 +330,9 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
     if (bAddDynamic)
     {
         // Hardcoded whitelist
-        static SString whitelist[] = {
-            "google.com",         "youtube.com", "www.youtube-nocookie.com", "vimeo.com",           "player.vimeo.com", "code.jquery.com", "mtasa.com",
-            "multitheftauto.com", "mtavc.com",   "www.googleapis.com",       "ajax.googleapis.com"};
+        static SString whitelist[] = {"google.com",         "youtube.com", "www.youtube-nocookie.com", "vimeo.com", "player.vimeo.com",
+                                      "code.jquery.com",    "mtasa.com",   "multitheftauto.com",       "mtavc.com", "www.googleapis.com",
+                                      "ajax.googleapis.com"};
 
         // Hardcoded blacklist
         static SString blacklist[] = {"nobrain.dk"};
@@ -498,9 +500,9 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     // Alt-Gr check
     if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU))
     {
-        HKL current_layout = ::GetKeyboardLayout(0);
+        HKL   current_layout = ::GetKeyboardLayout(0);
         SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
-        if (((scan_res >> 8) & 0xFF) == (2 | 4))
+        if ((HIBYTE(scan_res) & (2 | 4)) == (2 | 4))
         {
             keyEvent.modifiers &= ~(EVENTFLAG_CONTROL_DOWN | EVENTFLAG_ALT_DOWN);
             keyEvent.modifiers |= EVENTFLAG_ALTGR_DOWN;

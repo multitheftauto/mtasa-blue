@@ -142,7 +142,7 @@ public:
     // Auto update of min client check
     void ProcessMinClientVersion(CBitStream& bitStream)
     {
-        int     iForceSetting = 0;
+        int         iForceSetting = 0;
         CMtaVersion strResultMinClientVersion;
 
         bitStream->Read(iForceSetting);

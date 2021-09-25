@@ -215,7 +215,7 @@ bool CPlayer::UnsubscribeElementData(CElement* pElement)
 {
     bool erased = false;
 
-    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end(); )
+    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end();)
     {
         if (it->first == pElement)
         {
@@ -307,7 +307,7 @@ uint CPlayer::Send(const CPacket& Packet)
 
 void CPlayer::SendEcho(const char* szEcho)
 {
-    Send(CChatEchoPacket(szEcho, CHATCOLOR_MESSAGE));
+    Send(CChatEchoPacket(szEcho, CHATCOLOR_MESSAGE, false, MESSAGE_TYPE_INTERNAL));
 }
 
 void CPlayer::SendConsole(const char* szEcho)

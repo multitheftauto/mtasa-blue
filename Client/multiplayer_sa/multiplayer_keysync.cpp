@@ -94,7 +94,7 @@ void         PostContextSwitch()
     MemPutFast<BYTE>(0x50BFB1, 0x8B);
     MemPutFast<BYTE>(0x50BFB2, 0x44);
 
-    // This is so weapon clicks and similar don't play for us when done remotly
+    // This is so weapon clicks and similar don't play for us when done remotely
     MemPutFast<BYTE>(0x60F273, 0x75);
     MemPutFast<BYTE>(0x60F260, 0x74);
     MemPutFast<BYTE>(0x60F261, 0x13);
@@ -346,7 +346,7 @@ void SwitchContext(CPed* thePed)
                     //*(BYTE *)0x73811C = 0x90;
                     //*(BYTE *)0x73811D = 0xE9;
 
-                    // This is so weapon clicks and similar don't play for us when done remotly
+                    // This is so weapon clicks and similar don't play for us when done remotely
                     MemPutFast<BYTE>(0x60F273, 0xEB);
                     MemPutFast<BYTE>(0x60F260, 0x90);
                     MemPutFast<BYTE>(0x60F261, 0x90);

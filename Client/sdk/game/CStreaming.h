@@ -42,10 +42,13 @@ static_assert(sizeof(CStreamingInfo) == 0x14, "Invalid size for CStreamingInfo")
 class CStreaming
 {
 public:
-    virtual void RequestModel(DWORD dwModelID, DWORD dwFlags) = 0;
-    virtual void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL) = 0;
-    virtual BOOL HasModelLoaded(DWORD dwModelID) = 0;
-    virtual void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
+    virtual void            RequestModel(DWORD dwModelID, DWORD dwFlags) = 0;
+    virtual void            RemoveModel(std::uint32_t model) = 0;
+    virtual void            LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL) = 0;
+    virtual BOOL            HasModelLoaded(DWORD dwModelID) = 0;
+    virtual void            RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
     virtual CStreamingInfo* GetStreamingInfoFromModelId(uint32 id) = 0;
-    virtual void ReinitStreaming() = 0;
+    virtual void            ReinitStreaming() = 0;
+    virtual void            MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
+    virtual std::uint32_t   GetMemoryUsed() const = 0;
 };

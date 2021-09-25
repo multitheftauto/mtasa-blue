@@ -97,7 +97,8 @@ void CHandlingRPCs::SetVehicleHandlingProperty(CClientEntity* pSource, NetBitStr
                 bReadSuspension = pModelInfo->IsCar() || pModelInfo->IsMonsterTruck();
 
             // Temporary storage for reading out data
-            union {
+            union
+            {
                 unsigned char ucChar;
                 unsigned int  uiInt;
                 float         fFloat;

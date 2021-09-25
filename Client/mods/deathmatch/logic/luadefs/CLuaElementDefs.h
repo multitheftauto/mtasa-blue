@@ -40,8 +40,8 @@ public:
     LUA_DECLARE(IsElementWithinColShape);
     LUA_DECLARE(IsElementWithinMarker);
     LUA_DECLARE(GetElementsWithinColShape);
-    static CClientEntityResult GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
-        std::optional<unsigned short> interior, std::optional<unsigned short> dimension);
+    static CClientEntityResult GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
+                                                      std::optional<unsigned short> dimension);
     LUA_DECLARE(GetElementDimension);
     LUA_DECLARE(GetElementZoneName);
     LUA_DECLARE_OOP(GetElementBoundingBox);
