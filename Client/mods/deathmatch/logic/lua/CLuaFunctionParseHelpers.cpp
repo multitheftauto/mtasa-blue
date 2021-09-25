@@ -667,25 +667,6 @@ ADD_ENUM(eClientModelType::OBJECT, "object")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
-IMPLEMENT_ENUM_CLASS_BEGIN(eModelIdeFlag)
-ADD_ENUM(eModelIdeFlag::IS_ROAD, "is_road")
-ADD_ENUM(eModelIdeFlag::DRAW_LAST, "draw_last")
-ADD_ENUM(eModelIdeFlag::ADDITIVE, "additive")
-ADD_ENUM(eModelIdeFlag::IGNORE_LIGHTING, "ignore_lighting")
-ADD_ENUM(eModelIdeFlag::NO_ZBUFFER_WRITE, "no_zbuffer_write")
-ADD_ENUM(eModelIdeFlag::DONT_RECEIVE_SHADOWS, "dont_receive_shadows")
-ADD_ENUM(eModelIdeFlag::IS_GLASS_TYPE_1, "is_glass_type_1")
-ADD_ENUM(eModelIdeFlag::IS_GLASS_TYPE_2, "is_glass_type_2")
-ADD_ENUM(eModelIdeFlag::IS_GARAGE_DOOR, "is_garage_door")
-ADD_ENUM(eModelIdeFlag::IS_DAMAGABLE, "is_damagable")
-ADD_ENUM(eModelIdeFlag::IS_TREE, "is_tree")
-ADD_ENUM(eModelIdeFlag::IS_PALM, "is_palm")
-ADD_ENUM(eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER, "does_not_collide_with_flyer")
-ADD_ENUM(eModelIdeFlag::IS_TAG, "is_tag")
-ADD_ENUM(eModelIdeFlag::DISABLE_BACKFACE_CULLING, "disable_backface_culling")
-ADD_ENUM(eModelIdeFlag::IS_BREAKABLE_STATUE, "is_breakable_statue")
-ADD_ENUM(eModelIdeFlag::IS_CRANE, "is_crane")
-IMPLEMENT_ENUM_CLASS_END("model-ide-flag")
 // Sound effects
 IMPLEMENT_ENUM_BEGIN(eSoundEffectType)
 ADD_ENUM(BASS_FX_DX8_CHORUS, "chorus")
@@ -796,6 +777,7 @@ ADD_ENUM(eModelIdeFlag::DISABLE_BACKFACE_CULLING, "disable_backface_culling")
 ADD_ENUM(eModelIdeFlag::IS_BREAKABLE_STATUE, "is_breakable_statue")
 ADD_ENUM(eModelIdeFlag::IS_CRANE, "is_crane")
 IMPLEMENT_ENUM_CLASS_END("model-ide-flag")
+
 //
 // Get best guess at name of userdata type
 //

@@ -1555,7 +1555,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         if (!m_pOriginalColModelInterface)
         {
             m_pOriginalColModelInterface = m_pInterface->pColModel;
-            m_originalFlags = m_pInterface->flags;
+            m_originalFlags = m_pInterface->usFlags;
         }
 
         // Apply some low-level hacks
@@ -1596,7 +1596,7 @@ void CModelInfoSA::RestoreColModel()
         CBaseModelInfo_SetColModel(m_pInterface, m_pOriginalColModelInterface, true);
         CColAccel_addCacheCol(m_dwModelID, m_pInterface->pColModel);
 
-        m_pInterface->flags = m_originalFlags;
+        m_pInterface->usFlags = m_originalFlags;
 
         // Force the game to load the original collision model data, if we applied a custom collision model before
         // there was any object/building, which would've provoked CColStore to request it.

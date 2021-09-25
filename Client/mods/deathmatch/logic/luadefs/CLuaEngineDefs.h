@@ -63,7 +63,7 @@ public:
     static bool EngineGetModelFlag(uint uiModelID, eModelIdeFlag eFlag);
     static bool EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool state);
     static bool EngineResetModelFlags(uint uiModelID);
-    static bool                                            EngineRestreamWorld(lua_State* const luaVM);
+    static bool EngineRestreamWorld();
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 private:
