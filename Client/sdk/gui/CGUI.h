@@ -28,7 +28,7 @@ public:
 
     virtual bool ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 
-    virtual CGUIWindow* CreateGUIWindow(CVector2D pos, CVector2D size, std::string title) = 0;
+    virtual CGUIWindow* CreateGUIWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title) = 0;
 
     virtual void OnElementDestroy(CGUIElement* element) = 0;
     

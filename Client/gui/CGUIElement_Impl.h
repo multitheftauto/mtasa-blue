@@ -16,7 +16,7 @@ class CGUI_Impl;
 class CGUIElement_Impl : public CGUIElement
 {
 public:
-    CGUIElement_Impl();
+    CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative);
     ~CGUIElement_Impl();
 
     void Begin();
@@ -25,25 +25,43 @@ public:
     void SetPosition(CVector2D pos);
     void SetSize(CVector2D size);
 
-    CVector2D GetInitialPosition() const;
-    CVector2D GetInitialSize() const;
+    void         SetParent(CGUIElement* parent);
+    CGUIElement* GetParent();
+
+    void AddChild(CGUIElement* child);
+    void RemoveChild(CGUIElement* child);
+
+    std::list<CGUIElement*> GetChildren();
+
+    std::string GetType();
 
     void ProcessPosition();
     void ProcessSize();
 
+    void SetFrameEnabled(bool state);
+    bool GetFrameEnabled();
+
     bool IsDeleted();
 
 protected:
-    CGUI_Impl* m_pManager = nullptr;
+    CGUI_Impl*   m_pManager = nullptr;
+    CGUIElement* m_pParent = nullptr;
+
+    std::list<CGUIElement*> m_children;
 
     std::string m_title = {};
     std::string m_uid;
 
+    std::string m_type = "element";
+
     CVector2D m_initialPosition = {};
     CVector2D m_initialSize = {};
 
-    CVector2D m_pendingPosition = {};
-    CVector2D m_pendingSize = {};
+    bool m_relative;
+    bool m_frame;
+
+    CVector2D m_position = {};
+    CVector2D m_size = {};
 
     bool m_initialized = false;
     bool m_deleted = false;

@@ -36,11 +36,16 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
     ImGui_ImplDX9_Init(m_pDevice);
 
     // Windows test
-    CGUIWindow* window = CreateGUIWindow(CVector2D(0, 0), CVector2D(500, 500), "My Window");
-    window->SetPosition(CVector2D(250, 250));
+    CGUIWindow* window = CreateGUIWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
 
-    CGUIWindow* window2 = CreateGUIWindow(CVector2D(0, 0), CVector2D(300, 250), "My Window");
-    window2->SetPosition(CVector2D(125, 125));
+    CGUIWindow* window2 = CreateGUIWindow(CVector2D(50, 50), CVector2D(150, 150), window, false, "Child Window");
+
+    /* Tested functions */
+
+    //window2->SetFrameEnabled(false);
+    //window2->SetPosition(CVector2D(75, 125));
+    //window2->SetSize(CVector2D(200, 200));
+    //window2->SetParent(nullptr);
 }
 
 CGUI_Impl::~CGUI_Impl()
@@ -81,26 +86,28 @@ void CGUI_Impl::Draw()
 
     ImGui::NewFrame();
 
-    // Redraw the changed elements
+    // Draw ImGui elements
     if (!m_guiElements.empty())
     {
-        list<CGUIElement*>::const_iterator iter = m_guiElements.begin();
-        for (; iter != m_guiElements.end(); iter++)
+        list<CGUIElement*>::const_iterator e = m_guiElements.begin();
+        for (; e != m_guiElements.end(); e++)
         {
-            CGUIElement* elem = (*iter);
+            CGUIElement* elem = (*e);
 
-            if (!elem->IsDeleted())
+            if (elem->GetParent() == nullptr && !elem->IsDeleted())
             {
-                CVector2D pos = elem->GetInitialPosition();
-
-                // Set initial position (runs once only)
-                ImGui::SetNextWindowPos(ImVec2(elem->GetInitialPosition().fX, elem->GetInitialPosition().fY), ImGuiCond_Appearing);
-                ImGui::SetNextWindowSize(ImVec2(elem->GetInitialSize().fX, elem->GetInitialSize().fY), ImGuiCond_Appearing);
-
-                elem->ProcessPosition();
-                elem->ProcessSize();
-
                 elem->Begin();
+
+                list<CGUIElement*> children = elem->GetChildren();
+                list<CGUIElement*>::const_iterator c = children.begin();
+
+                for (; c != children.end(); c++)
+                {
+                    CGUIElement* child = (*c);
+
+                    child->Begin();
+                    child->End();
+                }
 
                 elem->End();
             }
@@ -129,9 +136,9 @@ void CGUI_Impl::OnElementDestroy(CGUIElement* element)
     m_guiElements.remove(element);
 }
 
-CGUIWindow* CGUI_Impl::CreateGUIWindow(CVector2D pos, CVector2D size, std::string title)
+CGUIWindow* CGUI_Impl::CreateGUIWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
 {
-    CGUIWindow* element = new CGUIWindow_Impl(this, nullptr, pos, size, title);
+    CGUIWindow* element = new CGUIWindow_Impl(this, parent, pos, size, relative, title);
 
     if (!element)
         return nullptr;

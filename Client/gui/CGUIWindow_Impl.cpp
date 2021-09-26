@@ -9,14 +9,12 @@
 
 #include "StdInc.h"
 
-CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, std::string title)
+CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative, std::string title) : CGUIElement_Impl(pGUI, pParent, pos, size, relative)
 {
-    m_pManager = pGUI;
-
-    m_initialPosition = pos;
-    m_initialSize = size;
-
+    m_type = "window";
     m_title = title;
+
+    SetFrameEnabled(true);
 }
 
 void CGUIWindow_Impl::Begin()

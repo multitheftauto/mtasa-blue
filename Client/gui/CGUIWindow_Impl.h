@@ -15,7 +15,7 @@
 class CGUIWindow_Impl : public CGUIWindow, public CGUIElement_Impl
 {
 public:
-    CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, std::string title);
+    CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative, std::string title);
 
     void Begin();
     void End();

@@ -27,7 +27,7 @@ public:
     void SetHookedWindow(HWND window);
     HWND GetHookedWindow() const { return m_hookedWindow; }
 
-    CGUIWindow* CreateGUIWindow(CVector2D pos, CVector2D size, std::string title);
+    CGUIWindow* CreateGUIWindow(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false, std::string title = "MTA Window");
 
     bool ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
