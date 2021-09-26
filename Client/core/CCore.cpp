@@ -1329,6 +1329,8 @@ void CCore::RegisterCommands()
     m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
+
+    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
 void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)
