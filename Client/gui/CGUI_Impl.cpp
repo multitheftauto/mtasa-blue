@@ -41,7 +41,6 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
     CGUIWindow* window2 = CreateGUIWindow(CVector2D(50, 50), CVector2D(150, 150), window, false, "Child Window");
 
     /* Tested functions */
-
     //window2->SetFrameEnabled(false);
     //window2->SetPosition(CVector2D(75, 125));
     //window2->SetSize(CVector2D(200, 200));

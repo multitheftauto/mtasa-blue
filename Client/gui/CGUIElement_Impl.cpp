@@ -16,8 +16,8 @@ CGUIElement_Impl::CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVecto
 {
     m_pManager = pGUI;
 
-    m_initialPosition = pos;
-    m_initialSize = size;
+    SetPosition(pos);
+    SetSize(size);
 
     SetParent(pParent);
 
@@ -54,9 +54,6 @@ void CGUIElement_Impl::SetParent(CGUIElement* parent)
     if (parent)
     {
         parent->AddChild(this);
-
-        SetPosition(m_initialPosition);
-        SetSize(m_initialSize);
     }
 }
 
@@ -119,8 +116,6 @@ void CGUIElement_Impl::End()
         ImGui::End();
     else
         ImGui::EndChild();
-
-    m_initialized = true;
 }
 
 std::string CGUIElement_Impl::GetType()
@@ -142,12 +137,6 @@ void CGUIElement_Impl::SetSize(CVector2D size)
 
 void CGUIElement_Impl::ProcessPosition()
 {
-    if (!m_initialized)
-    {
-        ImGui::SetNextWindowPos(ImVec2(m_initialPosition.fX, m_initialPosition.fY), ImGuiCond_Always);
-        return;
-    }
-
     if (m_updatePosition)
         ImGui::SetNextWindowPos(ImVec2(m_position.fX, m_position.fY));
 
@@ -156,12 +145,6 @@ void CGUIElement_Impl::ProcessPosition()
 
 void CGUIElement_Impl::ProcessSize()
 {
-    if (!m_initialized)
-    {
-        ImGui::SetNextWindowSize(ImVec2(m_initialSize.fX, m_initialSize.fY), ImGuiCond_Always);
-        return;
-    }
-
     if (m_updateSize)
         ImGui::SetNextWindowSize(ImVec2(m_size.fX, m_size.fY));
 

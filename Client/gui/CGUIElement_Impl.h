@@ -54,16 +54,12 @@ protected:
 
     std::string m_type = "element";
 
-    CVector2D m_initialPosition = {};
-    CVector2D m_initialSize = {};
-
     bool m_relative;
     bool m_frame;
 
     CVector2D m_position = {};
     CVector2D m_size = {};
 
-    bool m_initialized = false;
     bool m_deleted = false;
 
     bool m_updatePosition = false;
