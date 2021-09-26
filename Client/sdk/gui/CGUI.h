@@ -1,9 +1,7 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/gui/CGUI.h
- *  PURPOSE:     Graphical User Interface module interface
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -11,9 +9,11 @@
 
 #pragma once
 
-class CGUI;
+#include "CGUIElement.h"
+#include "CGUIWindow.h"
 
 #include <../Shared/sdk/CRect2D.h>
+#include <../Shared/sdk/CVector2D.h>
 
 class CGUI
 {
@@ -25,4 +25,11 @@ public:
 
     virtual void SetHookedWindow(HWND window) = 0;
     virtual HWND GetHookedWindow() const = 0;
+
+    virtual bool ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+
+    virtual CGUIWindow* CreateGUIWindow(CVector2D pos, CVector2D size, std::string title) = 0;
+
+    virtual void OnElementDestroy(CGUIElement* element) = 0;
+    
 };

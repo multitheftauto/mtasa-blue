@@ -1,9 +1,7 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        gui/CGUI_Impl.h
- *  PURPOSE:     Graphical User Interface module class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -29,10 +27,17 @@ public:
     void SetHookedWindow(HWND window);
     HWND GetHookedWindow() const { return m_hookedWindow; }
 
-private:
+    CGUIWindow* CreateGUIWindow(CVector2D pos, CVector2D size, std::string title);
 
+    bool ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+    void OnElementDestroy(CGUIElement* element);
+
+private:
     IDirect3DDevice9* m_pDevice;
-    HWND m_hookedWindow;
+    HWND              m_hookedWindow;
+
+    std::list<CGUIElement*> m_guiElements;
 
     bool m_bShowDemoWindow = true;
     bool m_bShowAnotherWindow = false;

@@ -15,5 +15,8 @@
 
 #include "SharedUtil.h"
 #include "CRect2D.h"
+#include "CVector2D.h"
 
 #include "CGUI_Impl.h"
+#include "CGUIElement_Impl.h"
+#include "CGUIWindow_Impl.h"
