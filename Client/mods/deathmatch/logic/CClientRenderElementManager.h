@@ -17,7 +17,6 @@ class CClientShader;
 class CClientRenderTarget;
 class CClientScreenSource;
 class CClientWebBrowser;
-class CClientVectorGraphic;
 
 class CClientRenderElementManager
 {
@@ -32,12 +31,11 @@ public:
                                   ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
     CClientShader* CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                 bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
-    CClientRenderTarget*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel);
-    CClientScreenSource*  CreateScreenSource(uint uiSizeX, uint uiSizeY);
-    CClientWebBrowser*    CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
-    CClientVectorGraphic* CreateVectorGraphic(uint width, uint height);
-    CClientTexture*       FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
-    void                  Remove(CClientRenderElement* pElement);
+    CClientRenderTarget* CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel);
+    CClientScreenSource* CreateScreenSource(uint uiSizeX, uint uiSizeY);
+    CClientWebBrowser*   CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
+    CClientTexture*      FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
+    void                 Remove(CClientRenderElement* pElement);
 
     uint GetDxFontCount() { return m_uiStatsDxFontCount; }
     uint GetGuiFontCount() { return m_uiStatsGuiFontCount; }
@@ -46,7 +44,6 @@ public:
     uint GetRenderTargetCount() { return m_uiStatsRenderTargetCount; }
     uint GetScreenSourceCount() { return m_uiStatsScreenSourceCount; }
     uint GetWebBrowserCount() { return m_uiStatsWebBrowserCount; }
-    uint GetVectorGraphicCount() { return m_uiStatsVectorGraphicCount; }
 
 protected:
     CClientManager*                               m_pClientManager;
@@ -60,5 +57,4 @@ protected:
     uint                                          m_uiStatsRenderTargetCount;
     uint                                          m_uiStatsScreenSourceCount;
     uint                                          m_uiStatsWebBrowserCount;
-    uint                                          m_uiStatsVectorGraphicCount;
 };
