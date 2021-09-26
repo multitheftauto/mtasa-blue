@@ -1213,6 +1213,8 @@ unsigned int CClientEntity::GetTypeID(const char* szTypeName)
         return CCLIENTSOUND;
     else if (strcmp(szTypeName, "light") == 0)
         return CCLIENTPOINTLIGHTS;
+    else if (strcmp(szTypeName, "svg") == 0)
+        return CCLIENTVECTORGRAPHIC;
     else
         return CCLIENTUNKNOWN;
 }
