@@ -4501,20 +4501,27 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
         if (!pTarget)
             pTarget = pPlayer;
 
-        // Make sure our target is a player element
-        if (pTarget->GetType() == CElement::PLAYER)
+        // Make sure our target is supported
+        switch (pTarget->GetType())
         {
-            pCamera->SetMode(CAMERAMODE_PLAYER);
-            pCamera->SetTarget(pTarget);
-            pCamera->SetRoll(0.0f);
-            pCamera->SetFOV(70.0f);
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+            {
+                pCamera->SetMode(CAMERAMODE_PLAYER);
+                pCamera->SetTarget(pTarget);
+                pCamera->SetRoll(0.0f);
+                pCamera->SetFOV(70.0f);
 
-            CBitStream BitStream;
-            if (pPlayer->GetBitStreamVersion() >= 0x5E)
-                BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
-            BitStream.pBitStream->Write(pTarget->GetID());
-            pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
-            return true;
+                CBitStream BitStream;
+                if (pPlayer->GetBitStreamVersion() >= 0x5E)
+                    BitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+                BitStream.pBitStream->Write(pTarget->GetID());
+                pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
+                return true;
+            }
+            default:
+                return false;
         }
     }
 

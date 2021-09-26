@@ -1460,9 +1460,6 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                 pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
             }
 
-            // Make sure our camera is fixed on the new vehicle
-            if (m_bIsLocalPlayer)
-                m_pManager->GetCamera()->SetTargetEntity(pVehicle);
         }
 
         // Update the vehicle and us so we know we've occupied it
@@ -1506,9 +1503,6 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                         pGameVehicle->GetVehicleAudioEntity()->JustGotInVehicleAsDriver();
                     }
 
-                    // Make sure our camera is fixed on the new vehicle
-                    if (m_bIsLocalPlayer)
-                        m_pManager->GetCamera()->SetTargetEntity(pVehicle);
                 }
             }
 

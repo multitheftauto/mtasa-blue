@@ -3856,7 +3856,7 @@ void CGame::Packet_CameraSync(CCameraSyncPacket& Packet)
         }
         else
         {
-            CPlayer* pTarget = GetElementFromId<CPlayer>(Packet.m_TargetID);
+            CElement* pTarget = GetElementFromId<CElement>(Packet.m_TargetID);
             if (!pTarget)
                 pTarget = pPlayer;
 

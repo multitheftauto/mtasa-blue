@@ -4806,9 +4806,14 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
 
 CClientEntity* CStaticFunctionDefinitions::GetCameraTarget()
 {
-    if (!m_pCamera->IsInFixedMode())
-        return m_pCamera->GetTargetEntity();
-    return NULL;
+    if (m_pCamera->IsInFixedMode())
+        return NULL;
+
+    CClientEntity* pPlayer = m_pCamera->GetFocusedPlayer();
+    if (pPlayer)
+        return pPlayer;
+
+    return m_pCamera->GetTargetEntity();
 }
 
 bool CStaticFunctionDefinitions::GetCameraInterior(unsigned char& ucInterior)
@@ -4842,9 +4847,6 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
 {
     assert(pEntity);
 
-    // Save our current target for later
-    CClientEntity* pPreviousTarget = m_pCamera->GetTargetEntity();
-
     switch (pEntity->GetType())
     {
         case CCLIENTPLAYER:
@@ -4862,6 +4864,15 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
                 // Put the focus on that player
                 m_pCamera->SetFocus(pPlayer, MODE_CAM_ON_A_STRING, false);
             }
+            break;
+        }
+        case CCLIENTPED:
+        case CCLIENTVEHICLE:
+        {
+            // Reset camera focus and remove all references
+            m_pCamera->Reset();
+            // Put the focus on entity
+            m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
             break;
         }
         default:
