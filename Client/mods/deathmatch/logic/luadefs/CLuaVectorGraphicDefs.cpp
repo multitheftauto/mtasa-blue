@@ -61,7 +61,7 @@ bool CLuaVectorGraphicDefs::SetDocument(CClientVectorGraphic* pVectorGraphic, CX
     if (!pVectorGraphic || !pXMLNode || !pXMLNode->IsValid())
         return false;
 
-    pVectorGraphic->SetDocument(pXMLNode);
+    return pVectorGraphic->SetDocument(pXMLNode);
 }
 
 bool CLuaVectorGraphicDefs::LoadFromFile(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CScriptFile* pFile, std::string strPath,
@@ -94,6 +94,8 @@ bool CLuaVectorGraphicDefs::LoadFromFile(lua_State* luaVM, CClientVectorGraphic*
             return false;
         }
     }
+
+    return true;
 }
 
 bool CLuaVectorGraphicDefs::SetSize(CClientVectorGraphic* pVectorGraphic, CVector2D size)
@@ -276,15 +278,13 @@ CLuaMultiReturn<int, int> CLuaVectorGraphicDefs::SVGGetSize(CClientVectorGraphic
     return {(int)pVectorGraphic->GetRenderItem()->m_uiSizeX, (int)pVectorGraphic->GetRenderItem()->m_uiSizeY};
 }
 
-bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, int width, int height, std::optional<CLuaFunctionRef> luaFunctionRef)
+bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, CVector2D size, std::optional<CLuaFunctionRef> luaFunctionRef)
 {
-    if (width <= 0 || height <= 0)
+    if (size.fX <= 0 || size.fY <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
-    if (width > 4096 || height > 4096)
+    if (size.fX > 4096 || size.fY > 4096)
         throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
-
-    CVector2D size = CVector2D(width, height);
 
     if (luaFunctionRef.has_value() && VERIFY_FUNCTION(luaFunctionRef.value()))
     {
