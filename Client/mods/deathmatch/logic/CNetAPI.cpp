@@ -1768,7 +1768,7 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -1819,7 +1819,7 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;

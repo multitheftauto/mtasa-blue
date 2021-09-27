@@ -254,8 +254,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
     std::lock_guard<std::recursive_mutex> lock(m_FilterMutex);
 
     // Initialize wildcard whitelist (be careful with modifying) | Todo: Think about the following
-    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
-                                          "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
+    static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com", "*.youtube.com", "*.ytimg.com", "*.vimeocdn.com", "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
     for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
     {
@@ -330,9 +329,9 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
     if (bAddDynamic)
     {
         // Hardcoded whitelist
-        static SString whitelist[] = {"google.com",         "youtube.com", "www.youtube-nocookie.com", "vimeo.com", "player.vimeo.com",
-                                      "code.jquery.com",    "mtasa.com",   "multitheftauto.com",       "mtavc.com", "www.googleapis.com",
-                                      "ajax.googleapis.com"};
+        static SString whitelist[] = {
+            "google.com",         "youtube.com", "www.youtube-nocookie.com", "vimeo.com",           "player.vimeo.com", "code.jquery.com", "mtasa.com",
+            "multitheftauto.com", "mtavc.com",   "www.googleapis.com",       "ajax.googleapis.com"};
 
         // Hardcoded blacklist
         static SString blacklist[] = {"nobrain.dk"};
@@ -500,7 +499,7 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     // Alt-Gr check
     if ((keyEvent.type == KEYEVENT_CHAR) && isKeyDown(VK_RMENU))
     {
-        HKL   current_layout = ::GetKeyboardLayout(0);
+        HKL current_layout = ::GetKeyboardLayout(0);
         SHORT scan_res = ::VkKeyScanExW(wParam, current_layout);
         if ((HIBYTE(scan_res) & (2 | 4)) == (2 | 4))
         {

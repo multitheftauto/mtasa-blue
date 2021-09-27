@@ -13,7 +13,11 @@
 void CLuaUTFDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"utfLen", UtfLen}, {"utfSeek", UtfSeek}, {"utfSub", UtfSub}, {"utfChar", UtfChar}, {"utfCode", UtfCode},
+        {"utfLen", UtfLen},
+        {"utfSeek", UtfSeek},
+        {"utfSub", UtfSub},
+        {"utfChar", UtfChar},
+        {"utfCode", UtfCode},
     };
 
     // Add functions

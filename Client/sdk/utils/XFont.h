@@ -56,8 +56,7 @@ typedef struct _tagFONT_PROPERTIES_ANSI
 
 typedef struct _tagTT_OFFSET_TABLE
 {
-    union
-    {
+    union {
         struct
         {
             USHORT uMajorVersion;

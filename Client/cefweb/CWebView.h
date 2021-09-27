@@ -131,8 +131,7 @@ public:
                              const CefString& failedURL) override;
 
     // CefRequestHandler methods
-    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture,
-                                bool isRedirect) override;
+    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture, bool isRedirect) override;
     virtual CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
                                                                            CefRefPtr<CefRequest> request, bool is_navigation, bool is_download,
                                                                            const CefString& request_initiator, bool& disable_default_handling) override
@@ -142,7 +141,7 @@ public:
 
     // CefResourceRequestHandler
     virtual CefResourceRequestHandler::ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
-                                                                        CefRefPtr<CefRequestCallback> callback) override;
+                                                                CefRefPtr<CefRequestCallback> callback) override;
 
     // CefLifeSpawnHandler methods
     virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;

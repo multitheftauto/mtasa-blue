@@ -118,10 +118,9 @@ public:
     bool              IsEntityRemoved(CEntitySAInterface* pInterface);
     bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
 
-    CSurfaceType* GetSurfaceInfo() override;
-    void          ResetAllSurfaceInfo() override;
-    bool          ResetSurfaceInfo(short sSurfaceID) override;
-
+    CSurfaceType*     GetSurfaceInfo() override;
+    void              ResetAllSurfaceInfo() override;
+    bool              ResetSurfaceInfo(short sSurfaceID) override;
 private:
     std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
     std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;

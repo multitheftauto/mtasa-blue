@@ -455,7 +455,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             case LUA_TTABLE:
             {
                 m_pTableData = new CLuaArguments();
-                if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
+                if(!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
                     return false;
                 m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
@@ -512,7 +512,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
                 uint uiLength;
                 if (bitStream.ReadCompressed(uiLength) && uiLength > 0)
                 {
-                    if (!bitStream.CanReadNumberOfBytes(uiLength))
+                    if(!bitStream.CanReadNumberOfBytes(uiLength))
                         return false;
 
                     bitStream.AlignReadToByteBoundary();

@@ -177,8 +177,7 @@ public:
 
     struct SD3DRenderState
     {
-        union
-        {
+        union {
             DWORD Raw[D3DRS_MAX];
             struct
             {
@@ -313,8 +312,7 @@ public:
 
     struct SD3DStageState
     {
-        union
-        {
+        union {
             DWORD Raw[D3DTSS_MAX];
             struct
             {
@@ -346,8 +344,7 @@ public:
 
     struct SD3DSamplerState
     {
-        union
-        {
+        union {
             DWORD Raw[D3DSAMP_MAX];
             struct
             {
@@ -375,8 +372,7 @@ public:
 
     struct SD3DTransformState
     {
-        union
-        {
+        union {
             struct
             {
                 D3DMATRIX  DUMMY;

@@ -368,7 +368,7 @@ namespace
         //     "has this function been removed yet?"
         // bRemoved actually means:
         //     "is not rename?" (you can't rename removed functions)
-        bool bRemoved;
+        bool    bRemoved;
 
         SString strOldName;
         SString strNewName;

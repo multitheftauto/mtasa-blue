@@ -34,8 +34,7 @@ enum eMessageType
 class CChatEchoPacket final : public CPacket
 {
 public:
-    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false,
-                    unsigned char ucMessageType = MESSAGE_TYPE_PLAYER)
+    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false, unsigned char ucMessageType = MESSAGE_TYPE_PLAYER)
     {
         m_strMessage = strMessage;
         m_ucRed = ucRed;

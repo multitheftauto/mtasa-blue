@@ -66,6 +66,7 @@ std::unique_ptr<SXMLString> CXMLImpl::ParseString(const char* strXmlContent)
     return nullptr;
 }
 
+
 CXMLNode* CXMLImpl::CreateDummyNode()
 {
     CXMLNode* xmlNode = new CXMLNodeImpl(nullptr, nullptr, *new TiXmlElement("dummy_storage"));

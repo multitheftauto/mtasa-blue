@@ -21,8 +21,7 @@ public:
     CConnectManager();
     ~CConnectManager();
 
-    bool Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false,
-                 const char* szSecret = nullptr);
+    bool Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false, const char* szSecret = nullptr);
     bool Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true);
 
     bool Abort();

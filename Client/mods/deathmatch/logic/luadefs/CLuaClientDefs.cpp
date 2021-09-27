@@ -15,13 +15,15 @@
 
 void CLuaClientDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
-                                                                             {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
-                                                                             {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
-                                                                             {"showChat", ArgumentParserWarn<false, ShowChat>},
-                                                                             {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
-                                                                             {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
-                                                                             {"clearDebugBox", ArgumentParser<ClearDebug>}};
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
+        {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
+        {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
+        {"showChat", ArgumentParserWarn<false, ShowChat>},
+        {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
+        {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
+        {"clearDebugBox", ArgumentParser<ClearDebug>}
+    };
 
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);

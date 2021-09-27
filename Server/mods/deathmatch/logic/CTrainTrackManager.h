@@ -19,7 +19,7 @@ public:
     CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
     void         DestroyTrainTrack(CTrainTrack* pTrainTrack);
 
-    const std::vector<CTrainTrack*>& GetTracks() { return m_Tracks; }
+    inline const std::vector<CTrainTrack*>& GetTracks() { return m_Tracks; }
 
     CTrainTrack* GetTrainTrackByIndex(unsigned int index);
 

@@ -2081,7 +2081,7 @@ CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
 void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
 {
     auto     vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    RwFrame* pFrame = NULL;
+    RwFrame*             pFrame = NULL;
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:

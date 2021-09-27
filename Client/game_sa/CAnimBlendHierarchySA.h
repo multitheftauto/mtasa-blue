@@ -68,3 +68,4 @@ public:
 protected:
     CAnimBlendHierarchySAInterface* m_pInterface;
 };
+

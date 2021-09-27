@@ -393,6 +393,7 @@ int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
         }
     }
 
+
     // Push all functions into a key-value pair tableif (pResource)
     {
         lua_createtable(luaVM, 0, pResource->GetExportedFunctions().size());
