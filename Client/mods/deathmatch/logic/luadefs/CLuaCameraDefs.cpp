@@ -13,7 +13,7 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 
-#define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20677"
+#define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"
 
 void CLuaCameraDefs::LoadFunctions()
 {
