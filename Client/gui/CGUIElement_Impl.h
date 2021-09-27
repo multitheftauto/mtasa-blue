@@ -22,18 +22,23 @@ public:
     void Begin();
     void End();
 
-    void SetPosition(CVector2D pos);
-    void SetSize(CVector2D size);
+    void SetPosition(CVector2D pos, bool relative = false);
+    void SetSize(CVector2D size, bool relative = false);
+
+    CVector2D GetPosition();
+    CVector2D GetSize();
 
     void         SetParent(CGUIElement* parent);
     CGUIElement* GetParent();
+
+    CVector2D GetOffset();
 
     void AddChild(CGUIElement* child);
     void RemoveChild(CGUIElement* child);
 
     std::list<CGUIElement*> GetChildren();
 
-    std::string GetType();
+    CGUIType GetType();
 
     void ProcessPosition();
     void ProcessSize();
@@ -52,12 +57,13 @@ protected:
     std::string m_title = {};
     std::string m_uid;
 
-    std::string m_type = "element";
+    CGUIType m_type = CGUIType::ELEMENT;
 
-    bool m_relative;
     bool m_frame;
 
     CVector2D m_position = {};
+    CVector2D m_offsetPosition = {};
+
     CVector2D m_size = {};
 
     bool m_deleted = false;

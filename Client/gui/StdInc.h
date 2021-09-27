@@ -17,6 +17,8 @@
 #include "CRect2D.h"
 #include "CVector2D.h"
 
+#include "../sdk/gui/CGUITypes.h"
+
 #include "CGUI_Impl.h"
 #include "CGUIElement_Impl.h"
 #include "CGUIWindow_Impl.h"

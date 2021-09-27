@@ -9,14 +9,8 @@
 
 #pragma once
 
-#include "CGUIElement.h"
-
-class CGUIWindow : public CGUIElement
+enum CGUIType
 {
-public:
-    virtual ~CGUIWindow(){};
-
-    virtual CVector2D GetOffset() override = 0;
-
-    virtual float GetTitlebarHeight() = 0;
+    ELEMENT,
+    WINDOW
 };

@@ -37,14 +37,13 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 
     // Windows test
     CGUIWindow* window = CreateGUIWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
-
     CGUIWindow* window2 = CreateGUIWindow(CVector2D(50, 50), CVector2D(150, 150), window, false, "Child Window");
 
     /* Tested functions */
-    //window2->SetFrameEnabled(false);
-    //window2->SetPosition(CVector2D(75, 125));
-    //window2->SetSize(CVector2D(200, 200));
-    //window2->SetParent(nullptr);
+    // window2->SetFrameEnabled(false);
+    // window2->SetPosition(CVector2D(75, 75));
+    // window2->SetSize(CVector2D(200, 200));
+    // window2->SetParent(nullptr);
 }
 
 CGUI_Impl::~CGUI_Impl()
@@ -97,7 +96,7 @@ void CGUI_Impl::Draw()
             {
                 elem->Begin();
 
-                list<CGUIElement*> children = elem->GetChildren();
+                list<CGUIElement*>                 children = elem->GetChildren();
                 list<CGUIElement*>::const_iterator c = children.begin();
 
                 for (; c != children.end(); c++)
@@ -133,6 +132,14 @@ void CGUI_Impl::Restore()
 void CGUI_Impl::OnElementDestroy(CGUIElement* element)
 {
     m_guiElements.remove(element);
+}
+
+CVector2D CGUI_Impl::GetResolution()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+
+    return CVector2D(io.DisplaySize.x, io.DisplaySize.y);
 }
 
 CGUIWindow* CGUI_Impl::CreateGUIWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)

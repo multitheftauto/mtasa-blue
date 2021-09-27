@@ -9,9 +9,10 @@
 
 #include "StdInc.h"
 
-CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative, std::string title) : CGUIElement_Impl(pGUI, pParent, pos, size, relative)
+CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative, std::string title)
+    : CGUIElement_Impl(pGUI, pParent, pos, size, relative)
 {
-    m_type = "window";
+    m_type = CGUIType::WINDOW;
     m_title = title;
 
     SetFrameEnabled(true);
@@ -24,5 +25,25 @@ void CGUIWindow_Impl::Begin()
 
 void CGUIWindow_Impl::End()
 {
+    if (m_titlebarHeight == -1)
+    {
+        float size = ImGui::GetWindowHeight();
+        float max = ImGui::GetWindowContentRegionMax().y;
+
+        max += ImGui::GetWindowPos().y;
+
+        m_titlebarHeight = size - max;
+    }
+
     CGUIElement_Impl::End();
+}
+
+float CGUIWindow_Impl::GetTitlebarHeight()
+{
+    return m_titlebarHeight;
+}
+
+CVector2D CGUIWindow_Impl::GetOffset()
+{
+    return CVector2D(0, GetTitlebarHeight());
 }

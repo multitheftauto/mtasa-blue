@@ -20,7 +20,11 @@ public:
     void Begin();
     void End();
 
-    #include "CGUIElement_Inc.h"
-private:
+    CVector2D GetOffset();
 
+    float GetTitlebarHeight();
+
+#include "CGUIElement_Inc.h"
+private:
+    float m_titlebarHeight = -1;
 };

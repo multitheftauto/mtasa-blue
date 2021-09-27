@@ -33,6 +33,8 @@ public:
 
     void OnElementDestroy(CGUIElement* element);
 
+    CVector2D GetResolution();
+
 private:
     IDirect3DDevice9* m_pDevice;
     HWND              m_hookedWindow;

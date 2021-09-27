@@ -16,12 +16,10 @@ CGUIElement_Impl::CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVecto
 {
     m_pManager = pGUI;
 
-    SetPosition(pos);
-    SetSize(size);
-
     SetParent(pParent);
 
-    m_relative = relative;
+    SetPosition(pos, relative);
+    SetSize(size, relative);
 
     // Create a unique ID for this element
     const void* address = static_cast<const void*>(this);
@@ -91,18 +89,16 @@ void CGUIElement_Impl::Begin()
 {
     const char* id = (m_title + "###" + m_uid).c_str();
 
+    ProcessPosition();
+
     if (m_pParent == nullptr)
     {
-        ProcessPosition();
         ProcessSize();
 
         ImGui::Begin(id);
     }
     else
     {
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + m_position.fX);
-        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + m_position.fY);
-
         if (!ImGui::BeginChild(id, ImVec2(m_size.fX, m_size.fY), m_frame))
             return;
 
@@ -112,33 +108,68 @@ void CGUIElement_Impl::Begin()
 
 void CGUIElement_Impl::End()
 {
+    m_position = CVector2D(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
+    m_size = CVector2D(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
+
     if (m_pParent == nullptr)
         ImGui::End();
     else
         ImGui::EndChild();
 }
 
-std::string CGUIElement_Impl::GetType()
+CGUIType CGUIElement_Impl::GetType()
 {
     return m_type;
 }
 
-void CGUIElement_Impl::SetPosition(CVector2D pos)
+void CGUIElement_Impl::SetPosition(CVector2D pos, bool relative)
 {
-    m_position = pos;
+    if (relative)
+    {
+        CVector2D parentSize = m_pParent ? m_pParent->GetSize() : m_pManager->GetResolution();
+        pos = CVector2D(pos.fX * parentSize.fX, pos.fY * parentSize.fY);
+    }
+
+    m_offsetPosition = pos;
     m_updatePosition = true;
 }
 
-void CGUIElement_Impl::SetSize(CVector2D size)
+void CGUIElement_Impl::SetSize(CVector2D size, bool relative)
 {
+    if (relative)
+    {
+        CVector2D parentSize = m_pParent ? m_pParent->GetSize() : m_pManager->GetResolution();
+        size = CVector2D(size.fX * parentSize.fX, size.fY * parentSize.fY);
+    }
+
     m_size = size;
     m_updateSize = true;
+}
+
+CVector2D CGUIElement_Impl::GetPosition()
+{
+    return m_position;
+}
+
+CVector2D CGUIElement_Impl::GetSize()
+{
+    return m_size;
 }
 
 void CGUIElement_Impl::ProcessPosition()
 {
     if (m_updatePosition)
+    {
         ImGui::SetNextWindowPos(ImVec2(m_position.fX, m_position.fY));
+    }
+
+    if (m_pParent)
+    {
+        CVector2D parentOffset = m_pParent->GetOffset();
+
+        ImGui::SetCursorPosX(m_offsetPosition.fX + parentOffset.fX);
+        ImGui::SetCursorPosY(m_offsetPosition.fY + parentOffset.fY);
+    }
 
     m_updatePosition = false;
 }
@@ -159,4 +190,9 @@ void CGUIElement_Impl::SetFrameEnabled(bool state)
 bool CGUIElement_Impl::GetFrameEnabled()
 {
     return m_frame;
+}
+
+CVector2D CGUIElement_Impl::GetOffset()
+{
+    return {};
 }

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <../Shared/sdk/CVector2D.h>
+#include "CGUITypes.h"
 
 class CGUIElement
 {
@@ -19,8 +20,13 @@ public:
     virtual void Begin() = 0;
     virtual void End() = 0;
 
-    virtual void SetPosition(CVector2D pos) = 0;
-    virtual void SetSize(CVector2D size) = 0;
+    virtual CVector2D GetOffset() = 0;
+
+    virtual void SetPosition(CVector2D pos, bool relative = false) = 0;
+    virtual void SetSize(CVector2D size, bool relative = false) = 0;
+
+    virtual CVector2D GetPosition() = 0;
+    virtual CVector2D GetSize() = 0;
 
     virtual void         SetParent(CGUIElement* element) = 0;
     virtual CGUIElement* GetParent() = 0;
@@ -30,7 +36,7 @@ public:
 
     virtual std::list<CGUIElement*> GetChildren() = 0;
 
-    virtual std::string GetType() = 0;
+    virtual CGUIType GetType() = 0;
 
     virtual void ProcessPosition() = 0;
     virtual void ProcessSize() = 0;

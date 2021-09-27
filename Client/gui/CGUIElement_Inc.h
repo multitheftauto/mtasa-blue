@@ -7,14 +7,24 @@
  *
  *****************************************************************************/
 
-void SetPosition(CVector2D pos)
+void SetPosition(CVector2D pos, bool relative = false)
 {
-    CGUIElement_Impl::SetPosition(pos);
+    CGUIElement_Impl::SetPosition(pos, relative);
 };
 
-void SetSize(CVector2D size)
+void SetSize(CVector2D size, bool relative = false)
 {
-    CGUIElement_Impl::SetSize(size);
+    CGUIElement_Impl::SetSize(size, relative);
+};
+
+CVector2D GetPosition()
+{
+    return CGUIElement_Impl::GetPosition();
+};
+
+CVector2D GetSize()
+{
+    return CGUIElement_Impl::GetSize();
 };
 
 void ProcessPosition()
@@ -52,7 +62,7 @@ void SetParent(CGUIElement* parent)
     CGUIElement_Impl::SetParent(parent);
 };
 
-std::string GetType()
+CGUIType GetType()
 {
     return CGUIElement_Impl::GetType();
 };
@@ -61,7 +71,6 @@ bool IsDeleted()
 {
     return CGUIElement_Impl::IsDeleted();
 };
-
 
 void SetFrameEnabled(bool state)
 {
