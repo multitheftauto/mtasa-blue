@@ -235,7 +235,8 @@ namespace
         {"setVehicleWheelScale", "1.5.7-9.20642"},
         {"getVehicleWheelScale", "1.5.7-9.20642"},
 
-        // Features added in 1.5.8
+        // Features added in 1.5.9
+        {"getRoofPosition", "1.5.8-9.20675"},
         {"onClientResourceFileDownload", "1.5.8-9.20788"},
         {"onClientTransferBoxProgressChange", "1.5.8-9.20788"},
         {"onClientTransferBoxVisibilityChange", "1.5.8-9.20788"},
@@ -351,7 +352,8 @@ namespace
         {"hasElementDataSubscriber", "1.5.7-9.20477"},
         {"removeElementDataSubscriber", "1.5.7-9.20477"},
 
-        // Features added in 1.5.8
+        // Features added in 1.5.9
+        {"onElementDimensionChange", "1.5.8-9.20724"},
         {"setTransferBoxVisible", "1.5.8-9.20788"},
         {"isTransferBoxVisible", "1.5.8-9.20788"},
         {"getColPolygonHeight", "1.5.8-9.20807"},
