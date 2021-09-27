@@ -4,6 +4,8 @@ project "lunasvg"
 	kind "StaticLib"
 	targetname "lunasvg"
 	targetdir(buildpath("mta"))
+	floatingpoint "Fast"
+	rtti "Off"
 
 	defines { 
 		"LUNASVG_EXPORT", 
