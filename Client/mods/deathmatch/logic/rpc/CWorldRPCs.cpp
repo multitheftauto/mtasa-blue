@@ -632,7 +632,8 @@ void CWorldRPCs::SetDiscordJoinParams(NetBitStreamInterface& bitStream)
 
     if (bitStream.ReadString<uchar>(strKey) && bitStream.ReadString<uchar>(strPartyId) && bitStream.Read(uiPartySize) && bitStream.Read(uiPartyMax))
     {
-        if (strKey.length() > 64 || strPartyId.length() > 64 || uiPartySize > uiPartyMax || strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
+        if (strKey.length() > 64 || strPartyId.length() > 64 || uiPartySize > uiPartyMax || strKey.find(' ') != SString::npos ||
+            strPartyId.find(' ') != SString::npos)
             return;
 
         g_pCore->GetDiscordManager()->SetJoinParameters(strKey, strPartyId, uiPartySize, uiPartyMax, [](EDiscordRes res) {});

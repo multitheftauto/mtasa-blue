@@ -1636,7 +1636,7 @@ namespace eObjectGroup
         BY_GUN,
         SMASHABLE,
     };
-}
+}            // namespace eObjectGroup
 
 enum eSoundEffectType;
 
@@ -1728,4 +1728,4 @@ namespace eSoundEffectParams
         REVERB_TIME,
         HIGH_FREQ_RT_RATIO,
     };
-}
+}            // namespace eSoundEffectParams

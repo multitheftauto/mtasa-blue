@@ -115,9 +115,9 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
     {
         return true;
     }
-    
+
     // Get associated resource
-    CResource& resource{ lua_getownerresource(luaVM) };
+    CResource& resource{lua_getownerresource(luaVM)};
 
     // Update execution time check
     resource.GetVirtualMachine()->CheckExecutionTime();

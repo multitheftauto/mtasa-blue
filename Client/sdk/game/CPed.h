@@ -277,10 +277,10 @@ public:
     virtual float        GetCurrentWeaponRange() = 0;
     virtual void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType) = 0;
 
-    virtual int GetCustomMoveAnim() = 0;
+    virtual int  GetCustomMoveAnim() = 0;
     virtual bool IsDoingGangDriveby() = 0;
 
-    virtual CPedIKSAInterface* GetPedIKInterface() = 0;
-    virtual void*              GetPedNodeInterface(std::int32_t nodeId) = 0;
+    virtual CPedIKSAInterface*      GetPedIKInterface() = 0;
+    virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
 };

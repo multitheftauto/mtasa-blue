@@ -40,7 +40,8 @@ public:
 };
 
 // size of tPoolObjectFlags is 1 byte only
-union tPoolObjectFlags {
+union tPoolObjectFlags
+{
     struct
     {
         unsigned char nId : 7;

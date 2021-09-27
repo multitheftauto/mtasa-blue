@@ -1114,7 +1114,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
             if (!m_pBoatHandlingEntry)
                 m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
 
-             m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
+            m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
         }
 
         m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData((eVehicleTypes)usHandlingModelID);

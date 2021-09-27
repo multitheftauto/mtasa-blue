@@ -41,7 +41,7 @@ class CWebViewInterface;
 class CEffectTemplate;
 class CVectorGraphicItem;
 
-#define RDEFAULT            ((uint) -1)
+#define RDEFAULT ((uint)-1)
 
 enum ERenderFormat
 {
@@ -191,7 +191,8 @@ public:
 struct SShaderValue
 {
     char cType, cCount;
-    union {
+    union
+    {
         CTextureItem* pTextureItem;
         bool          bValue;
         float         floatList[16];
@@ -358,13 +359,14 @@ class CShaderItem : public CMaterialItem
 {
     DECLARE_CLASS(CShaderItem, CMaterialItem)
     CShaderItem() : ClassInit(this) {}
-    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
-                               float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
+    virtual void PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
+                               float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
     virtual void OnResetDevice();
-    void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug, const EffectMacroList& macros);
+    void         CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
+                                      const EffectMacroList& macros);
     void         ReleaseUnderlyingData();
     virtual bool SetValue(const SString& strName, CTextureItem* pTextureItem);
     virtual bool SetValue(const SString& strName, bool bValue);
