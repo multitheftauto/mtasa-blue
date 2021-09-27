@@ -590,8 +590,10 @@ void CCore::SetConnected(bool bConnected)
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
 
-    if (bConnected) m_DiscordManager->RegisterPlay(true);
-    else ResetDiscordRichPresence();
+    if (bConnected)
+        m_DiscordManager->RegisterPlay(true);
+    else
+        ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()

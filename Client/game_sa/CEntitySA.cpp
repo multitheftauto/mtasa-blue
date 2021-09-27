@@ -661,7 +661,6 @@ bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& r
         }
     }
     return false;
-
 }
 
 bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll)

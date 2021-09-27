@@ -79,7 +79,8 @@ public:
     float               m_fTimeScale;                   // +80
     char                unk2;                           // +84 = 31488
     char                unk3;                           // +85 = 1005
-    union {
+    union
+    {
         unsigned short m_wEnvironmentFlags;
         struct
         {

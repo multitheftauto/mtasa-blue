@@ -62,8 +62,8 @@ public:
     void SizeChanged();
 
 protected:
-    CVector m_vecPosition;
-    class CColManager*  m_pManager;
+    CVector            m_vecPosition;
+    class CColManager* m_pManager;
 
 private:
     bool                m_bIsEnabled;

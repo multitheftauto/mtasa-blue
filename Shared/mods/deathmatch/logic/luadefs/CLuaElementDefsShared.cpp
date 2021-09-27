@@ -59,8 +59,8 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
 #else
     CElement* pElement;
 #endif
-    SString   strKey;
-    bool      bInherit;
+    SString strKey;
+    bool    bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

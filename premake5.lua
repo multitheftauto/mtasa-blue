@@ -132,7 +132,8 @@ workspace "MTASA"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
 		include "vendor/detours"
-		include "vendor/imgui"
+		include "vendor/lunasvg"
+        include "vendor/imgui"
 	end
 
 	filter {}

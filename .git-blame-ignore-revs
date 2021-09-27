@@ -97,3 +97,63 @@ eefde6d95260aef53308baa7fb1e59cf24522cd9
 # Date:   Sun Jan 17 13:23:58 2021 +0200
 #
 # Run clang-format (PR #2013)
+
+25d9ba3d30c618ba41c06201f697c69ac9e33f7e
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:05:27 2021 +0300
+#
+# Run clang-format
+
+d5b9a56ac1d1d4c156ef80cd3ec5ed4fc2c65c33
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:56:03 2021 +0300
+#
+# Addendum to 25d9ba3: Run clang-format again
+
+8e3e3b8b351934b48f9b1c530aca33b1140ed6fc
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:56:40 2021 +0300
+#
+# Addendum to 25d9ba3: Fix build error
+
+30639d61ca3e7783a693fe4d8206d6d604b338bd
+# Author: Patrik Juvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 00:43:44 2021 +0300
+#
+# Revert "update BASS libraries (#2377)"
+
+898fcaf6c879d4c4c7e9a786b3d87216b09376e2
+# Author: Patrik Juvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 01:11:05 2021 +0300
+#
+# Revert "Add SVG support (lunasvg) (#2026)"
+
+fba4ee41a9eb31ae3bf9c85afc0db4807915c18f
+# Author: Patrik Juvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 01:34:49 2021 +0300
+#
+# Revert "Revert "update BASS libraries (#2377)""
+
+6f09a0a99e0b2eded7cd73f18aa5f1fe4c47ada8
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 16:25:25 2021 +0300
+#
+# Revert "Run clang-format"
+
+7d055fbcaf70e11bf3940a81845afa8ad997c4a3
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 16:29:32 2021 +0300
+#
+# Revert "Revert "Add SVG support (lunasvg) (#2026)""
+
+a02c4b3a71b5a6e9d77ba849edd14a8048256120
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 17:02:43 2021 +0300
+#
+# Revert "Revert "Revert "Add SVG support (lunasvg) (#2026)"""
+
+16769b8d1c94e2b9fe6323dcba46d1305f87a190
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 17:57:32 2021 +0300
+#
+# Revert "Revert "Run clang-format""

@@ -21,7 +21,8 @@ public:
     virtual bool        DeletePoly(CWaterPoly* pPoly) = 0;
 
     virtual bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool ignoreDistanceToWaterThreshold, CVector* pvecUnknown) = 0;
-    virtual bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel) = 0;
+    virtual bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel,
+                                    bool bIncludeOutsideWorldLevel) = 0;
     virtual bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource) = 0;
     virtual bool SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource) = 0;
     virtual void ResetWorldWaterLevel() = 0;

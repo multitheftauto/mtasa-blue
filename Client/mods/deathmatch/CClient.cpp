@@ -180,8 +180,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
                     SString secret = g_pCore->GetDiscordManager()->GetJoinSecret();
 
                     // Start the game
-                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str(), CClientGame::SERVER_TYPE_NORMAL,
-                                             *secret);
+                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str(), CClientGame::SERVER_TYPE_NORMAL, *secret);
                 }
                 else
                 {
