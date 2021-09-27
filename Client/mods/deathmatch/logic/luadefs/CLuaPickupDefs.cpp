@@ -16,7 +16,10 @@ void CLuaPickupDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createPickup", CreatePickup},
 
-        {"getPickupType", GetPickupType}, {"getPickupWeapon", GetPickupWeapon}, {"getPickupAmount", GetPickupAmount}, {"getPickupAmmo", GetPickupAmmo},
+        {"getPickupType", GetPickupType},
+        {"getPickupWeapon", GetPickupWeapon},
+        {"getPickupAmount", GetPickupAmount},
+        {"getPickupAmmo", GetPickupAmmo},
 
         {"setPickupType", SetPickupType},
     };

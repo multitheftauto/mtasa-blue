@@ -228,8 +228,7 @@ public:
     uint8_t  m_tyreGrip;
     uint8_t  m_wetGrip;            // 2
     uint16_t pad;                  // 4
-    union
-    {
+    union {
         struct            // size 8
         {
             uint32_t flags[2];
@@ -291,7 +290,9 @@ public:
                 flags[flagsGroup] &= ~(1UL << (sFlagID + usForNext));
         }
     }
-    bool getFlagEnabled(char flagsGroup, short sFlagID) { return ((flags[flagsGroup] >> sFlagID) & 1U) == 1; }
+    inline bool getFlagEnabled(char flagsGroup, short sFlagID) {
+        return ((flags[flagsGroup] >> sFlagID) & 1U) == 1;
+    }
 };
 
 struct CSurfaceType
@@ -345,7 +346,7 @@ public:
     virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
     virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 
-    virtual CSurfaceType* GetSurfaceInfo() = 0;
-    virtual void          ResetAllSurfaceInfo() = 0;
-    virtual bool          ResetSurfaceInfo(short sSurfaceID) = 0;
+    virtual CSurfaceType*     GetSurfaceInfo() = 0;
+    virtual void              ResetAllSurfaceInfo() = 0;
+    virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
 };

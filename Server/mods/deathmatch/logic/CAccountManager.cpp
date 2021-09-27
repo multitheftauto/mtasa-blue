@@ -273,8 +273,8 @@ void CAccountManager::Save(CAccount* pAccount, bool bCheckForErrors)
     strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, "UPDATE accounts SET ip=?", SQLITE_TEXT, *strIP);
     if (!strSerial.empty())
         strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", serial=?", SQLITE_TEXT, *strSerial);
-    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", name=?, password=?, httppass=? WHERE id=?", SQLITE_TEXT, *strName, SQLITE_TEXT,
-                                                   *strPassword, SQLITE_TEXT, *strHttpPassAppend, SQLITE_INTEGER, iID);
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", name=?, password=?, httppass=? WHERE id=?", SQLITE_TEXT, *strName, SQLITE_TEXT, *strPassword,
+                                                   SQLITE_TEXT, *strHttpPassAppend, SQLITE_INTEGER, iID);
 
     if (bCheckForErrors)
     {
@@ -698,24 +698,24 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
         // Account data is stored as text so we don't need to check what type it is just return it
         switch (type)
         {
-            case LUA_TBOOLEAN:
-                pResult->ReadBool(strcmp(value, "true") == 0);
-                break;
+        case LUA_TBOOLEAN:
+            pResult->ReadBool(strcmp(value, "true") == 0);
+            break;
 
-            case LUA_TNUMBER:
-                pResult->ReadNumber(strtod(value, NULL));
-                break;
+        case LUA_TNUMBER:
+            pResult->ReadNumber(strtod(value, NULL));
+            break;
 
-            case LUA_TNIL:
-                break;
+        case LUA_TNIL:
+            break;
 
-            case LUA_TSTRING:
-                pResult->ReadString(value);
-                break;
+        case LUA_TSTRING:
+            pResult->ReadString(value);
+            break;
 
-            default:
-                dassert(0);            // It never should hit this, if so, something corrupted
-                break;
+        default:
+            dassert(0); // It never should hit this, if so, something corrupted
+            break;
         }
     }
     else

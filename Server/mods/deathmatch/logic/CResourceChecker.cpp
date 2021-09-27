@@ -722,8 +722,7 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
 //
 //
 ///////////////////////////////////////////////////////////////
-ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow,
-                                                                 CMtaVersion& strOutVersion)
+ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow, CMtaVersion& strOutVersion)
 {
     static CHashMap<SString, SDeprecatedItem*> clientUpgradeInfoMap;
     static CHashMap<SString, SDeprecatedItem*> serverUpgradeInfoMap;
@@ -1125,8 +1124,8 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 // Also calculates version requirements these days
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, CMtaVersion& strOutReqClientVersion,
-                                          CMtaVersion& strOutReqServerVersion, SString& strOutReqClientReason, SString& strOutReqServerReason)
+void CResourceChecker::LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, CMtaVersion& strOutReqClientVersion, CMtaVersion& strOutReqServerVersion,
+                                          SString& strOutReqClientReason, SString& strOutReqServerReason)
 {
     m_bUpgradeScripts = false;
     CheckResourceForIssues(pResource, strResourceZip);

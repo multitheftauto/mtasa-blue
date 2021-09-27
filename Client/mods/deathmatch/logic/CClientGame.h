@@ -805,7 +805,7 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
-    void UpdateDiscordState();            // If netc allows this function not to be here it would be better
+    void UpdateDiscordState(); // If netc allows this function not to be here it would be better
 
 private:
     CEvents                                     m_Events;

@@ -1096,7 +1096,7 @@ bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break;            // This should not be possible, but you never know
+                break; // This should not be possible, but you never know
         }
 
         return false;

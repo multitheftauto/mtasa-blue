@@ -14,6 +14,7 @@
 class CFlyingHandlingEntry
 {
 public:
+
     // Destructor
     virtual ~CFlyingHandlingEntry(){};
 

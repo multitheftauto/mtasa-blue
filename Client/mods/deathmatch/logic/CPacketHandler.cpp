@@ -2287,7 +2287,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world non-sea level (to all world water)
     if (bHasNonSeaLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, nullptr, true, false, false);
-    // Apply outside world level (before -3000 and after 3000)
+     // Apply outside world level (before -3000 and after 3000)
     if (bHasOutsideLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fOutsideLevel, nullptr, false, false, true);
     // Apply world sea level (to world sea level water only)
@@ -4066,8 +4066,7 @@ retry:
                     }
                     else
                     {
-                        pWater =
-                            new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
+                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
                     if (!pWater->Exists())
                     {

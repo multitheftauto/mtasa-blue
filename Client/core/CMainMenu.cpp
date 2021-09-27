@@ -324,17 +324,17 @@ CMainMenu::CMainMenu(CGUI* pManager)
     // Add annonying alert
     m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
     std::int32_t buffer = 0xFFFF0000;
-    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1);            // HACK: Load red dot
+    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
 
     m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
     m_pAlertImage->LoadFromTexture(m_pAlertTexture.get());
-    m_pAlertImage->SetPosition({0.0f, 0.0f}, false);
-    m_pAlertImage->SetSize({ScreenSize.fX, 20.0f});
+    m_pAlertImage->SetPosition({ 0.0f, 0.0f }, false);
+    m_pAlertImage->SetSize({ ScreenSize.fX, 20.0f });
 
     #define XP_VISTA_WARNING _("MTA will not receive updates on XP/Vista after July 2019.\n\nUpgrade Windows to play on the latest servers.")
     m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), XP_VISTA_WARNING)));
-    m_pAlertLabel->SetPosition({0.0f, 2.0f}, false);
-    m_pAlertLabel->SetSize({ScreenSize.fX, 20.0f});
+    m_pAlertLabel->SetPosition({ 0.0f, 2.0f }, false);
+    m_pAlertLabel->SetSize({ ScreenSize.fX, 20.0f });
     m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
 #endif
 }

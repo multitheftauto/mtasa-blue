@@ -270,7 +270,7 @@ static bool& GetBindableKeyState(const SBindableKey* key)
 {
     intptr_t base = reinterpret_cast<intptr_t>(&g_bkKeys[0]);
     intptr_t offset = reinterpret_cast<intptr_t>(key);
-    size_t   index = (offset - base) / sizeof(SBindableKey);
+    size_t index = (offset - base) / sizeof(SBindableKey);
     return bindableKeyStates[index];
 }
 
@@ -2301,12 +2301,12 @@ void CKeyBinds::DoPostFramePulse()
         {
             cs.ButtonCircle = (g_bcControls[17].bState) ? 255 : 0;             // Fire
             cs.LeftShoulder1 = (g_bcControls[18].bState) ? 255 : 0;            // Secondary Fire
-            cs.LeftStickX = ((g_bcControls[19].bState && g_bcControls[20].bState) || (!g_bcControls[19].bState && !g_bcControls[20].bState)) ? 0
-                            : (g_bcControls[19].bState)                                                                                      ? -128
-                                                                                                                                             : 128;
-            cs.LeftStickY = ((g_bcControls[21].bState && g_bcControls[22].bState) || (!g_bcControls[21].bState && !g_bcControls[22].bState)) ? 0
-                            : (g_bcControls[21].bState)                                                                                      ? -128
-                                                                                                                                             : 128;
+            cs.LeftStickX = ((g_bcControls[19].bState && g_bcControls[20].bState) || (!g_bcControls[19].bState && !g_bcControls[20].bState))
+                                ? 0
+                                : (g_bcControls[19].bState) ? -128 : 128;
+            cs.LeftStickY = ((g_bcControls[21].bState && g_bcControls[22].bState) || (!g_bcControls[21].bState && !g_bcControls[22].bState))
+                                ? 0
+                                : (g_bcControls[21].bState) ? -128 : 128;
             cs.ButtonCross = (g_bcControls[23].bState) ? 255 : 0;                                          // Accelerate
             cs.ButtonSquare = (g_bcControls[24].bState) ? 255 : 0;                                         // Reverse
             cs.DPadUp = (g_bcControls[25].bState) ? 255 : 0;                                               // Radio Next
@@ -2319,12 +2319,12 @@ void CKeyBinds::DoPostFramePulse()
             cs.RightShoulder2 = (g_bcControls[32].bState || g_bcControls[33].bState) ? 255 : 0;            // Look Right
             // * Look Behind - uses both keys above simultaneously
             // Mouse Look
-            cs.RightStickX = ((g_bcControls[35].bState && g_bcControls[36].bState) || (!g_bcControls[35].bState && !g_bcControls[36].bState)) ? 0
-                             : (g_bcControls[35].bState)                                                                                      ? 128
-                                                                                                                                              : -128;
-            cs.RightStickY = ((g_bcControls[37].bState && g_bcControls[38].bState) || (!g_bcControls[37].bState && !g_bcControls[38].bState)) ? 0
-                             : (g_bcControls[37].bState)                                                                                      ? 128
-                                                                                                                                              : -128;
+            cs.RightStickX = ((g_bcControls[35].bState && g_bcControls[36].bState) || (!g_bcControls[35].bState && !g_bcControls[36].bState))
+                                 ? 0
+                                 : (g_bcControls[35].bState) ? 128 : -128;
+            cs.RightStickY = ((g_bcControls[37].bState && g_bcControls[38].bState) || (!g_bcControls[37].bState && !g_bcControls[38].bState))
+                                 ? 0
+                                 : (g_bcControls[37].bState) ? 128 : -128;
         }
         cs.ButtonTriangle = (g_bcControls[9].bState) ? 255 : 0;            // Enter Exit
         cs.Select = (g_bcControls[10].bState) ? 255 : 0;                   // Change View

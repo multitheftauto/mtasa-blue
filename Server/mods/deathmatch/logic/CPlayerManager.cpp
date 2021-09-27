@@ -323,8 +323,8 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
 bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 {
     if (model > 312)
-        return false;            // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
-
+        return false; // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
+        
     switch (model)
     {
         case 3:

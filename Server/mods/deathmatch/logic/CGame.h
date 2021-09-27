@@ -451,10 +451,10 @@ public:
     void SendSyncSettings(CPlayer* pPlayer = NULL);
 
     CMtaVersion CalculateMinClientRequirement();
-    bool        IsBelowMinimumClient(const CMtaVersion& strVersion);
-    bool        IsBelowRecommendedClient(const CMtaVersion& strVersion);
-    void        ApplyAseSetting();
-    bool        IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
+    bool    IsBelowMinimumClient(const CMtaVersion& strVersion);
+    bool    IsBelowRecommendedClient(const CMtaVersion& strVersion);
+    void    ApplyAseSetting();
+    bool    IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
 
     void SetDevelopmentMode(bool enabled) { m_DevelopmentModeEnabled = enabled; }
     bool GetDevelopmentMode() { return m_DevelopmentModeEnabled; }

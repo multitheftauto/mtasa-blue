@@ -40,5 +40,5 @@ public:
 
 private:
     std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
-    unsigned int                                     m_modelCount = 0;
+    unsigned int m_modelCount = 0;
 };

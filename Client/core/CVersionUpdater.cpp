@@ -126,10 +126,10 @@ public:
     void _QuitCurrentProgram();
 
     // Doers
-    int  DoSendDownloadRequestToNextServer();
-    int  DoPollDownload();
-    int  DoSendPostToNextServer();
-    int  DoPollPost();
+    int DoSendDownloadRequestToNextServer();
+    int DoPollDownload();
+    int DoSendPostToNextServer();
+    int DoPollPost();
     void OnMainMenuFullyVisible();
 
     static void* StaticThreadProc(void* pContext);
@@ -3109,8 +3109,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     SString        strVideoCard = SStringX(g_pDeviceState->AdapterState.Name).Left(30);
-    std::replace_if(
-        strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
+    std::replace_if(strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
     SString strSystemStats(
         "1_%d_%d_%d_%d_%d"
         "_%d%d%d%d"

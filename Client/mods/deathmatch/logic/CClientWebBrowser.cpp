@@ -336,7 +336,7 @@ CClientGUIWebBrowser::CClientGUIWebBrowser(bool isLocal, bool isTransparent, uin
 
     if (m_pBrowser)
     {
-        m_pBrowser->SetParent(this);            // m_pBrowser gets deleted automatically by the element tree logic
+        m_pBrowser->SetParent(this); // m_pBrowser gets deleted automatically by the element tree logic
 
         // Set our owner resource
         m_pBrowser->SetResource(pLuaMain->GetResource());

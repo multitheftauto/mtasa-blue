@@ -18,8 +18,8 @@ class CConsole
 {
 public:
     CConsole(class CBlipManager* pBlipManager, class CMapManager* pMapManager, class CPlayerManager* pPlayerManager,
-             class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CBanManager* pBanManager,
-             class CAccessControlListManager* pACLManager);
+             class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager,
+             class CBanManager* pBanManager, class CAccessControlListManager* pACLManager);
     ~CConsole();
 
     bool HandleInput(const char* szCommand, CClient* pClient, CClient* pEchoClient);

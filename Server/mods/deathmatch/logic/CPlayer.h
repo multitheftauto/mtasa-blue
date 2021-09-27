@@ -117,16 +117,16 @@ public:
     long GetMoney() { return m_lMoney; };
     void SetMoney(long lMoney) { m_lMoney = lMoney; };
 
-    const CVector&       GetSniperSourceVector() { return m_vecSniperSource; };
-    void                 SetSniperSourceVector(const CVector& vecSource) { m_vecSniperSource = vecSource; };
-    void                 GetTargettingVector(CVector& vecTarget) { vecTarget = m_vecTargetting; };
-    void                 SetTargettingVector(const CVector& vecTarget) { m_vecTargetting = vecTarget; };
-    float                GetAimDirection() { return m_fAimDirection; };
-    void                 SetAimDirection(float fDirection) { m_fAimDirection = fDirection; };
+    const CVector& GetSniperSourceVector() { return m_vecSniperSource; };
+    void           SetSniperSourceVector(const CVector& vecSource) { m_vecSniperSource = vecSource; };
+    void           GetTargettingVector(CVector& vecTarget) { vecTarget = m_vecTargetting; };
+    void           SetTargettingVector(const CVector& vecTarget) { m_vecTargetting = vecTarget; };
+    float          GetAimDirection() { return m_fAimDirection; };
+    void           SetAimDirection(float fDirection) { m_fAimDirection = fDirection; };
     eVehicleAimDirection GetDriveByDirection() { return m_ucDriveByDirection; };
-    void                 SetDriveByDirection(eVehicleAimDirection ucDirection) { m_ucDriveByDirection = ucDirection; };
-    bool                 IsAkimboArmUp() { return m_bAkimboArmUp; };
-    void                 SetAkimboArmUp(bool bUp) { m_bAkimboArmUp = bUp; };
+    void           SetDriveByDirection(eVehicleAimDirection ucDirection) { m_ucDriveByDirection = ucDirection; };
+    bool           IsAkimboArmUp() { return m_bAkimboArmUp; };
+    void           SetAkimboArmUp(bool bUp) { m_bAkimboArmUp = bUp; };
 
     NetServerPlayerID& GetSocket() { return m_PlayerSocket; };
     const char*        GetSourceIP();
@@ -366,11 +366,11 @@ private:
 
     bool m_bNametagColorOverridden;
 
-    float                m_fCameraRotation;
-    long                 m_lMoney;
-    CVector              m_vecSniperSource;
-    CVector              m_vecTargetting;
-    float                m_fAimDirection;
+    float         m_fCameraRotation;
+    long          m_lMoney;
+    CVector       m_vecSniperSource;
+    CVector       m_vecTargetting;
+    float         m_fAimDirection;
     eVehicleAimDirection m_ucDriveByDirection;
 
     bool m_bAkimboArmUp;

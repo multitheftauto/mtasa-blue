@@ -164,8 +164,7 @@ inline SString GetClassTypeName(CRemoteCall*)
 {
     return "remotecall";
 }
-inline SString GetClassTypeName(CColShape*)
-{
+inline SString GetClassTypeName(CColShape*) {
     return "colshape";
 }
 inline SString GetClassTypeName(CDummy*)

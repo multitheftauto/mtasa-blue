@@ -77,6 +77,7 @@ void CClientObjectManager::DeleteAll()
     m_bCanRemoveFromList = true;
 }
 
+
 CClientObject* CClientObjectManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
@@ -305,8 +306,9 @@ void CClientObjectManager::RestreamObjects(unsigned short usModel)
 
 void CClientObjectManager::RestreamAllObjects()
 {
-    for (auto& pObject : m_Objects)
+    for (auto& pObject: m_Objects)
     {
+
         // Streamed in and same model ID?
         if (pObject->IsStreamedIn())
         {

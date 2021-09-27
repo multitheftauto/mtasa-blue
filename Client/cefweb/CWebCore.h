@@ -39,7 +39,10 @@ class CWebCore : public CWebCoreInterface
 
         EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
 #ifdef MTA_DEBUG
-        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_) : callback(callback_), pWebView(pWebView_), name(name_) {}
+        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_)
+            : callback(callback_), pWebView(pWebView_), name(name_)
+        {
+        }
 #endif
     };
 
