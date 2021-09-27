@@ -294,6 +294,7 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
         int RenderTargetCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetRenderTargetCount();
         int ScreenSourceCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetScreenSourceCount();
         int WebBrowserCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetWebBrowserCount();
+        int VectorGraphicCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetVectorGraphicCount();
         TextItemCount = std::max(TextItemCount - 4, 0);            // Remove count for radar items
         row[c++] = !TextItemCount ? "-" : SString("%d", TextItemCount);
         row[c++] = !DxFontCount ? "-" : SString("%d", DxFontCount);
@@ -303,6 +304,7 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
         row[c++] = !RenderTargetCount ? "-" : SString("%d", RenderTargetCount);
         row[c++] = !ScreenSourceCount ? "-" : SString("%d", ScreenSourceCount);
         row[c++] = !WebBrowserCount ? "-" : SString("%d", WebBrowserCount);
+        row[c++] = !VectorGraphicCount ? "-" : SString("%d", VectorGraphicCount);
     }
 
     // For each VM
