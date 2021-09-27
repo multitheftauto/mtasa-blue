@@ -40,7 +40,8 @@ public:
     // CPixelsManagerInterface
     virtual void OnDeviceCreate(IDirect3DDevice9* pDevice);
     virtual bool IsPixels(const CPixels& pixels);
-    virtual bool GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CPixels& outPixels, const RECT* pRect = NULL, uint uiSurfaceIndex = 0);
+    virtual bool GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CPixels& outPixels, EPixelsFormatType pixelsFormat = EPixelsFormat::PLAIN,
+                                  ERenderFormat renderFormat = RFORMAT_UNKNOWN, bool bMipMaps = true, const RECT* pRect = NULL, uint uiSurfaceIndex = 0);
     virtual bool SetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, const CPixels& pixels, const RECT* pRect = NULL, uint uiSurfaceIndex = 0);
     virtual bool GetPixelsSize(const CPixels& pixels, uint& uiOutWidth, uint& uiOutHeight);
     virtual EPixelsFormatType GetPixelsFormat(const CPixels& pixels);
@@ -61,6 +62,11 @@ public:
 
     bool GetVolumePixels(IDirect3DVolume9* pD3DVolume, CPixels& outPixels, const RECT* pRect, uint uiSlice);
     bool SetVolumePixels(IDirect3DVolume9* pD3DVolume, const CPixels& pixels, const RECT* pRect, uint uiSlice);
+
+    bool D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixels& outPixels, EPixelsFormatType pixelsFormat, ERenderFormat renderFormat, bool bMipMaps,
+                              const RECT* pRect);
+    bool D3DXGetVolumePixels(IDirect3DVolumeTexture9* pD3DVolumeTexture, CPixels& outPixels, EPixelsFormatType pixelsFormat, ERenderFormat renderFormat,
+                             bool bMipMaps, const RECT* pRect, uint uiSlice);
 
     // Util
     static int     GetRectWidth(const RECT& rc);

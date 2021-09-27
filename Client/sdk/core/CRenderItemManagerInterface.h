@@ -47,6 +47,8 @@ enum ERenderFormat
 {
     RFORMAT_UNKNOWN,
     RFORMAT_ARGB = 21,            // D3DFMT_A8R8G8B8
+    RFORMAT_XRGB = 22,            // D3DFMT_X8R8G8B8
+    RFORMAT_RGB  = 23,            // D3DFMT_R5G6B5
     RFORMAT_DXT1 = '1TXD',
     RFORMAT_DXT2 = '2TXD',
     RFORMAT_DXT3 = '3TXD',
