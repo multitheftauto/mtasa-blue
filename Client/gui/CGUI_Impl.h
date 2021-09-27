@@ -20,6 +20,7 @@ public:
     ~CGUI_Impl();
 
     void Draw();
+    void Draw(CGUIElement* element);
 
     void Invalidate();
     void Restore();

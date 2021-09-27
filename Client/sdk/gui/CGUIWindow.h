@@ -16,7 +16,5 @@ class CGUIWindow : public CGUIElement
 public:
     virtual ~CGUIWindow(){};
 
-    virtual CVector2D GetOffset() override = 0;
-
     virtual float GetTitlebarHeight() = 0;
 };

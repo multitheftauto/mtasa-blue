@@ -20,7 +20,7 @@ public:
     virtual void Begin() = 0;
     virtual void End() = 0;
 
-    virtual CVector2D GetOffset() = 0;
+    virtual std::string GetID() = 0;
 
     virtual void SetPosition(CVector2D pos, bool relative = false) = 0;
     virtual void SetSize(CVector2D size, bool relative = false) = 0;
@@ -43,6 +43,9 @@ public:
 
     virtual void SetFrameEnabled(bool state) = 0;
     virtual bool GetFrameEnabled() = 0;
+
+    virtual void SetDynamicPositionEnabled(bool state) = 0;
+    virtual bool GetDynamicPositionEnabled() = 0;
 
     virtual bool IsDeleted() = 0;
 };

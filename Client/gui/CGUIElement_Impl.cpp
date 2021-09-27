@@ -16,11 +16,6 @@ CGUIElement_Impl::CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVecto
 {
     m_pManager = pGUI;
 
-    SetParent(pParent);
-
-    SetPosition(pos, relative);
-    SetSize(size, relative);
-
     // Create a unique ID for this element
     const void* address = static_cast<const void*>(this);
 
@@ -28,12 +23,21 @@ CGUIElement_Impl::CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVecto
     ss << address;
 
     m_uid = std::to_string(GetTickCount32()) + ss.str();
+
+    SetParent(pParent);
+    SetPosition(pos, relative);
+    SetSize(size, relative);
 }
 
 CGUIElement_Impl::~CGUIElement_Impl()
 {
     m_deleted = true;
     m_pManager->OnElementDestroy(this);
+}
+
+std::string CGUIElement_Impl::GetID()
+{
+    return m_uid;
 }
 
 void CGUIElement_Impl::SetParent(CGUIElement* parent)
@@ -44,7 +48,6 @@ void CGUIElement_Impl::SetParent(CGUIElement* parent)
     if (m_pParent)
     {
         m_pParent->RemoveChild(this);
-        m_pParent = nullptr;
     }
 
     m_pParent = parent;
@@ -99,7 +102,7 @@ void CGUIElement_Impl::Begin()
     }
     else
     {
-        if (!ImGui::BeginChild(id, ImVec2(m_size.fX, m_size.fY), m_frame))
+        if (!ImGui::BeginChild(id, ImVec2(m_size.fX, m_size.fY), m_hasFrame))
             return;
 
         ImGui::Text(m_title.c_str());
@@ -108,9 +111,6 @@ void CGUIElement_Impl::Begin()
 
 void CGUIElement_Impl::End()
 {
-    m_position = CVector2D(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y);
-    m_size = CVector2D(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
-
     if (m_pParent == nullptr)
         ImGui::End();
     else
@@ -130,7 +130,7 @@ void CGUIElement_Impl::SetPosition(CVector2D pos, bool relative)
         pos = CVector2D(pos.fX * parentSize.fX, pos.fY * parentSize.fY);
     }
 
-    m_offsetPosition = pos;
+    m_position = pos;
     m_updatePosition = true;
 }
 
@@ -158,20 +158,16 @@ CVector2D CGUIElement_Impl::GetSize()
 
 void CGUIElement_Impl::ProcessPosition()
 {
-    if (m_updatePosition)
+    if (m_pParent == nullptr && m_updatePosition)
     {
         ImGui::SetNextWindowPos(ImVec2(m_position.fX, m_position.fY));
+        m_updatePosition = false;
     }
-
-    if (m_pParent)
+    else if (m_pParent && !m_hasDynamicPosition)
     {
-        CVector2D parentOffset = m_pParent->GetOffset();
-
-        ImGui::SetCursorPosX(m_offsetPosition.fX + parentOffset.fX);
-        ImGui::SetCursorPosY(m_offsetPosition.fY + parentOffset.fY);
+        ImGui::SetCursorPosX(m_position.fX);
+        ImGui::SetCursorPosY(m_position.fY);
     }
-
-    m_updatePosition = false;
 }
 
 void CGUIElement_Impl::ProcessSize()
@@ -184,15 +180,20 @@ void CGUIElement_Impl::ProcessSize()
 
 void CGUIElement_Impl::SetFrameEnabled(bool state)
 {
-    m_frame = state;
+    m_hasFrame = state;
 }
 
 bool CGUIElement_Impl::GetFrameEnabled()
 {
-    return m_frame;
+    return m_hasFrame;
 }
 
-CVector2D CGUIElement_Impl::GetOffset()
+void CGUIElement_Impl::SetDynamicPositionEnabled(bool state)
 {
-    return {};
+    m_hasDynamicPosition = state;
+}
+
+bool CGUIElement_Impl::GetDynamicPositionEnabled()
+{
+    return m_hasDynamicPosition;
 }

@@ -22,6 +22,8 @@ public:
     void Begin();
     void End();
 
+    std::string GetID();
+
     void SetPosition(CVector2D pos, bool relative = false);
     void SetSize(CVector2D size, bool relative = false);
 
@@ -30,8 +32,6 @@ public:
 
     void         SetParent(CGUIElement* parent);
     CGUIElement* GetParent();
-
-    CVector2D GetOffset();
 
     void AddChild(CGUIElement* child);
     void RemoveChild(CGUIElement* child);
@@ -46,6 +46,9 @@ public:
     void SetFrameEnabled(bool state);
     bool GetFrameEnabled();
 
+    void SetDynamicPositionEnabled(bool state);
+    bool GetDynamicPositionEnabled();
+
     bool IsDeleted();
 
 protected:
@@ -59,11 +62,10 @@ protected:
 
     CGUIType m_type = CGUIType::ELEMENT;
 
-    bool m_frame;
+    bool m_hasFrame = false;
+    bool m_hasDynamicPosition = false;
 
     CVector2D m_position = {};
-    CVector2D m_offsetPosition = {};
-
     CVector2D m_size = {};
 
     bool m_deleted = false;

@@ -42,8 +42,3 @@ float CGUIWindow_Impl::GetTitlebarHeight()
 {
     return m_titlebarHeight;
 }
-
-CVector2D CGUIWindow_Impl::GetOffset()
-{
-    return CVector2D(0, GetTitlebarHeight());
-}

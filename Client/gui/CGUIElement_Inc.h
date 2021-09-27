@@ -7,6 +7,11 @@
  *
  *****************************************************************************/
 
+std::string GetID()
+{
+    return CGUIElement_Impl::GetID();
+};
+
 void SetPosition(CVector2D pos, bool relative = false)
 {
     CGUIElement_Impl::SetPosition(pos, relative);
@@ -80,4 +85,14 @@ void SetFrameEnabled(bool state)
 bool GetFrameEnabled()
 {
     return CGUIElement_Impl::GetFrameEnabled();
+};
+
+void SetDynamicPositionEnabled(bool state)
+{
+    CGUIElement_Impl::SetDynamicPositionEnabled(state);
+};
+
+bool GetDynamicPositionEnabled()
+{
+    return CGUIElement_Impl::GetDynamicPositionEnabled();
 };

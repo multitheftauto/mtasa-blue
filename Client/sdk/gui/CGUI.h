@@ -19,6 +19,7 @@ class CGUI
 {
 public:
     virtual void Draw() = 0;
+    virtual void Draw(CGUIElement* element) = 0;
 
     virtual void Invalidate() = 0;
     virtual void Restore() = 0;

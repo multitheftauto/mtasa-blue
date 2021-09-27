@@ -20,8 +20,6 @@ public:
     void Begin();
     void End();
 
-    CVector2D GetOffset();
-
     float GetTitlebarHeight();
 
 #include "CGUIElement_Inc.h"

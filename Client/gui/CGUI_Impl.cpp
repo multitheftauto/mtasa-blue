@@ -37,13 +37,17 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 
     // Windows test
     CGUIWindow* window = CreateGUIWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
-    CGUIWindow* window2 = CreateGUIWindow(CVector2D(50, 50), CVector2D(150, 150), window, false, "Child Window");
+    CGUIWindow* window2 = CreateGUIWindow(CVector2D(125, 125), CVector2D(250, 250), window, false, "Child Window");
+    CGUIWindow* window3 = CreateGUIWindow(CVector2D(25, 25), CVector2D(100, 100), window2, false, "Child Window 2");
 
     /* Tested functions */
+    // window2->SetDynamicPositionEnabled(true);
     // window2->SetFrameEnabled(false);
-    // window2->SetPosition(CVector2D(75, 75));
+
+    // window2->SetPosition(CVector2D(125, 125));
     // window2->SetSize(CVector2D(200, 200));
-    // window2->SetParent(nullptr);
+
+    window2->SetParent(nullptr);
 }
 
 CGUI_Impl::~CGUI_Impl()
@@ -94,20 +98,7 @@ void CGUI_Impl::Draw()
 
             if (elem->GetParent() == nullptr && !elem->IsDeleted())
             {
-                elem->Begin();
-
-                list<CGUIElement*>                 children = elem->GetChildren();
-                list<CGUIElement*>::const_iterator c = children.begin();
-
-                for (; c != children.end(); c++)
-                {
-                    CGUIElement* child = (*c);
-
-                    child->Begin();
-                    child->End();
-                }
-
-                elem->End();
+                Draw(elem);
             }
         }
     }
@@ -117,6 +108,26 @@ void CGUI_Impl::Draw()
     // Rendering
     ImGui::Render();
     ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+}
+
+void CGUI_Impl::Draw(CGUIElement* element)
+{
+    if (element == nullptr)
+        return;
+
+    // Draw ImGui element
+    element->Begin();
+
+    list<CGUIElement*>                 children = element->GetChildren();
+    list<CGUIElement*>::const_iterator c = children.begin();
+
+    for (; c != children.end(); c++)
+    {
+        CGUIElement* child = (*c);
+        Draw(child);
+    }
+
+    element->End();
 }
 
 void CGUI_Impl::Invalidate()
