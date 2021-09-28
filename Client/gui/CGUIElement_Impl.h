@@ -49,13 +49,23 @@ public:
     void SetDynamicPositionEnabled(bool state);
     bool GetDynamicPositionEnabled();
 
-    bool IsDeleted();
+    int  AddRenderFunction(std::function<void()> renderFunction);
+    void RemoveRenderFunction(int index);
+
+    void Destroy();
+    bool IsDestroyed();
+
+    void DemoHookTest();
 
 protected:
     CGUI_Impl*   m_pManager = nullptr;
     CGUIElement* m_pParent = nullptr;
 
     std::list<CGUIElement*> m_children;
+
+    std::list<std::function<void()>>                    m_renderFunctions = {};
+    std::map<int, decltype(m_renderFunctions.cbegin())> m_renderFunctionIndexMap;
+    int                                                 m_numLifetimeRenderFunctions = 0;
 
     std::string m_title = {};
     std::string m_uid;
@@ -68,6 +78,7 @@ protected:
     CVector2D m_position = {};
     CVector2D m_size = {};
 
+    bool m_rendering = false;
     bool m_deleted = false;
 
     bool m_updatePosition = false;

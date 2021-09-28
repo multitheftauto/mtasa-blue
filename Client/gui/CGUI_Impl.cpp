@@ -35,19 +35,8 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
     // Setup Platform/Renderer backends
     ImGui_ImplDX9_Init(m_pDevice);
 
-    // Windows test
-    CGUIWindow* window = CreateGUIWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
-    CGUIWindow* window2 = CreateGUIWindow(CVector2D(125, 125), CVector2D(250, 250), window, false, "Child Window");
-    CGUIWindow* window3 = CreateGUIWindow(CVector2D(25, 25), CVector2D(100, 100), window2, false, "Child Window 2");
-
-    /* Tested functions */
-    // window2->SetDynamicPositionEnabled(true);
-    // window2->SetFrameEnabled(false);
-
-    // window2->SetPosition(CVector2D(125, 125));
-    // window2->SetSize(CVector2D(200, 200));
-
-    window2->SetParent(nullptr);
+    // Demo stuff & testing
+    CreateDemo();
 }
 
 CGUI_Impl::~CGUI_Impl()
@@ -56,6 +45,22 @@ CGUI_Impl::~CGUI_Impl()
     ImGui_ImplWin32_Shutdown();
 
     ImGui::DestroyContext();
+}
+
+void CGUI_Impl::CreateDemo()
+{
+    CGUIWindow* window = CreateGUIWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
+    CGUIWindow* window2 = CreateGUIWindow(CVector2D(50, 100), CVector2D(300, 300), window, false, "Child Window");
+    CGUIWindow* window3 = CreateGUIWindow(CVector2D(50, 50), CVector2D(200, 200), window2, false, "Child Window 2");
+
+    int funcIndex = window->AddRenderFunction(std::bind(&CGUIElement::DemoHookTest, window));
+    // window->RemoveRenderFunction(funcIndex);
+
+    window2->SetDynamicPositionEnabled(true);
+    // window2->SetFrameEnabled(false);
+    // window2->SetPosition(CVector2D(75, 75));
+    // window2->SetSize(CVector2D(100, 100));
+    // window2->SetParent(nullptr);
 }
 
 bool CGUI_Impl::ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -82,6 +87,21 @@ void CGUI_Impl::Draw()
     if (GetHookedWindow() == nullptr)
         return;
 
+    // Check if any elements need destroying, savely remove
+    std::list<CGUIElement*>::iterator e = m_guiElements.begin();
+    while (e != m_guiElements.end())
+    {
+        CGUIElement* elem = (*e);
+
+        if (elem->IsDestroyed())
+        {
+            m_guiElements.erase(e);
+            delete elem;
+        }
+
+        ++e;
+    }
+
     // Start the Dear ImGui frame
     ImGui_ImplDX9_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -96,7 +116,7 @@ void CGUI_Impl::Draw()
         {
             CGUIElement* elem = (*e);
 
-            if (elem->GetParent() == nullptr && !elem->IsDeleted())
+            if (elem->GetParent() == nullptr)
             {
                 Draw(elem);
             }
@@ -138,11 +158,6 @@ void CGUI_Impl::Invalidate()
 void CGUI_Impl::Restore()
 {
     ImGui_ImplDX9_CreateDeviceObjects();
-}
-
-void CGUI_Impl::OnElementDestroy(CGUIElement* element)
-{
-    m_guiElements.remove(element);
 }
 
 CVector2D CGUI_Impl::GetResolution()

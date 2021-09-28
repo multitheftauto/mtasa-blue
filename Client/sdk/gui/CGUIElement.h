@@ -47,5 +47,11 @@ public:
     virtual void SetDynamicPositionEnabled(bool state) = 0;
     virtual bool GetDynamicPositionEnabled() = 0;
 
-    virtual bool IsDeleted() = 0;
+    virtual int  AddRenderFunction(std::function<void()> renderFunction) = 0;
+    virtual void RemoveRenderFunction(int index) = 0;
+
+    virtual void Destroy() = 0;
+    virtual bool IsDestroyed() = 0;
+
+    virtual void DemoHookTest() = 0;
 };

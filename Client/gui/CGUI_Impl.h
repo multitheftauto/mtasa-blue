@@ -32,9 +32,9 @@ public:
 
     bool ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-    void OnElementDestroy(CGUIElement* element);
-
     CVector2D GetResolution();
+
+    void CreateDemo();
 
 private:
     IDirect3DDevice9* m_pDevice;

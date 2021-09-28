@@ -29,10 +29,37 @@ CGUIElement_Impl::CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVecto
     SetSize(size, relative);
 }
 
-CGUIElement_Impl::~CGUIElement_Impl()
+void CGUIElement_Impl::Destroy()
 {
     m_deleted = true;
-    m_pManager->OnElementDestroy(this);
+}
+
+CGUIElement_Impl::~CGUIElement_Impl()
+{
+    std::list<CGUIElement*>::iterator c = m_children.begin();
+    while (c != m_children.end())
+    {
+        CGUIElement* child = (*c);
+        m_children.erase(c++);
+        child->Destroy();
+    }
+
+    m_renderFunctions.clear();
+    m_renderFunctionIndexMap.clear();
+}
+
+void CGUIElement_Impl::DemoHookTest()
+{
+    ImGui::Text("Testing hook");
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Recreate demo", ImVec2(100, 30)))
+    {
+        // Destroy demo and create it again (assume we're the root demo window)
+        Destroy();
+        m_pManager->CreateDemo();
+    }
 }
 
 std::string CGUIElement_Impl::GetID()
@@ -83,13 +110,15 @@ std::list<CGUIElement*> CGUIElement_Impl::GetChildren()
     return m_children;
 }
 
-bool CGUIElement_Impl::IsDeleted()
+bool CGUIElement_Impl::IsDestroyed()
 {
     return m_deleted;
 }
 
 void CGUIElement_Impl::Begin()
 {
+    m_rendering = true;
+
     const char* id = (m_title + "###" + m_uid).c_str();
 
     ProcessPosition();
@@ -107,6 +136,17 @@ void CGUIElement_Impl::Begin()
 
         ImGui::Text(m_title.c_str());
     }
+
+    // Call render functions - you can 'hook' and modify this element (useful for script customization)
+    std::list<std::function<void()>>::const_iterator func = m_renderFunctions.begin();
+
+    for (; func != m_renderFunctions.end(); func++)
+    {
+        if (IsDestroyed())            // Maybe we got destroyed in the previous render function
+            return;
+
+        (*func)();
+    }
 }
 
 void CGUIElement_Impl::End()
@@ -115,6 +155,28 @@ void CGUIElement_Impl::End()
         ImGui::End();
     else
         ImGui::EndChild();
+
+    m_rendering = false;
+}
+
+int CGUIElement_Impl::AddRenderFunction(std::function<void()> renderFunction)
+{
+    auto iter = m_renderFunctions.insert(m_renderFunctions.end(), renderFunction);
+    int  index = ++m_numLifetimeRenderFunctions;
+
+    m_renderFunctionIndexMap[index] = iter;
+    return index;
+}
+
+void CGUIElement_Impl::RemoveRenderFunction(int index)
+{
+    if (m_renderFunctionIndexMap.count(index) <= 0)
+        return;
+
+    auto iter = m_renderFunctionIndexMap.at(index);
+
+    m_renderFunctions.erase(iter);
+    m_renderFunctionIndexMap.erase(index);
 }
 
 CGUIType CGUIElement_Impl::GetType()

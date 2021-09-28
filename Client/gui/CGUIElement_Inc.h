@@ -72,10 +72,15 @@ CGUIType GetType()
     return CGUIElement_Impl::GetType();
 };
 
-bool IsDeleted()
+bool IsDestroyed()
 {
-    return CGUIElement_Impl::IsDeleted();
+    return CGUIElement_Impl::IsDestroyed();
 };
+
+void Destroy()
+{
+    CGUIElement_Impl::Destroy();
+}
 
 void SetFrameEnabled(bool state)
 {
@@ -96,3 +101,19 @@ bool GetDynamicPositionEnabled()
 {
     return CGUIElement_Impl::GetDynamicPositionEnabled();
 };
+
+int AddRenderFunction(std::function<void()> renderFunction)
+{
+    return CGUIElement_Impl::AddRenderFunction(renderFunction);
+};
+
+void RemoveRenderFunction(int index)
+{
+    CGUIElement_Impl::RemoveRenderFunction(index);
+};
+
+void DemoHookTest()
+{
+    CGUIElement_Impl::DemoHookTest();
+};
+
