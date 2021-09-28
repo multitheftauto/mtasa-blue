@@ -255,6 +255,7 @@ CCredits::CCredits()
         "libpcre (https://www.pcre.org/)\n"
         "libpng (http://www.libpng.org/)\n"
         "Lua (https://www.lua.org/)\n"
+        "lunasvg (https://github.com/sammycage/lunasvg)\n"
         "PortAudio (http://www.portaudio.com/)\n"
         "RakNet (http://www.jenkinssoftware.com/)\n"
         "SA Limit adjuster source code (Credits to Sacky)\n"
