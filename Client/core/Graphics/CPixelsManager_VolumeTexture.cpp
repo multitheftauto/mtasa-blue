@@ -384,10 +384,15 @@ bool CPixelsManager::D3DXGetVolumePixels(IDirect3DVolumeTexture9* pD3DVolumeText
     box.Back = uiSlice + 1;
 
     D3DXIMAGE_FILEFORMAT dxFileFormat = D3DXIFF_DDS;
-    if (pixelsFormat == EPixelsFormat::PNG)
-        dxFileFormat = D3DXIFF_PNG;
-    else if (pixelsFormat == EPixelsFormat::JPEG)
-        dxFileFormat = D3DXIFF_JPG;
+    switch (pixelsFormat)
+    {
+        case EPixelsFormat::PNG:
+            dxFileFormat = D3DXIFF_PNG;
+            break;
+        case EPixelsFormat::JPEG:
+            dxFileFormat = D3DXIFF_JPG;
+            break;
+    }
 
     D3DFORMAT dxFormat = (D3DFORMAT)renderFormat;
     if (dxFormat == D3DFMT_UNKNOWN)

@@ -494,10 +494,15 @@ bool CPixelsManager::D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixel
     CAutoReleaseMe<ID3DXBuffer> Thanks1(dxBuffer);
 
     D3DXIMAGE_FILEFORMAT dxFileFormat = D3DXIFF_DDS;
-    if (pixelsFormat == EPixelsFormat::PNG)
-        dxFileFormat = D3DXIFF_PNG;
-    else if (pixelsFormat == EPixelsFormat::JPEG)
-        dxFileFormat = D3DXIFF_JPG;
+    switch (pixelsFormat)
+    {
+        case EPixelsFormat::PNG:
+            dxFileFormat = D3DXIFF_PNG;
+            break;
+        case EPixelsFormat::JPEG:
+            dxFileFormat = D3DXIFF_JPG;
+            break;
+    }
 
     if (dxFileFormat != D3DXIFF_DDS)
     {
