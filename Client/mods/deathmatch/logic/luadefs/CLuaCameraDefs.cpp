@@ -87,7 +87,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "position", OOP_SetCameraPosition, OOP_GetCameraPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetCameraRotation, OOP_GetCameraRotation);
     lua_classvariable(luaVM, "matrix", NULL, OOP_GetCameraMatrix);
-    lua_classvariable(luaVM, "type", NULL, ArgumentParser<GetElementType>);
+    lua_classvariable(luaVM, "type", nullptr, ArgumentParser<GetElementType>);
 
     lua_registerstaticclass(luaVM, "Camera");
 }
