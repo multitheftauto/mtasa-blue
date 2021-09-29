@@ -58,8 +58,8 @@ public:
     void ClearElementData(CElement* pElement, const std::string& name);
     void ClearElementData(CElement* pElement);
 
-    void           ResetAll();
-    void           OnPlayerJoin(CPlayer* pPlayer);
+    void               ResetAll();
+    void               OnPlayerJoin(CPlayer* pPlayer);
     const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
 
 private:

@@ -14,6 +14,11 @@
 #error conflicting BASS and BASSmix versions
 #endif
 
+#ifdef __OBJC__
+typedef int BOOL32;
+#define BOOL BOOL32 // override objc's BOOL
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -83,11 +88,14 @@ typedef struct {
 // Additional BASS_Mixer_ChannelSetPosition flag
 #define BASS_POS_MIXER_RESET	0x10000 // flag: clear mixer's playback buffer
 
+// Additional BASS_Mixer_ChannelGetPosition mode
+#define BASS_POS_MIXER_DELAY	5
+
 // BASS_CHANNELINFO types
 #define BASS_CTYPE_STREAM_MIXER	0x10800
 #define BASS_CTYPE_STREAM_SPLIT	0x10801
 
-DWORD BASSMIXDEF(BASS_Mixer_GetVersion)();
+DWORD BASSMIXDEF(BASS_Mixer_GetVersion)(void);
 
 HSTREAM BASSMIXDEF(BASS_Mixer_StreamCreate)(DWORD freq, DWORD chans, DWORD flags);
 BOOL BASSMIXDEF(BASS_Mixer_StreamAddChannel)(HSTREAM handle, DWORD channel, DWORD flags);
@@ -122,6 +130,10 @@ DWORD BASSMIXDEF(BASS_Split_StreamGetAvailable)(DWORD handle);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __OBJC__
+#undef BOOL
 #endif
 
 #endif

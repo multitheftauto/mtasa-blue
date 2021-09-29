@@ -7,8 +7,8 @@
  *
  *****************************************************************************/
 #pragma once
-#include <cef3/include/cef_app.h>
-#include <cef3/include/cef_scheme.h>
+#include <cef3/cef/include/cef_app.h>
+#include <cef3/cef/include/cef_scheme.h>
 
 class CWebApp : public CefApp, public CefSchemeHandlerFactory
 {

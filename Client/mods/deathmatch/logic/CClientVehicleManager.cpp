@@ -765,7 +765,7 @@ void CClientVehicleManager::RestreamAllVehicles()
     if (m_StreamedIn.empty())
         return;
 
-    for (auto& pVehicle: m_List)
+    for (auto& pVehicle : m_List)
     {
         // Streamed in and same vehicle ID?
         if (pVehicle->IsStreamedIn())

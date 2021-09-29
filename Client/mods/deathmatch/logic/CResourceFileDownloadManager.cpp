@@ -290,8 +290,7 @@ void CResourceFileDownloadManager::StaticDownloadFinished(const SHttpDownloadRes
 ///////////////////////////////////////////////////////////////
 void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& result)
 {
-    auto iter = std::find(std::begin(m_ActiveFileDownloadList), std::end(m_ActiveFileDownloadList),
-                          reinterpret_cast<CDownloadableResource*>(result.pObj));
+    auto iter = std::find(std::begin(m_ActiveFileDownloadList), std::end(m_ActiveFileDownloadList), reinterpret_cast<CDownloadableResource*>(result.pObj));
 
     if (iter == std::end(m_ActiveFileDownloadList))
         return;

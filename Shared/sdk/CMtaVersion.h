@@ -27,35 +27,17 @@ namespace SharedUtil
 
         // Assignment like SString
                     operator const char*() const { return c_str(); }            // Auto assign to const char* without using c_str()
-        const char* operator*()const { return c_str(); }
+        const char* operator*() const { return c_str(); }
 
         // Compare disregarding build type
-        bool operator==(const char* other) const
-        {
-            return operator==(CMtaVersion(other));
-        }
-        bool operator==(const CMtaVersion& other) const
-        {
-            return GetVersionStringUsingBuildType() == other.GetVersionStringUsingBuildType();
-        }
+        bool operator==(const char* other) const { return operator==(CMtaVersion(other)); }
+        bool operator==(const CMtaVersion& other) const { return GetVersionStringUsingBuildType() == other.GetVersionStringUsingBuildType(); }
 
-        bool operator>(const char* other) const
-        {
-            return operator>(CMtaVersion(other));
-        }
-        bool operator>(const CMtaVersion& other) const
-        {
-            return GetVersionStringUsingBuildType() > other.GetVersionStringUsingBuildType();
-        }
+        bool operator>(const char* other) const { return operator>(CMtaVersion(other)); }
+        bool operator>(const CMtaVersion& other) const { return GetVersionStringUsingBuildType() > other.GetVersionStringUsingBuildType(); }
 
-        bool operator<(const char* other) const
-        {
-            return operator<(CMtaVersion(other));
-        }
-        bool operator<(const CMtaVersion& other) const
-        {
-            return GetVersionStringUsingBuildType() < other.GetVersionStringUsingBuildType();
-        }
+        bool operator<(const char* other) const { return operator<(CMtaVersion(other)); }
+        bool operator<(const CMtaVersion& other) const { return GetVersionStringUsingBuildType() < other.GetVersionStringUsingBuildType(); }
 
         // Return version as a string with MTASA_VERSION_TYPE replaced
         SString GetVersionStringUsingBuildType(int buildType = 9) const
@@ -67,16 +49,10 @@ namespace SharedUtil
         }
 
         // Extract MTASA_VERSION_BUILD (0 to 99999)
-        int GetBuildNumber() const
-        {
-            return atoi(SStringX(*this).SubStr(8));
-        }
+        int GetBuildNumber() const { return atoi(SStringX(*this).SubStr(8)); }
 
         // Extract MTASA_VERSION_MAJOR.MTASA_VERSION_MINOR e.g. '1.5'
-        SString GetGeneration() const
-        {
-            return SStringX(*this).SubStr(0,3);
-        }
+        SString GetGeneration() const { return SStringX(*this).SubStr(0, 3); }
     };
 
 }            // namespace SharedUtil

@@ -78,7 +78,8 @@ std::string CLuaCryptDefs::Base64decode(std::string str)
     return SharedUtil::Base64decode(str);
 }
 
-std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, std::string password, PasswordHashFunction algorithm, std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> callback)
+std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, std::string password, PasswordHashFunction algorithm,
+                                                            std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> callback)
 {
     switch (algorithm)
     {
@@ -148,7 +149,6 @@ std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, st
             throw std::invalid_argument("Unknown algorithm");
     }
 }
-
 
 int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 {
@@ -320,7 +320,6 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                 }
                                 catch (const CryptoPP::Exception&)
                                 {
-
                                 }
                                 return result;
                             },
@@ -477,7 +476,6 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                 }
                                 catch (const CryptoPP::Exception&)
                                 {
-
                                 }
                                 return result;
                             },

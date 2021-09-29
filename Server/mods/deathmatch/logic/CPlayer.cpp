@@ -215,7 +215,7 @@ bool CPlayer::UnsubscribeElementData(CElement* pElement)
 {
     bool erased = false;
 
-    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end(); )
+    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end();)
     {
         if (it->first == pElement)
         {

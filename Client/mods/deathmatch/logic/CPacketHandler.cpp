@@ -2287,7 +2287,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world non-sea level (to all world water)
     if (bHasNonSeaLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, nullptr, true, false, false);
-     // Apply outside world level (before -3000 and after 3000)
+    // Apply outside world level (before -3000 and after 3000)
     if (bHasOutsideLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fOutsideLevel, nullptr, false, false, true);
     // Apply world sea level (to world sea level water only)
@@ -4066,7 +4066,8 @@ retry:
                     }
                     else
                     {
-                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
+                        pWater =
+                            new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
                     if (!pWater->Exists())
                     {
@@ -4880,7 +4881,7 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             // Read out the arguments aswell
             CLuaArguments Arguments(bitStream);
 
-            // Grab the event. Does it exist and is it remotly triggerable?
+            // Grab the event. Does it exist and is it remotely triggerable?
             SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
             if (pEvent)
             {
@@ -4894,7 +4895,7 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                     }
                 }
                 else
-                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotly triggerable",
+                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotely triggerable",
                                                                 szName);
             }
             else

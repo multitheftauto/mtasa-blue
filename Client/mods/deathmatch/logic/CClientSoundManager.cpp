@@ -134,7 +134,7 @@ CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIs
     else if (bIsRawData)
     {
         size_t size = strSound.size();
-        void* pMemory = new char[size];
+        void*  pMemory = new char[size];
         memcpy(pMemory, strSound.data(), size);
         if (pSound->Play((void*)pMemory, size, bLoop))
             return pSound;
@@ -170,7 +170,7 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
     else if (bIsRawData)
     {
         size_t size = strSound.size();
-        void* pMemory = new char[size];
+        void*  pMemory = new char[size];
         memcpy(pMemory, strSound.data(), size);
         if (pSound->Play3D((void*)pMemory, size, bLoop))
         {
