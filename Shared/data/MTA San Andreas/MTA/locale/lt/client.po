@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Translators: Kristupas Skabeikis; Rytis Jankauskas; Gabrielius  Laurinavičius; Tadas Lapė; Dzinas; Karolis Vaikutis\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1562879735.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
+"X-POOTLE-MTIME: 1562879735.000000\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -1058,8 +1058,9 @@ msgid "Render vehicles always in high detail"
 msgstr "Visada vaizduoti transporto priemones aukščiausia raiška"
 
 #: ..\Client\core\CSettings.cpp:808
+#, fuzzy
 msgid "Render peds always in high detail"
-msgstr ""
+msgstr "Visada vaizduoti transporto priemones aukščiausia raiška"
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
