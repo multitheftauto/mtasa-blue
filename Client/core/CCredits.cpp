@@ -218,7 +218,7 @@ CCredits::CCredits()
         "\n\n"
 
         "Derek \"slush\" Abdine\n"
-        "Mertcan \"Rocketbunny\" Aydoğmuş"
+        "Mertcan \"Rocketbunny\" Aydoğmuş\n"
         "Jordan \"Woovie\" Banasik\n"
         "Javier \"jbeta\" Beta\n"
         "Oliver \"Oli\" Brown\n"
