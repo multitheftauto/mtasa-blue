@@ -441,12 +441,6 @@ public:
 
     void TriggerDiscordJoin(SString strSecret);
 
-    inline const bool IsServerRPCFunctionDisabled(const eServerRPCFunctions eServerRPCFunction) const { return m_disabledServerRPCFunctions[eServerRPCFunction]; };
-    inline void SetServerRPCFunctionDisabled(const eServerRPCFunctions eServerRPCFunction, const bool bDisabled = true)
-    {
-        m_disabledServerRPCFunctions[eServerRPCFunction] = bDisabled;
-    };
-
 private:
     // CGUI Callbacks
     bool OnKeyDown(CGUIKeyEventArgs Args);
@@ -812,7 +806,7 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
-    void UpdateDiscordState(); // If netc allows this function not to be here it would be better
+    void UpdateDiscordState();            // If netc allows this function not to be here it would be better
 
 private:
     CEvents                                     m_Events;
@@ -830,8 +824,6 @@ private:
     uint                    m_uiAltPulseOrderCounter;
     SString                 m_strACInfo;
     std::map<uint, uint>    m_SentMessageIds;
-
-    std::array<bool, eServerRPCFunctions::NUM_SERVER_RPC_FUNCS> m_disabledServerRPCFunctions;
 
     bool              m_bLastKeyWasEscapeCancelled;
     std::set<SString> m_AllowKeyUpMap;

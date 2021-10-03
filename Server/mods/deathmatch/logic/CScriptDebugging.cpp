@@ -123,7 +123,8 @@ void CScriptDebugging::UpdateLogOutput()
             PrintLog(line.strText);
         }
         // Log to console
-        CLogger::LogPrintf("%s\n", line.strText.c_str());
+        CLogger::LogPrintf("%s", line.strText.c_str());
+        CLogger::LogPrintNoStamp("\n");
         // Tell the players
         Broadcast(CDebugEchoPacket(line.strText, line.uiMinimumDebugLevel, line.ucRed, line.ucGreen, line.ucBlue), line.uiMinimumDebugLevel);
     }

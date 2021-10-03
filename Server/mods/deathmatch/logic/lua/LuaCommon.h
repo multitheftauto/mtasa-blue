@@ -52,7 +52,7 @@ void lua_pushvector(lua_State* luaVM, const CVector& vector);
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector);
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix);
 
-class CLuaMain& lua_getownercluamain(lua_State* L);
+class CLuaMain&  lua_getownercluamain(lua_State* L);
 class CResource& lua_getownerresource(lua_State* L);
 
 void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pElement);

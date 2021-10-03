@@ -103,7 +103,9 @@ public:
 
     void RegisterHTMLDFunctions();
 
-    void           InitVM();
+    void           Initialize();
+    void           LoadEmbeddedScripts();
+    void           RegisterModuleFunctions();
     const SString& GetFunctionTag(int iFunctionNumber);
     int            PCall(lua_State* L, int nargs, int nresults, int errfunc);
     void           CheckExecutionTime();

@@ -14,32 +14,30 @@
 
 void CLuaColShapeDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createColCircle", CreateColCircle},
-        {"createColCuboid", CreateColCuboid},
-        {"createColSphere", CreateColSphere},
-        {"createColRectangle", CreateColRectangle},
-        {"createColPolygon", CreateColPolygon},
-        {"createColTube", CreateColTube},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"createColCircle", CreateColCircle},
+                                                                             {"createColCuboid", CreateColCuboid},
+                                                                             {"createColSphere", CreateColSphere},
+                                                                             {"createColRectangle", CreateColRectangle},
+                                                                             {"createColPolygon", CreateColPolygon},
+                                                                             {"createColTube", CreateColTube},
 
-        {"getColShapeRadius", GetColShapeRadius},
-        {"setColShapeRadius", SetColShapeRadius},
-        {"getColShapeSize", GetColShapeSize},
-        {"setColShapeSize", SetColShapeSize},
-        {"getColPolygonPoints", GetColPolygonPoints},
-        {"getColPolygonPointPosition", GetColPolygonPointPosition},
-        {"setColPolygonPointPosition", SetColPolygonPointPosition},
-        {"addColPolygonPoint", AddColPolygonPoint},
-        {"removeColPolygonPoint", RemoveColPolygonPoint},
+                                                                             {"getColShapeRadius", GetColShapeRadius},
+                                                                             {"setColShapeRadius", SetColShapeRadius},
+                                                                             {"getColShapeSize", GetColShapeSize},
+                                                                             {"setColShapeSize", SetColShapeSize},
+                                                                             {"getColPolygonPoints", GetColPolygonPoints},
+                                                                             {"getColPolygonPointPosition", GetColPolygonPointPosition},
+                                                                             {"setColPolygonPointPosition", SetColPolygonPointPosition},
+                                                                             {"addColPolygonPoint", AddColPolygonPoint},
+                                                                             {"removeColPolygonPoint", RemoveColPolygonPoint},
 
-        {"isInsideColShape", IsInsideColShape},
-        {"getColShapeType", GetColShapeType},
-        {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
-        {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
+                                                                             {"isInsideColShape", IsInsideColShape},
+                                                                             {"getColShapeType", GetColShapeType},
+                                                                             {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
+                                                                             {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
 
-        {"showCol", ArgumentParser<SetShowCollision>},
-        {"isShowCollisionsEnabled", ArgumentParser<IsShowCollisionsEnabled>}
-    };
+                                                                             {"showCol", ArgumentParser<SetShowCollision>},
+                                                                             {"isShowCollisionsEnabled", ArgumentParser<IsShowCollisionsEnabled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)

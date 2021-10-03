@@ -82,6 +82,3 @@ enum class ePhysicsElementType
 DECLARE_ENUM_CLASS(ePhysicsElementType);
 
 DECLARE_ENUM(ePacketID);
-
-DECLARE_ENUM(eElementRPCFunctions);
-DECLARE_ENUM(eServerRPCFunctions);
