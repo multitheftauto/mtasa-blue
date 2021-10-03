@@ -45,7 +45,7 @@ project "Client Deathmatch"
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
 			"../../../vendor/sparsehash/src/",
-			"../../../vendor/lunasvg/include"
+			"../../../vendor/lunasvg/include",
 			"../../../vendor/sparsehash/src/",
 			"../../../vendor/bulletphysics3d/src/",
 			"../../../vendor/bulletphysics3d/"
@@ -64,7 +64,7 @@ project "Client Deathmatch"
 	}
 
 	configuration "windows"
-		buildoptions { "-Zm180" }
+		buildoptions { "-Zm280" }
 
 	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }

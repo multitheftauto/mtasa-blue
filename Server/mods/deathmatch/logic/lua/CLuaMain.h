@@ -20,7 +20,6 @@ class CLuaMain;
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"
 
-#include "CLuaFunctionDefs.h"
 #include "CSharedLuaMain.h"
 
 #define MAX_SCRIPTNAME_LENGTH 64
