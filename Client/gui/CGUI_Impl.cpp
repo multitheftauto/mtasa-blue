@@ -84,7 +84,7 @@ void CGUI_Impl::SetHookedWindow(HWND window)
 
 void CGUI_Impl::Draw()
 {
-    if (GetHookedWindow() == nullptr)
+    if (m_hookedWindow == nullptr)
         return;
 
     // Check if any elements need destroying, savely remove
