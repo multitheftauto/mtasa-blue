@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CLuaPhysicsStaticCollisionManager.h"
 
-void CLuaPhysicsStaticCollisionManager::Remove(CLuaPhysicsStaticCollision* pLuaStaticCollision)
+void CLuaPhysicsStaticCollisionManager::Remove(CLuaPhysicsStaticCollision* pLuaStaticCollision, bool deleteFromList)
 {
     assert(pLuaStaticCollision);
 
@@ -27,7 +27,9 @@ void CLuaPhysicsStaticCollisionManager::Remove(CLuaPhysicsStaticCollision* pLuaS
 #else
     g_pGame->GetPhysics()->DestroyStaticCollision(pLuaStaticCollision);
 #endif
-    ListRemove(m_elementsList, pLuaStaticCollision);
+
+    if (deleteFromList)
+        ListRemove(m_elementsList, pLuaStaticCollision);
 
     delete pLuaStaticCollision;
 }

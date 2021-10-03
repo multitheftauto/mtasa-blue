@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CLuaPhysicsShapeManager.h"
 
-void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
+void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape, bool deleteFromList)
 {
     assert(pShape);
 
@@ -27,7 +27,8 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape)
     g_pGame->GetPhysics()->DestroyShape(pShape);
 #endif
 
-    ListRemove(m_elementsList, pShape);
+    if (deleteFromList)
+        ListRemove(m_elementsList, pShape);
     
     delete pShape;
 }

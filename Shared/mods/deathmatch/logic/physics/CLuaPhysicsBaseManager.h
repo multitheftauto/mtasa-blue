@@ -25,8 +25,9 @@ public:
     {
         for (auto it = m_elementsList.rbegin(); it != m_elementsList.rend(); ++it)
         {
-            Remove(*it);
+            Remove(*it, false);
         }
+        m_elementsList.clear();
     }
 
     T GetFromScriptID(unsigned int uiScriptID)
@@ -40,7 +41,7 @@ public:
         return pElement;
     }
 
-    virtual void Remove(T pElement) = 0;
+    virtual void Remove(T pElement, bool deleteFromList = true) = 0;
 
     void Add(T pElement) { m_elementsList.push_back(pElement); }
 

@@ -20,6 +20,6 @@ class CLuaPhysicsRigidBodyManager : public CLuaPhysicsBaseManager<CLuaPhysicsRig
 {
 public:
     CLuaPhysicsRigidBodyManager() : CLuaPhysicsBaseManager<CLuaPhysicsRigidBody*>(EIdClassType::RIGID_BODY) {}
-    void Remove(CLuaPhysicsRigidBody* pRigidBody);
+    void Remove(CLuaPhysicsRigidBody* pRigidBody, bool deleteFromList = true);
     bool IsRigidBodyValid(CLuaPhysicsRigidBody* pRigidBody);
 };

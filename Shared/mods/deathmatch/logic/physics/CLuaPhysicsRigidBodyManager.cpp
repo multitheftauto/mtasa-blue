@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 
-void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody)
+void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody, bool deleteFromList)
 {
     assert(pRigidBody);
 
@@ -28,7 +28,9 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody)
     g_pGame->GetPhysics()->DestroyRigidBody(pRigidBody);
 #endif
 
-    ListRemove(m_elementsList, pRigidBody);
+    if (deleteFromList)
+        ListRemove(m_elementsList, pRigidBody);
+
     delete pRigidBody;
 }
 
