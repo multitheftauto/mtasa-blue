@@ -2,6 +2,8 @@
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 
 #include <windows.h>
+#undef CreateWindow // mAcrosoft strikes again
+
 #include <list>
 #include <map>
 #include <string>
@@ -20,5 +22,14 @@
 #include "../sdk/gui/CGUITypes.h"
 
 #include "CGUI_Impl.h"
+#include "CGUIButton_Impl.h"
+#include "CGUICheckbox_Impl.h"
+#include "CGUIEdit_Impl.h"
 #include "CGUIElement_Impl.h"
+#include "CGUILabel_Impl.h"
+#include "CGUIMemo_Impl.h"
+#include "CGUIProgressBar_Impl.h"
+#include "CGUIRadioButton_Impl.h"
+#include "CGUIScrollbar_Impl.h"
+#include "CGUIStaticImage_Impl.h"
 #include "CGUIWindow_Impl.h"

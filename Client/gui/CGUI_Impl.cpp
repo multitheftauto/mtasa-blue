@@ -49,9 +49,9 @@ CGUI_Impl::~CGUI_Impl()
 
 void CGUI_Impl::CreateDemo()
 {
-    CGUIWindow* window = CreateGUIWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
-    CGUIWindow* window2 = CreateGUIWindow(CVector2D(50, 100), CVector2D(300, 300), window, false, "Child Window");
-    CGUIWindow* window3 = CreateGUIWindow(CVector2D(50, 50), CVector2D(200, 200), window2, false, "Child Window 2");
+    CGUIWindow* window = CreateWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
+    CGUIWindow* window2 = CreateWindow(CVector2D(50, 100), CVector2D(300, 300), window, false, "Child Window");
+    CGUIWindow* window3 = CreateWindow(CVector2D(50, 50), CVector2D(200, 200), window2, false, "Child Window 2");
 
     int funcIndex = window->AddRenderFunction(std::bind(&CGUIElement::DemoHookTest, window));
     // window->RemoveRenderFunction(funcIndex);
@@ -168,9 +168,117 @@ CVector2D CGUI_Impl::GetResolution()
     return CVector2D(io.DisplaySize.x, io.DisplaySize.y);
 }
 
-CGUIWindow* CGUI_Impl::CreateGUIWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
+CGUIWindow* CGUI_Impl::CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
 {
     CGUIWindow* element = new CGUIWindow_Impl(this, parent, pos, size, relative, title);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIButton* CGUI_Impl::CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIButton* element = new CGUIButton_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUICheckbox* CGUI_Impl::CreateCheckbox(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUICheckbox* element = new CGUICheckbox_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIEdit* CGUI_Impl::CreateEdit(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIEdit* element = new CGUIEdit_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUILabel* CGUI_Impl::CreateLabel(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUILabel* element = new CGUILabel_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIMemo* CGUI_Impl::CreateMemo(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIMemo* element = new CGUIMemo_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIProgressBar* CGUI_Impl::CreateProgressBar(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIProgressBar* element = new CGUIProgressBar_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIRadioButton* CGUI_Impl::CreateRadioButton(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIRadioButton* element = new CGUIRadioButton_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIScrollbar* CGUI_Impl::CreateScrollbar(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIScrollbar* element = new CGUIScrollbar_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIStaticImage* CGUI_Impl::CreateStaticImage(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIStaticImage* element = new CGUIStaticImage_Impl(this, parent, pos, size, relative);
 
     if (!element)
         return nullptr;

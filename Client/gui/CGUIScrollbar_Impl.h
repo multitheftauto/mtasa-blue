@@ -9,17 +9,17 @@
 
 #pragma once
 
-enum CGUIType
+#include <gui/CGUIScrollbar.h>
+#include "CGUIElement_Impl.h"
+
+class CGUIScrollbar_Impl : public CGUIScrollbar, public CGUIElement_Impl
 {
-    BUTTON,
-    CHECKBOX,
-    EDIT,
-    ELEMENT,
-    LABEL,
-    MEMO,
-    PROGRESSBAR,
-    RADIOBUTTON,
-    SCROLLBAR,
-    STATICIMAGE,
-    WINDOW,
+public:
+    CGUIScrollbar_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative);
+
+    void Begin();
+    void End();
+
+#include "CGUIElement_Inc.h"
+private:
 };

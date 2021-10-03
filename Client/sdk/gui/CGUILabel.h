@@ -9,17 +9,10 @@
 
 #pragma once
 
-enum CGUIType
+#include "CGUIElement.h"
+
+class CGUILabel : public CGUIElement
 {
-    BUTTON,
-    CHECKBOX,
-    EDIT,
-    ELEMENT,
-    LABEL,
-    MEMO,
-    PROGRESSBAR,
-    RADIOBUTTON,
-    SCROLLBAR,
-    STATICIMAGE,
-    WINDOW,
+public:
+    virtual ~CGUILabel(){};
 };
