@@ -12,6 +12,16 @@ std::string GetID()
     return CGUIElement_Impl::GetID();
 };
 
+void SetText(std::string text)
+{
+    CGUIElement_Impl::SetText(text);
+};
+
+std::string GetText()
+{
+    return CGUIElement_Impl::GetText();
+};
+
 void SetPosition(CVector2D pos, bool relative = false)
 {
     CGUIElement_Impl::SetPosition(pos, relative);

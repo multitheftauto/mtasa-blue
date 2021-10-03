@@ -13,7 +13,7 @@ CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2
     : CGUIElement_Impl(pGUI, pParent, pos, size, relative)
 {
     m_type = CGUIType::WINDOW;
-    m_title = title;
+    m_text = title;
 
     SetFrameEnabled(true);
 }
@@ -21,6 +21,9 @@ CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2
 void CGUIWindow_Impl::Begin()
 {
     CGUIElement_Impl::Begin();
+
+    if (m_pParent)
+        ImGui::Text(m_text.c_str());
 }
 
 void CGUIWindow_Impl::End()

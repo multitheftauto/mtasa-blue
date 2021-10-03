@@ -22,6 +22,9 @@ public:
 
     virtual std::string GetID() = 0;
 
+    virtual void        SetText(std::string text) = 0;
+    virtual std::string GetText() = 0;
+
     virtual void SetPosition(CVector2D pos, bool relative = false) = 0;
     virtual void SetSize(CVector2D size, bool relative = false) = 0;
 

@@ -119,7 +119,7 @@ void CGUIElement_Impl::Begin()
 {
     m_rendering = true;
 
-    const char* id = (m_title + "###" + m_uid).c_str();
+    const char* id = (m_text + "###" + m_uid).c_str();
 
     ProcessPosition();
 
@@ -133,8 +133,6 @@ void CGUIElement_Impl::Begin()
     {
         if (!ImGui::BeginChild(id, ImVec2(m_size.fX, m_size.fY), m_hasFrame))
             return;
-
-        ImGui::Text(m_title.c_str());
     }
 
     // Call render functions - you can 'hook' and modify this element (useful for script customization)
@@ -258,4 +256,14 @@ void CGUIElement_Impl::SetDynamicPositionEnabled(bool state)
 bool CGUIElement_Impl::GetDynamicPositionEnabled()
 {
     return m_hasDynamicPosition;
+}
+
+void CGUIElement_Impl::SetText(std::string text)
+{
+    m_text = text;
+}
+
+std::string CGUIElement_Impl::GetText()
+{
+    return m_text;
 }

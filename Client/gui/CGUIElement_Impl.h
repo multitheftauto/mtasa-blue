@@ -30,6 +30,9 @@ public:
     CVector2D GetPosition();
     CVector2D GetSize();
 
+    void        SetText(std::string text);
+    std::string GetText();
+
     void         SetParent(CGUIElement* parent);
     CGUIElement* GetParent();
 
@@ -67,7 +70,7 @@ protected:
     std::map<int, decltype(m_renderFunctions.cbegin())> m_renderFunctionIndexMap;
     int                                                 m_numLifetimeRenderFunctions = 0;
 
-    std::string m_title = {};
+    std::string m_text = {};
     std::string m_uid;
 
     CGUIType m_type = CGUIType::ELEMENT;
