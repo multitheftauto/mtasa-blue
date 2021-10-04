@@ -9,22 +9,17 @@
 
 #pragma once
 
-enum CGUIType
+#include <gui/CGUICombobox.h>
+#include "CGUIElement_Impl.h"
+
+class CGUICombobox_Impl : public CGUICombobox, public CGUIElement_Impl
 {
-    BROWSER,
-    BUTTON,
-    CHECKBOX,
-    COMBOBOX,
-    EDIT,
-    ELEMENT,
-    GRIDLIST,
-    LABEL,
-    MEMO,
-    PROGRESSBAR,
-    RADIOBUTTON,
-    SCROLLBAR,
-    SCROLLPANE,
-    STATICIMAGE,
-    TABPANEL,
-    WINDOW,
+public:
+    CGUICombobox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative);
+
+    void Begin();
+    void End();
+
+#include "CGUIElement_Inc.h"
+private:
 };

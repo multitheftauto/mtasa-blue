@@ -9,22 +9,17 @@
 
 #pragma once
 
-enum CGUIType
+#include <gui/CGUIBrowser.h>
+#include "CGUIElement_Impl.h"
+
+class CGUIBrowser_Impl : public CGUIBrowser, public CGUIElement_Impl
 {
-    BROWSER,
-    BUTTON,
-    CHECKBOX,
-    COMBOBOX,
-    EDIT,
-    ELEMENT,
-    GRIDLIST,
-    LABEL,
-    MEMO,
-    PROGRESSBAR,
-    RADIOBUTTON,
-    SCROLLBAR,
-    SCROLLPANE,
-    STATICIMAGE,
-    TABPANEL,
-    WINDOW,
+public:
+    CGUIBrowser_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative);
+
+    void Begin();
+    void End();
+
+#include "CGUIElement_Inc.h"
+private:
 };

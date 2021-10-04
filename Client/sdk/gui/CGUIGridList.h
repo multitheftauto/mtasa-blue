@@ -9,22 +9,10 @@
 
 #pragma once
 
-enum CGUIType
+#include "CGUIElement.h"
+
+class CGUIGridList : public CGUIElement
 {
-    BROWSER,
-    BUTTON,
-    CHECKBOX,
-    COMBOBOX,
-    EDIT,
-    ELEMENT,
-    GRIDLIST,
-    LABEL,
-    MEMO,
-    PROGRESSBAR,
-    RADIOBUTTON,
-    SCROLLBAR,
-    SCROLLPANE,
-    STATICIMAGE,
-    TABPANEL,
-    WINDOW,
+public:
+    virtual ~CGUIGridList(){};
 };

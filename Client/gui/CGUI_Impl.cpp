@@ -168,9 +168,9 @@ CVector2D CGUI_Impl::GetResolution()
     return CVector2D(io.DisplaySize.x, io.DisplaySize.y);
 }
 
-CGUIWindow* CGUI_Impl::CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
+CGUIBrowser* CGUI_Impl::CreateBrowser(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
 {
-    CGUIWindow* element = new CGUIWindow_Impl(this, parent, pos, size, relative, title);
+    CGUIBrowser* element = new CGUIBrowser_Impl(this, parent, pos, size, relative);
 
     if (!element)
         return nullptr;
@@ -204,9 +204,33 @@ CGUICheckbox* CGUI_Impl::CreateCheckbox(CVector2D pos, CVector2D size, CGUIEleme
     return element;
 }
 
+CGUICombobox* CGUI_Impl::CreateCombobox(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUICombobox* element = new CGUICombobox_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
 CGUIEdit* CGUI_Impl::CreateEdit(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
 {
     CGUIEdit* element = new CGUIEdit_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+CGUIGridList* CGUI_Impl::CreateGridList(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIGridList* element = new CGUIGridList_Impl(this, parent, pos, size, relative);
 
     if (!element)
         return nullptr;
@@ -276,9 +300,47 @@ CGUIScrollbar* CGUI_Impl::CreateScrollbar(CVector2D pos, CVector2D size, CGUIEle
     return element;
 }
 
+CGUIScrollpane* CGUI_Impl::CreateScrollpane(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUIScrollpane* element = new CGUIScrollpane_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
 CGUIStaticImage* CGUI_Impl::CreateStaticImage(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
 {
     CGUIStaticImage* element = new CGUIStaticImage_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+
+CGUITabPanel* CGUI_Impl::CreateTabPanel(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+{
+    CGUITabPanel* element = new CGUITabPanel_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+
+    return element;
+}
+
+
+CGUIWindow* CGUI_Impl::CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
+{
+    CGUIWindow* element = new CGUIWindow_Impl(this, parent, pos, size, relative, title);
 
     if (!element)
         return nullptr;
