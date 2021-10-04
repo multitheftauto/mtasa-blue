@@ -164,15 +164,15 @@ public:
 		Integer(RandomNumberGenerator &rng, size_t bitCount);
 
 		/// \brief Integer representing 0
-		/// \return an Integer representing 0
+		/// \returns an Integer representing 0
 		/// \details Zero() avoids calling constructors for frequently used integers
 		static const Integer & CRYPTOPP_API Zero();
 		/// \brief Integer representing 1
-		/// \return an Integer representing 1
+		/// \returns an Integer representing 1
 		/// \details One() avoids calling constructors for frequently used integers
 		static const Integer & CRYPTOPP_API One();
 		/// \brief Integer representing 2
-		/// \return an Integer representing 2
+		/// \returns an Integer representing 2
 		/// \details Two() avoids calling constructors for frequently used integers
 		static const Integer & CRYPTOPP_API Two();
 
@@ -195,7 +195,7 @@ public:
 		Integer(RandomNumberGenerator &rng, const Integer &min, const Integer &max, RandomNumberType rnType=ANY, const Integer &equiv=Zero(), const Integer &mod=One());
 
 		/// \brief Exponentiates to a power of 2
-		/// \return the Integer 2<sup>e</sup>
+		/// \returns the Integer 2<sup>e</sup>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		static Integer CRYPTOPP_API Power2(size_t e);
 	//@}
@@ -239,14 +239,14 @@ public:
 		/// \brief Encode absolute value in OpenPGP format
 		/// \param output big-endian byte array
 		/// \param bufferSize length of the byte array
-		/// \return length of the output
+		/// \returns length of the output
 		/// \details OpenPGPEncode places result into the buffer and returns the
 		///   number of bytes used for the encoding
 		size_t OpenPGPEncode(byte *output, size_t bufferSize) const;
 
 		/// \brief Encode absolute value in OpenPGP format
 		/// \param bt BufferedTransformation object
-		/// \return length of the output
+		/// \returns length of the output
 		/// \details OpenPGPEncode places result into a BufferedTransformation object and returns the
 		///   number of bytes used for the encoding
 		size_t OpenPGPEncode(BufferedTransformation &bt) const;
@@ -297,7 +297,7 @@ public:
 	/// \name ACCESSORS
 	//@{
 		/// \brief Determines if the Integer is convertable to Long
-		/// \return true if *this can be represented as a signed long
+		/// \returns true if *this can be represented as a signed long
 		/// \sa ConvertToLong()
 		bool IsConvertableToLong() const;
 		/// \brief Convert the Integer to Long
@@ -306,104 +306,82 @@ public:
 		signed long ConvertToLong() const;
 
 		/// \brief Determines the number of bits required to represent the Integer
-		/// \return number of significant bits
-		/// \details BitCount is calculated as <tt>floor(log2(abs(*this))) + 1</tt>.
+		/// \returns number of significant bits = floor(log2(abs(*this))) + 1
 		unsigned int BitCount() const;
 		/// \brief Determines the number of bytes required to represent the Integer
-		/// \return number of significant bytes
-		/// \details ByteCount is calculated as <tt>ceiling(BitCount()/8)</tt>.
+		/// \returns number of significant bytes = ceiling(BitCount()/8)
 		unsigned int ByteCount() const;
 		/// \brief Determines the number of words required to represent the Integer
-		/// \return number of significant words
-		/// \details WordCount is calculated as <tt>ceiling(ByteCount()/sizeof(word))</tt>.
+		/// \returns number of significant words = ceiling(ByteCount()/sizeof(word))
 		unsigned int WordCount() const;
 
 		/// \brief Provides the i-th bit of the Integer
-		/// \return the i-th bit, i=0 being the least significant bit
+		/// \returns the i-th bit, i=0 being the least significant bit
 		bool GetBit(size_t i) const;
 		/// \brief Provides the i-th byte of the Integer
-		/// \return the i-th byte
+		/// \returns the i-th byte
 		byte GetByte(size_t i) const;
 		/// \brief Provides the low order bits of the Integer
-		/// \return n lowest bits of *this >> i
+		/// \returns n lowest bits of *this >> i
 		lword GetBits(size_t i, size_t n) const;
 
 		/// \brief Determines if the Integer is 0
-		/// \return true if the Integer is 0, false otherwise
+		/// \returns true if the Integer is 0, false otherwise
 		bool IsZero() const {return !*this;}
 		/// \brief Determines if the Integer is non-0
-		/// \return true if the Integer is non-0, false otherwise
+		/// \returns true if the Integer is non-0, false otherwise
 		bool NotZero() const {return !IsZero();}
 		/// \brief Determines if the Integer is negative
-		/// \return true if the Integer is negative, false otherwise
+		/// \returns true if the Integer is negative, false otherwise
 		bool IsNegative() const {return sign == NEGATIVE;}
 		/// \brief Determines if the Integer is non-negative
-		/// \return true if the Integer is non-negative, false otherwise
+		/// \returns true if the Integer is non-negative, false otherwise
 		bool NotNegative() const {return !IsNegative();}
 		/// \brief Determines if the Integer is positive
-		/// \return true if the Integer is positive, false otherwise
+		/// \returns true if the Integer is positive, false otherwise
 		bool IsPositive() const {return NotNegative() && NotZero();}
 		/// \brief Determines if the Integer is non-positive
-		/// \return true if the Integer is non-positive, false otherwise
+		/// \returns true if the Integer is non-positive, false otherwise
 		bool NotPositive() const {return !IsPositive();}
 		/// \brief Determines if the Integer is even parity
-		/// \return true if the Integer is even, false otherwise
+		/// \returns true if the Integer is even, false otherwise
 		bool IsEven() const {return GetBit(0) == 0;}
 		/// \brief Determines if the Integer is odd parity
-		/// \return true if the Integer is odd, false otherwise
+		/// \returns true if the Integer is odd, false otherwise
 		bool IsOdd() const	{return GetBit(0) == 1;}
 	//@}
 
 	/// \name MANIPULATORS
 	//@{
 		/// \brief Assignment
-		/// \param t the other Integer
-		/// \return the result of assignment
 		Integer&  operator=(const Integer& t);
+
 		/// \brief Addition Assignment
-		/// \param t the other Integer
-		/// \return the result of <tt>*this + t</tt>
 		Integer&  operator+=(const Integer& t);
 		/// \brief Subtraction Assignment
-		/// \param t the other Integer
-		/// \return the result of <tt>*this - t</tt>
 		Integer&  operator-=(const Integer& t);
 		/// \brief Multiplication Assignment
-		/// \param t the other Integer
-		/// \return the result of <tt>*this * t</tt>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		Integer&  operator*=(const Integer& t)	{return *this = Times(t);}
 		/// \brief Division Assignment
-		/// \param t the other Integer
-		/// \return the result of <tt>*this / t</tt>
 		Integer&  operator/=(const Integer& t)	{return *this = DividedBy(t);}
 		/// \brief Remainder Assignment
-		/// \param t the other Integer
-		/// \return the result of <tt>*this % t</tt>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		Integer&  operator%=(const Integer& t)	{return *this = Modulo(t);}
 		/// \brief Division Assignment
-		/// \param t the other word
-		/// \return the result of <tt>*this / t</tt>
 		Integer&  operator/=(word t)  {return *this = DividedBy(t);}
 		/// \brief Remainder Assignment
-		/// \param t the other word
-		/// \return the result of <tt>*this % t</tt>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		Integer&  operator%=(word t)  {return *this = Integer(POSITIVE, 0, Modulo(t));}
 
 		/// \brief Left-shift Assignment
-		/// \param n number of bits to shift
-		/// \return reference to this Integer
 		Integer&  operator<<=(size_t n);
 		/// \brief Right-shift Assignment
-		/// \param n number of bits to shift
-		/// \return reference to this Integer
 		Integer&  operator>>=(size_t n);
 
 		/// \brief Bitwise AND Assignment
 		/// \param t the other Integer
-		/// \return the result of *this & t
+		/// \returns the result of *this & t
 		/// \details operator&=() performs a bitwise AND on *this. Missing bits are truncated
 		///   at the most significant bit positions, so the result is as small as the
 		///   smaller of the operands.
@@ -415,7 +393,7 @@ public:
 		Integer& operator&=(const Integer& t);
 		/// \brief Bitwise OR Assignment
 		/// \param t the second Integer
-		/// \return the result of *this | t
+		/// \returns the result of *this | t
 		/// \details operator|=() performs a bitwise OR on *this. Missing bits are shifted in
 		///   at the most significant bit positions, so the result is as large as the
 		///   larger of the operands.
@@ -427,7 +405,7 @@ public:
 		Integer& operator|=(const Integer& t);
 		/// \brief Bitwise XOR Assignment
 		/// \param t the other Integer
-		/// \return the result of *this ^ t
+		/// \returns the result of *this ^ t
 		/// \details operator^=() performs a bitwise XOR on *this. Missing bits are shifted
 		///   in at the most significant bit positions, so the result is as large as the
 		///   larger of the operands.
@@ -472,7 +450,7 @@ public:
 		/// \brief Generate a random number
 		/// \param rng RandomNumberGenerator used to generate material
 		/// \param params additional parameters that cannot be passed directly to the function
-		/// \return true if a random number was generated, false otherwise
+		/// \returns true if a random number was generated, false otherwise
 		/// \details GenerateRandomNoThrow attempts to generate a random number according to the
 		///   parameters specified in params. The function does not throw RandomNumberNotFound.
 		/// \details The example below generates a prime number using NameValuePairs that Integer
@@ -577,7 +555,7 @@ public:
 
 		/// \brief Bitwise AND
 		/// \param t the other Integer
-		/// \return the result of <tt>*this & t</tt>
+		/// \returns the result of <tt>*this & t</tt>
 		/// \details And() performs a bitwise AND on the operands. Missing bits are truncated
 		///   at the most significant bit positions, so the result is as small as the
 		///   smaller of the operands.
@@ -590,7 +568,7 @@ public:
 
 		/// \brief Bitwise OR
 		/// \param t the other Integer
-		/// \return the result of <tt>*this | t</tt>
+		/// \returns the result of <tt>*this | t</tt>
 		/// \details Or() performs a bitwise OR on the operands. Missing bits are shifted in
 		///   at the most significant bit positions, so the result is as large as the
 		///   larger of the operands.
@@ -603,7 +581,7 @@ public:
 
 		/// \brief Bitwise XOR
 		/// \param t the other Integer
-		/// \return the result of <tt>*this ^ t</tt>
+		/// \returns the result of <tt>*this ^ t</tt>
 		/// \details Xor() performs a bitwise XOR on the operands. Missing bits are shifted in
 		///   at the most significant bit positions, so the result is as large as the
 		///   larger of the operands.
@@ -636,10 +614,10 @@ public:
 		bool IsSquare() const;
 
 		/// \brief Determine if 1 or -1
-		/// \return true if this integer is 1 or -1, false otherwise
+		/// \returns true if this integer is 1 or -1, false otherwise
 		bool IsUnit() const;
 		/// \brief Calculate multiplicative inverse
-		/// \return MultiplicativeInverse inverse if 1 or -1, otherwise return 0.
+		/// \returns MultiplicativeInverse inverse if 1 or -1, otherwise return 0.
 		Integer MultiplicativeInverse() const;
 
 		/// \brief Extended Division
@@ -672,12 +650,12 @@ public:
 		/// \brief Calculate greatest common divisor
 		/// \param a a reference to the first number
 		/// \param n a reference to the secind number
-		/// \return the greatest common divisor <tt>a</tt> and <tt>n</tt>.
+		/// \returns the greatest common divisor <tt>a</tt> and <tt>n</tt>.
 		static Integer CRYPTOPP_API Gcd(const Integer &a, const Integer &n);
 
 		/// \brief Calculate multiplicative inverse
 		/// \param n a reference to the modulus
-		/// \return an Integer <tt>*this % n</tt>.
+		/// \returns an Integer <tt>*this % n</tt>.
 		/// \details InverseMod returns the multiplicative inverse of the Integer <tt>*this</tt>
 		///  modulo the Integer <tt>n</tt>. If no Integer exists then Integer 0 is returned.
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
@@ -685,7 +663,7 @@ public:
 
 		/// \brief Calculate multiplicative inverse
 		/// \param n the modulus
-		/// \return a word <tt>*this % n</tt>.
+		/// \returns a word <tt>*this % n</tt>.
 		/// \details InverseMod returns the multiplicative inverse of the Integer <tt>*this</tt>
 		///  modulo the word <tt>n</tt>. If no Integer exists then word 0 is returned.
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
@@ -697,16 +675,16 @@ public:
 		/// \brief Extraction operator
 		/// \param in a reference to a std::istream
 		/// \param a a reference to an Integer
-		/// \return a reference to a std::istream reference
+		/// \returns a reference to a std::istream reference
 		friend CRYPTOPP_DLL std::istream& CRYPTOPP_API operator>>(std::istream& in, Integer &a);
 
 		/// \brief Insertion operator
 		/// \param out a reference to a std::ostream
 		/// \param a a constant reference to an Integer
-		/// \return a reference to a std::ostream reference
+		/// \returns a reference to a std::ostream reference
 		/// \details The output integer responds to std::hex, std::oct, std::hex, std::upper and
-		///   std::lower. The output includes the suffix \a h (for hex), \a . (\a dot, for dec)
-		///   and \a o (for octal). There is currently no way to suppress the suffix.
+		///   std::lower. The output includes the suffix \a \b h (for hex), \a \b . (\a \b dot, for dec)
+		///   and \a \b o (for octal). There is currently no way to suppress the suffix.
 		/// \details If you want to print an Integer without the suffix or using an arbitrary base, then
 		///   use IntToString<Integer>().
 		/// \sa IntToString<Integer>
@@ -717,13 +695,13 @@ public:
 	/// \param x a reference to the first term
 	/// \param y a reference to the second term
 	/// \param m a reference to the modulus
-	/// \return an Integer <tt>(a * b) % m</tt>.
+	/// \returns an Integer <tt>(a * b) % m</tt>.
 	CRYPTOPP_DLL friend Integer CRYPTOPP_API a_times_b_mod_c(const Integer &x, const Integer& y, const Integer& m);
 	/// \brief Modular exponentiation
 	/// \param x a reference to the base
 	/// \param e a reference to the exponent
 	/// \param m a reference to the modulus
-	/// \return an Integer <tt>(a ^ b) % m</tt>.
+	/// \returns an Integer <tt>(a ^ b) % m</tt>.
 	CRYPTOPP_DLL friend Integer CRYPTOPP_API a_exp_b_mod_c(const Integer &x, const Integer& e, const Integer& m);
 
 protected:
@@ -784,7 +762,7 @@ inline CryptoPP::word    operator%(const CryptoPP::Integer &a, CryptoPP::word b)
 /// \brief Bitwise AND
 /// \param a the first Integer
 /// \param b the second Integer
-/// \return the result of a & b
+/// \returns the result of a & b
 /// \details operator&() performs a bitwise AND on the operands. Missing bits are truncated
 ///   at the most significant bit positions, so the result is as small as the
 ///   smaller of the operands.
@@ -798,7 +776,7 @@ inline CryptoPP::Integer operator&(const CryptoPP::Integer &a, const CryptoPP::I
 /// \brief Bitwise OR
 /// \param a the first Integer
 /// \param b the second Integer
-/// \return the result of a | b
+/// \returns the result of a | b
 /// \details operator|() performs a bitwise OR on the operands. Missing bits are shifted in
 ///   at the most significant bit positions, so the result is as large as the
 ///   larger of the operands.
@@ -812,7 +790,7 @@ inline CryptoPP::Integer operator|(const CryptoPP::Integer &a, const CryptoPP::I
 /// \brief Bitwise XOR
 /// \param a the first Integer
 /// \param b the second Integer
-/// \return the result of a ^ b
+/// \returns the result of a ^ b
 /// \details operator^() performs a bitwise XOR on the operands. Missing bits are shifted
 ///   in at the most significant bit positions, so the result is as large as the
 ///   larger of the operands.

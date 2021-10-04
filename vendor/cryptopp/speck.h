@@ -21,6 +21,14 @@
     CRYPTOPP_BOOL_ARM32 || CRYPTOPP_BOOL_ARMV8 || \
     CRYPTOPP_BOOL_PPC32 || CRYPTOPP_BOOL_PPC64
 # ifndef CRYPTOPP_DISABLE_SPECK_SIMD
+#  define CRYPTOPP_SPECK64_ADVANCED_PROCESS_BLOCKS 1
+# endif
+#endif
+
+#if CRYPTOPP_BOOL_X64 || CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X86 || \
+    CRYPTOPP_BOOL_ARM32 || CRYPTOPP_BOOL_ARMV8 || \
+    CRYPTOPP_BOOL_PPC32 || CRYPTOPP_BOOL_PPC64
+# ifndef CRYPTOPP_DISABLE_SPECK_SIMD
 #  define CRYPTOPP_SPECK128_ADVANCED_PROCESS_BLOCKS 1
 # endif
 #endif
@@ -28,6 +36,7 @@
 // Yet another SunStudio/SunCC workaround. Failed self tests
 // in SSE code paths on i386 for SunStudio 12.3 and below.
 #if defined(__SUNPRO_CC) && (__SUNPRO_CC <= 0x5120)
+# undef CRYPTOPP_SPECK64_ADVANCED_PROCESS_BLOCKS
 # undef CRYPTOPP_SPECK128_ADVANCED_PROCESS_BLOCKS
 #endif
 
@@ -43,7 +52,7 @@ template <unsigned int L, unsigned int D, unsigned int N, unsigned int M>
 struct SPECK_Info : public FixedBlockSize<L>, VariableKeyLength<D, N, M>
 {
     /// \brief The algorithm name
-    /// \return the algorithm name
+    /// \returns the algorithm name
     /// \details StaticAlgorithmName returns the algorithm's name as a static
     ///   member function.
     static const std::string StaticAlgorithmName()
@@ -83,14 +92,14 @@ struct SPECK_Base
 class CRYPTOPP_NO_VTABLE SPECK64 : public SPECK_Info<8, 12, 12, 16>, public BlockCipherDocumentation
 {
 public:
-    /// \brief SPECK64 block cipher base implementation
+    /// \brief SPECK block cipher transformation functions
     /// \details Provides implementation common to encryption and decryption
     /// \since Crypto++ 6.0
     class CRYPTOPP_NO_VTABLE Base : protected SPECK_Base<word32>, public BlockCipherImpl<SPECK_Info<8, 12, 12, 16> >
     {
     public:
         /// \brief The algorithm name
-        /// \return the algorithm name
+        /// \returns the algorithm name
         /// \details AlgorithmName returns the algorithm's name as a
         ///   member function.
         std::string AlgorithmName() const {
@@ -100,33 +109,34 @@ public:
 
         std::string AlgorithmProvider() const;
 
-        /// \brief Provides input and output data alignment for optimal performance.
-        /// \return the input data alignment that provides optimal performance
-        /// \sa GetAlignment() and OptimalBlockSize()
-        unsigned int OptimalDataAlignment() const;
-
     protected:
         void UncheckedSetKey(const byte *userKey, unsigned int keyLength, const NameValuePairs &params);
     };
 
-    /// \brief SPECK64 encryption transformation
-    /// \details Enc provides the encryption transformation.
-    ///  All key sizes are supported.
+    /// \brief Encryption transformation
+    /// \details Enc provides implementation for encryption transformation. All key
+    ///   sizes are supported.
     /// \since Crypto++ 6.0
     class CRYPTOPP_NO_VTABLE Enc : public Base
     {
     public:
         void ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const;
+#if CRYPTOPP_SPECK64_ADVANCED_PROCESS_BLOCKS
+        size_t AdvancedProcessBlocks(const byte *inBlocks, const byte *xorBlocks, byte *outBlocks, size_t length, word32 flags) const;
+#endif
     };
 
-    /// \brief SPECK64 decryption transformation
-    /// \details Dec provides the decryption transformation.
-    ///  All key sizes are supported.
+    /// \brief Encryption transformation
+    /// \details Dec provides implementation for decryption transformation. All key
+    ///   sizes are supported.
     /// \since Crypto++ 6.0
     class CRYPTOPP_NO_VTABLE Dec : public Base
     {
     public:
         void ProcessAndXorBlock(const byte *inBlock, const byte *xorBlock, byte *outBlock) const;
+#if CRYPTOPP_SPECK64_ADVANCED_PROCESS_BLOCKS
+        size_t AdvancedProcessBlocks(const byte *inBlocks, const byte *xorBlocks, byte *outBlocks, size_t length, word32 flags) const;
+#endif
     };
 
     typedef BlockCipherFinal<ENCRYPTION, Enc> Encryption;
@@ -145,14 +155,14 @@ public:
 class CRYPTOPP_NO_VTABLE SPECK128 : public SPECK_Info<16, 16, 16, 32>, public BlockCipherDocumentation
 {
 public:
-    /// \brief SPECK128 block cipher base implementation
+    /// \brief SPECK block cipher transformation functions
     /// \details Provides implementation common to encryption and decryption
     /// \since Crypto++ 6.0
     class CRYPTOPP_NO_VTABLE Base : protected SPECK_Base<word64>, public BlockCipherImpl<SPECK_Info<16, 16, 16, 32> >
     {
     public:
         /// \brief The algorithm name
-        /// \return the algorithm name
+        /// \returns the algorithm name
         /// \details AlgorithmName returns the algorithm's name as a
         ///   member function.
         std::string AlgorithmName() const {
@@ -162,18 +172,13 @@ public:
 
         std::string AlgorithmProvider() const;
 
-        /// \brief Provides input and output data alignment for optimal performance.
-        /// \return the input data alignment that provides optimal performance
-        /// \sa GetAlignment() and OptimalBlockSize()
-        unsigned int OptimalDataAlignment() const;
-
     protected:
         void UncheckedSetKey(const byte *userKey, unsigned int keyLength, const NameValuePairs &params);
     };
 
-    /// \brief SPECK128 encryption transformation
-    /// \details Enc provides the encryption transformation.
-    ///  All key sizes are supported.
+    /// \brief Encryption transformation
+    /// \details Enc provides implementation for encryption transformation. All key
+    ///   sizes are supported.
     /// \since Crypto++ 6.0
     class CRYPTOPP_NO_VTABLE Enc : public Base
     {
@@ -184,9 +189,9 @@ public:
 #endif
     };
 
-    /// \brief SPECK128 decryption transformation
-    /// \details Dec provides the decryption transformation.
-    ///  All key sizes are supported.
+    /// \brief Encryption transformation
+    /// \details Dec provides implementation for decryption transformation. All key
+    ///   sizes are supported.
     /// \since Crypto++ 6.0
     class CRYPTOPP_NO_VTABLE Dec : public Base
     {

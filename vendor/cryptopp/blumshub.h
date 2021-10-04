@@ -12,19 +12,13 @@
 
 NAMESPACE_BEGIN(CryptoPP)
 
-/// \brief BlumBlumShub without factorization of the modulus
-/// \details You should reseed the generator after a fork() to avoid multiple generators
-///  with the same internal state.
+/// BlumBlumShub without factorization of the modulus
 class PublicBlumBlumShub : public RandomNumberGenerator,
 						   public StreamTransformation
 {
 public:
 	virtual ~PublicBlumBlumShub() {}
 
-	/// \brief Construct a PublicBlumBlumShub
-	/// \param n the modulus
-	/// \param seed the seed for the generator
-	/// \details seed is the secret key and should be about as large as n.
 	PublicBlumBlumShub(const Integer &n, const Integer &seed);
 
 	unsigned int GenerateBit();
@@ -41,20 +35,14 @@ protected:
 	word maxBits, bitsLeft;
 };
 
-/// \brief BlumBlumShub with factorization of the modulus
-/// \details You should reseed the generator after a fork() to avoid multiple generators
-///  with the same internal state.
+/// BlumBlumShub with factorization of the modulus
 class BlumBlumShub : public PublicBlumBlumShub
 {
 public:
 	virtual ~BlumBlumShub() {}
 
-	/// \brief Construct a BlumBlumShub
-	/// \param p the first prime factor
-	/// \param q the second prime factor
-	/// \param seed the seed for the generator
-	/// \details Esure p and q are both primes congruent to 3 mod 4 and at least 512 bits long.
-	///  seed is the secret key and should be about as large as p*q.
+	// Make sure p and q are both primes congruent to 3 mod 4 and at least 512 bits long,
+	// seed is the secret key and should be about as big as p*q
 	BlumBlumShub(const Integer &p, const Integer &q, const Integer &seed);
 
 	bool IsRandomAccess() const {return true;}

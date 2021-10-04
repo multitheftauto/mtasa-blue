@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Translators: Jin Yin; mk124; ChineseGTA Li; hcyxsq; LilDollaTechZone\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1552191805.000000\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
+"X-POOTLE-MTIME: 1552191805.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -1050,9 +1050,8 @@ msgid "Render vehicles always in high detail"
 msgstr "总是以高细节渲染载具"
 
 #: ..\Client\core\CSettings.cpp:808
-#, fuzzy
 msgid "Render peds always in high detail"
-msgstr "总是以高细节渲染载具"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"

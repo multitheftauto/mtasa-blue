@@ -253,7 +253,6 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
     pResult->AddColumn("RenderTargets");
     pResult->AddColumn("ScreenSources");
     pResult->AddColumn("WebBrowsers");
-    pResult->AddColumn("VectorGraphics");
 
     // Calc totals
     if (strFilter == "")

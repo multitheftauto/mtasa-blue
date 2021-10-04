@@ -31,20 +31,17 @@
 # include <wmmintrin.h>
 #endif
 
-// Android makes <arm_acle.h> available with ARMv7-a
-#if (CRYPTOPP_BOOL_ARMV8)
+// C1189: error: This header is specific to ARM targets
+#if (CRYPTOPP_ARM_NEON_AVAILABLE)
 # include "adv_simd.h"
-# if (CRYPTOPP_ARM_NEON_HEADER)
+# ifndef _M_ARM64
 #  include <arm_neon.h>
-# endif
-# if (CRYPTOPP_ARM_ACLE_HEADER)
-#  include <stdint.h>
-#  include <arm_acle.h>
 # endif
 #endif
 
-#if defined(_M_ARM64)
-# include "adv_simd.h"
+#if (CRYPTOPP_ARM_ACLE_AVAILABLE)
+# include <stdint.h>
+# include <arm_acle.h>
 #endif
 
 #if defined(CRYPTOPP_POWER8_AES_AVAILABLE)
@@ -60,6 +57,10 @@
 #ifndef EXCEPTION_EXECUTE_HANDLER
 # define EXCEPTION_EXECUTE_HANDLER 1
 #endif
+
+// Clang __m128i casts, http://bugs.llvm.org/show_bug.cgi?id=20670
+#define M128_CAST(x) ((__m128i *)(void *)(x))
+#define CONST_M128_CAST(x) ((const __m128i *)(const void *)(x))
 
 // Squash MS LNK4221 and libtool warnings
 extern const char RIJNDAEL_SIMD_FNAME[] = __FILE__;
@@ -116,10 +117,7 @@ bool CPU_ProbeAES()
 
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
-    {
-        signal(SIGILL, oldHandler);
         return false;
-    }
 
     if (setjmp(s_jmpSIGILL))
         result = false;
@@ -151,7 +149,7 @@ bool CPU_ProbeAES()
 
 ANONYMOUS_NAMESPACE_BEGIN
 
-inline void ARMV8_Enc_Block(uint64x2_t &data, const word32 *subkeys, unsigned int rounds)
+static inline void ARMV8_Enc_Block(uint64x2_t &data, const word32 *subkeys, unsigned int rounds)
 {
     CRYPTOPP_ASSERT(subkeys);
     const byte *keys = reinterpret_cast<const byte*>(subkeys);
@@ -182,7 +180,7 @@ inline void ARMV8_Enc_Block(uint64x2_t &data, const word32 *subkeys, unsigned in
     data = vreinterpretq_u64_u8(block);
 }
 
-inline void ARMV8_Enc_6_Blocks(uint64x2_t &data0, uint64x2_t &data1,
+static inline void ARMV8_Enc_6_Blocks(uint64x2_t &data0, uint64x2_t &data1,
     uint64x2_t &data2, uint64x2_t &data3, uint64x2_t &data4, uint64x2_t &data5,
     const word32 *subkeys, unsigned int rounds)
 {
@@ -245,7 +243,7 @@ inline void ARMV8_Enc_6_Blocks(uint64x2_t &data0, uint64x2_t &data1,
     data5 = vreinterpretq_u64_u8(veorq_u8(block5, key));
 }
 
-inline void ARMV8_Dec_Block(uint64x2_t &data, const word32 *subkeys, unsigned int rounds)
+static inline void ARMV8_Dec_Block(uint64x2_t &data, const word32 *subkeys, unsigned int rounds)
 {
     CRYPTOPP_ASSERT(subkeys);
     const byte *keys = reinterpret_cast<const byte*>(subkeys);
@@ -276,7 +274,7 @@ inline void ARMV8_Dec_Block(uint64x2_t &data, const word32 *subkeys, unsigned in
     data = vreinterpretq_u64_u8(block);
 }
 
-inline void ARMV8_Dec_6_Blocks(uint64x2_t &data0, uint64x2_t &data1,
+static inline void ARMV8_Dec_6_Blocks(uint64x2_t &data0, uint64x2_t &data1,
     uint64x2_t &data2, uint64x2_t &data3, uint64x2_t &data4, uint64x2_t &data5,
     const word32 *subkeys, unsigned int rounds)
 {
@@ -369,7 +367,7 @@ const word32 s_rconLE[] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36
 };
 
-inline void AESNI_Enc_Block(__m128i &block, MAYBE_CONST word32 *subkeys, unsigned int rounds)
+static inline void AESNI_Enc_Block(__m128i &block, MAYBE_CONST word32 *subkeys, unsigned int rounds)
 {
     const __m128i* skeys = reinterpret_cast<const __m128i*>(subkeys);
 
@@ -383,7 +381,7 @@ inline void AESNI_Enc_Block(__m128i &block, MAYBE_CONST word32 *subkeys, unsigne
     block = _mm_aesenclast_si128(block, skeys[rounds]);
 }
 
-inline void AESNI_Enc_4_Blocks(__m128i &block0, __m128i &block1, __m128i &block2, __m128i &block3,
+static inline void AESNI_Enc_4_Blocks(__m128i &block0, __m128i &block1, __m128i &block2, __m128i &block3,
                                MAYBE_CONST word32 *subkeys, unsigned int rounds)
 {
     const __m128i* skeys = reinterpret_cast<const __m128i*>(subkeys);
@@ -408,7 +406,7 @@ inline void AESNI_Enc_4_Blocks(__m128i &block0, __m128i &block1, __m128i &block2
     block3 = _mm_aesenclast_si128(block3, rk);
 }
 
-inline void AESNI_Dec_Block(__m128i &block, MAYBE_CONST word32 *subkeys, unsigned int rounds)
+static inline void AESNI_Dec_Block(__m128i &block, MAYBE_CONST word32 *subkeys, unsigned int rounds)
 {
     const __m128i* skeys = reinterpret_cast<const __m128i*>(subkeys);
 
@@ -422,7 +420,7 @@ inline void AESNI_Dec_Block(__m128i &block, MAYBE_CONST word32 *subkeys, unsigne
     block = _mm_aesdeclast_si128(block, skeys[rounds]);
 }
 
-inline void AESNI_Dec_4_Blocks(__m128i &block0, __m128i &block1, __m128i &block2, __m128i &block3,
+static inline void AESNI_Dec_4_Blocks(__m128i &block0, __m128i &block1, __m128i &block2, __m128i &block3,
                         MAYBE_CONST word32 *subkeys, unsigned int rounds)
 {
     const __m128i* skeys = reinterpret_cast<const __m128i*>(subkeys);
@@ -551,32 +549,32 @@ static const uint32_t s_rconBE[] = {
     0x1B000000, 0x36000000
 };
 
-inline void POWER8_Enc_Block(uint32x4_p &block, const word32 *subkeys, unsigned int rounds)
+static inline void POWER8_Enc_Block(uint32x4_p &block, const word32 *subkeys, unsigned int rounds)
 {
     CRYPTOPP_ASSERT(IsAlignedOn(subkeys, 16));
     const byte *keys = reinterpret_cast<const byte*>(subkeys);
 
-    uint32x4_p k = VecLoadAligned(keys);
+    uint32x4_p k = VecLoad(keys);
     block = VecXor(block, k);
 
     for (size_t i=1; i<rounds-1; i+=2)
     {
-        block = VecEncrypt(block, VecLoadAligned(  i*16,   keys));
-        block = VecEncrypt(block, VecLoadAligned((i+1)*16, keys));
+        block = VecEncrypt(block, VecLoad(  i*16,   keys));
+        block = VecEncrypt(block, VecLoad((i+1)*16, keys));
     }
 
-    block = VecEncrypt(block, VecLoadAligned((rounds-1)*16, keys));
-    block = VecEncryptLast(block, VecLoadAligned(rounds*16, keys));
+    block = VecEncrypt(block, VecLoad((rounds-1)*16, keys));
+    block = VecEncryptLast(block, VecLoad(rounds*16, keys));
 }
 
-inline void POWER8_Enc_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
+static inline void POWER8_Enc_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
             uint32x4_p &block2, uint32x4_p &block3, uint32x4_p &block4,
             uint32x4_p &block5, const word32 *subkeys, unsigned int rounds)
 {
     CRYPTOPP_ASSERT(IsAlignedOn(subkeys, 16));
     const byte *keys = reinterpret_cast<const byte*>(subkeys);
 
-    uint32x4_p k = VecLoadAligned(keys);
+    uint32x4_p k = VecLoad(keys);
     block0 = VecXor(block0, k);
     block1 = VecXor(block1, k);
     block2 = VecXor(block2, k);
@@ -586,7 +584,7 @@ inline void POWER8_Enc_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
 
     for (size_t i=1; i<rounds; ++i)
     {
-        k = VecLoadAligned(i*16, keys);
+        k = VecLoad(i*16, keys);
         block0 = VecEncrypt(block0, k);
         block1 = VecEncrypt(block1, k);
         block2 = VecEncrypt(block2, k);
@@ -595,7 +593,7 @@ inline void POWER8_Enc_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
         block5 = VecEncrypt(block5, k);
     }
 
-    k = VecLoadAligned(rounds*16, keys);
+    k = VecLoad(rounds*16, keys);
     block0 = VecEncryptLast(block0, k);
     block1 = VecEncryptLast(block1, k);
     block2 = VecEncryptLast(block2, k);
@@ -604,32 +602,32 @@ inline void POWER8_Enc_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
     block5 = VecEncryptLast(block5, k);
 }
 
-inline void POWER8_Dec_Block(uint32x4_p &block, const word32 *subkeys, unsigned int rounds)
+static inline void POWER8_Dec_Block(uint32x4_p &block, const word32 *subkeys, unsigned int rounds)
 {
     CRYPTOPP_ASSERT(IsAlignedOn(subkeys, 16));
     const byte *keys = reinterpret_cast<const byte*>(subkeys);
 
-    uint32x4_p k = VecLoadAligned(rounds*16, keys);
+    uint32x4_p k = VecLoad(rounds*16, keys);
     block = VecXor(block, k);
 
     for (size_t i=rounds-1; i>1; i-=2)
     {
-        block = VecDecrypt(block, VecLoadAligned(  i*16,   keys));
-        block = VecDecrypt(block, VecLoadAligned((i-1)*16, keys));
+        block = VecDecrypt(block, VecLoad(  i*16,   keys));
+        block = VecDecrypt(block, VecLoad((i-1)*16, keys));
     }
 
-    block = VecDecrypt(block, VecLoadAligned(16, keys));
-    block = VecDecryptLast(block, VecLoadAligned(0, keys));
+    block = VecDecrypt(block, VecLoad(16, keys));
+    block = VecDecryptLast(block, VecLoad(0, keys));
 }
 
-inline void POWER8_Dec_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
+static inline void POWER8_Dec_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
             uint32x4_p &block2, uint32x4_p &block3, uint32x4_p &block4,
             uint32x4_p &block5, const word32 *subkeys, unsigned int rounds)
 {
     CRYPTOPP_ASSERT(IsAlignedOn(subkeys, 16));
     const byte *keys = reinterpret_cast<const byte*>(subkeys);
 
-    uint32x4_p k = VecLoadAligned(rounds*16, keys);
+    uint32x4_p k = VecLoad(rounds*16, keys);
     block0 = VecXor(block0, k);
     block1 = VecXor(block1, k);
     block2 = VecXor(block2, k);
@@ -639,7 +637,7 @@ inline void POWER8_Dec_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
 
     for (size_t i=rounds-1; i>0; --i)
     {
-        k = VecLoadAligned(i*16, keys);
+        k = VecLoad(i*16, keys);
         block0 = VecDecrypt(block0, k);
         block1 = VecDecrypt(block1, k);
         block2 = VecDecrypt(block2, k);
@@ -648,7 +646,7 @@ inline void POWER8_Dec_6_Blocks(uint32x4_p &block0, uint32x4_p &block1,
         block5 = VecDecrypt(block5, k);
     }
 
-    k = VecLoadAligned(0, keys);
+    k = VecLoad(0, keys);
     block0 = VecDecryptLast(block0, k);
     block1 = VecDecryptLast(block1, k);
     block2 = VecDecryptLast(block2, k);
@@ -702,17 +700,23 @@ void Rijndael_UncheckedSetKey_POWER8(const byte* userKey, size_t keyLen, word32*
 
 #if (CRYPTOPP_LITTLE_ENDIAN)
     rkey = rk;
-    const uint8x16_p mask = {12,13,14,15, 8,9,10,11, 4,5,6,7, 0,1,2,3};
+    const uint8x16_p mask = ((uint8x16_p){12,13,14,15, 8,9,10,11, 4,5,6,7, 0,1,2,3});
+    const uint8x16_p zero = {0};
 
     unsigned int i=0;
     for (i=0; i<rounds; i+=2, rkey+=8)
     {
-        VecStore(VecPermute(VecLoad(rkey+0), mask), rkey+0);
-        VecStore(VecPermute(VecLoad(rkey+4), mask), rkey+4);
+        const uint8x16_p d1 = vec_vsx_ld( 0, (uint8_t*)rkey);
+        const uint8x16_p d2 = vec_vsx_ld(16, (uint8_t*)rkey);
+        vec_vsx_st(VecPermute(d1, zero, mask),  0, (uint8_t*)rkey);
+        vec_vsx_st(VecPermute(d2, zero, mask), 16, (uint8_t*)rkey);
     }
 
     for ( ; i<rounds+1; i++, rkey+=4)
-        VecStore(VecPermute(VecLoad(rkey), mask), rkey);
+    {
+        const uint8x16_p d = vec_vsx_ld( 0, (uint8_t*)rkey);
+        vec_vsx_st(VecPermute(d, zero, mask),  0, (uint8_t*)rkey);
+    }
 #endif
 }
 

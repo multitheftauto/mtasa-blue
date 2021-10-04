@@ -11,10 +11,6 @@
 #include "misc.h"
 #include "cpu.h"
 
-#if CRYPTOPP_MSC_VERSION
-# pragma warning(disable: 4307)
-#endif
-
 ANONYMOUS_NAMESPACE_BEGIN
 
 using CryptoPP::byte;

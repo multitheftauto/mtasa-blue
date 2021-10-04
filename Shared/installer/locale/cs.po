@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2020-04-19 18:12+0000\n"
+"PO-Revision-Date: 2018-03-06 15:48+0000\n"
 "Last-Translator: Rataj <rataj@fabulasoft.cz>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: cs\n"
@@ -12,9 +12,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"Translators: MIKI785; Rataj; pyrodojo; arciCZ; ccw; qaisjp; LilDollaTechZone; Heavy; Jacek Hałas vel Łagoda\n"
+"Translators: MIKI785; Rataj; pyrodojo; ccw; LilDollaTechZone\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1587319924.0\n"
+"X-POOTLE-MTIME: 1520351306.0\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,7 +22,7 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
-"Verze MTA:SA, kterou jste stáhl nepodporuje Windows XP nebo Vista.  Prosím, "
+"Verze MTA:SA, kterou jste stáhl nepodporuje Windows XP nebo Vista. Prosím, "
 "stáhněte si alternativní verzi z www.mtasa.com."
 
 #. GET_MASTER_PLEASE
@@ -31,7 +31,7 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
-"Tato verze MTA:SA byla vytvořena pro starší verze systému Windows.  Prosím, "
+"Tato verze MTA:SA byla vytvořena pro starší verze systému Windows. Prosím, "
 "stáhněte si nejnovější verzi z www.mtasa.com."
 
 #. WELCOME_TEXT
@@ -267,7 +267,7 @@ msgstr "Volitelné Resources"
 #. INST_SEC_EDITOR
 #: ../Shared/installer/nightly.nsi:474
 msgid "Editor"
-msgstr "Editor map"
+msgstr "Editor"
 
 #. INST_SEC_DEVELOPER
 #: ../Shared/installer/nightly.nsi:967
@@ -399,9 +399,9 @@ msgid ""
 "$\n"
 "Are you sure you want to continue ?"
 msgstr ""
-"Nepodařilo se najít GTA:SA v $GTA_DIR $\n"
+"Nemožné najít GTA:SA v $GTA_DIR $\n"
 "$\n"
-"Jsi si jistý, že chceš pokračovat?"
+"Jsi si jist že chceš pokračovat ?"
 
 #. INST_CHOOSE_LOC_TOP
 #: ../Shared/installer/nightly.nsi:1905

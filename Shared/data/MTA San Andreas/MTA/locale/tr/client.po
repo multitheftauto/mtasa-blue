@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-07 18:33+0100\n"
-"PO-Revision-Date: 2021-07-25 13:42+0000\n"
-"Last-Translator: Furkan <furkanozden55@gmail.com>\n"
+"PO-Revision-Date: 2019-07-11 21:06+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; turret001; Eren Yücel; Uber; Cynydlan; Wickness; velona77; TRFURKAN; daaeernil\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1627220548.000000\n"
+"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; Eren Yücel; Cynydlan; Wickness; TRFURKAN; velona77\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
+"X-POOTLE-MTIME: 1562879193.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -34,7 +34,7 @@ msgstr "ÇALINMASINI ÖNLEMEK İÇİN ASLA ÖNEMLİ BİLGİLERİ GİRMEYİN"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:44
 msgid "Remember decision"
-msgstr "Seçimi hatırla"
+msgstr "Kararı hatırla"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:49 ..\Client\core\CSettings.cpp:923
 msgid "Allow"
@@ -61,7 +61,7 @@ msgstr ""
 
 #: ..\Client\core\CCommandFuncs.cpp:274 ..\Client\core\CCommandFuncs.cpp:342
 msgid "connect: Bad port number"
-msgstr "Bağlantı: Hatalı port adresi"
+msgstr "Bağlantı: Yanlış port adresi"
 
 #: ..\Client\core\CCommandFuncs.cpp:296 ..\Client\core\CCommandFuncs.cpp:357
 #, c-format, c-format
@@ -71,11 +71,11 @@ msgstr "bağlantı:  %s:%u...'e Bağlanılıyor"
 #: ..\Client\core\CCommandFuncs.cpp:300 ..\Client\core\CCommandFuncs.cpp:361
 #, c-format, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "Bağlantı:  %s:%u'e bağlanılamadı %s:%u!"
+msgstr "Bağlantı:  %s:%u'e bağlanılamadı!"
 
 #: ..\Client\core\CCommandFuncs.cpp:305
 msgid "connect: Failed to unload current mod"
-msgstr "Bağlantı: Mevcut mod devre dışı bırakılamadı"
+msgstr "Bağlantı: Mevcut modu devre dışı bırakılamadı"
 
 #: ..\Client\core\CCommandFuncs.cpp:395
 msgid "Bound all controls from GTA"
@@ -98,7 +98,7 @@ msgstr "Bilinmeyen komut veya fiil : "
 
 #: ..\Client\core\CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Bağlantı başarısız. Girilen kullanıcı adı geçersiz!"
+msgstr "Bağlantı başarısız. Geçersiz kullanıcı adı!"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -146,7 +146,7 @@ msgstr "Hata"
 
 #: ..\Client\core\CConnectManager.cpp:110
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Bağlantı başarısız. girilen sunucu adresi geçersiz!"
+msgstr "Bağlantı başarısız. Geçersiz sunucu!"
 
 #: ..\Client\core\CConnectManager.cpp:126
 #, c-format, c-format
@@ -200,7 +200,7 @@ msgstr "Bağlantı kesildi: sunucu ile olan bağlantı kesildi"
 #: ..\Client\core\CConnectManager.cpp:304
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1232
 msgid "Disconnected: connection to the server was lost"
-msgstr "Bağlantı kesildi: Sunucu ile yapılan bağlantı koptu."
+msgstr "Sunucu ile yapılan bağlantı koptu."
 
 #: ..\Client\core\CConnectManager.cpp:311
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1240
@@ -211,7 +211,7 @@ msgstr "Bağlantı Koptu : Bağlantı Reddedildi"
 #: ..\Client\core\CConnectManager.cpp:403
 #, c-format, c-format
 msgid "No such mod installed (%s)"
-msgstr "Böyle bir mod yüklü değil (%s)"
+msgstr "Böyle bir mod yüklü (%s)"
 
 #: ..\Client\core\CConnectManager.cpp:411
 msgid "Bad server response (2)"
@@ -219,7 +219,7 @@ msgstr "Sunucudan cevap alınamıyor (2)"
 
 #: ..\Client\core\CConnectManager.cpp:421
 msgid "Bad server response (1)"
-msgstr "Sunucudan yanıt alınamıyor (1)"
+msgstr "Sunucudan yayın alınamıyor (1)"
 
 #. Create window
 #: ..\Client\core\CConsole.cpp:417
@@ -229,11 +229,11 @@ msgstr "KONSOL"
 #: ..\Client\core\CCore.cpp:698 ..\Client\loader\CInstallManager.cpp:657
 #, c-format, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr " %s sürücüsünde yeterli alan olmadığı için MTA:SA devam edemiyor."
+msgstr "MTA:SA ilerletilemiyor çünkü %s sürücüsünde yeterince alan yok."
 
 #: ..\Client\core\CCore.cpp:700 ..\Client\mods\deathmatch\logic\Utils.cpp:144
 msgid "Fatal error"
-msgstr "Sistemsel hata"
+msgstr "Ölümcül hata"
 
 #: ..\Client\core\CCore.cpp:843
 msgid "TO FIX, REMOVE THIS FILE:"
@@ -251,53 +251,53 @@ msgstr "URL çalıştırılırken bir hata oluştu"
 #: ..\Client\core\CCore.cpp:1197
 #, c-format, c-format
 msgid "Error running mod specified in command line ('%s')"
-msgstr "Komut satırında ('%s') belirtilen mod'u çalıştırırken hata"
+msgstr "Komut satırında belirtilen Hata çalışan mod ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: ..\Client\core\CCore.cpp:1282
 msgid "this help screen"
-msgstr "Bu yardım ekranı"
+msgstr "yardım ekranı"
 
 #: ..\Client\core\CCore.cpp:1283 ..\Client\core\CCore.cpp:1284
 msgid "exits the application"
-msgstr "uygulamadan çıkar"
+msgstr "uygulama çıktığında"
 
 #: ..\Client\core\CCore.cpp:1285
 msgid "shows the version"
-msgstr "versiyonu gösterir"
+msgstr "sürümleri göster"
 
 #: ..\Client\core\CCore.cpp:1286
 msgid "shows the time"
-msgstr "zamanı gösterir"
+msgstr "zamanı göster"
 
 #: ..\Client\core\CCore.cpp:1287
 msgid "shows the hud"
-msgstr "arayüzü gösterir"
+msgstr "arayüzu göster"
 
 #: ..\Client\core\CCore.cpp:1288
 msgid "shows all the binds"
-msgstr "Bütün tuş atamalarını gösterir"
+msgstr "Bütün tuşları göster"
 
 #: ..\Client\core\CCore.cpp:1289
 msgid "shows your serial"
-msgstr "seri numaranızı gösterir"
+msgstr "seriali göster"
 
 #: ..\Client\core\CCore.cpp:1298
 msgid "connects to a server (host port nick pass)"
-msgstr "bir sunucuya (host port takma-ad şifre) bağlanır"
+msgstr "Bir sunucu (ana bağlantı noktası nick geçiş) bağlanır"
 
 #: ..\Client\core\CCore.cpp:1299
 msgid "connects to a previous server"
-msgstr "önceki bir sunucuya bağlanır"
+msgstr "Bir önceki sunucusuna bağlandığında"
 
 #: ..\Client\core\CCore.cpp:1300
 msgid "binds a key (key control)"
-msgstr "bir tuş atamasını kaydeder (tuş kontrol)"
+msgstr "bir tuşa basın (tuş kontrol)"
 
 #: ..\Client\core\CCore.cpp:1301
 msgid "unbinds a key (key)"
-msgstr "tuş atamasını çıkarır (tuş)"
+msgstr "tuş kontrollerini sıfırla"
 
 #: ..\Client\core\CCore.cpp:1302
 msgid "copies the default gta controls"
@@ -305,35 +305,35 @@ msgstr "Varsayılan gta kontrolleri kopyalar"
 
 #: ..\Client\core\CCore.cpp:1303
 msgid "outputs a screenshot"
-msgstr "Bir ekran görüntüsü kaydeder"
+msgstr "."
 
 #: ..\Client\core\CCore.cpp:1304
 msgid "immediately saves the config"
-msgstr "yapılandırmayı hemen kaydeder"
+msgstr "hemen yapılandırma kaydeder"
 
 #: ..\Client\core\CCore.cpp:1306
 msgid "clears the debug view"
-msgstr "Debug görünümünü temizler"
+msgstr "Debug görünmünü temizler"
 
 #: ..\Client\core\CCore.cpp:1307
 msgid "scrolls the chatbox upwards"
-msgstr "chatboxu yukarı kaydırır"
+msgstr "Basılırsa chatboxu yukarı kaydırır"
 
 #: ..\Client\core\CCore.cpp:1308
 msgid "scrolls the chatbox downwards"
-msgstr " Chatboxu aşağıya kaydırır"
+msgstr "Basılırsa chatboxu aşağıya kaydırır"
 
 #: ..\Client\core\CCore.cpp:1309
 msgid "scrolls the debug view upwards"
-msgstr "debug görünümünü yukarıya doğru kaydırır"
+msgstr "Basılırsa debugu yukarı gösterir"
 
 #: ..\Client\core\CCore.cpp:1310
 msgid "scrolls the debug view downwards"
-msgstr "debug görünümünü aşağı doğru kaydırır"
+msgstr "Basılırsa debugu aşağı gösterir"
 
 #: ..\Client\core\CCore.cpp:1313
 msgid "shows the memory statistics"
-msgstr "Hafıza istatistiklerini gösterir"
+msgstr "Memory istatisiklerini gösterir"
 
 #: ..\Client\core\CCore.cpp:1314
 msgid "shows the frame timing graph"
@@ -341,7 +341,7 @@ msgstr "Çerçeve zamanlama grafiğini gösterir"
 
 #: ..\Client\core\CCredits.cpp:32
 msgid "Programming"
-msgstr "Programlama"
+msgstr "Program Yapımı"
 
 #: ..\Client\core\CCredits.cpp:60
 msgid "Contributors"
@@ -349,23 +349,23 @@ msgstr "Katkıda Bulunanlar"
 
 #: ..\Client\core\CCredits.cpp:76
 msgid "Game Design / Scripting"
-msgstr "Oyun Dizaynı / Modlama"
+msgstr "Tasarım / Modlama"
 
 #: ..\Client\core\CCredits.cpp:96
 msgid "Language Localization"
-msgstr "Dil Bölgesi"
+msgstr "Lisan Bölgesi"
 
 #: ..\Client\core\CCredits.cpp:102
 msgid "Patch contributors"
-msgstr "Aktif katkıda bulunanlar"
+msgstr "Aktif Katılımcılar"
 
 #: ..\Client\core\CCredits.cpp:177
 msgid "Special Thanks"
-msgstr "Özel Teşekkürler"
+msgstr "Özellikle Teşekkür Ederiz"
 
 #: ..\Client\core\CCredits.cpp:204
 msgid "This software makes use of the following libraries and software:"
-msgstr "Bu yazılım aşağıdaki kütüphaneleri ve yazılımı kullanır:"
+msgstr "Bu yazılım aşağıdaki kütüphaneleri ve yazılım kullanır:"
 
 #. Even the default skin doesn't work, so give up
 #: ..\Client\core\CGUI.cpp:85
@@ -373,20 +373,20 @@ msgid ""
 "The skin you selected could not be loaded, and the default skin also could "
 "not be loaded, please reinstall MTA."
 msgstr ""
-"Seçtiğiniz oyuncu tipi yüklenemedi , ayrıca varsayılan tip de "
-"yüklenememiştir. Lütfen MTA' yı baştan yükleyiniz."
+"Seçtiğin oyuncu tipi yüklenemedi , ayrıca normal tipte yüklenememiştir. "
+"Lütfen MTA yı baştan yükleyiniz."
 
 #: ..\Client\core\CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
-msgstr "Ekseni hızlandır"
+msgstr "Eksen hızlandırın"
 
 #: ..\Client\core\CJoystickManager.cpp:1580
 msgid "Brake Axis"
-msgstr "Ekseni yavaşlat"
+msgstr "Eksen yavaşlatın"
 
 #: ..\Client\core\CKeyBinds.cpp:180
 msgid "Fire"
-msgstr "Ateş"
+msgstr "Ateş !"
 
 #: ..\Client\core\CKeyBinds.cpp:181
 msgid "Next weapon"
@@ -398,11 +398,11 @@ msgstr "Önceki silah"
 
 #: ..\Client\core\CKeyBinds.cpp:183
 msgid "Forwards"
-msgstr "İleri"
+msgstr "İleriye"
 
 #: ..\Client\core\CKeyBinds.cpp:184
 msgid "Backwards"
-msgstr "Geri"
+msgstr "Geriye"
 
 #: ..\Client\core\CKeyBinds.cpp:185 ..\Client\core\CSettings.cpp:2177
 #: ..\Client\core\CSettings.cpp:2205
@@ -424,7 +424,7 @@ msgstr "Uzaklaştır"
 
 #: ..\Client\core\CKeyBinds.cpp:189
 msgid "Enter/Exit"
-msgstr "Giriş/çıkış"
+msgstr "Çıkış/biniş"
 
 #: ..\Client\core\CKeyBinds.cpp:190
 msgid "Change camera"
@@ -441,7 +441,7 @@ msgstr "Koş"
 
 #: ..\Client\core\CKeyBinds.cpp:193
 msgid "Look behind"
-msgstr "Arkaya Bak"
+msgstr "Arkana Bak"
 
 #: ..\Client\core\CKeyBinds.cpp:194
 msgid "Crouch"
@@ -457,28 +457,28 @@ msgstr "Yürü"
 
 #: ..\Client\core\CKeyBinds.cpp:197
 msgid "Vehicle fire"
-msgstr "Araç silahı"
+msgstr "Araçtan Ateş - Araç Alevi"
 
 #: ..\Client\core\CKeyBinds.cpp:198
 msgid "Vehicle secondary fire"
-msgstr "Araç 2. silahı"
+msgstr "Araç 2. ateş"
 
 #: ..\Client\core\CKeyBinds.cpp:199
 msgid "Vehicle left"
-msgstr "Aracı sola döndürme"
+msgstr "Aracı sol tarafa döndürme"
 
 #: ..\Client\core\CKeyBinds.cpp:200
 msgid "Vehicle right"
-msgstr "Aracı sağa döndürme"
+msgstr "aracı sağa döndürme"
 
 #. 20
 #: ..\Client\core\CKeyBinds.cpp:201
 msgid "Steer forwards/down"
-msgstr "İleri/aşağı yönlendir"
+msgstr "Steer ileri/geri"
 
 #: ..\Client\core\CKeyBinds.cpp:202
 msgid "Steer backwards/up"
-msgstr "Geriye/yukarıya yönlendir"
+msgstr "geriye/yukarı sür"
 
 #: ..\Client\core\CKeyBinds.cpp:203
 msgid "Accelerate"
@@ -486,19 +486,19 @@ msgstr "İvme"
 
 #: ..\Client\core\CKeyBinds.cpp:204
 msgid "Brake/Reverse"
-msgstr "Fren/Geri"
+msgstr "Fren"
 
 #: ..\Client\core\CKeyBinds.cpp:205
 msgid "Radio next"
-msgstr "Bir sonraki radyo kanalı"
+msgstr "Diğer Kanal"
 
 #: ..\Client\core\CKeyBinds.cpp:206
 msgid "Radio previous"
-msgstr "Önceki radyo kanalı"
+msgstr "Önceki Kanal"
 
 #: ..\Client\core\CKeyBinds.cpp:207
 msgid "Radio user track skip"
-msgstr "Sonraki radyo kanalına geçiş"
+msgstr "Sonraki radio ya geçiş"
 
 #: ..\Client\core\CKeyBinds.cpp:208
 msgid "Horn"
@@ -506,7 +506,7 @@ msgstr "Korna"
 
 #: ..\Client\core\CKeyBinds.cpp:209
 msgid "Sub-mission"
-msgstr "Yan Görev"
+msgstr "Yardımcı Görev"
 
 #: ..\Client\core\CKeyBinds.cpp:210
 msgid "Handbrake"
@@ -515,15 +515,15 @@ msgstr "El Freni"
 #. 30
 #: ..\Client\core\CKeyBinds.cpp:211
 msgid "Vehicle look left"
-msgstr "Araçtan sola bak"
+msgstr "Aractan sola bakmak"
 
 #: ..\Client\core\CKeyBinds.cpp:212
 msgid "Vehicle look right"
-msgstr "Araçtan sağa bak"
+msgstr "Araçtan sağ tarafa bakalır"
 
 #: ..\Client\core\CKeyBinds.cpp:213
 msgid "Vehicle look behind"
-msgstr "Araçtan arkaya bak"
+msgstr "Araçtan arka tarafa bakmak"
 
 #: ..\Client\core\CKeyBinds.cpp:214
 msgid "Vehicle mouse look"
@@ -547,7 +547,7 @@ msgstr "Özel kontrol yukarı"
 
 #: ..\Client\core\CKeyBinds.cpp:219
 msgid "Aim weapon"
-msgstr "Silah nişan al"
+msgstr "Silah namlusu"
 
 #: ..\Client\core\CKeyBinds.cpp:220
 msgid "Conversation yes"
@@ -569,7 +569,7 @@ msgstr "Grup kontrol geri"
 #. TRANSLATORS: Replace with your language native name
 #: ..\Client\core\CLocalization.cpp:16
 msgid "English"
-msgstr "İngilizce"
+msgstr "Türkçe"
 
 #: ..\Client\core\CMainMenu.cpp:315
 msgid ""
@@ -585,9 +585,9 @@ msgid ""
 "\n"
 "Upgrade Windows to play on the latest servers."
 msgstr ""
-"Xp ve Vista Temmuz 2019'dan sonra MTA'yı kaldırmayacak.\n"
+"MTA temmuz 2019 itibari ile XP ve Vista için güncel etmeyecektir.\n"
 "\n"
-"En son ve güncel serverlarda oynamak için, Windowsunuzu güncelleyin."
+"Yeni serverlarda oynamak için Windows'unuzu yükseltin."
 
 #: ..\Client\core\CMainMenu.cpp:1133
 msgid ""
@@ -633,16 +633,16 @@ msgstr "Evet"
 #. News link
 #: ..\Client\core\CNewsBrowser.cpp:171
 msgid "Visit latest news article"
-msgstr "Son haber makalesini ziyaret et."
+msgstr ""
 
 #: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Bu problem hakkında biraz çevrimiçi yardım görmek istermisiniz ?"
+msgstr "Bu problem hakkında biraz çevrim içi yardım görmek istermisiniz ?"
 
 #: ..\Client\core\CScreenShot.cpp:51
 #, c-format, c-format
 msgid "Screenshot taken: '%s'"
-msgstr "Ekran görüntüsü alındı: '%s'"
+msgstr "Ekran görüntüsü alınıyor %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: ..\Client\core\CSettings.cpp:82
@@ -651,7 +651,7 @@ msgstr "AYARLAR"
 
 #: ..\Client\core\CSettings.cpp:114
 msgid "Multiplayer"
-msgstr "Çok Oyunculu"
+msgstr "Çoklu oyuncu"
 
 #: ..\Client\core\CSettings.cpp:115
 msgid "Video"
@@ -706,12 +706,12 @@ msgstr "TAMAM"
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:68 ..\Client\loader\Dialogs.cpp:36
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "İptal et"
+msgstr "İptal"
 
 #: ..\Client\core\CSettings.cpp:145 ..\Client\core\CSettings.cpp:336
 #: ..\Client\core\CSettings.cpp:593 ..\Client\core\CSettings.cpp:852
 msgid "Load defaults"
-msgstr "Varsayılanları yükle"
+msgstr "Varsayılanı yükle"
 
 #. *
 #. *  Controls tab
@@ -740,7 +740,7 @@ msgstr "mouse ile yönlendirme/sürüş"
 
 #: ..\Client\core\CSettings.cpp:173
 msgid "Fly with mouse"
-msgstr "fare ile uçuş"
+msgstr "mous ile uçuş"
 
 #. Joypad options
 #: ..\Client\core\CSettings.cpp:215
@@ -757,7 +757,7 @@ msgstr "Klasik kontroller (Joypad)"
 
 #: ..\Client\core\CSettings.cpp:272
 msgid "Dead Zone"
-msgstr "Ölü alan"
+msgstr "Ölüm alanı"
 
 #: ..\Client\core\CSettings.cpp:277
 msgid "Saturation"
@@ -765,7 +765,7 @@ msgstr "Dolgunluk"
 
 #: ..\Client\core\CSettings.cpp:283
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Joypad tuşları için 'Tuş atamaları' sekmesini kullanın"
+msgstr "Joypad tuşları için 'Binds' sekmesini kullanın"
 
 #: ..\Client\core\CSettings.cpp:322
 msgid "Left Stick"
@@ -792,7 +792,7 @@ msgstr "Alt tuşu"
 #. *
 #: ..\Client\core\CSettings.cpp:351 ..\Client\core\CSettings.cpp:354
 msgid "Nick:"
-msgstr "Kullanıcı adı:"
+msgstr "Takma ad:"
 
 #: ..\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
@@ -800,7 +800,7 @@ msgstr "sunucu şifrelerini kaydet"
 
 #: ..\Client\core\CSettings.cpp:369
 msgid "Auto-refresh server browser"
-msgstr "Sunucu tarayıcısını otomatik yenile"
+msgstr "Sunucuları otomatik yenile"
 
 #: ..\Client\core\CSettings.cpp:374
 msgid "Allow screen upload"
@@ -808,15 +808,15 @@ msgstr "Ekran yüklemesine izin ver."
 
 #: ..\Client\core\CSettings.cpp:379
 msgid "Allow external sounds"
-msgstr "Harici seslere izin ver."
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:384
 msgid "Use customized GTA:SA files"
-msgstr "Modifiye edilmiş GTA San Andreas dosyalarını kullan"
+msgstr "Düzenlenmiş GTA SanAndreas dosyalarını kullan"
 
 #: ..\Client\core\CSettings.cpp:389
 msgid "Map rendering options"
-msgstr "Harita renderlama seçenekleri"
+msgstr "Harita oluşturma seçenekleri"
 
 #: ..\Client\core\CSettings.cpp:395 ..\Client\core\CSettings.cpp:604
 msgid "Opacity:"
@@ -827,11 +827,11 @@ msgstr "Matlık"
 #. *
 #: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:424
 msgid "Master volume:"
-msgstr "Ana ses:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:443
 msgid "Radio volume:"
-msgstr "Radyo Ses seviyesi:"
+msgstr "Radio ses seviyesi:"
 
 #: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:462
 msgid "SFX volume:"
@@ -847,7 +847,7 @@ msgstr "Ses düzeyi"
 
 #: ..\Client\core\CSettings.cpp:416 ..\Client\core\CSettings.cpp:541
 msgid "Play mode:"
-msgstr "Oyun modu:"
+msgstr "Oynama modu:"
 
 #. *
 #. * Webbrowser tab
@@ -860,11 +860,11 @@ msgstr "Genel"
 
 #: ..\Client\core\CSettings.cpp:519
 msgid "Radio options"
-msgstr "Radyo ayarları"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:525
 msgid "Radio Equalizer"
-msgstr "Radyo Equalizer"
+msgstr "Radyo Dengeleyici"
 
 #: ..\Client\core\CSettings.cpp:530
 msgid "Radio Auto-tune"
@@ -891,8 +891,9 @@ msgid "Automatic Media Scan"
 msgstr "otomatik medya araması,"
 
 #: ..\Client\core\CSettings.cpp:561
+#, fuzzy
 msgid "Mute options"
-msgstr "Susturma ayarları"
+msgstr "Fare ayarları"
 
 #: ..\Client\core\CSettings.cpp:567
 #, fuzzy
@@ -1059,9 +1060,8 @@ msgid "Render vehicles always in high detail"
 msgstr "Araçları her zaman yüksek detaylı olarak göster."
 
 #: ..\Client\core\CSettings.cpp:808
-#, fuzzy
 msgid "Render peds always in high detail"
-msgstr "Araçları her zaman yüksek detaylı olarak göster."
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
@@ -1799,10 +1799,6 @@ msgid ""
 "To join this server please uncheck:\n"
 "Settings->Multiplayer->Use customized GTA:SA files"
 msgstr ""
-"Bu sunucu modifiye edilmiş GTA:SA dosyalarına izin vermiyor.\n"
-"\n"
-"Bu sunucuya girmek için lütfen şuradaki işareti kaldırın:\n"
-"Ayarlar > Çok oyunculu > Modifiye edilmiş GTA San Andreas dosyalarını kullan."
 
 #: ..\Client\core\CVersionUpdater.cpp:2091
 #: ..\Client\core\CVersionUpdater.cpp:2101
@@ -2288,7 +2284,7 @@ msgstr "Çıkış"
 
 #: ..\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas bir problemle karşılaştı"
+msgstr "MTA: San Andread bir problemle karşılaştı"
 
 #: ..\Client\loader\Dialogs.cpp:52
 msgid "Crash information"

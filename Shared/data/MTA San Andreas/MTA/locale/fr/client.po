@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-07 18:33+0100\n"
-"PO-Revision-Date: 2020-01-12 22:15+0000\n"
-"Last-Translator: Guillaume <guillaume.dorczynski@gmail.com>\n"
+"PO-Revision-Date: 2019-07-11 21:17+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Translators: guix; cedricpc; arthrik; 4L3X; Ea7gign; Sam; xPiwel; XyZ\n"
+"Translators: guix; cedricpc; arthrik; 4L3X; Sam; xPiwel; XyZ\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1578867350.0\n"
+"X-POOTLE-MTIME: 1562879871.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -47,7 +47,7 @@ msgstr "Refuser"
 
 #: ..\Client\core\CCommandFuncs.cpp:31
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ AIDE DES COMMANDES ]***\n"
+msgstr "***[ DESCRIPTION DES COMMANDES ]***\n"
 
 #: ..\Client\core\CCommandFuncs.cpp:182
 #, c-format, c-format
@@ -239,7 +239,7 @@ msgstr "Erreur fatale"
 
 #: ..\Client\core\CCore.cpp:843
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "Pour corriger ce problème, veuillez effacer ce fichier:"
+msgstr ""
 
 #: ..\Client\core\CCore.cpp:875
 #, c-format, c-format
@@ -579,8 +579,6 @@ msgid ""
 "You are using a feature-branch build! This is a test build only which cannot"
 " be used to connect to public servers!"
 msgstr ""
-"Vous utilisez une version de développement! Il s'agit d'une version de test "
-"qui ne peut pas être utilisée pour se connecter à des serveurs publics!"
 
 #: ..\Client\core\CMainMenu.cpp:334 ..\Client\core\CVersionUpdater.cpp:1919
 msgid ""
@@ -636,7 +634,7 @@ msgstr "Oui"
 #. News link
 #: ..\Client\core\CNewsBrowser.cpp:171
 msgid "Visit latest news article"
-msgstr "Lire les actualités"
+msgstr ""
 
 #: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
 msgid "Do you want to see some on-line help about this problem ?"
@@ -650,7 +648,7 @@ msgstr "Capture d'écran effectuée: '%s'"
 #. Create window (with frame) if it will fit inside the screen resolution
 #: ..\Client\core\CSettings.cpp:82
 msgid "SETTINGS"
-msgstr "PARAMÈTRES"
+msgstr "Audio"
 
 #: ..\Client\core\CSettings.cpp:114
 msgid "Multiplayer"
@@ -795,7 +793,7 @@ msgstr "TOUCHE ALTERNATIVE"
 #. *
 #: ..\Client\core\CSettings.cpp:351 ..\Client\core\CSettings.cpp:354
 msgid "Nick:"
-msgstr "Pseudonyme:"
+msgstr "Pseudonyme"
 
 #: ..\Client\core\CSettings.cpp:364
 msgid "Save server passwords"
@@ -811,7 +809,7 @@ msgstr "Autoriser l'envoi de captures d'écran"
 
 #: ..\Client\core\CSettings.cpp:379
 msgid "Allow external sounds"
-msgstr "Autoriser les sons externes"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:384
 msgid "Use customized GTA:SA files"
@@ -830,7 +828,7 @@ msgstr "Opacité:"
 #. *
 #: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:424
 msgid "Master volume:"
-msgstr "Volume principal:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:443
 msgid "Radio volume:"
@@ -863,19 +861,19 @@ msgstr "Général"
 
 #: ..\Client\core\CSettings.cpp:519
 msgid "Radio options"
-msgstr "Radio"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:525
 msgid "Radio Equalizer"
-msgstr "Égaliseur"
+msgstr "Égaliseur Radio"
 
 #: ..\Client\core\CSettings.cpp:530
 msgid "Radio Auto-tune"
-msgstr "Auto-tuning"
+msgstr "Auto-tune (radio)"
 
 #: ..\Client\core\CSettings.cpp:535
 msgid "Usertrack options"
-msgstr "Pistes utilisateur"
+msgstr "Paramètres des Pistes utilisateur"
 
 #: ..\Client\core\CSettings.cpp:549 ..\Client\core\CSettings.cpp:2975
 msgid "Radio"
@@ -894,12 +892,14 @@ msgid "Automatic Media Scan"
 msgstr "Scanner les médias automatiquement"
 
 #: ..\Client\core\CSettings.cpp:561
+#, fuzzy
 msgid "Mute options"
-msgstr "Sourdine"
+msgstr "Paramètres de souris"
 
 #: ..\Client\core\CSettings.cpp:567
+#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Désactiver tous les sons quand le jeu est minimisé"
+msgstr "Désactiver les effets quand le jeu est minimisé"
 
 #: ..\Client\core\CSettings.cpp:572
 msgid "Mute Radio sounds when minimized"
@@ -926,7 +926,7 @@ msgstr "Résolution:"
 
 #: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:659
 msgid "FOV:"
-msgstr "Champ de vision:"
+msgstr "FOV:"
 
 #: ..\Client\core\CSettings.cpp:603 ..\Client\core\CSettings.cpp:675
 msgid "Draw Distance:"
@@ -958,7 +958,7 @@ msgstr "Mode fenêtré"
 
 #: ..\Client\core\CSettings.cpp:630
 msgid "DPI aware"
-msgstr "Prise en charge DPI"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:638 ..\Client\core\CSettings.cpp:953
 #: ..\Client\loader\MainFunctions.cpp:370
@@ -976,7 +976,7 @@ msgstr "Fenêtre sans bordures"
 
 #: ..\Client\core\CSettings.cpp:647 ..\Client\core\CSettings.cpp:1558
 msgid "Borderless keep res"
-msgstr "Fenêtre sans bordures, résolution native"
+msgstr "Fenêtre sans bordures"
 
 #: ..\Client\core\CSettings.cpp:651
 msgid "Mip Mapping"
@@ -1038,7 +1038,7 @@ msgstr "16:9"
 
 #: ..\Client\core\CSettings.cpp:782
 msgid "HUD Match Aspect Ratio"
-msgstr "Corriger le HUD"
+msgstr "Redimensionner le HUD"
 
 #: ..\Client\core\CSettings.cpp:788
 msgid "Volumetric Shadows"
@@ -1046,11 +1046,11 @@ msgstr "Ombres volumétriques"
 
 #: ..\Client\core\CSettings.cpp:792
 msgid "Grass effect"
-msgstr "Effet 'herbe'"
+msgstr "Activer l'effet 'herbe'"
 
 #: ..\Client\core\CSettings.cpp:796
 msgid "Heat haze"
-msgstr "Effet 'chaleur'"
+msgstr "Activer l'effet 'chaleur'"
 
 #: ..\Client\core\CSettings.cpp:800
 msgid "Tyre Smoke etc"
@@ -1058,11 +1058,11 @@ msgstr "Fumée des pneus, etc"
 
 #: ..\Client\core\CSettings.cpp:804
 msgid "Render vehicles always in high detail"
-msgstr "Toujours afficher les véhicules en haute qualité"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:808
 msgid "Render peds always in high detail"
-msgstr "Toujours afficher les personnages en haute qualité"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
@@ -1124,7 +1124,7 @@ msgstr "Chargement rapide des vêtements de CJ:"
 #: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:973
 #: ..\Client\core\CSettings.cpp:4583
 msgid "Browser speed:"
-msgstr "Vitesse de l'explorateur:"
+msgstr "Vitesse de l'explorateur"
 
 #. Single download
 #: ..\Client\core\CSettings.cpp:952 ..\Client\core\CSettings.cpp:987
@@ -1154,7 +1154,7 @@ msgstr "Priorité du processus:"
 #: ..\Client\core\CSettings.cpp:953 ..\Client\core\CSettings.cpp:1040
 #: ..\Client\core\CSettings.cpp:4591
 msgid "Debug setting:"
-msgstr "Mode debug:"
+msgstr "Mode debug"
 
 #. Streaming memory
 #: ..\Client\core\CSettings.cpp:954 ..\Client\core\CSettings.cpp:1063
@@ -1198,11 +1198,11 @@ msgstr "Rapide"
 
 #: ..\Client\core\CSettings.cpp:1033 ..\Client\core\CSettings.cpp:3029
 msgid "Normal"
-msgstr "Normal"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1034 ..\Client\core\CSettings.cpp:3031
 msgid "Above normal"
-msgstr "Supérieur à la normal"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1070
 msgid "Min"
@@ -1228,11 +1228,11 @@ msgstr "Correctif de souris"
 #. Cache path info
 #: ..\Client\core\CSettings.cpp:1118
 msgid "Client resource files:"
-msgstr "Fichiers de ressources client:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1122
 msgid "Show in Explorer"
-msgstr "Ouvrir l'Explorateur"
+msgstr ""
 
 #. Auto updater section label
 #: ..\Client\core\CSettings.cpp:1137 ..\Client\core\CSettings.cpp:1140
@@ -1297,7 +1297,7 @@ msgstr "Déplacez un axe, ou appuyez sur Esc pour effacer"
 
 #: ..\Client\core\CSettings.cpp:1946
 msgid "Language:"
-msgstr "Langue:"
+msgstr "Langage:"
 
 #: ..\Client\core\CSettings.cpp:1946
 msgid "Skin:"
@@ -1317,31 +1317,31 @@ msgstr "Charger"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Colors"
-msgstr "Couleurs"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2025
 msgid "Layout"
-msgstr "Disposition"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2026 ..\Client\core\CSettings.cpp:2272
 msgid "Options"
-msgstr "Options"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2032
 msgid "Chat Background"
-msgstr "Arrière-plan Tchat"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2032
 msgid "Chat Text"
-msgstr "Texte Tchat"
+msgstr "Texte"
 
 #: ..\Client\core\CSettings.cpp:2032
 msgid "Input Background"
-msgstr "Arrière-plan Entrée"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2032
 msgid "Input Text"
-msgstr "Texte Entrée"
+msgstr "Texte"
 
 #: ..\Client\core\CSettings.cpp:2055
 msgid "Lines:"
@@ -1349,7 +1349,7 @@ msgstr "Lignes:"
 
 #: ..\Client\core\CSettings.cpp:2055
 msgid "Scale:"
-msgstr "Échelle:"
+msgstr "Echelle:"
 
 #: ..\Client\core\CSettings.cpp:2055
 msgid "Width:"
@@ -1357,15 +1357,15 @@ msgstr "Largeur:"
 
 #: ..\Client\core\CSettings.cpp:2058
 msgid "Size"
-msgstr "Taille"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2107
 msgid "after"
-msgstr "Après"
+msgstr "après"
 
 #: ..\Client\core\CSettings.cpp:2107
 msgid "for"
-msgstr "Pendant"
+msgstr "durant"
 
 #: ..\Client\core\CSettings.cpp:2107
 msgid "sec"
@@ -1373,7 +1373,7 @@ msgstr "secondes"
 
 #: ..\Client\core\CSettings.cpp:2110
 msgid "Fading"
-msgstr "Fondu"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2116
 msgid "Fade out old lines"
@@ -1381,51 +1381,52 @@ msgstr "Fondu des anciennes lignes"
 
 #: ..\Client\core\CSettings.cpp:2156
 msgid "Horizontal:"
-msgstr "Horizontale:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2156
 msgid "Vertical:"
-msgstr "Verticale:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2156
 msgid "Text-Align:"
-msgstr "Alignement:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2156
 msgid "X-Offset:"
-msgstr "Décalage X:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2157
 msgid "Y-Offset:"
-msgstr "Décalage Y:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2163
 msgid "Position"
-msgstr "Position"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2178 ..\Client\core\CSettings.cpp:2192
 msgid "Center"
-msgstr "Centre"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2191
 msgid "Top"
-msgstr "Haut"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2193
 msgid "Bottom"
-msgstr "Bas"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2241
+#, fuzzy
 msgid "Font"
-msgstr "Police"
+msgstr "Police:"
 
 #: ..\Client\core\CSettings.cpp:2278
 msgid "Hide background when not typing"
-msgstr "Masquer l'arrière-plan lorsque vous n'écrivez pas"
+msgstr "Masquer le fond quand rien n'est saisi"
 
 #: ..\Client\core\CSettings.cpp:2283
 msgid "Nickname completion using the \"Tab\" key"
-msgstr "Auto-complétion du pseudonyme avec la touche TAB"
+msgstr "Autocomplétion du pseudo avec la touche TAB"
 
 #: ..\Client\core\CSettings.cpp:2288
 msgid "Allow server to flash the window"
@@ -1433,11 +1434,11 @@ msgstr "Permettre au serveur de flasher la fenêtre"
 
 #: ..\Client\core\CSettings.cpp:2293
 msgid "Allow tray balloon notifications"
-msgstr "Autoriser les bulles de notifications"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2298
 msgid "Chat text black/white outline"
-msgstr "Contour du texte"
+msgstr ""
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'",
@@ -1483,15 +1484,15 @@ msgstr "Bleu:"
 
 #: ..\Client\core\CSettings.cpp:3621
 msgid "Transparency:"
-msgstr "Opacité:"
+msgstr "Transparence:"
 
 #: ..\Client\core\CSettings.cpp:3624
 msgid "Color"
-msgstr "Couleur"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:3701
 msgid "Preview"
-msgstr "Prévisualisation"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4009
 msgid "Please disconnect before changing language"
@@ -1536,14 +1537,10 @@ msgid ""
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr ""
-"Certains scripts peuvent lire des sons, comme une radio, à partir d'internet.\n"
-"\n"
-"Désactiver cette option peut diminuer la consommation\n"
-"de la bande passante.\n"
 
 #: ..\Client\core\CSettings.cpp:4367
 msgid "EXTERNAL SOUNDS"
-msgstr "SONS EXTERNES"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4388
 msgid ""
@@ -1573,15 +1570,10 @@ msgid ""
 "\n"
 "Are you sure you want to enable this option?"
 msgstr ""
-"La prise en charge DPI est une fonctionnalité expérimentale, qui devrait\n"
-"être activée uniquement si vous jouez à MTA:SA sur un écran mis à l'échelle.\n"
-"Des problèmes graphiques peuvent apparaître si vous activez cette option.\n"
-"\n"
-"Êtes-vous sûr de vouloir activer cette option?"
 
 #: ..\Client\core\CSettings.cpp:4443
 msgid "EXPERIMENTAL FEATURE"
-msgstr "FONCTIONNALITÉ EXPÉRIMENTALE"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4560
 msgid "Please enter a nickname"
@@ -1617,11 +1609,11 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4587
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "Étiqueter les paquets pour aider les FAI à identifier le trafic MTA."
+msgstr "Étiqueter les paquets pour aider les FAI à identifier le traffic MTA"
 
 #: ..\Client\core\CSettings.cpp:4589
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr "Animation du cercle tournant en bas de l'écran."
+msgstr "Animation en bas de l'écran"
 
 #: ..\Client\core\CSettings.cpp:4591
 msgid "Select default always. (This setting is not saved)"
@@ -1816,11 +1808,6 @@ msgid ""
 "To join this server please uncheck:\n"
 "Settings->Multiplayer->Use customized GTA:SA files"
 msgstr ""
-"Ce serveur a bloqué vos fichiers personnalisés de GTA:SA.\n"
-"\n"
-"Pour rejoindre ce serveur, désactivez l'option\n"
-"\"Utiliser les fichiers personnalisés de GTA:SA\"\n"
-"dans l'onglet Multijoueur."
 
 #: ..\Client\core\CVersionUpdater.cpp:2091
 #: ..\Client\core\CVersionUpdater.cpp:2101
@@ -2757,12 +2744,12 @@ msgstr ""
 
 #: ..\Client\loader\MainFunctions.cpp:1088
 msgid "Fix configuration issue"
-msgstr "Correction d'un problème de configuration"
+msgstr ""
 
 #. Try to relaunch as admin if not done so already
 #: ..\Client\loader\MainFunctions.cpp:1130
 msgid "Fix elevation required error"
-msgstr "Correction de l'erreur d'élévation requise"
+msgstr ""
 
 #: ..\Client\loader\MainFunctions.cpp:1137
 #, c-format, c-format
@@ -2832,7 +2819,7 @@ msgstr ""
 #: ..\Client\loader\Utils.cpp:1870
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA a détecté des erreurs dans le fichier '%s'"
+msgstr ""
 
 #: ..\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
@@ -2955,7 +2942,7 @@ msgstr "(mode développeur) affiche les colshapes"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:92
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Mode développeur) affiche les world sound ids dans la fenêtre Debug"
+msgstr "(mode développeur) affiche les world sound ids dans la fenêtre Debug"
 
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:590
 msgid "Entering the game ..."
@@ -3185,59 +3172,56 @@ msgstr "Vous avez été exclus du jeu"
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Ce serveur nécessite un fichier 'gta_sa.exe' original"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
 msgid "Please replace gta_sa.exe"
-msgstr "Veuillez remplacer 'gta_sa.exe'"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Ce serveur n'autorise pas les fichiers 'd3d9.dll' modifiés"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr ""
-"Supprimez le fichier 'd3d9.dll' de votre dossier d'installation de GTA:SA et"
-" redémarrez MTA:SA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
-msgstr "Ce serveur n'autorise pas les machines virtuelles"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
-msgstr "Ce serveur nécessite que la signature de pilotes soit activée"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr "Veuillez redémarrer votre ordinateur"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
-msgstr "Ce serveur a détecté des composants anti-triche manquants"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr "Essayez de redémarrer MTA:SA"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr ""
-"Ce serveur nécessite des fichiers 'gta3.img' et 'gta_int.img' originaux"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
 msgid "Please replace gta3.img or gta_int.img"
-msgstr "Veuillez remplacer 'gta3.img' et 'gta_int.img'"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr "Ce serveur n'autorise pas Wine"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Assurez-vous qu'aucun programme ne modifie MTA:SA"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "
@@ -3268,8 +3252,8 @@ msgstr[1] "%d minutes"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d seconde"
-msgstr[1] "%d secondes"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:639
@@ -3343,7 +3327,7 @@ msgstr "Erreur de connexion"
 #. Couldn't create render target for CPostEffects
 #: ..\Client\multiplayer_sa\CMultiplayerSA_CrashFixHacks.cpp:1382
 msgid "Problem with graphics driver"
-msgstr "Problème avec le pilote graphique"
+msgstr ""
 
 #: ..\Shared\sdk\SharedUtil.Misc.hpp:135
 msgid "Multi Theft Auto has not been installed properly, please reinstall."

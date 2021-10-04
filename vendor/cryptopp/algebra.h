@@ -33,56 +33,56 @@ public:
 	/// \brief Compare two elements for equality
 	/// \param a first element
 	/// \param b second element
-	/// \return true if the elements are equal, false otherwise
+	/// \returns true if the elements are equal, false otherwise
 	/// \details Equal() tests the elements for equality using <tt>a==b</tt>
 	virtual bool Equal(const Element &a, const Element &b) const =0;
 
 	/// \brief Provides the Identity element
-	/// \return the Identity element
+	/// \returns the Identity element
 	virtual const Element& Identity() const =0;
 
 	/// \brief Adds elements in the group
 	/// \param a first element
 	/// \param b second element
-	/// \return the sum of <tt>a</tt> and <tt>b</tt>
+	/// \returns the sum of <tt>a</tt> and <tt>b</tt>
 	virtual const Element& Add(const Element &a, const Element &b) const =0;
 
 	/// \brief Inverts the element in the group
 	/// \param a first element
-	/// \return the inverse of the element
+	/// \returns the inverse of the element
 	virtual const Element& Inverse(const Element &a) const =0;
 
 	/// \brief Determine if inversion is fast
-	/// \return true if inversion is fast, false otherwise
+	/// \returns true if inversion is fast, false otherwise
 	virtual bool InversionIsFast() const {return false;}
 
 	/// \brief Doubles an element in the group
 	/// \param a the element
-	/// \return the element doubled
+	/// \returns the element doubled
 	virtual const Element& Double(const Element &a) const;
 
 	/// \brief Subtracts elements in the group
 	/// \param a first element
 	/// \param b second element
-	/// \return the difference of <tt>a</tt> and <tt>b</tt>. The element <tt>a</tt> must provide a Subtract member function.
+	/// \returns the difference of <tt>a</tt> and <tt>b</tt>. The element <tt>a</tt> must provide a Subtract member function.
 	virtual const Element& Subtract(const Element &a, const Element &b) const;
 
 	/// \brief TODO
 	/// \param a first element
 	/// \param b second element
-	/// \return TODO
+	/// \returns TODO
 	virtual Element& Accumulate(Element &a, const Element &b) const;
 
 	/// \brief Reduces an element in the congruence class
 	/// \param a element to reduce
 	/// \param b the congruence class
-	/// \return the reduced element
+	/// \returns the reduced element
 	virtual Element& Reduce(Element &a, const Element &b) const;
 
 	/// \brief Performs a scalar multiplication
 	/// \param a multiplicand
 	/// \param e multiplier
-	/// \return the product
+	/// \returns the product
 	virtual Element ScalarMultiply(const Element &a, const Integer &e) const;
 
 	/// \brief TODO
@@ -90,7 +90,7 @@ public:
 	/// \param e1 the first multiplier
 	/// \param y second multiplicand
 	/// \param e2 the second multiplier
-	/// \return TODO
+	/// \returns TODO
 	virtual Element CascadeScalarMultiply(const Element &x, const Integer &e1, const Element &y, const Integer &e2) const;
 
 	/// \brief Multiplies a base to multiple exponents in a group
@@ -135,17 +135,17 @@ public:
 
 	/// \brief Determines whether an element is a unit in the group
 	/// \param a the element
-	/// \return true if the element is a unit after reduction, false otherwise.
+	/// \returns true if the element is a unit after reduction, false otherwise.
 	virtual bool IsUnit(const Element &a) const =0;
 
 	/// \brief Retrieves the multiplicative identity
-	/// \return the multiplicative identity
+	/// \returns the multiplicative identity
 	virtual const Element& MultiplicativeIdentity() const =0;
 
 	/// \brief Multiplies elements in the group
 	/// \param a the multiplicand
 	/// \param b the multiplier
-	/// \return the product of a and b
+	/// \returns the product of a and b
 	virtual const Element& Multiply(const Element &a, const Element &b) const =0;
 
 	/// \brief Calculate the multiplicative inverse of an element in the group
@@ -154,19 +154,19 @@ public:
 
 	/// \brief Square an element in the group
 	/// \param a the element
-	/// \return the element squared
+	/// \returns the element squared
 	virtual const Element& Square(const Element &a) const;
 
 	/// \brief Divides elements in the group
 	/// \param a the dividend
 	/// \param b the divisor
-	/// \return the quotient
+	/// \returns the quotient
 	virtual const Element& Divide(const Element &a, const Element &b) const;
 
 	/// \brief Raises a base to an exponent in the group
 	/// \param a the base
 	/// \param e the exponent
-	/// \return the exponentiation
+	/// \returns the exponentiation
 	virtual Element Exponentiate(const Element &a, const Integer &e) const;
 
 	/// \brief TODO
@@ -174,7 +174,7 @@ public:
 	/// \param e1 first exponent
 	/// \param y second element
 	/// \param e2 second exponent
-	/// \return TODO
+	/// \returns TODO
 	virtual Element CascadeExponentiate(const Element &x, const Integer &e1, const Element &y, const Integer &e2) const;
 
 	/// \brief Exponentiates a base to multiple exponents in the Ring
@@ -190,7 +190,7 @@ public:
 	virtual void SimultaneousExponentiate(Element *results, const Element &base, const Integer *exponents, unsigned int exponentsCount) const;
 
 	/// \brief Retrieves the multiplicative group
-	/// \return the multiplicative group
+	/// \returns the multiplicative group
 	virtual const AbstractGroup<T>& MultiplicativeGroup() const
 		{return m_mg;}
 
@@ -288,13 +288,13 @@ public:
 	/// \brief Performs a modular reduction in the ring
 	/// \param a the element
 	/// \param b the modulus
-	/// \return the result of <tt>a%b</tt>.
+	/// \returns the result of <tt>a%b</tt>.
 	virtual const Element& Mod(const Element &a, const Element &b) const =0;
 
 	/// \brief Calculates the greatest common denominator in the ring
 	/// \param a the first element
 	/// \param b the second element
-	/// \return the greatest common denominator of a and b.
+	/// \returns the the greatest common denominator of a and b.
 	virtual const Element& Gcd(const Element &a, const Element &b) const;
 
 protected:

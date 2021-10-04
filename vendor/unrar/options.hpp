@@ -61,8 +61,7 @@ enum SAVECOPY_MODE {
 
 enum APPENDARCNAME_MODE
 {
-  APPENDARCNAME_NONE=0,APPENDARCNAME_DESTPATH,APPENDARCNAME_OWNSUBDIR,
-  APPENDARCNAME_OWNDIR
+  APPENDARCNAME_NONE=0,APPENDARCNAME_DESTPATH,APPENDARCNAME_OWNDIR
 };
 
 enum POWER_MODE {
@@ -133,7 +132,6 @@ class RAROptions
     bool DisablePercentage;
     bool DisableCopyright;
     bool DisableDone;
-    bool DisableNames;
     bool PrintVersion;
     int Solid;
     int SolidCount;
@@ -148,7 +146,7 @@ class RAROptions
     Array<int64> NextVolSizes;
     uint CurVolNum;
     bool AllYes;
-    bool VerboseOutput; // -iv, display verbose output, used only in "WinRAR t" now.
+    bool MoreInfo; // -im, show more information, used only in "WinRAR t" now.
     bool DisableSortSolid;
     int ArcTime;
     int ConvertNames;

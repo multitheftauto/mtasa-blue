@@ -5,17 +5,14 @@
 #ifndef CRYPTOPP_IMPORTS
 
 #include "cmac.h"
-#include "misc.h"
 
-ANONYMOUS_NAMESPACE_BEGIN
+NAMESPACE_BEGIN(CryptoPP)
 
-using CryptoPP::byte;
-using CryptoPP::IsPowerOf2;
-
-void MulU(byte *k, unsigned int len)
+static void MulU(byte *k, unsigned int length)
 {
 	byte carry = 0;
-	for (int i=len-1; i>=1; i-=2)
+
+	for (int i=length-1; i>=1; i-=2)
 	{
 		byte carry2 = k[i] >> 7;
 		k[i] += k[i] + carry;
@@ -23,22 +20,9 @@ void MulU(byte *k, unsigned int len)
 		k[i-1] += k[i-1] + carry2;
 	}
 
-#ifndef CRYPTOPP_CMAC_WIDE_BLOCK_CIPHERS
-	CRYPTOPP_ASSERT(len == 16);
-
 	if (carry)
 	{
-		k[15] ^= 0x87;
-		return;
-	}
-#else
-	CRYPTOPP_ASSERT(IsPowerOf2(len));
-	CRYPTOPP_ASSERT(len >= 8);
-	CRYPTOPP_ASSERT(len <= 128);
-
-	if (carry)
-	{
-		switch (len)
+		switch (length)
 		{
 		case 8:
 			k[7] ^= 0x1b;
@@ -66,15 +50,10 @@ void MulU(byte *k, unsigned int len)
 			k[127] ^= 0x43;
 			break;
 		default:
-			CRYPTOPP_ASSERT(0);
+			throw InvalidArgument("CMAC: " + IntToString(length) + " is not a supported cipher block size");
 		}
 	}
-#endif  // CRYPTOPP_CMAC_WIDE_BLOCK_CIPHERS
 }
-
-ANONYMOUS_NAMESPACE_END
-
-NAMESPACE_BEGIN(CryptoPP)
 
 void CMAC_Base::UncheckedSetKey(const byte *key, unsigned int length, const NameValuePairs &params)
 {
@@ -151,9 +130,7 @@ void CMAC_Base::TruncatedFinal(byte *mac, size_t size)
 	else
 		cipher.AdvancedProcessBlocks(m_reg, m_reg+blockSize, m_reg, blockSize, BlockTransformation::BT_DontIncrementInOutPointers|BlockTransformation::BT_XorInput);
 
-	// UBsan finding
-	if (mac)
-		memcpy(mac, m_reg, size);
+	memcpy(mac, m_reg, size);
 
 	m_counter = 0;
 	memset(m_reg, 0, blockSize);

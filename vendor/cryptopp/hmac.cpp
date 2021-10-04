@@ -23,11 +23,7 @@ void HMAC_Base::UncheckedSetKey(const byte *userKey, unsigned int keylength, con
 	m_buf.resize(2*AccessHash().BlockSize() + AccessHash().DigestSize());
 
 	if (keylength <= blockSize)
-	{
-		// hmac.cpp:26:9: runtime error: null pointer passed as argument 2
-		if (AccessIpad() && userKey && keylength)
-			memcpy(AccessIpad(), userKey, keylength);
-	}
+		memcpy(AccessIpad(), userKey, keylength);
 	else
 	{
 		AccessHash().CalculateDigest(AccessIpad(), userKey, keylength);

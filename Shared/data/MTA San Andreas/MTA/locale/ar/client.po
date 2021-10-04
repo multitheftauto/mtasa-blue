@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-07 18:33+0100\n"
-"PO-Revision-Date: 2019-10-04 07:24+0000\n"
+"PO-Revision-Date: 2019-10-01 18:51+0000\n"
 "Last-Translator: Haxardous <a9xa@hotmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: ar\n"
@@ -15,9 +15,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"Translators: Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; Haxardous; KING-ABADY; ALBANDER; SoRa; Tete; Sam; Suspect san; Alnassre; Nawaf \"Live\" Alqarni; Majed-HQ; UAEpro; TAPL; Conolel; devmedoo; Ahmed Ly; Hani Rouatbi; N3xT; LoFFY; 3BaDy; MR.NaiF-MTA D:; Hamdy; #Bero; ibrahemdeeb.15; Bydlo; DABL; Zed159; #BrosS; Avenger; XyZ; xXHaMoDeXx Dante; Tifa_1999; Omar Karam\n"
+"Translators: Mr.Pres[T]ege; iMr.Dawix; MSHOOSH; Haxardous; KING-ABADY; ALBANDER; SoRa; Tete; Sam; Suspect san; Alnassre; Nawaf \"Live\" Alqarni; Majed-HQ; UAEpro; TAPL; Conolel; devmedoo; Ahmed Ly; Hani Rouatbi; N3xT; LoFFY; 3BaDy; MR.NaiF-MTA D:; Hamdy; #Bero; ibrahemdeeb.15; Bydlo; DABL; Zed159; #BrosS; Avenger; XyZ; xXHaMoDeXx Dante; Tifa_1999; Bullet7\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1570173891.0\n"
+"X-POOTLE-MTIME: 1569955911.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -2015,7 +2015,7 @@ msgstr "جاري التحميل..."
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1172
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:2103
 msgid "  ..loading.."
-msgstr "    ..جاري التحميل.."
+msgstr "..جاري التحميل.."
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1202
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1330
@@ -2107,7 +2107,7 @@ msgstr "إغلاق"
 #. Join Game button
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "دخول اللعبة"
+msgstr "الانضمام للعبة"
 
 #. Please enter password label
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:166
@@ -2116,7 +2116,7 @@ msgstr "يرجى إدخال كلمة المرور الخاصة بالخادم:"
 
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "الدخول الى الخادم في حين إيجاد فرصة متاحة."
+msgstr "ادخل الى الخادم عند خروج احد اللاعبين."
 
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
@@ -2125,12 +2125,12 @@ msgstr "الرجاء إدخال كلمة المرور الخاصة بالخاد�
 #. The server has timed out
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:402
 msgid "Timed Out"
-msgstr "انتهت مهلة الإتصال"
+msgstr "انتهت مهلة الاتصال"
 
 #. Set every GUI elements text to blank
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:431
 msgid "Querying..."
-msgstr "جاري الإستعلام..."
+msgstr "جاري الإرسال..."
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:25
 msgid "Idle"
@@ -2301,7 +2301,7 @@ msgstr "خروج"
 
 #: ..\Client\loader\Dialogs.cpp:51
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA:SA واجهت مشكلة ما"
+msgstr "MTA: تلقت مشكلة ما"
 
 #: ..\Client\loader\Dialogs.cpp:52
 msgid "Crash information"
@@ -2330,8 +2330,7 @@ msgstr "MTA:سان اندرس - تحذير"
 msgid ""
 "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
 "file:"
-msgstr ""
-"ملف تثبيت Grand Theft Auto: San Andreas الخاص بك يحتوي على ملف d3d9.dll: "
+msgstr "مسار لعبة Grand Theft Auto: San Andreas يحتوي على ملف d3d9.dll:"
 
 #: ..\Client\loader\Dialogs.cpp:65
 msgid ""
@@ -2339,9 +2338,9 @@ msgid ""
 "\n"
 "It is recommended that you remove or rename d3d9.dll"
 msgstr ""
-"هذا الملف غير ضروري ومن المحتمل أن يتعارض مع الخصائص الرسومية مع هذه النسخة من MTA:SA.\n"
+"هذا الملف غير ضروري ومن المحتمل أن يتعارض مع خصائص رسومية مع هذه النسخة من MTA:SA.\n"
 "\n"
-"من الأفضل أن تقوم بحذف أو إعادة تسمية الملف d3d9.dll"
+"من الأفضل أن تقوم بحذف أو إعادة تسمية هذا الملف d3d9.dll"
 
 #: ..\Client\loader\Dialogs.cpp:67
 msgid "Do not tell me about this d3d9.dll again"
@@ -2361,11 +2360,11 @@ msgstr "MTA: San Andreas - خيارات مربكة"
 
 #: ..\Client\loader\Dialogs.cpp:76
 msgid "NVidia Optimus detected!"
-msgstr "تم إكتشاف NVidia Optimus!"
+msgstr "تم اكتشاف NVidia Optimus!"
 
 #: ..\Client\loader\Dialogs.cpp:77
 msgid "Try each option and see what works:"
-msgstr "قم بتجربة كل خيار وانظر أيهم يعمل:"
+msgstr "قم بتجربة كل خيار وانظر أيهم يعمل"
 
 #: ..\Client\loader\Dialogs.cpp:78
 msgid "A - Standard NVidia"
@@ -2663,12 +2662,12 @@ msgstr "فشل التشغيل. يرجى التأكد من تثبيت أحدث م
 #: ..\Client\loader\MainFunctions.cpp:790
 #, c-format, c-format, c-format, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "فشل التشغيل. الرجاء التأكد من تثبيت %s بشكل صحيح."
+msgstr "فشل التشفيل. الرجاء التأكد من تثبيت %s بشكل صحيح."
 
 #: ..\Client\loader\MainFunctions.cpp:797
 #, c-format, c-format, c-format, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "فشل التشغيل. تعذر إيجاد ملف gta_sa.exe في %s."
+msgstr "فشل التشفيل. تعذر إيجاد ملف gta_sa.exe في %s."
 
 #: ..\Client\loader\MainFunctions.cpp:807
 #, c-format, c-format, c-format, c-format
@@ -2708,14 +2707,14 @@ msgid ""
 "\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
-"ملف .asi. موجودة في مجلد التثبيت لـ 'MTA:SA' او 'GTA:San Andreas'  \n"
+"ملفات asi. موجودة في ملفات تثبيت MTA:Sa أو GTA:San Andreas.\n"
 "\n"
-"قم بحذف ملفات .asi اذا كنت تواجه مشاكلة مع MTA:SA."
+"أزل ملفات asi. تلك إذا تواجه مشاكل مع MTA:SA."
 
 #: ..\Client\loader\MainFunctions.cpp:931
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "إصدار الملف لا يتطابق. اعد تثبيت MTA:SA إن كنت تواجهت مشاكل.\n"
+msgstr "اصدار الملف غير متوافق. قم بإعادة تثبيت MTA:SA اذا واجهت مشاكل.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:940
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -2727,7 +2726,7 @@ msgid ""
 "\n"
 "Please restart your PC.\n"
 msgstr ""
-"MTA:SA لا تتوافق مع \"وضع الآمان\" في الويندوز.\n"
+"MTA:SA لا تتوافق مع \"وضع الأمان\" في ويندوز.\n"
 "\n"
 "يرجى اعادة تشغيل حاسوبك.\n"
 
@@ -2793,7 +2792,7 @@ msgstr "GTA:SA عانت من مشكلة اثناء تحميل الموديل."
 
 #: ..\Client\loader\Utils.cpp:1826
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "إذا قمت بتعديل gta3.img مؤخراً، حاول إعادة تثبيت GTA: SA."
+msgstr "اذا كنت قد عدلت على الملف gta3.img مسبقًا، فقم بإعادة تثبيت GTA:SA."
 
 #: ..\Client\loader\Utils.cpp:1851
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -2806,7 +2805,7 @@ msgstr "GTA:SA وجدت أخطاء في الملف '%s'"
 
 #: ..\Client\loader\Utils.cpp:1943
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "هل عملت اعادة تشغيل للعبة عندما كانت MTA:SA تعمل؟"
+msgstr "هل جهازك أعيد تشغيله أثناء ما كنت تلعب MTA:SA؟"
 
 #: ..\Client\loader\Utils.cpp:2008
 msgid "Please terminate the following programs before continuing:"

@@ -491,7 +491,7 @@ inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
     return "soundeffect-params-reverb";
 }
 
-inline SString GetClassTypeName(CClientVectorGraphic*)
+inline SString GetClassByTypeName(CClientVectorGraphic*)
 {
     return "svg";
 }

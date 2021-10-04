@@ -31,9 +31,8 @@ public:
 /// \brief Pointer that overloads operator ->
 /// \tparam T class or type
 /// \details member_ptr is used frequently in the library to avoid the issues related to
-///  std::auto_ptr in C++11 (deprecated) and std::unique_ptr in C++03 (non-existent).
-/// \bug <a href="http://github.com/weidai11/cryptopp/issues/48">Issue 48: "Use of auto_ptr
-///  causes dirty compile under C++11"</a>
+///   std::auto_ptr in C++11 (deprecated) and std::unique_ptr in C++03 (non-existent).
+/// \bug <a href="http://github.com/weidai11/cryptopp/issues/48">Issue 48: "Use of auto_ptr causes dirty compile under C++11"</a>
 template <class T> class member_ptr
 {
 public:
@@ -57,7 +56,7 @@ public:
 		return old_p;
 	}
 
-	void reset(T *p = NULLPTR);
+	void reset(T *p = 0);
 
 protected:
 	member_ptr(const member_ptr<T>& rhs);		// copy not allowed
@@ -129,7 +128,7 @@ template <class T> clonable_ptr<T>& clonable_ptr<T>::operator=(const clonable_pt
 template<class T> class counted_ptr
 {
 public:
-	explicit counted_ptr(T *p = NULLPTR);
+	explicit counted_ptr(T *p = 0);
 	counted_ptr(const T &r) : m_p(0) {attach(r);}
 	counted_ptr(const counted_ptr<T>& rhs);
 

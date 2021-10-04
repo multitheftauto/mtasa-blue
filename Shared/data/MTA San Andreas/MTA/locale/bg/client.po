@@ -1058,9 +1058,8 @@ msgid "Render vehicles always in high detail"
 msgstr "Зареждай превозни средства винаги с голям детайл"
 
 #: ..\Client\core\CSettings.cpp:808
-#, fuzzy
 msgid "Render peds always in high detail"
-msgstr "Зареждай превозни средства винаги с голям детайл"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"

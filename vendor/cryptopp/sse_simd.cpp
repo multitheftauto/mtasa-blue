@@ -34,7 +34,7 @@ extern const char SSE_SIMD_FNAME[] = __FILE__;
 
 NAMESPACE_BEGIN(CryptoPP)
 
-#ifdef CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY
+#ifndef CRYPTOPP_MS_STYLE_INLINE_ASSEMBLY
 extern "C" {
     typedef void (*SigHandler)(int);
 }
@@ -42,12 +42,12 @@ extern "C" {
 extern "C"
 {
     static jmp_buf s_jmpNoSSE2;
-    static void SigIllHandler(int)
+    static void SigIllHandlerSSE2(int)
     {
         longjmp(s_jmpNoSSE2, 1);
     }
 }
-#endif  // CRYPTOPP_GNU_STYLE_INLINE_ASSEMBLY
+#endif  // Not CRYPTOPP_MS_STYLE_INLINE_ASSEMBLY
 
 bool CPU_ProbeSSE2()
 {
@@ -78,17 +78,14 @@ bool CPU_ProbeSSE2()
     // http://github.com/weidai11/cryptopp/issues/24 and http://stackoverflow.com/q/7721854
     volatile bool result = true;
 
-    volatile SigHandler oldHandler = signal(SIGILL, SigIllHandler);
+    volatile SigHandler oldHandler = signal(SIGILL, SigIllHandlerSSE2);
     if (oldHandler == SIG_ERR)
         return false;
 
 # ifndef __MINGW32__
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
-    {
-        signal(SIGILL, oldHandler);
         return false;
-    }
 # endif
 
     if (setjmp(s_jmpNoSSE2))

@@ -51,7 +51,7 @@ class CryptLoader
 };
 
 // We need to call FreeLibrary when RAR is exiting.
-static CryptLoader GlobalCryptLoader;
+CryptLoader GlobalCryptLoader;
 #endif
 
 SecPassword::SecPassword()

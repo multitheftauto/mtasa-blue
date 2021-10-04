@@ -1053,9 +1053,8 @@ msgid "Render vehicles always in high detail"
 msgstr "Chi tiết đồ họa của xe cộ ở mức cao"
 
 #: ..\Client\core\CSettings.cpp:808
-#, fuzzy
 msgid "Render peds always in high detail"
-msgstr "Chi tiết đồ họa của xe cộ ở mức cao"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"

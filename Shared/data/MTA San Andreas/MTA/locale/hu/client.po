@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-07 18:33+0100\n"
-"PO-Revision-Date: 2021-03-23 22:30+0000\n"
-"Last-Translator: Bence <szlobod95@gmail.com>\n"
+"PO-Revision-Date: 2019-07-11 21:16+0000\n"
+"Last-Translator: ccw <ccw808@googlemail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Translators: Bence Szlobodics; György Péter; NitroByte; pa3ck; Lámbó; csiguusz; Bishop_Waltemer; NeXuS; Hamza\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1616538641.000000\n"
+"X-Generator: Pootle 2.5.0-rc1\n"
+"X-POOTLE-MTIME: 1562879773.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -27,17 +27,18 @@ msgstr "Weboldal lekérések"
 msgid ""
 "The server requests the following websites in order to load them (later):"
 msgstr ""
-"A szerver a későbbiekben a következő weboldalakról szeretne tartalmat "
-"betölteni:"
+"A szerver kéri a következő weboldalakat annak érdekében, hogy betöltse "
+"(később):"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:32
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
 msgstr ""
-"VÉDD AZ ADATAIDAT! SOHA NE ADJ MEG ÉRZÉKENY ADATOKAT ILLETÉKTELENEKNEK"
+"SOHA NE ÍRJ BE ÉRZÉKENY ADATOKAT ANNAK ÉRDEKÉBEN, HOGY MEGVÉDD AZ ADATAIDAT "
+"ILLETÉKTELENEKTŐL."
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:44
 msgid "Remember decision"
-msgstr "Döntés megjegyzése"
+msgstr "Választás megjegyzése"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:49 ..\Client\core\CSettings.cpp:923
 msgid "Allow"
@@ -588,7 +589,7 @@ msgid ""
 msgstr ""
 "MTA nem kap frissítéseket XP-re/Vistára 2019 július után.\n"
 "\n"
-"Frissítsd a Windowst hogy játszhass a legújabb szervereken."
+"Frissítse a Windowst hogy játszon a legújabb szervereken."
 
 #: ..\Client\core\CMainMenu.cpp:1133
 msgid ""
@@ -634,7 +635,7 @@ msgstr "Igen"
 #. News link
 #: ..\Client\core\CNewsBrowser.cpp:171
 msgid "Visit latest news article"
-msgstr "Nézd meg a legfrissebb híreket"
+msgstr ""
 
 #: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
 msgid "Do you want to see some on-line help about this problem ?"
@@ -809,7 +810,7 @@ msgstr "Képfeltöltés engedélyezése"
 
 #: ..\Client\core\CSettings.cpp:379
 msgid "Allow external sounds"
-msgstr "Külső hangok engedélyezése"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:384
 msgid "Use customized GTA:SA files"
@@ -828,7 +829,7 @@ msgstr "Áttetszőség:"
 #. *
 #: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:424
 msgid "Master volume:"
-msgstr "Fő hangerő:"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:415 ..\Client\core\CSettings.cpp:443
 msgid "Radio volume:"
@@ -861,7 +862,7 @@ msgstr "Általános"
 
 #: ..\Client\core\CSettings.cpp:519
 msgid "Radio options"
-msgstr "Rádió beállítások"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:525
 msgid "Radio Equalizer"
@@ -892,12 +893,14 @@ msgid "Automatic Media Scan"
 msgstr "Automatikus média fájl felismerés"
 
 #: ..\Client\core\CSettings.cpp:561
+#, fuzzy
 msgid "Mute options"
-msgstr "Némítási beállítások"
+msgstr "Egér beállítások"
 
 #: ..\Client\core\CSettings.cpp:567
+#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Összes hang némítása, ha az alkalmazás a háttérben fut"
+msgstr "Némítsa az SFX hangokat amikor minimalizálva van"
 
 #: ..\Client\core\CSettings.cpp:572
 msgid "Mute Radio sounds when minimized"
@@ -956,7 +959,7 @@ msgstr "Ablakos mód"
 
 #: ..\Client\core\CSettings.cpp:630
 msgid "DPI aware"
-msgstr "DPI felismerés"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:638 ..\Client\core\CSettings.cpp:953
 #: ..\Client\loader\MainFunctions.cpp:370
@@ -1059,12 +1062,13 @@ msgid "Render vehicles always in high detail"
 msgstr "Jármű renderelés magas felbontáson"
 
 #: ..\Client\core\CSettings.cpp:808
+#, fuzzy
 msgid "Render peds always in high detail"
-msgstr "Játékos/NPC renderelés magas felbontáson"
+msgstr "Jármű renderelés magas felbontáson"
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
-msgstr "Minimalizálás teljes képernyős módban"
+msgstr "Gumi füstölés stb."
 
 #: ..\Client\core\CSettings.cpp:825
 msgid "Enable Device Selection Dialog"
@@ -1536,14 +1540,10 @@ msgid ""
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr ""
-"Egyes szkriptek hangot, például rádiót játszhatnak le az internetről.\n"
-"\n"
-"Ennek a beállításnak a letiltása csökkentheti\n"
-"a hálózat sávszélesség fogyasztását.\n"
 
 #: ..\Client\core\CSettings.cpp:4367
 msgid "EXTERNAL SOUNDS"
-msgstr "KÜLSŐ HANGOK"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4388
 msgid ""
@@ -1573,15 +1573,10 @@ msgid ""
 "\n"
 "Are you sure you want to enable this option?"
 msgstr ""
-"A DPI-felismerés engedélyezése egy kísérleti szolgáltatás és\n"
-"csak akkor javasoljuk, ha az MTA:SA-t egy arányos monitoron játssza.\n"
-"Grafikus problémákat tapasztalhat, ha engedélyezi ezt az opciót.\n"
-"\n"
-"Biztos benne, hogy engedélyezni kívánja ezt az opciót?"
 
 #: ..\Client\core\CSettings.cpp:4443
 msgid "EXPERIMENTAL FEATURE"
-msgstr "KÍSÉRLETI FUNKCIÓ"
+msgstr ""
 
 #: ..\Client\core\CSettings.cpp:4560
 msgid "Please enter a nickname"
@@ -1814,10 +1809,6 @@ msgid ""
 "To join this server please uncheck:\n"
 "Settings->Multiplayer->Use customized GTA:SA files"
 msgstr ""
-"Ez a szerver blokkolja a testreszabott GTA:SA fájlokat.\n"
-"\n"
-"A szerverhez való csatlakozáshoz távolítsa el a jelölést a következőről:\n"
-"Beállítások->Többjátékos->Használjon testreszabott GTA:SA fájlokat"
 
 #: ..\Client\core\CVersionUpdater.cpp:2091
 #: ..\Client\core\CVersionUpdater.cpp:2101
@@ -2759,7 +2750,7 @@ msgstr "Konfigurációs probléma helyreállítás"
 #. Try to relaunch as admin if not done so already
 #: ..\Client\loader\MainFunctions.cpp:1130
 msgid "Fix elevation required error"
-msgstr "Szükséges hibák javítása"
+msgstr ""
 
 #: ..\Client\loader\MainFunctions.cpp:1137
 #, c-format, c-format
@@ -3180,62 +3171,56 @@ msgstr "Ki lettél rúgva a játékból"
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Ehhez a szerverhez nem módosított gta_sa.exe szükséges"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
 msgid "Please replace gta_sa.exe"
-msgstr "Kérlek cseréld ki a gta_sa.exe fájlt"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Ez a szerver nem engedélyezi az egyedi D3D9.DLL fájlokat"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr ""
-"Távolítsd el a D3D9.DLL fájlt a GTA telepítési könyvtárából és indítsd újra "
-"az MTA-t"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
-msgstr "A szerver nem engedélyezi a virtuális gépek használatát"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
 msgstr ""
-"A szerverhez való csatlakozáshoz engedélyezned kell az illesztőprogramok "
-"digitális aláírását"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr "Kérlek indítsd újra a számítógépet"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
-msgstr "A szerver hiányzó anti-cheat összetevőket észlelt"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr "Próbáld meg újraindítani az MTA-t"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr ""
-"A szerverhez való csatlakozáshoz egy nem módosított gta3.img és gta_int.img "
-"szükséges"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
 msgid "Please replace gta3.img or gta_int.img"
-msgstr "Kérjük cseréld ki a gta3.img vagy a gta_int.img fájlt"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr "Ez a szerver nem engedélyezi a Wine használatát"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Győződj meg arról, hogy más program nem módosítja az MTA:SA-t"
+msgstr ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "
@@ -3266,8 +3251,8 @@ msgstr[1] "%d percek"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d másodperc"
-msgstr[1] "%d másodperc"
+msgstr[0] ""
+msgstr[1] ""
 
 #. Display the error
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:639

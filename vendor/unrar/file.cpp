@@ -8,6 +8,7 @@ File::File()
   LastWrite=false;
   HandleType=FILE_HANDLENORMAL;
   SkipClose=false;
+  IgnoreReadErrors=false;
   ErrorType=FILE_SUCCESS;
   OpenShared=false;
   AllowDelete=true;
@@ -17,8 +18,6 @@ File::File()
   NoSequentialRead=false;
   CreateMode=FMF_UNDEFINED;
 #endif
-  ReadErrorMode=FREM_ASK;
-  TruncatedAfterReadError=false;
 }
 
 
@@ -38,7 +37,6 @@ void File::operator = (File &SrcFile)
   NewFile=SrcFile.NewFile;
   LastWrite=SrcFile.LastWrite;
   HandleType=SrcFile.HandleType;
-  TruncatedAfterReadError=SrcFile.TruncatedAfterReadError;
   wcsncpyz(FileName,SrcFile.FileName,ASIZE(FileName));
   SrcFile.SkipClose=true;
 }
@@ -120,12 +118,12 @@ bool File::Open(const wchar *Name,uint Mode)
 #ifdef _OSF_SOURCE
   extern "C" int flock(int, int);
 #endif
+
   if (!OpenShared && UpdateMode && handle>=0 && flock(handle,LOCK_EX|LOCK_NB)==-1)
   {
     close(handle);
     return false;
   }
-
 #endif
   if (handle==-1)
     hNewFile=FILE_BAD_HANDLE;
@@ -148,7 +146,6 @@ bool File::Open(const wchar *Name,uint Mode)
   {
     hFile=hNewFile;
     wcsncpyz(FileName,Name,ASIZE(FileName));
-    TruncatedAfterReadError=false;
   }
   return Success;
 }
@@ -372,12 +369,9 @@ bool File::Write(const void *Data,size_t Size)
 
 int File::Read(void *Data,size_t Size)
 {
-  if (TruncatedAfterReadError)
-    return 0;
-
   int64 FilePos=0; // Initialized only to suppress some compilers warning.
 
-  if (ReadErrorMode==FREM_IGNORE)
+  if (IgnoreReadErrors)
     FilePos=Tell();
   int ReadSize;
   while (true)
@@ -387,7 +381,7 @@ int File::Read(void *Data,size_t Size)
     {
       ErrorType=FILE_READERROR;
       if (AllowExceptions)
-        if (ReadErrorMode==FREM_IGNORE)
+        if (IgnoreReadErrors)
         {
           ReadSize=0;
           for (size_t I=0;I<Size;I+=512)
@@ -400,18 +394,8 @@ int File::Read(void *Data,size_t Size)
         }
         else
         {
-          bool Ignore=false,Retry=false,Quit=false;
-          if (ReadErrorMode==FREM_ASK && HandleType==FILE_HANDLENORMAL)
-          {
-            ErrHandler.AskRepeatRead(FileName,Ignore,Retry,Quit);
-            if (Retry)
-              continue;
-          }
-          if (Ignore || ReadErrorMode==FREM_TRUNCATE)
-          {
-            TruncatedAfterReadError=true;
-            return 0;
-          }
+          if (HandleType==FILE_HANDLENORMAL && ErrHandler.AskRepeatRead(FileName))
+            continue;
           ErrHandler.ReadError(FileName);
         }
     }

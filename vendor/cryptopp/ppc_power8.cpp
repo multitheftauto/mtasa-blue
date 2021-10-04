@@ -56,10 +56,7 @@ bool CPU_ProbePower8()
 
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
-    {
-        signal(SIGILL, oldHandler);
         return false;
-    }
 
     if (setjmp(s_jmpSIGILL))
         result = false;
@@ -70,7 +67,7 @@ bool CPU_ProbePower8()
         word64 w1[2] = {x, x}, w2[2] = {4, 6}, w3[2];
 
         // Specifically call the VSX loads and stores with 64-bit types
-        #if defined(__ibmxl__) || (defined(_AIX) && defined(__xlC__)) || defined(__clang__)
+        #if defined(__ibmxl__) || (defined(_AIX) && defined(__xlC__))
         const uint64x2_p v1 = vec_xl(0, (unsigned long long*)w1);
         const uint64x2_p v2 = vec_xl(0, (unsigned long long*)w2);
         const uint64x2_p v3 = vec_add(v1, v2);  // 64-bit add
@@ -112,10 +109,7 @@ bool CPU_ProbeAES()
 
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
-    {
-        signal(SIGILL, oldHandler);
         return false;
-    }
 
     if (setjmp(s_jmpSIGILL))
         result = false;
@@ -164,10 +158,7 @@ bool CPU_ProbeSHA256()
 
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
-    {
-        signal(SIGILL, oldHandler);
         return false;
-    }
 
     if (setjmp(s_jmpSIGILL))
         result = false;
@@ -211,10 +202,7 @@ bool CPU_ProbeSHA512()
 
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
-    {
-        signal(SIGILL, oldHandler);
         return false;
-    }
 
     if (setjmp(s_jmpSIGILL))
         result = false;

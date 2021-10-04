@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: gfpts; bank; tim_pang; aa7867; jery0987; SKYGF; Ying; Tim885885; Jass; johncs61503; GTA Azukie; Milk_Shake; HKG_NewsJai\n"
+"Translators: gfpts; bank; tim_pang; aa7867; jery0987; SKYGF; Ying; Tim885885; Jass; johncs61503; Milk_Shake; HKG_NewsJai\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
 "X-POOTLE-MTIME: 1552191827.0\n"
 
