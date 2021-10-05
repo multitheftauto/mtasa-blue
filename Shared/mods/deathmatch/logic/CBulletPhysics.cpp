@@ -162,6 +162,7 @@ void CBulletPhysics::DoPulse()
         CStaticFunctionDefinitions::GetCameraMatrix(vecPosition, vecLookAt, fRoll, fFOV);
         m_pDebugDrawer->SetCameraPosition(vecPosition);
         m_pDynamicsWorld->debugDrawWorld();
+        DrawDebugLines();
     }
 #endif
 }
