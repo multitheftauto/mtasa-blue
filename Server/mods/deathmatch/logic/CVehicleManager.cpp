@@ -544,6 +544,7 @@ bool CVehicleManager::HasDamageModel(eVehicleType Type)
         case VEHICLE_HELI:
         case VEHICLE_PLANE:
         case VEHICLE_CAR:
+        case VEHICLE_NONE:
             return true;
         default:
             return false;
