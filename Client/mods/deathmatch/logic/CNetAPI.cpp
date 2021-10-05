@@ -1910,7 +1910,7 @@ void CNetAPI::ReadFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInte
     }
 
     // Read door angles.
-    if (CClientVehicleManager::HasDoors(iRemoteModelID))
+    if (CClientVehicleManager::HasDoors(iRemoteModelID) || !CClientVehicleManager::IsStandardModel(iRemoteModelID))
     {
         SDoorOpenRatioSync door;
         for (unsigned char i = 2; i < 6; ++i)
@@ -1944,7 +1944,7 @@ void CNetAPI::WriteFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInt
     }
 
     // Sync door angles.
-    if (CClientVehicleManager::HasDoors(iModelID))
+    if (CClientVehicleManager::HasDoors(iModelID) || !CClientVehicleManager::IsStandardModel(iModelID))
     {
         SDoorOpenRatioSync door;
         for (unsigned char i = 2; i < 6; ++i)
