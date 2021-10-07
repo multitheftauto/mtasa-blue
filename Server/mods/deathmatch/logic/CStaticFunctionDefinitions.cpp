@@ -949,10 +949,10 @@ bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, co
     assert(szName);
     assert(pPlayer);
 
-    ESyncType     lastSyncType;
+    ESyncType     lastSyncType = ESyncType::LOCAL;
     CLuaArgument* pCurrentVariable = pElement->GetCustomData(szName, false, &lastSyncType);
 
-    if (lastSyncType == ESyncType::SUBSCRIBE)
+    if (pCurrentVariable != nullptr && lastSyncType == ESyncType::SUBSCRIBE)
     {
         if (!pPlayer->SubscribeElementData(pElement, szName))
             return false;
