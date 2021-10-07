@@ -25,6 +25,8 @@ CBulletPhysics::CBulletPhysics()
 
     m_pDispatcher = std::make_unique<btCollisionDispatcher>(m_pCollisionConfiguration.get());
     m_pSolver = std::make_unique<btSequentialImpulseConstraintSolver>();
+    m_pSolver->setRandSeed(0);
+
     m_pDynamicsWorld =
         std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
 
@@ -161,6 +163,7 @@ void CBulletPhysics::DoPulse()
         float   fRoll, fFOV;
         CStaticFunctionDefinitions::GetCameraMatrix(vecPosition, vecLookAt, fRoll, fFOV);
         m_pDebugDrawer->SetCameraPosition(vecPosition);
+        m_pDebugDrawer->SetDrawDistance(500);
         m_pDynamicsWorld->debugDrawWorld();
         DrawDebugLines();
     }
