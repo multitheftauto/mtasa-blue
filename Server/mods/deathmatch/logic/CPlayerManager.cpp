@@ -290,7 +290,7 @@ static void DoBroadcast(const CPacket& Packet, const T& sendList)
     for (typename T::const_iterator iter = sendList.begin(); iter != sendList.end(); ++iter)
     {
         CPlayer* pPlayer = *iter;
-        MapInsert(groupMap, pPlayer->GetBitStreamVersion(), pPlayer);
+        if(pPlayer != nullptr) MapInsert(groupMap, pPlayer->GetBitStreamVersion(), pPlayer);
     }
 
     DoBroadcast(Packet, groupMap);
