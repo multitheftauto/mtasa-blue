@@ -1289,7 +1289,7 @@ bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient
         pEchoClient->SendConsole("help [command]");
 
         // Loop through all added commands
-        int                                    iCount = 0;
+        int iCount = 0;
         for (CConsoleCommand* command : pConsole->CommandsList())
         {
             // Add a new line every third command

@@ -44,9 +44,9 @@ public:
 class CObjectGroupPhysicalPropertiesSA : public CObjectGroupPhysicalProperties
 {
 protected:
-    CObjectGroupPhysicalPropertiesSAInterface*                                           m_pInterface;
-    unsigned char                                                                        m_ucObjectGroup;
-    bool                                                                                 m_bModified;
+    CObjectGroupPhysicalPropertiesSAInterface*                                                           m_pInterface;
+    unsigned char                                                                                        m_ucObjectGroup;
+    bool                                                                                                 m_bModified;
     static std::unordered_map<unsigned char, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> ms_OriginalGroupProperties;
 
 public:

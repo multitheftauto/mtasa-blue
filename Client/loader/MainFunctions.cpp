@@ -321,7 +321,7 @@ void HandleResetSettings()
             FileRename(strSettingsFilename, strSettingsFilenameBak);
             FileDelete(strSettingsFilename);
 
-            //Also reset NVidia Optimus "remember option" to allow them to choose again
+            // Also reset NVidia Optimus "remember option" to allow them to choose again
             SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
 
             if (!FileExists(strSettingsFilename))
@@ -832,14 +832,14 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"7B9496FAB92A79476343DDEDD4C76BAD", "bass.dll"},
+    } integrityCheckList[] = {{"B5375C189939F366CC79ECA57A915615", "bass.dll"},
                               {"E48EA82D7A87853FA4F09F19C4E7A2C1", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
                               {"03FB421991634C85D7AA7A914506381E", "bass_fx.dll"},
                               {"E2A26F0C195B75D520D39EAC4E4C804B", "bassflac.dll"},
                               {"2DF21511EB488D860BC43C904679D4AA", "bassmidi.dll"},
-                              {"01D4265D2E8F36677822833306F8D9F0", "bassmix.dll"},
-                              {"5E309F265D9A4769EB93D80B2A268A6B", "bassopus.dll"},
+                              {"7508CACD7EDC4749228BA0FB9A0BE296", "bassmix.dll"},
+                              {"26C74F5E9DF6C59DED3B09335E5D82AD", "bassopus.dll"},
                               {"476BDA1EE12C760A29E4EE43F593F878", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
                               {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},

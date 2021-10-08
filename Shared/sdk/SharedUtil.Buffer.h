@@ -16,7 +16,6 @@
 #include "SharedUtil.File.h"
 #include "SString.h"
 
-
 namespace SharedUtil
 {
     //

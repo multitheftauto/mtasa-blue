@@ -320,7 +320,8 @@ protected:
     struct Branch
     {
         Rect m_rect;            ///< Bounds
-        union {
+        union
+        {
             Node*    m_child;            ///< Child node
             DATATYPE m_data;             ///< Data Id or Ptr
         };
@@ -778,8 +779,8 @@ void RTREE_QUAL::Reset()
     // Delete all existing nodes
     RemoveAllRec(m_root);
 #else // RTREE_DONT_USE_MEMPOOLS
-    // Just reset memory pools.  We are not using complex types
-    // EXAMPLE
+        // Just reset memory pools.  We are not using complex types
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -806,7 +807,7 @@ typename RTREE_QUAL::Node* RTREE_QUAL::AllocNode()
 #ifdef RTREE_DONT_USE_MEMPOOLS
     newNode = new Node;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
     InitNode(newNode);
     return newNode;
@@ -820,7 +821,7 @@ void RTREE_QUAL::FreeNode(Node* a_node)
 #ifdef RTREE_DONT_USE_MEMPOOLS
     delete a_node;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -832,7 +833,7 @@ typename RTREE_QUAL::ListNode* RTREE_QUAL::AllocListNode()
 #ifdef RTREE_DONT_USE_MEMPOOLS
     return new ListNode;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -842,7 +843,7 @@ void RTREE_QUAL::FreeListNode(ListNode* a_listNode)
 #ifdef RTREE_DONT_USE_MEMPOOLS
     delete a_listNode;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 

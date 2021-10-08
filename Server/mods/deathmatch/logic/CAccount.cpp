@@ -122,24 +122,24 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
     {
         switch (pData->GetType())
         {
-        case LUA_TBOOLEAN:
-            pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
-            break;
+            case LUA_TBOOLEAN:
+                pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
+                break;
 
-        case LUA_TNUMBER:
-            pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
-            break;
+            case LUA_TNUMBER:
+                pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
+                break;
 
-        case LUA_TNIL:
-            break;
+            case LUA_TNIL:
+                break;
 
-        case LUA_TSTRING:
-            pResult->ReadString(pData->GetStrValue());
-            break;
+            case LUA_TSTRING:
+                pResult->ReadString(pData->GetStrValue());
+                break;
 
-        default:
-            dassert(0); // It never should hit this, if so, something corrupted
-            break;
+            default:
+                dassert(0);            // It never should hit this, if so, something corrupted
+                break;
         }
     }
     else

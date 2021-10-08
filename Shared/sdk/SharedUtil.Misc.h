@@ -22,7 +22,6 @@
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
 
-
 namespace SharedUtil
 {
     class CArgMap;
@@ -202,7 +201,7 @@ namespace SharedUtil
     };
     struct SThreadCPUTimesStore : SThreadCPUTimes
     {
-        SThreadCPUTimesStore(){}
+        SThreadCPUTimesStore() {}
         uint64 ullPrevCPUMeasureTimeMs = 0;
         uint64 ullPrevUserTimeUs = 0;
         uint64 ullPrevKernelTimeUs = 0;
@@ -471,7 +470,8 @@ namespace SharedUtil
         void operator<<=(int);
 
     public:
-        union {
+        union
+        {
             struct
             {
                 unsigned char B, G, R, A;

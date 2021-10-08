@@ -16,8 +16,8 @@
 // CEffectTemplate instantiation
 //
 ///////////////////////////////////////////////////////////////
-CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
-        const EffectMacroList& macros, HRESULT& outHResult)
+CEffectTemplate* NewEffectTemplate(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
+                                   bool bDebug, const EffectMacroList& macros, HRESULT& outHResult)
 {
     CEffectTemplate* pEffectTemplate = new CEffectTemplate();
     pEffectTemplate->PostConstruct(pManager, strFile, strRootPath, bIsRawData, strOutStatus, bDebug, macros);
@@ -122,7 +122,7 @@ namespace
 //
 ////////////////////////////////////////////////////////////////
 void CEffectTemplate::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-    bool bDebug, const EffectMacroList& macros)
+                                    bool bDebug, const EffectMacroList& macros)
 {
     Super::PostConstruct(pManager);
 
@@ -202,8 +202,8 @@ void CEffectTemplate::OnResetDevice()
 //
 //
 ////////////////////////////////////////////////////////////////
-void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-    bool bDebug, const EffectMacroList& macros)
+void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
+                                           const EffectMacroList& macros)
 {
     assert(!m_pD3DEffect);
 
@@ -217,7 +217,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     macroList.back().Definition = bUsesRAWZ ? "1" : "0";
 
     for (const auto& [name, definition] : macros)
-        macroList.push_back(std::move(D3DXMACRO{ name.c_str(), definition.c_str() }));
+        macroList.push_back(std::move(D3DXMACRO{name.c_str(), definition.c_str()}));
 
     macroList.push_back(D3DXMACRO());
     macroList.back().Name = NULL;
@@ -232,9 +232,11 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     CIncludeManager IncludeManager(strRootPath, ExtractPath(strMetaPath));
     LPD3DXBUFFER    pBufferErrors = NULL;
     if (bIsRawData)
-        m_CreateHResult = MyD3DXCreateEffect(m_pDevice, strFile, strFile.length(), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+        m_CreateHResult =
+            MyD3DXCreateEffect(m_pDevice, strFile, strFile.length(), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
     else
-        m_CreateHResult = MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+        m_CreateHResult =
+            MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
 
     // Handle compile errors
     strOutStatus = "";

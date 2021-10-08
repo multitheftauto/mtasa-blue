@@ -7,17 +7,17 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-07 18:33+0100\n"
-"PO-Revision-Date: 2019-09-29 12:40+0000\n"
-"Last-Translator: Anonymous Pootle User\n"
+"PO-Revision-Date: 2020-04-19 18:46+0000\n"
+"Last-Translator: Rataj <rataj@fabulasoft.cz>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"Translators: MIKI785; Rataj; pyrodojo; LilDollaTechZone; Jacek Hałas vel Łagoda\n"
+"Translators: MIKI785; Rataj; pyrodojo; arciCZ; LilDollaTechZone; Heavy; Jacek Hałas vel Łagoda\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1569760852.0\n"
+"X-POOTLE-MTIME: 1587321984.0\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -174,7 +174,7 @@ msgstr "Časový limit spojení vypršel"
 #: ..\Client\core\CConnectManager.cpp:281
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1208
 msgid "Disconnected: unknown protocol error"
-msgstr "Odpojeno: neznámý protokol"
+msgstr "Odpojeno: neznámá chyba protokolu"
 
 #: ..\Client\core\CConnectManager.cpp:285
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1212
@@ -292,11 +292,11 @@ msgstr "připojí k předchozímu serveru"
 
 #: ..\Client\core\CCore.cpp:1300
 msgid "binds a key (key control)"
-msgstr "nabinduje tlačítko"
+msgstr "nabinduje tlačítko (klávesu)"
 
 #: ..\Client\core\CCore.cpp:1301
 msgid "unbinds a key (key)"
-msgstr "odbinduje tlačítko"
+msgstr "odbinduje tlačítko (klávesu)"
 
 #: ..\Client\core\CCore.cpp:1302
 msgid "copies the default gta controls"
@@ -584,6 +584,9 @@ msgid ""
 "\n"
 "Upgrade Windows to play on the latest servers."
 msgstr ""
+"MTA již nebude získavat aktualizace na XP/Vista po Červenci 2019.\n"
+"\n"
+"Aktualizujte Windows pro hraní na nejnovějších serverech."
 
 #: ..\Client\core\CMainMenu.cpp:1133
 msgid ""
@@ -629,7 +632,7 @@ msgstr "Ano"
 #. News link
 #: ..\Client\core\CNewsBrowser.cpp:171
 msgid "Visit latest news article"
-msgstr ""
+msgstr "Navštivte nejnovější článek s novinkou"
 
 #: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:691
 msgid "Do you want to see some on-line help about this problem ?"
@@ -753,7 +756,7 @@ msgstr "Klasické ovládání (Joypad)"
 
 #: ..\Client\core\CSettings.cpp:272
 msgid "Dead Zone"
-msgstr "Mrtvá Zóna"
+msgstr "Mrtvá zóna"
 
 #: ..\Client\core\CSettings.cpp:277
 msgid "Saturation"
@@ -765,11 +768,11 @@ msgstr "Použij záložku 'Bindy' pro tlačítka joypadu."
 
 #: ..\Client\core\CSettings.cpp:322
 msgid "Left Stick"
-msgstr "Levý Stick"
+msgstr "Levá páčka"
 
 #: ..\Client\core\CSettings.cpp:328
 msgid "Right Stick"
-msgstr "Pravý Stick"
+msgstr "Pravá páčka"
 
 #: ..\Client\core\CSettings.cpp:343
 msgid "DESCRIPTION"
@@ -777,11 +780,11 @@ msgstr "POPIS"
 
 #: ..\Client\core\CSettings.cpp:344
 msgid "KEY"
-msgstr "TLAČÍTKO"
+msgstr "KLÁVESA"
 
 #: ..\Client\core\CSettings.cpp:346
 msgid "ALT. KEY"
-msgstr "ALT. TLAČÍTKO"
+msgstr "ALT. KLÁVESA"
 
 #. *
 #. *    Multiplayer tab
@@ -796,7 +799,7 @@ msgstr "Ukládat hesla serverů"
 
 #: ..\Client\core\CSettings.cpp:369
 msgid "Auto-refresh server browser"
-msgstr "Auto-obnova prohlížeče serverů"
+msgstr "Automatická obnova prohlížeče serverů"
 
 #: ..\Client\core\CSettings.cpp:374
 msgid "Allow screen upload"
@@ -804,7 +807,7 @@ msgstr "Povolit nahrávání screenů"
 
 #: ..\Client\core\CSettings.cpp:379
 msgid "Allow external sounds"
-msgstr ""
+msgstr "Povolit externí zvuky"
 
 #: ..\Client\core\CSettings.cpp:384
 msgid "Use customized GTA:SA files"
@@ -887,14 +890,12 @@ msgid "Automatic Media Scan"
 msgstr "Automatické skenování médií"
 
 #: ..\Client\core\CSettings.cpp:561
-#, fuzzy
 msgid "Mute options"
-msgstr "Možnosti myši"
+msgstr "Možnosti ztlumení"
 
 #: ..\Client\core\CSettings.cpp:567
-#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Ztlumit SFX zvuky, když je hra minimalizována"
+msgstr "Ztlumit všechny zvuky, když je hra minimalizována"
 
 #: ..\Client\core\CSettings.cpp:572
 msgid "Mute Radio sounds when minimized"
@@ -953,7 +954,7 @@ msgstr "V okně"
 
 #: ..\Client\core\CSettings.cpp:630
 msgid "DPI aware"
-msgstr ""
+msgstr "DPI aware"
 
 #: ..\Client\core\CSettings.cpp:638 ..\Client\core\CSettings.cpp:953
 #: ..\Client\loader\MainFunctions.cpp:370
@@ -1049,16 +1050,15 @@ msgstr "Tetelení"
 
 #: ..\Client\core\CSettings.cpp:800
 msgid "Tyre Smoke etc"
-msgstr "Kouř pneumatik, atd.."
+msgstr "Kouř pneumatik, apod."
 
 #: ..\Client\core\CSettings.cpp:804
 msgid "Render vehicles always in high detail"
 msgstr "Vykreslovat vozidla vždy ve vysoké kvalitě"
 
 #: ..\Client\core\CSettings.cpp:808
-#, fuzzy
 msgid "Render peds always in high detail"
-msgstr "Vykreslovat vozidla vždy ve vysoké kvalitě"
+msgstr "Vykreslovat postavy vždy ve vysoké kvalitě"
 
 #: ..\Client\core\CSettings.cpp:813
 msgid "Full Screen Minimize"
@@ -1256,7 +1256,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1331
 msgid "RESTART REQUIRED"
-msgstr "POTŘEBNÝ RESTART"
+msgstr "JE VYŽADOVÁN RESTART"
 
 #: ..\Client\core\CSettings.cpp:1351
 msgid "Some settings will be changed when you disconnect the current server"
@@ -1274,7 +1274,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1355
 msgid "DISCONNECT REQUIRED"
-msgstr "NUTNÉ ODPOJENÍ"
+msgstr "VYŽADOVÁNO ODPOJENÍ"
 
 #. Update the joystick name
 #: ..\Client\core\CSettings.cpp:1678
@@ -1295,7 +1295,7 @@ msgstr "Jazyk:"
 
 #: ..\Client\core\CSettings.cpp:1946
 msgid "Skin:"
-msgstr "Skin:"
+msgstr "Vzhled:"
 
 #: ..\Client\core\CSettings.cpp:1946
 msgid "Presets:"
@@ -1327,7 +1327,7 @@ msgstr "Pozadí chatu"
 
 #: ..\Client\core\CSettings.cpp:2032
 msgid "Chat Text"
-msgstr "Chat Text"
+msgstr "Text v chatu"
 
 #: ..\Client\core\CSettings.cpp:2032
 msgid "Input Background"
@@ -1530,10 +1530,14 @@ msgid ""
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr ""
+"Některé skripty mohou přehrávat zvuky z internetu, například rádio.\n"
+"\n"
+"Vypnutí tohoto nastavení může snížit\n"
+"spotřebu výkonu sítě.\n"
 
 #: ..\Client\core\CSettings.cpp:4367
 msgid "EXTERNAL SOUNDS"
-msgstr ""
+msgstr "EXTERNÍ ZVUKY"
 
 #: ..\Client\core\CSettings.cpp:4388
 msgid ""
@@ -1563,10 +1567,15 @@ msgid ""
 "\n"
 "Are you sure you want to enable this option?"
 msgstr ""
+"Aktivace DPI awareness je experimentální funkce a\n"
+"doporučujeme ji pouze pokud hrajete MTA:SA na škálovaném rozlišení.\n"
+"Pokud tuto funkci povolíte, mohou se projevit grafické problémy.\n"
+"\n"
+"Jsi si jistý, že chceš tuto funkci zapnout?"
 
 #: ..\Client\core\CSettings.cpp:4443
 msgid "EXPERIMENTAL FEATURE"
-msgstr ""
+msgstr "EXPERIMENTÁLNÍ FUNKCE"
 
 #: ..\Client\core\CSettings.cpp:4560
 msgid "Please enter a nickname"
@@ -1723,7 +1732,7 @@ msgid ""
 msgstr ""
 "Pro připojení k tomuto serveru musíš aktualizovat MTA.\n"
 "\n"
-"Chceš aktualizovat nyní?"
+" Chceš aktualizovat nyní?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1874
 msgid "OPTIONAL UPDATE"
@@ -1737,7 +1746,7 @@ msgid ""
 msgstr ""
 "Server doporučuje aktualizaci, která však není nutná.\n"
 "\n"
-"Chceš aktualizovat nyní?"
+" Chceš aktualizovat nyní?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1914
 msgid ""
@@ -1792,6 +1801,10 @@ msgid ""
 "To join this server please uncheck:\n"
 "Settings->Multiplayer->Use customized GTA:SA files"
 msgstr ""
+"Tento server blokuje Vaše upravené GTA:SA soubory.\n"
+"\n"
+"Pro připojení na tento server prosím odškrtněte:\n"
+"Nastavení->Hra pro více hráčů->Použít upravené GTA:SA soubory"
 
 #: ..\Client\core\CVersionUpdater.cpp:2091
 #: ..\Client\core\CVersionUpdater.cpp:2101
@@ -2106,7 +2119,7 @@ msgstr "Připojit se k serveru hned, jakmile se uvolní místo."
 
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "PROSÍM VLOŽ HESLO OD SERVERU"
+msgstr "PROSÍM VLOŽ HESLO SERVERU"
 
 #. The server has timed out
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:402
@@ -2116,7 +2129,7 @@ msgstr "Čas vypršel"
 #. Set every GUI elements text to blank
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:431
 msgid "Querying..."
-msgstr "Dotazuje se…"
+msgstr "Dotazuje se..."
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:25
 msgid "Idle"
@@ -2402,11 +2415,11 @@ msgid ""
 "\n"
 "Press 'Help' for more information."
 msgstr ""
-"MTA nenalezlo žádný antivir ve vašem počítači.\n"
+"MTA nenalezlo žádný antivir na tvém počítači.\n"
 "\n"
-"Viry ovlivňují MTA a mohou kazit váš herní zážitek.\n"
+"Viry ovlivňují MTA a mohou kazit tvůj herní zážitek.\n"
 "\n"
-"Klikňete na tlačíto 'Nápověda' pro více informací."
+"Klikni na tlačíto 'Nápověda' pro více informací."
 
 #: ..\Client\loader\Dialogs.cpp:100
 msgid "I have already installed an anti-virus"
@@ -2417,7 +2430,7 @@ msgid ""
 "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr ""
-"Nehodlám si antvir nainstalovat.\n"
+"Nehodlám si antivir nainstalovat.\n"
 "Chci, aby se můj počítač sekal a byl součástí botnetu."
 
 #: ..\Client\loader\Dialogs.cpp:691 ..\Client\loader\Utils.cpp:747
@@ -2500,9 +2513,9 @@ msgid ""
 "\n"
 "Do you want to revert to an earlier version?"
 msgstr ""
-"Máš problémy s během MTA?\n"
+"Máš problémy se spuštěním MTA:SA?\n"
 "\n"
-"Chceš vrátit starší verzi?"
+"Chceš se vrátit na starší verzi?"
 
 #: ..\Client\loader\MainFunctions.cpp:309
 msgid ""
@@ -3130,12 +3143,12 @@ msgstr "Odpojeno: Connection desync %s"
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
 #, c-format, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr "Odpojeno: Byl jsi vyhozen: %s"
+msgstr "Odpojeno: Byl jsi vyhozen od %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
 #, c-format, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr "Odpojeno: Byl jsi zabanován hráčem: %s"
+msgstr "Odpojeno: Byl jsi zabanován od %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
@@ -3173,31 +3186,31 @@ msgstr "Tento server vyžaduje povolit podepisování ovladačů"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr "Prosím restartuj svůj počítač"
+msgstr "Prosím, restartuj svůj počítač"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
-msgstr ""
+msgstr "Tento server detekoval chybějící anti-cheat komponenty"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr ""
+msgstr "Zkus restartovat MTA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
+msgstr "Tento server vyžaduje neupravený gta3.img a gta_int.img"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
 msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
+msgstr "Prosím, nahraď gta3.img nebo gta_int.img"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr ""
+msgstr "Tento server nepovoluje Wine"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr ""
+msgstr "Ujisti se, že žádný jiný program nezasahuje do MTA:SA"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "

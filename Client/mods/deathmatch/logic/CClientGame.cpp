@@ -1272,7 +1272,7 @@ void CClientGame::DoPulses()
         m_pLocalPlayer->UpdateVehicleInOut();
         UpdatePlayerTarget();
         UpdatePlayerWeapons();
-        UpdateTrailers (); // Test: Does it always work without this check?
+        UpdateTrailers();            // Test: Does it always work without this check?
         UpdateStunts();
         // Clear last damager if more than 2 seconds old
         if (CClientTime::GetTime() - m_ulDamageTime > 2000)
@@ -2757,8 +2757,8 @@ void CClientGame::DrawPlayerDetails(CClientPlayer* pPlayer)
 
     float fAimX, fAimY;
     pPlayer->GetAim(fAimX, fAimY);
-    const CVector& vecAimSource = pPlayer->GetAimSource();
-    const CVector& vecAimTarget = pPlayer->GetAimTarget();
+    const CVector&       vecAimSource = pPlayer->GetAimSource();
+    const CVector&       vecAimTarget = pPlayer->GetAimTarget();
     eVehicleAimDirection ucDrivebyAim = pPlayer->GetVehicleAimAnim();
 
     g_pCore->GetGraphics()->DrawLine3DQueued(vecAimSource, vecAimTarget, 1.0f, 0x10DE1212, true);
@@ -2926,10 +2926,10 @@ void CClientGame::UpdateMimics()
             CShotSyncData* pShotSync = g_pMultiplayer->GetLocalShotSyncData();
             CVector        vecOrigin, vecTarget;
             m_pLocalPlayer->GetShotData(&vecOrigin, &vecTarget);
-            float fAimX = pShotSync->m_fArmDirectionX;
-            float fAimY = pShotSync->m_fArmDirectionY;
+            float                fAimX = pShotSync->m_fArmDirectionX;
+            float                fAimY = pShotSync->m_fArmDirectionY;
             eVehicleAimDirection cVehicleAimDirection = pShotSync->m_cInVehicleAimDirection;
-            bool  bAkimboUp = g_pMultiplayer->GetAkimboTargetUp();
+            bool                 bAkimboUp = g_pMultiplayer->GetAkimboTargetUp();
 
             /*
             static CClientMarker *pOriginCorona = NULL, *pTargetCorona = NULL;
@@ -3805,8 +3805,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                 if (iGroupID == eAnimGroup::ANIM_GROUP_DEFAULT ||
                     (iGroupID >= eAnimGroup::ANIM_GROUP_PLAYER && iGroupID <= eAnimGroup::ANIM_GROUP_PLAYERJETPACK) || iGroupID >= eAnimGroup::ANIM_GROUP_MAN)
                 {
-                    auto pDuckAnimStaticAssoc =
-                        pAnimationManager->GetAnimStaticAssociation(eAnimGroup::ANIM_GROUP_DEFAULT, eAnimID::ANIM_ID_WEAPON_CROUCH);
+                    auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(eAnimGroup::ANIM_GROUP_DEFAULT, eAnimID::ANIM_ID_WEAPON_CROUCH);
                     pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
                     isCustomAnimationToPlay = true;
                 }
@@ -5101,7 +5100,7 @@ void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType T
                     pBitStream->WriteBit(0);
                 }
             }
-            
+
             // Convert position
             CVector vecTemp;
             pOrigin->GetPosition(vecTemp);
@@ -6715,8 +6714,8 @@ void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 void CClientGame::UpdateDiscordState()
 {
     // Set discord state to players[/slot] count
-    uint playerCount = g_pClientGame->GetPlayerManager()->Count();
-    uint playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
+    uint    playerCount = g_pClientGame->GetPlayerManager()->Count();
+    uint    playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
     SString state(std::to_string(playerCount));
 
     if (g_pCore->GetNetwork()->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))

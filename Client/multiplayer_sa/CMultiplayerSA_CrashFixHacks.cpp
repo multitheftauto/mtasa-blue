@@ -1461,10 +1461,10 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
     // Crash will occur at offset 0xCFCD6
     OnCrashAverted(32);
     CAnimBlendAssociationSAInterface* pAnimAssoc = pInterface->pAnimBlendAssociation;
-    CAnimBlendSequenceSAInterface* pAnimSequence = pInterface->pAnimSequence;
-    CAnimBlendHierarchySAInterface* pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+    CAnimBlendSequenceSAInterface*    pAnimSequence = pInterface->pAnimSequence;
+    CAnimBlendHierarchySAInterface*   pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
 
-    bool bSequenceExistsInHierarchy = false;
+    bool                           bSequenceExistsInHierarchy = false;
     CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
     for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
     {
@@ -1477,13 +1477,12 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
     }
 
     LogEvent(588, "GetCurrentTranslation", "Incorrect endKeyFrameIndex",
-        SString("m_endKeyFrameId = %d | pAnimAssoc = %p | GroupID = %d | AnimID = %d | \
+             SString("m_endKeyFrameId = %d | pAnimAssoc = %p | GroupID = %d | AnimID = %d | \
                 pAnimSeq = %p | BoneID = %d | BoneHash = %u | \
                 pAnimHier = %p | HierHash = %u | SequenceExistsInHierarchy: %s",
-            pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID,
-            pAnimSequence, pAnimSequence->m_boneId, pAnimSequence->m_hash, pAnimHierarchy,
-            pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"), 588);
-
+                     pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID, pAnimSequence, pAnimSequence->m_boneId,
+                     pAnimSequence->m_hash, pAnimHierarchy, pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"),
+             588);
 }
 
 // Hook info
@@ -1518,7 +1517,6 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         retn    8
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1688,7 +1686,7 @@ static void _cdecl LOG_CVehicleModelInfo__LoadVehicleColours(int location, const
 #define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_1         0x5B6B20
 #define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_1        5
 static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6B25;
-static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1     = 0x5B6D04;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6D04;
 
 static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 {
@@ -1722,7 +1720,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 #define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_2         0x5B6CAA
 #define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_2        5
 static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6CAF;
-static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2     = 0x5B6D04;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6D04;
 
 static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 {

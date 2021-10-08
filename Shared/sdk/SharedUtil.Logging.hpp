@@ -99,7 +99,7 @@ void SharedUtil::OutputDebugLine(const char* szMessage)
 #ifdef _WIN32
     OutputDebugString(strMessage);
 #else
-        // Other platforms here
+            // Other platforms here
 #endif
 }
 
