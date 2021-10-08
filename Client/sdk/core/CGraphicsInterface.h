@@ -14,6 +14,10 @@
 #include "CVector.h"
 #include <d3d9.h>
 
+class CRenderItemManagerInterface;
+class CScreenGrabberInterface;
+class CPixelsManagerInterface;
+
 // Vertex type used by the primitives batchers
 struct PrimitiveVertice
 {

@@ -43,6 +43,9 @@ public:
 
     CGUIType GetType();
 
+    void             SetFlag(ImGuiWindowFlags flag);
+    ImGuiWindowFlags GetFlag();
+
     void ProcessPosition();
     void ProcessSize();
 
@@ -73,7 +76,10 @@ protected:
     std::string m_text = {};
     std::string m_uid;
 
-    CGUIType m_type = CGUIType::ELEMENT;
+    CGUIType         m_type = CGUIType::ELEMENT;
+    ImGuiWindowFlags m_flag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+
+    float m_borderSize = 0.0f;
 
     bool m_hasFrame = false;
     bool m_hasDynamicPosition = false;

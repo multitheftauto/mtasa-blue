@@ -17,6 +17,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 {
     m_pDevice = pDevice;
+    m_pGraphics = nullptr;
+
     m_hookedWindow = nullptr;
 
     // Setup Dear ImGui context
@@ -49,23 +51,28 @@ CGUI_Impl::~CGUI_Impl()
 
 void CGUI_Impl::CreateDemo()
 {
-    CGUIWindow* window = CreateWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
-    CGUIWindow* window2 = CreateWindow(CVector2D(50, 100), CVector2D(300, 300), window, false, "Child Window");
-    CGUIWindow* window3 = CreateWindow(CVector2D(50, 50), CVector2D(200, 200), window2, false, "Child Window 2");
+    // CGUIWindow* window = CreateWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
+    // CGUIWindow* window2 = CreateWindow(CVector2D(50, 100), CVector2D(300, 300), window, false, "Child Window");
+    // CGUIWindow* window3 = CreateWindow(CVector2D(50, 50), CVector2D(200, 200), window2, false, "Child Window 2");
 
-    int funcIndex = window->AddRenderFunction(std::bind(&CGUIElement::DemoHookTest, window));
-    // window->RemoveRenderFunction(funcIndex);
+    // int funcIndex = window->AddRenderFunction(std::bind(&CGUIElement::DemoHookTest, window));
+    //// window->RemoveRenderFunction(funcIndex);
 
-    window2->SetDynamicPositionEnabled(true);
-    // window2->SetFrameEnabled(false);
-    // window2->SetPosition(CVector2D(75, 75));
-    // window2->SetSize(CVector2D(100, 100));
-    // window2->SetParent(nullptr);
+    // window2->SetDynamicPositionEnabled(true);
+    //// window2->SetFrameEnabled(false);
+    //// window2->SetPosition(CVector2D(75, 75));
+    //// window2->SetSize(CVector2D(100, 100));
+    //// window2->SetParent(nullptr);
 }
 
 bool CGUI_Impl::ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return ImGui_ImplWin32_WndProcHandler(wnd, msg, wParam, lParam) != 0;
+}
+
+void CGUI_Impl::SetGraphicsInterface(CGraphicsInterface* graphics)
+{
+    m_pGraphics = graphics;
 }
 
 void CGUI_Impl::SetHookedWindow(HWND window)
@@ -324,7 +331,6 @@ CGUIStaticImage* CGUI_Impl::CreateStaticImage(CVector2D pos, CVector2D size, CGU
     return element;
 }
 
-
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
 {
     CGUITabPanel* element = new CGUITabPanel_Impl(this, parent, pos, size, relative);
@@ -336,7 +342,6 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel(CVector2D pos, CVector2D size, CGUIEleme
 
     return element;
 }
-
 
 CGUIWindow* CGUI_Impl::CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
 {

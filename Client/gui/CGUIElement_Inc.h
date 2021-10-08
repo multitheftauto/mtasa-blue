@@ -82,6 +82,16 @@ CGUIType GetType()
     return CGUIElement_Impl::GetType();
 };
 
+void SetFlag(ImGuiWindowFlags flag)
+{
+    CGUIElement_Impl::SetFlag(flag);
+};
+
+ImGuiWindowFlags GetFlag()
+{
+    return CGUIElement_Impl::GetFlag();
+};
+
 bool IsDestroyed()
 {
     return CGUIElement_Impl::IsDestroyed();
@@ -126,4 +136,3 @@ void DemoHookTest()
 {
     CGUIElement_Impl::DemoHookTest();
 };
-

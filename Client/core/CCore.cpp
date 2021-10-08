@@ -941,6 +941,7 @@ void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
     m_pGUI->SetHookedWindow(GetHookedWindow());
+    m_pGUI->SetGraphicsInterface(GetGraphics());
 
     // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
     std::string strScreenShotPath = CalcMTASAPath("screenshots");

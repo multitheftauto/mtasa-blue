@@ -12,6 +12,8 @@
 #include <gui/CGUIStaticImage.h>
 #include "CGUIElement_Impl.h"
 
+class CTextureItem;
+
 class CGUIStaticImage_Impl : public CGUIStaticImage, public CGUIElement_Impl
 {
 public:
@@ -20,6 +22,11 @@ public:
     void Begin();
     void End();
 
+    CTextureItem* GetTexture() { return m_textureItem; }
+
+    bool LoadFromFile(std::string path);
+
 #include "CGUIElement_Inc.h"
 private:
+    CTextureItem* m_textureItem;
 };

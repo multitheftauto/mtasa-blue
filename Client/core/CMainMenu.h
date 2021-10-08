@@ -101,7 +101,7 @@ private:
     // Images
 
     /* TODO AFTER CEGUI API REWRITE */
-    //CGUIStaticImage* m_pBackground;
+    CGUIStaticImage* m_pBackground;
     //CGUIStaticImage* m_pLogo;
     //CGUIStaticImage* m_pLatestNews;
     //CGUIStaticImage* m_pFiller;

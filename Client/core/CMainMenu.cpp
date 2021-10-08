@@ -114,7 +114,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     }
     /* TODO AFTER CEGUI API REWRITE */
 //    // First create our filler black background image, which covers the whole screen
-//    m_pFiller = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+//    m_pFiller = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage({}, CVector2D(ScreenSize.fX, iBackgroundY)));
 //    m_pFiller->LoadFromFile(CORE_MTA_FILLER);
 //    m_pFiller->SetVisible(false);
 //    m_pFiller->MoveToBack();
@@ -123,9 +123,9 @@ CMainMenu::CMainMenu(CGUI* pManager)
 //    m_pFiller->MoveToBack();
 //    m_pFiller->SetSize(CVector2D(ScreenSize.fX, iBackgroundY), false);
 //
-//    // Background image
-//    m_pBackground = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
-//    m_pBackground->LoadFromFile(CORE_MTA_STATIC_BG);
+    // Background image
+    m_pBackground = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(CVector2D(iBackgroundX, iBackgroundY), CVector2D(iBackgroundSizeX, iBackgroundSizeY)));
+    m_pBackground->LoadFromFile(CORE_MTA_STATIC_BG);
 //    m_pBackground->SetProperty("InheritsAlpha", "False");
 //    m_pBackground->SetPosition(CVector2D(iBackgroundX, iBackgroundY), false);
 //    m_pBackground->SetSize(CVector2D(iBackgroundSizeX, iBackgroundSizeY), false);

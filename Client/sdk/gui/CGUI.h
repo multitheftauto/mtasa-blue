@@ -31,6 +31,8 @@
 
 #undef CreateWindow            // mAcrosoft strikes again
 
+class CGraphicsInterface;
+
 class CGUI
 {
 public:
@@ -43,7 +45,10 @@ public:
     virtual void SetHookedWindow(HWND window) = 0;
     virtual HWND GetHookedWindow() const = 0;
 
-    virtual bool             ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
+    virtual void                SetGraphicsInterface(CGraphicsInterface* graphics) = 0;
+    virtual CGraphicsInterface* GetGraphicsInterface() = 0;
+
+    virtual bool ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam) = 0;
 
     virtual CGUIBrowser*     CreateBrowser(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUIButton*      CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
@@ -59,7 +64,7 @@ public:
     virtual CGUIScrollpane*  CreateScrollpane(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUIStaticImage* CreateStaticImage(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUITabPanel*    CreateTabPanel(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
-    virtual CGUIWindow*      CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false, std::string title = "Window") = 0;
+    virtual CGUIWindow* CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false, std::string title = "Window") = 0;
 
     virtual void CreateDemo() = 0;
 };

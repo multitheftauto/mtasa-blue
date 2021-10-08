@@ -115,6 +115,16 @@ bool CGUIElement_Impl::IsDestroyed()
     return m_deleted;
 }
 
+void CGUIElement_Impl::SetFlag(ImGuiWindowFlags flag)
+{
+    m_flag = flag;
+}
+
+ImGuiWindowFlags CGUIElement_Impl::GetFlag()
+{
+    return m_flag;
+}
+
 void CGUIElement_Impl::Begin()
 {
     m_rendering = true;
@@ -127,7 +137,11 @@ void CGUIElement_Impl::Begin()
     {
         ProcessSize();
 
-        ImGui::Begin(id);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, m_borderSize);
+        {
+            ImGui::Begin(id, (bool*)0, m_flag);
+        }
+        ImGui::PopStyleVar();
     }
     else
     {

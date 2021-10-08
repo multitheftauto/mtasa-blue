@@ -27,6 +27,9 @@ public:
     void SetHookedWindow(HWND window);
     HWND GetHookedWindow() const { return m_hookedWindow; }
 
+    void                SetGraphicsInterface(CGraphicsInterface* graphics);
+    CGraphicsInterface* GetGraphicsInterface() { return m_pGraphics; }
+
     CGUIBrowser*     CreateBrowser(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false);
     CGUIButton*      CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false);
     CGUICheckbox*    CreateCheckbox(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false);
@@ -50,6 +53,8 @@ public:
     void CreateDemo();
 
 private:
+    CGraphicsInterface* m_pGraphics;
+
     IDirect3DDevice9* m_pDevice;
     HWND              m_hookedWindow;
 
