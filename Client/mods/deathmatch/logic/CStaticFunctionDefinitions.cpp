@@ -227,6 +227,16 @@ bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* 
     return false;
 }
 
+bool CStaticFunctionDefinitions::OpenBrowserURL(const SString& strUrl)
+{
+    if (strUrl.BeginsWithI("http://") || strUrl.BeginsWithI("https://"))
+    {
+        return ShellExecuteNonBlocking("open", strUrl.c_str());
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::OutputConsole(const char* szText)
 {
     m_pCore->GetConsole()->Print(szText);

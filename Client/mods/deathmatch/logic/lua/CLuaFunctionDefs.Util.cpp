@@ -396,6 +396,29 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::OpenBrowserURL(lua_State* luaVM)
+{
+    SString         strURL;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strURL);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::OpenBrowserURL(strURL))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::AddDebugHook(lua_State* luaVM)
 {
     //  bool AddDebugHook ( string hookType, function callback[, table allowedNames ] )

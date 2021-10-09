@@ -36,6 +36,7 @@ public:
 
     // Misc funcs
     static bool DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum = CChecksum());
+    static bool OpenBrowserURL(const SString& strUrl);
 
     // Output funcs
     static bool OutputConsole(const char* szText);
