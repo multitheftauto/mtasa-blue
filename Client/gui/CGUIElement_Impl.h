@@ -59,6 +59,10 @@ public:
     void RemoveRenderFunction(int index);
 
     void SetIndex(int index);
+    void SetChildIndex(CGUIElement* child, int index);
+
+    int GetIndex();
+    int GetChildIndex(CGUIElement* child);
 
     void BringToFront();
     void MoveToBack();

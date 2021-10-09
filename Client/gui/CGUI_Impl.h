@@ -51,6 +51,7 @@ public:
     CVector2D GetResolution();
 
     void SetElementIndex(CGUIElement* element, int index);
+    int  GetElementIndex(CGUIElement* element);
 
     void CreateDemo();
 

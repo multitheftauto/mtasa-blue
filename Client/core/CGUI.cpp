@@ -135,6 +135,8 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     /* TODO AFTER CEGUI API REWRITE */
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
+    pGUI->CreateDemo();
+
     //// Create chatbox
     m_pChat = new CChat(pGUI, CVector2D(0.0125f, 0.015f));
     //m_pChat->SetVisible(false, true);

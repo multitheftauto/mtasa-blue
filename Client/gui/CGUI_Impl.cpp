@@ -34,9 +34,6 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 
     // Setup Platform/Renderer backends
     ImGui_ImplDX9_Init(m_pDevice);
-
-    // Demo stuff & testing
-    CreateDemo();
 }
 
 CGUI_Impl::~CGUI_Impl()
@@ -49,21 +46,25 @@ CGUI_Impl::~CGUI_Impl()
 
 void CGUI_Impl::CreateDemo()
 {
-    CGUIWindow* window = CreateWindow(CVector2D(0, 0), CVector2D(300, 300), nullptr, false, "Parent Window 1");
-    CGUIWindow* window2 = CreateWindow(CVector2D(150, 150), CVector2D(300, 300), nullptr, false, "Parent Window 2");
-    CGUIWindow* window3 = CreateWindow(CVector2D(300, 300), CVector2D(300, 300), nullptr, false, "Parent Window 3");
-    CGUIWindow* window4 = CreateWindow(CVector2D(450, 450), CVector2D(300, 300), nullptr, false, "Parent Window 4");
+    CGUIWindow* window1 = CreateWindow(CVector2D(0, 0), CVector2D(200, 200), nullptr, false, "Parent Window 1");
 
-    window->BringToFront();
+    CGUIStaticImage* image1 = CreateStaticImage(CVector2D(50, 50), CVector2D(50, 50), window1, false);
+    image1->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "error.png")));
 
-    // int funcIndex = window->AddRenderFunction(std::bind(&CGUIElement::DemoHookTest, window));
-    //// window->RemoveRenderFunction(funcIndex);
+    CGUIStaticImage* image2 = CreateStaticImage(CVector2D(75, 75), CVector2D(50, 50), window1, false);
+    image2->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "info.png")));
 
-    // window2->SetDynamicPositionEnabled(true);
-    //// window2->SetFrameEnabled(false);
-    //// window2->SetPosition(CVector2D(75, 75));
-    //// window2->SetSize(CVector2D(100, 100));
-    //// window2->SetParent(nullptr);
+    CGUIStaticImage* image3 = CreateStaticImage(CVector2D(100, 100), CVector2D(50, 50), window1, false);
+    image3->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "question.png")));
+
+    CGUIWindow* window2 = CreateWindow(CVector2D(100, 100), CVector2D(200, 200), nullptr, false, "Parent Window 2");
+    CGUIWindow* window3 = CreateWindow(CVector2D(200, 200), CVector2D(200, 200), nullptr, false, "Parent Window 3");
+
+    image1->BringToFront();
+    window1->BringToFront();
+
+    //image1->MoveToBack();
+    //window1->MoveToBack();
 }
 
 bool CGUI_Impl::ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -146,10 +147,10 @@ void CGUI_Impl::Draw(CGUIElement* element)
     // Draw ImGui element
     element->Begin();
 
-    std::vector<CGUIElement*>                   children = element->GetChildren();
-    std::vector<CGUIElement*>::reverse_iterator c = children.rbegin();
+    std::vector<CGUIElement*>           children = element->GetChildren();
+    std::vector<CGUIElement*>::iterator c = children.begin();
 
-    for (; c != children.rend(); c++)
+    for (; c != children.end(); c++)
     {
         CGUIElement* child = (*c);
         Draw(child);
@@ -207,8 +208,32 @@ void CGUI_Impl::SetElementIndex(CGUIElement* element, int index)
 
         ++e;
     }
+}
 
-    return;
+int CGUI_Impl::GetElementIndex(CGUIElement* element)
+{
+    std::string id = element->GetID();
+    int         nonRootCount = 0;
+
+    std::vector<CGUIElement*>::iterator e = m_guiElements.begin();
+    while (e != m_guiElements.end())
+    {
+        CGUIElement* elem = (*e);
+
+        if (elem->GetParent() == nullptr)
+        {
+            if (elem->GetID() == id)
+            {
+                return std::distance(m_guiElements.begin(), e) - nonRootCount;
+            }
+        }
+        else
+            ++nonRootCount;
+
+        ++e;
+    }
+
+    return 0;
 }
 
 CGUIBrowser* CGUI_Impl::CreateBrowser(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)

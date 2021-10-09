@@ -70,7 +70,22 @@ std::vector<CGUIElement*> GetChildren()
 void SetIndex(int index)
 {
     CGUIElement_Impl::SetIndex(index);
-}
+};
+
+void SetChildIndex(CGUIElement* child, int index)
+{
+    CGUIElement_Impl::SetChildIndex(child, index);
+};
+
+int GetIndex()
+{
+    return CGUIElement_Impl::GetIndex();
+};
+
+int GetChildIndex(CGUIElement* child)
+{
+    return CGUIElement_Impl::GetChildIndex(child);
+};
 
 CGUIElement* GetParent()
 {

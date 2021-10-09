@@ -41,6 +41,12 @@ public:
 
     virtual std::vector<CGUIElement*> GetChildren() = 0;
 
+    virtual void SetIndex(int index) = 0;
+    virtual void SetChildIndex(CGUIElement* element, int index) = 0;
+
+    virtual int GetIndex() = 0;
+    virtual int GetChildIndex(CGUIElement* child) = 0;
+
     virtual CGUIType GetType() = 0;
 
     virtual void BringToFront() = 0;

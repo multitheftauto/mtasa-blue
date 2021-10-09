@@ -118,9 +118,54 @@ std::vector<CGUIElement*> CGUIElement_Impl::GetChildren()
 void CGUIElement_Impl::SetIndex(int index)
 {
     if (m_pParent == nullptr)
-    {
         m_pManager->SetElementIndex(this, index);
+    else
+        m_pParent->SetChildIndex(this, index);
+}
+
+int CGUIElement_Impl::GetIndex()
+{
+    if (m_pParent == nullptr)
+        return m_pManager->GetElementIndex(this);
+
+    return m_pParent->GetChildIndex(this);
+}
+
+int CGUIElement_Impl::GetChildIndex(CGUIElement* child)
+{
+    auto iter = std::find(m_children.begin(), m_children.end(), child);
+
+    if (iter != m_children.end())
+        return std::distance(m_children.begin(), iter);
+
+    return 0;
+}
+
+void CGUIElement_Impl::SetChildIndex(CGUIElement* child, int index)
+{
+    std::string id = child->GetID();
+
+    // exclude all numbers below 1, excluding -1
+    if (index < 1 && index != -1)
         return;
+
+    if (index == -1)
+        index = m_children.size();
+
+    std::vector<CGUIElement*>::iterator e = m_children.begin();
+    while (e != m_children.end())
+    {
+        CGUIElement* elem = (*e);
+
+        if (elem == child)
+        {
+            m_children.erase(e);
+            m_children.insert(m_children.begin() + (index - 1), child);
+
+            return;
+        }
+
+        ++e;
     }
 }
 
