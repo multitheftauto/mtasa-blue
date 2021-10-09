@@ -15,7 +15,7 @@ CGUIWindow_Impl::CGUIWindow_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2
     m_type = CGUIType::WINDOW;
     m_text = title;
 
-    SetFlag(ImGuiWindowFlags_None);
+    SetFlags(ImGuiWindowFlags_NoBringToFrontOnFocus);
     SetFrameEnabled(true);
 }
 

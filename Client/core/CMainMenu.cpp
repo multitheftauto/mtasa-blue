@@ -124,8 +124,8 @@ CMainMenu::CMainMenu(CGUI* pManager)
 //    m_pFiller->SetSize(CVector2D(ScreenSize.fX, iBackgroundY), false);
 //
     // Background image
-    m_pBackground = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(CVector2D(iBackgroundX, iBackgroundY), CVector2D(iBackgroundSizeX, iBackgroundSizeY)));
-    m_pBackground->LoadFromFile(CORE_MTA_STATIC_BG);
+    //m_pBackground = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(CVector2D(iBackgroundX, iBackgroundY), CVector2D(iBackgroundSizeX, iBackgroundSizeY)));
+    //m_pBackground->LoadFromFile(CalcMTASAPath(PathJoin("MTA", CORE_MTA_STATIC_BG)));
 //    m_pBackground->SetProperty("InheritsAlpha", "False");
 //    m_pBackground->SetPosition(CVector2D(iBackgroundX, iBackgroundY), false);
 //    m_pBackground->SetSize(CVector2D(iBackgroundSizeX, iBackgroundSizeY), false);

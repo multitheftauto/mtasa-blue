@@ -62,10 +62,15 @@ void RemoveChild(CGUIElement* child)
     CGUIElement_Impl::RemoveChild(child);
 };
 
-std::list<CGUIElement*> GetChildren()
+std::vector<CGUIElement*> GetChildren()
 {
     return CGUIElement_Impl::GetChildren();
 };
+
+void SetIndex(int index)
+{
+    CGUIElement_Impl::SetIndex(index);
+}
 
 CGUIElement* GetParent()
 {
@@ -82,14 +87,24 @@ CGUIType GetType()
     return CGUIElement_Impl::GetType();
 };
 
-void SetFlag(ImGuiWindowFlags flag)
+void BringToFront()
 {
-    CGUIElement_Impl::SetFlag(flag);
+    CGUIElement_Impl::BringToFront();
 };
 
-ImGuiWindowFlags GetFlag()
+void MoveToBack()
 {
-    return CGUIElement_Impl::GetFlag();
+    CGUIElement_Impl::MoveToBack();
+};
+
+void SetFlags(ImGuiWindowFlags flags)
+{
+    CGUIElement_Impl::SetFlags(flags);
+};
+
+ImGuiWindowFlags GetFlags()
+{
+    return CGUIElement_Impl::GetFlags();
 };
 
 bool IsDestroyed()

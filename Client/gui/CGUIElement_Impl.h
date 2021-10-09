@@ -39,12 +39,12 @@ public:
     void AddChild(CGUIElement* child);
     void RemoveChild(CGUIElement* child);
 
-    std::list<CGUIElement*> GetChildren();
+    std::vector<CGUIElement*> GetChildren();
 
     CGUIType GetType();
 
-    void             SetFlag(ImGuiWindowFlags flag);
-    ImGuiWindowFlags GetFlag();
+    void             SetFlags(ImGuiWindowFlags flags);
+    ImGuiWindowFlags GetFlags();
 
     void ProcessPosition();
     void ProcessSize();
@@ -58,6 +58,11 @@ public:
     int  AddRenderFunction(std::function<void()> renderFunction);
     void RemoveRenderFunction(int index);
 
+    void SetIndex(int index);
+
+    void BringToFront();
+    void MoveToBack();
+
     void Destroy();
     bool IsDestroyed();
 
@@ -67,7 +72,7 @@ protected:
     CGUI_Impl*   m_pManager = nullptr;
     CGUIElement* m_pParent = nullptr;
 
-    std::list<CGUIElement*> m_children;
+    std::vector<CGUIElement*> m_children;
 
     std::list<std::function<void()>>                    m_renderFunctions = {};
     std::map<int, decltype(m_renderFunctions.cbegin())> m_renderFunctionIndexMap;
@@ -77,7 +82,7 @@ protected:
     std::string m_uid;
 
     CGUIType         m_type = CGUIType::ELEMENT;
-    ImGuiWindowFlags m_flag = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+    ImGuiWindowFlags m_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus;
 
     float m_borderSize = 0.0f;
 
@@ -92,4 +97,6 @@ protected:
 
     bool m_updatePosition = false;
     bool m_updateSize = false;
+
+    bool m_bringToFront = false;
 };

@@ -50,6 +50,8 @@ public:
 
     CVector2D GetResolution();
 
+    void SetElementIndex(CGUIElement* element, int index);
+
     void CreateDemo();
 
 private:
@@ -58,10 +60,13 @@ private:
     IDirect3DDevice9* m_pDevice;
     HWND              m_hookedWindow;
 
-    std::list<CGUIElement*> m_guiElements;
+    std::vector<CGUIElement*> m_guiElements = {};
 
     bool m_bShowDemoWindow = true;
     bool m_bShowAnotherWindow = false;
 
     ImVec4 m_clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    void AddElement(CGUIElement* element);
+    void RemoveElement(CGUIElement* element);
 };

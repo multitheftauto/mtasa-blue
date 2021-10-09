@@ -9,8 +9,6 @@
 
 #include "StdInc.h"
 
-using std::list;
-
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -51,9 +49,12 @@ CGUI_Impl::~CGUI_Impl()
 
 void CGUI_Impl::CreateDemo()
 {
-    // CGUIWindow* window = CreateWindow(CVector2D(0, 0), CVector2D(500, 500), nullptr, false, "Parent Window");
-    // CGUIWindow* window2 = CreateWindow(CVector2D(50, 100), CVector2D(300, 300), window, false, "Child Window");
-    // CGUIWindow* window3 = CreateWindow(CVector2D(50, 50), CVector2D(200, 200), window2, false, "Child Window 2");
+    CGUIWindow* window = CreateWindow(CVector2D(0, 0), CVector2D(300, 300), nullptr, false, "Parent Window 1");
+    CGUIWindow* window2 = CreateWindow(CVector2D(150, 150), CVector2D(300, 300), nullptr, false, "Parent Window 2");
+    CGUIWindow* window3 = CreateWindow(CVector2D(300, 300), CVector2D(300, 300), nullptr, false, "Parent Window 3");
+    CGUIWindow* window4 = CreateWindow(CVector2D(450, 450), CVector2D(300, 300), nullptr, false, "Parent Window 4");
+
+    window->BringToFront();
 
     // int funcIndex = window->AddRenderFunction(std::bind(&CGUIElement::DemoHookTest, window));
     //// window->RemoveRenderFunction(funcIndex);
@@ -95,7 +96,7 @@ void CGUI_Impl::Draw()
         return;
 
     // Check if any elements need destroying, savely remove
-    std::list<CGUIElement*>::iterator e = m_guiElements.begin();
+    std::vector<CGUIElement*>::iterator e = m_guiElements.begin();
     while (e != m_guiElements.end())
     {
         CGUIElement* elem = (*e);
@@ -118,8 +119,8 @@ void CGUI_Impl::Draw()
     // Draw ImGui elements
     if (!m_guiElements.empty())
     {
-        list<CGUIElement*>::const_iterator e = m_guiElements.begin();
-        for (; e != m_guiElements.end(); e++)
+        std::vector<CGUIElement*>::reverse_iterator e = m_guiElements.rbegin();
+        for (; e != m_guiElements.rend(); e++)
         {
             CGUIElement* elem = (*e);
 
@@ -145,10 +146,10 @@ void CGUI_Impl::Draw(CGUIElement* element)
     // Draw ImGui element
     element->Begin();
 
-    list<CGUIElement*>                 children = element->GetChildren();
-    list<CGUIElement*>::const_iterator c = children.begin();
+    std::vector<CGUIElement*>                   children = element->GetChildren();
+    std::vector<CGUIElement*>::reverse_iterator c = children.rbegin();
 
-    for (; c != children.end(); c++)
+    for (; c != children.rend(); c++)
     {
         CGUIElement* child = (*c);
         Draw(child);
@@ -175,6 +176,41 @@ CVector2D CGUI_Impl::GetResolution()
     return CVector2D(io.DisplaySize.x, io.DisplaySize.y);
 }
 
+void CGUI_Impl::AddElement(CGUIElement* element)
+{
+    m_guiElements.push_back(element);
+}
+
+void CGUI_Impl::SetElementIndex(CGUIElement* element, int index)
+{
+    std::string id = element->GetID();
+
+    // exclude all numbers below 1, excluding -1
+    if (index < 1 && index != -1)
+        return;
+
+    if (index == -1)
+        index = m_guiElements.size();
+
+    std::vector<CGUIElement*>::iterator e = m_guiElements.begin();
+    while (e != m_guiElements.end())
+    {
+        CGUIElement* elem = (*e);
+
+        if (elem->GetID() == id)
+        {
+            m_guiElements.erase(e);
+            m_guiElements.insert(m_guiElements.begin() + (index - 1), element);
+
+            return;
+        }
+
+        ++e;
+    }
+
+    return;
+}
+
 CGUIBrowser* CGUI_Impl::CreateBrowser(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
 {
     CGUIBrowser* element = new CGUIBrowser_Impl(this, parent, pos, size, relative);
@@ -182,7 +218,7 @@ CGUIBrowser* CGUI_Impl::CreateBrowser(CVector2D pos, CVector2D size, CGUIElement
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -194,7 +230,7 @@ CGUIButton* CGUI_Impl::CreateButton(CVector2D pos, CVector2D size, CGUIElement* 
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -206,7 +242,7 @@ CGUICheckbox* CGUI_Impl::CreateCheckbox(CVector2D pos, CVector2D size, CGUIEleme
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -218,7 +254,7 @@ CGUICombobox* CGUI_Impl::CreateCombobox(CVector2D pos, CVector2D size, CGUIEleme
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -230,7 +266,7 @@ CGUIEdit* CGUI_Impl::CreateEdit(CVector2D pos, CVector2D size, CGUIElement* pare
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -242,7 +278,7 @@ CGUIGridList* CGUI_Impl::CreateGridList(CVector2D pos, CVector2D size, CGUIEleme
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -254,7 +290,7 @@ CGUILabel* CGUI_Impl::CreateLabel(CVector2D pos, CVector2D size, CGUIElement* pa
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -266,7 +302,7 @@ CGUIMemo* CGUI_Impl::CreateMemo(CVector2D pos, CVector2D size, CGUIElement* pare
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -278,7 +314,7 @@ CGUIProgressBar* CGUI_Impl::CreateProgressBar(CVector2D pos, CVector2D size, CGU
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -290,7 +326,7 @@ CGUIRadioButton* CGUI_Impl::CreateRadioButton(CVector2D pos, CVector2D size, CGU
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -302,7 +338,7 @@ CGUIScrollbar* CGUI_Impl::CreateScrollbar(CVector2D pos, CVector2D size, CGUIEle
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -314,7 +350,7 @@ CGUIScrollpane* CGUI_Impl::CreateScrollpane(CVector2D pos, CVector2D size, CGUIE
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -326,7 +362,7 @@ CGUIStaticImage* CGUI_Impl::CreateStaticImage(CVector2D pos, CVector2D size, CGU
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -338,7 +374,7 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel(CVector2D pos, CVector2D size, CGUIEleme
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }
@@ -350,7 +386,7 @@ CGUIWindow* CGUI_Impl::CreateWindow(CVector2D pos, CVector2D size, CGUIElement* 
     if (!element)
         return nullptr;
 
-    m_guiElements.push_back(reinterpret_cast<CGUIElement*>(element));
+    AddElement(element);
 
     return element;
 }

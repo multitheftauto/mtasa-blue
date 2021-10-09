@@ -40,8 +40,7 @@ bool CGUIStaticImage_Impl::LoadFromFile(std::string path)
     if (!graphics)
         return false;
 
-    std::string   fullPath = CalcMTASAPath(PathJoin("MTA", path));
-    CTextureItem* textureItem = graphics->GetRenderItemManager()->CreateTexture(fullPath, NULL, false, m_size.fX, m_size.fY);
+    CTextureItem* textureItem = graphics->GetRenderItemManager()->CreateTexture(path, NULL, false, m_size.fX, m_size.fY);
 
     if (!textureItem)
         return false;

@@ -36,7 +36,7 @@ void CGUIElement_Impl::Destroy()
 
 CGUIElement_Impl::~CGUIElement_Impl()
 {
-    std::list<CGUIElement*>::iterator c = m_children.begin();
+    std::vector<CGUIElement*>::iterator c = m_children.begin();
     while (c != m_children.end())
     {
         CGUIElement* child = (*c);
@@ -102,12 +102,26 @@ void CGUIElement_Impl::AddChild(CGUIElement* child)
 
 void CGUIElement_Impl::RemoveChild(CGUIElement* child)
 {
-    m_children.remove(child);
+    auto iter = std::find(m_children.begin(), m_children.end(), child);
+
+    if (iter == m_children.end())
+        return;
+
+    m_children.erase(iter);
 }
 
-std::list<CGUIElement*> CGUIElement_Impl::GetChildren()
+std::vector<CGUIElement*> CGUIElement_Impl::GetChildren()
 {
     return m_children;
+}
+
+void CGUIElement_Impl::SetIndex(int index)
+{
+    if (m_pParent == nullptr)
+    {
+        m_pManager->SetElementIndex(this, index);
+        return;
+    }
 }
 
 bool CGUIElement_Impl::IsDestroyed()
@@ -115,14 +129,24 @@ bool CGUIElement_Impl::IsDestroyed()
     return m_deleted;
 }
 
-void CGUIElement_Impl::SetFlag(ImGuiWindowFlags flag)
+void CGUIElement_Impl::BringToFront()
 {
-    m_flag = flag;
+    SetIndex(-1);
 }
 
-ImGuiWindowFlags CGUIElement_Impl::GetFlag()
+void CGUIElement_Impl::MoveToBack()
 {
-    return m_flag;
+    SetIndex(1);
+}
+
+void CGUIElement_Impl::SetFlags(ImGuiWindowFlags flags)
+{
+    m_flags = flags;
+}
+
+ImGuiWindowFlags CGUIElement_Impl::GetFlags()
+{
+    return m_flags;
 }
 
 void CGUIElement_Impl::Begin()
@@ -139,7 +163,7 @@ void CGUIElement_Impl::Begin()
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, m_borderSize);
         {
-            ImGui::Begin(id, (bool*)0, m_flag);
+            ImGui::Begin(id, (bool*)0, m_flags);
         }
         ImGui::PopStyleVar();
     }

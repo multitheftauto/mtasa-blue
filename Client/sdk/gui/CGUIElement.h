@@ -12,6 +12,8 @@
 #include <../Shared/sdk/CVector2D.h>
 #include "CGUITypes.h"
 
+typedef int ImGuiWindowFlags;
+
 class CGUIElement
 {
 public:
@@ -37,9 +39,15 @@ public:
     virtual void AddChild(CGUIElement* child) = 0;
     virtual void RemoveChild(CGUIElement* child) = 0;
 
-    virtual std::list<CGUIElement*> GetChildren() = 0;
+    virtual std::vector<CGUIElement*> GetChildren() = 0;
 
     virtual CGUIType GetType() = 0;
+
+    virtual void BringToFront() = 0;
+    virtual void MoveToBack() = 0;
+
+    virtual void             SetFlags(ImGuiWindowFlags flags) = 0;
+    virtual ImGuiWindowFlags GetFlags() = 0;
 
     virtual void ProcessPosition() = 0;
     virtual void ProcessSize() = 0;
