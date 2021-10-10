@@ -18,6 +18,8 @@ CGUILabel_Impl::CGUILabel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D 
 void CGUILabel_Impl::Begin()
 {
     CGUIElement_Impl::Begin();
+
+    ImGui::Text(m_text.c_str());
 }
 
 void CGUILabel_Impl::End()
