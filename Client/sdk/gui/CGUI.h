@@ -54,6 +54,8 @@ public:
     virtual void SetElementIndex(CGUIElement* element, int index) = 0;
     virtual int  GetElementIndex(CGUIElement* element) = 0;
 
+    virtual CVector2D GetResolution() = 0;
+
     virtual CGUIBrowser*     CreateBrowser(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUIButton*      CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUICheckbox*    CreateCheckbox(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;

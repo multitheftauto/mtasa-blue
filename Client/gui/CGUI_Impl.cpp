@@ -46,22 +46,22 @@ CGUI_Impl::~CGUI_Impl()
 
 void CGUI_Impl::CreateDemo()
 {
-    CGUIWindow* window1 = CreateWindow(CVector2D(0, 0), CVector2D(200, 200), nullptr, false, "Parent Window 1");
+    //CGUIWindow* window1 = CreateWindow(CVector2D(0, 0), CVector2D(200, 200), nullptr, false, "Parent Window 1");
 
-    CGUIStaticImage* image1 = CreateStaticImage(CVector2D(50, 50), CVector2D(50, 50), window1, false);
-    image1->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "error.png")));
+    //CGUIStaticImage* image1 = CreateStaticImage(CVector2D(50, 50), CVector2D(50, 50), window1, false);
+    //image1->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "error.png")));
 
-    CGUIStaticImage* image2 = CreateStaticImage(CVector2D(75, 75), CVector2D(50, 50), window1, false);
-    image2->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "info.png")));
+    //CGUIStaticImage* image2 = CreateStaticImage(CVector2D(75, 75), CVector2D(50, 50), window1, false);
+    //image2->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "info.png")));
 
-    CGUIStaticImage* image3 = CreateStaticImage(CVector2D(100, 100), CVector2D(50, 50), window1, false);
-    image3->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "question.png")));
+    //CGUIStaticImage* image3 = CreateStaticImage(CVector2D(100, 100), CVector2D(50, 50), window1, false);
+    //image3->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "question.png")));
 
-    CGUIWindow* window2 = CreateWindow(CVector2D(100, 100), CVector2D(200, 200), nullptr, false, "Parent Window 2");
-    CGUIWindow* window3 = CreateWindow(CVector2D(200, 200), CVector2D(200, 200), nullptr, false, "Parent Window 3");
+    //CGUIWindow* window2 = CreateWindow(CVector2D(100, 100), CVector2D(200, 200), nullptr, false, "Parent Window 2");
+    //CGUIWindow* window3 = CreateWindow(CVector2D(200, 200), CVector2D(200, 200), nullptr, false, "Parent Window 3");
 
-    image1->BringToFront();
-    window1->BringToFront();
+    //image1->BringToFront();
+    //window1->BringToFront();
 
     // image1->MoveToBack();
     // window1->MoveToBack();
@@ -125,7 +125,7 @@ void CGUI_Impl::Draw()
         {
             CGUIElement* elem = (*e);
 
-            if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() == true)
+            if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() && elem->IsVisible())
             {
                 Draw(elem);
             }
@@ -171,10 +171,15 @@ void CGUI_Impl::Restore()
 
 CVector2D CGUI_Impl::GetResolution()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    (void)io;
+    if (m_hookedWindow == nullptr)
+        return {};
 
-    return CVector2D(io.DisplaySize.x, io.DisplaySize.y);
+    RECT rect;
+
+    if (!GetWindowRect(m_hookedWindow, &rect))
+        return {};
+
+    return CVector2D(rect.right - rect.left, rect.bottom - rect.top);
 }
 
 void CGUI_Impl::AddElement(CGUIElement* element)
@@ -199,7 +204,7 @@ void CGUI_Impl::SetElementIndex(CGUIElement* element, int index)
     {
         CGUIElement* elem = (*e);
 
-        if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() == true && elem->GetID() == id)
+        if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() && elem->GetID() == id)
         {
             m_guiElements.erase(e);
             m_guiElements.insert(m_guiElements.begin() + (index + nonRootCount) - 1, element);
@@ -223,7 +228,7 @@ int CGUI_Impl::GetElementIndex(CGUIElement* element)
     {
         CGUIElement* elem = (*e);
 
-        if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() == true)
+        if (elem->GetParent() == nullptr && elem->IsRenderingEnabled())
         {
             if (elem->GetID() == id)
             {
