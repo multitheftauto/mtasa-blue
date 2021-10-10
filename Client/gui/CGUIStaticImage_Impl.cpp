@@ -9,23 +9,25 @@
 
 #include "StdInc.h"
 
-#include <core/CRenderItemManagerInterface.h>
-#include <core/CGraphicsInterface.h>
-
 CGUIStaticImage_Impl::CGUIStaticImage_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative)
     : CGUIElement_Impl(pGUI, pParent, pos, size, relative)
 {
     m_type = CGUIType::STATICIMAGE;
 
-    m_textureItem = nullptr;
+    m_texture = nullptr;
 }
 
 void CGUIStaticImage_Impl::Begin()
 {
     CGUIElement_Impl::Begin();
 
-    if (m_textureItem != nullptr)
-        ImGui::Image((void*)m_textureItem->m_pD3DTexture, ImVec2(m_size.fX, m_size.fY));
+    if (m_texture)
+    {
+        IDirect3DBaseTexture9* d3dTexture = m_texture->GetD3DTexture();
+
+        if (d3dTexture)
+            ImGui::Image((void*)d3dTexture, ImVec2(m_size.fX, m_size.fY));
+    }
 }
 
 void CGUIStaticImage_Impl::End()
@@ -33,18 +35,18 @@ void CGUIStaticImage_Impl::End()
     CGUIElement_Impl::End();
 }
 
-bool CGUIStaticImage_Impl::LoadFromFile(std::string path)
+void CGUIStaticImage_Impl::LoadFromFile(std::string path)
 {
-    CGraphicsInterface* graphics = m_pManager->GetGraphicsInterface();
+    CGUITexture* texture = m_pManager->CreateTexture(m_size);
 
-    if (!graphics)
-        return false;
+    if (!texture)
+        return;
 
-    CTextureItem* textureItem = graphics->GetRenderItemManager()->CreateTexture(path, NULL, false, m_size.fX, m_size.fY);
+    texture->LoadFromFile(path);
+    m_texture = texture;
+}
 
-    if (!textureItem)
-        return false;
-
-    m_textureItem = textureItem;
-    return true;
+void CGUIStaticImage_Impl::LoadFromTexture(CGUITexture* texture)
+{
+    m_texture = texture;
 }

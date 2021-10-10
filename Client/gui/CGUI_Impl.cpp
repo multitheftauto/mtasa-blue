@@ -404,6 +404,11 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel(CVector2D pos, CVector2D size, CGUIEleme
     return element;
 }
 
+CGUITexture* CGUI_Impl::CreateTexture(CVector2D size)
+{
+    return new CGUITexture_Impl(this, nullptr, {}, size, false);
+}
+
 CGUIWindow* CGUI_Impl::CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
 {
     CGUIWindow* element = new CGUIWindow_Impl(this, parent, pos, size, relative, title);

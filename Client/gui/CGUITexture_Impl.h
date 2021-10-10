@@ -9,25 +9,24 @@
 
 #pragma once
 
-#include <gui/CGUIStaticImage.h>
+#include <gui/CGUITexture.h>
 #include "CGUIElement_Impl.h"
 
-class CGUITexture;
+class CTextureItem;
 
-class CGUIStaticImage_Impl : public CGUIStaticImage, public CGUIElement_Impl
+class CGUITexture_Impl : public CGUITexture, public CGUIElement_Impl
 {
 public:
-    CGUIStaticImage_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative);
+    CGUITexture_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative);
 
     void Begin();
     void End();
 
-    CGUITexture* GetTexture() { return m_texture; }
+    IDirect3DBaseTexture9* GetD3DTexture();
 
     void LoadFromFile(std::string path);
-    void LoadFromTexture(CGUITexture* texture);
 
 #include "CGUIElement_Inc.h"
 private:
-    CGUITexture* m_texture;
+    CTextureItem* m_textureItem;
 };

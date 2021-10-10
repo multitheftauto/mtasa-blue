@@ -24,6 +24,7 @@
 #include "CGUIScrollpane.h"
 #include "CGUIStaticImage.h"
 #include "CGUITabPanel.h"
+#include "CGUITexture.h"
 #include "CGUIWindow.h"
 
 #include <../Shared/sdk/CRect2D.h>
@@ -67,6 +68,7 @@ public:
     virtual CGUIScrollpane*  CreateScrollpane(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUIStaticImage* CreateStaticImage(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUITabPanel*    CreateTabPanel(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
+    virtual CGUITexture*     CreateTexture(CVector2D size) = 0;
     virtual CGUIWindow* CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false, std::string title = "Window") = 0;
 
     virtual void CreateDemo() = 0;

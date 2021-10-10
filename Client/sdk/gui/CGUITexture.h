@@ -9,23 +9,16 @@
 
 #pragma once
 
-enum CGUIType
+#include "CGUIElement.h"
+
+class CTextureItem;
+
+class CGUITexture : public CGUIElement
 {
-    BROWSER,
-    BUTTON,
-    CHECKBOX,
-    COMBOBOX,
-    EDIT,
-    ELEMENT,
-    GRIDLIST,
-    LABEL,
-    MEMO,
-    PROGRESSBAR,
-    RADIOBUTTON,
-    SCROLLBAR,
-    SCROLLPANE,
-    STATICIMAGE,
-    TABPANEL,
-    TEXTURE,
-    WINDOW,
+public:
+    virtual ~CGUITexture(){};
+
+    virtual IDirect3DBaseTexture9* GetD3DTexture() = 0;
+
+    virtual void LoadFromFile(std::string path) = 0;
 };

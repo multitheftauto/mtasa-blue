@@ -11,14 +11,15 @@
 
 #include "CGUIElement.h"
 
-class CTextureItem;
+class CGUITexture;
 
 class CGUIStaticImage : public CGUIElement
 {
 public:
     virtual ~CGUIStaticImage(){};
 
-    virtual CTextureItem* GetTexture() = 0;
+    virtual CGUITexture* GetTexture() = 0;
 
-    virtual bool LoadFromFile(std::string path) = 0;
+    virtual void LoadFromFile(std::string path) = 0;
+    virtual void LoadFromTexture(CGUITexture* texture) = 0;
 };
