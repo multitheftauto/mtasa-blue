@@ -162,6 +162,16 @@ void RemoveRenderFunction(int index)
     CGUIElement_Impl::RemoveRenderFunction(index);
 };
 
+void SetRenderingEnabled(bool state)
+{
+    CGUIElement_Impl::SetRenderingEnabled(state);
+};
+
+bool IsRenderingEnabled() const
+{
+    return CGUIElement_Impl::IsRenderingEnabled();
+};
+
 void DemoHookTest()
 {
     CGUIElement_Impl::DemoHookTest();

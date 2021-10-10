@@ -350,3 +350,13 @@ std::string CGUIElement_Impl::GetText()
 {
     return m_text;
 }
+
+void CGUIElement_Impl::SetRenderingEnabled(bool state)
+{
+    m_render = state;
+}
+
+bool CGUIElement_Impl::IsRenderingEnabled() const
+{
+    return m_render;
+}

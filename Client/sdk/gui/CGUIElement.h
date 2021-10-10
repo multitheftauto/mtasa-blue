@@ -67,6 +67,9 @@ public:
     virtual int  AddRenderFunction(std::function<void()> renderFunction) = 0;
     virtual void RemoveRenderFunction(int index) = 0;
 
+    virtual void SetRenderingEnabled(bool state) = 0;
+    virtual bool IsRenderingEnabled() const = 0;
+
     virtual void Destroy() = 0;
     virtual bool IsDestroyed() = 0;
 

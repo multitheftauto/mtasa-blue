@@ -44,7 +44,7 @@ public:
     CGUIScrollpane*  CreateScrollpane(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false);
     CGUIStaticImage* CreateStaticImage(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false);
     CGUITabPanel*    CreateTabPanel(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false);
-    CGUITexture*     CreateTexture(CVector2D size);
+    CGUITexture*     CreateTexture(CVector2D size, bool relative = false);
     CGUIWindow*      CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false, std::string title = "Window");
 
     bool ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam);

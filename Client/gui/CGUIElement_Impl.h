@@ -70,6 +70,9 @@ public:
     void Destroy();
     bool IsDestroyed();
 
+    void SetRenderingEnabled(bool state);
+    bool IsRenderingEnabled() const;
+
     void DemoHookTest();
 
 protected:
@@ -95,6 +98,8 @@ protected:
 
     CVector2D m_position = {};
     CVector2D m_size = {};
+
+    bool m_render = true;
 
     bool m_rendering = false;
     bool m_deleted = false;

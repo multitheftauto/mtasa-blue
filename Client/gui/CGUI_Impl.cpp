@@ -63,8 +63,8 @@ void CGUI_Impl::CreateDemo()
     image1->BringToFront();
     window1->BringToFront();
 
-    //image1->MoveToBack();
-    //window1->MoveToBack();
+    // image1->MoveToBack();
+    // window1->MoveToBack();
 }
 
 bool CGUI_Impl::ProcessWindowMessage(HWND wnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -125,7 +125,7 @@ void CGUI_Impl::Draw()
         {
             CGUIElement* elem = (*e);
 
-            if (elem->GetParent() == nullptr)
+            if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() == true)
             {
                 Draw(elem);
             }
@@ -184,11 +184,12 @@ void CGUI_Impl::AddElement(CGUIElement* element)
 
 void CGUI_Impl::SetElementIndex(CGUIElement* element, int index)
 {
-    std::string id = element->GetID();
-
     // exclude all numbers below 1, excluding -1
     if (index < 1 && index != -1)
         return;
+
+    std::string id = element->GetID();
+    int         nonRootCount = 0;
 
     if (index == -1)
         index = m_guiElements.size();
@@ -198,13 +199,15 @@ void CGUI_Impl::SetElementIndex(CGUIElement* element, int index)
     {
         CGUIElement* elem = (*e);
 
-        if (elem->GetID() == id)
+        if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() == true && elem->GetID() == id)
         {
             m_guiElements.erase(e);
-            m_guiElements.insert(m_guiElements.begin() + (index - 1), element);
+            m_guiElements.insert(m_guiElements.begin() + (index + nonRootCount) - 1, element);
 
             return;
         }
+        else
+            ++nonRootCount;
 
         ++e;
     }
@@ -220,7 +223,7 @@ int CGUI_Impl::GetElementIndex(CGUIElement* element)
     {
         CGUIElement* elem = (*e);
 
-        if (elem->GetParent() == nullptr)
+        if (elem->GetParent() == nullptr && elem->IsRenderingEnabled() == true)
         {
             if (elem->GetID() == id)
             {
@@ -404,9 +407,17 @@ CGUITabPanel* CGUI_Impl::CreateTabPanel(CVector2D pos, CVector2D size, CGUIEleme
     return element;
 }
 
-CGUITexture* CGUI_Impl::CreateTexture(CVector2D size)
+CGUITexture* CGUI_Impl::CreateTexture(CVector2D size, bool relative)
 {
-    return new CGUITexture_Impl(this, nullptr, {}, size, false);
+    CGUITexture* element = new CGUITexture_Impl(this, nullptr, {}, size, relative);
+    element->SetRenderingEnabled(false);
+
+    if (!element)
+        return nullptr;
+
+    AddElement(element);
+
+    return element;
 }
 
 CGUIWindow* CGUI_Impl::CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string title)
