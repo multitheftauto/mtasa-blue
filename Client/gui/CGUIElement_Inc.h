@@ -112,14 +112,24 @@ void MoveToBack()
     CGUIElement_Impl::MoveToBack();
 };
 
-void SetFlags(ImGuiWindowFlags flags)
+void SetFlag(ImGuiWindowFlags flag, bool state)
 {
-    CGUIElement_Impl::SetFlags(flags);
+    CGUIElement_Impl::SetFlag(flag, state);
 };
 
-ImGuiWindowFlags GetFlags()
+void ResetFlags()
+{
+    CGUIElement_Impl::ResetFlags();
+};
+
+std::set<ImGuiWindowFlags> GetFlags()
 {
     return CGUIElement_Impl::GetFlags();
+};
+
+int GetFlagBits()
+{
+    return CGUIElement_Impl::GetFlagBits();
 };
 
 bool IsDestroyed()

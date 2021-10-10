@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <set>
 #include <../Shared/sdk/CVector2D.h>
 #include "CGUITypes.h"
 
@@ -52,8 +53,11 @@ public:
     virtual void BringToFront() = 0;
     virtual void MoveToBack() = 0;
 
-    virtual void             SetFlags(ImGuiWindowFlags flags) = 0;
-    virtual ImGuiWindowFlags GetFlags() = 0;
+    virtual void SetFlag(ImGuiWindowFlags flag, bool state) = 0;
+    virtual void ResetFlags() = 0;
+
+    virtual std::set<ImGuiWindowFlags> GetFlags() = 0;
+    virtual int                        GetFlagBits() = 0;
 
     virtual void ProcessPosition() = 0;
     virtual void ProcessSize() = 0;

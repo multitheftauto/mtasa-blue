@@ -24,6 +24,12 @@ CGUIElement_Impl::CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVecto
 
     m_uid = std::to_string(GetTickCount32()) + ss.str();
 
+    // Set flags
+    SetFlag(ImGuiWindowFlags_NoDecoration, true);
+    SetFlag(ImGuiWindowFlags_NoMove, true);
+    SetFlag(ImGuiWindowFlags_NoResize, true);
+    SetFlag(ImGuiWindowFlags_NoBringToFrontOnFocus, true);
+
     SetParent(pParent);
     SetPosition(pos, relative);
     SetSize(size, relative);
@@ -184,12 +190,36 @@ void CGUIElement_Impl::MoveToBack()
     SetIndex(1);
 }
 
-void CGUIElement_Impl::SetFlags(ImGuiWindowFlags flags)
+void CGUIElement_Impl::SetFlag(ImGuiWindowFlags flag, bool state)
 {
-    m_flags = flags;
+    auto iter = m_flags.find(flag);
+    bool hasFlag = (iter != m_flags.end());
+
+    if (!hasFlag && state)
+        m_flags.insert(flag);
+    else if (hasFlag && !state)
+        m_flags.erase(iter);
 }
 
-ImGuiWindowFlags CGUIElement_Impl::GetFlags()
+void CGUIElement_Impl::ResetFlags()
+{
+    m_flags.erase(m_flags.begin(), m_flags.end());
+}
+
+int CGUIElement_Impl::GetFlagBits()
+{
+    int bits = 0;
+
+    std::set<ImGuiWindowFlags>::iterator flag;
+    for (flag = m_flags.begin(); flag != m_flags.end(); ++flag)
+    {
+        bits |= (*flag);
+    }
+
+    return bits;
+}
+
+std::set<ImGuiWindowFlags> CGUIElement_Impl::GetFlags()
 {
     return m_flags;
 }
@@ -208,7 +238,7 @@ void CGUIElement_Impl::Begin()
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, m_borderSize);
         {
-            ImGui::Begin(id, (bool*)0, m_flags);
+            ImGui::Begin(id, (bool*)0, GetFlagBits());
         }
         ImGui::PopStyleVar();
     }

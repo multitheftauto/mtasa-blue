@@ -43,8 +43,11 @@ public:
 
     CGUIType GetType();
 
-    void             SetFlags(ImGuiWindowFlags flags);
-    ImGuiWindowFlags GetFlags();
+    void SetFlag(ImGuiWindowFlags flag, bool state);
+    void ResetFlags();
+
+    std::set<ImGuiWindowFlags> GetFlags();
+    int                        GetFlagBits();
 
     void ProcessPosition();
     void ProcessSize();
@@ -88,8 +91,9 @@ protected:
     std::string m_text = {};
     std::string m_uid;
 
-    CGUIType         m_type = CGUIType::ELEMENT;
-    ImGuiWindowFlags m_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    CGUIType m_type = CGUIType::ELEMENT;
+
+    std::set<ImGuiWindowFlags> m_flags = {};
 
     float m_borderSize = 0.0f;
 
