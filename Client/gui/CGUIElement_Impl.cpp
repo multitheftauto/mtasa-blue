@@ -25,6 +25,7 @@ CGUIElement_Impl::CGUIElement_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVecto
     m_uid = std::to_string(GetTickCount32()) + ss.str();
 
     // Set flags
+    SetFlag(ImGuiWindowFlags_NoBackground, true);
     SetFlag(ImGuiWindowFlags_NoDecoration, true);
     SetFlag(ImGuiWindowFlags_NoMove, true);
     SetFlag(ImGuiWindowFlags_NoResize, true);
@@ -237,10 +238,11 @@ void CGUIElement_Impl::Begin()
         ProcessSize();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, m_borderSize);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_padding.fX, m_padding.fY));
         {
             ImGui::Begin(id, (bool*)0, GetFlagBits());
         }
-        ImGui::PopStyleVar();
+        ImGui::PopStyleVar(2);
     }
     else
     {
@@ -389,4 +391,14 @@ void CGUIElement_Impl::SetRenderingEnabled(bool state)
 bool CGUIElement_Impl::IsRenderingEnabled() const
 {
     return m_render;
+}
+
+void CGUIElement_Impl::SetVisible(bool state)
+{
+    m_visible = state;
+}
+
+bool CGUIElement_Impl::IsVisible()
+{
+    return m_visible;
 }

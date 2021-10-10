@@ -186,3 +186,13 @@ void DemoHookTest()
 {
     CGUIElement_Impl::DemoHookTest();
 };
+
+void SetVisible(bool state)
+{
+    CGUIElement_Impl::SetVisible(state);
+};
+
+bool IsVisible()
+{
+    return CGUIElement_Impl::IsVisible();
+};

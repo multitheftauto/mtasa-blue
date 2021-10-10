@@ -76,6 +76,9 @@ public:
     void SetRenderingEnabled(bool state);
     bool IsRenderingEnabled() const;
 
+    void SetVisible(bool state);
+    bool IsVisible();
+
     void DemoHookTest();
 
 protected:
@@ -95,7 +98,8 @@ protected:
 
     std::set<ImGuiWindowFlags> m_flags = {};
 
-    float m_borderSize = 0.0f;
+    float     m_borderSize = 0.0f;
+    CVector2D m_padding = {};
 
     bool m_hasFrame = false;
     bool m_hasDynamicPosition = false;
@@ -104,6 +108,7 @@ protected:
     CVector2D m_size = {};
 
     bool m_render = true;
+    bool m_visible = true;
 
     bool m_rendering = false;
     bool m_deleted = false;

@@ -77,5 +77,8 @@ public:
     virtual void Destroy() = 0;
     virtual bool IsDestroyed() = 0;
 
+    virtual void SetVisible(bool state) = 0;
+    virtual bool IsVisible() = 0;
+
     virtual void DemoHookTest() = 0;
 };
