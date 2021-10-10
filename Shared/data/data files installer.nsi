@@ -17,8 +17,8 @@ Var Install_Dir
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
-    !define MAINT_VER "0"
+    !define MINOR_VER "5"
+    !define MAINT_VER "9"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -40,7 +40,7 @@ Var Install_Dir
 !define PRODUCT_NAME_NO_VER "MTA:SA"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
-!define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
+!define PRODUCT_WEB_SITE "https://www.multitheftauto.com"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
