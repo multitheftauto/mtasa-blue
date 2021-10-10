@@ -19,6 +19,7 @@ public:
     virtual ~CGUITexture(){};
 
     virtual IDirect3DBaseTexture9* GetD3DTexture() = 0;
+    virtual CVector2D              GetNativeSize() = 0;
 
     virtual void LoadFromFile(std::string path) = 0;
 };

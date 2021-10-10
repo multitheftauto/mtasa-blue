@@ -42,6 +42,7 @@ void CGUITexture_Impl::LoadFromFile(std::string path)
     if (!textureItem)
         return;
 
+    textureItem->m_TextureAddress = TADDRESS_MIRROR;
     m_textureItem = textureItem;
 }
 
@@ -51,5 +52,13 @@ IDirect3DBaseTexture9* CGUITexture_Impl::GetD3DTexture()
         return m_textureItem->m_pD3DTexture;
 
     return nullptr;
+}
+
+CVector2D CGUITexture_Impl::GetNativeSize()
+{
+    if (!m_textureItem)
+        return {};
+
+    return CVector2D(m_textureItem->m_uiSurfaceSizeX, m_textureItem->m_uiSurfaceSizeY);
 }
 

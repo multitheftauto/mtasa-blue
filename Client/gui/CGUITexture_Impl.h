@@ -23,6 +23,7 @@ public:
     void End();
 
     IDirect3DBaseTexture9* GetD3DTexture();
+    CVector2D GetNativeSize();
 
     void LoadFromFile(std::string path);
 
