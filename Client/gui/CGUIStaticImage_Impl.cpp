@@ -26,7 +26,7 @@ void CGUIStaticImage_Impl::Begin()
         IDirect3DBaseTexture9* d3dTexture = m_texture->GetD3DTexture();
 
         if (d3dTexture)
-            ImGui::Image((void*)d3dTexture, ImVec2(m_size.fX, m_size.fY));
+            ImGui::Image((void*)d3dTexture, ImVec2(m_size.fX, m_size.fY), ImVec2(0, 0), ImVec2(1, 1), ImVec4(1, 1, 1, GetAlpha() / 255), ImVec4(0, 0, 0, 0));
     }
 }
 
