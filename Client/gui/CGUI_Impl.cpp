@@ -26,6 +26,8 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
 
+    io.MouseDrawCursor = true;
+
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
