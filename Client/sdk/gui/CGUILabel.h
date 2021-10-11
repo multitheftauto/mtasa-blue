@@ -15,4 +15,7 @@ class CGUILabel : public CGUIElement
 {
 public:
     virtual ~CGUILabel(){};
+
+    virtual CVector2D GetTextSize() = 0;
+    virtual float       GetTextExtent() = 0;
 };

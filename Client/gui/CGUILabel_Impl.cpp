@@ -26,3 +26,27 @@ void CGUILabel_Impl::End()
 {
     CGUIElement_Impl::End();
 }
+
+CVector2D CGUILabel_Impl::GetTextSize()
+{
+    // Start the Dear ImGui frame
+    ImGui_ImplDX9_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+
+    ImGui::NewFrame();
+
+    Begin();
+
+    ImVec2 size = ImGui::CalcTextSize(m_text.c_str());
+
+    End();
+
+    ImGui::EndFrame();
+
+    return CVector2D(size.x, size.y);
+}
+
+float CGUILabel_Impl::GetTextExtent()
+{
+    return GetTextSize().fX;
+}

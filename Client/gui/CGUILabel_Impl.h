@@ -20,6 +20,9 @@ public:
     void Begin();
     void End();
 
+    CVector2D GetTextSize();
+    float     GetTextExtent();
+
 #include "CGUIElement_Inc.h"
 private:
 };
