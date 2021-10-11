@@ -80,5 +80,8 @@ public:
     virtual void SetVisible(bool state) = 0;
     virtual bool IsVisible() = 0;
 
+    virtual void SetAlpha(int alpha) = 0;
+    virtual int  GetAlpha() = 0;
+
     virtual void DemoHookTest() = 0;
 };

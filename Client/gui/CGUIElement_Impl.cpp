@@ -402,3 +402,13 @@ bool CGUIElement_Impl::IsVisible()
 {
     return m_visible;
 }
+
+void CGUIElement_Impl::SetAlpha(int alpha)
+{
+    m_alpha = alpha;
+}
+
+int CGUIElement_Impl::GetAlpha()
+{
+    return m_alpha;
+}

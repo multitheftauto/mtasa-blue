@@ -79,6 +79,9 @@ public:
     void SetVisible(bool state);
     bool IsVisible();
 
+    void SetAlpha(int alpha);
+    int GetAlpha();
+
     void DemoHookTest();
 
 protected:
@@ -106,6 +109,8 @@ protected:
 
     CVector2D m_position = {};
     CVector2D m_size = {};
+
+    int m_alpha = 255;
 
     bool m_render = true;
     bool m_visible = true;

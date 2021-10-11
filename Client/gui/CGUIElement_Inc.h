@@ -196,3 +196,15 @@ bool IsVisible()
 {
     return CGUIElement_Impl::IsVisible();
 };
+
+void SetAlpha(int alpha)
+{
+    CGUIElement_Impl::SetAlpha(alpha);
+}
+
+int GetAlpha()
+{
+    return CGUIElement_Impl::GetAlpha();
+}
+    
+
