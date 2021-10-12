@@ -32,7 +32,7 @@ struct sMenuItem
     int              drawPositionY;
     int              nativeSizeX;
     int              nativeSizeY;
-    //CGUIStaticImage* image; /* TODO AFTER CEGUI API REWRITE */
+    CGUIStaticImage* image; /* TODO AFTER CEGUI API REWRITE */
 };
 
 class CMainMenu
@@ -102,14 +102,14 @@ private:
 
     /* TODO AFTER CEGUI API REWRITE */
     CGUIStaticImage* m_pBackground;
-    //CGUIStaticImage* m_pLogo;
-    //CGUIStaticImage* m_pLatestNews;
-    //CGUIStaticImage* m_pFiller;
-    //CGUIStaticImage* m_pFiller2;
-    //CGUIStaticImage* m_pVersion;
-    //CGUIStaticImage* m_pMenuArea;
+    CGUIStaticImage* m_pLogo;
+    CGUIStaticImage* m_pLatestNews;
+    CGUIStaticImage* m_pFiller;
+    CGUIStaticImage* m_pFiller2;
+    CGUIStaticImage* m_pVersion;
+    CGUIStaticImage* m_pMenuArea;
 
-    //CGUIScrollPane* m_pCanvas; /* TODO AFTER CEGUI API REWRITE */
+    CGUIScrollpane* m_pCanvas; /* TODO AFTER CEGUI API REWRITE */
 
     std::deque<sMenuItem*> m_menuItems;
     std::set<sMenuItem*>   m_unhoveredItems;
@@ -161,23 +161,23 @@ private:
     unsigned long m_ulMoveStartTick;
 
     /* TODO AFTER CEGUI API REWRITE */
-    //CGUILabel* m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
-    //CGUILabel* m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];
-    //CGUILabel* m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
-    //CGUILabel* m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel* m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel* m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel* m_pNewsItemDateLabels[CORE_MTA_NEWS_ITEMS];
+    CGUILabel* m_pNewsItemNEWLabels[CORE_MTA_NEWS_ITEMS];
 
     /* TODO AFTER CEGUI API REWRITE */
-//#ifdef CI_BUILD
-//    std::unique_ptr<CGUITexture>     m_pFeatureBranchAlertTexture;
-//    std::unique_ptr<CGUIStaticImage> m_pFeatureBranchAlertImage;
-//    std::unique_ptr<CGUILabel>       m_pFeatureBranchAlertLabel;
-//#endif
-//
-//#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
-//    std::unique_ptr<CGUITexture> m_pAlertTexture;
-//    std::unique_ptr<CGUIStaticImage> m_pAlertImage;
-//    std::unique_ptr<CGUILabel> m_pAlertLabel;
-//#endif
+#ifdef CI_BUILD
+    std::unique_ptr<CGUITexture>     m_pFeatureBranchAlertTexture;
+    std::unique_ptr<CGUIStaticImage> m_pFeatureBranchAlertImage;
+    std::unique_ptr<CGUILabel>       m_pFeatureBranchAlertLabel;
+#endif
+
+#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
+    std::unique_ptr<CGUITexture> m_pAlertTexture;
+    std::unique_ptr<CGUIStaticImage> m_pAlertImage;
+    std::unique_ptr<CGUILabel> m_pAlertLabel;
+#endif
 
     // Fade states
     enum eFadeStates

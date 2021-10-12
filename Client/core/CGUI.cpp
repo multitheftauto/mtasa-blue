@@ -135,41 +135,48 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     /* TODO AFTER CEGUI API REWRITE */
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
+    if (pGUI->GetHookedWindow() == nullptr)
+        return;
+
     pGUI->CreateDemo();
 
     //// Create chatbox
     m_pChat = new CChat(pGUI, CVector2D(0.0125f, 0.015f));
-    //m_pChat->SetVisible(false, true);
+    m_pChat->SetVisible(false, true);
 
     //// Create the debug view
     m_pDebugView = new CDebugView(pGUI, CVector2D(0.23f, 0.785f));
-    //m_pDebugView->SetVisible(false, true);
+    m_pDebugView->SetVisible(false, true);
 
-    //// Create the overlayed version labels
-    //CVector2D ScreenSize = pGUI->GetResolution();
-    //SString   strText = "MTA:SA " MTA_DM_BUILDTAG_SHORT;
-    //if (_NETCODE_VERSION_BRANCH_ID != 0x04)
-    //    strText += SString(" (%X)", _NETCODE_VERSION_BRANCH_ID);
-    //m_pLabelVersionTag = reinterpret_cast<CGUILabel*>(pGUI->CreateLabel(strText));
-    //m_pLabelVersionTag->SetSize(CVector2D(m_pLabelVersionTag->GetTextExtent() + 5, 18));
-    //m_pLabelVersionTag->SetPosition(CVector2D(ScreenSize.fX - m_pLabelVersionTag->GetTextExtent() - 5, ScreenSize.fY - 15));
-    //m_pLabelVersionTag->SetAlpha(0.5f);
+    // Create the overlayed version labels
+    CVector2D ScreenSize = pGUI->GetResolution();
+    SString   strText = "MTA:SA " MTA_DM_BUILDTAG_SHORT;
+    if (_NETCODE_VERSION_BRANCH_ID != 0x04)
+        strText += SString(" (%X)", _NETCODE_VERSION_BRANCH_ID);
+
+    m_pLabelVersionTag = reinterpret_cast<CGUILabel*>(pGUI->CreateLabel({}, {}));
+    m_pLabelVersionTag->SetText(strText);
+
+    int textWidth = m_pLabelVersionTag->GetTextExtent();
+
+    m_pLabelVersionTag->SetSize(CVector2D(textWidth + 5, 18));
+    m_pLabelVersionTag->SetPosition(CVector2D(ScreenSize.fX - textWidth - 5, ScreenSize.fY - 15));
+    m_pLabelVersionTag->SetAlpha(0.5f * 255);
     //m_pLabelVersionTag->SetTextColor(255, 255, 255);
     //m_pLabelVersionTag->SetZOrderingEnabled(false);
-    //m_pLabelVersionTag->MoveToBack();
-    //m_pLabelVersionTag->SetVisible(false);
+    m_pLabelVersionTag->SetVisible(false);
 
     //// Create mainmenu
     m_pMainMenu = new CMainMenu(pGUI);
-    //m_pMainMenu->SetVisible(bGameIsAlreadyLoaded, !bGameIsAlreadyLoaded, false);
+    m_pMainMenu->SetVisible(bGameIsAlreadyLoaded, !bGameIsAlreadyLoaded, false);
 
     //// Create console
     m_pConsole = new CConsole(pGUI);
-    //m_pConsole->SetVisible(false);
+    m_pConsole->SetVisible(false);
 
-    //// Create our news headlines if we're already ingame
-    //if (bGameIsAlreadyLoaded)
-    //    m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
+    // Create our news headlines if we're already ingame
+    if (bGameIsAlreadyLoaded)
+        m_pMainMenu->GetNewsBrowser()->CreateHeadlines();
 }
 
 void CLocalGUI::CreateObjects(IUnknown* pDevice)
@@ -305,7 +312,7 @@ void CLocalGUI::Draw()
         else
         {
             /* TODO AFTER CEGUI API REWRITE */
-            //m_pLabelVersionTag->SetVisible(true);
+            m_pLabelVersionTag->SetVisible(true);
             //if (MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE)
             //    m_pLabelVersionTag->SetAlwaysOnTop(true);
         }
