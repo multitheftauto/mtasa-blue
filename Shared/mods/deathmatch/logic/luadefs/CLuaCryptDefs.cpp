@@ -235,8 +235,6 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsa
                                                                                         std::optional<CLuaFunctionRef> callback)
 {
     // size chceck (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
-    if (size <= 0)
-        throw std::invalid_argument("Invalid value for field 'size'");
     if (size < 128)
         throw std::invalid_argument("Size cannot be lower than 128 bits");
     if (size > 4096)
