@@ -801,6 +801,26 @@ void SharedUtil_Hash_Tests()
         TEST_END
     }
 
+    // RSA (keypair generation, encryption and decryption)
+    {
+        TEST_FUNCTION
+        std::pair<std::string, std::string> keypair = GenerateRsaKeyPair(keysize);
+        assert(!keypair.first.empty());
+        assert(!keypair.second.empty());
+        std::string encryptedData = RsaEncode(data, keypair.second);
+        std::string decryptedData = RsaDecode(encryptedData, keypair.first);
+        assert(data == decryptedData);
+        TEST_VARS
+        const std::string data;
+        const int     keysize;
+        TEST_DATA = {
+            {"Hello world", 128},
+            {"!@#$%^&*()_+|:<>", 2048},
+            {"Hello there", 4096},
+        };
+        TEST_END
+    }
+
     #define szTempFilename "hash_""\xD0""\x98""_test"
 
     // MD5
