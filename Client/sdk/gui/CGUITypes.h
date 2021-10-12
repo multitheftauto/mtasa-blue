@@ -29,3 +29,17 @@ enum CGUIType
     TEXTURE,
     WINDOW,
 };
+
+enum class CGUITextAlignHorizontal
+{
+    LEFT,
+    CENTER,
+    RIGHT
+};
+
+enum class CGUITextAlignVertical
+{
+    TOP,
+    MIDDLE,
+    BOTTOM
+};

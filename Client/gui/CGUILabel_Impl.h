@@ -23,6 +23,19 @@ public:
     CVector2D GetTextSize();
     float     GetTextExtent();
 
+    CColor GetTextColor();
+    void   SetTextColor(CColor color);
+    void   SetTextColor(int r, int g, int b, int a = 255);
+
+    CGUITextAlignHorizontal GetTextHorizontalAlign();
+    void                    SetTextHorizontalAlign(CGUITextAlignHorizontal align);
+
+    CGUITextAlignVertical GetTextVerticalAlign();
+    void                  SetTextVerticalAlign(CGUITextAlignVertical align);
+
 #include "CGUIElement_Inc.h"
 private:
+    CColor m_color = {255, 255, 255, 255};
+
+    std::pair<CGUITextAlignHorizontal, CGUITextAlignVertical> m_textAlign = {CGUITextAlignHorizontal::LEFT, CGUITextAlignVertical::TOP};
 };

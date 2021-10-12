@@ -29,6 +29,7 @@
 
 #include <../Shared/sdk/CRect2D.h>
 #include <../Shared/sdk/CVector2D.h>
+#include <../Shared/sdk/CColor.h>
 
 #undef CreateWindow            // mAcrosoft strikes again
 
