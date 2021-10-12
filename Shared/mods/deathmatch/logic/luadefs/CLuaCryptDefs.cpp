@@ -23,6 +23,7 @@ void CLuaCryptDefs::LoadFunctions()
         {"base64Encode", ArgumentParserWarn<false, Base64encode>},
         {"base64Decode", ArgumentParserWarn<false, Base64decode>},
         {"passwordHash", ArgumentParserWarn<false, PasswordHash>},
+        {"generateRsaKeyPair", ArgumentParser<GenerateRsaKeyPair>},
         {"passwordVerify", PasswordVerify},
         {"encodeString", EncodeString},
         {"decodeString", DecodeString},
@@ -230,6 +231,52 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
     return 1;
 }
 
+std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsaKeyPair(lua_State* const luaVM, int size,
+                                                                                        std::optional<CLuaFunctionRef> callback)
+{
+    // size chceck (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
+    if (size <= 0)
+        throw std::invalid_argument("Invalid value for field 'size'");
+    if (size < 128)
+        throw std::invalid_argument("Size cannot be lower than 128 bits");
+    if (size > 4096)
+        throw std::invalid_argument("Size cannot be further than 4096 bits");
+
+    if (callback.has_value())
+    {
+        // Async
+        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (pLuaMain)
+        {
+            CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, SString>>(
+                [size]
+                {
+                    // Execute time-consuming task
+                    return SharedUtil::GenerateRsaKeyPair(size);
+                },
+                [luaFunctionRef = callback.value()](std::pair<SString, SString> var)
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                    if (pLuaMain)
+                    {
+                        CLuaArguments arguments;
+
+                        arguments.PushString(var.first);
+                        arguments.PushString(var.second);
+
+                        arguments.Call(pLuaMain, luaFunctionRef);
+                    }
+                });
+        }
+    }
+    else
+    {
+        // Sync
+        return SharedUtil::GenerateRsaKeyPair(size);
+    }
+    return true;
+}
+
 int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 {
     StringEncryptFunction algorithm;
@@ -361,6 +408,74 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     lua_pushlstring(luaVM, result.second, result.second.length());
                 }
                 return 2;
+            }
+            case StringEncryptFunction::RSA:
+            {
+                std::string& key = options["key"];
+
+                if (key.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key]
+                            {
+                                std::string result;
+                                try
+                                {
+                                    result = SharedUtil::RsaEncode(data, key);
+                                }
+                                catch (const CryptoPP::Exception&)
+                                {
+                                }
+                                return result;
+                            },
+                            [luaFunctionRef](const SString result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result == nullptr)
+                                    {
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        arguments.PushString(result);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    std::string result;
+                    try
+                    {
+                        result = SharedUtil::RsaEncode(data, key);
+                    }
+                    catch (const CryptoPP::Exception&)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    lua_pushlstring(luaVM, result.c_str(), result.length());
+                }
+                return 1;
             }
             default:
             {
@@ -506,6 +621,74 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     try
                     {
                         result = SharedUtil::Aes128decode(data, key, iv);
+                    }
+                    catch (const CryptoPP::Exception&)
+                    {
+                        lua_pushboolean(luaVM, false);
+                        return 1;
+                    }
+                    lua_pushlstring(luaVM, result, result.length());
+                }
+                return 1;
+            }
+            case StringEncryptFunction::RSA:
+            {
+                SString& key = options["key"];
+
+                if (key.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                            [data, key]
+                            {
+                                SString result;
+                                try
+                                {
+                                    result = SharedUtil::RsaDecode(data, key);
+                                }
+                                catch (const CryptoPP::Exception&)
+                                {
+                                }
+                                return result;
+                            },
+                            [luaFunctionRef](const SString result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result == nullptr)
+                                    {
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        arguments.PushString(result);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua_pushboolean(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    SString result;
+                    try
+                    {
+                        result = SharedUtil::RsaDecode(data, key);
                     }
                     catch (const CryptoPP::Exception&)
                     {

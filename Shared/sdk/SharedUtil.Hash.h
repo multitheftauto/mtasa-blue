@@ -36,6 +36,7 @@ enum class StringEncryptFunction
 {
     TEA,
     AES128,
+    RSA,
 };
 
 namespace SharedUtil
