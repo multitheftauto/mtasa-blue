@@ -80,7 +80,7 @@ public:
     bool IsVisible();
 
     void SetAlpha(float alpha);
-    float  GetAlpha(bool clamp = false);
+    float  GetAlpha();
 
     CVector2D GetTextSize();
     float     GetTextExtent();

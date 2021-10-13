@@ -84,7 +84,7 @@ public:
     virtual bool IsVisible() = 0;
 
     virtual void SetAlpha(float alpha) = 0;
-    virtual float  GetAlpha(bool clamp = false) = 0;
+    virtual float  GetAlpha() = 0;
 
     virtual CVector2D GetTextSize() = 0;
     virtual float     GetTextExtent() = 0;

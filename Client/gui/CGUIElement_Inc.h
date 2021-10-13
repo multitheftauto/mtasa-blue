@@ -197,9 +197,9 @@ bool IsVisible()
     return CGUIElement_Impl::IsVisible();
 };
 
-float GetAlpha(bool clamp = false)
+float GetAlpha()
 {
-    return CGUIElement_Impl::GetAlpha(clamp);
+    return CGUIElement_Impl::GetAlpha();
 }
 
 void SetAlpha(float alpha)

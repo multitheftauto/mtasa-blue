@@ -443,12 +443,12 @@ bool CGUIElement_Impl::IsVisible()
 
 void CGUIElement_Impl::SetAlpha(float alpha)
 {
-    m_alpha = alpha;
+    m_alpha = Clamp<float>(0.f, alpha, 1.0f);
 }
 
-float CGUIElement_Impl::GetAlpha(bool clamp)
+float CGUIElement_Impl::GetAlpha()
 {
-    return clamp ? Clamp<float>(0.f, m_alpha, 1.0f) : m_alpha;
+    return m_alpha;
 }
 
 CVector2D CGUIElement_Impl::GetTextSize()

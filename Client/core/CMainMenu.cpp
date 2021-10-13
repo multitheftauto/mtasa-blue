@@ -128,7 +128,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pBackground =
         reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(CVector2D(iBackgroundX, iBackgroundY), CVector2D(iBackgroundSizeX, iBackgroundSizeY)));
     m_pBackground->LoadFromFile(CalcMTASAPath(PathJoin("MTA", CORE_MTA_STATIC_BG)));
-    m_pBackground->SetAlpha(255);
+    m_pBackground->SetAlpha(0);
     m_pBackground->SetVisible(false);
     //    m_pBackground->SetProperty("InheritsAlpha", "False");
     //    m_pBackground->SetPosition(CVector2D(iBackgroundX, iBackgroundY), false);
@@ -268,6 +268,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
         // Create 'NEW' sticker
         CGUILabel*& pLabel = m_pNewsItemNEWLabels[i];
         pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel({}, {}, m_pCanvas));
+        pLabel->SetAutoSizingEnabled(true);
         pLabel->SetText("NEW");
         // pLabel->SetFont("default-small");
         pLabel->SetTextColor(255, 0, 0);
@@ -403,6 +404,9 @@ void CMainMenu::SetMenuUnhovered()            // Dehighlight all our items
     /* TODO AFTER CEGUI API REWRITE */
     if (m_bIsIngame)            // CEGUI hack
     {
+        float fAlpha = m_pDisconnect->image->GetAlpha();
+        m_pDisconnect->image->SetAlpha(0.35f);
+        m_pDisconnect->image->SetAlpha(fAlpha);
         SetItemHoverProgress(m_pDisconnect, 0, false);
     }
     m_pHoveredItem = NULL;
@@ -426,7 +430,7 @@ void CMainMenu::Update()
     if (m_bFrameDelay)
     {
         m_bFrameDelay = false;
-        // return;
+        return;
     }
 
     // Get the game interface and the system state
@@ -502,7 +506,8 @@ void CMainMenu::Update()
 
             if (m_pHoveredItem)
             {
-                float fProgress = (m_pHoveredItem->image->GetAlpha(true) - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+                float alpha = m_pHoveredItem->image->GetAlpha();
+                float fProgress = (alpha - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
                 // Let's work out what the target progress should be by working out the time passed
                 fProgress = ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) + fProgress;
                 MapRemove(m_unhoveredItems, m_pHoveredItem);
@@ -519,10 +524,11 @@ void CMainMenu::Update()
         std::set<sMenuItem*>::iterator it = m_unhoveredItems.begin();
         while (it != m_unhoveredItems.end())
         {
-            float fProgress = ((*it)->image->GetAlpha(true) - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+            float alpha = (*it)->image->GetAlpha();
+            float fProgress = (alpha - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
             // Let's work out what the target progress should be by working out the time passed
             // Min of 0.5 progress fixes occasional graphical glitchekal
-            fProgress = (fProgress - ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
+            fProgress = fProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
             if (SetItemHoverProgress((*it), fProgress, false))
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;
@@ -1029,6 +1035,7 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
     // Reduced their size down to unhovered size.
     iSizeX = iSizeX * CORE_MTA_NORMAL_SCALE;
     iSizeY = iSizeY * CORE_MTA_NORMAL_SCALE;
+
     // Grab our draw position from which we enlarge from
     iPosY = iPosY - (iSizeY / 2);
 
