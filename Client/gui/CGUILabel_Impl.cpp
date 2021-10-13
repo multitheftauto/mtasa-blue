@@ -65,69 +65,10 @@ void CGUILabel_Impl::Begin()
         ImGui::SetCursorPosY(textPosition);
     }
 
-    ImGui::TextColored(ImVec4(m_color.R / 255, m_color.G / 255, m_color.B / 255, m_color.A / 255), m_text.c_str());
+    ImGui::TextColored(ImVec4(m_textColor.R / 255, m_textColor.G / 255, m_textColor.B / 255, m_textColor.A / 255), m_text.c_str());
 }
 
 void CGUILabel_Impl::End()
 {
     CGUIElement_Impl::End();
-}
-
-CVector2D CGUILabel_Impl::GetTextSize()
-{
-    // Start the Dear ImGui frame
-    ImGui_ImplDX9_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-
-    ImGui::NewFrame();
-
-    Begin();
-
-    ImVec2 size = ImGui::CalcTextSize(m_text.c_str());
-
-    End();
-
-    ImGui::EndFrame();
-
-    return CVector2D(size.x, size.y);
-}
-
-float CGUILabel_Impl::GetTextExtent()
-{
-    return GetTextSize().fX;
-}
-
-CColor CGUILabel_Impl::GetTextColor()
-{
-    return m_color;
-}
-
-void CGUILabel_Impl::SetTextColor(CColor color)
-{
-    m_color = color;
-}
-
-void CGUILabel_Impl::SetTextColor(int r, int g, int b, int a)
-{
-    m_color = CColor(Clamp(0, r, 255), Clamp(0, g, 255), Clamp(0, b, 255), Clamp(0, a, 255));
-}
-
-CGUITextAlignHorizontal CGUILabel_Impl::GetTextHorizontalAlign()
-{
-    return m_textAlign.first;
-}
-
-CGUITextAlignVertical CGUILabel_Impl::GetTextVerticalAlign()
-{
-    return m_textAlign.second;
-}
-
-void CGUILabel_Impl::SetTextHorizontalAlign(CGUITextAlignHorizontal align)
-{
-    m_textAlign.first = align;
-}
-
-void CGUILabel_Impl::SetTextVerticalAlign(CGUITextAlignVertical align)
-{
-    m_textAlign.second = align;
 }

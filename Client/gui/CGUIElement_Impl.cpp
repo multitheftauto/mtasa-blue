@@ -55,23 +55,9 @@ CGUIElement_Impl::~CGUIElement_Impl()
     m_renderFunctionIndexMap.clear();
 }
 
-void CGUIElement_Impl::DemoHookTest()
+std::string CGUIElement_Impl::GetID(bool imgui)
 {
-    ImGui::Text("Testing hook");
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Recreate demo", ImVec2(100, 30)))
-    {
-        // Destroy demo and create it again (assume we're the root demo window)
-        Destroy();
-        m_pManager->CreateDemo();
-    }
-}
-
-std::string CGUIElement_Impl::GetID()
-{
-    return m_uid;
+    return imgui ? (m_text + "###" + m_uid) : m_uid;
 }
 
 void CGUIElement_Impl::SetParent(CGUIElement* parent)
@@ -229,9 +215,20 @@ void CGUIElement_Impl::Begin()
 {
     m_rendering = true;
 
-    const char* id = (m_text + "###" + m_uid).c_str();
+    const char* id = GetID(true).c_str();
 
     ProcessPosition();
+
+    // Call PRE render functions (before Begin/BeginChild)
+    std::list<std::function<void()>>::const_iterator preFunc = m_preRenderFunctions.begin();
+
+    for (; preFunc != m_preRenderFunctions.end(); preFunc++)
+    {
+        if (IsDestroyed())            // Maybe we got destroyed in the previous render function
+            return;
+
+        (*preFunc)();
+    }
 
     if (m_pParent == nullptr)
     {
@@ -272,24 +269,40 @@ void CGUIElement_Impl::End()
     m_rendering = false;
 }
 
-int CGUIElement_Impl::AddRenderFunction(std::function<void()> renderFunction)
+int CGUIElement_Impl::AddRenderFunction(std::function<void()> renderFunction, bool preRender)
 {
-    auto iter = m_renderFunctions.insert(m_renderFunctions.end(), renderFunction);
-    int  index = ++m_numLifetimeRenderFunctions;
+    std::list<std::function<void()>>& list = preRender ? m_preRenderFunctions : m_renderFunctions;
+    std::map<int, decltype(list.cbegin())>& map = preRender ? m_preRenderFunctionIndexMap : m_renderFunctionIndexMap;
 
-    m_renderFunctionIndexMap[index] = iter;
+    auto iter = list.insert(list.end(), renderFunction);
+    int  index = preRender ? ++m_numLifetimePreRenderFunctions : ++m_numLifetimeRenderFunctions;
+
+    map[index] = iter;
     return index;
 }
 
-void CGUIElement_Impl::RemoveRenderFunction(int index)
+bool CGUIElement_Impl::RemoveRenderFunction(int index, bool preRender)
 {
-    if (m_renderFunctionIndexMap.count(index) <= 0)
-        return;
+    std::list<std::function<void()>>& list = preRender ? m_preRenderFunctions : m_renderFunctions;
+    std::map<int, decltype(list.cbegin())>& map = preRender ? m_preRenderFunctionIndexMap : m_renderFunctionIndexMap;
 
-    auto iter = m_renderFunctionIndexMap.at(index);
+    if (map.count(index) <= 0)
+        return false;
 
-    m_renderFunctions.erase(iter);
-    m_renderFunctionIndexMap.erase(index);
+    auto iter = map.at(index);
+
+    if (iter == list.end())
+        return false;
+
+    list.erase(iter);
+    map.erase(index);
+
+    return true;
+}
+
+std::list<std::function<void()>>& CGUIElement_Impl::GetRenderFunctions(bool preRender)
+{
+    return preRender ? m_preRenderFunctions : m_renderFunctions;
 }
 
 CGUIType CGUIElement_Impl::GetType()
@@ -311,6 +324,9 @@ void CGUIElement_Impl::SetPosition(CVector2D pos, bool relative)
 
 void CGUIElement_Impl::SetSize(CVector2D size, bool relative)
 {
+    if (m_autoSize)
+        return;
+
     if (relative)
     {
         CVector2D parentSize = m_pParent ? m_pParent->GetSize() : m_pManager->GetResolution();
@@ -318,6 +334,26 @@ void CGUIElement_Impl::SetSize(CVector2D size, bool relative)
     }
 
     m_size = size;
+
+    if (m_autoSize)
+    {
+        ImGui_ImplDX9_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+
+        ImGui::NewFrame();
+
+        Begin();
+
+        ImVec2 textSize = ImGui::CalcTextSize(m_text.c_str());
+
+        End();
+
+        ImGui::EndFrame();
+
+        m_size.fX = (size.fX > textSize.x) ? size.fX : textSize.x;
+        m_size.fY = (size.fY > textSize.y) ? size.fY : textSize.y;
+    }
+
     m_updateSize = true;
 }
 
@@ -347,8 +383,10 @@ void CGUIElement_Impl::ProcessPosition()
 
 void CGUIElement_Impl::ProcessSize()
 {
-    if (m_updateSize)
+    if (m_updateSize && m_pParent == nullptr)
         ImGui::SetNextWindowSize(ImVec2(m_size.fX, m_size.fY));
+
+
 
     m_updateSize = false;
 }
@@ -403,12 +441,81 @@ bool CGUIElement_Impl::IsVisible()
     return m_visible;
 }
 
-void CGUIElement_Impl::SetAlpha(int alpha)
+void CGUIElement_Impl::SetAlpha(float alpha)
 {
     m_alpha = alpha;
 }
 
-int CGUIElement_Impl::GetAlpha()
+float CGUIElement_Impl::GetAlpha(bool clamp)
 {
-    return m_alpha;
+    return clamp ? Clamp<float>(0.f, m_alpha, 1.0f) : m_alpha;
+}
+
+CVector2D CGUIElement_Impl::GetTextSize()
+{
+    // Start the Dear ImGui frame
+    ImGui_ImplDX9_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+
+    ImGui::NewFrame();
+
+    Begin();
+
+    ImVec2 size = ImGui::CalcTextSize(m_text.c_str());
+
+    End();
+
+    ImGui::EndFrame();
+
+    return CVector2D(size.x, size.y);
+}
+
+float CGUIElement_Impl::GetTextExtent()
+{
+    return GetTextSize().fX;
+}
+
+CColor CGUIElement_Impl::GetTextColor()
+{
+    return m_textColor;
+}
+
+void CGUIElement_Impl::SetTextColor(CColor color)
+{
+    m_textColor = color;
+}
+
+void CGUIElement_Impl::SetTextColor(int r, int g, int b, int a)
+{
+    m_textColor = CColor(Clamp(0, r, 255), Clamp(0, g, 255), Clamp(0, b, 255), Clamp(0, a, 255));
+}
+
+CGUITextAlignHorizontal CGUIElement_Impl::GetTextHorizontalAlign()
+{
+    return m_textAlign.first;
+}
+
+CGUITextAlignVertical CGUIElement_Impl::GetTextVerticalAlign()
+{
+    return m_textAlign.second;
+}
+
+void CGUIElement_Impl::SetTextHorizontalAlign(CGUITextAlignHorizontal align)
+{
+    m_textAlign.first = align;
+}
+
+void CGUIElement_Impl::SetTextVerticalAlign(CGUITextAlignVertical align)
+{
+    m_textAlign.second = align;
+}
+
+void CGUIElement_Impl::SetAutoSizingEnabled(bool state)
+{
+    m_autoSize = state;
+}
+
+bool CGUIElement_Impl::IsAutoSizingEnabled()
+{
+    return m_autoSize;
 }

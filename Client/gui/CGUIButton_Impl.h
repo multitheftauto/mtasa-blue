@@ -15,7 +15,7 @@
 class CGUIButton_Impl : public CGUIButton, public CGUIElement_Impl
 {
 public:
-    CGUIButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative);
+    CGUIButton_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, CVector2D pos, CVector2D size, bool relative, std::string text);
 
     void Begin();
     void End();

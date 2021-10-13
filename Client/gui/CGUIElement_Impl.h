@@ -22,7 +22,7 @@ public:
     void Begin();
     void End();
 
-    std::string GetID();
+    std::string GetID(bool imgui = false);
 
     void SetPosition(CVector2D pos, bool relative = false);
     void SetSize(CVector2D size, bool relative = false);
@@ -58,8 +58,8 @@ public:
     void SetDynamicPositionEnabled(bool state);
     bool GetDynamicPositionEnabled();
 
-    int  AddRenderFunction(std::function<void()> renderFunction);
-    void RemoveRenderFunction(int index);
+    int  AddRenderFunction(std::function<void()> renderFunction, bool preRender = false);
+    bool RemoveRenderFunction(int index, bool preRender = false);
 
     void SetIndex(int index);
     void SetChildIndex(CGUIElement* child, int index);
@@ -79,10 +79,26 @@ public:
     void SetVisible(bool state);
     bool IsVisible();
 
-    void SetAlpha(int alpha);
-    int GetAlpha();
+    void SetAlpha(float alpha);
+    float  GetAlpha(bool clamp = false);
 
-    void DemoHookTest();
+    CVector2D GetTextSize();
+    float     GetTextExtent();
+
+    CColor GetTextColor();
+    void   SetTextColor(CColor color);
+    void   SetTextColor(int r, int g, int b, int a = 255);
+
+    CGUITextAlignHorizontal GetTextHorizontalAlign();
+    void                    SetTextHorizontalAlign(CGUITextAlignHorizontal align);
+
+    CGUITextAlignVertical GetTextVerticalAlign();
+    void                  SetTextVerticalAlign(CGUITextAlignVertical align);
+
+    void SetAutoSizingEnabled(bool state);
+    bool IsAutoSizingEnabled();
+
+    std::list<std::function<void()>>& GetRenderFunctions(bool preRender = false);
 
 protected:
     CGUI_Impl*   m_pManager = nullptr;
@@ -93,6 +109,10 @@ protected:
     std::list<std::function<void()>>                    m_renderFunctions = {};
     std::map<int, decltype(m_renderFunctions.cbegin())> m_renderFunctionIndexMap;
     int                                                 m_numLifetimeRenderFunctions = 0;
+
+    std::list<std::function<void()>>                       m_preRenderFunctions = {};
+    std::map<int, decltype(m_preRenderFunctions.cbegin())> m_preRenderFunctionIndexMap;
+    int                                                    m_numLifetimePreRenderFunctions = 0;
 
     std::string m_text = {};
     std::string m_uid;
@@ -110,7 +130,7 @@ protected:
     CVector2D m_position = {};
     CVector2D m_size = {};
 
-    int m_alpha = 255;
+    float m_alpha = 255.f;
 
     bool m_render = true;
     bool m_visible = true;
@@ -122,4 +142,10 @@ protected:
     bool m_updateSize = false;
 
     bool m_bringToFront = false;
+
+    CColor m_textColor = {255, 255, 255, 255};
+
+    std::pair<CGUITextAlignHorizontal, CGUITextAlignVertical> m_textAlign = {CGUITextAlignHorizontal::LEFT, CGUITextAlignVertical::TOP};
+
+    bool m_autoSize = false;
 };

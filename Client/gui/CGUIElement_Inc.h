@@ -7,9 +7,9 @@
  *
  *****************************************************************************/
 
-std::string GetID()
+std::string GetID(bool imgui = false)
 {
-    return CGUIElement_Impl::GetID();
+    return CGUIElement_Impl::GetID(imgui);
 };
 
 void SetText(std::string text)
@@ -162,14 +162,19 @@ bool GetDynamicPositionEnabled()
     return CGUIElement_Impl::GetDynamicPositionEnabled();
 };
 
-int AddRenderFunction(std::function<void()> renderFunction)
+int AddRenderFunction(std::function<void()> renderFunction, bool preRender = false)
 {
-    return CGUIElement_Impl::AddRenderFunction(renderFunction);
+    return CGUIElement_Impl::AddRenderFunction(renderFunction, preRender);
 };
 
-void RemoveRenderFunction(int index)
+bool RemoveRenderFunction(int index, bool preRender = false)
 {
-    CGUIElement_Impl::RemoveRenderFunction(index);
+    return CGUIElement_Impl::RemoveRenderFunction(index, preRender);
+};
+
+std::list<std::function<void()>>& GetRenderFunctions(bool preRender = false)
+{
+    return CGUIElement_Impl::GetRenderFunctions(preRender);
 };
 
 void SetRenderingEnabled(bool state)
@@ -182,11 +187,6 @@ bool IsRenderingEnabled() const
     return CGUIElement_Impl::IsRenderingEnabled();
 };
 
-void DemoHookTest()
-{
-    CGUIElement_Impl::DemoHookTest();
-};
-
 void SetVisible(bool state)
 {
     CGUIElement_Impl::SetVisible(state);
@@ -197,14 +197,67 @@ bool IsVisible()
     return CGUIElement_Impl::IsVisible();
 };
 
-void SetAlpha(int alpha)
+float GetAlpha(bool clamp = false)
+{
+    return CGUIElement_Impl::GetAlpha(clamp);
+}
+
+void SetAlpha(float alpha)
 {
     CGUIElement_Impl::SetAlpha(alpha);
 }
 
-int GetAlpha()
+CVector2D GetTextSize()
 {
-    return CGUIElement_Impl::GetAlpha();
+    return CGUIElement_Impl::GetTextSize();
 }
-    
 
+float GetTextExtent()
+{
+    return CGUIElement_Impl::GetTextExtent();
+}
+
+CColor GetTextColor()
+{
+    return CGUIElement_Impl::GetTextColor();
+}
+
+void SetTextColor(CColor color)
+{
+    CGUIElement_Impl::SetTextColor(color);
+}
+
+void SetTextColor(int r, int g, int b, int a = 255)
+{
+    CGUIElement_Impl::SetTextColor(r, g, b, a);
+}
+
+CGUITextAlignHorizontal GetTextHorizontalAlign()
+{
+    return CGUIElement_Impl::GetTextHorizontalAlign();
+}
+
+void SetTextHorizontalAlign(CGUITextAlignHorizontal align)
+{
+    CGUIElement_Impl::SetTextHorizontalAlign(align);
+}
+
+CGUITextAlignVertical GetTextVerticalAlign()
+{
+    return CGUIElement_Impl::GetTextVerticalAlign();
+}
+
+void SetTextVerticalAlign(CGUITextAlignVertical align)
+{
+    CGUIElement_Impl::SetTextVerticalAlign(align);
+}
+
+void SetAutoSizingEnabled(bool state)
+{
+    CGUIElement_Impl::SetAutoSizingEnabled(state);
+}
+
+bool IsAutoSizingEnabled()
+{
+    return CGUIElement_Impl::IsAutoSizingEnabled();
+}

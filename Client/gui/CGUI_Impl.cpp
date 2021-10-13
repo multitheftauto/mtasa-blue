@@ -48,22 +48,22 @@ CGUI_Impl::~CGUI_Impl()
 
 void CGUI_Impl::CreateDemo()
 {
-    //CGUIWindow* window1 = CreateWindow(CVector2D(0, 0), CVector2D(200, 200), nullptr, false, "Parent Window 1");
+    // CGUIWindow* window1 = CreateWindow(CVector2D(0, 0), CVector2D(200, 200), nullptr, false, "Parent Window 1");
 
-    //CGUIStaticImage* image1 = CreateStaticImage(CVector2D(50, 50), CVector2D(50, 50), window1, false);
-    //image1->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "error.png")));
+    // CGUIStaticImage* image1 = CreateStaticImage(CVector2D(50, 50), CVector2D(50, 50), window1, false);
+    // image1->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "error.png")));
 
-    //CGUIStaticImage* image2 = CreateStaticImage(CVector2D(75, 75), CVector2D(50, 50), window1, false);
-    //image2->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "info.png")));
+    // CGUIStaticImage* image2 = CreateStaticImage(CVector2D(75, 75), CVector2D(50, 50), window1, false);
+    // image2->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "info.png")));
 
-    //CGUIStaticImage* image3 = CreateStaticImage(CVector2D(100, 100), CVector2D(50, 50), window1, false);
-    //image3->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "question.png")));
+    // CGUIStaticImage* image3 = CreateStaticImage(CVector2D(100, 100), CVector2D(50, 50), window1, false);
+    // image3->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", "question.png")));
 
-    //CGUIWindow* window2 = CreateWindow(CVector2D(100, 100), CVector2D(200, 200), nullptr, false, "Parent Window 2");
-    //CGUIWindow* window3 = CreateWindow(CVector2D(200, 200), CVector2D(200, 200), nullptr, false, "Parent Window 3");
+    // CGUIWindow* window2 = CreateWindow(CVector2D(100, 100), CVector2D(200, 200), nullptr, false, "Parent Window 2");
+    // CGUIWindow* window3 = CreateWindow(CVector2D(200, 200), CVector2D(200, 200), nullptr, false, "Parent Window 3");
 
-    //image1->BringToFront();
-    //window1->BringToFront();
+    // image1->BringToFront();
+    // window1->BringToFront();
 
     // image1->MoveToBack();
     // window1->MoveToBack();
@@ -155,7 +155,11 @@ void CGUI_Impl::Draw(CGUIElement* element)
     for (; c != children.end(); c++)
     {
         CGUIElement* child = (*c);
-        Draw(child);
+
+        if (child->IsRenderingEnabled() && child->IsVisible())
+        {
+            Draw(child);
+        }
     }
 
     element->End();
@@ -258,9 +262,9 @@ CGUIBrowser* CGUI_Impl::CreateBrowser(CVector2D pos, CVector2D size, CGUIElement
     return element;
 }
 
-CGUIButton* CGUI_Impl::CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
+CGUIButton* CGUI_Impl::CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative, std::string text)
 {
-    CGUIButton* element = new CGUIButton_Impl(this, parent, pos, size, relative);
+    CGUIButton* element = new CGUIButton_Impl(this, parent, pos, size, relative, text);
 
     if (!element)
         return nullptr;
@@ -405,6 +409,18 @@ CGUIStaticImage* CGUI_Impl::CreateStaticImage(CVector2D pos, CVector2D size, CGU
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CVector2D pos, CVector2D size, CGUIElement* parent, bool relative)
 {
     CGUITabPanel* element = new CGUITabPanel_Impl(this, parent, pos, size, relative);
+
+    if (!element)
+        return nullptr;
+
+    AddElement(element);
+
+    return element;
+}
+
+CGUITab* CGUI_Impl::CreateTab(CGUITabPanel* parent, std::string text)
+{
+    CGUITab* element = new CGUITab_Impl(this, reinterpret_cast<CGUIElement*>(parent), text);
 
     if (!element)
         return nullptr;

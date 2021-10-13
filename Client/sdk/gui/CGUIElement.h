@@ -13,6 +13,8 @@
 #include <../Shared/sdk/CVector2D.h>
 #include "CGUITypes.h"
 
+class CColor;
+
 typedef int ImGuiWindowFlags;
 
 class CGUIElement
@@ -23,7 +25,7 @@ public:
     virtual void Begin() = 0;
     virtual void End() = 0;
 
-    virtual std::string GetID() = 0;
+    virtual std::string GetID(bool imgui = false) = 0;
 
     virtual void        SetText(std::string text) = 0;
     virtual std::string GetText() = 0;
@@ -68,8 +70,9 @@ public:
     virtual void SetDynamicPositionEnabled(bool state) = 0;
     virtual bool GetDynamicPositionEnabled() = 0;
 
-    virtual int  AddRenderFunction(std::function<void()> renderFunction) = 0;
-    virtual void RemoveRenderFunction(int index) = 0;
+    virtual int  AddRenderFunction(std::function<void()> renderFunction, bool preRender = false) = 0;
+    virtual bool RemoveRenderFunction(int index, bool preRender = false) = 0;
+    virtual std::list<std::function<void()>>& GetRenderFunctions(bool preRender = false) = 0;
 
     virtual void SetRenderingEnabled(bool state) = 0;
     virtual bool IsRenderingEnabled() const = 0;
@@ -80,8 +83,22 @@ public:
     virtual void SetVisible(bool state) = 0;
     virtual bool IsVisible() = 0;
 
-    virtual void SetAlpha(int alpha) = 0;
-    virtual int  GetAlpha() = 0;
+    virtual void SetAlpha(float alpha) = 0;
+    virtual float  GetAlpha(bool clamp = false) = 0;
 
-    virtual void DemoHookTest() = 0;
+    virtual CVector2D GetTextSize() = 0;
+    virtual float     GetTextExtent() = 0;
+
+    virtual CColor GetTextColor() = 0;
+    virtual void   SetTextColor(CColor color) = 0;
+    virtual void   SetTextColor(int r, int g, int b, int a = 255) = 0;
+
+    virtual CGUITextAlignHorizontal GetTextHorizontalAlign() = 0;
+    virtual void                    SetTextHorizontalAlign(CGUITextAlignHorizontal align) = 0;
+
+    virtual CGUITextAlignVertical GetTextVerticalAlign() = 0;
+    virtual void                  SetTextVerticalAlign(CGUITextAlignVertical align) = 0;
+
+    virtual void SetAutoSizingEnabled(bool state) = 0;
+    virtual bool IsAutoSizingEnabled() = 0;
 };
