@@ -23,9 +23,9 @@ extern CCore* g_pCore;
 ////////////////////////////////////////////////////
 CNewsBrowser::CNewsBrowser()
 {
-    //m_pWindow = NULL;
-    //m_pTabPanel = NULL;
-    //m_pButtonOK = NULL;
+    m_pWindow = NULL;
+    m_pTabPanel = NULL;
+    m_pButtonOK = NULL;
 }
 
 ////////////////////////////////////////////////////
@@ -147,47 +147,47 @@ void CNewsBrowser::CreateHeadlines()
 void CNewsBrowser::CreateGUI()
 {
     /* TODO AFTER CEGUI API REWRITE */
-    //CreateHeadlines();
-    //CGUI* pManager = g_pCore->GetGUI();
+    CreateHeadlines();
+    CGUI* pManager = g_pCore->GetGUI();
 
-    //// Create the window
-    //m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, "NEWS"));
+    // Create the window
+    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWindow({}, {}, nullptr, false, "NEWS"));
     //m_pWindow->SetCloseButtonEnabled(true);
     //m_pWindow->SetMovable(true);
 
-    //CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
-    //float     yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
-    //m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - 640.0f / 2, resolution.fY / 2 - 480.0f / 2 + yoff), false);
-    //m_pWindow->SetSize(CVector2D(640.0f, 480.0f));
+    CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    float     yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
+    m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - 640.0f / 2, resolution.fY / 2 - 480.0f / 2 + yoff), false);
+    m_pWindow->SetSize(CVector2D(640.0f, 480.0f));
     //m_pWindow->SetSizingEnabled(false);
     //m_pWindow->SetAlwaysOnTop(true);
 
-    //// Create buttons
-    ////  OK button
-    //m_pButtonOK = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, "OK"));
-    //m_pButtonOK->SetPosition(CVector2D(560.0f - 60, 480.0f - 30));
+    // Create buttons
+    //  OK button
+    m_pButtonOK = reinterpret_cast<CGUIButton*>(pManager->CreateButton({}, {}, m_pWindow, false, "OK"));
+    m_pButtonOK->SetPosition(CVector2D(560.0f - 60, 480.0f - 30));
     //m_pButtonOK->SetZOrderingEnabled(false);
 
-    //// News link
-    //m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Visit latest news article")));
-    //m_pButtonNewsLink->SetSize(CVector2D(180, 40), false);
-    //m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 250, 480.0f - 30));
+    // News link
+    m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton({}, {}, m_pWindow, _("Visit latest news article")));
+    m_pButtonNewsLink->SetSize(CVector2D(180, 40), false);
+    m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 250, 480.0f - 30));
     //m_pButtonNewsLink->SetZOrderingEnabled(false);
 
-    //// Set up the events
+    // Set up the events
     //m_pWindow->SetEnterKeyHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
     //m_pButtonOK->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnOKButtonClick, this));
     //m_pButtonNewsLink->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnNewsLinkButtonClick, this));
 
-    //// Create the tab panel and necessary tabs
-    //m_pTabPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
-    //m_pTabPanel->SetPosition(CVector2D(0, 20.0f));
-    //m_pTabPanel->SetSize(CVector2D(640.0f, 480.0f - 60));
+    // Create the tab panel and necessary tabs
+    m_pTabPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel({}, {}, m_pWindow));
+    m_pTabPanel->SetPosition(CVector2D(0, 20.0f));
+    m_pTabPanel->SetSize(CVector2D(640.0f, 480.0f - 60));
 
-    //for (uint i = 0; i < m_NewsitemList.size(); i++)
-    //{
-    //    AddNewsTab(m_NewsitemList[i]);
-    //}
+    for (uint i = 0; i < m_NewsitemList.size(); i++)
+    {
+        AddNewsTab(m_NewsitemList[i]);
+    }
 }
 
 ////////////////////////////////////////////////////

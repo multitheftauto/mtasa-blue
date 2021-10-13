@@ -25,20 +25,20 @@
 
 #define CORE_MTA_MENUITEMS_START_X 0.168
 
-#define CORE_MTA_BG_MAX_ALPHA \
-    1.00f * 255            // ACHTUNG: Set to 1 for now due to GTA main menu showing through (no delay inserted between Entering game... and loading screen)
-#define CORE_MTA_BG_INGAME_ALPHA 0.90f * 255
-#define CORE_MTA_FADER           0.05f * 255            // 1/20
-#define CORE_MTA_FADER_CREDITS   0.01f * 255
+// ACHTUNG: Set to 1 for now due to GTA main menu showing through (no delay inserted between Entering game... and loading screen)
+#define CORE_MTA_BG_MAX_ALPHA    1.00f
+#define CORE_MTA_BG_INGAME_ALPHA 0.90f
+#define CORE_MTA_FADER           0.05f
+#define CORE_MTA_FADER_CREDITS   0.01f
 
 #define CORE_MTA_HOVER_SCALE  1.0f
 #define CORE_MTA_NORMAL_SCALE 0.6f
-#define CORE_MTA_HOVER_ALPHA  1.0f * 255
-#define CORE_MTA_NORMAL_ALPHA 0.6f * 255
+#define CORE_MTA_HOVER_ALPHA  1.0f
+#define CORE_MTA_NORMAL_ALPHA 0.6f
 
-#define CORE_MTA_HIDDEN_ALPHA   0.0f * 255
-#define CORE_MTA_DISABLED_ALPHA 0.4f * 255
-#define CORE_MTA_ENABLED_ALPHA  1.0f * 255
+#define CORE_MTA_HIDDEN_ALPHA   0.0f
+#define CORE_MTA_DISABLED_ALPHA 0.4f
+#define CORE_MTA_ENABLED_ALPHA  1.0f
 
 #define CORE_MTA_ANIMATION_TIME 200
 #define CORE_MTA_MOVE_ANIM_TIME 600
@@ -235,8 +235,8 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
         // pItem->SetFont("sans");
         // pItemShadow->SetFont("sans");
-         pItem->SetTextHorizontalAlign(CGUITextAlignHorizontal::RIGHT);
-         pItemShadow->SetTextHorizontalAlign(CGUITextAlignHorizontal::RIGHT);
+        pItem->SetTextHorizontalAlign(CGUITextAlignHorizontal::RIGHT);
+        pItemShadow->SetTextHorizontalAlign(CGUITextAlignHorizontal::RIGHT);
 
         pItem->SetSize(CVector2D(fDrawSizeX, 14), false);
         pItemShadow->SetSize(CVector2D(fDrawSizeX, 15), false);
@@ -258,7 +258,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
         CGUILabel* pItemDate = reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel({}, {}, m_pCanvas));
 
         // pItemDate->SetFont("default-small");
-         pItemDate->SetTextHorizontalAlign(CGUITextAlignHorizontal::RIGHT);
+        pItemDate->SetTextHorizontalAlign(CGUITextAlignHorizontal::RIGHT);
 
         pItemDate->SetSize(CVector2D(fDrawSizeX, 13), false);
         pItemDate->SetPosition(CVector2D(fDrawPosX, fDrawPosY), false);
@@ -270,9 +270,9 @@ CMainMenu::CMainMenu(CGUI* pManager)
         pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel({}, {}, m_pCanvas));
         pLabel->SetText("NEW");
         // pLabel->SetFont("default-small");
-         pLabel->SetTextColor(255, 0, 0);
+        pLabel->SetTextColor(255, 0, 0);
         // pLabel->AutoSize(pLabel->GetText().c_str());
-        pLabel->SetAlpha(0.7f * 255);
+        pLabel->SetAlpha(0.7f);
         // pLabel->SetVisible(false);
     }
 
@@ -403,9 +403,6 @@ void CMainMenu::SetMenuUnhovered()            // Dehighlight all our items
     /* TODO AFTER CEGUI API REWRITE */
     if (m_bIsIngame)            // CEGUI hack
     {
-        float fAlpha = m_pDisconnect->image->GetAlpha();
-        m_pDisconnect->image->SetAlpha(0.35f * 255);
-        m_pDisconnect->image->SetAlpha(fAlpha);
         SetItemHoverProgress(m_pDisconnect, 0, false);
     }
     m_pHoveredItem = NULL;
@@ -429,7 +426,7 @@ void CMainMenu::Update()
     if (m_bFrameDelay)
     {
         m_bFrameDelay = false;
-        return;
+        // return;
     }
 
     // Get the game interface and the system state
@@ -444,13 +441,6 @@ void CMainMenu::Update()
 
     if (m_bHideGame)
         m_pGraphics->DrawRectangle(0, 0, m_ScreenSize.fX, m_ScreenSize.fY, 0xFF000000);
-
-    if (m_bIsIngame)            // CEGUI hack
-    {
-        float fAlpha = m_pDisconnect->image->GetAlpha();
-        m_pDisconnect->image->SetAlpha(0.35f * 255);
-        m_pDisconnect->image->SetAlpha(fAlpha);
-    }
 
     if (m_bIsFullyVisible)
     {
@@ -512,7 +502,7 @@ void CMainMenu::Update()
 
             if (m_pHoveredItem)
             {
-                float fProgress = (m_pHoveredItem->image->GetAlpha() - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+                float fProgress = (m_pHoveredItem->image->GetAlpha(true) - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
                 // Let's work out what the target progress should be by working out the time passed
                 fProgress = ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) + fProgress;
                 MapRemove(m_unhoveredItems, m_pHoveredItem);
@@ -529,11 +519,11 @@ void CMainMenu::Update()
         std::set<sMenuItem*>::iterator it = m_unhoveredItems.begin();
         while (it != m_unhoveredItems.end())
         {
-            float fProgress = ((*it)->image->GetAlpha() - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
+            float fProgress = ((*it)->image->GetAlpha(true) - CORE_MTA_NORMAL_ALPHA) / (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA);
             // Let's work out what the target progress should be by working out the time passed
             // Min of 0.5 progress fixes occasional graphical glitchekal
-            fProgress = fProgress - std::min(0.5f * 255, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
-            if (SetItemHoverProgress((*it), fProgress / 255, false))
+            fProgress = (fProgress - ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
+            if (SetItemHoverProgress((*it), fProgress, false))
             {
                 std::set<sMenuItem*>::iterator itToErase = it++;
                 m_unhoveredItems.erase(itToErase);
@@ -552,7 +542,7 @@ void CMainMenu::Update()
         fMoveTime = -fMoveTime * (fMoveTime - 2);
 
         SetMenuVerticalPosition(fMoveTime * (m_iMoveTargetPos - m_iMoveStartPos) + m_iMoveStartPos);
-        m_pDisconnect->image->SetAlpha(m_bIsIngame ? fMoveTime * CORE_MTA_NORMAL_ALPHA : (1 - fMoveTime) * CORE_MTA_NORMAL_ALPHA);
+        m_pDisconnect->image->SetAlpha(m_bIsIngame ? fMoveTime * (CORE_MTA_NORMAL_ALPHA) : (1 - fMoveTime) * (CORE_MTA_NORMAL_ALPHA));
 
         if (fMoveTime == 1)
         {
@@ -1072,7 +1062,8 @@ bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHo
     float fTargetScale = (CORE_MTA_HOVER_SCALE - CORE_MTA_NORMAL_SCALE) * (fProgress) + CORE_MTA_NORMAL_SCALE;
 
     // Work out our current progress based upon the alpha value now
-    pItem->image->SetAlpha((CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) * (fProgress) + CORE_MTA_NORMAL_ALPHA);
+    int alpha = (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) * (fProgress) + CORE_MTA_NORMAL_ALPHA;
+    pItem->image->SetAlpha(alpha);
 
     int iSizeX = (pItem->nativeSizeX / NATIVE_RES_X) * m_iMenuSizeX * fTargetScale;
     int iSizeY = (pItem->nativeSizeY / NATIVE_RES_Y) * m_iMenuSizeY * fTargetScale;
@@ -1086,8 +1077,6 @@ bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHo
 
     // Return whether the hovering has maxed out
     return bHovering ? (fProgress == 1) : (fProgress == 0);
-
-    return false;
 }
 
 void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SString& strDate, bool bIsNew)
@@ -1102,6 +1091,7 @@ void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SS
     CGUILabel* pItem = m_pNewsItemLabels[iIndex];
     CGUILabel* pItemShadow = m_pNewsItemShadowLabels[iIndex];
     SColor     color = headlineColors[iIndex];
+
     // pItem->SetTextColor(color.R, color.G, color.B);
     pItem->SetText(strHeadline);
     pItemShadow->SetText(strHeadline);

@@ -169,7 +169,7 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
     //pContainerPane->SetProperty("ContentPaneAutoSized", "False");
     //pContainerPane->SetZOrderingEnabled(false);
     //pContainerPane->SetAlwaysOnTop(true);
-    //pContainerPane->SetVisible(true);
+    pContainerPane->SetVisible(true);
 
     CGUIStaticImage* pFlag = reinterpret_cast<CGUIStaticImage*>(g_pCore->GetGUI()->CreateStaticImage(vecFlagPos, CVector2D(FLAG_SIZE_X, FLAG_SIZE_Y), pGUIParent));
     //pFlag->SetZOrderingEnabled(false);
