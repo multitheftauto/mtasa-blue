@@ -23,6 +23,7 @@
 #include "CGUIScrollbar.h"
 #include "CGUIScrollpane.h"
 #include "CGUIStaticImage.h"
+#include "CGUITab.h"
 #include "CGUITabPanel.h"
 #include "CGUITexture.h"
 #include "CGUIWindow.h"
@@ -58,7 +59,7 @@ public:
     virtual CVector2D GetResolution() = 0;
 
     virtual CGUIBrowser*     CreateBrowser(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
-    virtual CGUIButton*      CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
+    virtual CGUIButton*      CreateButton(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false, std::string text = "") = 0;
     virtual CGUICheckbox*    CreateCheckbox(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUICombobox*    CreateCombobox(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;
     virtual CGUIEdit*        CreateEdit(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false) = 0;

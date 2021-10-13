@@ -25,6 +25,7 @@ enum CGUIType
     SCROLLBAR,
     SCROLLPANE,
     STATICIMAGE,
+    TAB,
     TABPANEL,
     TEXTURE,
     WINDOW,

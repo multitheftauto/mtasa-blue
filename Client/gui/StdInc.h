@@ -36,6 +36,7 @@
 #include "CGUIScrollbar_Impl.h"
 #include "CGUIScrollpane_Impl.h"
 #include "CGUIStaticImage_Impl.h"
+#include "CGUITab_Impl.h"
 #include "CGUITabPanel_Impl.h"
 #include "CGUITexture_Impl.h"
 #include "CGUIWindow_Impl.h"
