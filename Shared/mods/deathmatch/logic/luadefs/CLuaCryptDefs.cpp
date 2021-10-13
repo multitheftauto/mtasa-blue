@@ -234,7 +234,7 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsaKeyPair(lua_State* const luaVM, int size,
                                                                                         std::optional<CLuaFunctionRef> callback)
 {
-    // size chceck (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
+    // keysize checks (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
     if (size < 128)
         throw std::invalid_argument("Size cannot be lower than 128 bits");
     if (size > 4096)
