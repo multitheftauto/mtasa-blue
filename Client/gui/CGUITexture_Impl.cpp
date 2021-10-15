@@ -61,6 +61,6 @@ CVector2D CGUITexture_Impl::GetNativeSize()
     if (!m_textureItem)
         return {};
 
-    return CVector2D(m_textureItem->m_uiSizeX, m_textureItem->m_uiSizeY);
+    return CVector2D(m_textureItem->m_uiSurfaceSizeX, m_textureItem->m_uiSurfaceSizeY);
 }
 
