@@ -277,7 +277,7 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsa
 
 int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 {
-    StringEncryptFunction algorithm;
+    StringEncodeFunction algorithm;
     SString               data;
     CStringMap            options;
     CLuaFunctionRef       luaFunctionRef;
@@ -294,7 +294,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
     {
         switch (algorithm)
         {
-            case StringEncryptFunction::TEA:
+            case StringEncodeFunction::TEA:
             {
                 SString& key = options["key"];
 
@@ -339,7 +339,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 1;
             }
-            case StringEncryptFunction::AES128:
+            case StringEncodeFunction::AES128:
             {
                 SString& key = options["key"];
 
@@ -407,7 +407,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 2;
             }
-            case StringEncryptFunction::RSA:
+            case StringEncodeFunction::RSA:
             {
                 std::string& key = options["key"];
 
@@ -492,7 +492,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 
 int CLuaCryptDefs::DecodeString(lua_State* luaVM)
 {
-    StringEncryptFunction algorithm;
+    StringEncodeFunction algorithm;
     SString               data;
     CStringMap            options;
     CLuaFunctionRef       luaFunctionRef;
@@ -509,7 +509,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
     {
         switch (algorithm)
         {
-            case StringEncryptFunction::TEA:
+            case StringEncodeFunction::TEA:
             {
                 SString& key = options["key"];
 
@@ -554,7 +554,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 }
                 return 1;
             }
-            case StringEncryptFunction::AES128:
+            case StringEncodeFunction::AES128:
             {
                 SString& key = options["key"];
                 SString& iv = options["iv"];
@@ -629,7 +629,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 }
                 return 1;
             }
-            case StringEncryptFunction::RSA:
+            case StringEncodeFunction::RSA:
             {
                 SString& key = options["key"];
 

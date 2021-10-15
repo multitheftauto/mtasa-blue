@@ -32,7 +32,7 @@ enum class PasswordHashFunction
     Bcrypt
 };
 
-enum class StringEncryptFunction
+enum class StringEncodeFunction
 {
     TEA,
     AES128,
