@@ -1011,11 +1011,13 @@ bool CMainMenu::GetIsIngame()
 
 sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition)
 {
-    /* TODO AFTER CEGUI API REWRITE */
     CGUIStaticImage* pImage = reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage({}, {}, m_pCanvas));
 
     if (g_pCore->GetLocalization()->IsLocalized())
-        pImage->LoadFromFile(CalcMTASAPath(PathJoin("MTA", g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)));
+    {
+        if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)))
+            pImage->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", szFilename)));
+    }
     else
         pImage->LoadFromFile(CalcMTASAPath(PathJoin("MTA", "cgui", "images", szFilename)));
 
@@ -1025,8 +1027,9 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
 
     // Make our sizes relative to the size of menu, but in absolute coordinates
     CVector2D vecNativeSize = pImage->GetTexture()->GetNativeSize();
-    int       iSizeX = (vecNativeSize.fX / NATIVE_RES_X) * m_iMenuSizeX;
-    int       iSizeY = (vecNativeSize.fY / NATIVE_RES_Y) * m_iMenuSizeY;
+
+    int iSizeX = (vecNativeSize.fX / NATIVE_RES_X) * m_iMenuSizeX;
+    int iSizeY = (vecNativeSize.fY / NATIVE_RES_Y) * m_iMenuSizeY;
 
     // Mark our bounding box's bottom value.
     m_menuBY = (iPosY + (iSizeY * CORE_MTA_HOVER_SCALE) / 2) + m_iYOff;
@@ -1039,10 +1042,8 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
     // Grab our draw position from which we enlarge from
     iPosY = iPosY - (iSizeY / 2);
 
-    pImage->SetParent(m_pCanvas);
-    pImage->SetPosition(CVector2D(iPosX, iPosY));
-    pImage->SetSize(CVector2D(iSizeX, iSizeY));
-
+    pImage->SetPosition(CVector2D(iPosX, iPosY), false);
+    pImage->SetSize(CVector2D(iSizeX, iSizeY), false);
     // pImage->SetProperty("InheritsAlpha", "False");
     pImage->SetAlpha(CORE_MTA_NORMAL_ALPHA);
 
@@ -1054,12 +1055,10 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
     s->nativeSizeY = vecNativeSize.fY;
     s->image = pImage;
     return s;
-    return {};
 }
 
 bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHovering)
 {
-    /* TODO AFTER CEGUI API REWRITE */
     fProgress = Clamp<float>(0, fProgress, 1);
 
     // Use OutQuad equation for easing, or OutQuad for unhovering
@@ -1069,8 +1068,7 @@ bool CMainMenu::SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHo
     float fTargetScale = (CORE_MTA_HOVER_SCALE - CORE_MTA_NORMAL_SCALE) * (fProgress) + CORE_MTA_NORMAL_SCALE;
 
     // Work out our current progress based upon the alpha value now
-    int alpha = (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) * (fProgress) + CORE_MTA_NORMAL_ALPHA;
-    pItem->image->SetAlpha(alpha);
+    pItem->image->SetAlpha((CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA) * (fProgress) + CORE_MTA_NORMAL_ALPHA);
 
     int iSizeX = (pItem->nativeSizeX / NATIVE_RES_X) * m_iMenuSizeX * fTargetScale;
     int iSizeY = (pItem->nativeSizeY / NATIVE_RES_Y) * m_iMenuSizeY * fTargetScale;
