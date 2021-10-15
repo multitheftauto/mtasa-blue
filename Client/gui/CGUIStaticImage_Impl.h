@@ -24,7 +24,7 @@ public:
 
     CGUITexture* GetTexture() { return m_texture; }
 
-    void LoadFromFile(std::string path);
+    bool LoadFromFile(std::string path);
     void LoadFromTexture(CGUITexture* texture);
 
 #include "CGUIElement_Inc.h"

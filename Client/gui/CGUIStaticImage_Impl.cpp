@@ -35,15 +35,16 @@ void CGUIStaticImage_Impl::End()
     CGUIElement_Impl::End();
 }
 
-void CGUIStaticImage_Impl::LoadFromFile(std::string path)
+bool CGUIStaticImage_Impl::LoadFromFile(std::string path)
 {
     CGUITexture* texture = m_pManager->CreateTexture(m_size);
 
     if (!texture)
-        return;
+        return false;
 
-    texture->LoadFromFile(path);
     m_texture = texture;
+
+    return texture->LoadFromFile(path);
 }
 
 void CGUIStaticImage_Impl::LoadFromTexture(CGUITexture* texture)

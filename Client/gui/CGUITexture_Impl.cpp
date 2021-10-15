@@ -30,20 +30,22 @@ void CGUITexture_Impl::End()
     CGUIElement_Impl::End();
 }
 
-void CGUITexture_Impl::LoadFromFile(std::string path)
+bool CGUITexture_Impl::LoadFromFile(std::string path)
 {
     CGraphicsInterface* graphics = m_pManager->GetGraphicsInterface();
 
     if (!graphics)
-        return;
+        return false;
 
-    CTextureItem* textureItem = graphics->GetRenderItemManager()->CreateTexture(path, NULL, false, m_size.fX, m_size.fY);
+    CTextureItem* textureItem = graphics->GetRenderItemManager()->CreateTexture(path, NULL, false, (m_size.fX > 0) ? m_size.fX : -1, (m_size.fY > 0) ? m_size.fY : -1);
 
     if (!textureItem)
-        return;
+        return false;
 
     textureItem->m_TextureAddress = TADDRESS_MIRROR;
     m_textureItem = textureItem;
+
+    return true;
 }
 
 IDirect3DBaseTexture9* CGUITexture_Impl::GetD3DTexture()
@@ -59,6 +61,6 @@ CVector2D CGUITexture_Impl::GetNativeSize()
     if (!m_textureItem)
         return {};
 
-    return CVector2D(m_textureItem->m_uiSurfaceSizeX, m_textureItem->m_uiSurfaceSizeY);
+    return CVector2D(m_textureItem->m_uiSizeX, m_textureItem->m_uiSizeY);
 }
 

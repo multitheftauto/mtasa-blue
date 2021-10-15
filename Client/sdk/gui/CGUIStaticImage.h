@@ -20,6 +20,6 @@ public:
 
     virtual CGUITexture* GetTexture() = 0;
 
-    virtual void LoadFromFile(std::string path) = 0;
+    virtual bool LoadFromFile(std::string path) = 0;
     virtual void LoadFromTexture(CGUITexture* texture) = 0;
 };

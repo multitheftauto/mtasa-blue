@@ -25,7 +25,7 @@ public:
     IDirect3DBaseTexture9* GetD3DTexture();
     CVector2D GetNativeSize();
 
-    void LoadFromFile(std::string path);
+    bool LoadFromFile(std::string path);
 
 #include "CGUIElement_Inc.h"
 private:
