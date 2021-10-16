@@ -75,5 +75,8 @@ public:
     virtual CGUITexture*     CreateTexture(CVector2D size, bool relative = false) = 0;
     virtual CGUIWindow* CreateWindow(CVector2D pos, CVector2D size, CGUIElement* parent = nullptr, bool relative = false, std::string title = "Window") = 0;
 
+    virtual void OnMousePress(CGUIMouseButton button, CGUIElement* element = nullptr) = 0;
+    virtual void OnMouseRelease(CGUIMouseButton button, CGUIElement* element = nullptr) = 0;
+
     virtual void CreateDemo() = 0;
 };

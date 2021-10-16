@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <array>
+
 enum CGUIType
 {
     BROWSER,
@@ -44,3 +46,12 @@ enum class CGUITextAlignVertical
     MIDDLE,
     BOTTOM
 };
+
+enum class CGUIMouseButton
+{
+    LEFT,
+    RIGHT,
+    MIDDLE
+};
+
+const std::array<CGUIMouseButton, 3> CGUIMouseButtons = {CGUIMouseButton::LEFT, CGUIMouseButton::RIGHT, CGUIMouseButton::MIDDLE};

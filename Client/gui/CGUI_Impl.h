@@ -55,6 +55,11 @@ public:
     void SetElementIndex(CGUIElement* element, int index);
     int  GetElementIndex(CGUIElement* element);
 
+    ImGuiContext* GetCurrentContext();
+
+    void OnMousePress(CGUIMouseButton button, CGUIElement* element = nullptr);
+    void OnMouseRelease(CGUIMouseButton button, CGUIElement* element = nullptr);
+
     void CreateDemo();
 
 private:
@@ -62,6 +67,8 @@ private:
 
     IDirect3DDevice9* m_pDevice;
     HWND              m_hookedWindow;
+
+    ImGuiContext* m_context = nullptr;
 
     std::vector<CGUIElement*> m_guiElements = {};
 

@@ -21,7 +21,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+    m_context = ImGui::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
     (void)io;
@@ -44,6 +44,11 @@ CGUI_Impl::~CGUI_Impl()
     ImGui_ImplWin32_Shutdown();
 
     ImGui::DestroyContext();
+}
+
+ImGuiContext* CGUI_Impl::GetCurrentContext()
+{
+    return m_context;
 }
 
 void CGUI_Impl::CreateDemo()
@@ -91,6 +96,16 @@ void CGUI_Impl::SetHookedWindow(HWND window)
     {
         m_hookedWindow = window;
     }
+}
+
+void CGUI_Impl::OnMousePress(CGUIMouseButton button, CGUIElement* element)
+{
+    printf("pressed imgui element (%s) \n", element->GetID().c_str());
+}
+
+void CGUI_Impl::OnMouseRelease(CGUIMouseButton button, CGUIElement* element)
+{
+    printf("released imgui element (%s) \n", element->GetID().c_str());
 }
 
 void CGUI_Impl::Draw()
@@ -149,6 +164,25 @@ void CGUI_Impl::Draw(CGUIElement* element)
     // Draw ImGui element
     element->Begin();
 
+    if (ImGui::IsWindowHovered() || ImGui::IsItemHovered())
+    {
+        for (auto button : CGUIMouseButtons)
+        {
+            int i = static_cast<int>(button);
+
+            if (ImGui::IsMouseClicked(i))
+            {
+                OnMousePress(button, element);
+                break;
+            }
+            else if (ImGui::IsMouseReleased(i))
+            {
+                OnMouseRelease(button, element);
+                break;
+            }
+        }
+    }
+
     std::vector<CGUIElement*>           children = element->GetChildren();
     std::vector<CGUIElement*>::iterator c = children.begin();
 
@@ -191,6 +225,14 @@ CVector2D CGUI_Impl::GetResolution()
 void CGUI_Impl::AddElement(CGUIElement* element)
 {
     m_guiElements.push_back(element);
+}
+
+void CGUI_Impl::RemoveElement(CGUIElement* element)
+{
+    std::vector<CGUIElement*>::iterator position = std::find(m_guiElements.begin(), m_guiElements.end(), element);
+
+    if (position != m_guiElements.end())
+        m_guiElements.erase(position);
 }
 
 void CGUI_Impl::SetElementIndex(CGUIElement* element, int index)
