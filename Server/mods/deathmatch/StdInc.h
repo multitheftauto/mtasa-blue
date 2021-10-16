@@ -1,5 +1,10 @@
 #ifdef WIN32
 
+extern "C"
+{
+    #include "lua.h"
+}
+
 #include <winsock2.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -45,6 +50,10 @@ struct SAclRequest;
 #include "CChecksum.h"
 #include "CIdArray.h"
 #include "pcrecpp.h"
+
+#include "../publicsdk/IModule.h";
+#include "../modules/luaModules/include/CLuaModulesModule.h"
+#include "CModuleInterfaceImpl.h"
 
 // Packet includes
 #include "packets/CCameraSyncPacket.h"
@@ -150,7 +159,6 @@ struct SAclRequest;
 
 // Lua includes
 #include "lua/LuaCommon.h"
-#include "lua/CLuaMain.h"
 #include "CEasingCurve.h"
 #include "CBanManager.h"
 #include "lua/CLuaFunctionParseHelpers.h"
@@ -158,7 +166,6 @@ struct SAclRequest;
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
 #include "lua/CLuaTimer.h"
-#include "lua/CLuaModuleManager.h"
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"
 #include "lua/CLuaArguments.h"
@@ -176,6 +183,8 @@ struct SAclRequest;
 #include "lua/CLuaShared.h"
 
 // Logic includes
+#include "CModule.h"
+#include "CResource.h"
 #include "ASE.h"
 #include "ASEQuerySDK.h"
 #include "CAccessControlList.h"
@@ -257,7 +266,6 @@ struct SAclRequest;
 #include "CRegisteredCommands.h"
 #include "CRegistryManager.h"
 #include "CRegistry.h"
-#include "CResource.h"
 #include "CResourceChecker.h"
 #include "CResourceClientConfigItem.h"
 #include "CResourceClientFileItem.h"

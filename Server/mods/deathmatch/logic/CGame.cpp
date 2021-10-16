@@ -204,12 +204,13 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
 
     memset(&m_bGarageStates[0], 0, sizeof(m_bGarageStates));
 
+    m_vecModules.push_back(new CLuaModulesModule());
     // init our mutex
     pthread_mutex_init(&mutexhttp, NULL);
 }
 
 void CGame::ResetMapInfo()
-{
+    {
     // Add variables to get reset in resetMapInfo here
     m_fGravity = 0.008f;
     m_fGameSpeed = 1.0f;

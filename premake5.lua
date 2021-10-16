@@ -147,6 +147,8 @@ workspace "MTASA"
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
 		include "Server/sdk"
+		group "Server/Modules"
+			include "Server/modules/luaModules"
 
 		group "Shared"
 		include "Shared"

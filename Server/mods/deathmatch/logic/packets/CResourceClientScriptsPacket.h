@@ -12,7 +12,6 @@
 #pragma once
 
 #include <vector>
-#include "CResource.h"
 #include "CResourceClientScriptItem.h"
 
 class CResourceClientScriptsPacket final : public CPacket

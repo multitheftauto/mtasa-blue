@@ -85,7 +85,6 @@ protected:
     static CResourceManager*          m_pResourceManager;
     static CAccessControlListManager* m_pACLManager;
     static CMainConfig*               m_pMainConfig;
-    static inline CLuaModuleManager*  m_pLuaModuleManager = nullptr;
 
 protected:
     // Old style: Only warn on failure. This should

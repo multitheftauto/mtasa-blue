@@ -1356,7 +1356,7 @@ bool CConsoleCommands::LoadModule(CConsole* pConsole, const char* szArguments, C
         SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
 
         // These modules are late loaded
-        int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->LoadModule(szArguments, strFilename, true);
+        int iSuccess = g_pGame->GetModule<CLuaModulesModule>()->LoadModule(szArguments, strFilename, true);
         switch (iSuccess)
         {
             case 1:
@@ -1423,7 +1423,8 @@ bool CConsoleCommands::UnloadModule(CConsole* pConsole, const char* szArguments,
         if (pClient->GetNick())
             CLogger::LogPrintf("unloadmodule: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
 
-        if (g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule(szArguments) != 0)
+        
+        if (g_pGame->GetModule<CLuaModulesModule>()->UnloadModule(szArguments) != 0)
         {
             pEchoClient->SendConsole("unloadmodule: Module failed to unload");
             pEchoClient->SendConsole("unloadmodule: Couldn't find a module by that name");
@@ -1445,7 +1446,7 @@ bool CConsoleCommands::ReloadModule(CConsole* pConsole, const char* szArguments,
 
         SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
 
-        int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule(szArguments, strFilename, true);
+        int iSuccess = g_pGame->GetModule<CLuaModulesModule>()->ReloadModule(szArguments, strFilename, true);
         switch (iSuccess)
         {
             case 1:

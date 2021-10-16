@@ -642,7 +642,7 @@ bool CMainConfig::LoadExtended()
 
                 if (IsValidFilePath(strBuffer.c_str()))
                 {
-                    g_pGame->GetLuaManager()->GetLuaModuleManager()->LoadModule(strBuffer.c_str(), strFilename, false);
+                    g_pGame->GetModule<CLuaModulesModule>()->LoadModule(strBuffer.c_str(), strFilename, false);
                 }
             }
         }

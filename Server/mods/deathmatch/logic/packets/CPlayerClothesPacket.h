@@ -33,8 +33,8 @@ public:
 
     void         Add(const char* szTexture, const char* szModel, unsigned char ucType);
     void         Add(CPlayerClothes* pClothes);
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
+    unsigned int Count();
 
 private:
-    vector<SPlayerClothes*> m_List;
+    std::vector<SPlayerClothes*> m_List;
 };

@@ -688,28 +688,23 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        std::list<CLuaModule*> modules = m_pLuaModuleManager->GetLoadedModules();
-        for (const auto mod : modules)
+        ILuaModule* pLuaModule = g_pGame->GetModule<CLuaModulesModule>()->GetModuleByName(strModuleName);
+        if (pLuaModule)
         {
-            if (mod->_GetName() == strModuleName)
-            {
-                lua_newtable(luaVM);
+            lua_newtable(luaVM);
 
-                lua_pushstring(luaVM, "name");
-                lua_pushstring(luaVM, mod->_GetFunctions().szModuleName);
-                lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "name");
+            lua_pushstring(luaVM, pLuaModule->GetName());
+            lua_settable(luaVM, -3);
 
-                lua_pushstring(luaVM, "author");
-                lua_pushstring(luaVM, mod->_GetFunctions().szAuthor);
-                lua_settable(luaVM, -3);
+            lua_pushstring(luaVM, "author");
+            lua_pushstring(luaVM, pLuaModule->GetAuthor());
+            lua_settable(luaVM, -3);
 
-                lua_pushstring(luaVM, "version");
-                SString strVersion("%.2f", mod->_GetFunctions().fVersion);
-                lua_pushstring(luaVM, strVersion);
-                lua_settable(luaVM, -3);
-
-                return 1;
-            }
+            lua_pushstring(luaVM, "version");
+            SString strVersion("%.2f", pLuaModule->GetVersion());
+            lua_pushstring(luaVM, strVersion);
+            lua_settable(luaVM, -3);
         }
     }
     else
@@ -721,14 +716,13 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetModules(lua_State* luaVM)
 {
+    std::vector<ILuaModule*> modules = g_pGame->GetModule<CLuaModulesModule>()->GetModules();
     lua_newtable(luaVM);
-    list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-    list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
-    unsigned int                uiIndex = 1;
-    for (; iter != lua_LoadedModules.end(); ++iter)
+    unsigned int uiIndex = 1;
+    for (auto const& module : modules)
     {
         lua_pushnumber(luaVM, uiIndex++);
-        lua_pushstring(luaVM, (*iter)->_GetFunctions().szFileName);
+        lua_pushstring(luaVM, module->GetFileName());
         lua_settable(luaVM, -3);
     }
     return 1;

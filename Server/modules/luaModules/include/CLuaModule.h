@@ -11,13 +11,11 @@
 
 // IMPLEMENTATION of Lua dynamic modules
 
+#include "interfaces/ILuaModule.h"
+
 #ifndef WIN32
 typedef void* HMODULE;
 #endif
-
-class CLuaModule;
-
-#pragma once
 
 typedef bool (*DefaultModuleFunc)();
 typedef void (*RegisterModuleFunc)(lua_State*);
@@ -26,10 +24,10 @@ typedef bool (*InitModuleFunc)(ILuaModuleManager*, char*, char*, float*);
 struct FunctionInfo
 {
     // module information
-    char    szModuleName[MAX_INFO_LENGTH];
-    char    szAuthor[MAX_INFO_LENGTH];
-    float   fVersion;
-    SString szFileName;
+    char        szModuleName[MAX_INFO_LENGTH];
+    char        szAuthor[MAX_INFO_LENGTH];
+    float       fVersion;
+    std::string szFileName;
 
     // module function pointers
     DefaultModuleFunc  ShutdownModule;
@@ -40,10 +38,10 @@ struct FunctionInfo
     RegisterModuleFunc ResourceStopped;
 };
 
-class CLuaModule : public ILuaModuleManager10
+class CLuaModule : public ILuaModuleManager10, public ILuaModule
 {
 public:
-    CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName);
+    CLuaModule(CLuaModuleManager* pLuaModuleManager, IModuleInterface* pModuleInterface, const char* szFileName, const char* szShortFileName);
     virtual ~CLuaModule();
 
     // functions for external modules until DP2.3
@@ -70,25 +68,30 @@ public:
     // functions for deathmatch
     int  _LoadModule();
     void _UnloadModule();
-    void _RegisterFunctions(lua_State* luaVM);
+    void _RegisterFunctions(IResource* pResource);
     void _UnregisterFunctions();
     void _DoPulse();
-    void _ResourceStopping(lua_State* luaVM);
-    void _ResourceStopped(lua_State* luaVM);
+    void _ResourceStopping(IResource* pResource);
+    void _ResourceStopped(IResource* pResource);
     bool _DoesFunctionExist(const char* szFunctionName);
 
     HMODULE      _GetHandle() { return m_hModule; };
-    SString      _GetName() { return m_szShortFileName; };
+    std::string  _GetName() { return m_szShortFileName; };
     FunctionInfo _GetFunctions() { return m_FunctionInfo; };
 
-private:
-    SString         m_szFileName;
-    SString         m_szShortFileName;
-    FunctionInfo    m_FunctionInfo;
-    HMODULE         m_hModule;
-    vector<SString> m_Functions;
-    bool            m_bInitialised;
+    const char* GetName() const { return m_FunctionInfo.szModuleName; };
+    const char* GetAuthor() const { return m_FunctionInfo.szAuthor; };
+    float       GetVersion() const { return m_FunctionInfo.fVersion; };
+    const char* GetFileName() const { return m_FunctionInfo.szFileName.c_str(); };
 
-    CScriptDebugging*  m_pScriptDebugging;
+private:
+    std::string              m_szFileName;
+    std::string              m_szShortFileName;
+    FunctionInfo             m_FunctionInfo;
+    HMODULE                  m_hModule;
+    std::vector<std::string> m_Functions;
+    bool                     m_bInitialised;
+
+    IModuleInterface*  m_pModuleInterface;
     CLuaModuleManager* m_pLuaModuleManager;
 };

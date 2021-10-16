@@ -10,11 +10,6 @@
 
 #pragma once
 
-extern "C"
-{
-    #include "lua.h"
-}
-
 #include <net/bitstream.h>
 #include "CLuaArgument.h"
 #include "json.h"

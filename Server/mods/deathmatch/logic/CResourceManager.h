@@ -14,12 +14,24 @@
 
 #pragma once
 
-#include "CResource.h"
 #include "CElement.h"
 #include "ehs/ehs.h"
 #include <list>
 
 class CResource;
+
+struct SResourceStartOptions
+{
+    bool bIncludedResources = true;
+    bool bConfigs = true;
+    bool bMaps = true;
+    bool bScripts = true;
+    bool bHTML = true;
+    bool bClientConfigs = true;
+    bool bClientScripts = true;
+    bool bClientFiles = true;
+};
+
 #define INVALID_RESOURCE_NET_ID     0xFFFF
 
 class CResourceManager

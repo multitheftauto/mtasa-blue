@@ -13,7 +13,6 @@
 
 #include <list>
 #include "../packets/CPacket.h"
-#include "../CResource.h"
 
 class CResourceStartPacket final : public CPacket
 {

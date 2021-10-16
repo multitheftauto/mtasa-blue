@@ -43,8 +43,6 @@ public:
     void       OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
     void       OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
 
-    CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; }
-
     list<CLuaMain*>::const_iterator IterBegin() { return m_virtualMachines.begin(); };
     list<CLuaMain*>::const_iterator IterEnd() { return m_virtualMachines.end(); };
 
@@ -61,7 +59,6 @@ private:
     CVehicleManager*           m_pVehicleManager;
     CMapManager*               m_pMapManager;
     CEvents*                   m_pEvents;
-    CLuaModuleManager*         m_pLuaModuleManager;
 
     CFastHashMap<lua_State*, CLuaMain*> m_VirtualMachineMap;
     list<CLuaMain*>                     m_virtualMachines;

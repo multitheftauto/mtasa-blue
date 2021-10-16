@@ -1012,7 +1012,7 @@ bool CResource::Stop(bool bManualStop)
     CLogger::LogPrintf(LOGLEVEL_LOW, "Stopping %s\n", m_strResourceName.c_str());
 
     // Tell the modules we are stopping
-    g_pGame->GetLuaManager()->GetLuaModuleManager()->ResourceStopping(m_pVM->GetVirtualMachine());
+    g_pGame->GetModule<CLuaModulesModule>()->ResourceStopping(this);
 
     // Remove us from the running resources list
     m_StartedResources.remove(this);
@@ -1050,7 +1050,7 @@ bool CResource::Stop(bool bManualStop)
     }
 
     // Tell the module manager we have stopped
-    g_pGame->GetLuaManager()->GetLuaModuleManager()->ResourceStopped(m_pVM->GetVirtualMachine());
+    g_pGame->GetModule<CLuaModulesModule>()->ResourceStopped(this);
 
     // Remove the temporary XML storage node
     if (m_pNodeStorage)
@@ -3358,4 +3358,18 @@ bool CResource::IsFileDbConnectMysqlProtected(const SString& strAbsFilename, boo
     }
 
     return false;
+}
+
+CChecksum CResource::GetFileChecksum(const char* szFile)
+{
+    list<CResourceFile*>::iterator iter = IterBegin();
+    for (; iter != IterEnd(); ++iter)
+    {
+        if (strcmp((*iter)->GetName(), szFile) == 0)
+            return (*iter)->GetLastChecksum();
+    }
+    //     m_pScriptDebugging->LogInformation(luaVM, szFormat, args);
+
+
+    return CChecksum();
 }

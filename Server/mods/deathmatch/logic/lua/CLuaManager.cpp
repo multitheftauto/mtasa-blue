@@ -27,10 +27,6 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
     m_pMapManager = pMapManager;
     m_pEvents = pEvents;
 
-    // Create our lua dynamic module manager
-    m_pLuaModuleManager = new CLuaModuleManager(this);
-    m_pLuaModuleManager->SetScriptDebugging(g_pGame->GetScriptDebugging());
-
     // Load our C Functions into Lua and hook callback
     LoadCFunctions();
     lua_registerPreCallHook(CLuaDefs::CanUseFunction);
@@ -53,9 +49,6 @@ CLuaManager::~CLuaManager()
     {
         delete (*iter);
     }
-
-    // Destroy the module manager
-    delete m_pLuaModuleManager;
 }
 
 CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP)
@@ -108,7 +101,8 @@ void CLuaManager::DoPulse()
     {
         (*iter)->DoPulse();
     }
-    m_pLuaModuleManager->DoPulse();
+    // TODO impelemnt
+    //m_pLuaModuleManager->DoPulse();
 }
 
 CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)

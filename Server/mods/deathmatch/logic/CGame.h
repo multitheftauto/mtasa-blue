@@ -60,6 +60,7 @@ class CGame;
 #include "CBanManager.h"
 
 // Forward declarations
+class CModule;
 class ASE;
 class CAccessControlListManager;
 class CAccountManager;
@@ -462,6 +463,19 @@ public:
     bool IsClientTransferBoxVisible() const { return m_showClientTransferBox; }
     void SetClientTransferBoxVisible(bool visible) { m_showClientTransferBox = visible; }
 
+    template <typename T>
+    T* GetModule()
+    {
+        for (auto const& pModule : m_vecModules)
+        {
+            if (T* p = dynamic_cast<T*>(pModule))
+            {
+                return p;
+            }
+        }
+        return nullptr;
+    }
+
 private:
     void AddBuiltInEvents();
     void RelayPlayerPuresync(class CPacket& Packet);
@@ -655,4 +669,6 @@ private:
 
     bool m_DevelopmentModeEnabled;
     bool m_showClientTransferBox = true;
+
+    std::vector<IModule*> m_vecModules;
 };

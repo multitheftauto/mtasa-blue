@@ -77,3 +77,8 @@ void CPlayerClothesPacket::Add(CPlayerClothes* pClothes)
         }
     }
 }
+
+unsigned int CPlayerClothesPacket::Count()
+{
+    return static_cast<unsigned int>(m_List.size());
+}

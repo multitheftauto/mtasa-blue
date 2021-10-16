@@ -13,48 +13,39 @@
 
 #include "StdInc.h"
 
-extern CGame* g_pGame;
 
-CLuaModuleManager::CLuaModuleManager(CLuaManager* pLuaManager)
+CLuaModuleManager::CLuaModuleManager(IModuleInterface* pModuleInterface) : m_pModuleInterface(pModuleInterface)
 {
-    m_pLuaManager = pLuaManager;
 }
 
 CLuaModuleManager::~CLuaModuleManager()
 {
     // Shutdown all our modules
-    list<CLuaModule*>::iterator iter = m_Modules.begin();
-    for (; iter != m_Modules.end(); ++iter)
+    for (auto const& luaModule : m_vecModules)
     {
-        delete *iter;
+        delete luaModule;
     }
 }
 
-void CLuaModuleManager::SetScriptDebugging(CScriptDebugging* pScriptDebugging)
+void CLuaModuleManager::RegisterFunctions(IResource* resource)
 {
-    m_pScriptDebugging = pScriptDebugging;
-}
-
-void CLuaModuleManager::RegisterFunctions(lua_State* luaVM)
-{
-    list<CLuaModule*>::iterator iter = m_Modules.begin();
-    for (; iter != m_Modules.end(); ++iter)
+    for (auto const& luaModule : m_vecModules)
     {
-        (*iter)->_RegisterFunctions(luaVM);
+        luaModule->_RegisterFunctions(resource);
     }
 }
 
 void CLuaModuleManager::DoPulse()
 {
-    list<CLuaModule*>::iterator iter = m_Modules.begin();
-    for (; iter != m_Modules.end(); iter++)
+    for (auto const& luaModule : m_vecModules)
     {
-        (*iter)->_DoPulse();
+        luaModule->_DoPulse();
     }
 }
 
 int CLuaModuleManager::LoadModule(const char* szShortFileName, const char* szFileName, bool bLateLoad)
-{            // 0 = Success, 1 = Can't find file, 2 = Can't find initialise function, 3 = can't find dopulse function,
+{
+    // 0 = Success, 1 = Can't find file, 2 = Can't find initialise function, 3 = can't find dopulse function,
     // 4 = can't find shutdownmodule function, 5 = can't find register function, 6 = can't find resourcestopping function
     // 7 = can't find resourcestopped function, 8 = resource already loaded
 
@@ -62,17 +53,16 @@ int CLuaModuleManager::LoadModule(const char* szShortFileName, const char* szFil
     // and we need to register all it's functions to all available VM's
 
     // Check if the module is already loaded
-    list<CLuaModule*>::iterator iter = m_Modules.begin();
-    for (; iter != m_Modules.end(); ++iter)
+    for (auto const& luaModule : m_vecModules)
     {
-        if (strcmp((*iter)->_GetName().c_str(), szShortFileName) == 0)
+        if (strcmp(luaModule->_GetName().c_str(), szShortFileName) == 0)
         {
             return 8;
         }
     }
 
     // Initialize
-    CLuaModule* pModule = new CLuaModule(this, m_pScriptDebugging, szFileName, szShortFileName);
+    CLuaModule* pModule = new CLuaModule(this, m_pModuleInterface, szFileName, szShortFileName);
     // Load the module
     int iSuccess = pModule->_LoadModule();
     if (iSuccess != 0)
@@ -81,18 +71,18 @@ int CLuaModuleManager::LoadModule(const char* szShortFileName, const char* szFil
         return iSuccess;
     }
 
-    m_Modules.push_back(pModule);
+    m_vecModules.push_back(pModule);
 
-    // Perform registering for late loaded modules
-    if (bLateLoad)
-    {
-        list<CLuaMain*>::const_iterator iter = m_pLuaManager->IterBegin();
-        for (; iter != m_pLuaManager->IterEnd(); ++iter)
-        {
-            lua_State* luaVM = (*iter)->GetVM();
-            pModule->_RegisterFunctions(luaVM);
-        }
-    }
+    //// Perform registering for late loaded modules
+    //if (bLateLoad)
+    //{
+    //    list<CLuaMain*>::const_iterator iter = m_pLuaManager->IterBegin();
+    //    for (; iter != m_pLuaManager->IterEnd(); ++iter)
+    //    {
+    //        lua_State* luaVM = (*iter)->GetVM();
+    //        pModule->_RegisterFunctions(luaVM);
+    //    }
+    //}
 
     return iSuccess;
 }
@@ -111,34 +101,33 @@ int CLuaModuleManager::ReloadModule(const char* szShortFileName, const char* szF
 }
 
 int CLuaModuleManager::UnloadModule(const char* szShortFileName)
-{            // 0 = Success, 9 = Can't find module by name
-    list<CLuaModule*>::iterator iter = m_Modules.begin();
-    for (; iter != m_Modules.end(); ++iter)
+{
+    // 0 = Success, 9 = Can't find module by name
+    std::vector<CLuaModule*>::iterator iter = m_vecModules.begin();
+    for (; iter != m_vecModules.end(); ++iter)
     {
         if (strcmp((*iter)->_GetName().c_str(), szShortFileName) == 0)
         {
             delete *iter;
-            m_Modules.remove(*iter);
+            m_vecModules.erase(iter);
             return 0;
         }
     }
     return 9;
 }
 
-void CLuaModuleManager::ResourceStopping(lua_State* luaVM)
+void CLuaModuleManager::ResourceStopping(IResource* resource)
 {
-    list<CLuaModule*>::iterator iter = m_Modules.begin();
-    for (; iter != m_Modules.end(); ++iter)
+    for (auto const& luaModule : m_vecModules)
     {
-        (*iter)->_ResourceStopping(luaVM);
+        luaModule->_ResourceStopping(resource);
     }
 }
 
-void CLuaModuleManager::ResourceStopped(lua_State* luaVM)
+void CLuaModuleManager::ResourceStopped(IResource* resource)
 {
-    list<CLuaModule*>::iterator iter = m_Modules.begin();
-    for (; iter != m_Modules.end(); ++iter)
+    for (auto const& luaModule : m_vecModules)
     {
-        (*iter)->_ResourceStopped(luaVM);
+        luaModule->_ResourceStopped(resource);
     }
 }

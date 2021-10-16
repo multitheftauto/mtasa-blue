@@ -9,42 +9,26 @@
  *
  *****************************************************************************/
 
-// IMPLEMENTATION of Lua dynamic modules
-
-class CLuaModuleManager;
-
-#pragma once
-
-#include "CLuaMain.h"
-#include "ILuaModuleManager.h"
-#include "CLuaManager.h"
-#include "../CLogger.h"
-#include "../CResource.h"
-#include "CLuaModule.h"
-
 class CScriptDebugging;
 
 class CLuaModuleManager
 {
 public:
-    CLuaModuleManager(CLuaManager* pLuaManager);
+    CLuaModuleManager(IModuleInterface* pModuleInterface);
     ~CLuaModuleManager();
 
     // functions for deathmatch
     void DoPulse();
     int  LoadModule(const char* szShortFileName, const char* szFileName, bool bLateLoad);
-    void SetScriptDebugging(CScriptDebugging* pScriptDebugging);
-    void RegisterFunctions(lua_State* luaVM);
+    void RegisterFunctions(IResource* resource);
     int  UnloadModule(const char* szShortFileName);
     int  ReloadModule(const char* szShortFileName, const char* szFileName, bool bLateLoad);
-    void ResourceStopping(lua_State* luaVM);
-    void ResourceStopped(lua_State* luaVM);
+    void ResourceStopping(IResource* resource);
+    void ResourceStopped(IResource* resource);
 
-    CLuaManager*      GetLuaManager() { return m_pLuaManager; };
-    list<CLuaModule*> GetLoadedModules() { return m_Modules; };
+    std::vector<CLuaModule*> GetLoadedModules() { return m_vecModules; };
 
 private:
-    CScriptDebugging* m_pScriptDebugging;
-    CLuaManager*      m_pLuaManager;
-    list<CLuaModule*> m_Modules;
+    IModuleInterface*        m_pModuleInterface;
+    std::vector<CLuaModule*> m_vecModules;
 };

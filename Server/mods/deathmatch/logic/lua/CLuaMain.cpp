@@ -210,7 +210,9 @@ void CLuaMain::LoadEmbeddedScripts()
 
 void CLuaMain::RegisterModuleFunctions()
 {
-    m_pLuaManager->GetLuaModuleManager()->RegisterFunctions(m_luaVM);
+
+    // TODO
+ //   m_pLuaManager->GetLuaModuleManager()->RegisterFunctions(m_luaVM);
 }
 
 // Special function(s) that are only visible to HTMLD scripts
@@ -381,6 +383,11 @@ void CLuaMain::UnloadScript()
 void CLuaMain::DoPulse()
 {
     m_pLuaTimerManager->DoPulse(this);
+}
+
+unsigned long CLuaMain::GetElementCount() const
+{
+    return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0;
 }
 
 // Keep count of the number of open files in this resource and issue a warning if too high
