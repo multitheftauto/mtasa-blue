@@ -162,7 +162,7 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     m_pLabelVersionTag->SetSize(CVector2D(textWidth + 5, 18));
     m_pLabelVersionTag->SetPosition(CVector2D(ScreenSize.fX - textWidth - 5, ScreenSize.fY - 15));
     m_pLabelVersionTag->SetAlpha(0.5f * 255);
-    //m_pLabelVersionTag->SetTextColor(255, 255, 255);
+    m_pLabelVersionTag->SetTextColor(255, 255, 255);
     //m_pLabelVersionTag->SetZOrderingEnabled(false);
     m_pLabelVersionTag->SetVisible(false);
 
@@ -577,6 +577,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 bool CLocalGUI::InputGoesToGUI()
 {
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
+
     if (!pGUI)
         return false;
 
@@ -584,8 +585,8 @@ bool CLocalGUI::InputGoesToGUI()
     // If the console is visible OR the chat is expecting input OR the mainmenu is visible
 
     /* TODO AFTER CEGUI API REWRITE */
-    //return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
-    //        !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible ||
+            !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
 
     return false;
 }

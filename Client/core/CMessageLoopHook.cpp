@@ -435,7 +435,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             bool bProcessed = false, bClientProcessed = false;
 
             // Check and see if the GUI should process this message
-            bProcessed = CLocalGUI::GetSingleton().ProcessMessage(hwnd, uMsg, wParam, lParam);
+            bProcessed = CLocalGUI::GetSingleton().ProcessMessage(hwnd, uMsg, wParam, lParam) || g_pCore->GetGame()->IsAtMenu();
 
             // Check and see if the Core/mod should process this message
             if (g_pCore->GetGame() && !g_pCore->GetGame()->IsAtMenu())
