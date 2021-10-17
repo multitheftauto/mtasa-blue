@@ -33,6 +33,7 @@ public:
 
     const char*     GetServerPath() { return m_strServerPath; };
     const char*     GetModPath() { return m_strModPath; };
+    const char*     GetModulePath() { return PathJoin(GetServerPath(), SERVER_BIN_PATH_MOD, "modules"); };
     virtual SString GetAbsolutePath(const char* szRelative);
 
     bool         IsModLoaded();

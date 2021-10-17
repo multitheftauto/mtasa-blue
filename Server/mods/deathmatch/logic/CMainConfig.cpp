@@ -785,6 +785,8 @@ bool CMainConfig::LoadExtended()
                     "Usage: unloadmodule <module-filename>\nUnload a module eg: unloadmodule ml_sockets.dll");
     RegisterCommand("reloadmodule", CConsoleCommands::ReloadModule, false,
                     "Usage: reloadmodule <module-filename>\nReload a module eg: reloadmodule ml_sockets.dll");
+    RegisterCommand("modules", CConsoleCommands::ListModules, false,
+                    "Displays list of all modules and its status");
 
     RegisterCommand("ver", CConsoleCommands::Ver, false, "Get the MTA version");
     RegisterCommand("sver", CConsoleCommands::Ver, false, "Get the server MTA version");

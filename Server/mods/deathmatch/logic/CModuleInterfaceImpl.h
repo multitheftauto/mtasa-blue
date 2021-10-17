@@ -1,7 +1,8 @@
 class CLuaManager;
 
-class CModuleLoggerImpl : ILogger
+class CModuleLoggerImpl : public ILogger
 {
+public:
     void Printf(const char* szFormat, ...);
     void ErrorPrintf(const char* szFormat, ...);
     void LogInformation(lua_State* luaVM, const char* szFormat, ...);
@@ -10,11 +11,12 @@ class CModuleLoggerImpl : ILogger
 class CModuleInterfaceImpl : public IModuleInterface
 {
 public:
-    CModuleInterfaceImpl(CLuaManager* pLuaManager);
+    CModuleInterfaceImpl(CLuaManager* pLuaManager, ILogger* pLoggerImpl);
 
     ILogger*      GetLogger();
     IResource*    GetResourceFromName(const char* name);
     const char*   GetServerPath();
+    const char*   GetModulesPath();
     IResource*    GetResourceFromLuaState(lua_State* luaVM);
     unsigned long GetVersion();
     const char*   GetVersionString();
@@ -26,4 +28,5 @@ public:
 
 private:
     CLuaManager* m_pLuaManager;
+    ILogger*     m_pLogger;
 };

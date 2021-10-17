@@ -670,5 +670,6 @@ private:
     bool m_DevelopmentModeEnabled;
     bool m_showClientTransferBox = true;
 
+    CModuleInterfaceImpl* m_pModuleInterface;
     std::vector<IModule*> m_vecModules;
 };

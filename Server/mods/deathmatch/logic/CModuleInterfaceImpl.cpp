@@ -24,13 +24,13 @@ void CModuleLoggerImpl::LogInformation(lua_State* luaVM, const char* szFormat, .
     va_end(args);
 }
 
-CModuleInterfaceImpl::CModuleInterfaceImpl(CLuaManager* pLuaManager) : m_pLuaManager(pLuaManager)
+CModuleInterfaceImpl::CModuleInterfaceImpl(CLuaManager* pLuaManager, ILogger* pLoggerImpl) : m_pLuaManager(pLuaManager), m_pLogger(pLoggerImpl)
 {
 }
 
 ILogger* CModuleInterfaceImpl::GetLogger()
 {
-    return nullptr; // TODO impelemnt
+    return m_pLogger;
 }
 
 IResource* CModuleInterfaceImpl::GetResourceFromName(const char* name)
@@ -52,6 +52,11 @@ IResource* CModuleInterfaceImpl::GetResourceFromName(const char* name)
 const char* CModuleInterfaceImpl::GetServerPath()
 {
     return g_pServerInterface->GetModManager()->GetServerPath();
+}
+
+const char* CModuleInterfaceImpl::GetModulesPath()
+{
+    return PathJoin(GetServerPath(), SERVER_BIN_PATH_MOD, "modules");
 }
 
 IResource* CModuleInterfaceImpl::GetResourceFromLuaState(lua_State* luaVM)

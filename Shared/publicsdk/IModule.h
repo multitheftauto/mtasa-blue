@@ -29,6 +29,7 @@ public:
     virtual ILogger*    GetLogger() = 0;
     virtual IResource*  GetResourceFromName(const char* name) = 0;
     virtual const char* GetServerPath() = 0;
+    virtual const char* GetModulesPath() = 0;
     virtual IResource*  GetResourceFromLuaState(lua_State* luaVM) = 0;
 
     virtual unsigned long GetVersion() = 0;
@@ -42,7 +43,7 @@ public:
 class IModule
 {
 public:
-    virtual void Load(IModuleInterface* moduleInterface) = 0;
+    virtual void Load() = 0;
     virtual void UnLoad() = 0;
     virtual void DoPulse() = 0;
     virtual void ResourceStarted(IResource* resource) = 0;

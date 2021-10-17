@@ -1,5 +1,11 @@
 #pragma once
 
+struct SFoundModule
+{
+    std::string name;
+    std::string state;
+};
+
 class ILuaModule
 {
 public:

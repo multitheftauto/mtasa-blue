@@ -1,8 +1,9 @@
 #include "StdInc.h"
+#include <sdk/SharedUtil.File.h>
 
-void CLuaModulesModule::Load(IModuleInterface* pModuleInterface)
+void CLuaModulesModule::Load()
 {
-    m_pLuaModuleManager = new CLuaModuleManager(pModuleInterface);
+    m_pLuaModuleManager = new CLuaModuleManager(m_pModuleInterface);
     
 }
 
@@ -66,4 +67,38 @@ std::vector<ILuaModule*> CLuaModulesModule::GetModules()
         modules.push_back(luaModule);
     }
     return modules;
+}
+
+bool CLuaModulesModule::IsModuleRunning(std::string moduleName)
+{
+    std::vector<CLuaModule*> luaModules = m_pLuaModuleManager->GetLoadedModules();
+    for (const auto luaModule : luaModules)
+    {
+        if (luaModule->_GetName() == moduleName)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::vector<SFoundModule> CLuaModulesModule::GetAllModules()
+{
+    std::vector<SFoundModule> foundModules;
+    std::vector<SString>      itemList = SharedUtil::FindFiles(SharedUtil::PathJoin(m_pModuleInterface->GetModulesPath(), "*"), true, false);
+    for (auto const& file : itemList)
+    {
+        SFoundModule foundModule;
+        foundModule.name = file;
+        if (IsModuleRunning(file))
+        {
+            foundModule.state = "running";
+        }
+        else
+        {
+            foundModule.state = "loaded";
+        }
+        foundModules.push_back(foundModule);
+    }
+    return foundModules;
 }

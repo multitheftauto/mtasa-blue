@@ -204,7 +204,8 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
 
     memset(&m_bGarageStates[0], 0, sizeof(m_bGarageStates));
 
-    m_vecModules.push_back(new CLuaModulesModule());
+    m_pModuleInterface = new CModuleInterfaceImpl(m_pLuaManager, new CModuleLoggerImpl());
+    m_vecModules.push_back(new CLuaModulesModule(m_pModuleInterface));
     // init our mutex
     pthread_mutex_init(&mutexhttp, NULL);
 }
@@ -932,6 +933,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         }
     }
 
+    for (auto const& module : m_vecModules)
+    {
+        module->Load();
+    }
     // Done
     // If you're ever going to change this message, update the "server ready" determination
     // inside CServer.cpp in deathmatch mod aswell.

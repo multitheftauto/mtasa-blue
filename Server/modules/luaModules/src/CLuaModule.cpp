@@ -21,7 +21,7 @@ CLuaModule::CLuaModule(CLuaModuleManager* pLuaModuleManager, IModuleInterface* p
     m_pModuleInterface = pModuleInterface;
     // set module path
     m_szFileName = szFileName;
-    m_szShortFileName = szFileName;
+    m_szShortFileName = szShortFileName;
     // set as uninitialised
     m_bInitialised = false;
 }

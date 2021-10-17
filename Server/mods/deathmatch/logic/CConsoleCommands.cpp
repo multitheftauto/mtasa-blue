@@ -1353,7 +1353,7 @@ bool CConsoleCommands::LoadModule(CConsole* pConsole, const char* szArguments, C
             pEchoClient->SendConsole("loadmodule: Invalid module path");
             return false;
         }
-        SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
+        SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetModulePath(), szArguments);
 
         // These modules are late loaded
         int iSuccess = g_pGame->GetModule<CLuaModulesModule>()->LoadModule(szArguments, strFilename, true);
@@ -1444,7 +1444,7 @@ bool CConsoleCommands::ReloadModule(CConsole* pConsole, const char* szArguments,
         if (pClient->GetNick())
             CLogger::LogPrintf("reloadmodule: Requested by %s\n", pClient->GetNick());
 
-        SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
+        SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetModulePath(), szArguments);
 
         int iSuccess = g_pGame->GetModule<CLuaModulesModule>()->ReloadModule(szArguments, strFilename, true);
         switch (iSuccess)
@@ -1504,6 +1504,16 @@ bool CConsoleCommands::ReloadModule(CConsole* pConsole, const char* szArguments,
         pEchoClient->SendConsole("* Syntax: reloadmodule <module-name-with-extension>");
 
     return false;
+}
+
+bool CConsoleCommands::ListModules(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
+{
+    CLuaModulesModule* pLuaModulesModule = g_pGame->GetModule<CLuaModulesModule>();
+    for (auto const& luaModule : pLuaModulesModule->GetAllModules())
+    {
+        pEchoClient->SendConsole(SString("[%s] %s", luaModule.state.c_str(), luaModule.name.c_str()));
+    }
+    return true;
 }
 
 bool CConsoleCommands::Ver(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
