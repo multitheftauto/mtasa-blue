@@ -240,6 +240,11 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsa
     if (size > 4096)
         throw std::invalid_argument("Size cannot be further than 4096 bits");
 
+    // Since 2015, NIST recommends a minimum of 2048-bit keys for RSA, an update to the widely-accepted recommendation of a 1024-bit minimum since at least 2002.
+    // See: https://en.wikipedia.org/wiki/Key_size
+    if (size < 2048)
+        m_pScriptDebugging->LogWarning(luaVM, "Key sizes less than 2048-bit isn't recommened. Key Pair might be incesure.");
+
     if (callback.has_value())
     {
         // Async
@@ -252,15 +257,15 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsa
                     // Execute time-consuming task
                     return SharedUtil::GenerateRsaKeyPair(size);
                 },
-                [luaFunctionRef = callback.value()](std::pair<SString, SString> var)
+                [luaFunctionRef = callback.value()](std::pair<SString, SString> result)
                 {
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                     if (pLuaMain)
                     {
                         CLuaArguments arguments;
 
-                        arguments.PushString(var.first);
-                        arguments.PushString(var.second);
+                        arguments.PushString(result.first);
+                        arguments.PushString(result.second);
 
                         arguments.Call(pLuaMain, luaFunctionRef);
                     }
@@ -409,7 +414,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
             }
             case StringEncodeFunction::RSA:
             {
-                std::string& key = options["key"];
+                SString& key = options["key"];
 
                 if (key.empty())
                 {
@@ -427,7 +432,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
                             [data, key]
                             {
-                                std::string result;
+                                SString result;
                                 try
                                 {
                                     result = SharedUtil::RsaEncode(data, key);
@@ -443,7 +448,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    if (result == nullptr)
+                                    if (result.empty())
                                     {
                                         arguments.PushBoolean(false);
                                         arguments.Call(pLuaMain, luaFunctionRef);
@@ -461,17 +466,16 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 else            // Sync
                 {
-                    std::string result;
                     try
                     {
-                        result = SharedUtil::RsaEncode(data, key);
+                        lua::Push(luaVM, SharedUtil::RsaEncode(data, key));
+                        return 1;
                     }
                     catch (const CryptoPP::Exception&)
                     {
                         lua_pushboolean(luaVM, false);
                         return 1;
                     }
-                    lua_pushlstring(luaVM, result.c_str(), result.length());
                 }
                 return 1;
             }
@@ -665,7 +669,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    if (result == nullptr)
+                                    if (result.empty())
                                     {
                                         arguments.PushBoolean(false);
                                         arguments.Call(pLuaMain, luaFunctionRef);
@@ -683,17 +687,16 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 }
                 else            // Sync
                 {
-                    SString result;
                     try
                     {
-                        result = SharedUtil::RsaDecode(data, key);
+                        lua::Push(luaVM, SharedUtil::RsaDecode(data, key));
+                        return 1;
                     }
                     catch (const CryptoPP::Exception&)
                     {
                         lua_pushboolean(luaVM, false);
                         return 1;
                     }
-                    lua_pushlstring(luaVM, result, result.length());
                 }
                 return 1;
             }

@@ -804,14 +804,14 @@ void SharedUtil_Hash_Tests()
     // RSA (keypair generation, encryption and decryption)
     {
         TEST_FUNCTION
-        std::pair<std::string, std::string> keypair = GenerateRsaKeyPair(keysize);
-        assert(!keypair.first.empty());
-        assert(!keypair.second.empty());
-        std::string encryptedData = RsaEncode(data, keypair.second);
-        std::string decryptedData = RsaDecode(encryptedData, keypair.first);
+        auto [privateKey, publicKey] = GenerateRsaKeyPair(keysize);
+        assert(!privateKey.empty());
+        assert(!publicKey.empty());
+        SString encryptedData = RsaEncode(data, privateKey);
+        SString decryptedData = RsaDecode(encryptedData, publicKey);
         assert(data == decryptedData);
         TEST_VARS
-        const std::string data;
+        const SString data;
         const int     keysize;
         TEST_DATA = {
             {"Hello world", 128},

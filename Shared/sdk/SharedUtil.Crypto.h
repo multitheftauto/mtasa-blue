@@ -33,11 +33,10 @@ namespace SharedUtil
         return result;
     }
 
-    // Returns a pair of private and public keys, both of the specified size.
-    inline std::pair<std::string, std::string> GenerateRsaKeyPair(const unsigned int size)
+    inline std::pair<SString, SString> GenerateRsaKeyPair(const unsigned int size)
     {
-        std::string rawPrivateKey;
-        std::string rawPublicKey;
+        SString rawPrivateKey;
+        SString rawPublicKey;
 
         CryptoPP::AutoSeededRandomPool asrp;
 
@@ -56,9 +55,9 @@ namespace SharedUtil
         return std::make_pair(rawPrivateKey, rawPublicKey);
     }
 
-    inline std::string RsaEncode(const std::string& data, const std::string& publicKey)
+    inline SString RsaEncode(const SString& data, const SString& publicKey)
     {
-        std::string result;
+        SString result;
 
         CryptoPP::RSA::PublicKey       rsaPublicKey;
         CryptoPP::AutoSeededRandomPool asrp;
@@ -72,9 +71,9 @@ namespace SharedUtil
         return result;
     }
 
-    inline std::string RsaDecode(const std::string& data, const std::string& privateKey)
+    inline SString RsaDecode(const SString& data, const SString& privateKey)
     {
-        std::string result;
+        SString result;
 
         CryptoPP::RSA::PrivateKey      rsaPrivateKey;
         CryptoPP::AutoSeededRandomPool asrp;
