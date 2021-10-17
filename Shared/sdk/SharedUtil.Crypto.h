@@ -33,7 +33,8 @@ namespace SharedUtil
         return result;
     }
 
-    inline std::pair<std::string, std::string> GenerateRsaKeyPair(const int size)
+    // Returns a pair of private and public keys, both of the specified size.
+    inline std::pair<std::string, std::string> GenerateRsaKeyPair(const unsigned int size)
     {
         std::string rawPrivateKey;
         std::string rawPublicKey;

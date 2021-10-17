@@ -236,7 +236,7 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsa
 {
     // keysize checks (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
     if (size < 128)
-        throw std::invalid_argument("Size cannot be lower than 128 bits");
+        throw std::invalid_argument("Size cannot be less than 128 bits");
     if (size > 4096)
         throw std::invalid_argument("Size cannot be further than 4096 bits");
 
