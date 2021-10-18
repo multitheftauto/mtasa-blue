@@ -240,11 +240,6 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsa
     if (size > 4096)
         throw std::invalid_argument("Size cannot be further than 4096 bits");
 
-    // Since 2015, NIST recommends a minimum of 2048-bit keys for RSA, an update to the widely-accepted recommendation of a 1024-bit minimum since at least 2002.
-    // See: https://en.wikipedia.org/wiki/Key_size
-    if (size < 2048)
-        m_pScriptDebugging->LogWarning(luaVM, "Key sizes less than 2048-bit isn't recommened. Key Pair might be incesure.");
-
     if (callback.has_value())
     {
         // Async
