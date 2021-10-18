@@ -419,7 +419,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 if (key.empty())
                 {
                     m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
-                    lua_pushboolean(luaVM, false);
+                    lua::Push(luaVM, false);
                     return 1;
                 }
 
@@ -461,7 +461,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                 }
                             });
 
-                        lua_pushboolean(luaVM, true);
+                        lua::Push(luaVM, true);
                     }
                 }
                 else            // Sync
@@ -469,13 +469,12 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     try
                     {
                         lua::Push(luaVM, SharedUtil::RsaEncode(data, key));
-                        return 1;
                     }
                     catch (const CryptoPP::Exception&)
                     {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
+                        lua::Push(luaVM, false);
                     }
+                    return 1;
                 }
                 return 1;
             }
@@ -640,7 +639,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                 if (key.empty())
                 {
                     m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
-                    lua_pushboolean(luaVM, false);
+                    lua::Push(luaVM, false);
                     return 1;
                 }
 
@@ -682,7 +681,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                 }
                             });
 
-                        lua_pushboolean(luaVM, true);
+                        lua::Push(luaVM, true);
                     }
                 }
                 else            // Sync
@@ -690,13 +689,12 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     try
                     {
                         lua::Push(luaVM, SharedUtil::RsaDecode(data, key));
-                        return 1;
                     }
                     catch (const CryptoPP::Exception&)
                     {
-                        lua_pushboolean(luaVM, false);
-                        return 1;
+                        lua::Push(luaVM, false);
                     }
+                    return 1;
                 }
                 return 1;
             }
