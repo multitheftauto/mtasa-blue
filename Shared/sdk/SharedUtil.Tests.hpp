@@ -801,26 +801,6 @@ void SharedUtil_Hash_Tests()
         TEST_END
     }
 
-    // RSA (keypair generation, encryption and decryption)
-    {
-        TEST_FUNCTION
-        auto [privateKey, publicKey] = GenerateRsaKeyPair(keysize);
-        assert(!privateKey.empty());
-        assert(!publicKey.empty());
-        SString encryptedData = RsaEncode(data, privateKey);
-        SString decryptedData = RsaDecode(encryptedData, publicKey);
-        assert(data == decryptedData);
-        TEST_VARS
-        const SString data;
-        const int     keysize;
-        TEST_DATA = {
-            {"Hello world", 128},
-            {"!@#$%^&*()_+|:<>", 2048},
-            {"Hello there", 4096},
-        };
-        TEST_END
-    }
-
     #define szTempFilename "hash_""\xD0""\x98""_test"
 
     // MD5
