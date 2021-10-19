@@ -892,6 +892,16 @@ unsigned int CPedSA::GetFootBlood()
     return 0;
 }
 
+bool CPedSA::IsBleeding()
+{
+    return GetPedInterface()->pedFlags.bPedIsBleeding;
+}
+
+void CPedSA::SetBleeding(bool bBleeding)
+{
+    GetPedInterface()->pedFlags.bPedIsBleeding = bBleeding;
+}
+
 bool CPedSA::IsOnFire()
 {
     if (GetPedInterface()->pFireOnPed != NULL)

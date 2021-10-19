@@ -452,7 +452,8 @@ struct RwBuffer
     void*        ptr;
     unsigned int size;
 };
-union RwStreamTypeData {
+union RwStreamTypeData
+{
     struct
     {
         unsigned int position;

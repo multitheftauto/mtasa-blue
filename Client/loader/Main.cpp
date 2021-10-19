@@ -82,7 +82,7 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
     // Stuff
     HandleCustomStartMessage();
     #ifndef MTA_DEBUG
-        ForbodenProgramsMessage();
+    ForbodenProgramsMessage();
     #endif
     CycleEventLog();
     BsodDetectionPreLaunch();

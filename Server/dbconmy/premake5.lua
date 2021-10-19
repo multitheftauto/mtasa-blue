@@ -43,7 +43,7 @@ project "Dbconmy"
 	if GLIBC_COMPAT then
 		filter { "system:linux" }
 			buildoptions { "-pthread" }
-			linkoptions { "-l:libmysqlclient.a", "-pthread" }
+			linkoptions { "-l:libmysqlclient.a", "-pthread", "-lssl", "-lcrypto" }
 			links { "z", "dl", "m" }
 	else
 		filter "system:not windows"

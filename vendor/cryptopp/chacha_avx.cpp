@@ -91,39 +91,40 @@ NAMESPACE_BEGIN(CryptoPP)
 
 void ChaCha_OperateKeystream_AVX2(const word32 *state, const byte* input, byte *output, unsigned int rounds)
 {
-    MAYBE_CONST __m128i* state_mm = (MAYBE_CONST __m128i*)(state);
-    MAYBE_CONST __m256i* input_mm = (MAYBE_CONST __m256i*)(input);
-    __m256i* output_mm = reinterpret_cast<__m256i*>(output);
+    const __m256i state0 = _mm256_broadcastsi128_si256(
+        _mm_loadu_si128(reinterpret_cast<const __m128i*>(state+0*4)));
+    const __m256i state1 = _mm256_broadcastsi128_si256(
+        _mm_loadu_si128(reinterpret_cast<const __m128i*>(state+1*4)));
+    const __m256i state2 = _mm256_broadcastsi128_si256(
+        _mm_loadu_si128(reinterpret_cast<const __m128i*>(state+2*4)));
+    const __m256i state3 = _mm256_broadcastsi128_si256(
+        _mm_loadu_si128(reinterpret_cast<const __m128i*>(state+3*4)));
 
-    const __m256i state0 = _mm256_broadcastsi128_si256(_mm_loadu_si128(state_mm + 0));
-    const __m256i state1 = _mm256_broadcastsi128_si256(_mm_loadu_si128(state_mm + 1));
-    const __m256i state2 = _mm256_broadcastsi128_si256(_mm_loadu_si128(state_mm + 2));
-    const __m256i state3 = _mm256_broadcastsi128_si256(_mm_loadu_si128(state_mm + 3));
-
-    const __m256i CTR0 = _mm256_set_epi32(0, 0, 0, 0, 0, 0, 0, 4);
-    const __m256i CTR1 = _mm256_set_epi32(0, 0, 0, 1, 0, 0, 0, 5);
-    const __m256i CTR2 = _mm256_set_epi32(0, 0, 0, 2, 0, 0, 0, 6);
-    const __m256i CTR3 = _mm256_set_epi32(0, 0, 0, 3, 0, 0, 0, 7);
+    const word32 C = 0xFFFFFFFFu - state[12];
+    const __m256i CTR0 = _mm256_set_epi32(0, 0,     0, 0, 0, 0, C < 4, 4);
+    const __m256i CTR1 = _mm256_set_epi32(0, 0, C < 1, 1, 0, 0, C < 5, 5);
+    const __m256i CTR2 = _mm256_set_epi32(0, 0, C < 2, 2, 0, 0, C < 6, 6);
+    const __m256i CTR3 = _mm256_set_epi32(0, 0, C < 3, 3, 0, 0, C < 7, 7);
 
     __m256i X0_0 = state0;
     __m256i X0_1 = state1;
     __m256i X0_2 = state2;
-    __m256i X0_3 = _mm256_add_epi64(state3, CTR0);
+    __m256i X0_3 = _mm256_add_epi32(state3, CTR0);
 
     __m256i X1_0 = state0;
     __m256i X1_1 = state1;
     __m256i X1_2 = state2;
-    __m256i X1_3 = _mm256_add_epi64(state3, CTR1);
+    __m256i X1_3 = _mm256_add_epi32(state3, CTR1);
 
     __m256i X2_0 = state0;
     __m256i X2_1 = state1;
     __m256i X2_2 = state2;
-    __m256i X2_3 = _mm256_add_epi64(state3, CTR2);
+    __m256i X2_3 = _mm256_add_epi32(state3, CTR2);
 
     __m256i X3_0 = state0;
     __m256i X3_1 = state1;
     __m256i X3_2 = state2;
-    __m256i X3_3 = _mm256_add_epi64(state3, CTR3);
+    __m256i X3_3 = _mm256_add_epi32(state3, CTR3);
 
     for (int i = static_cast<int>(rounds); i > 0; i -= 2)
     {
@@ -284,100 +285,132 @@ void ChaCha_OperateKeystream_AVX2(const word32 *state, const byte* input, byte *
     X0_1 = _mm256_add_epi32(X0_1, state1);
     X0_2 = _mm256_add_epi32(X0_2, state2);
     X0_3 = _mm256_add_epi32(X0_3, state3);
-    X0_3 = _mm256_add_epi64(X0_3, CTR0);
+    X0_3 = _mm256_add_epi32(X0_3, CTR0);
 
     X1_0 = _mm256_add_epi32(X1_0, state0);
     X1_1 = _mm256_add_epi32(X1_1, state1);
     X1_2 = _mm256_add_epi32(X1_2, state2);
     X1_3 = _mm256_add_epi32(X1_3, state3);
-    X1_3 = _mm256_add_epi64(X1_3, CTR1);
+    X1_3 = _mm256_add_epi32(X1_3, CTR1);
 
     X2_0 = _mm256_add_epi32(X2_0, state0);
     X2_1 = _mm256_add_epi32(X2_1, state1);
     X2_2 = _mm256_add_epi32(X2_2, state2);
     X2_3 = _mm256_add_epi32(X2_3, state3);
-    X2_3 = _mm256_add_epi64(X2_3, CTR2);
+    X2_3 = _mm256_add_epi32(X2_3, CTR2);
 
     X3_0 = _mm256_add_epi32(X3_0, state0);
     X3_1 = _mm256_add_epi32(X3_1, state1);
     X3_2 = _mm256_add_epi32(X3_2, state2);
     X3_3 = _mm256_add_epi32(X3_3, state3);
-    X3_3 = _mm256_add_epi64(X3_3, CTR3);
+    X3_3 = _mm256_add_epi32(X3_3, CTR3);
 
-    if (input_mm)
+    if (input)
     {
-        _mm256_storeu_si256(output_mm + 0, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 0),
-            _mm256_permute2x128_si256(X0_0, X0_1, 1 + (3 << 4))));
-        _mm256_storeu_si256(output_mm + 1, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 1),
-            _mm256_permute2x128_si256(X0_2, X0_3, 1 + (3 << 4))));
-        _mm256_storeu_si256(output_mm + 2, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 2),
-            _mm256_permute2x128_si256(X1_0, X1_1, 1 + (3 << 4))));
-        _mm256_storeu_si256(output_mm + 3, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 3),
-            _mm256_permute2x128_si256(X1_2, X1_3, 1 + (3 << 4))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+0*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X0_0, X0_1, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+0*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+1*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X0_2, X0_3, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+1*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+2*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X1_0, X1_1, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+2*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+3*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X1_2, X1_3, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+3*32)))));
     }
     else
     {
-        _mm256_storeu_si256(output_mm + 0, _mm256_permute2x128_si256(X0_0, X0_1, 1 + (3 << 4)));
-        _mm256_storeu_si256(output_mm + 1, _mm256_permute2x128_si256(X0_2, X0_3, 1 + (3 << 4)));
-        _mm256_storeu_si256(output_mm + 2, _mm256_permute2x128_si256(X1_0, X1_1, 1 + (3 << 4)));
-        _mm256_storeu_si256(output_mm + 3, _mm256_permute2x128_si256(X1_2, X1_3, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+0*32),
+            _mm256_permute2x128_si256(X0_0, X0_1, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+1*32),
+            _mm256_permute2x128_si256(X0_2, X0_3, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+2*32),
+            _mm256_permute2x128_si256(X1_0, X1_1, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+3*32),
+            _mm256_permute2x128_si256(X1_2, X1_3, 1 + (3 << 4)));
     }
 
-    if (input_mm)
+    if (input)
     {
-        _mm256_storeu_si256(output_mm + 4, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 4),
-            _mm256_permute2x128_si256(X2_0, X2_1, 1 + (3 << 4))));
-        _mm256_storeu_si256(output_mm + 5, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 5),
-            _mm256_permute2x128_si256(X2_2, X2_3, 1 + (3 << 4))));
-        _mm256_storeu_si256(output_mm + 6, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 6),
-            _mm256_permute2x128_si256(X3_0, X3_1, 1 + (3 << 4))));
-        _mm256_storeu_si256(output_mm + 7, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 7),
-            _mm256_permute2x128_si256(X3_2, X3_3, 1 + (3 << 4))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+4*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X2_0, X2_1, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+4*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+5*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X2_2, X2_3, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+5*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+6*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X3_0, X3_1, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+6*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+7*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X3_2, X3_3, 1 + (3 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+7*32)))));
     }
     else
     {
-        _mm256_storeu_si256(output_mm + 4, _mm256_permute2x128_si256(X2_0, X2_1, 1 + (3 << 4)));
-        _mm256_storeu_si256(output_mm + 5, _mm256_permute2x128_si256(X2_2, X2_3, 1 + (3 << 4)));
-        _mm256_storeu_si256(output_mm + 6, _mm256_permute2x128_si256(X3_0, X3_1, 1 + (3 << 4)));
-        _mm256_storeu_si256(output_mm + 7, _mm256_permute2x128_si256(X3_2, X3_3, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+4*32),
+            _mm256_permute2x128_si256(X2_0, X2_1, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+5*32),
+            _mm256_permute2x128_si256(X2_2, X2_3, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+6*32),
+            _mm256_permute2x128_si256(X3_0, X3_1, 1 + (3 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+7*32),
+            _mm256_permute2x128_si256(X3_2, X3_3, 1 + (3 << 4)));
     }
 
-    if (input_mm)
+    if (input)
     {
-        _mm256_storeu_si256(output_mm +  8, _mm256_xor_si256(_mm256_loadu_si256(input_mm +  8),
-            _mm256_permute2x128_si256(X0_0, X0_1, 0 + (2 << 4))));
-        _mm256_storeu_si256(output_mm +  9, _mm256_xor_si256(_mm256_loadu_si256(input_mm +  9),
-            _mm256_permute2x128_si256(X0_2, X0_3, 0 + (2 << 4))));
-        _mm256_storeu_si256(output_mm + 10, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 10),
-            _mm256_permute2x128_si256(X1_0, X1_1, 0 + (2 << 4))));
-        _mm256_storeu_si256(output_mm + 11, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 11),
-            _mm256_permute2x128_si256(X1_2, X1_3, 0 + (2 << 4))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+ 8*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X0_0, X0_1, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+8*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+ 9*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X0_2, X0_3, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+9*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+10*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X1_0, X1_1, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+10*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+11*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X1_2, X1_3, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+11*32)))));
     }
     else
     {
-        _mm256_storeu_si256(output_mm +  8, _mm256_permute2x128_si256(X0_0, X0_1, 0 + (2 << 4)));
-        _mm256_storeu_si256(output_mm +  9, _mm256_permute2x128_si256(X0_2, X0_3, 0 + (2 << 4)));
-        _mm256_storeu_si256(output_mm + 10, _mm256_permute2x128_si256(X1_0, X1_1, 0 + (2 << 4)));
-        _mm256_storeu_si256(output_mm + 11, _mm256_permute2x128_si256(X1_2, X1_3, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+ 8*32),
+            _mm256_permute2x128_si256(X0_0, X0_1, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+ 9*32),
+            _mm256_permute2x128_si256(X0_2, X0_3, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+10*32),
+            _mm256_permute2x128_si256(X1_0, X1_1, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+11*32),
+            _mm256_permute2x128_si256(X1_2, X1_3, 0 + (2 << 4)));
     }
 
-    if (input_mm)
+    if (input)
     {
-        _mm256_storeu_si256(output_mm + 12, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 12),
-            _mm256_permute2x128_si256(X2_0, X2_1, 0 + (2 << 4))));
-        _mm256_storeu_si256(output_mm + 13, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 13),
-            _mm256_permute2x128_si256(X2_2, X2_3, 0 + (2 << 4))));
-        _mm256_storeu_si256(output_mm + 14, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 14),
-            _mm256_permute2x128_si256(X3_0, X3_1, 0 + (2 << 4))));
-        _mm256_storeu_si256(output_mm + 15, _mm256_xor_si256(_mm256_loadu_si256(input_mm + 15),
-            _mm256_permute2x128_si256(X3_2, X3_3, 0 + (2 << 4))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+12*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X2_0, X2_1, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+12*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+13*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X2_2, X2_3, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+13*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+14*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X3_0, X3_1, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+14*32)))));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+15*32),
+            _mm256_xor_si256(_mm256_permute2x128_si256(X3_2, X3_3, 0 + (2 << 4)),
+            _mm256_loadu_si256(const_cast<MAYBE_CONST __m256i*>(reinterpret_cast<const __m256i*>(input+15*32)))));
     }
     else
     {
-        _mm256_storeu_si256(output_mm + 12, _mm256_permute2x128_si256(X2_0, X2_1, 0 + (2 << 4)));
-        _mm256_storeu_si256(output_mm + 13, _mm256_permute2x128_si256(X2_2, X2_3, 0 + (2 << 4)));
-        _mm256_storeu_si256(output_mm + 14, _mm256_permute2x128_si256(X3_0, X3_1, 0 + (2 << 4)));
-        _mm256_storeu_si256(output_mm + 15, _mm256_permute2x128_si256(X3_2, X3_3, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+12*32),
+            _mm256_permute2x128_si256(X2_0, X2_1, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+13*32),
+            _mm256_permute2x128_si256(X2_2, X2_3, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+14*32),
+            _mm256_permute2x128_si256(X3_0, X3_1, 0 + (2 << 4)));
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(output+15*32),
+            _mm256_permute2x128_si256(X3_2, X3_3, 0 + (2 << 4)));
     }
 
     // https://software.intel.com/en-us/articles/avoiding-avx-sse-transition-penalties

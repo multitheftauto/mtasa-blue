@@ -1101,7 +1101,7 @@ protected:
                 // Dumb number -> string convertion to avoid stack perturbations
                 if (keyType == LUA_TNUMBER)
                 {
-                    char s[LUAI_MAXNUMBER2STR];
+                    char       s[LUAI_MAXNUMBER2STR];
                     lua_Number n = lua_tonumber(m_luaVM, -2);
                     lua_number2str(s, n);
 
