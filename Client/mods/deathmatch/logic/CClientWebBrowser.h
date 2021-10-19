@@ -85,17 +85,20 @@ public:
     void Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason) override;
     void Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL) override;
 
+    void SetAllowedEvents(std::vector<SString> vecAllowedEvents);
+
 private:
     CWebViewInterface*                 m_pWebView;
     CResource*                         m_pResource;
     std::map<SString, ajax_callback_t> m_mapAjaxCallback;
+    std::set<SString>                  m_allowedEvents;
 };
 
 class CClientGUIWebBrowser : public CClientGUIElement
 {
 public:
     CClientGUIWebBrowser(bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain, CGUIElement* pCGUIElement,
-                         ElementID ID = INVALID_ELEMENT_ID);
+                         std::vector<SString> vecAllowedEvents, ElementID ID = INVALID_ELEMENT_ID);
 
     CClientWebBrowser* GetBrowser() { return m_pBrowser; }
 

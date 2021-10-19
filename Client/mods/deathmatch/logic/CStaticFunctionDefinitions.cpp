@@ -5564,7 +5564,8 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
 }
 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal,
-                                                                bool bIsTransparent, bool bRelative, CClientGUIElement* pParent)
+                                                                bool bIsTransparent, bool bRelative, CClientGUIElement* pParent,
+                                                                std::vector<SString> vecAllowedEvents)
 {
     CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser(pParent ? pParent->GetCGUIElement() : nullptr);
     pElement->SetPosition(position, bRelative);
@@ -5573,7 +5574,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMai
     // Register to the gui manager
     CVector2D absoluteSize;
     pElement->GetSize(absoluteSize, false);
-    auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement);
+    auto pGUIElement = new CClientGUIWebBrowser(bIsLocal, bIsTransparent, (uint)absoluteSize.fX, (uint)absoluteSize.fY, m_pManager, &LuaMain, pElement, vecAllowedEvents);
 
     if (!pGUIElement->GetBrowser())
     {

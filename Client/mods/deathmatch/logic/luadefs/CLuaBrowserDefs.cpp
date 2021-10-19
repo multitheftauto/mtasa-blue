@@ -109,15 +109,18 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
 
 int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
 {
-    //  texture createBrowser ( int width, int height, bool isLocal [, bool transparent = false] )
-    CVector2D vecSize;
-    bool      bIsLocal;
-    bool      bTransparent;
+    //  texture createBrowser ( int width, int height, bool isLocal [, bool transparent = false [, table allowedEvents = nil ] )
+    CVector2D            vecSize;
+    bool                 bIsLocal;
+    bool                 bTransparent;
+    std::vector<SString> vecAllowedEvents;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecSize);
     argStream.ReadBool(bIsLocal);
     argStream.ReadBool(bTransparent, false);
+    if (argStream.NextIsTable())
+        argStream.ReadStringTable(vecAllowedEvents);
 
     if (!argStream.HasErrors())
     {
@@ -157,6 +160,8 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
 
                 // Set our owner resource
                 pBrowserTexture->SetResource(pParentResource);
+
+                pBrowserTexture->SetAllowedEvents(vecAllowedEvents);
             }
             lua_pushelement(luaVM, pBrowserTexture);
             return 1;
@@ -889,13 +894,14 @@ int CLuaBrowserDefs::ReloadBrowserPage(lua_State* luaVM)
 
 int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
 {
-    //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil] )
-    CVector2D          position;
-    CVector2D          size;
-    bool               bIsLocal;
-    bool               bIsTransparent;
-    bool               bIsRelative;
-    CClientGUIElement* parent;
+    //  element guiCreateBrowser ( float x, float y, float width, float height, bool isLocal, bool isTransparent, bool relative, [element parent = nil [, table allowedEvents = nil ] ] )
+    CVector2D            position;
+    CVector2D            size;
+    bool                 bIsLocal;
+    bool                 bIsTransparent;
+    bool                 bIsRelative;
+    CClientGUIElement*   parent;
+    std::vector<SString> vecAllowedEvents;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
@@ -904,6 +910,8 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     argStream.ReadBool(bIsTransparent);
     argStream.ReadBool(bIsRelative);
     argStream.ReadUserData(parent, nullptr);
+    if (argStream.NextIsTable())
+        argStream.ReadStringTable(vecAllowedEvents);
 
     if (!argStream.HasErrors())
     {
@@ -933,7 +941,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         if (pLuaMain)
         {
             CClientGUIElement* pGUIElement =
-                CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent);
+                CStaticFunctionDefinitions::GUICreateBrowser(*pLuaMain, position, size, bIsLocal, bIsTransparent, bIsRelative, parent, vecAllowedEvents);
 
             if (pGUIElement)
             {

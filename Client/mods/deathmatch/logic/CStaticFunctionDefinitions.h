@@ -441,7 +441,7 @@ public:
     static CClientGUIElement* GUICreateComboBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption, bool bRelative,
                                                 CClientGUIElement* pParent);
     static CClientGUIElement* GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal, bool bIsTransparent,
-                                               bool bRelative, CClientGUIElement* pParent);
+                                               bool bRelative, CClientGUIElement* pParent, std::vector<SString> vecAllowedEvents);
 
     static bool GUIStaticImageLoadImage(CClientEntity& Element, const SString& strDir);
     static bool GUIStaticImageGetNativeSize(CClientEntity& Entity, CVector2D& vecSize);

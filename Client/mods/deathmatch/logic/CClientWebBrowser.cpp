@@ -227,6 +227,10 @@ void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
 
 void CClientWebBrowser::Events_OnTriggerEvent(const SString& strEventName, const std::vector<std::string>& arguments)
 {
+    if (m_allowedEvents.size() > 0)
+        if (m_allowedEvents.find(strEventName) == m_allowedEvents.end())
+            return;
+
     CLuaArguments Arguments;
     for (std::vector<std::string>::const_iterator iter = arguments.begin(); iter != arguments.end(); ++iter)
     {
@@ -327,12 +331,18 @@ bool CClientWebBrowser::ToggleDevTools(bool visible)
     return m_pWebView->ToggleDevTools(visible);
 }
 
+void CClientWebBrowser::SetAllowedEvents(std::vector<SString> vecAllowedEvents)
+{
+    m_allowedEvents = std::set(vecAllowedEvents.begin(), vecAllowedEvents.end());
+}
+
 CClientGUIWebBrowser::CClientGUIWebBrowser(bool isLocal, bool isTransparent, uint width, uint height, CClientManager* pManager, CLuaMain* pLuaMain,
-                                           CGUIElement* pCGUIElement, ElementID ID)
+                                           CGUIElement* pCGUIElement, std::vector<SString> vecAllowedEvents, ElementID ID)
     : CClientGUIElement(pManager, pLuaMain, pCGUIElement, ID)
 {
     m_pManager = pManager;
     m_pBrowser = g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser(width, height, isLocal, isTransparent);
+    m_pBrowser->SetAllowedEvents(vecAllowedEvents);
 
     if (m_pBrowser)
     {
