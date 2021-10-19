@@ -103,4 +103,3 @@ void CModuleInterfaceImpl::AddFunction(lua_State* luaVM, const char* szName, lua
     CLuaCFunctions::AddFunction(szName, function);
     lua_register(luaVM, szName, function);
 }
-

@@ -13,6 +13,9 @@
 #include <sdk/SharedUtil.File.h>
 #include <sdk/SharedUtil.Defines.h>
 
+#define MTA_API_VERSION 2
+#define MTA_API_REVISION 0
+
 CLuaModule::CLuaModule(CLuaModuleManager* pLuaModuleManager, IModuleInterface* pModuleInterface, const char* szFileName, const char* szShortFileName)
 {
     // Set module manager
@@ -390,4 +393,14 @@ bool CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName, cha
 
     std::strncpy(path, p.c_str(), length);
     return true;
+}
+
+IResource* CLuaModule::GetResourceFromNameV2(const char* szResourceName)
+{
+    return m_pModuleInterface->GetResourceFromName(szResourceName);
+}
+
+IResource* CLuaModule::GetResourceFromLuaState(lua_State* luaVM)
+{
+    return m_pModuleInterface->GetResourceFromLuaState(luaVM);
 }

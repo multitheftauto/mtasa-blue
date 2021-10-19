@@ -19,7 +19,7 @@ typedef void* HMODULE;
 
 typedef bool (*DefaultModuleFunc)();
 typedef void (*RegisterModuleFunc)(lua_State*);
-typedef bool (*InitModuleFunc)(ILuaModuleManager*, char*, char*, float*);
+typedef bool (*InitModuleFunc)(ILuaModuleManager*, char*, char*, float*, int version, int revision);
 
 struct FunctionInfo
 {
@@ -38,7 +38,7 @@ struct FunctionInfo
     RegisterModuleFunc ResourceStopped;
 };
 
-class CLuaModule : public ILuaModuleManager10, public ILuaModule
+class CLuaModule : public ILuaModuleManager20, public ILuaModule
 {
 public:
     CLuaModule(CLuaModuleManager* pLuaModuleManager, IModuleInterface* pModuleInterface, const char* szFileName, const char* szShortFileName);
@@ -49,8 +49,7 @@ public:
     void      ErrorPrintf(const char* szFormat, ...);
     void      DebugPrintf(lua_State* luaVM, const char* szFormat, ...);
     bool      RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func);
-    bool      GetResourceName(lua_State*   luaVM,
-                              std::string& strName);            // This function might not work if module and MTA were compiled with different compiler versions
+    bool      GetResourceName(lua_State* luaVM, std::string& strName);            // This function might not work if module and MTA were compiled with different compiler versions
     CChecksum GetResourceMetaChecksum(lua_State* luaVM);
     CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile);
 
@@ -83,6 +82,9 @@ public:
     const char* GetAuthor() const { return m_FunctionInfo.szAuthor; };
     float       GetVersion() const { return m_FunctionInfo.fVersion; };
     const char* GetFileName() const { return m_FunctionInfo.szFileName.c_str(); };
+
+    IResource*              GetResourceFromNameV2(const char* szResourceName);
+    IResource*              GetResourceFromLuaState(lua_State* luaVM);
 
 private:
     std::string              m_szFileName;

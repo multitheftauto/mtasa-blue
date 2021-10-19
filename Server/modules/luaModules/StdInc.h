@@ -1,5 +1,3 @@
-//#include "../../../../Shared/publicsdk/include/ILuaModuleManager.h"
-
 class CLuaModuleManager;
 
 #define MAX_INFO_LENGTH 128

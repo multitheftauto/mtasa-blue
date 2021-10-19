@@ -42,3 +42,15 @@ public:
     virtual bool GetResourceName(lua_State* luaVM, char* szName, size_t length) = 0;
     virtual bool GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length) = 0;
 };
+
+class ILuaModuleManager20 : public ILuaModuleManager10
+{
+public:
+    virtual IResource* GetResourceFromNameV2(const char* szResourceName) = 0;
+    virtual IResource* GetResourceFromLuaState(lua_State* luaVM) = 0;
+};
+
+// Wants to add new methods? create new class that inherits from ILuaModuleManager20, call it eg: ILuaModuleManager21
+// Add your methods and update version in MTA_API_VERSION and MTA_API_REVISION in CLuaModule.cpp
+// where 21 - 2 version, 1 - revision. Remember to update CLuaModule to inherit from new class you created
+// Wants to update existing function? Bump version and add method with `VX` where X is next version
