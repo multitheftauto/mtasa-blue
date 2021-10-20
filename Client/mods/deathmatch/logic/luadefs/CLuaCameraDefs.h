@@ -48,5 +48,5 @@ public:
     LUA_DECLARE(OOP_GetCameraRotation);
     LUA_DECLARE(OOP_SetCameraRotation);
 
-    static std::string GetElementType();
+    static SString GetElementType();
 };
