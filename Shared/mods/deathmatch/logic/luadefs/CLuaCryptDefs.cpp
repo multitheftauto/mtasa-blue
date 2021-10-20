@@ -422,33 +422,33 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
                             [data, key]
                             {
-                                SString result;
                                 try
                                 {
-                                    result = SharedUtil::RsaEncode(data, key);
+                                    return std::make_pair(SharedUtil::RsaEncode(data, key), true);
                                 }
-                                catch (const CryptoPP::Exception&)
+                                catch (const CryptoPP::Exception& ex)
                                 {
+                                    return std::make_pair(SString(ex.GetWhat()), false);
                                 }
-                                return result;
                             },
-                            [luaFunctionRef](const SString result)
+                            [luaFunctionRef](const std::pair<SString, bool> result)
                             {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    if (result.empty())
+                                    if (!result.second)
                                     {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
                                         arguments.PushBoolean(false);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                     else
                                     {
-                                        arguments.PushString(result);
+                                        arguments.PushString(result.first);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                 }
@@ -463,8 +463,9 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     {
                         lua::Push(luaVM, SharedUtil::RsaEncode(data, key));
                     }
-                    catch (const CryptoPP::Exception&)
+                    catch (const CryptoPP::Exception& ex)
                     {
+                        m_pScriptDebugging->LogWarning(luaVM, ex.what());
                         lua::Push(luaVM, false);
                     }
                     return 1;
@@ -642,33 +643,33 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
                             [data, key]
                             {
-                                SString result;
                                 try
                                 {
-                                    result = SharedUtil::RsaDecode(data, key);
+                                    return std::make_pair(SharedUtil::RsaDecode(data, key), true);
                                 }
-                                catch (const CryptoPP::Exception&)
+                                catch (const CryptoPP::Exception& ex)
                                 {
+                                    return std::make_pair(SString(ex.GetWhat()), false);
                                 }
-                                return result;
                             },
-                            [luaFunctionRef](const SString result)
+                            [luaFunctionRef](const std::pair<SString, bool> result)
                             {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    if (result.empty())
+                                    if (!result.second)
                                     {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
                                         arguments.PushBoolean(false);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                     else
                                     {
-                                        arguments.PushString(result);
+                                        arguments.PushString(result.first);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                 }
@@ -683,8 +684,9 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     {
                         lua::Push(luaVM, SharedUtil::RsaDecode(data, key));
                     }
-                    catch (const CryptoPP::Exception&)
+                    catch (const CryptoPP::Exception& ex)
                     {
+                        m_pScriptDebugging->LogWarning(luaVM, ex.what());
                         lua::Push(luaVM, false);
                     }
                     return 1;
