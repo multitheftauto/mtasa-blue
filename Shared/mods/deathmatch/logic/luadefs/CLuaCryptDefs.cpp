@@ -440,15 +440,15 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    if (!result.second)
+                                    if (result.second)
                                     {
-                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
-                                        arguments.PushBoolean(false);
+                                        arguments.PushString(result.first);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                     else
                                     {
-                                        arguments.PushString(result.first);
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                 }
@@ -661,15 +661,15 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                 if (pLuaMain)
                                 {
                                     CLuaArguments arguments;
-                                    if (!result.second)
+                                    if (result.second)
                                     {
-                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
-                                        arguments.PushBoolean(false);
+                                        arguments.PushString(result.first);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                     else
                                     {
-                                        arguments.PushString(result.first);
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
                                         arguments.Call(pLuaMain, luaFunctionRef);
                                     }
                                 }
