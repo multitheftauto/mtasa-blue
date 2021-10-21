@@ -231,7 +231,7 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
     return 1;
 }
 
-std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsaKeyPair(lua_State* const luaVM, int size,
+CLuaMultiReturn<SString, SString> CLuaCryptDefs::GenerateRsaKeyPair(lua_State* const luaVM, int size,
                                                                                         std::optional<CLuaFunctionRef> callback)
 {
     // keysize checks (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
@@ -270,7 +270,6 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateRsa
         // Sync
         return SharedUtil::GenerateRsaKeyPair(size);
     }
-    return true;
 }
 
 int CLuaCryptDefs::EncodeString(lua_State* luaVM)
