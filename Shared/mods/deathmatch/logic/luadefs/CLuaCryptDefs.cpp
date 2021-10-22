@@ -271,7 +271,7 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                             }
                             return result;
                         },
-                        [luaFunctionRef = callback.value()](const std::pair<SString, SString> result)
+                        [luaFunctionRef = callback.value()](const std::pair<SString, SString>& result)
                         {
                             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                             if (pLuaMain)
@@ -475,7 +475,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                     return std::make_pair(SString(ex.GetWhat()), false);
                                 }
                             },
-                            [luaFunctionRef](const std::pair<SString, bool> result)
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
                             {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
@@ -696,7 +696,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                     return std::make_pair(SString(ex.GetWhat()), false);
                                 }
                             },
-                            [luaFunctionRef](const std::pair<SString, bool> result)
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
                             {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
