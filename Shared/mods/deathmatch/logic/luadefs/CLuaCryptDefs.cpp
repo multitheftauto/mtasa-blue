@@ -642,7 +642,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<const std::pair<SString, bool>>(
                             [data, key]
                             {
                                 try
