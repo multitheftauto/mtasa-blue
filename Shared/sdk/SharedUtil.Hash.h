@@ -39,6 +39,11 @@ enum class StringEncodeFunction
     RSA,
 };
 
+enum class KeyPairAlgorithm
+{
+    RSA
+};
+
 namespace SharedUtil
 {
     struct MD5

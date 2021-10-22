@@ -23,7 +23,7 @@ void CLuaCryptDefs::LoadFunctions()
         {"base64Encode", ArgumentParserWarn<false, Base64encode>},
         {"base64Decode", ArgumentParserWarn<false, Base64decode>},
         {"passwordHash", ArgumentParserWarn<false, PasswordHash>},
-        {"generateRsaKeyPair", ArgumentParser<GenerateRsaKeyPair>},
+        {"generateKeyPair", ArgumentParser<GenerateKeyPair>},
         {"passwordVerify", PasswordVerify},
         {"encodeString", EncodeString},
         {"decodeString", DecodeString},
@@ -231,44 +231,86 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
     return 1;
 }
 
-CLuaMultiReturn<SString, SString> CLuaCryptDefs::GenerateRsaKeyPair(lua_State* const luaVM, int size,
-                                                                                        std::optional<CLuaFunctionRef> callback)
+std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKeyPair(lua_State* const luaVM, KeyPairAlgorithm algorithm,
+                                                                 std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> callback)
 {
-    // keysize checks (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
-    if (size > 16384)
-        throw std::invalid_argument("Field 'size' cannot be bigger than 16384 bits");
-
-    if (callback.has_value())
+    switch (algorithm)
     {
-        // Async
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        case KeyPairAlgorithm::RSA:
         {
-            CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, SString>>(
-                [size]
+
+            uint32_t size;
+            if (auto it = options.find("size"); it != options.end())
+            {
+                auto [__, err] = std::from_chars(it->second.data(), it->second.data() + it->second.length(), size);
+                if (err != std::errc{})
+                    throw std::invalid_argument("Invalid value for field 'size'");
+            }
+
+            // keysize checks (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
+            if (size > 16384)
+                throw std::invalid_argument("Field 'size' cannot be bigger than 16384 bits");
+
+            if (callback.has_value())
+            {
+                // Async
+                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                if (pLuaMain)
                 {
-                    // Execute time-consuming task
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, SString>>(
+                        [size]
+                        {
+                            // Execute time-consuming task
+                            std::pair<SString, SString> result;
+                            try
+                            {
+                                result = SharedUtil::GenerateRsaKeyPair(size);
+                            }
+                            catch (const CryptoPP::Exception& ex)
+                            {
+                            }
+                            return result;
+                        },
+                        [luaFunctionRef = callback.value()](const std::pair<SString, SString> result)
+                        {
+                            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                            if (pLuaMain)
+                            {
+                                CLuaArguments arguments;
+                                if (!result.first.empty() && !result.second.empty())
+                                {
+                                    arguments.PushString(result.first);
+                                    arguments.PushString(result.second);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                                else
+                                {
+                                    arguments.PushBoolean(false);
+                                    arguments.Call(pLuaMain, luaFunctionRef);
+                                }
+                            }
+                        });
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                // Sync
+                try
+                {
                     return SharedUtil::GenerateRsaKeyPair(size);
-                },
-                [luaFunctionRef = callback.value()](std::pair<SString, SString> result)
+                }
+                catch (const CryptoPP::Exception& ex)
                 {
-                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
-                    if (pLuaMain)
-                    {
-                        CLuaArguments arguments;
+                    m_pScriptDebugging->LogWarning(luaVM, ex.what());
+                    return false;
+                }
+            }
 
-                        arguments.PushString(result.first);
-                        arguments.PushString(result.second);
-
-                        arguments.Call(pLuaMain, luaFunctionRef);
-                    }
-                });
         }
-    }
-    else
-    {
-        // Sync
-        return SharedUtil::GenerateRsaKeyPair(size);
+        default:
+            throw std::invalid_argument("Unknown algorithm");
     }
 }
 
@@ -642,7 +684,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<const std::pair<SString, bool>>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
                             [data, key]
                             {
                                 try

@@ -58,6 +58,10 @@ ADD_ENUM(StringEncodeFunction::AES128, "aes128")
 ADD_ENUM(StringEncodeFunction::RSA, "rsa")
 IMPLEMENT_ENUM_CLASS_END("string-encode-function")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(KeyPairAlgorithm)
+ADD_ENUM(KeyPairAlgorithm::RSA, "rsa")
+IMPLEMENT_ENUM_CLASS_END("key-pair-algorithm")
+
 IMPLEMENT_ENUM_BEGIN(ePacketID)
 ADD_ENUM1(PACKET_ID_SERVER_JOIN)
 ADD_ENUM1(PACKET_ID_SERVER_JOIN_DATA)
