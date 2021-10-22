@@ -298,7 +298,8 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                 // Sync
                 try
                 {
-                    return SharedUtil::GenerateRsaKeyPair(size);
+                    auto rsaKeyPair = SharedUtil::GenerateRsaKeyPair(size);
+                    return std::make_pair(rsaKeyPair.privateKey, rsaKeyPair.publicKey);
                 }
                 catch (const CryptoPP::Exception& ex)
                 {
