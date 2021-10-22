@@ -247,44 +247,43 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                     throw std::invalid_argument("Invalid value for field 'size'");
             }
 
-            // keysize checks (based on https://www.cryptopp.com/wiki/RSA_Cryptography)
-            if (size > 16384)
-                throw std::invalid_argument("Field 'size' cannot be bigger than 16384 bits");
-
             if (callback.has_value())
             {
                 // Async
                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                 if (pLuaMain)
                 {
-                    CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, SString>>(
-                        [size]
+                    
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask<std::variant<KeyPair, SString>>(
+                        [size]() -> std::variant<KeyPair, SString>
                         {
                             // Execute time-consuming task
-                            std::pair<SString, SString> result;
                             try
                             {
-                                result = SharedUtil::GenerateRsaKeyPair(size);
+                                return SharedUtil::GenerateRsaKeyPair(size);
                             }
                             catch (const CryptoPP::Exception& ex)
                             {
+                                return {ex.GetWhat()};
                             }
-                            return result;
                         },
-                        [luaFunctionRef = callback.value()](const std::pair<SString, SString>& result)
+                        [luaFunctionRef = callback.value()](const auto& result)
                         {
                             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                             if (pLuaMain)
                             {
                                 CLuaArguments arguments;
-                                if (!result.first.empty() && !result.second.empty())
+                                if (std::holds_alternative<KeyPair>(result))
                                 {
-                                    arguments.PushString(result.first);
-                                    arguments.PushString(result.second);
+                                    auto keyPair = std::get<0>(result);
+                                    arguments.PushString(keyPair.privateKey);
+                                    arguments.PushString(keyPair.publicKey);
                                     arguments.Call(pLuaMain, luaFunctionRef);
                                 }
-                                else
+                                else if (std::holds_alternative<SString>(result))
                                 {
+                                    auto exceptionCause = std::get<1>(result);
+                                    m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), exceptionCause.c_str());
                                     arguments.PushBoolean(false);
                                     arguments.Call(pLuaMain, luaFunctionRef);
                                 }

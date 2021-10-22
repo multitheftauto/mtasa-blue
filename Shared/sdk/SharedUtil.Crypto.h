@@ -17,6 +17,12 @@
 
 namespace SharedUtil
 {
+
+    struct KeyPair
+    {
+        SString publicKey, privateKey;
+    };
+
     inline SString Base64encode(const SString& data)
     {
         SString                result;
@@ -33,10 +39,9 @@ namespace SharedUtil
         return result;
     }
 
-    inline std::pair<SString, SString> GenerateRsaKeyPair(const unsigned int size)
+    inline KeyPair GenerateRsaKeyPair(const unsigned int size)
     {
-        SString rawPrivateKey;
-        SString rawPublicKey;
+        KeyPair rsaKeyPair;
 
         CryptoPP::AutoSeededRandomPool asrp;
 
@@ -46,13 +51,13 @@ namespace SharedUtil
         CryptoPP::RSA::PrivateKey rsaPrivateKey(params);
         CryptoPP::RSA::PublicKey  rsaPublicKey(params);
 
-        CryptoPP::StringSink rawPrivateKeySink(rawPrivateKey);
+        CryptoPP::StringSink rawPrivateKeySink(rsaKeyPair.privateKey);
         rsaPrivateKey.DEREncode(rawPrivateKeySink);
 
-        CryptoPP::StringSink rawPublicKeySink(rawPublicKey);
+        CryptoPP::StringSink rawPublicKeySink(rsaKeyPair.publicKey);
         rsaPublicKey.DEREncode(rawPublicKeySink);
 
-        return std::make_pair(rawPrivateKey, rawPublicKey);
+        return rsaKeyPair;
     }
 
     inline SString RsaEncode(const SString& data, const SString& publicKey)
