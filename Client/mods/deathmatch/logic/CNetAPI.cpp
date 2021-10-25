@@ -1547,15 +1547,9 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
     pPlayerModel->GetControllerState(ControllerState);
     WriteFullKeysync(ControllerState, BitStream);
 
-    // Use parent model ID for non-standard vehicle model IDs.
-    // This avoids a mismatch between client and server, ensuring doors and damage sync correctly.
-    int iModelID = pVehicle->GetModel();
-    if (iModelID < 400 || iModelID > 611)
-        iModelID = pVehicle->m_pModelInfo->GetParentID();
-
     // Write the clientside model
     if (BitStream.Version() >= 0x05F)
-        BitStream.Write(iModelID);
+        BitStream.Write((int)pVehicle->GetModel());
 
     // Grab the vehicle position
     CVector vecPosition;
