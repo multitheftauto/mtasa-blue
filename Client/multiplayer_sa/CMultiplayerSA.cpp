@@ -578,6 +578,76 @@ CMultiplayerSA::CMultiplayerSA()
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
 }
 
+namespace GrainEffect
+{
+
+static BYTE ucGrainEnabled = FALSE;
+static DWORD dwGrainStrength = 1.0f;
+
+struct MasterModifier
+{
+    static float fMultiplier;
+
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    {
+        return ((int(__cdecl*)(char, char))0x7037C0)(ucLevel * fMultiplier, ucUpdate);
+    }
+};
+
+struct InfraredModifier
+{
+    static float fMultiplier;
+
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    {
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
+
+struct NightModifier
+{
+    static float fMultiplier;
+
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    {
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
+
+struct RainModifier
+{
+    static float fMultiplier;
+
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    {
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
+
+struct OverlayModifier
+{
+    static float fMultiplier;
+
+    static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate)
+    {
+        return MasterModifier::ApplyEffect(ucLevel * fMultiplier, ucUpdate);
+    }
+};
+
+float MasterModifier::fMultiplier = 1.0f;
+float InfraredModifier::fMultiplier = 1.0f;
+float NightModifier::fMultiplier = 1.0f;
+float RainModifier::fMultiplier = 1.0f;
+float OverlayModifier::fMultiplier = 1.0f;
+
+}
+
+template <typename T>
+int _cdecl HOOK_GrainEffect(char a1, char a2)
+{
+    return T::ApplyEffect(a1, a2);
+}
+
 void CMultiplayerSA::InitHooks()
 {
     InitKeysyncHooks();
@@ -754,6 +824,11 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
+
+    HookInstallCall(0x704EE8, (DWORD)HOOK_GrainEffect<GrainEffect::NightModifier>);
+    HookInstallCall(0x704F59, (DWORD)HOOK_GrainEffect<GrainEffect::InfraredModifier>);
+    HookInstallCall(0x705078, (DWORD)HOOK_GrainEffect<GrainEffect::RainModifier>);
+    HookInstallCall(0x705091, (DWORD)HOOK_GrainEffect<GrainEffect::OverlayModifier>);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1666,6 +1741,61 @@ void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
     {
         MemPut<BYTE>(0x70373D, 0xB8);            // mov eax
         MemPut<DWORD>(0x70373E, dwPass1Color);
+    }
+}
+
+void CMultiplayerSA::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
+{
+    using namespace GrainEffect;
+
+    fMultiplier = Clamp(0.0f, fMultiplier, 1.0f);
+
+    switch (type)
+    {
+    case eGrainMultiplierType::MASTER:
+        MasterModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::INFRARED:
+        InfraredModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::NIGHT:
+        NightModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::RAIN:
+        RainModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::OVERLAY:
+        OverlayModifier::fMultiplier = fMultiplier;
+        break;
+    case eGrainMultiplierType::ALL:
+        MasterModifier::fMultiplier = InfraredModifier::fMultiplier = NightModifier::fMultiplier = RainModifier::fMultiplier = OverlayModifier::fMultiplier = fMultiplier;
+        break;
+    default:
+        break;
+    }
+}
+
+void CMultiplayerSA::SetGrainLevel(BYTE ucLevel)
+{
+    const bool bOverridden = *(DWORD*)0x705081 != (DWORD)0x00C402B4;
+    const bool bEnable = ucLevel > 0;
+
+    GrainEffect::ucGrainEnabled = static_cast<BYTE>(bEnable);
+    GrainEffect::dwGrainStrength = static_cast<DWORD>(ucLevel);
+
+    if (bEnable == bOverridden)
+        return;    
+
+    if (bEnable)
+    {
+        MemPut<DWORD>(0x705081, (DWORD)&GrainEffect::ucGrainEnabled);
+        MemPut<DWORD>(0x70508A, (DWORD)&GrainEffect::dwGrainStrength);
+    }
+    else
+    {
+        // Restore the original address
+        MemPut<DWORD>(0x705081, (DWORD)0x00C402B4);
+        MemPut<DWORD>(0x70508A, (DWORD)0x008D5094);
     }
 }
 
@@ -3915,8 +4045,7 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
     if (bNoiseEnabled)
     {
-        BYTE originalCodes[5] = {0xE8, 0xD3, 0xE8, 0xFF, 0xFF};
-        MemCpy((void*)0x704EE8, &originalCodes, 5);
+        HookInstallCall(0x704EE8, (DWORD)HOOK_GrainEffect<GrainEffect::NightModifier>);
     }
     else
     {
@@ -3936,8 +4065,7 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
     if (bNoiseEnabled)
     {
-        BYTE originalCodes[5] = {0xE8, 0x62, 0xE8, 0xFF, 0xFF};
-        MemCpy((void*)0x704F59, &originalCodes, 5);
+        HookInstallCall(0x704F59, (DWORD)HOOK_GrainEffect<GrainEffect::InfraredModifier>);
     }
     else
     {
