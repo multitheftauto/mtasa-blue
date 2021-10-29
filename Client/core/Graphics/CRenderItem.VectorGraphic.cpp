@@ -25,8 +25,6 @@ void CVectorGraphicItem::PostConstruct(CRenderItemManager* pManager, uint width,
     m_uiSurfaceSizeX = width;
     m_uiSurfaceSizeY = height;
 
-    m_TextureAddress = TADDRESS_CLAMP;
-
     CreateUnderlyingData();
 }
 
