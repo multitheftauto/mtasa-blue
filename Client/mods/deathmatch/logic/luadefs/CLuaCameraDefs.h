@@ -48,5 +48,5 @@ public:
     LUA_DECLARE(OOP_GetCameraRotation);
     LUA_DECLARE(OOP_SetCameraRotation);
 
-    static SString GetElementType();
+    static const SString& GetElementType();
 };

@@ -593,7 +593,7 @@ int CLuaCameraDefs::OOP_SetCameraRotation(lua_State* luaVM)
     return 1;
 }
 
-SString CLuaCameraDefs::GetElementType()
+const SString& CLuaCameraDefs::GetElementType()
 {
     return m_pManager->GetCamera()->GetTypeName();
 }
