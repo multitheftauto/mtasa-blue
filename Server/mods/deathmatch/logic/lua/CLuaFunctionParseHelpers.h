@@ -164,7 +164,8 @@ inline SString GetClassTypeName(CRemoteCall*)
 {
     return "remotecall";
 }
-inline SString GetClassTypeName(CColShape*) {
+inline SString GetClassTypeName(CColShape*)
+{
     return "colshape";
 }
 inline SString GetClassTypeName(CDummy*)
@@ -423,7 +424,7 @@ CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
 
     if (pRemoteCall && g_pGame->GetRemoteCalls()->CallExists(pRemoteCall))
         return pRemoteCall;
-    
+
     return nullptr;
 }
 

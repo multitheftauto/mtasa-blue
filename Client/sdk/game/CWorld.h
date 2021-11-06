@@ -228,7 +228,8 @@ public:
     uint8_t  m_tyreGrip;
     uint8_t  m_wetGrip;            // 2
     uint16_t pad;                  // 4
-    union {
+    union
+    {
         struct            // size 8
         {
             uint32_t flags[2];
@@ -290,9 +291,7 @@ public:
                 flags[flagsGroup] &= ~(1UL << (sFlagID + usForNext));
         }
     }
-    inline bool getFlagEnabled(char flagsGroup, short sFlagID) {
-        return ((flags[flagsGroup] >> sFlagID) & 1U) == 1;
-    }
+    bool getFlagEnabled(char flagsGroup, short sFlagID) { return ((flags[flagsGroup] >> sFlagID) & 1U) == 1; }
 };
 
 struct CSurfaceType
@@ -315,6 +314,7 @@ public:
     virtual BYTE  GetLevelFromPosition(CVector* vecPosition) = 0;
     virtual float FindGroundZForPosition(float fX, float fY) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
+    virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;
     virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
     virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
     virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;
@@ -345,7 +345,7 @@ public:
     virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
     virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 
-    virtual CSurfaceType*     GetSurfaceInfo() = 0;
-    virtual void              ResetAllSurfaceInfo() = 0;
-    virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
+    virtual CSurfaceType* GetSurfaceInfo() = 0;
+    virtual void          ResetAllSurfaceInfo() = 0;
+    virtual bool          ResetSurfaceInfo(short sSurfaceID) = 0;
 };

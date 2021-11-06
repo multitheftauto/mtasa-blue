@@ -119,9 +119,9 @@ jobs:
 
   linux-release:
     name: linux-release
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     container:
-      image: docker://sbx320/mtasa-blue-azure:latest
+      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
       - uses: actions/checkout@v2
       - name: Run Build
@@ -129,9 +129,9 @@ jobs:
 
   linux-debug:
     name: linux-debug
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     container:
-      image: docker://sbx320/mtasa-blue-azure:latest
+      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
       - uses: actions/checkout@v2
       - name: Run Build

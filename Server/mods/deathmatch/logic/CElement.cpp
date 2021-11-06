@@ -1058,6 +1058,34 @@ void CElement::RemoveAllCollisions()
     m_Collisions.clear();
 }
 
+void CElement::SetDimension(unsigned short usDimension)
+{
+    if (m_usDimension == usDimension)
+        return;
+
+    unsigned short usOldDimension = m_usDimension;
+    m_usDimension = usDimension;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(usOldDimension);
+    Arguments.PushNumber(usDimension);
+    CallEvent("onElementDimensionChange", Arguments);
+}
+
+void CElement::SetInterior(unsigned char ucInterior)
+{
+    if (m_ucInterior == ucInterior)
+        return;
+
+    unsigned char ucOldInterior = m_ucInterior;
+    m_ucInterior = ucInterior;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(ucOldInterior);
+    Arguments.PushNumber(ucInterior);
+    CallEvent("onElementInteriorChange", Arguments);
+}
+
 CClient* CElement::GetClient()
 {
     CClient* pClient = NULL;
@@ -1138,7 +1166,7 @@ bool CElement::IsAttachedToElement(CElement* pElement, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break; // This should not be possible, but you never know
+                break;            // This should not be possible, but you never know
         }
 
         return false;

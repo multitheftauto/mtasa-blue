@@ -7,6 +7,11 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+
+#include <list>
+#include <deque>
+#include "SharedUtil.IntTypes.h"
 
 template <class T>
 class CDuplicateLineFilter

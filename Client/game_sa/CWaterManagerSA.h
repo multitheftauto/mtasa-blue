@@ -13,6 +13,7 @@
 
 #include "CWaterSA.h"
 
+#define DEFAULT_WATER_LEVEL                0.0f
 #define DEFAULT_WAVE_LEVEL                 0.0f
 
 #define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
@@ -152,11 +153,12 @@ public:
     CWaterPoly* CreateTriangle(const CVector& vec1, const CVector& vec2, const CVector& vec3, bool bShallow = false);
     bool        DeletePoly(CWaterPoly* pPoly);
 
-    bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);
+    bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool ignoreDistanceToWaterThreshold, CVector* pvecUnknown);
 
-    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
+    bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
     bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     bool SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource);
+    void SetOutsideWorldWaterLevel(float fLevel);
     void ResetWorldWaterLevel();
 
     float GetWaveLevel();

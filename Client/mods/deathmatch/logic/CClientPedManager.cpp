@@ -51,7 +51,6 @@ void CClientPedManager::DoPulse(bool bDoStandardPulses)
     }
 }
 
-
 CClientPed* CClientPedManager::Get(ElementID ID, bool bCheckPlayers)
 {
     // Grab the element with the given id. Check its type.
@@ -126,6 +125,26 @@ void CClientPedManager::RestreamPeds(unsigned short usModel)
         }
     }
 }
+
+void CClientPedManager::RestreamAllPeds()
+{
+    for (auto& pPed : m_List)
+    {
+        // Streamed in and same vehicle ID?
+        if (pPed->IsStreamedIn())
+        {
+            // Stream it out for a while until streamed decides to stream it
+            // back in eventually
+            pPed->StreamOutForABit();
+            // Hack fix for Players not unloading.
+            if (IS_PLAYER(pPed))
+            {
+                pPed->SetModel(0, true);
+            }
+        }
+    }
+}
+
 void CClientPedManager::RestreamWeapon(unsigned short usModel)
 {
     eWeaponSlot eSlot = (eWeaponSlot)GetWeaponSlotFromModel(usModel);

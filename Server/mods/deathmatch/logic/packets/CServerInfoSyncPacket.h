@@ -19,7 +19,7 @@ enum EServerInfoSyncFlag : uint8
     SERVER_INFO_FLAG_RESERVED = 1 << 1            // 0b00000010 and so on
 };
 
-class CServerInfoSyncPacket : public CPacket
+class CServerInfoSyncPacket final : public CPacket
 {
 public:
     CServerInfoSyncPacket(uint8 flags) { m_ActualInfo = flags; }
@@ -31,7 +31,8 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 
 private:
-    union {
+    union
+    {
         uint8 m_ActualInfo;
         struct
         {

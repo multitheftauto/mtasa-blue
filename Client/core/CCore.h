@@ -13,7 +13,7 @@ class CCore;
 
 #pragma once
 
-#include "../version.h"
+#include "version.h"
 
 #include "CClientVariables.h"
 #include "CCommands.h"
@@ -28,7 +28,6 @@ class CCore;
 #include "CMessageLoopHook.h"
 #include "CConsoleLogger.h"
 #include "CModManager.h"
-#include <core/CClientBase.h>
 #include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include <DXHook/CDirect3DData.h>
@@ -120,8 +119,9 @@ public:
     void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false);
     void ChatPrintf(const char* szFormat, bool bColorCoded, ...);
     void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...);
-    void SetChatVisible(bool bVisible);
+    void SetChatVisible(bool bVisible, bool bInputBlocked);
     bool IsChatVisible();
+    bool IsChatInputBlocked();
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled();
     bool ClearChat();
@@ -277,7 +277,6 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
-    HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
     bool        IsFirstFrame() const noexcept { return m_bFirstFrame; }
 
 private:

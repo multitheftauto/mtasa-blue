@@ -45,19 +45,26 @@ std::unique_ptr<SXMLString> CXMLImpl::ParseString(const char* strXmlContent)
 {
     TiXmlDocument* xmlDoc = new TiXmlDocument();
     if (xmlDoc)
-    {   
+    {
         xmlDoc->Parse(strXmlContent, 0, TIXML_DEFAULT_ENCODING);
         if (!xmlDoc->Error())
         {
             TiXmlElement* xmlDocumentRoot = xmlDoc->RootElement();
-            CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
-            xmlBaseNode->BuildFromDocument();
-            return std::unique_ptr<SXMLString>(new SXMLStringImpl(xmlDoc, xmlBaseNode));
+
+            if (xmlDocumentRoot)
+            {
+                CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
+
+                if (xmlBaseNode && xmlBaseNode->IsValid())
+                {
+                    xmlBaseNode->BuildFromDocument();
+                    return std::unique_ptr<SXMLString>(new SXMLStringImpl(xmlDoc, xmlBaseNode));
+                }
+            }
         }
     }
     return nullptr;
 }
-
 
 CXMLNode* CXMLImpl::CreateDummyNode()
 {

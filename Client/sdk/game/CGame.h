@@ -70,7 +70,6 @@ typedef void(InRenderer)();
 #include "CStreaming.h"
 #include "CTaskManagementSystem.h"
 #include "CTasks.h"
-#include "CText.h"
 #include "CTheCarGenerators.h"
 #include "CTimeCycle.h"
 #include "CVisibilityPlugins.h"
@@ -81,6 +80,7 @@ typedef void(InRenderer)();
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
 #include "CObjectGroupPhysicalProperties.h"
+#include "CColStore.h"
 
 #include <windows.h>
 
@@ -147,7 +147,6 @@ public:
     virtual CAESoundManager*          GetAESoundManager() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
     virtual CMenuManager*             GetMenuManager() = 0;
-    virtual CText*                    GetText() = 0;
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
     virtual CFont*                    GetFont() = 0;
@@ -168,6 +167,7 @@ public:
     virtual CWaterManager*            GetWaterManager() = 0;
     virtual CWeaponStatManager*       GetWeaponStatManager() = 0;
     virtual CPointLights*             GetPointLights() = 0;
+    virtual CColStore*                GetCollisionStore() = 0;
     virtual CTimeCycle*               GetTimeCycle() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
@@ -244,6 +244,7 @@ public:
     virtual void ResetModelLodDistances() = 0;
     virtual void ResetAlphaTransparencies() = 0;
     virtual void DisableVSync() = 0;
+    virtual void ResetModelTimes() = 0;
 
     virtual void  OnPedContextChange(CPed* pPedContext) = 0;
     virtual CPed* GetPedContext() = 0;
@@ -255,4 +256,14 @@ public:
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
     virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
+
+    virtual int32_t GetBaseIDforDFF() = 0;
+    virtual int32_t GetBaseIDforTXD() = 0;
+    virtual int32_t GetBaseIDforCOL() = 0;
+    virtual int32_t GetBaseIDforIPL() = 0;
+    virtual int32_t GetBaseIDforDAT() = 0;
+    virtual int32_t GetBaseIDforIFP() = 0;
+    virtual int32_t GetBaseIDforRRR() = 0;
+    virtual int32_t GetBaseIDforSCM() = 0;
+    virtual int32_t GetCountOfAllFileIDs() = 0;
 };

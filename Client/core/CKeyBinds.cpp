@@ -255,8 +255,24 @@ const SDefaultCommandBind g_dcbDefaultCommands[] = {{"g", true, "enter_passenger
 
                                                     {"", false, NULL, NULL}};
 
+static bool bindableKeyStates[std::size(g_bkKeys)];
+
 // HACK: our current shift key states
 bool bPreLeftShift = false, bPreRightShift = false;
+
+enum eBindableKeys
+{
+    BK_MOUSE_WHEEL_UP = 5,
+    BK_MOUSE_WHEEL_DOWN = 6,
+};
+
+static bool& GetBindableKeyState(const SBindableKey* key)
+{
+    intptr_t base = reinterpret_cast<intptr_t>(&g_bkKeys[0]);
+    intptr_t offset = reinterpret_cast<intptr_t>(key);
+    size_t   index = (offset - base) / sizeof(SBindableKey);
+    return bindableKeyStates[index];
+}
 
 // Ensure zero length strings are NULL
 static void NullEmptyStrings(const char*& a, const char*& b = *(const char**)NULL, const char*& c = *(const char**)NULL, const char*& d = *(const char**)NULL,
@@ -319,6 +335,18 @@ bool CKeyBinds::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
     return false;
 }
 
+void CKeyBinds::OnLoseFocus()
+{
+    for (size_t i = 0; i < std::size(bindableKeyStates); ++i)
+    {
+        if (bindableKeyStates[i] == true)
+        {
+            const SBindableKey* key = &g_bkKeys[i];
+            ProcessKeyStroke(key, false);
+        }
+    }
+}
+
 bool CKeyBinds::ProcessCharacter(WPARAM wChar)
 {
     if (m_CharacterKeyHandler && m_CharacterKeyHandler(wChar))
@@ -367,6 +395,9 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     bool bIsConsoleInputKey = true;
     if ((pKey->ulCode >= VK_F1 && pKey->ulCode <= VK_F12) || (pKey->ulCode <= VK_MBUTTON))
         bIsConsoleInputKey = false;
+
+    bool& keyState = GetBindableKeyState(pKey);
+    keyState = bState;
 
     bool bAllowed = TriggerKeyStrokeHandler(pKey->szKey, bState, bIsConsoleInputKey);
 
@@ -449,10 +480,14 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                                                     }
                                                 }
 
-                                                // don't fire if its already fired
+                                                // don't add if its already added to queue
                                                 if (!bAlreadyProcessed)
                                                 {
-                                                    Call(pCommandBind);
+                                                    if (pCommandBind->bScriptCreated || processedList.empty())
+                                                        Call(pCommandBind);
+                                                    else
+                                                        m_vecBindQueue.push_back(pCommandBind);
+
                                                     processedList.push_back(pCommandBind);
                                                 }
                                             }
@@ -505,6 +540,11 @@ void CKeyBinds::Add(CKeyBind* pKeyBind)
 
 void CKeyBinds::Remove(CKeyBind* pKeyBind)
 {
+    // If this is an active chatbox bind, delete it
+    // so it won't be called on next frame
+    if (m_pChatBoxBind == pKeyBind)
+        m_pChatBoxBind = nullptr;
+
     if (m_bProcessingKeyStroke)
         pKeyBind->beingDeleted = true;
     else
@@ -886,6 +926,13 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
 {
     NullEmptyStrings(szKey, szArguments, szResource, szOriginalScriptKey);
 
+    char* szCompArguments = nullptr;
+    if (szArguments)
+        szCompArguments = strdup(szArguments);
+    if (szCompArguments)
+        szCompArguments = SharedUtil::Trim(szCompArguments);
+
+    CCommandBind*                   pResult = nullptr;
     list<CKeyBind*>::const_iterator iter = m_pList->begin();
     for (; iter != m_pList->end(); iter++)
     {
@@ -898,7 +945,7 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
                 {
                     if (!bCheckState || (pBind->bHitState == bState))
                     {
-                        if (!szArguments || (pBind->szArguments && strcmp(pBind->szArguments, szArguments) == 0))
+                        if (!szCompArguments || (pBind->szArguments && strcmp(pBind->szArguments, szCompArguments) == 0))
                         {
                             if (!szResource || (pBind->szResource && strcmp(pBind->szResource, szResource) == 0))
                             {
@@ -906,7 +953,8 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
                                 {
                                     if (!szOriginalScriptKey || (pBind->strOriginalScriptKey == szOriginalScriptKey))
                                     {
-                                        return pBind;
+                                        pResult = pBind;
+                                        break;
                                     }
                                 }
                             }
@@ -916,7 +964,8 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
             }
         }
     }
-    return NULL;
+    free(szCompArguments);
+    return pResult;
 }
 
 //
@@ -1776,18 +1825,19 @@ bool CKeyBinds::ControlFunctionExists(SBindableGTAControl* pControl, ControlFunc
     return false;
 }
 
-const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey)
+const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey) const
 {
-    for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
+    for (int i = 0; *g_bkKeys[i].szKey != 0; i++)
     {
         const SBindableKey* temp = &g_bkKeys[i];
+
         if (!stricmp(temp->szKey, szKey))
         {
             return temp;
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 SBindableGTAControl* CKeyBinds::GetBindableFromAction(eControllerAction action)
@@ -1908,6 +1958,17 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage(UINT uMsg, WPARAM wParam, 
         }
     }
     return NULL;
+}
+
+bool CKeyBinds::GetKeyStateByName(const char* keyName, bool& state) const
+{
+    if (const SBindableKey* key = GetBindableFromKey(keyName); key != nullptr)
+    {
+        state = GetBindableKeyState(key);
+        return true;
+    }
+
+    return false;
 }
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szControl)
@@ -2040,6 +2101,16 @@ void CKeyBinds::DoPreFramePulse()
     {
         Call(m_pChatBoxBind);
         m_pChatBoxBind = NULL;
+    }
+
+    // Execute two binds from queue
+    for (auto i = 0; i < 2; i++)
+    {
+        auto it = m_vecBindQueue.begin();
+        if (it == m_vecBindQueue.end())
+            break;
+        Call(*it);
+        m_vecBindQueue.erase(it);
     }
 
     // HACK: shift keys
@@ -2230,12 +2301,12 @@ void CKeyBinds::DoPostFramePulse()
         {
             cs.ButtonCircle = (g_bcControls[17].bState) ? 255 : 0;             // Fire
             cs.LeftShoulder1 = (g_bcControls[18].bState) ? 255 : 0;            // Secondary Fire
-            cs.LeftStickX = ((g_bcControls[19].bState && g_bcControls[20].bState) || (!g_bcControls[19].bState && !g_bcControls[20].bState))
-                                ? 0
-                                : (g_bcControls[19].bState) ? -128 : 128;
-            cs.LeftStickY = ((g_bcControls[21].bState && g_bcControls[22].bState) || (!g_bcControls[21].bState && !g_bcControls[22].bState))
-                                ? 0
-                                : (g_bcControls[21].bState) ? -128 : 128;
+            cs.LeftStickX = ((g_bcControls[19].bState && g_bcControls[20].bState) || (!g_bcControls[19].bState && !g_bcControls[20].bState)) ? 0
+                            : (g_bcControls[19].bState)                                                                                      ? -128
+                                                                                                                                             : 128;
+            cs.LeftStickY = ((g_bcControls[21].bState && g_bcControls[22].bState) || (!g_bcControls[21].bState && !g_bcControls[22].bState)) ? 0
+                            : (g_bcControls[21].bState)                                                                                      ? -128
+                                                                                                                                             : 128;
             cs.ButtonCross = (g_bcControls[23].bState) ? 255 : 0;                                          // Accelerate
             cs.ButtonSquare = (g_bcControls[24].bState) ? 255 : 0;                                         // Reverse
             cs.DPadUp = (g_bcControls[25].bState) ? 255 : 0;                                               // Radio Next
@@ -2248,17 +2319,23 @@ void CKeyBinds::DoPostFramePulse()
             cs.RightShoulder2 = (g_bcControls[32].bState || g_bcControls[33].bState) ? 255 : 0;            // Look Right
             // * Look Behind - uses both keys above simultaneously
             // Mouse Look
-            cs.RightStickX = ((g_bcControls[35].bState && g_bcControls[36].bState) || (!g_bcControls[35].bState && !g_bcControls[36].bState))
-                                 ? 0
-                                 : (g_bcControls[35].bState) ? 128 : -128;
-            cs.RightStickY = ((g_bcControls[37].bState && g_bcControls[38].bState) || (!g_bcControls[37].bState && !g_bcControls[38].bState))
-                                 ? 0
-                                 : (g_bcControls[37].bState) ? 128 : -128;
+            cs.RightStickX = ((g_bcControls[35].bState && g_bcControls[36].bState) || (!g_bcControls[35].bState && !g_bcControls[36].bState)) ? 0
+                             : (g_bcControls[35].bState)                                                                                      ? 128
+                                                                                                                                              : -128;
+            cs.RightStickY = ((g_bcControls[37].bState && g_bcControls[38].bState) || (!g_bcControls[37].bState && !g_bcControls[38].bState)) ? 0
+                             : (g_bcControls[37].bState)                                                                                      ? 128
+                                                                                                                                              : -128;
         }
         cs.ButtonTriangle = (g_bcControls[9].bState) ? 255 : 0;            // Enter Exit
         cs.Select = (g_bcControls[10].bState) ? 255 : 0;                   // Change View
 
-        GetJoystickManager()->ApplyAxes(cs, bInVehicle);
+        bool disableGameplayControls = m_pCore->IsCursorForcedVisible() && m_pCore->IsCursorControlsToggled();
+
+        if (!disableGameplayControls)
+        {
+            GetJoystickManager()->ApplyAxes(cs, bInVehicle);
+        }
+
         // m_pCore->GetMouseControl()->ApplyAxes ( cs );
     }
 
@@ -2294,6 +2371,10 @@ void CKeyBinds::DoPostFramePulse()
                 }
             }
         }
+
+        bindableKeyStates[BK_MOUSE_WHEEL_UP] = false;
+        bindableKeyStates[BK_MOUSE_WHEEL_DOWN] = false;
+
         m_bMouseWheel = false;
     }
 }
@@ -2634,7 +2715,12 @@ void CKeyBinds::BindCommand(const char* szCmdLine)
 
                 if (szCommand)
                 {
-                    char*   szArguments = strtok(NULL, "\0");
+                    char* szArguments = strtok(NULL, "\0");
+                    if (szArguments)
+                        szArguments = SharedUtil::Trim(szArguments);
+                    if (szArguments != nullptr && szArguments[0] == '\0')
+                        szArguments = nullptr;
+
                     SString strKeyState("%s", bState ? "down" : "up");
                     SString strCommandAndArguments("%s%s%s", szCommand, szArguments ? " " : "", szArguments ? szArguments : "");
 

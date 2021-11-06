@@ -20,8 +20,9 @@ public:
     virtual CWaterPoly* CreateTriangle(const CVector& vec1, const CVector& vec2, const CVector& vec3, bool bShallow = false) = 0;
     virtual bool        DeletePoly(CWaterPoly* pPoly) = 0;
 
-    virtual bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown) = 0;
-    virtual bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel) = 0;
+    virtual bool GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool ignoreDistanceToWaterThreshold, CVector* pvecUnknown) = 0;
+    virtual bool SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel,
+                                    bool bIncludeOutsideWorldLevel) = 0;
     virtual bool SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource) = 0;
     virtual bool SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource) = 0;
     virtual void ResetWorldWaterLevel() = 0;

@@ -88,9 +88,10 @@ bool CClientWaterManager::SetPositionWaterLevel(const CVector& vecPosition, floa
     return g_pGame->GetWaterManager()->SetPositionWaterLevel(vecPosition, fLevel, pChangeSource);
 }
 
-bool CClientWaterManager::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel)
+bool CClientWaterManager::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel,
+                                             bool bIncludeOutsideWorldLevel)
 {
-    return g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel);
+    return g_pGame->GetWaterManager()->SetWorldWaterLevel(fLevel, pChangeSource, bIncludeWorldNonSeaLevel, bIncludeWorldSeaLevel, bIncludeOutsideWorldLevel);
 }
 
 bool CClientWaterManager::SetAllElementWaterLevel(float fLevel, void* pChangeSource)

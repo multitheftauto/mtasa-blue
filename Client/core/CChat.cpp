@@ -41,6 +41,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_bUseCEGUI = false;
     m_iCVarsRevision = -1;
     m_bVisible = false;
+    m_bInputBlocked = false;
     m_bInputVisible = false;
     m_pFont = m_pManager->GetClearFont();
     m_pDXFont = NULL;
@@ -149,8 +150,8 @@ void CChat::LoadCVars()
 //
 void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
 {
-    // Are we visible?
-    if (!m_bVisible)
+    // Are we visible and is input blocked?
+    if (!m_bVisible && m_bInputBlocked)
         return;
 
     // Is it time to update all the chat related cvars?
@@ -163,6 +164,10 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
 
     bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
     DrawInputLine(bUsingOutline);
+
+    // Are we visible?
+    if (!m_bVisible)
+        return;
 
     // Get drawList for the chat box text
     SDrawList drawList;
@@ -771,17 +776,18 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
     return true;
 }
 
-void CChat::SetVisible(bool bVisible)
+void CChat::SetVisible(bool bVisible, bool bInputBlocked)
 {
     m_bVisible = bVisible;
-    // If hiding chat, also reset chat input line
-    if (!m_bVisible)
+    m_bInputBlocked = bInputBlocked;
+
+    if (m_bInputBlocked)
         SetInputVisible(false);
 }
 
 void CChat::SetInputVisible(bool bVisible)
 {
-    if (!IsVisible())
+    if (m_bInputBlocked)
         bVisible = false;
 
     if (!bVisible)

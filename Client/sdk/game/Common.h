@@ -12,13 +12,14 @@
 #pragma once
 
 #include <windows.h>
+#include <stdint.h>
 
 // Limits for MTA
 #define MAX_VEHICLES_MTA                    64          // Real limit is 110
 #define MAX_PEDS_MTA                        110         // Real limit is 140
 #define MAX_OBJECTS_MTA                     1000        // Real limit is 1200
 #define MAX_ENTRY_INFO_NODES_MTA            72000       // Real limit is 72600  ( MAX_OBJECTS_MTA * 72 ) [Large col models are the cause of high usage]
-#define MAX_POINTER_SINGLE_LINKS_MTA        65000       // Real limit is 70000
+#define MAX_POINTER_SINGLE_LINKS_MTA        85000       // Real limit is 90000 [Large col models are the cause of high usage]
 #define MAX_POINTER_DOUBLE_LINKS_MTA        74000       // Real limit is 74800  ( MAX_OBJECTS_MTA * 72 + 2000 )
 
 // Real limits for GTA
@@ -27,7 +28,7 @@
 #define MAX_OBJECTS                         ( MAX_OBJECTS_MTA + 200 )               // 1200
 #define MAX_BUILDINGS                       13000
 #define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 600 )      // 72600
-#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 70000
+#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 90000
 #define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 74800
 #define MAX_RWOBJECT_INSTANCES              2500
 
@@ -183,6 +184,22 @@ typedef struct eControlStatesSA
     BYTE  bytePadding2[15];
     DWORD dwKeyHeld;
 } eControlStatesSA;
+
+enum class VehicleClass : uint8_t
+{
+    AUTOMOBILE,
+    MONSTER_TRUCK,
+    QUAD,
+    HELI,
+    PLANE,
+    BOAT,
+    TRAIN,
+    FAKE_HELI,
+    FAKE_PLANE,
+    BIKE,
+    BMX,
+    TRAILER,
+};
 
 enum eVehicleTypes
 {
@@ -1534,6 +1551,7 @@ enum eVehicleDummies
     EXHAUST_SECONDARY,
     WING_AIRTRAIL,
     VEH_GUN,
+    VEHICLE_DUMMY_COUNT,
 };
 
 enum class eResizableVehicleWheelGroup
@@ -1618,4 +1636,96 @@ namespace eObjectGroup
         BY_GUN,
         SMASHABLE,
     };
-}
+}            // namespace eObjectGroup
+
+enum eSoundEffectType;
+
+namespace eSoundEffectParams
+{
+    enum class Chorus
+    {
+        WET_DRY_MIX,
+        DEPTH,
+        FEEDBACK,
+        FREQUENCY,
+        WAVEFORM,
+        DELAY,
+        PHASE,
+    };
+
+    enum class Compressor
+    {
+        GAIN,
+        ATTACK,
+        RELEASE,
+        THRESHOLD,
+        RATIO,
+        PREDELAY,
+    };
+
+    enum class Distortion
+    {
+        GAIN,
+        EDGE,
+        POST_EQ_CENTER_FREQUENCY,
+        POST_EQ_BANDWIDTH,
+        PRE_LOWPASS_CUTOFF,
+    };
+
+    enum class Echo
+    {
+        WET_DRY_MIX,
+        FEEDBACK,
+        LEFT_DELAY,
+        RIGHT_DELAY,
+        PAN_DELAY,
+    };
+
+    enum class Flanger
+    {
+        WET_DRY_MIX,
+        DEPTH,
+        FEEDBACK,
+        FREQUENCY,
+        WAVEFORM,
+        DELAY,
+        PHASE,
+    };
+
+    enum class Gargle
+    {
+        RATE_HZ,
+        WAVE_SHAPE,
+    };
+
+    enum class I3DL2Reverb
+    {
+        ROOM,
+        ROOM_HF,
+        ROOM_ROLLOFF_FACTOR,
+        DECAY_TIME,
+        DECAY_HF_RATIO,
+        REFLECTIONS,
+        REFLECTIONS_DELAY,
+        REVERB,
+        REVERB_DELAY,
+        DIFFUSION,
+        DENSITY,
+        HF_REFERENCE,
+    };
+
+    enum class ParamEq
+    {
+        CENTER,
+        BANDWIDTH,
+        GAIN,
+    };
+
+    enum class Reverb
+    {
+        IN_GAIN,
+        REVERB_MIX,
+        REVERB_TIME,
+        HIGH_FREQ_RT_RATIO,
+    };
+}            // namespace eSoundEffectParams

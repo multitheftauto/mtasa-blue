@@ -18,7 +18,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-class CColModelSAInterface;
+struct CColModelSAInterface;
 
 /*****************************************************************************/
 /** Renderware functions                                                    **/
@@ -43,6 +43,7 @@ typedef RwFrame*(__cdecl* RwFrameRemoveChild_t)(RwFrame* child);
 typedef RwFrame*(__cdecl* RwFrameForAllObjects_t)(RwFrame* frame, void* callback, void* data);
 typedef RwFrame*(__cdecl* RwFrameTranslate_t)(RwFrame* frame, const RwV3d* v, RwTransformOrder order);
 typedef RwFrame*(__cdecl* RwFrameScale_t)(RwFrame* frame, const RwV3d* v, RwTransformOrder order);
+typedef RwFrame*(__cdecl* RwFrameUpdateObjects_t)(RwFrame*);
 typedef RwFrame*(__cdecl* RwFrameCreate_t)();
 typedef int(__cdecl* RwFrameDestroy_t)(RwFrame* frame);
 typedef RwFrame*(__cdecl* RwFrameSetIdentity_t)(RwFrame* frame);
@@ -101,6 +102,10 @@ typedef RwRaster*(__cdecl* RwRasterLock_t)(RwRaster* raster, unsigned char level
 typedef RwRaster*(__cdecl* RwRasterCreate_t)(int width, int height, int depth, int flags);
 typedef RwTexture*(__cdecl* RwTextureCreate_t)(RwRaster* raster);
 typedef RpMaterial*(__cdecl* RpMaterialSetTexture_t)(RpMaterial* mat, RwTexture* tex);
+typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromSkinClump_t)(RpClump*);
+typedef int(__cdecl* RpHAnimIDGetIndex_t)(RpHAnimHierarchy*, int);
+typedef RwMatrix*(__cdecl* RpHAnimHierarchyGetMatrixArray_t)(RpHAnimHierarchy*);
+typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp);
 
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
@@ -167,6 +172,7 @@ RWFUNC(RwIm3DEnd_t RwIm3DEnd, (RwIm3DEnd_t)0xDEAD)
 RWFUNC(RwMatrixInvert_t RwMatrixInvert, (RwMatrixInvert_t)0xDEAD)
 RWFUNC(RpWorldAddClump_t RpWorldAddClump, (RpWorldAddClump_t)0xDEAD)
 RWFUNC(RwFrameScale_t RwFrameScale, (RwFrameScale_t)0xDEAD)
+RWFUNC(RwFrameUpdateObjects_t RwFrameUpdateObjects, (RwFrameUpdateObjects_t)0xDAED)
 RWFUNC(RwV3dTransformVector_t RwV3dTransformVector, (RwV3dTransformVector_t)0xDEAD)
 RWFUNC(RpLightCreate_t RpLightCreate, (RpLightCreate_t)0xDEAD)
 RWFUNC(RpClumpAddLight_t RpClumpAddLight, (RpClumpAddLight_t)0xDEAD)
@@ -183,6 +189,10 @@ RWFUNC(RwRasterLock_t RwRasterLock, (RwRasterLock_t)0xDEAD)
 RWFUNC(RwRasterCreate_t RwRasterCreate, (RwRasterCreate_t)0xDEAD)
 RWFUNC(RwTextureCreate_t RwTextureCreate, (RwTextureCreate_t)0xDEAD)
 RWFUNC(RpMaterialSetTexture_t RpMaterialSetTexture, (RpMaterialSetTexture_t)0xDEAD)
+RWFUNC(GetAnimHierarchyFromSkinClump_t GetAnimHierarchyFromSkinClump, (GetAnimHierarchyFromSkinClump_t)0xDEAD)
+RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
+RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
+RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
 
 /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/

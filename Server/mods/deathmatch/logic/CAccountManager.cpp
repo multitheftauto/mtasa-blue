@@ -166,12 +166,12 @@ bool CAccountManager::Load()
         // Check for overlong names and incorrect escapement
         bool bRemoveAccount = false;
         bool bChanged = false;
-        if (strName.length() > 64)
+        if (strName.length() > MAX_USERNAME_LENGTH)
         {
             // Try to repair name
             if (strName.length() <= 256)
             {
-                strName = strName.Replace("\"\"", "\"", true).substr(0, 64);
+                strName = strName.Replace("\"\"", "\"", true).substr(0, MAX_USERNAME_LENGTH);
                 bChanged = true;
             }
 
@@ -273,8 +273,8 @@ void CAccountManager::Save(CAccount* pAccount, bool bCheckForErrors)
     strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, "UPDATE accounts SET ip=?", SQLITE_TEXT, *strIP);
     if (!strSerial.empty())
         strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", serial=?", SQLITE_TEXT, *strSerial);
-    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", name=?, password=?, httppass=? WHERE id=?", SQLITE_TEXT, *strName, SQLITE_TEXT, *strPassword,
-                                                   SQLITE_TEXT, *strHttpPassAppend, SQLITE_INTEGER, iID);
+    strQuery += m_pDatabaseManager->PrepareStringf(m_hDbConnection, ", name=?, password=?, httppass=? WHERE id=?", SQLITE_TEXT, *strName, SQLITE_TEXT,
+                                                   *strPassword, SQLITE_TEXT, *strHttpPassAppend, SQLITE_INTEGER, iID);
 
     if (bCheckForErrors)
     {
@@ -481,7 +481,7 @@ void CAccountManager::RemoveAll()
     DeletePointersAndClearList(m_List);
 }
 
-bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, const char* szPassword)
+bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const std::string& strAccountName, const char* szPassword)
 {
     // Is he already logged in?
     if (pClient->IsRegistered())
@@ -504,10 +504,23 @@ bool CAccountManager::LogIn(CClient* pClient, CClient* pEchoClient, const char* 
     SString  strPlayerIP = pPlayer->GetSourceIP();
     SString  strPlayerSerial = pPlayer->GetSerial();
 
+    std::string strSlicedAccountName = strAccountName.substr(0, MAX_USERNAME_LENGTH);
+    const char* szAccountName = strSlicedAccountName.c_str();
+
+    if (!IsValidAccountName(szAccountName))
+    {
+        if (pEchoClient)
+            pEchoClient->SendEcho("login: Invalid account name provided");
+        CLogger::AuthPrintf("LOGIN: %s tried to log in with an invalid account name (IP: %s  Serial: %s)\n", szAccountName, strPlayerIP.c_str(),
+                            strPlayerSerial.c_str());
+        m_AccountProtect.AddConnect(strPlayerIP.c_str());
+        return false;
+    }
+
     if (m_AccountProtect.IsFlooding(strPlayerIP.c_str()))
     {
         if (pEchoClient)
-            pEchoClient->SendEcho(SString("login: Account locked", szAccountName).c_str());
+            pEchoClient->SendEcho("login: Account locked");
         CLogger::AuthPrintf("LOGIN: Ignoring %s trying to log in as '%s' (IP: %s  Serial: %s)\n", strPlayerName.c_str(), szAccountName, strPlayerIP.c_str(),
                             strPlayerSerial.c_str());
         return false;
@@ -685,24 +698,24 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
         // Account data is stored as text so we don't need to check what type it is just return it
         switch (type)
         {
-        case LUA_TBOOLEAN:
-            pResult->ReadBool(strcmp(value, "true") == 0);
-            break;
+            case LUA_TBOOLEAN:
+                pResult->ReadBool(strcmp(value, "true") == 0);
+                break;
 
-        case LUA_TNUMBER:
-            pResult->ReadNumber(strtod(value, NULL));
-            break;
+            case LUA_TNUMBER:
+                pResult->ReadNumber(strtod(value, NULL));
+                break;
 
-        case LUA_TNIL:
-            break;
+            case LUA_TNIL:
+                break;
 
-        case LUA_TSTRING:
-            pResult->ReadString(value);
-            break;
+            case LUA_TSTRING:
+                pResult->ReadString(value);
+                break;
 
-        default:
-            dassert(0); // It never should hit this, if so, something corrupted
-            break;
+            default:
+                dassert(0);            // It never should hit this, if so, something corrupted
+                break;
         }
     }
     else
@@ -932,7 +945,7 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
 {
     Save();
     CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE added_ip = ?", SQLITE_TEXT, strIP.c_str());
+    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE ip = ?", SQLITE_TEXT, strIP.c_str());
 
     for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
     {
@@ -1058,7 +1071,7 @@ void CAccountManager::DbCallback(CDbJobData* pJobData)
 //
 bool CAccountManager::IsValidAccountName(const SString& strName)
 {
-    if (strName.length() < 1)
+    if (strName.length() < MIN_USERNAME_LENGTH)
         return false;
     return true;
 }
@@ -1078,7 +1091,7 @@ bool CAccountManager::IsValidPassword(const SString& strPassword)
 //
 bool CAccountManager::IsValidNewAccountName(const SString& strName)
 {
-    if (!IsValidAccountName(strName))
+    if (!IsValidAccountName(strName) || strName.length() > MAX_USERNAME_LENGTH)
         return false;
 
     // Extra restrictions for new account names

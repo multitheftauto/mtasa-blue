@@ -12,7 +12,6 @@
 #pragma once
 
 #include <cmath>
-#include "CVector.h"
 
 /**
  * CVector4D Structure used to store a 2D vertex.
@@ -20,48 +19,32 @@
 class CVector4D
 {
 public:
-    CVector4D()
+    float fX = 0.0f;
+    float fY = 0.0f;
+    float fZ = 0.0f;
+    float fW = 0.0f;
+
+    constexpr CVector4D() noexcept = default;
+
+    constexpr CVector4D(const CVector4D&) noexcept = default;
+
+    constexpr CVector4D& operator=(const CVector4D&) noexcept = default;
+
+    constexpr CVector4D(float x, float y, float z, float w) noexcept : fX(x), fY(y), fZ(z), fW(w) {}
+
+    // Warning, this function is returning the wrong value(fW is missing), its kept because nothing uses it, only
+    // CLuaVector4DDefs.
+    constexpr float DotProduct(const CVector4D& other) const noexcept { return fX * other.fX + fY * other.fY + fZ * other.fZ; }
+
+    float Length() const noexcept { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
+
+    // LengthSquared returns Length() without sqrt applied (i.e. returns x*x* + y*y + z*z + w*w).
+    // This can be useful if you only want to compare lengths.
+    constexpr float LengthSquared() const noexcept { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
+
+    void Normalize() noexcept
     {
-        fX = 0;
-        fY = 0;
-        fZ = 0;
-        fW = 0;
-    }
-
-    CVector4D(float _fX, float _fY, float _fZ, float _fW)
-    {
-        fX = _fX;
-        fY = _fY;
-        fZ = _fZ;
-        fW = _fW;
-    }
-
-    CVector4D(const CVector4D& vec)
-    {
-        fX = vec.fX;
-        fY = vec.fY;
-        fZ = vec.fZ;
-        fW = vec.fW;
-    }
-
-    CVector4D& operator=(const CVector4D& vec)
-    {
-        fX = vec.fX;
-        fY = vec.fY;
-        fZ = vec.fZ;
-        fW = vec.fW;
-        return *this;
-    }
-
-    float DotProduct(CVector4D& other) const { return fX * other.fX + fY * other.fY + fZ * other.fZ; }
-
-    float Length() const { return sqrt(fX * fX + fY * fY + fZ * fZ + fW * fW); }
-
-    float LengthSquared() const { return (fX * fX) + (fY * fY) + (fZ * fZ) + (fW * fW); }
-
-    void Normalize()
-    {
-        float fLength = Length();
+        const float fLength = Length();
         if (fLength > 0.0f)
         {
             fX /= fLength;
@@ -71,23 +54,28 @@ public:
         }
     }
 
-    CVector4D operator*(float fRight) const { return CVector4D(fX * fRight, fY * fRight, fZ * fRight, fW * fRight); }
+    constexpr CVector4D operator*(const CVector4D& vecRight) const { return CVector4D(fX * vecRight.fX, fY * vecRight.fY, fZ * vecRight.fZ, fW * vecRight.fW); }
 
-    CVector4D operator/(float fRight) const
+    constexpr CVector4D operator*(const float fRight) const noexcept { return CVector4D(fX * fRight, fY * fRight, fZ * fRight, fW * fRight); }
+
+    constexpr CVector4D operator+(const CVector4D& vecRight) const noexcept
     {
-        float fRcpValue = 1 / fRight;
-        return CVector4D(fX * fRcpValue, fY * fRcpValue, fZ * fRcpValue, fW * fRcpValue);
+        return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW);
     }
 
-    CVector4D operator+(const CVector4D& vecRight) const { return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW); }
+    constexpr CVector4D operator-(const CVector4D& vecRight) const noexcept
+    {
+        return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW);
+    }
 
-    CVector4D operator-(const CVector4D& vecRight) const { return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW); }
+    constexpr CVector4D operator/(const CVector4D& vecRight) const noexcept
+    {
+        return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW);
+    }
 
-    CVector4D operator*(const CVector4D& vecRight) const { return CVector4D(fX * vecRight.fX, fY * vecRight.fY, fZ * vecRight.fZ, fW * vecRight.fW); }
+    constexpr CVector4D operator/(const float fRight) const noexcept { return CVector4D(fX / fRight, fY / fRight, fZ / fRight, fW / fRight); }
 
-    CVector4D operator/(const CVector4D& vecRight) const { return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW); }
-
-    void operator+=(float fRight)
+    constexpr void operator+=(const float fRight) noexcept
     {
         fX += fRight;
         fY += fRight;
@@ -95,7 +83,7 @@ public:
         fW += fRight;
     }
 
-    void operator+=(const CVector4D& vecRight)
+    constexpr void operator+=(const CVector4D& vecRight) noexcept
     {
         fX += vecRight.fX;
         fY += vecRight.fY;
@@ -103,7 +91,7 @@ public:
         fW += vecRight.fW;
     }
 
-    void operator-=(float fRight)
+    constexpr void operator-=(const float fRight) noexcept
     {
         fX -= fRight;
         fY -= fRight;
@@ -111,7 +99,7 @@ public:
         fW -= fRight;
     }
 
-    void operator-=(const CVector4D& vecRight)
+    constexpr void operator-=(const CVector4D& vecRight) noexcept
     {
         fX -= vecRight.fX;
         fY -= vecRight.fY;
@@ -119,7 +107,7 @@ public:
         fW -= vecRight.fW;
     }
 
-    void operator*=(float fRight)
+    constexpr void operator*=(const float fRight) noexcept
     {
         fX *= fRight;
         fY *= fRight;
@@ -127,15 +115,7 @@ public:
         fW *= fRight;
     }
 
-    void operator*=(const CVector4D& vecRight)
-    {
-        fX *= vecRight.fX;
-        fY *= vecRight.fY;
-        fZ *= vecRight.fZ;
-        fW *= vecRight.fW;
-    }
-
-    void operator/=(float fRight)
+    constexpr void operator/=(const float fRight) noexcept
     {
         fX /= fRight;
         fY /= fRight;
@@ -143,7 +123,7 @@ public:
         fW /= fRight;
     }
 
-    void operator/=(const CVector4D& vecRight)
+    constexpr void operator/=(const CVector4D& vecRight) noexcept
     {
         fX /= vecRight.fX;
         fY /= vecRight.fY;
@@ -151,20 +131,11 @@ public:
         fW /= vecRight.fW;
     }
 
-    bool operator==(const CVector4D& param) const
+    bool operator==(const CVector4D& param) const noexcept
     {
         return ((fabs(fX - param.fX) < FLOAT_EPSILON) && (fabs(fY - param.fY) < FLOAT_EPSILON) && (fabs(fZ - param.fZ) < FLOAT_EPSILON) &&
                 (fabs(fW - param.fW) < FLOAT_EPSILON));
     }
 
-    bool operator!=(const CVector4D& param) const
-    {
-        return ((fabs(fX - param.fX) >= FLOAT_EPSILON) || (fabs(fY - param.fY) >= FLOAT_EPSILON) || (fabs(fZ - param.fZ) >= FLOAT_EPSILON) ||
-                (fabs(fW - param.fW) >= FLOAT_EPSILON));
-    }
-
-    float fX;
-    float fY;
-    float fZ;
-    float fW;
+    bool operator!=(const CVector4D& param) const noexcept { return !(*this == param); }
 };

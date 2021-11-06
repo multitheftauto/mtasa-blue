@@ -321,7 +321,7 @@ void HandleResetSettings()
             FileRename(strSettingsFilename, strSettingsFilenameBak);
             FileDelete(strSettingsFilename);
 
-            //Also reset NVidia Optimus "remember option" to allow them to choose again
+            // Also reset NVidia Optimus "remember option" to allow them to choose again
             SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
 
             if (!FileExists(strSettingsFilename))
@@ -823,7 +823,7 @@ void CheckDataFiles()
     if (!VerifyEmbeddedSignature(PathJoin(strMTASAPath, MTA_EXE_NAME)))
     {
         SString strMessage(_("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly."));
-        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC) && !defined(MTA_DEBUG)
+        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_PUBLIC_CONNECTIONS) && !defined(MTA_DEBUG)
         DisplayErrorMessageBox(strMessage, _E("CL29"), "maybe-virus1");
         #endif
     }
@@ -832,15 +832,15 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"DF51D99AFA46AE359FDFCE18966F0078", "bass.dll"},
-                              {"1427B642B1E10B15E84C10FF43B1D8A5", "bass_aac.dll"},
+    } integrityCheckList[] = {{"B5375C189939F366CC79ECA57A915615", "bass.dll"},
+                              {"E48EA82D7A87853FA4F09F19C4E7A2C1", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
-                              {"27D2069B89AA55C21DB23C835AA90730", "bass_fx.dll"},
-                              {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
-                              {"0140838049533F988D8845AE522589FA", "bassmidi.dll"},
-                              {"7B00E76ABC6128AE2B29B2B7F77F49FC", "bassmix.dll"},
-                              {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
-                              {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
+                              {"03FB421991634C85D7AA7A914506381E", "bass_fx.dll"},
+                              {"E2A26F0C195B75D520D39EAC4E4C804B", "bassflac.dll"},
+                              {"2DF21511EB488D860BC43C904679D4AA", "bassmidi.dll"},
+                              {"7508CACD7EDC4749228BA0FB9A0BE296", "bassmix.dll"},
+                              {"26C74F5E9DF6C59DED3B09335E5D82AD", "bassopus.dll"},
+                              {"476BDA1EE12C760A29E4EE43F593F878", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
                               {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
                               {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},

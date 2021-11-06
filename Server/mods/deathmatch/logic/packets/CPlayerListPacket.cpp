@@ -122,7 +122,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         // Flags
         bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
         BitStream.WriteBit(pPlayer->IsDead());
-        BitStream.WriteBit(true);                         // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
+        BitStream.WriteBit(true);            // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
         BitStream.WriteBit(bInVehicle);
         BitStream.WriteBit(pPlayer->HasJetPack());
         BitStream.WriteBit(pPlayer->IsNametagShowing());
@@ -136,7 +136,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         if (szNametagText)
             ucNametagTextLength = static_cast<unsigned char>(strlen(szNametagText));
 
-        if (BitStream.Version() < 0x67)
+        if (!BitStream.Can(eBitStreamVersion::UnicodeNametags))
         {
             // Old client version has a fixed buffer of 22 characters
             ucNametagTextLength = std::min<uchar>(ucNametagTextLength, 22);

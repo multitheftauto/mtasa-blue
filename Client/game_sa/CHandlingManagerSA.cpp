@@ -22,6 +22,17 @@ DWORD CHandlingManagerSA::m_dwStore_LoadHandlingCfg = 0;
 tHandlingDataSA   CHandlingManagerSA::m_OriginalHandlingData[HT_MAX];
 CHandlingEntrySA* CHandlingManagerSA::m_pOriginalEntries[HT_MAX];
 
+tFlyingHandlingDataSA   CHandlingManagerSA::m_OriginalFlyingHandlingData[24];
+CFlyingHandlingEntrySA* CHandlingManagerSA::m_pOriginalFlyingEntries[24];
+
+tBoatHandlingDataSA   CHandlingManagerSA::m_OriginalBoatHandlingData[12];
+CBoatHandlingEntrySA* CHandlingManagerSA::m_pOriginalBoatEntries[12];
+
+tBikeHandlingDataSA   CHandlingManagerSA::m_OriginalBikeHandlingData[14];
+CBikeHandlingEntrySA* CHandlingManagerSA::m_pOriginalBikeEntries[14];
+
+// TODO We need install a hook in 0x6F52D0 to make some stuff work corrently
+
 // Use the following code to dump handling data unrecalculated on GTA load.
 // NB: You need to disable the other hook in the constructor of the manager and uncomment the other
 
@@ -112,6 +123,21 @@ CHandlingManagerSA::CHandlingManagerSA()
         m_pOriginalEntries[i] = new CHandlingEntrySA(&m_OriginalHandlingData[i]);
     }
 
+    for (int i = 0; i < 24; i++)
+    {
+        m_pOriginalFlyingEntries[i] = new CFlyingHandlingEntrySA(&m_OriginalFlyingHandlingData[i]);
+    }
+
+    for (int i = 0; i < 12; i++)
+    {
+        m_pOriginalBoatEntries[i] = new CBoatHandlingEntrySA(&m_OriginalBoatHandlingData[i]);
+    }
+
+    for (int i = 0; i < 14; i++)
+    {
+        m_pOriginalBikeEntries[i] = new CBikeHandlingEntrySA(&m_OriginalBikeHandlingData[i]);
+    }
+
     // Uncomment this to dump
     // HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
     m_HandlingNames["mass"] = HANDLING_MASS;                                                             // works (mass > 0)
@@ -158,6 +184,21 @@ CHandlingManagerSA::~CHandlingManagerSA()
     {
         delete m_pOriginalEntries[i];
     }
+
+    for (int i = 0; i < 24; i++)
+    {
+        delete m_pOriginalFlyingEntries[i];
+    }
+
+    for (int i = 0; i < 12; i++)
+    {
+        delete m_pOriginalBoatEntries[i];
+    }
+
+    for (int i = 0; i < 14; i++)
+    {
+        delete m_pOriginalBikeEntries[i];
+    }
 }
 
 eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strName)
@@ -178,6 +219,24 @@ CHandlingEntry* CHandlingManagerSA::CreateHandlingData()
     return pHandlingEntry;
 }
 
+CFlyingHandlingEntry* CHandlingManagerSA::CreateFlyingHandlingData()
+{
+    CFlyingHandlingEntrySA* pFlyingHandlingEntry = new CFlyingHandlingEntrySA();
+    return pFlyingHandlingEntry;
+}
+
+CBoatHandlingEntry* CHandlingManagerSA::CreateBoatHandlingData()
+{
+    CBoatHandlingEntrySA* pBoatHandlingEntry = new CBoatHandlingEntrySA();
+    return pBoatHandlingEntry;
+}
+
+CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
+{
+    CBikeHandlingEntrySA* pBikeHandlingEntry = new CBikeHandlingEntrySA();
+    return pBikeHandlingEntry;
+}
+
 const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel)
 {
     // Within range?
@@ -187,6 +246,56 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes 
         eHandlingTypes eHandling = GetHandlingID(eModel);
         // Return it
         return m_pOriginalEntries[eHandling];
+    }
+
+    return NULL;
+}
+
+const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel)
+{
+    // Within range?
+    if (eModel >= 400 && eModel < VT_MAX)
+    {
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(eModel);
+        // Original GTA:SA behavior
+        if (eHandling < 186 || eHandling > 209)
+            return m_pOriginalFlyingEntries[0];
+        else
+            return m_pOriginalFlyingEntries[eHandling - 186];
+    }
+
+    return NULL;
+}
+
+const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel)
+{
+    // Within range?
+    if (eModel >= 400 && eModel < VT_MAX)
+    {
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(eModel);
+        // Original GTA:SA behavior
+        if (eHandling < 175 || eHandling > 186)
+            return m_pOriginalBoatEntries[0];
+        else
+            return m_pOriginalBoatEntries[eHandling - 175];
+    }
+
+    return NULL;
+}
+
+const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel)
+{
+    // Within range?
+    if (eModel >= 400 && eModel < VT_MAX)
+    {
+        // Get our Handling ID
+        eHandlingTypes eHandling = GetHandlingID(eModel);
+        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
+            return m_pOriginalBikeEntries[eHandling - HT_BIKE];
+        else if (eHandling == HT_FAGGIO)
+            return m_pOriginalBikeEntries[13];
     }
 
     return NULL;
@@ -8192,29 +8301,859 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalHandlingData[209].ucTailLight = 1;
     m_OriginalHandlingData[209].ucAnimGroup = 0;
 
-    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];   // HT_HOTRINA = HT_HOTRING
+    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];            // HT_HOTRINA = HT_HOTRING
     m_OriginalHandlingData[210].iVehicleID = 210;
 
-    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];   // HT_HOTRINB = HT_HOTRING
+    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];            // HT_HOTRINB = HT_HOTRING
     m_OriginalHandlingData[211].iVehicleID = 211;
 
-    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];  // HT_SADLSHIT = HT_SADLER
+    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];            // HT_SADLSHIT = HT_SADLER
     m_OriginalHandlingData[212].iVehicleID = 212;
 
-    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];   // HT_GLENSHIT = HT_GLENDALE
+    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];            // HT_GLENSHIT = HT_GLENDALE
     m_OriginalHandlingData[213].iVehicleID = 213;
 
-    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];  // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];            // HT_FAGGIO = HT_PIZZABOY
     m_OriginalHandlingData[214].iVehicleID = 214;
 
-    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];    // HT_FIRELA = HT_FIRETRUK
+    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];            // HT_FIRELA = HT_FIRETRUK
     m_OriginalHandlingData[215].iVehicleID = 215;
 
-    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];   // HT_RNCHLURE = HT_RANCHER
+    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];            // HT_RNCHLURE = HT_RANCHER
     m_OriginalHandlingData[216].iVehicleID = 216;
 
-    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];  // HT_FREIBOX = HT_FREIFLAT
+    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];            // HT_FREIBOX = HT_FREIFLAT
     m_OriginalHandlingData[217].iVehicleID = 217;
+
+    // Aircrafts handling
+
+    m_OriginalFlyingHandlingData[0].iVehicleID = 186;
+    m_OriginalFlyingHandlingData[0].fThrust = 0.5f;
+    m_OriginalFlyingHandlingData[0].fThrustFallOff = 0.40f;
+    m_OriginalFlyingHandlingData[0].fYaw = -0.00006f;
+    m_OriginalFlyingHandlingData[0].fYawStab = 0.002f;
+    m_OriginalFlyingHandlingData[0].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[0].fRoll = 0.002f;
+    m_OriginalFlyingHandlingData[0].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[0].fPitch = 0.0002f;
+    m_OriginalFlyingHandlingData[0].fPitchStab = 0.0020f;
+    m_OriginalFlyingHandlingData[0].fFormLift = 0.020f;
+    m_OriginalFlyingHandlingData[0].fAttackLift = 0.15f;
+    m_OriginalFlyingHandlingData[0].fGearUpR = 1.0f;
+    m_OriginalFlyingHandlingData[0].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[0].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[0].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[0].vecTurnResistance = CVector(0.998f, 0.998, 0.995);
+    m_OriginalFlyingHandlingData[0].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[1].iVehicleID = 187;
+    m_OriginalFlyingHandlingData[1].fThrust = 0.4f;
+    m_OriginalFlyingHandlingData[1].fThrustFallOff = 0.30f;
+    m_OriginalFlyingHandlingData[1].fYaw = -0.0025f;
+    m_OriginalFlyingHandlingData[1].fYawStab = 0.02f;
+    m_OriginalFlyingHandlingData[1].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[1].fRoll = 0.001f;
+    m_OriginalFlyingHandlingData[1].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[1].fPitch = 0.0003f;
+    m_OriginalFlyingHandlingData[1].fPitchStab = 0.0020f;
+    m_OriginalFlyingHandlingData[1].fFormLift = 0.000f;
+    m_OriginalFlyingHandlingData[1].fAttackLift = 0.10f;
+    m_OriginalFlyingHandlingData[1].fGearUpR = 1.0f;
+    m_OriginalFlyingHandlingData[1].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[1].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[1].fMoveResistance = 0.995f;
+    m_OriginalFlyingHandlingData[1].vecTurnResistance = CVector(1.000f, 1.000, 0.998);
+    m_OriginalFlyingHandlingData[1].vecSpeedResistance = CVector(0.0f, 0.0f, 10.0f);
+
+    m_OriginalFlyingHandlingData[2].iVehicleID = 188;
+    m_OriginalFlyingHandlingData[2].fThrust = 0.5f;
+    m_OriginalFlyingHandlingData[2].fThrustFallOff = 0.30f;
+    m_OriginalFlyingHandlingData[2].fYaw = -0.00010f;
+    m_OriginalFlyingHandlingData[2].fYawStab = 0.004f;
+    m_OriginalFlyingHandlingData[2].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[2].fRoll = 0.002f;
+    m_OriginalFlyingHandlingData[2].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[2].fPitch = 0.0002f;
+    m_OriginalFlyingHandlingData[2].fPitchStab = 0.0020f;
+    m_OriginalFlyingHandlingData[2].fFormLift = 0.008f;
+    m_OriginalFlyingHandlingData[2].fAttackLift = 0.10f;
+    m_OriginalFlyingHandlingData[2].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[2].fGearDownL = 1.2f;
+    m_OriginalFlyingHandlingData[2].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[2].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[2].vecTurnResistance = CVector(0.998f, 0.998, 0.990);
+    m_OriginalFlyingHandlingData[2].vecSpeedResistance = CVector(10.0f, 20.0f, 0.0f);
+
+    m_OriginalFlyingHandlingData[3].iVehicleID = 189;
+    m_OriginalFlyingHandlingData[3].fThrust = 0.65f;
+    m_OriginalFlyingHandlingData[3].fThrustFallOff = 0.10f;
+    m_OriginalFlyingHandlingData[3].fYaw = -0.00010f;
+    m_OriginalFlyingHandlingData[3].fYawStab = 0.002f;
+    m_OriginalFlyingHandlingData[3].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[3].fRoll = 0.002f;
+    m_OriginalFlyingHandlingData[3].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[3].fPitch = 0.0002f;
+    m_OriginalFlyingHandlingData[3].fPitchStab = 0.0020f;
+    m_OriginalFlyingHandlingData[3].fFormLift = 0.018f;
+    m_OriginalFlyingHandlingData[3].fAttackLift = 0.15f;
+    m_OriginalFlyingHandlingData[3].fGearUpR = 1.0f;
+    m_OriginalFlyingHandlingData[3].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[3].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[3].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[3].vecTurnResistance = CVector(0.998f, 0.998, 0.990);
+    m_OriginalFlyingHandlingData[3].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[4].iVehicleID = 190;
+    m_OriginalFlyingHandlingData[4].fThrust = 0.6f;
+    m_OriginalFlyingHandlingData[4].fThrustFallOff = 0.10f;
+    m_OriginalFlyingHandlingData[4].fYaw = -0.00015f;
+    m_OriginalFlyingHandlingData[4].fYawStab = 0.002f;
+    m_OriginalFlyingHandlingData[4].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[4].fRoll = 0.002f;
+    m_OriginalFlyingHandlingData[4].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[4].fPitch = 0.0003f;
+    m_OriginalFlyingHandlingData[4].fPitchStab = 0.0020f;
+    m_OriginalFlyingHandlingData[4].fFormLift = 0.030f;
+    m_OriginalFlyingHandlingData[4].fAttackLift = 0.20f;
+    m_OriginalFlyingHandlingData[4].fGearUpR = 1.0f;
+    m_OriginalFlyingHandlingData[4].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[4].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[4].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[4].vecTurnResistance = CVector(0.9985f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[4].vecSpeedResistance = CVector(20.0f, 30.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[5].iVehicleID = 191;
+    m_OriginalFlyingHandlingData[5].fThrust = 0.8f;
+    m_OriginalFlyingHandlingData[5].fThrustFallOff = 0.30f;
+    m_OriginalFlyingHandlingData[5].fYaw = -0.00020f;
+    m_OriginalFlyingHandlingData[5].fYawStab = 0.002f;
+    m_OriginalFlyingHandlingData[5].fSideSlip = 0.010f;
+    m_OriginalFlyingHandlingData[5].fRoll = 0.004f;
+    m_OriginalFlyingHandlingData[5].fRollStab = -0.001f;
+    m_OriginalFlyingHandlingData[5].fPitch = 0.0005f;
+    m_OriginalFlyingHandlingData[5].fPitchStab = 0.0015f;
+    m_OriginalFlyingHandlingData[5].fFormLift = 0.014f;
+    m_OriginalFlyingHandlingData[5].fAttackLift = 0.14f;
+    m_OriginalFlyingHandlingData[5].fGearUpR = 1.0f;
+    m_OriginalFlyingHandlingData[5].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[5].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[5].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[5].vecTurnResistance = CVector(0.997f, 0.997, 0.997);
+    m_OriginalFlyingHandlingData[5].vecSpeedResistance = CVector(10.0f, 5.0f, 5.0f);
+
+    m_OriginalFlyingHandlingData[6].iVehicleID = 192;
+    m_OriginalFlyingHandlingData[6].fThrust = 0.5f;
+    m_OriginalFlyingHandlingData[6].fThrustFallOff = 1.00f;
+    m_OriginalFlyingHandlingData[6].fYaw = -0.00003f;
+    m_OriginalFlyingHandlingData[6].fYawStab = 0.001f;
+    m_OriginalFlyingHandlingData[6].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[6].fRoll = 0.002f;
+    m_OriginalFlyingHandlingData[6].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[6].fPitch = 0.00006f;
+    m_OriginalFlyingHandlingData[6].fPitchStab = 0.0015f;
+    m_OriginalFlyingHandlingData[6].fFormLift = 0.006f;
+    m_OriginalFlyingHandlingData[6].fAttackLift = 0.10f;
+    m_OriginalFlyingHandlingData[6].fGearUpR = 0.3f;
+    m_OriginalFlyingHandlingData[6].fGearDownL = 1.7f;
+    m_OriginalFlyingHandlingData[6].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[6].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[6].vecTurnResistance = CVector(0.998f, 0.996, 0.995);
+    m_OriginalFlyingHandlingData[6].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[7].iVehicleID = 193;
+    m_OriginalFlyingHandlingData[7].fThrust = 1.1f;
+    m_OriginalFlyingHandlingData[7].fThrustFallOff = 1.00f;
+    m_OriginalFlyingHandlingData[7].fYaw = -0.00010f;
+    m_OriginalFlyingHandlingData[7].fYawStab = 0.004f;
+    m_OriginalFlyingHandlingData[7].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[7].fRoll = 0.002f;
+    m_OriginalFlyingHandlingData[7].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[7].fPitch = 0.0001f;
+    m_OriginalFlyingHandlingData[7].fPitchStab = 0.0020f;
+    m_OriginalFlyingHandlingData[7].fFormLift = 0.006f;
+    m_OriginalFlyingHandlingData[7].fAttackLift = 0.10f;
+    m_OriginalFlyingHandlingData[7].fGearUpR = 0.1f;
+    m_OriginalFlyingHandlingData[7].fGearDownL = 1.3f;
+    m_OriginalFlyingHandlingData[7].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[7].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[7].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[7].vecSpeedResistance = CVector(10.0f, 10.0f, 40.0f);
+
+    m_OriginalFlyingHandlingData[8].iVehicleID = 194;
+    m_OriginalFlyingHandlingData[8].fThrust = 0.4f;
+    m_OriginalFlyingHandlingData[8].fThrustFallOff = 0.30f;
+    m_OriginalFlyingHandlingData[8].fYaw = -0.00001f;
+    m_OriginalFlyingHandlingData[8].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[8].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[8].fRoll = 0.001f;
+    m_OriginalFlyingHandlingData[8].fRollStab = -0.003f;
+    m_OriginalFlyingHandlingData[8].fPitch = 0.00003f;
+    m_OriginalFlyingHandlingData[8].fPitchStab = 0.0030f;
+    m_OriginalFlyingHandlingData[8].fFormLift = 0.012f;
+    m_OriginalFlyingHandlingData[8].fAttackLift = 0.20f;
+    m_OriginalFlyingHandlingData[8].fGearUpR = 0.3f;
+    m_OriginalFlyingHandlingData[8].fGearDownL = 1.3f;
+    m_OriginalFlyingHandlingData[8].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[8].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[8].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[8].vecSpeedResistance = CVector(20.0f, 100.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[9].iVehicleID = 195;
+    m_OriginalFlyingHandlingData[9].fThrust = 0.35f;
+    m_OriginalFlyingHandlingData[9].fThrustFallOff = 1.00f;
+    m_OriginalFlyingHandlingData[9].fYaw = -0.000005f;
+    m_OriginalFlyingHandlingData[9].fYawStab = 0.0002f;
+    m_OriginalFlyingHandlingData[9].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[9].fRoll = 0.0003f;
+    m_OriginalFlyingHandlingData[9].fRollStab = -0.0001f;
+    m_OriginalFlyingHandlingData[9].fPitch = 0.00001f;
+    m_OriginalFlyingHandlingData[9].fPitchStab = 0.00005f;
+    m_OriginalFlyingHandlingData[9].fFormLift = 0.008f;
+    m_OriginalFlyingHandlingData[9].fAttackLift = 0.10f;
+    m_OriginalFlyingHandlingData[9].fGearUpR = 0.5f;
+    m_OriginalFlyingHandlingData[9].fGearDownL = 1.5f;
+    m_OriginalFlyingHandlingData[9].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[9].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[9].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[9].vecSpeedResistance = CVector(20.0f, 100.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[10].iVehicleID = 196;
+    m_OriginalFlyingHandlingData[10].fThrust = 0.35f;
+    m_OriginalFlyingHandlingData[10].fThrustFallOff = 1.00f;
+    m_OriginalFlyingHandlingData[10].fYaw = -0.000005f;
+    m_OriginalFlyingHandlingData[10].fYawStab = 0.0002f;
+    m_OriginalFlyingHandlingData[10].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[10].fRoll = 0.0003f;
+    m_OriginalFlyingHandlingData[10].fRollStab = -0.0001f;
+    m_OriginalFlyingHandlingData[10].fPitch = 0.00001f;
+    m_OriginalFlyingHandlingData[10].fPitchStab = 0.00005f;
+    m_OriginalFlyingHandlingData[10].fFormLift = 0.008f;
+    m_OriginalFlyingHandlingData[10].fAttackLift = 0.10f;
+    m_OriginalFlyingHandlingData[10].fGearUpR = 0.5f;
+    m_OriginalFlyingHandlingData[10].fGearDownL = 1.5f;
+    m_OriginalFlyingHandlingData[10].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[10].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[10].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[10].vecSpeedResistance = CVector(20.0f, 100.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[11].iVehicleID = 197;
+    m_OriginalFlyingHandlingData[11].fThrust = 0.5f;
+    m_OriginalFlyingHandlingData[11].fThrustFallOff = 0.40f;
+    m_OriginalFlyingHandlingData[11].fYaw = -0.00015f;
+    m_OriginalFlyingHandlingData[11].fYawStab = 0.002f;
+    m_OriginalFlyingHandlingData[11].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[11].fRoll = 0.003f;
+    m_OriginalFlyingHandlingData[11].fRollStab = -0.002f;
+    m_OriginalFlyingHandlingData[11].fPitch = 0.0003f;
+    m_OriginalFlyingHandlingData[11].fPitchStab = 0.0020f;
+    m_OriginalFlyingHandlingData[11].fFormLift = 0.020f;
+    m_OriginalFlyingHandlingData[11].fAttackLift = 0.15f;
+    m_OriginalFlyingHandlingData[11].fGearUpR = 1.0f;
+    m_OriginalFlyingHandlingData[11].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[11].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[11].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[11].vecTurnResistance = CVector(0.998f, 0.998, 0.995);
+    m_OriginalFlyingHandlingData[11].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
+
+    m_OriginalFlyingHandlingData[12].iVehicleID = 198;
+    m_OriginalFlyingHandlingData[12].fThrust = 0.40f;
+    m_OriginalFlyingHandlingData[12].fThrustFallOff = 0.95f;
+    m_OriginalFlyingHandlingData[12].fYaw = -0.001f;
+    m_OriginalFlyingHandlingData[12].fYawStab = 0.01f;
+    m_OriginalFlyingHandlingData[12].fSideSlip = 0.05f;
+    m_OriginalFlyingHandlingData[12].fRoll = 0.0020f;
+    m_OriginalFlyingHandlingData[12].fRollStab = 2.0f;
+    m_OriginalFlyingHandlingData[12].fPitch = 0.0020f;
+    m_OriginalFlyingHandlingData[12].fPitchStab = 2.0f;
+    m_OriginalFlyingHandlingData[12].fFormLift = 0.7f;
+    m_OriginalFlyingHandlingData[12].fAttackLift = 0.004f;
+    m_OriginalFlyingHandlingData[12].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[12].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[12].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[12].fMoveResistance = 0.998f;
+    m_OriginalFlyingHandlingData[12].vecTurnResistance = CVector(0.980f, 0.980, 0.990);
+    m_OriginalFlyingHandlingData[12].vecSpeedResistance = CVector(1.0f, 1.0f, 10.0f);
+
+    m_OriginalFlyingHandlingData[13].iVehicleID = 199;
+    m_OriginalFlyingHandlingData[13].fThrust = 0.50f;
+    m_OriginalFlyingHandlingData[13].fThrustFallOff = 0.95f;
+    m_OriginalFlyingHandlingData[13].fYaw = -0.001f;
+    m_OriginalFlyingHandlingData[13].fYawStab = 0.01f;
+    m_OriginalFlyingHandlingData[13].fSideSlip = 0.05f;
+    m_OriginalFlyingHandlingData[13].fRoll = 0.0020f;
+    m_OriginalFlyingHandlingData[13].fRollStab = 2.0f;
+    m_OriginalFlyingHandlingData[13].fPitch = 0.0020f;
+    m_OriginalFlyingHandlingData[13].fPitchStab = 2.0f;
+    m_OriginalFlyingHandlingData[13].fFormLift = 0.7f;
+    m_OriginalFlyingHandlingData[13].fAttackLift = 0.003f;
+    m_OriginalFlyingHandlingData[13].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[13].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[13].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[13].fMoveResistance = 0.998f;
+    m_OriginalFlyingHandlingData[13].vecTurnResistance = CVector(0.980f, 0.980, 0.990);
+    m_OriginalFlyingHandlingData[13].vecSpeedResistance = CVector(1.0f, 1.0f, 10.0f);
+
+    m_OriginalFlyingHandlingData[14].iVehicleID = 200;
+    m_OriginalFlyingHandlingData[14].fThrust = 0.60f;
+    m_OriginalFlyingHandlingData[14].fThrustFallOff = 0.85f;
+    m_OriginalFlyingHandlingData[14].fYaw = -0.0005f;
+    m_OriginalFlyingHandlingData[14].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[14].fSideSlip = 0.03f;
+    m_OriginalFlyingHandlingData[14].fRoll = 0.0010f;
+    m_OriginalFlyingHandlingData[14].fRollStab = 1.5f;
+    m_OriginalFlyingHandlingData[14].fPitch = 0.0010f;
+    m_OriginalFlyingHandlingData[14].fPitchStab = 1.5f;
+    m_OriginalFlyingHandlingData[14].fFormLift = 0.6f;
+    m_OriginalFlyingHandlingData[14].fAttackLift = 0.002f;
+    m_OriginalFlyingHandlingData[14].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[14].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[14].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[14].fMoveResistance = 0.9985f;
+    m_OriginalFlyingHandlingData[14].vecTurnResistance = CVector(0.992f, 0.992, 0.996);
+    m_OriginalFlyingHandlingData[14].vecSpeedResistance = CVector(0.5f, 0.5f, 10.0f);
+
+    m_OriginalFlyingHandlingData[15].iVehicleID = 201;
+    m_OriginalFlyingHandlingData[15].fThrust = 0.60f;
+    m_OriginalFlyingHandlingData[15].fThrustFallOff = 0.95f;
+    m_OriginalFlyingHandlingData[15].fYaw = -0.0005f;
+    m_OriginalFlyingHandlingData[15].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[15].fSideSlip = 0.03f;
+    m_OriginalFlyingHandlingData[15].fRoll = 0.0012f;
+    m_OriginalFlyingHandlingData[15].fRollStab = 1.0f;
+    m_OriginalFlyingHandlingData[15].fPitch = 0.0015f;
+    m_OriginalFlyingHandlingData[15].fPitchStab = 1.0f;
+    m_OriginalFlyingHandlingData[15].fFormLift = 0.6f;
+    m_OriginalFlyingHandlingData[15].fAttackLift = 0.002f;
+    m_OriginalFlyingHandlingData[15].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[15].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[15].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[15].fMoveResistance = 0.9985f;
+    m_OriginalFlyingHandlingData[15].vecTurnResistance = CVector(0.992f, 0.992, 0.996);
+    m_OriginalFlyingHandlingData[15].vecSpeedResistance = CVector(1.5f, 1.5f, 10.0f);
+
+    m_OriginalFlyingHandlingData[16].iVehicleID = 202;
+    m_OriginalFlyingHandlingData[16].fThrust = 0.60f;
+    m_OriginalFlyingHandlingData[16].fThrustFallOff = 0.75f;
+    m_OriginalFlyingHandlingData[16].fYaw = -0.0005f;
+    m_OriginalFlyingHandlingData[16].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[16].fSideSlip = 0.03f;
+    m_OriginalFlyingHandlingData[16].fRoll = 0.0010f;
+    m_OriginalFlyingHandlingData[16].fRollStab = 1.5f;
+    m_OriginalFlyingHandlingData[16].fPitch = 0.0010f;
+    m_OriginalFlyingHandlingData[16].fPitchStab = 1.5f;
+    m_OriginalFlyingHandlingData[16].fFormLift = 0.6f;
+    m_OriginalFlyingHandlingData[16].fAttackLift = 0.002f;
+    m_OriginalFlyingHandlingData[16].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[16].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[16].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[16].fMoveResistance = 0.9985f;
+    m_OriginalFlyingHandlingData[16].vecTurnResistance = CVector(0.992f, 0.992, 0.996);
+    m_OriginalFlyingHandlingData[16].vecSpeedResistance = CVector(0.5f, 0.5f, 10.0f);
+
+    m_OriginalFlyingHandlingData[17].iVehicleID = 203;
+    m_OriginalFlyingHandlingData[17].fThrust = 0.55f;
+    m_OriginalFlyingHandlingData[17].fThrustFallOff = 0.50f;
+    m_OriginalFlyingHandlingData[17].fYaw = -0.0005f;
+    m_OriginalFlyingHandlingData[17].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[17].fSideSlip = 0.01f;
+    m_OriginalFlyingHandlingData[17].fRoll = 0.001f;
+    m_OriginalFlyingHandlingData[17].fRollStab = 1.0f;
+    m_OriginalFlyingHandlingData[17].fPitch = 0.001f;
+    m_OriginalFlyingHandlingData[17].fPitchStab = 1.0f;
+    m_OriginalFlyingHandlingData[17].fFormLift = 0.5f;
+    m_OriginalFlyingHandlingData[17].fAttackLift = 0.001f;
+    m_OriginalFlyingHandlingData[17].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[17].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[17].fWindMult = 0.2f;
+    m_OriginalFlyingHandlingData[17].fMoveResistance = 0.9985f;
+    m_OriginalFlyingHandlingData[17].vecTurnResistance = CVector(0.992f, 0.992, 0.992);
+    m_OriginalFlyingHandlingData[17].vecSpeedResistance = CVector(2.0f, 2.0f, 7.0f);
+
+    m_OriginalFlyingHandlingData[18].iVehicleID = 204;
+    m_OriginalFlyingHandlingData[18].fThrust = 0.3f;
+    m_OriginalFlyingHandlingData[18].fThrustFallOff = 0.85f;
+    m_OriginalFlyingHandlingData[18].fYaw = -0.0003f;
+    m_OriginalFlyingHandlingData[18].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[18].fSideSlip = 0.02f;
+    m_OriginalFlyingHandlingData[18].fRoll = 0.0007f;
+    m_OriginalFlyingHandlingData[18].fRollStab = 1.0f;
+    m_OriginalFlyingHandlingData[18].fPitch = 0.0007f;
+    m_OriginalFlyingHandlingData[18].fPitchStab = 1.0f;
+    m_OriginalFlyingHandlingData[18].fFormLift = 0.5f;
+    m_OriginalFlyingHandlingData[18].fAttackLift = 0.001f;
+    m_OriginalFlyingHandlingData[18].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[18].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[18].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[18].fMoveResistance = 0.9985f;
+    m_OriginalFlyingHandlingData[18].vecTurnResistance = CVector(0.992f, 0.992, 0.995);
+    m_OriginalFlyingHandlingData[18].vecSpeedResistance = CVector(2.0f, 2.0f, 10.0f);
+
+    m_OriginalFlyingHandlingData[19].iVehicleID = 205;
+    m_OriginalFlyingHandlingData[19].fThrust = 0.4f;
+    m_OriginalFlyingHandlingData[19].fThrustFallOff = 0.85f;
+    m_OriginalFlyingHandlingData[19].fYaw = -0.0003f;
+    m_OriginalFlyingHandlingData[19].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[19].fSideSlip = 0.02f;
+    m_OriginalFlyingHandlingData[19].fRoll = 0.0007f;
+    m_OriginalFlyingHandlingData[19].fRollStab = 1.0f;
+    m_OriginalFlyingHandlingData[19].fPitch = 0.0007f;
+    m_OriginalFlyingHandlingData[19].fPitchStab = 1.0f;
+    m_OriginalFlyingHandlingData[19].fFormLift = 0.5f;
+    m_OriginalFlyingHandlingData[19].fAttackLift = 0.001f;
+    m_OriginalFlyingHandlingData[19].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[19].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[19].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[19].fMoveResistance = 0.9985f;
+    m_OriginalFlyingHandlingData[19].vecTurnResistance = CVector(0.992f, 0.992, 0.995);
+    m_OriginalFlyingHandlingData[19].vecSpeedResistance = CVector(2.0f, 2.0f, 10.0f);
+
+    m_OriginalFlyingHandlingData[20].iVehicleID = 206;
+    m_OriginalFlyingHandlingData[20].fThrust = 0.4f;
+    m_OriginalFlyingHandlingData[20].fThrustFallOff = 0.85f;
+    m_OriginalFlyingHandlingData[20].fYaw = -0.0003f;
+    m_OriginalFlyingHandlingData[20].fYawStab = 0.005f;
+    m_OriginalFlyingHandlingData[20].fSideSlip = 0.02f;
+    m_OriginalFlyingHandlingData[20].fRoll = 0.0007f;
+    m_OriginalFlyingHandlingData[20].fRollStab = 1.0f;
+    m_OriginalFlyingHandlingData[20].fPitch = 0.0007f;
+    m_OriginalFlyingHandlingData[20].fPitchStab = 1.0f;
+    m_OriginalFlyingHandlingData[20].fFormLift = 0.5f;
+    m_OriginalFlyingHandlingData[20].fAttackLift = 0.001f;
+    m_OriginalFlyingHandlingData[20].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[20].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[20].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[20].fMoveResistance = 0.9985f;
+    m_OriginalFlyingHandlingData[20].vecTurnResistance = CVector(0.992f, 0.992, 0.995);
+    m_OriginalFlyingHandlingData[20].vecSpeedResistance = CVector(2.0f, 2.0f, 10.0f);
+
+    m_OriginalFlyingHandlingData[21].iVehicleID = 207;
+    m_OriginalFlyingHandlingData[21].fThrust = 0.5f;
+    m_OriginalFlyingHandlingData[21].fThrustFallOff = -0.05f;
+    m_OriginalFlyingHandlingData[21].fYaw = -0.006f;
+    m_OriginalFlyingHandlingData[21].fYawStab = 0.6f;
+    m_OriginalFlyingHandlingData[21].fSideSlip = 0.30f;
+    m_OriginalFlyingHandlingData[21].fRoll = 0.015f;
+    m_OriginalFlyingHandlingData[21].fRollStab = -0.005f;
+    m_OriginalFlyingHandlingData[21].fPitch = 0.005f;
+    m_OriginalFlyingHandlingData[21].fPitchStab = 0.2f;
+    m_OriginalFlyingHandlingData[21].fFormLift = 0.10f;
+    m_OriginalFlyingHandlingData[21].fAttackLift = 0.30f;
+    m_OriginalFlyingHandlingData[21].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[21].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[21].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[21].fMoveResistance = 1.0f;
+    m_OriginalFlyingHandlingData[21].vecTurnResistance = CVector(0.998f, 0.996, 0.990);
+    m_OriginalFlyingHandlingData[21].vecSpeedResistance = CVector(10.0f, 40.0f, 10.0f);
+
+    m_OriginalFlyingHandlingData[22].iVehicleID = 208;
+    m_OriginalFlyingHandlingData[22].fThrust = 0.20f;
+    m_OriginalFlyingHandlingData[22].fThrustFallOff = 0.75f;
+    m_OriginalFlyingHandlingData[22].fYaw = -0.001f;
+    m_OriginalFlyingHandlingData[22].fYawStab = 0.05f;
+    m_OriginalFlyingHandlingData[22].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[22].fRoll = 0.006f;
+    m_OriginalFlyingHandlingData[22].fRollStab = 6.0f;
+    m_OriginalFlyingHandlingData[22].fPitch = 0.006f;
+    m_OriginalFlyingHandlingData[22].fPitchStab = 6.0f;
+    m_OriginalFlyingHandlingData[22].fFormLift = 0.7f;
+    m_OriginalFlyingHandlingData[22].fAttackLift = 0.015f;
+    m_OriginalFlyingHandlingData[22].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[22].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[22].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[22].fMoveResistance = 0.989f;
+    m_OriginalFlyingHandlingData[22].vecTurnResistance = CVector(0.850f, 0.860, 0.992);
+    m_OriginalFlyingHandlingData[22].vecSpeedResistance = CVector(0.0f, 0.0f, 7.0f);
+
+    m_OriginalFlyingHandlingData[23].iVehicleID = 209;
+    m_OriginalFlyingHandlingData[23].fThrust = 0.25f;
+    m_OriginalFlyingHandlingData[23].fThrustFallOff = 0.6f;
+    m_OriginalFlyingHandlingData[23].fYaw = -0.002f;
+    m_OriginalFlyingHandlingData[23].fYawStab = 0.05f;
+    m_OriginalFlyingHandlingData[23].fSideSlip = 0.10f;
+    m_OriginalFlyingHandlingData[23].fRoll = 0.009f;
+    m_OriginalFlyingHandlingData[23].fRollStab = 5.0f;
+    m_OriginalFlyingHandlingData[23].fPitch = 0.009f;
+    m_OriginalFlyingHandlingData[23].fPitchStab = 5.0f;
+    m_OriginalFlyingHandlingData[23].fFormLift = 0.4f;
+    m_OriginalFlyingHandlingData[23].fAttackLift = 0.008f;
+    m_OriginalFlyingHandlingData[23].fGearUpR = 0.2f;
+    m_OriginalFlyingHandlingData[23].fGearDownL = 1.0f;
+    m_OriginalFlyingHandlingData[23].fWindMult = 0.1f;
+    m_OriginalFlyingHandlingData[23].fMoveResistance = 0.989f;
+    m_OriginalFlyingHandlingData[23].vecTurnResistance = CVector(0.880f, 0.880, 0.998);
+    m_OriginalFlyingHandlingData[23].vecSpeedResistance = CVector(0.0f, 0.0f, 5.0f);
+
+    // Boats handling
+
+    m_OriginalBoatHandlingData[0].iVehicleID = 175;
+    m_OriginalBoatHandlingData[0].fThrustY = 0.79f;
+    m_OriginalBoatHandlingData[0].fThrustZ = 0.5f;
+    m_OriginalBoatHandlingData[0].fThrustAppZ = 0.6f;
+    m_OriginalBoatHandlingData[0].fAqPlaneForce = 7.0f;
+    m_OriginalBoatHandlingData[0].fAqPlaneLimit = 0.60f;
+    m_OriginalBoatHandlingData[0].fAqPlaneOffset = -1.9f;
+    m_OriginalBoatHandlingData[0].fWaveAudioMult = 4.0f;
+    m_OriginalBoatHandlingData[0].vecMoveRes = CVector(0.8f, 0.998f, 0.998f);
+    m_OriginalBoatHandlingData[0].vecTurnRes = CVector(0.85f, 0.98f, 0.97f);
+    m_OriginalBoatHandlingData[0].fLookLRHeight = 4.0f;
+
+    m_OriginalBoatHandlingData[1].iVehicleID = 176;
+    m_OriginalBoatHandlingData[1].fThrustY = 0.65f;
+    m_OriginalBoatHandlingData[1].fThrustZ = 0.5f;
+    m_OriginalBoatHandlingData[1].fThrustAppZ = 0.5f;
+    m_OriginalBoatHandlingData[1].fAqPlaneForce = 8.0f;
+    m_OriginalBoatHandlingData[1].fAqPlaneLimit = 0.70f;
+    m_OriginalBoatHandlingData[1].fAqPlaneOffset = -0.5f;
+    m_OriginalBoatHandlingData[1].fWaveAudioMult = 3.0f;
+    m_OriginalBoatHandlingData[1].vecMoveRes = CVector(0.7f, 0.998f, 0.999f);
+    m_OriginalBoatHandlingData[1].vecTurnRes = CVector(0.85f, 0.98f, 0.96f);
+    m_OriginalBoatHandlingData[1].fLookLRHeight = 4.0f;
+
+    m_OriginalBoatHandlingData[2].iVehicleID = 177;
+    m_OriginalBoatHandlingData[2].fThrustY = 0.35f;
+    m_OriginalBoatHandlingData[2].fThrustZ = 0.6f;
+    m_OriginalBoatHandlingData[2].fThrustAppZ = 0.0f;
+    m_OriginalBoatHandlingData[2].fAqPlaneForce = 3.0f;
+    m_OriginalBoatHandlingData[2].fAqPlaneLimit = 0.20f;
+    m_OriginalBoatHandlingData[2].fAqPlaneOffset = -0.9f;
+    m_OriginalBoatHandlingData[2].fWaveAudioMult = 3.5f;
+    m_OriginalBoatHandlingData[2].vecMoveRes = CVector(0.8f, 0.998f, 0.995f);
+    m_OriginalBoatHandlingData[2].vecTurnRes = CVector(0.85f, 0.98f, 0.96f);
+    m_OriginalBoatHandlingData[2].fLookLRHeight = 4.0f;
+
+    m_OriginalBoatHandlingData[3].iVehicleID = 178;
+    m_OriginalBoatHandlingData[3].fThrustY = 0.75f;
+    m_OriginalBoatHandlingData[3].fThrustZ = 0.7f;
+    m_OriginalBoatHandlingData[3].fThrustAppZ = 0.0f;
+    m_OriginalBoatHandlingData[3].fAqPlaneForce = 3.0f;
+    m_OriginalBoatHandlingData[3].fAqPlaneLimit = 0.20f;
+    m_OriginalBoatHandlingData[3].fAqPlaneOffset = 0.0f;
+    m_OriginalBoatHandlingData[3].fWaveAudioMult = 10.0f;
+    m_OriginalBoatHandlingData[3].vecMoveRes = CVector(0.7f, 0.998f, 0.999f);
+    m_OriginalBoatHandlingData[3].vecTurnRes = CVector(0.85f, 0.96f, 0.96f);
+    m_OriginalBoatHandlingData[3].fLookLRHeight = 4.0f;
+
+    m_OriginalBoatHandlingData[4].iVehicleID = 179;
+    m_OriginalBoatHandlingData[4].fThrustY = 0.50f;
+    m_OriginalBoatHandlingData[4].fThrustZ = 1.1f;
+    m_OriginalBoatHandlingData[4].fThrustAppZ = 0.2f;
+    m_OriginalBoatHandlingData[4].fAqPlaneForce = 9.0f;
+    m_OriginalBoatHandlingData[4].fAqPlaneLimit = 0.80f;
+    m_OriginalBoatHandlingData[4].fAqPlaneOffset = 1.2f;
+    m_OriginalBoatHandlingData[4].fWaveAudioMult = 4.0f;
+    m_OriginalBoatHandlingData[4].vecMoveRes = CVector(0.90f, 0.998f, 0.999f);
+    m_OriginalBoatHandlingData[4].vecTurnRes = CVector(0.89f, 0.975f, 0.97f);
+    m_OriginalBoatHandlingData[4].fLookLRHeight = 4.0f;
+
+    m_OriginalBoatHandlingData[5].iVehicleID = 180;
+    m_OriginalBoatHandlingData[5].fThrustY = 0.35f;
+    m_OriginalBoatHandlingData[5].fThrustZ = 0.6f;
+    m_OriginalBoatHandlingData[5].fThrustAppZ = 0.5f;
+    m_OriginalBoatHandlingData[5].fAqPlaneForce = 4.0f;
+    m_OriginalBoatHandlingData[5].fAqPlaneLimit = 0.35f;
+    m_OriginalBoatHandlingData[5].fAqPlaneOffset = -1.0f;
+    m_OriginalBoatHandlingData[5].fWaveAudioMult = 6.0f;
+    m_OriginalBoatHandlingData[5].vecMoveRes = CVector(0.7f, 0.998f, 0.995f);
+    m_OriginalBoatHandlingData[5].vecTurnRes = CVector(0.78f, 0.985f, 0.96f);
+    m_OriginalBoatHandlingData[5].fLookLRHeight = 5.0f;
+
+    m_OriginalBoatHandlingData[6].iVehicleID = 181;
+    m_OriginalBoatHandlingData[6].fThrustY = 0.50f;
+    m_OriginalBoatHandlingData[6].fThrustZ = 0.65f;
+    m_OriginalBoatHandlingData[6].fThrustAppZ = 0.5f;
+    m_OriginalBoatHandlingData[6].fAqPlaneForce = 8.0f;
+    m_OriginalBoatHandlingData[6].fAqPlaneLimit = 0.60f;
+    m_OriginalBoatHandlingData[6].fAqPlaneOffset = -0.3f;
+    m_OriginalBoatHandlingData[6].fWaveAudioMult = 3.0f;
+    m_OriginalBoatHandlingData[6].vecMoveRes = CVector(0.7f, 0.996f, 0.998f);
+    m_OriginalBoatHandlingData[6].vecTurnRes = CVector(0.85f, 0.96f, 0.96f);
+    m_OriginalBoatHandlingData[6].fLookLRHeight = 3.0f;
+
+    m_OriginalBoatHandlingData[7].iVehicleID = 182;
+    m_OriginalBoatHandlingData[7].fThrustY = 0.70f;
+    m_OriginalBoatHandlingData[7].fThrustZ = 0.6f;
+    m_OriginalBoatHandlingData[7].fThrustAppZ = 0.4f;
+    m_OriginalBoatHandlingData[7].fAqPlaneForce = 5.0f;
+    m_OriginalBoatHandlingData[7].fAqPlaneLimit = 0.30f;
+    m_OriginalBoatHandlingData[7].fAqPlaneOffset = -0.8f;
+    m_OriginalBoatHandlingData[7].fWaveAudioMult = 3.0f;
+    m_OriginalBoatHandlingData[7].vecMoveRes = CVector(0.94f, 0.993f, 0.997f);
+    m_OriginalBoatHandlingData[7].vecTurnRes = CVector(0.85f, 0.94f, 0.94f);
+    m_OriginalBoatHandlingData[7].fLookLRHeight = 3.0f;
+
+    m_OriginalBoatHandlingData[8].iVehicleID = 183;
+    m_OriginalBoatHandlingData[8].fThrustY = 0.95f;
+    m_OriginalBoatHandlingData[8].fThrustZ = 0.7f;
+    m_OriginalBoatHandlingData[8].fThrustAppZ = 0.0f;
+    m_OriginalBoatHandlingData[8].fAqPlaneForce = 1.5f;
+    m_OriginalBoatHandlingData[8].fAqPlaneLimit = 0.10f;
+    m_OriginalBoatHandlingData[8].fAqPlaneOffset = 0.0f;
+    m_OriginalBoatHandlingData[8].fWaveAudioMult = 3.5f;
+    m_OriginalBoatHandlingData[8].vecMoveRes = CVector(0.8f, 0.998f, 0.970f);
+    m_OriginalBoatHandlingData[8].vecTurnRes = CVector(0.84f, 0.99f, 0.94f);
+    m_OriginalBoatHandlingData[8].fLookLRHeight = 5.0f;
+
+    m_OriginalBoatHandlingData[9].iVehicleID = 184;
+    m_OriginalBoatHandlingData[9].fThrustY = 0.50f;
+    m_OriginalBoatHandlingData[9].fThrustZ = 0.6f;
+    m_OriginalBoatHandlingData[9].fThrustAppZ = 0.9f;
+    m_OriginalBoatHandlingData[9].fAqPlaneForce = 9.0f;
+    m_OriginalBoatHandlingData[9].fAqPlaneLimit = 0.80f;
+    m_OriginalBoatHandlingData[9].fAqPlaneOffset = -1.0f;
+    m_OriginalBoatHandlingData[9].fWaveAudioMult = 4.0f;
+    m_OriginalBoatHandlingData[9].vecMoveRes = CVector(0.92f, 0.998f, 0.998f);
+    m_OriginalBoatHandlingData[9].vecTurnRes = CVector(0.87f, 0.96f, 0.97f);
+    m_OriginalBoatHandlingData[9].fLookLRHeight = 4.0f;
+
+    m_OriginalBoatHandlingData[10].iVehicleID = 185;
+    m_OriginalBoatHandlingData[10].fThrustY = 0.50f;
+    m_OriginalBoatHandlingData[10].fThrustZ = 0.9f;
+    m_OriginalBoatHandlingData[10].fThrustAppZ = 0.5f;
+    m_OriginalBoatHandlingData[10].fAqPlaneForce = 6.0f;
+    m_OriginalBoatHandlingData[10].fAqPlaneLimit = 0.50f;
+    m_OriginalBoatHandlingData[10].fAqPlaneOffset = -0.5f;
+    m_OriginalBoatHandlingData[10].fWaveAudioMult = 3.0f;
+    m_OriginalBoatHandlingData[10].vecMoveRes = CVector(0.7f, 0.998f, 0.999f);
+    m_OriginalBoatHandlingData[10].vecTurnRes = CVector(0.85f, 0.98f, 0.96f);
+    m_OriginalBoatHandlingData[10].fLookLRHeight = 4.0f;
+
+    m_OriginalBoatHandlingData[11].iVehicleID = 186;
+    m_OriginalBoatHandlingData[11].fThrustY = 0.50f;
+    m_OriginalBoatHandlingData[11].fThrustZ = 1.2f;
+    m_OriginalBoatHandlingData[11].fThrustAppZ = 1.2f;
+    m_OriginalBoatHandlingData[11].fAqPlaneForce = 50.0f;
+    m_OriginalBoatHandlingData[11].fAqPlaneLimit = 0.85f;
+    m_OriginalBoatHandlingData[11].fAqPlaneOffset = -0.4f;
+    m_OriginalBoatHandlingData[11].fWaveAudioMult = 20.0f;
+    m_OriginalBoatHandlingData[11].vecMoveRes = CVector(0.93f, 0.998f, 0.999f);
+    m_OriginalBoatHandlingData[11].vecTurnRes = CVector(0.95f, 0.96f, 0.96f);
+    m_OriginalBoatHandlingData[11].fLookLRHeight = 4.5f;
+
+    // Bike handlings
+
+    m_OriginalBikeHandlingData[0].iVehicleID = 162;
+    m_OriginalBikeHandlingData[0].fLeanFwdCOM = 0.35f;
+    m_OriginalBikeHandlingData[0].fLeanFwdForce = 0.15f;
+    m_OriginalBikeHandlingData[0].fLeanBackCOM = 0.34f;
+    m_OriginalBikeHandlingData[0].fLeanBackForce = 0.10f;
+    m_OriginalBikeHandlingData[0].fMaxLean = 45.0f;
+    m_OriginalBikeHandlingData[0].fFullAnimLean = 38.0f;
+    m_OriginalBikeHandlingData[0].fDesLean = 0.93f;
+    m_OriginalBikeHandlingData[0].fSpeedSteer = 0.70f;
+    m_OriginalBikeHandlingData[0].fSlipSteer = 0.5f;
+    m_OriginalBikeHandlingData[0].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[0].fWheelieAng = 35.0f;
+    m_OriginalBikeHandlingData[0].fStoppieAng = -40.0f;
+    m_OriginalBikeHandlingData[0].fWheelieSteer = -0.009f;
+    m_OriginalBikeHandlingData[0].fWheelieStabMult = 0.7f;
+    m_OriginalBikeHandlingData[0].fStoppieStabMult = 0.6f;
+
+    m_OriginalBikeHandlingData[1].iVehicleID = 163;
+    m_OriginalBikeHandlingData[1].fLeanFwdCOM = 0.35f;
+    m_OriginalBikeHandlingData[1].fLeanFwdForce = 0.25f;
+    m_OriginalBikeHandlingData[1].fLeanBackCOM = 0.25f;
+    m_OriginalBikeHandlingData[1].fLeanBackForce = 0.04f;
+    m_OriginalBikeHandlingData[1].fMaxLean = 35.0f;
+    m_OriginalBikeHandlingData[1].fFullAnimLean = 25.0f;
+    m_OriginalBikeHandlingData[1].fDesLean = 0.90f;
+    m_OriginalBikeHandlingData[1].fSpeedSteer = 0.75f;
+    m_OriginalBikeHandlingData[1].fSlipSteer = 0.8f;
+    m_OriginalBikeHandlingData[1].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[1].fWheelieAng = 35.0f;
+    m_OriginalBikeHandlingData[1].fStoppieAng = -45.0f;
+    m_OriginalBikeHandlingData[1].fWheelieSteer = -0.010f;
+    m_OriginalBikeHandlingData[1].fWheelieStabMult = 0.7f;
+    m_OriginalBikeHandlingData[1].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[2].iVehicleID = 164;
+    m_OriginalBikeHandlingData[2].fLeanFwdCOM = 0.40f;
+    m_OriginalBikeHandlingData[2].fLeanFwdForce = 0.40f;
+    m_OriginalBikeHandlingData[2].fLeanBackCOM = 0.30f;
+    m_OriginalBikeHandlingData[2].fLeanBackForce = 0.08f;
+    m_OriginalBikeHandlingData[2].fMaxLean = 48.0f;
+    m_OriginalBikeHandlingData[2].fFullAnimLean = 43.0f;
+    m_OriginalBikeHandlingData[2].fDesLean = 0.92f;
+    m_OriginalBikeHandlingData[2].fSpeedSteer = 0.60f;
+    m_OriginalBikeHandlingData[2].fSlipSteer = 1.0f;
+    m_OriginalBikeHandlingData[2].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[2].fWheelieAng = 45.0f;
+    m_OriginalBikeHandlingData[2].fStoppieAng = -35.0f;
+    m_OriginalBikeHandlingData[2].fWheelieSteer = -0.010f;
+    m_OriginalBikeHandlingData[2].fWheelieStabMult = 0.5f;
+    m_OriginalBikeHandlingData[2].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[3].iVehicleID = 165;
+    m_OriginalBikeHandlingData[3].fLeanFwdCOM = 0.33f;
+    m_OriginalBikeHandlingData[3].fLeanFwdForce = 0.15f;
+    m_OriginalBikeHandlingData[3].fLeanBackCOM = 0.28f;
+    m_OriginalBikeHandlingData[3].fLeanBackForce = 0.15f;
+    m_OriginalBikeHandlingData[3].fMaxLean = 45.0f;
+    m_OriginalBikeHandlingData[3].fFullAnimLean = 38.0f;
+    m_OriginalBikeHandlingData[3].fDesLean = 0.93f;
+    m_OriginalBikeHandlingData[3].fSpeedSteer = 0.70f;
+    m_OriginalBikeHandlingData[3].fSlipSteer = 0.5f;
+    m_OriginalBikeHandlingData[3].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[3].fWheelieAng = 35.0f;
+    m_OriginalBikeHandlingData[3].fStoppieAng = -40.0f;
+    m_OriginalBikeHandlingData[3].fWheelieSteer = -0.009f;
+    m_OriginalBikeHandlingData[3].fWheelieStabMult = 0.7f;
+    m_OriginalBikeHandlingData[3].fStoppieStabMult = 0.6f;
+
+    m_OriginalBikeHandlingData[4].iVehicleID = 166;
+    m_OriginalBikeHandlingData[4].fLeanFwdCOM = 0.25f;
+    m_OriginalBikeHandlingData[4].fLeanFwdForce = 0.10f;
+    m_OriginalBikeHandlingData[4].fLeanBackCOM = 0.30f;
+    m_OriginalBikeHandlingData[4].fLeanBackForce = 0.10f;
+    m_OriginalBikeHandlingData[4].fMaxLean = 55.0f;
+    m_OriginalBikeHandlingData[4].fFullAnimLean = 38.0f;
+    m_OriginalBikeHandlingData[4].fDesLean = 0.95f;
+    m_OriginalBikeHandlingData[4].fSpeedSteer = 0.60f;
+    m_OriginalBikeHandlingData[4].fSlipSteer = 0.5f;
+    m_OriginalBikeHandlingData[4].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[4].fWheelieAng = 30.0f;
+    m_OriginalBikeHandlingData[4].fStoppieAng = -35.0f;
+    m_OriginalBikeHandlingData[4].fWheelieSteer = -0.012f;
+    m_OriginalBikeHandlingData[4].fWheelieStabMult = 0.7f;
+    m_OriginalBikeHandlingData[4].fStoppieStabMult = 0.6f;
+
+    m_OriginalBikeHandlingData[5].iVehicleID = 167;
+    m_OriginalBikeHandlingData[5].fLeanFwdCOM = 0.25f;
+    m_OriginalBikeHandlingData[5].fLeanFwdForce = 0.08f;
+    m_OriginalBikeHandlingData[5].fLeanBackCOM = 0.25f;
+    m_OriginalBikeHandlingData[5].fLeanBackForce = 0.08f;
+    m_OriginalBikeHandlingData[5].fMaxLean = 40.0f;
+    m_OriginalBikeHandlingData[5].fFullAnimLean = 30.0f;
+    m_OriginalBikeHandlingData[5].fDesLean = 0.93f;
+    m_OriginalBikeHandlingData[5].fSpeedSteer = 0.65f;
+    m_OriginalBikeHandlingData[5].fSlipSteer = 0.5f;
+    m_OriginalBikeHandlingData[5].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[5].fWheelieAng = 35.0f;
+    m_OriginalBikeHandlingData[5].fStoppieAng = -40.0f;
+    m_OriginalBikeHandlingData[5].fWheelieSteer = -0.009f;
+    m_OriginalBikeHandlingData[5].fWheelieStabMult = 0.5f;
+    m_OriginalBikeHandlingData[5].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[6].iVehicleID = 168;
+    m_OriginalBikeHandlingData[6].fLeanFwdCOM = 0.35f;
+    m_OriginalBikeHandlingData[6].fLeanFwdForce = 0.10f;
+    m_OriginalBikeHandlingData[6].fLeanBackCOM = 0.35f;
+    m_OriginalBikeHandlingData[6].fLeanBackForce = 0.10f;
+    m_OriginalBikeHandlingData[6].fMaxLean = 40.0f;
+    m_OriginalBikeHandlingData[6].fFullAnimLean = 30.0f;
+    m_OriginalBikeHandlingData[6].fDesLean = 0.92f;
+    m_OriginalBikeHandlingData[6].fSpeedSteer = 0.65f;
+    m_OriginalBikeHandlingData[6].fSlipSteer = 0.6f;
+    m_OriginalBikeHandlingData[6].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[6].fWheelieAng = 40.0f;
+    m_OriginalBikeHandlingData[6].fStoppieAng = -40.0f;
+    m_OriginalBikeHandlingData[6].fWheelieSteer = -0.013f;
+    m_OriginalBikeHandlingData[6].fWheelieStabMult = 0.6f;
+    m_OriginalBikeHandlingData[6].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[7].iVehicleID = 169;
+    m_OriginalBikeHandlingData[7].fLeanFwdCOM = 0.10f;
+    m_OriginalBikeHandlingData[7].fLeanFwdForce = 0.05f;
+    m_OriginalBikeHandlingData[7].fLeanBackCOM = 0.20f;
+    m_OriginalBikeHandlingData[7].fLeanBackForce = 0.05f;
+    m_OriginalBikeHandlingData[7].fMaxLean = 30.0f;
+    m_OriginalBikeHandlingData[7].fFullAnimLean = 25.0f;
+    m_OriginalBikeHandlingData[7].fDesLean = 0.945f;
+    m_OriginalBikeHandlingData[7].fSpeedSteer = 1.20f;
+    m_OriginalBikeHandlingData[7].fSlipSteer = 0.7f;
+    m_OriginalBikeHandlingData[7].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[7].fWheelieAng = 33.0f;
+    m_OriginalBikeHandlingData[7].fStoppieAng = -55.0f;
+    m_OriginalBikeHandlingData[7].fWheelieSteer = -0.006f;
+    m_OriginalBikeHandlingData[7].fWheelieStabMult = 0.4f;
+    m_OriginalBikeHandlingData[7].fStoppieStabMult = 0.3f;
+
+    m_OriginalBikeHandlingData[8].iVehicleID = 170;
+    m_OriginalBikeHandlingData[8].fLeanFwdCOM = 0.14f;
+    m_OriginalBikeHandlingData[8].fLeanFwdForce = 0.04f;
+    m_OriginalBikeHandlingData[8].fLeanBackCOM = 0.14f;
+    m_OriginalBikeHandlingData[8].fLeanBackForce = 0.08f;
+    m_OriginalBikeHandlingData[8].fMaxLean = 48.0f;
+    m_OriginalBikeHandlingData[8].fFullAnimLean = 43.0f;
+    m_OriginalBikeHandlingData[8].fDesLean = 0.88f;
+    m_OriginalBikeHandlingData[8].fSpeedSteer = 0.60f;
+    m_OriginalBikeHandlingData[8].fSlipSteer = 1.0f;
+    m_OriginalBikeHandlingData[8].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[8].fWheelieAng = 45.0f;
+    m_OriginalBikeHandlingData[8].fStoppieAng = -35.0f;
+    m_OriginalBikeHandlingData[8].fWheelieSteer = -0.007f;
+    m_OriginalBikeHandlingData[8].fWheelieStabMult = 1.0f;
+    m_OriginalBikeHandlingData[8].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[9].iVehicleID = 171;
+    m_OriginalBikeHandlingData[9].fLeanFwdCOM = 0.35f;
+    m_OriginalBikeHandlingData[9].fLeanFwdForce = 0.50f;
+    m_OriginalBikeHandlingData[9].fLeanBackCOM = 0.30f;
+    m_OriginalBikeHandlingData[9].fLeanBackForce = 0.09f;
+    m_OriginalBikeHandlingData[9].fMaxLean = 48.0f;
+    m_OriginalBikeHandlingData[9].fFullAnimLean = 43.0f;
+    m_OriginalBikeHandlingData[9].fDesLean = 0.92f;
+    m_OriginalBikeHandlingData[9].fSpeedSteer = 0.60f;
+    m_OriginalBikeHandlingData[9].fSlipSteer = 1.0f;
+    m_OriginalBikeHandlingData[9].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[9].fWheelieAng = 45.0f;
+    m_OriginalBikeHandlingData[9].fStoppieAng = -35.0f;
+    m_OriginalBikeHandlingData[9].fWheelieSteer = -0.007f;
+    m_OriginalBikeHandlingData[9].fWheelieStabMult = 1.0f;
+    m_OriginalBikeHandlingData[9].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[10].iVehicleID = 172;
+    m_OriginalBikeHandlingData[10].fLeanFwdCOM = 0.35f;
+    m_OriginalBikeHandlingData[10].fLeanFwdForce = 0.50f;
+    m_OriginalBikeHandlingData[10].fLeanBackCOM = 0.30f;
+    m_OriginalBikeHandlingData[10].fLeanBackForce = 0.09f;
+    m_OriginalBikeHandlingData[10].fMaxLean = 40.0f;
+    m_OriginalBikeHandlingData[10].fFullAnimLean = 30.0f;
+    m_OriginalBikeHandlingData[10].fDesLean = 0.92f;
+    m_OriginalBikeHandlingData[10].fSpeedSteer = 0.60f;
+    m_OriginalBikeHandlingData[10].fSlipSteer = 1.0f;
+    m_OriginalBikeHandlingData[10].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[10].fWheelieAng = 45.0f;
+    m_OriginalBikeHandlingData[10].fStoppieAng = -35.0f;
+    m_OriginalBikeHandlingData[10].fWheelieSteer = -0.007f;
+    m_OriginalBikeHandlingData[10].fWheelieStabMult = 0.6f;
+    m_OriginalBikeHandlingData[10].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[11].iVehicleID = 173;
+    m_OriginalBikeHandlingData[11].fLeanFwdCOM = 0.35f;
+    m_OriginalBikeHandlingData[11].fLeanFwdForce = 0.30f;
+    m_OriginalBikeHandlingData[11].fLeanBackCOM = 0.25f;
+    m_OriginalBikeHandlingData[11].fLeanBackForce = 0.08f;
+    m_OriginalBikeHandlingData[11].fMaxLean = 48.0f;
+    m_OriginalBikeHandlingData[11].fFullAnimLean = 43.0f;
+    m_OriginalBikeHandlingData[11].fDesLean = 0.92f;
+    m_OriginalBikeHandlingData[11].fSpeedSteer = 0.60f;
+    m_OriginalBikeHandlingData[11].fSlipSteer = 1.0f;
+    m_OriginalBikeHandlingData[11].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[11].fWheelieAng = 35.0f;
+    m_OriginalBikeHandlingData[11].fStoppieAng = -35.0f;
+    m_OriginalBikeHandlingData[11].fWheelieSteer = -0.015f;
+    m_OriginalBikeHandlingData[11].fWheelieStabMult = 0.6f;
+    m_OriginalBikeHandlingData[11].fStoppieStabMult = 0.5f;
+
+    m_OriginalBikeHandlingData[12].iVehicleID = 174;
+    m_OriginalBikeHandlingData[12].fLeanFwdCOM = 0.10f;
+    m_OriginalBikeHandlingData[12].fLeanFwdForce = 0.05f;
+    m_OriginalBikeHandlingData[12].fLeanBackCOM = 0.30f;
+    m_OriginalBikeHandlingData[12].fLeanBackForce = 0.062f;
+    m_OriginalBikeHandlingData[12].fMaxLean = 30.0f;
+    m_OriginalBikeHandlingData[12].fFullAnimLean = 25.0f;
+    m_OriginalBikeHandlingData[12].fDesLean = 0.945f;
+    m_OriginalBikeHandlingData[12].fSpeedSteer = 1.20f;
+    m_OriginalBikeHandlingData[12].fSlipSteer = 0.7f;
+    m_OriginalBikeHandlingData[12].fNoPlayerCOMz = 0.1f;
+    m_OriginalBikeHandlingData[12].fWheelieAng = 33.0f;
+    m_OriginalBikeHandlingData[12].fStoppieAng = -55.0f;
+    m_OriginalBikeHandlingData[12].fWheelieSteer = -0.006f;
+    m_OriginalBikeHandlingData[12].fWheelieStabMult = 0.5f;
+    m_OriginalBikeHandlingData[12].fStoppieStabMult = 0.3f;
+
+    m_OriginalBikeHandlingData[13] = m_OriginalBikeHandlingData[1];            // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
 void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)

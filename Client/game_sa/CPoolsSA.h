@@ -40,7 +40,8 @@ public:
 };
 
 // size of tPoolObjectFlags is 1 byte only
-union tPoolObjectFlags {
+union tPoolObjectFlags
+{
     struct
     {
         unsigned char nId : 7;
@@ -72,6 +73,9 @@ public:
         m_nSize = 0;
         m_bOwnsAllocations = false;
     }
+
+    bool IsEmpty(std::int32_t objectIndex) { return m_byteMap[objectIndex].bEmpty; }
+    B*   GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
 };
 
 class CPoolsSA : public CPools
@@ -112,6 +116,7 @@ public:
     DWORD                     GetObjectRef(CObject* pObject);
     DWORD                     GetObjectRef(DWORD* pGameInterface);
     CObject*                  GetObjectFromRef(DWORD dwGameRef);
+    CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool);
     unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
     void                      DeleteAllObjects();
 

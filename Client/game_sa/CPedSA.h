@@ -150,8 +150,8 @@ public:
     unsigned int bIsPedDieAnimPlaying : 1;            // is ped die animation finished so can dead now
     unsigned int bStayInSamePlace : 1;                // when set, ped stays put
     unsigned int
-                 bKindaStayInSamePlace : 1;            // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
-    unsigned int bBeingChasedByPolice : 1;             // use nodes for routefind
+        bKindaStayInSamePlace : 1;                    // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
+    unsigned int bBeingChasedByPolice : 1;            // use nodes for routefind
 
     unsigned int bNotAllowedToDuck : 1;              // Is this ped allowed to duck at all?
     unsigned int bCrouchWhenShooting : 1;            // duck behind cars etc
@@ -281,7 +281,8 @@ public:
     CPedFlags                        pedFlags;            // 1132 (16 bytes long including alignment probably)
     CPedIntelligenceSAInterface*     pPedIntelligence;
     CPlayerPedDataSAInterface*       pPlayerData;            // 1152
-    BYTE                             bPad4a[80];
+    BYTE                             bPad4a[4];
+    void*                            pedNodes[19];
     int                              iMoveAnimGroup;            // 1236
     BYTE                             bPad4b[52];
     CPedIKSAInterface                pedIK;            // 1292 (length 32 bytes)
@@ -430,6 +431,9 @@ public:
     void         SetFootBlood(unsigned int uiFootBlood);
     unsigned int GetFootBlood();
 
+    bool IsBleeding();
+    void SetBleeding(bool bBleeding);
+
     bool IsOnFire();
     void SetOnFire(bool bOnFire);
 
@@ -441,6 +445,7 @@ public:
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
     void SetLanding(bool bIsLanding) { GetPedInterface()->pedFlags.bIsLanding = bIsLanding; }
+    void SetUpdateMetricsRequired(bool required) { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
 
     CWeaponStat* GetCurrentWeaponStat();
     float        GetCurrentWeaponRange();
@@ -449,5 +454,8 @@ public:
     virtual int GetCustomMoveAnim();
     bool        IsDoingGangDriveby();
 
-    static void StaticSetHooks();
+    CPedIKSAInterface*      GetPedIKInterface() { return &reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedIK; }
+    void*                   GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
+    std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
+    static void             StaticSetHooks();
 };

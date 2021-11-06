@@ -373,7 +373,7 @@ void CNetAPI::DoPulse()
             // Time to freeze because of lack of return sync?
             if (!g_pClientGame->IsDownloadingBigPacket() && (m_bStoredReturnSync) && (m_ulLastPuresyncTime != 0) && (m_ulLastSyncReturnTime != 0) &&
                 (ulCurrentTime <= m_ulLastPuresyncTime + 5000) && (ulCurrentTime >= m_ulLastSyncReturnTime + 10000) &&
-                (!g_pClientGame->IsGettingIntoVehicle()) && (!m_bIncreaseTimeoutTime))
+                (!g_pClientGame->GetLocalPlayer()->m_bIsGettingIntoVehicle) && (!m_bIncreaseTimeoutTime))
             {
                 // No vehicle or vehicle in seat 0?
                 if (!pVehicle || pPlayer->GetOccupiedVehicleSeat() == 0)
@@ -1547,9 +1547,15 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
     pPlayerModel->GetControllerState(ControllerState);
     WriteFullKeysync(ControllerState, BitStream);
 
+    // Use parent model ID for non-standard vehicle model IDs.
+    // This avoids a mismatch between client and server, ensuring doors and damage sync correctly.
+    int iModelID = pVehicle->GetModel();
+    if (iModelID < 400 || iModelID > 611)
+        iModelID = pVehicle->GetModelInfo()->GetParentID();
+
     // Write the clientside model
     if (BitStream.Version() >= 0x05F)
-        BitStream.Write((int)pVehicle->GetModel());
+        BitStream.Write(iModelID);
 
     // Grab the vehicle position
     CVector vecPosition;
@@ -1762,13 +1768,13 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
     ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Version() >= 0x06F)
+    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -1813,13 +1819,13 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
     ControllerState.RightShoulder1 = 255 * keys.data.bRightShoulder1;
     short sButtonSquare = 255 * keys.data.bButtonSquare;
     short sButtonCross = 255 * keys.data.bButtonCross;
-    if (BitStream.Version() >= 0x06F)
+    if (BitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
     {
         if (keys.data.ucButtonSquare != 0)
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -1981,11 +1987,15 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
     {
         // Write our target
         ElementID      ID = INVALID_ELEMENT_ID;
-        CClientPlayer* pPlayer = pCamera->GetFocusedPlayer();
-        if (!pPlayer)
-            pPlayer = g_pClientGame->GetLocalPlayer();
-        if (!pPlayer->IsLocalEntity())
-            ID = pPlayer->GetID();
+        CClientEntity* pTarget = pCamera->GetFocusedPlayer();
+
+        if (!pTarget)
+            pTarget = pCamera->GetTargetEntity();
+
+        if (!pTarget)
+            pTarget = g_pClientGame->GetLocalPlayer();
+        if (!pTarget->IsLocalEntity())
+            ID = pTarget->GetID();
 
         BitStream.Write(ID);
     }

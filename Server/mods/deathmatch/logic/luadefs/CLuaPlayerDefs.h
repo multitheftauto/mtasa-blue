@@ -97,7 +97,7 @@ public:
     LUA_DECLARE(ShowCursor);
 
     // Chat funcs
-    LUA_DECLARE(ShowChat);
+    static bool ShowChat(CElement* pPlayer, bool bShow, std::optional<bool> optInputBlocked);
 
     // Admin funcs
     LUA_DECLARE(KickPlayer);
