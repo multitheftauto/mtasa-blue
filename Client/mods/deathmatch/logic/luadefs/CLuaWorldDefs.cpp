@@ -85,8 +85,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setAircraftMaxVelocity", SetAircraftMaxVelocity},
                                                                              {"setOcclusionsEnabled", SetOcclusionsEnabled},
                                                                              {"setBirdsEnabled", SetBirdsEnabled},
-                                                                             {"addBirds", AddBirds},
-                                                                             {"removeBirds", RemoveBirds},
+                                                                             {"addBirds", ArgumentParser<AddBirds>},
+                                                                             {"removeBirds", ArgumentParser<RemoveBirds>},
                                                                              {"resetTimeCycle", ResetTimeCycle},
                                                                              {"setTimeCycle", SetTimeCycle},
                                                                              {"getTimeCycle", GetTimeCycle},
@@ -1911,47 +1911,19 @@ int CLuaWorldDefs::GetBirdsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWorldDefs::RemoveBirds(lua_State* luaVM)
+bool CLuaWorldDefs::RemoveBirds()
 {
-    if (CStaticFunctionDefinitions::RemoveBirds())
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::RemoveBirds();
 }
 
-int CLuaWorldDefs::AddBirds(lua_State* luaVM)
+int CLuaWorldDefs::AddBirds(const CVector vecStartPosition, const CVector vecDestPosition, std::optional<int> iNumBirds, std::optional<int> iBirdType,
+                            std::optional<bool> bCheckObstacles)
 {
     //  bool addBirds ( float startX, float startY, float startZ, float destX, float destY, float destZ, [int birdsCount = 1, int birdType = 0, bool
     //  checkObstacles = false] )
 
-    CVector          vecStartPosition, vecDestPosition;
-    int              iNumBirds, iBirdType;
-    bool             bCheckObstacles;
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadVector3D(vecStartPosition);
-    argStream.ReadVector3D(vecDestPosition);
-    argStream.ReadNumber(iNumBirds, 1);
-    argStream.ReadNumber(iBirdType, 0);
-    argStream.ReadBool(bCheckObstacles, false);
-
-    if (!argStream.HasErrors())
-    {
-        int iBirdsCreated = CStaticFunctionDefinitions::AddBirds(vecStartPosition, vecDestPosition, iNumBirds, iBirdType, bCheckObstacles);
-        if (iBirdsCreated != 0)
-        {
-            lua_pushnumber(luaVM, iBirdsCreated);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::AddBirds(vecStartPosition, vecDestPosition, iNumBirds.value_or(1), iBirdType.value_or(0),
+                                                bCheckObstacles.value_or(false));
 }
 
 int CLuaWorldDefs::ResetTimeCycle(lua_State* luaVM)
