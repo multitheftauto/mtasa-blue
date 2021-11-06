@@ -87,7 +87,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setBirdsEnabled", SetBirdsEnabled},
                                                                              {"addBirds", ArgumentParser<AddBirds>},
                                                                              {"removeBirds", ArgumentParser<RemoveBirds>},
-                                                                             {"resetTimeCycle", ResetTimeCycle},
+                                                                             {"resetTimeCycle", ArgumentParser<ResetTimeCycle>},
                                                                              {"setTimeCycle", SetTimeCycle},
                                                                              {"getTimeCycle", GetTimeCycle},
                                                                              {"getOriginalTimeCycle", GetOriginalTimeCycle},
@@ -1926,15 +1926,9 @@ int CLuaWorldDefs::AddBirds(const CVector vecStartPosition, const CVector vecDes
                                                 bCheckObstacles.value_or(false));
 }
 
-int CLuaWorldDefs::ResetTimeCycle(lua_State* luaVM)
+bool CLuaWorldDefs::ResetTimeCycle()
 {
-    if (g_pGame->GetTimeCycle()->ResetTimeCycle())
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return g_pGame->GetTimeCycle()->ResetTimeCycle();
 }
 
 int CLuaWorldDefs::SetTimeCycle(lua_State* luaVM)

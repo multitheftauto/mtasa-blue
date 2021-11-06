@@ -103,7 +103,6 @@ public:
     LUA_DECLARE(CreateSWATRope);
     LUA_DECLARE(SetBirdsEnabled);
     LUA_DECLARE(GetBirdsEnabled);
-    LUA_DECLARE(ResetTimeCycle);
     LUA_DECLARE(SetTimeCycle);
     LUA_DECLARE(GetTimeCycle);
     LUA_DECLARE(GetOriginalTimeCycle);
@@ -120,6 +119,7 @@ public:
     static int  AddBirds(const CVector vecStartPosition, const CVector vecDestPosition, std::optional<int> iNumBirds, std::optional<int> iBirdType,
                          std::optional<bool> bCheckObstacles);
     static bool RemoveBirds();
+    static bool ResetTimeCycle();
     static bool ResetColorFilter();
     static bool SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha, uchar ucPass1Red, uchar ucPass1Green,
                                uchar ucPass1Blue, uchar ucPass1Alpha);
