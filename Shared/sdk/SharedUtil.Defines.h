@@ -8,7 +8,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
+#pragma once
 //
 // System wide defines
 //
@@ -126,7 +126,7 @@
 #else
     #define dassert(_Expression)     ((void)0)
     #ifdef WIN32
-// This, along with RedirectedSetUnhandledExceptionFilter means we can get reports from all crashes with the correct crash address in the file name
+    // This, along with RedirectedSetUnhandledExceptionFilter means we can get reports from all crashes with the correct crash address in the file name
         #undef assert
         #define assert(_Expression) (void)( (!!(_Expression)) || ( *((int*)NULL) = 0) )
     #endif
@@ -191,3 +191,4 @@
                 : __DATE__ [2] == 't' ? 9 \
                 : __DATE__ [2] == 'v' ? 10 : 11)
 #define BUILD_DAY ((__DATE__ [4]==' ' ? 0 : __DATE__[4]-'0')*10+(__DATE__[5]-'0'))
+static constexpr float FLOAT_EPSILON = 0.0001f;

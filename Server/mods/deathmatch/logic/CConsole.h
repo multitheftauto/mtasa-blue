@@ -18,8 +18,8 @@ class CConsole
 {
 public:
     CConsole(class CBlipManager* pBlipManager, class CMapManager* pMapManager, class CPlayerManager* pPlayerManager,
-             class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CLuaManager* pLuaManager,
-             class CBanManager* pBanManager, class CAccessControlListManager* pACLManager);
+             class CRegisteredCommands* pRegisteredCommands, class CVehicleManager* pVehicleManager, class CBanManager* pBanManager,
+             class CAccessControlListManager* pACLManager);
     ~CConsole();
 
     bool HandleInput(const char* szCommand, CClient* pClient, CClient* pEchoClient);
@@ -34,7 +34,6 @@ public:
     const auto&                            CommandsList() { return m_Commands; }
 
     class CBlipManager*    GetBlipManager() { return m_pBlipManager; };
-    class CLuaManager*     GetLuaManager() { return m_pLuaManager; };
     class CMapManager*     GetMapManager() { return m_pMapManager; };
     class CPlayerManager*  GetPlayerManager() { return m_pPlayerManager; };
     class CVehicleManager* GetVehicleManager() { return m_pVehicleManager; };
@@ -46,7 +45,6 @@ private:
     class CPlayerManager*            m_pPlayerManager;
     class CRegisteredCommands*       m_pRegisteredCommands;
     class CVehicleManager*           m_pVehicleManager;
-    class CLuaManager*               m_pLuaManager;
     class CBanManager*               m_pBanManager;
     class CAccessControlListManager* m_pACLManager;
 

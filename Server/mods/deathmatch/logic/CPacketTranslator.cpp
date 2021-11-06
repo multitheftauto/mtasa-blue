@@ -174,6 +174,10 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
             pTemp = new CDiscordJoinPacket;
             break;
 
+        case PACKET_ID_PLAYER_RESOURCE_START:
+            pTemp = new CPlayerResourceStartPacket;
+            break;
+
         default:
             break;
     }

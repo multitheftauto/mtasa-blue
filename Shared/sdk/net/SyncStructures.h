@@ -13,6 +13,9 @@
 
 #include <CVector.h>
 #include <net/bitstream.h>
+#include "SharedUtil.Game.h"
+#include "SharedUtil.Misc.h"
+#include "CVector2D.h"
 
 // Used to make sure that any position values we receive are at least half sane
 #define SYNC_POSITION_LIMIT 100000.0f
@@ -677,7 +680,6 @@ struct SVehiclePuresyncFlags : public ISyncStructure
         bool bIsHeliSearchLightVisible : 1;
     } data;
 };
-
 
 enum class eVehicleAimDirection : unsigned char
 {

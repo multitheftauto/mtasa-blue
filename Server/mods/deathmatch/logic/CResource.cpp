@@ -1106,6 +1106,8 @@ bool CResource::CreateVM(bool bEnableOOP)
         return false;
 
     m_pVM->SetScriptName(m_strResourceName.c_str());
+    m_pVM->LoadEmbeddedScripts();
+    m_pVM->RegisterModuleFunctions();
     return true;
 }
 
@@ -1155,6 +1157,8 @@ void CResource::DisplayInfo()            // duplicated for HTML
 
             for (CResource* pDependent : m_Dependents)
                 CLogger::LogPrintf("  %s\n", pDependent->GetName().c_str());
+
+            break;
         }
         case EResourceState::Stopping:
         {
@@ -1259,7 +1263,7 @@ bool CResource::HasGoneAway()
 // gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    // Always prefer the local resource directory, as scripts may 
+    // Always prefer the local resource directory, as scripts may
     // have added new files to the regular folder, rather than the zip
     strPath = m_strResourceDirectoryPath + szFilename;
     if (FileExists(strPath))
@@ -1268,7 +1272,7 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
     // If this is a zipped resource, try to use the unzipped file
     if (!IsResourceZip())
         return false;
-    
+
     strPath = m_strResourceCachePath + szFilename;
     return FileExists(strPath);
 }

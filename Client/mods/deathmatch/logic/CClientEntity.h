@@ -77,6 +77,7 @@ enum eClientEntityType
     CCLIENTBROWSER,
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
+    CCLIENTVECTORGRAPHIC,
     CCLIENTUNKNOWN,
 };
 
@@ -138,6 +139,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientRenderTarget,
     CLASS_CClientScreenSource,
     CLASS_CClientWebBrowser,
+    CLASS_CClientVectorGraphic,
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
@@ -178,6 +180,7 @@ public:
 
     const SString& GetTypeName() { return m_strTypeName; }
     unsigned int   GetTypeHash() { return m_uiTypeHash; }
+    static auto    GetTypeHashFromString(std::string_view type) { return HashString(type.data(), type.length()); }
     void           SetTypeName(const SString& name);
 
     CClientEntity* GetParent() { return m_pParent; };
@@ -221,7 +224,7 @@ public:
     virtual void SetRotationDegrees(const CVector& vecDegrees);
 
     virtual inline unsigned short GetDimension() { return m_usDimension; }
-    virtual void                  SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    virtual void                  SetDimension(unsigned short usDimension);
 
     virtual void ModelRequestCallback(CModelInfo* pModelInfo){};
 

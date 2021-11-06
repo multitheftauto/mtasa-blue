@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaObjectDefs::LoadFunctions()
 {
@@ -23,6 +24,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"isObjectBreakable", IsObjectBreakable},
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
+        {"isObjectMoving", ArgumentParser<IsObjectMoving>},
 
         // Object set funcs
         {"moveObject", MoveObject},
@@ -58,12 +60,14 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMass", "getObjectMass");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
+    lua_classfunction(luaVM, "isMoving", "isObjectMoving");
 
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
     lua_classfunction(luaVM, "setMass", "setObjectMass");
     lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
+    lua_classvariable(luaVM, "moving", nullptr, "isObjectMoving");
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
     lua_classvariable(luaVM, "mass", "setObjectMass", "getObjectMass");
@@ -209,6 +213,11 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
     return 1;
 }
 
+bool CLuaObjectDefs::IsObjectMoving(CClientEntity* pEntity)
+{
+    return CStaticFunctionDefinitions::IsObjectMoving(*pEntity);
+}
+
 int CLuaObjectDefs::GetObjectMass(lua_State* luaVM)
 {
     //  float getObjectMass ( object theObject )
@@ -232,7 +241,7 @@ int CLuaObjectDefs::GetObjectMass(lua_State* luaVM)
     return 1;
 }
 
-int CLuaObjectDefs::GetObjectProperties (lua_State* luaVM)
+int CLuaObjectDefs::GetObjectProperties(lua_State* luaVM)
 {
     lua_pushstring(luaVM, "all");
     return GetObjectProperty(luaVM);

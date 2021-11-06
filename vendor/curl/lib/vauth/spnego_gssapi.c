@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2019, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -137,8 +137,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
 
     /* Ensure we have a valid challenge message */
     if(!chlg) {
-      infof(data, "SPNEGO handshake failure (empty challenge message)\n");
-
+      infof(data, "SPNEGO handshake failure (empty challenge message)");
       return CURLE_BAD_CONTENT_ENCODING;
     }
 

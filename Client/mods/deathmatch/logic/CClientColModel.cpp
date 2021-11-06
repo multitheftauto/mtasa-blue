@@ -32,7 +32,7 @@ CClientColModel::~CClientColModel()
     RestoreAll();
 
     if (m_pColModel)
-        delete m_pColModel;
+        m_pColModel->Destroy();
 }
 
 bool CClientColModel::Load(bool isRaw, SString input)

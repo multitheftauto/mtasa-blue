@@ -57,11 +57,11 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isTrainDerailable", IsTrainDerailable},
         {"getTrainDirection", GetTrainDirection},
         {"getTrainSpeed", GetTrainSpeed},
-        {"getTrainTrack", ArgumentParser<GetTrainTrack>},
+        //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
         {"isTrainChainEngine", IsTrainChainEngine},
         {"getVehicleGravity", GetVehicleGravity},
-        {"isVehicleBlown", IsVehicleBlown},
+        {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"isVehicleTaxiLightOn", IsVehicleTaxiLightOn},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
         {"getVehicleCurrentGear", GetVehicleCurrentGear},
@@ -83,13 +83,16 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleComponents", GetVehicleComponents},
         {"getVehicleModelExhaustFumesPosition", GetVehicleModelExhaustFumesPosition},
         {"getVehicleModelDummyPosition", GetVehicleModelDummyPosition},
+        {"getVehicleModelDummyDefaultPosition", ArgumentParser<GetVehicleModelDummyDefaultPosition>},
+        {"getVehicleDummyPosition", ArgumentParser<GetVehicleDummyPosition>},
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
+        {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
         {"fixVehicle", FixVehicle},
-        {"blowVehicle", BlowVehicle},
+        {"blowVehicle", ArgumentParserWarn<false, BlowVehicle>},
         {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
         {"setVehicleColor", SetVehicleColor},
         {"setVehicleLandingGearDown", SetVehicleLandingGearDown},
@@ -117,7 +120,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
         {"setTrainSpeed", SetTrainSpeed},
-        {"setTrainTrack", ArgumentParser<SetTrainTrack>},
+        //{"setTrainTrack", ArgumentParser<SetTrainTrack>},
         {"setTrainPosition", SetTrainPosition},
         {"setVehicleTaxiLightOn", SetVehicleTaxiLightOn},
         {"setVehicleGravity", SetVehicleGravity},
@@ -141,6 +144,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWindowOpen", SetVehicleWindowOpen},
         {"setVehicleModelExhaustFumesPosition", SetVehicleModelExhaustFumesPosition},
         {"setVehicleModelDummyPosition", SetVehicleModelDummyPosition},
+        {"resetVehicleDummyPositions", ArgumentParser<ResetVehicleDummyPositions>},
+        {"setVehicleDummyPosition", ArgumentParser<SetVehicleDummyPosition>},
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
@@ -178,7 +183,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getNitroLevel", "getVehicleNitroLevel");
     lua_classfunction(luaVM, "getDirection", "getTrainDirection");
     lua_classfunction(luaVM, "getTrainSpeed", "getTrainSpeed");
-    lua_classfunction(luaVM, "getTrack", "getTrainTrack");
+    // lua_classfunction(luaVM, "getTrack", "getTrainTrack");
     lua_classfunction(luaVM, "getTrainPosition", "getTrainPosition");
     lua_classfunction(luaVM, "getName", "getVehicleName");
     lua_classfunction(luaVM, "getVehicleType", "getVehicleType");
@@ -226,8 +231,11 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getModelExhaustFumesPosition", OOP_GetVehicleModelExhaustFumesPosition);
     lua_classfunction(luaVM, "getVehicleModelDummyPosition", OOP_GetVehicleModelDummyPosition);
+    lua_classfunction(luaVM, "getVehicleModelDummyDefaultPosition", ArgumentParser<OOP_GetVehicleModelDummyDefaultPosition>);
+    lua_classfunction(luaVM, "getDummyPosition", ArgumentParser<OOP_GetVehicleDummyPosition>);
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
+    lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -261,7 +269,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setNitroLevel", "setVehicleNitroLevel");
     lua_classfunction(luaVM, "setDirection", "setTrainDirection");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");
-    lua_classfunction(luaVM, "setTrack", "setTrainTrack");
+    // lua_classfunction(luaVM, "setTrack", "setTrainTrack");
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setDerailable", "setTrainDerailable");
     lua_classfunction(luaVM, "setDerailed", "setTrainDerailed");
@@ -271,6 +279,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setGravity", "setVehicleGravity");
     lua_classfunction(luaVM, "setModelExhaustFumesPosition", "setVehicleModelExhaustFumesPosition");
     lua_classfunction(luaVM, "setVehicleModelDummyPosition", "setVehicleModelDummyPosition");
+    lua_classfunction(luaVM, "setDummyPosition", "setVehicleDummyPosition");
+    lua_classfunction(luaVM, "resetDummyPositions", "resetVehicleDummyPositions");
     lua_classfunction(luaVM, "setVariant", "setVehicleVariant");
     lua_classfunction(luaVM, "setWheelScale", "setVehicleWheelScale");
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
@@ -318,7 +328,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "towedByVehicle", NULL, "getVehicleTowedByVehicle");
     lua_classvariable(luaVM, "direction", "setTrainDirection", "getTrainDirection");
     lua_classvariable(luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed");
-    lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
+    // lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
     lua_classvariable(luaVM, "trainPosition", "setTrainPosition", "getTrainPosition");
     lua_classvariable(luaVM, "derailable", "setTrainDerailable", "isTrainDerailable");
     lua_classvariable(luaVM, "derailed", "setTrainDerailed", "isTrainDerailed");
@@ -1538,47 +1548,9 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::BlowVehicle(lua_State* luaVM)
+bool CLuaVehicleDefs::IsVehicleBlown(CClientVehicle* vehicle)
 {
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::BlowVehicle(*pEntity))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaVehicleDefs::IsVehicleBlown(lua_State* luaVM)
-{
-    CClientVehicle*  pVehicle = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (!argStream.HasErrors())
-    {
-        bool bBlown;
-        if (CStaticFunctionDefinitions::IsVehicleBlown(*pVehicle, bBlown))
-        {
-            lua_pushboolean(luaVM, bBlown);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vehicle->IsBlown();
 }
 
 int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)
@@ -4108,4 +4080,71 @@ bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, con
     m_pVehicleManager->RestreamVehicles(usModel);
 
     return true;
+}
+
+int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel)
+{
+    if (wheel < 0 || wheel > 3)
+        throw std::invalid_argument("Invalid wheel number");
+
+    if (CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) != CLIENTVEHICLE_CAR)
+        throw std::invalid_argument("Invalid vehicle type");
+
+    return pVehicle->GetWheelFrictionState(wheel);
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short  vehicleModel,
+                                                                                                              eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(vehicleModel, dummy, position))
+        return false;
+
+    return std::tuple(position.fX, position.fY, position.fZ);
+}
+
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(vehicleModel, dummy, position))
+        return false;
+
+    return position;
+}
+
+bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position)
+{
+    return vehicle->SetDummyPosition(dummy, position);
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!vehicle->GetDummyPosition(dummy, position))
+        return false;
+
+    return std::tuple(position.fX, position.fY, position.fZ);
+}
+
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy)
+{
+    CVector position;
+
+    if (!vehicle->GetDummyPosition(dummy, position))
+        return false;
+
+    return position;
+}
+
+bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
+{
+    return vehicle->ResetDummyPositions();
+}
+
+bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion)
+{
+    return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }

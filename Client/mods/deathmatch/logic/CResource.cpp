@@ -83,6 +83,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     if (m_pLuaVM)
     {
         m_pLuaVM->SetScriptName(szResourceName);
+        m_pLuaVM->LoadEmbeddedScripts();
     }
 }
 
@@ -155,14 +156,6 @@ CResource::~CResource()
         delete (*iterc);
     }
     m_ConfigFiles.clear();
-
-    // Delete the exported functions
-    list<CExportedFunction*>::iterator iterExportedFunction = m_exportedFunctions.begin();
-    for (; iterExportedFunction != m_exportedFunctions.end(); ++iterExportedFunction)
-    {
-        delete (*iterExportedFunction);
-    }
-    m_exportedFunctions.clear();
 }
 
 CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResourceType resourceType, const char* szFileName, uint uiDownloadSize,
@@ -208,24 +201,10 @@ CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiD
     return pConfig;
 }
 
-void CResource::AddExportedFunction(const char* szFunctionName)
+bool CResource::CallExportedFunction(const SString& name, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
 {
-    m_exportedFunctions.push_back(new CExportedFunction(szFunctionName));
-}
-
-bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
-{
-    list<CExportedFunction*>::iterator iter = m_exportedFunctions.begin();
-    for (; iter != m_exportedFunctions.end(); ++iter)
-    {
-        if (strcmp((*iter)->GetFunctionName(), szFunctionName) == 0)
-        {
-            if (args.CallGlobal(m_pLuaVM, szFunctionName, &returns))
-            {
-                return true;
-            }
-        }
-    }
+    if (m_exportedFunctions.find(name) != m_exportedFunctions.end())
+        return args.CallGlobal(m_pLuaVM, name.c_str(), &returns);
     return false;
 }
 
@@ -346,6 +325,20 @@ void CResource::Load()
         CLuaArguments Arguments;
         Arguments.PushResource(this);
         m_pResourceEntity->CallEvent("onClientResourceStart", Arguments, true);
+
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+        if (pBitStream)
+        {
+            if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
+            {
+                // Write resource net ID
+                pBitStream->Write(GetNetID());
+
+                g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+            }
+
+            g_pNet->DeallocateNetBitStream(pBitStream);
+        }
     }
     else
         assert(0);

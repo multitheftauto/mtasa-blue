@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaVehicleDefs : public CLuaDefs
 {
@@ -67,7 +68,7 @@ public:
     LUA_DECLARE(GetTrainPosition);
     LUA_DECLARE(IsTrainChainEngine);
     LUA_DECLARE_OOP(GetVehicleGravity);
-    LUA_DECLARE(IsVehicleBlown);
+    static bool IsVehicleBlown(CClientVehicle* vehicle);
     LUA_DECLARE(GetVehicleHeadLightColor);
     LUA_DECLARE(GetVehicleCurrentGear);
     LUA_DECLARE(GetVehicleHandling);
@@ -81,7 +82,7 @@ public:
     LUA_DECLARE(IsVehicleWindowOpen);
 
     LUA_DECLARE(FixVehicle);
-    LUA_DECLARE(BlowVehicle);
+    static bool BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion);
     LUA_DECLARE(SetVehicleRotation);
     LUA_DECLARE(SetVehicleTurnVelocity);
     LUA_DECLARE(SetVehicleColor);
@@ -140,6 +141,14 @@ public:
     LUA_DECLARE(SetVehicleModelDummyPosition);
     LUA_DECLARE_OOP(GetVehicleModelDummyPosition)
 
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy);
+    static std::variant<bool, CVector>                              OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy);
+
+    static bool                                                     SetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy, CVector position);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
+    static std::variant<bool, CVector>                              OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
+    static bool                                                     ResetVehicleDummyPositions(CClientVehicle* vehicle);
+
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
@@ -149,6 +158,7 @@ public:
     static std::variant<float, std::unordered_map<std::string, float>> GetVehicleModelWheelSize(const unsigned short                             usModel,
                                                                                                 const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
+    static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);

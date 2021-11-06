@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include "SharedUtil.hpp"
 
-CCoreInterface* g_pCore = NULL;
+CCoreInterface*         g_pCore = NULL;
 CLocalizationInterface* g_pLocalization = nullptr;
 
 extern "C" _declspec(dllexport) CWebCoreInterface* InitWebCoreInterface(CCoreInterface* pCore)

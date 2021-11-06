@@ -511,16 +511,18 @@ eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource*
         return eResourceModifyScope::SINGLE_RESOURCE;
 
     CAccessControlListManager* const pACLManager = g_pGame->GetACLManager();
-    const SString& strResourceName = pThisResource->GetName();
+    const SString&                   strResourceName = pThisResource->GetName();
 
     // Check if resource has right to modify any resource
-    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "ModifyOtherObjects", CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "ModifyOtherObjects",
+                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
         return eResourceModifyScope::EVERY_RESOURCE;
 
     // Check if resource has right to modify only pOtherResource
     const SString strRightName("ModifyOtherObjects.%s", pOtherResource->GetName().c_str());
 
-    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strRightName.c_str(), CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strRightName.c_str(),
+                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
         return eResourceModifyScope::SINGLE_RESOURCE;
 
     return eResourceModifyScope::NONE;
@@ -532,7 +534,9 @@ eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource*
 void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource)
 {
     if (GetResourceModifyScope(pThisResource, pOtherResource) == eResourceModifyScope::NONE)
-        argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()), "Access denied");
+        argStream.SetCustomError(
+            SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()),
+            "Access denied");
 }
 
 //
@@ -560,26 +564,27 @@ void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisR
         return;
 
     std::stringstream ssResourceNames;
-    size_t remainingElements = setNoPermissionResources.size();
+    size_t            remainingElements = setNoPermissionResources.size();
 
     for (CResource* pResource : setNoPermissionResources)
     {
         ssResourceNames << pResource->GetName();
-        
+
         if (remainingElements > 1)
             ssResourceNames << ", ";
 
         --remainingElements;
     }
 
-    argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
+    argStream.SetCustomError(
+        SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
 }
 
 //
 // Set error if resource file access is blocked due to reasons
 //
 void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-    bool* pbReadOnly)
+                                     bool* pbReadOnly)
 {
     if (!g_pGame->GetConfig()->IsDatabaseCredentialsProtectionEnabled())
         return;

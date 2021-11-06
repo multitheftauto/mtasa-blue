@@ -5,6 +5,7 @@ require "install_data"
 require "install_resources"
 require "install_cef"
 require "install_discord"
+require "install_unifont"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -36,7 +37,6 @@ workspace "MTASA"
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
 		"vendor",
-		"Shared/sdk",
 	}
 
 	defines {
@@ -90,6 +90,7 @@ workspace "MTASA"
 		toolset "v142"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
+		buildoptions { "/Zc:__cplusplus" }
 		includedirs {
 			path.join(dxdir, "Include")
 		}
@@ -129,12 +130,14 @@ workspace "MTASA"
 		include "vendor/portaudio"
 		include "vendor/cef3"
 		include "vendor/freetype"
-		include "vendor/jpeg-9b"
+		include "vendor/jpeg-9d"
 		include "vendor/ksignals"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
+		include "vendor/detours"
+		include "vendor/lunasvg"
 	end
 
 	filter {}
@@ -155,7 +158,6 @@ workspace "MTASA"
 		include "vendor/curl"
 		include "vendor/ehs"
 		include "vendor/google-breakpad"
-		include "vendor/hwbrk"
 		include "vendor/json-c"
 		include "vendor/lua"
 		include "vendor/mbedtls"

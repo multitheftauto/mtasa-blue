@@ -301,7 +301,7 @@ public:
     CServerListItemList* m_pItemList;
 
 protected:
-    int          m_iDataQuality;
+    int m_iDataQuality;
 
     static std::set<CServerListItem*> ms_ValidServerListItemMap;
 };

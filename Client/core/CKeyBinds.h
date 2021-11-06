@@ -35,6 +35,7 @@ public:
     ~CKeyBinds();
 
     bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void OnLoseFocus() override;
 
 protected:
     bool ProcessCharacter(WPARAM wChar);
@@ -116,12 +117,14 @@ public:
     bool ControlFunctionExists(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState = false, bool bState = true);
 
     // Key/code funcs
-    const SBindableKey* GetBindableFromKey(const char* szKey);
+    const SBindableKey* GetBindableFromKey(const char* szKey) override { return reinterpret_cast<const CKeyBinds*>(this)->GetBindableFromKey(szKey); }
+    const SBindableKey* GetBindableFromKey(const char* szKey) const override;
     const SBindableKey* GetBindableFromGTARelative(int iGTAKey);
     bool                IsKey(const char* szKey);
     const SBindableKey* GetBindableFromMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, bool& bState);
     void                SetKeyStrokeHandler(KeyStrokeHandler Handler) { m_KeyStrokeHandler = Handler; }
     void                SetCharacterKeyHandler(CharacterKeyHandler Handler) { m_CharacterKeyHandler = Handler; }
+    bool                GetKeyStateByName(const char* keyName, bool& state) const override;
 
     // Control/action funcs
     SBindableGTAControl* GetBindableFromControl(const char* szControl);
@@ -158,18 +161,19 @@ public:
 private:
     CCore* m_pCore;
 
-    std::list<CKeyBind*>* m_pList;
-    bool                  m_bMouseWheel;
-    bool                  m_bInVehicle;
-    CCommandBind*         m_pChatBoxBind;
-    bool                  m_bProcessingKeyStroke;
-    KeyStrokeHandler      m_KeyStrokeHandler;
-    CharacterKeyHandler   m_CharacterKeyHandler;
-    bool                  m_bWaitingToLoadDefaults;
-    bool                  m_bLastStateForwards;
-    bool                  m_bLastStateBackwards;
-    bool                  m_bMoveForwards;
-    bool                  m_bLastStateLeft;
-    bool                  m_bLastStateRight;
-    bool                  m_bMoveLeft;
+    std::list<CKeyBind*>*  m_pList;
+    bool                   m_bMouseWheel;
+    bool                   m_bInVehicle;
+    CCommandBind*          m_pChatBoxBind;
+    std::vector<CKeyBind*> m_vecBindQueue;
+    bool                   m_bProcessingKeyStroke;
+    KeyStrokeHandler       m_KeyStrokeHandler;
+    CharacterKeyHandler    m_CharacterKeyHandler;
+    bool                   m_bWaitingToLoadDefaults;
+    bool                   m_bLastStateForwards;
+    bool                   m_bLastStateBackwards;
+    bool                   m_bMoveForwards;
+    bool                   m_bLastStateLeft;
+    bool                   m_bLastStateRight;
+    bool                   m_bMoveLeft;
 };

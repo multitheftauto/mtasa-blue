@@ -440,6 +440,24 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     health.data.fValue = pVehicle->GetHealth();
                     BitStream.Write(&health);
 
+                    // Blow state
+                    if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+                    {
+                        unsigned char blowState = 0;
+
+                        switch (pVehicle->GetBlowState())
+                        {
+                            case VehicleBlowState::AWAITING_EXPLOSION_SYNC:
+                                blowState = 1;
+                                break;
+                            case VehicleBlowState::BLOWN:
+                                blowState = 2;
+                                break;
+                        }
+
+                        BitStream.WriteBits(&blowState, 2);
+                    }
+
                     // Color
                     CVehicleColor& vehColor = pVehicle->GetColor();
                     uchar          ucNumColors = vehColor.GetNumColorsUsed() - 1;
@@ -1024,6 +1042,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 SPosition2DSync vertex(false);
                                 vertex.data.vecPosition = *iter;
                                 BitStream.Write(&vertex);
+                            }
+
+                            if (BitStream.Can(eBitStreamVersion::SetColPolygonHeight))
+                            {
+                                float fFloor, fCeil;
+                                pPolygon->GetHeight(fFloor, fCeil);
+
+                                BitStream.Write(fFloor);
+                                BitStream.Write(fCeil);
                             }
                             break;
                         }
