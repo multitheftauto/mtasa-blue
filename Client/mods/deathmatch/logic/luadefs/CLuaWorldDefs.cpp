@@ -85,6 +85,12 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setAircraftMaxVelocity", SetAircraftMaxVelocity},
                                                                              {"setOcclusionsEnabled", SetOcclusionsEnabled},
                                                                              {"setBirdsEnabled", SetBirdsEnabled},
+                                                                             {"addBirds", AddBirds},
+                                                                             {"removeBirds", RemoveBirds},
+                                                                             {"resetTimeCycle", ResetTimeCycle},
+                                                                             {"setTimeCycle", SetTimeCycle},
+                                                                             {"getTimeCycle", GetTimeCycle},
+                                                                             {"getOriginalTimeCycle", GetOriginalTimeCycle},
                                                                              {"setPedTargetingMarkerEnabled", SetPedTargetingMarkerEnabled},
                                                                              {"setMoonSize", SetMoonSize},
                                                                              {"setFPSLimit", SetFPSLimit},
@@ -1901,6 +1907,264 @@ int CLuaWorldDefs::GetBirdsEnabled(lua_State* luaVM)
         lua_pushboolean(luaVM, true);
         return 1;
     }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::RemoveBirds(lua_State* luaVM)
+{
+    if (CStaticFunctionDefinitions::RemoveBirds())
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::AddBirds(lua_State* luaVM)
+{
+    //  bool addBirds ( float startX, float startY, float startZ, float destX, float destY, float destZ, [int birdsCount = 1, int birdType = 0, bool
+    //  checkObstacles = false] )
+
+    CVector          vecStartPosition, vecDestPosition;
+    int              iNumBirds, iBirdType;
+    bool             bCheckObstacles;
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadVector3D(vecStartPosition);
+    argStream.ReadVector3D(vecDestPosition);
+    argStream.ReadNumber(iNumBirds, 1);
+    argStream.ReadNumber(iBirdType, 0);
+    argStream.ReadBool(bCheckObstacles, false);
+
+    if (!argStream.HasErrors())
+    {
+        int iBirdsCreated = CStaticFunctionDefinitions::AddBirds(vecStartPosition, vecDestPosition, iNumBirds, iBirdType, bCheckObstacles);
+        if (iBirdsCreated != 0)
+        {
+            lua_pushnumber(luaVM, iBirdsCreated);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::ResetTimeCycle(lua_State* luaVM)
+{
+    if (g_pGame->GetTimeCycle()->ResetTimeCycle())
+    {
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::SetTimeCycle(lua_State* luaVM)
+{
+    //  bool setTimeCycle ( string property, [float value = -1, int weatherID = -1, int cycle = -1] )
+
+    SString          strPropertyName;
+    float            fValue;
+    int              iWeatherID, iCycleNum;
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadString(strPropertyName);
+    if (argStream.NextIsNone())
+    {
+        argStream.Skip(1);
+        fValue = -1;
+    }
+    else if (argStream.NextIsBool())
+    {
+        bool bValue;
+        argStream.ReadBool(bValue, false);
+        if (!bValue)
+            fValue = -1;
+        else
+            argStream.SetCustomError("The value should be either a number or false");
+    }
+    else
+    {
+        argStream.ReadNumber(fValue, -1, false);
+    }
+    argStream.ReadNumber(iWeatherID, -1, false);
+    argStream.ReadNumber(iCycleNum, -1, false);
+
+    if (iWeatherID < -1 || iWeatherID > 23)
+        argStream.SetCustomError("The weatherID should be between 0 and 23");
+    if (iCycleNum < -1 || iCycleNum > 7)
+        argStream.SetCustomError("The cycle should be between 0 and 7");
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, g_pGame->GetTimeCycle()->SetTimeCycle(strPropertyName, fValue, iWeatherID, iCycleNum));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::GetTimeCycle(lua_State* luaVM)
+{
+    //  mixed getTimeCycle ( int weatherID, [int cycle = -1, string property = ""] )
+
+    int              iWeatherID, iCycleNum;
+    SString          strPropertyName;
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadNumber(iWeatherID);
+    argStream.ReadNumber(iCycleNum, -1);
+    argStream.ReadString(strPropertyName, "");
+
+    if (!argStream.HasErrors())
+    {
+        if (iWeatherID >= 0 && iWeatherID <= 23 && iCycleNum >= 0 && iCycleNum <= 7)
+        {
+            if (!strPropertyName.empty())
+            {
+                float fValue = g_pGame->GetTimeCycle()->GetTimeCycle(iWeatherID, iCycleNum, strPropertyName);
+                if (fValue != -1)
+                    lua_pushnumber(luaVM, fValue);
+                else
+                    argStream.SetCustomError("Property doesn't exist");
+            }
+            else
+            {
+                std::map<const char*, float> m_Properties;
+                g_pGame->GetTimeCycle()->GetTimeCycle(iWeatherID, iCycleNum, m_Properties);
+                if (!m_Properties.empty())
+                {
+                    lua_newtable(luaVM);
+                    std::map<const char*, float>::iterator it = m_Properties.begin();
+                    for (; it != m_Properties.end(); it++)
+                    {
+                        lua_pushstring(luaVM, it->first);
+                        lua_pushnumber(luaVM, it->second);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+            }
+        }
+        else if (iWeatherID >= 0 && iWeatherID <= 23 && iCycleNum == -1)
+        {
+            std::map<int, std::map<const char*, float>> m_Properties;
+            g_pGame->GetTimeCycle()->GetTimeCycle(iWeatherID, m_Properties);
+            if (!m_Properties.empty())
+            {
+                lua_newtable(luaVM);
+                std::map<int, std::map<const char*, float>>::iterator it = m_Properties.begin();
+                for (; it != m_Properties.end(); it++)
+                {
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, it->first);
+                    lua_pushvalue(luaVM, -2);
+                    lua_settable(luaVM, -4);
+
+                    std::map<const char*, float>::iterator it2 = it->second.begin();
+                    for (; it2 != it->second.end(); it2++)
+                    {
+                        lua_pushstring(luaVM, it2->first);
+                        lua_pushnumber(luaVM, it2->second);
+                        lua_settable(luaVM, -3);
+                    }
+                    lua_pop(luaVM, 1);
+                }
+            }
+        }
+        else
+            lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::GetOriginalTimeCycle(lua_State* luaVM)
+{
+    //  mixed getOriginalTimeCycle ( int weatherID, [int cycle = -1, string property = ""] )
+
+    int              iWeatherID, iCycleNum;
+    SString          strPropertyName;
+    CScriptArgReader argStream(luaVM);
+
+    argStream.ReadNumber(iWeatherID);
+    argStream.ReadNumber(iCycleNum, -1);
+    argStream.ReadString(strPropertyName, "");
+
+    if (!argStream.HasErrors())
+    {
+        if (iWeatherID >= 0 && iWeatherID <= 23 && iCycleNum >= 0 && iCycleNum <= 7)
+        {
+            if (!strPropertyName.empty())
+            {
+                float fValue = g_pGame->GetTimeCycle()->GetOriginalTimeCycle(iWeatherID, iCycleNum, strPropertyName);
+                if (fValue != -1)
+                    lua_pushnumber(luaVM, fValue);
+                else
+                    argStream.SetCustomError("Property doesn't exist");
+            }
+            else
+            {
+                std::map<const char*, float> m_Properties;
+                g_pGame->GetTimeCycle()->GetOriginalTimeCycle(iWeatherID, iCycleNum, m_Properties);
+                if (!m_Properties.empty())
+                {
+                    lua_newtable(luaVM);
+                    std::map<const char*, float>::iterator it = m_Properties.begin();
+                    for (; it != m_Properties.end(); it++)
+                    {
+                        lua_pushstring(luaVM, it->first);
+                        lua_pushnumber(luaVM, it->second);
+                        lua_settable(luaVM, -3);
+                    }
+                }
+            }
+        }
+        else if (iWeatherID >= 0 && iWeatherID <= 23 && iCycleNum == -1)
+        {
+            std::map<int, std::map<const char*, float>> m_Properties;
+            g_pGame->GetTimeCycle()->GetOriginalTimeCycle(iWeatherID, m_Properties);
+            if (!m_Properties.empty())
+            {
+                lua_newtable(luaVM);
+                std::map<int, std::map<const char*, float>>::iterator it = m_Properties.begin();
+                for (; it != m_Properties.end(); it++)
+                {
+                    lua_newtable(luaVM);
+                    lua_pushnumber(luaVM, it->first);
+                    lua_pushvalue(luaVM, -2);
+                    lua_settable(luaVM, -4);
+
+                    std::map<const char*, float>::iterator it2 = it->second.begin();
+                    for (; it2 != it->second.end(); it2++)
+                    {
+                        lua_pushstring(luaVM, it2->first);
+                        lua_pushnumber(luaVM, it2->second);
+                        lua_settable(luaVM, -3);
+                    }
+                    lua_pop(luaVM, 1);
+                }
+            }
+        }
+        else
+            lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

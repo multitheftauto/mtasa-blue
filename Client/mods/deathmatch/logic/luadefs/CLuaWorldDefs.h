@@ -103,6 +103,12 @@ public:
     LUA_DECLARE(CreateSWATRope);
     LUA_DECLARE(SetBirdsEnabled);
     LUA_DECLARE(GetBirdsEnabled);
+    LUA_DECLARE(RemoveBirds);
+    LUA_DECLARE(AddBirds);
+    LUA_DECLARE(ResetTimeCycle);
+    LUA_DECLARE(SetTimeCycle);
+    LUA_DECLARE(GetTimeCycle);
+    LUA_DECLARE(GetOriginalTimeCycle);
     LUA_DECLARE(SetPedTargetingMarkerEnabled);
     LUA_DECLARE(IsPedTargetingMarkerEnabled);
     LUA_DECLARE(SetMoonSize);
