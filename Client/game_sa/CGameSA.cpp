@@ -726,27 +726,12 @@ bool CGameSA::IsWaterCreaturesEnabled()
 
 void CGameSA::SetWaterCreaturesEnabled(bool bEnabled)
 {
-    DWORD g_waterCreatureMan = 0xC1DF30;
-    if (bEnabled && !m_bWaterCreatures)
-    {
-        // initialise dynamic water creatures generation
-        DWORD CALL_WaterCreatureManager_Init = 0x6E3F90;
-        _asm
-        {
-            mov     ecx, g_waterCreatureMan
-            call    CALL_WaterCreatureManager_Init
-        }
-    }
-    else if (!bEnabled && m_bWaterCreatures)
-    {
-        // shutdown dynamic water creatures generation
-        DWORD CALL_WaterCreatureManager_Exit = 0x6E3FD0;
-        _asm
-        {
-            mov     ecx, g_waterCreatureMan
-            call    CALL_WaterCreatureManager_Exit
-        }
-    }
+    if (bEnabled == m_bWaterCreatures)
+        return;
+
+    typedef int(__thiscall * Func_t)(void*);
+    (Func_t(bEnabled ? 0x6E3F90 : 0x6E3FD0))((void*)0xC1DF30);            // Init/Deinit WaterCreateManager
+
     m_bWaterCreatures = bEnabled;
 }
 
