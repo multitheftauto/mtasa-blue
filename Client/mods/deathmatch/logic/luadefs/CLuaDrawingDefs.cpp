@@ -9,7 +9,6 @@
  *
  *****************************************************************************/
 
-
 #include "StdInc.h"
 #include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
@@ -218,14 +217,14 @@ int CLuaDrawingDefs::DxDrawLine3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 {
-    //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, [bool flipUV,] element material, int width [, int color =
-    //  white,
+    //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, [bool flipUV,] element material, int width [,
+    //  int color = white,
     //                          float faceX, float faceY, float faceZ ] )
     CVector          vecBegin;
     CVector          vecEnd;
     bool             bFlipUV;
     CClientMaterial* pMaterial;
-    float            fWidth;   
+    float            fWidth;
     SColor           color;
     bool             bPostGUI;
     CVector          vecFaceToward;
@@ -236,7 +235,7 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     argStream.ReadVector3D(vecEnd);
     argStream.ReadIfNextIsBool(bFlipUV, false);
     argStream.ReadUserData(pMaterial);
-    argStream.ReadNumber(fWidth);    
+    argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
@@ -247,8 +246,8 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bFlipUV, bUseFaceToward,
-                                                         vecFaceToward, bPostGUI);
+        g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bFlipUV,
+                                                         bUseFaceToward, vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -271,7 +270,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     CVector2D        vecSectionSize;
     bool             bFlipUV;
     CClientMaterial* pMaterial;
-    float            fWidth;    
+    float            fWidth;
     SColor           color;
     bool             bPostGUI;
     CVector          vecFaceToward;
@@ -284,7 +283,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     argStream.ReadVector2D(vecSectionSize);
     argStream.ReadIfNextIsBool(bFlipUV, false);
     argStream.ReadUserData(pMaterial);
-    argStream.ReadNumber(fWidth);    
+    argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadIfNextIsBool(bPostGUI, false);
     if (argStream.NextIsVector3D())
@@ -330,6 +329,7 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
     bool               bSubPixelPositioning;
     float              fRotation;
     CVector2D          vecRotationOrigin;
+    float              fLineHeight;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strText);
@@ -367,6 +367,7 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
     argStream.ReadBool(bSubPixelPositioning, false);
     argStream.ReadNumber(fRotation, 0);
     argStream.ReadVector2D(vecRotationOrigin, CVector2D((vecTopLeft.fX + vecBottomRight.fX) * 0.5f, (vecTopLeft.fY + vecBottomRight.fY) * 0.5f));
+    argStream.ReadNumber(fLineHeight, 0);
 
     if (!argStream.HasErrors())
     {
@@ -382,7 +383,8 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
             ulFormat |= DT_NOCLIP;
 
         g_pCore->GetGraphics()->DrawStringQueued(vecTopLeft.fX, vecTopLeft.fY, vecBottomRight.fX, vecBottomRight.fY, color, strText, fScaleX, fScaleY, ulFormat,
-                                                 pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY);
+                                                 pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY,
+                                                 fLineHeight);
 
         lua_pushboolean(luaVM, true);
         return 1;

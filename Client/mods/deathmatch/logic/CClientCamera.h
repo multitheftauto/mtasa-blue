@@ -60,6 +60,7 @@ public:
     void           SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoothTransition = false);
     void           SetFocus(CClientPlayer* pPlayer, eCamMode eMode, bool bSmoothTransition = false);
     void           SetFocusToLocalPlayer();
+    void           Reset();
 
     void            SetCameraVehicleViewMode(eVehicleCamMode eMode);
     void            SetCameraPedViewMode(ePedCamMode eMode);

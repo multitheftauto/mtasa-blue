@@ -1,5 +1,8 @@
 // iterhash.h - originally written and placed in the public domain by Wei Dai
 
+/// \file iterhash.h
+/// \brief Base classes for iterated hashes
+
 #ifndef CRYPTOPP_ITERHASH_H
 #define CRYPTOPP_ITERHASH_H
 
@@ -76,7 +79,7 @@ public:
 	/// \brief Computes the hash of the current message
 	/// \param digest a pointer to the buffer to receive the hash
 	/// \param digestSize the size of the truncated digest, in bytes
-	/// \details TruncatedFinal() call Final() and then copies digestSize bytes to digest.
+	/// \details TruncatedFinal() calls Final() and then copies digestSize bytes to digest.
 	///   The hash is restarted the hash for the next message.
 	void TruncatedFinal(byte *digest, size_t digestSize);
 
@@ -126,7 +129,7 @@ public:
 	typedef T_Endianness ByteOrderClass;
 	typedef T_HashWordType HashWordType;
 
-	CRYPTOPP_CONSTANT(BLOCKSIZE = T_BlockSize)
+	CRYPTOPP_CONSTANT(BLOCKSIZE = T_BlockSize);
 	// BCB2006 workaround: can't use BLOCKSIZE here
 	CRYPTOPP_COMPILE_ASSERT((T_BlockSize & (T_BlockSize - 1)) == 0);	// blockSize is a power of 2
 
@@ -138,7 +141,7 @@ public:
 	unsigned int BlockSize() const {return T_BlockSize;}
 
 	/// \brief Provides the byte order of the hash
-	/// \returns the byte order of the hash as an enumeration
+	/// \return the byte order of the hash as an enumeration
 	/// \details GetByteOrder() returns <tt>T_Endianness::ToEnum()</tt>.
 	/// \sa ByteOrder()
 	ByteOrder GetByteOrder() const {return T_Endianness::ToEnum();}
@@ -159,8 +162,9 @@ public:
 	}
 
 protected:
+	enum { Blocks = T_BlockSize/sizeof(T_HashWordType) };
 	T_HashWordType* DataBuf() {return this->m_data;}
-	FixedSizeSecBlock<T_HashWordType, T_BlockSize/sizeof(T_HashWordType)> m_data;
+	FixedSizeSecBlock<T_HashWordType, Blocks> m_data;
 };
 
 /// \brief Iterated hash with a static transformation function
@@ -177,7 +181,7 @@ class CRYPTOPP_NO_VTABLE IteratedHashWithStaticTransform
 	: public ClonableImpl<T_Transform, AlgorithmImpl<IteratedHash<T_HashWordType, T_Endianness, T_BlockSize>, T_Transform> >
 {
 public:
-	CRYPTOPP_CONSTANT(DIGESTSIZE = T_DigestSize ? T_DigestSize : T_StateSize)
+	CRYPTOPP_CONSTANT(DIGESTSIZE = T_DigestSize ? T_DigestSize : T_StateSize);
 
 	virtual ~IteratedHashWithStaticTransform() {}
 
@@ -187,12 +191,14 @@ public:
 	unsigned int DigestSize() const {return DIGESTSIZE;}
 
 protected:
-	IteratedHashWithStaticTransform() {this->Init();}
+	// https://github.com/weidai11/cryptopp/issues/147#issuecomment-766231864
+	IteratedHashWithStaticTransform() {IteratedHashWithStaticTransform::Init();}
 	void HashEndianCorrectedBlock(const T_HashWordType *data) {T_Transform::Transform(this->m_state, data);}
 	void Init() {T_Transform::InitState(this->m_state);}
 
+	enum { Blocks = T_BlockSize/sizeof(T_HashWordType) };
 	T_HashWordType* StateBuf() {return this->m_state;}
-	FixedSizeAlignedSecBlock<T_HashWordType, T_BlockSize/sizeof(T_HashWordType), T_StateAligned> m_state;
+	FixedSizeAlignedSecBlock<T_HashWordType, Blocks, T_StateAligned> m_state;
 };
 
 #if !defined(__GNUC__) && !defined(__clang__)

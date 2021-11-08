@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        multiplayer_sa/CMultiplayerSA_VehicleDummies.cpp
-*
-*  Multi Theft Auto is available from https://multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_VehicleDummies.cpp
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
+ *****************************************************************************/
 #include "StdInc.h"
 
 static const uint32_t CModelInfo__ms_modelInfoPtrs = 0xA9B0C8;
@@ -344,6 +344,8 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
 //
 // CVehicle::DoVehicleLights
 //
+// Note: _1 is for the light exactly on the dummy position,
+//       _2 is for the light on the mirrored dummy position.
 // Required for: Position for a secondary front light (eVehicleDummies::LIGHT_FRONT_SECONDARY)
 //               The secondary front light only appears if the position is non-zero
 //
@@ -352,11 +354,11 @@ static void _declspec(naked) HOOK_CAutomobile_DoNitroEffect_2()
 // >>> 0x6E1F3C | 8B 40 5C             | mov eax, [eax+5Ch]
 // >>> 0x6E1F3F | 83 C0 18             | add eax, 18h
 //     0x6E1F42 | 8B 08                | mov ecx, [eax]
-#define HOOKPOS_CVehicle_DoVehicleLights               0x6E1F3C
-#define HOOKSIZE_CVehicle_DoVehicleLights              6
-static const DWORD CONTINUE_CVehicle_DoVehicleLights = 0x6E1F42;
+#define HOOKPOS_CVehicle_DoVehicleLights_1               0x6E1F3C
+#define HOOKSIZE_CVehicle_DoVehicleLights_1              6
+static const DWORD CONTINUE_CVehicle_DoVehicleLights_1 = 0x6E1F42;
 
-static void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
+static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_1()
 {
     _asm
     {
@@ -372,13 +374,47 @@ static void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
         popad
         mov     eax, vehicleDummiesPositionArray
         add     eax, 18h
-        jmp     CONTINUE_CVehicle_DoVehicleLights
+        jmp     CONTINUE_CVehicle_DoVehicleLights_1
 
         continueWithOriginalCode:
         popad
         mov     eax, [eax+5Ch]
         add     eax, 18h
-        jmp     CONTINUE_CVehicle_DoVehicleLights
+        jmp     CONTINUE_CVehicle_DoVehicleLights_1
+    }
+}
+
+//     0x6E22C6 | 8B 04 85 C8 B0 A9 00 | mov eax, CModelInfo::ms_modelInfoPtrs
+// >>> 0x6E22CD | 8B 48 5C             | mov ecx, [eax+5Ch]
+// >>> 0x6E22D0 | 83 C1 18             | add ecx, 18h
+//     0x6E22D3 | 8B 11                | mov edx, [ecx]
+#define HOOKPOS_CVehicle_DoVehicleLights_2               0x6E22CD
+#define HOOKSIZE_CVehicle_DoVehicleLights_2              6
+static const DWORD CONTINUE_CVehicle_DoVehicleLights_2 = 0x6E22D3;
+
+static void _declspec(naked) HOOK_CVehicle_DoVehicleLights_2()
+{
+    _asm
+    {
+        pushad
+        push    esi            // CVehicleSAInterface*
+        call    UpdateVehicleDummiesPositionArray
+        add     esp, 4
+
+        mov     eax, vehicleDummiesPositionArray
+        test    eax, eax
+        jz      continueWithOriginalCode
+
+        popad
+        mov     ecx, vehicleDummiesPositionArray
+        add     ecx, 18h
+        jmp     CONTINUE_CVehicle_DoVehicleLights_2
+
+        continueWithOriginalCode:
+        popad
+        mov     ecx, [eax+5Ch]
+        add     ecx, 18h
+        jmp     CONTINUE_CVehicle_DoVehicleLights_2
     }
 }
 
@@ -1098,7 +1134,8 @@ static void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_VehicleDummies()
 {
-    EZHookInstall(CVehicle_DoVehicleLights);
+    EZHookInstall(CVehicle_DoVehicleLights_1);
+    EZHookInstall(CVehicle_DoVehicleLights_2);
     EZHookInstall(CVehicle_DoHeadLightBeam);
     EZHookInstall(CVehicle_DoHeadLightEffect);
     EZHookInstall(CVehicle_DoTailLightEffect);

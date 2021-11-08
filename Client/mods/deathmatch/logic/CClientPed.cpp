@@ -300,6 +300,7 @@ CClientPed::~CClientPed()
         m_pClothes->DefaultClothes(true);
         SetCanBeKnockedOffBike(true);
         SetHeadless(false);
+        SetBleeding(false);
     }
     else
     {
@@ -1112,8 +1113,8 @@ CClientVehicle* CClientPed::GetRealOccupiedVehicle()
 }
 
 CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
-                                                     bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition,
-                                                     float fWithinRange)
+                                                       bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition,
+                                                       float fWithinRange)
 {
     if (bGetPositionFromClosestDoor)
     {
@@ -1423,6 +1424,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
         }
     }
 
+    CClientVehicle* pPrevVehicle = GetRealOccupiedVehicle();
     // Eventually remove us from a previous vehicle
     RemoveFromVehicle();
     // m_uiOccupyingSeat = uiSeat;
@@ -1460,7 +1462,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
             }
 
             // Make sure our camera is fixed on the new vehicle
-            if (m_bIsLocalPlayer)
+            if (m_bIsLocalPlayer && pPrevVehicle && m_pManager->GetCamera()->GetTargetEntity() == pPrevVehicle)
                 m_pManager->GetCamera()->SetTargetEntity(pVehicle);
         }
 
@@ -1506,7 +1508,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
                     }
 
                     // Make sure our camera is fixed on the new vehicle
-                    if (m_bIsLocalPlayer)
+                    if (m_bIsLocalPlayer && pPrevVehicle && m_pManager->GetCamera()->GetTargetEntity() == pPrevVehicle)
                         m_pManager->GetCamera()->SetTargetEntity(pVehicle);
                 }
             }
@@ -1586,7 +1588,8 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
             if (pVehicle != m_pOccupyingVehicle && pVehicle->GetOccupant())
             {
                 // Local player left vehicle or got abandoned by remote driver
-                if ((m_bIsLocalPlayer || (m_uiOccupiedVehicleSeat == 0 && (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle))))
+                if ((m_bIsLocalPlayer ||
+                     (m_uiOccupiedVehicleSeat == 0 && (g_pClientGame->GetLocalPlayer() && g_pClientGame->GetLocalPlayer()->GetOccupiedVehicle() == pVehicle))))
                 {
                     // Tell vehicle audio the driver left
                     pGameVehicle->GetVehicleAudioEntity()->JustGotOutOfVehicleAsDriver();
@@ -2587,7 +2590,8 @@ void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimD
     }
 }
 
-void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim)
+void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp,
+                                    eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2606,8 +2610,8 @@ void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX,
     }
 }
 
-void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
-                               CVector* pSource, bool bInterpolateAim)
+void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
+                               eVehicleAimDirection cInVehicleAimAnim, CVector* pSource, bool bInterpolateAim)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -2854,8 +2858,8 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                 // Copy our name incase it gets deleted
                 SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
-                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
+                                  m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
         }
 
@@ -3051,7 +3055,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     }
 
     // If we started crouching less than some time ago, make sure we can't jump or sprint.
-    // This fixes the exploit both locally and remotly that enables players to abort
+    // This fixes the exploit both locally and remotely that enables players to abort
     // the crouching animation and shoot quickly with slow shooting weapons. Also fixes
     // the exploit making you able to get crouched without being able to move and shoot
     // with infinite ammo for remote players.
@@ -3124,7 +3128,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         {
             // Don't allow the aiming key (RightShoulder1)
             // This fixes bug allowing you to run around in aim mode while
-            // entering a vehicle both locally and remotly.
+            // entering a vehicle both locally and remotely.
             Current.RightShoulder1 = 0;
         }
     }
@@ -3674,6 +3678,7 @@ void CClientPed::_CreateModel()
         SetHeadless(m_bHeadless);
         SetOnFire(m_bIsOnFire);
         SetSpeechEnabled(m_bSpeechEnabled);
+        SetBleeding(m_bBleeding);
 
         // Rebuild the player if it's CJ. So we get the clothes.
         RebuildModel();
@@ -3701,8 +3706,8 @@ void CClientPed::_CreateModel()
             // Copy our anim name incase it gets deleted
             SString strAnimName = m_AnimationCache.strName;
             // Run our animation
-            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
-                m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+            RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
+                              m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
         }
 
         // Set the voice that corresponds to our model
@@ -3994,8 +3999,8 @@ void CClientPed::_ChangeModel()
                 // Copy our anim name incase it gets deleted
                 SString strAnimName = m_AnimationCache.strName;
                 // Run our animation
-                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop, m_AnimationCache.bUpdatePosition,
-                    m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+                RunNamedAnimation(m_pAnimationBlock, strAnimName, m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
+                                  m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
             }
 
             // Set the voice that corresponds to the new model
@@ -6212,10 +6217,10 @@ void CClientPed::RestoreAllAnimations()
         auto pAnimAssociation = pAnimationManager->RpAnimBlendClumpGetFirstAssociation(pClump);
         while (pAnimAssociation)
         {
-            auto pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
-            auto pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
-            eAnimGroup  iGroupID = pAnimAssociation->GetAnimGroup();
-            eAnimID iAnimID = pAnimAssociation->GetAnimID();
+            auto       pAnimNextAssociation = pAnimationManager->RpAnimBlendGetNextAssociation(pAnimAssociation);
+            auto       pAnimHierarchy = pAnimAssociation->GetAnimHierarchy();
+            eAnimGroup iGroupID = pAnimAssociation->GetAnimGroup();
+            eAnimID    iAnimID = pAnimAssociation->GetAnimID();
             if (pAnimHierarchy && iGroupID >= eAnimGroup::ANIM_GROUP_DEFAULT && iAnimID >= eAnimID::ANIM_ID_WALK)
             {
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
@@ -6523,11 +6528,12 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     // If the Jump task is playing and we are in water - I know right
     // Kill the task.
     CTask* pTask = GetCurrentPrimaryTask();
-    if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)  // Kill jump task - breaks warp in entry and doesn't really matter
+    if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)            // Kill jump task - breaks warp in entry and doesn't really matter
     {
-        if (pVehicle->IsInWater() || IsInWater())            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+        if (pVehicle->IsInWater() ||
+            IsInWater())            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
         {
-            KillTask(3, true);                               // Kill jump task if we are about to warp in
+            KillTask(3, true);            // Kill jump task if we are about to warp in
         }
     }
 

@@ -43,8 +43,8 @@
 // our stuff
 VOID           InitShotsyncHooks();
 CShotSyncData* GetLocalPedShotSyncData();
-VOID           WriteGunDirectionDataForPed(class CPedSAInterface* pPedInterface, float* fGunDirectionX, float* fGunDirectionY, eVehicleAimDirection* cGunDirection);
-bool           IsLocalPlayer(CPedSAInterface* pPedInterface);
+VOID WriteGunDirectionDataForPed(class CPedSAInterface* pPedInterface, float* fGunDirectionX, float* fGunDirectionY, eVehicleAimDirection* cGunDirection);
+bool IsLocalPlayer(CPedSAInterface* pPedInterface);
 
 // hooks
 VOID HOOK_CWeapon__Fire();

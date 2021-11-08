@@ -512,17 +512,16 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pPedManager = new CPedManager;
     m_pWaterManager = new CWaterManager;
     m_pScriptDebugging = new CScriptDebugging();
-    m_pMapManager = new CMapManager(m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager,
-                                    m_pVehicleManager, m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pGroups,
-                                    &m_Events, m_pScriptDebugging, &m_ElementDeleter);
+    m_pMapManager =
+        new CMapManager(m_pBlipManager, m_pObjectManager, m_pPickupManager, m_pPlayerManager, m_pRadarAreaManager, m_pMarkerManager, m_pVehicleManager,
+                        m_pTeamManager, m_pPedManager, m_pColManager, m_pWaterManager, m_pClock, m_pGroups, &m_Events, m_pScriptDebugging, &m_ElementDeleter);
     m_pACLManager = new CAccessControlListManager;
     m_pHqComms = new CHqComms;
 
     m_pRegisteredCommands = new CRegisteredCommands(m_pACLManager);
     m_pLuaManager = new CLuaManager(m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pRegisteredCommands,
                                     m_pMapManager, &m_Events);
-    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager,
-                              m_pBanManager, m_pACLManager);
+    m_pConsole = new CConsole(m_pBlipManager, m_pMapManager, m_pPlayerManager, m_pRegisteredCommands, m_pVehicleManager, m_pBanManager, m_pACLManager);
     m_pMainConfig = new CMainConfig(m_pConsole);
     m_pRPCFunctions = new CRPCFunctions;
 
@@ -1205,6 +1204,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PLAYER_RESOURCE_START:
+        {
+            Packet_PlayerResourceStart(static_cast<CPlayerResourceStartPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1523,6 +1528,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
+    m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1752,8 +1758,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                             {
                                 // Tell the console
-                                CLogger::LogPrintf("CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick,
-                                                    strIPAndSerial.c_str());
+                                CLogger::LogPrintf("CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str());
 
                                 // Tell the player
                                 pPlayer->Send(CUpdateInfoPacket("Mandatory", CalculateMinClientRequirement()));
@@ -1767,7 +1772,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             {
                                 // Tell the console
                                 CLogger::LogPrintf("CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick,
-                                                    strIPAndSerial.c_str());
+                                                   strIPAndSerial.c_str());
 
                                 // Tell the player
                                 pPlayer->Send(CUpdateInfoPacket("Optional", GetConfig()->GetRecommendedClientVersion()));
@@ -1803,7 +1808,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
 
                                 // Tell the console
                                 CLogger::LogPrintf("CONNECT: %s failed to connect (IP is banned%s) (%s)\n", szNick, strBanMessage.c_str(),
-                                                    strIPAndSerial.c_str());
+                                                   strIPAndSerial.c_str());
 
                                 // Tell the player he's banned
                                 DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::BANNED_IP, Duration, pBan->GetReason().c_str());
@@ -2326,9 +2331,6 @@ void CGame::Packet_VehiclePuresync(CVehiclePuresyncPacket& Packet)
             // Increment counter to spread out damage info sends
             pVehicle->m_uiDamageInfoSendPhase++;
 
-            // Increment counter to spread out damage info sends
-            pVehicle->m_uiDamageInfoSendPhase++;
-
             CLOCK("VehiclePuresync", "RelayPlayerPuresync");
             // Relay to other players
             RelayPlayerPuresync(Packet);
@@ -2491,7 +2493,7 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 pElement->CallEvent(szName, *pArguments, pCaller);
             }
             else
-                m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not marked as remotly triggerable",
+                m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not marked as remotely triggerable",
                                              pCaller->GetNick(), szName);
         }
         else
@@ -2740,9 +2742,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
             CElement* pPedElement = CElementIDs::GetElement(PedID);
             if (pPedElement && IS_PED(pPedElement))
             {
-                CPed* pPed = static_cast<CPed*>(pPedElement);
-                bool  bValidPed = false;
-                bool  bValidVehicle = false;
+                CPed*     pPed = static_cast<CPed*>(pPedElement);
+                bool      bValidPed = false;
+                bool      bValidVehicle = false;
                 CSendList sendListIncompatiblePlayers;
 
                 // Grab the vehicle with the chosen ID
@@ -2834,7 +2836,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                     }
                 }
 
-                // Check we have a valid ped & he is spawned
+                // Check we have a valid ped
                 if (bValidPed)
                 {
                     // Handle it depending on the action
@@ -2857,6 +2859,14 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 FAIL_TRAILER,
                             } failReason = FAIL_INVALID;
 
+                            // Is he spawned? (Fix for #2335)
+                            if (!pPed->IsSpawned())
+                            {
+                                CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
+                                pPlayer->Send(Reply);
+                                break;
+                            }
+
                             // Is this vehicle enterable? (not a trailer)
                             unsigned short usVehicleModel = pVehicle->GetModel();
                             if (!CVehicleManager::IsTrailer(usVehicleModel))
@@ -2872,7 +2882,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         // Jax: is he in water and trying to get in a floating vehicle
                                         // Cazomino05: changed to check if the vehicle is in water not player
                                         if ((pPed->IsInWater() || Packet.GetOnWater()) && (usVehicleModel == VT_SKIMMER || usVehicleModel == VT_SEASPAR ||
-                                                                                            usVehicleModel == VT_LEVIATHN || usVehicleModel == VT_VORTEX))
+                                                                                           usVehicleModel == VT_LEVIATHN || usVehicleModel == VT_VORTEX))
                                         {
                                             fCutoffDistance = 10.0f;
                                             bWarpIn = true;
@@ -3010,7 +3020,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                                 CLuaArguments ExitArguments;
                                                                 ExitArguments.PushElement(pOccupant);            // player / ped
                                                                 ExitArguments.PushNumber(ucSeat);                // seat
-                                                                ExitArguments.PushElement(pPed);              // jacker
+                                                                ExitArguments.PushElement(pPed);                 // jacker
                                                                 if (pVehicle->CallEvent("onVehicleStartExit", ExitArguments))
                                                                 {
                                                                     // HACK?: check the player's vehicle-action is still the same (not warped out?)
@@ -3212,7 +3222,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     {
                                         CBitStream BitStream;
                                         BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
-                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream),
+                                                                    sendListIncompatiblePlayers);
                                     }
                                 }
                             }
@@ -3296,7 +3307,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         // Warp the ped out of the vehicle manually for incompatible players
                                         CBitStream BitStream;
                                         BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
-                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream),
+                                                                    sendListIncompatiblePlayers);
                                     }
 
                                     // Call the ped->vehicle event
@@ -3482,14 +3494,15 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 }
 
                                 if (!sendListIncompatiblePlayers.empty())
-                                    {
-                                        // Warp the ped into the vehicle manually for incompatible players
-                                        CBitStream BitStream;
-                                        BitStream.pBitStream->Write(pVehicle->GetID());
-                                        BitStream.pBitStream->Write((unsigned char)0);
-                                        BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
-                                        m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
-                                    }
+                                {
+                                    // Warp the ped into the vehicle manually for incompatible players
+                                    CBitStream BitStream;
+                                    BitStream.pBitStream->Write(pVehicle->GetID());
+                                    BitStream.pBitStream->Write((unsigned char)0);
+                                    BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
+                                    m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream),
+                                                                sendListIncompatiblePlayers);
+                                }
                             }
 
                             break;
@@ -3539,7 +3552,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                             // Warp the ped out of the vehicle manually for incompatible players
                                             CBitStream BitStream;
                                             BitStream.pBitStream->Write(pJacked->GetSyncTimeContext());
-                                            m_pPlayerManager->Broadcast(CElementRPCPacket(pJacked, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream), sendListIncompatiblePlayers);
+                                            m_pPlayerManager->Broadcast(CElementRPCPacket(pJacked, REMOVE_PED_FROM_VEHICLE, *BitStream.pBitStream),
+                                                                        sendListIncompatiblePlayers);
                                         }
                                     }
                                     pJacked->SetVehicleAction(CPed::VEHICLEACTION_NONE);
@@ -3839,7 +3853,7 @@ void CGame::Packet_CameraSync(CCameraSyncPacket& Packet)
         }
         else
         {
-            CPlayer* pTarget = GetElementFromId<CPlayer>(Packet.m_TargetID);
+            CElement* pTarget = GetElementFromId<CElement>(Packet.m_TargetID);
             if (!pTarget)
                 pTarget = pPlayer;
 
@@ -4001,6 +4015,21 @@ void CGame::Packet_DiscordJoin(CDiscordJoinPacket& Packet)
         Arguments.PushBoolean(false);
         Arguments.PushString(Packet.GetSecret());
         pPlayer->CallEvent("onPlayerDiscordJoin", Arguments, NULL);
+    }
+}
+
+void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (pPlayer)
+    {
+        CResource* pResource = Packet.GetResource();
+        if (pResource)
+        {
+            CLuaArguments Arguments;
+            Arguments.PushResource(pResource);
+            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
+        }
     }
 }
 

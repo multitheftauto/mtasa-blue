@@ -8,7 +8,7 @@
  *
  *****************************************************************************/
 #pragma once
-#include <cef3/include/cef_v8.h>
+#include <cef3/cef/include/cef_v8.h>
 #include <SString.h>
 
 bool isKeyDown(WPARAM wParam)

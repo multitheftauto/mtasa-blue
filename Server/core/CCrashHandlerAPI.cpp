@@ -121,7 +121,6 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
     return (TRUE);
 }
 
-
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
 {
     LONG lRet = EXCEPTION_CONTINUE_SEARCH;

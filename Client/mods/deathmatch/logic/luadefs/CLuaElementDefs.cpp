@@ -954,30 +954,31 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
-    std::optional<unsigned short> interior, std::optional<unsigned short> dimension)
+CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
+                                                            std::optional<unsigned short> dimension)
 {
-    const auto typeHash = (type.has_value() && !type.value().empty()) ?
-        CClientEntity::GetTypeHashFromString(type.value()) : 0;
+    const auto typeHash = (type.has_value() && !type.value().empty()) ? CClientEntity::GetTypeHashFromString(type.value()) : 0;
 
     CClientEntityResult result;
-    GetClientSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
+    GetClientSpatialDatabase()->SphereQuery(result, CSphere{pos, radius});
 
     // Remove elements that do not match the criterias
-    if (interior || dimension || typeHash) {
-        result.erase(std::remove_if(result.begin(), result.end(), [&](CElement* pElement) {
-            if (typeHash && typeHash != pElement->GetTypeHash())
-                return true;
+    if (interior || dimension || typeHash)
+    {
+        result.erase(std::remove_if(result.begin(), result.end(),
+                                    [&](CElement* pElement) {
+                                        if (typeHash && typeHash != pElement->GetTypeHash())
+                                            return true;
 
-            if (interior.has_value() && interior != pElement->GetInterior())
-                return true;
+                                        if (interior.has_value() && interior != pElement->GetInterior())
+                                            return true;
 
-            if (dimension.has_value() && dimension != pElement->GetDimension())
-                return true;
+                                        if (dimension.has_value() && dimension != pElement->GetDimension())
+                                            return true;
 
-            return pElement->IsBeingDeleted();
-            }), result.end()
-        );
+                                        return pElement->IsBeingDeleted();
+                                    }),
+                     result.end());
     }
 
     return result;

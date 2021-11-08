@@ -93,7 +93,7 @@ bool CAntiCheat::PerformChecks()
 // Turn optimizations back on if enabled in project settings
 #pragma optimize("", on)
 
-SString CAntiCheat::GetInfo(const SString &acInfo, const SString &sdInfo)
+SString CAntiCheat::GetInfo(const SString& acInfo, const SString& sdInfo)
 {
     if (acInfo.empty())
         return "[Undisclosed]";
