@@ -1,21 +1,21 @@
-/* Copyright (C) 2002-2006 Jean-Marc Valin 
+/* Copyright (C) 2002-2006 Jean-Marc Valin
    File: cb_search.c
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -60,7 +60,7 @@ static void compute_weighted_codebook(const signed char *shape_cb, const spx_wor
    for (i=0;i<shape_cb_size;i++)
    {
       spx_word16_t *res;
-      
+
       res = resp+i*subvect_size;
       for (k=0;k<subvect_size;k++)
          shape[k] = (spx_word16_t)shape_cb[i*subvect_size+k];
@@ -131,7 +131,7 @@ int   update_target
    int best_index;
    spx_word32_t best_dist;
    int have_sign;
-   
+
    params = (const split_cb_params *) par;
    subvect_size = params->subvect_size;
    nb_subvect = params->nb_subvect;
@@ -148,7 +148,7 @@ int   update_target
 #endif
    ALLOC(t, nsf, spx_word16_t);
    ALLOC(e, nsf, spx_sig_t);
-   
+
    /* FIXME: Do we still need to copy the target? */
    SPEEX_COPY(t, target, nsf);
 
@@ -164,9 +164,9 @@ int   update_target
       else
 #endif /* DISABLE_WIDEBAND */
          vq_nbest(x, resp2, subvect_size, shape_cb_size, E, 1, &best_index, &best_dist, stack);
-      
+
       speex_bits_pack(bits,best_index,params->shape_bits+have_sign);
-      
+
       {
          int rind;
          spx_word16_t *res;
@@ -198,9 +198,9 @@ int   update_target
          for (j=0;j<subvect_size;j++)
             e[subvect_size*i+j]=sign*0.03125*shape_cb[rind*subvect_size+j];
 #endif
-      
+
       }
-            
+
       for (m=0;m<subvect_size;m++)
       {
          spx_word16_t g;
@@ -212,7 +212,7 @@ int   update_target
             sign=-1;
             rind-=shape_cb_size;
          }
-         
+
          q=subvect_size-m;
 #ifdef FIXED_POINT
          g=sign*shape_cb[rind*subvect_size+m];
@@ -227,7 +227,7 @@ int   update_target
    /* FIXME: We could update the excitation directly above */
    for (j=0;j<nsf;j++)
       exc[j]=ADD32(exc[j],e[j]);
-   
+
    /* Update target: only update target if necessary */
    if (update_target)
    {
@@ -338,14 +338,14 @@ int   update_target
    ALLOC(best_ntarget, N, int);
    ALLOC(ndist, N, spx_word32_t);
    ALLOC(odist, N, spx_word32_t);
-   
+
    ALLOC(itmp, 2*N*nb_subvect, int);
    for (i=0;i<N;i++)
    {
       nind[i]=itmp+2*i*nb_subvect;
       oind[i]=itmp+(2*i+1)*nb_subvect;
    }
-   
+
    SPEEX_COPY(t, target, nsf);
 
    for (j=0;j<N;j++)
@@ -356,14 +356,14 @@ int   update_target
 
    for (j=0;j<N;j++)
       odist[j]=0;
-   
+
    /*For all subvectors*/
    for (i=0;i<nb_subvect;i++)
    {
       /*"erase" nbest list*/
       for (j=0;j<N;j++)
          ndist[j]=VERY_LARGE32;
-      /* This is not strictly necessary, but it provides an additonal safety 
+      /* This is not strictly necessary, but it provides an additonal safety
          to prevent crashes in case something goes wrong in the previous
          steps (e.g. NaNs) */
       for (j=0;j<N;j++)
@@ -393,7 +393,7 @@ int   update_target
          {
             /* Compute total distance (including previous sub-vectors */
             spx_word32_t err = ADD32(ADD32(odist[j],best_dist[k]),tener);
-            
+
             /*update n-best list*/
             if (err<ndist[N-1])
             {
@@ -424,7 +424,7 @@ int   update_target
          /*previous target (we don't care what happened before*/
          for (m=(i+1)*subvect_size;m<nsf;m++)
             nt[j][m]=ot[best_ntarget[j]][m];
-         
+
          /* New code: update the rest of the target only if it's worth it */
          for (m=0;m<subvect_size;m++)
          {
@@ -473,7 +473,7 @@ int   update_target
       ind[i]=nind[0][i];
       speex_bits_pack(bits,ind[i],params->shape_bits+have_sign);
    }
-   
+
    /* Put everything back together */
    for (i=0;i<nb_subvect;i++)
    {
@@ -498,11 +498,11 @@ int   update_target
       for (j=0;j<subvect_size;j++)
          e[subvect_size*i+j]=sign*0.03125*shape_cb[rind*subvect_size+j];
 #endif
-   }   
+   }
    /* Update excitation */
    for (j=0;j<nsf;j++)
       exc[j]=ADD32(exc[j],e[j]);
-   
+
    /* Update target: only update target if necessary */
    if (update_target)
    {
@@ -531,14 +531,14 @@ spx_int32_t *seed
    VARDECL(int *ind);
    VARDECL(int *signs);
    const signed char *shape_cb;
-   int shape_cb_size, subvect_size, nb_subvect;
+   int subvect_size, nb_subvect;
    const split_cb_params *params;
    int have_sign;
 
    params = (const split_cb_params *) par;
    subvect_size = params->subvect_size;
    nb_subvect = params->nb_subvect;
-   shape_cb_size = 1<<params->shape_bits;
+
    shape_cb = params->shape_cb;
    have_sign = params->have_sign;
 
@@ -571,7 +571,7 @@ spx_int32_t *seed
       }
 #else
       for (j=0;j<subvect_size;j++)
-         exc[subvect_size*i+j]+=s*0.03125*shape_cb[ind[i]*subvect_size+j];      
+         exc[subvect_size*i+j]+=s*0.03125*shape_cb[ind[i]*subvect_size+j];
 #endif
    }
 }
