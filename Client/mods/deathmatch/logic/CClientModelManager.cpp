@@ -49,7 +49,9 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     int modelId = pModel->GetModelID();
     if (m_Models[modelId] != nullptr)
     {
-        m_Models[modelId]->RestoreEntitiesUsingThisModel();
+        if (g_pGame->GetModelInfo(modelId))
+            m_Models[modelId]->RestoreEntitiesUsingThisModel();
+
         m_Models[modelId] = nullptr;
         m_modelCount--;
         return true;
