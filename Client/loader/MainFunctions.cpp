@@ -840,6 +840,7 @@ void CheckDataFiles()
                               {"6BD691BB8E37DDCF1E2F620673442667", "bassmidi.dll"},
                               {"444B4B36442ABA15F72E2B20A34B24EE", "bassmix.dll"},
                               {"26C74F5E9DF6C59DED3B09335E5D82AD", "bassopus.dll"},
+                              {"1A78628A8AB4B8DB0E336610A3ACF153", "basswebm.dll"},
                               {"476BDA1EE12C760A29E4EE43F593F878", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
                               {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
