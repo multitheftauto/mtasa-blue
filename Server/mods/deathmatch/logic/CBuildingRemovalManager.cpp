@@ -73,13 +73,7 @@ void CBuildingRemovalManager::RestoreWorldModel(unsigned short usModel, float fR
         if (pFind)
         {
             const CVector& vecRemovalPos = pFind->GetPosition();
-            // Grab distances across each axis
-            float fDistanceX = vecPos.fX - vecRemovalPos.fX;
-            float fDistanceY = vecPos.fY - vecRemovalPos.fY;
-            float fDistanceZ = vecPos.fZ - vecRemovalPos.fZ;
-
-            // Square root 'em
-            float fDistance = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
+            float fDistance = (vecPos - vecRemovalPos).Length();
 
             if (fDistance <= pFind->GetRadius() && (cInterior == -1 || pFind->GetInterior() == cInterior))
             {
