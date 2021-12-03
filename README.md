@@ -37,7 +37,7 @@ If not using Visual Studio 2017, download and install the [EditorConfig](https:/
 #### Windows
 
 Prerequisites
-- [Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 - [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
 - [Git for Windows](https://git-scm.com/download/win) (Optional)
 
