@@ -135,7 +135,7 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
             pEntity->AddCollision(pShape);
 
             // Can we call the event?
-            if (pShape->GetAutoCallEvent())
+            if (pShape->GetAutoCallEvent() && !pEntity->IsBeingDeleted())
             {
                 // Call the event
                 CLuaArguments Arguments;
@@ -162,16 +162,20 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
             pShape->RemoveCollider(pEntity);
             pEntity->RemoveCollision(pShape);
 
-            // Call the event
-            CLuaArguments Arguments;
-            Arguments.PushElement(pEntity);
-            Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pShape->CallEvent("onColShapeLeave", Arguments);
+            // Can we call the event?
+            if(!pEntity->IsBeingDeleted())
+            {
+                // Call the event
+                CLuaArguments Arguments;
+                Arguments.PushElement(pEntity);
+                Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                pShape->CallEvent("onColShapeLeave", Arguments);
 
-            CLuaArguments Arguments2;
-            Arguments2.PushElement(pShape);
-            Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pEntity->CallEvent("onElementColShapeLeave", Arguments2);
+                CLuaArguments Arguments2;
+                Arguments2.PushElement(pShape);
+                Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                pEntity->CallEvent("onElementColShapeLeave", Arguments2);
+            }
 
             pShape->CallLeaveCallback(*pEntity);
         }
