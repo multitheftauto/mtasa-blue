@@ -702,7 +702,7 @@ int CLuaGUIDefs::GUICreateWindow(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(titleBarText);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -736,7 +736,7 @@ int CLuaGUIDefs::GUICreateLabel(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -771,7 +771,7 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(path);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -823,7 +823,7 @@ int CLuaGUIDefs::GUICreateButton(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -856,7 +856,7 @@ int CLuaGUIDefs::GUICreateProgressBar(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -893,7 +893,7 @@ int CLuaGUIDefs::GUICreateCheckBox(lua_State* luaVM)
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
     argStream.ReadBool(selected);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -928,7 +928,7 @@ int CLuaGUIDefs::GUICreateRadioButton(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -963,7 +963,7 @@ int CLuaGUIDefs::GUICreateEdit(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -998,7 +998,7 @@ int CLuaGUIDefs::GUICreateMemo(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1031,7 +1031,7 @@ int CLuaGUIDefs::GUICreateGridList(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1064,7 +1064,7 @@ int CLuaGUIDefs::GUICreateScrollPane(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1099,7 +1099,7 @@ int CLuaGUIDefs::GUICreateScrollBar(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadBool(horizontal);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1132,7 +1132,7 @@ int CLuaGUIDefs::GUICreateTabPanel(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1754,7 +1754,7 @@ int CLuaGUIDefs::GUIGetSize(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(theElement);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -1790,7 +1790,7 @@ int CLuaGUIDefs::GUIGetPosition(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(guiElement);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2080,7 +2080,7 @@ int CLuaGUIDefs::GUISetSize(lua_State* luaVM)
     argStream.ReadUserData(guiElement);
     argStream.ReadNumber(width);
     argStream.ReadNumber(height);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2108,7 +2108,7 @@ int CLuaGUIDefs::GUISetPosition(lua_State* luaVM)
     argStream.ReadUserData(guiElement);
     argStream.ReadNumber(x);
     argStream.ReadNumber(y);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2230,7 +2230,7 @@ int CLuaGUIDefs::GUIGridListSetColumnWidth(lua_State* luaVM)
     argStream.ReadUserData<CGUIGridList>(guiGridlist);
     argStream.ReadNumber(columnIndex);
     argStream.ReadNumber(width);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2256,7 +2256,7 @@ int CLuaGUIDefs::GUIGridListGetColumnWidth(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIGridList>(pGridList);
     argStream.ReadNumber(columnIndex);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -3755,7 +3755,7 @@ int CLuaGUIDefs::GUICreateComboBox(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(caption);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
