@@ -40,6 +40,10 @@ bool CWebDevTools::Close(CWebView* pWebView)
     if (!browser)
         return false;
 
-    browser.get()->GetHost()->CloseDevTools();
+    auto host = browser.get()->GetHost();
+
+    if (host)
+        host->CloseDevTools();
+
     return true;
 }

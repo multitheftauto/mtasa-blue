@@ -79,8 +79,13 @@ void CWebView::CloseBrowser()
     // Make sure we don't dead lock the CEF render thread
     m_RenderData.cv.notify_all();
 
-    if (m_pWebView)
-        m_pWebView.get()->GetHost()->CloseBrowser(true);
+    if (!m_pWebView)
+        return;
+
+    auto host = m_pWebView.get()->GetHost();
+
+    if (host)
+        host->CloseBrowser(true);
 }
 
 bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded)
@@ -969,6 +974,8 @@ bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
                              bool* no_javascript_access)
 {
     // ATTENTION: This method is called on the IO thread
+    if (!frame)
+        return true; // block it
 
     // Trigger the popup/new tab event
     SString strTagetURL = UTF16ToMbUTF8(target_url);

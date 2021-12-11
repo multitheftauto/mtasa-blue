@@ -482,7 +482,13 @@ void CWebCore::OnPostScreenshot()
         auto browser = pWebView->GetCefBrowser();
 
         if (browser)
-            browser.get()->GetHost()->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
+        {
+            auto host = browser.get()->GetHost();
+
+            if (host)
+                host->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
+        }
+            
     }
 }
 
