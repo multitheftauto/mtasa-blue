@@ -63,8 +63,8 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
     if (!m_bHasData)
     {
         bytes_read = 0;
-        m_callback = callback.get();
-        callback->Continue();
+        m_callback = callback;
+        callback.get()->Continue();
         return true;
     }
 
