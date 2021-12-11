@@ -116,7 +116,16 @@ public:
             return;
 
         CefRefPtr<CefProcessMessage> message = V8Helpers::SerialiseV8Arguments("TriggerLuaEvent", arguments);
-        frame.get()->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
+
+        auto browser = frame.get()->GetBrowser();
+
+        if (!browser)
+            return;
+
+        auto mainFrame = browser->GetMainFrame();
+
+        if (mainFrame)
+            mainFrame.get()->SendProcessMessage(PID_BROWSER, message);
     }
 
 public:
