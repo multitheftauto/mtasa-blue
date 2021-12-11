@@ -20,7 +20,7 @@ bool CWebDevTools::Show(CWebView* pWebView)
     CefBrowserSettings settings;
 
     CefWindowInfo windowInfo;
-    windowInfo.SetAsPopup(NULL, "CEF Dev Tools (MTA:SA)");
+    windowInfo.SetAsPopup(nullptr, "CEF Dev Tools (MTA:SA)");
 
     // Create independent CefClient (to bypass access restrictions)
     CefRefPtr<CefClient> client{new CDevToolsClient};
