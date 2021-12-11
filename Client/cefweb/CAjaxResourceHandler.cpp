@@ -33,7 +33,7 @@ void CAjaxResourceHandler::SetResponse(const SString& data)
     m_strResponse = data;
     m_bHasData = true;
 
-    if (m_callback && m_callback.get())
+    if (m_callback)
         m_callback.get()->Continue();
 }
 
@@ -44,16 +44,17 @@ void CAjaxResourceHandler::Cancel()
 
 void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl)
 {
-    response->SetStatus(200);
-    response->SetStatusText("OK");
-    response->SetMimeType(m_strMime);
+    CefResponse* pResponse = response.get();
+    pResponse->SetStatus(200);
+    pResponse->SetStatusText("OK");
+    pResponse->SetMimeType(m_strMime);
     response_length = -1;
 }
 
 bool CAjaxResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
 {
     // Since we have nothing to process yet, continue
-    callback->Continue();
+    callback.get()->Continue();
     return true;
 }
 
@@ -65,8 +66,8 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
         bytes_read = 0;
         m_callback = callback;
 
-        if (callback.get())
-            callback.get()->Continue();
+        if (m_callback)
+            m_callback.get()->Continue();
 
         return true;
     }

@@ -105,14 +105,18 @@ CWebViewInterface* CWebCore::CreateWebView(unsigned int uiWidth, unsigned int ui
 
 void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
 {
-    CefRefPtr<CWebView> pWebView = dynamic_cast<CWebView*>(pWebViewInterface);
-    if (pWebView)
-    {
-        // Ensure that no attached events or tasks are in the queue
-        RemoveWebViewEvents(pWebView.get());
-        RemoveWebViewTasks(pWebView.get());
+    CefRefPtr<CWebView> webView = dynamic_cast<CWebView*>(pWebViewInterface);
 
-        m_WebViews.remove(pWebView);
+    if (webView)
+    {
+        CWebView* pWebView = webView.get();
+
+        // Ensure that no attached events or tasks are in the queue
+        RemoveWebViewEvents(pWebView);
+        RemoveWebViewTasks(pWebView);
+
+        m_WebViews.remove(webView);
+
         // pWebView->Release(); // Do not release since other references get corrupted then
         pWebView->CloseBrowser();
     }
@@ -135,19 +139,20 @@ CWebView* CWebCore::FindWebView(CefRefPtr<CefBrowser> browser)
     if (!browser)
         return nullptr;
 
-    for (auto pWebView : m_WebViews)
+    for (auto webView : m_WebViews)
     {
-        if (!pWebView)
+        if (!webView)
             continue;
 
-        CefRefPtr<CefBrowser> pBrowser = pWebView->GetCefBrowser();
+        CWebView*   pWebView = webView.get();
+        auto        thisBrowser = pWebView->GetCefBrowser();
 
-        if (!pBrowser)
+        if (!thisBrowser)
             continue;
 
         // CefBrowser objects are not unique
-        if (pBrowser->GetIdentifier() == browser->GetIdentifier())
-            return pWebView.get();
+        if (thisBrowser.get()->GetIdentifier() == browser.get()->GetIdentifier())
+            return pWebView;
     }
 
     return nullptr;
@@ -474,7 +479,10 @@ void CWebCore::OnPostScreenshot()
     // Re-draw textures
     for (auto& pWebView : m_WebViews)
     {
-        pWebView->GetCefBrowser()->GetHost()->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
+        auto browser = pWebView->GetCefBrowser();
+
+        if (browser)
+            browser.get()->GetHost()->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
     }
 }
 

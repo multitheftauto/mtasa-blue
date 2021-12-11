@@ -22,6 +22,8 @@ public:
     // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnFocusedNodeChanged(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefDOMNode%3E)
     virtual void OnFocusedNodeChanged(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefDOMNode> node) override
     {
+        CefBrowser* pBrowser = browser.get();
+
         if (m_bHasInputFocus)
         {
             if (node)
@@ -29,26 +31,50 @@ public:
 
             // Tell MTA that we lost input focus
             auto message = CefProcessMessage::Create("InputFocus");
-            message->GetArgumentList()->SetBool(0, false);
-            browser->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
 
-            // Set variable to ensure that the event does not trigger twice
-            m_bHasInputFocus = false;
-            return;
+            if (message)
+            {
+                message.get()->GetArgumentList()->SetBool(0, false);
+
+                auto mainFrame = pBrowser->GetMainFrame();
+
+                if (mainFrame)
+                    mainFrame.get()->SendProcessMessage(PID_BROWSER, message);
+
+                // Set variable to ensure that the event does not trigger twice
+                m_bHasInputFocus = false;
+                return;
+            }
+
         }
         else
         {
             if (!node)
                 return;
 
-            if (node->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && !node->GetFormControlElementType().empty())
+            CefDOMNode* pNode = node.get();
+
+            if (pNode->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && !pNode->GetFormControlElementType().empty())
             {
                 auto message = CefProcessMessage::Create("InputFocus");
-                message->GetArgumentList()->SetBool(0, true);
-                browser->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
 
-                // Set variable to ensure that the event does not trigger twice
-                m_bHasInputFocus = true;
+                if (message)
+                {
+                    auto argList = message.get()->GetArgumentList();
+
+                    if (argList)
+                    {
+                        argList.get()->SetBool(0, true);
+
+                        auto mainFrame = pBrowser->GetMainFrame();
+
+                        if (mainFrame)
+                            mainFrame.get()->SendProcessMessage(PID_BROWSER, message);
+
+                        // Set variable to ensure that the event does not trigger twice
+                        m_bHasInputFocus = true;
+                    }
+                }
             }
         }
     }
@@ -63,8 +89,15 @@ public:
     // //
     virtual void OnContextCreated(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefV8Context> context) override
     {
+        if (!context)
+            return;
+
         // Get global object and create a v8 handler instance
-        CefRefPtr<CefV8Value> globalObject = context->GetGlobal();
+        CefRefPtr<CefV8Value> globalObject = context.get()->GetGlobal();
+
+        if (!globalObject)
+            return;
+           
         CefRefPtr<CV8Handler> handler = new CV8Handler(frame);
 
         // Create MTA object
@@ -74,16 +107,16 @@ public:
         V8Helpers::BindV8Function(handler, mtaObject, "triggerEvent", Javascript_triggerEvent);
 
         // Assign mtaObject to global object
-        globalObject->SetValue("mta", mtaObject, V8_PROPERTY_ATTRIBUTE_NONE);
+        globalObject.get()->SetValue("mta", mtaObject, V8_PROPERTY_ATTRIBUTE_NONE);
     }
 
     static void Javascript_triggerEvent(CefRefPtr<CefFrame> frame, const CefV8ValueList& arguments)
     {
-        if (arguments.size() == 0)
+        if (!frame || arguments.size() == 0)
             return;
 
         CefRefPtr<CefProcessMessage> message = V8Helpers::SerialiseV8Arguments("TriggerLuaEvent", arguments);
-        frame->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
+        frame.get()->GetBrowser()->GetMainFrame()->SendProcessMessage(PID_BROWSER, message);
     }
 
 public:

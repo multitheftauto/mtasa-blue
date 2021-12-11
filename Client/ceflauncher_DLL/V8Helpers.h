@@ -41,22 +41,27 @@ namespace V8Helpers
     std::stringstream conversionStream;
     void              ConvertV8ArgToString(std::string& outResult, CefRefPtr<CefV8Value> cefValue)
     {
+        if (!cefValue)
+            return;
+
         // Prepare stringstream for next argument (clear and reset states)
         conversionStream.str("");
         conversionStream.clear();
 
-        if (cefValue->IsBool())
-            conversionStream << cefValue->GetBoolValue();
-        else if (cefValue->IsDouble())
-            conversionStream << cefValue->GetDoubleValue();
-        else if (cefValue->IsInt())
-            conversionStream << cefValue->GetIntValue();
-        else if (cefValue->IsNull())
+        CefV8Value* pCefValue = cefValue.get();
+
+        if (pCefValue->IsBool())
+            conversionStream << pCefValue->GetBoolValue();
+        else if (pCefValue->IsDouble())
+            conversionStream << pCefValue->GetDoubleValue();
+        else if (pCefValue->IsInt())
+            conversionStream << pCefValue->GetIntValue();
+        else if (pCefValue->IsNull())
             conversionStream << "nil";
-        else if (cefValue->IsString())
-            conversionStream << std::string(cefValue->GetStringValue());
-        else if (cefValue->IsUInt())
-            conversionStream << cefValue->GetUIntValue();
+        else if (pCefValue->IsString())
+            conversionStream << std::string(pCefValue->GetStringValue());
+        else if (pCefValue->IsUInt())
+            conversionStream << pCefValue->GetUIntValue();
         else
             conversionStream << "unsupported type";
 
@@ -67,20 +72,29 @@ namespace V8Helpers
     {
         // Create the process message
         CefRefPtr<CefProcessMessage> message = CefProcessMessage::Create(messageName);
-        CefRefPtr<CefListValue>      argList = message->GetArgumentList();
+
+        if (!message)
+            return {};
+
+        auto argList = message.get()->GetArgumentList();
+
+        if (!message)
+            return {};
+
+        CefListValue* pArgList = argList.get();
 
         // Write the event name
-        argList->SetString(0, arguments[0]->GetStringValue());
+        pArgList->SetString(0, arguments[0]->GetStringValue());
 
         // Write number of arguments
-        argList->SetInt(1, arguments.size() - 1);
+        pArgList->SetInt(1, arguments.size() - 1);
 
         // Write arguments
         for (size_t i = 1; i < arguments.size(); ++i)
         {
             std::string strArgument;
             V8Helpers::ConvertV8ArgToString(strArgument, arguments[i]);
-            argList->SetString(i + 1, strArgument);
+            pArgList->SetString(i + 1, strArgument);
         }
 
         return message;
@@ -88,8 +102,11 @@ namespace V8Helpers
 
     void BindV8Function(CefRefPtr<CV8Handler> handler, CefRefPtr<CefV8Value> object, const std::string& name, JavascriptCallback cb)
     {
-        handler->Bind(name, cb);
+        if (!handler || !object)
+            return;
+
+        handler.get()->Bind(name, cb);
         CefRefPtr<CefV8Value> func = CefV8Value::CreateFunction(name, handler);
-        object->SetValue(name, func, V8_PROPERTY_ATTRIBUTE_NONE);
+        object.get()->SetValue(name, func, V8_PROPERTY_ATTRIBUTE_NONE);
     }
 }            // namespace V8Helpers

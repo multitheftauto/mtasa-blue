@@ -12,9 +12,12 @@
 
 bool CWebDevTools::Show(CWebView* pWebView)
 {
-    auto pBrowser = pWebView->GetCefBrowser();
-    if (!pBrowser)
+    auto browser = pWebView->GetCefBrowser();
+
+    if (!browser)
         return false;
+
+    CefBrowser* pBrowser = browser.get();
 
     // Default settings are suitable
     CefBrowserSettings settings;
@@ -32,10 +35,11 @@ bool CWebDevTools::Show(CWebView* pWebView)
 
 bool CWebDevTools::Close(CWebView* pWebView)
 {
-    auto pBrowser = pWebView->GetCefBrowser();
-    if (!pBrowser)
+    auto browser = pWebView->GetCefBrowser();
+
+    if (!browser)
         return false;
 
-    pBrowser->GetHost()->CloseDevTools();
+    browser.get()->GetHost()->CloseDevTools();
     return true;
 }

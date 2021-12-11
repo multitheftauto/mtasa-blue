@@ -27,15 +27,17 @@ void CWebApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
-    command_line->AppendSwitch("disable-gpu-compositing");
-    command_line->AppendSwitch("disable-gpu");
-    // command_line->AppendSwitch("disable-d3d11");
-    command_line->AppendSwitch("enable-begin-frame-scheduling");
+    CefCommandLine* pCommandLine = command_line.get();
+
+    pCommandLine->AppendSwitch("disable-gpu-compositing");
+    pCommandLine->AppendSwitch("disable-gpu");
+    // pCommandLine->AppendSwitch("disable-d3d11");
+    pCommandLine->AppendSwitch("enable-begin-frame-scheduling");
 
     if (process_type.empty())
     {
-        command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
-        command_line->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
+        pCommandLine->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");
+        pCommandLine->AppendSwitchWithValue("enable-blink-features", "ShadowDOMV0,CustomElementsV0,HTMLImports");
     }
 }
 
@@ -50,11 +52,14 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
 
     CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
     auto      pWebView = pWebCore->FindWebView(browser);
+
     if (!pWebView || !pWebView->IsLocal())
         return nullptr;
 
-    CefURLParts urlParts;
-    if (!CefParseURL(request->GetURL(), urlParts))
+    CefURLParts  urlParts;
+    CefRequest*  pRequest = request.get();
+
+    if (!CefParseURL(pRequest->GetURL(), urlParts))
         return nullptr;
 
     if (scheme_name == "mtalocal")            // Backward compatibility
@@ -72,14 +77,14 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                 SString resourcePath = path.substr(end);
 
                 // Call this function recursively and use the mta scheme instead
-                request->SetURL("http://mta/local/" + resourceName + resourcePath);
+                pRequest->SetURL("http://mta/local/" + resourceName + resourcePath);
                 return Create(browser, frame, "http", request);
             }
             return HandleError("404 - Not found", 404);
         }
 
         // Redirect mtalocal://* to http://mta/local/*, call recursively
-        request->SetURL("http://mta/local/" + path);
+        pRequest->SetURL("http://mta/local/" + path);
         return Create(browser, frame, "http", request);
     }
 
