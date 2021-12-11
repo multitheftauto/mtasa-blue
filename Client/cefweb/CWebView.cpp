@@ -816,7 +816,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
        ERR_ABORTED.
     */
 
-    if (!request)
+    if (!request || !frame)
         return false;
 
     CefURLParts urlParts;

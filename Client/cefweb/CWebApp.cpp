@@ -27,6 +27,9 @@ void CWebApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
 
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
+    if (!command_line)
+        return;
+
     CefCommandLine* pCommandLine = command_line.get();
 
     pCommandLine->AppendSwitch("disable-gpu-compositing");
@@ -47,7 +50,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
     // browser or frame are NULL if the request does not orginate from a browser window
     // This is for exmaple true for the application cache or CEFURLRequests
     // (http://www.html5rocks.com/en/tutorials/appcache/beginner/)
-    if (!browser || !frame)
+    if (!browser || !frame || !request)
         return nullptr;
 
     CWebCore* pWebCore = static_cast<CWebCore*>(g_pCore->GetWebCore());
@@ -196,7 +199,7 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
                 fileData = CBuffer("", sizeof(""));
 
             auto stream = CefStreamReader::CreateForData(fileData.GetData(), fileData.GetSize());
-            if (stream.get())
+            if (stream && stream.get())
                 return new CefStreamResourceHandler(mimeType, stream);
             return HandleError("404 - Not found", 404);
         }

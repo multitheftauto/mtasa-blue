@@ -44,15 +44,22 @@ void CAjaxResourceHandler::Cancel()
 
 void CAjaxResourceHandler::GetResponseHeaders(CefRefPtr<CefResponse> response, int64& response_length, CefString& redirectUrl)
 {
+    if (!response)
+        return;
+
     CefResponse* pResponse = response.get();
     pResponse->SetStatus(200);
     pResponse->SetStatusText("OK");
     pResponse->SetMimeType(m_strMime);
+
     response_length = -1;
 }
 
 bool CAjaxResourceHandler::ProcessRequest(CefRefPtr<CefRequest> request, CefRefPtr<CefCallback> callback)
 {
+    if (!callback)
+        return false;
+
     // Since we have nothing to process yet, continue
     callback.get()->Continue();
     return true;
