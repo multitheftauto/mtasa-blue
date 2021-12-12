@@ -32,9 +32,6 @@ void CAjaxResourceHandler::SetResponse(const SString& data)
 {
     m_strResponse = data;
     m_bHasData = true;
-
-    if (m_callback)
-        m_callback->Continue();
 }
 
 // CefResourceHandler implementation
