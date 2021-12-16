@@ -29,6 +29,8 @@ CClientVectorGraphic::CClientVectorGraphic(CClientManager* pManager, ElementID I
 
 CClientVectorGraphic::~CClientVectorGraphic()
 {
+    delete m_pXMLDocument;
+
     Unlink();
 }
 
