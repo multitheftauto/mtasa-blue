@@ -659,6 +659,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\bassmidi.dll"
         File "${FILES_ROOT}\mta\bassmix.dll"
         File "${FILES_ROOT}\mta\bassopus.dll"
+        File "${FILES_ROOT}\mta\basswebm.dll"
         File "${FILES_ROOT}\mta\basswma.dll"
         File "${FILES_ROOT}\mta\tags.dll"
 
