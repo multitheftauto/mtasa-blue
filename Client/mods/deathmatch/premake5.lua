@@ -59,7 +59,7 @@ project "Client Deathmatch"
 		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp"
 	}
 
-	configuration "windows"
+	filter "system:windows"
 		buildoptions { "-Zm180" }
 
 	filter "architecture:x64"
