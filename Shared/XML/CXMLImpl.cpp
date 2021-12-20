@@ -53,7 +53,7 @@ std::unique_ptr<SXMLString> CXMLImpl::ParseString(const char* strXmlContent)
 
             if (xmlDocumentRoot)
             {
-                CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot);
+                CXMLNodeImpl* xmlBaseNode = new CXMLNodeImpl(nullptr, nullptr, *xmlDocumentRoot, false);
 
                 if (xmlBaseNode && xmlBaseNode->IsValid())
                 {
