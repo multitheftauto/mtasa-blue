@@ -15,9 +15,9 @@ using std::list;
 
 CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node, bool bUseIDs)
     : m_ulID(INVALID_XML_ID),
-      m_bUsingIDs((!pFile) ? bUseIDs : pFile && pFile->IsUsingIDs()),
+      m_bUsingIDs((!pFile) ? bUseIDs : pFile->IsUsingIDs()),
       m_pNode(&Node),
-      m_Attributes(Node, (!pFile) ? bUseIDs : pFile && pFile->IsUsingIDs())
+      m_Attributes(Node, (!pFile) ? bUseIDs : pFile->IsUsingIDs())
 {
     // Init
     m_pFile = pFile;
