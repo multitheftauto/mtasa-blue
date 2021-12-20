@@ -13,11 +13,11 @@
 #define BLANK_LINE_COMMENT_MAGIC "##BLANK-LINE##"
 using std::list;
 
-CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node)
+CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node, bool bUseIDs)
     : m_ulID(INVALID_XML_ID),
-      m_bUsingIDs((!pFile) || pFile && pFile->IsUsingIDs()),
+      m_bUsingIDs((!pFile) ? bUseIDs : pFile && pFile->IsUsingIDs()),
       m_pNode(&Node),
-      m_Attributes(Node, (!pFile) || pFile && pFile->IsUsingIDs())
+      m_Attributes(Node, (!pFile) ? bUseIDs : pFile && pFile->IsUsingIDs())
 {
     // Init
     m_pFile = pFile;
@@ -85,7 +85,7 @@ void CXMLNodeImpl::BuildFromDocument()
         auto xmlChildElement = xmlChild->ToElement();
         if (xmlChildElement)
         {
-            auto xmlChildNode = new CXMLNodeImpl(nullptr, this, *xmlChildElement);
+            auto xmlChildNode = new CXMLNodeImpl(nullptr, this, *xmlChildElement, false);
             xmlChildNode->BuildFromDocument();
         }
     }

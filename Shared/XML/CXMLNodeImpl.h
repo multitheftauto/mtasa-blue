@@ -21,7 +21,7 @@
 class CXMLNodeImpl : public CXMLNode
 {
 public:
-    CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node);
+    CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node, bool bUseIDs = true);
     ~CXMLNodeImpl();
 
     // BuildFromDocument recursively builds child CXMLNodeImpl from the underlying TiXmlElement.
@@ -65,7 +65,6 @@ public:
     eXMLClass     GetClassType() { return CXML_NODE; };
     unsigned long GetID()
     {
-        dassert((!m_pFile) || m_pFile && m_pFile->IsUsingIDs());
         return m_ulID;
     };
     bool IsUsingIDs() { return m_bUsingIDs; };
