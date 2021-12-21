@@ -189,7 +189,7 @@ void CQuestionBox::SetCallbackEdit(pfnQuestionEditCallback callback, void* ptr)
 void CQuestionBox::SetOnLineHelpOption(const SString& strTroubleLink)
 {
     SString strMessage = "\n\n";
-    strMessage += _("Do you want to see some on-line help about this problem ?");
+    strMessage += _("Do you want to see some online help about this problem?");
     AppendMessage(strMessage);
     SetButton(0, _("No"));
     SetButton(1, _("Yes"));
