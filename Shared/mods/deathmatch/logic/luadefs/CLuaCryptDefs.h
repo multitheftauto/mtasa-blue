@@ -26,6 +26,8 @@ public:
     static std::string                     TeaDecode(std::string str, std::string key);
     static std::string                     Base64encode(std::string str);
     static std::string                     Base64decode(std::string str);
+    static std::variant<bool, CLuaMultiReturn<SString, SString>> GenerateKeyPair(lua_State* const luaVM, KeyPairAlgorithm algorithm,
+                                                             std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> callback);
     static std::variant<std::string, bool> PasswordHash(lua_State* luaVM, std::string password, PasswordHashFunction algorithm,
                                                         std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> callback);
     static std::string                     Sha256(std::string strSourceData);
