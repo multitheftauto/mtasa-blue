@@ -32,16 +32,10 @@ enum class PasswordHashFunction
     Bcrypt
 };
 
-enum class StringEncodeFunction
+enum class StringEncryptFunction
 {
     TEA,
     AES128,
-    RSA,
-};
-
-enum class KeyPairAlgorithm
-{
-    RSA
 };
 
 namespace SharedUtil
