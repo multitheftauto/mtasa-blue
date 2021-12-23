@@ -28,6 +28,7 @@ public:
 
 private:
     static bool LoadFromData(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, std::string strRawData);
+    static bool LoadFromNode(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CXMLNode* pNode);
     static bool LoadFromFile(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CScriptFile* pFile, std::string strPath, CResource* pParentResource);
 
     static bool SetDocument(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode);

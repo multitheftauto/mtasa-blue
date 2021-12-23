@@ -56,6 +56,22 @@ bool CLuaVectorGraphicDefs::LoadFromData(lua_State* luaVM, CClientVectorGraphic*
     return true;
 }
 
+bool CLuaVectorGraphicDefs::LoadFromNode(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CXMLNode* pNode)
+{
+    if (!luaVM || !pVectorGraphic)
+        return false;
+
+    if (!pVectorGraphic->SetDocument(pNode))
+    {
+        delete pVectorGraphic;
+
+        m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
+        return false;
+    }
+
+    return true;
+}
+
 bool CLuaVectorGraphicDefs::SetDocument(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode)
 {
     if (!pVectorGraphic || !pXMLNode || !pXMLNode->IsValid())
@@ -151,9 +167,17 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             {
                 CLuaFunctionRef funcRef = luaFunctionRef.value();
 
+                CXMLNode* xmlNode = pLuaMain.ParseString(strRawData.c_str());
+
+                if (!xmlNode || !xmlNode->IsValid())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
+                    return false;
+                }
+
                 CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
-                    [funcRef, pVectorGraphic, strRawData] {
-                        return LoadFromData(funcRef.GetLuaVM(), pVectorGraphic, strRawData);
+                    [funcRef, pVectorGraphic, xmlNode] {
+                        return LoadFromNode(funcRef.GetLuaVM(), pVectorGraphic, xmlNode);
                     },
                     [funcRef](const bool didLoad)
                     {
