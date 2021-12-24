@@ -45,7 +45,7 @@ void GetNameAndDamage(const char* nodeName, char(&outName)[OutBuffSize], bool& o
     const auto NodeNameEndsWith = [=](const char* with) {
         const auto withLen = strlen(with);
         dassert(withLen <= nodeNameLen);
-        return withLen >= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
+        return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
                && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
     };
 
@@ -53,9 +53,7 @@ void GetNameAndDamage(const char* nodeName, char(&outName)[OutBuffSize], bool& o
     // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
     const auto TerminatedCopy = [&](size_t off) {
         dassert(nodeNameLen - off < OutBuffSize);
-
-        strncpy_s(outName, OutBuffSize, nodeName, nodeNameLen - off);
-        outName[nodeNameLen - off] = 0;
+        strncpy_s(outName, nodeName, std::min(nodeNameLen - off, OutBuffSize - 1)); // By providing `OutBuffSize - 1` it is ensured the array will be null terminated
     };
 
     if (NodeNameEndsWith("_dam"))
@@ -70,8 +68,7 @@ void GetNameAndDamage(const char* nodeName, char(&outName)[OutBuffSize], bool& o
             TerminatedCopy(sizeof("_l0") - 1);
         } else {
             dassert(nodeNameLen < OutBuffSize);
-            //strcpy_s(outName, nodeName);
-            strncpy_s(outName, OutBuffSize, nodeName, strlen(nodeName));
+            strncpy_s(outName, OutBuffSize, nodeName, OutBuffSize - 1);
         }
     }
 }
