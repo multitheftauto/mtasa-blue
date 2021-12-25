@@ -4,8 +4,11 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  windows-release:
-    name: windows-release
+  windows:
+    strategy:
+      matrix:
+        type: [release, debug]
+    name: windows-${{ matrix.type }}
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
@@ -32,51 +35,16 @@ jobs:
       - name: Install data files
         run: utils\premake5 install_data
 
-      - name: Run Build
+      - name: Run Build [Release]
+        if: ${{ matrix.type == 'release' }}
         run: win-build.bat
         shell: cmd
         env:
           DXSDK_DIR: './utils/DXFiles/'
           CI: 'true'
 
-      - name: Create build artifacts
-        run: utils\premake5 compose_files
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: InstallFiles
-          path: InstallFiles/
-
-
-  windows-debug:
-    name: windows-debug
-    runs-on: windows-2022
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/cache@v1
-        id: cache-dxfiles
-        with:
-          path: utils/DXFiles
-          key: dxfiles-0001
-
-      - name: Download DirectX
-        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
-        run: Invoke-WebRequest https://mirror.mtasa.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
-        shell: powershell
-
-      - name: Extract DirectX
-        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
-        run: Expand-Archive -Path utils/DXFiles.zip -DestinationPath utils/DXFiles
-        shell: powershell
-
-      - name: Install CEF
-        run: utils\premake5 install_cef
-
-      - name: Install data files
-        run: utils\premake5 install_data
-
-      - name: Run Build
+      - name: Run Build [Debug]
+        if: ${{ matrix.type == 'debug' }}
         run: win-build.bat Debug
         shell: cmd
         env:
@@ -87,52 +55,56 @@ jobs:
         run: utils\premake5 compose_files
 
       - uses: actions/upload-artifact@master
+        if: ${{ matrix.type == 'release' }}
+        with:
+          name: InstallFiles
+          path: InstallFiles/
+
+      - uses: actions/upload-artifact@master
+        if: ${{ matrix.type == 'debug' }}
         with:
           name: InstallFiles-debug
           path: InstallFiles/
 
-  macOS-release:
-    name: macOS-release
+  macOS:
+    strategy:
+      matrix:
+        type: [release, debug]
+    name: macOS-${{ matrix.type }}
     runs-on: macOS-latest
     steps:
+      - uses: actions/checkout@v2
+
       - name: Install MySQL
         run: brew install mysql
         continue-on-error: true
+
       - name: Link MySQL
         run: brew link --overwrite mysql
-      - uses: actions/checkout@v2
-      - name: Run Build
+
+      - name: Run Build [Release]
+        if: ${{ matrix.type == 'release' }}
         run: ./linux-build.sh
 
-  macOS-debug:
-    name: macOS-debug
-    runs-on: macOS-latest
-    steps:
-      - name: Install MySQL
-        run: brew install mysql
-        continue-on-error: true
-      - name: Link MySQL
-        run: brew link --overwrite mysql
-      - uses: actions/checkout@v2
-      - name: Run Build
+      - name: Run Build [Debug]
+        if: ${{ matrix.type == 'debug' }}
         run: ./linux-build.sh "" debug
 
-  linux-release:
-    name: linux-release
+  linux:
+    strategy:
+      matrix:
+        type: [release, debug]
+    name: linux-${{ matrix.type }}
     runs-on: ubuntu-latest
     container:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
     steps:
       - uses: actions/checkout@v2
-      - name: Run Build
+
+      - name: Run Build [Release]
+        if: ${{ matrix.type == 'release' }}
         run: ./linux-build.sh
 
-  linux-debug:
-    name: linux-debug
-    runs-on: ubuntu-latest
-    container:
-      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Run Build
+      - name: Run Build [Debug]
+        if: ${{ matrix.type == 'debug' }}
         run: ./linux-build.sh "" debug
