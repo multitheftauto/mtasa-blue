@@ -573,7 +573,7 @@ bool CGUIElement_Impl::Event_OnSized(const CEGUI::EventArgs& e)
 bool CGUIElement_Impl::Event_OnClick(const CEGUI::EventArgs& eBase)
 {
     const CEGUI::MouseEventArgs& e = reinterpret_cast<const CEGUI::MouseEventArgs&>(eBase);
-    CGUIElement*               pElement = reinterpret_cast<CGUIElement*>(this);
+    CGUIElement*                 pElement = reinterpret_cast<CGUIElement*>(this);
 
     if (m_OnClick)
         m_OnClick(pElement);

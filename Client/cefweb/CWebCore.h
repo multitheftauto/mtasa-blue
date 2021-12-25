@@ -16,7 +16,7 @@
 #include <unordered_set>
 #include <future>
 #include <core/CWebCoreInterface.h>
-#include <cef3/include/cef_app.h>
+#include <cef3/cef/include/cef_app.h>
 #define MTA_BROWSERDATA_PATH "mta/cef/browserdata.xml"
 #define BROWSER_LIST_UPDATE_INTERVAL (24*60*60)
 #define BROWSER_UPDATE_URL "http://cef.multitheftauto.com/get.php"
@@ -39,10 +39,7 @@ class CWebCore : public CWebCoreInterface
 
         EventEntry(const std::function<void()>& callback_, CWebView* pWebView_) : callback(callback_), pWebView(pWebView_) {}
 #ifdef MTA_DEBUG
-        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_)
-            : callback(callback_), pWebView(pWebView_), name(name_)
-        {
-        }
+        EventEntry(const std::function<void()>& callback_, CWebView* pWebView_, const SString& name_) : callback(callback_), pWebView(pWebView_), name(name_) {}
 #endif
     };
 

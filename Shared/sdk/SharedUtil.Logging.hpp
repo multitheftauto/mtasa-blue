@@ -9,6 +9,16 @@
  *
  *****************************************************************************/
 
+#include "SharedUtil.Logging.h"
+#include <set>
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.File.h"
+#include "SharedUtil.Time.h"
+
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
 #ifdef MTA_DEBUG
 
 namespace SharedUtil
@@ -89,7 +99,7 @@ void SharedUtil::OutputDebugLine(const char* szMessage)
 #ifdef _WIN32
     OutputDebugString(strMessage);
 #else
-        // Other platforms here
+            // Other platforms here
 #endif
 }
 

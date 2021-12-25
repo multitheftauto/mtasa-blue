@@ -62,6 +62,7 @@ public:
     bool         Refresh(bool bRefreshAll = false, const SString strJustThisResource = "", bool bShowTiming = false);
     void         UpgradeResources(CResource* pResource = NULL);
     void         CheckResources(CResource* pResource = NULL);
+    void         OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState) const;
     unsigned int GetResourceLoadedCount() { return m_uiResourceLoadedCount; }
     unsigned int GetResourceFailedCount() { return m_uiResourceFailedCount; }
     void         OnPlayerJoin(CPlayer& Player);
@@ -103,9 +104,9 @@ public:
     void AddResourceToLists(CResource* pResource);
     void RemoveResourceFromLists(CResource* pResource);
 
-    void    ApplyMinClientRequirement(CResource* pResource, const CMtaVersion& strMinClientRequirement);
-    void    RemoveMinClientRequirement(CResource* pResource);
-    void    ReevaluateMinClientRequirement();
+    void        ApplyMinClientRequirement(CResource* pResource, const CMtaVersion& strMinClientRequirement);
+    void        RemoveMinClientRequirement(CResource* pResource);
+    void        ReevaluateMinClientRequirement();
     CMtaVersion GetMinClientRequirement() { return m_strMinClientRequirement; }
 
     void ApplySyncMapElementDataOption(CResource* pResource, bool bSyncMapElementData);

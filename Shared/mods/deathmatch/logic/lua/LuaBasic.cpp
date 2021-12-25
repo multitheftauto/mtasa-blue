@@ -20,11 +20,10 @@ namespace lua
         return outValue;
     }
 
-    
     template <>
     std::string_view PopPrimitive<std::string_view>(lua_State* L, std::size_t& index)
     {
-        uint        uiLength = lua_strlen(L, index);
+        uint             uiLength = lua_strlen(L, index);
         std::string_view outValue(lua_tostring(L, index++), uiLength);
         return outValue;
     }
@@ -88,7 +87,7 @@ namespace lua
     {
         return static_cast<double>(lua_tonumber(L, index++));
     }
-    
+
     template <>
     bool PopPrimitive<bool>(lua_State* L, std::size_t& index)
     {
@@ -100,4 +99,4 @@ namespace lua
     {
         return lua_touserdata(L, index++);
     }
-}            // namespace mta::impl
+}            // namespace lua

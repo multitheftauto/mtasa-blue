@@ -215,7 +215,7 @@ void CLuaDatabaseDefs::DbFreeCallback(CDbJobData* pJobData, void* pContext)
     if (pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL)
     {
         if (!pJobData->result.bErrorSuppressed)
-            m_pScriptDebugging->LogWarning(pJobData->m_LuaDebugInfo, "dbExec failed; (%d) %s", pJobData->result.uiErrorCode, *pJobData->result.strReason);
+            m_pScriptDebugging->LogWarning(pJobData->m_LuaDebugInfo, "dbFree failed; (%d) %s", pJobData->result.uiErrorCode, *pJobData->result.strReason);
     }
 }
 

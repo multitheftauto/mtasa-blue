@@ -16,10 +16,10 @@
 #include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include <core/CLocalizationInterface.h>
-#include "../version.h"
+#include "version.h"
 
 #include "CWebCore.h"
 #include "CWebView.h"
 
-extern CCoreInterface* g_pCore;
+extern CCoreInterface*         g_pCore;
 extern CLocalizationInterface* g_pLocalization;

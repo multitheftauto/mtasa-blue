@@ -15,8 +15,8 @@ extern CGame* g_pGame;
 
 CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectManager, CPickupManager* pPickupManager, CPlayerManager* pPlayerManager,
                          CRadarAreaManager* pRadarAreaManager, CMarkerManager* pMarkerManager, CVehicleManager* pVehicleManager, CTeamManager* pTeamManager,
-                         CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock,
-                         CGroups* pGroups, CEvents* pEvents, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter)
+                         CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock, CGroups* pGroups, CEvents* pEvents,
+                         class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter)
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -565,13 +565,13 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
                 pOccupant->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
 
                 // Tell everyone
-                CVehicleInOutPacket Reply(pVehicle->GetID(), 0, CGame::VEHICLE_NOTIFY_JACK_RETURN, pOccupant->GetID(), Player.GetID());
+                CVehicleInOutPacket Reply(Player.GetID(), pVehicle->GetID(), 0, CGame::VEHICLE_NOTIFY_JACK_RETURN, pOccupant->GetID(), Player.GetID());
                 Reply.SetSourceElement(&Player);
                 m_pPlayerManager->BroadcastOnlyJoined(Reply);
             }
         }
-        if (pVehicle->GetJackingPlayer() == &Player)
-            pVehicle->SetJackingPlayer(NULL);
+        if (pVehicle->GetJackingPed() == &Player)
+            pVehicle->SetJackingPed(NULL);
     }
 
     // Update the player data
