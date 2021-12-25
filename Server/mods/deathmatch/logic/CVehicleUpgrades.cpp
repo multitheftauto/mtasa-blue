@@ -86,7 +86,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 
     if (us == 1000 || us == 1001 || us == 1002 || us == 1003 || us == 1014 || /* spoiler */
         us == 1015 || us == 1016 || us == 1023 || us == 1049 || us == 1050 || us == 1058 || us == 1060 || us == 1138 || us == 1139 || us == 1146 ||
-        us == 1147 || us == 1158 || us == 1162 || us == 1163 || us == 116)
+        us == 1147 || us == 1158 || us == 1162 || us == 1163 || us == 1164)
     {
         return true;
     }
