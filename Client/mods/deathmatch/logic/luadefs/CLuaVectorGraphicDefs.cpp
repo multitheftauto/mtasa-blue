@@ -171,6 +171,8 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
                 if (!xmlNode || !xmlNode->IsValid())
                 {
+                    delete pVectorGraphic;
+
                     m_pScriptDebugging->LogCustom(luaVM, "Unable to load SVG data (check for XML syntax errors)");
                     return false;
                 }
