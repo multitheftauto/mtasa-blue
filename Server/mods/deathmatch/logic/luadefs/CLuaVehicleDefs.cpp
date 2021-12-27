@@ -1223,7 +1223,7 @@ int CLuaVehicleDefs::GetVehicleCompatibleUpgrades(lua_State* luaVM)
             unsigned int uiIndex = 0;
             for (unsigned short usUpgrade = 1000; usUpgrade <= 1193; usUpgrade++)
             {
-                if (pUpgrades->IsUpgradeCompatible(usUpgrade))
+                if (pUpgrades->IsStaticUpgradeCompatible(usUpgrade))
                 {
                     if (ucSlot != 0xFF)
                     {

@@ -15,6 +15,8 @@ class CVehicleUpgrades;
 
 #define VEHICLE_UPGRADE_SLOTS 17
 
+#define NUM_VEHICLE_MODELS 212
+
 #include "CVehicle.h"
 
 enum eVehicleUpgrade
@@ -34,6 +36,7 @@ public:
     CVehicleUpgrades(CVehicle* pVehicle, CVehicleUpgrades* pUpgrades);
 
     bool               IsUpgradeCompatible(unsigned short usUpgrade);
+    bool               IsStaticUpgradeCompatible(unsigned short usUpgrade);
     static bool        GetSlotFromUpgrade(unsigned short usUpgrade, unsigned char& ucSlot);
     void               SetSlotState(unsigned char ucSlot, unsigned short usUpgrade);
     unsigned short     GetSlotState(unsigned char ucSlot);
