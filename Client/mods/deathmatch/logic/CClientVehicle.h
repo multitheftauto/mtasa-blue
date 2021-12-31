@@ -212,7 +212,7 @@ public:
     float GetHealth() const;
     void  SetHealth(float health);
     void  Fix();
-
+    void  SetSunGlare(bool show);
     void             Blow(VehicleBlowFlags blow);
     bool             IsBlown() const noexcept { return m_blowState != VehicleBlowState::INTACT; }
     void             SetBlowState(VehicleBlowState state) { m_blowState = state; }

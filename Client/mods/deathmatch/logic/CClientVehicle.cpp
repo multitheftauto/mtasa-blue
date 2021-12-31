@@ -795,11 +795,70 @@ void CClientVehicle::SetHealth(float health)
     if (m_pVehicle)
         m_pVehicle->SetHealth(health);
 }
+/*
+
+void CVehicleSA::SetSunGlare(bool show)
+{
+    DEBUG_TRACE("void CVehicleSA::SetSunGlare ( bool show )");
+    if (show)
+    {
+        // Converted from thiscall void CVehicle::DoSunGlare(void) 0x6DD6F0
+        using Signature = void(__cdecl*)(DWORD vehicle);
+        const auto doSunGlare = reinterpret_cast<Signature>(0x6DD6F0);
+
+        
+        doSunGlare(dwThis);
+        g_pCore->GetConsole()->Printf("CVehicleSA:: SetSunGlare()");
+        DWORD dwThis = (DWORD)GetInterface();
+        DWORD dwFunc = 0x6DD6F0;
+
+        if (dwFunc)
+        {
+            _asm
+            {
+                mov     ecx, dwThis
+                call    dwFunc
+            }
+        }
+        printf("called");
+        
+    }
+}
+*/
+void CClientVehicle::SetSunGlare(bool show)
+{
+    g_pCore->GetConsole()->Printf("CClientVehicle:: SetSunGlare checking m_pVehicle...");
+    if (m_pVehicle)
+    {
+        //m_pVehicle->SetSunGlare(true);
+        g_pCore->GetConsole()->Printf("CClientVehicle:: m_pVehicle check pass");
+
+        /* 
+        using Signature = void(__cdecl*)(DWORD vehicle);
+        const auto doSunGlare = reinterpret_cast<Signature>(0x6DD6F0);
+        */
+        DWORD dwThis = (DWORD)m_pVehicle->GetInterface();
+        DWORD dwFunc = 0x6DD6F0;
+
+        if (dwFunc)
+        {
+            _asm
+            {
+                mov     ecx, dwThis
+                call    dwFunc
+            }
+        }
+
+
+        g_pCore->GetConsole()->Printf("CClientVehicle:: SetSunGlare() run");
+    }
+}
 
 void CClientVehicle::Fix()
 {
     if (m_pVehicle)
     {
+        g_pCore->GetConsole()->Printf("CClientVehicle::Fix:: m_pVehicle yes");
         m_pVehicle->Fix();
         // Make sure its visible, if its supposed to be
         m_pVehicle->SetVisible(m_bVisible);

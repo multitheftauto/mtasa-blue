@@ -82,6 +82,7 @@ public:
     LUA_DECLARE(IsVehicleWindowOpen);
 
     LUA_DECLARE(FixVehicle);
+    LUA_DECLARE(AddVehicleSunGlare);
     static bool BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion);
     LUA_DECLARE(SetVehicleRotation);
     LUA_DECLARE(SetVehicleTurnVelocity);

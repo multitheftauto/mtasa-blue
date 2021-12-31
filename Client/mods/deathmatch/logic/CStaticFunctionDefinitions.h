@@ -226,6 +226,7 @@ public:
     static bool            GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
 
     // Vehicle set functions
+    static bool AddVehicleSunGlare(CClientVehicle& Vehicle);
     static bool FixVehicle(CClientEntity& Entity);
     static bool BlowVehicle(CClientEntity& Entity, std::optional<bool> withExplosion);
     static bool SetVehicleColor(CClientEntity& Entity, const CVehicleColor& color);
@@ -267,7 +268,7 @@ public:
     static bool SetVehiclePlateText(CClientEntity& Entity, const SString& strText);
     static bool SetHeliBladeCollisionsEnabled(CClientVehicle& Vehicle, bool bEnabled);
     static bool SetVehicleWindowOpen(CClientVehicle& Vehicle, uchar ucWindow, bool bOpen);
-
+    
     // Object get funcs
     static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);

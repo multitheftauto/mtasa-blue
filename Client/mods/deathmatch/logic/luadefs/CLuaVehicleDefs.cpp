@@ -92,6 +92,7 @@ void CLuaVehicleDefs::LoadFunctions()
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
         {"fixVehicle", FixVehicle},
+        {"addVehicleSunGlare", AddVehicleSunGlare},
         {"blowVehicle", ArgumentParserWarn<false, BlowVehicle>},
         {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
         {"setVehicleColor", SetVehicleColor},
@@ -1547,6 +1548,27 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+int CLuaVehicleDefs::AddVehicleSunGlare(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::AddVehicleSunGlare(*pVehicle))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 
 bool CLuaVehicleDefs::IsVehicleBlown(CClientVehicle* vehicle)
 {
