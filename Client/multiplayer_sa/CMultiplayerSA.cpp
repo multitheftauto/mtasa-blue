@@ -578,26 +578,63 @@ CMultiplayerSA::CMultiplayerSA()
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
 }
 
-void CVehicle__DoSunGlare(void* this_)
+// sun glare
+enum
 {
-    //EAXJMP(0x6DD6F0);
-    MemSet((void*)0x6DD6F0, 0x1, 1);
+    PATCH_CALL,
+    PATCH_JUMP,
+    PATCH_NOTHING,
+};
+_declspec(naked) void CVehicle__DoSunGlare(void* this_)
+{
+    #define EAXJMP(a) {_asm mov eax, a _asm jmp eax}
+    EAXJMP(0x6DD6F0);
 }
 
-void __declspec(naked) doglare(void)
+void _declspec(naked) doglare(void)
 {
+
     _asm {
-		mov	ecx, 1
-		cmp	[ecx+8], 0            // doglare
-		jle	noglare
 		mov	ecx,esi
 		call	CVehicle__DoSunGlare
-	noglare:
 		mov     [esp+0D4h], edi
 		push	6ABD04h
 		retn
-    }
+	}
+  
 }
+template <typename AT, typename HT>
+inline void InjectHook(AT address, HT hook, unsigned int nType = PATCH_NOTHING)
+{
+    DWORD dwProtect[2];
+    switch (nType)
+    {
+        case PATCH_JUMP:
+            VirtualProtect((void*)address, 5, PAGE_EXECUTE_READWRITE, &dwProtect[0]);
+            *(BYTE*)address = 0xE9;
+            break;
+        case PATCH_CALL:
+            VirtualProtect((void*)address, 5, PAGE_EXECUTE_READWRITE, &dwProtect[0]);
+            *(BYTE*)address = 0xE8;
+            break;
+        default:
+            VirtualProtect((void*)((DWORD)address + 1), 4, PAGE_EXECUTE_READWRITE, &dwProtect[0]);
+            break;
+    }
+    DWORD dwHook;
+    _asm
+        {
+		mov		eax, hook
+		mov		dwHook, eax
+        }
+
+    *(ptrdiff_t*)((DWORD)address + 1) = (DWORD)dwHook - (DWORD)address - 5;
+    if (nType == PATCH_NOTHING)
+        VirtualProtect((void*)((DWORD)address + 1), 4, dwProtect[0], &dwProtect[1]);
+    else
+        VirtualProtect((void*)address, 5, dwProtect[0], &dwProtect[1]);
+}
+
 void CMultiplayerSA::InitHooks()
 {
     InitKeysyncHooks();
@@ -1541,7 +1578,10 @@ void CMultiplayerSA::InitHooks()
         MemPut(uiAddr, &m_fShadowsOffset);
     //Fuck Sun Glar
     //MemPut((void*)0x6ABCFD, 0x6DD6F0);
+    //HookInstall(0x6ABCFD, (DWORD)CVehicle__DoSunGlare, 5);
+
    
+
     //Fuck the wet road reflection
     MemSet((void*)0x6FB9A0, 0x1C, 1);
 
@@ -1558,6 +1598,14 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleWeapons();
 
     InitHooks_Streaming();
+
+
+    //InjectHook(0x6ABCFD, doglare, PATCH_JUMP);
+  
+    HookInstall(0x6ABCFD, (DWORD)doglare, 5);
+   
+
+
 }
 
 // Used to store copied pointers for explosions in the FxSystem
