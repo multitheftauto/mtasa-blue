@@ -578,26 +578,6 @@ CMultiplayerSA::CMultiplayerSA()
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
 }
 
-void CVehicle__DoSunGlare(void* this_)
-{
-    //EAXJMP(0x6DD6F0);
-    MemSet((void*)0x6DD6F0, 0x1, 1);
-}
-
-void __declspec(naked) doglare(void)
-{
-    _asm {
-		mov	ecx, 1
-		cmp	[ecx+8], 0            // doglare
-		jle	noglare
-		mov	ecx,esi
-		call	CVehicle__DoSunGlare
-	noglare:
-		mov     [esp+0D4h], edi
-		push	6ABD04h
-		retn
-    }
-}
 void CMultiplayerSA::InitHooks()
 {
     InitKeysyncHooks();
@@ -1530,7 +1510,7 @@ void CMultiplayerSA::InitHooks()
     // Allow water cannon to hit objects and players visually
     MemSet((void*)0x72925D, 0x1, 1);            // objects
     MemSet((void*)0x729263, 0x1, 1);            // players
-    
+
     // Allow crouching with 1HP
     MemPut((void*)0x6943AD, &fDuckingHealthThreshold);
     fDuckingHealthThreshold = 0;
@@ -1539,12 +1519,6 @@ void CMultiplayerSA::InitHooks()
     m_fShadowsOffset = 0.013f;            // GTA default = 0.06f
     for (auto uiAddr : shadowAddr)
         MemPut(uiAddr, &m_fShadowsOffset);
-    //Fuck Sun Glar
-    //MemPut((void*)0x6ABCFD, 0x6DD6F0);
-   
-    //Fuck the wet road reflection
-    MemSet((void*)0x6FB9A0, 0x1C, 1);
-
 
     InitHooks_CrashFixHacks();
 

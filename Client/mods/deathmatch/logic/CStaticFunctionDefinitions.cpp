@@ -2760,17 +2760,6 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
 
     return nullptr;
 }
-bool CStaticFunctionDefinitions::AddVehicleSunGlare(CClientVehicle& Vehicle)
-{
-    if (IS_VEHICLE(&Vehicle))
-    {
-        //memset((void*)0x6DD6F0, Entity,1);
-        Vehicle.SetSunGlare(true);
-
-        m_pCore->GetConsole()->Print("LUA VEHICLE GLAR CALLED");
-    }
-    return false;
-}
 
 bool CStaticFunctionDefinitions::FixVehicle(CClientEntity& Entity)
 {
