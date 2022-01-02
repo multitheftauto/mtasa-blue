@@ -391,6 +391,9 @@ public:
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
+    void SetVehicleSunGlareEnabled(bool bEnabled);
+    bool GetVehicleSunGlareEnabled();
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -506,6 +509,7 @@ private:
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
+    bool         m_bVehicleSunGlare;
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
