@@ -34,30 +34,30 @@ unsigned long* CGameSA::VAR_Framelimiter;
 
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
+static int m_iVehicleSunGlare;
+#define HOOK_CAutomobile_OnVehiclePreRender 0x6ABCFD
+#define HOOKPOS_CVehicle_DoSunGlare         0x6DD6F0
 
-_declspec(naked) void DoSunGlare(void* this_)
+_declspec(naked) void DoVehicleSunGlare(void* this_)
 {
-    /*
-        #define EAXJMP(a) {_asm mov eax, a _asm jmp eax}
-        EAXJMP(0x6DD6F0);
-    */
     _asm {
-        mov eax, 0x6DD6F0
+        mov eax, HOOKPOS_CVehicle_DoSunGlare
         jmp eax
     }
 }
 
-void _declspec(naked) HookVehicleGlare(void)
+
+void _declspec(naked) HOOK_Vehicle_PreRender(void)
 {
     _asm {
-		mov	ecx,1
-		cmp	ecx, 0            // doglare
+        mov	ecx, m_iVehicleSunGlare
+		cmp	ecx, 0
 		jle	noglare
-		mov	ecx,esi
-		call	DoSunGlare
+		mov	ecx, esi
+		call DoVehicleSunGlare
 	noglare:
-		mov     [esp+0D4h], edi
-		push	6ABD04h
+		mov [esp+0D4h], edi
+		push 6ABD04h
 		retn
     }
 }
@@ -67,12 +67,13 @@ void _declspec(naked) HookVehicleGlare(void)
  */
 CGameSA::CGameSA()
 {
+
     pGame = this;
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
-    m_bVehicleSunGlare = false;
+    m_iVehicleSunGlare = 0;
 
     const unsigned int modelInfoMax = GetCountOfAllFileIDs();
     ModelInfo = new CModelInfoSA[modelInfoMax];
@@ -253,7 +254,8 @@ CGameSA::CGameSA()
     D3DResourceSystemSA::StaticSetHooks();
 
     //Setup Vehicle Sun Glare Hook
-    HookInstall(0x6ABCFD, (DWORD)HookVehicleGlare, 5);
+    HookInstall(HOOK_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+    
 }
 
 CGameSA::~CGameSA()
@@ -635,6 +637,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
         return IsUnderWorldWarpEnabled();
 
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+        return IsVehicleSunGlareEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -666,6 +671,13 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         SetUnderWorldWarpEnabled(bEnable);
         return true;
     }
+
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+    {
+        SetVehicleSunGlareEnabled(bEnable);
+        return true;
+    }
+        
 
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
@@ -759,7 +771,12 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
 void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
 {
     // State turning will be handled in hooks handler
-    m_bVehicleSunGlare = bEnabled;
+    m_iVehicleSunGlare = bEnabled ? 1 : 0;
+}
+
+bool CGameSA::IsVehicleSunGlareEnabled()
+{
+    return m_iVehicleSunGlare == 1 ? true : false;
 }
 
 bool CGameSA::PerformChecks()
