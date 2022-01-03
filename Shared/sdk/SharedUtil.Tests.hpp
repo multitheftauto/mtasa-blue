@@ -806,8 +806,6 @@ void SharedUtil_Hash_Tests()
             case HmacAlgorithm::SHA512:
                 hmacResult = SharedUtil::Hmac<CryptoPP::SHA512>(data, key);
                 break;
-            default:
-                throw std::exception("Invalid hmac algorithm");
         }
         assert(!hmacResult.empty());
         assert(hmacResult == result);
