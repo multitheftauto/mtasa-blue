@@ -13,6 +13,9 @@
 #include <cryptopp/rsa.h>
 #include <cryptopp/modes.h>
 #include <cryptopp/osrng.h>
+#include <cryptopp/hmac.h>
+#include <cryptopp/hex.h>
+#include <cryptopp/md5.h>
 #include "SString.h"
 
 namespace SharedUtil
@@ -38,6 +41,21 @@ namespace SharedUtil
 
         return result;
     }
+
+    template <class HmacType>
+    inline SString Hmac(const SString& value, const SString& key)
+    {
+        SString mac;
+        SString result;
+
+        CryptoPP::HMAC<HmacType> hmac((CryptoPP::byte*)key.c_str(), key.size());
+
+        CryptoPP::StringSource ssMac(value, true, new CryptoPP::HashFilter(hmac, new CryptoPP::StringSink(mac)));
+        CryptoPP::StringSource ssResult(mac, true, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result)));
+
+        return result;
+    }
+
 
     inline KeyPair GenerateRsaKeyPair(const unsigned int size)
     {

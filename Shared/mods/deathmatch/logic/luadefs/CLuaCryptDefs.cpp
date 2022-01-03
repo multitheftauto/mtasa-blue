@@ -15,6 +15,7 @@
 void CLuaCryptDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"hmac", ArgumentParserWarn<false, Hmac>},
         {"md5", ArgumentParserWarn<false, Md5>},
         {"sha256", ArgumentParserWarn<false, Sha256>},
         {"hash", ArgumentParserWarn<false, Hash>},
@@ -32,6 +33,35 @@ void CLuaCryptDefs::LoadFunctions()
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
+}
+
+std::variant<std::string, bool> CLuaCryptDefs::Hmac(lua_State* const luaVM, std::string value, std::string key, HmacAlgorithm algorithm)
+{
+    try
+    {
+        switch (algorithm)
+        {
+            case HmacAlgorithm::MD5:
+                return SharedUtil::Hmac<CryptoPP::MD5>(value, key);
+            case HmacAlgorithm::SHA1:
+                return SharedUtil::Hmac<CryptoPP::SHA1>(value, key);
+            case HmacAlgorithm::SHA224:
+                return SharedUtil::Hmac<CryptoPP::SHA224>(value, key);
+            case HmacAlgorithm::SHA256:
+                return SharedUtil::Hmac<CryptoPP::SHA256>(value, key);
+            case HmacAlgorithm::SHA384:
+                return SharedUtil::Hmac<CryptoPP::SHA384>(value, key);
+            case HmacAlgorithm::SHA512:
+                return SharedUtil::Hmac<CryptoPP::SHA512>(value, key);
+            default:
+                throw std::invalid_argument("Unknown algorithm");
+        }
+    }
+    catch (const std::exception& ex)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, ex.what());            // log exception to script debug
+        return false;
+    }
 }
 
 std::string CLuaCryptDefs::Md5(std::string strMd5)

@@ -44,6 +44,16 @@ enum class KeyPairAlgorithm
     RSA
 };
 
+enum class HmacAlgorithm
+{
+    MD5,
+    SHA1,
+    SHA224,
+    SHA256,
+    SHA384,
+    SHA512
+};
+
 namespace SharedUtil
 {
     struct MD5
