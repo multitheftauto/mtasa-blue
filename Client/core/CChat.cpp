@@ -165,6 +165,15 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
     DrawInputLine(bUsingOutline);
 
+    if (m_bInputVisible)
+    {
+        // ChrML: Hack so chatbox input always works. It might get unfocused..
+        if (!m_pBackground->IsActive())
+        {
+            m_pBackground->Activate();
+        }
+    }
+
     // Are we visible?
     if (!m_bVisible)
         return;
@@ -296,15 +305,6 @@ void CChat::GetDrawList(SDrawList& outDrawList, bool bUsingOutline)
         m_pBackground->SetVisible(true);
         m_pBackground->Render();
         m_pBackground->SetVisible(false);
-    }
-
-    if (m_bInputVisible)
-    {
-        // ChrML: Hack so chatbox input always works. It might get unfocused..
-        if (!m_pBackground->IsActive())
-        {
-            m_pBackground->Activate();
-        }
     }
 
     // Used for render clipping in CChat::DrawTextString
