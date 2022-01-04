@@ -75,4 +75,4 @@ Execute `win-create-projects.bat`.
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997–2021.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997–2022.
