@@ -37,6 +37,7 @@ enum class StringEncodeFunction
     TEA,
     AES128,
     RSA,
+    HMAC,
 };
 
 enum class KeyPairAlgorithm

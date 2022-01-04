@@ -22,8 +22,6 @@ public:
 
     static std::string Hash(EHashFunctionType hashFunction, std::string strSourceData);
 
-    static std::variant<std::string, bool> Hmac(lua_State* const luaVM, std::string value, std::string key, HmacAlgorithm algorithm);
-
     static std::string                     TeaEncode(std::string str, std::string key);
     static std::string                     TeaDecode(std::string str, std::string key);
     static std::string                     Base64encode(std::string str);

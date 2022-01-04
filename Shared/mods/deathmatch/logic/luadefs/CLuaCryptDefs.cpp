@@ -15,7 +15,6 @@
 void CLuaCryptDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"hmac", ArgumentParser<Hmac>},
         {"md5", ArgumentParserWarn<false, Md5>},
         {"sha256", ArgumentParserWarn<false, Sha256>},
         {"hash", ArgumentParserWarn<false, Hash>},
@@ -33,35 +32,6 @@ void CLuaCryptDefs::LoadFunctions()
     // Add functions
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
-}
-
-std::variant<std::string, bool> CLuaCryptDefs::Hmac(lua_State* const luaVM, std::string value, std::string key, HmacAlgorithm algorithm)
-{
-    try
-    {
-        switch (algorithm)
-        {
-            case HmacAlgorithm::MD5:
-                return SharedUtil::Hmac<CryptoPP::MD5>(value, key);
-            case HmacAlgorithm::SHA1:
-                return SharedUtil::Hmac<CryptoPP::SHA1>(value, key);
-            case HmacAlgorithm::SHA224:
-                return SharedUtil::Hmac<CryptoPP::SHA224>(value, key);
-            case HmacAlgorithm::SHA256:
-                return SharedUtil::Hmac<CryptoPP::SHA256>(value, key);
-            case HmacAlgorithm::SHA384:
-                return SharedUtil::Hmac<CryptoPP::SHA384>(value, key);
-            case HmacAlgorithm::SHA512:
-                return SharedUtil::Hmac<CryptoPP::SHA512>(value, key);
-            default:
-                throw std::invalid_argument("Unknown algorithm");
-        }
-    }
-    catch (const std::exception& ex)
-    {
-        m_pScriptDebugging->LogWarning(luaVM, ex.what());            // log exception to script debug
-        return false;
-    }
 }
 
 std::string CLuaCryptDefs::Md5(std::string strMd5)
@@ -542,6 +512,111 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     return 1;
                 }
                 return 1;
+            }
+            case StringEncodeFunction::HMAC:
+            {
+
+                // variables
+                SString& key = options["key"];
+                SString& algorithm = options["algorithm"];
+                HmacAlgorithm hmacAlgorithm;
+
+                // Parse algorithm string to enum
+                StringToEnum(algorithm, hmacAlgorithm);
+
+                if (key.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'key'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+
+                if (algorithm.empty())
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'algorithm'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+
+                 // Async
+                 if (VERIFY_FUNCTION(luaFunctionRef))
+                 {
+                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                     if (pLuaMain)
+                     {
+                         CLuaShared::GetAsyncTaskScheduler()->PushTask<std::variant<bool, SString>>(
+                             [data, key, hmacAlgorithm]() -> std::variant<bool, SString>
+                             {
+                                 switch(hmacAlgorithm)
+                                 {
+                                     case HmacAlgorithm::MD5:
+                                         return SharedUtil::Hmac<CryptoPP::MD5>(data, key);
+                                     case HmacAlgorithm::SHA1:
+                                         return SharedUtil::Hmac<CryptoPP::SHA1>(data, key);
+                                     case HmacAlgorithm::SHA224:
+                                         return SharedUtil::Hmac<CryptoPP::SHA224>(data, key);
+                                     case HmacAlgorithm::SHA256:
+                                         return SharedUtil::Hmac<CryptoPP::SHA256>(data, key);
+                                     case HmacAlgorithm::SHA384:
+                                         return SharedUtil::Hmac<CryptoPP::SHA384>(data, key);
+                                     case HmacAlgorithm::SHA512:
+                                         return SharedUtil::Hmac<CryptoPP::SHA512>(data, key);
+                                     default:
+                                         return false;
+                                 }
+                             },
+                             [luaFunctionRef](const auto& result)
+                             {
+                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                 if (pLuaMain)
+                                 {
+                                     CLuaArguments arguments;
+                                     if (std::holds_alternative<SString>(result))
+                                     {
+                                         arguments.PushString(std::get<1>(result));
+                                         arguments.Call(pLuaMain, luaFunctionRef);
+                                     }
+                                     else
+                                     {
+                                         m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), "Invalid algorithm");
+                                         arguments.PushBoolean(false);
+                                         arguments.Call(pLuaMain, luaFunctionRef);
+                                     }
+                                 }
+                             });
+
+                         lua::Push(luaVM, true);
+                     }
+                 }
+                 else            // Sync
+                 {
+                     switch (hmacAlgorithm)
+                     {
+                         case HmacAlgorithm::MD5:
+                             lua::Push(luaVM, SharedUtil::Hmac<CryptoPP::MD5>(data, key));
+                             break;
+                         case HmacAlgorithm::SHA1:
+                             lua::Push(luaVM, SharedUtil::Hmac<CryptoPP::SHA1>(data, key));
+                             break;
+                         case HmacAlgorithm::SHA224:
+                             lua::Push(luaVM, SharedUtil::Hmac<CryptoPP::SHA224>(data, key));
+                             break;
+                         case HmacAlgorithm::SHA256:
+                             lua::Push(luaVM, SharedUtil::Hmac<CryptoPP::SHA256>(data, key));
+                             break;
+                         case HmacAlgorithm::SHA384:
+                             lua::Push(luaVM, SharedUtil::Hmac<CryptoPP::SHA384>(data, key));
+                             break;
+                         case HmacAlgorithm::SHA512:
+                             lua::Push(luaVM, SharedUtil::Hmac<CryptoPP::SHA512>(data, key));
+                             break;
+                         default:
+                             m_pScriptDebugging->LogWarning(luaVM, "Invalid algorithm");
+                             lua::Push(luaVM, false);
+                     }
+                     return 1;
+                 }
+                 return 1;
             }
             default:
             {
