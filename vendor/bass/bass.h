@@ -88,7 +88,7 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_ERROR_FREQ		25	// illegal sample rate
 #define BASS_ERROR_NOTFILE	27	// the stream is not a file stream
 #define BASS_ERROR_NOHW		29	// no hardware voices available
-#define BASS_ERROR_EMPTY	31	// the MOD music has no sequence data
+#define BASS_ERROR_EMPTY	31	// the file has no sample data
 #define BASS_ERROR_NONET	32	// no internet connection could be opened
 #define BASS_ERROR_CREATE	33	// couldn't create the file
 #define BASS_ERROR_NOFX		34	// effects are not available
@@ -161,6 +161,7 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_CONFIG_DEV_TIMEOUT		70
 #define BASS_CONFIG_NET_META		71
 #define BASS_CONFIG_NET_RESTRATE	72
+#define BASS_CONFIG_REC_DEFAULT		73
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16

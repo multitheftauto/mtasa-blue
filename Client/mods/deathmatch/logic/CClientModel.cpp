@@ -32,11 +32,17 @@ bool CClientModel::Allocate(ushort usParentID)
     if (pModelInfo->IsValid())
         return false;
 
+    // Avoid hierarchy
+    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(usParentID, true);
+
+    if (pParentModelInfo->GetParentID())
+        return false;
+
     switch (m_eModelType)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
-            break;
+            return true;
         case eClientModelType::OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {

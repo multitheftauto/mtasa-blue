@@ -317,9 +317,7 @@ public:
 
     void FuckCarCompletely(bool bKeepWheels);
 
-    unsigned long GetMemoryValue(unsigned long ulOffset);
-    unsigned long GetGameBaseAddress();
-    void          WorldIgnore(bool bWorldIgnore);
+    void WorldIgnore(bool bWorldIgnore);
 
     bool IsVirtual() { return m_pVehicle == NULL; };
 
