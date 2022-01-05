@@ -229,7 +229,7 @@ public:
     void SetTurretRotation(float fHorizontal, float fVertical);
 
     unsigned short GetModel() { return m_usModel; };
-    void           SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    void           SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, bool restoreHandling);
 
     unsigned char GetVariant() { return m_ucVariation; };
     unsigned char GetVariant2() { return m_ucVariation2; };

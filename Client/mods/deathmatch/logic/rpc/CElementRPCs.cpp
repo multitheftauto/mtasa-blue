@@ -474,7 +474,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
             if (usCurrentModel != usModel)
             {
-                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
+                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2, true);
 
                 CLuaArguments Arguments;
                 Arguments.PushNumber(usCurrentModel);
