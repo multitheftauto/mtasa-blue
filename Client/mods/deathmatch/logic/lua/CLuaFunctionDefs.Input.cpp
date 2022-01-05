@@ -581,28 +581,27 @@ int CLuaFunctionDefs::GetCommandsBoundToKey(lua_State* luaVM)
             lua_newtable(luaVM);
 
             // Add all the bound commands to it
-            list<CKeyBind*>::const_iterator iter = g_pCore->GetKeyBinds()->IterBegin();
-
-            for (; iter != g_pCore->GetKeyBinds()->IterEnd(); iter++)
+            for (CKeyBind* bind : *g_pCore->GetKeyBinds())
             {
-                CKeyBind* pKeyBind = *iter;
+                if (bind->isBeingDeleted || !bind->isActive || bind->type != KeyBindType::COMMAND)
+                    continue;
 
-                if (!pKeyBind->IsBeingDeleted() && pKeyBind->bActive && pKeyBind->GetType() == KEY_BIND_COMMAND)
-                {
-                    CCommandBind* pCommandBind = static_cast<CCommandBind*>(pKeyBind);
+                auto commandBind = static_cast<CCommandBind*>(bind);
 
-                    if (!bCheckHitState || pCommandBind->bHitState == bHitState)
-                    {
-                        if (strcmp(strKey, pCommandBind->boundKey->szKey) == 0)
-                        {
-                            lua_pushstring(luaVM, pCommandBind->szCommand);
-                            lua_pushstring(luaVM, (pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0' && pCommandBind->bScriptCreated)
-                                                      ? pCommandBind->szArguments
-                                                      : "");
-                            lua_settable(luaVM, -3);
-                        }
-                    }
-                }
+                if (bCheckHitState && commandBind->bHitState != bHitState)
+                    continue;
+
+                if (strKey != commandBind->boundKey->szKey)
+                    continue;
+
+                lua_pushstring(luaVM, commandBind->command.c_str());
+
+                if (!commandBind->arguments.empty() && commandBind->bScriptCreated)
+                    lua_pushstring(luaVM, commandBind->arguments.c_str());
+                else
+                    lua_pushliteral(luaVM, "");
+
+                lua_settable(luaVM, -3);
             }
 
             return 1;
@@ -626,24 +625,20 @@ int CLuaFunctionDefs::GetKeyBoundToCommand(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            // get the key
-            list<CKeyBind*>::const_iterator iter = g_pCore->GetKeyBinds()->IterBegin();
-            for (; iter != g_pCore->GetKeyBinds()->IterEnd(); iter++)
+            for (CKeyBind* bind : *g_pCore->GetKeyBinds())
             {
-                CKeyBind* pKeyBind = *iter;
-                if (!pKeyBind->IsBeingDeleted() && pKeyBind->bActive)
-                {
-                    if (pKeyBind->GetType() == KEY_BIND_COMMAND)
-                    {
-                        CCommandBind* pBind = static_cast<CCommandBind*>(pKeyBind);
-                        if (strcmp(strCommand, pBind->szCommand) == 0)
-                        {
-                            lua_pushstring(luaVM, pBind->boundKey->szKey);
-                            return 1;
-                        }
-                    }
-                }
+                if (bind->isBeingDeleted || !bind->isActive || bind->type != KeyBindType::COMMAND)
+                    continue;
+
+                auto commandBind = static_cast<CCommandBind*>(bind);
+
+                if (strCommand != commandBind->command)
+                    continue;
+
+                lua_pushstring(luaVM, commandBind->boundKey->szKey);
+                return 1;
             }
+
             lua_pushboolean(luaVM, false);
             return 1;
         }

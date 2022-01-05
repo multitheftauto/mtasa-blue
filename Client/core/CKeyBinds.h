@@ -50,8 +50,8 @@ public:
     void ClearCommandsAndControls();
     bool Call(CKeyBind* pKeyBind);
 
-    std::list<CKeyBind*>::const_iterator IterBegin() { return m_pList->begin(); }
-    std::list<CKeyBind*>::const_iterator IterEnd() { return m_pList->end(); }
+    std::list<CKeyBind*>::const_iterator IterBegin() const override { return m_pList->begin(); }
+    std::list<CKeyBind*>::const_iterator IterEnd() const override { return m_pList->end(); }
 
     // Command-bind funcs
     bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL, bool bScriptCreated = false,
@@ -134,9 +134,9 @@ public:
     void                 SetAllFootControls(bool bState);
     void                 SetAllVehicleControls(bool bState);
 
-    void SetAllBindStates(bool bState, eKeyBindType onlyType = KEY_BIND_UNDEFINED);
+    void SetAllBindStates(bool bState, KeyBindType onlyType = KeyBindType::UNDEFINED) override;
 
-    unsigned int Count(eKeyBindType bindType = KEY_BIND_UNDEFINED);
+    unsigned int Count(KeyBindType bindType = KeyBindType::UNDEFINED);
 
     bool ControlForwardsBackWards(CControllerState& cs);
     bool ControlLeftAndRight(CControllerState& cs);
