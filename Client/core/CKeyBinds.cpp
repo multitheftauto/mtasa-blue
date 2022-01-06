@@ -429,7 +429,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
         auto iter = std::find_if(processedCommandBinds.begin(), processedCommandBinds.end(),
                                  [&](CCommandBind* processedCommandBind)
                                  {
-                                     if (processedCommandBind->bHitState != commandBind->bHitState)
+                                     if (processedCommandBind->triggerState != commandBind->triggerState)
                                          return false;
 
                                      if (processedCommandBind->command != commandBind->command)
@@ -471,14 +471,14 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
             {
                 auto bindWithState = static_cast<CKeyBindWithState*>(bind);
 
-                if (bindWithState->bState == bState)
+                if (bindWithState->state == bState)
                     break;
 
                 wasBindFound = true;
-                bindWithState->bState = bState;
+                bindWithState->state = bState;
 
                 // Does it match our up/down state?
-                if (bindWithState->bHitState != bState)
+                if (bindWithState->triggerState != bState)
                     break;
 
                 if (bindWithState->type == KeyBindType::COMMAND)
@@ -500,7 +500,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
 
                     if (!wasCommandBindProcessed(commandBind))
                     {
-                        if (commandBind->bScriptCreated || processedCommandBinds.empty())
+                        if (commandBind->wasCreatedByScript || processedCommandBinds.empty())
                             Call(commandBind);
                         else
                             m_vecBindQueue.push_back(commandBind);
@@ -514,8 +514,8 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                     {
                         auto functionBind = static_cast<CKeyFunctionBind*>(bind);
 
-                        if (functionBind->Handler && (!bInputGoesToGUI || functionBind->bIgnoreGUI))
-                            functionBind->Handler(functionBind);
+                        if (functionBind->handler && (!bInputGoesToGUI || functionBind->ignoresGUI))
+                            functionBind->handler(functionBind);
                     }
                 }
                 break;
@@ -592,15 +592,15 @@ bool CKeyBinds::Call(CKeyBind* keyBind)
         case KeyBindType::FUNCTION:
         {
             auto functionBind = static_cast<CKeyFunctionBind*>(keyBind);
-            if (functionBind->Handler)
-                functionBind->Handler(functionBind);
+            if (functionBind->handler)
+                functionBind->handler(functionBind);
             break;
         }
         case KeyBindType::CONTROL_FUNCTION:
         {
             auto functionBind = static_cast<CControlFunctionBind*>(keyBind);
-            if (functionBind->Handler)
-                functionBind->Handler(functionBind);
+            if (functionBind->handler)
+                functionBind->handler(functionBind);
             break;
         }
         default:
@@ -630,9 +630,9 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
         if (pUserAddedBind)
         {
             // Upgrade
-            pUserAddedBind->bScriptCreated = true;
-            pUserAddedBind->bIsReplacingScriptKey = true;
-            assert(pUserAddedBind->strOriginalScriptKey == szKey);
+            pUserAddedBind->wasCreatedByScript = true;
+            pUserAddedBind->isReplacingScriptKey = true;
+            assert(pUserAddedBind->originalScriptKey == szKey);
             return true;
         }
     }
@@ -640,7 +640,7 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
     auto bind = std::make_unique<CCommandBind>();
     bind->boundKey = bindableKey;
     bind->command = szCommand;
-    bind->bHitState = bState;
+    bind->triggerState = bState;
 
     if (szArguments)
         bind->arguments = szArguments;
@@ -648,12 +648,12 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
     if (szResource)
     {
         bind->resource = szResource;
-        bind->bScriptCreated = bScriptCreated;
+        bind->wasCreatedByScript = bScriptCreated;
 
         if (bScriptCreated)
-            bind->strOriginalScriptKey = szKey;
+            bind->originalScriptKey = szKey;
         else
-            bind->strOriginalScriptKey = szOriginalScriptKey;            // Will wait for script to addcommand before doing replace
+            bind->originalScriptKey = szOriginalScriptKey;            // Will wait for script to addcommand before doing replace
     }
 
     m_binds.emplace_back(bind.release());
@@ -670,7 +670,7 @@ bool CKeyBinds::AddCommand(const SBindableKey* pKey, const char* szCommand, cons
     auto bind = std::make_unique<CCommandBind>();
     bind->boundKey = pKey;
     bind->command = szCommand;
-    bind->bHitState = bState;
+    bind->triggerState = bState;
 
     if (szArguments)
         bind->arguments = szArguments;
@@ -699,7 +699,7 @@ bool CKeyBinds::RemoveCommand(const char* szKey, const char* szCommand, bool bCh
         if (!commandBind->resource.empty() || commandBind->command != command)
             return false;
 
-        return !bCheckState || commandBind->bHitState == bState;
+        return !bCheckState || commandBind->triggerState == bState;
     };
 
     return ForEachBind(m_binds, predicate, [this](KeyBindContainer::iterator& iter) { Remove(iter); });
@@ -719,7 +719,7 @@ bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bSta
             return false;
 
         auto commandBind = static_cast<CCommandBind*>(bind.get());
-        return !bCheckState || commandBind->bHitState == bState;
+        return !bCheckState || commandBind->triggerState == bState;
     };
 
     return ForEachBind(m_binds, predicate, [this](KeyBindContainer::iterator& iter) { Remove(iter); });
@@ -761,7 +761,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
         auto commandBind = static_cast<CCommandBind*>(bind.get());
 
         if (szKey && stricmp(szKey, commandBind->boundKey->szKey) &&
-            !(bConsiderDefaultKey && commandBind->bIsReplacingScriptKey && !stricmp(szKey, commandBind->strOriginalScriptKey.c_str())))
+            !(bConsiderDefaultKey && commandBind->isReplacingScriptKey && !stricmp(szKey, commandBind->originalScriptKey.c_str())))
             continue;
 
         if (!commandBind->resource.empty() && commandBind->resource != szResource)
@@ -770,7 +770,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
         if (szCommand && commandBind->command != szCommand)
             continue;
 
-        if (checkHitState && commandBind->bHitState != bState)
+        if (checkHitState && commandBind->triggerState != bState)
             continue;
 
         if (szArguments && commandBind->arguments != szArguments)
@@ -795,7 +795,7 @@ void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const
 
         auto commandBind = static_cast<CCommandBind*>(bind.get());
 
-        if (szOnlyWithDefaultKey && !(commandBind->bIsReplacingScriptKey && !stricmp(szOnlyWithDefaultKey, commandBind->strOriginalScriptKey.c_str())) &&
+        if (szOnlyWithDefaultKey && !(commandBind->isReplacingScriptKey && !stricmp(szOnlyWithDefaultKey, commandBind->originalScriptKey.c_str())) &&
             stricmp(szOnlyWithDefaultKey, commandBind->boundKey->szKey))
             continue;
 
@@ -805,7 +805,7 @@ void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const
         if (szCommand && commandBind->command != szCommand)
             continue;
 
-        if (checkHitState && commandBind->bHitState != bState)
+        if (checkHitState && commandBind->triggerState != bState)
             continue;
 
         if (szArguments && commandBind->arguments != szArguments)
@@ -845,7 +845,7 @@ CCommandBind* CKeyBinds::GetBindFromCommand(const char* szCommand, const char* s
                 continue;
         }
 
-        if (bCheckHitState && commandBind->bHitState != bState)
+        if (bCheckHitState && commandBind->triggerState != bState)
             continue;
 
         return commandBind;
@@ -881,13 +881,13 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
         if (szResource && commandBind->resource != szResource)
             continue;
 
-        if (bCheckScriptCreated && commandBind->bScriptCreated != bScriptCreated)
+        if (bCheckScriptCreated && commandBind->wasCreatedByScript != bScriptCreated)
             continue;
 
-        if (szOriginalScriptKey && commandBind->strOriginalScriptKey != szOriginalScriptKey)
+        if (szOriginalScriptKey && commandBind->originalScriptKey != szOriginalScriptKey)
             continue;
 
-        if (bCheckState && commandBind->bHitState != bState)
+        if (bCheckState && commandBind->triggerState != bState)
             continue;
 
         return commandBind;
@@ -902,8 +902,8 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
 CCommandBind* CKeyBinds::FindMatchingUpBind(CCommandBind* pBind)
 {
     const char* szResource = pBind->resource.empty() ? nullptr : pBind->resource.c_str();
-    return FindCommandMatch(pBind->boundKey->szKey, pBind->command.c_str(), /*arguments=*/nullptr, szResource, pBind->strOriginalScriptKey.c_str(),
-                            /*bCheckState=*/true, /*bState=*/false, /*bCheckScriptCreated=*/true, pBind->bScriptCreated);
+    return FindCommandMatch(pBind->boundKey->szKey, pBind->command.c_str(), /*arguments=*/nullptr, szResource, pBind->originalScriptKey.c_str(),
+                            /*bCheckState=*/true, /*bState=*/false, /*bCheckScriptCreated=*/true, pBind->wasCreatedByScript);
 }
 
 //
@@ -911,13 +911,13 @@ CCommandBind* CKeyBinds::FindMatchingUpBind(CCommandBind* pBind)
 //
 void CKeyBinds::UserRemoveCommandBoundKey(CCommandBind* pBind)
 {
-    if (pBind->bScriptCreated)
+    if (pBind->wasCreatedByScript)
     {
-        if (pBind->bIsReplacingScriptKey)
+        if (pBind->isReplacingScriptKey)
         {
             // Remove user added key change
-            pBind->bIsReplacingScriptKey = false;
-            const SBindableKey* boundKey = GetBindableFromKey(pBind->strOriginalScriptKey.c_str());
+            pBind->isReplacingScriptKey = false;
+            const SBindableKey* boundKey = GetBindableFromKey(pBind->originalScriptKey.c_str());
             if (boundKey)
                 pBind->boundKey = boundKey;
         }
@@ -932,13 +932,13 @@ void CKeyBinds::UserRemoveCommandBoundKey(CCommandBind* pBind)
 //
 void CKeyBinds::UserChangeCommandBoundKey(CCommandBind* pBind, const SBindableKey* pNewBoundKey)
 {
-    if (pBind->bScriptCreated)
+    if (pBind->wasCreatedByScript)
     {
         // Set replacing flag if was script bind (and key is different)
-        if (pBind->strOriginalScriptKey != pNewBoundKey->szKey)
-            pBind->bIsReplacingScriptKey = true;
+        if (pBind->originalScriptKey != pNewBoundKey->szKey)
+            pBind->isReplacingScriptKey = true;
         else
-            pBind->bIsReplacingScriptKey = false;
+            pBind->isReplacingScriptKey = false;
     }
     // Do change
     pBind->boundKey = pNewBoundKey;
@@ -971,13 +971,13 @@ void CKeyBinds::SortCommandBinds()
             return result < 0;
 
         // Script added before user added
-        if (lhsCommand->bScriptCreated && !rhsCommand->bScriptCreated)
+        if (lhsCommand->wasCreatedByScript && !rhsCommand->wasCreatedByScript)
             return true;
-        if (!lhsCommand->bScriptCreated && rhsCommand->bScriptCreated)
+        if (!lhsCommand->wasCreatedByScript && rhsCommand->wasCreatedByScript)
             return false;
 
         // Replacers before norms
-        return !lhsCommand->strOriginalScriptKey.empty() && rhsCommand->strOriginalScriptKey.empty();
+        return !lhsCommand->originalScriptKey.empty() && rhsCommand->originalScriptKey.empty();
     };
 
     m_binds.sort(compare);
@@ -1108,7 +1108,7 @@ void CKeyBinds::CallGTAControlBind(CGTAControlBind* pBind, bool bState)
         return;
 
     // Set this binds state
-    pBind->bState = bState;
+    pBind->state = bState;
 
     // If its keydown, or there isnt another bind for this control down
     if (bState || !GetMultiGTAControlState(pBind))
@@ -1142,10 +1142,10 @@ void CKeyBinds::CallGTAControlBind(CGTAControlBind* pBind, bool bState)
                     continue;
             }
 
-            if (functionBind->bState != bState && functionBind->bHitState == bState)
+            if (functionBind->state != bState && functionBind->triggerState == bState)
                 Call(functionBind);
 
-            functionBind->bState = bState;
+            functionBind->state = bState;
         }
     }
 }
@@ -1178,7 +1178,7 @@ bool CKeyBinds::GetMultiGTAControlState(CGTAControlBind* pBind)
         if (controlBind == pBind || controlBind->control->action != action)
             continue;
 
-        if (controlBind->bState)
+        if (controlBind->state)
             return true;
     }
 
@@ -1276,9 +1276,9 @@ void CKeyBinds::ResetGTAControlState(SBindableGTAControl* pControl)
 
         auto controlBind = static_cast<CGTAControlBind*>(bind.get());
 
-        if (controlBind->control == pControl && controlBind->bState)
+        if (controlBind->control == pControl && controlBind->state)
         {
-            controlBind->bState = true;
+            controlBind->state = true;
             return;
         }
     }
@@ -1298,7 +1298,7 @@ void CKeyBinds::ResetAllGTAControlStates()
 
         auto controlBind = static_cast<CGTAControlBind*>(bind.get());
 
-        if (controlBind->bState)
+        if (controlBind->state)
             controlBind->control->bState = true;
     }
 }
@@ -1335,9 +1335,9 @@ bool CKeyBinds::AddFunction(const SBindableKey* pKey, KeyFunctionBindHandler Han
 
     auto bind = std::make_unique<CKeyFunctionBind>();
     bind->boundKey = pKey;
-    bind->bHitState = bState;
-    bind->Handler = Handler;
-    bind->bIgnoreGUI = bIgnoreGUI;
+    bind->triggerState = bState;
+    bind->handler = Handler;
+    bind->ignoresGUI = bIgnoreGUI;
     m_binds.emplace_back(bind.release());
     return true;
 }
@@ -1358,10 +1358,10 @@ bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler 
 
         auto functionBind = static_cast<const CKeyFunctionBind*>(bind.get());
 
-        if (bCheckState && functionBind->bHitState != bState)
+        if (bCheckState && functionBind->triggerState != bState)
             return false;
 
-        return functionBind->Handler == Handler && functionBind->boundKey == pKey;
+        return functionBind->handler == Handler && functionBind->boundKey == pKey;
     };
 
     return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
@@ -1375,7 +1375,7 @@ bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
             return false;
 
         auto functionBind = static_cast<const CKeyFunctionBind*>(bind.get());
-        return functionBind->Handler == Handler;
+        return functionBind->handler == Handler;
     };
 
     return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
@@ -1403,10 +1403,10 @@ bool CKeyBinds::FunctionExists(const SBindableKey* pKey, KeyFunctionBindHandler 
 
         auto functionBind = static_cast<const CKeyFunctionBind*>(bind.get());
 
-        if (Handler && functionBind->Handler != Handler)
+        if (Handler && functionBind->handler != Handler)
             continue;
 
-        if (bCheckState && functionBind->bHitState != bState)
+        if (bCheckState && functionBind->triggerState != bState)
             continue;
 
         if (functionBind->boundKey == pKey)
@@ -1428,8 +1428,8 @@ bool CKeyBinds::AddControlFunction(const char* szControl, ControlFunctionBindHan
 
     auto bind = std::make_unique<CControlFunctionBind>();
     bind->control = bindableControl;
-    bind->Handler = Handler;
-    bind->bHitState = bState;
+    bind->handler = Handler;
+    bind->triggerState = bState;
     m_binds.emplace_back(bind.release());
     return true;
 }
@@ -1441,8 +1441,8 @@ bool CKeyBinds::AddControlFunction(SBindableGTAControl* pControl, ControlFunctio
 
     auto bind = std::make_unique<CControlFunctionBind>();
     bind->control = pControl;
-    bind->Handler = Handler;
-    bind->bHitState = bState;
+    bind->handler = Handler;
+    bind->triggerState = bState;
     m_binds.emplace_back(bind.release());
     return true;
 }
@@ -1464,10 +1464,10 @@ bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunc
 
         auto functionBind = static_cast<const CControlFunctionBind*>(bind.get());
 
-        if (bCheckState && functionBind->bState != bState)
+        if (bCheckState && functionBind->triggerState != bState)
             return false;
 
-        return functionBind->Handler == Handler && functionBind->control == pControl;
+        return functionBind->handler == Handler && functionBind->control == pControl;
     };
 
     return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
@@ -1481,7 +1481,7 @@ bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
             return false;
 
         auto functionBind = static_cast<const CControlFunctionBind*>(bind.get());
-        return functionBind->Handler == Handler;
+        return functionBind->handler == Handler;
     };
 
     return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
@@ -1509,10 +1509,10 @@ bool CKeyBinds::ControlFunctionExists(SBindableGTAControl* pControl, ControlFunc
 
         auto functionBind = static_cast<const CControlFunctionBind*>(bind.get());
 
-        if (bCheckState && functionBind->bHitState != bState)
+        if (bCheckState && functionBind->triggerState != bState)
             continue;
 
-        if (functionBind->Handler == Handler && functionBind->control == pControl)
+        if (functionBind->handler == Handler && functionBind->control == pControl)
             return true;
     }
 
@@ -1741,12 +1741,12 @@ void CKeyBinds::SetAllBindStates(bool bState, KeyBindType onlyType)
             case KeyBindType::FUNCTION:
             {
                 auto stateBind = static_cast<CKeyBindWithState*>(bind.get());
-                if (stateBind->bState != bState)
+                if (stateBind->state != bState)
                 {
-                    if (stateBind->bHitState == bState)
+                    if (stateBind->triggerState == bState)
                         Call(stateBind);
 
-                    stateBind->bState = bState;
+                    stateBind->state = bState;
                 }
                 break;
             }
@@ -2037,7 +2037,7 @@ void CKeyBinds::DoPostFramePulse()
                 {
                     auto stateBind = static_cast<CKeyBindWithState*>(bind.get());
                     if (stateBind->boundKey->iGTARelative == GTA_KEY_MSCROLLUP || stateBind->boundKey->iGTARelative == GTA_KEY_MSCROLLDOWN)
-                        stateBind->bState = false;
+                        stateBind->state = false;
                     break;
                 }
                 case KeyBindType::GTA_CONTROL:
@@ -2045,7 +2045,7 @@ void CKeyBinds::DoPostFramePulse()
                     auto controlBind = static_cast<CGTAControlBind*>(bind.get());
                     if (controlBind->boundKey->iGTARelative == GTA_KEY_MSCROLLUP || controlBind->boundKey->iGTARelative == GTA_KEY_MSCROLLDOWN)
                     {
-                        if (controlBind->bState)
+                        if (controlBind->state)
                             CallGTAControlBind(controlBind, false);
                     }
                     break;
@@ -2213,21 +2213,21 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
             auto commandBind = static_cast<CCommandBind*>(bind.get());
 
             // Don't save script added binds
-            if (commandBind->bScriptCreated && !commandBind->bIsReplacingScriptKey)
+            if (commandBind->wasCreatedByScript && !commandBind->isReplacingScriptKey)
             {
                 pMainNode->DeleteSubNode(bindNode);
                 continue;
             }
 
             createAttribute("key", commandBind->boundKey->szKey);
-            createAttribute("state", commandBind->bHitState ? "down" : "up");
+            createAttribute("state", commandBind->triggerState ? "down" : "up");
             createAttribute("command", commandBind->command.c_str());
             createAttribute("arguments", commandBind->arguments.c_str());
 
             if (!commandBind->resource.empty())
             {
                 createAttribute("resource", commandBind->resource.c_str());
-                createAttribute("default", commandBind->strOriginalScriptKey.c_str());
+                createAttribute("default", commandBind->originalScriptKey.c_str());
             }
         }
         else // bind->type == KeyBindType::GTA_CONTROL
@@ -2485,7 +2485,7 @@ void CKeyBinds::PrintBindsCommand(const char* szCmdLine)
             case KeyBindType::COMMAND:
             {
                 auto commandBind = static_cast<CCommandBind*>(bind.get());
-                console->Printf("Command^%s %s: %s %s", commandBind->boundKey->szKey, (commandBind->bHitState) ? "down" : "up", commandBind->command.c_str(),
+                console->Printf("Command^%s %s: %s %s", commandBind->boundKey->szKey, (commandBind->triggerState) ? "down" : "up", commandBind->command.c_str(),
                                 commandBind->arguments.c_str());
                 break;
             }

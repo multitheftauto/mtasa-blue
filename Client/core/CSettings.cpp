@@ -2722,7 +2722,7 @@ void CSettings::Initialize()
 
         auto commandBind = reinterpret_cast<CCommandBind*>(bind.get());
 
-        if (!commandBind->bHitState)
+        if (!commandBind->triggerState)
             continue;
 
         bool foundMatches = false;

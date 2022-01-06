@@ -401,7 +401,7 @@ int CLuaFunctionDefs::GetBoundKeys(lua_State* luaVM)
                 for (; iter != commandBinds.end(); iter++)
                 {
                     lua_pushstring(luaVM, (*iter)->boundKey->szKey);
-                    lua_pushstring(luaVM, (*iter)->bHitState ? "down" : "up");
+                    lua_pushstring(luaVM, (*iter)->triggerState ? "down" : "up");
                     lua_settable(luaVM, -3);
                 }
             }
@@ -590,7 +590,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey(lua_State* luaVM)
 
                 auto commandBind = static_cast<const CCommandBind*>(bind.get());
 
-                if (bCheckHitState && commandBind->bHitState != bHitState)
+                if (bCheckHitState && commandBind->triggerState != bHitState)
                     continue;
 
                 if (strKey != commandBind->boundKey->szKey)
@@ -598,7 +598,7 @@ int CLuaFunctionDefs::GetCommandsBoundToKey(lua_State* luaVM)
 
                 lua_pushstring(luaVM, commandBind->command.c_str());
 
-                if (!commandBind->arguments.empty() && commandBind->bScriptCreated)
+                if (!commandBind->arguments.empty() && commandBind->wasCreatedByScript)
                     lua_pushstring(luaVM, commandBind->arguments.c_str());
                 else
                     lua_pushliteral(luaVM, "");

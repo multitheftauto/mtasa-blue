@@ -79,9 +79,9 @@ public:
 
 public:
     const KeyBindType   type;
-    const SBindableKey* boundKey = nullptr;
-    bool                isBeingDeleted = false;
-    bool                isActive = true;
+    const SBindableKey* boundKey{nullptr};
+    bool                isBeingDeleted{false};
+    bool                isActive{true};
 };
 
 class CKeyBindWithState : public CKeyBind
@@ -90,8 +90,8 @@ public:
     using CKeyBind::CKeyBind;
 
 public:
-    bool bState = false;
-    bool bHitState = false;
+    bool state{false};
+    bool triggerState{false}; // true == "down", false == "up"
 };
 
 class CCommandBind : public CKeyBindWithState
@@ -103,9 +103,9 @@ public:
     std::string command;
     std::string arguments;
     std::string resource;
-    std::string strOriginalScriptKey;                     // Original key set by script
-    bool        bScriptCreated = false;                   // true if created by script
-    bool        bIsReplacingScriptKey = false;            // true if script set key is not being used
+    std::string originalScriptKey;                   // Original key set by script
+    bool        wasCreatedByScript{false};
+    bool        isReplacingScriptKey{false};            // true if script set key is not being used
 };
 
 class CKeyFunctionBind : public CKeyBindWithState
@@ -114,8 +114,8 @@ public:
     CKeyFunctionBind() : CKeyBindWithState(KeyBindType::FUNCTION) {}
 
 public:
-    KeyFunctionBindHandler Handler = nullptr;
-    bool                   bIgnoreGUI = false;
+    KeyFunctionBindHandler handler{nullptr};
+    bool                   ignoresGUI{false};
 };
 
 class CControlFunctionBind : public CKeyBindWithState
@@ -124,8 +124,8 @@ public:
     CControlFunctionBind() : CKeyBindWithState(KeyBindType::CONTROL_FUNCTION) {}
 
 public:
-    SBindableGTAControl*       control = nullptr;
-    ControlFunctionBindHandler Handler = nullptr;
+    SBindableGTAControl*       control{nullptr};
+    ControlFunctionBindHandler handler{nullptr};
 };
 
 class CGTAControlBind : public CKeyBind
@@ -134,9 +134,9 @@ public:
     CGTAControlBind() : CKeyBind(KeyBindType::GTA_CONTROL) {}
 
 public:
-    SBindableGTAControl* control = nullptr;
-    bool                 bState = false;
-    bool                 bEnabled = false;
+    SBindableGTAControl* control{nullptr};
+    bool                 state{false};
+    bool                 isEnabled{false};
 };
 
 class CKeyBindsInterface
