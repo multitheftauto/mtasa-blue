@@ -2611,6 +2611,8 @@ bool CSettings::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CSettings::Initialize()
 {
+    using KeyBindPtr = CKeyBindsInterface::KeyBindPtr;
+
     // Add binds and sections
     bool bPrimaryKey = true;
     int  iBind = 0, iRowGame;
@@ -2648,12 +2650,12 @@ void CSettings::Initialize()
         // Loop through the binds for a matching control
         size_t numMatches = 0;
 
-        for (CKeyBind* bind : *pKeyBinds)
+        for (KeyBindPtr& bind : *pKeyBinds)
         {
             if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
                 continue;
 
-            auto controlBind = reinterpret_cast<CGTAControlBind*>(bind);
+            auto controlBind = reinterpret_cast<CGTAControlBind*>(bind.get());
 
             if (controlBind->control != pControl)
                 continue;
@@ -2711,14 +2713,14 @@ void CSettings::Initialize()
 
     std::map<std::string, int> iResourceItems;
 
-    for (CKeyBind* bind : *pKeyBinds)
+    for (KeyBindPtr& bind : *pKeyBinds)
     {
         // keys bound to a console command or a function (we don't show keys bound
         // from gta controls by scripts as these are clearly not user editable)
         if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             continue;
 
-        auto commandBind = reinterpret_cast<CCommandBind*>(bind);
+        auto commandBind = reinterpret_cast<CCommandBind*>(bind.get());
 
         if (!commandBind->bHitState)
             continue;

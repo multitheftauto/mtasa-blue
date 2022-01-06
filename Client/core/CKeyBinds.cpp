@@ -12,8 +12,6 @@
 #include "StdInc.h"
 #include <game/CGame.h>
 
-using std::list;
-
 const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NONE, 0},
                                  {"mouse2", VK_RBUTTON, GTA_KEY_RMOUSE, DATA_NONE, 0},
                                  {"mouse3", VK_MBUTTON, GTA_KEY_MMOUSE, DATA_NONE, 0},
@@ -290,20 +288,18 @@ static void NullEmptyStrings(const char*& a, const char*& b = *(const char**)NUL
         e = NULL;
 }
 
-template <typename Predicate, typename UnaryFunction>
-bool ForEachBind(std::list<CKeyBind*>& binds, Predicate predicate, UnaryFunction action)
+template <typename Container, typename Predicate, typename UnaryFunction>
+bool ForEachBind(Container& binds, Predicate predicate, UnaryFunction action)
 {
     if (binds.empty())
         return false;
 
-    auto condition = [&predicate](CKeyBind* bind) { return !bind->isBeingDeleted && predicate(bind); };
-
-    if (auto iter = std::remove_if(binds.begin(), binds.end(), condition); iter != binds.end())
+    if (auto iter = std::remove_if(binds.begin(), binds.end(), predicate); iter != binds.end())
     {
         while (iter != binds.end())
         {
             auto current = iter++;
-            action(*current);
+            action(current);
         }
 
         return true;
@@ -312,19 +308,17 @@ bool ForEachBind(std::list<CKeyBind*>& binds, Predicate predicate, UnaryFunction
     return false;
 }
 
-template <typename Predicate>
-bool RemoveBinds(std::list<CKeyBind*>& binds, bool isProcessingKeyStroke, Predicate predicate)
+template <typename Container, typename Predicate>
+bool RemoveBinds(Container& binds, bool isProcessingKeyStroke, Predicate predicate)
 {
     if (binds.empty())
         return false;
 
-    auto condition = [&predicate](CKeyBind* bind) { return !bind->isBeingDeleted && predicate(bind); };
-
-    if (auto iter = std::remove_if(binds.begin(), binds.end(), condition); iter != binds.end())
+    if (auto iter = std::remove_if(binds.begin(), binds.end(), predicate); iter != binds.end())
     {
         if (isProcessingKeyStroke)
         {
-            std::for_each(iter, binds.end(), [](CKeyBind* bind) { bind->isBeingDeleted = true; });
+            std::for_each(iter, binds.end(), [](auto& bind) { bind->isBeingDeleted = true; });
         }
         else
         {
@@ -337,35 +331,10 @@ bool RemoveBinds(std::list<CKeyBind*>& binds, bool isProcessingKeyStroke, Predic
     return false;
 }
 
-bool RemoveBindTypeBinds(std::list<CKeyBind*>& binds, bool isProcessingKeyStroke, KeyBindType bindType)
+template <typename Container>
+bool RemoveBindTypeBinds(Container& binds, bool isProcessingKeyStroke, KeyBindType bindType)
 {
-    return RemoveBinds(binds, isProcessingKeyStroke, [bindType](CKeyBind* bind) { return bind->type == bindType; });
-}
-
-CKeyBinds::CKeyBinds(CCore* pCore)
-{
-    m_pCore = pCore;
-
-    m_pList = new list<CKeyBind*>;
-    m_bMouseWheel = false;
-    m_bInVehicle = false;
-    m_pChatBoxBind = NULL;
-    m_bProcessingKeyStroke = false;
-    m_KeyStrokeHandler = NULL;
-    m_CharacterKeyHandler = NULL;
-    m_bWaitingToLoadDefaults = false;
-    m_bLastStateForwards = false;
-    m_bLastStateBackwards = false;
-    m_bMoveForwards = false;
-    m_bLastStateLeft = false;
-    m_bLastStateRight = false;
-    m_bMoveLeft = false;
-}
-
-CKeyBinds::~CKeyBinds()
-{
-    Clear();
-    delete m_pList;
+    return RemoveBinds(binds, isProcessingKeyStroke, [bindType](auto& bind) { return bind->type == bindType; });
 }
 
 bool CKeyBinds::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -391,7 +360,7 @@ void CKeyBinds::OnLoseFocus()
 {
     for (size_t i = 0; i < std::size(bindableKeyStates); ++i)
     {
-        if (bindableKeyStates[i] == true)
+        if (bindableKeyStates[i])
         {
             const SBindableKey* key = &g_bkKeys[i];
             ProcessKeyStroke(key, false);
@@ -401,9 +370,7 @@ void CKeyBinds::OnLoseFocus()
 
 bool CKeyBinds::ProcessCharacter(WPARAM wChar)
 {
-    if (m_CharacterKeyHandler && m_CharacterKeyHandler(wChar))
-        return true;
-    return false;
+    return m_CharacterKeyHandler && m_CharacterKeyHandler(wChar);
 }
 
 bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
@@ -473,8 +440,14 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
         return iter != processedCommandBinds.end();
     };
 
-    // Search through a list-copy of our binds
-    for (CKeyBind* bind : std::list<CKeyBind*>(*m_pList))
+    // Search through a copy of our binds
+    std::vector<CKeyBind*> binds;
+    binds.reserve(m_binds.size());
+
+    for (KeyBindPtr& bind : m_binds)
+        binds.push_back(bind.get());
+
+    for (CKeyBind* bind : binds)
     {
         if (bind->isBeingDeleted || !bind->isActive || bind->boundKey != pKey)
             continue;
@@ -564,83 +537,68 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     return wasBindFound;
 }
 
-void CKeyBinds::Add(CKeyBind* pKeyBind)
+void CKeyBinds::Remove(CKeyBind* keyBind)
 {
-    if (pKeyBind)
-        m_pList->push_back(pKeyBind);
+    auto predicate = [keyBind](const KeyBindPtr& bind) { return bind.get() == keyBind; };
+
+    if (auto iter = std::find_if(m_binds.begin(), m_binds.end(), predicate); iter != m_binds.end())
+        m_binds.erase(iter);
 }
 
-void CKeyBinds::Remove(CKeyBind* pKeyBind)
+void CKeyBinds::Remove(KeyBindContainer::iterator& iter)
 {
-    // If this is an active chatbox bind, delete it
-    // so it won't be called on next frame
-    if (m_pChatBoxBind == pKeyBind)
+    KeyBindPtr& keyBind = *iter;
+
+    // If this is an active chatbox bind, delete it so it won't be called on next frame
+    if (m_pChatBoxBind == keyBind.get())
         m_pChatBoxBind = nullptr;
 
     if (m_bProcessingKeyStroke)
-    {
-        pKeyBind->isBeingDeleted = true;
-    }
+        keyBind->isBeingDeleted = true;
     else
-    {
-        m_pList->remove(pKeyBind);
-        delete pKeyBind;
-    }
-}
-
-void CKeyBinds::Clear()
-{
-    for (CKeyBind* bind : std::exchange(*m_pList, {}))
-        delete bind;
+        m_binds.erase(iter);
 }
 
 void CKeyBinds::RemoveDeletedBinds()
 {
-    auto predicate = [](CKeyBind* bind)
-    {
-        if (!bind->isBeingDeleted)
-            return false;
-        delete bind;
-        return true;
-    };
-
-    if (auto iter = std::remove_if(m_pList->begin(), m_pList->end(), predicate); iter != m_pList->end())
-        m_pList->erase(iter, m_pList->end());
+    auto predicate = [](const KeyBindPtr& bind) { return bind->isBeingDeleted; };
+    m_binds.erase(std::remove_if(m_binds.begin(), m_binds.end(), predicate), m_binds.end());
 }
 
 void CKeyBinds::ClearCommandsAndControls()
 {
-    auto predicate = [](CKeyBind* bind) { return bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION; };
-    RemoveBinds(*m_pList, m_bProcessingKeyStroke, predicate);
+    auto predicate = [](const KeyBindPtr& bind)
+    { return !bind->isBeingDeleted && bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION; };
+    RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
 }
 
-bool CKeyBinds::Call(CKeyBind* pKeyBind)
+bool CKeyBinds::Call(CKeyBind* keyBind)
 {
-    if (!pKeyBind)
+    if (!keyBind)
         return false;
 
-    switch (pKeyBind->type)
+    switch (keyBind->type)
     {
         case KeyBindType::COMMAND:
         {
-            auto commandBind = static_cast<CCommandBind*>(pKeyBind);
+            auto commandBind = static_cast<CCommandBind*>(keyBind);
             if (commandBind->isActive)
             {
                 const char* arguments = commandBind->arguments.empty() ? nullptr : commandBind->arguments.c_str();
-                m_pCore->GetCommands()->Execute(commandBind->command.c_str(), arguments, false, !commandBind->resource.empty());
+                m_pCore->GetCommands()->Execute(commandBind->command.c_str(), arguments, /*bHandleRemotely=*/false, !commandBind->resource.empty());
             }
             break;
         }
         case KeyBindType::FUNCTION:
         {
-            auto functionBind = static_cast<CKeyFunctionBind*>(pKeyBind);
+            auto functionBind = static_cast<CKeyFunctionBind*>(keyBind);
             if (functionBind->Handler)
                 functionBind->Handler(functionBind);
             break;
         }
         case KeyBindType::CONTROL_FUNCTION:
         {
-            auto functionBind = static_cast<CControlFunctionBind*>(pKeyBind);
+            auto functionBind = static_cast<CControlFunctionBind*>(keyBind);
             if (functionBind->Handler)
                 functionBind->Handler(functionBind);
             break;
@@ -660,9 +618,9 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
     if (!szKey || !szCommand)
         return false;
 
-    const SBindableKey* boundKey = GetBindableFromKey(szKey);
+    const SBindableKey* bindableKey = GetBindableFromKey(szKey);
 
-    if (!boundKey)
+    if (!bindableKey)
         return false;
 
     if (szResource && bScriptCreated)
@@ -679,11 +637,10 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
         }
     }
 
-    CCommandBind* bind = new CCommandBind;
-    bind->boundKey = boundKey;
+    auto bind = std::make_unique<CCommandBind>();
+    bind->boundKey = bindableKey;
     bind->command = szCommand;
     bind->bHitState = bState;
-    bind->bState = false;
 
     if (szArguments)
         bind->arguments = szArguments;
@@ -698,8 +655,8 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
         else
             bind->strOriginalScriptKey = szOriginalScriptKey;            // Will wait for script to addcommand before doing replace
     }
-    
-    m_pList->push_back(bind);
+
+    m_binds.emplace_back(bind.release());
     return true;
 }
 
@@ -710,16 +667,15 @@ bool CKeyBinds::AddCommand(const SBindableKey* pKey, const char* szCommand, cons
     if (!pKey || !szCommand)
         return false;
 
-    CCommandBind* bind = new CCommandBind;
+    auto bind = std::make_unique<CCommandBind>();
     bind->boundKey = pKey;
     bind->command = szCommand;
     bind->bHitState = bState;
-    bind->bState = false;
 
     if (szArguments)
         bind->arguments = szArguments;
-    
-    m_pList->push_back(bind);
+
+    m_binds.emplace_back(bind.release());
     return true;
 }
 
@@ -730,15 +686,15 @@ bool CKeyBinds::RemoveCommand(const char* szKey, const char* szCommand, bool bCh
 
     std::string_view command{szCommand};
 
-    auto predicate = [&](CKeyBind* bind)
+    auto predicate = [&](const KeyBindPtr& bind)
     {
-        if (bind->type != KeyBindType::COMMAND)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             return false;
 
         if (stricmp(szKey, bind->boundKey->szKey))
             return false;
 
-        auto commandBind = static_cast<CCommandBind*>(bind);
+        auto commandBind = static_cast<const CCommandBind*>(bind.get());
 
         if (!commandBind->resource.empty() || commandBind->command != command)
             return false;
@@ -746,7 +702,7 @@ bool CKeyBinds::RemoveCommand(const char* szKey, const char* szCommand, bool bCh
         return !bCheckState || commandBind->bHitState == bState;
     };
 
-    return ForEachBind(*m_pList, predicate, [this](CKeyBind* bind) { Remove(bind); });
+    return ForEachBind(m_binds, predicate, [this](KeyBindContainer::iterator& iter) { Remove(iter); });
 }
 
 bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bState)
@@ -754,25 +710,25 @@ bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bSta
     if (!szKey)
         return false;
 
-    auto predicate = [&](CKeyBind* bind)
+    auto predicate = [&](const KeyBindPtr& bind)
     {
-        if (bind->type != KeyBindType::COMMAND)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             return false;
 
         if (stricmp(szKey, bind->boundKey->szKey))
             return false;
 
-        auto commandBind = static_cast<CCommandBind*>(bind);
+        auto commandBind = static_cast<CCommandBind*>(bind.get());
         return !bCheckState || commandBind->bHitState == bState;
     };
 
-    return ForEachBind(*m_pList, predicate, [this](CKeyBind* bind) { Remove(bind); });
+    return ForEachBind(m_binds, predicate, [this](KeyBindContainer::iterator& iter) { Remove(iter); });
 }
 
 bool CKeyBinds::RemoveAllCommands()
 {
-    auto predicate = [](CKeyBind* bind) { return bind->type == KeyBindType::COMMAND; };
-    return ForEachBind(*m_pList, predicate, [this](CKeyBind* bind) { Remove(bind); });
+    auto predicate = [](const KeyBindPtr& bind) { return !bind->isBeingDeleted && bind->type == KeyBindType::COMMAND; };
+    return ForEachBind(m_binds, predicate, [this](KeyBindContainer::iterator& iter) { Remove(iter); });
 }
 
 bool CKeyBinds::CommandExists(const char* szKey, const char* szCommand, bool bCheckState, bool bState, const char* szArguments, const char* szResource,
@@ -797,12 +753,12 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
 {
     NullEmptyStrings(szKey, szCommand, szArguments);
 
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
-        if (bind->type != KeyBindType::COMMAND)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             continue;
 
-        auto commandBind = static_cast<CCommandBind*>(bind);
+        auto commandBind = static_cast<CCommandBind*>(bind.get());
 
         if (szKey && stricmp(szKey, commandBind->boundKey->szKey) &&
             !(bConsiderDefaultKey && commandBind->bIsReplacingScriptKey && !stricmp(szKey, commandBind->strOriginalScriptKey.c_str())))
@@ -832,18 +788,18 @@ void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const
 {
     NullEmptyStrings(szCommand, szArguments);
 
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
-        if (bind->type != KeyBindType::COMMAND)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             continue;
 
-        auto commandBind = static_cast<CCommandBind*>(bind);
+        auto commandBind = static_cast<CCommandBind*>(bind.get());
 
         if (szOnlyWithDefaultKey && !(commandBind->bIsReplacingScriptKey && !stricmp(szOnlyWithDefaultKey, commandBind->strOriginalScriptKey.c_str())) &&
             stricmp(szOnlyWithDefaultKey, commandBind->boundKey->szKey))
             continue;
 
-        if (!commandBind->resource.empty() && commandBind->resource != szResource)
+        if (szResource && !commandBind->resource.empty() && commandBind->resource != szResource)
             continue;
 
         if (szCommand && commandBind->command != szCommand)
@@ -864,12 +820,12 @@ CCommandBind* CKeyBinds::GetBindFromCommand(const char* szCommand, const char* s
 {
     NullEmptyStrings(szKey, szArguments);
 
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
-        if (bind->type != KeyBindType::COMMAND)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             continue;
 
-        auto commandBind = static_cast<CCommandBind*>(bind);
+        auto commandBind = static_cast<CCommandBind*>(bind.get());
 
         if (szKey && stricmp(szKey, commandBind->boundKey->szKey))
             continue;
@@ -906,12 +862,12 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
     std::string arguments = szArguments ? szArguments : "";
     szArguments = SharedUtil::Trim(arguments.data());
 
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
-        if (bind->type != KeyBindType::COMMAND)
-            return false;
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
+            continue;
 
-        auto commandBind = static_cast<CCommandBind*>(bind);
+        auto commandBind = static_cast<CCommandBind*>(bind.get());
 
         if (szKey && stricmp(szKey, commandBind->boundKey->szKey))
             continue;
@@ -946,8 +902,8 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
 CCommandBind* CKeyBinds::FindMatchingUpBind(CCommandBind* pBind)
 {
     const char* szResource = pBind->resource.empty() ? nullptr : pBind->resource.c_str();
-    return FindCommandMatch(pBind->boundKey->szKey, pBind->command.c_str(), NULL, szResource, pBind->strOriginalScriptKey.c_str(), true, false, true,
-                            pBind->bScriptCreated);
+    return FindCommandMatch(pBind->boundKey->szKey, pBind->command.c_str(), /*arguments=*/nullptr, szResource, pBind->strOriginalScriptKey.c_str(),
+                            /*bCheckState=*/true, /*bState=*/false, /*bCheckScriptCreated=*/true, pBind->bScriptCreated);
 }
 
 //
@@ -993,15 +949,16 @@ void CKeyBinds::UserChangeCommandBoundKey(CCommandBind* pBind, const SBindableKe
 //
 void CKeyBinds::SortCommandBinds()
 {
-    auto compare = [](const CKeyBind* lhs, const CKeyBind* rhs) {
+    auto compare = [](const KeyBindPtr& lhs, const KeyBindPtr& rhs)
+    {
         // Group command binds last
         if (lhs->type != KeyBindType::COMMAND && rhs->type == KeyBindType::COMMAND)
             return true;
         if (lhs->type != KeyBindType::COMMAND || rhs->type != KeyBindType::COMMAND)
             return false;
 
-        auto lhsCommand = static_cast<const CCommandBind*>(lhs);
-        auto rhsCommand = static_cast<const CCommandBind*>(rhs);
+        auto lhsCommand = static_cast<const CCommandBind*>(lhs.get());
+        auto rhsCommand = static_cast<const CCommandBind*>(rhs.get());
 
         // Command binds with resource name last
         if (lhsCommand->resource.empty() && !rhsCommand->resource.empty())
@@ -1023,65 +980,59 @@ void CKeyBinds::SortCommandBinds()
         return !lhsCommand->strOriginalScriptKey.empty() && rhsCommand->strOriginalScriptKey.empty();
     };
 
-    m_pList->sort(compare);
+    m_binds.sort(compare);
 }
 
-bool CKeyBinds::GetBoundCommands(const char* szCommand, list<CCommandBind*>& commandsList)
+bool CKeyBinds::GetBoundCommands(const char* szCommand, std::list<CCommandBind*>& commandsList)
 {
-    std::size_t before = commandsList.size();
+    std::size_t sizeBefore = commandsList.size();
 
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             continue;
 
-        auto commandBind = static_cast<CCommandBind*>(bind);
+        auto commandBind = static_cast<CCommandBind*>(bind.get());
 
         if (!stricmp(commandBind->command.c_str(), szCommand))
             commandsList.push_back(commandBind);
     }
 
-    return commandsList.size() != before;
+    return commandsList.size() != sizeBefore;
 }
 
 bool CKeyBinds::AddGTAControl(const char* szKey, const char* szControl)
 {
-    if (szKey == NULL || szControl == NULL)
+    if (!szKey || !szControl)
         return false;
 
-    const SBindableKey*  boundKey = GetBindableFromKey(szKey);
-    SBindableGTAControl* boundControl = GetBindableFromControl(szControl);
+    const SBindableKey* bindableKey = GetBindableFromKey(szKey);
 
-    if (boundKey && boundControl)
-    {
-        CGTAControlBind* bind = new CGTAControlBind;
-        bind->boundKey = boundKey;
-        bind->control = boundControl;
-        bind->bState = false;
+    if (!bindableKey)
+        return false;
 
-        m_pList->push_back(bind);
+    SBindableGTAControl* bindableControl = GetBindableFromControl(szControl);
 
-        return true;
-    }
+    if (!bindableControl)
+        return false;
 
-    return false;
+    auto bind = std::make_unique<CGTAControlBind>();
+    bind->boundKey = bindableKey;
+    bind->control = bindableControl;
+    m_binds.emplace_back(bind.release());
+    return true;
 }
 
 bool CKeyBinds::AddGTAControl(const SBindableKey* pKey, SBindableGTAControl* pControl)
 {
-    if (pKey && pControl)
-    {
-        CGTAControlBind* bind = new CGTAControlBind;
-        bind->boundKey = pKey;
-        bind->control = pControl;
-        bind->bState = false;
+    if (!pKey || !pControl)
+        return false;
 
-        m_pList->push_back(bind);
-
-        return true;
-    }
-
-    return false;
+    auto bind = std::make_unique<CGTAControlBind>();
+    bind->boundKey = pKey;
+    bind->control = pControl;
+    m_binds.emplace_back(bind.release());
+    return true;
 }
 
 bool CKeyBinds::RemoveGTAControl(const char* szKey, const char* szControl)
@@ -1089,15 +1040,15 @@ bool CKeyBinds::RemoveGTAControl(const char* szKey, const char* szControl)
     if (!szKey|| !szControl)
         return false;
 
-    auto predicate = [&](CKeyBind* bind) {
-        if (bind->type != KeyBindType::GTA_CONTROL)
+    auto predicate = [&](const KeyBindPtr& bind) {
+        if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             return false;
 
-        auto controlBind = static_cast<CGTAControlBind*>(bind);
+        auto controlBind = static_cast<CGTAControlBind*>(bind.get());
         return !stricmp(szKey, controlBind->boundKey->szKey) && !strcmp(szControl, controlBind->control->szControl);
     };
 
-    return RemoveBinds(*m_pList, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
@@ -1105,21 +1056,21 @@ bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
     if (!szKey)
         return false;
 
-    auto predicate = [&](CKeyBind* bind)
+    auto predicate = [&](const KeyBindPtr& bind)
     {
-        if (bind->type != KeyBindType::GTA_CONTROL)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             return false;
 
-        auto controlBind = static_cast<CGTAControlBind*>(bind);
+        auto controlBind = static_cast<CGTAControlBind*>(bind.get());
         return !stricmp(szKey, controlBind->boundKey->szKey);
     };
 
-    return RemoveBinds(*m_pList, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllGTAControls()
 {
-    return RemoveBindTypeBinds(*m_pList, m_bProcessingKeyStroke, KeyBindType::GTA_CONTROL);
+    return RemoveBindTypeBinds(m_binds, m_bProcessingKeyStroke, KeyBindType::GTA_CONTROL);
 }
 
 bool CKeyBinds::GTAControlExists(const char* szKey, const char* szControl)
@@ -1131,12 +1082,12 @@ bool CKeyBinds::GTAControlExists(const char* szKey, const char* szControl)
 
 bool CKeyBinds::GTAControlExists(const SBindableKey* pKey, SBindableGTAControl* pControl)
 {
-    for (CKeyBind* bind : *m_pList)
+    for (const KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             continue;
 
-        auto controlBind = static_cast<CGTAControlBind*>(bind);
+        auto controlBind = static_cast<CGTAControlBind*>(bind.get());
 
         if (controlBind->boundKey != pKey || controlBind->control != pControl)
             continue;
@@ -1149,64 +1100,64 @@ bool CKeyBinds::GTAControlExists(const SBindableKey* pKey, SBindableGTAControl* 
 
 void CKeyBinds::CallGTAControlBind(CGTAControlBind* pBind, bool bState)
 {
-    if (pBind)
+    if (!pBind)
+        return;
+
+    // Don't allow custom track skips. Crashes for some reason.
+    if (pBind->control->action == RADIO_USER_TRACK_SKIP)
+        return;
+
+    // Set this binds state
+    pBind->bState = bState;
+
+    // If its keydown, or there isnt another bind for this control down
+    if (bState || !GetMultiGTAControlState(pBind))
     {
-        // Don't allow custom track skips. Crashes for some reason.
-        if (pBind->control->action == RADIO_USER_TRACK_SKIP)
-            return;
+        // HACK: Are we're trying to ZOOM IN or ZOOM OUT using the mouse wheel?
+        bool bZoomWheel = m_bMouseWheel && (pBind->control->action == ZOOM_IN || pBind->control->action == ZOOM_OUT);
 
-        // Set this binds state
-        pBind->bState = bState;
-
-        // If its keydown, or there isnt another bind for this control down
-        if (bState || !GetMultiGTAControlState(pBind))
+        // If this control is enabled
+        // HACK: Prevent the game from using the mouse wheel to zoom *again* (it still does this itself)
+        if (pBind->control->bEnabled && !bZoomWheel)
         {
-            // HACK: Are we're trying to ZOOM IN or ZOOM OUT using the mouse wheel?
-            bool bZoomWheel = m_bMouseWheel && (pBind->control->action == ZOOM_IN || pBind->control->action == ZOOM_OUT);
+            pBind->control->bState = bState;
+        }
 
-            // If this control is enabled
-            // HACK: Prevent the game from using the mouse wheel to zoom *again* (it still does this itself)
-            if (pBind->control->bEnabled && !bZoomWheel)
+        for (KeyBindPtr& bind : m_binds)
+        {
+            if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
+                continue;
+
+            auto functionBind = static_cast<CControlFunctionBind*>(bind.get());
+
+            if (functionBind->control != pBind->control)
+                continue;
+
+            // If its a key up or our player's state matches the control
+            eControlType controlType = functionBind->control->controlType;
+
+            if (bState)
             {
-                pBind->control->bState = bState;
+                if ((controlType == CONTROL_FOOT && m_bInVehicle) || (controlType == CONTROL_VEHICLE && !m_bInVehicle))
+                    continue;
             }
 
-            for (CKeyBind* bind : *m_pList)
-            {
-                if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
-                    continue;
+            if (functionBind->bState != bState && functionBind->bHitState == bState)
+                Call(functionBind);
 
-                auto functionBind = static_cast<CControlFunctionBind*>(bind);
-
-                if (functionBind->control != pBind->control)
-                    continue;
-
-                // If its a key up or our player's state matches the control
-                eControlType controlType = functionBind->control->controlType;
-
-                if (bState)
-                {
-                    if ((controlType == CONTROL_FOOT && m_bInVehicle) || (controlType == CONTROL_VEHICLE && !m_bInVehicle))
-                        continue;
-                }
-
-                if (functionBind->bState != bState && functionBind->bHitState == bState)
-                    Call(functionBind);
-
-                functionBind->bState = bState;
-            }
+            functionBind->bState = bState;
         }
     }
 }
 
 void CKeyBinds::CallAllGTAControlBinds(eControlType controlType, bool bState)
 {
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
-        if (bind->type != KeyBindType::GTA_CONTROL)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             continue;
 
-        auto controlBind = static_cast<CGTAControlBind*>(bind);
+        auto controlBind = static_cast<CGTAControlBind*>(bind.get());
 
         if (controlType == CONTROL_BOTH || controlBind->control->controlType == controlType)
             CallGTAControlBind(controlBind, bState);
@@ -1217,12 +1168,12 @@ bool CKeyBinds::GetMultiGTAControlState(CGTAControlBind* pBind)
 {
     eControllerAction action = pBind->control->action;
 
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             continue;
 
-        auto controlBind = reinterpret_cast<CGTAControlBind*>(bind);
+        auto controlBind = reinterpret_cast<CGTAControlBind*>(bind.get());
 
         if (controlBind == pBind || controlBind->control->action != action)
             continue;
@@ -1301,7 +1252,7 @@ void CKeyBinds::SetAllControlsEnabled(bool bGameControls, bool bMTAControls, boo
     }
     if (bMTAControls)
     {
-        list<COMMANDENTRY*>::iterator iter = m_pCore->GetCommands()->IterBegin();
+        std::list<COMMANDENTRY*>::iterator iter = m_pCore->GetCommands()->IterBegin();
         for (; iter != m_pCore->GetCommands()->IterEnd(); iter++)
         {
             if ((*iter)->bModCommand)
@@ -1318,12 +1269,12 @@ void CKeyBinds::ResetGTAControlState(SBindableGTAControl* pControl)
     pControl->bState = false;
 
     // Search for a pressed bind for this control and set the control state accordingly
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             continue;
 
-        auto controlBind = static_cast<CGTAControlBind*>(bind);
+        auto controlBind = static_cast<CGTAControlBind*>(bind.get());
 
         if (controlBind->control == pControl && controlBind->bState)
         {
@@ -1340,26 +1291,26 @@ void CKeyBinds::ResetAllGTAControlStates()
         g_bcControls[i].bState = false;
 
     // Go through all our control binds, if they're state is true, turn their control on
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             continue;
 
-        auto controlBind = static_cast<CGTAControlBind*>(bind);
+        auto controlBind = static_cast<CGTAControlBind*>(bind.get());
 
         if (controlBind->bState)
             controlBind->control->bState = true;
     }
 }
 
-bool CKeyBinds::GetBoundControls(SBindableGTAControl* pControl, list<CGTAControlBind*>& controlsList)
+bool CKeyBinds::GetBoundControls(SBindableGTAControl* pControl, std::list<CGTAControlBind*>& controlsList)
 {
-    for (CKeyBind* bind : *m_pList)
+    for (KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             continue;
 
-        auto controlBind = static_cast<CGTAControlBind*>(bind);
+        auto controlBind = static_cast<CGTAControlBind*>(bind.get());
 
         if (controlBind->control == pControl)
             controlsList.push_back(controlBind);
@@ -1370,30 +1321,25 @@ bool CKeyBinds::GetBoundControls(SBindableGTAControl* pControl, list<CGTAControl
 
 bool CKeyBinds::AddFunction(const char* szKey, KeyFunctionBindHandler Handler, bool bState, bool bIgnoreGUI)
 {
-    if (szKey == NULL)
+    if (!szKey)
         return false;
 
-    const SBindableKey* boundKey = GetBindableFromKey(szKey);
-
-    return AddFunction(boundKey, Handler, bState, bIgnoreGUI);
+    const SBindableKey* bindableKey = GetBindableFromKey(szKey);
+    return AddFunction(bindableKey, Handler, bState, bIgnoreGUI);
 }
 
 bool CKeyBinds::AddFunction(const SBindableKey* pKey, KeyFunctionBindHandler Handler, bool bState, bool bIgnoreGUI)
 {
-    list<CKeyBind*>::const_iterator iter = m_pList->begin();
+    if (!pKey || !Handler)
+        return false;
 
-    if (pKey && Handler)
-    {
-        CKeyFunctionBind* pBind = new CKeyFunctionBind;
-        pBind->boundKey = pKey;
-        m_pList->push_back(pBind);
-        pBind->bHitState = bState;
-        pBind->Handler = Handler;
-        pBind->bState = false;
-        pBind->bIgnoreGUI = bIgnoreGUI;
-        return true;
-    }
-    return false;
+    auto bind = std::make_unique<CKeyFunctionBind>();
+    bind->boundKey = pKey;
+    bind->bHitState = bState;
+    bind->Handler = Handler;
+    bind->bIgnoreGUI = bIgnoreGUI;
+    m_binds.emplace_back(bind.release());
+    return true;
 }
 
 bool CKeyBinds::RemoveFunction(const char* szKey, KeyFunctionBindHandler Handler, bool bCheckState, bool bState)
@@ -1406,11 +1352,11 @@ bool CKeyBinds::RemoveFunction(const char* szKey, KeyFunctionBindHandler Handler
 
 bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    auto predicate = [&](CKeyBind* bind) {
-        if (bind->type != KeyBindType::FUNCTION)
+    auto predicate = [&](const KeyBindPtr& bind) {
+        if (bind->isBeingDeleted || bind->type != KeyBindType::FUNCTION)
             return false;
 
-        auto functionBind = static_cast<CKeyFunctionBind*>(bind);
+        auto functionBind = static_cast<const CKeyFunctionBind*>(bind.get());
 
         if (bCheckState && functionBind->bHitState != bState)
             return false;
@@ -1418,119 +1364,105 @@ bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler 
         return functionBind->Handler == Handler && functionBind->boundKey == pKey;
     };
 
-    return RemoveBinds(*m_pList, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
 {
-    auto predicate = [&](CKeyBind* bind)
+    auto predicate = [&](const KeyBindPtr& bind)
     {
-        if (bind->type != KeyBindType::FUNCTION)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::FUNCTION)
             return false;
 
-        auto functionBind = static_cast<CKeyFunctionBind*>(bind);
+        auto functionBind = static_cast<const CKeyFunctionBind*>(bind.get());
         return functionBind->Handler == Handler;
     };
 
-    return RemoveBinds(*m_pList, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllFunctions()
 {
-    return RemoveBindTypeBinds(*m_pList, m_bProcessingKeyStroke, KeyBindType::FUNCTION);
+    return RemoveBindTypeBinds(m_binds, m_bProcessingKeyStroke, KeyBindType::FUNCTION);
 }
 
 bool CKeyBinds::FunctionExists(const char* szKey, KeyFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    if (const SBindableKey* key = GetBindableFromKey(szKey); key != nullptr)
-        return FunctionExists(key, Handler, bCheckState, bState);
+    if (const SBindableKey* bindableKey = GetBindableFromKey(szKey); bindableKey != nullptr)
+        return FunctionExists(bindableKey, Handler, bCheckState, bState);
     
     return false;
 }
 
 bool CKeyBinds::FunctionExists(const SBindableKey* pKey, KeyFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    auto predicate = [&](CKeyBind* bind)
+    for (const KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::FUNCTION)
-            return false;
+            continue;
 
-        auto functionBind = static_cast<CKeyFunctionBind*>(bind);
+        auto functionBind = static_cast<const CKeyFunctionBind*>(bind.get());
 
         if (Handler && functionBind->Handler != Handler)
-            return false;
+            continue;
 
         if (bCheckState && functionBind->bHitState != bState)
-            return false;
+            continue;
 
-        return functionBind->boundKey == pKey;
-    };
+        if (functionBind->boundKey == pKey)
+            return true;
+    }
 
-    return std::find_if(m_pList->begin(), m_pList->end(), predicate) != m_pList->end();
+    return false;
 }
 
 bool CKeyBinds::AddControlFunction(const char* szControl, ControlFunctionBindHandler Handler, bool bState)
 {
-    if (szControl == NULL || Handler == NULL)
+    if (!szControl || !Handler)
         return false;
 
-    SBindableGTAControl* boundControl = GetBindableFromControl(szControl);
+    SBindableGTAControl* bindableControl = GetBindableFromControl(szControl);
 
-    if (boundControl)
-    {
-        CControlFunctionBind* pBind = new CControlFunctionBind;
-        pBind->boundKey = NULL;
-        pBind->control = boundControl;
-        pBind->Handler = Handler;
-        pBind->bHitState = bState;
-        pBind->bState = false;
+    if (!bindableControl)
+        return false;
 
-        m_pList->push_back(pBind);
-
-        return true;
-    }
-
-    return false;
+    auto bind = std::make_unique<CControlFunctionBind>();
+    bind->control = bindableControl;
+    bind->Handler = Handler;
+    bind->bHitState = bState;
+    m_binds.emplace_back(bind.release());
+    return true;
 }
 
 bool CKeyBinds::AddControlFunction(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bState)
 {
-    if (Handler == NULL)
+    if (!Handler || !pControl)
         return false;
 
-    if (pControl)
-    {
-        CControlFunctionBind* pBind = new CControlFunctionBind;
-        pBind->boundKey = NULL;
-        pBind->control = pControl;
-        pBind->Handler = Handler;
-        pBind->bHitState = bState;
-        pBind->bState = false;
-
-        m_pList->push_back(pBind);
-
-        return true;
-    }
-
-    return false;
+    auto bind = std::make_unique<CControlFunctionBind>();
+    bind->control = pControl;
+    bind->Handler = Handler;
+    bind->bHitState = bState;
+    m_binds.emplace_back(bind.release());
+    return true;
 }
 
 bool CKeyBinds::RemoveControlFunction(const char* szControl, ControlFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    if (SBindableGTAControl* control = GetBindableFromControl(szControl); control != nullptr)
-        return RemoveControlFunction(control, Handler, bCheckState, bState);
+    if (SBindableGTAControl* bindableControl = GetBindableFromControl(szControl); bindableControl != nullptr)
+        return RemoveControlFunction(bindableControl, Handler, bCheckState, bState);
     
     return false;
 }
 
 bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    auto predicate = [&](CKeyBind* bind)
+    auto predicate = [&](const KeyBindPtr& bind)
     {
-        if (bind->type != KeyBindType::CONTROL_FUNCTION)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
             return false;
 
-        auto functionBind = static_cast<CControlFunctionBind*>(bind);
+        auto functionBind = static_cast<const CControlFunctionBind*>(bind.get());
 
         if (bCheckState && functionBind->bState != bState)
             return false;
@@ -1538,44 +1470,44 @@ bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunc
         return functionBind->Handler == Handler && functionBind->control == pControl;
     };
 
-    return RemoveBinds(*m_pList, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
 {
-    auto predicate = [&](CKeyBind* bind)
+    auto predicate = [&](const KeyBindPtr& bind)
     {
-        if (bind->type != KeyBindType::CONTROL_FUNCTION)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
             return false;
 
-        auto functionBind = static_cast<CControlFunctionBind*>(bind);
+        auto functionBind = static_cast<const CControlFunctionBind*>(bind.get());
         return functionBind->Handler == Handler;
     };
 
-    return RemoveBinds(*m_pList, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllControlFunctions()
 {
-    return RemoveBindTypeBinds(*m_pList, m_bProcessingKeyStroke, KeyBindType::CONTROL_FUNCTION);
+    return RemoveBindTypeBinds(m_binds, m_bProcessingKeyStroke, KeyBindType::CONTROL_FUNCTION);
 }
 
 bool CKeyBinds::ControlFunctionExists(const char* szControl, ControlFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    if (SBindableGTAControl* control = GetBindableFromControl(szControl); control != nullptr)
-        return ControlFunctionExists(control, Handler, bCheckState, bState);
+    if (SBindableGTAControl* bindableControl = GetBindableFromControl(szControl); bindableControl != nullptr)
+        return ControlFunctionExists(bindableControl, Handler, bCheckState, bState);
 
     return false;
 }
 
 bool CKeyBinds::ControlFunctionExists(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    for (CKeyBind* bind : *m_pList)
+    for (const KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
             continue;
 
-        auto functionBind = static_cast<CControlFunctionBind*>(bind);
+        auto functionBind = static_cast<const CControlFunctionBind*>(bind.get());
 
         if (bCheckState && functionBind->bHitState != bState)
             continue;
@@ -1594,9 +1526,7 @@ const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey) const
         const SBindableKey* temp = &g_bkKeys[i];
 
         if (!stricmp(temp->szKey, szKey))
-        {
             return temp;
-        }
     }
 
     return nullptr;
@@ -1607,10 +1537,9 @@ SBindableGTAControl* CKeyBinds::GetBindableFromAction(eControllerAction action)
     for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
+
         if (temp->action == action)
-        {
             return temp;
-        }
     }
 
     return NULL;
@@ -1621,10 +1550,9 @@ bool CKeyBinds::IsKey(const char* szKey)
     for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
     {
         const SBindableKey* temp = &g_bkKeys[i];
+
         if (!stricmp(temp->szKey, szKey))
-        {
             return true;
-        }
     }
 
     return false;
@@ -1724,9 +1652,9 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage(UINT uMsg, WPARAM wParam, 
 
 bool CKeyBinds::GetKeyStateByName(const char* keyName, bool& state) const
 {
-    if (const SBindableKey* key = GetBindableFromKey(keyName); key != nullptr)
+    if (const SBindableKey* bindableKey = GetBindableFromKey(keyName); bindableKey != nullptr)
     {
-        state = GetBindableKeyState(key);
+        state = GetBindableKeyState(bindableKey);
         return true;
     }
 
@@ -1738,10 +1666,9 @@ SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szControl)
     for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
+
         if (!stricmp(temp->szControl, szControl))
-        {
             return temp;
-        }
     }
 
     return NULL;
@@ -1752,10 +1679,9 @@ const SBindableKey* CKeyBinds::GetBindableFromGTARelative(int iGTAKey)
     for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
     {
         const SBindableKey* temp = &g_bkKeys[i];
+
         if (temp->iGTARelative == iGTAKey)
-        {
             return temp;
-        }
     }
 
     return NULL;
@@ -1766,10 +1692,9 @@ bool CKeyBinds::IsControl(const char* szControl)
     for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
+
         if (!strcmp(temp->szControl, szControl))
-        {
             return true;
-        }
     }
 
     return false;
@@ -1786,10 +1711,9 @@ void CKeyBinds::SetAllFootControls(bool bState)
     for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
+
         if (temp->controlType == CONTROL_FOOT)
-        {
             temp->bState = bState;
-        }
     }
 }
 
@@ -1798,52 +1722,41 @@ void CKeyBinds::SetAllVehicleControls(bool bState)
     for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
+
         if (temp->controlType == CONTROL_VEHICLE)
-        {
             temp->bState = bState;
-        }
     }
 }
 
 void CKeyBinds::SetAllBindStates(bool bState, KeyBindType onlyType)
 {
-    auto setState = [this](CKeyBind* bind, bool state) {
+    for (KeyBindPtr& bind : m_binds)
+    {
+        if (onlyType != KeyBindType::UNDEFINED && bind->type != onlyType)
+            continue;
+
         switch (bind->type)
         {
             case KeyBindType::COMMAND:
             case KeyBindType::FUNCTION:
             {
-                auto stateBind = static_cast<CKeyBindWithState*>(bind);
-                if (stateBind->bState != state)
+                auto stateBind = static_cast<CKeyBindWithState*>(bind.get());
+                if (stateBind->bState != bState)
                 {
-                    if (stateBind->bHitState == state)
+                    if (stateBind->bHitState == bState)
                         Call(stateBind);
 
-                    stateBind->bState = state;
+                    stateBind->bState = bState;
                 }
                 break;
             }
             case KeyBindType::GTA_CONTROL:
             {
-                CallGTAControlBind(static_cast<CGTAControlBind*>(bind), state);
+                CallGTAControlBind(static_cast<CGTAControlBind*>(bind.get()), bState);
                 break;
             }
             default:
                 break;
-        }
-    };
-
-    if (onlyType == KeyBindType::UNDEFINED)
-    {
-        for (CKeyBind* bind : *m_pList)
-            setState(bind, bState);
-    }
-    else
-    {
-        for (CKeyBind* bind : *m_pList)
-        {
-            if (bind->type == onlyType)
-                setState(bind, bState);
         }
     }
 }
@@ -1851,10 +1764,10 @@ void CKeyBinds::SetAllBindStates(bool bState, KeyBindType onlyType)
 unsigned int CKeyBinds::Count(KeyBindType bindType)
 {
     if (bindType == KeyBindType::UNDEFINED)
-        return static_cast<unsigned int>(m_pList->size());
+        return static_cast<unsigned int>(m_binds.size());
 
-    auto predicate = [bindType](CKeyBind* bind) { return bind->type == bindType; };
-    ptrdiff_t count = std::count_if(m_pList->begin(), m_pList->end(), predicate);
+    auto predicate = [bindType](const KeyBindPtr& bind) { return bind->type == bindType; };
+    ptrdiff_t count = std::count_if(m_binds.begin(), m_binds.end(), predicate);
     return static_cast<unsigned int>(count);
 }
 
@@ -2115,21 +2028,21 @@ void CKeyBinds::DoPostFramePulse()
     // Unset the mousewheel states if we have any bound
     if (m_bMouseWheel)
     {
-        for (CKeyBind* bind : *m_pList)
+        for (const KeyBindPtr& bind : m_binds)
         {
             switch (bind->type)
             {
                 case KeyBindType::COMMAND:
                 case KeyBindType::FUNCTION:
                 {
-                    auto stateBind = static_cast<CKeyBindWithState*>(bind);
+                    auto stateBind = static_cast<CKeyBindWithState*>(bind.get());
                     if (stateBind->boundKey->iGTARelative == GTA_KEY_MSCROLLUP || stateBind->boundKey->iGTARelative == GTA_KEY_MSCROLLDOWN)
                         stateBind->bState = false;
                     break;
                 }
                 case KeyBindType::GTA_CONTROL:
                 {
-                    auto controlBind = static_cast<CGTAControlBind*>(bind);
+                    auto controlBind = static_cast<CGTAControlBind*>(bind.get());
                     if (controlBind->boundKey->iGTARelative == GTA_KEY_MSCROLLUP || controlBind->boundKey->iGTARelative == GTA_KEY_MSCROLLDOWN)
                     {
                         if (controlBind->bState)
@@ -2272,7 +2185,7 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
 
     bool success = true;
 
-    for (CKeyBind* bind : *m_pList)
+    for (const KeyBindPtr& bind : m_binds)
     {
         if (bind->isBeingDeleted || !bind->boundKey || (bind->type != KeyBindType::COMMAND && bind->type != KeyBindType::GTA_CONTROL))
             continue;
@@ -2297,7 +2210,7 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
 
         if (bind->type == KeyBindType::COMMAND)
         {
-            auto commandBind = static_cast<CCommandBind*>(bind);
+            auto commandBind = static_cast<CCommandBind*>(bind.get());
 
             // Don't save script added binds
             if (commandBind->bScriptCreated && !commandBind->bIsReplacingScriptKey)
@@ -2319,7 +2232,7 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
         }
         else // bind->type == KeyBindType::GTA_CONTROL
         {
-            auto controlBind = static_cast<CGTAControlBind*>(bind);
+            auto controlBind = static_cast<CGTAControlBind*>(bind.get());
             createAttribute("key", controlBind->boundKey->szKey);
             createAttribute("control", controlBind->control->szControl);
         }
@@ -2566,19 +2479,19 @@ void CKeyBinds::PrintBindsCommand(const char* szCmdLine)
 
     CConsoleInterface* console = m_pCore->GetConsole();
 
-    auto print = [console](CKeyBind* bind) {
+    auto print = [console](const KeyBindPtr& bind) {
         switch (bind->type)
         {
             case KeyBindType::COMMAND:
             {
-                auto commandBind = static_cast<CCommandBind*>(bind);
+                auto commandBind = static_cast<CCommandBind*>(bind.get());
                 console->Printf("Command^%s %s: %s %s", commandBind->boundKey->szKey, (commandBind->bHitState) ? "down" : "up", commandBind->command.c_str(),
                                 commandBind->arguments.c_str());
                 break;
             }
             case KeyBindType::GTA_CONTROL:
             {
-                auto controlBind = static_cast<CGTAControlBind*>(bind);
+                auto controlBind = static_cast<CGTAControlBind*>(bind.get());
                 console->Printf("Control^%s: %s", controlBind->boundKey->szKey, controlBind->control->szControl);
                 break;
             }
@@ -2595,7 +2508,7 @@ void CKeyBinds::PrintBindsCommand(const char* szCmdLine)
     {
         console->Print("* Current key binds: *");
 
-        for (CKeyBind* bind : *m_pList)
+        for (const KeyBindPtr& bind : m_binds)
         {
             if (print(bind))
                 anyMatches = true;
@@ -2613,7 +2526,7 @@ void CKeyBinds::PrintBindsCommand(const char* szCmdLine)
 
         console->Printf("* Current key binds for '%.*s': *", key.size(), key.data());
 
-        for (CKeyBind* bind : *m_pList)
+        for (const KeyBindPtr& bind : m_binds)
         {
             if (!bind->boundKey || bind->boundKey != bindableKey || !bind->boundKey->szKey)
                 continue;

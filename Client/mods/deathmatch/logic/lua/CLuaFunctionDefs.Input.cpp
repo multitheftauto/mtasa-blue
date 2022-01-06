@@ -581,12 +581,14 @@ int CLuaFunctionDefs::GetCommandsBoundToKey(lua_State* luaVM)
             lua_newtable(luaVM);
 
             // Add all the bound commands to it
-            for (CKeyBind* bind : *g_pCore->GetKeyBinds())
+            using KeyBindPtr = CKeyBindsInterface::KeyBindPtr;
+
+            for (const KeyBindPtr& bind : *g_pCore->GetKeyBinds())
             {
                 if (bind->isBeingDeleted || !bind->isActive || bind->type != KeyBindType::COMMAND)
                     continue;
 
-                auto commandBind = static_cast<CCommandBind*>(bind);
+                auto commandBind = static_cast<const CCommandBind*>(bind.get());
 
                 if (bCheckHitState && commandBind->bHitState != bHitState)
                     continue;
@@ -625,12 +627,14 @@ int CLuaFunctionDefs::GetKeyBoundToCommand(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            for (CKeyBind* bind : *g_pCore->GetKeyBinds())
+            using KeyBindPtr = CKeyBindsInterface::KeyBindPtr;
+
+            for (const KeyBindPtr& bind : *g_pCore->GetKeyBinds())
             {
                 if (bind->isBeingDeleted || !bind->isActive || bind->type != KeyBindType::COMMAND)
                     continue;
 
-                auto commandBind = static_cast<CCommandBind*>(bind);
+                auto commandBind = static_cast<const CCommandBind*>(bind.get());
 
                 if (strCommand != commandBind->command)
                     continue;

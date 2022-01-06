@@ -142,20 +142,20 @@ public:
 class CKeyBindsInterface
 {
 public:
+    using KeyBindPtr = std::unique_ptr<CKeyBind>;
+    using KeyBindContainer = std::list<KeyBindPtr>;
+
+    virtual ~CKeyBindsInterface() = default;
+
     virtual bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
     virtual void OnLoseFocus() = 0;
 
-    // Basic funcs
-    virtual void Add(CKeyBind* pKeyBind) = 0;
-    virtual void Remove(CKeyBind* pKeyBind) = 0;
-    virtual void Clear() = 0;
-    virtual bool Call(CKeyBind* pKeyBind) = 0;
+    virtual void Remove(CKeyBind* keyBind) = 0;
 
-    virtual std::list<CKeyBind*>::const_iterator IterBegin() const = 0;
-    virtual std::list<CKeyBind*>::const_iterator IterEnd() const = 0;
-
-    std::list<CKeyBind*>::const_iterator begin() const { return IterBegin(); }
-    std::list<CKeyBind*>::const_iterator end() const { return IterEnd(); }
+    virtual KeyBindContainer::iterator       begin() = 0;
+    virtual KeyBindContainer::const_iterator begin() const = 0;
+    virtual KeyBindContainer::iterator       end() = 0;
+    virtual KeyBindContainer::const_iterator end() const = 0;
 
     // Command-bind funcs
     virtual bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL,
