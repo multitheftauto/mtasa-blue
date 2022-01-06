@@ -33,19 +33,15 @@ float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
-
 static int m_iVehicleSunGlare;
-#define HOOK_CAutomobile_OnVehiclePreRender 0x6ABCFD
-#define HOOKPOS_CVehicle_DoSunGlare         0x6DD6F0
 
 _declspec(naked) void DoVehicleSunGlare(void* this_)
 {
     _asm {
-        mov eax, HOOKPOS_CVehicle_DoSunGlare
+        mov eax, FUNC_CVehicle_DoSunGlare
         jmp eax
     }
 }
-
 
 void _declspec(naked) HOOK_Vehicle_PreRender(void)
 {
@@ -254,8 +250,8 @@ CGameSA::CGameSA()
     D3DResourceSystemSA::StaticSetHooks();
 
     //Setup Vehicle Sun Glare Hook
-    HookInstall(HOOK_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
-    
+    HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+   
 }
 
 CGameSA::~CGameSA()
