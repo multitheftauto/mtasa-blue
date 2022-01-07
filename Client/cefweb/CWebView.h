@@ -142,7 +142,7 @@ public:
 
     // CefResourceRequestHandler
     virtual CefResourceRequestHandler::ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
-                                                                        CefRefPtr<CefRequestCallback> callback) override;
+                                                                        CefRefPtr<CefCallback> callback) override;
 
     // CefLifeSpawnHandler methods
     virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;

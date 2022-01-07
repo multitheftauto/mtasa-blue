@@ -1,21 +1,21 @@
-/* Copyright (C) 2002-2006 Jean-Marc Valin 
+/* Copyright (C) 2002-2006 Jean-Marc Valin
    File: nb_celp.c
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -119,13 +119,13 @@ void *nb_encoder_init(const SpeexMode *m)
 #else
    st->stack = (char*)speex_alloc_scratch(NB_ENC_STACK);
 #endif
-   
+
    st->mode=m;
 
    st->gamma1=mode->gamma1;
    st->gamma2=mode->gamma2;
    st->lpc_floor = mode->lpc_floor;
-  
+
    st->submodes=mode->submodes;
    st->submodeID=st->submodeSelect=mode->defaultSubmode;
    st->bounded_pitch = 1;
@@ -142,7 +142,7 @@ void *nb_encoder_init(const SpeexMode *m)
    st->cumul_gain = 1024;
 
    st->window= lpc_window;
-   
+
    /* Create the window for autocorrelation (lag-windowing) */
    st->lagWindow = lag_window;
 
@@ -151,7 +151,7 @@ void *nb_encoder_init(const SpeexMode *m)
       st->old_lsp[i]= DIV32(MULT16_16(QCONST16(3.1415927f, LSP_SHIFT), i+1), NB_ORDER+1);
 
    st->innov_rms_save = NULL;
-   
+
 #ifndef DISABLE_VBR
    vbr_init(&st->vbr);
    st->vbr_quality = 8;
@@ -170,7 +170,7 @@ void *nb_encoder_init(const SpeexMode *m)
    st->sampling_rate=8000;
    st->isWideband = 0;
    st->highpass_enabled = 1;
-   
+
 #ifdef ENABLE_VALGRIND
    VALGRIND_MAKE_READABLE(st, NB_ENC_STACK);
 #endif
@@ -204,7 +204,7 @@ void nb_encoder_destroy(void *state)
 int nb_encoder_ctl(void *state, int request, void *ptr)
 {
    EncState *st;
-   st=(EncState*)state;     
+   st=(EncState*)state;
    switch(request)
    {
    case SPEEX_GET_FRAME_SIZE:
@@ -240,7 +240,7 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
    case SPEEX_SET_ABR:
       st->abr_enabled = (*(spx_int32_t*)ptr);
       st->vbr_enabled = st->abr_enabled!=0;
-      if (st->vbr_enabled) 
+      if (st->vbr_enabled)
       {
          spx_int32_t i=10;
          spx_int32_t rate, target;
@@ -262,7 +262,7 @@ int nb_encoder_ctl(void *state, int request, void *ptr)
          st->abr_drift=0;
          st->abr_drift2=0;
       }
-      
+
       break;
    case SPEEX_GET_ABR:
       (*(spx_int32_t*)ptr) = st->abr_enabled;
@@ -428,7 +428,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
    VARDECL(spx_coef_t *interp_qlpc);
    char *stack;
    VARDECL(spx_word16_t *syn_resp);
-   
+
    spx_word32_t ener=0;
    spx_word16_t fine_gain;
    spx_word16_t *in = (spx_word16_t*)vin;
@@ -454,7 +454,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
    if (st->highpass_enabled)
       highpass(in, in, NB_FRAME_SIZE, (st->isWideband?HIGHPASS_WIDEBAND:HIGHPASS_NARROWBAND)|HIGHPASS_INPUT, st->mem_hp);
-   
+
    {
       VARDECL(spx_word16_t *w_sig);
       VARDECL(spx_word16_t *autocorr);
@@ -506,7 +506,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
 
 
       /*Open-loop pitch*/
-      if (!st->submodes[st->submodeID] || (st->complexity>2 && SUBMODE(have_subframe_gain)<3) || SUBMODE(forced_pitch_gain) || SUBMODE(lbr_pitch) != -1 
+      if (!st->submodes[st->submodeID] || (st->complexity>2 && SUBMODE(have_subframe_gain)<3) || SUBMODE(forced_pitch_gain) || SUBMODE(lbr_pitch) != -1
 #ifndef DISABLE_VBR
            || st->vbr_enabled || st->vad_enabled
 #endif
@@ -514,7 +514,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       {
          int nol_pitch[6];
          spx_word16_t nol_pitch_coef[6];
-         
+
          bw_lpc(0.9, interp_lpc, bw_lpc1, NB_ORDER);
          bw_lpc(0.55, interp_lpc, bw_lpc2, NB_ORDER);
 
@@ -522,7 +522,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          SPEEX_COPY(st->sw+diff, in, NB_FRAME_SIZE-diff);
          filter10(st->sw, bw_lpc1, bw_lpc2, st->sw, NB_FRAME_SIZE, st->mem_sw_whole, stack);
 
-         open_loop_nbest_pitch(st->sw, NB_PITCH_START, NB_PITCH_END, NB_FRAME_SIZE, 
+         open_loop_nbest_pitch(st->sw, NB_PITCH_START, NB_PITCH_END, NB_FRAME_SIZE,
                                nol_pitch, nol_pitch_coef, 6, stack);
          ol_pitch=nol_pitch[0];
          ol_pitch_coef = nol_pitch_coef[0];
@@ -530,11 +530,11 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          for (i=1;i<6;i++)
          {
 #ifdef FIXED_POINT
-            if ((nol_pitch_coef[i]>MULT16_16_Q15(nol_pitch_coef[0],27853)) && 
+            if ((nol_pitch_coef[i]>MULT16_16_Q15(nol_pitch_coef[0],27853)) &&
 #else
-            if ((nol_pitch_coef[i]>.85*nol_pitch_coef[0]) && 
+            if ((nol_pitch_coef[i]>.85*nol_pitch_coef[0]) &&
 #endif
-                (ABS(2*nol_pitch[i]-ol_pitch)<=2 || ABS(3*nol_pitch[i]-ol_pitch)<=3 || 
+                (ABS(2*nol_pitch[i]-ol_pitch)<=2 || ABS(3*nol_pitch[i]-ol_pitch)<=3 ||
                  ABS(4*nol_pitch[i]-ol_pitch)<=4 || ABS(5*nol_pitch[i]-ol_pitch)<=5))
             {
                /*ol_pitch_coef=nol_pitch_coef[i];*/
@@ -549,7 +549,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          ol_pitch=0;
          ol_pitch_coef=0;
       }
-      
+
       /*Compute "real" excitation*/
       /*SPEEX_COPY(st->exc, st->winBuf, diff);
       SPEEX_COPY(st->exc+diff, in, NB_FRAME_SIZE-diff);*/
@@ -584,7 +584,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       for (i=0;i<NB_ORDER;i++)
          lsp_dist += (st->old_lsp[i] - lsp[i])*(st->old_lsp[i] - lsp[i]);
       lsp_dist /= LSP_SCALING*LSP_SCALING;
-      
+
       if (st->abr_enabled)
       {
          float qual_change=0;
@@ -607,7 +607,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       st->relative_quality = vbr_analysis(&st->vbr, in, NB_FRAME_SIZE, ol_pitch, GAIN_SCALING_1*ol_pitch_coef);
       /*if (delta_qual<0)*/
       /*  delta_qual*=.1*(3+st->vbr_quality);*/
-      if (st->vbr_enabled) 
+      if (st->vbr_enabled)
       {
          spx_int32_t mode;
          int choice=0;
@@ -622,7 +622,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
                thresh = vbr_nb_thresh[mode][v1];
             else
                thresh = (st->vbr_quality-v1)*vbr_nb_thresh[mode][v1+1] + (1+v1-st->vbr_quality)*vbr_nb_thresh[mode][v1];
-            if (st->relative_quality > thresh && 
+            if (st->relative_quality > thresh &&
                 st->relative_quality-thresh<min_diff)
             {
                choice = mode;
@@ -656,7 +656,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
                speex_encoder_ctl(state, SPEEX_SET_BITRATE, &rate);
             }
          }
-         
+
          if (st->abr_enabled)
          {
             spx_int32_t bitrate;
@@ -685,7 +685,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          }
          /*speex_encoder_ctl(state, SPEEX_SET_MODE, &mode);*/
          st->submodeID=mode;
-      } 
+      }
    } else {
       st->relative_quality = -1;
    }
@@ -741,7 +741,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
    if (SUBMODE(lbr_pitch)!=-1)
    {
       speex_bits_pack(bits, ol_pitch-NB_PITCH_START, 7);
-   } 
+   }
 
    if (SUBMODE(forced_pitch_gain))
    {
@@ -760,8 +760,8 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       speex_bits_pack(bits, quant, 4);
       ol_pitch_coef=MULT16_16_P15(QCONST16(0.066667,15),SHL16(quant,GAIN_SHIFT));
    }
-   
-   
+
+
    /*Quantize and transmit open-loop excitation gain*/
 #ifdef FIXED_POINT
    {
@@ -813,7 +813,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       exc=st->exc+offset;
       /* Weighted signal */
       sw=st->sw+offset;
-      
+
       /* LSP interpolation (quantized and unquantized) */
       lsp_interpolate(st->old_lsp, lsp, interp_lsp, NB_ORDER, sub, NB_NB_SUBFRAMES, LSP_MARGIN);
       lsp_interpolate(st->old_qlsp, qlsp, interp_qlsp, NB_ORDER, sub, NB_NB_SUBFRAMES, LSP_MARGIN);
@@ -857,13 +857,13 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          inBuf = &in[((sub-1)*NB_SUBFRAME_SIZE)];
       for (i=0;i<NB_SUBFRAME_SIZE;i++)
          sw[i] = inBuf[i];
-      
+
       if (st->complexity==0)
          response_bound >>= 1;
       compute_impulse_response(interp_qlpc, bw_lpc1, bw_lpc2, syn_resp, response_bound, NB_ORDER, stack);
       for (i=response_bound;i<NB_SUBFRAME_SIZE;i++)
          syn_resp[i]=VERY_SMALL;
-      
+
       /* Compute zero response of A(z/g1) / ( A(z/g2) * A(z) ) */
       for (i=0;i<NB_ORDER;i++)
          mem[i]=SHL32(st->mem_sp[i],1);
@@ -881,16 +881,16 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          mem[i]=SHL32(st->mem_sw[i],1);
       filter10(exc, bw_lpc1, bw_lpc2, exc, NB_SUBFRAME_SIZE, mem, stack);
 #endif
-      
+
       /* Compute weighted signal */
       for (i=0;i<NB_ORDER;i++)
          mem[i]=st->mem_sw[i];
       filter10(sw, bw_lpc1, bw_lpc2, sw, NB_SUBFRAME_SIZE, mem, stack);
-      
+
       if (st->complexity==0)
          for (i=0;i<NB_ORDER;i++)
             st->mem_sw[i]=mem[i];
-      
+
       /* Compute target signal (saturation prevents overflows on clipped input speech) */
       for (i=0;i<NB_SUBFRAME_SIZE;i++)
          target[i]=EXTRACT16(SATURATE(SUB32(sw[i],PSHR32(exc[i],1)),32767));
@@ -923,7 +923,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
             pit_min = NB_PITCH_START;
             pit_max = NB_PITCH_END;
          }
-         
+
          /* Force pitch to use only the current frame if needed */
          if (st->bounded_pitch && pit_max>offset)
             pit_max=offset;
@@ -931,20 +931,20 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
          /* Perform pitch search */
          pitch = SUBMODE(ltp_quant)(target, sw, interp_qlpc, bw_lpc1, bw_lpc2,
                                     exc32, SUBMODE(ltp_params), pit_min, pit_max, ol_pitch_coef,
-                                    NB_ORDER, NB_SUBFRAME_SIZE, bits, stack, 
+                                    NB_ORDER, NB_SUBFRAME_SIZE, bits, stack,
                                     exc, syn_resp, st->complexity, 0, st->plc_tuning, &st->cumul_gain);
 
          st->pitch[sub]=pitch;
       }
       /* Quantization of innovation */
       SPEEX_MEMSET(innov, 0, NB_SUBFRAME_SIZE);
-      
+
       /* FIXME: Make sure this is safe from overflows (so far so good) */
       for (i=0;i<NB_SUBFRAME_SIZE;i++)
          exc[i] = EXTRACT16(SUB32(EXTEND32(exc[i]), PSHR32(exc32[i],SIG_SHIFT-1)));
-      
+
       ener = SHL32(EXTEND32(compute_rms16(exc, NB_SUBFRAME_SIZE)),SIG_SHIFT);
-      
+
       /*FIXME: Should use DIV32_16 and make sure result fits in 16 bits */
 #ifdef FIXED_POINT
       {
@@ -958,7 +958,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       fine_gain = PDIV32_16(ener,PSHR32(ol_gain,SIG_SHIFT));
 #endif
       /* Calculate gain correction for the sub-frame (if any) */
-      if (SUBMODE(have_subframe_gain)) 
+      if (SUBMODE(have_subframe_gain))
       {
          int qe;
          if (SUBMODE(have_subframe_gain)==3)
@@ -974,23 +974,23 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       } else {
          ener=ol_gain;
       }
-      
+
       /*printf ("%f %f\n", ener, ol_gain);*/
-      
+
       /* Normalize innovation */
       signal_div(target, target, ener, NB_SUBFRAME_SIZE);
-      
+
       /* Quantize innovation */
       speex_assert (SUBMODE(innovation_quant));
       {
          /* Codebook search */
-         SUBMODE(innovation_quant)(target, interp_qlpc, bw_lpc1, bw_lpc2, 
-                  SUBMODE(innovation_params), NB_ORDER, NB_SUBFRAME_SIZE, 
+         SUBMODE(innovation_quant)(target, interp_qlpc, bw_lpc1, bw_lpc2,
+                  SUBMODE(innovation_params), NB_ORDER, NB_SUBFRAME_SIZE,
                   innov, syn_resp, bits, stack, st->complexity, SUBMODE(double_codebook));
-         
+
          /* De-normalize innovation and update excitation */
          signal_mul(innov, innov, ener, NB_SUBFRAME_SIZE);
-         
+
          /* In some (rare) modes, we do a second search (more bits) to reduce noise even more */
          if (SUBMODE(double_codebook)) {
             char *tmp_stack=stack;
@@ -999,8 +999,8 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
             SPEEX_MEMSET(innov2, 0, NB_SUBFRAME_SIZE);
             for (i=0;i<NB_SUBFRAME_SIZE;i++)
                target[i]=MULT16_16_P13(QCONST16(2.2f,13), target[i]);
-            SUBMODE(innovation_quant)(target, interp_qlpc, bw_lpc1, bw_lpc2, 
-                                      SUBMODE(innovation_params), NB_ORDER, NB_SUBFRAME_SIZE, 
+            SUBMODE(innovation_quant)(target, interp_qlpc, bw_lpc1, bw_lpc2,
+                                      SUBMODE(innovation_params), NB_ORDER, NB_SUBFRAME_SIZE,
                                       innov2, syn_resp, bits, stack, st->complexity, 0);
             signal_mul(innov2, innov2, MULT16_32_Q15(QCONST16(0.454545f,15),ener), NB_SUBFRAME_SIZE);
             for (i=0;i<NB_SUBFRAME_SIZE;i++)
@@ -1019,7 +1019,7 @@ int nb_encode(void *state, void *vin, SpeexBits *bits)
       /* Compute weighted signal again, from synthesized speech (not sure it's the right thing) */
       if (st->complexity!=0)
          filter10(sw, bw_lpc1, bw_lpc2, sw, NB_SUBFRAME_SIZE, st->mem_sw, stack);
-      
+
    }
 
    /* Store the LSPs for interpolation in the next frame */
@@ -1097,7 +1097,7 @@ void *nb_decoder_init(const SpeexMode *m)
    st->pitch_gain_buf[0] = st->pitch_gain_buf[1] = st->pitch_gain_buf[2] = 0;
    st->pitch_gain_buf_idx = 0;
    st->seed = 1000;
-   
+
    st->sampling_rate=8000;
    st->last_ol_gain = 0;
 
@@ -1120,10 +1120,10 @@ void *nb_decoder_init(const SpeexMode *m)
 
 void nb_decoder_destroy(void *state)
 {
+#if !(defined(VAR_ARRAYS) || defined (USE_ALLOCA))
    DecState *st;
    st=(DecState*)state;
-   
-#if !(defined(VAR_ARRAYS) || defined (USE_ALLOCA))
+
    speex_free_scratch(st->stack);
 #endif
 
@@ -1285,13 +1285,13 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
    gain_med = median3(st->pitch_gain_buf[0], st->pitch_gain_buf[1], st->pitch_gain_buf[2]);
    if (gain_med < st->last_pitch_gain)
       st->last_pitch_gain = gain_med;
-   
+
 #ifdef FIXED_POINT
    pitch_gain = st->last_pitch_gain;
    if (pitch_gain>54)
       pitch_gain = 54;
    pitch_gain = SHL16(pitch_gain, 9);
-#else   
+#else
    pitch_gain = GAIN_SCALING_1*st->last_pitch_gain;
    if (pitch_gain>.85)
       pitch_gain=.85;
@@ -1302,7 +1302,7 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
    noise_gain = MULT16_16_Q15(innov_gain, MULT16_16_Q15(fact, SUB16(Q15ONE,MULT16_16_Q15(pitch_gain,pitch_gain))));
    /* Shift all buffers by one frame */
    SPEEX_MOVE(st->excBuf, st->excBuf+NB_FRAME_SIZE, 2*NB_PITCH_END + NB_SUBFRAME_SIZE + 12);
-   
+
 
    pitch_val = st->last_pitch + SHR32((spx_int32_t)speex_rand(1+st->count_lost, &st->seed),SIG_SHIFT);
    if (pitch_val > NB_PITCH_END)
@@ -1311,7 +1311,7 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
       pitch_val = NB_PITCH_START;
    for (i=0;i<NB_FRAME_SIZE;i++)
    {
-      st->exc[i]= MULT16_16_Q15(pitch_gain, (st->exc[i-pitch_val]+VERY_SMALL)) + 
+      st->exc[i]= MULT16_16_Q15(pitch_gain, (st->exc[i-pitch_val]+VERY_SMALL)) +
             speex_rand(noise_gain, &st->seed);
    }
 
@@ -1319,7 +1319,7 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
    iir_mem16(&st->exc[-NB_SUBFRAME_SIZE], st->interp_qlpc, out, NB_FRAME_SIZE,
              NB_ORDER, st->mem_sp, stack);
    highpass(out, out, NB_FRAME_SIZE, HIGHPASS_NARROWBAND|HIGHPASS_OUTPUT, st->mem_hp);
-   
+
    st->first = 0;
    st->count_lost++;
    st->pitch_gain_buf[st->pitch_gain_buf_idx++] = PSHR16(pitch_gain,9);
@@ -1329,7 +1329,7 @@ static void nb_decode_lost(DecState *st, spx_word16_t *out, char *stack)
 
 /* Just so we don't need to carry the complete wideband mode information */
 static const int wb_skip_table[8] = {0, 36, 112, 192, 352, 0, 0, 0};
-   
+
 int nb_decode(void *state, SpeexBits *bits, void *vout)
 {
    DecState *st;
@@ -1349,7 +1349,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    VARDECL(spx_coef_t *ak);
    VARDECL(spx_lsp_t *qlsp);
    spx_word16_t pitch_average=0;
-   
+
    spx_word16_t *out = (spx_word16_t*)vout;
    VARDECL(spx_lsp_t *interp_qlsp);
 
@@ -1362,7 +1362,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    if (!bits && st->dtx_enabled)
    {
       st->submodeID=0;
-   } else 
+   } else
    {
       /* If bits is NULL, consider the packet to be lost (what could we do anyway) */
       if (!bits)
@@ -1390,10 +1390,10 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
             {
                speex_notify("Invalid mode encountered. The stream is corrupted.");
                return -2;
-            } 
+            }
             advance -= (SB_SUBMODE_BITS+1);
             speex_bits_advance(bits, advance);
-            
+
             if (speex_bits_remaining(bits)<5)
                return -1;
             wideband = speex_bits_unpack_unsigned(bits, 1);
@@ -1406,7 +1406,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
                {
                   speex_notify("Invalid mode encountered. The stream is corrupted.");
                   return -2;
-               } 
+               }
                advance -= (SB_SUBMODE_BITS+1);
                speex_bits_advance(bits, advance);
                wideband = speex_bits_unpack_unsigned(bits, 1);
@@ -1440,7 +1440,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
             speex_notify("Invalid mode encountered. The stream is corrupted.");
             return -2;
          }
-      
+
       } while (m>8);
 
       /* Get the sub-mode that was used */
@@ -1489,7 +1489,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
       for (i=0;i<NB_ORDER;i++)
          lsp_dist = ADD32(lsp_dist, EXTEND32(ABS(st->old_qlsp[i] - qlsp[i])));
 #ifdef FIXED_POINT
-      fact = SHR16(19661,SHR32(lsp_dist,LSP_SHIFT+2));      
+      fact = SHR16(19661,SHR32(lsp_dist,LSP_SHIFT+2));
 #else
       fact = .6*exp(-.2*lsp_dist);
 #endif
@@ -1509,15 +1509,15 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    if (SUBMODE(lbr_pitch)!=-1)
    {
       ol_pitch = NB_PITCH_START+speex_bits_unpack_unsigned(bits, 7);
-   } 
-   
+   }
+
    if (SUBMODE(forced_pitch_gain))
    {
       int quant;
       quant = speex_bits_unpack_unsigned(bits, 4);
       ol_pitch_coef=MULT16_16_P15(QCONST16(0.066667,15),SHL16(quant,GAIN_SHIFT));
    }
-   
+
    /* Get global excitation gain */
    {
       int qe;
@@ -1552,7 +1552,6 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    {
       int offset;
       spx_word16_t *exc;
-      spx_word16_t *sp;
       spx_word16_t *innov_save = NULL;
       spx_word16_t tmp;
 
@@ -1561,7 +1560,6 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
       /* Excitation */
       exc=st->exc+offset;
       /* Original signal */
-      sp=out+offset;
       if (st->innov_save)
          innov_save = st->innov_save+offset;
 
@@ -1604,20 +1602,20 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
 
 
 
-         SUBMODE(ltp_unquant)(exc, exc32, pit_min, pit_max, ol_pitch_coef, SUBMODE(ltp_params), 
-                 NB_SUBFRAME_SIZE, &pitch, &pitch_gain[0], bits, stack, 
+         SUBMODE(ltp_unquant)(exc, exc32, pit_min, pit_max, ol_pitch_coef, SUBMODE(ltp_params),
+                 NB_SUBFRAME_SIZE, &pitch, &pitch_gain[0], bits, stack,
                  st->count_lost, offset, st->last_pitch_gain, 0);
 
-         /* Ensuring that things aren't blowing up as would happen if e.g. an encoder is 
+         /* Ensuring that things aren't blowing up as would happen if e.g. an encoder is
          crafting packets to make us produce NaNs and slow down the decoder (vague DoS threat).
          We can probably be even more aggressive and limit to 15000 or so. */
          sanitize_values32(exc32, NEG32(QCONST32(32000,SIG_SHIFT-1)), QCONST32(32000,SIG_SHIFT-1), NB_SUBFRAME_SIZE);
-         
+
          tmp = gain_3tap_to_1tap(pitch_gain);
 
          pitch_average += tmp;
-         if ((tmp>best_pitch_gain&&ABS(2*best_pitch-pitch)>=3&&ABS(3*best_pitch-pitch)>=4&&ABS(4*best_pitch-pitch)>=5) 
-              || (tmp>MULT16_16_Q15(QCONST16(.6,15),best_pitch_gain)&&(ABS(best_pitch-2*pitch)<3||ABS(best_pitch-3*pitch)<4||ABS(best_pitch-4*pitch)<5)) 
+         if ((tmp>best_pitch_gain&&ABS(2*best_pitch-pitch)>=3&&ABS(3*best_pitch-pitch)>=4&&ABS(4*best_pitch-pitch)>=5)
+              || (tmp>MULT16_16_Q15(QCONST16(.6,15),best_pitch_gain)&&(ABS(best_pitch-2*pitch)<3||ABS(best_pitch-3*pitch)<4||ABS(best_pitch-4*pitch)<5))
               || (MULT16_16_Q15(QCONST16(.67,15),tmp)>best_pitch_gain&&(ABS(2*best_pitch-pitch)<3||ABS(3*best_pitch-pitch)<4||ABS(4*best_pitch-pitch)<5)) )
          {
             best_pitch = pitch;
@@ -1625,12 +1623,12 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
                best_pitch_gain = tmp;
          }
       }
-      
+
       /* Unquantize the innovation */
       {
          int q_energy;
          spx_word32_t ener;
-         
+
          SPEEX_MEMSET(innov, 0, NB_SUBFRAME_SIZE);
 
          /* Decode sub-frame gain correction */
@@ -1645,7 +1643,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
          } else {
             ener = ol_gain;
          }
-                  
+
          speex_assert (SUBMODE(innovation_unquant));
          {
             /*Fixed codebook contribution*/
@@ -1678,7 +1676,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
          }
 
          /*Vocoder mode*/
-         if (st->submodeID==1) 
+         if (st->submodeID==1)
          {
             spx_word16_t g=ol_pitch_coef;
             g=MULT16_16_P14(QCONST16(1.5f,14),(g-QCONST16(.2f,6)));
@@ -1686,7 +1684,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
                g=0;
             if (g>GAIN_SCALING)
                g=GAIN_SCALING;
-            
+
             SPEEX_MEMSET(exc, 0, NB_SUBFRAME_SIZE);
             while (st->voc_offset<NB_SUBFRAME_SIZE)
             {
@@ -1697,7 +1695,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
                st->voc_offset+=ol_pitch;
             }
             st->voc_offset -= NB_SUBFRAME_SIZE;
-            
+
             for (i=0;i<NB_SUBFRAME_SIZE;i++)
             {
                spx_word16_t exci=exc[i];
@@ -1714,7 +1712,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
 
       }
    }
-   
+
    ALLOC(interp_qlsp, NB_ORDER, spx_lsp_t);
 
    if (st->lpc_enh_enabled && SUBMODE(comb_gain)>0 && !st->count_lost)
@@ -1724,9 +1722,9 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    } else {
       SPEEX_COPY(out, &st->exc[-NB_SUBFRAME_SIZE], NB_FRAME_SIZE);
    }
-   
+
    /* If the last packet was lost, re-scale the excitation to obtain the same energy as encoded in ol_gain */
-   if (st->count_lost) 
+   if (st->count_lost)
    {
       spx_word16_t exc_ener;
       spx_word32_t gain32;
@@ -1754,13 +1752,11 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    {
       int offset;
       spx_word16_t *sp;
-      spx_word16_t *exc;
+
       /* Offset relative to start of frame */
       offset = NB_SUBFRAME_SIZE*sub;
       /* Original signal */
       sp=out+offset;
-      /* Excitation */
-      exc=st->exc+offset;
 
       /* LSP interpolation (quantized and unquantized) */
       lsp_interpolate(st->old_qlsp, qlsp, interp_qlsp, NB_ORDER, sub, NB_NB_SUBFRAMES, LSP_MARGIN);
@@ -1778,10 +1774,10 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
          }
          st->pi_gain[sub] = pi_g;
       }
-      
-      iir_mem16(sp, st->interp_qlpc, sp, NB_SUBFRAME_SIZE, NB_ORDER, 
+
+      iir_mem16(sp, st->interp_qlpc, sp, NB_SUBFRAME_SIZE, NB_ORDER,
                 st->mem_sp, stack);
-      
+
       for (i=0;i<NB_ORDER;i++)
          st->interp_qlpc[i] = ak[i];
 
@@ -1799,7 +1795,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
    if (st->max_level < st->min_level+1)
       st->max_level = st->min_level+1;
    /*printf ("%f %f %f %d\n", og, st->min_level, st->max_level, update);*/
-   
+
    /* Store the LSPs for interpolation in the next frame */
    for (i=0;i<NB_ORDER;i++)
       st->old_qlsp[i] = qlsp[i];
@@ -1811,7 +1807,7 @@ int nb_decode(void *state, SpeexBits *bits, void *vout)
 #ifdef FIXED_POINT
    st->last_pitch_gain = PSHR16(pitch_average,2);
 #else
-   st->last_pitch_gain = .25*pitch_average;   
+   st->last_pitch_gain = .25*pitch_average;
 #endif
    st->pitch_gain_buf[st->pitch_gain_buf_idx++] = st->last_pitch_gain;
    if (st->pitch_gain_buf_idx > 2) /* rollover */

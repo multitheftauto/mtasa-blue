@@ -4806,14 +4806,9 @@ bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& 
 
 CClientEntity* CStaticFunctionDefinitions::GetCameraTarget()
 {
-    if (m_pCamera->IsInFixedMode())
-        return NULL;
-
-    CClientEntity* pPlayer = m_pCamera->GetFocusedPlayer();
-    if (pPlayer)
-        return pPlayer;
-
-    return m_pCamera->GetTargetEntity();
+    if (!m_pCamera->IsInFixedMode())
+        return m_pCamera->GetTargetEntity();
+    return NULL;
 }
 
 bool CStaticFunctionDefinitions::GetCameraInterior(unsigned char& ucInterior)
