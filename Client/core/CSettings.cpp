@@ -2691,7 +2691,7 @@ void CSettings::Initialize()
         if (!numMatches)
         {
             iBind = m_pBindsList->InsertRowAfter(iRowGame);
-            m_pBindsList->SetItemText(iBind, m_hBind, pControl->szDescription);
+            m_pBindsList->SetItemText(iBind, m_hBind, _(pControl->szDescription));
             m_pBindsList->SetItemText(iBind, m_hPriKey, CORE_SETTINGS_NO_KEY);
             for (int k = 0; k < SecKeyNum; k++)
                 m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
