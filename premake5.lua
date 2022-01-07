@@ -37,7 +37,6 @@ workspace "MTASA"
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
 		"vendor",
-		"Shared/sdk",
 	}
 
 	defines {
@@ -88,7 +87,8 @@ workspace "MTASA"
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 
 	filter "system:windows"
-		toolset "v142"
+		toolset "v143"
+		preferredtoolarchitecture "x86_64"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		buildoptions { "/Zc:__cplusplus" }
@@ -137,6 +137,8 @@ workspace "MTASA"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
+		include "vendor/detours"
+		include "vendor/lunasvg"
 	end
 
 	filter {}

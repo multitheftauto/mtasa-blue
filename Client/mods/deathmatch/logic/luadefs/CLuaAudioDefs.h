@@ -59,6 +59,8 @@ public:
     LUA_DECLARE(GetSoundMetaTags);
     LUA_DECLARE(SetSoundEffectEnabled);
     LUA_DECLARE(GetSoundEffects);
+    LUA_DECLARE(SetSoundEffectParameter);
+    LUA_DECLARE(GetSoundEffectParameters);
     LUA_DECLARE(SetSoundPan);
     LUA_DECLARE(GetSoundPan);
 
@@ -69,4 +71,7 @@ public:
     LUA_DECLARE(SetRadioChannel);
     LUA_DECLARE(GetRadioChannel);
     LUA_DECLARE(GetRadioChannelName);
+
+    static bool ShowSound(bool state);
+    static bool IsShowSoundEnabled();
 };

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -130,7 +130,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
                                                       TEXT(SP_NAME_NEGOTIATE),
                                                       &SecurityPackage);
     if(nego->status != SEC_E_OK) {
-      failf(data, "SSPI: couldn't get auth info\n");
+      failf(data, "SSPI: couldn't get auth info");
       return CURLE_AUTH_ERROR;
     }
 
@@ -191,8 +191,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
 
     /* Ensure we have a valid challenge message */
     if(!chlg) {
-      infof(data, "SPNEGO handshake failure (empty challenge message)\n");
-
+      infof(data, "SPNEGO handshake failure (empty challenge message)");
       return CURLE_BAD_CONTENT_ENCODING;
     }
 

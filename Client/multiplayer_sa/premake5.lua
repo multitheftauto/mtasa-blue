@@ -17,6 +17,7 @@ project "Multiplayer SA"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/sparsehash/src/",
 		}

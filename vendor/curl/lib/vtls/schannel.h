@@ -8,7 +8,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2012, Marc Hoersken, <info@marc-hoersken.de>, et al.
- * Copyright (C) 2012 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -53,7 +53,8 @@
 
 extern const struct Curl_ssl Curl_ssl_schannel;
 
-CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex);
+CURLcode Curl_verify_certificate(struct Curl_easy *data,
+                                 struct connectdata *conn, int sockindex);
 
 /* structs to expose only in schannel.c and schannel_verify.c */
 #ifdef EXPOSE_SCHANNEL_INTERNAL_STRUCTS
@@ -69,6 +70,8 @@ CURLcode Curl_verify_certificate(struct connectdata *conn, int sockindex);
 #define HAS_MANUAL_VERIFY_API
 #endif
 #endif
+
+#define NUMOF_CIPHERS 45 /* There are 45 listed in the MS headers */
 
 struct Curl_schannel_cred {
   CredHandle cred_handle;
@@ -101,6 +104,7 @@ struct ssl_backend_data {
 #ifdef HAS_MANUAL_VERIFY_API
   bool use_manual_cred_validation; /* true if manual cred validation is used */
 #endif
+  ALG_ID algIds[NUMOF_CIPHERS];
 };
 #endif /* EXPOSE_SCHANNEL_INTERNAL_STRUCTS */
 

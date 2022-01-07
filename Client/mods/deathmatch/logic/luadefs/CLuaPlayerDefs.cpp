@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -47,6 +48,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerMapForced", IsPlayerMapForced},
         {"isPlayerMapVisible", IsPlayerMapVisible},
         {"getPlayerMapBoundingBox", GetPlayerMapBoundingBox},
+        {"getPlayerMapOpacity", ArgumentParser<GetPlayerMapOpacity>},
     };
 
     // Add functions
@@ -67,6 +69,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSerial", "getPlayerSerial");
     lua_classfunction(luaVM, "getWantedLevel", "getPlayerWantedLevel");
     lua_classfunction(luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox");
+    lua_classfunction(luaVM, "getMapOpacity", "getPlayerMapOpacity");
     lua_classfunction(luaVM, "forceMap", "forcePlayerMap");
     lua_classfunction(luaVM, "isMapForced", "isPlayerMapForced");
     lua_classfunction(luaVM, "isMapVisible", "isPlayerMapVisible");
@@ -618,4 +621,10 @@ int CLuaPlayerDefs::GetPlayerMapBoundingBox(lua_State* luaVM)
     // The map is invisible
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+unsigned char CLuaPlayerDefs::GetPlayerMapOpacity()
+{
+    int iMapOpacity = g_pCore->GetCVars()->GetValue<int>("mapalpha");
+    return static_cast<unsigned char>(Clamp(0, iMapOpacity, 255));
 }

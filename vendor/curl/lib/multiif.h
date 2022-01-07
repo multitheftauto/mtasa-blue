@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -26,11 +26,11 @@
  * Prototypes for library-wide functions provided by multi.c
  */
 
-void Curl_updatesocket(struct Curl_easy *data);
+CURLcode Curl_updatesocket(struct Curl_easy *data);
 void Curl_expire(struct Curl_easy *data, timediff_t milli, expire_id);
 void Curl_expire_clear(struct Curl_easy *data);
 void Curl_expire_done(struct Curl_easy *data, expire_id id);
-void Curl_update_timer(struct Curl_multi *multi);
+CURLMcode Curl_update_timer(struct Curl_multi *multi) WARN_UNUSED_RESULT;
 void Curl_attach_connnection(struct Curl_easy *data,
                              struct connectdata *conn);
 void Curl_detach_connnection(struct Curl_easy *data);
@@ -69,7 +69,7 @@ size_t Curl_multi_max_host_connections(struct Curl_multi *multi);
 /* Return the value of the CURLMOPT_MAX_TOTAL_CONNECTIONS option */
 size_t Curl_multi_max_total_connections(struct Curl_multi *multi);
 
-void Curl_multiuse_state(struct connectdata *conn,
+void Curl_multiuse_state(struct Curl_easy *data,
                          int bundlestate); /* use BUNDLE_* defines */
 
 /*

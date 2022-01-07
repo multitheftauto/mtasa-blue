@@ -141,9 +141,10 @@ public:
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL, bool bTriggerEvent = true);
-    void DeleteCustomData(const char* szName);
-    void SendAllCustomData(CPlayer* pPlayer);
+    void           SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
+                                 bool bTriggerEvent = true);
+    void           DeleteCustomData(const char* szName);
+    void           SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
@@ -219,7 +220,7 @@ public:
     void RemoveOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.remove(pPed); }
 
     unsigned char GetInterior() { return m_ucInterior; }
-    void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
+    void          SetInterior(unsigned char ucInterior);
 
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }

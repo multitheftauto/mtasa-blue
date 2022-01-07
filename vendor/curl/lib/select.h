@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -72,12 +72,6 @@ struct pollfd
    therefore defined here */
 #define CURL_CSELECT_IN2 (CURL_CSELECT_ERR << 1)
 
-int Curl_select(curl_socket_t maxfd,
-                fd_set *fds_read,
-                fd_set *fds_write,
-                fd_set *fds_err,
-                timediff_t timeout_ms);
-
 int Curl_socket_check(curl_socket_t readfd, curl_socket_t readfd2,
                       curl_socket_t writefd,
                       timediff_t timeout_ms);
@@ -103,8 +97,10 @@ int tpf_select_libcurl(int maxfds, fd_set* reads, fd_set* writes,
 #if defined(TPF)
 #define VALID_SOCK(x) 1
 #define VERIFY_SOCK(x) Curl_nop_stmt
+#define FDSET_SOCK(x) 1
 #elif defined(USE_WINSOCK)
 #define VALID_SOCK(s) ((s) < INVALID_SOCKET)
+#define FDSET_SOCK(x) 1
 #define VERIFY_SOCK(x) do { \
   if(!VALID_SOCK(x)) { \
     SET_SOCKERRNO(WSAEINVAL); \
@@ -112,13 +108,17 @@ int tpf_select_libcurl(int maxfds, fd_set* reads, fd_set* writes,
   } \
 } while(0)
 #else
-#define VALID_SOCK(s) (((s) >= 0) && ((s) < FD_SETSIZE))
-#define VERIFY_SOCK(x) do { \
-  if(!VALID_SOCK(x)) { \
-    SET_SOCKERRNO(EINVAL); \
-    return -1; \
-  } \
-} while(0)
+#define VALID_SOCK(s) ((s) >= 0)
+
+/* If the socket is small enough to get set or read from an fdset */
+#define FDSET_SOCK(s) ((s) < FD_SETSIZE)
+
+#define VERIFY_SOCK(x) do {                     \
+    if(!VALID_SOCK(x) || !FDSET_SOCK(x)) {      \
+      SET_SOCKERRNO(EINVAL);                    \
+      return -1;                                \
+    }                                           \
+  } while(0)
 #endif
 
 #endif /* HEADER_CURL_SELECT_H */

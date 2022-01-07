@@ -19,7 +19,7 @@
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
-#include "detours/include/detours.h"
+#include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordManager.h"
 
@@ -34,6 +34,17 @@ SString       g_strJingleBells;
 
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
+
+static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+
+static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
+{
+    if (StrCmpIA("dpnhpast.dll", fileName) != 0)
+        return Win32LoadLibraryA(fileName);
+
+    // GTA:SA expects a valid module handle for DirectPlay. We return a handle for an already loaded library.
+    return Win32LoadLibraryA("d3d8.dll");
+}
 
 CCore::CCore() : m_DiscordManager(new CDiscordManager())
 {
@@ -427,11 +438,11 @@ void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned cha
     }
 }
 
-void CCore::SetChatVisible(bool bVisible)
+void CCore::SetChatVisible(bool bVisible, bool bInputBlocked)
 {
     if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetChatBoxVisible(bVisible);
+        m_pLocalGUI->SetChatBoxVisible(bVisible, bInputBlocked);
     }
 }
 
@@ -440,6 +451,15 @@ bool CCore::IsChatVisible()
     if (m_pLocalGUI)
     {
         return m_pLocalGUI->IsChatBoxVisible();
+    }
+    return false;
+}
+
+bool CCore::IsChatInputBlocked()
+{
+    if (m_pLocalGUI)
+    {
+        return m_pLocalGUI->IsChatBoxInputBlocked();
     }
     return false;
 }
@@ -570,8 +590,10 @@ void CCore::SetConnected(bool bConnected)
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
 
-    if (bConnected) m_DiscordManager->RegisterPlay(true);
-    else ResetDiscordRichPresence();
+    if (bConnected)
+        m_DiscordManager->RegisterPlay(true);
+    else
+        ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -741,25 +763,7 @@ void CCore::ApplyHooks()
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
-    using LoadLibraryA_t = HMODULE(__stdcall*)(LPCTSTR fileName);
-    static LoadLibraryA_t oldLoadLibraryA =
-        (LoadLibraryA_t)DetourFunction(DetourFindFunction("KERNEL32.DLL", "LoadLibraryA"), (PBYTE)(LoadLibraryA_t)[](LPCSTR fileName)->HMODULE {
-            // Don't load dpnhpast.dll
-            if (StrCmpA("dpnhpast.dll", fileName) == 0)
-            {
-                // Unfortunately, Microsoft's detours library doesn't support something like 'detour chains' properly,
-                // so that we cannot remove the hook flawlessly
-                // See
-                // http://read.pudn.com/downloads71/ebook/256925/%E5%BE%AE%E8%BD%AF%E6%8F%90%E4%BE%9B%E7%9A%84%E6%88%AA%E5%8F%96Win32%20API%E5%87%BD%E6%95%B0%E7%9A%84%E5%BC%80%E5%8F%91%E5%8C%85%E5%92%8C%E4%BE%8B%E5%AD%90detours-src-1.2/src/detours.cpp__.htm
-
-                // Do something hacky: GTA requires a valid module handle, so pass a module handle of a DLL that is already loaded
-                // as FreeLibrary is later called
-                return oldLoadLibraryA("D3D8.DLL");
-            }
-
-            // Call old LoadLibraryA (this in our case SharedUtil::MyLoadLibraryA though)
-            return oldLoadLibraryA(fileName);
-        });
+    DetourLibraryFunction("kernel32.dll", "LoadLibraryA", Win32LoadLibraryA, SkipDirectPlay_LoadLibraryA);
 }
 
 bool UsingAltD3DSetup()
@@ -1151,6 +1155,9 @@ void CCore::DoPostFramePulse()
         ApplyGameSettings();
 
         m_pGUI->SelectInputHandlers(INPUT_CORE);
+
+        // Change the main thread affinity to first core
+        SetThreadAffinityMask(GetCurrentThread(), 0x1);
     }
 
     if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
