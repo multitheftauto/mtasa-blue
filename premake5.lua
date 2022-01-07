@@ -87,7 +87,8 @@ workspace "MTASA"
 		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 
 	filter "system:windows"
-		toolset "v142"
+		toolset "v143"
+		preferredtoolarchitecture "x86_64"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		buildoptions { "/Zc:__cplusplus" }
@@ -137,6 +138,7 @@ workspace "MTASA"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
 		include "vendor/detours"
+		include "vendor/lunasvg"
 	end
 
 	filter {}

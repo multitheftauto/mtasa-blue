@@ -40,7 +40,6 @@ public:
     // Output funcs
     static bool OutputConsole(const char* szText);
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
-    static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
@@ -228,7 +227,7 @@ public:
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
-    static bool BlowVehicle(CClientEntity& Entity);
+    static bool BlowVehicle(CClientEntity& Entity, std::optional<bool> withExplosion);
     static bool SetVehicleColor(CClientEntity& Entity, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CClientEntity& Entity, bool bLandingGearDown);
     static bool SetVehicleLocked(CClientEntity& Entity, bool bLocked);
@@ -567,10 +566,11 @@ public:
                                    CEntity* pIgnoredEntity = NULL);
     static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision);
     static CClientWater* CreateWater(CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
-    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown);
+    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool ignoreDistanceToWaterThreshold, CVector& vecUnknown);
     static bool          GetWaterLevel(CClientWater* pWater, float& fLevel);
     static bool          GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex, CVector& vecPosition);
-    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
+    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel,
+                                            bool bIncludeOutsideWorldLevel);
     static bool          SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     static bool          SetAllElementWaterLevel(float fLevel, void* pChangeSource);
     static bool          ResetWorldWaterLevel();
@@ -735,7 +735,8 @@ public:
 
     // Sound funcs
     static CClientSound* PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
-    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
+    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop,
+                                     bool bThrottle);
     static bool          StopSound(CClientSound& Sound);
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);

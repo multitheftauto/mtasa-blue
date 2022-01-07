@@ -1495,7 +1495,10 @@ void CVehicleSA::SetHealth(FLOAT fHealth)
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
     vehicle->m_nHealth = fHealth;
     if (fHealth >= 250.0f)
+    {
         vehicle->m_fBurningTime = 0.0f;
+        vehicle->m_delayedExplosionTimer = 0;
+    }
 }
 
 // SHould be plane funcs
@@ -2078,7 +2081,7 @@ CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
 void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
 {
     auto     vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    RwFrame*             pFrame = NULL;
+    RwFrame* pFrame = NULL;
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
@@ -2196,7 +2199,7 @@ void* CVehicleSA::GetPrivateSuspensionLines()
     if (m_pSuspensionLines == NULL)
     {
         CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-        CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->pColData;
+        CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
         if (pModelInfo->IsMonsterTruck())
         {
             // Monster truck suspension data is 0x90 BYTES rather than 0x80 (some extra stuff I guess)
@@ -2210,7 +2213,7 @@ void* CVehicleSA::GetPrivateSuspensionLines()
         else
         {
             // CAutomobile allocates wheels * 32 (0x20)
-            m_pSuspensionLines = new BYTE[pColData->ucNumWheels * 0x20];
+            m_pSuspensionLines = new BYTE[pColData->m_numSuspensionLines * 0x20];
         }
     }
 
@@ -2220,24 +2223,24 @@ void* CVehicleSA::GetPrivateSuspensionLines()
 void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->pColData;
+    CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
     if (pModelInfo->IsMonsterTruck())
     {
         // Monster trucks are 0x90 bytes not 0x80
-        if (pColData->pSuspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->pSuspensionLines, 0x90);
+        if (pColData->m_suspensionLines)
+            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x90);
     }
     else if (pModelInfo->IsBike())
     {
         // Bikes are 0x80 bytes not 0x40
-        if (pColData->pSuspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->pSuspensionLines, 0x80);
+        if (pColData->m_suspensionLines)
+            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x80);
     }
     else
     {
         // CAutomobile allocates wheels * 32 (0x20)
-        if (pColData->pSuspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->pSuspensionLines, pColData->ucNumWheels * 0x20);
+        if (pColData->m_suspensionLines)
+            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, pColData->m_numSuspensionLines * 0x20);
     }
 }
 

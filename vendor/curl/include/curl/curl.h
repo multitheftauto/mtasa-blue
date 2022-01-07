@@ -25,9 +25,6 @@
 /*
  * If you have libcurl problems, all docs and details are found here:
  *   https://curl.se/libcurl/
- *
- * curl-library mailing list subscription and unsubscription web interface:
- *   https://cool.haxx.se/mailman/listinfo/curl-library/
  */
 
 #ifdef CURL_NO_OLDIES
@@ -49,8 +46,8 @@
 #include <stdio.h>
 #include <limits.h>
 
-#if defined(__FreeBSD__) && (__FreeBSD__ >= 2)
-/* Needed for __FreeBSD_version symbol definition */
+#if (defined(__FreeBSD__) && (__FreeBSD__ >= 2)) || defined(__MidnightBSD__)
+/* Needed for __FreeBSD_version or __MidnightBSD_version symbol definition */
 #include <osreldate.h>
 #endif
 
@@ -74,8 +71,10 @@
 #if defined(_AIX) || defined(__NOVELL_LIBC__) || defined(__NetBSD__) || \
     defined(__minix) || defined(__SYMBIAN32__) || defined(__INTEGRITY) || \
     defined(ANDROID) || defined(__ANDROID__) || defined(__OpenBSD__) || \
-    defined(__CYGWIN__) || defined(AMIGA) || \
-   (defined(__FreeBSD_version) && (__FreeBSD_version < 800000))
+    defined(__CYGWIN__) || defined(AMIGA) || defined(__NuttX__) || \
+   (defined(__FreeBSD_version) && (__FreeBSD_version < 800000)) || \
+   (defined(__MidnightBSD_version) && (__MidnightBSD_version < 100000)) || \
+    defined(__VXWORKS__)
 #include <sys/select.h>
 #endif
 
@@ -155,7 +154,8 @@ typedef enum {
   CURLSSLBACKEND_AXTLS = 10, /* never used since 7.63.0 */
   CURLSSLBACKEND_MBEDTLS = 11,
   CURLSSLBACKEND_MESALINK = 12,
-  CURLSSLBACKEND_BEARSSL = 13
+  CURLSSLBACKEND_BEARSSL = 13,
+  CURLSSLBACKEND_RUSTLS = 14
 } curl_sslbackend;
 
 /* aliases for library clones and renames */
@@ -471,6 +471,20 @@ typedef int (*curl_debug_callback)
         size_t size,       /* size of the data pointed to */
         void *userptr);    /* whatever the user please */
 
+/* This is the CURLOPT_PREREQFUNCTION callback prototype. */
+typedef int (*curl_prereq_callback)(void *clientp,
+                                    char *conn_primary_ip,
+                                    char *conn_local_ip,
+                                    int conn_primary_port,
+                                    int conn_local_port);
+
+/* Return code for when the pre-request callback has terminated without
+   any errors */
+#define CURL_PREREQFUNC_OK 0
+/* Return code for when the pre-request callback wants to abort the
+   request */
+#define CURL_PREREQFUNC_ABORT 1
+
 /* All possible error codes from all sorts of curl functions. Future versions
    may return other values, stay prepared.
 
@@ -540,7 +554,7 @@ typedef enum {
   CURLE_OBSOLETE46,              /* 46 - NOT USED */
   CURLE_TOO_MANY_REDIRECTS,      /* 47 - catch endless re-direct loops */
   CURLE_UNKNOWN_OPTION,          /* 48 - User specified an unknown option */
-  CURLE_TELNET_OPTION_SYNTAX,    /* 49 - Malformed telnet option */
+  CURLE_SETOPT_OPTION_SYNTAX,    /* 49 - Malformed setopt option */
   CURLE_OBSOLETE50,              /* 50 - NOT USED */
   CURLE_OBSOLETE51,              /* 51 - NOT USED */
   CURLE_GOT_NOTHING,             /* 52 - when this is a specific error */
@@ -611,6 +625,7 @@ typedef enum {
   CURLE_HTTP3,                   /* 95 - An HTTP/3 layer problem */
   CURLE_QUIC_CONNECT_ERROR,      /* 96 - QUIC connection error */
   CURLE_PROXY,                   /* 97 - proxy handshake error */
+  CURLE_SSL_CLIENTCERT,          /* 98 - client-side certificate required */
   CURL_LAST /* never use! */
 } CURLcode;
 
@@ -633,6 +648,9 @@ typedef enum {
 
 /* The following were added in 7.21.5, April 2011 */
 #define CURLE_UNKNOWN_TELNET_OPTION CURLE_UNKNOWN_OPTION
+
+/* Added for 7.78.0 */
+#define CURLE_TELNET_OPTION_SYNTAX CURLE_SETOPT_OPTION_SYNTAX
 
 /* The following were added in 7.17.1 */
 /* These are scheduled to disappear by 2009 */
@@ -886,6 +904,10 @@ typedef enum {
 /* - CURLSSLOPT_NATIVE_CA tells libcurl to use standard certificate store of
    operating system. Currently implemented under MS-Windows. */
 #define CURLSSLOPT_NATIVE_CA (1<<4)
+
+/* - CURLSSLOPT_AUTO_CLIENT_CERT tells libcurl to automatically locate and use
+   a client certificate for authentication. (Schannel) */
+#define CURLSSLOPT_AUTO_CLIENT_CERT (1<<5)
 
 /* The default connection attempt delay in milliseconds for happy eyeballs.
    CURLOPT_HAPPY_EYEBALLS_TIMEOUT_MS.3 and happy-eyeballs-timeout-ms.d document
@@ -1460,8 +1482,8 @@ typedef enum {
 #define CURLOPT_SERVER_RESPONSE_TIMEOUT CURLOPT_FTP_RESPONSE_TIMEOUT
 
   /* Set this option to one of the CURL_IPRESOLVE_* defines (see below) to
-     tell libcurl to resolve names to those IP versions only. This only has
-     affect on systems with support for more than one, i.e IPv4 _and_ IPv6. */
+     tell libcurl to use those IP versions only. This only has effect on
+     systems with support for more than one, i.e IPv4 _and_ IPv6. */
   CURLOPT(CURLOPT_IPRESOLVE, CURLOPTTYPE_VALUES, 113),
 
   /* Set this option to limit the size of a file that will be downloaded from
@@ -2036,7 +2058,8 @@ typedef enum {
   /* alt-svc cache file name to possibly read from/write to */
   CURLOPT(CURLOPT_ALTSVC, CURLOPTTYPE_STRINGPOINT, 287),
 
-  /* maximum age of a connection to consider it for reuse (in seconds) */
+  /* maximum age (idle time) of a connection to consider it for reuse
+   * (in seconds) */
   CURLOPT(CURLOPT_MAXAGE_CONN, CURLOPTTYPE_LONG, 288),
 
   /* SASL authorisation identity */
@@ -2078,6 +2101,40 @@ typedef enum {
   /* Parameters for V4 signature */
   CURLOPT(CURLOPT_AWS_SIGV4, CURLOPTTYPE_STRINGPOINT, 305),
 
+  /* Same as CURLOPT_SSL_VERIFYPEER but for DoH (DNS-over-HTTPS) servers. */
+  CURLOPT(CURLOPT_DOH_SSL_VERIFYPEER, CURLOPTTYPE_LONG, 306),
+
+  /* Same as CURLOPT_SSL_VERIFYHOST but for DoH (DNS-over-HTTPS) servers. */
+  CURLOPT(CURLOPT_DOH_SSL_VERIFYHOST, CURLOPTTYPE_LONG, 307),
+
+  /* Same as CURLOPT_SSL_VERIFYSTATUS but for DoH (DNS-over-HTTPS) servers. */
+  CURLOPT(CURLOPT_DOH_SSL_VERIFYSTATUS, CURLOPTTYPE_LONG, 308),
+
+  /* The CA certificates as "blob" used to validate the peer certificate
+     this option is used only if SSL_VERIFYPEER is true */
+  CURLOPT(CURLOPT_CAINFO_BLOB, CURLOPTTYPE_BLOB, 309),
+
+  /* The CA certificates as "blob" used to validate the proxy certificate
+     this option is used only if PROXY_SSL_VERIFYPEER is true */
+  CURLOPT(CURLOPT_PROXY_CAINFO_BLOB, CURLOPTTYPE_BLOB, 310),
+
+  /* used by scp/sftp to verify the host's public key */
+  CURLOPT(CURLOPT_SSH_HOST_PUBLIC_KEY_SHA256, CURLOPTTYPE_STRINGPOINT, 311),
+
+  /* Function that will be called immediately before the initial request
+     is made on a connection (after any protocol negotiation step).  */
+  CURLOPT(CURLOPT_PREREQFUNCTION, CURLOPTTYPE_FUNCTIONPOINT, 312),
+
+  /* Data passed to the CURLOPT_PREREQFUNCTION callback */
+  CURLOPT(CURLOPT_PREREQDATA, CURLOPTTYPE_CBPOINT, 313),
+
+  /* maximum age (since creation) of a connection to consider it for reuse
+   * (in seconds) */
+  CURLOPT(CURLOPT_MAXLIFETIME_CONN, CURLOPTTYPE_LONG, 314),
+
+  /* Set MIME option flags. */
+  CURLOPT(CURLOPT_MIME_OPTIONS, CURLOPTTYPE_LONG, 315),
+
   CURLOPT_LASTENTRY /* the last unused */
 } CURLoption;
 
@@ -2112,10 +2169,10 @@ typedef enum {
   /* Below here follows defines for the CURLOPT_IPRESOLVE option. If a host
      name resolves addresses using more than one IP protocol version, this
      option might be handy to force libcurl to use a specific IP version. */
-#define CURL_IPRESOLVE_WHATEVER 0 /* default, resolves addresses to all IP
+#define CURL_IPRESOLVE_WHATEVER 0 /* default, uses addresses to all IP
                                      versions that your system allows */
-#define CURL_IPRESOLVE_V4       1 /* resolve to IPv4 addresses */
-#define CURL_IPRESOLVE_V6       2 /* resolve to IPv6 addresses */
+#define CURL_IPRESOLVE_V4       1 /* uses only IPv4 addresses/connections */
+#define CURL_IPRESOLVE_V6       2 /* uses only IPv6 addresses/connections */
 
   /* three convenient "aliases" that follow the name scheme better */
 #define CURLOPT_RTSPHEADER CURLOPT_HTTPHEADER
@@ -2236,6 +2293,9 @@ CURL_EXTERN int curl_strnequal(const char *s1, const char *s2, size_t n);
 /* Mime/form handling support. */
 typedef struct curl_mime      curl_mime;      /* Mime context. */
 typedef struct curl_mimepart  curl_mimepart;  /* Mime part context. */
+
+/* CURLMIMEOPT_ defines are for the CURLOPT_MIME_OPTIONS option. */
+#define CURLMIMEOPT_FORMESCAPE  (1<<0) /* Use backslash-escaping for forms. */
 
 /*
  * NAME curl_mime_init()
@@ -2751,8 +2811,9 @@ typedef enum {
   CURLINFO_RETRY_AFTER      = CURLINFO_OFF_T + 57,
   CURLINFO_EFFECTIVE_METHOD = CURLINFO_STRING + 58,
   CURLINFO_PROXY_ERROR      = CURLINFO_LONG + 59,
+  CURLINFO_REFERER          = CURLINFO_STRING + 60,
 
-  CURLINFO_LASTONE          = 59
+  CURLINFO_LASTONE          = 60
 } CURLINFO;
 
 /* CURLINFO_RESPONSE_CODE is the new name for the option previously known as
@@ -2855,6 +2916,7 @@ typedef enum {
   CURLVERSION_SEVENTH,
   CURLVERSION_EIGHTH,
   CURLVERSION_NINTH,
+  CURLVERSION_TENTH,
   CURLVERSION_LAST /* never actually use this */
 } CURLversion;
 
@@ -2863,7 +2925,7 @@ typedef enum {
    meant to be a built-in version number for what kind of struct the caller
    expects. If the struct ever changes, we redefine the NOW to another enum
    from above. */
-#define CURLVERSION_NOW CURLVERSION_NINTH
+#define CURLVERSION_NOW CURLVERSION_TENTH
 
 struct curl_version_info_data {
   CURLversion age;          /* age of the returned struct */
@@ -2916,6 +2978,9 @@ struct curl_version_info_data {
 
   /* These fields were added in CURLVERSION_NINTH */
   const char *hyper_version; /* human readable string. */
+
+  /* These fields were added in CURLVERSION_TENTH */
+  const char *gsasl_version; /* human readable string. */
 };
 typedef struct curl_version_info_data curl_version_info_data;
 
@@ -2953,6 +3018,7 @@ typedef struct curl_version_info_data curl_version_info_data;
 #define CURL_VERSION_ZSTD         (1<<26) /* zstd features are present */
 #define CURL_VERSION_UNICODE      (1<<27) /* Unicode support on Windows */
 #define CURL_VERSION_HSTS         (1<<28) /* HSTS is supported */
+#define CURL_VERSION_GSASL        (1<<29) /* libgsasl is supported */
 
  /*
  * NAME curl_version_info()

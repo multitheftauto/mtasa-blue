@@ -23,9 +23,6 @@
     <ClCompile Include="..\..\..\src\base\ftinit.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\base\ftsystem.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\bdf\bdf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -63,6 +60,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\sfnt\sfnt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\sdf\sdf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\smooth\smooth.c">
@@ -130,6 +130,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\base\ftwinfnt.c">
       <Filter>Source Files\FT_MODULES</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dlg\dlgwrap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ftsystem.c">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

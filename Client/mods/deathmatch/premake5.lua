@@ -9,7 +9,7 @@ project "Client Deathmatch"
 
 	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt",
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
@@ -43,7 +43,8 @@ project "Client Deathmatch"
 			"../../../vendor/lua/src",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
-			"../../../vendor/sparsehash/src/"
+			"../../../vendor/sparsehash/src/",
+			"../../../vendor/lunasvg/include"
 	}
 
 	files {
@@ -58,7 +59,7 @@ project "Client Deathmatch"
 		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp"
 	}
 
-	configuration "windows"
+	filter "system:windows"
 		buildoptions { "-Zm180" }
 
 	filter "architecture:x64"

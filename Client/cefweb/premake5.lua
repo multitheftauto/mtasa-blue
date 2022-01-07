@@ -14,12 +14,12 @@ project "Client Webbrowser"
 			"../../Shared/sdk",
 			".",
 			"../sdk",
-			"../../vendor/cef3",
+			"../../vendor/cef3/cef",
 			"../../vendor/sparsehash/src/"
 		}
 
 	libdirs {
-		"../../vendor/cef3/Release"
+		"../../vendor/cef3/cef/Release"
 	}
 
 

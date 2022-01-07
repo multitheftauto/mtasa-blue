@@ -64,7 +64,7 @@
  * Waiting indefinitely with this function is not allowed, a
  * zero or negative timeout value will return immediately.
  * Timeout resolution, accuracy, as well as maximum supported
- * value is system dependent, neither factor is a citical issue
+ * value is system dependent, neither factor is a critical issue
  * for the intended use of this function in the library.
  *
  * Return values:
@@ -442,7 +442,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
       if(ufds[i].events & POLLPRI)
         ufds[i].revents |= POLLPRI;
     }
-    if(ufds[i].revents != 0)
+    if(ufds[i].revents)
       r++;
   }
 

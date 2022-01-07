@@ -53,9 +53,6 @@ call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --find "\t" --repla
 echo Remove trailing spaces
 call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --useEscapeChars --find " +%EOL%" --replace "%EOL%"
 
-echo Remove DEVELOPERS
-call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --find ".*DEVELOPERS.*(%EOL%.*\w.*)*%EOL%(.*)" --replace "$2"
-
 echo Remove inline from class methods
 call:searchInReplaced %FINDANDREPLACE% --dir "%1" --useRegEx --find "^(class(.*%EOL%)*)( +)inline +((.*%EOL%)*})" --replace "$1$3$4"
 

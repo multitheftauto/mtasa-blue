@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -33,12 +33,27 @@
 #ifdef USE_MBEDTLS
 #include <mbedtls/version.h>
 
-#if(MBEDTLS_VERSION_NUMBER >= 0x02070000)
+#if(MBEDTLS_VERSION_NUMBER >= 0x02070000) && \
+   (MBEDTLS_VERSION_NUMBER < 0x03000000)
   #define HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS
 #endif
 #endif /* USE_MBEDTLS */
 
-#if defined(USE_GNUTLS_NETTLE)
+#if defined(USE_OPENSSL) && !defined(USE_AMISSL)
+  #include <openssl/opensslconf.h>
+  #if !defined(OPENSSL_NO_MD5) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+    #define USE_OPENSSL_MD5
+  #endif
+#endif
+
+#ifdef USE_WOLFSSL
+  #include <wolfssl/options.h>
+  #ifndef NO_MD5
+    #define USE_WOLFSSL_MD5
+  #endif
+#endif
+
+#if defined(USE_GNUTLS)
 
 #include <nettle/md5.h>
 #include "curl_memory.h"
@@ -47,9 +62,10 @@
 
 typedef struct md5_ctx MD5_CTX;
 
-static void MD5_Init(MD5_CTX *ctx)
+static CURLcode MD5_Init(MD5_CTX *ctx)
 {
   md5_init(ctx);
+  return CURLE_OK;
 }
 
 static void MD5_Update(MD5_CTX *ctx,
@@ -64,35 +80,9 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
   md5_digest(ctx, 16, digest);
 }
 
-#elif defined(USE_GNUTLS)
+#elif defined(USE_OPENSSL_MD5) || defined(USE_WOLFSSL_MD5)
 
-#include <gcrypt.h>
-#include "curl_memory.h"
-/* The last #include file should be: */
-#include "memdebug.h"
-
-typedef gcry_md_hd_t MD5_CTX;
-
-static void MD5_Init(MD5_CTX *ctx)
-{
-  gcry_md_open(ctx, GCRY_MD_MD5, 0);
-}
-
-static void MD5_Update(MD5_CTX *ctx,
-                       const unsigned char *input,
-                       unsigned int inputLen)
-{
-  gcry_md_write(*ctx, input, inputLen);
-}
-
-static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
-{
-  memcpy(digest, gcry_md_read(*ctx, 0), 16);
-  gcry_md_close(*ctx);
-}
-
-#elif defined(USE_OPENSSL) && !defined(USE_AMISSL)
-/* When OpenSSL is available we use the MD5-function from OpenSSL */
+/* When OpenSSL or wolfSSL is available, we use their MD5 functions. */
 #include <openssl/md5.h>
 #include "curl_memory.h"
 /* The last #include file should be: */
@@ -109,13 +99,14 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 
 typedef mbedtls_md5_context MD5_CTX;
 
-static void MD5_Init(MD5_CTX *ctx)
+static CURLcode MD5_Init(MD5_CTX *ctx)
 {
 #if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
-  mbedtls_md5_starts(ctx);
+  (void) mbedtls_md5_starts(ctx);
 #else
   (void) mbedtls_md5_starts_ret(ctx);
 #endif
+  return CURLE_OK;
 }
 
 static void MD5_Update(MD5_CTX *ctx,
@@ -123,7 +114,7 @@ static void MD5_Update(MD5_CTX *ctx,
                        unsigned int length)
 {
 #if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
-  mbedtls_md5_update(ctx, data, length);
+  (void) mbedtls_md5_update(ctx, data, length);
 #else
   (void) mbedtls_md5_update_ret(ctx, data, length);
 #endif
@@ -132,7 +123,7 @@ static void MD5_Update(MD5_CTX *ctx,
 static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 {
 #if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
-  mbedtls_md5_finish(ctx, digest);
+  (void) mbedtls_md5_finish(ctx, digest);
 #else
   (void) mbedtls_md5_finish_ret(ctx, digest);
 #endif
@@ -157,9 +148,10 @@ static void MD5_Final(unsigned char *digest, MD5_CTX *ctx)
 /* The last #include file should be: */
 #include "memdebug.h"
 
-static void MD5_Init(MD5_CTX *ctx)
+static CURLcode MD5_Init(MD5_CTX *ctx)
 {
   CC_MD5_Init(ctx);
+  return CURLE_OK;
 }
 
 static void MD5_Update(MD5_CTX *ctx,
@@ -187,12 +179,13 @@ struct md5_ctx {
 };
 typedef struct md5_ctx MD5_CTX;
 
-static void MD5_Init(MD5_CTX *ctx)
+static CURLcode MD5_Init(MD5_CTX *ctx)
 {
   if(CryptAcquireContext(&ctx->hCryptProv, NULL, NULL, PROV_RSA_FULL,
                          CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
     CryptCreateHash(ctx->hCryptProv, CALG_MD5, 0, 0, &ctx->hHash);
   }
+  return CURLE_OK;
 }
 
 static void MD5_Update(MD5_CTX *ctx,
@@ -272,7 +265,7 @@ struct md5_ctx {
 };
 typedef struct md5_ctx MD5_CTX;
 
-static void MD5_Init(MD5_CTX *ctx);
+static CURLcode MD5_Init(MD5_CTX *ctx);
 static void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size);
 static void MD5_Final(unsigned char *result, MD5_CTX *ctx);
 
@@ -433,7 +426,7 @@ static const void *body(MD5_CTX *ctx, const void *data, unsigned long size)
   return ptr;
 }
 
-static void MD5_Init(MD5_CTX *ctx)
+static CURLcode MD5_Init(MD5_CTX *ctx)
 {
   ctx->a = 0x67452301;
   ctx->b = 0xefcdab89;
@@ -442,6 +435,8 @@ static void MD5_Init(MD5_CTX *ctx)
 
   ctx->lo = 0;
   ctx->hi = 0;
+
+  return CURLE_OK;
 }
 
 static void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size)
@@ -566,8 +561,9 @@ const struct MD5_params Curl_DIGEST_MD5[] = {
 
 /*
  * @unittest: 1601
+ * Returns CURLE_OK on success.
  */
-void Curl_md5it(unsigned char *outbuffer, const unsigned char *input,
+CURLcode Curl_md5it(unsigned char *outbuffer, const unsigned char *input,
                 const size_t len)
 {
   MD5_CTX ctx;
@@ -575,6 +571,8 @@ void Curl_md5it(unsigned char *outbuffer, const unsigned char *input,
   MD5_Init(&ctx);
   MD5_Update(&ctx, input, curlx_uztoui(len));
   MD5_Final(outbuffer, &ctx);
+
+  return CURLE_OK;
 }
 
 struct MD5_context *Curl_MD5_init(const struct MD5_params *md5params)

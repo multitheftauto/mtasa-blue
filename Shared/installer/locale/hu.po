@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-03-16 18:18+0000\n"
-"Last-Translator: Bence <szlobod95@gmail.com>\n"
+"PO-Revision-Date: 2021-03-23 22:11+0000\n"
+"Last-Translator: Zero <spooky33@freemail.hu>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -13,8 +13,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Translators: Bence Szlobodics; György Péter; NitroByte; pa3ck; Lámbó; csiguusz; Bishop_Waltemer; NeXuS; Hamza; ccw\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1521224331.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
+"X-POOTLE-MTIME: 1616537494.000000\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -22,6 +22,8 @@ msgid ""
 "The version of MTA:SA you've downloaded does not support Windows XP or "
 "Vista.  Please download an alternative version from www.mtasa.com."
 msgstr ""
+"Jelen verzió Windows XP-vel és Vista-val inkompatibilis. Kérlek, töltsd le a"
+" megfelelő verziót a www.mtasa.com oldalról!"
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:184
@@ -29,6 +31,8 @@ msgid ""
 "The version of MTA:SA is designed for old versions of Windows.  Please "
 "download the newest version from www.mtasa.com."
 msgstr ""
+"Az MTA:SA ezen változatát a Windows korábbi verzióira tervezték. Kérlek, "
+"töltsd le a legújabb verziót a www.mtasa.com webhelyről."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:188
@@ -97,7 +101,7 @@ msgstr "MTA:SA hozzáadása a Windows Játékböngészőhöz (ha elérhető)."
 #. DESC_DirectX
 #: ../Shared/installer/nightly.nsi:198
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "Telepítse vagy frissítse a DirectX-et (ha szükséges)."
 
 #. DESC_Section1
 #: ../Shared/installer/nightly.nsi:199

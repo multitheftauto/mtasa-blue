@@ -274,5 +274,5 @@ enum eElementRPCFunctions
     SET_COLPOLYGON_HEIGHT,
     REMOTE_PLAYER_WEAPON_SWITCH,
 
-    NUM_RPC_FUNCS // Add above this line
+    NUM_RPC_FUNCS            // Add above this line
 };

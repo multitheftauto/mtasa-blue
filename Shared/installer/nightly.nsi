@@ -34,14 +34,14 @@ Var ShowLastUsed
 Var PermissionsGroup
 Var PATCH_TARGET
 
-; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
+; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
+!define GUID "{D32E69D8-716F-4E74-91CB-044DB9AA3F40}"
 
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
-    !define MAINT_VER "0"
+    !define MINOR_VER "5"
+    !define MAINT_VER "9"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -79,7 +79,7 @@ Var PATCH_TARGET
 !define PRODUCT_NAME_NO_VER "MTA:SA"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
-!define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
+!define PRODUCT_WEB_SITE "https://www.multitheftauto.com"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -659,6 +659,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\bassmidi.dll"
         File "${FILES_ROOT}\mta\bassmix.dll"
         File "${FILES_ROOT}\mta\bassopus.dll"
+        File "${FILES_ROOT}\mta\basswebm.dll"
         File "${FILES_ROOT}\mta\basswma.dll"
         File "${FILES_ROOT}\mta\tags.dll"
 
@@ -674,10 +675,20 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
-        File "${FILES_ROOT}\mta\CEF\cef.pak"
-        File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+
+
+	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+        File "${FILES_ROOT}\mta\CEF\chrome_100_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\chrome_200_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\resources.pak"
+
+	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+        #File "${FILES_ROOT}\mta\CEF\cef.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
+        #File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+		
+	# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
 
         SetOutPath "$INSTDIR\MTA\CEF\locales"
