@@ -4,7 +4,7 @@
  *
  *   Debugging and logging component for WinCE (body).
  *
- * Copyright (C) 1996-2020 by
+ * Copyright (C) 1996-2021 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -230,7 +230,7 @@
 
     /* const char*  ft2_debug = getenv( "FT2_DEBUG" ); */
 
-    const char*  ft2_debug = 0;
+    const char*  ft2_debug = NULL;
 
 
     if ( ft2_debug )
