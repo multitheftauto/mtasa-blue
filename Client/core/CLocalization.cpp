@@ -44,6 +44,17 @@ SString CLocalization::ValidateLocale(SString strLocale)
 {
     if (strLocale.empty() && (CClientVariables::GetSingletonPtr() == nullptr || !CVARS_GET("locale", strLocale)))
         strLocale = "en_US";
+
+    // NOTE(patrik): Convert old two letter language to locale to fix any issues with flags
+    if (strLocale == "en")
+        strLocale = "en_US";
+    else if (strLocale == "fi")
+        strLocale = "fi_FI";
+    else if (strLocale == "az")
+        strLocale = "az_AZ";
+    else if (strLocale == "ka")
+        strLocale = "ka_GE";
+
     Language Lang = Language::from_name(strLocale);
     Lang = Lang ? Lang : Language::from_name("en_US");
     return Lang.str();
