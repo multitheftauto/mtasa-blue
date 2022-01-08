@@ -1,5 +1,8 @@
 files:
-  - source: /utils/l10n-sources/*
+  - source: /Shared/data/MTA San Andreas/MTA/locale/en/*
+    ignore_settings: 1
     ignore:
       - '*.psd'
     translation: /Shared/data/MTA San Andreas/MTA/locale/%two_letters_code%/%original_file_name%
+  - source: /Shared/installer/locale/en.pot
+    translation: /Shared/installer/locale/%two_letters_code%.%file_extension%
