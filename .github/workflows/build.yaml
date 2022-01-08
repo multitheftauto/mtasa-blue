@@ -1,7 +1,13 @@
 name: Build
 
 # Trigger the workflow on push or pull request
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '!l10n/**'
+  pull_request:
+    branches:
+      - '!l10n/**'
 
 jobs:
   windows:
