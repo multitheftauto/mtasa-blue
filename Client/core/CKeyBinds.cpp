@@ -757,7 +757,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
             !(bConsiderDefaultKey && commandBind->isReplacingScriptKey && !stricmp(szKey, commandBind->originalScriptKey.c_str())))
             continue;
 
-        if (szResource && !commandBind->resource.empty() && commandBind->resource != szResource)
+        if (commandBind->resource != szResource)
             continue;
 
         if (szCommand && commandBind->command != szCommand)
