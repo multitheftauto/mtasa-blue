@@ -43,10 +43,10 @@ CLocalization::~CLocalization()
 SString CLocalization::ValidateLocale(SString strLocale)
 {
     if (strLocale.empty() && (CClientVariables::GetSingletonPtr() == nullptr || !CVARS_GET("locale", strLocale)))
-        strLocale = "en";
+        strLocale = "en_US";
     Language Lang = Language::from_name(strLocale);
-    Lang = Lang ? Lang : Language::from_name("en");
-    return Lang.get_language();
+    Lang = Lang ? Lang : Language::from_name("en_US");
+    return Lang.str();
 }
 
 //
@@ -71,8 +71,8 @@ CLanguage* CLocalization::GetLanguage(SString strLocale)
     if (!pLanguage)
     {
         Language Lang = Language::from_name(strLocale);
-        Lang = Lang ? Lang : Language::from_name("en");
-        pLanguage = new CLanguage(m_DictManager.get_dictionary(Lang, MTA_LOCALE_TEXTDOMAIN), Lang.get_language(), Lang.get_name());
+        Lang = Lang ? Lang : Language::from_name("en_US");
+        pLanguage = new CLanguage(m_DictManager.get_dictionary(Lang, MTA_LOCALE_TEXTDOMAIN), Lang.str(), Lang.get_name());
         MapSet(m_LanguageMap, strLocale, pLanguage);
     }
     return pLanguage;
@@ -85,7 +85,7 @@ SString CLocalization::GetLanguageNativeName(SString strLocale)
 {
     strLocale = ValidateLocale(strLocale);
     SString strNativeName = GetLanguage(strLocale)->Translate(NATIVE_LANGUAGE_NAME);
-    if (strNativeName == "English" && strLocale != "en")
+    if (strNativeName == "English" && strLocale != "en_US")
     {
         // If native name not available, use English version
         strNativeName = GetLanguage(strLocale)->GetName();
@@ -126,9 +126,9 @@ SString CLocalization::GetTranslators()
 
 std::vector<SString> CLocalization::GetAvailableLocales()
 {
-    std::vector<SString> localeList = {"en"};
+    std::vector<SString> localeList = {"en_US"};
     for (const auto& language : m_DictManager.get_languages(MTA_LOCALE_TEXTDOMAIN))
-        localeList.push_back(language.get_language());
+        localeList.push_back(language.str());
     // Alpha sort
     std::sort(localeList.begin(), localeList.end());
     return localeList;
@@ -139,7 +139,7 @@ bool CLocalization::IsLocalized()
 {
     std::string strLocale;
     CVARS_GET("locale", strLocale);
-    return strLocale != "en";
+    return strLocale != "en_US";
 }
 
 SString CLocalization::GetLanguageCode()
