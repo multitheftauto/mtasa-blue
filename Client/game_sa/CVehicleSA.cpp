@@ -16,7 +16,7 @@ bool            g_bVehiclePointerInvalid = false;
 
 #include "gamesa_renderware.h"
 
-static int m_iVehicleSunGlare;
+static int m_iVehicleSunGlare = 0;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
 {
     _asm {
