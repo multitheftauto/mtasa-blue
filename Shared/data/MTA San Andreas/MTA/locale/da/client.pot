@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-08 15:35\n"
+"PO-Revision-Date: 2022-01-08 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Crowdin-Project-ID: 13\n"
 "X-Crowdin-Language: da\n"
 "X-Crowdin-File: /master/utils/l10n-sources/client.pot\n"
-"X-Crowdin-File-ID: 131\n"
+"X-Crowdin-File-ID: 87\n"
 "Language: da_DK\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
@@ -2060,7 +2060,7 @@ msgstr "på"
 msgid "server"
 msgid_plural "servers"
 msgstr[0] ""
-msgstr[1] ""
+msgstr[1] "servere"
 
 #. We are polling for the master server list (first pass)
 #: ..\Client\core\ServerBrowser\CServerList.cpp:238
