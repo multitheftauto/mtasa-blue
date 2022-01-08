@@ -139,7 +139,9 @@ std::vector<SString> CLocalization::GetAvailableLocales()
 {
     std::vector<SString> localeList = {"en_US"};
     for (const auto& language : m_DictManager.get_languages(MTA_LOCALE_TEXTDOMAIN))
-        localeList.push_back(language.str());
+        // To avoid duplicates
+        if (std::find(localeList.begin(), localeList.end(), language.str()) == localeList.end())
+            localeList.push_back(language.str());
     // Alpha sort
     std::sort(localeList.begin(), localeList.end());
     return localeList;
