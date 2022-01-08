@@ -40,8 +40,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 
 #define     FUNC_CDebug_DebugDisplayTextBuffer      0x532260
 #define     FUNC_JPegCompressScreenToFile   0x5D0820
-#define     FUNC_CAutomobile_OnVehiclePreRender     0x6ABCFD
-#define     FUNC_CVehicle_DoSunGlare        0x6DD6F0
 
 #define     VAR_FlyingCarsEnabled           0x969160 // ##SA##
 #define     VAR_ExtraBunnyhopEnabled        0x969161 // ##SA##

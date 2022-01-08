@@ -16,6 +16,30 @@ bool            g_bVehiclePointerInvalid = false;
 
 #include "gamesa_renderware.h"
 
+static int m_iVehicleSunGlare;
+_declspec(naked) void DoVehicleSunGlare(void* this_)
+{
+    _asm {
+        mov eax, FUNC_CVehicle_DoSunGlare
+        jmp eax
+    }
+}
+
+void _declspec(naked) HOOK_Vehicle_PreRender(void)
+{
+    _asm {
+        mov	ecx, m_iVehicleSunGlare
+		cmp	ecx, 0
+		jle	noglare
+		mov	ecx, esi
+		call DoVehicleSunGlare
+	noglare:
+		mov [esp+0D4h], edi
+		push 6ABD04h
+		retn
+    }
+}
+
 namespace
 {
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
@@ -2318,6 +2342,20 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
     }
 }
 
+void CVehicleSA::StaticSetHooks()
+{
+    // Setup Vehicle Sun Glare Hook
+    HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+}
+
+void CVehicleSA::SetVehiclesSunGlareEnable(bool bEnabled)
+{
+    m_iVehicleSunGlare = bEnabled ? 1 : 0;
+}
+bool CVehicleSA::GetVehiclesSunGlareEnable()
+{
+    return m_iVehicleSunGlare == 1 ? true : false;
+}
 namespace
 {
     VOID _MatrixConvertFromEulerAngles(CMatrix_Padded* matrixPadded, float fX, float fY, float fZ)

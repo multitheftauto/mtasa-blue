@@ -33,30 +33,7 @@ float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
-static int m_iVehicleSunGlare;
 
-_declspec(naked) void DoVehicleSunGlare(void* this_)
-{
-    _asm {
-        mov eax, FUNC_CVehicle_DoSunGlare
-        jmp eax
-    }
-}
-
-void _declspec(naked) HOOK_Vehicle_PreRender(void)
-{
-    _asm {
-        mov	ecx, m_iVehicleSunGlare
-		cmp	ecx, 0
-		jle	noglare
-		mov	ecx, esi
-		call DoVehicleSunGlare
-	noglare:
-		mov [esp+0D4h], edi
-		push 6ABD04h
-		retn
-    }
-}
 
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
@@ -69,7 +46,6 @@ CGameSA::CGameSA()
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
-    m_iVehicleSunGlare = 0;
 
     const unsigned int modelInfoMax = GetCountOfAllFileIDs();
     ModelInfo = new CModelInfoSA[modelInfoMax];
@@ -248,10 +224,8 @@ CGameSA::CGameSA()
     CFxSystemSA::StaticSetHooks();
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
-
-    //Setup Vehicle Sun Glare Hook
-    HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
-   
+    CVehicleSA::StaticSetHooks();
+    
 }
 
 CGameSA::~CGameSA()
@@ -767,12 +741,12 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
 void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
 {
     // State turning will be handled in hooks handler
-    m_iVehicleSunGlare = bEnabled ? 1 : 0;
+    CVehicleSA::SetVehiclesSunGlareEnable(bEnabled);
 }
 
 bool CGameSA::IsVehicleSunGlareEnabled()
 {
-    return m_iVehicleSunGlare == 1 ? true : false;
+    return CVehicleSA::GetVehiclesSunGlareEnable();
 }
 
 bool CGameSA::PerformChecks()
