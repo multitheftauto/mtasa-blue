@@ -440,14 +440,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
         return iter != processedCommandBinds.end();
     };
 
-    // Search through a copy of our binds
-    std::vector<CKeyBind*> binds;
-    binds.reserve(m_binds.size());
-
     for (KeyBindPtr& bind : m_binds)
-        binds.push_back(bind.get());
-
-    for (CKeyBind* bind : binds)
     {
         if (bind->isBeingDeleted || !bind->isActive || bind->boundKey != pKey)
             continue;
@@ -460,7 +453,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                 {
                     if (!bState || (!bInputGoesToGUI && (!m_pCore->IsCursorForcedVisible() || !m_pCore->IsCursorControlsToggled())))
                     {
-                        CallGTAControlBind(static_cast<CGTAControlBind*>(bind), bState);
+                        CallGTAControlBind(static_cast<CGTAControlBind*>(bind.get()), bState);
                         wasBindFound = true;
                     }
                 }
@@ -469,7 +462,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
             case KeyBindType::COMMAND:
             case KeyBindType::FUNCTION:
             {
-                auto bindWithState = static_cast<CKeyBindWithState*>(bind);
+                auto bindWithState = static_cast<CKeyBindWithState*>(bind.get());
 
                 if (bindWithState->state == bState)
                     break;
@@ -486,7 +479,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                     if (bInputGoesToGUI)
                         break;
 
-                    auto commandBind = static_cast<CCommandBind*>(bind);
+                    auto commandBind = static_cast<CCommandBind*>(bind.get());
 
                     if (!bAllowed && commandBind->command != "screenshot")
                         break;
@@ -512,7 +505,7 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
                 {
                     if (bAllowed)
                     {
-                        auto functionBind = static_cast<CKeyFunctionBind*>(bind);
+                        auto functionBind = static_cast<CKeyFunctionBind*>(bind.get());
 
                         if (functionBind->handler && (!bInputGoesToGUI || functionBind->ignoresGUI))
                             functionBind->handler(functionBind);
@@ -764,7 +757,7 @@ bool CKeyBinds::SetCommandActive(const char* szKey, const char* szCommand, bool 
             !(bConsiderDefaultKey && commandBind->isReplacingScriptKey && !stricmp(szKey, commandBind->originalScriptKey.c_str())))
             continue;
 
-        if (szResource && !commandBind->resource.empty() && commandBind->resource != szResource)
+        if (commandBind->resource != szResource)
             continue;
 
         if (szCommand && commandBind->command != szCommand)
@@ -799,7 +792,7 @@ void CKeyBinds::SetAllCommandsActive(const char* szResource, bool bActive, const
             stricmp(szOnlyWithDefaultKey, commandBind->boundKey->szKey))
             continue;
 
-        if (szResource && !commandBind->resource.empty() && commandBind->resource != szResource)
+        if (commandBind->resource != szResource)
             continue;
 
         if (szCommand && commandBind->command != szCommand)
