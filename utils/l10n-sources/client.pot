@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-08 17:25+0200\n"
+"POT-Creation-Date: 2021-12-21 17:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,8 +109,8 @@ msgstr ""
 #: ..\Client\core\CConnectManager.cpp:417
 #: ..\Client\core\CConnectManager.cpp:427 ..\Client\core\CCore.cpp:1200
 #: ..\Client\core\CCore.cpp:1213 ..\Client\core\CGUI.cpp:87
-#: ..\Client\core\CSettings.cpp:2870 ..\Client\core\CSettings.cpp:4044
-#: ..\Client\core\CSettings.cpp:4072 ..\Client\core\CSettings.cpp:4577
+#: ..\Client\core\CSettings.cpp:2851 ..\Client\core\CSettings.cpp:4025
+#: ..\Client\core\CSettings.cpp:4053 ..\Client\core\CSettings.cpp:4558
 #: ..\Client\core\DXHook\CDirect3DHook9.cpp:127
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1273
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1295
@@ -123,17 +123,17 @@ msgstr ""
 #: ..\Client\loader\MainFunctions.cpp:260
 #: ..\Client\loader\MainFunctions.cpp:262
 #: ..\Client\loader\MainFunctions.cpp:815
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:568
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1246
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:567
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:641
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:665
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:687
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1003
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1083
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1093
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1162
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1196
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1245
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1257
 #: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:145
 #: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 #: ..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:358
@@ -158,48 +158,48 @@ msgstr ""
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:154
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:584
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:583
 msgid "CONNECTING"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:269
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1162
 msgid "Connection timed out"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:283
 #: ..\Client\core\CConnectManager.cpp:287
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1208
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1207
 msgid "Disconnected: unknown protocol error"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:291
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1212
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1211
 msgid "Disconnected: disconnected remotely"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:295
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1216
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1215
 msgid "Disconnected: connection lost remotely"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:299
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1220
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1219
 msgid "Disconnected: you are banned from this server"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:306
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1228
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1227
 msgid "Disconnected: disconnected from the server"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:310
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1232
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1231
 msgid "Disconnected: connection to the server was lost"
 msgstr ""
 
 #: ..\Client\core\CConnectManager.cpp:317
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1240
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1239
 msgid "Disconnected: connection was refused"
 msgstr ""
 
@@ -378,185 +378,185 @@ msgstr ""
 msgid "Brake Axis"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:181
+#: ..\Client\core\CKeyBinds.cpp:183
 msgid "Fire"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:182
+#: ..\Client\core\CKeyBinds.cpp:184
 msgid "Next weapon"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:183
+#: ..\Client\core\CKeyBinds.cpp:185
 msgid "Previous weapon"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:184
+#: ..\Client\core\CKeyBinds.cpp:186
 msgid "Forwards"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:185
+#: ..\Client\core\CKeyBinds.cpp:187
 msgid "Backwards"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:186 ..\Client\core\CSettings.cpp:2169
+#: ..\Client\core\CKeyBinds.cpp:188 ..\Client\core\CSettings.cpp:2169
 #: ..\Client\core\CSettings.cpp:2197
 msgid "Left"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:187 ..\Client\core\CSettings.cpp:2171
+#: ..\Client\core\CKeyBinds.cpp:189 ..\Client\core\CSettings.cpp:2171
 #: ..\Client\core\CSettings.cpp:2198
 msgid "Right"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:188
+#: ..\Client\core\CKeyBinds.cpp:190
 msgid "Zoom in"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:189
+#: ..\Client\core\CKeyBinds.cpp:191
 msgid "Zoom out"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:190
+#: ..\Client\core\CKeyBinds.cpp:192
 msgid "Enter/Exit"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:191
+#: ..\Client\core\CKeyBinds.cpp:193
 msgid "Change camera"
 msgstr ""
 
 #. 10
-#: ..\Client\core\CKeyBinds.cpp:192
+#: ..\Client\core\CKeyBinds.cpp:194
 msgid "Jump"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:193
+#: ..\Client\core\CKeyBinds.cpp:195
 msgid "Sprint"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:194
+#: ..\Client\core\CKeyBinds.cpp:196
 msgid "Look behind"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:195
+#: ..\Client\core\CKeyBinds.cpp:197
 msgid "Crouch"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:196
+#: ..\Client\core\CKeyBinds.cpp:198
 msgid "Action"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:197
+#: ..\Client\core\CKeyBinds.cpp:199
 msgid "Walk"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:198
+#: ..\Client\core\CKeyBinds.cpp:200
 msgid "Vehicle fire"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:199
+#: ..\Client\core\CKeyBinds.cpp:201
 msgid "Vehicle secondary fire"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:200
+#: ..\Client\core\CKeyBinds.cpp:202
 msgid "Vehicle left"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:201
+#: ..\Client\core\CKeyBinds.cpp:203
 msgid "Vehicle right"
 msgstr ""
 
 #. 20
-#: ..\Client\core\CKeyBinds.cpp:202
+#: ..\Client\core\CKeyBinds.cpp:204
 msgid "Steer forwards/down"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:203
+#: ..\Client\core\CKeyBinds.cpp:205
 msgid "Steer backwards/up"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:204
+#: ..\Client\core\CKeyBinds.cpp:206
 msgid "Accelerate"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:205
+#: ..\Client\core\CKeyBinds.cpp:207
 msgid "Brake/Reverse"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:206
+#: ..\Client\core\CKeyBinds.cpp:208
 msgid "Radio next"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:207
+#: ..\Client\core\CKeyBinds.cpp:209
 msgid "Radio previous"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:208
+#: ..\Client\core\CKeyBinds.cpp:210
 msgid "Radio user track skip"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:209
+#: ..\Client\core\CKeyBinds.cpp:211
 msgid "Horn"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:210
+#: ..\Client\core\CKeyBinds.cpp:212
 msgid "Sub-mission"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:211
+#: ..\Client\core\CKeyBinds.cpp:213
 msgid "Handbrake"
 msgstr ""
 
 #. 30
-#: ..\Client\core\CKeyBinds.cpp:212
+#: ..\Client\core\CKeyBinds.cpp:214
 msgid "Vehicle look left"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:213
+#: ..\Client\core\CKeyBinds.cpp:215
 msgid "Vehicle look right"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:214
+#: ..\Client\core\CKeyBinds.cpp:216
 msgid "Vehicle look behind"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:215
+#: ..\Client\core\CKeyBinds.cpp:217
 msgid "Vehicle mouse look"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:216
+#: ..\Client\core\CKeyBinds.cpp:218
 msgid "Special control left"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:217
+#: ..\Client\core\CKeyBinds.cpp:219
 msgid "Special control right"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:218
+#: ..\Client\core\CKeyBinds.cpp:220
 msgid "Special control down"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:219
+#: ..\Client\core\CKeyBinds.cpp:221
 msgid "Special control up"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:220
+#: ..\Client\core\CKeyBinds.cpp:222
 msgid "Aim weapon"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:221
+#: ..\Client\core\CKeyBinds.cpp:223
 msgid "Conversation yes"
 msgstr ""
 
 #. 40
-#: ..\Client\core\CKeyBinds.cpp:222
+#: ..\Client\core\CKeyBinds.cpp:224
 msgid "Conversation no"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:223
+#: ..\Client\core\CKeyBinds.cpp:225
 msgid "Group control forwards"
 msgstr ""
 
-#: ..\Client\core\CKeyBinds.cpp:224
+#: ..\Client\core\CKeyBinds.cpp:226
 msgid "Group control backwards"
 msgstr ""
 
@@ -591,8 +591,8 @@ msgstr ""
 
 #: ..\Client\core\CMainMenu.cpp:1154 ..\Client\core\CQuestionBox.cpp:194
 #: ..\Client\core\CSettings.cpp:1339 ..\Client\core\CSettings.cpp:1363
-#: ..\Client\core\CSettings.cpp:4364 ..\Client\core\CSettings.cpp:4431
-#: ..\Client\core\CSettings.cpp:4480 ..\Client\core\CVersionUpdater.cpp:1569
+#: ..\Client\core\CSettings.cpp:4345 ..\Client\core\CSettings.cpp:4412
+#: ..\Client\core\CSettings.cpp:4461 ..\Client\core\CVersionUpdater.cpp:1569
 #: ..\Client\core\CVersionUpdater.cpp:1587
 #: ..\Client\core\CVersionUpdater.cpp:1856
 #: ..\Client\core\CVersionUpdater.cpp:1875
@@ -609,8 +609,8 @@ msgstr ""
 #. /////////////////////////////////////////////////////////////////////////
 #: ..\Client\core\CMainMenu.cpp:1155 ..\Client\core\CQuestionBox.cpp:195
 #: ..\Client\core\CSettings.cpp:1340 ..\Client\core\CSettings.cpp:1364
-#: ..\Client\core\CSettings.cpp:4365 ..\Client\core\CSettings.cpp:4432
-#: ..\Client\core\CSettings.cpp:4481 ..\Client\core\CVersionUpdater.cpp:1570
+#: ..\Client\core\CSettings.cpp:4346 ..\Client\core\CSettings.cpp:4413
+#: ..\Client\core\CSettings.cpp:4462 ..\Client\core\CVersionUpdater.cpp:1570
 #: ..\Client\core\CVersionUpdater.cpp:1588
 #: ..\Client\core\CVersionUpdater.cpp:1857
 #: ..\Client\core\CVersionUpdater.cpp:1876
@@ -625,7 +625,7 @@ msgid "Visit latest news article"
 msgstr ""
 
 #: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:696
-msgid "Do you want to see some on-line help about this problem ?"
+msgid "Do you want to see some online help about this problem?"
 msgstr ""
 
 #: ..\Client\core\CScreenShot.cpp:53
@@ -672,7 +672,7 @@ msgstr ""
 
 #. Create buttons
 #. OK button
-#: ..\Client\core\CSettings.cpp:126 ..\Client\core\CSettings.cpp:4598
+#: ..\Client\core\CSettings.cpp:126 ..\Client\core\CSettings.cpp:4579
 #: ..\Client\core\CVersionUpdater.cpp:1605
 #: ..\Client\core\CVersionUpdater.cpp:1821
 #: ..\Client\core\CVersionUpdater.cpp:1914
@@ -688,7 +688,7 @@ msgid "OK"
 msgstr ""
 
 #. Cancel button
-#: ..\Client\core\CSettings.cpp:131 ..\Client\core\CSettings.cpp:4597
+#: ..\Client\core\CSettings.cpp:131 ..\Client\core\CSettings.cpp:4578
 #: ..\Client\core\CVersionUpdater.cpp:1788
 #: ..\Client\core\CVersionUpdater.cpp:1804
 #: ..\Client\core\CVersionUpdater.cpp:1839
@@ -867,15 +867,15 @@ msgstr ""
 msgid "Usertrack options"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:555 ..\Client\core\CSettings.cpp:3005
+#: ..\Client\core\CSettings.cpp:555 ..\Client\core\CSettings.cpp:2986
 msgid "Radio"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:556 ..\Client\core\CSettings.cpp:3007
+#: ..\Client\core\CSettings.cpp:556 ..\Client\core\CSettings.cpp:2988
 msgid "Random"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:557 ..\Client\core\CSettings.cpp:3009
+#: ..\Client\core\CSettings.cpp:557 ..\Client\core\CSettings.cpp:2990
 msgid "Sequential"
 msgstr ""
 
@@ -981,7 +981,7 @@ msgid "Medium"
 msgstr ""
 
 #: ..\Client\core\CSettings.cpp:727 ..\Client\core\CSettings.cpp:1041
-#: ..\Client\core\CSettings.cpp:1472 ..\Client\core\CSettings.cpp:3063
+#: ..\Client\core\CSettings.cpp:1472 ..\Client\core\CSettings.cpp:3044
 msgid "High"
 msgstr ""
 
@@ -992,8 +992,8 @@ msgstr ""
 #: ..\Client\core\CSettings.cpp:743 ..\Client\core\CSettings.cpp:766
 #: ..\Client\core\CSettings.cpp:972 ..\Client\core\CSettings.cpp:1026
 #: ..\Client\core\CSettings.cpp:1157 ..\Client\core\CSettings.cpp:1478
-#: ..\Client\core\CSettings.cpp:3070 ..\Client\core\CSettings.cpp:3102
-#: ..\Client\core\CSettings.cpp:3124 ..\Client\core\CSettings.cpp:4112
+#: ..\Client\core\CSettings.cpp:3051 ..\Client\core\CSettings.cpp:3083
+#: ..\Client\core\CSettings.cpp:3105 ..\Client\core\CSettings.cpp:4093
 msgid "Off"
 msgstr ""
 
@@ -1010,7 +1010,7 @@ msgid "3x"
 msgstr ""
 
 #: ..\Client\core\CSettings.cpp:782 ..\Client\core\CSettings.cpp:974
-#: ..\Client\core\CSettings.cpp:1490 ..\Client\core\CSettings.cpp:3072
+#: ..\Client\core\CSettings.cpp:1490 ..\Client\core\CSettings.cpp:3053
 msgid "Auto"
 msgstr ""
 
@@ -1106,49 +1106,49 @@ msgstr ""
 
 #. Fast clothes loading
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:965
-#: ..\Client\core\CSettings.cpp:4616
+#: ..\Client\core\CSettings.cpp:4597
 msgid "Fast CJ clothes loading:"
 msgstr ""
 
 #. Browser scan speed
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:979
-#: ..\Client\core\CSettings.cpp:4618
+#: ..\Client\core\CSettings.cpp:4599
 msgid "Browser speed:"
 msgstr ""
 
 #. Single download
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:993
-#: ..\Client\core\CSettings.cpp:4620
+#: ..\Client\core\CSettings.cpp:4601
 msgid "Single connection:"
 msgstr ""
 
 #. Packet tag
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:1006
-#: ..\Client\core\CSettings.cpp:4622
+#: ..\Client\core\CSettings.cpp:4603
 msgid "Packet tag:"
 msgstr ""
 
 #. Progress animation
 #: ..\Client\core\CSettings.cpp:959 ..\Client\core\CSettings.cpp:1019
-#: ..\Client\core\CSettings.cpp:4624
+#: ..\Client\core\CSettings.cpp:4605
 msgid "Progress animation:"
 msgstr ""
 
 #. Process priority
 #: ..\Client\core\CSettings.cpp:959 ..\Client\core\CSettings.cpp:1032
-#: ..\Client\core\CSettings.cpp:4614
+#: ..\Client\core\CSettings.cpp:4595
 msgid "Process priority:"
 msgstr ""
 
 #. Debug setting
 #: ..\Client\core\CSettings.cpp:959 ..\Client\core\CSettings.cpp:1046
-#: ..\Client\core\CSettings.cpp:4626
+#: ..\Client\core\CSettings.cpp:4607
 msgid "Debug setting:"
 msgstr ""
 
 #. Streaming memory
 #: ..\Client\core\CSettings.cpp:960 ..\Client\core\CSettings.cpp:1069
-#: ..\Client\core\CSettings.cpp:4628
+#: ..\Client\core\CSettings.cpp:4609
 msgid "Streaming memory:"
 msgstr ""
 
@@ -1163,12 +1163,12 @@ msgid "Install important updates:"
 msgstr ""
 
 #: ..\Client\core\CSettings.cpp:973 ..\Client\core\CSettings.cpp:1001
-#: ..\Client\core\CSettings.cpp:1014 ..\Client\core\CSettings.cpp:3074
-#: ..\Client\core\CSettings.cpp:3090 ..\Client\core\CSettings.cpp:3097
+#: ..\Client\core\CSettings.cpp:1014 ..\Client\core\CSettings.cpp:3055
+#: ..\Client\core\CSettings.cpp:3071 ..\Client\core\CSettings.cpp:3078
 msgid "On"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:986 ..\Client\core\CSettings.cpp:3079
+#: ..\Client\core\CSettings.cpp:986 ..\Client\core\CSettings.cpp:3060
 msgid "Very slow"
 msgstr ""
 
@@ -1176,21 +1176,21 @@ msgstr ""
 #: ..\Client\core\CSettings.cpp:1013 ..\Client\core\CSettings.cpp:1027
 #: ..\Client\core\CSettings.cpp:1053 ..\Client\core\CSettings.cpp:1065
 #: ..\Client\core\CSettings.cpp:1158 ..\Client\core\CSettings.cpp:1178
-#: ..\Client\core\CSettings.cpp:3081 ..\Client\core\CSettings.cpp:3088
-#: ..\Client\core\CSettings.cpp:3095 ..\Client\core\CSettings.cpp:3104
-#: ..\Client\core\CSettings.cpp:3117
+#: ..\Client\core\CSettings.cpp:3062 ..\Client\core\CSettings.cpp:3069
+#: ..\Client\core\CSettings.cpp:3076 ..\Client\core\CSettings.cpp:3085
+#: ..\Client\core\CSettings.cpp:3098
 msgid "Default"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:988 ..\Client\core\CSettings.cpp:3083
+#: ..\Client\core\CSettings.cpp:988 ..\Client\core\CSettings.cpp:3064
 msgid "Fast"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:1039 ..\Client\core\CSettings.cpp:3059
+#: ..\Client\core\CSettings.cpp:1039 ..\Client\core\CSettings.cpp:3040
 msgid "Normal"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:1040 ..\Client\core\CSettings.cpp:3061
+#: ..\Client\core\CSettings.cpp:1040 ..\Client\core\CSettings.cpp:3042
 msgid "Above normal"
 msgstr ""
 
@@ -1425,85 +1425,85 @@ msgstr ""
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: ..\Client\core\CSettings.cpp:2539 ..\Client\core\CSettings.cpp:2546
+#: ..\Client\core\CSettings.cpp:2538 ..\Client\core\CSettings.cpp:2545
 msgid "Press a key to bind, or escape to clear"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:2540
+#: ..\Client\core\CSettings.cpp:2539
 msgid "Binding a primary key"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:2547
+#: ..\Client\core\CSettings.cpp:2546
 msgid "Binding a secondary key"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:2623
+#: ..\Client\core\CSettings.cpp:2620
 msgid "GTA GAME CONTROLS"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:2625
+#: ..\Client\core\CSettings.cpp:2622
 msgid "MULTIPLAYER CONTROLS"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:2870 ..\Client\core\CSettings.cpp:4577
+#: ..\Client\core\CSettings.cpp:2851 ..\Client\core\CSettings.cpp:4558
 msgid "Your nickname contains invalid characters!"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3656
+#: ..\Client\core\CSettings.cpp:3637
 msgid "Red:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3656
+#: ..\Client\core\CSettings.cpp:3637
 msgid "Green:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3656
+#: ..\Client\core\CSettings.cpp:3637
 msgid "Blue:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3656
+#: ..\Client\core\CSettings.cpp:3637
 msgid "Transparency:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3659
+#: ..\Client\core\CSettings.cpp:3640
 msgid "Color"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:3736
+#: ..\Client\core\CSettings.cpp:3717
 msgid "Preview"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4044
+#: ..\Client\core\CSettings.cpp:4025
 msgid "Please disconnect before changing language"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4072
+#: ..\Client\core\CSettings.cpp:4053
 msgid "Please disconnect before changing skin"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4358
+#: ..\Client\core\CSettings.cpp:4339
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
 "Are you sure you want to enable them?"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4362
+#: ..\Client\core\CSettings.cpp:4343
 msgid "PERFORMANCE WARNING"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4382
+#: ..\Client\core\CSettings.cpp:4363
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4384
+#: ..\Client\core\CSettings.cpp:4365
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4399
+#: ..\Client\core\CSettings.cpp:4380
 msgid ""
 "Some scripts may play sounds, such as radio, from the internet.\n"
 "\n"
@@ -1511,11 +1511,11 @@ msgid ""
 "bandwidth consumption.\n"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4402
+#: ..\Client\core\CSettings.cpp:4383
 msgid "EXTERNAL SOUNDS"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4423
+#: ..\Client\core\CSettings.cpp:4404
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -1525,11 +1525,11 @@ msgid ""
 "Are you sure you want to use them?"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4429 ..\Client\core\CVersionUpdater.cpp:2079
+#: ..\Client\core\CSettings.cpp:4410 ..\Client\core\CVersionUpdater.cpp:2079
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4472
+#: ..\Client\core\CSettings.cpp:4453
 msgid ""
 "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
@@ -1538,77 +1538,77 @@ msgid ""
 "Are you sure you want to enable this option?"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4478
+#: ..\Client\core\CSettings.cpp:4459
 msgid "EXPERIMENTAL FEATURE"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4595
+#: ..\Client\core\CSettings.cpp:4576
 msgid "Please enter a nickname"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4596
+#: ..\Client\core\CSettings.cpp:4577
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4614
+#: ..\Client\core\CSettings.cpp:4595
 msgid "Very experimental feature."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4616
+#: ..\Client\core\CSettings.cpp:4597
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4618
+#: ..\Client\core\CSettings.cpp:4599
 msgid "Older routers may require a slower scan speed."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4620
+#: ..\Client\core\CSettings.cpp:4601
 msgid "Switch on to use only one connection when downloading."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4622
+#: ..\Client\core\CSettings.cpp:4603
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4624
+#: ..\Client\core\CSettings.cpp:4605
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4626
+#: ..\Client\core\CSettings.cpp:4607
 msgid "Select default always. (This setting is not saved)"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4628
+#: ..\Client\core\CSettings.cpp:4609
 msgid "Maximum is usually best"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4630 ..\Client\core\CSettings.cpp:4632
+#: ..\Client\core\CSettings.cpp:4611 ..\Client\core\CSettings.cpp:4613
 msgid "Auto updater:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4630
+#: ..\Client\core\CSettings.cpp:4611
 msgid "Select default unless you like filling out bug reports."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4632
+#: ..\Client\core\CSettings.cpp:4613
 msgid "Select default to automatically install important updates."
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4634
+#: ..\Client\core\CSettings.cpp:4615
 msgid "16-bit color:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4634
+#: ..\Client\core\CSettings.cpp:4615
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4636
+#: ..\Client\core\CSettings.cpp:4617
 msgid "Mouse fix:"
 msgstr ""
 
-#: ..\Client\core\CSettings.cpp:4636
+#: ..\Client\core\CSettings.cpp:4617
 msgid "Mouse movement fix - May need PC restart"
 msgstr ""
 
@@ -1962,8 +1962,8 @@ msgstr ""
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1295
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1352
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:568
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:567
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:665
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr ""
 
@@ -2774,59 +2774,59 @@ msgstr ""
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:584
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:583
 msgid "Entering the game ..."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:641
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:687
 msgid "The server is not installed"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:697
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1072
 msgid "Local Server"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:697
 msgid "Starting local server ..."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1003
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1072
 msgid "Connecting to local server..."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1083
 msgid "Error connecting to server."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1093
 msgid "Connecting to local server timed out. See console for details."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1196
 msgid "Connection with the server was lost"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1224
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1223
 msgid "Disconnected: the server is currently full"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1236
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1235
 msgid "Disconnected: invalid password specified"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1257
 msgid "MTA Client verification failed!"
 msgstr ""
 
@@ -2875,191 +2875,191 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:480
 msgid "Disconnected: Invalid nickname"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:484
 msgid "Disconnect from server"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:488
 #, c-format
 msgid ""
 "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:494
 #, c-format
 msgid ""
 "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
 #, c-format
 msgid ""
 "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:505
 msgid "Disconnected: Version mismatch"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:509
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
 #, c-format
 msgid ""
 "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
 #, c-format
 msgid ""
 "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
 #, c-format
 msgid ""
 "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 #, c-format
 msgid ""
 "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:533
 msgid "Disconnected: Nick already in use"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:537
 msgid "Disconnected: Player element could not be created."
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:546
 msgid "Disconnected: Serial verification failed"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:550
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:564
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:575
 msgid "Disconnected: Server shutdown or restarting"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:590
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "You were kicked from the game"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:608
 msgid "Please replace gta_sa.exe"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server does not allow virtual machines"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
 msgid "This server requires driver signing to be enabled"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
 msgid "Please restart your PC"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
 msgid "This server has detected missing anti-cheat components"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
 msgid "Try restarting MTA"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:606
 msgid "Please replace gta3.img or gta_int.img"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
 msgid "This server does not allow Wine"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:610
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:624
 msgid "Time Remaining: "
 msgstr ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:629
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:634
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:631
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:636
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:633
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:638
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:635
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:640
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -3067,7 +3067,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Display the error
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:639
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:644
 msgid "Disconnected"
 msgstr ""
 
