@@ -1,0 +1,3 @@
+files:
+  - source: /utils/l10n-sources/*
+    translation: /Shared/data/MTA San Andreas/MTA/locale/%two_letters_code%/%original_file_name%
