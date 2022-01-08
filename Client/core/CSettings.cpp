@@ -158,7 +158,7 @@ void CSettings::CreateGUI()
     // Mouse Options
     m_pControlsMouseLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Mouse options")));
     m_pControlsMouseLabel->SetPosition(CVector2D(vecTemp.fX + 11, vecTemp.fY));
-    m_pControlsMouseLabel->AutoSize(NULL, 5.0f);
+    m_pControlsMouseLabel->AutoSize(NULL, 20.0f);
     m_pControlsMouseLabel->SetFont("default-bold-small");
     vecTemp.fY += 18;
 
@@ -176,7 +176,7 @@ void CSettings::CreateGUI()
     m_pFlyWithMouse->AutoSize(NULL, 20.0f);
 
     // MouseSensitivity
-    vecTemp.fY += 52.0f;
+    vecTemp.fY += 54.0f;
     m_pLabelMouseSensitivity = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Mouse sensitivity:")));
     m_pLabelMouseSensitivity->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pLabelMouseSensitivity->AutoSize();
@@ -192,7 +192,7 @@ void CSettings::CreateGUI()
     m_pLabelMouseSensitivityValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pLabelMouseSensitivityValue->AutoSize("100%");
     vecTemp.fX = 16;
-    vecTemp.fY += 26.f;
+    vecTemp.fY += 24.f;
 
     // VerticalAimSensitivity
     m_pLabelVerticalAimSensitivity = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Vertical aim sensitivity:")));
@@ -271,12 +271,12 @@ void CSettings::CreateGUI()
         m_pEditSaturation->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
 
         CGUILabel* pLabelDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Dead Zone")));
-        pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, -1.f));
+        pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, 1.f));
         pLabelDeadZone->AutoSize();
         pLabelDeadZone->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 
         CGUILabel* pLabelSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Saturation")));
-        pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, -1.f));
+        pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, 1.f));
         pLabelSaturation->AutoSize();
         pLabelSaturation->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
         vecTemp.fY += 106;
@@ -525,7 +525,7 @@ void CSettings::CreateGUI()
     m_pAudioRadioLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Radio options")));
     m_pAudioRadioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
     m_pAudioRadioLabel->GetPosition(vecTemp, false);
-    m_pAudioRadioLabel->AutoSize(NULL, 10.0f);
+    m_pAudioRadioLabel->AutoSize(NULL, 20.0f);
     m_pAudioRadioLabel->SetFont("default-bold-small");
 
     m_pCheckBoxAudioEqualizer = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAudio, _("Radio Equalizer"), true));
@@ -541,7 +541,7 @@ void CSettings::CreateGUI()
     m_pAudioUsertrackLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Usertrack options")));
     m_pAudioUsertrackLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
     m_pAudioUsertrackLabel->GetPosition(vecTemp, false);
-    m_pAudioUsertrackLabel->AutoSize(NULL, 10.0f);
+    m_pAudioUsertrackLabel->AutoSize(NULL, 20.0f);
     m_pAudioUsertrackLabel->SetFont("default-bold-small");
 
     m_pLabelUserTrackMode = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Play mode:")));
@@ -567,7 +567,7 @@ void CSettings::CreateGUI()
     m_pAudioMuteLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Mute options")));
     m_pAudioMuteLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 52.0f));
     m_pAudioMuteLabel->GetPosition(vecTemp, false);
-    m_pAudioMuteLabel->AutoSize(NULL, 5.0f);
+    m_pAudioMuteLabel->AutoSize(NULL, 20.0f);
     m_pAudioMuteLabel->SetFont("default-bold-small");
 
     m_pCheckBoxMuteMaster = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAudio, _("Mute All sounds when minimized"), true));
@@ -889,7 +889,7 @@ void CSettings::CreateGUI()
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);
-    m_pLabelBrowserCustomBlacklist->AutoSize(NULL, 5.0f);
+    m_pLabelBrowserCustomBlacklist->AutoSize(NULL, 20.0f);
     m_pLabelBrowserCustomBlacklist->SetFont("default-bold-small");
 
     m_pEditBrowserBlacklistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
@@ -917,7 +917,7 @@ void CSettings::CreateGUI()
     m_pLabelBrowserCustomWhitelist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom whitelist")));
     m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(292.0f, vecTemp.fY));
     m_pLabelBrowserCustomWhitelist->GetPosition(vecTemp);
-    m_pLabelBrowserCustomWhitelist->AutoSize(NULL, 5.0f);
+    m_pLabelBrowserCustomWhitelist->AutoSize(NULL, 20.0f);
     m_pLabelBrowserCustomWhitelist->SetFont("default-bold-small");
 
     m_pEditBrowserWhitelistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
@@ -1096,15 +1096,14 @@ void CSettings::CreateGUI()
     m_pWin8Label = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Windows 8 compatibility:")));
     m_pWin8Label->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pWin8Label->AutoSize();
-    vecTemp.fX += 20;
 
     m_pWin8ColorCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("16-bit color")));
-    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8ColorCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fX += 90;
+    vecTemp.fX += 110;
 
     m_pWin8MouseCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Mouse fix")));
-    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8MouseCheckBox->AutoSize(NULL, 20.0f);
     vecTemp.fY += fLineHeight;
     vecTemp.fX -= 110;
@@ -2264,7 +2263,7 @@ void CSettings::CreateInterfaceTabGUI()
             pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabOptions, _("Options")));
             pLabel->SetPosition(CVector2D(fMarginX, 10.0f));
             pLabel->GetPosition(vecTemp);
-            pLabel->AutoSize(NULL, 5.0f);
+            pLabel->AutoSize(NULL, 20.0f);
             pLabel->SetFont("default-bold-small");
 
             m_pChatCssBackground = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabOptions, _("Hide background when not typing")));
