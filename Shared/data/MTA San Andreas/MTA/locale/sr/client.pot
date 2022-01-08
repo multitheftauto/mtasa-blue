@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-08 15:35\n"
+"PO-Revision-Date: 2022-01-08 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "MIME-Version: 1.0\n"
@@ -14,7 +14,7 @@ msgstr ""
 "X-Crowdin-Project-ID: 13\n"
 "X-Crowdin-Language: sr\n"
 "X-Crowdin-File: /master/utils/l10n-sources/client.pot\n"
-"X-Crowdin-File-ID: 131\n"
+"X-Crowdin-File-ID: 87\n"
 "Language: srp\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
@@ -2046,8 +2046,8 @@ msgstr "Nepokretan"
 #: ..\Client\core\ServerBrowser\CServerList.cpp:150
 msgid "player"
 msgid_plural "players"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "igrač"
+msgstr[1] "igrači"
 msgstr[2] ""
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:151
@@ -2058,7 +2058,7 @@ msgstr "na"
 msgid "server"
 msgid_plural "servers"
 msgstr[0] ""
-msgstr[1] ""
+msgstr[1] "serveri"
 msgstr[2] ""
 
 #. We are polling for the master server list (first pass)
@@ -2972,32 +2972,32 @@ msgstr "Preostalo vreme: "
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d dan"
+msgstr[1] "%d dana"
 msgstr[2] ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:631
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d sat"
+msgstr[1] "%d sati"
 msgstr[2] ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:633
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minut"
+msgstr[1] "%d minuta"
 msgstr[2] ""
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:635
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d sekunda"
+msgstr[1] "%d sekundi"
 msgstr[2] ""
 
 #. Display the error
