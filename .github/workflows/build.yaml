@@ -2,11 +2,14 @@ name: Build
 
 # Trigger the workflow on push or pull request
 on:
+  workflow_dispatch:
   push:
     branches:
+      - '**'
       - '!l10n/**'
   pull_request:
     branches:
+      - '**'
       - '!l10n/**'
 
 jobs:
