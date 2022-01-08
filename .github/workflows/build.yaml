@@ -4,9 +4,11 @@ name: Build
 on:
   push:
     branches:
+      - '**'
       - '!l10n/**'
   pull_request:
     branches:
+      - '**'
       - '!l10n/**'
 
 jobs:
