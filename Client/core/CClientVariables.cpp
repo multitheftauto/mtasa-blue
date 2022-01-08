@@ -357,7 +357,7 @@ void CClientVariables::LoadDefaults()
     if (!Exists("locale"))
     {
         SString strLangCode = GetApplicationSetting("locale");
-        Set("locale", !strLangCode.empty() ? strLangCode : _S("en_US"));
+        Set("locale", !strLangCode.empty() ? strLangCode : _S("en"));
     }
 
     // Set default resolution to native resolution
