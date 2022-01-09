@@ -163,7 +163,7 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
             pEntity->RemoveCollision(pShape);
 
             // Can we call the event?
-            if(!pEntity->IsBeingDeleted())
+            if (!pEntity->IsBeingDeleted())
             {
                 // Call the event
                 CLuaArguments Arguments;

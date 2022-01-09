@@ -79,7 +79,7 @@ std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
 
     if (iModelID < MAX_MODEL_ID)
         return m_Models[iModelID];
-    
+
     return nullptr;
 }
 
