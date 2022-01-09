@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 05:23\n"
+"PO-Revision-Date: 2022-01-09 16:35\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -794,7 +794,7 @@ msgstr "مجاز کردن صداهای خارجی"
 
 #: ..\Client\core\CSettings.cpp:385
 msgid "Always show download window"
-msgstr "همیشه پنجره دانلود را نشان بدهید"
+msgstr "همیشه پنجره دانلود را نشان بده"
 
 #: ..\Client\core\CSettings.cpp:390
 msgid "Use customized GTA:SA files"
