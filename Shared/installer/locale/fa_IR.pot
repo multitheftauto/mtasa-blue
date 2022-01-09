@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-21 17:13\n"
-"PO-Revision-Date: 2022-01-08 21:09\n"
+"PO-Revision-Date: 2022-01-09 17:35\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -21,13 +21,12 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:188
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "این نسخه از ام تی ای که شما دانلود کردید ویندوز اکسپی یا ویستا رو ساپورت نمیکنه. \n"
-"لطفا یک نسخه دیگر ام تی ای را از www.mtasa.com دانلود کنید."
+msgstr "این نسخه از MTA:SA که دانلود کرده اید از ویندوز XP یا Vista پشتیبانی نمی کند. لطفا یک نسخه دیگر را از www.mtasa.com دانلود کنید."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:189
 msgid "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
-msgstr "این نسخه از ام تی ای برای نسخه های قدیمی ویندوز طراحی شده. لطفا جدید ترین نسخه را از www.mtasa.com دانلود کنید."
+msgstr "این نسخه از MTA:SA برای نسخه های قدیمی ویندوز طراحی شده است. لطفا جدیدترین نسخه را از www.mtasa.com دانلود کنید."
 
 #. WELCOME_TEXT
 #: ../Shared/installer/nightly.nsi:193
@@ -44,12 +43,12 @@ msgstr "این ویزارد شما را برای نصب یا به روز رسا�
 #. HEADER_Text
 #: ../Shared/installer/nightly.nsi:194
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "Grand Theft Auto: مکان سن آندریاس"
+msgstr "Grand Theft Auto: San Andreas مکان نصب"
 
 #. DIRECTORY_Text_Dest
 #: ../Shared/installer/nightly.nsi:195
 msgid "Grand Theft Auto: San Andreas folder"
-msgstr "Grand Theft Auto: پوشه San Andreas"
+msgstr "Grand Theft Auto: San Andreas پوشه"
 
 #. DIRECTORY_Text_Top
 #: ../Shared/installer/nightly.nsi:196
