@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 06:25\n"
+"PO-Revision-Date: 2022-01-09 20:15\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -678,7 +678,7 @@ msgstr "Erweitert"
 #: ..\Client\core\CVersionUpdater.cpp:2150
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:64 ..\Client\loader\Dialogs.cpp:33
 msgid "OK"
-msgstr "Ok"
+msgstr "OK"
 
 #. Cancel button
 #: ..\Client\core\CSettings.cpp:131 ..\Client\core\CSettings.cpp:4597
