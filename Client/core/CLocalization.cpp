@@ -166,9 +166,10 @@ SString CLocalization::GetLanguageName()
 }
 
 // Get the file directory of the current language
-SString CLocalization::GetLanguageDirectory()
+SString CLocalization::GetLanguageDirectory(CLanguage* pLanguage)
 {
-    SString strFullPath = m_pCurrentLang->GetDictionary().get_filepath();
+    CLanguage* pSelectLang = pLanguage != nullptr ? pLanguage : m_pCurrentLang;
+    SString    strFullPath = pSelectLang->GetDictionary().get_filepath();
 
     // Replace all backslashes with forward slashes
     int idx = 0;

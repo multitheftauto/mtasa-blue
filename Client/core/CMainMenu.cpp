@@ -46,7 +46,6 @@
 #define CORE_MTA_LOGO               "cgui\\images\\background_logo.png"
 #define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
-#define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
 
 static int          WaitForMenu = 0;
 static const SColor headlineColors[] = {SColorRGBA(233, 234, 106, 255), SColorRGBA(233 / 6 * 4, 234 / 6 * 4, 106 / 6 * 4, 255),
@@ -214,7 +213,12 @@ CMainMenu::CMainMenu(CGUI* pManager)
     float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;
     float fDrawPosY = 0.60f * m_iMenuSizeY;
     m_pLatestNews = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
-    m_pLatestNews->LoadFromFile(CORE_MTA_LATEST_NEWS);
+    if (!m_pLatestNews->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), "latest_news.png")))
+    {
+        // Load en_US if no localization is available
+        auto pLanguage = g_pLocalization->GetLanguage("en_US");
+        m_pLatestNews->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(pLanguage), "latest_news.png"));
+    }
     m_pLatestNews->SetParent(m_pCanvas);
     m_pLatestNews->SetPosition(CVector2D(fDrawPosX, fDrawPosY), false);
     m_pLatestNews->SetSize(CVector2D(fDrawSizeX, fDrawSizeY), false);
@@ -1014,13 +1018,12 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
 {
     CGUIStaticImage* pImage = reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage());
 
-    if (g_pCore->GetLocalization()->IsLocalized())
+    if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)))
     {
-        if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)))
-            pImage->LoadFromFile(PathJoin("cgui/images", szFilename));
+        // Load en_US if no localization is available
+        auto pLanguage = g_pLocalization->GetLanguage("en_US");
+        pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(pLanguage), szFilename));
     }
-    else
-        pImage->LoadFromFile(PathJoin("cgui/images", szFilename));
 
     // Make our positions absolute
     int iPosX = vecRelPosition.fX * m_iMenuSizeX;
