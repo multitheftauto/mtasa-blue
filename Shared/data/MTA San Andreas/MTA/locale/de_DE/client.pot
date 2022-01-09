@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-08 18:25\n"
+"PO-Revision-Date: 2022-01-09 05:23\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -854,7 +854,7 @@ msgstr "Radio Equalizer"
 
 #: ..\Client\core\CSettings.cpp:536
 msgid "Radio Auto-tune"
-msgstr ""
+msgstr "Radio-Autotune"
 
 #: ..\Client\core\CSettings.cpp:541
 msgid "Usertrack options"
@@ -941,7 +941,7 @@ msgstr "Fenstermodus"
 
 #: ..\Client\core\CSettings.cpp:636
 msgid "DPI aware"
-msgstr ""
+msgstr "DPI-bewusst"
 
 #: ..\Client\core\CSettings.cpp:644 ..\Client\core\CSettings.cpp:959
 #: ..\Client\loader\MainFunctions.cpp:380
@@ -1045,7 +1045,7 @@ msgstr "Fahrzeuge immer mit vielen Details"
 
 #: ..\Client\core\CSettings.cpp:814
 msgid "Render peds always in high detail"
-msgstr ""
+msgstr "Pädiatrie immer mit hohem Detailgrad rendern"
 
 #: ..\Client\core\CSettings.cpp:819
 msgid "Full Screen Minimize"
@@ -1081,7 +1081,7 @@ msgstr "Blockieren"
 
 #: ..\Client\core\CSettings.cpp:909 ..\Client\core\CSettings.cpp:937
 msgid "Domain"
-msgstr ""
+msgstr "Domäne"
 
 #: ..\Client\core\CSettings.cpp:911 ..\Client\core\CSettings.cpp:939
 msgid "Remove domain"
@@ -1181,7 +1181,7 @@ msgstr "Schnell"
 
 #: ..\Client\core\CSettings.cpp:1039 ..\Client\core\CSettings.cpp:3059
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: ..\Client\core\CSettings.cpp:1040 ..\Client\core\CSettings.cpp:3061
 msgid "Above normal"
@@ -1189,11 +1189,11 @@ msgstr "Über normal"
 
 #: ..\Client\core\CSettings.cpp:1076
 msgid "Min"
-msgstr ""
+msgstr "Min"
 
 #: ..\Client\core\CSettings.cpp:1089
 msgid "Max"
-msgstr ""
+msgstr "Max"
 
 #. Windows 8 compatibility
 #: ..\Client\core\CSettings.cpp:1096
@@ -1274,7 +1274,7 @@ msgstr "Sprache:"
 
 #: ..\Client\core\CSettings.cpp:1938
 msgid "Skin:"
-msgstr ""
+msgstr "Haut:"
 
 #: ..\Client\core\CSettings.cpp:1938
 msgid "Presets:"
@@ -1282,7 +1282,7 @@ msgstr "Voreinstellungen:"
 
 #: ..\Client\core\CSettings.cpp:1987
 msgid "Chat"
-msgstr ""
+msgstr "Chatten"
 
 #: ..\Client\core\CSettings.cpp:2004
 msgid "Load"
@@ -1294,7 +1294,7 @@ msgstr "Farben"
 
 #: ..\Client\core\CSettings.cpp:2017
 msgid "Layout"
-msgstr ""
+msgstr "Befehl"
 
 #: ..\Client\core\CSettings.cpp:2018 ..\Client\core\CSettings.cpp:2264
 msgid "Options"
@@ -1306,7 +1306,7 @@ msgstr "Chathintergrund"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Chat Text"
-msgstr ""
+msgstr "Chat-Text"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Input Background"
@@ -1346,7 +1346,7 @@ msgstr "sek"
 
 #: ..\Client\core\CSettings.cpp:2102
 msgid "Fading"
-msgstr ""
+msgstr "Verblassen"
 
 #: ..\Client\core\CSettings.cpp:2108
 msgid "Fade out old lines"
@@ -1354,7 +1354,7 @@ msgstr "Alte Zeilen ausfaden"
 
 #: ..\Client\core\CSettings.cpp:2148
 msgid "Horizontal:"
-msgstr ""
+msgstr "Horizontale:"
 
 #: ..\Client\core\CSettings.cpp:2148
 msgid "Vertical:"
@@ -1366,15 +1366,15 @@ msgstr "Textausrichtung:"
 
 #: ..\Client\core\CSettings.cpp:2148
 msgid "X-Offset:"
-msgstr ""
+msgstr "X-Versatz:"
 
 #: ..\Client\core\CSettings.cpp:2149
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Y-Versatz:"
 
 #: ..\Client\core\CSettings.cpp:2155
 msgid "Position"
-msgstr ""
+msgstr "Standpunkt"
 
 #: ..\Client\core\CSettings.cpp:2170 ..\Client\core\CSettings.cpp:2184
 msgid "Center"
@@ -1522,7 +1522,10 @@ msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr ""
+msgstr "Die Aktivierung der DPI-Erkennung ist eine experimentelle Funktion und\n"
+"wir empfehlen sie nur, wenn Sie MTA:SA auf einem skalierten Monitor spielen.\n"
+"Es kann zu grafischen Problemen kommen, wenn Sie diese Option aktivieren.\n\n"
+"Sind Sie sicher, dass Sie diese Option aktivieren möchten?"
 
 #: ..\Client\core\CSettings.cpp:4478
 msgid "EXPERIMENTAL FEATURE"
@@ -1572,7 +1575,7 @@ msgstr "Maximum ist normalerweise am besten"
 
 #: ..\Client\core\CSettings.cpp:4630 ..\Client\core\CSettings.cpp:4632
 msgid "Auto updater:"
-msgstr ""
+msgstr "Automatischer Updater:"
 
 #: ..\Client\core\CSettings.cpp:4630
 msgid "Select default unless you like filling out bug reports."
@@ -1726,7 +1729,7 @@ msgstr " - Unbekanntes Problem in _DialogUpdateResult"
 #: ..\Client\core\CVersionUpdater.cpp:2086
 #: ..\Client\core\CVersionUpdater.cpp:2096
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: ..\Client\core\CVersionUpdater.cpp:2094
 msgid "ERROR"
@@ -1752,7 +1755,7 @@ msgstr "\n\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3399
 msgid "We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n"
-msgstr ""
+msgstr "Wir haben Ihre Update-Einstellungen auf Standard zurückgesetzt. Bitte ändern Sie Ihre Einstellungen erneut, wenn Sie nächtliche Updates wünschen.\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3400
 msgid "VERSION UPDATE INFORMATION"
