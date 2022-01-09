@@ -30,7 +30,8 @@ static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutC
                                                                                          "chat_line_life",
                                                                                          "chat_line_fade_out",
                                                                                          "chat_use_cegui",
-                                                                                         "text_scale"}};
+                                                                                         "text_scale",
+                                                                                         "chat_text_outline"}};
 
 void CLuaGUIDefs::LoadFunctions()
 {
@@ -3645,6 +3646,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
     //* chat_line_fade_out - Returns how long takes for text to fade out
     //* chat_use_cegui - Returns whether CEGUI is used to render the chatbox
     //* text_scale - Returns text scale
+    //* chat_text_outline - Returns whether text black/white outline is used
 
     CScriptArgReader  argStream(luaVM);
     CCVarsInterface*  pCVars = g_pCore->GetCVars();
