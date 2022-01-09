@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 19:15\n"
+"PO-Revision-Date: 2022-01-09 21:15\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -2462,12 +2462,12 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
-msgstr "آدرس محل نصب 'MTA:SA' و 'GTA: San Andreas' شامل یک ';' میباشد.\n\n"
-"اگر در هنگام اجرای MTA:SA مشکلی دارید، محل نصب GTA و یا MTA:SA را به محلی که شامل ';' نمیباشد تغییر دهید."
+msgstr "آدرس محل نصب 'MTA:SA' و 'GTA: San Andreas' شامل یک ';' می‌باشد. (نقطه ویگرول/سمی‌کالن)\n\n"
+"اگر در هنگام اجرای MTA:SA مشکلی دارید، محل نصب GTA و یا MTA:SA را به محلی که شامل ';' نمی‌باشد تغییر دهید."
 
 #: ..\Client\loader\MainFunctions.cpp:779
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "مشکلی هنگام لود به وجود آمده است. لطفا اطمینان حاصل فرمایید که فایل های اخرین نسخه و به صورت سالم نصب شده اند."
+msgstr "مشکلی هنگام لود به وجود آمده است. لطفا اطمینان حاصل فرمایید که فایل های آخرین نسخه و به صورت سالم نصب شده‌اند."
 
 #: ..\Client\loader\MainFunctions.cpp:788
 #, c-format
@@ -2487,18 +2487,18 @@ msgstr "مشکلی در هنگام لود به وجود آمده است. %s در
 #: ..\Client\loader\MainFunctions.cpp:814
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "فایل اصلی دارای اسم اشتباهی می‌باشد. (%s)"
+msgstr "فایل اصلی دارای اسم اشتباهی می‌باشد (%s)"
 
 #: ..\Client\loader\MainFunctions.cpp:825
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr "فایل اصلی بدون امضا میباشد. احتمال وجود ویروس.\n\n"
+msgstr "فایل اصلی بدون امضا می‌باشد. احتمال وجود ویروس.\n\n"
 "لطفا در صورت درست نشدن به پشتیبانی آنلاین MTA مراجعه کنید."
 
 #: ..\Client\loader\MainFunctions.cpp:856
 msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr "فایل ها ویرایش شده اند. احتمال وجود ویروس.\n\n"
+msgstr "فایل‌ها ویرایش شده‌اند. احتمال وجود ویروس.\n\n"
 "لطفا در صورت درست نشدن به پشتیبانی آنلاین MTA مراجعه کنید."
 
 #: ..\Client\loader\MainFunctions.cpp:868
@@ -2509,7 +2509,7 @@ msgstr "فایل های .asi در محل نصب 'GTA: San Andreas' و 'MTA:SA' �
 
 #: ..\Client\loader\MainFunctions.cpp:933
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "خطای عدم تطابق نسخه فایل. در صورت بروز مشکل، MTA:SA را مجددا نصب کنید\n"
+msgstr "خطای عدم تطابق نسخه فایل. در صورت بروز مشکل، MTA:SA را مجددا نصب کنید.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:942
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -2519,7 +2519,7 @@ msgstr "برخی از فایل ها گم شده اند. در صورت بروز �
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA با \"حالت ایمن\" ویندوز سازگار نیست.\n\n"
-"لطفا کامپیوتر خود را مجددا راه اندازی کنید.\n"
+"لطفا کامپیوتر خود را مجددا راه‌اندازی کنید.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:1090
 msgid "Fix configuration issue"
@@ -2534,12 +2534,12 @@ msgstr "رفع خطای دسترسی"
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr "نمی‌توان Grand Theft Auto: San Andreas را راه‌اندازی کرد. لطفاً راه اندازی مجدد را امتحان کنید، یا اگر مشکل همچنان ادامه داشت، با MTA در www.multitheftauto.com تماس بگیرید.\n\n"
+msgstr "نمی‌توان Grand Theft Auto: San Andreas را راه‌اندازی کرد. لطفاً راه‌اندازی مجدد را امتحان کنید، یا اگر مشکل همچنان ادامه داشت، با MTA در www.multitheftauto.com تماس بگیرید.\n\n"
 "[%s]"
 
 #: ..\Client\loader\MainFunctions.cpp:1204
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "GTA: San Andreas ممکن است به درستی راه اندازی نشده باشد. آیا می خواهید آن را ببندید کنید؟"
+msgstr "GTA: San Andreas ممکن است به درستی راه‌اندازی نشده باشد. آیا می خواهید آن را ببندید کنید؟"
 
 #: ..\Client\loader\Utils.cpp:813
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -2548,7 +2548,7 @@ msgstr "محل نصب بازی Grand Theft Auto: San Andreas را انتخاب �
 #: ..\Client\loader\Utils.cpp:1283
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "خطا در بارگیری ماژول %s! (%s)"
+msgstr "خطا در هنگام بارگذاری ماژول %s ! (%s)"
 
 #: ..\Client\loader\Utils.cpp:1713
 #, c-format
@@ -2586,7 +2586,7 @@ msgstr "GTA:SA خطاهایی را در فایل '%s' پیدا کرد"
 
 #: ..\Client\loader\Utils.cpp:1918
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "آیا کامپیوتر شما هنگام بازی MTA:SA ریستارت شد؟"
+msgstr "آیا کامپیوتر شما هنگام اجرای MTA:SA ریستارت شد؟"
 
 #: ..\Client\loader\Utils.cpp:1983
 msgid "Please terminate the following programs before continuing:"
@@ -2726,7 +2726,7 @@ msgstr "سرور محلی"
 
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
 msgid "Starting local server ..."
-msgstr "راه اندازی سرور محلی ..."
+msgstr "در حال راه‌اندازی سرور محلی ..."
 
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
 #, c-format
@@ -2873,7 +2873,7 @@ msgstr "اتصال قطع شد: سرور در حال اجرای یک نسخه ق
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
-msgstr "اتصال قطع شد: این اسم در حال حاظر در حال استفاده میباشد"
+msgstr "اتصال قطع شد: این اسم در حال حاضر در حال استفاده میباشد"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
@@ -2927,7 +2927,7 @@ msgstr "این سرور به D3D9.DLL های ویرایش شده اجازه ور
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "D3D9.DLL را از محل نصب GTA خود حذف کرده و MTA را مجددا راه اندازی کنید"
+msgstr "D3D9.DLL را از محل نصب GTA خود حذف کرده و MTA را مجددا راه‌اندازی کنید"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
@@ -2939,7 +2939,7 @@ msgstr "این سرور برای ورود نیاز به فعال بودن امض
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr "لطفا کامپیوتر خود را مجددا راه اندازی کنید"
+msgstr "لطفا کامپیوتر خود را مجددا راه‌اندازی کنید"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
@@ -2947,7 +2947,7 @@ msgstr "این سرور اجزای ضد تقلب گم شده را شناسایی
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr "MTA را مجدداً راه اندازی کنید"
+msgstr "MTA را مجدداً راه‌اندازی کنید"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
@@ -2967,7 +2967,7 @@ msgstr "اطمینان حاصل کنید که هیچ برنامه دیگری MTA
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "
-msgstr "زمان باقی مانده:"
+msgstr "زمان باقی مانده: "
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:629
 #, c-format
@@ -3010,12 +3010,12 @@ msgstr "خطای دانلود: %s"
 
 #: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 msgid "Could not start the local server. See console for details."
-msgstr "سرور محلی راه اندازی نشد. برای جزئیات بیشتر به کنسول مراجعه کنید."
+msgstr "سرور محلی راه‌اندازی نشد. برای جزئیات بیشتر به کنسول مراجعه کنید."
 
 #: ..\Client\mods\deathmatch\logic\CServer.cpp:182
 #, c-format
 msgid "Error: Could not start local server. [%s]"
-msgstr "خطا: سرور محلی راه اندازی نشد. [%s]"
+msgstr "خطا: سرور محلی راه‌اندازی نشد. [%s]"
 
 #: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:25
 msgid "Map download progress:"
