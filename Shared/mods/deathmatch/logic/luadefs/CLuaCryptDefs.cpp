@@ -232,13 +232,13 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
 }
 
 std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKeyPair(lua_State* const luaVM, KeyPairAlgorithm algorithm,
-                                                                 std::unordered_map<std::string, std::string> options, std::optional<CLuaFunctionRef> callback)
+                                                                                     std::unordered_map<std::string, std::string> options,
+                                                                                     std::optional<CLuaFunctionRef>               callback)
 {
     switch (algorithm)
     {
         case KeyPairAlgorithm::RSA:
         {
-
             uint32_t size;
             if (auto it = options.find("size"); it != options.end())
             {
@@ -253,10 +253,8 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                 if (pLuaMain)
                 {
-                    
                     CLuaShared::GetAsyncTaskScheduler()->PushTask<std::variant<KeyPair, SString>>(
-                        [size]() -> std::variant<KeyPair, SString>
-                        {
+                        [size]() -> std::variant<KeyPair, SString> {
                             // Execute time-consuming task
                             try
                             {
@@ -267,8 +265,7 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                                 return {ex.GetWhat()};
                             }
                         },
-                        [luaFunctionRef = callback.value()](const auto& result)
-                        {
+                        [luaFunctionRef = callback.value()](const auto& result) {
                             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                             if (pLuaMain)
                             {
@@ -307,7 +304,6 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                     return false;
                 }
             }
-
         }
         default:
             throw std::invalid_argument("Unknown algorithm");
@@ -317,9 +313,9 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
 int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 {
     StringEncodeFunction algorithm;
-    SString               data;
-    CStringMap            options;
-    CLuaFunctionRef       luaFunctionRef;
+    SString              data;
+    CStringMap           options;
+    CLuaFunctionRef      luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
@@ -464,8 +460,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
-                            [data, key]
-                            {
+                            [data, key] {
                                 try
                                 {
                                     return std::make_pair(SharedUtil::RsaEncode(data, key), true);
@@ -475,8 +470,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                     return std::make_pair(SString(ex.GetWhat()), false);
                                 }
                             },
-                            [luaFunctionRef](const std::pair<SString, bool>& result)
-                            {
+                            [luaFunctionRef](const std::pair<SString, bool>& result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
@@ -531,9 +525,9 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
 int CLuaCryptDefs::DecodeString(lua_State* luaVM)
 {
     StringEncodeFunction algorithm;
-    SString               data;
-    CStringMap            options;
-    CLuaFunctionRef       luaFunctionRef;
+    SString              data;
+    CStringMap           options;
+    CLuaFunctionRef      luaFunctionRef;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
@@ -685,8 +679,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
-                            [data, key]
-                            {
+                            [data, key] {
                                 try
                                 {
                                     return std::make_pair(SharedUtil::RsaDecode(data, key), true);
@@ -696,8 +689,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                     return std::make_pair(SString(ex.GetWhat()), false);
                                 }
                             },
-                            [luaFunctionRef](const std::pair<SString, bool>& result)
-                            {
+                            [luaFunctionRef](const std::pair<SString, bool>& result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {

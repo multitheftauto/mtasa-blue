@@ -47,9 +47,9 @@ extern "C" bool g_bNoTopBar;
 
 /** Multi-platform defines **/
 #ifdef WIN32
-/* Win32 */
+    /* Win32 */
 
-// Define includes
+    // Define includes
     #include <conio.h>
     #include <direct.h>
     #include <windows.h>
@@ -57,7 +57,7 @@ extern "C" bool g_bNoTopBar;
 // Define types
 typedef int socklen_t;
 
-// Define keys
+    // Define keys
     #define KEY_BACKSPACE   0x08
     #define KEY_EXTENDED    0xE0
     #define KEY_LEFT    0x4B
@@ -65,9 +65,9 @@ typedef int socklen_t;
     #define KEY_UP      0x48
     #define KEY_DOWN    0x50
 #else
-/* POSIX */
+    /* POSIX */
 
-// Define includes
+    // Define includes
     #include <stdio.h>
     #include <stdlib.h>
     #include <unistd.h>

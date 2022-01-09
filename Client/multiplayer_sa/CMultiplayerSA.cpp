@@ -762,8 +762,10 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 
-    HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
-    HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
+    HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
+                (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
+    HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio,
+                (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -6944,11 +6946,11 @@ void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
 }
 
 DWORD dwLastRequestedStation = -1;
-void CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_ChangeStation(DWORD dwStationID)
+void  CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_ChangeStation(DWORD dwStationID)
 {
-    if(dwLastRequestedStation != dwStationID)
+    if (dwLastRequestedStation != dwStationID)
     {
-        if(m_pAudioZoneRadioSwitchHandler)
+        if (m_pAudioZoneRadioSwitchHandler)
         {
             m_pAudioZoneRadioSwitchHandler(dwStationID);
         }
