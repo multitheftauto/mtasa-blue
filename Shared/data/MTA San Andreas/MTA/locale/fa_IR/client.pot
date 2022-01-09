@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 17:35\n"
+"PO-Revision-Date: 2022-01-09 19:15\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -2487,7 +2487,7 @@ msgstr "مشکلی در هنگام لود به وجود آمده است. %s در
 #: ..\Client\loader\MainFunctions.cpp:814
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "فایل اصلی دارای اسم اشتباهی میباشد. (%s)"
+msgstr "فایل اصلی دارای اسم اشتباهی می‌باشد. (%s)"
 
 #: ..\Client\loader\MainFunctions.cpp:825
 msgid "Main file is unsigned. Possible virus activity.\n\n"
