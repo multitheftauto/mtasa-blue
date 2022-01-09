@@ -1056,7 +1056,7 @@ void CClientGame::DoPulses()
             g_pNet->SetServerBitStreamVersion(static_cast<unsigned short>(MTA_DM_BITSTREAM_VERSION));
 
             // Run the game normally.
-            StartGame(m_strLocalNick, m_Server.GetPassword().c_str());
+            StartGame(m_strLocalNick, m_Server.GetPassword().c_str(), m_ServerType);
         }
         else
         {
