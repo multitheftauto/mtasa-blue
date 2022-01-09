@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 05:23\n"
+"PO-Revision-Date: 2022-01-09 06:25\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -1759,7 +1759,7 @@ msgstr "Wir haben Ihre Update-Einstellungen auf Standard zurückgesetzt. Bitte �
 
 #: ..\Client\core\CVersionUpdater.cpp:3400
 msgid "VERSION UPDATE INFORMATION"
-msgstr ""
+msgstr "INFORMATIONEN ZUR VERSIONSAKTUALISIERUNG"
 
 #: ..\Client\core\DXHook\CDirect3DEvents9.cpp:230
 #, c-format
@@ -1781,13 +1781,13 @@ msgstr "Konnte Direct3D9 nicht initialisieren.\n\n"
 #. Create the window
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
-msgstr ""
+msgstr "SERVER-BROWSER"
 
 #. Create the tabs
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:133
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:90
 msgid "Internet"
-msgstr ""
+msgstr "Internet"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:134
 msgid "Local"
@@ -1862,7 +1862,7 @@ msgstr "Suche nach Servernamen..."
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:453
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:454
 msgid "Players"
@@ -1870,11 +1870,11 @@ msgstr "Spieler"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:455
 msgid "Ping"
-msgstr ""
+msgstr "Verzögerung"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:456
 msgid "Gamemode"
-msgstr ""
+msgstr "Spielmodus"
 
 #. Player List Columns
 #. Column for player names
@@ -1902,7 +1902,7 @@ msgstr "Passwortgeschützt"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:516
 msgid "Offline"
-msgstr ""
+msgstr "Offline"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:529
 msgid "Other Versions"
@@ -1952,7 +1952,7 @@ msgstr "Ungültiger Nickname! Bitte setze einen neuen in den Einstellungen!"
 #: ..\Client\loader\MainFunctions.cpp:601
 #: ..\Client\loader\MainFunctions.cpp:1204
 msgid "Information"
-msgstr ""
+msgstr "Informationen"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1375
 msgid "You have to select a server to connect to."
@@ -1970,7 +1970,7 @@ msgstr "SERVER IST VOLL"
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:53
 msgid "Name:"
-msgstr ""
+msgstr "Name:"
 
 #. Server IP
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
@@ -1982,7 +1982,7 @@ msgstr "Serveradresse:"
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:75
 msgid "Gamemode:"
-msgstr ""
+msgstr "Spielmodus:"
 
 #. Map
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:44
@@ -2100,7 +2100,7 @@ msgstr "Bist du dir sicher, dass du diese Bildschirmauflösungen verwenden wills
 
 #: ..\Client\game_sa\CSettingsSA.cpp:878 ..\Client\loader\Dialogs.cpp:98
 msgid "MTA: San Andreas"
-msgstr ""
+msgstr "MTA: San Andreas"
 
 #: ..\Client\loader\CExePatchedStatus.cpp:153
 msgid "Update Aero setting"
@@ -2169,7 +2169,7 @@ msgstr "MTA:SA kann nicht fortsetzen, da folgende Dateien nicht korrekt sind:"
 
 #: ..\Client\loader\CInstallManager.cpp:609
 msgid "Patch GTA"
-msgstr ""
+msgstr "Aufnäher GTA"
 
 #: ..\Client\loader\CInstallManager.cpp:812
 msgid "Missing file:"
@@ -2259,7 +2259,7 @@ msgstr "Versuche jede Option und schaue, was funktioniert:"
 
 #: ..\Client\loader\Dialogs.cpp:80
 msgid "A - Standard NVidia"
-msgstr ""
+msgstr "A - Standard Nvidia"
 
 #: ..\Client\loader\Dialogs.cpp:81
 msgid "B - Alternate NVidia"
@@ -2275,7 +2275,7 @@ msgstr "D - Alternatives NVidia und Umbenennung der exe"
 
 #: ..\Client\loader\Dialogs.cpp:84
 msgid "E - Standard Intel"
-msgstr ""
+msgstr "E - Standard Intel"
 
 #: ..\Client\loader\Dialogs.cpp:85
 msgid "F - Alternate Intel"
@@ -2295,7 +2295,7 @@ msgstr "Wenn du verzweifelst, könnte folgendes helfen:"
 
 #: ..\Client\loader\Dialogs.cpp:89
 msgid "If you have already selected an option that works, this might help:"
-msgstr ""
+msgstr "Wenn Sie bereits eine funktionierende Option ausgewählt haben, könnte dies helfen:"
 
 #: ..\Client\loader\Dialogs.cpp:90
 msgid "Force windowed mode"
@@ -2881,7 +2881,7 @@ msgstr "Verbindung getrennt: Nickname wird bereits verwendet"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
-msgstr ""
+msgstr "Verbindung unterbrochen: Das Spielerelement konnte nicht erstellt werden."
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
 #, c-format
