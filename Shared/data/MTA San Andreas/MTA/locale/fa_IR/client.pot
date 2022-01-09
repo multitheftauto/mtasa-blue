@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 16:35\n"
+"PO-Revision-Date: 2022-01-09 17:35\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -1754,7 +1754,7 @@ msgstr "\n\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3399
 msgid "We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n"
-msgstr "تنظیمات آپدیت شما به حالت پیشفرض باز گرداندیم، در صورت تمایل استفاده از بروزرسانی های شبانه (Nightly) می توانید از تنظیمات مجددا فعال سازی کنید.\n"
+msgstr "تنظیمات آپدیت شما را به حالت پیشفرض باز گرداندیم، در صورت تمایل استفاده از بروزرسانی های شبانه (Nightly) می توانید از تنظیمات مجددا فعال سازی کنید.\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3400
 msgid "VERSION UPDATE INFORMATION"
@@ -1763,7 +1763,7 @@ msgstr "اطلاعات آپدیت نسخه"
 #: ..\Client\core\DXHook\CDirect3DEvents9.cpp:230
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "حجم اسکرین شات %d بایت میباشد، ولی باید %d بایت می بود"
+msgstr "حجم اسکرین شات %d بایت می باشد، ولی باید %d بایت می بود"
 
 #: ..\Client\core\DXHook\CDirect3DEvents9.cpp:236
 msgid "Screenshot failed"
@@ -2233,7 +2233,7 @@ msgstr "دیگر در مورد d3d9.dll نگو"
 
 #: ..\Client\loader\Dialogs.cpp:69
 msgid "Rename this d3d9.dll to d3d9.dll.bak"
-msgstr "تغییر اسم d3d9.dll کنونی به d3d9.dll.bak"
+msgstr "تغییر نام d3d9.dll کنونی به d3d9.dll.bak"
 
 #: ..\Client\loader\Dialogs.cpp:70
 msgid "Show me the file"
@@ -2293,11 +2293,11 @@ msgstr "اگر ناامید شدید، ممکن است این کمکتان کن�
 
 #: ..\Client\loader\Dialogs.cpp:89
 msgid "If you have already selected an option that works, this might help:"
-msgstr "اگر تاحالا گزینه ای که کار میکند را انتخاب کردید، این ممکن است کمکتان کند:"
+msgstr "اگر تا به حال گزینه ای را که کار میکند را انتخاب کردید، این ممکن است کمکتان کند:"
 
 #: ..\Client\loader\Dialogs.cpp:90
 msgid "Force windowed mode"
-msgstr "اجبار به حالت پنجره ای"
+msgstr "اجبار حالت پنجره ای"
 
 #: ..\Client\loader\Dialogs.cpp:91
 msgid "Don't show again"
@@ -2312,7 +2312,7 @@ msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
 msgstr "MTA نتوانست آنتی ویروسی روی سیستم شما شناسایی کند.\n\n"
-"ویروس ها می توانند در تجربه MTA و گیم پلی آن مشکل و یا اختلالی ایجاد کنند.\n\n"
+"ویروس ها می توانند در تجربه MTA و گیم پلی آن مشکل و اختلال ایجاد کنند.\n\n"
 "برای دیدن اطلاعات بیشتر روی دکمه 'کمک' کلیک کنید."
 
 #: ..\Client\loader\Dialogs.cpp:104
@@ -2323,7 +2323,7 @@ msgstr "من از قبل آنتی ویروس نصب کرده ام"
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "من آنتی ویروس نصب نمی‌کنم.\n"
-"من میخواهم سیستمم دچار لگ و جز سیستم های ویروسی باشد."
+"میخواهم سیستم من دچار لگ و جز سیستم های ویروسی باشد."
 
 #: ..\Client\loader\Dialogs.cpp:717 ..\Client\loader\Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -2406,7 +2406,7 @@ msgstr "تنظیمات GTA بازنشانی شد.\n\n"
 #: ..\Client\loader\MainFunctions.cpp:335
 #, c-format
 msgid "File could not be deleted: '%s'"
-msgstr "حذف فایل نتوانست انجام شود: '%s'"
+msgstr "حذف فایل انجام نشد: '%s'"
 
 #. No settings to delete, or can't find them
 #: ..\Client\loader\MainFunctions.cpp:343
@@ -2426,7 +2426,7 @@ msgstr "آیا در اجرای MTA:SA مشکل دارید؟ \n\n"
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "آیا در اجرای MTA:SA مشکل دارید؟\n\n"
-"سعی کنید تنظیمات/گزینه های زیر را برای GTA و MTA عوض کنید:"
+"می توانید غیرفعال کردن تنظیمات/گزینه های زیر را برای GTA و MTA امتحان کنید:"
 
 #: ..\Client\loader\MainFunctions.cpp:456
 msgid "WARNING\n\n"
