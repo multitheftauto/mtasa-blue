@@ -1,9 +1,5 @@
 name: 'Rebuild en_US pot files'
-on:
-  push:
-    branch: master
-  workflow_dispatch:
-
+on: [pull_request, push, workflow_dispatch]
 jobs:
   rebuild-pots:
     runs-on: windows-latest
