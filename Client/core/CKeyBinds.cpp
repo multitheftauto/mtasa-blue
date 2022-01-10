@@ -294,12 +294,13 @@ bool ForEachBind(Container& binds, Predicate predicate, UnaryFunction action)
     if (binds.empty())
         return false;
 
-    if (auto iter = std::remove_if(binds.begin(), binds.end(), predicate); iter != binds.end())
+    if (auto iter = std::find_if(binds.begin(), binds.end(), predicate); iter != binds.end())
     {
         while (iter != binds.end())
         {
             auto current = iter++;
             action(current);
+            iter = std::find_if(iter, binds.end(), predicate);
         }
 
         return true;
@@ -309,32 +310,18 @@ bool ForEachBind(Container& binds, Predicate predicate, UnaryFunction action)
 }
 
 template <typename Container, typename Predicate>
-bool RemoveBinds(Container& binds, bool isProcessingKeyStroke, Predicate predicate)
+bool RemoveBinds(Container& binds, bool isContainerMutable, Predicate predicate)
 {
-    if (binds.empty())
-        return false;
-
-    if (auto iter = std::remove_if(binds.begin(), binds.end(), predicate); iter != binds.end())
-    {
-        if (isProcessingKeyStroke)
-        {
-            std::for_each(iter, binds.end(), [](auto& bind) { bind->isBeingDeleted = true; });
-        }
-        else
-        {
-            binds.erase(iter, binds.end());
-        }
-
-        return true;
-    }
-
-    return false;
+    if (isContainerMutable)
+        return ForEachBind(binds, predicate, [&binds](const auto& iter) { binds.erase(iter); });
+    else
+        return ForEachBind(binds, predicate, [](const auto& iter) { (*iter)->isBeingDeleted = true; });
 }
 
 template <typename Container>
-bool RemoveBindTypeBinds(Container& binds, bool isProcessingKeyStroke, KeyBindType bindType)
+bool RemoveBindTypeBinds(Container& binds, bool isContainerMutable, KeyBindType bindType)
 {
-    return RemoveBinds(binds, isProcessingKeyStroke, [bindType](const auto& bind) { return bind->type == bindType; });
+    return RemoveBinds(binds, isContainerMutable, [bindType](const auto& bind) { return bind->type == bindType; });
 }
 
 bool CKeyBinds::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -560,7 +547,7 @@ void CKeyBinds::ClearCommandsAndControls()
     const auto predicate = [](const KeyBindPtr& bind) {
         return !bind->isBeingDeleted && bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION;
     };
-    RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
+    RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::Call(CKeyBind* keyBind)
@@ -1036,7 +1023,7 @@ bool CKeyBinds::RemoveGTAControl(const char* szKey, const char* szControl)
         return !stricmp(szKey, controlBind->boundKey->szKey) && !strcmp(szControl, controlBind->control->szControl);
     };
 
-    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
@@ -1052,12 +1039,12 @@ bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
         return !stricmp(szKey, controlBind->boundKey->szKey);
     };
 
-    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllGTAControls()
 {
-    return RemoveBindTypeBinds(m_binds, m_bProcessingKeyStroke, KeyBindType::GTA_CONTROL);
+    return RemoveBindTypeBinds(m_binds, !m_bProcessingKeyStroke, KeyBindType::GTA_CONTROL);
 }
 
 bool CKeyBinds::GTAControlExists(const char* szKey, const char* szControl)
@@ -1351,7 +1338,7 @@ bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler 
         return functionBind->handler == Handler && functionBind->boundKey == pKey;
     };
 
-    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
@@ -1364,12 +1351,12 @@ bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
         return functionBind->handler == Handler;
     };
 
-    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllFunctions()
 {
-    return RemoveBindTypeBinds(m_binds, m_bProcessingKeyStroke, KeyBindType::FUNCTION);
+    return RemoveBindTypeBinds(m_binds, !m_bProcessingKeyStroke, KeyBindType::FUNCTION);
 }
 
 bool CKeyBinds::FunctionExists(const char* szKey, KeyFunctionBindHandler Handler, bool bCheckState, bool bState)
@@ -1455,7 +1442,7 @@ bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunc
         return functionBind->handler == Handler && functionBind->control == pControl;
     };
 
-    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
@@ -1468,12 +1455,12 @@ bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
         return functionBind->handler == Handler;
     };
 
-    return RemoveBinds(m_binds, m_bProcessingKeyStroke, predicate);
+    return RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
 bool CKeyBinds::RemoveAllControlFunctions()
 {
-    return RemoveBindTypeBinds(m_binds, m_bProcessingKeyStroke, KeyBindType::CONTROL_FUNCTION);
+    return RemoveBindTypeBinds(m_binds, !m_bProcessingKeyStroke, KeyBindType::CONTROL_FUNCTION);
 }
 
 bool CKeyBinds::ControlFunctionExists(const char* szControl, ControlFunctionBindHandler Handler, bool bCheckState, bool bState)
