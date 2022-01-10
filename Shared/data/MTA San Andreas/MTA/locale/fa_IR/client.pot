@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 21:15\n"
+"PO-Revision-Date: 2022-01-10 23:15\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "MIME-Version: 1.0\n"
@@ -2462,8 +2462,8 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
-msgstr "آدرس محل نصب 'MTA:SA' و 'GTA: San Andreas' شامل یک ';' می‌باشد. (نقطه ویگرول/سمی‌کالن)\n\n"
-"اگر در هنگام اجرای MTA:SA مشکلی دارید، محل نصب GTA و یا MTA:SA را به محلی که شامل ';' نمی‌باشد تغییر دهید."
+msgstr "مکان نصب 'MTA:SA' یا 'GTA: San Andreas' شامل یک ';' (نقطه ویرگول) می باشد.\n\n"
+"اگر در اجرای MTA:SA به مشکل برخوردید، محل نصب GTA یا MTA:SA را به محلی که شامل ';' نمیباشد تغییر دهید."
 
 #: ..\Client\loader\MainFunctions.cpp:779
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -2709,7 +2709,7 @@ msgstr "(حالت توسعه) شناسه های صدای جهان را در پن
 
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:584
 msgid "Entering the game ..."
-msgstr "ورود به بازی ..."
+msgstr "در حال ورود به بازی ..."
 
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
