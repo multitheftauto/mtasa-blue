@@ -57,22 +57,22 @@ std::variant<std::string, bool> CLuaCryptDefs::Hash(lua_State* const luaVM, Hash
         switch (hashFunction)
         {
             case HashFunctionType::MD5:
-                return SharedUtil::Hash<CryptoPP::MD5>(strSourceData);
+                return SharedUtil::Hash<CryptoPP::MD5>(strSourceData).ToLower();
 
             case HashFunctionType::SHA1:
-                return SharedUtil::Hash<CryptoPP::SHA1>(strSourceData);
+                return SharedUtil::Hash<CryptoPP::SHA1>(strSourceData).ToLower();
 
             case HashFunctionType::SHA224:
-                return SharedUtil::Hash<CryptoPP::SHA224>(strSourceData);
+                return SharedUtil::Hash<CryptoPP::SHA224>(strSourceData).ToLower();
 
             case HashFunctionType::SHA256:
-                return SharedUtil::Hash<CryptoPP::SHA256>(strSourceData);
+                return SharedUtil::Hash<CryptoPP::SHA256>(strSourceData).ToLower();
 
             case HashFunctionType::SHA384:
-                return SharedUtil::Hash<CryptoPP::SHA384>(strSourceData);
+                return SharedUtil::Hash<CryptoPP::SHA384>(strSourceData).ToLower();
 
             case HashFunctionType::SHA512:
-                return SharedUtil::Hash<CryptoPP::SHA512>(strSourceData);
+                return SharedUtil::Hash<CryptoPP::SHA512>(strSourceData).ToLower();
 
             case HashFunctionType::HMAC:
 
@@ -101,22 +101,22 @@ std::variant<std::string, bool> CLuaCryptDefs::Hash(lua_State* const luaVM, Hash
                 switch (hmacAlgorithm)
                 {
                     case HmacAlgorithm::MD5:
-                        return SharedUtil::Hmac<CryptoPP::MD5>(strSourceData, key);
+                        return SharedUtil::Hmac<CryptoPP::MD5>(strSourceData, key).ToLower();
 
                     case HmacAlgorithm::SHA1:
-                        return SharedUtil::Hmac<CryptoPP::SHA1>(strSourceData, key);
+                        return SharedUtil::Hmac<CryptoPP::SHA1>(strSourceData, key).ToLower();
 
                     case HmacAlgorithm::SHA224:
-                        return SharedUtil::Hmac<CryptoPP::SHA224>(strSourceData, key);
+                        return SharedUtil::Hmac<CryptoPP::SHA224>(strSourceData, key).ToLower();
 
                     case HmacAlgorithm::SHA256:
-                        return SharedUtil::Hmac<CryptoPP::SHA256>(strSourceData, key);
+                        return SharedUtil::Hmac<CryptoPP::SHA256>(strSourceData, key).ToLower();
 
                     case HmacAlgorithm::SHA384:
-                        return  SharedUtil::Hmac<CryptoPP::SHA384>(strSourceData, key);
+                        return SharedUtil::Hmac<CryptoPP::SHA384>(strSourceData, key).ToLower();
 
                     case HmacAlgorithm::SHA512:
-                        return SharedUtil::Hmac<CryptoPP::SHA512>(strSourceData, key);
+                        return SharedUtil::Hmac<CryptoPP::SHA512>(strSourceData, key).ToLower();
 
                 }
 
