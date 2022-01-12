@@ -16,7 +16,7 @@ bool            g_bVehiclePointerInvalid = false;
 
 #include "gamesa_renderware.h"
 
-static int m_iVehicleSunGlare = 0;
+static BOOL m_iVehicleSunGlare = false;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
 {
     _asm {
@@ -2350,12 +2350,12 @@ void CVehicleSA::StaticSetHooks()
 
 void CVehicleSA::SetVehiclesSunGlareEnable(bool bEnabled)
 {
-    m_iVehicleSunGlare = bEnabled ? 1 : 0;
+    m_iVehicleSunGlare = bEnabled;
 }
 
 bool CVehicleSA::GetVehiclesSunGlareEnable()
 {
-    return m_iVehicleSunGlare == 1 ? true : false;
+    return m_iVehicleSunGlare;
 }
 
 namespace
