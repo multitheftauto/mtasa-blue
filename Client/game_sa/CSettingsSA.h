@@ -89,6 +89,7 @@ private:
     eAspectRatio          m_AspectRatio;
     int                   m_iDesktopWidth;
     int                   m_iDesktopHeight;
+    bool                  m_bCoronaReflectionsViaScript;
 
 public:
     CSettingsSA();
@@ -162,6 +163,9 @@ public:
     void ResetVehiclesLODDistance(bool bFromScript);
     void ResetVehiclesLODDistanceFromScript();
     void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance);
+
+    void ResetCoronaReflectionsEnabled();
+    void SetCoronaReflectionsControlledByScript(bool bViaScript);
 
     void Save();
 

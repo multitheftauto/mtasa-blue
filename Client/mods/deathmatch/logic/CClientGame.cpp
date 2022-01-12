@@ -5291,6 +5291,10 @@ void CClientGame::ResetMapInfo()
     // Peds LOD distance
     g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
 
+    // Corona rain reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
+
     // Sun color
     g_pMultiplayer->ResetSunColor();
 
@@ -5356,8 +5360,6 @@ void CClientGame::ResetMapInfo()
 #else
     g_pGame->SetBlurLevel(DEFAULT_BLUR_LEVEL);
 #endif
-
-    SetCoronaReflectionsEnabled(CORONA_REFLECTIONS_ON);
 
     // Close all garages
     CGarage*  pGarage = NULL;
@@ -5877,21 +5879,6 @@ bool CClientGame::SetBirdsEnabled(bool bEnabled)
 bool CClientGame::GetBirdsEnabled()
 {
     return m_bBirdsEnabled;
-}
-
-bool CClientGame::SetCoronaReflectionsEnabled(uchar ucEnabled)
-{
-    if(ucEnabled > 2) {
-        return false;
-    }
-    m_ucCoronaReflectionsEnabled = ucEnabled;
-    g_pMultiplayer->SetCoronaReflectionsEnabled(ucEnabled);
-    return true;
-}
-
-uchar CClientGame::GetCoronaReflectionsEnabled()
-{
-    return m_ucCoronaReflectionsEnabled;
 }
 
 #pragma code_seg(".text")

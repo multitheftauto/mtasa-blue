@@ -160,6 +160,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxTyreSmokeParticles;
     CGUICheckBox*  m_pCheckBoxHighDetailVehicles;
     CGUICheckBox*  m_pCheckBoxHighDetailPeds;
+    CGUICheckBox*  m_pCheckBoxCoronaReflections;
     CGUILabel*     m_pFieldOfViewLabel;
     CGUIScrollBar* m_pFieldOfView;
     CGUILabel*     m_pFieldOfViewValueLabel;

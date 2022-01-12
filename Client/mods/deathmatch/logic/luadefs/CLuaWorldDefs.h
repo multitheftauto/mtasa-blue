@@ -119,4 +119,5 @@ public:
                                
     static bool SetCoronaReflectionsEnabled(uchar ucEnabled);
     static uchar GetCoronaReflectionsEnabled();
+    static bool ResetCoronaReflectionsEnabled();
 };

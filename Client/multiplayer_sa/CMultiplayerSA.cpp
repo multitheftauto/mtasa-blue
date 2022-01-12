@@ -2211,6 +2211,7 @@ void CMultiplayerSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
         1 - enabled
         2 - force enabled (render even if there is no rain)
     */
+    m_ucCoronaReflectionsEnabled = ucEnabled;
 
     if(ucEnabled == 0) {
         // Disable corona rain reflections
@@ -2238,6 +2239,11 @@ void CMultiplayerSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
         MemPut<BYTE>(0x6FB645, 0x7A);
         MemCpy((void*)0x6FB906, "\x08\x13\xC8\x00", 4);
     }
+}
+
+unsigned char CMultiplayerSA::GetCoronaReflectionsEnabled()
+{
+    return m_ucCoronaReflectionsEnabled;
 }
 
 bool CMultiplayerSA::GetExplosionsDisabled()
