@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 21:15\n"
+"PO-Revision-Date: 2022-01-12 18:38\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -27,7 +27,7 @@ msgstr "Il server richiede i seguenti siti Web per caricarli (in seguito):"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "NON INSERIRE MAI DATI SENSIBILI PER PROTEGGERLI DALL'ESSERE RUBATO"
+msgstr "NON INSERIRE MAI DATI SENSIBILI PER EVITARE CHE VENGANO RUBATI"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:46
 msgid "Remember decision"
@@ -39,7 +39,7 @@ msgstr "Permetti"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "Non permette"
+msgstr "Rifiuta"
 
 #: ..\Client\core\CCommandFuncs.cpp:29
 msgid "***[ COMMAND HELP ]***\n"
@@ -1243,7 +1243,7 @@ msgstr "RIAVVIO RICHIESTO"
 
 #: ..\Client\core\CSettings.cpp:1357
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Alcune impostazioni verranno modificate quando disconnetti il ​​server corrente"
+msgstr "Alcune impostazioni verranno modificate dopo la disconnessione dal server corrente"
 
 #: ..\Client\core\CSettings.cpp:1358
 msgid "\n\n"
