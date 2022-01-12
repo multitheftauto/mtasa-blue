@@ -22,10 +22,21 @@ namespace EHashFunction
         SHA224,
         SHA256,
         SHA384,
-        SHA512,
+        SHA512
     };
 }
 using EHashFunction::EHashFunctionType;
+
+enum class HashFunctionType
+{
+    MD5,
+    SHA1,
+    SHA224,
+    SHA256,
+    SHA384,
+    SHA512,
+    HMAC
+};
 
 enum class PasswordHashFunction
 {
@@ -36,8 +47,7 @@ enum class StringEncodeFunction
 {
     TEA,
     AES128,
-    RSA,
-    HMAC,
+    RSA
 };
 
 enum class KeyPairAlgorithm
