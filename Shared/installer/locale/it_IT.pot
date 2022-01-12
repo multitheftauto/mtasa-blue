@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-21 17:13\n"
-"PO-Revision-Date: 2022-01-08 18:31\n"
+"PO-Revision-Date: 2022-01-12 19:39\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -256,9 +256,9 @@ msgstr "Sei sicuro di voler rimuovere completamente $(^Name) e tutti i suoi comp
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
-msgstr "Disinstallazione prima dell'aggiornamento? \n"
-"Non è necessario disinstallare prima di installare una nuova versione di MTA:SA\n"
-"Esegui il nuovo programma di installazione per aggiornare e preservare le tue impostazioni."
+msgstr "Disinstallare prima dell'aggiornamento?$\\r$\n"
+"Non è necessario disinstallare prima di installare una nuova versione di MTA:SA$\\r$\n"
+"Esegui il nuovo programma di installazione per mantenere le tue impostazioni."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1034
@@ -303,7 +303,8 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
 msgstr "MTA non può essere installato nella stessa cartella di GTA:SA.\n"
-"Vuoi usare la cartella di installazione predefinita?"
+"Vuoi usare la cartella di installazione predefinita?$\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: ../Shared/installer/nightly.nsi:1739
