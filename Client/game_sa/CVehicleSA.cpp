@@ -16,7 +16,7 @@ bool            g_bVehiclePointerInvalid = false;
 
 #include "gamesa_renderware.h"
 
-static BOOL m_iVehicleSunGlare = false;
+static BOOL m_bVehicleSunGlare = false;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
 {
     _asm {
@@ -28,7 +28,7 @@ _declspec(naked) void DoVehicleSunGlare(void* this_)
 void _declspec(naked) HOOK_Vehicle_PreRender(void)
 {
     _asm {
-        mov	ecx, m_iVehicleSunGlare
+        mov	ecx, m_bVehicleSunGlare
 		cmp	ecx, 0
 		jle	noglare
 		mov	ecx, esi
@@ -2350,12 +2350,12 @@ void CVehicleSA::StaticSetHooks()
 
 void CVehicleSA::SetVehiclesSunGlareEnable(bool bEnabled)
 {
-    m_iVehicleSunGlare = bEnabled;
+    m_bVehicleSunGlare = bEnabled;
 }
 
 bool CVehicleSA::GetVehiclesSunGlareEnable()
 {
-    return m_iVehicleSunGlare;
+    return m_bVehicleSunGlare;
 }
 
 namespace
