@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-12 18:38\n"
+"PO-Revision-Date: 2022-01-12 19:39\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -1274,7 +1274,7 @@ msgstr "Lingua:"
 
 #: ..\Client\core\CSettings.cpp:1938
 msgid "Skin:"
-msgstr "Pelle:"
+msgstr "Tema:"
 
 #: ..\Client\core\CSettings.cpp:1938
 msgid "Presets:"
@@ -1282,7 +1282,7 @@ msgstr "Preimpostazioni:"
 
 #: ..\Client\core\CSettings.cpp:1987
 msgid "Chat"
-msgstr "Chiacchierata"
+msgstr "Chat"
 
 #: ..\Client\core\CSettings.cpp:2004
 msgid "Load"
@@ -1406,7 +1406,7 @@ msgstr "Consenti al server di far lampeggiare la finestra"
 
 #: ..\Client\core\CSettings.cpp:2285
 msgid "Allow tray balloon notifications"
-msgstr "Notifiche sui palloncini del vassoio in lega"
+msgstr "Permetti notifiche a fumetto"
 
 #: ..\Client\core\CSettings.cpp:2290
 msgid "Chat text black/white outline"
@@ -1756,7 +1756,7 @@ msgstr "\n\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3399
 msgid "We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n"
-msgstr "Abbiamo ripristinato le tue preferenze di aggiornamento sui valori predefiniti, modifica nuovamente le impostazioni se desideri aggiornamenti notturni.\n"
+msgstr "Abbiamo ripristinato le tue preferenze di aggiornamento sui valori predefiniti, modifica nuovamente le impostazioni se desideri aggiornamenti Nightly.\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3400
 msgid "VERSION UPDATE INFORMATION"
@@ -2054,7 +2054,7 @@ msgstr[1] "Giocatori"
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:151
 msgid "on"
-msgstr "attivo"
+msgstr "in"
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:154
 msgid "server"
