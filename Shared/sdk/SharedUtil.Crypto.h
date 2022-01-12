@@ -45,8 +45,10 @@ namespace SharedUtil
     template <class HashType>
     inline SString Hash(const SString& value)
     {
-        SString result;
-        CryptoPP::StringSource ss(value, true, new CryptoPP::HashFilter(HashType(), new CryptoPP::HexEncoder(new CryptoPP::StringSink(result))));
+        SString  result;
+        HashType hashType{};
+
+        CryptoPP::StringSource ss(value, true, new CryptoPP::HashFilter(hashType, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result))));
 
         return result;
     }
