@@ -325,5 +325,5 @@ void DeletePointersAndClearList(T& elementList)
 
 // for debug
 #if defined(MTA_DEBUG) && defined(MTA_CLIENT)
-HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
+bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
 #endif

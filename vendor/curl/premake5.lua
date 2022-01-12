@@ -4,7 +4,7 @@ project "curl"
 	kind "StaticLib"
 	targetname "curl"
 
-	includedirs { "include", "lib", "../mbedtls/2.27.0/include", "../zlib" }
+	includedirs { "include", "lib", "../mbedtls/2.28.0/include", "../zlib" }
 	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H" }
 	warnings "off"
 

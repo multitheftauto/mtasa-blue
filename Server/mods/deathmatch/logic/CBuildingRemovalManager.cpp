@@ -73,7 +73,7 @@ void CBuildingRemovalManager::RestoreWorldModel(unsigned short usModel, float fR
         if (pFind)
         {
             const CVector& vecRemovalPos = pFind->GetPosition();
-            float fDistance = (vecPos - vecRemovalPos).Length();
+            float          fDistance = (vecPos - vecRemovalPos).Length();
 
             if (fDistance <= pFind->GetRadius() && (cInterior == -1 || pFind->GetInterior() == cInterior))
             {

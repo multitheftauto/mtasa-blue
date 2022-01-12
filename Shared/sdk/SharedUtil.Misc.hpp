@@ -64,10 +64,10 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
     #include <version.h>
 #endif
 
-//
-// Output a UTF8 encoded messagebox
-// Used in the Win32 Client only
-//
+    //
+    // Output a UTF8 encoded messagebox
+    // Used in the Win32 Client only
+    //
 #ifdef _WINDOWS_ //Only for modules that use windows.h
 int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType)
 {
@@ -1228,7 +1228,7 @@ static LONG SafeNtQueryInformationThread(HANDLE ThreadHandle, INT ThreadInformat
         HMODULE ntdll = LoadLibraryA("ntdll.dll");
 
         if (ntdll)
-            lookup.function = reinterpret_cast<FunctionPointer>(GetProcAddress(ntdll, "NtQueryInformationThread"));
+            lookup.function = static_cast<FunctionPointer>(static_cast<void*>(GetProcAddress(ntdll, "NtQueryInformationThread")));
         else
             return 0xC0000135L;            // STATUS_DLL_NOT_FOUND
     }
@@ -1819,21 +1819,20 @@ namespace SharedUtil
     DWORD _GetCurrentProcessorNumber()
     {
 #ifdef WIN32
-        DWORD dwProcessorNumber = -1;
-        typedef DWORD(WINAPI * FUNC_GetCurrentProcessorNumber)();
-
         // Dynamically load GetCurrentProcessorNumber, as it does not exist on XP
-        static FUNC_GetCurrentProcessorNumber pfn = NULL;
-        static bool                           bDone = false;
-        if (!bDone)
-        {
-            HMODULE hModule = LoadLibraryA("Kernel32");
-            pfn = static_cast<FUNC_GetCurrentProcessorNumber>(static_cast<PVOID>(GetProcAddress(hModule, "GetCurrentProcessorNumber")));
-            bDone = true;
-        }
+        using GetCurrentProcessorNumber_t = DWORD(WINAPI*)();
 
-        if (pfn)
-            return pfn();
+        static auto FnGetCurrentProcessorNumber = ([]() -> GetCurrentProcessorNumber_t {
+            HMODULE kernel32 = LoadLibraryA("kernel32");
+
+            if (kernel32)
+                return static_cast<GetCurrentProcessorNumber_t>(static_cast<void*>(GetProcAddress(kernel32, "GetCurrentProcessorNumber")));
+
+            return nullptr;
+        })();
+
+        if (FnGetCurrentProcessorNumber)
+            return FnGetCurrentProcessorNumber();
 
         return _GetCurrentProcessorNumberXP();
 #elif defined(__APPLE__)
@@ -1872,7 +1871,7 @@ namespace SharedUtil
         outKernelTime = 0;
 #ifdef WIN32
         FILETIME CreationTime, ExitTime, KernelTime, UserTime;
-        if (SUCCEEDED(GetThreadTimes(GetCurrentThread(), &CreationTime, &ExitTime, &KernelTime, &UserTime)))
+        if (GetThreadTimes(GetCurrentThread(), &CreationTime, &ExitTime, &KernelTime, &UserTime))
         {
             ((ULARGE_INTEGER*)&outUserTime)->LowPart = UserTime.dwLowDateTime;
             ((ULARGE_INTEGER*)&outUserTime)->HighPart = UserTime.dwHighDateTime;
