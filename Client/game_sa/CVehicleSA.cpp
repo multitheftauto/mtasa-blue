@@ -2352,10 +2352,12 @@ void CVehicleSA::SetVehiclesSunGlareEnable(bool bEnabled)
 {
     m_iVehicleSunGlare = bEnabled ? 1 : 0;
 }
+
 bool CVehicleSA::GetVehiclesSunGlareEnable()
 {
     return m_iVehicleSunGlare == 1 ? true : false;
 }
+
 namespace
 {
     VOID _MatrixConvertFromEulerAngles(CMatrix_Padded* matrixPadded, float fX, float fY, float fZ)
