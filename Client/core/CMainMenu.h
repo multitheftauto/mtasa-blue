@@ -101,8 +101,9 @@ private:
 
     CGUI* m_pManager;
 
-    std::unique_ptr<CGUIStaticImage> m_socialButtons[6] = {nullptr};
-    std::map<std::string, std::string> socialButtonLinks;
+    CGUIStaticImage* m_socialButtons[6] = {nullptr};
+    std::map<CGUIStaticImage*, const char*> m_socialButtonLinks;
+    std::map<const char*, const char*> m_socialMediaLinks;
 
     // Images
     CGUIStaticImage* m_pBackground;

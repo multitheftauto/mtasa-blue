@@ -233,14 +233,13 @@ CMainMenu::CMainMenu(CGUI* pManager)
         {"github", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
     };
 
-    const std::map<std::string, std::string> socialButtonLinks[]
-    {
-        {"website", "https://google.com"},
-        {"discord", "https://google.com"},
-        {"twitter", "https://google.com"},
-        {"facebook", "https://google.com"},
-        {"youtube", "https://google.com"},
-        {"github", "https://google.com"},
+    m_socialMediaLinks = {
+        {"website", "https://multitheftauto.com"},
+        {"discord", "https://discord.gg/mtasa"},
+        {"twitter", "https://twitter.com/mtaqa"},
+        {"facebook", "https://www.facebook.com/multitheftauto"},
+        {"youtube", "https://www.youtube.com/user/mtaqa"},
+        {"github", "https://github.com/multitheftauto/mtasa-blue"},
     };
 
     float offsetX = 0.01f;
@@ -248,8 +247,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     const CVector2D buttonSize((NATIVE_SOCIAL_ICON_X / NATIVE_RES_X) * m_iMenuSizeX, (NATIVE_SOCIAL_ICON_Y / NATIVE_RES_Y) * m_iMenuSizeY);
     for (const auto& [name, buttonClickHandler] : socialButtonDatas)
     {
-
-        std::unique_ptr<CGUIStaticImage> button(pManager->CreateStaticImage(m_pCanvas));
+        CGUIStaticImage* button(pManager->CreateStaticImage(m_pCanvas));
 
         button->LoadFromFile(SString("cgui\\images\\socialset\\%s.png", name).c_str());
         button->SetProperty("InheritsAlpha", "False");
@@ -261,9 +259,9 @@ CMainMenu::CMainMenu(CGUI* pManager)
         button->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonUnhover, this));
         button->SetClickHandler(buttonClickHandler);
 
-        button->SetProperty("socialMediaName", name);
+        m_socialButtonLinks[button] = m_socialMediaLinks[name];
 
-        m_socialButtons[i++] = std::move(button);
+        m_socialButtons[i++] = button;
         offsetX += 0.03f;
     }
 
@@ -1058,12 +1056,9 @@ bool CMainMenu::OnNewsButtonClick(CGUIElement* pElement)
 
 bool CMainMenu::OnSocialMediaButtonClick(CGUIElement* pElement)
 {
-    std::string mediaName = pElement->GetProperty("socialMediaName");
-    std::string link = socialButtonLinks.at(mediaName);
+    const char* link = m_socialButtonLinks[dynamic_cast<CGUIStaticImage*>(pElement)];
 
-    SString command = "open";
-
-    ShellExecuteNonBlocking(command, SString(link));
+    ShellExecuteNonBlocking("open", link);
 
     return true;
 }
