@@ -23,6 +23,9 @@
 #define NATIVE_LOGO_X     1058.0f
 #define NATIVE_LOGO_Y     540.0f
 
+#define NATIVE_SOCIAL_ICON_X        32.0f
+#define NATIVE_SOCIAL_ICON_Y        32.0f
+
 #define CORE_MTA_MENUITEMS_START_X  0.168
 
 #define CORE_MTA_BG_MAX_ALPHA       1.00f   //ACHTUNG: Set to 1 for now due to GTA main menu showing through (no delay inserted between Entering game... and loading screen)
@@ -220,6 +223,49 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLatestNews->SetSize(CVector2D(fDrawSizeX, fDrawSizeY), false);
     m_pLatestNews->SetProperty("InheritsAlpha", "False");
     m_pLatestNews->SetVisible(false);
+
+    const std::pair<const char*, GUI_CALLBACK> socialButtonDatas[]{
+        {"website", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
+        {"discord", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
+        {"twitter", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
+        {"facebook", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
+        {"youtube", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
+        {"github", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
+    };
+
+    const std::map<std::string, std::string> socialButtonLinks[]
+    {
+        {"website", "https://google.com"},
+        {"discord", "https://google.com"},
+        {"twitter", "https://google.com"},
+        {"facebook", "https://google.com"},
+        {"youtube", "https://google.com"},
+        {"github", "https://google.com"},
+    };
+
+    float offsetX = 0.01f;
+    size_t i = 0;
+    const CVector2D buttonSize((NATIVE_SOCIAL_ICON_X / NATIVE_RES_X) * m_iMenuSizeX, (NATIVE_SOCIAL_ICON_Y / NATIVE_RES_Y) * m_iMenuSizeY);
+    for (const auto& [name, buttonClickHandler] : socialButtonDatas)
+    {
+
+        std::unique_ptr<CGUIStaticImage> button(pManager->CreateStaticImage(m_pCanvas));
+
+        button->LoadFromFile(SString("cgui\\images\\socialset\\%s.png", name).c_str());
+        button->SetProperty("InheritsAlpha", "False");
+        button->SetAlpha(0.35f);
+        button->SetSize(buttonSize, false);
+        button->SetPosition({offsetX * m_iMenuSizeX - buttonSize.fX / 2, 0.97f * m_iMenuSizeY - buttonSize.fY / 2}, false);
+        button->SetZOrderingEnabled(false);
+        button->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonHover, this));
+        button->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonUnhover, this));
+        button->SetClickHandler(buttonClickHandler);
+
+        button->SetProperty("socialMediaName", name);
+
+        m_socialButtons[i++] = std::move(button);
+        offsetX += 0.03f;
+    }
 
     // Create news item stuff
     fDrawPosX -= 25;
@@ -1006,6 +1052,32 @@ bool CMainMenu::OnNewsButtonClick(CGUIElement* pElement)
 
     m_pNewsBrowser->SetVisible(true);
     m_pNewsBrowser->SwitchToTab(iIndex);
+
+    return true;
+}
+
+bool CMainMenu::OnSocialMediaButtonClick(CGUIElement* pElement)
+{
+    std::string mediaName = pElement->GetProperty("socialMediaName");
+    std::string link = socialButtonLinks.at(mediaName);
+
+    SString command = "open";
+
+    ShellExecuteNonBlocking(command, SString(link));
+
+    return true;
+}
+
+bool CMainMenu::OnSocialMediaButtonHover(CGUIElement* pElement)
+{
+    pElement->SetAlpha(0.8f);
+
+    return true;
+}
+
+bool CMainMenu::OnSocialMediaButtonUnhover(CGUIElement* pElement)
+{
+    pElement->SetAlpha(0.35f);
 
     return true;
 }
