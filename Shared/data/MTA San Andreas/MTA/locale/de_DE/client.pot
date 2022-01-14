@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 21:15\n"
+"PO-Revision-Date: 2022-01-14 20:08\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -19,15 +19,15 @@ msgstr ""
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr "Angeforderte Webseiten"
+msgstr "Website-Anfragen"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr "Der Server möchte folgende Webseiten laden (ggf. später):"
+msgstr "Der Server fordert die folgenden Websites an, um sie (später) zu laden:"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "GIB NIEMALS SENSIBLE DATEN EIN, UM DIEBSTAHL ZU VERHINDERN"
+msgstr "NIEMALS SENSIBLE DATEN EINGEBEN, UM SIE VOR DIEBSTAHL ZU SCHÜTZEN"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:46
 msgid "Remember decision"
@@ -35,11 +35,11 @@ msgstr "Entscheidung merken"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:51 ..\Client\core\CSettings.cpp:929
 msgid "Allow"
-msgstr "Akzeptieren"
+msgstr "Erlauben Sie"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "Blockieren"
+msgstr "Verweigern"
 
 #: ..\Client\core\CCommandFuncs.cpp:29
 msgid "***[ COMMAND HELP ]***\n"
@@ -48,52 +48,52 @@ msgstr "***[ BEFEHLSHILFE ]***\n"
 #: ..\Client\core\CCommandFuncs.cpp:167
 #, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "* Es ist %d:%02d:%02d Uhr"
+msgstr "* Die Zeit ist %d:%02d:%02d"
 
 #: ..\Client\core\CCommandFuncs.cpp:251
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "connect: Syntax ist 'connect <host> [<port> <nick> <passwort>]'"
+msgstr "verbinden: Syntax ist 'connect <host> [<port> <nick> <pass>]'"
 
 #: ..\Client\core\CCommandFuncs.cpp:259 ..\Client\core\CCommandFuncs.cpp:327
 msgid "connect: Bad port number"
-msgstr "connect: Falscher Port"
+msgstr "verbinden: Falscher Hafen"
 
 #: ..\Client\core\CCommandFuncs.cpp:281 ..\Client\core\CCommandFuncs.cpp:342
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "connect: Verbinde zu %s:%u..."
+msgstr "verbinden: Verbindung zu %s:%u..."
 
 #: ..\Client\core\CCommandFuncs.cpp:285 ..\Client\core\CCommandFuncs.cpp:346
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "connect: Konnte keine Verbindung zu %s:%u herstellen!"
+msgstr "connect: konnte keine Verbindung zu %s:%u herstellen!"
 
 #: ..\Client\core\CCommandFuncs.cpp:290
 msgid "connect: Failed to unload current mod"
-msgstr "connect: Fehler beim Entladen des derzeitigen Mods"
+msgstr "verbinden: Entladen der aktuellen Mod fehlgeschlagen"
 
 #: ..\Client\core\CCommandFuncs.cpp:380
 msgid "Bound all controls from GTA"
-msgstr "Alle Steuerungsbelegungen von GTA übernommen"
+msgstr "Binden Sie alle Kontrollen aus GTA"
 
 #: ..\Client\core\CCommandFuncs.cpp:394
 msgid "Saved configuration file"
-msgstr "Konfigurationsdatei gespeichert"
+msgstr "Gespeicherte Konfigurationsdatei"
 
 #. Print it
 #: ..\Client\core\CCommandFuncs.cpp:460
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "* Deine Serial ist: %s"
+msgstr "* Ihre Seriennummer lautet: %s"
 
 #. Unknown command
 #: ..\Client\core\CCommands.cpp:209
 msgid "Unknown command or cvar: "
-msgstr "Unbekannter Befehl oder Clientvariable: "
+msgstr "Unbekannter Befehl oder cvar: "
 
 #: ..\Client\core\CConnectManager.cpp:80
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Verbindung fehlgeschlagen. Ungültiger Nickname!"
+msgstr "Verbinden fehlgeschlagen. Ungültiger Nickname angegeben!"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -142,29 +142,29 @@ msgstr "Fehler"
 
 #: ..\Client\core\CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Verbindung fehlgeschlagen. Ungültiger Hostname!"
+msgstr "Verbindungsaufbau fehlgeschlagen. Ungültiger Host angegeben!"
 
 #: ..\Client\core\CConnectManager.cpp:132
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "Verbindung zu %s an Port %u fehlgeschlagen!"
+msgstr "Die Verbindung zu %s an Port %u ist fehlgeschlagen!"
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "Verbinde zu %s:%u ..."
+msgstr "Verbindung zu %s:%u herstellen ..."
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:154
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:584
 msgid "CONNECTING"
-msgstr "VERBINDE"
+msgstr "VERBINDEN"
 
 #: ..\Client\core\CConnectManager.cpp:269
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
 msgid "Connection timed out"
-msgstr "Zeitüberschreitung beim Verbinden"
+msgstr "Zeitüberschreitung der Verbindung"
 
 #: ..\Client\core\CConnectManager.cpp:283
 #: ..\Client\core\CConnectManager.cpp:287
