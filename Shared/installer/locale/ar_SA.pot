@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-21 17:13\n"
-"PO-Revision-Date: 2022-01-08 18:31\n"
+"PO-Revision-Date: 2022-01-15 19:37\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +21,7 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:188
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "النسخة التي حملتها لـ MTA:SA لا تدعم ويندوز XP أو Vista. يرجى تحميل نسخى بديلة من www.mtasa.com"
+msgstr "الإصدار الذي قمت بتنزيله لـ MTA:SA لا يدعم ويندوز XP أو Vista. يرجى تنزيل إصدار بديل من www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: ../Shared/installer/nightly.nsi:189
