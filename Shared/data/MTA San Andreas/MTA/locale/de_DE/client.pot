@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-14 20:08\n"
+"PO-Revision-Date: 2022-01-15 17:24\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "NIEMALS SENSIBLE DATEN EINGEBEN, UM SIE VOR DIEBSTAHL ZU SCHÜTZEN"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr "Entscheidung merken"
+msgstr "Entscheidung erinnern"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:51 ..\Client\core\CSettings.cpp:929
 msgid "Allow"
@@ -619,7 +619,7 @@ msgstr "Letzten Artikel aufrufen"
 
 #: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:696
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Möchtest du online Hilfe zu diesem Problem bekommen?"
+msgstr "Möchten Sie Online-Hilfe zu diesem Problem sehen?"
 
 #: ..\Client\core\CScreenShot.cpp:53
 #, c-format
@@ -653,7 +653,7 @@ msgstr "Steuerung"
 
 #: ..\Client\core\CSettings.cpp:120
 msgid "Interface"
-msgstr "Benutzeroberfläche"
+msgstr "Schnittstelle"
 
 #: ..\Client\core\CSettings.cpp:121
 msgid "Web Browser"
@@ -794,7 +794,7 @@ msgstr "Externe Sounds erlauben"
 
 #: ..\Client\core\CSettings.cpp:385
 msgid "Always show download window"
-msgstr "Downloadfenster immer anzeigen"
+msgstr "Download-Fenster immer anzeigen"
 
 #: ..\Client\core\CSettings.cpp:390
 msgid "Use customized GTA:SA files"
@@ -854,7 +854,7 @@ msgstr "Radio Equalizer"
 
 #: ..\Client\core\CSettings.cpp:536
 msgid "Radio Auto-tune"
-msgstr "Radio-Autotune"
+msgstr "Radio Auto-tune"
 
 #: ..\Client\core\CSettings.cpp:541
 msgid "Usertrack options"
@@ -963,7 +963,7 @@ msgstr "Rahmenlos, behalte Auflösung"
 
 #: ..\Client\core\CSettings.cpp:657
 msgid "Mip Mapping"
-msgstr "Mip Mapping"
+msgstr "Mip-Mapping"
 
 #: ..\Client\core\CSettings.cpp:725 ..\Client\core\CSettings.cpp:1468
 msgid "Low"
@@ -1005,7 +1005,7 @@ msgstr "3x"
 #: ..\Client\core\CSettings.cpp:782 ..\Client\core\CSettings.cpp:974
 #: ..\Client\core\CSettings.cpp:1490 ..\Client\core\CSettings.cpp:3072
 msgid "Auto"
-msgstr "Automatisch"
+msgstr "Auto"
 
 #: ..\Client\core\CSettings.cpp:783 ..\Client\core\CSettings.cpp:1492
 msgid "4:3"
