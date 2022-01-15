@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-15 17:24\n"
+"PO-Revision-Date: 2022-01-15 18:08\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "MIME-Version: 1.0\n"
@@ -2165,7 +2165,7 @@ msgstr "Multi Theft Auto wurde nicht korrekt installiert. Bitte installiere es e
 #: ..\Client\loader\CInstallManager.cpp:584
 #: ..\Client\loader\CInstallManager.cpp:616
 msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "MTA:SA kann nicht fortsetzen, da folgende Dateien nicht korrekt sind:"
+msgstr "MTA:SA kann nicht fortgesetzt werden, da die folgenden Dateien falsch sind:"
 
 #: ..\Client\loader\CInstallManager.cpp:609
 msgid "Patch GTA"
@@ -2227,7 +2227,7 @@ msgstr "Diese Datei ist nicht nötig und könnte die Grafik von MTA:SA beeinträ
 
 #: ..\Client\loader\Dialogs.cpp:67
 msgid "Use this d3d9.dll, but also show this warning on next start"
-msgstr "Diese d3d9.dll verwenden, aber beim nächsten Start diese Warnung wieder anzeigen"
+msgstr "Verwenden Sie diese d3d9.dll, aber zeigen Sie diese Warnung auch beim nächsten Start an"
 
 #: ..\Client\loader\Dialogs.cpp:68
 msgid "Do not tell me about this d3d9.dll again"
@@ -2235,7 +2235,7 @@ msgstr "Ich möchte nicht mehr über die d3d9.dll informiert werden"
 
 #: ..\Client\loader\Dialogs.cpp:69
 msgid "Rename this d3d9.dll to d3d9.dll.bak"
-msgstr "Diese d3d9.dll in d3d9.dll.bak umbenennen"
+msgstr "Benennen Sie diese d3d9.dll in d3d9 um.dll.bak"
 
 #: ..\Client\loader\Dialogs.cpp:70
 msgid "Show me the file"
@@ -2303,7 +2303,7 @@ msgstr "Fenstermodus erzwingen"
 
 #: ..\Client\loader\Dialogs.cpp:91
 msgid "Don't show again"
-msgstr "Nicht erneut anzeigen"
+msgstr "Nicht mehr anzeigen"
 
 #: ..\Client\loader\Dialogs.cpp:99
 msgid "Warning: Could not detect anti-virus product"
@@ -2792,7 +2792,7 @@ msgstr "Max Spieler:"
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:82
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "Übertragung:"
+msgstr "Rundfunk:"
 
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:86
 msgid "LAN"
