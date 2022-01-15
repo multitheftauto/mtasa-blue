@@ -1252,7 +1252,7 @@ void CKeyBinds::ResetGTAControlState(SBindableGTAControl* pControl)
 
         if (controlBind->control == pControl && controlBind->state)
         {
-            controlBind->state = true;
+            pControl->bState = true;
             return;
         }
     }
