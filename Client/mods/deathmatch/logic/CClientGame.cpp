@@ -624,6 +624,12 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
 
+            // Send an empty string if server still has old Discord implementation (#2499)
+            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation) && !g_pNet->CanServerBitStream(eBitStreamVersion::Discord_Cleanup))
+            {
+                pBitStream->WriteString<uchar>("");
+            }
+
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
