@@ -93,16 +93,11 @@ private:
     bool OnQuitButtonClick(CGUIElement* pElement);
     bool OnNewsButtonClick(CGUIElement* pElement);
 
-    bool OnSocialMediaButtonClick(CGUIElement* pElement);
-    bool OnSocialMediaButtonHover(CGUIElement* pElement);
-    bool OnSocialMediaButtonUnhover(CGUIElement* pElement);
-
     void HideServerInfo();
 
     CGUI* m_pManager;
 
-    CGUIStaticImage* m_socialButtons[6] = {nullptr};
-    std::map<CGUIStaticImage*, const char*> m_socialButtonLinks;
+    std::array<std::unique_ptr<CGUIStaticImage>, 6> m_socialsImages{};
     std::map<const char*, const char*> m_socialMediaLinks;
 
     // Images

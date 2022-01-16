@@ -224,44 +224,50 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLatestNews->SetProperty("InheritsAlpha", "False");
     m_pLatestNews->SetVisible(false);
 
-    const std::pair<const char*, GUI_CALLBACK> socialButtonDatas[]{
-        {"website", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
-        {"discord", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
-        {"twitter", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
-        {"facebook", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
-        {"youtube", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
-        {"github", GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonClick, this)},
-    };
-
-    m_socialMediaLinks = {
+    static const std::array<std::pair<std::string, std::string>, 6> m_socialMediaLinks{{
         {"website", "https://multitheftauto.com"},
         {"discord", "https://discord.gg/mtasa"},
         {"twitter", "https://twitter.com/mtaqa"},
         {"facebook", "https://www.facebook.com/multitheftauto"},
         {"youtube", "https://www.youtube.com/user/mtaqa"},
         {"github", "https://github.com/multitheftauto/mtasa-blue"},
-    };
-
+    }};
     float offsetX = 0.01f;
     size_t i = 0;
     const CVector2D buttonSize((NATIVE_SOCIAL_ICON_X / NATIVE_RES_X) * m_iMenuSizeX, (NATIVE_SOCIAL_ICON_Y / NATIVE_RES_Y) * m_iMenuSizeY);
-    for (const auto& [name, buttonClickHandler] : socialButtonDatas)
-    {
-        CGUIStaticImage* button(pManager->CreateStaticImage(m_pCanvas));
+    size_t socialsIndex = 0;
 
-        button->LoadFromFile(SString("cgui\\images\\socialset\\%s.png", name).c_str());
+    for (const auto& nameAndLink : m_socialMediaLinks)
+    {
+        CGUIStaticImage* button = pManager->CreateStaticImage(m_pCanvas);
+        m_socialsImages[socialsIndex++].reset(button);
+        //m_socialsImages->fill(static_cast<std::unique_ptr<CGUIStaticImage>>(button));
+        button->LoadFromFile(SString(R"(cgui\images\socialset\%s.png)", nameAndLink.first.c_str()).c_str());
         button->SetProperty("InheritsAlpha", "False");
         button->SetAlpha(0.35f);
         button->SetSize(buttonSize, false);
         button->SetPosition({offsetX * m_iMenuSizeX - buttonSize.fX / 2, 0.97f * m_iMenuSizeY - buttonSize.fY / 2}, false);
         button->SetZOrderingEnabled(false);
-        button->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonHover, this));
-        button->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnSocialMediaButtonUnhover, this));
-        button->SetClickHandler(buttonClickHandler);
-
-        m_socialButtonLinks[button] = m_socialMediaLinks[name];
-
-        m_socialButtons[i++] = button;
+        button->SetUserData(const_cast<char*>(nameAndLink.second.c_str()));
+        button->SetMouseEnterHandler(GUI_CALLBACK(
+            [](CGUIElement* button)
+            {
+                button->SetAlpha(0.08f);
+                return true;
+            }));
+        button->SetMouseLeaveHandler(GUI_CALLBACK(
+            [](CGUIElement* button)
+            {
+                button->SetAlpha(0.35f);
+                return true;
+            }));
+        button->SetClickHandler(GUI_CALLBACK(
+            [](CGUIElement* button)
+            {
+                auto url = static_cast<const char*>(button->GetUserData());
+                ShellExecuteNonBlocking("open", url);
+                return true;
+            }));
         offsetX += 0.03f;
     }
 
@@ -1050,29 +1056,6 @@ bool CMainMenu::OnNewsButtonClick(CGUIElement* pElement)
 
     m_pNewsBrowser->SetVisible(true);
     m_pNewsBrowser->SwitchToTab(iIndex);
-
-    return true;
-}
-
-bool CMainMenu::OnSocialMediaButtonClick(CGUIElement* pElement)
-{
-    const char* link = m_socialButtonLinks[dynamic_cast<CGUIStaticImage*>(pElement)];
-
-    ShellExecuteNonBlocking("open", link);
-
-    return true;
-}
-
-bool CMainMenu::OnSocialMediaButtonHover(CGUIElement* pElement)
-{
-    pElement->SetAlpha(0.8f);
-
-    return true;
-}
-
-bool CMainMenu::OnSocialMediaButtonUnhover(CGUIElement* pElement)
-{
-    pElement->SetAlpha(0.35f);
 
     return true;
 }
