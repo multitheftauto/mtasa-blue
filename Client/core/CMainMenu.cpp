@@ -224,7 +224,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLatestNews->SetProperty("InheritsAlpha", "False");
     m_pLatestNews->SetVisible(false);
 
-    static const std::array<std::pair<std::string, std::string>, 6> m_socialMediaLinks{{
+    static const std::array<std::pair<const char*, const char*>, 6> m_socialMediaLinks{{
         {"website", "https://multitheftauto.com"},
         {"discord", "https://discord.gg/mtasa"},
         {"twitter", "https://twitter.com/mtaqa"},
@@ -242,13 +242,13 @@ CMainMenu::CMainMenu(CGUI* pManager)
         CGUIStaticImage* button = pManager->CreateStaticImage(m_pCanvas);
         m_socialsImages[socialsIndex++].reset(button);
         //m_socialsImages->fill(static_cast<std::unique_ptr<CGUIStaticImage>>(button));
-        button->LoadFromFile(SString(R"(cgui\images\socialset\%s.png)", nameAndLink.first.c_str()).c_str());
+        button->LoadFromFile(SString(R"(cgui\images\socialset\%s.png)", nameAndLink.first).c_str());
         button->SetProperty("InheritsAlpha", "False");
         button->SetAlpha(0.35f);
         button->SetSize(buttonSize, false);
         button->SetPosition({offsetX * m_iMenuSizeX - buttonSize.fX / 2, 0.97f * m_iMenuSizeY - buttonSize.fY / 2}, false);
         button->SetZOrderingEnabled(false);
-        button->SetUserData(const_cast<char*>(nameAndLink.second.c_str()));
+        button->SetUserData(const_cast<char*>(nameAndLink.second));
         button->SetMouseEnterHandler(GUI_CALLBACK(
             [](CGUIElement* button)
             {

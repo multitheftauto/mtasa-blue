@@ -98,7 +98,6 @@ private:
     CGUI* m_pManager;
 
     std::array<std::unique_ptr<CGUIStaticImage>, 6> m_socialsImages{};
-    std::map<const char*, const char*> m_socialMediaLinks;
 
     // Images
     CGUIStaticImage* m_pBackground;
