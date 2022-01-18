@@ -39,6 +39,7 @@
 #define TRAIN_LOD_DISTANCE_MULTIPLIER   ( 2.14f )
 #define MAX_VEHICLE_LOD_DISTANCE        ( 500.0f )
 #define MAX_PEDS_LOD_DISTANCE           ( 500.0f )
+#define DEFAULT_BLUR_LEVEL              ( 36 )
 
 struct CSettingsSAInterface            // see code around 0x57CE9A for where these are
 {
@@ -89,6 +90,7 @@ private:
     eAspectRatio          m_AspectRatio;
     int                   m_iDesktopWidth;
     int                   m_iDesktopHeight;
+    bool                  m_bBlurViaScript;
 
 public:
     CSettingsSA();
@@ -162,6 +164,9 @@ public:
     void ResetVehiclesLODDistance(bool bFromScript);
     void ResetVehiclesLODDistanceFromScript();
     void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance);
+
+    void ResetBlurEnabled();
+    void SetBlurControlledByScript(bool bByScript);
 
     void Save();
 

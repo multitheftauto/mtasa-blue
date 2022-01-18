@@ -180,6 +180,7 @@ void CWorldRPCs::SetBlurLevel(NetBitStreamInterface& bitStream)
     unsigned char ucLevel;
     if (bitStream.Read(ucLevel))
     {
+        g_pGame->GetSettings()->SetBlurControlledByScript(true);
         g_pGame->SetBlurLevel(ucLevel);
     }
 }

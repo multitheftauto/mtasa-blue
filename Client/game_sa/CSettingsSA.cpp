@@ -43,6 +43,7 @@ CSettingsSA::CSettingsSA()
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
+    m_bBlurViaScript = false;
     SetAspectRatio(ASPECT_RATIO_4_3);
     HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
@@ -696,6 +697,29 @@ void CSettingsSA::ResetPedsLODDistanceFromScript()
 float CSettingsSA::GetPedsLODDistance()
 {
     return ms_fPedsLODDistance;
+}
+
+////////////////////////////////////////////////
+//
+// Blur
+//
+// When blur is controlled by script changing this option
+// in settings doesn't produce any effect
+//
+////////////////////////////////////////////////
+void CSettingsSA::ResetBlurEnabled()
+{
+    if (m_bBlurViaScript)
+        return;
+
+    bool bEnabled;
+    g_pCore->GetCVars()->Get("blur", bEnabled);
+    pGame->SetBlurLevel(bEnabled ? DEFAULT_BLUR_LEVEL : 0);
+}
+
+void CSettingsSA::SetBlurControlledByScript(bool bByScript)
+{
+    m_bBlurViaScript = bByScript;
 }
 
 ////////////////////////////////////////////////

@@ -166,5 +166,8 @@ public:
     virtual void  ResetPedsLODDistanceFromScript() = 0;
     virtual float GetPedsLODDistance() = 0;
 
+    virtual void ResetBlurEnabled() = 0;
+    virtual void SetBlurControlledByScript(bool bByScript) = 0;
+
     virtual void Save() = 0;
 };

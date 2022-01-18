@@ -44,7 +44,6 @@ CVector             g_vecBulletFireEndPosition;
 
 #define DEFAULT_GRAVITY              0.008f
 #define DEFAULT_GAME_SPEED           1.0f
-#define DEFAULT_BLUR_LEVEL           36
 #define DEFAULT_JETPACK_MAXHEIGHT    100
 #define DEFAULT_AIRCRAFT_MAXHEIGHT   800
 #define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
@@ -5297,6 +5296,10 @@ void CClientGame::ResetMapInfo()
     // Peds LOD distance
     g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
 
+    // Blur
+    g_pGame->GetSettings()->SetBlurControlledByScript(false);
+    g_pGame->GetSettings()->ResetBlurEnabled();
+
     // Sun color
     g_pMultiplayer->ResetSunColor();
 
@@ -5355,13 +5358,6 @@ void CClientGame::ResetMapInfo()
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
-
-    // Restore blur
-#ifdef MTA_DEBUG
-    g_pGame->SetBlurLevel(0);
-#else
-    g_pGame->SetBlurLevel(DEFAULT_BLUR_LEVEL);
-#endif
 
     // Close all garages
     CGarage*  pGarage = NULL;
