@@ -63,6 +63,15 @@ static const int       BODGE_FACTOR_4 = 5;
 static const CVector2D BODGE_FACTOR_5(0, -50);
 static const CVector2D BODGE_FACTOR_6(0, 100);
 
+static const std::array<std::pair<const char*, const char*>, 6> socialMediaLinks{{
+        {"website", "https://multitheftauto.com"},
+        {"discord", "https://discord.gg/mtasa"},
+        {"twitter", "https://twitter.com/mtaqa"},
+        {"facebook", "https://www.facebook.com/multitheftauto"},
+        {"youtube", "https://www.youtube.com/user/mtaqa"},
+        {"github", "https://github.com/multitheftauto/mtasa-blue"},
+    }};
+
 CMainMenu::CMainMenu(CGUI* pManager)
 {
     m_pNewsBrowser = new CNewsBrowser();
@@ -224,24 +233,15 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLatestNews->SetProperty("InheritsAlpha", "False");
     m_pLatestNews->SetVisible(false);
 
-    static const std::array<std::pair<const char*, const char*>, 6> m_socialMediaLinks{{
-        {"website", "https://multitheftauto.com"},
-        {"discord", "https://discord.gg/mtasa"},
-        {"twitter", "https://twitter.com/mtaqa"},
-        {"facebook", "https://www.facebook.com/multitheftauto"},
-        {"youtube", "https://www.youtube.com/user/mtaqa"},
-        {"github", "https://github.com/multitheftauto/mtasa-blue"},
-    }};
     float offsetX = 0.01f;
     size_t i = 0;
     const CVector2D buttonSize((NATIVE_SOCIAL_ICON_X / NATIVE_RES_X) * m_iMenuSizeX, (NATIVE_SOCIAL_ICON_Y / NATIVE_RES_Y) * m_iMenuSizeY);
     size_t socialsIndex = 0;
 
-    for (const auto& nameAndLink : m_socialMediaLinks)
+    for (const auto& nameAndLink : socialMediaLinks)
     {
         CGUIStaticImage* button = pManager->CreateStaticImage(m_pCanvas);
         m_socialsImages[socialsIndex++].reset(button);
-        //m_socialsImages->fill(static_cast<std::unique_ptr<CGUIStaticImage>>(button));
         button->LoadFromFile(SString(R"(cgui\images\socialset\%s.png)", nameAndLink.first).c_str());
         button->SetProperty("InheritsAlpha", "False");
         button->SetAlpha(0.35f);
