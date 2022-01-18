@@ -1,7 +1,8 @@
 name: 'Rebuild en_US pot files'
 on:
   push:
-    branch: master
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:

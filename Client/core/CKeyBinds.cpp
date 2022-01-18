@@ -630,7 +630,7 @@ bool CKeyBinds::AddCommand(const char* szKey, const char* szCommand, const char*
 
         if (bScriptCreated)
             bind->originalScriptKey = szKey;
-        else
+        else if (szOriginalScriptKey)
             bind->originalScriptKey = szOriginalScriptKey;            // Will wait for script to addcommand before doing replace
     }
 
@@ -1252,7 +1252,7 @@ void CKeyBinds::ResetGTAControlState(SBindableGTAControl* pControl)
 
         if (controlBind->control == pControl && controlBind->state)
         {
-            controlBind->state = true;
+            pControl->bState = true;
             return;
         }
     }
