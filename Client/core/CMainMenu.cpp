@@ -226,7 +226,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     static const std::array<std::pair<const char*, const char*>, 6> m_socialMediaLinks{{
         {"website", "https://multitheftauto.com"},
-        {"discord", "https://discord.gg/mtasa"},
+        {"discord", "https://discord.com/invite/mtasa"},
         {"twitter", "https://twitter.com/mtaqa"},
         {"facebook", "https://www.facebook.com/multitheftauto"},
         {"youtube", "https://www.youtube.com/user/mtaqa"},
