@@ -114,6 +114,11 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
+            // Restore pickups with custom model
+            CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
+
+            unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
             break;
