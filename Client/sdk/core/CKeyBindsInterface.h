@@ -61,102 +61,101 @@ struct SBindableGTAControl
     const char*       szDescription;
 };
 
-enum eKeyBindType
+enum class KeyBindType
 {
-    KEY_BIND_COMMAND,                     // bind key function args
-    KEY_BIND_GTA_CONTROL,                 // bind key gta_control
-    KEY_BIND_FUNCTION,                    // script bind key to function
-    KEY_BIND_CONTROL_FUNCTION,            // script bind gta_control to function (pressing control, calls function)
-    KEY_BIND_UNDEFINED,
+    UNDEFINED,
+    COMMAND,                     // bind key function args
+    GTA_CONTROL,                 // bind key gta_control
+    FUNCTION,                    // script bind key to function
+    CONTROL_FUNCTION,            // script bind gta_control to function (pressing control, calls function)
 };
 
 class CKeyBind
 {
 public:
-    CKeyBind() : boundKey(NULL), beingDeleted(false) { bActive = true; }
-    const SBindableKey*  boundKey;
-    bool                 beingDeleted;
-    bool                 bActive;
-    bool                 IsBeingDeleted() { return beingDeleted; }
-    virtual eKeyBindType GetType() = 0;
+    explicit CKeyBind(KeyBindType type_ = KeyBindType::UNDEFINED) : type(type_) {}
+
+    virtual ~CKeyBind() = default;
+
+public:
+    const KeyBindType   type;
+    const SBindableKey* boundKey{nullptr};
+    bool                isBeingDeleted{false};
+    bool                isActive{true};
 };
 
 class CKeyBindWithState : public CKeyBind
 {
 public:
-    CKeyBindWithState() { bState = false; }
-    bool bState;
-    bool bHitState;
+    using CKeyBind::CKeyBind;
+
+public:
+    bool state{false};
+    bool triggerState{false};            // true == "down", false == "up"
 };
 
 class CCommandBind : public CKeyBindWithState
 {
 public:
-    CCommandBind()
-    {
-        szCommand = NULL;
-        szArguments = NULL;
-        szResource = NULL;
-        bScriptCreated = false;
-        ;
-        bIsReplacingScriptKey = false;
-    }
-    ~CCommandBind()
-    {
-        delete[] szCommand;
-        if (szArguments)
-            delete[] szArguments;
-        if (szResource)
-            delete[] szResource;
-    }
-    eKeyBindType GetType() { return KEY_BIND_COMMAND; }
-    char*        szCommand;
-    char*        szArguments;
-    char*        szResource;
-    bool         bScriptCreated;                   // true if created by script
-    bool         bIsReplacingScriptKey;            // true if script set key is not being used
-    SString      strOriginalScriptKey;             // Original key set by script
+    CCommandBind() : CKeyBindWithState(KeyBindType::COMMAND) {}
+
+public:
+    std::string command;
+    std::string arguments;
+    std::string resource;
+    std::string originalScriptKey;            // Original key set by script
+    bool        wasCreatedByScript{false};
+    bool        isReplacingScriptKey{false};            // true if script set key is not being used
 };
 
 class CKeyFunctionBind : public CKeyBindWithState
 {
 public:
-    eKeyBindType           GetType() { return KEY_BIND_FUNCTION; }
-    KeyFunctionBindHandler Handler;
-    bool                   bIgnoreGUI;
+    CKeyFunctionBind() : CKeyBindWithState(KeyBindType::FUNCTION) {}
+
+public:
+    KeyFunctionBindHandler handler{nullptr};
+    bool                   ignoresGUI{false};
 };
 
 class CControlFunctionBind : public CKeyBindWithState
 {
 public:
-    eKeyBindType               GetType() { return KEY_BIND_CONTROL_FUNCTION; }
-    SBindableGTAControl*       control;
-    ControlFunctionBindHandler Handler;
+    CControlFunctionBind() : CKeyBindWithState(KeyBindType::CONTROL_FUNCTION) {}
+
+public:
+    SBindableGTAControl*       control{nullptr};
+    ControlFunctionBindHandler handler{nullptr};
 };
 
 class CGTAControlBind : public CKeyBind
 {
 public:
-    eKeyBindType         GetType() { return KEY_BIND_GTA_CONTROL; }
-    SBindableGTAControl* control;
-    bool                 bState;
-    bool                 bEnabled;
+    CGTAControlBind() : CKeyBind(KeyBindType::GTA_CONTROL) {}
+
+public:
+    SBindableGTAControl* control{nullptr};
+    bool                 state{false};
+    bool                 isEnabled{false};
 };
 
 class CKeyBindsInterface
 {
 public:
+    using KeyBindPtr = std::unique_ptr<CKeyBind>;
+    using KeyBindContainer = std::list<KeyBindPtr>;
+
+    virtual ~CKeyBindsInterface() = default;
+
     virtual bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
     virtual void OnLoseFocus() = 0;
 
-    // Basic funcs
-    virtual void Add(CKeyBind* pKeyBind) = 0;
-    virtual void Remove(CKeyBind* pKeyBind) = 0;
-    virtual void Clear() = 0;
-    virtual bool Call(CKeyBind* pKeyBind) = 0;
+    virtual void Remove(CKeyBind* keyBind) = 0;
 
-    virtual std::list<CKeyBind*>::const_iterator IterBegin() = 0;
-    virtual std::list<CKeyBind*>::const_iterator IterEnd() = 0;
+    virtual KeyBindContainer::iterator       begin() = 0;
+    virtual KeyBindContainer::const_iterator begin() const = 0;
+    virtual KeyBindContainer::iterator       end() = 0;
+    virtual KeyBindContainer::const_iterator end() const = 0;
 
     // Command-bind funcs
     virtual bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL,
@@ -230,8 +229,8 @@ public:
     virtual void SetAllFootControls(bool bState) = 0;
     virtual void SetAllVehicleControls(bool bState) = 0;
 
-    virtual void         SetAllBindStates(bool bState, eKeyBindType onlyType = KEY_BIND_UNDEFINED) = 0;
-    virtual unsigned int Count(eKeyBindType bindType) = 0;
+    virtual void         SetAllBindStates(bool bState, KeyBindType onlyType = KeyBindType::UNDEFINED) = 0;
+    virtual unsigned int Count(KeyBindType bindType = KeyBindType::UNDEFINED) = 0;
 
     virtual void DoPreFramePulse() = 0;
     virtual void DoPostFramePulse() = 0;
