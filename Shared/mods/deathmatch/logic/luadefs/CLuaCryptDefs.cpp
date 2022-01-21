@@ -108,7 +108,7 @@ std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, st
                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                 if (pLuaMain)
                 {
-                    CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask(
                         [password, salt = options["salt"], cost] {
                             // Execute time-consuming task
                             return SharedUtil::BcryptHash(password, salt, cost);
@@ -199,7 +199,7 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                 if (pLuaMain)
                 {
-                    CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask(
                         [password, hash] {
                             // Execute time-consuming task
                             return SharedUtil::BcryptVerify(password, hash);
@@ -253,7 +253,7 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                 if (pLuaMain)
                 {
-                    CLuaShared::GetAsyncTaskScheduler()->PushTask<std::variant<KeyPair, SString>>(
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask(
                         [size]() -> std::variant<KeyPair, SString> {
                             // Execute time-consuming task
                             try
@@ -346,7 +346,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
                             [data, key] {
                                 // Execute time-consuming task
                                 SString result;
@@ -391,7 +391,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, SString>>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
                             [data, key] {
                                 std::pair<SString, SString> result;
                                 try
@@ -459,7 +459,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
                             [data, key] {
                                 try
                                 {
@@ -558,7 +558,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
                             [data, key] {
                                 // Execute time-consuming task
                                 SString result;
@@ -611,7 +611,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<SString>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
                             [data, key, iv] {
                                 // Execute time-consuming task
                                 SString result;
@@ -678,7 +678,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask<std::pair<SString, bool>>(
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
                             [data, key] {
                                 try
                                 {
