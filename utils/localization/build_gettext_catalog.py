@@ -14,7 +14,6 @@ from pathlib import Path
 from os import close
 import subprocess
 import tempfile
-import typer
 import typing as t
 
 
@@ -55,7 +54,7 @@ def main(output: Path, version: str, xgettext: str, paths: t.Optional[t.List[Pat
     fd, fp_path = tempfile.mkstemp()
     fp_path = Path(fp_path)
     with fp_path.open("w", encoding="utf-8") as fp:
-        dir_list_file = write_directory_list_file(files, fp)
+        write_directory_list_file(files, fp)
 
     try:
         subprocess.run([
