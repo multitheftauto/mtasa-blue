@@ -395,8 +395,6 @@ public:
 
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
-    
-
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -513,7 +511,6 @@ private:
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
-
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;

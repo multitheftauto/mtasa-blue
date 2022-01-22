@@ -34,13 +34,11 @@ unsigned long* CGameSA::VAR_Framelimiter;
 
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
-
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
  */
 CGameSA::CGameSA()
 {
-
     pGame = this;
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
@@ -225,7 +223,6 @@ CGameSA::CGameSA()
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
     CVehicleSA::StaticSetHooks();
-    
 }
 
 CGameSA::~CGameSA()
@@ -647,7 +644,6 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         SetVehicleSunGlareEnabled(bEnable);
         return true;
     }
-        
 
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
