@@ -2344,7 +2344,7 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
 
 void CVehicleSA::StaticSetHooks()
 {
-    // Setup Vehicle Sun Glare Hook
+    // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
 }
 
