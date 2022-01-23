@@ -490,6 +490,9 @@ void CGameSA::Reset()
 
         // Restore vehicle model wheel sizes
         CModelInfoSA::ResetAllVehiclesWheelSizes();
+
+        // Reset the vehicle sun glare effect to default
+        CVehicleSA::SetVehiclesSunGlareEnable(false);
     }
 }
 
