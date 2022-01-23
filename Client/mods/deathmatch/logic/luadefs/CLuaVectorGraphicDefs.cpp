@@ -151,7 +151,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             {
                 CLuaFunctionRef funcRef = luaFunctionRef.value();
 
-                CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+                CLuaShared::GetAsyncTaskScheduler()->PushTask(
                     [funcRef, pVectorGraphic, strRawData] { return LoadFromData(funcRef.GetLuaVM(), pVectorGraphic, strRawData); },
                     [funcRef](const bool didLoad) {
                         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
@@ -186,7 +186,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                     CLuaFunctionRef funcRef = luaFunctionRef.value();
                     std::string     path = pathOrRawData.value();
 
-                    CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>(
+                    CLuaShared::GetAsyncTaskScheduler()->PushTask(
                         [funcRef, pFile, pVectorGraphic, path] {
                             lua_State* luaVM = funcRef.GetLuaVM();
 
@@ -248,7 +248,7 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* pVectorGraph
     {
         CLuaFunctionRef funcRef = luaFunctionRef.value();
 
-        CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>([pVectorGraphic, pXMLNode] { return SetDocument(pVectorGraphic, pXMLNode); },
+        CLuaShared::GetAsyncTaskScheduler()->PushTask([pVectorGraphic, pXMLNode] { return SetDocument(pVectorGraphic, pXMLNode); },
                                                             [funcRef](const bool didLoad) {
                                                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
                                                                 if (pLuaMain)
@@ -282,7 +282,7 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* pVectorGraphic, CVe
     {
         CLuaFunctionRef funcRef = luaFunctionRef.value();
 
-        CLuaShared::GetAsyncTaskScheduler()->PushTask<bool>([pVectorGraphic, size] { return SetSize(pVectorGraphic, size); },
+        CLuaShared::GetAsyncTaskScheduler()->PushTask([pVectorGraphic, size] { return SetSize(pVectorGraphic, size); },
                                                             [funcRef](const bool didLoad) {
                                                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(funcRef.GetLuaVM());
                                                                 if (pLuaMain)
