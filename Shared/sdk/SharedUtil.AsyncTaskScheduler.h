@@ -85,10 +85,12 @@ namespace SharedUtil
 
         //
         // Pushes a new task for execution once a worker is free
-        // (Template Parameter) ResultType: The type of the result
         //
         // taskFunc: Time-consuming function that is executed on the secondary thread (be aware of thread safety!)
         // readyFunc: Function that is called once the result is ready (called on the main thread)
+        //
+        // NOTE: Use `CLuaMain::PushTask` for resource related tasks!
+        // `lua_getownercluamain` can be used to the `CLuaMain` from a `lua_State`
         //
         template <typename TaskFn, typename ReadyFn>
         void PushTask(TaskFn&& task, ReadyFn&& ready)

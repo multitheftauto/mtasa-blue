@@ -18,6 +18,7 @@ class CLuaMain;
 #include "lua/CLuaVector3.h"
 #include "lua/CLuaVector4.h"
 #include "lua/CLuaMatrix.h"
+#include "ResourceTask.h"
 
 #include "CLuaFunctionDefs.h"
 
@@ -70,6 +71,23 @@ public:
     unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
     unsigned long GetElementCount() const;
 
+    void          OnTaskFinishedOrCancelled(BaseResourceTask& task);
+    size_t        GetNumOfActiveTasks();
+
+    //
+    // Pushes an async task.
+    // These tasks have the same life-time as the resoure that created them
+    // This means that the ready callback function won't ever be called after the resource has stopped/restarted!
+    // (Although the task function might be running when the resource was stopped)
+    //
+    template<typename... Args>
+    auto PushTask(Args&&... args) {
+        auto task = new ResourceTask{ *this, std::forward<Args>(args)... };
+        task->AddToList(m_ActiveTasksHead);
+        m_ActiveTasksHead = task;
+        return CLuaShared::GetAsyncTaskScheduler()->PushTask(std::unique_ptr<struct CAsyncTaskScheduler::SBaseTask>(task));
+    }
+
     void           InitClasses(lua_State* luaVM);
     void           InitVM();
     void           LoadEmbeddedScripts();
@@ -89,6 +107,10 @@ private:
 
     lua_State*        m_luaVM;
     CLuaTimerManager* m_pLuaTimerManager;
+
+    // List head for active tasks - that is, all tasks not cancelled
+    // Tasks cancelled or finished are removed by a call to `OnTaskFinishedOrCancelled`
+    BaseResourceTask* m_ActiveTasksHead{};
 
     bool m_bBeingDeleted;            // prevent it being deleted twice
 

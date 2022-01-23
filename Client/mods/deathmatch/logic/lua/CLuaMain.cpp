@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #define DECLARE_PROFILER_SECTION_CLuaMain
 #include "profiler/SharedUtil.Profiler.h"
+#include "ResourceTask.h"
 
 using std::list;
 
@@ -421,6 +422,26 @@ bool CLuaMain::SaveXML(CXMLNode* pRootNode)
     return false;
 }
 
+void CLuaMain::OnTaskFinishedOrCancelled(BaseResourceTask& task) {
+    if (m_ActiveTasksHead == &task) {
+        assert(!m_ActiveTasksHead->Prev()); // Head should have no `prev` link
+        m_ActiveTasksHead = task.Next();
+    }
+    else {
+        dassert(m_ActiveTasksHead && (task.Prev() || task.Next())); // Task not the head - It has to have links
+    }
+}
+
+// Inefficient, try not to call it on every frame
+size_t CLuaMain::GetNumOfActiveTasks() {
+    size_t count{};
+    for (auto it = m_ActiveTasksHead; it; it = it->Next()) {
+        count++;
+    }
+    return count;
+}
+
+
 ///////////////////////////////////////////////////////////////
 //
 // CLuaMain::GetElementCount
@@ -434,6 +455,7 @@ unsigned long CLuaMain::GetElementCount() const
         return m_pResource->GetElementGroup()->GetCount();
     return 0;
 }
+
 
 ///////////////////////////////////////////////////////////////
 //
@@ -553,3 +575,18 @@ int CLuaMain::OnUndump(const char* p, size_t n)
     }
     return 1;
 }
+
+// Not sure how hacky this is, but this is the easiest way
+void BaseResourceTask::NotifyCreatorOfCancellation() {
+    dassert(g_pClientGame->GetLuaManager()->Exists(&m_Creator)); // Creator should still exist as the task wasn't cancelled (But is being cancelled)
+
+    m_Creator.OnTaskFinishedOrCancelled(*this);
+}
+
+void BaseResourceTask::NotifyCreatorWeFinished() {
+    dassert(!WasCancelled());                              // Task can only finish if wasn't cancelled
+    dassert(g_pClientGame->GetLuaManager()->Exists(&m_Creator)); // Creator should still exist as the task wasn't cancelled
+
+    m_Creator.OnTaskFinishedOrCancelled(*this);
+}
+

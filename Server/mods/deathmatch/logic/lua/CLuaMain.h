@@ -81,13 +81,20 @@ public:
     void          OnOpenFile(const SString& strFilename);
     void          OnCloseFile(const SString& strFilename);
 
-    void          OnTaskDestruct(BaseResourceTask* task);
+    void          OnTaskFinishedOrCancelled(BaseResourceTask& task);
+    size_t        CLuaMain::GetNumOfActiveTasks();
 
+    //
+    // Pushes an async task.
+    // These tasks have the same life-time as the resoure that created them.
+    // This means that the ready callback function won't ever be called after the resource has stopped/restarted!
+    // (Although the task function might be running when the resource was stopped)
+    //
     template<typename... Args>
     auto PushTask(Args&&... args) {
-        auto task = new ResourceTask{ this, std::forward<Args>(args)... };
-        task->AddToList(m_TasksHead);
-        m_TasksHead = task;
+        auto task = new ResourceTask{ *this, std::forward<Args>(args)... };
+        task->AddToList(m_ActiveTasksHead);
+        m_ActiveTasksHead = task;
         return CLuaShared::GetAsyncTaskScheduler()->PushTask(std::unique_ptr<struct CAsyncTaskScheduler::SBaseTask>(task));
     }
 
@@ -145,7 +152,9 @@ private:
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
 
-    BaseResourceTask*    m_TasksHead{};
+    // List head for active tasks - that is, all tasks not cancelled
+    // Tasks cancelled or finished are removed by a call to `OnTaskFinishedOrCancelled`
+    BaseResourceTask*    m_ActiveTasksHead{};
 
     list<CXMLFile*>                                 m_XMLFiles;
     std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;

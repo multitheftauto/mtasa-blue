@@ -92,7 +92,7 @@ CLuaMain::~CLuaMain()
     }
 
     // Cancel all related tasks
-    for (auto it = m_TasksHead; it;) {
+    for (auto it = m_ActiveTasksHead; it;) {
         // We treat `it` as invalidated after `Cancel` is called, thus we gotta save `next` before cancelling
         auto next = it->Next(); 
         it->Cancel();
@@ -408,11 +408,22 @@ void CLuaMain::OnCloseFile(const SString& strFilename)
     ListRemoveFirst(m_OpenFilenameList, strFilename);
 }
 
-void CLuaMain::OnTaskDestruct(BaseResourceTask* task) {
-    if (m_TasksHead == task) {
-        assert(!task->Prev()); // Head should have no `prev` link
-        m_TasksHead = task->Next();
+void CLuaMain::OnTaskFinishedOrCancelled(BaseResourceTask& task) {
+    if (m_ActiveTasksHead == &task) {
+        assert(!m_ActiveTasksHead->Prev()); // Head should have no `prev` link
+        m_ActiveTasksHead = task.Next();
+    } else {
+        dassert(m_ActiveTasksHead && (task.Prev() || task.Next())); // Task not the head - It has to have links
     }
+}
+
+// Inefficient, try not to call it on every frame
+size_t CLuaMain::GetNumOfActiveTasks() {
+    size_t count{};
+    for (auto it = m_ActiveTasksHead; it; it = it->Next()) {
+        count++;
+    }
+    return count;
 }
 
 CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOnly)
@@ -678,7 +689,15 @@ int CLuaMain::OnUndump(const char* p, size_t n)
 }
 
 // Not sure how hacky this is, but this is the easiest way
-BaseResourceTask::~BaseResourceTask() {
-    m_Creator->OnTaskDestruct(this);
-    RemoveFromList();
+void BaseResourceTask::NotifyCreatorOfCancellation() {
+    dassert(g_pGame->GetLuaManager()->Exists(&m_Creator)); // Creator should still exist as the task wasn't cancelled (But is being cancelled)
+
+    m_Creator.OnTaskFinishedOrCancelled(*this); 
+}
+
+void BaseResourceTask::NotifyCreatorWeFinished() {
+    dassert(!WasCancelled());                              // Task can only finish if wasn't cancelled
+    dassert(g_pGame->GetLuaManager()->Exists(&m_Creator)); // Creator should still exist as the task wasn't cancelled
+
+    m_Creator.OnTaskFinishedOrCancelled(*this);
 }

@@ -98,6 +98,10 @@ void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
     MapRemove(m_VirtualMachineMap, pLuaMain->GetVirtualMachine());
 }
 
+bool CLuaManager::Exists(CLuaMain* pLuaMain) const {
+    return std::find(m_virtualMachines.begin(), m_virtualMachines.end(), pLuaMain) != m_virtualMachines.end();
+}
+
 void CLuaManager::ProcessPendingDeleteList()
 {
     while (!m_PendingDeleteList.empty())

@@ -32,6 +32,8 @@ public:
     CLuaMain* GetVirtualMachine(lua_State* luaVM);
     void      OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
     void      OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
+    bool      Exists(CLuaMain* pLuaMain) const;
+
 
     std::list<CLuaMain*>::const_iterator IterBegin() { return m_virtualMachines.begin(); };
     std::list<CLuaMain*>::const_iterator IterEnd() { return m_virtualMachines.end(); };

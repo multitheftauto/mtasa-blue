@@ -42,6 +42,7 @@ public:
     CResource* GetVirtualMachineResource(lua_State* luaVM);
     void       OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
     void       OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
+    bool       Exists(CLuaMain* pLuaMain) const; // Inefficient, should only be used for debug asserts
 
     CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; }
 
