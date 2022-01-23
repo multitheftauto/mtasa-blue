@@ -346,7 +346,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
                     if (pLuaMain)
                     {
-                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
+                        pLuaMain->PushTask(
                             [data, key] {
                                 // Execute time-consuming task
                                 SString result;
@@ -361,7 +361,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                     arguments.PushString(result);
                                     arguments.Call(pLuaMain, luaFunctionRef);
                                 }
-                            });
+                        });
 
                         lua_pushboolean(luaVM, true);
                     }

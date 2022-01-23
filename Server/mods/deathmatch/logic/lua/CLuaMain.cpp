@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "luadefs/CLuaFunctionDefs.h"
 #include <clocale>
+#include "ResourceTask.h"
 
 static CLuaManager* m_pLuaManager;
 SString             CLuaMain::ms_strExpectedUndumpHash;
@@ -88,6 +89,14 @@ CLuaMain::~CLuaMain()
     for (; iterItems != m_TextItems.end(); ++iterItems)
     {
         delete *iterItems;
+    }
+
+    // Cancel all related tasks
+    for (auto it = m_TasksHead; it;) {
+        // We treat `it` as invalidated after `Cancel` is called, thus we gotta save `next` before cancelling
+        auto next = it->Next(); 
+        it->Cancel();
+        it = next;
     }
 
     CPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
@@ -399,6 +408,13 @@ void CLuaMain::OnCloseFile(const SString& strFilename)
     ListRemoveFirst(m_OpenFilenameList, strFilename);
 }
 
+void CLuaMain::OnTaskDestruct(BaseResourceTask* task) {
+    if (m_TasksHead == task) {
+        assert(!task->Prev()); // Head should have no `prev` link
+        m_TasksHead = task->Next();
+    }
+}
+
 CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOnly)
 {
     CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(szFilename, bUseIDs, bReadOnly);
@@ -659,4 +675,10 @@ int CLuaMain::OnUndump(const char* p, size_t n)
         return 0;
     }
     return 1;
+}
+
+// Not sure how hacky this is, but this is the easiest way
+BaseResourceTask::~BaseResourceTask() {
+    m_Creator->OnTaskDestruct(this);
+    RemoveFromList();
 }

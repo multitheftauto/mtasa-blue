@@ -25,13 +25,23 @@ namespace SharedUtil
     ///////////////////////////////////////////////////////////////
     class CAsyncTaskScheduler
     {
+    public:
+
+        //
+        // Base class, custom tasks may be derived from it.
+        //
         struct SBaseTask
         {
             virtual ~SBaseTask() {}
-            virtual void Execute() = 0;
-            virtual void ProcessResult() = 0;
+            virtual void Execute() = 0;         // Function executed on a worker thread.
+            virtual void ProcessResult() = 0;   // Function executed on the main thread.
         };
 
+        //
+        // Basic task taking a `TaskFn` which is executed on a worker thread,
+        // and `ReadyFn` which is executed on the main thread.
+        // Custom tasks may be derived from it.
+        //
         template <typename TaskFn, typename ReadyFn>
         struct STask : public SBaseTask
         {
@@ -62,6 +72,16 @@ namespace SharedUtil
         // Ends all worker threads (waits for the last task to finish)
         //
         ~CAsyncTaskScheduler();
+
+        //
+        // Push some user-defined task
+        // Semantics are the same as below, `Execute` is called on a worker thread, and
+        // `ProcessResult` is called on the main thread.
+        //
+        void PushTask(std::unique_ptr<SBaseTask> task) {
+            std::scoped_lock<std::mutex> lock{ m_TasksMutex };
+            m_Tasks.emplace(std::move(task));
+        }
 
         //
         // Pushes a new task for execution once a worker is free

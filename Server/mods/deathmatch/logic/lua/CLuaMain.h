@@ -19,6 +19,8 @@ class CLuaMain;
 #include "lua/CLuaMatrix.h"
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"
+#include "ResourceTask.h"
+#include <utility>
 
 #define MAX_SCRIPTNAME_LENGTH 64
 
@@ -79,6 +81,16 @@ public:
     void          OnOpenFile(const SString& strFilename);
     void          OnCloseFile(const SString& strFilename);
 
+    void          OnTaskDestruct(BaseResourceTask* task);
+
+    template<typename... Args>
+    auto PushTask(Args&&... args) {
+        auto task = new ResourceTask{ this, std::forward<Args>(args)... };
+        task->AddToList(m_TasksHead);
+        m_TasksHead = task;
+        return CLuaShared::GetAsyncTaskScheduler()->PushTask(std::unique_ptr<struct CAsyncTaskScheduler::SBaseTask>(task));
+    }
+
     CTextDisplay* CreateDisplay();
     void          DestroyDisplay(CTextDisplay* pDisplay);
     CTextItem*    CreateTextItem(const char* szText, float fX, float fY, eTextPriority priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f,
@@ -132,6 +144,8 @@ private:
     CRadarAreaManager*   m_pRadarAreaManager;
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
+
+    BaseResourceTask*    m_TasksHead{};
 
     list<CXMLFile*>                                 m_XMLFiles;
     std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
