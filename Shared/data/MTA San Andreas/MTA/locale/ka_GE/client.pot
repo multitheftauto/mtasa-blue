@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-08 21:04\n"
+"PO-Revision-Date: 2022-01-25 12:01\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
 "MIME-Version: 1.0\n"
@@ -31,15 +31,15 @@ msgstr ""
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr ""
+msgstr "დამახსოვრება"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:51 ..\Client\core\CSettings.cpp:929
 msgid "Allow"
-msgstr ""
+msgstr "დაშვება"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr ""
+msgstr "უარყოფა"
 
 #: ..\Client\core\CCommandFuncs.cpp:29
 msgid "***[ COMMAND HELP ]***\n"
@@ -153,7 +153,7 @@ msgstr ""
 #: ..\Client\core\CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr ""
+msgstr "უკავშირდება სერვერს %s:%u ..."
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:154
