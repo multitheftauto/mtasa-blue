@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-25 12:01\n"
+"PO-Revision-Date: 2022-01-25 13:02\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
 "MIME-Version: 1.0\n"
@@ -159,12 +159,12 @@ msgstr "უკავშირდება სერვერს %s:%u ..."
 #: ..\Client\core\CConnectManager.cpp:154
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:584
 msgid "CONNECTING"
-msgstr ""
+msgstr "დაკავშირება"
 
 #: ..\Client\core\CConnectManager.cpp:269
 #: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
 msgid "Connection timed out"
-msgstr ""
+msgstr "კავშირის დრო ამოიწურა"
 
 #: ..\Client\core\CConnectManager.cpp:283
 #: ..\Client\core\CConnectManager.cpp:287
@@ -214,30 +214,30 @@ msgstr "ცუდ სერვერზე პასუხი (2)"
 
 #: ..\Client\core\CConnectManager.cpp:427
 msgid "Bad server response (1)"
-msgstr ""
+msgstr "სერვერი მიუწვდომელია (1)"
 
 #. Create window
 #: ..\Client\core\CConsole.cpp:417
 msgid "CONSOLE"
-msgstr ""
+msgstr "კონსოლი"
 
 #: ..\Client\core\CCore.cpp:727 ..\Client\loader\CInstallManager.cpp:756
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr ""
+msgstr "MTA:SA ვერ გაგრძელდება, რადგან %s დისკზე არ არის საკმარისი სივრცე."
 
 #: ..\Client\core\CCore.cpp:729 ..\Shared\mods\deathmatch\logic\Utils.cpp:102
 msgid "Fatal error"
-msgstr ""
+msgstr "შეცდომა"
 
 #: ..\Client\core\CCore.cpp:855
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "გამოსასწორებლად, წაშალეთ შემდეგი ფაილი:"
 
 #: ..\Client\core\CCore.cpp:887
 #, c-format
 msgid "%s module is incorrect!"
-msgstr ""
+msgstr "%s მოდული არასწორია!"
 
 #: ..\Client\core\CCore.cpp:1200
 msgid "Error executing URL"
@@ -252,11 +252,11 @@ msgstr ""
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: ..\Client\core\CCore.cpp:1297
 msgid "this help screen"
-msgstr ""
+msgstr "ეს დამხმარე გვერდი"
 
 #: ..\Client\core\CCore.cpp:1298 ..\Client\core\CCore.cpp:1299
 msgid "exits the application"
-msgstr ""
+msgstr "თამაშიდან გასვლა"
 
 #: ..\Client\core\CCore.cpp:1300
 msgid "shows the version"
@@ -660,7 +660,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:122
 msgid "Advanced"
-msgstr ""
+msgstr "დამატებითი"
 
 #. Create buttons
 #. OK button
@@ -677,7 +677,7 @@ msgstr ""
 #: ..\Client\core\CVersionUpdater.cpp:2150
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:64 ..\Client\loader\Dialogs.cpp:33
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #. Cancel button
 #: ..\Client\core\CSettings.cpp:131 ..\Client\core\CSettings.cpp:4597
@@ -687,7 +687,7 @@ msgstr ""
 #: ..\Client\gui\CGUIMessageBox_Impl.cpp:68 ..\Client\loader\Dialogs.cpp:36
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:123
 msgid "Cancel"
-msgstr ""
+msgstr "გაუქმება"
 
 #: ..\Client\core\CSettings.cpp:146 ..\Client\core\CSettings.cpp:337
 #: ..\Client\core\CSettings.cpp:599 ..\Client\core\CSettings.cpp:858
@@ -758,7 +758,7 @@ msgstr "მარჯვენა ჯოხი"
 
 #: ..\Client\core\CSettings.cpp:344
 msgid "DESCRIPTION"
-msgstr ""
+msgstr "აღწერა"
 
 #: ..\Client\core\CSettings.cpp:345
 msgid "KEY"
@@ -773,7 +773,7 @@ msgstr ""
 #. *
 #: ..\Client\core\CSettings.cpp:352 ..\Client\core\CSettings.cpp:355
 msgid "Nick:"
-msgstr ""
+msgstr "ნიკნეიმი:"
 
 #: ..\Client\core\CSettings.cpp:365
 msgid "Save server passwords"
@@ -805,7 +805,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:401 ..\Client\core\CSettings.cpp:610
 msgid "Opacity:"
-msgstr ""
+msgstr "გამჭვირვალობა:"
 
 #. *
 #. *  Audio tab
@@ -861,11 +861,11 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:555 ..\Client\core\CSettings.cpp:3005
 msgid "Radio"
-msgstr ""
+msgstr "რადიო"
 
 #: ..\Client\core\CSettings.cpp:556 ..\Client\core\CSettings.cpp:3007
 msgid "Random"
-msgstr ""
+msgstr "შემთხვევითი"
 
 #: ..\Client\core\CSettings.cpp:557 ..\Client\core\CSettings.cpp:3009
 msgid "Sequential"
@@ -966,20 +966,20 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:725 ..\Client\core\CSettings.cpp:1468
 msgid "Low"
-msgstr ""
+msgstr "დაბალი"
 
 #: ..\Client\core\CSettings.cpp:726 ..\Client\core\CSettings.cpp:1470
 msgid "Medium"
-msgstr ""
+msgstr "საშუალო"
 
 #: ..\Client\core\CSettings.cpp:727 ..\Client\core\CSettings.cpp:1041
 #: ..\Client\core\CSettings.cpp:1472 ..\Client\core\CSettings.cpp:3063
 msgid "High"
-msgstr ""
+msgstr "მაღალი"
 
 #: ..\Client\core\CSettings.cpp:728 ..\Client\core\CSettings.cpp:1474
 msgid "Very high"
-msgstr ""
+msgstr "ძალიან მაღალი"
 
 #: ..\Client\core\CSettings.cpp:743 ..\Client\core\CSettings.cpp:766
 #: ..\Client\core\CSettings.cpp:972 ..\Client\core\CSettings.cpp:1026
@@ -987,15 +987,15 @@ msgstr ""
 #: ..\Client\core\CSettings.cpp:3070 ..\Client\core\CSettings.cpp:3102
 #: ..\Client\core\CSettings.cpp:3124 ..\Client\core\CSettings.cpp:4112
 msgid "Off"
-msgstr ""
+msgstr "გამორთ."
 
 #: ..\Client\core\CSettings.cpp:767 ..\Client\core\CSettings.cpp:1480
 msgid "1x"
-msgstr ""
+msgstr "1x"
 
 #: ..\Client\core\CSettings.cpp:768 ..\Client\core\CSettings.cpp:1482
 msgid "2x"
-msgstr ""
+msgstr "2x"
 
 #: ..\Client\core\CSettings.cpp:769 ..\Client\core\CSettings.cpp:1484
 msgid "3x"
@@ -1076,15 +1076,15 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:901
 msgid "Block"
-msgstr ""
+msgstr "დაბლოკვა"
 
 #: ..\Client\core\CSettings.cpp:909 ..\Client\core\CSettings.cpp:937
 msgid "Domain"
-msgstr ""
+msgstr "დომენი"
 
 #: ..\Client\core\CSettings.cpp:911 ..\Client\core\CSettings.cpp:939
 msgid "Remove domain"
-msgstr ""
+msgstr "დომეინის წაშლა"
 
 #. Reset vecTemp
 #: ..\Client\core\CSettings.cpp:917
@@ -1094,7 +1094,7 @@ msgstr ""
 #. Misc section label
 #: ..\Client\core\CSettings.cpp:952
 msgid "Misc"
-msgstr ""
+msgstr "სხვადასხვა"
 
 #. Fast clothes loading
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:965
@@ -1158,11 +1158,11 @@ msgstr ""
 #: ..\Client\core\CSettings.cpp:1014 ..\Client\core\CSettings.cpp:3074
 #: ..\Client\core\CSettings.cpp:3090 ..\Client\core\CSettings.cpp:3097
 msgid "On"
-msgstr ""
+msgstr "ჩართ."
 
 #: ..\Client\core\CSettings.cpp:986 ..\Client\core\CSettings.cpp:3079
 msgid "Very slow"
-msgstr ""
+msgstr "ძალიან ნელი"
 
 #: ..\Client\core\CSettings.cpp:987 ..\Client\core\CSettings.cpp:1000
 #: ..\Client\core\CSettings.cpp:1013 ..\Client\core\CSettings.cpp:1027
@@ -1176,23 +1176,23 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:988 ..\Client\core\CSettings.cpp:3083
 msgid "Fast"
-msgstr ""
+msgstr "სწრაფი"
 
 #: ..\Client\core\CSettings.cpp:1039 ..\Client\core\CSettings.cpp:3059
 msgid "Normal"
-msgstr ""
+msgstr "საშუალო"
 
 #: ..\Client\core\CSettings.cpp:1040 ..\Client\core\CSettings.cpp:3061
 msgid "Above normal"
-msgstr ""
+msgstr "საშუალოზე მაღალი"
 
 #: ..\Client\core\CSettings.cpp:1076
 msgid "Min"
-msgstr ""
+msgstr "მინ."
 
 #: ..\Client\core\CSettings.cpp:1089
 msgid "Max"
-msgstr ""
+msgstr "მაქს."
 
 #. Windows 8 compatibility
 #: ..\Client\core\CSettings.cpp:1096
@@ -1267,11 +1267,11 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:1938
 msgid "Language:"
-msgstr ""
+msgstr "ენა:"
 
 #: ..\Client\core\CSettings.cpp:1938
 msgid "Skin:"
-msgstr ""
+msgstr "სკინი:"
 
 #: ..\Client\core\CSettings.cpp:1938
 msgid "Presets:"
@@ -1295,7 +1295,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2018 ..\Client\core\CSettings.cpp:2264
 msgid "Options"
-msgstr ""
+msgstr "პარამეტრები"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Chat Background"
@@ -1387,7 +1387,7 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:2233
 msgid "Font"
-msgstr ""
+msgstr "ფონტი"
 
 #: ..\Client\core\CSettings.cpp:2270
 msgid "Hide background when not typing"
@@ -1439,27 +1439,27 @@ msgstr ""
 
 #: ..\Client\core\CSettings.cpp:3656
 msgid "Red:"
-msgstr ""
+msgstr "წითელი:"
 
 #: ..\Client\core\CSettings.cpp:3656
 msgid "Green:"
-msgstr ""
+msgstr "მწვანე:"
 
 #: ..\Client\core\CSettings.cpp:3656
 msgid "Blue:"
-msgstr ""
+msgstr "ლურჯი:"
 
 #: ..\Client\core\CSettings.cpp:3656
 msgid "Transparency:"
-msgstr ""
+msgstr "გამჭირვალე:"
 
 #: ..\Client\core\CSettings.cpp:3659
 msgid "Color"
-msgstr ""
+msgstr "ფერი"
 
 #: ..\Client\core\CSettings.cpp:3736
 msgid "Preview"
-msgstr ""
+msgstr "გადახედვა"
 
 #: ..\Client\core\CSettings.cpp:4044
 msgid "Please disconnect before changing language"
