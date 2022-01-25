@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-25 18:39\n"
+"PO-Revision-Date: 2022-01-25 19:38\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
@@ -1159,7 +1159,7 @@ msgstr "Önemli güncellemeleri kur:"
 #: ..\Client\core\CSettings.cpp:1014 ..\Client\core\CSettings.cpp:3074
 #: ..\Client\core\CSettings.cpp:3090 ..\Client\core\CSettings.cpp:3097
 msgid "On"
-msgstr "Devrede"
+msgstr "Açık"
 
 #: ..\Client\core\CSettings.cpp:986 ..\Client\core\CSettings.cpp:3079
 msgid "Very slow"
