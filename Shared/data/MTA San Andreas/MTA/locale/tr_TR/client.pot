@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-25 17:40\n"
+"PO-Revision-Date: 2022-01-25 18:39\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
@@ -272,7 +272,7 @@ msgstr "arayüzü gösterir"
 
 #: ..\Client\core\CCore.cpp:1303
 msgid "shows all the binds"
-msgstr "Bütün tuş atamalarını gösterir"
+msgstr "bütün tuş atamalarını gösterir"
 
 #: ..\Client\core\CCore.cpp:1304
 msgid "shows your serial"
@@ -296,7 +296,7 @@ msgstr "tuş atamasını çıkarır (tuş)"
 
 #: ..\Client\core\CCore.cpp:1317
 msgid "copies the default gta controls"
-msgstr "varsayılan gta kontrolleri kopyalar"
+msgstr "varsayılan gta kontrollerini kopyalar"
 
 #: ..\Client\core\CCore.cpp:1318
 msgid "outputs a screenshot"
@@ -352,7 +352,7 @@ msgstr "Yerelleştirme"
 
 #: ..\Client\core\CCredits.cpp:108
 msgid "Patch contributors"
-msgstr "Aktif katkıda bulunanlar"
+msgstr "Aktif Katkıda Bulunanlar"
 
 #: ..\Client\core\CCredits.cpp:216
 msgid "Special Thanks"
@@ -365,7 +365,7 @@ msgstr "Bu yazılım aşağıdaki kütüphaneleri ve yazılımı kullanır:"
 #. Even the default skin doesn't work, so give up
 #: ..\Client\core\CGUI.cpp:86
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Seçtiğiniz oyuncu tipi yüklenemedi , ayrıca varsayılan tip de yüklenememiştir. Lütfen MTA' yı baştan yükleyiniz."
+msgstr "Seçtiğiniz oyuncu tipi yüklenemedi, ayrıca varsayılan tip de yüklenememiştir. Lütfen MTA' yı yeniden yükleyiniz."
 
 #: ..\Client\core\CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
@@ -432,7 +432,7 @@ msgstr "Koş"
 
 #: ..\Client\core\CKeyBinds.cpp:194
 msgid "Look behind"
-msgstr "Arkaya Bak"
+msgstr "Arkaya bakma"
 
 #: ..\Client\core\CKeyBinds.cpp:195
 msgid "Crouch"
@@ -806,7 +806,7 @@ msgstr "Harita renderlama seçenekleri"
 
 #: ..\Client\core\CSettings.cpp:401 ..\Client\core\CSettings.cpp:610
 msgid "Opacity:"
-msgstr "Matlık:"
+msgstr "Opaklık:"
 
 #. *
 #. *  Audio tab
@@ -850,7 +850,7 @@ msgstr "Radyo ayarları"
 
 #: ..\Client\core\CSettings.cpp:531
 msgid "Radio Equalizer"
-msgstr "Radyo Equalizer"
+msgstr "Radyo Ekolayzer"
 
 #: ..\Client\core\CSettings.cpp:536
 msgid "Radio Auto-tune"
@@ -898,7 +898,7 @@ msgstr "Simge durumuna küçültüldüğünde MTA seslerini sustur"
 
 #: ..\Client\core\CSettings.cpp:593
 msgid "Mute Voice sounds when minimized"
-msgstr "Simge durumuna küçültüldüğünde radyoyu sustur"
+msgstr "Simge durumuna küçültüldüğünde oyuncu mikrofonlarını sustur"
 
 #. *
 #. *  Video tab
@@ -921,7 +921,7 @@ msgstr "Parlaklık:"
 
 #: ..\Client\core\CSettings.cpp:609 ..\Client\core\CSettings.cpp:717
 msgid "FX Quality:"
-msgstr "FX kalitesi"
+msgstr "FX Kalitesi:"
 
 #: ..\Client\core\CSettings.cpp:610 ..\Client\core\CSettings.cpp:731
 msgid "Anisotropic filtering:"
@@ -1057,7 +1057,7 @@ msgstr "Cihaz Seçme Diyaloğunu Aktif Hale Getir"
 
 #: ..\Client\core\CSettings.cpp:843
 msgid "Show unsafe resolutions"
-msgstr "Stabil olmayan çözünürlükleri göster"
+msgstr "Güvenli olmayan çözünürlükleri göster"
 
 #: ..\Client\core\CSettings.cpp:879
 msgid "Enable remote websites"
