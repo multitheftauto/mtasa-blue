@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-08 18:25\n"
+"PO-Revision-Date: 2022-01-25 16:39\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
@@ -142,7 +142,7 @@ msgstr "Hata"
 
 #: ..\Client\core\CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Bağlantı başarısız. girilen sunucu adresi geçersiz!"
+msgstr "Bağlantı başarısız. Girilen sunucu adresi geçersiz!"
 
 #: ..\Client\core\CConnectManager.cpp:132
 #, c-format
