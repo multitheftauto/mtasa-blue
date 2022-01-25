@@ -773,6 +773,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
 
+    // Disable Corona Ztest (Emulates PS2 Effect)
+    MemSet((void*)0x6FB17C, 0x90, 3);
+
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
 
