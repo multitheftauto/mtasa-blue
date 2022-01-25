@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-25 16:39\n"
+"PO-Revision-Date: 2022-01-25 17:40\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
@@ -210,7 +210,7 @@ msgstr "Böyle bir mod yüklü değil (%s)"
 
 #: ..\Client\core\CConnectManager.cpp:417
 msgid "Bad server response (2)"
-msgstr "Sunucudan cevap alınamıyor (2)"
+msgstr "Sunucudan yanıt alınamıyor (2)"
 
 #: ..\Client\core\CConnectManager.cpp:427
 msgid "Bad server response (1)"
@@ -637,7 +637,7 @@ msgstr "Çok Oyunculu"
 
 #: ..\Client\core\CSettings.cpp:116
 msgid "Video"
-msgstr "Video"
+msgstr "Görüntü"
 
 #: ..\Client\core\CSettings.cpp:117
 msgid "Audio"
