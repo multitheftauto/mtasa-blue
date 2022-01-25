@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-09 02:44\n"
+"PO-Revision-Date: 2022-01-25 15:13\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "MIME-Version: 1.0\n"
@@ -747,7 +747,7 @@ msgstr "Saturação"
 
 #: ..\Client\core\CSettings.cpp:284
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Vá à aba 'Teclas' para configurar os botões do teclado."
+msgstr "Use a aba 'Teclas' para configurar os botões do joystick."
 
 #: ..\Client\core\CSettings.cpp:323
 msgid "Left Stick"
