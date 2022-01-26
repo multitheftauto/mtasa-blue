@@ -43,7 +43,9 @@ CGameSA::CGameSA()
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
+    m_bCoronaZTest = true;
     m_iCheckStatus = 0;
+
 
     const unsigned int modelInfoMax = GetCountOfAllFileIDs();
     ModelInfo = new CModelInfoSA[modelInfoMax];
@@ -493,6 +495,9 @@ void CGameSA::Reset()
 
         // Reset the vehicle sun glare effect to default
         CVehicleSA::SetVehiclesSunGlareEnable(false);
+
+        // Reset the corona ztest to sa pc default (Enabled)
+        SetCoronaZTestEnabled(true);
     }
 }
 
@@ -610,6 +615,10 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
         return IsVehicleSunGlareEnabled();
 
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
+        return IsCoronaZTestEnabled();
+ 
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -645,6 +654,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
     if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
     {
         SetVehicleSunGlareEnabled(bEnable);
+        return true;
+    }
+
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
+    {
+        SetCoronaZTestEnabled(bEnable);
         return true;
     }
 
@@ -746,6 +761,29 @@ void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
 bool CGameSA::IsVehicleSunGlareEnabled()
 {
     return CVehicleSA::GetVehiclesSunGlareEnable();
+}
+
+void CGameSA::SetCoronaZTestEnabled(bool bEnabled)
+{
+    if (!bEnabled)
+    {
+        // Disable Ztest (PS2)
+        MemSet((void*)0x6FB17C, 0x90, 3);
+        m_bCoronaZTest = false;
+    }
+    else
+    {
+        // Enable (PC)
+        MemPut<BYTE>(0x6FB17C + 0, 0xFF);
+        MemPut<BYTE>(0x6FB17C + 1, 0x51);
+        MemPut<BYTE>(0x6FB17C + 2, 0x20);
+        m_bCoronaZTest = true;
+    }
+}
+
+bool CGameSA::IsCoronaZTestEnabled()
+{
+    return m_bCoronaZTest;
 }
 
 bool CGameSA::PerformChecks()
