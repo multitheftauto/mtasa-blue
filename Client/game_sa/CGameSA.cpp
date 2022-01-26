@@ -495,9 +495,6 @@ void CGameSA::Reset()
 
         // Reset the vehicle sun glare effect to default
         CVehicleSA::SetVehiclesSunGlareEnable(false);
-
-        // Reset the corona ztest to sa pc default (Enabled)
-        SetCoronaZTestEnabled(true);
     }
 }
 
@@ -679,6 +676,7 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
+    SetCoronaZTestEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
