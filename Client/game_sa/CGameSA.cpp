@@ -490,9 +490,6 @@ void CGameSA::Reset()
 
         // Restore vehicle model wheel sizes
         CModelInfoSA::ResetAllVehiclesWheelSizes();
-
-        // Reset the vehicle sun glare effect to default
-        CVehicleSA::SetVehiclesSunGlareEnable(false);
     }
 }
 
@@ -664,6 +661,7 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
+    CVehicleSA::SetVehiclesSunGlareEnable(false);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
