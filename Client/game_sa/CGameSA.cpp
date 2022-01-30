@@ -492,9 +492,6 @@ void CGameSA::Reset()
 
         // Restore vehicle model wheel sizes
         CModelInfoSA::ResetAllVehiclesWheelSizes();
-
-        // Reset the vehicle sun glare effect to default
-        CVehicleSA::SetVehiclesSunGlareEnable(false);
     }
 }
 
@@ -677,7 +674,8 @@ void CGameSA::ResetCheats()
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
     SetCoronaZTestEnabled(true);
-
+    CVehicleSA::SetVehiclesSunGlareEnabled(false);
+  
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
@@ -753,12 +751,12 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
 void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
 {
     // State turning will be handled in hooks handler
-    CVehicleSA::SetVehiclesSunGlareEnable(bEnabled);
+    CVehicleSA::SetVehiclesSunGlareEnabled(bEnabled);
 }
 
 bool CGameSA::IsVehicleSunGlareEnabled()
 {
-    return CVehicleSA::GetVehiclesSunGlareEnable();
+    return CVehicleSA::GetVehiclesSunGlareEnabled();
 }
 
 void CGameSA::SetCoronaZTestEnabled(bool bEnabled)
