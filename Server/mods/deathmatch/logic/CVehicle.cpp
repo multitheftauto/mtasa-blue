@@ -843,7 +843,7 @@ void CVehicle::GenerateHandlingData()
     if (m_pHandlingEntry == NULL)
         m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
     // Apply the model handling info
-    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetHandlingManager()->GetModelHandlingData(static_cast<eVehicleTypes>(m_usModel)));
+    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetModelManager()->GetVehicleModel(m_usModel)->GetVehicleHandling());
 
     m_bHandlingChanged = false;
 }

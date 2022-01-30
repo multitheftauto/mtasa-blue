@@ -45,9 +45,4 @@ private:
 
     // Array with the original handling entries
     static SFixedArray<CHandlingEntry*, HT_MAX> m_pOriginalEntries;
-
-    // Array with the model handling entries
-    static SFixedArray<CHandlingEntry*, HT_MAX> m_pModelEntries;
-
-    SFixedArray<bool, HT_MAX> m_bModelHandlingChanged;
 };

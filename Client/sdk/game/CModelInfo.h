@@ -31,7 +31,8 @@ public:
 
 enum class eModelInfoType : unsigned char
 {
-    ATOMIC = 1,
+    INVALID = 0,
+    OBJECT = 1,
     TIME = 3,
     WEAPON = 4,
     CLUMP = 5,

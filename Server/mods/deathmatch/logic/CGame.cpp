@@ -141,6 +141,8 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pBuildingRemovalManager = NULL;
     m_pCustomWeaponManager = NULL;
     m_pFunctionUseLogger = NULL;
+    m_pModelLoader = NULL;
+    m_pModelManager = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
 #endif
@@ -328,6 +330,8 @@ CGame::~CGame()
     SAFE_DELETE(m_pMasterServerAnnouncer);
     SAFE_DELETE(m_pASE);
     SAFE_RELEASE(m_pHqComms);
+    SAFE_DELETE(m_pModelLoader);
+    SAFE_DELETE(m_pModelManager)
     CSimControl::Shutdown();
 
     // Clear our global pointer
@@ -532,6 +536,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pCustomWeaponManager = new CCustomWeaponManager();
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
+
+    m_pModelManager = new CModelManager();
+    m_pModelLoader = new CModelLoader();
+    m_pModelLoader->loadDefaultData();
 
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))

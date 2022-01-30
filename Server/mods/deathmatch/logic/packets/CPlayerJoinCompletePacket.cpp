@@ -116,5 +116,19 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
             break;
     }
 
+    std::list<CModelBase*> listSimpleAllocatedModels = g_pGame->GetModelManager()->GetSimpleAllocatedModels();
+
+    if (BitStream.Can(eBitStreamVersion::SimpleModelAllocationg))
+    {
+        uint32_t uiModelsCount = listSimpleAllocatedModels.size();
+        BitStream.Write(uiModelsCount);
+
+        for (auto model : listSimpleAllocatedModels)
+        {
+            BitStream.Write(model->GetModelID());
+            BitStream.Write(model->GetParentModel());
+        }
+    }
+
     return true;
 }

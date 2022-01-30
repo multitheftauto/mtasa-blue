@@ -83,7 +83,7 @@ std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
     return nullptr;
 }
 
-std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(eClientModelType type, const unsigned int minModelID)
+std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(eModelInfoType type, const unsigned int minModelID)
 {
     std::vector<std::shared_ptr<CClientModel>> found;
     found.reserve(m_modelCount);
@@ -108,4 +108,20 @@ void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResour
         if (m_Models[i] != nullptr && m_Models[i]->GetParentResource() == pResource)
             Remove(m_Models[i]);
     }
+}
+
+void CClientModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModelID)
+{
+    eModelInfoType eModelType = g_pGame->GetModelInfo(uiParentModelID)->GetModelType();
+
+    std::shared_ptr<CClientModel> pModel = FindModelByID(uiNewModelID);
+    if (pModel == nullptr)
+        pModel = std::make_shared<CClientModel>(g_pClientGame->GetManager(), uiNewModelID, eModelType);
+
+    Add(pModel);
+
+    if (pModel->Allocate(uiParentModelID))
+        return;
+
+    assert("Can not allocateModel");
 }

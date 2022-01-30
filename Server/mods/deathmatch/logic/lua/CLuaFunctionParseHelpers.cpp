@@ -277,6 +277,19 @@ ADD_ENUM(ESyncType::LOCAL, "local")
 ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
 IMPLEMENT_ENUM_CLASS_END("sync-mode")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eModelInfoType)
+ADD_ENUM(eModelInfoType::INVALID, "invalid")
+ADD_ENUM(eModelInfoType::ATOMIC, "atomic")
+ADD_ENUM(eModelInfoType::UNKNOWN, "unknown")
+ADD_ENUM(eModelInfoType::TIME, "time")
+ADD_ENUM(eModelInfoType::WEAPON, "weapon")
+ADD_ENUM(eModelInfoType::CLUMP, "clump")
+ADD_ENUM(eModelInfoType::VEHICLE, "vehicle")
+ADD_ENUM(eModelInfoType::PED, "ped")
+ADD_ENUM(eModelInfoType::LOD_ATOMIC, "lod-atomic")
+IMPLEMENT_ENUM_CLASS_END("model-info-type")
+
+
 //
 // Get best guess at name of userdata type
 //

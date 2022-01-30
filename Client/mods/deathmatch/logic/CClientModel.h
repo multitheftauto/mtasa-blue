@@ -14,13 +14,6 @@ class CClientModel;
 
 #include <list>
 
-enum class eClientModelType
-{
-    PED,
-    OBJECT,
-    VEHICLE,
-};
-
 class CResource;
 class CClientManager;
 
@@ -29,11 +22,11 @@ class CClientModel final
     friend class CClientModelManager;
 
 public:
-    CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType);
+    CClientModel(CClientManager* pManager, int iModelID, eModelInfoType eModelType);
     ~CClientModel(void);
 
     int              GetModelID(void) const { return m_iModelID; };
-    eClientModelType GetModelType(void) const { return m_eModelType; };
+    eModelInfoType   GetModelType(void) const { return m_eModelType; };
     bool             Allocate(ushort usParentID);
     bool             Deallocate(void);
     void             RestoreEntitiesUsingThisModel();
@@ -44,7 +37,7 @@ protected:
     CClientManager* m_pManager;
 
     int              m_iModelID;
-    eClientModelType m_eModelType;
+    eModelInfoType   m_eModelType;
     bool             m_bAllocatedByUs = false;
     CResource*       m_pParentResource = nullptr;            // Resource that allocated model
 };

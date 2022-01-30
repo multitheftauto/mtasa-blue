@@ -661,10 +661,10 @@ ADD_ENUM(SURFACE_ADHESION_GROUP_SAND, "sand")
 ADD_ENUM(SURFACE_ADHESION_GROUP_WET, "wet")
 IMPLEMENT_ENUM_END("surface-adhesion-group")
 
-IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
-ADD_ENUM(eClientModelType::PED, "ped")
-ADD_ENUM(eClientModelType::OBJECT, "object")
-ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
+IMPLEMENT_ENUM_CLASS_BEGIN(eModelInfoType)
+ADD_ENUM(eModelInfoType::PED, "ped")
+ADD_ENUM(eModelInfoType::OBJECT, "object")
+ADD_ENUM(eModelInfoType::VEHICLE, "vehicle")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects

@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType)
+CClientModel::CClientModel(CClientManager* pManager, int iModelID, eModelInfoType eModelType)
 {
     m_pManager = pManager;
     m_iModelID = iModelID;
@@ -40,17 +40,17 @@ bool CClientModel::Allocate(ushort usParentID)
 
     switch (m_eModelType)
     {
-        case eClientModelType::PED:
+        case eModelInfoType::PED:
             pModelInfo->MakePedModel("PSYCHO");
             return true;
-        case eClientModelType::OBJECT:
+        case eModelInfoType::OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeObjectModel(usParentID);
                 return true;
             }
             break;
-        case eClientModelType::VEHICLE:
+        case eModelInfoType::VEHICLE:
             if (g_pClientGame->GetVehicleManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeVehicleAutomobile(usParentID);
@@ -99,7 +99,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
     switch (m_eModelType)
     {
-        case eClientModelType::PED:
+        case eModelInfoType::PED:
         {
             // If some ped is using this ID, change him to CJ
             CClientPedManager* pPedManager = g_pClientGame->GetManager()->GetPedManager();
@@ -107,7 +107,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
             break;
         }
-        case eClientModelType::OBJECT:
+        case eModelInfoType::OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
             unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
@@ -123,7 +123,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
             break;
         }
-        case eClientModelType::VEHICLE:
+        case eModelInfoType::VEHICLE:
         {
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
             unsigned short         usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();

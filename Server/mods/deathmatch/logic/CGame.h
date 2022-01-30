@@ -105,6 +105,8 @@ class CWaterManager;
 class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
+class CModelManager;
+class CModelLoader;
 
 class CCustomWeaponManager;
 class COpenPortsTester;
@@ -252,6 +254,8 @@ public:
     CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
     CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
+    CModelManager*                   GetModelManager() { return m_pModelManager; }
+    CModelLoader*                    GetModelLoader() { return m_pModelLoader; }
 
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
@@ -556,6 +560,8 @@ private:
     CRPCFunctions*             m_pRPCFunctions;
     CLanBroadcast*             m_pLanBroadcast;
     CWaterManager*             m_pWaterManager;
+    CModelManager*             m_pModelManager;
+    CModelLoader*              m_pModelLoader;
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;

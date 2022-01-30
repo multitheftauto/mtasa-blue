@@ -65,7 +65,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
-DECLARE_ENUM_CLASS(eClientModelType);
+DECLARE_ENUM_CLASS(eModelInfoType);
 DECLARE_ENUM(eSoundEffectType);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Chorus);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Compressor);

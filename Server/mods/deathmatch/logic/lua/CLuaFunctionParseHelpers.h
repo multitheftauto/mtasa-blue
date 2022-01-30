@@ -10,6 +10,7 @@
 #pragma once
 #include "CElementIDs.h"
 #include "CConsoleClient.h"
+#include "models/CModelBase.h"
 
 // Forward declare enum reflection stuff
 enum eLuaType
@@ -28,6 +29,7 @@ DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 DECLARE_ENUM_CLASS(ESyncType);
+DECLARE_ENUM_CLASS(eModelInfoType);
 
 enum eHudComponent
 {

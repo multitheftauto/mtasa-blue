@@ -1242,7 +1242,7 @@ void CModelInfoSA::SetCustomModel(RpClump* pClump)
                 return pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
             case eModelInfoType::VEHICLE:
                 return pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case eModelInfoType::ATOMIC:
+            case eModelInfoType::OBJECT:
             case eModelInfoType::LOD_ATOMIC:
             case eModelInfoType::TIME:
                 return pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
@@ -1518,7 +1518,7 @@ void CModelInfoSA::DeallocateModel(void)
         case eModelInfoType::PED:
             delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
-        case eModelInfoType::ATOMIC:
+        case eModelInfoType::OBJECT:
             delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         default:

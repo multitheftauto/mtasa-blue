@@ -147,6 +147,7 @@ struct SAclRequest;
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWaterDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
+#include "luadefs/CLuaModelDefs.h"
 
 // Lua includes
 #include "lua/LuaCommon.h"
@@ -301,6 +302,14 @@ struct SAclRequest;
 #include "logic/CBuildingRemovalManager.h"
 
 #include "CStaticFunctionDefinitions.h"
+
+// Serverside model includes
+#include "models/CModelBase.h"
+#include "models/CModelAtomic.h"
+#include "models/CModelVehicle.h"
+#include "models/CModelManager.h"
+#include "models/CModelLoader.h"
+#include "models/CModelVehicle.h"
 
 // Utility includes
 #include "utils/CZipMaker.h"

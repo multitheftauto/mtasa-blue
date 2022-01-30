@@ -184,6 +184,7 @@ void CLuaManager::LoadCFunctions()
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
     CLuaGenericDefs::LoadFunctions();
+    CLuaModelDefs::LoadFunctions();
     // Backward compatibility functions at the end, so the new function name is used in ACL
     CLuaCompatibilityDefs::LoadFunctions();
 }

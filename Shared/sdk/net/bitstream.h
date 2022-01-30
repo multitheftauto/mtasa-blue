@@ -473,6 +473,10 @@ enum class eBitStreamVersion : unsigned short
     // 2021-08-30 0x75
     OnPlayerResourceStart,
 
+    // Implement simple serverside model allocating
+    // yyyy-mm-dd 0xFF add date later ;-)
+    SimpleModelAllocationg,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

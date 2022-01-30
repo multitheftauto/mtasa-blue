@@ -14,7 +14,6 @@
 SFixedArray<tHandlingData, HT_MAX> CHandlingManager::m_OriginalHandlingData;
 
 SFixedArray<CHandlingEntry*, HT_MAX> CHandlingManager::m_pOriginalEntries;
-SFixedArray<CHandlingEntry*, HT_MAX> CHandlingManager::m_pModelEntries;
 
 CHandlingManager::CHandlingManager()
 {
@@ -25,13 +24,6 @@ CHandlingManager::CHandlingManager()
     for (int i = 0; i < HT_MAX; i++)
     {
         m_pOriginalEntries[i] = new CHandlingEntry(&m_OriginalHandlingData[i]);
-    }
-
-    // Create a handling entry for every model
-    for (int i = 0; i < HT_MAX; i++)
-    {
-        m_pModelEntries[i] = new CHandlingEntry(&m_OriginalHandlingData[i]);
-        m_bModelHandlingChanged[i] = false;
     }
 
     // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
@@ -80,12 +72,6 @@ CHandlingManager::~CHandlingManager()
     {
         delete m_pOriginalEntries[i];
     }
-
-    // Destroy all model handling entries
-    for (int i = 0; i < HT_MAX; i++)
-    {
-        delete m_pModelEntries[i];
-    }
 }
 
 CHandlingEntry* CHandlingManager::CreateHandlingData()
@@ -96,18 +82,8 @@ CHandlingEntry* CHandlingManager::CreateHandlingData()
 
 bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry)
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Apply the data and return success
-        m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
-        return true;
-    }
-
-    // Failed
-    return false;
+    g_pGame->GetModelManager()->GetVehicleModel(eModel)->GetVehicleHandling()->ApplyHandlingData(pEntry);
+    return true;
 }
 
 const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eModel)
@@ -126,16 +102,7 @@ const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eM
 
 const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eModel)
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return it
-        return m_pModelEntries[eHandling];
-    }
-
-    return NULL;
+    return g_pGame->GetModelManager()->GetVehicleModel(eModel)->GetVehicleHandling();
 }
 
 eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
@@ -153,23 +120,12 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
 
 bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return if we have changed
-        return m_bModelHandlingChanged[eHandling];
-    }
-    return false;
+    return g_pGame->GetModelManager()->GetVehicleModel(eModel)->HasVehicleHandlingChanged();
 }
 
 void CHandlingManager::SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged)
 {
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Return if we have changed.
-    m_bModelHandlingChanged[eHandling] = bChanged;
+    g_pGame->GetModelManager()->GetVehicleModel(eModel)->SetVehicleHandlingChanged(bChanged);
 }
 
 // Return the handling manager id

@@ -409,6 +409,19 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
         bitStream.ReadString(strExternalHTTPDownloadURL);
     }
 
+    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocationg))
+    {
+        uint32_t modelsCount = 0;
+        bitStream.Read(modelsCount);
+        for (int i = 0; i < modelsCount; i++)
+        {
+            uint32_t usModelID, usParentID;
+            bitStream.Read(usModelID);
+            bitStream.Read(usParentID);
+            g_pClientGame->GetManager()->GetModelManager()->AllocateModelFromParent(usModelID, usParentID);
+        }
+    }
+
     //
     // Add servers to use
     //
@@ -3186,17 +3199,27 @@ retry:
                     bitStream.Read(&rotationDegrees);
 
                     // Read out the vehicle value as a char, then convert
-                    unsigned char ucModel = 0xFF;
-                    bitStream.Read(ucModel);
+                    unsigned short usModel = 0xFFFF;
 
-                    // The server appears to subtract 400 from the vehicle id before
-                    // sending it to us, as to allow the value to fit into an unsigned
-                    // char.
-                    //
-                    // Too bad this was never documented.
-                    //
-                    // --slush
-                    unsigned short usModel = ucModel + 400;
+                    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocationg))
+                    {
+                        bitStream.Read(usModel);
+                    }
+                    else
+                    {
+                        // The server appears to subtract 400 from the vehicle id before
+                        // sending it to us, as to allow the value to fit into an unsigned
+                        // char.
+                        //
+                        // Too bad this was never documented.
+                        //
+                        // --slush
+                        unsigned char ucModel = 0xFF;
+
+                        bitStream.Read(ucModel);
+                        unsigned short usModel = ucModel + 400;
+                    }
+
                     if (!CClientVehicleManager::IsValidModel(usModel))
                     {
                         RaiseEntityAddError(39);
