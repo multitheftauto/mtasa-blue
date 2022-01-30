@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-30 17:45\n"
+"PO-Revision-Date: 2022-01-30 18:45\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
@@ -1580,7 +1580,7 @@ msgstr "Otomatik güncelleyici:"
 
 #: ..\Client\core\CSettings.cpp:4630
 msgid "Select default unless you like filling out bug reports."
-msgstr "Eğer hata raporu doldurmayı sevmiyorsanız varsayılanı seçiniz."
+msgstr "Eğer hata raporu doldurmayı sevmiyorsanız varsayılanı seçin."
 
 #: ..\Client\core\CSettings.cpp:4632
 msgid "Select default to automatically install important updates."
@@ -1699,7 +1699,7 @@ msgstr "KAYIT HATASI"
 #: ..\Client\core\CVersionUpdater.cpp:1935
 #: ..\Client\core\CVersionUpdater.cpp:2117
 msgid "Unable to create the file."
-msgstr "Dosya oluşturulamadı."
+msgstr "Dosya oluşturulamıyor."
 
 #: ..\Client\core\CVersionUpdater.cpp:1943
 #: ..\Client\core\CVersionUpdater.cpp:1952
@@ -1716,7 +1716,7 @@ msgstr "İndirilen dosya bozuk gibi gözüküyor."
 #: ..\Client\core\CVersionUpdater.cpp:1953
 #: ..\Client\core\CVersionUpdater.cpp:2135
 msgid "For some reason."
-msgstr "Nedense."
+msgstr "Bazı sebeplerden dolayı."
 
 #: ..\Client\core\CVersionUpdater.cpp:1964
 #: ..\Client\core\CVersionUpdater.cpp:2148
@@ -1808,7 +1808,7 @@ msgid "FOR QUICK CONNECT:\n\n"
 "Or select a server from the history list and press 'Connect'"
 msgstr "HIZLI BAĞLANTI İÇİN:\n\n"
 "Adresi ve portu adres çubuğuna yazın.\n"
-"Veya geçmiş listesinden bir sunucu seçim 'Bağlan'a basın."
+"Veya geçmiş listesinden bir sunucu seçin ve 'Bağlan'a basın"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:203
 msgid "HELP"
@@ -2350,7 +2350,7 @@ msgstr "Dosyalar kopyalanıyor..."
 
 #: ..\Client\loader\Dialogs.cpp:746 ..\Client\loader\Utils.cpp:1665
 msgid "Copy finished early. Everything OK."
-msgstr "Kopyalama işlemi erken bitti. Herşey yolunda."
+msgstr "Kopyalama işlemi erken bitti. Her şey yolunda."
 
 #: ..\Client\loader\Dialogs.cpp:751 ..\Client\loader\Utils.cpp:1671
 msgid "Finishing..."
@@ -2514,7 +2514,7 @@ msgstr "'MTA:SA' veya 'GTA: San Andreas' klasörlerinde .asi uzantılı dosyalar
 
 #: ..\Client\loader\MainFunctions.cpp:933
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Dosya sürümü uyumsuzluk hatası. Bir problemle karşılaşırsanız MTA:SA tekrar kurun.\n"
+msgstr "Dosya sürümü uyumsuzluk hatası. Bir problemle karşılaşırsanız MTA:SA'yı tekrar kurun.\n"
 
 #: ..\Client\loader\MainFunctions.cpp:942
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -2539,7 +2539,7 @@ msgstr "Yükseltme gerektiren hatayı düzelt"
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr "Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz, yada sorun devam ederse, lütfen www.multitheftauto.com adresinden MTA ile iletişime geçiniz. \n\n"
+msgstr "Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz, ya da sorun devam ederse, lütfen www.multitheftauto.com adresinden MTA ile iletişime geçiniz. \n\n"
 "[%s]"
 
 #: ..\Client\loader\MainFunctions.cpp:1204
@@ -2599,7 +2599,7 @@ msgstr "Lütfen devam etmeden önce şu programları sonlandırınız:"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:36
 msgid "This version has expired."
-msgstr "bu versiyon zaman aşımına uğradı"
+msgstr "Bu versiyon zaman aşımına uğradı."
 
 #: ..\Client\mods\deathmatch\CClient.cpp:56
 msgid "disconnect from the game"
@@ -2632,7 +2632,7 @@ msgstr "bir araca yolcu olarak biner"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:66
 msgid "next radio channel"
-msgstr "sonraki radio kanalı"
+msgstr "sonraki radyo kanalı"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:67
 msgid "previous radio channel"
@@ -2846,7 +2846,7 @@ msgstr "Bağlantı kesildi: Sürüm uyumsuzluğu"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Bağlantı kesildi: Giriş trafiği. Lütfen bir dakika bekleyin, ve tekrar bağlanın."
+msgstr "Bağlantı kesildi: Giriş trafiği. Lütfen bir dakika bekleyin, ardından tekrar bağlanın."
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
 #, c-format
@@ -2878,7 +2878,7 @@ msgstr "Bağlantı kesildi: Sunucu daha eski bir versiyonda çalışıyor.\n"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
-msgstr "Bağlantı kesildi: Takma ad zaten kullanılıyor"
+msgstr "Bağlantı kesildi: Nick zaten kullanılıyor"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
