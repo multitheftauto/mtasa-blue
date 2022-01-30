@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-25 19:38\n"
+"PO-Revision-Date: 2022-01-30 17:45\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
@@ -1189,11 +1189,11 @@ msgstr "Normal üstü"
 
 #: ..\Client\core\CSettings.cpp:1076
 msgid "Min"
-msgstr "En az"
+msgstr "Min"
 
 #: ..\Client\core\CSettings.cpp:1089
 msgid "Max"
-msgstr "En fazla"
+msgstr "Maks"
 
 #. Windows 8 compatibility
 #: ..\Client\core\CSettings.cpp:1096
@@ -1235,7 +1235,7 @@ msgstr "Bazı ayarlar MTA'yı bir sonraki başlattığınızda değişmiş olaca
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
-"Şimdi yeniden başlatmak ister misiniz?"
+"Şimdi yeniden başlatmak istiyor musun?"
 
 #: ..\Client\core\CSettings.cpp:1337
 msgid "RESTART REQUIRED"
@@ -1302,7 +1302,7 @@ msgstr "Seçenekler"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Chat Background"
-msgstr "Konuşma Arkaplanı"
+msgstr "Sohbet Arka Planı"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Chat Text"
@@ -1310,7 +1310,7 @@ msgstr "Sohbet Yazısı"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Input Background"
-msgstr "Giriş Arkaplanı"
+msgstr "Giriş Arka planı"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Input Text"
@@ -1410,7 +1410,7 @@ msgstr "Balon bildirimlerine izin ver"
 
 #: ..\Client\core\CSettings.cpp:2290
 msgid "Chat text black/white outline"
-msgstr "Chat mesajlarına siyah çerçeve ekle"
+msgstr "Chat mesajlarına siyah/beyaz çerçeve ekle"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -1462,7 +1462,7 @@ msgstr "Renk"
 
 #: ..\Client\core\CSettings.cpp:3736
 msgid "Preview"
-msgstr "Önizleme"
+msgstr "Ön izleme"
 
 #: ..\Client\core\CSettings.cpp:4044
 msgid "Please disconnect before changing language"
@@ -1523,7 +1523,7 @@ msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr "DPI Hassasiyetini aktif etmek, deneysel bir özellik ve sadece\n"
+msgstr "DPI hassasiyetini aktif etmek, deneysel bir özellik ve sadece\n"
 "MTA:SA'yı ölçekli bir monitörde oynadığınızda tavsiye ediyoruz.\n"
 "Aksi taktirde bazı grafiksel problemlerle karşılaşabilirsiniz.\n\n"
 "Bu özelliği aktif etmek istiyor musunuz?"
