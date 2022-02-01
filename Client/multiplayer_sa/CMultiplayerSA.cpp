@@ -1687,6 +1687,12 @@ void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
     }
 }
 
+void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color)
+{
+    dwPass0Color = *(DWORD*)0x7036ED;
+    dwPass1Color = *(DWORD*)0x70373E;
+}
+
 void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
                         bool bAllowAutoTypeChange)
 {
