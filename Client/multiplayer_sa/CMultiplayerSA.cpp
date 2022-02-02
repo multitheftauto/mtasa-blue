@@ -1704,22 +1704,6 @@ void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color)
     }
 }
 
-void CMultiplayerSA::GetMemory(uint8_t* data, uint32_t size, uint32_t pos)
-{
-    for (int i = 0; i < size; i++)
-    {
-        data[i] = *((unsigned char*)((uintptr_t)pos)+i);
-    }
-}
-
-void CMultiplayerSA::SetMemory(uint8_t* data, uint32_t size, uint32_t pos)
-{
-    for (uint32_t i = 0; i < size; i++)
-    {
-        MemPut<uint8_t>(pos + i, data[i]);
-    }
-}
-
 void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
                         bool bAllowAutoTypeChange)
 {
