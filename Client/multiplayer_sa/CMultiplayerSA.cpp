@@ -1689,8 +1689,35 @@ void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
 
 void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color)
 {
-    dwPass0Color = *(DWORD*)0x7036ED;
-    dwPass1Color = *(DWORD*)0x70373E;
+    // GTASA PC has 2 color filter, one of them is static color filter, and another one is blended by time cycle
+    bool bUseTimeCycle = *(BYTE*)0x7036EC == 0xC1;
+    if (bUseTimeCycle){
+        SColorRGBA pass0SColor(*(float*)0xB7C518, *(float*)0xB7C51C, *(float*)0xB7C520, *(float*)0xB7C524);
+        SColorRGBA pass1SColor(*(float*)0xB7C528, *(float*)0xB7C52C, *(float*)0xB7C530, *(float*)0xB7C534);
+        dwPass0Color = pass0SColor.ulARGB;
+        dwPass1Color = pass1SColor.ulARGB;
+    }
+    else
+    {
+        dwPass0Color = *(DWORD*)0x7036ED;
+        dwPass1Color = *(DWORD*)0x70373E;
+    }
+}
+
+void CMultiplayerSA::GetMemory(uint8_t* data, uint32_t size, uint32_t pos)
+{
+    for (int i = 0; i < size; i++)
+    {
+        data[i] = *((unsigned char*)((uintptr_t)pos)+i);
+    }
+}
+
+void CMultiplayerSA::SetMemory(uint8_t* data, uint32_t size, uint32_t pos)
+{
+    for (uint32_t i = 0; i < size; i++)
+    {
+        MemPut<uint8_t>(pos + i, data[i]);
+    }
 }
 
 void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int iHourEnd, float fFadeSpeed, float fInsideBuildingFadeSpeed,
