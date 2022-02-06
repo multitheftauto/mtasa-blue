@@ -85,6 +85,8 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
+#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
+
 
 struct SCheatSA
 {
@@ -390,6 +392,9 @@ public:
 
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
+
+    void SetVehicleSunGlareEnabled(bool bEnabled);
+    bool IsVehicleSunGlareEnabled();
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
