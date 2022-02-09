@@ -265,8 +265,6 @@ public:
     virtual void  SetWaterColor(float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha) = 0;
     virtual void  ResetWater() = 0;
     virtual void  SetCloudsEnabled(bool bDisabled) = 0;
-    virtual void  SetCoronaReflectionsEnabled(unsigned char ucEnabled) = 0;
-    virtual unsigned char GetCoronaReflectionsEnabled() = 0;
     virtual bool  GetInteriorSoundsEnabled() = 0;
     virtual void  SetInteriorSoundsEnabled(bool bEnabled) = 0;
     virtual bool  GetInteriorFurnitureEnabled(char cRoomId) = 0;

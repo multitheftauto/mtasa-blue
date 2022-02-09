@@ -2000,13 +2000,13 @@ bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)
         return false;
 
     g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(true);
-    g_pMultiplayer->SetCoronaReflectionsEnabled(ucEnabled);
+    g_pGame->GetCoronas()->SetCoronaReflectionsEnabled(ucEnabled);
     return true;
 }
 
 uchar CLuaWorldDefs::GetCoronaReflectionsEnabled()
 {
-    return g_pMultiplayer->GetCoronaReflectionsEnabled();
+    return g_pGame->GetCoronas()->GetCoronaReflectionsEnabled();
 }
 
 bool CLuaWorldDefs::ResetCoronaReflectionsEnabled()

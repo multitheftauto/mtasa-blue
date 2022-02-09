@@ -714,7 +714,7 @@ void CSettingsSA::ResetCoronaReflectionsEnabled()
 
     bool bEnabled;
     g_pCore->GetCVars()->Get("corona_reflections", bEnabled);
-    g_pCore->GetMultiplayer()->SetCoronaReflectionsEnabled(bEnabled ? 1 : 0);
+    g_pCore->GetGame()->GetCoronas()->SetCoronaReflectionsEnabled(bEnabled ? 1 : 0);
 }
 
 void CSettingsSA::SetCoronaReflectionsControlledByScript(bool bViaScript)
