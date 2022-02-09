@@ -44,17 +44,18 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSize", "getMarkerSize");
     lua_classfunction(luaVM, "getTarget", OOP_GetMarkerTarget);
     lua_classfunction(luaVM, "getColor", "getMarkerColor");
+    lua_classfunction(luaVM, "isCoronaReflectionEnabled", "isCoronaReflectionEnabled");
 
     lua_classfunction(luaVM, "setType", "setMarkerType");
     lua_classfunction(luaVM, "setIcon", "setMarkerIcon");
     lua_classfunction(luaVM, "setSize", "setMarkerSize");
     lua_classfunction(luaVM, "setTarget", "setMarkerTarget");
     lua_classfunction(luaVM, "setColor", "setMarkerColor");
+    lua_classfunction(luaVM, "setCoronaReflectionEnabled", "setCoronaReflectionEnabled");
 
     lua_classvariable(luaVM, "markerType", "setMarkerType", "getMarkerType");
     lua_classvariable(luaVM, "icon", "setMarkerIcon", "getMarkerIcon");
     lua_classvariable(luaVM, "size", "setMarkerSize", "getMarkerSize");
-    lua_classvariable(luaVM, "coronaReflectionEnabled", "setCoronaReflectionEnabled", "isCoronaReflectionEnabled");
 
     lua_classvariable(luaVM, "target", SetMarkerTarget, OOP_GetMarkerTarget);
 
