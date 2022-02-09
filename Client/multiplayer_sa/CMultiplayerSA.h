@@ -161,8 +161,6 @@ public:
     void  GetWaterColor(float& fWaterRed, float& fWaterGreen, float& fWaterBlue, float& fWaterAlpha);
     void  SetWaterColor(float fWaterRed, float fWaterGreen, float fWaterBlue, float fWaterAlpha);
     void  ResetWater();
-    void  SetCoronaReflectionsEnabled(unsigned char ucEnabled);
-    unsigned char GetCoronaReflectionsEnabled();
     void  SetCloudsEnabled(bool bDisabled);
     void  RebuildMultiplayerPlayer(CPed* player);
     bool  GetInteriorSoundsEnabled();
@@ -320,7 +318,6 @@ private:
     eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
-    unsigned char       m_ucCoronaReflectionsEnabled;
 
     /*  VOID                        SetPlayerShotVectors(CPlayerPed* player, Vector3D * vecTarget, Vector3D * vecStart);
         VOID                        SetPlayerCameraVectors(CPlayerPed* player, Vector3D * vecSource, Vector3D * vecFront);
