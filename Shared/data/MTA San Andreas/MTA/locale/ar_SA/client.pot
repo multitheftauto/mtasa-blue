@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-15 19:33\n"
+"PO-Revision-Date: 2022-02-11 20:27\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -48,7 +48,7 @@ msgstr "***[ مساعدة في الآوامر ]***\n"
 #: ..\Client\core\CCommandFuncs.cpp:167
 #, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "‫‪‫* الوقت الآن %d:%02d:%02d"
+msgstr "* الوقت الآن %d:%02d:%02d"
 
 #: ..\Client\core\CCommandFuncs.cpp:251
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
@@ -497,7 +497,7 @@ msgstr "بوق السيارة"
 
 #: ..\Client\core\CKeyBinds.cpp:210
 msgid "Sub-mission"
-msgstr "مهمة فرعية‏"
+msgstr "مهمة فرعية"
 
 #: ..\Client\core\CKeyBinds.cpp:211
 msgid "Handbrake"
