@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-02-11 20:27\n"
+"PO-Revision-Date: 2022-02-11 21:29\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -633,7 +633,7 @@ msgstr "الإعدادات"
 
 #: ..\Client\core\CSettings.cpp:115
 msgid "Multiplayer"
-msgstr "‪لعب جماعي"
+msgstr "لعب جماعي"
 
 #: ..\Client\core\CSettings.cpp:116
 msgid "Video"
@@ -1235,7 +1235,7 @@ msgstr "ستتغير بعض الإعدادات عند إعادة تشغيل MTA 
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
-"هل تريد إعادة التشغيل الآن؟‫"
+"هل تريد إعادة التشغيل الآن؟"
 
 #: ..\Client\core\CSettings.cpp:1337
 msgid "RESTART REQUIRED"
