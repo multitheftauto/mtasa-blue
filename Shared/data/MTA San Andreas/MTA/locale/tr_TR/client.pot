@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-30 18:45\n"
+"PO-Revision-Date: 2022-02-11 20:27\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
@@ -66,7 +66,7 @@ msgstr "bağlantı: %s:%u...'e bağlanılıyor..."
 #: ..\Client\core\CCommandFuncs.cpp:285 ..\Client\core\CCommandFuncs.cpp:346
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "Bağlantı:  %s:%u'e bağlanılamadı!"
+msgstr "bağlantı: %s:%u adresine bağlanılamadı!"
 
 #: ..\Client\core\CCommandFuncs.cpp:290
 msgid "connect: Failed to unload current mod"
