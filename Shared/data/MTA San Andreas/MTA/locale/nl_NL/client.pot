@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-02-11 19:27\n"
+"PO-Revision-Date: 2022-02-11 20:27\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -1119,7 +1119,7 @@ msgstr "Enkelvoudige verbinding:"
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:1006
 #: ..\Client\core\CSettings.cpp:4622
 msgid "Packet tag:"
-msgstr "Packet tag:"
+msgstr "Pakket tag:"
 
 #. Progress animation
 #: ..\Client\core\CSettings.cpp:959 ..\Client\core\CSettings.cpp:1019
