@@ -52,6 +52,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleNameFromModel", GetVehicleNameFromModel},
         {"getVehicleAdjustableProperty", GetVehicleAdjustableProperty},
         {"getHelicopterRotorSpeed", GetHelicopterRotorSpeed},
+        {"getPlaneRotorSpeed", GetPlaneRotorSpeed},
         {"getVehicleEngineState", GetVehicleEngineState},
         {"isTrainDerailed", IsTrainDerailed},
         {"isTrainDerailable", IsTrainDerailable},
@@ -116,6 +117,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleFrozen", SetVehicleFrozen},
         {"setVehicleAdjustableProperty", SetVehicleAdjustableProperty},
         {"setHelicopterRotorSpeed", SetHelicopterRotorSpeed},
+        {"setPlaneRotorSpeed", SetPlaneRotorSpeed},
         {"setTrainDerailed", SetTrainDerailed},
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
@@ -1291,6 +1293,28 @@ int CLuaVehicleDefs::GetHelicopterRotorSpeed(lua_State* luaVM)
     return 1;
 }
 
+int CLuaVehicleDefs::GetPlaneRotorSpeed(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        float fSpeed;
+        if (CStaticFunctionDefinitions::GetPlaneRotorSpeed(*pVehicle, fSpeed))
+        {
+            lua_pushnumber(luaVM, fSpeed);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaVehicleDefs::IsTrainDerailed(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
@@ -2190,6 +2214,29 @@ int CLuaVehicleDefs::SetHelicopterRotorSpeed(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetHelicopterRotorSpeed(*pVehicle, fSpeed))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::SetPlaneRotorSpeed(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = NULL;
+    float            fSpeed = 0.0f;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadNumber(fSpeed);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetPlaneRotorSpeed(*pVehicle, fSpeed))
         {
             lua_pushboolean(luaVM, true);
             return 1;

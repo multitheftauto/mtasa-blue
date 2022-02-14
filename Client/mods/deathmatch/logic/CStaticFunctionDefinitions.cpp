@@ -2674,6 +2674,18 @@ bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed(CClientVehicle& Vehicle
     return false;
 }
 
+bool CStaticFunctionDefinitions::GetPlaneRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
+{
+    // It's a plane?
+    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE)
+    {
+        fSpeed = Vehicle.GetPlaneRotorSpeed();
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::IsVehicleDamageProof(CClientVehicle& Vehicle, bool& bDamageProof)
 {
     bDamageProof = !Vehicle.GetScriptCanBeDamaged();
@@ -3316,6 +3328,17 @@ bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed(CClientVehicle& Vehicle
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPlaneRotorSpeed(CClientVehicle& Vehicle, float fSpeed)
+{
+    // It's a plane?
+    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE)
+    {
+        Vehicle.SetPlaneRotorSpeed(fSpeed);
+        return true;
+    }
+
+    return false;
+}
 bool CStaticFunctionDefinitions::SetTrainDerailed(CClientVehicle& Vehicle, bool bDerailed)
 {
     if (Vehicle.GetVehicleType() != CLIENTVEHICLE_TRAIN)

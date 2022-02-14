@@ -292,6 +292,9 @@ public:
     float GetHeliRotorSpeed();
     void  SetHeliRotorSpeed(float fSpeed);
 
+    float GetPlaneRotorSpeed();
+    void  SetPlaneRotorSpeed(float fSpeed);
+
     bool IsHeliSearchLightVisible();
     void SetHeliSearchLightVisible(bool bVisible);
 
@@ -638,6 +641,7 @@ protected:
     bool                                   m_bIsOnGround;
     bool                                   m_bHeliSearchLightVisible;
     float                                  m_fHeliRotorSpeed;
+    float                                  m_fPlaneRotorSpeed;
     const CHandlingEntry*                  m_pOriginalHandlingEntry = nullptr;
     CHandlingEntry*                        m_pHandlingEntry = nullptr;
     const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry = nullptr;
