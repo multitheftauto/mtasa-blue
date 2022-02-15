@@ -2674,10 +2674,15 @@ bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed(CClientVehicle& Vehicle
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetPlaneRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
+bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
 {
-    // It's a plane?
-    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE)
+    // It's a plane or heli?
+    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI)
+    {
+        fSpeed = Vehicle.GetHeliRotorSpeed();
+        return true;
+    }
+    else if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE)
     {
         fSpeed = Vehicle.GetPlaneRotorSpeed();
         return true;
@@ -3328,15 +3333,19 @@ bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed(CClientVehicle& Vehicle
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPlaneRotorSpeed(CClientVehicle& Vehicle, float fSpeed)
+bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CClientVehicle& Vehicle, float fSpeed)
 {
-    // It's a plane?
-    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE)
+    // It's a plane or heli?
+
+    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI)
     {
+        Vehicle.SetHeliRotorSpeed(fSpeed);
+        return true;
+    }
+    else if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE) {
         Vehicle.SetPlaneRotorSpeed(fSpeed);
         return true;
     }
-
     return false;
 }
 bool CStaticFunctionDefinitions::SetTrainDerailed(CClientVehicle& Vehicle, bool bDerailed)

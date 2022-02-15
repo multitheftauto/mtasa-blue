@@ -202,7 +202,7 @@ public:
     static bool            GetVehicleUpgradeSlotName(unsigned short usUpgrade, SString& strOutName);
     static bool            GetVehicleNameFromModel(unsigned short usModel, SString& strOutName);
     static bool            GetHelicopterRotorSpeed(CClientVehicle& Vehicle, float& fSpeed);
-    static bool            GetPlaneRotorSpeed(CClientVehicle& Vehicle, float& fSpeed);
+    static bool            GetVehicleRotorSpeed(CClientVehicle& Vehicle, float& fSpeed);
     static bool            GetVehicleEngineState(CClientVehicle& Vehicle, bool& bState);
     static bool            IsVehicleDamageProof(CClientVehicle& Vehicle, bool& bDamageProof);
     static bool            IsTrainDerailed(CClientVehicle& Vehicle, bool& bDerailed);
@@ -254,7 +254,7 @@ public:
     static bool SetVehicleFrozen(CClientEntity& Entity, bool bFrozen);
     static bool SetVehicleAdjustableProperty(CClientEntity& Entity, unsigned short usAdjustableProperty);
     static bool SetHelicopterRotorSpeed(CClientVehicle& Vehicle, float fSpeed);
-    static bool SetPlaneRotorSpeed(CClientVehicle& Vehicle, float fSpeed);
+    static bool SetVehicleRotorSpeed(CClientVehicle& Vehicle, float fSpeed);
     static bool SetTrainDerailed(CClientVehicle& Vehicle, bool bDerailed);
     static bool SetTrainDerailable(CClientVehicle& Vehicle, bool bDerailable);
     static bool SetTrainDirection(CClientVehicle& Vehicle, bool bDirection);
