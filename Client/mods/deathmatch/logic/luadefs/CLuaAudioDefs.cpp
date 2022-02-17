@@ -1402,6 +1402,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
     argStream.ReadUserData(pSound);
     argStream.ReadEnumString(eEffectType);
 
+    // Hard error on usage mistake
     if (argStream.HasErrors()) {
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
@@ -1419,15 +1420,14 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
             return 1;
         }
 
-        // Unsuccessful, log error
-        return luaL_error(luaVM, "BASS Error %i, after setting parameter %s::%s. (Message: %s)",
+        // Unsuccessful, log error. (Hard error on usage mistakes)
+        return luaL_error(luaVM, "BASS Error %i, after setting parameter %s -> %s. (Message: %s)",
             CBassAudio::ErrorGetCode(),
-            CBassAudio::ErrorGetMessage(),
             EnumToString(eEffectType).c_str(),
-            EnumToString(effectParam).c_str()
+            EnumToString(effectParam).c_str(),
+            CBassAudio::ErrorGetMessage()
         );
     };
-
 
     using namespace eSoundEffectParams;
     switch (eEffectType)

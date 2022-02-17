@@ -237,7 +237,7 @@ bool CBassAudio::BeginLoadingMedia()
     return true;
 }
 
-std::string_view CBassAudio::ErrorGetMessage() {
+const char* CBassAudio::ErrorGetMessage() {
     // As BASS has no function to retrieve the error messages we must do it manually
     // So this should be kept updated
     // Error messages copied directly from BASS
@@ -328,9 +328,8 @@ std::string_view CBassAudio::ErrorGetMessage() {
     // End of possible BASS error codes
     // If this label is reache that means there's a
     // new error code that has to be added here
-    default: {
+    default:
         return "Unknown error - `CBassAudio::ErrorGetMessage` should be updated to return a message for it!";
-    }
     }
 }
 

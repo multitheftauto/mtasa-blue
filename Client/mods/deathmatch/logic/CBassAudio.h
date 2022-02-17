@@ -95,8 +95,10 @@ public:
     void   SetSoundBPM(float fBPM) { m_fBPM = fBPM; }
 
     // Bass audio helpers
-    std::string_view ErrorGetMessage();
-    int              ErrorGetCode();
+    // For now these AREN'T PER SOUND ERRORS, so they always refer to the last modified sound.
+    // One day we could store errors for each sound separtely.
+    static const char* ErrorGetMessage();
+    static int         ErrorGetCode();
 
 protected:
     HSTREAM             ConvertFileToMono(const SString& strPath);
