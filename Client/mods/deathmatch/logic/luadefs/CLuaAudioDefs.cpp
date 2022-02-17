@@ -1421,12 +1421,23 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
         }
 
         // Unsuccessful, log error. (Hard error on usage mistakes)
-        return luaL_error(luaVM, "BASS Error %i, after setting parameter %s -> %s. (Message: %s)",
+        // `luaL_error` with a format string straight out crashes, so we have to do it this way..
+        const SString msg("BASS Error %i, after setting parameter %s -> %s. (Message: %s)",
             CBassAudio::ErrorGetCode(),
             EnumToString(eEffectType).c_str(),
             EnumToString(effectParam).c_str(),
             CBassAudio::ErrorGetMessage()
         );
+
+        // Do not use `luaL_error` here and pass in `msg` as the format string,
+        // user could inject paramters into the format string, and that would be bad :D
+        // The below code is based on the code from `luaL_error`
+        luaL_where(luaVM, 1);
+        lua::Push(luaVM, msg);
+        lua_concat(luaVM, 2);
+        lua_error(luaVM);
+
+        return 1;
     };
 
     using namespace eSoundEffectParams;
