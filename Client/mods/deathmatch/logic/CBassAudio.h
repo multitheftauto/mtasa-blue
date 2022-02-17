@@ -94,6 +94,10 @@ public:
     float  GetSoundBPM();
     void   SetSoundBPM(float fBPM) { m_fBPM = fBPM; }
 
+    // Bass audio helpers
+    std::string_view ErrorGetMessage();
+    int              ErrorGetCode();
+
 protected:
     HSTREAM             ConvertFileToMono(const SString& strPath);
     static DWORD WINAPI PlayStreamIntern(LPVOID argument);
