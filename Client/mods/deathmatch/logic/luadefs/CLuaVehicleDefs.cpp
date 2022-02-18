@@ -52,7 +52,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleNameFromModel", GetVehicleNameFromModel},
         {"getVehicleAdjustableProperty", GetVehicleAdjustableProperty},
         {"getHelicopterRotorSpeed", GetHelicopterRotorSpeed},
-        {"getVehicleRotorSpeed", GetVehicleRotorSpeed},
+        {"getVehicleRotorSpeed", ArgumentParser<GetVehicleRotorSpeed>},
         {"getVehicleEngineState", GetVehicleEngineState},
         {"isTrainDerailed", IsTrainDerailed},
         {"isTrainDerailable", IsTrainDerailable},
@@ -117,7 +117,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleFrozen", SetVehicleFrozen},
         {"setVehicleAdjustableProperty", SetVehicleAdjustableProperty},
         {"setHelicopterRotorSpeed", SetHelicopterRotorSpeed},
-        {"setVehicleRotorSpeed", SetVehicleRotorSpeed},
+        {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
         {"setTrainDerailed", SetTrainDerailed},
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
@@ -1293,26 +1293,12 @@ int CLuaVehicleDefs::GetHelicopterRotorSpeed(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::GetVehicleRotorSpeed(lua_State* luaVM)
+std::variant<bool,float> CLuaVehicleDefs::GetVehicleRotorSpeed(CClientVehicle* const vehicle)
 {
-    CClientVehicle*  pVehicle = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (!argStream.HasErrors())
-    {
-        float fSpeed;
-        if (CStaticFunctionDefinitions::GetVehicleRotorSpeed(*pVehicle, fSpeed))
-        {
-            lua_pushnumber(luaVM, fSpeed);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    float fSpeed = 0;
+    if (!CStaticFunctionDefinitions::GetVehicleRotorSpeed(*vehicle, fSpeed))
+        return false;
+    return fSpeed;
 }
 
 int CLuaVehicleDefs::IsTrainDerailed(lua_State* luaVM)
@@ -2226,27 +2212,11 @@ int CLuaVehicleDefs::SetHelicopterRotorSpeed(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::SetVehicleRotorSpeed(lua_State* luaVM)
+bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed)
 {
-    CClientVehicle*  pVehicle = NULL;
-    float            fSpeed = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-    argStream.ReadNumber(fSpeed);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetVehicleRotorSpeed(*pVehicle, fSpeed))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (!CStaticFunctionDefinitions::SetVehicleRotorSpeed(*pVehicle, fSpeed))
+        return false;
+    return true;
 }
 
 int CLuaVehicleDefs::SetTrainDerailed(lua_State* luaVM)

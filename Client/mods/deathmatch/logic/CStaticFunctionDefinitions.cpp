@@ -2677,18 +2677,25 @@ bool CStaticFunctionDefinitions::GetHelicopterRotorSpeed(CClientVehicle& Vehicle
 bool CStaticFunctionDefinitions::GetVehicleRotorSpeed(CClientVehicle& Vehicle, float& fSpeed)
 {
     // It's a plane or heli?
-    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI)
+    switch (Vehicle.GetVehicleType())
     {
-        fSpeed = Vehicle.GetHeliRotorSpeed();
-        return true;
-    }
-    else if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE)
-    {
-        fSpeed = Vehicle.GetPlaneRotorSpeed();
-        return true;
+        case CLIENTVEHICLE_PLANE:
+        {
+            fSpeed = Vehicle.GetPlaneRotorSpeed();
+            break;
+        }
+        case CLIENTVEHICLE_HELI:
+        {
+            fSpeed = Vehicle.GetHeliRotorSpeed();
+            break;
+        }
+        default:
+        {
+            return false;
+        }
     }
 
-    return false;
+    return true;
 }
 
 bool CStaticFunctionDefinitions::IsVehicleDamageProof(CClientVehicle& Vehicle, bool& bDamageProof)
@@ -3336,17 +3343,25 @@ bool CStaticFunctionDefinitions::SetHelicopterRotorSpeed(CClientVehicle& Vehicle
 bool CStaticFunctionDefinitions::SetVehicleRotorSpeed(CClientVehicle& Vehicle, float fSpeed)
 {
     // It's a plane or heli?
-
-    if (Vehicle.GetVehicleType() == CLIENTVEHICLE_HELI)
+    switch (Vehicle.GetVehicleType())
     {
-        Vehicle.SetHeliRotorSpeed(fSpeed);
-        return true;
+        case CLIENTVEHICLE_HELI:
+        {
+            Vehicle.SetHeliRotorSpeed(fSpeed);
+            break;
+        }
+        case CLIENTVEHICLE_PLANE:
+        {
+            Vehicle.SetPlaneRotorSpeed(fSpeed);
+            break;
+        }
+        default:
+        {
+            return false;
+        }
     }
-    else if (Vehicle.GetVehicleType() == CLIENTVEHICLE_PLANE) {
-        Vehicle.SetPlaneRotorSpeed(fSpeed);
-        return true;
-    }
-    return false;
+  
+    return true;
 }
 bool CStaticFunctionDefinitions::SetTrainDerailed(CClientVehicle& Vehicle, bool bDerailed)
 {

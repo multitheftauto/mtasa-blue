@@ -59,7 +59,8 @@ public:
     LUA_DECLARE(GetVehicleNameFromModel);
     LUA_DECLARE(GetVehicleAdjustableProperty);
     LUA_DECLARE(GetHelicopterRotorSpeed);
-    LUA_DECLARE(GetVehicleRotorSpeed);
+    //LUA_DECLARE(GetVehicleRotorSpeed); use new parser instead
+    static std::variant<bool,float> GetVehicleRotorSpeed(CClientVehicle* const pVehicle);
     LUA_DECLARE(GetVehicleEngineState);
     LUA_DECLARE(IsTrainDerailed);
     LUA_DECLARE(IsTrainDerailable);
@@ -118,7 +119,8 @@ public:
     LUA_DECLARE(SetVehicleFrozen);
     LUA_DECLARE(SetVehicleAdjustableProperty);
     LUA_DECLARE(SetHelicopterRotorSpeed);
-    LUA_DECLARE(SetVehicleRotorSpeed);
+    //LUA_DECLARE(SetVehicleRotorSpeed);
+    static bool SetVehicleRotorSpeed(CClientVehicle* pVehicle,float fSpeed);
     LUA_DECLARE(SetTrainDerailed);
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
@@ -161,6 +163,7 @@ public:
                                                                                                 const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
+
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
