@@ -1293,11 +1293,28 @@ int CLuaVehicleDefs::GetHelicopterRotorSpeed(lua_State* luaVM)
     return 1;
 }
 
-std::variant<bool,float> CLuaVehicleDefs::GetVehicleRotorSpeed(CClientVehicle* const vehicle)
+std::variant<bool,float> CLuaVehicleDefs::GetVehicleRotorSpeed(CClientVehicle* pVehicle)
 {
     float fSpeed = 0;
-    if (!CStaticFunctionDefinitions::GetVehicleRotorSpeed(*vehicle, fSpeed))
-        return false;
+    // It's a plane or heli?
+    switch (pVehicle->GetVehicleType())
+    {
+        case CLIENTVEHICLE_PLANE:
+        {
+            fSpeed = pVehicle->GetPlaneRotorSpeed();
+            break;
+        }
+        case CLIENTVEHICLE_HELI:
+        {
+            fSpeed = pVehicle->GetHeliRotorSpeed();
+            break;
+        }
+        default:
+        {
+            return false;
+        }
+    }
+
     return fSpeed;
 }
 
@@ -2214,8 +2231,25 @@ int CLuaVehicleDefs::SetHelicopterRotorSpeed(lua_State* luaVM)
 
 bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed)
 {
-    if (!CStaticFunctionDefinitions::SetVehicleRotorSpeed(*pVehicle, fSpeed))
-        return false;
+    // It's a plane or heli?
+    switch (pVehicle->GetVehicleType())
+    {
+        case CLIENTVEHICLE_HELI:
+        {
+            pVehicle->SetHeliRotorSpeed(fSpeed);
+            break;
+        }
+        case CLIENTVEHICLE_PLANE:
+        {
+            pVehicle->SetPlaneRotorSpeed(fSpeed);
+            break;
+        }
+        default:
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 
