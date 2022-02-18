@@ -1,0 +1,34 @@
+name: 'Rebuild en_US pot files'
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  rebuild-pots:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 2
+      - run: python "utils/localization/build_gettext_catalog.py"
+      - run: python "utils/localization/build_gettext_catalog_nsi.py"
+      - run: |
+          git config user.name "Pot Bot"
+          git config user.email "github@multitheftauto.com"
+          git add "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot" && git commit -m "Update client en_US pot" -m "[ci skip]"
+          git add "Shared/installer/locale/en_US.pot" && git commit -m "Update installer en_US pot" -m "[ci skip]"
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          body: |
+            It's that time again. I've rebuilt the English pot files.
+
+            Please review and merge these changes at your convenience.
+          branch: l10n/update-pots
+          delete-branch: true
+          labels: |
+            localization
+          title: Update pot files

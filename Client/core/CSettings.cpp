@@ -2678,7 +2678,7 @@ void CSettings::Initialize()
             if (controlBind->control != pControl)
                 continue;
 
-            if (!numMatches) // Primary key
+            if (!numMatches)            // Primary key
             {
                 // Add bind to the list
                 iBind = m_pBindsList->InsertRowAfter(iRowGame);
@@ -2690,7 +2690,7 @@ void CSettings::Initialize()
                 m_pBindsList->SetItemData(iBind, m_hPriKey, controlBind);
                 iGameRowCount++;
             }
-            else // Secondary key
+            else            // Secondary key
             {
                 for (size_t k = 0; k < SecKeyNum; k++)
                 {

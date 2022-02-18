@@ -13,7 +13,7 @@
 
 #include "MTAPlatform.h"
 #ifndef WIN32
-// Linux allocation tracking doesn't work in this module for some reason
+    // Linux allocation tracking doesn't work in this module for some reason
     #define WITH_ALLOC_TRACKING 0
 #endif
 #include "SharedUtil.h"

@@ -1151,7 +1151,7 @@ protected:
     void InternalReadPairKeyValue(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
     {
         lua_pushnil(m_luaVM);
-        
+
         while (lua_next(m_luaVM, iIndex) != 0)
         {
             std::pair<SString, SString> keyValue;
