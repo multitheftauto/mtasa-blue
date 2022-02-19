@@ -779,6 +779,11 @@ public:
     static void SetVehiclesSunGlareEnabled(bool bEnabled);
     static bool GetVehiclesSunGlareEnabled();
 
+    // From <https://github.com/Updated-Classic/gta-reversed-modern/blob/master/source/game_sa/Entity/Vehicle/Vehicle.h>
+
+    CPlane* AsPlane() { return reinterpret_cast<CPlane*>(this); }
+    //CHeli*  AsHeli() { return reinterpret_cast<CHeli*>(this); }
+
 private:
     static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
 

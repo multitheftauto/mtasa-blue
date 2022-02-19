@@ -8,7 +8,6 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-class CPlaneSA;
 #pragma once
 
 #include <game/CPlane.h>
@@ -101,4 +100,5 @@ public:
     //static_cast<CAutomobileSAInterface*>(GetInterface()) +
     CPlaneSA(CPlaneSAInterface* plane);
     CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CPlaneSAInterface* GetPlaneInterface() { return (CPlaneSAInterface*)m_pInterface; }
 };
