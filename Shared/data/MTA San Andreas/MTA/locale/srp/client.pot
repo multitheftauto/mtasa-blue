@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-08 21:04\n"
+"PO-Revision-Date: 2022-02-19 14:06\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "MIME-Version: 1.0\n"
@@ -2259,35 +2259,35 @@ msgstr "Pokušaj svaku opciju i vidi koja radi:"
 
 #: ..\Client\loader\Dialogs.cpp:80
 msgid "A - Standard NVidia"
-msgstr ""
+msgstr "A - Standard NVidia"
 
 #: ..\Client\loader\Dialogs.cpp:81
 msgid "B - Alternate NVidia"
-msgstr ""
+msgstr "B - Alternate NVidia"
 
 #: ..\Client\loader\Dialogs.cpp:82
 msgid "C - Standard NVidia with exe rename"
-msgstr ""
+msgstr "C - Standard NVidia with exe rename"
 
 #: ..\Client\loader\Dialogs.cpp:83
 msgid "D - Alternate NVidia with exe rename"
-msgstr ""
+msgstr "D - Alternate NVidia with exe rename"
 
 #: ..\Client\loader\Dialogs.cpp:84
 msgid "E - Standard Intel"
-msgstr ""
+msgstr "E - Standard Intel"
 
 #: ..\Client\loader\Dialogs.cpp:85
 msgid "F - Alternate Intel"
-msgstr ""
+msgstr "F - Alternate Intel"
 
 #: ..\Client\loader\Dialogs.cpp:86
 msgid "G - Standard Intel with exe rename"
-msgstr ""
+msgstr "G - Standard Intel with exe rename"
 
 #: ..\Client\loader\Dialogs.cpp:87
 msgid "H - Alternate Intel with exe rename"
-msgstr ""
+msgstr "H - Alternate Intel with exe rename"
 
 #: ..\Client\loader\Dialogs.cpp:88
 msgid "If you get desperate, this might help:"
