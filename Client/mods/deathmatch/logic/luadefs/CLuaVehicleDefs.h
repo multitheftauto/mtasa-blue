@@ -59,8 +59,7 @@ public:
     LUA_DECLARE(GetVehicleNameFromModel);
     LUA_DECLARE(GetVehicleAdjustableProperty);
     LUA_DECLARE(GetHelicopterRotorSpeed);
-    //LUA_DECLARE(GetVehicleRotorSpeed); use new parser instead
-    static std::variant<bool,float> GetVehicleRotorSpeed(CClientVehicle* pVehicle);
+    static std::variant<bool, float> GetVehicleRotorSpeed(CClientVehicle* pVehicle);
     LUA_DECLARE(GetVehicleEngineState);
     LUA_DECLARE(IsTrainDerailed);
     LUA_DECLARE(IsTrainDerailable);
