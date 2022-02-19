@@ -47,6 +47,7 @@ enum eDoorLock : int32_t
 class CPed;
 class CObject;
 class CColModel;
+class CPlane;
 
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST 6
@@ -341,4 +342,8 @@ public:
     virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;
 
     virtual const CVector* GetDummyPositions() const = 0;
+    virtual CPlane*        AsPlane() = 0;
+    //virtual CHeli*  AsHeli() { return reinterpret_cast<CHeli*>(this); }
+
+
 };

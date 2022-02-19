@@ -2249,7 +2249,6 @@ bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpee
             return false;
         }
     }
-
     return true;
 }
 

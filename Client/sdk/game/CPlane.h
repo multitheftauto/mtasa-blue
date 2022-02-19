@@ -17,4 +17,5 @@ class CPlane : public virtual CVehicle
 {
 public:
     virtual ~CPlane(){};
+    virtual class CPlaneSAInterface* GetPlaneInterface() = 0;
 };

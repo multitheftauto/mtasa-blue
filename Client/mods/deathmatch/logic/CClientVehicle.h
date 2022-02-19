@@ -10,6 +10,7 @@
 
 struct CClientVehicleProperties;
 class CClientVehicle;
+class CPlaneSAInterface;
 
 #pragma once
 

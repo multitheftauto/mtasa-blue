@@ -1563,6 +1563,9 @@ void CClientVehicle::SetPlaneRotorSpeed(float fSpeed)
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
         m_pVehicle->SetPlaneRotorSpeed(fSpeed);
 
+    //m_pVehicle->AsPlane()->GetPlaneInterface()->m_fPropSpeed = 0;
+    CPlaneSAInterface* plane = m_pVehicle->AsPlane()->GetPlaneInterface();
+ 
     m_fHeliRotorSpeed = fSpeed;
 }
 
