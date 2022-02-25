@@ -1538,6 +1538,9 @@ void CMultiplayerSA::InitHooks()
     for (auto uiAddr : shadowAddr)
         MemPut(uiAddr, &m_fShadowsOffset);
 
+    // Skip check for disabled HUD
+    MemSet((void*)0x58FBC4, 0x90, 9);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
