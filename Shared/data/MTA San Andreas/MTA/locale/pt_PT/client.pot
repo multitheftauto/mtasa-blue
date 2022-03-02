@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-01-08 21:05\n"
+"PO-Revision-Date: 2022-03-02 22:28\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "MIME-Version: 1.0\n"
@@ -2456,18 +2456,21 @@ msgstr "Algo está em falta no Registry do Windows. Por favor, reinstalei Multi 
 
 #: ..\Client\loader\MainFunctions.cpp:629
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr ""
+msgstr "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 
 #: ..\Client\loader\MainFunctions.cpp:639
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
-msgstr ""
+msgstr "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
 
 #: ..\Client\loader\MainFunctions.cpp:779
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr ""
+msgstr "Load failed. Please ensure that the latest data files have been installed correctly."
 
 #: ..\Client\loader\MainFunctions.cpp:788
 #, c-format
