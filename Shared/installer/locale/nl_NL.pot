@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-21 17:13\n"
-"PO-Revision-Date: 2022-01-08 18:31\n"
+"PO-Revision-Date: 2022-03-05 22:36\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -397,5 +397,5 @@ msgstr "Controleren op installatie update informatie..."
 #. NETTEST_STATUS2
 #: ../Shared/installer/nightly.nsi:2309
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "Check of je firewall het niet blokkeert"
 
