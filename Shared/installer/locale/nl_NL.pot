@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-21 17:13\n"
-"PO-Revision-Date: 2022-03-05 22:36\n"
+"PO-Revision-Date: 2022-03-05 23:36\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -256,7 +256,9 @@ msgstr "Ben je zeker dat je $(^Name) en alle bijhorende onderdelen volledig wens
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
-msgstr ""
+msgstr "Verwijderen voor update?$\\r$\n"
+"Het is niet nodig om de installatie ongedaan te maken voordat u een nieuwe versie van MTA:SA$\\r$\n"
+"Voer het nieuwe installatieprogramma uit om te upgraden en uw instellingen te behouden."
 
 #. UNINST_DATA_REQUEST
 #: ../Shared/installer/nightly.nsi:1034
@@ -300,7 +302,10 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
-msgstr ""
+msgstr "MTA kan niet worden geïnstalleerd in dezelfde map als GTA:SA.$\n"
+"$\n"
+"Wilt u de standaard installatiemap $ . gebruiken\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: ../Shared/installer/nightly.nsi:1739
