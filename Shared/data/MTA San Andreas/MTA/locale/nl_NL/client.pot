@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-08 17:25+0200\n"
-"PO-Revision-Date: 2022-03-05 22:36\n"
+"PO-Revision-Date: 2022-03-05 23:36\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "MIME-Version: 1.0\n"
@@ -1752,7 +1752,7 @@ msgstr "\n\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3399
 msgid "We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n"
-msgstr ""
+msgstr "We hebben je update voorkeuren teruggezet naar de standaardinstellingen. Wijzig je instellingen opnieuw als je nachtelijke updates wilt. Dit zou alles moeten terugzetten.\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3400
 msgid "VERSION UPDATE INFORMATION"
@@ -2224,7 +2224,7 @@ msgstr "Dit bestand is niet nodig en kan mogelijks de grafische functies van MTA
 
 #: ..\Client\loader\Dialogs.cpp:67
 msgid "Use this d3d9.dll, but also show this warning on next start"
-msgstr ""
+msgstr "Gebruik deze d3d9.dll, maar toon ook deze waarschuwing bij de volgende start"
 
 #: ..\Client\loader\Dialogs.cpp:68
 msgid "Do not tell me about this d3d9.dll again"
@@ -2292,7 +2292,7 @@ msgstr "Als u wanhopig wordt, dit helpt mogelijks:"
 
 #: ..\Client\loader\Dialogs.cpp:89
 msgid "If you have already selected an option that works, this might help:"
-msgstr ""
+msgstr "Als je al een optie hebt geselecteerd die werkt, kan dit helpen:"
 
 #: ..\Client\loader\Dialogs.cpp:90
 msgid "Force windowed mode"
