@@ -5023,3 +5023,31 @@ void CClientVehicle::ResetWheelScale()
 
     m_bWheelScaleChanged = false;
 }
+
+void CClientVehicle::GetEntryPoint(CVector& entryPoint, int entryPointIndex)
+{
+    unsigned int saDoorIndex = 0;
+
+    switch (entryPointIndex)
+    {
+        case 0:
+            saDoorIndex = 10;
+            break;
+        case 1:
+            saDoorIndex = 8;
+            break;
+        case 2:
+            saDoorIndex = 11;
+            break;
+        case 3:
+            saDoorIndex = 9;
+            break;
+    }
+
+    if (saDoorIndex != 0)
+    {
+        CVehicle* gameVehicle = GetGameVehicle();
+
+        g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(entryPoint, gameVehicle, saDoorIndex);
+    }
+}

@@ -151,6 +151,9 @@ public:
     static std::variant<bool, CVector>                              OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
     static bool                                                     ResetVehicleDummyPositions(CClientVehicle* vehicle);
 
+    static std::variant<bool, std::vector<std::array<float, 3>>>    GetVehicleEntryPoints(CClientVehicle* vehicle);
+    static std::variant<bool, std::vector<CVector>>                 OOP_GetVehicleEntryPoints(CClientVehicle* vehicle);
+
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
 
