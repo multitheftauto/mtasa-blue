@@ -5,7 +5,7 @@
 /*    Mac FOND support.  Written by just@letterror.com.                    */
 /*  Heavily Fixed by mpsuzuki, George Williams and Sean McBride            */
 /*                                                                         */
-/*  Copyright (C) 1996-2020 by                                             */
+/*  Copyright (C) 1996-2021 by                                             */
 /*  Just van Rossum, David Turner, Robert Wilhelm, and Werner Lemberg.     */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -447,7 +447,7 @@ typedef short ResourceIndex;
 
     stream->descriptor.pointer = NULL;
     stream->size               = 0;
-    stream->base               = 0;
+    stream->base               = NULL;
   }
 
 
@@ -939,7 +939,7 @@ typedef short ResourceIndex;
     if ( lwfn_file_name[0] )
     {
       err = lookup_lwfn_by_fond( pathname, lwfn_file_name,
-                                 buff, sizeof ( buff )  );
+                                 buff, sizeof ( buff ) );
       if ( !err )
         have_lwfn = 1;
     }
@@ -1011,7 +1011,7 @@ typedef short ResourceIndex;
       old_total_size = total_size;
     }
 
-    if ( FT_ALLOC( buffer, (FT_Long)total_size ) )
+    if ( FT_QALLOC( buffer, (FT_Long)total_size ) )
       goto Error;
 
     /* Second pass: append all POST data to the buffer, add PFB fields. */
@@ -1127,7 +1127,7 @@ typedef short ResourceIndex;
       return FT_THROW( Invalid_Handle );
 
     sfnt_size = (FT_ULong)GetHandleSize( sfnt );
-    if ( FT_ALLOC( sfnt_data, (FT_Long)sfnt_size ) )
+    if ( FT_QALLOC( sfnt_data, (FT_Long)sfnt_size ) )
     {
       ReleaseResource( sfnt );
       return error;

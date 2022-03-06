@@ -154,7 +154,7 @@ void CResourceFileDownloadManager::DoPulse()
     // Call Lua event 'onClientTransferBoxProgressChange'
     CLuaArguments arguments;
     arguments.PushNumber(uiDownloadedSizeTotal);
-    arguments.PushNumber(GetTransferBox()->GetDownloadTotalSize());
+    arguments.PushNumber(static_cast<double>(GetTransferBox()->GetDownloadTotalSize()));
 
     g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxProgressChange", arguments, false);
 

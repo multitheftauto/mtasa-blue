@@ -1,6 +1,6 @@
 /*
 	BASS 2.4 C/C++ header file
-	Copyright (c) 1999-2021 Un4seen Developments Ltd.
+	Copyright (c) 1999-2022 Un4seen Developments Ltd.
 
 	See the BASS.CHM file for more detailed documentation
 */
@@ -88,7 +88,7 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_ERROR_FREQ		25	// illegal sample rate
 #define BASS_ERROR_NOTFILE	27	// the stream is not a file stream
 #define BASS_ERROR_NOHW		29	// no hardware voices available
-#define BASS_ERROR_EMPTY	31	// the MOD music has no sequence data
+#define BASS_ERROR_EMPTY	31	// the file has no sample data
 #define BASS_ERROR_NONET	32	// no internet connection could be opened
 #define BASS_ERROR_CREATE	33	// couldn't create the file
 #define BASS_ERROR_NOFX		34	// effects are not available
@@ -104,6 +104,7 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_ERROR_BUSY		46	// the device is busy
 #define BASS_ERROR_UNSTREAMABLE	47	// unstreamable file
 #define BASS_ERROR_PROTOCOL	48	// unsupported protocol
+#define BASS_ERROR_DENIED	49	// access denied
 #define BASS_ERROR_UNKNOWN	-1	// some other mystery problem
 
 // BASS_SetConfig options
@@ -158,9 +159,9 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_CONFIG_REC_WASAPI		66
 #define BASS_CONFIG_ANDROID_AAUDIO	67
 #define BASS_CONFIG_SAMPLE_ONEHANDLE	69
-#define BASS_CONFIG_DEV_TIMEOUT		70
 #define BASS_CONFIG_NET_META		71
 #define BASS_CONFIG_NET_RESTRATE	72
+#define BASS_CONFIG_REC_DEFAULT		73
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
@@ -176,6 +177,10 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_IOS_SESSION_AMBIENT	4
 #define BASS_IOS_SESSION_SPEAKER	8
 #define BASS_IOS_SESSION_DISABLE	16
+#define BASS_IOS_SESSION_DEACTIVATE	32
+#define BASS_IOS_SESSION_AIRPLAY	64
+#define BASS_IOS_SESSION_BTHFP		128
+#define BASS_IOS_SESSION_BTA2DP		0x100
 
 // BASS_Init flags
 #define BASS_DEVICE_8BITS		1		// unused

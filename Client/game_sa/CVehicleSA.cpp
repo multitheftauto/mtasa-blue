@@ -16,6 +16,30 @@ bool            g_bVehiclePointerInvalid = false;
 
 #include "gamesa_renderware.h"
 
+static BOOL m_bVehicleSunGlare = false;
+_declspec(naked) void DoVehicleSunGlare(void* this_)
+{
+    _asm {
+        mov eax, FUNC_CVehicle_DoSunGlare
+        jmp eax
+    }
+}
+
+void _declspec(naked) HOOK_Vehicle_PreRender(void)
+{
+    _asm {
+        mov	ecx, m_bVehicleSunGlare
+		cmp	ecx, 0
+		jle	noglare
+		mov	ecx, esi
+		call DoVehicleSunGlare
+	noglare:
+		mov [esp+0D4h], edi
+		push 6ABD04h
+		retn
+    }
+}
+
 namespace
 {
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
@@ -2316,6 +2340,22 @@ void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
             pInterface->m_wheelColPoint[REAR_RIGHT_WHEEL].Position += vecDelta;
         }
     }
+}
+
+void CVehicleSA::StaticSetHooks()
+{
+    // Setup vehicle sun glare hook
+    HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+}
+
+void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
+{
+    m_bVehicleSunGlare = bEnabled;
+}
+
+bool CVehicleSA::GetVehiclesSunGlareEnabled()
+{
+    return m_bVehicleSunGlare;
 }
 
 namespace
