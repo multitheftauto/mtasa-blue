@@ -30,7 +30,7 @@ CBulletPhysics::CBulletPhysics()
     m_pDynamicsWorld =
         std::make_unique<btDiscreteDynamicsWorld>(m_pDispatcher.get(), m_pOverlappingPairCache.get(), m_pSolver.get(), m_pCollisionConfiguration.get());
 
-    m_pDynamicsWorld->setGravity(BulletPhysics::Defaults::Gravity);
+    m_pDynamicsWorld->setGravity(CPhysicsSharedLogic::ConvertVector(BulletPhysics::Defaults::Gravity));
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
     m_bSimulationEnabled = true;
 }
@@ -172,10 +172,10 @@ void CBulletPhysics::DoPulse()
 
 void CBulletPhysics::SetGravity(CVector vecGravity) const
 {
-    m_pDynamicsWorld->setGravity(vecGravity);
+    m_pDynamicsWorld->setGravity(CPhysicsSharedLogic::ConvertVector(vecGravity));
 }
 
 CVector CBulletPhysics::GetGravity() const
 {
-    return m_pDynamicsWorld->getGravity();
+    return CPhysicsSharedLogic::ConvertVector(m_pDynamicsWorld->getGravity());
 }

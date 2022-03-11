@@ -36,4 +36,7 @@ public:
     // throws proper std::invalid_argument error when something wrong
     static void CheckMaximumPrimitiveSize(const float value);
     static void CheckMaximumPrimitiveSize(const CVector vector);
+
+    static CVector ConvertVector(const btVector3& vector);
+    static btVector3 ConvertVector(const CVector& vector);
 };

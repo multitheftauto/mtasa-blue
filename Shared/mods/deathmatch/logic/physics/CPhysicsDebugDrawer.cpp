@@ -18,8 +18,8 @@ void CPhysicsDebugDrawer::Clear()
 
 void CPhysicsDebugDrawer::DrawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
-    const CVector& vecFrom = from;
-    const CVector& vecTo = to;
+    const CVector& vecFrom = CPhysicsSharedLogic::ConvertVector(from);
+    const CVector& vecTo = CPhysicsSharedLogic::ConvertVector(to);
     const float    distance = DistanceBetweenPoints3D((vecFrom + vecTo) / 2, m_vecCameraPosition);
     if (distance < m_fDrawDistance) // 50, 500 - 10%
     {

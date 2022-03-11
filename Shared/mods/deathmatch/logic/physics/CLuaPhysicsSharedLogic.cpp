@@ -3,7 +3,7 @@
 void CPhysicsSharedLogic::SetRotation(btTransform& transform, CVector vecRotation)
 {
     btQuaternion quaternion = btQuaternion::getIdentity();
-    EulerToQuaternion(vecRotation, quaternion);
+    EulerToQuaternion(ConvertVector(vecRotation), quaternion);
     transform.setRotation(quaternion);
 }
 
@@ -12,17 +12,17 @@ CVector CPhysicsSharedLogic::GetRotation(const btTransform& transform)
     btQuaternion quanternion = transform.getRotation();
     btVector3    rotation;
     CPhysicsSharedLogic::QuaternionToEuler(quanternion, rotation);
-    return rotation;
+    return ConvertVector(rotation);
 }
 
 CVector CPhysicsSharedLogic::GetPosition(const btTransform& transform)
 {
-    return transform.getOrigin();
+    return ConvertVector(transform.getOrigin());
 }
 
 void CPhysicsSharedLogic::SetPosition(btTransform& transform, const CVector vecPosition)
 {
-    transform.setOrigin(vecPosition);
+    transform.setOrigin(ConvertVector(vecPosition));
 }
 
 void CPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, const CVector vecRotation)
@@ -53,7 +53,7 @@ CVector CPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject)
 
 btBoxShape* CPhysicsSharedLogic::CreateBox(const CVector half, const CVector vecPosition, const CVector vecRotation)
 {
-    btBoxShape* pBoxShape = new btBoxShape(half);
+    btBoxShape* pBoxShape = new btBoxShape(ConvertVector(half));
     btTransform transform = btTransform::getIdentity();
 
     CPhysicsSharedLogic::SetPosition(transform, vecPosition);
@@ -176,5 +176,24 @@ void CPhysicsSharedLogic::CheckPrimitiveSize(const CVector vector)
 {
     CheckMinimumPrimitiveSize(vector);
     CheckMaximumPrimitiveSize(vector);
+}
+
+//
+//    CVector(const btVector3& other) : fX(other.x()), fY(other.y()), fZ(other.z())
+//{
+//}
+//operator btVector3() const
+//{
+//    return btVector3{fX, fY, fZ};
+//}
+
+CVector CPhysicsSharedLogic::ConvertVector(const btVector3& vector)
+{
+    return CVector(vector.x(), vector.y(), vector.z());
+}
+
+btVector3 CPhysicsSharedLogic::ConvertVector(const CVector& vector)
+{
+    return btVector3{vector.fX, vector.fY, vector.fZ};
 }
 

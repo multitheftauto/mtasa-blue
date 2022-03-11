@@ -47,7 +47,7 @@ public:
         SetEnabled(false);
     }
 
-    static std::unique_ptr<CPhysicsRigidBodyProxy> New(CLuaPhysicsShape* pShape, const float fMass, CVector vecLocalInertia, CVector vecCenterOfMass,
+    static std::unique_ptr<CPhysicsRigidBodyProxy> New(CLuaPhysicsShape* pShape, const float fMass, CVector& vecLocalInertia, CVector& vecCenterOfMass,
                                                        MotionState* pMotionstate);
 
     void SetEnabled(bool bEnabled);
