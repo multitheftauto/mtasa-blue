@@ -39,7 +39,6 @@ public:
 
     void Clear();
 
-    void DrawLine(const btVector3& from, const btVector3& to, const btVector3& lineColor);
     void drawLine(const btVector3& from, const btVector3& to, const btVector3& fromColor, const btVector3& toColor);
     void drawLine(const btVector3& from, const btVector3& to, const btVector3& color);
     void drawSphere(const btVector3& p, btScalar radius, const btVector3& color){};
@@ -54,4 +53,7 @@ public:
     bool getDebugMode(int bit) const { return m_debugMode.test((size_t)bit); }
 
     std::vector<CPhysicsDebugLine> m_vecLines;
+
+private:
+    void DrawLineInternal(const btVector3& from, const btVector3& to, const btVector3& lineColor);
 };
