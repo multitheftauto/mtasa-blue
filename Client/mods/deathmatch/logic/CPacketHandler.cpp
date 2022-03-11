@@ -348,16 +348,11 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     pPlayer->SetID(g_pClientGame->m_LocalID);
 
-    // Read out number of players
-    unsigned char ucNumberOfPlayers = 0;
-    bitStream.Read(ucNumberOfPlayers);
-
-    // Can't be 0
-    if (ucNumberOfPlayers == 0)
-    {
-        RaiseProtocolError(14);
-        return;
-    }
+    // For protocol backwards compatibility: read a single byte value.
+    // This used to hold the number of players, it was never used on the client side,
+    // and caused protocol error 14 whenever the player count was narrowed down to a single byte.
+    uint8_t numPlayers = 0;
+    bitStream.Read(numPlayers);
 
     // Read out the root element id
     ElementID RootElementID;

@@ -470,6 +470,10 @@ eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
 
 unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 {
+    // Use parent model ID for non-standard vehicle model IDs.
+    if ((ulModel < 400 || ulModel > 611) && IsValidModel(ulModel))
+        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+
     // Valid model?
     if (IsStandardModel(ulModel))
     {
