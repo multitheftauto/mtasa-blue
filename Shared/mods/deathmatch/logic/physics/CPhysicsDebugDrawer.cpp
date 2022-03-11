@@ -38,9 +38,9 @@ void CPhysicsDebugDrawer::drawLine(const btVector3& from, const btVector3& to, c
     DrawLine(from, to, lineColor);
 }
 
-void CPhysicsDebugDrawer::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color)
+void CPhysicsDebugDrawer::drawContactPoint(const btVector3& btPointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color)
 {
-    DrawLine(PointOnB, PointOnB + normalOnB * distance, color);
+    DrawLine(btPointOnB, btPointOnB + normalOnB * distance, color);
 }
 
 void CPhysicsDebugDrawer::draw3dText(const btVector3& location, const char* textString)

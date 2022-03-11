@@ -20,8 +20,8 @@ public:
     static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, const float fMass, const CVector vecLocalInertia,
                                                         const CVector vecCenterOfMass);
 
-    static void EulerToQuaternion(const btVector3 rotation, btQuaternion& result);
-    static void QuaternionToEuler(const btQuaternion rotation, btVector3& result);
+    static void EulerToQuaternion(const btVector3& rotation, btQuaternion& result);
+    static void QuaternionToEuler(btQuaternion rotation, btVector3& result);
 
     // throws proper std::invalid_argument error when something wrong
     static void CheckPrimitiveSize(const CVector vector);

@@ -76,7 +76,7 @@ std::unique_ptr<btRigidBody> CPhysicsSharedLogic::CreateRigidBody(btCollisionSha
     return std::move(pRigidBody);
 }
 
-void CPhysicsSharedLogic::EulerToQuaternion(const btVector3 rotation, btQuaternion& result)
+void CPhysicsSharedLogic::EulerToQuaternion(const btVector3& rotation, btQuaternion& result)
 {
     float c1 = cos(rotation.getX() / 2 * PI / 180);
     float c2 = cos(rotation.getY() / 2 * PI / 180);
