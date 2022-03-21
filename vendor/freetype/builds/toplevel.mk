@@ -3,7 +3,7 @@
 #
 
 
-# Copyright (C) 1996-2020 by
+# Copyright (C) 1996-2021 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -103,6 +103,7 @@ ifneq ($(findstring setup,$(MAKECMDGOALS)),)
   check_platform := 1
 endif
 
+
 # Include the automatic host platform detection rules when we need to
 # check the platform.
 #
@@ -111,6 +112,17 @@ ifdef check_platform
   all modules: setup
 
   include $(TOP_DIR)/builds/detect.mk
+
+  # For builds directly from the git repository we need to copy files
+  # from `subprojects/dlg' to `src/dlg' and `include/dlg'.
+  #
+  ifeq ($(wildcard $(TOP_DIR)/src/dlg/dlg.*),)
+    ifeq ($(wildcard $(TOP_DIR)/subprojects/dlg/*),)
+      copy_submodule: check_out_submodule
+    endif
+
+    setup: copy_submodule
+  endif
 
   # This rule makes sense for Unix only to remove files created by a run of
   # the configure script which hasn't been successful (so that no
@@ -152,6 +164,23 @@ else
   include $(CONFIG_MK)
 
 endif # test check_platform
+
+
+.PHONY: check_out_submodule copy_submodule
+
+check_out_submodule:
+	$(info Checking out submodule in `subprojects/dlg')
+	git submodule init
+	git submodule update
+
+copy_submodule:
+	$(info Copying files from `subprojects/dlg' to `src/dlg' and `include/dlg')
+  ifeq ($(wildcard include/dlg),)
+	mkdir $(subst /,$(SEP),include/dlg)
+  endif
+	$(COPY) $(subst /,$(SEP),subprojects/dlg/include/dlg/output.h include/dlg)
+	$(COPY) $(subst /,$(SEP),subprojects/dlg/include/dlg/dlg.h include/dlg)
+	$(COPY) $(subst /,$(SEP),subprojects/dlg/src/dlg/dlg.c src/dlg)
 
 
 # We always need the list of modules in ftmodule.h.
@@ -197,6 +226,7 @@ patch := $(firstword $(patch))
 # else
   version := $(major).$(minor).$(patch)
   winversion := $(major)$(minor)$(patch)
+  version_tag := VER-$(major)-$(minor)-$(patch)
 # endif
 
 
@@ -219,7 +249,10 @@ dist:
 
 	currdir=`pwd` ; \
 	for f in `find . -wholename '*/.git' -prune \
+	                 -o -name .gitattributes \
 	                 -o -name .gitignore \
+	                 -o -name .gitlab-ci.yml \
+	                 -o -name .gitmodules \
 	                 -o -name .mailmap \
 	                 -o -type d \
 	                 -o -print` ; do \
@@ -250,6 +283,10 @@ dist:
 CONFIG_GUESS = ~/git/config/config.guess
 CONFIG_SUB   = ~/git/config/config.sub
 
+# We also use this repository to access the gnulib script that converts git
+# commit messages to a ChangeLog file.
+CHANGELOG_SCRIPT = ~/git/config/gitlog-to-changelog
+
 
 # Don't say `make do-dist'.  Always use `make dist' instead.
 #
@@ -267,8 +304,20 @@ do-dist: distclean refdoc
 	cp $(CONFIG_GUESS) builds/unix
 	cp $(CONFIG_SUB) builds/unix
 
+	@# Generate `ChangeLog' file with commits since previous release.
+	$(CHANGELOG_SCRIPT) \
+	  --format='%B%n' \
+	  --no-cluster \
+	  -- `git describe --tags \
+	                   --abbrev=0 \
+	                   $(version_tag)^`..$(version_tag) \
+	> ChangeLog
+
 	@# Remove intermediate files created by the `refdoc' target.
 	rm -rf docs/markdown
 	rm -f docs/mkdocs.yml
+
+	@# Remove more stuff related to git.
+	rm -rf subprojects
 
 # EOF

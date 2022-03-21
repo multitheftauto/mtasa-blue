@@ -2117,7 +2117,7 @@ void CClientGame::StaticProcessClientKeyBind(CKeyFunctionBind* pBind)
 
 void CClientGame::ProcessClientKeyBind(CKeyFunctionBind* pBind)
 {
-    m_pScriptKeyBinds->ProcessKey(pBind->boundKey->szKey, pBind->bHitState, SCRIPT_KEY_BIND_FUNCTION);
+    m_pScriptKeyBinds->ProcessKey(pBind->boundKey->szKey, pBind->triggerState, SCRIPT_KEY_BIND_FUNCTION);
 }
 
 void CClientGame::StaticProcessClientControlBind(CControlFunctionBind* pBind)
@@ -2127,7 +2127,7 @@ void CClientGame::StaticProcessClientControlBind(CControlFunctionBind* pBind)
 
 void CClientGame::ProcessClientControlBind(CControlFunctionBind* pBind)
 {
-    m_pScriptKeyBinds->ProcessKey(pBind->control->szControl, pBind->bHitState, SCRIPT_KEY_BIND_CONTROL_FUNCTION);
+    m_pScriptKeyBinds->ProcessKey(pBind->control->szControl, pBind->triggerState, SCRIPT_KEY_BIND_CONTROL_FUNCTION);
 }
 
 void CClientGame::StaticProcessServerKeyBind(CKeyFunctionBind* pBind)
@@ -2141,7 +2141,7 @@ void CClientGame::ProcessServerKeyBind(CKeyFunctionBind* pBind)
     unsigned char ucNameLength = (unsigned char)strlen(szName);
     CBitStream    bitStream;
     bitStream.pBitStream->WriteBit(false);
-    bitStream.pBitStream->WriteBit(pBind->bHitState);
+    bitStream.pBitStream->WriteBit(pBind->triggerState);
     bitStream.pBitStream->Write(szName, ucNameLength);
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
@@ -2157,7 +2157,7 @@ void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
     unsigned char ucNameLength = (unsigned char)strlen(szName);
     CBitStream    bitStream;
     bitStream.pBitStream->WriteBit(true);
-    bitStream.pBitStream->WriteBit(pBind->bHitState);
+    bitStream.pBitStream->WriteBit(pBind->triggerState);
     bitStream.pBitStream->Write(szName, ucNameLength);
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
@@ -6685,17 +6685,19 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 //////////////////////////////////////////////////////////////////
 void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
-    if(m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
+    if (m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
     {
         // Do not change radio station if player is inside vehicle
         // because it is supposed to play own radio
         return;
     }
 
-    if(dwStationID == 0) {
+    if (dwStationID == 0)
+    {
         g_pGame->GetAudioEngine()->StopRadio();
     }
-    else {
+    else
+    {
         g_pGame->GetAudioEngine()->StartRadio(dwStationID);
     }
 }

@@ -157,3 +157,15 @@ a02c4b3a71b5a6e9d77ba849edd14a8048256120
 # Date:   Mon Sep 27 17:57:32 2021 +0300
 #
 # Revert "Revert "Run clang-format""
+
+652bda2d87d78b93516d8320a659353d517ce5d4
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sun Jan 9 15:07:20 2022 +0200
+#
+# Run clang-format
+
+8931b796ea60c4b32422bba986529e39fb2737b5
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sun Jan 9 15:36:06 2022 +0200
+#
+# Run clang-format

@@ -1,7 +1,7 @@
 name: Build
 
-# Trigger the workflow on push or pull request
-on: [push, pull_request]
+# Trigger the workflow on any pull request, push or manual dispatch
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
   windows:

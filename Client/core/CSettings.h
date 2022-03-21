@@ -321,11 +321,13 @@ protected:
     CGUICheckBox* m_pCheckBoxRemoteJavascript;
     CGUILabel*    m_pLabelBrowserCustomBlacklist;
     CGUIEdit*     m_pEditBrowserBlacklistAdd;
+    CGUILabel*    m_pLabelBrowserBlacklistAdd;
     CGUIButton*   m_pButtonBrowserBlacklistAdd;
     CGUIGridList* m_pGridBrowserBlacklist;
     CGUIButton*   m_pButtonBrowserBlacklistRemove;
     CGUILabel*    m_pLabelBrowserCustomWhitelist;
     CGUIEdit*     m_pEditBrowserWhitelistAdd;
+    CGUILabel*    m_pLabelBrowserWhitelistAdd;
     CGUIButton*   m_pButtonBrowserWhitelistAdd;
     CGUIGridList* m_pGridBrowserWhitelist;
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
@@ -366,8 +368,12 @@ protected:
     bool OnVerticalAimSensitivityChanged(CGUIElement* pElement);
     bool OnBrowserBlacklistAdd(CGUIElement* pElement);
     bool OnBrowserBlacklistRemove(CGUIElement* pElement);
+    bool OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement);
+    bool OnBrowserBlacklistDomainAddDefocused(CGUIElement* pElement);
     bool OnBrowserWhitelistAdd(CGUIElement* pElement);
     bool OnBrowserWhitelistRemove(CGUIElement* pElement);
+    bool OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement);
+    bool OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement);
 
     bool OnMouseDoubleClick(CGUIMouseEventArgs Args);
 
