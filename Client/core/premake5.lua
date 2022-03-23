@@ -20,6 +20,7 @@ project "Client Core"
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
+			"../../vendor/discord-rpc/discord/include",
 		}
 
 	pchheader "StdInc.h"
