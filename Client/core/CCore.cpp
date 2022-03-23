@@ -136,11 +136,17 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Create discord rich presence
+    m_pDiscordRichPresence = new CDiscordRichPresence();
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Destroy discord rich presence
+    delete m_pDiscordRichPresence;
 
     // Destroy tray icon
     delete m_pTrayIcon;
