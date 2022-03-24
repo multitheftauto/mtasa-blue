@@ -18,6 +18,14 @@ public:
     CDiscordRichPresence();
     ~CDiscordRichPresence();
 
+    // void SetApplicationId();
+    void UpdatePresence();
+    void SetPresenceState(const char* szState);
+    // void SetPresenceDetails();
+    // void SetPresenceTimestamp();
+    // void SetPresenceImage();
+    // void SetPresenceText();
+
 private:
     const char* m_strDiscordAppId;
     const char* m_strDiscordAppAsset;

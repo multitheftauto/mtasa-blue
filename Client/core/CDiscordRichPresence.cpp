@@ -31,8 +31,8 @@ CDiscordRichPresence::CDiscordRichPresence()
     m_strDiscordAppCurrentId = DEFAULT_APP_ID;
     m_strDiscordAppState = "";
     m_strDiscordAppDetails = "";
-    m_strDiscordAppStart = 0;
-    m_strDiscordAppEnd = 0;
+    m_uiDiscordAppStart = 0;
+    m_uiDiscordAppEnd = 0;
 
     Discord_Initialize(m_strDiscordAppId, &handlers, 1, nullptr);
 }
@@ -43,4 +43,19 @@ CDiscordRichPresence::~CDiscordRichPresence()
     Discord_Shutdown();
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
+}
+
+void CDiscordRichPresence::UpdatePresence()
+{
+    DiscordRichPresence discordPresence;
+    memset(&discordPresence, 0, sizeof(discordPresence));
+    discordPresence.state = m_strDiscordAppState;
+    discordPresence.details = m_strDiscordAppDetails;
+
+    Discord_UpdatePresence(&discordPresence);
+}
+
+void CDiscordRichPresence::SetPresenceState(const char* szState)
+{
+    m_strDiscordAppState = szState;
 }
