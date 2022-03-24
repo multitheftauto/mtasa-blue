@@ -28,7 +28,13 @@ CDiscordRichPresence::CDiscordRichPresence()
     m_strDiscordAppAssetText = DEFAULT_APP_ASSET_TEXT;
     m_strDiscordAppAssetSmallText = DEFAULT_APP_ASSET_SMALL_TEXT;
 
-    Discord_Initialize(m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
+    m_strDiscordAppCurrentId = DEFAULT_APP_ID;
+    m_strDiscordAppState = "";
+    m_strDiscordAppDetails = "";
+    m_strDiscordAppStart = 0;
+    m_strDiscordAppEnd = 0;
+
+    Discord_Initialize(m_strDiscordAppId, &handlers, 1, nullptr);
 }
 
 CDiscordRichPresence::~CDiscordRichPresence()

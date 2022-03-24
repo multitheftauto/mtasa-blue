@@ -19,9 +19,15 @@ public:
     ~CDiscordRichPresence();
 
 private:
-    std::string m_strDiscordAppId;
-    std::string m_strDiscordAppAsset;
-    std::string m_strDiscordAppAssetSmall;
-    std::string m_strDiscordAppAssetText;
-    std::string m_strDiscordAppAssetSmallText;
+    const char* m_strDiscordAppId;
+    const char* m_strDiscordAppAsset;
+    const char* m_strDiscordAppAssetSmall;
+    const char* m_strDiscordAppAssetText;
+    const char* m_strDiscordAppAssetSmallText;
+
+    const char*   m_strDiscordAppCurrentId;
+    const char*   m_strDiscordAppState;
+    const char*   m_strDiscordAppDetails;
+    unsigned long m_uiDiscordAppStart;
+    unsigned long m_uiDiscordAppEnd;
 };
