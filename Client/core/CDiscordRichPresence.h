@@ -10,13 +10,16 @@
  *****************************************************************************/
 #pragma once
 
+#include <core/CDiscordInterface.h>
 #include <string>
 
-class CDiscordRichPresence
+class CDiscordRichPresence : public CDiscordInterface
 {
 public:
     CDiscordRichPresence();
     ~CDiscordRichPresence();
+
+    void SetTemplate(unsigned int uiNumber);
 
     // void SetApplicationId();
     void UpdatePresence();

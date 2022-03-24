@@ -102,6 +102,7 @@ public:
     CLocalizationInterface*   GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*        GetWebCore();
     CTrayIconInterface*       GetTrayIcon() { return m_pTrayIcon; };
+    CDiscordInterface*        GetDiscord() { return m_pDiscordRichPresence; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
 

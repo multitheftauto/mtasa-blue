@@ -45,6 +45,24 @@ CDiscordRichPresence::~CDiscordRichPresence()
     memset(&handlers, 0, sizeof(handlers));
 }
 
+void CDiscordRichPresence::SetTemplate(unsigned int uiNumber)
+{
+    switch (uiNumber)
+    {
+        case 0: // main menu
+        {
+            this->SetPresenceState("Main Menu");
+            break;
+        }
+        case 1: // in-game
+        {
+            this->SetPresenceState("In-game");
+            break;
+        }
+    }
+    this->UpdatePresence();
+}
+
 void CDiscordRichPresence::UpdatePresence()
 {
     DiscordRichPresence discordPresence;

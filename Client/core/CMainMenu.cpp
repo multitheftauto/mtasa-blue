@@ -286,6 +286,9 @@ CMainMenu::CMainMenu(CGUI* pManager)
     // We're not ingame
     SetIsIngame(false);
 
+    // Discord
+    g_pCore->GetDiscord()->SetTemplate(0);
+
     // Store the pointer to the graphics subsystem
     m_pGraphics = CGraphics::GetSingletonPtr();
 
