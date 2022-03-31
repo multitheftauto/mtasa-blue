@@ -5026,23 +5026,27 @@ void CClientVehicle::ResetWheelScale()
 
 void CClientVehicle::GetEntryPoint(CVector& entryPoint, int entryPointIndex)
 {
-    unsigned int saDoorIndex = 0;
-
-    switch (entryPointIndex)
+    const auto GetSADoorIndex = [entryPointIndex]()
     {
-        case 0:
-            saDoorIndex = 10;
-            break;
-        case 1:
-            saDoorIndex = 8;
-            break;
-        case 2:
-            saDoorIndex = 11;
-            break;
-        case 3:
-            saDoorIndex = 9;
-            break;
-    }
+        switch (entryPointIndex)
+        {
+            case 0:
+                return 10;
+            case 1:
+                return 8;
+                break;
+            case 2:
+                return 11;
+                break;
+            case 3:
+                return 9;
+                break;
+        }
+
+        return 0;
+    };
+
+    unsigned int saDoorIndex = GetSADoorIndex();
 
     if (saDoorIndex != 0)
     {

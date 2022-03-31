@@ -4171,43 +4171,43 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
 
-std::variant<bool, std::vector<std::array<float, 3>>> CLuaVehicleDefs::GetVehicleEntryPoints(CClientVehicle* vehicle)
+std::variant<bool, std::array<std::array<float, 3>, 4>> CLuaVehicleDefs::GetVehicleEntryPoints(CClientVehicle* vehicle)
 {
     if (CClientVehicleManager::GetMaxPassengerCount(vehicle->GetModel()) == 255)
     {
         return false;
     }
 
-    std::vector<std::array<float, 3>> entryPoints;
+    std::array<std::array<float, 3>, 4> entryPoints;
 
-    for (unsigned int i = 0; i <= 3; i++)
+    for (unsigned int i = 0; i < 4; i++)
     {
         CVector entryPoint;
 
         vehicle->GetEntryPoint(entryPoint, i);
 
-        entryPoints.push_back({entryPoint.fX, entryPoint.fY, entryPoint.fZ});
+        entryPoints[i] = {entryPoint.fX, entryPoint.fY, entryPoint.fZ};
     }
 
     return entryPoints;
 }
 
-std::variant<bool, std::vector<CVector>> CLuaVehicleDefs::OOP_GetVehicleEntryPoints(CClientVehicle* vehicle)
+std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryPoints(CClientVehicle* vehicle)
 {
     if (CClientVehicleManager::GetMaxPassengerCount(vehicle->GetModel()) == 255)
     {
         return false;
     }
 
-    std::vector<CVector> entryPoints;
+    std::array<CVector, 4> entryPoints;
 
-    for (unsigned int i = 0; i <= 3; i++)
+    for (unsigned int i = 0; i < 4; i++)
     {
         CVector entryPoint;
 
         vehicle->GetEntryPoint(entryPoint, i);
 
-        entryPoints.push_back(entryPoint);
+        entryPoints[i] = entryPoint;
     }
 
     return entryPoints;
