@@ -1547,6 +1547,7 @@ float CClientVehicle::GetPlaneRotorSpeed()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
         return m_pVehicle->GetPlaneRotorSpeed();
+
     return m_fPlaneRotorSpeed;
 }
 

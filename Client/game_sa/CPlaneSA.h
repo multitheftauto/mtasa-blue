@@ -66,7 +66,7 @@ public:
     float        m_planeHeadingPrev;
     float        m_forwardZ;
     uint32       m_nStartedFlyingTime;
-    float        m_fPropSpeed;
+    float        m_fPropSpeed;            // Rotor speed 0x09C4
     float        field_9C8;
     float        m_fLandingGearStatus;
     int32        m_planeDamageWave;

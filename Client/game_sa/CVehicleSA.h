@@ -636,7 +636,6 @@ public:
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
     unsigned short GetAdjustablePropertyValue() { return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
     float          GetHeliRotorSpeed() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124); };
-    //float        GetPlaneRotorSpeed() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 0x09C4); };
     float          GetPlaneRotorSpeed();
     unsigned long  GetExplodeTime() { return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240); };
 
@@ -662,7 +661,6 @@ public:
         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_pInterface) + 2156) = usAdjustableProperty;
     };
     void SetHeliRotorSpeed(float fSpeed) { *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124) = fSpeed; };
-    //void SetPlaneRotorSpeed(float fSpeed) { *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 0x09C4) = fSpeed; };
     void SetPlaneRotorSpeed(float fSpeed);
     
     void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240) = ulTime; };
@@ -719,8 +717,6 @@ public:
     void* GetPrivateSuspensionLines();
 
     CVehicleSAInterface* GetVehicleInterface() { return (CVehicleSAInterface*)m_pInterface; }
-
- 
 
     bool DoesVehicleHaveSirens() { return m_tSirenInfo.m_bOverrideSirens; }
 
