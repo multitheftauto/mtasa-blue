@@ -25,111 +25,111 @@ class CVehicleSA;
 #include "CColPointSA.h"
 #include "CAEVehicleAudioEntitySA.h"
 
-#define SIZEOF_CHELI                            2584
+#define SIZEOF_CHELI 2584
 
 // 00431f80 public: static class CVehicle * __cdecl CCarCtrl::CreateCarForScript(int,class CVector,unsigned char)
-#define FUNC_CCarCtrlCreateCarForScript         0x431f80 // ##SA##
+#define FUNC_CCarCtrlCreateCarForScript 0x431f80            // ##SA##
 
 // 006d6a40  public: virtual void __thiscall CVehicle::SetModelIndex(unsigned int)
-#define FUNC_CVehicleSetModelIndex              0x6d6a40
+#define FUNC_CVehicleSetModelIndex 0x6d6a40
 
 // 006d16a0  public: void __thiscall CVehicle::SetDriver(class CPed *)
-#define FUNC_CVehicleSetDriver                  0x6d16a0
+#define FUNC_CVehicleSetDriver 0x6d16a0
 
 // 006d14d0  public: bool __thiscall CVehicle::AddPassenger(class CPed *,unsigned char)
-#define FUNC_CVehicleAddPassengerWithSeat       0x6d14d0
+#define FUNC_CVehicleAddPassengerWithSeat 0x6d14d0
 
 // 006d13a0  public: bool __thiscall CVehicle::AddPassenger(class CPed *)
-#define FUNC_CVehicleAddPassenger               0x6d13a0
+#define FUNC_CVehicleAddPassenger 0x6d13a0
 
 // 006d1610  public: void __thiscall CVehicle::RemovePassenger(class CPed *)
-#define FUNC_CVehicleRemovePassenger            0x6d1610
+#define FUNC_CVehicleRemovePassenger 0x6d1610
 
 // 006E3290  public: void __thiscall CVehicle::AddVehicleUpgrade(DWORD dwModelID)
-#define FUNC_CVehicle_AddVehicleUpgrade         0x6E3290
+#define FUNC_CVehicle_AddVehicleUpgrade 0x6E3290
 
 // 006DF930     ; public: void __thiscall CVehicle::RemoveVehicleUpgrade(int)
-#define FUNC_CVehicle_RemoveVehicleUpgrade      0x6DF930
+#define FUNC_CVehicle_RemoveVehicleUpgrade 0x6DF930
 
 // 006D1E80  public: bool __thiscall CVehicle::CanPedEnterCar()
-#define FUNC_CVehicle_CanPedEnterCar            0x6D1E80
+#define FUNC_CVehicle_CanPedEnterCar 0x6D1E80
 
 // 006D2030  public: bool __thiscall CVehicle::CanPedJumpOutCar()
-#define FUNC_CVehicle_CanPedJumpOutCar          0x6D2030
+#define FUNC_CVehicle_CanPedJumpOutCar 0x6D2030
 
 // 006D5CF0  public: bool __thiscall CVehicle::CanPedLeanOut(CPed*)
-#define FUNC_CVehicle_CanPedLeanOut             0x6D5CF0
+#define FUNC_CVehicle_CanPedLeanOut 0x6D5CF0
 
 // 006D1F30  public: bool __thiscall CVehicle::CanPedStepOutCar()
-#define FUNC_CVehicle_CanPedStepOutCar          0x6D1F30
+#define FUNC_CVehicle_CanPedStepOutCar 0x6D1F30
 
 // 006D25D0  public: bool __thiscall CVehicle::CarHasRoof()
-#define FUNC_CVehicle_CarHasRoof                0x6D25D0
+#define FUNC_CVehicle_CarHasRoof 0x6D25D0
 
 // 006D2460  public: void __thiscall CVehicle::ExtinguishCarFire()
-#define FUNC_CVehicle_ExtinguishCarFire         0x6D2460
+#define FUNC_CVehicle_ExtinguishCarFire 0x6D2460
 
 // 006D2460  public: DWORD __thiscall CVehicle::GetBaseVehicleType()
-#define FUNC_CVehicle_GetBaseVehicleType        0x411D50
+#define FUNC_CVehicle_GetBaseVehicleType 0x411D50
 
 // 006D63F0  public: DWORD __thiscall CVehicle::GetHeightAboveRoad()
-#define FUNC_CVehicle_GetHeightAboveRoad        0x6D63F0
+#define FUNC_CVehicle_GetHeightAboveRoad 0x6D63F0
 
 // 006DFBE0  public: DWORD __thiscall CVehicle::GetTowBarPos(CVector*, 1, 0)
-#define FUNC_CVehicle_GetTowBarPos              0x6DFBE0
+#define FUNC_CVehicle_GetTowBarPos 0x6DFBE0
 
 // 006DFB70  public: void __thiscall CVehicle::GetTowHitchPos(CVector*, 1, 0)
-#define FUNC_CVehicle_GetTowHitchPos            0x6DFB70
+#define FUNC_CVehicle_GetTowHitchPos 0x6DFB70
 
 // 006D1DD0  public: bool __thiscall CVehicle::IsOnItsSide()
-#define FUNC_CVehicle_IsOnItsSide               0x6D1DD0
+#define FUNC_CVehicle_IsOnItsSide 0x6D1DD0
 
 // 006D2370  public: bool __thiscall CVehicle::IsLawEnforcementVehicle()
-#define FUNC_CVehicle_IsLawEnforcementVehicle   0x6D2370
+#define FUNC_CVehicle_IsLawEnforcementVehicle 0x6D2370
 
 // 006D1BD0  public: bool __thiscall CVehicle::IsPassenger(CPed*)
-#define FUNC_CVehicle_IsPassenger               0x6D1BD0
+#define FUNC_CVehicle_IsPassenger 0x6D1BD0
 
 // 006D84D0  public: bool __thiscall CVehicle.:IsSphereTouchingVehicle(float, float, float, float)
-#define FUNC_CVehicle_IsSphereTouchingVehicle   0x6D84D0
+#define FUNC_CVehicle_IsSphereTouchingVehicle 0x6D84D0
 
 // 006D1D90  public: bool __thiscall CVehicle::IsUpsideDown()
-#define FUNC_CVehicle_IsUpsideDown              0x6D1D90
+#define FUNC_CVehicle_IsUpsideDown 0x6D1D90
 
 // 006D2BF0  public: void __thiscall CVehicle::MakeDirty(CColPoint*)
-#define FUNC_CVehicle_MakeDirty                 0x6D2BF0
+#define FUNC_CVehicle_MakeDirty 0x6D2BF0
 
 // 0041BDD0  public: void __thiscall CVehicle::SetEngineOn(bool)
-#define FUNC_CVehicle_SetEngineOn               0x41BDD0
+#define FUNC_CVehicle_SetEngineOn 0x41BDD0
 
 // 006F6CC0  public: void __thiscall CTrain::FindPositionOnTrackFromCoors()
-#define FUNC_CTrain_FindPositionOnTrackFromCoors           0x6F6CC0
+#define FUNC_CTrain_FindPositionOnTrackFromCoors 0x6F6CC0
 
 // 006F6BD0  int GetTrainNodeNearPoint(float x, float y, float z, int* pTrackID) places track ID in *pTrackID and returns node ID
-#define FUNC_GetTrainNodeNearPoint              0x6F6BD0
+#define FUNC_GetTrainNodeNearPoint 0x6F6BD0
 
-#define FUNC_CVehicle_QueryPickedUpEntityWithWinch              0x6d3cf0
-#define FUNC_CVehicle_PickUpEntityWithWinch                     0x6d3cd0
-#define FUNC_CVehicle_ReleasePickedUpEntityWithWinch            0x6d3cb0
-#define FUNC_CVehicle_SetRopeHeightForHeli                      0x6d3d30
+#define FUNC_CVehicle_QueryPickedUpEntityWithWinch   0x6d3cf0
+#define FUNC_CVehicle_PickUpEntityWithWinch          0x6d3cd0
+#define FUNC_CVehicle_ReleasePickedUpEntityWithWinch 0x6d3cb0
+#define FUNC_CVehicle_SetRopeHeightForHeli           0x6d3d30
 
-#define FUNC_CVehicle__SetRemapTexDictionary                    0x6D0BC0
-#define FUNC_CVehicle__GetRemapIndex                            0x6D0B70
-#define FUNC_CVehicle__SetRemap                                 0x6D0C00
-#define FUNC_CVehicle_CustomCarPlate_TextureCreate              0x6D10E0
+#define FUNC_CVehicle__SetRemapTexDictionary       0x6D0BC0
+#define FUNC_CVehicle__GetRemapIndex               0x6D0B70
+#define FUNC_CVehicle__SetRemap                    0x6D0C00
+#define FUNC_CVehicle_CustomCarPlate_TextureCreate 0x6D10E0
 
-#define FUNC_CVehicle_SetWindowOpenFlag                         0x6D3080
-#define FUNC_CVehicle_ClearWindowOpenFlag                       0x6D30B0
+#define FUNC_CVehicle_SetWindowOpenFlag   0x6D3080
+#define FUNC_CVehicle_ClearWindowOpenFlag 0x6D30B0
 
 // from CBike
-#define FUNC_Bike_PlaceOnRoadProperly           0x6BEEB0
-#define FUNC_Automobile_PlaceOnRoadProperly     0x6AF420
-#define FUNC_CBike_Fix                          0x6B7050
+#define FUNC_Bike_PlaceOnRoadProperly       0x6BEEB0
+#define FUNC_Automobile_PlaceOnRoadProperly 0x6AF420
+#define FUNC_CBike_Fix                      0x6B7050
 
 // from CPlane
-#define FUNC_CPlane__SetGearUp                  0x6CAC20
-#define FUNC_CPlane__SetGearDown                0x6CAC70
-#define FUNC_CPlane__Fix                        0x6CABB0
+#define FUNC_CPlane__SetGearUp   0x6CAC20
+#define FUNC_CPlane__SetGearDown 0x6CAC70
+#define FUNC_CPlane__Fix         0x6CABB0
 
 // from CAutomobile
 #define FUNC_CAutomobile__Fix                   0x6A3440
@@ -137,32 +137,32 @@ class CVehicleSA;
 #define FUNC_CAutomobile__UpdateMovingCollision 0x6a1460
 
 // from CHeli
-#define FUNC_CHeli__Fix                         0x6C4530
+#define FUNC_CHeli__Fix 0x6C4530
 
 // from CQuadBike
-#define FUNC_CQuadBike__Fix                     0x6CE2B0
+#define FUNC_CQuadBike__Fix 0x6CE2B0
 
-#define VARS_CarCounts                          0x969094 // 5 values for each vehicle type
+#define VARS_CarCounts 0x969094            // 5 values for each vehicle type
 
 // Used when deleting vehicles
-#define VTBL_CPlaceable                         0x863C40
+#define VTBL_CPlaceable 0x863C40
 
-#define MAX_PASSENGERS                          8
+#define MAX_PASSENGERS 8
 
-#define NUM_RAILTRACKS                          4
-#define ARRAY_NumRailTrackNodes                 0xC38014    // NUM_RAILTRACKS dwords
-#define ARRAY_RailTrackNodePointers             0xC38024    // NUM_RAILTRACKS pointers to arrays of SRailNode
+#define NUM_RAILTRACKS              4
+#define ARRAY_NumRailTrackNodes     0xC38014            // NUM_RAILTRACKS dwords
+#define ARRAY_RailTrackNodePointers 0xC38024            // NUM_RAILTRACKS pointers to arrays of SRailNode
 
-#define VAR_CVehicle_SpecialColModels           0xc1cc78
+#define VAR_CVehicle_SpecialColModels 0xc1cc78
 
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
-#define HANDLING_NOS_Flag                       0x00080000
-#define    HANDLING_Hydraulics_Flag                0x00020000
+#define HANDLING_NOS_Flag        0x00080000
+#define HANDLING_Hydraulics_Flag 0x00020000
 
-#define VAR_CVehicle_Variation1                 0x8A6458
-#define VAR_CVehicle_Variation2                 0x8A6459
+#define VAR_CVehicle_Variation1 0x8A6458
+#define VAR_CVehicle_Variation2 0x8A6459
 
 // for vehicle sun glare
 #define FUNC_CAutomobile_OnVehiclePreRender 0x6ABCFD
@@ -328,7 +328,7 @@ class CAutoPilot
     BYTE pad[56];
 };
 
-#define MAX_UPGRADES_ATTACHED 15 // perhaps?
+#define MAX_UPGRADES_ATTACHED 15            // perhaps?
 
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
@@ -662,7 +662,7 @@ public:
     };
     void SetHeliRotorSpeed(float fSpeed) { *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124) = fSpeed; };
     void SetPlaneRotorSpeed(float fSpeed);
-    
+
     void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240) = ulTime; };
     void SetRadioStatus(bool bStatus) { *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_pInterface) + 0x1D3) = bStatus; };
 

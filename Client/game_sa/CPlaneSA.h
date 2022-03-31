@@ -14,7 +14,6 @@
 #include <game/CPlane.h>
 #include "CAutomobileSA.h"
 
-
 enum ePlaneNodes
 {
     PLANE_NODE_NONE = 0,
@@ -79,7 +78,6 @@ public:
     FxSystem_c*  m_pSmokeParticle;
     uint32       m_nSmokeTimer;
     bool         m_bSmokeEjectorEnabled;
-
 };
 static_assert(sizeof(CPlaneSAInterface) == 0xA04, "Invalid size for CPlaneSAInterface");
 
