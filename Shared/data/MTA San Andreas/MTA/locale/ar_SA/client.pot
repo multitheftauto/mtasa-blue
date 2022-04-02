@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-02 16:58+0000\n"
-"PO-Revision-Date: 2022-04-02 18:04\n"
+"PO-Revision-Date: 2022-04-02 20:25\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -23,11 +23,11 @@ msgstr "طلبات الموقع الإلكتروني"
 
 #: Client\cefweb\CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr "الخادم يطلب المواقع الإلكترونية الأتية من أجل تحميلهم (لاحقاً):"
+msgstr "يطلب الخادم المواقع الإلكترونية الآتية من أجل تحميلها (لاحقاً):"
 
 #: Client\cefweb\CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "لا تقم أبدًا بإدخال معلومات حساسة لحمايتها من السرقة"
+msgstr "لا تقم أبدًا بإدخال معلومات حساسة لحمايتها من التعرّض للسرقة"
 
 #: Client\cefweb\CWebsiteRequests.cpp:46
 msgid "Remember decision"
@@ -43,7 +43,7 @@ msgstr "رفض"
 
 #: Client\core\CCommandFuncs.cpp:29
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ مساعدة في الآوامر ]***\n"
+msgstr "***[ مساعدة في الأوامر ]***\n"
 
 #: Client\core\CCommandFuncs.cpp:167
 #, c-format
@@ -52,11 +52,11 @@ msgstr "* الوقت الآن %d:%02d:%02d"
 
 #: Client\core\CCommandFuncs.cpp:251
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "تصحيح: تركيبة الآمر بالشكل الآتي: '[<كلمة المرور> <الأسم>] <المنفذ> <الخادم> connect'"
+msgstr "تصحيح: تركيبة الأمر بالشكل الآتي: '[<كلمة المرور> <الاسم>] <المنفذ> <الخادم> connect'"
 
 #: Client\core\CCommandFuncs.cpp:259 Client\core\CCommandFuncs.cpp:327
 msgid "connect: Bad port number"
-msgstr "الإتصال: خطأ في رقم المنفذ"
+msgstr "الاتصال: خطأ في رَقْم المنفذ"
 
 #: Client\core\CCommandFuncs.cpp:281 Client\core\CCommandFuncs.cpp:342
 #, c-format
@@ -66,15 +66,15 @@ msgstr "الإتصال: جاري الإتصال بـ %s:%u..."
 #: Client\core\CCommandFuncs.cpp:285 Client\core\CCommandFuncs.cpp:346
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "الإتصال: تعذر الاتصال بـ %s:%u!"
+msgstr "الاتصال: تعذر الاتصال بـ %s:%u!"
 
 #: Client\core\CCommandFuncs.cpp:290
 msgid "connect: Failed to unload current mod"
-msgstr "الإتصال: فشل في إلغاء تحميل المود الحالي"
+msgstr "الاتصال: فشل في إلغاء تحميل المود الحالي"
 
 #: Client\core\CCommandFuncs.cpp:380
 msgid "Bound all controls from GTA"
-msgstr "تمت إعادة الإختصارات الإفتراضية لـ GTA"
+msgstr "تمت إعادة الاختصارات الافتراضية لـ GTA"
 
 #: Client\core\CCommandFuncs.cpp:394
 msgid "Saved configuration file"
@@ -89,11 +89,11 @@ msgstr "* الرقم التسلسلي (السيريال) الخاص بك هو : 
 #. Unknown command
 #: Client\core\CCommands.cpp:209
 msgid "Unknown command or cvar: "
-msgstr "آمر غير معروف أو cvar:"
+msgstr "أمر غير معروف أو cvar: "
 
 #: Client\core\CConnectManager.cpp:80
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "تعذر الإتصال. الإسم المستخدم غير صالح!"
+msgstr "تعذر الاتصال. الاسم المستخدم غير صالح!"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -135,18 +135,18 @@ msgstr "خطأ"
 
 #: Client\core\CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "فشل في الاتصال. المضيف غير صالح!"
+msgstr "تعذر الاتصال. المضيف غير صالح!"
 
 #: Client\core\CConnectManager.cpp:132
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "تعذر الإتصال بـ %s في المنفذ %u!"
+msgstr "تعذر الاتصال بـ %s في المنفذ %u!"
 
 #. Display the status box
 #: Client\core\CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "الإتصال بـ %s:%u ..."
+msgstr "الاتصال بـ %s:%u ..."
 
 #. Display the status box
 #: Client\core\CConnectManager.cpp:154
@@ -604,12 +604,12 @@ msgstr "نعم"
 #. Create the window
 #: Client\core\CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "الأخبار"
 
 #. News link
 #: Client\core\CNewsBrowser.cpp:171
 msgid "Visit latest news article"
-msgstr "قم بزيارة مقال آخر الأخبار"
+msgstr "زيارة مقال آخر الأخبار"
 
 #: Client\core\CQuestionBox.cpp:192 Shared\sdk\SharedUtil.Misc.hpp:696
 msgid "Do you want to see some on-line help about this problem ?"
