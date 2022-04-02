@@ -99,7 +99,7 @@ public:
     void  SetBuoyancyConstant(float fBuoyancyConstant);
     void  GetCenterOfMass(CVector& vecCenterOfMass) const;
     void  SetCenterOfMass(const CVector& vecCenterOfMass);
-
+    float GetRopeHeight();
     bool IsBreakable(bool bCheckModelList = true);
     bool SetBreakable(bool bBreakable);
     bool Break();

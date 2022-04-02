@@ -774,6 +774,14 @@ void CClientObject::SetTurnMass(float fTurnMass)
     m_fTurnMass = fTurnMass;
 }
 
+float CClientObject::GetRopeHeight()
+{
+    if (m_pObject)
+        return m_pObject->GetRopeHeight();
+
+    return 0.f;
+}
+
 float CClientObject::GetAirResistance()
 {
     if (m_pObject)

@@ -401,6 +401,12 @@ void CObjectSA::SetScale(float fX, float fY, float fZ)
     GetObjectInterface()->fScale = std::max(fX, std::max(fY, fZ));
 }
 
+float CObjectSA::GetRopeHeight()
+{
+    const auto ropeIndex = CRopesSA::FindRope(static_cast<CObjectSAInterface*>(this->GetInterface()));
+    return CRopesSA::GetRope(ropeIndex).m_fSegmentLength;
+}
+
 CVector* CObjectSA::GetScale()
 {
     return &m_vecScale;

@@ -42,4 +42,6 @@ public:
     LUA_DECLARE(ToggleObjectRespawn);
     LUA_DECLARE(SetObjectMass);
     LUA_DECLARE(SetObjectProperty);
+    //Rope Related funcs
+    LUA_DECLARE(GetRopeHeight);
 };

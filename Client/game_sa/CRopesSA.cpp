@@ -10,9 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#define MAX_NUM_ROPES 8
 DWORD dwDurationAddress = 0x558D1El;
-
-CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface(*)[8])0xB768B8;
+CRopesSAInterface (&CRopesSA::ms_aRopes)[MAX_NUM_ROPES] = *(CRopesSAInterface(*)[MAX_NUM_ROPES])0xB768B8;
 
 int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
 {
@@ -51,4 +51,21 @@ void CRopesSA::RemoveEntityRope(CEntitySAInterface* pEntity)
         auto CRope_Remove = (void(__thiscall*)(CRopesSAInterface*))0x556780;
         CRope_Remove(pRope);
     }
+}
+
+int32 CRopesSA::FindRope(CEntitySAInterface* id)
+{
+    for (auto ropeId = 0; ropeId < MAX_NUM_ROPES; ropeId++)
+    {
+        if (ms_aRopes[ropeId].m_ucRopeType != eRopeType::NONE && ms_aRopes[ropeId].m_pRopeEntity == id)
+            return ropeId;
+    }
+    return -1;
+}
+
+CRopesSAInterface& CRopesSA::GetRope(int32 index)
+{
+    //assert(index >= 0);
+    if (index >= 0)
+        return ms_aRopes[index];
 }

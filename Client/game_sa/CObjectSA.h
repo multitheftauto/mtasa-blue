@@ -155,6 +155,9 @@ public:
     CVector* GetScale();
     void     ResetScale();
 
+    float GetRopeHeight();
+    void  SetRopeHeight(float height);
+
 private:
     void CheckForGangTag();
 };
