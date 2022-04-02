@@ -142,7 +142,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
         {
             bool didLoad = LoadFromData(luaVM, vectorGraphic, pathOrRawData.value());
 
-            // Retain support for callback functions (#2587)
+            // Retain support for callback functions (#2589)
             if (luaFunctionRef.has_value() && VERIFY_FUNCTION(luaFunctionRef.value()))
             {
                 vectorGraphic->SetUpdateCallback(luaFunctionRef.value());
@@ -168,7 +168,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
                 delete file;
 
-                // Retain support for callback functions (#2587)
+                // Retain support for callback functions (#2589)
                 if (luaFunctionRef.has_value() && VERIFY_FUNCTION(luaFunctionRef.value()))
                 {
                     vectorGraphic->SetUpdateCallback(luaFunctionRef.value());
@@ -208,7 +208,7 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* vectorGraphi
 {
     bool didLoad = SetDocument(vectorGraphic, xmlNode);
 
-    // Retain support for callback functions (#2587)
+    // Retain support for callback functions (#2589)
     if (luaFunctionRef.has_value() && VERIFY_FUNCTION(luaFunctionRef.value()))
     {
         vectorGraphic->SetUpdateCallback(luaFunctionRef.value());
@@ -232,7 +232,7 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* vectorGraphic, CVec
 
     bool didLoad = SetSize(vectorGraphic, size);
 
-    // Retain support for callback functions (#2587)
+    // Retain support for callback functions (#2589)
     if (luaFunctionRef.has_value() && VERIFY_FUNCTION(luaFunctionRef.value()))
     {
         vectorGraphic->SetUpdateCallback(luaFunctionRef.value());
