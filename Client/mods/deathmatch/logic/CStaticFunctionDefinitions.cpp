@@ -3906,6 +3906,16 @@ bool CStaticFunctionDefinitions::GetRopeHeight(CClientObject& Object, float& hei
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetRopeHeight(CClientObject& Object, float& height)
+{
+    if (IS_OBJECT(&Object))
+    {
+        Object.SetRopeHeight(height);
+        return true;
+    }
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetObjectBuoyancyConstant(CClientObject& Object, float& fBuoyancyConstant)
 {
     fBuoyancyConstant = Object.GetBuoyancyConstant();

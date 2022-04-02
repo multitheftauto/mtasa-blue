@@ -782,6 +782,12 @@ float CClientObject::GetRopeHeight()
     return 0.f;
 }
 
+void CClientObject::SetRopeHeight(float height)
+{
+    if (m_pObject)
+        return m_pObject->SetRopeHeight(height);
+}
+
 float CClientObject::GetAirResistance()
 {
     if (m_pObject)

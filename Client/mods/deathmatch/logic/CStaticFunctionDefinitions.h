@@ -281,6 +281,8 @@ public:
     static bool           GetObjectCenterOfMass(CClientObject& Object, CVector& vecCenterOfMass);
     static bool           IsObjectVisibleInAllDimensions(CClientEntity& Entity);
     static bool           GetRopeHeight(CClientObject& Object, float& height);
+    static bool           SetRopeHeight(CClientObject& Object, float& height);
+
     // Object set funcs
     static bool SetObjectRotation(CClientEntity& Entity, const CVector& vecRotation);
     static bool MoveObject(CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation,

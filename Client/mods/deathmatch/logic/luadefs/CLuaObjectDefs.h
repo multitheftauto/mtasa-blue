@@ -44,4 +44,5 @@ public:
     LUA_DECLARE(SetObjectProperty);
     //Rope Related funcs
     LUA_DECLARE(GetRopeHeight);
+    LUA_DECLARE(SetRopeHeight);
 };

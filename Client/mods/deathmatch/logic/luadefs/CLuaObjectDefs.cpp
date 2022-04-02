@@ -24,6 +24,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"isObjectBreakable", IsObjectBreakable},
         {"getObjectMass", GetObjectMass},
         {"getRopeHeight", GetRopeHeight},
+        {"setRopeHeight", SetRopeHeight},
         {"getObjectProperty", GetObjectProperty},
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
 
@@ -726,6 +727,30 @@ int CLuaObjectDefs::GetRopeHeight(lua_State* luaVM)
             return 1;
         }
       
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaObjectDefs::SetRopeHeight(lua_State* luaVM)
+{
+    //  float, float, float getObjectScale ( object theObject )
+    CClientObject* pObject;
+    float height;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pObject);
+    argStream.ReadNumber(height);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetRopeHeight(*pObject, height))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

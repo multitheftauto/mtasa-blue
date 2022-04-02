@@ -100,6 +100,7 @@ public:
     void  GetCenterOfMass(CVector& vecCenterOfMass) const;
     void  SetCenterOfMass(const CVector& vecCenterOfMass);
     float GetRopeHeight();
+    void  SetRopeHeight(float height);
     bool IsBreakable(bool bCheckModelList = true);
     bool SetBreakable(bool bBreakable);
     bool Break();

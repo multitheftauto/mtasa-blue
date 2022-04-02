@@ -407,6 +407,12 @@ float CObjectSA::GetRopeHeight()
     return CRopesSA::GetRope(ropeIndex).m_fSegmentLength;
 }
 
+void CObjectSA::SetRopeHeight(float height)
+{
+    const auto ropeIndex = CRopesSA::FindRope(static_cast<CObjectSAInterface*>(this->GetInterface()));
+    CRopesSA::GetRope(ropeIndex).m_fSegmentLength = height;
+}
+
 CVector* CObjectSA::GetScale()
 {
     return &m_vecScale;

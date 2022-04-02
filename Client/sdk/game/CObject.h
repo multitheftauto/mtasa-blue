@@ -42,4 +42,5 @@ public:
     virtual CVector* GetScale() = 0;
     virtual void     ResetScale() = 0;
     virtual float GetRopeHeight() = 0;
+    virtual void SetRopeHeight(float height) = 0;
 };
