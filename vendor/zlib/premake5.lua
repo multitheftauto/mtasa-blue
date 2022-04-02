@@ -21,5 +21,5 @@ project "zlib"
 
 	defines { "verbose=-1" }    -- Stop "bit length overflow" warning
 
-	filter "system:Mac"
+	filter "system:Mac*"
 		defines { "Z_HAVE_UNISTD_H" }
