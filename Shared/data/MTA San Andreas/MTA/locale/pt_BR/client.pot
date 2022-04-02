@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-02 16:58+0000\n"
-"PO-Revision-Date: 2022-04-02 18:08\n"
+"PO-Revision-Date: 2022-04-02 19:26\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "MIME-Version: 1.0\n"
@@ -604,7 +604,7 @@ msgstr "Sim"
 #. Create the window
 #: Client\core\CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "NOTÍCIAS"
 
 #. News link
 #: Client\core\CNewsBrowser.cpp:171
