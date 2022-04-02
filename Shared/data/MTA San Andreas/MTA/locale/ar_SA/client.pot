@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-02 16:58+0000\n"
-"PO-Revision-Date: 2022-04-02 20:25\n"
+"PO-Revision-Date: 2022-04-02 21:24\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "MIME-Version: 1.0\n"
@@ -152,12 +152,12 @@ msgstr "الاتصال بـ %s:%u ..."
 #: Client\core\CConnectManager.cpp:154
 #: Client\mods\deathmatch\logic\CClientGame.cpp:584
 msgid "CONNECTING"
-msgstr "جاري الإتصال"
+msgstr "جاري الاتصال"
 
 #: Client\core\CConnectManager.cpp:269
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1163
 msgid "Connection timed out"
-msgstr "إنتهت مهلة الإتصال"
+msgstr "انتهت مهلة الاتصال"
 
 #: Client\core\CConnectManager.cpp:283 Client\core\CConnectManager.cpp:287
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1208
@@ -172,17 +172,17 @@ msgstr "قطع الإتصال: قطع الإتصال عن بعد"
 #: Client\core\CConnectManager.cpp:295
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1216
 msgid "Disconnected: connection lost remotely"
-msgstr "قُطع الإتصال: فقد الإتصال عن بُعد"
+msgstr "قطع الاتصال: فقد الاتصال عن بُعد"
 
 #: Client\core\CConnectManager.cpp:299
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1220
 msgid "Disconnected: you are banned from this server"
-msgstr "قطع الإتصال: أنت محظور من الدخول إلى هذا الخادم"
+msgstr "قطع الاتصال: أنت محظور من الدخول إلى هذا الخادم"
 
 #: Client\core\CConnectManager.cpp:306
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1228
 msgid "Disconnected: disconnected from the server"
-msgstr "قُطع الإتصال: قُطع الإتصال من الخادم"
+msgstr "قطع الاتصال: قطع الاتصال من الخادم"
 
 #: Client\core\CConnectManager.cpp:310
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1232
@@ -202,11 +202,11 @@ msgstr "لا يوجد mod مُشابه مُثبت (%s)"
 
 #: Client\core\CConnectManager.cpp:417
 msgid "Bad server response (2)"
-msgstr "إستجابة خادم سيئة (2)"
+msgstr "استجابة خادم سيئة (2)"
 
 #: Client\core\CConnectManager.cpp:427
 msgid "Bad server response (1)"
-msgstr "إستجابة خادم سيئة (1)"
+msgstr "استجابة خادم سيئة (1)"
 
 #. Create window
 #: Client\core\CConsole.cpp:417
@@ -224,7 +224,7 @@ msgstr "خطأ فادح"
 
 #: Client\core\CCore.cpp:855
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "للإصلاح, أحدف هذا الملف:"
+msgstr "للإصلاح، قم بإزالة هذا المِلَفّ:"
 
 #: Client\core\CCore.cpp:887
 #, c-format
@@ -233,7 +233,7 @@ msgstr "وحدة %s غير صحيحة!"
 
 #: Client\core\CCore.cpp:1200
 msgid "Error executing URL"
-msgstr "خطأ في تنفيذ الرابط ."
+msgstr "خطأ في تنفيذ الرابط"
 
 #: Client\core\CCore.cpp:1212
 #, c-format
@@ -244,7 +244,7 @@ msgstr "خطأ في تشغيل المورد 'mod' المحدد في سطر ال�
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client\core\CCore.cpp:1297
 msgid "this help screen"
-msgstr "هذه شاشة المساعدة"
+msgstr "شاشة المساعدة هذه"
 
 #: Client\core\CCore.cpp:1298 Client\core\CCore.cpp:1299
 msgid "exits the application"
@@ -252,7 +252,7 @@ msgstr "الخروج من التطبيق"
 
 #: Client\core\CCore.cpp:1300
 msgid "shows the version"
-msgstr "اضهار الإصدار"
+msgstr "إظهار الإصدار"
 
 #: Client\core\CCore.cpp:1301
 msgid "shows the time"
@@ -260,11 +260,11 @@ msgstr "إظهار الوقت"
 
 #: Client\core\CCore.cpp:1302
 msgid "shows the hud"
-msgstr "ظهور معلومات اللاعب (Hud)."
+msgstr "إظهار معلومات اللعب (Hud)"
 
 #: Client\core\CCore.cpp:1303
 msgid "shows all the binds"
-msgstr "يظهر كل الأزرار المربوطة بالأوامر"
+msgstr "إظهار جميع الأزرار المربوطة"
 
 #: Client\core\CCore.cpp:1304
 msgid "shows your serial"
@@ -296,7 +296,7 @@ msgstr "يخرج لقطة من الشاشة"
 
 #: Client\core\CCore.cpp:1319
 msgid "immediately saves the config"
-msgstr "يحفظ الإعدادات على الفور."
+msgstr "يحفظ الإعدادات على الفور"
 
 #: Client\core\CCore.cpp:1321
 msgid "clears the debug view"
@@ -1346,7 +1346,7 @@ msgstr "أفقي:"
 
 #: Client\core\CSettings.cpp:2166
 msgid "Vertical:"
-msgstr "عامودي:"
+msgstr "عمودي:"
 
 #: Client\core\CSettings.cpp:2166
 msgid "Text-Align:"
