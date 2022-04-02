@@ -1,16 +1,15 @@
-# 
 msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-21 17:13\n"
-"PO-Revision-Date: 2022-01-08 18:31\n"
+"POT-Creation-Date: 2022-04-02 16:58\n"
+"PO-Revision-Date: 2022-04-02 18:07\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
+"Language: sk_SK\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: sk_SK\n"
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 3;\n"
 "X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
 "X-Crowdin-Project-ID: 13\n"
@@ -19,17 +18,17 @@ msgstr ""
 "X-Crowdin-File-ID: 89\n"
 
 #. GET_XPVISTA_PLEASE
-#: ../Shared/installer/nightly.nsi:188
+#: Shared/installer/nightly.nsi:188
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
 msgstr "Verzia MTA:SA, ktorú ste si stiahli, nepodporuje Windows XP alebo Vista. Stiahnite si alternatívnu verziu z www.mtasa.com."
 
 #. GET_MASTER_PLEASE
-#: ../Shared/installer/nightly.nsi:189
+#: Shared/installer/nightly.nsi:189
 msgid "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
 msgstr "Verzia MTA:SA je navrhnutá pre staré verzie systému Windows. Stiahnite si najnovšiu verziu z www.mtasa.com."
 
 #. WELCOME_TEXT
-#: ../Shared/installer/nightly.nsi:193
+#: Shared/installer/nightly.nsi:193
 msgid "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n"
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
@@ -40,17 +39,17 @@ msgstr "Tento sprievodca Vás povedie počas inštalácie alebo aktualizácie $(
 "Kliknite na Ďalej pre pokračovanie."
 
 #. HEADER_Text
-#: ../Shared/installer/nightly.nsi:194
+#: Shared/installer/nightly.nsi:194
 msgid "Grand Theft Auto: San Andreas location"
 msgstr "Umiestnenie Grand Theft Auto: San Andreas"
 
 #. DIRECTORY_Text_Dest
-#: ../Shared/installer/nightly.nsi:195
+#: Shared/installer/nightly.nsi:195
 msgid "Grand Theft Auto: San Andreas folder"
 msgstr "Priečinok s Grand Theft Auto: San Andreas"
 
 #. DIRECTORY_Text_Top
-#: ../Shared/installer/nightly.nsi:196
+#: Shared/installer/nightly.nsi:196
 msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
@@ -63,152 +62,152 @@ msgstr "Prosím vyberte priečinok s Grand Theft Auto: San Andreas.$\n"
 "Pre začatie inštalácie kliknite na Inštalovať."
 
 #. DESC_Section10
-#: ../Shared/installer/nightly.nsi:199
+#: Shared/installer/nightly.nsi:199
 msgid "Create a Start Menu group for installed applications"
 msgstr "Pridať zástupcu do menu Štart"
 
 #. DESC_Section11
-#: ../Shared/installer/nightly.nsi:200
+#: Shared/installer/nightly.nsi:200
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
 msgstr "Pridať odkaz na plochu."
 
 #. DESC_Section12
-#: ../Shared/installer/nightly.nsi:201
+#: Shared/installer/nightly.nsi:201
 msgid "Register mtasa:// protocol for browser clickable-ness."
 msgstr "Zaregistrovať protokol mtasa:// v prehliadačoch."
 
 #. DESC_Section13
-#: ../Shared/installer/nightly.nsi:202
+#: Shared/installer/nightly.nsi:202
 msgid "Add to Windows Games Explorer (if present)."
 msgstr "Pridať do Hier Windows (ak sú k dispozícií)."
 
 #. DESC_DirectX
-#: ../Shared/installer/nightly.nsi:203
+#: Shared/installer/nightly.nsi:203
 msgid "Install or update DirectX (if required)."
 msgstr "Nainštalujte alebo aktualizujte DirectX (ak je to potrebné)."
 
 #. DESC_Section1
-#: ../Shared/installer/nightly.nsi:204
+#: Shared/installer/nightly.nsi:204
 msgid "The core components required to run Multi Theft Auto."
 msgstr "Hlavné súčasti potrebné k fungovaniu Multi Theft Auto."
 
 #. DESC_Section2
-#: ../Shared/installer/nightly.nsi:205
+#: Shared/installer/nightly.nsi:205
 msgid "The MTA:SA modification, allowing you to play online."
 msgstr "Súčasť MTA:SA pre server"
 
 #. DESC_SectionGroupServer
-#: ../Shared/installer/nightly.nsi:208
+#: Shared/installer/nightly.nsi:208
 msgid "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 msgstr "Multi Theft Auto Server. Umožňuje vytvoriť server spustený z Vášho počítača. Vyžaduje sa rýchle internetové pripojenie."
 
 #. DESC_Section4
-#: ../Shared/installer/nightly.nsi:209
+#: Shared/installer/nightly.nsi:209
 msgid "The Multi Theft Auto server. This is a required component."
 msgstr "Multi Theft Auto server. Toto je potrebná súčasť."
 
 #. DESC_Section5
-#: ../Shared/installer/nightly.nsi:210
+#: Shared/installer/nightly.nsi:210
 msgid "The MTA:SA modification for the server."
 msgstr "Súčasť MTA:SA pre server."
 
 #. DESC_Section6
-#: ../Shared/installer/nightly.nsi:211
+#: Shared/installer/nightly.nsi:211
 msgid "This is a set of required resources for your server."
 msgstr "Toto je zoznam vyžadovaných doplnkov pre Váš server."
 
 #. DESC_Section7
-#: ../Shared/installer/nightly.nsi:212
+#: Shared/installer/nightly.nsi:212
 msgid "This is an optional set of gamemodes and maps for your server."
 msgstr "Toto je voliteľný zoznam herných módov a máp pre Váš server."
 
 #. DESC_Section8
-#: ../Shared/installer/nightly.nsi:213
+#: Shared/installer/nightly.nsi:213
 msgid "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
 msgstr "MTA:SA 1.0 mapový editor. Môžete ho použiť na vytvorenie vlastnej mapy ktorú použijete v niektorom hernom móde MTA."
 
 #. DESC_Section9
-#: ../Shared/installer/nightly.nsi:214
+#: Shared/installer/nightly.nsi:214
 msgid "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
 msgstr "Toto je SDK - sada nástrojov pre vývojára. Inštalujte iba ak máte dobré znalosti C++!"
 
 #. DESC_SectionGroupDev
-#: ../Shared/installer/nightly.nsi:216
+#: Shared/installer/nightly.nsi:216
 msgid "Development code and tools that aid in the creation of mods for Multi Theft Auto"
 msgstr "Vývojový kód a nástroje ktoré pomáhajú pri vytváraní módov pre Multi Theft Auto"
 
 #. DESC_SectionGroupClient
-#: ../Shared/installer/nightly.nsi:217
+#: Shared/installer/nightly.nsi:217
 msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "Klient je program ktorý spustíte pre hranie na Multi Theft Auto serveri"
 
 #. INST_CLIENTSERVER
-#: ../Shared/installer/nightly.nsi:417
+#: Shared/installer/nightly.nsi:417
 msgid "Client and Server"
 msgstr "Klient a Server"
 
 #. INST_SERVER
-#: ../Shared/installer/nightly.nsi:418
+#: Shared/installer/nightly.nsi:418
 msgid "Server only"
 msgstr "Len Server"
 
 #. INST_STARTMENU_GROUP
-#: ../Shared/installer/nightly.nsi:432
+#: Shared/installer/nightly.nsi:432
 msgid "Start menu group"
 msgstr "Zástupca v menu Štart"
 
 #. INST_DESKTOP_ICON
-#: ../Shared/installer/nightly.nsi:433
+#: Shared/installer/nightly.nsi:433
 msgid "Desktop icon"
 msgstr "Ikona na ploche"
 
 #. INST_PROTOCOL
-#: ../Shared/installer/nightly.nsi:434
+#: Shared/installer/nightly.nsi:434
 msgid "Register mtasa:// protocol"
 msgstr "Zaregistrovať mtasa:// protokol"
 
 #. INST_GAMES_EXPLORER
-#: ../Shared/installer/nightly.nsi:435
+#: Shared/installer/nightly.nsi:435
 msgid "Add to Games Explorer"
 msgstr "Pridať do Hier Windows"
 
 #. INST_DIRECTX
-#: ../Shared/installer/nightly.nsi:436
+#: Shared/installer/nightly.nsi:436
 msgid "Install DirectX"
 msgstr "Nainštalujte DirectX"
 
 #. INST_SEC_CLIENT
-#: ../Shared/installer/nightly.nsi:470
+#: Shared/installer/nightly.nsi:470
 msgid "Game client"
 msgstr "Herný klient"
 
 #. INST_SEC_SERVER
-#: ../Shared/installer/nightly.nsi:471
+#: Shared/installer/nightly.nsi:471
 msgid "Dedicated server"
 msgstr "Dedikovaný server"
 
 #. INST_SEC_CORE
-#: ../Shared/installer/nightly.nsi:472
+#: Shared/installer/nightly.nsi:472
 msgid "Core components"
 msgstr "Hlavné súčasti"
 
 #. INST_SEC_GAME
-#: ../Shared/installer/nightly.nsi:473
+#: Shared/installer/nightly.nsi:473
 msgid "Game module"
 msgstr "Herný modul"
 
 #. INFO_INPLACE_UPGRADE
-#: ../Shared/installer/nightly.nsi:475
+#: Shared/installer/nightly.nsi:475
 msgid "Performing in-place upgrade..."
 msgstr "Prevedenie miestnej aktualizácie..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: ../Shared/installer/nightly.nsi:476
+#: Shared/installer/nightly.nsi:476
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Aktualizácia oprávnení. Toto môže trvať niekoľko minút..."
 
 #. MSGBOX_INVALID_GTASA
-#: ../Shared/installer/nightly.nsi:479
+#: Shared/installer/nightly.nsi:479
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -217,42 +216,42 @@ msgstr "Platná Windows verzia hry Grand Theft Auto: San Andreas nebola nájden�
 "Preinštalujte MTA v prípade neskorších problémov."
 
 #. INST_SEC_CORE_RESOURCES
-#: ../Shared/installer/nightly.nsi:480
+#: Shared/installer/nightly.nsi:480
 msgid "Core Resources"
 msgstr "Hlavné Súčasti"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: ../Shared/installer/nightly.nsi:481
+#: Shared/installer/nightly.nsi:481
 msgid "Optional Resources"
 msgstr "Voliteľné Súčasti"
 
 #. INST_SEC_EDITOR
-#: ../Shared/installer/nightly.nsi:482
+#: Shared/installer/nightly.nsi:482
 msgid "Editor"
 msgstr "Mapový editor"
 
 #. INST_SEC_DEVELOPER
-#: ../Shared/installer/nightly.nsi:957
+#: Shared/installer/nightly.nsi:957
 msgid "Development"
 msgstr "Vývoj"
 
 #. UNINST_SUCCESS
-#: ../Shared/installer/nightly.nsi:1005
+#: Shared/installer/nightly.nsi:1005
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) bol úspešne odstránený z Vášho počítača."
 
 #. UNINST_FAIL
-#: ../Shared/installer/nightly.nsi:1012
+#: Shared/installer/nightly.nsi:1012
 msgid "Uninstallation has failed!"
 msgstr "Odinštalácia neúspešná!"
 
 #. UNINST_REQUEST
-#: ../Shared/installer/nightly.nsi:1020
+#: Shared/installer/nightly.nsi:1020
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Ste si istý že chcete kompletne odstrániť $(^Name) a všetky jeho súčasti?"
 
 #. UNINST_REQUEST_NOTE
-#: ../Shared/installer/nightly.nsi:1023
+#: Shared/installer/nightly.nsi:1023
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -261,32 +260,32 @@ msgstr "Odinštalovanie pred aktualizovaním?$\\r$\n"
 "Spustite novú inštaláciu, aby ste aktualizovali a zachovali svoje nastavenia."
 
 #. UNINST_DATA_REQUEST
-#: ../Shared/installer/nightly.nsi:1034
+#: Shared/installer/nightly.nsi:1034
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Chcete ponechať Vaše osobné súbory (ako doplnky, screenshoty a nastavenie servera)? Ak kliknete na nie, všetky doplnky, nastavenia a screenshoty ktoré ste vytvorili budú zmazané."
 
 #. UAC_RIGHTS1
-#: ../Shared/installer/nightly.nsi:1132
+#: Shared/installer/nightly.nsi:1132
 msgid "This installer requires admin access, try again"
 msgstr "Tento inštalátor vyžaduje administrátorský prístup, skúste to znovu"
 
 #. UAC_RIGHTS_UN
-#: ../Shared/installer/nightly.nsi:1133
+#: Shared/installer/nightly.nsi:1133
 msgid "This uninstaller requires admin access, try again"
 msgstr "Tento odinštalátor vyžaduje administrátorský prístup, skúste to znovu"
 
 #. UAC_RIGHTS3
-#: ../Shared/installer/nightly.nsi:1134
+#: Shared/installer/nightly.nsi:1134
 msgid "Logon service not running, aborting!"
 msgstr "Prihlasovacia služba nie je spustená, ukončenie!"
 
 #. UAC_RIGHTS4
-#: ../Shared/installer/nightly.nsi:1135
+#: Shared/installer/nightly.nsi:1135
 msgid "Unable to elevate"
 msgstr "Nemožno povýšiť"
 
 #. INST_MTA_CONFLICT
-#: ../Shared/installer/nightly.nsi:1734
+#: Shared/installer/nightly.nsi:1734
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -297,7 +296,7 @@ msgstr "Odlišná hlavná verzia MTA ($1) existuje v danom umiestnení.$\n"
 "Ste si istý, že chcete nahradiť MTA $1 v $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
-#: ../Shared/installer/nightly.nsi:1737
+#: Shared/installer/nightly.nsi:1737
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -308,7 +307,7 @@ msgstr "MTA nemožno nainštalovať do rovnakého adresára ako GTA:SA.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: ../Shared/installer/nightly.nsi:1739
+#: Shared/installer/nightly.nsi:1739
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -317,7 +316,7 @@ msgstr "Vybratý priečinok neexistuje.$\n"
 "Prosím zvoľte priečinok s hrou GTA:SA"
 
 #. INST_GTA_ERROR2
-#: ../Shared/installer/nightly.nsi:1741
+#: Shared/installer/nightly.nsi:1741
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -326,17 +325,17 @@ msgstr "Nemožno nájsť hru GTA:SA nainštalovanú v $GTA_DIR $\n"
 "Ste si istý že chcete pokračovať?"
 
 #. INST_CHOOSE_LOC_TOP
-#: ../Shared/installer/nightly.nsi:1858
+#: Shared/installer/nightly.nsi:1858
 msgid "Choose Install Location"
 msgstr "Vyberte umiestnenie inštalácie"
 
 #. INST_CHOOSE_LOC
-#: ../Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1859
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Vyberte priečinok do ktorého chcete nainštalovať ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: ../Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1861
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -347,62 +346,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bude nainštalovaný do nasled
 "Kliknite na Ďalej pre pokračovanie."
 
 #. INST_CHOOSE_LOC3
-#: ../Shared/installer/nightly.nsi:1862
+#: Shared/installer/nightly.nsi:1862
 msgid "Destination Folder"
 msgstr "Cieľový priečinok"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: ../Shared/installer/nightly.nsi:1863
+#: Shared/installer/nightly.nsi:1863
 msgid "Browse..."
 msgstr "Prehľadávať..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: ../Shared/installer/nightly.nsi:1864
+#: Shared/installer/nightly.nsi:1864
 msgid "Default"
 msgstr "Predvolené"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: ../Shared/installer/nightly.nsi:1865
+#: Shared/installer/nightly.nsi:1865
 msgid "Last used"
 msgstr "Naposledy použité"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: ../Shared/installer/nightly.nsi:1866
+#: Shared/installer/nightly.nsi:1866
 msgid "Custom"
 msgstr "Pokročilé"
 
 #. INST_CHOOSE_LOC4
-#: ../Shared/installer/nightly.nsi:2044
+#: Shared/installer/nightly.nsi:2044
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Vyberte priečinok pre inštaláciu ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
-#: ../Shared/installer/nightly.nsi:2062
+#: Shared/installer/nightly.nsi:2062
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Varovanie: Odlišná hlavná verzia MTA ($1) existuje v danom umiestnení."
 
 #. INST_LOC_UPGRADE
-#: ../Shared/installer/nightly.nsi:2063
+#: Shared/installer/nightly.nsi:2063
 msgid "Installation type:  Upgrade"
 msgstr "Typ inštalácie: Aktualizácia"
 
 #. NETTEST_TITLE1
-#: ../Shared/installer/nightly.nsi:2306
+#: Shared/installer/nightly.nsi:2306
 msgid "Online update"
 msgstr "Online aktualizácia"
 
 #. NETTEST_TITLE2
-#: ../Shared/installer/nightly.nsi:2307
+#: Shared/installer/nightly.nsi:2307
 msgid "Checking for update information"
 msgstr "Hľadajú sa informácie o aktualizácii"
 
 #. NETTEST_STATUS1
-#: ../Shared/installer/nightly.nsi:2308
+#: Shared/installer/nightly.nsi:2308
 msgid "Checking for installer update information..."
 msgstr "Hľadajú sa informácie o aktualizácii inštalátora..."
 
 #. NETTEST_STATUS2
-#: ../Shared/installer/nightly.nsi:2309
+#: Shared/installer/nightly.nsi:2309
 msgid "Please ensure your firewall is not blocking"
 msgstr "Uistite sa, že váš firewall neni blokovaný"
 
