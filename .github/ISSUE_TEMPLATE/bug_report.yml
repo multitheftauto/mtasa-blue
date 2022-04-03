@@ -8,11 +8,13 @@ body:
         # Stop right now if you're reporting a cheat or security vulnerability!
 
         **Please read our [Security Policy](https://github.com/multitheftauto/mtasa-blue/security/policy) to learn where to responsibly report security issues. Thank you.**
+
+        This template is only for reporting bugs. If you have a feature request, please use the [feature request template](https://github.com/multitheftauto/mtasa-blue/issues/new?assignees=&labels=enhancement&template=feature_request.yml).
   - type: textarea
     id: what-happened
     attributes:
       label: Describe the bug
-      description: Please provide us a clear and concise description of what the bug is.
+      description: Please provide a clear and concise description of what the bug is.
       placeholder: Tell us what you see!
     validations:
       required: true
@@ -20,7 +22,7 @@ body:
     id: to-reproduce
     attributes:
       label: Steps to reproduce
-      description: Please provide us clear steps to reproduce the behaviour.
+      description: Please provide clear steps to reproduce the behaviour.
       placeholder: |
         1. Go to '...'
         2. Click on '...'
@@ -33,7 +35,7 @@ body:
     attributes:
       label: Version
       description: |
-        Please provide us the version of the MTA client and/or server you are running.
+        Please provide the version of the MTA client and/or server you are running.
 
         Client: You can open the client console using the `F8` key on your keyboard and using the `ver` command to get the version.
         Server: You can use the `ver` command in the server console to get the version. 
@@ -49,7 +51,7 @@ body:
     attributes:
       label: Additional context
       description: |
-        If available, please provide any other additional context, such as screenshots or videos, or links to other relevant issues, pull requests or documents about the problem here that can help us troubleshoot your issue more accurately.
+        If available, please provide any other additional context, such as screenshots or videos, or links to other relevant issues, pull requests or documents that can help others troubleshoot your issue more accurately and efficiently.
   - type: textarea
     id: logs
     attributes:
