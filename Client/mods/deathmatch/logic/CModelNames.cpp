@@ -10017,7 +10017,7 @@ struct
     10267, "cables16",
     10040, "cables3",
     10012, "cables4",
-    8802, "lodrailroad26",
+    8802,  "lodrailroad26",
     6469,  "LODds23_LAw2",
     10159, "LOD_another_sfe",
     6206,  "LODjalaw_plaza",
@@ -11124,7 +11124,7 @@ struct
     3725,  "LODhillhouse06_LA",
     7255,  "lodasNedge22",
     8892,  "lodbond03_lvs",
-//  16562, "cn2_rosmot1",
+//  16562, "cn2_rosmot1", Wrong name retained for BC
     10161, "LODvicgrnd_sfe",
     17755, "LOD1lndprt1_lae",
     7002,  "lodasNroad032",
@@ -11663,7 +11663,7 @@ struct
     10577, "LODlaybyland_SFS",
     11605, "des_railbr2_LOD",
     17793, "LODLae2_roads58",
-//  2571,  "Hotel_SINGLE_1",
+//  2571,  "Hotel_SINGLE_1", Wrong name retained for BC
     16460, "lod_ne_bit_25",
     13432, "LODcuntEground04",
     11595, "nw_lodbit_23",
@@ -14107,7 +14107,7 @@ struct
     4191,  "LODFoodmart1_lan",
     7736,  "lodasNroad05",
     16483, "lod_s_bit_08",
-//  6458,  "pier03Tr_LAw2",
+//  6458,  "pier03Tr_LAw2", Wrong name retained for BC
     4944,  "LODpurt2ax_las01",
     13431, "LODcuntEground05",
     13094, "LODcuntetownrd05",
