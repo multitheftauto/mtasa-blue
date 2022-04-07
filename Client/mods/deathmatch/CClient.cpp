@@ -177,10 +177,8 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
                     // g_pClientGame->EnablePacketRecorder ( "log.rec" );
                     // g_pCore->GetConsole ()->Echo ( "Packetlogger is logging to log.rec" );
 
-                    SString secret = g_pCore->GetDiscordManager()->GetJoinSecret();
-
                     // Start the game
-                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str(), CClientGame::SERVER_TYPE_NORMAL, *secret);
+                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str());
                 }
                 else
                 {
@@ -313,11 +311,6 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
             vPlayerNames.push_back(strPlayerName);
         }
     }
-}
-
-void CClient::TriggerDiscordJoin(SString strSecret)
-{
-    g_pClientGame->TriggerDiscordJoin(strSecret);
 }
 
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
