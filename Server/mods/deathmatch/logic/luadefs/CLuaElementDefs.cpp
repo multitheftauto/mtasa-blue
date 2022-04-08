@@ -269,9 +269,7 @@ int CLuaElementDefs::destroyElement(lua_State* luaVM)
     CLuaPhysicsElement* pPhysicsElement = NULL;
     CScriptArgReader    argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
-    {
         argStream.ReadUserData(pPhysicsElement);
-    }
     else
         argStream.ReadUserData(pElement);
 
@@ -571,13 +569,9 @@ int CLuaElementDefs::getElementPosition(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
-    {
         argStream.ReadUserData(pPhysicsWorldElement);
-    }
     else
-    {
         argStream.ReadUserData(pElement);
-    }
 
     if (!argStream.HasErrors())
     {
@@ -737,20 +731,16 @@ int CLuaElementDefs::OOP_getElementMatrix(lua_State* luaVM)
 
 int CLuaElementDefs::getElementRotation(lua_State* luaVM)
 {
-    //  float float float getElementRotation ( element theElement [, string rotOrder = "default" ] )
+    //  float float float getElementRotation ( element theElement / physics-world-element thePhysicsWorldElement [, string rotOrder = "default" ] )
     CElement*                pElement = nullptr;
     CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
     eEulerRotationOrder      rotationOrder;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
-    {
         argStream.ReadUserData(pPhysicsWorldElement);
-    }
     else
-    {
         argStream.ReadUserData(pElement);
-    }
 
     argStream.ReadEnumString(rotationOrder, EULER_DEFAULT);
 
@@ -820,13 +810,9 @@ int CLuaElementDefs::getElementVelocity(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
         argStream.ReadUserData(pRigidBody);
-    }
     else
-    {
         argStream.ReadUserData(pElement);
-    }
 
     argStream.ReadUserData(pElement);
 
@@ -835,7 +821,6 @@ int CLuaElementDefs::getElementVelocity(lua_State* luaVM)
         if (pRigidBody)
         {
             const CVector vecVelocity = pRigidBody->GetVelocity();
-            // Return it
             lua_pushnumber(luaVM, vecVelocity.fX);
             lua_pushnumber(luaVM, vecVelocity.fY);
             lua_pushnumber(luaVM, vecVelocity.fZ);
@@ -886,19 +871,15 @@ int CLuaElementDefs::OOP_getElementVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::getElementTurnVelocity(lua_State* luaVM)
 {
-    //  float float float getElementAngularVelocity ( element theElement )
-    CElement* pElement = nullptr;
+    //  float float float getElementAngularVelocity ( element theElement / physics-rigid-body thePhysicsRigidBody )
+    CElement*             pElement = nullptr;
     CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
         argStream.ReadUserData(pRigidBody);
-    }
     else
-    {
         argStream.ReadUserData(pElement);
-    }
 
     argStream.ReadUserData(pElement);
 
@@ -906,11 +887,10 @@ int CLuaElementDefs::getElementTurnVelocity(lua_State* luaVM)
     {
         if (pRigidBody)
         {
-            const CVector vecTurnVelocity = pRigidBody->GetAngularVelocity();
-            // Return it
-            lua_pushnumber(luaVM, vecTurnVelocity.fX);
-            lua_pushnumber(luaVM, vecTurnVelocity.fY);
-            lua_pushnumber(luaVM, vecTurnVelocity.fZ);
+            const CVector vecAngularVelocity = pRigidBody->GetAngularVelocity();
+            lua_pushnumber(luaVM, vecAngularVelocity.fX);
+            lua_pushnumber(luaVM, vecAngularVelocity.fY);
+            lua_pushnumber(luaVM, vecAngularVelocity.fZ);
             return 3;
         }
         else
@@ -1880,21 +1860,17 @@ int CLuaElementDefs::setElementParent(lua_State* luaVM)
 
 int CLuaElementDefs::setElementPosition(lua_State* luaVM)
 {
-    //  bool setElementPosition ( element theElement, float x, float y, float z [, bool warp = true ] )
-    CElement*                pElement;
+    //  bool setElementPosition ( element theElement / physics-world-element thePhysicsWorldElement, float x, float y, float z [, bool warp = true ] )
+    CElement*                pElement = nullptr;
     CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
     CVector                  vecPosition;
     bool                     bWarp;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
-    {
         argStream.ReadUserData(pPhysicsWorldElement);
-    }
     else
-    {
         argStream.ReadUserData(pElement);
-    }
 
     if (!argStream.HasErrors() && pElement && pElement->GetType() == CElement::RADAR_AREA)
     {
@@ -1940,27 +1916,40 @@ int CLuaElementDefs::setElementPosition(lua_State* luaVM)
 
 int CLuaElementDefs::setElementRotation(lua_State* luaVM)
 {
-    //  bool setElementRotation ( element theElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
-    CElement*           pElement;
-    CVector             vecRotation;
-    eEulerRotationOrder rotationOrder;
-    bool                bNewWay;
+    //  bool setElementRotation ( element theElement  / physics-world-element thePhysicsWorldElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
+    CElement*                pElement = nullptr;
+    CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
+    CVector                  vecRotation;
+    eEulerRotationOrder      rotationOrder;
+    bool                     bNewWay;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+        argStream.ReadUserData(pPhysicsWorldElement);
+    else
+        argStream.ReadUserData(pElement);
+
     argStream.ReadVector3D(vecRotation);
     argStream.ReadEnumString(rotationOrder, EULER_DEFAULT);
     argStream.ReadBool(bNewWay, false);
 
     if (!argStream.HasErrors())
     {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        // Set the rotation
-        if (CStaticFunctionDefinitions::SetElementRotation(pElement, vecRotation, rotationOrder, bNewWay))
+        if (pPhysicsWorldElement)
         {
-            lua_pushboolean(luaVM, true);
-            return 1;
+            pPhysicsWorldElement->SetRotation(vecRotation);
+        }
+        else
+        {
+            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+            // Set the rotation
+            if (CStaticFunctionDefinitions::SetElementRotation(pElement, vecRotation, rotationOrder, bNewWay))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
@@ -2030,13 +2019,10 @@ int CLuaElementDefs::setElementVelocity(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
         argStream.ReadUserData(pRigidBody);
-    }
     else
-    {
         argStream.ReadUserData(pElement);
-    }
+
     argStream.ReadVector3D(vecVelocity);
 
     if (!argStream.HasErrors())
@@ -2075,13 +2061,9 @@ int CLuaElementDefs::setElementTurnVelocity(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
-    {
         argStream.ReadUserData(pRigidBody);
-    }
     else
-    {
         argStream.ReadUserData(pElement);
-    }
 
     argStream.ReadVector3D(vecTurnVelocity);
 

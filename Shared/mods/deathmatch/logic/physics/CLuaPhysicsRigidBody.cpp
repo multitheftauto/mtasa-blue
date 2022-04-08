@@ -44,6 +44,7 @@ void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
     CPhysicsSharedLogic::SetPosition(transform, vecPosition);
     m_pRigidBodyProxy->setWorldTransform(transform);
     m_pRigidBodyProxy->getMotionState()->setWorldTransform(transform);
+    m_pRigidBodyProxy->activate(true);
 }
 
 const CVector CLuaPhysicsRigidBody::GetPosition() const
@@ -60,6 +61,7 @@ void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation)
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
     m_pRigidBodyProxy->proceedToTransform(transform);
+    m_pRigidBodyProxy->activate(true);
 }
 
 const CVector CLuaPhysicsRigidBody::GetRotation() const
@@ -71,6 +73,7 @@ const CVector CLuaPhysicsRigidBody::GetRotation() const
 
 void CLuaPhysicsRigidBody::SetVelocity(CVector vecVelocity)
 {
+    m_pRigidBodyProxy->activate(true);
     m_pRigidBodyProxy->setLinearVelocity(CPhysicsSharedLogic::ConvertVector(vecVelocity));
 }
 
@@ -81,6 +84,7 @@ CVector CLuaPhysicsRigidBody::GetVelocity()
 
 void CLuaPhysicsRigidBody::SetAngularVelocity(CVector vecVelocity)
 {
+    m_pRigidBodyProxy->activate(true);
     m_pRigidBodyProxy->setAngularVelocity(CPhysicsSharedLogic::ConvertVector(vecVelocity));
 }
 
