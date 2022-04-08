@@ -61,7 +61,6 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
         {"setPlayerMuted", SetPlayerMuted},
         {"setPlayerBlurLevel", SetPlayerBlurLevel},
-        {"setPlayerDiscordJoinParams", SetPlayerDiscordJoinParams},
         {"redirectPlayer", RedirectPlayer},
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
@@ -141,7 +140,6 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setMuted", "setPlayerMuted");
     lua_classfunction(luaVM, "setName", "setPlayerName");
     lua_classfunction(luaVM, "setBlurLevel", "setPlayerBlurLevel");
-    lua_classfunction(luaVM, "setDiscordJoinParams", "setPlayerDiscordJoinParams");
     lua_classfunction(luaVM, "setWantedLevel", "setPlayerWantedLevel");
     lua_classfunction(luaVM, "setMoney", "setPlayerMoney");
     lua_classfunction(luaVM, "setNametagText", "setPlayerNametagText");
@@ -1155,38 +1153,6 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaPlayerDefs::SetPlayerDiscordJoinParams(lua_State* luaVM)
-{
-    CElement* pElement;
-    SString   strKey;
-    SString   strPartyId;
-    uint      uiPartySize;
-    uint      uiPartyMax;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
-    argStream.ReadString(strPartyId);
-    argStream.ReadNumber(uiPartySize);
-    argStream.ReadNumber(uiPartyMax);
-
-    if (!argStream.HasErrors())
-    {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        if (CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(pElement, strKey, strPartyId, uiPartySize, uiPartyMax))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

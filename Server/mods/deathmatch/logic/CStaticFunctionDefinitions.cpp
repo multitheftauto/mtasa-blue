@@ -3346,35 +3346,6 @@ bool CStaticFunctionDefinitions::SetPlayerBlurLevel(CElement* pElement, unsigned
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax)
-{
-    assert(pElement);
-
-    if (uiPartyMax > m_pMainConfig->GetMaxPlayers() || uiPartySize > uiPartyMax || strKey.length() > 64 || strPartyId.length() > 64 ||
-        strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
-        return false;
-
-    RUN_CHILDREN(SetPlayerDiscordJoinParams(*iter, strKey, strPartyId, uiPartySize, uiPartyMax))
-
-    if (IS_PLAYER(pElement))
-    {
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-
-        if (!pPlayer->CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
-            return false;
-
-        CBitStream bitStream;
-        bitStream.pBitStream->WriteString<uchar>(strKey);
-        bitStream.pBitStream->WriteString<uchar>(strPartyId);
-        bitStream.pBitStream->Write(uiPartySize);
-        bitStream.pBitStream->Write(uiPartyMax);
-        pPlayer->Send(CLuaPacket(SET_DISCORD_JOIN_PARAMETERS, *bitStream.pBitStream));
-
-        return true;
-    }
-    return false;
-}
-
 bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword)
 {
     if (IS_PLAYER(pElement))

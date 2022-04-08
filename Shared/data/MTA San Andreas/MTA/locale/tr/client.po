@@ -1,31 +1,28 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-30 23:37+0300\n"
-"PO-Revision-Date: 2021-10-03 02:55+0000\n"
-"Last-Translator: turret001 <kemalcanakcan@gmail.com>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: tr\n"
+"POT-Creation-Date: 2022-01-08 17:25+0200\n"
+"PO-Revision-Date: 2022-02-11 23:12\n"
+"Last-Translator: \n"
+"Language-Team: Turkish\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; WindowsOttoman; RaceXtreme; Oguzcan; turret001; Eren Yücel; Uber; Cynydlan; Wickness; velona77; TRFURKAN; daaeernil\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-POOTLE-MTIME: 1633229753.000000\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: tr\n"
+"X-Crowdin-File: /master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
+"X-Crowdin-File-ID: 87\n"
+"Language: tr_TR\n"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:19
 msgid "Website requests"
 msgstr "Website istekleri"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:27
-msgid ""
-"The server requests the following websites in order to load them (later):"
+msgid "The server requests the following websites in order to load them (later):"
 msgstr "Sunucu, (sonradan) yükleme yapmak için şu siteleri talep ediyor:"
 
 #: ..\Client\cefweb\CWebsiteRequests.cpp:33
@@ -49,29 +46,27 @@ msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ KOMUT YARDIMI ]***\n"
 
 #: ..\Client\core\CCommandFuncs.cpp:167
-#, c-format, c-format
+#, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* Saat %d:%02d:%02d"
 
 #: ..\Client\core\CCommandFuncs.cpp:251
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr ""
-"bağlan (/connect): Sözdizimi 'connect <sunucu ip> [<port> <kullanıcı adı> "
-"<şifre>]'"
+msgstr "bağlan (/connect): Sözdizimi 'connect <sunucu ip> [<port> <kullanıcı adı> <şifre>]'"
 
 #: ..\Client\core\CCommandFuncs.cpp:259 ..\Client\core\CCommandFuncs.cpp:327
 msgid "connect: Bad port number"
 msgstr "Bağlantı: Hatalı port adresi"
 
 #: ..\Client\core\CCommandFuncs.cpp:281 ..\Client\core\CCommandFuncs.cpp:342
-#, c-format, c-format
+#, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "bağlantı:  %s:%u...'e Bağlanılıyor"
+msgstr "bağlantı: %s:%u...'e bağlanılıyor..."
 
 #: ..\Client\core\CCommandFuncs.cpp:285 ..\Client\core\CCommandFuncs.cpp:346
-#, c-format, c-format
+#, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "Bağlantı:  %s:%u'e bağlanılamadı %s:%u!"
+msgstr "bağlantı: %s:%u adresine bağlanılamadı!"
 
 #: ..\Client\core\CCommandFuncs.cpp:290
 msgid "connect: Failed to unload current mod"
@@ -87,7 +82,7 @@ msgstr "Yapılandırma dosyası kaydedildi"
 
 #. Print it
 #: ..\Client\core\CCommandFuncs.cpp:460
-#, c-format, c-format
+#, c-format
 msgid "* Your serial is: %s"
 msgstr "* Seri numaran: %s"
 
@@ -113,8 +108,8 @@ msgstr "Bağlantı başarısız. Girilen kullanıcı adı geçersiz!"
 #: ..\Client\core\CConnectManager.cpp:417
 #: ..\Client\core\CConnectManager.cpp:427 ..\Client\core\CCore.cpp:1200
 #: ..\Client\core\CCore.cpp:1213 ..\Client\core\CGUI.cpp:87
-#: ..\Client\core\CSettings.cpp:2851 ..\Client\core\CSettings.cpp:4025
-#: ..\Client\core\CSettings.cpp:4053 ..\Client\core\CSettings.cpp:4558
+#: ..\Client\core\CSettings.cpp:2870 ..\Client\core\CSettings.cpp:4044
+#: ..\Client\core\CSettings.cpp:4072 ..\Client\core\CSettings.cpp:4577
 #: ..\Client\core\DXHook\CDirect3DHook9.cpp:127
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1273
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1295
@@ -127,17 +122,17 @@ msgstr "Bağlantı başarısız. Girilen kullanıcı adı geçersiz!"
 #: ..\Client\loader\MainFunctions.cpp:260
 #: ..\Client\loader\MainFunctions.cpp:262
 #: ..\Client\loader\MainFunctions.cpp:815
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:567
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:641
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:665
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:687
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1003
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1083
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1093
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1162
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1196
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1245
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1257
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:568
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1246
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
 #: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:145
 #: ..\Client\mods\deathmatch\logic\CServer.cpp:181
 #: ..\Shared\mods\deathmatch\logic\CLatentTransferManager.cpp:358
@@ -147,76 +142,75 @@ msgstr "Hata"
 
 #: ..\Client\core\CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Bağlantı başarısız. girilen sunucu adresi geçersiz!"
+msgstr "Bağlantı başarısız. Girilen sunucu adresi geçersiz!"
 
 #: ..\Client\core\CConnectManager.cpp:132
-#, c-format, c-format
+#, c-format
 msgid "Connecting to %s at port %u failed!"
 msgstr "%s sunucusuna %u portundan yapılan bağlantı başarısız!"
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:153
-#, c-format, c-format
+#, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "%s:%u'a bağlanılıyor ..."
+msgstr "%s:%u'a bağlanılıyor..."
 
 #. Display the status box
 #: ..\Client\core\CConnectManager.cpp:154
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:583
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:584
 msgid "CONNECTING"
 msgstr "BAĞLANILIYOR"
 
 #: ..\Client\core\CConnectManager.cpp:269
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1162
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1163
 msgid "Connection timed out"
 msgstr "Bağlantı zaman aşımına uğradı"
 
 #: ..\Client\core\CConnectManager.cpp:283
 #: ..\Client\core\CConnectManager.cpp:287
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1207
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1208
 msgid "Disconnected: unknown protocol error"
-msgstr "Bağlantı Kesildi : Bilinmeyen protokol hatası"
+msgstr "Bağlantı kesildi: Bilinmeyen protokol hatası"
 
 #: ..\Client\core\CConnectManager.cpp:291
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1211
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1212
 msgid "Disconnected: disconnected remotely"
 msgstr "Bağlantı kesildi: bağlantı uzaktan kesildi."
 
 #: ..\Client\core\CConnectManager.cpp:295
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1215
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1216
 msgid "Disconnected: connection lost remotely"
-msgstr "Bağlanti Kesildi: bağlantı uzaktan kaybedildi"
+msgstr "Bağlanti kesildi: bağlantı uzaktan kaybedildi"
 
-# Bağlantı koptu: Bu sunucudan uzaklaştırıldınız
 #: ..\Client\core\CConnectManager.cpp:299
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1219
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1220
 msgid "Disconnected: you are banned from this server"
-msgstr "Bağlantı kesildi: Bu sunucudan yasaklandınız"
+msgstr "Bağlantı kesildi: bu sunucudan yasaklandınız"
 
 #: ..\Client\core\CConnectManager.cpp:306
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1227
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1228
 msgid "Disconnected: disconnected from the server"
 msgstr "Bağlantı kesildi: sunucu ile olan bağlantı kesildi"
 
 #: ..\Client\core\CConnectManager.cpp:310
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1231
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1232
 msgid "Disconnected: connection to the server was lost"
-msgstr "Bağlantı kesildi: Sunucu ile yapılan bağlantı koptu."
+msgstr "Bağlantı kesildi: sunucu ile yapılan bağlantı koptu"
 
 #: ..\Client\core\CConnectManager.cpp:317
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1239
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1240
 msgid "Disconnected: connection was refused"
-msgstr "Bağlantı Koptu : Bağlantı Reddedildi"
+msgstr "Bağlantı Koptu: bağlantı reddedildi"
 
 #. Failed loading the mod
 #: ..\Client\core\CConnectManager.cpp:409
-#, c-format, c-format
+#, c-format
 msgid "No such mod installed (%s)"
 msgstr "Böyle bir mod yüklü değil (%s)"
 
 #: ..\Client\core\CConnectManager.cpp:417
 msgid "Bad server response (2)"
-msgstr "Sunucudan cevap alınamıyor (2)"
+msgstr "Sunucudan yanıt alınamıyor (2)"
 
 #: ..\Client\core\CConnectManager.cpp:427
 msgid "Bad server response (1)"
@@ -228,9 +222,9 @@ msgid "CONSOLE"
 msgstr "KONSOL"
 
 #: ..\Client\core\CCore.cpp:727 ..\Client\loader\CInstallManager.cpp:756
-#, c-format, c-format
+#, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr " %s sürücüsünde yeterli alan olmadığı için MTA:SA devam edemiyor."
+msgstr "%s diskinde yeterli alan olmadığı için MTA:SA devam edemiyor."
 
 #: ..\Client\core\CCore.cpp:729 ..\Shared\mods\deathmatch\logic\Utils.cpp:102
 msgid "Fatal error"
@@ -241,7 +235,7 @@ msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "DÜZELTMEK İÇİN, ŞU DOSYAYI SİL:"
 
 #: ..\Client\core\CCore.cpp:887
-#, c-format, c-format
+#, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modülü yanlış!"
 
@@ -250,7 +244,7 @@ msgid "Error executing URL"
 msgstr "URL çalıştırılırken bir hata oluştu"
 
 #: ..\Client\core\CCore.cpp:1212
-#, c-format, c-format
+#, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Komut satırında ('%s') belirtilen mod'u çalıştırırken hata"
 
@@ -258,7 +252,7 @@ msgstr "Komut satırında ('%s') belirtilen mod'u çalıştırırken hata"
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: ..\Client\core\CCore.cpp:1297
 msgid "this help screen"
-msgstr "Bu yardım ekranı"
+msgstr "bu yardım ekranı"
 
 #: ..\Client\core\CCore.cpp:1298 ..\Client\core\CCore.cpp:1299
 msgid "exits the application"
@@ -278,7 +272,7 @@ msgstr "arayüzü gösterir"
 
 #: ..\Client\core\CCore.cpp:1303
 msgid "shows all the binds"
-msgstr "Bütün tuş atamalarını gösterir"
+msgstr "bütün tuş atamalarını gösterir"
 
 #: ..\Client\core\CCore.cpp:1304
 msgid "shows your serial"
@@ -286,7 +280,7 @@ msgstr "seri numaranızı gösterir"
 
 #: ..\Client\core\CCore.cpp:1313
 msgid "connects to a server (host port nick pass)"
-msgstr "bir sunucuya (host port takma-ad şifre) bağlanır"
+msgstr "bir sunucuya (ip port takma-ad şifre) bağlanır"
 
 #: ..\Client\core\CCore.cpp:1314
 msgid "connects to a previous server"
@@ -302,11 +296,11 @@ msgstr "tuş atamasını çıkarır (tuş)"
 
 #: ..\Client\core\CCore.cpp:1317
 msgid "copies the default gta controls"
-msgstr "Varsayılan gta kontrolleri kopyalar"
+msgstr "varsayılan gta kontrollerini kopyalar"
 
 #: ..\Client\core\CCore.cpp:1318
 msgid "outputs a screenshot"
-msgstr "Bir ekran görüntüsü kaydeder"
+msgstr "bir ekran görüntüsü kaydeder"
 
 #: ..\Client\core\CCore.cpp:1319
 msgid "immediately saves the config"
@@ -314,7 +308,7 @@ msgstr "yapılandırmayı hemen kaydeder"
 
 #: ..\Client\core\CCore.cpp:1321
 msgid "clears the debug view"
-msgstr "Debug görünümünü temizler"
+msgstr "debug görünümünü temizler"
 
 #: ..\Client\core\CCore.cpp:1322
 msgid "scrolls the chatbox upwards"
@@ -322,7 +316,7 @@ msgstr "chatboxu yukarı kaydırır"
 
 #: ..\Client\core\CCore.cpp:1323
 msgid "scrolls the chatbox downwards"
-msgstr " Chatboxu aşağıya kaydırır"
+msgstr "chatboxu aşağıya kaydırır"
 
 #: ..\Client\core\CCore.cpp:1324
 msgid "scrolls the debug view upwards"
@@ -334,11 +328,11 @@ msgstr "debug görünümünü aşağı doğru kaydırır"
 
 #: ..\Client\core\CCore.cpp:1328
 msgid "shows the memory statistics"
-msgstr "Hafıza istatistiklerini gösterir"
+msgstr "hafıza istatistiklerini gösterir"
 
 #: ..\Client\core\CCore.cpp:1329
 msgid "shows the frame timing graph"
-msgstr "Çerçeve zamanlama grafiğini gösterir"
+msgstr "çerçeve zamanlama grafiğini gösterir"
 
 #: ..\Client\core\CCredits.cpp:32
 msgid "Programming"
@@ -348,34 +342,30 @@ msgstr "Programlama"
 msgid "Contributors"
 msgstr "Katkıda Bulunanlar"
 
-#: ..\Client\core\CCredits.cpp:78
+#: ..\Client\core\CCredits.cpp:82
 msgid "Game Design / Scripting"
 msgstr "Oyun Dizaynı / Modlama"
 
-#: ..\Client\core\CCredits.cpp:98
+#: ..\Client\core\CCredits.cpp:102
 msgid "Language Localization"
-msgstr "Dil Bölgesi"
+msgstr "Yerelleştirme"
 
-#: ..\Client\core\CCredits.cpp:104
+#: ..\Client\core\CCredits.cpp:108
 msgid "Patch contributors"
-msgstr "Aktif katkıda bulunanlar"
+msgstr "Aktif Katkıda Bulunanlar"
 
-#: ..\Client\core\CCredits.cpp:204
+#: ..\Client\core\CCredits.cpp:216
 msgid "Special Thanks"
 msgstr "Özel Teşekkürler"
 
-#: ..\Client\core\CCredits.cpp:231
+#: ..\Client\core\CCredits.cpp:245
 msgid "This software makes use of the following libraries and software:"
 msgstr "Bu yazılım aşağıdaki kütüphaneleri ve yazılımı kullanır:"
 
 #. Even the default skin doesn't work, so give up
 #: ..\Client\core\CGUI.cpp:86
-msgid ""
-"The skin you selected could not be loaded, and the default skin also could "
-"not be loaded, please reinstall MTA."
-msgstr ""
-"Seçtiğiniz oyuncu tipi yüklenemedi , ayrıca varsayılan tip de "
-"yüklenememiştir. Lütfen MTA' yı baştan yükleyiniz."
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Seçtiğiniz oyuncu tipi yüklenemedi, ayrıca varsayılan tip de yüklenememiştir. Lütfen MTA' yı yeniden yükleyiniz."
 
 #: ..\Client\core\CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
@@ -385,185 +375,185 @@ msgstr "Ekseni hızlandır"
 msgid "Brake Axis"
 msgstr "Ekseni yavaşlat"
 
-#: ..\Client\core\CKeyBinds.cpp:183
+#: ..\Client\core\CKeyBinds.cpp:181
 msgid "Fire"
-msgstr "Ateş"
+msgstr "Ateş Etme"
 
-#: ..\Client\core\CKeyBinds.cpp:184
+#: ..\Client\core\CKeyBinds.cpp:182
 msgid "Next weapon"
 msgstr "Sonraki silah"
 
-#: ..\Client\core\CKeyBinds.cpp:185
+#: ..\Client\core\CKeyBinds.cpp:183
 msgid "Previous weapon"
 msgstr "Önceki silah"
 
-#: ..\Client\core\CKeyBinds.cpp:186
+#: ..\Client\core\CKeyBinds.cpp:184
 msgid "Forwards"
 msgstr "İleri"
 
-#: ..\Client\core\CKeyBinds.cpp:187
+#: ..\Client\core\CKeyBinds.cpp:185
 msgid "Backwards"
 msgstr "Geri"
 
-#: ..\Client\core\CKeyBinds.cpp:188 ..\Client\core\CSettings.cpp:2169
+#: ..\Client\core\CKeyBinds.cpp:186 ..\Client\core\CSettings.cpp:2169
 #: ..\Client\core\CSettings.cpp:2197
 msgid "Left"
 msgstr "Sol"
 
-#: ..\Client\core\CKeyBinds.cpp:189 ..\Client\core\CSettings.cpp:2171
+#: ..\Client\core\CKeyBinds.cpp:187 ..\Client\core\CSettings.cpp:2171
 #: ..\Client\core\CSettings.cpp:2198
 msgid "Right"
 msgstr "Sağ"
 
-#: ..\Client\core\CKeyBinds.cpp:190
+#: ..\Client\core\CKeyBinds.cpp:188
 msgid "Zoom in"
 msgstr "Yakınlaştır"
 
-#: ..\Client\core\CKeyBinds.cpp:191
+#: ..\Client\core\CKeyBinds.cpp:189
 msgid "Zoom out"
 msgstr "Uzaklaştır"
 
-#: ..\Client\core\CKeyBinds.cpp:192
+#: ..\Client\core\CKeyBinds.cpp:190
 msgid "Enter/Exit"
 msgstr "Giriş/Çıkış"
 
-#: ..\Client\core\CKeyBinds.cpp:193
+#: ..\Client\core\CKeyBinds.cpp:191
 msgid "Change camera"
-msgstr "Kamerayı Değiştir"
+msgstr "Kamerayı değiştir"
 
 #. 10
-#: ..\Client\core\CKeyBinds.cpp:194
+#: ..\Client\core\CKeyBinds.cpp:192
 msgid "Jump"
 msgstr "Zıpla"
 
-#: ..\Client\core\CKeyBinds.cpp:195
+#: ..\Client\core\CKeyBinds.cpp:193
 msgid "Sprint"
 msgstr "Koş"
 
-#: ..\Client\core\CKeyBinds.cpp:196
+#: ..\Client\core\CKeyBinds.cpp:194
 msgid "Look behind"
-msgstr "Arkaya Bak"
+msgstr "Arkaya bakma"
 
-#: ..\Client\core\CKeyBinds.cpp:197
+#: ..\Client\core\CKeyBinds.cpp:195
 msgid "Crouch"
 msgstr "Eğil"
 
-#: ..\Client\core\CKeyBinds.cpp:198
+#: ..\Client\core\CKeyBinds.cpp:196
 msgid "Action"
 msgstr "Eylem"
 
-#: ..\Client\core\CKeyBinds.cpp:199
+#: ..\Client\core\CKeyBinds.cpp:197
 msgid "Walk"
 msgstr "Yürü"
 
-#: ..\Client\core\CKeyBinds.cpp:200
+#: ..\Client\core\CKeyBinds.cpp:198
 msgid "Vehicle fire"
 msgstr "Araç silahı"
 
-#: ..\Client\core\CKeyBinds.cpp:201
+#: ..\Client\core\CKeyBinds.cpp:199
 msgid "Vehicle secondary fire"
-msgstr "Araç 2. silahı"
+msgstr "Araç ikincil silahı"
 
-#: ..\Client\core\CKeyBinds.cpp:202
+#: ..\Client\core\CKeyBinds.cpp:200
 msgid "Vehicle left"
 msgstr "Aracı sola döndürme"
 
-#: ..\Client\core\CKeyBinds.cpp:203
+#: ..\Client\core\CKeyBinds.cpp:201
 msgid "Vehicle right"
 msgstr "Aracı sağa döndürme"
 
 #. 20
-#: ..\Client\core\CKeyBinds.cpp:204
+#: ..\Client\core\CKeyBinds.cpp:202
 msgid "Steer forwards/down"
 msgstr "İleri/aşağı yönlendir"
 
-#: ..\Client\core\CKeyBinds.cpp:205
+#: ..\Client\core\CKeyBinds.cpp:203
 msgid "Steer backwards/up"
 msgstr "Geriye/yukarıya yönlendir"
 
-#: ..\Client\core\CKeyBinds.cpp:206
+#: ..\Client\core\CKeyBinds.cpp:204
 msgid "Accelerate"
 msgstr "İvme"
 
-#: ..\Client\core\CKeyBinds.cpp:207
+#: ..\Client\core\CKeyBinds.cpp:205
 msgid "Brake/Reverse"
 msgstr "Fren/Geri"
 
-#: ..\Client\core\CKeyBinds.cpp:208
+#: ..\Client\core\CKeyBinds.cpp:206
 msgid "Radio next"
-msgstr "Bir sonraki radyo kanalı"
+msgstr "Sonraki radyo kanalı"
 
-#: ..\Client\core\CKeyBinds.cpp:209
+#: ..\Client\core\CKeyBinds.cpp:207
 msgid "Radio previous"
 msgstr "Önceki radyo kanalı"
 
-#: ..\Client\core\CKeyBinds.cpp:210
+#: ..\Client\core\CKeyBinds.cpp:208
 msgid "Radio user track skip"
-msgstr "Sonraki radyo kanalına geçiş"
+msgstr "Kullanıcı radyosu şarkı geçme"
 
-#: ..\Client\core\CKeyBinds.cpp:211
+#: ..\Client\core\CKeyBinds.cpp:209
 msgid "Horn"
 msgstr "Korna"
 
-#: ..\Client\core\CKeyBinds.cpp:212
+#: ..\Client\core\CKeyBinds.cpp:210
 msgid "Sub-mission"
 msgstr "Yan Görev"
 
-#: ..\Client\core\CKeyBinds.cpp:213
+#: ..\Client\core\CKeyBinds.cpp:211
 msgid "Handbrake"
 msgstr "El Freni"
 
 #. 30
-#: ..\Client\core\CKeyBinds.cpp:214
+#: ..\Client\core\CKeyBinds.cpp:212
 msgid "Vehicle look left"
-msgstr "Araçtan sola bak"
+msgstr "Araçta sola bak"
+
+#: ..\Client\core\CKeyBinds.cpp:213
+msgid "Vehicle look right"
+msgstr "Araçta sağa bak"
+
+#: ..\Client\core\CKeyBinds.cpp:214
+msgid "Vehicle look behind"
+msgstr "Araçta arkaya bak"
 
 #: ..\Client\core\CKeyBinds.cpp:215
-msgid "Vehicle look right"
-msgstr "Araçtan sağa bak"
+msgid "Vehicle mouse look"
+msgstr "Araç mouse bakışı"
 
 #: ..\Client\core\CKeyBinds.cpp:216
-msgid "Vehicle look behind"
-msgstr "Araçtan arkaya bak"
-
-#: ..\Client\core\CKeyBinds.cpp:217
-msgid "Vehicle mouse look"
-msgstr "araç mouse bakışı"
-
-#: ..\Client\core\CKeyBinds.cpp:218
 msgid "Special control left"
 msgstr "Özel kontrol sol"
 
-#: ..\Client\core\CKeyBinds.cpp:219
+#: ..\Client\core\CKeyBinds.cpp:217
 msgid "Special control right"
 msgstr "Özel kontrol sağ"
 
-#: ..\Client\core\CKeyBinds.cpp:220
+#: ..\Client\core\CKeyBinds.cpp:218
 msgid "Special control down"
 msgstr "Özel kontrol aşağı"
 
-#: ..\Client\core\CKeyBinds.cpp:221
+#: ..\Client\core\CKeyBinds.cpp:219
 msgid "Special control up"
 msgstr "Özel kontrol yukarı"
 
-#: ..\Client\core\CKeyBinds.cpp:222
+#: ..\Client\core\CKeyBinds.cpp:220
 msgid "Aim weapon"
 msgstr "Silah nişan al"
 
-#: ..\Client\core\CKeyBinds.cpp:223
+#: ..\Client\core\CKeyBinds.cpp:221
 msgid "Conversation yes"
-msgstr "Sohbetler açık"
+msgstr "Sohbet olumlu"
 
 #. 40
-#: ..\Client\core\CKeyBinds.cpp:224
+#: ..\Client\core\CKeyBinds.cpp:222
 msgid "Conversation no"
-msgstr "Sohbetler kapalı"
+msgstr "Sohbet olumsuz"
 
-#: ..\Client\core\CKeyBinds.cpp:225
+#: ..\Client\core\CKeyBinds.cpp:223
 msgid "Group control forwards"
 msgstr "Grup kontrol ileri"
 
-#: ..\Client\core\CKeyBinds.cpp:226
+#: ..\Client\core\CKeyBinds.cpp:224
 msgid "Group control backwards"
 msgstr "Grup kontrol geri"
 
@@ -573,41 +563,29 @@ msgid "English"
 msgstr "Türkçe"
 
 #: ..\Client\core\CMainMenu.cpp:315
-msgid ""
-"You are using a feature-branch build! This is a test build only which cannot"
-" be used to connect to public servers!"
-msgstr ""
-"Yeni özelliklerin olduğu bir versiyon kullanıyorsun! Bu versiyon sadece "
-"deneme amaçlıdır ve herhangi bir sunucuya bağlanmak için kullanılamaz!"
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Yeni özelliklerin olduğu bir versiyon kullanıyorsun! Bu versiyon sadece deneme amaçlıdır ve herhangi bir sunucuya bağlanmak için kullanılamaz!"
 
 #: ..\Client\core\CMainMenu.cpp:334
-msgid ""
-"MTA will not receive updates on XP/Vista after July 2019.\n"
-"\n"
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr ""
-"Xp ve Vista Temmuz 2019'dan sonra MTA'yı kaldırmayacak.\n"
-"\n"
+msgstr "Xp ve Vista Temmuz 2019'dan sonra MTA'yı kaldırmayacak.\n\n"
 "En son ve güncel serverlarda oynamak için, Windowsunuzu güncelleyin."
 
 #: ..\Client\core\CMainMenu.cpp:1148
-msgid ""
-"This will disconnect you from the current server.\n"
-"\n"
+msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
-msgstr ""
-"Bu sizi mevcut sunucudan atacaktır.\n"
-"\n"
+msgstr "Bu sizi mevcut sunucudan atacaktır.\n\n"
 "Çıkmak istediğinizden emin misiniz?"
 
 #: ..\Client\core\CMainMenu.cpp:1152
 msgid "DISCONNECT WARNING"
-msgstr "Bağlantı kesme hatası"
+msgstr "BAĞLANTI KESME UYARISI"
 
 #: ..\Client\core\CMainMenu.cpp:1154 ..\Client\core\CQuestionBox.cpp:194
 #: ..\Client\core\CSettings.cpp:1339 ..\Client\core\CSettings.cpp:1363
-#: ..\Client\core\CSettings.cpp:4345 ..\Client\core\CSettings.cpp:4412
-#: ..\Client\core\CSettings.cpp:4461 ..\Client\core\CVersionUpdater.cpp:1569
+#: ..\Client\core\CSettings.cpp:4364 ..\Client\core\CSettings.cpp:4431
+#: ..\Client\core\CSettings.cpp:4480 ..\Client\core\CVersionUpdater.cpp:1569
 #: ..\Client\core\CVersionUpdater.cpp:1587
 #: ..\Client\core\CVersionUpdater.cpp:1856
 #: ..\Client\core\CVersionUpdater.cpp:1875
@@ -617,12 +595,15 @@ msgid "No"
 msgstr "Hayır"
 
 #. /////////////////////////////////////////////////////////////////////////
+#.
 #. Dialog strings
+#.
+#.
 #. /////////////////////////////////////////////////////////////////////////
 #: ..\Client\core\CMainMenu.cpp:1155 ..\Client\core\CQuestionBox.cpp:195
 #: ..\Client\core\CSettings.cpp:1340 ..\Client\core\CSettings.cpp:1364
-#: ..\Client\core\CSettings.cpp:4346 ..\Client\core\CSettings.cpp:4413
-#: ..\Client\core\CSettings.cpp:4462 ..\Client\core\CVersionUpdater.cpp:1570
+#: ..\Client\core\CSettings.cpp:4365 ..\Client\core\CSettings.cpp:4432
+#: ..\Client\core\CSettings.cpp:4481 ..\Client\core\CVersionUpdater.cpp:1570
 #: ..\Client\core\CVersionUpdater.cpp:1588
 #: ..\Client\core\CVersionUpdater.cpp:1857
 #: ..\Client\core\CVersionUpdater.cpp:1876
@@ -634,14 +615,14 @@ msgstr "Evet"
 #. News link
 #: ..\Client\core\CNewsBrowser.cpp:171
 msgid "Visit latest news article"
-msgstr "Son haber makalesini ziyaret et."
+msgstr "Son haber makalesini ziyaret et"
 
 #: ..\Client\core\CQuestionBox.cpp:192 ..\Shared\sdk\SharedUtil.Misc.hpp:696
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Bu problem hakkında önerilen çözümü görmek ister misiniz?"
 
 #: ..\Client\core\CScreenShot.cpp:53
-#, c-format, c-format
+#, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "Ekran görüntüsü alındı: '%s'"
 
@@ -656,7 +637,7 @@ msgstr "Çok Oyunculu"
 
 #: ..\Client\core\CSettings.cpp:116
 msgid "Video"
-msgstr "Video"
+msgstr "Görüntü"
 
 #: ..\Client\core\CSettings.cpp:117
 msgid "Audio"
@@ -684,7 +665,7 @@ msgstr "Gelişmiş"
 
 #. Create buttons
 #. OK button
-#: ..\Client\core\CSettings.cpp:126 ..\Client\core\CSettings.cpp:4579
+#: ..\Client\core\CSettings.cpp:126 ..\Client\core\CSettings.cpp:4598
 #: ..\Client\core\CVersionUpdater.cpp:1605
 #: ..\Client\core\CVersionUpdater.cpp:1821
 #: ..\Client\core\CVersionUpdater.cpp:1914
@@ -700,7 +681,7 @@ msgid "OK"
 msgstr "TAMAM"
 
 #. Cancel button
-#: ..\Client\core\CSettings.cpp:131 ..\Client\core\CSettings.cpp:4578
+#: ..\Client\core\CSettings.cpp:131 ..\Client\core\CSettings.cpp:4597
 #: ..\Client\core\CVersionUpdater.cpp:1788
 #: ..\Client\core\CVersionUpdater.cpp:1804
 #: ..\Client\core\CVersionUpdater.cpp:1839
@@ -724,7 +705,7 @@ msgstr "Fare hassasiyeti:"
 #. VerticalAimSensitivity
 #: ..\Client\core\CSettings.cpp:156 ..\Client\core\CSettings.cpp:198
 msgid "Vertical aim sensitivity:"
-msgstr "Dikey mouse hassasiyeti"
+msgstr "Dikey fare hassasiyeti:"
 
 #. Mouse Options
 #: ..\Client\core\CSettings.cpp:159
@@ -737,7 +718,7 @@ msgstr "Fareyi dikine doğru ters çevir"
 
 #: ..\Client\core\CSettings.cpp:170
 msgid "Steer with mouse"
-msgstr "Mouse ile sürüş"
+msgstr "Fare ile sürüş"
 
 #: ..\Client\core\CSettings.cpp:174
 msgid "Fly with mouse"
@@ -762,7 +743,7 @@ msgstr "Ölü alan"
 
 #: ..\Client\core\CSettings.cpp:278
 msgid "Saturation"
-msgstr "Dolgunluk"
+msgstr "Doygunluk"
 
 #: ..\Client\core\CSettings.cpp:284
 msgid "Use the 'Binds' tab for joypad buttons."
@@ -774,11 +755,11 @@ msgstr "Sol Çubuk"
 
 #: ..\Client\core\CSettings.cpp:329
 msgid "Right Stick"
-msgstr "Sağ çubuk"
+msgstr "Sağ Çubuk"
 
 #: ..\Client\core\CSettings.cpp:344
 msgid "DESCRIPTION"
-msgstr "Tanım"
+msgstr "AÇIKLAMA"
 
 #: ..\Client\core\CSettings.cpp:345
 msgid "KEY"
@@ -786,7 +767,7 @@ msgstr "TUŞ"
 
 #: ..\Client\core\CSettings.cpp:347
 msgid "ALT. KEY"
-msgstr "Alt tuşu"
+msgstr "ALTERNATİF TUŞ"
 
 #. *
 #. *    Multiplayer tab
@@ -805,11 +786,11 @@ msgstr "Sunucu tarayıcısını otomatik yenile"
 
 #: ..\Client\core\CSettings.cpp:375
 msgid "Allow screen upload"
-msgstr "Ekran yüklemesine izin ver."
+msgstr "Ekran yüklemesine izin ver"
 
 #: ..\Client\core\CSettings.cpp:380
 msgid "Allow external sounds"
-msgstr "Harici seslere izin ver."
+msgstr "Harici seslere izin ver"
 
 #: ..\Client\core\CSettings.cpp:385
 msgid "Always show download window"
@@ -825,7 +806,7 @@ msgstr "Harita renderlama seçenekleri"
 
 #: ..\Client\core\CSettings.cpp:401 ..\Client\core\CSettings.cpp:610
 msgid "Opacity:"
-msgstr "Matlık"
+msgstr "Opaklık:"
 
 #. *
 #. *  Audio tab
@@ -840,7 +821,7 @@ msgstr "Radyo Ses seviyesi:"
 
 #: ..\Client\core\CSettings.cpp:421 ..\Client\core\CSettings.cpp:468
 msgid "SFX volume:"
-msgstr "SFX ses düzeyi"
+msgstr "SFX ses düzeyi:"
 
 #: ..\Client\core\CSettings.cpp:421 ..\Client\core\CSettings.cpp:487
 msgid "MTA volume:"
@@ -848,7 +829,7 @@ msgstr "MTA ses düzeyi"
 
 #: ..\Client\core\CSettings.cpp:422 ..\Client\core\CSettings.cpp:506
 msgid "Voice volume:"
-msgstr "Ses düzeyi"
+msgstr "Ses düzeyi:"
 
 #: ..\Client\core\CSettings.cpp:422 ..\Client\core\CSettings.cpp:547
 msgid "Play mode:"
@@ -869,7 +850,7 @@ msgstr "Radyo ayarları"
 
 #: ..\Client\core\CSettings.cpp:531
 msgid "Radio Equalizer"
-msgstr "Radyo Equalizer"
+msgstr "Radyo Ekolayzer"
 
 #: ..\Client\core\CSettings.cpp:536
 msgid "Radio Auto-tune"
@@ -879,30 +860,29 @@ msgstr "Radyo Otomatik Açıcı"
 msgid "Usertrack options"
 msgstr "Kullanıcı radyosu ayarları"
 
-#: ..\Client\core\CSettings.cpp:555 ..\Client\core\CSettings.cpp:2986
+#: ..\Client\core\CSettings.cpp:555 ..\Client\core\CSettings.cpp:3005
 msgid "Radio"
 msgstr "Radyo"
 
-#: ..\Client\core\CSettings.cpp:556 ..\Client\core\CSettings.cpp:2988
+#: ..\Client\core\CSettings.cpp:556 ..\Client\core\CSettings.cpp:3007
 msgid "Random"
 msgstr "Rastgele"
 
-#: ..\Client\core\CSettings.cpp:557 ..\Client\core\CSettings.cpp:2990
+#: ..\Client\core\CSettings.cpp:557 ..\Client\core\CSettings.cpp:3009
 msgid "Sequential"
 msgstr "Ardışık Sıralı"
 
 #: ..\Client\core\CSettings.cpp:560
 msgid "Automatic Media Scan"
-msgstr "otomatik medya araması,"
+msgstr "Otomatik Medya Taraması"
 
 #: ..\Client\core\CSettings.cpp:567
 msgid "Mute options"
 msgstr "Susturma ayarları"
 
 #: ..\Client\core\CSettings.cpp:573
-#, fuzzy
 msgid "Mute All sounds when minimized"
-msgstr "Simge durumuna küçültüldüğünde radyoyu sustur"
+msgstr "Simge durumuna küçültüldüğünde bütün sesleri sustur"
 
 #: ..\Client\core\CSettings.cpp:578
 msgid "Mute Radio sounds when minimized"
@@ -910,15 +890,15 @@ msgstr "Simge durumuna küçültüldüğünde radyoyu sustur"
 
 #: ..\Client\core\CSettings.cpp:583
 msgid "Mute SFX sounds when minimized"
-msgstr "Simge durumuna küçültüldüğünde radyoyu sustur"
+msgstr "Simge durumuna küçültüldüğünde SFX seslerini sustur"
 
 #: ..\Client\core\CSettings.cpp:588
 msgid "Mute MTA sounds when minimized"
-msgstr "Simge durumuna küçültüldüğünde radyoyu sustur"
+msgstr "Simge durumuna küçültüldüğünde MTA seslerini sustur"
 
 #: ..\Client\core\CSettings.cpp:593
 msgid "Mute Voice sounds when minimized"
-msgstr "Simge durumuna küçültüldüğünde radyoyu sustur"
+msgstr "Simge durumuna küçültüldüğünde oyuncu mikrofonlarını sustur"
 
 #. *
 #. *  Video tab
@@ -933,7 +913,7 @@ msgstr "Görüş Açısı:"
 
 #: ..\Client\core\CSettings.cpp:609 ..\Client\core\CSettings.cpp:681
 msgid "Draw Distance:"
-msgstr "Render Mesafesi:"
+msgstr "Görüş Mesafesi:"
 
 #: ..\Client\core\CSettings.cpp:609 ..\Client\core\CSettings.cpp:699
 msgid "Brightness:"
@@ -941,7 +921,7 @@ msgstr "Parlaklık:"
 
 #: ..\Client\core\CSettings.cpp:609 ..\Client\core\CSettings.cpp:717
 msgid "FX Quality:"
-msgstr "FX kalitesi"
+msgstr "FX Kalitesi:"
 
 #: ..\Client\core\CSettings.cpp:610 ..\Client\core\CSettings.cpp:731
 msgid "Anisotropic filtering:"
@@ -949,11 +929,11 @@ msgstr "Anizotropik filtreleme:"
 
 #: ..\Client\core\CSettings.cpp:610 ..\Client\core\CSettings.cpp:758
 msgid "Anti-aliasing:"
-msgstr "Yumuşatma"
+msgstr "Yumuşatma:"
 
 #: ..\Client\core\CSettings.cpp:610 ..\Client\core\CSettings.cpp:772
 msgid "Aspect Ratio:"
-msgstr "Ekran oranı:"
+msgstr "Ekran Oranı:"
 
 #: ..\Client\core\CSettings.cpp:630
 msgid "Windowed"
@@ -966,7 +946,7 @@ msgstr "DPI hassaslığı"
 #: ..\Client\core\CSettings.cpp:644 ..\Client\core\CSettings.cpp:959
 #: ..\Client\loader\MainFunctions.cpp:380
 msgid "Fullscreen mode:"
-msgstr "Tam ekran modu:"
+msgstr "Ekran modu:"
 
 #: ..\Client\core\CSettings.cpp:651 ..\Client\core\CSettings.cpp:1546
 msgid "Standard"
@@ -994,7 +974,7 @@ msgid "Medium"
 msgstr "Orta"
 
 #: ..\Client\core\CSettings.cpp:727 ..\Client\core\CSettings.cpp:1041
-#: ..\Client\core\CSettings.cpp:1472 ..\Client\core\CSettings.cpp:3044
+#: ..\Client\core\CSettings.cpp:1472 ..\Client\core\CSettings.cpp:3063
 msgid "High"
 msgstr "Yüksek"
 
@@ -1005,8 +985,8 @@ msgstr "Çok yüksek"
 #: ..\Client\core\CSettings.cpp:743 ..\Client\core\CSettings.cpp:766
 #: ..\Client\core\CSettings.cpp:972 ..\Client\core\CSettings.cpp:1026
 #: ..\Client\core\CSettings.cpp:1157 ..\Client\core\CSettings.cpp:1478
-#: ..\Client\core\CSettings.cpp:3051 ..\Client\core\CSettings.cpp:3083
-#: ..\Client\core\CSettings.cpp:3105 ..\Client\core\CSettings.cpp:4093
+#: ..\Client\core\CSettings.cpp:3070 ..\Client\core\CSettings.cpp:3102
+#: ..\Client\core\CSettings.cpp:3124 ..\Client\core\CSettings.cpp:4112
 msgid "Off"
 msgstr "Kapalı"
 
@@ -1023,7 +1003,7 @@ msgid "3x"
 msgstr "3x"
 
 #: ..\Client\core\CSettings.cpp:782 ..\Client\core\CSettings.cpp:974
-#: ..\Client\core\CSettings.cpp:1490 ..\Client\core\CSettings.cpp:3053
+#: ..\Client\core\CSettings.cpp:1490 ..\Client\core\CSettings.cpp:3072
 msgid "Auto"
 msgstr "Otomatik"
 
@@ -1061,7 +1041,7 @@ msgstr "Lastik dumanı vs."
 
 #: ..\Client\core\CSettings.cpp:810
 msgid "Render vehicles always in high detail"
-msgstr "Araçları her zaman yüksek detaylı olarak göster."
+msgstr "Araçları her zaman yüksek detayda göster"
 
 #: ..\Client\core\CSettings.cpp:814
 msgid "Render peds always in high detail"
@@ -1077,7 +1057,7 @@ msgstr "Cihaz Seçme Diyaloğunu Aktif Hale Getir"
 
 #: ..\Client\core\CSettings.cpp:843
 msgid "Show unsafe resolutions"
-msgstr "Stabil olmayan çözünürlükleri göster"
+msgstr "Güvenli olmayan çözünürlükleri göster"
 
 #: ..\Client\core\CSettings.cpp:879
 msgid "Enable remote websites"
@@ -1119,49 +1099,49 @@ msgstr "Diğer"
 
 #. Fast clothes loading
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:965
-#: ..\Client\core\CSettings.cpp:4597
+#: ..\Client\core\CSettings.cpp:4616
 msgid "Fast CJ clothes loading:"
 msgstr "Hızlı CJ giysileri yükleme:"
 
 #. Browser scan speed
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:979
-#: ..\Client\core\CSettings.cpp:4599
+#: ..\Client\core\CSettings.cpp:4618
 msgid "Browser speed:"
 msgstr "Tarayıcı hızı:"
 
 #. Single download
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:993
-#: ..\Client\core\CSettings.cpp:4601
+#: ..\Client\core\CSettings.cpp:4620
 msgid "Single connection:"
 msgstr "Tek bağlantı:"
 
 #. Packet tag
 #: ..\Client\core\CSettings.cpp:958 ..\Client\core\CSettings.cpp:1006
-#: ..\Client\core\CSettings.cpp:4603
+#: ..\Client\core\CSettings.cpp:4622
 msgid "Packet tag:"
 msgstr "Paket etiketi:"
 
 #. Progress animation
 #: ..\Client\core\CSettings.cpp:959 ..\Client\core\CSettings.cpp:1019
-#: ..\Client\core\CSettings.cpp:4605
+#: ..\Client\core\CSettings.cpp:4624
 msgid "Progress animation:"
 msgstr "Yükleme animasyonu:"
 
 #. Process priority
 #: ..\Client\core\CSettings.cpp:959 ..\Client\core\CSettings.cpp:1032
-#: ..\Client\core\CSettings.cpp:4595
+#: ..\Client\core\CSettings.cpp:4614
 msgid "Process priority:"
 msgstr "İşlem önceliği:"
 
 #. Debug setting
 #: ..\Client\core\CSettings.cpp:959 ..\Client\core\CSettings.cpp:1046
-#: ..\Client\core\CSettings.cpp:4607
+#: ..\Client\core\CSettings.cpp:4626
 msgid "Debug setting:"
 msgstr "Geliştirici ayarları:"
 
 #. Streaming memory
 #: ..\Client\core\CSettings.cpp:960 ..\Client\core\CSettings.cpp:1069
-#: ..\Client\core\CSettings.cpp:4609
+#: ..\Client\core\CSettings.cpp:4628
 msgid "Streaming memory:"
 msgstr "Görüntüleme belleği:"
 
@@ -1176,12 +1156,12 @@ msgid "Install important updates:"
 msgstr "Önemli güncellemeleri kur:"
 
 #: ..\Client\core\CSettings.cpp:973 ..\Client\core\CSettings.cpp:1001
-#: ..\Client\core\CSettings.cpp:1014 ..\Client\core\CSettings.cpp:3055
-#: ..\Client\core\CSettings.cpp:3071 ..\Client\core\CSettings.cpp:3078
+#: ..\Client\core\CSettings.cpp:1014 ..\Client\core\CSettings.cpp:3074
+#: ..\Client\core\CSettings.cpp:3090 ..\Client\core\CSettings.cpp:3097
 msgid "On"
-msgstr "Devrede"
+msgstr "Açık"
 
-#: ..\Client\core\CSettings.cpp:986 ..\Client\core\CSettings.cpp:3060
+#: ..\Client\core\CSettings.cpp:986 ..\Client\core\CSettings.cpp:3079
 msgid "Very slow"
 msgstr "Çok yavaş"
 
@@ -1189,31 +1169,31 @@ msgstr "Çok yavaş"
 #: ..\Client\core\CSettings.cpp:1013 ..\Client\core\CSettings.cpp:1027
 #: ..\Client\core\CSettings.cpp:1053 ..\Client\core\CSettings.cpp:1065
 #: ..\Client\core\CSettings.cpp:1158 ..\Client\core\CSettings.cpp:1178
-#: ..\Client\core\CSettings.cpp:3062 ..\Client\core\CSettings.cpp:3069
-#: ..\Client\core\CSettings.cpp:3076 ..\Client\core\CSettings.cpp:3085
-#: ..\Client\core\CSettings.cpp:3098
+#: ..\Client\core\CSettings.cpp:3081 ..\Client\core\CSettings.cpp:3088
+#: ..\Client\core\CSettings.cpp:3095 ..\Client\core\CSettings.cpp:3104
+#: ..\Client\core\CSettings.cpp:3117
 msgid "Default"
 msgstr "Varsayılan"
 
-#: ..\Client\core\CSettings.cpp:988 ..\Client\core\CSettings.cpp:3064
+#: ..\Client\core\CSettings.cpp:988 ..\Client\core\CSettings.cpp:3083
 msgid "Fast"
 msgstr "Hızlı"
 
-#: ..\Client\core\CSettings.cpp:1039 ..\Client\core\CSettings.cpp:3040
+#: ..\Client\core\CSettings.cpp:1039 ..\Client\core\CSettings.cpp:3059
 msgid "Normal"
 msgstr "Normal"
 
-#: ..\Client\core\CSettings.cpp:1040 ..\Client\core\CSettings.cpp:3042
+#: ..\Client\core\CSettings.cpp:1040 ..\Client\core\CSettings.cpp:3061
 msgid "Above normal"
 msgstr "Normal üstü"
 
 #: ..\Client\core\CSettings.cpp:1076
 msgid "Min"
-msgstr "En az"
+msgstr "Min"
 
 #: ..\Client\core\CSettings.cpp:1089
 msgid "Max"
-msgstr "En fazla"
+msgstr "Maks"
 
 #. Windows 8 compatibility
 #: ..\Client\core\CSettings.cpp:1096
@@ -1252,14 +1232,10 @@ msgid "Some settings will be changed when you next start MTA"
 msgstr "Bazı ayarlar MTA'yı bir sonraki başlattığınızda değişmiş olacak"
 
 #: ..\Client\core\CSettings.cpp:1334
-msgid ""
-"\n"
-"\n"
+msgid "\n\n"
 "Do you want to restart now?"
-msgstr ""
-"\n"
-"\n"
-"Şimdi yeniden başlatmak ister misiniz?"
+msgstr "\n\n"
+"Şimdi yeniden başlatmak istiyor musun?"
 
 #: ..\Client\core\CSettings.cpp:1337
 msgid "RESTART REQUIRED"
@@ -1270,13 +1246,9 @@ msgid "Some settings will be changed when you disconnect the current server"
 msgstr "Şu anki sunucudan çıktığınızda bazı ayarlar değiştirilicektir."
 
 #: ..\Client\core\CSettings.cpp:1358
-msgid ""
-"\n"
-"\n"
+msgid "\n\n"
 "Do you want to disconnect now?"
-msgstr ""
-"\n"
-"\n"
+msgstr "\n\n"
 "Bağlantıyı şimdi kesmek ister misiniz?"
 
 #: ..\Client\core\CSettings.cpp:1361
@@ -1330,7 +1302,7 @@ msgstr "Seçenekler"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Chat Background"
-msgstr "Konuşma Arka Planı"
+msgstr "Sohbet Arka Planı"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Chat Text"
@@ -1338,7 +1310,7 @@ msgstr "Sohbet Yazısı"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Input Background"
-msgstr "Giriş Arka Planı"
+msgstr "Giriş Arka planı"
 
 #: ..\Client\core\CSettings.cpp:2024
 msgid "Input Text"
@@ -1438,230 +1410,197 @@ msgstr "Balon bildirimlerine izin ver"
 
 #: ..\Client\core\CSettings.cpp:2290
 msgid "Chat text black/white outline"
-msgstr "Chat mesajlarına siyah çerçeve ekle"
+msgstr "Chat mesajlarına siyah/beyaz çerçeve ekle"
 
 #. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'",
-#. pItemBind->GetText ().c_str () );
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'",
-#. pItemBind->GetText ().c_str () );
-#: ..\Client\core\CSettings.cpp:2538 ..\Client\core\CSettings.cpp:2545
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#: ..\Client\core\CSettings.cpp:2539 ..\Client\core\CSettings.cpp:2546
 msgid "Press a key to bind, or escape to clear"
 msgstr "Atamak istediğin tuşa bas veya tuşu temizlemek için ESC'ye bas"
 
-#: ..\Client\core\CSettings.cpp:2539
+#: ..\Client\core\CSettings.cpp:2540
 msgid "Binding a primary key"
 msgstr "Ana tuş ataması"
 
-#: ..\Client\core\CSettings.cpp:2546
+#: ..\Client\core\CSettings.cpp:2547
 msgid "Binding a secondary key"
 msgstr "İkincil tuş ataması"
 
-#: ..\Client\core\CSettings.cpp:2620
+#: ..\Client\core\CSettings.cpp:2623
 msgid "GTA GAME CONTROLS"
 msgstr "GTA OYUN KONTROLLERİ"
 
-#: ..\Client\core\CSettings.cpp:2622
+#: ..\Client\core\CSettings.cpp:2625
 msgid "MULTIPLAYER CONTROLS"
 msgstr "ÇOKLU OYUNCU KONTROLLERİ"
 
-#: ..\Client\core\CSettings.cpp:2851 ..\Client\core\CSettings.cpp:4558
+#: ..\Client\core\CSettings.cpp:2870 ..\Client\core\CSettings.cpp:4577
 msgid "Your nickname contains invalid characters!"
 msgstr "Nickinde izin verilmeyen karakterler var!"
 
-#: ..\Client\core\CSettings.cpp:3637
+#: ..\Client\core\CSettings.cpp:3656
 msgid "Red:"
 msgstr "Kırmızı:"
 
-#: ..\Client\core\CSettings.cpp:3637
+#: ..\Client\core\CSettings.cpp:3656
 msgid "Green:"
 msgstr "Yeşil:"
 
-#: ..\Client\core\CSettings.cpp:3637
+#: ..\Client\core\CSettings.cpp:3656
 msgid "Blue:"
 msgstr "Mavi:"
 
-#: ..\Client\core\CSettings.cpp:3637
+#: ..\Client\core\CSettings.cpp:3656
 msgid "Transparency:"
 msgstr "Şeffaflık:"
 
-#: ..\Client\core\CSettings.cpp:3640
+#: ..\Client\core\CSettings.cpp:3659
 msgid "Color"
 msgstr "Renk"
 
-#: ..\Client\core\CSettings.cpp:3717
+#: ..\Client\core\CSettings.cpp:3736
 msgid "Preview"
-msgstr "Önizleme"
+msgstr "Ön izleme"
 
-#: ..\Client\core\CSettings.cpp:4025
+#: ..\Client\core\CSettings.cpp:4044
 msgid "Please disconnect before changing language"
 msgstr "Lütfen dilinizi değiştirmeden önce sunucudan ayrılın"
 
-#: ..\Client\core\CSettings.cpp:4053
+#: ..\Client\core\CSettings.cpp:4072
 msgid "Please disconnect before changing skin"
 msgstr "Lütfen temanızı değiştirmeden önce sunucudan ayrılın"
 
-#: ..\Client\core\CSettings.cpp:4339
-msgid ""
-"Volmetric shadows can cause some systems to slow down.\n"
-"\n"
+#: ..\Client\core\CSettings.cpp:4358
+msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
-msgstr ""
-"Volumetrik gölgeler bazı sistemlerin yavaşlamasına neden olabilir.\n"
-"\n"
+msgstr "Volumetrik gölgeler bazı sistemlerin yavaşlamasına neden olabilir.\n\n"
 "Etkinleştirmek istediğine emin misin?"
 
-#: ..\Client\core\CSettings.cpp:4343
+#: ..\Client\core\CSettings.cpp:4362
 msgid "PERFORMANCE WARNING"
 msgstr "PERFORMANS UYARISI"
 
-#: ..\Client\core\CSettings.cpp:4363
-msgid ""
-"Screen upload is required by some servers for anti-cheat purposes.\n"
-"\n"
+#: ..\Client\core\CSettings.cpp:4382
+msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
-msgstr ""
-"Ekran görüntüsü paylaşımı, bazı sunucular için anti-hile amacıyla gerekmektedir.\n"
-"\n"
+msgstr "Ekran görüntüsü paylaşımı, bazı sunucular için anti-hile amacıyla gerekmektedir.\n\n"
 "(Sohbet kutusu ve GUI yüklemenin dışındadır)\n"
 
-#: ..\Client\core\CSettings.cpp:4365
+#: ..\Client\core\CSettings.cpp:4384
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "EKRAN YÜKLEME BİLGİSİ"
 
-#: ..\Client\core\CSettings.cpp:4380
-msgid ""
-"Some scripts may play sounds, such as radio, from the internet.\n"
-"\n"
+#: ..\Client\core\CSettings.cpp:4399
+msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
-msgstr ""
-"Bazı scriptler, internetten -radyo gibi- sesleri oynatabilir.\n"
-"\n"
+msgstr "Bazı scriptler, internetten -radyo gibi- sesleri oynatabilir.\n\n"
 "Bu ayarı kapatmak internet\n"
 "bant genişliğini rahatlatabilir\n"
 
-#: ..\Client\core\CSettings.cpp:4383
+#: ..\Client\core\CSettings.cpp:4402
 msgid "EXTERNAL SOUNDS"
 msgstr "HARİCİ SESLER"
 
-#: ..\Client\core\CSettings.cpp:4404
-msgid ""
-"Some files in your GTA:SA data directory are customized.\n"
-"MTA will only use these modified files if this check box is ticked.\n"
-"\n"
-"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n"
-"\n"
+#: ..\Client\core\CSettings.cpp:4423
+msgid "Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
 "Are you sure you want to use them?"
-msgstr ""
-"GTA:SA klasörünüzdeki bazı dosyalar değiştirilmiş.\n"
-"MTA bu dosyaları sadece bu kutu işaretlenmişse kullanır.\n"
-"\n"
-"Ancak, DEĞİŞTİRİLMİŞ GTA:SA DOSYALARI ÇOĞU SUNUCU TARAFINDAN ENGELLENMİŞTİR.\n"
-"\n"
-"Bu dosyaları kullanmak istediğinizden emin misiniz?"
+msgstr "GTA:SA klasörünüzdeki bazı dosyalar değiştirilmiş.\n"
+"MTA bu dosyaları sadece bu kutu işaretlenmişse kullanır.\n\n"
+"Ancak, DEĞİŞTİRİLMİŞ GTA:SA DOSYALARI ÇOĞU SUNUCU TARAFINDAN ENGELLENMİŞTİR.\n\n"
+"Bu dosyaları kullanmak istediğinize emin misiniz?"
 
-#: ..\Client\core\CSettings.cpp:4410 ..\Client\core\CVersionUpdater.cpp:2079
+#: ..\Client\core\CSettings.cpp:4429 ..\Client\core\CVersionUpdater.cpp:2079
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "DEĞİŞTİRİLMİŞ GTA:SA DOSYALARI"
 
-#: ..\Client\core\CSettings.cpp:4453
-msgid ""
-"Enabling DPI awareness is an experimental feature and\n"
+#: ..\Client\core\CSettings.cpp:4472
+msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
-"You may experience graphical issues if you enable this option.\n"
-"\n"
+"You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr ""
-"DPI Hassasiyetini aktif etmek, deneysel bir özellik ve sadece\n"
+msgstr "DPI hassasiyetini aktif etmek, deneysel bir özellik ve sadece\n"
 "MTA:SA'yı ölçekli bir monitörde oynadığınızda tavsiye ediyoruz.\n"
-"Aksi taktirde bazı grafiksel problemlerle karşılaşabilirsiniz.\n"
-"\n"
+"Aksi taktirde bazı grafiksel problemlerle karşılaşabilirsiniz.\n\n"
 "Bu özelliği aktif etmek istiyor musunuz?"
 
-#: ..\Client\core\CSettings.cpp:4459
+#: ..\Client\core\CSettings.cpp:4478
 msgid "EXPERIMENTAL FEATURE"
 msgstr "DENEYSEL ÖZELLİK"
 
-#: ..\Client\core\CSettings.cpp:4576
+#: ..\Client\core\CSettings.cpp:4595
 msgid "Please enter a nickname"
 msgstr "Lütfen bir nick girin"
 
-#: ..\Client\core\CSettings.cpp:4577
-msgid ""
-"Please enter a nickname to be used ingame.  \n"
+#: ..\Client\core\CSettings.cpp:4596
+msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr ""
-"Oyunda kullanılmak üzere bir nick girin. \n"
-"Bu girdiğiniz sunucularda sizin adınız olarak kullanılacak"
+msgstr "Oyunda kullanılmak üzere bir nick girin. \n"
+"Bu, girdiğiniz sunucularda sizin adınız olarak kullanılacak"
 
-#: ..\Client\core\CSettings.cpp:4595
+#: ..\Client\core\CSettings.cpp:4614
 msgid "Very experimental feature."
 msgstr "Çok deneysel özellik."
 
-#: ..\Client\core\CSettings.cpp:4597
+#: ..\Client\core\CSettings.cpp:4616
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr ""
-"CJ varyasyonlarındaki takılmaları durdurur (65MB daha fazla RAM kullanır)"
+msgstr "CJ varyasyonlarındaki takılmaları durdurur (65MB daha fazla RAM kullanır)"
 
-#: ..\Client\core\CSettings.cpp:4599
+#: ..\Client\core\CSettings.cpp:4618
 msgid "Older routers may require a slower scan speed."
 msgstr "Eski modemler daha yavaş tarama hızı gerektirebilir."
 
-#: ..\Client\core\CSettings.cpp:4601
+#: ..\Client\core\CSettings.cpp:4620
 msgid "Switch on to use only one connection when downloading."
-msgstr ""
-"İndirme yaparken sadece bir bağlantı üzerinden indirmek yapmak için aktif "
-"edin."
+msgstr "İndirme yaparken sadece bir bağlantı üzerinden indirme yapmak için aktif edin."
 
-#: ..\Client\core\CSettings.cpp:4603
+#: ..\Client\core\CSettings.cpp:4622
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr ""
-"Ağ paketlerini etiketleyerek MTA trafiğini tanıyabilmesi için Internet "
-"Servis Sağlayıcılarına yardımcı olun."
+msgstr "Ağ paketlerini etiketleyerek MTA trafiğini tanıyabilmesi için Internet Servis Sağlayıcılarına yardımcı olun."
 
-#: ..\Client\core\CSettings.cpp:4605
+#: ..\Client\core\CSettings.cpp:4624
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Ekranın alt kısmındaki dönen daire animasyonu"
 
-#: ..\Client\core\CSettings.cpp:4607
+#: ..\Client\core\CSettings.cpp:4626
 msgid "Select default always. (This setting is not saved)"
 msgstr "Varsayılan seçin. (Bu ayar kaydedilmez)"
 
-#: ..\Client\core\CSettings.cpp:4609
+#: ..\Client\core\CSettings.cpp:4628
 msgid "Maximum is usually best"
 msgstr "Maximum genellikle en iyidir"
 
-#: ..\Client\core\CSettings.cpp:4611 ..\Client\core\CSettings.cpp:4613
+#: ..\Client\core\CSettings.cpp:4630 ..\Client\core\CSettings.cpp:4632
 msgid "Auto updater:"
 msgstr "Otomatik güncelleyici:"
 
-#: ..\Client\core\CSettings.cpp:4611
+#: ..\Client\core\CSettings.cpp:4630
 msgid "Select default unless you like filling out bug reports."
-msgstr "Eğer hata raporu doldurmayı sevmiyorsanız varsayılanı seçiniz."
+msgstr "Eğer hata raporu doldurmayı sevmiyorsanız varsayılanı seçin."
 
-#: ..\Client\core\CSettings.cpp:4613
+#: ..\Client\core\CSettings.cpp:4632
 msgid "Select default to automatically install important updates."
-msgstr ""
-"Önemli güncelleştirmeleri otomatik olarak yüklemek için varsayılan'ı seçin."
+msgstr "Önemli güncelleştirmeleri otomatik olarak yüklemek için varsayılan'ı seçin."
 
-#: ..\Client\core\CSettings.cpp:4615
+#: ..\Client\core\CSettings.cpp:4634
 msgid "16-bit color:"
 msgstr "16-bit renk:"
 
-#: ..\Client\core\CSettings.cpp:4615
+#: ..\Client\core\CSettings.cpp:4634
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "16-bit renk modunu etkinleştir - MTA'yı baştan başlatmayı gerektirir"
 
-#: ..\Client\core\CSettings.cpp:4617
+#: ..\Client\core\CSettings.cpp:4636
 msgid "Mouse fix:"
-msgstr "Fareyi düzeltmesi:"
+msgstr "Fare düzeltmesi:"
 
-#: ..\Client\core\CSettings.cpp:4617
+#: ..\Client\core\CSettings.cpp:4636
 msgid "Mouse movement fix - May need PC restart"
-msgstr ""
-"Fare hareketini düzelt - Bilgisayarı yeniden başlatmayı gerektirebilir"
+msgstr "Fare hareketini düzelt - Bilgisayarı yeniden başlatmayı gerektirebilir"
 
 #: ..\Client\core\CVersionUpdater.cpp:624
 msgid "Busy"
@@ -1669,40 +1608,31 @@ msgstr "Meşgul"
 
 #: ..\Client\core\CVersionUpdater.cpp:624
 msgid "Can't check for updates right now"
-msgstr "Güncellemeler şuan kontrol edilemez"
+msgstr "Güncellemeler şuan kontrol edilemiyor"
 
 #: ..\Client\core\CVersionUpdater.cpp:1565
 #: ..\Client\core\CVersionUpdater.cpp:1585
 #: ..\Client\core\CVersionUpdater.cpp:1603
-#, c-format, c-format
+#, c-format
 msgid "MTA:SA %s required"
 msgstr "MTA:SA %s gerekli"
 
 #: ..\Client\core\CVersionUpdater.cpp:1566
-#, c-format, c-format
-msgid ""
-"An updated version of MTA:SA %s is required to join the selected server.\n"
-"\n"
+#, c-format
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr ""
-"Bu sunucuya girebilmek için MTA:SA %s gerekiyor.\n"
-"\n"
+msgstr "Bu sunucuya girebilmek için MTA:SA %s gerekiyor.\n\n"
 "MTA:SA %s versiyonunu indirip yüklemek ister misiniz?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1586
-#, c-format, c-format
+#, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr ""
-"MTA:SA %s versiyonunu çalıştırıp bu sunucuyua bağlanmak ister misiniz?"
+msgstr "MTA:SA %s versiyonunu çalıştırıp bu sunucuyua bağlanmak ister misiniz?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1604
-msgid ""
-"It is not possible to connect at this time.\n"
-"\n"
+msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
-msgstr ""
-"Bağlantı şu an mümkün değil.\n"
-"\n"
+msgstr "Bağlantı şu an mümkün değil.\n\n"
 "Lütfen sonra tekrar deneyin."
 
 #: ..\Client\core\CVersionUpdater.cpp:1786
@@ -1740,13 +1670,9 @@ msgid "MANDATORY UPDATE"
 msgstr "ZORUNLU GÜNCELLEME"
 
 #: ..\Client\core\CVersionUpdater.cpp:1855
-msgid ""
-"To join this server, you must update MTA.\n"
-"\n"
+msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
-msgstr ""
-"Bu sunucuya bağlanmak için MTA'yı güncellemeniz gerekiyor.\n"
-"\n"
+msgstr "Bu sunucuya bağlanmak için MTA'yı güncellemeniz gerekiyor.\n\n"
 "Şimdi güncellemek ister misiniz?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1873
@@ -1754,23 +1680,15 @@ msgid "OPTIONAL UPDATE"
 msgstr "İSTEĞE BAĞLI GÜNCELLEME"
 
 #: ..\Client\core\CVersionUpdater.cpp:1874
-msgid ""
-"Server says an update is recommended, but not essential.\n"
-"\n"
+msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
-msgstr ""
-"Sunucu bir güncelleme yapmanızı öneriyor, ama zorunlu değil.\n"
-"\n"
+msgstr "Sunucu bir güncelleme yapmanızı öneriyor, ama zorunlu değil.\n\n"
 "Güncellemek ister misiniz?"
 
 #: ..\Client\core\CVersionUpdater.cpp:1913
-msgid ""
-"Update not currently avalable.\n"
-"\n"
+msgid "Update not currently avalable.\n\n"
 "Please check www.mtasa.com"
-msgstr ""
-"Güncelleştirme şu an mevcut değil.\n"
-"\n"
+msgstr "Güncelleştirme şu an mevcut değil.\n\n"
 "Lütfen www.mtasa.com'a bakınız."
 
 #: ..\Client\core\CVersionUpdater.cpp:1934
@@ -1781,7 +1699,7 @@ msgstr "KAYIT HATASI"
 #: ..\Client\core\CVersionUpdater.cpp:1935
 #: ..\Client\core\CVersionUpdater.cpp:2117
 msgid "Unable to create the file."
-msgstr "Dosya oluşturulamadı."
+msgstr "Dosya oluşturulamıyor."
 
 #: ..\Client\core\CVersionUpdater.cpp:1943
 #: ..\Client\core\CVersionUpdater.cpp:1952
@@ -1798,7 +1716,7 @@ msgstr "İndirilen dosya bozuk gibi gözüküyor."
 #: ..\Client\core\CVersionUpdater.cpp:1953
 #: ..\Client\core\CVersionUpdater.cpp:2135
 msgid "For some reason."
-msgstr "Nedense."
+msgstr "Bazı sebeplerden dolayı."
 
 #: ..\Client\core\CVersionUpdater.cpp:1964
 #: ..\Client\core\CVersionUpdater.cpp:2148
@@ -1819,47 +1737,33 @@ msgid "ERROR"
 msgstr "HATA"
 
 #: ..\Client\core\CVersionUpdater.cpp:2095
-msgid ""
-"Some MTA:SA data files are missing.\n"
-"\n"
-"\n"
+msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
-msgstr ""
-"Bazı MTA:SA dosyaları bulunamıyor.\n"
-"\n"
-"\n"
+msgstr "Bazı MTA:SA dosyaları bulunamıyor.\n\n\n"
 "Lütfen MTA:SA'yı tekrar yükleyin."
 
 #: ..\Client\core\CVersionUpdater.cpp:2722
-#, c-format, c-format
+#, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% tamamlandı"
 
 #: ..\Client\core\CVersionUpdater.cpp:2724
-#, c-format, c-format
-msgid ""
-"\n"
-"\n"
+#, c-format
+msgid "\n\n"
 "Waiting for response  -  %-3d"
-msgstr ""
-"\n"
-"\n"
-"Cevap bekleniyor %-3d"
+msgstr "\n\n"
+"Cevap bekleniyor  -  %-3d"
 
 #: ..\Client\core\CVersionUpdater.cpp:3399
-msgid ""
-"We've reset your update preferences back to Default, please go change your "
-"settings again if you want Nightly updates.\n"
-msgstr ""
-"Güncelleme tercihlerinizi Varsayılan'a sıfırladık, Nightly güncellemelerini "
-"istiyorsanız lütfen ayarlarınızı tekrar değiştirin.\n"
+msgid "We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n"
+msgstr "Güncelleme tercihlerinizi Varsayılan'a sıfırladık, Nightly güncellemelerini istiyorsanız lütfen ayarlarınızı tekrar değiştirin.\n"
 
 #: ..\Client\core\CVersionUpdater.cpp:3400
 msgid "VERSION UPDATE INFORMATION"
 msgstr "VERSİYON GÜNCELLEME BİLGİSİ"
 
 #: ..\Client\core\DXHook\CDirect3DEvents9.cpp:230
-#, c-format, c-format, c-format, c-format
+#, c-format
 msgid "Screenshot got %d bytes, but expected %d"
 msgstr "Ekran görüntüsü  %d boyutunda, ancak %d olması gerekiyor"
 
@@ -1868,14 +1772,10 @@ msgid "Screenshot failed"
 msgstr "Ekran görüntüsü alınamadı"
 
 #: ..\Client\core\DXHook\CDirect3DHook9.cpp:124
-msgid ""
-"Could not initialize Direct3D9.\n"
-"\n"
+msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
-msgstr ""
-"Direct3D9 başlatılamadı.\n"
-"\n"
+msgstr "Direct3D9 başlatılamadı.\n\n"
 "Lütfen DirectX End-User Runtime ve\n"
 "son çıkan Windows Güncelleştirmelerinin doğru yüklendiğini teyit edin."
 
@@ -1903,16 +1803,12 @@ msgid "Recent"
 msgstr "Son oynananlar"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:191
-msgid ""
-"FOR QUICK CONNECT:\n"
-"\n"
+msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
-msgstr ""
-"HIZLI BAĞLANTI İÇİN:\n"
-"\n"
+msgstr "HIZLI BAĞLANTI İÇİN:\n\n"
 "Adresi ve portu adres çubuğuna yazın.\n"
-"Veya geçmiş listesinden bir sunucu seçim 'Bağlan'a basın."
+"Veya geçmiş listesinden bir sunucu seçin ve 'Bağlan'a basın"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:203
 msgid "HELP"
@@ -2046,8 +1942,8 @@ msgstr "Lütfen mtasa:// protokolünü kullanın!"
 
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1295
 #: ..\Client\core\ServerBrowser\CServerBrowser.cpp:1352
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:567
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:665
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:568
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:666
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Geçersiz nick! Ayarlardan yeni bir isim belirleyin!"
 
@@ -2055,7 +1951,7 @@ msgstr "Geçersiz nick! Ayarlardan yeni bir isim belirleyin!"
 #: ..\Client\core\ServerBrowser\CServerInfo.cpp:319
 #: ..\Client\loader\MainFunctions.cpp:594
 #: ..\Client\loader\MainFunctions.cpp:601
-#: ..\Client\loader\MainFunctions.cpp:1203
+#: ..\Client\loader\MainFunctions.cpp:1204
 msgid "Information"
 msgstr "Bilgiler"
 
@@ -2153,7 +2049,8 @@ msgstr "Beklemede"
 #: ..\Client\core\ServerBrowser\CServerList.cpp:150
 msgid "player"
 msgid_plural "players"
-msgstr[0] "oyuncuoyuncular"
+msgstr[0] "oyuncu"
+msgstr[1] "oyuncular"
 
 #: ..\Client\core\ServerBrowser\CServerList.cpp:151
 msgid "on"
@@ -2162,11 +2059,12 @@ msgstr "açık"
 #: ..\Client\core\ServerBrowser\CServerList.cpp:154
 msgid "server"
 msgid_plural "servers"
-msgstr[0] "sunucusunucular"
+msgstr[0] "sunucu"
+msgstr[1] "sunucular"
 
 #. We are polling for the master server list (first pass)
 #: ..\Client\core\ServerBrowser\CServerList.cpp:238
-#, c-format, c-format
+#, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
 msgstr "Ana sunucu listesi alınıyor. (%lu ms geçti)"
 
@@ -2231,39 +2129,25 @@ msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Ekran kartı sorunlarını önlemek için ana çalıştırılabiliri kopyala"
 
 #: ..\Client\loader\CInstallManager.cpp:329 ..\Client\loader\Utils.cpp:1182
-#, c-format, c-format
-msgid ""
-"MTA:SA needs Administrator access for the following task:\n"
-"\n"
-"  '%s'\n"
-"\n"
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
 "Please confirm in the next window."
-msgstr ""
-"MTA:SA şu görevi yürütebilmek için Yönetici izni istiyor:\n"
-"\n"
-"'%s'\n"
-"\n"
+msgstr "MTA:SA şu görevi yürütebilmek için Yönetici izni istiyor:\n\n"
+"'%s'\n\n"
 "Lütfen bir sonraki pencereden onay verin. "
 
 #: ..\Client\loader\CInstallManager.cpp:344
-#, c-format, c-format
-msgid ""
-"MTA:SA could not complete the following task:\n"
-"\n"
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
-msgstr ""
-"MTA:SA bu görevi tamamlayamadı:\n"
-"\n"
+msgstr "MTA:SA bu görevi tamamlayamadı:\n\n"
 "'%s'\n"
 
 #: ..\Client\loader\CInstallManager.cpp:394
-msgid ""
-"** The crash was caused by a graphics driver error **\n"
-"\n"
+msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
-msgstr ""
-"** Hata, grafik kartı sürücüsü nedeniyle oluştu **\n"
-"\n"
+msgstr "** Hata, grafik kartı sürücüsü nedeniyle oluştu **\n\n"
 "** Lütfen grafik kartı sürücülerinizi güncelleyin**"
 
 #: ..\Client\loader\CInstallManager.cpp:500
@@ -2271,25 +2155,18 @@ msgid "Install updated MTA:SA files"
 msgstr "Güncellenmiş MTA:SA dosyalarını yükle"
 
 #: ..\Client\loader\CInstallManager.cpp:520
-msgid ""
-"Could not update due to file conflicts. Please close other applications and "
-"retry"
-msgstr ""
-"Dosya çakışmaları nedeniyle güncellenemedi. Lütfen diğer uygulamaları "
-"kapatın ve tekrar deneyin"
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Dosya çakışmaları nedeniyle güncellenemedi. Lütfen diğer uygulamaları kapatın ve tekrar deneyin"
 
 #: ..\Client\loader\CInstallManager.cpp:529
-#, c-format, c-format
+#, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr ""
-"Multi Theft Auto düzgün şekilde yüklenmemiş, lütfen tekrar yükleyin. %s"
+msgstr "Multi Theft Auto düzgün şekilde yüklenmemiş, lütfen tekrar yükleyin. %s"
 
 #: ..\Client\loader\CInstallManager.cpp:584
 #: ..\Client\loader\CInstallManager.cpp:616
 msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr ""
-"Bazı dosyalarınız bozuk olduğundan MTA:SA çalışmaya devam edemiyor. Bozuk "
-"dosyalar:"
+msgstr "Bazı dosyalarınız bozuk olduğundan MTA:SA çalışmaya devam edemiyor. Bozuk dosyalar:"
 
 #: ..\Client\loader\CInstallManager.cpp:609
 msgid "Patch GTA"
@@ -2301,9 +2178,7 @@ msgstr "Eksik dosya:"
 
 #: ..\Client\loader\CInstallManager.cpp:816
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr ""
-"Eğer MTA açılırken başarısız olursa, lütfen GTA:San Andreas'ı tekrardan "
-"kurun"
+msgstr "Eğer MTA açılırken başarısız olursa, lütfen GTA:San Andreas'ı tekrardan kurun"
 
 #: ..\Client\loader\CInstallManager.cpp:937
 msgid "Update install settings"
@@ -2326,11 +2201,8 @@ msgid "Crash information"
 msgstr "Çökme bilgisi"
 
 #: ..\Client\loader\Dialogs.cpp:53
-msgid ""
-"Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr ""
-"Çökme bilgisini 'internet' aracılığı ile MTA geliştiricilerine göndemek için"
-" kutucuğu işaretleyin"
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Çökme bilgisini 'internet' aracılığı ile MTA geliştiricilerine göndemek için kutucuğu işaretleyin"
 
 #: ..\Client\loader\Dialogs.cpp:54
 msgid "Doing so will increase the chance of this crash being fixed."
@@ -2345,27 +2217,18 @@ msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - Uyarı"
 
 #: ..\Client\loader\Dialogs.cpp:63
-msgid ""
-"Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll "
-"file:"
-msgstr ""
-"Grand Theft Auto: San Andreas'ın yüklü olduğu dizin d3d9.dll dosyası "
-"içermektedir:"
+msgid "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:"
+msgstr "Grand Theft Auto: San Andreas'ın yüklü olduğu dizin d3d9.dll dosyası içermektedir:"
 
 #: ..\Client\loader\Dialogs.cpp:65
-msgid ""
-"The file is not required and may interfere with the graphical features in this version of MTA:SA.\n"
-"\n"
+msgid "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename d3d9.dll"
-msgstr ""
-"Bu dosya lazım değil ve MTA'nın bu sürümündeki grafik özellikleri ile çakışabilir.\n"
-"\n"
+msgstr "Bu dosya lazım değil ve MTA'nın bu sürümündeki grafik özellikleri ile çakışabilir.\n\n"
 "d3d9.dll dosyasını silmeniz veya yeniden adlandırmanız önerilmektedir"
 
 #: ..\Client\loader\Dialogs.cpp:67
 msgid "Use this d3d9.dll, but also show this warning on next start"
-msgstr ""
-"Bu d3d9.dll dosyasını kullan, fakat sonraki başlatmada bana tekrar sor"
+msgstr "Bu d3d9.dll dosyasını kullan, fakat sonraki başlatmada bana tekrar sor"
 
 #: ..\Client\loader\Dialogs.cpp:68
 msgid "Do not tell me about this d3d9.dll again"
@@ -2448,17 +2311,11 @@ msgid "Warning: Could not detect anti-virus product"
 msgstr "Uyarı: Anti-virüs programı bulunamadı"
 
 #: ..\Client\loader\Dialogs.cpp:101
-msgid ""
-"MTA could not detect an anti-virus on your PC.\n"
-"\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n"
-"\n"
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
-msgstr ""
-"MTA bilgisayarınızda anti-virüs programı bulamadı.\n"
-"\n"
-"Virüsler, MTA ile çakışır ve oyun deneyiminizi düşürür.\n"
-"\n"
+msgstr "MTA bilgisayarınızda anti-virüs programı bulamadı.\n\n"
+"Virüsler, MTA ile çakışır ve oyun deneyiminizi düşürür.\n\n"
 "Daha fazla bilgi için 'Yardım' butonuna basın."
 
 #: ..\Client\loader\Dialogs.cpp:104
@@ -2466,11 +2323,9 @@ msgid "I have already installed an anti-virus"
 msgstr "Ben zaten önceden anti-virüs kurdum"
 
 #: ..\Client\loader\Dialogs.cpp:106
-msgid ""
-"I will not install an anti-virus.\n"
+msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
-msgstr ""
-"Anti-virüs kurmayacağım.\n"
+msgstr "Anti-virüs kurmayacağım.\n"
 "Bilgisayarımın yavaşlamasını ve botnetin bir parçası olmasını istiyorum."
 
 #: ..\Client\loader\Dialogs.cpp:717 ..\Client\loader\Utils.cpp:747
@@ -2495,7 +2350,7 @@ msgstr "Dosyalar kopyalanıyor..."
 
 #: ..\Client\loader\Dialogs.cpp:746 ..\Client\loader\Utils.cpp:1665
 msgid "Copy finished early. Everything OK."
-msgstr "Kopyalama işlemi erken bitti. Herşey yolunda."
+msgstr "Kopyalama işlemi erken bitti. Her şey yolunda."
 
 #: ..\Client\loader\Dialogs.cpp:751 ..\Client\loader\Utils.cpp:1671
 msgid "Finishing..."
@@ -2507,293 +2362,188 @@ msgstr "Bitti!"
 
 #: ..\Client\loader\Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
-"MTA Sunucusunu sonlandırmak ve güncellemeye devam etmek istiyor musunuz?"
+msgstr "MTA Sunucusunu sonlandırmak ve güncellemeye devam etmek istiyor musunuz?"
 
 #: ..\Client\loader\MainFunctions.cpp:241
-msgid ""
-"Trouble restarting MTA:SA\n"
-"\n"
+msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
-"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n"
-"\n"
-"\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr ""
-"MTA:SA'yı başlatırken sorun\n"
-"\n"
+msgstr "MTA:SA'yı başlatırken sorun\n\n"
 "Bu problem tekrar ederse, Görev Yöneticisini açın ve\n"
-"'gta_sa.exe' ve 'Multi Theft Auto.exe' işlemlerini durdurun.\n"
-"\n"
-"\n"
+"'gta_sa.exe' ve 'Multi Theft Auto.exe' işlemlerini durdurun.\n\n\n"
 "MTA:SA'yı tekrar başlatmak istiyor musunuz?"
 
 #: ..\Client\loader\MainFunctions.cpp:259
-msgid ""
-"Another instance of MTA is already running.\n"
-"\n"
+msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
-msgstr ""
-"MTA zaten çalışıyor.\n"
-"\n"
+msgstr "Başka bir MTA işlemi zaten çalışıyor.\n\n"
 "Bu problem devam ederse, lütfen bilgisayarınızı yeniden başlatın"
 
 #: ..\Client\loader\MainFunctions.cpp:262
-msgid ""
-"Another instance of MTA is already running.\n"
-"\n"
+msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr ""
-"Başka bir MTA zaten çalışıyor.\n"
-"\n"
+msgstr "Başka bir MTA zaten çalışıyor.\n\n"
 "Durdurmak ister misiniz?"
 
 #: ..\Client\loader\MainFunctions.cpp:286
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
+msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
-msgstr ""
-"MTA:SA'yı başlatmakta sorun mu yaşıyorsunuz?.\n"
-"\n"
+msgstr "MTA:SA'yı başlatmakta sorun mu yaşıyorsunuz?.\n\n"
 "Bir eski sürüme dönmek ister misiniz?"
 
 #: ..\Client\loader\MainFunctions.cpp:315
-msgid ""
-"There seems to be a problem launching MTA:SA.\n"
-"Resetting GTA settings can sometimes fix this problem.\n"
-"\n"
+msgid "There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
-msgstr ""
-"MTA:SA'nın başlatmasında bir problem olduğu görülüyor.\n"
-"GTA ayarlarını sıfırlamak bazen bu hatayı düzeltir.\n"
-"\n"
+msgstr "MTA:SA'nın başlatmasında bir problem olduğu görülüyor.\n"
+"GTA ayarlarını sıfırlamak bazen bu hatayı düzeltir.\n\n"
 "GTA ayarlarını şimdi sıfırlamak ister misiniz?"
 
 #: ..\Client\loader\MainFunctions.cpp:330
-msgid ""
-"GTA settings have been reset.\n"
-"\n"
+msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
-msgstr ""
-"GTA ayarları sıfırlandı.\n"
-"\n"
+msgstr "GTA ayarları sıfırlandı.\n\n"
 "Devam etmek için Tamam'a basın."
 
 #: ..\Client\loader\MainFunctions.cpp:335
-#, c-format, c-format
+#, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Dosya silinemedi: '%s'"
 
 #. No settings to delete, or can't find them
 #: ..\Client\loader\MainFunctions.cpp:343
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
+msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
-msgstr ""
-"MTA:SA'yı çalıştırmakta sorun mu yaşıyorsunuz?\n"
-"\n"
+msgstr "MTA:SA'yı çalıştırmakta sorun mu yaşıyorsunuz?\n\n"
 "Çevrimiçi yardım almak ister misiniz?"
 
 #. Inform user
 #: ..\Client\loader\MainFunctions.cpp:379
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
+msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr ""
-"MTA:SA'yı çalıştırırken sorun mu yaşıyorsunuz?.\n"
-"\n"
+msgstr "MTA:SA'yı çalıştırırken sorun mu yaşıyorsunuz?.\n\n"
 "Şu ayarı değiştirmek ister misiniz?"
 
 #: ..\Client\loader\MainFunctions.cpp:422
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
+msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
-msgstr ""
-"MTA:SA'yı çalıştırırken sorun mu yaşıyorsunuz?.\n"
-"\n"
+msgstr "MTA:SA'yı çalıştırırken sorun mu yaşıyorsunuz?.\n\n"
 "Şu programları GTA ve MTA için devre dışı bırakmayı deneyin:"
 
 #: ..\Client\loader\MainFunctions.cpp:456
-msgid ""
-"WARNING\n"
-"\n"
+msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
-"Please run a virus scan to ensure your system is secure.\n"
-"\n"
-msgstr ""
-"UYARI\n"
-"\n"
+"Please run a virus scan to ensure your system is secure.\n\n"
+msgstr "UYARI\n\n"
 "MTA:SA alışılmadık bir olay algıladı.\n"
-"Lütfen bilgisayarınızın güvenli olduğundan emin olmak için virüs taraması yapın.\n"
-"\n"
+"Lütfen bilgisayarınızın güvenli olduğundan emin olmak için virüs taraması yapın.\n\n"
 
 #: ..\Client\loader\MainFunctions.cpp:459
-#, c-format, c-format
+#, c-format
 msgid "The detected file was:  %s\n"
-msgstr "Algılanan dosya:     %s\n"
+msgstr "Algılanan dosya:  %s\n"
 
 #: ..\Client\loader\MainFunctions.cpp:593
-msgid ""
-"An instance of GTA: San Andreas is already running. It needs to be "
-"terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr ""
-"Başka bir GTA:San Andreas işlemi zaten çalışıyor. MTA:SA'nın başlatılması "
-"için bu işlemin sonlandırılması gerekiyor. Şu an yapmak ister misiniz?"
+msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr "Başka bir GTA:San Andreas işlemi zaten çalışıyor. MTA:SA'nın başlatılması için bu işlemin sonlandırılması gerekiyor. Şu an yapmak ister misiniz?"
 
 #: ..\Client\loader\MainFunctions.cpp:600
-msgid ""
-"Unable to terminate GTA: San Andreas. If the problem persists, please "
-"restart your computer."
-msgstr ""
-"GTA:San Andreas'ı sonlandırmak başarısız oldu. Eğer sorun devam ederse, "
-"lütfen bilgisayarınızı yeniden başlatın."
+msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
+msgstr "GTA: San Andreas sonlandırması başarısız oldu. Eğer sorun devam ederse, lütfen bilgisayarınızı yeniden başlatın."
 
 #: ..\Client\loader\MainFunctions.cpp:623
-msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San "
-"Andreas."
-msgstr ""
-"Kayıt defteri girdileri eksik. Lütfen Multi Theft Auto: San Andreas'ı "
-"denetim masasından silip tekrar yükleyiniz."
+msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+msgstr "Kayıt defteri girdileri eksik. Lütfen Multi Theft Auto: San Andreas'ı denetim masasından silip tekrar yükleyiniz."
 
 #: ..\Client\loader\MainFunctions.cpp:629
-msgid ""
-"The path to your installation of GTA: San Andreas contains unsupported "
-"(unicode) characters. Please move your Grand Theft Auto: San Andreas "
-"installation to a compatible path that contains only standard ASCII "
-"characters and reinstall Multi Theft Auto: San Andreas."
-msgstr ""
-"GTA: San Andreas yüklemenizin yolu desteklenmeyen (unicode) karakterler "
-"içeriyor. Lütfen Grand Theft Auto: San Andreas yüklemenizi sadece uyumlu bir"
-" yola, yani sadece standart ASCII karakterleri içeren bir yere taşıyın ve "
-"Multi Theft Auto: San Andreas'ı tekrar yükleyin. "
+msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
+msgstr "GTA: San Andreas yüklemenizin yolu desteklenmeyen (unicode) karakterler içeriyor. Lütfen Grand Theft Auto: San Andreas yüklemenizi sadece uyumlu bir yola, yani sadece standart ASCII karakterleri içeren bir yere taşıyın ve Multi Theft Auto: San Andreas'ı tekrar yükleyin. "
 
 #: ..\Client\loader\MainFunctions.cpp:639
-msgid ""
-"The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-"contains a ';' (semicolon).\n"
-"\n"
+msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
-msgstr ""
-"'MTA:SA' veya 'GTA San Andreas' yüklemenizin yolu\n"
-"bir ';' (noktalı virgül) içeriyor.\n"
-"\n"
+msgstr "'MTA:SA' veya 'GTA San Andreas' yüklemenizin yolu\n"
+"bir ';' (noktalı virgül) içeriyor.\n\n"
 "MTA:SA'yı çalıştırırken sorun yaşıyorsanız,\n"
 "yükleme(leri)nizi noktalı virgül içermeyen bir yola taşıyın. "
 
 #: ..\Client\loader\MainFunctions.cpp:779
-msgid ""
-"Load failed. Please ensure that the latest data files have been installed "
-"correctly."
-msgstr ""
-"Yükleme başarısız. Lütfen en yeni veri dosyalarının doğru yüklendiğinden "
-"emin olunuz."
+msgid "Load failed. Please ensure that the latest data files have been installed correctly."
+msgstr "Yükleme başarısız. Lütfen en yeni veri dosyalarının doğru yüklendiğinden emin olunuz."
 
 #: ..\Client\loader\MainFunctions.cpp:788
-#, c-format, c-format
+#, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Yükleme başarısız. Lütfen %s doğru yüklendiğinden emin olun."
 
 #: ..\Client\loader\MainFunctions.cpp:795
-#, c-format, c-format
+#, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Yükleme başarısız. gta_sa.exe %s konumunda bulunamadı"
 
 #: ..\Client\loader\MainFunctions.cpp:805
-#, c-format, c-format
-msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before "
-"continuing."
-msgstr ""
-"Yükleme başarısız. GTA klasöründe %s bulunmaktadır. Lütfen devam etmeden "
-"önce bunu siliniz."
+#, c-format
+msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
+msgstr "Yükleme başarısız. GTA klasöründe %s bulunmaktadır. Lütfen devam etmeden önce bunu siliniz."
 
 #: ..\Client\loader\MainFunctions.cpp:814
-#, c-format, c-format
+#, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Ana dosya hatalı isme sahip (%s)"
 
 #: ..\Client\loader\MainFunctions.cpp:825
-msgid ""
-"Main file is unsigned. Possible virus activity.\n"
-"\n"
+msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr ""
-"Ana dosya imzalanmamış. Buna bilgisayarınızdaki bir virüs sebep olmuş olabilir.\n"
-"\n"
+msgstr "Ana dosya imzalanmamış. Buna bilgisayarınızdaki bir virüs sebep olmuş olabilir.\n\n"
 "Eğer MTA doğru bir biçimde çalışmazsa çevrimiçi yardıma bakın."
 
-#: ..\Client\loader\MainFunctions.cpp:855
-msgid ""
-"Data files modified. Possible virus activity.\n"
-"\n"
+#: ..\Client\loader\MainFunctions.cpp:856
+msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr ""
-"Veri dosyaları değiştirilmiş. Buna bilgisayarınızdaki bir virüs sebep olmuş olabilir.\n"
-"\n"
+msgstr "Veri dosyaları değiştirilmiş. Buna bilgisayarınızdaki bir virüs sebep olmuş olabilir.\n\n"
 "Eğer MTA doğru bir biçimde çalıştırılamıyorsa çevrimiçi yardıma bakın."
 
-#: ..\Client\loader\MainFunctions.cpp:867
-msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n"
-"\n"
+#: ..\Client\loader\MainFunctions.cpp:868
+msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
-msgstr ""
-"'MTA:SA' veya 'GTA: San Andreas' klasörlerinde .asi uzantılı dosyalar var.\n"
-"\n"
+msgstr "'MTA:SA' veya 'GTA: San Andreas' klasörlerinde .asi uzantılı dosyalar var.\n\n"
 "Eğer MTA:SA ile alakalı bir problemle karşılaşırsanız bu klasörlerden .asi uzantılı dosyalarını silin."
 
-#: ..\Client\loader\MainFunctions.cpp:932
-msgid ""
-"File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
-"Dosya sürümü uyumsuzluk hatası. Bir problemle karşılaşırsanız MTA:SA tekrar "
-"kurun.\n"
+#: ..\Client\loader\MainFunctions.cpp:933
+msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Dosya sürümü uyumsuzluk hatası. Bir problemle karşılaşırsanız MTA:SA'yı tekrar kurun.\n"
 
-#: ..\Client\loader\MainFunctions.cpp:941
+#: ..\Client\loader\MainFunctions.cpp:942
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
-"Bazı dosyalar eksik. Bir problemle karşılaşırsanız MTA:SA'yı tekrar kurun.\n"
+msgstr "Bazı dosyalar eksik. Bir problemle karşılaşırsanız MTA:SA'yı tekrar kurun.\n"
 
-#: ..\Client\loader\MainFunctions.cpp:953
-msgid ""
-"MTA:SA is not compatible with Windows 'Safe Mode'.\n"
-"\n"
+#: ..\Client\loader\MainFunctions.cpp:954
+msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr ""
-"MTA:SA Windows 'Güvenli Mod' ile uyumlu değildir.\n"
-"\n"
+msgstr "MTA:SA Windows 'Güvenli Mod' ile uyumlu değildir.\n\n"
 "Lütfen bilgisayarınızı yeniden başlatın.\n"
 
-#: ..\Client\loader\MainFunctions.cpp:1089
+#: ..\Client\loader\MainFunctions.cpp:1090
 msgid "Fix configuration issue"
 msgstr "Kurulum hatasını düzelt"
 
 #. Try to relaunch as admin if not done so already
-#: ..\Client\loader\MainFunctions.cpp:1131
+#: ..\Client\loader\MainFunctions.cpp:1132
 msgid "Fix elevation required error"
 msgstr "Yükseltme gerektiren hatayı düzelt"
 
-#: ..\Client\loader\MainFunctions.cpp:1138
-#, c-format, c-format
-msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n"
-"\n"
+#: ..\Client\loader\MainFunctions.cpp:1139
+#, c-format
+msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr ""
-"Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz, yada sorun devam ederse, lütfen www.multitheftauto.com adresinden MTA ile iletişime geçiniz. \n"
-"\n"
+msgstr "Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz, ya da sorun devam ederse, lütfen www.multitheftauto.com adresinden MTA ile iletişime geçiniz. \n\n"
 "[%s]"
 
-#: ..\Client\loader\MainFunctions.cpp:1203
-msgid ""
-"GTA: San Andreas may not have launched correctly. Do you want to terminate "
-"it?"
+#: ..\Client\loader\MainFunctions.cpp:1204
+msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Gta: San Andreas doğru çalıştıralamadı. Yok etmek istermisiniz ?"
 
 #: ..\Client\loader\Utils.cpp:813
@@ -2801,47 +2551,41 @@ msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Grand Theft Auto: San Andreas yükleme adresinizi seçiniz."
 
 #: ..\Client\loader\Utils.cpp:1283
-#, c-format, c-format
+#, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "%s modülünü yüklemede hata! (%s)"
 
 #: ..\Client\loader\Utils.cpp:1713
-#, c-format, c-format
-msgid ""
-"New installation of %s detected.\n"
-"\n"
+#, c-format
+msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
-msgstr ""
-"%s yeni kurulumu algılanı.\n"
-"\n"
-"%s den ayarlarınızı kopyalamak ister misiniz?"
+msgstr "Yeni %s kurulumu algılandı.\n\n"
+"%s ayarlarınızı kopyalamak ister misiniz?"
 
 #: ..\Client\loader\Utils.cpp:1752
-#, c-format, c-format
+#, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA '%s' dosyasını açmakta sorun yaşadı"
 
 #: ..\Client\loader\Utils.cpp:1774
-#, c-format, c-format
+#, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA dosyası kayıp '%s'."
+msgstr "GTA:SA '%s' dosyası kayıp."
 
 #: ..\Client\loader\Utils.cpp:1799
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA model yüklerken sorunla karşılaştı."
+msgstr "GTA:SA bir modeli yüklerken sorunla karşılaştı."
 
 #: ..\Client\loader\Utils.cpp:1801
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr ""
-"Eğer yakın zamanda gta3.img dosyasını değiştirdiyseniz, GTA:SA'yı tekrar "
-"yüklemeyi deneyin."
+msgstr "Eğer yakın zamanda gta3.img dosyasını değiştirdiyseniz, GTA:SA'yı tekrar yüklemeyi deneyin."
 
 #: ..\Client\loader\Utils.cpp:1826
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA arabaya modifiye eklerken sorunla karşılaştı."
 
 #: ..\Client\loader\Utils.cpp:1845
-#, c-format, c-format
+#, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA '%s' dosyasında hatalar buldu"
 
@@ -2851,15 +2595,15 @@ msgstr "MTA:SA oynarken bilgisayar yeniden başlatıldı mı?"
 
 #: ..\Client\loader\Utils.cpp:1983
 msgid "Please terminate the following programs before continuing:"
-msgstr "Lütfen devam etmeden önce gerekli programları sonlandırınız:"
+msgstr "Lütfen devam etmeden önce şu programları sonlandırınız:"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:36
 msgid "This version has expired."
-msgstr "bu versiyon zaman aşımına uğradı"
+msgstr "Bu versiyon zaman aşımına uğradı."
 
 #: ..\Client\mods\deathmatch\CClient.cpp:56
 msgid "disconnect from the game"
-msgstr "Oyundun ayrılma"
+msgstr "oyundan ayrıl"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:57
 msgid "shows the nametags"
@@ -2867,7 +2611,7 @@ msgstr "isim etikletlerini göster"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:58
 msgid "shows the chatbox"
-msgstr "konuşma kutusunda göster"
+msgstr "konuşma kutusunu göster"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:59
 msgid "shows the network statistics"
@@ -2884,11 +2628,11 @@ msgstr "sesi diğer oyunculara iletir"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:65
 msgid "enters a car as passenger"
-msgstr "Bir araca yolcu olarak bin"
+msgstr "bir araca yolcu olarak biner"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:66
 msgid "next radio channel"
-msgstr "sonraki radio kanalı"
+msgstr "sonraki radyo kanalı"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:67
 msgid "previous radio channel"
@@ -2900,7 +2644,7 @@ msgstr "radar bakışını aktif eder"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:69
 msgid "zooms the radar in"
-msgstr "radarı içeri zumlar"
+msgstr "radarı yakınlaştırır"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:70
 msgid "zooms the radar out"
@@ -2928,11 +2672,11 @@ msgstr "radarı ekler"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:76
 msgid "reduces radar opacity"
-msgstr "radarın donukluğunu düşürür"
+msgstr "radarın opaklığını düşürür"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:77
 msgid "increases radar opacity"
-msgstr "radarın donukluğunu arttırır"
+msgstr "radarın opaklığını arttırır"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:78
 msgid "toggles radar help text"
@@ -2966,71 +2710,65 @@ msgstr "(Geliştirme Modu) colshapeleri gösterir"
 
 #: ..\Client\mods\deathmatch\CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Geliştirme Modu) colshapeleri gösterir"
+msgstr "(Geliştirme Modu) dünya seslerinin id'lerini debug ekranına yollar"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:583
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:584
 msgid "Entering the game ..."
-msgstr ""
-"(Geliştirme modu) dünya seslerinin idlerini bir debug penceresine yazdırır"
+msgstr "Oyuna giriliyor ..."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:641
-msgid ""
-"Not connected; please use Quick Connect or the 'connect' command to connect "
-"to a server."
-msgstr ""
-"Bağlanmadı; lütfen Hızlı Bağlan veya 'bağlan' komutunu kullanın ve bir "
-"sunucuya bağlanın."
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:642
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Bağlanmadı; lütfen Hızlı Bağlan veya 'connect' komutunu kullanın ve bir sunucuya bağlanın."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:687
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:688
 msgid "The server is not installed"
 msgstr "Sunucu kurulmadı."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:697
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1072
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Local Server"
 msgstr "Yerel Sunucu"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:697
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:698
 msgid "Starting local server ..."
 msgstr "Yerel sunucu başlatılıyor ..."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1003
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1004
+#, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "Oyundan atıldınız (%s)"
+msgstr "Oyundan atıldınız ( %s )"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1072
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1073
 msgid "Connecting to local server..."
 msgstr "Yerel sunucuya bağlanılıyor..."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1083
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1084
 msgid "Error connecting to server."
-msgstr "Sununcuya bağlanırken hata."
+msgstr "Sunucuya bağlanırken hata."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1093
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1094
 msgid "Connecting to local server timed out. See console for details."
-msgstr ""
-"Yerel sunucuya bağlantı zaman aşımına uğradı. Detaylar için konsola bakınız."
+msgstr "Yerel sunucuya bağlantı zaman aşımına uğradı. Detaylar için konsola bakınız."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1196
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1197
 msgid "Connection with the server was lost"
 msgstr "Sunucuyla bağlantı koptu."
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1223
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1224
 msgid "Disconnected: the server is currently full"
-msgstr "Bağlantı Kesildi: sunucu şu an dolu"
+msgstr "Bağlantı Kesildi: sunucu dolu"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1235
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1236
 msgid "Disconnected: invalid password specified"
 msgstr "Bağlantı Kesildi: yanlış şifre girildi"
 
-#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1257
+#: ..\Client\mods\deathmatch\logic\CClientGame.cpp:1258
 msgid "MTA Client verification failed!"
-msgstr "MTA müşteri doğrulaması yapılamadı!"
+msgstr "MTA İstemci doğrulaması yapılamadı!"
 
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr "Ev Sunucusu"
+msgstr "SUNUCU KUR"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:53
@@ -3040,7 +2778,7 @@ msgstr "Kaynaklar"
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:55
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "Sunucu adı"
+msgstr "Sunucu adı:"
 
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:64
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:66
@@ -3050,12 +2788,12 @@ msgstr "Parola:"
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:73
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:75
 msgid "Max players:"
-msgstr "En fazla oyuncu:"
+msgstr "Oyuncu limiti:"
 
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:82
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "Yayın:"
+msgstr "Yayınla:"
 
 #: ..\Client\mods\deathmatch\logic\CLocalServer.cpp:86
 msgid "LAN"
@@ -3073,218 +2811,205 @@ msgstr "Tüm"
 msgid "Start"
 msgstr "Başlat"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:480
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
-msgstr "Bağlantı Kesildi: Geçersiz takma ad"
+msgstr "Bağlantı Kesildi: Geçersiz nick"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:484
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:479
 msgid "Disconnect from server"
 msgstr "Sunucu bağlantısını sonlandır"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:488
-#, c-format, c-format
-msgid ""
-"Disconnected: Serial is banned.\n"
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:483
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr ""
-"Bağlantı kesildi. Seri kodu yasaklandı.\n"
+msgstr "Bağlantı kesildi. Seri kodu yasaklandı.\n"
 "Gerekçe: %s"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:494
-#, c-format, c-format
-msgid ""
-"Disconnected: You are banned.\n"
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:489
+#, c-format
+msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr ""
-"Bağlantı kesildi: Yasaklandınız.\n"
+msgstr "Bağlantı kesildi: Yasaklandınız.\n"
+"Gerekçe: %s"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:495
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Bağlantı kesildi: Hesap yasaklandı.\n"
 "Gerekçe: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:500
-#, c-format, c-format
-msgid ""
-"Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr ""
-"Bağlantı kesildi: Hesap yasaklandı.\n"
-"Gerekçe: %s"
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:505
 msgid "Disconnected: Version mismatch"
 msgstr "Bağlantı kesildi: Sürüm uyumsuzluğu"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:509
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr ""
-"Bağlantı kesildi; Flood'a katıl. Lütfen bir dakika bekleyin, ve tekrar "
-"bağlanın. "
+msgstr "Bağlantı kesildi: Giriş trafiği. Lütfen bir dakika bekleyin, ardından tekrar bağlanın."
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:508
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Bağlantı kesildi: Server farklı branştan.\n"
+"Bilgi: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:513
-#, c-format, c-format
-msgid ""
-"Disconnected: Server from different branch.\n"
+#, c-format
+msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr ""
-"Bağlantı kesildi: Server farklı branştan.\n"
+msgstr "Bağlantı kesildi: Kötü versiyon.\n"
 "Bilgi: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:518
-#, c-format, c-format
-msgid ""
-"Disconnected: Bad version.\n"
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr ""
-"Bağlantı kesildi: Kötü versiyon.\n"
+msgstr "Bağlantı kesildi: Sunucu daha yeni bir versiyonda çalışıyor.\n"
 "Bilgi: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:523
-#, c-format, c-format
-msgid ""
-"Disconnected: Server is running a newer build.\n"
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr ""
-"Bağlantı kesildi: Sunucu daha yeni bir yapı çalıştırıyor.\n"
+msgstr "Bağlantı kesildi: Sunucu daha eski bir versiyonda çalışıyor.\n"
 "Bilgi: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:528
-#, c-format, c-format
-msgid ""
-"Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr ""
-"Bağlantı kesildi: Sunucu daha eski bir yapı çalıştırıyor.\n"
-"Bilgi: %s"
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:533
 msgid "Disconnected: Nick already in use"
-msgstr "Bağlantı kesildi: Takma ad zaten kullanılıyor"
+msgstr "Bağlantı kesildi: Nick zaten kullanılıyor"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:537
-#, fuzzy
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
-msgstr "Bağlantı kesildi: Oyuncu Elementi Oluşturulamadı. "
+msgstr "Bağlantı kesildi: Oyuncu elementi yaratılamadı."
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:536
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Bağlantı kesildi: Sunucu bağlantıyı reddetti: %s"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:541
-#, c-format, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Bağlantı kesildi: Server bağlantıyı geri çevirdi: %s"
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:546
 msgid "Disconnected: Serial verification failed"
 msgstr "Bağlantı kesildi: Seri kod doğrulaması başarısız oldu"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:550
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:545
+#, c-format
 msgid "Disconnected: Connection desync %s"
-msgstr "Bağlantı kesildi: Bağlantı desenkronize %s"
+msgstr "Bağlantı kesildi: Bağlantı desenkronize oldu %s"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:554
+#, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "Bağlantı kesildi: %s tarafından atıldınız."
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:564
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:559
+#, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "Bağlantı kesildi: %s tarafından yasaklandınız."
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:575
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "Bağlantı Koptu: Server kapatıldı veya yeniden başlatılıyor"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:590
 msgid "You were kicked from the game"
 msgstr "Oyundan atıldınız"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:607
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:591
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr ""
+msgstr "Bu sunucu değiştirilmemiş bir gta_sa.exe dosyasına ihtiyaç duyuyor"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:592
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
+msgid "Please replace gta_sa.exe"
+msgstr "Lütfen gta_sa.exe dosyasını değiştirin"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:593
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "Bu sunucu özelleştirilmiş D3D9.DLL dosyalarına izin vermiyor"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:594
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "D3D9.DLL dosyasını GTA yükleme dizininden kaldırın ve MTA'yı yeniden başlatın"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:595
+msgid "This server does not allow virtual machines"
+msgstr "Bu sunucu sanal bilgisayarlara izin vermiyor"
+
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:596
+msgid "This server requires driver signing to be enabled"
+msgstr "Bu sunucu, sürücü imzalamasına izin verilmiş olmasını gerektiriyor"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:597
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:608
-msgid "Please replace gta_sa.exe"
-msgstr ""
+msgid "Please restart your PC"
+msgstr "Lütfen bilgisayarınızı yeniden başlatın"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:598
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr ""
+msgid "This server has detected missing anti-cheat components"
+msgstr "Bu sunucu, eksik anti-hile bileşenleri algıladı"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:599
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr ""
+msgid "Try restarting MTA"
+msgstr "MTA'yı yeniden başlatmayı deneyin"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:600
-msgid "This server does not allow virtual machines"
-msgstr ""
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "Bu sunucu değiştirilmemiş gta3.img ve gta_int.img dosyalarına ihtiyaç duyuyor"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:601
-msgid "This server requires driver signing to be enabled"
-msgstr ""
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:602
-msgid "Please restart your PC"
-msgstr ""
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:603
-msgid "This server has detected missing anti-cheat components"
-msgstr ""
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "Lütfen gta3.img ve gta_int.img dosyalarının yerini seçin"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:604
-msgid "Try restarting MTA"
-msgstr ""
+msgid "This server does not allow Wine"
+msgstr "Bu sunucu Wine ile girişlere izin vermiyor"
 
 #: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:605
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:606
-msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:609
-msgid "This server does not allow Wine"
-msgstr ""
-
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:610
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr ""
+msgstr "Farklı bir programın MTA:SA'yı değiştirmediğinden emin olun"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:624
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:619
 msgid "Time Remaining: "
 msgstr "Kalan Süre:"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:634
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:629
+#, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d gün"
+msgstr[1] "%d gün"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:636
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:631
+#, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d saat"
+msgstr[1] "%d saat"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:638
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:633
+#, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d dakika"
+msgstr[1] "%d dakika"
 
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:640
-#, c-format, c-format
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:635
+#, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d saniye"
+msgstr[1] "%d saniye"
 
 #. Display the error
-#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:644
+#: ..\Client\mods\deathmatch\logic\CPacketHandler.cpp:639
 msgid "Disconnected"
 msgstr "Bağlantı kesildi"
 
 #. Throw the error and disconnect
 #: ..\Client\mods\deathmatch\logic\CResourceFileDownloadManager.cpp:141
-#, c-format, c-format
+#, c-format
 msgid "Download error: %s"
 msgstr "İndirme hatası: %s"
 
@@ -3293,7 +3018,7 @@ msgid "Could not start the local server. See console for details."
 msgstr "Yerel sunucu başlatılamadı. Ayrıntılar için konsola bakın. "
 
 #: ..\Client\mods\deathmatch\logic\CServer.cpp:182
-#, c-format, c-format
+#, c-format
 msgid "Error: Could not start local server. [%s]"
 msgstr "Hata: Yerel sunucu başlatılamadı. [%s]"
 
@@ -3308,7 +3033,7 @@ msgstr "İndirme Süreci: "
 #. Find our largest piece of text, so we can size accordingly
 #: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:42
 #: ..\Client\mods\deathmatch\logic\CTransferBox.cpp:105
-#, c-format, c-format
+#, c-format
 msgid "%s of %s"
 msgstr "%s'nin %s'i"
 
@@ -3324,26 +3049,18 @@ msgstr "Grafik sürücüsü ile problem"
 
 #. Populate the message and show the box
 #: ..\Shared\mods\deathmatch\logic\Utils.cpp:100
-#, c-format, c-format
-msgid ""
-"Fatal error (%u). If this problem persists, please check out mtasa.com for "
-"support."
-msgstr ""
-"Ölümcül hata (%u). Eğer bu problem devam ederse, lütfen destek için "
-"mtasa.com'u kontol edin. "
+#, c-format
+msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
+msgstr "Ölümcül hata (%u). Eğer bu problem devam ederse, lütfen destek için mtasa.com'a göz atın."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
 #: ..\Shared\mods\deathmatch\logic\Utils.cpp:116
-#, c-format, c-format
-msgid ""
-"Protocol error (%u). If this problem persists, please check out mtasa.com "
-"for support."
-msgstr ""
-"Protokol hatası (%u). Eğer bu problem devam ederse, lütfen destek için "
-"mtasa.com'a göz atın."
+#, c-format
+msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
+msgstr "Protokol hatası (%u). Eğer bu problem devam ederse, lütfen destek için mtasa.com'a göz atın."
 
 #: ..\Shared\mods\deathmatch\logic\Utils.cpp:118
 msgid "Connection error"
@@ -3354,186 +3071,8 @@ msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto düzgün yüklenmemiş, lütfen tekrar yükleyin."
 
 #: ..\Shared\sdk\SharedUtil.Misc.hpp:710
-msgid ""
-"Your browser will now display a web page with some help infomation.\n"
-"\n"
+msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr ""
-"Tarayıcınız biraz yardım bilgisi bulunduran bir sayfa açacak.\n"
-"\n"
-"(Sayfa hata verip yüklenmez ise, tarayıcınıza URL'yi yapıştırın (CTRL-V))."
+msgstr "Tarayıcınız yardım bilgisi bulunduran bir sayfa açacak.\n\n"
+"(Sayfa hata verip yüklenmez ise, URL'yi tarayıcınıza yapıştırın(CTRL+V))"
 
-#~ msgid ""
-#~ "This server is blocking your customized GTA:SA files.\n"
-#~ "\n"
-#~ "To join this server please uncheck:\n"
-#~ "Settings->Multiplayer->Use customized GTA:SA files"
-#~ msgstr ""
-#~ "Bu sunucu modifiye edilmiş GTA:SA dosyalarına izin vermiyor.\n"
-#~ "\n"
-#~ "Bu sunucuya girmek için lütfen şuradaki işareti kaldırın:\n"
-#~ "Ayarlar > Çok oyunculu > Modifiye edilmiş GTA San Andreas dosyalarını kullan."
-
-#~ msgid ""
-#~ "It appears you have a Steam version of GTA:SA, which is currently "
-#~ "incompatible with MTASA.  You are now being redirected to a page where you "
-#~ "can find information to resolve this issue."
-#~ msgstr ""
-#~ "Sizde GTA:SA'nın Steam versiyonu var gibi gözüküyor, bu MTASA ile "
-#~ "uyumsuzdur. Şimdi bu sorunu çözmek için bilgi alabileceğiniz sayfaya "
-#~ "yönlendiriliyorsunuz."
-
-#~ msgid "Disconnected: Player Element Could not be created."
-#~ msgstr "Bağlantı kesildi: Oyuncu Elementi Oluşturulamadı. "
-
-#~ msgid "No host specified!"
-#~ msgstr "Hiç makine adı belirtilmemiş!"
-
-#~ msgid "No port specified!"
-#~ msgstr "port belirtilmedi!"
-
-#~ msgid "Invalid port specified!"
-#~ msgstr "Geçersiz port "
-
-#~ msgid "connect: Syntax is 'connect <host> <port> [<nick> <pass>]'"
-#~ msgstr ""
-#~ "bağlan (/connect): Sözdizimi 'connect <sunucu ip> <port> [<kullanıcı adı> "
-#~ "<şifre>]'"
-
-#~ msgid "Copyright (C) 2003 - 2018 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2018 Multi Theft Auto' ya aittir"
-
-#~ msgid "Services currently unavailable"
-#~ msgstr "Servis bulunamıyor"
-
-#~ msgid "Login Error"
-#~ msgstr "Giriş hatası"
-
-#~ msgid "Invalid username/password"
-#~ msgstr "Geçersiz kullanıcı adı/Şifre"
-
-#~ msgid "Success"
-#~ msgstr "Başarılı"
-
-#~ msgid "Successfully registered!"
-#~ msgstr "Başarı ile kayıt oldunuz"
-
-#~ msgid "Username missing"
-#~ msgstr "Takma ad eksik."
-
-#~ msgid "Email missing"
-#~ msgstr "Mail adresiniz eksik"
-
-#~ msgid "Password missing"
-#~ msgstr "Parola eksik"
-
-#~ msgid "Passwords do not match"
-#~ msgstr "Parolalar birbirini tutmuyor"
-
-#~ msgid "Validation code missing"
-#~ msgstr "Onay kodu eksik"
-
-#, fuzzy
-#~ msgid "Copyright (C) 2003 - 2015 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2014 Multi Theft Auto ya aittir"
-
-#~ msgid "Community"
-#~ msgstr "Topluluk"
-
-#~ msgid "Username:"
-#~ msgstr "Kullanıcı adı:"
-
-#~ msgid "Login"
-#~ msgstr "Oturum Aç:"
-
-#~ msgid "Register"
-#~ msgstr "Kayıt ol"
-
-#~ msgid "Chat BG"
-#~ msgstr "sohbet BG"
-
-#~ msgid "Input BG"
-#~ msgstr "Giriş BG"
-
-#~ msgid "Font:"
-#~ msgstr "Yazı tipi"
-
-#~ msgid "Logging in..."
-#~ msgstr "Giriş yapılıyor..."
-
-#~ msgid "Logout"
-#~ msgstr "Çıkış yap"
-
-#~ msgid "Copyright (C) 2003 - 2014 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2014 Multi Theft Auto ya aittir"
-
-#~ msgid "Disable Aero Desktop"
-#~ msgstr "Aero Masaüstünü Devre Dışı Bırak"
-
-#~ msgid "Disable Driver Overrides"
-#~ msgstr "Sürücü engellemelerini devredışı bırak"
-
-#~ msgid "Experimental feature."
-#~ msgstr "Deneysel özellik."
-
-#~ msgid "DATA FILES"
-#~ msgstr "veri dosyaları"
-
-#~ msgid ""
-#~ "Data files not currently avalable.\n"
-#~ "\n"
-#~ "Please check www.mtasa.com"
-#~ msgstr ""
-#~ "Veri dosyaları şu an mevcut değil.\n"
-#~ "\n"
-#~ "Lütfen www.mtasa.com'a bakınız."
-
-#~ msgid "Slow"
-#~ msgstr "Yavaş"
-
-#~ msgid "General  "
-#~ msgstr "Genel"
-
-#~ msgid "Copyright (C) 2003 - 2013 Multi Theft Auto"
-#~ msgstr "Tüm Hakları (C) 2003-2013 Multi Theft Auto ya aittir"
-
-#~ msgid "Resolution"
-#~ msgstr "Çözünürlük:"
-
-#~ msgid " and "
-#~ msgstr "ve"
-
-#~ msgid "Anti-aliasing"
-#~ msgstr "Yumuşatma"
-
-#~ msgid "Aero setting"
-#~ msgstr "aero ayarları"
-
-#, c-format
-#~ msgid "%s will be changed when you next start MTA"
-#~ msgstr "%s bir daha MTA başlattığında değişmiş olacak"
-
-#~ msgid "/Full Screen Minimize"
-#~ msgstr "/Tam Ekran Küçültme"
-
-#~ msgid "Customized GTA:SA files setting"
-#~ msgstr "özel GTA:SA dosya ayarı"
-
-#~ msgid "Language setting"
-#~ msgstr "Dil ayarları"
-
-#~ msgid "Some settings"
-#~ msgstr "bazı ayarlar"
-
-#~ msgid "Error! (CTRL+C to copy)"
-#~ msgstr "HATA! (CTRL+C kopyalama)"
-
-#, c-format
-#~ msgid ""
-#~ "GTA:SA had trouble opening the file '%s'\n"
-#~ "\n"
-#~ "Try reinstalling GTA:SA to fix it"
-#~ msgstr ""
-#~ "GTA:SA %s dosyasını açmakta problem yaşadı.\n"
-#~ "\n"
-#~ "Onarmak için GTA:SA yı tekrar yüklemeyi deneyin."
