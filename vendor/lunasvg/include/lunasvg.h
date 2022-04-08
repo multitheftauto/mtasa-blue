@@ -129,14 +129,14 @@ public:
     static std::unique_ptr<Document> loadFromData(const char* data);
 
     /**
-     * @brief Rotates the document matrix clockwise around the current origin
+     * @brief Pre-Rotates the document matrix clockwise around the current origin
      * @param angle - rotation angle, in degrees
      * @return this
      */
     Document* rotate(double angle);
 
     /**
-     * @brief Rotates the document matrix clockwise around the given point
+     * @brief Pre-Rotates the document matrix clockwise around the given point
      * @param angle - rotation angle, in degrees
      * @param cx - horizontal translation
      * @param cy - vertical translation
@@ -145,7 +145,7 @@ public:
     Document* rotate(double angle, double cx, double cy);
 
     /**
-     * @brief Scales the document matrix by sx horizontally and sy vertically
+     * @brief Pre-Scales the document matrix by sx horizontally and sy vertically
      * @param sx - horizontal scale factor
      * @param sy - vertical scale factor
      * @return this
@@ -153,7 +153,7 @@ public:
     Document* scale(double sx, double sy);
 
     /**
-     * @brief Shears the document matrix by shx horizontally and shy vertically
+     * @brief Pre-Shears the document matrix by shx horizontally and shy vertically
      * @param shx - horizontal skew factor, in degree
      * @param shy - vertical skew factor, in degree
      * @return this
@@ -161,7 +161,7 @@ public:
     Document* shear(double shx, double shy);
 
     /**
-     * @brief Translates the document matrix by tx horizontally and ty vertically
+     * @brief Pre-Translates the document matrix by tx horizontally and ty vertically
      * @param tx - horizontal translation
      * @param ty - vertical translation
      * @return this
@@ -169,7 +169,7 @@ public:
     Document* translate(double tx, double ty);
 
     /**
-     * @brief Multiplies the document matrix by Matrix(a, b, c, d, e, f)
+     * @brief Pre-Multiplies the document matrix by Matrix(a, b, c, d, e, f)
      * @param a - horizontal scale factor
      * @param b - horizontal skew factor
      * @param c - vertical skew factor

@@ -554,7 +554,7 @@ void CClientGame::StartPlayback()
     }
 }
 
-bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type, const char* szSecret)
+bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type)
 {
     m_ServerType = Type;
     // int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
@@ -626,10 +626,10 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
 
-            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
+            // Send an empty string if server still has old Discord implementation (#2499)
+            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation) && !g_pNet->CanServerBitStream(eBitStreamVersion::Discord_Cleanup))
             {
-                SString joinSecret = SStringX(szSecret);
-                pBitStream->WriteString<uchar>(joinSecret);
+                pBitStream->WriteString<uchar>("");
             }
 
             // Send the packet as joindata
@@ -6543,17 +6543,6 @@ void CClientGame::RestreamWorld()
     g_pGame->GetStreaming()->ReinitStreaming();
 }
 
-void CClientGame::TriggerDiscordJoin(SString strSecret)
-{
-    if (!g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
-        return;
-
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-    pBitStream->WriteString<uchar>(strSecret);
-    g_pNet->SendPacket(PACKET_ID_DISCORD_JOIN, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DEFAULT);
-    g_pNet->DeallocateNetBitStream(pBitStream);
-}
-
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
@@ -6717,18 +6706,4 @@ void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
     {
         g_pGame->GetAudioEngine()->StartRadio(dwStationID);
     }
-}
-
-void CClientGame::UpdateDiscordState()
-{
-    // Set discord state to players[/slot] count
-    uint    playerCount = g_pClientGame->GetPlayerManager()->Count();
-    uint    playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
-    SString state(std::to_string(playerCount));
-
-    if (g_pCore->GetNetwork()->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
-        state += "/" + std::to_string(playerSlot);
-
-    state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
-    g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
 }
