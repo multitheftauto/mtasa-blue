@@ -68,3 +68,23 @@ const CVector CLuaPhysicsRigidBody::GetRotation() const
     m_pMotionState->getWorldTransform(transform);
     return CPhysicsSharedLogic::GetRotation(transform);
 }
+
+void CLuaPhysicsRigidBody::SetVelocity(CVector vecVelocity)
+{
+    m_pRigidBodyProxy->setLinearVelocity(CPhysicsSharedLogic::ConvertVector(vecVelocity));
+}
+
+CVector CLuaPhysicsRigidBody::GetVelocity()
+{
+    return CPhysicsSharedLogic::ConvertVector(m_pRigidBodyProxy->getLinearVelocity());
+}
+
+void CLuaPhysicsRigidBody::SetAngularVelocity(CVector vecVelocity)
+{
+    m_pRigidBodyProxy->setAngularVelocity(CPhysicsSharedLogic::ConvertVector(vecVelocity));
+}
+
+CVector CLuaPhysicsRigidBody::GetAngularVelocity()
+{
+    return CPhysicsSharedLogic::ConvertVector(m_pRigidBodyProxy->getAngularVelocity());
+}

@@ -565,7 +565,7 @@ int CLuaElementDefs::getElementParent(lua_State* luaVM)
 
 int CLuaElementDefs::getElementPosition(lua_State* luaVM)
 {
-    //  float, float, float getElementPosition ( element theElement )
+    //  float, float, float getElementPosition ( element theElement / physics-element thePhysicsElement )
     CElement*                pElement = nullptr;
     CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
 
@@ -738,24 +738,45 @@ int CLuaElementDefs::OOP_getElementMatrix(lua_State* luaVM)
 int CLuaElementDefs::getElementRotation(lua_State* luaVM)
 {
     //  float float float getElementRotation ( element theElement [, string rotOrder = "default" ] )
-    CElement*           pElement;
-    eEulerRotationOrder rotationOrder;
+    CElement*                pElement = nullptr;
+    CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
+    eEulerRotationOrder      rotationOrder;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+    {
+        argStream.ReadUserData(pPhysicsWorldElement);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement);
+    }
+
     argStream.ReadEnumString(rotationOrder, EULER_DEFAULT);
 
     if (!argStream.HasErrors())
     {
-        // Grab the rotation
-        CVector vecRotation;
-        if (CStaticFunctionDefinitions::GetElementRotation(pElement, vecRotation, rotationOrder))
+        if (pPhysicsWorldElement)
         {
+            const CVector vecRotation = pPhysicsWorldElement->GetRotation();
             // Return it
             lua_pushnumber(luaVM, vecRotation.fX);
             lua_pushnumber(luaVM, vecRotation.fY);
             lua_pushnumber(luaVM, vecRotation.fZ);
             return 3;
+        }
+        else
+        {
+            // Grab the rotation
+            CVector vecRotation;
+            if (CStaticFunctionDefinitions::GetElementRotation(pElement, vecRotation, rotationOrder))
+            {
+                // Return it
+                lua_pushnumber(luaVM, vecRotation.fX);
+                lua_pushnumber(luaVM, vecRotation.fY);
+                lua_pushnumber(luaVM, vecRotation.fZ);
+                return 3;
+            }
         }
     }
     else
@@ -793,23 +814,45 @@ int CLuaElementDefs::OOP_getElementRotation(lua_State* luaVM)
 
 int CLuaElementDefs::getElementVelocity(lua_State* luaVM)
 {
-    //  float float float getElementVelocity ( element theElement )
-    CElement* pElement;
+    //  float float float getElementVelocity ( element theElement / physics-rigid-body thePhysicsRigidBody)
+    CElement*             pElement = nullptr;
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
     CScriptArgReader argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    {
+        argStream.ReadUserData(pRigidBody);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement);
+    }
+
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        // Grab the velocity
-        CVector vecVelocity;
-        if (CStaticFunctionDefinitions::GetElementVelocity(pElement, vecVelocity))
+        if (pRigidBody)
         {
+            const CVector vecVelocity = pRigidBody->GetVelocity();
             // Return it
             lua_pushnumber(luaVM, vecVelocity.fX);
             lua_pushnumber(luaVM, vecVelocity.fY);
             lua_pushnumber(luaVM, vecVelocity.fZ);
             return 3;
+        }
+        else
+        {
+            // Grab the velocity
+            CVector vecVelocity;
+            if (CStaticFunctionDefinitions::GetElementVelocity(pElement, vecVelocity))
+            {
+                // Return it
+                lua_pushnumber(luaVM, vecVelocity.fX);
+                lua_pushnumber(luaVM, vecVelocity.fY);
+                lua_pushnumber(luaVM, vecVelocity.fZ);
+                return 3;
+            }
         }
     }
     else
@@ -844,22 +887,44 @@ int CLuaElementDefs::OOP_getElementVelocity(lua_State* luaVM)
 int CLuaElementDefs::getElementTurnVelocity(lua_State* luaVM)
 {
     //  float float float getElementAngularVelocity ( element theElement )
-    CElement* pElement;
+    CElement* pElement = nullptr;
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
 
     CScriptArgReader argStream(luaVM);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    {
+        argStream.ReadUserData(pRigidBody);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement);
+    }
+
     argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
-        // Grab the turn velocity
-        CVector vecTurnVelocity;
-        if (CStaticFunctionDefinitions::GetElementTurnVelocity(pElement, vecTurnVelocity))
+        if (pRigidBody)
         {
+            const CVector vecTurnVelocity = pRigidBody->GetAngularVelocity();
             // Return it
             lua_pushnumber(luaVM, vecTurnVelocity.fX);
             lua_pushnumber(luaVM, vecTurnVelocity.fY);
             lua_pushnumber(luaVM, vecTurnVelocity.fZ);
             return 3;
+        }
+        else
+        {
+            // Grab the turn velocity
+            CVector vecTurnVelocity;
+            if (CStaticFunctionDefinitions::GetElementTurnVelocity(pElement, vecTurnVelocity))
+            {
+                // Return it
+                lua_pushnumber(luaVM, vecTurnVelocity.fX);
+                lua_pushnumber(luaVM, vecTurnVelocity.fY);
+                lua_pushnumber(luaVM, vecTurnVelocity.fZ);
+                return 3;
+            }
         }
     }
     else
@@ -1958,21 +2023,38 @@ int CLuaElementDefs::OOP_setElementRotation(lua_State* luaVM)
 
 int CLuaElementDefs::setElementVelocity(lua_State* luaVM)
 {
-    //  bool setElementVelocity ( element theElement, float speedX, float speedY, float speedZ )
-    CElement* pElement;
-    CVector   vecVelocity;
+    //  bool setElementVelocity ( element theElement / physics-rigid-body theRigidBody, float speedX, float speedY, float speedZ )
+    CElement*             pElement = nullptr;
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
+    CVector               vecVelocity;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    {
+        argStream.ReadUserData(pRigidBody);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement);
+    }
     argStream.ReadVector3D(vecVelocity);
 
     if (!argStream.HasErrors())
     {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        // Set the velocity
-        if (CStaticFunctionDefinitions::SetElementVelocity(pElement, vecVelocity))
+        if (pElement)
         {
+            LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+            // Set the velocity
+            if (CStaticFunctionDefinitions::SetElementVelocity(pElement, vecVelocity))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+        {
+            pRigidBody->SetVelocity(vecVelocity);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -1987,18 +2069,36 @@ int CLuaElementDefs::setElementVelocity(lua_State* luaVM)
 int CLuaElementDefs::setElementTurnVelocity(lua_State* luaVM)
 {
     //  bool setElementAngularVelocity ( element theElement, float spinX, float spinY, float spinZ )
-    CElement* pElement;
-    CVector   vecTurnVelocity;
+    CElement*             pElement = nullptr;
+    CLuaPhysicsRigidBody* pRigidBody = nullptr;
+    CVector               vecTurnVelocity;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsRigidBody>())
+    {
+        argStream.ReadUserData(pRigidBody);
+    }
+    else
+    {
+        argStream.ReadUserData(pElement);
+    }
+
     argStream.ReadVector3D(vecTurnVelocity);
 
     if (!argStream.HasErrors())
     {
-        // Set the turn velocity
-        if (CStaticFunctionDefinitions::SetElementAngularVelocity(pElement, vecTurnVelocity))
+        if (pElement)
         {
+            // Set the turn velocity
+            if (CStaticFunctionDefinitions::SetElementAngularVelocity(pElement, vecTurnVelocity))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+        {
+            pRigidBody->SetAngularVelocity(vecTurnVelocity);
             lua_pushboolean(luaVM, true);
             return 1;
         }

@@ -12,8 +12,8 @@
 
 #include "lua/CLuaFunctionParser.h"
 #include "Enums.h"
-typedef std::unordered_map<std::string, std::variant<float, CVector>>       RigidBodyOptions;
-typedef std::unordered_map<std::string, std::variant<int, double, CVector>> CreateWorldOptions;
+typedef std::unordered_map<std::string, std::variant<float, CVector>>                     RigidBodyOptions;
+typedef std::unordered_map<std::string, std::variant<int, double, CVector>>               CreateWorldOptions;
 
 class CLuaPhysicsDefs : public CLuaDefs
 {
@@ -22,7 +22,8 @@ public:
     static void            LoadFunctions(void);
     static void            AddClass(lua_State* luaVM);
 
-    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options);
+    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector vecPosition, CVector vecRotation,
+                                                        std::optional<RigidBodyOptions> options);
 
     static CLuaPhysicsStaticCollision* PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                     std::optional<CVector> rotation);
@@ -40,7 +41,7 @@ public:
         if (const auto it = options.find(szProperty); it != options.end())
         {
             if (!std::holds_alternative<U>(it->second))
-                throw std::invalid_argument(SString("'%s' value must be ...", szProperty.c_str()).c_str());
+                throw std::invalid_argument(SString("Value for option '%s' is invalid.", szProperty.c_str()).c_str());
             return std::get<U>(it->second);
         }
         return defaultValue;

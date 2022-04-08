@@ -33,6 +33,10 @@ public:
     void          SetRotation(CVector vecRotation);
     const CVector GetRotation() const;
 
+    void    SetVelocity(CVector vecVelocity);
+    CVector GetVelocity();
+    void    SetAngularVelocity(CVector vecVelocity);
+    CVector GetAngularVelocity();
 
     CPhysicsRigidBodyProxy* GetBtRigidBody() const { return m_pRigidBodyProxy.get(); }
 

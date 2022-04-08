@@ -43,9 +43,6 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-    // lua_classfunction(luaVM, "set", "PhysicsTestSet");
-    // lua_classfunction(luaVM, "get", "PhysicsTestGet");
-
     lua_registerstaticclass(luaVM, "Physics");
 }
 
@@ -73,7 +70,8 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::
     return pBox;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<RigidBodyOptions> options)
+CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector vecPosition,
+                                                              CVector vecRotation, std::optional<RigidBodyOptions> options)
 {
     auto& pLuaMain = lua_getownercluamain(luaVM);
 
@@ -95,8 +93,6 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
 
     CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
     CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
-    CVector vecPosition = getOption(options.value(), "position", CVector{0, 0, 0});
-    CVector vecRotation = getOption(options.value(), "rotation", CVector{0, 0, 0});
 
     pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
