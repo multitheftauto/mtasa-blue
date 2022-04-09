@@ -20,7 +20,7 @@ void CLuaVectorGraphicDefs::LoadFunctions()
         {"svgGetSize", ArgumentParser<SVGGetSize>},
         {"svgSetSize", ArgumentParser<SVGSetSize>},
         {"svgSetUpdateCallback", ArgumentParser<SVGSetUpdateCallback>},
-
+        // {"svgGetUpdateCallback", ArgumentParser<SVGGetUpdateCallback>}, -- see method notes
     };
 
     // Add functions
@@ -257,12 +257,16 @@ bool CLuaVectorGraphicDefs::SVGSetUpdateCallback(CClientVectorGraphic* vectorGra
     return false;
 }
 
-std::variant<CLuaFunctionRef, bool> CLuaVectorGraphicDefs::SVGGetUpdateCallback(CClientVectorGraphic* vectorGraphic)
-{
-    auto func = vectorGraphic->GetUpdateCallback();
+// This doesn't work, there is no conversion from CLuaFunctionRef to the Lua side, so the parser always uses bool.
+// Scripts will just have to keep track of the function callback they've set, can't see it being an issue.
+// It can be added in future if the Lua parser supports it.
 
-    if (std::holds_alternative<CLuaFunctionRef>(func))
-        return func;
-
-    return false;
-}
+//std::variant<CLuaFunctionRef, bool> CLuaVectorGraphicDefs::SVGGetUpdateCallback(CClientVectorGraphic* vectorGraphic)
+//{
+//    auto func = vectorGraphic->GetUpdateCallback();
+//
+//    if (std::holds_alternative<CLuaFunctionRef>(func))
+//        return func;
+//
+//    return false;
+//}
