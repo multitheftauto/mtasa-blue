@@ -18,27 +18,6 @@ CLuaPhysicsShape::CLuaPhysicsShape(btCollisionShape* pShape) : CLuaPhysicsElemen
     m_pBtShape->setUserIndex(EIdClass::SHAPE);
 }
 
-bool CLuaPhysicsShape::Destroy()
-{
-#ifdef MTA_CLIENT
-    g_pClientGame->GetPhysics()->DestroyShape(this);
-#else
-    g_pGame->GetPhysics()->DestroyShape(this);
-#endif
-    return true;
-}
-
-void CLuaPhysicsShape::Unlink()
-{
-    std::vector<CLuaPhysicsRigidBody*>       bodies = m_vecRigidBodyList;
-    std::vector<CLuaPhysicsStaticCollision*> staticCollisions = m_vecStaticCollisions;
-
-    for (auto const& pRigidBody : bodies)
-        pRigidBody->Destroy();
-    for (auto const& pStaticCollision : staticCollisions)
-        pStaticCollision->Destroy();
-}
-
 CLuaPhysicsShape::~CLuaPhysicsShape()
 {
     assert(m_vecRigidBodyList.empty());

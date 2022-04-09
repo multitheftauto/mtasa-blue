@@ -26,18 +26,6 @@ CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
 {
 }
 
-bool CLuaPhysicsRigidBody::Destroy()
-{
-    SetEnabled(false);
-#ifdef MTA_CLIENT
-    g_pClientGame->GetPhysics()->DestroyRigidBody(this);
-#else
-    g_pGame->GetPhysics()->DestroyRigidBody(this);
-#endif
-    m_pShape->RemoveRigidBody(this);
-    return true;
-}
-
 void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
 {
     btTransform& transform = m_pRigidBodyProxy->getWorldTransform();
@@ -90,4 +78,10 @@ void CLuaPhysicsRigidBody::SetAngularVelocity(CVector vecVelocity)
 CVector CLuaPhysicsRigidBody::GetAngularVelocity()
 {
     return CPhysicsSharedLogic::ConvertVector(m_pRigidBodyProxy->getAngularVelocity());
+}
+
+void CLuaPhysicsRigidBody::Unlink()
+{
+    m_pShape->RemoveRigidBody(this);
+    m_pRigidBodyProxy->setCollisionShape(nullptr);
 }

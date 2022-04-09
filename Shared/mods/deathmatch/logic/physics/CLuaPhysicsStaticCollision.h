@@ -20,8 +20,6 @@ public:
     CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
     ~CLuaPhysicsStaticCollision();
 
-    bool Destroy();
-
     void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;
     void          SetRotation(CVector vecRotation);
@@ -34,7 +32,9 @@ public:
     CLuaPhysicsShape*             GetShape() const { return m_pShape; }
     virtual ePhysicsElementType   GetType() const { return ePhysicsElementType::StaticCollision; }
 
+    // Set's whatever static collision is added to physics world
     void SetEnabled(bool bEnabled) { m_btCollisionObject->SetEnabled(bEnabled); }
+    // Checks whatever static collision is in physics world
     bool IsEnabled() const { return m_btCollisionObject->IsEnabled(); }
 
 private:

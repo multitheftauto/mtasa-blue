@@ -22,7 +22,6 @@ protected:
 public:
     uint                   GetScriptID() const { return m_uiScriptID; }
     EIdClass::EIdClassType GetClassType() const { return m_classType; }
-    virtual bool           Destroy() = 0;
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::Shape; }
 

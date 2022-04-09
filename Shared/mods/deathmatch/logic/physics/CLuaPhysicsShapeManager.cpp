@@ -20,7 +20,6 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape, bool deleteFromLi
     if (!ListContains(m_elementsList, pShape))
         return;
 
-    pShape->Unlink();
 #ifdef MTA_CLIENT
     g_pClientGame->GetPhysics()->DestroyShape(pShape);
 #else

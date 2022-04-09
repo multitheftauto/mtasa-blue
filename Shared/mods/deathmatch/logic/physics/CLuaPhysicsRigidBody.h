@@ -11,22 +11,16 @@
 
 class CLuaPhysicsRigidBody;
 
-#include "physics/CPhysicsRigidBodyProxy.h"
-#include "physics/CLuaPhysicsWorldElement.h"
-
 #pragma once
 
-struct SPhysicsCollisionReport;
-struct SBoundingBox;
-struct SBoundingSphere;
+#include "physics/CPhysicsRigidBodyProxy.h"
+#include "physics/CLuaPhysicsWorldElement.h"
 
 class CLuaPhysicsRigidBody : public CLuaPhysicsWorldElement
 {
 public:
     CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
     ~CLuaPhysicsRigidBody();
-
-    bool Destroy();
 
     void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;
@@ -41,15 +35,19 @@ public:
     CPhysicsRigidBodyProxy* GetBtRigidBody() const { return m_pRigidBodyProxy.get(); }
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::RigidBody; }
-    
-    CLuaPhysicsShape* GetShape() const { return m_pShape; }
+
+    CLuaPhysicsShape*  GetShape() const { return m_pShape; }
     btCollisionObject* GetBtCollisionObject() const { return m_pRigidBodyProxy.get(); }
 
+    // Set's whatever rigid body is added to physics world
     void SetEnabled(bool bEnabled) { m_pRigidBodyProxy->SetEnabled(bEnabled); }
+    // Checks whatever rigid body is in physics world
     bool IsEnabled() const { return m_pRigidBodyProxy->IsEnabled(); }
 
+    void Unlink();
+
 private:
-    std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy = nullptr;
-    CLuaPhysicsShape*     m_pShape;
+    std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy;
+    CLuaPhysicsShape*                       m_pShape = nullptr;
     std::unique_ptr<MotionState>            m_pMotionState;            // Thread safe
 };

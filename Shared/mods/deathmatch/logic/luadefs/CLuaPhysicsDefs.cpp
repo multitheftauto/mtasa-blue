@@ -65,39 +65,28 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::
     CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
     CLuaPhysicsBoxShape* pBox = GetPhysics()->CreateBoxShape(vecSize / 2);
-    pLuaMain.GetPhysicsShapeManager()->Add(pBox);
 
     return pBox;
 }
 
 CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector vecPosition,
-                                                              CVector vecRotation, std::optional<RigidBodyOptions> options)
+                                                              CVector vecRotation, RigidBodyOptions options)
 {
     auto& pLuaMain = lua_getownercluamain(luaVM);
 
-    CLuaPhysicsRigidBody* pRigidBody = nullptr;
-    if (!options.has_value() || options.value().empty())
-    {
-        pRigidBody = GetPhysics()->CreateRigidBody(pShape);
-        pRigidBody->SetEnabled(true);
-        pLuaMain.GetPhysicsRigidBodyManager()->Add(pRigidBody);
-        return pRigidBody;
-    }
-
-    float fMass = getOption(options.value(), "mass", BulletPhysics::Defaults::RigidBodyMass);
+    float fMass = getOption(options, "mass", BulletPhysics::Defaults::RigidBodyMass);
 
     if (fMass < 0)
         throw std::invalid_argument("Mass can not be negative");
     if (fMass > BulletPhysics::Limits::RigidBodyMassLimit)
         throw std::invalid_argument(SString("Mass can not larger than %.2f units", BulletPhysics::Limits::RigidBodyMassLimit).c_str());
 
-    CVector vecLocalInertia = getOption(options.value(), "localIntertia", CVector{0, 0, 0});
-    CVector vecCenterOfMass = getOption(options.value(), "centerOfMass", CVector{0, 0, 0});
+    CVector vecLocalInertia = getOption(options, "localIntertia", CVector{0, 0, 0});
+    CVector vecCenterOfMass = getOption(options, "centerOfMass", CVector{0, 0, 0});
 
-    pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    auto pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
     pRigidBody->SetEnabled(true);
-    pLuaMain.GetPhysicsRigidBodyManager()->Add(pRigidBody);
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation);
     return pRigidBody;
@@ -106,13 +95,9 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
                                                                           std::optional<CVector> rotation)
 {
-    auto&                       pLuaMain = lua_getownercluamain(luaVM);
     CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
-
-    pStaticCollision->SetEnabled(true);
     pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
     pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
-    pLuaMain.GetPhysicsStaticCollisionManager()->Add(pStaticCollision);
     return pStaticCollision;
 }
 

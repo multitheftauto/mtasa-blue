@@ -26,18 +26,6 @@ CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
 {
 }
 
-bool CLuaPhysicsStaticCollision::Destroy()
-{
-    SetEnabled(false);
-#ifdef MTA_CLIENT
-    g_pClientGame->GetPhysics()->DestroyStaticCollision(this);
-#else
-    g_pGame->GetPhysics()->DestroyStaticCollision(this);
-#endif
-    m_pShape->RemoveStaticCollision(this);
-    return true;
-}
-
 void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)
 {
     btTransform& transform = GetCollisionObject()->getWorldTransform();
@@ -68,5 +56,6 @@ const CVector CLuaPhysicsStaticCollision::GetRotation() const
 
 void CLuaPhysicsStaticCollision::Unlink()
 {
+    m_pShape->RemoveStaticCollision(this);
     m_btCollisionObject->setCollisionShape(nullptr);
 }

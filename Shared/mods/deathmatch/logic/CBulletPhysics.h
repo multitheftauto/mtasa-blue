@@ -56,10 +56,6 @@ public:
 
     CPhysicsDebugDrawer* GetDebug() const { return m_pDebugDrawer.get(); }
 
-    std::vector<CLuaPhysicsShape*>           GetShapes() const { return m_vecShapes; }
-    std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const { return m_vecRigidBodies; }
-    std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
-
     CLuaPhysicsRigidBodyManager*       GetRigidBodiesManager() const { return m_pLuaPhysicsRigidBodyManager.get(); }
     CLuaPhysicsStaticCollisionManager* GetStaticCollisionsManager() const { return m_pLuaPhysicsStaticCollisionManager.get(); }
     CLuaPhysicsShapeManager*           GetShapesManager() const { return m_pLuaPhysicsShapeManager.get(); }
@@ -71,24 +67,16 @@ public:
     void DoPulse();
 
 private:
-    std::vector<CLuaPhysicsShape*>           m_vecShapes;
-    std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodies;
-    std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
-
     void AddStaticCollision(btCollisionObject* pBtCollisionObject) const;
-    void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
     void AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const;
-    void RemoveRigidBody(btRigidBody* pBtRigidBody) const;
+    void RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const;
+    void RemoveRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const;
 
     void DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody);
     void DestroyShape(CLuaPhysicsShape* pLuaShape);
     void DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     void StepSimulation();
-
-    void AddShape(CLuaPhysicsShape* pShape);
-    void AddRigidBody(CLuaPhysicsRigidBody* pRigidBody);
-    void AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision);
 
     std::unique_ptr<btSequentialImpulseConstraintSolver> m_pSolver;
     std::unique_ptr<btBroadphaseInterface>               m_pOverlappingPairCache;

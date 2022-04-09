@@ -44,58 +44,39 @@ void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) c
     m_pDynamicsWorld->addCollisionObject(pBtCollisionObject);
 }
 
-void CBulletPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const
-{
-    m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
-}
-
 void CBulletPhysics::AddRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const
 {
     m_pDynamicsWorld->addRigidBody(pRigidBodyProxy);
 }
 
-void CBulletPhysics::RemoveRigidBody(btRigidBody* pBtRigidBody) const
+void CBulletPhysics::RemoveStaticCollision(btCollisionObject* pBtCollisionObject) const
 {
-    m_pDynamicsWorld->removeRigidBody(pBtRigidBody);
+    m_pDynamicsWorld->removeCollisionObject(pBtCollisionObject);
 }
 
-CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape)
+void CBulletPhysics::RemoveRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) const
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
-    AddStaticCollision(pStaticCollision);
-    pShape->AddStaticCollision(pStaticCollision);
-    return pStaticCollision;
-}
-
-void CBulletPhysics::AddStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
-{
-    m_vecStaticCollisions.push_back(pStaticCollision);
-}
-
-void CBulletPhysics::AddShape(CLuaPhysicsShape* pShape)
-{
-    m_vecShapes.push_back(pShape);
-}
-
-void CBulletPhysics::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)
-{
-    m_vecRigidBodies.push_back(pRigidBody);
-}
-
-void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
-{
-    ListRemove(m_vecRigidBodies, pLuaRigidBody);
-}
-
-void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
-{
-    pLuaShape->Unlink();
-    ListRemove(m_vecShapes, pLuaShape);
+    m_pDynamicsWorld->removeRigidBody(pRigidBodyProxy);
 }
 
 void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
-    ListRemove(m_vecStaticCollisions, pStaticCollision);
+    pStaticCollision->Unlink();
+    RemoveStaticCollision(pStaticCollision->GetBtCollisionObject());
+}
+
+void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
+{
+    pLuaRigidBody->Unlink();
+    RemoveRigidBody(pLuaRigidBody->GetBtRigidBody());
+}
+
+void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
+{
+    for (auto const& pRigidBody : pLuaShape->GetRigidBodies())
+        m_pLuaPhysicsRigidBodyManager->Remove(pRigidBody);
+    for (auto const& pStaticCollision : pLuaShape->GetStaticCollisions())
+        m_pLuaPhysicsStaticCollisionManager->Remove(pStaticCollision);
 }
 
 void CBulletPhysics::StepSimulation()
@@ -103,17 +84,28 @@ void CBulletPhysics::StepSimulation()
     m_pDynamicsWorld->stepSimulation(((float)m_fDeltaTime) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
 }
 
+CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape)
+{
+    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
+    m_pLuaPhysicsStaticCollisionManager->Add(pStaticCollision);
+    pShape->AddStaticCollision(pStaticCollision);
+    pStaticCollision->SetEnabled(true);
+    return pStaticCollision;
+}
+
 CLuaPhysicsBoxShape* CBulletPhysics::CreateBoxShape(CVector vector)
 {
     CLuaPhysicsBoxShape* pShape = new CLuaPhysicsBoxShape(vector);
-    AddShape(pShape);
+    m_pLuaPhysicsShapeManager->Add(pShape);
     return pShape;
 }
 
 CLuaPhysicsRigidBody* CBulletPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
     CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
-    AddRigidBody(pRigidBody);
+    m_pLuaPhysicsRigidBodyManager->Add(pRigidBody);
+    pShape->AddRigidBody(pRigidBody);
+    pRigidBody->SetEnabled(true);
     return pRigidBody;
 }
 
