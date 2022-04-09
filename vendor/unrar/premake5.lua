@@ -67,3 +67,9 @@ project "unrar"
 		"threadpool.cpp",
 		"ui.cpp"
 	}
+
+	filter "system:Mac*"
+		defines { "__APPLE__" }
+
+	filter { "system:Unix", "system:Linux" }
+		defines { "_UNIX" }
