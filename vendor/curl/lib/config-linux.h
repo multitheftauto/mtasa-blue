@@ -493,14 +493,12 @@
 /* Define to 1 if you have the <openssl/rsa.h> header file. */
 /* #undef HAVE_OPENSSL_RSA_H */
 
-/* if you have the function SRP_Calc_client_key */
+/* if you have the functions SSL_CTX_set_srp_username and
+   SSL_CTX_set_srp_password */
 /* #undef HAVE_OPENSSL_SRP */
 
 /* Define to 1 if you have the <openssl/ssl.h> header file. */
 /* #undef HAVE_OPENSSL_SSL_H */
-
-/* Define to 1 if you have the `OpenSSL_version' function. */
-/* #undef HAVE_OPENSSL_VERSION */
 
 /* Define to 1 if you have the <openssl/x509.h> header file. */
 /* #undef HAVE_OPENSSL_X509_H */
@@ -600,9 +598,6 @@
 
 /* Define to 1 if you have the <socket.h> header file. */
 /* #undef HAVE_SOCKET_H */
-
-/* Define to 1 if you have the `SSLv2_client_method' function. */
-/* #undef HAVE_SSLV2_CLIENT_METHOD */
 
 /* Define to 1 if you have the `SSL_get_ech_status' function. */
 /* #undef HAVE_SSL_GET_ECH_STATUS */
@@ -762,9 +757,6 @@
 
 /* Define to 1 if you have the winsock2.h header file. */
 /* #undef HAVE_WINSOCK2_H */
-
-/* Define to 1 if you have the winsock.h header file. */
-/* #undef HAVE_WINSOCK_H */
 
 /* Define to 1 if you have the <wolfssh/ssh.h> header file. */
 /* #undef HAVE_WOLFSSH_SSH_H */
@@ -968,9 +960,6 @@
 
 /* if mbedTLS is enabled */
 /* #undef USE_MBEDTLS */
-
-/* if MesaLink is enabled */
-/* #undef USE_MESALINK */
 
 /* if nghttp2 is in use */
 /* #undef USE_NGHTTP2 */

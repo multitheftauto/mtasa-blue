@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -85,7 +85,7 @@
 
 static bool verifyconnect(curl_socket_t sockfd, int *error);
 
-#if defined(__DragonFly__) || defined(HAVE_WINSOCK_H)
+#if defined(__DragonFly__) || defined(HAVE_WINSOCK2_H)
 /* DragonFlyBSD and Windows use millisecond units */
 #define KEEPALIVE_FACTOR(x) (x *= 1000)
 #else
@@ -257,6 +257,9 @@ static CURLcode bindlocal(struct Curl_easy *data,
 #ifdef IP_BIND_ADDRESS_NO_PORT
   int on = 1;
 #endif
+#ifndef ENABLE_IPV6
+  (void)scope;
+#endif
 
   /*************************************************************
    * Select device to bind socket to
@@ -314,8 +317,11 @@ static CURLcode bindlocal(struct Curl_easy *data,
       }
 #endif
 
-      switch(Curl_if2ip(af, scope, conn->scope_id, dev,
-                        myhost, sizeof(myhost))) {
+      switch(Curl_if2ip(af,
+#ifdef ENABLE_IPV6
+                        scope, conn->scope_id,
+#endif
+                        dev, myhost, sizeof(myhost))) {
         case IF2IP_NOT_FOUND:
           if(is_interface) {
             /* Do not fall back to treating it as a host name */
@@ -629,7 +635,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
 #ifdef ENABLE_IPV6
   struct sockaddr_in6 *si6 = NULL;
 #endif
-#if defined(HAVE_SYS_UN_H) && defined(AF_UNIX)
+#if (defined(HAVE_SYS_UN_H) || defined(WIN32_SOCKADDR_UN)) && defined(AF_UNIX)
   struct sockaddr_un *su = NULL;
 #else
   (void)salen;
@@ -656,7 +662,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
       }
       break;
 #endif
-#if defined(HAVE_SYS_UN_H) && defined(AF_UNIX)
+#if (defined(HAVE_SYS_UN_H) || defined(WIN32_SOCKADDR_UN)) && defined(AF_UNIX)
     case AF_UNIX:
       if(salen > (curl_socklen_t)sizeof(CURL_SA_FAMILY_T)) {
         su = (struct sockaddr_un*)sa;
@@ -894,6 +900,8 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
         connkeep(conn, "HTTP/3 default");
         return CURLE_OK;
       }
+      /* When a QUIC connect attempt fails, the better error explanation is in
+         'result' and not in errno */
       if(result) {
         conn->tempsock[i] = CURL_SOCKET_BAD;
         error = SOCKERRNO;
@@ -977,6 +985,13 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
         char buffer[STRERROR_LEN];
         Curl_printable_address(conn->tempaddr[i], ipaddress,
                                sizeof(ipaddress));
+#ifdef ENABLE_QUIC
+        if(conn->transport == TRNSPRT_QUIC) {
+          infof(data, "connect to %s port %u failed: %s",
+                ipaddress, conn->port, curl_easy_strerror(result));
+        }
+        else
+#endif
         infof(data, "connect to %s port %u failed: %s",
               ipaddress, conn->port,
               Curl_strerror(error, buffer, sizeof(buffer)));
@@ -988,9 +1003,11 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
         ainext(conn, i, TRUE);
         status = trynextip(data, conn, sockindex, i);
         if((status != CURLE_COULDNT_CONNECT) ||
-           conn->tempsock[other] == CURL_SOCKET_BAD)
+           conn->tempsock[other] == CURL_SOCKET_BAD) {
           /* the last attempt failed and no other sockets remain open */
-          result = status;
+          if(!result)
+            result = status;
+        }
       }
     }
   }
@@ -1016,12 +1033,15 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
     /* no more addresses to try */
     const char *hostname;
     char buffer[STRERROR_LEN];
+    CURLcode failreason = result;
 
     /* if the first address family runs out of addresses to try before the
        happy eyeball timeout, go ahead and try the next family now */
     result = trynextip(data, conn, sockindex, 1);
     if(!result)
       return result;
+
+    result = failreason;
 
 #ifndef CURL_DISABLE_PROXY
     if(conn->bits.socksproxy)
@@ -1036,10 +1056,14 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
       hostname = conn->host.name;
 
     failf(data, "Failed to connect to %s port %u after "
-                "%" CURL_FORMAT_TIMEDIFF_T " ms: %s",
-        hostname, conn->port,
-        Curl_timediff(now, data->progress.t_startsingle),
-        Curl_strerror(error, buffer, sizeof(buffer)));
+          "%" CURL_FORMAT_TIMEDIFF_T " ms: %s",
+          hostname, conn->port,
+          Curl_timediff(now, data->progress.t_startsingle),
+#ifdef ENABLE_QUIC
+          (conn->transport == TRNSPRT_QUIC) ?
+          curl_easy_strerror(result) :
+#endif
+          Curl_strerror(error, buffer, sizeof(buffer)));
 
     Curl_quic_disconnect(data, conn, 0);
     Curl_quic_disconnect(data, conn, 1);
@@ -1127,7 +1151,7 @@ void Curl_sndbufset(curl_socket_t sockfd)
   static int detectOsState = DETECT_OS_NONE;
 
   if(detectOsState == DETECT_OS_NONE) {
-    if(curlx_verify_windows_version(6, 0, PLATFORM_WINNT,
+    if(curlx_verify_windows_version(6, 0, 0, PLATFORM_WINNT,
                                     VERSION_GREATER_THAN_EQUAL))
       detectOsState = DETECT_OS_VISTA_OR_LATER;
     else

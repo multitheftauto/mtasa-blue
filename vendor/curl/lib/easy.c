@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -68,7 +68,6 @@
 #include "slist.h"
 #include "mime.h"
 #include "amigaos.h"
-#include "non-ascii.h"
 #include "warnless.h"
 #include "multiif.h"
 #include "sigpipe.h"
@@ -165,12 +164,6 @@ static CURLcode global_init(long flags, bool memoryfuncs)
   if(!Curl_amiga_init()) {
     DEBUGF(fprintf(stderr, "Error: Curl_amiga_init failed\n"));
     goto fail;
-  }
-#endif
-
-#ifdef NETWARE
-  if(netware_init()) {
-    DEBUGF(fprintf(stderr, "Warning: LONG namespace not available\n"));
   }
 #endif
 
@@ -822,7 +815,7 @@ static CURLcode dupset(struct Curl_easy *dst, struct Curl_easy *src)
 struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
 {
   struct Curl_easy *outcurl = calloc(1, sizeof(struct Curl_easy));
-  if(NULL == outcurl)
+  if(!outcurl)
     goto fail;
 
   /*
@@ -932,8 +925,6 @@ struct Curl_easy *curl_easy_duphandle(struct Curl_easy *data)
       goto fail;
   }
 #endif /* USE_ARES */
-
-  Curl_convert_setup(outcurl);
 
   Curl_initinfo(outcurl);
 
@@ -1087,14 +1078,16 @@ CURLcode curl_easy_pause(struct Curl_easy *data, int action)
       /* if not pausing again, force a recv/send check of this connection as
          the data might've been read off the socket already */
       data->conn->cselect_bits = CURL_CSELECT_IN | CURL_CSELECT_OUT;
-    if(data->multi)
-      Curl_update_timer(data->multi);
+    if(data->multi) {
+      if(Curl_update_timer(data->multi))
+        return CURLE_ABORTED_BY_CALLBACK;
+    }
   }
 
   if(!data->state.done)
     /* This transfer may have been moved in or out of the bundle, update the
        corresponding socket callback, if used */
-    Curl_updatesocket(data);
+    result = Curl_updatesocket(data);
 
   return result;
 }

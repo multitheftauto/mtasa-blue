@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -47,22 +47,21 @@ extern const struct Curl_handler Curl_handler_https;
 /* Header specific functions */
 bool Curl_compareheader(const char *headerline,  /* line to check */
                         const char *header,   /* header keyword _with_ colon */
-                        const char *content); /* content string to find */
+                        const size_t hlen,   /* len of the keyword in bytes */
+                        const char *content, /* content string to find */
+                        const size_t clen);   /* len of the content in bytes */
 
 char *Curl_copy_header_value(const char *header);
 
 char *Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
-                             const char *thisheader);
-#ifndef USE_HYPER
+                             const char *thisheader,
+                             const size_t thislen);
 CURLcode Curl_buffer_send(struct dynbuf *in,
                           struct Curl_easy *data,
                           curl_off_t *bytes_written,
                           curl_off_t included_body_bytes,
                           int socketindex);
-#else
-#define Curl_buffer_send(a,b,c,d,e) CURLE_OK
-#endif
 
 CURLcode Curl_add_timecondition(struct Curl_easy *data,
 #ifndef USE_HYPER
@@ -288,6 +287,8 @@ struct http_conn {
   int unused; /* prevent a compiler warning */
 #endif
 };
+
+CURLcode Curl_http_size(struct Curl_easy *data);
 
 CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                                      struct connectdata *conn,

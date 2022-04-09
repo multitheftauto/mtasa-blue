@@ -274,6 +274,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
     g_pMultiplayer->SetVehicleWeaponHitHandler(CClientGame::StaticVehicleWeaponHitHandler);
+    g_pMultiplayer->SetAudioZoneRadioSwitchHandler(CClientGame::StaticAudioZoneRadioSwitchHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -551,7 +552,7 @@ void CClientGame::StartPlayback()
     }
 }
 
-bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type, const char* szSecret)
+bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerType Type)
 {
     m_ServerType = Type;
     // int dbg = _CrtSetDbgFlag ( _CRTDBG_REPORT_FLAG );
@@ -623,10 +624,10 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             std::string strUser;
             pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
 
-            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
+            // Send an empty string if server still has old Discord implementation (#2499)
+            if (g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation) && !g_pNet->CanServerBitStream(eBitStreamVersion::Discord_Cleanup))
             {
-                SString joinSecret = SStringX(szSecret);
-                pBitStream->WriteString<uchar>(joinSecret);
+                pBitStream->WriteString<uchar>("");
             }
 
             // Send the packet as joindata
@@ -2116,7 +2117,7 @@ void CClientGame::StaticProcessClientKeyBind(CKeyFunctionBind* pBind)
 
 void CClientGame::ProcessClientKeyBind(CKeyFunctionBind* pBind)
 {
-    m_pScriptKeyBinds->ProcessKey(pBind->boundKey->szKey, pBind->bHitState, SCRIPT_KEY_BIND_FUNCTION);
+    m_pScriptKeyBinds->ProcessKey(pBind->boundKey->szKey, pBind->triggerState, SCRIPT_KEY_BIND_FUNCTION);
 }
 
 void CClientGame::StaticProcessClientControlBind(CControlFunctionBind* pBind)
@@ -2126,7 +2127,7 @@ void CClientGame::StaticProcessClientControlBind(CControlFunctionBind* pBind)
 
 void CClientGame::ProcessClientControlBind(CControlFunctionBind* pBind)
 {
-    m_pScriptKeyBinds->ProcessKey(pBind->control->szControl, pBind->bHitState, SCRIPT_KEY_BIND_CONTROL_FUNCTION);
+    m_pScriptKeyBinds->ProcessKey(pBind->control->szControl, pBind->triggerState, SCRIPT_KEY_BIND_CONTROL_FUNCTION);
 }
 
 void CClientGame::StaticProcessServerKeyBind(CKeyFunctionBind* pBind)
@@ -2140,7 +2141,7 @@ void CClientGame::ProcessServerKeyBind(CKeyFunctionBind* pBind)
     unsigned char ucNameLength = (unsigned char)strlen(szName);
     CBitStream    bitStream;
     bitStream.pBitStream->WriteBit(false);
-    bitStream.pBitStream->WriteBit(pBind->bHitState);
+    bitStream.pBitStream->WriteBit(pBind->triggerState);
     bitStream.pBitStream->Write(szName, ucNameLength);
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
@@ -2156,7 +2157,7 @@ void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
     unsigned char ucNameLength = (unsigned char)strlen(szName);
     CBitStream    bitStream;
     bitStream.pBitStream->WriteBit(true);
-    bitStream.pBitStream->WriteBit(pBind->bHitState);
+    bitStream.pBitStream->WriteBit(pBind->triggerState);
     bitStream.pBitStream->Write(szName, ucNameLength);
     m_pNetAPI->RPC(KEY_BIND, bitStream.pBitStream);
 }
@@ -3582,6 +3583,11 @@ void CClientGame::StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot)
 void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 {
     g_pClientGame->VehicleWeaponHitHandler(event);
+}
+
+void CClientGame::StaticAudioZoneRadioSwitchHandler(DWORD dwStationID)
+{
+    g_pClientGame->AudioZoneRadioSwitchHandler(dwStationID);
 }
 
 void CClientGame::DrawRadarAreasHandler()
@@ -6531,17 +6537,6 @@ void CClientGame::RestreamWorld()
     g_pGame->GetStreaming()->ReinitStreaming();
 }
 
-void CClientGame::TriggerDiscordJoin(SString strSecret)
-{
-    if (!g_pNet->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
-        return;
-
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-    pBitStream->WriteString<uchar>(strSecret);
-    g_pNet->SendPacket(PACKET_ID_DISCORD_JOIN, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED, PACKET_ORDERING_DEFAULT);
-    g_pNet->DeallocateNetBitStream(pBitStream);
-}
-
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
@@ -6680,16 +6675,29 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
     pVehicle->CallEvent("onClientVehicleWeaponHit", arguments, false);
 }
 
-void CClientGame::UpdateDiscordState()
+//////////////////////////////////////////////////////////////////
+//
+// CClientGame::AudioZoneRadioSwitchHandler
+//
+// Called when player either enter or leave audio zone which has defined radio station.
+// We basically set player radio station here.
+//
+//////////////////////////////////////////////////////////////////
+void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
-    // Set discord state to players[/slot] count
-    uint    playerCount = g_pClientGame->GetPlayerManager()->Count();
-    uint    playerSlot = g_pClientGame->GetServerInfo()->GetMaxPlayers();
-    SString state(std::to_string(playerCount));
+    if (m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
+    {
+        // Do not change radio station if player is inside vehicle
+        // because it is supposed to play own radio
+        return;
+    }
 
-    if (g_pCore->GetNetwork()->CanServerBitStream(eBitStreamVersion::Discord_InitialImplementation))
-        state += "/" + std::to_string(playerSlot);
-
-    state += (playerCount == 1 && (!playerSlot || playerSlot == 1) ? " Player" : " Players");
-    g_pCore->GetDiscordManager()->SetState(state, [](EDiscordRes) {});
+    if (dwStationID == 0)
+    {
+        g_pGame->GetAudioEngine()->StopRadio();
+    }
+    else
+    {
+        g_pGame->GetAudioEngine()->StartRadio(dwStationID);
+    }
 }

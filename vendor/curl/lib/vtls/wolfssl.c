@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -202,6 +202,43 @@ static int do_file_type(const char *type)
   return -1;
 }
 
+#ifdef HAVE_LIBOQS
+struct group_name_map {
+  const word16 group;
+  const char   *name;
+};
+
+static const struct group_name_map gnm[] = {
+  { WOLFSSL_KYBER_LEVEL1, "KYBER_LEVEL1" },
+  { WOLFSSL_KYBER_LEVEL3, "KYBER_LEVEL3" },
+  { WOLFSSL_KYBER_LEVEL5, "KYBER_LEVEL5" },
+  { WOLFSSL_NTRU_HPS_LEVEL1, "NTRU_HPS_LEVEL1" },
+  { WOLFSSL_NTRU_HPS_LEVEL3, "NTRU_HPS_LEVEL3" },
+  { WOLFSSL_NTRU_HPS_LEVEL5, "NTRU_HPS_LEVEL5" },
+  { WOLFSSL_NTRU_HRSS_LEVEL3, "NTRU_HRSS_LEVEL3" },
+  { WOLFSSL_SABER_LEVEL1, "SABER_LEVEL1" },
+  { WOLFSSL_SABER_LEVEL3, "SABER_LEVEL3" },
+  { WOLFSSL_SABER_LEVEL5, "SABER_LEVEL5" },
+  { WOLFSSL_KYBER_90S_LEVEL1, "KYBER_90S_LEVEL1" },
+  { WOLFSSL_KYBER_90S_LEVEL3, "KYBER_90S_LEVEL3" },
+  { WOLFSSL_KYBER_90S_LEVEL5, "KYBER_90S_LEVEL5" },
+  { WOLFSSL_P256_NTRU_HPS_LEVEL1, "P256_NTRU_HPS_LEVEL1" },
+  { WOLFSSL_P384_NTRU_HPS_LEVEL3, "P384_NTRU_HPS_LEVEL3" },
+  { WOLFSSL_P521_NTRU_HPS_LEVEL5, "P521_NTRU_HPS_LEVEL5" },
+  { WOLFSSL_P384_NTRU_HRSS_LEVEL3, "P384_NTRU_HRSS_LEVEL3" },
+  { WOLFSSL_P256_SABER_LEVEL1, "P256_SABER_LEVEL1" },
+  { WOLFSSL_P384_SABER_LEVEL3, "P384_SABER_LEVEL3" },
+  { WOLFSSL_P521_SABER_LEVEL5, "P521_SABER_LEVEL5" },
+  { WOLFSSL_P256_KYBER_LEVEL1, "P256_KYBER_LEVEL1" },
+  { WOLFSSL_P384_KYBER_LEVEL3, "P384_KYBER_LEVEL3" },
+  { WOLFSSL_P521_KYBER_LEVEL5, "P521_KYBER_LEVEL5" },
+  { WOLFSSL_P256_KYBER_90S_LEVEL1, "P256_KYBER_90S_LEVEL1" },
+  { WOLFSSL_P384_KYBER_90S_LEVEL3, "P384_KYBER_90S_LEVEL3" },
+  { WOLFSSL_P521_KYBER_90S_LEVEL5, "P521_KYBER_90S_LEVEL5" },
+  { 0, NULL }
+};
+#endif
+
 /*
  * This function loads all the client/CA certificates and CRLs. Setup the TLS
  * layer and do all necessary magic.
@@ -210,17 +247,23 @@ static CURLcode
 wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
                      int sockindex)
 {
-  char *ciphers;
+  char *ciphers, *curves;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   struct ssl_backend_data *backend = connssl->backend;
   SSL_METHOD* req_method = NULL;
   curl_socket_t sockfd = conn->sock[sockindex];
+#ifdef HAVE_LIBOQS
+  word16 oqsAlg = 0;
+  size_t idx = 0;
+#endif
 #ifdef HAVE_SNI
   bool sni = FALSE;
 #define use_sni(x)  sni = (x)
 #else
 #define use_sni(x)  Curl_nop_stmt
 #endif
+
+  DEBUGASSERT(backend);
 
   if(connssl->state == ssl_connection_complete)
     return CURLE_OK;
@@ -327,6 +370,26 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
     infof(data, "Cipher selection: %s", ciphers);
   }
 
+  curves = SSL_CONN_CONFIG(curves);
+  if(curves) {
+
+#ifdef HAVE_LIBOQS
+    for(idx = 0; gnm[idx].name != NULL; idx++) {
+      if(strncmp(curves, gnm[idx].name, strlen(gnm[idx].name)) == 0) {
+        oqsAlg = gnm[idx].group;
+        break;
+      }
+    }
+
+    if(oqsAlg == 0)
+#endif
+    {
+      if(!SSL_CTX_set1_curves_list(backend->ctx, curves)) {
+        failf(data, "failed setting curves list: '%s'", curves);
+        return CURLE_SSL_CIPHER;
+      }
+    }
+  }
 #ifndef NO_FILESYSTEM
   /* load trusted cacert */
   if(SSL_CONN_CONFIG(CAfile)) {
@@ -401,12 +464,17 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
     if((hostname_len < USHRT_MAX) &&
        (0 == Curl_inet_pton(AF_INET, hostname, &addr4)) &&
 #ifdef ENABLE_IPV6
-       (0 == Curl_inet_pton(AF_INET6, hostname, &addr6)) &&
+       (0 == Curl_inet_pton(AF_INET6, hostname, &addr6))
 #endif
-       (wolfSSL_CTX_UseSNI(backend->ctx, WOLFSSL_SNI_HOST_NAME, hostname,
-                          (unsigned short)hostname_len) != 1)) {
-      infof(data, "WARNING: failed to configure server name indication (SNI) "
-            "TLS extension");
+      ) {
+      size_t snilen;
+      char *snihost = Curl_ssl_snihost(data, hostname, &snilen);
+      if(!snihost ||
+         wolfSSL_CTX_UseSNI(backend->ctx, WOLFSSL_SNI_HOST_NAME, snihost,
+                            (unsigned short)snilen) != 1) {
+        failf(data, "Failed to set SNI");
+        return CURLE_SSL_CONNECT_ERROR;
+      }
     }
   }
 #endif
@@ -438,6 +506,14 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
     failf(data, "SSL: couldn't create a context (handle)!");
     return CURLE_OUT_OF_MEMORY;
   }
+
+#ifdef HAVE_LIBOQS
+  if(oqsAlg) {
+    if(wolfSSL_UseKeyShare(backend->handle, oqsAlg) != WOLFSSL_SUCCESS) {
+      failf(data, "unable to use oqs KEM");
+    }
+  }
+#endif
 
 #ifdef HAVE_ALPN
   if(conn->bits.tls_enable_alpn) {
@@ -495,7 +571,7 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
       /* we got a session id, use it! */
       if(!SSL_set_session(backend->handle, ssl_sessionid)) {
         Curl_ssl_delsessionid(data, ssl_sessionid);
-        infof(data, "Can't use session ID, going on without\n");
+        infof(data, "Can't use session ID, going on without");
       }
       else
         infof(data, "SSL re-using session ID");
@@ -521,9 +597,10 @@ wolfssl_connect_step2(struct Curl_easy *data, struct connectdata *conn,
   int ret = -1;
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   struct ssl_backend_data *backend = connssl->backend;
-  const char * const hostname = SSL_HOST_NAME();
   const char * const dispname = SSL_HOST_DISPNAME();
   const char * const pinnedpubkey = SSL_PINNED_PUB_KEY();
+
+  DEBUGASSERT(backend);
 
   ERR_clear_error();
 
@@ -532,9 +609,10 @@ wolfssl_connect_step2(struct Curl_easy *data, struct connectdata *conn,
 
   /* Enable RFC2818 checks */
   if(SSL_CONN_CONFIG(verifyhost)) {
-    ret = wolfSSL_check_domain_name(backend->handle, hostname);
-    if(ret == SSL_FAILURE)
-      return CURLE_OUT_OF_MEMORY;
+    char *snihost = Curl_ssl_snihost(data, SSL_HOST_NAME(), NULL);
+    if(!snihost ||
+       (wolfSSL_check_domain_name(backend->handle, snihost) == SSL_FAILURE))
+      return CURLE_SSL_CONNECT_ERROR;
   }
 
   ret = SSL_connect(backend->handle);
@@ -728,6 +806,7 @@ wolfssl_connect_step3(struct Curl_easy *data, struct connectdata *conn,
   struct ssl_backend_data *backend = connssl->backend;
 
   DEBUGASSERT(ssl_connect_3 == connssl->connecting_state);
+  DEBUGASSERT(backend);
 
   if(SSL_SET_OPTION(primary.sessionid)) {
     bool incache;
@@ -749,7 +828,7 @@ wolfssl_connect_step3(struct Curl_easy *data, struct connectdata *conn,
 
       if(!incache) {
         result = Curl_ssl_addsessionid(data, conn, isproxy, our_ssl_sessionid,
-                                       0, sockindex);
+                                       0, sockindex, NULL);
         if(result) {
           Curl_ssl_sessionid_unlock(data);
           failf(data, "failed to store ssl session");
@@ -778,6 +857,8 @@ static ssize_t wolfssl_send(struct Curl_easy *data,
   char error_buffer[WOLFSSL_MAX_ERROR_SZ];
   int memlen = (len > (size_t)INT_MAX) ? INT_MAX : (int)len;
   int rc;
+
+  DEBUGASSERT(backend);
 
   ERR_clear_error();
 
@@ -811,6 +892,8 @@ static void wolfssl_close(struct Curl_easy *data, struct connectdata *conn,
 
   (void) data;
 
+  DEBUGASSERT(backend);
+
   if(backend->handle) {
     char buf[32];
     /* Maybe the server has already sent a close notify alert.
@@ -839,17 +922,22 @@ static ssize_t wolfssl_recv(struct Curl_easy *data,
   int buffsize = (buffersize > (size_t)INT_MAX) ? INT_MAX : (int)buffersize;
   int nread;
 
+  DEBUGASSERT(backend);
+
   ERR_clear_error();
 
   nread = SSL_read(backend->handle, buf, buffsize);
 
-  if(nread < 0) {
+  if(nread <= 0) {
     int err = SSL_get_error(backend->handle, nread);
 
     switch(err) {
     case SSL_ERROR_ZERO_RETURN: /* no more data */
       break;
+    case SSL_ERROR_NONE:
+      /* FALLTHROUGH */
     case SSL_ERROR_WANT_READ:
+      /* FALLTHROUGH */
     case SSL_ERROR_WANT_WRITE:
       /* there's data pending, re-invoke SSL_read() */
       *curlcode = CURLE_AGAIN;
@@ -905,6 +993,7 @@ static bool wolfssl_data_pending(const struct connectdata *conn,
 {
   const struct ssl_connect_data *connssl = &conn->ssl[connindex];
   struct ssl_backend_data *backend = connssl->backend;
+  DEBUGASSERT(backend);
   if(backend->handle)   /* SSL is in use */
     return (0 != SSL_pending(backend->handle)) ? TRUE : FALSE;
   else
@@ -924,6 +1013,8 @@ static int wolfssl_shutdown(struct Curl_easy *data, struct connectdata *conn,
   struct ssl_backend_data *backend = connssl->backend;
 
   (void) data;
+
+  DEBUGASSERT(backend);
 
   if(backend->handle) {
     ERR_clear_error();
@@ -1104,6 +1195,7 @@ static void *wolfssl_get_internals(struct ssl_connect_data *connssl,
 {
   struct ssl_backend_data *backend = connssl->backend;
   (void)info;
+  DEBUGASSERT(backend);
   return backend->handle;
 }
 

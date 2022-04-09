@@ -6,7 +6,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2012 - 2016, Linus Nielsen Feltzing, <linus@haxx.se>
- * Copyright (C) 2012 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -113,21 +113,16 @@ static void free_bundle_hash_entry(void *freethis)
 
 int Curl_conncache_init(struct conncache *connc, int size)
 {
-  int rc;
-
   /* allocate a new easy handle to use when closing cached connections */
   connc->closure_handle = curl_easy_init();
   if(!connc->closure_handle)
     return 1; /* bad */
 
-  rc = Curl_hash_init(&connc->hash, size, Curl_hash_str,
-                      Curl_str_key_compare, free_bundle_hash_entry);
-  if(rc)
-    Curl_close(&connc->closure_handle);
-  else
-    connc->closure_handle->state.conn_cache = connc;
+  Curl_hash_init(&connc->hash, size, Curl_hash_str,
+                 Curl_str_key_compare, free_bundle_hash_entry);
+  connc->closure_handle->state.conn_cache = connc;
 
-  return rc;
+  return 0; /* good */
 }
 
 void Curl_conncache_destroy(struct conncache *connc)
@@ -198,13 +193,11 @@ Curl_conncache_find_bundle(struct Curl_easy *data,
   return bundle;
 }
 
-static bool conncache_add_bundle(struct conncache *connc,
-                                 char *key,
-                                 struct connectbundle *bundle)
+static void *conncache_add_bundle(struct conncache *connc,
+                                  char *key,
+                                  struct connectbundle *bundle)
 {
-  void *p = Curl_hash_add(&connc->hash, key, strlen(key), bundle);
-
-  return p?TRUE:FALSE;
+  return Curl_hash_add(&connc->hash, key, strlen(key), bundle);
 }
 
 static void conncache_remove_bundle(struct conncache *connc,
@@ -243,7 +236,6 @@ CURLcode Curl_conncache_add_conn(struct Curl_easy *data)
   bundle = Curl_conncache_find_bundle(data, conn, data->state.conn_cache,
                                       NULL);
   if(!bundle) {
-    int rc;
     char key[HASHKEY_SIZE];
 
     result = bundle_create(&bundle);
@@ -252,9 +244,8 @@ CURLcode Curl_conncache_add_conn(struct Curl_easy *data)
     }
 
     hashkey(conn, key, sizeof(key), NULL);
-    rc = conncache_add_bundle(data->state.conn_cache, key, bundle);
 
-    if(!rc) {
+    if(!conncache_add_bundle(data->state.conn_cache, key, bundle)) {
       bundle_destroy(bundle);
       result = CURLE_OUT_OF_MEMORY;
       goto unlock;
@@ -415,7 +406,7 @@ bool Curl_conncache_return_conn(struct Curl_easy *data,
     conn_candidate = Curl_conncache_extract_oldest(data);
     if(conn_candidate) {
       /* the winner gets the honour of being disconnected */
-      (void)Curl_disconnect(data, conn_candidate, /* dead_connection */ FALSE);
+      Curl_disconnect(data, conn_candidate, /* dead_connection */ FALSE);
     }
   }
 
@@ -552,7 +543,7 @@ void Curl_conncache_close_all_connections(struct conncache *connc)
     /* This will remove the connection from the cache */
     connclose(conn, "kill all");
     Curl_conncache_remove_conn(connc->closure_handle, conn, TRUE);
-    (void)Curl_disconnect(connc->closure_handle, conn, FALSE);
+    Curl_disconnect(connc->closure_handle, conn, FALSE);
     sigpipe_restore(&pipe_st);
 
     conn = conncache_find_first_connection(connc);

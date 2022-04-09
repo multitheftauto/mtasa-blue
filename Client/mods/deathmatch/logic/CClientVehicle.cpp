@@ -570,7 +570,7 @@ void CClientVehicle::SetMoveSpeed(const CVector& vecMoveSpeed)
     {
         if (m_pVehicle)
             m_pVehicle->SetMoveSpeed(const_cast<CVector*>(&vecMoveSpeed));
-        
+
         m_vecMoveSpeed = vecMoveSpeed;
 
         if (IsFrozenWaitingForGroundToLoad())
@@ -582,7 +582,7 @@ void CClientVehicle::GetTurnSpeed(CVector& vecTurnSpeed) const
 {
     if (m_bIsFrozen)
         vecTurnSpeed = CVector(0, 0, 0);
-    
+
     if (m_pVehicle)
         m_pVehicle->GetTurnSpeed(&vecTurnSpeed);
     else
@@ -595,7 +595,7 @@ void CClientVehicle::SetTurnSpeed(const CVector& vecTurnSpeed)
     {
         if (m_pVehicle)
             m_pVehicle->SetTurnSpeed(const_cast<CVector*>(&vecTurnSpeed));
-        
+
         m_vecTurnSpeed = vecTurnSpeed;
 
         if (IsFrozenWaitingForGroundToLoad())
@@ -612,7 +612,7 @@ void CClientVehicle::SetVisible(bool bVisible)
 {
     if (m_pVehicle)
         m_pVehicle->SetVisible(bVisible);
-    
+
     m_bVisible = bVisible;
 }
 
@@ -697,7 +697,7 @@ void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsign
             {
                 if (m_pVehicle)
                     m_pVehicle->OpenDoor(ucDoor, fRatio, false);
-                
+
                 m_fDoorOpenRatio[ucDoor] = fRatio;
             }
             else
@@ -714,7 +714,7 @@ float CClientVehicle::GetDoorOpenRatio(unsigned char ucDoor)
     {
         if (m_pVehicle)
             return m_pVehicle->GetDoor(ucDoor)->GetAngleOpenRatio();
-        
+
         return m_fDoorOpenRatio[ucDoor];
     }
 
@@ -725,7 +725,7 @@ void CClientVehicle::SetSwingingDoorsAllowed(bool bAllowed)
 {
     if (m_pVehicle)
         m_pVehicle->SetSwingingDoorsAllowed(bAllowed);
-    
+
     m_bSwingingDoorsAllowed = bAllowed;
 }
 
@@ -733,7 +733,7 @@ bool CClientVehicle::AreSwingingDoorsAllowed() const
 {
     if (m_pVehicle)
         return m_pVehicle->AreSwingingDoorsAllowed();
-    
+
     return m_bSwingingDoorsAllowed;
 }
 
@@ -755,7 +755,7 @@ bool CClientVehicle::AreDoorsLocked()
 {
     if (m_pVehicle)
         return m_pVehicle->AreDoorsLocked();
-    
+
     return m_bDoorsLocked;
 }
 
@@ -763,7 +763,7 @@ void CClientVehicle::SetDoorsLocked(bool bLocked)
 {
     if (m_pVehicle)
         m_pVehicle->LockDoors(bLocked);
-    
+
     m_bDoorsLocked = bLocked;
 }
 
@@ -776,7 +776,7 @@ void CClientVehicle::SetDoorsUndamageable(bool bUndamageable)
 {
     if (m_pVehicle)
         m_pVehicle->SetDoorsUndamageable(bUndamageable);
-    
+
     m_bDoorsUndamageable = bUndamageable;
 }
 
@@ -1276,7 +1276,7 @@ void CClientVehicle::SetSirenOrAlarmActive(bool bActive)
 {
     if (m_pVehicle)
         m_pVehicle->SetSirenOrAlarmActive(bActive);
-    
+
     m_bSireneOrAlarmActive = bActive;
 }
 
@@ -1305,7 +1305,7 @@ void CClientVehicle::SetLandingGearDown(bool bLandingGearDown)
     {
         if (m_pVehicle)
             m_pVehicle->SetLandingGearDown(bLandingGearDown);
-        
+
         m_bLandingGearDown = bLandingGearDown;
     }
 }
@@ -1429,7 +1429,7 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
     {
         if (m_pVehicle && HasDamageModel())
             return m_pVehicle->GetDamageManager()->GetLightStatus(ucLight);
-        
+
         return m_ucLightStates[ucLight];
     }
 
@@ -1442,7 +1442,7 @@ void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus,
     {
         if (m_pVehicle && HasDamageModel())
             m_pVehicle->GetDamageManager()->SetDoorStatus(static_cast<eDoors>(ucDoor), ucStatus, spawnFlyingComponent);
-        
+
         m_ucDoorStates[ucDoor] = ucStatus;
     }
 }
@@ -1513,7 +1513,7 @@ void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatu
     {
         if (m_pVehicle && HasDamageModel())
             m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus);
-        
+
         m_ucPanelStates[ucPanel] = ucStatus;
     }
 }
@@ -1524,7 +1524,7 @@ void CClientVehicle::SetLightStatus(unsigned char ucLight, unsigned char ucStatu
     {
         if (m_pVehicle && HasDamageModel())
             m_pVehicle->GetDamageManager()->SetLightStatus(static_cast<eLights>(ucLight), ucStatus);
-        
+
         m_ucLightStates[ucLight] = ucStatus;
     }
 }
@@ -1546,7 +1546,7 @@ void CClientVehicle::SetHeliRotorSpeed(float fSpeed)
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
         m_pVehicle->SetHeliRotorSpeed(fSpeed);
-    
+
     m_fHeliRotorSpeed = fSpeed;
 }
 
@@ -1554,7 +1554,7 @@ bool CClientVehicle::IsHeliSearchLightVisible()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
         return m_pVehicle->IsHeliSearchLightVisible();
-    
+
     return m_bHeliSearchLightVisible;
 }
 
@@ -1562,7 +1562,7 @@ void CClientVehicle::SetHeliSearchLightVisible(bool bVisible)
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
         m_pVehicle->SetHeliSearchLightVisible(bVisible);
-    
+
     m_bHeliSearchLightVisible = bVisible;
 }
 
@@ -1583,7 +1583,7 @@ void CClientVehicle::SetCanShootPetrolTank(bool bCanShoot)
 {
     if (m_pVehicle)
         m_pVehicle->SetCanShootPetrolTank(bCanShoot);
-    
+
     m_bCanShootPetrolTank = bCanShoot;
 }
 
@@ -1596,7 +1596,7 @@ void CClientVehicle::SetCanBeTargettedByHeatSeekingMissiles(bool bEnabled)
 {
     if (m_pVehicle)
         m_pVehicle->SetCanBeTargettedByHeatSeekingMissiles(bEnabled);
-    
+
     m_bCanBeTargettedByHeatSeekingMissiles = bEnabled;
 }
 
@@ -1606,7 +1606,7 @@ void CClientVehicle::SetAlpha(unsigned char ucAlpha)
     {
         if (m_pVehicle)
             m_pVehicle->SetAlpha(ucAlpha);
-        
+
         m_ucAlpha = ucAlpha;
         m_bAlphaChanged = true;
     }
@@ -1997,7 +1997,7 @@ void CClientVehicle::SetDerailable(bool bDerailable)
 {
     if (m_pVehicle)
         m_pVehicle->SetDerailable(bDerailable);
-    
+
     m_bIsDerailable = bDerailable;
 }
 
@@ -2005,7 +2005,7 @@ bool CClientVehicle::GetTrainDirection()
 {
     if (m_pVehicle)
         return m_pVehicle->GetTrainDirection();
-    
+
     return m_bTrainDirection;
 }
 
@@ -2013,7 +2013,7 @@ void CClientVehicle::SetTrainDirection(bool bDirection)
 {
     if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN)
         m_pVehicle->SetTrainDirection(bDirection);
-    
+
     m_bTrainDirection = bDirection;
 }
 
@@ -2026,7 +2026,7 @@ void CClientVehicle::SetTrainSpeed(float fSpeed)
 {
     if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN)
         m_pVehicle->SetTrainSpeed(fSpeed);
-    
+
     m_fTrainSpeed = fSpeed;
 }
 
@@ -2039,7 +2039,7 @@ void CClientVehicle::SetTrainPosition(float fTrainPosition, bool bRecalcOnRailDi
 {
     if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN)
         m_pVehicle->SetTrainPosition(fTrainPosition, bRecalcOnRailDistance);
-    
+
     m_fTrainPosition = fTrainPosition;
 }
 
@@ -2052,7 +2052,7 @@ void CClientVehicle::SetTrainTrack(uchar ucTrack)
 {
     if (m_pVehicle && GetVehicleType() == CLIENTVEHICLE_TRAIN)
         m_pVehicle->SetRailTrack(ucTrack);
-    
+
     m_ucTrackID = ucTrack;
 }
 
@@ -2060,7 +2060,7 @@ void CClientVehicle::SetOverrideLights(unsigned char ucOverrideLights)
 {
     if (m_pVehicle)
         m_pVehicle->SetOverrideLights(static_cast<unsigned int>(ucOverrideLights));
-    
+
     m_ucOverrideLights = ucOverrideLights;
 }
 
@@ -3354,7 +3354,7 @@ void CClientVehicle::SetDirtLevel(float fDirtLevel)
 {
     if (m_pVehicle)
         m_pVehicle->SetBodyDirtLevel(fDirtLevel);
-    
+
     m_fDirtLevel = fDirtLevel;
 }
 bool CClientVehicle::IsOnWater()
@@ -3860,7 +3860,7 @@ SColor CClientVehicle::GetHeadLightColor()
 {
     if (m_pVehicle)
         return m_pVehicle->GetHeadLightColor();
-    
+
     return m_HeadLightColor;
 }
 
@@ -3873,7 +3873,7 @@ void CClientVehicle::SetHeadLightColor(const SColor color)
 {
     if (m_pVehicle)
         m_pVehicle->SetHeadLightColor(color);
-    
+
     m_HeadLightColor = color;
 }
 
@@ -4188,7 +4188,7 @@ CFlyingHandlingEntry* CClientVehicle::GetFlyingHandlingData()
         return m_pVehicle->GetFlyingHandlingData();
     else if (m_pFlyingHandlingEntry)
         return m_pFlyingHandlingEntry;
-    
+
     return nullptr;
 }
 
@@ -4201,7 +4201,7 @@ CBoatHandlingEntry* CClientVehicle::GetBoatHandlingData()
         return reinterpret_cast<CBoat*>(m_pVehicle)->GetBoatHandlingData();
     else if (m_pBoatHandlingEntry)
         return m_pBoatHandlingEntry;
-    
+
     return nullptr;
 }
 
@@ -4214,7 +4214,7 @@ CBikeHandlingEntry* CClientVehicle::GetBikeHandlingData()
         return reinterpret_cast<CBike*>(m_pVehicle)->GetBikeHandlingData();
     else if (m_pBikeHandlingEntry)
         return m_pBikeHandlingEntry;
-    
+
     return nullptr;
 }
 
@@ -4347,7 +4347,7 @@ bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char 
 
     if (m_pVehicle)
         m_pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
-    
+
     return true;
 }
 void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
@@ -4389,7 +4389,7 @@ void CClientVehicle::RemoveVehicleSirens()
 {
     if (m_pVehicle)
         m_pVehicle->RemoveVehicleSirens();
-    
+
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
     SetSirenOrAlarmActive(false);
 
@@ -4896,7 +4896,7 @@ void CClientVehicle::SetNitroLevel(float fNitroLevel)
 {
     if (m_pVehicle)
         m_pVehicle->SetNitroLevel(fNitroLevel);
-    
+
     m_fNitroLevel = fNitroLevel;
 }
 
@@ -4909,7 +4909,7 @@ void CClientVehicle::SetNitroCount(char cNitroCount)
 {
     if (m_pVehicle)
         m_pVehicle->SetNitroCount(cNitroCount);
-    
+
     m_cNitroCount = cNitroCount;
 }
 
@@ -4917,7 +4917,7 @@ char CClientVehicle::GetNitroCount()
 {
     if (m_pVehicle)
         return m_pVehicle->GetNitroCount();
-    
+
     return m_cNitroCount;
 }
 
@@ -4941,7 +4941,7 @@ void CClientVehicle::SetWheelScale(float fWheelScale)
 {
     if (m_pVehicle)
         m_pVehicle->SetWheelScale(fWheelScale);
-    
+
     m_fWheelScale = fWheelScale;
     m_bWheelScaleChanged = true;
 }

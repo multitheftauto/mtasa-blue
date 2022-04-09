@@ -153,7 +153,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = *pVector;
+                    outValue = static_cast<CVector2D&>(*pVector);
                     return;
                 }
                 outValue = CVector2D();
@@ -214,7 +214,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = *pVector;
+                    outValue = static_cast<CVector2D&>(*pVector);
                     return;
                 }
                 outValue = CVector2D();
@@ -279,7 +279,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = *pVector;
+                    outValue = static_cast<CVector&>(*pVector);
                     return;
                 }
                 outValue = CVector();
@@ -328,7 +328,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = *pVector;
+                    outValue = static_cast<CVector&>(*pVector);
                     return;
                 }
                 outValue = CVector();
@@ -381,7 +381,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = *pVector;
+                    outValue = static_cast<CVector4D&>(*pVector);
                     return;
                 }
                 outValue = CVector4D();
@@ -418,7 +418,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = *pVector;
+                    outValue = static_cast<CVector4D&>(*pVector);
                     return;
                 }
                 outValue = CVector4D();
@@ -464,7 +464,7 @@ public:
             ReadUserData(pMatrix);
             if (pMatrix)
             {
-                outValue = *pMatrix;
+                outValue = static_cast<CMatrix&>(*pMatrix);
                 return;
             }
             outValue = CMatrix();
@@ -1120,8 +1120,6 @@ protected:
     // Reads { key, value } as a pair
     void InternalReadPairTable(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
     {
-        std::pair<SString, SString> keyValue;
-
         // lua_next has a bug after it calling findindex internally
         // But we have to iterate sequentially right now. So luaL_getn is the solution.
         for (int i = 1; i <= luaL_getn(m_luaVM, iIndex); ++i)
@@ -1136,6 +1134,8 @@ protected:
 
                 lua_pushnumber(m_luaVM, 2);
                 lua_gettable(m_luaVM, -3);
+
+                std::pair<SString, SString> keyValue;
 
                 if (InternalReadPair(keyValue))
                     outPairs.push_back(std::move(keyValue));
@@ -1152,9 +1152,10 @@ protected:
     {
         lua_pushnil(m_luaVM);
 
-        std::pair<SString, SString> keyValue;
         while (lua_next(m_luaVM, iIndex) != 0)
         {
+            std::pair<SString, SString> keyValue;
+
             if (InternalReadPair(keyValue))
                 outPairs.push_back(std::move(keyValue));
 
