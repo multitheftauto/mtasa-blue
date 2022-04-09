@@ -6,11 +6,9 @@
 #include "physics/CLuaPhysicsStaticCollisionManager.h"
 #include "physics/CLuaPhysicsShapeManager.h"
 
-CSharedLuaMain::CSharedLuaMain(CResource* pResource) : m_pResource(pResource)
+CSharedLuaMain::CSharedLuaMain(CResource* pResource, CLuaPhysicsRigidBodyManager* pLuaPhysicsRigidBodyManager, CLuaPhysicsStaticCollisionManager* pLuaPhysicsStaticCollisionManager, CLuaPhysicsShapeManager* pLuaPhysicsShapeManager)
+ : m_pResource(pResource), m_pLuaPhysicsRigidBodyManager(pLuaPhysicsRigidBodyManager), m_pLuaPhysicsStaticCollisionManager(pLuaPhysicsStaticCollisionManager), m_pLuaPhysicsShapeManager(pLuaPhysicsShapeManager)
 {
-    m_pLuaPhysicsRigidBodyManager = std::make_unique<CLuaPhysicsRigidBodyManager>();
-    m_pLuaPhysicsStaticCollisionManager = std::make_unique<CLuaPhysicsStaticCollisionManager>();
-    m_pLuaPhysicsShapeManager = std::make_unique<CLuaPhysicsShapeManager>();
 }
 
 CSharedLuaMain::~CSharedLuaMain()

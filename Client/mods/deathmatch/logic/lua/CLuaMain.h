@@ -38,7 +38,8 @@ class CLuaMain : public CSharedLuaMain            //: public CClient
 {
 public:
     ZERO_ON_NEW
-    CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP);
+    CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, CLuaPhysicsRigidBodyManager* pLuaPhysicsRigidBodyManager,
+             CLuaPhysicsStaticCollisionManager* pLuaPhysicsStaticCollisionManager, CLuaPhysicsShapeManager* pLuaPhysicsShapeManager, bool bEnableOOP);
     virtual ~CLuaMain();
 
     bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);

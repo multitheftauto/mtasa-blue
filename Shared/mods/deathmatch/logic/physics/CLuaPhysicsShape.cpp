@@ -43,7 +43,6 @@ CLuaPhysicsShape::~CLuaPhysicsShape()
 {
     assert(m_vecRigidBodyList.empty());
     assert(m_vecStaticCollisions.empty());
-    assert(m_vecCompoundShapes.empty());
 }
 
 void CLuaPhysicsShape::AddRigidBody(CLuaPhysicsRigidBody* pRigidBody)

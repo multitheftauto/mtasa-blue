@@ -59,7 +59,6 @@ void CLuaPhysicsRigidBody::SetRotation(CVector vecRotation)
     btTransform transform;
     m_pMotionState->getWorldTransform(transform);
     CPhysicsSharedLogic::SetRotation(transform, vecRotation);
-    CPhysicsSharedLogic::SetRotation(transform, vecRotation);
     m_pRigidBodyProxy->proceedToTransform(transform);
     m_pRigidBodyProxy->activate(true);
 }

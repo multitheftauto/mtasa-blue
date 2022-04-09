@@ -16,7 +16,9 @@
 extern CGame* g_pGame;
 
 CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager, CBlipManager* pBlipManager,
-                         CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager, CEvents* pEvents)
+                         CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager, CEvents* pEvents,
+                         CLuaPhysicsRigidBodyManager* pLuaPhysicsRigidBodyManager, CLuaPhysicsStaticCollisionManager* pLuaPhysicsStaticCollisionManager,
+                         CLuaPhysicsShapeManager* pLuaPhysicsShapeManager)
 {
     m_pObjectManager = pObjectManager;
     m_pPlayerManager = pPlayerManager;
@@ -26,6 +28,9 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
     m_pRegisteredCommands = pRegisteredCommands;
     m_pMapManager = pMapManager;
     m_pEvents = pEvents;
+    m_pLuaPhysicsRigidBodyManager = pLuaPhysicsRigidBodyManager;
+    m_pLuaPhysicsStaticCollisionManager = pLuaPhysicsStaticCollisionManager;
+    m_pLuaPhysicsShapeManager = pLuaPhysicsShapeManager;
 
     // Create our lua dynamic module manager
     m_pLuaModuleManager = new CLuaModuleManager(this);
@@ -62,7 +67,7 @@ CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEna
 {
     // Create it and add it to the list over VM's
     CLuaMain* pLuaMain = new CLuaMain(this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager,
-                                      pResourceOwner, bEnableOOP);
+                                      pResourceOwner, m_pLuaPhysicsRigidBodyManager, m_pLuaPhysicsStaticCollisionManager, m_pLuaPhysicsShapeManager, bEnableOOP);
     m_virtualMachines.push_back(pLuaMain);
     pLuaMain->Initialize();
 

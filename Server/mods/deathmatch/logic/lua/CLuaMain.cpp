@@ -27,8 +27,10 @@ extern CNetServer* g_pRealNetServer;
 #include "luascripts/inspect.lua.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
-                   CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP)
-    : CSharedLuaMain(pResourceOwner)
+                   CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner,
+                   CLuaPhysicsRigidBodyManager* pLuaPhysicsRigidBodyManager, CLuaPhysicsStaticCollisionManager* pLuaPhysicsStaticCollisionManager,
+                   CLuaPhysicsShapeManager* pLuaPhysicsShapeManager, bool bEnableOOP)
+    : CSharedLuaMain(pResourceOwner, pLuaPhysicsRigidBodyManager, pLuaPhysicsStaticCollisionManager,  pLuaPhysicsShapeManager)
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;

@@ -38,6 +38,10 @@ static CClientExplosionManager*  m_pExplosionManager;
 static CClientProjectileManager* m_pProjectileManager;
 static CClientSoundManager*      m_pSoundManager;
 
+static CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
+static CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
+static CLuaPhysicsShapeManager*           m_pLuaPhysicsShapeManager;
+
 // Used to run a function on all the children of the elements too
 #define RUN_CHILDREN(func) \
     if (Entity.CountChildren() && Entity.IsCallPropagationEnabled()) \
@@ -76,6 +80,10 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pExplosionManager = pManager->GetExplosionManager();
     m_pProjectileManager = pManager->GetProjectileManager();
     m_pSoundManager = pManager->GetSoundManager();
+
+    m_pLuaPhysicsRigidBodyManager = pManager->GetRigidBodiesManager();
+    m_pLuaPhysicsStaticCollisionManager = pManager->GetStaticCollisionsManager();
+    m_pLuaPhysicsShapeManager = pManager->GetShapesManager();
 }
 
 CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
@@ -959,6 +967,24 @@ bool CStaticFunctionDefinitions::DestroyElement(CClientEntity& Entity)
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::DestroyPhysicsElement(CLuaPhysicsElement* pPhysicsElement)
+{
+    switch (pPhysicsElement->GetClassType())
+    {
+        case EIdClass::EIdClassType::SHAPE:
+            m_pLuaPhysicsShapeManager->Remove(reinterpret_cast<CLuaPhysicsShape*>(pPhysicsElement));
+            return true;
+        case EIdClass::EIdClassType::RIGID_BODY:
+            m_pLuaPhysicsRigidBodyManager->Remove(reinterpret_cast<CLuaPhysicsRigidBody*>(pPhysicsElement));
+            return true;
+        case EIdClass::EIdClassType::STATIC_COLLISION:
+            m_pLuaPhysicsStaticCollisionManager->Remove(reinterpret_cast<CLuaPhysicsStaticCollision*>(pPhysicsElement));
+            return true;
+        default:
+            return false;
+    }
 }
 
 bool CStaticFunctionDefinitions::SetElementID(CClientEntity& Entity, const char* szID)

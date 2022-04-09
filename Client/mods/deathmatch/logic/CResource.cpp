@@ -20,6 +20,7 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
+
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
                      const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
@@ -78,8 +79,9 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     // Move this after the CreateVirtualMachine line and heads will roll
     m_bOOPEnabled = bEnableOOP;
     m_iDownloadPriorityGroup = 0;
+    auto physics = g_pClientGame->GetPhysics();
 
-    m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, bEnableOOP);
+    m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, physics->GetRigidBodiesManager(), physics->GetStaticCollisionsManager(), physics->GetShapesManager(), bEnableOOP);
     if (m_pLuaVM)
     {
         m_pLuaVM->SetScriptName(szResourceName);

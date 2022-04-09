@@ -7,7 +7,7 @@ class CResource;
 class CSharedLuaMain
 {
 public:
-    CSharedLuaMain(CResource* pResource);
+    CSharedLuaMain(CResource* pResource, CLuaPhysicsRigidBodyManager* pLuaPhysicsRigidBodyManager, CLuaPhysicsStaticCollisionManager* pLuaPhysicsStaticCollisionManager, CLuaPhysicsShapeManager* pLuaPhysicsShapeManager);
     ~CSharedLuaMain();
 
 #ifdef MTA_CLIENT
@@ -49,9 +49,9 @@ public:
 
     void UnloadScript();
 
-    CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager.get(); };
-    CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager.get(); };
-    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager.get(); };
+    CLuaPhysicsRigidBodyManager*       GetPhysicsRigidBodyManager() const { return m_pLuaPhysicsRigidBodyManager; };
+    CLuaPhysicsStaticCollisionManager* GetPhysicsStaticCollisionManager() const { return m_pLuaPhysicsStaticCollisionManager; };
+    CLuaPhysicsShapeManager*           GetPhysicsShapeManager() const { return m_pLuaPhysicsShapeManager; };
     CLuaPhysicsRigidBody*              GetRigidBodyFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
@@ -61,7 +61,7 @@ protected:
     CResource* m_pResource;
 
 private:
-    std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;
-    std::unique_ptr<CLuaPhysicsStaticCollisionManager> m_pLuaPhysicsStaticCollisionManager;
-    std::unique_ptr<CLuaPhysicsShapeManager>           m_pLuaPhysicsShapeManager;
+    CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
+    CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
+    CLuaPhysicsShapeManager*           m_pLuaPhysicsShapeManager;
 };

@@ -60,6 +60,9 @@ public:
     std::vector<CLuaPhysicsRigidBody*>       GetRigidBodies() const { return m_vecRigidBodies; }
     std::vector<CLuaPhysicsStaticCollision*> GetStaticCollisions() const { return m_vecStaticCollisions; }
 
+    CLuaPhysicsRigidBodyManager*       GetRigidBodiesManager() const { return m_pLuaPhysicsRigidBodyManager.get(); }
+    CLuaPhysicsStaticCollisionManager* GetStaticCollisionsManager() const { return m_pLuaPhysicsStaticCollisionManager.get(); }
+    CLuaPhysicsShapeManager*           GetShapesManager() const { return m_pLuaPhysicsShapeManager.get(); }
 #ifdef MTA_CLIENT
     void DrawDebug() { m_bDrawDebugNextTime = true; };
     void DrawDebugLines();
@@ -101,6 +104,10 @@ private:
     std::atomic<int>   m_iSubSteps = 10;
     std::atomic<bool>  m_bSimulationEnabled = false;
     float              m_fDeltaTime;
+
+    std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;
+    std::unique_ptr<CLuaPhysicsStaticCollisionManager> m_pLuaPhysicsStaticCollisionManager;
+    std::unique_ptr<CLuaPhysicsShapeManager>           m_pLuaPhysicsShapeManager;
 
 #ifdef MTA_CLIENT
     bool m_bDrawDebugNextTime = false;

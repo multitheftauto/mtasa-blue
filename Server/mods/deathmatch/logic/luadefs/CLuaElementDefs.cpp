@@ -268,7 +268,7 @@ int CLuaElementDefs::destroyElement(lua_State* luaVM)
     CElement*           pElement = nullptr;
     CLuaPhysicsElement* pPhysicsElement = NULL;
     CScriptArgReader    argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsElement>())
         argStream.ReadUserData(pPhysicsElement);
     else
         argStream.ReadUserData(pElement);
@@ -286,7 +286,25 @@ int CLuaElementDefs::destroyElement(lua_State* luaVM)
         }
         else
         {
-            lua_pushboolean(luaVM, pPhysicsElement->Destroy());
+            auto& pLuaMain = lua_getownercluamain(luaVM);
+            switch (pPhysicsElement->GetClassType())
+            {
+                case EIdClass::EIdClassType::SHAPE:
+                    pLuaMain.GetPhysicsShapeManager()->Remove(reinterpret_cast<CLuaPhysicsShape*>(pPhysicsElement));
+                    lua_pushboolean(luaVM, true);
+                    break;
+                case EIdClass::EIdClassType::RIGID_BODY:
+                    pLuaMain.GetPhysicsRigidBodyManager()->Remove(reinterpret_cast<CLuaPhysicsRigidBody*>(pPhysicsElement));
+                    lua_pushboolean(luaVM, true);
+                    break;
+                case EIdClass::EIdClassType::STATIC_COLLISION:
+                    pLuaMain.GetPhysicsStaticCollisionManager()->Remove(reinterpret_cast<CLuaPhysicsStaticCollision*>(pPhysicsElement));
+                    lua_pushboolean(luaVM, true);
+                    break;
+                default:
+                    lua_pushboolean(luaVM, false);
+                    break;
+            }
             return 1;
         }
     }

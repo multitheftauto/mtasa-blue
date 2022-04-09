@@ -13,6 +13,8 @@ class CPhysicsRigidBodyProxy;
 class MotionState;
 
 #pragma once
+#include "LinearMath/btTransform.h"
+#include "BulletDynamics/Dynamics/btRigidBody.h"
 #include "CPhysicsProxyElement.h"
 #include "CLuaPhysicsShape.h"
 

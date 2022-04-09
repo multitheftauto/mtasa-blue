@@ -10,10 +10,6 @@
 
 #include "StdInc.h"
 
-#include "physics/CLuaPhysicsBaseManager.h"
-#include "physics/CLuaPhysicsRigidBodyManager.h"
-#include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsShapeManager.h"
 #include "physics/CPhysicsDebugDrawer.h"
 
 CBulletPhysics::CBulletPhysics()
@@ -33,6 +29,10 @@ CBulletPhysics::CBulletPhysics()
     m_pDynamicsWorld->setGravity(CPhysicsSharedLogic::ConvertVector(BulletPhysics::Defaults::Gravity));
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
     m_bSimulationEnabled = true;
+
+    m_pLuaPhysicsRigidBodyManager = std::make_unique<CLuaPhysicsRigidBodyManager>();
+    m_pLuaPhysicsStaticCollisionManager = std::make_unique<CLuaPhysicsStaticCollisionManager>();
+    m_pLuaPhysicsShapeManager = std::make_unique<CLuaPhysicsShapeManager>();
 }
 
 CBulletPhysics::~CBulletPhysics()

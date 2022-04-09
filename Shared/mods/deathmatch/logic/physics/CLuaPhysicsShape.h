@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 class CLuaPhysicsShape;
-class CLuaPhysicsCompoundShape;
+class btCollisionShape;
 
 #pragma once
 
@@ -44,5 +44,4 @@ private:
 
     std::vector<CLuaPhysicsRigidBody*>       m_vecRigidBodyList;
     std::vector<CLuaPhysicsStaticCollision*> m_vecStaticCollisions;
-    std::vector<CLuaPhysicsCompoundShape*>   m_vecCompoundShapes;
 };

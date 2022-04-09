@@ -1739,7 +1739,7 @@ int CLuaElementDefs::DestroyElement(lua_State* luaVM)
     CLuaPhysicsElement* pPhysicsElement = nullptr;
 
     CScriptArgReader    argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsWorldElement>())
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsElement>())
         argStream.ReadUserData(pPhysicsElement);
     else
         argStream.ReadUserData(pEntity);
@@ -1757,8 +1757,11 @@ int CLuaElementDefs::DestroyElement(lua_State* luaVM)
         }
         else
         {
-            lua_pushboolean(luaVM, pPhysicsElement->Destroy());
-            return 1;
+            if (CStaticFunctionDefinitions::DestroyPhysicsElement(pPhysicsElement))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else

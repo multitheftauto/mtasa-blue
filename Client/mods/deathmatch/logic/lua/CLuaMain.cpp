@@ -27,7 +27,9 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
-CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP) : CSharedLuaMain(pResourceOwner)
+CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, CLuaPhysicsRigidBodyManager* pLuaPhysicsRigidBodyManager,
+                   CLuaPhysicsStaticCollisionManager* pLuaPhysicsStaticCollisionManager, CLuaPhysicsShapeManager* pLuaPhysicsShapeManager, bool bEnableOOP)
+    : CSharedLuaMain(pResourceOwner, pLuaPhysicsRigidBodyManager, pLuaPhysicsStaticCollisionManager, pLuaPhysicsShapeManager)
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;

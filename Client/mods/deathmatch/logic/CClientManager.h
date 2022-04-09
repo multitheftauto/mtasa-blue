@@ -44,6 +44,11 @@ class CClientManager;
 #include "CClientPointLightsManager.h"
 #include "CClientModelManager.h"
 
+#include "physics/CLuaPhysicsBaseManager.h"
+#include "physics/CLuaPhysicsRigidBodyManager.h"
+#include "physics/CLuaPhysicsStaticCollisionManager.h"
+#include "physics/CLuaPhysicsShapeManager.h"
+
 class CClientProjectileManager;
 class CClientExplosionManager;
 
@@ -97,6 +102,10 @@ public:
     CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
 
+    CLuaPhysicsRigidBodyManager*       GetRigidBodiesManager() const { return m_pLuaPhysicsRigidBodyManager; }
+    CLuaPhysicsStaticCollisionManager* GetStaticCollisionsManager() const { return m_pLuaPhysicsStaticCollisionManager; }
+    CLuaPhysicsShapeManager*           GetShapesManager() const { return m_pLuaPhysicsShapeManager; }
+
     bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }
     void SetGameUnloadedFlag() { m_bGameUnloadedFlag = true; }
@@ -148,6 +157,11 @@ private:
     CClientPointLightsManager*   m_pPointLightsManager;
     CClientModelManager*         m_pModelManager;
     CClientPacketRecorder*       m_pPacketRecorder;
+
+    CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
+    CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
+    CLuaPhysicsShapeManager*           m_pLuaPhysicsShapeManager;
+
     bool                         m_bBeingDeleted;
     bool                         m_bGameUnloadedFlag;
     int                          m_iNumLowLODElements;

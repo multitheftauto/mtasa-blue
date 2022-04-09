@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 class CLuaPhysicsWorldElement;
+class btCollisionObject;
 
 #pragma once
 
