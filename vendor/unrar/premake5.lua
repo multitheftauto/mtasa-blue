@@ -34,7 +34,6 @@ project "unrar"
 		"find.cpp",
 		"getbits.cpp",
 		"global.cpp",
-		"isnt.cpp",
 		"list.cpp",
 		"match.cpp",
 		"options.cpp",
@@ -68,8 +67,5 @@ project "unrar"
 		"ui.cpp"
 	}
 
-	filter "system:Mac*"
-		defines { "__APPLE__" }
-
-	filter { "system:Unix", "system:Linux" }
-		defines { "_UNIX" }
+	filter "system:Windows*"
+		files { "isnt.cpp" }
