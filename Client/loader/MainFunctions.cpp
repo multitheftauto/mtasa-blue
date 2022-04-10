@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <array>
 
 DECLARE_ENUM(WSC_SECURITY_PROVIDER_HEALTH)
 IMPLEMENT_ENUM_BEGIN(WSC_SECURITY_PROVIDER_HEALTH)
@@ -863,14 +864,44 @@ void CheckDataFiles()
         }
     }
 
-    // Warning if d3d9.dll exists in the GTA install directory
-    if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
+    // Check for graphics libraries in the GTA install directory
     {
-        SString fileHash = CMD5Hasher::CalculateHexString(filePath);
-        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+        std::vector<GraphicsLibrary> offenders;
 
-        ShowD3dDllDialog(g_hInstance, filePath);
-        HideD3dDllDialog();
+        for (const char* libraryName : {"d3d9", "dxgi"})
+        {
+            GraphicsLibrary library(libraryName);
+            library.absoluteFilePath = PathJoin(strGTAPath, library.stem + ".dll");
+
+            if (!FileExists(library.absoluteFilePath))
+                continue;
+
+            library.appLastHash = SString("%s-dll-last-hash", library.stem.c_str());
+            library.appDontRemind = SString("%s-dll-not-again", library.stem.c_str());
+            library.md5Hash = CMD5Hasher::CalculateHexString(library.absoluteFilePath);
+            WriteDebugEvent(SString("%s.dll in GTA:SA directory (md5: %s)", library.stem.c_str(), library.md5Hash.c_str()));
+            
+            bool isProblematic = true;
+
+            if (GetApplicationSetting("diagnostics", library.appLastHash) == library.md5Hash)
+            {
+                if (GetApplicationSetting("diagnostics", library.appDontRemind) == "yes")
+                {
+                    isProblematic = false;
+                }
+            }
+
+            if (isProblematic)
+            {
+                offenders.emplace_back(std::move(library));
+            }
+        }
+
+        if (!offenders.empty())
+        {
+            ShowGraphicsDllDialog(g_hInstance, offenders);
+            HideGraphicsDllDialog();
+        }
     }
 
     // Remove old log files saved in the wrong place
