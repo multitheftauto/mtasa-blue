@@ -23,8 +23,8 @@ void CPhysicsDebugDrawer::DrawLineInternal(const btVector3& from, const btVector
     const float    distance = DistanceBetweenPoints3D((vecFrom + vecTo) / 2, m_vecCameraPosition);
     if (distance < m_fDrawDistance) // 50, 500 - 10%
     {
-        float alpha = 255 - distance / m_fDrawDistance * 255; 
-        m_vecLines.emplace_back(vecFrom, vecTo, SColorARGB(Min(alpha, 255.0f), lineColor.x() * 255.0f, lineColor.y() * 255.0f, lineColor.z() * 255.0f));
+        float alpha = 255 - distance / m_fDrawDistance * 255;
+        m_vecLines.emplace_back(vecFrom, vecTo, SColorARGB(Clamp(0.0f, alpha, 255.0f), lineColor.x() * 254.0f, lineColor.y() * 254.0f, lineColor.z() * 254.0f));
     }
 }
 
