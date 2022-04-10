@@ -25,6 +25,7 @@ CBulletPhysics* CLuaPhysicsDefs::GetPhysics()
 void CLuaPhysicsDefs::LoadFunctions(void)
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"isPhysicsElement", ArgumentParser<IsPhysicsElement>},
         {"physicsCreateBoxShape", ArgumentParser<PhysicsCreateBoxShape>},
         {"physicsCreateRigidBody", ArgumentParser<PhysicsCreateRigidBody>},
         {"physicsCreateStaticCollision", ArgumentParser<PhysicsCreateStaticCollision>},
@@ -44,6 +45,16 @@ void CLuaPhysicsDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_registerstaticclass(luaVM, "Physics");
+}
+
+bool CLuaPhysicsDefs::IsPhysicsElement(lua_State* luaVM)
+{
+    CLuaPhysicsElement* pPhysicsElement = nullptr;
+    CScriptArgReader    argStream(luaVM);
+
+    argStream.ReadUserData(pPhysicsElement);
+
+    return !argStream.HasErrors();
 }
 
 CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::variant<CVector, float> variant)
@@ -70,7 +81,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::
 }
 
 CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector vecPosition,
-                                                              CVector vecRotation, RigidBodyOptions options)
+                                                              std::optional<CVector> vecRotation, RigidBodyOptions options)
 {
     auto& pLuaMain = lua_getownercluamain(luaVM);
 
@@ -87,15 +98,15 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
     auto pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
     pRigidBody->SetPosition(vecPosition);
-    pRigidBody->SetRotation(vecRotation);
+    pRigidBody->SetRotation(vecRotation.value_or(CVector{0, 0, 0}));
     return pRigidBody;
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, std::optional<CVector> position,
+CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector position,
                                                                           std::optional<CVector> rotation)
 {
     CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
-    pStaticCollision->SetPosition(position.value_or(CVector{0, 0, 0}));
+    pStaticCollision->SetPosition(position);
     pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
     return pStaticCollision;
 }

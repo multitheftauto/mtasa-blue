@@ -364,14 +364,10 @@ int CLuaElementDefs::cloneElement(lua_State* luaVM)
 int CLuaElementDefs::isElement(lua_State* luaVM)
 {
     //  bool isElement ( var theValue )
-    CLuaPhysicsElement* pPhysicsElement = nullptr;
-    CElement*           pElement = nullptr;
+    CElement*        pElement = NULL;
     CScriptArgReader argStream(luaVM);
 
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsElement>())
-        argStream.ReadUserData(pPhysicsElement);
-    else
-        argStream.ReadUserData(pElement);
+    argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {
@@ -836,8 +832,6 @@ int CLuaElementDefs::getElementVelocity(lua_State* luaVM)
     else
         argStream.ReadUserData(pElement);
 
-    argStream.ReadUserData(pElement);
-
     if (!argStream.HasErrors())
     {
         if (pRigidBody)
@@ -902,8 +896,6 @@ int CLuaElementDefs::getElementTurnVelocity(lua_State* luaVM)
         argStream.ReadUserData(pRigidBody);
     else
         argStream.ReadUserData(pElement);
-
-    argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {

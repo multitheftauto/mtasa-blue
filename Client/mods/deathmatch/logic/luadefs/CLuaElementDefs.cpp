@@ -235,14 +235,10 @@ int CLuaElementDefs::GetRootElement(lua_State* luaVM)
 
 int CLuaElementDefs::IsElement(lua_State* luaVM)
 {
-    CLuaPhysicsElement* pPhysicsElement = nullptr;
-    CClientEntity*      pEntity = nullptr;
+    CClientEntity*      pEntity = NULL;
     CScriptArgReader    argStream(luaVM);
 
-    if (argStream.NextIsUserDataOfType<CLuaPhysicsElement>())
-        argStream.ReadUserData(pPhysicsElement);
-    else
-        argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(pEntity);
 
     if (!argStream.HasErrors())
     {
@@ -1965,9 +1961,9 @@ int CLuaElementDefs::SetElementPosition(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementRotation(lua_State* luaVM)
 {
-    //  bool setElementRotation ( element theElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
-    CClientEntity*              pEntity = nullptr;
-    CLuaPhysicsRigidBody*       pPhysicsWorldElement = nullptr;
+    //  bool setElementRotation ( element theElement / physics-world-element thePhysicsWorldElement, float rotX, float rotY, float rotZ [, string rotOrder = "default", bool fixPedRotation = false ] )
+    CClientEntity*           pEntity = nullptr;
+    CLuaPhysicsWorldElement* pPhysicsWorldElement = nullptr;
 
     CVector             vecRotation;
     eEulerRotationOrder rotationOrder;
@@ -2104,6 +2100,8 @@ int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
         argStream.ReadUserData(pRigidBody);
     else
         argStream.ReadUserData(pEntity);
+
+    argStream.ReadVector3D(vecAngularVelocity);
 
     // Verify the arguments
     if (!argStream.HasErrors())
