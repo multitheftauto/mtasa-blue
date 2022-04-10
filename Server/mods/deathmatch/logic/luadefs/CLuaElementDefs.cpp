@@ -364,10 +364,14 @@ int CLuaElementDefs::cloneElement(lua_State* luaVM)
 int CLuaElementDefs::isElement(lua_State* luaVM)
 {
     //  bool isElement ( var theValue )
-    CElement* pElement;
-
+    CLuaPhysicsElement* pPhysicsElement = nullptr;
+    CElement*           pElement = nullptr;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsElement>())
+        argStream.ReadUserData(pPhysicsElement);
+    else
+        argStream.ReadUserData(pElement);
 
     if (!argStream.HasErrors())
     {

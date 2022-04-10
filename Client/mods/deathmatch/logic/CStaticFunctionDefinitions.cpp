@@ -81,9 +81,10 @@ CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager,
     m_pProjectileManager = pManager->GetProjectileManager();
     m_pSoundManager = pManager->GetSoundManager();
 
-    m_pLuaPhysicsRigidBodyManager = pManager->GetRigidBodiesManager();
-    m_pLuaPhysicsStaticCollisionManager = pManager->GetStaticCollisionsManager();
-    m_pLuaPhysicsShapeManager = pManager->GetShapesManager();
+    auto physics = g_pClientGame->GetPhysics();
+    m_pLuaPhysicsRigidBodyManager = physics->GetRigidBodiesManager();
+    m_pLuaPhysicsStaticCollisionManager = physics->GetStaticCollisionsManager();
+    m_pLuaPhysicsShapeManager = physics->GetShapesManager();
 }
 
 CStaticFunctionDefinitions::~CStaticFunctionDefinitions()

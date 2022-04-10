@@ -86,7 +86,6 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
 
     auto pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
 
-    pRigidBody->SetEnabled(true);
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation);
     return pRigidBody;

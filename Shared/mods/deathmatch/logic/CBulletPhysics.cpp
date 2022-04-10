@@ -73,9 +73,12 @@ void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 
 void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)
 {
-    for (auto const& pRigidBody : pLuaShape->GetRigidBodies())
+    std::vector<CLuaPhysicsRigidBody*> rigidBodiesToRemove(pLuaShape->GetRigidBodies());
+    std::vector<CLuaPhysicsStaticCollision*> staticCollisionsToRemove(pLuaShape->GetStaticCollisions());
+
+    for (auto const& pRigidBody : rigidBodiesToRemove)
         m_pLuaPhysicsRigidBodyManager->Remove(pRigidBody);
-    for (auto const& pStaticCollision : pLuaShape->GetStaticCollisions())
+    for (auto const& pStaticCollision : staticCollisionsToRemove)
         m_pLuaPhysicsStaticCollisionManager->Remove(pStaticCollision);
 }
 
@@ -88,7 +91,6 @@ CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsSha
 {
     CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
     m_pLuaPhysicsStaticCollisionManager->Add(pStaticCollision);
-    pShape->AddStaticCollision(pStaticCollision);
     pStaticCollision->SetEnabled(true);
     return pStaticCollision;
 }
@@ -104,7 +106,6 @@ CLuaPhysicsRigidBody* CBulletPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, 
 {
     CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
     m_pLuaPhysicsRigidBodyManager->Add(pRigidBody);
-    pShape->AddRigidBody(pRigidBody);
     pRigidBody->SetEnabled(true);
     return pRigidBody;
 }

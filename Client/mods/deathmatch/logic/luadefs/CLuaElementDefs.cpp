@@ -235,9 +235,14 @@ int CLuaElementDefs::GetRootElement(lua_State* luaVM)
 
 int CLuaElementDefs::IsElement(lua_State* luaVM)
 {
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+    CLuaPhysicsElement* pPhysicsElement = nullptr;
+    CClientEntity*      pEntity = nullptr;
+    CScriptArgReader    argStream(luaVM);
+
+    if (argStream.NextIsUserDataOfType<CLuaPhysicsElement>())
+        argStream.ReadUserData(pPhysicsElement);
+    else
+        argStream.ReadUserData(pEntity);
 
     if (!argStream.HasErrors())
     {

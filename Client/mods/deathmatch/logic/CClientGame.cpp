@@ -224,6 +224,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // MTA Voice
     m_pVoiceRecorder = new CVoiceRecorder();
 
+    // Bullet physics
+    m_pPhysics = std::make_unique<CBulletPhysics>();
+
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
@@ -342,8 +345,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Setup builtin Lua events
     SetupGlobalLuaEvents();
-    
-    m_pPhysics = std::make_unique<CBulletPhysics>();
 }
 
 CClientGame::~CClientGame()

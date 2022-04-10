@@ -102,10 +102,6 @@ public:
     CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
 
-    CLuaPhysicsRigidBodyManager*       GetRigidBodiesManager() const { return m_pLuaPhysicsRigidBodyManager; }
-    CLuaPhysicsStaticCollisionManager* GetStaticCollisionsManager() const { return m_pLuaPhysicsStaticCollisionManager; }
-    CLuaPhysicsShapeManager*           GetShapesManager() const { return m_pLuaPhysicsShapeManager; }
-
     bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }
     void SetGameUnloadedFlag() { m_bGameUnloadedFlag = true; }
