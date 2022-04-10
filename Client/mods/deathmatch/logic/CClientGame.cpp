@@ -3689,7 +3689,6 @@ void CClientGame::PostWorldProcessHandler()
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
 
-    m_pPhysics->DrawDebug();
 
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;
