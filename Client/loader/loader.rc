@@ -117,9 +117,9 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Play MTA:SA",IDOK,153,209,67,14
     PUSHBUTTON      "Quit",IDCANCEL,245,209,67,14
-    CTEXT           "Your Grand Theft Auto: San Andreas install directory contains one of these files:",IDC_D3DDLL_TEXT1,31,26,310,17
-    EDITTEXT        IDC_EDIT_GRAPHICS_DLL_PATH,31,46,310,28,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY | ES_MULTILINE
-    CTEXT           "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename these files.",IDC_D3DDLL_TEXT2,14,81,345,33
+    CTEXT           "Your Grand Theft Auto: San Andreas install directory contains one of these files:",IDC_D3DDLL_TEXT1,31,18,310,17 
+    EDITTEXT        IDC_EDIT_GRAPHICS_DLL_PATH,31,30,310,50,ES_CENTER | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL
+    CTEXT           "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename these files.",IDC_D3DDLL_TEXT2,14,91,345,33
     GROUPBOX        "",IDC_STATIC,7,7,359,122
     GROUPBOX        "",IDC_STATIC,7,142,359,43
     CONTROL         " Keep these files, but also show this warning on next start",IDC_NO_ACTION,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,151,228,10

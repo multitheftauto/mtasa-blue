@@ -864,36 +864,45 @@ void CheckDataFiles()
         }
     }
 
-    // Check for graphics libraries in the GTA install directory
+    // Check for graphics libraries in the GTA/MTA install directory
     {
+        // An array of pairs of: a registry prefix and a directory path
+        std::array<std::pair<const char*, SString>, 2> directoriesToCheck = {{
+            {"", strGTAPath},
+            {"mta-", PathJoin(strMTASAPath, "mta")}
+        }};
+
         std::vector<GraphicsLibrary> offenders;
 
-        for (const char* libraryName : {"d3d9", "dxgi"})
+        for (const std::pair<const char*, SString>& directory : directoriesToCheck)
         {
-            GraphicsLibrary library(libraryName);
-            library.absoluteFilePath = PathJoin(strGTAPath, library.stem + ".dll");
-
-            if (!FileExists(library.absoluteFilePath))
-                continue;
-
-            library.appLastHash = SString("%s-dll-last-hash", library.stem.c_str());
-            library.appDontRemind = SString("%s-dll-not-again", library.stem.c_str());
-            library.md5Hash = CMD5Hasher::CalculateHexString(library.absoluteFilePath);
-            WriteDebugEvent(SString("%s.dll in GTA:SA directory (md5: %s)", library.stem.c_str(), library.md5Hash.c_str()));
-            
-            bool isProblematic = true;
-
-            if (GetApplicationSetting("diagnostics", library.appLastHash) == library.md5Hash)
+            for (const char* libraryName : {"d3d9", "dxgi"})
             {
-                if (GetApplicationSetting("diagnostics", library.appDontRemind) == "yes")
+                GraphicsLibrary library(libraryName);
+                library.absoluteFilePath = PathJoin(directory.second, library.stem + ".dll");
+
+                if (!FileExists(library.absoluteFilePath))
+                    continue;
+
+                library.appLastHash = SString("%s%s-dll-last-hash", directory.first, library.stem.c_str());
+                library.appDontRemind = SString("%s%s-dll-not-again", directory.first, library.stem.c_str());
+                library.md5Hash = CMD5Hasher::CalculateHexString(library.absoluteFilePath);
+                WriteDebugEvent(SString("Detected graphics library %s (md5: %s)", library.absoluteFilePath.c_str(), library.md5Hash.c_str()));
+
+                bool isProblematic = true;
+
+                if (GetApplicationSetting("diagnostics", library.appLastHash) == library.md5Hash)
                 {
-                    isProblematic = false;
+                    if (GetApplicationSetting("diagnostics", library.appDontRemind) == "yes")
+                    {
+                        isProblematic = false;
+                    }
                 }
-            }
 
-            if (isProblematic)
-            {
-                offenders.emplace_back(std::move(library));
+                if (isProblematic)
+                {
+                    offenders.emplace_back(std::move(library));
+                }
             }
         }
 
