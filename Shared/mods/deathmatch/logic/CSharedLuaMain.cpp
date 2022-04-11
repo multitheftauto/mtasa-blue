@@ -17,9 +17,9 @@ CSharedLuaMain::~CSharedLuaMain()
 
 void CSharedLuaMain::UnloadScript()
 {
-    m_pLuaPhysicsShapeManager->RemoveAll();
-    m_pLuaPhysicsRigidBodyManager->RemoveAll();
-    m_pLuaPhysicsStaticCollisionManager->RemoveAll();
+    m_pLuaPhysicsShapeManager->RemoveAll(m_pResource);
+    m_pLuaPhysicsRigidBodyManager->RemoveAll(m_pResource);
+    m_pLuaPhysicsStaticCollisionManager->RemoveAll(m_pResource);
 }
 
 CLuaPhysicsRigidBody* CSharedLuaMain::GetRigidBodyFromScriptID(unsigned int uiScriptID)

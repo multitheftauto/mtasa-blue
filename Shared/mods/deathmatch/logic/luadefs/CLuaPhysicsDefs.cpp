@@ -76,7 +76,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::
     CPhysicsSharedLogic::CheckPrimitiveSize(vecSize);
 
     CLuaPhysicsBoxShape* pBox = GetPhysics()->CreateBoxShape(vecSize / 2);
-
+    pBox->SetOwnedResource(pLuaMain.GetResource());
     return pBox;
 }
 
@@ -99,15 +99,18 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
 
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation.value_or(CVector{0, 0, 0}));
+    pRigidBody->SetOwnedResource(pLuaMain.GetResource());
     return pRigidBody;
 }
 
 CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector position,
                                                                           std::optional<CVector> rotation)
 {
+    auto&                       pLuaMain = lua_getownercluamain(luaVM);
     CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
     pStaticCollision->SetPosition(position);
     pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
+    pStaticCollision->SetOwnedResource(pLuaMain.GetResource());
     return pStaticCollision;
 }
 

@@ -27,9 +27,13 @@ public:
 
     const char* GetName() { return EnumToString(GetType()); }
 
+    void SetOwnedResource(CResource* pResource) { m_pOwnedResource = pResource; }
+    CResource* GetOwnedResource() const { return m_pOwnedResource; }
+
 private:
     void RemoveScriptID();
 
     EIdClass::EIdClassType m_classType;
+    CResource*             m_pOwnedResource = nullptr;
     unsigned int           m_uiScriptID;
 };

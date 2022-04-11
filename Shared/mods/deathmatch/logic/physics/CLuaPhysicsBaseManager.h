@@ -21,13 +21,20 @@ public:
     CLuaPhysicsBaseManager(EIdClassType idClass) : m_IdClass(idClass){};
     ~CLuaPhysicsBaseManager() {}
 
-    void RemoveAll()
+    void RemoveAll(CResource* pResource)
     {
-        for (auto it = m_elementsList.rbegin(); it != m_elementsList.rend(); ++it)
+        std::vector<std::vector<T>::const_iterator> elementsToRemove;
+        for (auto& it = m_elementsList.begin(); it != m_elementsList.end(); ++it)
         {
-            Remove(*it, false);
+            if ((*it)->GetOwnedResource() == pResource)
+            {
+                Remove(*it, false);
+                elementsToRemove.push_back(it);
+            }
         }
-        m_elementsList.clear();
+
+        for (auto& it : elementsToRemove)
+            m_elementsList.erase(it);
     }
 
     T GetFromScriptID(unsigned int uiScriptID)
