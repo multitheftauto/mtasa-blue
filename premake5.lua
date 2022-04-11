@@ -5,6 +5,7 @@ require "install_data"
 require "install_resources"
 require "install_cef"
 require "install_unifont"
+require "install_bulletphysics"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -168,6 +169,4 @@ workspace "MTASA"
 		include "vendor/unrar"
 		include "vendor/zip"
 		include "vendor/zlib"
-		include "vendor/bulletphysics3d/BulletDynamics"
-		include "vendor/bulletphysics3d/BulletCollision"
-		include "vendor/bulletphysics3d/LinearMath"
+		include "vendor/bulletphysics3d"

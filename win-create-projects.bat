@@ -1,10 +1,13 @@
 @echo off
 
-rem Update CEF eventually
-utils\premake5.exe install_cef
+@REM rem Update CEF eventually
+@REM utils\premake5.exe install_cef
+
+@REM rem Update Unifont
+@REM utils\premake5.exe install_unifont
 
 rem Update Unifont
-utils\premake5.exe install_unifont
+utils\premake5.exe install_bulletphysics
 
 rem Generate solutions
 utils\premake5.exe vs2022
