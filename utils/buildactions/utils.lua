@@ -97,6 +97,8 @@ function os.sha256_file(path)
 	local s, errc
 	if windows then
 		s, errc = os.outputof(string.format("CertUtil -hashfile \"%s\" SHA256", path))
+	elseif (os.host() == "macosx") then
+		s, errc = os.outputof(string.format("shasum -a 256 \"%s\" | awk '{ print $1 }'", path))
 	else
 		s, errc = os.outputof(string.format("sha256sum \"%s\" | awk '{ print $1 }'", path))
 	end

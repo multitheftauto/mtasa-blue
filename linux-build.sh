@@ -3,7 +3,6 @@
 # Find premake binary location
 if [ "$(uname)" == "Darwin" ]; then
     PREMAKE5=utils/premake5-macos
-    brew install unzip
 else
     PREMAKE5=utils/premake5
 fi
