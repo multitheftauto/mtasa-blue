@@ -36,6 +36,17 @@ CLuaPhysicsShape* CSharedLuaMain::GetShapeFromScriptID(unsigned int uiScriptID)
     return m_pLuaPhysicsShapeManager->GetFromScriptID(uiScriptID);
 }
 
+CLuaPhysicsWorldElement* CSharedLuaMain::GetPhysicsWorldElementFromScriptID(unsigned int uiScriptID)
+{
+    auto pStaticCollision = GetStaticCollisionFromScriptID(uiScriptID);
+    if (pStaticCollision != nullptr)
+        return pStaticCollision;
+    auto pRigidBody = GetRigidBodyFromScriptID(uiScriptID);
+    if (pRigidBody != nullptr)
+        return pRigidBody;
+    return nullptr;
+}
+
 CLuaPhysicsElement* CSharedLuaMain::GetPhysicsElementFromScriptID(unsigned int uiScriptID)
 {
     auto pShape = GetShapeFromScriptID(uiScriptID);

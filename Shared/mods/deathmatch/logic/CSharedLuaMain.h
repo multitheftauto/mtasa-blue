@@ -2,6 +2,7 @@ class CLuaPhysicsRigidBodyManager;
 class CLuaPhysicsStaticCollisionManager;
 class CLuaPhysicsShapeManager;
 class CLuaPhysicsElement;
+class CLuaPhysicsWorldElement;
 class CResource;
 
 class CSharedLuaMain
@@ -56,6 +57,7 @@ public:
     CLuaPhysicsStaticCollision*        GetStaticCollisionFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsShape*                  GetShapeFromScriptID(unsigned int uiScriptID);
     CLuaPhysicsElement*                GetPhysicsElementFromScriptID(unsigned int uiScriptID);
+    CLuaPhysicsWorldElement*           GetPhysicsWorldElementFromScriptID(unsigned int uiScriptID);
 
 protected:
     CResource* m_pResource;

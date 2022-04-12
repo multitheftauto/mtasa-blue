@@ -55,4 +55,11 @@ CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaV
     return pLuaMain.GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
 }
 
+template <class T>
+CLuaPhysicsWorldElement* UserDataCast(CLuaPhysicsWorldElement*, void* ptr, lua_State* luaVM)
+{
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsWorldElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
 SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM);
