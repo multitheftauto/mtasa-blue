@@ -24,7 +24,7 @@ public:
     void RemoveAll(CResource* pResource)
     {
         std::vector<std::vector<T>::iterator> elementsToRemove;
-        for (auto& it = m_elementsList.begin(); it != m_elementsList.end(); ++it)
+        for (std::vector<T>::iterator it = m_elementsList.begin(); it != m_elementsList.end(); ++it)
         {
             if ((*it)->GetOwnedResource() == pResource)
             {
@@ -33,7 +33,7 @@ public:
             }
         }
 
-        for (auto& it : elementsToRemove)
+        for (std::vector<T>::iterator it : elementsToRemove)
             m_elementsList.erase(it);
     }
 
