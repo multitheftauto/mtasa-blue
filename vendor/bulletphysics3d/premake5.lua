@@ -1,4 +1,5 @@
 project "LinearMath"
+    language "C++"
     kind "StaticLib"
     
     filter { "system:Linux" }
@@ -18,7 +19,7 @@ project "LinearMath"
     defines { "BT_THREADSAFE" }
 
 project "BulletCollision"
-
+    language "C++"
 	kind "StaticLib"
     
     filter { "system:Linux" }
@@ -44,6 +45,7 @@ project "BulletCollision"
 	}
 
 project "BulletDynamics"
+    language "C++"
 	kind "StaticLib"
 	includedirs {
         ".",

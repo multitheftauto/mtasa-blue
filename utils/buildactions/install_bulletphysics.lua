@@ -17,7 +17,7 @@ newaction {
 		local archive_path = BULLETPHYSICS_PATH.."/"..BULLETPHYSICS_FILENAME..".zip"
 		if os.isfile(archive_path) and os.sha256_file(archive_path) == BULLETPHYSICS_HASH then
 			print("Bullet physics is up to date.")
-			--return
+			return
 		end
 
 		-- Download Bullet physics
