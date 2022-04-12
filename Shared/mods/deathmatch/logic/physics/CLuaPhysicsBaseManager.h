@@ -14,6 +14,10 @@ class CLuaPhysicsBaseManager;
 
 #pragma once
 
+class CLuaPhysicsRigidBodyManager;
+class CLuaPhysicsStaticCollisionManager;
+class CLuaPhysicsShapeManager;
+
 template <class T>
 class CLuaPhysicsBaseManager
 {
