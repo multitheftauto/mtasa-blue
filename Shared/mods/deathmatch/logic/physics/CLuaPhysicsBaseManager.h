@@ -21,7 +21,6 @@ public:
     CLuaPhysicsBaseManager(EIdClassType idClass) : m_IdClass(idClass){};
     ~CLuaPhysicsBaseManager() {}
 
-
     T GetFromScriptID(unsigned int uiScriptID)
     {
         T pElement = (T)CIdArray::FindEntry(uiScriptID, m_IdClass);
@@ -34,7 +33,23 @@ public:
     }
 
     virtual void Remove(T pElement, bool deleteFromList = true) = 0;
-    virtual void RemoveAll(CResource* pResource) = 0;
+
+    void RemoveAll(CResource* pResource)
+    {
+        std::vector<T> elementsToRemove;
+
+        for (auto it = m_elementsList.begin(); it != m_elementsList.end(); ++it)
+        {
+            if ((*it)->GetOwnedResource() == pResource)
+            {
+                Remove(*it, false);
+                elementsToRemove.push_back(*it);
+            }
+        }
+
+        for (auto it : elementsToRemove)
+            ListRemove(m_elementsList, it);
+    }
 
     void Add(T pElement) { m_elementsList.push_back(pElement); }
 

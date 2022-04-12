@@ -19,7 +19,4 @@ public:
     CLuaPhysicsShapeManager() : CLuaPhysicsBaseManager<CLuaPhysicsShape*>(EIdClassType::SHAPE) {}
     ~CLuaPhysicsShapeManager();
     void Remove(CLuaPhysicsShape* pShape, bool deleteFromList = true);
-    void RemoveAll(CResource* pResource);
-
-    bool IsShapeValid(CLuaPhysicsShape* pShape);
 };

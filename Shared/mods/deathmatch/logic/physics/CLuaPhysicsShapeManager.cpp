@@ -32,29 +32,6 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape, bool deleteFromLi
     delete pShape;
 }
 
-void CLuaPhysicsShapeManager::RemoveAll(CResource* pResource)
-{
-    std::vector<std::vector<CLuaPhysicsShape*>::iterator> elementsToRemove;
-    for (auto it = m_elementsList.begin(); it != m_elementsList.end(); ++it)
-    {
-        if ((*it)->GetOwnedResource() == pResource)
-        {
-            Remove(*it, false);
-            elementsToRemove.push_back(it);
-        }
-    }
-
-    for (auto it : elementsToRemove)
-        m_elementsList.erase(it);
-}
-
 CLuaPhysicsShapeManager::~CLuaPhysicsShapeManager()
 {
-}
-
-bool CLuaPhysicsShapeManager::IsShapeValid(CLuaPhysicsShape* pShape)
-{
-    assert(pShape);
-
-    return ListContains(m_elementsList, pShape);
 }

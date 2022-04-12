@@ -20,5 +20,4 @@ class CLuaPhysicsStaticCollisionManager : public CLuaPhysicsBaseManager<CLuaPhys
 public:
     CLuaPhysicsStaticCollisionManager() : CLuaPhysicsBaseManager<CLuaPhysicsStaticCollision*>(EIdClassType::STATIC_COLLISION) {}
     void Remove(CLuaPhysicsStaticCollision* pStaticCollision, bool deleteFromList = true);
-    void RemoveAll(CResource* pResource);
 };
