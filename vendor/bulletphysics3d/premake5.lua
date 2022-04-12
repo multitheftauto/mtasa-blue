@@ -1,8 +1,10 @@
 project "LinearMath"
     kind "StaticLib"
-    if os.istarget("Linux") then
-        buildoptions{"-fPIC"}
-    end
+    
+    filter { "system:Linux" }
+        buildoptions { "-fPIC" }
+	filter {}
+
     includedirs {
         ".",
     }
@@ -18,9 +20,11 @@ project "LinearMath"
 project "BulletCollision"
 
 	kind "StaticLib"
-    if os.istarget("Linux") then
-        buildoptions{"-fPIC"}
-    end
+    
+    filter { "system:Linux" }
+        buildoptions { "-fPIC" }
+	filter {}
+
 	includedirs {
         ".",
 	}
@@ -44,9 +48,11 @@ project "BulletDynamics"
 	includedirs {
         ".",
 	}
-    if os.istarget("Linux") then
-        buildoptions{"-fPIC"}
-    end
+    
+    filter { "system:Linux" }
+        buildoptions { "-fPIC" }
+	filter {}
+
 	files {
 		"BulletDynamics/Dynamics/*.cpp",
         "BulletDynamics/Dynamics/*.h",
