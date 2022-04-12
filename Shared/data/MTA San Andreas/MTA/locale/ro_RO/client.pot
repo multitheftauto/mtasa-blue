@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-02 16:58+0000\n"
-"PO-Revision-Date: 2022-04-02 18:04\n"
+"PO-Revision-Date: 2022-04-12 16:11\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "MIME-Version: 1.0\n"
@@ -613,7 +613,7 @@ msgstr "Vizitați cel mai recent articol"
 
 #: Client\core\CQuestionBox.cpp:192 Shared\sdk\SharedUtil.Misc.hpp:696
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Doriți să vedeți niște ajutor on-line despre această problemă?"
+msgstr "Doriți ajutor online pentru această problemă ?"
 
 #: Client\core\CScreenShot.cpp:53
 #, c-format
