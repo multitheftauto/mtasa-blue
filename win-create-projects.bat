@@ -6,7 +6,7 @@ utils\premake5.exe install_cef
 rem Update Unifont
 utils\premake5.exe install_unifont
 
-rem Update Unifont
+rem Update Bullet physics
 utils\premake5.exe install_bulletphysics
 
 rem Generate solutions

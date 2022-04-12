@@ -49,6 +49,7 @@ printf "\$CONFIG=$CONFIG\n"
 rm -Rf Build/
 rm -Rf Bin/
 
+$PREMAKE5 install_bulletphysics
 # Generate makefiles
 $PREMAKE5 gmake
 
