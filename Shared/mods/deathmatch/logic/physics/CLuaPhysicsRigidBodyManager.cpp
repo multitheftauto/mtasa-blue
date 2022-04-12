@@ -34,6 +34,22 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody, bool 
     delete pRigidBody;
 }
 
+void CLuaPhysicsRigidBodyManager::RemoveAll(CResource* pResource)
+{
+    std::vector<std::vector<CLuaPhysicsRigidBody*>::iterator> elementsToRemove;
+    for (auto it = m_elementsList.begin(); it != m_elementsList.end(); ++it)
+    {
+        if ((*it)->GetOwnedResource() == pResource)
+        {
+            Remove(*it, false);
+            elementsToRemove.push_back(it);
+        }
+    }
+
+    for (auto it : elementsToRemove)
+        m_elementsList.erase(it);
+}
+
 bool CLuaPhysicsRigidBodyManager::IsRigidBodyValid(CLuaPhysicsRigidBody* pRigidBody)
 {
     assert(pRigidBody);
