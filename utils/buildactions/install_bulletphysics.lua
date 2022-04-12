@@ -32,9 +32,9 @@ newaction {
 		if download_hash ~= BULLETPHYSICS_HASH then
 			errormsg("ERROR: Bullet physics hash mismatch!", ("\nExpected %s, got %s"):format(BULLETPHYSICS_HASH, download_hash))
 			-- Delete bad file
-			-- os.remove(archive_path)
-			-- os.exit(1)
-			-- return
+			os.remove(archive_path)
+			os.exit(1)
+			return
 		end
 
         if not os.extract_archive(archive_path, BULLETPHYSICS_PATH, true) then
