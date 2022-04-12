@@ -12,15 +12,7 @@
 template <class T>
 class CLuaPhysicsBaseManager;
 
-class CLuaPhysicsRigidBodyManager;
-class CLuaPhysicsStaticCollisionManager;
-class CLuaPhysicsShapeManager;
-
 #pragma once
-
-class CLuaPhysicsRigidBodyManager;
-class CLuaPhysicsStaticCollisionManager;
-class CLuaPhysicsShapeManager;
 
 template <class T>
 class CLuaPhysicsBaseManager
@@ -31,7 +23,7 @@ public:
 
     void RemoveAll(CResource* pResource)
     {
-        std::vector<std::vector<T>::const_iterator> elementsToRemove;
+        std::vector<std::vector<T>::iterator> elementsToRemove;
         for (auto& it = m_elementsList.begin(); it != m_elementsList.end(); ++it)
         {
             if ((*it)->GetOwnedResource() == pResource)
