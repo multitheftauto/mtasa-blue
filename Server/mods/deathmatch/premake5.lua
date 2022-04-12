@@ -28,6 +28,7 @@ project "Deathmatch"
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
 			"../../../vendor/bulletphysics3d/",
+			"../../../vendor/bulletphysics3d/src",
 			"logic",
 			"utils",
 			"."
