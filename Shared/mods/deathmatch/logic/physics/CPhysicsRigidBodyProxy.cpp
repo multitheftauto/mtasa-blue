@@ -18,13 +18,11 @@ MotionState::MotionState(const btTransform& startTrans, const btTransform& cente
 
 void MotionState::getWorldTransform(btTransform& centerOfMassWorldTrans) const
 {
-    std::lock_guard guard(m_lock);
     centerOfMassWorldTrans = m_graphicsWorldTrans * m_centerOfMassOffset.inverse();
 }
 
 void MotionState::setWorldTransform(const btTransform& centerOfMassWorldTrans)
 {
-    std::lock_guard guard(m_lock);
     m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset;
 }
 

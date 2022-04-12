@@ -123,7 +123,6 @@ function os.extract_archive(archive_path, target_path, override)
 	if os.host() == "windows" then
 		return os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	elseif (os.host() == "macosx") then
-		print("unpacking on macos...")
 		return os.executef("unzip -a \"%s\" -d \"%s\"", archive_path, target_path)
 	else
 		if not os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path) then

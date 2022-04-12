@@ -4,7 +4,7 @@
  *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/shared_logic/CBulletPhysics.cpp
- *  PURPOSE:     Bullet dhysics entity class
+ *  PURPOSE:     Bullet physics entity class
  *
  *****************************************************************************/
 
@@ -33,10 +33,6 @@ CBulletPhysics::CBulletPhysics()
     m_pLuaPhysicsRigidBodyManager = std::make_unique<CLuaPhysicsRigidBodyManager>();
     m_pLuaPhysicsStaticCollisionManager = std::make_unique<CLuaPhysicsStaticCollisionManager>();
     m_pLuaPhysicsShapeManager = std::make_unique<CLuaPhysicsShapeManager>();
-}
-
-CBulletPhysics::~CBulletPhysics()
-{
 }
 
 void CBulletPhysics::AddStaticCollision(btCollisionObject* pBtCollisionObject) const
@@ -161,14 +157,4 @@ void CBulletPhysics::DoPulse()
         DrawDebugLines();
     }
 #endif
-}
-
-void CBulletPhysics::SetGravity(CVector vecGravity) const
-{
-    m_pDynamicsWorld->setGravity(CPhysicsSharedLogic::ConvertVector(vecGravity));
-}
-
-CVector CBulletPhysics::GetGravity() const
-{
-    return CPhysicsSharedLogic::ConvertVector(m_pDynamicsWorld->getGravity());
 }

@@ -55,15 +55,16 @@ public:
     void LoadCFunctions();
 
 private:
-    CBlipManager*                      m_pBlipManager;
-    CObjectManager*                    m_pObjectManager;
-    CPlayerManager*                    m_pPlayerManager;
-    CRadarAreaManager*                 m_pRadarAreaManager;
-    class CRegisteredCommands*         m_pRegisteredCommands;
-    CVehicleManager*                   m_pVehicleManager;
-    CMapManager*                       m_pMapManager;
-    CEvents*                           m_pEvents;
-    CLuaModuleManager*                 m_pLuaModuleManager;
+    CBlipManager*              m_pBlipManager;
+    CObjectManager*            m_pObjectManager;
+    CPlayerManager*            m_pPlayerManager;
+    CRadarAreaManager*         m_pRadarAreaManager;
+    class CRegisteredCommands* m_pRegisteredCommands;
+    CVehicleManager*           m_pVehicleManager;
+    CMapManager*               m_pMapManager;
+    CEvents*                   m_pEvents;
+    CLuaModuleManager*         m_pLuaModuleManager;
+
     CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;
     CLuaPhysicsStaticCollisionManager* m_pLuaPhysicsStaticCollisionManager;
     CLuaPhysicsShapeManager*           m_pLuaPhysicsShapeManager;

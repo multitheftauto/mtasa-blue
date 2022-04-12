@@ -41,10 +41,6 @@ class CBulletPhysics
 
 public:
     CBulletPhysics();
-    ~CBulletPhysics();
-
-    void    SetGravity(CVector vecGravity) const;
-    CVector GetGravity() const;
 
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
 
@@ -87,11 +83,11 @@ private:
 
     std::unique_ptr<CPhysicsDebugDrawer> m_pDebugDrawer;
 
-    CTickCount         m_LastTimeMs;
-    std::atomic<float> m_fSpeed = 1.0f;
-    std::atomic<int>   m_iSubSteps = 10;
-    std::atomic<bool>  m_bSimulationEnabled = false;
-    float              m_fDeltaTime;
+    CTickCount m_LastTimeMs;
+    float      m_fSpeed = 1.0f;
+    int        m_iSubSteps = 10;
+    bool       m_bSimulationEnabled = false;
+    float      m_fDeltaTime;
 
     std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;
     std::unique_ptr<CLuaPhysicsStaticCollisionManager> m_pLuaPhysicsStaticCollisionManager;

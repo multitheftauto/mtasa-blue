@@ -9,10 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "physics/CLuaPhysicsBaseManager.h"
-#include "physics/CLuaPhysicsRigidBodyManager.h"
-#include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsShapeManager.h"
 
 //
 // enum values <-> script strings

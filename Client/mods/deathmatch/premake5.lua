@@ -46,7 +46,6 @@ project "Client Deathmatch"
 			"../../../Shared/animation",
 			"../../../vendor/sparsehash/src/",
 			"../../../vendor/lunasvg/include",
-			"../../../vendor/sparsehash/src/",
 			"../../../vendor/bulletphysics3d/src/",
 			"../../../vendor/bulletphysics3d/"
 	}
@@ -63,7 +62,7 @@ project "Client Deathmatch"
 		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp"
 	}
 
-	configuration "windows"
+	filter "system:windows"
 		buildoptions { "-Zm280" }
 
 	filter "architecture:x64"

@@ -499,7 +499,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     CElement::StartupEntitiesFromRoot();
 
     CSimControl::Startup();
-
     m_pGroups = new CGroups;
     m_pClock = new CClock;
     m_pBlipManager = new CBlipManager;

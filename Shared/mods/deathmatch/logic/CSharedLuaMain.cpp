@@ -1,6 +1,5 @@
 #include "StdInc.h"
 
-// i can not use forward declaration here
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
 #include "physics/CLuaPhysicsStaticCollisionManager.h"

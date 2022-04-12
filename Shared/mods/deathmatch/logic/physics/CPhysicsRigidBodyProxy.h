@@ -18,7 +18,6 @@ class MotionState;
 #include "CPhysicsProxyElement.h"
 #include "CLuaPhysicsShape.h"
 
-// Thread safe motion state
 class MotionState : public btMotionState
 {
 public:
@@ -29,9 +28,6 @@ public:
     btTransform m_graphicsWorldTrans;
     btTransform m_centerOfMassOffset;
     btTransform m_startWorldTrans;
-
-private:
-    mutable std::mutex m_lock;
 };
 
 // Create using static member method "New"
@@ -42,12 +38,6 @@ public:
         : btRigidBody(mass, motionState, collisionShape, localInertia){};
 
     CPhysicsRigidBodyProxy(const btRigidBodyConstructionInfo& constructionInfo) : btRigidBody(constructionInfo){};
-
-    ~CPhysicsRigidBodyProxy()
-    {
-        setCollisionShape(nullptr);            // prevent from destryoing shape
-        SetEnabled(false);
-    }
 
     static std::unique_ptr<CPhysicsRigidBodyProxy> New(CLuaPhysicsShape* pShape, const float fMass, CVector& vecLocalInertia, CVector& vecCenterOfMass,
                                                        MotionState* pMotionstate);

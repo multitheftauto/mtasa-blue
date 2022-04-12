@@ -452,10 +452,6 @@ struct CLuaFunctionParserBase
             ++index;
             return map;
         }
-        else if constexpr (std::is_same_v<T, std::monostate>)
-        {
-            return T{};
-        }
         else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
         {
         #ifdef MTA_CLIENT

@@ -47,22 +47,12 @@ CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
     auto& pLuaMain = lua_getownercluamain(luaVM);
     return pLuaMain.GetPhysicsShapeManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
 }
-//
-// CLuaPhysicsContraint from userdata
-//
+
 template <class T>
 CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaVM)
 {
-#ifdef MTA_CLIENT
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#else
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-#endif
-    if (pLuaMain)
-    {
-        return pLuaMain->GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-    return nullptr;
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
 }
 
 SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM);

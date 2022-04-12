@@ -235,8 +235,8 @@ int CLuaElementDefs::GetRootElement(lua_State* luaVM)
 
 int CLuaElementDefs::IsElement(lua_State* luaVM)
 {
-    CClientEntity*      pEntity = NULL;
-    CScriptArgReader    argStream(luaVM);
+    CClientEntity*   pEntity = NULL;
+    CScriptArgReader argStream(luaVM);
 
     argStream.ReadUserData(pEntity);
 
@@ -447,26 +447,24 @@ int CLuaElementDefs::GetElementPosition(lua_State* luaVM)
     {
         // Grab the position
         CVector vecPosition;
-        bool    bHasPosition = false;
 
         if (pWorldElement)
         {
             vecPosition = pWorldElement->GetPosition();
-            bHasPosition = true;
-        }
-        else if (pEntity != nullptr)            // because of C6011, should always be true anyway
-            if (CStaticFunctionDefinitions::GetElementPosition(*pEntity, vecPosition))
-            {
-                bHasPosition = true;
-            }
-
-        if (bHasPosition)
-        {
-            // Return it
             lua_pushnumber(luaVM, vecPosition.fX);
             lua_pushnumber(luaVM, vecPosition.fY);
             lua_pushnumber(luaVM, vecPosition.fZ);
             return 3;
+        }
+        else
+        {
+            if (CStaticFunctionDefinitions::GetElementPosition(*pEntity, vecPosition))
+            {
+                lua_pushnumber(luaVM, vecPosition.fX);
+                lua_pushnumber(luaVM, vecPosition.fY);
+                lua_pushnumber(luaVM, vecPosition.fZ);
+                return 3;
+            }
         }
     }
     else
@@ -519,26 +517,24 @@ int CLuaElementDefs::GetElementRotation(lua_State* luaVM)
     {
         // Grab the rotation
         CVector vecRotation;
-        bool    bHasRotation = false;
 
         if (pWorldElement)
         {
             vecRotation = pWorldElement->GetRotation();
-            bHasRotation = true;
-        }
-        else if (pEntity)
-            if (CStaticFunctionDefinitions::GetElementRotation(*pEntity, vecRotation, rotationOrder))
-            {
-                bHasRotation = true;
-            }
-
-        if (bHasRotation)
-        {
-            // Return it
             lua_pushnumber(luaVM, vecRotation.fX);
             lua_pushnumber(luaVM, vecRotation.fY);
             lua_pushnumber(luaVM, vecRotation.fZ);
             return 3;
+        }
+        else
+        {
+            if (CStaticFunctionDefinitions::GetElementRotation(*pEntity, vecRotation, rotationOrder))
+            {
+                lua_pushnumber(luaVM, vecRotation.fX);
+                lua_pushnumber(luaVM, vecRotation.fY);
+                lua_pushnumber(luaVM, vecRotation.fZ);
+                return 3;
+            }
         }
     }
     else
@@ -657,7 +653,7 @@ int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
     {
         if (pRigidBody)
         {
-            const CVector vecAngularVelocity = pRigidBody->GetAngularVelocity();
+            CVector vecAngularVelocity = pRigidBody->GetAngularVelocity();
             lua_pushnumber(luaVM, vecAngularVelocity.fX);
             lua_pushnumber(luaVM, vecAngularVelocity.fY);
             lua_pushnumber(luaVM, vecAngularVelocity.fZ);
@@ -665,11 +661,9 @@ int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
         }
         else
         {
-            // Grab the turn velocity
             CVector vecTurnVelocity;
             if (CStaticFunctionDefinitions::GetElementTurnVelocity(*pEntity, vecTurnVelocity))
             {
-                // Return it
                 lua_pushnumber(luaVM, vecTurnVelocity.fX);
                 lua_pushnumber(luaVM, vecTurnVelocity.fY);
                 lua_pushnumber(luaVM, vecTurnVelocity.fZ);
@@ -1749,7 +1743,6 @@ int CLuaElementDefs::DestroyElement(lua_State* luaVM)
     {
         if (pEntity)
         {
-            // Destroy it
             if (CStaticFunctionDefinitions::DestroyElement(*pEntity))
             {
                 lua_pushboolean(luaVM, true);
@@ -1880,9 +1873,8 @@ int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
 int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
 {
     //  setElementMatrix ( element theElement, table matrix )
-    CClientEntity* pEntity = NULL;
-
-    CMatrix matrix;
+    CClientEntity* pEntity;
+    CMatrix        matrix;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -1943,7 +1935,6 @@ int CLuaElementDefs::SetElementPosition(lua_State* luaVM)
         else
         {
             if (pEntity)
-                // Try to set the position
                 if (CStaticFunctionDefinitions::SetElementPosition(*pEntity, vecPosition, bWarp))
                 {
                     lua_pushboolean(luaVM, true);
@@ -2067,7 +2058,6 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
     {
         if (pEntity)
         {
-            // Set the velocity
             if (CStaticFunctionDefinitions::SetElementVelocity(*pEntity, vecVelocity))
             {
                 lua_pushboolean(luaVM, true);
@@ -2108,7 +2098,6 @@ int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
     {
         if (pEntity)
         {
-            // Set the turn velocity
             if (CStaticFunctionDefinitions::SetElementAngularVelocity(*pEntity, vecAngularVelocity))
             {
                 lua_pushboolean(luaVM, true);

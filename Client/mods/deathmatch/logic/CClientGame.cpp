@@ -3689,7 +3689,6 @@ void CClientGame::PostWorldProcessHandler()
     m_TimeSliceTimer.Reset();
     m_uiFrameCount++;
 
-
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);

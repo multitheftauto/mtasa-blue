@@ -14,7 +14,6 @@
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
     : CLuaPhysicsWorldElement(EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pShape))
 {
-    // pShape->AddStaticCollision(this);
     m_pShape = pShape;
 
     m_btCollisionObject->setUserPointer((void*)this);

@@ -90,8 +90,6 @@ void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pRigidBody)
 {
     const char* szClass = nullptr;
     auto&       pLuaMain = lua_getownercluamain(luaVM);
-    //if (pLuaMain->IsOOPEnabled())
-    //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
 
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pRigidBody->GetScriptID()));
 }
@@ -100,8 +98,6 @@ void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pStat
 {
     const char* szClass = nullptr;
     auto&       pLuaMain = lua_getownercluamain(luaVM);
-    //if (pLuaMain->IsOOPEnabled())
-    //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
 
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pStaticCollision->GetScriptID()));
 }
@@ -110,8 +106,6 @@ void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape)
 {
     const char* szClass = nullptr;
     auto&   pLuaMain = lua_getownercluamain(luaVM);
-    //if (pLuaMain->IsOOPEnabled())
-    //    szClass = CLuaClassDefs::GetTimerClass(pRigidBody);
 
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pShape->GetScriptID()));
 }
@@ -144,11 +138,11 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushvector(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
-    else if (auto pShape = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)NULL, pData, luaVM))
+    else if (auto pShape = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)nullptr, pData, luaVM))
         return lua_pushshape(luaVM, pShape);
-    else if (auto pRigidBody = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)NULL, pData, luaVM))
+    else if (auto pRigidBody = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)nullptr, pData, luaVM))
         return lua_pushrigidbody(luaVM, pRigidBody);
-    else if (auto pStaticCollision = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)NULL, pData, luaVM))
+    else if (auto pStaticCollision = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)nullptr, pData, luaVM))
         return lua_pushstaticcollision(luaVM, pStaticCollision);
 
     lua_pushobject(luaVM, NULL, pData);
