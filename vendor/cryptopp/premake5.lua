@@ -206,6 +206,9 @@ project "cryptopp"
 	filter "system:macosx"
 		defines {"CRYPTOPP_DISABLE_ASM"}
 
+	filter { "options:arch=arm*" }
+		defines { "CRYPTOPP_DISABLE_ASM" }
+
 	filter "platforms:x64"
 		files {
 			"x64dll.asm",

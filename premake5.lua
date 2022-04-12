@@ -15,6 +15,29 @@ else
 end
 GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
+-- Cross-building options
+newoption {
+	trigger = "arch",
+	value = "ARCHITECTURE",
+	description = "Choose a particular target architecture for building",
+	allowed = {
+		{ "host", "Host architecture" },
+		{ "armhf", "ARM hard-float" },
+		{ "arm64", "64-bit ARM" }
+	},
+	default = "host"
+}
+
+newoption {
+	trigger     = "gccprefix",
+	value       = "PREFIX",
+	description = "Prefix to be prepended to commands used by the GCC toolchain (for cross-building)"
+}
+
+if _OPTIONS["gccprefix"] then
+	gccprefix(_OPTIONS["gccprefix"])
+end
+
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 

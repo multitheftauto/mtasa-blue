@@ -1,0 +1,37 @@
+FROM jetbrains/teamcity-minimal-agent:latest
+
+# Set to 1 to configure this image as Teamcity build agent
+# Default value is 0 (manual build)
+ENV AS_BUILDAGENT=0
+
+# Set this to the target arm architecture: arm64 or armhf
+ENV BUILD_ARCHITECTURE=arm64
+
+# Set this to the target build configuration
+ENV BUILD_CONFIG=release
+
+# This is important for using apt-get
+USER root
+
+# Add architecture support for armhf and arm64
+COPY utils/arm-cross-compile-sources.list /etc/apt/sources.list.d/
+
+RUN sed -i 's/deb http/deb \[arch=amd64,i386\] http/' /etc/apt/sources.list && \
+    dpkg --add-architecture arm64 && \
+    dpkg --add-architecture armhf && \
+    apt-get update && \
+    apt-get install -y make git \
+        gcc-10-arm-linux-gnueabihf g++-10-arm-linux-gnueabihf \
+        libncursesw5:armhf libncursesw5-dev:armhf \
+        gcc-10-aarch64-linux-gnu g++-10-aarch64-linux-gnu \
+        libncursesw5:arm64 libncursesw5-dev:arm64 libmysqlclient-dev:arm64
+
+# Set build directory
+VOLUME /build
+WORKDIR /build
+
+# Copy entrypoint script
+COPY utils/docker-entrypoint-arm.sh /docker-entrypoint.sh
+
+# Set entrypoint
+ENTRYPOINT bash /docker-entrypoint.sh
