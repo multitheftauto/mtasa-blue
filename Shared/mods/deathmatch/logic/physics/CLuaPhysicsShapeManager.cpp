@@ -31,7 +31,3 @@ void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape, bool deleteFromLi
     
     delete pShape;
 }
-
-CLuaPhysicsShapeManager::~CLuaPhysicsShapeManager()
-{
-}

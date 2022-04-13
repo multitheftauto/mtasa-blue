@@ -33,9 +33,3 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody, bool 
 
     delete pRigidBody;
 }
-bool CLuaPhysicsRigidBodyManager::IsRigidBodyValid(CLuaPhysicsRigidBody* pRigidBody)
-{
-    assert(pRigidBody);
-
-    return ListContains(m_elementsList, pRigidBody);
-}
