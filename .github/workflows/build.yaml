@@ -83,7 +83,7 @@ jobs:
         run: brew link --overwrite mysql
 
       - name: Run Build
-        run: ./linux-build.sh BUILD_CONFIG=${{ matrix.type }}
+        run: ./linux-build.sh --config=${{ matrix.type }}
 
   linux:
     strategy:
@@ -103,4 +103,4 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Run Build
-        run: ./linux-build.sh BUILD_ARCHITECTURE=${{ matrix.architecture }} BUILD_CONFIG=${{ matrix.type }}
+        run: ./linux-build.sh --arch=${{ matrix.architecture }} --config=${{ matrix.type }}
