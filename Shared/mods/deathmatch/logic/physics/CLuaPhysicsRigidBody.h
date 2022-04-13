@@ -19,8 +19,7 @@ class CLuaPhysicsRigidBody;
 class CLuaPhysicsRigidBody : public CLuaPhysicsWorldElement
 {
 public:
-    CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
-    ~CLuaPhysicsRigidBody();
+    CLuaPhysicsRigidBody(CLuaPhysicsShape* pPhysicsShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass);
 
     void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;

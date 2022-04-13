@@ -11,9 +11,9 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsShape::CLuaPhysicsShape(btCollisionShape* pShape) : CLuaPhysicsElement(EIdClass::SHAPE)
+CLuaPhysicsShape::CLuaPhysicsShape(btCollisionShape* pBtShape) : CLuaPhysicsElement(EIdClass::SHAPE)
 {
-    m_pBtShape.reset(pShape);
+    m_pBtShape.reset(pBtShape);
     m_pBtShape->setUserPointer((void*)this);
     m_pBtShape->setUserIndex(EIdClass::SHAPE);
 }

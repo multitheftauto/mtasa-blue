@@ -14,7 +14,3 @@
 CLuaPhysicsWorldElement::CLuaPhysicsWorldElement(EIdClass::EIdClassType classType) : CLuaPhysicsElement(classType)
 {
 }
-
-CLuaPhysicsWorldElement::~CLuaPhysicsWorldElement()
-{
-}

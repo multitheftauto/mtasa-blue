@@ -19,10 +19,9 @@ class CPhysicsStaticCollisionProxy;
 class CPhysicsStaticCollisionProxy : public CPhysicsProxyElement, public btCollisionObject
 {
 public:
-    CPhysicsStaticCollisionProxy(){};
-    ~CPhysicsStaticCollisionProxy();
+    CPhysicsStaticCollisionProxy(CLuaPhysicsShape* pPhysicsShape);
 
-    static std::unique_ptr<CPhysicsStaticCollisionProxy> New(CLuaPhysicsShape* pShape);
+    static std::unique_ptr<CPhysicsStaticCollisionProxy> New(CLuaPhysicsShape* pPhysicsShape);
     void SetEnabled(bool bEnabled);
     bool IsEnabled() const { return m_bEnabled; }
 };

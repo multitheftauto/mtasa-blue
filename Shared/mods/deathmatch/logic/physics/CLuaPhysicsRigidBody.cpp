@@ -11,19 +11,15 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-    : CLuaPhysicsWorldElement(EIdClass::RIGID_BODY), m_pShape(pShape)
+CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pPhysicsShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+    : CLuaPhysicsWorldElement(EIdClass::RIGID_BODY), m_pShape(pPhysicsShape)
 {
     m_pMotionState = std::make_unique<MotionState>();
 
     m_pRigidBodyProxy = CPhysicsRigidBodyProxy::New(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, m_pMotionState.get());
     m_pRigidBodyProxy->setUserPointer((void*)this);
     m_pRigidBodyProxy->setUserIndex(EIdClass::RIGID_BODY);
-    pShape->AddRigidBody(this);
-}
-
-CLuaPhysicsRigidBody::~CLuaPhysicsRigidBody()
-{
+    pPhysicsShape->AddRigidBody(this);
 }
 
 void CLuaPhysicsRigidBody::SetPosition(CVector vecPosition)
@@ -61,8 +57,8 @@ const CVector CLuaPhysicsRigidBody::GetRotation() const
 
 void CLuaPhysicsRigidBody::SetVelocity(CVector vecVelocity)
 {
-    m_pRigidBodyProxy->activate(true);
     m_pRigidBodyProxy->setLinearVelocity(CPhysicsSharedLogic::ConvertVector(vecVelocity));
+    m_pRigidBodyProxy->activate(true);
 }
 
 CVector CLuaPhysicsRigidBody::GetVelocity()
@@ -72,8 +68,8 @@ CVector CLuaPhysicsRigidBody::GetVelocity()
 
 void CLuaPhysicsRigidBody::SetAngularVelocity(CVector vecVelocity)
 {
-    m_pRigidBodyProxy->activate(true);
     m_pRigidBodyProxy->setAngularVelocity(CPhysicsSharedLogic::ConvertVector(vecVelocity));
+    m_pRigidBodyProxy->activate(true);
 }
 
 CVector CLuaPhysicsRigidBody::GetAngularVelocity()

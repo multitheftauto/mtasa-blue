@@ -21,5 +21,5 @@ public:
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConvexShape; }
 
 protected:
-    CLuaPhysicsConvexShape(btCollisionShape* pShape);
+    CLuaPhysicsConvexShape(btCollisionShape* pBtShape);
 };

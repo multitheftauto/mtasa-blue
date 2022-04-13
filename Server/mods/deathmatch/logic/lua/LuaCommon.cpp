@@ -148,12 +148,12 @@ void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pStat
     lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pStaticCollision->GetScriptID()));
 }
 
-void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pShape)
+void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pPhysicsShape)
 {
     const char* szClass = nullptr;
     CLuaMain*   pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pShape->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pPhysicsShape->GetScriptID()));
 }
 
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)

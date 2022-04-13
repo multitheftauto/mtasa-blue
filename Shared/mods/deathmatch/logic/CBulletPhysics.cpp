@@ -83,9 +83,9 @@ void CBulletPhysics::StepSimulation()
     m_pDynamicsWorld->stepSimulation(((float)m_fDeltaTime) / 1000.0f * m_fSpeed, m_iSubSteps, 1.0f / 60.0f);
 }
 
-CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pShape)
+CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsShape* pPhysicsShape)
 {
-    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pShape);
+    CLuaPhysicsStaticCollision* pStaticCollision = new CLuaPhysicsStaticCollision(pPhysicsShape);
     m_pLuaPhysicsStaticCollisionManager->Add(pStaticCollision);
     pStaticCollision->SetEnabled(true);
     return pStaticCollision;
@@ -93,14 +93,14 @@ CLuaPhysicsStaticCollision* CBulletPhysics::CreateStaticCollision(CLuaPhysicsSha
 
 CLuaPhysicsBoxShape* CBulletPhysics::CreateBoxShape(CVector vector)
 {
-    CLuaPhysicsBoxShape* pShape = new CLuaPhysicsBoxShape(vector);
-    m_pLuaPhysicsShapeManager->Add(pShape);
-    return pShape;
+    CLuaPhysicsBoxShape* pPhysicsBoxShape = new CLuaPhysicsBoxShape(vector);
+    m_pLuaPhysicsShapeManager->Add(pPhysicsBoxShape);
+    return pPhysicsBoxShape;
 }
 
-CLuaPhysicsRigidBody* CBulletPhysics::CreateRigidBody(CLuaPhysicsShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+CLuaPhysicsRigidBody* CBulletPhysics::CreateRigidBody(CLuaPhysicsShape* pPhysicsShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
-    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    CLuaPhysicsRigidBody* pRigidBody = new CLuaPhysicsRigidBody(pPhysicsShape, fMass, vecLocalInertia, vecCenterOfMass);
     m_pLuaPhysicsRigidBodyManager->Add(pRigidBody);
     pRigidBody->SetEnabled(true);
     return pRigidBody;

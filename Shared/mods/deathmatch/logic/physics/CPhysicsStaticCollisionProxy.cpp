@@ -11,17 +11,15 @@
 
 #include "StdInc.h"
 
-std::unique_ptr<CPhysicsStaticCollisionProxy> CPhysicsStaticCollisionProxy::New(CLuaPhysicsShape* pShape)
+CPhysicsStaticCollisionProxy::CPhysicsStaticCollisionProxy(CLuaPhysicsShape* pPhysicsShape)
 {
-    std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject = std::make_unique<CPhysicsStaticCollisionProxy>();
-    m_btCollisionObject->setCollisionShape(pShape->InternalGetBtShape());
-    return std::move(m_btCollisionObject);
+    setCollisionShape(pPhysicsShape->InternalGetBtShape());
 }
 
-CPhysicsStaticCollisionProxy::~CPhysicsStaticCollisionProxy()
+std::unique_ptr<CPhysicsStaticCollisionProxy> CPhysicsStaticCollisionProxy::New(CLuaPhysicsShape* pPhysicsShape)
 {
-    setCollisionShape(nullptr);            // don't destroy shape, only static collision
-    SetEnabled(false);
+    std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject = std::make_unique<CPhysicsStaticCollisionProxy>(pPhysicsShape);
+    return std::move(m_btCollisionObject);
 }
 
 void CPhysicsStaticCollisionProxy::SetEnabled(bool bEnabled)

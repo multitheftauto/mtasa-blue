@@ -21,7 +21,7 @@ class btCollisionShape;
 class CLuaPhysicsShape : public CLuaPhysicsElement, CShapeHolder<btCollisionShape>
 {
 protected:
-    CLuaPhysicsShape(btCollisionShape* pShape);
+    CLuaPhysicsShape(btCollisionShape* pBtShape);
 public:
     virtual ~CLuaPhysicsShape();
 

@@ -11,18 +11,14 @@
 
 #include <StdInc.h>
 
-CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape)
-    : CLuaPhysicsWorldElement(EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pShape))
+CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pPhysicsShape)
+    : CLuaPhysicsWorldElement(EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pPhysicsShape))
 {
-    m_pShape = pShape;
+    m_pShape = pPhysicsShape;
 
     m_btCollisionObject->setUserPointer((void*)this);
     m_btCollisionObject->setUserIndex(EIdClass::STATIC_COLLISION);
-    pShape->AddStaticCollision(this);
-}
-
-CLuaPhysicsStaticCollision::~CLuaPhysicsStaticCollision()
-{
+    pPhysicsShape->AddStaticCollision(this);
 }
 
 void CLuaPhysicsStaticCollision::SetPosition(CVector vecPosition)

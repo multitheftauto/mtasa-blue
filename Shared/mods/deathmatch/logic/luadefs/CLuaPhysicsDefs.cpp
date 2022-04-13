@@ -80,7 +80,7 @@ CLuaPhysicsShape* CLuaPhysicsDefs::PhysicsCreateBoxShape(lua_State* luaVM, std::
     return pBox;
 }
 
-CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector vecPosition,
+CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pPhysicsShape, CVector vecPosition,
                                                               std::optional<CVector> vecRotation, RigidBodyOptions options)
 {
     auto& pLuaMain = lua_getownercluamain(luaVM);
@@ -95,7 +95,7 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
     CVector vecLocalInertia = getOption(options, "localIntertia", CVector{0, 0, 0});
     CVector vecCenterOfMass = getOption(options, "centerOfMass", CVector{0, 0, 0});
 
-    auto pRigidBody = GetPhysics()->CreateRigidBody(pShape, fMass, vecLocalInertia, vecCenterOfMass);
+    auto pRigidBody = GetPhysics()->CreateRigidBody(pPhysicsShape, fMass, vecLocalInertia, vecCenterOfMass);
 
     pRigidBody->SetPosition(vecPosition);
     pRigidBody->SetRotation(vecRotation.value_or(CVector{0, 0, 0}));
@@ -103,11 +103,11 @@ CLuaPhysicsRigidBody* CLuaPhysicsDefs::PhysicsCreateRigidBody(lua_State* luaVM, 
     return pRigidBody;
 }
 
-CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector position,
+CLuaPhysicsStaticCollision* CLuaPhysicsDefs::PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pPhysicsShape, CVector position,
                                                                           std::optional<CVector> rotation)
 {
     auto&                       pLuaMain = lua_getownercluamain(luaVM);
-    CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pShape);
+    CLuaPhysicsStaticCollision* pStaticCollision = GetPhysics()->CreateStaticCollision(pPhysicsShape);
     pStaticCollision->SetPosition(position);
     pStaticCollision->SetRotation(rotation.value_or(CVector{0, 0, 0}));
     pStaticCollision->SetOwnedResource(pLuaMain.GetResource());

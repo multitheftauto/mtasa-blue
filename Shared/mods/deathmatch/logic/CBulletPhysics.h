@@ -44,8 +44,8 @@ public:
 
     std::vector<std::vector<float>> GetDebugLines(CVector vecPosition, float radius);
 
-    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pShape);
-    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
+    CLuaPhysicsStaticCollision* CreateStaticCollision(CLuaPhysicsShape* pPhysicsShape);
+    CLuaPhysicsRigidBody*       CreateRigidBody(CLuaPhysicsShape* pPhysicsShape, float fMass = BulletPhysics::Defaults::RigidBodyMass,
                                                 CVector vecLocalInertia = CVector{0, 0, 0}, CVector vecCenterOfMass = CVector{0, 0, 0});
 
     CLuaPhysicsBoxShape* CreateBoxShape(CVector vector);

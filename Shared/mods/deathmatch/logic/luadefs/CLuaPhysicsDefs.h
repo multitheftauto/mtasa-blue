@@ -23,9 +23,10 @@ public:
     static void            AddClass(lua_State* luaVM);
 
     static bool                  IsPhysicsElement(lua_State* luaVM);
-    static CLuaPhysicsRigidBody* PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector vecPosition, std::optional<CVector> vecRotation,
+    static CLuaPhysicsRigidBody*       PhysicsCreateRigidBody(lua_State* luaVM, CLuaPhysicsShape* pPhysicsShape, CVector vecPosition,
+                                                              std::optional<CVector> vecRotation,
                                                         RigidBodyOptions options);
-    static CLuaPhysicsStaticCollision* PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pShape, CVector position,
+    static CLuaPhysicsStaticCollision* PhysicsCreateStaticCollision(lua_State* luaVM, CLuaPhysicsShape* pPhysicsShape, CVector position,
                                                                     std::optional<CVector> rotation);
     static CLuaPhysicsShape*           PhysicsCreateBoxShape(lua_State* luaVM, std::variant<CVector, float> variant);
 #ifdef MTA_CLIENT

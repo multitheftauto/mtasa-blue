@@ -12,22 +12,22 @@
 #include <StdInc.h>
 #include "CLuaPhysicsShapeManager.h"
 
-void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pShape, bool deleteFromList)
+void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pPhysicsShape, bool deleteFromList)
 {
-    assert(pShape);
+    assert(pPhysicsShape);
 
     // Check if already removed
-    if (!ListContains(m_elementsList, pShape))
+    if (!ListContains(m_elementsList, pPhysicsShape))
         return;
 
 #ifdef MTA_CLIENT
-    g_pClientGame->GetPhysics()->DestroyShape(pShape);
+    g_pClientGame->GetPhysics()->DestroyShape(pPhysicsShape);
 #else
-    g_pGame->GetPhysics()->DestroyShape(pShape);
+    g_pGame->GetPhysics()->DestroyShape(pPhysicsShape);
 #endif
 
     if (deleteFromList)
-        ListRemove(m_elementsList, pShape);
+        ListRemove(m_elementsList, pPhysicsShape);
     
-    delete pShape;
+    delete pPhysicsShape;
 }

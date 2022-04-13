@@ -18,7 +18,6 @@ class CLuaPhysicsWorldElement : public CLuaPhysicsElement
 {
 protected:
     CLuaPhysicsWorldElement(EIdClass::EIdClassType classType);
-    ~CLuaPhysicsWorldElement();
 
 public:
     virtual void               SetPosition(CVector vecPosition) = 0;

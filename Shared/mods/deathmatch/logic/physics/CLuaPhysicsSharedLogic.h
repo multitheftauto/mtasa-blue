@@ -15,9 +15,9 @@ public:
     static CVector GetPosition(btCollisionObject* pCollisionObject);
     static CVector GetRotation(btCollisionObject* pCollisionObject);
 
-    static btBoxShape* CreateBox(const CVector half, const CVector vecPosition = CVector{0, 0, 0}, const CVector vecRotation = CVector{0, 0, 0});
+    static btBoxShape* CreateBox(const CVector half);
 
-    static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pShape, const float fMass, const CVector vecLocalInertia,
+    static std::unique_ptr<btRigidBody> CreateRigidBody(btCollisionShape* pBtShape, const float fMass, const CVector vecLocalInertia,
                                                         const CVector vecCenterOfMass);
 
     static void EulerToQuaternion(const btVector3& rotation, btQuaternion& result);

@@ -17,8 +17,7 @@
 class CLuaPhysicsStaticCollision : public CLuaPhysicsWorldElement
 {
 public:
-    CLuaPhysicsStaticCollision(CLuaPhysicsShape* pShape);
-    ~CLuaPhysicsStaticCollision();
+    CLuaPhysicsStaticCollision(CLuaPhysicsShape* pPhysicsShape);
 
     void          SetPosition(CVector vecPosition);
     const CVector GetPosition() const;

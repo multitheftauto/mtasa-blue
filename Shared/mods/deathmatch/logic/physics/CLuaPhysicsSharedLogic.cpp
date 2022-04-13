@@ -27,51 +27,46 @@ void CPhysicsSharedLogic::SetPosition(btTransform& transform, const CVector vecP
 
 void CPhysicsSharedLogic::SetRotation(btCollisionObject* pCollisionObject, const CVector vecRotation)
 {
-    btTransform transform = pCollisionObject->getWorldTransform();
+    btTransform& transform = pCollisionObject->getWorldTransform();
     SetRotation(transform, vecRotation);
     pCollisionObject->setWorldTransform(transform);
 }
 
 void CPhysicsSharedLogic::SetPosition(btCollisionObject* pCollisionObject, const CVector vecPosition)
 {
-    btTransform transform = pCollisionObject->getWorldTransform();
+    btTransform& transform = pCollisionObject->getWorldTransform();
     SetPosition(transform, vecPosition);
     pCollisionObject->setWorldTransform(transform);
 }
 
 CVector CPhysicsSharedLogic::GetRotation(btCollisionObject* pCollisionObject)
 {
-    btTransform transform = pCollisionObject->getWorldTransform();
+    btTransform& transform = pCollisionObject->getWorldTransform();
     return GetRotation(transform);
 }
 
 CVector CPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject)
 {
-    btTransform transform = pCollisionObject->getWorldTransform();
+    btTransform& transform = pCollisionObject->getWorldTransform();
     return GetPosition(transform);
 }
 
-btBoxShape* CPhysicsSharedLogic::CreateBox(const CVector half, const CVector vecPosition, const CVector vecRotation)
+btBoxShape* CPhysicsSharedLogic::CreateBox(const CVector half)
 {
     btBoxShape* pBoxShape = new btBoxShape(ConvertVector(half));
-    btTransform transform = btTransform::getIdentity();
-
-    CPhysicsSharedLogic::SetPosition(transform, vecPosition);
-    CPhysicsSharedLogic::SetRotation(transform, vecRotation);
 
     return pBoxShape;
 }
 
-std::unique_ptr<btRigidBody> CPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
+std::unique_ptr<btRigidBody> CPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pBtShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
 {
-    btTransform           transform = btTransform::getIdentity();
-    btDefaultMotionState* motionstate = new btDefaultMotionState(transform);
-    motionstate->m_centerOfMassOffset.setOrigin(btVector3(vecCenterOfMass.fX, vecCenterOfMass.fY, vecCenterOfMass.fZ));
+    btDefaultMotionState* motionstate = new btDefaultMotionState(btTransform::getIdentity());
+    motionstate->m_centerOfMassOffset.setOrigin(ConvertVector(vecCenterOfMass));
 
     btVector3 localInertia(vecLocalInertia.fX, vecLocalInertia.fY, vecLocalInertia.fZ);
-    pShape->calculateLocalInertia(fMass, localInertia);
+    pBtShape->calculateLocalInertia(fMass, localInertia);
 
-    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pShape, localInertia);
+    btRigidBody::btRigidBodyConstructionInfo rigidBodyCI(fMass, motionstate, pBtShape, localInertia);
     std::unique_ptr<btRigidBody>             pRigidBody = std::make_unique<btRigidBody>(rigidBodyCI);
     return std::move(pRigidBody);
 }
