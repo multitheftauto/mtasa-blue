@@ -23,7 +23,6 @@ newoption {
 
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
-	platforms { "x86", "x64", "armhf", "arm64" }
 
 	if os.host() == "macosx" then
 		platforms { "x64" }
