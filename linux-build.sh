@@ -1,5 +1,9 @@
 #!/bin/bash -e
 
+# Set variable defaults
+: ${BUILD_ARCHITECTURE:=x64}
+: ${BUILD_CONFIG:=release}
+
 # Find premake binary location
 if [ "$(uname)" == "Darwin" ]; then
     PREMAKE5=utils/premake5-macos
