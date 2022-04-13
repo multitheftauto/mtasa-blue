@@ -86,7 +86,6 @@ private:
     CTickCount m_LastTimeMs;
     float      m_fSpeed = 1.0f;
     int        m_iSubSteps = 10;
-    bool       m_bSimulationEnabled = false;
     float      m_fDeltaTime;
 
     std::unique_ptr<CLuaPhysicsRigidBodyManager>       m_pLuaPhysicsRigidBodyManager;

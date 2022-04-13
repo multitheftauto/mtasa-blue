@@ -1,3 +1,14 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/logic/lua/CLuaPhysicsShapeManager.cpp
+ *  PURPOSE:     Physics shared logic with utility functions
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
 
 void CPhysicsSharedLogic::SetRotation(btTransform& transform, CVector vecRotation)

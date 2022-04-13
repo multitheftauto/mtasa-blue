@@ -14,7 +14,7 @@
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pPhysicsShape)
     : CLuaPhysicsWorldElement(EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pPhysicsShape))
 {
-    m_pShape = pPhysicsShape;
+    m_pPhysicsShape = pPhysicsShape;
 
     m_btCollisionObject->setUserPointer((void*)this);
     m_btCollisionObject->setUserIndex(EIdClass::STATIC_COLLISION);
@@ -51,6 +51,6 @@ const CVector CLuaPhysicsStaticCollision::GetRotation() const
 
 void CLuaPhysicsStaticCollision::Unlink()
 {
-    m_pShape->RemoveStaticCollision(this);
+    m_pPhysicsShape->RemoveStaticCollision(this);
     m_btCollisionObject->setCollisionShape(nullptr);
 }

@@ -28,7 +28,6 @@ CBulletPhysics::CBulletPhysics()
 
     m_pDynamicsWorld->setGravity(CPhysicsSharedLogic::ConvertVector(BulletPhysics::Defaults::Gravity));
     m_pDynamicsWorld->setDebugDrawer(m_pDebugDrawer.get());
-    m_bSimulationEnabled = true;
 
     m_pLuaPhysicsRigidBodyManager = std::make_unique<CLuaPhysicsRigidBodyManager>();
     m_pLuaPhysicsStaticCollisionManager = std::make_unique<CLuaPhysicsStaticCollisionManager>();
@@ -58,13 +57,13 @@ void CBulletPhysics::RemoveRigidBody(CPhysicsRigidBodyProxy* pRigidBodyProxy) co
 void CBulletPhysics::DestroyStaticCollision(CLuaPhysicsStaticCollision* pStaticCollision)
 {
     pStaticCollision->Unlink();
-    RemoveStaticCollision(pStaticCollision->GetBtCollisionObject());
+    RemoveStaticCollision(pStaticCollision->GetCollisionObject());
 }
 
 void CBulletPhysics::DestroyRigidBody(CLuaPhysicsRigidBody* pLuaRigidBody)
 {
     pLuaRigidBody->Unlink();
-    RemoveRigidBody(pLuaRigidBody->GetBtRigidBody());
+    RemoveRigidBody(pLuaRigidBody->GetCollisionObject());
 }
 
 void CBulletPhysics::DestroyShape(CLuaPhysicsShape* pLuaShape)

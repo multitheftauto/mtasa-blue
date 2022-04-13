@@ -19,7 +19,6 @@ class CLuaPhysicsBoxShape : public CLuaPhysicsConvexShape, CShapeHolder<btBoxSha
 
 public:
     CLuaPhysicsBoxShape(CVector half);
-    void    Update() {}
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::BoxShape; }
     btBoxShape*                 GetBtShape() const { return (btBoxShape*)InternalGetBtShape(); }

@@ -12,11 +12,11 @@
 #include <StdInc.h>
 
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pPhysicsShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
-    : CLuaPhysicsWorldElement(EIdClass::RIGID_BODY), m_pShape(pPhysicsShape)
+    : CLuaPhysicsWorldElement(EIdClass::RIGID_BODY), m_pPhysicsShape(pPhysicsShape)
 {
     m_pMotionState = std::make_unique<MotionState>();
 
-    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::New(m_pShape, fMass, vecLocalInertia, vecCenterOfMass, m_pMotionState.get());
+    m_pRigidBodyProxy = CPhysicsRigidBodyProxy::New(m_pPhysicsShape, fMass, vecLocalInertia, vecCenterOfMass, m_pMotionState.get());
     m_pRigidBodyProxy->setUserPointer((void*)this);
     m_pRigidBodyProxy->setUserIndex(EIdClass::RIGID_BODY);
     pPhysicsShape->AddRigidBody(this);
@@ -79,6 +79,6 @@ CVector CLuaPhysicsRigidBody::GetAngularVelocity()
 
 void CLuaPhysicsRigidBody::Unlink()
 {
-    m_pShape->RemoveRigidBody(this);
+    m_pPhysicsShape->RemoveRigidBody(this);
     m_pRigidBodyProxy->setCollisionShape(nullptr);
 }

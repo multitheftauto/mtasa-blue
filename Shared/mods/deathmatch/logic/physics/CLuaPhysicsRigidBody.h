@@ -31,12 +31,9 @@ public:
     void    SetAngularVelocity(CVector vecVelocity);
     CVector GetAngularVelocity();
 
-    CPhysicsRigidBodyProxy* GetBtRigidBody() const { return m_pRigidBodyProxy.get(); }
-
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::RigidBody; }
 
-    CLuaPhysicsShape*  GetShape() const { return m_pShape; }
-    btCollisionObject* GetBtCollisionObject() const { return m_pRigidBodyProxy.get(); }
+    CPhysicsRigidBodyProxy* GetCollisionObject() const { return m_pRigidBodyProxy.get(); }
 
     // Set's whatever rigid body is added to physics world
     void SetEnabled(bool bEnabled) { m_pRigidBodyProxy->SetEnabled(bEnabled); }
@@ -47,6 +44,6 @@ public:
 
 private:
     std::unique_ptr<CPhysicsRigidBodyProxy> m_pRigidBodyProxy;
-    CLuaPhysicsShape*                       m_pShape = nullptr;
+    CLuaPhysicsShape*                       m_pPhysicsShape = nullptr;
     std::unique_ptr<MotionState>            m_pMotionState;            // Thread safe
 };

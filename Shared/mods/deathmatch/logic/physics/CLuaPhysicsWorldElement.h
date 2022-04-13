@@ -24,7 +24,6 @@ public:
     virtual const CVector      GetPosition() const = 0;
     virtual void               SetRotation(CVector vecRotation) = 0;
     virtual const CVector      GetRotation() const = 0;
-    virtual btCollisionObject* GetBtCollisionObject() const = 0;
 
     virtual ePhysicsElementType GetType() const { return ePhysicsElementType::WorldElement; }
 

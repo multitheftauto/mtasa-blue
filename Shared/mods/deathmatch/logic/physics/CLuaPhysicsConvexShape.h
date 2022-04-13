@@ -17,9 +17,9 @@ class CLuaPhysicsConvexShape;
 
 class CLuaPhysicsConvexShape : public CLuaPhysicsShape
 {
-public:
-    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConvexShape; }
-
 protected:
     CLuaPhysicsConvexShape(btCollisionShape* pBtShape);
+
+public:
+    virtual ePhysicsElementType GetType() const { return ePhysicsElementType::ConvexShape; }
 };

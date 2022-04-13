@@ -26,9 +26,7 @@ public:
 
     void Unlink();
 
-    btCollisionObject*            GetBtCollisionObject() const { return m_btCollisionObject.get(); }
     CPhysicsStaticCollisionProxy* GetCollisionObject() const { return m_btCollisionObject.get(); }
-    CLuaPhysicsShape*             GetShape() const { return m_pShape; }
     virtual ePhysicsElementType   GetType() const { return ePhysicsElementType::StaticCollision; }
 
     // Set's whatever static collision is added to physics world
@@ -38,5 +36,5 @@ public:
 
 private:
     std::unique_ptr<CPhysicsStaticCollisionProxy> m_btCollisionObject;
-    CLuaPhysicsShape*                             m_pShape;
+    CLuaPhysicsShape*                             m_pPhysicsShape;
 };
