@@ -64,9 +64,7 @@ CVector CPhysicsSharedLogic::GetPosition(btCollisionObject* pCollisionObject)
 
 btBoxShape* CPhysicsSharedLogic::CreateBox(const CVector half)
 {
-    btBoxShape* pBoxShape = new btBoxShape(ConvertVector(half));
-
-    return pBoxShape;
+    return new btBoxShape(ConvertVector(half));
 }
 
 std::unique_ptr<btRigidBody> CPhysicsSharedLogic::CreateRigidBody(btCollisionShape* pBtShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)

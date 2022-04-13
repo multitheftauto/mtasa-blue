@@ -273,10 +273,6 @@ struct CLuaFunctionParserBase
             }
             return true;
         }
-
-        if constexpr (std::is_same_v<T, std::shared_ptr<CLuaPhysicsShape>>)
-            return iArgument == LUA_TLIGHTUSERDATA;
-
         // Catch all for class pointer types, assume all classes are valid script entities
         // and can be fetched from a userdata
         if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
