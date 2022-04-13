@@ -473,6 +473,10 @@ enum class eBitStreamVersion : unsigned short
     // 2021-08-30 0x75
     OnPlayerResourceStart,
 
+    // Remove "old" Discord implementation (#2499)
+    // 2022-01-16 0x76
+    Discord_Cleanup,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

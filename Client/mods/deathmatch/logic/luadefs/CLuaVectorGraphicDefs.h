@@ -20,16 +20,19 @@ public:
     static CClientVectorGraphic* SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData,
                                            std::optional<CLuaFunctionRef> luaFunctionRef);
 
-    static CXMLNode* SVGGetDocumentXML(CClientVectorGraphic* pVectorGraphic);
-    static bool      SVGSetDocumentXML(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode, std::optional<CLuaFunctionRef> luaFunctionRef);
+    static CXMLNode* SVGGetDocumentXML(CClientVectorGraphic* vectorGraphic);
+    static bool      SVGSetDocumentXML(CClientVectorGraphic* vectorGraphic, CXMLNode* xmlNode, std::optional<CLuaFunctionRef> luaFunctionRef);
 
-    static CLuaMultiReturn<int, int> SVGGetSize(CClientVectorGraphic* pVectorGraphic);
-    static bool                      SVGSetSize(CClientVectorGraphic* pVectorGraphic, CVector2D size, std::optional<CLuaFunctionRef> luaFunctionRef);
+    static CLuaMultiReturn<int, int> SVGGetSize(CClientVectorGraphic* vectorGraphic);
+    static bool                      SVGSetSize(CClientVectorGraphic* vectorGraphic, CVector2D size, std::optional<CLuaFunctionRef> luaFunctionRef);
 
 private:
-    static bool LoadFromData(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, std::string strRawData);
-    static bool LoadFromFile(lua_State* luaVM, CClientVectorGraphic* pVectorGraphic, CScriptFile* pFile, std::string strPath, CResource* pParentResource);
+    static bool LoadFromData(lua_State* luaVM, CClientVectorGraphic* vectorGraphic, std::string rawData);
+    static bool LoadFromFile(lua_State* luaVM, CClientVectorGraphic* vectorGraphic, CScriptFile* file, std::string path, CResource* parentResource);
 
-    static bool SetDocument(CClientVectorGraphic* pVectorGraphic, CXMLNode* pXMLNode);
-    static bool SetSize(CClientVectorGraphic* pVectorGraphic, CVector2D size);
+    static bool SetDocument(CClientVectorGraphic* vectorGraphic, CXMLNode* xmlNode);
+    static bool SetSize(CClientVectorGraphic* vectorGraphic, CVector2D size);
+
+    static bool                                SVGSetUpdateCallback(CClientVectorGraphic* vectorGraphic, std::variant<CLuaFunctionRef, bool> luaFunctionRef);
+    static std::variant<CLuaFunctionRef, bool> SVGGetUpdateCallback(CClientVectorGraphic* vectorGraphic);
 };

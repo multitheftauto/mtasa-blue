@@ -188,7 +188,7 @@ Path Parser::parsePath(const std::string& string)
         case 'M':
         case 'm':
             if(!parseNumberList(ptr, end, c, 2))
-                break;
+                return path;
 
             if(command == 'm')
             {
@@ -204,7 +204,7 @@ Path Parser::parsePath(const std::string& string)
         case 'L':
         case 'l':
             if(!parseNumberList(ptr, end, c, 2))
-                break;
+                return path;
 
             if(command == 'l')
             {
@@ -219,7 +219,7 @@ Path Parser::parsePath(const std::string& string)
         case 'Q':
         case 'q':
             if(!parseNumberList(ptr, end, c, 4))
-                break;
+                return path;
 
             if(command == 'q')
             {
@@ -238,7 +238,7 @@ Path Parser::parsePath(const std::string& string)
         case 'C':
         case 'c':
             if(!parseNumberList(ptr, end, c, 6))
-                break;
+                return path;
 
             if(command == 'c')
             {
@@ -261,7 +261,7 @@ Path Parser::parsePath(const std::string& string)
             c[0] = 2 * currentPoint.x - controlPoint.x;
             c[1] = 2 * currentPoint.y - controlPoint.y;
             if(!parseNumberList(ptr, end, c + 2, 2))
-                break;
+                return path;
 
             if(command == 't')
             {
@@ -280,7 +280,7 @@ Path Parser::parsePath(const std::string& string)
             c[0] = 2 * currentPoint.x - controlPoint.x;
             c[1] = 2 * currentPoint.y - controlPoint.y;
             if(!parseNumberList(ptr, end, c + 2, 4))
-                break;
+                return path;
 
             if(command == 's')
             {
@@ -299,7 +299,7 @@ Path Parser::parsePath(const std::string& string)
         case 'H':
         case 'h':
             if(!parseNumberList(ptr, end, c, 1))
-                break;
+                return path;
 
             if(command == 'h')
                c[0] += currentPoint.x;
@@ -310,7 +310,7 @@ Path Parser::parsePath(const std::string& string)
         case 'V':
         case 'v':
             if(!parseNumberList(ptr, end, c + 1, 1))
-                break;
+                return path;
 
             if(command == 'v')
                c[1] += currentPoint.y;
@@ -324,7 +324,7 @@ Path Parser::parsePath(const std::string& string)
                     || !parseArcFlag(ptr, end, f[0])
                     || !parseArcFlag(ptr, end, f[1])
                     || !parseNumberList(ptr, end, c + 3, 2))
-                break;
+                return path;
 
             if(command == 'a')
             {
@@ -343,7 +343,7 @@ Path Parser::parsePath(const std::string& string)
             currentPoint.y = controlPoint.y = startPoint.y;
             break;
         default:
-            break;
+            return path;
         }
 
         Utils::skipWsComma(ptr, end);
