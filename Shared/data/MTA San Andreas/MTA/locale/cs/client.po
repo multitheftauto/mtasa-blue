@@ -445,7 +445,7 @@ msgstr "Pohled dozadu"
 
 #: ..\Client\core\CKeyBinds.cpp:197
 msgid "Crouch"
-msgstr "Zkrčení"
+msgstr "Skrčení"
 
 #: ..\Client\core\CKeyBinds.cpp:198
 msgid "Action"
@@ -490,11 +490,11 @@ msgstr "Brzda/Zpátečka"
 
 #: ..\Client\core\CKeyBinds.cpp:208
 msgid "Radio next"
-msgstr "Další rádio"
+msgstr "Další stanice"
 
 #: ..\Client\core\CKeyBinds.cpp:209
 msgid "Radio previous"
-msgstr "Předchozí rádio"
+msgstr "Předchozí stanice"
 
 #: ..\Client\core\CKeyBinds.cpp:210
 msgid "Radio user track skip"
