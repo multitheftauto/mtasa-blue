@@ -20,8 +20,6 @@ void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody, bool 
     if (!ListContains(m_elementsList, pRigidBody))
         return;
 
-    // Remove all references
-
 #ifdef MTA_CLIENT
     g_pClientGame->GetPhysics()->DestroyRigidBody(pRigidBody);
 #else

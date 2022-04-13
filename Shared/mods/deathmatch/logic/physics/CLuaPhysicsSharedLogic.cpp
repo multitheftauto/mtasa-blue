@@ -178,15 +178,6 @@ void CPhysicsSharedLogic::CheckPrimitiveSize(const CVector vector)
     CheckMaximumPrimitiveSize(vector);
 }
 
-//
-//    CVector(const btVector3& other) : fX(other.x()), fY(other.y()), fZ(other.z())
-//{
-//}
-//operator btVector3() const
-//{
-//    return btVector3{fX, fY, fZ};
-//}
-
 CVector CPhysicsSharedLogic::ConvertVector(const btVector3& vector)
 {
     return CVector(vector.x(), vector.y(), vector.z());

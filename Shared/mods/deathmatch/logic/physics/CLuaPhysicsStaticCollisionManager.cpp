@@ -20,8 +20,6 @@ void CLuaPhysicsStaticCollisionManager::Remove(CLuaPhysicsStaticCollision* pLuaS
     if (!ListContains(m_elementsList, pLuaStaticCollision))
         return;
 
-    // Remove all references
-    pLuaStaticCollision->Unlink();
 #ifdef MTA_CLIENT
     g_pClientGame->GetPhysics()->DestroyStaticCollision(pLuaStaticCollision);
 #else
