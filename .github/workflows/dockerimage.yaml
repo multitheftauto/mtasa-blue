@@ -8,9 +8,20 @@ on:
     - '.github/**'
     - 'utils/compat/**'
     - 'Dockerfile'
+    - 'Dockerfile.armhf'
+    - 'Dockerfile.arm64'
 
 jobs:
   build:
+    strategy:
+      matrix:
+        include:
+        - tag: latest
+          dockerfile: Dockerfile
+        - tag: armhf
+          dockerfile: Dockerfile.armhf
+        - tag: arm64
+          dockerfile: Dockerfile.arm64
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -23,5 +34,5 @@ jobs:
     - uses: docker/build-push-action@v2.2.1
       with:
         push: true
-        file: ./Dockerfile
-        tags: ghcr.io/multitheftauto/mtasa-blue-build:latest
+        file: ./${{ matrix.dockerfile }}
+        tags: ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.tag }}

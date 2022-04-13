@@ -82,29 +82,25 @@ jobs:
       - name: Link MySQL
         run: brew link --overwrite mysql
 
-      - name: Run Build [Release]
-        if: ${{ matrix.type == 'release' }}
-        run: ./linux-build.sh
-
-      - name: Run Build [Debug]
-        if: ${{ matrix.type == 'debug' }}
-        run: ./linux-build.sh "" debug
+      - name: Run Build
+        run: ./linux-build.sh BUILD_CONFIG=${{ matrix.type }}
 
   linux:
     strategy:
       matrix:
         type: [release, debug]
-    name: linux-${{ matrix.type }}
+        architecture: [x64, arm64]
+        include:
+        - architecture: x64
+          image-tag: latest
+        - architecture: arm64
+          image-tag: arm64
+    name: linux-${{ matrix.type }}-${{ matrix.architecture }}
     runs-on: ubuntu-latest
     container:
-      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
+      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
     steps:
       - uses: actions/checkout@v2
 
-      - name: Run Build [Release]
-        if: ${{ matrix.type == 'release' }}
-        run: ./linux-build.sh
-
-      - name: Run Build [Debug]
-        if: ${{ matrix.type == 'debug' }}
-        run: ./linux-build.sh "" debug
+      - name: Run Build
+        run: ./linux-build.sh BUILD_ARCHITECTURE=${{ matrix.architecture }} BUILD_CONFIG=${{ matrix.type }}

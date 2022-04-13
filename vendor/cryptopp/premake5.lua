@@ -206,7 +206,7 @@ project "cryptopp"
 	filter "system:macosx"
 		defines {"CRYPTOPP_DISABLE_ASM"}
 
-	filter { "options:arch=arm*" }
+	filter { "platforms:armhf or arm64" }
 		defines { "CRYPTOPP_DISABLE_ASM" }
 
 	filter "platforms:x64"
@@ -215,6 +215,6 @@ project "cryptopp"
 			"x64masm.asm"
 		}
 
-	filter {"system:windows"}
+	filter { "system:windows" }
 		linkoptions { "/ignore:4221" }
 		disablewarnings { "4005" }

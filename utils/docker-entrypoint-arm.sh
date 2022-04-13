@@ -12,10 +12,5 @@ if [ ! -f ./premake5.lua ]; then
     git clone --depth=1 https://github.com/multitheftauto/mtasa-blue.git .
 fi
 
-# Set the default build target
-if [ -z "$BUILD_CONFIG" ]; then
-    BUILD_CONFIG=release
-fi
-
 # Start manual building
-./linux-build-arm.sh --arch=$BUILD_ARCHITECTURE --config=$BUILD_CONFIG
+./linux-build.sh --arch=$BUILD_ARCHITECTURE --config=$BUILD_CONFIG
