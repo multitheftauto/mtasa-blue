@@ -11,7 +11,7 @@ jobs:
     name: windows-${{ matrix.type }}
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - uses: actions/cache@v1
         id: cache-dxfiles
@@ -73,7 +73,7 @@ jobs:
     name: macOS-${{ matrix.type }}
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install MySQL
         run: brew install mysql
@@ -100,7 +100,7 @@ jobs:
     container:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Run Build
         run: ./linux-build.sh --arch=${{ matrix.architecture }} --config=${{ matrix.type }}
