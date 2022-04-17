@@ -170,8 +170,8 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
             pTemp = new CPlayerNetworkStatusPacket;
             break;
 
-        case PACKET_ID_DISCORD_JOIN:
-            pTemp = new CDiscordJoinPacket;
+        case PACKET_ID_PLAYER_RESOURCE_START:
+            pTemp = new CPlayerResourceStartPacket;
             break;
 
         default:

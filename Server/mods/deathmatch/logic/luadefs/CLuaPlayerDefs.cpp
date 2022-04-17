@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaGenericDefs.h"
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -60,7 +61,6 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
         {"setPlayerMuted", SetPlayerMuted},
         {"setPlayerBlurLevel", SetPlayerBlurLevel},
-        {"setPlayerDiscordJoinParams", SetPlayerDiscordJoinParams},
         {"redirectPlayer", RedirectPlayer},
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
@@ -94,7 +94,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"showCursor", ShowCursor},
 
         // Chat funcs
-        {"showChat", ShowChat},
+        {"showChat", ArgumentParserWarn<false, ShowChat>},
 
         // Admin functions
         {"kickPlayer", KickPlayer},
@@ -132,7 +132,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "logOut", "logOut");
     lua_classfunction(luaVM, "toggleControl", "toggleControl");
     lua_classfunction(luaVM, "triggerEvent", "triggerClientEvent");
-    lua_classfunction(luaVM, "outputChat", "outputChatBox", CLuaFunctionDefs::OOP_OutputChatBox);
+    lua_classfunction(luaVM, "outputChat", "outputChatBox", ArgumentParserWarn<false, CLuaGenericDefs::OOP_OutputChatBox>);
 
     lua_classfunction(luaVM, "forceMap", "forcePlayerMap");
     lua_classfunction(luaVM, "fadeCamera", "fadeCamera");
@@ -140,7 +140,6 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setMuted", "setPlayerMuted");
     lua_classfunction(luaVM, "setName", "setPlayerName");
     lua_classfunction(luaVM, "setBlurLevel", "setPlayerBlurLevel");
-    lua_classfunction(luaVM, "setDiscordJoinParams", "setPlayerDiscordJoinParams");
     lua_classfunction(luaVM, "setWantedLevel", "setPlayerWantedLevel");
     lua_classfunction(luaVM, "setMoney", "setPlayerMoney");
     lua_classfunction(luaVM, "setNametagText", "setPlayerNametagText");
@@ -232,7 +231,7 @@ int CLuaPlayerDefs::CanPlayerUseFunction(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 {
     //  string getPlayerName ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -261,7 +260,7 @@ int CLuaPlayerDefs::GetPlayerName(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerIP(lua_State* luaVM)
 {
     //  string getPlayerIP ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -311,7 +310,7 @@ int CLuaPlayerDefs::GetPlayerVersion(lua_State* luaVM)
 int CLuaPlayerDefs::GetPlayerAccount(lua_State* luaVM)
 {
     //  account getPlayerAccount ( player thePlayer )
-    CElement* pElement; // player or console
+    CElement* pElement;            // player or console
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1154,38 +1153,6 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaPlayerDefs::SetPlayerDiscordJoinParams(lua_State* luaVM)
-{
-    CElement* pElement;
-    SString   strKey;
-    SString   strPartyId;
-    uint      uiPartySize;
-    uint      uiPartyMax;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strKey);
-    argStream.ReadString(strPartyId);
-    argStream.ReadNumber(uiPartySize);
-    argStream.ReadNumber(uiPartyMax);
-
-    if (!argStream.HasErrors())
-    {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-
-        if (CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(pElement, strKey, strPartyId, uiPartySize, uiPartyMax))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -2049,28 +2016,15 @@ int CLuaPlayerDefs::ShowCursor(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::ShowChat(lua_State* luaVM)
+bool CLuaPlayerDefs::ShowChat(CElement* pPlayer, bool bShow, std::optional<bool> optInputBlocked)
 {
-    CElement* pPlayer;
-    bool      bShow;
+    // Keep old behaviour: input is blocked when chat is hidden
+    bool bInputBlocked = !bShow;
+    if (optInputBlocked.has_value())
+        bInputBlocked = optInputBlocked.value();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-    argStream.ReadBool(bShow);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::ShowChat(pPlayer, bShow))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CStaticFunctionDefinitions::ShowChat(pPlayer, bShow, bInputBlocked);
+    return true;
 }
 
 int CLuaPlayerDefs::BanPlayer(lua_State* luaVM)

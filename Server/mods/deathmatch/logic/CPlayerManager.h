@@ -53,13 +53,13 @@ public:
     static void Broadcast(const CPacket& Packet, const std::vector<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::multimap<ushort, CPlayer*>& groupMap);
 
-    static bool IsValidPlayerModel(unsigned short usPlayerModel);
+    static bool IsValidPlayerModel(unsigned short model);
 
     void ClearElementData(CElement* pElement, const std::string& name);
     void ClearElementData(CElement* pElement);
 
-    void           ResetAll();
-    void           OnPlayerJoin(CPlayer* pPlayer);
+    void               ResetAll();
+    void               OnPlayerJoin(CPlayer* pPlayer);
     const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
 
 private:

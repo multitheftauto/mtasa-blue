@@ -52,16 +52,16 @@ public:
     void SetCorrectVector(const CVector& vector) { m_pCorrectVector = new CVector(vector.fX, vector.fY, vector.fZ); }
 
 private:
-    ElementID     m_PedID;              // The ped
-    ElementID     m_VehicleID;          // The vehicle
-    unsigned char m_ucSeat;             // The seat
-    unsigned char m_ucAction;           // The action, see CGame.h
-    ElementID     m_PedIn;              // The ped jacking
-    ElementID     m_PedOut;             // The ped getting jacked
-    unsigned char m_ucStartedJacking;   // 1 = client reports he started jacking
-    unsigned char m_ucFailReason;       // eFailReasons
-    CVector*      m_pCorrectVector;     // Ped position reported by client
-    bool          m_bOnWater;           // Vehicle in water reported by client
-    unsigned char m_ucDoor;             // Door ID
-    float         m_fDoorAngle;         // Door angle
+    ElementID     m_PedID;                       // The ped
+    ElementID     m_VehicleID;                   // The vehicle
+    unsigned char m_ucSeat;                      // The seat
+    unsigned char m_ucAction;                    // The action, see CGame.h
+    ElementID     m_PedIn;                       // The ped jacking
+    ElementID     m_PedOut;                      // The ped getting jacked
+    unsigned char m_ucStartedJacking;            // 1 = client reports he started jacking
+    unsigned char m_ucFailReason;                // eFailReasons
+    CVector*      m_pCorrectVector;              // Ped position reported by client
+    bool          m_bOnWater;                    // Vehicle in water reported by client
+    unsigned char m_ucDoor;                      // Door ID
+    float         m_fDoorAngle;                  // Door angle
 };

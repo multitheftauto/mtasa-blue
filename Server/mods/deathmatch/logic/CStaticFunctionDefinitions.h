@@ -145,7 +145,6 @@ public:
                             unsigned short usDimension, CTeam* pTeam = NULL);
     static bool SetPlayerMuted(CElement* pElement, bool bMuted);
     static bool SetPlayerBlurLevel(CElement* pElement, unsigned char ucLevel);
-    static bool SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax);
     static bool RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword);
     static bool SetPlayerName(CElement* pElement, const char* szName);
     static bool DetonateSatchels(CElement* pElement);
@@ -289,7 +288,7 @@ public:
 
     // Vehicle set functions
     static bool FixVehicle(CElement* pElement);
-    static bool BlowVehicle(CElement* pElement);
+    static bool BlowVehicle(CElement* pElement, std::optional<bool> withExplosion);
     static bool SetVehicleColor(CElement* pElement, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CElement* pElement, bool bLandingGearDown);
     static bool SetVehicleLocked(CElement* pElement, bool bLocked);
@@ -562,9 +561,9 @@ public:
                               CLuaMain* pLuaMain);
     static void OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
                               bool bColorCoded);
-    static bool OutputConsole(const char* szText, CElement* pElement);
+    static void OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
-    static bool ClearChatBox(CElement* pElement);
+    static void ClearChatBox(CElement* pElement);
 
     // General world get funcs
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMinute);
@@ -729,7 +728,7 @@ public:
     static bool ShowCursor(CElement* pElement, CLuaMain* pLuaMain, bool bShow, bool bToggleControls);
 
     // Chat funcs
-    static bool ShowChat(CElement* pElement, bool bShow);
+    static bool ShowChat(CElement* pElement, bool bShow, bool bInputBlocked);
 
     // Misc funcs
     static bool ResetMapInfo(CElement* pElement);

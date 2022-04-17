@@ -1096,7 +1096,7 @@ bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break; // This should not be possible, but you never know
+                break;            // This should not be possible, but you never know
         }
 
         return false;
@@ -1213,6 +1213,8 @@ unsigned int CClientEntity::GetTypeID(const char* szTypeName)
         return CCLIENTSOUND;
     else if (strcmp(szTypeName, "light") == 0)
         return CCLIENTPOINTLIGHTS;
+    else if (strcmp(szTypeName, "svg") == 0)
+        return CCLIENTVECTORGRAPHIC;
     else
         return CCLIENTUNKNOWN;
 }
@@ -1303,7 +1305,17 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     {
         pEntity->SetAreaCode(ucInterior);
     }
+
+    unsigned char ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
+
+    if (ucOldInterior != ucInterior)
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(ucOldInterior);
+        Arguments.PushNumber(ucInterior);
+        CallEvent("onClientElementInteriorChange", Arguments, true);
+    }
 }
 
 bool CClientEntity::IsOnScreen()

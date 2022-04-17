@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -34,17 +34,8 @@
 #error "We can't compile without select() or poll() support."
 #endif
 
-#if defined(__BEOS__) && !defined(__HAIKU__)
-/* BeOS has FD_SET defined in socket.h */
-#include <socket.h>
-#endif
-
 #ifdef MSDOS
 #include <dos.h>  /* delay() */
-#endif
-
-#ifdef __VXWORKS__
-#include <strings.h>  /* bzero() in FD_SET */
 #endif
 
 #include <curl/curl.h>
@@ -64,7 +55,7 @@
  * Waiting indefinitely with this function is not allowed, a
  * zero or negative timeout value will return immediately.
  * Timeout resolution, accuracy, as well as maximum supported
- * value is system dependent, neither factor is a citical issue
+ * value is system dependent, neither factor is a critical issue
  * for the intended use of this function in the library.
  *
  * Return values:
@@ -130,6 +121,7 @@ int Curl_wait_ms(timediff_t timeout_ms)
   return r;
 }
 
+#ifndef HAVE_POLL_FINE
 /*
  * This is a wrapper around select() to aid in Windows compatibility.
  * A negative timeout value makes this function wait indefinitely,
@@ -141,11 +133,11 @@ int Curl_wait_ms(timediff_t timeout_ms)
  *    0 = timeout
  *    N = number of signalled file descriptors
  */
-int Curl_select(curl_socket_t maxfd,   /* highest socket number */
-                fd_set *fds_read,      /* sockets ready for reading */
-                fd_set *fds_write,     /* sockets ready for writing */
-                fd_set *fds_err,       /* sockets with errors */
-                timediff_t timeout_ms) /* milliseconds to wait */
+static int our_select(curl_socket_t maxfd,   /* highest socket number */
+                      fd_set *fds_read,      /* sockets ready for reading */
+                      fd_set *fds_write,     /* sockets ready for writing */
+                      fd_set *fds_err,       /* sockets with errors */
+                      timediff_t timeout_ms) /* milliseconds to wait */
 {
   struct timeval pending_tv;
   struct timeval *ptimeout;
@@ -219,6 +211,8 @@ int Curl_select(curl_socket_t maxfd,   /* highest socket number */
   return select((int)maxfd + 1, fds_read, fds_write, fds_err, ptimeout);
 #endif
 }
+
+#endif
 
 /*
  * Wait for read or write events on a set of file descriptors. It uses poll()
@@ -412,7 +406,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
      curl_socket_t is unsigned in such cases and thus -1 is the largest
      value).
   */
-  r = Curl_select(maxfd, &fds_read, &fds_write, &fds_err, timeout_ms);
+  r = our_select(maxfd, &fds_read, &fds_write, &fds_err, timeout_ms);
   if(r <= 0)
     return r;
 
@@ -439,7 +433,7 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
       if(ufds[i].events & POLLPRI)
         ufds[i].revents |= POLLPRI;
     }
-    if(ufds[i].revents != 0)
+    if(ufds[i].revents)
       r++;
   }
 
@@ -447,23 +441,3 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
 
   return r;
 }
-
-#ifdef TPF
-/*
- * This is a replacement for select() on the TPF platform.
- * It is used whenever libcurl calls select().
- * The call below to tpf_process_signals() is required because
- * TPF's select calls are not signal interruptible.
- *
- * Return values are the same as select's.
- */
-int tpf_select_libcurl(int maxfds, fd_set *reads, fd_set *writes,
-                       fd_set *excepts, struct timeval *tv)
-{
-   int rc;
-
-   rc = tpf_select_bsd(maxfds, reads, writes, excepts, tv);
-   tpf_process_signals();
-   return rc;
-}
-#endif /* TPF */

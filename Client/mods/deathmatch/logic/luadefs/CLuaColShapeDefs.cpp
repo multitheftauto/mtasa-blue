@@ -14,29 +14,30 @@
 
 void CLuaColShapeDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createColCircle", CreateColCircle},
-        {"createColCuboid", CreateColCuboid},
-        {"createColSphere", CreateColSphere},
-        {"createColRectangle", CreateColRectangle},
-        {"createColPolygon", CreateColPolygon},
-        {"createColTube", CreateColTube},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"createColCircle", CreateColCircle},
+                                                                             {"createColCuboid", CreateColCuboid},
+                                                                             {"createColSphere", CreateColSphere},
+                                                                             {"createColRectangle", CreateColRectangle},
+                                                                             {"createColPolygon", CreateColPolygon},
+                                                                             {"createColTube", CreateColTube},
 
-        {"getColShapeRadius", GetColShapeRadius},
-        {"setColShapeRadius", SetColShapeRadius},
-        {"getColShapeSize", GetColShapeSize},
-        {"setColShapeSize", SetColShapeSize},
-        {"getColPolygonPoints", GetColPolygonPoints},
-        {"getColPolygonPointPosition", GetColPolygonPointPosition},
-        {"setColPolygonPointPosition", SetColPolygonPointPosition},
-        {"addColPolygonPoint", AddColPolygonPoint},
-        {"removeColPolygonPoint", RemoveColPolygonPoint},
+                                                                             {"getColShapeRadius", GetColShapeRadius},
+                                                                             {"setColShapeRadius", SetColShapeRadius},
+                                                                             {"getColShapeSize", GetColShapeSize},
+                                                                             {"setColShapeSize", SetColShapeSize},
+                                                                             {"getColPolygonPoints", GetColPolygonPoints},
+                                                                             {"getColPolygonPointPosition", GetColPolygonPointPosition},
+                                                                             {"setColPolygonPointPosition", SetColPolygonPointPosition},
+                                                                             {"addColPolygonPoint", AddColPolygonPoint},
+                                                                             {"removeColPolygonPoint", RemoveColPolygonPoint},
 
-        {"isInsideColShape", IsInsideColShape},
-        {"getColShapeType", GetColShapeType},
-        {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
-        {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
-    };
+                                                                             {"isInsideColShape", IsInsideColShape},
+                                                                             {"getColShapeType", GetColShapeType},
+                                                                             {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
+                                                                             {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
+
+                                                                             {"showCol", ArgumentParser<SetShowCollision>},
+                                                                             {"isShowCollisionsEnabled", ArgumentParser<IsShowCollisionsEnabled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -829,7 +830,7 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CClientColPolygon* pColPolygon, std::
     float fFloor, fCeil;
 
     if (std::holds_alternative<bool>(floor))
-        fFloor = std::numeric_limits<float>::min();
+        fFloor = std::numeric_limits<float>::lowest();
     else
         fFloor = std::get<float>(floor);
 
@@ -848,4 +849,18 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CClientColPolygon* pColPolygon, std::
     }
 
     return false;
+}
+
+bool CLuaColShapeDefs::SetShowCollision(bool state)
+{
+    if (!g_pClientGame->GetDevelopmentMode())
+        return false;
+
+    g_pClientGame->SetShowCollision(state);
+    return true;
+}
+
+bool CLuaColShapeDefs::IsShowCollisionsEnabled()
+{
+    return g_pClientGame->GetShowCollision();
 }

@@ -20,8 +20,6 @@ class CLuaMain;
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"
 
-#include "CLuaFunctionDefs.h"
-
 #define MAX_SCRIPTNAME_LENGTH 64
 
 class CBlipManager;
@@ -102,7 +100,9 @@ public:
 
     void RegisterHTMLDFunctions();
 
-    void           InitVM();
+    void           Initialize();
+    void           LoadEmbeddedScripts();
+    void           RegisterModuleFunctions();
     const SString& GetFunctionTag(int iFunctionNumber);
     int            PCall(lua_State* L, int nargs, int nresults, int errfunc);
     void           CheckExecutionTime();

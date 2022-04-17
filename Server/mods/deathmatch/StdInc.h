@@ -111,7 +111,7 @@ struct SAclRequest;
 #include "packets/CVoiceDataPacket.h"
 #include "packets/CVoiceEndPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
-#include "packets/CDiscordJoinPacket.h"
+#include "packets/CPlayerResourceStartPacket.h"
 
 // has to be included early to prevent "unknown type name 'CRemoteCall'" in CLuaFunctionParser.h
 #include "CRemoteCalls.h"
@@ -157,7 +157,6 @@ struct SAclRequest;
 #include "lua/CLuaManager.h"
 #include "lua/CLuaTimerManager.h"
 #include "lua/CLuaTimer.h"
-#include "lua/CLuaFunctionDefs.h"
 #include "lua/CLuaModuleManager.h"
 #include "lua/CLuaArgument.h"
 #include "lua/CLuaCFunctions.h"

@@ -154,7 +154,7 @@ void CResourceFileDownloadManager::DoPulse()
     // Call Lua event 'onClientTransferBoxProgressChange'
     CLuaArguments arguments;
     arguments.PushNumber(uiDownloadedSizeTotal);
-    arguments.PushNumber(GetTransferBox()->GetDownloadTotalSize());
+    arguments.PushNumber(static_cast<double>(GetTransferBox()->GetDownloadTotalSize()));
 
     g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxProgressChange", arguments, false);
 
@@ -290,8 +290,7 @@ void CResourceFileDownloadManager::StaticDownloadFinished(const SHttpDownloadRes
 ///////////////////////////////////////////////////////////////
 void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& result)
 {
-    auto iter = std::find(std::begin(m_ActiveFileDownloadList), std::end(m_ActiveFileDownloadList),
-                          reinterpret_cast<CDownloadableResource*>(result.pObj));
+    auto iter = std::find(std::begin(m_ActiveFileDownloadList), std::end(m_ActiveFileDownloadList), reinterpret_cast<CDownloadableResource*>(result.pObj));
 
     if (iter == std::end(m_ActiveFileDownloadList))
         return;

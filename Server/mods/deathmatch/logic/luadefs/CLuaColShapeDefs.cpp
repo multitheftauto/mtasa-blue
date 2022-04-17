@@ -74,6 +74,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "radius", "setColShapeRadius", "getColShapeRadius", SetColShapeRadius, GetColShapeRadius);
     lua_classvariable(luaVM, "size", "setColShapeSize", "getColShapeSize", SetColShapeSize, OOP_GetColShapeSize);
     lua_classvariable(luaVM, "points", nullptr, "getColPolygonPoints", nullptr, OOP_GetColPolygonPoints);
+    lua_classvariable(luaVM, "elementsWithin", nullptr, "getElementsWithinColShape");
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
@@ -641,7 +642,7 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
         CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
-        CVector2D          vecPoint;
+        CVector2D    vecPoint;
         if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
         {
             lua_pushnumber(luaVM, vecPoint.fX);
@@ -809,7 +810,7 @@ bool CLuaColShapeDefs::SetColPolygonHeight(CColPolygon* pColPolygon, std::varian
     float fFloor, fCeil;
 
     if (std::holds_alternative<bool>(floor))
-        fFloor = std::numeric_limits<float>::min();
+        fFloor = std::numeric_limits<float>::lowest();
     else
         fFloor = std::get<float>(floor);
 

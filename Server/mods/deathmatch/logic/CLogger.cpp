@@ -22,17 +22,22 @@ bool             CLogger::m_bCaptureConsole = false;
 CCriticalSection CLogger::m_CaptureBufferMutex;
 
 #define MAX_STRING_LENGTH 2048
-void CLogger::LogPrintf(const char* szFormat, ...)
+
+void CLogger::LogPrintvf(const char* format, va_list vlist)
 {
-    // Compose the formatted message
-    char    szBuffer[MAX_STRING_LENGTH];
-    va_list marker;
-    va_start(marker, szFormat);
-    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
-    va_end(marker);
+    std::array<char, MAX_STRING_LENGTH> buffer{};
+    VSNPRINTF(buffer.data(), buffer.size(), format, vlist);
 
     // Timestamp and send to the console and logfile
-    HandleLogPrint(true, "", szBuffer, true, true, false);
+    HandleLogPrint(true, "", buffer.data(), true, true, false);
+}
+
+void CLogger::LogPrintf(const char* szFormat, ...)
+{
+    va_list marker;
+    va_start(marker, szFormat);
+    LogPrintvf(szFormat, marker);
+    va_end(marker);
 }
 
 void CLogger::LogPrint(const char* szText)
@@ -82,15 +87,19 @@ void CLogger::LogPrintNoStamp(const char* szText)
 
 void CLogger::ErrorPrintf(const char* szFormat, ...)
 {
-    // Compose the formatted message
-    char    szBuffer[MAX_STRING_LENGTH];
     va_list marker;
     va_start(marker, szFormat);
-    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
+    ErrorPrintvf(szFormat, marker);
     va_end(marker);
+}
+
+void CLogger::ErrorPrintvf(const char* format, va_list vlist)
+{
+    std::array<char, MAX_STRING_LENGTH> buffer{};
+    VSNPRINTF(buffer.data(), buffer.size(), format, vlist);
 
     // Timestamp and send to the console and logfile
-    HandleLogPrint(true, "ERROR: ", szBuffer, true, true, false);
+    HandleLogPrint(true, "ERROR: ", buffer.data(), true, true, false);
 }
 
 void CLogger::DebugPrintf(const char* szFormat, ...)

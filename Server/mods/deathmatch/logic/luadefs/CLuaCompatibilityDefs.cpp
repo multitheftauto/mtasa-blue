@@ -74,7 +74,15 @@ void CLuaCompatibilityDefs::LoadFunctions()
         // Deprecated since 1.5.5-9.13846
         {"doesPedHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
         {"givePedJetPack", CLuaPedDefs::GivePedJetPack},
-        {"removePedJetPack", CLuaPedDefs::RemovePedJetPack}
+        {"removePedJetPack", CLuaPedDefs::RemovePedJetPack},
+
+        // Old Discord implementation (see #2499)
+        {"setPlayerDiscordJoinParams",
+         [](lua_State* luaVM) -> int
+         {
+             lua_pushboolean(luaVM, false);
+             return 1;
+         }},
     };
 
     // Add functions
