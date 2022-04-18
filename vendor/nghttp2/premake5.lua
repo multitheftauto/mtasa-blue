@@ -1,11 +1,12 @@
 -- This file is inspired by: https://github.com/premake/premake-core/blob/master/contrib/curl/premake5.lua
 project "nghttp2"
 	language "C"
-	kind "StaticLib"
+	kind "SharedLib"
 	targetname "nghttp2"
+	targetdir(buildpath("server"))
 
 	includedirs { ".", "lib/includes" }
-	defines { "ENABLE_LIB_ONLY", "ENABLE_STATIC_LIB", "HAVE_CONFIG_H" }
+	defines { "BUILDING_NGHTTP2", "HAVE_CONFIG_H" }
 	warnings "off"
 
 	files {
@@ -14,12 +15,27 @@ project "nghttp2"
 		"config-linux.h",
 		"config-macos.h",
 		"config-win32.h",
-		"lib/**.h",
-		"lib/**.c"
+		"**.h",
+		"**.c"
 	}
 
-	vpaths {
-		["Headers/*"] = "**.h",
-		["Sources/*"] = "**.c",
-		["*"] = "premake5.lua"
-	}
+	filter {"system:windows", "platforms:x86"}
+		postbuildcommands {
+			copy "mta"
+		}
+
+	filter {"system:windows", "platforms:x86", "configurations:Debug"}
+		postbuildcommands {
+			-- Fix net(c).dll requiring the release build
+			"copy \"%{wks.location}..\\Bin\\server\\nghttp2_d.dll\" \"%{wks.location}..\\Bin\\mta\\nghttp2.dll\"",
+			"copy \"%{wks.location}..\\Bin\\server\\nghttp2_d.dll\" \"%{wks.location}..\\Bin\\server\\nghttp2.dll\""
+		}
+
+	filter {"system:windows", "platforms:x64", "configurations:Debug"}
+		postbuildcommands {
+			-- Fix net.dll requiring the release build
+			"copy \"%{wks.location}..\\Bin\\server\\x64\\nghttp2_d.dll\" \"%{wks.location}..\\Bin\\server\\x64\\nghttp2.dll\""
+		}
+
+	filter {"system:windows", "platforms:x64"}
+		targetdir(buildpath("server/x64"))

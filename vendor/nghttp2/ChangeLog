@@ -1,239 +1,660 @@
-commit fb0bd22979711c89d92d98ac5db57ebc6f4fd148 (HEAD, tag: v1.43.0, origin/master, origin/HEAD, master)
+commit d9f580c3cb419e77474da507eef20f1c81ecff32 (HEAD, tag: v1.47.0, origin/master, origin/HEAD, master)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2021-02-02
+AuthorDate: 2022-02-23
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2021-02-02
+CommitDate: 2022-02-23
 
-    Update manual pages
-
-commit 3dc6c0afa2ed8b80b1f219813539db28f70886a3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2021-02-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2021-02-02
-
-    Bump version number to 1.43.0
-
-commit e8762781a72bf9220ec4de4e1c540d046051bb0a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2021-02-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2021-02-02
-
-    Update AUTHORS
-
-commit 2bf841e22ae1fc27b9f4881cdc63020511ec047a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2021-01-17
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2021-01-17
-
-    workflow: Build with UBSAN enabled
-
-commit 7ebab98e91df1678da74b47d690a1b1c5f2ba2e2
-Merge: 43ba3125 23fc6cc9
-Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-12-29
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-12-29
-
-    Merge pull request #1548 from nghttp2/py3-bindings
+    Update doc
     
-    Py3 bindings
+    Bring back clang because we need it to compile bpf program.
 
-commit 23fc6cc9002e34f9b771ee54286e559fa4eecaef
+commit f6b05a0111b99ad87bf58bc833298223506c98e3
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
+AuthorDate: 2022-02-23
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
-
-    Bump Linux runner OS to ubuntu 20.04
-
-commit 2e35cdea6ca3cdad3c111d1ca927d70dc29f9771
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
+CommitDate: 2022-02-23
 
     Update doc
 
-commit 22af8e782bed98e4b4f71617c9b905dd37e7c3f3
+commit 0353da4605fe6134aeb2c4ca92910e0758824849
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
+AuthorDate: 2022-02-23
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
+CommitDate: 2022-02-23
 
-    Require python3 for python bindings
+    Update bash_completion
 
-commit c88e9100096330c5d4445bc8d7482d6ad2c75fce
+commit 039ff29a2fb3318eace4155b3398f222000bf790
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
+AuthorDate: 2022-02-23
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
+CommitDate: 2022-02-23
 
-    Update ax_python_devel.m4
+    Update manual pages
 
-commit 43ba3125932c1d56addaeded2b7f62637af255cd
-Merge: 79a4f789 3c17299a
-Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-12-29
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-12-29
+commit 385a28c7f1cbffbccd9d387c8310fc769d8d4547
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-23
 
-    Merge pull request #1547 from nghttp2/sphinx-v3.3
+    Update doc
     
-    Sphinx v3.3
+    rlimit-memlock is not required anymore.
 
-commit 3c17299a925dc150fd7aa7e1534d4b1679fb397d
+commit 89e49f10662f330e4adabd19eb98953a0452d324
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
+AuthorDate: 2022-02-23
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
+CommitDate: 2022-02-23
 
-    Update enum references
+    Dockerfile: Pin ngtcp2 and nghttp3 versions
 
-commit a7ecff657cfbcc442bfc70d51efbad1b57a9be46
+commit abd6bb6818fbf918143ed775e2baa48d8fe08915
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
+AuthorDate: 2022-02-23
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
+CommitDate: 2022-02-23
 
-    Make doc generation work with sphinx v3.3
+    Bump package and library versions
 
-commit 79a4f789a1453d8b916fbcfa43804184462bd11f
-Merge: 46536729 28ba0b37
-Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-12-29
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-12-29
+commit ad2fbea08743420be11988e08be3ca77ee6d9f28
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-23
 
-    Merge pull request #1546 from nghttp2/py3-scripts
+    Update AUTHORS
+
+commit 47cc36969ab81e4e8b2a1b58a381c73620663704
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-21
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-21
+
+    Bump libbpf in Dockerfile
+
+commit 830cf1e294b5a3918d8aa2c430d2e2b3c1162eda
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-21
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-21
+
+    Bump libbpf to v0.7.0 and turn on all strict features
+
+commit a22f2cfcc803b0b5cd6b77c24060c8a1a8078808
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-19
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-19
+
+    Bump ngtcp2 and nghttp3
+
+commit f3d4b4f846a7f72929b70c23a0223be52b8daf07
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-18
+
+    nghttpx: Fix bug that h3 stream ends prematurely
+
+commit a6537cb9ce3300629e2f2d5529cf57cfb2be8d92
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-12
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-12
+
+    Fix compile error
+
+commit 79524471b4c545b28a5908f4687ce20e790f2226
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-12
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-12
+
+    nghttpx: Add --require-http-scheme option
+
+commit a67822b3828a71b2993a68202465148c0fa3f228
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-10
+
+    Bump llhttp to v6.0.6
+
+commit 79da3fdedc7274c515844c1833c23b43864c5014
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-10
+
+    Revert "Bump llhttp to 836430e892862ed6462f6197417eba8e17378956"
     
-    Python3 development scripts
+    This reverts commit b5d74d7c9d38af45542ab6d4db59d5337343d964.
 
-commit 28ba0b37e17e4daa901b622b0865dae61ee709a3
+commit b5d74d7c9d38af45542ab6d4db59d5337343d964
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
+AuthorDate: 2022-02-10
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
+CommitDate: 2022-02-10
 
-    Update document reference
+    Bump llhttp to 836430e892862ed6462f6197417eba8e17378956
 
-commit 6b7ade9f3fb9ebb68bcb0c0911b2a831d4f10333
+commit 385abf10f7b114cda65c35210d1cce886a2c5153
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-29
+AuthorDate: 2022-02-10
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-29
+CommitDate: 2022-02-10
 
-    Require python3 for python scripts
+    nghttpx: Add support QUIC BBR2
 
-commit 465367294fbcd2029b09844c4859b5acaa3fbe87
+commit f3206b12d5362763b1b18bd045f525959b31cf5e
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-28
+AuthorDate: 2022-02-10
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-28
+CommitDate: 2022-02-10
 
-    Bump clang-format to 10
+    Update doc
 
-commit 563c1173038a418165eebc27e61e4845eee3ca81
-Merge: 1c04ca80 d32e20bc
+commit b70fdca9acabfd7781e8a05b8b75b117cc284424
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-10
+
+    h2load: Handle EAGAIN/EWOULDBLOCK from sendmsg
+
+commit bd3cc94a365f6d19bfdddb23ad8d139d0357a132
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-10
+
+    Use nullptr for C++ code
+
+commit 02f2336ab1844afe4f80ab48fa815b353eb59816
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-09
+
+    Bump libbpf to v0.6.1
+
+commit 832d811982e4a094b7626dc5981b7945ee4c4f2c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-08
+
+    Remove appveyor.yml
+
+commit 637f3d7b33c3de3bb17c7ab64aa4e87f9c46a8f1
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-08
+
+    Windows build on GitHub Actions
+
+commit 254f2b3c4294227983b15ad7558fb86d67c4057c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-08
+
+    Remove macos + gcc ci build to speed up ci build time
+
+commit 633691e164e8c3935fb3085751649112c2da5b52
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-08
+
+    Remove .travis.yml
+
+commit 01bcc72f66674d8f0aee8358c767c9cca56475ca
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-03
+
+    nghttpx: Handle EAGAIN/EWOULDBLOCK from sendmsg
+
+commit 7ca255ff54be6d10cf0f82d137b7b2528f9f1c9f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-02
+
+    Fix docker build error
+
+commit 6430c98e86e90d53d0895d90ee64141c706857df
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-02-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-02-02
+
+    Compile with the latest ngtcp2
+
+commit 32c2557bb74b8fc12973a60e9e532ff3dbfa57b7
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-26
+
+    Bump nghttp3
+
+commit 3122a8390035a6c8bcbea38be542df7291d697c2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-23
+
+    h2load: Set quic error code based on error from ngtcp2_conn_read_pkt
+
+commit 75272a817e9a6da4cbd42d698d576cc4f02d4917
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-23
+
+    h2load: Fix ngtcp2 callback error code
+
+commit 809d5af43e2eba903f8e7c0ceaa5892a6cbbb1e9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-23
+
+    nghttpx: Fix invalid error code
+
+commit 3b549caf90475b34717fc837a1bfbe2fde02a120
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-23
+
+    clang-format
+
+commit 42b659354d4490ca509848935b9bc23ddd06c7f9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-23
+
+    nghttpx: Support h3 trailer fields
+
+commit 227532779439062705991a86de5f335962ba9754
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-23
+
+    nghttpx: Fix the issue that forwarded h3 GET request always has chunked TE
+
+commit 02a564934378926881fad374167eca9e7a840080
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-23
+
+    Require ngtcp2 >= 0.1.0 and nghttp3 >= 0.1.0
+
+commit 3b0b9a458c9fccdb74002d54d12c6c6ed549de3e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-22
+
+    Build docker image with ngtcp2 v0.1.0
+
+commit 6e6388e7c25e232937704460e7b50fe0ebb46943
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-22
+
+    Depend on nghttp3 v0.1.1
+
+commit ea6f0c641d9f224ee84806284f62e439e39f90cd
+Merge: c883b18f abc15c69
 Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-12-16
+AuthorDate: 2022-01-19
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-12-16
+CommitDate: 2022-01-19
 
-    Merge pull request #1544 from nghttp2/nghttpx-clear-mcpool
+    Merge pull request #1643 from nwtgck/fix-example-quotes
     
-    nghttpx: Make sure that Pool gets cleared when all buffers are returned
+    fix quotes in --altsvc example
 
-commit 1c04ca80328434e8972726c9b26f524b4ee25a90
-Merge: 8b8ba6b0 d8c71d5f
-Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-12-16
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-12-16
-
-    Merge pull request #1540 from tavrez/patch-1
-    
-    Added new nghttp2_ksl.c to Windows makefile
-
-commit d32e20bcaa8c9f4f24b9d5c3885204b6414fc923
+commit c883b18f2d46a05915ff135c00f892e12b8ba032
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-16
+AuthorDate: 2022-01-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-16
+CommitDate: 2022-01-16
 
-    nghttpx: Make sure that Pool gets cleared when all buffers are returned
+    Pin quic dependency
 
-commit 8b8ba6b0a61b58b2e40cb0325dbf49aca6fe62e2
-Merge: fb5b5aef 81fb0153
-Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-12-14
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-12-14
-
-    Merge pull request #1542 from nghttp2/nghttpx-check-sigalg
-    
-    nghttpx: Choose ECDSA cert if compatible signature algorithm available
-
-commit 81fb015391c7ba9218b87caa148f46c888a49368
+commit 97e69f7416c6a3f411c9fb901d17cec9cc558f29
+Merge: 8a552631 ad0c9eeb
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-12-13
+AuthorDate: 2022-01-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-12-13
+CommitDate: 2022-01-16
 
-    nghttpx: Choose ECDSA cert if compatible signature algorithm available
+    Merge branch 'rex4539-typos'
 
-commit d8c71d5fdb6cd1579f2a569ccd7bdbdf9f776ea1
-Author:     Reza Tavakoli <9096461+tavrez@users.noreply.github.com>
-AuthorDate: 2020-12-02
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-12-02
+commit ad0c9eebf780f30351998391a17b6ab618e9e1e6
+Author:     Dimitris Apostolou <dimitris.apostolou@icloud.com>
+AuthorDate: 2022-01-13
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-16
 
-    Added new nghttp2_ksl.c to Windows makefile
+    Fix typos
 
-commit fb5b5aef0aca21142d867b45f8b425a1da32bc4d
-Merge: ffcdf5df 6787423e
+commit 8a552631b4e64851018947a44b98fa022133fa81
+Merge: cff81069 deb390cf
 Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-11-27
+AuthorDate: 2022-01-11
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-11-27
+CommitDate: 2022-01-11
 
-    Merge pull request #1537 from nghttp2/nghttpx-allow-colon-in-pattern
+    Merge pull request #1667 from nghttp2/keep-hd-table-size
     
-    nghttpx: Add workaround to include ':' in backend pattern
+    Fix decoder table size update
 
-commit 6787423edc7928ea778260e9c0c54b72f0a39770
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-11-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-11-27
-
-    nghttpx: Add workaround to include ':' in backend pattern
-
-commit ffcdf5dfbcfa9fa35a5501e0ea679bdf6181a88c
-Merge: c9d5472f 0cdb1738
+commit cff810690822db09bd81c701f4754ebfe451cce3
+Merge: 4eb49ac2 e1446fd5
 Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
-AuthorDate: 2020-11-24
+AuthorDate: 2022-01-11
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-11-24
+CommitDate: 2022-01-11
 
-    Merge pull request #1533 from LorenzNickel/patch-1
+    Merge pull request #1665 from c0bw3b/cleanup/spdy
     
-    Fix typo in security.rst
+    Remove SPDY option for CMake
 
-commit 0cdb173846f84ffff8035b83c1d9ddd4fe732fda
-Author:     Lorenz Nickel <lorenz.nickel@gmx.net>
-AuthorDate: 2020-11-23
+commit 4eb49ac28e89ae7d0a0cfa1e614be838b3998723
+Merge: d91ae698 8ddb2273
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2022-01-11
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2020-11-23
+CommitDate: 2022-01-11
 
-    Fix typo in security.rst
+    Merge pull request #1666 from Kludex/patch-1
+    
+    Update nghttp2.pyx
 
-commit c9d5472ffb5e7ec1214dd08d0afb4781c83725b2
+commit deb390cf858f4a5c31b9a69630478762041bde64
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2020-11-23
+AuthorDate: 2022-01-11
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2020-11-23
+CommitDate: 2022-01-11
 
-    Bump version number to 1.43.0-DEV
+    Fix decoder table size update
+    
+    When applying new header table size acknowledged with SETTINGS ACK by
+    an encoder, change the header table size on a decoder only when it
+    strictly lowers the current maximum table size set by Dynamic Table
+    Size Update from the encoder or the default size 4096 if no Dynamic
+    Table Size Update is received.
+    
+    Previously, the header table size on a decoder is always changed.  If
+    a maximum size in SETTINGS are increased (e.g., 4096 -> 8192), and
+    then decreased to the previous value, the decoder incorrectly requires
+    Dynamic Table Size Update from an encoder.
+
+commit d91ae6987dc73b8f16a6250e2b358ed5e403b153
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2022-01-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2022-01-11
+
+    Compile with the latest ngtcp2
+
+commit 8ddb2273b960dc161dfd9b3332ae389b0b5eb11d
+Author:     Marcelo Trylesinski <marcelotryle@gmail.com>
+AuthorDate: 2022-01-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2022-01-01
+
+    Update nghttp2.pyx
+
+commit e1446fd57a4af5aa6bf02c628f47a7f664a1f83e
+Author:     Renaud <c0bw3b@users.noreply.github.com>
+AuthorDate: 2022-01-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2022-01-01
+
+    Remove SPDY option for CMake
+    
+    SPDY feature removed in #1091 and release v1.29.0
+
+commit 02e6cad1210fb2586482b2b819c8f015929bd5e1
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-12-19
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-12-19
+
+    Bump quictls/openssl versions
+
+commit 0b053e06d83428ff8c7e6fd88f76b6d42af04f1a
+Merge: 344d300c c3c0403d
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2021-12-13
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2021-12-13
+
+    Merge pull request #1657 from nwtgck/patch-2
+    
+    Make Docker speak HTTP/3
+
+commit c3c0403dfaae0f86e5d334fd19fb93281dbcb06a
+Author:     Ryo Ota <nwtgck@nwtgck.org>
+AuthorDate: 2021-12-12
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2021-12-12
+
+    Make Docker speak HTTP/3
+
+commit abc15c696d8f47257e0b592f381ba8e9af861259
+Author:     Ryo Ota <nwtgck@nwtgck.org>
+AuthorDate: 2021-11-18
+Commit:     Ryo Ota <nwtgck@nwtgck.org>
+CommitDate: 2021-11-18
+
+    fix quotes in --altsvc example
+
+commit 344d300cf95bdfbd3fe06b9012a4da375181d847
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-16
+
+    Fix cmake CI build
+
+commit dec233b9ef19d0cd81ea9edaa545a2723566a3f8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-16
+
+    cmake: Disable libbpf build by default
+
+commit f695dc999b7e9b3b8855e62055fa53d9e3ee2410
+Merge: 3c4449c0 f92f81c0
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-14
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-14
+
+    Merge branch 'robaho-robaho/issue1639'
+
+commit f92f81c05a656e6f84ba281403ca8a0207a7e6f6
+Author:     robaho <rengels@ix.netcom.com>
+AuthorDate: 2021-11-13
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-14
+
+    allow setting max frame size for h2load
+
+commit 3c4449c046d04263da53ded448333089b9213a9d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-10
+
+    nghttpx: Use nghttp3 error code
+
+commit 918e4ea46b53d74f3ca217237665dc5de0f2dbab
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-09
+
+    Compile with the latest ngtcp2
+
+commit d14d97ab682dfce91aa1ce6431fb15a925c46772
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-09
+
+    Rename send_stop_sending to stop_sending
+
+commit 2aed077761aa96f4a7891e0736e6463d2c9f2050
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-06
+
+    Merge fd_set_recv_ecn to create_quic_server_socket and handle errors
+
+commit 68b2295f4eed17c08f9c75b35621bfa26c3abe43
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-06
+
+    nghttpx: Set IP_PMTUDISC_DO explicitly
+
+commit 528d177847a98f00c75a0759e1b2d885193bf6f5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-06
+
+    nghttpx: Fix compile error
+
+commit deae6c95b176eff00f547508dc19d2fdc87b89bb
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-05
+
+    nghttpx: Send ECN
+
+commit 7eb179069df4d14585a382519416dc371f61ba60
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-05
+
+    Remove useless assignments
+
+commit 47c33b8d03b17fb8b42e29468f63ff3359076917
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-05
+
+    nghttpx: Receive ECN
+
+commit 94372fbe2a6c1afcbe1d7be5580387d0027bcc34
+Merge: c4828dbd 9e154297
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-05
+
+    Merge branch 'bagder-version-h3-too'
+
+commit 9e154297ff414b243759a0eca34befb9fb94f823
+Author:     Daniel Stenberg <daniel@haxx.se>
+AuthorDate: 2021-11-04
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-05
+
+    shrpx: make nghttpx -v show ngtcp2 and nghttp3 version as well
+    
+    ... if HTTP/3 support is built in.
+
+commit c4828dbd7cc12433dc84310a5591615da04ac9a5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-11-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-11-03
+
+    h2load: Fix assertion failure with the latest ngtcp2
+
+commit 0d16db2c65d8678fe7311c7db6b3aed85bac7832
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-10-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-10-30
+
+    Use quictls 1.1.1l for now because 3.0.0 is much slower
+
+commit fb63ef305def619d180604474a35597b30fb3bc6
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-10-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-10-30
+
+    Update doc
+
+commit 089fc81d729c33a7d8810837c809aa6352d2c257
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-10-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-10-29
+
+    Change qlog file extension to .sqlog
+    
+    Change qlog file extension to .sqlog because upstream ngtcp2 moves to
+    JSON-SEQ streaming qlog format.
+
+commit c20d175ff2011dd71f348ff1d17c9d2e68663276
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-10-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-10-29
+
+    Guard RLIMIT_MEMLOCK usage
+
+commit 3985957c4d0de756ac6199fba918e5345bef4e77
+Merge: 845a20b5 59a76c6d
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2021-10-29
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2021-10-29
+
+    Merge pull request #1625 from codebytere/fix-unreachable-return
+    
+    chore: fix `-Wunreachable-code-return`
+
+commit 845a20b5827cf7aa8dc9e9a7956b150963e5e6a5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2021-10-19
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2021-10-19
+
+    Bump version number to 1.47.0-DEV
+
+commit 59a76c6d39cb17b79e3bcab6c9f7b90fdeef754b
+Author:     Shelley Vohr <shelley.vohr@gmail.com>
+AuthorDate: 2021-10-11
+Commit:     Shelley Vohr <shelley.vohr@gmail.com>
+CommitDate: 2021-10-11
+
+    chore: fix -Wunreachable-code-return

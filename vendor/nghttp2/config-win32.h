@@ -1,5 +1,5 @@
 /* Hint to the compiler that a function never returns */
-#define NGHTTP2_NORETURN 
+#define NGHTTP2_NORETURN
 
 /* Define to `int' if <sys/types.h> does not define. */
 #define ssize_t int
@@ -20,10 +20,10 @@
 /* #undef HAVE_NEVERBLEED */
 
 /* sizeof(int *) */
-#define SIZEOF_INT_P   8
+#define SIZEOF_INT_P 8
 
 /* sizeof(time_t) */
-#define SIZEOF_TIME_T  8
+#define SIZEOF_TIME_T 8
 
 /* Define to 1 if you have the `_Exit` function. */
 #define HAVE__EXIT 1
@@ -78,3 +78,15 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
+
+/* Define to 1 if HTTP/3 is enabled. */
+/* #undef ENABLE_HTTP3 */
+
+/* Define to 1 if you have `libbpf` library. */
+/* #undef HAVE_LIBBPF */
+
+/* Define to 1 if you have enum bpf_stats_type in linux/bpf.h. */
+/* #undef HAVE_BPF_STATS_TYPE */
+
+/* Define to 1 if you have `libngtcp2_crypto_openssl` library. */
+/* #undef HAVE_LIBNGTCP2_CRYPTO_OPENSSL */
