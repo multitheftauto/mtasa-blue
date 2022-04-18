@@ -26,6 +26,12 @@
 #
 # Reverted r1551 "Set property 'svn:eol-style native' on all non binary files"
 
+4d81499ddd188b408a9e6b2c942618e7284de18b
+# Author: ccw808 <ccw808@googlemail.com>
+# Date:   Thu Apr 29 02:24:27 2010 +0000
+#
+# Converted line endings for Linux related files
+
 2c1bd0ba585d74486e6724d56a10c0477bf2b559
 # Author: Qais Patankar <qaisjp@gmail.com>
 # Date:   Sun Jul 31 23:35:22 2016 +0100
