@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <zip/minishared.h>
 
 ///////////////////////////////////////////////////////////////
 //
@@ -139,13 +140,7 @@ bool CZipMaker::AddFile(const SString& strDest, const std::vector<char>& buffer)
     time_t secondsNow = time(NULL);
     tm*    tmp = gmtime(&secondsNow);
 
-    zfi.dosDate = 0;
-    zfi.tmz_date.tm_year = tmp->tm_year + 1900;
-    zfi.tmz_date.tm_mon = tmp->tm_mon;
-    zfi.tmz_date.tm_mday = tmp->tm_mday;
-    zfi.tmz_date.tm_hour = tmp->tm_hour;
-    zfi.tmz_date.tm_min = tmp->tm_min;
-    zfi.tmz_date.tm_sec = tmp->tm_sec;
+    zfi.dos_date = tm_to_dosdate(tmp);
 
     int iResult = zipOpenNewFileInZip(m_uzFile, strDest, &zfi, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION);
 

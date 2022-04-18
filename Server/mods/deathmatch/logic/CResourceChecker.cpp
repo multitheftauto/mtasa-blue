@@ -938,8 +938,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 
             // open destination file
             zip_fileinfo zfi;
-            memcpy(&zfi.tmz_date, &unzfi.tmu_date, sizeof(tm_unz));
-            zfi.dosDate = unzfi.dosDate;
+            zfi.dos_date = unzfi.dos_date;
             zfi.internal_fa = unzfi.internal_fa;
             zfi.external_fa = unzfi.external_fa;
 
@@ -1057,8 +1056,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 
             // open destination file
             zip_fileinfo zfi;
-            memcpy(&zfi.tmz_date, &unzfi.tmu_date, sizeof(tm_unz));
-            zfi.dosDate = unzfi.dosDate;
+            zfi.dos_date = unzfi.dos_date;
             zfi.internal_fa = unzfi.internal_fa;
             zfi.external_fa = unzfi.external_fa;
 

@@ -6,7 +6,7 @@ project "zip"
 	includedirs  { "../zlib" }
 
 	vpaths {
-		["Headers/*"] = "**.h",
+		["Headers"] = "*.h",
 		["Sources"] = "*.c",
 		["*"] = "premake5.lua"
 	}
