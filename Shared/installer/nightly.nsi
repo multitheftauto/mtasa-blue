@@ -794,7 +794,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${LogText} "+Section begin - CLIENT GAME"
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
-        File "${FILES_ROOT}\mods\deathmatch\Client.dll"
+        File "${FILES_ROOT}\mods\deathmatch\client.dll"
         File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
         ${LogText} "-Section end - CLIENT GAME"
@@ -1056,27 +1056,38 @@ Section Uninstall
     Call un.DoServiceUninstall
     ; server CORE FILES
     Delete "$INSTDIR\server\core.dll"
-    Delete "$INSTDIR\server\xmll.dll"
     Delete "$INSTDIR\server\MTA Server.exe"
     Delete "$INSTDIR\server\net.dll"
-    Delete "$INSTDIR\server\libcurl.dll"
+    Delete "$INSTDIR\server\pthread.dll"
+    Delete "$INSTDIR\server\xmll.dll"
 
     ; server files
+    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
     Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
+    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
     Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
     Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthread.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+
+    ; server x64 CORE FILES
+    Delete "$INSTDIR\server\MTA Server64.exe"
+    Delete "$INSTDIR\server\x64\core.dll"
+    Delete "$INSTDIR\server\x64\net.dll"
+    Delete "$INSTDIR\server\x64\pthread.dll"
+    Delete "$INSTDIR\server\x64\xmll.dll"
+
+    ; server x64 files
+    Delete "$INSTDIR\server\x64\dbconmy.dll"
+    Delete "$INSTDIR\server\x64\deathmatch.dll"
+    Delete "$INSTDIR\server\x64\libmysql.dll"
+    Delete "$INSTDIR\server\x64\lua5.1.dll"
+    Delete "$INSTDIR\server\x64\pcre3.dll"
+    RmDir "$INSTDIR\server\x64"
 
     Delete "$INSTDIR\Multi Theft Auto.exe"
     Delete "$INSTDIR\Multi Theft Auto.exe.dat"
     Delete "$INSTDIR\Uninstall.exe"
 
-    Delete "$INSTDIR\mods\deathmatch\Client.dll"
-    Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+    Delete "$INSTDIR\mods\deathmatch\client.dll"
     Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
     RmDir /r "$INSTDIR\MTA\cgui"
