@@ -6,7 +6,7 @@
 #  PURPOSE:     Build a multi-language .NSI script based upon input PO files
 #  DEVELOPERS:  Dan Chowdhury <>
 #
-#  Multi Theft Auto is available from http://www.multitheftauto.com/
+#  Multi Theft Auto is available from https://www.multitheftauto.com/
 #
 ##############################################################################
 import argparse
