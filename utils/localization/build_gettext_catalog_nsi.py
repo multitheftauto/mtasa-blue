@@ -2,7 +2,7 @@
 #
 #  PROJECT:     Multi Theft Auto
 #  LICENSE:     See LICENSE in the top level directory
-#  FILE:        utils/build_gettext_catalog_nsi.py
+#  FILE:        utils/localization/build_gettext_catalog_nsi.py
 #  PURPOSE:     Create a template .pot file from a .NSI script
 #  DEVELOPERS:  Dan Chowdhury <>
 #
