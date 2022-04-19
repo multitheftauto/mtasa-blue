@@ -52,6 +52,7 @@ jobs:
 
           # Get rid of all other changes
           git restore .
+          rm utils/localization/setup-miniconda-patched-environment.yml
       - name: Create Pull Request
         if: ${{ steps.stage_changes.outputs.has_changes == '1' }}
         uses: peter-evans/create-pull-request@v4
@@ -65,4 +66,3 @@ jobs:
           labels: |
             localization
           title: Update pot files
-          add-paths: placeholder
