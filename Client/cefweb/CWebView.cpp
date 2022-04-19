@@ -54,7 +54,6 @@ void CWebView::Initialise()
     browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
 
-    browserSettings.plugins = cef_state_t::STATE_DISABLED;
     if (!m_bIsLocal)
     {
         bool bEnabledJavascript = g_pCore->GetWebCore()->GetRemoteJavascriptEnabled();

@@ -1198,12 +1198,6 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
-        case PACKET_ID_DISCORD_JOIN:
-        {
-            Packet_DiscordJoin(static_cast<CDiscordJoinPacket&>(Packet));
-            return true;
-        }
-
         case PACKET_ID_PLAYER_RESOURCE_START:
         {
             Packet_PlayerResourceStart(static_cast<CPlayerResourceStartPacket&>(Packet));
@@ -1244,10 +1238,6 @@ void CGame::JoinPlayer(CPlayer& Player)
         m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(), m_pMainConfig->GetVoiceBitrate()));
 
     marker.Set("CPlayerJoinCompletePacket");
-
-    // Sync up server info on entry
-    if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
-        Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
@@ -1363,15 +1353,6 @@ void CGame::InitialDataStream(CPlayer& Player)
     Player.CallEvent("onPlayerJoin", Arguments);
 
     marker.Set("onPlayerJoin");
-
-    SString joinSecret = Player.GetDiscordJoinSecret();
-    if (joinSecret.length())
-    {
-        CLuaArguments Arguments;
-        Arguments.PushBoolean(true);
-        Arguments.PushString(joinSecret);
-        Player.CallEvent("onPlayerDiscordJoin", Arguments);
-    }
 
     // Register them on the lightweight sync manager.
     m_lightsyncManager.RegisterPlayer(&Player);
@@ -1527,7 +1508,6 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerACInfo", "aclist, size, md5, sha256", NULL, false);
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
-    m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
 
     // Ped events
@@ -1752,7 +1732,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strSerial, 0);
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
-                            pPlayer->SetDiscordJoinSecret(Packet.GetDiscordJoinSecret());
 
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
@@ -4003,18 +3982,6 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
         Arguments.PushNumber(Packet.m_ucType);             // 0-interruption began  1-interruption end
         Arguments.PushNumber(Packet.m_uiTicks);            // Ticks since interruption start
         pPlayer->CallEvent("onPlayerNetworkStatus", Arguments, NULL);
-    }
-}
-
-void CGame::Packet_DiscordJoin(CDiscordJoinPacket& Packet)
-{
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushBoolean(false);
-        Arguments.PushString(Packet.GetSecret());
-        pPlayer->CallEvent("onPlayerDiscordJoin", Arguments, NULL);
     }
 }
 
