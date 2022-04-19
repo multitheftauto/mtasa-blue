@@ -22,14 +22,8 @@ IMPLEMENT_ENUM_CLASS_END("physics-element-type")
 
 SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM)
 {
-    if (auto* pVar = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)nullptr, ptr, luaVM))
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)nullptr, ptr, luaVM))
-        return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)nullptr, ptr, luaVM))
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaPhysicsElement>((CLuaPhysicsElement*)nullptr, ptr, luaVM))
-        return GetClassTypeName(pVar);
+        return EnumToString(pVar->GetType());
 
     return "";
 }
