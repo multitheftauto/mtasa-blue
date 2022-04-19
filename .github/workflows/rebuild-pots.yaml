@@ -42,7 +42,8 @@ jobs:
 
           echo "::echo::on"
 
-          if [[ $(git diff --name-only --staged) ]]
+          # Check for local commits
+          if [[ $(git diff --name-only "@{upstream}..") ]]
           then
             echo "::set-output name=has_changes::1"
           else
