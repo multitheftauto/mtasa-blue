@@ -40,6 +40,8 @@ jobs:
             git add "Shared/installer/locale/en_US.pot" && git commit -m "Update installer en_US pot" -m "[ci skip]"
           fi
 
+          echo "::echo::on"
+
           if [[ $(git diff --name-only --staged) ]]
           then
             echo "::set-output name=has_changes::1"
