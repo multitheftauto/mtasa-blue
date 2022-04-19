@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-02 16:58+0000\n"
-"PO-Revision-Date: 2022-04-02 18:06\n"
+"PO-Revision-Date: 2022-04-19 16:44\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "MIME-Version: 1.0\n"
@@ -182,7 +182,7 @@ msgstr "Desconectado: foi banido do servidor"
 #: Client\core\CConnectManager.cpp:306
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1228
 msgid "Disconnected: disconnected from the server"
-msgstr "Desconectado: Desconectado do servidor"
+msgstr "Desconectado: desconectado do servidor"
 
 #: Client\core\CConnectManager.cpp:310
 #: Client\mods\deathmatch\logic\CClientGame.cpp:1232
