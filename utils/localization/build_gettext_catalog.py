@@ -93,7 +93,7 @@ if __name__ == "__main__":
         "-e",
         "--exe",
         help="xgettext executable location",
-        default="utils/xgettext/xgettext.exe"
+        default="utils/xgettext.exe"
     )
     parser.add_argument(
         "-o",
