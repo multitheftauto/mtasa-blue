@@ -16,6 +16,8 @@ jobs:
           environment-file: utils/localization/environment.yml
           python-version: 3
           auto-activate-base: false
+      - run: apt-get update
+      - run: apt-get install --yes --no-install-recommends gettext
       - run: python "utils/localization/build_gettext_catalog.py"
       - run: python "utils/localization/build_gettext_catalog_nsi.py"
       - run: |
