@@ -1,6 +1,6 @@
 name: "Rebuild en_US pot files"
 
-on: push
+on: [push, workflow_dispatch]
 
 jobs:
   test:
