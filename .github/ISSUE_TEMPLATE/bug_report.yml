@@ -1,0 +1,71 @@
+name: Bug report
+description: Create a report to help us improve
+labels: bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Stop right now if you're reporting a cheat or security vulnerability!
+
+        **Please read our [Security Policy](https://github.com/multitheftauto/mtasa-blue/security/policy) to learn where to responsibly report security issues. Thank you.**
+
+        This template is only for reporting bugs. If you have a feature request, please use the [feature request template](https://github.com/multitheftauto/mtasa-blue/issues/new?assignees=&labels=enhancement&template=feature_request.yml).
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Describe the bug
+      description: Please provide a clear and concise description of what the bug is.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Please provide clear steps to reproduce the behaviour.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: version
+    attributes:
+      label: Version
+      description: |
+        Please provide the version of the MTA client and/or server you are running.
+
+        Client: You can open the client console using the `F8` key on your keyboard and using the `ver` command to get the version.
+        Server: You can use the `ver` command in the server console to get the version. 
+
+        If you are running Wine, please say so, and say if you're using Linux or MacOS.
+
+        Which operating system the server is running on, if relevant.
+      placeholder: |
+        Client: v1.5.9-release-21140 (Windows 10, 64-bit)
+        Server: v1.5.9-release-21140 (Debian 10, 64-bit)
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: |
+        If available, please provide any other additional context, such as screenshots or videos, or links to other relevant issues, pull requests or documents that can help others troubleshoot your issue more accurately and efficiently.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+
+        **Warning!** Do not post any personal information or sensitive logs here. You are responsible for redacting any personal information from the logs. If you need to post sensitive logs, you can use our [private log uploader](https://upload.mtasa.com/) which will only allow MTA staff to access the file, just paste the link to it here.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Security Policy
+      description: By submitting this issue, you express that you have read and understood our [Security Policy](https://github.com/multitheftauto/mtasa-blue/security/policy) and that this issue is not security related.
+      options:
+        - label: I have read and understood the Security Policy and this issue is not security related.
+          required: true

@@ -774,8 +774,8 @@ public:
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
 
     static void StaticSetHooks();
-    static void SetVehiclesSunGlareEnable(bool bEnabled);
-    static bool GetVehiclesSunGlareEnable();
+    static void SetVehiclesSunGlareEnabled(bool bEnabled);
+    static bool GetVehiclesSunGlareEnabled();
 
 private:
     static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
