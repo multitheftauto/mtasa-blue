@@ -36,7 +36,7 @@ def test_split_nsi():
 
 
 def test_get_translations_from_pofile():
-    # Given 
+    # Given
     po = polib.POFile()
     po.append(polib.POEntry(
         msgid="untranslated",

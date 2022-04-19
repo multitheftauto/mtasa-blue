@@ -32,7 +32,7 @@ def get_source_files_from_dirs(dirs: t.List[Path]) -> t.List[Path]:
     return [
         file_path
         for dir_path in dirs
-        for file_path in get_source_files_from_dir(dir_path) 
+        for file_path in get_source_files_from_dir(dir_path)
     ]
 
 
@@ -42,7 +42,7 @@ def write_directory_list_file(files: t.List[Path], fp: t.TextIO):
 
 def main(output: Path, version: str, xgettext: str, paths: t.Optional[t.List[Path]] = None) -> None:
     paths = paths or [Path("Client"), Path("Shared")]
-    
+
     # If we have .pot in the destination, strip it (xgettext seems to append an extension regardless)
     output = output.with_suffix("")
 
@@ -71,7 +71,7 @@ def main(output: Path, version: str, xgettext: str, paths: t.Optional[t.List[Pat
             "--keyword=_tn:1,2",
             "--keyword=_tc:1c,2",
             "--keyword=_tcn:1c,2,3",
-            "--package-name=MTA San Andreas", 
+            "--package-name=MTA San Andreas",
             f"--package-version={version}"
         ], check=True)
 
@@ -90,9 +90,9 @@ def main(output: Path, version: str, xgettext: str, paths: t.Optional[t.List[Pat
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-e", 
-        "--exe", 
-        help="xgettext executable location", 
+        "-e",
+        "--exe",
+        help="xgettext executable location",
         default="utils/xgettext/xgettext.exe"
     )
     parser.add_argument(
@@ -104,9 +104,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-v",
         "--version",
-        help="MTA:SA Version to write to the POT file", 
+        help="MTA:SA Version to write to the POT file",
         default="1.x"
     )
     args = parser.parse_args()
     main(xgettext=args.exe, output=Path(args.output), version=args.version)
-

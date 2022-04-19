@@ -27,7 +27,7 @@ def source_files(tmp_path):
         p = tmp_path / file_name
         p.parent.mkdir(parents=True, exist_ok=True)
         p.touch()
-    
+
     return tmp_path
 
 

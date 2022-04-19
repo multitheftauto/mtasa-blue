@@ -45,7 +45,7 @@ def test_parse_nsi():
         nsi.LangString(nsi_label="test_blank", line_number=15, msgid=""),
 
     ]
-    
+
 
 
 @pytest.mark.parametrize("input_pos, expected_line",[

@@ -89,12 +89,12 @@ def write_pofile(
             comment=lang_string.nsi_label
         )
         po_file.append(entry)
-            
+
 
 def main(input_nsi: Path, output: Path, project: str, version: str) -> None:
     content = input_nsi.read_text()
     lang_strings = parse_nsi(content)
-    
+
     po_file = polib.POFile()
     po_file.metadata = get_metadata(project=project, version=version)
     write_pofile(lang_strings, po_file, str(input_nsi))
@@ -107,8 +107,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
-        "--input", 
-        help="nightly.nsi location", 
+        "--input",
+        help="nightly.nsi location",
         default="Shared/installer/nightly.nsi"
     )
     parser.add_argument(
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-v",
         "--version",
-        help="MTA:SA Version to write to the POT file", 
+        help="MTA:SA Version to write to the POT file",
         default="1.x"
     )
     args = parser.parse_args()

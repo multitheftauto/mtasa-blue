@@ -118,14 +118,14 @@ def get_default_lang_strings(
     defaults = [
         TranslatedLangString(nsi_label="LANGUAGE_CODE", msgstr=locale)
     ]
-    
+
     if locale in rtl_locales:
         defaults.append(
             TranslatedLangString(nsi_label="LANGUAGE_RTL", msgstr="1")
         )
-    
+
     return defaults
-    
+
 
 def get_translations_from_pofile(po: polib.pofile) -> t.List[TranslatedLangString]:
     translations = [
@@ -157,7 +157,7 @@ def get_translations(podir: Path) -> t.Dict[str, t.List[TranslatedLangString]]:
 
         po = polib.pofile(str(po_path))
         translations[locale] += get_translations_from_pofile(po)
-    
+
     return translations
 
 
@@ -176,7 +176,7 @@ def create_locale_lang_strings(
 def create_nsi_lang_strings(
     translations: t.Dict[str, t.List[TranslatedLangString]]
 ) -> t.List[str]:
-    return [ 
+    return [
         lang_string
         for locale, locale_translations in translations.items()
         for lang_string in create_locale_lang_strings(
@@ -196,7 +196,7 @@ def main(input_nsi: Path, output: Path, podir: Path) -> None:
 
     translations = get_translations(podir)
     translation_lines = create_nsi_lang_strings(translations)
-    
+
     new_nsi_lines = top + translation_lines + bottom
 
     output.write_text("".join(new_nsi_lines), encoding="utf-8")
@@ -208,8 +208,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-i",
-        "--input", 
-        help="nightly.nsi location", 
+        "--input",
+        help="nightly.nsi location",
         default="Shared/installer/nightly.nsi"
     )
     parser.add_argument(
