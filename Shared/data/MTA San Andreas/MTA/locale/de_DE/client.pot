@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 20:59\n"
+"PO-Revision-Date: 2022-04-19 21:55\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -60,9 +60,9 @@ msgstr "Ja"
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
-msgstr "MTA:SA benötigt Administratorberechtigungen für die folgende Operation:\n\n"
+msgstr "MTA:SA benötigt Administratorzugriff für die folgende Aufgabe:\n\n"
 "  '%s'\n\n"
-"Bitte bestätige dies im nächsten Fenster."
+"Bitte bestätigen Sie dies im nächsten Fenster."
 
 #: Client/loader/CInstallManager.cpp:344
 #, c-format
@@ -74,16 +74,16 @@ msgstr "MTA:SA konnte die folgende Operation nicht erfolgreich durchführen:\n\n
 #: Client/loader/CInstallManager.cpp:394
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
-msgstr "** Der Absturz wurde durch ein Grafiktreiber-Problem verursacht **\n\n"
-"** Bitte bringen Sie Ihre Grafiktreiber auf den aktuellsten Stand **"
+msgstr "** Der Absturz wurde durch einen Grafiktreiberfehler verursacht **\n\n"
+"** Bitte aktualisieren Sie Ihre Grafiktreiber **"
 
 #: Client/loader/CInstallManager.cpp:500
 msgid "Install updated MTA:SA files"
-msgstr "Aktualisierte MTA:SA Dateien installieren"
+msgstr "Aktualisierte MTA:SA-Dateien installieren"
 
 #: Client/loader/CInstallManager.cpp:520
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Konnte aufgrund von Dateikonflikten nicht aktualisieren. Bitte schließe andere Programme und versuche es erneut"
+msgstr "Die Aktualisierung konnte aufgrund von Dateikonflikten nicht durchgeführt werden. Bitte schließen Sie andere Anwendungen und versuchen Sie es erneut"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -126,7 +126,7 @@ msgstr "Fehler"
 #: Client/loader/CInstallManager.cpp:529
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto wurde nicht korrekt installiert. Bitte installiere es erneut. %s"
+msgstr "Multi Theft Auto wurde nicht richtig installiert, bitte installieren Sie es neu. %s"
 
 #: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
 msgid "MTA:SA cannot continue because the following files are incorrect:"
@@ -139,7 +139,7 @@ msgstr "Aufnäher GTA"
 #: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:718
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "Aktion kann nicht fortgesetzt werden, da nicht genügend freier Speicher auf Laufwerk %s vorhanden ist."
+msgstr "MTA:SA kann nicht fortgesetzt werden, da das Laufwerk %s nicht über genügend Speicherplatz verfügt."
 
 #: Client/loader/CInstallManager.cpp:812
 msgid "Missing file:"
@@ -147,11 +147,11 @@ msgstr "Fehlende Datei:"
 
 #: Client/loader/CInstallManager.cpp:816
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Wenn MTA nicht gestartet werden kann, installiere bitte GTA:SA neu."
+msgstr "Wenn MTA nicht geladen werden kann, installieren Sie bitte GTA:SA neu"
 
 #: Client/loader/CInstallManager.cpp:937
 msgid "Update install settings"
-msgstr "Installationseinstellung aktualisieren"
+msgstr "Installationseinstellungen aktualisieren"
 
 #: Client/loader/CInstallManager.cpp:1070
 msgid "Update compatibility settings"
@@ -178,15 +178,15 @@ msgstr "Hilfe"
 
 #: Client/loader/Dialogs.cpp:52
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA:SA hat einen Fehler festgestellt"
+msgstr "MTA: San Andreas ist auf ein Problem gestoßen"
 
 #: Client/loader/Dialogs.cpp:53
 msgid "Crash information"
-msgstr "Absturzinformation"
+msgstr "Informationen zum Absturz"
 
 #: Client/loader/Dialogs.cpp:54
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Aktiviere die Checkbox, um die Absturzinformationen den MTA Entwicklern über das Internet zu senden"
+msgstr "Aktivieren Sie das Kontrollkästchen, um diese Absturzinformationen über das Internet an die MTA-Entwickler zu senden"
 
 #: Client/loader/Dialogs.cpp:55
 msgid "Doing so will increase the chance of this crash being fixed."
