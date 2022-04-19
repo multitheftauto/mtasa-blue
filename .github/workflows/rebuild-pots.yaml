@@ -1,4 +1,4 @@
-name: 'Rebuild en_US pot files'
+name: "Rebuild en_US pot files"
 on:
   push:
     branches:
@@ -10,9 +10,12 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v2
+      - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: 2
+          activate-environment: mtasa
+          environment-file: utils/localization/environment.yml
+          python-version: 3
+          auto-activate-base: false
       - run: python "utils/localization/build_gettext_catalog.py"
       - run: python "utils/localization/build_gettext_catalog_nsi.py"
       - run: |
