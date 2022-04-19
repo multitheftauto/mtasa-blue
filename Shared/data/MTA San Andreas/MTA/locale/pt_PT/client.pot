@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 20:59\n"
+"PO-Revision-Date: 2022-04-19 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -182,11 +182,11 @@ msgstr "MTA: San Andreas encontrou um problema"
 
 #: Client/loader/Dialogs.cpp:53
 msgid "Crash information"
-msgstr "Informação de Crash"
+msgstr "Informação de crash"
 
 #: Client/loader/Dialogs.cpp:54
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Selecione para enviar informação sobre o Crash à equipa do MTA usando a 'internet'"
+msgstr "Selecione para enviar informação sobre o crash à equipa do MTA usando a 'internet'"
 
 #: Client/loader/Dialogs.cpp:55
 msgid "Doing so will increase the chance of this crash being fixed."
@@ -287,7 +287,7 @@ msgstr "Forçar modo janela"
 
 #: Client/loader/Dialogs.cpp:92
 msgid "Don't show again"
-msgstr "Não mostrar novamnete"
+msgstr "Não mostrar novamente"
 
 #: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:878
 msgid "MTA: San Andreas"
@@ -458,25 +458,22 @@ msgstr "Incapaz de fechar o GTA: San Andreas. Se o problema persistir reinicie o
 
 #: Client/loader/MainFunctions.cpp:624
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Algo está em falta no Registry do Windows. Por favor, reinstalei Multi Theft Auto: San Andreas."
+msgstr "Algo está em falta no Registry do Windows. Por favor, reinstale Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:630
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
+msgstr ""
 
 #: Client/loader/MainFunctions.cpp:640
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
-msgstr "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-"contains a ';' (semicolon).\n\n"
-" If you experience problems when running MTA:SA,\n"
-" move your installation(s) to a path that does not contain a semicolon."
+msgstr ""
 
 #: Client/loader/MainFunctions.cpp:780
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Load failed. Please ensure that the latest data files have been installed correctly."
+msgstr ""
 
 #: Client/loader/MainFunctions.cpp:789
 #, c-format
@@ -618,7 +615,7 @@ msgstr "Corrigir problemas de ficheiro"
 
 #: Client/loader/CExePatchedStatus.cpp:164
 msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Copie o executável principal para evitar problemas gráficos de driver"
+msgstr "Copie o executável principal para evitar problemas no driver de gráficos"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -722,7 +719,7 @@ msgstr "Inverter rato verticalmente"
 
 #: Client/core/CSettings.cpp:170
 msgid "Steer with mouse"
-msgstr "Virar (a conduzir) com rato"
+msgstr "Conduzir com rato"
 
 #: Client/core/CSettings.cpp:174
 msgid "Fly with mouse"
@@ -778,7 +775,7 @@ msgstr "TECLA ALT."
 #. *
 #: Client/core/CSettings.cpp:352 Client/core/CSettings.cpp:355
 msgid "Nick:"
-msgstr "Usuario:"
+msgstr "Usuário:"
 
 #: Client/core/CSettings.cpp:365
 msgid "Save server passwords"
