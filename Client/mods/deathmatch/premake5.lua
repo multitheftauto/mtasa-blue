@@ -40,7 +40,6 @@ project "Client Deathmatch"
 			"../../../vendor/zlib",
 			"../../../vendor/pcre",
 			"../../../vendor/json-c",
-			"../../../vendor/bob_withers",
 			"../../../vendor/lua/src",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",

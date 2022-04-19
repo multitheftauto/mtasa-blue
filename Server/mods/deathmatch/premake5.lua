@@ -20,7 +20,6 @@ project "Deathmatch"
 			"../../../vendor/zlib",
 			"../../../vendor/pcre",
 			"../../../vendor/json-c",
-			"../../../vendor/bob_withers",
 			"../../../vendor/lua/src",
 			"../../../Shared/gta",
 			"../../../Shared/mods/deathmatch/logic",
