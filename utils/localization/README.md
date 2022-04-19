@@ -1,9 +1,11 @@
-These scripts will run in a native Python 3 environment.  You can install from the website or appstore as appropriate.
+These scripts will run in a native Python 3 environment. You can install from the website or appstore as appropriate.
 
 # Setting up development environment
-For testing, a Conda environment is provided.  This is the reccomended distribution for installing Python on Windows.
+
+For testing, a Conda environment is provided. This is the recommended distribution for installing Python on Windows.
 
 ## Step 1: Download Miniconda3
+
 Download available here: https://docs.conda.io/en/latest/miniconda.html
 
 ## Step 2: Open Terminal
@@ -14,13 +16,15 @@ Download available here: https://docs.conda.io/en/latest/miniconda.html
 Then `cd` into your `mtasa-blue` git directory
 
 ## Step 3: Create environment
-In the shell, type 
+
+In the shell, type
 
 `conda env create -f utils/localization/environment.yml`
 
 # Running scripts
 
 ## Step 1: Activate environment
+
 In shell
 
 `conda activate mtasa`
@@ -30,7 +34,8 @@ In shell
 `python utils/localization/build_gettext_catalog.py --help`
 
 # Running tests
-```
+
+```shell
 conda activate mtasa
 pytest utils/localization/tests
 ```
