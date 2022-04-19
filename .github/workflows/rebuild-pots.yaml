@@ -1,6 +1,6 @@
 name: "Rebuild en_US pot files"
 
-on: [push, pull_request]
+on: push
 
 jobs:
   rebuild-pots:
