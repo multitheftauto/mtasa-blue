@@ -24,7 +24,7 @@ jobs:
           git add "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot" && git commit -m "Update client en_US pot" -m "[ci skip]"
           git add "Shared/installer/locale/en_US.pot" && git commit -m "Update installer en_US pot" -m "[ci skip]"
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           body: |
             It's that time again. I've rebuilt the English pot files.
