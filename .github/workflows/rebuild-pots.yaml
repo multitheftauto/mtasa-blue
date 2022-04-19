@@ -1,15 +1,14 @@
 name: "Rebuild en_US pot files"
-on:
-  push:
-    branches:
-      - master
-  workflow_dispatch:
+
+on: [push, pull_request]
 
 jobs:
   rebuild-pots:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: mtasa
@@ -25,19 +24,22 @@ jobs:
         shell: bash -l {0}
       - id: stage_changes
         run: |
-          git config user.name "Pot Bot"
-          git config user.email "github@multitheftauto.com"
+          # GitHub Actions bot user
+          git config --global user.name "Pot Bot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           # Check that diff contains something and it's not only POT-Creation-Date
           if [[ $(git diff --unified=0 "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot" | grep -v POT-Creation-Date | grep '^[+|-][^+|-]') ]]
           then
-            git add "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot" && git commit -m "Update client en_US pot" -m "[ci skip]"
+            git add "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot"
+            git commit -m "Update client en_US pot"
           fi
 
           # Check that diff contains something and it's not only POT-Creation-Date
           if [[ $(git diff --unified=0 "Shared/installer/locale/en_US.pot" | grep -v POT-Creation-Date | grep '^[+|-][^+|-]') ]]
           then
-            git add "Shared/installer/locale/en_US.pot" && git commit -m "Update installer en_US pot" -m "[ci skip]"
+            git add "Shared/installer/locale/en_US.pot"
+            git commit -m "Update installer en_US pot"
           fi
 
           echo "::echo::on"
@@ -53,16 +55,5 @@ jobs:
           # Get rid of all other changes
           git checkout -- .
           git clean -fd
-      - name: Create Pull Request
-        if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
-        uses: peter-evans/create-pull-request@v4
-        with:
-          body: |
-            It's that time again. I've rebuilt the English pot files.
-
-            Please review and merge these changes at your convenience.
-          branch: l10n/update-pots
-          delete-branch: true
-          labels: |
-            localization
-          title: Update pot files
+      - if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+        run: git push
