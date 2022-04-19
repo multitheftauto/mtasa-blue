@@ -23,7 +23,8 @@ jobs:
         shell: bash -l {0}
       - run: python "utils/localization/build_gettext_catalog_nsi.py"
         shell: bash -l {0}
-      - run: |
+      - id: stage_changes
+        run: |
           git config user.name "Pot Bot"
           git config user.email "github@multitheftauto.com"
 
@@ -38,7 +39,15 @@ jobs:
           then
             git add "Shared/installer/locale/en_US.pot" && git commit -m "Update installer en_US pot" -m "[ci skip]"
           fi
+
+          if [[ $(git diff --name-only --staged) ]]
+          then
+            echo "::set-output name=has_changes::1"
+          else
+            echo "::set-output name=has_changes::0"
+          fi
       - name: Create Pull Request
+        if: ${{ steps.stage_changes.outputs.has_changes == '1' }}
         uses: peter-evans/create-pull-request@v4
         with:
           body: |
