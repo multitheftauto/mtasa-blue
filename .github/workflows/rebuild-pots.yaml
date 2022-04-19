@@ -49,6 +49,9 @@ jobs:
           else
             echo "::set-output name=has_changes::0"
           fi
+
+          # Get rid of all other changes
+          git restore .
       - name: Create Pull Request
         if: ${{ steps.stage_changes.outputs.has_changes == '1' }}
         uses: peter-evans/create-pull-request@v4
