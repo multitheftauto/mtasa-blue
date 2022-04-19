@@ -15,7 +15,8 @@ jobs:
           environment-file: utils/localization/environment.yml
           python-version: 3
           auto-activate-base: false
-      - run: |
+      - name: Install gettext
+        run: |
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends gettext
       - run: python "utils/localization/build_gettext_catalog.py"
@@ -57,4 +58,5 @@ jobs:
           git checkout -- .
           git clean -fd
       - if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+        name: Push changes
         run: git push
