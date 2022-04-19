@@ -11,7 +11,7 @@
 ##############################################################################
 import argparse
 from pathlib import Path
-from os import close
+import os
 import subprocess
 import tempfile
 import typing as t
@@ -83,7 +83,7 @@ def main(output: Path, version: str, xgettext: str, paths: t.Optional[t.List[Pat
         print(err)
 
     # Delete our temporary file
-    close(fd)
+    os.close(fd)
     fp_path.unlink()
 
 
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         "-e",
         "--exe",
         help="xgettext executable location",
-        default="utils/xgettext.exe"
+        default=("utils/xgettext.exe" if os.name == "nt" else "xgettext")
     )
     parser.add_argument(
         "-o",
