@@ -79,9 +79,5 @@ else
     $PREMAKE5 gmake
 fi
 
-# Number of cores
-if [ "$(uname)" == "Darwin" ]; then
-    NUM_CORES=$(sysctl -n hw.ncpu)
-
 # Build!
 make -C Build/ -j ${NUM_CORES} AR=${AR} CC=${CC} CXX=${CXX} config=${CONFIG} all
