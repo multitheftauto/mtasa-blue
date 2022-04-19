@@ -23,6 +23,7 @@ jobs:
       - run: python "utils/localization/build_gettext_catalog_nsi.py"
         shell: bash -l {0}
       - id: stage_changes
+        name: Commit changes
         run: |
           # GitHub Actions bot user
           git config --global user.name "Pot Bot"
