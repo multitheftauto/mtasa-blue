@@ -1,0 +1,10 @@
+name: mtasa
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - pytest
+  - polib
+  - python=3
