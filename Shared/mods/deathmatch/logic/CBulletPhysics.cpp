@@ -143,7 +143,7 @@ void CBulletPhysics::DoPulse()
     StepSimulation();
 
 #ifdef MTA_CLIENT
-    if (m_bDrawDebugNextTime)
+    if (m_bDrawDebugNextTime && !g_pCore->IsWindowMinimized())
     {
         m_pDebugDrawer->Clear();
 
