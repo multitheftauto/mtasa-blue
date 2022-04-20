@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-20 15:26\n"
+"PO-Revision-Date: 2022-04-20 16:24\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -826,11 +826,11 @@ msgstr "Volume SFX:"
 
 #: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:487
 msgid "MTA volume:"
-msgstr "Volume MTA:"
+msgstr "Volume do MTA:"
 
 #: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:506
 msgid "Voice volume:"
-msgstr "Volume Voz:"
+msgstr "Volume da Voz:"
 
 #: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:547
 msgid "Play mode:"
@@ -887,7 +887,7 @@ msgstr "Silenciar todos os sons ao minimizar"
 
 #: Client/core/CSettings.cpp:578
 msgid "Mute Radio sounds when minimized"
-msgstr "Silenciar sons Rádio ao minimizar"
+msgstr "Silenciar sons da Rádio ao minimizar"
 
 #: Client/core/CSettings.cpp:583
 msgid "Mute SFX sounds when minimized"
@@ -895,11 +895,11 @@ msgstr "Silenciar sons SFX ao minimizar"
 
 #: Client/core/CSettings.cpp:588
 msgid "Mute MTA sounds when minimized"
-msgstr "Silenciar sons MTA ao minimizar"
+msgstr "Silenciar sons do MTA ao minimizar"
 
 #: Client/core/CSettings.cpp:593
 msgid "Mute Voice sounds when minimized"
-msgstr "Silenciar sons Voz ao minimizar"
+msgstr "Silenciar sons da Voz ao minimizar"
 
 #. *
 #. *  Video tab
@@ -1321,7 +1321,7 @@ msgstr "Largura:"
 
 #: Client/core/CSettings.cpp:2068
 msgid "Size"
-msgstr "Size"
+msgstr "Tamanho"
 
 #: Client/core/CSettings.cpp:2117
 msgid "after"
@@ -1497,7 +1497,7 @@ msgstr "INFO - UPLOAD DE CAPTURA DE ECRÃ"
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
-msgstr "Alguns scripts podem tocar sons, como rádio, da internet\n\n"
+msgstr "Alguns scripts podem tocar sons, como rádio, da internet.\n\n"
 "Desativar esta configuração poderá diminuir o consumo de banda larga.\n"
 
 #: Client/core/CSettings.cpp:4420
@@ -1879,7 +1879,8 @@ msgstr "Está a usar uma versão de testes! Esta build não pode ser usada para 
 #: Client/core/CMainMenu.cpp:334
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "MTA não vai receber atualizações para XP/Vista depois de Julho 2019."
+msgstr "MTA não vai receber atualizações para XP/Vista depois de Julho 2019.\n\n"
+"Atualize o Windows para jogar nos servidores mais recentes."
 
 #: Client/core/CMainMenu.cpp:1141
 msgid "This will disconnect you from the current server.\n\n"
@@ -1961,7 +1962,7 @@ msgstr "desassocia uma tecla (controle)"
 
 #: Client/core/CCore.cpp:1307
 msgid "copies the default gta controls"
-msgstr "copia os controles gta padrão"
+msgstr "copia os controles padrão do gta"
 
 #: Client/core/CCore.cpp:1308
 msgid "outputs a screenshot"
@@ -1969,7 +1970,7 @@ msgstr "produz uma captura de ecrã"
 
 #: Client/core/CCore.cpp:1309
 msgid "immediately saves the config"
-msgstr "guarda a configuraçãoo imediatamente"
+msgstr "guarda a configuração imediatamente"
 
 #: Client/core/CCore.cpp:1311
 msgid "clears the debug view"
@@ -1981,7 +1982,7 @@ msgstr "desliza o chat para cima"
 
 #: Client/core/CCore.cpp:1313
 msgid "scrolls the chatbox downwards"
-msgstr "rolar a caixa do chat para baixo/cima"
+msgstr "desliza o chat para baixo"
 
 #: Client/core/CCore.cpp:1314
 msgid "scrolls the debug view upwards"
@@ -2389,7 +2390,7 @@ msgstr "Utilize o protocolo mtasa://"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:568
 #: Client/mods/deathmatch/logic/CClientGame.cpp:666
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Nick inválido! Por favor vá a Opções e redefina!"
+msgstr "Nick inválido! Por favor vá a Definições e redefina!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1375
 msgid "You have to select a server to connect to."
