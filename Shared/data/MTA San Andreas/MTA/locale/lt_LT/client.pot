@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 21:01\n"
+"PO-Revision-Date: 2022-04-20 11:33\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -202,28 +202,29 @@ msgstr "MTA: San Andreas - Perspėjimas"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Jūsų Grand Theft Auto: San Andreas įrašymo vietoje aptiktas d3d9.dll failas:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Šis failas yra nebūtinas ir gali sukelti nesklandumų su naujomis grafikos galimybėmis šioje MTA:SA versijoje.\n\n"
+"Rekomenduojama pašalinti arba pervadinti failą d3d9.dll."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Naudoti d3d9.dll, bet taip pat parodyti šį įspėjimą kitą kartą paleidus"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Nebepriminti apie šiuos failus"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Pervadinti šiuos failus iš *.dll į *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Rodyti failus"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -1615,7 +1616,7 @@ msgstr "Pelės valdymo pataisymas - Gali prireikti paleisti kompiuterį iš nauj
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "NAUJIENOS"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
