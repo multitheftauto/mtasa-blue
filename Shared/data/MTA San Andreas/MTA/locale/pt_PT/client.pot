@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-20 16:24\n"
+"PO-Revision-Date: 2022-04-20 18:20\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -1619,7 +1619,7 @@ msgstr "Quer ver ajuda online sobre este problema?"
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "A skin que você selecionou não conseguiu ser carregada, e a skin predeterminada também não conseguiu ser carregada, porfavor reinstale o MTA."
+msgstr "A skin que você selecionou não conseguiu ser carregada, e a skin predeterminada também não conseguiu ser carregada, por favor reinstale o MTA."
 
 #: Client/core/CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
@@ -1706,7 +1706,7 @@ msgstr "Disparar"
 
 #: Client/core/CKeyBinds.cpp:182
 msgid "Next weapon"
-msgstr "Seguinte arma"
+msgstr "Arma seguinte"
 
 #: Client/core/CKeyBinds.cpp:183
 msgid "Previous weapon"
@@ -1763,19 +1763,19 @@ msgstr "Caminhar"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Vehicle fire"
-msgstr "Veículo disparar"
+msgstr "Disparar (veículo)"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Vehicle secondary fire"
-msgstr "Veículo disparar secundário"
+msgstr "Disparar - secundário (veículo)"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Vehicle left"
-msgstr "Veículo esquerda"
+msgstr "Virar à esquerda (veículo)"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Vehicle right"
-msgstr "Veículo direita"
+msgstr "Virar à direita (veículo)"
 
 #. 20
 #: Client/core/CKeyBinds.cpp:202
@@ -1796,7 +1796,7 @@ msgstr "Travar/Recuar"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Radio next"
-msgstr "Seguinte rádio"
+msgstr "Rádio seguinte"
 
 #: Client/core/CKeyBinds.cpp:207
 msgid "Radio previous"
@@ -1812,7 +1812,7 @@ msgstr "Buzina"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Sub-mission"
-msgstr "Submissão"
+msgstr "Missão secundária"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Handbrake"
@@ -2014,24 +2014,24 @@ msgstr "Design do Jogo / Programação"
 
 #: Client/core/CCredits.cpp:102
 msgid "Language Localization"
-msgstr "Localização de Linguagem"
+msgstr "Tradução"
 
 #: Client/core/CCredits.cpp:108
 msgid "Patch contributors"
-msgstr "Contribuidores"
+msgstr "Contribuidores do Patch"
 
 #: Client/core/CCredits.cpp:216
 msgid "Special Thanks"
-msgstr "Agradecer especialmente"
+msgstr "Agradecimentos especiais"
 
 #: Client/core/CCredits.cpp:245
 msgid "This software makes use of the following libraries and software:"
-msgstr "Este software utiliza o software e bibliotecas seguintes:"
+msgstr "Este software utiliza as seguintes: bibliotecas e software:"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
-msgstr "Português de Portugal"
+msgstr "Português (PT)"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
@@ -2486,7 +2486,7 @@ msgstr "Standby"
 #: Client/core/ServerBrowser/CServerList.cpp:150
 msgid "player"
 msgid_plural "players"
-msgstr[0] ""
+msgstr[0] "jogador"
 msgstr[1] "jogadores"
 
 #: Client/core/ServerBrowser/CServerList.cpp:151
@@ -2496,7 +2496,7 @@ msgstr "on"
 #: Client/core/ServerBrowser/CServerList.cpp:154
 msgid "server"
 msgid_plural "servers"
-msgstr[0] ""
+msgstr[0] "servidor"
 msgstr[1] "servidores"
 
 #. We are polling for the master server list (first pass)
