@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 22:56\n"
+"PO-Revision-Date: 2022-04-20 15:26\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -818,7 +818,7 @@ msgstr "Volume principal:"
 
 #: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:449
 msgid "Radio volume:"
-msgstr "Volume rádio:"
+msgstr "Volume do rádio:"
 
 #: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:468
 msgid "SFX volume:"
