@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-20 18:20\n"
+"PO-Revision-Date: 2022-04-20 21:21\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -2438,7 +2438,7 @@ msgstr "Jogadores:"
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "Palavra-passe:"
+msgstr "Com palavra-passe:"
 
 #. Latency
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
@@ -2538,7 +2538,7 @@ msgstr "Erro ao inicializar Direct3D9.\n\n"
 #: Client/core/DXHook/CDirect3DEvents9.cpp:230
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Captura de ecrã teve %d byes, mas esperava-se %d"
+msgstr "Captura de ecrã teve %d bytes, mas esperava-se %d"
 
 #: Client/core/DXHook/CDirect3DEvents9.cpp:236
 msgid "Screenshot failed"
@@ -2550,7 +2550,7 @@ msgstr "Esta versão expirou."
 
 #: Client/mods/deathmatch/CClient.cpp:56
 msgid "disconnect from the game"
-msgstr "Desconectar do jogo"
+msgstr "desconecta do jogo"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
@@ -2575,11 +2575,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
-msgstr "entrar em um carro como passageiro "
+msgstr "entra em um carro como passageiro"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
-msgstr "seguinte estação de rádio"
+msgstr "estação de rádio seguinte"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
