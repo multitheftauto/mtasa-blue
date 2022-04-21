@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-21 14:50\n"
+"PO-Revision-Date: 2022-04-21 15:54\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -223,7 +223,7 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Mostre-me esses ficheiros"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -799,7 +799,7 @@ msgstr "Mostrar janela de descarregamento"
 
 #: Client/core/CSettings.cpp:390
 msgid "Use customized GTA:SA files"
-msgstr "Usar ficheiros GTA:SA customizados"
+msgstr "Usar ficheiros customizados do GTA:SA"
 
 #: Client/core/CSettings.cpp:395
 msgid "Map rendering options"
@@ -834,7 +834,7 @@ msgstr "Volume da Voz:"
 
 #: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:547
 msgid "Play mode:"
-msgstr "Modo de jogo:"
+msgstr "Modo de reprodução:"
 
 #. *
 #. * Webbrowser tab
@@ -950,7 +950,7 @@ msgstr "Padrão"
 
 #: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1568
 msgid "Borderless keep res"
-msgstr "Janela manter resolução"
+msgstr "Manter reso. sem borda"
 
 #: Client/core/CSettings.cpp:657
 msgid "Mip Mapping"
@@ -1040,7 +1040,7 @@ msgstr "Renderizar pedestres sempre em detalhe elevado"
 
 #: Client/core/CSettings.cpp:819
 msgid "Full Screen Minimize"
-msgstr "Ecrã Inteiro Minimizar"
+msgstr "Minimizar Ecrã Inteiro"
 
 #: Client/core/CSettings.cpp:831
 msgid "Enable Device Selection Dialog"
@@ -2562,7 +2562,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
-msgstr ""
+msgstr "mostra as estatísticas da internet"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
@@ -2619,11 +2619,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
-msgstr ""
+msgstr "reduz a opacidade do radar"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases radar opacity"
-msgstr ""
+msgstr "aumenta a opacidade do radar"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles radar help text"
@@ -2697,7 +2697,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr ""
+msgstr "Nome do servidor:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
@@ -2716,19 +2716,19 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
-msgstr ""
+msgstr "LAN"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
-msgstr ""
+msgstr "Selecionado"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
-msgstr ""
+msgstr "Todos"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr ""
+msgstr "Iniciar"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:584
 msgid "Entering the game ..."
@@ -2910,7 +2910,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:597
 msgid "Please restart your PC"
-msgstr ""
+msgstr "Por favor, reinicie o seu PC"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
