@@ -33,7 +33,7 @@
     #else
         #define LINUX_x64
     #endif
-#elif define(__arm__) || defined(_M_ARM)
+#elif defined(__arm__) || defined(_M_ARM)
     #define ANY_armhf
     #ifdef _M_ARM
         #define WIN_armhf
