@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-19 21:02\n"
+"PO-Revision-Date: 2022-04-21 15:54\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -164,7 +164,7 @@ msgstr "Ícone da área de trabalho"
 #. INST_PROTOCOL
 #: Shared/installer/nightly.nsi:434
 msgid "Register mtasa:// protocol"
-msgstr ""
+msgstr "Registrar o protocolo mtasa://"
 
 #. INST_GAMES_EXPLORER
 #: Shared/installer/nightly.nsi:435
@@ -174,7 +174,7 @@ msgstr ""
 #. INST_DIRECTX
 #: Shared/installer/nightly.nsi:436
 msgid "Install DirectX"
-msgstr ""
+msgstr "Instalar DirectX"
 
 #. INST_SEC_CLIENT
 #: Shared/installer/nightly.nsi:470
@@ -226,7 +226,7 @@ msgstr ""
 #. INST_SEC_EDITOR
 #: Shared/installer/nightly.nsi:482
 msgid "Editor"
-msgstr ""
+msgstr "Editor"
 
 #. INST_SEC_DEVELOPER
 #: Shared/installer/nightly.nsi:957
