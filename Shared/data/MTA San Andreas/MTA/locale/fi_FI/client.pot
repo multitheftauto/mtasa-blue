@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-21 21:57\n"
+"PO-Revision-Date: 2022-04-21 22:57\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -1575,7 +1575,7 @@ msgstr "Valitse oletus aina. (Tätä asetusta ei tallenneta)"
 
 #: Client/core/CSettings.cpp:4672
 msgid "Maximum is usually best"
-msgstr ""
+msgstr "Korkein asetus on yleensä paras"
 
 #: Client/core/CSettings.cpp:4674 Client/core/CSettings.cpp:4676
 msgid "Auto updater:"
@@ -2527,7 +2527,7 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerList.cpp:345
 msgid "Attempting to discover LAN servers"
-msgstr ""
+msgstr "Etsitään LAN palvelimia"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:123
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2768,7 +2768,7 @@ msgstr "Virhe yhdistettäessä palvelimeen."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1094
 msgid "Connecting to local server timed out. See console for details."
-msgstr ""
+msgstr "Paikalliselle palvelimelle yhdistäminen aikakatkaistiin. Katso konsolista lisätietoja."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1197
 msgid "Connection with the server was lost"
@@ -2915,7 +2915,7 @@ msgstr "Tämä pelipalvelin ei salli virtuaalikoneita"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "Ajurien allekirjoitus on oltava käytössä pelataksesi tällä palvelimella."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:597
 msgid "Please restart your PC"
