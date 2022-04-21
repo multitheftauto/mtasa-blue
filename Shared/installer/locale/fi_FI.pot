@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-19 21:00\n"
+"PO-Revision-Date: 2022-04-21 21:57\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -106,7 +106,7 @@ msgstr "Multi Theft Auto -palvelin. Tämä on vaadittu komponentti."
 #. DESC_Section5
 #: Shared/installer/nightly.nsi:210
 msgid "The MTA:SA modification for the server."
-msgstr ""
+msgstr "MTA:SA pelipalvelimen pelikomponentti."
 
 #. DESC_Section6
 #: Shared/installer/nightly.nsi:211
@@ -136,12 +136,12 @@ msgstr ""
 #. DESC_SectionGroupClient
 #: Shared/installer/nightly.nsi:217
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr ""
+msgstr "Pelisovellusta käytetään pelaamiseen Multi Theft Auto pelipalvelimilla."
 
 #. INST_CLIENTSERVER
 #: Shared/installer/nightly.nsi:417
 msgid "Client and Server"
-msgstr ""
+msgstr "Peli ja pelipalvelin"
 
 #. INST_SERVER
 #: Shared/installer/nightly.nsi:418
@@ -151,7 +151,7 @@ msgstr "Vain palvelin"
 #. INST_STARTMENU_GROUP
 #: Shared/installer/nightly.nsi:432
 msgid "Start menu group"
-msgstr ""
+msgstr "Valikkoryhmä"
 
 #. INST_DESKTOP_ICON
 #: Shared/installer/nightly.nsi:433
@@ -176,7 +176,7 @@ msgstr "Asenna DirectX"
 #. INST_SEC_CLIENT
 #: Shared/installer/nightly.nsi:470
 msgid "Game client"
-msgstr ""
+msgstr "Pelisovellus"
 
 #. INST_SEC_SERVER
 #: Shared/installer/nightly.nsi:471
@@ -196,7 +196,7 @@ msgstr "Pelimoduuli"
 #. INFO_INPLACE_UPGRADE
 #: Shared/installer/nightly.nsi:475
 msgid "Performing in-place upgrade..."
-msgstr ""
+msgstr "Päivitetään..."
 
 #. INFO_UPDATE_PERMISSIONS
 #: Shared/installer/nightly.nsi:476
@@ -252,22 +252,24 @@ msgstr "Haluatko varmasti poistaa $(^Name):n ja kaikki sen osat?"
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
-msgstr ""
+msgstr "Oletko poistamassa MTA:n päivitystä varten?$\\r$\n"
+"Poistaminen ei ole tarpeellista uuden MTA:SA version asentamista varten.$\\r$\n"
+"Aja päivitysohjelmisto päivittääksesi ja säilyttääksesi asetuksesi."
 
 #. UNINST_DATA_REQUEST
 #: Shared/installer/nightly.nsi:1034
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
-msgstr ""
+msgstr "Haluatko säilyttää datatiedostot, kuten resurssit, kuvakaappaukset ja palvelimen asetukset? Jos valitset ei, kaikki resurssit, asetukset ja kuvakaappaukset poistetaan lopullisesti."
 
 #. UAC_RIGHTS1
 #: Shared/installer/nightly.nsi:1143
 msgid "This installer requires admin access, try again"
-msgstr ""
+msgstr "Tämä asennustyökalu vaatii järjestelmänvalvojan oikeudet, ola hyvä ja kokeile uudelleen."
 
 #. UAC_RIGHTS_UN
 #: Shared/installer/nightly.nsi:1144
 msgid "This uninstaller requires admin access, try again"
-msgstr ""
+msgstr "Tämä poistotyökalu vaatii järjestelmänvalvojan oikeudet, ola hyvä ja kokeile uudelleen."
 
 #. UAC_RIGHTS3
 #: Shared/installer/nightly.nsi:1145
@@ -285,7 +287,10 @@ msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
 " Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
-msgstr ""
+msgstr "Toinen MTA versio ($1) on jo asennettuna tähän hakemistoon.$\n"
+"$\n"
+"MTA:n eri versiot on suunniteltu asennettavaksi eri hakemistoihin.$\n"
+"Haluatko varmasti ylikirjoittaa MTA $1:n hakemistossa $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
 #: Shared/installer/nightly.nsi:1746
@@ -293,21 +298,28 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
-msgstr ""
+msgstr "MTA:ta ei voida asentaa GTA:SA:n kanssa samaan hakemistoon.$\n"
+"$\n"
+"Haluatko asentaa oletushakemistoon$\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: Shared/installer/nightly.nsi:1749
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
-msgstr ""
+msgstr "Valittua hakemistoa ei ole olemassa.$\n"
+"$\n"
+"Ole hyvä ja valitse GTA:SA:n asennushakemisto."
 
 #. INST_GTA_ERROR2
 #: Shared/installer/nightly.nsi:1751
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
-msgstr ""
+msgstr "GTA:SA:ta ei löytynyt hakemistosta $GTA_DIR $\n"
+"$\n"
+"Haluatko varmasti jatkaa?"
 
 #. INST_CHOOSE_LOC_TOP
 #: Shared/installer/nightly.nsi:1869
@@ -317,7 +329,7 @@ msgstr "Valitse asennuspolku"
 #. INST_CHOOSE_LOC
 #: Shared/installer/nightly.nsi:1870
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
-msgstr ""
+msgstr "Valitse hakemisto johon ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} asennetaan"
 
 #. INST_CHOOSE_LOC2
 #: Shared/installer/nightly.nsi:1871
@@ -325,7 +337,10 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
 " Click Next to continue."
-msgstr ""
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} asennetaan seuraavaan hakemistoon.$\n"
+"Mikäli haluat asentaa toiseen hakemistoon, paina Selaa ja valitse toinen kansio.$\n"
+"$\n"
+"Paina Next kun olet valmis."
 
 #. INST_CHOOSE_LOC3
 #: Shared/installer/nightly.nsi:1873
@@ -355,7 +370,7 @@ msgstr "Mukautettu"
 #. INST_CHOOSE_LOC4
 #: Shared/installer/nightly.nsi:2055
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr ""
+msgstr "Valitse hakemisto johon ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} asennetaan:"
 
 #. INST_LOC_OW
 #: Shared/installer/nightly.nsi:2073
@@ -385,5 +400,5 @@ msgstr "Tarkistetaan asennusohjelman päivitystietoja..."
 #. NETTEST_STATUS2
 #: Shared/installer/nightly.nsi:2320
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "Varmista ettei palomuurisi estä yhteyttä"
 
