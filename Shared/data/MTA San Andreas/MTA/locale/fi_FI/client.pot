@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 21:00\n"
+"PO-Revision-Date: 2022-04-21 21:57\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -83,7 +83,7 @@ msgstr "Asenna päivitetyt MTA:SA-tiedostot"
 
 #: Client/loader/CInstallManager.cpp:520
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr ""
+msgstr "Päivitys epäonnistui tiedostojen välisen ristiriidan takia. Ole hyvä ja sulje muut sovellukset ja kokeile uudelleen."
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -202,28 +202,29 @@ msgstr "MTA: San Andreas - Varoitus"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas asennushakemistosi sisältää nämä tiedostot:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Näitä tiedostoja ei tarvita ja ne saattavat häiritä MTA:n graafisten ominaisuuksien kanssa.\n\n"
+"Suosittelemme että poistat tai uudelleennimeät nämä tiedostot."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Pidä nämä tiedostot ja näytä tämä varoitus seuraavalla kerralla"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Älä muistuta näistä tiedostoista"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Uudelleennimeä nämä *.dll tiedostot *.dll.bak:ksi"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Näytä tiedostot"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -515,7 +516,7 @@ msgstr ".asi tiedostoja löytyi 'MTA:SA' tai 'GTA: San Andreas' asennushakemisto
 
 #: Client/loader/MainFunctions.cpp:965
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
+msgstr "Tiedostojen versiot eivät täsmää. Asenna MTA:SA uudelleen mikäli havaitset ongelmia.\n"
 
 #: Client/loader/MainFunctions.cpp:974
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -524,7 +525,8 @@ msgstr "Jotkin tiedostot puuttuvat. Asenna MTA:SA uudelleen mikäli havaitset on
 #: Client/loader/MainFunctions.cpp:986
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr ""
+msgstr "MTA:SA ei ole yhteensopiva Windowsin vikasietotilan kanssa.\n\n"
+"Ole hyvä ja käynnistä tietokoneesi uudelleen.\n"
 
 #: Client/loader/MainFunctions.cpp:1122
 msgid "Fix configuration issue"
@@ -539,15 +541,16 @@ msgstr "Korjaa oikeudet"
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr ""
+msgstr "Grand Theft Auto: San Andreasta ei voitu käynnistää. Ole hyvä ja kokeile käynnistää tietokoneesi uudelleen, ja jos ongelma jatkuu, ota yhteyttä tukeen osoitteessa www.multitheftauto.com.\n\n"
+"[%s]"
 
 #: Client/loader/MainFunctions.cpp:1236
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr ""
+msgstr "GTA: San Andreas ei välttämättä käynnistynyt oikein. Haluatko lopettaa sen?"
 
 #: Client/loader/Utils.cpp:813
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr ""
+msgstr "Valitse Grand Theft Auto: San Andreaksen asennushakemisto"
 
 #: Client/loader/Utils.cpp:1283
 #, c-format
@@ -1332,7 +1335,7 @@ msgstr "jälkeen"
 
 #: Client/core/CSettings.cpp:2117
 msgid "for"
-msgstr ""
+msgstr "kesto"
 
 #: Client/core/CSettings.cpp:2117
 msgid "sec"
@@ -1605,7 +1608,7 @@ msgstr ""
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "UUTISET"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
@@ -2040,7 +2043,7 @@ msgstr "KONSOLI"
 
 #: Client/core/CVersionUpdater.cpp:623
 msgid "Busy"
-msgstr ""
+msgstr "Varattu"
 
 #: Client/core/CVersionUpdater.cpp:623
 msgid "Can't check for updates right now"
@@ -2480,7 +2483,7 @@ msgstr "Pyydetään tietoja..."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
-msgstr ""
+msgstr "Idle"
 
 #: Client/core/ServerBrowser/CServerList.cpp:150
 msgid "player"
@@ -2516,7 +2519,7 @@ msgstr "Palvelinluetteloa ei voitu hakea."
 
 #: Client/core/ServerBrowser/CServerList.cpp:274
 msgid "(Backup server list)"
-msgstr ""
+msgstr "(Vara-palvelinlista)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:326
 msgid "Cannot bind LAN-broadcast socket"
@@ -2995,12 +2998,12 @@ msgstr "Ongelma grafiikka-ajurin kanssa"
 
 #: Client/game_sa/CSettingsSA.cpp:800
 msgid "Can't find valid screen resolution."
-msgstr ""
+msgstr "Näytön resoluutiota ei löydy."
 
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:876
 msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
+msgstr "Haluatko varmasti käyttää tätä näytön resoluutiota?"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:100
