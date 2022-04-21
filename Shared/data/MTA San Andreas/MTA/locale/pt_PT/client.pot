@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-20 22:20\n"
+"PO-Revision-Date: 2022-04-21 14:50\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -525,7 +525,7 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:1122
 msgid "Fix configuration issue"
-msgstr "Consertar configuração do assunto"
+msgstr "Corrigir problema de configuração"
 
 #. Try to relaunch as admin if not done so already
 #: Client/loader/MainFunctions.cpp:1164
@@ -740,7 +740,7 @@ msgstr "Controlos clássicos (Comando)"
 
 #: Client/core/CSettings.cpp:273
 msgid "Dead Zone"
-msgstr "Zona Morta"
+msgstr "Zona Limite"
 
 #: Client/core/CSettings.cpp:278
 msgid "Saturation"
