@@ -61,3 +61,9 @@ project "Dbconmy"
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
+
+	filter "platforms:armhf"
+		targetdir(buildpath("server/armhf"))
+
+	filter "platforms:arm64"
+		targetdir(buildpath("server/arm64"))

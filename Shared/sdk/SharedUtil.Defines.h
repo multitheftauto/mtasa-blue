@@ -33,6 +33,20 @@
     #else
         #define LINUX_x64
     #endif
+#elif define(__arm__) || defined(_M_ARM)
+    #define ANY_armhf
+    #ifdef _M_ARM
+        #define WIN_armhf
+    #else
+        #define LINUX_armhf
+    #endif
+#elif defined(__aarch64__) || defined(_M_ARM64)
+    #define ANY_arm64
+    #ifdef _M_ARM64
+        #define WIN_arm64
+    #else
+        #define LINUX_arm64
+    #endif
 #else
     #define ANY_x86
     #ifdef WIN32
@@ -48,6 +62,12 @@
 #ifdef ANY_x86
     #define SERVER_BIN_PATH     ""
     #define SERVER_BIN_PATH_MOD "mods/deathmatch/"
+#elif defined(ANY_armhf)
+    #define SERVER_BIN_PATH     "armhf/"
+    #define SERVER_BIN_PATH_MOD "armhf/"
+#elif defined(ANY_arm64)
+    #define SERVER_BIN_PATH     "arm64/"
+    #define SERVER_BIN_PATH_MOD "arm64/"
 #else
     #define SERVER_BIN_PATH     "x64/"
     #define SERVER_BIN_PATH_MOD "x64/"
