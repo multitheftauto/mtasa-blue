@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-22 03:36\n"
+"PO-Revision-Date: 2022-04-22 04:37\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -2759,7 +2759,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1073
 msgid "Connecting to local server..."
-msgstr ""
+msgstr "A conectar ao servidor local..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1084
 msgid "Error connecting to server."
@@ -2791,25 +2791,28 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:479
 msgid "Disconnect from server"
-msgstr ""
+msgstr "Desconectado do servidor"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:483
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "Desconectado: Serial está banido.\n"
+"Motivo: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:489
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "Desconectado: Você está banido.\n"
+"Motivo: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "Desconectado: Conta está banida.\n"
+"Motivo: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
@@ -2891,11 +2894,11 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:592
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
 msgid "Please replace gta_sa.exe"
-msgstr ""
+msgstr "Por favor, substitua o gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:593
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr ""
+msgstr "Este servidor não permite D3D9.DLLs customizadas"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
@@ -2919,7 +2922,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
 msgid "Try restarting MTA"
-msgstr ""
+msgstr "Tente reiniciar o MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
@@ -2972,7 +2975,7 @@ msgstr[1] "%d segundos"
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:639
 msgid "Disconnected"
-msgstr ""
+msgstr "Desconectado"
 
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 msgid "Could not start the local server. See console for details."
