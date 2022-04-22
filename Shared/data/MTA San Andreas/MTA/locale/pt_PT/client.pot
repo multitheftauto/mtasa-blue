@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-22 20:38\n"
+"PO-Revision-Date: 2022-04-22 21:40\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -538,7 +538,7 @@ msgstr "Corrigir problema de configuração"
 #. Try to relaunch as admin if not done so already
 #: Client/loader/MainFunctions.cpp:1164
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Corrigir erro de elevação necessária"
 
 #: Client/loader/MainFunctions.cpp:1171
 #, c-format
@@ -2677,7 +2677,7 @@ msgstr "Erro de descarregamento: %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr ""
+msgstr "Progresso do descarregamento do mapa:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
@@ -2693,7 +2693,7 @@ msgstr "%s de %s"
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr ""
+msgstr "Desconecte-se para cancelar o descarregamento"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -2742,11 +2742,11 @@ msgstr "Iniciar"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:584
 msgid "Entering the game ..."
-msgstr ""
+msgstr "A entrar no jogo ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:642
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr ""
+msgstr "Não conectado; por favor use Conexão Rápida ou o comando 'connect' para conectar-se a um servidor."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:688
 msgid "The server is not installed"
@@ -2772,11 +2772,11 @@ msgstr "A conectar ao servidor local..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1084
 msgid "Error connecting to server."
-msgstr ""
+msgstr "Erro ao conectar ao servidor."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1094
 msgid "Connecting to local server timed out. See console for details."
-msgstr ""
+msgstr "Conexão com o servidor local caiu. Veja a consola para detalhes."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1197
 msgid "Connection with the server was lost"
@@ -2829,7 +2829,7 @@ msgstr "Desconectado: Versão incompatível"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr ""
+msgstr "Desconectado: Entradas constantes. Por favor espere um minuto, e reconecte-se."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:508
 #, c-format
@@ -2849,13 +2849,15 @@ msgstr "Desconectado: Versão errada.\n"
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr ""
+msgstr "Desconectado: Servidor está a executar uma build mais recente.\n"
+"Informação: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:523
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr ""
+msgstr "Desconectado: Servidor está a executar uma build mais antiga.\n"
+"Informação: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
@@ -2863,7 +2865,7 @@ msgstr "Desconectado: Nick já está em uso"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
-msgstr ""
+msgstr "Desconectado: O elemento do jogador não pôde ser criado."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
@@ -2891,7 +2893,7 @@ msgstr "Desconectado: Foste banido por %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
-msgstr ""
+msgstr "Desconectado: Servidor desligado ou a reiniciar"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:590
 msgid "You were kicked from the game"
@@ -2900,7 +2902,7 @@ msgstr "Foste expulso do jogo"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr ""
+msgstr "Este servidor requer um gta_sa.exe não modificado"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:592
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
@@ -2917,11 +2919,11 @@ msgstr "Remova o D3D9.DLL da pasta de instalação do GTA e reinicie o MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
-msgstr ""
+msgstr "Este servidor não permite máquinas virtuais"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "Este servidor requer que a assinatura do driver esteja habilitada"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:597
 msgid "Please restart your PC"
@@ -2929,7 +2931,7 @@ msgstr "Por favor, reinicie o seu PC"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:598
 msgid "This server has detected missing anti-cheat components"
-msgstr ""
+msgstr "Este servidor detetou componentes do anti-cheat em falta"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
 msgid "Try restarting MTA"
@@ -2937,11 +2939,11 @@ msgstr "Tente reiniciar o MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
+msgstr "Este servidor requer um gta3.img e gta_int.img não modificados"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
 msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
+msgstr "Por favor substitua o gta3.img ou gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
