@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-22 19:40\n"
+"PO-Revision-Date: 2022-04-22 20:38\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -463,7 +463,7 @@ msgstr "Algo está em falta no Registry do Windows. Por favor, reinstale Multi T
 
 #: Client/loader/MainFunctions.cpp:630
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr ""
+msgstr "O caminho para a sua instalação do GTA: San Andreas contém caracteres não suportados (unicode). Por favor, mova a sua instalação do Grand Theft Auto: San Andreas para um caminho compatível que contenha apenas caracteres ASCII padrão e reinstale o Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:640
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
@@ -519,7 +519,7 @@ msgstr "Ficheiros .asi estão na pasta de instalação do 'MTA:SA' ou 'GTA: San 
 
 #: Client/loader/MainFunctions.cpp:965
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Erro de incompatibilidade da versão do ficheiro. Volte a instalar MTA:SA se tiver problemas.\n"
+msgstr "Erro de incompatibilidade da versão do ficheiro. Volte a instalar o MTA:SA se tiver problemas.\n"
 
 #: Client/loader/MainFunctions.cpp:974
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -558,7 +558,7 @@ msgstr "Selecione a pasta de instalação do Grand Theft Auto: San Andreas"
 #: Client/loader/Utils.cpp:1283
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr ""
+msgstr "Erro ao carregar o módulo %s! (%s)"
 
 #: Client/loader/Utils.cpp:1713
 #, c-format
@@ -2597,35 +2597,35 @@ msgstr "estação de rádio anterior"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr ""
+msgstr "habilita o radar"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
-msgstr ""
+msgstr "amplia o radar"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the radar out"
-msgstr ""
+msgstr "diminui o radar"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the radar north"
-msgstr ""
+msgstr "move o radar para o norte"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the radar south"
-msgstr ""
+msgstr "move o radar para o sul"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the radar east"
-msgstr ""
+msgstr "move o radar para o leste"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the radar west"
-msgstr ""
+msgstr "move o radar para o oeste"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
-msgstr ""
+msgstr "anexa o radar"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
@@ -2637,37 +2637,37 @@ msgstr "aumenta a opacidade do radar"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles radar help text"
-msgstr ""
+msgstr "ativa/desativa o texto de ajuda do radar"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
-msgstr ""
+msgstr "envia uma mensagem para o jogador específicado"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr ""
+msgstr "altera para a próxima arma enquanto em um veículo"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr ""
+msgstr "altera para a arma anterior enquanto em um veículo"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "mostra informações sobre o servidor atual"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr ""
+msgstr "define a escala de todos os textos mostrados no ecrã"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
-msgstr ""
+msgstr "(Modo de desenvolvimento) mostra as colshapes"
 
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr ""
+msgstr "(Modo de desenvolvimento) mostra os ids dos sons do ambiente no painel de depuração"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -2697,12 +2697,12 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr ""
+msgstr "HOSPEDAR JOGO"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:53
 msgid "Resources"
-msgstr ""
+msgstr "Recursos"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
@@ -2722,7 +2722,7 @@ msgstr "Max. de Jogadores:"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr ""
+msgstr "Transmissão:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
@@ -2764,7 +2764,7 @@ msgstr "Iniciando o servidor local ..."
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1004
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr ""
+msgstr "Você foi expulso do jogo ( %s )"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1073
 msgid "Connecting to local server..."
@@ -2792,7 +2792,7 @@ msgstr "Desconectado: palavra-passe incorreta"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 msgid "MTA Client verification failed!"
-msgstr ""
+msgstr "A verificação do cliente do MTA falhou!"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
@@ -2835,13 +2835,15 @@ msgstr ""
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr ""
+msgstr "Desconectado: Servidor de um branch diferente.\n"
+"Informação: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr ""
+msgstr "Desconectado: Versão errada.\n"
+"Informação: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:518
 #, c-format
@@ -2857,7 +2859,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Nick already in use"
-msgstr ""
+msgstr "Desconectado: Nick já está em uso"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
@@ -2870,7 +2872,7 @@ msgstr "Desconectado: O servidor recusou a ligação: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 msgid "Disconnected: Serial verification failed"
-msgstr ""
+msgstr "Desconectado: Verificação do serial falhou"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
 #, c-format
@@ -2880,12 +2882,12 @@ msgstr "Desconectado: Dessincronização de conexão %s"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
 #, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr ""
+msgstr "Desconectado: Foste expulso por %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:559
 #, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr ""
+msgstr "Desconectado: Foste banido por %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:570
 msgid "Disconnected: Server shutdown or restarting"
@@ -2893,7 +2895,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:590
 msgid "You were kicked from the game"
-msgstr ""
+msgstr "Foste expulso do jogo"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
@@ -2943,15 +2945,15 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr ""
+msgstr "Este servidor não permite Wine"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr ""
+msgstr "Certifique-se de que nenhum outro programa está a modificar o MTA:SA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:619
 msgid "Time Remaining: "
-msgstr ""
+msgstr "Tempo Restante: "
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 #, c-format
@@ -3013,7 +3015,7 @@ msgstr "Tem a certeza que deseja utilizar esta resolução de ecrã?"
 #: Shared/mods/deathmatch/logic/Utils.cpp:100
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr ""
+msgstr "Erro fatal (%u). Se este problema persistir, verifique mtasa.com para apoio."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3022,7 +3024,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:116
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr ""
+msgstr "Erro do protocolo (%u). Se este problema persistir, verifique mtasa.com para apoio."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:118
 msgid "Connection error"
@@ -3030,10 +3032,11 @@ msgstr "Erro de ligação"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:140
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr ""
+msgstr "Multi Theft Auto não foi instalado corretamente, por favor reinstale."
 
 #: Shared/sdk/SharedUtil.Misc.hpp:710
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr ""
+msgstr "Seu navegador mostrará uma página web com algumas informações de ajuda.\n\n"
+"(Se a página não carregar, cole o URL (CTRL-V) no seu navegador)"
 
