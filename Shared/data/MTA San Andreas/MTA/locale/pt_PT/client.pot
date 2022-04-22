@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-22 18:38\n"
+"PO-Revision-Date: 2022-04-22 19:40\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -470,7 +470,10 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
-msgstr ""
+msgstr "O caminho para a sua instalação do 'MTA:SA' ou 'GTA: San Andreas'\n"
+"contém um ';', (ponto e vírgula).\n\n"
+"Se tiver problemas ao executar o MTA:SA,\n"
+" mova a sua(s) instalação(ões) para um caminho que não contenha um ponto e vírgula."
 
 #: Client/loader/MainFunctions.cpp:780
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -499,7 +502,8 @@ msgstr "O ficheiro principal tem um nome incorreto (%s)"
 #: Client/loader/MainFunctions.cpp:826
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "O ficheiro principal não está assinado. Possível atividade de vírus.\n\n"
+"Consulte a ajuda online se o MTA não funcionar corretamente."
 
 #: Client/loader/MainFunctions.cpp:849
 msgid "Data files modified. Possible virus activity.\n\n"
@@ -515,7 +519,7 @@ msgstr "Ficheiros .asi estão na pasta de instalação do 'MTA:SA' ou 'GTA: San 
 
 #: Client/loader/MainFunctions.cpp:965
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
+msgstr "Erro de incompatibilidade da versão do ficheiro. Volte a instalar MTA:SA se tiver problemas.\n"
 
 #: Client/loader/MainFunctions.cpp:974
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
@@ -524,7 +528,8 @@ msgstr "Alguns ficheiros estão faltando. Reinstale o MTA:SA se tiver problemas.
 #: Client/loader/MainFunctions.cpp:986
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr ""
+msgstr "MTA:SA não é compatível com o 'Modo de Segurança' do Windows.\n\n"
+"Por favor, reinicie o seu PC.\n"
 
 #: Client/loader/MainFunctions.cpp:1122
 msgid "Fix configuration issue"
@@ -539,11 +544,12 @@ msgstr ""
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr ""
+msgstr "Não foi possível iniciar o Grand Theft Auto: San Andreas. Por favor tente reiniciar, ou se o problema persistir, contacte o MTA em www.multitheftauto.com. \n\n"
+"[%s]"
 
 #: Client/loader/MainFunctions.cpp:1236
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr ""
+msgstr "GTA: San Andreas pode não ter iniciado corretamente. Quer terminar?"
 
 #: Client/loader/Utils.cpp:813
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
@@ -581,7 +587,7 @@ msgstr "Se o gta3.img foi modificado recentemente, tente reinstalar o GTA:SA."
 
 #: Client/loader/Utils.cpp:1826
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr ""
+msgstr "GTA:SA teve dificuldade em adicionar um upgrade a um veículo."
 
 #: Client/loader/Utils.cpp:1845
 #, c-format
@@ -2558,11 +2564,11 @@ msgstr "desconecta do jogo"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
-msgstr ""
+msgstr "mostra as nametags"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
-msgstr ""
+msgstr "mostra o chat"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
@@ -2571,11 +2577,11 @@ msgstr "mostra as estatísticas da internet"
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
-msgstr ""
+msgstr "abre o input do chat"
 
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
-msgstr ""
+msgstr "transmite voz a outros jogadores"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
@@ -2982,12 +2988,12 @@ msgstr "Desconectado"
 
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 msgid "Could not start the local server. See console for details."
-msgstr ""
+msgstr "Não foi possível iniciar o servidor local. Consulte a consola para detalhes."
 
 #: Client/mods/deathmatch/logic/CServer.cpp:182
 #, c-format
 msgid "Error: Could not start local server. [%s]"
-msgstr ""
+msgstr "Erro: Não foi possível iniciar o servidor local. [%s]"
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
