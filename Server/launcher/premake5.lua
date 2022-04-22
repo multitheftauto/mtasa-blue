@@ -35,6 +35,12 @@ project "Launcher"
 		buildoptions { "-pthread", "-fvisibility=default" }
 		linkoptions { "-pthread", "-rdynamic" }
 
+	filter "platforms:armhf"
+		targetname "mta-server-arm"
+
+	filter "platforms:arm64"
+		targetname "mta-server-arm64"
+
 	filter {"system:linux", "platforms:x64"}
 		targetname "mta-server64"
 

@@ -707,6 +707,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         MTA_DM_BUILDTAG_SHORT
 #ifdef ANY_x64
         " [64 bit]"
+#elif defined(ANY_arm)
+        " [arm]"
+#elif defined(ANY_arm64)
+        " [arm64]"
 #endif
         ,
         m_pMainConfig->GetServerName().c_str(), strServerIPList.empty() ? "auto" : strServerIPList.c_str(), usServerPort, pszLogFileName, uiMaxPlayers,

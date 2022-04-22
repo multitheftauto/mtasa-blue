@@ -2,85 +2,110 @@
 #
 #  PROJECT:     Multi Theft Auto
 #  LICENSE:     See LICENSE in the top level directory
-#  FILE:        utils/build_gettext_catalog.py
+#  FILE:        utils/localization/build_gettext_catalog.py
 #  PURPOSE:     Create a template .pot file from .cpp and .h project files for client and server
 #  DEVELOPERS:  Dan Chowdhury <>
 #
 #  Multi Theft Auto is available from https://www.multitheftauto.com/
 #
 ##############################################################################
-
+import argparse
+from pathlib import Path
 import os
 import subprocess
 import tempfile
-from optparse import OptionParser
+import typing as t
 
-parser = OptionParser()
-parser.add_option("-e", "--exe", dest="exe",
-                  help="xgettext executable location", default="utils/xgettext/xgettext.exe" )
-#parser.add_option("-f", "--file", dest="output",
-#                  help="POT File output directory", default="messages")
-parser.add_option("-v", "--version", dest="version",
-                  help="MTA:SA Version to write to the POT file", default="1.x")
 
-(options, args) = parser.parse_args()
+def get_source_files_from_dir(dir: Path) -> t.List[Path]:
+    file_types = [".c", ".cpp", ".h", ".hpp"]
 
-directories = {
-    "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot" : [ "Client", "Shared" ],
-    #"Server/locale/client.pot" : [ "Server", "Shared" ],
-}
+    return [
+        file_path
+        for file_type in file_types
+        for file_path in dir.glob(f"**/*{file_type}")
+        if not str(file_path).endswith(".lua.h")
+    ]
 
-scanDirsList = []
 
-fd,temp_path = tempfile.mkstemp()
+def get_source_files_from_dirs(dirs: t.List[Path]) -> t.List[Path]:
+    return [
+        file_path
+        for dir_path in dirs
+        for file_path in get_source_files_from_dir(dir_path)
+    ]
 
-# The objective here is to scan for all our .cpp's and .h's in each root directory
-# We then compile a list of these files into a temporary file, which is given to xgettext
-# xgettext then reads this list, and produces our template .po file which is renamed to .pot
-for output,dirList in directories.iteritems():
-    scanDirsFile = open(temp_path, 'w')
-    # Scan for .cpp and .h files
-    for dir in dirList:
-        for root,dirs,files in os.walk(dir):
-            for file in files:
-                filename,ext = os.path.splitext(file)
-                if ext == ".c" or ext == ".cpp" or ext == ".h" or ext == ".hpp":
-                    if not file.endswith(".lua.h"):
-                        filePath = os.path.join(root,file)
-                        print ( filePath )
-                        # Add each file to a list
-                        scanDirsList.append ( filePath + "\n" )
-                
-    print ( "Files found: " + str(len(scanDirsList)) )
 
-    # Write this to our temporary file
-    scanDirsFile.writelines(scanDirsList)
-    scanDirsFile.close()
+def write_directory_list_file(files: t.List[Path], fp: t.TextIO):
+    fp.writelines(f"{path}\n" for path in files)
+
+
+def main(output: Path, version: str, xgettext: str, paths: t.Optional[t.List[Path]] = None) -> None:
+    paths = paths or [Path("Client"), Path("Shared")]
 
     # If we have .pot in the destination, strip it (xgettext seems to append an extension regardless)
-    path,ext = os.path.splitext(output)
-    if ext == ".pot":
-        output = path
+    output = output.with_suffix("")
 
-    # Give xgettext our temporary file to produce our .po
-    cmdArgs = [options.exe,"-f",os.path.abspath(scanDirsFile.name),"-d",output,
-               "--c++","--from-code=UTF-8","--add-comments",
-               "--keyword=_", "--keyword=_td", "--keyword=_tn:1,2", "--keyword=_tc:1c,2", "--keyword=_tcn:1c,2,3",
-               "--package-name=MTA San Andreas","--package-version="+options.version]
+    files = get_source_files_from_dirs(paths)
+    print ( f"Files found: {len(files)}" )
 
-    proc = subprocess.Popen(cmdArgs)
-    stdout, stderr = proc.communicate()
-    print ( stdout )
-    print ( stderr)
-    
-    #Rename our template to .pot (xgettext always outputs .po)
-    if os.path.isfile(output + ".pot"):
-        os.remove(output + ".pot")
-    if os.path.isfile(output + ".po"):
-        os.rename(output + ".po", output + ".pot")
+    # xgettext requires a list of filepaths in a newline delimited file
+    # so we create a tmpfile containing all our paths and give it to xgettext
+    fd, fp_path = tempfile.mkstemp()
+    fp_path = Path(fp_path)
+    with fp_path.open("w", encoding="utf-8") as fp:
+        write_directory_list_file(files, fp)
 
-# Delete our temporary file
-os.close(fd)
-os.remove(temp_path)
+    try:
+        subprocess.run([
+            xgettext,
+            "-f",
+            str(fp_path),
+            "-d",
+            str(output.with_suffix("")),
+            "--c++",
+            "--from-code=UTF-8",
+            "--add-comments",
+            "--keyword=_",
+            "--keyword=_td",
+            "--keyword=_tn:1,2",
+            "--keyword=_tc:1c,2",
+            "--keyword=_tcn:1c,2,3",
+            "--package-name=MTA San Andreas",
+            f"--package-version={version}"
+        ], check=True)
 
-print ( "POT Generation Operation Complete" )
+        # Rename our template to .pot (xgettext always outputs .po)
+        output.with_suffix(".po").replace(output.with_suffix(".pot"))
+
+        print ( "POT Generation Operation Complete" )
+    except BaseException as err:
+        print(err)
+
+    # Delete our temporary file
+    os.close(fd)
+    fp_path.unlink()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-e",
+        "--exe",
+        help="xgettext executable location",
+        default=("utils/xgettext.exe" if os.name == "nt" else "xgettext")
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help="output file destination",
+        default="Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot"
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        help="MTA:SA Version to write to the POT file",
+        default="1.x"
+    )
+    args = parser.parse_args()
+    main(xgettext=args.exe, output=Path(args.output), version=args.version)
