@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-22 14:59\n"
+"PO-Revision-Date: 2022-04-22 17:39\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -494,7 +494,7 @@ msgstr "A carga falhou. %s existe na pasta do GTA. Por favor, apague antes de co
 #: Client/loader/MainFunctions.cpp:815
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr ""
+msgstr "O ficheiro principal tem um nome incorreto (%s)"
 
 #: Client/loader/MainFunctions.cpp:826
 msgid "Main file is unsigned. Possible virus activity.\n\n"
@@ -2777,11 +2777,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1224
 msgid "Disconnected: the server is currently full"
-msgstr ""
+msgstr "Desconectado: o servidor está atualmente cheio"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1236
 msgid "Disconnected: invalid password specified"
-msgstr ""
+msgstr "Desconectado: palavra-passe inválida"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 msgid "MTA Client verification failed!"
@@ -2789,7 +2789,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
-msgstr ""
+msgstr "Desconectado: nickname inválido"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:479
 msgid "Disconnect from server"
@@ -2818,7 +2818,7 @@ msgstr "Desconectado: Conta está banida.\n"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:500
 msgid "Disconnected: Version mismatch"
-msgstr ""
+msgstr "Desconectado: Versão incompatível"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
