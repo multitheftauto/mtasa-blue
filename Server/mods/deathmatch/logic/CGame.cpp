@@ -703,8 +703,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         MTA_DM_BUILDTAG_SHORT
 #ifdef ANY_x64
         " [64 bit]"
-#elif defined(ANY_armhf)
-        " [armhf]"
+#elif defined(ANY_arm)
+        " [arm]"
 #elif defined(ANY_arm64)
         " [arm64]"
 #endif
