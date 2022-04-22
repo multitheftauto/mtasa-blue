@@ -119,8 +119,11 @@ workspace "MTASA"
 		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
 
-	filter { "system:linux", "platforms:not arm*" }
+	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }
+
+	filter { "system:linux or macosx", "configurations:not Debug", "language:C++" }
+		buildoptions { "-fvisibility-inlines-hidden" }
 
 	filter { "system:linux", "platforms:x86 or x64" }
 		vectorextensions "SSE2"
