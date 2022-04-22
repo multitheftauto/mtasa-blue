@@ -36,7 +36,7 @@ project "Launcher"
 		linkoptions { "-pthread", "-rdynamic" }
 
 	filter "platforms:armhf"
-		targetname "mta-server-armhf"
+		targetname "mta-server-arm"
 
 	filter "platforms:arm64"
 		targetname "mta-server-arm64"
