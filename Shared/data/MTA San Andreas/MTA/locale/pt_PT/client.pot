@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-21 21:57\n"
+"PO-Revision-Date: 2022-04-22 02:37\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -1780,11 +1780,11 @@ msgstr "Virar à direita (veículo)"
 #. 20
 #: Client/core/CKeyBinds.cpp:202
 msgid "Steer forwards/down"
-msgstr "Dirigir para frente/baixo"
+msgstr "Rotacionar para frente/baixo"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Steer backwards/up"
-msgstr "Dirigir para trás/cima"
+msgstr "Rotacionar para trás/cima"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Accelerate"
@@ -2517,7 +2517,7 @@ msgstr "Não foi possível obter a lista de servidores."
 
 #: Client/core/ServerBrowser/CServerList.cpp:274
 msgid "(Backup server list)"
-msgstr "(Lista de servidores backup)"
+msgstr "(Backup da lista de servidores)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:326
 msgid "Cannot bind LAN-broadcast socket"
