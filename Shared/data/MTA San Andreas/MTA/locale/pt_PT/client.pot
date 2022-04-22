@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-22 04:37\n"
+"PO-Revision-Date: 2022-04-22 14:59\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -474,22 +474,22 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:780
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr ""
+msgstr "A carga falhou. Certifique-se de que os ficheiros de dados mais recentes foram instalados corretamente."
 
 #: Client/loader/MainFunctions.cpp:789
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr ""
+msgstr "A carga falhou. Certifique-se de que %s está instalado corretamente."
 
 #: Client/loader/MainFunctions.cpp:796
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr ""
+msgstr "A carga falhou. Não foi possível encontrar o gta_sa.exe em %s."
 
 #: Client/loader/MainFunctions.cpp:806
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr ""
+msgstr "A carga falhou. %s existe na pasta do GTA. Por favor, apague antes de continuar."
 
 #: Client/loader/MainFunctions.cpp:815
 #, c-format
@@ -504,12 +504,14 @@ msgstr ""
 #: Client/loader/MainFunctions.cpp:849
 msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Ficheiros de dados modificados. Possível atividade de vírus.\n\n"
+"Consulte a ajuda online se o MTA não funcionar corretamente."
 
 #: Client/loader/MainFunctions.cpp:861
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
-msgstr ""
+msgstr "Ficheiros .asi estão na pasta de instalação do 'MTA:SA' ou 'GTA: San Andreas'\n\n"
+"Remova estes ficheiros .asi se tiver problemas com o MTA:SA."
 
 #: Client/loader/MainFunctions.cpp:965
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
@@ -545,7 +547,7 @@ msgstr ""
 
 #: Client/loader/Utils.cpp:813
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr ""
+msgstr "Selecione a pasta de instalação do Grand Theft Auto: San Andreas"
 
 #: Client/loader/Utils.cpp:1283
 #, c-format
@@ -574,7 +576,7 @@ msgstr "GTA:SA teve dificuldade em carregar um modelo."
 
 #: Client/loader/Utils.cpp:1801
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr ""
+msgstr "Se o gta3.img foi modificado recentemente, tente reinstalar o GTA:SA."
 
 #: Client/loader/Utils.cpp:1826
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -583,11 +585,11 @@ msgstr ""
 #: Client/loader/Utils.cpp:1845
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
+msgstr "GTA:SA encontrou erros no ficheiro '%s'"
 
 #: Client/loader/Utils.cpp:1918
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr ""
+msgstr "O seu PC reiniciou quando jogava MTA:SA?"
 
 #: Client/loader/Utils.cpp:1983
 msgid "Please terminate the following programs before continuing:"
@@ -2165,7 +2167,7 @@ msgstr "ERRO"
 #: Client/core/CVersionUpdater.cpp:2094
 msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
-msgstr "Alguns ficheiros do MTA:SA estã em falta.\n\n\n"
+msgstr "Alguns ficheiros do MTA:SA estão em falta.\n\n\n"
 "Reinstale o MTA:SA"
 
 #: Client/core/CVersionUpdater.cpp:2721
@@ -2902,7 +2904,7 @@ msgstr "Este servidor não permite D3D9.DLLs customizadas"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:594
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr ""
+msgstr "Remova o D3D9.DLL da pasta de instalação do GTA e reinicie o MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:595
 msgid "This server does not allow virtual machines"
@@ -2989,7 +2991,7 @@ msgstr ""
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Problema com o driver de gráficos"
 
 #: Client/game_sa/CSettingsSA.cpp:800
 msgid "Can't find valid screen resolution."
