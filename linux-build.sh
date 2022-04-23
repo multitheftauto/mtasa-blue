@@ -50,11 +50,8 @@ case $BUILD_ARCHITECTURE in
     64|x64)
         CONFIG=${BUILD_CONFIG}_x64
     ;;
-    arm64)
-        CONFIG=${BUILD_CONFIG}_arm64
-    ;;
-    armhf)
-        CONFIG=${BUILD_CONFIG}_armhf
+    arm64|arm)
+        CONFIG=${BUILD_CONFIG}_${BUILD_ARCHITECTURE}
     ;;
     *)
         echo "Error: Invalid build architecture" >&2
