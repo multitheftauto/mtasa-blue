@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-22 21:40\n"
+"PO-Revision-Date: 2022-04-23 03:49\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -252,7 +252,7 @@ msgstr "B - NVidia Alternativo"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "C - Standard NVidia with exe rename"
-msgstr "C - Standard NVidia com exe renomeado"
+msgstr "C - NVidia Padrão com exe renomeado"
 
 #: Client/loader/Dialogs.cpp:84
 msgid "D - Alternate NVidia with exe rename"
@@ -264,7 +264,7 @@ msgstr "E - Intel Padrão"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "F - Alternate Intel"
-msgstr "F - Alternate Intel"
+msgstr "F - Intel Alternativo"
 
 #: Client/loader/Dialogs.cpp:87
 msgid "G - Standard Intel with exe rename"
@@ -746,7 +746,7 @@ msgstr "Controles predeterminados (Rato + Teclado)"
 
 #: Client/core/CSettings.cpp:236
 msgid "Classic controls (Joypad)"
-msgstr "Controlos clássicos (Comando)"
+msgstr "Controlos clássicos (Joystick)"
 
 #: Client/core/CSettings.cpp:273
 msgid "Dead Zone"
@@ -785,7 +785,7 @@ msgstr "TECLA ALT."
 #. *
 #: Client/core/CSettings.cpp:352 Client/core/CSettings.cpp:355
 msgid "Nick:"
-msgstr "Usuário:"
+msgstr "Nick:"
 
 #: Client/core/CSettings.cpp:365
 msgid "Save server passwords"
@@ -960,7 +960,7 @@ msgstr "Padrão"
 
 #: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1568
 msgid "Borderless keep res"
-msgstr "Manter reso. sem borda"
+msgstr "Manter reso. sem contornos"
 
 #: Client/core/CSettings.cpp:657
 msgid "Mip Mapping"
@@ -1753,7 +1753,7 @@ msgstr "Saltar"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Sprint"
-msgstr "Arrancada"
+msgstr "Correr"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Look behind"
@@ -1956,7 +1956,7 @@ msgstr "mostra o seu serial"
 
 #: Client/core/CCore.cpp:1303
 msgid "connects to a server (host port nick pass)"
-msgstr "conecta-se a um servidor (host porta nick pass)"
+msgstr "conecta-se a um servidor (host porta nick palavra-passe)"
 
 #: Client/core/CCore.cpp:1304
 msgid "connects to a previous server"
@@ -1972,7 +1972,7 @@ msgstr "desassocia uma tecla (controle)"
 
 #: Client/core/CCore.cpp:1307
 msgid "copies the default gta controls"
-msgstr "copia os controles padrão do gta"
+msgstr "copia os controles padrões do gta"
 
 #: Client/core/CCore.cpp:1308
 msgid "outputs a screenshot"
@@ -2036,7 +2036,7 @@ msgstr "Agradecimentos especiais"
 
 #: Client/core/CCredits.cpp:245
 msgid "This software makes use of the following libraries and software:"
-msgstr "Este software utiliza as seguintes: bibliotecas e software:"
+msgstr "Este software utiliza as seguintes bibliotecas e software:"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
@@ -2205,7 +2205,7 @@ msgstr "* São %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:251
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "connect: A síntaxe é 'connect <anfitrião> [<porta> <nick> <palavra-passe>]'"
+msgstr "connect: A síntaxe é 'connect <host> [<porta> <nick> <palavra-passe>]'"
 
 #: Client/core/CCommandFuncs.cpp:259 Client/core/CCommandFuncs.cpp:327
 msgid "connect: Bad port number"
