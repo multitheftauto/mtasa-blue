@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 21:55\n"
+"PO-Revision-Date: 2022-04-23 22:55\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1615,7 +1615,7 @@ msgstr "Maus-Bewegungs Fix - Benötigt möglicherweise Reboot"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "NEWS"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
