@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-21 15:54\n"
+"PO-Revision-Date: 2022-04-23 19:36\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -169,7 +169,7 @@ msgstr "Registrar o protocolo mtasa://"
 #. INST_GAMES_EXPLORER
 #: Shared/installer/nightly.nsi:435
 msgid "Add to Games Explorer"
-msgstr ""
+msgstr "Adicionar à pasta Jogos"
 
 #. INST_DIRECTX
 #: Shared/installer/nightly.nsi:436
@@ -179,22 +179,22 @@ msgstr "Instalar DirectX"
 #. INST_SEC_CLIENT
 #: Shared/installer/nightly.nsi:470
 msgid "Game client"
-msgstr ""
+msgstr "Cliente"
 
 #. INST_SEC_SERVER
 #: Shared/installer/nightly.nsi:471
 msgid "Dedicated server"
-msgstr ""
+msgstr "Servidor dedicado"
 
 #. INST_SEC_CORE
 #: Shared/installer/nightly.nsi:472
 msgid "Core components"
-msgstr ""
+msgstr "Componentes principais"
 
 #. INST_SEC_GAME
 #: Shared/installer/nightly.nsi:473
 msgid "Game module"
-msgstr ""
+msgstr "Módulo do jogo"
 
 #. INFO_INPLACE_UPGRADE
 #: Shared/installer/nightly.nsi:475
@@ -216,12 +216,12 @@ msgstr ""
 #. INST_SEC_CORE_RESOURCES
 #: Shared/installer/nightly.nsi:480
 msgid "Core Resources"
-msgstr ""
+msgstr "Recursos Principais"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: Shared/installer/nightly.nsi:481
 msgid "Optional Resources"
-msgstr ""
+msgstr "Recursos Opcionais"
 
 #. INST_SEC_EDITOR
 #: Shared/installer/nightly.nsi:482
@@ -231,12 +231,12 @@ msgstr "Editor"
 #. INST_SEC_DEVELOPER
 #: Shared/installer/nightly.nsi:957
 msgid "Development"
-msgstr ""
+msgstr "Desenvolvimento"
 
 #. UNINST_SUCCESS
 #: Shared/installer/nightly.nsi:1005
 msgid "$(^Name) was successfully removed from your computer."
-msgstr ""
+msgstr "$(^Name) foi removido com sucesso do seu PC."
 
 #. UNINST_FAIL
 #: Shared/installer/nightly.nsi:1012
