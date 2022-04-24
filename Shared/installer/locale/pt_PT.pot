@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-24 18:35\n"
+"PO-Revision-Date: 2022-04-24 19:36\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -41,7 +41,7 @@ msgstr "Este assistente irá guiá-lo através do processo de instalação ou at
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:194
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "Direção do jogo Grand Theft Auto: San Andreas "
+msgstr "Local do Grand Theft Auto: San Andreas"
 
 #. DIRECTORY_Text_Dest
 #: Shared/installer/nightly.nsi:195
@@ -64,22 +64,22 @@ msgstr "Por favor selecione a sua pasta do Grand Theft Auto: San Andreas.$\n"
 #. DESC_Section10
 #: Shared/installer/nightly.nsi:199
 msgid "Create a Start Menu group for installed applications"
-msgstr "Adicionar à barra \"Iniciar\""
+msgstr "Adiciona à barra \"Iniciar\""
 
 #. DESC_Section11
 #: Shared/installer/nightly.nsi:200
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "Criar um atalho no ambiente de trabalho para MTA:SA Client"
+msgstr "Cria um atalho no ambiente de trabalho para MTA:SA Client."
 
 #. DESC_Section12
 #: Shared/installer/nightly.nsi:201
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr "Registrar o protocolo mtasa:// para abrir com um browser"
+msgstr "Registra o protocolo mtasa:// para abrir com um browser."
 
 #. DESC_Section13
 #: Shared/installer/nightly.nsi:202
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "Adicionar à pasta \"Jogos\" (Se presente)"
+msgstr "Adiciona à pasta \"Jogos\" (se presente)."
 
 #. DESC_DirectX
 #: Shared/installer/nightly.nsi:203
@@ -94,12 +94,12 @@ msgstr "Principais componentes necessários para iniciar Multi Theft Auto"
 #. DESC_Section2
 #: Shared/installer/nightly.nsi:205
 msgid "The MTA:SA modification, allowing you to play online."
-msgstr "Modificações MTA:SA, que permitem jogar online"
+msgstr "Modificação MTA:SA, que permite jogar online."
 
 #. DESC_SectionGroupServer
 #: Shared/installer/nightly.nsi:208
 msgid "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
-msgstr "Servidor Multi Theft Auto. Permite criar um próprio \"servidor\" a partir do seu pc. Isto require uma ligação rápida à internet."
+msgstr "Servidor Multi Theft Auto. Permite criar um servidor próprio a partir do seu PC. Isto requer uma ligação rápida à internet."
 
 #. DESC_Section4
 #: Shared/installer/nightly.nsi:209
@@ -159,7 +159,7 @@ msgstr "Grupo de menu inicial"
 #. INST_DESKTOP_ICON
 #: Shared/installer/nightly.nsi:433
 msgid "Desktop icon"
-msgstr "Ícone da área de trabalho"
+msgstr "Ícone da ambiente de trabalho"
 
 #. INST_PROTOCOL
 #: Shared/installer/nightly.nsi:434
@@ -267,7 +267,7 @@ msgstr "Gostaria de manter os seus ficheiros de dados (como recursos, capturas d
 #. UAC_RIGHTS1
 #: Shared/installer/nightly.nsi:1143
 msgid "This installer requires admin access, try again"
-msgstr "Este instalador requer previlégios de administrador, tente novamente"
+msgstr "Este instalador requer privilégios de administrador, tente novamente"
 
 #. UAC_RIGHTS_UN
 #: Shared/installer/nightly.nsi:1144
@@ -320,14 +320,14 @@ msgstr "A pasta selecionada não existe.$\n"
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
-msgstr "Não foi possível encontrar GTA:SA instalado em $GTA_DIR $\n"
+msgstr "Não foi possível encontrar o GTA:SA instalado em $GTA_DIR $\n"
 "$\n"
 "Tem certeza que quer continuar?"
 
 #. INST_CHOOSE_LOC_TOP
 #: Shared/installer/nightly.nsi:1869
 msgid "Choose Install Location"
-msgstr "Escolher o local de instalação"
+msgstr "Escolha o local de instalação"
 
 #. INST_CHOOSE_LOC
 #: Shared/installer/nightly.nsi:1870
@@ -398,7 +398,7 @@ msgstr "A verificar informações de atualização"
 #. NETTEST_STATUS1
 #: Shared/installer/nightly.nsi:2319
 msgid "Checking for installer update information..."
-msgstr "A verificar informações de atualização do atualizador..."
+msgstr "A verificar informações do atualizador..."
 
 #. NETTEST_STATUS2
 #: Shared/installer/nightly.nsi:2320
