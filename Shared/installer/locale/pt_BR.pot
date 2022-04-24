@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-19 21:03\n"
+"PO-Revision-Date: 2022-04-24 19:36\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -64,27 +64,27 @@ msgstr "Selecione a pasta onde Grand Theft Auto: San Andreas foi instalado.$\n"
 #. DESC_Section10
 #: Shared/installer/nightly.nsi:199
 msgid "Create a Start Menu group for installed applications"
-msgstr "Criar um grupo no Menu Iniciar para as aplicações instaladas"
+msgstr "Cria um grupo no Menu Iniciar para as aplicações instaladas"
 
 #. DESC_Section11
 #: Shared/installer/nightly.nsi:200
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "Criar um atalho do MTA:SA na Área de Trabalho."
+msgstr "Cria um atalho do MTA:SA na Área de Trabalho."
 
 #. DESC_Section12
 #: Shared/installer/nightly.nsi:201
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr "Registrar o protocolo mtasa:// para os navegadores redirecionarem algum link contendo este prefixo."
+msgstr "Registra o protocolo mtasa:// para os navegadores redirecionarem algum link contendo este prefixo."
 
 #. DESC_Section13
 #: Shared/installer/nightly.nsi:202
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "Adicionar ao Explorador de Jogos do Windows (se disponível)."
+msgstr "Adiciona ao Explorador de Jogos do Windows (se disponível)."
 
 #. DESC_DirectX
 #: Shared/installer/nightly.nsi:203
 msgid "Install or update DirectX (if required)."
-msgstr "Instale ou atualize o DirectX (se necessário)."
+msgstr "Instala ou atualiza o DirectX (se necessário)."
 
 #. DESC_Section1
 #: Shared/installer/nightly.nsi:204
