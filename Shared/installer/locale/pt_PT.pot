@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-23 19:36\n"
+"PO-Revision-Date: 2022-04-24 17:35\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -20,7 +20,7 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:188
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "A versão baixada do MTA: SA não é compatível com Windows XP ou Vista. Baixe uma versão alternativa em www.mtasa.com."
+msgstr "A versão do MTA:SA descarregada não é compatível com  Windows XP ou o Vista. Por favor, descarregue uma versão alternativa a partir de www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:189
@@ -33,10 +33,10 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr "Este assistente irá guiá-lo através do processo de instalação ou atualização $ (^ Name) ${REVISION_TAG}\n\n"
-"É recomendável que você feche todos os outros aplicativos antes de executar a instalação.\n\n"
-"[O acesso administrativo pode ser necessário para o Vista e superior]\n\n"
-"Clique em próximo para continuar."
+msgstr "Este assistente irá guiá-lo através do processo de instalação ou atualização do $ (^ Name) ${REVISION_TAG}\n\n"
+"Recomenda-se que feche todas as outras aplicações antes de iniciar a instalação.\n\n"
+"[Acesso a administrador pode ser solicitado para o Vista e superior]\n\n"
+"Clique em Próximo para continuar."
 
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:194
