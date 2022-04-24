@@ -27,10 +27,8 @@ workspace "MTASA"
 
 	if os.host() == "macosx" then
 		platforms { "x64" }
-	elseif os.host() == "linux" then
-		platforms { "x86", "x64", "armhf", "arm64" }
 	else
-		platforms { "x86", "x64" }
+		platforms { "x86", "x64", "arm", "arm64" }
 	end
 
 	if _OPTIONS["gccprefix"] then
@@ -79,7 +77,7 @@ workspace "MTASA"
 		architecture "x86"
 	filter "platforms:x64"
 		architecture "x86_64"
-	filter "platforms:armhf"
+	filter "platforms:arm"
 		architecture "ARM"
 	filter "platforms:arm64"
 		architecture "ARM64"

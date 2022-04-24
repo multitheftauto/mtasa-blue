@@ -41,7 +41,7 @@ project "XML"
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
 
-	filter "platforms:armhf"
+	filter "platforms:arm"
 		targetdir(buildpath("server/arm"))
 
 	filter "platforms:arm64"

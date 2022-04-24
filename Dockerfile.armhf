@@ -5,7 +5,7 @@ USER root
 
 # Default build configuration
 ENV AS_BUILDAGENT=0 \
-    BUILD_ARCHITECTURE=armhf \
+    BUILD_ARCHITECTURE=arm \
     BUILD_CONFIG=release \
     GCC_PREFIX=arm-linux-gnueabihf- \
     AR=arm-linux-gnueabihf-ar \

@@ -1796,6 +1796,8 @@ namespace SharedUtil
     {
     #ifdef WIN_x64
         return 0;
+    #elif defined(WIN_arm) || defined(WIN_arm64)
+        return 0;
     #else
         _asm
         {

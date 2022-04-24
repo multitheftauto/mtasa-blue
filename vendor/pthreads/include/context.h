@@ -63,7 +63,7 @@
 #define PTW32_PROGCTR(Context)  ((Context).Rip)
 #endif
 
-#if defined(_ARM_) || defined(ARM)
+#if defined(_ARM_) || defined(ARM) || defined(_ARM64_)
 #define PTW32_PROGCTR(Context)  ((Context).Pc)
 #endif
 
