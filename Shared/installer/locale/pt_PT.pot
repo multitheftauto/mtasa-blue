@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-24 17:35\n"
+"PO-Revision-Date: 2022-04-24 18:35\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -199,19 +199,21 @@ msgstr "Módulo do jogo"
 #. INFO_INPLACE_UPGRADE
 #: Shared/installer/nightly.nsi:475
 msgid "Performing in-place upgrade..."
-msgstr ""
+msgstr "A afetuar uma atualização..."
 
 #. INFO_UPDATE_PERMISSIONS
 #: Shared/installer/nightly.nsi:476
 msgid "Updating permissions. This could take a few minutes..."
-msgstr ""
+msgstr "A atualizar permissões. Isto pode levar alguns minutos..."
 
 #. MSGBOX_INVALID_GTASA
 #: Shared/installer/nightly.nsi:477
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
-msgstr ""
+msgstr "Uma versão válida do Grand Theft Auto: San Andreas para Windows não foi encontrada.$\\r$\n"
+"No entanto, a instalação continuará.$\\r$\n"
+"Por favor, reinstale se houver problemas mais tarde."
 
 #. INST_SEC_CORE_RESOURCES
 #: Shared/installer/nightly.nsi:480
@@ -241,19 +243,21 @@ msgstr "$(^Name) foi removido com sucesso do seu PC."
 #. UNINST_FAIL
 #: Shared/installer/nightly.nsi:1012
 msgid "Uninstallation has failed!"
-msgstr ""
+msgstr "A desinstalação falhou!"
 
 #. UNINST_REQUEST
 #: Shared/installer/nightly.nsi:1020
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
-msgstr ""
+msgstr "Tem a certeza que deseja remover completamente o $(^Name) e todos os seus componentes?"
 
 #. UNINST_REQUEST_NOTE
 #: Shared/installer/nightly.nsi:1021
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
-msgstr ""
+msgstr "Desinstalar antes de atualizar?$\\r$\n"
+"Não é necessário desinstalar antes de instalar uma nova versão do MTA:SA$\\r$\n"
+"Execute o novo instalador para atualizar e preservar as suas definições."
 
 #. UNINST_DATA_REQUEST
 #: Shared/installer/nightly.nsi:1034
@@ -278,7 +282,7 @@ msgstr "O serviço início de sessão não está em execução, a terminar!"
 #. UAC_RIGHTS4
 #: Shared/installer/nightly.nsi:1146
 msgid "Unable to elevate"
-msgstr ""
+msgstr "Não foi possível obter o direito de execução necessário"
 
 #. INST_MTA_CONFLICT
 #: Shared/installer/nightly.nsi:1742
@@ -297,31 +301,38 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
-msgstr ""
+msgstr "O MTA não pode ser instalado na mesma pasta do GTA:SA.$\n"
+"$\n"
+"Deseja utilizar a pasta de instalação predefinida$\n"
+"$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
 #: Shared/installer/nightly.nsi:1749
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
-msgstr ""
+msgstr "A pasta selecionada não existe.$\n"
+"$\n"
+"Por favor selecione a pasta de instalação do GTA:SA"
 
 #. INST_GTA_ERROR2
 #: Shared/installer/nightly.nsi:1751
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
-msgstr ""
+msgstr "Não foi possível encontrar GTA:SA instalado em $GTA_DIR $\n"
+"$\n"
+"Tem certeza que quer continuar?"
 
 #. INST_CHOOSE_LOC_TOP
 #: Shared/installer/nightly.nsi:1869
 msgid "Choose Install Location"
-msgstr ""
+msgstr "Escolher o local de instalação"
 
 #. INST_CHOOSE_LOC
 #: Shared/installer/nightly.nsi:1870
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
-msgstr ""
+msgstr "Escolha a pasta para instalar o ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
 #: Shared/installer/nightly.nsi:1871
@@ -329,17 +340,20 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
 " Click Next to continue."
-msgstr ""
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} será instalado na seguinta pasta.$\n"
+"Para instalar numa pasta diferente, clique em Procurar e selecione outra pasta.$\n"
+"$\n"
+" Clique em Próximo para continuar."
 
 #. INST_CHOOSE_LOC3
 #: Shared/installer/nightly.nsi:1873
 msgid "Destination Folder"
-msgstr ""
+msgstr "Pasta de Destino"
 
 #. INST_CHOOSE_LOC_BROWSE
 #: Shared/installer/nightly.nsi:1874
 msgid "Browse..."
-msgstr ""
+msgstr "Procurar..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: Shared/installer/nightly.nsi:1875
@@ -349,17 +363,17 @@ msgstr "Padrão"
 #. INST_CHOOSE_LOC_LAST_USED
 #: Shared/installer/nightly.nsi:1876
 msgid "Last used"
-msgstr ""
+msgstr "Usado recentemente"
 
 #. INST_CHOOSE_LOC_CUSTOM
 #: Shared/installer/nightly.nsi:1877
 msgid "Custom"
-msgstr ""
+msgstr "Personalizado"
 
 #. INST_CHOOSE_LOC4
 #: Shared/installer/nightly.nsi:2055
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr ""
+msgstr "Selecione a pasta para instalar o ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
 #: Shared/installer/nightly.nsi:2073
@@ -369,25 +383,25 @@ msgstr "Atenção: Uma diferente versão principal do MTA ($1) já existe nesta 
 #. INST_LOC_UPGRADE
 #: Shared/installer/nightly.nsi:2074
 msgid "Installation type:  Upgrade"
-msgstr ""
+msgstr "Tipo de instalação: Atualização"
 
 #. NETTEST_TITLE1
 #: Shared/installer/nightly.nsi:2317
 msgid "Online update"
-msgstr ""
+msgstr "Atualização online"
 
 #. NETTEST_TITLE2
 #: Shared/installer/nightly.nsi:2318
 msgid "Checking for update information"
-msgstr ""
+msgstr "A verificar informações de atualização"
 
 #. NETTEST_STATUS1
 #: Shared/installer/nightly.nsi:2319
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "A verificar informações de atualização do atualizador..."
 
 #. NETTEST_STATUS2
 #: Shared/installer/nightly.nsi:2320
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "Por favor, certifique-se de que o seu firewall não está a bloquear"
 
