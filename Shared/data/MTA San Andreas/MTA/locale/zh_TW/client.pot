@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-26 07:11\n"
+"PO-Revision-Date: 2022-04-26 08:07\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -207,11 +207,12 @@ msgstr "您安裝 Grand Theft Auto: San Andreas 的資料夾內包含以下檔�
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "這些檔案並不是MTA:SA必須的檔案，而且可能會導致圖形功能出現問題。\n\n"
+"建議您刪除或是重新命名這些檔案。"
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "保留這些檔案，但下次啟動時仍然會出現該警告。"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
