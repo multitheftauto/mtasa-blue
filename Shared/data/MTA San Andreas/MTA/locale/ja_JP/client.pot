@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 21:01\n"
+"PO-Revision-Date: 2022-04-26 08:07\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -202,28 +202,29 @@ msgstr "MTA: San Andreas - 警告"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas がインストールされたフォルダーには以下のファイルが含まれています："
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "これらのファイルがなくても問題なく作動しますが、ゲームと共に起動すると画面機能に影響を与える可能性があります。\n\n"
+"この一覧のファイルを削除か、ファイル名の変更、どちらかをお選ぶのがお勧めです。"
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "この一覧のファイルを保留し、次回に起動するときも同じ警告を表示します。"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "この警告をこれから表示しないようにします。"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "これらのファイル名を *.dll から *.dll.bak に変更します。"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "一覧のファイルをエクスプローラーから開きます。"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -1614,7 +1615,7 @@ msgstr "マウス移動修正 - パソコンを再起動するのが必要かも
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "お知らせ"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
