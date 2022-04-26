@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-19 21:02\n"
+"PO-Revision-Date: 2022-04-26 07:11\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -202,7 +202,7 @@ msgstr "MTA: San Andreas-警告"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "您安裝 Grand Theft Auto: San Andreas 的資料夾內包含以下檔案："
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
@@ -215,15 +215,15 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "不要再提醒我關於這些檔案的警告"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "將這些 *.dll 檔案重新命名為 *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "顯示這些檔案"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -1615,7 +1615,7 @@ msgstr "滑鼠移動修正 - 可能需要重啟電腦"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "最新訊息"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
