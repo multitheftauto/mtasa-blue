@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 19:41+0000\n"
-"PO-Revision-Date: 2022-04-30 13:55\n"
+"PO-Revision-Date: 2022-04-30 14:55\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -207,23 +207,24 @@ msgstr "Jūsu Grand Theft Auto: San Andreas instalācijas direktorija sastāv no
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Šie faili nav vajadzīgi un var traucēt grafisko līdzekļu darbību šajā MTA:SA versijā.\n\n"
+"Ieteicams šos failus noņemt vai pārdēvēt."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Saglabāt šos failus un parādiet šo brīdinājumu arī nākamajā starta reizē"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Neatgādināt par šiem failiem atkārtoti"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Pārdēvēt šos failus no *.dll uz *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Parādīt šos failus"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -349,7 +350,7 @@ msgstr "Gatavs!"
 
 #: Client/loader/Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
+msgstr "Vai vēlaties pārtraukt MTA servera darbību un turpināt atjaunināšanu?"
 
 #: Client/loader/MainFunctions.cpp:242
 msgid "Trouble restarting MTA:SA\n\n"
@@ -1615,7 +1616,7 @@ msgstr "Peles kustības fiksēšana - Nepieciešama MTA restartēšana"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "JAUNUMI"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
@@ -2924,7 +2925,7 @@ msgstr "Šis serveris neatbalsta virtuālās mašīnas"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:596
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "Šis serveris pieprasa iespējotu 'driver signing'"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:597
 msgid "Please restart your PC"
@@ -2948,7 +2949,7 @@ msgstr "Lūdzu samainiet gta3.img vai gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
 msgid "This server does not allow Wine"
-msgstr ""
+msgstr "Šis serveris neatbalsta 'Wine'"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
 msgid "Ensure no other program is modifying MTA:SA"
@@ -2986,7 +2987,7 @@ msgstr[2] "%d minūtes"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
+msgstr[0] "%d sekundes"
 msgstr[1] "%d sekunde"
 msgstr[2] "%d sekundes"
 
