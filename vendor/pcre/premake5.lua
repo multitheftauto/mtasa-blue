@@ -30,6 +30,12 @@ project "pcre"
 	filter {"system:windows", "platforms:x64"}
 		targetdir(buildpath("server/x64"))
 
+	filter {"system:windows", "platforms:arm"}
+		targetdir(buildpath("server/arm"))
+
+	filter {"system:windows", "platforms:arm64"}
+		targetdir(buildpath("server/arm64"))
+
 	filter "system:not windows"
 		defines { "HAVE_STRTOLL" }
 		kind "StaticLib"
