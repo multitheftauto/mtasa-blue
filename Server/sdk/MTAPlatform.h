@@ -18,6 +18,10 @@ extern "C" bool g_bNoTopBar;
 #if defined(WIN32)
     #ifdef _WIN64
         #define MTA_OS_STRING   "Windows x64"
+    #elif defined(_M_ARM64)
+        #define MTA_OS_STRING   "Windows arm64"
+    #elif defined(_M_ARM)
+        #define MTA_OS_STRING   "Windows arm"
     #else
         #define MTA_OS_STRING   "Windows"
     #endif
@@ -25,6 +29,10 @@ extern "C" bool g_bNoTopBar;
 #elif defined(__linux__)
     #ifdef __x86_64__
         #define MTA_OS_STRING   "GNU/Linux x64"
+    #elif defined(__aarch64__)
+        #define MTA_OS_STRING   "GNU/Linux arm64"
+    #elif defined(__arm__)
+        #define MTA_OS_STRING   "GNU/Linux arm"
     #else
         #define MTA_OS_STRING   "GNU/Linux"
     #endif
