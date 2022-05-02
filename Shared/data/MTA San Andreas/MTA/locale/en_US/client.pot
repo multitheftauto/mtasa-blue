@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-02 06:34+0000\n"
+"POT-Creation-Date: 2022-05-02 20:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -875,7 +875,7 @@ msgstr ""
 #. Display an error, reset the error status and exit
 #: Client/core/CSettings.cpp:2888 Client/core/CSettings.cpp:4062
 #: Client/core/CSettings.cpp:4090 Client/core/CSettings.cpp:4621
-#: Client/core/CCore.cpp:1214 Client/core/CCore.cpp:1227
+#: Client/core/CCore.cpp:1211 Client/core/CCore.cpp:1224
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
@@ -1258,98 +1258,98 @@ msgstr ""
 msgid "%s module is incorrect!"
 msgstr ""
 
-#: Client/core/CCore.cpp:1214
+#: Client/core/CCore.cpp:1211
 msgid "Error executing URL"
 msgstr ""
 
-#: Client/core/CCore.cpp:1226
+#: Client/core/CCore.cpp:1223
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr ""
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1311
+#: Client/core/CCore.cpp:1308
 msgid "this help screen"
 msgstr ""
 
-#: Client/core/CCore.cpp:1312 Client/core/CCore.cpp:1313
+#: Client/core/CCore.cpp:1309 Client/core/CCore.cpp:1310
 msgid "exits the application"
 msgstr ""
 
-#: Client/core/CCore.cpp:1314
+#: Client/core/CCore.cpp:1311
 msgid "shows the version"
 msgstr ""
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1312
 msgid "shows the time"
 msgstr ""
 
-#: Client/core/CCore.cpp:1316
+#: Client/core/CCore.cpp:1313
 msgid "shows the hud"
 msgstr ""
 
-#: Client/core/CCore.cpp:1317
+#: Client/core/CCore.cpp:1314
 msgid "shows all the binds"
 msgstr ""
 
-#: Client/core/CCore.cpp:1318
+#: Client/core/CCore.cpp:1315
 msgid "shows your serial"
 msgstr ""
 
-#: Client/core/CCore.cpp:1327
+#: Client/core/CCore.cpp:1324
 msgid "connects to a server (host port nick pass)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1328
+#: Client/core/CCore.cpp:1325
 msgid "connects to a previous server"
 msgstr ""
 
-#: Client/core/CCore.cpp:1329
+#: Client/core/CCore.cpp:1326
 msgid "binds a key (key control)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1330
+#: Client/core/CCore.cpp:1327
 msgid "unbinds a key (key)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1331
+#: Client/core/CCore.cpp:1328
 msgid "copies the default gta controls"
 msgstr ""
 
-#: Client/core/CCore.cpp:1332
+#: Client/core/CCore.cpp:1329
 msgid "outputs a screenshot"
 msgstr ""
 
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1330
 msgid "immediately saves the config"
 msgstr ""
 
-#: Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1332
 msgid "clears the debug view"
 msgstr ""
 
-#: Client/core/CCore.cpp:1336
+#: Client/core/CCore.cpp:1333
 msgid "scrolls the chatbox upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1334
 msgid "scrolls the chatbox downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1335
 msgid "scrolls the debug view upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1336
 msgid "scrolls the debug view downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1342
+#: Client/core/CCore.cpp:1339
 msgid "shows the memory statistics"
 msgstr ""
 
-#: Client/core/CCore.cpp:1343
+#: Client/core/CCore.cpp:1340
 msgid "shows the frame timing graph"
 msgstr ""
 
