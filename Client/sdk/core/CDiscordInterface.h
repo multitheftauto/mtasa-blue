@@ -13,7 +13,8 @@
 class CDiscordInterface
 {
 public:
-    virtual void SetTemplate(unsigned int uiNumber) = 0;
     virtual void UpdatePresence() = 0;
     virtual void SetPresenceState(const char* szState) = 0;
+    virtual void SetPresenceDetails(const char* szDetails) = 0;
+    virtual void SetPresenceStartTimestamp(const unsigned long ulStart) = 0;
 };

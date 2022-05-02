@@ -45,30 +45,14 @@ CDiscordRichPresence::~CDiscordRichPresence()
     memset(&handlers, 0, sizeof(handlers));
 }
 
-void CDiscordRichPresence::SetTemplate(unsigned int uiNumber)
-{
-    switch (uiNumber)
-    {
-        case 0: // main menu
-        {
-            this->SetPresenceState("Main Menu");
-            break;
-        }
-        case 1: // in-game
-        {
-            this->SetPresenceState("In-game");
-            break;
-        }
-    }
-    this->UpdatePresence();
-}
-
 void CDiscordRichPresence::UpdatePresence()
 {
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
+    discordPresence.largeImageKey = m_strDiscordAppAsset;
     discordPresence.state = m_strDiscordAppState;
     discordPresence.details = m_strDiscordAppDetails;
+    discordPresence.startTimestamp = m_uiDiscordAppStart;
 
     Discord_UpdatePresence(&discordPresence);
 }
@@ -76,4 +60,14 @@ void CDiscordRichPresence::UpdatePresence()
 void CDiscordRichPresence::SetPresenceState(const char* szState)
 {
     m_strDiscordAppState = szState;
+}
+
+void CDiscordRichPresence::SetPresenceDetails(const char* szDetails)
+{
+    m_strDiscordAppDetails = szDetails;
+}
+
+void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart)
+{
+    m_uiDiscordAppStart = ulStart;
 }

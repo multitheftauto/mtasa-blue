@@ -19,12 +19,11 @@ public:
     CDiscordRichPresence();
     ~CDiscordRichPresence();
 
-    void SetTemplate(unsigned int uiNumber);
-
     // void SetApplicationId();
     void UpdatePresence();
     void SetPresenceState(const char* szState);
-    // void SetPresenceDetails();
+    void SetPresenceDetails(const char* szDetails);
+    void SetPresenceStartTimestamp(const unsigned long ulStart);
     // void SetPresenceTimestamp();
     // void SetPresenceImage();
     // void SetPresenceText();
