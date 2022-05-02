@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-02 03:54+0000\n"
+"POT-Creation-Date: 2022-05-02 06:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -642,7 +642,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:4498 Client/core/CQuestionBox.cpp:194
 #: Client/core/CVersionUpdater.cpp:1568 Client/core/CVersionUpdater.cpp:1586
 #: Client/core/CVersionUpdater.cpp:1855 Client/core/CVersionUpdater.cpp:1874
-#: Client/core/CMainMenu.cpp:1150 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CMainMenu.cpp:1151 Client/core/ServerBrowser/CServerInfo.cpp:479
 #: Client/loader/Dialogs.cpp:33
 msgid "No"
 msgstr ""
@@ -658,7 +658,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:4499 Client/core/CQuestionBox.cpp:195
 #: Client/core/CVersionUpdater.cpp:1569 Client/core/CVersionUpdater.cpp:1587
 #: Client/core/CVersionUpdater.cpp:1856 Client/core/CVersionUpdater.cpp:1875
-#: Client/core/CMainMenu.cpp:1151 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CMainMenu.cpp:1152 Client/core/ServerBrowser/CServerInfo.cpp:479
 #: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
 msgstr ""
@@ -875,7 +875,7 @@ msgstr ""
 #. Display an error, reset the error status and exit
 #: Client/core/CSettings.cpp:2888 Client/core/CSettings.cpp:4062
 #: Client/core/CSettings.cpp:4090 Client/core/CSettings.cpp:4621
-#: Client/core/CCore.cpp:1196 Client/core/CCore.cpp:1209
+#: Client/core/CCore.cpp:1214 Client/core/CCore.cpp:1227
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
@@ -1240,116 +1240,116 @@ msgid ""
 "Waiting for response  -  %-3d"
 msgstr ""
 
-#: Client/core/CCore.cpp:724 Client/loader/CInstallManager.cpp:756
+#: Client/core/CCore.cpp:742 Client/loader/CInstallManager.cpp:756
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
 
-#: Client/core/CCore.cpp:726 Shared/mods/deathmatch/logic/Utils.cpp:102
+#: Client/core/CCore.cpp:744 Shared/mods/deathmatch/logic/Utils.cpp:102
 msgid "Fatal error"
 msgstr ""
 
-#: Client/core/CCore.cpp:851
+#: Client/core/CCore.cpp:869
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr ""
 
-#: Client/core/CCore.cpp:883
+#: Client/core/CCore.cpp:901
 #, c-format
 msgid "%s module is incorrect!"
 msgstr ""
 
-#: Client/core/CCore.cpp:1196
+#: Client/core/CCore.cpp:1214
 msgid "Error executing URL"
 msgstr ""
 
-#: Client/core/CCore.cpp:1208
+#: Client/core/CCore.cpp:1226
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr ""
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1293
+#: Client/core/CCore.cpp:1311
 msgid "this help screen"
 msgstr ""
 
-#: Client/core/CCore.cpp:1294 Client/core/CCore.cpp:1295
+#: Client/core/CCore.cpp:1312 Client/core/CCore.cpp:1313
 msgid "exits the application"
 msgstr ""
 
-#: Client/core/CCore.cpp:1296
+#: Client/core/CCore.cpp:1314
 msgid "shows the version"
 msgstr ""
 
-#: Client/core/CCore.cpp:1297
+#: Client/core/CCore.cpp:1315
 msgid "shows the time"
 msgstr ""
 
-#: Client/core/CCore.cpp:1298
+#: Client/core/CCore.cpp:1316
 msgid "shows the hud"
 msgstr ""
 
-#: Client/core/CCore.cpp:1299
+#: Client/core/CCore.cpp:1317
 msgid "shows all the binds"
 msgstr ""
 
-#: Client/core/CCore.cpp:1300
+#: Client/core/CCore.cpp:1318
 msgid "shows your serial"
 msgstr ""
 
-#: Client/core/CCore.cpp:1309
+#: Client/core/CCore.cpp:1327
 msgid "connects to a server (host port nick pass)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1310
+#: Client/core/CCore.cpp:1328
 msgid "connects to a previous server"
 msgstr ""
 
-#: Client/core/CCore.cpp:1311
+#: Client/core/CCore.cpp:1329
 msgid "binds a key (key control)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1312
+#: Client/core/CCore.cpp:1330
 msgid "unbinds a key (key)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1313
+#: Client/core/CCore.cpp:1331
 msgid "copies the default gta controls"
 msgstr ""
 
-#: Client/core/CCore.cpp:1314
+#: Client/core/CCore.cpp:1332
 msgid "outputs a screenshot"
 msgstr ""
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1333
 msgid "immediately saves the config"
 msgstr ""
 
-#: Client/core/CCore.cpp:1317
+#: Client/core/CCore.cpp:1335
 msgid "clears the debug view"
 msgstr ""
 
-#: Client/core/CCore.cpp:1318
+#: Client/core/CCore.cpp:1336
 msgid "scrolls the chatbox upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1319
+#: Client/core/CCore.cpp:1337
 msgid "scrolls the chatbox downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1320
+#: Client/core/CCore.cpp:1338
 msgid "scrolls the debug view upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1321
+#: Client/core/CCore.cpp:1339
 msgid "scrolls the debug view downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1324
+#: Client/core/CCore.cpp:1342
 msgid "shows the memory statistics"
 msgstr ""
 
-#: Client/core/CCore.cpp:1325
+#: Client/core/CCore.cpp:1343
 msgid "shows the frame timing graph"
 msgstr ""
 
@@ -1532,27 +1532,27 @@ msgstr ""
 msgid "This software makes use of the following libraries and software:"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:318
+#: Client/core/CMainMenu.cpp:319
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot "
 "be used to connect to public servers!"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:337
+#: Client/core/CMainMenu.cpp:338
 msgid ""
 "MTA will not receive updates on XP/Vista after July 2019.\n"
 "\n"
 "Upgrade Windows to play on the latest servers."
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1144
+#: Client/core/CMainMenu.cpp:1145
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
 "Are you sure you want to disconnect?"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1148
+#: Client/core/CMainMenu.cpp:1149
 msgid "DISCONNECT WARNING"
 msgstr ""
 
