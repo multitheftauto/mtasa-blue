@@ -1169,9 +1169,6 @@ void CCore::DoPostFramePulse()
         ApplyGameSettings();
 
         m_pGUI->SelectInputHandlers(INPUT_CORE);
-
-        // Change the main thread affinity to first core
-        SetThreadAffinityMask(GetCurrentThread(), 0x1);
     }
 
     if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
