@@ -38,11 +38,21 @@ project "pthread"
 			"copy \"%{wks.location}..\\Bin\\server\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\pthread.dll\""
 		}
 
-	filter {"system:windows", "platforms:not x86", "configurations:Debug"}
+	filter {"system:windows", "platforms:x64", "configurations:Debug"}
 		postbuildcommands {
 			-- Fix net.dll requiring the release build
 			"copy \"%{wks.location}..\\Bin\\server\\x64\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\x64\\pthread.dll\"",
+		}
+
+	filter {"system:windows", "platforms:arm", "configurations:Debug"}
+		postbuildcommands {
+			-- Fix net.dll requiring the release build
 			"copy \"%{wks.location}..\\Bin\\server\\arm\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\arm\\pthread.dll\"",
+		}
+
+	filter {"system:windows", "platforms:arm64", "configurations:Debug"}
+		postbuildcommands {
+			-- Fix net.dll requiring the release build
 			"copy \"%{wks.location}..\\Bin\\server\\arm64\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\arm64\\pthread.dll\"",
 		}
 
