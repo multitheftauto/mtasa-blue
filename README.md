@@ -97,7 +97,7 @@ If you have problems resolving the required dependencies or want maximum compati
 $ docker pull ghcr.io/multitheftauto/mtasa-blue-build:latest
 ```
 
-| Architecture | Docker image tag | Required command line arguments |
+| Architecture | Docker image tag | Required build-time CLI-arguments |
 | ------------ | ---------------- | ------------------------------- |
 | x86          | latest           | `-e BUILD_ARCHITECTURE=x86`     |
 | x86_64       | latest           |                                 |
