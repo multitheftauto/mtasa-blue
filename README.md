@@ -107,18 +107,14 @@ $ docker pull ghcr.io/multitheftauto/mtasa-blue-build:latest
 
 **Building with Docker**
 
-These examples assume that your current directory is the mtasa-blue checkout directory. You should also know that `/build` is the code directory required by our Docker images inside the container.
+These examples assume that your current directory is the mtasa-blue checkout directory. You should also know that `/build` is the code directory required by our Docker images inside the container. If the current directory is not a valid git repository, it instead create a (shallow) clone of the mtasa-blue repository. After compiling, you will find the resulting binaries in `./Bin`. To build the unoptimised debug build, add `-e BUILD_CONFIG=debug` to the docker run arguments.
 
 | Architecture | Build command                                                                                |
 | ------------ | -------------------------------------------------------------------------------------------- |
-| x86          | `docker run --rm -v `pwd`:/build -e BUILD_ARCHITECTURE=x86 multitheftauto/mtasa-blue:latest` |
-| x86_64       | `docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:latest`                           |
-| arm          | `docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:armhf`                            |
-| arm64        | `docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:arm64`                            |
-
-If the current directory is a valid git repository clone, it will use this as the build source. If not, it will create a (shallow) clone. After compiling, you will find the resulting binaries in `./Bin`.
-
-To build the unoptimised debug build, add `-e BUILD_CONFIG=debug` to the docker run arguments.
+| x86          | ``` docker run --rm -v `pwd`:/build -e BUILD_ARCHITECTURE=x86 multitheftauto/mtasa-blue:latest ``` |
+| x86_64       | ``` docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:latest ```                           |
+| arm          | ``` docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:armhf ```                            |
+| arm64        | ``` docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:arm64 ```                            |
 
 ### Premake FAQ
 #### How to add new C++ source files?
