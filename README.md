@@ -48,7 +48,7 @@ Prerequisites
 
 #### GNU/Linux
 
-You can only build the MTA:SA server for GNU/Linux distributions and then only for x86, x86_64, armhf and arm64 CPU architectures. ARM architectures are currently in **experimental phase**, which means it's unstable, untested and they may crash randomly. Beware, that we officially only support building from x86_64 and that includes cross-compiling for x86, arm and arm64.
+You can build the MTA:SA server on GNU/Linux distributions only for x86, x86_64, armhf and arm64 CPU architectures. ARM architectures are currently in **experimental phase**, which means they're unstable, untested and may crash randomly. Beware that we only officially support building from x86_64 and that includes cross-compiling for x86, arm and arm64.
 
 **Build dependencies**
 
