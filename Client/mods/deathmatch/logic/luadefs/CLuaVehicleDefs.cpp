@@ -1300,21 +1300,17 @@ std::variant<bool, float> CLuaVehicleDefs::GetVehicleRotorSpeed(CClientVehicle* 
     {
         case CLIENTVEHICLE_PLANE:
         {
-            fSpeed = pVehicle->GetPlaneRotorSpeed();
-            break;
+            return pVehicle->GetPlaneRotorSpeed();
         }
         case CLIENTVEHICLE_HELI:
         {
-            fSpeed = pVehicle->GetHeliRotorSpeed();
-            break;
+            return pVehicle->GetHeliRotorSpeed();
         }
         default:
         {
             return false;
         }
     }
-
-    return fSpeed;
 }
 
 int CLuaVehicleDefs::IsTrainDerailed(lua_State* luaVM)

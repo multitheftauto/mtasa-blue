@@ -289,10 +289,10 @@ public:
     bool GetWheelMissing(unsigned char ucWheel, const SString& strWheelName = "");
 
     // TODO: Make the class remember on virtualization
-    float GetHeliRotorSpeed();
+    float GetHeliRotorSpeed() const;
     void  SetHeliRotorSpeed(float fSpeed);
 
-    float GetPlaneRotorSpeed();
+    float GetPlaneRotorSpeed() const;
     void  SetPlaneRotorSpeed(float fSpeed);
 
     bool IsHeliSearchLightVisible();

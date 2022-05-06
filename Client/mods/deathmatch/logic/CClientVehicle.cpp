@@ -1535,7 +1535,7 @@ bool CClientVehicle::AreLightsOn()
     return m_pVehicle ? m_pVehicle->GetLightsOn() : false;
 }
 
-float CClientVehicle::GetHeliRotorSpeed()
+float CClientVehicle::GetHeliRotorSpeed() const
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
         return m_pVehicle->GetHeliRotorSpeed();
@@ -1543,7 +1543,7 @@ float CClientVehicle::GetHeliRotorSpeed()
     return m_fHeliRotorSpeed;
 }
 
-float CClientVehicle::GetPlaneRotorSpeed()
+float CClientVehicle::GetPlaneRotorSpeed() const
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
         return m_pVehicle->GetPlaneRotorSpeed();
