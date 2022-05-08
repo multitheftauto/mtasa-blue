@@ -450,14 +450,10 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
         {
-        #ifdef MTA_CLIENT
-            CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(L);
-        #else
-            CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(L);
-        #endif
+            CLuaMain&   luaMain = lua_getownercluamain(L);
             const void* pFuncPtr = lua_topointer(L, index);
 
-            if (CRefInfo* pInfo = MapFind(pLuaMain->m_CallbackTable, pFuncPtr))
+            if (CRefInfo* pInfo = MapFind(luaMain.m_CallbackTable, pFuncPtr))
             {
                 // Re-use the lua ref we already have to this function
                 pInfo->ulUseCount++;
@@ -472,7 +468,7 @@ struct CLuaFunctionParserBase
 
                 // Save ref info
                 CRefInfo info{1, ref};
-                MapSet(pLuaMain->m_CallbackTable, pFuncPtr, info);
+                MapSet(luaMain.m_CallbackTable, pFuncPtr, info);
 
                 ++index;
                 return CLuaFunctionRef(L, ref, pFuncPtr);

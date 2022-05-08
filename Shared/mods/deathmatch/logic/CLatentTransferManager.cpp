@@ -391,7 +391,7 @@ void DoDeallocateNetBitStream(NetBitStreamInterface* pBitStream)
 bool DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetServerPacketPriority packetPriority,
                   NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering)
 {
-    return g_pNetServer->SendPacket(ucPacketID, remoteId, bitStream, FALSE, packetPriority, packetReliability, packetOrdering);
+    return g_pNetServer->SendPacket(ucPacketID, remoteId, bitStream, false, packetPriority, packetReliability, packetOrdering);
 }
 
 bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)
