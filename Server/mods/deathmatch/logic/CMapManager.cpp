@@ -10,6 +10,23 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMapManager.h"
+#include "CPedManager.h"
+#include "CWaterManager.h"
+#include "CPlayerManager.h"
+#include "CMarkerManager.h"
+#include "CWater.h"
+#include "CMarker.h"
+#include "CBlip.h"
+#include "CGame.h"
+#include "CMainConfig.h"
+#include "CResource.h"
+#include "CPerfStatManager.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "packets/CEntityAddPacket.h"
+#include "packets/CPlayerSpawnPacket.h"
+#include "packets/CPickupHideShowPacket.h"
+#include "packets/CVehicleSpawnPacket.h"
 
 extern CGame* g_pGame;
 

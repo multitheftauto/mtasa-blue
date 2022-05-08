@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaArgument.h"
+#include "CLuaArguments.h"
+#include "LuaCommon.h"
+#include "CGame.h"
+#include "CElementIDs.h"
+#include "CScriptDebugging.h"
+#include "CResourceManager.h"
 
 extern CGame* g_pGame;
 

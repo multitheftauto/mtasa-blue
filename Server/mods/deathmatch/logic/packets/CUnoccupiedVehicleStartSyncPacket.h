@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CPacket.h"
+
 class CVehicle;
 
 class CUnoccupiedVehicleStartSyncPacket final : public CPacket

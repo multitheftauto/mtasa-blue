@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPickupHitConfirmPacket.h"
+#include "CPickup.h"
 
 bool CPickupHitConfirmPacket::Write(NetBitStreamInterface& BitStream) const
 {

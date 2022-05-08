@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerChangeNickPacket.h"
+#include "CElement.h"
 
 CPlayerChangeNickPacket::CPlayerChangeNickPacket(const char* szNewNick)
 {

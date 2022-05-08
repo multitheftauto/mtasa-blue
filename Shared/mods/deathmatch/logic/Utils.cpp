@@ -10,12 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "Utils.h"
 
 #ifndef MTA_CLIENT
-#include "net/SyncStructures.h"
+    #include "CGame.h"
+    #include "packets/CPlayerDisconnectedPacket.h"
+    #include "net/SyncStructures.h"
 
-#include <sys/types.h>  // For stat().
-#include <sys/stat.h>   // For stat().
+    #include <sys/types.h>  // For stat().
+    #include <sys/stat.h>   // For stat().
 #endif
 
 #ifdef MTA_CLIENT

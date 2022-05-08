@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaElementDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CDummy.h"
+#include "Utils.h"
 
 void CLuaElementDefs::LoadFunctions()
 {

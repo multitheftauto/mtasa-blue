@@ -9,6 +9,14 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "CBandwidthSettings.h"
+
+class CLuaMain;
+class CRegistry;
+struct lua_State;
+
 //
 // Use global struct instead of calls for efficient gathering of certain stats
 //

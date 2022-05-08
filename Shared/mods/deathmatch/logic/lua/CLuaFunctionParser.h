@@ -503,8 +503,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector2 may also be filled from a vector3/vector4
                 if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
@@ -536,8 +536,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
@@ -568,8 +568,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
@@ -608,8 +608,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector4 may also be filled from a CLuaMatrix
                 if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
@@ -628,8 +628,7 @@ struct CLuaFunctionParserBase
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopPrimitive<void*>(L, index);
             using class_t = std::remove_pointer_t<T>;
-            auto result =
-                isLightUserData ? UserDataCast<class_t>((class_t*)0, pValue, L) : UserDataCast<class_t>((class_t*)0, *reinterpret_cast<void**>(pValue), L);
+            auto result = isLightUserData ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
             if (result == nullptr)
             {
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the

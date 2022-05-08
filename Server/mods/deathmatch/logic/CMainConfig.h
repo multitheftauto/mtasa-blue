@@ -20,7 +20,10 @@ class CMainConfig;
 #include <list>
 
 #define MAX_MAP_NAME_LENGTH 64
+
 class CMainConfig;
+class CCommandLineParser;
+class CLuaArguments;
 
 typedef void (CMainConfig::*PFN_SettingChangeCallback)();
 

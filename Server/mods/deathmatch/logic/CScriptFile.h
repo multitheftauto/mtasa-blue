@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CElement.h"
+#include "lua/LuaCommon.h"
 #include <stdio.h>
 #include <string>
 

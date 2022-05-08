@@ -8,5 +8,6 @@
  *
  *****************************************************************************/
 
+#define SHOW_SELF_COMPILE_WARNING
 #include "StdInc.h"
 #include "SharedUtil.hpp"

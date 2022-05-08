@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicleTrailerPacket.h"
+#include "CVehicle.h"
+#include <net/SyncStructures.h>
 
 CVehicleTrailerPacket::CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrailer, bool bAttached)
 {

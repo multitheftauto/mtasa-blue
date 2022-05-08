@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerManager.h"
+#include "packets/CPlayerDisconnectedPacket.h"
+#include "CGame.h"
 #include "net/SimHeaders.h"
 
 CPlayerManager::CPlayerManager()
