@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-05 20:20+0000\n"
-"PO-Revision-Date: 2022-05-05 21:09\n"
+"POT-Creation-Date: 2022-05-09 08:36+0000\n"
+"PO-Revision-Date: 2022-05-09 09:32\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -899,7 +899,7 @@ msgstr "УПРАВЛІННЯ МУЛЬТИПЛЕЄРУ"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:358
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:140
 msgid "Error"
 msgstr "Помилка"
@@ -1228,7 +1228,7 @@ msgstr "\n\n"
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "Для інсталяції MTA:SA бракує вільного місця на диску %s."
 
-#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:102
+#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Фатальна помилка"
 
@@ -3018,7 +3018,7 @@ msgid "Download error: %s"
 msgstr "Помилка завантаження: %s"
 
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:100
+#: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Критична помилка (%u). Якщо проблема не виправлена, то зверніться на mtasa.com, за рішенням."
@@ -3027,12 +3027,12 @@ msgstr "Критична помилка (%u). Якщо проблема не в�
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:116
+#: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Помилка протоколу (%u). Якщо проблема не виправлена, то зверніться на сайт mtasa.com, щоб отримати підтримку."
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:118
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
 msgstr "Помилка з'єднання"
 
