@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-05 20:20+0000\n"
-"PO-Revision-Date: 2022-05-05 21:09\n"
+"POT-Creation-Date: 2022-05-09 08:36+0000\n"
+"PO-Revision-Date: 2022-05-09 09:32\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -899,7 +899,7 @@ msgstr "KONTROL MULTI PEMAIN"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:358
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:140
 msgid "Error"
 msgstr "Kesalahan"
@@ -1231,7 +1231,7 @@ msgstr "\n\n"
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA tidak dapat dilanjutkan karena drive %s tidak mempunyai ruang yang cukup."
 
-#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:102
+#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Kesalahan fatal"
 
@@ -3005,7 +3005,7 @@ msgid "Download error: %s"
 msgstr "Kesalahan pengunduhan: %s"
 
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:100
+#: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Kesalahan fatal (%u). Jika masalah ini berlanjut, silakan cek mtasa.com untuk bantuan."
@@ -3014,12 +3014,12 @@ msgstr "Kesalahan fatal (%u). Jika masalah ini berlanjut, silakan cek mtasa.com 
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:116
+#: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Kesalahan protokol (%u). Jika masalah ini berlanjut, silakan cek mtasa.com untuk bantuan."
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:118
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
 msgstr "Kesalahan koneksi"
 
