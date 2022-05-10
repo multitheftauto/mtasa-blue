@@ -1,3 +1,163 @@
+2022-05-01  Werner Lemberg  <wl@gnu.org>
+
+	* Version 2.12.1 released.
+	==========================
+
+	Tag sources with `VER-2-12-1'.
+
+	* docs/VERSION.TXT: Add entry for version 2.12.1.
+	* docs/CHANGES, docs/release: Updated.
+
+	* README, src/base/ftver.rc, builds/windows/vc2010/index.html,
+	builds/windows/visualc/index.html, builds/windows/visualce/index.html,
+	builds/wince/vc2005-ce/index.html, builds/wince/vc2008-ce/index.html,
+	docs/freetype-config.1: s/2.12.0/2.12.1/, s/2120/2121/.
+
+	* include/freetype/freetype.h (FREETYPE_PATCH): Set to 1.
+
+	* builds/unix/configure.raw (version_info): Set to 24:3:18.
+	* CMakeLists.txt (VERSION_PATCH): Set to 1.
+
+2022-04-30  Anuj Verma  <anuj@posteo.net>
+
+	[sdf] Do not throw errors for invisible glyphs.
+
+	* src/sdf/ftsdfrend.c (ft_sdf_render, ft_bsdf_render): Return `FT_Err_Ok` if
+	width or height is zero, since some glyphs do not generate visible bitmaps.
+
+	Fixes #1150.
+
+2022-04-30  Werner Lemberg  <wl@gnu.org>
+
+	* src/sfnt/sfobjs.c (sfnt_load_face): Set `FT_FACE_FLAG_COLOR` for SVG fonts.
+
+	Fixes #1151.
+
+2022-04-27  Brendan Shanks  <bshanks@codeweavers.com>
+
+	autogen.sh: Fix building when freetype is itself a git submodule.
+
+	There are situations where .git is not a directory, like when
+	freetype is a submodule in another repository.
+
+2022-04-26  Alexei Podtelezhnikov  <apodtele@gmail.com>
+
+	[builds/windows] Simplify non-desktop UWP check.
+
+	Fixes mingw compilation described in !159.
+
+	* builds/windows/ftsystem.c: Do not use WINAPI_FAMILY_PARTITION macro.
+
+2022-04-25  Alexei Podtelezhnikov  <apodtele@gmail.com>
+
+	[truetype] Reset IUP flags in `TT_RunIns`.
+
+	Fixes #1148 by moving the flag initialization back, partly reverting
+	7809007a and fd03dcc1.  Initializing these flags elsewhere skips 'cvt'.
+
+	* src/truetype/ttinterp.c (TT_RunIns): Initialize the IUP flag here...
+	(TT_Run_Context): ... instead of here.
+
+2022-04-24  Xavier Claessens  <xavier.claessens@collabora.com>
+
+	[meson] Remove `default_library=both` from `default_options`.
+
+	It is inconsistent with what all other Meson projects do.
+
+	It also prevents static linking to FreeType when it is a subproject because
+	`default_options` in a subproject takes precedence on values set on the main
+	project.  For example, building 'GStreamer' with `-Ddefault_library=static`
+	would still dynamically link on FreeType unless the user also sets
+	`-Dfreetype2:default_library=static`.
+
+	* meson.build: Updated.
+
+	* .gitlab-ci.yml: Retain `both` option for testing.
+
+2022-04-19  Werner Lemberg  <wl@gnu.org>
+
+	* src/truetype/ttgload.c (TT_Process_Simple_Glyph): Integer overflow.
+
+	Reported as
+
+	  https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=46792
+
+2022-04-16  Georg Brandl  <georg@python.org>
+
+	* src/cff/cffgload.c (cff_slot_load) [FT_CONFIG_OPTION_SVG]: Fix segfault.
+
+	This can happen if the function is called with `size` being `NULL`.
+
+	Fixes #1147.
+
+2022-04-14  Steve Lhomme  <robux4@ycbcr.xyz>
+
+	.gitlab-ci.yml: Add a Universal Windows build target
+
+	It's compiled for Windows 10 and up, ensuring UNICODE is set (default for UWP)
+	and selecting the proper WINAPI_FAMILY (WINAPI_FAMILY_APP).
+
+	Do not try to run the UWP exe in the Docker as it doesn't work.
+
+2022-04-04  Ben Wagner  <bungeman@chromium.org>
+
+	[sfnt] Correct FT_ColorStopIterator documentation.
+
+	* include/freetype/ftcolor.h (FT_ColorStopIterator): the user should not
+	 set `p` to NULL before calling `FT_Get_Colorline_Stops`. `p` and
+	`num_color_stops` are set by `FT_Get_Paint`. `p` and
+	`current_color_stop` are updated by `FT_Get_Colorline_Stops`.
+
+2022-04-01  Werner Lemberg  <wl@gnu.org>
+
+	* builds/unix/configure.raw: Add option `--with-librsvg`.
+
+	Since 'librsvg' is written in Rust, this option allows distributions to
+	avoid a dependency on the entire Rust toolchain to provide the FreeType demo
+	programs.
+
+	Suggested by Lars Wendler in !156.
+
+2022-04-01  Werner Lemberg  <wl@gnu.org>
+
+	* src/sfnt/sfwoff.c (reconstruct_glyf): Fix gcc 10 warning.
+
+2022-04-01  Werner Lemberg  <wl@gnu.org>
+
+	[gzip] Update sources to zlib 1.2.12.
+
+2022-04-01  Eric Jing  <@CPUcontrol>
+
+	CMakeLists.txt: Fix `Info.plist` path.
+
+	When building a framework using CMake with `add_subdirectory`, CMake must be
+	able to find `freetype-Info.plist` when configuring the framework
+	properties.
+
+	Fixes #1145.
+
+2022-04-01  Werner Lemberg  <wl@gnu.org>
+
+	Whitespace.
+
+2022-04-01  Ben Wagner  <bungeman@chromium.org>
+
+	[truetype] Use SUB_LONG for component offset.
+
+	* src/truetype/ttgload.c (TT_Process_Composite_Component): do it.
+
+	Bug: https://crbug.com/1309429
+
+2022-03-31  Werner Lemberg  <wl@gnu.org>
+
+	CMakeList.txt: Update code to handle recent changes for `freetype.pc`.
+
+	Fixes #1144.
+
+2022-03-31  Werner Lemberg  <wl@gnu.org>
+
+	CMakeLists.txt: s/PKG_CONFIG/PKGCONFIG/, s/REQUIRED_/REQUIRES_/.
+
 2022-03-31  Werner Lemberg  <wl@gnu.org>
 
 	* Version 2.12.0 released.

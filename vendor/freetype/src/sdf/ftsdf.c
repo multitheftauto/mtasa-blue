@@ -3014,7 +3014,7 @@
         diff = current_dist.distance - min_dist.distance;
 
 
-        if ( FT_ABS(diff ) < CORNER_CHECK_EPSILON )
+        if ( FT_ABS( diff ) < CORNER_CHECK_EPSILON )
           min_dist = resolve_corner( min_dist, current_dist );
         else if ( diff < 0 )
           min_dist = current_dist;

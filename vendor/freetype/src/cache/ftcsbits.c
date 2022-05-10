@@ -171,7 +171,7 @@
       sbit->xadvance  = (FT_Char)xadvance;
       sbit->yadvance  = (FT_Char)yadvance;
       sbit->format    = (FT_Byte)bitmap->pixel_mode;
-      sbit->max_grays = (FT_Byte)(bitmap->num_grays - 1);
+      sbit->max_grays = (FT_Byte)( bitmap->num_grays - 1 );
 
       if ( slot->internal->flags & FT_GLYPH_OWN_BITMAP )
       {

@@ -489,7 +489,7 @@
                                       &dir_entry1 )                )
             goto Exit;
 
-          if ( !(dir_entry1.offset & 0x80000000UL ) /* DataIsDirectory */ )
+          if ( !( dir_entry1.offset & 0x80000000UL ) /* DataIsDirectory */ )
           {
             error = FT_THROW( Invalid_File_Format );
             goto Exit;
@@ -513,7 +513,7 @@
                                         &dir_entry2 )                )
               goto Exit;
 
-            if ( !(dir_entry2.offset & 0x80000000UL ) /* DataIsDirectory */ )
+            if ( !( dir_entry2.offset & 0x80000000UL ) /* DataIsDirectory */ )
             {
               error = FT_THROW( Invalid_File_Format );
               goto Exit;
