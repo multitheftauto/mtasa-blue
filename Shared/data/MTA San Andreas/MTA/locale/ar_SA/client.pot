@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-09 08:36+0000\n"
-"PO-Revision-Date: 2022-05-09 09:32\n"
+"POT-Creation-Date: 2022-05-10 21:53+0000\n"
+"PO-Revision-Date: 2022-05-10 23:13\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -900,7 +900,7 @@ msgstr "إعدادات متعدد اللاعبين"
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "خطأ"
 
@@ -1069,7 +1069,7 @@ msgstr "إصلاح الفأرة:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "إصلاح حركة الفأرة - قد يتطلب إعادة تشغيل الجهاز"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "هل تريد أن ترى بعض المساعدة على الإنترنت عن هذه المشكلة؟"
 
@@ -3052,11 +3052,11 @@ msgstr "خطأ بروتوكول  (%u). اذا استمرت هذه المشكلة
 msgid "Connection error"
 msgstr "خطأ في الاتصال."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "لم يتم تثبيت Multi Theft Auto بشكل صحيح، الرجاء إعادة التثبيت."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "سوف يعرض المتصفح الآن صفحة ويب مع بعض المعلومات للمساعدة.\n\n"
