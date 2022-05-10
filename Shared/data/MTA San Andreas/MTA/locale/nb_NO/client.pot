@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-09 08:36+0000\n"
-"PO-Revision-Date: 2022-05-09 09:32\n"
+"POT-Creation-Date: 2022-05-10 21:53+0000\n"
+"PO-Revision-Date: 2022-05-10 23:13\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
@@ -900,7 +900,7 @@ msgstr "FLERSPILLER KONTROLLER"
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "Feil"
 
@@ -1065,7 +1065,7 @@ msgstr "Mus fiks:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Mus bevegelses fiks - Omstart av datamaskinen er kanskje påkrevd"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Ønsker du søke internettet for hjelp for dette problemet ?"
 
@@ -3026,11 +3026,11 @@ msgstr "Protokoll feil (%u). Om dette problemet fortsetter, vennligst sjekk mtas
 msgid "Connection error"
 msgstr "Tilkoblingsfeil"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto har ikke blitt installert rett, vennligst reinstaller."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Din nettleser vill nå vise en side som inneholder hjelpe informasjon.\n\n"
