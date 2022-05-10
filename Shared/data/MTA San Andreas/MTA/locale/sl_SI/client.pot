@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-09 08:36+0000\n"
-"PO-Revision-Date: 2022-05-09 09:32\n"
+"POT-Creation-Date: 2022-05-10 21:53+0000\n"
+"PO-Revision-Date: 2022-05-10 23:13\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -899,7 +899,7 @@ msgstr "UKAZI  VEČIGRALSKEGA NAČINA"
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "Napaka"
 
@@ -1064,7 +1064,7 @@ msgstr ""
 msgid "Mouse movement fix - May need PC restart"
 msgstr ""
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Ali si želite ogledati internetno pomoč o tem problemu?"
 
@@ -3025,11 +3025,11 @@ msgstr "Napaka protokola (%u). Če se ta problem ponavlja, prosimo, da obiščet
 msgid "Connection error"
 msgstr "Napaka povezave"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto ni bil pravilno nameščen, prosimo, da ga ponovno namestite."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Vaš brskalnik bo sedaj prikazal spletno stran za pomoč in informacije.\n\n"
