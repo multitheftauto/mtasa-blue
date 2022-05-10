@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-09 08:36+0000\n"
-"PO-Revision-Date: 2022-05-09 09:32\n"
+"POT-Creation-Date: 2022-05-10 21:53+0000\n"
+"PO-Revision-Date: 2022-05-10 23:13\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -900,7 +900,7 @@ msgstr "ĐIỀU KHIỂN MULTIPLAYER"
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "Lỗi"
 
@@ -1065,7 +1065,7 @@ msgstr "Sửa chuột:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Sửa lỗi di chuyển chuột - Có thể cần khởi động lại máy tính"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Bạn có muốn tìm kiếm trợ giúp về vẫn đề này ở trên mạng không?"
 
@@ -3020,11 +3020,11 @@ msgstr "Lỗi giao thức (%u). Nếu sự cố này vẫn tiếp diễn, vui l�
 msgid "Connection error"
 msgstr "Lỗi kết nối"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto chưa được cài đặt đúng cách, vui lòng cài đặt lại."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Trình duyệt của bạn bây giờ sẽ hiển thị một trang web với một số thông tin trợ giúp.\n\n"
