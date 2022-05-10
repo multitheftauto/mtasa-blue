@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-09 08:36+0000\n"
-"PO-Revision-Date: 2022-05-09 09:32\n"
+"POT-Creation-Date: 2022-05-10 21:53+0000\n"
+"PO-Revision-Date: 2022-05-10 23:13\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -900,7 +900,7 @@ msgstr "OVLÁDÁNÍ MULTIPLAYERU"
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "Chyba"
 
@@ -1070,7 +1070,7 @@ msgstr "Fixace myši:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Fixace pohybu myši - Může vyžadovat restart počítače"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Chceš se podívat na online pomoc s tímto problémem?"
 
@@ -3044,11 +3044,11 @@ msgstr "Chyba protokolu (%u). Pokud problém přetrvává, podívej se na mtasa.
 msgid "Connection error"
 msgstr "Chyba připojení"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto nebylo správně nainstalováno, prosím reinstall."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Tvůj prohlížeč nyní zobrazí webovou stránku s nápovědou.\n\n"
