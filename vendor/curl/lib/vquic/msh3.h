@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_TIMEVAL_H
-#define HEADER_CURL_TIMEVAL_H
+#ifndef HEADER_CURL_VQUIC_MSH3_H
+#define HEADER_CURL_VQUIC_MSH3_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -24,29 +24,15 @@
 
 #include "curl_setup.h"
 
-#include "timediff.h"
+#ifdef USE_MSH3
 
-struct curltime {
-  time_t tv_sec; /* seconds */
-  int tv_usec;   /* microseconds */
+#include <msh3.h>
+
+struct quicsocket {
+  MSH3_API* api;
+  MSH3_CONNECTION* conn;
 };
 
-struct curltime Curl_now(void);
+#endif /* USE_MSQUIC */
 
-/*
- * Make sure that the first argument (t1) is the more recent time and t2 is
- * the older time, as otherwise you get a weird negative time-diff back...
- *
- * Returns: the time difference in number of milliseconds.
- */
-timediff_t Curl_timediff(struct curltime t1, struct curltime t2);
-
-/*
- * Make sure that the first argument (t1) is the more recent time and t2 is
- * the older time, as otherwise you get a weird negative time-diff back...
- *
- * Returns: the time difference in number of microseconds.
- */
-timediff_t Curl_timediff_us(struct curltime newer, struct curltime older);
-
-#endif /* HEADER_CURL_TIMEVAL_H */
+#endif /* HEADER_CURL_VQUIC_MSH3_H */
