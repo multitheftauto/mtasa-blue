@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-10 21:53+0000\n"
-"PO-Revision-Date: 2022-05-10 23:13\n"
+"PO-Revision-Date: 2022-05-12 05:56\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -2294,7 +2294,7 @@ msgstr "MTA: San Andreas - Предупреждение"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "В папке установки Grand Theft Auto: San Andreas обнаружены следующие файлы:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
