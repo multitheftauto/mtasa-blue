@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-10 21:53+0000\n"
-"PO-Revision-Date: 2022-05-12 05:56\n"
+"PO-Revision-Date: 2022-05-12 07:00\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1072,7 +1072,7 @@ msgstr "Исправить движения мыши - Необходим пер
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Вы хотите посмотреть онлайн помощь по этой проблеме?"
+msgstr "Найти помощь по этой проблеме в сети?"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:209
@@ -2312,7 +2312,7 @@ msgstr "Не напоминать об этих файлах снова"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Переименовать файлы из *.dll в *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
