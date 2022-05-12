@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-10 21:53+0000\n"
-"PO-Revision-Date: 2022-05-12 07:00\n"
+"PO-Revision-Date: 2022-05-12 07:59\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -252,15 +252,15 @@ msgstr "यूज़रट्रैक आप्शन"
 
 #: Client/core/CSettings.cpp:555 Client/core/CSettings.cpp:3023
 msgid "Radio"
-msgstr ""
+msgstr "रेडियो"
 
 #: Client/core/CSettings.cpp:556 Client/core/CSettings.cpp:3025
 msgid "Random"
-msgstr ""
+msgstr "रैंडम"
 
 #: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:3027
 msgid "Sequential"
-msgstr ""
+msgstr "सेकेंटिअल"
 
 #: Client/core/CSettings.cpp:560
 msgid "Automatic Media Scan"
@@ -268,7 +268,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:567
 msgid "Mute options"
-msgstr ""
+msgstr "म्यूट ऑप्शन"
 
 #: Client/core/CSettings.cpp:573
 msgid "Mute All sounds when minimized"
@@ -295,61 +295,61 @@ msgstr ""
 #. *
 #: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:618
 msgid "Resolution:"
-msgstr ""
+msgstr "रेजोल्युशन:"
 
 #: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:665
 msgid "FOV:"
-msgstr ""
+msgstr "FOV:"
 
 #: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:681
 msgid "Draw Distance:"
-msgstr ""
+msgstr "ड्रा डिस्टेंस:"
 
 #: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:699
 msgid "Brightness:"
-msgstr ""
+msgstr "ब्राइटनेस:"
 
 #: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:717
 msgid "FX Quality:"
-msgstr ""
+msgstr "FX क्वालिटी:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:731
 msgid "Anisotropic filtering:"
-msgstr ""
+msgstr "आइसोट्रॉपिक फ़िल्टरिंग:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:758
 msgid "Anti-aliasing:"
-msgstr ""
+msgstr "एंटी-अलियासिंग:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:772
 msgid "Aspect Ratio:"
-msgstr ""
+msgstr "ऐस्पेक्ट रैशीओ:"
 
 #: Client/core/CSettings.cpp:630
 msgid "Windowed"
-msgstr ""
+msgstr "विंडोड"
 
 #: Client/core/CSettings.cpp:636
 msgid "DPI aware"
-msgstr ""
+msgstr "DPI अवेयर"
 
 #: Client/core/CSettings.cpp:644 Client/core/CSettings.cpp:973
 #: Client/loader/MainFunctions.cpp:381
 msgid "Fullscreen mode:"
-msgstr ""
+msgstr "फुलस्क्रीन मोड:"
 
 #: Client/core/CSettings.cpp:651 Client/core/CSettings.cpp:1564
 msgid "Standard"
-msgstr ""
+msgstr "स्टैण्डर्ड"
 
 #: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:1566
 #: Client/loader/MainFunctions.cpp:381
 msgid "Borderless window"
-msgstr ""
+msgstr "बॉर्डरलेस विंडो"
 
 #: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1568
 msgid "Borderless keep res"
-msgstr ""
+msgstr "बॉर्डरलेस कीप रेसोलुशन"
 
 #: Client/core/CSettings.cpp:657
 msgid "Mip Mapping"
@@ -2328,7 +2328,7 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:92
 msgid "Don't show again"
-msgstr ""
+msgstr "दोबारा न दिखाएं"
 
 #: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:878
 msgid "MTA: San Andreas"
@@ -2375,7 +2375,7 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
 msgid "Done!"
-msgstr ""
+msgstr "समाप्त!"
 
 #: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
@@ -2806,34 +2806,34 @@ msgstr ""
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d दिन"
+msgstr[1] "%d दिन"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d घंटा"
+msgstr[1] "%d घंटे"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d मिनट"
+msgstr[1] "%d मिनट"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d सेकंड"
+msgstr[1] "%d सेकंड"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:639
 msgid "Disconnected"
-msgstr ""
+msgstr "डिसकनेक्ट हो गया है"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -2847,12 +2847,12 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr ""
+msgstr "सर्वर नाम:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
 msgid "Password:"
-msgstr ""
+msgstr "पासवर्ड:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:73
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:75
@@ -2947,7 +2947,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr ""
+msgstr "डाउनलोड एरर: %s"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
@@ -2966,7 +2966,7 @@ msgstr ""
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
-msgstr ""
+msgstr "कनेक्शन एरर"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
