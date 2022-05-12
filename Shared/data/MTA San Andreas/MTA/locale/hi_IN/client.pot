@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-10 21:53+0000\n"
-"PO-Revision-Date: 2022-05-10 23:13\n"
+"PO-Revision-Date: 2022-05-12 07:00\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -20,44 +20,44 @@ msgstr ""
 #. Create window
 #: Client/core/CConsole.cpp:417
 msgid "CONSOLE"
-msgstr ""
+msgstr "कान्सोल"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:83
 msgid "SETTINGS"
-msgstr ""
+msgstr "सेटिंग"
 
 #: Client/core/CSettings.cpp:115
 msgid "Multiplayer"
-msgstr ""
+msgstr "मल्टीप्लेयर"
 
 #: Client/core/CSettings.cpp:116
 msgid "Video"
-msgstr ""
+msgstr "वीडियो"
 
 #: Client/core/CSettings.cpp:117
 msgid "Audio"
-msgstr ""
+msgstr "ऑडियो"
 
 #: Client/core/CSettings.cpp:118
 msgid "Binds"
-msgstr ""
+msgstr "बाइंड"
 
 #: Client/core/CSettings.cpp:119
 msgid "Controls"
-msgstr ""
+msgstr "कन्ट्रोल्ज़"
 
 #: Client/core/CSettings.cpp:120
 msgid "Interface"
-msgstr ""
+msgstr "इंटरफेस"
 
 #: Client/core/CSettings.cpp:121
 msgid "Web Browser"
-msgstr ""
+msgstr "वेब ब्राउज़र"
 
 #: Client/core/CSettings.cpp:122
 msgid "Advanced"
-msgstr ""
+msgstr "एडवांस्ड"
 
 #. Create buttons
 #. OK button
@@ -69,7 +69,7 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:2135 Client/core/CVersionUpdater.cpp:2149
 #: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
-msgstr ""
+msgstr "ओके"
 
 #. Cancel button
 #: Client/core/CSettings.cpp:131 Client/core/CSettings.cpp:4641
@@ -78,101 +78,101 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 msgid "Cancel"
-msgstr ""
+msgstr "कैंसिल"
 
 #: Client/core/CSettings.cpp:146 Client/core/CSettings.cpp:337
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:858
 msgid "Load defaults"
-msgstr ""
+msgstr "लोड डिफॉल्ट"
 
 #. *
 #. *  Controls tab
 #. *
 #: Client/core/CSettings.cpp:156 Client/core/CSettings.cpp:180
 msgid "Mouse sensitivity:"
-msgstr ""
+msgstr "माउस सेन्सिटिविटी:"
 
 #. VerticalAimSensitivity
 #: Client/core/CSettings.cpp:156 Client/core/CSettings.cpp:198
 msgid "Vertical aim sensitivity:"
-msgstr ""
+msgstr "वर्टिकल ऐम सेन्सिटिविटी:"
 
 #. Mouse Options
 #: Client/core/CSettings.cpp:159
 msgid "Mouse options"
-msgstr ""
+msgstr "माउस ऑप्शन"
 
 #: Client/core/CSettings.cpp:166
 msgid "Invert mouse vertically"
-msgstr ""
+msgstr "इन्वर्ट माउस वर्टिक्ली"
 
 #: Client/core/CSettings.cpp:170
 msgid "Steer with mouse"
-msgstr ""
+msgstr "स्टिर विद माउस"
 
 #: Client/core/CSettings.cpp:174
 msgid "Fly with mouse"
-msgstr ""
+msgstr "फ्लाइ विद माउस"
 
 #. Joypad options
 #: Client/core/CSettings.cpp:216
 msgid "Joypad options"
-msgstr ""
+msgstr "जॉयपैड ऑप्शन"
 
 #: Client/core/CSettings.cpp:229
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr ""
+msgstr "स्टैन्डर्ड कन्ट्रोल्ज़ (माउस + कीबोर्ड)"
 
 #: Client/core/CSettings.cpp:236
 msgid "Classic controls (Joypad)"
-msgstr ""
+msgstr "क्लैसिक कन्ट्रोल्ज़ (जॉयपैड)"
 
 #: Client/core/CSettings.cpp:273
 msgid "Dead Zone"
-msgstr ""
+msgstr "डेड ज़ोन"
 
 #: Client/core/CSettings.cpp:278
 msgid "Saturation"
-msgstr ""
+msgstr "सैचरेशन"
 
 #: Client/core/CSettings.cpp:284
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr ""
+msgstr "यूस द \"बाइन्ड\" टैब फॉर जॉयपैड बटन।"
 
 #: Client/core/CSettings.cpp:323
 msgid "Left Stick"
-msgstr ""
+msgstr "लेफ्ट स्टिक"
 
 #: Client/core/CSettings.cpp:329
 msgid "Right Stick"
-msgstr ""
+msgstr "राइट स्टिक"
 
 #: Client/core/CSettings.cpp:344
 msgid "DESCRIPTION"
-msgstr ""
+msgstr "डिस्क्रिप्शन"
 
 #: Client/core/CSettings.cpp:345
 msgid "KEY"
-msgstr ""
+msgstr "बटन"
 
 #: Client/core/CSettings.cpp:347
 msgid "ALT. KEY"
-msgstr ""
+msgstr "ऑल्टर्नटिव बटन"
 
 #. *
 #. *    Multiplayer tab
 #. *
 #: Client/core/CSettings.cpp:352 Client/core/CSettings.cpp:355
 msgid "Nick:"
-msgstr ""
+msgstr "नेम:"
 
 #: Client/core/CSettings.cpp:365
 msgid "Save server passwords"
-msgstr ""
+msgstr "सेव सर्वर पैस्वर्ड"
 
 #: Client/core/CSettings.cpp:370
 msgid "Auto-refresh server browser"
-msgstr ""
+msgstr "ऑटो-रिफ्रेश सर्वर ब्राउज़र"
 
 #: Client/core/CSettings.cpp:375
 msgid "Allow screen upload"
@@ -196,34 +196,34 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:401 Client/core/CSettings.cpp:610
 msgid "Opacity:"
-msgstr ""
+msgstr "ओपैसटी"
 
 #. *
 #. *  Audio tab
 #. *
 #: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:430
 msgid "Master volume:"
-msgstr ""
+msgstr "मास्टर वोल्यूम:"
 
 #: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:449
 msgid "Radio volume:"
-msgstr ""
+msgstr "रेडीओ वॉल्यूम:"
 
 #: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:468
 msgid "SFX volume:"
-msgstr ""
+msgstr "SFX वॉल्यूम:"
 
 #: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:487
 msgid "MTA volume:"
-msgstr ""
+msgstr "MTA वॉल्यूम:"
 
 #: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:506
 msgid "Voice volume:"
-msgstr ""
+msgstr "वॉइस वॉल्यूम:"
 
 #: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:547
 msgid "Play mode:"
-msgstr ""
+msgstr "प्ले मोड:"
 
 #. *
 #. * Webbrowser tab
@@ -232,23 +232,23 @@ msgstr ""
 #: Client/core/CSettings.cpp:873 Client/core/CSettings.cpp:1965
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
-msgstr ""
+msgstr "जेनरल"
 
 #: Client/core/CSettings.cpp:525
 msgid "Radio options"
-msgstr ""
+msgstr "रेडीओ आप्शन"
 
 #: Client/core/CSettings.cpp:531
 msgid "Radio Equalizer"
-msgstr ""
+msgstr "रेडीओ ईक्वलाइज़र"
 
 #: Client/core/CSettings.cpp:536
 msgid "Radio Auto-tune"
-msgstr ""
+msgstr "रेडीओ ऑटो-टून"
 
 #: Client/core/CSettings.cpp:541
 msgid "Usertrack options"
-msgstr ""
+msgstr "यूज़रट्रैक आप्शन"
 
 #: Client/core/CSettings.cpp:555 Client/core/CSettings.cpp:3023
 msgid "Radio"
