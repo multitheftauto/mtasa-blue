@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-14 10:17+0000\n"
-"PO-Revision-Date: 2022-05-14 11:16\n"
+"POT-Creation-Date: 2022-05-15 10:39+0000\n"
+"PO-Revision-Date: 2022-05-15 10:43\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -895,8 +895,8 @@ msgstr "УПРАВЛІННЯ МУЛЬТИПЛЕЄРУ"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1246
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:137
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:358
+#: Shared/sdk/SharedUtil.Misc.hpp:140
 msgid "Error"
 msgstr "Помилка"
 
@@ -1578,7 +1578,7 @@ msgstr "Спільнота: назад"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Обрана вами графічна тема не може бути завантажена, тема за замовчуванням також не може бути завантажена, перевстановіть MTA для вирішення проблеми."
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Ви хочете переглянути онлайн допомогу з цього питання?"
 
@@ -1597,7 +1597,7 @@ msgstr ""
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "Для інсталяції MTA:SA бракує вільного місця на диску %s."
 
-#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:102
 msgid "Fatal error"
 msgstr "Фатальна помилка"
 
@@ -3019,7 +3019,7 @@ msgid "Deny"
 msgstr "Заперечення"
 
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:109
+#: Shared/mods/deathmatch/logic/Utils.cpp:100
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Критична помилка (%u). Якщо проблема не виправлена, то зверніться на mtasa.com, за рішенням."
@@ -3028,20 +3028,20 @@ msgstr "Критична помилка (%u). Якщо проблема не в�
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:125
+#: Shared/mods/deathmatch/logic/Utils.cpp:116
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Помилка протоколу (%u). Якщо проблема не виправлена, то зверніться на сайт mtasa.com, щоб отримати підтримку."
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:127
+#: Shared/mods/deathmatch/logic/Utils.cpp:118
 msgid "Connection error"
 msgstr "Помилка з'єднання"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:137
+#: Shared/sdk/SharedUtil.Misc.hpp:140
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto інстальовано ​​неправильно, будь ласка, переінсталюйте."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:704
+#: Shared/sdk/SharedUtil.Misc.hpp:710
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Відвідайте веб-сторінку, щоб отримати більше відомостей.\n\n"
