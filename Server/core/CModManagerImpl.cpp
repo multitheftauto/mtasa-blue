@@ -16,9 +16,6 @@
 
 using namespace std;
 
-void WaitForKey(int iKey);
-void Print(const char* szFormat, ...);
-
 CModManagerImpl::CModManagerImpl(CServerImpl* pServer)
 {
     // Init

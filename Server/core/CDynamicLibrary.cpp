@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CDynamicLibrary.h"
 #include "MTAPlatform.h"
-#include "version.h"
 
 #ifdef WIN32
 #include <stdio.h>

@@ -11,11 +11,10 @@
 
 #include "StdInc.h"
 #include "CCrashHandler.h"
-#include "CExceptionInformation_Impl.h"
+#include <string>
 #ifndef WIN32
     #include <execinfo.h>
 #endif
-#include "version.h"
 
 // clang-format off
 #ifndef WIN32

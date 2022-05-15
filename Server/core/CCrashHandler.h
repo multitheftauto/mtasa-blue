@@ -19,8 +19,6 @@
     #include <signal.h>
 #endif
 
-class CExceptionInformation;
-
 class CCrashHandler
 {
 public:
