@@ -265,7 +265,7 @@ static void DoBroadcast(const CPacket& Packet, const std::multimap<ushort, CPlay
             {
                 CPlayer* pPlayer = s_it->second;
                 dassert(usBitStreamVersion == pPlayer->GetBitStreamVersion());
-                g_pGame->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, false, packetPriority, Reliability, Packet.GetPacketOrdering());
+                g_pGame->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering());
             }
 
             g_pGame->SendPacketBatchEnd();

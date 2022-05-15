@@ -24,18 +24,17 @@
 #include <iostream>
 #include "MTAPlatform.h"
 #include "SharedUtil.h"
-
 #ifdef WIN32
     // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
 #else
-    #include <unistd.h>
-
 FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
 {
     return fopen(szFilename, szMode);
 }
 #endif
+
+using namespace std;
 
 #ifdef WIN32
     #define LIB_CORE SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
@@ -103,7 +102,7 @@ int main(int argc, char* argv[])
 
         // Wait for a key then exit
         printf("Press enter to continue...\n");
-        std::cin.get();
+        cin.get();
         return 1;
     }
 #endif
@@ -152,6 +151,6 @@ int main(int argc, char* argv[])
 
     // Wait for a key then exit
     printf("Press enter to continue...\n");
-    std::cin.get();
+    cin.get();
     return 1;
 }

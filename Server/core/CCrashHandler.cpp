@@ -11,12 +11,11 @@
 
 #include "StdInc.h"
 #include "CCrashHandler.h"
-#include "version.h"
-#ifdef WIN32
-    #include "CExceptionInformation_Impl.h"
-#else
+#include "CExceptionInformation_Impl.h"
+#ifndef WIN32
     #include <execinfo.h>
 #endif
+#include "version.h"
 
 // clang-format off
 #ifndef WIN32
@@ -29,7 +28,6 @@
 extern "C" WINDOW* m_wndMenu;
 extern "C" WINDOW* m_wndInput;
 extern "C" bool    g_bNoCurses;
-extern bool        g_bSilent;
 
     #ifdef __APPLE__
         #include <client/mac/handler/exception_handler.h>

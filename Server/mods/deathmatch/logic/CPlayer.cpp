@@ -313,7 +313,7 @@ uint CPlayer::Send(const CPacket& Packet)
         if (Packet.Write(*pBitStream))
         {
             uiBitsSent = pBitStream->GetNumberOfBitsUsed();
-            g_pGame->SendPacket(Packet.GetPacketID(), m_PlayerSocket, pBitStream, false, packetPriority, Reliability, Packet.GetPacketOrdering());
+            g_pGame->SendPacket(Packet.GetPacketID(), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering());
         }
 
         // Destroy the bitstream

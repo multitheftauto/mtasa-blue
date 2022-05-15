@@ -19,12 +19,6 @@
 
     #include <sys/types.h>  // For stat().
     #include <sys/stat.h>   // For stat().
-
-    #ifndef WIN32
-        #include <sys/socket.h>
-        #include <netinet/in.h>
-        #include <arpa/inet.h>
-    #endif
 #endif
 
 #ifdef MTA_CLIENT

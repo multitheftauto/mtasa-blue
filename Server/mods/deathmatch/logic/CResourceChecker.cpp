@@ -18,14 +18,6 @@
 #include <core/CServerInterface.h>
 #include <clocale>
 
-#ifndef WIN32
-    #include <limits.h>
-
-    #ifndef MAX_PATH
-        #define MAX_PATH PATH_MAX
-    #endif
-#endif
-
 extern CNetServer*       g_pRealNetServer;
 extern CServerInterface* g_pServerInterface;
 

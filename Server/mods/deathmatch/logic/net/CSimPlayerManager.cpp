@@ -492,7 +492,7 @@ void CSimPlayerManager::Broadcast(const CSimPacket& Packet, const std::multimap<
             {
                 CSimPlayer* pPlayer = s_it->second;
                 dassert(usBitStreamVersion == pPlayer->GetBitStreamVersion());
-                g_pRealNetServer->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, false, packetPriority, Reliability,
+                g_pRealNetServer->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, packetPriority, Reliability,
                                              Packet.GetPacketOrdering());
             }
         }

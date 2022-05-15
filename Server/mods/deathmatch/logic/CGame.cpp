@@ -84,14 +84,6 @@
 #define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
 #define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
 
-#ifndef WIN32
-    #include <limits.h>
-    
-    #ifndef MAX_PATH
-        #define MAX_PATH PATH_MAX
-    #endif
-#endif
-
 CGame* g_pGame = NULL;
 
 char          szProgress[4] = {'-', '\\', '|', '/'};

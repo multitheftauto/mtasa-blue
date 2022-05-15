@@ -19,12 +19,7 @@
     #include <sys/stat.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
-    #include <unistd.h>
-    #include <fcntl.h>
     #define sockclose close
-    #ifndef INVALID_SOCKET
-        #define INVALID_SOCKET -1
-    #endif
     typedef int SOCKET;
 #endif
 
