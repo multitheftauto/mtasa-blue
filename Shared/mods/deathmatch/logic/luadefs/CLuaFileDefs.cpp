@@ -9,9 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaFileDefs.h"
-#include "CScriptFile.h"
-#include "CScriptArgReader.h"
 
 #define DEFAULT_MAX_FILESIZE 52428800
 

@@ -13,8 +13,6 @@
 
 #include "CPacket.h"
 
-typedef SFixedArray<bool, MAX_GARAGES> SGarageStates;
-
 struct SWorldWaterLevelInfo
 {
     bool  bNonSeaLevelSet;

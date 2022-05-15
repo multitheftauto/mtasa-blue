@@ -10,8 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVehicleNames.h"
-#include "CVehicleManager.h"
+
+using namespace std;
 
 const char* szVehicleNameEmpty = "";
 

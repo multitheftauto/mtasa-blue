@@ -10,18 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CMainConfig.h"
-#include "CBandwidthSettings.h"
-#include "CTickRateSettings.h"
-#include "Utils.h"
-#include "ASE.h"
-#include "CGame.h"
-#include "CScriptDebugging.h"
-#include "CResourceManager.h"
-#include "CConsoleCommands.h"
-#include "CHTTPD.h"
-#include "CStaticFunctionDefinitions.h"
-
 #define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 
 extern CGame* g_pGame;

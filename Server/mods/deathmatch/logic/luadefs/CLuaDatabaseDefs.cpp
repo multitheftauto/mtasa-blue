@@ -10,12 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaDatabaseDefs.h"
-#include "CStaticFunctionDefinitions.h"
-#include "CScriptArgReader.h"
-#include "CPerfStatManager.h"
-#include "lua/CLuaCallback.h"
-#include "Utils.h"
 
 void CLuaDatabaseDefs::LoadFunctions()
 {

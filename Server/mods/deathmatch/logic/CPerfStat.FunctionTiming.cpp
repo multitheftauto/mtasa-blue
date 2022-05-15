@@ -10,10 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
-
 #define DEFAULT_THRESH_MS 1
-
 TIMEUS CPerfStatFunctionTiming::ms_PeakUsThresh = DEFAULT_THRESH_MS * 1000;
 
 namespace

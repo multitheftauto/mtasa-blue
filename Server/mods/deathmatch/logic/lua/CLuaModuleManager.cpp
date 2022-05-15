@@ -12,7 +12,6 @@
 /** This class handles all communication from and to the lua addon-modules **/
 
 #include "StdInc.h"
-#include "CLuaModuleManager.h"
 
 extern CGame* g_pGame;
 

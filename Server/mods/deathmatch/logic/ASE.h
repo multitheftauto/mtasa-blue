@@ -9,6 +9,8 @@
  *
  *****************************************************************************/
 
+class ASE;
+
 #pragma once
 
 #ifdef WIN32
@@ -20,12 +22,16 @@
     #include <netinet/in.h>
     #include <arpa/inet.h>
     #define sockclose close
-    typedef int SOCKET;
+typedef int SOCKET;
 #endif
 
-#include "CConnectHistory.h"
 #include <string.h>
 #include <stdio.h>
+
+#include "CMainConfig.h"
+#include "CPlayerManager.h"
+#include "CPlayer.h"
+
 #include <list>
 
 #define MAX_ASE_GAME_TYPE_LENGTH    200
@@ -35,9 +41,6 @@
 #define MAX_ANNOUNCE_VALUE_LENGTH   200
 
 class CASERule;
-class CMainConfig;
-class CPlayerManager;
-class CLanBroadcast;
 
 class ASE
 {
@@ -70,8 +73,8 @@ public:
     bool        RemoveRuleValue(const char* szKey);
     void        ClearRules();
 
-    std::list<CASERule*>::iterator IterBegin() { return m_Rules.begin(); }
-    std::list<CASERule*>::iterator IterEnd() { return m_Rules.end(); }
+    list<CASERule*>::iterator IterBegin() { return m_Rules.begin(); }
+    list<CASERule*>::iterator IterEnd() { return m_Rules.end(); }
 
     std::string QueryLight();
 
@@ -96,7 +99,7 @@ private:
     static ASE* _instance;
     time_t      m_tStartTime;
 
-    std::list<CASERule*> m_Rules;
+    list<CASERule*> m_Rules;
 
     std::vector<SOCKET> m_SocketList;
 

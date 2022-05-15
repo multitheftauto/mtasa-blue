@@ -10,12 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaVehicleDefs.h"
-#include "CVehicleNames.h"
-#include "CTrainTrack.h"
-#include "CStaticFunctionDefinitions.h"
-#include "CScriptArgReader.h"
-#include "packets/CElementRPCPacket.h"
 
 void CLuaVehicleDefs::LoadFunctions()
 {

@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaBlipDefs.h"
-#include "CBlip.h"
-#include "CStaticFunctionDefinitions.h"
-#include "CScriptArgReader.h"
 
 void CLuaBlipDefs::LoadFunctions()
 {

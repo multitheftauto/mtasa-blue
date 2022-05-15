@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPlayerClothes.h"
 
 static const SPlayerClothingType g_clothesNames[PLAYER_CLOTHING_SLOTS] = {
     {"Torso"},           {"Hair"},     {"Legs"},       {"Shoes"},       {"Left Upper Arm"}, {"Left Lower Arm"}, {"Right Upper Arm"},

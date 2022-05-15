@@ -10,11 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
-#include "lua/CLuaMain.h"
-#include "CGame.h"
-#include "Utils.h"
-
 extern CNetServer* g_pRealNetServer;
 
 namespace

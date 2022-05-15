@@ -9,9 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLatentTransferManager.h"
-#include <net/Packets.h>
-
 using namespace LatentTransfer;
 
 ///////////////////////////////////////////////////////////////

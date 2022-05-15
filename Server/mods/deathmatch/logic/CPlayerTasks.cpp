@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPlayerTasks.h"
 
 CPlayerTasks::CPlayerTasks()
 {

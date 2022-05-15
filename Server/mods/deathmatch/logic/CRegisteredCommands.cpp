@@ -10,14 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRegisteredCommands.h"
-#include "lua/LuaCommon.h"
-#include "lua/CLuaArguments.h"
-#include "lua/CLuaMain.h"
-#include "CAccessControlListManager.h"
-#include "CClient.h"
-#include "CConsoleClient.h"
-#include "CPlayer.h"
 
 CRegisteredCommands::CRegisteredCommands(CAccessControlListManager* pACLManager)
 {
@@ -61,9 +53,9 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey, c
     assert(szKey);
 
     // Call the handler for every virtual machine that matches the given key
-    int                            iCompareResult;
-    bool                           bFound = false;
-    std::list<SCommand*>::iterator iter = m_Commands.begin();
+    int                       iCompareResult;
+    bool                      bFound = false;
+    list<SCommand*>::iterator iter = m_Commands.begin();
 
     while (iter != m_Commands.end())
     {
@@ -105,7 +97,7 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey, c
 void CRegisteredCommands::ClearCommands()
 {
     // Delete all the commands
-    std::list<SCommand*>::const_iterator iter = m_Commands.begin();
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
 
     for (; iter != m_Commands.end(); iter++)
         delete *iter;
@@ -119,7 +111,7 @@ void CRegisteredCommands::CleanUpForVM(CLuaMain* pLuaMain)
     assert(pLuaMain);
 
     // Delete every command that matches
-    std::list<SCommand*>::iterator iter = m_Commands.begin();
+    list<SCommand*>::iterator iter = m_Commands.begin();
 
     while (iter != m_Commands.end())
     {
@@ -147,9 +139,9 @@ bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArgume
     assert(szKey);
 
     // Call the handler for every virtual machine that matches the given key
-    bool                                 bHandled = false;
-    int                                  iCompareResult;
-    std::list<SCommand*>::const_iterator iter = m_Commands.begin();
+    bool                            bHandled = false;
+    int                             iCompareResult;
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
 
     m_bIteratingList = true;
 
@@ -187,8 +179,8 @@ CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* szKey
     assert(szKey);
 
     // Try to find an entry with a matching name in our list
-    int                                  iCompareResult;
-    std::list<SCommand*>::const_iterator iter = m_Commands.begin();
+    int                             iCompareResult;
+    list<SCommand*>::const_iterator iter = m_Commands.begin();
 
     for (; iter != m_Commands.end(); iter++)
     {

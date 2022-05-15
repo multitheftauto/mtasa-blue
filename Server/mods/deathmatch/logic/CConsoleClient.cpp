@@ -10,11 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CConsoleClient.h"
-#include "CConsole.h"
-#include "CMapManager.h"
-#include "CAccountManager.h"
-#include "CGame.h"
 
 CConsoleClient::CConsoleClient(CConsole* pConsole) : CElement(pConsole->GetMapManager()->GetRootElement()), CClient(false)
 {

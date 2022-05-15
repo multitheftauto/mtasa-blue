@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CUnoccupiedVehicleStartSyncPacket.h"
-#include "CVehicle.h"
 
 bool CUnoccupiedVehicleStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
 {

@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLatentTransferManager.h"
-
 using namespace LatentTransfer;
 
 ///////////////////////////////////////////////////////////////

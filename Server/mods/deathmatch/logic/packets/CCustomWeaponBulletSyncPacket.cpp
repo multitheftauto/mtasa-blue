@@ -9,10 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCustomWeaponBulletSyncPacket.h"
 #include "net/SyncStructures.h"
-#include "CPlayer.h"
-#include "lua/CLuaFunctionParseHelpers.h"
 
 CCustomWeaponBulletSyncPacket::CCustomWeaponBulletSyncPacket(CPlayer* pPlayer)
 {

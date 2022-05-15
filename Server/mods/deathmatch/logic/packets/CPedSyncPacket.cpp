@@ -10,11 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPedSyncPacket.h"
 
 CPedSyncPacket::~CPedSyncPacket()
 {
-    std::vector<SyncData*>::const_iterator iter = m_Syncs.begin();
+    vector<SyncData*>::const_iterator iter = m_Syncs.begin();
     for (; iter != m_Syncs.end(); ++iter)
     {
         delete *iter;
@@ -102,8 +101,8 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
 bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
 {
     // While we're not out of syncs to write
-    bool                                   bSent = false;
-    std::vector<SyncData*>::const_iterator iter = m_Syncs.begin();
+    bool                              bSent = false;
+    vector<SyncData*>::const_iterator iter = m_Syncs.begin();
     for (; iter != m_Syncs.end(); ++iter)
     {
         // If we're not supposed to ignore the packet

@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CObjectStartSyncPacket.h"
-#include "CObject.h"
-#include <net/SyncStructures.h>
 
 bool CObjectStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
 {

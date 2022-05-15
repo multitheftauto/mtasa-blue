@@ -9,10 +9,7 @@
  *
  *****************************************************************************/
 
-#include "StdInc.h"
-#include "CLuaVector4.h"
-#include "CVector4D.h"
-#include "CIdArray.h"
+#include <StdInc.h>
 
 CLuaVector4D::CLuaVector4D() : CVector4D()
 {

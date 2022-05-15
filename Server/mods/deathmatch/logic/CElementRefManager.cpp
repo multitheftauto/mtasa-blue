@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CElementRefManager.h"
-#include "CElement.h"
 #include <set>
 
 static std::set<CElement**>            ms_ElementRefList;

@@ -7,10 +7,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-#include <net/SyncStructures.h>
-
 struct STrailerInfo
 {
     ElementID m_TrailerID;

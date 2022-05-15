@@ -10,13 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CScriptDebugging.h"
-
-#ifndef MTA_CLIENT
-    #include "CGame.h"
-    #include "CMainConfig.h"
-    #include "CMapManager.h"
-#endif
 
 #define MAX_STRING_LENGTH 2048
 

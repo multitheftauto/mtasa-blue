@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "CPacket.h"
+#include "../packets/CPacket.h"
 
 class CResourceStopPacket final : public CPacket
 {

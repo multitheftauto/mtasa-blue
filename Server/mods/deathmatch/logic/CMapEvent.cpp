@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CMapEvent.h"
-#include "lua/CLuaArguments.h"
 
 CMapEvent::CMapEvent(CLuaMain* pMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                      float fPriorityMod)

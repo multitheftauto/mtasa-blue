@@ -50,13 +50,12 @@ public:
     bool GetAutoCallEvent() { return m_bAutoCallEvent; };
     void SetAutoCallEvent(bool bAutoCallEvent) { m_bAutoCallEvent = bAutoCallEvent; };
 
-    void AddCollider(CElement* pElement) { m_Colliders.push_back(pElement); }
-    void RemoveCollider(CElement* pElement) { m_Colliders.remove(pElement); }
-    bool ColliderExists(CElement* pElement);
-    void RemoveAllColliders();
-
-    std::list<CElement*>::iterator CollidersBegin() { return m_Colliders.begin(); }
-    std::list<CElement*>::iterator CollidersEnd() { return m_Colliders.end(); }
+    void                      AddCollider(CElement* pElement) { m_Colliders.push_back(pElement); }
+    void                      RemoveCollider(CElement* pElement) { m_Colliders.remove(pElement); }
+    bool                      ColliderExists(CElement* pElement);
+    void                      RemoveAllColliders();
+    list<CElement*>::iterator CollidersBegin() { return m_Colliders.begin(); }
+    list<CElement*>::iterator CollidersEnd() { return m_Colliders.end(); }
 
     bool IsPartnered() { return m_bPartnered; }
 
@@ -71,7 +70,7 @@ private:
     class CColCallback* m_pCallback;
     bool                m_bAutoCallEvent;
 
-    std::list<CElement*> m_Colliders;
+    list<CElement*> m_Colliders;
 
     bool m_bPartnered;
 };

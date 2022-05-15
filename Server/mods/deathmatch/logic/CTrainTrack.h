@@ -8,9 +8,6 @@
  *****************************************************************************/
 
 #pragma once
-
-#include "CElement.h"
-
 class CTrainTrackManager;
 
 struct STrackNode

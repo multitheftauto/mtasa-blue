@@ -9,15 +9,18 @@
  *
  *****************************************************************************/
 
+typedef CAutoRefedPointer<struct CRegistryResultData> CRegistryResult;
+
 #pragma once
 
 #include "CLogger.h"
 #include <list>
 #include <vector>
 #include <string>
-#include <sqlite/sqlite3.h>
+#include "../../../vendor/sqlite/sqlite3.h"
 
-typedef CAutoRefedPointer<struct CRegistryResultData> CRegistryResult;
+// Only used for identifying 8 byte integers in varargs list
+#define SQLITE_INTEGER64 10
 
 class CRegistry
 {

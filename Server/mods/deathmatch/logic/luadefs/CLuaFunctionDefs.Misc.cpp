@@ -11,8 +11,6 @@
 
 #include "StdInc.h"
 #include "CLuaFunctionDefs.h"
-#include "CScriptArgReader.h"
-#include "CStaticFunctionDefinitions.h"
 
 int CLuaFunctionDefs::CreateExplosion(lua_State* luaVM)
 {

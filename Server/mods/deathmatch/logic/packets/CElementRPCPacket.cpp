@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CElementRPCPacket.h"
-#include "CElement.h"
 
 bool CElementRPCPacket::Write(NetBitStreamInterface& BitStream) const
 {

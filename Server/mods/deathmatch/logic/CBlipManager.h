@@ -9,13 +9,12 @@
  *
  *****************************************************************************/
 
+class CBlipManager;
+
 #pragma once
 
+#include "CBlip.h"
 #include <list>
-
-class CBlip;
-class CElement;
-class CEvents;
 
 class CBlipManager
 {
@@ -32,11 +31,11 @@ public:
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
     bool         Exists(CBlip* pBlip);
 
-    std::list<CBlip*>::const_iterator IterBegin() { return m_List.begin(); };
-    std::list<CBlip*>::const_iterator IterEnd() { return m_List.end(); };
+    list<CBlip*>::const_iterator IterBegin() { return m_List.begin(); };
+    list<CBlip*>::const_iterator IterEnd() { return m_List.end(); };
 
     static bool IsValidIcon(unsigned long ulIcon) { return ulIcon <= 63; };
 
 private:
-    std::list<CBlip*> m_List;
+    list<CBlip*> m_List;
 };

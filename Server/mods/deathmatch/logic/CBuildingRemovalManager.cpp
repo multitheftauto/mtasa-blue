@@ -7,10 +7,7 @@
  *  PURPOSE:
  *
  *****************************************************************************/
-
 #include "StdInc.h"
-#include "CBuildingRemovalManager.h"
-#include "CBuildingRemoval.h"
 
 CBuildingRemovalManager::CBuildingRemovalManager()
 {

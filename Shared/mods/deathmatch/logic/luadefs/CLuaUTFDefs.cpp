@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaUTFDefs.h"
-#include "CScriptArgReader.h"
 
 void CLuaUTFDefs::LoadFunctions()
 {

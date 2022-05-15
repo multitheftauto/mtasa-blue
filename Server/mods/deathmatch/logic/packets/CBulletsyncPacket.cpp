@@ -9,9 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CBulletsyncPacket.h"
 #include "net/SyncStructures.h"
-#include "CPlayer.h"
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* pPlayer)
 {

@@ -18,8 +18,6 @@
 class CResourceFile;
 
 #pragma once
-
-#include "CChecksum.h"
 #include "ehs/ehs.h"
 
 class CResourceFile

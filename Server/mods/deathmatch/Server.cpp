@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CServer.h"
 
 CServer* g_pServer = NULL;
 

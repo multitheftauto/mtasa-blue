@@ -29,12 +29,12 @@ public:
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
     bool         Exists(CRadarArea* pArea);
 
-    std::list<CRadarArea*>::const_iterator IterBegin() { return m_List.begin(); };
-    std::list<CRadarArea*>::const_iterator IterEnd() { return m_List.end(); };
+    list<CRadarArea*>::const_iterator IterBegin() { return m_List.begin(); };
+    list<CRadarArea*>::const_iterator IterEnd() { return m_List.end(); };
 
 private:
     void AddToList(CRadarArea* pArea) { m_List.push_back(pArea); };
     void RemoveFromList(CRadarArea* pArea);
 
-    std::list<CRadarArea*> m_List;
+    list<CRadarArea*> m_List;
 };

@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVoiceEndPacket.h"
-#include "CPlayer.h"
 
 CVoiceEndPacket::CVoiceEndPacket(CPlayer* pPlayer)
 {

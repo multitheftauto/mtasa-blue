@@ -13,6 +13,7 @@
 
 #include "CCommon.h"
 #include "CPacket.h"
+#include "CPlayer.h"
 
 class CVehicle;
 
@@ -20,7 +21,7 @@ class CVehiclePuresyncPacket final : public CPacket
 {
 public:
     CVehiclePuresyncPacket(){};
-    explicit CVehiclePuresyncPacket(class CPlayer* pPlayer);
+    explicit CVehiclePuresyncPacket(class CPlayer* pPlayer) { m_pSourceElement = pPlayer; };
 
     bool          HasSimHandler() const { return true; }
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };

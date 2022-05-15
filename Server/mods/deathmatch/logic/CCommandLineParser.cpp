@@ -10,7 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCommandLineParser.h"
+
+using namespace std;
 
 CCommandLineParser::CCommandLineParser()
 {

@@ -10,11 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCustomData.h"
 
 void CCustomData::Copy(CCustomData* pCustomData)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
+    map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
     for (; iter != pCustomData->IterEnd(); iter++)
     {
         Set(iter->first.c_str(), iter->second.Variable);

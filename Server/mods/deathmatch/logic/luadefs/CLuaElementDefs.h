@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #pragma once
-
 #include "CLuaDefs.h"
 #include "CSpatialDatabase.h"
 

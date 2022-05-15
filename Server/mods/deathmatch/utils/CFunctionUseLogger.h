@@ -8,10 +8,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-struct lua_State;
-
 struct SFuncCallRecord
 {
     SString    strFunctionName;

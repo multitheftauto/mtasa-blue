@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CResourceClientScriptsPacket.h"
 
 CResourceClientScriptsPacket::CResourceClientScriptsPacket(CResource* pResource) : m_pResource(pResource)
 {

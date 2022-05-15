@@ -6,10 +6,7 @@
  *  PURPOSE:     Client/server shared enum definitions
  *
  *****************************************************************************/
-
 #pragma once
-
-#include <net/Packets.h>
 
 namespace EEventPriority
 {

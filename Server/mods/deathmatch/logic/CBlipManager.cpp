@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CBlipManager.h"
-#include "CBlip.h"
-#include "Utils.h"
 
 CBlipManager::CBlipManager()
 {

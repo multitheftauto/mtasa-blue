@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CChatEchoPacket.h"
-#include "CElement.h"
 
 bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
 {

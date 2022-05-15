@@ -10,14 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPedSync.h"
-#include "Utils.h"
-#include "CElementIDs.h"
-#include "CTickRateSettings.h"
-#include "packets/CPedStartSyncPacket.h"
-#include "packets/CPedStopSyncPacket.h"
-#include "CGame.h"
-#include "CColManager.h"
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {
@@ -202,7 +194,7 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
     if (pPlayer && pPlayer->IsJoined())
     {
         // Apply the data for each ped in the packet
-        std::vector<CPedSyncPacket::SyncData*>::const_iterator iter = Packet.IterBegin();
+        vector<CPedSyncPacket::SyncData*>::const_iterator iter = Packet.IterBegin();
         for (; iter != Packet.IterEnd(); iter++)
         {
             CPedSyncPacket::SyncData* pData = *iter;

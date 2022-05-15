@@ -6,16 +6,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
 #pragma once
-
-#include "lua/LuaCommon.h"
-#include "lua/CLuaArgument.h"
-#include "lua/CLuaArguments.h"
-#include "lua/CLuaVector2.h"
-#include "lua/CLuaVector3.h"
-#include "lua/CLuaVector4.h"
-#include "lua/CLuaMatrix.h"
 #include <optional>
 #include <variant>
 #include <array>
@@ -25,6 +16,10 @@
         void Push(L, T value)
         T PopPrimitive(L, std::size_t stackIndex)
 */
+
+class CVector2D;
+class CVector;
+class CVector4D;
 
 namespace lua
 {

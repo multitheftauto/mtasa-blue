@@ -12,8 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-#include <net/SyncStructures.h>
-
 class CVehicle;
 
 class CUnoccupiedVehiclePushPacket final : public CPacket

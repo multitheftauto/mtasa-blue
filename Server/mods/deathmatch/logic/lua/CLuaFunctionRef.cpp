@@ -10,15 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaFunctionRef.h"
-#include "lua/CLuaManager.h"
-#include "CGame.h"
-
 #ifdef WIN32
     #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 #endif
-
-struct lua_State;
 
 CIntrusiveList<CLuaFunctionRef> CLuaFunctionRef::ms_AllRefList(&CLuaFunctionRef::m_ListNode);
 

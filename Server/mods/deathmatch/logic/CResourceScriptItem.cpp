@@ -15,9 +15,6 @@
 // the VM once its been added
 
 #include "StdInc.h"
-#include "CResourceScriptItem.h"
-#include "CResource.h"
-#include "lua/CLuaMain.h"
 
 CResourceScriptItem::CResourceScriptItem(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes)
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)

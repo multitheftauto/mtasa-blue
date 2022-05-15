@@ -10,10 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLightsyncPacket.h"
 #include "net/SyncStructures.h"
-#include "CTickRateSettings.h"
-#include "CPlayer.h"
 
 bool CLightsyncPacket::Read(NetBitStreamInterface& BitStream)
 {

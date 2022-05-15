@@ -18,7 +18,6 @@
 #include "CEvents.h"
 #include <list>
 #include <cstring>
-#include "Enums.h"
 #include "CElementGroup.h"
 
 // Used to check fast version of getElementsByType
@@ -40,8 +39,6 @@
 #define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 #define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
-
-class CLuaMain;
 
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;

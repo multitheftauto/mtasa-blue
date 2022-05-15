@@ -13,14 +13,6 @@ class CStaticFunctionDefinitions;
 
 #pragma once
 
-#include "CVehicle.h"
-#include "CRegistry.h"
-#include "lua/CLuaFunctionParseHelpers.h"
-#include <optional>
-
-class CVector2D;
-struct SLineOfSightFlags;
-
 class CStaticFunctionDefinitions
 {
 public:
@@ -452,14 +444,14 @@ public:
     static bool UsePickup(CElement* pElement, CPlayer* pPlayer);
 
     // Shape create funcs
-    static class CColCircle*    CreateColCircle(CResource* pResource, const CVector2D& vecPosition, float fRadius);
-    static class CColCuboid*    CreateColCuboid(CResource* pResource, const CVector& vecPosition, const CVector& vecSize);
-    static class CColSphere*    CreateColSphere(CResource* pResource, const CVector& vecPosition, float fRadius);
-    static class CColRectangle* CreateColRectangle(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize);
-    static class CColPolygon*   CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList);
-    static class CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
-    static bool                 IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
-    static void                 RefreshColShapeColliders(CColShape* pColShape);
+    static CColCircle*    CreateColCircle(CResource* pResource, const CVector2D& vecPosition, float fRadius);
+    static CColCuboid*    CreateColCuboid(CResource* pResource, const CVector& vecPosition, const CVector& vecSize);
+    static CColSphere*    CreateColSphere(CResource* pResource, const CVector& vecPosition, float fRadius);
+    static CColRectangle* CreateColRectangle(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize);
+    static CColPolygon*   CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList);
+    static CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
+    static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
+    static void           RefreshColShapeColliders(CColShape* pColShape);
 
     // Shape get functions
     static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);

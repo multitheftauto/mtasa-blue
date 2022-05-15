@@ -10,12 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CKeysyncPacket.h"
-#include "CPlayer.h"
-#include "CWeaponNames.h"
-#include "CVehicleManager.h"
 #include "net/SyncStructures.h"
-#include "Utils.h"
 
 CKeysyncPacket::CKeysyncPacket(CPlayer* pPlayer)
 {
@@ -114,7 +109,7 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
 
                     // Read out the driveby direction
                     eVehicleAimDirection ucDriveByDirection;
-                    if (!BitStream.Read(*reinterpret_cast<std::underlying_type_t<eVehicleAimDirection>*>(&ucDriveByDirection)))
+                    if (!BitStream.Read(*reinterpret_cast<underlying_type_t<eVehicleAimDirection>*>(&ucDriveByDirection)))
                         return false;
                     pSourcePlayer->SetDriveByDirection(ucDriveByDirection);
                 }
@@ -221,7 +216,7 @@ bool CKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.Write(&aim);
 
                 // Write the driveby aim directoin
-                BitStream.Write(static_cast<std::underlying_type_t<eVehicleAimDirection>>(pSourcePlayer->GetDriveByDirection()));
+                BitStream.Write(static_cast<underlying_type_t<eVehicleAimDirection>>(pSourcePlayer->GetDriveByDirection()));
             }
             else
             {

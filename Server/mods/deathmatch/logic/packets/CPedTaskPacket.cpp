@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPedTaskPacket.h"
-#include "CPlayer.h"
 #include "net/SyncStructures.h"
 
 CPedTaskPacket::CPedTaskPacket()

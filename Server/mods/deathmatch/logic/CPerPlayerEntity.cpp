@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerPlayerEntity.h"
-#include "CGame.h"
-#include "CMapManager.h"
-#include "packets/CEntityAddPacket.h"
 
 std::set<CPerPlayerEntity*> CPerPlayerEntity::ms_AllPerPlayerEntityMap;
 

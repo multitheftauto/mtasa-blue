@@ -10,13 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CDatabaseManager.h"
 #include "CDatabaseJobQueueManager.h"
-#include "lua/CLuaArguments.h"
-#include "CRegistry.h"
-#include "CIdArray.h"
-#include "CGame.h"
-
 SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs);
 SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs);
 SString InsertQueryArgumentsSqlite(const char* szQuery, va_list vl);
@@ -738,14 +732,4 @@ SString CDbJobData::GetCommandStringForLog()
         }
     }
     return command.strData;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDatabaseConnectionElement::Unlink
-//
-///////////////////////////////////////////////////////////////
-void CDatabaseConnectionElement::Unlink()
-{
-    g_pGame->GetDatabaseManager()->Disconnect(m_Connection);
 }

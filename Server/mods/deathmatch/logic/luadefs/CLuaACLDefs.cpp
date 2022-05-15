@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaACLDefs.h"
-#include "CGame.h"
-#include "CScriptArgReader.h"
-#include "Utils.h"
 
 // Helper function
 static const char* GetResourceName(lua_State* luaVM)

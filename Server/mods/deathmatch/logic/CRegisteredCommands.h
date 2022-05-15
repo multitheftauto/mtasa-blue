@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "lua/CLuaFunctionRef.h"
 #include <list>
 #include <unordered_set>
 

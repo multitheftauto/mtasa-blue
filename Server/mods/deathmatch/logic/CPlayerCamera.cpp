@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPlayerCamera.h"
-#include "CCameraSpatialDatabase.h"
-#include "CPlayer.h"
-#include "Utils.h"
 
 CPlayerCamera::CPlayerCamera(CPlayer* pPlayer)
 {

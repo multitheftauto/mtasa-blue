@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CDebugEchoPacket.h"
 
 bool CDebugEchoPacket::Write(NetBitStreamInterface& BitStream) const
 {

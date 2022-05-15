@@ -7,15 +7,10 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
 #include "StdInc.h"
-#include "CLuaCryptDefs.h"
-#include "CStringMap.h"
-#include "CScriptArgReader.h"
 #include <charconv>
 #include <SharedUtil.Crypto.h>
 #include <lua/CLuaFunctionParser.h>
-#include <lua/CLuaShared.h>
 
 void CLuaCryptDefs::LoadFunctions()
 {

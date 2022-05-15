@@ -10,16 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CResourceChecker.h"
 #include "CResourceChecker.Data.h"
-#include "CResource.h"
-#include "CLogger.h"
-#include "CStaticFunctionDefinitions.h"
-#include <core/CServerInterface.h>
 #include <clocale>
-
-extern CNetServer*       g_pRealNetServer;
-extern CServerInterface* g_pServerInterface;
+extern CNetServer* g_pRealNetServer;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -41,7 +34,7 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
     m_upgradedFullPathList.clear();
 
     // Check each file in the resource
-    std::list<CResourceFile*>::iterator iterf = pResource->IterBegin();
+    list<CResourceFile*>::iterator iterf = pResource->IterBegin();
     for (; iterf != pResource->IterEnd(); iterf++)
     {
         CResourceFile* pResourceFile = *iterf;

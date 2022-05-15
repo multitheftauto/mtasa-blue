@@ -10,12 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRegistry.h"
-#include "CDatabaseType.h"
-#include "CPerfStatModule.h"
-#include "CGame.h"
-#include "CMainConfig.h"
-#include "Utils.h"
 
 CRegistry::CRegistry(const std::string& strFileName)
 {

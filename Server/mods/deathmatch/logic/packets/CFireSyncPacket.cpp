@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CFireSyncPacket.h"
-#include "CPlayer.h"
 
 CFireSyncPacket::CFireSyncPacket()
 {

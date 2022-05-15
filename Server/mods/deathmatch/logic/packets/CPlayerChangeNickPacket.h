@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CPacket.h"
+#include "../../Config.h"
 
 class CPlayerChangeNickPacket final : public CPacket
 {

@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaPacket.h"
 
 bool CLuaPacket::Write(NetBitStreamInterface& BitStream) const
 {

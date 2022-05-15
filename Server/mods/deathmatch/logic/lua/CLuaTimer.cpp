@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaTimer.h"
-#include "CLuaMain.h"
-#include "CIdArray.h"
 
 CLuaTimer::CLuaTimer(const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments)
 {

@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CServerInfoSyncPacket.h"
-#include "CStaticFunctionDefinitions.h"
 
 bool CServerInfoSyncPacket::Write(NetBitStreamInterface& BitStream) const
 {

@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CGroups.h"
-#include "Utils.h"
 
 CDummy* CGroups::Create(CElement* pParent)
 {

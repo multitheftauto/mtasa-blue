@@ -8,10 +8,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-#include "CStaticFunctionDefinitions.h"
-
 enum
 {
     HQCOMMS_STAGE_NONE,

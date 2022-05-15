@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CUnoccupiedVehiclePushPacket.h"
 
 bool CUnoccupiedVehiclePushPacket::Read(NetBitStreamInterface& BitStream)
 {

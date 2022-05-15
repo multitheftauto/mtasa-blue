@@ -494,47 +494,97 @@ inline SString GetClassTypeName(CClientVectorGraphic*)
 //
 // CResource from userdata
 //
-CResource* UserDataCast(CResource* ptr, lua_State* luaState);
+template <class T>
+CResource* UserDataCast(CResource*, void* ptr, lua_State*)
+{
+    return g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
 
 //
 // CXMLNode from userdata
 //
-CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState);
+template <class T>
+CXMLNode* UserDataCast(CXMLNode*, void* ptr, lua_State*)
+{
+    return g_pCore->GetXML()->GetNodeFromID(reinterpret_cast<unsigned long>(ptr));
+}
 
 //
 // CLuaTimer from userdata
 //
-CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState);
+template <class T>
+CLuaTimer* UserDataCast(CLuaTimer*, void* ptr, lua_State* luaVM)
+{
+    CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        return pLuaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+    return NULL;
+}
 
 //
 // CLuaVector2D from userdata
 //
-CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState);
+template <class T>
+CLuaVector2D* UserDataCast(CLuaVector2D*, void* ptr, lua_State* luaVM)
+{
+    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
 
 //
 // CLuaVector3D from userdata
 //
-CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState);
+template <class T>
+CLuaVector3D* UserDataCast(CLuaVector3D*, void* ptr, lua_State* luaVM)
+{
+    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
 
 //
 // CLuaVector4D from userdata
 //
-CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState);
+template <class T>
+CLuaVector4D* UserDataCast(CLuaVector4D*, void* ptr, lua_State* luaVM)
+{
+    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
 
 //
 // CLuaMatrix from userdata
 //
-CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState);
+template <class T>
+CLuaMatrix* UserDataCast(CLuaMatrix*, void* ptr, lua_State* luaVM)
+{
+    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
 
 //
 // CClientEntity from userdata
 //
-CClientEntity* UserDataCast(CClientEntity* ptr, lua_State* luaState);
+template <class T>
+CClientEntity* UserDataCast(CClientEntity*, void* ptr, lua_State*)
+{
+    ElementID      ID = TO_ELEMENTID(ptr);
+    CClientEntity* pEntity = CElementIDs::GetElement(ID);
+    if (!pEntity || pEntity->IsBeingDeleted() || !pEntity->IsA(T::GetClassId()))
+        return NULL;
+    return pEntity;
+}
 
 //
 // CRemoteCall from userdata
 //
-CRemoteCall* UserDataCast(CRemoteCall* ptr, lua_State* luaState);
+template <class T>
+CRemoteCall* UserDataCast(CRemoteCall*, void* ptr, lua_State*)
+{
+    CRemoteCall* pRemoteCall = (CRemoteCall*)ptr;
+
+    if (pRemoteCall && g_pClientGame->GetRemoteCalls()->CallExists(pRemoteCall))
+        return pRemoteCall;
+
+    return nullptr;
+}
 
 //
 // CClientGUIElement ( CGUIElement )

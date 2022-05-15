@@ -15,8 +15,6 @@
 #define VERIFY_FUNCTION(func) ( (func).ToInt () != LUA_REFNIL )
 #define IS_REFNIL(func) ( (func).ToInt () == LUA_REFNIL )
 
-struct lua_State;
-
 class CLuaFunctionRef
 {
 public:
