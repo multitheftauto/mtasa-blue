@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-15 10:39+0000\n"
-"PO-Revision-Date: 2022-05-15 10:44\n"
+"POT-Creation-Date: 2022-05-15 19:34+0000\n"
+"PO-Revision-Date: 2022-05-15 20:34\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -895,8 +895,8 @@ msgstr "OVLÁDÁNÍ MULTIPLAYERU"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1246
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:358
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "Chyba"
 
@@ -1584,7 +1584,7 @@ msgstr "Skupinové ovládání dozadu"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Vybraný skin nemůže být načten a výchozí skin taktéž, prosím přeinstaluj MTA."
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Chceš se podívat na online pomoc s tímto problémem?"
 
@@ -1603,7 +1603,7 @@ msgstr "Navštivte nejnovější článek s novinkou"
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA nemůže pokračovat, protože na disku %s není dostatek místa."
 
-#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:102
+#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Fatální chyba"
 
@@ -3027,7 +3027,7 @@ msgid "Deny"
 msgstr "Odmítnout"
 
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:100
+#: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Fatální chyba (%u). Pokud problém přetrvává, podívej se na mtasa.com pro podporu."
@@ -3036,20 +3036,20 @@ msgstr "Fatální chyba (%u). Pokud problém přetrvává, podívej se na mtasa.
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:116
+#: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Chyba protokolu (%u). Pokud problém přetrvává, podívej se na mtasa.com pro podporu."
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:118
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
 msgstr "Chyba připojení"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto nebylo správně nainstalováno, prosím reinstall."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Tvůj prohlížeč nyní zobrazí webovou stránku s nápovědou.\n\n"
