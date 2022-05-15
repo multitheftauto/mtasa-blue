@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CServerTextItemPacket.h"
 
 CServerTextItemPacket::CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color,
                                              unsigned char format, unsigned char ucShadowAlpha, const char* szText)

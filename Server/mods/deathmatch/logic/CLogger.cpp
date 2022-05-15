@@ -10,8 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLogger.h"
+#include "core/CServerInterface.h"
 
-using namespace std;
+#define MAX_STRING_LENGTH 2048
 
 FILE*            CLogger::m_pLogFile = NULL;
 FILE*            CLogger::m_pAuthFile = NULL;
@@ -21,7 +23,7 @@ SString          CLogger::m_strCaptureBuffer;
 bool             CLogger::m_bCaptureConsole = false;
 CCriticalSection CLogger::m_CaptureBufferMutex;
 
-#define MAX_STRING_LENGTH 2048
+extern CServerInterface* g_pServerInterface;
 
 void CLogger::LogPrintvf(const char* format, va_list vlist)
 {
@@ -240,8 +242,8 @@ void CLogger::HandleLogPrint(bool bTimeStamp, const char* szPrePend, const char*
         ProgressDotsEnd();
 
     // Put the timestamp at the beginning of the string
-    string strOutputShort;
-    string strOutputLong;
+    std::string strOutputShort;
+    std::string strOutputLong;
     if (bTimeStamp)
     {
         strOutputShort = SString("[%s] ", *GetLocalTimeString());

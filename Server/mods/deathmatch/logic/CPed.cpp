@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPed.h"
+#include "CPedManager.h"
+#include "CLogger.h"
+#include "Utils.h"
+#include "CStaticFunctionDefinitions.h"
 
 char szBodyPartNameEmpty[] = "";
 struct SBodyPartName

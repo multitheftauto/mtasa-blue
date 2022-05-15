@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "Utils.h"
+#include "CWeaponNames.h"
 
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
                                                    float WeaponRange, CControllerState& sharedControllerState)

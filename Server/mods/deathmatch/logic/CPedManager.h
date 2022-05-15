@@ -9,9 +9,13 @@
  *
  *****************************************************************************/
 
-class CPedManager;
-
 #pragma once
+
+#include <list>
+
+class CEvents;
+class CElement;
+class CXMLNode;
 
 class CPedManager
 {
@@ -28,8 +32,8 @@ public:
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
     bool         Exists(class CPed* pPed);
 
-    list<class CPed*>::const_iterator IterBegin() { return m_List.begin(); }
-    list<class CPed*>::const_iterator IterEnd() { return m_List.end(); }
+    std::list<class CPed*>::const_iterator IterBegin() { return m_List.begin(); }
+    std::list<class CPed*>::const_iterator IterEnd() { return m_List.end(); }
 
     static bool IsValidModel(unsigned short usModel);
 
@@ -37,5 +41,5 @@ protected:
     void AddToList(class CPed* pPed) { m_List.push_back(pPed); }
     void RemoveFromList(class CPed* pPed);
 
-    list<class CPed*> m_List;
+    std::list<class CPed*> m_List;
 };

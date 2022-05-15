@@ -8,13 +8,15 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"
 #include "packets/CEntityRemovePacket.h"
-
+#include "SResourceStartOptions.h"
 #include "CResourceFile.h"
+#include "CAclRightName.h"
 #include <unzip.h>
 #include <list>
 #include <vector>
@@ -32,6 +34,7 @@ class CXMLNode;
 class CAccount;
 class CLuaMain;
 class CResourceManager;
+class CChecksum;
 
 struct SVersion
 {
@@ -126,18 +129,6 @@ enum class EResourceState : unsigned char
     Starting,            // the resource is starting
     Running,             // resource items are running
     Stopping,            // the resource is stopping
-};
-
-struct SResourceStartOptions
-{
-    bool bIncludedResources = true;
-    bool bConfigs = true;
-    bool bMaps = true;
-    bool bScripts = true;
-    bool bHTML = true;
-    bool bClientConfigs = true;
-    bool bClientScripts = true;
-    bool bClientFiles = true;
 };
 
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.

@@ -6,7 +6,10 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
+
+class CPlayer;
 
 //
 // Bridge between the game and sim system

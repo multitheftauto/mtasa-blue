@@ -487,19 +487,19 @@ void CSimPlayerManager::Broadcast(const CSimPacket& Packet, const std::multimap<
         if (Packet.Write(*pBitStream))
         {
             // For each player, send the packet
-            const pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
+            const std::pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
             for (s_it = keyRange.first; s_it != keyRange.second; ++s_it)
             {
                 CSimPlayer* pPlayer = s_it->second;
                 dassert(usBitStreamVersion == pPlayer->GetBitStreamVersion());
-                g_pRealNetServer->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, packetPriority, Reliability,
+                g_pRealNetServer->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, false, packetPriority, Reliability,
                                              Packet.GetPacketOrdering());
             }
         }
         else
         {
             // Skip
-            const pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
+            const std::pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
             for (s_it = keyRange.first; s_it != keyRange.second; ++s_it)
             {
             }

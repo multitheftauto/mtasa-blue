@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "CElement.h"
+
 class CWaterManager;
 
 class CWater final : public CElement

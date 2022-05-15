@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaModule.h"
+#include "CLuaModuleManager.h"
+#include "CScriptDebugging.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CGame.h"
+#include "CResourceManager.h"
 
 extern CGame* g_pGame;
 

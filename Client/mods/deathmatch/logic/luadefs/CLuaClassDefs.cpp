@@ -248,13 +248,13 @@ int CLuaClassDefs::ToString(lua_State* luaVM)
 
 const char* CLuaClassDefs::GetObjectClass(void* pObject)
 {
-    if (CClientEntity* pEntity = UserDataCast<CClientEntity>((CClientEntity*)NULL, pObject, NULL))
+    if (CClientEntity* pEntity = UserDataCast((CClientEntity*)pObject, NULL))
         return GetEntityClass(pEntity);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pObject, NULL))
+    else if (CResource* pResource = UserDataCast((CResource*)pObject, NULL))
         return GetResourceClass(pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pObject, NULL))
+    else if (CXMLNode* pNode = UserDataCast((CXMLNode*)pObject, NULL))
         return GetXmlNodeClass(pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pObject, NULL))
+    else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pObject, NULL))
         return GetTimerClass(pTimer);
     return NULL;
 }
