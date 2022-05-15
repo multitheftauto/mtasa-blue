@@ -1,10 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10_Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
- *  PURPOSE:
+ *  FILE:        Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *
  *****************************************************************************/
 
@@ -18,6 +16,7 @@
 #include "CMainConfig.h"
 #include "CAccessControlListManager.h"
 #include "CDatabaseManager.h"
+#include "CBan.h"
 
 //
 // enum values <-> script strings
@@ -416,13 +415,14 @@ CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
 //
 // CElement from userdata
 //
-CElement* UserDataCast(CElement* ptr, lua_State* luaState)
+CElement* UserDataToElementCast(CElement* ptr, eEntityType entityType, lua_State* luaState)
 {
-    ElementID ID = TO_ELEMENTID(ptr);
-    CElement* pElement = CElementIDs::GetElement(ID);
-    if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != GetClassType((CElement*)0) && GetClassType((CElement*)0) != -1))
+    CElement* element = CElementIDs::GetElement(TO_ELEMENTID(ptr));
+
+    if (element == nullptr || element->IsBeingDeleted() || (element->GetType() != entityType && entityType != -1))
         return nullptr;
-    return pElement;
+
+    return element;
 }
 
 //

@@ -1,10 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.cpp
- *  PURPOSE:
+ *  FILE:        Client/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *
  *****************************************************************************/
 
@@ -822,13 +820,14 @@ CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
 //
 // CClientEntity from userdata
 //
-CClientEntity* UserDataCast(CClientEntity* ptr, lua_State* luaState)
+CClientEntity* UserDataToElementCast(CClientEntity* ptr, SharedUtil::ClassId classId, lua_State* luaState)
 {
-    ElementID      ID = TO_ELEMENTID(ptr);
-    CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (!pEntity || pEntity->IsBeingDeleted() || !pEntity->IsA(CClientEntity::GetClassId()))
+    CClientEntity* element = CElementIDs::GetElement(TO_ELEMENTID(ptr));
+
+    if (element == nullptr || element->IsBeingDeleted() || !element->IsA(classId))
         return nullptr;
-    return pEntity;
+
+    return element;
 }
 
 //

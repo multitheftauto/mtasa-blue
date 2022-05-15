@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CLuaBanDefs.h"
+#include "CBan.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
 

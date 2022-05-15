@@ -1,10 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.h
- *  PURPOSE:
+ *  FILE:        Client/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
  *
  *****************************************************************************/
 
@@ -12,6 +10,7 @@
 
 // Forward declare enum reflection stuff
 #include <gui/CGUIEnumDefs.h>
+#include <type_traits>
 
 enum eLuaType
 {
@@ -529,7 +528,13 @@ CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState);
 //
 // CClientEntity from userdata
 //
-CClientEntity* UserDataCast(CClientEntity* ptr, lua_State* luaState);
+CClientEntity* UserDataToElementCast(CClientEntity* ptr, SharedUtil::ClassId classId, lua_State* luaState);
+
+template <typename T, typename = std::enable_if_t<std::is_base_of_v<CClientEntity, T>>>
+T* UserDataCast(T* ptr, lua_State* luaState)
+{
+    return reinterpret_cast<T*>(UserDataToElementCast(ptr, T::GetClassId(), luaState));
+}
 
 //
 // CRemoteCall from userdata

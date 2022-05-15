@@ -374,7 +374,7 @@ bool CMainConfig::Load()
     // Grab the Quality for Voice
     iTemp = m_ucVoiceQuality;
     iResult = GetInteger(m_pRootNode, "voice_quality", iTemp, 0, 10);
-    m_ucVoiceQuality = Clamp(0, iTemp, 10);
+    m_ucVoiceQuality = static_cast<unsigned char>(Clamp(0, iTemp, 10));
 
     // Grab the bitrate for Voice [optional]
     iResult = GetInteger(m_pRootNode, "voice_bitrate", iTemp);

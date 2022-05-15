@@ -131,7 +131,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_usBitStreamVersion = pPlayer->GetBitStreamVersion();
     pSim->m_bHasOccupiedVehicle = pVehicle != NULL;
     pSim->m_PlayerID = pPlayer->GetID();
-    pSim->m_usLatency = pPlayer->GetPing();
+    pSim->m_usLatency = static_cast<unsigned short>(pPlayer->GetPing());
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
     pSim->m_usVehicleModel = pVehicle ? pVehicle->GetModel() : 0;
     pSim->m_ucSyncTimeContext = pPlayer->GetSyncTimeContext();

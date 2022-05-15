@@ -1,10 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10_Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
- *  PURPOSE:
+ *  FILE:        Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
  *
  *****************************************************************************/
 
@@ -16,7 +14,7 @@
 #include "CAccount.h"
 #include "CEasingCurve.h"
 #include "CAccessControlListRight.h"
-// #include "CDatabaseManager.h"
+#include <type_traits>
 
 class CLuaVector2D;
 class CLuaVector3D;
@@ -331,7 +329,13 @@ CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState);
 //
 // CElement from userdata
 //
-CElement* UserDataCast(CElement* ptr, lua_State* luaState);
+CElement* UserDataToElementCast(CElement* ptr, eEntityType entityType, lua_State* luaState);
+
+template <typename T, typename = std::enable_if_t<std::is_base_of_v<CElement, T>>>
+T* UserDataCast(T* ptr, lua_State* luaState)
+{
+    return reinterpret_cast<T*>(UserDataToElementCast(ptr, GetClassType(static_cast<T*>(nullptr)), luaState));
+}
 
 //
 // CPed from userdata

@@ -130,7 +130,7 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         // Set weapon slot
         if (bWeaponCorrect)
-            m_Cache.ucWeaponSlot = uiSlot;
+            m_Cache.ucWeaponSlot = static_cast<uchar>(uiSlot);
 
         if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {
