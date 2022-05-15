@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-15 10:39+0000\n"
-"PO-Revision-Date: 2022-05-15 10:44\n"
+"POT-Creation-Date: 2022-05-15 19:34+0000\n"
+"PO-Revision-Date: 2022-05-15 20:34\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -896,8 +896,8 @@ msgstr "کنترل های آنلاین"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1246
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1258
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:358
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "خطا"
 
@@ -1582,7 +1582,7 @@ msgstr "کنترل گروه عقب"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "اسکین انتخابی شما نمی تواند باگذاری شود, همچنین اسکین های پیشفرض, لطفا مجددا MTA را نصب نمایید."
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "آیا می خواهید در مورد این مشکل راهنمای آنلاین را مشاهده نمایید؟"
 
@@ -1601,7 +1601,7 @@ msgstr "مشاهده آخرین مقاله خبری"
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA نمی تواند ادامه دهد زیرا درایو %s فضای کافی ندارد.‎‏‎‪‎‏"
 
-#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:102
+#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "خطای مهلک"
 
@@ -3009,7 +3009,7 @@ msgid "Deny"
 msgstr "اجازه نده"
 
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:100
+#: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفاً برای پشتیبانی، به وبسایت mtasa.com مراجعه کنید."
@@ -3018,20 +3018,20 @@ msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفاً 
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:116
+#: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "خطای پروتکل (%u). در صورت حل نشدن مشکل، لطفاً برای پشتیبانی، به mtasa.com مراجعه کنید."
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:118
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
 msgstr "خطای اتصال"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "مولتی دفت آتو به درستی نصب نشده است, لطفا دوباره نصب نمایید."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "مرورگر شما اکنون یک صفحه وب با برخی اطلاعات راهنما نمایش می دهد.\n\n"
