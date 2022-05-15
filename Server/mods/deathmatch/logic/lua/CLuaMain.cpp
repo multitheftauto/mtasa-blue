@@ -617,6 +617,10 @@ void CLuaMain::CheckExecutionTime()
     if (g_pGame->GetPlayerManager()->Count() == 0)
         return;
 
+    // Was the resource stopped? (no warning)
+    if (GetResource() && !GetResource()->IsActive())
+        return;
+
     // Issue warning about script execution time
     CLogger::LogPrintf("WARNING: Long execution (%s)\n", GetScriptName());
 }
