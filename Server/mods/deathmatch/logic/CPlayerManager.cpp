@@ -145,7 +145,7 @@ void CPlayerManager::DeleteAll()
         delete *m_Players.begin();
 }
 
-void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip)
+size_t CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
@@ -162,9 +162,11 @@ void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip)
     }
 
     CPlayerManager::Broadcast(Packet, sendList);
+
+    return sendList.size();
 }
 
-void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip)
+size_t CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
@@ -182,9 +184,11 @@ void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort 
     }
 
     CPlayerManager::Broadcast(Packet, sendList);
+
+    return sendList.size();
 }
 
-void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
+size_t CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
@@ -201,6 +205,8 @@ void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pE
     }
 
     CPlayerManager::Broadcast(Packet, sendList);
+
+    return sendList.size();
 }
 
 // Send one packet to a list of players, grouped by bitstream version
