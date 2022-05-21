@@ -442,6 +442,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
+    g_pMultiplayer->SetAudioZoneRadioSwitchHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
