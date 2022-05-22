@@ -8887,7 +8887,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
     pEntry->SetAnimGroup(pNewEntry->GetAnimGroup());
 
     // Lower and Upper limits cannot match or LSOD (unless boat)
-    // if ( eModel != VEHICLE_BOAT )     // Commented until fully tested
+    // if ( eModel != eVehicleType::BOAT )     // Commented until fully tested
     {
         float fSuspensionLimitSize = pEntry->GetSuspensionUpperLimit() - pEntry->GetSuspensionLowerLimit();
         if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)

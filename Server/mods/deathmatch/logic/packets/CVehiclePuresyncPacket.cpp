@@ -62,7 +62,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             pSourcePlayer->SetPosition(position.data.vecPosition);
 
             // If the remote vehicle is a train, we want to read special train-specific data
-            if (remoteVehicleType == VEHICLE_TRAIN)
+            if (remoteVehicleType == eVehicleType::TRAIN)
             {
                 float        fPosition;
                 bool         bDirection;
@@ -82,7 +82,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 BitStream.Read(fSpeed);
 
                 // But we should only actually apply that train-specific data if that vehicle is train on our side
-                if (vehicleType == VEHICLE_TRAIN)
+                if (vehicleType == eVehicleType::TRAIN)
                 {
                     pVehicle->SetTrainPosition(fPosition);
                     pVehicle->SetTrainDirection(bDirection);
@@ -493,7 +493,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.Write(&position);
 
                 // If the remote vehicle is a train, we want to read special train-specific data
-                if (pVehicle->GetVehicleType() == VEHICLE_TRAIN)
+                if (pVehicle->GetVehicleType() == eVehicleType::TRAIN)
                 {
                     // Train specific data
                     float fPosition = pVehicle->GetTrainPosition();
@@ -602,7 +602,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             flags.data.bIsOnGround = pVehicle->IsOnGround();
             flags.data.bIsInWater = pVehicle->IsInWater();
             flags.data.bIsDerailed = pVehicle->IsDerailed();
-            flags.data.bIsAircraft = (pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI);
+            flags.data.bIsAircraft = (pVehicle->GetVehicleType() == eVehicleType::PLANE || pVehicle->GetVehicleType() == eVehicleType::HELI);
             flags.data.bHasAWeapon = (ucWeaponType != 0);
             flags.data.bIsHeliSearchLightVisible = pVehicle->IsHeliSearchLightVisible();
             BitStream.Write(&flags);

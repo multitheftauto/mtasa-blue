@@ -4071,7 +4071,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
     // Valid seat id for that vehicle?
     // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player on the first seat being the vehicle
     // syncer (Todo)
-    if (uiSeat <= pVehicle->GetMaxPassengers() && (pVehicle->GetVehicleType() != VEHICLE_TRAIN || !pVehicle->GetTowedByVehicle()))
+    if (uiSeat <= pVehicle->GetMaxPassengers() && (pVehicle->GetVehicleType() != eVehicleType::TRAIN || !pVehicle->GetTowedByVehicle()))
     {
         if (!pPed->IsDead())
         {
@@ -4840,8 +4840,8 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens(CVehicle* pVehicle, unsigned 
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
     // Won't work with below.
-    if (vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI &&
-        vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX)
+    if (vehicleType != eVehicleType::PLANE && vehicleType != eVehicleType::BOAT && vehicleType != eVehicleType::TRAILER && vehicleType != eVehicleType::HELI &&
+        vehicleType != eVehicleType::BIKE && vehicleType != eVehicleType::BMX)
     {
         if (ucSirenType >= 1 && ucSirenType <= 6)
         {
@@ -4881,8 +4881,8 @@ bool CStaticFunctionDefinitions::SetVehicleSirens(CVehicle* pVehicle, unsigned c
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
     // Won't work with below.
-    if (vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI &&
-        vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX)
+    if (vehicleType != eVehicleType::PLANE && vehicleType != eVehicleType::BOAT && vehicleType != eVehicleType::TRAILER && vehicleType != eVehicleType::HELI &&
+        vehicleType != eVehicleType::BIKE && vehicleType != eVehicleType::BMX)
     {
         if (ucSirenID <= SIREN_ID_MAX)
         {
@@ -5197,7 +5197,7 @@ bool CStaticFunctionDefinitions::IsTrainDerailed(CVehicle* pVehicle, bool& bDera
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     bDerailed = pVehicle->IsDerailed();
@@ -5208,7 +5208,7 @@ bool CStaticFunctionDefinitions::IsTrainDerailable(CVehicle* pVehicle, bool& bDe
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     bDerailable = pVehicle->IsDerailable();
@@ -5219,7 +5219,7 @@ bool CStaticFunctionDefinitions::GetTrainDirection(CVehicle* pVehicle, bool& bDi
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     bDirection = pVehicle->GetTrainDirection();
@@ -5230,7 +5230,7 @@ bool CStaticFunctionDefinitions::GetTrainSpeed(CVehicle* pVehicle, float& fSpeed
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     const CVector& vecVelocity = pVehicle->GetVelocity();
@@ -5242,7 +5242,7 @@ bool CStaticFunctionDefinitions::GetTrainPosition(CVehicle* pVehicle, float& fPo
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
     else if (pVehicle->IsDerailed())
         return false;
@@ -6888,7 +6888,7 @@ bool CStaticFunctionDefinitions::AttachTrailerToVehicle(CVehicle* pVehicle, CVeh
                 return false;
             }
 
-            if (pTrailer->GetVehicleType() == VEHICLE_TRAIN)
+            if (pTrailer->GetVehicleType() == eVehicleType::TRAIN)
             {
                 // Set the position near the chain engine (doesn't influence visual appearance, but will allow entering)
                 pTrailer->SetPosition(pVehicle->GetPosition());
@@ -7084,7 +7084,7 @@ bool CStaticFunctionDefinitions::SetTrainDerailed(CVehicle* pVehicle, bool bDera
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     pVehicle->SetDerailed(bDerailed);
@@ -7101,7 +7101,7 @@ bool CStaticFunctionDefinitions::SetTrainDerailable(CVehicle* pVehicle, bool bDe
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     pVehicle->SetDerailable(bDerailable);
@@ -7118,7 +7118,7 @@ bool CStaticFunctionDefinitions::SetTrainDirection(CVehicle* pVehicle, bool bDir
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     pVehicle->SetTrainDirection(bDirection);
@@ -7135,7 +7135,7 @@ bool CStaticFunctionDefinitions::SetTrainSpeed(CVehicle* pVehicle, float fSpeed)
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
 
     CVector vecVelocity = pVehicle->GetVelocity();
@@ -7155,7 +7155,7 @@ bool CStaticFunctionDefinitions::SetTrainPosition(CVehicle* pVehicle, float fPos
 {
     assert(pVehicle);
 
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
     else if (pVehicle->IsDerailed())
         return false;
@@ -7375,7 +7375,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
         handling.data.ucAnimGroup = pNewEntry->GetAnimGroup();
 
         // Lower and Upper limits cannot match or LSOD (unless boat)
-        // if ( eModel != VEHICLE_BOAT )     // Commented until fully tested
+        // if ( eModel != eVehicleType::BOAT )     // Commented until fully tested
         {
             float fSuspensionLimitSize = handling.data.fSuspensionUpperLimit - handling.data.fSuspensionLowerLimit;
             if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)

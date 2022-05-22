@@ -63,7 +63,7 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
-        if (CVehicleManager::GetVehicleType(m_Cache.iModelID) == VEHICLE_TRAIN)
+        if (CVehicleManager::GetVehicleType(m_Cache.iModelID) == eVehicleType::TRAIN)
         {
             // Train specific data
             float fRailPosition = 0.0f;

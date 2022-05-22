@@ -96,19 +96,19 @@ enum eLights
     MAX_LIGHTS
 };
 
-enum eVehicleType
+enum class eVehicleType
 {
-    VEHICLE_NONE = 0,
-    VEHICLE_CAR,
-    VEHICLE_BOAT,
-    VEHICLE_TRAIN,
-    VEHICLE_HELI,
-    VEHICLE_PLANE,
-    VEHICLE_BIKE,
-    VEHICLE_MONSTERTRUCK,
-    VEHICLE_QUADBIKE,
-    VEHICLE_BMX,
-    VEHICLE_TRAILER
+    NONE,
+    CAR,
+    BOAT,
+    TRAIN,
+    HELI,
+    PLANE,
+    BIKE,
+    MONSTERTRUCK,
+    QUADBIKE,
+    BMX,
+    TRAILER
 };
 
 #define SIREN_TYPE_FIRST 1

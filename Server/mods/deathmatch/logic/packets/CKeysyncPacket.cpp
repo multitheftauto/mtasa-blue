@@ -136,7 +136,7 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
                 ControllerState.RightStickY = sRightStickY;
             }
 
-            if (pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI)
+            if (pVehicle->GetVehicleType() == eVehicleType::PLANE || pVehicle->GetVehicleType() == eVehicleType::HELI)
             {
                 bool bState1, bState2;
                 if (!BitStream.ReadBit(bState1) || !BitStream.ReadBit(bState2))
@@ -236,7 +236,7 @@ bool CKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.Write(ControllerState.RightStickY);
             }
 
-            if (pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI)
+            if (pVehicle->GetVehicleType() == eVehicleType::PLANE || pVehicle->GetVehicleType() == eVehicleType::HELI)
             {
                 BitStream.WriteBit(ControllerState.LeftShoulder2 != 0);
                 BitStream.WriteBit(ControllerState.RightShoulder2 != 0);

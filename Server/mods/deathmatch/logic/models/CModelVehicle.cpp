@@ -12,17 +12,12 @@
 #pragma once
 #include "StdInc.h"
 
-CModelVehicle::CModelVehicle(uint32_t uiModelID, const CHandlingEntry* pHandling, eVehicleType eType, uint8_t cVariantsCount, uint8_t cAttributes,
-                             uint8_t cPassengesCount)
+CModelVehicle::CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs* sModelDefs)
     : CModelBase(uiModelID)
 {
-    m_pOriginalVehicleHandling = pHandling;
+    m_modelDef = sModelDefs;
     m_pVehicleHandling = new CHandlingEntry();
-    m_pVehicleHandling->ApplyHandlingData(pHandling);
-    m_eVehicleType = eType;
-    m_cVariantsCount = cVariantsCount;
-    m_cAttributes = cAttributes;
-    m_cPassengesCount = cPassengesCount;
+    m_pVehicleHandling->ApplyHandlingData(sModelDefs->pHandling);
 }
 
 CModelVehicle::~CModelVehicle()
@@ -31,11 +26,27 @@ CModelVehicle::~CModelVehicle()
 
 CModelVehicle* CModelVehicle::Clone(uint32_t uiModelID)
 {
-    CModelVehicle* pNewModel = new CModelVehicle(uiModelID, m_pOriginalVehicleHandling, m_eVehicleType, m_cVariantsCount, m_cAttributes, m_cPassengesCount);
+    CModelVehicle* pNewModel = new CModelVehicle(uiModelID, m_modelDef);
 
     pNewModel->SetParentModel(m_uiModelID);
 
     return pNewModel;
+}
+
+bool CModelVehicle::HasDamageModel()
+{
+    switch (GetVehicleType())
+    {
+        case eVehicleType::TRAILER:
+        case eVehicleType::MONSTERTRUCK:
+        case eVehicleType::QUADBIKE:
+        case eVehicleType::HELI:
+        case eVehicleType::PLANE:
+        case eVehicleType::CAR:
+            return true;
+        default:
+            return false;
+    }
 }
 
 void CModelVehicle::Unload()

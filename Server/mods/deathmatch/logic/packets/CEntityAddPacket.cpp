@@ -634,7 +634,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         handling.data.ucAnimGroup = pEntry->GetAnimGroup();
 
                         // Lower and Upper limits cannot match or LSOD (unless boat)
-                        // if ( pVehicle->GetModel() != VEHICLE_BOAT )     // Commented until fully tested
+                        // if ( pVehicle->GetModel() != eVehicleType::BOAT )     // Commented until fully tested
                         {
                             float fSuspensionLimitSize = handling.data.fSuspensionUpperLimit - handling.data.fSuspensionLowerLimit;
                             if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)

@@ -26,6 +26,7 @@ public:
     void loadVehicleHandling(std::string_view strData);
     void loadObjectDefs(const std::filesystem::path path);
     void loadVehicleDefs(const std::filesystem::path path);
+    void loadVehicleHandling(const std::filesystem::path path);
 
 private:
     void parseConfigCSV(const std::filesystem::path path, std::function<void(std::vector<char*> lineParams)> parseLineFun);

@@ -58,14 +58,14 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     eVehicleType   vehicleType = m_pVehicle->GetVehicleType();
 
     // No upgrades for trains/boats
-    if (vehicleType == VEHICLE_TRAIN || vehicleType == VEHICLE_BOAT)
+    if (vehicleType == eVehicleType::TRAIN || vehicleType == eVehicleType::BOAT)
         return false;
 
     // In MTA every vehicle has a radio...
     if (us == 1086)
         return true;
 
-    if (vehicleType == VEHICLE_BIKE || vehicleType == VEHICLE_BMX || vehicleType == VEHICLE_HELI)
+    if (vehicleType == eVehicleType::BIKE || vehicleType == eVehicleType::BMX || vehicleType == eVehicleType::HELI)
         return false;
 
     unsigned short usModel = m_pVehicle->GetModel();
@@ -78,7 +78,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
         return true;
 
     // No nitro or other upgrades for planes/helicopters
-    if (vehicleType == VEHICLE_PLANE)
+    if (vehicleType == eVehicleType::PLANE)
         return false;
 
     if (us == VEHICLEUPGRADE_NITRO_5X || us == VEHICLEUPGRADE_NITRO_2X || us == VEHICLEUPGRADE_NITRO_10X || us == VEHICLEUPGRADE_HYDRAULICS)

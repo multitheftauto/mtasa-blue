@@ -98,7 +98,7 @@ eVehicleType CVehicleManager::GetVehicleType(unsigned short usModel)
     if (pModel)
         return pModel->GetVehicleType();
 
-    return VEHICLE_NONE;
+    return eVehicleType::NONE;
 }
 
 bool CVehicleManager::IsValidUpgrade(unsigned short usUpgrade)
@@ -220,11 +220,6 @@ bool CVehicleManager::HasSmokeTrail(unsigned int uiModel)
     return false;
 }
 
-bool CVehicleManager::IsTrailer(unsigned int uiVehicleModel)
-{
-    return GetVehicleType(uiVehicleModel) == VEHICLE_TRAILER;
-}
-
 bool CVehicleManager::HasDamageModel(unsigned short usModel)
 {
     return HasDamageModel(GetVehicleType(usModel));
@@ -234,12 +229,12 @@ bool CVehicleManager::HasDamageModel(eVehicleType Type)
 {
     switch (Type)
     {
-        case VEHICLE_TRAILER:
-        case VEHICLE_MONSTERTRUCK:
-        case VEHICLE_QUADBIKE:
-        case VEHICLE_HELI:
-        case VEHICLE_PLANE:
-        case VEHICLE_CAR:
+        case eVehicleType::TRAILER:
+        case eVehicleType::MONSTERTRUCK:
+        case eVehicleType::QUADBIKE:
+        case eVehicleType::HELI:
+        case eVehicleType::PLANE:
+        case eVehicleType::CAR:
             return true;
         default:
             return false;

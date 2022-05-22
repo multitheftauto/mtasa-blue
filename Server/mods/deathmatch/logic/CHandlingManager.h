@@ -28,7 +28,7 @@ public:
     const CHandlingEntry* GetModelHandlingData(eVehicleTypes eModel);
     const CHandlingEntry* GetOriginalHandlingData(eVehicleTypes eModel);
 
-    eHandlingTypes GetHandlingID(eVehicleTypes eModel);
+    void RehisterHandling(uint32_t uiModelID, tHandlingData& handling);
 
     // Helper functions
     eHandlingProperty GetPropertyEnumFromName(std::string strName);
@@ -38,11 +38,6 @@ public:
     std::map<std::string, eHandlingProperty> m_HandlingNames;
 
 private:
-    void InitializeDefaultHandlings();
-
-    // Original handling data unaffected by handling.cfg changes
-    static SFixedArray<tHandlingData, HT_MAX> m_OriginalHandlingData;
-
     // Array with the original handling entries
-    static SFixedArray<CHandlingEntry*, HT_MAX> m_pOriginalEntries;
+    static std::map<uint32_t, CHandlingEntry*> m_pOriginalEntries;
 };

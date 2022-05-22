@@ -2877,7 +2877,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                             // Is this vehicle enterable? (not a trailer)
                             unsigned short usVehicleModel = pVehicle->GetModel();
-                            if (!CVehicleManager::IsTrailer(usVehicleModel))
+                            if (!g_pGame->GetModelManager()->GetVehicleModel(usVehicleModel)->IsTrailer())
                             {
                                 // He musn't already be doing something
                                 if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
@@ -2914,7 +2914,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                             // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the
                                             // player on the first seat being the vehicle syncer (Todo)
-                                            if (pVehicle->GetVehicleType() == VEHICLE_TRAIN && ucSeat == 0 && pVehicle->GetTowedByVehicle())
+                                            if (pVehicle->GetVehicleType() == eVehicleType::TRAIN && ucSeat == 0 && pVehicle->GetTowedByVehicle())
                                                 ucSeat++;
 
                                             // Going for driver?

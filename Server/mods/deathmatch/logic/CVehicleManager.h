@@ -46,7 +46,6 @@ public:
     static bool         HasLandingGears(unsigned int uiVehicleModel);
     static bool         HasAdjustableProperty(unsigned int uiVehicleModel);
     static bool         HasSmokeTrail(unsigned int uiVehicleModel);
-    static bool         IsTrailer(unsigned int uiVehicleModel);
     static bool         HasDamageModel(unsigned short usModel);
     static bool         HasDamageModel(eVehicleType Type);
     static bool         HasDoors(unsigned short usModel);

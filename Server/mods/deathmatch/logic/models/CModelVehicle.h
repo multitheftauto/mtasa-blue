@@ -13,34 +13,43 @@ class CModelVehicle;
 
 #pragma once
 
+struct SModelVehicleDefs
+{
+    uint8_t uiMaxPassengers;
+    uint8_t uiVariantsCount;
+    eVehicleType eVehicleType;
+    uint8_t      cAttributes;
+    CVehicleColor vehicleColors;
+    bool          bHasDoors;
+    const CHandlingEntry* pHandling;
+};
+
 class CModelVehicle : public CModelBase
 {
 public:
     // CModelVehicle(){};
-    CModelVehicle(uint32_t uiModelID, const CHandlingEntry* pHandling, eVehicleType eType, uint8_t cVariantsCount, uint8_t cAttributes, uint8_t cPassengesCount);
+    CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs* SModelVehicleDefs);
     ~CModelVehicle();
 
     virtual CModelVehicle* Clone(uint32_t uiModelID);
     CHandlingEntry*        GetVehicleHandling() { return m_pVehicleHandling; };
-    const CHandlingEntry*  GetOriginalHandling() { return m_pOriginalVehicleHandling; };
+    const CHandlingEntry*  GetOriginalHandling() { return m_modelDef->pHandling; };
     void                   SetVehicleHandling(CHandlingEntry* pEntry) { m_pVehicleHandling = pEntry; };
     void                   SetVehicleHandlingChanged(bool bState) { m_bVehicleHandlingChanged = bState; };
     bool                   HasVehicleHandlingChanged() { return m_bVehicleHandlingChanged; };
+    bool                   HasDamageModel();
+    bool                   IsTrailer() { return m_modelDef->eVehicleType == eVehicleType::TRAILER; };
 
-    eVehicleType GetVehicleType() { return m_eVehicleType; };
-    uint8_t GetVariantsCount() { return m_cVariantsCount; };
-    uint8_t GetAttributes() { return m_cAttributes; };
-    uint8_t GetPassengesCount() { return m_cPassengesCount; };
+    eVehicleType GetVehicleType() { return m_modelDef->eVehicleType; };
+    uint8_t      GetVariantsCount() { return m_modelDef->uiVariantsCount; };
+    uint8_t      GetAttributes() { return m_modelDef->cAttributes; };
+    uint8_t      GetPassengesCount() { return m_modelDef->uiMaxPassengers; };
     
     eModelInfoType GetType() { return eModelInfoType::VEHICLE; };
     void           Unload();
 
 private:
+    const SModelVehicleDefs*    m_modelDef;
     CHandlingEntry*       m_pVehicleHandling;
-    const CHandlingEntry* m_pOriginalVehicleHandling;
     bool                  m_bVehicleHandlingChanged = false;
-    eVehicleType          m_eVehicleType;
-    uint8_t               m_cVariantsCount;
-    uint8_t               m_cAttributes;
-    uint8_t               m_cPassengesCount;
 };
