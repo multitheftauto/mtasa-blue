@@ -6686,7 +6686,9 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 //////////////////////////////////////////////////////////////////
 void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
-    if (m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
+    CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
+    
+    if (pPlayer && pPlayer->IsInVehicle())
     {
         // Do not change radio station if player is inside vehicle
         // because it is supposed to play own radio
