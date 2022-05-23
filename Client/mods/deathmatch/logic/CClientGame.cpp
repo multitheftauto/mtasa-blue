@@ -6686,7 +6686,7 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 //////////////////////////////////////////////////////////////////
 void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
-    CClientPlayer* pPlayer = g_pClientGame->GetLocalPlayer();
+    CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
     
     if (pPlayer && pPlayer->IsInVehicle())
     {
