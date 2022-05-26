@@ -1580,6 +1580,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", NULL, false);
     m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
+    m_Events.AddEvent("onPedDamage", "loss", NULL, false);
 
     // Element events
     m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
