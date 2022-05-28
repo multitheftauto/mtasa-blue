@@ -197,8 +197,7 @@
 
 
   /* non-desktop Universal Windows Platform */
-#if defined( WINAPI_FAMILY_PARTITION )                 && \
-    !WINAPI_FAMILY_PARTITION( WINAPI_PARTITION_DESKTOP )
+#if defined( WINAPI_FAMILY ) && WINAPI_FAMILY != WINAPI_FAMILY_DESKTOP_APP
 
 #define PACK_DWORD64( hi, lo )  ( ( (DWORD64)(hi) << 32 ) | (DWORD)(lo) )
 

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClient.h"
+#include "CGame.h"
+#include "CAccountManager.h"
 
 extern CGame* g_pGame;
 

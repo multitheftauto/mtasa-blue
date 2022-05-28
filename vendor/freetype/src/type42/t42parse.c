@@ -92,7 +92,7 @@
 #undef  T1CODE
 #define T1CODE        T1_FIELD_LOCATION_BBOX
 
-    T1_FIELD_BBOX("FontBBox", xMin, 0 )
+    T1_FIELD_BBOX( "FontBBox", xMin, 0 )
 
     T1_FIELD_CALLBACK( "FontMatrix",  t42_parse_font_matrix, 0 )
     T1_FIELD_CALLBACK( "Encoding",    t42_parse_encoding,    0 )
@@ -1008,9 +1008,9 @@
         name_table->elements[n][len] = '\0';
 
         /* record index of /.notdef */
-        if ( *cur == '.'                                              &&
+        if ( *cur == '.'                                                &&
              ft_strcmp( ".notdef",
-                        (const char*)(name_table->elements[n]) ) == 0 )
+                        (const char*)( name_table->elements[n] ) ) == 0 )
         {
           notdef_index = n;
           notdef_found = 1;

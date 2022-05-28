@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaPlayerDefs.h"
 #include "CLuaGenericDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CKeyBinds.h"
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -1639,8 +1643,8 @@ int CLuaPlayerDefs::GetFunctionsBoundToKey(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Add all the bound functions to it
-        unsigned int              uiIndex = 0;
-        list<CKeyBind*>::iterator iter = pPlayer->GetKeyBinds()->IterBegin();
+        unsigned int                   uiIndex = 0;
+        std::list<CKeyBind*>::iterator iter = pPlayer->GetKeyBinds()->IterBegin();
         for (; iter != pPlayer->GetKeyBinds()->IterEnd(); ++iter)
         {
             CKeyBind* pKeyBind = *iter;

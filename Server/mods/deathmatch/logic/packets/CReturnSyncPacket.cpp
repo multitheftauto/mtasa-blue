@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CReturnSyncPacket.h"
+#include "CPlayer.h"
 #include "net/SyncStructures.h"
 
 CReturnSyncPacket::CReturnSyncPacket(CPlayer* pPlayer)

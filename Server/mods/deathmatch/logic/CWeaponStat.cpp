@@ -9,6 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CWeaponStat.h"
+#include "CWeaponStatManager.h"
+#include "CGame.h"
 
 uint CWeaponStat::ms_uiAllWeaponStatsRevision = 0;
 

@@ -6,7 +6,8 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-#include <StdInc.h>
+
+#include "StdInc.h"
 #include "LuaBasic.h"
 
 namespace lua

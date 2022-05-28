@@ -225,7 +225,7 @@ public:
     unsigned char GetFightingStyle() { return m_ucFightingStyle; }
     void          SetFightingStyle(unsigned char ucStyle) { m_ucFightingStyle = ucStyle; }
 
-    unsigned char GetMoveAnim() { return m_iMoveAnim; }
+    unsigned char GetMoveAnim() { return static_cast<unsigned char>(m_iMoveAnim); }
     void          SetMoveAnim(int iMoveAnim) { m_iMoveAnim = iMoveAnim; }
 
     float GetGravity() { return m_fGravity; }

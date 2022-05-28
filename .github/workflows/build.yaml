@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         configuration: [release, debug]
-        platform: [x64, arm64]
+        platform: [win32, x64, arm64]
         include:
         - configuration: release
           artifact-name: InstallFiles

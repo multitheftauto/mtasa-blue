@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAccessControlListRight.h"
+#include "CAclRightName.h"
+#include "lua/CLuaFunctionParseHelpers.h"
 
 CAccessControlListRight::CAccessControlListRight(const char* szRightName, ERightType eRightType, bool bAccess, CAccessControlListManager* pACLManager)
 {

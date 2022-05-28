@@ -111,10 +111,10 @@ These examples assume that your current directory is the mtasa-blue checkout dir
 
 | Architecture | Build command                                                                                |
 | ------------ | -------------------------------------------------------------------------------------------- |
-| x86          | ``` docker run --rm -v `pwd`:/build -e BUILD_ARCHITECTURE=x86 multitheftauto/mtasa-blue:latest ``` |
-| x86_64       | ``` docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:latest ```                           |
-| arm          | ``` docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:armhf ```                            |
-| arm64        | ``` docker run --rm -v `pwd`:/build multitheftauto/mtasa-blue:arm64 ```                            |
+| x86          | ``` docker run --rm -v `pwd`:/build -e BUILD_ARCHITECTURE=x86 ghcr.io/multitheftauto/mtasa-blue-build:latest ``` |
+| x86_64       | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest ```                           |
+| arm          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:armhf ```                            |
+| arm64        | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:arm64 ```                            |
 
 ### Premake FAQ
 #### How to add new C++ source files?

@@ -7,7 +7,10 @@
  *  PURPOSE:     source file for the custom weapon stats manager.
  *
  *****************************************************************************/
+
 #include "StdInc.h"
+#include "CWeaponStatManager.h"
+#include "CWeaponStat.h"
 
 SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> CWeaponStatManager::OriginalPoorWeaponData;
 SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> CWeaponStatManager::OriginalNormalWeaponData;

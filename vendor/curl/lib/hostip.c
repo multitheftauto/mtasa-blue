@@ -945,7 +945,7 @@ clean_up:
          less than 1! */
       alarm(1);
       rc = CURLRESOLV_TIMEDOUT;
-      failf(data, "Previous alarm fired off!");
+      failf(data, "Previous alarm fired off");
     }
     else
       alarm((unsigned int)alarm_set);
@@ -1131,7 +1131,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
 
         ai = Curl_str2addr(address, port);
         if(!ai) {
-          infof(data, "Resolve address '%s' found illegal!", address);
+          infof(data, "Resolve address '%s' found illegal", address);
           goto err;
         }
 
@@ -1150,7 +1150,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
       error = false;
    err:
       if(error) {
-        failf(data, "Couldn't parse CURLOPT_RESOLVE entry '%s'!",
+        failf(data, "Couldn't parse CURLOPT_RESOLVE entry '%s'",
               hostp->data);
         Curl_freeaddrinfo(head);
         return CURLE_SETOPT_OPTION_SYNTAX;
@@ -1167,8 +1167,8 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
       dns = Curl_hash_pick(data->dns.hostcache, entry_id, entry_len + 1);
 
       if(dns) {
-        infof(data, "RESOLVE %s:%d is - old addresses discarded!",
-                hostname, port);
+        infof(data, "RESOLVE %s:%d is - old addresses discarded",
+              hostname, port);
         /* delete old entry, there are two reasons for this
          1. old entry may have different addresses.
          2. even if entry with correct addresses is already in the cache,
@@ -1268,7 +1268,7 @@ CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_done)
   result = Curl_setup_conn(data, protocol_done);
 
   if(result) {
-    Curl_detach_connnection(data);
+    Curl_detach_connection(data);
     Curl_conncache_remove_conn(data, conn, TRUE);
     Curl_disconnect(data, conn, TRUE);
   }

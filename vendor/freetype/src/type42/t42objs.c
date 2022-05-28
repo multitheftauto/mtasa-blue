@@ -148,7 +148,7 @@
     t42_loader_done( &loader );
     if ( error )
     {
-      FT_FREE(face->ttf_data);
+      FT_FREE( face->ttf_data );
       face->ttf_size = 0;
     }
     return error;

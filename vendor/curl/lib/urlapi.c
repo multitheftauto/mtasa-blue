@@ -228,7 +228,7 @@ static void strcpy_url(char *output, const char *url, bool relative)
  */
 bool Curl_is_absolute_url(const char *url, char *buf, size_t buflen)
 {
-  size_t i;
+  int i;
   DEBUGASSERT(!buf || (buflen > MAX_SCHEME_LEN));
   (void)buflen; /* only used in debug-builds */
   if(buf)
@@ -678,8 +678,8 @@ static CURLUcode hostname_check(struct Curl_URL *u, char *hostname)
 #endif
   }
   else {
-    /* letters from the second string is not ok */
-    len = strcspn(hostname, " \r\n");
+    /* letters from the second string are not ok */
+    len = strcspn(hostname, " \r\n\t/:#?!@");
     if(hlen != len)
       /* hostname with bad content */
       return CURLUE_BAD_HOSTNAME;
@@ -1144,7 +1144,7 @@ static CURLUcode parseurl(const char *url, CURLU *u, unsigned int flags)
 }
 
 /*
- * Parse the URL and, if successful, replace everyting in the Curl_URL struct.
+ * Parse the URL and, if successful, replace everything in the Curl_URL struct.
  */
 static CURLUcode parseurl_and_replace(const char *url, CURLU *u,
                                       unsigned int flags)

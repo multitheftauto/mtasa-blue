@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRadarArea.h"
+#include "CRadarAreaManager.h"
+#include "CResource.h"
+#include "CLogger.h"
+#include "Utils.h"
+#include "packets/CElementRPCPacket.h"
+#include <net/rpc_enums.h>
 
 CRadarArea::CRadarArea(CRadarAreaManager* pRadarAreaManager, CElement* pParent) : CPerPlayerEntity(pParent)
 {
