@@ -1295,7 +1295,6 @@ int CLuaVehicleDefs::GetHelicopterRotorSpeed(lua_State* luaVM)
 
 std::variant<bool, float> CLuaVehicleDefs::GetVehicleRotorSpeed(CClientVehicle* pVehicle)
 {
-    float fSpeed = 0.0f;
     switch (pVehicle->GetVehicleType())
     {
         case CLIENTVEHICLE_PLANE:

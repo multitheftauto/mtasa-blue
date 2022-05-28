@@ -89,5 +89,5 @@ public:
     CPlaneSA(CPlaneSAInterface* plane);
     CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    CPlaneSAInterface* GetPlaneInterface() { return (CPlaneSAInterface*)m_pInterface; };
+    CPlaneSAInterface* GetPlaneInterface() const { return (CPlaneSAInterface*)m_pInterface; };
 };
