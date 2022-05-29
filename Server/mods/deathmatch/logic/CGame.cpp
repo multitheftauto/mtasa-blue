@@ -4322,6 +4322,8 @@ void CGame::HandleBackup()
     zipMaker.InsertFile(m_pMainConfig->GetIdFile(), PathJoin("config", "server-id.keys"));
     zipMaker.InsertFile(pModManager->GetAbsolutePath(FILENAME_SETTINGS), PathJoin("config", "settings.xml"));
     zipMaker.InsertFile(pModManager->GetAbsolutePath("vehiclecolors.conf"), PathJoin("config", "vehiclecolors.conf"));
+    zipMaker.InsertFile(pModManager->GetAbsolutePath("handling.conf"), PathJoin("config", "handling.conf"));
+    zipMaker.InsertFile(pModManager->GetAbsolutePath("vehicles.conf"), PathJoin("config", "vehicles.conf"));
 
     // Backup database files
     zipMaker.InsertDirectoryTree(m_pMainConfig->GetGlobalDatabasesPath(), PathJoin("databases", "global"));

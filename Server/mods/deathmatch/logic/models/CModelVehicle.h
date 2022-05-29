@@ -13,6 +13,14 @@ class CModelVehicle;
 
 #pragma once
 
+enum class eVehicleVariationType
+{
+    DEFAULT,
+    NRG,
+    SLAMVAN,
+    CADDY,
+};
+
 struct SModelVehicleDefs
 {
     uint8_t uiMaxPassengers;
@@ -22,6 +30,8 @@ struct SModelVehicleDefs
     CVehicleColor vehicleColors;
     bool          bHasDoors;
     const CHandlingEntry* pHandling;
+    const char*           strVehicleName;
+    eVehicleVariationType eVehicleVariationType;
 };
 
 class CModelVehicle : public CModelBase
@@ -32,18 +42,21 @@ public:
     ~CModelVehicle();
 
     virtual CModelVehicle* Clone(uint32_t uiModelID);
+
     CHandlingEntry*        GetVehicleHandling() { return m_pVehicleHandling; };
     const CHandlingEntry*  GetOriginalHandling() { return m_modelDef->pHandling; };
     void                   SetVehicleHandling(CHandlingEntry* pEntry) { m_pVehicleHandling = pEntry; };
     void                   SetVehicleHandlingChanged(bool bState) { m_bVehicleHandlingChanged = bState; };
     bool                   HasVehicleHandlingChanged() { return m_bVehicleHandlingChanged; };
+
     bool                   HasDamageModel();
     bool                   IsTrailer() { return m_modelDef->eVehicleType == eVehicleType::TRAILER; };
-
-    eVehicleType GetVehicleType() { return m_modelDef->eVehicleType; };
-    uint8_t      GetVariantsCount() { return m_modelDef->uiVariantsCount; };
-    uint8_t      GetAttributes() { return m_modelDef->cAttributes; };
-    uint8_t      GetPassengesCount() { return m_modelDef->uiMaxPassengers; };
+    const char*            GetVehicleName() { return m_modelDef->strVehicleName; };
+    eVehicleType           GetVehicleType() { return m_modelDef->eVehicleType; }
+    uint8_t                GetVariantsCount() { return m_modelDef->uiVariantsCount; };
+    uint8_t                GetAttributes() { return m_modelDef->cAttributes; };
+    uint8_t                GetPassengesCount() { return m_modelDef->uiMaxPassengers; };
+    eVehicleVariationType  GetVariationType() { return m_modelDef->eVehicleVariationType; };
     
     eModelInfoType GetType() { return eModelInfoType::VEHICLE; };
     void           Unload();
