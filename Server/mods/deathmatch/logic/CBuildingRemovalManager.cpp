@@ -78,7 +78,8 @@ void CBuildingRemovalManager::RestoreWorldModel(unsigned short usModel, float fR
             const CVector& vecRemovalPos = pFind->GetPosition();
             float          fDistance = (vecPos - vecRemovalPos).Length();
 
-            if (fDistance <= pFind->GetRadius() && (cInterior == -1 || pFind->GetInterior() == cInterior))
+            // Remove a building when it's inside a sphere fRadius
+            if (fDistance <= pFind->GetRadius() + fRadius && (cInterior == -1 || pFind->GetInterior() == cInterior))
             {
                 m_BuildingRemovals.erase(iter++);
                 delete pFind;
