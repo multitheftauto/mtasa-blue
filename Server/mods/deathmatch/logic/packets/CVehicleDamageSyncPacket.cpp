@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicleDamageSyncPacket.h"
+#include "CVehicle.h"
 
 CVehicleDamageSyncPacket::CVehicleDamageSyncPacket() : m_damage(true, true, true, true, true)
 {

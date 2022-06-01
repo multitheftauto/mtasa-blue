@@ -442,6 +442,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
+    g_pMultiplayer->SetAudioZoneRadioSwitchHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -6685,7 +6686,9 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 //////////////////////////////////////////////////////////////////
 void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
-    if (m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
+    CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
+    
+    if (pPlayer && pPlayer->IsInVehicle())
     {
         // Do not change radio station if player is inside vehicle
         // because it is supposed to play own radio

@@ -10,6 +10,8 @@
 
 #include "StdInc.h"
 #include "CLuaGenericDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaGenericDefs::LoadFunctions()
 {

@@ -9,7 +9,9 @@
  *
  *****************************************************************************/
 
-#include <StdInc.h>
+#include "StdInc.h"
+#include "CLuaMatrix.h"
+#include "CIdArray.h"
 
 CLuaMatrix::CLuaMatrix() : CMatrix()
 {

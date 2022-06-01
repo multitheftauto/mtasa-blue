@@ -1033,7 +1033,7 @@
     GXV_NAME_ENTER( "StateArray" );
 
     GXV_TRACE(( "parse %d bytes by stateSize=%d maxClassID=%d\n",
-                (int)(*length_p), stateSize, (int)(maxClassID) ));
+                (int)( *length_p ), stateSize, (int)maxClassID ));
 
     /*
      * 2 states are predefined and must be described in StateArray:
@@ -1418,7 +1418,7 @@
     GXV_NAME_ENTER( "XStateArray" );
 
     GXV_TRACE(( "parse % 3d bytes by stateSize=% 3d maxClassID=% 3d\n",
-                (int)(*length_p), (int)stateSize, (int)(maxClassID) ));
+                (int)( *length_p ), (int)stateSize, (int)maxClassID ));
 
     /*
      * 2 states are predefined and must be described:

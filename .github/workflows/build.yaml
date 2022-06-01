@@ -8,7 +8,7 @@ jobs:
     strategy:
       matrix:
         configuration: [release, debug]
-        platform: [x64, arm64]
+        platform: [win32, x64, arm64]
         include:
         - configuration: release
           artifact-name: InstallFiles
@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         id: cache-dxfiles
         with:
           path: utils/DXFiles

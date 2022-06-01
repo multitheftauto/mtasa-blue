@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
+#include "lua/CLuaMain.h"
 
 namespace
 {

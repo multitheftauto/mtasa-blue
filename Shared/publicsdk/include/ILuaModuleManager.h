@@ -24,6 +24,7 @@ extern "C"
 #include <string>
 
 #ifndef __CChecksum_H
+#define __CChecksum_H
 class CChecksum
 {
 public:

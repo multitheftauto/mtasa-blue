@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBlendedWeather.h"
 
 CBlendedWeather::CBlendedWeather(CClock* pClock)
 {

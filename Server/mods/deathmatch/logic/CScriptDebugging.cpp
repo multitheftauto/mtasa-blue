@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CScriptDebugging.h"
+#include "packets/CDebugEchoPacket.h"
 
 extern CGame* g_pGame;
 

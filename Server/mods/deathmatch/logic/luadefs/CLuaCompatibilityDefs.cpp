@@ -8,6 +8,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaCompatibilityDefs.h"
+#include "CLuaElementDefs.h"
+#include "CLuaVehicleDefs.h"
+#include "CLuaPedDefs.h"
+#include "CLuaPlayerDefs.h"
+#include "luadefs/CLuaXMLDefs.h"
 #include <lua/CLuaFunctionParser.h>
 
 void CLuaCompatibilityDefs::LoadFunctions()

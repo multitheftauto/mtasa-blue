@@ -12,6 +12,8 @@
 
 #include "CPacket.h"
 
+class CResource;
+
 class CPlayerResourceStartPacket final : public CPacket
 {
 public:

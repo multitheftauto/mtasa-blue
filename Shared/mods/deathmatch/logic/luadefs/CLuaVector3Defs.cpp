@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaVector3Defs.h"
 #include "lua/CLuaFunctionParser.h"
+#include "lua/LuaCommon.h"
+#include "lua/CLuaShared.h"
+#include "CScriptArgReader.h"
 
 void CLuaVector3Defs::AddClass(lua_State* luaVM)
 {

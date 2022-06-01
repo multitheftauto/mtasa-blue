@@ -11,7 +11,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
+#include "CPositionRotationAnimation.h"
+#include "CEasingCurve.h"
+#include "TInterpolation.h"
 #include "net/SyncStructures.h"
 
 CPositionRotationAnimation::CPositionRotationAnimation() : m_bDeltaRotationMode(false)
