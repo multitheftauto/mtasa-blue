@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-21 23:54+0000\n"
-"PO-Revision-Date: 2022-05-22 00:54\n"
+"PO-Revision-Date: 2022-06-02 10:48\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -437,20 +437,21 @@ msgstr "MTA:سان اندرس - تحذير"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "مسار تثبيت Grand Theft Auto: San Anders الخاص بك يحوي هذه الملفات:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "هذه الملفات غير مطلوبة وقد تتداخل مع الميزات الرسومية في هذه النسخة من MTA:SA.\n\n"
+"يُنصح بإزالة أو إعادة تسمية هذه الملفات."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "ابقِ هذه الملفات، ولكن أظهر هذا التحذير في التشغيل القادم"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "لا تذكرني بهذه الملفات مرة أخرى"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
