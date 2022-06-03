@@ -846,7 +846,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 
             // Allow YouTube TV to work (#1162)
             if (domain == "www.youtube.com" && UTF16ToMbUTF8(urlParts.path.str) == "/tv")
-                iter->second = iter->second.ToString() + "; SMART-TV; Tizen 4.0";
+                iter->second = iter->second.ToString() + "; Roku 3/7.0";
 
             request->SetHeaderMap(headerMap);
         }
