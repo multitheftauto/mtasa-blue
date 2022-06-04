@@ -255,7 +255,6 @@ public:
     CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
     CModelManager*                   GetModelManager() { return m_pModelManager; }
-    CModelLoader*                    GetModelLoader() { return m_pModelLoader; }
 
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
@@ -561,7 +560,6 @@ private:
     CLanBroadcast*             m_pLanBroadcast;
     CWaterManager*             m_pWaterManager;
     CModelManager*             m_pModelManager;
-    CModelLoader*              m_pModelLoader;
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;

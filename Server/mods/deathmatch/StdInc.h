@@ -300,6 +300,8 @@ struct SAclRequest;
 #include "logic/CWeaponStatManager.h"
 #include "logic/CBuildingRemoval.h"
 #include "logic/CBuildingRemovalManager.h"
+#include "CVehiclesConfig.h"
+#include "CHandlingConfig.h"
 
 #include "CStaticFunctionDefinitions.h"
 
@@ -308,7 +310,6 @@ struct SAclRequest;
 #include "models/CModelAtomic.h"
 #include "models/CModelVehicle.h"
 #include "models/CModelManager.h"
-#include "models/CModelLoader.h"
 #include "models/CModelVehicle.h"
 
 // Utility includes

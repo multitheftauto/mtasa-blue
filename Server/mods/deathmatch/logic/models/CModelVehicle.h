@@ -23,15 +23,15 @@ enum class eVehicleVariationType
 
 struct SModelVehicleDefs
 {
-    uint8_t uiMaxPassengers;
-    uint8_t uiVariantsCount;
-    eVehicleType eVehicleType;
-    uint8_t      cAttributes;
-    CVehicleColor vehicleColors;
-    bool          bHasDoors;
-    const CHandlingEntry* pHandling;
-    const char*           strVehicleName;
-    eVehicleVariationType eVehicleVariationType;
+    uint8_t               uiMaxPassengers = 0;
+    uint8_t               uiVariantsCount = 0;
+    eVehicleType          eVehicleType = eVehicleType::CAR;
+    uint8_t               cAttributes = 0;
+    bool                  bHasDoors = true;
+    const CHandlingEntry* pHandling = nullptr;
+    const char*           strVehicleName = "NoName";
+    eVehicleVariationType eVehicleVariationType = eVehicleVariationType::DEFAULT;
+    CVehicleColor         vehicleColors;
 };
 
 class CModelVehicle : public CModelBase

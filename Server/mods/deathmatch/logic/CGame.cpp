@@ -141,7 +141,6 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pBuildingRemovalManager = NULL;
     m_pCustomWeaponManager = NULL;
     m_pFunctionUseLogger = NULL;
-    m_pModelLoader = NULL;
     m_pModelManager = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
@@ -330,7 +329,6 @@ CGame::~CGame()
     SAFE_DELETE(m_pMasterServerAnnouncer);
     SAFE_DELETE(m_pASE);
     SAFE_RELEASE(m_pHqComms);
-    SAFE_DELETE(m_pModelLoader);
     SAFE_DELETE(m_pModelManager)
     CSimControl::Shutdown();
 
@@ -538,8 +536,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
 
     m_pModelManager = new CModelManager();
-    m_pModelLoader = new CModelLoader();
-    m_pModelLoader->loadDefaultData();
 
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
@@ -824,6 +820,26 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     // Add our builtin events
     AddBuiltInEvents();
+
+    // Load handling config
+    const char*     strHandlingPath = g_pServerInterface->GetModManager()->GetAbsolutePath("handling.conf");
+    CHandlingConfig handlingConfig(strHandlingPath);
+    if (!handlingConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'hadling.conf' failed\n");
+        return false;
+    }
+
+    // Load vehicles config
+    CVehiclesConfig vehiclesConfig;
+
+    const char* strVehiclesPath = g_pServerInterface->GetModManager()->GetAbsolutePath("vehicles.conf");
+    vehiclesConfig.SetFileName(strVehiclesPath);
+    if (!vehiclesConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'vehicles.conf' failed\n");
+        return false;
+    }
 
     // Load the vehicle colors before the main config
     strBuffer = g_pServerInterface->GetModManager()->GetAbsolutePath("vehiclecolors.conf");

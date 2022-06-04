@@ -21,13 +21,11 @@ public:
     ~CModelLoader();
 
     void loadDefaultData();
-    void unloadDefaultData();
-
-    void loadVehicleHandling(std::string_view strData);
-    void loadObjectDefs(const std::filesystem::path path);
-    void loadVehicleDefs(const std::filesystem::path path);
-    void loadVehicleHandling(const std::filesystem::path path);
 
 private:
-    void parseConfigCSV(const std::filesystem::path path, std::function<void(std::vector<char*> lineParams)> parseLineFun);
+    void loadVehicleHandling(const char* strPath);
+    void loadObjectDefs(const char* strPath);
+    void loadVehicleDefs(const char* strPath);
+    void loadVehicleHandling(const char* strPath);
+
 };
