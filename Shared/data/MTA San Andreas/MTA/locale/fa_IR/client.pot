@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-21 23:54+0000\n"
-"PO-Revision-Date: 2022-06-04 14:14\n"
+"PO-Revision-Date: 2022-06-04 15:14\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -437,12 +437,13 @@ msgstr "ام تی ای: سن آندریاس - اخطار"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "نصب دایرکتی Grand Theft Auto: San Andreas شما این فایل ها را همراه دارد:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "این فایل ها نیاز نیست و شاید با گرافیک این نسخه MTA:SA مشکل ایجاد کند.\n\n"
+"پیشنهاد داده میشود که شما این فایل ها را حذف یا تغییر نام دهید."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
