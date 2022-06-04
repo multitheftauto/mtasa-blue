@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "CPacket.h"
+
 class CPlayerTransgressionPacket final : public CPacket
 {
 public:

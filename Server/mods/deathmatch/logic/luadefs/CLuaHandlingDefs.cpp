@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaHandlingDefs.h"
+#include "CScriptArgReader.h"
+#include "CStaticFunctionDefinitions.h"
 
 void CLuaHandlingDefs::LoadFunctions()
 {

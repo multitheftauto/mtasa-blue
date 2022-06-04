@@ -473,6 +473,10 @@ enum class eBitStreamVersion : unsigned short
     // 2021-08-30 0x75
     OnPlayerResourceStart,
 
+    // Remove "old" Discord implementation (#2499)
+    // 2022-01-16 0x76
+    Discord_Cleanup,
+
     // Implement simple serverside model allocating
     // yyyy-mm-dd 0xFF add date later ;-)
     SimpleModelAllocationg,

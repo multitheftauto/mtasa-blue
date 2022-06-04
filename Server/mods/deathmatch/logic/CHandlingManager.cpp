@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHandlingManager.h"
+#include "CCommon.h"
 
 std::map<uint32_t, CHandlingEntry*> CHandlingManager::m_pOriginalEntries;
 

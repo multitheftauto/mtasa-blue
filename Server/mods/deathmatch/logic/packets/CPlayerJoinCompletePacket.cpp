@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerJoinCompletePacket.h"
+#include "CGame.h"
+#include "CMainConfig.h"
+#include <net/SyncStructures.h>
 
 CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
 {

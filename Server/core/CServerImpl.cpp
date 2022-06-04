@@ -13,6 +13,7 @@
 #include "CServerImpl.h"
 #include "CCrashHandler.h"
 #include "MTAPlatform.h"
+#include "version.h"
 #include "ErrorCodes.h"
 #include <clocale>
 #include <cstdio>
@@ -24,6 +25,9 @@
     #include <termios.h>
     #include <unistd.h>
 #endif
+
+void WaitForKey(int iKey);
+void Print(const char* szFormat, ...);
 
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;

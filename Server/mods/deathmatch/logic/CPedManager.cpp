@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedManager.h"
+#include "CPed.h"
+#include "Utils.h"
 
 CPedManager::CPedManager()
 {

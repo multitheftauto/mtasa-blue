@@ -288,7 +288,7 @@ namespace SharedUtil
             return ReadBytes(&e, sizeof(e), m_bToFromNetwork);
         }
 
-#ifdef ANY_x64
+#if defined(ANY_x64) || defined(ANY_arm64)
         // Force all these types to use 4 bytes
         bool Read(unsigned long& e)
         {
@@ -384,7 +384,7 @@ namespace SharedUtil
             WriteBytes(&e, sizeof(e), m_bToFromNetwork);
         }
 
-#ifdef ANY_x64
+#if defined(ANY_x64) || defined(ANY_arm64)
         // Force all these types to use 4 bytes
         void Write(unsigned long e) { Write((uint)e); }
         void Write(long e) { Write((int)e); }

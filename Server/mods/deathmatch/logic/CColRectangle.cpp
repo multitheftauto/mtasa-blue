@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CColRectangle.h"
+#include "CSpatialDatabase.h"
 
 CColRectangle::CColRectangle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, const CVector2D& vecSize) : CColShape(pManager, pParent)
 {

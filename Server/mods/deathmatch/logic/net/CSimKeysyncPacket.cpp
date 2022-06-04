@@ -9,6 +9,9 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "Utils.h"
+#include "CWeaponNames.h"
+#include "CVehicleManager.h"
 
 CSimKeysyncPacket::CSimKeysyncPacket(ElementID PlayerID, bool bPlayerHasOccupiedVehicle, ushort usVehicleGotModel, uchar ucPlayerGotWeaponType,
                                      float fPlayerGotWeaponRange, bool bVehicleHasHydraulics, bool bVehicleIsPlaneOrHeli,

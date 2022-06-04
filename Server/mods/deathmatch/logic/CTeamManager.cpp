@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTeamManager.h"
+#include "Utils.h"
 
 CTeamManager::CTeamManager()
 {

@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaArgument.h"
+#include "CLuaArguments.h"
+#include "LuaCommon.h"
+#include "CGame.h"
+#include "CElementIDs.h"
+#include "CScriptDebugging.h"
+#include "CResourceManager.h"
 
 extern CGame* g_pGame;
 
@@ -975,7 +982,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                 m_iType = LUA_TNIL;
                 break;
             case json_type_boolean:
-                if (json_object_get_boolean(object) == TRUE)
+                if (json_object_get_boolean(object))
                     ReadBool(true);
                 else
                     ReadBool(false);

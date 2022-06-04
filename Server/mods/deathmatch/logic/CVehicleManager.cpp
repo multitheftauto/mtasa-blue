@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicleManager.h"
+#include "Utils.h"
+#include "lua/LuaCommon.h"
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -271,8 +274,8 @@ void CVehicleManager::GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM)
     assert(luaVM);
 
     // Add all the matching vehicles to the table
-    unsigned int              uiIndex = 0;
-    list<CVehicle*>::iterator iter = m_List.begin();
+    unsigned int                   uiIndex = 0;
+    std::list<CVehicle*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)
     {
         if ((*iter)->GetModel() == uiModel)

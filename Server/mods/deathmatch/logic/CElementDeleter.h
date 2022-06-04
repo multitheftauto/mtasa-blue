@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "CElement.h"
 #include <list>
 
 class CElementDeleter
