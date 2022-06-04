@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-21 23:54+0000\n"
-"PO-Revision-Date: 2022-05-22 00:54\n"
+"PO-Revision-Date: 2022-06-04 14:14\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -446,19 +446,19 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "این فایل ها را نگه دار ولی این اخطار را دفعه بدی نشان بده"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "این فایل ها را به من یاداوری نکن"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "این فایل ها را از.dll به.dll.bak تغییر بده"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "این فایل ها را به من نشان بده"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -1225,7 +1225,7 @@ msgstr "پاسخ بد از سرور (1)"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "اخبار"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
