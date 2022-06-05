@@ -15,6 +15,7 @@
 #include "CHandlingManager.h"
 #include "CElementRefManager.h"
 #include "CGame.h"
+#include "models/CModelManager.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "CBandwidthSettings.h"
 #include "Utils.h"
@@ -537,7 +538,7 @@ void CVehicle::SetHealth(float fHealth)
 CVehicleColor& CVehicle::RandomizeColor()
 {
     // Grab a random color for this vehicle and return it
-    m_Color = m_pVehicleManager->GetRandomColor(m_usModel);
+    m_Color = g_pGame->GetModelManager()->GetVehicleModel(m_usModel)->GetRandomColor();
     return m_Color;
 }
 
@@ -849,7 +850,7 @@ void CVehicle::GenerateHandlingData()
 {
     // Make a new CHandlingEntry
     if (m_pHandlingEntry == NULL)
-        m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
+        m_pHandlingEntry = new CHandlingEntry();
     // Apply the model handling info
     m_pHandlingEntry->ApplyHandlingData(g_pGame->GetModelManager()->GetVehicleModel(m_usModel)->GetVehicleHandling());
 

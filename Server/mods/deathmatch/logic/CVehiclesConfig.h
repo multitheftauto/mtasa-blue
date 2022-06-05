@@ -1,9 +1,8 @@
 
-class CVehiclesConfig;
-
 #pragma once
 
 #include "StdInc.h"
+#include "CXMLConfig.h"
 
 class CVehiclesConfig : public CXMLConfig
 {

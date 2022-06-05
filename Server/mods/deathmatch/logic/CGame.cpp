@@ -41,6 +41,10 @@
 #include "CScriptDebugging.h"
 #include "CBandwidthSettings.h"
 #include "CMainConfig.h"
+#include "CVehiclesConfig.h"
+#include "CHandlingConfig.h"
+#include "CVehicleColorConfig.h"
+#include "models/CModelManager.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CRegistryManager.h"
 #include "CLatentTransferManager.h"
@@ -886,15 +890,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Add our builtin events
     AddBuiltInEvents();
 
-    // Load handling config
-    const char*     strHandlingPath = g_pServerInterface->GetModManager()->GetAbsolutePath("handling.conf");
-    CHandlingConfig handlingConfig(strHandlingPath);
-    if (!handlingConfig.Load())
-    {
-        CLogger::ErrorPrintf("%s", "Loading 'hadling.conf' failed\n");
-        return false;
-    }
-
     // Load vehicles config
     CVehiclesConfig vehiclesConfig;
 
@@ -906,14 +901,24 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         return false;
     }
 
+    // Load handling config
+    const char*     strHandlingPath = g_pServerInterface->GetModManager()->GetAbsolutePath("handling.conf");
+    CHandlingConfig handlingConfig(strHandlingPath);
+    if (!handlingConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'hadling.conf' failed\n");
+        return false;
+    }
+
     // Load the vehicle colors before the main config
     strBuffer = g_pServerInterface->GetModManager()->GetAbsolutePath("vehiclecolors.conf");
-    if (!m_pVehicleManager->GetColorManager()->Load(strBuffer))
+    CVehicleColorConfig colorConfig;
+    if (!colorConfig.Load(strBuffer))
     {
         // Try to generate a new one and load it again
-        if (m_pVehicleManager->GetColorManager()->Generate(strBuffer))
+        if (colorConfig.Generate(strBuffer))
         {
-            if (!m_pVehicleManager->GetColorManager()->Load(strBuffer))
+            if (!colorConfig.Load(strBuffer))
             {
                 CLogger::ErrorPrintf("%s", "Loading 'vehiclecolors.conf' failed\n ");
             }

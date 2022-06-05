@@ -2,12 +2,19 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/models/CModelBase.cpp
- *  PURPOSE:     Base model info class
+ *  FILE:        mods/deathmatch/logic/CVehicleColorConfig.h
+ *  PURPOSE:     Vehicle colors loader
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
-#include "CModelBase.h"
+#pragma once
+
+class CVehicleColorConfig
+{
+public:
+    bool Load(const char* szFilename);
+    bool Generate(const char* szFilename);
+    void Reset();
+};

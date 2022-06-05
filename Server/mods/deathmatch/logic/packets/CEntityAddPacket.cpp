@@ -24,8 +24,8 @@
 #include "CRadarArea.h"
 #include "CWater.h"
 #include "CVehicleManager.h"
-#include "CHandlingManager.h"
 #include "CGame.h"
+#include "models/CModelManager.h"
 
 //
 // Temporary helper functions for fixing crashes on pre r6459 clients.
@@ -608,8 +608,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(false);
 
                     // Write handling
-                    if (g_pGame->GetHandlingManager()->HasModelHandlingChanged(static_cast<eVehicleTypes>(pVehicle->GetModel())) ||
-                        pVehicle->HasHandlingChanged())
+                    if (g_pGame->GetModelManager()->GetVehicleModel(pVehicle->GetModel())->HasVehicleHandlingChanged() || pVehicle->HasHandlingChanged())
                     {
                         BitStream.WriteBit(true);
                         SVehicleHandlingSync handling;

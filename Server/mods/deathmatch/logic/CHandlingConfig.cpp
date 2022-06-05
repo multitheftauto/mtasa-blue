@@ -1,8 +1,10 @@
-
-
 #include "StdInc.h"
+#include "CHandlingConfig.h"
 #include <iostream>
 #include <fstream>
+#include "CHandlingEntry.h"
+#include "models/CModelManager.h"
+#include "CGame.h"
 
 CHandlingConfig::CHandlingConfig(std::string_view strPath)
 {
@@ -77,5 +79,13 @@ void CHandlingConfig::LoadHandlingParams(std::vector<char*> lineParams)
     handling.ucTailLight = atoi(lineParams[35]);
     handling.ucAnimGroup = atoi(lineParams[36]);
 
-    g_pGame->GetHandlingManager()->RehisterHandling(uiModelID, handling);
+
+    auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(uiModelID);
+
+    if (pVehicleModel)
+    {
+        CHandlingEntry handlingEntry(&handling);
+        pVehicleModel->SetVehicleDefaultHandling(handlingEntry);
+    }
+
 }

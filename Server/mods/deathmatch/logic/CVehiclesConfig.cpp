@@ -1,4 +1,11 @@
 #include "StdInc.h"
+#include "CVehiclesConfig.h"
+#include "CLogger.h"
+#include "models/CModelVehicle.h"
+#include "models/CModelManager.h"
+#include <logic/CVehicle.h>
+#include "CGame.h"
+#include "CHandlingManager.h"
 
 CVehiclesConfig::CVehiclesConfig() : CXMLConfig(nullptr)
 {
@@ -155,13 +162,7 @@ void CVehiclesConfig::RegisterVehicles()
             sModelData->eVehicleVariationType = eVehicleVariationType::DEFAULT;
         }
 
-        // + Colors
-
-        const CHandlingEntry* pHandling = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)uiModelID);
-        sModelData->pHandling = pHandling;
-
-        CModelVehicle* pModelData = new CModelVehicle(uiModelID, sModelData);
-
+        CModelVehicle* pModelData = new CModelVehicle(uiModelID, *sModelData);
         g_pGame->GetModelManager()->RegisterModel(pModelData);
     }
 }

@@ -22,23 +22,8 @@ public:
     CHandlingManager();
     ~CHandlingManager();
 
-    CHandlingEntry* CreateHandlingData();
-
-    bool ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry);
-
-    const CHandlingEntry* GetModelHandlingData(eVehicleTypes eModel);
-    const CHandlingEntry* GetOriginalHandlingData(eVehicleTypes eModel);
-
-    void RehisterHandling(uint32_t uiModelID, tHandlingData& handling);
-
     // Helper functions
     eHandlingProperty GetPropertyEnumFromName(std::string strName);
-    bool              HasModelHandlingChanged(eVehicleTypes eModel);
-    void              SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged);
 
     std::map<std::string, eHandlingProperty> m_HandlingNames;
-
-private:
-    // Array with the original handling entries
-    static std::map<uint32_t, CHandlingEntry*> m_pOriginalEntries;
 };

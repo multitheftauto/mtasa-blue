@@ -67,6 +67,7 @@
 #include "packets/CElementRPCPacket.h"
 #include "version.h"
 #include <net/rpc_enums.h>
+#include "models/CModelManager.h"
 
 #ifndef WIN32
     #include <limits.h>
@@ -5425,41 +5426,44 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CVehicle* pVehicle, eHandlin
 
 bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, CVector& vecValue, bool bOriginal)
 {
-    const CHandlingEntry* pEntry = NULL;
-    if (bOriginal)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
-    }
-    else
-    {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    }
+        const CHandlingEntry* pEntry = nullptr;
+        if (bOriginal)
+        {
+            pEntry = pVehicleModel->GetOriginalHandling();
+        }
+        else
+        {
+            pEntry = pVehicleModel->GetVehicleHandling();
+        }
 
-    if (pEntry)
-    {
         if (eProperty == HANDLING_CENTEROFMASS)
         {
             vecValue = pEntry->GetCenterOfMass();
             return true;
         }
     }
+
     return false;
 }
 
 bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, float& fValue, bool bOriginal)
 {
-    const CHandlingEntry* pEntry = NULL;
-    if (bOriginal)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
-    }
-    else
-    {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    }
+        const CHandlingEntry* pEntry = nullptr;
+        if (bOriginal)
+        {
+            pEntry = pVehicleModel->GetOriginalHandling();
+        }
+        else
+        {
+            pEntry = pVehicleModel->GetVehicleHandling();
+        }
 
-    if (pEntry)
-    {
         if (GetEntryHandling(pEntry, eProperty, fValue))
         {
             return true;
@@ -5470,18 +5474,19 @@ bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int& uiValue, bool bOriginal)
 {
-    const CHandlingEntry* pEntry = NULL;
-    if (bOriginal)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
-    }
-    else
-    {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    }
+        const CHandlingEntry* pEntry = nullptr;
+        if (bOriginal)
+        {
+            pEntry = pVehicleModel->GetOriginalHandling();
+        }
+        else
+        {
+            pEntry = pVehicleModel->GetVehicleHandling();
+        }
 
-    if (pEntry)
-    {
         if (GetEntryHandling(pEntry, eProperty, uiValue))
         {
             return true;
@@ -5492,18 +5497,19 @@ bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char& ucValue, bool bOriginal)
 {
-    const CHandlingEntry* pEntry = NULL;
-    if (bOriginal)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
-    }
-    else
-    {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    }
+        const CHandlingEntry* pEntry = nullptr;
+        if (bOriginal)
+        {
+            pEntry = pVehicleModel->GetOriginalHandling();
+        }
+        else
+        {
+            pEntry = pVehicleModel->GetVehicleHandling();
+        }
 
-    if (pEntry)
-    {
         if (GetEntryHandling(pEntry, eProperty, ucValue))
         {
             return true;
@@ -5514,18 +5520,19 @@ bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, std::string& strValue, bool bOriginal)
 {
-    const CHandlingEntry* pEntry = NULL;
-    if (bOriginal)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
-        pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
-    }
-    else
-    {
-        pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    }
+        const CHandlingEntry* pEntry = nullptr;
+        if (bOriginal)
+        {
+            pEntry = pVehicleModel->GetOriginalHandling();
+        }
+        else
+        {
+            pEntry = pVehicleModel->GetVehicleHandling();
+        }
 
-    if (pEntry)
-    {
         if (GetEntryHandling(pEntry, eProperty, strValue))
         {
             return true;
@@ -5536,12 +5543,14 @@ bool CStaticFunctionDefinitions::GetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, float fValue)
 {
-    CHandlingEntry* pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    if (pEntry)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
+        CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
+        
         if (SetEntryHandling(pEntry, eProperty, fValue))
         {
-            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(eModel, true);
+            pVehicleModel->SetVehicleHandlingChanged(true);
             return true;
         }
     }
@@ -5551,13 +5560,13 @@ bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, CVector vecValue)
 {
-    CHandlingEntry* pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-
-    if (pEntry)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
+        CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
         if (SetEntryHandling(pEntry, eProperty, vecValue))
         {
-            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(eModel, true);
+            pVehicleModel->SetVehicleHandlingChanged(true);
             return true;
         }
     }
@@ -5566,12 +5575,13 @@ bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, std::string strValue)
 {
-    CHandlingEntry* pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    if (pEntry)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
+        CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
         if (SetEntryHandling(pEntry, eProperty, strValue))
         {
-            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(eModel, true);
+            pVehicleModel->SetVehicleHandlingChanged(true);
             return true;
         }
     }
@@ -5581,12 +5591,13 @@ bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned char ucValue)
 {
-    CHandlingEntry* pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    if (pEntry)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
+        CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
         if (SetEntryHandling(pEntry, eProperty, ucValue))
         {
-            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(eModel, true);
+            pVehicleModel->SetVehicleHandlingChanged(true);
             return true;
         }
     }
@@ -5596,12 +5607,13 @@ bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlin
 
 bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlingProperty eProperty, unsigned int uiValue)
 {
-    CHandlingEntry* pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    if (pEntry)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
+        CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
         if (SetEntryHandling(pEntry, eProperty, uiValue))
         {
-            g_pGame->GetHandlingManager()->SetModelHandlingHasChanged(eModel, true);
+            pVehicleModel->SetVehicleHandlingChanged(true);
             return true;
         }
     }
@@ -7360,19 +7372,21 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
 {
     assert(pVehicle);
 
-    eVehicleTypes         eModel = (eVehicleTypes)pVehicle->GetModel();
+
+    uint16_t              usModel = (eVehicleTypes)pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
     const CHandlingEntry* pNewEntry;
     CBitStream            BitStream;
 
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(usModel);
     if (bUseOriginal)
     {
-        pNewEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
+        pNewEntry = pVehicleModel->GetOriginalHandling();
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, RESET_VEHICLE_HANDLING, *BitStream.pBitStream));
     }
     else
     {
-        pNewEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
+        pNewEntry = pVehicleModel->GetVehicleHandling();
 
         SVehicleHandlingSync handling;
         handling.data.fMass = pNewEntry->GetMass();
@@ -7503,15 +7517,13 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CVehicle* pVehicle
 
 bool CStaticFunctionDefinitions::ResetModelHandling(eVehicleTypes eModel)
 {
-    CHandlingEntry* pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
-    if (pEntry)
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (pVehicleModel)
     {
-        const CHandlingEntry* pHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
-        if (pHandlingEntry)
-        {
-            pEntry->ApplyHandlingData(pHandlingEntry);
-            return true;
-        }
+        CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
+        const CHandlingEntry* pOriginalEntry = pVehicleModel->GetOriginalHandling();
+        pEntry->ApplyHandlingData(pOriginalEntry);
+        return true;
     }
 
     return false;
@@ -7519,7 +7531,11 @@ bool CStaticFunctionDefinitions::ResetModelHandling(eVehicleTypes eModel)
 
 bool CStaticFunctionDefinitions::ResetModelHandlingProperty(eVehicleTypes eModel, eHandlingProperty eProperty)
 {
-    CHandlingEntry* pEntry = (CHandlingEntry*)g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
+    const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
+    if (!pVehicleModel)
+        return false;
+
+    CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
 
     float   fValue = 0.0f;
     CVector vecValue = CVector(0.0f, 0.0f, 0.0f);

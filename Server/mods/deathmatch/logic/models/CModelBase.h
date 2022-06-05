@@ -30,19 +30,16 @@ enum class eModelInfoType : unsigned char
 class CModelBase
 {
 public:
-    CModelBase(uint32_t uiModelID):
-        m_uiModelID(uiModelID)
+    CModelBase(uint32_t uiModelID): m_uiModelID(uiModelID), m_uiParentID(-1)
     {};
 
-    ~CModelBase();
+    ~CModelBase(){};
 
     virtual CModelBase* Clone(uint32_t uiModelID) = 0;
 
-    CResource*       GetCreatorResource() { return m_pCreatorResouce; };
     uint32_t         GetModelID() { return m_uiModelID; };
     uint32_t         GetParentModel() { return m_uiParentID; };
     void             SetParentModel(uint32_t uiParentModel) { m_uiParentID = uiParentModel; };
-    std::string_view GetName() { return m_modelName; };
     virtual bool     SetName(std::string_view strName) { return false; };
     virtual bool     IsCustom() { return true; };
     virtual void     Unload() = 0;
@@ -56,7 +53,4 @@ protected:
 
     // Model prototype
     uint32_t m_uiParentID;
-
-    CResource* m_pCreatorResouce;
-    char       m_modelName[22];
 };

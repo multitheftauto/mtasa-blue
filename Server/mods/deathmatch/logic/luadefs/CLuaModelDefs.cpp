@@ -8,7 +8,12 @@
  *
  *****************************************************************************/
 #include "StdInc.h"
+#include "CLuaModelDefs.h"
 #include <lua/CLuaFunctionParser.h>
+#include "CScriptArgReader.h"
+#include "CGame.h"
+#include "models/CModelManager.h"
+#include <packets/CLuaPacket.h>
 
 void CLuaModelDefs::LoadFunctions()
 {
@@ -31,6 +36,12 @@ uint CLuaModelDefs::AllocateModel(eModelInfoType eModel, std::optional<uint> uiP
 boolean CLuaModelDefs::AllocateModelFromParent(uint32_t uiModelID, uint32_t uiParentModelID)
 {
     g_pGame->GetModelManager()->AllocateModelFromParent(uiModelID, uiParentModelID);
+
+    // Send network event
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(uiModelID);
+    BitStream.pBitStream->Write(uiParentModelID);
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CLuaPacket(ALLOCATE_MODEL_FROM_PARENT, *BitStream.pBitStream));
     return true;
 }
 

@@ -13,6 +13,8 @@
 #include "CVehicleManager.h"
 #include "Utils.h"
 #include "lua/LuaCommon.h"
+#include "CGame.h"
+#include "models/CModelManager.h"
 
 // List over all vehicles with their special attributes
 #define VEHICLE_HAS_TURRENT             0x001UL //1
@@ -212,61 +214,14 @@ bool CVehicleManager::HasSmokeTrail(unsigned int uiModel)
     return false;
 }
 
-bool CVehicleManager::HasDamageModel(unsigned short usModel)
-{
-    return HasDamageModel(GetVehicleType(usModel));
-}
-
-bool CVehicleManager::HasDamageModel(eVehicleType Type)
-{
-    switch (Type)
-    {
-        case eVehicleType::TRAILER:
-        case eVehicleType::MONSTERTRUCK:
-        case eVehicleType::QUADBIKE:
-        case eVehicleType::HELI:
-        case eVehicleType::PLANE:
-        case eVehicleType::CAR:
-            return true;
-        default:
-            return false;
-    }
-}
-
 bool CVehicleManager::HasDoors(unsigned short usModel)
 {
-    bool bHasDoors = false;
-
-    if (HasDamageModel(usModel) == true)
+    CModelVehicle* pModel = g_pGame->GetModelManager()->GetVehicleModel(usModel);
+    if (pModel)
     {
-        switch (usModel)
-        {
-            case VT_BFINJECT:
-            case VT_RCBANDIT:
-            case VT_CADDY:
-            case VT_RCRAIDER:
-            case VT_BAGGAGE:
-            case VT_DOZER:
-            case VT_FORKLIFT:
-            case VT_TRACTOR:
-            case VT_RCTIGER:
-            case VT_BANDITO:
-            case VT_KART:
-            case VT_MOWER:
-            case VT_RCCAM:
-            case VT_RCGOBLIN:
-                break;
-            default:
-                bHasDoors = true;
-        }
+        return pModel->HasDoors();
     }
-
-    return bHasDoors;
-}
-
-CVehicleColor CVehicleManager::GetRandomColor(unsigned short usModel)
-{
-    return m_ColorManager.GetRandomColor(usModel);
+    return false;
 }
 
 void CVehicleManager::GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM)

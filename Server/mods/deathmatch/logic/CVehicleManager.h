@@ -14,7 +14,6 @@ class CVehicleManager;
 #pragma once
 
 #include "CVehicle.h"
-#include "CVehicleColorManager.h"
 #include <list>
 
 // Undefined number of passengers (to disable custom passenger seats overriding in CVehicle)
@@ -46,13 +45,8 @@ public:
     static bool         HasLandingGears(unsigned int uiVehicleModel);
     static bool         HasAdjustableProperty(unsigned int uiVehicleModel);
     static bool         HasSmokeTrail(unsigned int uiVehicleModel);
-    static bool         HasDamageModel(unsigned short usModel);
-    static bool         HasDamageModel(eVehicleType Type);
     static bool         HasDoors(unsigned short usModel);
     static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
-
-    CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
-    CVehicleColor         GetRandomColor(unsigned short usModel);
 
     void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
 
@@ -67,8 +61,6 @@ public:
 private:
     void AddToList(CVehicle* pVehicle) { m_List.push_back(pVehicle); }
     void RemoveFromList(CVehicle* pVehicle);
-
-    CVehicleColorManager m_ColorManager;
 
     Container m_List;
     Container m_RespawnEnabledVehicles;

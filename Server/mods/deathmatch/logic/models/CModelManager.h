@@ -14,7 +14,9 @@ class CModelManager;
 #pragma once
 
 #include "StdInc.h"
-#include <vector>
+#include "CModelBase.h"
+#include "CModelAtomic.h"
+#include "CModelVehicle.h"
 
 class CModelManager
 {
@@ -24,12 +26,7 @@ public:
 
     // Register generic GTA:SA model info
     void RegisterModel(CModelBase* pModelHandler);
-
-    // Create new GTA:SA model info
-    CModelBase* CreateModel(uint32_t iModelID, eModelInfoType eType);
-
-    void CleanResourceModels(CResource* pResource);
-    void AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModel);
+    bool AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModel);
 
     CModelVehicle* GetVehicleModel(uint32_t iModelID) { return dynamic_cast<CModelVehicle*>(m_vModels[iModelID]); };
 

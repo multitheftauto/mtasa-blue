@@ -42,6 +42,7 @@
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaCompatibilityDefs.h"
+#include "luadefs/CLuaModelDefs.h"
 
 extern CGame* g_pGame;
 

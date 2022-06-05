@@ -13,6 +13,7 @@
 #include "CLuaHandlingDefs.h"
 #include "CScriptArgReader.h"
 #include "CStaticFunctionDefinitions.h"
+#include "models/CModelManager.h"
 
 void CLuaHandlingDefs::LoadFunctions()
 {
@@ -562,10 +563,10 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        eVehicleTypes eModel = static_cast<eVehicleTypes>(usModel);
-        if (eModel)
+        const auto    pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(usModel);
+        if (pVehicleModel)
         {
-            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetModelHandlingData(eModel);
+            const CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
             if (pEntry)
             {
                 lua_newtable(luaVM);
@@ -735,10 +736,10 @@ int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        eVehicleTypes eModel = static_cast<eVehicleTypes>(usModel);
-        if (eModel)
+        const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(usModel);
+        if (pVehicleModel)
         {
-            const CHandlingEntry* pEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData(eModel);
+            const CHandlingEntry* pEntry = pVehicleModel->GetOriginalHandling();
             if (pEntry)
             {
                 lua_newtable(luaVM);

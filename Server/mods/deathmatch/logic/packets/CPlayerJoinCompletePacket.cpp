@@ -14,6 +14,7 @@
 #include "CGame.h"
 #include "CMainConfig.h"
 #include <net/SyncStructures.h>
+#include "models/CModelManager.h"
 
 CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
 {

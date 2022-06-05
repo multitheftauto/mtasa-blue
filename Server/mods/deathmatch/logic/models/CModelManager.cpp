@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CModelManager.h"
 
 CModelManager::CModelManager()
 {
@@ -37,64 +38,21 @@ void CModelManager::RegisterModel(CModelBase* pModelHandler)
     m_vModels[iModelID] = pModelHandler;
 }
 
-CModelBase* CModelManager::CreateModel(uint iModelID, eModelInfoType eType)
-{
-    // Model is curently allocated, skip it
-    if (m_vModels[iModelID])
-    {
-        return nullptr;
-    }
-
-    CModelBase* pModelInfo;
-
-    switch (eType)
-    {
-        //case eModelInfoType::VEHICLE:
-        //    break;
-        case eModelInfoType::ATOMIC:
-            //pModelInfo = new CModelAtomic();
-            break;
-        default:
-            return nullptr;
-    }
-
-    m_vModels[iModelID] = pModelInfo;
-
-    return pModelInfo;
-}
-
-void CModelManager::CleanResourceModels(CResource* pResource)
-{
-    for (auto* pModel : m_vModels)
-    {
-        if (pModel->GetCreatorResource() == pResource)
-        {
-            RemoveModel(pModel);
-        }
-    }
-}
-
-void CModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModel)
+bool CModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModel)
 {
     CModelBase* pParentModel = m_vModels[uiParentModel];
 
     if (!pParentModel)
-        return;
+        return false;
 
     if (m_vModels[uiNewModelID])
-        return;
+        return false;
 
     CModelBase* pNewModel = pParentModel->Clone(uiNewModelID);
     RegisterModel(pNewModel);
 
     // Save in simple allocated list
     m_vSimpleAllocatedModels.push_back(pNewModel);
-
-    // Send network event
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(uiNewModelID);
-    BitStream.pBitStream->Write(uiParentModel);
-    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CLuaPacket(ALLOCATE_MODEL_FROM_PARENT, *BitStream.pBitStream));
 }
 
 void CModelManager::RemoveModel(CModelBase* pModel)

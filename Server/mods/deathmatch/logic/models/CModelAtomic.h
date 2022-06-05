@@ -13,6 +13,8 @@ class CModelAtomic;
 
 #pragma once
 
+#include "CModelBase.h"
+
 class CModelAtomic : public CModelBase
 {
 public:

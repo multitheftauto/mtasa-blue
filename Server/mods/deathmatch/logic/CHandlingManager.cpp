@@ -13,8 +13,6 @@
 #include "CHandlingManager.h"
 #include "CCommon.h"
 
-std::map<uint32_t, CHandlingEntry*> CHandlingManager::m_pOriginalEntries;
-
 CHandlingManager::CHandlingManager()
 {
     // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
@@ -58,40 +56,8 @@ CHandlingManager::CHandlingManager()
 
 CHandlingManager::~CHandlingManager()
 {
-    // Destroy all original handling entries
-    for (auto pData : m_pOriginalEntries)
-    {
-        delete pData.second;
-    }
 }
 
-CHandlingEntry* CHandlingManager::CreateHandlingData()
-{
-    CHandlingEntry* pHandlingEntry = new CHandlingEntry();
-    return pHandlingEntry;
-}
-
-bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry)
-{
-    g_pGame->GetModelManager()->GetVehicleModel(eModel)->GetVehicleHandling()->ApplyHandlingData(pEntry);
-    return true;
-}
-
-const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eModel)
-{
-    return m_pOriginalEntries[eModel];
-}
-
-void CHandlingManager::RehisterHandling(uint32_t uiModelID, tHandlingData& handling)
-{
-    assert(!m_pOriginalEntries[uiModelID], "Handling data registered twice");
-    m_pOriginalEntries[uiModelID] = new CHandlingEntry(&handling);
-}
-
-const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eModel)
-{
-    return g_pGame->GetModelManager()->GetVehicleModel(eModel)->GetVehicleHandling();
-}
 
 eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
 {
@@ -104,14 +70,4 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
     }
 
     return HANDLING_MAX;
-}
-
-bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
-{
-    return g_pGame->GetModelManager()->GetVehicleModel(eModel)->HasVehicleHandlingChanged();
-}
-
-void CHandlingManager::SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged)
-{
-    g_pGame->GetModelManager()->GetVehicleModel(eModel)->SetVehicleHandlingChanged(bChanged);
 }

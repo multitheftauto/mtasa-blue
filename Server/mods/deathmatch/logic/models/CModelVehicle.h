@@ -12,6 +12,9 @@
 class CModelVehicle;
 
 #pragma once
+#include "CModelBase.h"
+#include <CVehicle.h>
+#include "CVehicleColors.h"
 
 enum class eVehicleVariationType
 {
@@ -28,41 +31,50 @@ struct SModelVehicleDefs
     eVehicleType          eVehicleType = eVehicleType::CAR;
     uint8_t               cAttributes = 0;
     bool                  bHasDoors = true;
-    const CHandlingEntry* pHandling = nullptr;
+    CHandlingEntry        handling;
     const char*           strVehicleName = "NoName";
     eVehicleVariationType eVehicleVariationType = eVehicleVariationType::DEFAULT;
-    CVehicleColor         vehicleColors;
+    CVehicleColors        vehicleColors;
 };
 
 class CModelVehicle : public CModelBase
 {
 public:
-    // CModelVehicle(){};
-    CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs* SModelVehicleDefs);
+    CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs &SModelVehicleDefs);
     ~CModelVehicle();
 
     virtual CModelVehicle* Clone(uint32_t uiModelID);
 
     CHandlingEntry*        GetVehicleHandling() { return m_pVehicleHandling; };
-    const CHandlingEntry*  GetOriginalHandling() { return m_modelDef->pHandling; };
+    const CHandlingEntry*  GetOriginalHandling() { return &m_modelDef.handling; };
+    void                   SetVehicleDefaultHandling(CHandlingEntry &pEntry) { m_modelDef.handling = pEntry; }
     void                   SetVehicleHandling(CHandlingEntry* pEntry) { m_pVehicleHandling = pEntry; };
     void                   SetVehicleHandlingChanged(bool bState) { m_bVehicleHandlingChanged = bState; };
     bool                   HasVehicleHandlingChanged() { return m_bVehicleHandlingChanged; };
 
+
+    void SetVehicleDafaultColors(CVehicleColors colors) { m_modelDef.vehicleColors = colors; };
+
     bool                   HasDamageModel();
-    bool                   IsTrailer() { return m_modelDef->eVehicleType == eVehicleType::TRAILER; };
-    const char*            GetVehicleName() { return m_modelDef->strVehicleName; };
-    eVehicleType           GetVehicleType() { return m_modelDef->eVehicleType; }
-    uint8_t                GetVariantsCount() { return m_modelDef->uiVariantsCount; };
-    uint8_t                GetAttributes() { return m_modelDef->cAttributes; };
-    uint8_t                GetPassengesCount() { return m_modelDef->uiMaxPassengers; };
-    eVehicleVariationType  GetVariationType() { return m_modelDef->eVehicleVariationType; };
-    
+    bool                   HasDoors() { return m_modelDef.bHasDoors; };
+    bool                   IsTrailer() { return m_modelDef.eVehicleType == eVehicleType::TRAILER; };
+    const char*            GetVehicleName() { return m_modelDef.strVehicleName; };
+    eVehicleType           GetVehicleType() { return m_modelDef.eVehicleType; }
+    uint8_t                GetVariantsCount() { return m_modelDef.uiVariantsCount; };
+    uint8_t                GetAttributes() { return m_modelDef.cAttributes; };
+    uint8_t                GetPassengesCount() { return m_modelDef.uiMaxPassengers; };
+    eVehicleVariationType  GetVariationType() { return m_modelDef.eVehicleVariationType; };
+
+    CVehicleColor GetRandomColor() { return m_modelDef.vehicleColors.GetRandomColor(); }
+    void          AddColor(const CVehicleColor& color) { return m_modelDef.vehicleColors.AddColor(color); };
+
+    void GetRandomVariation(unsigned char& ucVariant, unsigned char& ucVariant2);
+
     eModelInfoType GetType() { return eModelInfoType::VEHICLE; };
     void           Unload();
 
 private:
-    const SModelVehicleDefs*    m_modelDef;
+    SModelVehicleDefs     m_modelDef;
     CHandlingEntry*       m_pVehicleHandling;
     bool                  m_bVehicleHandlingChanged = false;
 };

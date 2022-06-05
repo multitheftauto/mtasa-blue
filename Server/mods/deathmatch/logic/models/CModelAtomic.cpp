@@ -10,11 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CModelAtomic.h"
 
 CModelAtomic::CModelAtomic(uint32_t uiModelID, char strName[22], char strTextureName[22], uint32_t uiDrawDistance, uint32_t uiFlags) : CModelBase(uiModelID)
 {
-    strcpy(m_modelName, strName);
-    strcpy(m_strTextureName, strTextureName);
+    //strcpy(m_modelName, strName);
+    //strcpy(m_strTextureName, strTextureName);
     SetDrawDistance(uiDrawDistance);
     SetFlags(uiFlags);
 }
