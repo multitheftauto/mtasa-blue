@@ -59,7 +59,7 @@ void CModelVehicle::GetRandomVariation(unsigned char& ucVariant, unsigned char& 
     char cVariants = GetVariantsCount();
     if (cVariants != 255)
     {
-        switch (m_modelDef.eVehicleVariationType)
+        switch (m_modelDef.eVariationType)
         {
             case eVehicleVariationType::CADDY:
                 // 255, 0, 1, 2

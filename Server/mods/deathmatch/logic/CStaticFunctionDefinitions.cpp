@@ -7373,7 +7373,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
     assert(pVehicle);
 
 
-    uint16_t              usModel = (eVehicleTypes)pVehicle->GetModel();
+    uint16_t              usModel = pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
     const CHandlingEntry* pNewEntry;
     CBitStream            BitStream;

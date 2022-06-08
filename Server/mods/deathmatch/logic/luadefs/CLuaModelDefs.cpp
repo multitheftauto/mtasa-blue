@@ -33,7 +33,7 @@ uint CLuaModelDefs::AllocateModel(eModelInfoType eModel, std::optional<uint> uiP
     return -1;
 }
 
-boolean CLuaModelDefs::AllocateModelFromParent(uint32_t uiModelID, uint32_t uiParentModelID)
+bool CLuaModelDefs::AllocateModelFromParent(uint32_t uiModelID, uint32_t uiParentModelID)
 {
     g_pGame->GetModelManager()->AllocateModelFromParent(uiModelID, uiParentModelID);
 

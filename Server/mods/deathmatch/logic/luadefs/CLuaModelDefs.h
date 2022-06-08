@@ -18,7 +18,7 @@ public:
     static void LoadFunctions();
 
     static uint AllocateModel(eModelInfoType eModel, std::optional<uint> uiParentModel, std::optional<uint> uiModelID);
-    static boolean AllocateModelFromParent(uint32_t uiModelID, uint32_t uiParentModelID);
+    static bool AllocateModelFromParent(uint32_t uiModelID, uint32_t uiParentModelID);
 
     static std::vector<uint> GetAllocatedModels(std::optional<eModelInfoType> eType);
 };

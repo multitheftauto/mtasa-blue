@@ -28,12 +28,12 @@ struct SModelVehicleDefs
 {
     uint8_t               uiMaxPassengers = 0;
     uint8_t               uiVariantsCount = 0;
-    eVehicleType          eVehicleType = eVehicleType::CAR;
+    eVehicleType          eVehicleModelType = eVehicleType::CAR;
     uint8_t               cAttributes = 0;
     bool                  bHasDoors = true;
     CHandlingEntry        handling;
     const char*           strVehicleName = "NoName";
-    eVehicleVariationType eVehicleVariationType = eVehicleVariationType::DEFAULT;
+    eVehicleVariationType eVariationType = eVehicleVariationType::DEFAULT;
     CVehicleColors        vehicleColors;
 };
 
@@ -57,13 +57,13 @@ public:
 
     bool                   HasDamageModel();
     bool                   HasDoors() { return m_modelDef.bHasDoors; };
-    bool                   IsTrailer() { return m_modelDef.eVehicleType == eVehicleType::TRAILER; };
+    bool                   IsTrailer() { return m_modelDef.eVehicleModelType == eVehicleType::TRAILER; };
     const char*            GetVehicleName() { return m_modelDef.strVehicleName; };
-    eVehicleType           GetVehicleType() { return m_modelDef.eVehicleType; }
+    eVehicleType           GetVehicleType() { return m_modelDef.eVehicleModelType; }
     uint8_t                GetVariantsCount() { return m_modelDef.uiVariantsCount; };
     uint8_t                GetAttributes() { return m_modelDef.cAttributes; };
     uint8_t                GetPassengesCount() { return m_modelDef.uiMaxPassengers; };
-    eVehicleVariationType  GetVariationType() { return m_modelDef.eVehicleVariationType; };
+    eVehicleVariationType  GetVariationType() { return m_modelDef.eVariationType; };
 
     CVehicleColor GetRandomColor() { return m_modelDef.vehicleColors.GetRandomColor(); }
     void          AddColor(const CVehicleColor& color) { return m_modelDef.vehicleColors.AddColor(color); };

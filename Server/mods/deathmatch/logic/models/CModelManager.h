@@ -21,7 +21,7 @@ class CModelManager;
 class CModelManager
 {
 public:
-    CModelManager::CModelManager();
+    CModelManager();
     ~CModelManager();
 
     // Register generic GTA:SA model info

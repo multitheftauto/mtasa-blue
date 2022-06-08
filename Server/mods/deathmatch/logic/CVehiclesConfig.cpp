@@ -106,60 +106,60 @@ void CVehiclesConfig::RegisterVehicles()
 
         if (strcmp(strType, "car") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::CAR;
+            sModelData->eVehicleModelType = eVehicleType::CAR;
         }
         else if (strcmp(strType, "mtruck") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::MONSTERTRUCK;
+            sModelData->eVehicleModelType = eVehicleType::MONSTERTRUCK;
         }
         else if (strcmp(strType, "heli") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::HELI;
+            sModelData->eVehicleModelType = eVehicleType::HELI;
         }
         else if (strcmp(strType, "boat") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::BOAT;
+            sModelData->eVehicleModelType = eVehicleType::BOAT;
         }
         else if (strcmp(strType, "trailer") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::TRAILER;
+            sModelData->eVehicleModelType = eVehicleType::TRAILER;
         }
         else if (strcmp(strType, "train") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::TRAIN;
+            sModelData->eVehicleModelType = eVehicleType::TRAIN;
         }
         else if (strcmp(strType, "plane") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::PLANE;
+            sModelData->eVehicleModelType = eVehicleType::PLANE;
         }
         else if (strcmp(strType, "bike") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::BIKE;
+            sModelData->eVehicleModelType = eVehicleType::BIKE;
         }
         else if (strcmp(strType, "quad") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::QUADBIKE;
+            sModelData->eVehicleModelType = eVehicleType::QUADBIKE;
         }
         else if (strcmp(strType, "bmx") == 0)
         {
-            sModelData->eVehicleType = eVehicleType::BMX;
+            sModelData->eVehicleModelType = eVehicleType::BMX;
         }
 
         else if (strcmp(strVarianType, "nrg") == 0)
         {
-            sModelData->eVehicleVariationType = eVehicleVariationType::NRG;
+            sModelData->eVariationType = eVehicleVariationType::NRG;
         }
         else if (strcmp(strVarianType, "caddy") == 0)
         {
-            sModelData->eVehicleVariationType = eVehicleVariationType::CADDY;
+            sModelData->eVariationType = eVehicleVariationType::CADDY;
         }
         else if (strcmp(strVarianType, "slamvan") == 0)
         {
-            sModelData->eVehicleVariationType = eVehicleVariationType::SLAMVAN;
+            sModelData->eVariationType = eVehicleVariationType::SLAMVAN;
         }
         else
         {
-            sModelData->eVehicleVariationType = eVehicleVariationType::DEFAULT;
+            sModelData->eVariationType = eVehicleVariationType::DEFAULT;
         }
 
         CModelVehicle* pModelData = new CModelVehicle(uiModelID, *sModelData);
