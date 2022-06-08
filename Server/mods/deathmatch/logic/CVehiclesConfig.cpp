@@ -101,7 +101,7 @@ void CVehiclesConfig::RegisterVehicles()
 
         pAttribute = pAttibites.Find("hasDoors");
         if (pAttribute)
-            sModelData->bHasDoors = strcmp(pAttribute->GetValue().c_str(), "true");
+            sModelData->bHasDoors = strcmp(pAttribute->GetValue().c_str(), "true") == 0;
 
 
         if (strcmp(strType, "car") == 0)
