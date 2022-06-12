@@ -14,7 +14,5 @@ public:
     virtual bool Save() override;
 
 private:
-    void RegisterVehicles();
-
-    CXMLNode* m_pRootNode;
+    void RegisterVehicles(CXMLNode* pNode);
 };

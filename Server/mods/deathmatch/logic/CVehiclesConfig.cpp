@@ -9,7 +9,6 @@
 
 CVehiclesConfig::CVehiclesConfig() : CXMLConfig(nullptr)
 {
-    m_pRootNode = nullptr;
 }
 
 bool CVehiclesConfig::Load()
@@ -18,7 +17,7 @@ bool CVehiclesConfig::Load()
     if (m_pFile)
     {
         delete m_pFile;
-        m_pFile = NULL;
+        m_pFile = nullptr;
     }
 
     // Load the XML
@@ -39,14 +38,15 @@ bool CVehiclesConfig::Load()
     }
 
     // Grab the XML root node
-    m_pRootNode = m_pFile->GetRootNode();
-    if (!m_pRootNode)
+    CXMLNode* pRootNode = m_pFile->GetRootNode();
+    if (!pRootNode)
     {
         CLogger::ErrorPrintf("Missing root node ('config')\n");
         return false;
     }
 
-    RegisterVehicles();
+    RegisterVehicles(pRootNode);
+
     return true;
 }
 
@@ -56,9 +56,9 @@ bool CVehiclesConfig::Save()
     return false;
 }
 
-void CVehiclesConfig::RegisterVehicles()
+void CVehiclesConfig::RegisterVehicles(CXMLNode* pRootNode)
 {
-    for (auto it = m_pRootNode->ChildrenBegin(); it != m_pRootNode->ChildrenEnd(); ++it)
+    for (auto it = pRootNode->ChildrenBegin(); it != pRootNode->ChildrenEnd(); ++it)
     {
         CXMLNode* pNode = *it;
         CXMLAttributes &pAttibites = pNode->GetAttributes();
@@ -66,8 +66,8 @@ void CVehiclesConfig::RegisterVehicles()
         CXMLAttribute*     pAttribute;
         uint32_t           uiModelID;
         SModelVehicleDefs* sModelData = new SModelVehicleDefs();
-        const char*        strType;
-        const char*        strVarianType;
+        std::string_view   strType;
+        std::string_view   strVarianType;
 
         pAttribute = pAttibites.Find("modelID");
         if (pAttribute)
@@ -77,15 +77,19 @@ void CVehiclesConfig::RegisterVehicles()
 
         pAttribute = pAttibites.Find("name");
         if (pAttribute)
-            sModelData->strVehicleName = pAttribute->GetValue().c_str();
+        {
+            std::string_view strName = pAttribute->GetValue();
+            const char*      pName = new char[strName.size()];
+            sModelData->strVehicleName = pName;
+        }
 
         pAttribute = pAttibites.Find("type");
         if (pAttribute)
-            strType = pAttribute->GetValue().c_str();
+            strType = pAttribute->GetValue();
 
         pAttribute = pAttibites.Find("variationType");
         if (pAttribute)
-            strVarianType = pAttribute->GetValue().c_str();
+            strVarianType = pAttribute->GetValue();
 
         pAttribute = pAttibites.Find("variantsCount");
         if (pAttribute)
@@ -101,61 +105,63 @@ void CVehiclesConfig::RegisterVehicles()
 
         pAttribute = pAttibites.Find("hasDoors");
         if (pAttribute)
-            sModelData->bHasDoors = strcmp(pAttribute->GetValue().c_str(), "true") == 0;
+            sModelData->bHasDoors = (pAttribute->GetValue().compare("true") == 0);
 
 
-        // TODO
-        // Replace it with std function
-        if (strcmp(strType, "car") == 0)
+        if (strType.compare("car") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::CAR;
         }
-        else if (strcmp(strType, "mtruck") == 0)
+        else if (strType.compare("mtruck") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::MONSTERTRUCK;
         }
-        else if (strcmp(strType, "heli") == 0)
+        else if (strType.compare("heli") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::HELI;
         }
-        else if (strcmp(strType, "boat") == 0)
+        else if (strType.compare("boat") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::BOAT;
         }
-        else if (strcmp(strType, "trailer") == 0)
+        else if (strType.compare("trailer") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::TRAILER;
         }
-        else if (strcmp(strType, "train") == 0)
+        else if (strType.compare("train") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::TRAIN;
         }
-        else if (strcmp(strType, "plane") == 0)
+        else if (strType.compare("plane") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::PLANE;
         }
-        else if (strcmp(strType, "bike") == 0)
+        else if (strType.compare("bike") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::BIKE;
         }
-        else if (strcmp(strType, "quad") == 0)
+        else if (strType.compare("quad") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::QUADBIKE;
         }
-        else if (strcmp(strType, "bmx") == 0)
+        else if (strType.compare("bmx") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::BMX;
         }
+        else
+        {
+            continue;
+        }
 
-        else if (strcmp(strVarianType, "nrg") == 0)
+        if (strVarianType.compare("nrg") == 0)
         {
             sModelData->eVariationType = eVehicleVariationType::NRG;
         }
-        else if (strcmp(strVarianType, "caddy") == 0)
+        else if (strVarianType.compare("caddy") == 0)
         {
             sModelData->eVariationType = eVehicleVariationType::CADDY;
         }
-        else if (strcmp(strVarianType, "slamvan") == 0)
+        else if (strVarianType.compare("slamvan") == 0)
         {
             sModelData->eVariationType = eVehicleVariationType::SLAMVAN;
         }
