@@ -782,7 +782,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
     outStatus.settings.bHighDetailPeds = false;
-    outStatus.settings.bCoronaReflections = true;
+    outStatus.settings.bCoronaReflections = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
