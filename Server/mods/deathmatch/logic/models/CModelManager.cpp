@@ -14,7 +14,7 @@
 
 CModelManager::CModelManager()
 {
-    m_vModels.resize(25500);
+    m_vModels.resize(MAX_GAME_MODELS);
 }
 
 CModelManager::~CModelManager()
@@ -40,6 +40,9 @@ void CModelManager::RegisterModel(CModelBase* pModelHandler)
 
 bool CModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModel)
 {
+    if (uiNewModelID >= MAX_GAME_MODELS)
+        return false;
+
     CModelBase* pParentModel = m_vModels[uiParentModel];
 
     if (!pParentModel)
@@ -73,4 +76,3 @@ bool CModelManager::UnloadCustomModel(uint32 uiModelID)
 
     return true;
 }
-

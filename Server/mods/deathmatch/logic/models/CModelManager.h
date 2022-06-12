@@ -19,6 +19,8 @@ class CModelManager;
 #include "CModelVehicle.h"
 #include "CModelPed.h"
 
+#define MAX_GAME_MODELS 20000
+
 class CModelManager
 {
 public:
