@@ -104,6 +104,8 @@ void CVehiclesConfig::RegisterVehicles()
             sModelData->bHasDoors = strcmp(pAttribute->GetValue().c_str(), "true") == 0;
 
 
+        // TODO
+        // Replace it with std function
         if (strcmp(strType, "car") == 0)
         {
             sModelData->eVehicleModelType = eVehicleType::CAR;

@@ -14,6 +14,8 @@ class CModelBase;
 
 #include <string_view>
 
+#define MODEL_MISSING_PARENT -1
+
 enum class eModelInfoType : unsigned char
 {
     INVALID = 0,
@@ -30,27 +32,28 @@ enum class eModelInfoType : unsigned char
 class CModelBase
 {
 public:
-    CModelBase(uint32_t uiModelID): m_uiModelID(uiModelID), m_uiParentID(-1)
+    CModelBase(uint32_t uiModelID) : m_uiModelID(uiModelID), m_uiParentID(MODEL_MISSING_PARENT)
     {};
 
-    ~CModelBase(){};
+    virtual ~CModelBase(){};
 
     virtual CModelBase* Clone(uint32_t uiModelID) = 0;
 
-    uint32_t         GetModelID() { return m_uiModelID; };
-    uint32_t         GetParentModel() { return m_uiParentID; };
-    void             SetParentModel(uint32_t uiParentModel) { m_uiParentID = uiParentModel; };
-    virtual bool     SetName(std::string_view strName) { return false; };
-    virtual bool     IsCustom() { return true; };
-    virtual void     Unload() = 0;
+    const uint32_t GetModelID() { return m_uiModelID; };
+    uint32_t       GetParentModel() { return m_uiParentID; };
+    void           SetParentModel(uint32_t uiParentModel) { m_uiParentID = uiParentModel; };
+    bool           IsCustom() { return m_uiParentID != MODEL_MISSING_PARENT; };
+    virtual void   Unload() = 0;
 
     eModelInfoType GetType() { return m_type; };
 
 protected:
     eModelInfoType m_type = eModelInfoType::INVALID;
     // Model id
-    uint32_t m_uiModelID;
+    const uint32_t m_uiModelID;
 
     // Model prototype
     uint32_t m_uiParentID;
 };
+
+#undef MODEL_MISSING_PARENT

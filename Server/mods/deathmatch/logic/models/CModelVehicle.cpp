@@ -12,6 +12,8 @@
 #pragma once
 #include "StdInc.h"
 #include "CModelVehicle.h"
+#include "CGame.h"
+#include "CVehicleManager.h"
 
 CModelVehicle::CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs &sModelDefs)
     : CModelBase(uiModelID)
@@ -97,4 +99,17 @@ void CModelVehicle::GetRandomVariation(unsigned char& ucVariant, unsigned char& 
 
 void CModelVehicle::Unload()
 {
+    const auto vehicles = g_pGame->GetVehicleManager()->GetVehicles();
+    for (CVehicle* pVehicle : vehicles)
+    {
+        if (pVehicle->GetModel() == m_uiModelID)
+        {
+            pVehicle->SetModel(m_uiParentID);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(m_uiModelID);
+            Arguments.PushNumber(m_uiParentID);
+            pVehicle->CallEvent("onElementModelChange", Arguments);
+        }
+    }
 }

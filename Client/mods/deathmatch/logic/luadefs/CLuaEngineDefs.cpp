@@ -630,7 +630,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         return 1;
                     }
 
-                    m_pManager->GetModelManager()->Remove(pModel);
+                    m_pManager->GetModelManager()->Remove(iModelID);
                     argStream.SetCustomError("Expected valid original model ID at argument 2");
                 }
             }
@@ -653,9 +653,8 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        auto                          modelManager = m_pManager->GetModelManager();
-        std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
-        if (pModel && modelManager->Remove(pModel))
+        auto modelManager = m_pManager->GetModelManager();
+        if (modelManager->Remove(iModelID))
         {
             lua_pushboolean(luaVM, true);
             return 1;

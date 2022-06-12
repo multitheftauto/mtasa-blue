@@ -274,6 +274,7 @@ enum eElementRPCFunctions
     SET_COLPOLYGON_HEIGHT,
 
     ALLOCATE_MODEL_FROM_PARENT,
+    UNLOAD_MODEL,
 
     NUM_RPC_FUNCS            // Add above this line
 };

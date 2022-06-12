@@ -23,7 +23,7 @@ CModelManager::~CModelManager()
     {
         if (pModel)
         {
-            RemoveModel(pModel);
+            delete pModel;
         }
     }
 }
@@ -55,19 +55,22 @@ bool CModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiPa
     m_vSimpleAllocatedModels.push_back(pNewModel);
 }
 
-void CModelManager::RemoveModel(CModelBase* pModel)
+bool CModelManager::UnloadCustomModel(uint32 uiModelID)
 {
+    CModelBase* pModel = m_vModels[uiModelID];
+
+    if (!pModel)
+        return false;
+
+    if (!pModel->IsCustom())
+        return false;
+
     pModel->Unload();
 
-    switch (pModel->GetType())
-    {
-        case eModelInfoType::ATOMIC:
-            delete dynamic_cast<CModelAtomic*>(pModel);
-            break;
-        case eModelInfoType::VEHICLE:
-            delete dynamic_cast<CModelVehicle*>(pModel);
-            break;
-        default:
-            break;
-    }
+    delete pModel;
+
+    m_vSimpleAllocatedModels.remove(pModel);
+
+    return true;
 }
+

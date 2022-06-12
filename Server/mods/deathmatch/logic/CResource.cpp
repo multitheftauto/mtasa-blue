@@ -34,6 +34,7 @@
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
+#include "models/CModelManager.h"
 
 #ifdef WIN32
     #include <zip/iowin32.h>
@@ -1091,6 +1092,12 @@ bool CResource::Stop(bool bManualStop)
 
     // Destroy the virtual machine for this resource
     DestroyVM();
+
+    // Remove allocated models
+    for (const uint32_t uiModelID : m_allocatedModels)
+    {
+        g_pGame->GetModelManager()->UnloadCustomModel(uiModelID);
+    }
 
     // Remove the resource element from the client
     CEntityRemovePacket removePacket;

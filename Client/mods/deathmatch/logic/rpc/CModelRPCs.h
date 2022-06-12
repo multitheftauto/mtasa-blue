@@ -19,4 +19,5 @@ public:
     static void LoadFunctions();
 
     DECLARE_RPC(AllocateModelFromParent);
+    DECLARE_RPC(UnloadModel);
 };

@@ -44,9 +44,8 @@ void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
     m_modelCount++;
 }
 
-bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
+bool CClientModelManager::Remove(const int modelId)
 {
-    int modelId = pModel->GetModelID();
     if (m_Models[modelId] != nullptr)
     {
         if (g_pGame->GetModelInfo(modelId))
@@ -106,7 +105,7 @@ void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResour
     for (unsigned int i = 0; i < MAX_MODEL_ID; i++)
     {
         if (m_Models[i] != nullptr && m_Models[i]->GetParentResource() == pResource)
-            Remove(m_Models[i]);
+            Remove(i);
     }
 }
 

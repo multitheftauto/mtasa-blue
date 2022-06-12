@@ -128,6 +128,9 @@ namespace lua
     template <typename T>
     void Push(lua_State* L, const std::vector<T>& val);
 
+    template <typename T>
+    void Push(lua_State* L, const std::list<T>& val);
+
     template <typename K, typename V>
     void Push(lua_State* L, const std::unordered_map<K, V>& val);
 
@@ -165,6 +168,19 @@ namespace lua
 
     template <typename T>
     void Push(lua_State* L, const std::vector<T>& val)
+    {
+        lua_newtable(L);
+        int i = 1;
+        for (const auto& v : val)
+        {
+            Push(L, i++);
+            Push(L, v);
+            lua_settable(L, -3);
+        }
+    }
+
+    template <typename T>
+    void Push(lua_State* L, const std::list<T>& val)
     {
         lua_newtable(L);
         int i = 1;

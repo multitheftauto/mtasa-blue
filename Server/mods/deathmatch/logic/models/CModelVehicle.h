@@ -41,7 +41,7 @@ class CModelVehicle : public CModelBase
 {
 public:
     CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs &SModelVehicleDefs);
-    ~CModelVehicle();
+    virtual ~CModelVehicle();
 
     virtual CModelVehicle* Clone(uint32_t uiModelID);
 

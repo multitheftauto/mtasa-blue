@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/rpc/CMarkerRPCs.cpp
- *  PURPOSE:     Marker remote procedure calls
+ *  PURPOSE:     Custom models remote procedure calls
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -15,6 +15,7 @@
 void CModelRPCs::LoadFunctions()
 {
     AddHandler(ALLOCATE_MODEL_FROM_PARENT, AllocateModelFromParent, "AllocateModelFromParent");
+    AddHandler(UNLOAD_MODEL, UnloadModel, "UnloadModel");
 }
 
 void CModelRPCs::AllocateModelFromParent(NetBitStreamInterface& bitStream)
@@ -25,5 +26,14 @@ void CModelRPCs::AllocateModelFromParent(NetBitStreamInterface& bitStream)
     if (bitStream.Read(uiNewModelID) && bitStream.Read(uiParentModelID))
     {
         m_pManager->GetModelManager()->AllocateModelFromParent(uiNewModelID, uiParentModelID);
+    }
+}
+
+void CModelRPCs::UnloadModel(NetBitStreamInterface& bitStream)
+{
+    uint32_t uiModelID;
+    if (bitStream.Read(uiModelID))
+    {
+        m_pManager->GetModelManager()->Remove(uiModelID);
     }
 }

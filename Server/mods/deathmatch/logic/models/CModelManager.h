@@ -27,13 +27,13 @@ public:
     // Register generic GTA:SA model info
     void RegisterModel(CModelBase* pModelHandler);
     bool AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModel);
+    bool UnloadCustomModel(uint32 uiModelID);
+
+    std::vector<CModelBase*>& GetModels() { return m_vModels; };
 
     CModelVehicle* GetVehicleModel(uint32_t iModelID) { return dynamic_cast<CModelVehicle*>(m_vModels[iModelID]); };
 
     std::list<CModelBase*> GetSimpleAllocatedModels() { return m_vSimpleAllocatedModels; };
-
-private:
-    void RemoveModel(CModelBase* pModel);
 
 private:
     // modelID - CModelBase
