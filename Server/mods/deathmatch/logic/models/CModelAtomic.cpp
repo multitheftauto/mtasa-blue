@@ -11,22 +11,34 @@
 
 #include "StdInc.h"
 #include "CModelAtomic.h"
+#include "CGame.h"
+#include "CObjectManager.h"
 
-CModelAtomic::CModelAtomic(uint32_t uiModelID, char strName[22], char strTextureName[22], uint32_t uiDrawDistance, uint32_t uiFlags) : CModelBase(uiModelID)
+CModelAtomic* CModelAtomic::Clone(uint32_t uiModelID)
 {
-    //strcpy(m_modelName, strName);
-    //strcpy(m_strTextureName, strTextureName);
-    SetDrawDistance(uiDrawDistance);
-    SetFlags(uiFlags);
-}
+    CModelAtomic* pNewModel = new CModelAtomic(uiModelID);
 
-CModelAtomic::~CModelAtomic()
-{
+    pNewModel->SetParentModel(m_uiModelID);
 
+    return pNewModel;
 }
 
 void CModelAtomic::Unload()
 {
-    return;
+    auto iterBegin = g_pGame->GetObjectManager()->IterBegin();
+    auto iterEnd = g_pGame->GetObjectManager()->IterEnd();
+    for (auto iter = iterBegin; iterBegin != iterEnd; ++iterBegin)
+    {
+        CObject* pObject = *iter;
+        if (pObject->GetModel() == m_uiModelID)
+        {
+            pObject->SetModel(m_uiParentID);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(m_uiModelID);
+            Arguments.PushNumber(m_uiParentID);
+            pObject->CallEvent("onElementModelChange", Arguments);
+        }
+    }
 }
 

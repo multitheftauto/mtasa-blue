@@ -44,6 +44,8 @@
 #include "CVehiclesConfig.h"
 #include "CHandlingConfig.h"
 #include "CVehicleColorConfig.h"
+#include "CPedConfig.h"
+#include "CObjectConfig.h"
 #include "models/CModelManager.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CRegistryManager.h"
@@ -927,6 +929,24 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         {
             CLogger::ErrorPrintf("%s", "Generating a new 'vehiclecolors.conf' failed\n ");
         }
+    }
+
+    // Load ped config
+    const char*     strPedsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("peds.conf");
+    CPedConfig  pedConfig(strPedsPath);
+    if (!pedConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'peds.conf' failed\n");
+        return false;
+    }
+
+    // Load object config
+    const char* strObjectsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("objects.conf");
+    CObjectConfig  objectConfig(strObjectsPath);
+    if (!objectConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'objects.conf' failed\n");
+        return false;
     }
 
     // Load the registry

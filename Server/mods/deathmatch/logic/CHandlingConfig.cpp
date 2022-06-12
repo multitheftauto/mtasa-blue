@@ -1,6 +1,5 @@
 #include "StdInc.h"
 #include "CHandlingConfig.h"
-#include <iostream>
 #include <fstream>
 #include "CHandlingEntry.h"
 #include "models/CModelManager.h"
@@ -35,8 +34,9 @@ bool CHandlingConfig::Load()
             }
         }
         pFile.close();
+        return true;
     }
-    return true;
+    return false;
 }
 
 void CHandlingConfig::LoadHandlingParams(std::vector<char*> lineParams)

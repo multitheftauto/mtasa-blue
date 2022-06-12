@@ -119,10 +119,11 @@ std::list<uint32_t> CLuaModelDefs::GetFreeModels()
     std::list<uint32_t> output;
 
     const auto models = g_pGame->GetModelManager()->GetModels();
-    for (CModelBase* pModel : models)
+    // Fix magick umber
+    for (uint32_t uiModelID = 0; uiModelID < 20000; uiModelID++)
     {
-        if (!pModel)
-            output.push_back(pModel->GetModelID());
+        if (!models[uiModelID])
+            output.push_back(uiModelID);
     }
 
     return output;

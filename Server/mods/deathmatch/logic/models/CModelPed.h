@@ -2,25 +2,25 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/models/CModelAtomic.h
- *  PURPOSE:     Atomic model class
+ *  FILE:        mods/deathmatch/logic/models/CModelPed.h
+ *  PURPOSE:     Ped model class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-class CModelAtomic;
+class CModelPed;
 #pragma once
 
 #include "CModelBase.h"
 
-class CModelAtomic : public CModelBase
+class CModelPed : public CModelBase
 {
 public:
-    CModelAtomic(uint32_t uiModelID) : CModelBase(uiModelID){};
-    ~CModelAtomic(){};
+    CModelPed(uint32_t uiModelID) : CModelBase(uiModelID){};
+    ~CModelPed(){};
 
-    eModelInfoType GetType() { return eModelInfoType::ATOMIC; };
-    CModelAtomic*  Clone(uint32_t uiModelID);
+    eModelInfoType GetType() { return eModelInfoType::PED; };
+    CModelPed*     Clone(uint32_t uiModelID);
     void           Unload();
 };

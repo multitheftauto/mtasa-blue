@@ -17,6 +17,7 @@ class CModelManager;
 #include "CModelBase.h"
 #include "CModelAtomic.h"
 #include "CModelVehicle.h"
+#include "CModelPed.h"
 
 class CModelManager
 {
