@@ -34,7 +34,7 @@ public:
 
     std::vector<CModelBase*>& GetModels() { return m_vModels; };
 
-    CModelVehicle* GetVehicleModel(uint32_t iModelID) { return dynamic_cast<CModelVehicle*>(m_vModels[iModelID]); };
+    CModelVehicle* GetVehicleModel(uint32_t iModelID);
 
     std::list<CModelBase*> GetSimpleAllocatedModels() { return m_vSimpleAllocatedModels; };
 

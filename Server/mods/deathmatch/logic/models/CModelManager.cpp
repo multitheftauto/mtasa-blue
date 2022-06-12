@@ -73,6 +73,16 @@ bool CModelManager::UnloadCustomModel(uint32 uiModelID)
     delete pModel;
 
     m_vSimpleAllocatedModels.remove(pModel);
+    m_vModels[uiModelID] = nullptr;
 
     return true;
+}
+
+CModelVehicle* CModelManager::GetVehicleModel(uint32_t iModelID)
+{
+    CModelBase* pModel = m_vModels[iModelID];
+    if (pModel && pModel->GetType() == eModelInfoType::VEHICLE)
+        return dynamic_cast<CModelVehicle*>(pModel);
+
+    return nullptr;
 }
