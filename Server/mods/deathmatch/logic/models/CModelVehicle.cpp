@@ -16,7 +16,7 @@
 #include "CVehicleManager.h"
 
 CModelVehicle::CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs &sModelDefs)
-    : CModelBase(uiModelID)
+    : CModelBase(eModelInfoType::VEHICLE, uiModelID)
 {
     m_modelDef = sModelDefs;
     m_pVehicleHandling = new CHandlingEntry();

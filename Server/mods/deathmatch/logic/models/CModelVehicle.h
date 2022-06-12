@@ -69,8 +69,6 @@ public:
     void          AddColor(const CVehicleColor& color) { return m_modelDef.vehicleColors.AddColor(color); };
 
     void GetRandomVariation(unsigned char& ucVariant, unsigned char& ucVariant2);
-
-    eModelInfoType GetType() { return eModelInfoType::VEHICLE; };
     void           Unload();
 
 private:

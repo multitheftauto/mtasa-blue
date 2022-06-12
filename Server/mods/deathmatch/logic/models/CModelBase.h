@@ -32,8 +32,7 @@ enum class eModelInfoType : unsigned char
 class CModelBase
 {
 public:
-    CModelBase(uint32_t uiModelID) : m_uiModelID(uiModelID), m_uiParentID(MODEL_MISSING_PARENT)
-    {};
+    CModelBase(eModelInfoType eType, uint32_t uiModelID) : m_eType(eType), m_uiModelID(uiModelID), m_uiParentID(MODEL_MISSING_PARENT){};
 
     virtual ~CModelBase(){};
 
@@ -45,10 +44,10 @@ public:
     bool           IsCustom() { return m_uiParentID != MODEL_MISSING_PARENT; };
     virtual void   Unload() = 0;
 
-    eModelInfoType GetType() { return m_type; };
+   eModelInfoType GetType() { return m_eType; };
 
 protected:
-    eModelInfoType m_type = eModelInfoType::INVALID;
+    eModelInfoType m_eType;
     // Model id
     const uint32_t m_uiModelID;
 

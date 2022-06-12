@@ -17,10 +17,9 @@ class CModelAtomic;
 class CModelAtomic : public CModelBase
 {
 public:
-    CModelAtomic(uint32_t uiModelID) : CModelBase(uiModelID){};
+    CModelAtomic(uint32_t uiModelID) : CModelBase(eModelInfoType::ATOMIC, uiModelID){};
     ~CModelAtomic(){};
 
-    eModelInfoType GetType() { return eModelInfoType::ATOMIC; };
     CModelAtomic*  Clone(uint32_t uiModelID);
     void           Unload();
 };

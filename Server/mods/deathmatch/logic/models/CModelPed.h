@@ -17,10 +17,12 @@ class CModelPed;
 class CModelPed : public CModelBase
 {
 public:
-    CModelPed(uint32_t uiModelID) : CModelBase(uiModelID){};
+    CModelPed(uint32_t uiModelID) : CModelBase(eModelInfoType::PED, uiModelID){};
     ~CModelPed(){};
 
-    eModelInfoType GetType() { return eModelInfoType::PED; };
-    CModelPed*     Clone(uint32_t uiModelID);
-    void           Unload();
+    virtual CModelPed* Clone(uint32_t uiModelID);
+    virtual void       Unload();
+
+private:
+    eModelInfoType m_eType = eModelInfoType::PED;
 };
