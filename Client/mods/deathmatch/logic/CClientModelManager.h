@@ -37,7 +37,7 @@ public:
     std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eModelInfoType type, const unsigned int minModelID = 0);
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
-    void AllocateModelFromParent(uint32_t usModelID, uint32_t usParentModel);
+    bool AllocateModelFromParent(uint32_t usModelID, uint32_t usParentModel);
 
 
 private:

@@ -661,7 +661,7 @@ IMPLEMENT_ENUM_END("surface-adhesion-group")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(eModelInfoType)
 ADD_ENUM(eModelInfoType::PED, "ped")
-ADD_ENUM(eModelInfoType::OBJECT, "object")
+ADD_ENUM(eModelInfoType::ATOMIC, "object")
 ADD_ENUM(eModelInfoType::VEHICLE, "vehicle")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 

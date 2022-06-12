@@ -25,7 +25,12 @@ void CModelRPCs::AllocateModelFromParent(NetBitStreamInterface& bitStream)
 
     if (bitStream.Read(uiNewModelID) && bitStream.Read(uiParentModelID))
     {
-        m_pManager->GetModelManager()->AllocateModelFromParent(uiNewModelID, uiParentModelID);
+        const bool status = m_pManager->GetModelManager()->AllocateModelFromParent(uiNewModelID, uiParentModelID);
+        if (!status)
+        {
+            g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD21"), _("Server allocated existing model."));
+            g_pCore->GetModManager()->RequestUnload();
+        }
     }
 }
 

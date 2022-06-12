@@ -29,10 +29,10 @@ public:
     float   fRadius;
 };
 
-enum class eModelInfoType : unsigned char
+enum class eModelInfoType
 {
     INVALID = 0,
-    OBJECT = 1,
+    ATOMIC = 1,
     TIME = 3,
     WEAPON = 4,
     CLUMP = 5,

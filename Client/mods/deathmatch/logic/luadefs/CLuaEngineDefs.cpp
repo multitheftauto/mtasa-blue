@@ -611,7 +611,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                             case eModelInfoType::PED:
                                 usParentID = 7;            // male01
                                 break;
-                            case eModelInfoType::OBJECT:
+                            case eModelInfoType::ATOMIC:
                                 usParentID = 1337;            // BinNt07_LA (trash can)
                                 break;
                             case eModelInfoType::VEHICLE:
@@ -622,14 +622,14 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         }
                     }
 
-                    if (pModel->Allocate(usParentID))
+                    if (usParentID != -1 && pModel->Allocate(usParentID))
                     {
                         pModel->SetParentResource(pResource);
 
                         lua_pushinteger(luaVM, iModelID);
                         return 1;
                     }
-
+                    
                     m_pManager->GetModelManager()->Remove(iModelID);
                     argStream.SetCustomError("Expected valid original model ID at argument 2");
                 }

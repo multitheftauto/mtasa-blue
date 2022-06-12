@@ -43,7 +43,7 @@ bool CClientModel::Allocate(ushort usParentID)
         case eModelInfoType::PED:
             pModelInfo->MakePedModel("PSYCHO");
             return true;
-        case eModelInfoType::OBJECT:
+        case eModelInfoType::ATOMIC:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeObjectModel(usParentID);
@@ -107,7 +107,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
             break;
         }
-        case eModelInfoType::OBJECT:
+        case eModelInfoType::ATOMIC:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
             unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
