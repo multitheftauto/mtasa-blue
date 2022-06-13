@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-21 23:54+0000\n"
-"PO-Revision-Date: 2022-05-22 00:53\n"
+"PO-Revision-Date: 2022-06-13 09:15\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -1231,7 +1231,7 @@ msgstr "Răspuns invalid de la server (1)"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "NOUTĂȚI"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
