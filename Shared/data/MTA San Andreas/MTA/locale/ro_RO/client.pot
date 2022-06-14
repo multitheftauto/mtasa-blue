@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-14 16:29+0000\n"
-"PO-Revision-Date: 2022-06-14 17:27\n"
+"PO-Revision-Date: 2022-06-14 22:55\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -118,7 +118,7 @@ msgstr "Directorul tău Grand Theft Auto: San Andreas conține aceste fișiere:"
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "Acest fișier nu este necesar și poate interfera cu caracteristicile grafice ale MTA:SA.\n\n"
+msgstr "Aceste fișiere nu sunt necesare și pot interfera cu caracteristicile grafice ale MTA:SA.\n\n"
 "Este recomandat să ștergi sau să redenumești aceste fișiere."
 
 #: Client/loader/Dialogs.cpp:68
