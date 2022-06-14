@@ -1538,6 +1538,10 @@ void CMultiplayerSA::InitHooks()
     for (auto uiAddr : shadowAddr)
         MemPut(uiAddr, &m_fShadowsOffset);
 
+    // Fix corona rain reflections aren't rendering (#2345)
+    // By using zBufferFar instead of zBufferNear for corona position
+    MemPut<BYTE>(0x6FB9A0, 0x1C);
+
     // Skip check for disabled HUD
     MemSet((void*)0x58FBC4, 0x90, 9);
 

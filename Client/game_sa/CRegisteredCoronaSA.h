@@ -72,6 +72,7 @@ public:
     VOID     SetTexture(eCoronaType texture);
     BYTE     GetFlareType();
     VOID     SetFlareType(BYTE fFlareType);
+    VOID     SetReflectionType(BYTE reflectionType);
     DWORD    GetIdentifier() { return internalInterface->Identifier; }
     DWORD    GetID();
     VOID     Init(DWORD Identifier);

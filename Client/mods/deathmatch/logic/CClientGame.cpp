@@ -5298,6 +5298,10 @@ void CClientGame::ResetMapInfo()
     // Peds LOD distance
     g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
 
+    // Corona rain reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
+
     // Sun color
     g_pMultiplayer->ResetSunColor();
 
