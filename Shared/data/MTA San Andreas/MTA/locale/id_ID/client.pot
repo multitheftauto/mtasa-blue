@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-14 16:29+0000\n"
-"PO-Revision-Date: 2022-06-14 17:26\n"
+"PO-Revision-Date: 2022-06-17 02:13\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -1642,7 +1642,7 @@ msgstr "Penetapan gerakan mouse - Mungkin PC perlu dimulai ulang"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "BERITA"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
