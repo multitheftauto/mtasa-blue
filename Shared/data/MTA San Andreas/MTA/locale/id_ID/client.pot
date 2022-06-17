@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-14 16:29+0000\n"
-"PO-Revision-Date: 2022-06-17 02:13\n"
+"PO-Revision-Date: 2022-06-17 03:12\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -113,28 +113,29 @@ msgstr "MTA: San Andreas - Peringatan"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Direktori pemasangan Grand Theft Auto: San Andreas anda yang berisi berkas ini:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Berkas ini tidak diperlukan dan mungkin mengganggu ciri grafik dari versi MTA:SA ini.\n\n"
+"Dianjurkan agar anda menghapus atau mengganti nama berkas ini."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Simpan berkas ini, tetapi juga tunjukkan peringatan ini saat mulai selanjutnya"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Jangan ingatkan saya lagi tentang berkas ini lagi"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Ganti nama berkas ini dari *.dll ke *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Tunjukkan berkas berkas ini"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -1086,7 +1087,7 @@ msgstr "Tampilkan resolusi yang tidak aman"
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Korona refleksi hujan"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
