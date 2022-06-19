@@ -761,9 +761,6 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_pEditAddress[Type]->Activate();
         m_pEditAddress[Type]->SetCaretAtEnd();
 
-        // Make sure search box is visible
-        m_pEditSearch[Type]->SetVisible(true);
-
         // Flash search box if it is not empty
         for (uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
         {
@@ -777,6 +774,11 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_pGeneralHelpWindow->SetVisible(false);
         m_pQuickConnectHelpWindow->SetVisible(false);
         CServerInfo::GetSingletonPtr()->Hide();
+
+        for (uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        {
+            m_FlashSearchBox[i].uiCount = 0;
+        }
     }
 }
 
