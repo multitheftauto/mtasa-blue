@@ -20,58 +20,27 @@ CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* 
 
 CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned int AnimID)
 {
-    CAnimBlendAssociationSAInterface* pAnimAssociationReturn = nullptr;
-
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CopyAnimation;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    AnimID
-        call    dwFunc
-        mov     pAnimAssociationReturn, eax
-    }
-    return pAnimAssociationReturn;
+    // CAnimBlendAssocGroup::CopyAnimation
+    return ((CAnimBlendAssociationSAInterface * (__thiscall*)(CAnimBlendAssocGroupSAInterface*, unsigned int)) FUNC_CAnimBlendAssocGroup_CopyAnimation)(
+        m_pInterface, AnimID);
 }
 
 void CAnimBlendAssocGroupSA::InitEmptyAssociations(RpClump* pClump)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_InitEmptyAssociations;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    pClump
-        call    dwFunc
-    }
+    // CAnimBlendAssocGroup::InitEmptyAssociations
+    return ((void(__thiscall*)(CAnimBlendAssocGroupSAInterface*, RpClump*))FUNC_CAnimBlendAssocGroup_InitEmptyAssociations)(m_pInterface, pClump);
 }
 
 bool CAnimBlendAssocGroupSA::IsCreated()
 {
-    bool  bReturn;
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_IsCreated;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CAnimBlendAssocGroup::IsCreated
+    return ((bool(__thiscall*)(CAnimBlendAssocGroupSAInterface*))FUNC_CAnimBlendAssocGroup_IsCreated)(m_pInterface);
 }
 
 int CAnimBlendAssocGroupSA::GetNumAnimations()
 {
-    int   iReturn;
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_GetNumAnimations;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     iReturn, eax
-    }
-    return iReturn;
+    // CAnimBlendAssocGroup::GetNumAnimations
+    return ((int(__thiscall*)(CAnimBlendAssocGroupSAInterface*))FUNC_CAnimBlendAssocGroup_GetNumAnimations)(m_pInterface);
 }
 
 CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock()
@@ -83,18 +52,9 @@ CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock()
 
 CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int ID)
 {
-    // ppAssociations [ ID - this->iIDOffset ] ??
-    CAnimBlendStaticAssociation* pReturn;
-    DWORD                        dwThis = (DWORD)m_pInterface;
-    DWORD                        dwFunc = FUNC_CAnimBlendAssocGroup_GetAnimation;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    ID
-        call    dwFunc
-        mov     pReturn, eax
-    }
-    return pReturn;
+    // CAnimBlendAssocGroup::GetAnimation
+    return ((CAnimBlendStaticAssociation * (__thiscall*)(CAnimBlendAssocGroupSAInterface*, unsigned int)) FUNC_CAnimBlendAssocGroup_GetAnimation)(m_pInterface,
+                                                                                                                                                  ID);
 }
 
 eAnimGroup CAnimBlendAssocGroupSA::GetGroupID()
@@ -117,14 +77,8 @@ bool CAnimBlendAssocGroupSA::IsLoaded()
 
 void CAnimBlendAssocGroupSA::CreateAssociations(const char* szBlockName)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CreateAssociations;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    szBlockName
-        call    dwFunc
-    }
+    // CAnimBlendAssocGroup::CreateAssociations
+    ((void(__thiscall*)(CAnimBlendAssocGroupSAInterface*, const char*))FUNC_CAnimBlendAssocGroup_CreateAssociations)(m_pInterface, szBlockName);
 }
 
 void CAnimBlendAssocGroupSA::SetupAnimBlock()
