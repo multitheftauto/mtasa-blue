@@ -138,32 +138,24 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
             SString strMessage("Caller: %i ", CallerId);
             LogEvent(506, "CWorld::Add ( CEntity * ) Crash", "", strMessage);
         }
-        DWORD dwEntity = (DWORD)pEntitySA->GetInterface();
-        DWORD dwFunction = FUNC_Add;
-        _asm
-        {
-            push    dwEntity
-            call    dwFunction
-            add     esp, 4
-        }
+
+        // CWorld::Add
+        ((void(__cdecl*)(CEntitySAInterface*))FUNC_Add)(pEntitySA->GetInterface());
     }
 }
 
 void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
 {
     DEBUG_TRACE("VOID CWorldSA::Add ( CEntitySAInterface * entityInterface )");
-    DWORD dwFunction = FUNC_Add;
+
     if ((DWORD)entityInterface->vtbl == VTBL_CPlaceable)
     {
         SString strMessage("Caller: %i ", CallerId);
         LogEvent(506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage);
     }
-    _asm
-    {
-        push    entityInterface
-        call    dwFunction
-        add     esp, 4
-    }
+
+    // CWorld::Add
+    ((void(__cdecl*)(CEntitySAInterface*))FUNC_Add)(entityInterface);
 }
 
 void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
@@ -180,14 +172,9 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
             SString strMessage("Caller: %i ", CallerId);
             LogEvent(507, "CWorld::Remove ( CEntity * ) Crash", "", strMessage);
         }
-        DWORD dwEntity = (DWORD)pInterface;
-        DWORD dwFunction = FUNC_Remove;
-        _asm
-        {
-            push    dwEntity
-            call    dwFunction
-            add     esp, 4
-        }
+
+        // CWorld::Remove
+        ((void(__cdecl*)(CEntitySAInterface*))FUNC_Remove)(pInterface);
     }
 }
 
@@ -199,83 +186,26 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
         SString strMessage("Caller: %i ", CallerId);
         LogEvent(507, "CWorld::Remove ( CEntitySAInterface * ) Crash", "", strMessage);
     }
-    DWORD dwFunction = FUNC_Remove;
-    _asm
-    {
-        push    entityInterface
-        call    dwFunction
-        add     esp, 4
 
-    /*  mov     ecx, entityInterface
-        mov     esi, [ecx]
-        push    1
-        call    dword ptr [esi+8]*/
-    }
+    // CWorld::Remove
+    ((void(__cdecl*)(CEntitySAInterface*))FUNC_Remove)(entityInterface);
 }
 
 void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
 {
-    DWORD dwFunc = FUNC_RemoveReferencesToDeletedObject;
-    DWORD dwEntity = (DWORD)entity;
-    _asm
-    {
-        push    dwEntity
-        call    dwFunc
-        add     esp, 4
-    }
+    // CWorld::RemoveReferencesToDeletedObject
+    ((void(__cdecl*)(CEntitySAInterface*))FUNC_RemoveReferencesToDeletedObject)(entity);
 }
 
 // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED
 bool CWorldSA::TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision)
 {
-    // Create a CColLine for us
-    DWORD dwFunc = FUNC_CColLine_Constructor;
-    DWORD dwCColLine[10];            // I don't know how big CColLine is, so we'll just be safe
-    _asm
-    {
-        lea     ecx, dwCColLine
-        push    vecEnd
-        push    vecStart
-        call    dwFunc
-    }
-
-    // Now, lets make a CColSphere
-    BYTE byteColSphere[18];            // looks like its 18 bytes { vecPos, fSize, byteUnk, byteUnk, byteUnk }
-    dwFunc = FUNC_CColSphere_Set;
-    _asm
-    {
-        lea     ecx, byteColSphere
-        push    255
-        push    0
-        push    0
-        push    vecSphereCenter
-        push    fSphereRadius
-        call    dwFunc
-    }
+    return false;
 }
 
 void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, float& fY, float& fZ)
 {
-    // Convert the given matrix to a padded matrix
-    // CMatrix_Padded matrixPadded ( Matrix );
-
-    // Grab its pointer and call gta's func
-    const CMatrix_Padded* pMatrixPadded = &matrixPadded;
-    DWORD                 dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
-
-    float* pfX = &fX;
-    float* pfY = &fY;
-    float* pfZ = &fZ;
-    int    iUnknown = 21;
-    _asm
-    {
-        push    iUnknown
-            push    pfZ
-            push    pfY
-            push    pfX
-            mov     ecx, pMatrixPadded
-            call    dwFunc
-    }
+    ((void(__thiscall*)(const CMatrix_Padded*, float&, float&, float&, int))FUNC_CMatrix__ConvertToEulerAngles)(&matrixPadded, fX, fY, fZ, 21);
 }
 
 bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
@@ -290,33 +220,16 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
 
     // DWORD targetEntity;
     CEntitySAInterface* targetEntity = NULL;
-    bool                bReturn = false;
 
-    DWORD dwFunc = FUNC_ProcessLineOfSight;
     // bool bCheckBuildings = true,                 bool bCheckVehicles = true,     bool bCheckPeds = true,
     // bool bCheckObjects = true,                   bool bCheckDummies = true,      bool bSeeThroughStuff = false,
     // bool bIgnoreSomeObjectsForCamera = false,    bool bShootThroughStuff = false
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, flags.bCheckCarTires);
 
-    _asm
-    {
-        push    flags.bShootThroughStuff
-        push    flags.bIgnoreSomeObjectsForCamera
-        push    flags.bSeeThroughStuff
-        push    flags.bCheckDummies
-        push    flags.bCheckObjects
-        push    flags.bCheckPeds
-        push    flags.bCheckVehicles
-        push    flags.bCheckBuildings
-        lea     eax, targetEntity
-        push    eax
-        push    pColPointSAInterface
-        push    vecEnd
-        push    vecStart
-        call    dwFunc
-        mov     bReturn, al
-        add     esp, 0x30
-    }
+    bool bReturn = ((bool(__cdecl*)(const CVector*, const CVector*, CColPointSAInterface*, CEntitySAInterface**, bool, bool, bool, bool, bool, bool, bool,
+                                    bool))FUNC_ProcessLineOfSight)(vecStart, vecEnd, pColPointSAInterface, &targetEntity, flags.bCheckBuildings,
+                                                                   flags.bCheckVehicles, flags.bCheckPeds, flags.bCheckObjects, flags.bCheckDummies,
+                                                                   flags.bSeeThroughStuff, flags.bIgnoreSomeObjectsForCamera, flags.bShootThroughStuff);
 
     MemPutFast<BYTE>(VAR_CWorld_bIncludeCarTires, 0);
 
@@ -402,54 +315,27 @@ void CWorldSA::IgnoreEntity(CEntity* pEntity)
 BYTE CWorldSA::GetLevelFromPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("BYTE CWorldSA::GetLevelFromPosition(CVector * vecPosition)");
-    DWORD dwFunc = FUNC_GetLevelFromPosition;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunc
-        mov     bReturn, al
-        pop     eax
-    }
-    return bReturn;
+
+    // CTheZones::GetLevelFromPosition
+    return ((bool(__cdecl*)(CVector*))FUNC_GetLevelFromPosition)(vecPosition);
 }
 
 float CWorldSA::FindGroundZForPosition(float fX, float fY)
 {
     DEBUG_TRACE("FLOAT CWorldSA::FindGroundZForPosition(FLOAT fX, FLOAT fY)");
-    DWORD dwFunc = FUNC_FindGroundZFor3DCoord;
-    FLOAT fReturn = 0;
-    _asm
-    {
-        push    fY
-        push    fX
-        call    dwFunc
-        fstp    fReturn
-        add     esp, 8
-    }
-    return fReturn;
+
+    // calls the wrong function should call CWorld::FindGroundZForCoord(0x569660)
+    // CWorld::FindGroundZFor3DCoord
+    return ((float(__cdecl*)(float, float))FUNC_FindGroundZFor3DCoord)(fX, fY);
 }
 
 float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("FLOAT CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)");
-    DWORD dwFunc = FUNC_FindGroundZFor3DCoord;
-    FLOAT fReturn = 0;
-    FLOAT fX = vecPosition->fX;
-    FLOAT fY = vecPosition->fY;
-    FLOAT fZ = vecPosition->fZ;
-    _asm
-    {
-        push    0
-        push    0
-        push    fZ
-        push    fY
-        push    fX
-        call    dwFunc
-        fstp    fReturn
-        add     esp, 0x14
-    }
-    return fReturn;
+
+    // CWorld::FindGroundZFor3DCoord
+    return ((float(__cdecl*)(float, float, float, bool*, CEntity**))FUNC_FindGroundZFor3DCoord)(vecPosition->fX, vecPosition->fY, vecPosition->fZ, nullptr,
+                                                                                                nullptr);
 }
 
 float CWorldSA::FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult)
@@ -463,76 +349,36 @@ float CWorldSA::FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult)
 void CWorldSA::LoadMapAroundPoint(CVector* vecPosition, FLOAT fRadius)
 {
     DEBUG_TRACE("VOID CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)");
-    DWORD dwFunc = FUNC_CTimer_Stop;
-    _asm
-    {
-        call    dwFunc
-    }
 
-    dwFunc = FUNC_CRenderer_RequestObjectsInDirection;
-    _asm
-    {
-        push    32
-        push    fRadius
-        push    vecPosition
-        call    dwFunc
-        add     esp, 12
-    }
+    // CTimer::Stop
+    ((void(__cdecl*)())FUNC_CTimer_Stop)();
 
-    dwFunc = FUNC_CStreaming_LoadScene;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunc
-        add     esp, 4
-    }
+    // CRenderer::RequestObjectsInDirection
+    ((void(__cdecl*)(CVector&, float, int))FUNC_CRenderer_RequestObjectsInDirection)(*vecPosition, fRadius, 32);
 
-    dwFunc = FUNC_CTimer_Update;
-    _asm
-    {
-        call    dwFunc
-    }
+    // CStreaming::LoadScene
+    ((void(__cdecl*)(CVector&))FUNC_CStreaming_LoadScene)(*vecPosition);
+
+    // CTimer::Update
+    ((void(__cdecl*)())FUNC_CTimer_Update)();
 }
 
 bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags)
 {
-    DWORD dwFunc = FUNC_IsLineOfSightClear;
-    bool  bReturn = false;
     // bool bCheckBuildings = true, bool bCheckVehicles = true, bool bCheckPeds = true,
     // bool bCheckObjects = true, bool bCheckDummies = true, bool bSeeThroughStuff = false,
     // bool bIgnoreSomeObjectsForCamera = false
 
-    _asm
-    {
-        push    flags.bIgnoreSomeObjectsForCamera
-        push    flags.bSeeThroughStuff
-        push    flags.bCheckDummies
-        push    flags.bCheckObjects
-        push    flags.bCheckPeds
-        push    flags.bCheckVehicles
-        push    flags.bCheckBuildings
-        push    vecEnd
-        push    vecStart
-        call    dwFunc
-        mov     bReturn, al
-        add     esp, 0x24
-    }
-    return bReturn;
+    // CWorld::GetIsLineOfSightClear
+    return ((bool(__cdecl*)(const CVector&, const CVector&, bool, bool, bool, bool, bool, bool, bool))FUNC_IsLineOfSightClear)(
+        *vecStart, *vecEnd, flags.bCheckBuildings, flags.bCheckVehicles, flags.bCheckPeds, flags.bCheckObjects, flags.bCheckDummies, flags.bSeeThroughStuff,
+        flags.bIgnoreSomeObjectsForCamera);
 }
 
 bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
 {
-    DWORD dwFunc = FUNC_HasCollisionBeenLoaded;
-    bool  bRet = false;
-    _asm
-    {
-        push    0
-        push    vecPosition
-        call    dwFunc
-        mov     bRet, al
-        add     esp, 8
-    }
-    return bRet;
+    // CColStore::HasCollisionLoaded
+    return ((bool(__cdecl*)(CVector&, int))FUNC_HasCollisionBeenLoaded)(*vecPosition, 0);
 }
 
 DWORD CWorldSA::GetCurrentArea()
@@ -544,13 +390,8 @@ void CWorldSA::SetCurrentArea(DWORD dwArea)
 {
     MemPutFast<DWORD>(VAR_currArea, dwArea);
 
-    DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
-    _asm
-    {
-        push    dwArea
-        call    dwFunc
-        add     esp, 4
-    }
+    // CStreaming::RemoveBuildingsNotInArea
+    ((void(__cdecl*)(int))FUNC_RemoveBuildingsNotInArea)(dwArea);
 }
 
 void CWorldSA::SetJetpackMaxHeight(float fHeight)
@@ -607,16 +448,8 @@ bool CWorldSA::GetOcclusionsEnabled()
 
 void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition)
 {
-    DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;            // __cdecl
-
-    _asm
-    {
-        push pOutVecPosition
-        push iTrackId
-        push fRailTrackPosition
-        call dwFunc
-        add  esp, 3*4
-    }
+    // CTrain::FindCoorsFromPositionOnTrack
+    ((void(__cdecl*)(float, int, CVector*))FUNC_CWorld_FindPositionForTrackPosition)(fRailTrackPosition, iTrackId, pOutVecPosition);
 }
 
 int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance)
