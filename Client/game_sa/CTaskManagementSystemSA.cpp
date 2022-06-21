@@ -111,12 +111,7 @@ CTask* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
     if (dwFunc && dwFunc != 0x82263A)
     {
-        _asm
-        {
-            mov     ecx, pTaskInterface
-            call    dwFunc
-            mov     iTaskType, eax
-        }
+        iTaskType = ((int(__thiscall*)(void*))dwFunc)(pTaskInterface);
     }
 
     // Create it and add it to our list
