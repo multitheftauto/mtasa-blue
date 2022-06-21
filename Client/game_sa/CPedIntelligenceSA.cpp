@@ -46,16 +46,8 @@ bool CPedIntelligenceSA::IsRespondingToEvent()
 
 int CPedIntelligenceSA::GetCurrentEventType()
 {
-    DWORD dwFunc = FUNC_GetCurrentEventType;
-    DWORD dwRet = 0;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwRet, eax
-    }
-    return dwRet;
+    // CPedIntelligence::GetCurrentEventType
+    return ((int(__thiscall*)(CPedIntelligenceSAInterface*))FUNC_GetCurrentEventType)(this->GetInterface());
 }
 
 CEvent* CPedIntelligenceSA::GetCurrentEvent()
@@ -65,34 +57,15 @@ CEvent* CPedIntelligenceSA::GetCurrentEvent()
 
 bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
 {
-    bool  bReturn;
-    DWORD dwThis = (DWORD)internalInterface;
-    DWORD dwPed = (DWORD)pPed->GetInterface();
-    DWORD dwFunc = FUNC_CPedIntelligence_TestForStealthKill;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CPedIntelligence::TestForStealthKill
+    return ((bool(__thiscall*)(CPedIntelligenceSAInterface*, CPedSAInterface*, bool))FUNC_CPedIntelligence_TestForStealthKill)(this->GetInterface(),
+                                                                                                                               pPed->GetPedInterface(), bUnk);
 }
 
 CTaskSimpleUseGunSAInterface* CPedIntelligenceSA::GetTaskUseGun()
 {
-    CTaskSimpleUseGunSAInterface* pTaskUseGun;
-    DWORD                         dwThis = (DWORD)internalInterface;
-    DWORD                         dwFunc = FUNC_CPedIntelligence_GetTaskUseGun;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     pTaskUseGun, eax
-    }
-
-    return pTaskUseGun;
+    // CPedIntelligence::GetTaskUseGun
+    return ((CTaskSimpleUseGunSAInterface*(__thiscall*)(CPedIntelligenceSAInterface*))FUNC_CPedIntelligence_GetTaskUseGun)(this->GetInterface());
 }
 
 CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
