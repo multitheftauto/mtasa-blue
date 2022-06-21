@@ -62,194 +62,98 @@ CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
 BOOL CModelInfoSA::IsBoat()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsBoat ( )");
-    DWORD dwFunction = FUNC_IsBoatModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsBoatModel
+    return ((bool(__cdecl*)(int))FUNC_IsBoatModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsCar()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsCar ( )");
-    DWORD dwFunction = FUNC_IsCarModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsCarModel
+    return ((bool(__cdecl*)(int))FUNC_IsCarModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsTrain()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsTrain ( )");
-    DWORD dwFunction = FUNC_IsTrainModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsTrainModel
+    return ((bool(__cdecl*)(int))FUNC_IsTrainModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsHeli()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsHeli ( )");
-    DWORD dwFunction = FUNC_IsHeliModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsHeliModel
+    return ((bool(__cdecl*)(int))FUNC_IsHeliModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsPlane()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsPlane ( )");
-    DWORD dwFunction = FUNC_IsPlaneModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsPlaneModel
+    return ((bool(__cdecl*)(int))FUNC_IsPlaneModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsBike()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsBike ( )");
-    DWORD dwFunction = FUNC_IsBikeModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsBikeModel
+    return ((bool(__cdecl*)(int))FUNC_IsBikeModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsFakePlane()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsFakePlane ( )");
-    DWORD dwFunction = FUNC_IsFakePlaneModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsFakePlaneModel
+    return ((bool(__cdecl*)(int))FUNC_IsFakePlaneModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsMonsterTruck()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsMonsterTruck ( )");
-    DWORD dwFunction = FUNC_IsMonsterTruckModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsMonsterTruckModel
+    return ((bool(__cdecl*)(int))FUNC_IsMonsterTruckModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsQuadBike()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsQuadBike ( )");
-    DWORD dwFunction = FUNC_IsQuadBikeModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsQuadBikeModel
+    return ((bool(__cdecl*)(int))FUNC_IsQuadBikeModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsBmx()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsBmx ( )");
-    DWORD dwFunction = FUNC_IsBmxModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsBmxModel
+    return ((bool(__cdecl*)(int))FUNC_IsBmxModel)(m_dwModelID);
 }
 
 BOOL CModelInfoSA::IsTrailer()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsTrailer ( )");
-    DWORD dwFunction = FUNC_IsTrailerModel;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return (BOOL)bReturn;
+
+    // CModelInfo::IsTrailerModel
+    return ((bool(__cdecl*)(int))FUNC_IsTrailerModel)(m_dwModelID);
 }
 
 BYTE CModelInfoSA::GetVehicleType()
 {
     DEBUG_TRACE("BOOL CModelInfoSA::IsVehicle ( )");
     // This function will return a vehicle type for vehicles or 0xFF on failure
-    DWORD dwFunction = FUNC_IsVehicleModelType;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = -1;
-    _asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
-    return bReturn;
+
+    // CModelInfo::IsVehicleModelType
+    return ((BYTE(__cdecl*)(int))FUNC_IsVehicleModelType)(m_dwModelID);
 }
 
 bool CModelInfoSA::IsVehicle() const
@@ -276,55 +180,17 @@ BOOL CModelInfoSA::IsUpgrade()
 char* CModelInfoSA::GetNameIfVehicle()
 {
     DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
-    //  if(this->IsVehicle())
-    //  {
-    DWORD dwModelInfo = (DWORD)ARRAY_ModelInfo;
-    DWORD dwFunc = FUNC_CText_Get;
-    DWORD ModelID = m_dwModelID;
-    DWORD dwReturn = 0;
 
-        _asm
-        {
-            push    eax
-            push    ebx
-            push    ecx
+    CVehicleModelInfoSAInterface* pVehicleMI = (CVehicleModelInfoSAInterface*)(ppModelInfo[m_dwModelID]);
 
-            mov     ebx, ModelID
-            lea     ebx, [ebx*4]
-            add     ebx, dword ptr[ARRAY_ModelInfo]
-            mov     eax, [ebx]
-            add     eax, 50
+    // CText::Get
+    return ((char*(__thiscall*)(int, char*))FUNC_CText_Get)(CLASS_CText, pVehicleMI->gameName);
 
-            push    eax
-            mov     ecx, CLASS_CText
-            call    dwFunc
-
-            mov     dwReturn, eax
-
-            pop     ecx
-            pop     ebx
-            pop     eax
-        }
-    return (char*)dwReturn;
-    //  }
-    //  return NULL;
 }
 
 uint CModelInfoSA::GetAnimFileIndex()
 {
-    DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
-    DWORD dwThis = (DWORD)m_pInterface;
-    uint  uiReturn = 0;
-    if (dwFunc)
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-            mov     uiReturn, eax
-        }
-    }
-    return uiReturn;
+    return ((unsigned int(__thiscall*)(CBaseModelInfoSAInterface*))m_pInterface->VFTBL->GetAnimFileIndex)(m_pInterface);
 }
 
 VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
@@ -438,16 +304,9 @@ VOID CModelInfoSA::Remove()
 BYTE CModelInfoSA::GetLevelFromPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )");
-    DWORD dwFunction = FUNC_GetLevelFromPosition;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunction
-        add     esp, 4
-        mov     bReturn, al
-    }
-    return bReturn;
+
+    // ?
+    return 0;//((BYTE(__cdecl*)(CVector*))FUNC_GetLevelFromPosition)(vecPosition);
 }
 
 BOOL CModelInfoSA::IsLoaded()
@@ -489,32 +348,14 @@ BOOL CModelInfoSA::DoIsLoaded()
 
 BYTE CModelInfoSA::GetFlags()
 {
-    DWORD dwFunc = FUNC_GetModelFlags;
-    DWORD ModelID = m_dwModelID;
-    BYTE  bFlags = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunc
-        add     esp, 4
-        mov     bFlags, al
-    }
-    return bFlags;
+    // CStreaming::GetFlags
+    return ((BYTE(__cdecl*)(int))FUNC_GetModelFlags)(m_dwModelID);
 }
 
 CBoundingBox* CModelInfoSA::GetBoundingBox()
 {
-    DWORD         dwFunc = FUNC_GetBoundingBox;
-    DWORD         ModelID = m_dwModelID;
-    CBoundingBox* dwReturn = 0;
-    _asm
-    {
-        push    ModelID
-        call    dwFunc
-        add     esp, 4
-        mov     dwReturn, eax
-    }
-    return dwReturn;
+    // CBoundingBox is actually CBoundingBox + CSphere from CColModel
+    return (CBoundingBox*)(ppModelInfo[m_dwModelID]->pColModel);
 }
 
 bool CModelInfoSA::IsValid()
@@ -535,26 +376,8 @@ bool CModelInfoSA::IsAllocatedInArchive()
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
-    DWORD dwModelInfo = 0;
-    DWORD ModelID = m_dwModelID;
-    FLOAT fReturn = 0;
-    _asm {
-        mov     eax, ModelID
-
-        push    ecx
-        mov     ecx, dword ptr[ARRAY_ModelInfo]
-        mov     eax, dword ptr[ecx + eax*4]
-        pop     ecx
-
-        mov     eax, [eax+20]
-        cmp     eax, 0
-        jz      skip
-        fld     [eax + 8]
-        fchs
-        fstp    fReturn
-skip:
-    }
-    return fReturn;
+    CColModelSAInterface* pColModel = ppModelInfo[m_dwModelID]->pColModel;
+    return pColModel ? -pColModel->m_bounds.m_vecMin.fZ : 0.0f;
 }
 
 unsigned short CModelInfoSA::GetTextureDictionaryID()
@@ -738,12 +561,8 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
-                    _asm
-                    {
-                        mov ecx, pEntity
-                        mov eax, [ecx]
-                        call dword ptr [eax+20h]
-                    }
+                    ((void(__thiscall*)(CEntitySAInterface*))pEntity->vtbl->DeleteRwObject)(pEntity);
+
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -762,12 +581,8 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
-                    _asm
-                    {
-                        mov ecx, pEntity
-                        mov eax, [ecx]
-                        call dword ptr [eax+20h]
-                    }
+                    ((void(__thiscall*)(CEntitySAInterface*))pEntity->vtbl->DeleteRwObject)(pEntity);
+
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -836,13 +651,8 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         // Remove ref added by GTA.
         if (m_pInterface->usNumberOfRefs > 1)
         {
-            DWORD                      dwFunction = FUNC_RemoveRef;
-            CBaseModelInfoSAInterface* pInterface = m_pInterface;
-            _asm
-            {
-                mov     ecx, pInterface
-                call    dwFunction
-            }
+            // CBaseModelInfo::RemoveRef
+            ((void(__thiscall*)(CBaseModelInfoSAInterface*))FUNC_RemoveRef)(m_pInterface);
         }
     }
 
@@ -925,77 +735,34 @@ short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
             mov     ax, [eax+edx*2+0x2D6]
             mov     sreturn, ax
         }
+        // short CVehicleModelInfo::m_asUpgrades[18]
+        //return ((CVehicleModelInfoSAInterface*)ppModelInfo[m_dwModelID])->upgrades[usUpgrade];
     }
     return sreturn;
 }
 
 bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
 {
-    bool  bRet = false;
-    DWORD ModelID = m_dwModelID;
-    _asm
-    {
-        mov     eax, ModelID
-        mov ecx, dword ptr[ARRAY_ModelInfo]
-        mov     ecx, dword ptr[ecx + eax*4]
-
-        mov     eax, posn
-        mov     ecx, [ecx+0x5C]
-        shl     eax, 5
-        push    esi
-        mov     esi, [ecx+eax+0D0h]
-        xor     edx, edx
-        test    esi, esi
-        setnl   dl
-        mov     al, dl
-        pop     esi
-
-        mov     bRet, al
-    }
-    return bRet;
+    CVehicleModelInfoSAInterface* pVehicleMI = (CVehicleModelInfoSAInterface*)ppModelInfo[m_dwModelID];
+    // CVehicleModelInfo::IsUpgradeAvailable
+    return ((bool(__thiscall*)(CVehicleModelInfoSAInterface*, eVehicleUpgradePosn))0x4C8200)(pVehicleMI, posn);
 }
 
 void CModelInfoSA::SetCustomCarPlateText(const char* szText)
 {
-    char* szStoredText;
-    DWORD ModelID = m_dwModelID;
-    _asm
-    {
-        push    ecx
-        mov     ecx, ModelID
-
-        push    eax
-        mov     eax, dword ptr[ARRAY_ModelInfo]
-        mov     ecx, dword ptr[eax + ecx*4]
-        pop     eax
-
-        add     ecx, 40
-        mov     szStoredText, ecx
-        pop     ecx
-    }
-
-    if (szText) strncpy(szStoredText, szText, 8);
-    else szStoredText[0] = 0;
+    CVehicleModelInfoSAInterface* pVehicleMI = (CVehicleModelInfoSAInterface*)ppModelInfo[m_dwModelID];
+    if (szText)
+        strncpy(pVehicleMI->plateText, szText, 8);
+    else
+        pVehicleMI->plateText[0] = 0;
 }
 
 unsigned int CModelInfoSA::GetNumRemaps()
 {
-    DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
-    DWORD        ModelID = m_dwModelID;
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        mov     ecx, ModelID
+    CVehicleModelInfoSAInterface* pVehicleMI = (CVehicleModelInfoSAInterface*)ppModelInfo[m_dwModelID];
 
-        push    eax
-        mov     eax, dword ptr[ARRAY_ModelInfo]
-        mov     ecx, dword ptr[eax + ecx*4]
-        pop     eax
-
-        call    dwFunc
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // CVehicleModelInfo::GetNumRemaps
+    return ((unsigned int(__thiscall*)(CVehicleModelInfoSAInterface*))FUNC_CVehicleModelInfo__GetNumRemaps)(pVehicleMI);
 }
 
 void* CModelInfoSA::GetVehicleSuspensionData()
