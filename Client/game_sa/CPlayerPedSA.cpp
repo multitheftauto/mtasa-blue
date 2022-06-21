@@ -23,25 +23,14 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
 {
     DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( ePedModel pedType )");
     // based on CPlayerPed::SetupPlayerPed (R*)
-    DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
-    DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
 
-    DWORD dwPedPointer = 0;
-    _asm
-    {
-        push    SIZEOF_CPLAYERPED
-        call    CPedOperatorNew
-        add     esp, 4
+    // CPed::operator new
+    CPlayerPedSAInterface* pPlayerPed = ((CPlayerPedSAInterface*(__cdecl*)(unsigned int))FUNC_CPedOperatorNew)(SIZEOF_CPLAYERPED);
 
-        mov     dwPedPointer, eax
+    // CPlayerPed::CPlayerPed
+    ((CPlayerPedSAInterface*(__thiscall*)(CPlayerPedSAInterface*, int, bool))FUNC_CPlayerPedConstructor)(pPlayerPed, 1, false);
 
-        mov     ecx, eax
-        push    0 // set to 0 and they'll behave like AI peds
-        push    1
-        call    CPlayerPedConstructor
-    }
-
-    this->SetInterface((CEntitySAInterface*)dwPedPointer);
+    this->SetInterface(pPlayerPed);
 
     this->Init();            // init our interfaces
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
@@ -135,14 +124,8 @@ CPlayerPedSA::~CPlayerPedSA()
             CWorldSA* world = (CWorldSA*)pGame->GetWorld();
             world->Remove(m_pInterface, CPlayerPed_Destructor);
 
-            DWORD dwThis = (DWORD)m_pInterface;
-            DWORD dwFunc = m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
-            _asm
-            {
-                mov     ecx, dwThis
-                push    1            // delete too
-                call    dwFunc
-            }
+            // CPlayerPed::~CPlayerPed
+            ((void(__thiscall*)(CPlayerPedSAInterface*, bool))m_pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(GetPlayerPedInterface(), true);
         }
         this->BeingDeleted = true;
         ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
@@ -187,15 +170,8 @@ void CPlayerPedSA::SetSprintEnergy(float fSprintEnergy)
 
 void CPlayerPedSA::SetInitialState()
 {
-    DWORD dwUnknown = 1;
-    DWORD dwFunction = FUNC_SetInitialState;
-    DWORD dwThis = (DWORD)m_pInterface;
-    _asm
-    {
-        push    dwUnknown
-        mov     ecx, dwThis
-        call    dwFunction
-    }
+    // CPlayerPed::SetInitialState
+    ((void(__thiscall*)(CPlayerPedSAInterface*, bool))FUNC_SetInitialState)(GetPlayerPedInterface(), true);
 
     // Avoid direction locks for respawning after a jump
     GetPlayerPedInterface()->pedFlags.bIsLanding = false;
@@ -319,13 +295,8 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
     pedInterface->iMoveAnimGroup = (int)iAnimGroup;
 
-    DWORD dwThis = (DWORD)pedInterface;
-    DWORD dwFunc = FUNC_CPlayerPed_ReApplyMoveAnims;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CPlayerPed::ReApplyMoveAnims
+    ((void(__thiscall*)(CPlayerPedSAInterface*))FUNC_CPlayerPed_ReApplyMoveAnims)(GetPlayerPedInterface());
 }
 
 /**
