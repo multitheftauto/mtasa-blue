@@ -93,56 +93,27 @@ CBuildingSA::CBuildingSA(DWORD dwModel)
     }*/
 
     //    EAX=00B71848 (gta_sa.00B71848), ASCII "3999  LODtwintjail1_LAn  13  1785.976563  -1564.859375  25.25  0  0  0.04361938313  0.999048233  -1  "
-    DWORD dwFunc = 0x538690;
-    char  szLoadString[255];
-    DWORD dwThis = 0;
+    char szLoadString[255];
 
     sprintf(szLoadString, "%d NoName 0  0.00  0.00  0.00  0  0  0  1  -1", dwModel);
-    _asm
-    {
-        lea     ecx, szLoadString
-        push    ecx
-        call    dwFunc
-        add     esp, 4
-        mov     dwThis, eax
-    }
 
-    this->SetInterface((CEntitySAInterface*)dwThis);
+    // CFileLoader::LoadObjectInstance
+    CEntitySAInterface* pEntity = ((CEntitySAInterface * (__cdecl*)(const char*))0x538690)(szLoadString);
+
+    this->SetInterface(pEntity);
 
     // DWORD * Index = (DWORD *)0xBCC0D8;
-    MemPutFast<DWORD>(0xBCC0E0, dwThis);
+    MemPutFast<CEntitySAInterface*>(0xBCC0E0, pEntity);
     MemPutFast<DWORD>(0xBCC0D8, 1);
 
-    dwFunc = 0x404DE0;            // CIplStore__SetupRelatedIpls
-    DWORD dwTemp = 0;
-    char  szTemp[255];
-    strcpy(szTemp, "moo");
-    _asm
-    {
-        push    0xBCC0E0
-        push    -1
-        lea     eax, szTemp
-        push    eax
-        call    dwFunc
-        add     esp, 0xC
-        mov     dwTemp, eax
-    }
+    // CIplStore::SetupRelatedIpls
+    int ipl = ((int(__cdecl*)(const char*, short, CEntity**))0x538690)("moo", -1, (CEntity**)0xBCC0E0);
 
-    dwFunc = 0x5B51E0;            // AddBuildingInstancesToWorld
-    _asm
-    {
-        push    dwTemp
-        call    dwFunc
-        add     esp, 4
-    }
+    // AddBuildingInstancesToWorld
+    ((void(__cdecl*)(int))0x5B51E0)(ipl);
 
-    dwFunc = 0x405110;            // CIplStore__RemoveRelatedIpls
-    _asm
-    {
-        push    -1
-        call    dwFunc
-        add     esp, 4
-    }
+    // CIplStore::RemoveRelatedIpls
+    ((void(__cdecl*)(int))0x405110)(-1);
 
     // world->Add(this->GetInterface());
 
@@ -163,14 +134,7 @@ CBuildingSA::~CBuildingSA()
         CWorldSA* world = (CWorldSA*)pGame->GetWorld();
         world->Remove(this->GetInterface(), CBuilding_Destructor);
 
-        DWORD dwThis = (DWORD)this->GetInterface();
-        DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
-        _asm
-        {
-            mov     ecx, dwThis
-            push    1            // delete too
-            call    dwFunc
-        }
+        ((void(__thiscall*)(void*, bool))GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR)(GetInterface(), true);
 
         this->BeingDeleted = true;
         //((CPoolsSA *)pGame->GetPools())->RemoveBuilding((CBuilding *)(CBuildingSA *)this);
