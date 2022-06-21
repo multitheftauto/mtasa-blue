@@ -16,19 +16,10 @@ CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CEntity* pEntity,
     m_pInterface = new CPedDamageResponseCalculatorSAInterface;
     m_bDestroyInterface = true;
 
-    DWORD dwEntityInterface = (DWORD)pEntity->GetInterface();
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Constructor;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    b_1
-        push    bodyPart
-        push    weaponType
-        push    fDamage
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    // CPedDamageResponseCalculator::CPedDamageResponseCalculator
+    ((CPedDamageResponseCalculatorSAInterface*
+      (__thiscall*)(CPedDamageResponseCalculatorSAInterface*, CEntitySAInterface*, float, eWeaponType, ePedPieceTypes, bool))
+         FUNC_CPedDamageResponseCalculator_Constructor)(m_pInterface, pEntity->GetInterface(), fDamage, weaponType, bodyPart, b_1);
 }
 
 CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CPedDamageResponseCalculatorSAInterface* pInterface)
@@ -41,29 +32,17 @@ CPedDamageResponseCalculatorSA::~CPedDamageResponseCalculatorSA()
 {
     if (m_bDestroyInterface)
     {
-        DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Destructor;
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        // CPedDamageResponseCalculator::~CPedDamageResponseCalculator
+        ((void(__thiscall*)(CPedDamageResponseCalculatorSAInterface*))FUNC_CPedDamageResponseCalculator_Destructor)(m_pInterface);
+
         delete m_pInterface;
     }
 }
 
 void CPedDamageResponseCalculatorSA::ComputeDamageResponse(CPed* pPed, CPedDamageResponse* pDamageResponse, bool bSpeak)
 {
-    DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    DWORD dwResponseInterface = (DWORD)pDamageResponse->GetInterface();
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CPedDamageResponseCalculator_ComputeDamageResponse;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    bSpeak
-        push    dwResponseInterface
-        push    dwPedInterface
-        call    dwFunc
-    }
+    // CPedDamageResponseCalculator::ComputeDamageResponse
+    ((void(__thiscall*)(CPedDamageResponseCalculatorSAInterface*, CPedSAInterface*, CPedDamageResponseSAInterface*,
+                        bool))FUNC_CPedDamageResponseCalculator_ComputeDamageResponse)(m_pInterface, pPed->GetPedInterface(), pDamageResponse->GetInterface(),
+                                                                                       bSpeak);
 }
