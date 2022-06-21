@@ -18,32 +18,13 @@ using CHeli_PostSearchLightCone_t = int(__cdecl*)();
 void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow,
                               CEntity* pAffected)
 {
-    DWORD dwEntityInterface = 0;
-    if (pAffected)
-        dwEntityInterface = (DWORD)pAffected->GetInterface();
-    DWORD dwFunc = FUNC_CPointLights_AddLight;
-    float fPosX = vecPosition.fX, fPosY = vecPosition.fY, fPosZ = vecPosition.fZ;
-    float fDirX = vecDirection.fX, fDirY = vecDirection.fY, fDirZ = vecDirection.fZ;
+    CEntitySAInterface* pEntityInterface = pAffected ? pAffected->GetInterface() : nullptr;
+
     float fRed = (float)color.R / 255, fGreen = (float)color.G / 255, fBlue = (float)color.B / 255;
-    _asm
-    {
-        push    dwEntityInterface
-        push    bCreatesShadow
-        push    uc_8
-        push    fBlue
-        push    fGreen
-        push    fRed
-        push    fRadius
-        push    fDirZ
-        push    fDirY
-        push    fDirX
-        push    fPosZ
-        push    fPosY
-        push    fPosX
-        push    iMode
-        call    dwFunc
-        add     esp, 56
-    }
+
+    // CPointLights::AddLight
+    ((void(__cdecl*)(unsigned char, CVector, CVector, float, float, float, float, unsigned char, bool, CEntitySAInterface*))FUNC_CPointLights_AddLight)(
+        iMode, vecPosition, vecDirection, fRadius, fRed, fGreen, fBlue, uc_8, bCreatesShadow, pEntityInterface);
 }
 
 void CPointLightsSA::PreRenderHeliLights()
