@@ -17,13 +17,10 @@
 VOID CFireSA::Extinguish()
 {
     DEBUG_TRACE("VOID CFireSA::Extinguish (  )");
-    DWORD dwFunction = FUNC_Extinguish;
-    DWORD dwPointer = (DWORD)this->internalInterface;
-    _asm
-    {
-        mov     ecx, dwPointer
-        call    dwFunction
-    }
+
+    // CFire::Extinguish
+    ((void(__thiscall*)(CFireSAInterface*))(FUNC_Extinguish))(this->internalInterface);
+
     this->internalInterface->bActive = FALSE;
 }
 
@@ -187,16 +184,8 @@ VOID CFireSA::Ignite()
     DEBUG_TRACE("VOID CFireSA::Ignite( )");
     this->internalInterface->bActive = TRUE;
 
-    CVector* vecPosition = this->GetPosition();
-    DWORD    dwFunc = FUNC_CreateFxSysForStrength;
-    DWORD    dwThis = (DWORD)this->internalInterface;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    0
-        push    vecPosition
-        call    dwFunc
-    }
+    // CFire::CreateFxSysForStrength
+    ((void(__thiscall*)(CFireSAInterface*, CVector*, RwMatrix*))(FUNC_CreateFxSysForStrength))(this->internalInterface, GetPosition(), nullptr);
 
     this->internalInterface->bBeingExtinguished = 0;
     this->internalInterface->bFirstGeneration = 1;
