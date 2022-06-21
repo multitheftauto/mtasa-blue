@@ -18,21 +18,9 @@ CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType w
     m_bDestroyInterface = true;
     m_DamageReason = EDamageReason::OTHER;
 
-    DWORD dwEntityInterface = (DWORD)pEntity->GetInterface();
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_Constructor;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    b_4
-        push    b_3
-        push    uc_2
-        push    hitZone
-        push    weaponType
-        push    i_1
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    // CEventDamage::CEventDamage
+    ((CEventDamageSAInterface*(__thiscall*)(CEventDamageSAInterface*, CEntitySAInterface*, unsigned int, eWeaponType, ePedPieceTypes, unsigned char, bool, bool))
+         FUNC_CEventDamage_Constructor)(m_pInterface, pEntity->GetInterface(), i_1, weaponType, hitZone, uc_2, b_3, b_4);
 }
 
 CEventDamageSA::CEventDamageSA(CEventDamageSAInterface* pInterface)
@@ -49,13 +37,9 @@ CEventDamageSA::~CEventDamageSA()
 
     if (m_bDestroyInterface)
     {
-        DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = FUNC_CEventDamage_Destructor;
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        // CEventDamage::~CEventDamage
+        ((void(__thiscall*)(CEventDamageSAInterface*))FUNC_CEventDamage_Destructor)(m_pInterface);
+
         delete m_pInterface;
     }
 }
@@ -74,114 +58,48 @@ CEntity* CEventDamageSA::GetInflictingEntity()
 
 bool CEventDamageSA::HasKilledPed()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_HasKilledPed;
-    bool  bReturn = false;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CEventDamage::HasKilledPed
+    return ((bool(__thiscall*)(CEventDamageSAInterface*))FUNC_CEventDamage_HasKilledPed)(m_pInterface);
 }
 
 float CEventDamageSA::GetDamageApplied()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_GetDamageApplied;
-    float fReturn = 0.0f;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        fstp    fReturn
-    }
-    return fReturn;
+    // CEventDamage::GetDamageApplied
+    return ((float(__thiscall*)(CEventDamageSAInterface*))FUNC_CEventDamage_GetDamageApplied)(m_pInterface);
 }
 
 AssocGroupId CEventDamageSA::GetAnimGroup()
 {
-    DWORD        dwThis = (DWORD)m_pInterface;
-    DWORD        dwFunc = FUNC_CEventDamage_GetAnimGroup;
-    AssocGroupId animGroup = 0;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     animGroup, eax
-    }
-    return animGroup;
+    // CEventDamage::GetAnimGroup
+    return ((AssocGroupId(__thiscall*)(CEventDamageSAInterface*))FUNC_CEventDamage_GetAnimGroup)(m_pInterface);
 }
 
 AnimationId CEventDamageSA::GetAnimId()
 {
-    DWORD       dwThis = (DWORD)m_pInterface;
-    DWORD       dwFunc = FUNC_CEventDamage_GetAnimId;
-    AnimationId animID = 0;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     animID, eax
-    }
-    return animID;
+    // CEventDamage::GetAnimGroup
+    return ((AnimationId(__thiscall*)(CEventDamageSAInterface*))FUNC_CEventDamage_GetAnimId)(m_pInterface);
 }
 
 bool CEventDamageSA::GetAnimAdded()
 {
-    bool  bReturn;
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CEventDamage::GetAnimAdded
+    return ((bool(__thiscall*)(CEventDamageSAInterface*))FUNC_CEventDamage_GetAnimAdded)(m_pInterface);
 }
 
 void CEventDamageSA::ComputeDeathAnim(CPed* pPed, bool bUnk)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwPed = (DWORD)pPed->GetInterface();
-    DWORD dwFunc = FUNC_CEventDamage_ComputeDeathAnim;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-    }
+    // CEventDamage::ComputeDeathAnim
+    ((void(__thiscall*)(CEventDamageSAInterface*, CEntitySAInterface*, bool))FUNC_CEventDamage_ComputeDeathAnim)(m_pInterface, pPed->GetInterface(), bUnk);
 }
 
 void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwPed = (DWORD)pPed->GetInterface();
-    DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-    }
+    // CEventDamage::ComputeDamageAnim
+    ((void(__thiscall*)(CEventDamageSAInterface*, CEntitySAInterface*, bool))FUNC_CEventDamage_ComputeDamageAnim)(m_pInterface, pPed->GetInterface(), bUnk);
 }
 
 bool CEventDamageSA::AffectsPed(CPed* pPed)
 {
-    bool  bReturn;
-    DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_AffectsPed;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    dwPedInterface
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CEventDamage::AffectsPed
+    return ((bool(__thiscall*)(CEventDamageSAInterface*, CEntitySAInterface*))FUNC_CEventDamage_AffectsPed)(m_pInterface, pPed->GetInterface());
 }
