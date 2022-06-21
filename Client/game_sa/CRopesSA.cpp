@@ -17,17 +17,13 @@ CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface(*)[8])0xB768B8
 int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
 {
     int      iReturn;
-    DWORD    dwFunc = FUNC_CRopes_CreateRopeForSwatPed;
-    CVector* pvecPosition = const_cast<CVector*>(&vecPosition);
+
     // First Push @ 0x558D1D is the duration.
     MemPut((void*)(dwDurationAddress), dwDuration);
-    _asm
-    {
-        push    pvecPosition
-        call    dwFunc
-        add     esp, 0x4
-        mov     iReturn, eax
-    }
+
+    // CRopes::CreateRopeForSwatPed
+    iReturn = ((int(__cdecl*)(const CVector&))FUNC_CRopes_CreateRopeForSwatPed)(vecPosition);
+
     // Set it back for SA in case we ever do some other implementation.
     MemPut((DWORD*)(dwDurationAddress), 4000);
     return iReturn;
