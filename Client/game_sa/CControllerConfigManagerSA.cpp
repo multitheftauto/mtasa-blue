@@ -32,56 +32,29 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
 {
-    DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
-    _asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    iKey
-        push    action
-        call    dwFunc
-    }
+    // CControllerConfigManager::SetControllerKeyAssociatedWithAction
+    ((void(__thiscall*)(int, eControllerAction, int, eControllerType))(FUNC_SetControllerKeyAssociatedWithAction))(
+        CLASS_CControllerConfigManager, action, iKey, controllerType);
 }
 
 int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
-    int   iReturn = 0;
-    DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
-    _asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    action
-        call    dwFunc
-        mov     iReturn, eax
-    }
-    return iReturn;
+    // CControllerConfigManager::GetControllerKeyAssociatedWithAction
+    return ((int(__thiscall*)(int, eControllerAction, eControllerType))(FUNC_GetControllerKeyAssociatedWithAction))(
+        CLASS_CControllerConfigManager, action, controllerType);
 }
 
 int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction action)
 {
-    int   iReturn = 0;
-    DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
-    _asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    action
-        call    dwFunc
-        mov     iReturn, eax
-    }
-    return iReturn;
+    // CControllerConfigManager::GetNumOfSettingsForAction
+    return ((int(__thiscall*)(int, eControllerAction))(FUNC_GetNumOfSettingsForAction))(CLASS_CControllerConfigManager, action);
 }
 
 void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
-    DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
-    _asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    action
-        call    dwFunc
-    }
+    // CControllerConfigManager::ClearSettingsAssociatedWithAction
+    ((void(__thiscall*)(int, eControllerAction, eControllerType))(FUNC_ClearSettingsAssociatedWithAction))(
+        CLASS_CControllerConfigManager, action, controllerType);
 }
 
 void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
