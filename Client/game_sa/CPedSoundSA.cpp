@@ -28,71 +28,32 @@ void CPedSoundSA::SetVoiceID(short sVoiceID)
 
 bool CPedSoundSA::IsSpeechDisabled()
 {
-    bool  bReturn;
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAEPedSound__IsSpeedDisabled;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CPedSound::IsSpeechDisabled
+    return ((bool(__thiscall*)(CPedSoundSAInterface*))FUNC_CAEPedSound__IsSpeedDisabled)(m_pInterface);
 }
 
 void CPedSoundSA::EnablePedSpeech()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAEPedSound__EnablePedSpeech;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CPedSound::EnablePedSpeech
+    ((void(__thiscall*)(CPedSoundSAInterface*))FUNC_CAEPedSound__EnablePedSpeech)(m_pInterface);
 }
 
 void CPedSoundSA::DisablePedSpeech(bool bStopCurrent)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAEPedSound__DisablePedSpeech;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    bStopCurrent
-        call    dwFunc
-    }
+    // CPedSound::DisablePedSpeech
+    ((void(__thiscall*)(CPedSoundSAInterface*, bool))FUNC_CAEPedSound__DisablePedSpeech)(m_pInterface, bStopCurrent);
 }
 
 short CPedSoundSA::GetVoiceTypeIDFromName(const char* szVoiceTypeName)
 {
-    DWORD dwFunc = (DWORD)FUNC_CAEPedSound__GetAudioPedType;
-    short sVoiceTypeID;
-
-    _asm
-    {
-        push    szVoiceTypeName
-        call    dwFunc
-        add     esp, 4
-        mov     sVoiceTypeID, ax
-    }
-    return sVoiceTypeID;
+    // CAEPedSpeechAudioEntity::GetAudioPedType
+    return ((short(__cdecl*)(const char*))FUNC_CAEPedSound__GetAudioPedType)(szVoiceTypeName);
 }
 
 short CPedSoundSA::GetVoiceIDFromName(short sVoiceTypeID, const char* szVoiceName)
 {
-    DWORD dwFunc = (DWORD)FUNC_CAEPedSound__GetVoice;
-    short sVoiceID;
-
-    _asm
-    {
-        movzx eax, sVoiceTypeID
-        push    eax
-        push    szVoiceName
-        call    dwFunc
-        add     esp, 8
-        mov     sVoiceID, ax
-    }
-    return sVoiceID;
+    // CAEPedSpeechAudioEntity::GetVoice
+    return ((short(__cdecl*)(const char*, short))FUNC_CAEPedSound__GetVoice)(szVoiceName, sVoiceTypeID);
 }
 
 short CPedSoundSA::GetVoiceIDFromName(const char* szVoiceTypeName, const char* szVoiceName)
