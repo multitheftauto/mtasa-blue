@@ -16,67 +16,32 @@ extern CGameSA* pGame;
 CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, CVector effectorVec, int pivotBoneTag, CEntity* pEntity, int offsetBoneTag,
                                            CVector offsetPos, float speed, int time, int blendTime)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleIKChain__Constructor;
     // TODO: Find out the real size
     this->CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwEntityInterface = 0;
-    if (pEntity)
-        dwEntityInterface = (DWORD)pEntity->GetInterface();
-    float fEffectorX = effectorVec.fX, fEffectorY = effectorVec.fY, fEffectorZ = effectorVec.fZ;
-    float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    blendTime
-        push    time
-        push    speed
-        push    fZ
-        push    fY
-        push    fX
-        push    offsetBoneTag
-        push    dwEntityInterface
-        push    pivotBoneTag
-        push    fEffectorZ
-        push    fEffectorY
-        push    fEffectorX
-        push    effectorBoneTag
-        push    idString
-        call    dwFunc
-    }
+
+    CEntitySAInterface* pEntityInterface = pEntity ? pEntity->GetInterface() : nullptr;
+
+    // CTaskSimpleIKChain::CTaskSimpleIKChain
+    ((void*(__thiscall*)(CTaskSAInterface*, char*, int, CVector, int, CEntitySAInterface*, int, CVector, float, int, int))FUNC_CTaskSimpleIKChain__Constructor)(
+        this->GetInterface(), idString, effectorBoneTag, effectorVec, pivotBoneTag, pEntityInterface, offsetBoneTag, offsetPos, speed, time, blendTime);
 }
 
 CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso,
                                              float speed, int blendTime, int m_priority)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleIKLookAt__Constructor;
     // TODO: Find out the real size
     this->CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwEntityInterface = 0;
-    if (pEntity)
-        dwEntityInterface = (DWORD)pEntity->GetInterface();
-    float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    m_priority
-        push    blendTime
-        push    speed
-        push    useTorso
-        push    fZ
-        push    fY
-        push    fX
-        push    offsetBoneTag
-        push    time
-        push    dwEntityInterface
-        push    idString
-        call    dwFunc
-    }
+
+    CEntitySAInterface* pEntityInterface = pEntity ? pEntity->GetInterface() : nullptr;
+
+    // CTaskSimpleIKLookAt::CTaskSimpleIKLookAt
+    ((void*(__thiscall*)(CTaskSAInterface*, char*, CEntitySAInterface*, int, int, CVector, unsigned char, float, int,
+                         int))FUNC_CTaskSimpleIKLookAt__Constructor)(this->GetInterface(), idString, pEntityInterface, time, offsetBoneTag, offsetPos, useTorso,
+                                                                     speed, blendTime, m_priority);
 }
 
 CTaskSimpleIKManagerSA::CTaskSimpleIKManagerSA()
@@ -143,29 +108,14 @@ CTaskSimpleIKChain* CTaskSimpleIKManagerSA::GetTaskAtSlot(int slotID)
 CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso, float speed,
                                                        int blendTime, int priority)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleTriggerLookAt__Constructor;
     // TODO: Find out the real size
     this->CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwEntityInterface = 0;
-    if (pEntity)
-        dwEntityInterface = (DWORD)pEntity->GetInterface();
-    float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    priority
-        push    blendTime
-        push    speed
-        push    useTorso
-        push    fZ
-        push    fY
-        push    fX
-        push    offsetBoneTag
-        push    time
-        push    dwEntityInterface
-        call    dwFunc
-    }
+
+    CEntitySAInterface* pEntityInterface = pEntity ? pEntity->GetInterface() : nullptr;
+
+    // CTaskSimpleTriggerLookAt::CTaskSimpleTriggerLookAt
+    ((void*(__thiscall*)(CTaskSAInterface*, CEntitySAInterface*, int, int, CVector, unsigned char, float, int, int))FUNC_CTaskSimpleTriggerLookAt__Constructor)(
+        this->GetInterface(), pEntityInterface, time, offsetBoneTag, offsetPos, useTorso, speed, blendTime, priority);
 }
