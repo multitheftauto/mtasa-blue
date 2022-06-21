@@ -18,21 +18,14 @@
 FLOAT CDoorSA::GetAngleOpenRatio()
 {
     DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
-    DWORD dwFunction = FUNC_GetAngleOpenRatio;
-    DWORD dwPointer = (DWORD)GetInterface();
-    FLOAT fReturn = 0.0f;
 
-    if (dwPointer != 0)
+    if (GetInterface())
     {
-        _asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            fstp    fReturn
-        }
+        // CDoor::GetAngleOpenRatio
+        return ((float(__thiscall*)(CDoorSAInterface*))(FUNC_GetAngleOpenRatio))(GetInterface());
     }
 
-    return fReturn;
+    return 0.0f;
 }
 
 /**
@@ -42,21 +35,14 @@ FLOAT CDoorSA::GetAngleOpenRatio()
 BOOL CDoorSA::IsClosed()
 {
     DEBUG_TRACE("BOOL CDoorSA::IsClosed (  )");
-    DWORD dwFunction = FUNC_IsClosed;
-    DWORD dwPointer = (DWORD)GetInterface();
-    BYTE  bReturn = 0;
 
-    if (dwPointer != 0)
+    if (GetInterface())
     {
-        _asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            mov     bReturn, al
-        }
+        // CDoor::IsClosed
+        return ((bool(__thiscall*)(CDoorSAInterface*))(FUNC_IsClosed))(GetInterface());
     }
 
-    return bReturn;
+    return FALSE;
 }
 
 /**
@@ -67,21 +53,14 @@ BOOL CDoorSA::IsClosed()
 BOOL CDoorSA::IsFullyOpen()
 {
     DEBUG_TRACE("BOOL CDoorSA::IsFullyOpen (  )");
-    DWORD dwFunction = FUNC_IsFullyOpen;
-    DWORD dwPointer = (DWORD)GetInterface();
-    BYTE  bReturn = 0;
 
-    if (dwPointer != 0)
+    if (GetInterface())
     {
-        _asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            mov     bReturn, al
-        }
+        // CDoor::IsFullyOpen
+        return ((bool(__thiscall*)(CDoorSAInterface*))(FUNC_IsFullyOpen))(GetInterface());
     }
 
-    return bReturn;
+    return FALSE;
 }
 
 /**
@@ -92,16 +71,10 @@ BOOL CDoorSA::IsFullyOpen()
 VOID CDoorSA::Open(float fOpenRatio)
 {
     DEBUG_TRACE("VOID CDoorSA::Open ( float fOpenRatio )");
-    DWORD dwFunction = FUNC_Open;
-    DWORD dwPointer = (DWORD)GetInterface();
 
-    if (dwPointer != 0)
+    if (GetInterface())
     {
-        _asm
-        {
-            mov     ecx, dwPointer
-            push    fOpenRatio
-            call    dwFunction
-        }
+        // CDoor::Open
+        ((void(__thiscall*)(CDoorSAInterface*, float))(FUNC_Open))(GetInterface(), fOpenRatio);
     }
 }
