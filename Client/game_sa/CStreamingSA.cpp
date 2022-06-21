@@ -52,25 +52,13 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
 {
     if (IsUpgradeModelId(dwModelID))
     {
-        DWORD dwFunc = FUNC_RequestVehicleUpgrade;
-        _asm
-        {
-            push    dwFlags
-            push    dwModelID
-            call    dwFunc
-            add     esp, 8
-        }
+        // CStreaming::RequestVehicleUpgrade
+        ((void(__cdecl*)(int, int))FUNC_RequestVehicleUpgrade)(dwModelID, dwFlags);
     }
     else
     {
-        DWORD dwFunction = FUNC_CStreaming__RequestModel;
-        _asm
-        {
-            push    dwFlags
-            push    dwModelID
-            call    dwFunction
-            add     esp, 8
-        }
+        // CStreaming::RequestModel
+        ((void(__cdecl*)(int, int))FUNC_CStreaming__RequestModel)(dwModelID, dwFlags);
     }
 }
 
@@ -85,14 +73,8 @@ void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* 
 {
     TIMEUS startTime = GetTimeUs();
 
-    DWORD dwFunction = FUNC_LoadAllRequestedModels;
-    DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
-    _asm
-    {
-        push    dwOnlyPriorityModels
-        call    dwFunction
-        add     esp, 4
-    }
+    // CStreaming::LoadAllRequestedModels
+    ((void(__cdecl*)(bool))FUNC_LoadAllRequestedModels)(bOnlyPriorityModels);
 
     if (IS_TIMING_CHECKPOINTS())
     {
@@ -106,45 +88,20 @@ BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
 {
     if (IsUpgradeModelId(dwModelID))
     {
-        bool  bReturn;
-        DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
-        _asm
-        {
-            push    dwModelID
-            call    dwFunc
-            add     esp, 0x4
-            mov     bReturn, al
-        }
-        return bReturn;
+        // CStreaming::HasVehicleUpgradeLoaded
+        return ((bool(__cdecl*)(int))FUNC_CStreaming__HasVehicleUpgradeLoaded)(dwModelID);
     }
     else
     {
-        DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-        BOOL  bReturn = 0;
-        _asm
-        {
-            push    dwModelID
-            call    dwFunc
-            movzx   eax, al
-            mov     bReturn, eax
-            pop     eax
-        }
-
-        return bReturn;
+        // CStreaming::HasModelLoaded
+        return ((bool(__cdecl*)(int))FUNC_CStreaming__HasModelLoaded)(dwModelID);
     }
 }
 
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
-    DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
-    _asm
-    {
-        push    channel
-        push    szTexture
-        push    model
-        call    dwFunc
-        add     esp, 0xC
-    }
+    // CStreaming::RequestSpecialModel
+    ((void(__cdecl*)(int, const char*, int))FUNC_CStreaming_RequestSpecialModel)(model, szTexture, channel);
 }
 
 CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint32 id)
