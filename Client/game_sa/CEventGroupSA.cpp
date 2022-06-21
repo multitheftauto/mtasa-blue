@@ -13,17 +13,8 @@
 
 CEvent* CEventGroupSA::Add(CEvent* pEvent, bool b_1)
 {
-    CEventSAInterface* pReturnInterface = NULL;
-    DWORD              dwEventInterface = (DWORD)pEvent->GetInterface();
-    DWORD              dwThis = (DWORD)m_pInterface;
-    DWORD              dwFunc = FUNC_CEventGroup_Add;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    b_1
-        push    dwEventInterface
-        call    dwFunc
-        mov     pReturnInterface, eax
-    }
-    return NULL;
+    // CEventGroup::Add
+    ((CEventSAInterface*(__cdecl*)(CEventGroupSAInterface*, CEventSAInterface*, bool))FUNC_CEventGroup_Add)(m_pInterface, pEvent->GetInterface(), b_1);
+
+    return nullptr;
 }
