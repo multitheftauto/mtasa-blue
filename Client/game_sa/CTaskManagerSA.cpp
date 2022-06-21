@@ -31,22 +31,10 @@ void CTaskManagerSA::SetTask(CTaskSA* pTaskPrimary, const int iTaskPriority, con
 {
     DEBUG_TRACE("void CTaskManagerSA::SetTask(CTask* pTaskPrimary, const int iTaskPriority, const bool bForceNewTask)");
 
-    DWORD             dwFunc = FUNC_SetTask;
-    CTaskSAInterface* taskInterface = NULL;
-    if (pTaskPrimary)
-        taskInterface = pTaskPrimary->GetInterface();
+    CTaskSAInterface* pTaskInterface = pTaskPrimary ? pTaskPrimary->GetInterface() : nullptr;
 
-    DWORD dwInterface = (DWORD)this->GetInterface();
-    _asm
-    {
-        xor     eax, eax
-        movzx   eax, bForceNewTask
-        push    eax
-        push    iTaskPriority
-        push    taskInterface
-        mov     ecx, dwInterface
-        call    dwFunc
-    }
+    // CTaskManager::SetTask
+    ((void(__thiscall*)(void*, CTaskSAInterface*, int, bool))FUNC_SetTask)(GetInterface(), pTaskInterface, iTaskPriority, bForceNewTask);
 }
 
 CTask* CTaskManagerSA::GetTask(const int iTaskPriority)
@@ -59,94 +47,69 @@ CTask* CTaskManagerSA::GetTask(const int iTaskPriority)
 CTask* CTaskManagerSA::GetActiveTask()
 {
     DEBUG_TRACE("CTask* CTaskManagerSA::GetActiveTask()");
-    DWORD dwFunc = FUNC_GetActiveTask;
-    DWORD dwReturn = 0;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
 
-    CTaskSAInterface* pActiveTask = (CTaskSAInterface*)dwReturn;
-    if (dwReturn)
-        return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else
-        return NULL;
+    // CTaskManager::GetActiveTask
+    CTaskSAInterface* pTaskInterface = ((CTaskSAInterface * (__thiscall*)(CTaskManagerSAInterface*)) FUNC_GetActiveTask)(this->GetInterface());
+
+    if (pTaskInterface)
+        return m_pTaskManagementSystem->GetTask(pTaskInterface);
+
+    return nullptr;
 }
 
 CTask* CTaskManagerSA::GetSimplestActiveTask()
 {
     DEBUG_TRACE("CTask* CTaskManagerSA::GetSimplestActiveTask()");
-    DWORD dwFunc = FUNC_GetSimplestActiveTask;
-    DWORD dwReturn = 0;
-    DWORD dwThis = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    // CTaskManager::GetSimplestActiveTask
+    CTaskSAInterface* pTaskInterface = ((CTaskSAInterface * (__thiscall*)(CTaskManagerSAInterface*)) FUNC_GetSimplestActiveTask)(this->GetInterface());
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    if (pTaskInterface)
+        return m_pTaskManagementSystem->GetTask(pTaskInterface);
+
+    return nullptr;
 }
 
 CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
 {
     DEBUG_TRACE("CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)");
-    DWORD dwFunc = FUNC_GetSimplestTask;
-    DWORD dwReturn = 0;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        push    iPriority
-        call    dwFunc
-        mov     dwReturn, eax
-    }
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    // CTaskManager::GetSimplestTask
+    CTaskSAInterface* pTaskInterface =
+        ((CTaskSAInterface * (__thiscall*)(CTaskManagerSAInterface*, int)) FUNC_GetSimplestTask)(this->GetInterface(), iPriority);
+
+    if (pTaskInterface)
+        return m_pTaskManagementSystem->GetTask(pTaskInterface);
+
+    return nullptr;
 }
 
 CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
 {
     DEBUG_TRACE("CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)");
-    DWORD dwFunc = FUNC_FindActiveTaskByType;
-    DWORD dwReturn = 0;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        push    iTaskType
-        call    dwFunc
-        mov     dwReturn, eax
-    }
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    // CTaskManager::FindActiveTaskByType
+    CTaskSAInterface* pTaskInterface =
+        ((CTaskSAInterface * (__thiscall*)(CTaskManagerSAInterface*, int)) FUNC_FindActiveTaskByType)(this->GetInterface(), iTaskType);
+
+    if (pTaskInterface)
+        return m_pTaskManagementSystem->GetTask(pTaskInterface);
+
+    return nullptr;
 }
 
 CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
 {
     DEBUG_TRACE("CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)");
-    DWORD dwFunc = FUNC_FindTaskByType;
-    DWORD dwReturn = 0;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        push    iTaskType
-        push    iPriority
-        call    dwFunc
-        mov     dwReturn, eax
-    }
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    // CTaskManager::FindTaskByType
+    CTaskSAInterface* pTaskInterface =
+        ((CTaskSAInterface * (__thiscall*)(CTaskManagerSAInterface*, int, int)) FUNC_FindTaskByType)(this->GetInterface(), iPriority, iTaskType);
+
+    if (pTaskInterface)
+        return m_pTaskManagementSystem->GetTask(pTaskInterface);
+
+    return nullptr;
 }
 
 void CTaskManagerSA::RemoveTaskSecondary(const int iTaskPriority)
@@ -157,18 +120,11 @@ void CTaskManagerSA::RemoveTaskSecondary(const int iTaskPriority)
 void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
 {
     DEBUG_TRACE("void CTaskManagerSA::SetTaskSecondary(CTask* pTaskSecondary, const int iType)");
-    DWORD             dwFunc = FUNC_SetTaskSecondary;
-    CTaskSAInterface* taskInterface = NULL;
-    if (pTaskSecondary)
-        taskInterface = pTaskSecondary->GetInterface();
-    DWORD dwInterface = (DWORD)this->GetInterface();
-    _asm
-    {
-        push    iType
-        push    taskInterface
-        mov     ecx, dwInterface
-        call    dwFunc
-    }
+
+    CTaskSAInterface* pTaskInterface = pTaskSecondary ? pTaskSecondary->GetInterface() : nullptr;
+
+    // CTaskManager::SetTaskSecondary
+    ((void(__thiscall*)(void*, CTaskSAInterface*, int))FUNC_SetTaskSecondary)(GetInterface(), pTaskInterface, iType);
 }
 
 /**
@@ -186,25 +142,17 @@ CTask* CTaskManagerSA::GetTaskSecondary(const int iType)
 bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)
 {
     DEBUG_TRACE("bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)");
-    DWORD dwFunc = FUNC_HasTaskSecondary;
-    bool  bReturn = false;
-    _asm
-    {
-        push    pTaskSecondary
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // was not called as thiscall and pushes CTask* where it should be CTaskSAInterface*
+    // CTaskManager::HasTaskSecondary
+    return ((bool(__thiscall*)(void*, const CTask*))FUNC_HasTaskSecondary)(GetInterface(), pTaskSecondary);
 }
 
 void CTaskManagerSA::ClearTaskEventResponse()
 {
     DEBUG_TRACE("void CTaskManagerSA::ClearTaskEventResponse()");
-    DWORD dwFunc = FUNC_ClearTaskEventResponse;
-    _asm
-    {
-        call    dwFunc
-    }
+
+    // CTaskManager::ClearTaskEventResponse
+    ((void(__thiscall*)(void*))FUNC_ClearTaskEventResponse)(GetInterface());
 }
 
 void CTaskManagerSA::Flush(const int iPriority)
