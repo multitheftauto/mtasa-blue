@@ -31,16 +31,10 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
     this->CreateTaskInterface(sizeof(CTaskSimpleChokingSAInterface));
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    ebx
-        push    bIsTearGas
-        push    pAttackerInterface
-        call    dwFunc
-        pop     ebx
-    }
+
+    // CTaskSimpleChoking::CTaskSimpleChoking
+    ((void*(__thiscall*)(void*, CPedSAInterface*, unsigned char))FUNC_CTaskSimpleChoking__Constructor)(
+        this->GetInterface(), pAttackerInterface, bIsTearGas);
 }
 
 CPed* CTaskSimpleChokingSA::GetAttacker()
@@ -91,15 +85,7 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
             pAttackerInterface = pAttackerSA->GetPedInterface();
     }
 
-    // Call the func
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = FUNC_CTaskSimpleChoking__UpdateChoke;
-    _asm
-    {
-        mov         ecx, dwThisInterface
-        push        bIsTearGas
-        push        pAttackerInterface
-        push        pPedInterface
-        call        dwFunc
-    }
+    // CTaskSimpleChoking::UpdateChoke
+    ((void(__thiscall*)(void*, CPedSAInterface*, CPedSAInterface*, unsigned char))FUNC_CTaskSimpleChoking__UpdateChoke)(
+        this->GetInterface(), pPedInterface, pAttackerInterface, bIsTearGas);
 }
