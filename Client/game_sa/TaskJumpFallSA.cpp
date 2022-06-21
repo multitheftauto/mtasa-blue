@@ -21,20 +21,10 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTar
     this->CreateTaskInterface(sizeof(CTaskSimpleClimbSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleClimb__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    bForceClimb
-        push    nHeight
-        push    nSurfaceType
-        push    fHeading
-        push    vecTarget
-        push    pClimbEnt
-        call    dwFunc
-    }
+ 
+    // CTaskSimpleClimb::CTaskSimpleClimb
+    ((CTaskSAInterface*(__thiscall*)(CTaskSAInterface*, CEntity*, const CVector&, float, unsigned char, char, const bool))
+         FUNC_CTaskSimpleClimb__Constructor)(this->GetInterface(), pClimbEnt, vecTarget, fHeading, nSurfaceType, nHeight, bForceClimb);
 }
 
 // ##############################################################################
@@ -48,16 +38,8 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     this->CreateTaskInterface(sizeof(CTaskSimpleJetPackSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleJetPack__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    0               // pTargetEnt - ignored for simplicity's sake (we really don't need it)
-        push    nHoverTime
-        push    fCruiseHeight
-        push    pVecTargetPos
-        call    dwFunc
-    }
+    // CTaskSimpleJetPack::CTaskSimpleJetPack
+    ((CTaskSAInterface*(__thiscall*)(CTaskSAInterface*, const CVector*, float, int, CEntitySAInterface*))FUNC_CTaskSimpleJetPack__Constructor)(
+        this->GetInterface(), pVecTargetPos, fCruiseHeight, nHoverTime, nullptr);
 }
