@@ -139,16 +139,11 @@ BYTE CPickupSA::IsNearby()
 VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
 {
     DEBUG_TRACE("VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)");
-    DWORD GiveUsAPickUpObject = FUNC_GIVEUSAPICKUP;
-    DWORD dwObject = (DWORD) & (this->GetInterface()->pObject);
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        push    ForcedObjectIndex
-        push    dwObject
-        mov     ecx, dwThis
-        call    GiveUsAPickUpObject
-    }
+
+    // CPickup::GiveUsAPickUpObject
+    ((void(__thiscall*)(CPickupSAInterface*, CObjectSAInterface**, int))FUNC_GIVEUSAPICKUP)(this->GetInterface(), &this->GetInterface()->pObject,
+                                                                                            ForcedObjectIndex);
+
     if (this->GetInterface()->pObject)
     {
         if (this->object)
@@ -177,13 +172,8 @@ VOID CPickupSA::GetRidOfObjects()
 
 VOID CPickupSA::Remove()
 {
-    DWORD dwFunc = FUNC_CPickup_Remove;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CPickup::GiveUsAPickUpObject
+    ((void(__thiscall*)(CPickupSAInterface*))FUNC_CPickup_Remove)(this->GetInterface());
 
     // CPickup::Remove also destroys the owned object, so we need to delete our CObjectSA class
     if (this->object)
