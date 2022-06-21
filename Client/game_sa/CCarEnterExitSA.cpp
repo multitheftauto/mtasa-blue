@@ -13,71 +13,37 @@
 
 bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector* pVector, int* pDoor)
 {
-    DWORD dwFunc = FUNC_GetNearestCarDoor;
-    bool  bReturn = false;
-
     CPedSA*     pPedSA = dynamic_cast<CPedSA*>(pPed);
     CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
 
     if (pPedSA && pVehicleSA)
     {
-        CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
-        CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-        _asm
-        {
-            push    pDoor
-            push    pVector
-            push    pVehicleInterface
-            push    pPedInterface
-            call    dwFunc
-            add     esp, 0x10
-            mov     bReturn, al
-        }
+        // CCarEnterExit::GetNearestCarDoor
+        return ((bool(__cdecl*)(CPedSAInterface*, CVehicleSAInterface*, CVector*, int*))(FUNC_GetNearestCarDoor))(
+            pPedSA->GetPedInterface(), pVehicleSA->GetVehicleInterface(), pVector, pDoor);
     }
 
-    return bReturn;
+    return false;
 }
 
 bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle, CVector* pVector, int* pDoor, bool bUnknown, bool bUnknown2,
                                                  bool bCheckIfRoomToGetIn)
 {
-    DWORD dwFunc = FUNC_GetNearestCarPassengerDoor;
-    bool  bReturn = false;
-
     CPedSA*     pPedSA = dynamic_cast<CPedSA*>(pPed);
     CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
 
     if (pPedSA && pVehicleSA)
     {
-        CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
-        CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-        _asm
-        {
-            push    ebx
-            xor     ebx, ebx
-            mov     bl, bCheckIfRoomToGetIn
-            push    ebx
-            mov     bl, bUnknown2
-            push    ebx
-            mov     bl, bUnknown
-            push    ebx
-            push    pDoor
-            push    pVector
-            push    pVehicleInterface
-            push    pPedInterface
-            call    dwFunc
-            add     esp, 0x1C
-            mov     bReturn, al
-            pop     ebx
-        }
+        // CCarEnterExit::GetNearestCarPassengerDoor
+        return ((bool(__cdecl*)(CPedSAInterface*, CVehicleSAInterface*, CVector*, int*, bool, bool, bool))(FUNC_GetNearestCarPassengerDoor))(
+            pPedSA->GetPedInterface(), pVehicleSA->GetVehicleInterface(), pVector, pDoor, bUnknown, bUnknown2, bCheckIfRoomToGetIn);
     }
 
-    return bReturn;
+    return false;
 }
 
 int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
 {
-    DWORD dwFunc = FUNC_ComputeTargetDoorToExit;
     int   door = -1;
 
     CPedSA*     pPedSA = dynamic_cast<CPedSA*>(pPed);
@@ -85,16 +51,9 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
 
     if (pPedSA && pVehicleSA)
     {
-        CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
-        CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-        _asm
-        {
-            push    pPedInterface
-            push    pVehicleInterface
-            call    dwFunc
-            add     esp, 8
-            mov     door, eax
-        }
+        // CCarEnterExit::ComputeTargetDoorToExit
+        door = ((int(__cdecl*)(CVehicleSAInterface*, CPedSAInterface*))(FUNC_ComputeTargetDoorToExit))(pVehicleSA->GetVehicleInterface(),
+                                                                                                      pPedSA->GetPedInterface());
 
         switch (door)
         {
@@ -158,9 +117,6 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
 
 bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown)
 {
-    DWORD dwFunc = FUNC_IsRoomForPedToLeaveCar;
-    bool  bRet = true;
-
     if (iDoor >= 0 && iDoor <= 5)
     {
         static int  s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
@@ -168,18 +124,10 @@ bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVec
         DWORD       dwIdx = s_iCarNodeIndexes[iDoor];
         if (pVehicleSA)
         {
-            CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
-            _asm
-            {
-                push    pUnknown
-                push    dwIdx
-                push    pVehicleInterface
-                call    dwFunc
-                add     esp, 12
-                mov     bRet, al
-            }
+            // CCarEnterExit::IsRoomForPedToLeaveCar
+            return ((bool(__cdecl*)(CVehicleSAInterface*, int, CVector*))(FUNC_IsRoomForPedToLeaveCar))(pVehicleSA->GetVehicleInterface(), dwIdx, pUnknown);
         }
     }
 
-    return bRet;
+    return true;
 }
