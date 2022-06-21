@@ -45,6 +45,8 @@ VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnF
             // Set it
             internalInterface->Door[bDoor] = bDoorStatus;
 
+            CAutomobileSAInterface* pAutomobile = (CAutomobileSAInterface*)internalEntityInterface;
+
             // Are we making it intact?
             if (bDoorStatus == DT_DOOR_INTACT || bDoorStatus == DT_DOOR_SWINGING_FREE)
             {
@@ -52,32 +54,14 @@ VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnF
                 static int s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
 
                 // Call CAutomobile::FixDoor to update the model
-                DWORD dwFunc = 0x6A35A0;
-                DWORD dwThis = (DWORD)internalEntityInterface;
-                int   iCarNodeIndex = s_iCarNodeIndexes[bDoor];
-                DWORD dwDoor = (DWORD)bDoor;
-                _asm
-                {
-                    mov     ecx, dwThis
-                    push    dwDoor
-                    push    iCarNodeIndex
-                    call    dwFunc
-                }
+                // CAutomobile::FixDoor
+                ((void(__thiscall*)(CAutomobileSAInterface*, int, int))(0x6A35A0))(pAutomobile, s_iCarNodeIndexes[bDoor], bDoor);
             }
             else
             {
                 // Call CAutomobile::SetDoorDamage to update the model
-                DWORD dwFunc = 0x6B1600;
-                DWORD dwThis = (DWORD)internalEntityInterface;
-                DWORD dwDoor = (DWORD)bDoor;
-                bool  bQuiet = !spawnFlyingComponent;
-                _asm
-                {
-                    mov     ecx, dwThis
-                    push    bQuiet
-                    push    dwDoor
-                    call    dwFunc
-                }
+                // CAutomobile::SetDoorDamage
+                ((void(__thiscall*)(CAutomobileSAInterface*, int, bool))(0x6B1600))(pAutomobile, bDoor, !spawnFlyingComponent);
             }
         }
     }
@@ -114,18 +98,10 @@ VOID CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
         // Different than already?
         if (GetPanelStatus(bPanel) != bPanelStatus)
         {
-            // Call the function to set it
-            DWORD dwFunction = FUNC_SetPanelStatus;
-            DWORD dwThis = (DWORD)internalInterface;
-            DWORD dwPanel = bPanel;
-            DWORD dwStatus = bPanelStatus;
-            _asm
-            {
-                mov     ecx, dwThis
-                push    dwStatus
-                push    dwPanel
-                call    dwFunction
-            }
+            // CDamageManager::SetPanelStatus
+            ((void(__thiscall*)(CDamageManagerSAInterface*, unsigned char, int))(FUNC_SetPanelStatus))(internalInterface, bPanel, bPanelStatus);
+
+            CAutomobileSAInterface* pAutomobile = (CAutomobileSAInterface*)internalEntityInterface;
 
             // Intact?
             if (bPanelStatus == DT_PANEL_INTACT)
@@ -134,30 +110,15 @@ VOID CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
                 static int s_iCarNodeIndexes[7] = {0x0F, 0x0E, 0x00 /*?*/, 0x00 /*?*/, 0x12, 0x0C, 0x0D};
 
                 //  Call CAutomobile::FixPanel to update the vehicle
-                dwFunction = 0x6A3670;
-                dwThis = (DWORD)internalEntityInterface;
-                int iCarNodeIndex = s_iCarNodeIndexes[bPanel];
-                _asm
-                {
-                    mov     ecx, dwThis
-                    push    dwPanel
-                    push    iCarNodeIndex
-                    call    dwFunction
-                }
+                // CAutomobile::FixPanel
+                ((void(__thiscall*)(CAutomobileSAInterface*, int, int))(0x6A3670))(pAutomobile, s_iCarNodeIndexes[bPanel], bPanel);
             }
             else
             {
                 // Call CAutomobile::SetPanelDamage to update the vehicle
-                dwFunction = 0x6B1480;
-                dwThis = (DWORD)internalEntityInterface;
-                bool bUnknown = false;
-                _asm
-                {
-                    mov     ecx, dwThis
-                    push    bUnknown
-                    push    dwPanel
-                    call    dwFunction
-                }
+
+                // CAutomobile::SetPanelDamage
+                ((void(__thiscall*)(CAutomobileSAInterface*, int, bool))(0x6B1480))(pAutomobile, bPanel, false);
             }
         }
     }
@@ -179,19 +140,9 @@ BYTE CDamageManagerSA::GetPanelStatus(BYTE bPanel)
     if (bPanel < MAX_PANELS)
     {
         DEBUG_TRACE("BYTE CDamageManagerSA::GetPanelStatus ( BYTE bPannel )");
-        DWORD dwFunction = FUNC_GetPanelStatus;
-        DWORD dwPointer = (DWORD)internalInterface;
-        BYTE  bReturn = 0;
-        DWORD dwPanel = bPanel;
-        _asm
-        {
-            mov     ecx, dwPointer
-            push    dwPanel
-            call    dwFunction
-            mov     bReturn, al
-        }
 
-        return bReturn;
+        // CDamageManager::GetPanelStatus
+        return ((BYTE(__thiscall*)(CDamageManagerSAInterface*, int))(FUNC_GetPanelStatus))(internalInterface, bPanel);
     }
 
     return 0;
@@ -205,17 +156,9 @@ unsigned long CDamageManagerSA::GetPanelStatus()
 VOID CDamageManagerSA::SetLightStatus(BYTE bLight, BYTE bLightStatus)
 {
     DEBUG_TRACE("BYTE CDamageManagerSA::SetLightStatus ( BYTE bLight, BYTE bLightStatus )");
-    DWORD dwFunction = FUNC_SetLightStatus;
-    DWORD dwPointer = (DWORD)internalInterface;
-    DWORD dwLight = bLight;
-    DWORD dwStatus = bLightStatus;
-    _asm
-    {
-        mov     ecx, dwPointer
-        push    dwStatus
-        push    dwLight
-        call    dwFunction
-    }
+
+    // CDamageManager::SetLightStatus
+    ((void(__thiscall*)(CDamageManagerSAInterface*, int, int))(FUNC_SetLightStatus))(internalInterface, bLight, bLightStatus);
 }
 
 void CDamageManagerSA::SetLightStatus(unsigned char ucStatus)
@@ -226,18 +169,9 @@ void CDamageManagerSA::SetLightStatus(unsigned char ucStatus)
 BYTE CDamageManagerSA::GetLightStatus(BYTE bLight)
 {
     DEBUG_TRACE("BYTE CDamageManagerSA::GetLightStatus ( BYTE bLight )");
-    DWORD dwFunction = FUNC_GetLightStatus;
-    DWORD dwPointer = (DWORD)internalInterface;
-    BYTE  bReturn = 0;
-    DWORD dwLight = bLight;
-    _asm
-    {
-        mov     ecx, dwPointer
-        push    dwLight
-        call    dwFunction
-        mov     bReturn, al
-    }
-    return bReturn;
+
+    // CDamageManager::SetLightStatus
+    return ((BYTE(__thiscall*)(CDamageManagerSAInterface*, int))(FUNC_GetLightStatus))(internalInterface, bLight);
 }
 
 unsigned char CDamageManagerSA::GetLightStatus()
@@ -248,44 +182,22 @@ unsigned char CDamageManagerSA::GetLightStatus()
 VOID CDamageManagerSA::SetAeroplaneCompStatus(BYTE CompID, BYTE Status)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::SetAeroplaneCompStatus( BYTE CompID, BYTE Status)");
-    DWORD dwFunction = FUNC_SetAeroplaneCompStatus;
-    DWORD dwPointer = (DWORD)internalInterface;
-    DWORD dwPannel = CompID;
-    _asm
-    {
-        mov     ecx, dwPointer
-        push    Status
-        push    dwPannel
-        call    dwFunction
-    }
+
+    // CDamageManager::SetAeroplaneCompStatus
+    ((void(__thiscall*)(CDamageManagerSAInterface*, int, uint))(FUNC_SetAeroplaneCompStatus))(internalInterface, CompID, Status);
 }
 
 BYTE CDamageManagerSA::GetAeroplaneCompStatus(BYTE CompID)
 {
     DEBUG_TRACE("BYTE CDamageManagerSA::GetAeroplaneCompStatus( BYTE CompID )");
-    DWORD dwFunction = FUNC_GetAeroplaneCompStatus;
-    DWORD dwPointer = (DWORD)internalInterface;
-    BYTE  bReturn = 0;
-    DWORD dwPannel = CompID;
-    _asm
-    {
-        mov     ecx, dwPointer
-        push    dwPannel
-        call    dwFunction
-        mov     bReturn, al
-    }
-    return bReturn;
+
+    // CDamageManager::GetAeroplaneCompStatus
+    return ((BYTE(__thiscall*)(CDamageManagerSAInterface*, int))(FUNC_GetAeroplaneCompStatus))(internalInterface, CompID);
 }
 
 VOID CDamageManagerSA::FuckCarCompletely(BOOL bKeepWheels)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::FuckCarCompletely ( BOOL bKeepWheels )");
-    DWORD dwFunc = FUNC_FuckCarCompletely;
-    DWORD dwPointer = (DWORD)internalInterface;
-    _asm
-    {
-        mov     ecx, dwPointer
-        push    bKeepWheels
-        call    dwFunc
-    }
+    // CDamageManager::FuckCarCompletely
+    ((void(__thiscall*)(CDamageManagerSAInterface*, bool))(FUNC_FuckCarCompletely))(internalInterface, bKeepWheels);
 }
