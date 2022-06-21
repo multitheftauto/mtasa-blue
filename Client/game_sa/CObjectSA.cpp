@@ -166,26 +166,19 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 
 #else
 
-    DWORD CObjectCreate = FUNC_CObject_Create;
-    DWORD dwObjectPtr = 0;
-    _asm
+    CObjectSAInterface* pObject = ((CObjectSAInterface*(__cdecl*)(int, bool)) FUNC_CObject_Create)(dwModel, true);
+
+    if (pObject)
     {
-        push    1
-        push    dwModel
-        call    CObjectCreate
-        add     esp, 8
-        mov     dwObjectPtr, eax
-    }
-    if (dwObjectPtr)
-    {
-        this->SetInterface((CEntitySAInterface*)dwObjectPtr);
+        this->SetInterface(pObject);
 
         world->Add(m_pInterface, CObject_Constructor);
 
         // Setup some flags
         this->BeingDeleted = FALSE;
         this->DoNotRemoveFromGame = FALSE;
-        MemPutFast<BYTE>(dwObjectPtr + 316, 6);
+        pObject->pad1 = 6;
+
         if (bBreakingDisabled)
         {
             // Set our immunities
@@ -233,13 +226,7 @@ CObjectSA::~CObjectSA()
                 CWorldSA* world = (CWorldSA*)pGame->GetWorld();
                 world->Remove(pInterface, CObject_Destructor);
 
-                DWORD dwFunc = pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
-                _asm
-                {
-                    mov     ecx, pInterface
-                    push    1            // delete too
-                    call    dwFunc
-                }
+                ((void(__thiscall*)(void*))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface);
 
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
                 DWORD dwModelID = this->internalInterface->m_nModelIndex;
@@ -273,55 +260,23 @@ CObjectSA::~CObjectSA()
 
 void CObjectSA::Explode()
 {
-    DWORD dwFunc = FUNC_CObject_Explode;
-    DWORD dwThis = (DWORD)this->GetInterface();
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CObject::Explode
+    ((void(__thiscall*)(CObjectSAInterface*))FUNC_CObject_Explode)(GetObjectInterface());
 }
 
 void CObjectSA::Break()
 {
-    DWORD dwFunc = 0x5A0D90;
-    DWORD dwThis = (DWORD)GetInterface();
-
     float fHitVelocity = 1000.0f;            // has no direct influence, but should be high enough to trigger the break (effect)
 
-    _asm
-    {
-        push    32h // most cases: between 30 and 37
-        push    0 // colliding entity. To ignore it, we can set it to 0
-        push    0B73710h // vecCollisionImpactVelocity
-        push    0 // vecCollisionLastPos
-        push    fHitVelocity
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CObject::ObjectDamage
+    ((void(__thiscall*)(CObjectSAInterface*, float, CVector*, CVector*, CEntitySAInterface*, eWeaponType))0x5A0D90)(
+        GetObjectInterface(), fHitVelocity, nullptr, (CVector*)0xB73710, nullptr, WEAPONTYPE_RUNOVERBYCAR);
 
     if (IsGlass())
     {
-        float fX = 0.0f;
-        float fY = 0.0f;
-        float fZ = 0.0f;
-        dwFunc = FUNC_CGlass_WindowRespondsToCollision;
-
-        _asm
-        {
-            push 0
-            push fZ
-            push fY
-            push fX
-            push 0
-            push 0
-            push 0
-            push fHitVelocity
-            push dwThis
-            call dwFunc
-            add esp, 24h
-        }
+        // CGlass::WindowRespondsToCollision
+        ((void(__cdecl*)(CEntitySAInterface*, float, CVector, CVector, bool))FUNC_CGlass_WindowRespondsToCollision)(GetObjectInterface(), fHitVelocity,
+                                                                                                                    CVector(0, 0, 0), CVector(0, 0, 0), false);
     }
 }
 
@@ -338,22 +293,10 @@ float CObjectSA::GetHealth()
 void CObjectSA::SetModelIndex(unsigned long ulModel)
 {
     // Delete any existing RwObject first
-    DWORD dwFunc = this->GetInterface()->vtbl->DeleteRwObject;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-        {
-        mov     ecx, dwThis
-        call    dwFunc
-        }
+    ((void(__thiscall*)(CObjectSAInterface*))GetInterface()->vtbl->DeleteRwObject)(GetObjectInterface());
 
     // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
-    dwFunc = this->GetInterface()->vtbl->SetModelIndex;
-    _asm
-        {
-        mov     ecx, dwThis
-        push    ulModel
-        call    dwFunc
-        }
+    ((void(__thiscall*)(CObjectSAInterface*, int))GetInterface()->vtbl->SetModelIndex)(GetObjectInterface(), ulModel);
 
     CheckForGangTag();
 }
@@ -380,18 +323,8 @@ void CObjectSA::CheckForGangTag()
 
 bool CObjectSA::IsGlass()
 {
-    DWORD dwFunc = 0x46A760;
-    DWORD dwThis = (DWORD)GetInterface();
-    bool  bResult;
-
-    _asm
-    {
-        push dwThis
-        call dwFunc
-        mov bResult, al
-        add esp, 4
-    }
-    return bResult;
+    // CGlass::IsObjectGlass
+    return ((bool(__cdecl*)(CObjectSAInterface*))0x46A760)(GetObjectInterface());
 }
 
 void CObjectSA::SetScale(float fX, float fY, float fZ)
