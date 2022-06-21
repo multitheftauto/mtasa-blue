@@ -32,20 +32,10 @@ CFireManagerSA::~CFireManagerSA()
 VOID CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 {
     DEBUG_TRACE("VOID CFireManagerSA::ExtinguishPoint ( CVector & vecPosition, float fRadius )");
-    FLOAT fX = vecPosition.fX;
-    FLOAT fY = vecPosition.fY;
-    FLOAT fZ = vecPosition.fZ;
-    DWORD dwFunction = FUNC_ExtinguishPoint;
 
-    _asm
-    {
-        mov     ecx, CLASS_CFireManager
-        push    fRadius
-        push    fZ
-        push    fY
-        push    fX
-        call    dwFunction
-    }
+    // CFireManager::ExtinguishPoint
+    ((void(__thiscall*)(int, float, float, float, float))FUNC_ExtinguishPoint)(CLASS_CFireManager, vecPosition.fX, vecPosition.fY,
+                                                                                                    vecPosition.fZ, fRadius);
 }
 
 CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
