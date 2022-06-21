@@ -66,49 +66,26 @@ CVector* CPhysicalSA::GetTurnSpeed(CVector* vecTurnSpeed)
 CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
 {
     DEBUG_TRACE("CVector * CPhysicalSA::GetMoveSpeed(CVector * vecMoveSpeed)");
-    DWORD dwFunc = FUNC_GetMoveSpeed;
-    DWORD dwThis = (DWORD)((CPhysicalSAInterface*)this->GetInterface());
-    DWORD dwReturn = 0;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
-    MemCpyFast(vecMoveSpeed, (void*)dwReturn, sizeof(CVector));
+
+    *vecMoveSpeed = GetPhysicalInterface()->m_vecLinearVelocity;
+
     return vecMoveSpeed;
 }
 
 CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
 {
     DEBUG_TRACE("CVector * CPhysicalSA::GetTurnSpeed(CVector * vecTurnSpeed)");
-    DWORD dwFunc = FUNC_GetTurnSpeed;
-    DWORD dwThis = (DWORD)((CPhysicalSAInterface*)this->GetInterface());
-    DWORD dwReturn = 0;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
-    MemCpyFast(vecTurnSpeed, (void*)dwReturn, sizeof(CVector));
+
+    *vecTurnSpeed = GetPhysicalInterface()->m_vecAngularVelocity;
+
     return vecTurnSpeed;
 }
 
 VOID CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)");
-    DWORD dwFunc = FUNC_GetMoveSpeed;
-    DWORD dwThis = (DWORD)((CPhysicalSAInterface*)this->GetInterface());
-    DWORD dwReturn = 0;
 
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
-    MemCpyFast((void*)dwReturn, vecMoveSpeed, sizeof(CVector));
+    GetPhysicalInterface()->m_vecLinearVelocity = *vecMoveSpeed;
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
     {
@@ -121,7 +98,7 @@ VOID CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
 
-    ((CPhysicalSAInterface*)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
+    GetPhysicalInterface()->m_vecAngularVelocity = *vecTurnSpeed;
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
     {
@@ -193,26 +170,15 @@ void CPhysicalSA::SetCenterOfMass(CVector& vecCenterOfMass)
 VOID CPhysicalSA::ProcessCollision()
 {
     DEBUG_TRACE("VOID CPhysicalSA::ProcessCollision()");
-    DWORD dwFunc = FUNC_ProcessCollision;
-    DWORD dwThis = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CPhysical::ProcessCollision
+    ((void(__thiscall*)(CPhysicalSAInterface*))FUNC_ProcessCollision)(GetPhysicalInterface());
 }
 
 void CPhysicalSA::AddToMovingList()
 {
-    DWORD dwFunc = FUNC_CPhysical_AddToMovingList;
-    DWORD dwThis = (DWORD)GetInterface();
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CPhysical::AddToMovingList
+    ((void(__thiscall*)(CPhysicalSAInterface*))FUNC_CPhysical_AddToMovingList)(GetPhysicalInterface());
 }
 
 float CPhysicalSA::GetDamageImpulseMagnitude()
@@ -280,47 +246,25 @@ void CPhysicalSA::AttachEntityToEntity(CPhysical& Entity, const CVector& vecPosi
 void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, bool bUnk)
 {
     DEBUG_TRACE("void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnk, bool bUnk)");
-    DWORD dwFunc = FUNC_DetatchEntityFromEntity;
-    DWORD dwThis = (DWORD)this->GetInterface();
 
     // DetachEntityFromEntity appears to crash when there's no entity attached (0x544403, bug 2350)
     // So do a NULL check here
-    if (((CPhysicalSAInterface*)this->GetInterface())->m_pAttachedEntity == NULL)
+    if (GetPhysicalInterface()->m_pAttachedEntity == NULL)
         return;
 
-    _asm
-    {
-        push    bUnk
-        push    fUnkZ
-        push    fUnkY
-        push    fUnkX
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CPhysical::DettachEntityFromEntity
+    ((void(__thiscall*)(CPhysicalSAInterface*, float, float, float, bool))FUNC_DetatchEntityFromEntity)(GetPhysicalInterface(), fUnkX, fUnkY, fUnkZ, bUnk);
 }
 
 bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation)
 {
     DEBUG_TRACE("bool CPhysicalSA::AttachEntityToEntity(CPhysical * entityToAttach, CVector * vecPosition, CVector * vecRotation)");
-    DWORD dwFunc = FUNC_AttachEntityToEntity;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    DWORD dwReturn = 0;
-    _asm
-    {
-        mov     ecx, vecRotation
-        push    [ecx+8]
-        push    [ecx+4]
-        push    [ecx]
-        mov     ecx, vecPosition
-        push    [ecx+8]
-        push    [ecx+4]
-        push    [ecx]
-        push    dwEntityInterface
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
-    return (dwReturn != NULL);
+
+    // CPhysical::DettachEntityFromEntity
+    CEntitySAInterface* pEntity = ((CEntitySAInterface*(__thiscall*)(CPhysicalSAInterface*, CEntitySAInterface*, CVector, CVector))
+                                       FUNC_AttachEntityToEntity)(GetPhysicalInterface(), (CEntitySAInterface*)dwEntityInterface, *vecPosition, *vecRotation);
+
+    return pEntity != nullptr;
 }
 
 void CPhysicalSA::GetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)

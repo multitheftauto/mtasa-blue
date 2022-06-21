@@ -123,6 +123,8 @@ public:
     void         SetMoveSpeed(CVector* vecMoveSpeed);
     void         SetTurnSpeed(CVector* vecTurnSpeed);
 
+    CPhysicalSAInterface* GetPhysicalInterface() { return (CPhysicalSAInterface*)m_pInterface; };
+
     float GetMass();
     void  SetMass(float fMass);
     float GetTurnMass();
