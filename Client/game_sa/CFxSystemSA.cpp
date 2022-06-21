@@ -35,13 +35,8 @@ CFxSystemSA::~CFxSystemSA()
 
 void CFxSystemSA::PlayAndKill()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_FxSystem_c__PlayAndKill;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // FxSystem_c::PlayAndKill
+    ((void(__thiscall*)(CFxSystemSAInterface*))(FUNC_FxSystem_c__PlayAndKill))(m_pInterface);
 }
 
 void CFxSystemSA::GetMatrix(CMatrix& matrix)
