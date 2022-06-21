@@ -14,21 +14,10 @@
 CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
                                         bool bSoundEnable)
 {
-    const CVector*        pvecPosition = &vecPosition;
-    DWORD                 dwThis = (DWORD)m_pInterface;
-    DWORD                 dwFunc = FUNC_FxManager_c__CreateFxSystem;
-    CFxSystemSAInterface* pFxSystem;
 
-    _asm
-    {
-        mov     ecx, dwThis
-        push    bSkipCameraFrustumCheck
-        push    pRwMatrixTag
-        push    pvecPosition
-        push    szBlueprint
-        call    dwFunc
-        mov     pFxSystem, eax
-    }
+    // FxManager_c::CreateFxSystem
+    CFxSystemSAInterface* pFxSystem = ((CFxSystemSAInterface*(__thiscall*)(CFxManagerSAInterface*, const char*, const CVector&, RwMatrix*, unsigned char))
+                  FUNC_FxManager_c__CreateFxSystem)(m_pInterface, szBlueprint, vecPosition, pRwMatrixTag, bSkipCameraFrustumCheck);
 
     if (pFxSystem)
     {
@@ -43,17 +32,8 @@ CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& 
 
 void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_FxManager_c__DestroyFxSystem;
-
-    void* pFxSA = pFxSystem->GetInterface();
-
-    _asm
-    {
-        mov     ecx, dwThis
-        push    pFxSA
-        call    dwFunc
-    }
+    // FxManager_c::DestroyFxSystem
+    ((void(__thiscall*)(CFxManagerSAInterface*, void*))FUNC_FxManager_c__DestroyFxSystem)(m_pInterface, pFxSystem->GetInterface());
 }
 
 //
