@@ -48,31 +48,20 @@ CCameraSA::~CCameraSA()
 VOID CCameraSA::Restore()
 {
     DEBUG_TRACE("VOID CCameraSA::Restore()");
-    DWORD               dwFunc = FUNC_Restore;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    _asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-    }
+
+    // CCamera::Restore
+    ((void(__thiscall*)(CCameraSAInterface*))FUNC_Restore)(GetInterface());
 }
 
 VOID CCameraSA::RestoreWithJumpCut()
 {
     DEBUG_TRACE("VOID CCameraSA::RestoreWithJumpCut()");
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    DWORD               dwFunc = 0x50BD40;
-    _asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-    }
-    dwFunc = 0x50BAB0;
-    _asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-    }
+
+    // CCamera::SetCameraDirectlyBehindForFollowPed_CamOnAString
+    ((void(__thiscall*)(CCameraSAInterface*))0x50BD40)(GetInterface());
+
+    // CCamera::RestoreWithJumpCut
+    ((void(__thiscall*)(CCameraSAInterface*))0x50BAB0)(GetInterface()); 
 }
 
 /**
@@ -86,60 +75,22 @@ VOID CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
     if (!pEntitySA)
         return;
 
-    CEntitySAInterface* entityInterface = pEntitySA->GetInterface();
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    // __thiscall
-
-    DWORD CCamera__TakeControl = FUNC_TakeControl;
-    _asm
-    {
-        mov ecx, cameraInterface
-        push 1
-        push CamSwitchStyle
-        push CamMode
-        push entityInterface
-        call CCamera__TakeControl
-    }
+    // CCamera::TakeControl
+    ((void(__thiscall*)(CCameraSAInterface*, CEntitySAInterface*, short, short, int))FUNC_TakeControl)(GetInterface(), pEntitySA->GetInterface(), CamMode,
+                                                                                                       CamSwitchStyle, SCRIPT_CAM_CONTROL);
 }
 
 VOID CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
 {
     DEBUG_TRACE("VOID CCameraSA::TakeControl(CVector * position, int CamSwitchStyle)");
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    // __thiscall
+
     CVector vecOffset;
-    /*  vecOffset.fZ = 0.5f;
-        vecOffset.fY = 0.5f;
-        vecOffset.fX = 0.5f;*/
-    /*  DWORD dwFunc = 0x50BEC0;
-        _asm
-        {
-            mov ecx, cameraInterface
-            lea     eax, vecOffset
-            push    eax
-            push    position
-            call    dwFunc
-        }*/
 
-    DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
-    _asm
-        {
-        mov ecx, cameraInterface
-        push 1
-        push CamSwitchStyle
-        push position
-        call CCamera__TakeControlNoEntity
-        }
+    // CCamera::TakeControlNoEntity
+    ((void(__thiscall*)(CCameraSAInterface*, CVector&, int, int))FUNC_TakeControlNoEntity)(GetInterface(), *position, CamSwitchStyle, SCRIPT_CAM_CONTROL);
 
-    DWORD dwFunc = 0x50BEC0;
-    _asm
-    {
-        mov ecx, cameraInterface
-        lea     eax, vecOffset
-        push    eax
-        push    position
-        call    dwFunc
-    }
+    // CCamera::SetCamPositionForFixedMode
+    ((void(__thiscall*)(CCameraSAInterface*, CVector&, CVector&))0x50BEC0)(GetInterface(), *position, vecOffset);
 }
 
 // vecOffset: an offset from 0,0,0
@@ -171,26 +122,13 @@ VOID CCameraSA::TakeControlAttachToEntity(CEntity* TargetEntity, CEntity* Attach
     if (!attachEntityInterface)
         return;
 
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    // __thiscall
-
     //  void    TakeControlAttachToEntity(CEntity* NewTarget, CEntity* AttachEntity,
     //  CVector& vecOffset, CVector& vecLookAt, float fTilt, short CamSwitchStyle,
     //  int WhoIsTakingControl=SCRIPT_CAM_CONTROL);
-    DWORD CCamera__TakeControlAttachToEntity = FUNC_TakeControlAttachToEntity;
 
-    _asm
-    {
-        mov ecx, cameraInterface
-        push 1
-        push CamSwitchStyle
-        push fTilt
-        push vecLookAt
-        push vecOffset
-        push attachEntityInterface
-        push targetEntityInterface
-        call CCamera__TakeControlAttachToEntity
-    }
+    // CCamera::TakeControlAttachToEntity
+    ((void(__thiscall*)(CCameraSAInterface*, CEntitySAInterface*, CEntitySAInterface*, CVector&, CVector&, float, short, int))FUNC_TakeControlAttachToEntity)(
+        GetInterface(), targetEntityInterface, attachEntityInterface, *vecOffset, *vecLookAt, fTilt, CamSwitchStyle, SCRIPT_CAM_CONTROL);
 }
 
 // LSOD recovery
@@ -282,51 +220,25 @@ VOID CCameraSA::SetMatrix(CMatrix* matrix)
 
 VOID CCameraSA::SetCamPositionForFixedMode(CVector* vecPosition, CVector* vecUpOffset)
 {
-    DWORD               dwFunc = FUNC_SetCamPositionForFixedMode;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    _asm
-    {
-        mov     ecx, cameraInterface
-        push    vecUpOffset
-        push    vecPosition
-        call    dwFunc
-    }
+    // CCamera::SetCamPositionForFixedMode
+    ((void(__thiscall*)(CCameraSAInterface*, CVector&, CVector&))FUNC_SetCamPositionForFixedMode)(GetInterface(), *vecPosition, *vecUpOffset);
 }
 
 VOID CCameraSA::Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget)
 {
     DEBUG_TRACE("VOID CCameraSA::Find3rdPersonCamTargetVector ( FLOAT fDistance, CVector * vecGunMuzzle, CVector * vecSource, CVector * vecTarget )");
-    FLOAT               fOriginX = vecGunMuzzle->fX;
-    FLOAT               fOriginY = vecGunMuzzle->fY;
-    FLOAT               fOriginZ = vecGunMuzzle->fZ;
-    DWORD               dwFunc = FUNC_Find3rdPersonCamTargetVector;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    _asm
-    {
-        mov     ecx, cameraInterface
-        push    vecTarget
-        push    vecSource
-        push    fOriginZ
-        push    fOriginY
-        push    fOriginX
-        push    fDistance
-        call    dwFunc
-    }
+
+    // CCamera::Find3rdPersonCamTargetVector
+    ((void(__thiscall*)(CCameraSAInterface*, float, float, float, float, CVector&, CVector&))FUNC_Find3rdPersonCamTargetVector)(
+        GetInterface(), fDistance, vecGunMuzzle->fX, vecGunMuzzle->fY, vecGunMuzzle->fZ, *vecSource, *vecTarget);
 }
 
 float CCameraSA::Find3rdPersonQuickAimPitch()
 {
     DEBUG_TRACE("float CCameraSA::Find3rdPersonQuickAimPitch ( void )");
-    float               fReturn;
-    DWORD               dwFunc = FUNC_Find3rdPersonQuickAimPitch;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    _asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-        fstp    fReturn
-    }
-    return fReturn;
+
+    // CCamera::Find3rdPersonQuickAimPitch
+    return ((float(__thiscall*)(CCameraSAInterface*))FUNC_Find3rdPersonQuickAimPitch)(GetInterface());
 }
 
 BYTE CCameraSA::GetActiveCam()
@@ -405,6 +317,7 @@ VOID CCameraSA::SetCarZoom(float fCarZoom)
 bool CCameraSA::TryToStartNewCamMode(DWORD dwCamMode)
 {
     DEBUG_TRACE("VOID CCameraSA::TryToStartNewCamMode(DWORD dwCamMode)");
+    /*
     DWORD               dwFunc = FUNC_TryToStartNewCamMode;
     bool                bReturn = false;
     CCameraSAInterface* cameraInterface = this->GetInterface();
@@ -415,100 +328,45 @@ bool CCameraSA::TryToStartNewCamMode(DWORD dwCamMode)
         call    dwFunc
         mov     bReturn, al
     }
-    return bReturn;
+    return bReturn;*/
+    return false;
 }
 
 bool CCameraSA::ConeCastCollisionResolve(CVector* pPos, CVector* pLookAt, CVector* pDest, float rad, float minDist, float* pDist)
 {
-    DWORD               dwFunc = FUNC_ConeCastCollisionResolve;
-    bool                bReturn = false;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    _asm
-    {
-        mov     ecx, cameraInterface
-        push    pDist
-        push    minDist
-        push    rad
-        push    pDest
-        push    pLookAt
-        push    pPos
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CCamera::ConeCastCollisionResolve
+    return ((bool(__thiscall*)(CCameraSAInterface*, CVector&, CVector&, CVector&, float, float, float*))FUNC_ConeCastCollisionResolve)(
+        GetInterface(), *pPos, *pLookAt, *pDest, rad, minDist, pDist);
 }
 
 void CCameraSA::VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool bSmoothEnds)
 {
-    DWORD               dwFunc = FUNC_VectorTrackLinear;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    _asm
-    {
-        mov     ecx, cameraInterface
-        push    bSmoothEnds
-        push    time
-        push    pFrom
-        push    pTo
-        call    dwFunc
-    }
+    // CCamera::VectorTrackLinear
+    ((void(__thiscall*)(CCameraSAInterface*, CVector*, CVector*, float, bool))FUNC_VectorTrackLinear)(GetInterface(), pTo, pFrom, time, bSmoothEnds);
 }
 
 bool CCameraSA::IsFading()
 {
-    DWORD               dwFunc = FUNC_GetFading;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    bool                bRet = false;
-    _asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-        mov     bRet, al
-    }
-    return bRet;
+    // CCamera::GetFading
+    return ((bool(__thiscall*)(CCameraSAInterface*))FUNC_GetFading)(GetInterface());
 }
 
 int CCameraSA::GetFadingDirection()
 {
-    DWORD               dwFunc = FUNC_GetFadingDirection;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    int                 dwRet = false;
-    _asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-        mov     dwRet, eax
-    }
-    return dwRet;
+    // CCamera::GetFadingDirection
+    return ((int(__thiscall*)(CCameraSAInterface*))FUNC_GetFadingDirection)(GetInterface());
 }
 
 void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
 {
-    DWORD               dwFunc = FUNC_Fade;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    _asm
-    {
-        mov     ecx, cameraInterface
-        push    iOutOrIn
-        push    fFadeOutTime
-        call    dwFunc
-    }
+    // CCamera::Fade
+    ((void(__thiscall*)(CCameraSAInterface*, float, int))FUNC_Fade)(GetInterface(), fFadeOutTime, iOutOrIn);
 }
 
 void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    DWORD               dwFunc = FUNC_SetFadeColour;
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    DWORD               dwRed = ucRed;
-    DWORD               dwGreen = ucGreen;
-    DWORD               dwBlue = ucBlue;
-    _asm
-    {
-        mov     ecx, cameraInterface
-        push    dwBlue
-        push    dwGreen
-        push    dwRed
-        call    dwFunc
-    }
+    // CCamera::SetFadeColour
+    ((void(__thiscall*)(CCameraSAInterface*, unsigned char, unsigned char, unsigned char))FUNC_SetFadeColour)(GetInterface(), ucRed, ucGreen, ucBlue);
 }
 
 float CCameraSA::GetCameraRotation()
@@ -518,16 +376,8 @@ float CCameraSA::GetCameraRotation()
 
 RwMatrix* CCameraSA::GetLTM()
 {
-    DWORD frame = *(DWORD*)(((DWORD)this->GetInterface()->m_pRwCamera) + 4);
-    DWORD dwReturn;
-    _asm
-    {
-        push    frame
-        call    FUNC_RwFrameGetLTM
-        add     esp, 4
-        mov     dwReturn, eax
-    }
-    return (RwMatrix*)dwReturn;
+    // RwFrameGetLTM
+    return ((RwMatrix*(_cdecl*)(void*))FUNC_RwFrameGetLTM)(GetInterface()->m_pRwCamera->object.object.parent);
 }
 
 CEntity* CCameraSA::GetTargetEntity()
