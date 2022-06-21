@@ -204,6 +204,8 @@ public:
     CAutomobileSA(CAutomobileSAInterface* automobile);
     ~CAutomobileSA();
 
+    CAutomobileSAInterface* GetAutomobileInterface() { return (CAutomobileSAInterface*)m_pInterface; }
+
     bool  BurstTyre(DWORD dwTyreID);
     bool  BreakTowLink();
     void  BlowUpCar(CEntity* pEntity);
