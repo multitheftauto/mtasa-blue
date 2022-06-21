@@ -40,16 +40,10 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTarget
         this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsDriverSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskComplexEnterCarAsDriver__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+        // CTaskComplexEnterCarAsDriver::CTaskComplexEnterCarAsDriver
+        ((CTaskSAInterface * (__thiscall*)(CTaskSAInterface*, CVehicleSAInterface*)) FUNC_CTaskComplexEnterCarAsDriver__Constructor)(
+            GetInterface(), pTargetVehicleSA->GetVehicleInterface());
     }
     else
     {
@@ -74,22 +68,10 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* p
         this->CreateTaskInterface(sizeof(CTaskComplexEnterCarAsPassengerSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskComplexEnterCarAsPassenger__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-        _asm
-        {
-            push    edx
-            xor     edx, edx
-            movzx   edx, bCarryOnAfterFallingOff
-            mov     ecx, dwThisInterface
-            push    edx
-            push    iTargetSeat
-            push    dwVehiclePtr
-            call    dwFunc
-            pop     edx
-        }
+        // CTaskComplexEnterCarAsPassenger::CTaskComplexEnterCarAsPassenger
+        ((CTaskSAInterface * (__thiscall*)(CTaskSAInterface*, CVehicleSAInterface*, int, bool)) FUNC_CTaskComplexEnterCarAsPassenger__Constructor)(
+            GetInterface(), pTargetVehicleSA->GetVehicleInterface(), iTargetSeat, bCarryOnAfterFallingOff);
     }
     else
     {
@@ -113,16 +95,10 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTarg
         this->CreateTaskInterface(sizeof(CTaskComplexEnterBoatAsDriverSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskComplexEnterBoatAsDriver__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+        // CTaskComplexEnterBoatAsDriver::CTaskComplexEnterBoatAsDriver
+        ((CTaskSAInterface * (__thiscall*)(CTaskSAInterface*, CVehicleSAInterface*)) FUNC_CTaskComplexEnterBoatAsDriver__Constructor)(
+            GetInterface(), pTargetVehicleSA->GetVehicleInterface());
     }
     else
     {
@@ -150,30 +126,16 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const i
         this->CreateTaskInterface(sizeof(CTaskComplexLeaveCarSAInterface));
         if (!IsValid())
             return;
-        DWORD      dwFunc = FUNC_CTaskComplexLeaveCar__Constructor;
-        DWORD      dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD      dwThisInterface = (DWORD)this->GetInterface();
+
         DWORD      dwDoorIdx = 0;
         static int s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
 
         if (iTargetDoor >= 0 && iTargetDoor <= 5)
             dwDoorIdx = s_iCarNodeIndexes[iTargetDoor];
 
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    ebx
-            xor     ebx, ebx
-            movzx   ebx, bForceGetOut
-            push    ebx
-            movzx   ebx, bSensibleLeaveCar
-            push    ebx
-            push    iDelayTime
-            push    dwDoorIdx
-            push    dwVehiclePtr
-            call    dwFunc
-            pop     ebx
-        }
+        // CTaskComplexLeaveCar::CTaskComplexLeaveCar
+        ((CTaskSAInterface * (__thiscall*)(CTaskSAInterface*, CVehicleSAInterface*, int, int, bool, bool)) FUNC_CTaskComplexLeaveCar__Constructor)(
+            GetInterface(), pTargetVehicleSA->GetVehicleInterface(), dwDoorIdx, iDelayTime, bSensibleLeaveCar, bForceGetOut);
     }
     else
     {
