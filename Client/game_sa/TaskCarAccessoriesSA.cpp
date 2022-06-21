@@ -27,17 +27,10 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
         this->CreateTaskInterface(sizeof(CTaskSimpleCarSetPedInAsDriverSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskSimpleCarSetPedInAsDriver__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    pUtility
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+        // CTaskSimpleCarSetPedInAsDriver::CTaskSimpleCarSetPedInAsDriver
+        ((CTaskSAInterface * (__thiscall*)(void*, CEntitySAInterface*, CTaskUtilityLineUpPedWithCar*)) FUNC_CTaskSimpleCarSetPedInAsDriver__Constructor)(
+            this->GetInterface(), pTargetVehicleSA->GetInterface(), pUtility);
     }
     else
     {
@@ -81,17 +74,10 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
         this->CreateTaskInterface(sizeof(CTaskSimpleCarSetPedInAsPassengerSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD dwThisInterface = (DWORD)this->GetInterface();
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            push    pUtility
-            push    iTargetDoor
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+
+        // CTaskSimpleCarSetPedInAsPassenger::CTaskSimpleCarSetPedInAsPassenger
+        ((CTaskSAInterface * (__thiscall*)(void*, CEntitySAInterface*, int, CTaskUtilityLineUpPedWithCar*))
+             FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor)(this->GetInterface(), pTargetVehicleSA->GetInterface(), iTargetDoor, pUtility);
     }
     else
     {
@@ -133,19 +119,10 @@ CTaskSimpleCarSetPedOutSA::CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, i
         this->CreateTaskInterface(sizeof(CTaskSimpleCarSetPedOutSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__Constructor;
-        DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
-        DWORD dwThisInterface = (DWORD)this->GetInterface();
-        _asm
-        {
-            mov     ecx, dwThisInterface
-            xor     eax, eax
-            movzx   eax, bSwitchOffEngine
-            push    eax
-            push    iTargetDoor
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+
+        // CTaskSimpleCarSetPedOut::CTaskSimpleCarSetPedOut
+        ((CTaskSAInterface * (__thiscall*)(void*, CEntitySAInterface*, int, bool)) FUNC_CTaskSimpleCarSetPedOut__Constructor)(
+            this->GetInterface(), pTargetVehicleSA->GetInterface(), iTargetDoor, bSwitchOffEngine);
     }
     else
     {
@@ -181,14 +158,11 @@ void CTaskSimpleCarSetPedOutSA::SetNumGettingInToClear(const unsigned char nNumG
 void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed* ped, CVehicle* vehicle, int nDoor)
 {
     DEBUG_TRACE("void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed * ped, CVehicle * vehicle, int nDoor)");
-    DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision;
-    DWORD dwVehiclePtr = (DWORD)((CEntitySA*)vehicle)->GetInterface();
-    DWORD dwPedPtr = (DWORD)((CEntitySA*)ped)->GetInterface();
-    _asm
-    {
-        push    nDoor
-        push    dwVehiclePtr
-        push    dwPedPtr
-        call    dwFunc
-    }
+
+    CPedSAInterface*     pPedInterface = dynamic_cast<CPedSA*>(ped)->GetPedInterface();
+    CVehicleSAInterface* pVehicleInterface = dynamic_cast<CVehicleSA*>(vehicle)->GetVehicleInterface();
+
+    // CTaskSimpleCarSetPedOut::PositionPedOutOfCollision
+    ((void(__cdecl*)(CPedSAInterface*, CVehicleSAInterface*, int))FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision)(pPedInterface, pVehicleInterface,
+                                                                                                                           nDoor);
 }
