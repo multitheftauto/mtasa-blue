@@ -18,15 +18,9 @@ CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)
     this->CreateTaskInterface(sizeof(CTaskComplexUseMobilePhoneSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskComplexUseMobilePhone__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    iDuration
-        call    dwFunc
-    }
+    // CTaskComplexUseMobilePhone::CTaskComplexUseMobilePhone
+    ((void*(__thiscall*)(void*, int))FUNC_CTaskComplexUseMobilePhone__Constructor)(GetInterface(), iDuration);
 }
 
 CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const AnimationId animID, const float fBlendDelta, const int iTaskType,
@@ -40,20 +34,10 @@ CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const A
     this->CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleRunAnim__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    bHoldLastFrame
-        push    pTaskName
-        push    iTaskType
-        push    fBlendDelta
-        push    animID
-        push    animGroup
-        call    dwFunc
-    }
+    // CTaskSimpleRunAnim::CTaskSimpleRunAnim
+    ((void*(__thiscall*)(void*, AssocGroupId, AnimationId, float, int, const char*, bool))FUNC_CTaskSimpleRunAnim__Constructor)(
+        GetInterface(), animGroup, animID, fBlendDelta, iTaskType, pTaskName, bHoldLastFrame);
 }
 
 CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA(const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta,
@@ -69,23 +53,10 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA(const char* pAnimName, cons
     this->CreateTaskInterface(sizeof(CTaskSimpleRunNamedAnimSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleRunNamedAnim__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    bHoldLastFrame
-        push    bOffsetPed
-        push    bRunInSequence
-        push    bDontInterrupt
-        push    iTime
-        push    fBlendDelta
-        push    flags
-        push    pAnimGroupName
-        push    pAnimName
-        call    dwFunc
-    }
+    // CTaskSimpleRunNamedAnim::CTaskSimpleRunNamedAnim
+    ((void*(__thiscall*)(void*, const char*, const char*, int, float, int, bool, bool, bool, bool))FUNC_CTaskSimpleRunNamedAnim__Constructor)(
+        GetInterface(), pAnimName, pAnimGroupName, flags, fBlendDelta, iTime, bDontInterrupt, bRunInSequence, bOffsetPed, bHoldLastFrame);
 }
 
 CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const AssocGroupId animGroup, const AnimationId anim, const float fBlendDelta,
@@ -101,23 +72,11 @@ CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const Asso
     this->CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskComplexDie__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    bFallToDeathOverRailing
-        push    iFallToDeathDir
-        push    bFallingToDeath
-        push    bBeingKilledByStealth
-        push    fAnimSpeed
-        push    fBlendDelta
-        push    anim
-        push    animGroup
-        push    eMeansOfDeath
-        call    dwFunc
-    }
+    // CTaskComplexDie::CTaskComplexDie
+    ((void*(__thiscall*)(void*, eWeaponType, AssocGroupId, AnimationId, float, float, bool, bool, int, bool))FUNC_CTaskComplexDie__Constructor)(
+        GetInterface(), eMeansOfDeath, animGroup, anim, fBlendDelta, fAnimSpeed, bBeingKilledByStealth, bFallingToDeath, iFallToDeathDir,
+        bFallToDeathOverRailing);
 }
 
 CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, const AssocGroupId animGroup)
@@ -128,18 +87,12 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, con
     this->CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleStealthKill__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwPedInterface = (DWORD)pPed->GetPedInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    animGroup
-        push    dwPedInterface
-        push    bKiller
-        call    dwFunc
-    }
+    CPedSAInterface* pPedInterface = pPed->GetPedInterface();
+
+    // CTaskSimpleStealthKill::CTaskSimpleStealthKill
+    ((void*(__thiscall*)(void*, bool, CPedSAInterface*, AssocGroupId))FUNC_CTaskSimpleStealthKill__Constructor)(GetInterface(), bKiller, pPedInterface,
+                                                                                                                animGroup);
 }
 
 CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
@@ -149,16 +102,9 @@ CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
     this->CreateTaskInterface(sizeof(CTaskSimpleDeadSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleDead__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    bUnk2
-        push    uiDeathTimeMS
-        call    dwFunc
-    }
+    // CTaskSimpleDead::CTaskSimpleDead
+    ((void*(__thiscall*)(void*, unsigned int, bool))FUNC_CTaskSimpleDead__Constructor)(GetInterface(), uiDeathTimeMS, bUnk2);
 }
 
 CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -168,19 +114,12 @@ CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBod
     this->CreateTaskInterface(sizeof(CTaskSimpleBeHitSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleBeHit__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwPedInterface = (DWORD)pPedAttacker->GetPedInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    weaponId
-        push    hitBodySide
-        push    hitBodyPart
-        push    dwPedInterface
-        call    dwFunc
-    }
+    CPedSAInterface* pPedInterface = pPedAttacker->GetPedInterface();
+
+    // CTaskSimpleBeHit::CTaskSimpleBeHit
+    ((void*(__thiscall*)(void*, CPedSAInterface*, ePedPieceTypes, int, int))FUNC_CTaskSimpleBeHit__Constructor)(GetInterface(), pPedInterface, hitBodyPart,
+                                                                                                                hitBodySide, weaponId);
 }
 
 CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStartStanding)
@@ -191,19 +130,11 @@ CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStar
     this->CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskComplexSunbathe__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwObjectInterface = 0;
-    if (pTowel)
-        dwObjectInterface = (DWORD)pTowel->GetObjectInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    bStartStanding
-        push    dwObjectInterface;
-        call    dwFunc
-    }
+    CObjectSAInterface* pTowelInterface = pTowel ? pTowel->GetObjectInterface() : nullptr;
+
+    // CTaskComplexSunbathe::CTaskComplexSunbathe
+    ((void*(__thiscall*)(void*, CObjectSAInterface*, bool))FUNC_CTaskComplexSunbathe__Constructor)(GetInterface(), pTowelInterface, bStartStanding);
 }
 
 void CTaskComplexSunbatheSA::SetEndTime(DWORD dwTime)
@@ -221,14 +152,9 @@ CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA()
     this->CreateTaskInterface(sizeof(CTaskSimplePlayerOnFootSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = (DWORD)FUNC_CTASKSimplePlayerOnFoot__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        call    dwFunc
-    }
+    // CTaskSimplePlayerOnFoot::CTaskSimplePlayerOnFoot
+    ((void*(__thiscall*)(void*))FUNC_CTASKSimplePlayerOnFoot__Constructor)(GetInterface());
 }
 
 ////////////////////
@@ -240,12 +166,7 @@ CTaskComplexFacialSA::CTaskComplexFacialSA()
     this->CreateTaskInterface(sizeof(CTaskComplexFacialSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = (DWORD)FUNC_CTASKComplexFacial__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
 
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        call    dwFunc
-    }
+    // CTaskComplexFacial::CTaskComplexFacial
+    ((void*(__thiscall*)(void*))FUNC_CTASKComplexFacial__Constructor)(GetInterface());
 }
