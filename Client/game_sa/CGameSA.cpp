@@ -440,16 +440,9 @@ VOID CGameSA::SetRenderHook(InRenderer* pInRenderer)
 
 VOID CGameSA::TakeScreenshot(char* szFileName)
 {
-    DWORD dwFunc = FUNC_JPegCompressScreenToFile;
-    _asm
-    {
-        mov     eax, CLASS_RwCamera
-        mov     eax, [eax]
-        push    szFileName
-        push    eax
-        call    dwFunc
-        add     esp,8
-    }
+    // JPegCompressScreenToFile
+    CCameraSAInterface& TheCamera = *(CCameraSAInterface*)0xB6F028;
+    ((void(__cdecl*)(RwCamera*, const char*))(FUNC_JPegCompressScreenToFile))(TheCamera.m_pRwCamera, szFileName);
 }
 
 DWORD* CGameSA::GetMemoryValue(DWORD dwOffset)
