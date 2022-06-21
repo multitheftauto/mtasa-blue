@@ -23,27 +23,12 @@ BYTE CMenuManagerSA::GetPreviousScreen()
 
 void CMenuManagerSA::SwitchToNewScreen(BYTE ScreenID)
 {
-    DWORD dwThis = (DWORD)this->GetInterface();
-    DWORD dwFunc = FUNC_SwitchToNewScreen;
-    DWORD dwScreenID = ScreenID;
-
-    _asm
-    {
-        mov     eax, dwThis
-        push    dwScreenID
-        call    dwFunc
-    }
+    // CMenuManager::SwitchToNewScreen
+    ((void(__cdecl*)(BYTE))FUNC_SwitchToNewScreen)(ScreenID);
 }
 
 void CMenuManagerSA::DisplayHelpText(char* szHelpText)            // DisplayHelperText
 {
-    DWORD dwThis = (DWORD)this->GetInterface();
-    DWORD dwFunc = FUNC_DisplayHelperText;
-
-    _asm
-    {
-        mov     eax, dwThis
-        push    szHelpText
-        call    dwFunc
-    }
+    // CMenuManager::DisplayHelperText
+    ((void(__cdecl*)(const char*))FUNC_DisplayHelperText)(szHelpText);
 }
