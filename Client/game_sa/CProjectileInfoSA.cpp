@@ -18,11 +18,9 @@ extern CGameSA* pGame;
 void CProjectileInfoSA::RemoveAllProjectiles()
 {
     DEBUG_TRACE("void CProjectileInfoSA::RemoveAllProjectiles (  )");
-    DWORD dwFunction = FUNC_RemoveAllProjectiles;
-    _asm
-    {
-        call    dwFunction
-    }
+
+    // CProjectileInfo::RemoveAllProjectiles
+    ((void(__cdecl*)())FUNC_RemoveAllProjectiles)();
 }
 
 /**
@@ -59,7 +57,7 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
     if (!pProjectileSA)
         return;
 
-    CEntitySAInterface* projectileInterface = pProjectileSA->GetInterface();
+    CProjectileSAInterface* projectileInterface = (CProjectileSAInterface*)pProjectileSA->GetInterface();
 
     // Check that this infact is a CProjectile
     // This is perhaps the fix for a crash where it jumps to 0x42480000
@@ -71,24 +69,13 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
         {
             if (bBlow)
             {
-                DWORD dwFunc = FUNC_RemoveProjectile;
-                _asm
-                {
-                    push    projectileInterface
-                    push    projectileInfoInterface
-                    call    dwFunc
-                    add     esp, 8
-                }
+                // CProjectileInfo::RemoveProjectile
+                ((void(__cdecl*)(CProjectileInfoSAInterface*, CProjectileSAInterface*))FUNC_RemoveProjectile)(projectileInfoInterface, projectileInterface);
             }
             else
             {
-                DWORD dwFunc = FUNC_RemoveIfThisIsAProjectile;
-                _asm
-                {
-                    push   projectileInterface
-                    call   dwFunc
-                    add    esp, 4
-                }
+                // CProjectileInfo::RemoveIfThisIsAProjectile
+                ((void(__cdecl*)(CProjectileSAInterface*))FUNC_RemoveIfThisIsAProjectile)(projectileInterface);
             }
         }
     }
@@ -124,8 +111,6 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
 {
     DEBUG_TRACE("bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOffset, float fForce )");
 
-    DWORD               dwFunction = FUNC_AddProjectile;
-    DWORD               dwReturn = 0;
     CEntitySAInterface* creatorVC = NULL;
     if (creator != NULL)
     {
@@ -146,27 +131,12 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
             targetVC = pTargetEntitySA->GetInterface();
     }
 
-    _asm
-    {
-        push    eax
+    // CProjectileInfo::AddProjectile
+    bool bRet = ((bool(__cdecl*)(CEntitySAInterface*, eWeaponType, CVector, float, CVector*, CEntitySAInterface*))FUNC_AddProjectile)(
+        creatorVC, eWeapon, vecOrigin, fForce, target, targetVC);
 
-        push    targetVC
-        push    target
-        push    fForce
-        lea     eax, vecOrigin
-        push    [eax+8]
-        push    [eax+4]
-        push    [eax]
-        push    eWeapon
-        push    creatorVC
-        call    dwFunction
-        add     esp, 32
-        mov     dwReturn, eax
-
-        pop     eax
-    }
     pGame->GetWorld()->IgnoreEntity(NULL);
-    return dwReturn != 0;
+    return bRet;
 }
 
 CEntity* CProjectileInfoSA::GetTarget()
