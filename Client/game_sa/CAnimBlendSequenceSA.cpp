@@ -21,41 +21,21 @@ void CAnimBlendSequenceSA::Initialize()
 
 void CAnimBlendSequenceSA::SetName(const char* szName)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendSequence_SetName;
-    _asm
-    {
-        push    szName
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendSequence::SetName
+    ((void(__thiscall*)(CAnimBlendSequenceSAInterface*))FUNC_CAnimBlendSequence_SetName)(m_pInterface);
 }
 
 void CAnimBlendSequenceSA::SetBoneTag(int32_t i32BoneID)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendSequence_SetBoneTag;
-    _asm
-    {
-        push    i32BoneID
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendSequence::SetBoneTag
+    ((void(__thiscall*)(CAnimBlendSequenceSAInterface*, int))FUNC_CAnimBlendSequence_SetBoneTag)(m_pInterface, i32BoneID);
 }
 
 void CAnimBlendSequenceSA::SetKeyFrames(size_t cKeyFrames, bool bRoot, bool bCompressed, void* pKeyFrames)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendSequence_SetKeyFrames;
-    _asm
-    {
-        push    pKeyFrames
-        push    bCompressed
-        push    bRoot
-        push    cKeyFrames
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendSequence::SetKeyFrames
+    ((void(__thiscall*)(CAnimBlendSequenceSAInterface*, size_t, bool, bool, void*))FUNC_CAnimBlendSequence_SetKeyFrames)(m_pInterface, cKeyFrames, bRoot,
+                                                                                                                         bCompressed, pKeyFrames);
 }
 
 void CAnimBlendSequenceSA::CopySequenceProperties(CAnimBlendSequenceSAInterface* pAnimSequenceInterface)
