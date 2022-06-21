@@ -71,51 +71,27 @@ void CSettingsSA::SetWideScreenEnabled(bool bEnabled)
 
 unsigned int CSettingsSA::GetNumVideoModes()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetNumVideoModes
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetNumVideoModes
+    return ((unsigned int(__cdecl*)())FUNC_GetNumVideoModes)();
 }
 
 VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex)
 {
-    VideoMode* pReturn = NULL;
-    _asm
-    {
-        push    modeIndex
-        push    modeInfo
-        call    FUNC_GetVideoModeInfo
-        mov     pReturn, eax
-        add     esp, 8
-    }
-    return pReturn;
+    // RwEngineGetVideoModeInfo
+    return ((VideoMode*(__cdecl*)(VideoMode*, unsigned int))FUNC_GetVideoModeInfo)(modeInfo, modeIndex);
 }
 
 unsigned int CSettingsSA::GetCurrentVideoMode()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetCurrentVideoMode
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetCurrentVideoMode
+    return ((unsigned int(__cdecl*)())FUNC_GetCurrentVideoMode)();
 }
 
 void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
 {
     if (!bOnRestart)
-    {
-        _asm
-        {
-            push    modeIndex
-            call    FUNC_SetCurrentVideoMode
-            add     esp, 4
-        }
-    }
+        ((void(__cdecl*)(unsigned int))FUNC_SetCurrentVideoMode)(modeIndex);
+
     // Only update settings variables for fullscreen modes
     if (modeIndex)
         m_pInterface->dwVideoMode = modeIndex;
@@ -123,34 +99,20 @@ void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
 
 uint CSettingsSA::GetNumAdapters()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetNumSubSystems
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetNumSubSystems
+    return ((unsigned int(__cdecl*)())FUNC_GetNumSubSystems)();
 }
 
 void CSettingsSA::SetAdapter(unsigned int uiAdapterIndex)
 {
-    _asm
-    {
-        push    uiAdapterIndex
-        call    FUNC_SetSubSystem
-        add     esp, 4
-    }
+    // RwEngineSetSubSystem
+    ((void(__cdecl*)(unsigned int))FUNC_SetSubSystem)(uiAdapterIndex);
 }
 
 unsigned int CSettingsSA::GetCurrentAdapter()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetCurrentSubSystem
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetCurrentSubSystem
+    return ((unsigned int(__cdecl*)())FUNC_GetCurrentSubSystem)();
 }
 
 unsigned char CSettingsSA::GetRadioVolume()
@@ -227,12 +189,7 @@ float CSettingsSA::GetDrawDistance()
 
 void CSettingsSA::SetDrawDistance(float fDistance)
 {
-    _asm
-    {
-        push    fDistance
-        call    FUNC_SetDrawDistance
-        add     esp, 4
-    }
+    ((void(__cdecl*)(float))FUNC_SetDrawDistance)(fDistance);
     m_pInterface->fDrawDistance = fDistance;
 }
 
@@ -280,13 +237,9 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
 {
     if (!bOnRestart)
     {
-        DWORD dwFunc = FUNC_SetAntiAliasing;
-        _asm
-        {
-            push    uiAntiAliasing
-            call    dwFunc
-            add     esp, 4
-        }
+        // RwD3D9ChangeMultiSamplingLevels
+        ((void(__cdecl*)(unsigned int))FUNC_SetAntiAliasing)(uiAntiAliasing);
+
         SetCurrentVideoMode(m_pInterface->dwVideoMode, false);
     }
 
@@ -305,12 +258,8 @@ void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 
 void CSettingsSA::Save()
 {
-    _asm
-    {
-        mov ecx, CLASS_CMenuManager
-        mov eax, FUNC_CMenuManager_Save
-        call eax
-    }
+    // CMenuManager::SaveSettings
+    ((void(__thiscall*)(int))FUNC_CMenuManager_Save)(CLASS_CMenuManager);
 }
 
 bool CSettingsSA::IsVolumetricShadowsEnabled()
