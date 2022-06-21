@@ -39,25 +39,14 @@ CWantedSA::~CWantedSA()
 
 void CWantedSA::SetMaximumWantedLevel(DWORD dwWantedLevel)
 {
-    DWORD dwFunc = FUNC_SetMaximumWantedLevel;
-    _asm
-    {
-        push    dwWantedLevel
-        call    dwFunc
-        add     esp, 4
-    }
+    // CWanted::SetMaximumWantedLevel
+    ((void(__cdecl*)(int))FUNC_SetMaximumWantedLevel)(dwWantedLevel);
 }
 
 void CWantedSA::SetWantedLevel(DWORD dwWantedLevel)
 {
-    DWORD dwThis = (DWORD)this->GetInterface();
-    DWORD dwFunc = FUNC_SetWantedLevel;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    dwWantedLevel
-        call    dwFunc
-    }
+    // CWanted::SetWantedLevel
+    ((void(__thiscall*)(CWantedSAInterface*, int))FUNC_SetWantedLevel)(this->GetInterface(), dwWantedLevel);
 }
 void CWantedSA::SetWantedLevelNoFlash(DWORD dwWantedLevel)
 {
@@ -68,12 +57,6 @@ void CWantedSA::SetWantedLevelNoFlash(DWORD dwWantedLevel)
 
 void CWantedSA::SetWantedLevelNoDrop(DWORD dwWantedLevel)
 {
-    DWORD dwThis = (DWORD)this->GetInterface();
-    DWORD dwFunc = FUNC_SetWantedLevelNoDrop;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    dwWantedLevel
-        call    dwFunc
-    }
+    // CWanted::SetWantedLevelNoDrop
+    ((void(__thiscall*)(CWantedSAInterface*, int))FUNC_SetWantedLevelNoDrop)(this->GetInterface(), dwWantedLevel);
 }
