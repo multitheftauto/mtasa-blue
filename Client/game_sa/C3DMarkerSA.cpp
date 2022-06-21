@@ -148,13 +148,8 @@ VOID C3DMarkerSA::DeleteMarkerObject()
 {
     if (this->GetInterface()->m_pRwObject)
     {
-        DWORD dwFunc = FUNC_DeleteMarkerObject;
-        DWORD dwThis = (DWORD)this->GetInterface();
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        // C3DMarkers::DeleteMarkerObject
+        ((void(__thiscall*)(C3DMarkerSAInterface*))FUNC_DeleteMarkerObject)(this->GetInterface());
 
         // OutputDebugString ( "Object destroyed!" );
     }
