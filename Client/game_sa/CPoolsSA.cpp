@@ -231,61 +231,33 @@ DWORD CPoolsSA::GetVehicleRef(CVehicle* pVehicle)
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetVehicleRef ( CVehicle* pVehicle )");
 
-    DWORD       dwRef = 0;
     CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
-    if (pVehicleSA)
-    {
-        CVehicleSAInterface* pInterface = pVehicleSA->GetVehicleInterface();
-        DWORD                dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
+    if (!pVehicleSA)
+        return 0;
 
-    return dwRef;
+    // CPools::GetVehicleRef
+    return ((int(__cdecl*)(CVehicleSAInterface*))FUNC_GetVehicleRef)(pVehicleSA->GetVehicleInterface());
 }
 
 DWORD CPoolsSA::GetVehicleRef(DWORD* pGameInterface)
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetVehicleRef ( DWORD* pGameInterface )");
 
-    DWORD                dwRef = 0;
     CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
+    if (!pInterface)
+        return 0;
 
-    return dwRef;
+    // CPools::GetVehicleRef
+    return ((int(__cdecl*)(CVehicleSAInterface*))FUNC_GetVehicleRef)(pInterface);
 }
 
 CVehicle* CPoolsSA::GetVehicleFromRef(DWORD dwGameRef)
 {
     DEBUG_TRACE("CVehicle* CPoolsSA::GetVehicleFromRef ( DWORD dwGameRef )");
 
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetVehicle;
+    // CPools::GetVehicle
+    CVehicleSAInterface* pInterface = ((CVehicleSAInterface*(__thiscall*)(void*, int))FUNC_GetVehicleRef)(*(void**)CLASS_CPool_Vehicle, dwGameRef);
 
-    _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Vehicle]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CVehicleSAInterface* pInterface = (CVehicleSAInterface*)dwReturn;
     if (pInterface)
     {
         DWORD       dwElementIndexInPool = dwGameRef >> 8;
@@ -430,22 +402,12 @@ DWORD CPoolsSA::GetObjectRef(CObject* pObject)
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetObjectRef ( CObject* pObject )");
 
-    DWORD      dwRef = 0;
     CObjectSA* pObjectSA = dynamic_cast<CObjectSA*>(pObject);
-    if (pObjectSA)
-    {
-        CObjectSAInterface* pInterface = pObjectSA->GetObjectInterface();
-        DWORD               dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
+    if (!pObjectSA)
+        return 0;
 
-    return dwRef;
+    // CPools::GetObjectRef
+    return ((int(__cdecl*)(CObjectSAInterface*))FUNC_GetObjectRef)(pObjectSA->GetObjectInterface());
 }
 
 DWORD CPoolsSA::GetObjectRef(DWORD* pGameInterface)
@@ -455,36 +417,18 @@ DWORD CPoolsSA::GetObjectRef(DWORD* pGameInterface)
     DWORD               dwRef = 0;
     CObjectSAInterface* pInterface = reinterpret_cast<CObjectSAInterface*>(pGameInterface);
     if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
+        return 0;
 
-    return dwRef;
+    // CPools::GetObjectRef
+    return ((int(__cdecl*)(CObjectSAInterface*))FUNC_GetObjectRef)(pInterface);
 }
 
 CObject* CPoolsSA::GetObjectFromRef(DWORD dwGameRef)
 {
     DEBUG_TRACE("CObject* CPoolsSA::GetObjectFromRef ( DWORD dwGameRef )");
 
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetObject;
-
-    _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Object]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CObjectSAInterface* pInterface = (CObjectSAInterface*)dwReturn;
+    // CPools::GetObject
+    CObjectSAInterface* pInterface = ((CObjectSAInterface*(__thiscall*)(void*, int))FUNC_GetObject)(*(void**)CLASS_CPool_Object, dwGameRef);
 
     if (pInterface)
     {
@@ -729,42 +673,24 @@ DWORD CPoolsSA::GetPedRef(CPed* pPed)
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetPedRef ( CPed* pPed )");
 
-    DWORD   dwRef = 0;
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
-    if (pPedSA)
-    {
-        CPedSAInterface* pInterface = pPedSA->GetPedInterface();
-        DWORD            dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
+    if (!pPedSA)
+        return 0;
 
-    return dwRef;
+    // CPools::GetPedRef
+    return ((int(__cdecl*)(CPedSAInterface*))FUNC_GetPedRef)(pPedSA->GetPedInterface());
 }
 
 DWORD CPoolsSA::GetPedRef(DWORD* pGameInterface)
 {
     DEBUG_TRACE("DWORD CPoolsSA::GetPedRef ( DWORD* pGameInterface )");
 
-    DWORD            dwRef = 0;
     CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-    return dwRef;
+    if (!pInterface)
+        return 0;
+
+    // CPools::GetPedRef
+    return ((int(__cdecl*)(CPedSAInterface*))FUNC_GetPedRef)(pInterface);
 }
 
 CPed* CPoolsSA::GetPedFromRef(DWORD dwGameRef)
@@ -789,19 +715,8 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
 {
     DEBUG_TRACE("CPedSAInterface* CPoolsSA::GetPedInterface ( DWORD dwGameRef )");
 
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetPed;
-
-    _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CPedSAInterface* pInterface = (CPedSAInterface*)dwReturn;
-    return pInterface;
+    // CPools::GetPed
+    return ((CPedSAInterface*(__cdecl*)(int))FUNC_GetPed)(dwGameRef);
 }
 
 void CPoolsSA::DeleteAllPeds()
@@ -903,8 +818,8 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
         }
     }
 
-    CVehicleSAInterface* pTrainBeginning = NULL;
-    CVehicleSAInterface* pTrainEnd = NULL;
+    CTrainSAInterface* pTrainBeginning = NULL;
+    CTrainSAInterface* pTrainEnd = NULL;
 
     float fX = vecPosition->fX;
     float fY = vecPosition->fY;
@@ -916,27 +831,10 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
     // Find closest track node
     float fRailDistance;
     int   iNodeId = pGame->GetWorld()->FindClosestRailTrackNode(*vecPosition, ucTrackId, fRailDistance);
-    int   iDesiredTrackId = ucTrackId;
 
-    DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
-    _asm
-    {
-        push    0            // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from
-                             // 1 to 0)
-                             push    iDesiredTrackId            // track ID
-                             push    iNodeId            // node to start at (-1 for closest node)
-                             lea     ecx, pTrainEnd
-                             push    ecx            // end of train
-                             lea     ecx, pTrainBeginning
-                             push    ecx            // begining of train
-                             push    0            // train type (always use 0 as thats where we're writing to)
-                             push    bDirection            // direction
-                             push    fZ            // z
-                             push    fY            // y
-                             push    fX            // x
-                             call    dwFunc
-                             add     esp, 0x28
-    }
+    // CTrain::CreateMissionTrain
+    ((void(__cdecl*)(CVector, bool, unsigned int, CTrainSAInterface**, CTrainSAInterface**, int, int, bool))FUNC_CTrain_CreateMissionTrain)(
+        *vecPosition, bDirection, 0, &pTrainBeginning, &pTrainEnd, iNodeId, ucTrackId, false);
 
     // Enable GetVehicle
     m_bGetVehicleEnabled = true;
@@ -1358,20 +1256,10 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
             return -1;
     }
 
-    int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            mov     ecx, [ecx]
-            call    dwFunc
-            mov     iOut, eax
+        return ((int(__thiscall*)(void*))dwFunc)(*(void**)dwThis);
 
-        }
-    }
-
-    return iOut;
+    return -2;
 }
 
 CEntryInfoNodePool* CPoolsSA::GetEntryInfoNodePool()
@@ -1381,17 +1269,8 @@ CEntryInfoNodePool* CPoolsSA::GetEntryInfoNodePool()
 
 int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces()
 {
-    DWORD dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CEntryInfoNodePool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
+    // CPool<CEntryInfoNode>::GetNoOfUsedSpaces
+    return ((int(__thiscall*)(void*))FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces)(*(void**)CLASS_CEntryInfoNodePool);
 }
 
 CPointerNodeDoubleLinkPool* CPoolsSA::GetPointerNodeDoubleLinkPool()
@@ -1401,17 +1280,8 @@ CPointerNodeDoubleLinkPool* CPoolsSA::GetPointerNodeDoubleLinkPool()
 
 int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces()
 {
-    DWORD dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeDoubleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
+    // CPool<CPtrNodeDoubleLink>::GetNoOfUsedSpaces
+    return ((int(__thiscall*)(void*))FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces)(*(void**)CLASS_CPtrNodeDoubleLinkPool);
 }
 
 CPointerNodeSingleLinkPool* CPoolsSA::GetPointerNodeSingleLinkPool()
@@ -1426,15 +1296,6 @@ void CPoolsSA::InvalidateLocalPlayerClientEntity()
 
 int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces()
 {
-    DWORD dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeSingleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
+    // CPool<CPtrNodeSingleLink>::GetNoOfUsedSpaces
+    return ((int(__thiscall*)(void*))FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces)(*(void**)CLASS_CPtrNodeSingleLinkPool);
 }
