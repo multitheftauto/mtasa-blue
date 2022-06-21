@@ -13,87 +13,36 @@
 
 float CStatsSA::GetStatValue(unsigned short usIndex)
 {
-    DWORD dwFunc = FUNC_GetStatValue;
-    float fReturn = 0.0f;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 4
-        fstp    fReturn
-    }
-    return fReturn;
+    // CStats::GetStatValue
+    return ((float(__cdecl*)(unsigned short))FUNC_GetStatValue)(usIndex);
 }
 
 void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
 {
-    DWORD dwFunc = FUNC_ModifyStat;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
+    // CStats::ModifyStat
+    ((void(__cdecl*)(unsigned short, float))FUNC_ModifyStat)(usIndex, fAmmount);
 }
 
 void CStatsSA::IncrementStat(unsigned short usIndex, float fAmmount)
 {
-    DWORD dwFunc = FUNC_IncrementStat;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
+    // CStats::IncrementStat
+    ((void(__cdecl*)(unsigned short, float))FUNC_IncrementStat)(usIndex, fAmmount);
 }
 
 void CStatsSA::DecrementStat(unsigned short usIndex, float fAmmount)
 {
-    DWORD dwFunc = FUNC_DecrementStat;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
+    // CStats::DecrementStat
+    ((void(__cdecl*)(unsigned short, float))FUNC_DecrementStat)(usIndex, fAmmount);
 }
 
 void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
 {
-    DWORD dwFunc = FUNC_SetStatValue;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
+    // CStats::SetStatValue
+    ((void(__cdecl*)(unsigned short, float))FUNC_SetStatValue)(usIndex, fAmmount);
 }
 
 unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
 {
-    int   weaponType = (int)type;
-    int   iIndex;
-    DWORD dwFunc = FUNC_CWeaponInfo_GetSkillStatIndex;
-    _asm
-    {
-        push    weaponType
-        call    dwFunc
-        add     esp, 0x4
-        mov     iIndex, eax
-    }
-    return (unsigned short)iIndex;
+    // CStats::SetStatValue
+    return ((int(__cdecl*)(eWeaponType))FUNC_CWeaponInfo_GetSkillStatIndex)(type);
 }
