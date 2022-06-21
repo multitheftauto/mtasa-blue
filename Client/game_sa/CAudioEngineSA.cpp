@@ -154,42 +154,25 @@ VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
     if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)            // may prevent a crash
     {
         DEBUG_TRACE("VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwSound)");
-        DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
-        FLOAT fSpeed = 1.0f;
-        FLOAT fVolumeChange = 0.0f;
-        _asm
-        {
-            push    fSpeed
-            push    fVolumeChange
-            push    dwEventID
-            mov     ecx, CLASS_CAudioEngine
-            call    dwFunc
-        }
+
+        float fSpeed = 1.0f;
+        float fVolumeChange = 0.0f;
+
+        // CAudioEngine::ReportFrontendAudioEvent
+        ((void(__thiscall*)(CAudioEngineSAInterface*, int, float, float))FUNC_ReportFrontendAudioEvent)(m_pInterface, dwEventID, fVolumeChange, fSpeed);
     }
 }
 
 VOID CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
 {
-    DWORD dwFunc = FUNC_SetEffectsMasterVolume;
-    DWORD dwVolume = bVolume;
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    dwVolume
-        call    dwFunc
-    }
+    // CAudioEngine::SetEffectsMasterVolume
+    ((void(__thiscall*)(CAudioEngineSAInterface*, char))FUNC_SetEffectsMasterVolume)(m_pInterface, bVolume);
 }
 
 VOID CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
 {
-    DWORD dwFunc = FUNC_SetMusicMasterVolume;
-    DWORD dwVolume = bVolume;
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    dwVolume
-        call    dwFunc
-    }
+    // CAudioEngine::SetMusicMasterVolume
+    ((void(__thiscall*)(CAudioEngineSAInterface*, char))FUNC_SetMusicMasterVolume)(m_pInterface, bVolume);
 
     //
     // See if radio stream should be stopped/started
@@ -221,75 +204,37 @@ VOID CAudioEngineSA::PlayBeatTrack(short iTrack)
     if (*(DWORD*)VAR_AudioEventVolumes != 0)            // may prevent a crash
     {
         DEBUG_TRACE("VOID CAudioEngineSA::PlayBeatTrack ( short iTrack )");
-        DWORD dwFunc = FUNC_PreloadBeatTrack;
-        DWORD dwTrack = iTrack;
-        _asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            push    dwTrack
-            call    dwFunc
-        }
 
-        dwFunc = FUNC_PlayPreloadedBeatTrack;
-        _asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            push    1
-            call    dwFunc
-        }
+        // CAudioEngine::PreloadBeatTrack
+        ((void(__thiscall*)(CAudioEngineSAInterface*, short))FUNC_PreloadBeatTrack)(m_pInterface, iTrack);
+
+        // CAudioEngine::PlayPreloadedBeatTrack
+        ((void(__thiscall*)(CAudioEngineSAInterface*, unsigned char))FUNC_PlayPreloadedBeatTrack)(m_pInterface, 1);
     }
 }
 
 VOID CAudioEngineSA::ClearMissionAudio(int slot)
 {
-    DWORD dwFunc = 0x5072F0;            // CAudioEngine::ClearMissionAudio(unsigned char)
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    slot // sound bank slot?
-        call    dwFunc
-    }
+    // CAudioEngine::ClearMissionAudio
+    ((void(__thiscall*)(CAudioEngineSAInterface*, unsigned char))0x5072F0)(m_pInterface, slot);
 }
 
 bool CAudioEngineSA::IsMissionAudioSampleFinished(int slot)
 {
-    DWORD dwFunc = 0x5072C0;            // CAudioEngine::IsMissionAudioSampleFinished
-    bool  cret = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    slot
-        call    dwFunc
-        mov     cret, al
-    }
-    return cret;
+    // CAudioEngine::IsMissionAudioSampleFinished
+    return ((bool(__thiscall*)(CAudioEngineSAInterface*, unsigned char))0x5072C0)(m_pInterface, slot);
 }
 
 VOID CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
 {
-    DWORD dwFunc = 0x507290;            // CAudioEngine__PreloadMissionAudio
-    DWORD AudioEvent = usAudioEvent;
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    AudioEvent
-        push    slot
-        call    dwFunc
-    }
+    // CAudioEngine::PreloadMissionAudio
+    ((void(__thiscall*)(CAudioEngineSAInterface*, unsigned char, int))0x507290)(m_pInterface, slot, usAudioEvent);
 }
 
 unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
 {
-    DWORD         dwFunc = 0x5072A0;            // get load status
-    unsigned char cret = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    slot
-        call    dwFunc
-        mov     cret, al
-    }
-    return cret;
+    // CAudioEngine::IsMissionAudioSampleFinished
+    return ((unsigned char(__thiscall*)(CAudioEngineSAInterface*, unsigned char))0x5072A0)(m_pInterface, slot);
 }
 
 VOID CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
@@ -302,39 +247,23 @@ VOID CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
             entity = pPhysical->GetInterface();
     }
 
-    DWORD dwFunc = 0x507330;            // AttachMissionAudioToPhysical
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    entity
-        push    slot
-        call    dwFunc
-    }
+    // CAudioEngine::AttachMissionAudioToPhysical
+    ((void(__thiscall*)(CAudioEngineSAInterface*, unsigned char, CEntitySAInterface*))0x507330)(m_pInterface, slot, entity);
 }
 
 VOID CAudioEngineSA::SetMissionAudioPosition(CVector* position, int slot)
 {
-    DWORD dwFunc = 0x507300;            // CAudioEngine__SetMissionAudioPosition
-    _asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    position
-        push    slot
-        call    dwFunc
-    }
+    // CAudioEngine::AttachMissionAudioToPhysical
+    ((void(__thiscall*)(CAudioEngineSAInterface*, unsigned char, CVector&))0x507300)(m_pInterface, slot, *position);
 }
 
 bool CAudioEngineSA::PlayLoadedMissionAudio(int slot)
 {
     if (GetMissionAudioLoadingStatus(slot) == 1)
     {
-        DWORD dwFunc = 0x5072B0;            // CAudioEngine::PlayLoadedMissionAudio(unsigned char)
-        _asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            push    slot
-            call    dwFunc
-        }
+        // CAudioEngine::PlayLoadedMissionAudio
+        ((void(__thiscall*)(CAudioEngineSAInterface*, unsigned char))0x5072B0)(m_pInterface, slot);
+
         return true;
     }
     return false;
@@ -344,21 +273,13 @@ VOID CAudioEngineSA::PauseAllSound(bool bPaused)
 {
     if (bPaused)
     {
-        DWORD dwFunc = FUNC_PauseAllSounds;
-        _asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            call    dwFunc
-        }
+        // CAudioEngine::PauseAllSounds
+        ((void(__thiscall*)(CAudioEngineSAInterface*))FUNC_PauseAllSounds)(m_pInterface);
     }
     else
     {
-        DWORD dwFunc = FUNC_ResumeAllSounds;
-        _asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            call    dwFunc
-        }
+        // CAudioEngine::ResumeAllSounds
+        ((void(__thiscall*)(CAudioEngineSAInterface*))FUNC_ResumeAllSounds)(m_pInterface);
     }
 }
 
@@ -533,35 +454,14 @@ skip:   // Skip playing sound
 
 void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2)
 {
-    DWORD dwEntityInterface = 0;
-    if (pEntity)
-        dwEntityInterface = (DWORD)pEntity->GetInterface();
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAudioEngine_ReportBulletHit;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    f_2
-        push    pvecPosition
-        push    ucSurfaceType
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    // CAudioEngine::ReportBulletHit
+    ((void(__thiscall*)(CAudioEngineSAInterface*, CEntitySAInterface*, unsigned char, CVector&, float))FUNC_CAudioEngine_ReportBulletHit)(
+        m_pInterface, pEntity ? pEntity->GetInterface() : nullptr, ucSurfaceType, *pvecPosition, f_2);
 }
 
 void CAudioEngineSA::ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical)
 {
-    DWORD dwPhysicalInterface = NULL;
-    if (pPhysical)
-        dwPhysicalInterface = (DWORD)pPhysical->GetInterface();
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAudioEngine_ReportWeaponEvent;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    dwPhysicalInterface
-        push    weaponType
-        push    iEvent
-        call    dwFunc
-    }
+    // CAudioEngine::ReportWeaponEvent
+    ((void(__thiscall*)(CAudioEngineSAInterface*, int, eWeaponType, CEntitySAInterface*))FUNC_CAudioEngine_ReportWeaponEvent)(
+        m_pInterface, iEvent, weaponType, pPhysical ? pPhysical->GetInterface() : nullptr);
 }
