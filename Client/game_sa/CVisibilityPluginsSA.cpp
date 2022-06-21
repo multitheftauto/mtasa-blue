@@ -13,14 +13,8 @@
 
 void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
-    DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
-    _asm
-    {
-        push    iAlpha
-        push    pClump
-        call    dwFunc
-        add     esp, 0x8
-    }
+    // CVisibilityPlugins::SetClumpAlpha
+    ((void(__cdecl*)(RpClump*, int))FUNC_CVisiblityPlugins_SetClumpAlpha)(pClump, iAlpha);
 }
 
 // Some AtomicId bits are:
@@ -39,14 +33,6 @@ void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 //      0x8000 - Some door flag?
 int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
 {
-    DWORD dwFunc = FUNC_CVisibilityPlugins_GetAtomicId;
-    int   iResult = 0;
-    _asm
-    {
-        push    pAtomic
-        call    dwFunc
-        add     esp, 0x4
-        mov     iResult, eax
-    }
-    return iResult;
+    // CVisibilityPlugins::GetAtomicId
+    return ((int(__cdecl*)(RwObject*))FUNC_CVisibilityPlugins_GetAtomicId)(pAtomic);
 }
