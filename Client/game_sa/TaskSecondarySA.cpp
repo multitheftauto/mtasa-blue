@@ -22,17 +22,8 @@ CTaskSimpleDuckSA::CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned sh
     this->CreateTaskInterface(sizeof(CTaskSimpleDuckSAInterface));
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThisInterface
-        push    ebx
-        mov     bx, nUseShotsWhizzingEvents
-        push    ebx
-        mov     bx, nLengthOfDuck
-        push    ebx
-        push    nDuckControl
-        call    dwFunc
-        pop     ebx
-    }
+
+    // CTaskSimpleDuck::CTaskSimpleDuck
+    ((void*(__thiscall*)(void*, eDuckControlTypes, unsigned short, short))FUNC_CTaskSimpleDuck__Constructor)(this->GetInterface(), nDuckControl, nLengthOfDuck,
+                                                                                                             nUseShotsWhizzingEvents);
 }
