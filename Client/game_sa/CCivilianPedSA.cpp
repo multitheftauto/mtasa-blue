@@ -21,21 +21,13 @@ CCivilianPedSA::CCivilianPedSA(ePedModel pedType)
     DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
     DWORD CCivilianPedConstructor = FUNC_CCivilianPedConstructor;
 
-    DWORD dwPedPointer = 0;
-    _asm
-    {
-        push    SIZEOF_CCIVILIANPED
-        call    CPedOperatorNew
-        add     esp, 4
+    // CPed::operator new
+    CCivilianPedSAInterface* pCivilianPed = ((CCivilianPedSAInterface * (__cdecl*)(unsigned int)) FUNC_CPedOperatorNew)(SIZEOF_CCIVILIANPED);
 
-        mov     dwPedPointer, eax
+    // CCivilianPed::CCivilianPed
+    ((CCivilianPedSAInterface * (__thiscall*)(CCivilianPedSAInterface*, int, bool)) FUNC_CCivilianPedConstructor)(pCivilianPed, 1, false);
 
-        mov     ecx, eax
-        push    0 // set to 0 and they'll behave like AI peds
-        push    1 // ped type
-        call    CCivilianPedConstructor
-    }
-    this->SetInterface((CEntitySAInterface*)dwPedPointer);
+    this->SetInterface(pCivilianPed);
     this->Init();            // init our interfaces
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
@@ -62,14 +54,9 @@ CCivilianPedSA::~CCivilianPedSA()
             CWorldSA* world = (CWorldSA*)pGame->GetWorld();
             world->Remove(this->GetInterface(), CCivPed_Destructor);
 
-            DWORD dwThis = (DWORD)this->GetInterface();
-            DWORD dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR;            // we use the vtbl so we can be type independent
-            _asm
-            {
-                mov     ecx, dwThis
-                push    1            // delete too
-                call    dwFunc
-            }
+            // CCivilianPed::~CCivilianPed
+            ((void(__thiscall*)(void*, bool))GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR)(GetInterface(), true);
+
         }
         this->BeingDeleted = true;
         ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
