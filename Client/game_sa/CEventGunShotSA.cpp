@@ -15,39 +15,19 @@ CEventGunShotSA::CEventGunShotSA(CEntity* pEntity, CVector& vecOrigin, CVector& 
 {
     m_pInterface = new CEventGunShotSAInterface;
 
-    DWORD dwEntityInterface = 0;
-    if (pEntity)
-        dwEntityInterface = (DWORD)pEntity->GetInterface();
-    float originX = vecOrigin.fX, originY = vecOrigin.fY, originZ = vecOrigin.fZ;
-    float targetX = vecTarget.fX, targetY = vecTarget.fY, targetZ = vecTarget.fZ;
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventGunShot_Constructor;
-    _asm
-    {
-        mov     ecx, dwThis
-        push    b_1
-        push    targetZ
-        push    targetY
-        push    targetX
-        push    originZ
-        push    originY
-        push    originX
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    // CEventGunShot::CEventGunShot
+    ((CEventGunShotSAInterface*(__thiscall*)(CEventGunShotSAInterface*, CEntitySAInterface*, float, float, float, float, float, float, bool))
+         FUNC_CEventGunShot_Constructor)(m_pInterface, pEntity ? pEntity->GetInterface() : nullptr, vecOrigin.fX, vecOrigin.fY, vecOrigin.fZ, vecTarget.fX, vecTarget.fY,
+                                         vecTarget.fZ, b_1);
 }
 
 void CEventGunShotSA::Destroy(bool bDestroyInterface)
 {
     if (bDestroyInterface)
     {
-        DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = FUNC_CEventGunShot_Destructor;
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        // CEventGunShot::~CEventGunShot
+        ((CEventGunShotSAInterface*(__thiscall*)(CEventGunShotSAInterface*))FUNC_CEventGunShot_Destructor)(m_pInterface);
+
         delete m_pInterface;
     }
     delete this;
