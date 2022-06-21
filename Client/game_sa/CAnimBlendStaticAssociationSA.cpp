@@ -13,13 +13,7 @@
 
 void CAnimBlendStaticAssociationSA::Initialize(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimBlendHierarchyInterface)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendStaticAssociation_Initialize;
-    _asm
-    {
-        push    pAnimBlendHierarchyInterface
-        push    pClump
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendStaticAssociation::Initialize
+    ((void(__thiscall*)(CAnimBlendStaticAssociationSAInterface*, RpClump*, CAnimBlendHierarchySAInterface*))FUNC_CAnimBlendStaticAssociation_Initialize)(
+        m_pInterface, pClump, pAnimBlendHierarchyInterface);
 }
