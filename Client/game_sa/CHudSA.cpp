@@ -139,62 +139,21 @@ bool CHudSA::IsDisabled()
 
 VOID CHudSA::DrawBarChart(float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor)
 {
-    DWORD dwFunc = FUNC_DrawBarChart;
-    _asm
-    {
-        push    dwBorderColor
-        push    dwForeColor
-        push    1
-        push    0
-        push    0
-        push    fPercentage
-        push    dwHeight
-        push    dwWidth
-        push    fY
-        push    fX
-        call    dwFunc
-        add     esp, 0x28
-    }
+    // CSprite2d::DrawBarChart
+    ((void(__cdecl*)(float, float, unsigned short, unsigned char, float, char, unsigned char, unsigned char, DWORD, DWORD))FUNC_DrawBarChart)(
+        fX, fY, dwWidth, dwHeight, fPercentage, 0, 0, 1, dwForeColor, dwBorderColor);
 }
 
 bool CHudSA::CalcScreenCoors(CVector* vecPosition1, CVector* vecPosition2, float* fX, float* fY, bool bSetting1, bool bSetting2)
 {
-    DWORD dwFunc = 0x71DA00;
-    bool  bReturn = false;
-    _asm
-    {
-        //push  bSetting2
-        //push  bSetting1
-        push    fY
-        push    fX
-        push    vecPosition2
-        push    vecPosition1
-        call    dwFunc
-        add     esp, 0x18
-        sub     esp, 8
-        mov     bReturn, al
-    }
-    return bReturn;
+    // CalcScreenCoors
+    return ((bool(__cdecl*)(CVector&, CVector&, float*, float*))0x71DA00)(*vecPosition1, *vecPosition2, fX, fY);
 }
 
 void CHudSA::Draw2DPolygon(float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor)
 {
-    DWORD dwFunc = FUNC_Draw2DPolygon;
-    _asm
-    {
-        lea     eax, dwColor
-        push    eax
-        push    fY4
-        push    fX4
-        push    fY3
-        push    fX3
-        push    fY2
-        push    fX2
-        push    fY1
-        push    fX1
-        call    dwFunc
-        add     esp, 36
-    }
+    // CSprite2d::Draw2DPolygon
+    ((void(__cdecl*)(float, float, float, float, float, float, float, float, DWORD))FUNC_Draw2DPolygon)(fX1, fY1, fX2, fY2, fX3, fY3, fX4, fY4, dwColor);
 }
 
 //
