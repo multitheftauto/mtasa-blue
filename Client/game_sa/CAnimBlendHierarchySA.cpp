@@ -30,58 +30,32 @@ void CAnimBlendHierarchySA::Initialize()
 
 void CAnimBlendHierarchySA::SetName(const char* szName)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_SetName;
-    _asm
-    {
-        push    szName
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendHierarchy::SetName
+    ((void(__thiscall*)(CAnimBlendHierarchySAInterface*, const char*))FUNC_CAnimBlendHierarchy_SetName)(m_pInterface, szName);
 }
 
 void CAnimBlendHierarchySA::RemoveAnimSequences()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveAnimSequences;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendHierarchy::RemoveAnimSequences
+    ((void(__thiscall*)(CAnimBlendHierarchySAInterface*))FUNC_CAnimBlendHierarchy_RemoveAnimSequences)(m_pInterface);
 }
 
 void CAnimBlendHierarchySA::RemoveFromUncompressedCache()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendHierarchy::RemoveFromUncompressedCache
+    ((void(__thiscall*)(CAnimBlendHierarchySAInterface*))FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache)(m_pInterface);
 }
 
 void CAnimBlendHierarchySA::RemoveQuaternionFlips()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendHierarchy::RemoveQuaternionFlips
+    ((void(__thiscall*)(CAnimBlendHierarchySAInterface*))FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips)(m_pInterface);
 }
 
 void CAnimBlendHierarchySA::CalculateTotalTime()
 {
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_CalculateTotalTime;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    // CAnimBlendHierarchy::CalculateTotalTime
+    ((void(__thiscall*)(CAnimBlendHierarchySAInterface*))FUNC_CAnimBlendHierarchy_CalculateTotalTime)(m_pInterface);
 }
 
 CAnimBlendSequenceSAInterface* CAnimBlendHierarchySA::GetSequence(DWORD dwIndex)
