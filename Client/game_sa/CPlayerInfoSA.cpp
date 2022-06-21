@@ -69,11 +69,9 @@ void CPlayerInfoSA::SetPlayerMoney(long lMoney, bool bInstant)
 VOID CPlayerInfoSA::GivePlayerParachute()
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::GivePlayerParachute ( VOID )");
-    DWORD dwFunction = FUNC_GivePlayerParachute;
-    _asm
-    {
-        call dwFunction
-    }
+
+    // CPlayerInfo::GivePlayerParachute
+    ((void(__cdecl*)())FUNC_GivePlayerParachute)();
 }
 
 /**
@@ -82,12 +80,9 @@ VOID CPlayerInfoSA::GivePlayerParachute()
 VOID CPlayerInfoSA::StreamParachuteWeapon(bool bAllowParachute)
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::StreamParachuteWeapon ( bool bAllowParachute )");
-    DWORD dwFunction = FUNC_StreamParachuteWeapon;
-    _asm
-    {
-        push bAllowParachute
-        call dwFunction
-    }
+
+    // CPlayerInfo::StreamParachuteWeapon
+    ((void(__cdecl*)(bool))FUNC_StreamParachuteWeapon)(bAllowParachute);
 }
 
 /**
@@ -98,12 +93,9 @@ VOID CPlayerInfoSA::StreamParachuteWeapon(bool bAllowParachute)
 VOID CPlayerInfoSA::MakePlayerSafe(BOOL boolSafe)
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::MakePlayerSafe ( BOOL boolSafe )");
-    DWORD dwFunction = FUNC_MakePlayerSafe;
-    _asm
-    {
-        push    boolSafe
-        call    dwFunction
-    }
+
+    // CPlayerInfo::MakePlayerSafe
+    ((void(__cdecl*)(bool))FUNC_MakePlayerSafe)(boolSafe);
 }
 
 /**
@@ -114,12 +106,7 @@ VOID CPlayerInfoSA::MakePlayerSafe(BOOL boolSafe)
 VOID CPlayerInfoSA::CancelPlayerEnteringCars(CVehicle* vehicle)
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::CancelPlayerEnteringCars ( CVehicle * vehicle )");
-    DWORD dwFunction = FUNC_CancelPlayerEnteringCars;
-    _asm
-    {
-        push    vehicle
-        call    dwFunction
-    }
+
 }
 
 /**
@@ -130,11 +117,9 @@ VOID CPlayerInfoSA::CancelPlayerEnteringCars(CVehicle* vehicle)
 VOID CPlayerInfoSA::ArrestPlayer()
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::ArrestPlayer (  )");
-    DWORD dwFunction = FUNC_ArrestPlayer;
-    _asm
-    {
-        call    dwFunction
-    }
+
+    // CPlayerInfo::ArrestPlayer
+    ((void(__cdecl*)())FUNC_ArrestPlayer)();
 }
 
 /**
@@ -145,11 +130,9 @@ VOID CPlayerInfoSA::ArrestPlayer()
 VOID CPlayerInfoSA::KillPlayer()
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::KillPlayer (  )");
-    DWORD dwFunction = FUNC_KillPlayer;
-    _asm
-    {
-        call    dwFunction
-    }
+
+    // CPlayerInfo::KillPlayer
+    ((void(__cdecl*)())FUNC_KillPlayer)();
 }
 
 /**
@@ -163,20 +146,12 @@ CVehicle* CPlayerInfoSA::GivePlayerRemoteControlledCar(eVehicleTypes vehicletype
     /**
      * \todo Add the player's X, Y, Z as the initial start position
      */
-    DWORD dwFunction = FUNC_GivePlayerRemoteControlledCar;
     // this->GetPlayerPed();
     float fX, fY, fZ;
     float fRotation;
-    _asm
-    {
-        push    vehicletype
-        push    fRotation;
-        push    fZ
-        push    fY
-        push    fX
-        call    dwFunction
-        add     esp, 0x14
-    }
+
+    // CRemote::GivePlayerRemoteControlledCar
+    ((void(__cdecl*)(float, float, float, float, unsigned short))FUNC_GivePlayerRemoteControlledCar)(fX, fY, fZ, fRotation, vehicletype);
 
     return this->GetPlayerRemoteControlledCar();
 }
@@ -187,14 +162,9 @@ CVehicle* CPlayerInfoSA::GivePlayerRemoteControlledCar(eVehicleTypes vehicletype
 VOID CPlayerInfoSA::TakeRemoteControlledCarFromPlayer()
 {
     DEBUG_TRACE("VOID CPlayerInfoSA::TakeRemoteControlledCarFromPlayer (  )");
-    DWORD dwFunction = FUNC_TakeRemoteControlledCarFromPlayer;
-    _asm
-    {
-        push    ecx
-        push    1
-        call    dwFunction
-        pop     ecx
-    }
+
+    // CRemote::TakeRemoteControlledCarFromPlayer
+    ((void(__cdecl*)(bool))FUNC_TakeRemoteControlledCarFromPlayer)(true);
 }
 
 /**
