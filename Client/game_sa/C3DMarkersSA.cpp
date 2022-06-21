@@ -38,59 +38,16 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
     unsigned short nPeriod, float fPulseFrac, short nRotRate, float normalX = 0.0f,
     float normalY = 0.0f, float normalZ = 0.0f, bool zCheck = FALSE);
     */
-    WORD wType = dwType;
-    dwType = (e3DMarkerType)wType;
-    bool bZCheck = true;
 
-    DWORD dwFunc = FUNC_PlaceMarker;
-    DWORD dwReturn = 0;
-    _asm
-    {
-        push    bZCheck     // zCheck  ##SA##
-        push    0           // normalZ ##SA##
-        push    0           // normalY ##SA##
-        push    0           // normalX ##SA##
-        push    0           // rotate rate
-        push    fPulseFraction      // pulse
-        push    0           // period
-        push    a           // alpha
-        push    b           // blue
-        push    g           // green
-        push    r           // red
-        push    fSize       // size
-        push    vecPosition // position
-        push    dwType      // type
-        push    Identifier  // identifier
-        call    dwFunc
-        mov     dwReturn, eax
-        add     esp, 0x3C
-    }
-    /*
-        DWORD dwFunc = 0x0726D40;
-        DWORD dwReturn = 0;
-        _asm
-        {
-            push    0           // uses collision
-            push    5           // rotate rate
-            push    0x3F800000  // pulse (1.0)
-            push    1024        // period
-            push    255         // alpha
-            push    0           // blue
-            push    255         // green
-            push    255         // red
-            push    0x40000000      // size (2.0)
-            push    vecPosition // position
-            push    Identifier  // identifier
-            call    dwFunc
-            mov     dwReturn, eax
-            add     esp, 0x2C
-        }
-        */
-    if (dwReturn)
+    // C3DMarkers::PlaceMarker
+    C3DMarkerSAInterface* marker = ((C3DMarkerSAInterface * (__cdecl*)(unsigned int, unsigned short, CVector&, float, unsigned char, unsigned char,
+                                                                       unsigned char, unsigned char, unsigned short, float, short, float, float, float, bool))
+                                        FUNC_PlaceMarker)(Identifier, dwType, *vecPosition, fSize, r, g, b, a, 0, fPulseFraction, 0, 0.0f, 0.0f, 0.0f, true);
+    if (marker)
     {
         for (int i = 0; i < MAX_3D_MARKERS; i++)
         {
-            if (Markers[i]->GetInterface() == (C3DMarkerSAInterface*)dwReturn)
+            if (Markers[i]->GetInterface() == marker)
             {
                 // Markers[i]->Reset(); // debug stuff
                 return Markers[i];
