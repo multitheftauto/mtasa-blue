@@ -68,14 +68,7 @@ void CWeatherSA::Release()
 bool CWeatherSA::IsRaining()
 {
     DEBUG_TRACE("bool CWeatherSA::IsRaining ( void )");
-    DWORD dwFunc = FUNC_IsRaining;
-    bool  bReturn = false;
-    _asm
-    {
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    return ((bool(__cdecl*)())FUNC_IsRaining)();
 }
 
 float CWeatherSA::GetAmountOfRain()
