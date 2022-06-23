@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-22 18:11+0000\n"
-"PO-Revision-Date: 2022-06-22 18:13\n"
+"PO-Revision-Date: 2022-06-23 11:43\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -2145,7 +2145,7 @@ msgstr "Показывать неподдерживаемые разрешени
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Отражение капель дождя"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
