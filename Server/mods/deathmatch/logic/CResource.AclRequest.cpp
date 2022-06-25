@@ -9,6 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResource.h"
+#include "CAccessControlList.h"
+#include "CAccessControlListManager.h"
+#include "CAclRightName.h"
+#include "CGame.h"
+#include "lua/CLuaFunctionParseHelpers.h"
 
 ///////////////////////////////////////////////////////////////
 //

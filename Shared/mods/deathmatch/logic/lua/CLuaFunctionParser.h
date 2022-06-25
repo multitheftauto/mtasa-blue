@@ -450,14 +450,10 @@ struct CLuaFunctionParserBase
         }
         else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
         {
-        #ifdef MTA_CLIENT
-            CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(L);
-        #else
-            CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(L);
-        #endif
+            CLuaMain&   luaMain = lua_getownercluamain(L);
             const void* pFuncPtr = lua_topointer(L, index);
 
-            if (CRefInfo* pInfo = MapFind(pLuaMain->m_CallbackTable, pFuncPtr))
+            if (CRefInfo* pInfo = MapFind(luaMain.m_CallbackTable, pFuncPtr))
             {
                 // Re-use the lua ref we already have to this function
                 pInfo->ulUseCount++;
@@ -472,7 +468,7 @@ struct CLuaFunctionParserBase
 
                 // Save ref info
                 CRefInfo info{1, ref};
-                MapSet(pLuaMain->m_CallbackTable, pFuncPtr, info);
+                MapSet(luaMain.m_CallbackTable, pFuncPtr, info);
 
                 ++index;
                 return CLuaFunctionRef(L, ref, pFuncPtr);
@@ -503,8 +499,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector2 may also be filled from a vector3/vector4
                 if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
@@ -536,8 +532,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
@@ -568,8 +564,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
@@ -608,8 +604,8 @@ struct CLuaFunctionParserBase
                 bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
-                    return isLightUserData ? UserDataCast<decltype(null)>(null, pValue, L)
-                                            : UserDataCast<decltype(null)>(null, *reinterpret_cast<void**>(pValue), L);
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector4 may also be filled from a CLuaMatrix
                 if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
@@ -628,8 +624,7 @@ struct CLuaFunctionParserBase
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopPrimitive<void*>(L, index);
             using class_t = std::remove_pointer_t<T>;
-            auto result =
-                isLightUserData ? UserDataCast<class_t>((class_t*)0, pValue, L) : UserDataCast<class_t>((class_t*)0, *reinterpret_cast<void**>(pValue), L);
+            auto result = isLightUserData ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
             if (result == nullptr)
             {
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the

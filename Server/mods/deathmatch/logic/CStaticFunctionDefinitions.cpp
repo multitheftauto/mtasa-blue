@@ -10,6 +10,71 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CStaticFunctionDefinitions.h"
+#include "lua/CLuaMain.h"
+#include "CGame.h"
+#include "ASE.h"
+#include "CBan.h"
+#include "CColManager.h"
+#include "CPickupManager.h"
+#include "CMarkerManager.h"
+#include "CClock.h"
+#include "CBlip.h"
+#include "CWater.h"
+#include "CPlayerCamera.h"
+#include "CElementDeleter.h"
+#include "CMainConfig.h"
+#include "CRegistry.h"
+#include "CColRectangle.h"
+#include "CColCircle.h"
+#include "CColTube.h"
+#include "CColCuboid.h"
+#include "CColPolygon.h"
+#include "CColSphere.h"
+#include "CPedSync.h"
+#include "CZoneNames.h"
+#include "CKeyBinds.h"
+#include "CAccountManager.h"
+#include "CMapManager.h"
+#include "CBanManager.h"
+#include "CPedManager.h"
+#include "CWaterManager.h"
+#include "CResourceManager.h"
+#include "CWeaponStatManager.h"
+#include "CHandlingManager.h"
+#include "CCustomWeaponManager.h"
+#include "CBuildingRemovalManager.h"
+#include "CTickRateSettings.h"
+#include "CWeaponNames.h"
+#include "CAccessControlListManager.h"
+#include "CPerfStatManager.h"
+#include "CVehicleNames.h"
+#include "CUnoccupiedVehicleSync.h"
+#include "Utils.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "packets/CLuaPacket.h"
+#include "packets/CElementRPCPacket.h"
+#include "packets/CVehicleSpawnPacket.h"
+#include "packets/CEntityAddPacket.h"
+#include "packets/CPlayerChangeNickPacket.h"
+#include "packets/CPlayerWastedPacket.h"
+#include "packets/CPlayerClothesPacket.h"
+#include "packets/CFireSyncPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
+#include "packets/CChatEchoPacket.h"
+#include "packets/CConsoleEchoPacket.h"
+#include "packets/CChatClearPacket.h"
+#include "packets/CElementRPCPacket.h"
+#include "version.h"
+#include <net/rpc_enums.h>
+
+#ifndef WIN32
+    #include <limits.h>
+
+    #ifndef MAX_PATH
+        #define MAX_PATH PATH_MAX
+    #endif
+#endif
 
 extern CGame*            g_pGame;
 extern CTimeUsMarker<20> markerLatentEvent;
@@ -894,12 +959,11 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
             BitStream.pBitStream->Write(szName, usNameLength);
             Variable.WriteToBitStream(*BitStream.pBitStream);
 
-            if (syncType == ESyncType::BROADCAST)
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
-            else
-                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName);
+            const CElementRPCPacket packet(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream);
+            const size_t numPlayers = syncType == ESyncType::BROADCAST ? m_pPlayerManager->BroadcastOnlyJoined(packet) :
+                m_pPlayerManager->BroadcastOnlySubscribed(packet, pElement, szName);
 
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, m_pPlayerManager->Count(),
+            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, numPlayers,
                                                                                  BitStream.pBitStream->GetNumberOfBytesUsed());
         }
 
@@ -3340,35 +3404,6 @@ bool CStaticFunctionDefinitions::SetPlayerBlurLevel(CElement* pElement, unsigned
         CBitStream bitStream;
         bitStream.pBitStream->Write(ucLevel);
         pPlayer->Send(CLuaPacket(SET_BLUR_LEVEL, *bitStream.pBitStream));
-
-        return true;
-    }
-    return false;
-}
-
-bool CStaticFunctionDefinitions::SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax)
-{
-    assert(pElement);
-
-    if (uiPartyMax > m_pMainConfig->GetMaxPlayers() || uiPartySize > uiPartyMax || strKey.length() > 64 || strPartyId.length() > 64 ||
-        strKey.find(' ') != SString::npos || strPartyId.find(' ') != SString::npos)
-        return false;
-
-    RUN_CHILDREN(SetPlayerDiscordJoinParams(*iter, strKey, strPartyId, uiPartySize, uiPartyMax))
-
-    if (IS_PLAYER(pElement))
-    {
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-
-        if (!pPlayer->CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
-            return false;
-
-        CBitStream bitStream;
-        bitStream.pBitStream->WriteString<uchar>(strKey);
-        bitStream.pBitStream->WriteString<uchar>(strPartyId);
-        bitStream.pBitStream->Write(uiPartySize);
-        bitStream.pBitStream->Write(uiPartyMax);
-        pPlayer->Send(CLuaPacket(SET_DISCORD_JOIN_PARAMETERS, *bitStream.pBitStream));
 
         return true;
     }

@@ -766,8 +766,16 @@ bool CStaticFunctionDefinitions::IsElementInWater(CClientEntity& Entity, bool& b
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            bInWater = Ped.IsInWater();
-            break;
+            if (Ped.GetOccupiedVehicle())
+            {
+                bInWater = Ped.GetOccupiedVehicle()->IsInWater();
+                break;
+            }
+            else
+            {
+                bInWater = Ped.IsInWater();
+                break;
+            }
         }
         case CCLIENTVEHICLE:
         {

@@ -108,3 +108,49 @@ void CCoronasSA::DisableSunAndMoon(bool bDisabled)
         byteOriginal = 0;
     }
 }
+
+/*
+    Enable or disable corona rain reflections.
+    ucEnabled:
+     0 - disabled
+     1 - enabled
+     2 - force enabled (render even if there is no rain)
+*/
+void CCoronasSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
+{
+    m_ucCoronaReflectionsEnabled = ucEnabled;
+
+    if (ucEnabled == 0)
+    {
+        // Disable corona rain reflections
+        // Return out CCoronas::RenderReflections()
+        MemPut<BYTE>(0x6FB630, 0xC3);
+    }
+    else
+    {
+        // Enable corona rain reflections
+        // Re-enable CCoronas::RenderReflections()
+        MemPut<BYTE>(0x6FB630, 0xD9);
+    }
+
+    if (ucEnabled == 2)
+    {
+        // Force enable corona reflections (render even if there is no rain)
+        // Disable fWetGripScale check
+        MemPut<BYTE>(0x6FB645, 0xEB);
+
+        // Patch "fld fWetGripScale" to "fld fOne"
+        MemCpy((void*)0x6FB906, "\x24\x86\x85\x00", 4);
+    }
+    else
+    {
+        // Restore patched code
+        MemPut<BYTE>(0x6FB645, 0x7A);
+        MemCpy((void*)0x6FB906, "\x08\x13\xC8\x00", 4);
+    }
+}
+
+unsigned char CCoronasSA::GetCoronaReflectionsEnabled()
+{
+    return m_ucCoronaReflectionsEnabled;
+}

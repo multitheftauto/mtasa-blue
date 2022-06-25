@@ -8,7 +8,21 @@
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #include "StdInc.h"
+#include "CResourceMapItem.h"
+#include "CGame.h"
+#include "CDummy.h"
+#include "CWater.h"
+#include "CBlip.h"
+#include "CMapManager.h"
+#include "CPedManager.h"
+#include "CWaterManager.h"
+#include "CMarkerManager.h"
+#include "CVehicleManager.h"
+#include "CBlipManager.h"
+#include "Enums.h"
+#include "lua/CLuaFunctionParseHelpers.h"
 
 extern CGame* g_pGame;
 

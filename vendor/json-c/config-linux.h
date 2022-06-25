@@ -74,6 +74,12 @@
 /* Define to 1 if you have the <xlocale.h> header file. */
 /* #undef HAVE_XLOCALE_H */
 
+/* Define to 1 if you have the <bsd/stdlib.h> header file. */
+/* #undef HAVE_BSD_STDLIB_H */
+
+/* Define to 1 if you have `arc4random' */
+/* #undef HAVE_ARC4RANDOM */
+
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
 
@@ -177,7 +183,7 @@
 #define PACKAGE_NAME "json-c"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "json-c 0.15.99"
+#define PACKAGE_STRING "json-c 0.16."
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "json-c"
@@ -186,7 +192,7 @@
 #define PACKAGE_URL "https://github.com/json-c/json-c"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.15.99"
+#define PACKAGE_VERSION "0.16."
 
 /* The number of bytes in type int */
 #define SIZEOF_INT 4
@@ -213,7 +219,7 @@
 #define STDC_HEADERS
 
 /* Version number of package */
-#define VERSION "0.15.99"
+#define VERSION "0.16."
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

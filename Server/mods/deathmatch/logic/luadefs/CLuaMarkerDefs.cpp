@@ -9,6 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaMarkerDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaMarkerDefs::LoadFunctions()
 {

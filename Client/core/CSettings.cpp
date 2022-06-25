@@ -856,6 +856,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
     m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
+
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -1567,6 +1571,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("blur", bBlur);
     m_pCheckBoxBlur->SetSelected(bBlur);
 
+    // Corona rain reflections
+    bool bCoronaReflections;
+    CVARS_GET("corona_reflections", bCoronaReflections);
+    m_pCheckBoxCoronaReflections->SetSelected(bCoronaReflections);
+
     PopulateResolutionComboBox();
 
     // Fullscreen style
@@ -1792,6 +1801,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
     CVARS_SET("blur", true);
+    CVARS_SET("corona_reflections", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
@@ -3441,6 +3451,11 @@ void CSettings::SaveData()
     bool bBlur = m_pCheckBoxBlur->GetSelected();
     CVARS_SET("blur", bBlur);
     gameSettings->ResetBlurEnabled();
+
+    // Corona rain reflections
+    bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
+    CVARS_SET("corona_reflections", bCoronaReflections);
+    gameSettings->ResetCoronaReflectionsEnabled();
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())

@@ -129,6 +129,7 @@ struct SDxStatus
         bool         bHighDetailVehicles;
         bool         bHighDetailPeds;
         bool         bBlur;
+        bool         bCoronaReflections;
     } settings;
 };
 

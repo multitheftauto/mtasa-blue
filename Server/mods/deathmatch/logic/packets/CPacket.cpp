@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPacket.h"
+#include "CPlayer.h"
 
 CPacket::CPacket()
 {

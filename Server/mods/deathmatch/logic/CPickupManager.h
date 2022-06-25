@@ -32,8 +32,8 @@ public:
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
     bool         Exists(CPickup* pPickup);
 
-    list<CPickup*>::const_iterator IterBegin() { return m_List.begin(); };
-    list<CPickup*>::const_iterator IterEnd() { return m_List.end(); };
+    std::list<CPickup*>::const_iterator IterBegin() { return m_List.begin(); };
+    std::list<CPickup*>::const_iterator IterEnd() { return m_List.end(); };
 
     static bool           IsValidWeaponID(unsigned int uiWeaponID);
     static unsigned short GetWeaponModel(unsigned int uiWeaponID);
@@ -44,6 +44,6 @@ private:
     void AddToList(CPickup* pPickup) { m_List.push_back(pPickup); };
     void RemoveFromList(CPickup* pPickup) { m_List.remove(pPickup); };
 
-    CColManager*   m_pColManager;
-    list<CPickup*> m_List;
+    CColManager*        m_pColManager;
+    std::list<CPickup*> m_List;
 };

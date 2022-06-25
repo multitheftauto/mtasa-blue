@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHandlingManager.h"
+#include "CCommon.h"
 
 SFixedArray<tHandlingData, HT_MAX> CHandlingManager::m_OriginalHandlingData;
 

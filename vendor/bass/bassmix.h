@@ -1,6 +1,6 @@
 /*
 	BASSmix 2.4 C/C++ header file
-	Copyright (c) 2005-2021 Un4seen Developments Ltd.
+	Copyright (c) 2005-2022 Un4seen Developments Ltd.
 
 	See the BASSMIX.CHM file for more detailed documentation
 */
@@ -56,6 +56,7 @@ extern "C" {
 // Mixer attributes
 #define BASS_ATTRIB_MIXER_LATENCY	0x15000
 #define BASS_ATTRIB_MIXER_THREADS	0x15001
+#define BASS_ATTRIB_MIXER_VOL		0x15002
 
 // Additional BASS_Mixer_ChannelIsActive return values
 #define BASS_ACTIVE_WAITING			5

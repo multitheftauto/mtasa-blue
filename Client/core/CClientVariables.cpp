@@ -330,6 +330,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
     DEFAULT("high_detail_peds", 0);                                                   // Disable rendering high detail peds all the time
     DEFAULT("blur", 1);                                                               // Enable blur
+    DEFAULT("corona_reflections", 0);                                                 // Disable corona rain reflections
     DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on
     DEFAULT("allow_screen_upload", 1);                                                // 0-off 1-on
     DEFAULT("allow_external_sounds", 1);                                              // 0-off 1-on
@@ -351,7 +352,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("browser_remote_websites", true);                                         // Load remote websites?
     DEFAULT("browser_remote_javascript", true);                                       // Execute javascript on remote websites?
     DEFAULT("filter_duplicate_log_lines", true);                                      // Filter duplicate log lines for debug view and clientscript.log
-    DEFAULT("discord_rich_presence", true);                                           // Enable Discord Game SDK
     DEFAULT("always_show_transferbox", false);            // Should the transfer box always be visible for downloads? (and ignore scripted control)
     DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));            // Command to run when right clicking quick connect (beta - can be removed at any time)
 

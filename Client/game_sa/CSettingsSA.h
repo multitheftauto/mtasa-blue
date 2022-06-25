@@ -91,6 +91,7 @@ private:
     int                   m_iDesktopWidth;
     int                   m_iDesktopHeight;
     bool                  m_bBlurViaScript;
+    bool                  m_bCoronaReflectionsViaScript;
 
 public:
     CSettingsSA();
@@ -167,6 +168,9 @@ public:
 
     void ResetBlurEnabled();
     void SetBlurControlledByScript(bool bByScript);
+
+    void ResetCoronaReflectionsEnabled();
+    void SetCoronaReflectionsControlledByScript(bool bViaScript);
 
     void Save();
 

@@ -1714,6 +1714,10 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
 
         lua_pushstring(luaVM, "SettingBlur");
         lua_pushboolean(luaVM, dxStatus.settings.bBlur);
+
+        lua_pushstring(luaVM, "SettingCoronaReflections");
+        lua_pushboolean(luaVM, dxStatus.settings.bCoronaReflections);
+
         lua_settable(luaVM, -3);
 
         lua_pushstring(luaVM, "TotalPhysicalMemory");

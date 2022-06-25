@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CObjectSync.h"
 
 #ifdef WITH_OBJECT_SYNC
 

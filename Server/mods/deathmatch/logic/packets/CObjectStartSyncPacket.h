@@ -13,6 +13,8 @@
 
 #include "CPacket.h"
 
+class CObject;
+
 class CObjectStartSyncPacket final : public CPacket
 {
 public:

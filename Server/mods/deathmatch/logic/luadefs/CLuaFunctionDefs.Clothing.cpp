@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 #include "CLuaFunctionDefs.h"
+#include "CScriptArgReader.h"
+#include "CStaticFunctionDefinitions.h"
 
 int CLuaFunctionDefs::GetBodyPartName(lua_State* luaVM)
 {

@@ -54,7 +54,6 @@ void CWebView::Initialise()
     browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
 
-    browserSettings.plugins = cef_state_t::STATE_DISABLED;
     if (!m_bIsLocal)
     {
         bool bEnabledJavascript = g_pCore->GetWebCore()->GetRemoteJavascriptEnabled();
@@ -977,8 +976,8 @@ bool CWebView::OnJSDialog(CefRefPtr<CefBrowser> browser, const CefString& origin
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name,
-                            const std::vector<CefString>& accept_types, int selected_accept_filter, CefRefPtr<CefFileDialogCallback> callback)
+bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                            const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback)
 {
     // Don't show the dialog
     return true;

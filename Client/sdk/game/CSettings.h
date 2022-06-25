@@ -169,5 +169,8 @@ public:
     virtual void ResetBlurEnabled() = 0;
     virtual void SetBlurControlledByScript(bool bByScript) = 0;
 
+    virtual void ResetCoronaReflectionsEnabled() = 0;
+    virtual void SetCoronaReflectionsControlledByScript(bool bViaScript) = 0;
+
     virtual void Save() = 0;
 };

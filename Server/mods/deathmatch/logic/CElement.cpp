@@ -10,6 +10,22 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CElement.h"
+#include "CPerPlayerEntity.h"
+#include "CElementIDs.h"
+#include "CPed.h"
+#include "CPlayerCamera.h"
+#include "CConsoleClient.h"
+#include "CGame.h"
+#include "CMainConfig.h"
+#include "CMapManager.h"
+#include "CDebugHookManager.h"
+#include "CElementRefManager.h"
+#include "CLogger.h"
+#include "CSpatialDatabase.h"
+#include "packets/CElementRPCPacket.h"
+#include "Utils.h"
+#include "lua/CLuaFunctionParseHelpers.h"
 
 extern CGame* g_pGame;
 
@@ -71,7 +87,7 @@ CElement::~CElement()
     delete m_pEventManager;
 
     // Unreference us from what's referencing us
-    list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
+    std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
     for (; iter != m_ElementReferenced.end(); iter++)
     {
         (*iter)->m_ElementReferences.remove(this);
@@ -89,7 +105,7 @@ CElement::~CElement()
     if (m_pAttachedTo)
         m_pAttachedTo->RemoveAttachedElement(this);
 
-    list<CElement*>::iterator iterAttached = m_AttachedElements.begin();
+    std::list<CElement*>::iterator iterAttached = m_AttachedElements.begin();
     for (; iterAttached != m_AttachedElements.end(); iterAttached++)
     {
         // Make sure our attached element stores it's current position
@@ -98,7 +114,7 @@ CElement::~CElement()
         (*iterAttached)->m_pAttachedTo = NULL;
     }
 
-    list<CPed*>::iterator iterUsers = m_OriginSourceUsers.begin();
+    std::list<CPed*>::iterator iterUsers = m_OriginSourceUsers.begin();
     for (; iterUsers != m_OriginSourceUsers.end(); iterUsers++)
     {
         CPed* pPed = *iterUsers;
@@ -832,7 +848,7 @@ void CElement::OnSubtreeAdd(CElement* pElement)
     // Call the event on the elements that references us
     if (!m_ElementReferenced.empty())            // This check reduces cpu usage when loading large maps (due to recursion)
     {
-        list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
+        std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
         {
             (*iter)->OnReferencedSubtreeAdd(pElement);
@@ -851,7 +867,7 @@ void CElement::OnSubtreeRemove(CElement* pElement)
     // Call the event on the elements that references us
     if (!m_ElementReferenced.empty())            // This check reduces cpu usage when unloading large maps (due to recursion)
     {
-        list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
+        std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
         {
             (*iter)->OnReferencedSubtreeRemove(pElement);
@@ -1037,7 +1053,7 @@ void CElement::CallParentEvent(const char* szName, const CLuaArguments& Argument
 
 bool CElement::CollisionExists(CColShape* pShape)
 {
-    list<CColShape*>::iterator iter = m_Collisions.begin();
+    std::list<CColShape*>::iterator iter = m_Collisions.begin();
     for (; iter != m_Collisions.end(); iter++)
     {
         if (*iter == pShape)
@@ -1050,7 +1066,7 @@ bool CElement::CollisionExists(CColShape* pShape)
 
 void CElement::RemoveAllCollisions()
 {
-    list<CColShape*>::iterator iter = m_Collisions.begin();
+    std::list<CColShape*>::iterator iter = m_Collisions.begin();
     for (; iter != m_Collisions.end(); iter++)
     {
         (*iter)->RemoveCollider(this);
@@ -1144,7 +1160,7 @@ void CElement::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
 
 bool CElement::IsElementAttached(CElement* pElement)
 {
-    list<CElement*>::iterator iter = m_AttachedElements.begin();
+    std::list<CElement*>::iterator iter = m_AttachedElements.begin();
     for (; iter != m_AttachedElements.end(); iter++)
     {
         if (*iter == pElement)
@@ -1510,7 +1526,7 @@ void CElement::UpdateSpatialData()
         m_bUpdatingSpatialData = true;
         GetSpatialDatabase()->UpdateEntity(this);
         // Also make sure attached entites get updated
-        for (list<CElement*>::iterator iter = m_AttachedElements.begin(); iter != m_AttachedElements.end(); iter++)
+        for (std::list<CElement*>::iterator iter = m_AttachedElements.begin(); iter != m_AttachedElements.end(); iter++)
         {
             CElement* pElement = *iter;
             if (pElement->GetAttachedToElement())

@@ -25,6 +25,7 @@ class CCoronasSA : public CCoronas
 {
 private:
     CRegisteredCoronaSA* Coronas[MAX_CORONAS];
+    unsigned char m_ucCoronaReflectionsEnabled;
 
 public:
     CCoronasSA();
@@ -37,4 +38,7 @@ public:
     RwTexture*         GetTexture(eCoronaType type);
 
     void DisableSunAndMoon(bool bDisabled);
+
+    void SetCoronaReflectionsEnabled(unsigned char ucEnabled);
+    unsigned char GetCoronaReflectionsEnabled();
 };
