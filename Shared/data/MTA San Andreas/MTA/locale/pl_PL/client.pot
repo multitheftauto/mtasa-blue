@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-22 18:11+0000\n"
-"PO-Revision-Date: 2022-06-22 18:13\n"
+"PO-Revision-Date: 2022-06-26 21:11\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -337,7 +337,7 @@ msgstr "MTA: San Andreas - Ostrzeżenie"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Katalog instalacyjny Grand Theft Auto: San Andreas zawiera następujące pliki:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
@@ -346,19 +346,19 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Zachowaj te pliki, ale pokaż również to ostrzeżenie przy następnym uruchomieniu"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Nie przypominaj mi więcej o tych plikach"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Zmień nazwy tych plików z *.dll na *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Otwórz folder"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -1637,7 +1637,7 @@ msgstr "To oprogramowanie korzysta z poniższych bibliotek i technologii:"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Czy chcesz uzyskać pomoc dla tego problemu w trybie online?"
+msgstr "Czy chcesz uzyskać pomoc online w sprawie tego problemu ?"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:209
@@ -2702,7 +2702,7 @@ msgstr "Oś hamowania"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr "AKTUALNOŚCI"
+msgstr "NOWOŚCI"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
