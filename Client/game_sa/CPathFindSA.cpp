@@ -56,7 +56,7 @@ void CPathFindSA::SwitchRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecArea
     float fZ2 = vecAreaCorner2->fZ;
 
     ((void(__thiscall*)(int, float, float, float, float, float, float, bool, bool, bool))FUNC_SwitchRoadsOffInArea)(CLASS_CPathFind, fX1, fX2, fY1, fY2, fZ1,
-                                                                                                                    fZ2, bEnable, true, false);
+                                                                                                                    fZ2, !bEnable, true, false);
 }
 
 void CPathFindSA::SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable)
@@ -70,7 +70,7 @@ void CPathFindSA::SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecA
     float fZ2 = vecAreaCorner2->fZ;
 
     ((void(__thiscall*)(int, float, float, float, float, float, float, bool, bool))FUNC_SwitchPedRoadsOffInArea)(CLASS_CPathFind, fX1, fX2, fY1, fY2, fZ1, fZ2,
-                                                                                                                 bEnable, false);
+                                                                                                                 !bEnable, false);
 }
 
 void CPathFindSA::SetPedDensity(float fPedDensity)
