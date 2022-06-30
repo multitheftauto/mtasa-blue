@@ -3040,20 +3040,9 @@ bool CStaticFunctionDefinitions::GivePlayerMoney(CElement* pElement, long lMoney
     if (IS_PLAYER(pElement))
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-
-        // Is it above 99999999? Limit it to it
-        if (lMoney > 99999999)
-            lMoney = 99999999;
-        // Is it below -99999999?
-        else if (lMoney < -99999999)
-            lMoney = -99999999;
-
-        // Calculate his new money, if it exceeds 8 digits, set it to 99999999
+		
+		// Set the new money. This could overflow and make the value negative
         long lNewMoney = pPlayer->GetMoney() + lMoney;
-        if (lNewMoney > 99999999)
-            lNewMoney = 99999999;
-        else if (lNewMoney < -99999999)
-            lNewMoney = -99999999;
 
         // Tell him his new money
         CBitStream BitStream;
