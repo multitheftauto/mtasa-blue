@@ -3018,13 +3018,6 @@ bool CStaticFunctionDefinitions::SetPlayerMoney(CElement* pElement, long lMoney,
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        // Is it above 99999999? Limit it to it
-        if (lMoney > 99999999)
-            lMoney = 99999999;
-        // Is it below -99999999?
-        else if (lMoney < -99999999)
-            lMoney = -99999999;
-
         // Tell him his new money
         CBitStream BitStream;
         BitStream.pBitStream->Write(lMoney);
