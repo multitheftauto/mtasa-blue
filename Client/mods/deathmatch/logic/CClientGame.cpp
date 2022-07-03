@@ -4199,29 +4199,25 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
         // Do not apply fall damage if ped has both jump and climb task
         if (!pInflictingEntity && weaponUsed == WEAPONTYPE_FALL && hitZone == PED_PIECE_TORSO)
         {
-            CTaskManager * pTaskManager = pDamagedPed->GetTaskManager();
-            if (pTaskManager)
+            CTask * pTask = pDamagedPed->GetCurrentPrimaryTask();
+            if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)
             {
-                CTask * pTask = pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
-                if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)
+                bool bHasClimbTask = false;
+                while (pTask)
                 {
-                    bool bHasClimbTask = false;
-                    while (pTask)
+                    pTask = pTask->GetSubTask();
+                    if (pTask && pTask->GetTaskType() == TASK_SIMPLE_CLIMB)
                     {
-                        pTask = pTask->GetSubTask();
-                        if (pTask && pTask->GetTaskType() == TASK_SIMPLE_CLIMB)
-                        {
-                            bHasClimbTask = true;
-                            break;
-                        }
+                        bHasClimbTask = true;
+                        break;
                     }
+                }
 
-                    if (bHasClimbTask)
-                    {
-                        // Restore ped health
-                        pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
-                        return false;
-                    }
+                if (bHasClimbTask)
+                {
+                    // Restore ped health
+                    pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
+                    return false;
                 }
             }
         }
