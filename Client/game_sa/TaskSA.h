@@ -77,6 +77,7 @@ public:
     void        SetParent(CTask* pParent);
     CTask*      GetParent() { return Parent; }
     CTask*      GetSubTask();
+    bool        HasSubTask(eTaskType eTaskType);
     bool        IsSimpleTask();
     int         GetTaskType();
     void        StopTimer(const CEvent* pEvent);

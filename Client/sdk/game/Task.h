@@ -34,6 +34,7 @@ public:
     virtual void                    SetParent(CTask* pParent) = 0;
     virtual CTask*                  GetParent() = 0;
     virtual CTask*                  GetSubTask() = 0;
+    virtual bool                    HasSubTask(eTaskType eTaskType) = 0;
     virtual bool                    IsSimpleTask() = 0;
     virtual int                     GetTaskType() = 0;            // returns NO_TASK_TYPE if no task type exists
     virtual void                    StopTimer(const CEvent* pEvent) = 0;
