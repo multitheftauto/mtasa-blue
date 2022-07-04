@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-22 18:11+0000\n"
-"PO-Revision-Date: 2022-06-22 18:14\n"
+"PO-Revision-Date: 2022-07-04 10:15\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -338,20 +338,21 @@ msgstr "MTA: San Andreas - Xəbərdarlıq"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Sizin Grand Theft Auto: San Andreas quraşdırma qovluğunda göstərilmiş sənəd var:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Bu sənəd lazım deyil və MTA-nın bu versiyasındakı qrafiki xüsisiyyətlikləri ilə problem yarada bilər.\n\n"
+"Göstərilmiş sənədinin silməniz vəya yenidən adlandırmanız tələb olunur."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Göstərilmiş sənədi işlət, və mənə gələn dəfə bu xəbərdarlıqı göstər"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Bu sənəd haqqında xəbərdarlıq göstərmə"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
