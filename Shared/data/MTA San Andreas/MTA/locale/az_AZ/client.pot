@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-22 18:11+0000\n"
-"PO-Revision-Date: 2022-07-04 10:15\n"
+"PO-Revision-Date: 2022-07-04 11:14\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -356,11 +356,11 @@ msgstr "Bu sənəd haqqında xəbərdarlıq göstərmə"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Sənədi *.dll yerinə *.dll.bak adlandır"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Mənə sənədi göstər"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -2139,7 +2139,7 @@ msgstr "Təhlükəli ekran nisbətlərini göstərin"
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Korona yağış parıltısı"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
