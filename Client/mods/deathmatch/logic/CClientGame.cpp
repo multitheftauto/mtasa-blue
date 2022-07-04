@@ -4196,7 +4196,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
         ///////////////////////////////////////////////////////////////////////////
 
         // Workaround fix for "Climbing over certain objects kills you, when you have high FPS"
-        // Do not apply fall damage if ped has both jump and climb task
+        // Do not apply fall damage if ped has climb task
         if (!pInflictingEntity && weaponUsed == WEAPONTYPE_FALL && hitZone == PED_PIECE_TORSO)
         {
             CTask* pTask = pDamagedPed->GetCurrentPrimaryTask();
