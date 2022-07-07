@@ -153,7 +153,7 @@ bool CHudSA::CalcScreenCoors(CVector* vecPosition1, CVector* vecPosition2, float
 void CHudSA::Draw2DPolygon(float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor)
 {
     // CSprite2d::Draw2DPolygon
-    ((void(__cdecl*)(float, float, float, float, float, float, float, float, DWORD))FUNC_Draw2DPolygon)(fX1, fY1, fX2, fY2, fX3, fY3, fX4, fY4, dwColor);
+    ((void(__cdecl*)(float, float, float, float, float, float, float, float, DWORD*))FUNC_Draw2DPolygon)(fX1, fY1, fX2, fY2, fX3, fY3, fX4, fY4, &dwColor);
 }
 
 //
