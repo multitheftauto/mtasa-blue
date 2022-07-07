@@ -7050,7 +7050,7 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
         };
 
         // Fx_c::AddDebris
-        ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(0xA9AE00, vecPosition, color, 0.06f, count / 100 + 1);
+        ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);
     }
 }
 
