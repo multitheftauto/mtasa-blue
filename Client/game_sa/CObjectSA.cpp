@@ -226,7 +226,7 @@ CObjectSA::~CObjectSA()
                 CWorldSA* world = (CWorldSA*)pGame->GetWorld();
                 world->Remove(pInterface, CObject_Destructor);
 
-                ((void(__thiscall*)(void*))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface);
+                ((void(__thiscall*)(void*, unsigned int))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 1);
 
 #ifdef MTA_USE_BUILDINGS_AS_OBJECTS
                 DWORD dwModelID = this->internalInterface->m_nModelIndex;
