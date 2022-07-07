@@ -470,7 +470,7 @@ VOID CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
 bool CEntitySA::IsPlayingAnimation(char* szAnimName)
 {
     // RpAnimBlendClumpGetAssociation
-    return ((CAnimBlendAssociation*(__cdecl*)(RpClump*, const char*))FUNC_RpAnimBlendClumpGetAssociation)(m_pInterface->m_pRwObject, szAnimName) ? true : false;
+    return ((CAnimBlendAssociation*(__cdecl*)(RpClump*, const char*))FUNC_RpAnimBlendClumpGetAssociation)(m_pInterface->m_pRwObject, szAnimName) != nullptr;
 }
 
 RwMatrixTag* CEntitySA::GetBoneRwMatrix(eBone boneId)
