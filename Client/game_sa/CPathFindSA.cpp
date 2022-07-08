@@ -13,17 +13,7 @@
 
 CNodeAddress* CPathFindSA::FindNthNodeClosestToCoors(CVector* vecCoors, int iNodeNumber, int iType, CNodeAddress* pNodeAddress, float fDistance)
 {
-    DWORD dwFunc = FUNC_FindNthNodeClosestToCoors;
-
-    CNodeAddress  node;
-    CNodeAddress* nodeptr;
-
-    // CPathFind::FindNthNodeClosestToCoors
-    ((CNodeAddress * (__thiscall*)(int, CNodeAddress*, CVector, unsigned char, float, bool, bool, int, bool, bool, CNodeAddress*))
-         FUNC_FindNthNodeClosestToCoors)(CLASS_CPathFind, &nodeptr, *vecCoors, 0, fDistance, false, false, iNodeNumber, iType, false, &node);
-
-    *pNodeAddress = node;
-    return pNodeAddress;
+    return nullptr;
 }
 
 CPathNode* CPathFindSA::GetPathNode(CNodeAddress* node)
