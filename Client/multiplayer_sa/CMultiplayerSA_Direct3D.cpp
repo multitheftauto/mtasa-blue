@@ -47,6 +47,11 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
     ms_BehaviorFlags = *BehaviorFlags;
     ms_pPresentationParameters = pPresentationParameters;
     ms_ppReturnedDeviceInterface = ppReturnedDeviceInterface;
+
+    // Set fullscreen refresh rate to display adapter's value
+    D3DDISPLAYMODE DisplayMode;
+    if (!FAILED(ms_pDirect3D->GetAdapterDisplayMode(Adapter, &DisplayMode)))
+        ms_pPresentationParameters->FullScreen_RefreshRateInHz = DisplayMode.RefreshRate;
 }
 
 // Hook info
