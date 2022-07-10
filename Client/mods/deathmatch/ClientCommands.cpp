@@ -1035,6 +1035,12 @@ void COMMAND_Debug4(const char* szCmdLine)
     g_pClientGame->StartPlayback();
     return;
 }
+
+void COMMAND_TimeStep(const char* szCmdLine)
+{
+    g_pCore->GetConsole()->Printf("TimeStep: %f", *(float*)0xB7CB5C); // CTimer::ms_fTimeStep
+}
+
 #endif
 
 void COMMAND_ShowCollision(const char* szCmdLine)
