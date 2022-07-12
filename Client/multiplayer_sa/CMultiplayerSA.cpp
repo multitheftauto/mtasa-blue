@@ -1551,6 +1551,9 @@ void CMultiplayerSA::InitHooks()
     // Skip check for disabled HUD
     MemSet((void*)0x58FBC4, 0x90, 9);
 
+    // Show muzzle flash for last bullet in magazine
+    MemSet((void*)0x61ECD2, 0x90, 20);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
