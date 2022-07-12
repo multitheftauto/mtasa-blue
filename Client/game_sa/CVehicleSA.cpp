@@ -661,14 +661,13 @@ CDoorSA* CVehicleSA::GetDoor(unsigned char ucDoor)
 
 void CVehicleSA::OpenDoor(unsigned char ucDoor, float fRatio, bool bMakeNoise)
 {
-    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = ((CVehicleSAInterfaceVTBL*)GetVehicleInterface()->vtbl)->OpenDoor;
 
     // Grab the car node index for the given door id
     static int s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
     DWORD      dwIdx = s_iCarNodeIndexes[ucDoor];
 
-    ((void(__thiscall*)(void*, CPedSAInterface*, int, unsigned char, float, bool))dwFunc)(GetInterface(), nullptr, dwIdx, ucDoor, fRatio, bMakeNoise);
+    ((void(__thiscall*)(void*, CPedSAInterface*, int, unsigned int, float, bool))dwFunc)(GetInterface(), nullptr, dwIdx, ucDoor, fRatio, bMakeNoise);
 }
 
 void CVehicleSA::SetSwingingDoorsAllowed(bool bAllowed)
