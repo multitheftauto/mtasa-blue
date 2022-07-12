@@ -315,6 +315,7 @@ private:
     bool                m_bHeatHazeCustomized;
     float               m_fNearClipDistance;
     float               m_fMaddDoggPoolLevel;
+    float               m_fOrgTimeStep;
     eAnimGroup          m_dwLastStaticAnimGroupID;
     eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;

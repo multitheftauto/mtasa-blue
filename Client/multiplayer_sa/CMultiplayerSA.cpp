@@ -589,6 +589,7 @@ CMultiplayerSA::CMultiplayerSA()
     m_bHeatHazeEnabled = true;
     m_bHeatHazeCustomized = false;
     m_fMaddDoggPoolLevel = 1082.73f;
+    m_fOrgTimeStep = 5.0f / 3.0f;
     m_dwLastStaticAnimGroupID = eAnimGroup::ANIM_GROUP_DEFAULT;
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
 }
@@ -1550,6 +1551,10 @@ void CMultiplayerSA::InitHooks()
 
     // Skip check for disabled HUD
     MemSet((void*)0x58FBC4, 0x90, 9);
+
+    // Fix "Climbing over certain objects kills you, when you have high FPS" (#602)
+    // By using constant timestep in CTaskSimpleClimb::ProcessPed
+    MemPut(0x6811E9, &m_fOrgTimeStep);
 
     InitHooks_CrashFixHacks();
 
