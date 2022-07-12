@@ -580,9 +580,9 @@ void CSettingsSA::SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrai
     ms_bMaxVehicleLODDistanceFromScript = bFromScript;
 }
 
-void CSettingsSA::ResetVehiclesLODDistance(bool bFromScript)
+void CSettingsSA::ResetVehiclesLODDistance(bool bFromScript, bool bFromConfig)
 {
-    if (!bFromScript)
+    if (!bFromScript || bFromConfig)
     {
         bool bHighDetailVehicles;
         g_pCore->GetCVars()->Get("high_detail_vehicles", bHighDetailVehicles);
@@ -598,19 +598,13 @@ void CSettingsSA::ResetVehiclesLODDistance(bool bFromScript)
             ms_fClientMaxTrainPlaneLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE * TRAIN_LOD_DISTANCE_MULTIPLIER;
         }
 
-        if (ms_bMaxVehicleLODDistanceFromScript)
+        if (ms_bMaxVehicleLODDistanceFromScript && !bFromConfig)
             return;
     }
 
     ms_bMaxVehicleLODDistanceFromScript = false;
     ms_fVehicleLODDistance = ms_fClientMaxVehicleLODDistance;
     ms_fTrainPlaneLODDistance = ms_fClientMaxTrainPlaneLODDistance;
-}
-
-void CSettingsSA::ResetVehiclesLODDistanceFromScript()
-{
-    ms_bMaxVehicleLODDistanceFromScript = false;
-    ResetVehiclesLODDistance(false);
 }
 
 void CSettingsSA::GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance)
@@ -636,9 +630,9 @@ void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance, bool bFromScript)
     ms_bMaxPedsLODDistanceFromScript = bFromScript;
 }
 
-void CSettingsSA::ResetPedsLODDistance(bool bFromScript)
+void CSettingsSA::ResetPedsLODDistance(bool bFromScript, bool bFromConfig)
 {
-    if (!bFromScript)
+    if (!bFromScript || bFromConfig)
     {
         bool bHighDetailPeds;
         g_pCore->GetCVars()->Get("high_detail_peds", bHighDetailPeds);
@@ -648,18 +642,12 @@ void CSettingsSA::ResetPedsLODDistance(bool bFromScript)
         else
             ms_fClientMaxPedsLODDistance = DEFAULT_PEDS_LOD_DISTANCE;
 
-        if (ms_bMaxPedsLODDistanceFromScript)
+        if (ms_bMaxPedsLODDistanceFromScript && !bFromConfig)
             return;
     }
 
     ms_bMaxPedsLODDistanceFromScript = false;
     ms_fPedsLODDistance = ms_fClientMaxPedsLODDistance;
-}
-
-void CSettingsSA::ResetPedsLODDistanceFromScript()
-{
-    ms_bMaxPedsLODDistanceFromScript = false;
-    ResetPedsLODDistance(false);
 }
 
 float CSettingsSA::GetPedsLODDistance()

@@ -160,8 +160,7 @@ public:
     float GetFieldOfViewVehicleMax();
 
     void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript);
-    void ResetVehiclesLODDistance(bool bFromScript);
-    void ResetVehiclesLODDistanceFromScript();
+    void ResetVehiclesLODDistance(bool bFromScript, bool bFromConfig = false);
     void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance);
 
     void ResetCoronaReflectionsEnabled();
@@ -170,8 +169,7 @@ public:
     void Save();
 
     void  SetPedsLODDistance(float fPedsLODDistance, bool bFromScript);
-    void  ResetPedsLODDistance(bool bFromScript);
-    void  ResetPedsLODDistanceFromScript();
+    void  ResetPedsLODDistance(bool bFromScript, bool bFromConfig = false);
     float GetPedsLODDistance();
 
     static void StaticSetHooks();
