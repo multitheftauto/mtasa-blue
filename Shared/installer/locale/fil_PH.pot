@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-19 21:04\n"
+"PO-Revision-Date: 2022-07-13 12:26\n"
 "Last-Translator: \n"
 "Language-Team: Filipino\n"
 "Language: fil_PH\n"
@@ -20,12 +20,12 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:188
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Ang bersyon ng MTA:SA na iyong na-download ay hindi sumusuporta sa Windows XP o Vista.  Mangyaring mag-download ng alternatibong bersyon mula sa www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:189
 msgid "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
-msgstr ""
+msgstr "Ang bersyon ng MTA:SA ay idinisenyo para sa mga lumang bersyon ng Windows.  Mangyaring i-download ang pinakabagong bersyon mula sa www.mtasa.com."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:190
@@ -33,12 +33,15 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr ""
+msgstr "Gagabayan ka ng wizard na ito sa pag-install o pag-update ng $(^Name) ${REVISION_TAG}\n\n"
+"Inirerekomenda na isara mo ang lahat ng iba pang mga application bago simulan ang Setup.\n\n"
+"[Maaaring humiling ng access sa admin para sa Vista at mas bago]\n\n"
+"I-click ang Susunod upang magpatuloy."
 
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:194
 msgid "Grand Theft Auto: San Andreas location"
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas lokasyon ng"
 
 #. DIRECTORY_Text_Dest
 #: Shared/installer/nightly.nsi:195
