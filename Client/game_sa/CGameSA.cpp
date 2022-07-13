@@ -222,6 +222,7 @@ CGameSA::CGameSA()
     CFxSystemSA::StaticSetHooks();
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
+    CVehicleSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -606,6 +607,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_BURN_FLIPPED_CARS))
         return IsBurnFlippedCarsEnabled();
 
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+        return IsVehicleSunGlareEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -644,6 +648,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+    {
+        SetVehicleSunGlareEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -661,6 +671,7 @@ void CGameSA::ResetCheats()
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
     SetBurnFlippedCarsEnabled(true);
+    CVehicleSA::SetVehiclesSunGlareEnabled(false);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -758,6 +769,17 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
     {
         m_JetpackWeapons[weaponType] = bEnabled;
     }
+}
+
+void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
+{
+    // State turning will be handled in hooks handler
+    CVehicleSA::SetVehiclesSunGlareEnabled(bEnabled);
+}
+
+bool CGameSA::IsVehicleSunGlareEnabled()
+{
+    return CVehicleSA::GetVehiclesSunGlareEnabled();
 }
 
 bool CGameSA::PerformChecks()

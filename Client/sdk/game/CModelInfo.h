@@ -114,20 +114,20 @@ public:
     virtual class CBaseModelInfoSAInterface* GetInterface() = 0;
 
     virtual eModelInfoType GetModelType() = 0;
-    virtual DWORD GetModel() = 0;
-    virtual bool  IsPlayerModel() = 0;
-    virtual BOOL  IsBoat() = 0;
-    virtual BOOL  IsCar() = 0;
-    virtual BOOL  IsTrain() = 0;
-    virtual BOOL  IsHeli() = 0;
-    virtual BOOL  IsPlane() = 0;
-    virtual BOOL  IsBike() = 0;
-    virtual BOOL  IsFakePlane() = 0;
-    virtual BOOL  IsMonsterTruck() = 0;
-    virtual BOOL  IsQuadBike() = 0;
-    virtual BOOL  IsBmx() = 0;
-    virtual BOOL  IsTrailer() = 0;
-    virtual bool  IsVehicle() const = 0;
+    virtual DWORD          GetModel() = 0;
+    virtual bool           IsPlayerModel() = 0;
+    virtual BOOL           IsBoat() = 0;
+    virtual BOOL           IsCar() = 0;
+    virtual BOOL           IsTrain() = 0;
+    virtual BOOL           IsHeli() = 0;
+    virtual BOOL           IsPlane() = 0;
+    virtual BOOL           IsBike() = 0;
+    virtual BOOL           IsFakePlane() = 0;
+    virtual BOOL           IsMonsterTruck() = 0;
+    virtual BOOL           IsQuadBike() = 0;
+    virtual BOOL           IsBmx() = 0;
+    virtual BOOL           IsTrailer() = 0;
+    virtual bool           IsVehicle() const = 0;
 
     virtual char* GetNameIfVehicle() = 0;
 

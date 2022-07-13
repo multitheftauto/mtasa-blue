@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTextItem.h"
+#include "CIdArray.h"
 
 static unsigned long ulUniqueId = 0;
 

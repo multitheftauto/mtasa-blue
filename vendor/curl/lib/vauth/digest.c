@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -40,7 +40,6 @@
 #include "warnless.h"
 #include "strtok.h"
 #include "strcase.h"
-#include "non-ascii.h" /* included for Curl_convert_... prototypes */
 #include "curl_printf.h"
 #include "rand.h"
 
@@ -56,20 +55,7 @@
 #define DIGEST_QOP_VALUE_STRING_AUTH      "auth"
 #define DIGEST_QOP_VALUE_STRING_AUTH_INT  "auth-int"
 #define DIGEST_QOP_VALUE_STRING_AUTH_CONF "auth-conf"
-
-/* The CURL_OUTPUT_DIGEST_CONV macro below is for non-ASCII machines.
-   It converts digest text to ASCII so the MD5 will be correct for
-   what ultimately goes over the network.
-*/
-#define CURL_OUTPUT_DIGEST_CONV(a, b)                  \
-  do {                                                 \
-    result = Curl_convert_to_network(a, b, strlen(b)); \
-    if(result) {                                       \
-      free(b);                                         \
-      return result;                                   \
-    }                                                  \
-  } while(0)
-#endif /* !USE_WINDOWS_SSPI */
+#endif
 
 bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
                                const char **endptr)
@@ -230,7 +216,7 @@ static CURLcode auth_digest_get_qop_values(const char *options, int *value)
     return CURLE_OUT_OF_MEMORY;
 
   token = strtok_r(tmp, ",", &tok_buf);
-  while(token != NULL) {
+  while(token) {
     if(strcasecompare(token, DIGEST_QOP_VALUE_STRING_AUTH))
       *value |= DIGEST_QOP_VALUE_AUTH;
     else if(strcasecompare(token, DIGEST_QOP_VALUE_STRING_AUTH_INT))
@@ -556,7 +542,7 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
           return CURLE_OUT_OF_MEMORY;
 
         token = strtok_r(tmp, ",", &tok_buf);
-        while(token != NULL) {
+        while(token) {
           if(strcasecompare(token, DIGEST_QOP_VALUE_STRING_AUTH)) {
             foundAuth = TRUE;
           }
@@ -666,8 +652,8 @@ static CURLcode auth_create_digest_http_message(
                   struct digestdata *digest,
                   char **outptr, size_t *outlen,
                   void (*convert_to_ascii)(unsigned char *, unsigned char *),
-                  void (*hash)(unsigned char *, const unsigned char *,
-                               const size_t))
+                  CURLcode (*hash)(unsigned char *, const unsigned char *,
+                                   const size_t))
 {
   CURLcode result;
   unsigned char hashbuf[32]; /* 32 bytes/256 bits */
@@ -692,7 +678,7 @@ static CURLcode auth_create_digest_http_message(
     if(result)
       return result;
 
-    result = Curl_base64_encode(data, cnoncebuf, strlen(cnoncebuf),
+    result = Curl_base64_encode(cnoncebuf, strlen(cnoncebuf),
                                 &cnonce, &cnonce_sz);
     if(result)
       return result;
@@ -705,7 +691,6 @@ static CURLcode auth_create_digest_http_message(
     if(!hashthis)
       return CURLE_OUT_OF_MEMORY;
 
-    CURL_OUTPUT_DIGEST_CONV(data, hashthis);
     hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
     free(hashthis);
     convert_to_ascii(hashbuf, (unsigned char *)userh);
@@ -722,12 +707,10 @@ static CURLcode auth_create_digest_http_message(
            unq(nonce-value) ":" unq(cnonce-value)
   */
 
-  hashthis = aprintf("%s:%s:%s", digest->userhash ? userh : userp,
-                                 digest->realm, passwdp);
+  hashthis = aprintf("%s:%s:%s", userp, digest->realm, passwdp);
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
-  CURL_OUTPUT_DIGEST_CONV(data, hashthis); /* convert on non-ASCII machines */
   hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
   free(hashthis);
   convert_to_ascii(hashbuf, ha1);
@@ -740,7 +723,6 @@ static CURLcode auth_create_digest_http_message(
     if(!tmp)
       return CURLE_OUT_OF_MEMORY;
 
-    CURL_OUTPUT_DIGEST_CONV(data, tmp); /* Convert on non-ASCII machines */
     hash(hashbuf, (unsigned char *) tmp, strlen(tmp));
     free(tmp);
     convert_to_ascii(hashbuf, ha1);
@@ -779,7 +761,6 @@ static CURLcode auth_create_digest_http_message(
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
-  CURL_OUTPUT_DIGEST_CONV(data, hashthis); /* convert on non-ASCII machines */
   hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
   free(hashthis);
   convert_to_ascii(hashbuf, ha2);
@@ -795,7 +776,6 @@ static CURLcode auth_create_digest_http_message(
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
-  CURL_OUTPUT_DIGEST_CONV(data, hashthis); /* convert on non-ASCII machines */
   hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
   free(hashthis);
   convert_to_ascii(hashbuf, request_digest);

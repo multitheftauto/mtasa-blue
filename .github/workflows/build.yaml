@@ -1,16 +1,25 @@
 name: Build
 
-# Trigger the workflow on push or pull request
-on: [push, pull_request]
+# Trigger the workflow on any pull request, push or manual dispatch
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
-  windows-release:
-    name: windows-release
-    runs-on: windows-2019
+  windows:
+    strategy:
+      matrix:
+        configuration: [release, debug]
+        platform: [win32, x64, arm64]
+        include:
+        - configuration: release
+          artifact-name: InstallFiles
+        - configuration: debug
+          artifact-name: InstallFiles-debug
+    name: windows-${{ matrix.configuration }}-${{ matrix.platform }}
+    runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         id: cache-dxfiles
         with:
           path: utils/DXFiles
@@ -33,7 +42,7 @@ jobs:
         run: utils\premake5 install_data
 
       - name: Run Build
-        run: win-build.bat
+        run: win-build.bat ${{ matrix.configuration }} ${{ matrix.platform }}
         shell: cmd
         env:
           DXSDK_DIR: './utils/DXFiles/'
@@ -44,95 +53,44 @@ jobs:
 
       - uses: actions/upload-artifact@master
         with:
-          name: InstallFiles
+          name: ${{ matrix.artifact-name }}
           path: InstallFiles/
 
-
-  windows-debug:
-    name: windows-debug
-    runs-on: windows-2019
-    steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/cache@v1
-        id: cache-dxfiles
-        with:
-          path: utils/DXFiles
-          key: dxfiles-0001
-
-      - name: Download DirectX
-        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
-        run: Invoke-WebRequest https://mirror.mtasa.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
-        shell: powershell
-
-      - name: Extract DirectX
-        if: steps.cache-dxfiles.outputs.cache-hit != 'true'
-        run: Expand-Archive -Path utils/DXFiles.zip -DestinationPath utils/DXFiles
-        shell: powershell
-
-      - name: Install CEF
-        run: utils\premake5 install_cef
-
-      - name: Install data files
-        run: utils\premake5 install_data
-
-      - name: Run Build
-        run: win-build.bat Debug
-        shell: cmd
-        env:
-          DXSDK_DIR: './utils/DXFiles/'
-          CI: 'true'
-
-      - name: Create build artifacts
-        run: utils\premake5 compose_files
-
-      - uses: actions/upload-artifact@master
-        with:
-          name: InstallFiles-debug
-          path: InstallFiles/
-
-  macOS-release:
-    name: macOS-release
+  macOS:
+    strategy:
+      matrix:
+        type: [release, debug]
+    name: macOS-${{ matrix.type }}
     runs-on: macOS-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Install MySQL
         run: brew install mysql
         continue-on-error: true
+
       - name: Link MySQL
         run: brew link --overwrite mysql
-      - uses: actions/checkout@v2
-      - name: Run Build
-        run: ./linux-build.sh
 
-  macOS-debug:
-    name: macOS-debug
-    runs-on: macOS-latest
-    steps:
-      - name: Install MySQL
-        run: brew install mysql
-        continue-on-error: true
-      - name: Link MySQL
-        run: brew link --overwrite mysql
-      - uses: actions/checkout@v2
       - name: Run Build
-        run: ./linux-build.sh "" debug
+        run: ./linux-build.sh --config=${{ matrix.type }}
 
-  linux-release:
-    name: linux-release
+  linux:
+    strategy:
+      matrix:
+        type: [release, debug]
+        architecture: [x64, arm64]
+        include:
+        - architecture: x64
+          image-tag: latest
+        - architecture: arm64
+          image-tag: arm64
+    name: linux-${{ matrix.type }}-${{ matrix.architecture }}
     runs-on: ubuntu-latest
     container:
-      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
+      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Run Build
-        run: ./linux-build.sh
+      - uses: actions/checkout@v3
 
-  linux-debug:
-    name: linux-debug
-    runs-on: ubuntu-latest
-    container:
-      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
-    steps:
-      - uses: actions/checkout@v2
       - name: Run Build
-        run: ./linux-build.sh "" debug
+        run: ./linux-build.sh --arch=${{ matrix.architecture }} --config=${{ matrix.type }}

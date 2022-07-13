@@ -6,7 +6,10 @@
  *  PURPOSE:     Client/server shared enum definitions
  *
  *****************************************************************************/
+
 #pragma once
+
+#include <net/Packets.h>
 
 namespace EEventPriority
 {
@@ -65,6 +68,7 @@ DECLARE_ENUM(eEulerRotationOrder);
 
 DECLARE_ENUM(EHashFunction::EHashFunctionType);
 DECLARE_ENUM_CLASS(PasswordHashFunction);
-DECLARE_ENUM_CLASS(StringEncryptFunction);
+DECLARE_ENUM_CLASS(StringEncodeFunction);
+DECLARE_ENUM_CLASS(KeyPairAlgorithm);
 
 DECLARE_ENUM(ePacketID);

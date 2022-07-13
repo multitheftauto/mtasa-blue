@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -76,7 +76,6 @@
 #include "speedcheck.h"
 #include "warnless.h"
 #include "http_proxy.h"
-#include "non-ascii.h"
 #include "socks.h"
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -592,7 +591,7 @@ static CURLcode ftp_readresp(struct Curl_easy *data,
      * This response code can come at any point so having it treated
      * generically is a good idea.
      */
-    infof(data, "We got a 421 - timeout!");
+    infof(data, "We got a 421 - timeout");
     state(data, FTP_STOP);
     return CURLE_OPERATION_TIMEDOUT;
   }
@@ -876,11 +875,6 @@ static CURLcode ftp_state_cwd(struct Curl_easy *data,
 
     ftpc->count2 = 0; /* count2 counts failed CWDs */
 
-    /* count3 is set to allow a MKD to fail once. In the case when first CWD
-       fails and then MKD fails (due to another session raced it to create the
-       dir) this then allows for a second try to CWD to it */
-    ftpc->count3 = (data->set.ftp_create_missing_dirs == 2)?1:0;
-
     if(conn->bits.reuse && ftpc->entrypath &&
        /* no need to go to entrypath when we have an absolute path */
        !(ftpc->dirdepth && ftpc->dirs[0][0] == '/')) {
@@ -1009,7 +1003,7 @@ static CURLcode ftp_state_use_port(struct Curl_easy *data,
       }
 
     /* parse the port */
-    if(ip_end != NULL) {
+    if(ip_end) {
       port_start = strchr(ip_end, ':');
       if(port_start) {
         port_min = curlx_ultous(strtoul(port_start + 1, NULL, 10));
@@ -1035,8 +1029,11 @@ static CURLcode ftp_state_use_port(struct Curl_easy *data,
     if(*addr != '\0') {
       /* attempt to get the address of the given interface name */
       switch(Curl_if2ip(conn->ip_addr->ai_family,
+#ifdef ENABLE_IPV6
                         Curl_ipv6_scope(conn->ip_addr->ai_addr),
-                        conn->scope_id, addr, hbuf, sizeof(hbuf))) {
+                        conn->scope_id,
+#endif
+                        addr, hbuf, sizeof(hbuf))) {
         case IF2IP_NOT_FOUND:
           /* not an interface, use the given string as host name instead */
           host = addr;
@@ -1168,7 +1165,7 @@ static CURLcode ftp_state_use_port(struct Curl_easy *data,
 
   /* maybe all ports were in use already*/
   if(port > port_max) {
-    failf(data, "bind() failed, we ran out of ports!");
+    failf(data, "bind() failed, we ran out of ports");
     Curl_closesocket(data, conn, portsock);
     return CURLE_FTP_PORT_FAILED;
   }
@@ -1465,7 +1462,7 @@ static CURLcode ftp_state_list(struct Curl_easy *data)
     /* url-decode before evaluation: e.g. paths starting/ending with %2f */
     const char *slashPos = NULL;
     char *rawPath = NULL;
-    result = Curl_urldecode(data, ftp->path, 0, &rawPath, NULL, REJECT_CTRL);
+    result = Curl_urldecode(ftp->path, 0, &rawPath, NULL, REJECT_CTRL);
     if(result)
       return result;
 
@@ -2705,7 +2702,7 @@ static CURLcode ftp_statemachine(struct Curl_easy *data,
         Curl_sec_request_prot(conn, data->set.str[STRING_KRB_LEVEL]);
 
         if(Curl_sec_login(data, conn))
-          infof(data, "Logging in with password in cleartext!");
+          infof(data, "Logging in with password in cleartext");
         else
           infof(data, "Authentication successful");
       }
@@ -3002,6 +2999,12 @@ static CURLcode ftp_statemachine(struct Curl_easy *data,
            ftpc->cwdcount && !ftpc->count2) {
           /* try making it */
           ftpc->count2++; /* counter to prevent CWD-MKD loops */
+
+          /* count3 is set to allow MKD to fail once per dir. In the case when
+          CWD fails and then MKD fails (due to another session raced it to
+          create the dir) this then allows for a second try to CWD to it. */
+          ftpc->count3 = (data->set.ftp_create_missing_dirs == 2) ? 1 : 0;
+
           result = Curl_pp_sendf(data, &ftpc->pp, "MKD %s",
                                  ftpc->dirs[ftpc->cwdcount - 1]);
           if(!result)
@@ -3246,7 +3249,7 @@ static CURLcode ftp_done(struct Curl_easy *data, CURLcode status,
 
   if(!result)
     /* get the url-decoded "raw" path */
-    result = Curl_urldecode(data, ftp->path, 0, &rawPath, &pathLen,
+    result = Curl_urldecode(ftp->path, 0, &rawPath, &pathLen,
                             REJECT_CTRL);
   if(result) {
     /* We can limp along anyway (and should try to since we may already be in
@@ -3378,7 +3381,7 @@ static CURLcode ftp_done(struct Curl_easy *data, CURLcode status,
        (ftp->transfer == PPTRANSFER_BODY)) {
       failf(data, "Uploaded unaligned file size (%" CURL_FORMAT_CURL_OFF_T
             " out of %" CURL_FORMAT_CURL_OFF_T " bytes)",
-            data->req.bytecount, data->state.infilesize);
+            data->req.writebytecount, data->state.infilesize);
       result = CURLE_PARTIAL_FILE;
     }
   }
@@ -3401,7 +3404,7 @@ static CURLcode ftp_done(struct Curl_easy *data, CURLcode status,
     else if(!ftpc->dont_check &&
             !data->req.bytecount &&
             (data->req.size>0)) {
-      failf(data, "No data was received!");
+      failf(data, "No data was received");
       result = CURLE_FTP_COULDNT_RETR_FILE;
     }
   }
@@ -4101,6 +4104,11 @@ static CURLcode ftp_disconnect(struct Curl_easy *data,
   return CURLE_OK;
 }
 
+#ifdef _MSC_VER
+/* warning C4706: assignment within conditional expression */
+#pragma warning(disable:4706)
+#endif
+
 /***********************************************************************
  *
  * ftp_parse_url_path()
@@ -4125,9 +4133,11 @@ CURLcode ftp_parse_url_path(struct Curl_easy *data)
   ftpc->cwdfail = FALSE;
 
   /* url-decode ftp path before further evaluation */
-  result = Curl_urldecode(data, ftp->path, 0, &rawPath, &pathLen, REJECT_CTRL);
-  if(result)
+  result = Curl_urldecode(ftp->path, 0, &rawPath, &pathLen, REJECT_CTRL);
+  if(result) {
+    failf(data, "path contains control characters");
     return result;
+  }
 
   switch(data->set.ftp_filemethod) {
     case FTPFILE_NOCWD: /* fastest, but less standard-compliant */
@@ -4189,7 +4199,7 @@ CURLcode ftp_parse_url_path(struct Curl_easy *data)
         }
 
         /* parse the URL path into separate path components */
-        while((slashPos = strchr(curPos, '/')) != NULL) {
+        while((slashPos = strchr(curPos, '/'))) {
           size_t compLen = slashPos - curPos;
 
           /* path starts with a slash: add that as a directory */
@@ -4225,7 +4235,7 @@ CURLcode ftp_parse_url_path(struct Curl_easy *data)
 
   if(data->set.upload && !ftpc->file && (ftp->transfer == PPTRANSFER_BODY)) {
     /* We need a file name when uploading. Return error! */
-    failf(data, "Uploading to a URL without a file name!");
+    failf(data, "Uploading to a URL without a file name");
     free(rawPath);
     return CURLE_URL_MALFORMAT;
   }
@@ -4356,7 +4366,7 @@ static CURLcode ftp_setup_connection(struct Curl_easy *data,
   struct FTP *ftp;
 
   data->req.p.ftp = ftp = calloc(sizeof(struct FTP), 1);
-  if(NULL == ftp)
+  if(!ftp)
     return CURLE_OUT_OF_MEMORY;
 
   ftp->path = &data->state.up.path[1]; /* don't include the initial slash */

@@ -12,10 +12,13 @@
 #include "StdInc.h"
 #include "CDynamicLibrary.h"
 #include "MTAPlatform.h"
+#include "version.h"
 
 #ifdef WIN32
-#include <stdio.h>
+    #include <stdio.h>
 #endif
+
+void Print(const char* szFormat, ...);
 
 CDynamicLibrary::CDynamicLibrary()
 {
@@ -145,7 +148,7 @@ FuncPtr_t CDynamicLibrary::GetProcedureAddress(const char* szProcName)
 bool CDynamicLibrary::CheckMtaVersion(const char* szLibName)
 {
 #if MTASA_VERSION_TYPE >= VERSION_TYPE_UNSTABLE
-// define MTASA_SKIP_VERSION_CHECKS in "Shared/build_overrides.h" to skip version checks
+    // define MTASA_SKIP_VERSION_CHECKS in "Shared/build_overrides.h" to skip version checks
 #ifndef MTASA_SKIP_VERSION_CHECKS
 
     if (m_hModule == 0)

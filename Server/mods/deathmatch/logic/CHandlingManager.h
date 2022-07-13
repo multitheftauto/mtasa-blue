@@ -14,6 +14,7 @@ class CHandlingManager;
 #pragma once
 
 #include "CHandlingEntry.h"
+#include "CCommon.h"
 
 class CHandlingManager
 {

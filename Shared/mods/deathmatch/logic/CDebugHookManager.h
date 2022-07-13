@@ -7,12 +7,23 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
+
+#include "lua/CLuaFunctionRef.h"
+#include "Enums.h"
+#include "lua/LuaCommon.h"
 
 #ifdef MTA_CLIENT
     #define CElement CClientEntity
     #define CPlayer CClientPlayer
 #endif
+
+class CLuaMain;
+class CLuaArguments;
+class CElement;
+class CPlayer;
+class CMapEvent;
 
 struct SDebugHookCallInfo
 {
@@ -31,7 +42,7 @@ enum class EArgType
 struct SMaskArgument
 {
     EArgType argType;
-    uint index;
+    uint     index;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -61,7 +72,8 @@ public:
 
 protected:
     void GetFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, lua_State* luaVM, bool bAllowed);
-    void GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent);
+    void GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource,
+                                           CPlayer* pCaller, CMapEvent* pMapEvent);
     void GetEventCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);
 
     std::vector<SDebugHookCallInfo>& GetHookInfoListForType(EDebugHookType hookType);
@@ -71,12 +83,12 @@ protected:
     bool MustNameBeExplicitlyAllowed(const SString& strName);
     void MaybeMaskArgumentValues(const SString& strFunctionName, CLuaArguments& FunctionArguments);
 
-    uint                                  m_uiPostFunctionOverride;
-    std::vector<SDebugHookCallInfo>       m_PreEventHookList;
-    std::vector<SDebugHookCallInfo>       m_PostEventHookList;
-    std::vector<SDebugHookCallInfo>       m_PreFunctionHookList;
-    std::vector<SDebugHookCallInfo>       m_PostFunctionHookList;
-    std::vector<SDebugHookCallInfo>       m_PreEventFunctionHookList;
-    std::vector<SDebugHookCallInfo>       m_PostEventFunctionHookList;
-    std::map<SString, std::vector<SMaskArgument> > m_MaskArgumentsMap;
+    uint                                          m_uiPostFunctionOverride;
+    std::vector<SDebugHookCallInfo>               m_PreEventHookList;
+    std::vector<SDebugHookCallInfo>               m_PostEventHookList;
+    std::vector<SDebugHookCallInfo>               m_PreFunctionHookList;
+    std::vector<SDebugHookCallInfo>               m_PostFunctionHookList;
+    std::vector<SDebugHookCallInfo>               m_PreEventFunctionHookList;
+    std::vector<SDebugHookCallInfo>               m_PostEventFunctionHookList;
+    std::map<SString, std::vector<SMaskArgument>> m_MaskArgumentsMap;
 };

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -65,6 +65,7 @@
 #include "connect.h"
 #include "select.h"
 #include "progress.h"
+#include "timediff.h"
 
 #  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
   defined(WIN32)
@@ -109,7 +110,9 @@ struct thread_data {
   struct Curl_addrinfo *temp_ai; /* intermediary result while fetching c-ares
                                     parts */
   int last_status;
+#ifndef HAVE_CARES_GETADDRINFO
   struct curltime happy_eyeballs_dns_time; /* when this timer started, or 0 */
+#endif
 };
 
 /* How long we are willing to wait for additional parallel responses after
@@ -288,7 +291,7 @@ int Curl_resolver_getsock(struct Curl_easy *data,
 
   timeout = ares_timeout((ares_channel)data->state.async.resolver, &maxtime,
                          &timebuf);
-  milli = (timeout->tv_sec * 1000) + (timeout->tv_usec/1000);
+  milli = (long)curlx_tvtoms(timeout);
   if(milli == 0)
     milli += 10;
   Curl_expire(data, milli, EXPIRE_ASYNC_NAME);
@@ -341,7 +344,7 @@ static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
     nfds = 0;
 
   if(!nfds)
-    /* Call ares_process() unconditonally here, even if we simply timed out
+    /* Call ares_process() unconditionally here, even if we simply timed out
        above, as otherwise the ares name resolve won't timeout! */
     ares_process_fd((ares_channel)data->state.async.resolver, ARES_SOCKET_BAD,
                     ARES_SOCKET_BAD);
@@ -375,6 +378,7 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
 
   waitperform(data, 0);
 
+#ifndef HAVE_CARES_GETADDRINFO
   /* Now that we've checked for any last minute results above, see if there are
      any responses still pending when the EXPIRE_HAPPY_EYEBALLS_DNS timer
      expires. */
@@ -397,6 +401,7 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
     ares_cancel((ares_channel)data->state.async.resolver);
     DEBUGASSERT(res->num_pending == 0);
   }
+#endif
 
   if(res && !res->num_pending) {
     (void)Curl_addrinfo_callback(data, res->last_status, res->temp_ai);

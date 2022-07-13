@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "Utils.h"
+#include "CWeaponNames.h"
 
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
                                                    float WeaponRange, CControllerState& sharedControllerState)
@@ -128,7 +130,7 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         // Set weapon slot
         if (bWeaponCorrect)
-            m_Cache.ucWeaponSlot = uiSlot;
+            m_Cache.ucWeaponSlot = static_cast<uchar>(uiSlot);
 
         if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {

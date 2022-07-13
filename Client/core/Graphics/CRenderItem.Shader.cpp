@@ -20,8 +20,8 @@ uint CShaderItem::ms_uiCreateTimeCounter = 0;
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
-                                float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros)
+void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
+                                float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros)
 {
     m_fPriority = fPriority;
     m_uiCreateTime = ms_uiCreateTimeCounter++;            // Priority tie breaker
@@ -91,8 +91,8 @@ void CShaderItem::OnResetDevice()
 //
 //
 ////////////////////////////////////////////////////////////////
-void CShaderItem::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus,
-    bool bDebug, const EffectMacroList& macros)
+void CShaderItem::CreateUnderlyingData(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
+                                       const EffectMacroList& macros)
 {
     assert(!m_pEffectWrap);
     assert(!m_pShaderInstance);

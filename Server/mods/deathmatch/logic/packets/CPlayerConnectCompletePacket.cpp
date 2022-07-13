@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerConnectCompletePacket.h"
+#include "CStaticFunctionDefinitions.h"
+#include "version.h"
+
 #define MAX_CONN_TEXT_LEN 128
 
 bool CPlayerConnectCompletePacket::Write(NetBitStreamInterface& BitStream) const

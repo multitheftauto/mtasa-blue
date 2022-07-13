@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -253,10 +253,17 @@ struct ssl_primary_config {
   char *cipher_list;     /* list of ciphers to use */
   char *cipher_list13;   /* list of TLS 1.3 cipher suites to use */
   char *pinned_key;
+  char *CRLfile;         /* CRL to check certificate revocation */
   struct curl_blob *cert_blob;
   struct curl_blob *ca_info_blob;
   struct curl_blob *issuercert_blob;
+#ifdef USE_TLS_SRP
+  char *username; /* TLS username (for, e.g., SRP) */
+  char *password; /* TLS password (for, e.g., SRP) */
+  enum CURL_TLSAUTH authtype; /* TLS authentication type (default SRP) */
+#endif
   char *curves;          /* list of curves to use */
+  unsigned char ssl_options;  /* the CURLOPT_SSL_OPTIONS bitmask */
   BIT(verifypeer);       /* set TRUE if this is desired */
   BIT(verifyhost);       /* set TRUE if CN/SAN must match hostname */
   BIT(verifystatus);     /* set TRUE if certificate status must be checked */
@@ -266,7 +273,6 @@ struct ssl_primary_config {
 struct ssl_config_data {
   struct ssl_primary_config primary;
   long certverifyresult; /* result from the certificate verification */
-  char *CRLfile;   /* CRL to check certificate revocation */
   curl_ssl_ctx_callback fsslctx; /* function to initialize ssl ctx */
   void *fsslctxp;        /* parameter for call back */
   char *cert_type; /* format for certificate (default: PEM)*/
@@ -274,11 +280,6 @@ struct ssl_config_data {
   struct curl_blob *key_blob;
   char *key_type; /* format for private key (default: PEM) */
   char *key_passwd; /* plain text private key password */
-#ifdef USE_TLS_SRP
-  char *username; /* TLS username (for, e.g., SRP) */
-  char *password; /* TLS password (for, e.g., SRP) */
-  enum CURL_TLSAUTH authtype; /* TLS authentication type (default SRP) */
-#endif
   BIT(certinfo);     /* gather lots of certificate info */
   BIT(falsestart);
   BIT(enable_beast); /* allow this flaw for interoperability's sake*/
@@ -330,7 +331,7 @@ struct digestdata {
   char *opaque;
   char *qop;
   char *algorithm;
-  int nc; /* nounce count */
+  int nc; /* nonce count */
   BIT(stale); /* set true for re-negotiation */
   BIT(userhash);
 #endif
@@ -351,10 +352,6 @@ typedef enum {
   GSS_AUTHDONE,
   GSS_AUTHSUCC
 } curlnegotiate;
-
-#if defined(CURL_DOES_CONVERSIONS) && defined(HAVE_ICONV)
-#include <iconv.h>
-#endif
 
 /* Struct used for GSSAPI (Kerberos V5) authentication */
 #if defined(USE_KERBEROS5)
@@ -450,6 +447,11 @@ struct negotiatedata {
 };
 #endif
 
+#ifdef CURL_DISABLE_PROXY
+#define CONN_IS_PROXIED(x) 0
+#else
+#define CONN_IS_PROXIED(x) x->bits.proxy
+#endif
 
 /*
  * Boolean values that concerns this connection.
@@ -470,6 +472,7 @@ struct ConnectBits {
   BIT(proxy_connect_closed); /* TRUE if a proxy disconnected the connection
                                 in a CONNECT request with auth, so that
                                 libcurl should reconnect and continue. */
+  BIT(proxy); /* if set, this transfer is done through a proxy - any type */
 #endif
   /* always modify bits.close with the connclose() and connkeep() macros! */
   BIT(close); /* if set, we close the connection after this request */
@@ -479,8 +482,6 @@ struct ConnectBits {
                         that overrides the host in the URL */
   BIT(conn_to_port); /* if set, this connection has a "connect to port"
                         that overrides the port in the URL (remote port) */
-  BIT(proxy); /* if set, this transfer is done through a proxy - any type */
-  BIT(user_passwd); /* do we use user+password for this connection? */
   BIT(ipv6_ip); /* we communicate with a remote site specified with pure IPv6
                    IP address */
   BIT(ipv6);    /* we communicate with a site using an IPv6 address */
@@ -518,7 +519,9 @@ struct ConnectBits {
   BIT(tls_enable_npn);  /* TLS NPN extension? */
   BIT(tls_enable_alpn); /* TLS ALPN extension? */
   BIT(connect_only);
+#ifndef CURL_DISABLE_DOH
   BIT(doh);
+#endif
 #ifdef USE_UNIX_SOCKETS
   BIT(abstract_unix_socket);
 #endif
@@ -835,6 +838,7 @@ struct Curl_handler {
 #define PROTOPT_WILDCARD (1<<12) /* protocol supports wildcard matching */
 #define PROTOPT_USERPWDCTRL (1<<13) /* Allow "control bytes" (< 32 ascii) in
                                        user name and password */
+#define PROTOPT_NOTCPPROXY (1<<14) /* this protocol can't proxy over TCP */
 
 #define CONNCHECK_NONE 0                 /* No checks */
 #define CONNCHECK_ISDEAD (1<<0)          /* Check if the connection is dead. */
@@ -936,8 +940,9 @@ struct connectdata {
      cache entry remains locked. It gets unlocked in multi_done() */
   struct Curl_addrinfo *ip_addr;
   struct Curl_addrinfo *tempaddr[2]; /* for happy eyeballs */
-
+#ifdef ENABLE_IPV6
   unsigned int scope_id;  /* Scope id for IPv6 */
+#endif
 
   enum {
     TRNSPRT_TCP = 3,
@@ -979,7 +984,8 @@ struct connectdata {
   char *user;    /* user name string, allocated */
   char *passwd;  /* password string, allocated */
   char *options; /* options string, allocated */
-  char *sasl_authzid;     /* authorisation identity string, allocated */
+  char *sasl_authzid;     /* authorization identity string, allocated */
+  char *oauth_bearer; /* OAUTH2 bearer, allocated */
   unsigned char httpversion; /* the HTTP version*10 reported by the server */
   struct curltime now;     /* "current" time */
   struct curltime created; /* creation time */
@@ -1155,7 +1161,11 @@ struct PureInfo {
      reused, in the connection cache. */
 
   char conn_primary_ip[MAX_IPADR_LEN];
-  int conn_primary_port;
+  int conn_primary_port; /* this is the destination port to the connection,
+                            which might have been a proxy */
+  int conn_remote_port;  /* this is the "remote port", which is the port
+                            number of the used URL, independent of proxy or
+                            not */
   char conn_local_ip[MAX_IPADR_LEN];
   int conn_local_port;
   const char *conn_scheme;
@@ -1324,14 +1334,16 @@ struct UrlState {
   char *ulbuf; /* allocated upload buffer or NULL */
   curl_off_t current_speed;  /* the ProgressShow() function sets this,
                                 bytes / second */
-  char *first_host; /* host name of the first (not followed) request.
-                       if set, this should be the host name that we will
-                       sent authorization to, no else. Used to make Location:
-                       following not keep sending user+password... This is
-                       strdup() data.
-                    */
+
+  /* host name, port number and protocol of the first (not followed) request.
+     if set, this should be the host name that we will sent authorization to,
+     no else. Used to make Location: following not keep sending user+password.
+     This is strdup()ed data. */
+  char *first_host;
+  int first_remote_port;
+  unsigned int first_remote_protocol;
+
   int retrycount; /* number of retries on a new connection */
-  int first_remote_port; /* remote port of the first (not followed) request */
   struct Curl_ssl_session *session; /* array of 'max_ssl_sessions' size */
   long sessionage;                  /* number of the most recent session */
   struct tempbuf tempwrite[3]; /* BOTH, HEADER, BODY */
@@ -1339,6 +1351,7 @@ struct UrlState {
   int os_errno;  /* filled in with errno whenever an error occurs */
   char *scratch; /* huge buffer[set.buffer_size*2] for upload CRLF replacing */
   long followlocation; /* redirect counter */
+  int requests; /* request counter: redirects + authentication retakes */
 #ifdef HAVE_SIGNAL
   /* storage for the previous bag^H^H^HSIGPIPE signal handler :-) */
   void (*prev_signal)(int sig);
@@ -1410,6 +1423,8 @@ struct UrlState {
   size_t trailers_bytes_sent;
   struct dynbuf trailers_buf; /* a buffer containing the compiled trailing
                                  headers */
+  struct Curl_llist httphdrs; /* received headers */
+  struct curl_header headerout; /* for external purposes */
 #endif
   trailers_state trailers_state; /* whether we are sending trailers
                                        and what stage are we at */
@@ -1554,6 +1569,7 @@ enum dupstring {
   STRING_SSH_PRIVATE_KEY, /* path to the private key file for auth */
   STRING_SSH_PUBLIC_KEY,  /* path to the public key file for auth */
   STRING_SSH_HOST_PUBLIC_KEY_MD5, /* md5 of host public key in ascii hex */
+  STRING_SSH_HOST_PUBLIC_KEY_SHA256, /* sha256 of host public key in base64 */
   STRING_SSH_KNOWNHOSTS,  /* file name of knownhosts file */
   STRING_PROXY_SERVICE_NAME, /* Proxy service name */
   STRING_SERVICE_NAME,    /* Service name */
@@ -1651,15 +1667,10 @@ struct UserDefined {
   curl_closesocket_callback fclosesocket; /* function for closing the
                                              socket */
   void *closesocket_client;
+  curl_prereq_callback fprereq; /* pre-initial request callback */
+  void *prereq_userp; /* pre-initial request user data */
 
   void *seek_client;    /* pointer to pass to the seek callback */
-  /* the 3 curl_conv_callback functions below are used on non-ASCII hosts */
-  /* function to convert from the network encoding: */
-  curl_conv_callback convfromnetwork;
-  /* function to convert to the network encoding: */
-  curl_conv_callback convtonetwork;
-  /* function to convert from UTF-8 encoding: */
-  curl_conv_callback convfromutf8;
 #ifndef CURL_DISABLE_HSTS
   curl_hstsread_callback hsts_read;
   void *hsts_read_userp;
@@ -1675,6 +1686,8 @@ struct UserDefined {
   long server_response_timeout; /* in milliseconds, 0 means no timeout */
   long maxage_conn;     /* in seconds, max idle time to allow a connection that
                            is to be reused */
+  long maxlifetime_conn; /* in seconds, max time since creation to allow a
+                            connection that is to be reused */
   long tftp_blksize;    /* in bytes, 0 means use default */
   curl_off_t filesize;  /* size of file to upload, -1 means unknown */
   long low_speed_limit; /* bytes/second */
@@ -1741,9 +1754,12 @@ struct UserDefined {
   long ssh_auth_types;   /* allowed SSH auth types */
   char *str[STRING_LAST]; /* array of strings, pointing to allocated memory */
   struct curl_blob *blobs[BLOB_LAST];
+#ifdef ENABLE_IPV6
   unsigned int scope_id;  /* Scope id for IPv6 */
+#endif
   long allowed_protocols;
   long redir_protocols;
+  long mime_options;      /* Mime option flags. */
   struct curl_slist *mail_rcpt; /* linked list of mail recipients */
   /* Common RTSP header options */
   Curl_RtspReq rtspreq; /* RTSP request type */
@@ -1851,11 +1867,12 @@ struct UserDefined {
                            header */
   BIT(abstract_unix_socket);
   BIT(disallow_username_in_url); /* disallow username in url */
+#ifndef CURL_DISABLE_DOH
   BIT(doh); /* DNS-over-HTTPS enabled */
-  BIT(doh_get); /* use GET for DoH requests, instead of POST */
   BIT(doh_verifypeer);     /* DoH certificate peer verification */
   BIT(doh_verifyhost);     /* DoH certificate hostname verification */
   BIT(doh_verifystatus);   /* DoH certificate status verification */
+#endif
   BIT(http09_allowed); /* allow HTTP/0.9 responses */
   BIT(mail_rcpt_allowfails); /* allow RCPT TO command to fail for some
                                 recipients */
@@ -1939,11 +1956,6 @@ struct Curl_easy {
   struct PureInfo info;        /* stats, reports and info data */
   struct curl_tlssessioninfo tsi; /* Information about the TLS session, only
                                      valid after a client has asked for it */
-#if defined(CURL_DOES_CONVERSIONS) && defined(HAVE_ICONV)
-  iconv_t outbound_cd;         /* for translating to the network encoding */
-  iconv_t inbound_cd;          /* for translating from the network encoding */
-  iconv_t utf8_cd;             /* for translating to UTF8 */
-#endif /* CURL_DOES_CONVERSIONS && HAVE_ICONV */
 #ifdef USE_HYPER
   struct hyptransfer hyp;
 #endif

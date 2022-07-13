@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "Enums.h"
 
 IMPLEMENT_ENUM_BEGIN(EEventPriority::EEventPriorityType)
 ADD_ENUM(EEventPriority::LOW, "low")
@@ -52,10 +53,15 @@ IMPLEMENT_ENUM_CLASS_BEGIN(PasswordHashFunction)
 ADD_ENUM(PasswordHashFunction::Bcrypt, "bcrypt")
 IMPLEMENT_ENUM_CLASS_END("password-hash-function")
 
-IMPLEMENT_ENUM_CLASS_BEGIN(StringEncryptFunction)
-ADD_ENUM(StringEncryptFunction::TEA, "tea")
-ADD_ENUM(StringEncryptFunction::AES128, "aes128")
-IMPLEMENT_ENUM_CLASS_END("string-encrypt-function")
+IMPLEMENT_ENUM_CLASS_BEGIN(StringEncodeFunction)
+ADD_ENUM(StringEncodeFunction::TEA, "tea")
+ADD_ENUM(StringEncodeFunction::AES128, "aes128")
+ADD_ENUM(StringEncodeFunction::RSA, "rsa")
+IMPLEMENT_ENUM_CLASS_END("string-encode-function")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(KeyPairAlgorithm)
+ADD_ENUM(KeyPairAlgorithm::RSA, "rsa")
+IMPLEMENT_ENUM_CLASS_END("key-pair-algorithm")
 
 IMPLEMENT_ENUM_BEGIN(ePacketID)
 ADD_ENUM1(PACKET_ID_SERVER_JOIN)

@@ -43,6 +43,7 @@ CSettingsSA::CSettingsSA()
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
+    m_bCoronaReflectionsViaScript = false;
     SetAspectRatio(ASPECT_RATIO_4_3);
     HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
@@ -696,6 +697,29 @@ void CSettingsSA::ResetPedsLODDistanceFromScript()
 float CSettingsSA::GetPedsLODDistance()
 {
     return ms_fPedsLODDistance;
+}
+
+////////////////////////////////////////////////
+//
+// Corona rain reflections
+//
+// When corona reflections are controlled by script changing this option
+// in settings doesn't produce any effect
+//
+////////////////////////////////////////////////
+void CSettingsSA::ResetCoronaReflectionsEnabled()
+{
+    if (m_bCoronaReflectionsViaScript)
+        return;
+
+    bool bEnabled;
+    g_pCore->GetCVars()->Get("corona_reflections", bEnabled);
+    g_pCore->GetGame()->GetCoronas()->SetCoronaReflectionsEnabled(bEnabled ? 1 : 0);
+}
+
+void CSettingsSA::SetCoronaReflectionsControlledByScript(bool bViaScript)
+{
+    m_bCoronaReflectionsViaScript = bViaScript;
 }
 
 ////////////////////////////////////////////////

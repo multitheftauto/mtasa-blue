@@ -348,16 +348,11 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     pPlayer->SetID(g_pClientGame->m_LocalID);
 
-    // Read out number of players
-    unsigned char ucNumberOfPlayers = 0;
-    bitStream.Read(ucNumberOfPlayers);
-
-    // Can't be 0
-    if (ucNumberOfPlayers == 0)
-    {
-        RaiseProtocolError(14);
-        return;
-    }
+    // For protocol backwards compatibility: read a single byte value.
+    // This used to hold the number of players, it was never used on the client side,
+    // and caused protocol error 14 whenever the player count was narrowed down to a single byte.
+    uint8_t numPlayers = 0;
+    bitStream.Read(numPlayers);
 
     // Read out the root element id
     ElementID RootElementID;
@@ -994,8 +989,6 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
         }
     }
-
-    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
@@ -1027,8 +1020,6 @@ void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
     {
         RaiseProtocolError(15);
     }
-
-    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
@@ -2287,7 +2278,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world non-sea level (to all world water)
     if (bHasNonSeaLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, nullptr, true, false, false);
-     // Apply outside world level (before -3000 and after 3000)
+    // Apply outside world level (before -3000 and after 3000)
     if (bHasOutsideLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fOutsideLevel, nullptr, false, false, true);
     // Apply world sea level (to world sea level water only)
@@ -4066,7 +4057,8 @@ retry:
                     }
                     else
                     {
-                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
+                        pWater =
+                            new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
                     if (!pWater->Exists())
                     {

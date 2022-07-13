@@ -1,6 +1,6 @@
 /*
 	BASSmix 2.4 C/C++ header file
-	Copyright (c) 2005-2021 Un4seen Developments Ltd.
+	Copyright (c) 2005-2022 Un4seen Developments Ltd.
 
 	See the BASSMIX.CHM file for more detailed documentation
 */
@@ -12,6 +12,11 @@
 
 #if BASSVERSION!=0x204
 #error conflicting BASS and BASSmix versions
+#endif
+
+#ifdef __OBJC__
+typedef int BOOL32;
+#define BOOL BOOL32 // override objc's BOOL
 #endif
 
 #ifdef __cplusplus
@@ -51,6 +56,7 @@ extern "C" {
 // Mixer attributes
 #define BASS_ATTRIB_MIXER_LATENCY	0x15000
 #define BASS_ATTRIB_MIXER_THREADS	0x15001
+#define BASS_ATTRIB_MIXER_VOL		0x15002
 
 // Additional BASS_Mixer_ChannelIsActive return values
 #define BASS_ACTIVE_WAITING			5
@@ -83,11 +89,14 @@ typedef struct {
 // Additional BASS_Mixer_ChannelSetPosition flag
 #define BASS_POS_MIXER_RESET	0x10000 // flag: clear mixer's playback buffer
 
+// Additional BASS_Mixer_ChannelGetPosition mode
+#define BASS_POS_MIXER_DELAY	5
+
 // BASS_CHANNELINFO types
 #define BASS_CTYPE_STREAM_MIXER	0x10800
 #define BASS_CTYPE_STREAM_SPLIT	0x10801
 
-DWORD BASSMIXDEF(BASS_Mixer_GetVersion)();
+DWORD BASSMIXDEF(BASS_Mixer_GetVersion)(void);
 
 HSTREAM BASSMIXDEF(BASS_Mixer_StreamCreate)(DWORD freq, DWORD chans, DWORD flags);
 BOOL BASSMIXDEF(BASS_Mixer_StreamAddChannel)(HSTREAM handle, DWORD channel, DWORD flags);
@@ -122,6 +131,10 @@ DWORD BASSMIXDEF(BASS_Split_StreamGetAvailable)(DWORD handle);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __OBJC__
+#undef BOOL
 #endif
 
 #endif

@@ -9,6 +9,13 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "CRegistry.h"
+
+// Only used for identifying 8 byte integers in varargs list
+#define SQLITE_INTEGER64 10
+
 class CDatabaseConnection;
 
 ///////////////////////////////////////////////////////////////

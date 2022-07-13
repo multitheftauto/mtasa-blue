@@ -77,7 +77,6 @@ void CClientObjectManager::DeleteAll()
     m_bCanRemoveFromList = true;
 }
 
-
 CClientObject* CClientObjectManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
@@ -92,7 +91,7 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
 {
-    if (ulObjectModel >= g_pGame->GetBaseIDforTXD())
+    if (ulObjectModel >= static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
         return false;
 
     // Clothes and hands cause crash (Github #424)
@@ -306,9 +305,8 @@ void CClientObjectManager::RestreamObjects(unsigned short usModel)
 
 void CClientObjectManager::RestreamAllObjects()
 {
-    for (auto& pObject: m_Objects)
+    for (auto& pObject : m_Objects)
     {
-
         // Streamed in and same model ID?
         if (pObject->IsStreamedIn())
         {

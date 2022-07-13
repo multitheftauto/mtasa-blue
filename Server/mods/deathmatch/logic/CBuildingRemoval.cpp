@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBuildingRemoval.h"
 
 CBuildingRemoval::CBuildingRemoval(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior)
 {

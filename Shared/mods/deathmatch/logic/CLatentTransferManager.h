@@ -7,7 +7,12 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
+
+#ifndef MTA_CLIENT
+    #include <net/ns_common.h>
+#endif
 
 typedef uint                       SSendHandle;
 typedef CAutoRefedPointer<CBuffer> CBufferRef;
