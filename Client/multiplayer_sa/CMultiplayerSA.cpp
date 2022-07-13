@@ -1552,6 +1552,9 @@ void CMultiplayerSA::InitHooks()
     // Skip check for disabled HUD
     MemSet((void*)0x58FBC4, 0x90, 9);
 
+    // Show muzzle flash for last bullet in magazine
+    MemSet((void*)0x61ECD2, 0x90, 20);
+
     // Fix "Climbing over certain objects kills you, when you have high FPS" (#602)
     // By using constant timestep in CTaskSimpleClimb::ProcessPed
     MemPut(0x6811E9, &m_fOrgTimeStep);
