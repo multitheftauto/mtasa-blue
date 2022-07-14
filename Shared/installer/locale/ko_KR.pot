@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-19 21:00\n"
+"PO-Revision-Date: 2022-07-14 13:00\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -20,12 +20,12 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:188
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "다운로드한 MTA:SA 버전은 Windows XP 또는 Vista를 지원하지 않습니다. www.mtasa.com 에서 대체 버전을 다운로드하십시오."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:189
 msgid "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
-msgstr ""
+msgstr "MTA:SA 버전은 이전 버전의 Windows용으로 설계되었습니다. www.mtasa.com 에서 최신 버전을 다운로드하십시오."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:190
@@ -33,17 +33,20 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr ""
+msgstr "이 마법사는 $(^Name) ${REVISION_TAG} 의 설치 또는 업데이트를 안내합니다.\n\n"
+"설치 프로그램을 시작하기 전에 다른 모든 응용 프로그램을 닫는 것이 좋습니다.\n\n"
+"[Vista 이상에 대한 관리자 액세스가 요청될 수 있음]\n\n"
+"다음을 클릭하여 계속합니다."
 
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:194
 msgid "Grand Theft Auto: San Andreas location"
-msgstr ""
+msgstr "그랜드 테프트 오토: 산 안드레아스 위치"
 
 #. DIRECTORY_Text_Dest
 #: Shared/installer/nightly.nsi:195
 msgid "Grand Theft Auto: San Andreas folder"
-msgstr ""
+msgstr "그랜드 테프트 오토: 산 안드레아스 폴더"
 
 #. DIRECTORY_Text_Top
 #: Shared/installer/nightly.nsi:196
@@ -52,37 +55,41 @@ msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
 "$\n"
 "Click Install to begin installing."
-msgstr ""
+msgstr "그랜드 테 프트 오토를 선택하십시오 : 산 안드레아스 폴더.$\n"
+"$\n"
+"당신은 그랜드 테 프트 오토가 있어야합니다: 산 안드레아스 1.0 MTA:SA를 사용하기 위해 설치, 그것은 다른 버전을 지원하지 않습니다.$\n"
+"$\n"
+"설치를 클릭하여 설치를 시작합니다."
 
 #. DESC_Section10
 #: Shared/installer/nightly.nsi:199
 msgid "Create a Start Menu group for installed applications"
-msgstr ""
+msgstr "설치된 응용 프로그램에 대한 시작 메뉴 그룹 만들기"
 
 #. DESC_Section11
 #: Shared/installer/nightly.nsi:200
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr ""
+msgstr "MTA:SA 클라이언트에 대한 데스크톱 바로 가기를 만듭니다."
 
 #. DESC_Section12
 #: Shared/installer/nightly.nsi:201
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr ""
+msgstr "브라우저 클릭성 mtasa:// 위해 프로토콜을 등록합니다."
 
 #. DESC_Section13
 #: Shared/installer/nightly.nsi:202
 msgid "Add to Windows Games Explorer (if present)."
-msgstr ""
+msgstr "Windows 게임 탐색기에 추가합니다(있는 경우)."
 
 #. DESC_DirectX
 #: Shared/installer/nightly.nsi:203
 msgid "Install or update DirectX (if required)."
-msgstr ""
+msgstr "DirectX를 설치하거나 업데이트합니다(필요한 경우)."
 
 #. DESC_Section1
 #: Shared/installer/nightly.nsi:204
 msgid "The core components required to run Multi Theft Auto."
-msgstr ""
+msgstr "Multi Theft Auto를 실행하는 데 필요한 핵심 구성 요소입니다."
 
 #. DESC_Section2
 #: Shared/installer/nightly.nsi:205
