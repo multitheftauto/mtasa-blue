@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-13 01:53+0000\n"
-"PO-Revision-Date: 2022-07-13 02:05\n"
+"POT-Creation-Date: 2022-07-14 19:47+0000\n"
+"PO-Revision-Date: 2022-07-14 20:54\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -634,16 +634,16 @@ msgstr "%s no %s"
 msgid "Disconnect to cancel download"
 msgstr "Atslēdzieties, lai atceltu lejupielādi"
 
-#: Client/game_sa/CSettingsSA.cpp:824
+#: Client/game_sa/CSettingsSA.cpp:759
 msgid "Can't find valid screen resolution."
 msgstr "Nevar atrast derīgu ekrāna izšķirtspēju."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:900
+#: Client/game_sa/CSettingsSA.cpp:835
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Vai jūs esat pārliecināts, ka vēlaties izmantot šo izšķirtspēju?"
 
-#: Client/game_sa/CSettingsSA.cpp:902 Client/loader/Dialogs.cpp:99
+#: Client/game_sa/CSettingsSA.cpp:837 Client/loader/Dialogs.cpp:99
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
