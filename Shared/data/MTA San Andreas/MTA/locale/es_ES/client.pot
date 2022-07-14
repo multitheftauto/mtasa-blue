@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-14 19:47+0000\n"
-"PO-Revision-Date: 2022-07-14 20:50\n"
+"PO-Revision-Date: 2022-07-14 21:45\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -1066,7 +1066,7 @@ msgstr "* Tu serial es: %s"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr "NUEVO"
+msgstr "NOTICIAS"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
@@ -1660,7 +1660,7 @@ msgstr "Mostrar resoluciones no seguras"
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Reflejos de lluvia de Corona"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
@@ -2908,28 +2908,29 @@ msgstr "MTA: San Andreas - Advertencia"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Tu directorio de instalación de Grand Theft Auto: San Andreas contiene estos archivos:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Estos archivos no son necesarios y pueden interferir con las características gráficas de esta versión de MTA:SA.\n\n"
+"Se recomienda eliminar o cambiar el nombre de estos archivos."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Mantenga estos archivos, pero también muestre esta advertencia en el próximo inicio"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "No me vuelvas a recordar estos archivos"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Cambie el nombre de estos archivos de *.dll a *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Muéstrame estos archivos"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
