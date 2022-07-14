@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-13 01:53+0000\n"
-"PO-Revision-Date: 2022-07-13 02:03\n"
+"POT-Creation-Date: 2022-07-14 19:47+0000\n"
+"PO-Revision-Date: 2022-07-14 20:51\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -626,16 +626,16 @@ msgstr "%s の %s"
 msgid "Disconnect to cancel download"
 msgstr "ダウンロードをキャンセルするには、切断してください"
 
-#: Client/game_sa/CSettingsSA.cpp:824
+#: Client/game_sa/CSettingsSA.cpp:759
 msgid "Can't find valid screen resolution."
 msgstr "有効な解像度が見つかりませんでした。"
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:900
+#: Client/game_sa/CSettingsSA.cpp:835
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "この解像度を利用するに確かですか？"
 
-#: Client/game_sa/CSettingsSA.cpp:902 Client/loader/Dialogs.cpp:99
+#: Client/game_sa/CSettingsSA.cpp:837 Client/loader/Dialogs.cpp:99
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
