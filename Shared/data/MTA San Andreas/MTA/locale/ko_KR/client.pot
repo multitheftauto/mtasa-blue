@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-13 01:53+0000\n"
-"PO-Revision-Date: 2022-07-13 02:02\n"
+"PO-Revision-Date: 2022-07-14 12:59\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -251,13 +251,13 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr ""
+msgstr "시작"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr ""
+msgstr "다운로드 오류:"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -537,7 +537,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1164
 #: Client/core/CConnectManager.cpp:263
 msgid "Connection timed out"
-msgstr ""
+msgstr "연결 시간이 초과되었습니다."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1198
 msgid "Connection with the server was lost"
@@ -771,7 +771,7 @@ msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:2085 Client/core/CVersionUpdater.cpp:2095
 msgid "Ok"
-msgstr ""
+msgstr "그래"
 
 #: Client/core/CVersionUpdater.cpp:2093
 msgid "ERROR"
@@ -988,7 +988,7 @@ msgstr ""
 #. 40
 #: Client/core/CKeyBinds.cpp:222
 msgid "Conversation no"
-msgstr ""
+msgstr "대화 없음"
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Group control forwards"
@@ -1209,7 +1209,7 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1311
 msgid "scrolls the chatbox downwards"
-msgstr ""
+msgstr "채팅상자를 아래로 스크롤합니다"
 
 #: Client/core/CCore.cpp:1312
 msgid "scrolls the debug view upwards"
@@ -1429,7 +1429,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:531
 msgid "Radio Equalizer"
-msgstr ""
+msgstr "라디오 이퀄라이저"
 
 #: Client/core/CSettings.cpp:536
 msgid "Radio Auto-tune"
