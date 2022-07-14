@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-13 01:53+0000\n"
-"PO-Revision-Date: 2022-07-14 12:59\n"
+"PO-Revision-Date: 2022-07-14 13:56\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -257,7 +257,7 @@ msgstr "시작"
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr "다운로드 오류:"
+msgstr "다운로드 오류: %s"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -1644,7 +1644,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
-msgstr ""
+msgstr "원격 웹 사이트 사용"
 
 #: Client/core/CSettings.cpp:889
 msgid "Enable Javascript on remote websites"
@@ -1652,101 +1652,101 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:894
 msgid "Custom blacklist"
-msgstr ""
+msgstr "사용자 지정 블랙리스트"
 
 #: Client/core/CSettings.cpp:905 Client/core/CSettings.cpp:940
 msgid "Enter a domain e.g. google.com"
-msgstr ""
+msgstr "도메인 입력 (예: google.com)"
 
 #: Client/core/CSettings.cpp:913
 msgid "Block"
-msgstr ""
+msgstr "차단"
 
 #: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:956
 msgid "Domain"
-msgstr ""
+msgstr "도메인"
 
 #: Client/core/CSettings.cpp:923 Client/core/CSettings.cpp:958
 msgid "Remove domain"
-msgstr ""
+msgstr "도메인 제거"
 
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:929
 msgid "Custom whitelist"
-msgstr ""
+msgstr "사용자 지정 허용 목록"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:971
 msgid "Misc"
-msgstr ""
+msgstr "기타"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:984
 #: Client/core/CSettings.cpp:4676
 msgid "Fast CJ clothes loading:"
-msgstr ""
+msgstr "빠른 CJ 옷 적재:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:998
 #: Client/core/CSettings.cpp:4678
 msgid "Browser speed:"
-msgstr ""
+msgstr "브라우저 속도:"
 
 #. Single download
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:1012
 #: Client/core/CSettings.cpp:4680
 msgid "Single connection:"
-msgstr ""
+msgstr "단일 연결:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:1025
 #: Client/core/CSettings.cpp:4682
 msgid "Packet tag:"
-msgstr ""
+msgstr "패킷 태그:"
 
 #. Progress animation
 #: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1038
 #: Client/core/CSettings.cpp:4684
 msgid "Progress animation:"
-msgstr ""
+msgstr "진행 애니메이션:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1051
 #: Client/core/CSettings.cpp:4674
 msgid "Process priority:"
-msgstr ""
+msgstr "프로세스 우선 순위:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1065
 #: Client/core/CSettings.cpp:4686
 msgid "Debug setting:"
-msgstr ""
+msgstr "디버그 설정:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1088
 #: Client/core/CSettings.cpp:4688
 msgid "Streaming memory:"
-msgstr ""
+msgstr "스트리밍 메모리:"
 
 #. Update build type
 #: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1190
 msgid "Update build type:"
-msgstr ""
+msgstr "빌드 유형 업데이트:"
 
 #. UpdateAutoInstall
 #: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1169
 msgid "Install important updates:"
-msgstr ""
+msgstr "중요한 업데이트를 설치합니다."
 
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1020
 #: Client/core/CSettings.cpp:1033 Client/core/CSettings.cpp:3103
 #: Client/core/CSettings.cpp:3119 Client/core/CSettings.cpp:3126
 msgid "On"
-msgstr ""
+msgstr "에"
 
 #: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:3108
 msgid "Very slow"
-msgstr ""
+msgstr "매우 느린"
 
 #: Client/core/CSettings.cpp:1006 Client/core/CSettings.cpp:1019
 #: Client/core/CSettings.cpp:1032 Client/core/CSettings.cpp:1046
@@ -1756,134 +1756,136 @@ msgstr ""
 #: Client/core/CSettings.cpp:3124 Client/core/CSettings.cpp:3133
 #: Client/core/CSettings.cpp:3146
 msgid "Default"
-msgstr ""
+msgstr "기본값"
 
 #: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:3112
 msgid "Fast"
-msgstr ""
+msgstr "빠른"
 
 #: Client/core/CSettings.cpp:1058 Client/core/CSettings.cpp:3088
 msgid "Normal"
-msgstr ""
+msgstr "보통"
 
 #: Client/core/CSettings.cpp:1059 Client/core/CSettings.cpp:3090
 msgid "Above normal"
-msgstr ""
+msgstr "정상 이상"
 
 #: Client/core/CSettings.cpp:1095
 msgid "Min"
-msgstr ""
+msgstr "분"
 
 #: Client/core/CSettings.cpp:1108
 msgid "Max"
-msgstr ""
+msgstr "최대"
 
 #. Windows 8 compatibility
 #: Client/core/CSettings.cpp:1115
 msgid "Windows 8 compatibility:"
-msgstr ""
+msgstr "윈도우 8 호환성:"
 
 #: Client/core/CSettings.cpp:1120
 msgid "16-bit color"
-msgstr ""
+msgstr "16비트 색상"
 
 #: Client/core/CSettings.cpp:1125
 msgid "Mouse fix"
-msgstr ""
+msgstr "마우스 수정"
 
 #. Cache path info
 #: Client/core/CSettings.cpp:1143
 msgid "Client resource files:"
-msgstr ""
+msgstr "클라이언트 리소스 파일:"
 
 #: Client/core/CSettings.cpp:1147
 msgid "Show in Explorer"
-msgstr ""
+msgstr "탐색기에 표시"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1162 Client/core/CSettings.cpp:1165
 msgid "Auto updater"
-msgstr ""
+msgstr "자동 업데이터"
 
 #. Check for updates
 #: Client/core/CSettings.cpp:1203
 msgid "Check for update now"
-msgstr ""
+msgstr "지금 업데이트 확인"
 
 #: Client/core/CSettings.cpp:1356
 msgid "Some settings will be changed when you next start MTA"
-msgstr ""
+msgstr "일부 설정은 다음에 MTA를 시작할 때 변경됩니다."
 
 #: Client/core/CSettings.cpp:1357
 msgid "\n\n"
 "Do you want to restart now?"
-msgstr ""
+msgstr "\n\n"
+"지금 다시 시작하시겠습니까?"
 
 #: Client/core/CSettings.cpp:1360
 msgid "RESTART REQUIRED"
-msgstr ""
+msgstr "다시 시작 필요"
 
 #: Client/core/CSettings.cpp:1380
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
+msgstr "일부 설정은 현재 서버의 연결을 끊을 때 변경됩니다."
 
 #: Client/core/CSettings.cpp:1381
 msgid "\n\n"
 "Do you want to disconnect now?"
-msgstr ""
+msgstr "\n\n"
+"지금 연결을 끊으시겠습니까?"
 
 #: Client/core/CSettings.cpp:1384
 msgid "DISCONNECT REQUIRED"
-msgstr ""
+msgstr "연결 끊기 필요"
 
 #. Update the joystick name
 #: Client/core/CSettings.cpp:1698
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr ""
+msgstr "조이패드가 인식되지 않음 - 연결을 확인하고 게임을 다시 시작합니다."
 
 #: Client/core/CSettings.cpp:1890
 msgid "Binding axis"
-msgstr ""
+msgstr "바인딩 축"
 
 #: Client/core/CSettings.cpp:1890
 msgid "Move an axis to bind, or escape to clear"
-msgstr ""
+msgstr "축을 바인드로 이동하거나 이스케이프를 통해 클리어"
 
 #: Client/core/CSettings.cpp:1967
 msgid "Language:"
-msgstr ""
+msgstr "언어:"
 
 #: Client/core/CSettings.cpp:1967
 msgid "Skin:"
-msgstr ""
+msgstr "피부:"
 
 #: Client/core/CSettings.cpp:1967
 msgid "Presets:"
-msgstr ""
+msgstr "프리셋:"
 
 #: Client/core/CSettings.cpp:2016
 msgid "Chat"
-msgstr ""
+msgstr "잡담"
 
 #: Client/core/CSettings.cpp:2033
 msgid "Load"
-msgstr ""
+msgstr "부하"
 
 #: Client/core/CSettings.cpp:2045
 msgid "Colors"
-msgstr ""
+msgstr "색상"
 
 #: Client/core/CSettings.cpp:2046
 msgid "Layout"
-msgstr ""
+msgstr "레이아웃"
 
 #: Client/core/CSettings.cpp:2047 Client/core/CSettings.cpp:2293
 msgid "Options"
-msgstr ""
+msgstr "옵션"
 
 #: Client/core/CSettings.cpp:2053
 msgid "Chat Background"
-msgstr ""
+msgstr "채팅 배경"
 
 #: Client/core/CSettings.cpp:2053
 msgid "Chat Text"
@@ -2101,229 +2103,233 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4655
 msgid "Please enter a nickname"
-msgstr ""
+msgstr "별명을 입력하십시오."
 
 #: Client/core/CSettings.cpp:4656
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr ""
+msgstr "게임 내에서 사용할 닉네임을 입력하십시오. \n"
+"이것은 서버에 연결하고 서버에서 재생할 때 귀하의 이름이 될 것입니다."
 
 #: Client/core/CSettings.cpp:4674
 msgid "Very experimental feature."
-msgstr ""
+msgstr "매우 실험적인 기능."
 
 #: Client/core/CSettings.cpp:4676
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr ""
+msgstr "CJ 변형으로 스톨 정지 (65MB 더 많은 RAM 사용)"
 
 #: Client/core/CSettings.cpp:4678
 msgid "Older routers may require a slower scan speed."
-msgstr ""
+msgstr "구형 라우터는 스캔 속도가 느려질 수 있습니다."
 
 #: Client/core/CSettings.cpp:4680
 msgid "Switch on to use only one connection when downloading."
-msgstr ""
+msgstr "다운로드할 때 하나의 연결만 사용하도록 스위치를 켭니다."
 
 #: Client/core/CSettings.cpp:4682
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr ""
+msgstr "ISP가 MTA 트래픽을 식별하는 데 도움이 되도록 네트워크 패킷에 태그를 지정합니다."
 
 #: Client/core/CSettings.cpp:4684
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
+msgstr "화면 하단의 회전 원 애니메이션"
 
 #: Client/core/CSettings.cpp:4686
 msgid "Select default always. (This setting is not saved)"
-msgstr ""
+msgstr "항상 기본값을 선택합니다. (이 설정은 저장되지 않음)"
 
 #: Client/core/CSettings.cpp:4688
 msgid "Maximum is usually best"
-msgstr ""
+msgstr "일반적으로 최대값이 가장 좋습니다."
 
 #: Client/core/CSettings.cpp:4690 Client/core/CSettings.cpp:4692
 msgid "Auto updater:"
-msgstr ""
+msgstr "자동 업데이터:"
 
 #: Client/core/CSettings.cpp:4690
 msgid "Select default unless you like filling out bug reports."
-msgstr ""
+msgstr "버그 보고서를 작성하는 것을 좋아하지 않는 한 기본값을 선택하십시오."
 
 #: Client/core/CSettings.cpp:4692
 msgid "Select default to automatically install important updates."
-msgstr ""
+msgstr "버그 보고서를 작성하는 것을 좋아하지 않는 한 기본값을 선택하십시오."
 
 #: Client/core/CSettings.cpp:4694
 msgid "16-bit color:"
-msgstr ""
+msgstr "16비트 색상:"
 
 #: Client/core/CSettings.cpp:4694
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr ""
+msgstr "16비트 색상 모드 사용 - MTA를 다시 시작해야 합니다."
 
 #: Client/core/CSettings.cpp:4696
 msgid "Mouse fix:"
-msgstr ""
+msgstr "마우스 수정:"
 
 #: Client/core/CSettings.cpp:4696
 msgid "Mouse movement fix - May need PC restart"
-msgstr ""
+msgstr "마우스 이동 수정 - PC를 다시 시작해야 할 수 있습니다."
 
 #. Create window
 #: Client/core/CConsole.cpp:417
 msgid "CONSOLE"
-msgstr ""
+msgstr "콘솔"
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
-msgstr ""
+msgstr "게으른"
 
 #: Client/core/ServerBrowser/CServerList.cpp:150
 msgid "player"
 msgid_plural "players"
-msgstr[0] ""
+msgstr[0] "배우\n"
+"플레이어"
 
 #: Client/core/ServerBrowser/CServerList.cpp:151
 msgid "on"
-msgstr ""
+msgstr "에"
 
 #: Client/core/ServerBrowser/CServerList.cpp:154
 msgid "server"
 msgid_plural "servers"
-msgstr[0] ""
+msgstr[0] "서버"
 
 #. We are polling for the master server list (first pass)
 #: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr ""
+msgstr "마스터 서버 목록 요청( %lu ms 경과)"
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:254
 msgid "Master server list could not be parsed."
-msgstr ""
+msgstr "마스터 서버 목록을 구문 분석할 수 없습니다."
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:264
 msgid "Master server list could not be retrieved."
-msgstr ""
+msgstr "마스터 서버 목록을 검색할 수 없습니다."
 
 #: Client/core/ServerBrowser/CServerList.cpp:274
 msgid "(Backup server list)"
-msgstr ""
+msgstr "(백업 서버 목록)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:326
 msgid "Cannot bind LAN-broadcast socket"
-msgstr ""
+msgstr "LAN 브로드캐스트 소켓을 바인딩할 수 없습니다."
 
 #: Client/core/ServerBrowser/CServerList.cpp:345
 msgid "Attempting to discover LAN servers"
-msgstr ""
+msgstr "LAN 서버 검색 시도 중"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
-msgstr ""
+msgstr "서버 브라우저"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
-msgstr ""
+msgstr "현지"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:135
 msgid "Favourites"
-msgstr ""
+msgstr "즐겨찾기"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:136
 msgid "Recent"
-msgstr ""
+msgstr "최근"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:191
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
-msgstr ""
+msgstr "빠른 연결을 위해:\n\n"
+"주소 표시줄에 주소와 포트를 입력합니다.\n"
+"또는 기록 목록에서 서버를 선택하고 '연결'을 누릅니다."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:203
 msgid "HELP"
-msgstr ""
+msgstr "도움말"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
 #: Client/core/ServerBrowser/CServerBrowser.cpp:252
 msgid "Refresh"
-msgstr ""
+msgstr "리프레쉬"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
 #: Client/core/ServerBrowser/CServerBrowser.cpp:253
 msgid "Add Favorite"
-msgstr ""
+msgstr "즐겨찾기 추가"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
 #: Client/core/ServerBrowser/CServerBrowser.cpp:254
 #: Client/core/ServerBrowser/CServerBrowser.cpp:301
 #: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Connect"
-msgstr ""
+msgstr "연결하다"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:212
 #: Client/core/ServerBrowser/CServerBrowser.cpp:255
 msgid "Server information"
-msgstr ""
+msgstr "연결하다"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:256
 msgid "Search servers"
-msgstr ""
+msgstr "검색 서버"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:257
 msgid "Search players"
-msgstr ""
+msgstr "플레이어 검색"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:258
 msgid "Start search"
-msgstr ""
+msgstr "검색 시작"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:299
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1692
 msgid "Search players..."
-msgstr ""
+msgstr "플레이어 검색..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:422
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1690
 msgid "Search servers..."
-msgstr ""
+msgstr "검색 서버..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:453
 msgid "Name"
-msgstr ""
+msgstr "이름"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:454
 msgid "Players"
-msgstr ""
+msgstr "플레이어"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Ping"
-msgstr ""
+msgstr "핑"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:456
 msgid "Gamemode"
-msgstr ""
+msgstr "게임 모드"
 
 #. Player List Columns
 #. Column for player names
 #: Client/core/ServerBrowser/CServerBrowser.cpp:478
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 msgid "Player list"
-msgstr ""
+msgstr "선수 목록"
 
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
-msgstr ""
+msgstr "포함하다:"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:492
 msgid "Empty"
-msgstr ""
+msgstr "비우다"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:498
 msgid "Full"
