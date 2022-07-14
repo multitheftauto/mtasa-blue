@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-13 01:53+0000\n"
-"PO-Revision-Date: 2022-07-13 02:01\n"
+"POT-Creation-Date: 2022-07-14 19:47+0000\n"
+"PO-Revision-Date: 2022-07-14 20:50\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -646,16 +646,16 @@ msgstr "%s من %s"
 msgid "Disconnect to cancel download"
 msgstr "اقطع الأتصال حتى تلغي التحميل"
 
-#: Client/game_sa/CSettingsSA.cpp:824
+#: Client/game_sa/CSettingsSA.cpp:759
 msgid "Can't find valid screen resolution."
 msgstr "لا يمكن العثور على دقة شاشة صالحة"
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:900
+#: Client/game_sa/CSettingsSA.cpp:835
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "هل أنت متأكد من أنك تريد استخدام دقة الشاشة هذه؟"
 
-#: Client/game_sa/CSettingsSA.cpp:902 Client/loader/Dialogs.cpp:99
+#: Client/game_sa/CSettingsSA.cpp:837 Client/loader/Dialogs.cpp:99
 msgid "MTA: San Andreas"
 msgstr "ملتي تيڤت اوتو: سان أندرياس"
 
