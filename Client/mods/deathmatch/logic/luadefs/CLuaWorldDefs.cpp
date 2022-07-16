@@ -262,20 +262,13 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     {
         argStream.ReadUserDataTable(vecIgnoredElements);
     }
-    else if (argStream.NextIsNil()) // Is the next value nil? We can just skip to reading bIncludeBuildingInfo
-    {
-        argStream.Skip(1);
-    }
-    else if (!argStream.NextIsNone()) // Has the next value been supplied AT ALL? Then we'll try to read that argument as a userdata (which will ensure errors are returned upon incorrect type)
-    {
-        CClientEntity* pElement;
-        argStream.ReadUserData(pElement);
-        vecIgnoredElements.push_back(pElement);
-        while(!argStream.NextIsNone() && !argStream.NextIsBool()) // Keep trying to read each successive argument as userdata until the next argument has not been supplied, or it is a bool (bIncludeBuildingInfo).
+    else {
+        CClientEntity* pIgnoredElement;
+        argStream.ReadUserData(pIgnoredElement, NULL);
+
+        if (pIgnoredElement != NULL)
         {
-            CClientEntity* pElement;
-            argStream.ReadUserData(pElement);
-            vecIgnoredElements.push_back(pElement);
+            vecIgnoredElements.push_back(pIgnoredElement);
         }
     }
 
