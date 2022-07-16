@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerSpawnPacket.h"
 
 CPlayerSpawnPacket::CPlayerSpawnPacket()
 {

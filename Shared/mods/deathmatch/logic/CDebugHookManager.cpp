@@ -9,11 +9,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDebugHookManager.h"
+#include "Enums.h"
+#include "CScriptDebugging.h"
+
 #ifdef MTA_CLIENT
     #define DECLARE_PROFILER_SECTION_CDebugHookManager
     #include "profiler/SharedUtil.Profiler.h"
     #define g_pGame g_pClientGame
 #else
+    #include "CGame.h"
     #define DECLARE_PROFILER_SECTION(tag)
 #endif
 
@@ -28,27 +33,27 @@ CDebugHookManager::CDebugHookManager()
 {
     m_MaskArgumentsMap = {
 #ifndef MTA_CLIENT
-                        {"logIn", {{EArgType::Password, 2}}},                           // player, account, 2=PASSWORD
-                        {"addAccount", {{EArgType::Password, 1}}},                      // name, 1=PASSWORD
-                        {"getAccount", {{EArgType::Password, 1}}},                      // name, 1=PASSWORD
-                        {"setAccountPassword", {{EArgType::Password, 1}}},              // account, 1=PASSWORD
-                        {"dbConnect", {{EArgType::MaxArgs, 0}}},
-                        {"dbExec", {{EArgType::MaxArgs, 0}}},
-                        {"dbFree", {{EArgType::MaxArgs, 0}}},
-                        {"dbPoll", {{EArgType::MaxArgs, 0}}},
-                        {"dbPrepareString", {{EArgType::MaxArgs, 0}}},
-                        {"dbQuery", {{EArgType::MaxArgs, 0}}},
-                        {"executeSQLQuery", {{EArgType::MaxArgs, 0}}},
-                        {"callRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},   // 0=URL, ...
+        {"logIn", {{EArgType::Password, 2}}},                         // player, account, 2=PASSWORD
+        {"addAccount", {{EArgType::Password, 1}}},                    // name, 1=PASSWORD
+        {"getAccount", {{EArgType::Password, 1}}},                    // name, 1=PASSWORD
+        {"setAccountPassword", {{EArgType::Password, 1}}},            // account, 1=PASSWORD
+        {"dbConnect", {{EArgType::MaxArgs, 0}}},
+        {"dbExec", {{EArgType::MaxArgs, 0}}},
+        {"dbFree", {{EArgType::MaxArgs, 0}}},
+        {"dbPoll", {{EArgType::MaxArgs, 0}}},
+        {"dbPrepareString", {{EArgType::MaxArgs, 0}}},
+        {"dbQuery", {{EArgType::MaxArgs, 0}}},
+        {"executeSQLQuery", {{EArgType::MaxArgs, 0}}},
+        {"callRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},            // 0=URL, ...
 #endif
-                        {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},  // 0=URL, ...
-                        {"passwordHash", {{EArgType::Password, 0}}},                    // 0=PASSWORD, ...
-                        {"passwordVerify", {{EArgType::Password, 0}}},                  // 0=PASSWORD, ...
-                        {"encodeString", {{EArgType::MaxArgs, 2}}},                     // algorithm, input, 2=SECRETKEY, ...
-                        {"decodeString", {{EArgType::MaxArgs, 2}}},                     // algorithm, input, 2=SECRETKEY, ...
-                        {"teaEncode", {{EArgType::Password, 1}}},                       // input, 1=SECRETKEY
-                        {"teaDecode", {{EArgType::Password, 1}}},                       // input, 1=SECRETKEY
-                    };
+        {"fetchRemote", {{EArgType::MaxArgs, 1}, {EArgType::Url, 0}}},            // 0=URL, ...
+        {"passwordHash", {{EArgType::Password, 0}}},                              // 0=PASSWORD, ...
+        {"passwordVerify", {{EArgType::Password, 0}}},                            // 0=PASSWORD, ...
+        {"encodeString", {{EArgType::MaxArgs, 2}}},                               // algorithm, input, 2=SECRETKEY, ...
+        {"decodeString", {{EArgType::MaxArgs, 2}}},                               // algorithm, input, 2=SECRETKEY, ...
+        {"teaEncode", {{EArgType::Password, 1}}},                                 // input, 1=SECRETKEY
+        {"teaDecode", {{EArgType::Password, 1}}},                                 // input, 1=SECRETKEY
+    };
 }
 
 ///////////////////////////////////////////////////////////////
@@ -392,7 +397,8 @@ void CDebugHookManager::OnPostEvent(const char* szName, const CLuaArguments& Arg
 // Get call hook arguments for OnPre/PostEvent
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::GetEventCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
+void CDebugHookManager::GetEventCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource,
+                                                  CPlayer* pCaller)
 {
     CLuaMain*  pSourceLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
     CResource* pSourceResource = pSourceLuaMain ? pSourceLuaMain->GetResource() : NULL;
@@ -469,7 +475,8 @@ void CDebugHookManager::OnPostEventFunction(const char* szName, const CLuaArgume
 // Get call hook arguments for OnPre/PostEventFunction
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments,
+                                                          CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
 {
     CLuaMain*  pEventLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
     CResource* pEventResource = pEventLuaMain ? pEventLuaMain->GetResource() : NULL;
@@ -573,13 +580,13 @@ void CDebugHookManager::MaybeMaskArgumentValues(const SString& strFunctionName, 
                 if (pArgument)
                 {
                     // Remove query portion of URL
-                    SString strUrlCleaned = SString(pArgument->GetString()).ReplaceI("%3F","?").Replace("#","?").SplitLeft("?");
+                    SString strUrlCleaned = SString(pArgument->GetString()).ReplaceI("%3F", "?").Replace("#", "?").SplitLeft("?");
                     pArgument->ReadString(strUrlCleaned);
                 }
             }
             else if (maskArgument.argType == EArgType::MaxArgs)
             {
-                while(FunctionArguments.Count() > maskArgument.index)
+                while (FunctionArguments.Count() > maskArgument.index)
                     FunctionArguments.Pop();
             }
         }

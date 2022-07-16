@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaClassDefs.h"
+
 int CLuaClassDefs::Index(lua_State* luaVM)
 {
     lua_pushvalue(luaVM, lua_upvalueindex(1));            // ud, k, mt
@@ -246,13 +248,13 @@ int CLuaClassDefs::ToString(lua_State* luaVM)
 
 const char* CLuaClassDefs::GetObjectClass(void* pObject)
 {
-    if (CElement* pElement = UserDataCast<CElement>((CElement*)NULL, pObject, NULL))
+    if (CElement* pElement = UserDataCast((CElement*)pObject, NULL))
         return GetElementClass(pElement);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pObject, NULL))
+    else if (CResource* pResource = UserDataCast((CResource*)pObject, NULL))
         return GetResourceClass(pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pObject, NULL))
+    else if (CXMLNode* pNode = UserDataCast((CXMLNode*)pObject, NULL))
         return GetXmlNodeClass(pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pObject, NULL))
+    else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pObject, NULL))
         return GetTimerClass(pTimer);
     return NULL;
 }

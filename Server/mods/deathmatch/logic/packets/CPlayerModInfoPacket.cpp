@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerModInfoPacket.h"
 
 bool CPlayerModInfoPacket::Read(NetBitStreamInterface& BitStream)
 {

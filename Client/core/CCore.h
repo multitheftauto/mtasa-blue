@@ -101,7 +101,6 @@ public:
     CLocalizationInterface*   GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*        GetWebCore();
     CTrayIconInterface*       GetTrayIcon() { return m_pTrayIcon; };
-    CDiscordManagerInterface* GetDiscordManager() { return reinterpret_cast<CDiscordManagerInterface*>(m_DiscordManager.get()); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -119,8 +118,9 @@ public:
     void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false);
     void ChatPrintf(const char* szFormat, bool bColorCoded, ...);
     void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...);
-    void SetChatVisible(bool bVisible);
+    void SetChatVisible(bool bVisible, bool bInputBlocked);
     bool IsChatVisible();
+    bool IsChatInputBlocked();
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled();
     bool ClearChat();
@@ -226,8 +226,6 @@ public:
     uint GetMinStreamingMemory();
     uint GetMaxStreamingMemory();
 
-    void ResetDiscordRichPresence();
-
     SString GetConnectCommandFromURI(const char* szURI);
     void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
     bool    bScreenShot;
@@ -296,8 +294,6 @@ private:
     CClientVariables   m_ClientVariables;
     CWebCoreInterface* m_pWebCore = nullptr;
     CTrayIcon*         m_pTrayIcon;
-
-    std::unique_ptr<class CDiscordManager> m_DiscordManager;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;

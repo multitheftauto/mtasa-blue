@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerTransgressionPacket.h"
 
 bool CPlayerTransgressionPacket::Read(NetBitStreamInterface& BitStream)
 {

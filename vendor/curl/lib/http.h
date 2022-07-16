@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -38,6 +38,10 @@ typedef enum {
 #include <nghttp2/nghttp2.h>
 #endif
 
+#if defined(_WIN32) && defined(ENABLE_QUIC)
+#include <stdint.h>
+#endif
+
 extern const struct Curl_handler Curl_handler_http;
 
 #ifdef USE_SSL
@@ -47,22 +51,21 @@ extern const struct Curl_handler Curl_handler_https;
 /* Header specific functions */
 bool Curl_compareheader(const char *headerline,  /* line to check */
                         const char *header,   /* header keyword _with_ colon */
-                        const char *content); /* content string to find */
+                        const size_t hlen,   /* len of the keyword in bytes */
+                        const char *content, /* content string to find */
+                        const size_t clen);   /* len of the content in bytes */
 
 char *Curl_copy_header_value(const char *header);
 
 char *Curl_checkProxyheaders(struct Curl_easy *data,
                              const struct connectdata *conn,
-                             const char *thisheader);
-#ifndef USE_HYPER
+                             const char *thisheader,
+                             const size_t thislen);
 CURLcode Curl_buffer_send(struct dynbuf *in,
                           struct Curl_easy *data,
                           curl_off_t *bytes_written,
-                          size_t included_body_bytes,
+                          curl_off_t included_body_bytes,
                           int socketindex);
-#else
-#define Curl_buffer_send(a,b,c,d,e) CURLE_OK
-#endif
 
 CURLcode Curl_add_timecondition(struct Curl_easy *data,
 #ifndef USE_HYPER
@@ -93,11 +96,14 @@ CURLcode Curl_http_statusline(struct Curl_easy *data,
                               struct connectdata *conn);
 CURLcode Curl_http_header(struct Curl_easy *data, struct connectdata *conn,
                           char *headp);
+CURLcode Curl_transferencode(struct Curl_easy *data);
 CURLcode Curl_http_body(struct Curl_easy *data, struct connectdata *conn,
                         Curl_HttpReq httpreq,
                         const char **teep);
 CURLcode Curl_http_bodysend(struct Curl_easy *data, struct connectdata *conn,
                             struct dynbuf *r, Curl_HttpReq httpreq);
+bool Curl_use_http_1_1plus(const struct Curl_easy *data,
+                           const struct connectdata *conn);
 #ifndef CURL_DISABLE_COOKIES
 CURLcode Curl_http_cookies(struct Curl_easy *data,
                            struct connectdata *conn,
@@ -161,6 +167,29 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data);
 struct h3out; /* see ngtcp2 */
 #endif
 
+#ifdef USE_MSH3
+#ifdef _WIN32
+#define msh3_lock CRITICAL_SECTION
+#define msh3_lock_initialize(lock) InitializeCriticalSection(lock)
+#define msh3_lock_uninitialize(lock) DeleteCriticalSection(lock)
+#define msh3_lock_acquire(lock) EnterCriticalSection(lock)
+#define msh3_lock_release(lock) LeaveCriticalSection(lock)
+#else /* !_WIN32 */
+#include <pthread.h>
+#define msh3_lock pthread_mutex_t
+#define msh3_lock_initialize(lock) { \
+  pthread_mutexattr_t attr; \
+  pthread_mutexattr_init(&attr); \
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE); \
+  pthread_mutex_init(lock, &attr); \
+  pthread_mutexattr_destroy(&attr); \
+}
+#define msh3_lock_uninitialize(lock) pthread_mutex_destroy(lock)
+#define msh3_lock_acquire(lock) pthread_mutex_lock(lock)
+#define msh3_lock_release(lock) pthread_mutex_unlock(lock)
+#endif /* _WIN32 */
+#endif /* USE_MSH3 */
+
 /****************************************************************************
  * HTTP unique setup
  ***************************************************************************/
@@ -184,8 +213,7 @@ struct HTTP {
   enum {
     HTTPSEND_NADA,    /* init */
     HTTPSEND_REQUEST, /* sending a request */
-    HTTPSEND_BODY,    /* sending body */
-    HTTPSEND_LAST     /* never use this */
+    HTTPSEND_BODY     /* sending body */
   } sending;
 
 #ifndef CURL_DISABLE_HTTP
@@ -211,6 +239,7 @@ struct HTTP {
   char **push_headers;       /* allocated array */
   size_t push_headers_used;  /* number of entries filled in */
   size_t push_headers_alloc; /* number of entries allocated */
+  uint32_t error; /* HTTP/2 stream error code */
 #endif
 #if defined(USE_NGHTTP2) || defined(USE_NGHTTP3)
   bool closed; /* TRUE on HTTP2 stream close */
@@ -226,17 +255,34 @@ struct HTTP {
 #endif
 
 #ifdef ENABLE_QUIC
+#ifndef USE_MSH3
   /*********** for HTTP/3 we store stream-local data here *************/
   int64_t stream3_id; /* stream we are interested in */
   bool firstheader;  /* FALSE until headers arrive */
   bool firstbody;  /* FALSE until body arrives */
   bool h3req;    /* FALSE until request is issued */
+#endif
   bool upload_done;
 #endif
 #ifdef USE_NGHTTP3
   size_t unacked_window;
   struct h3out *h3out; /* per-stream buffers for upload */
   struct dynbuf overflow; /* excess data received during a single Curl_read */
+#endif
+#ifdef USE_MSH3
+  struct MSH3_REQUEST *req;
+  msh3_lock recv_lock;
+  /* Receive Buffer (Headers and Data) */
+  uint8_t* recv_buf;
+  size_t recv_buf_alloc;
+  /* Receive Headers */
+  size_t recv_header_len;
+  bool recv_header_complete;
+  /* Receive Data */
+  size_t recv_data_len;
+  bool recv_data_complete;
+  /* General Receive Error */
+  CURLcode recv_error;
 #endif
 };
 
@@ -251,9 +297,16 @@ struct h2settings {
 struct http_conn {
 #ifdef USE_NGHTTP2
 #define H2_BINSETTINGS_LEN 80
-  nghttp2_session *h2;
   uint8_t binsettings[H2_BINSETTINGS_LEN];
   size_t  binlen; /* length of the binsettings data */
+
+  /* We associate the connnectdata struct with the connection, but we need to
+     make sure we can identify the current "driving" transfer. This is a
+     work-around for the lack of nghttp2_session_set_user_data() in older
+     nghttp2 versions that we want to support. (Added in 1.31.0) */
+  struct Curl_easy *trnsfr;
+
+  nghttp2_session *h2;
   Curl_send *send_underlying; /* underlying send Curl_send callback */
   Curl_recv *recv_underlying; /* underlying recv Curl_recv callback */
   char *inbuf; /* buffer to receive data from underlying socket */
@@ -274,11 +327,12 @@ struct http_conn {
   /* list of settings that will be sent */
   nghttp2_settings_entry local_settings[3];
   size_t local_settings_num;
-  uint32_t error_code; /* HTTP/2 error code */
 #else
   int unused; /* prevent a compiler warning */
 #endif
 };
+
+CURLcode Curl_http_size(struct Curl_easy *data);
 
 CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                                      struct connectdata *conn,
@@ -309,5 +363,11 @@ Curl_http_output_auth(struct Curl_easy *data,
                       const char *path,
                       bool proxytunnel); /* TRUE if this is the request setting
                                             up the proxy tunnel */
+
+/*
+ * Curl_allow_auth_to_host() tells if authentication, cookies or other
+ * "sensitive data" can (still) be sent to this host.
+ */
+bool Curl_allow_auth_to_host(struct Curl_easy *data);
 
 #endif /* HEADER_CURL_HTTP_H */

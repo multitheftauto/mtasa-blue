@@ -34,14 +34,14 @@ Var ShowLastUsed
 Var PermissionsGroup
 Var PATCH_TARGET
 
-; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
+; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
+!define GUID "{D32E69D8-716F-4E74-91CB-044DB9AA3F40}"
 
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
-    !define MAINT_VER "0"
+    !define MINOR_VER "5"
+    !define MAINT_VER "9"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -79,7 +79,7 @@ Var PATCH_TARGET
 !define PRODUCT_NAME_NO_VER "MTA:SA"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
-!define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
+!define PRODUCT_WEB_SITE "https://www.multitheftauto.com"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -624,8 +624,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 ${GetDLLVersionNumbers} "$SYSDIR\crypt32.dll" $0 $1 $2 $3
                 ${If} $2 == 7601
                     ${If} $3 < 18741
-                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "http://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
-                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "http://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
+                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "https://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
+                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "https://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
                     ${EndIf}
                 ${EndIf}
             ${EndIf}
@@ -659,6 +659,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\bassmidi.dll"
         File "${FILES_ROOT}\mta\bassmix.dll"
         File "${FILES_ROOT}\mta\bassopus.dll"
+        File "${FILES_ROOT}\mta\basswebm.dll"
         File "${FILES_ROOT}\mta\basswma.dll"
         File "${FILES_ROOT}\mta\tags.dll"
 
@@ -674,10 +675,20 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
-        File "${FILES_ROOT}\mta\CEF\cef.pak"
-        File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+
+
+	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+        File "${FILES_ROOT}\mta\CEF\chrome_100_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\chrome_200_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\resources.pak"
+
+	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+        #File "${FILES_ROOT}\mta\CEF\cef.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
+        #File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+		
+	# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
 
         SetOutPath "$INSTDIR\MTA\CEF\locales"
@@ -771,7 +782,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             ${If} ${Errors}
                 ${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
                 CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
-                CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
+                CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "https://wiki.multitheftauto.com/wiki/Client_Manual"
             ${EndIf}
         ${EndIf}
 
@@ -783,7 +794,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${LogText} "+Section begin - CLIENT GAME"
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
-        File "${FILES_ROOT}\mods\deathmatch\Client.dll"
+        File "${FILES_ROOT}\mods\deathmatch\client.dll"
         File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
         ${LogText} "-Section end - CLIENT GAME"
@@ -1045,27 +1056,38 @@ Section Uninstall
     Call un.DoServiceUninstall
     ; server CORE FILES
     Delete "$INSTDIR\server\core.dll"
-    Delete "$INSTDIR\server\xmll.dll"
     Delete "$INSTDIR\server\MTA Server.exe"
     Delete "$INSTDIR\server\net.dll"
-    Delete "$INSTDIR\server\libcurl.dll"
+    Delete "$INSTDIR\server\pthread.dll"
+    Delete "$INSTDIR\server\xmll.dll"
 
     ; server files
+    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
     Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
+    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
     Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
     Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthread.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+
+    ; server x64 CORE FILES
+    Delete "$INSTDIR\server\MTA Server64.exe"
+    Delete "$INSTDIR\server\x64\core.dll"
+    Delete "$INSTDIR\server\x64\net.dll"
+    Delete "$INSTDIR\server\x64\pthread.dll"
+    Delete "$INSTDIR\server\x64\xmll.dll"
+
+    ; server x64 files
+    Delete "$INSTDIR\server\x64\dbconmy.dll"
+    Delete "$INSTDIR\server\x64\deathmatch.dll"
+    Delete "$INSTDIR\server\x64\libmysql.dll"
+    Delete "$INSTDIR\server\x64\lua5.1.dll"
+    Delete "$INSTDIR\server\x64\pcre3.dll"
+    RmDir "$INSTDIR\server\x64"
 
     Delete "$INSTDIR\Multi Theft Auto.exe"
     Delete "$INSTDIR\Multi Theft Auto.exe.dat"
     Delete "$INSTDIR\Uninstall.exe"
 
-    Delete "$INSTDIR\mods\deathmatch\Client.dll"
-    Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+    Delete "$INSTDIR\mods\deathmatch\client.dll"
     Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
     RmDir /r "$INSTDIR\MTA\cgui"

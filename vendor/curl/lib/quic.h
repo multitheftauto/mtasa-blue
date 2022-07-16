@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -31,6 +31,9 @@
 #ifdef USE_QUICHE
 #include "vquic/quiche.h"
 #endif
+#ifdef USE_MSH3
+#include "vquic/msh3.h"
+#endif
 
 #include "urldata.h"
 
@@ -45,7 +48,7 @@ CURLcode Curl_quic_is_connected(struct Curl_easy *data,
                                 struct connectdata *conn,
                                 int sockindex,
                                 bool *connected);
-int Curl_quic_ver(char *p, size_t len);
+void Curl_quic_ver(char *p, size_t len);
 CURLcode Curl_quic_done_sending(struct Curl_easy *data);
 void Curl_quic_done(struct Curl_easy *data, bool premature);
 bool Curl_quic_data_pending(const struct Curl_easy *data);

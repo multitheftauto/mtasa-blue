@@ -8,10 +8,21 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #include "StdInc.h"
+#include "CHTTPD.h"
+#include "CGame.h"
+#include "CAccountManager.h"
+#include "CMainConfig.h"
 #include <cryptopp/rsa.h>
 #include <cryptopp/osrng.h>
 #include <SharedUtil.Crypto.h>
+
+#ifndef WIN32
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <arpa/inet.h>
+#endif
 
 extern CGame* g_pGame;
 

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -87,11 +87,12 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   struct tm tm;
   char timestamp[17];
   char date[9];
-  const char *content_type = Curl_checkheaders(data, "Content-Type");
+  const char *content_type = Curl_checkheaders(data, STRCONST("Content-Type"));
   char *canonical_headers = NULL;
   char *signed_headers = NULL;
   Curl_HttpReq httpreq;
   const char *method;
+  size_t post_data_len;
   const char *post_data = data->set.postfields ? data->set.postfields : "";
   unsigned char sha_hash[32];
   char sha_hex[65];
@@ -99,8 +100,8 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   char *request_type = NULL;
   char *credential_scope = NULL;
   char *str_to_sign = NULL;
-  const char *user = conn->user ? conn->user : "";
-  const char *passwd = conn->passwd ? conn->passwd : "";
+  const char *user = data->state.aptr.user ? data->state.aptr.user : "";
+  const char *passwd = data->state.aptr.passwd ? data->state.aptr.passwd : "";
   char *secret = NULL;
   unsigned char tmp_sign0[32] = {0};
   unsigned char tmp_sign1[32] = {0};
@@ -109,7 +110,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   DEBUGASSERT(!proxy);
   (void)proxy;
 
-  if(Curl_checkheaders(data, "Authorization")) {
+  if(Curl_checkheaders(data, STRCONST("Authorization"))) {
     /* Authorization already present, Bailing out */
     return CURLE_OK;
   }
@@ -126,7 +127,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
   tmp1 = strchr(tmp0, ':');
   len = tmp1 ? (size_t)(tmp1 - tmp0) : strlen(tmp0);
   if(len < 1) {
-    infof(data, "first provider can't be empty\n");
+    infof(data, "first provider can't be empty");
     ret = CURLE_BAD_FUNCTION_ARGUMENT;
     goto fail;
   }
@@ -145,7 +146,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     tmp1 = strchr(tmp0, ':');
     len = tmp1 ? (size_t)(tmp1 - tmp0) : strlen(tmp0);
     if(len < 1) {
-      infof(data, "second provider can't be empty\n");
+      infof(data, "second provider can't be empty");
       ret = CURLE_BAD_FUNCTION_ARGUMENT;
       goto fail;
     }
@@ -165,7 +166,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
       tmp1 = strchr(tmp0, ':');
       len = tmp1 ? (size_t)(tmp1 - tmp0) : strlen(tmp0);
       if(len < 1) {
-        infof(data, "region can't be empty\n");
+        infof(data, "region can't be empty");
         ret = CURLE_BAD_FUNCTION_ARGUMENT;
         goto fail;
       }
@@ -182,7 +183,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
           goto fail;
         }
         if(strlen(service) < 1) {
-          infof(data, "service can't be empty\n");
+          infof(data, "service can't be empty");
           ret = CURLE_BAD_FUNCTION_ARGUMENT;
           goto fail;
         }
@@ -203,7 +204,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     tmp1 = strchr(tmp0, '.');
     len = tmp1 - tmp0;
     if(!tmp1 || len < 1) {
-      infof(data, "service missing in parameters or hostname\n");
+      infof(data, "service missing in parameters or hostname");
       ret = CURLE_URL_MALFORMAT;
       goto fail;
     }
@@ -218,7 +219,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
       tmp1 = strchr(tmp0, '.');
       len = tmp1 - tmp0;
       if(!tmp1 || len < 1) {
-        infof(data, "region missing in parameters or hostname\n");
+        infof(data, "region missing in parameters or hostname");
         ret = CURLE_URL_MALFORMAT;
         goto fail;
       }
@@ -281,8 +282,15 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     goto fail;
   }
 
-  Curl_sha256it(sha_hash,
-                (const unsigned char *) post_data, strlen(post_data));
+  if(data->set.postfieldsize < 0)
+    post_data_len = strlen(post_data);
+  else
+    post_data_len = (size_t)data->set.postfieldsize;
+  if(Curl_sha256it(sha_hash, (const unsigned char *) post_data,
+                   post_data_len)) {
+    goto fail;
+  }
+
   sha256_to_hex(sha_hex, sha_hash, sizeof(sha_hex));
 
   Curl_http_method(data, conn, &method, &httpreq);
@@ -315,13 +323,16 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
     goto fail;
   }
 
-  Curl_sha256it(sha_hash, (unsigned char *) canonical_request,
-                strlen(canonical_request));
+  if(Curl_sha256it(sha_hash, (unsigned char *) canonical_request,
+                   strlen(canonical_request))) {
+    goto fail;
+  }
+
   sha256_to_hex(sha_hex, sha_hash, sizeof(sha_hex));
 
   /*
    * Google allow to use rsa key instead of HMAC, so this code might change
-   * In the furure, but for now we support only HMAC version
+   * In the future, but for now we support only HMAC version
    */
   str_to_sign = curl_maprintf("%s4-HMAC-SHA256\n" /* Algorithm */
                               "%s\n" /* RequestDateTime */

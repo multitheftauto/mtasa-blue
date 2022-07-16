@@ -7,6 +7,10 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "CDatabaseManager.h"
+
 // Base class for net function arguments
 struct SArgs
 {

@@ -313,12 +313,12 @@ static void Event_BulletImpact()
     }
 }
 
-CPedSAInterface*       pAPed = NULL;
-float                  fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
-CPed*                  pATargetingPed = NULL;
-CVector*               pTempVec;
-bool*                  pSkipAim;
-CRemoteDataStorageSA*  pTempRemote;
+CPedSAInterface*      pAPed = NULL;
+float                 fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
+CPed*                 pATargetingPed = NULL;
+CVector*              pTempVec;
+bool*                 pSkipAim;
+CRemoteDataStorageSA* pTempRemote;
 
 VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
 {
@@ -340,7 +340,7 @@ VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
     }
 }
 
-static CPed * GetTargetingPed()
+static CPed* GetTargetingPed()
 {
     SClientEntity<CPedSA>* pClientEntity = m_pools->GetPed((DWORD*)pAPed);
     return pClientEntity ? pClientEntity->pEntity : nullptr;
@@ -930,7 +930,7 @@ void _declspec(naked) HOOK_CFireManager__StartFire_()
     }
 }
 
-static CEntity* GetProjectileOwner(CPools*  pPools)
+static CEntity* GetProjectileOwner(CPools* pPools)
 {
     CEntity* pOwner = nullptr;
     if (pProjectileOwner)
@@ -960,7 +960,7 @@ static CEntity* GetProjectileOwner(CPools*  pPools)
     return pOwner;
 }
 
-static void GetProjectileTarget(CPools*  pPools)
+static void GetProjectileTarget(CPools* pPools)
 {
     projectileTargetEntity = nullptr;
 
@@ -1012,7 +1012,7 @@ void ProcessProjectile()
     if (m_pProjectileHandler != NULL)
     {
         CPoolsSA* pPools = (CPoolsSA*)pGameInterface->GetPools();
-        CEntity* pOwner = GetProjectileOwner(pPools);
+        CEntity*  pOwner = GetProjectileOwner(pPools);
         GetProjectileTarget(pPools);
 
         CProjectileInfo* projectileInfo = pGameInterface->GetProjectileInfo()->GetProjectileInfo(dwProjectileInfoIndex);

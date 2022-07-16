@@ -9,9 +9,10 @@
  *
  *****************************************************************************/
 
-class CWaterManager;
-
 #pragma once
+
+#include "CWater.h"
+#include "packets/CMapInfoPacket.h"
 
 class CWaterManager
 {
