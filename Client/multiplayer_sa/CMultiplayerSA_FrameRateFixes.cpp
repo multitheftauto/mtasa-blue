@@ -10,26 +10,27 @@
 
 #include "StdInc.h"
 
-const float kOriginalTimeStep = 50.0f / 30.0f;
+constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 
-#define HOOKPOS_CTaskSimpleUseGun__ControlGunMove 0x61E0C0
-#define HOOKSIZE_CTaskSimpleUseGun__ControlGunMove 0x10
-const unsigned int RETURN_CTaskSimpleUseGun__ControlGunMove = 0x61E0D0;
+#define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
+#define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
+const unsigned int RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
 
-void _declspec(naked) HOOK_CTaskSimpleUseGun__ControlGunMove()
+void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 {
-    _asm
-    {
-        fld ds:[0xB7CB5C]       // CTimer::ms_fTimeStep
-        fdiv kOriginalTimeStep  // 1.666f
-        fdivr ds:[0x858CA8]     // 0.07f
-        fmul ds:[0xB7CB5C]      // CTimer::ms_fTimeStep
-        mov edx, [esp + 0x4]
-        jmp RETURN_CTaskSimpleUseGun__ControlGunMove
+    _asm {
+        fld ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fmul ds:[0x858B1C]          // 0.1f
+        fxch
+        fcom
+        fxch
+        fstp st(0)
+        jmp RETURN_CTaskSimpleUseGun__SetMoveAnim
     }
 }
 
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
-    EZHookInstall(CTaskSimpleUseGun__ControlGunMove);
+    EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
 }
