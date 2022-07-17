@@ -18,6 +18,11 @@ CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* 
     SetupAnimBlock();
 }
 
+CAnimBlendAssocGroupSA::~CAnimBlendAssocGroupSA()
+{
+    delete m_pAnimBlock;
+}
+
 CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned int AnimID)
 {
     CAnimBlendAssociationSAInterface* pAnimAssociationReturn = nullptr;

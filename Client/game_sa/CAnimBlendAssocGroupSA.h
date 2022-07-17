@@ -54,6 +54,7 @@ class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 
 public:
     CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface);
+    ~CAnimBlendAssocGroupSA();
 
     CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID);
     void                              InitEmptyAssociations(RpClump* pClump);
