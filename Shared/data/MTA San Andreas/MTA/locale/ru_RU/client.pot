@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-14 19:47+0000\n"
-"PO-Revision-Date: 2022-07-17 10:40\n"
+"PO-Revision-Date: 2022-07-17 11:43\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1668,7 +1668,7 @@ msgstr "Показывать неподдерживаемые разрешени
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr "Отражение капель дождя"
+msgstr "Отражения дождя"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
@@ -2236,7 +2236,7 @@ msgid_plural "servers"
 msgstr[0] "сервере"
 msgstr[1] "серверах"
 msgstr[2] "серверах"
-msgstr[3] "сервера"
+msgstr[3] "серверы"
 
 #. We are polling for the master server list (first pass)
 #: Client/core/ServerBrowser/CServerList.cpp:238
@@ -2919,29 +2919,29 @@ msgstr "MTA: San Andreas - Предупреждение"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "В папке установки Grand Theft Auto: San Andreas обнаружены следующие файлы:"
+msgstr "Ваша папка установки Grand Theft Auto: San Andreas содержит следующие файлы:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "Эти файлы не требуются и могут конфликтовать с графическими функциями в этой версии MTA:SA.\n\n"
-"Рекомендуется удалить или переименовать эти файлы."
+msgstr "Эти файлы не требуются и могут конфликтовать с графическими особенностями в данной версии MTA:SA.\n\n"
+"Рекомендуется переименовать или удалить эти файлы."
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr "Оставить эти файлы и показать предупреждение при следующем запуске"
+msgstr "Оставить данные файлы, а также отобразить это предупреждение при следующем запуске"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr "Не напоминать об этих файлах снова"
+msgstr "Больше не спрашивать об этих файлах"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Переименовать файлы из *.dll в *.dll.bak"
+msgstr "Переименовать данные файлы из *.dll в *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr "Показать файлы"
+msgstr "Показать эти файлы"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
