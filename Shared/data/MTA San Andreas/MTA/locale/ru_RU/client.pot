@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-14 19:47+0000\n"
-"PO-Revision-Date: 2022-07-14 20:52\n"
+"PO-Revision-Date: 2022-07-17 10:40\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -369,7 +369,7 @@ msgstr "Отключение: Такой никнейм уже использу�
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
-msgstr "Отключение: Не удалось создать element Player."
+msgstr "Отключен: Элемент Player не может быть создан."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
@@ -1262,7 +1262,7 @@ msgstr "Скриншот сделан: '%s'"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Найти помощь по этой проблеме в сети?"
+msgstr "Хотите ли вы посмотреть помощь по этой проблеме онлайн?"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
