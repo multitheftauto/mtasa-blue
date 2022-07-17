@@ -179,6 +179,8 @@ enum class eAnimID : int
 class CAnimBlendAssocGroup
 {
 public:
+    virtual ~CAnimBlendAssocGroup() = default;
+
     virtual CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID) = 0;
     virtual void                              InitEmptyAssociations(RpClump* pClump) = 0;
     virtual bool                              IsCreated() = 0;
