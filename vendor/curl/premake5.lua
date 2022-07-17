@@ -20,11 +20,9 @@ project "curl"
 		"lib/config-dos.h",
 		"lib/config-mac.h",
 		"lib/config-os400.h",
+		"lib/config-plan9.h",
 		"lib/config-riscos.h",
-		"lib/config-symbian.h",
-		"lib/config-tpf.h",
 		"lib/config-win32ce.h",
-		"lib/config-vxworks.h",
 		"lib/setup-os400.h",
 		"lib/setup-vms.h"
 	}
@@ -33,10 +31,7 @@ project "curl"
 		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN", "WANT_IDN_PROTOTYPES" }
 		links { "crypt32", "Normaliz" }
 
-	filter { "system:macosx" }
-		defines { "USE_DARWINSSL" }
-
-	filter { "system:not windows", "system:not macosx" }
+	filter { "system:not windows" }
 		defines { "USE_MBEDTLS" }
 
 	filter { "system:linux or bsd or macosx" }
