@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-14 19:47+0000\n"
-"PO-Revision-Date: 2022-07-14 20:53\n"
+"PO-Revision-Date: 2022-07-21 16:22\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -1660,7 +1660,7 @@ msgstr "نمایش وضوح های غیر امن"
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "بازتاب باران کرونا"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
