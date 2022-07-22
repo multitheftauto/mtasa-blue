@@ -5361,9 +5361,10 @@ watercheck:
         add esp, 8
 
 rendercheck:
-        xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
-        cmp eax, [esp+0x88+8]
-        jnz fail
+        // causes some foliage not generating in certain places when uncommented
+        //xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
+        //cmp eax, [esp+0x88+8]
+        //jnz fail
 
         mov ax, [esi-0x10]
         mov edx, edi
