@@ -59,8 +59,30 @@ void _declspec(naked) HOOK_CTimer__Update()
     }
 }
 
+#define HOOKPOS_BreakObject_c__Update  0x59E420
+#define HOOKSIZE_BreakObject_c__Update 0xB
+const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
+
+void _declspec(naked) HOOK_BreakObject_c__Update()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov edx, [edi+eax+0x70]
+        lea eax, [edi+eax+0x70]
+        dec edx
+        mov [eax], edx
+
+    skip:
+        jmp RETURN_BreakObject_c__Update
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CTimer__Update);
+    EZHookInstall(BreakObject_c__Update);
 }
