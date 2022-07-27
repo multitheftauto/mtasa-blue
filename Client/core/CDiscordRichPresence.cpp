@@ -41,8 +41,6 @@ CDiscordRichPresence::~CDiscordRichPresence()
 {
     m_strDiscordAppId = DEFAULT_APP_ID;
     Discord_Shutdown();
-    DiscordEventHandlers handlers;
-    memset(&handlers, 0, sizeof(handlers));
 }
 
 void CDiscordRichPresence::UpdatePresence()
