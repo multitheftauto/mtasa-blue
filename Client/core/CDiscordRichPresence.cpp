@@ -39,7 +39,6 @@ CDiscordRichPresence::CDiscordRichPresence()
 
 CDiscordRichPresence::~CDiscordRichPresence()
 {
-    m_strDiscordAppId = DEFAULT_APP_ID;
     Discord_Shutdown();
 }
 
