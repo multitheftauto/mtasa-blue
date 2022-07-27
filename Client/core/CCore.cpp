@@ -593,22 +593,19 @@ void CCore::SetConnected(bool bConnected)
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
 
+    CDiscordInterface* discord = g_pCore->GetDiscord();
+    discord->SetPresenceState(bConnected ? "In-game" : "Main menu");
+    discord->SetPresenceStartTimestamp(0);
+    discord->SetPresenceDetails("");
+
     if (bConnected)
     {
         time_t timer;
         time(&timer);
-
-        g_pCore->GetDiscord()->SetPresenceState("In-game");
-        g_pCore->GetDiscord()->SetPresenceDetails("");
-        g_pCore->GetDiscord()->SetPresenceStartTimestamp((long)timer);
-        g_pCore->GetDiscord()->UpdatePresence();
-    } else
-    {
-        g_pCore->GetDiscord()->SetPresenceState("Main Menu");
-        g_pCore->GetDiscord()->SetPresenceDetails("");
-        g_pCore->GetDiscord()->SetPresenceStartTimestamp(0);
-        g_pCore->GetDiscord()->UpdatePresence();
+        discord->SetPresenceStartTimestamp((long)timer);
     }
+
+    discord->UpdatePresence();
     
 }
 
