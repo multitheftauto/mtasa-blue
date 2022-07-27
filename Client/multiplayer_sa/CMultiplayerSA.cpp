@@ -293,6 +293,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio    0x4D7198
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio     0x4D71E7
 
+#define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles 0x6A6FF0
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -537,6 +539,8 @@ void HOOK_CHud_RenderHealthBar();
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio();
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
 
+void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -772,6 +776,8 @@ void CMultiplayerSA::InitHooks()
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
+
+    HookInstall(HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles, (DWORD)HOOK_CAutomobile__dmgDrawCarCollidingParticles, 0x91);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1538,8 +1544,15 @@ void CMultiplayerSA::InitHooks()
     for (auto uiAddr : shadowAddr)
         MemPut(uiAddr, &m_fShadowsOffset);
 
+    // Fix corona rain reflections aren't rendering (#2345)
+    // By using zBufferFar instead of zBufferNear for corona position
+    MemPut<BYTE>(0x6FB9A0, 0x1C);
+
     // Skip check for disabled HUD
     MemSet((void*)0x58FBC4, 0x90, 9);
+
+    // Show muzzle flash for last bullet in magazine
+    MemSet((void*)0x61ECD2, 0x90, 20);
 
     InitHooks_CrashFixHacks();
 
@@ -1553,6 +1566,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleWeapons();
 
     InitHooks_Streaming();
+    InitHooks_FrameRateFixes();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -7021,5 +7035,41 @@ void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume
         pop     ebx
         add     esp, 36
         retn
+    }
+}
+
+static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, CVector& vecPosition, int count)
+{
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    if (pVehicle) {
+        SColor colors[4];
+        pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
+
+        RwColor color = {
+            colors[0].R * pVehicleInterface->m_fLighting,
+            colors[0].G * pVehicleInterface->m_fLighting,
+            colors[0].B * pVehicleInterface->m_fLighting,
+            0xFF
+        };
+
+        // Fx_c::AddDebris
+        ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);
+    }
+}
+
+const DWORD RETURN_CAutomobile__dmgDrawCarCollidingParticles = 0x6A7081;
+void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
+{
+    _asm
+    {
+        lea eax, [esp + 0x1C]
+        push ebp                // count
+        push eax                // pos
+        push edi                // vehicle
+        call AddVehicleColoredDebris
+        add esp, 12
+
+        jmp RETURN_CAutomobile__dmgDrawCarCollidingParticles
     }
 }

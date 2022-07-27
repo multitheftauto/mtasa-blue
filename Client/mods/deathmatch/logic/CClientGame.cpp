@@ -5293,10 +5293,14 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->RestoreFogDistance();
 
     // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
 
     // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetPedsLODDistance(true);
+
+    // Corona rain reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
 
     // Sun color
     g_pMultiplayer->ResetSunColor();

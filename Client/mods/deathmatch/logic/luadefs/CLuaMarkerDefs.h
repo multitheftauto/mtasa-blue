@@ -32,4 +32,7 @@ public:
     LUA_DECLARE(SetMarkerColor);
     LUA_DECLARE(SetMarkerTarget);
     LUA_DECLARE(SetMarkerIcon);
+
+    static bool SetCoronaReflectionEnabled(CClientMarker* pMarker, bool bEnabled);
+    static bool IsCoronaReflectionEnabled(CClientMarker* pMarker);
 };
