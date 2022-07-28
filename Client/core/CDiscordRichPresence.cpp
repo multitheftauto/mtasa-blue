@@ -34,7 +34,7 @@ CDiscordRichPresence::CDiscordRichPresence()
     m_uiDiscordAppStart = 0;
     m_uiDiscordAppEnd = 0;
 
-    Discord_Initialize(m_strDiscordAppId, &handlers, 1, nullptr);
+    Discord_Initialize(m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
 }
 
 CDiscordRichPresence::~CDiscordRichPresence()
@@ -46,9 +46,9 @@ void CDiscordRichPresence::UpdatePresence()
 {
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
-    discordPresence.largeImageKey = m_strDiscordAppAsset;
-    discordPresence.state = m_strDiscordAppState;
-    discordPresence.details = m_strDiscordAppDetails;
+    discordPresence.largeImageKey = m_strDiscordAppAsset.c_str();
+    discordPresence.state = m_strDiscordAppState.c_str();
+    discordPresence.details = m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
 
     Discord_UpdatePresence(&discordPresence);
