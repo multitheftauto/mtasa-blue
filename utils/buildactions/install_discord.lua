@@ -71,7 +71,7 @@ local function check_github_update(name, url, version)
 	return meta["tag_name"]
 end
 
-local function check_discord(upgrade)
+local function check_discord(should_upgrade)
 	local has_discord_dir = os.isdir(DISCORD_PATH)
 
 	-- Check file hash
@@ -93,7 +93,7 @@ local function check_discord(upgrade)
 	end
 
 	local downloaded_hash = os.sha256_file(archive_path)
-	if upgrade then
+	if should_upgrade then
 		print("New discord-rpc hash is:", downloaded_hash)
 		DISCORD_HASH = downloaded_hash
 
@@ -143,7 +143,7 @@ local function check_discord(upgrade)
 	os.expanddir_wildcard(DISCORD_PATH.."discord-rpc*", DISCORD_PATH)
 end
 
-local function check_rapid(upgrade)
+local function check_rapid(should_upgrade)
 	local has_rapid_dir = os.isdir(RAPID_PATH)
 
 	-- Check file hash
@@ -165,7 +165,7 @@ local function check_rapid(upgrade)
 	end
 
 	local downloaded_hash = os.sha256_file(archive_path)
-	if upgrade then
+	if should_upgrade then
 		print("New rapidjson hash is:", downloaded_hash)
 		RAPID_HASH = downloaded_hash
 
@@ -220,8 +220,8 @@ newaction {
 	description = "Downloads and installs discord-rpc",
 
 	execute = function(...)
-		local upgrade = _ARGS[1] == "upgrade"
-		if upgrade then
+		local should_upgrade = _ARGS[1] == "upgrade"
+		if should_upgrade then
 			-- discord-rpc
 			local discord = check_github_update("discord-rpc", DISCORD_UPDATE, DISCORD_VERSION)
 			if discord then
@@ -238,12 +238,12 @@ newaction {
 		end
 
 		-- Only execute on Windows in normal scenarios
-		if os.host() ~= "windows" and not upgrade then
+		if os.host() ~= "windows" and not should_upgrade then
 			return
 		end
 
-		check_discord(upgrade)
-		check_rapid(upgrade)
+		check_discord(should_upgrade)
+		check_rapid(should_upgrade)
 	end
 }
 
