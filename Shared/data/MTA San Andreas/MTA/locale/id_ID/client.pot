@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-21 23:25+0000\n"
-"PO-Revision-Date: 2022-07-22 00:25\n"
+"PO-Revision-Date: 2022-07-28 11:19\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -457,7 +457,7 @@ msgstr "Terputus: Nama telah digunakan"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Player element could not be created."
-msgstr "Koneksi Terputus: Player elemen tidak bisa dibuat."
+msgstr "Koneksi Putus: Pemain elemen tidak bisa dibuat."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
