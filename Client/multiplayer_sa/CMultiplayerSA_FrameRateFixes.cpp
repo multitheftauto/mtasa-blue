@@ -80,7 +80,7 @@ void _declspec(naked) HOOK_BreakObject_c__Update()
     }
 }
 
-#define HOOKPOS_CProjectileInfo__Update  0x738C63
+#define HOOKPOS_CProjectileInfo__Update 0x738C63
 #define HOOKSIZE_CProjectileInfo__Update 0x5
 const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
 const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
@@ -100,7 +100,7 @@ void _declspec(naked) HOOK_CProjectileInfo__Update()
     }
 }
 
-#define HOOKPOS_CVehicle__AddWheelDirtAndWater  0x6D2D50
+#define HOOKPOS_CVehicle__AddWheelDirtAndWater 0x6D2D50
 #define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
 const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
 void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
