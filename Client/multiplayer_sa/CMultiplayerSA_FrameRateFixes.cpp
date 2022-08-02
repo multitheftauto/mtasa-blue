@@ -100,10 +100,31 @@ void _declspec(naked) HOOK_CProjectileInfo__Update()
     }
 }
 
+#define HOOKPOS_CVehicle__AddWheelDirtAndWater 0x6D2D50
+#define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
+const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
+void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov eax, [esp+0x8]
+        test eax, eax
+
+        jmp RETURN_CVehicle__AddWheelDirtAndWater
+    skip:
+        xor eax, eax
+        retn 0x10
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CTimer__Update);
     EZHookInstall(BreakObject_c__Update);
     EZHookInstall(CProjectileInfo__Update);
+    EZHookInstall(CVehicle__AddWheelDirtAndWater);
 }
