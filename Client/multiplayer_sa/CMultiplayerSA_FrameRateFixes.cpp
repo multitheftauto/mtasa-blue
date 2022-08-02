@@ -80,7 +80,7 @@ void _declspec(naked) HOOK_BreakObject_c__Update()
     }
 }
 
-#define HOOKPOS_CProjectileInfo__Update  0x738C63
+#define HOOKPOS_CProjectileInfo__Update 0x738C63
 #define HOOKSIZE_CProjectileInfo__Update 0x5
 const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
 const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
