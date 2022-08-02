@@ -120,6 +120,26 @@ void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
     }
 }
 
+#define HOOKPOS_CPlane__PreRender 0x6CA937
+#define HOOKSIZE_CPlane__PreRender 0x6
+const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
+const unsigned int RETURN_CPlane__PreRender_SKIP = 0x6CAA93;
+
+void _declspec(naked) HOOK_CPlane__PreRender()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov al, [esi+0xA00]
+
+        jmp RETURN_CPlane__PreRender
+    skip:
+        jmp RETURN_CPlane__PreRender_SKIP
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -127,4 +147,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(BreakObject_c__Update);
     EZHookInstall(CProjectileInfo__Update);
     EZHookInstall(CVehicle__AddWheelDirtAndWater);
+    EZHookInstall(CPlane__PreRender);
 }
