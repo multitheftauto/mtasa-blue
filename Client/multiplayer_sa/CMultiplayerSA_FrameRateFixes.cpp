@@ -80,9 +80,30 @@ void _declspec(naked) HOOK_BreakObject_c__Update()
     }
 }
 
+#define HOOKPOS_CProjectileInfo__Update 0x738C63
+#define HOOKSIZE_CProjectileInfo__Update 0x5
+const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
+const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
+void _declspec(naked) HOOK_CProjectileInfo__Update()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov eax, [ebx]
+        cmp eax, 0x13
+
+        jmp RETURN_CProjectileInfo__Update
+    skip:
+        jmp RETURN_CProjectileInfo__Update_SKIP
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CTimer__Update);
     EZHookInstall(BreakObject_c__Update);
+    EZHookInstall(CProjectileInfo__Update);
 }
