@@ -59,6 +59,67 @@ void _declspec(naked) HOOK_CTimer__Update()
     }
 }
 
+#define HOOKPOS_BreakObject_c__Update  0x59E420
+#define HOOKSIZE_BreakObject_c__Update 0xB
+const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
+
+void _declspec(naked) HOOK_BreakObject_c__Update()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov edx, [edi+eax+0x70]
+        lea eax, [edi+eax+0x70]
+        dec edx
+        mov [eax], edx
+
+    skip:
+        jmp RETURN_BreakObject_c__Update
+    }
+}
+
+#define HOOKPOS_CProjectileInfo__Update  0x738C63
+#define HOOKSIZE_CProjectileInfo__Update 0x5
+const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
+const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
+void _declspec(naked) HOOK_CProjectileInfo__Update()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov eax, [ebx]
+        cmp eax, 0x13
+
+        jmp RETURN_CProjectileInfo__Update
+    skip:
+        jmp RETURN_CProjectileInfo__Update_SKIP
+    }
+}
+
+#define HOOKPOS_CVehicle__AddWheelDirtAndWater  0x6D2D50
+#define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
+const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
+void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov eax, [esp+0x8]
+        test eax, eax
+
+        jmp RETURN_CVehicle__AddWheelDirtAndWater
+    skip:
+        xor eax, eax
+        retn 0x10
+    }
+}
+
 #define HOOKPOS_CPlane__PreRender 0x6CA937
 #define HOOKSIZE_CPlane__PreRender 0x6
 const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
@@ -83,5 +144,8 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CTimer__Update);
+    EZHookInstall(BreakObject_c__Update);
+    EZHookInstall(CProjectileInfo__Update);
+    EZHookInstall(CVehicle__AddWheelDirtAndWater);
     EZHookInstall(CPlane__PreRender);
 }
