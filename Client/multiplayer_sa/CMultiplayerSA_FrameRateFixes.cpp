@@ -140,6 +140,64 @@ void _declspec(naked) HOOK_CPlane__PreRender()
     }
 }
 
+#define HOOKPOS_CWaterCannon__Update_OncePerFrame 0x72A29B
+#define HOOKSIZE_CWaterCannon__Update_OncePerFrame 0x5
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0;
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_SKIP = 0x72A2BB;
+static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        movsx eax, [edi+0x4]
+        inc eax
+
+        jmp RETURN_CWaterCannon__Update_OncePerFrame
+    skip:
+        jmp RETURN_CWaterCannon__Update_OncePerFrame_SKIP
+    }
+}
+
+#define HOOKPOS_CWaterCannon__Update_OncePerFrame_PushPedFix 0x72A37B
+#define HOOKSIZE_CWaterCannon__Update_OncePerFrame_PushPedFix 0x6
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix = 0x72A381;
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP = 0x72A38E;
+static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov ecx, ds:[0xB7CB4C]
+
+        jmp RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix
+    skip:
+        jmp RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP
+    }
+}
+
+#define HOOKPOS_CWaterCannon__Render_FxFix 0x729430
+#define HOOKSIZE_CWaterCannon__Render_FxFix 0x7
+static const unsigned int RETURN_CWaterCannon__Render_FxFix = 0x729440;
+static const unsigned int RETURN_CWaterCannon__Render_FxFix_SKIP = 0x7294EE;
+static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        fstp [esp+0x84]
+
+        jmp RETURN_CWaterCannon__Render_FxFix
+    skip:
+        jmp RETURN_CWaterCannon__Render_FxFix_SKIP
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -148,4 +206,7 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CProjectileInfo__Update);
     EZHookInstall(CVehicle__AddWheelDirtAndWater);
     EZHookInstall(CPlane__PreRender);
+    EZHookInstall(CWaterCannon__Update_OncePerFrame);
+    EZHookInstall(CWaterCannon__Update_OncePerFrame_PushPedFix);
+    EZHookInstall(CWaterCannon__Render_FxFix);
 }
