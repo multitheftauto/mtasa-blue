@@ -33,9 +33,24 @@ void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
     }
 }
 
+#define HOOKPOS_CCamera__Process 0x52C723
+#define HOOKSIZE_CCamera__Process 0x12
+static const unsigned int RETURN_CCamera__Process = 0x52C735;
+static void _declspec(naked) HOOK_CCamera__Process()
+{
+    _asm {
+        fld ds:[0x858C80]           // 5.0f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd ds:[0xB6EC30]
+        fstp ds:[0xB6EC30]
+        jmp RETURN_CCamera__Process
+    }
+}
+
 #define HOOKPOS_CTimer__Update 0x561C5D
 #define HOOKSIZE_CTimer__Update 0xE
-void _declspec(naked) HOOK_CTimer__Update()
+static void _declspec(naked) HOOK_CTimer__Update()
 {
     _asm {
         add esp, 0x4
@@ -59,11 +74,10 @@ void _declspec(naked) HOOK_CTimer__Update()
     }
 }
 
-#define HOOKPOS_BreakObject_c__Update  0x59E420
+#define HOOKPOS_BreakObject_c__Update 0x59E420
 #define HOOKSIZE_BreakObject_c__Update 0xB
-const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
-
-void _declspec(naked) HOOK_BreakObject_c__Update()
+static const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
+static void _declspec(naked) HOOK_BreakObject_c__Update()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -82,9 +96,9 @@ void _declspec(naked) HOOK_BreakObject_c__Update()
 
 #define HOOKPOS_CProjectileInfo__Update 0x738C63
 #define HOOKSIZE_CProjectileInfo__Update 0x5
-const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
-const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
-void _declspec(naked) HOOK_CProjectileInfo__Update()
+static const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
+static const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
+static void _declspec(naked) HOOK_CProjectileInfo__Update()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -102,8 +116,8 @@ void _declspec(naked) HOOK_CProjectileInfo__Update()
 
 #define HOOKPOS_CVehicle__AddWheelDirtAndWater 0x6D2D50
 #define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
-const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
-void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
+static const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
+static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
 {
     _asm {
         movzx edx, bWouldBeNewFrame
@@ -122,10 +136,9 @@ void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
 
 #define HOOKPOS_CPlane__PreRender 0x6CA937
 #define HOOKSIZE_CPlane__PreRender 0x6
-const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
-const unsigned int RETURN_CPlane__PreRender_SKIP = 0x6CAA93;
-
-void _declspec(naked) HOOK_CPlane__PreRender()
+static const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
+static const unsigned int RETURN_CPlane__PreRender_SKIP = 0x6CAA93;
+static void _declspec(naked) HOOK_CPlane__PreRender()
 {
     _asm {
         movzx eax, bWouldBeNewFrame
@@ -201,6 +214,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
+    EZHookInstall(CCamera__Process);
     EZHookInstall(CTimer__Update);
     EZHookInstall(BreakObject_c__Update);
     EZHookInstall(CProjectileInfo__Update);
