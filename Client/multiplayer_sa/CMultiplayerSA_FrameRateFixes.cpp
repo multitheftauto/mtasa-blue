@@ -211,6 +211,25 @@ static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
     }
 }
 
+#define HOOKPOS_CPed__PreRenderAfterTest 0x5E7181
+#define HOOKSIZE_CPed__PreRenderAfterTest 0x6
+static const unsigned int RETURN_CPed__PreRenderAfterTest = 0x5E7187;
+static const unsigned int RETURN_CPed__PreRenderAfterTest_SKIP = 0x5E722D;
+static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov eax, [ebp+0x46C]
+
+        jmp RETURN_CPed__PreRenderAfterTest
+    skip:
+        jmp RETURN_CPed__PreRenderAfterTest_SKIP
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -223,4 +242,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CWaterCannon__Update_OncePerFrame);
     EZHookInstall(CWaterCannon__Update_OncePerFrame_PushPedFix);
     EZHookInstall(CWaterCannon__Render_FxFix);
+    EZHookInstall(CPed__PreRenderAfterTest);
 }
