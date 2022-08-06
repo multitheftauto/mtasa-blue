@@ -249,6 +249,24 @@ static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
     }
 }
 
+#define HOOKPOS_cBuoyancy__AddSplashParticles 0x6C34E0
+#define HOOKSIZE_cBuoyancy__AddSplashParticles 0x6
+static const unsigned int RETURN_cBuoyancy__AddSplashParticles = 0x6C34E6;
+static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        sub esp, 0xE0
+
+        jmp RETURN_cBuoyancy__AddSplashParticles
+    skip:
+        retn 0x2C
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -267,4 +285,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CWaterCannon__Update_OncePerFrame_PushPedFix);
     EZHookInstall(CWaterCannon__Render_FxFix);
     EZHookInstall(CPed__PreRenderAfterTest);
+    EZHookInstall(cBuoyancy__AddSplashParticles);
 }
