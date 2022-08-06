@@ -306,6 +306,25 @@ static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
     }
 }
 
+#define HOOKPOS_CAutomobile__UpdateWheelMatrix 0x6AA78A
+#define HOOKSIZE_CAutomobile__UpdateWheelMatrix 0x5
+static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix = 0x6AA78F;
+static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix_SKIP = 0x6AAAD0;
+static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        push 0x3D4CCCCD
+
+        jmp RETURN_CAutomobile__UpdateWheelMatrix
+    skip:
+        jmp RETURN_CAutomobile__UpdateWheelMatrix_SKIP
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -327,4 +346,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(cBuoyancy__AddSplashParticles);
     EZHookInstall(CWeather__AddRain);
     EZHookInstall(CPlane__ProcessFlyingCarStuff);
+    EZHookInstall(CAutomobile__UpdateWheelMatrix);
 }
