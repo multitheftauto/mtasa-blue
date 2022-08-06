@@ -399,6 +399,46 @@ static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
     }
 }
 
+#define HOOKPOS_CTaskSimpleSwim__ProcessEffects 0x68AD3B
+#define HOOKSIZE_CTaskSimpleSwim__ProcessEffects 0x6
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects = 0x68AD41;
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects_SKIP = 0x68AFDB;
+static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov eax, [edi+0x14]
+        add eax, 0x10
+
+        jmp RETURN_CTaskSimpleSwim__ProcessEffects
+    skip:
+        jmp RETURN_CTaskSimpleSwim__ProcessEffects_SKIP
+    }
+}
+
+#define HOOKPOS_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x68AC31
+#define HOOKSIZE_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x7
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix = 0x68AC38;
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP = 0x68AD36;
+static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov ecx, edi
+        mov esi, 5
+
+        jmp RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix
+    skip:
+        jmp RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -425,4 +465,6 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CVehicle__AddWaterSplashParticles);
     EZHookInstall(CPlane__ProcessControl);
     EZHookInstall(CVehicle__AddExhaustParticles);
+    EZHookInstall(CTaskSimpleSwim__ProcessEffects);
+    EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
 }
