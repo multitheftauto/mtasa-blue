@@ -325,6 +325,24 @@ static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
     }
 }
 
+#define HOOKPOS_CVehicle__DoBoatSplashes 0x6DD130
+#define HOOKSIZE_CVehicle__DoBoatSplashes 0x6
+static const unsigned int RETURN_CVehicle__DoBoatSplashes = 0x6DD136;
+static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        sub esp, 0x80
+
+        jmp RETURN_CVehicle__DoBoatSplashes
+    skip:
+        retn 4
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -347,4 +365,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CWeather__AddRain);
     EZHookInstall(CPlane__ProcessFlyingCarStuff);
     EZHookInstall(CAutomobile__UpdateWheelMatrix);
+    EZHookInstall(CVehicle__DoBoatSplashes);
 }
