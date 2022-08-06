@@ -267,6 +267,26 @@ static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
     }
 }
 
+#define HOOKPOS_CWeather__AddRain 0x72AAA8
+#define HOOKSIZE_CWeather__AddRain 0x6
+static const unsigned int RETURN_CWeather__AddRain = 0x72AAAE;
+static void _declspec(naked) HOOK_CWeather__AddRain()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        fld ds:[0xC812F0]
+
+        jmp RETURN_CWeather__AddRain
+
+    skip:
+        add esp, 0x84
+        ret
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -286,4 +306,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CWaterCannon__Render_FxFix);
     EZHookInstall(CPed__PreRenderAfterTest);
     EZHookInstall(cBuoyancy__AddSplashParticles);
+    EZHookInstall(CWeather__AddRain);
 }
