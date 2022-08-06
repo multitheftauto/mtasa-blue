@@ -94,6 +94,45 @@ static void _declspec(naked) HOOK_BreakObject_c__Update()
     }
 }
 
+#define HOOKPOS_CWaterCannon__Update_OncePerFrame  0x72A29B
+#define HOOKSIZE_CWaterCannon__Update_OncePerFrame 0x5
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0;
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_SKIP = 0x72A2BB;
+static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        movsx eax, [edi+0x4]
+        inc eax
+
+        jmp RETURN_CWaterCannon__Update_OncePerFrame
+    skip:
+        jmp RETURN_CWaterCannon__Update_OncePerFrame_SKIP
+    }
+}
+
+#define HOOKPOS_CPlayerInfo__Process 0x5700F5
+#define HOOKSIZE_CPlayerInfo__Process 0x6
+static const unsigned int RETURN_CPlayerInfo__Process = 0x5700FB;
+static const unsigned int RETURN_CPlayerInfo__Process_SKIP = 0x57015B;
+static void _declspec(naked) HOOK_CPlayerInfo__Process()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov edx, [esi+0xBC]
+
+        jmp RETURN_CPlayerInfo__Process
+    skip:
+        jmp RETURN_CPlayerInfo__Process_SKIP
+    }
+}
+
 #define HOOKPOS_CProjectileInfo__Update 0x738C63
 #define HOOKSIZE_CProjectileInfo__Update 0x5
 static const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
@@ -150,26 +189,6 @@ static void _declspec(naked) HOOK_CPlane__PreRender()
         jmp RETURN_CPlane__PreRender
     skip:
         jmp RETURN_CPlane__PreRender_SKIP
-    }
-}
-
-#define HOOKPOS_CWaterCannon__Update_OncePerFrame 0x72A29B
-#define HOOKSIZE_CWaterCannon__Update_OncePerFrame 0x5
-static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0;
-static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_SKIP = 0x72A2BB;
-static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
-{
-    _asm {
-        movzx eax, bWouldBeNewFrame
-        test eax, eax
-        jz skip
-
-        movsx eax, [edi+0x4]
-        inc eax
-
-        jmp RETURN_CWaterCannon__Update_OncePerFrame
-    skip:
-        jmp RETURN_CWaterCannon__Update_OncePerFrame_SKIP
     }
 }
 
@@ -234,12 +253,17 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CCamera__Process);
+
+    // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);
+
     EZHookInstall(BreakObject_c__Update);
+    EZHookInstall(CWaterCannon__Update_OncePerFrame);
+    EZHookInstall(CPlayerInfo__Process);
+
     EZHookInstall(CProjectileInfo__Update);
     EZHookInstall(CVehicle__AddWheelDirtAndWater);
     EZHookInstall(CPlane__PreRender);
-    EZHookInstall(CWaterCannon__Update_OncePerFrame);
     EZHookInstall(CWaterCannon__Update_OncePerFrame_PushPedFix);
     EZHookInstall(CWaterCannon__Render_FxFix);
     EZHookInstall(CPed__PreRenderAfterTest);
