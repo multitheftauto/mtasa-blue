@@ -287,6 +287,25 @@ static void _declspec(naked) HOOK_CWeather__AddRain()
     }
 }
 
+#define HOOKPOS_CPlane__ProcessFlyingCarStuff 0x6CBE4B
+#define HOOKSIZE_CPlane__ProcessFlyingCarStuff 0x6
+static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff = 0x6CBE51;
+static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff_SKIP = 0x6CC0D9;
+static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov edx, ds:[0xB6F03C]
+
+        jmp RETURN_CPlane__ProcessFlyingCarStuff
+    skip:
+        jmp RETURN_CPlane__ProcessFlyingCarStuff_SKIP
+    }
+}
+
 void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
@@ -307,4 +326,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CPed__PreRenderAfterTest);
     EZHookInstall(cBuoyancy__AddSplashParticles);
     EZHookInstall(CWeather__AddRain);
+    EZHookInstall(CPlane__ProcessFlyingCarStuff);
 }
