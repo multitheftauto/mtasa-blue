@@ -48,6 +48,32 @@ static void _declspec(naked) HOOK_CCamera__Process()
     }
 }
 
+#define HOOKPOS_CHeli__ProcessFlyingCarStuff 0x6C4F13
+#define HOOKSIZE_CHeli__ProcessFlyingCarStuff 0x2A
+static const unsigned int RETURN_CHeli__ProcessFlyingCarStuff = 0x6C4F3D;
+static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
+{
+    _asm {
+        mov ax, [esi+0x22]
+        cmp ax, 465
+        jz is_rc_heli
+        cmp ax, 501
+        jz is_rc_heli
+
+        fld ds:[0x858CDC]           // 0.001f
+        jmp end
+
+    is_rc_heli:
+        fld ds:[0x859CD8]           // 0.003f
+
+    end:
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd [esi+0x84C]
+        jmp RETURN_CHeli__ProcessFlyingCarStuff
+    }
+}
+
 #define HOOKPOS_CTimer__Update 0x561C5D
 #define HOOKSIZE_CTimer__Update 0xE
 static void _declspec(naked) HOOK_CTimer__Update()
@@ -443,6 +469,7 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
 {
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CCamera__Process);
+    EZHookInstall(CHeli__ProcessFlyingCarStuff);
 
     // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);
