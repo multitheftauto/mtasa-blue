@@ -390,4 +390,8 @@ public:
     virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
     virtual eAnimID    GetLastStaticAnimationID() = 0;
     virtual DWORD      GetLastAnimArrayAddress() = 0;
+
+    virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() = 0;
+    virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() = 0;
+    virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() = 0;
 };
