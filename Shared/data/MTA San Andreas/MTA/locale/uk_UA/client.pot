@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-21 23:25+0000\n"
-"PO-Revision-Date: 2022-08-11 20:33\n"
+"PO-Revision-Date: 2022-08-11 21:32\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -1914,7 +1914,7 @@ msgstr "Віконний режим"
 
 #: Client/core/CSettings.cpp:636
 msgid "DPI aware"
-msgstr ""
+msgstr "DPI aware"
 
 #: Client/core/CSettings.cpp:651 Client/core/CSettings.cpp:1574
 msgid "Standard"
@@ -2008,7 +2008,7 @@ msgstr "Зображати транспортні засоби завжди з �
 
 #: Client/core/CSettings.cpp:814
 msgid "Render peds always in high detail"
-msgstr ""
+msgstr "Завжди візуалізувати NPC з високою деталізацією"
 
 #: Client/core/CSettings.cpp:819
 msgid "Full Screen Minimize"
@@ -2281,7 +2281,7 @@ msgstr "Текст чату"
 
 #: Client/core/CSettings.cpp:2053
 msgid "Input Background"
-msgstr ""
+msgstr "Фон введення"
 
 #: Client/core/CSettings.cpp:2053
 msgid "Input Text"
@@ -2333,23 +2333,23 @@ msgstr "Вертикально:"
 
 #: Client/core/CSettings.cpp:2177
 msgid "Text-Align:"
-msgstr ""
+msgstr "Вирівнювання тексту:"
 
 #: Client/core/CSettings.cpp:2177
 msgid "X-Offset:"
-msgstr ""
+msgstr "Зміщення по X:"
 
 #: Client/core/CSettings.cpp:2178
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Зміщення по X:"
 
 #: Client/core/CSettings.cpp:2184
 msgid "Position"
-msgstr ""
+msgstr "Позиція"
 
 #: Client/core/CSettings.cpp:2199 Client/core/CSettings.cpp:2213
 msgid "Center"
-msgstr ""
+msgstr "Центр"
 
 #: Client/core/CSettings.cpp:2212
 msgid "Top"
@@ -2381,7 +2381,7 @@ msgstr "Показувати повідомлення в області пові
 
 #: Client/core/CSettings.cpp:2319
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Чорно-білий контур тексту чату"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -2433,7 +2433,7 @@ msgstr "Колір"
 
 #: Client/core/CSettings.cpp:3770
 msgid "Preview"
-msgstr ""
+msgstr "Перегляд"
 
 #: Client/core/CSettings.cpp:4078
 msgid "Please disconnect before changing language"
@@ -2471,7 +2471,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4436
 msgid "EXTERNAL SOUNDS"
-msgstr ""
+msgstr "ЗОВНІШНІ ЗВУКИ"
 
 #: Client/core/CSettings.cpp:4457
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -2488,11 +2488,14 @@ msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr ""
+msgstr "Увімкнення усвідомлене, DPI є експериментальною функцією\n"
+"ми рекомендуємо, лише коли ви граєте в MTA:SA на моніторі зі змінним масштабом.\n"
+"Якщо ввімкнути цю опцію, у вас можуть виникнути проблеми з графікою.\n\n"
+"Ви впевнені, що бажаєте ввімкнути цю опцію?"
 
 #: Client/core/CSettings.cpp:4512
 msgid "EXPERIMENTAL FEATURE"
-msgstr ""
+msgstr "ЕКСПЕРИМЕНТАЛЬНА ХАРАКТЕРИСТИКА"
 
 #: Client/core/CSettings.cpp:4655
 msgid "Please enter a nickname"
@@ -2654,12 +2657,12 @@ msgstr "Українська"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "НОВИНИ"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
 msgid "Visit latest news article"
-msgstr ""
+msgstr "Перегляньте останню статтю новин"
 
 #: Client/core/CCredits.cpp:32
 msgid "Programming"
