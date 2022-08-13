@@ -490,11 +490,6 @@ void CGameSA::Reset()
 
         // Restore vehicle model wheel sizes
         CModelInfoSA::ResetAllVehiclesWheelSizes();
-
-        CPlayerInfo* pPlayerInfo = GetPlayerInfo();
-
-        if (pPlayerInfo)
-            pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
     }
 }
 
