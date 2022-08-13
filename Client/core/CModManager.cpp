@@ -224,6 +224,12 @@ void CModManager::Unload()
         CCore::GetSingleton().GetNetwork()->Reset();
         assert(CCore::GetSingleton().GetNetwork()->GetServerBitStreamVersion() == 0);
 
+        // Reset camera drunk/shake level
+        CPlayerInfo* pPlayerInfo = CCore::GetSingleton().GetGame()->GetPlayerInfo();
+
+        if (pPlayerInfo)
+            pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
+
         // Enable the console again
         CCore::GetSingleton().GetConsole()->SetEnabled(true);
 
