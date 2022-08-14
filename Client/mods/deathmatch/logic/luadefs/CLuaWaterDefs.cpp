@@ -18,7 +18,7 @@ void CLuaWaterDefs::LoadFunctions()
         {"createWater", CreateWater},
         {"testLineAgainstWater", TestLineAgainstWater},
         {"resetWaterColor", ResetWaterColor},
-        {"resetWaterLevel", ArgumentParser<ResetWaterLevel>},
+        {"resetWaterLevel", ArgumentParserWarn<false, ResetWaterLevel>},
 
         {"setWaterColor", SetWaterColor},
         {"setWaterLevel", SetWaterLevel},
