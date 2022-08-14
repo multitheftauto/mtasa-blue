@@ -37,6 +37,7 @@ public:
     void                        ResetWorldWaterLevel();
     void                        SetElementWaterLevel(CWater* pWater, float fLevel);
     void                        SetAllElementWaterLevel(float fLevel);
+    void                        ResetAllElementWaterLevel();
 
     std::list<CWater*>::const_iterator IterBegin() { return m_List.begin(); }
     std::list<CWater*>::const_iterator IterEnd() { return m_List.end(); }

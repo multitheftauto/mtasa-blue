@@ -12,15 +12,17 @@
 #include "StdInc.h"
 #include "CLuaWaterDefs.h"
 #include "CWater.h"
+#include "CWaterManager.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaWaterDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createWater", CreateWater},
         {"setWaterLevel", SetWaterLevel},
-        {"resetWaterLevel", ResetWaterLevel},
+        {"resetWaterLevel", ArgumentParser<ResetWaterLevel>},
         {"getWaterVertexPosition", GetWaterVertexPosition},
         {"setWaterVertexPosition", SetWaterVertexPosition},
         {"getWaterColor", GetWaterColor},
@@ -167,11 +169,14 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWaterDefs::ResetWaterLevel(lua_State* luaVM)
+bool CLuaWaterDefs::ResetWaterLevel(bool resetElements)
 {
     CStaticFunctionDefinitions::ResetWorldWaterLevel();
-    lua_pushboolean(luaVM, true);
-    return 1;
+
+    if (resetElements)
+        g_pGame->GetWaterManager()->ResetAllElementWaterLevel();
+
+    return true;
 }
 
 int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)

@@ -68,6 +68,8 @@ bool CClientWater::Create()
     g_pCore->GetConsole()->Printf("CClientWater::Create %d", GetID());
 #endif
 
+    m_iDefaultLevel = GetLevel();
+
     return true;
 }
 
@@ -179,4 +181,19 @@ bool CClientWater::SetLevel(float fLevel, void* pChangeSource)
         SetVertexPosition(i, vecVertexPos, pChangeSource);
     }
     return true;
+}
+
+float CClientWater::GetLevel() const
+{
+    float fLevel = 0.0f;
+    for (int i = 0; i < GetNumVertices(); i++)
+    {
+        fLevel += m_Vertices[i].fZ;
+    }
+    return fLevel / static_cast<float>(GetNumVertices());
+}
+
+void CClientWater::ResetLevel()
+{
+    SetLevel(m_iDefaultLevel);
 }

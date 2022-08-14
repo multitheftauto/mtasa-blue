@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaWaterDefs::LoadFunctions()
 {
@@ -17,7 +18,7 @@ void CLuaWaterDefs::LoadFunctions()
         {"createWater", CreateWater},
         {"testLineAgainstWater", TestLineAgainstWater},
         {"resetWaterColor", ResetWaterColor},
-        {"resetWaterLevel", ResetWaterLevel},
+        {"resetWaterLevel", ArgumentParser<ResetWaterLevel>},
 
         {"setWaterColor", SetWaterColor},
         {"setWaterLevel", SetWaterLevel},
@@ -140,11 +141,14 @@ int CLuaWaterDefs::TestLineAgainstWater(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWaterDefs::ResetWaterLevel(lua_State* luaVM)
+bool CLuaWaterDefs::ResetWaterLevel(bool resetElements)
 {
     CStaticFunctionDefinitions::ResetWorldWaterLevel();
-    lua_pushboolean(luaVM, true);
-    return 1;
+
+    if (resetElements)
+        g_pClientGame->GetManager()->GetWaterManager()->ResetAllElementWaterLevel();
+
+    return true;
 }
 
 int CLuaWaterDefs::ResetWaterColor(lua_State* luaVM)

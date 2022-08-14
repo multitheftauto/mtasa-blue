@@ -20,10 +20,11 @@ public:
 
     LUA_DECLARE(CreateWater);
     LUA_DECLARE(SetWaterLevel);
-    LUA_DECLARE(ResetWaterLevel);
     LUA_DECLARE(GetWaterVertexPosition);
     LUA_DECLARE(SetWaterVertexPosition);
     LUA_DECLARE(GetWaterColor);
     LUA_DECLARE(SetWaterColor);
     LUA_DECLARE(ResetWaterColor);
+
+    static bool ResetWaterLevel(bool resetElements);
 };

@@ -19,7 +19,6 @@ public:
     static void AddClass(lua_State* luaVM);
 
     LUA_DECLARE(CreateWater);
-    LUA_DECLARE(ResetWaterLevel);
     LUA_DECLARE(ResetWaterColor);
     LUA_DECLARE(TestLineAgainstWater);
 
@@ -32,4 +31,6 @@ public:
     LUA_DECLARE(GetWaterLevel);
     LUA_DECLARE(IsWaterDrawnLast);
     LUA_DECLARE(GetWaterVertexPosition);
+
+    static bool ResetWaterLevel(bool resetElements);
 };
