@@ -32,5 +32,5 @@ public:
     LUA_DECLARE(IsWaterDrawnLast);
     LUA_DECLARE(GetWaterVertexPosition);
 
-    static bool ResetWaterLevel(bool resetElements);
+    static bool ResetWaterLevel(std::variant<std::monostate, bool, std::vector<CClientWater*>, CClientWater*> resetElements);
 };

@@ -26,5 +26,5 @@ public:
     LUA_DECLARE(SetWaterColor);
     LUA_DECLARE(ResetWaterColor);
 
-    static bool ResetWaterLevel(bool resetElements);
+    static bool ResetWaterLevel(std::variant<std::monostate, bool, std::vector<CWater*>, CWater*> resetElements);
 };
