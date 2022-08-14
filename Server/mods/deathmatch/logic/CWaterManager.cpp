@@ -85,8 +85,8 @@ void CWaterManager::ResetElementWaterLevel(CWater* pWater)
 
 void CWaterManager::ResetElementWaterLevel(std::vector<CWater*>& vecWaterElements)
 {
-    for (CWater* water : vecWaterElements)
-        water->ResetLevel();
+    for (CWater* pWater : vecWaterElements)
+        pWater->ResetLevel();
 }
 
 void CWaterManager::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)

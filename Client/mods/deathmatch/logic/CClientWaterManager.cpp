@@ -121,8 +121,8 @@ void CClientWaterManager::ResetElementWaterLevel(CClientWater* pWater)
 
 void CClientWaterManager::ResetElementWaterLevel(std::vector<CClientWater*>& vecWaterElements)
 {
-    for (CClientWater* water : vecWaterElements)
-        water->ResetLevel();
+    for (CClientWater* pWater : vecWaterElements)
+        pWater->ResetLevel();
 }
 
 void CClientWaterManager::ResetWorldWaterLevel()
