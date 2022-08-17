@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-21 23:25+0000\n"
-"PO-Revision-Date: 2022-07-27 07:25\n"
+"POT-Creation-Date: 2022-08-17 08:23+0000\n"
+"PO-Revision-Date: 2022-08-17 08:36\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -16,11 +16,6 @@ msgstr ""
 "X-Crowdin-Language: ar\n"
 "X-Crowdin-File: /master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
-msgid "Problem with graphics driver"
-msgstr "مشكلة في معرّف الرسوم"
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
@@ -137,18 +132,10 @@ msgstr "(وضع التطوير) وضع التطوير يظهر الـ colshape"
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(وضع التطوير)يطبع ارقام اصوات العالم في إطار التصحيح"
 
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "خطأ في التحميل:  %s"
-
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:569
 #: Client/mods/deathmatch/logic/CClientGame.cpp:643
 #: Client/mods/deathmatch/logic/CClientGame.cpp:667
@@ -160,124 +147,28 @@ msgstr "خطأ في التحميل:  %s"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1198
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1259
-#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:816
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/core/CGUI.cpp:87
-#: Client/core/CCore.cpp:1188 Client/core/CCore.cpp:1201
-#: Client/core/CSettings.cpp:2899 Client/core/CSettings.cpp:4078
-#: Client/core/CSettings.cpp:4106 Client/core/CSettings.cpp:4637
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
+#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
+#: Client/loader/MainFunctions.cpp:816 Client/core/CCore.cpp:1188
+#: Client/core/CCore.cpp:1201 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421 Client/core/CSettings.cpp:2899
+#: Client/core/CSettings.cpp:4078 Client/core/CSettings.cpp:4106
+#: Client/core/CSettings.cpp:4637 Client/core/CGUI.cpp:87
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1273
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1295
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1352
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1401
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "خطأ"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "تقدم تحميل الخريطة:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "تقدًم التحميل:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s من %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "اقطع الأتصال حتى تلغي التحميل"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "تعذر بدء تشغيل الخادم المحلي، افتح وحدة التحكم console للحصول على التفاصيل."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "خطأ: تعذر تشغيل الخادم المحلي. [%s]"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "خادم اللعبة"
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:424 Client/core/CSettings.cpp:612
-#: Client/core/CSettings.cpp:878 Client/core/CSettings.cpp:1976
-msgid "General"
-msgstr "عام"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "الموارد"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "إسم الخادم: "
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "كلمة المرور:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "الحد الأقصى للاعبين:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "إذاعة: "
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "الشبكة المحلية"
-
-#. Create the tabs
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-msgid "Internet"
-msgstr "الإنترنت"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "المحدد"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "الكل"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "تشغيل"
-
-#. Cancel button
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/loader/Dialogs.cpp:37 Client/core/CVersionUpdater.cpp:1787
-#: Client/core/CVersionUpdater.cpp:1803 Client/core/CVersionUpdater.cpp:1838
-#: Client/core/CSettings.cpp:131 Client/core/CSettings.cpp:4657
-#: Client/gui/CGUIMessageBox_Impl.cpp:68
-msgid "Cancel"
-msgstr "إلغاء"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:569
 #: Client/mods/deathmatch/logic/CClientGame.cpp:667
@@ -598,19 +489,111 @@ msgstr[5] "%d ثواني"
 msgid "Disconnected"
 msgstr "قطع الإتصال"
 
-#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:751
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "جاري البحث عن Grand Theft Auto San Andreas"
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "تعذر بدء تشغيل الخادم المحلي، افتح وحدة التحكم console للحصول على التفاصيل."
 
-#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:754
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "يرجى تشغيل Grand Theft Auto San Andreas"
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "خطأ: تعذر تشغيل الخادم المحلي. [%s]"
 
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "اختر مسار تثبيت Grand Theft Auto: San Andreas"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "تقدم تحميل الخريطة:"
 
-#: Client/loader/Utils.cpp:1182 Client/loader/CInstallManager.cpp:329
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "تقدًم التحميل:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s من %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "اقطع الأتصال حتى تلغي التحميل"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "خطأ في التحميل:  %s"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "خادم اللعبة"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:424 Client/core/CSettings.cpp:612
+#: Client/core/CSettings.cpp:878 Client/core/CSettings.cpp:1976
+msgid "General"
+msgstr "عام"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "الموارد"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "إسم الخادم: "
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "كلمة المرور:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "الحد الأقصى للاعبين:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "إذاعة: "
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "الشبكة المحلية"
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr "الإنترنت"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "المحدد"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "الكل"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "تشغيل"
+
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/loader/Dialogs.cpp:37 Client/gui/CGUIMessageBox_Impl.cpp:68
+#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
+#: Client/core/CVersionUpdater.cpp:1838 Client/core/CSettings.cpp:131
+#: Client/core/CSettings.cpp:4657
+msgid "Cancel"
+msgstr "إلغاء"
+
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -619,93 +602,60 @@ msgstr "MTA:SA تحتاج الى صلاحيات المسؤول للوظيفة ا
 "  '%s'\n\n"
 "الرجاء التأكيد في النافذة التالية."
 
-#: Client/loader/Utils.cpp:1283
+#: Client/loader/CInstallManager.cpp:344
 #, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "خطأ في تحميل الوحدة البرمجية %s !(%s)"
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "لعبة MTA:SA لا يمكنها إكمال المهمة التالية:\n\n"
+"  '%s'\n"
 
-#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:775
-msgid "Copying files..."
-msgstr "جاري نسخ الملفات..."
+#: Client/loader/CInstallManager.cpp:394
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** فشل التشغيل بسبب خطأ في معرف الرسومات **\n\n"
+"** يرجى تحديث برنامج معرف الرسومات الخاص بك **"
 
-#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:780
-msgid "Copy finished early. Everything OK."
-msgstr "الأنتهاء من النسخ في وقت مبكر. كل شي جاهز."
+#: Client/loader/CInstallManager.cpp:500
+msgid "Install updated MTA:SA files"
+msgstr "تثبيت ملفات MTA:SA محدثة"
 
-#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:785
-msgid "Finishing..."
-msgstr "يتم الآن الإنهاء..."
+#: Client/loader/CInstallManager.cpp:520
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "تعذر تحديث بسبب تضارب الملفات. الرجاء إغلاق أي برامج آخرى وإعادة المحاولة"
 
-#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:789
-msgid "Done!"
-msgstr "!تم"
-
-#: Client/loader/Utils.cpp:1713
+#: Client/loader/CInstallManager.cpp:529
 #, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "تم الكشف عن تثبيت جديد لـ s%. \n\n"
-"هل تريد أن تنسخ اعداداتك من s% ?"
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "لم يتم تثبيت ملتي تيڤت أوتو بشكل صحيح، الرجاء إعادة تثبيتها مرة أخرى. %s"
 
-#: Client/loader/Utils.cpp:1752
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr "لا يمكن لـ MTA:SA الاستمرار لأن الملفات التالية غير صحيحة:"
+
+#: Client/loader/CInstallManager.cpp:609
+msgid "Patch GTA"
+msgstr "تصحيح GTA"
+
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:719
 #, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA تواجه مشكلة في فتح الملف '%s'"
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA لا يمكن أن يستمر لأن القرص %s ليس به مساحة كافية"
 
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA تفقد الملف '%s'."
+#: Client/loader/CInstallManager.cpp:812
+msgid "Missing file:"
+msgstr "الملف مفقود:"
 
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA عانت من مشكلة اثناء تحميل الموديل."
+#: Client/loader/CInstallManager.cpp:816
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "إذا فشل تشغيل MTA ، قم بإعادة تثبيت GTA:SA"
 
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "إذا قمت بتعديل gta3.img مؤخراً، حاول إعادة تثبيت GTA: SA."
+#: Client/loader/CInstallManager.cpp:937
+msgid "Update install settings"
+msgstr "تحديث إعدادات التثبيت"
 
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA عانت من مشكلة اثناء إضافة تحسينات المركبة."
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA وجدت أخطاء في الملف '%s'"
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "هل عملت اعادة تشغيل للعبة عندما كانت MTA:SA تعمل؟"
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr "الرجاء أيقاف البرامج التالية قبل الاستمرار:"
-
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr "تحديث إعداد Aero"
-
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr "تحديث إعدادات الذاكرة الكبيرة"
-
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr "تحديث إعداد DEP"
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr "تحديث تعريف الرسومات"
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr "إصلاح مشكلات الملف"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "أنسخ الملف التنفيذي لتجنب مشاكل برنامج تشغيل الرسوميات"
+#: Client/loader/CInstallManager.cpp:1070
+msgid "Update compatibility settings"
+msgstr "تحديث إعدادات التوافق"
 
 #: Client/loader/MainFunctions.cpp:242
 msgid "Trouble restarting MTA:SA\n\n"
@@ -802,8 +752,8 @@ msgstr "يوجد نسخة تعمل من جراند تيڤت أوتو: سان ا�
 
 #: Client/loader/MainFunctions.cpp:595 Client/loader/MainFunctions.cpp:602
 #: Client/loader/MainFunctions.cpp:1236
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1375
+#: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
 msgstr "معلومات"
 
@@ -904,42 +854,53 @@ msgstr "تعذر تشغيل Grand Theft Auto: San Andreas. الرجاء محاو
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "من المحتمل أن لا تكون GTA: San Andreas قد اشتغلت بشكل صحيح. هل تريد إنهائها؟"
 
+#: Client/loader/Install.cpp:92
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr "هل تريد إيقاف خادم الـ MTA و مواصلة التحديث؟"
+
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
+msgid "Installing update..."
+msgstr "جاري تثبيت التحديث..."
+
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
+msgid "Extracting files..."
+msgstr "جاري إستخراج الملفات..."
+
 #. /////////////////////////////////////////////////////////////////////////
 #.
 #. Dialog strings
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:32 Client/core/CMainMenu.cpp:1148
+#: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
 #: Client/core/CVersionUpdater.cpp:1569 Client/core/CVersionUpdater.cpp:1587
 #: Client/core/CVersionUpdater.cpp:1856 Client/core/CVersionUpdater.cpp:1875
 #: Client/core/CSettings.cpp:1363 Client/core/CSettings.cpp:1387
 #: Client/core/CSettings.cpp:4399 Client/core/CSettings.cpp:4466
-#: Client/core/CSettings.cpp:4515 Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/gui/CGUIMessageBox_Impl.cpp:72
+#: Client/core/CSettings.cpp:4515 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr "نعم"
 
-#: Client/loader/Dialogs.cpp:33 Client/core/CMainMenu.cpp:1147
-#: Client/core/CVersionUpdater.cpp:1568 Client/core/CVersionUpdater.cpp:1586
-#: Client/core/CVersionUpdater.cpp:1855 Client/core/CVersionUpdater.cpp:1874
-#: Client/core/CSettings.cpp:1362 Client/core/CSettings.cpp:1386
-#: Client/core/CSettings.cpp:4398 Client/core/CSettings.cpp:4465
-#: Client/core/CSettings.cpp:4514 Client/core/CQuestionBox.cpp:194
+#: Client/loader/Dialogs.cpp:33 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1147 Client/core/CVersionUpdater.cpp:1568
+#: Client/core/CVersionUpdater.cpp:1586 Client/core/CVersionUpdater.cpp:1855
+#: Client/core/CVersionUpdater.cpp:1874 Client/core/CSettings.cpp:1362
+#: Client/core/CSettings.cpp:1386 Client/core/CSettings.cpp:4398
+#: Client/core/CSettings.cpp:4465 Client/core/CSettings.cpp:4514
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "لا"
 
 #. Create buttons
 #. OK button
-#: Client/loader/Dialogs.cpp:34 Client/core/CVersionUpdater.cpp:1604
-#: Client/core/CVersionUpdater.cpp:1820 Client/core/CVersionUpdater.cpp:1913
-#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:1953
-#: Client/core/CVersionUpdater.cpp:1965 Client/core/CVersionUpdater.cpp:2117
-#: Client/core/CVersionUpdater.cpp:2126 Client/core/CVersionUpdater.cpp:2135
-#: Client/core/CVersionUpdater.cpp:2149 Client/core/CSettings.cpp:126
-#: Client/core/CSettings.cpp:4658 Client/gui/CGUIMessageBox_Impl.cpp:64
+#: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
+#: Client/core/CVersionUpdater.cpp:1604 Client/core/CVersionUpdater.cpp:1820
+#: Client/core/CVersionUpdater.cpp:1913 Client/core/CVersionUpdater.cpp:1935
+#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:1965
+#: Client/core/CVersionUpdater.cpp:2117 Client/core/CVersionUpdater.cpp:2126
+#: Client/core/CVersionUpdater.cpp:2135 Client/core/CVersionUpdater.cpp:2149
+#: Client/core/CSettings.cpp:126 Client/core/CSettings.cpp:4658
 msgid "OK"
 msgstr "موافق"
 
@@ -1092,72 +1053,230 @@ msgid "I will not install an anti-virus.\n"
 msgstr "لن أثبت مكافح فيروسات.\n"
 "أريد ان يصاب جهازي بالبطأ."
 
-#: Client/loader/Dialogs.cpp:762 Client/loader/Install.cpp:187
-msgid "Installing update..."
-msgstr "جاري تثبيت التحديث..."
+#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "جاري البحث عن Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:770 Client/loader/Install.cpp:287
-msgid "Extracting files..."
-msgstr "جاري إستخراج الملفات..."
+#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "يرجى تشغيل Grand Theft Auto San Andreas"
 
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "هل تريد إيقاف خادم الـ MTA و مواصلة التحديث؟"
+#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+msgid "Copying files..."
+msgstr "جاري نسخ الملفات..."
 
-#: Client/loader/CInstallManager.cpp:344
+#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+msgid "Copy finished early. Everything OK."
+msgstr "الأنتهاء من النسخ في وقت مبكر. كل شي جاهز."
+
+#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+msgid "Finishing..."
+msgstr "يتم الآن الإنهاء..."
+
+#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+msgid "Done!"
+msgstr "!تم"
+
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr "تحديث إعداد Aero"
+
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr "تحديث إعدادات الذاكرة الكبيرة"
+
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr "تحديث إعداد DEP"
+
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr "تحديث تعريف الرسومات"
+
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr "إصلاح مشكلات الملف"
+
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "أنسخ الملف التنفيذي لتجنب مشاكل برنامج تشغيل الرسوميات"
+
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "اختر مسار تثبيت Grand Theft Auto: San Andreas"
+
+#: Client/loader/Utils.cpp:1283
 #, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "لعبة MTA:SA لا يمكنها إكمال المهمة التالية:\n\n"
-"  '%s'\n"
+msgid "Error loading %s module! (%s)"
+msgstr "خطأ في تحميل الوحدة البرمجية %s !(%s)"
 
-#: Client/loader/CInstallManager.cpp:394
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** فشل التشغيل بسبب خطأ في معرف الرسومات **\n\n"
-"** يرجى تحديث برنامج معرف الرسومات الخاص بك **"
-
-#: Client/loader/CInstallManager.cpp:500
-msgid "Install updated MTA:SA files"
-msgstr "تثبيت ملفات MTA:SA محدثة"
-
-#: Client/loader/CInstallManager.cpp:520
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "تعذر تحديث بسبب تضارب الملفات. الرجاء إغلاق أي برامج آخرى وإعادة المحاولة"
-
-#: Client/loader/CInstallManager.cpp:529
+#: Client/loader/Utils.cpp:1713
 #, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "لم يتم تثبيت ملتي تيڤت أوتو بشكل صحيح، الرجاء إعادة تثبيتها مرة أخرى. %s"
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "تم الكشف عن تثبيت جديد لـ s%. \n\n"
+"هل تريد أن تنسخ اعداداتك من s% ?"
 
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "لا يمكن لـ MTA:SA الاستمرار لأن الملفات التالية غير صحيحة:"
-
-#: Client/loader/CInstallManager.cpp:609
-msgid "Patch GTA"
-msgstr "تصحيح GTA"
-
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:719
+#: Client/loader/Utils.cpp:1752
 #, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA لا يمكن أن يستمر لأن القرص %s ليس به مساحة كافية"
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA تواجه مشكلة في فتح الملف '%s'"
 
-#: Client/loader/CInstallManager.cpp:812
-msgid "Missing file:"
-msgstr "الملف مفقود:"
+#: Client/loader/Utils.cpp:1774
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA تفقد الملف '%s'."
 
-#: Client/loader/CInstallManager.cpp:816
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "إذا فشل تشغيل MTA ، قم بإعادة تثبيت GTA:SA"
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA عانت من مشكلة اثناء تحميل الموديل."
 
-#: Client/loader/CInstallManager.cpp:937
-msgid "Update install settings"
-msgstr "تحديث إعدادات التثبيت"
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "إذا قمت بتعديل gta3.img مؤخراً، حاول إعادة تثبيت GTA: SA."
 
-#: Client/loader/CInstallManager.cpp:1070
-msgid "Update compatibility settings"
-msgstr "تحديث إعدادات التوافق"
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA عانت من مشكلة اثناء إضافة تحسينات المركبة."
+
+#: Client/loader/Utils.cpp:1845
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA وجدت أخطاء في الملف '%s'"
+
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "هل عملت اعادة تشغيل للعبة عندما كانت MTA:SA تعمل؟"
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr "الرجاء أيقاف البرامج التالية قبل الاستمرار:"
+
+#: Client/core/CCore.cpp:721 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "خطأ فادح"
+
+#: Client/core/CCore.cpp:846
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "للإصلاح، قم بإزالة هذا المِلَفّ:"
+
+#: Client/core/CCore.cpp:878
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "وحدة %s غير صحيحة!"
+
+#: Client/core/CCore.cpp:1188
+msgid "Error executing URL"
+msgstr "خطأ في تنفيذ الرابط"
+
+#: Client/core/CCore.cpp:1200
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "خطأ في تشغيل المورد 'mod' المحدد في سطر الأوامر ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1285
+msgid "this help screen"
+msgstr "شاشة المساعدة هذه"
+
+#: Client/core/CCore.cpp:1286 Client/core/CCore.cpp:1287
+msgid "exits the application"
+msgstr "الخروج من التطبيق"
+
+#: Client/core/CCore.cpp:1288
+msgid "shows the version"
+msgstr "إظهار الإصدار"
+
+#: Client/core/CCore.cpp:1289
+msgid "shows the time"
+msgstr "إظهار الوقت"
+
+#: Client/core/CCore.cpp:1290
+msgid "shows the hud"
+msgstr "إظهار معلومات اللعب (Hud)"
+
+#: Client/core/CCore.cpp:1291
+msgid "shows all the binds"
+msgstr "إظهار جميع الأزرار المربوطة"
+
+#: Client/core/CCore.cpp:1292
+msgid "shows your serial"
+msgstr "يظهر رقمك التسلسلي"
+
+#: Client/core/CCore.cpp:1301
+msgid "connects to a server (host port nick pass)"
+msgstr "الاتصال بـ خادم (المضيف المنفذ الاسم المستخدم كلمة المرور)"
+
+#: Client/core/CCore.cpp:1302
+msgid "connects to a previous server"
+msgstr "يتصل بخادم سابق"
+
+#: Client/core/CCore.cpp:1303
+msgid "binds a key (key control)"
+msgstr "يربط بـ الزر (مفتاح التحكم)"
+
+#: Client/core/CCore.cpp:1304
+msgid "unbinds a key (key)"
+msgstr "يزيل الربط عن الزر (الزر)"
+
+#: Client/core/CCore.cpp:1305
+msgid "copies the default gta controls"
+msgstr "ينسخ ضوابط اللعبة الافتراضية"
+
+#: Client/core/CCore.cpp:1306
+msgid "outputs a screenshot"
+msgstr "يخرج لقطة من الشاشة"
+
+#: Client/core/CCore.cpp:1307
+msgid "immediately saves the config"
+msgstr "يحفظ الإعدادات على الفور"
+
+#: Client/core/CCore.cpp:1309
+msgid "clears the debug view"
+msgstr "ينظف عرض تصحيح الأخطاء"
+
+#: Client/core/CCore.cpp:1310
+msgid "scrolls the chatbox upwards"
+msgstr "تمرير مربع الشات للأعلى"
+
+#: Client/core/CCore.cpp:1311
+msgid "scrolls the chatbox downwards"
+msgstr "ينزل مربع الدردشة إلى الأسفل"
+
+#: Client/core/CCore.cpp:1312
+msgid "scrolls the debug view upwards"
+msgstr "يرفع معالج الأخطاء إلى الأعلى"
+
+#: Client/core/CCore.cpp:1313
+msgid "scrolls the debug view downwards"
+msgstr "ينزل معالج الأخطاء إلى الاسفل"
+
+#: Client/core/CCore.cpp:1316
+msgid "shows the memory statistics"
+msgstr "يظهر إحصائيات الذاكرة"
+
+#: Client/core/CCore.cpp:1317
+msgid "shows the frame timing graph"
+msgstr "يظهر مخطط توقيت الإطار"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "هل تريد أن ترى بعض المساعدة على الإنترنت عن هذه المشكلة؟"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "تسريع المحور"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "مكابح المحور"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "لوحة التحكم"
 
 #: Client/core/CMainMenu.cpp:315
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -1178,24 +1297,6 @@ msgstr "هذا سيقوم بفصلك من الخادم الحالي. \n\n"
 #: Client/core/CMainMenu.cpp:1145
 msgid "DISCONNECT WARNING"
 msgstr "تحذير انقطع الاتصال"
-
-#: Client/core/CScreenShot.cpp:53
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "تم أخذ لقطة للشاشة : '%s'"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "لوحة التحكم"
-
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "تسريع المحور"
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "مكابح المحور"
 
 #: Client/core/CVersionUpdater.cpp:623
 msgid "Busy"
@@ -1342,305 +1443,53 @@ msgid "\n\n"
 msgstr "\n\n"
 "بإنتظار إستجابة من الخادم  -  %-3d"
 
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "الشخصية التي قمت بإختيارها لا يمكن تحميلها, والشخصية الأساسية لا يمكن تحميلها أيضاً, الرجاء إعادة تثبيت MTA."
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "العربية"
 
-#: Client/core/CCore.cpp:721 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "خطأ فادح"
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "تعذر الاتصال. الاسم المستخدم غير صالح!"
 
-#: Client/core/CCore.cpp:846
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "للإصلاح، قم بإزالة هذا المِلَفّ:"
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "تعذر الاتصال. المضيف غير صالح!"
 
-#: Client/core/CCore.cpp:878
+#: Client/core/CConnectManager.cpp:126
 #, c-format
-msgid "%s module is incorrect!"
-msgstr "وحدة %s غير صحيحة!"
+msgid "Connecting to %s at port %u failed!"
+msgstr "تعذر الاتصال بـ %s في المنفذ %u!"
 
-#: Client/core/CCore.cpp:1188
-msgid "Error executing URL"
-msgstr "خطأ في تنفيذ الرابط"
-
-#: Client/core/CCore.cpp:1200
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
 #, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "خطأ في تشغيل المورد 'mod' المحدد في سطر الأوامر ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1285
-msgid "this help screen"
-msgstr "شاشة المساعدة هذه"
-
-#: Client/core/CCore.cpp:1286 Client/core/CCore.cpp:1287
-msgid "exits the application"
-msgstr "الخروج من التطبيق"
-
-#: Client/core/CCore.cpp:1288
-msgid "shows the version"
-msgstr "إظهار الإصدار"
-
-#: Client/core/CCore.cpp:1289
-msgid "shows the time"
-msgstr "إظهار الوقت"
-
-#: Client/core/CCore.cpp:1290
-msgid "shows the hud"
-msgstr "إظهار معلومات اللعب (Hud)"
-
-#: Client/core/CCore.cpp:1291
-msgid "shows all the binds"
-msgstr "إظهار جميع الأزرار المربوطة"
-
-#: Client/core/CCore.cpp:1292
-msgid "shows your serial"
-msgstr "يظهر رقمك التسلسلي"
-
-#: Client/core/CCore.cpp:1301
-msgid "connects to a server (host port nick pass)"
-msgstr "الاتصال بـ خادم (المضيف المنفذ الاسم المستخدم كلمة المرور)"
-
-#: Client/core/CCore.cpp:1302
-msgid "connects to a previous server"
-msgstr "يتصل بخادم سابق"
-
-#: Client/core/CCore.cpp:1303
-msgid "binds a key (key control)"
-msgstr "يربط بـ الزر (مفتاح التحكم)"
-
-#: Client/core/CCore.cpp:1304
-msgid "unbinds a key (key)"
-msgstr "يزيل الربط عن الزر (الزر)"
-
-#: Client/core/CCore.cpp:1305
-msgid "copies the default gta controls"
-msgstr "ينسخ ضوابط اللعبة الافتراضية"
-
-#: Client/core/CCore.cpp:1306
-msgid "outputs a screenshot"
-msgstr "يخرج لقطة من الشاشة"
-
-#: Client/core/CCore.cpp:1307
-msgid "immediately saves the config"
-msgstr "يحفظ الإعدادات على الفور"
-
-#: Client/core/CCore.cpp:1309
-msgid "clears the debug view"
-msgstr "ينظف عرض تصحيح الأخطاء"
-
-#: Client/core/CCore.cpp:1310
-msgid "scrolls the chatbox upwards"
-msgstr "تمرير مربع الشات للأعلى"
-
-#: Client/core/CCore.cpp:1311
-msgid "scrolls the chatbox downwards"
-msgstr "ينزل مربع الدردشة إلى الأسفل"
-
-#: Client/core/CCore.cpp:1312
-msgid "scrolls the debug view upwards"
-msgstr "يرفع معالج الأخطاء إلى الأعلى"
-
-#: Client/core/CCore.cpp:1313
-msgid "scrolls the debug view downwards"
-msgstr "ينزل معالج الأخطاء إلى الاسفل"
-
-#: Client/core/CCore.cpp:1316
-msgid "shows the memory statistics"
-msgstr "يظهر إحصائيات الذاكرة"
-
-#: Client/core/CCore.cpp:1317
-msgid "shows the frame timing graph"
-msgstr "يظهر مخطط توقيت الإطار"
-
-#: Client/core/CKeyBinds.cpp:181
-msgid "Fire"
-msgstr "إطلاق"
-
-#: Client/core/CKeyBinds.cpp:182
-msgid "Next weapon"
-msgstr "السلاح التالي"
-
-#: Client/core/CKeyBinds.cpp:183
-msgid "Previous weapon"
-msgstr "السلاح السابق"
-
-#: Client/core/CKeyBinds.cpp:184
-msgid "Forwards"
-msgstr "إلى الأمام"
-
-#: Client/core/CKeyBinds.cpp:185
-msgid "Backwards"
-msgstr "إلى الخلف"
-
-#: Client/core/CKeyBinds.cpp:186 Client/core/CSettings.cpp:2198
-#: Client/core/CSettings.cpp:2226
-msgid "Left"
-msgstr "يسار"
-
-#: Client/core/CKeyBinds.cpp:187 Client/core/CSettings.cpp:2200
-#: Client/core/CSettings.cpp:2227
-msgid "Right"
-msgstr "يمين"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Zoom in"
-msgstr "تكبير"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Zoom out"
-msgstr "تصغير"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Enter/Exit"
-msgstr "دخول/خروج"
-
-#: Client/core/CKeyBinds.cpp:191
-msgid "Change camera"
-msgstr "تغيير الكاميرا"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:192
-msgid "Jump"
-msgstr "قفز"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Sprint"
-msgstr "ركض"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Look behind"
-msgstr "النظر للخلف"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Crouch"
-msgstr "إنحناء"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Action"
-msgstr "اتخاذ إجراء"
-
-#: Client/core/CKeyBinds.cpp:197
-msgid "Walk"
-msgstr "مشي"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Vehicle fire"
-msgstr "إطلاق نار من المركبة"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Vehicle secondary fire"
-msgstr "إطلاق نار من المركبة ثانوي"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Vehicle left"
-msgstr "تحريك المركبة لليسار"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Vehicle right"
-msgstr "تحريك المركبة لليمين"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:202
-msgid "Steer forwards/down"
-msgstr "توجيه إلى الأمام/الأسفل"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Steer backwards/up"
-msgstr "توجيه إلى الخلف/الأعلى"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Accelerate"
-msgstr "التسارع"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Brake/Reverse"
-msgstr "الفرملة/الرجوع إلى الوراء"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Radio next"
-msgstr "الراديو التالي"
-
-#: Client/core/CKeyBinds.cpp:207
-msgid "Radio previous"
-msgstr "الراديو السابق"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Radio user track skip"
-msgstr "تخطي تتبع مستخدم الراديو"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Horn"
-msgstr "بوق السيارة"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Sub-mission"
-msgstr "مهمة فرعية"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Handbrake"
-msgstr "فرامل يدوية"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:212
-msgid "Vehicle look left"
-msgstr "النظر يسار المركبة"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Vehicle look right"
-msgstr "النظر يمين المركبة"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Vehicle look behind"
-msgstr "النظر خلف المركبة"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Vehicle mouse look"
-msgstr "النظر للمركبة بالفأرة"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Special control left"
-msgstr "زر التحكم الخاص يسار"
-
-#: Client/core/CKeyBinds.cpp:217
-msgid "Special control right"
-msgstr "زر التحكم الخاص يمين"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Special control down"
-msgstr "زر التحكم الخاص للأسفل"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Special control up"
-msgstr "زر التحكم الخاص للأعلى"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Aim weapon"
-msgstr "تصويب السلاح"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Conversation yes"
-msgstr "تشغيل المحادثة"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:222
-msgid "Conversation no"
-msgstr "إيقاف المحادثة"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Group control forwards"
-msgstr "زر تحكم المجموعة للأمام"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Group control backwards"
-msgstr "زر تحكم المجموعة للخلف"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:209
-msgid "Unknown command or cvar: "
-msgstr "أمر غير معروف أو cvar: "
+msgid "Connecting to %s:%u ..."
+msgstr "الاتصال بـ %s:%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "لا يوجد mod مُشابه مُثبت (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "استجابة خادم سيئة (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "استجابة خادم سيئة (1)"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "الأخبار"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "زيارة مقال آخر الأخبار"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:83
@@ -2354,9 +2203,19 @@ msgstr "الإزاحة على محور Y:"
 msgid "Position"
 msgstr "موقع"
 
+#: Client/core/CSettings.cpp:2198 Client/core/CSettings.cpp:2226
+#: Client/core/CKeyBinds.cpp:186
+msgid "Left"
+msgstr "يسار"
+
 #: Client/core/CSettings.cpp:2199 Client/core/CSettings.cpp:2213
 msgid "Center"
 msgstr "الوسط"
+
+#: Client/core/CSettings.cpp:2200 Client/core/CSettings.cpp:2227
+#: Client/core/CKeyBinds.cpp:187
+msgid "Right"
+msgstr "يمين"
 
 #: Client/core/CSettings.cpp:2212
 msgid "Top"
@@ -2575,42 +2434,187 @@ msgstr "إصلاح الفأرة:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "إصلاح حركة الفأرة - قد يتطلب إعادة تشغيل الجهاز"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "تعذر الاتصال. الاسم المستخدم غير صالح!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "تعذر الاتصال. المضيف غير صالح!"
-
-#: Client/core/CConnectManager.cpp:126
+#: Client/core/CScreenShot.cpp:53
 #, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "تعذر الاتصال بـ %s في المنفذ %u!"
+msgid "Screenshot taken: '%s'"
+msgstr "تم أخذ لقطة للشاشة : '%s'"
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "الاتصال بـ %s:%u ..."
+#: Client/core/CKeyBinds.cpp:181
+msgid "Fire"
+msgstr "إطلاق"
 
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "لا يوجد mod مُشابه مُثبت (%s)"
+#: Client/core/CKeyBinds.cpp:182
+msgid "Next weapon"
+msgstr "السلاح التالي"
 
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "استجابة خادم سيئة (2)"
+#: Client/core/CKeyBinds.cpp:183
+msgid "Previous weapon"
+msgstr "السلاح السابق"
 
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "استجابة خادم سيئة (1)"
+#: Client/core/CKeyBinds.cpp:184
+msgid "Forwards"
+msgstr "إلى الأمام"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "هل تريد أن ترى بعض المساعدة على الإنترنت عن هذه المشكلة؟"
+#: Client/core/CKeyBinds.cpp:185
+msgid "Backwards"
+msgstr "إلى الخلف"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Zoom in"
+msgstr "تكبير"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Zoom out"
+msgstr "تصغير"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Enter/Exit"
+msgstr "دخول/خروج"
+
+#: Client/core/CKeyBinds.cpp:191
+msgid "Change camera"
+msgstr "تغيير الكاميرا"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:192
+msgid "Jump"
+msgstr "قفز"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Sprint"
+msgstr "ركض"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Look behind"
+msgstr "النظر للخلف"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Crouch"
+msgstr "إنحناء"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Action"
+msgstr "اتخاذ إجراء"
+
+#: Client/core/CKeyBinds.cpp:197
+msgid "Walk"
+msgstr "مشي"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Vehicle fire"
+msgstr "إطلاق نار من المركبة"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Vehicle secondary fire"
+msgstr "إطلاق نار من المركبة ثانوي"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Vehicle left"
+msgstr "تحريك المركبة لليسار"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Vehicle right"
+msgstr "تحريك المركبة لليمين"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:202
+msgid "Steer forwards/down"
+msgstr "توجيه إلى الأمام/الأسفل"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Steer backwards/up"
+msgstr "توجيه إلى الخلف/الأعلى"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Accelerate"
+msgstr "التسارع"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Brake/Reverse"
+msgstr "الفرملة/الرجوع إلى الوراء"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Radio next"
+msgstr "الراديو التالي"
+
+#: Client/core/CKeyBinds.cpp:207
+msgid "Radio previous"
+msgstr "الراديو السابق"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Radio user track skip"
+msgstr "تخطي تتبع مستخدم الراديو"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Horn"
+msgstr "بوق السيارة"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Sub-mission"
+msgstr "مهمة فرعية"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Handbrake"
+msgstr "فرامل يدوية"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:212
+msgid "Vehicle look left"
+msgstr "النظر يسار المركبة"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Vehicle look right"
+msgstr "النظر يمين المركبة"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Vehicle look behind"
+msgstr "النظر خلف المركبة"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Vehicle mouse look"
+msgstr "النظر للمركبة بالفأرة"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Special control left"
+msgstr "زر التحكم الخاص يسار"
+
+#: Client/core/CKeyBinds.cpp:217
+msgid "Special control right"
+msgstr "زر التحكم الخاص يمين"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Special control down"
+msgstr "زر التحكم الخاص للأسفل"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Special control up"
+msgstr "زر التحكم الخاص للأعلى"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Aim weapon"
+msgstr "تصويب السلاح"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Conversation yes"
+msgstr "تشغيل المحادثة"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:222
+msgid "Conversation no"
+msgstr "إيقاف المحادثة"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Group control forwards"
+msgstr "زر تحكم المجموعة للأمام"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Group control backwards"
+msgstr "زر تحكم المجموعة للخلف"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "الشخصية التي قمت بإختيارها لا يمكن تحميلها, والشخصية الأساسية لا يمكن تحميلها أيضاً, الرجاء إعادة تثبيت MTA."
 
 #: Client/core/CCommandFuncs.cpp:29
 msgid "***[ COMMAND HELP ]***\n"
@@ -2657,20 +2661,10 @@ msgstr "تم حفظ ملف الإعدادات"
 msgid "* Your serial is: %s"
 msgstr "* الرقم التسلسلي (السيريال) الخاص بك هو : %s"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "العربية"
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "الأخبار"
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "زيارة مقال آخر الأخبار"
+#. Unknown command
+#: Client/core/CCommands.cpp:209
+msgid "Unknown command or cvar: "
+msgstr "أمر غير معروف أو cvar: "
 
 #: Client/core/CCredits.cpp:32
 msgid "Programming"
@@ -2699,23 +2693,6 @@ msgstr "شكر خاص"
 #: Client/core/CCredits.cpp:245
 msgid "This software makes use of the following libraries and software:"
 msgstr "هذا البرنامج يقوم بإستخدام المكتبات والبرامج الأتية:"
-
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "تعذر تهئية Direct3D9.\n\n"
-"الرجاء التأكد من تثبيت حزمة تشغيل DirectX\n"
-"وآخر اصدار من حزمة خدمات وندوز بشكل صحيح."
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:230
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "لقطة الشاشة حصلت على %d بايت، لكن المتوقع %d"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:236
-msgid "Screenshot failed"
-msgstr "تعذر تصوير الشاشة"
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
@@ -2772,96 +2749,6 @@ msgstr "لا يمكن ربط توصيل شبكة LAN-broadcast"
 #: Client/core/ServerBrowser/CServerList.cpp:345
 msgid "Attempting to discover LAN servers"
 msgstr "جاري محاولة استكشاف خوادم محلية"
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "الخادم ممتلئ"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "الإسم:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "عنوان السيرفر:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "نوع اللعب:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "الخريطة:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "اللاعبين:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "كلمة المرور:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "زمن الإستجابة:"
-
-#. Column for player names
-#. Player List Columns
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-msgid "Player list"
-msgstr "قائمة اللاعبين"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "إغلاق"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "دخول اللعبة"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "يرجى إدخال كلمة المرور الخاصة بالخادم:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "الدخول الى الخادم في حين إيجاد فرصة متاحة."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "الرجاء إدخال كلمة المرور الخاصة بالخادم"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "انتهت مهلة الإتصال"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "جاري الإستعلام..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2955,6 +2842,13 @@ msgstr "البنق"
 msgid "Gamemode"
 msgstr "نوع اللعب"
 
+#. Player List Columns
+#. Column for player names
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+msgid "Player list"
+msgstr "قائمة اللاعبين"
+
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -3009,6 +2903,111 @@ msgstr "الرجاء إستخدام بروتوكول mtasa://!"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1375
 msgid "You have to select a server to connect to."
 msgstr "يجب إختيار خادم للإتصال به."
+
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "الخادم ممتلئ"
+
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "الإسم:"
+
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "عنوان السيرفر:"
+
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "نوع اللعب:"
+
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "الخريطة:"
+
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "اللاعبين:"
+
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "كلمة المرور:"
+
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "زمن الإستجابة:"
+
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "إغلاق"
+
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "دخول اللعبة"
+
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "يرجى إدخال كلمة المرور الخاصة بالخادم:"
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "الدخول الى الخادم في حين إيجاد فرصة متاحة."
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "الرجاء إدخال كلمة المرور الخاصة بالخادم"
+
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "انتهت مهلة الإتصال"
+
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "جاري الإستعلام..."
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "تعذر تهئية Direct3D9.\n\n"
+"الرجاء التأكد من تثبيت حزمة تشغيل DirectX\n"
+"وآخر اصدار من حزمة خدمات وندوز بشكل صحيح."
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:230
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "لقطة الشاشة حصلت على %d بايت، لكن المتوقع %d"
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:236
+msgid "Screenshot failed"
+msgstr "تعذر تصوير الشاشة"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
+msgid "Problem with graphics driver"
+msgstr "مشكلة في معرّف الرسوم"
 
 #: Client/game_sa/CSettingsSA.cpp:759
 msgid "Can't find valid screen resolution."
