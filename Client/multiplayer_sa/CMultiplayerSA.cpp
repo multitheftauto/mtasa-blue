@@ -1561,6 +1561,7 @@ void CMultiplayerSA::InitHooks()
 
     InitHooks_Streaming();
     InitHooks_FrameRateFixes();
+    InitHooks_ProjectileCollisionFix();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
