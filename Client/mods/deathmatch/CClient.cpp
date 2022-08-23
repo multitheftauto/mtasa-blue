@@ -128,6 +128,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->GetCommands()->Add("debug2", "debug function 2", COMMAND_Debug2);
     pCore->GetCommands()->Add("debug3", "debug function 3", COMMAND_Debug3);
     pCore->GetCommands()->Add("debug4", "debug function 4", COMMAND_Debug4);
+    pCore->GetCommands()->Add("timestep", "timestep", COMMAND_TimeStep);
 #endif
 
     // Got any arguments?

@@ -5404,6 +5404,12 @@ void CClientGame::ResetMapInfo()
         }
     }
 
+    // Reset camera drunk/shake level
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
+
+    if (pPlayerInfo)
+        pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
+
     RestreamWorld();
 }
 

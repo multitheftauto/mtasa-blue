@@ -833,7 +833,7 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"7B58CB80363513232E827CC2000D9E68", "bass.dll"},     {"E48EA82D7A87853FA4F09F19C4E7A2C1", "bass_aac.dll"},
+    } integrityCheckList[] = {{"D337EC1DB2680AA092359CF8F39F3350", "bass.dll"},     {"E48EA82D7A87853FA4F09F19C4E7A2C1", "bass_aac.dll"},
                               {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"}, {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
                               {"9FF783BB73F8868FA6599CDE65ED21D7", "bassflac.dll"}, {"9D1DE3E37AFA3D52E400DA572BB55B9C", "bassmidi.dll"},
                               {"DADDA272FB2BE2DD8F04BCDB7946558E", "bassmix.dll"},  {"26C74F5E9DF6C59DED3B09335E5D82AD", "bassopus.dll"},

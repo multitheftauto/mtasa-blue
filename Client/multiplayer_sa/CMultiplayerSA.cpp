@@ -288,8 +288,6 @@ DWORD       RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
 const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
-#define HOOKPOS_CHud_RenderHealthBar 0x5892AF
-
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio    0x4D7198
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio     0x4D71E7
 
@@ -534,8 +532,6 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
 
-void HOOK_CHud_RenderHealthBar();
-
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio();
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
 
@@ -769,8 +765,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
-
-    HookInstall(HOOKPOS_CHud_RenderHealthBar, (DWORD)HOOK_CHud_RenderHealthBar, 9);
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
@@ -1566,6 +1560,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleWeapons();
 
     InitHooks_Streaming();
+    InitHooks_FrameRateFixes();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -6964,29 +6959,6 @@ void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
        call CWorld_ProcessPedsAfterPreRender
        call PostCWorld_ProcessPedsAfterPreRender
        jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
-    }
-}
-
-const DWORD RETURN_CHud_RenderHealthBar = 0x5892B8;
-const DWORD RETURN_CHud_RenderHealthBarNoRender = 0x58939E;
-void _declspec(naked) HOOK_CHud_RenderHealthBar()
-{
-    __asm {
-        //(CTimer::m_snTimeInMilliseconds / 250) % 2
-        mov eax, 0xB7CB84
-        mov eax, [eax]
-        xor edx, edx
-        mov ecx, 250
-        div ecx
-        xor edx, edx
-        mov ecx, 2
-        div ecx
-        test edx, edx
-        jz norender
-        jmp RETURN_CHud_RenderHealthBar
-
-norender:
-        jmp RETURN_CHud_RenderHealthBarNoRender
     }
 }
 
