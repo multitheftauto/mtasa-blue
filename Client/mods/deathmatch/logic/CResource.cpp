@@ -267,12 +267,13 @@ void CResource::Load()
     }
 
     // Load the no cache scripts first
-    while (!m_NoClientCacheScriptList.empty()) {
+    for (auto& item : m_NoClientCacheScriptList) {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
-        auto& item = m_NoClientCacheScriptList.front();
+
         GetVM()->LoadScriptFromBuffer(item.buffer.GetData(), item.buffer.GetSize(), item.strFilename);
         item.buffer.ZeroClear();
         m_NoClientCacheScriptList.pop_front();
+
         DECLARE_PROFILER_SECTION(OnPostLoadNoClientCacheScript)
     }
 
