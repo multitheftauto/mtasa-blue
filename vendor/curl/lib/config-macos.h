@@ -43,6 +43,9 @@
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
 
+/* disable headers-api */
+/* #undef CURL_DISABLE_HEADERS_API */
+
 /* disable alt-svc */
 #define CURL_DISABLE_HSTS 1
 
@@ -151,6 +154,9 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
 
+/* Define to 1 if you have _Atomic support. */
+#define HAVE_ATOMIC 1
+
 /* Define to 1 if you have the basename function. */
 #define HAVE_BASENAME 1
 
@@ -199,6 +205,9 @@
 
 /* Define to 1 if you have the <err.h> header file. */
 /* #undef HAVE_ERR_H */
+
+/* Define to 1 if you have the `fchmod' function. */
+#define HAVE_FCHMOD 1
 
 /* Define to 1 if you have the fcntl function. */
 #define HAVE_FCNTL 1
@@ -445,7 +454,10 @@
 /* #undef HAVE_MEMRCHR */
 
 /* Define to 1 if you have the MSG_NOSIGNAL flag. */
-/* #undef HAVE_MSG_NOSIGNAL */
+#define HAVE_MSG_NOSIGNAL 1
+
+/* Define to 1 if you have the <msh3.h> header file. */
+/* #undef HAVE_MSH3_H */
 
 /* Define to 1 if you have the <netdb.h> header file. */
 #define HAVE_NETDB_H 1
@@ -458,6 +470,9 @@
 
 /* Define to 1 if you have the <netinet/tcp.h> header file. */
 #define HAVE_NETINET_TCP_H 1
+
+/* Define to 1 if you have the <netinet/udp.h> header file. */
+#define HAVE_NETINET_UDP_H 1
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #define HAVE_NET_IF_H 1
@@ -548,11 +563,17 @@
 /* Define to 1 if you have the <rsa.h> header file. */
 /* #undef HAVE_RSA_H */
 
+/* Define to 1 if you have the `sched_yield' function. */
+#define HAVE_SCHED_YIELD 1
+
 /* Define to 1 if you have the select function. */
 #define HAVE_SELECT 1
 
 /* Define to 1 if you have the send function. */
 #define HAVE_SEND 1
+
+/* Define to 1 if you have the `sendmsg' function. */
+#define HAVE_SENDMSG 1
 
 /* Define to 1 if you have the <setjmp.h> header file. */
 #define HAVE_SETJMP_H 1
@@ -816,7 +837,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin21.4.0"
+#define OS "x86_64-apple-darwin20.6.0"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -858,7 +879,7 @@
 #define RECV_TYPE_RETV ssize_t
 
 /* Define to the type qualifier of arg 5 for select. */
-#define SELECT_QUAL_ARG5 
+#define SELECT_QUAL_ARG5
 
 /* Define to the type of arg 1 for select. */
 #define SELECT_TYPE_ARG1 int
@@ -960,6 +981,9 @@
 
 /* if mbedTLS is enabled */
 /* #undef USE_MBEDTLS */
+
+/* if msh3 is in use */
+/* #undef USE_MSH3 */
 
 /* if nghttp2 is in use */
 /* #undef USE_NGHTTP2 */
