@@ -227,7 +227,6 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
     // If compiled script, make sure correct chunkname is embedded
     CLuaShared::EmbedChunkName(strNiceFilename, &cpBuffer, &uiSize);
 
-    bool ret{};
     if (m_luaVM)
     {
         // Are we not marked as UTF-8 already, and not precompiled?
@@ -248,12 +247,13 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
         }
 
         // Run the script
-        const bool loadSuccess = CLuaMain::LuaLoadBuffer(m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString("@%s", *strNiceFilename));
+        const bool loadFailed = CLuaMain::LuaLoadBuffer(m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString("@%s", *strNiceFilename));
 
+        // Clear raw script from memory
         std::fill(strUTFScript.begin(), strUTFScript.end(), 0);
         memset((void*)cpBuffer, 0, uiSize);
 
-        if (loadSuccess)
+        if (loadFailed)
         {
             // Print the error
             std::string strRes = lua_tostring(m_luaVM, -1);
@@ -267,6 +267,8 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
                 CLogger::LogPrint("SCRIPT ERROR: Unknown\n");
                 g_pClientGame->GetScriptDebugging()->LogError(m_luaVM, "Loading script failed for unknown reason");
             }
+
+            return false;
         }
         else
         {
@@ -281,13 +283,13 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
             // Cleanup any return values
             if (lua_gettop(m_luaVM) > luaSavedTop)
                 lua_settop(m_luaVM, luaSavedTop);
-            ret = true;
+
+            return true;
         }
-    } else {
-        memset((void*)cpBuffer, 0, uiSize);
     }
 
-    return ret;
+    memset((void*)cpBuffer, 0, uiSize);
+    return false;
 }
 
 bool CLuaMain::LoadScript(const char* szLUAScript)
