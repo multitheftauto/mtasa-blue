@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-17 08:23+0000\n"
-"PO-Revision-Date: 2022-08-17 08:39\n"
+"PO-Revision-Date: 2022-08-27 18:46\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -471,11 +471,10 @@ msgstr[3] "%d minúty"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d sekunda"
-msgstr[1] "%d sekunda\n\n"
-"%d sekúnd"
-msgstr[2] ""
-msgstr[3] "%d sekundy"
+msgstr[0] "%d Sekunda"
+msgstr[1] "%d Sekúnd"
+msgstr[2] "%d Sekúnd"
+msgstr[3] "%d Sekundy"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:639
@@ -934,28 +933,29 @@ msgstr "MTA: San Andreas – varovanie"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Vaše GTA: San Andreas inštalačná složka obsahuje tieto súbory:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Tieto súbory nie sú povolené a môžu spôsobiť chybu s grafickou kartou v tejto verzii MTA:SA\n\n"
+"Doporučuje sa aby ste ich vymazali alebo premenovali"
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Ponechajte tieto súbory, ale nechajte aby vyskakovalo okno upozornenia pri každom štarte"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Nepripominajte mi problémy o týchtoch súborov"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Premenujte tieto súbory ktoré majú koncovku .dll na .dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr ""
+msgstr "Ukažte mi tieto súbory"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
@@ -1478,7 +1478,7 @@ msgstr "Chybná odpoveď servera (1)"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "Novinky"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
@@ -1874,7 +1874,7 @@ msgstr "Zobraziť nebezpečné rozlíšenia"
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Dáždove reflekcie"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
