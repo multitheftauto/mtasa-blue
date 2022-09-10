@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "إتصال سريع"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "فصل الأتصال بالخادم"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "متصفح الخـوادم"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "إستضافة خادم"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "محرر الخريطة"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "الإعدادات"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "حول"
 
 #. Found in the main menu navigation
 msgid "Quit"
