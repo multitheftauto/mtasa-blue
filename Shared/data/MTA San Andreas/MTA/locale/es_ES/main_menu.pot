@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 18:46\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -31,19 +31,19 @@ msgstr "Explorador de servidores"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr "Crear juego"
+msgstr "Organizar partida"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr "Editor de Mapas"
+msgstr "Editor de mapas"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr "Ajustes"
+msgstr "Configuración"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr "Acerca de"
+msgstr "Acerca"
 
 #. Found in the main menu navigation
 msgid "Quit"
