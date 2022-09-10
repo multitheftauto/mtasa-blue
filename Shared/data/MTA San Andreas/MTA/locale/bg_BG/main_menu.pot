@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Бързо свързване"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Изключване"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Преглед на сървъри"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Създай игра"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Редактор на карти"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Настройки"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Информация"
 
 #. Found in the main menu navigation
 msgid "Quit"
