@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 18:46\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -23,7 +23,7 @@ msgstr "Під'єднання"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr "Від'єднатися"
+msgstr "Від’єднатися"
 
 #. Found in the main menu navigation
 msgid "Server browser"
