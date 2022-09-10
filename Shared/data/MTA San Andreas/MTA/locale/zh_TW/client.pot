@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-17 08:23+0000\n"
-"PO-Revision-Date: 2022-08-17 08:39\n"
+"PO-Revision-Date: 2022-09-10 12:36\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -1697,19 +1697,19 @@ msgstr "最小化時靜音所有音量"
 
 #: Client/core/CSettings.cpp:578
 msgid "Mute Radio sounds when minimized"
-msgstr "聲音最小化時收音機調至靜音"
+msgstr "最小化時靜音電台音量"
 
 #: Client/core/CSettings.cpp:583
 msgid "Mute SFX sounds when minimized"
-msgstr "聲音最小化時把SFX聲音調至靜音"
+msgstr "最小化時靜音音效"
 
 #: Client/core/CSettings.cpp:588
 msgid "Mute MTA sounds when minimized"
-msgstr "聲音最小化時把MTA聲音調至靜音"
+msgstr "最小化時靜音MTA音量"
 
 #: Client/core/CSettings.cpp:593
 msgid "Mute Voice sounds when minimized"
-msgstr "聲音最小化時靜音語音"
+msgstr "最小化時靜音語音音量"
 
 #. *
 #. *  Video tab
@@ -2636,7 +2636,7 @@ msgstr "綁定GTA 所有的控制設定"
 
 #: Client/core/CCommandFuncs.cpp:394
 msgid "Saved configuration file"
-msgstr "儲存配置檔案"
+msgstr "設定已經保存"
 
 #. Print it
 #: Client/core/CCommandFuncs.cpp:460
@@ -2663,7 +2663,7 @@ msgstr "遊戲設計/腳本師"
 
 #: Client/core/CCredits.cpp:102
 msgid "Language Localization"
-msgstr "語言本地化"
+msgstr "本土語言翻譯"
 
 #: Client/core/CCredits.cpp:108
 msgid "Patch contributors"
