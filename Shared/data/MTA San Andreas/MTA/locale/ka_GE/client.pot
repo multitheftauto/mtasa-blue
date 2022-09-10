@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-17 08:23+0000\n"
-"PO-Revision-Date: 2022-08-17 08:38\n"
+"PO-Revision-Date: 2022-09-10 12:36\n"
 "Last-Translator: \n"
 "Language-Team: Georgian\n"
 "Language: ka_GE\n"
@@ -1747,7 +1747,7 @@ msgstr "ძალიან მაღალი"
 #: Client/core/CSettings.cpp:3099 Client/core/CSettings.cpp:3131
 #: Client/core/CSettings.cpp:3153 Client/core/CSettings.cpp:4146
 msgid "Off"
-msgstr "გამორთ."
+msgstr "გამორთ"
 
 #: Client/core/CSettings.cpp:767 Client/core/CSettings.cpp:1503
 msgid "1x"
@@ -1926,7 +1926,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:1033 Client/core/CSettings.cpp:3103
 #: Client/core/CSettings.cpp:3119 Client/core/CSettings.cpp:3126
 msgid "On"
-msgstr "ჩართ."
+msgstr "ჩართ"
 
 #: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:3108
 msgid "Very slow"
@@ -1956,11 +1956,11 @@ msgstr "საშუალოზე მაღალი"
 
 #: Client/core/CSettings.cpp:1095
 msgid "Min"
-msgstr "მინ."
+msgstr "მინ"
 
 #: Client/core/CSettings.cpp:1108
 msgid "Max"
-msgstr "მაქს."
+msgstr "მაქს"
 
 #. Windows 8 compatibility
 #: Client/core/CSettings.cpp:1115
