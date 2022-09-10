@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:43\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Conn. rapida"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Disconnetti"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Trova server"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Crea partita"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Editor mappe"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Impostazioni"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Crediti"
 
 #. Found in the main menu navigation
 msgid "Quit"
