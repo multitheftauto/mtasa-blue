@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Estonian\n"
 "Language: et_EE\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Loo ühendus"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Katkesta ühendus"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Serverite list"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Hosti mäng"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Loo enda kaart"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Seaded"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Info meist"
 
 #. Found in the main menu navigation
 msgid "Quit"
