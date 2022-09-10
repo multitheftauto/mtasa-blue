@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Ātrais savienojums"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Atslēgties"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Servera pārlūks"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Izveidot spēli"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Map ediotrs"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Uzstādījumi"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Kredīti"
 
 #. Found in the main menu navigation
 msgid "Quit"
