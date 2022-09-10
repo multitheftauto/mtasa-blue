@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 17:46\n"
+"PO-Revision-Date: 2022-09-10 18:46\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -43,7 +43,7 @@ msgstr "Instellingen"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr "Afsluiten"
+msgstr "Over ons"
 
 #. Found in the main menu navigation
 msgid "Quit"
