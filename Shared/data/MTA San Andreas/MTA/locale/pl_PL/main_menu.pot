@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 17:46\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr "Szybkie połączenie"
+msgstr "Szybkie łączenie"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
@@ -31,7 +31,7 @@ msgstr "Przeglądarka serwerów"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr "Utwórz serwer lokalny"
+msgstr "Utwórz serwer"
 
 #. Found in the main menu navigation
 msgid "Map editor"
@@ -51,5 +51,5 @@ msgstr "Zakończ"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr "Ostatnie aktualności"
+msgstr "Najnowsze wiadomości"
 
