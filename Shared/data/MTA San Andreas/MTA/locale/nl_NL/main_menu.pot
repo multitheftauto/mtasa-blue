@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:43\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Verbind snel"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Verbinding verbreken"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Servers doorbladeren"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Creeër server"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Map bewerker"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Instellingen"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Afsluiten"
 
 #. Found in the main menu navigation
 msgid "Quit"
