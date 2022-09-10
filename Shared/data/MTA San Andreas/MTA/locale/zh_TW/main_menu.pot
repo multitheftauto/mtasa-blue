@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "快速連線"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "斷開連接"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "瀏覽伺服器"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "本機遊戲"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "地圖編輯器"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "關於"
 
 #. Found in the main menu navigation
 msgid "Quit"
@@ -51,5 +51,5 @@ msgstr "離開"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr ""
+msgstr "最新消息"
 
