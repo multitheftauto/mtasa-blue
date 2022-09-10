@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "क्विक कनेक्ट"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "डिस्कनेक्ट"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "सर्वर ब्राउज़र"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "होस्ट गेम"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "मैप एडिटर"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "सेटिंग"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "अबाउट"
 
 #. Found in the main menu navigation
 msgid "Quit"
@@ -51,5 +51,5 @@ msgstr ""
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr ""
+msgstr "लेटेस्ट न्यूज़"
 
