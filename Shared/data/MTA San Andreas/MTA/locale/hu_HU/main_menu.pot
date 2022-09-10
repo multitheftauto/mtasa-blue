@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:43\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Gyors csatlakozás"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Lecsatlakozás"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Szerver kereső"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Szerver indítás"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Pályaszerkesztő"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Beállítások"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Készítők"
 
 #. Found in the main menu navigation
 msgid "Quit"
@@ -51,5 +51,5 @@ msgstr "Kilépés"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr ""
+msgstr "A Legfrissebb Hírek"
 
