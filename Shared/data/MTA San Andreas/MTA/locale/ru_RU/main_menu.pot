@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 17:46\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr "Подключение"
+msgstr "Быстрое подключение"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
