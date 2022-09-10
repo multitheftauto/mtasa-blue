@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 17:46\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -23,7 +23,7 @@ msgstr "クイック接続"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr "接続解除"
+msgstr "セッションを切断"
 
 #. Found in the main menu navigation
 msgid "Server browser"
@@ -31,11 +31,11 @@ msgstr "サーバーブラウザ"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr "主催ゲーム"
+msgstr "ローカルサーバー"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr "マップエディタ"
+msgstr "マップエディター"
 
 #. Found in the main menu navigation
 msgid "Settings"
@@ -43,7 +43,7 @@ msgstr "設定"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr "について"
+msgstr "MTASAについて"
 
 #. Found in the main menu navigation
 msgid "Quit"
