@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:43\n"
+"PO-Revision-Date: 2022-09-10 17:46\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Hurtig tilkobling"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Koble fra"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Serverliste"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Start nytt spill"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Kartredigering"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Innstillinger"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Om"
 
 #. Found in the main menu navigation
 msgid "Quit"
