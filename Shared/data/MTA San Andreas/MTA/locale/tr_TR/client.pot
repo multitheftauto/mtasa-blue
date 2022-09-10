@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-17 08:23+0000\n"
-"PO-Revision-Date: 2022-08-17 08:39\n"
+"PO-Revision-Date: 2022-09-10 12:36\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -925,7 +925,7 @@ msgstr "MTA: San Andreas - Uyarı"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Grand Theft Auto: San Andreas kurulum dizininiz şu dosyaları içerir:"
+msgstr "Grand Theft Auto: San Andreas kurulum dizininiz şu dosyaları içeriyor:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
@@ -1866,7 +1866,7 @@ msgstr "Güvenli olmayan çözünürlükleri göster"
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr "Corona yağmur efektleri"
+msgstr "Corona yağmur yansımaları"
 
 #: Client/core/CSettings.cpp:884
 msgid "Enable remote websites"
