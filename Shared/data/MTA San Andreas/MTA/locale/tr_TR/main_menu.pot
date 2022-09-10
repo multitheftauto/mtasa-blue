@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 18:46\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "Hemen bağlan"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "Bağlantiyi kes"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "Sunucu tarayici"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "Sunucu kur"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "Harita editörü"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "Ayarlar"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "Hakkinda"
 
 #. Found in the main menu navigation
 msgid "Quit"
@@ -51,5 +51,5 @@ msgstr "Çık"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr ""
+msgstr "Güncel Haberler"
 
