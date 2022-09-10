@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -288,7 +290,7 @@ static CURLcode status_line(struct Curl_easy *data,
              len);
 
   if(!data->state.hconnect || !data->set.suppress_connect_headers) {
-    writetype = CLIENTWRITE_HEADER;
+    writetype = CLIENTWRITE_HEADER|CLIENTWRITE_STATUS;
     if(data->set.include_header)
       writetype |= CLIENTWRITE_BODY;
     result = Curl_client_write(data, writetype,
@@ -690,9 +692,18 @@ static int uploadstreamed(void *userdata, hyper_context *ctx,
     data->state.hresult = result;
     return HYPER_POLL_ERROR;
   }
-  if(!fillcount)
-    /* done! */
-    *chunk = NULL;
+  if(!fillcount) {
+    if((data->req.keepon & KEEP_SEND_PAUSE) != KEEP_SEND_PAUSE)
+      /* done! */
+      *chunk = NULL;
+    else {
+      /* paused, save a waker */
+      if(data->hyp.send_body_waker)
+        hyper_waker_free(data->hyp.send_body_waker);
+      data->hyp.send_body_waker = hyper_context_waker(ctx);
+      return HYPER_POLL_PENDING;
+    }
+  }
   else {
     hyper_buf *copy = hyper_buf_copy((uint8_t *)data->state.ulbuf, fillcount);
     if(copy)
@@ -913,6 +924,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   }
   hyper_clientconn_options_set_preserve_header_case(options, 1);
   hyper_clientconn_options_set_preserve_header_order(options, 1);
+  hyper_clientconn_options_http1_allow_multiline_headers(options, 1);
 
   hyper_clientconn_options_exec(options, h->exec);
 
@@ -1002,10 +1014,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
     /* For HTTP/2, we show the Host: header as if we sent it, to make it look
        like for HTTP/1 but it isn't actually sent since :authority is then
        used. */
-    result = Curl_debug(data, CURLINFO_HEADER_OUT, data->state.aptr.host,
-                        strlen(data->state.aptr.host));
-    if(result)
-      goto error;
+    Curl_debug(data, CURLINFO_HEADER_OUT, data->state.aptr.host,
+               strlen(data->state.aptr.host));
   }
 
   if(data->state.aptr.proxyuserpwd) {
@@ -1046,6 +1056,21 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
     if(result)
       goto error;
   }
+
+#ifndef CURL_DISABLE_ALTSVC
+  if(conn->bits.altused && !Curl_checkheaders(data, STRCONST("Alt-Used"))) {
+    char *altused = aprintf("Alt-Used: %s:%d\r\n",
+                            conn->conn_to_host.name, conn->conn_to_port);
+    if(!altused) {
+      result = CURLE_OUT_OF_MEMORY;
+      goto error;
+    }
+    result = Curl_hyper_header(data, headers, altused);
+    if(result)
+      goto error;
+    free(altused);
+  }
+#endif
 
 #ifndef CURL_DISABLE_PROXY
   if(conn->bits.httpproxy && !conn->bits.tunnel_proxy &&
@@ -1110,9 +1135,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   if(result)
     goto error;
 
-  result = Curl_debug(data, CURLINFO_HEADER_OUT, (char *)"\r\n", 2);
-  if(result)
-    goto error;
+  Curl_debug(data, CURLINFO_HEADER_OUT, (char *)"\r\n", 2);
 
   data->req.upload_chunky = FALSE;
   sendtask = hyper_clientconn_send(client, req);

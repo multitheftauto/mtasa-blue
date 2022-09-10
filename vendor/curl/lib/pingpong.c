@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  *   'pingpong' is for generic back-and-forth support functions used by FTP,
  *   IMAP, POP3, SMTP and whatever more that likes them.
  *
@@ -396,7 +398,8 @@ CURLcode Curl_pp_readresp(struct Curl_easy *data,
       }
       else if(keepon) {
 
-        if((perline == gotbytes) && (gotbytes > data->set.buffer_size/2)) {
+        if((perline == gotbytes) &&
+           (gotbytes > (ssize_t)data->set.buffer_size/2)) {
           /* We got an excessive line without newlines and we need to deal
              with it. We keep the first bytes of the line then we throw
              away the rest. */
