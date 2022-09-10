@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-10 16:42\n"
+"PO-Revision-Date: 2022-09-10 19:49\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -19,31 +19,31 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr ""
+msgstr "快速连接服务器"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr ""
+msgstr "断开服务器连接"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr ""
+msgstr "游戏服务端浏览器"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr ""
+msgstr "建立游戏服务器"
 
 #. Found in the main menu navigation
 msgid "Map editor"
-msgstr ""
+msgstr "地图编辑器"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr ""
+msgstr "关于"
 
 #. Found in the main menu navigation
 msgid "Quit"
