@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-04-19 21:02\n"
+"PO-Revision-Date: 2022-09-10 12:36\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -114,7 +114,7 @@ msgstr "MTA:SA 被修改為了伺服器."
 #. DESC_Section6
 #: Shared/installer/nightly.nsi:211
 msgid "This is a set of required resources for your server."
-msgstr "這是作為遊戲伺服器所要求的必選元件系列."
+msgstr "伺服器可能會使用到的資源腳本。"
 
 #. DESC_Section7
 #: Shared/installer/nightly.nsi:212
@@ -124,7 +124,7 @@ msgstr "這是一個可選的伺服器 Gamemode 和地圖包."
 #. DESC_Section8
 #: Shared/installer/nightly.nsi:213
 msgid "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-msgstr "MTA:SA 1.0 地圖編輯器. 這個可以用來作創建給 gaemmodes 使用的個人地圖."
+msgstr "MTA:SA 1.0 地圖編輯器。 可以用來製作您使用於腳本的地圖。"
 
 #. DESC_Section9
 #: Shared/installer/nightly.nsi:214
