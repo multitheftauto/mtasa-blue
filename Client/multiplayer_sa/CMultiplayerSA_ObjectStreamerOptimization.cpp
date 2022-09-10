@@ -153,17 +153,17 @@ void CMultiplayerSA::InitHooks_ObjectStreamerOptimization()
     EZHookInstall(CPtrListDoubleLink__Flush);
 }
 
-unsigned int CMultiplayerSA::EntryInfoNodePool_NoOfUsedSpaces()
+unsigned int CMultiplayerSA::EntryInfoNodePool_NoOfUsedSpaces() const noexcept
 {
     return CEntryInfoNodePool_UsedSpaces;
 }
 
-unsigned int CMultiplayerSA::PtrNodeSingleLinkPool_NoOfUsedSpaces()
+unsigned int CMultiplayerSA::PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept
 {
     return CPtrNodeSingleLinkPool_UsedSpaces;
 }
 
-unsigned int CMultiplayerSA::PtrNodeDoubleLinkPool_NoOfUsedSpaces()
+unsigned int CMultiplayerSA::PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept
 {
     return CPtrNodeDoubleLinkPool_UsedSpaces;
 }
