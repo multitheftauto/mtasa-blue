@@ -1505,11 +1505,10 @@ CElementListSnapshotRef CElement::GetChildrenListSnapshot()
         m_pChildrenListSnapshot = std::make_shared<CElementListSnapshot>();
 
         // Fill it up
-        m_pChildrenListSnapshot->reserve(m_Children.size()); // Potentially faster than using vector's range constructor
+        m_pChildrenListSnapshot->reserve(m_Children.size());
 
-        // Use stupid iterator loop, because CFastList::itreator isn't std compatible..
-        for (auto it = m_Children.begin(); it != m_Children.end(); it++)
-            m_pChildrenListSnapshot->push_back(*it);
+        for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
+            m_pChildrenListSnapshot->push_back(*iter);
     }
 
     return m_pChildrenListSnapshot;
