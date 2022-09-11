@@ -52,6 +52,9 @@ public:
     bool             GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit);
     CDynamicLibrary& GetDynamicLibrary() { return m_Library; };
 
+    void SetExitCode(int exitCode) override;
+    int  GetExitCode() const override;
+
 private:
     CServerImpl* m_pServer;
 

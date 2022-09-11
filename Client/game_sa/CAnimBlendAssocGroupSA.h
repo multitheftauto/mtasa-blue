@@ -30,12 +30,12 @@ class CAnimManagerSA;
 class CAnimationStyleDescriptorSAInterface
 {
 public:
-    char groupName[16];
-    char blockName[16];
-    int field_20;
-    int animsCount;
-    void *animNames;
-    void *animDesc;
+    char  groupName[16];
+    char  blockName[16];
+    int   field_20;
+    int   animsCount;
+    void* animNames;
+    void* animDesc;
 };
 
 class CAnimBlendAssocGroupSAInterface
@@ -67,7 +67,7 @@ public:
     bool IsLoaded();
     void SetIDOffset(int iOffset) { m_pInterface->iIDOffset = iOffset; }
 
-    CAnimBlendAssocGroupSAInterface*  GetInterface() { return m_pInterface; }
+    CAnimBlendAssocGroupSAInterface* GetInterface() { return m_pInterface; }
 
 protected:
     void SetupAnimBlock();

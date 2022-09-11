@@ -281,8 +281,12 @@ void CInputRPCs::ShowCursor(NetBitStreamInterface& bitStream)
 void CInputRPCs::ShowChat(NetBitStreamInterface& bitStream)
 {
     unsigned char ucShow;
+    unsigned char ucInputBlocked;
     if (bitStream.Read(ucShow))
     {
-        g_pCore->SetChatVisible(ucShow == 1);
+        if (bitStream.Read(ucInputBlocked))
+            g_pCore->SetChatVisible(ucShow == 1, ucInputBlocked == 1);
+        else
+            g_pCore->SetChatVisible(ucShow == 1, ucShow != 1);
     }
 }

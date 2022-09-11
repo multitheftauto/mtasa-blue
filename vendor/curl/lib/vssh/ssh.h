@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -111,6 +113,17 @@ typedef enum {
    struct. */
 struct SSHPROTO {
   char *path;                  /* the path we operate on */
+#ifdef USE_LIBSSH2
+  struct dynbuf readdir_link;
+  struct dynbuf readdir;
+  char *readdir_filename;
+  char *readdir_longentry;
+
+  LIBSSH2_SFTP_ATTRIBUTES quote_attrs; /* used by the SFTP_QUOTE state */
+
+  /* Here's a set of struct members used by the SFTP_READDIR state */
+  LIBSSH2_SFTP_ATTRIBUTES readdir_attrs;
+#endif
 };
 
 /* ssh_conn is used for struct connection-oriented data in the connectdata
@@ -120,9 +133,11 @@ struct ssh_conn {
 
   /* common */
   const char *passphrase;     /* pass-phrase to use */
-  char *rsa_pub;              /* path name */
-  char *rsa;                  /* path name */
+  char *rsa_pub;              /* strdup'ed public key file */
+  char *rsa;                  /* strdup'ed private key file */
   bool authed;                /* the connection has been authenticated fine */
+  bool acceptfail;            /* used by the SFTP_QUOTE (continue if
+                                 quote command fails) */
   sshstate state;             /* always use ssh.c:state() to change state! */
   sshstate nextstate;         /* the state to goto after stopping */
   CURLcode actualcode;        /* the actual error code */
@@ -130,8 +145,6 @@ struct ssh_conn {
   char *quote_path1;          /* two generic pointers for the QUOTE stuff */
   char *quote_path2;
 
-  bool acceptfail;            /* used by the SFTP_QUOTE (continue if
-                                 quote command fails) */
   char *homedir;              /* when doing SFTP we figure out home dir in the
                                  connect phase */
   char *readdir_line;
@@ -140,9 +153,8 @@ struct ssh_conn {
   int secondCreateDirs;         /* counter use by the code to see if the
                                    second attempt has been made to change
                                    to/create a directory */
-  char *slash_pos;              /* used by the SFTP_CREATE_DIRS state */
-
   int orig_waitfor;             /* default READ/WRITE bits wait for */
+  char *slash_pos;              /* used by the SFTP_CREATE_DIRS state */
 
 #if defined(USE_LIBSSH)
   char *readdir_linkPath;
@@ -168,15 +180,6 @@ struct ssh_conn {
   const char *readdir_longentry;
   char *readdir_tmp;
 #elif defined(USE_LIBSSH2)
-  struct dynbuf readdir_link;
-  struct dynbuf readdir;
-  char *readdir_filename;
-  char *readdir_longentry;
-
-  LIBSSH2_SFTP_ATTRIBUTES quote_attrs; /* used by the SFTP_QUOTE state */
-
-  /* Here's a set of struct members used by the SFTP_READDIR state */
-  LIBSSH2_SFTP_ATTRIBUTES readdir_attrs;
   LIBSSH2_SESSION *ssh_session; /* Secure Shell session */
   LIBSSH2_CHANNEL *ssh_channel; /* Secure Shell channel handle */
   LIBSSH2_SFTP *sftp_session;   /* SFTP handle */
@@ -208,11 +211,7 @@ struct ssh_conn {
 #endif /* USE_LIBSSH */
 };
 
-#if defined(USE_LIBSSH)
-
-#define CURL_LIBSSH_VERSION ssh_version(0)
-
-#elif defined(USE_LIBSSH2)
+#if defined(USE_LIBSSH2)
 
 /* Feature detection based on version numbers to better work with
    non-configure platforms */
@@ -261,10 +260,13 @@ extern const struct Curl_handler Curl_handler_sftp;
 /* generic SSH backend functions */
 CURLcode Curl_ssh_init(void);
 void Curl_ssh_cleanup(void);
-size_t Curl_ssh_version(char *buffer, size_t buflen);
+void Curl_ssh_version(char *buffer, size_t buflen);
+void Curl_ssh_attach(struct Curl_easy *data,
+                     struct connectdata *conn);
 #else
 /* for non-SSH builds */
 #define Curl_ssh_cleanup()
+#define Curl_ssh_attach(x,y)
 #endif
 
 #endif /* HEADER_CURL_SSH_H */

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CScriptFile.h"
+#include "CGame.h"
+#include "CResourceManager.h"
 
 CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, unsigned long ulMaxSize) : CElement(NULL)
 {

@@ -79,6 +79,7 @@ typedef void(InRenderer)();
 #include "CWorld.h"
 #include "TaskCarAccessories.h"
 #include "CObjectGroupPhysicalProperties.h"
+#include "CColStore.h"
 
 #include <windows.h>
 
@@ -165,6 +166,7 @@ public:
     virtual CWaterManager*            GetWaterManager() = 0;
     virtual CWeaponStatManager*       GetWeaponStatManager() = 0;
     virtual CPointLights*             GetPointLights() = 0;
+    virtual CColStore*                GetCollisionStore() = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;

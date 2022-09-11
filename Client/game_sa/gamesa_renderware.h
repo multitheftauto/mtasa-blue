@@ -18,7 +18,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-class CColModelSAInterface;
+struct CColModelSAInterface;
 
 /*****************************************************************************/
 /** Renderware functions                                                    **/
@@ -194,7 +194,7 @@ RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
 RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
 RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
 
-    /*****************************************************************************/
+/*****************************************************************************/
 /** GTA function definitions and mappings                                   **/
 /*****************************************************************************/
 

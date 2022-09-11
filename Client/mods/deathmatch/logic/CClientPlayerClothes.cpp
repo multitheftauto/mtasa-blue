@@ -323,6 +323,9 @@ const SPlayerClothing* CClientPlayerClothes::GetClothing(unsigned char ucType)
 
 void CClientPlayerClothes::AddClothes(const char* szTexture, const char* szModel, unsigned char ucType, bool bAddToModel)
 {
+    if (ucType >= PLAYER_CLOTHING_SLOTS)
+        return;
+
     const SPlayerClothing* pClothing = GetClothing(szTexture, szModel, ucType);
     if (pClothing && pClothing != m_Clothes[ucType])
     {
@@ -359,6 +362,9 @@ void CClientPlayerClothes::InternalAddClothes(const SPlayerClothing* pClothing, 
 
 bool CClientPlayerClothes::RemoveClothes(unsigned char ucType, bool bRemoveFromModel)
 {
+    if (ucType >= PLAYER_CLOTHING_SLOTS)
+        return false;
+
     // Do we have any set clothes on this slot?
     if (m_Clothes[ucType])
     {

@@ -10,7 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CMainConfig.h"
+#include "CTickRateSettings.h"
+#include "CBandwidthSettings.h"
+#include "ASE.h"
+#include "CGame.h"
 #include "net/SimHeaders.h"
+
 #ifdef WIN32
     #include "Psapi.h"
 #else

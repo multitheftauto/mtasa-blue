@@ -41,8 +41,8 @@ void CEntitySAInterface::UpdateRpHAnim()
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
 {
     CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
-    CVector               vecMin = colModel->boundingBox.vecMin;
-    CVector               vecMax = colModel->boundingBox.vecMax;
+    CVector               vecMin = colModel->m_bounds.m_vecMin;
+    CVector               vecMax = colModel->m_bounds.m_vecMax;
     CRect                 rect;
     CVector               point;
     TransformFromObjectSpace(point, vecMin);
@@ -661,7 +661,6 @@ bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& r
         }
     }
     return false;
-
 }
 
 bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll)
@@ -678,6 +677,11 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
             RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
             RwV3d   angles = {yaw, roll, pitch};
             BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
+            CEntitySAInterface* theInterface = GetInterface();
+            if (theInterface)
+            {
+                theInterface->bDontUpdateHierarchy = false;
+            }
             return true;
         }
     }

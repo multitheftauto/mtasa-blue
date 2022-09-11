@@ -12,114 +12,115 @@
 
 void CLuaWorldDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // World get functions
-        {"getTime", GetTime},
-        {"getRoofPosition", GetRoofPosition},
-        {"getGroundPosition", GetGroundPosition},
-        {"processLineOfSight", ProcessLineOfSight},
-        {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
-        {"getScreenFromWorldPosition", GetScreenFromWorldPosition},
-        {"getWeather", GetWeather},
-        {"getZoneName", GetZoneName},
-        {"getGravity", GetGravity},
-        {"getGameSpeed", GetGameSpeed},
-        {"getMinuteDuration", GetMinuteDuration},
-        {"getWaveHeight", GetWaveHeight},
-        {"getGaragePosition", GetGaragePosition},
-        {"getGarageSize", GetGarageSize},
-        {"getGarageBoundingBox", GetGarageBoundingBox},
-        {"getBlurLevel", GetBlurLevel},
-        {"getTrafficLightState", GetTrafficLightState},
-        {"getSkyGradient", GetSkyGradient},
-        {"getHeatHaze", GetHeatHaze},
-        {"getJetpackMaxHeight", GetJetpackMaxHeight},
-        {"getWindVelocity", GetWindVelocity},
-        {"getInteriorSoundsEnabled", GetInteriorSoundsEnabled},
-        {"getInteriorFurnitureEnabled", GetInteriorFurnitureEnabled},
-        {"getFarClipDistance", GetFarClipDistance},
-        {"getNearClipDistance", GetNearClipDistance},
-        {"getVehiclesLODDistance", GetVehiclesLODDistance},
-        {"getPedsLODDistance", GetPedsLODDistance},
-        {"getFogDistance", GetFogDistance},
-        {"getSunColor", GetSunColor},
-        {"getSunSize", GetSunSize},
-        {"getAircraftMaxHeight", GetAircraftMaxHeight},
-        {"getAircraftMaxVelocity", GetAircraftMaxVelocity},
-        {"getOcclusionsEnabled", GetOcclusionsEnabled},
-        {"getCloudsEnabled", GetCloudsEnabled},
-        {"getRainLevel", GetRainLevel},
-        {"getMoonSize", GetMoonSize},
-        {"getFPSLimit", GetFPSLimit},
-        {"getBirdsEnabled", GetBirdsEnabled},
-        
-        // World set funcs
-        {"setTime", SetTime},
-        {"setColorFilter", ArgumentParser<SetColorFilter>},
-        {"setSkyGradient", SetSkyGradient},
-        {"setHeatHaze", SetHeatHaze},
-        {"setWeather", SetWeather},
-        {"setWeatherBlended", SetWeatherBlended},
-        {"setGravity", SetGravity},
-        {"setGameSpeed", SetGameSpeed},
-        {"setWaveHeight", SetWaveHeight},
-        {"setMinuteDuration", SetMinuteDuration},
-        {"setGarageOpen", SetGarageOpen},
-        {"setWorldSpecialPropertyEnabled", SetWorldSpecialPropertyEnabled},
-        {"setBlurLevel", SetBlurLevel},
-        {"setJetpackMaxHeight", SetJetpackMaxHeight},
-        {"setCloudsEnabled", SetCloudsEnabled},
-        {"setTrafficLightState", SetTrafficLightState},
-        {"setTrafficLightsLocked", SetTrafficLightsLocked},
-        {"setWindVelocity", SetWindVelocity},
-        {"setInteriorSoundsEnabled", SetInteriorSoundsEnabled},
-        {"setInteriorFurnitureEnabled", SetInteriorFurnitureEnabled},
-        {"setRainLevel", SetRainLevel},
-        {"setFarClipDistance", SetFarClipDistance},
-        {"setNearClipDistance", SetNearClipDistance},
-        {"setVehiclesLODDistance", SetVehiclesLODDistance},
-        {"setPedsLODDistance", SetPedsLODDistance},
-        {"setFogDistance", SetFogDistance},
-        {"setSunColor", SetSunColor},
-        {"setSunSize", SetSunSize},
-        {"setAircraftMaxHeight", SetAircraftMaxHeight},
-        {"setAircraftMaxVelocity", SetAircraftMaxVelocity},
-        {"setOcclusionsEnabled", SetOcclusionsEnabled},
-        {"setBirdsEnabled", SetBirdsEnabled},
-        {"setPedTargetingMarkerEnabled", SetPedTargetingMarkerEnabled},
-        {"setMoonSize", SetMoonSize},
-        {"setFPSLimit", SetFPSLimit},
-        {"removeWorldModel", RemoveWorldBuilding},
-        {"restoreAllWorldModels", RestoreWorldBuildings},
-        {"restoreWorldModel", RestoreWorldBuilding},
-        
-        // World create funcs
-        {"createSWATRope", CreateSWATRope},
-        {"createExplosion", CreateExplosion},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{// World get functions
+                                                                             {"getTime", GetTime},
+                                                                             {"getRoofPosition", GetRoofPosition},
+                                                                             {"getGroundPosition", GetGroundPosition},
+                                                                             {"processLineOfSight", ProcessLineOfSight},
+                                                                             {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
+                                                                             {"getScreenFromWorldPosition", GetScreenFromWorldPosition},
+                                                                             {"getWeather", GetWeather},
+                                                                             {"getZoneName", GetZoneName},
+                                                                             {"getGravity", GetGravity},
+                                                                             {"getGameSpeed", GetGameSpeed},
+                                                                             {"getMinuteDuration", GetMinuteDuration},
+                                                                             {"getWaveHeight", GetWaveHeight},
+                                                                             {"getGaragePosition", GetGaragePosition},
+                                                                             {"getGarageSize", GetGarageSize},
+                                                                             {"getGarageBoundingBox", GetGarageBoundingBox},
+                                                                             {"getBlurLevel", GetBlurLevel},
+                                                                             {"getTrafficLightState", GetTrafficLightState},
+                                                                             {"getSkyGradient", GetSkyGradient},
+                                                                             {"getHeatHaze", GetHeatHaze},
+                                                                             {"getJetpackMaxHeight", GetJetpackMaxHeight},
+                                                                             {"getWindVelocity", GetWindVelocity},
+                                                                             {"getInteriorSoundsEnabled", GetInteriorSoundsEnabled},
+                                                                             {"getInteriorFurnitureEnabled", GetInteriorFurnitureEnabled},
+                                                                             {"getFarClipDistance", GetFarClipDistance},
+                                                                             {"getNearClipDistance", GetNearClipDistance},
+                                                                             {"getVehiclesLODDistance", GetVehiclesLODDistance},
+                                                                             {"getPedsLODDistance", GetPedsLODDistance},
+                                                                             {"getFogDistance", GetFogDistance},
+                                                                             {"getSunColor", GetSunColor},
+                                                                             {"getSunSize", GetSunSize},
+                                                                             {"getAircraftMaxHeight", GetAircraftMaxHeight},
+                                                                             {"getAircraftMaxVelocity", GetAircraftMaxVelocity},
+                                                                             {"getOcclusionsEnabled", GetOcclusionsEnabled},
+                                                                             {"getCloudsEnabled", GetCloudsEnabled},
+                                                                             {"getRainLevel", GetRainLevel},
+                                                                             {"getMoonSize", GetMoonSize},
+                                                                             {"getFPSLimit", GetFPSLimit},
+                                                                             {"getBirdsEnabled", GetBirdsEnabled},
+                                                                             {"getCoronaReflectionsEnabled", ArgumentParser<GetCoronaReflectionsEnabled>},
 
-        // World reset funcs
-        {"resetColorFilter", ArgumentParser<ResetColorFilter>},
-        {"resetSkyGradient", ResetSkyGradient},
-        {"resetHeatHaze", ResetHeatHaze},
-        {"resetWindVelocity", ResetWindVelocity},
-        {"resetRainLevel", ResetRainLevel},
-        {"resetFarClipDistance", ResetFarClipDistance},
-        {"resetNearClipDistance", ResetNearClipDistance},
-        {"resetVehiclesLODDistance", ResetVehiclesLODDistance},
-        {"resetPedsLODDistance", ResetPedsLODDistance},
-        {"resetFogDistance", ResetFogDistance},
-        {"resetSunColor", ResetSunColor},
-        {"resetSunSize", ResetSunSize},
-        {"resetMoonSize", ResetMoonSize},
-        {"resetBlurLevel", ResetBlurLevel},        
-        
-        // World check funcs
-        {"areTrafficLightsLocked", AreTrafficLightsLocked},
-        {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
-        {"isLineOfSightClear", IsLineOfSightClear},
-        {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
-        {"isGarageOpen", IsGarageOpen}        
-    };
+                                                                             // World set funcs
+                                                                             {"setTime", SetTime},
+                                                                             {"setColorFilter", ArgumentParser<SetColorFilter>},
+                                                                             {"setSkyGradient", SetSkyGradient},
+                                                                             {"setHeatHaze", SetHeatHaze},
+                                                                             {"setWeather", SetWeather},
+                                                                             {"setWeatherBlended", SetWeatherBlended},
+                                                                             {"setGravity", SetGravity},
+                                                                             {"setGameSpeed", SetGameSpeed},
+                                                                             {"setWaveHeight", SetWaveHeight},
+                                                                             {"setMinuteDuration", SetMinuteDuration},
+                                                                             {"setGarageOpen", SetGarageOpen},
+                                                                             {"setWorldSpecialPropertyEnabled", SetWorldSpecialPropertyEnabled},
+                                                                             {"setBlurLevel", SetBlurLevel},
+                                                                             {"setJetpackMaxHeight", SetJetpackMaxHeight},
+                                                                             {"setCloudsEnabled", SetCloudsEnabled},
+                                                                             {"setTrafficLightState", SetTrafficLightState},
+                                                                             {"setTrafficLightsLocked", SetTrafficLightsLocked},
+                                                                             {"setWindVelocity", SetWindVelocity},
+                                                                             {"setInteriorSoundsEnabled", SetInteriorSoundsEnabled},
+                                                                             {"setInteriorFurnitureEnabled", SetInteriorFurnitureEnabled},
+                                                                             {"setRainLevel", SetRainLevel},
+                                                                             {"setFarClipDistance", SetFarClipDistance},
+                                                                             {"setNearClipDistance", SetNearClipDistance},
+                                                                             {"setVehiclesLODDistance", SetVehiclesLODDistance},
+                                                                             {"setPedsLODDistance", SetPedsLODDistance},
+                                                                             {"setFogDistance", SetFogDistance},
+                                                                             {"setSunColor", SetSunColor},
+                                                                             {"setSunSize", SetSunSize},
+                                                                             {"setAircraftMaxHeight", SetAircraftMaxHeight},
+                                                                             {"setAircraftMaxVelocity", SetAircraftMaxVelocity},
+                                                                             {"setOcclusionsEnabled", SetOcclusionsEnabled},
+                                                                             {"setBirdsEnabled", SetBirdsEnabled},
+                                                                             {"setPedTargetingMarkerEnabled", SetPedTargetingMarkerEnabled},
+                                                                             {"setMoonSize", SetMoonSize},
+                                                                             {"setFPSLimit", SetFPSLimit},
+                                                                             {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
+                                                                             {"removeWorldModel", RemoveWorldBuilding},
+                                                                             {"restoreAllWorldModels", RestoreWorldBuildings},
+                                                                             {"restoreWorldModel", RestoreWorldBuilding},
+
+                                                                             // World create funcs
+                                                                             {"createSWATRope", CreateSWATRope},
+                                                                             {"createExplosion", CreateExplosion},
+
+                                                                             // World reset funcs
+                                                                             {"resetColorFilter", ArgumentParser<ResetColorFilter>},
+                                                                             {"resetCoronaReflectionsEnabled", ArgumentParser<ResetCoronaReflectionsEnabled>},
+                                                                             {"resetSkyGradient", ResetSkyGradient},
+                                                                             {"resetHeatHaze", ResetHeatHaze},
+                                                                             {"resetWindVelocity", ResetWindVelocity},
+                                                                             {"resetRainLevel", ResetRainLevel},
+                                                                             {"resetFarClipDistance", ResetFarClipDistance},
+                                                                             {"resetNearClipDistance", ResetNearClipDistance},
+                                                                             {"resetVehiclesLODDistance", ResetVehiclesLODDistance},
+                                                                             {"resetPedsLODDistance", ResetPedsLODDistance},
+                                                                             {"resetFogDistance", ResetFogDistance},
+                                                                             {"resetSunColor", ResetSunColor},
+                                                                             {"resetSunSize", ResetSunSize},
+                                                                             {"resetMoonSize", ResetMoonSize},
+                                                                             {"resetBlurLevel", ResetBlurLevel},
+
+                                                                             // World check funcs
+                                                                             {"areTrafficLightsLocked", AreTrafficLightsLocked},
+                                                                             {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
+                                                                             {"isLineOfSightClear", IsLineOfSightClear},
+                                                                             {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
+                                                                             {"isGarageOpen", IsGarageOpen}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -1984,11 +1985,33 @@ bool CLuaWorldDefs::ResetColorFilter()
     return true;
 }
 
-bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
-    uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha)
+bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha, uchar ucPass1Red, uchar ucPass1Green,
+                                   uchar ucPass1Blue, uchar ucPass1Alpha)
 {
     unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
     unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
+    return true;
+}
+
+bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)
+{
+    if(ucEnabled > 2)
+        return false;
+
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(true);
+    g_pGame->GetCoronas()->SetCoronaReflectionsEnabled(ucEnabled);
+    return true;
+}
+
+uchar CLuaWorldDefs::GetCoronaReflectionsEnabled()
+{
+    return g_pGame->GetCoronas()->GetCoronaReflectionsEnabled();
+}
+
+bool CLuaWorldDefs::ResetCoronaReflectionsEnabled()
+{
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
     return true;
 }

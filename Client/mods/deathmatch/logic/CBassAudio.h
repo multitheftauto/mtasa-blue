@@ -1,14 +1,13 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:
- *  PURPOSE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-#define CUT_OFF 5.0f //Cut off point at which volume is regarded as 0 in the function e^-x
+#define CUT_OFF 5.0f            // Cut off point at which volume is regarded as 0 in the function e^-x
 
 enum eSoundEventType
 {
@@ -76,6 +75,8 @@ public:
     bool    GetPanEnabled() { return m_bPan; };
     void    SetPanEnabled(bool bPan) { m_bPan = bPan; };
     void    SetFxEffects(int* pEnabledEffects, uint iNumElements);
+    BOOL    SetFxParameters(uint iFxEffect, void* params);
+    BOOL    GetFxParameters(uint iFxEffect, void* params);
     SString GetMetaTags(const SString& strFormat);
     uint    GetReachedEndCount();
     bool    IsFreed();

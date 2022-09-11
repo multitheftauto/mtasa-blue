@@ -11,13 +11,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
+
+#define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"
 
 void CLuaCameraDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Cam get funcs
         {"getCamera", GetCamera},
-        {"getCameraViewMode", GetCameraViewMode},
+        {"getCameraViewMode", ArgumentParserWarn<false, GetCameraViewMode>},
         {"getCameraMatrix", GetCameraMatrix},
         {"getCameraTarget", GetCameraTarget},
         {"getCameraInterior", GetCameraInterior},
@@ -33,7 +36,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"fadeCamera", FadeCamera},
         {"setCameraClip", SetCameraClip},
         {"getCameraClip", GetCameraClip},
-        {"setCameraViewMode", SetCameraViewMode},
+        {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
         {"setCameraShakeLevel", SetCameraShakeLevel},
     };
@@ -62,6 +65,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getClip", "getCameraClip");
     lua_classfunction(luaVM, "getFarClipDistance", "getFarClipDistance");
     lua_classfunction(luaVM, "getNearClipDistance", "getNearClipDistance");
+    lua_classfunction(luaVM, "getType", ArgumentParser<GetElementType>);
 
     lua_classfunction(luaVM, "setPosition", OOP_SetCameraPosition);
     lua_classfunction(luaVM, "setRotation", OOP_SetCameraRotation);
@@ -85,6 +89,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "position", OOP_SetCameraPosition, OOP_GetCameraPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetCameraRotation, OOP_GetCameraRotation);
     lua_classvariable(luaVM, "matrix", NULL, OOP_GetCameraMatrix);
+    lua_classvariable(luaVM, "type", nullptr, ArgumentParser<GetElementType>);
 
     lua_registerstaticclass(luaVM, "Camera");
 }
@@ -102,17 +107,14 @@ int CLuaCameraDefs::GetCamera(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::GetCameraViewMode(lua_State* luaVM)
+CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
 {
-    unsigned short ucMode;
-    if (CStaticFunctionDefinitions::GetCameraViewMode(ucMode))
-    {
-        lua_pushnumber(luaVM, ucMode);
-        return 1;
-    }
+    CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    unsigned char ucVehicleMode = (unsigned char)pCamera->GetCameraVehicleViewMode();
+    unsigned char ucPedMode = (unsigned char)pCamera->GetCameraPedViewMode();
+
+    return {ucVehicleMode, ucPedMode};
 }
 
 int CLuaCameraDefs::GetCameraMatrix(lua_State* luaVM)
@@ -332,6 +334,9 @@ int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
         CClientEntity* pTarget;
         argStream.ReadUserData(pTarget);
 
+        if (pTarget->GetType() != CCLIENTPLAYER)
+            MinClientReqCheck(argStream, MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
+
         if (!argStream.HasErrors())
         {
             if (CStaticFunctionDefinitions::SetCameraTarget(pTarget))
@@ -439,24 +444,17 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
     return 2;
 }
 
-int CLuaCameraDefs::SetCameraViewMode(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleViewMode, std::optional<unsigned char> ucPedViewMode)
 {
-    unsigned short   usViewMode = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usViewMode);
+    CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
-    if (!argStream.HasErrors())
-    {
-        CStaticFunctionDefinitions::SetCameraViewMode(usViewMode);
+    if (ucVehicleViewMode)
+        pCamera->SetCameraVehicleViewMode((eVehicleCamMode)ucVehicleViewMode.value());
 
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (ucPedViewMode)
+        pCamera->SetCameraPedViewMode((ePedCamMode)ucPedViewMode.value());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return true;
 }
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
@@ -598,4 +596,9 @@ int CLuaCameraDefs::OOP_SetCameraRotation(lua_State* luaVM)
     }
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+const SString& CLuaCameraDefs::GetElementType()
+{
+    return m_pManager->GetCamera()->GetTypeName();
 }

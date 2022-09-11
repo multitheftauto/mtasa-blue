@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -29,6 +31,7 @@
 #include "vssh/ssh.h"
 #include "quic.h"
 #include "curl_printf.h"
+#include "easy_lock.h"
 
 #ifdef USE_ARES
 #  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
@@ -44,10 +47,6 @@
 
 #ifdef USE_LIBPSL
 #include <libpsl.h>
-#endif
-
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-#include <iconv.h>
 #endif
 
 #ifdef USE_LIBRTMP
@@ -66,29 +65,35 @@
 #include <zstd.h>
 #endif
 
+#ifdef USE_GSASL
+#include <gsasl.h>
+#endif
+
+#ifdef USE_OPENLDAP
+#include <ldap.h>
+#endif
+
 #ifdef HAVE_BROTLI
-static size_t brotli_version(char *buf, size_t bufsz)
+static void brotli_version(char *buf, size_t bufsz)
 {
   uint32_t brotli_version = BrotliDecoderVersion();
   unsigned int major = brotli_version >> 24;
   unsigned int minor = (brotli_version & 0x00FFFFFF) >> 12;
   unsigned int patch = brotli_version & 0x00000FFF;
-
-  return msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
+  (void)msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
 }
 #endif
 
 #ifdef HAVE_ZSTD
-static size_t zstd_version(char *buf, size_t bufsz)
+static void zstd_version(char *buf, size_t bufsz)
 {
   unsigned long zstd_version = (unsigned long)ZSTD_versionNumber();
   unsigned int major = (unsigned int)(zstd_version / (100 * 100));
   unsigned int minor = (unsigned int)((zstd_version -
-                         (major * 100 * 100)) / 100);
+                                       (major * 100 * 100)) / 100);
   unsigned int patch = (unsigned int)(zstd_version -
-                         (major * 100 * 100) - (minor * 100));
-
-  return msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
+                                      (major * 100 * 100) - (minor * 100));
+  (void)msnprintf(buf, bufsz, "%u.%u.%u", major, minor, patch);
 }
 #endif
 
@@ -100,7 +105,7 @@ static size_t zstd_version(char *buf, size_t bufsz)
  * zeros in the data.
  */
 
-#define VERSION_PARTS 14 /* number of substrings we can concatenate */
+#define VERSION_PARTS 16 /* number of substrings we can concatenate */
 
 char *curl_version(void)
 {
@@ -129,9 +134,6 @@ char *curl_version(void)
 #ifdef USE_LIBPSL
   char psl_version[40];
 #endif
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-  char iconv_version[40]="iconv";
-#endif
 #ifdef USE_SSH
   char ssh_version[40];
 #endif
@@ -143,6 +145,15 @@ char *curl_version(void)
 #endif
 #ifdef USE_LIBRTMP
   char rtmp_version[40];
+#endif
+#ifdef USE_HYPER
+  char hyper_buf[30];
+#endif
+#ifdef USE_GSASL
+  char gsasl_buf[30];
+#endif
+#ifdef USE_OPENLDAP
+  char ldap_buf[30];
 #endif
   int i = 0;
   int j;
@@ -191,15 +202,7 @@ char *curl_version(void)
   msnprintf(psl_version, sizeof(psl_version), "libpsl/%s", psl_get_version());
   src[i++] = psl_version;
 #endif
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-#ifdef _LIBICONV_VERSION
-  msnprintf(iconv_version, sizeof(iconv_version), "iconv/%d.%d",
-            _LIBICONV_VERSION >> 8, _LIBICONV_VERSION & 255);
-#else
-  /* version unknown, let the default stand */
-#endif /* _LIBICONV_VERSION */
-  src[i++] = iconv_version;
-#endif
+
 #ifdef USE_SSH
   Curl_ssh_version(ssh_version, sizeof(ssh_version));
   src[i++] = ssh_version;
@@ -226,6 +229,33 @@ char *curl_version(void)
               RTMP_LIB_VERSION >> 16, (RTMP_LIB_VERSION >> 8) & 0xff,
               suff);
     src[i++] = rtmp_version;
+  }
+#endif
+#ifdef USE_HYPER
+  msnprintf(hyper_buf, sizeof(hyper_buf), "Hyper/%s", hyper_version());
+  src[i++] = hyper_buf;
+#endif
+#ifdef USE_GSASL
+  msnprintf(gsasl_buf, sizeof(gsasl_buf), "libgsasl/%s",
+            gsasl_check_version(NULL));
+  src[i++] = gsasl_buf;
+#endif
+#ifdef USE_OPENLDAP
+  {
+    LDAPAPIInfo api;
+    api.ldapai_info_version = LDAP_API_INFO_VERSION;
+
+    if(ldap_get_option(NULL, LDAP_OPT_API_INFO, &api) == LDAP_OPT_SUCCESS) {
+      unsigned int patch = api.ldapai_vendor_version % 100;
+      unsigned int major = api.ldapai_vendor_version / 10000;
+      unsigned int minor =
+        ((api.ldapai_vendor_version - major * 10000) - patch) / 100;
+      msnprintf(ldap_buf, sizeof(ldap_buf), "%s/%u.%u.%u",
+                api.ldapai_vendor_name, major, minor, patch);
+      src[i++] = ldap_buf;
+      ldap_memfree(api.ldapai_vendor_name);
+      ber_memvfree((void **)api.ldapai_extensions);
+    }
   }
 #endif
 
@@ -274,6 +304,9 @@ static const char * const protocols[] = {
 #ifndef CURL_DISABLE_GOPHER
   "gopher",
 #endif
+#if defined(USE_SSL) && !defined(CURL_DISABLE_GOPHER)
+  "gophers",
+#endif
 #ifndef CURL_DISABLE_HTTP
   "http",
 #endif
@@ -316,7 +349,7 @@ static const char * const protocols[] = {
   "sftp",
 #endif
 #if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE) && \
-   (CURL_SIZEOF_CURL_OFF_T > 4)
+   (SIZEOF_CURL_OFF_T > 4)
   "smb",
 #  ifdef USE_SSL
   "smbs",
@@ -381,20 +414,17 @@ static curl_version_info_data version_info = {
 #ifdef CURLRES_ASYNCH
   | CURL_VERSION_ASYNCHDNS
 #endif
-#if (CURL_SIZEOF_CURL_OFF_T > 4) && \
+#if (SIZEOF_CURL_OFF_T > 4) && \
     ( (SIZEOF_OFF_T > 4) || defined(USE_WIN32_LARGE_FILES) )
   | CURL_VERSION_LARGEFILE
 #endif
 #if defined(WIN32) && defined(UNICODE) && defined(_UNICODE)
   | CURL_VERSION_UNICODE
 #endif
-#if defined(CURL_DOES_CONVERSIONS)
-  | CURL_VERSION_CONV
-#endif
 #if defined(USE_TLS_SRP)
   | CURL_VERSION_TLSAUTH_SRP
 #endif
-#if defined(USE_NGHTTP2)
+#if defined(USE_NGHTTP2) || defined(USE_HYPER)
   | CURL_VERSION_HTTP2
 #endif
 #if defined(ENABLE_QUIC)
@@ -418,8 +448,14 @@ static curl_version_info_data version_info = {
 #ifndef CURL_DISABLE_ALTSVC
   | CURL_VERSION_ALTSVC
 #endif
-#if defined(USE_HSTS)
+#ifndef CURL_DISABLE_HSTS
   | CURL_VERSION_HSTS
+#endif
+#if defined(USE_GSASL)
+  | CURL_VERSION_GSASL
+#endif
+#if defined(GLOBAL_INIT_IS_THREADSAFE)
+  | CURL_VERSION_THREADSAFE
 #endif
   ,
   NULL, /* ssl_version */
@@ -447,7 +483,9 @@ static curl_version_info_data version_info = {
   NULL,
 #endif
   0,    /* zstd_ver_num */
-  NULL  /* zstd version */
+  NULL, /* zstd version */
+  NULL, /* Hyper version */
+  NULL  /* gsasl version */
 };
 
 curl_version_info_data *curl_version_info(CURLversion stamp)
@@ -468,7 +506,6 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
 #ifdef HAVE_ZSTD
   static char zstd_buffer[80];
 #endif
-
 
 #ifdef USE_SSL
   Curl_ssl_version(ssl_buffer, sizeof(ssl_buffer));
@@ -502,15 +539,6 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   version_info.features |= CURL_VERSION_IDN;
 #endif
 
-#if defined(HAVE_ICONV) && defined(CURL_DOES_CONVERSIONS)
-#ifdef _LIBICONV_VERSION
-  version_info.iconv_ver_num = _LIBICONV_VERSION;
-#else
-  /* version unknown */
-  version_info.iconv_ver_num = -1;
-#endif /* _LIBICONV_VERSION */
-#endif
-
 #if defined(USE_SSH)
   Curl_ssh_version(ssh_buffer, sizeof(ssh_buffer));
   version_info.libssh_version = ssh_buffer;
@@ -541,6 +569,20 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
     static char quicbuffer[80];
     Curl_quic_ver(quicbuffer, sizeof(quicbuffer));
     version_info.quic_version = quicbuffer;
+  }
+#endif
+
+#ifdef USE_HYPER
+  {
+    static char hyper_buffer[30];
+    msnprintf(hyper_buffer, sizeof(hyper_buffer), "Hyper/%s", hyper_version());
+    version_info.hyper_version = hyper_buffer;
+  }
+#endif
+
+#ifdef USE_GSASL
+  {
+    version_info.gsasl_version = gsasl_check_version(NULL);
   }
 #endif
 

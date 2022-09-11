@@ -74,6 +74,13 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
 }
 
+void CStreamingSA::RemoveModel(std::uint32_t model)
+{
+    using Signature = void(__cdecl*)(std::uint32_t);
+    const auto function = reinterpret_cast<Signature>(0x4089A0);
+    function(model);
+}
+
 void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
 {
     TIMEUS startTime = GetTimeUs();
@@ -151,4 +158,14 @@ void CStreamingSA::ReinitStreaming()
     Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
 
     reinitStreaming();
+}
+
+void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
+{
+    (reinterpret_cast<void(__cdecl*)(std::uint32_t)>(0x40E120))(memoryToCleanInBytes);
+}
+
+std::uint32_t CStreamingSA::GetMemoryUsed() const
+{
+    return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
 }

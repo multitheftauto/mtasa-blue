@@ -60,7 +60,7 @@ bool CallRemoteFunction(HANDLE hProcess, const SString& strFunctionName, const W
         }
 
         /* Start a remote thread executing LoadLibraryA exported from Kernel32. Passing the
-           remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
+           remotely allocated path buffer as an argument to that thread (and also to LoadLibraryA)
            will make the remote process load the DLL into it's userspace (giving the DLL full
            access to the game executable).*/
         LPTHREAD_START_ROUTINE pFunc = reinterpret_cast<LPTHREAD_START_ROUTINE>(GetProcAddress(hKernel32, strFunctionName));
@@ -1966,7 +1966,7 @@ void BsodDetectionOnGameEnd()
 //////////////////////////////////////////////////////////
 void ForbodenProgramsMessage()
 {
-    std::vector<SString> forbodenList = {"ProcessHacker", "CheatEngine", "PCHunter"};
+    std::vector<SString> forbodenList = {"CheatEngine", "PCHunter"};
     std::vector<SString> foundList;
     for (auto processId : MyEnumProcesses(true))
     {

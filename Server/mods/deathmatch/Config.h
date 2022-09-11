@@ -16,37 +16,6 @@
 #include <MTAPlatform.h>
 #include <Common.h>
 
-/*** va_pass() (passing of ... variable length arguments ***/
-template <unsigned char count>
-struct SVaPassNext
-{
-    SVaPassNext<count - 1> big;
-    unsigned long          dw;
-};
-template <>
-struct SVaPassNext<0>
-{
-};
-// SVaPassNext - is generator of structure of any size at compile time.
-
-class CVaPassNext
-{
-public:
-    SVaPassNext<50> svapassnext;
-    CVaPassNext(va_list& args)
-    {
-        try
-        {            // to avoid access violation
-            memcpy(&svapassnext, args, sizeof(svapassnext));
-        }
-        catch (...)
-        {
-        }
-    }
-};
-#define va_pass(valist) CVaPassNext(valist).svapassnext
-/*** va_pass() (passing of ... variable length arguments ***/
-
 // Min and max number of characters in player nicknames (this must match the client's)
 #define MIN_PLAYER_NICK_LENGTH 1
 #define MAX_PLAYER_NICK_LENGTH 22

@@ -51,8 +51,8 @@ public:
     typedef std::unique_ptr<CAnimBlendAssociation>       AnimBlendAssoc_type;
     typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
     typedef std::unique_ptr<CAnimBlendAssocGroup>        AnimAssocGroup_type;
-    virtual void Initialize() = 0;
-    virtual void Shutdown() = 0;
+    virtual void                                         Initialize() = 0;
+    virtual void                                         Shutdown() = 0;
 
     virtual int GetNumAnimations() = 0;
     virtual int GetNumAnimBlocks() = 0;

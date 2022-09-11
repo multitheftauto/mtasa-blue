@@ -843,6 +843,16 @@ void CBassAudio::ApplyFxEffects()
     }
 }
 
+BOOL CBassAudio::SetFxParameters(uint iFxEffect, void* params)
+{
+    return BASS_FXSetParameters(m_FxEffects[iFxEffect], params);
+}
+
+BOOL CBassAudio::GetFxParameters(uint iFxEffect, void* params)
+{
+    return BASS_FXGetParameters(m_FxEffects[iFxEffect], params);
+}
+
 //
 // Must be call every frame
 //
