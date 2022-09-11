@@ -140,14 +140,18 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                 }
             }
 
-            if (wState == WA_ACTIVE)
+            switch (wState)
             {
-                GetVideoModeManager()->OnGainFocus();
-            }
-            else if (wState == WA_INACTIVE)
-            {
-                GetVideoModeManager()->OnLoseFocus();
-                g_pCore->GetKeyBinds()->OnLoseFocus();
+                case WA_ACTIVE:
+                    GetVideoModeManager()->OnGainFocus();
+                    break;
+
+                case WA_INACTIVE:
+                {
+                    GetVideoModeManager()->OnLoseFocus();
+                    g_pCore->GetKeyBinds()->OnLoseFocus();
+                    break;
+                }
             }
         }
 
