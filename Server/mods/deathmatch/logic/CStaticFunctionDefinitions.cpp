@@ -105,12 +105,10 @@ static CCustomWeaponManager* m_pCustomWeaponManager;
 #define RUN_CHILDREN(func) \
     if (pElement->CountChildren() && pElement->IsCallPropagationEnabled()) \
     { \
-        CElementListSnapshot* pList = pElement->GetChildrenListSnapshot(); \
-        pList->AddRef(); /* Keep list alive during use */ \
+        CElementListSnapshotRef pList = pElement->GetChildrenListSnapshot(); \
         for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
             if (!(*iter)->IsBeingDeleted()) \
                 func; \
-        pList->Release(); \
     }
 
 CStaticFunctionDefinitions::CStaticFunctionDefinitions(CGame* pGame)
