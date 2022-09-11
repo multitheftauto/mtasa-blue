@@ -288,7 +288,7 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
         }
     }
 
-    memset((void*)cpBuffer, 0, uiSize);
+    std::fill_n(const_cast<char*>(cpBuffer), uiSize, 0);
     return false;
 }
 
