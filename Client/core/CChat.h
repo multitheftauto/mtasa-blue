@@ -204,8 +204,8 @@ public:
 
     void      SetCharacterLimit(int charLimit);
     int       GetCharacterLimit() const { return m_iCharacterLimit; }
-    const int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
-    const int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
+    int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
+    int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
 
 private:
     void LoadCVars();

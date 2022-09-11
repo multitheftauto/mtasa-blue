@@ -287,7 +287,7 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
     lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
-    //lua_classvariable(luaVM, "chatboxCharacterLimit", "setChatboxCharacterLimit", "getChatboxCharacterLimit");
+    lua_classvariable(luaVM, "chatboxCharacterLimit", "setChatboxCharacterLimit", "getChatboxCharacterLimit");
 
     lua_registerclass(luaVM, "GuiElement", "Element");
 }
