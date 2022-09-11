@@ -19,6 +19,7 @@ enum class eClientModelType
     PED,
     OBJECT,
     VEHICLE,
+    TIMED_OBJECT,
 };
 
 class CResource;
