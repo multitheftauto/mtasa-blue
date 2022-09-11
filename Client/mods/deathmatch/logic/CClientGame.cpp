@@ -92,7 +92,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
-    m_bWasFocused = g_pCore->IsFocused();
+    m_bFocused = g_pCore->IsFocused();
 
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
