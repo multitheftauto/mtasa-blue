@@ -569,7 +569,8 @@ public:
     static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool ignoreDistanceToWaterThreshold, CVector& vecUnknown);
     static bool          GetWaterLevel(CClientWater* pWater, float& fLevel);
     static bool          GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex, CVector& vecPosition);
-    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel);
+    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel,
+                                            bool bIncludeOutsideWorldLevel);
     static bool          SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     static bool          SetAllElementWaterLevel(float fLevel, void* pChangeSource);
     static bool          ResetWorldWaterLevel();
@@ -734,7 +735,8 @@ public:
 
     // Sound funcs
     static CClientSound* PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
-    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
+    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop,
+                                     bool bThrottle);
     static bool          StopSound(CClientSound& Sound);
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);

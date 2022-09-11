@@ -126,11 +126,10 @@ public:
     void _QuitCurrentProgram();
 
     // Doers
-    int DoSendDownloadRequestToNextServer();
-    int DoPollDownload();
-    int DoSendPostToNextServer();
-    int DoPollPost();
-    void OnMainMenuFullyVisible();
+    int  DoSendDownloadRequestToNextServer();
+    int  DoPollDownload();
+    int  DoSendPostToNextServer();
+    int  DoPollPost();
 
     static void* StaticThreadProc(void* pContext);
     void*        ThreadProc();
@@ -3109,7 +3108,8 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     SString        strVideoCard = SStringX(g_pDeviceState->AdapterState.Name).Left(30);
-    std::replace_if(strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
+    std::replace_if(
+        strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
     SString strSystemStats(
         "1_%d_%d_%d_%d_%d"
         "_%d%d%d%d"
@@ -3377,26 +3377,4 @@ int CVersionUpdater::DoPollPost()
         return RES_POLL;
     }
     return RES_OK;
-}
-
-// Issue: #1708
-// Set the update settings to stable build if the user is on 1.5.8.
-// We do this only once, this is why we need to write to registry.
-void CVersionUpdater::OnMainMenuFullyVisible()
-{
-    if (MTASA_VERSION_BUILD != 20670)            // 20670 is the build number with PR #1712 merged.
-        return;
-    const std::string requiredValue = "discord-rich-presence";
-    const std::string lastSubKey = "version-revert-reason";
-    if (GetApplicationSetting(lastSubKey) != requiredValue)
-    {
-        SetApplicationSetting(lastSubKey, requiredValue);
-        // check if the MTA client version is 1.5.8
-        if (MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
-        {
-            CVARS_SET("update_build_type", 0);
-            std::string message = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
-            g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), message.c_str(), MB_BUTTON_OK | MB_ICON_INFO);
-        }
-    }
 }

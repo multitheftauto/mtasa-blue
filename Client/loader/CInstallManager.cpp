@@ -611,7 +611,8 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         }
         else
         {
-            AddReportLog(5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s' %s", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
+            AddReportLog(
+                5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s' %s", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
             SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
             strMessage += "\n\n" + strGtaExe;
             strMessage += "\n\n" + _("Error") + SString(" %d", result);

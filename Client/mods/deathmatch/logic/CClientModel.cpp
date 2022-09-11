@@ -32,11 +32,17 @@ bool CClientModel::Allocate(ushort usParentID)
     if (pModelInfo->IsValid())
         return false;
 
+    // Avoid hierarchy
+    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(usParentID, true);
+
+    if (pParentModelInfo->GetParentID())
+        return false;
+
     switch (m_eModelType)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
-            break;
+            return true;
         case eClientModelType::OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
@@ -107,6 +113,11 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+
+            // Restore pickups with custom model
+            CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
+
+            unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);

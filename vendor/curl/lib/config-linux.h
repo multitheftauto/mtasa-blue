@@ -43,6 +43,9 @@
 /* to disable Gopher */
 /* #undef CURL_DISABLE_GOPHER */
 
+/* disable headers-api */
+/* #undef CURL_DISABLE_HEADERS_API */
+
 /* disable alt-svc */
 #define CURL_DISABLE_HSTS 1
 
@@ -151,6 +154,9 @@
 /* Define to 1 if you have the <assert.h> header file. */
 #define HAVE_ASSERT_H 1
 
+/* Define to 1 if you have _Atomic support. */
+#define HAVE_ATOMIC 1
+
 /* Define to 1 if you have the basename function. */
 #define HAVE_BASENAME 1
 
@@ -199,6 +205,9 @@
 
 /* Define to 1 if you have the <err.h> header file. */
 /* #undef HAVE_ERR_H */
+
+/* Define to 1 if you have the `fchmod' function. */
+#define HAVE_FCHMOD 1
 
 /* Define to 1 if you have the fcntl function. */
 #define HAVE_FCNTL 1
@@ -447,6 +456,9 @@
 /* Define to 1 if you have the MSG_NOSIGNAL flag. */
 #define HAVE_MSG_NOSIGNAL 1
 
+/* Define to 1 if you have the <msh3.h> header file. */
+/* #undef HAVE_MSH3_H */
+
 /* Define to 1 if you have the <netdb.h> header file. */
 #define HAVE_NETDB_H 1
 
@@ -458,6 +470,9 @@
 
 /* Define to 1 if you have the <netinet/tcp.h> header file. */
 #define HAVE_NETINET_TCP_H 1
+
+/* Define to 1 if you have the <netinet/udp.h> header file. */
+#define HAVE_NETINET_UDP_H 1
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #define HAVE_NET_IF_H 1
@@ -493,14 +508,12 @@
 /* Define to 1 if you have the <openssl/rsa.h> header file. */
 /* #undef HAVE_OPENSSL_RSA_H */
 
-/* if you have the function SRP_Calc_client_key */
+/* if you have the functions SSL_CTX_set_srp_username and
+   SSL_CTX_set_srp_password */
 /* #undef HAVE_OPENSSL_SRP */
 
 /* Define to 1 if you have the <openssl/ssl.h> header file. */
 /* #undef HAVE_OPENSSL_SSL_H */
-
-/* Define to 1 if you have the `OpenSSL_version' function. */
-/* #undef HAVE_OPENSSL_VERSION */
 
 /* Define to 1 if you have the <openssl/x509.h> header file. */
 /* #undef HAVE_OPENSSL_X509_H */
@@ -550,11 +563,17 @@
 /* Define to 1 if you have the <rsa.h> header file. */
 /* #undef HAVE_RSA_H */
 
+/* Define to 1 if you have the `sched_yield' function. */
+#define HAVE_SCHED_YIELD 1
+
 /* Define to 1 if you have the select function. */
 #define HAVE_SELECT 1
 
 /* Define to 1 if you have the send function. */
 #define HAVE_SEND 1
+
+/* Define to 1 if you have the `sendmsg' function. */
+#define HAVE_SENDMSG 1
 
 /* Define to 1 if you have the <setjmp.h> header file. */
 #define HAVE_SETJMP_H 1
@@ -600,9 +619,6 @@
 
 /* Define to 1 if you have the <socket.h> header file. */
 /* #undef HAVE_SOCKET_H */
-
-/* Define to 1 if you have the `SSLv2_client_method' function. */
-/* #undef HAVE_SSLV2_CLIENT_METHOD */
 
 /* Define to 1 if you have the `SSL_get_ech_status' function. */
 /* #undef HAVE_SSL_GET_ECH_STATUS */
@@ -762,9 +778,6 @@
 
 /* Define to 1 if you have the winsock2.h header file. */
 /* #undef HAVE_WINSOCK2_H */
-
-/* Define to 1 if you have the winsock.h header file. */
-/* #undef HAVE_WINSOCK_H */
 
 /* Define to 1 if you have the <wolfssh/ssh.h> header file. */
 /* #undef HAVE_WOLFSSH_SSH_H */
@@ -969,8 +982,8 @@
 /* if mbedTLS is enabled */
 /* #undef USE_MBEDTLS */
 
-/* if MesaLink is enabled */
-/* #undef USE_MESALINK */
+/* if msh3 is in use */
+/* #undef USE_MSH3 */
 
 /* if nghttp2 is in use */
 /* #undef USE_NGHTTP2 */

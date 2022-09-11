@@ -78,6 +78,7 @@ public:
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
+    void                InitHooks_FrameRateFixes();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -141,6 +142,7 @@ public:
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
     void SetPedStepHandler(PedStepHandler* pHandler);
     void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
+    void SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler);
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
@@ -291,8 +293,8 @@ public:
         m_dwLastAnimArrayAddress = dwAnimArrayAddress;
     }
     eAnimGroup GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
-    eAnimID GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
-    DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
+    eAnimID    GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
+    DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
@@ -315,7 +317,7 @@ private:
     float               m_fNearClipDistance;
     float               m_fMaddDoggPoolLevel;
     eAnimGroup          m_dwLastStaticAnimGroupID;
-    eAnimID          m_dwLastStaticAnimID;
+    eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
 

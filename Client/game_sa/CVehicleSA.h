@@ -164,6 +164,10 @@ class CVehicleSA;
 #define VAR_CVehicle_Variation1                 0x8A6458
 #define VAR_CVehicle_Variation2                 0x8A6459
 
+// for vehicle sun glare
+#define FUNC_CAutomobile_OnVehiclePreRender 0x6ABCFD
+#define FUNC_CVehicle_DoSunGlare            0x6DD6F0
+
 struct SRailNodeSA
 {
     short sX;                       // x coordinate times 8
@@ -403,8 +407,8 @@ public:
     // 1216
     float m_nHealth;            // 1000.0f = full health. 0 -> explode
 
-    CVehicleSAInterface* m_towingVehicle;      // 1220
-    CVehicleSAInterface* m_trailerVehicle;     // 1224
+    CVehicleSAInterface* m_towingVehicle;             // 1220
+    CVehicleSAInterface* m_trailerVehicle;            // 1224
 
     CPedSAInterface* m_bombPlanter;                         // 1228
     uint32_t         m_deleteAfterTime;                     // 1232
@@ -437,7 +441,7 @@ public:
     CFxSystemSAInterface* m_overheatParticle;
     CFxSystemSAInterface* m_fireParticle;
     CFxSystemSAInterface* m_dustParticle;
-    uint32_t m_renderLights;
+    uint32_t              m_renderLights;
 
     // 1416
     RwTexture* m_pCustomPlateTexture;
@@ -768,6 +772,10 @@ public:
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
+
+    static void StaticSetHooks();
+    static void SetVehiclesSunGlareEnabled(bool bEnabled);
+    static bool GetVehiclesSunGlareEnabled();
 
 private:
     static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);

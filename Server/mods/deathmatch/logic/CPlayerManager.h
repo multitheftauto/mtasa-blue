@@ -44,9 +44,9 @@ public:
     std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
-    void BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
-    void BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
-    void BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = NULL);
+    size_t BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
+    size_t BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
+    size_t BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = NULL);
 
     static void Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList);
@@ -58,8 +58,8 @@ public:
     void ClearElementData(CElement* pElement, const std::string& name);
     void ClearElementData(CElement* pElement);
 
-    void           ResetAll();
-    void           OnPlayerJoin(CPlayer* pPlayer);
+    void               ResetAll();
+    void               OnPlayerJoin(CPlayer* pPlayer);
     const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
 
 private:

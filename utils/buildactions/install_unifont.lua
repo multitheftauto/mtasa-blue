@@ -27,14 +27,17 @@ newaction {
 		-- Download Unifont
 		print("Downloading Unifont...")
 		if not http.download_print_errors(UNIFONT_BASEURL..UNIFONT_TAG.."/"..UNIFONT_DOWNLOAD_FILENAME, archive_path) then
+			os.exit(1)
 			return
 		end
 
 		-- Check downloaded file hash
-		if os.sha256_file(archive_path) ~= UNIFONT_HASH then
-			print("Unifont hash mismatch!")
+		local download_hash = os.sha256_file(archive_path)
+		if download_hash ~= UNIFONT_HASH then
+			errormsg("ERROR: Unifont hash mismatch!", ("\nExpected %s, got %s"):format(UNIFONT_HASH, download_hash))
 			-- Delete bad file
 			os.remove(archive_path)
+			os.exit(1)
 			return
 		end
 

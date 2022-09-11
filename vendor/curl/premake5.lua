@@ -4,7 +4,7 @@ project "curl"
 	kind "StaticLib"
 	targetname "curl"
 
-	includedirs { "include", "lib", "../mbedtls/2.27.0/include", "../zlib" }
+	includedirs { "include", "lib", "../mbedtls/2.28.0/include", "../zlib" }
 	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H" }
 	warnings "off"
 
@@ -20,11 +20,9 @@ project "curl"
 		"lib/config-dos.h",
 		"lib/config-mac.h",
 		"lib/config-os400.h",
+		"lib/config-plan9.h",
 		"lib/config-riscos.h",
-		"lib/config-symbian.h",
-		"lib/config-tpf.h",
 		"lib/config-win32ce.h",
-		"lib/config-vxworks.h",
 		"lib/setup-os400.h",
 		"lib/setup-vms.h"
 	}
@@ -33,10 +31,7 @@ project "curl"
 		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN", "WANT_IDN_PROTOTYPES" }
 		links { "crypt32", "Normaliz" }
 
-	filter { "system:macosx" }
-		defines { "USE_DARWINSSL" }
-
-	filter { "system:not windows", "system:not macosx" }
+	filter { "system:not windows" }
 		defines { "USE_MBEDTLS" }
 
 	filter { "system:linux or bsd or macosx" }

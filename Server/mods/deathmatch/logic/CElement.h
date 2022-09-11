@@ -18,6 +18,7 @@
 #include "CEvents.h"
 #include <list>
 #include <cstring>
+#include "Enums.h"
 #include "CElementGroup.h"
 
 // Used to check fast version of getElementsByType
@@ -39,6 +40,8 @@
 #define IS_TEAM(element)     ((element)->GetType()==CElement::TEAM)
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 #define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
+
+class CLuaMain;
 
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
@@ -141,9 +144,10 @@ public:
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL, bool bTriggerEvent = true);
-    void DeleteCustomData(const char* szName);
-    void SendAllCustomData(CPlayer* pPlayer);
+    void           SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
+                                 bool bTriggerEvent = true);
+    void           DeleteCustomData(const char* szName);
+    void           SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 

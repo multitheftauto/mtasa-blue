@@ -89,7 +89,7 @@ void CVehicleRPCs::BlowVehicle(CClientEntity* pSource, NetBitStreamInterface& bi
         }
 
         CClientVehicle* vehicle = m_pVehicleManager->Get(pSource->GetID());
-        
+
         if (vehicle)
         {
             VehicleBlowFlags blow;

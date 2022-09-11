@@ -26,7 +26,7 @@ std::unordered_map<DWORD, unsigned short>                             CModelInfo
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
-static constexpr size_t RESOURCE_ID_COL = 25000;
+static constexpr size_t    RESOURCE_ID_COL = 25000;
 
 static void CBaseModelInfo_SetColModel(CBaseModelInfoSAInterface* self, CColModelSAInterface* colModel, bool applyToPairedModel)
 {
@@ -241,7 +241,7 @@ BYTE CModelInfoSA::GetVehicleType()
     // This function will return a vehicle type for vehicles or 0xFF on failure
     DWORD dwFunction = FUNC_IsVehicleModelType;
     DWORD ModelID = m_dwModelID;
-    BYTE bReturn = -1;
+    BYTE  bReturn = -1;
     _asm
     {
         push    ModelID
@@ -665,7 +665,8 @@ void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
         fDistance = std::min(fDistance, fMaximumValue);
     }
 #endif
-    if (!bOverrideMaxDistance) {
+    if (!bOverrideMaxDistance)
+    {
         // Limit to 325.f as it goes horrible after that
         fDistance = std::min(fDistance, 325.f);
     }
@@ -1102,7 +1103,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return; // Early out in case the model doesn't have any dummies modified
+        return;            // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
@@ -1120,7 +1121,8 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 void CModelInfoSA::ResetAllVehicleDummies()
 {
     CGame* game = g_pCore->GetGame();
-    for (auto& info : ms_ModelDefaultDummiesPosition) {
+    for (auto& info : ms_ModelDefaultDummiesPosition)
+    {
         CModelInfo* modelInfo = game->GetModelInfo(info.first);
         if (modelInfo)
             modelInfo->ResetVehicleDummies(false);
@@ -1507,6 +1509,22 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
+
+    switch (GetModelType())
+    {
+        case eModelInfoType::VEHICLE:
+            delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::PED:
+            delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::ATOMIC:
+            delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        default:
+            break;
+    }
+
     ppModelInfo[m_dwModelID] = nullptr;
     pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
 }

@@ -82,7 +82,7 @@ public:
 
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);
-    
+
     bool SetFxEffectParameters(uint uiFxEffect, void* params);
     bool GetFxEffectParameters(uint uiFxEffect, void* params);
 

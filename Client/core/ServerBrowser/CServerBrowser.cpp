@@ -346,7 +346,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pAddressFavoriteIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\favorite.png");
     m_pAddressFavoriteIcon[type]->SetAlpha(0.3f);
     m_pAddressFavoriteIcon[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFavouritesClick, this));
-    
+
     // Remove recent played icon
     if (type == ServerBrowserTypes::RECENTLY_PLAYED)
     {
@@ -890,7 +890,7 @@ void CServerBrowser::UpdateServerList(ServerBrowserType Type, bool bClearServerL
 
     m_pServerList[Type]->ForceUpdate();
     pList->SetUpdated(false);
-    
+
     if (Type == ServerBrowserTypes::RECENTLY_PLAYED)
         m_pRemoveFromRecentIcon[Type]->SetAlpha(0.3f);
 }

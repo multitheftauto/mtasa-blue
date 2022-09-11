@@ -34,7 +34,7 @@
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
-extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
+extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 
 #define     FUNC_GetLevelFromPosition       0x4DD300
 
@@ -85,6 +85,8 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;  // default: 160
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
+#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
+
 
 struct SCheatSA
 {
@@ -106,9 +108,10 @@ class CGameSA : public CGame
     typedef std::unique_ptr<CAnimBlendAssocGroup> AssocGroup_type;
 
 private:
-    CWeaponInfo* WeaponInfos[NUM_WeaponInfosTotal];
-    CModelInfoSA* ModelInfo;
+    CWeaponInfo*                      WeaponInfos[NUM_WeaponInfosTotal];
+    CModelInfoSA*                     ModelInfo;
     CObjectGroupPhysicalPropertiesSA* ObjectGroupsInfo;
+
 public:
     ZERO_ON_NEW
 
@@ -390,6 +393,9 @@ public:
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
+    void SetVehicleSunGlareEnabled(bool bEnabled);
+    bool IsVehicleSunGlareEnabled();
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -526,6 +532,6 @@ private:
 
     SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
 
-    CPed*                m_pPedContext;
-    CTickCount           m_llASyncLoadingAutoUnsuspendTime;
+    CPed*      m_pPedContext;
+    CTickCount m_llASyncLoadingAutoUnsuspendTime;
 };
