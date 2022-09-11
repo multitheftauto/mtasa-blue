@@ -11,7 +11,10 @@
 
 #include "StdInc.h"
 #include "CDatabaseType.h"
+#include "CDatabaseManager.h"
 #include "CDynamicLibrary.h"
+#include "CPerfStatManager.h"
+#include <sqlite/sqlite3.h>
 
 #define LIB_DBCONMY "dbconmy" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 

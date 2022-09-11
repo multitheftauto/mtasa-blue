@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicle.h"
+#include "CVehicleManager.h"
+#include "CHandlingManager.h"
+#include "CElementRefManager.h"
+#include "CGame.h"
+#include "packets/CVehicleInOutPacket.h"
+#include "CBandwidthSettings.h"
+#include "Utils.h"
 
 extern CGame* g_pGame;
 

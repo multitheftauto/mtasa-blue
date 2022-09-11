@@ -8,7 +8,7 @@
  *                             \___|\___/|_| \_\_____|
  *
  * Copyright (C) 2012, Marc Hoersken, <info@marc-hoersken.de>, et al.
- * Copyright (C) 2012 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -21,10 +21,34 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "curl_setup.h"
 
 #ifdef USE_SCHANNEL
+
+#define SCHANNEL_USE_BLACKLISTS 1
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4201)
+#endif
+#include <subauth.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+/* Wincrypt must be included before anything that could include OpenSSL. */
+#if defined(USE_WIN32_CRYPTO)
+#include <wincrypt.h>
+/* Undefine wincrypt conflicting symbols for BoringSSL. */
+#undef X509_NAME
+#undef X509_EXTENSIONS
+#undef PKCS7_ISSUER_AND_SERIAL
+#undef PKCS7_SIGNER_INFO
+#undef OCSP_REQUEST
+#undef OCSP_RESPONSE
+#endif
 
 #include <schnlsp.h>
 #include <schannel.h>
@@ -60,7 +84,6 @@ CURLcode Curl_verify_certificate(struct Curl_easy *data,
 #ifdef EXPOSE_SCHANNEL_INTERNAL_STRUCTS
 
 #ifdef __MINGW32__
-#include <_mingw.h>
 #ifdef __MINGW64_VERSION_MAJOR
 #define HAS_MANUAL_VERIFY_API
 #endif
@@ -71,11 +94,67 @@ CURLcode Curl_verify_certificate(struct Curl_easy *data,
 #endif
 #endif
 
-#define NUMOF_CIPHERS 45 /* There are 45 listed in the MS headers */
+#ifndef SCH_CREDENTIALS_VERSION
+
+#define SCH_CREDENTIALS_VERSION  0x00000005
+
+typedef enum _eTlsAlgorithmUsage
+{
+    TlsParametersCngAlgUsageKeyExchange,
+    TlsParametersCngAlgUsageSignature,
+    TlsParametersCngAlgUsageCipher,
+    TlsParametersCngAlgUsageDigest,
+    TlsParametersCngAlgUsageCertSig
+} eTlsAlgorithmUsage;
+
+typedef struct _CRYPTO_SETTINGS
+{
+    eTlsAlgorithmUsage  eAlgorithmUsage;
+    UNICODE_STRING      strCngAlgId;
+    DWORD               cChainingModes;
+    PUNICODE_STRING     rgstrChainingModes;
+    DWORD               dwMinBitLength;
+    DWORD               dwMaxBitLength;
+} CRYPTO_SETTINGS, * PCRYPTO_SETTINGS;
+
+typedef struct _TLS_PARAMETERS
+{
+    DWORD               cAlpnIds;
+    PUNICODE_STRING     rgstrAlpnIds;
+    DWORD               grbitDisabledProtocols;
+    DWORD               cDisabledCrypto;
+    PCRYPTO_SETTINGS    pDisabledCrypto;
+    DWORD               dwFlags;
+} TLS_PARAMETERS, * PTLS_PARAMETERS;
+
+typedef struct _SCH_CREDENTIALS
+{
+    DWORD               dwVersion;
+    DWORD               dwCredFormat;
+    DWORD               cCreds;
+    PCCERT_CONTEXT* paCred;
+    HCERTSTORE          hRootStore;
+
+    DWORD               cMappers;
+    struct _HMAPPER **aphMappers;
+
+    DWORD               dwSessionLifespan;
+    DWORD               dwFlags;
+    DWORD               cTlsParameters;
+    PTLS_PARAMETERS     pTlsParameters;
+} SCH_CREDENTIALS, * PSCH_CREDENTIALS;
+
+#define SCH_CRED_MAX_SUPPORTED_PARAMETERS 16
+#define SCH_CRED_MAX_SUPPORTED_ALPN_IDS 16
+#define SCH_CRED_MAX_SUPPORTED_CRYPTO_SETTINGS 16
+#define SCH_CRED_MAX_SUPPORTED_CHAINING_MODES 16
+
+#endif
 
 struct Curl_schannel_cred {
   CredHandle cred_handle;
   TimeStamp time_stamp;
+  TCHAR *sni_hostname;
   int refcount;
 };
 
@@ -104,7 +183,6 @@ struct ssl_backend_data {
 #ifdef HAS_MANUAL_VERIFY_API
   bool use_manual_cred_validation; /* true if manual cred validation is used */
 #endif
-  ALG_ID algIds[NUMOF_CIPHERS];
 };
 #endif /* EXPOSE_SCHANNEL_INTERNAL_STRUCTS */
 

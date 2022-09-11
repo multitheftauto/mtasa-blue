@@ -9,12 +9,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerResourceStartPacket.h"
+#include "CGame.h"
+#include "CResourceManager.h"
 
 bool CPlayerResourceStartPacket::Read(NetBitStreamInterface& BitStream)
 {
     ushort usResourceNetId;
     BitStream.Read(usResourceNetId);
     m_pResource = g_pGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
-
     return true;
 }

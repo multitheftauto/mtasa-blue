@@ -98,8 +98,6 @@ public:
     void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
     bool               ShouldIgnoreMinClientVersionChecks();
-    void               SetDiscordJoinSecret(const SString& joinSecret) { m_strDiscordJoinSecret = joinSecret; }
-    SString            GetDiscordJoinSecret() const { return m_strDiscordJoinSecret; }
 
     bool IsMuted() { return m_bIsMuted; };
     void SetMuted(bool bSetMuted) { m_bIsMuted = bSetMuted; };
@@ -362,7 +360,6 @@ private:
     bool           m_bIsMuted;
     bool           m_bIsLeavingServer;
     bool           m_bIsJoined;
-    SString        m_strDiscordJoinSecret;
 
     bool m_bNametagColorOverridden;
 

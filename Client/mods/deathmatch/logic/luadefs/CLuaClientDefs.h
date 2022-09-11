@@ -26,4 +26,5 @@ private:
     static bool IsChatVisible();
     static bool IsChatInputBlocked();
     static bool ClearDebug();
+    static bool IsCapsLockEnabled();
 };

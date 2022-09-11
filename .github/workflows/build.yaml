@@ -7,13 +7,19 @@ jobs:
   windows:
     strategy:
       matrix:
-        type: [release, debug]
-    name: windows-${{ matrix.type }}
+        configuration: [release, debug]
+        platform: [win32, x64, arm64]
+        include:
+        - configuration: release
+          artifact-name: InstallFiles
+        - configuration: debug
+          artifact-name: InstallFiles-debug
+    name: windows-${{ matrix.configuration }}-${{ matrix.platform }}
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         id: cache-dxfiles
         with:
           path: utils/DXFiles
@@ -35,17 +41,8 @@ jobs:
       - name: Install data files
         run: utils\premake5 install_data
 
-      - name: Run Build [Release]
-        if: ${{ matrix.type == 'release' }}
-        run: win-build.bat
-        shell: cmd
-        env:
-          DXSDK_DIR: './utils/DXFiles/'
-          CI: 'true'
-
-      - name: Run Build [Debug]
-        if: ${{ matrix.type == 'debug' }}
-        run: win-build.bat Debug
+      - name: Run Build
+        run: win-build.bat ${{ matrix.configuration }} ${{ matrix.platform }}
         shell: cmd
         env:
           DXSDK_DIR: './utils/DXFiles/'
@@ -55,15 +52,8 @@ jobs:
         run: utils\premake5 compose_files
 
       - uses: actions/upload-artifact@master
-        if: ${{ matrix.type == 'release' }}
         with:
-          name: InstallFiles
-          path: InstallFiles/
-
-      - uses: actions/upload-artifact@master
-        if: ${{ matrix.type == 'debug' }}
-        with:
-          name: InstallFiles-debug
+          name: ${{ matrix.artifact-name }}
           path: InstallFiles/
 
   macOS:
@@ -73,7 +63,7 @@ jobs:
     name: macOS-${{ matrix.type }}
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install MySQL
         run: brew install mysql
@@ -82,29 +72,25 @@ jobs:
       - name: Link MySQL
         run: brew link --overwrite mysql
 
-      - name: Run Build [Release]
-        if: ${{ matrix.type == 'release' }}
-        run: ./linux-build.sh
-
-      - name: Run Build [Debug]
-        if: ${{ matrix.type == 'debug' }}
-        run: ./linux-build.sh "" debug
+      - name: Run Build
+        run: ./linux-build.sh --config=${{ matrix.type }}
 
   linux:
     strategy:
       matrix:
         type: [release, debug]
-    name: linux-${{ matrix.type }}
+        architecture: [x64, arm64]
+        include:
+        - architecture: x64
+          image-tag: latest
+        - architecture: arm64
+          image-tag: arm64
+    name: linux-${{ matrix.type }}-${{ matrix.architecture }}
     runs-on: ubuntu-latest
     container:
-      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:latest
+      image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Run Build [Release]
-        if: ${{ matrix.type == 'release' }}
-        run: ./linux-build.sh
-
-      - name: Run Build [Debug]
-        if: ${{ matrix.type == 'debug' }}
-        run: ./linux-build.sh "" debug
+      - name: Run Build
+        run: ./linux-build.sh --arch=${{ matrix.architecture }} --config=${{ matrix.type }}

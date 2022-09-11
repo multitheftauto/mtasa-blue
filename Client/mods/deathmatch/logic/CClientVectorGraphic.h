@@ -43,6 +43,12 @@ public:
 
     bool SetDocument(CXMLNode* node);
 
+    bool                                SetUpdateCallback(CLuaFunctionRef& funcRef);
+    std::variant<CLuaFunctionRef, bool> GetUpdateCallback() const { return m_updateCallbackRef; }
+    bool                                RemoveUpdateCallback();
+
+    void OnUpdate();
+
 private:
     CResource*      m_pResource = nullptr;
     CClientManager* m_pManager;
@@ -52,6 +58,8 @@ private:
     CXMLNode*                          m_pXMLDocument = nullptr;
 
     std::unique_ptr<CClientVectorGraphicDisplay> m_pVectorGraphicDisplay;
+
+    std::variant<CLuaFunctionRef, bool> m_updateCallbackRef = false;
 
     bool m_bIsDestroyed = false;
 };

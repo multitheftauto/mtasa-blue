@@ -1,10 +1,8 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.cpp
- *  PURPOSE:
+ *  FILE:        Client/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *
  *****************************************************************************/
 
@@ -759,12 +757,97 @@ ADD_ENUM(eSoundEffectParams::Reverb::HIGH_FREQ_RT_RATIO, "highFreqRTRatio")
 IMPLEMENT_ENUM_CLASS_END("soundeffect-params-reverb")
 
 //
+// CResource from userdata
+//
+CResource* UserDataCast(CResource* ptr, lua_State* luaState)
+{
+    return g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CXMLNode from userdata
+//
+CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState)
+{
+    return g_pCore->GetXML()->GetNodeFromID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CLuaTimer from userdata
+//
+CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
+{
+    if (CLuaMain* luaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaState); luaMain)
+    {
+        return luaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+
+    return nullptr;
+}
+
+//
+// CLuaVector2D from userdata
+//
+CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
+{
+    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaVector3D from userdata
+//
+CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
+{
+    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaVector4D from userdata
+//
+CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
+{
+    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaMatrix from userdata
+//
+CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
+{
+    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CClientEntity from userdata
+//
+CClientEntity* UserDataToElementCast(CClientEntity* ptr, SharedUtil::ClassId classId, lua_State* luaState)
+{
+    CClientEntity* element = CElementIDs::GetElement(TO_ELEMENTID(ptr));
+
+    if (element == nullptr || element->IsBeingDeleted() || !element->IsA(classId))
+        return nullptr;
+
+    return element;
+}
+
+//
+// CRemoteCall from userdata
+//
+CRemoteCall* UserDataCast(CRemoteCall* ptr, lua_State* luaState)
+{
+    if (ptr && g_pClientGame->GetRemoteCalls()->CallExists(ptr))
+        return ptr;
+
+    return nullptr;
+}
+
+//
 // Get best guess at name of userdata type
 //
 SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
 {
     // Try element
-    if (CClientEntity* pClientElement = UserDataCast<CClientEntity>((CClientEntity*)NULL, ptr, NULL))
+    if (CClientEntity* pClientElement = UserDataCast((CClientEntity*)ptr, nullptr))
     {
         if (bFindElementType)
             // Try gui element first
@@ -776,17 +859,17 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
             return GetClassTypeName(pClientElement);
     }
 
-    if (auto* pVar = UserDataCast<CResource>((CResource*)NULL, ptr, luaVM))            // Try resource
+    if (auto* pVar = UserDataCast((CResource*)ptr, luaVM))            // Try resource
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CXMLNode>((CXMLNode*)NULL, ptr, luaVM))            // Try xml node
+    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))            // Try xml node
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, ptr, luaVM))            // Try timer
+    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))            // Try 2D Vector
+    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, ptr, luaVM))            // Try 3D Vector
+    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))            // Try 3D Vector
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
         return GetClassTypeName(pVar);
 
     return "";

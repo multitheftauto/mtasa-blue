@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 #include "CLuaFunctionDefs.h"
+#include "CScriptArgReader.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CPerfStatManager.h"
+#include "CLatentTransferManager.h"
+#include "CDebugHookManager.h"
 
 #define MIN_SERVER_REQ_TRIGGERCLIENTEVENT_SENDLIST          "1.3.0-9.04570"
 
