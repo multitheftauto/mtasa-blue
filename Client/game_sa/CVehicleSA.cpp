@@ -2348,12 +2348,12 @@ void CVehicleSA::StaticSetHooks()
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
 }
 
-void CVehicleSA::SetVehiclesSunGlareEnable(bool bEnabled)
+void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
 {
     m_bVehicleSunGlare = bEnabled;
 }
 
-bool CVehicleSA::GetVehiclesSunGlareEnable()
+bool CVehicleSA::GetVehiclesSunGlareEnabled()
 {
     return m_bVehicleSunGlare;
 }

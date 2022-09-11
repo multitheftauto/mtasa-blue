@@ -15,7 +15,7 @@
 #define IDC_SEND_DESC_STATIC            1006
 #define IDC_RESTART_QUESTION_STATIC     1007
 #define IDC_CRASH_INFO_EDIT             1009
-#define IDC_EDIT_D3DDLL_PATH            1011
+#define IDC_EDIT_GRAPHICS_DLL_PATH      1011
 #define IDC_CHECK_NOT_AGAIN             1012
 #define IDC_BUTTON_SHOW_DIR             1013
 #define IDC_RADIO1                      1014

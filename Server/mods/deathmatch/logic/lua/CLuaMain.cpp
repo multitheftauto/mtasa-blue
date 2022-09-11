@@ -10,6 +10,41 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaMain.h"
+#include "LuaCommon.h"
+#include "lua/CLuaShared.h"
+#include "luadefs/CLuaHTTPDefs.h"
+#include "luadefs/CLuaUtilDefs.h"
+#include "luadefs/CLuaElementDefs.h"
+#include "luadefs/CLuaAccountDefs.h"
+#include "luadefs/CLuaACLDefs.h"
+#include "luadefs/CLuaBanDefs.h"
+#include "luadefs/CLuaBlipDefs.h"
+#include "luadefs/CLuaColShapeDefs.h"
+#include "luadefs/CLuaDatabaseDefs.h"
+#include "luadefs/CLuaMarkerDefs.h"
+#include "luadefs/CLuaObjectDefs.h"
+#include "luadefs/CLuaPedDefs.h"
+#include "luadefs/CLuaPickupDefs.h"
+#include "luadefs/CLuaPlayerDefs.h"
+#include "luadefs/CLuaRadarAreaDefs.h"
+#include "luadefs/CLuaResourceDefs.h"
+#include "luadefs/CLuaTeamDefs.h"
+#include "luadefs/CLuaTextDefs.h"
+#include "luadefs/CLuaTimerDefs.h"
+#include "luadefs/CLuaVehicleDefs.h"
+#include "luadefs/CLuaWaterDefs.h"
+#include "CPerfStatManager.h"
+#include "CRemoteCalls.h"
+#include "CLatentTransferManager.h"
+#include "CDebugHookManager.h"
+#include "lua/CLuaCallback.h"
+#include "CGame.h"
+#include "CMapManager.h"
+#include "CDummy.h"
+#include "CKeyBinds.h"
+#include "CIdArray.h"
+#include "CResourceConfigItem.h"
 #include "luadefs/CLuaFunctionDefs.h"
 #include <clocale>
 #include "ResourceTask.h"
@@ -688,7 +723,17 @@ int CLuaMain::OnUndump(const char* p, size_t n)
     return 1;
 }
 
-// Not sure how hacky this is, but this is the easiest way
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::GetElementCount
+//
+///////////////////////////////////////////////////////////////
+unsigned long CLuaMain::GetElementCount() const
+{
+    return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0;
+}
+
+
 void BaseResourceTask::NotifyCreatorOfCancellation() {
     dassert(g_pGame->GetLuaManager()->Exists(&m_Creator)); // Creator should still exist as the task wasn't cancelled (But is being cancelled)
 
@@ -701,3 +746,4 @@ void BaseResourceTask::NotifyCreatorWeFinished() {
 
     m_Creator.OnTaskFinishedOrCancelled(*this);
 }
+

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerDisconnectedPacket.h"
 
 CPlayerDisconnectedPacket::CPlayerDisconnectedPacket(const char* szReason)
 {

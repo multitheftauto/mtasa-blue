@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -65,6 +67,7 @@
 #include "connect.h"
 #include "select.h"
 #include "progress.h"
+#include "timediff.h"
 
 #  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
   defined(WIN32)
@@ -112,6 +115,7 @@ struct thread_data {
 #ifndef HAVE_CARES_GETADDRINFO
   struct curltime happy_eyeballs_dns_time; /* when this timer started, or 0 */
 #endif
+  char hostname[1];
 };
 
 /* How long we are willing to wait for additional parallel responses after
@@ -249,8 +253,6 @@ void Curl_resolver_kill(struct Curl_easy *data)
  */
 static void destroy_async_data(struct Curl_async *async)
 {
-  free(async->hostname);
-
   if(async->tdata) {
     struct thread_data *res = async->tdata;
     if(res) {
@@ -262,8 +264,6 @@ static void destroy_async_data(struct Curl_async *async)
     }
     async->tdata = NULL;
   }
-
-  async->hostname = NULL;
 }
 
 /*
@@ -290,7 +290,7 @@ int Curl_resolver_getsock(struct Curl_easy *data,
 
   timeout = ares_timeout((ares_channel)data->state.async.resolver, &maxtime,
                          &timebuf);
-  milli = (timeout->tv_sec * 1000) + (timeout->tv_usec/1000);
+  milli = (long)curlx_tvtoms(timeout);
   if(milli == 0)
     milli += 10;
   Curl_expire(data, milli, EXPIRE_ASYNC_NAME);
@@ -305,7 +305,7 @@ int Curl_resolver_getsock(struct Curl_easy *data,
  * 2) wait for the timeout period to check for action on ares' sockets.
  * 3) tell ares to act on all the sockets marked as "with action"
  *
- * return number of sockets it worked on
+ * return number of sockets it worked on, or -1 on error
  */
 
 static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
@@ -337,8 +337,11 @@ static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
       break;
   }
 
-  if(num)
+  if(num) {
     nfds = Curl_poll(pfd, num, timeout_ms);
+    if(nfds < 0)
+      return -1;
+  }
   else
     nfds = 0;
 
@@ -375,7 +378,8 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
   DEBUGASSERT(dns);
   *dns = NULL;
 
-  waitperform(data, 0);
+  if(waitperform(data, 0) < 0)
+    return CURLE_UNRECOVERABLE_POLL;
 
 #ifndef HAVE_CARES_GETADDRINFO
   /* Now that we've checked for any last minute results above, see if there are
@@ -474,7 +478,8 @@ CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
     else
       timeout_ms = 1000;
 
-    waitperform(data, timeout_ms);
+    if(waitperform(data, timeout_ms) < 0)
+      return CURLE_UNRECOVERABLE_POLL;
     result = Curl_resolver_is_resolved(data, entry);
 
     if(result || data->state.async.done)
@@ -750,25 +755,18 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
                                                 int port,
                                                 int *waitp)
 {
-  char *bufp;
-
+  struct thread_data *res = NULL;
+  size_t namelen = strlen(hostname);
   *waitp = 0; /* default to synchronous response */
 
-  bufp = strdup(hostname);
-  if(bufp) {
-    struct thread_data *res = NULL;
-    free(data->state.async.hostname);
-    data->state.async.hostname = bufp;
+  res = calloc(sizeof(struct thread_data) + namelen, 1);
+  if(res) {
+    strcpy(res->hostname, hostname);
+    data->state.async.hostname = res->hostname;
     data->state.async.port = port;
     data->state.async.done = FALSE;   /* not done */
     data->state.async.status = 0;     /* clear */
     data->state.async.dns = NULL;     /* clear */
-    res = calloc(sizeof(struct thread_data), 1);
-    if(!res) {
-      free(data->state.async.hostname);
-      data->state.async.hostname = NULL;
-      return NULL;
-    }
     data->state.async.tdata = res;
 
     /* initial status - failed */

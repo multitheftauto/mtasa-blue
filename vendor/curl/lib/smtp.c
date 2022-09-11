@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  * RFC1870 SMTP Service Extension for Message Size
  * RFC2195 CRAM-MD5 authentication
@@ -492,7 +494,7 @@ static CURLcode smtp_perform_authentication(struct Curl_easy *data)
   /* Check we have enough data to authenticate with, and the
      server supports authentication, and end the connect phase if not */
   if(!smtpc->auth_supported ||
-     !Curl_sasl_can_authenticate(&smtpc->sasl, conn)) {
+     !Curl_sasl_can_authenticate(&smtpc->sasl, data)) {
     state(data, SMTP_STOP);
     return result;
   }
@@ -505,7 +507,7 @@ static CURLcode smtp_perform_authentication(struct Curl_easy *data)
       state(data, SMTP_AUTH);
     else {
       /* Other mechanisms not supported */
-      infof(data, "No known authentication mechanisms supported!");
+      infof(data, "No known authentication mechanisms supported");
       result = CURLE_LOGIN_DENIED;
     }
   }
@@ -698,7 +700,7 @@ static CURLcode smtp_perform_mail(struct Curl_easy *data)
                                        NULL, MIMESTRATEGY_MAIL);
 
     if(!result)
-      if(!Curl_checkheaders(data, "Mime-Version"))
+      if(!Curl_checkheaders(data, STRCONST("Mime-Version")))
         result = Curl_mime_add_header(&data->set.mimepost.curlheaders,
                                       "Mime-Version: 1.0");
 
@@ -1037,7 +1039,7 @@ static CURLcode smtp_state_command_resp(struct Curl_easy *data, int smtpcode,
   if((smtp->rcpt && smtpcode/100 != 2 && smtpcode != 553 && smtpcode != 1) ||
      (!smtp->rcpt && smtpcode/100 != 2 && smtpcode != 1)) {
     failf(data, "Command failed: %d", smtpcode);
-    result = CURLE_RECV_ERROR;
+    result = CURLE_WEIRD_SERVER_REPLY;
   }
   else {
     /* Temporarily add the LF character back and send as body to the client */
@@ -1182,7 +1184,7 @@ static CURLcode smtp_state_postdata_resp(struct Curl_easy *data,
   (void)instate; /* no use for this yet */
 
   if(smtpcode != 250)
-    result = CURLE_RECV_ERROR;
+    result = CURLE_WEIRD_SERVER_REPLY;
 
   /* End of DONE phase */
   state(data, SMTP_STOP);
@@ -1724,8 +1726,7 @@ static CURLcode smtp_parse_url_path(struct Curl_easy *data)
   }
 
   /* URL decode the path and use it as the domain in our EHLO */
-  return Curl_urldecode(data, path, 0, &smtpc->domain, NULL,
-                        REJECT_CTRL);
+  return Curl_urldecode(path, 0, &smtpc->domain, NULL, REJECT_CTRL);
 }
 
 /***********************************************************************
@@ -1742,7 +1743,7 @@ static CURLcode smtp_parse_custom_request(struct Curl_easy *data)
 
   /* URL decode the custom request */
   if(custom)
-    result = Curl_urldecode(data, custom, 0, &smtp->custom, NULL, REJECT_CTRL);
+    result = Curl_urldecode(custom, 0, &smtp->custom, NULL, REJECT_CTRL);
 
   return result;
 }
@@ -1819,7 +1820,9 @@ static CURLcode smtp_parse_address(struct Curl_easy *data, const char *fqma,
   return result;
 }
 
-CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread)
+CURLcode Curl_smtp_escape_eob(struct Curl_easy *data,
+                              const ssize_t nread,
+                              const ssize_t offset)
 {
   /* When sending a SMTP payload we must detect CRLF. sequences making sure
      they are sent as CRLF.. instead, as a . on the beginning of a line will
@@ -1841,7 +1844,7 @@ CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread)
 
     scratch = newscratch = malloc(2 * data->set.upload_buffer_size);
     if(!newscratch) {
-      failf(data, "Failed to alloc scratch buffer!");
+      failf(data, "Failed to alloc scratch buffer");
 
       return CURLE_OUT_OF_MEMORY;
     }
@@ -1853,7 +1856,9 @@ CURLcode Curl_smtp_escape_eob(struct Curl_easy *data, const ssize_t nread)
 
   /* This loop can be improved by some kind of Boyer-Moore style of
      approach but that is saved for later... */
-  for(i = 0, si = 0; i < nread; i++) {
+  if(offset)
+    memcpy(scratch, data->req.upload_fromhere, offset);
+  for(i = offset, si = offset; i < nread; i++) {
     if(SMTP_EOB[smtp->eob] == data->req.upload_fromhere[i]) {
       smtp->eob++;
 

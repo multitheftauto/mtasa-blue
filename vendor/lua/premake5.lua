@@ -26,6 +26,12 @@ project "Lua_Server"
 	filter {"system:windows", "platforms:x64"}
 		targetdir(buildpath("server/x64"))
 
+	filter {"system:windows", "platforms:arm"}
+		targetdir(buildpath("server/arm"))
+
+	filter {"system:windows", "platforms:arm64"}
+		targetdir(buildpath("server/arm64"))
+
 
 if os.target() == "windows" then
 	project "Lua_Client"
@@ -51,6 +57,6 @@ if os.target() == "windows" then
 			"LUA_BUILD_AS_DLL"
 		}
 
-        filter "platforms:x64"
+        filter "platforms:not x86"
             flags { "ExcludeFromBuild" } 
 end

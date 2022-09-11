@@ -519,7 +519,7 @@ void CKeyBinds::Remove(CKeyBind* keyBind)
     const auto predicate = [keyBind](const KeyBindPtr& bind) { return bind.get() == keyBind; };
 
     if (auto iter = std::find_if(m_binds.begin(), m_binds.end(), predicate); iter != m_binds.end())
-        m_binds.erase(iter);
+        Remove(iter);
 }
 
 void CKeyBinds::Remove(KeyBindContainer::iterator& iter)
