@@ -11,6 +11,9 @@
 
 #include <StdInc.h>
 
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+
 CLuaPhysicsShape::CLuaPhysicsShape(btCollisionShape* pBtShape) : CLuaPhysicsElement(EIdClass::SHAPE)
 {
     m_pBtShape.reset(pBtShape);

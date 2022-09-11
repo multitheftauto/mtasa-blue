@@ -10,6 +10,17 @@
 
 #pragma once
 
+extern "C"
+{
+    #include "lua.h"
+}
+
+class CLuaPhysicsRigidBody;
+class CLuaPhysicsStaticCollision;
+class CLuaPhysicsShape;
+class CLuaPhysicsElement;
+class CLuaPhysicsWorldElement;
+
 inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
 {
     return "physics-rigid-body";

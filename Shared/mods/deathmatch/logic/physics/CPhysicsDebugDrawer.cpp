@@ -9,7 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPhysicsDebugDrawer.h"
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+#include <Utils.h>
 
 void CPhysicsDebugDrawer::Clear()
 {

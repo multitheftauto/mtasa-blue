@@ -31,6 +31,7 @@
 #include "../CVehicleManager.h"
 #include "../CRegistry.h"
 #include "../CDatabaseManager.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include <lua/CLuaFunctionParser.h>
 
 // Used by script handlers to verify elements

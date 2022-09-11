@@ -10,8 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
+#include "CBulletPhysicsCommon.h"
+#include <CBulletPhysics.h>
+#include "CLuaPhysicsDefs.h"
+#include "CScriptArgReader.h"
 #include "Enums.h"
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+#endif
  
 CBulletPhysics* CLuaPhysicsDefs::GetPhysics()
 {

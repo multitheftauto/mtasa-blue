@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+#endif
+
 MotionState::MotionState(const btTransform& startTrans, const btTransform& centerOfMassOffset)
     : m_graphicsWorldTrans(startTrans), m_centerOfMassOffset(centerOfMassOffset), m_startWorldTrans(startTrans)
 {

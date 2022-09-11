@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CIdArray.h"
+
+#include "CLuaPhysicsElement.h"
+#include "CLuaPhysicsWorldElement.h"
 
 CLuaPhysicsWorldElement::CLuaPhysicsWorldElement(EIdClass::EIdClassType classType) : CLuaPhysicsElement(classType)
 {

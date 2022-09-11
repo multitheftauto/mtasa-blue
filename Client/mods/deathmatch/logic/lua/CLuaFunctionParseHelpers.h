@@ -10,7 +10,8 @@
 
 // Forward declare enum reflection stuff
 #include <gui/CGUIEnumDefs.h>
-#include <type_traits>
+#include <type_traits>"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 
 enum eLuaType
 {

@@ -15,6 +15,7 @@ class CStaticFunctionDefinitions;
 
 #include "CVehicle.h"
 #include "CRegistry.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <optional>
 

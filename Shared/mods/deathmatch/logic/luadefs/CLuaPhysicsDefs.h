@@ -10,8 +10,12 @@
  *****************************************************************************/
 #pragma once
 
+#include "luadefs/CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
 #include "Enums.h"
+
+class CBulletPhysics;
+
 typedef std::optional<std::unordered_map<std::string, std::variant<float, CVector>>> RigidBodyOptions;
 typedef std::unordered_map<std::string, std::variant<int, double, CVector>>          CreateWorldOptions;
 

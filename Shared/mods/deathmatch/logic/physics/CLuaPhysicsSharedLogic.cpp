@@ -11,6 +11,10 @@
 
 #include "StdInc.h"
 
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+
+
 void CPhysicsSharedLogic::SetRotation(btTransform& transform, CVector vecRotation)
 {
     btQuaternion quaternion = btQuaternion::getIdentity();

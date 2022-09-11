@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "CLuaPhysicsShapeManager.h"
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+#endif
 
 void CLuaPhysicsShapeManager::Remove(CLuaPhysicsShape* pPhysicsShape, bool deleteFromList)
 {

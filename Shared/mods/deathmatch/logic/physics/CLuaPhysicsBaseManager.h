@@ -14,6 +14,8 @@ class CLuaPhysicsBaseManager;
 
 #pragma once
 
+class CResource;
+
 template <class T>
 class CLuaPhysicsBaseManager
 {

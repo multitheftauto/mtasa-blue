@@ -14,6 +14,7 @@
 #include "CAccessControlListManager.h"
 #include "CAclRightName.h"
 #include "CGame.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 
 ///////////////////////////////////////////////////////////////

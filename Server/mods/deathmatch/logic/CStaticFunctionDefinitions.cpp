@@ -51,6 +51,7 @@
 #include "CVehicleNames.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "Utils.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "packets/CLuaPacket.h"
 #include "packets/CElementRPCPacket.h"

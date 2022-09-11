@@ -11,6 +11,8 @@
 
 #include <StdInc.h>
 
+#include "CLuaPhysicsElement.h"
+
 CLuaPhysicsElement::CLuaPhysicsElement(EIdClass::EIdClassType classType)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, classType);

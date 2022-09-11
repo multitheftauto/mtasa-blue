@@ -11,8 +11,11 @@
 
 #pragma once
 
+#include "bulletphysics3d/btBulletDynamicsCommon.h"
 #include "physics/CPhysicsStaticCollisionProxy.h"
 #include "physics/CLuaPhysicsWorldElement.h"
+
+class CLuaPhysicsShape;
 
 class CLuaPhysicsStaticCollision : public CLuaPhysicsWorldElement
 {

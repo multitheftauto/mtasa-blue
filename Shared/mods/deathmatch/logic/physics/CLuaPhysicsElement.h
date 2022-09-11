@@ -10,8 +10,12 @@
  *****************************************************************************/
 
 class CLuaPhysicsElement;
+class CResource;
 
 #pragma once
+
+#include "CIdArray.h"
+#include "Enums.h"
 
 class CLuaPhysicsElement
 {

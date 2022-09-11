@@ -17,6 +17,10 @@ class btCollisionShape;
 #include "CLuaPhysicsElement.h"
 #include "CLuaPhysicsStaticCollision.h"
 #include "CShapeHolder.h"
+#include "Enums.h"
+
+class CLuaPhysicsRigidBody;
+class CLuaPhysicsStaticCollision;
 
 class CLuaPhysicsShape : public CLuaPhysicsElement, CShapeHolder<btCollisionShape>
 {

@@ -22,6 +22,7 @@
 #include "CTickRateSettings.h"
 #include "CGame.h"
 #include "Utils.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync(CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager)

@@ -11,6 +11,10 @@
 
 #include <StdInc.h>
 
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+#include "CLuaPhysicsSharedLogic.h"
+
 CLuaPhysicsBoxShape::CLuaPhysicsBoxShape(CVector half) : CLuaPhysicsConvexShape(CPhysicsSharedLogic::CreateBox(half))
 {
 }

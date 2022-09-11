@@ -64,11 +64,14 @@
 #include "../utils/CFunctionUseLogger.h"
 #include "Utils.h"
 #include "CStaticFunctionDefinitions.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "CZipMaker.h"
 #include "version.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
 
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f

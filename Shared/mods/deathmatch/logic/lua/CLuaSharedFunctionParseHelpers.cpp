@@ -10,6 +10,15 @@
 
 #include "StdInc.h"
 
+extern "C"
+{
+    #include "lua.h"
+}
+
+#include "Enums.h"
+#include "physics/CLuaPhysicsShape.h"
+#include "CLuaSharedFunctionParseHelpers.h"
+
 IMPLEMENT_ENUM_CLASS_BEGIN(ePhysicsElementType)
 ADD_ENUM(ePhysicsElementType::Unknown, "physics-unknown")
 ADD_ENUM(ePhysicsElementType::WorldElement, "physics-world-element")

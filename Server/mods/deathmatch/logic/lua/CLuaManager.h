@@ -29,6 +29,10 @@ class CRadarAreaManager;
 class CRegisteredCommands;
 class CVehicleManager;
 
+class CLuaPhysicsRigidBodyManager;
+class CLuaPhysicsStaticCollisionManager;
+class CLuaPhysicsShapeManager;
+
 class CLuaManager
 {
 public:

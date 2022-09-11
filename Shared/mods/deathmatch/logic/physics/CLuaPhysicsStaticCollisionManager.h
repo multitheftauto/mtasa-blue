@@ -10,10 +10,11 @@
  *****************************************************************************/
 
 class CLuaPhysicsStaticCollisionManager;
-#include "CLuaPhysicsElement.h"
-#include "CLuaPhysicsStaticCollision.h"
 
 #pragma once
+
+#include "CLuaPhysicsElement.h"
+#include "CLuaPhysicsStaticCollision.h"
 
 class CLuaPhysicsStaticCollisionManager : public CLuaPhysicsBaseManager<CLuaPhysicsStaticCollision*>
 {

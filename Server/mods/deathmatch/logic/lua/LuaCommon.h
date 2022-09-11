@@ -52,9 +52,9 @@ void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix);
 class CLuaMain&  lua_getownercluamain(lua_State* L);
 class CResource& lua_getownerresource(lua_State* L);
 
-void lua_pushrigidbody(lua_State* luaVM, CLuaPhysicsRigidBody* pElement);
-void lua_pushstaticcollision(lua_State* luaVM, CLuaPhysicsStaticCollision* pElement);
-void lua_pushshape(lua_State* luaVM, CLuaPhysicsShape* pPhysicsShape);
+void lua_pushrigidbody(lua_State* luaVM, class CLuaPhysicsRigidBody* pElement);
+void lua_pushstaticcollision(lua_State* luaVM, class CLuaPhysicsStaticCollision* pElement);
+void lua_pushshape(lua_State* luaVM, class CLuaPhysicsShape* pPhysicsShape);
 // Converts any type to string
 const char* lua_makestring(lua_State* luaVM, int iArgument);
 

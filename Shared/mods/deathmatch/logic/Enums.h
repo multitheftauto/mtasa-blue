@@ -10,6 +10,8 @@
 #pragma once
 
 #include <net/Packets.h>
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Hash.h"
 
 namespace EEventPriority
 {

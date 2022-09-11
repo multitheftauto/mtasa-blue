@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+#endif
+
 CPhysicsStaticCollisionProxy::CPhysicsStaticCollisionProxy(CLuaPhysicsShape* pPhysicsShape)
 {
     setCollisionShape(pPhysicsShape->InternalGetBtShape());

@@ -1,9 +1,8 @@
 #include "StdInc.h"
 
-#include "physics/CLuaPhysicsBaseManager.h"
-#include "physics/CLuaPhysicsRigidBodyManager.h"
-#include "physics/CLuaPhysicsStaticCollisionManager.h"
-#include "physics/CLuaPhysicsShapeManager.h"
+#include "CSharedLuaMain.h"
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
 
 CSharedLuaMain::CSharedLuaMain(CResource* pResource, CLuaPhysicsRigidBodyManager* pLuaPhysicsRigidBodyManager, CLuaPhysicsStaticCollisionManager* pLuaPhysicsStaticCollisionManager, CLuaPhysicsShapeManager* pLuaPhysicsShapeManager)
  : m_pResource(pResource), m_pLuaPhysicsRigidBodyManager(pLuaPhysicsRigidBodyManager), m_pLuaPhysicsStaticCollisionManager(pLuaPhysicsStaticCollisionManager), m_pLuaPhysicsShapeManager(pLuaPhysicsShapeManager)

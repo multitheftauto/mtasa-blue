@@ -9,7 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
 #include "physics/CPhysicsDebugDrawer.h"
 
 CBulletPhysics::CBulletPhysics()

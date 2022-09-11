@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "physics/CLuaPhysicsRigidBodyManager.h"
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+#endif
 
 void CLuaPhysicsRigidBodyManager::Remove(CLuaPhysicsRigidBody* pRigidBody, bool deleteFromList)
 {

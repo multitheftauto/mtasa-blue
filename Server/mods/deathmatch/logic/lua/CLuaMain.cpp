@@ -34,6 +34,7 @@
 #include "luadefs/CLuaTimerDefs.h"
 #include "luadefs/CLuaVehicleDefs.h"
 #include "luadefs/CLuaWaterDefs.h"
+#include "luadefs/CLuaPhysicsDefs.h"
 #include "CPerfStatManager.h"
 #include "CRemoteCalls.h"
 #include "CLatentTransferManager.h"

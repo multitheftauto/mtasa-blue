@@ -10,7 +10,14 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "CIdArray.h"
+#include "CLuaPhysicsBaseManager.h"
 #include "CLuaPhysicsStaticCollisionManager.h"
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+    #include "CBulletPhysicsCommon.h"
+    #include "CBulletPhysics.h"
+#endif
 
 void CLuaPhysicsStaticCollisionManager::Remove(CLuaPhysicsStaticCollision* pLuaStaticCollision, bool deleteFromList)
 {

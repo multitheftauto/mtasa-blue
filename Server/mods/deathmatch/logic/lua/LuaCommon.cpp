@@ -16,6 +16,8 @@
 #include "CBan.h"
 #include "CGame.h"
 #include "lua/CLuaShared.h"
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
 #include "luadefs/CLuaClassDefs.h"
 
 extern CGame* g_pGame;

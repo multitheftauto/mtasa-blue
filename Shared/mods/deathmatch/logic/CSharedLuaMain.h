@@ -4,6 +4,11 @@ class CLuaPhysicsShapeManager;
 class CLuaPhysicsElement;
 class CLuaPhysicsWorldElement;
 class CResource;
+class CLuaPhysicsRigidBody;
+class CLuaPhysicsStaticCollision;
+class CLuaPhysicsShape;
+
+#pragma once
 
 class CSharedLuaMain
 {

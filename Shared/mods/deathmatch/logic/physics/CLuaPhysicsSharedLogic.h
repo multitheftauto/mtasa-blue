@@ -2,6 +2,8 @@ class CPhysicsSharedLogic;
 
 #pragma once
 
+class btBoxShape;
+
 class CPhysicsSharedLogic
 {
 public:

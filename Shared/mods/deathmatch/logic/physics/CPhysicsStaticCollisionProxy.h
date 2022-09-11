@@ -15,6 +15,8 @@ class CPhysicsStaticCollisionProxy;
 
 #pragma once
 
+class CLuaPhysicsShape;
+
 // Create using static member method "New"
 class CPhysicsStaticCollisionProxy : public CPhysicsProxyElement, public btCollisionObject
 {

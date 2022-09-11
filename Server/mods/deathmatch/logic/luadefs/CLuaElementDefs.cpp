@@ -15,6 +15,9 @@
 #include "CScriptArgReader.h"
 #include "CDummy.h"
 #include "Utils.h"
+#include <CIdArray.h>
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
 
 void CLuaElementDefs::LoadFunctions()
 {

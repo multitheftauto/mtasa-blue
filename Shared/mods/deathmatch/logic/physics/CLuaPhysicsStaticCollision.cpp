@@ -11,6 +11,9 @@
 
 #include <StdInc.h>
 
+#include "CBulletPhysicsCommon.h"
+#include "CBulletPhysics.h"
+
 CLuaPhysicsStaticCollision::CLuaPhysicsStaticCollision(CLuaPhysicsShape* pPhysicsShape)
     : CLuaPhysicsWorldElement(EIdClass::STATIC_COLLISION), m_btCollisionObject(CPhysicsStaticCollisionProxy::New(pPhysicsShape))
 {

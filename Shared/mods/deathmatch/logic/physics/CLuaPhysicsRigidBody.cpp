@@ -11,6 +11,9 @@
 
 #include <StdInc.h>
 
+#include "CLuaPhysicsRigidBody.h"
+#include "CLuaPhysicsSharedLogic.h"
+
 CLuaPhysicsRigidBody::CLuaPhysicsRigidBody(CLuaPhysicsShape* pPhysicsShape, float fMass, CVector vecLocalInertia, CVector vecCenterOfMass)
     : CLuaPhysicsWorldElement(EIdClass::RIGID_BODY), m_pPhysicsShape(pPhysicsShape)
 {
