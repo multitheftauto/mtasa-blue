@@ -27,4 +27,5 @@ private:
     static bool IsChatInputBlocked();
     static bool ClearDebug();
     static bool IsMTAWindowFocused();
+    static bool IsCapsLockEnabled();
 };
