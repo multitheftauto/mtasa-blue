@@ -327,15 +327,13 @@ const char* CBassAudio::ErrorGetMessage() {
     case BASS_ERROR_UNKNOWN:	
          return "some other mystery problem";
 
-    // End of possible BASS error codes
-    // If this label is reache that means there's a
-    // new error code that has to be added here
+    // BASS may add new error codes in the future, which must be appended to the switch above.
+    // Also, add-ons may introduce additional error codes.
     default:
         return "Unknown error - `CBassAudio::ErrorGetMessage` should be updated to return a message for it!";
     }
 }
 
-// Just a wrapper
 int CBassAudio::ErrorGetCode() { 
     return BASS_ErrorGetCode();
 }

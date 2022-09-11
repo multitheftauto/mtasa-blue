@@ -94,11 +94,11 @@ public:
     float  GetSoundBPM();
     void   SetSoundBPM(float fBPM) { m_fBPM = fBPM; }
 
-    // Bass audio helpers
-    // For now these AREN'T PER SOUND ERRORS, so they always refer to the last modified sound.
-    // One day we could store errors for each sound separtely.
+    // Retrieves the error message for the most recent BASS function call in the current thread.
     static const char* ErrorGetMessage();
-    static int         ErrorGetCode();
+
+    // Retrieves the error code for the most recent BASS function call in the current thread.
+    static int ErrorGetCode();
 
 protected:
     HSTREAM             ConvertFileToMono(const SString& strPath);

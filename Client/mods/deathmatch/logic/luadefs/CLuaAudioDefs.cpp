@@ -1402,7 +1402,6 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
     argStream.ReadUserData(pSound);
     argStream.ReadEnumString(eEffectType);
 
-    // Hard error on usage mistake
     if (argStream.HasErrors()) {
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
