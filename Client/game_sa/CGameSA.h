@@ -397,8 +397,8 @@ public:
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
 
-    void SetCoronaZTestEnabled(bool bEnabled);
-    bool IsCoronaZTestEnabled();
+    void SetCoronaZTestEnabled(bool isEnabled);
+    bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -515,7 +515,7 @@ private:
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
-    bool         m_bCoronaZTest;
+    bool         m_isCoronaZTestEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;

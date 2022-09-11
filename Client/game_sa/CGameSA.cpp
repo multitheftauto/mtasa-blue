@@ -43,7 +43,6 @@ CGameSA::CGameSA()
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
-    m_bCoronaZTest = true;
     m_iCheckStatus = 0;
 
 
@@ -675,7 +674,6 @@ void CGameSA::ResetCheats()
     SetUnderWorldWarpEnabled(true);
     SetCoronaZTestEnabled(true);
     CVehicleSA::SetVehiclesSunGlareEnabled(false);
-  
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
@@ -759,27 +757,25 @@ bool CGameSA::IsVehicleSunGlareEnabled()
     return CVehicleSA::GetVehiclesSunGlareEnabled();
 }
 
-void CGameSA::SetCoronaZTestEnabled(bool bEnabled)
+void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
 {
-    if (!bEnabled)
+    if (m_isCoronaZTestEnabled == isEnabled)
+        return;
+
+    if (isEnabled)
     {
-        // Disable Ztest (PS2)
-        MemSet((void*)0x6FB17C, 0x90, 3);
-        m_bCoronaZTest = false;
-    }
-    else
-    {
-        // Enable (PC)
+        // Enable ZTest (PC)
         MemPut<BYTE>(0x6FB17C + 0, 0xFF);
         MemPut<BYTE>(0x6FB17C + 1, 0x51);
         MemPut<BYTE>(0x6FB17C + 2, 0x20);
-        m_bCoronaZTest = true;
     }
-}
-
-bool CGameSA::IsCoronaZTestEnabled()
-{
-    return m_bCoronaZTest;
+    else
+    {
+        // Disable ZTest (PS2)
+        MemSet((void*)0x6FB17C, 0x90, 3);
+    }
+    
+    m_isCoronaZTestEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()
