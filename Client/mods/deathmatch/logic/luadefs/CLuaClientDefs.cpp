@@ -23,6 +23,7 @@ void CLuaClientDefs::LoadFunctions()
         {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
         {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
         {"clearDebugBox", ArgumentParser<ClearDebug>},
+        {"isMTAWindowFocused", ArgumentParser<IsMTAWindowFocused>},
         {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>}
     };
 
@@ -70,6 +71,11 @@ bool CLuaClientDefs::ClearDebug()
 {
     g_pCore->DebugClear();
     return true;
+}
+
+bool CLuaClientDefs::IsMTAWindowFocused()
+{
+    return m_pClientGame->IsWindowFocused();
 }
 
 bool CLuaClientDefs::IsCapsLockEnabled()
