@@ -45,7 +45,6 @@ CGameSA::CGameSA()
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
-
     const unsigned int modelInfoMax = GetCountOfAllFileIDs();
     ModelInfo = new CModelInfoSA[modelInfoMax];
     ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
@@ -674,6 +673,7 @@ void CGameSA::ResetCheats()
     SetUnderWorldWarpEnabled(true);
     SetCoronaZTestEnabled(true);
     CVehicleSA::SetVehiclesSunGlareEnabled(false);
+
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
