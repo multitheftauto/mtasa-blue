@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include "../packets/CPacket.h"
+#include "CPacket.h"
 
-class CResourceStopPacket : public CPacket
+class CResourceStopPacket final : public CPacket
 {
 public:
     CResourceStopPacket(unsigned short usID);

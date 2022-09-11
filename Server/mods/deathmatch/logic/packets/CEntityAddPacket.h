@@ -9,17 +9,12 @@
  *
  *****************************************************************************/
 
-class CEntityAddPacket;
-
 #pragma once
 
-#include "../packets/CPacket.h"
+#include "CPacket.h"
 #include <vector>
-#include "../CGame.h"
 
-extern CGame* g_pGame;
-
-class CEntityAddPacket : public CPacket
+class CEntityAddPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_ENTITY_ADD; };

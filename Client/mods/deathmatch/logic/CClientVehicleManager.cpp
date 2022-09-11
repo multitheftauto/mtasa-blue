@@ -422,6 +422,12 @@ bool CClientVehicleManager::IsTrainModel(unsigned long ulModel)
 
 bool CClientVehicleManager::IsValidModel(unsigned long ulModel)
 {
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
+    return pModelInfo && pModelInfo->IsVehicle();
+}
+
+bool CClientVehicleManager::IsStandardModel(unsigned long ulModel)
+{
     return ulModel >= 400 && ulModel <= 611;
 }
 
@@ -464,8 +470,12 @@ eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
 
 unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 {
+    // Use parent model ID for non-standard vehicle model IDs.
+    if ((ulModel < 400 || ulModel > 611) && IsValidModel(ulModel))
+        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+
     // Valid model?
-    if (IsValidModel(ulModel))
+    if (IsStandardModel(ulModel))
     {
         return g_ucMaxPassengers[ulModel - 400];
     }
@@ -480,7 +490,7 @@ void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned 
     ucVariant = 255;
     ucVariant2 = 255;
     // Valid model?
-    if (IsValidModel(usModel) && g_ucVariants[usModel - 400] != 255)
+    if (IsStandardModel(usModel) && g_ucVariants[usModel - 400] != 255)
     {
         // caddy || cropduster
         if (usModel == 457 || usModel == 512)
@@ -614,37 +624,37 @@ unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulMode
 
 bool CClientVehicleManager::HasTurret(unsigned long ulModel)
 {
-    return (IsValidModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TURRENT));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TURRENT));
 }
 
 bool CClientVehicleManager::HasSirens(unsigned long ulModel)
 {
-    return (IsValidModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SIRENS));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SIRENS));
 }
 
 bool CClientVehicleManager::HasTaxiLight(unsigned long ulModel)
 {
-    return (IsValidModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
 bool CClientVehicleManager::HasSearchLight(unsigned long ulModel)
 {
-    return (IsValidModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
 }
 
 bool CClientVehicleManager::HasLandingGears(unsigned long ulModel)
 {
-    return (IsValidModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_LANDING_GEARS));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_LANDING_GEARS));
 }
 
 bool CClientVehicleManager::HasAdjustableProperty(unsigned long ulModel)
 {
-    return (IsValidModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
 }
 
 bool CClientVehicleManager::HasSmokeTrail(unsigned long ulModel)
 {
-    return (IsValidModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
 }
 
 bool CClientVehicleManager::HasDamageModel(unsigned long ulModel)
@@ -744,6 +754,24 @@ void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
 
         // Streamed in and same vehicle ID?
         if (pVehicle->IsStreamedIn() && pVehicle->GetModel() == usModel)
+        {
+            // Stream it out for a while until streamed decides to stream it
+            // back in eventually
+            pVehicle->StreamOutForABit();
+        }
+    }
+}
+
+void CClientVehicleManager::RestreamAllVehicles()
+{
+    // This can speed up initial connect
+    if (m_StreamedIn.empty())
+        return;
+
+    for (auto& pVehicle : m_List)
+    {
+        // Streamed in and same vehicle ID?
+        if (pVehicle->IsStreamedIn())
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually

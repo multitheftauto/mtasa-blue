@@ -14,7 +14,7 @@
 #include "../CCommon.h"
 #include "CPacket.h"
 
-class CPlayerSpawnPacket : public CPacket
+class CPlayerSpawnPacket final : public CPacket
 {
 public:
     CPlayerSpawnPacket();

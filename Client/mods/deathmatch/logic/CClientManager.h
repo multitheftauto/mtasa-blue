@@ -101,9 +101,9 @@ public:
     bool IsBeingDeleted() { return m_bBeingDeleted; }
     void SetGameUnloadedFlag() { m_bGameUnloadedFlag = true; }
 
-    void           InvalidateEntity(CClientEntity* pEntity);
-    void           RestoreEntity(CClientEntity* pEntity);
-    void           UnreferenceEntity(CClientEntity* pEntity);
+    void InvalidateEntity(CClientEntity* pEntity);
+    void RestoreEntity(CClientEntity* pEntity);
+    void UnreferenceEntity(CClientEntity* pEntity);
 
     void OnUpdateStreamPosition(CClientStreamElement* pElement);
     void OnLowLODElementCreated();

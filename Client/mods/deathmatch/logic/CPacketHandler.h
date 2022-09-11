@@ -99,6 +99,7 @@ public:
     void Packet_PedTask(NetBitStreamInterface& bitStream);
     void Packet_ChatClear(NetBitStreamInterface& bitStream);
     void Packet_ServerInfoSync(NetBitStreamInterface& bitStream);
+    void Packet_PolygonHeight(NetBitStreamInterface& bitStream);
 
     // For debugging protocol errors during ENTITY_ADD packet
     void    EntityAddDebugBegin(uint uiNumEntities, NetBitStreamInterface* pBitStream);

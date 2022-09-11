@@ -15,7 +15,7 @@
 #include "CResource.h"
 #include "CResourceClientScriptItem.h"
 
-class CResourceClientScriptsPacket : public CPacket
+class CResourceClientScriptsPacket final : public CPacket
 {
 public:
     CResourceClientScriptsPacket(CResource* pResource);

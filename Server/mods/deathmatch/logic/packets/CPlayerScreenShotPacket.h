@@ -8,9 +8,14 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-class CPlayerScreenShotPacket : public CPacket
+#include "CPacket.h"
+
+class CResource;
+
+class CPlayerScreenShotPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SCREENSHOT; };

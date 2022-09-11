@@ -13,14 +13,18 @@
 
 #include "CPacket.h"
 
+typedef SFixedArray<bool, MAX_GARAGES> SGarageStates;
+
 struct SWorldWaterLevelInfo
 {
     bool  bNonSeaLevelSet;
+    bool  bOutsideLevelSet;
     float fSeaLevel;
     float fNonSeaLevel;
+    float fOutsideLevel;
 };
 
-class CMapInfoPacket : public CPacket
+class CMapInfoPacket final : public CPacket
 {
 public:
     explicit CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,

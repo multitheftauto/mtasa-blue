@@ -11,11 +11,10 @@
 
 #pragma once
 
+#include "CPacket.h"
 #include <list>
-#include "../packets/CPacket.h"
-#include "../CResource.h"
 
-class CResourceStartPacket : public CPacket
+class CResourceStartPacket final : public CPacket
 {
 public:
     CResourceStartPacket(const char* szResourceName, class CResource* pResource);

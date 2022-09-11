@@ -12,9 +12,11 @@
 #pragma once
 
 #include "CPacket.h"
+#include <net/SyncStructures.h>
+
 class CVehicle;
 
-class CUnoccupiedVehiclePushPacket : public CPacket
+class CUnoccupiedVehiclePushPacket final : public CPacket
 {
 public:
     CUnoccupiedVehiclePushPacket(){};

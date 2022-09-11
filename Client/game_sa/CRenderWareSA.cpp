@@ -14,6 +14,7 @@
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
 #include <game/RenderWareD3D.h>
+
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 #include "CRenderWareSA.ShaderMatching.h"
@@ -299,12 +300,13 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 //
 void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList)
 {
-    RpClumpForAllAtomics(pClump,
-                         [](RpAtomic* pAtomic, void* pData) {
-                             reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
-                             return true;
-                         },
-                         &outAtomicList);
+    RpClumpForAllAtomics(
+        pClump,
+        [](RpAtomic* pAtomic, void* pData) {
+            reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
+            return true;
+        },
+        &outAtomicList);
 }
 
 //
@@ -351,9 +353,9 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 // Replaces a vehicle/weapon/ped model
 void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction)
 {
-    auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*) (CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
-    auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*) (CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
-    auto CBaseModelInfo_SetClump = (void(__thiscall*) (CBaseModelInfoSAInterface * pThis, RpClump * clump))dwSetClumpFunction;
+    auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
+    auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
+    auto CBaseModelInfo_SetClump = (void(__thiscall*)(CBaseModelInfoSAInterface * pThis, RpClump * clump)) dwSetClumpFunction;
 
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
     if (pModelInfo)
@@ -468,12 +470,12 @@ typedef struct
 bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
 {
     SAtomicsReplacer* pData = reinterpret_cast<SAtomicsReplacer*>(data);
-    SRelatedModelInfo relatedModelInfo = { 0 };
+    SRelatedModelInfo relatedModelInfo = {0};
     relatedModelInfo.pClump = pData->pClump;
     relatedModelInfo.bDeleteOldRwObject = true;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
 
-    // The above function adds a reference to the model's TXD by either 
+    // The above function adds a reference to the model's TXD by either
     // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
     CTxdStore_RemoveRef(pData->usTxdID);
     return true;
@@ -686,17 +688,17 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
 ////////////////////////////////////////////////////////////////
 ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
 {
-    if (usModelID >= 20000 && usModelID < 25000)
+    if (usModelID >= pGame->GetBaseIDforTXD() && usModelID < pGame->GetBaseIDforCOL())
     {
         // Get global TXD ID instead
-        return usModelID - 20000;
+        return usModelID - pGame->GetBaseIDforTXD();
     }
     else
     {
         // Get the CModelInfo's TXD ID
 
         // Ensure valid
-        if (usModelID >= 20000 || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
+        if (usModelID >= pGame->GetBaseIDforTXD() || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
             return 0;
 
         return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
@@ -904,4 +906,64 @@ CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
 RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
 {
     return RwFrameFindFrame(RpGetFrame(pRoot), strName);
+}
+
+void CRenderWareSA::CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix)
+{
+    rwOutMatrix.right = (RwV3d&)mat.vRight;
+    rwOutMatrix.up = (RwV3d&)mat.vFront;
+    rwOutMatrix.at = (RwV3d&)mat.vUp;
+    rwOutMatrix.pos = (RwV3d&)mat.vPos;
+}
+
+void CRenderWareSA::RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut)
+{
+    matOut.vRight = (CVector&)rwMatrix.right;
+    matOut.vFront = (CVector&)rwMatrix.up;
+    matOut.vUp = (CVector&)rwMatrix.at;
+    matOut.vPos = (CVector&)rwMatrix.pos;
+}
+
+void CRenderWareSA::RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwMatrix, matTemp);
+    vecOutRotation = matTemp.GetRotation();
+}
+
+void CRenderWareSA::RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwInOutMatrix, matTemp);
+    matTemp.SetRotation(vecRotation);
+    rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
+    rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
+    rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
+}
+
+void CRenderWareSA::RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition)
+{
+    vecOutPosition = (CVector&)rwMatrix.pos;
+}
+
+void CRenderWareSA::RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition)
+{
+    rwInOutMatrix.pos = (RwV3d&)vecPosition;
+}
+
+void CRenderWareSA::RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwMatrix, matTemp);
+    vecOutScale = matTemp.GetScale();
+}
+
+void CRenderWareSA::RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale)
+{
+    CMatrix matTemp;
+    RwMatrixToCMatrix(rwInOutMatrix, matTemp);
+    matTemp.SetScale(vecScale);
+    rwInOutMatrix.right = (RwV3d&)matTemp.vRight;
+    rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
+    rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
 }

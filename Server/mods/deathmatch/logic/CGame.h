@@ -451,13 +451,16 @@ public:
     void SendSyncSettings(CPlayer* pPlayer = NULL);
 
     CMtaVersion CalculateMinClientRequirement();
-    bool    IsBelowMinimumClient(const CMtaVersion& strVersion);
-    bool    IsBelowRecommendedClient(const CMtaVersion& strVersion);
-    void    ApplyAseSetting();
-    bool    IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
+    bool        IsBelowMinimumClient(const CMtaVersion& strVersion);
+    bool        IsBelowRecommendedClient(const CMtaVersion& strVersion);
+    void        ApplyAseSetting();
+    bool        IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
 
     void SetDevelopmentMode(bool enabled) { m_DevelopmentModeEnabled = enabled; }
     bool GetDevelopmentMode() { return m_DevelopmentModeEnabled; }
+
+    bool IsClientTransferBoxVisible() const { return m_showClientTransferBox; }
+    void SetClientTransferBoxVisible(bool visible) { m_showClientTransferBox = visible; }
 
 private:
     void AddBuiltInEvents();
@@ -498,7 +501,7 @@ private:
     void Packet_PlayerScreenShot(class CPlayerScreenShotPacket& Packet);
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
-    void Packet_DiscordJoin(class CDiscordJoinPacket& Packet);
+    void Packet_PlayerResourceStart(class CPlayerResourceStartPacket& Packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
@@ -650,4 +653,5 @@ private:
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 
     bool m_DevelopmentModeEnabled;
+    bool m_showClientTransferBox = true;
 };

@@ -8,13 +8,15 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"
 #include "packets/CEntityRemovePacket.h"
-
+#include "SResourceStartOptions.h"
 #include "CResourceFile.h"
+#include "CAclRightName.h"
 #include <unzip.h>
 #include <list>
 #include <vector>
@@ -32,6 +34,7 @@ class CXMLNode;
 class CAccount;
 class CLuaMain;
 class CResourceManager;
+class CChecksum;
 
 struct SVersion
 {
@@ -128,18 +131,6 @@ enum class EResourceState : unsigned char
     Stopping,            // the resource is stopping
 };
 
-struct SResourceStartOptions
-{
-    bool bIncludedResources = true;
-    bool bConfigs = true;
-    bool bMaps = true;
-    bool bScripts = true;
-    bool bHTML = true;
-    bool bClientConfigs = true;
-    bool bClientScripts = true;
-    bool bClientFiles = true;
-};
-
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.
 // The directory or ZIP file must contain a meta.xml file, which describes the required content by the resource.
 // It's a process-like environment for scripts, maps, images and other files.
@@ -190,13 +181,13 @@ public:
     bool IsClientScriptsOn() const noexcept { return m_bClientScripts; }
     bool IsClientFilesOn() const noexcept { return m_bClientFiles; }
 
-    bool             GenerateChecksums();
+    bool                 GenerateChecksums();
     std::future<SString> GenerateChecksumForFile(CResourceFile* pResourceFile);
-    const CChecksum& GetLastMetaChecksum() { return m_metaChecksum; }
-    bool             HasResourceChanged();
-    void             ApplyUpgradeModifications();
-    void             LogUpgradeWarnings();
-    bool             GetCompatibilityStatus(SString& strOutStatus);
+    const CChecksum&     GetLastMetaChecksum() { return m_metaChecksum; }
+    bool                 HasResourceChanged();
+    void                 ApplyUpgradeModifications();
+    void                 LogUpgradeWarnings();
+    bool                 GetCompatibilityStatus(SString& strOutStatus);
 
     void      AddTemporaryInclude(CResource* resource);
     SString   GetFailureReason() { return m_strFailureReason.TrimEnd("\n"); }
@@ -370,11 +361,10 @@ private:
 
     CResourceManager* m_pResourceManager;
 
-    
     SString     m_strResourceName;
-    SString     m_strAbsPath;                      // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
-    std::string m_strResourceZip;                  // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
-    std::string m_strResourceDirectoryPath;        // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
+    SString     m_strAbsPath;                          // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
+    std::string m_strResourceZip;                      // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
+    std::string m_strResourceDirectoryPath;            // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
     std::string m_strResourceCachePath;            // Absolute path to unzipped cache (if a zip)   i.e. /server/mods/deathmatch/resources/cache/resource_name
 
     unsigned int m_uiVersionMajor = 0;
@@ -396,7 +386,7 @@ private:
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded
     std::list<CResourceFile*>      m_ResourceFiles;
-    std::list<CResource*>          m_Dependents;                   // resources that have "included" or loaded this one
+    std::list<CResource*>          m_Dependents;            // resources that have "included" or loaded this one
     std::list<CExportedFunction>   m_ExportedFunctions;
     std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command
 
@@ -434,8 +424,8 @@ private:
     CMtaVersion m_strMinServerFromMetaXml;              // Min MTA server version as declared in meta.xml
     CMtaVersion m_strMinClientReqFromSource;            // Min MTA client version as calculated by scanning the script source
     CMtaVersion m_strMinServerReqFromSource;            // Min MTA server version as calculated by scanning the script source
-    SString m_strMinClientReason;
-    SString m_strMinServerReason;
+    SString     m_strMinClientReason;
+    SString     m_strMinServerReason;
 
     CChecksum m_metaChecksum;            // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
 

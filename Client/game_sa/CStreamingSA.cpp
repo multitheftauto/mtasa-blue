@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 
+#include "CModelInfoSA.h"
+
+// count: 26316 in unmodified game
+CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;
+
 namespace
 {
     //
@@ -67,6 +72,13 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
             add     esp, 8
         }
     }
+}
+
+void CStreamingSA::RemoveModel(std::uint32_t model)
+{
+    using Signature = void(__cdecl*)(std::uint32_t);
+    const auto function = reinterpret_cast<Signature>(0x4089A0);
+    function(model);
 }
 
 void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
@@ -133,4 +145,27 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         call    dwFunc
         add     esp, 0xC
     }
+}
+
+CStreamingInfo* CStreamingSA::GetStreamingInfoFromModelId(uint32 id)
+{
+    return &ms_aInfoForModel[id];
+}
+
+void CStreamingSA::ReinitStreaming()
+{
+    typedef int(__cdecl * Function_ReInitStreaming)();
+    Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
+
+    reinitStreaming();
+}
+
+void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
+{
+    (reinterpret_cast<void(__cdecl*)(std::uint32_t)>(0x40E120))(memoryToCleanInBytes);
+}
+
+std::uint32_t CStreamingSA::GetMemoryUsed() const
+{
+    return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
 }

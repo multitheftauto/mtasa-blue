@@ -149,7 +149,7 @@ void COMMAND_ShowChat(const char* szCmdLine)
 {
     int  iCmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
     bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : !g_pCore->IsChatVisible();
-    g_pCore->SetChatVisible(bShow);
+    g_pCore->SetChatVisible(bShow, !bShow);
 }
 
 void COMMAND_ShowNetstat(const char* szCmdLine)
@@ -177,7 +177,21 @@ void COMMAND_EnterPassenger(const char* szCmdLine)
             {
                 if (pWeapon->GetState() != WEAPONSTATE_RELOADING)
                 {
-                    g_pClientGame->ProcessVehicleInOutKey(true);
+                    // If we are already in a vehicle
+                    CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
+                    if (pVehicle)
+                    {
+                        // Make sure we are in a passenger seat, otherwise we must use enter_exit
+                        if (pPlayer->GetOccupiedVehicleSeat() != 0)
+                        {
+                            pPlayer->ExitVehicle();
+                        }
+                    }
+                    else
+                    {
+                        // Enter nearest vehicle as passenger
+                        pPlayer->EnterVehicle(nullptr, true);
+                    }
                 }
             }
         }
@@ -1021,6 +1035,12 @@ void COMMAND_Debug4(const char* szCmdLine)
     g_pClientGame->StartPlayback();
     return;
 }
+
+void COMMAND_TimeStep(const char* szCmdLine)
+{
+    g_pCore->GetConsole()->Printf("TimeStep: %f", *(float*)0xB7CB5C); // CTimer::ms_fTimeStep
+}
+
 #endif
 
 void COMMAND_ShowCollision(const char* szCmdLine)

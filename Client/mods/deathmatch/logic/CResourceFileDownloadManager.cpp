@@ -82,6 +82,16 @@ void CResourceFileDownloadManager::UpdatePendingDownloads()
             ListRemove(m_PendingFileDownloadList, pResourceFile);
             m_ActiveFileDownloadList.push_back(pResourceFile);
             BeginResourceFileDownload(pResourceFile, 0);
+
+            // Call Lua event 'onClientResourceFileDownload'
+            CLuaArguments arguments;
+            arguments.PushResource(pResourceFile->GetResource());
+            arguments.PushString(pResourceFile->GetShortName());
+            arguments.PushNumber(pResourceFile->GetDownloadSize());
+            arguments.PushString("queued");
+
+            CClientEntity* resourceEntity = pResourceFile->GetResource()->GetResourceEntity();
+            resourceEntity->CallEvent("onClientResourceFileDownload", arguments, false);
         }
     }
 }
@@ -115,12 +125,13 @@ void CResourceFileDownloadManager::DoPulse()
         return;
 
     // Pulse the http downloads
-    uint uiDownloadSizeTotal = 0;
+    uint uiDownloadedSizeTotal = 0;
+
     for (auto serverInfo : m_HttpServerList)
     {
         CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(serverInfo.downloadChannel);
         pHTTP->ProcessQueuedFiles();
-        uiDownloadSizeTotal += pHTTP->GetDownloadSizeNow();
+        uiDownloadedSizeTotal += pHTTP->GetDownloadSizeNow();
     }
 
     // Handle fatal error
@@ -137,8 +148,15 @@ void CResourceFileDownloadManager::DoPulse()
     }
 
     // Update progress box
-    GetTransferBox()->SetInfo(uiDownloadSizeTotal);
+    GetTransferBox()->SetDownloadProgress(uiDownloadedSizeTotal);
     GetTransferBox()->DoPulse();
+
+    // Call Lua event 'onClientTransferBoxProgressChange'
+    CLuaArguments arguments;
+    arguments.PushNumber(uiDownloadedSizeTotal);
+    arguments.PushNumber(static_cast<double>(GetTransferBox()->GetDownloadTotalSize()));
+
+    g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxProgressChange", arguments, false);
 
     // Check if completed downloading current group
     if (m_ActiveFileDownloadList.empty())
@@ -148,6 +166,12 @@ void CResourceFileDownloadManager::DoPulse()
         {
             m_bIsTransferingFiles = false;
             GetTransferBox()->Hide();
+
+            // Call Lua event 'onClientTransferBoxVisibilityChange'
+            CLuaArguments arguments;
+            arguments.PushBoolean(false);
+
+            g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxVisibilityChange", arguments, false);
         }
 
         // Load our newly ready resources
@@ -174,8 +198,15 @@ void CResourceFileDownloadManager::AddDownloadSize(int iSize)
             CNetHTTPDownloadManagerInterface* pHTTP = g_pNet->GetHTTPDownloadManager(serverInfo.downloadChannel);
             pHTTP->ResetDownloadSize();
         }
+
+        // Call Lua event 'onClientTransferBoxVisibilityChange'
+        CLuaArguments arguments;
+        arguments.PushBoolean(true);
+
+        g_pClientGame->GetRootEntity()->CallEvent("onClientTransferBoxVisibilityChange", arguments, false);
     }
-    GetTransferBox()->AddToTotalSize(iSize);
+
+    GetTransferBox()->AddToDownloadTotalSize(iSize);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -226,14 +257,15 @@ bool CResourceFileDownloadManager::BeginResourceFileDownload(CDownloadableResour
     options.uiConnectTimeoutMs = serverInfo.uiConnectTimeoutMs;
     options.bCheckContents = true;
     options.bIsLocal = g_pClientGame->IsLocalGame();
-    SString* pstrContext = MakeDownloadContextString(pResourceFile);
-    SString  strFilename = pResourceFile->GetName();
-    bool bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, strFilename, pstrContext, StaticDownloadFinished, options);
+
+    bool bUniqueDownload = pHTTP->QueueFile(strHTTPDownloadURLFull, pResourceFile->GetName(), pResourceFile, StaticDownloadFinished, options);
+
     if (!bUniqueDownload)
     {
         // TODO - If piggybacking on another matching download, then adjust progress bar
         OutputDebugLine(SString("[ResourceFileDownload] Using existing download for %s", *strHTTPDownloadURLFull));
     }
+
     return true;
 }
 
@@ -258,14 +290,26 @@ void CResourceFileDownloadManager::StaticDownloadFinished(const SHttpDownloadRes
 ///////////////////////////////////////////////////////////////
 void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& result)
 {
-    CDownloadableResource* pResourceFile = ResolveDownloadContextString((SString*)result.pObj);
-    if (!pResourceFile)
+    auto iter = std::find(std::begin(m_ActiveFileDownloadList), std::end(m_ActiveFileDownloadList), reinterpret_cast<CDownloadableResource*>(result.pObj));
+
+    if (iter == std::end(m_ActiveFileDownloadList))
         return;
 
-    assert(ListContains(m_ActiveFileDownloadList, pResourceFile));
+    CDownloadableResource* pResourceFile = *iter;
+
+    // Call Lua event 'onClientResourceFileDownload'
+    CLuaArguments arguments;
+    arguments.PushResource(pResourceFile->GetResource());
+    arguments.PushString(pResourceFile->GetShortName());
+    arguments.PushNumber(pResourceFile->GetDownloadSize());
+    arguments.PushString(result.bSuccess ? "finished" : "failed");
+
+    CClientEntity* resourceEntity = pResourceFile->GetResource()->GetResourceEntity();
+    resourceEntity->CallEvent("onClientResourceFileDownload", arguments, false);
+
     if (result.bSuccess)
     {
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName());
         if (checksum != pResourceFile->GetServerChecksum())
         {
             // Checksum failed - Try download on next server
@@ -279,8 +323,7 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
             }
         }
     }
-    else
-    if (result.iErrorCode == 1007)
+    else if (result.iErrorCode == 1007)
     {
         // Download failed due to being unable to create file
         // Ignore here so it will be processed at CResource::HandleDownloadedFileTrouble
@@ -308,47 +351,6 @@ void CResourceFileDownloadManager::DownloadFinished(const SHttpDownloadResult& r
     }
 
     // File now done (or failed)
-    ListRemove(m_ActiveFileDownloadList, pResourceFile);
+    m_ActiveFileDownloadList.erase(iter);
     pResourceFile->SetIsWaitingForDownload(false);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CResourceFileDownloadManager::MakeDownloadContextString
-//
-// For passing to HTTP->QueueFile
-//
-///////////////////////////////////////////////////////////////
-SString* CResourceFileDownloadManager::MakeDownloadContextString(CDownloadableResource* pDownloadableResource)
-{
-    return new SString("%d:%s", pDownloadableResource->GetResource()->GetScriptID(), pDownloadableResource->GetShortName());
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CResourceFileDownloadManager::ResolveDownloadContextString
-//
-// Decode previously generated context string.
-// Automatically deletes the string
-//
-///////////////////////////////////////////////////////////////
-CDownloadableResource* CResourceFileDownloadManager::ResolveDownloadContextString(SString* pString)
-{
-    SString strFilename;
-    uint    uiScriptId = atoi(pString->SplitLeft(":", &strFilename));
-    delete pString;
-
-    CResource* pResource = g_pClientGame->GetResourceManager()->GetResourceFromScriptID(uiScriptId);
-    if (!pResource)
-        return NULL;
-
-    // Find match in active downloads
-    for (auto pDownloadableResource : m_ActiveFileDownloadList)
-    {
-        if (pDownloadableResource->GetResource() == pResource && pDownloadableResource->GetShortName() == strFilename)
-        {
-            return pDownloadableResource;
-        }
-    }
-    return NULL;
 }

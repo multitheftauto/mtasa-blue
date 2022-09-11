@@ -12,9 +12,8 @@
 #pragma once
 
 #include "CPacket.h"
-#include <CVector.h>
 
-class CDetonateSatchelsPacket : public CPacket
+class CDetonateSatchelsPacket final : public CPacket
 {
 public:
     CDetonateSatchelsPacket();
@@ -24,6 +23,4 @@ public:
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
-
-private:
 };

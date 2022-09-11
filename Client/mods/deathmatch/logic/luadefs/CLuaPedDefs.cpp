@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
+#include "CMatrix_Pad.h"
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -49,6 +50,13 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedDucked", IsPedDucked},
         {"getPedStat", GetPedStat},
         {"getPedBonePosition", GetPedBonePosition},
+        {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
+        {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
+        {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
+        {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
+        {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
+        {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
+        {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
         {"getPedClothes", GetPedClothes},
         {"getPedControlState", GetPedControlState},
         {"getPedAnalogControlState", GetPedAnalogControlState},
@@ -64,6 +72,7 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedFootBloodEnabled", IsPedFootBloodEnabled},
         {"getPedCameraRotation", GetPedCameraRotation},
         {"getPedOxygenLevel", GetPedOxygenLevel},
+        {"isPedBleeding", ArgumentParser<IsPedBleeding>},
 
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedRotation", SetPedRotation},
@@ -91,6 +100,9 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedArmor", ArgumentParser<SetPedArmor>},
         {"givePedWeapon", GivePedWeapon},
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
+        {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
+        {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
+        {"setPedBleeding", ArgumentParser<SetPedBleeding>},
     };
 
     // Add functions
@@ -155,6 +167,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
+    lua_classfunction(luaVM, "isBleeding", "isPedBleeding");
 
     lua_classfunction(luaVM, "setCanBeKnockedOffBike", "setPedCanBeKnockedOffBike");
     lua_classfunction(luaVM, "setAnalogControlState", "setPedAnalogControlState");
@@ -180,6 +193,9 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStat", "setPedStat");
     lua_classfunction(luaVM, "giveWeapon", "givePedWeapon");
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
+    lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
+    lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
+    lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -204,6 +220,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
     lua_classvariable(luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classvariable(luaVM, "footBlood", "setPedFootBloodEnabled", NULL);
+    lua_classvariable(luaVM, "bleeding", "setPedBleeding", "isPedBleeding");
     lua_classvariable(luaVM, "targetCollision", nullptr, OOP_GetPedTargetCollision);
     lua_classvariable(luaVM, "targetEnd", nullptr, OOP_GetPedTargetEnd);
     lua_classvariable(luaVM, "targetStart", nullptr, OOP_GetPedTargetStart);
@@ -969,6 +986,78 @@ int CLuaPedDefs::CanPedBeKnockedOffBike(lua_State* luaVM)
     return 1;
 }
 
+bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CVector position)
+{
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBonePosition(static_cast<eBone>(boneId), position) : false;
+}
+
+bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll)
+{
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+{
+    CEntity* theEntity = entity->GetGameEntity();
+    CVector  position;
+    if (theEntity && theEntity->GetBonePosition(static_cast<eBone>(boneId), position))
+        return std::make_tuple(position.fX, position.fY, position.fZ);
+    return false;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+{
+    float    yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity && theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
+        return std::make_tuple(yaw, pitch, roll);
+    return false;
+}
+
+bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix)
+{
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
+}
+
+std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+{
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity)
+    {
+        RwMatrix* boneRwMatrix = theEntity->GetBoneRwMatrix(static_cast<eBone>(boneId));
+        if (boneRwMatrix)
+        {
+            CMatrix matrix;
+            g_pGame->GetRenderWare()->RwMatrixToCMatrix(*boneRwMatrix, matrix);
+            return matrix.To4x4Array();
+        }
+    }
+    return false;
+}
+
+bool CLuaPedDefs::UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity)
+{
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity)
+    {
+        theEntity->UpdateRpHAnim();
+
+        if (theEntity->GetModelIndex() == 0)            // CJ skin
+        {
+            RpClump* clump = theEntity->GetRpClump();
+            if (clump)
+            {
+                ((void(__cdecl*)(RpClump*))0x5DF560)(clump);            // CPed::ShoulderBoneRotation
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
 int CLuaPedDefs::GetPedBonePosition(lua_State* luaVM)
 {
     // Verify the argument
@@ -1411,6 +1500,11 @@ int CLuaPedDefs::IsPedFootBloodEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaPedDefs::IsPedBleeding(CClientPed* pPed)
+{
+    return pPed->IsBleeding();
 }
 
 int CLuaPedDefs::GetPedCameraRotation(lua_State* luaVM)
@@ -1874,6 +1968,12 @@ int CLuaPedDefs::SetPedFootBloodEnabled(lua_State* luaVM)
     return 1;
 }
 
+bool CLuaPedDefs::SetPedBleeding(CClientPed* ped, bool bleeding)
+{
+    ped->SetBleeding(bleeding);
+    return true;
+}
+
 int CLuaPedDefs::SetPedCameraRotation(lua_State* luaVM)
 {
     //  bool setPedCameraRotation ( ped thePed, float cameraRotation )
@@ -2264,4 +2364,16 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
     }
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
+{
+    CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
+    bool            bPassenger = bOptPassenger.value_or(false);
+    return pPed->EnterVehicle(pVehicle, bPassenger);
+}
+
+bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
+{
+    return pPed->ExitVehicle();
 }

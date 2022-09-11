@@ -9,9 +9,7 @@
  *
  *****************************************************************************/
 
-#pragma once 
-
-#include <set>
+#pragma once
 
 class CExceptionInformation;
 
@@ -38,11 +36,8 @@ enum EDumpFileNameParts
 //
 class CCrashDumpWriter
 {
-    //static 
 public:
     static long WINAPI HandleExceptionGlobal(_EXCEPTION_POINTERS* pException);
-    static LONG WINAPI HandleExceptionHardWareBreakPoint(PEXCEPTION_POINTERS ExceptionInfo);
-    static bool        GetHardWareBreakPointAddress(PCONTEXT ContextRecord, DWORD& dwAddress);
     static void        DumpCoreLog(CExceptionInformation* pExceptionInformation);
     static void        DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);
     static void        RunErrorTool(CExceptionInformation* pExceptionInformation);
@@ -64,5 +59,4 @@ public:
     static void        SetHandlers();
     static void        UpdateCounters();
     static void        HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved);
-    static HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
 };

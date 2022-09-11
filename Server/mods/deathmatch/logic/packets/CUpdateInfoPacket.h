@@ -11,7 +11,9 @@
 
 #pragma once
 
-class CUpdateInfoPacket : public CPacket
+#include "CPacket.h"
+
+class CUpdateInfoPacket final : public CPacket
 {
 public:
     CUpdateInfoPacket();

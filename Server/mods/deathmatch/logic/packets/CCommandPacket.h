@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CCommandPacket : public CPacket
+class CCommandPacket final : public CPacket
 {
 public:
     CCommandPacket() { m_strCommand = ""; };

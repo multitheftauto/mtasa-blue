@@ -13,6 +13,17 @@
 
 extern CGameSA* pGame;
 
+AnimBlendFrameData* CAnimBlendClumpDataSAInterface::GetFrameDataByNodeId(unsigned int nodeId)
+{
+    for (int i = 0; i < m_dwNumBones; i++)
+    {
+        AnimBlendFrameData& frameData = m_frames[i];
+        if (frameData.m_nNodeId == nodeId)
+            return &frameData;
+    }
+    return nullptr;
+}
+
 CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(CAnimBlendStaticAssociationSAInterface& staticAssociationByReference)
 {
     DWORD DwFunc = 0x4CF080;

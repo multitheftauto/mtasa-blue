@@ -19,9 +19,8 @@
 #include <clocale>
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
-#include "detours/include/detours.h"
+#include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
-#include "CDiscordManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -35,7 +34,18 @@ SString       g_strJingleBells;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-CCore::CCore() : m_DiscordManager(new CDiscordManager())
+static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+
+static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
+{
+    if (StrCmpIA("dpnhpast.dll", fileName) != 0)
+        return Win32LoadLibraryA(fileName);
+
+    // GTA:SA expects a valid module handle for DirectPlay. We return a handle for an already loaded library.
+    return Win32LoadLibraryA("d3d8.dll");
+}
+
+CCore::CCore()
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -56,9 +66,6 @@ CCore::CCore() : m_DiscordManager(new CDiscordManager())
     CreateXML();
     ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
-
-    // Initialize discord manager
-    m_DiscordManager->Initialize();
 
     // Create a logger instance.
     m_pConsoleLogger = new CConsoleLogger();
@@ -427,11 +434,11 @@ void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned cha
     }
 }
 
-void CCore::SetChatVisible(bool bVisible)
+void CCore::SetChatVisible(bool bVisible, bool bInputBlocked)
 {
     if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetChatBoxVisible(bVisible);
+        m_pLocalGUI->SetChatBoxVisible(bVisible, bInputBlocked);
     }
 }
 
@@ -440,6 +447,15 @@ bool CCore::IsChatVisible()
     if (m_pLocalGUI)
     {
         return m_pLocalGUI->IsChatBoxVisible();
+    }
+    return false;
+}
+
+bool CCore::IsChatInputBlocked()
+{
+    if (m_pLocalGUI)
+    {
+        return m_pLocalGUI->IsChatBoxInputBlocked();
     }
     return false;
 }
@@ -557,8 +573,9 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance(false);
-    pGameSettings->ResetPedsLODDistance(false);
+    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetPedsLODDistance();
+    pGameSettings->ResetCoronaReflectionsEnabled();
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -569,9 +586,6 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
-
-    if (bConnected) m_DiscordManager->RegisterPlay(true);
-    else ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -741,25 +755,7 @@ void CCore::ApplyHooks()
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
-    using LoadLibraryA_t = HMODULE(__stdcall*)(LPCTSTR fileName);
-    static LoadLibraryA_t oldLoadLibraryA =
-        (LoadLibraryA_t)DetourFunction(DetourFindFunction("KERNEL32.DLL", "LoadLibraryA"), (PBYTE)(LoadLibraryA_t)[](LPCSTR fileName)->HMODULE {
-            // Don't load dpnhpast.dll
-            if (StrCmpA("dpnhpast.dll", fileName) == 0)
-            {
-                // Unfortunately, Microsoft's detours library doesn't support something like 'detour chains' properly,
-                // so that we cannot remove the hook flawlessly
-                // See
-                // http://read.pudn.com/downloads71/ebook/256925/%E5%BE%AE%E8%BD%AF%E6%8F%90%E4%BE%9B%E7%9A%84%E6%88%AA%E5%8F%96Win32%20API%E5%87%BD%E6%95%B0%E7%9A%84%E5%BC%80%E5%8F%91%E5%8C%85%E5%92%8C%E4%BE%8B%E5%AD%90detours-src-1.2/src/detours.cpp__.htm
-
-                // Do something hacky: GTA requires a valid module handle, so pass a module handle of a DLL that is already loaded
-                // as FreeLibrary is later called
-                return oldLoadLibraryA("D3D8.DLL");
-            }
-
-            // Call old LoadLibraryA (this in our case SharedUtil::MyLoadLibraryA though)
-            return oldLoadLibraryA(fileName);
-        });
+    DetourLibraryFunction("kernel32.dll", "LoadLibraryA", Win32LoadLibraryA, SkipDirectPlay_LoadLibraryA);
 }
 
 bool UsingAltD3DSetup()
@@ -786,7 +782,6 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
-            CCore::GetSingleton().ResetDiscordRichPresence();
         }
     }
 }
@@ -968,7 +963,7 @@ void CCore::CreateNetwork()
         ulong ulNetModuleVersion = 0;
         pfnCheckCompatibility(1, &ulNetModuleVersion);
         SString strMessage("Network module not compatible! (Expected 0x%x, got 0x%x)", MTA_DM_CLIENT_NET_MODULE_VERSION, ulNetModuleVersion);
-#if !defined(MTA_DM_CONNECT_TO_PUBLIC)
+#if !defined(MTA_DM_PUBLIC_CONNECTIONS)
         strMessage += "\n\n(Devs: Update source and run win-install-data.bat)";
 #endif
         BrowseToSolution("netc-not-compatible", ASK_GO_ONLINE | TERMINATE_PROCESS, strMessage);
@@ -1322,7 +1317,7 @@ void CCore::RegisterCommands()
     m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
-    
+
     m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
@@ -1989,28 +1984,6 @@ uint CCore::GetMaxStreamingMemory()
 }
 
 //
-// ResetDiscordRichPresence
-//
-void CCore::ResetDiscordRichPresence()
-{
-    time_t currentTime;
-    time(&currentTime);
-
-    // Set default parameters
-    SDiscordActivity activity;
-    activity.m_details = "In Main Menu";
-    activity.m_startTimestamp = currentTime;
-
-    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
-        if (res == DiscordRes_Ok)
-            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
-        else
-            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
-    });
-    m_DiscordManager->RegisterPlay(false);
-}
-
-//
 // OnCrashAverted
 //
 void CCore::OnCrashAverted(uint uiId)
@@ -2270,9 +2243,4 @@ SString CCore::GetBlueCopyrightString()
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
-}
-
-HANDLE CCore::SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
-{
-    return CCrashDumpWriter::SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
 }

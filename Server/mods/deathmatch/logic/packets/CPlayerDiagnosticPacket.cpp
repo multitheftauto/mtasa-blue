@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerDiagnosticPacket.h"
 
 bool CPlayerDiagnosticPacket::Read(NetBitStreamInterface& BitStream)
 {

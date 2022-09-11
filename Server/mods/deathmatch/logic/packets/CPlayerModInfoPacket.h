@@ -9,6 +9,10 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "CPacket.h"
+
 struct SModInfoItem
 {
     ushort  usId;
@@ -26,7 +30,7 @@ struct SModInfoItem
     SString strLongSha256;
 };
 
-class CPlayerModInfoPacket : public CPacket
+class CPlayerModInfoPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_MODINFO; };

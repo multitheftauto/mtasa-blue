@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CLuaPacket : public CPacket
+class CLuaPacket final : public CPacket
 {
 public:
     CLuaPacket(unsigned char ucActionID, NetBitStreamInterface& BitStream) : m_ucActionID(ucActionID), m_BitStream(BitStream){};

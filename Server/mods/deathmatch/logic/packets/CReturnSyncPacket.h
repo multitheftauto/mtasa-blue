@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CReturnSyncPacket : public CPacket
+class CReturnSyncPacket final : public CPacket
 {
 public:
     CReturnSyncPacket(class CPlayer* pPlayer);

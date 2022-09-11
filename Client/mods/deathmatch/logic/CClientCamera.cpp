@@ -412,11 +412,15 @@ void CClientCamera::SetFocusToLocalPlayer()
     // Restore the camera
     SetFocusToLocalPlayerImpl();
 
+    Reset();
+}
+
+void CClientCamera::Reset()
+{
     // Remove stream reference from the previous target
     if (m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass())
         static_cast<CClientStreamElement*>((CClientEntity*)m_pFocusedEntity)->RemoveStreamReference();
 
-    // Reset
     m_pFocusedPlayer = NULL;
     m_pFocusedEntity = NULL;
     m_pFocusedGameEntity = NULL;
@@ -481,14 +485,24 @@ void CClientCamera::RestoreEntity(CClientEntity* pEntity)
     }
 }
 
-void CClientCamera::SetCameraViewMode(eVehicleCamMode eMode)
+void CClientCamera::SetCameraVehicleViewMode(eVehicleCamMode eMode)
 {
-    m_pCamera->SetCameraViewMode(eMode);
+    m_pCamera->SetCameraVehicleViewMode(static_cast<BYTE>(eMode));
 }
 
-eVehicleCamMode CClientCamera::GetCameraViewMode()
+void CClientCamera::SetCameraPedViewMode(ePedCamMode eMode)
 {
-    return (eVehicleCamMode)m_pCamera->GetCameraViewMode();
+    m_pCamera->SetCameraPedViewMode(static_cast<BYTE>(eMode));
+}
+
+eVehicleCamMode CClientCamera::GetCameraVehicleViewMode()
+{
+    return (eVehicleCamMode)m_pCamera->GetCameraVehicleViewMode();
+}
+
+ePedCamMode CClientCamera::GetCameraPedViewMode()
+{
+    return (ePedCamMode)m_pCamera->GetCameraPedViewMode();
 }
 
 void CClientCamera::SetCameraClip(bool bObjects, bool bVehicles)

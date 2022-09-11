@@ -23,6 +23,7 @@ project "Game SA"
 	filter {}
 
 	includedirs {
+		"../../Shared/sdk",
 		"../sdk/",
 		"../../vendor/sparsehash/src/"
 	}
@@ -34,7 +35,7 @@ project "Game SA"
 		"**.cpp"
 	}
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

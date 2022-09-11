@@ -13,29 +13,32 @@ class CClientModelManager;
 #pragma once
 
 #include <list>
+#include <vector>
+#include <memory>
 #include "CClientModel.h"
-
-#define MAX_MODEL_ID 20000
 
 class CClientModelManager
 {
     friend class CClientModel;
 
 public:
-    CClientModelManager(class CClientManager* pManager);
+    CClientModelManager::CClientModelManager();
     ~CClientModelManager(void);
 
     void RemoveAll(void);
 
-    void Add(CClientModel* pModel);
-    bool Remove(CClientModel* pModel);
+    void Add(const std::shared_ptr<CClientModel>& pModel);
+    bool Remove(const std::shared_ptr<CClientModel>& pModel);
 
     int GetFirstFreeModelID(void);
 
-    CClientModel* FindModelByID(int iModelID);
+    std::shared_ptr<CClientModel> FindModelByID(int iModelID);
+
+    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0);
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
 private:
-    CClientModel* m_Models[MAX_MODEL_ID];
+    std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
+    unsigned int                                     m_modelCount = 0;
 };

@@ -8,9 +8,12 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-class CPlayerACInfoPacket : public CPacket
+#include "CPacket.h"
+
+class CPlayerACInfoPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_ACINFO; };

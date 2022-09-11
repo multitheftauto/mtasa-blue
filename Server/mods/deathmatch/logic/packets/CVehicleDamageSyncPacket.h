@@ -12,10 +12,11 @@
 #pragma once
 
 #include "CPacket.h"
-#include "../CVehicle.h"
 #include "net/SyncStructures.h"
 
-class CVehicleDamageSyncPacket : public CPacket
+class CVehicle;
+
+class CVehicleDamageSyncPacket final : public CPacket
 {
 public:
     CVehicleDamageSyncPacket();

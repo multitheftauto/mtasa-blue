@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CPedStopSyncPacket : public CPacket
+class CPedStopSyncPacket final : public CPacket
 {
 public:
     CPedStopSyncPacket(ElementID ID) { m_ID = ID; };

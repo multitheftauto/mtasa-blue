@@ -11,7 +11,9 @@
 
 #pragma once
 
-class CPlayerDiagnosticPacket : public CPacket
+#include "CPacket.h"
+
+class CPlayerDiagnosticPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_DIAGNOSTIC; };

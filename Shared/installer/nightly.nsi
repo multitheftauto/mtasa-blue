@@ -34,14 +34,14 @@ Var ShowLastUsed
 Var PermissionsGroup
 Var PATCH_TARGET
 
-; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\GDFImp.gdf.xml
-!define GUID "{DF780162-2450-4665-9BA2-EAB14ED640A3}"
+; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
+!define GUID "{D32E69D8-716F-4E74-91CB-044DB9AA3F40}"
 
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
-    !define MAINT_VER "0"
+    !define MINOR_VER "5"
+    !define MAINT_VER "9"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -79,7 +79,7 @@ Var PATCH_TARGET
 !define PRODUCT_NAME_NO_VER "MTA:SA"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
-!define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
+!define PRODUCT_WEB_SITE "https://www.multitheftauto.com"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -153,8 +153,8 @@ Page custom CustomDirectoryPage CustomDirectoryPageLeave
 ; Language Tools ----
 ;Note: Assumes NSIS Unicode edition compiler
 !define MUI_LANGDLL_ALLLANGUAGES
-!define MUI_LANGDLL_REGISTRY_ROOT "HKLM" 
-!define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" 
+!define MUI_LANGDLL_REGISTRY_ROOT "HKLM"
+!define MUI_LANGDLL_REGISTRY_KEY "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
 !insertmacro MUI_RESERVEFILE_LANGDLL ;Solid compression optimization for multilang
 
@@ -236,8 +236,8 @@ Function .onInit
     ${Else}
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
-    
-	
+
+
 	${If} ${AtMostWinVista}
 		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
 		ExecShell "open" "http://mtasa.com"
@@ -245,7 +245,7 @@ Function .onInit
 	${EndIf}
 
     File /oname=$TEMP\image.bmp "connect.bmp"
-    
+
     ; #############################################
     ; Remove old shortcuts put in rand(user,admin) startmenu by previous installers (shortcuts now go in all users)
     SetShellVarContext current
@@ -268,14 +268,14 @@ Function .onInit
 
     ; Try to find previously saved MTA:SA install path
     ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
-    ${If} $Install_Dir == "" 
+    ${If} $Install_Dir == ""
         ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "Last Install Location"
     ${EndIf}
-    ${If} $Install_Dir != "" 
+    ${If} $Install_Dir != ""
         Call NoteMTAWasPresent
     ${EndIf}
 
-    ${If} $Install_Dir == "" 
+    ${If} $Install_Dir == ""
         strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
     ${EndIf}
     strcpy $INSTDIR $Install_Dir
@@ -285,11 +285,11 @@ Function .onInit
     strcpy $DEFAULT_INSTDIR "$PROGRAMFILES\MTA San Andreas ${0.0}"
     strcpy $LAST_INSTDIR $Install_Dir
     strcpy $CUSTOM_INSTDIR $DEFAULT_INSTDIR
-    ${If} $DEFAULT_INSTDIR == $LAST_INSTDIR 
+    ${If} $DEFAULT_INSTDIR == $LAST_INSTDIR
         StrCpy $WhichRadio "default"
         StrCpy $ShowLastUsed "0"
     ${Else}
-        Push $LAST_INSTDIR 
+        Push $LAST_INSTDIR
         Call GetInstallType
         Pop $0
         Pop $1
@@ -305,16 +305,16 @@ Function .onInit
 
     ; Try to find previously saved GTA:SA install path
     ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path"
-    ${If} $2 == "" 
+    ${If} $2 == ""
         ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
     ${EndIf}
-    ${If} $2 == "" 
+    ${If} $2 == ""
         ReadRegStr $2 HKLM "SOFTWARE\Rockstar Games\GTA San Andreas\Installation" "ExePath"
     ${EndIf}
-    ${If} $2 == "" 
+    ${If} $2 == ""
         ReadRegStr $2 HKLM "SOFTWARE\Multi Theft Auto: San Andreas" "GTA:SA Path"
     ${EndIf}
-    ${If} $2 == "" 
+    ${If} $2 == ""
         ReadRegStr $3 HKCU "Software\Valve\Steam\Apps\12120" "Installed"
         StrCpy $3 $3 1
         ${If} $3 == "1"
@@ -322,12 +322,12 @@ Function .onInit
             StrCpy $2 "$3\steamapps\common\grand theft auto san andreas"
         ${EndIf}
     ${EndIf}
-    ${If} $2 == "" 
+    ${If} $2 == ""
         ReadRegStr $2 HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "GTA:SA Path Backup"
     ${EndIf}
 
     ; Report previous install status
-    ${If} $2 != "" 
+    ${If} $2 != ""
         Call NoteGTAWasPresent
     ${EndIf}
 
@@ -338,11 +338,11 @@ Function .onInit
     ; Remove quotes
     strcpy $3 '"'
     !insertmacro ReplaceSubStr $MODIFIED_STR $3 ""
-    ; Store result 
+    ; Store result
     strcpy $GTA_DIR $MODIFIED_STR
 
     ; Default to standard path if nothing defined
-    ${If} $GTA_DIR == "" 
+    ${If} $GTA_DIR == ""
         strcpy $GTA_DIR "$PROGRAMFILES\Rockstar Games\GTA San Andreas\"
     ${EndIf}
 
@@ -362,7 +362,7 @@ Function .onInstSuccess
 
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
-    
+
     ; Start menu items
     ${If} $CreateSMShortcuts == 1
         CreateDirectory "$SMPROGRAMS\MTA San Andreas ${0.0}"
@@ -374,14 +374,14 @@ Function .onInstSuccess
             "" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
             "" "Play Multi Theft Auto: San Andreas ${0.0}"
         skip1:
-        
+
         IfFileExists "$INSTDIR\Server\MTA Server.exe" 0 skip2
         SetOutPath "$INSTDIR\Server"
         CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk" "$INSTDIR\Server\MTA Server.exe" \
             "" "$INSTDIR\Server\MTA Server.exe" 2 SW_SHOWNORMAL \
             "" "Run the Multi Theft Auto: San Andreas ${0.0} Server"
         skip2:
-        
+
         IfFileExists "$INSTDIR\Uninstall.exe" 0 skip3
         SetOutPath "$INSTDIR"
         CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
@@ -389,7 +389,7 @@ Function .onInstSuccess
             "" "Uninstall Multi Theft Auto: San Andreas ${0.0}"
         skip3:
     ${EndIf}
-    
+
     ${If} $CreateDesktopIcon == 1
         IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
         SetOutPath "$INSTDIR"
@@ -490,7 +490,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
         #############################################################
         # Show that upgrade is catered for
-        Push $INSTDIR 
+        Push $INSTDIR
         Call GetInstallType
         Pop $0
         Pop $1
@@ -562,7 +562,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             StrCpy $0 $INSTDIR
             Call RemoveVirtualStore
 
-            Push $GTA_DIR 
+            Push $GTA_DIR
             Call IsGtaDirectory
             Pop $0
             ${If} $0 == "gta"
@@ -579,7 +579,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
         #############################################################
         # Issue warning if GTA path looks incorrect
-        Push $GTA_DIR 
+        Push $GTA_DIR
         Call IsGtaDirectory
         Pop $0
         ${If} $0 != "gta"
@@ -624,8 +624,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 ${GetDLLVersionNumbers} "$SYSDIR\crypt32.dll" $0 $1 $2 $3
                 ${If} $2 == 7601
                     ${If} $3 < 18741
-                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "http://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
-                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "http://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
+                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "https://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
+                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "https://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
                     ${EndIf}
                 ${EndIf}
             ${EndIf}
@@ -659,6 +659,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\bassmidi.dll"
         File "${FILES_ROOT}\mta\bassmix.dll"
         File "${FILES_ROOT}\mta\bassopus.dll"
+        File "${FILES_ROOT}\mta\basswebm.dll"
         File "${FILES_ROOT}\mta\basswma.dll"
         File "${FILES_ROOT}\mta\tags.dll"
 
@@ -670,16 +671,26 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\libGLESv2.dll"
         File "${FILES_ROOT}\mta\snapshot_blob.bin"
         File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
-        
+
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher_DLL.dll"
-        File "${FILES_ROOT}\mta\CEF\cef.pak"
-        File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
-        File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+
+
+	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+        File "${FILES_ROOT}\mta\CEF\chrome_100_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\chrome_200_percent.pak"
+        File "${FILES_ROOT}\mta\CEF\resources.pak"
+
+	# Clarification for the below 4 deprecated files: https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
+        #File "${FILES_ROOT}\mta\CEF\cef.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_100_percent.pak"
+        #File "${FILES_ROOT}\mta\CEF\cef_200_percent.pak"
+        #File "${FILES_ROOT}\mta\CEF\devtools_resources.pak"
+		
+	# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
-        
+
         SetOutPath "$INSTDIR\MTA\CEF\locales"
         File "${FILES_ROOT}\mta\CEF\locales\en-US.pak"
 
@@ -716,13 +727,13 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\skins\Classic\CGUI.lnf.xml"
             File "${FILES_ROOT}\skins\Classic\CGUI.png"
             File "${FILES_ROOT}\skins\Classic\CGUI.xml"
-            
+
             SetOutPath "$INSTDIR\skins\Default"
             File "${FILES_ROOT}\skins\Default\CGUI.is.xml"
             File "${FILES_ROOT}\skins\Default\CGUI.lnf.xml"
             File "${FILES_ROOT}\skins\Default\CGUI.png"
             File "${FILES_ROOT}\skins\Default\CGUI.xml"
-            
+
             SetOutPath "$INSTDIR\skins\Lighter black"
             File "${FILES_ROOT}\skins\Lighter black\CGUI.is.xml"
             File "${FILES_ROOT}\skins\Lighter black\CGUI.lnf.xml"
@@ -739,7 +750,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\cgui\sagothic.ttf"
             File "${FILES_ROOT}\mta\cgui\saheader.ttf"
             File "${FILES_ROOT}\mta\cgui\sans.ttf"
-            File "${FILES_ROOT}\mta\cgui\unifont-5.1.20080907.ttf"
+            File "${FILES_ROOT}\mta\cgui\unifont.ttf"
 
             SetOutPath "$INSTDIR\MTA\cgui\images"
             File "${FILES_ROOT}\mta\cgui\images\*.png"
@@ -755,7 +766,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\cgui\images\serverbrowser\*.png"
 
         !endif
-            
+
         SetOutPath "$INSTDIR\MTA\locale\"
         File /r "${FILES_ROOT}\mta\locale\*.png"
         File /r "${FILES_ROOT}\mta\locale\*.po"
@@ -771,7 +782,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             ${If} ${Errors}
                 ${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
                 CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
-                CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
+                CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "https://wiki.multitheftauto.com/wiki/Client_Manual"
             ${EndIf}
         ${EndIf}
 
@@ -783,7 +794,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${LogText} "+Section begin - CLIENT GAME"
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
-        File "${FILES_ROOT}\mods\deathmatch\Client.dll"
+        File "${FILES_ROOT}\mods\deathmatch\client.dll"
         File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
         ${LogText} "-Section end - CLIENT GAME"
@@ -794,7 +805,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
     Section "$(INST_SEC_CORE)" SEC04
         ${LogText} "+Section begin - SERVER CORE"
         SectionIn 1 2 RO ; section is required
-        
+
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\core.dll"
@@ -809,7 +820,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         ${LogText} "+Section begin - SERVER GAME"
         SectionIn 1 2 RO ; section is required
         SetOutPath "$INSTDIR\server\mods\deathmatch"
-        
+
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
@@ -818,7 +829,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
         !endif
-        
+
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
         !insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
         !insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "706869E53F508919F987A2F7F2653AD2"
@@ -834,7 +845,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
-            
+
             SetOutPath "$INSTDIR\server\mods\deathmatch\resources"
             SetOutPath "$INSTDIR\server\mods\deathmatch\resource-cache"
             SetOutPath "$INSTDIR\server\mods\deathmatch\logs"
@@ -880,12 +891,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
                 SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[briefcaserace]"
                 SetOverwrite ifnewer
                 File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[briefcaserace]\*.zip"
-            SectionEnd
-            Section "Classic Deathmatch Gamemode"
-            SectionIn 1 2
-                SetOutPath "$INSTDIR\server\mods\deathmatch\resources\[gamemodes]\[cdm]"
-                SetOverwrite ifnewer
-                File /r "${SERVER_FILES_ROOT}\mods\deathmatch\resources\[gamemodes]\[cdm]\*.zip"
             SectionEnd
             Section "Capture the Flag Gamemode"
             SectionIn 1 2
@@ -937,7 +942,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             SectionEnd
         SectionGroupEnd
     !endif
-    
+
     !ifdef INCLUDE_EDITOR
         Section "$(INST_SEC_EDITOR)" SEC08
             SectionIn 1 2
@@ -1011,7 +1016,7 @@ Function un.OnUnInstFailed
     ;UAC::Unload ;Must call unload! ; #3017 fix
 FunctionEnd
 
- 
+
 LangString UNINST_REQUEST ${LANG_ENGLISH}   "Are you sure you want to completely remove $(^Name) and all of its components?"
 LangString UNINST_REQUEST_NOTE ${LANG_ENGLISH}  "Uninstalling before update?\
 $\r$\nIt is not necessary to uninstall before installing a new version of MTA:SA\
@@ -1022,7 +1027,7 @@ Function un.onInit
     SetShellVarContext all
         MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_REQUEST_NOTE)$\r$\n$\r$\n$\r$\n$(UNINST_REQUEST)" IDYES +2
         Abort
-        
+
     !insertmacro MUI_UNGETLANGUAGE
 FunctionEnd
 
@@ -1051,27 +1056,38 @@ Section Uninstall
     Call un.DoServiceUninstall
     ; server CORE FILES
     Delete "$INSTDIR\server\core.dll"
-    Delete "$INSTDIR\server\xmll.dll"
     Delete "$INSTDIR\server\MTA Server.exe"
     Delete "$INSTDIR\server\net.dll"
-    Delete "$INSTDIR\server\libcurl.dll"
+    Delete "$INSTDIR\server\pthread.dll"
+    Delete "$INSTDIR\server\xmll.dll"
 
     ; server files
+    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
     Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
+    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
     Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
     Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthread.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+
+    ; server x64 CORE FILES
+    Delete "$INSTDIR\server\MTA Server64.exe"
+    Delete "$INSTDIR\server\x64\core.dll"
+    Delete "$INSTDIR\server\x64\net.dll"
+    Delete "$INSTDIR\server\x64\pthread.dll"
+    Delete "$INSTDIR\server\x64\xmll.dll"
+
+    ; server x64 files
+    Delete "$INSTDIR\server\x64\dbconmy.dll"
+    Delete "$INSTDIR\server\x64\deathmatch.dll"
+    Delete "$INSTDIR\server\x64\libmysql.dll"
+    Delete "$INSTDIR\server\x64\lua5.1.dll"
+    Delete "$INSTDIR\server\x64\pcre3.dll"
+    RmDir "$INSTDIR\server\x64"
 
     Delete "$INSTDIR\Multi Theft Auto.exe"
     Delete "$INSTDIR\Multi Theft Auto.exe.dat"
     Delete "$INSTDIR\Uninstall.exe"
 
-    Delete "$INSTDIR\mods\deathmatch\Client.dll"
-    Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+    Delete "$INSTDIR\mods\deathmatch\client.dll"
     Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
     RmDir /r "$INSTDIR\MTA\cgui"
@@ -1094,9 +1110,9 @@ Section Uninstall
     DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
     DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
     ; TODO if HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common is the only one left, delete it
-    
+
     ${GameExplorer_RemoveGame} ${GUID}
-    
+
     ; Delete client shortcuts
     Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
     Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
@@ -1108,7 +1124,7 @@ Section Uninstall
     Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk"
     Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk"
     RmDir /r "$SMPROGRAMS\\MTA San Andreas ${0.0}"
-    
+
     SetAutoClose true
 SectionEnd
 
@@ -1199,12 +1215,12 @@ Function ScreenToClient
         ; Free 2 int struct
         System::Free $1
     ${EndIf}
-    
+
     ;Restore register values from the stack
     Pop $3
     Pop $2
     Pop $1
-    
+
 FunctionEnd
 
 
@@ -1236,14 +1252,14 @@ Function GetWindowRect
         ; Free 4 int struct
         System::Free $1
     ${EndIf}
-    
+
     ;Restore register values from the stack
     Pop $5
     Pop $4
     Pop $3
     Pop $2
     Pop $1
-    
+
 FunctionEnd
 
 
@@ -1290,13 +1306,13 @@ Function MoveDialogItem
 
     StrCpy $HWND $ITEM_HWND
     Call GetChildRect
-    
+
     ; Calculate new dims
     IntOp $1 $RECT_X + $X
     IntOp $2 $RECT_Y + $Y
     IntOp $3 $RECT_W + $CX
-    IntOp $4 $RECT_H + $CY 
-    
+    IntOp $4 $RECT_H + $CY
+
     ; Set new dims
     System::Call "User32::MoveWindow(i, i, i, i, i, b) b ($ITEM_HWND, $1, $2, $3, $4, true)"
 
@@ -1305,7 +1321,7 @@ Function MoveDialogItem
     Pop $3
     Pop $2
     Pop $1
-    
+
 FunctionEnd
 
 
@@ -1338,11 +1354,11 @@ Function ResizeComponentsDialogContents
     StrCpy $ITEM_PARENT $HWND_DIALOG
     StrCpy $ITEM_ID 1043    ; Static - "Position your mouse over a component to see its description."
     Call MoveDialogItem
-    
+
     StrCpy $ITEM_PARENT $HWND_DIALOG
     StrCpy $ITEM_ID 1042    ; Button - Description
     Call MoveDialogItem
-    
+
     ${If} "$(LANGUAGE_RTL)" == "1"
         StrCpy $X $RESIZE_X
         StrCpy $Y 0
@@ -1379,23 +1395,23 @@ Function ResizeComponentsDialogContents
     StrCpy $ITEM_PARENT $HWND_DIALOG
     StrCpy $ITEM_ID 1032    ; Tree view
     Call MoveDialogItem
-    
+
     ;Stretch combo box to the right
     StrCpy $X 0
     StrCpy $Y 0
     StrCpy $CX $RESIZE_X
     StrCpy $CY 0
-    
+
     StrCpy $ITEM_PARENT $HWND_DIALOG
     StrCpy $ITEM_ID 1017    ; Combo box
     Call MoveDialogItem
-    
+
     ;Move space required text down
     StrCpy $X 0
     StrCpy $Y $RESIZE_Y
     StrCpy $CX 0
     StrCpy $CY 0
-    
+
     StrCpy $ITEM_PARENT $HWND_DIALOG
     StrCpy $ITEM_ID 1023    ; Static
     Call MoveDialogItem
@@ -1424,13 +1440,13 @@ Function ResizeSharedDialogContents
     StrCpy $ITEM_PARENT $HWNDPARENT
     StrCpy $ITEM_ID 3 ; Button - Back
     Call MoveDialogItem
-    
+
     ;Move branding text down
     StrCpy $X 0
     StrCpy $Y $RESIZE_Y
     StrCpy $CX 0
     StrCpy $CY 0
-    
+
     StrCpy $ITEM_PARENT $HWNDPARENT
     StrCpy $ITEM_ID 1256    ; Static - "Nullsoft Install System..."
     Call MoveDialogItem
@@ -1460,7 +1476,7 @@ Function ResizeSharedDialogContents
     StrCpy $ITEM_PARENT $HWNDPARENT
     StrCpy $ITEM_ID 1036    ; Static - Line
     Call MoveDialogItem
-    
+
     ;Move header text to the right
     StrCpy $X $RESIZE_X
     StrCpy $Y 0
@@ -1473,7 +1489,7 @@ Function ResizeSharedDialogContents
     StrCpy $ITEM_PARENT $HWNDPARENT
     StrCpy $ITEM_ID 1038    ; Static - "Choose which features of MTA:SA v1.0 you want to install."
     Call MoveDialogItem
-    
+
     ${If} "$(LANGUAGE_RTL)" == "1"
         ;Move image to the right most end if RTL
         StrCpy $X $RESIZE_X
@@ -1485,7 +1501,7 @@ Function ResizeSharedDialogContents
         StrCpy $ITEM_ID 1046    ; Static - mta_install_header_rtl.bmp
         Call MoveDialogItem
     ${EndIf}
-    
+
 FunctionEnd
 
 
@@ -1500,16 +1516,16 @@ Function ResizeMainWindow
     Push $2
     Push $3
     Push $4
- 
+
     StrCpy $HWND $HWNDPARENT
     Call GetWindowRect
 
     IntOp $0 $RESIZE_X / 2
     IntOp $1 $RECT_X - $0
-    
+
     IntOp $0 $RESIZE_Y / 2
     IntOp $2 $RECT_Y - $0
-    
+
     IntOp $3 $RECT_W + $RESIZE_X
     IntOp $4 $RECT_H + $RESIZE_Y
 
@@ -1530,7 +1546,7 @@ Var COMPONENTS_EXPAND_STATUS
 Function "WelcomePreProc"
     ${LogText} "+Function begin - WelcomePreProc"
     !insertmacro UAC_IsInnerInstance
-    ${If} ${UAC_IsInnerInstance} 
+    ${If} ${UAC_IsInnerInstance}
         ; If switched to admin, don't show welcome window again
         ${LogText} "-Function end - WelcomePreProc (IsInnerInstance)"
         Abort
@@ -1723,30 +1739,30 @@ Function GetVersionAtLocation
 FunctionEnd
 
 
-LangString INST_MTA_CONFLICT ${LANG_ENGLISH}    "A different major version of MTA ($1) already exists at that path.$\n$\n\ 
+LangString INST_MTA_CONFLICT ${LANG_ENGLISH}    "A different major version of MTA ($1) already exists at that path.$\n$\n\
             MTA is designed for major versions to be installed in different paths.$\n \
             Are you sure you want to overwrite MTA $1 at \
             $INSTDIR ?"
-LangString INST_GTA_CONFLICT ${LANG_ENGLISH}    "MTA cannot be installed into the same directory as GTA:SA.$\n$\n\ 
+LangString INST_GTA_CONFLICT ${LANG_ENGLISH}    "MTA cannot be installed into the same directory as GTA:SA.$\n$\n\
             Do you want to use the default install directory$\n\
             $DEFAULT_INSTDIR ?"
 LangString INST_GTA_ERROR1 ${LANG_ENGLISH} "The selected directory does not exist.$\n$\n\
             Please select the GTA:SA install directory"
 LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find GTA:SA installed at $GTA_DIR $\n$\n\
             Are you sure you want to continue ?"
-            
+
 Function "CustomDirectoryPageLeave"
     ${LogText} "+Function begin - CustomDirectoryPageLeave"
     Call CustomDirectoryPageUpdateINSTDIR
 
     # Check if user is trying to install MTA into GTA directory
-    Push $INSTDIR 
+    Push $INSTDIR
     Call IsGtaDirectory
     Pop $0
     ${If} $0 == "gta"
 
         # Don't allow install into GTA directory unless MTA is already there
-        Push $INSTDIR 
+        Push $INSTDIR
         Call GetInstallType
         Pop $0
         Pop $1
@@ -1762,7 +1778,7 @@ Function "CustomDirectoryPageLeave"
     ${Endif}
 
     # Check if user is trying to install over a different major version of MTA
-    Push $INSTDIR 
+    Push $INSTDIR
     Call GetInstallType
     Pop $0
     Pop $1
@@ -1890,14 +1906,14 @@ Function CustomDirectoryPage
     ${NSD_CreateGroupBox} 0 $PosY 100% $SizeY "$(INST_CHOOSE_LOC3)"
     Pop $0
     IntOp $PosY $PosY + 24
-    
+
     # Pick the longest string and use that as SizeX
     !insertmacro GetTextExtent "$(INST_CHOOSE_LOC_DEFAULT)" $SizeX
     !insertmacro GetTextExtent "$(INST_CHOOSE_LOC_LAST_USED)" $Length
     !insertmacro Max $SizeX $Length
     !insertmacro GetTextExtent "$(INST_CHOOSE_LOC_CUSTOM)" $Length
     !insertmacro Max $SizeX $Length
-    
+
     IntOp $SizeX $SizeX + 6 # Take into account the radio button itself
     IntOp $PosX $SizeX + 20 # Take into account the x padding of 10, plus spacing of 15
     IntOp $Length ${DIALOG_X} - $PosX # [Total width] - [radio button width]
@@ -1924,7 +1940,7 @@ Function CustomDirectoryPage
     # Add custom option
     ${NSD_CreateRadioButton} 10 $PosY $SizeX 12u "$(INST_CHOOSE_LOC_CUSTOM)"
     Pop $RadioCustom
-    
+
     !insertmacro GetTextExtent "$(INST_CHOOSE_LOC_BROWSE)" $R9
     IntOp $R9 $R9 + 5 # Add spacing for the button on top of text
     IntOp $Length $Length - $R9
@@ -2058,7 +2074,7 @@ LangString INST_LOC_OW ${LANG_ENGLISH}  "Warning: A different major version of M
 LangString INST_LOC_UPGRADE ${LANG_ENGLISH} "Installation type:  Upgrade"
 Function CustomDirectoryPageSetUpgradeMessage
     Call CustomDirectoryPageUpdateINSTDIR
-    Push $INSTDIR 
+    Push $INSTDIR
     Call GetInstallType
     Pop $0
     Pop $1
@@ -2454,7 +2470,7 @@ FunctionEnd
 ;--------------------------
 ; Out $NetMsgURL = URL
 Function NetComposeURL
-    ${If} $NetMsgURL == ""  
+    ${If} $NetMsgURL == ""
         IfFileExists "$APPDATA\MTA San Andreas All" 0 skip
             StrCpy $NetPrevInfo "$NetPrevInfo&pp=1"
         skip:
@@ -2513,4 +2529,3 @@ Function SetPermissionsGroup
     StrCpy $PermissionsGroup "S-1-2-0"
     ${LogText} "SetPermissionsGroup using '$PermissionsGroup'"
 FunctionEnd
-

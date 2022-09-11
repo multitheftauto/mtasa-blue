@@ -581,15 +581,24 @@ void _declspec(naked) HOOK_Camera_CollisionDetection()
     }
 }
 
-BYTE CCameraSA::GetCameraViewMode()
+BYTE CCameraSA::GetCameraVehicleViewMode()
 {
-    // TODO: Add support for ped camera view, this will only work on vehicles for now.
     return *(BYTE*)VAR_VehicleCameraView;
 }
 
-VOID CCameraSA::SetCameraViewMode(BYTE dwCamMode)
+BYTE CCameraSA::GetCameraPedViewMode()
+{
+    return *(BYTE*)VAR_PedCameraView;
+}
+
+VOID CCameraSA::SetCameraVehicleViewMode(BYTE dwCamMode)
 {
     MemPutFast<BYTE>(VAR_VehicleCameraView, dwCamMode);
+}
+
+VOID CCameraSA::SetCameraPedViewMode(BYTE dwCamMode)
+{
+    MemPutFast<BYTE>(VAR_PedCameraView, dwCamMode);
 }
 
 void CCameraSA::SetShakeForce(float fShakeForce)

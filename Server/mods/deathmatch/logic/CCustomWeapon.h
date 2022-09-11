@@ -9,9 +9,14 @@
  *****************************************************************************/
 
 #pragma once
+
 #include "CCommon.h"
 #include "CCustomWeaponManager.h"
 #include "CWeaponStat.h"
+#include "CObject.h"
+#include "CPed.h"
+
+class CCustomWeaponManager;
 
 struct SLineOfSightFlags
 {
@@ -54,7 +59,7 @@ struct SWeaponConfiguration
     SLineOfSightFlags flags;
 };
 
-class CCustomWeapon : public CObject
+class CCustomWeapon final : public CObject
 {
 public:
     CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType);

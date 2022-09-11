@@ -13,7 +13,9 @@
 
 #include "CPacket.h"
 
-class CObjectStartSyncPacket : public CPacket
+class CObject;
+
+class CObjectStartSyncPacket final : public CPacket
 {
 public:
     CObjectStartSyncPacket(CObject* pObject) { m_pObject = pObject; };

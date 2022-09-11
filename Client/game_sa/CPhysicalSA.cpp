@@ -15,7 +15,7 @@ CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->boundingBox.fRadius;
+    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
     pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
@@ -180,13 +180,12 @@ void CPhysicalSA::SetBuoyancyConstant(float fBuoyancyConstant)
     ((CPhysicalSAInterface*)this->GetInterface())->m_fBuoyancyConstant = fBuoyancyConstant;
 }
 
-void CPhysicalSA::GetCenterOfMass(CVector & vecCenterOfMass)
+void CPhysicalSA::GetCenterOfMass(CVector& vecCenterOfMass)
 {
     vecCenterOfMass = ((CPhysicalSAInterface*)this->GetInterface())->m_vecCenterOfMass;
 }
 
-
-void CPhysicalSA::SetCenterOfMass(CVector & vecCenterOfMass)
+void CPhysicalSA::SetCenterOfMass(CVector& vecCenterOfMass)
 {
     ((CPhysicalSAInterface*)this->GetInterface())->m_vecCenterOfMass = vecCenterOfMass;
 }

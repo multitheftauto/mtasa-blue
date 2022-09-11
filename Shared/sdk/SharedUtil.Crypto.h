@@ -9,9 +9,19 @@
  *****************************************************************************/
 #pragma once
 #include <cryptopp/base64.h>
+#include <cryptopp/aes.h>
+#include <cryptopp/rsa.h>
+#include <cryptopp/modes.h>
+#include <cryptopp/osrng.h>
+#include "SString.h"
 
 namespace SharedUtil
 {
+    struct KeyPair
+    {
+        SString publicKey, privateKey;
+    };
+
     inline SString Base64encode(const SString& data)
     {
         SString                result;
@@ -24,6 +34,94 @@ namespace SharedUtil
     {
         SString                result;
         CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Decoder(new CryptoPP::StringSink(result)));            // Memory is freed automatically
+
+        return result;
+    }
+
+    inline KeyPair GenerateRsaKeyPair(const unsigned int size)
+    {
+        KeyPair rsaKeyPair;
+
+        CryptoPP::AutoSeededRandomPool asrp;
+
+        CryptoPP::InvertibleRSAFunction params;
+        params.GenerateRandomWithKeySize(asrp, size);
+
+        CryptoPP::RSA::PrivateKey rsaPrivateKey(params);
+        CryptoPP::RSA::PublicKey  rsaPublicKey(params);
+
+        CryptoPP::StringSink rawPrivateKeySink(rsaKeyPair.privateKey);
+        rsaPrivateKey.DEREncode(rawPrivateKeySink);
+
+        CryptoPP::StringSink rawPublicKeySink(rsaKeyPair.publicKey);
+        rsaPublicKey.DEREncode(rawPublicKeySink);
+
+        return rsaKeyPair;
+    }
+
+    inline SString RsaEncode(const SString& data, const SString& publicKey)
+    {
+        SString result;
+
+        CryptoPP::RSA::PublicKey       rsaPublicKey;
+        CryptoPP::AutoSeededRandomPool asrp;
+
+        CryptoPP::StringSource rsaPublicKeySource(publicKey, true);
+        rsaPublicKey.BERDecode(rsaPublicKeySource);
+
+        CryptoPP::RSAES_OAEP_SHA_Encryptor rsaEncryptor(rsaPublicKey);
+        CryptoPP::StringSource             ss(data, true, new CryptoPP::PK_EncryptorFilter(asrp, rsaEncryptor, new CryptoPP::StringSink(result)));
+
+        return result;
+    }
+
+    inline SString RsaDecode(const SString& data, const SString& privateKey)
+    {
+        SString result;
+
+        CryptoPP::RSA::PrivateKey      rsaPrivateKey;
+        CryptoPP::AutoSeededRandomPool asrp;
+
+        CryptoPP::StringSource rsaPrivateKeySource(privateKey, true);
+        rsaPrivateKey.BERDecode(rsaPrivateKeySource);
+
+        CryptoPP::RSAES_OAEP_SHA_Decryptor rsaDecryptor(rsaPrivateKey);
+        CryptoPP::StringSource             ss(data, true, new CryptoPP::PK_DecryptorFilter(asrp, rsaDecryptor, new CryptoPP::StringSink(result)));
+
+        return result;
+    }
+
+    inline std::pair<SString, SString> Aes128encode(const SString& sData, const SString& sKey)
+    {
+        using namespace CryptoPP;
+        using CryptoPP::byte;
+
+        AutoSeededRandomPool rnd;
+
+        SString result;
+        SString sIv;
+
+        sIv.resize(AES::BLOCKSIZE);
+        rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
+
+        CTR_Mode<AES>::Encryption aesEncryption;
+        aesEncryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+        StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
+
+        return {result, sIv};
+    }
+
+    inline SString Aes128decode(const SString& sData, const SString& sKey, SString sIv)
+    {
+        using namespace CryptoPP;
+        using CryptoPP::byte;
+
+        sIv.resize(AES::BLOCKSIZE);
+        SString result;
+
+        CTR_Mode<AES>::Decryption aesDecryption;
+        aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+        StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
 
         return result;
     }

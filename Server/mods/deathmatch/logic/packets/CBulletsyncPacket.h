@@ -7,9 +7,13 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-class CBulletsyncPacket : public CPacket
+#include "CPacket.h"
+#include "CCommon.h"
+
+class CBulletsyncPacket final : public CPacket
 {
 public:
     CBulletsyncPacket(){};

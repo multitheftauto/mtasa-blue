@@ -7,9 +7,12 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-class CPedTaskPacket : public CPacket
+#include "CPacket.h"
+
+class CPedTaskPacket final : public CPacket
 {
 public:
     CPedTaskPacket();

@@ -25,24 +25,11 @@ public:
 
     constexpr CVector2D() noexcept = default;
 
-    constexpr CVector2D(float x, float y) noexcept :
-        fX(x),
-        fY(y)
-    {
-    }
+    constexpr CVector2D(float x, float y) noexcept : fX(x), fY(y) {}
 
-    constexpr CVector2D(const CVector& vec) noexcept :
-        fX(vec.fX),
-        fY(vec.fY)
-    {
-    }
+    constexpr CVector2D(const CVector& vec) noexcept : fX(vec.fX), fY(vec.fY) {}
 
-    constexpr CVector2D(const CVector4D& vec) noexcept :
-        fX(vec.fX),
-        fY(vec.fY)
-    {
-    }
-
+    constexpr CVector2D(const CVector4D& vec) noexcept : fX(vec.fX), fY(vec.fY) {}
 
     constexpr CVector2D& operator=(const CVector& vec) noexcept
     {
@@ -66,7 +53,7 @@ public:
     // This can be useful if you only want to compare lengths.
     constexpr float LengthSquared() const noexcept { return (fX * fX) + (fY * fY); }
 
-    inline void Normalize() noexcept
+    void Normalize() noexcept
     {
         const float fLength = Length();
         if (fLength > 0.0f)

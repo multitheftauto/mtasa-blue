@@ -18,6 +18,8 @@
 
 #include <windows.h>
 
+enum eBone;
+
 enum eEntityType
 {
     ENTITY_TYPE_NOTHING,
@@ -54,6 +56,8 @@ public:
 
     //  virtual VOID                        SetModelAlpha ( int iAlpha )=0;
     virtual class CEntitySAInterface* GetInterface() = 0;
+    virtual void                      UpdateRpHAnim() = 0;
+    virtual bool                      SetScaleInternal(const CVector& scale) = 0;
     virtual VOID                      SetPosition(float fX, float fY, float fZ) = 0;
     virtual VOID                      SetPosition(CVector* vecPosition) = 0;
     virtual VOID                      Teleport(float fX, float fY, float fZ) = 0;
@@ -104,4 +108,12 @@ public:
     virtual void SetStaticWaitingForCollision(bool bStatic) = 0;
 
     virtual unsigned long GetArrayID() = 0;
+
+    virtual RwMatrixTag* GetBoneRwMatrix(eBone boneId) = 0;
+    virtual bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
+
+    virtual bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll) = 0;
+    virtual bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll) = 0;
+    virtual bool GetBonePosition(eBone boneId, CVector& position) = 0;
+    virtual bool SetBonePosition(eBone boneId, const CVector& position) = 0;
 };

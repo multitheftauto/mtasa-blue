@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 
-
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray)
 {
     ByteArray[0] = 0xE9;

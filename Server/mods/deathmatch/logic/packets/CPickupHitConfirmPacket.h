@@ -13,7 +13,7 @@
 
 #include "CPacket.h"
 
-class CPickupHitConfirmPacket : public CPacket
+class CPickupHitConfirmPacket final : public CPacket
 {
 public:
     explicit CPickupHitConfirmPacket(class CPickup* pPickup, bool bPlaySound)

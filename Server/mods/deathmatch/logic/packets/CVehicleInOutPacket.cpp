@@ -10,10 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicleInOutPacket.h"
+#include "CGame.h"
 
 CVehicleInOutPacket::CVehicleInOutPacket()
 {
-    m_ID = INVALID_ELEMENT_ID;
+    m_PedID = INVALID_ELEMENT_ID;
+    m_VehicleID = INVALID_ELEMENT_ID;
     m_ucSeat = 0;
     m_ucAction = 0;
     m_ucFailReason = 0xFF;
@@ -22,9 +25,10 @@ CVehicleInOutPacket::CVehicleInOutPacket()
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID ID, unsigned char ucSeat, unsigned char ucAction)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction)
 {
-    m_ID = ID;
+    m_PedID = PedID;
+    m_VehicleID = VehicleID;
     m_ucSeat = ucSeat;
     m_ucAction = ucAction;
     m_ucFailReason = 0xFF;
@@ -33,9 +37,10 @@ CVehicleInOutPacket::CVehicleInOutPacket(ElementID ID, unsigned char ucSeat, uns
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID ID, unsigned char ucSeat, unsigned char ucAction, unsigned char ucDoor)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, unsigned char ucDoor)
 {
-    m_ID = ID;
+    m_PedID = PedID;
+    m_VehicleID = VehicleID;
     m_ucSeat = ucSeat;
     m_ucAction = ucAction;
     m_ucFailReason = 0xFF;
@@ -44,13 +49,14 @@ CVehicleInOutPacket::CVehicleInOutPacket(ElementID ID, unsigned char ucSeat, uns
     m_ucDoor = ucDoor;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID ID, unsigned char ucSeat, unsigned char ucAction, ElementID PlayerIn, ElementID PlayerOut)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, ElementID PedIn, ElementID PedOut)
 {
-    m_ID = ID;
+    m_PedID = PedID;
+    m_VehicleID = VehicleID;
     m_ucSeat = ucSeat;
     m_ucAction = ucAction;
-    m_PlayerIn = PlayerIn;
-    m_PlayerOut = PlayerOut;
+    m_PedIn = PedIn;
+    m_PedOut = PedOut;
     m_ucStartedJacking = 0;
     m_ucFailReason = 0xFF;
     m_pCorrectVector = NULL;
@@ -69,10 +75,24 @@ CVehicleInOutPacket::~CVehicleInOutPacket()
 
 bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
 {
+    m_PedID = INVALID_ELEMENT_ID;
+    if (BitStream.Can(eBitStreamVersion::PedEnterExit))
+    {
+        BitStream.Read(m_PedID);
+        if (m_PedID == INVALID_ELEMENT_ID)
+        {
+            return false;
+        }
+    }
+    else
+    {
+        m_PedID = GetSourcePlayer()->GetID();
+    }
+
     // Read out the vehicle id
-    m_ID = INVALID_ELEMENT_ID;
-    BitStream.Read(m_ID);
-    if (m_ID == INVALID_ELEMENT_ID)
+    m_VehicleID = INVALID_ELEMENT_ID;
+    BitStream.Read(m_VehicleID);
+    if (m_VehicleID == INVALID_ELEMENT_ID)
     {
         return false;
     }
@@ -120,12 +140,10 @@ bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
 
 bool CVehicleInOutPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    if (m_pSourceElement && m_ID != INVALID_ELEMENT_ID)
+    if (m_PedID != INVALID_ELEMENT_ID && m_VehicleID != INVALID_ELEMENT_ID)
     {
-        ElementID ID = m_pSourceElement->GetID();
-        BitStream.Write(ID);
-
-        BitStream.Write(m_ID);
+        BitStream.Write(m_PedID);
+        BitStream.Write(m_VehicleID);
         BitStream.WriteBits(&m_ucSeat, 4);
         BitStream.WriteBits(&m_ucAction, 4);
 
@@ -133,11 +151,11 @@ bool CVehicleInOutPacket::Write(NetBitStreamInterface& BitStream) const
         {
             BitStream.WriteBits(&m_ucDoor, 3);
         }
-        // If the action id is VEHICLE_NOTIFY_JACK_RETURN, send the in/out player chars aswell
+        // If the action id is VEHICLE_NOTIFY_JACK_RETURN, send the in/out ped chars aswell
         if (m_ucAction == CGame::VEHICLE_NOTIFY_JACK_RETURN)
         {
-            BitStream.Write(m_PlayerIn);
-            BitStream.Write(m_PlayerOut);
+            BitStream.Write(m_PedIn);
+            BitStream.Write(m_PedOut);
         }
 
         if (m_ucAction == 9 /*VEHICLE_ATTEMPT_FAILED*/)
