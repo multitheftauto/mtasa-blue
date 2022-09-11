@@ -9,7 +9,20 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLatentTransferManager.h"
+
 using namespace LatentTransfer;
+
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+    #include "CResource.h"
+    #include "CResourceManager.h"
+    #include "Utils.h"
+    #include <net/CNetServer.h>
+
+    extern CNetServer*       g_pNetServer;
+    extern CTimeUsMarker<20> markerLatentEvent;
+#endif
 
 ///////////////////////////////////////////////////////////////
 //
@@ -376,7 +389,7 @@ void DoDeallocateNetBitStream(NetBitStreamInterface* pBitStream)
 bool DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetServerPacketPriority packetPriority,
                   NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering)
 {
-    return g_pNetServer->SendPacket(ucPacketID, remoteId, bitStream, FALSE, packetPriority, packetReliability, packetOrdering);
+    return g_pNetServer->SendPacket(ucPacketID, remoteId, bitStream, false, packetPriority, packetReliability, packetOrdering);
 }
 
 bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)

@@ -13,7 +13,7 @@ class CCore;
 
 #pragma once
 
-#include "../version.h"
+#include "version.h"
 
 #include "CClientVariables.h"
 #include "CCommands.h"
@@ -28,7 +28,6 @@ class CCore;
 #include "CMessageLoopHook.h"
 #include "CConsoleLogger.h"
 #include "CModManager.h"
-#include <core/CClientBase.h>
 #include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include <DXHook/CDirect3DData.h>
@@ -102,7 +101,6 @@ public:
     CLocalizationInterface*   GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*        GetWebCore();
     CTrayIconInterface*       GetTrayIcon() { return m_pTrayIcon; };
-    CDiscordManagerInterface* GetDiscordManager() { return reinterpret_cast<CDiscordManagerInterface*>(m_DiscordManager.get()); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -120,8 +118,9 @@ public:
     void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false);
     void ChatPrintf(const char* szFormat, bool bColorCoded, ...);
     void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...);
-    void SetChatVisible(bool bVisible);
+    void SetChatVisible(bool bVisible, bool bInputBlocked);
     bool IsChatVisible();
+    bool IsChatInputBlocked();
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled();
     bool ClearChat();
@@ -227,8 +226,6 @@ public:
     uint GetMinStreamingMemory();
     uint GetMaxStreamingMemory();
 
-    void ResetDiscordRichPresence();
-
     SString GetConnectCommandFromURI(const char* szURI);
     void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
     bool    bScreenShot;
@@ -277,7 +274,6 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
-    HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
     bool        IsFirstFrame() const noexcept { return m_bFirstFrame; }
 
 private:
@@ -298,8 +294,6 @@ private:
     CClientVariables   m_ClientVariables;
     CWebCoreInterface* m_pWebCore = nullptr;
     CTrayIcon*         m_pTrayIcon;
-
-    std::unique_ptr<class CDiscordManager> m_DiscordManager;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;

@@ -28,11 +28,21 @@ CVector* CEntitySAInterface::GetBoundCentre(CVector* pOutCentre)
     return ((CVector * (__thiscall*)(CEntitySAInterface*, CVector*))0x534250)(this, pOutCentre);
 }
 
+void CEntitySAInterface::UpdateRW()
+{
+    ((void(__thiscall*)(CEntitySAInterface*))0x446F90)(this);
+}
+
+void CEntitySAInterface::UpdateRpHAnim()
+{
+    ((void(__thiscall*)(CEntitySAInterface*))0x532B20)(this);
+}
+
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
 {
     CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
-    CVector               vecMin = colModel->boundingBox.vecMin;
-    CVector               vecMax = colModel->boundingBox.vecMax;
+    CVector               vecMin = colModel->m_bounds.m_vecMin;
+    CVector               vecMax = colModel->m_bounds.m_vecMax;
     CRect                 rect;
     CVector               point;
     TransformFromObjectSpace(point, vecMin);
@@ -69,8 +79,19 @@ CEntitySA::CEntitySA()
 
 void CEntitySA::UpdateRpHAnim()
 {
-    auto CEntity_UpdateRpHAnim = (void(__thiscall*)(CEntitySAInterface*))0x532B20;
-    CEntity_UpdateRpHAnim(m_pInterface);
+    m_pInterface->UpdateRpHAnim();
+}
+
+bool CEntitySA::SetScaleInternal(const CVector& scale)
+{
+    m_pInterface->UpdateRW();
+    RpClump* clump = GetRpClump();
+    if (!clump)
+        return false;
+    RwFrame* frame = reinterpret_cast<RwFrame*>(clump->object.parent);
+    RwMatrixScale((RwMatrix*)&frame->modelling, (RwV3d*)&scale, TRANSFORM_BEFORE);
+    RwFrameUpdateObjects(frame);
+    return true;
 }
 
 /*VOID CEntitySA::SetModelAlpha ( int iAlpha )
@@ -640,7 +661,6 @@ bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& r
         }
     }
     return false;
-
 }
 
 bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll)
@@ -657,6 +677,11 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
             RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
             RwV3d   angles = {yaw, roll, pitch};
             BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
+            CEntitySAInterface* theInterface = GetInterface();
+            if (theInterface)
+            {
+                theInterface->bDontUpdateHierarchy = false;
+            }
             return true;
         }
     }

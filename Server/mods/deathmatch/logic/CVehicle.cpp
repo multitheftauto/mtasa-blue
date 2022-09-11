@@ -10,13 +10,21 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicle.h"
+#include "CVehicleManager.h"
+#include "CHandlingManager.h"
+#include "CElementRefManager.h"
+#include "CGame.h"
+#include "packets/CVehicleInOutPacket.h"
+#include "CBandwidthSettings.h"
+#include "Utils.h"
 
 extern CGame* g_pGame;
 
 CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
     : CElement(pParent)
 {
-    CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL);
+    CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPed, NULL);
 
     // Init
     m_pVehicleManager = pVehicleManager;
@@ -64,7 +72,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_bOnGround = true;
     m_bSmokeTrail = false;
     m_ucAlpha = 255;
-    m_pJackingPlayer = NULL;
+    m_pJackingPed = NULL;
     m_bInWater = false;
     m_bDerailed = false;
     m_bIsDerailable = true;
@@ -104,38 +112,35 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
 
 CVehicle::~CVehicle()
 {
-    if (m_pJackingPlayer && m_pJackingPlayer->GetJackingVehicle() == this)
+    if (m_pJackingPed && m_pJackingPed->GetJackingVehicle() == this)
     {
-        if (m_pJackingPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_JACKING)
+        if (m_pJackingPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
         {
-            m_pJackingPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+            m_pJackingPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
         }
-        m_pJackingPlayer->SetJackingVehicle(NULL);
+        m_pJackingPed->SetJackingVehicle(NULL);
     }
 
-    // loop through players and fix their in out state
-
+    // loop through peds and fix their in out state
     for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
         CPed* pPed = m_pOccupants[i];
-        if (pPed && pPed->IsPlayer())
+        if (pPed)
         {
-            CPlayer* pPlayer = static_cast<CPlayer*>(pPed);
             // Is he already getting out?
-            if (pPlayer->GetVehicleAction() == CPlayer::VEHICLEACTION_EXITING)
+            if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
             {
-                // Does it have an occupant and is the occupant the requesting player?
-                unsigned char ucOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-                if (pPlayer == GetOccupant(ucOccupiedSeat))
+                // Does it have an occupant and is the occupant the requesting ped?
+                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                if (pPed == GetOccupant(ucOccupiedSeat))
                 {
-                    // Mark the player/vehicle as empty
+                    // Mark the ped/vehicle as empty
                     SetOccupant(NULL, ucOccupiedSeat);
-                    pPlayer->SetOccupiedVehicle(NULL, 0);
-                    pPlayer->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
+                    pPed->SetOccupiedVehicle(NULL, 0);
+                    pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
                     // Tell everyone he has exited the vehicle
-                    CVehicleInOutPacket Reply(GetID(), ucOccupiedSeat, CGame::VEHICLE_NOTIFY_OUT_RETURN);
-                    Reply.SetSourceElement(pPlayer);
+                    CVehicleInOutPacket Reply(pPed->GetID(), GetID(), ucOccupiedSeat, CGame::VEHICLE_NOTIFY_OUT_RETURN);
                     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(Reply);
                 }
             }
@@ -164,7 +169,7 @@ CVehicle::~CVehicle()
     delete m_pUpgrades;
     delete m_pHandlingEntry;
 
-    CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPlayer, NULL);
+    CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPed, NULL);
 
     // Notify the vehicle manager that we are not to be respawned anymore if neccessary
     if (m_bRespawnEnabled)
@@ -183,6 +188,7 @@ CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
         CVector vecRotationDegrees;
         GetRotationDegrees(vecRotationDegrees);
         pTemp->SetRotationDegrees(vecRotationDegrees);
+        pTemp->SetBlowState(m_blowState);
         pTemp->SetHealth(GetHealth());
         pTemp->SetColor(GetColor());
         pTemp->SetUpgrades(GetUpgrades());
@@ -520,6 +526,14 @@ void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
     m_ucVariant2 = ucVariant2;
 }
 
+void CVehicle::SetHealth(float fHealth)
+{
+    if (fHealth < 0.0f || IsBlown())
+        fHealth = 0.0f;
+
+    m_fHealth = fHealth;
+}
+
 CVehicleColor& CVehicle::RandomizeColor()
 {
     // Grab a random color for this vehicle and return it
@@ -743,8 +757,8 @@ bool CVehicle::SetTowedByVehicle(CVehicle* pVehicle)
 
 void CVehicle::SpawnAt(const CVector& vecPosition, const CVector& vecRotation)
 {
+    SetBlowState(VehicleBlowState::INTACT);
     SetHealth(GetRespawnHealth());
-    SetIsBlown(false);
     StopIdleTimer();
     ResetDoorsWheelsPanelsLights();
     SetLandingGearDown(true);
@@ -892,23 +906,23 @@ void CVehicle::ResetDoorsWheelsPanelsLights()
     memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
 }
 
-// For blow respawn timer
-void CVehicle::SetIsBlown(bool bBlown)
+bool CVehicle::IsBlowTimerFinished()
 {
-    if (!bBlown)
-        m_llBlowTime = CTickCount(0LL);
-    else
+    return (m_blowState == VehicleBlowState::BLOWN) && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
+}
+
+void CVehicle::ResetExplosionTimer()
+{
+    if (m_blowState == VehicleBlowState::BLOWN)
         m_llBlowTime = CTickCount::Now();
 }
 
-bool CVehicle::GetIsBlown()
+void CVehicle::SetBlowState(VehicleBlowState state)
 {
-    return m_llBlowTime.ToLongLong() != 0;
-}
+    m_blowState = state;
 
-bool CVehicle::IsBlowTimerFinished()
-{
-    return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
+    if (state == VehicleBlowState::BLOWN)
+        m_llBlowTime = CTickCount::Now();
 }
 
 void CVehicle::StopIdleTimer()
@@ -942,24 +956,24 @@ bool CVehicle::IsStationary()
     return false;
 }
 
-void CVehicle::SetJackingPlayer(CPlayer* pPlayer)
+void CVehicle::SetJackingPed(CPed* pPed)
 {
-    if (pPlayer == m_pJackingPlayer)
+    if (pPed == m_pJackingPed)
         return;
 
     // Remove old
-    if (m_pJackingPlayer)
+    if (m_pJackingPed)
     {
-        CPlayer* pPrev = m_pJackingPlayer;
-        m_pJackingPlayer = NULL;
+        CPed* pPrev = m_pJackingPed;
+        m_pJackingPed = NULL;
         pPrev->SetJackingVehicle(NULL);
     }
 
     // Set new
-    m_pJackingPlayer = pPlayer;
+    m_pJackingPed = pPed;
 
-    if (m_pJackingPlayer)
-        m_pJackingPlayer->SetJackingVehicle(this);
+    if (m_pJackingPed)
+        m_pJackingPed->SetJackingVehicle(this);
 }
 
 void CVehicle::OnRelayUnoccupiedSync()

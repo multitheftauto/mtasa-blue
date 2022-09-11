@@ -210,7 +210,7 @@ void CVoiceRecorder::SetPTTState(bool bState)
 
                 if (!bEventTriggered)
                     return;
-                
+
                 m_Mutex.lock();
 
                 if (m_VoiceState == VOICESTATE_AWAITING_INPUT)
@@ -325,7 +325,7 @@ void CVoiceRecorder::DoPulse()
     if (m_VoiceState == VOICESTATE_RECORDING_LAST_PACKET)            // End of voice data (for events)
     {
         m_VoiceState = VOICESTATE_AWAITING_INPUT;
-        
+
         if (g_pClientGame->GetPlayerManager()->GetLocalPlayer())
         {
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();

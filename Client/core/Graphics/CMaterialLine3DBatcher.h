@@ -19,6 +19,7 @@ struct SMaterialLine3DItem
     CMaterialItem* pMaterial;
     float          fU1, fV1;
     float          fU2, fV2;
+    bool           bFlipUV;
     float          fWidth;
     ulong          ulColor;
     bool           bUseFaceToward;
@@ -39,7 +40,7 @@ public:
     void Flush();
     bool HasItems() { return !m_LineList.empty(); }
     void AddLine3D(const CVector& vecFrom, const CVector& vecTo, float fWidth, ulong ulColor, CMaterialItem* pMaterial, float fU, float fV, float fSizeU,
-                   float fSizeV, bool bRelativeUV, bool bUseFaceToward, const CVector& vecFaceToward);
+                   float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward, const CVector& vecFaceToward);
 
 protected:
     void DrawBatch(const CVector& vecCameraPos, uint* pBatchIndices, uint uiNumBatchLines, CMaterialItem* pMaterial);

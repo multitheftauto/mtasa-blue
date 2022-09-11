@@ -9,6 +9,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaUtilDefs.h"
+#include "CScriptArgReader.h"
+#include "Utils.h"
+
+#ifndef MTA_CLIENT
+    #include "CRemoteCalls.h"
+#endif
 
 void CLuaUtilDefs::LoadFunctions()
 {
@@ -527,7 +534,7 @@ int CLuaUtilDefs::PregReplace(lua_State* luaVM)
     {
         pcrecpp::RE pPattern(strPattern, pOptions);
 
-        string strNew = strBase;
+        std::string strNew = strBase;
         if (pPattern.GlobalReplace(strReplace, &strNew))
         {
             lua_pushstring(luaVM, strNew.c_str());
@@ -562,8 +569,8 @@ int CLuaUtilDefs::PregMatch(lua_State* luaVM)
 
         pcrecpp::StringPiece strInput(strBase);
 
-        string strGet;
-        int    i = 1;
+        std::string strGet;
+        int         i = 1;
         while (pPattern.FindAndConsume(&strInput, &strGet) && i <= iMaxResults)
         {
             lua_pushnumber(luaVM, i);
@@ -634,7 +641,7 @@ int CLuaUtilDefs::GetTok(lua_State* luaVM)
     if (argStream.NextIsNumber())
     {
         argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = { static_cast<wchar_t>(uiDelimiter), '\0' };
+        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
     else            // It's already a string

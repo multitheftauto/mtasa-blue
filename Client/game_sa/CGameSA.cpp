@@ -15,6 +15,7 @@
 #include "SharedUtil.MemAccess.hpp"
 #include "D3DResourceSystemSA.h"
 #include "CFileLoaderSA.h"
+#include "CColStoreSA.h"
 
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
@@ -31,6 +32,8 @@ float*         CGameSA::VAR_OldTimeStep;
 float*         CGameSA::VAR_TimeStep;
 unsigned long* CGameSA::VAR_Framelimiter;
 
+unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
+
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
  */
@@ -41,6 +44,10 @@ CGameSA::CGameSA()
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
+
+    const unsigned int modelInfoMax = GetCountOfAllFileIDs();
+    ModelInfo = new CModelInfoSA[modelInfoMax];
+    ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
 
@@ -63,7 +70,7 @@ CGameSA::CGameSA()
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (int i = 0; i < MODELINFO_MAX; i++)
+    for (int i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
@@ -96,7 +103,6 @@ CGameSA::CGameSA()
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
     this->m_pMenuManager = new CMenuManagerSA();
-    this->m_pText = new CTextSA();
     this->m_pStats = new CStatsSA();
     this->m_pFont = new CFontSA();
     this->m_pPathFind = new CPathFindSA();
@@ -121,6 +127,7 @@ CGameSA::CGameSA()
     this->m_pWaterManager = new CWaterManagerSA();
     this->m_pWeaponStatsManager = new CWeaponStatManagerSA();
     this->m_pPointLights = new CPointLightsSA();
+    this->m_collisionStore = new CColStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -191,6 +198,7 @@ CGameSA::CGameSA()
     m_pPools->SetPoolCapacity(ENV_MAP_ATOMIC_POOL, 4000);                                     // Default is 1024
     m_pPools->SetPoolCapacity(SPEC_MAP_MATERIAL_POOL, 16000);                                 // Default is 4096
     m_pPools->SetPoolCapacity(ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES);                    // Default is 500
+    m_pPools->SetPoolCapacity(POINTER_SINGLE_LINK_POOL, MAX_POINTER_SINGLE_LINKS);            // Default is 70000
     m_pPools->SetPoolCapacity(POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS);            // Default is 3200
     dassert(m_pPools->GetPoolCapacity(POINTER_SINGLE_LINK_POOL) == MAX_POINTER_SINGLE_LINKS);
 
@@ -203,6 +211,7 @@ CGameSA::CGameSA()
 
     CEntitySAInterface::StaticSetHooks();
     CPhysicalSAInterface::StaticSetHooks();
+    CObjectSA::StaticSetHooks();
     CModelInfoSA::StaticSetHooks();
     CPlayerPedSA::StaticSetHooks();
     CRenderWareSA::StaticSetHooks();
@@ -213,6 +222,7 @@ CGameSA::CGameSA()
     CFxSystemSA::StaticSetHooks();
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
+    CVehicleSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -237,7 +247,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CFontSA*>(m_pFont);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
-    delete reinterpret_cast<CTextSA*>(m_pText);
     delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
@@ -259,6 +268,10 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
+    delete static_cast<CColStoreSA*>(m_collisionStore);
+
+    delete[] ModelInfo;
+    delete[] ObjectGroupsInfo;
 }
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
@@ -310,7 +323,7 @@ bool CGameSA::IsInForeground()
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
     DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
-    if (dwModelID < MODELINFO_MAX)
+    if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {
@@ -496,6 +509,7 @@ void CGameSA::Initialize()
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters();
+    SetupBrokenModels();
     m_pRenderWare->Initialize();
 
     // *Sebas* Hide the GTA:SA Main menu.
@@ -590,6 +604,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
         return IsUnderWorldWarpEnabled();
 
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+        return IsVehicleSunGlareEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -622,6 +639,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+    {
+        SetVehicleSunGlareEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -638,6 +661,7 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
+    CVehicleSA::SetVehiclesSunGlareEnabled(false);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -709,6 +733,17 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
     {
         m_JetpackWeapons[weaponType] = bEnabled;
     }
+}
+
+void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
+{
+    // State turning will be handled in hooks handler
+    CVehicleSA::SetVehiclesSunGlareEnabled(bEnabled);
+}
+
+bool CGameSA::IsVehicleSunGlareEnabled()
+{
+    return CVehicleSA::GetVehiclesSunGlareEnabled();
 }
 
 bool CGameSA::PerformChecks()
@@ -814,6 +849,26 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[316].MakePedModel ( "COPGRL2" );
     ModelInfo[317].MakePedModel ( "NURGRL2" );
     */
+}
+
+void CGameSA::FixModelCol(uint iFixModel, uint iFromModel)
+{
+    CBaseModelInfoSAInterface* pFixModelInterface = ModelInfo[iFixModel].GetInterface();
+    if (!pFixModelInterface || pFixModelInterface->pColModel)
+        return;
+
+    CBaseModelInfoSAInterface* pAviableModelInterface = ModelInfo[iFromModel].GetInterface();
+
+    if (!pAviableModelInterface)
+        return;
+
+    pFixModelInterface->pColModel = pAviableModelInterface->pColModel;
+}
+
+void CGameSA::SetupBrokenModels()
+{
+    FixModelCol(3118, 3059);
+    FixModelCol(3553, 3554);
 }
 
 // Well, has it?

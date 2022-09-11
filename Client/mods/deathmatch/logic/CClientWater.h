@@ -10,7 +10,7 @@
 
 #pragma once
 
-class CClientWater : public CClientEntity
+class CClientWater final : public CClientEntity
 {
     DECLARE_CLASS(CClientWater, CClientEntity)
 public:

@@ -1,14 +1,13 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:
- *  PURPOSE:
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-#define CUT_OFF 5.0f //Cut off point at which volume is regarded as 0 in the function e^-x
+#define CUT_OFF 5.0f            // Cut off point at which volume is regarded as 0 in the function e^-x
 
 enum eSoundEventType
 {
@@ -76,11 +75,14 @@ public:
     bool    GetPanEnabled() { return m_bPan; };
     void    SetPanEnabled(bool bPan) { m_bPan = bPan; };
     void    SetFxEffects(int* pEnabledEffects, uint iNumElements);
+    BOOL    SetFxParameters(uint iFxEffect, void* params);
+    BOOL    GetFxParameters(uint iFxEffect, void* params);
     SString GetMetaTags(const SString& strFormat);
     uint    GetReachedEndCount();
     bool    IsFreed();
     float   GetPan();
     void    SetPan(float fPan);
+    bool    SetLooped(bool bLoop);
 
     void   DoPulse(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
     void   AddQueuedEvent(eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false, const SString& strError = "");
@@ -111,7 +113,6 @@ private:
     const bool    m_bStream;
     const SString m_strPath;
     const bool    m_b3D;
-    const bool    m_bLoop;
     const bool    m_bThrottle;
     void*         m_pBuffer;
     unsigned int  m_uiBufferLength;
@@ -120,6 +121,7 @@ private:
     DWORD m_pSound;
 
     // Playback state
+    bool    m_bLoop;
     bool    m_bPaused;
     bool    m_bReversed;
     bool    m_bPan;

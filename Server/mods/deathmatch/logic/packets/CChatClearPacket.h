@@ -16,7 +16,7 @@
 class CChatClearPacket final : public CPacket
 {
 public:
-    CChatClearPacket() {};
+    CChatClearPacket(){};
 
     // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
     ePacketID               GetPacketID() const { return PACKET_ID_CHAT_CLEAR; };

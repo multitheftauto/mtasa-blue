@@ -548,9 +548,9 @@ void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVecto
     float dX = fabs(maxX - minX);
     float dY = fabs(maxY - minY);
     float dist;
-    int n = 1;
-    int xZone = lowXZone;
-    int yZone = lowYZone;
+    int   n = 1;
+    int   xZone = lowXZone;
+    int   yZone = lowYZone;
 
     n += highXZone - lowXZone;
     n += highYZone - lowYZone;
@@ -561,8 +561,7 @@ void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVecto
     {
         // A bound check here fixes client crash (https://github.com/multitheftauto/mtasa-blue/issues/835)
         // See PR https://github.com/multitheftauto/mtasa-blue/pull/836
-        if (Between<int>(lowXZone, xZone, highXZone) &&
-            Between<int>(lowYZone, yZone, highYZone))
+        if (Between<int>(lowXZone, xZone, highXZone) && Between<int>(lowYZone, yZone, highYZone))
         {
             vecOut.push_back(GetZone(xZone, yZone));
         }
@@ -727,9 +726,9 @@ bool CWaterManagerSA::DeletePoly(CWaterPoly* pPoly)
     return true;
 }
 
-bool CWaterManagerSA::GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown)
+bool CWaterManagerSA::GetWaterLevel(const CVector& vecPosition, float* pfLevel, bool ignoreDistanceToWaterThreshold, CVector* pvecUnknown)
 {
-    return ((GetWaterLevel_t)FUNC_GetWaterLevel)(vecPosition.fX, vecPosition.fY, vecPosition.fZ, pfLevel, bCheckWaves, pvecUnknown);
+    return ((GetWaterLevel_t)FUNC_GetWaterLevel)(vecPosition.fX, vecPosition.fY, vecPosition.fZ, pfLevel, ignoreDistanceToWaterThreshold, pvecUnknown);
 }
 
 bool CWaterManagerSA::SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource)
@@ -742,7 +741,8 @@ bool CWaterManagerSA::SetPositionWaterLevel(const CVector& vecPosition, float fL
     return SetPolyWaterLevel(pPoly, fLevel, pChangeSource);
 }
 
-bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
+bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel,
+                                         bool bIncludeOutsideWorldLevel)
 {
     assert(m_bInitializedVertices);
     CVector vecVertexPos;
@@ -752,10 +752,10 @@ bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool
         for (DWORD i = 0; i < NUM_DefWaterVertices; i++)
         {
             m_Vertices[i].GetPosition(vecVertexPos);
-            if ((bIncludeWorldNonSeaLevel && m_Vertices[i].IsWorldNonSeaLevel()) || (bIncludeWorldSeaLevel && !m_Vertices[i].IsWorldNonSeaLevel())) 
+            if ((bIncludeWorldNonSeaLevel && m_Vertices[i].IsWorldNonSeaLevel()) || (bIncludeWorldSeaLevel && !m_Vertices[i].IsWorldNonSeaLevel()))
                 vecVertexPos.fZ = fLevel;
             m_Vertices[i].SetPosition(vecVertexPos, pChangeSource);
-        }        
+        }
     }
 
     if (bIncludeOutsideWorldLevel)
@@ -785,6 +785,8 @@ void CWaterManagerSA::SetOutsideWorldWaterLevel(float fLevel)
     MemPut<float>(0x6EFFA6, fLevel);
     // Collision
     MemPut<float>(0x6E873F, fLevel);
+    // Sound
+    MemPut<float>(0x6EA238, fLevel);
 }
 
 float CWaterManagerSA::GetWaveLevel()
@@ -838,11 +840,19 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     CVector rayDir = vecEnd - vecStart;
 
     // Check if we're outside of map area.
-    CVector zeroPoint;
-    if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, 0), &zeroPoint) && IsPointOutsideOfGameArea(zeroPoint))
+    // Check for intersection with ocean outside the game area (takes water level into account)
+    // If a hit is detected, and it is outside, we early out, as custom water can't be created outside game boundaries
     {
-        *vecCollision = zeroPoint;
-        return true;
+        CVector     intersection{};
+        const float waterHeight = *reinterpret_cast<float*>(0x6E873F);
+        if (vecStart.IntersectsSegmentPlane(rayDir, CVector(0, 0, 1), CVector(0, 0, waterHeight), &intersection))
+        {
+            if (IsPointOutsideOfGameArea(intersection))
+            {
+                *vecCollision = intersection;
+                return true;
+            }
+        }
     }
 
     // Early out in case of both points being out of map
@@ -850,10 +860,8 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     {
         // Check if both points are on the same side of the map, in case of some mad person
         // trying to testLineAgainstWater over entire SA landmass, which is still a valid option.
-        if ((vecStart.fX < -3000.0f && vecEnd.fX < -3000.0f) ||
-            (vecStart.fX > 3000.0f && vecEnd.fX > 3000.0f) ||
-            (vecStart.fY < -3000.0f && vecEnd.fY < -3000.0f) ||
-            (vecStart.fY > 3000.0f && vecEnd.fY > 3000.0f))
+        if ((vecStart.fX < -3000.0f && vecEnd.fX < -3000.0f) || (vecStart.fX > 3000.0f && vecEnd.fX > 3000.0f) ||
+            (vecStart.fY < -3000.0f && vecEnd.fY < -3000.0f) || (vecStart.fY > 3000.0f && vecEnd.fY > 3000.0f))
         {
             return false;
         }
@@ -866,7 +874,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
     {
         return false;
     }
-   
+
     std::deque<CVector> vecVertices;
     for (auto& zone : vecZones)
     {
@@ -874,8 +882,9 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
         for (iter = zone->begin(); iter != zone->end(); ++iter)
         {
             auto poly = *iter;
-            int iNumVertices = poly->GetNumVertices();
-            if (iNumVertices < 3) continue;
+            int  iNumVertices = poly->GetNumVertices();
+            if (iNumVertices < 3)
+                continue;
 
             vecVertices.clear();
 
@@ -892,7 +901,8 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
                 return true;
             }
 
-            if (iNumVertices < 4) continue;
+            if (iNumVertices < 4)
+                continue;
 
             for (int i = 3; i < iNumVertices; i++)
             {
@@ -905,12 +915,10 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
                     return true;
                 }
             }
-            
         }
     }
 
     return false;
-
 }
 
 void CWaterManagerSA::AddChange(void* pChangeSource, void* pChangedObject, CWaterChange* pChange)

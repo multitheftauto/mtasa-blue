@@ -646,6 +646,16 @@ void CBassAudio::SetPlaybackSpeed(float fSpeed)
         BASS_ChannelSetAttribute(m_pSound, BASS_ATTRIB_FREQ, fSpeed * m_fDefaultFrequency);
 }
 
+bool CBassAudio::SetLooped(bool bLoop)
+{
+    if (!m_pSound)
+        return false;
+
+    m_bLoop = bLoop;
+
+    return BASS_ChannelFlags(m_pSound, bLoop ? BASS_SAMPLE_LOOP : 0, BASS_SAMPLE_LOOP);
+}
+
 void CBassAudio::SetPosition(const CVector& vecPosition)
 {
     m_vecPosition = vecPosition;
@@ -770,12 +780,12 @@ float CBassAudio::GetSoundBPM()
 
         // open the same file as played but for bpm decoding detection
         DWORD bpmChan = BASS_StreamCreateFile(false, FromUTF8(m_strPath), 0, 0, BASS_STREAM_DECODE | BASS_UNICODE);
-        
+
         if (!bpmChan)
         {
             bpmChan = BASS_MusicLoad(false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_DECODE | BASS_MUSIC_PRESCAN | BASS_UNICODE, 0);
         }
-        
+
         if (bpmChan)
         {
             fData = BASS_FX_BPM_DecodeGet(bpmChan, 0, GetLength(), 0, BASS_FX_FREESOURCE, NULL, NULL);
@@ -831,6 +841,16 @@ void CBassAudio::ApplyFxEffects()
             m_FxEffects[i] = 0;
         }
     }
+}
+
+BOOL CBassAudio::SetFxParameters(uint iFxEffect, void* params)
+{
+    return BASS_FXSetParameters(m_FxEffects[iFxEffect], params);
+}
+
+BOOL CBassAudio::GetFxParameters(uint iFxEffect, void* params)
+{
+    return BASS_FXGetParameters(m_FxEffects[iFxEffect], params);
 }
 
 //

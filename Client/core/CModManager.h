@@ -46,6 +46,8 @@ public:
 
     void RefreshMods();
 
+    bool TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const override;
+
 private:
     void InitializeModList(const char* szModFolderPath);
     void Clear();

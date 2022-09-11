@@ -11,9 +11,11 @@
 
 #pragma once
 
+#include "CElement.h"
+
 class CWaterManager;
 
-class CWater : public CElement
+class CWater final : public CElement
 {
 public:
     enum EWaterType

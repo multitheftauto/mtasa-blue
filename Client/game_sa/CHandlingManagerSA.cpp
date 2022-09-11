@@ -28,8 +28,8 @@ CFlyingHandlingEntrySA* CHandlingManagerSA::m_pOriginalFlyingEntries[24];
 tBoatHandlingDataSA   CHandlingManagerSA::m_OriginalBoatHandlingData[12];
 CBoatHandlingEntrySA* CHandlingManagerSA::m_pOriginalBoatEntries[12];
 
-tBikeHandlingDataSA   CHandlingManagerSA::m_OriginalBikeHandlingData[13];
-CBikeHandlingEntrySA* CHandlingManagerSA::m_pOriginalBikeEntries[13];
+tBikeHandlingDataSA   CHandlingManagerSA::m_OriginalBikeHandlingData[14];
+CBikeHandlingEntrySA* CHandlingManagerSA::m_pOriginalBikeEntries[14];
 
 // TODO We need install a hook in 0x6F52D0 to make some stuff work corrently
 
@@ -133,7 +133,7 @@ CHandlingManagerSA::CHandlingManagerSA()
         m_pOriginalBoatEntries[i] = new CBoatHandlingEntrySA(&m_OriginalBoatHandlingData[i]);
     }
 
-    for (int i = 0; i < 13; i++)
+    for (int i = 0; i < 14; i++)
     {
         m_pOriginalBikeEntries[i] = new CBikeHandlingEntrySA(&m_OriginalBikeHandlingData[i]);
     }
@@ -190,6 +190,15 @@ CHandlingManagerSA::~CHandlingManagerSA()
         delete m_pOriginalFlyingEntries[i];
     }
 
+    for (int i = 0; i < 12; i++)
+    {
+        delete m_pOriginalBoatEntries[i];
+    }
+
+    for (int i = 0; i < 14; i++)
+    {
+        delete m_pOriginalBikeEntries[i];
+    }
 }
 
 eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strName)
@@ -285,6 +294,8 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehic
         eHandlingTypes eHandling = GetHandlingID(eModel);
         if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
             return m_pOriginalBikeEntries[eHandling - HT_BIKE];
+        else if (eHandling == HT_FAGGIO)
+            return m_pOriginalBikeEntries[13];
     }
 
     return NULL;
@@ -8290,28 +8301,28 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalHandlingData[209].ucTailLight = 1;
     m_OriginalHandlingData[209].ucAnimGroup = 0;
 
-    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];   // HT_HOTRINA = HT_HOTRING
+    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];            // HT_HOTRINA = HT_HOTRING
     m_OriginalHandlingData[210].iVehicleID = 210;
 
-    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];   // HT_HOTRINB = HT_HOTRING
+    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];            // HT_HOTRINB = HT_HOTRING
     m_OriginalHandlingData[211].iVehicleID = 211;
 
-    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];  // HT_SADLSHIT = HT_SADLER
+    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];            // HT_SADLSHIT = HT_SADLER
     m_OriginalHandlingData[212].iVehicleID = 212;
 
-    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];   // HT_GLENSHIT = HT_GLENDALE
+    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];            // HT_GLENSHIT = HT_GLENDALE
     m_OriginalHandlingData[213].iVehicleID = 213;
 
-    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];  // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];            // HT_FAGGIO = HT_PIZZABOY
     m_OriginalHandlingData[214].iVehicleID = 214;
 
-    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];    // HT_FIRELA = HT_FIRETRUK
+    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];            // HT_FIRELA = HT_FIRETRUK
     m_OriginalHandlingData[215].iVehicleID = 215;
 
-    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];   // HT_RNCHLURE = HT_RANCHER
+    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];            // HT_RNCHLURE = HT_RANCHER
     m_OriginalHandlingData[216].iVehicleID = 216;
 
-    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];  // HT_FREIBOX = HT_FREIFLAT
+    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];            // HT_FREIBOX = HT_FREIFLAT
     m_OriginalHandlingData[217].iVehicleID = 217;
 
     // Aircrafts handling
@@ -8776,7 +8787,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[0].iVehicleID = 175;
     m_OriginalBoatHandlingData[0].fThrustY = 0.79f;
-    m_OriginalBoatHandlingData[0].fThrustZ= 0.5f;
+    m_OriginalBoatHandlingData[0].fThrustZ = 0.5f;
     m_OriginalBoatHandlingData[0].fThrustAppZ = 0.6f;
     m_OriginalBoatHandlingData[0].fAqPlaneForce = 7.0f;
     m_OriginalBoatHandlingData[0].fAqPlaneLimit = 0.60f;
@@ -8788,7 +8799,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[1].iVehicleID = 176;
     m_OriginalBoatHandlingData[1].fThrustY = 0.65f;
-    m_OriginalBoatHandlingData[1].fThrustZ= 0.5f;
+    m_OriginalBoatHandlingData[1].fThrustZ = 0.5f;
     m_OriginalBoatHandlingData[1].fThrustAppZ = 0.5f;
     m_OriginalBoatHandlingData[1].fAqPlaneForce = 8.0f;
     m_OriginalBoatHandlingData[1].fAqPlaneLimit = 0.70f;
@@ -8800,7 +8811,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[2].iVehicleID = 177;
     m_OriginalBoatHandlingData[2].fThrustY = 0.35f;
-    m_OriginalBoatHandlingData[2].fThrustZ= 0.6f;
+    m_OriginalBoatHandlingData[2].fThrustZ = 0.6f;
     m_OriginalBoatHandlingData[2].fThrustAppZ = 0.0f;
     m_OriginalBoatHandlingData[2].fAqPlaneForce = 3.0f;
     m_OriginalBoatHandlingData[2].fAqPlaneLimit = 0.20f;
@@ -8812,7 +8823,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[3].iVehicleID = 178;
     m_OriginalBoatHandlingData[3].fThrustY = 0.75f;
-    m_OriginalBoatHandlingData[3].fThrustZ= 0.7f;
+    m_OriginalBoatHandlingData[3].fThrustZ = 0.7f;
     m_OriginalBoatHandlingData[3].fThrustAppZ = 0.0f;
     m_OriginalBoatHandlingData[3].fAqPlaneForce = 3.0f;
     m_OriginalBoatHandlingData[3].fAqPlaneLimit = 0.20f;
@@ -8824,7 +8835,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[4].iVehicleID = 179;
     m_OriginalBoatHandlingData[4].fThrustY = 0.50f;
-    m_OriginalBoatHandlingData[4].fThrustZ= 1.1f;
+    m_OriginalBoatHandlingData[4].fThrustZ = 1.1f;
     m_OriginalBoatHandlingData[4].fThrustAppZ = 0.2f;
     m_OriginalBoatHandlingData[4].fAqPlaneForce = 9.0f;
     m_OriginalBoatHandlingData[4].fAqPlaneLimit = 0.80f;
@@ -8836,7 +8847,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[5].iVehicleID = 180;
     m_OriginalBoatHandlingData[5].fThrustY = 0.35f;
-    m_OriginalBoatHandlingData[5].fThrustZ= 0.6f;
+    m_OriginalBoatHandlingData[5].fThrustZ = 0.6f;
     m_OriginalBoatHandlingData[5].fThrustAppZ = 0.5f;
     m_OriginalBoatHandlingData[5].fAqPlaneForce = 4.0f;
     m_OriginalBoatHandlingData[5].fAqPlaneLimit = 0.35f;
@@ -8848,7 +8859,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[6].iVehicleID = 181;
     m_OriginalBoatHandlingData[6].fThrustY = 0.50f;
-    m_OriginalBoatHandlingData[6].fThrustZ= 0.65f;
+    m_OriginalBoatHandlingData[6].fThrustZ = 0.65f;
     m_OriginalBoatHandlingData[6].fThrustAppZ = 0.5f;
     m_OriginalBoatHandlingData[6].fAqPlaneForce = 8.0f;
     m_OriginalBoatHandlingData[6].fAqPlaneLimit = 0.60f;
@@ -8860,7 +8871,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[7].iVehicleID = 182;
     m_OriginalBoatHandlingData[7].fThrustY = 0.70f;
-    m_OriginalBoatHandlingData[7].fThrustZ= 0.6f;
+    m_OriginalBoatHandlingData[7].fThrustZ = 0.6f;
     m_OriginalBoatHandlingData[7].fThrustAppZ = 0.4f;
     m_OriginalBoatHandlingData[7].fAqPlaneForce = 5.0f;
     m_OriginalBoatHandlingData[7].fAqPlaneLimit = 0.30f;
@@ -8872,7 +8883,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[8].iVehicleID = 183;
     m_OriginalBoatHandlingData[8].fThrustY = 0.95f;
-    m_OriginalBoatHandlingData[8].fThrustZ= 0.7f;
+    m_OriginalBoatHandlingData[8].fThrustZ = 0.7f;
     m_OriginalBoatHandlingData[8].fThrustAppZ = 0.0f;
     m_OriginalBoatHandlingData[8].fAqPlaneForce = 1.5f;
     m_OriginalBoatHandlingData[8].fAqPlaneLimit = 0.10f;
@@ -8884,7 +8895,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[9].iVehicleID = 184;
     m_OriginalBoatHandlingData[9].fThrustY = 0.50f;
-    m_OriginalBoatHandlingData[9].fThrustZ= 0.6f;
+    m_OriginalBoatHandlingData[9].fThrustZ = 0.6f;
     m_OriginalBoatHandlingData[9].fThrustAppZ = 0.9f;
     m_OriginalBoatHandlingData[9].fAqPlaneForce = 9.0f;
     m_OriginalBoatHandlingData[9].fAqPlaneLimit = 0.80f;
@@ -8896,7 +8907,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[10].iVehicleID = 185;
     m_OriginalBoatHandlingData[10].fThrustY = 0.50f;
-    m_OriginalBoatHandlingData[10].fThrustZ= 0.9f;
+    m_OriginalBoatHandlingData[10].fThrustZ = 0.9f;
     m_OriginalBoatHandlingData[10].fThrustAppZ = 0.5f;
     m_OriginalBoatHandlingData[10].fAqPlaneForce = 6.0f;
     m_OriginalBoatHandlingData[10].fAqPlaneLimit = 0.50f;
@@ -8908,7 +8919,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBoatHandlingData[11].iVehicleID = 186;
     m_OriginalBoatHandlingData[11].fThrustY = 0.50f;
-    m_OriginalBoatHandlingData[11].fThrustZ= 1.2f;
+    m_OriginalBoatHandlingData[11].fThrustZ = 1.2f;
     m_OriginalBoatHandlingData[11].fThrustAppZ = 1.2f;
     m_OriginalBoatHandlingData[11].fAqPlaneForce = 50.0f;
     m_OriginalBoatHandlingData[11].fAqPlaneLimit = 0.85f;
@@ -9140,6 +9151,9 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalBikeHandlingData[12].fWheelieSteer = -0.006f;
     m_OriginalBikeHandlingData[12].fWheelieStabMult = 0.5f;
     m_OriginalBikeHandlingData[12].fStoppieStabMult = 0.3f;
+
+    m_OriginalBikeHandlingData[13] = m_OriginalBikeHandlingData[1];            // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
 void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)

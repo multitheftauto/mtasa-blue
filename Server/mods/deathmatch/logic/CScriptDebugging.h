@@ -34,7 +34,7 @@ struct SLogLine
 class CScriptDebugging
 {
 public:
-    CScriptDebugging(CLuaManager* pLuaManager);
+    CScriptDebugging();
     ~CScriptDebugging();
 
     bool AddPlayer(class CPlayer& Player, unsigned int uiLevel);
@@ -43,6 +43,7 @@ public:
 
     void LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
     void LogDebug(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...);
+    void LogInformationV(lua_State* luaVM, const char* format, va_list vlist);
     void LogInformation(lua_State* luaVM, const char* szFormat, ...);
     void LogWarning(lua_State* luaVM, const char* szFormat, ...);
     void LogError(lua_State* luaVM, const char* szFormat, ...);
@@ -74,7 +75,6 @@ private:
     void PrintLog(const char* szText);
     void Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel);
 
-    CLuaManager*                   m_pLuaManager;
     unsigned int                   m_uiLogFileLevel;
     unsigned int                   m_uiHtmlLogLevel;
     FILE*                          m_pLogFile;

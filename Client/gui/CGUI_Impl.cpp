@@ -22,7 +22,7 @@ using std::list;
 #define CGUI_MTA_DEFAULT_REG_BOLD   "Tahoma Bold (TrueType)"
 #define CGUI_MTA_CLEAR_REG          "Verdana (TrueType)"
 
-#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont-5.1.20080907.ttf"  // GTA/MTA/<...>
+#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont.ttf"  // GTA/MTA/<...>
 #define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
 #define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
 #define CGUI_SA_GOTHIC_FONT         "cgui/sagothic.ttf" // GTA/MTA/<...>
@@ -148,9 +148,6 @@ void CGUI_Impl::SetSkin(const char* szName)
 
     // Disallow input routing to the GUI unless edit box has focus
     m_eInputMode = INPUTMODE_NO_BINDS_ON_EDIT;
-
-    // The transfer box is not visible by default
-    m_bTransferBoxVisible = false;
 }
 
 void CGUI_Impl::SetBidiEnabled(bool bEnabled)

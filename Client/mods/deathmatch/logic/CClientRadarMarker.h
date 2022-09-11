@@ -21,7 +21,7 @@ class CClientRadarMarker;
 
 #define RADAR_MARKER_LIMIT 63
 
-class CClientRadarMarker : public CClientEntity
+class CClientRadarMarker final : public CClientEntity
 {
     DECLARE_CLASS(CClientRadarMarker, CClientEntity)
     friend class CClientRadarMarkerManager;
@@ -51,7 +51,7 @@ public:
     bool IsVisible() const { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
-    void SetDimension(unsigned short usDimension);
+    void SetDimension(unsigned short usDimension) override;
     void RelateDimension(unsigned short usDimension);
 
     short GetOrdering() { return m_sOrdering; }

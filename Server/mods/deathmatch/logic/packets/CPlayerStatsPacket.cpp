@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerStatsPacket.h"
+#include "CElement.h"
 
 bool CPlayerStatsPacket::Write(NetBitStreamInterface& BitStream) const
 {
