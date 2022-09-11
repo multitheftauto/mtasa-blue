@@ -330,7 +330,7 @@ const char* CBassAudio::ErrorGetMessage() {
     // BASS may add new error codes in the future, which must be appended to the switch above.
     // Also, add-ons may introduce additional error codes.
     default:
-        return "Unknown error - `CBassAudio::ErrorGetMessage` should be updated to return a message for it!";
+        return "unknown error (?)";
     }
 }
 
