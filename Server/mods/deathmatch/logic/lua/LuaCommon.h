@@ -18,13 +18,13 @@ extern "C"
     #include "lauxlib.h"
 }
 
-class CLuaPhysicsRigidBody;
-class CLuaPhysicsStaticCollision;
-class CLuaPhysicsShape;
+#include "CLuaFunctionRef.h"
+
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast<unsigned long>(x))
+
+class CVector2D;
 
 CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
-
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
 
 // Lua pop macros for our datatypes
 class CElement* lua_toelement(lua_State* luaVM, int iArgument);

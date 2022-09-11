@@ -13,13 +13,36 @@
 //#define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
-#include "net/SimHeaders.h"
-#ifndef WIN32
-#include <utime.h>
+#include "CResource.h"
+#include "CResourceManager.h"
+#include "CResourceChecker.h"
+#include "CResourceHTMLItem.h"
+#include "CResourceConfigItem.h"
+#include "CResourceClientConfigItem.h"
+#include "CResourceClientFileItem.h"
+#include "CResourceScriptItem.h"
+#include "CResourceClientScriptItem.h"
+#include "CAccessControlListManager.h"
+#include "CScriptDebugging.h"
+#include "CMapManager.h"
+#include "CKeyBinds.h"
+#include "CIdArray.h"
+#include "CChecksum.h"
+#include "CHTTPD.h"
+#include "Utils.h"
+#include "packets/CResourceClientScriptsPacket.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include <net/SimHeaders.h>
+#include <zip.h>
+
+#ifdef WIN32
+    #include <zip/iowin32.h>
+#else
+    #include <utime.h>
 #endif
 
 #ifndef MAX_PATH
-#define MAX_PATH 260
+    #define MAX_PATH 260
 #endif
 
 int           do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath);

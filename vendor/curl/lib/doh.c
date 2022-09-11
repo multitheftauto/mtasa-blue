@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -67,12 +69,6 @@ static const char *doh_strerror(DOHcode code)
     return errors[code];
   return "bad error code";
 }
-#endif
-
-#ifdef DEBUGBUILD
-#define UNITTEST
-#else
-#define UNITTEST static
 #endif
 
 /* @unittest 1655
@@ -247,12 +243,13 @@ static CURLcode dohprobe(struct Curl_easy *data,
        the gcc typecheck helpers */
     struct dynbuf *resp = &p->serverdoh;
     ERROR_CHECK_SETOPT(CURLOPT_URL, url);
+    ERROR_CHECK_SETOPT(CURLOPT_DEFAULT_PROTOCOL, "https");
     ERROR_CHECK_SETOPT(CURLOPT_WRITEFUNCTION, doh_write_cb);
     ERROR_CHECK_SETOPT(CURLOPT_WRITEDATA, resp);
     ERROR_CHECK_SETOPT(CURLOPT_POSTFIELDS, p->dohbuffer);
     ERROR_CHECK_SETOPT(CURLOPT_POSTFIELDSIZE, (long)p->dohlen);
     ERROR_CHECK_SETOPT(CURLOPT_HTTPHEADER, headers);
-#ifdef USE_NGHTTP2
+#ifdef USE_HTTP2
     ERROR_CHECK_SETOPT(CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
 #endif
 #ifndef CURLDEBUG
@@ -306,14 +303,6 @@ static CURLcode dohprobe(struct Curl_easy *data,
     }
     if(data->set.ssl.certinfo)
       ERROR_CHECK_SETOPT(CURLOPT_CERTINFO, 1L);
-    if(data->set.str[STRING_SSL_RANDOM_FILE]) {
-      ERROR_CHECK_SETOPT(CURLOPT_RANDOM_FILE,
-                         data->set.str[STRING_SSL_RANDOM_FILE]);
-    }
-    if(data->set.str[STRING_SSL_EGDSOCKET]) {
-      ERROR_CHECK_SETOPT(CURLOPT_EGDSOCKET,
-                         data->set.str[STRING_SSL_EGDSOCKET]);
-    }
     if(data->set.ssl.fsslctx)
       ERROR_CHECK_SETOPT(CURLOPT_SSL_CTX_FUNCTION, data->set.ssl.fsslctx);
     if(data->set.ssl.fsslctxp)

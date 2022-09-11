@@ -15,6 +15,7 @@
 #include "UTF8.h"
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
+#include "version.h"
 #ifdef WIN32
     #include <ctime>
     #include <windows.h>
@@ -59,10 +60,6 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 #define PRODUCT_REGISTRY_PATH       "Software\\Multi Theft Auto: San Andreas All"       // HKLM
 #define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
-
-#ifndef MTA_DM_ASE_VERSION
-    #include <version.h>
-#endif
 
     //
     // Output a UTF8 encoded messagebox
@@ -308,7 +305,6 @@ void SharedUtil::SetOnQuitCommand(const SString& strOperation, const SString& st
     SetRegistryValue("", "OnQuitCommand", strValue);
 }
 
-#ifdef MTASA_VERSION_MAJOR
 //
 // What to do on next restart
 //
@@ -380,8 +376,6 @@ SString SharedUtil::GetPostUpdateConnect()
 
     return strHost;
 }
-
-#endif
 
 //
 // Application settings

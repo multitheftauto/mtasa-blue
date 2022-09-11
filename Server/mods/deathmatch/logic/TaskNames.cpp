@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "TaskNames.h"
 
 char sNoTaskName[100] = "[NO TASK TYPE]";
 

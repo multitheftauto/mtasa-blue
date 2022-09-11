@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaColShapeDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CColCircle.h"
+#include "CColCuboid.h"
+#include "CColRectangle.h"
+#include "CColPolygon.h"
+#include "CColTube.h"
 
 void CLuaColShapeDefs::LoadFunctions()
 {

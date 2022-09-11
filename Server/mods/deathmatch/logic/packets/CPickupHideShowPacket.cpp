@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPickupHideShowPacket.h"
+#include "CPickup.h"
+#include "CPickupManager.h"
 
 bool CPickupHideShowPacket::Write(NetBitStreamInterface& BitStream) const
 {
@@ -20,9 +23,9 @@ bool CPickupHideShowPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(m_bShow);
 
         // Write the pickup ids
-        unsigned short                   usPickupModelID;
-        CPickup*                         pPickup;
-        vector<CPickup*>::const_iterator iter = m_List.begin();
+        unsigned short                        usPickupModelID;
+        CPickup*                              pPickup;
+        std::vector<CPickup*>::const_iterator iter = m_List.begin();
         for (; iter != m_List.end(); ++iter)
         {
             pPickup = *iter;

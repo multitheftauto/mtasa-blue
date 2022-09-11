@@ -6844,7 +6844,7 @@ bool CStaticFunctionDefinitions::SetMoonSize(int iSize)
 
 bool CStaticFunctionDefinitions::SetFPSLimit(int iLimit)
 {
-    if (iLimit == 0 || (iLimit >= 25 && iLimit <= 100))
+    if (iLimit == 0 || (iLimit >= 25 && iLimit <= std::numeric_limits<short>::max()))
     {
         g_pCore->SetClientScriptFrameRateLimit(iLimit);
         return true;

@@ -10,7 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaTeamDefs.h"
 #include "CLuaGenericDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaTeamDefs::LoadFunctions()
 {

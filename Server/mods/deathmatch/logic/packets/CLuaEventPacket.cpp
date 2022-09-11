@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaEventPacket.h"
 
 CLuaEventPacket::CLuaEventPacket()
 {

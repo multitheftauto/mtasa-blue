@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -687,7 +689,7 @@ static void printsub(struct Curl_easy *data,
             infof(data, "%s", CURL_TELCMD(j));
           else
             infof(data, "%d", j);
-          infof(data, ", not IAC SE!) ");
+          infof(data, ", not IAC SE) ");
         }
       }
       length -= 2;

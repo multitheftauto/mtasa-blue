@@ -10,9 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "net/SyncStructures.h"
+#include "CPlayerPuresyncPacket.h"
+#include "CElementIDs.h"
+#include "CWeaponNames.h"
+#include "Utils.h"
+#include <net/SyncStructures.h>
 
 extern CGame* g_pGame;
+
+CPlayerPuresyncPacket::CPlayerPuresyncPacket(CPlayer* pPlayer)
+{
+    m_pSourceElement = pPlayer;
+}
 
 bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 {

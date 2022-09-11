@@ -193,6 +193,7 @@ public:
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
+
     class CStoredWeaponSlot
     {
     public:

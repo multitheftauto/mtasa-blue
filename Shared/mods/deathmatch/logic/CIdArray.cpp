@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CIdArray.h"
 
 #define SHARED_ARRAY_BASE_ID    0x02000000
 

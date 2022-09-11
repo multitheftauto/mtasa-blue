@@ -61,7 +61,7 @@ FT_BEGIN_HEADER
 
   typedef const FTC_SFamilyClassRec*  FTC_SFamilyClass;
 
-#define FTC_SFAMILY_CLASS( x )  ((FTC_SFamilyClass)(x))
+#define FTC_SFAMILY_CLASS( x )  ( (FTC_SFamilyClass)(x) )
 
 #define FTC_CACHE_SFAMILY_CLASS( x )  \
           FTC_SFAMILY_CLASS( FTC_CACHE_GCACHE_CLASS( x )->family_class )

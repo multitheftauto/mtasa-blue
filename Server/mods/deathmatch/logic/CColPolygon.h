@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CColShape.h"
-
+#include "CVector2D.h"
 #include <list>
 
 class CColPolygon : public CColShape
