@@ -1699,11 +1699,22 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CPlayerManager::IsValidPlayerModel(usModel))
                 return false;
+            unsigned short usOldModel = pPed->GetModel();      // Get the old model
             CLuaArguments Arguments;
-            Arguments.PushNumber(pPed->GetModel());            // Get the old model
+            Arguments.PushNumber(usOldModel);
             pPed->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                     // Get the new model
-            pPed->CallEvent("onElementModelChange", Arguments);
+            bool bContinue = pPed->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pPed->GetModel())
+                 return false;
+
+            if (!bContinue)
+            {
+                // Change canceled
+                pPed->SetModel(usOldModel);
+                return false;
+            }
             break;
         }
         case CElement::VEHICLE:
@@ -1713,11 +1724,22 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CVehicleManager::IsValidModel(usModel))
                 return false;
+            unsigned short usOldModel = pVehicle->GetModel();      // Get the old model
             CLuaArguments Arguments;
-            Arguments.PushNumber(pVehicle->GetModel());            // Get the old model
+            Arguments.PushNumber(usOldModel);
             pVehicle->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                         // Get the new model
-            pVehicle->CallEvent("onElementModelChange", Arguments);
+            bool bContinue = pVehicle->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pVehicle->GetModel())
+                 return false;
+
+            if (!bContinue)
+            {
+                // Change canceled
+                pVehicle->SetModel(usOldModel);
+                return false;
+            }
 
             // Check for any passengers above the max seat list
             unsigned char ucMaxPassengers = pVehicle->GetMaxPassengers();
@@ -1735,6 +1757,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                     RemovePedFromVehicle(pPed);
                 }
             }
+
             break;
         }
         case CElement::OBJECT:
@@ -1744,11 +1767,22 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CObjectManager::IsValidModel(usModel))
                 return false;
+            unsigned short usOldModel = pObject->GetModel();      // Get the old model
             CLuaArguments Arguments;
-            Arguments.PushNumber(pObject->GetModel());            // Get the old model
+            Arguments.PushNumber(usOldModel);
             pObject->SetModel(usModel);                           // Set the new model
             Arguments.PushNumber(usModel);                        // Get the new model
-            pObject->CallEvent("onElementModelChange", Arguments);
+            bool bContinue = pObject->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pObject->GetModel())
+                 return false;
+
+            if (!bContinue)
+            {
+                // Change canceled
+                pObject->SetModel(usOldModel);
+                return false;
+            }
             break;
         }
         default:

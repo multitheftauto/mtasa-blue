@@ -1,0 +1,497 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        multiplayer_sa/CMultiplayerSA_FrameRateFixes.cpp
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#include "StdInc.h"
+
+static bool bWouldBeNewFrame = false;
+static unsigned int nLastFrameTime = 0;
+
+constexpr float kOriginalTimeStep = 50.0f / 30.0f;
+
+#define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
+#define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
+const unsigned int RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
+
+void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
+{
+    _asm {
+        fld ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fmul ds:[0x858B1C]          // 0.1f
+        fxch
+        fcom
+        fxch
+        fstp st(0)
+        jmp RETURN_CTaskSimpleUseGun__SetMoveAnim
+    }
+}
+
+#define HOOKPOS_CCamera__Process 0x52C723
+#define HOOKSIZE_CCamera__Process 0x12
+static const unsigned int RETURN_CCamera__Process = 0x52C735;
+static void _declspec(naked) HOOK_CCamera__Process()
+{
+    _asm {
+        fld ds:[0x858C80]           // 5.0f
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd ds:[0xB6EC30]
+        fstp ds:[0xB6EC30]
+        jmp RETURN_CCamera__Process
+    }
+}
+
+#define HOOKPOS_CHeli__ProcessFlyingCarStuff 0x6C4F13
+#define HOOKSIZE_CHeli__ProcessFlyingCarStuff 0x2A
+static const unsigned int RETURN_CHeli__ProcessFlyingCarStuff = 0x6C4F3D;
+static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
+{
+    _asm {
+        mov ax, [esi+0x22]
+        cmp ax, 465
+        jz is_rc_heli
+        cmp ax, 501
+        jz is_rc_heli
+
+        fld ds:[0x858CDC]           // 0.001f
+        jmp end
+
+    is_rc_heli:
+        fld ds:[0x859CD8]           // 0.003f
+
+    end:
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd [esi+0x84C]
+        jmp RETURN_CHeli__ProcessFlyingCarStuff
+    }
+}
+
+#define HOOKPOS_CTimer__Update 0x561C5D
+#define HOOKSIZE_CTimer__Update 0xE
+static void _declspec(naked) HOOK_CTimer__Update()
+{
+    _asm {
+        add esp, 0x4
+
+        mov bWouldBeNewFrame, 0
+        mov eax, nLastFrameTime
+        add eax, 33                 // 33 = 1000 / 30
+        mov ecx, ds:[0xB7CB84]      // CTimer::m_snTimeInMilliseconds
+        cmp ecx, eax
+        jb skip
+
+        mov bWouldBeNewFrame, 1
+        mov nLastFrameTime, ecx
+        mov eax, ds:[0xB7CB4C]      // CTimer::m_FrameCounter
+        inc eax
+        mov ds:[0xB7CB4C], eax      // CTimer::m_FrameCounter
+
+    skip:
+        add esp, 0xC
+        ret
+    }
+}
+
+#define HOOKPOS_BreakObject_c__Update 0x59E420
+#define HOOKSIZE_BreakObject_c__Update 0xB
+static const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
+static void _declspec(naked) HOOK_BreakObject_c__Update()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov edx, [edi+eax+0x70]
+        lea eax, [edi+eax+0x70]
+        dec edx
+        mov [eax], edx
+
+    skip:
+        jmp RETURN_BreakObject_c__Update
+    }
+}
+
+#define HOOKPOS_CWaterCannon__Update_OncePerFrame  0x72A29B
+#define HOOKSIZE_CWaterCannon__Update_OncePerFrame 0x5
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0;
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_SKIP = 0x72A2BB;
+static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        movsx eax, [edi+0x4]
+        inc eax
+
+        jmp RETURN_CWaterCannon__Update_OncePerFrame
+    skip:
+        jmp RETURN_CWaterCannon__Update_OncePerFrame_SKIP
+    }
+}
+
+#define HOOKPOS_CPlayerInfo__Process 0x5700F5
+#define HOOKSIZE_CPlayerInfo__Process 0x6
+static const unsigned int RETURN_CPlayerInfo__Process = 0x5700FB;
+static const unsigned int RETURN_CPlayerInfo__Process_SKIP = 0x57015B;
+static void _declspec(naked) HOOK_CPlayerInfo__Process()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov edx, [esi+0xBC]
+
+        jmp RETURN_CPlayerInfo__Process
+    skip:
+        jmp RETURN_CPlayerInfo__Process_SKIP
+    }
+}
+
+#define HOOKPOS_CProjectileInfo__Update 0x738C63
+#define HOOKSIZE_CProjectileInfo__Update 0x5
+static const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
+static const unsigned int RETURN_CProjectileInfo__Update_SKIP = 0x738F22;
+static void _declspec(naked) HOOK_CProjectileInfo__Update()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov eax, [ebx]
+        cmp eax, 0x13
+
+        jmp RETURN_CProjectileInfo__Update
+    skip:
+        jmp RETURN_CProjectileInfo__Update_SKIP
+    }
+}
+
+#define HOOKPOS_CVehicle__AddWheelDirtAndWater 0x6D2D50
+#define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
+static const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
+static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov eax, [esp+0x8]
+        test eax, eax
+
+        jmp RETURN_CVehicle__AddWheelDirtAndWater
+    skip:
+        xor eax, eax
+        retn 0x10
+    }
+}
+
+#define HOOKPOS_CPlane__PreRender 0x6CA937
+#define HOOKSIZE_CPlane__PreRender 0x6
+static const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
+static const unsigned int RETURN_CPlane__PreRender_SKIP = 0x6CAA93;
+static void _declspec(naked) HOOK_CPlane__PreRender()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov al, [esi+0xA00]
+
+        jmp RETURN_CPlane__PreRender
+    skip:
+        jmp RETURN_CPlane__PreRender_SKIP
+    }
+}
+
+#define HOOKPOS_CWaterCannon__Update_OncePerFrame_PushPedFix 0x72A37B
+#define HOOKSIZE_CWaterCannon__Update_OncePerFrame_PushPedFix 0x6
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix = 0x72A381;
+static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP = 0x72A38E;
+static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov ecx, ds:[0xB7CB4C]
+
+        jmp RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix
+    skip:
+        jmp RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix_SKIP
+    }
+}
+
+#define HOOKPOS_CWaterCannon__Render_FxFix 0x729430
+#define HOOKSIZE_CWaterCannon__Render_FxFix 0x7
+static const unsigned int RETURN_CWaterCannon__Render_FxFix = 0x729440;
+static const unsigned int RETURN_CWaterCannon__Render_FxFix_SKIP = 0x7294EE;
+static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        fstp [esp+0x84]
+
+        jmp RETURN_CWaterCannon__Render_FxFix
+    skip:
+        jmp RETURN_CWaterCannon__Render_FxFix_SKIP
+    }
+}
+
+#define HOOKPOS_CPed__PreRenderAfterTest 0x5E7181
+#define HOOKSIZE_CPed__PreRenderAfterTest 0x6
+static const unsigned int RETURN_CPed__PreRenderAfterTest = 0x5E7187;
+static const unsigned int RETURN_CPed__PreRenderAfterTest_SKIP = 0x5E722D;
+static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov eax, [ebp+0x46C]
+
+        jmp RETURN_CPed__PreRenderAfterTest
+    skip:
+        jmp RETURN_CPed__PreRenderAfterTest_SKIP
+    }
+}
+
+#define HOOKPOS_cBuoyancy__AddSplashParticles 0x6C34E0
+#define HOOKSIZE_cBuoyancy__AddSplashParticles 0x6
+static const unsigned int RETURN_cBuoyancy__AddSplashParticles = 0x6C34E6;
+static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        sub esp, 0xE0
+
+        jmp RETURN_cBuoyancy__AddSplashParticles
+    skip:
+        retn 0x2C
+    }
+}
+
+#define HOOKPOS_CWeather__AddRain 0x72AAA8
+#define HOOKSIZE_CWeather__AddRain 0x6
+static const unsigned int RETURN_CWeather__AddRain = 0x72AAAE;
+static void _declspec(naked) HOOK_CWeather__AddRain()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        fld ds:[0xC812F0]
+
+        jmp RETURN_CWeather__AddRain
+
+    skip:
+        add esp, 0x84
+        ret
+    }
+}
+
+#define HOOKPOS_CPlane__ProcessFlyingCarStuff 0x6CBE4B
+#define HOOKSIZE_CPlane__ProcessFlyingCarStuff 0x6
+static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff = 0x6CBE51;
+static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff_SKIP = 0x6CC0D9;
+static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov edx, ds:[0xB6F03C]
+
+        jmp RETURN_CPlane__ProcessFlyingCarStuff
+    skip:
+        jmp RETURN_CPlane__ProcessFlyingCarStuff_SKIP
+    }
+}
+
+#define HOOKPOS_CAutomobile__UpdateWheelMatrix 0x6AA78A
+#define HOOKSIZE_CAutomobile__UpdateWheelMatrix 0x5
+static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix = 0x6AA78F;
+static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix_SKIP = 0x6AAAD0;
+static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        push 0x3D4CCCCD
+
+        jmp RETURN_CAutomobile__UpdateWheelMatrix
+    skip:
+        jmp RETURN_CAutomobile__UpdateWheelMatrix_SKIP
+    }
+}
+
+#define HOOKPOS_CVehicle__DoBoatSplashes 0x6DD130
+#define HOOKSIZE_CVehicle__DoBoatSplashes 0x6
+static const unsigned int RETURN_CVehicle__DoBoatSplashes = 0x6DD136;
+static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        sub esp, 0x80
+
+        jmp RETURN_CVehicle__DoBoatSplashes
+    skip:
+        retn 4
+    }
+}
+
+#define HOOKPOS_CVehicle__AddWaterSplashParticles 0x6DDF60
+#define HOOKSIZE_CVehicle__AddWaterSplashParticles 0x6
+static const unsigned int RETURN_CVehicle__AddWaterSplashParticles = 0x6DDF66;
+static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        sub esp, 0xC4
+
+        jmp RETURN_CVehicle__AddWaterSplashParticles
+    skip:
+        ret
+    }
+}
+
+#define HOOKPOS_CPlane__ProcessControl 0x6C939A
+#define HOOKSIZE_CPlane__ProcessControl 0x5
+static const unsigned int RETURN_CPlane__ProcessControl = 0x6C939F;
+static const unsigned int RETURN_CPlane__ProcessControl_SKIP = 0x6C9463;
+static void _declspec(naked) HOOK_CPlane__ProcessControl()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        lea ecx, [esp+0x3C]
+        push ecx
+
+        jmp RETURN_CPlane__ProcessControl
+    skip:
+        jmp RETURN_CPlane__ProcessControl_SKIP
+    }
+}
+
+#define HOOKPOS_CVehicle__AddExhaustParticles 0x6DE240
+#define HOOKSIZE_CVehicle__AddExhaustParticles 0x6
+static const unsigned int RETURN_CVehicle__AddExhaustParticles = 0x6DE246;
+static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
+{
+    _asm {
+        movzx edx, bWouldBeNewFrame
+        test edx, edx
+        jz skip
+
+        mov eax, fs:0x0
+
+        jmp RETURN_CVehicle__AddExhaustParticles
+    skip:
+        ret
+    }
+}
+
+#define HOOKPOS_CTaskSimpleSwim__ProcessEffects 0x68AD3B
+#define HOOKSIZE_CTaskSimpleSwim__ProcessEffects 0x6
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects = 0x68AD41;
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects_SKIP = 0x68AFDB;
+static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov eax, [edi+0x14]
+        add eax, 0x10
+
+        jmp RETURN_CTaskSimpleSwim__ProcessEffects
+    skip:
+        jmp RETURN_CTaskSimpleSwim__ProcessEffects_SKIP
+    }
+}
+
+#define HOOKPOS_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x68AC31
+#define HOOKSIZE_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x7
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix = 0x68AC38;
+static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP = 0x68AD36;
+static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
+{
+    _asm {
+        movzx eax, bWouldBeNewFrame
+        test eax, eax
+        jz skip
+
+        mov ecx, edi
+        mov esi, 5
+
+        jmp RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix
+    skip:
+        jmp RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix_SKIP
+    }
+}
+
+void CMultiplayerSA::InitHooks_FrameRateFixes()
+{
+    EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
+    EZHookInstall(CCamera__Process);
+    EZHookInstall(CHeli__ProcessFlyingCarStuff);
+
+    // CTimer::m_FrameCounter fixes
+    EZHookInstall(CTimer__Update);
+
+    EZHookInstall(BreakObject_c__Update);
+    EZHookInstall(CWaterCannon__Update_OncePerFrame);
+    EZHookInstall(CPlayerInfo__Process);
+
+    EZHookInstall(CProjectileInfo__Update);
+    EZHookInstall(CVehicle__AddWheelDirtAndWater);
+    EZHookInstall(CPlane__PreRender);
+    EZHookInstall(CWaterCannon__Update_OncePerFrame_PushPedFix);
+    EZHookInstall(CWaterCannon__Render_FxFix);
+    EZHookInstall(CPed__PreRenderAfterTest);
+    EZHookInstall(cBuoyancy__AddSplashParticles);
+    EZHookInstall(CWeather__AddRain);
+    EZHookInstall(CPlane__ProcessFlyingCarStuff);
+    EZHookInstall(CAutomobile__UpdateWheelMatrix);
+    EZHookInstall(CVehicle__DoBoatSplashes);
+    EZHookInstall(CVehicle__AddWaterSplashParticles);
+    EZHookInstall(CPlane__ProcessControl);
+    EZHookInstall(CVehicle__AddExhaustParticles);
+    EZHookInstall(CTaskSimpleSwim__ProcessEffects);
+    EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
+}
