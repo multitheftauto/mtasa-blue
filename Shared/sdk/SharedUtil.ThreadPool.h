@@ -100,12 +100,12 @@ namespace SharedUtil
         }
 
     private:
-        std::vector<std::thread>                                 m_vecThreads;
-        std::queue<std::packaged_task<void(bool)>>               m_tasks;
-        std::mutex                                               m_mutex;
-        std::condition_variable                                  m_cv;
-        bool                                                     m_exit = false;
-    } ;
+        std::vector<std::thread>                   m_vecThreads;
+        std::queue<std::packaged_task<void(bool)>> m_tasks;
+        std::mutex                                 m_mutex;
+        std::condition_variable                    m_cv;
+        bool                                       m_exit = false;
+    };
 
     template <typename... Args>
     auto async(Args&&... args)

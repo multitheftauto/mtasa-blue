@@ -66,6 +66,7 @@ public:
     void                InitHooks_Files();
     void                InitHooks_Weapons();
     void                InitHooks_Peds();
+    void                InitHooks_ObjectCollision();
     void                InitHooks_VehicleCollision();
     void                InitHooks_VehicleDummies();
     void                InitHooks_Vehicles();
@@ -77,6 +78,8 @@ public:
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
+    void                InitHooks_FrameRateFixes();
+    void                InitHooks_ObjectStreamerOptimization();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -140,6 +143,7 @@ public:
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
     void SetPedStepHandler(PedStepHandler* pHandler);
     void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
+    void SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler);
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
@@ -290,8 +294,12 @@ public:
         m_dwLastAnimArrayAddress = dwAnimArrayAddress;
     }
     eAnimGroup GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
-    eAnimID GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
-    DWORD GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
+    eAnimID    GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
+    DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
+
+    unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
+    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
+    unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
@@ -314,7 +322,7 @@ private:
     float               m_fNearClipDistance;
     float               m_fMaddDoggPoolLevel;
     eAnimGroup          m_dwLastStaticAnimGroupID;
-    eAnimID          m_dwLastStaticAnimID;
+    eAnimID             m_dwLastStaticAnimID;
     DWORD               m_dwLastAnimArrayAddress;
     float               m_fShadowsOffset;
 

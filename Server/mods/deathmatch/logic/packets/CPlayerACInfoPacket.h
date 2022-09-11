@@ -8,7 +8,10 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
+
+#include "CPacket.h"
 
 class CPlayerACInfoPacket final : public CPacket
 {

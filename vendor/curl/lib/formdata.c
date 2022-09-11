@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -33,7 +35,6 @@
 
 #include "urldata.h" /* for struct Curl_easy */
 #include "mime.h"
-#include "non-ascii.h"
 #include "vtls/vtls.h"
 #include "strcase.h"
 #include "sendf.h"
@@ -77,10 +78,15 @@ AddHttpPost(char *name, size_t namelength,
             struct curl_httppost **last_post)
 {
   struct curl_httppost *post;
+  if(!namelength && name)
+    namelength = strlen(name);
+  if((bufferlength > LONG_MAX) || (namelength > LONG_MAX))
+    /* avoid overflow in typecasts below */
+    return NULL;
   post = calloc(1, sizeof(struct curl_httppost));
   if(post) {
     post->name = name;
-    post->namelength = (long)(name?(namelength?namelength:strlen(name)):0);
+    post->namelength = (long)namelength;
     post->contents = value;
     post->contentlen = contentslength;
     post->buffer = buffer;
@@ -269,14 +275,8 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
        * Set the Name property.
        */
     case CURLFORM_PTRNAME:
-#ifdef CURL_DOES_CONVERSIONS
-      /* Treat CURLFORM_PTR like CURLFORM_COPYNAME so that libcurl will copy
-       * the data in all cases so that we'll have safe memory for the eventual
-       * conversion.
-       */
-#else
       current_form->flags |= HTTPPOST_PTRNAME; /* fall through */
-#endif
+
       /* FALLTHROUGH */
     case CURLFORM_COPYNAME:
       if(current_form->name)
@@ -865,8 +865,6 @@ CURLcode Curl_getformdata(struct Curl_easy *data,
 
         if(post->flags & CURL_HTTPPOST_LARGE)
           clen = post->contentlen;
-        if(!clen)
-          clen = -1;
 
         if(post->flags & (HTTPPOST_FILENAME | HTTPPOST_READFILE)) {
           if(!strcmp(file->contents, "-")) {
@@ -888,18 +886,21 @@ CURLcode Curl_getformdata(struct Curl_easy *data,
         else if(post->flags & HTTPPOST_BUFFER)
           result = curl_mime_data(part, post->buffer,
                                   post->bufferlength? post->bufferlength: -1);
-        else if(post->flags & HTTPPOST_CALLBACK)
+        else if(post->flags & HTTPPOST_CALLBACK) {
           /* the contents should be read with the callback and the size is set
              with the contentslength */
+          if(!clen)
+            clen = -1;
           result = curl_mime_data_cb(part, clen,
                                      fread_func, NULL, NULL, post->userp);
+        }
         else {
-          result = curl_mime_data(part, post->contents, (ssize_t) clen);
-#ifdef CURL_DOES_CONVERSIONS
-          /* Convert textual contents now. */
-          if(!result && data && part->datasize)
-            result = Curl_convert_to_network(data, part->data, part->datasize);
-#endif
+          size_t uclen;
+          if(!clen)
+            uclen = CURL_ZERO_TERMINATED;
+          else
+            uclen = (size_t)clen;
+          result = curl_mime_data(part, post->contents, uclen);
         }
       }
 

@@ -20,16 +20,19 @@
 #define FUNC_CStreaming_RequestAnimations            0x407120
 #define FUNC_CStreaming_RequestSpecialModel          0x409d10
 
-class CStreamingSA : public CStreaming
+class CStreamingSA final : public CStreaming
 {
 public:
-    void RequestModel(DWORD dwModelID, DWORD dwFlags);
-    void LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
-    BOOL HasModelLoaded(DWORD dwModelID);
-    void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
-    void ReinitStreaming();
+    void            RequestModel(DWORD dwModelID, DWORD dwFlags);
+    void            RemoveModel(std::uint32_t model) override;
+    void            LoadAllRequestedModels(BOOL bOnlyPriorityModels = 0, const char* szTag = NULL);
+    BOOL            HasModelLoaded(DWORD dwModelID);
+    void            RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
+    void            ReinitStreaming();
     CStreamingInfo* GetStreamingInfoFromModelId(uint32 id);
+    void            MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
+    std::uint32_t   GetMemoryUsed() const override;
 
 private:
-    static CStreamingInfo* ms_aInfoForModel; // count: 26316 in unmodified game
+    static CStreamingInfo* ms_aInfoForModel;            // count: 26316 in unmodified game
 };

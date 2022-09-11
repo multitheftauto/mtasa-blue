@@ -234,7 +234,7 @@ void CClientVariables::ValidateValues()
 
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
-    ClampValue("fps_limit", 0, 100);
+    ClampValue("fps_limit", 0, std::numeric_limits<short>::max());
     ClampValue("chat_font", 0, 3);
     ClampValue("chat_lines", 3, 62);
     ClampValue("chat_color", CColor(0, 0, 0, 0), CColor(255, 255, 255, 255));
@@ -329,6 +329,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("tyre_smoke_enabled", 1);                                                 // Enable tyre smoke
     DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
     DEFAULT("high_detail_peds", 0);                                                   // Disable rendering high detail peds all the time
+    DEFAULT("corona_reflections", 0);                                                 // Disable corona rain reflections
     DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on
     DEFAULT("allow_screen_upload", 1);                                                // 0-off 1-on
     DEFAULT("allow_external_sounds", 1);                                              // 0-off 1-on
@@ -350,9 +351,8 @@ void CClientVariables::LoadDefaults()
     DEFAULT("browser_remote_websites", true);                                         // Load remote websites?
     DEFAULT("browser_remote_javascript", true);                                       // Execute javascript on remote websites?
     DEFAULT("filter_duplicate_log_lines", true);                                      // Filter duplicate log lines for debug view and clientscript.log
-    DEFAULT("discord_rich_presence", true);                                           // Enable Discord Game SDK
-    DEFAULT("always_show_transferbox", false);                                        // Should the transfer box always be visible for downloads? (and ignore scripted control)
-    DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));                          // Command to run when right clicking quick connect (beta - can be removed at any time)
+    DEFAULT("always_show_transferbox", false);            // Should the transfer box always be visible for downloads? (and ignore scripted control)
+    DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));            // Command to run when right clicking quick connect (beta - can be removed at any time)
 
     if (!Exists("locale"))
     {

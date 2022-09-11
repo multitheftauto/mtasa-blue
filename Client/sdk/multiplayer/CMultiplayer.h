@@ -121,6 +121,7 @@ typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
+typedef void(AudioZoneRadioSwitchHandler)(DWORD dwStationID);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
@@ -246,6 +247,7 @@ public:
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
     virtual void  SetPedStepHandler(PedStepHandler* pHandler) = 0;
     virtual void  SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) = 0;
+    virtual void  SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler) = 0;
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
     virtual bool  HasSkyColor() = 0;
@@ -386,6 +388,10 @@ public:
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 
     virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
-    virtual eAnimID GetLastStaticAnimationID() = 0;
-    virtual DWORD GetLastAnimArrayAddress() = 0;
+    virtual eAnimID    GetLastStaticAnimationID() = 0;
+    virtual DWORD      GetLastAnimArrayAddress() = 0;
+
+    virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
 };

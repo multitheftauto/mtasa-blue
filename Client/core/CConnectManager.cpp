@@ -46,7 +46,7 @@ CConnectManager::~CConnectManager()
     g_pConnectManager = NULL;
 }
 
-bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser, const char* szSecret)
+bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser)
 {
     assert(szHost);
     assert(szNick);
@@ -99,11 +99,6 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     m_Address.s_addr = 0;
     m_usPort = usPort;
     m_bSave = true;
-
-    if (szSecret)
-        m_strDiscordSecretJoin = szSecret;
-    else
-        m_strDiscordSecretJoin.clear();
 
     m_strLastHost = m_strHost;
     m_usLastPort = m_usPort;
@@ -493,11 +488,4 @@ void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, boo
         SString strDummyUrl("http://%s/mta_client_firewall_probe/", inet_ntoa(Address));
         g_pCore->GetNetwork()->GetHTTPDownloadManager(EDownloadMode::CONNECT_TCP_SEND)->QueueFile(strDummyUrl, NULL, NULL, NULL, options);
     }
-}
-
-SString CConnectManager::GetJoinSecret()
-{
-    SString dummy = m_strDiscordSecretJoin;
-    m_strDiscordSecretJoin.clear();
-    return dummy;
 }

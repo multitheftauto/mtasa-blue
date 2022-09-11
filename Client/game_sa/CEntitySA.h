@@ -153,12 +153,12 @@ public:
     unsigned long bDontCastShadowsOn : 1;            // Dont cast shadows on this object
     unsigned long bOffscreen : 1;                    // offscreen flag. This can only be trusted when it is set to true
     unsigned long
-                  bIsStaticWaitingForCollision : 1;            // this is used by script created entities - they are static until the collision is loaded below them
-    unsigned long bDontStream : 1;                             // tell the streaming not to stream me
-    unsigned long bUnderwater : 1;                             // this object is underwater change drawing order
-    unsigned long bHasPreRenderEffects : 1;                    // Object has a prerender effects attached to it
-    unsigned long bIsTempBuilding : 1;                         // whether or not the building is temporary (i.e. can be created and deleted more than once)
-    unsigned long bDontUpdateHierarchy : 1;                    // Don't update the aniamtion hierarchy this frame
+        bIsStaticWaitingForCollision : 1;              // this is used by script created entities - they are static until the collision is loaded below them
+    unsigned long bDontStream : 1;                     // tell the streaming not to stream me
+    unsigned long bUnderwater : 1;                     // this object is underwater change drawing order
+    unsigned long bHasPreRenderEffects : 1;            // Object has a prerender effects attached to it
+    unsigned long bIsTempBuilding : 1;                 // whether or not the building is temporary (i.e. can be created and deleted more than once)
+    unsigned long bDontUpdateHierarchy : 1;            // Don't update the aniamtion hierarchy this frame
 
     unsigned long bHasRoadsignText : 1;            // entity is roadsign and has some 2deffect text stuff to be rendered
     unsigned long bDisplayedSuperLowLOD : 1;

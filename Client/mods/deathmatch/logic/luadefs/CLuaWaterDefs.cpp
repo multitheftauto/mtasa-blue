@@ -68,7 +68,8 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
 int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 {
-    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] [, bool bShallow = false ] )
+    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] [, bool
+    //  bShallow = false ] )
     CVector v1;
     CVector v2;
     CVector v3;
@@ -240,7 +241,8 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
     else
     {
         // Call type 3
-        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel )
+        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements, bool bIncludeWorldSeaLevel, bool
+        //  bIncludeOutsideWorldLevel )
         float fLevel;
         bool  bIncludeWorldNonSeaLevel;
         bool  bIncludeAllWaterElements;
@@ -355,18 +357,18 @@ int CLuaWaterDefs::GetWaterLevel(lua_State* luaVM)
     if (!argStream.NextIsUserData())
     {
         // Call type 1
-        //  float getWaterLevel ( float posX, float posY, float posZ [ , bool bCheckWaves = false ] )
+        //  float getWaterLevel ( float posX, float posY, float posZ [ , bool ignoreDistanceToWaterThreshold = false ] )
         CVector vecPosition;
-        bool    bCheckWaves;
+        bool    ignoreDistanceToWaterThreshold;
 
         argStream.ReadVector3D(vecPosition);
-        argStream.ReadBool(bCheckWaves, false);
+        argStream.ReadBool(ignoreDistanceToWaterThreshold, false);
 
         if (!argStream.HasErrors())
         {
             float   fWaterLevel;
             CVector vecUnknown;
-            if (CStaticFunctionDefinitions::GetWaterLevel(vecPosition, fWaterLevel, bCheckWaves, vecUnknown))
+            if (CStaticFunctionDefinitions::GetWaterLevel(vecPosition, fWaterLevel, ignoreDistanceToWaterThreshold, vecUnknown))
             {
                 lua_pushnumber(luaVM, fWaterLevel);
                 return 1;
