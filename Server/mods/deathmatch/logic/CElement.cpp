@@ -138,7 +138,6 @@ CElement::~CElement()
     assert(m_pParent == NULL);
 
     CElementRefManager::OnElementDelete(this);
-    SAFE_RELEASE(m_pChildrenListSnapshot);
 }
 
 bool CElement::IsCloneable()
@@ -1018,11 +1017,8 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
     }
 
     // Call it on all our children
-    CElementListSnapshot* pList = GetChildrenListSnapshot();
-    pList->AddRef();            // Keep list alive during use
-    for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+    for (CElement* pElement : *GetChildrenListSnapshot())
     {
-        CElement* pElement = *iter;
         if (!pElement->IsBeingDeleted())
         {
             if (!pElement->m_pEventManager || pElement->m_pEventManager->HasEvents() || !pElement->m_Children.empty())
@@ -1033,7 +1029,6 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
             }
         }
     }
-    pList->Release();
 }
 
 void CElement::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
@@ -1543,25 +1538,21 @@ void CElement::UpdateSpatialData()
 //
 // Ensure children list snapshot is up to date and return it
 //
-CElementListSnapshot* CElement::GetChildrenListSnapshot()
+CElementListSnapshotRef CElement::GetChildrenListSnapshot()
 {
     // See if list needs updating
     if (m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL)
     {
         m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
 
-        // Detach old
-        SAFE_RELEASE(m_pChildrenListSnapshot);
-
         // Make new
-        m_pChildrenListSnapshot = new CElementListSnapshot();
+        m_pChildrenListSnapshot = std::make_shared<CElementListSnapshot>();
 
         // Fill it up
         m_pChildrenListSnapshot->reserve(m_Children.size());
-        for (CChildListType::const_iterator iter = m_Children.begin(); iter != m_Children.end(); iter++)
-        {
+
+        for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
             m_pChildrenListSnapshot->push_back(*iter);
-        }
     }
 
     return m_pChildrenListSnapshot;
