@@ -127,6 +127,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
         if (uMsg == WM_ACTIVATE)
         {
             CModManager* pModManager = CModManager::GetSingletonPtr();
+            WORD         wState = LOWORD(wParam);
 
             if (pModManager && pModManager->IsLoaded())
             {
@@ -134,18 +135,16 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
 
                 if (pBase)
                 {
-                    WORD state = LOWORD(wParam);
-                    bool focus = (state == WA_CLICKACTIVE) || (state == WA_ACTIVE);
-
-                    pBase->OnWindowFocusChange(focus);
+                    bool bFocus = (wState == WA_CLICKACTIVE) || (wState == WA_ACTIVE);
+                    pBase->OnWindowFocusChange(bFocus);
                 }
             }
 
-            if (LOWORD(wParam) == WA_ACTIVE)
+            if (wState == WA_ACTIVE)
             {
                 GetVideoModeManager()->OnGainFocus();
             }
-            else if (LOWORD(wParam) == WA_INACTIVE)
+            else if (wState == WA_INACTIVE)
             {
                 GetVideoModeManager()->OnLoseFocus();
                 g_pCore->GetKeyBinds()->OnLoseFocus();
