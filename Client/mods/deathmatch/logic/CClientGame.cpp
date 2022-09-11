@@ -6553,10 +6553,10 @@ void CClientGame::RestreamWorld()
 
 void CClientGame::OnWindowFocusChange(bool state)
 {
-    if (state == m_bWasFocused)
+    if (state == m_bFocused)
         return;
 
-    m_bWasFocused = state;
+    m_bFocused = state;
 
     CLuaArguments Arguments;
     Arguments.PushBoolean(state);
