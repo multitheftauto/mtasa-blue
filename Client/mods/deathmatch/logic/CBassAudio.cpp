@@ -322,6 +322,8 @@ const char* CBassAudio::ErrorGetMessage() {
          return "unstreamable file";
     case BASS_ERROR_PROTOCOL:	
          return "unsupported protocol";
+    case BASS_ERROR_DENIED:
+         return "access denied";
     case BASS_ERROR_UNKNOWN:	
          return "some other mystery problem";
 
