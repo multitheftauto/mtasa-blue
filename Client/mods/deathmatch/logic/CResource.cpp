@@ -266,15 +266,18 @@ void CResource::Load()
         }
     }
 
-    // Load the no cache scripts first
-    for (auto& item : m_NoClientCacheScriptList) {
+    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front()) {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
 
+        auto& item = list.front();
         GetVM()->LoadScriptFromBuffer(item.buffer.GetData(), item.buffer.GetSize(), item.strFilename);
         item.buffer.ZeroClear();
-        m_NoClientCacheScriptList.pop_front();
 
         DECLARE_PROFILER_SECTION(OnPostLoadNoClientCacheScript)
+    }
+
+    // Load the no cache scripts first
+    for (auto& item : m_NoClientCacheScriptList) {
     }
 
     // Load the files that are queued in the list "to be loaded"
