@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-17 08:23+0000\n"
-"PO-Revision-Date: 2022-08-17 08:39\n"
+"PO-Revision-Date: 2022-09-11 16:02\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -892,7 +892,7 @@ msgstr "V redu"
 
 #: Client/loader/Dialogs.cpp:35
 msgid "Quit"
-msgstr ""
+msgstr "Izhod"
 
 #: Client/loader/Dialogs.cpp:36
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
