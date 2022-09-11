@@ -86,6 +86,7 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
 #define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
+#define PROP_CORONA_ZTEST           "coronaztest"
 
 
 struct SCheatSA
@@ -396,6 +397,9 @@ public:
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
 
+    void SetCoronaZTestEnabled(bool isEnabled);
+    bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -511,6 +515,7 @@ private:
     bool         m_bASyncLoadingSuspended;
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
+    bool         m_isCoronaZTestEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
