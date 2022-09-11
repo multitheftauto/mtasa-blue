@@ -9,6 +9,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaUtilDefs.h"
+#include "CScriptArgReader.h"
+#include "Utils.h"
+
+#ifndef MTA_CLIENT
+    #include "CRemoteCalls.h"
+#endif
 
 void CLuaUtilDefs::LoadFunctions()
 {

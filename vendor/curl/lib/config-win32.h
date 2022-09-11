@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -41,11 +43,6 @@
 
 /* Define if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
-
-/* Define if you have the <getopt.h> header file. */
-#if defined(__MINGW32__) || defined(__POCC__)
-#define HAVE_GETOPT_H 1
-#endif
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #if defined(_MSC_VER) && (_MSC_VER >= 1800)
@@ -124,8 +121,7 @@
 #define HAVE_TIME_H 1
 
 /* Define if you have the <unistd.h> header file. */
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(__LCC__) || \
-    defined(__POCC__)
+#if defined(__MINGW32__) || defined(__LCC__) || defined(__POCC__)
 #define HAVE_UNISTD_H 1
 #endif
 
@@ -164,9 +160,6 @@
 /* Define if you have the closesocket function. */
 #define HAVE_CLOSESOCKET 1
 
-/* Define if you don't have vprintf but do have _doprnt. */
-/* #define HAVE_DOPRNT 1 */
-
 /* Define if you have the ftruncate function. */
 /* #define HAVE_FTRUNCATE 1 */
 
@@ -179,36 +172,14 @@
 /* Define if you have the gethostname function. */
 #define HAVE_GETHOSTNAME 1
 
-/* Define if you have the getpass function. */
-/* #define HAVE_GETPASS 1 */
-
-/* Define if you have the getservbyname function. */
-#define HAVE_GETSERVBYNAME 1
-
-/* Define if you have the getprotobyname function. */
-#define HAVE_GETPROTOBYNAME
-
 /* Define if you have the gettimeofday function. */
 /* #define HAVE_GETTIMEOFDAY 1 */
-
-/* Define if you have the inet_addr function. */
-#define HAVE_INET_ADDR 1
 
 /* Define if you have the ioctlsocket function. */
 #define HAVE_IOCTLSOCKET 1
 
 /* Define if you have a working ioctlsocket FIONBIO function. */
 #define HAVE_IOCTLSOCKET_FIONBIO 1
-
-/* Define if you have the RAND_screen function when using SSL. */
-#define HAVE_RAND_SCREEN 1
-
-/* Define if you have the `RAND_status' function when using SSL. */
-#define HAVE_RAND_STATUS 1
-
-/* Define if you have the `CRYPTO_cleanup_all_ex_data' function.
-   This is present in OpenSSL versions after 0.9.6b */
-#define HAVE_CRYPTO_CLEANUP_ALL_EX_DATA 1
 
 /* Define if you have the select function. */
 #define HAVE_SELECT 1
@@ -218,9 +189,6 @@
 
 /* Define if you have the setmode function. */
 #define HAVE_SETMODE 1
-
-/* Define if you have the setvbuf function. */
-#define HAVE_SETVBUF 1
 
 /* Define if you have the socket function. */
 #define HAVE_SOCKET 1
@@ -233,20 +201,11 @@
 /* Define if you have the strdup function. */
 #define HAVE_STRDUP 1
 
-/* Define if you have the strftime function. */
-#define HAVE_STRFTIME 1
-
 /* Define if you have the stricmp function. */
 #define HAVE_STRICMP 1
 
-/* Define if you have the strnicmp function. */
-#define HAVE_STRNICMP 1
-
-/* Define if you have the strstr function. */
-#define HAVE_STRSTR 1
-
 /* Define if you have the strtoll function. */
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(__POCC__) || \
+#if defined(__MINGW32__) || defined(__POCC__) || \
     (defined(_MSC_VER) && (_MSC_VER >= 1800))
 #define HAVE_STRTOLL 1
 #endif
@@ -273,30 +232,6 @@
 
 /* Define to the function return type for recv. */
 #define RECV_TYPE_RETV int
-
-/* Define if you have the recvfrom function. */
-#define HAVE_RECVFROM 1
-
-/* Define to the type of arg 1 for recvfrom. */
-#define RECVFROM_TYPE_ARG1 SOCKET
-
-/* Define to the type pointed by arg 2 for recvfrom. */
-#define RECVFROM_TYPE_ARG2 char
-
-/* Define to the type of arg 3 for recvfrom. */
-#define RECVFROM_TYPE_ARG3 int
-
-/* Define to the type of arg 4 for recvfrom. */
-#define RECVFROM_TYPE_ARG4 int
-
-/* Define to the type pointed by arg 5 for recvfrom. */
-#define RECVFROM_TYPE_ARG5 struct sockaddr
-
-/* Define to the type pointed by arg 6 for recvfrom. */
-#define RECVFROM_TYPE_ARG6 int
-
-/* Define to the function return type for recvfrom. */
-#define RECVFROM_TYPE_RETV int
 
 /* Define if you have the send function. */
 #define HAVE_SEND 1
@@ -328,9 +263,7 @@
 
 /* Define if ssize_t is not an available 'typedefed' type. */
 #ifndef _SSIZE_T_DEFINED
-#  if (defined(__WATCOMC__) && (__WATCOMC__ >= 1240)) || \
-      defined(__POCC__) || \
-      defined(__MINGW32__)
+#  if defined(__POCC__) || defined(__MINGW32__)
 #  elif defined(_WIN64)
 #    define _SSIZE_T_DEFINED
 #    define ssize_t __int64
@@ -347,14 +280,8 @@
 /* Define to the size of `int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
-/* Define to the size of `long double', as computed by sizeof. */
-#define SIZEOF_LONG_DOUBLE 16
-
 /* Define to the size of `long long', as computed by sizeof. */
 /* #define SIZEOF_LONG_LONG 8 */
-
-/* Define to the size of `short', as computed by sizeof. */
-#define SIZEOF_SHORT 2
 
 /* Define to the size of `long', as computed by sizeof. */
 #define SIZEOF_LONG 4
@@ -389,7 +316,6 @@
 #  undef SEND_TYPE_ARG3
 #  define HAVE_FREEADDRINFO
 #  define HAVE_GETADDRINFO
-#  define HAVE_GETHOSTBYNAME
 #  define HAVE_GETHOSTBYNAME_R
 #  define HAVE_GETHOSTBYNAME_R_6
 #  define LWIP_POSIX_SOCKETS_IO_NAMES 0
@@ -440,7 +366,7 @@
 #endif
 
 /* Define if the compiler supports the 'long long' data type. */
-#if defined(__MINGW32__) || defined(__WATCOMC__)      || \
+#if defined(__MINGW32__) || \
     (defined(_MSC_VER)     && (_MSC_VER     >= 1310)) || \
     (defined(__BORLANDC__) && (__BORLANDC__ >= 0x561))
 #define HAVE_LONGLONG 1
@@ -454,9 +380,6 @@
 
 /* mingw-w64, mingw using >= MSVCR80, and visual studio >= 2005 (MSVCR80)
    all default to 64-bit time_t unless _USE_32BIT_TIME_T is defined */
-#ifdef __MINGW32__
-#  include <_mingw.h>
-#endif
 #if defined(__MINGW64_VERSION_MAJOR) || \
     (defined(__MINGW32__) && (__MSVCRT_VERSION__ >= 0x0800)) || \
     (defined(_MSC_VER) && (_MSC_VER >= 1400))
@@ -604,10 +527,6 @@ Vista
 #  define USE_WIN32_LARGE_FILES
 #endif
 
-#if defined(__WATCOMC__) && !defined(USE_WIN32_LARGE_FILES)
-#  define USE_WIN32_LARGE_FILES
-#endif
-
 #if defined(__POCC__)
 #  undef USE_WIN32_LARGE_FILES
 #endif
@@ -654,13 +573,6 @@ Vista
 #define USE_WIN32_LDAP 1
 #endif
 
-#if defined(__WATCOMC__) && defined(USE_WIN32_LDAP)
-#if __WATCOMC__ < 1280
-#define WINBERAPI  __declspec(cdecl)
-#define WINLDAPAPI __declspec(cdecl)
-#endif
-#endif
-
 #if defined(__POCC__) && defined(USE_WIN32_LDAP)
 #  define CURL_DISABLE_LDAP 1
 #endif
@@ -678,7 +590,7 @@ Vista
 /* ---------------------------------------------------------------- */
 
 /* Define cpu-machine-OS */
-#undef OS
+#if !defined(OS)
 #if defined(_M_IX86) || defined(__i386__) /* x86 (MSVC or gcc) */
 #define OS "i386-pc-win32"
 #elif defined(_M_X64) || defined(__x86_64__) /* x86_64 (MSVC >=2005 or gcc) */
@@ -691,6 +603,7 @@ Vista
 #define OS "aarch64-pc-win32"
 #else
 #define OS "unknown-pc-win32"
+#endif
 #endif
 
 /* Name of package */

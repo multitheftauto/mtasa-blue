@@ -73,7 +73,7 @@ public:
     unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };
     unsigned long GetOpenFileCount() const { return m_OpenFilenameList.size(); };
     unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
-    unsigned long GetElementCount() const { return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0; };
+    unsigned long GetElementCount() const;
     unsigned long GetTextDisplayCount() const { return m_Displays.size(); };
     unsigned long GetTextItemCount() const { return m_TextItems.size(); };
     void          OnOpenFile(const SString& strFilename);

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2012 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  * Copyright (C) 2012 - 2016, Marc Hoersken, <info@marc-hoersken.de>
  * Copyright (C) 2012, Mark Salisbury, <mark.salisbury@hp.com>
  *
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -51,6 +53,7 @@
 #include "curl_printf.h"
 #include "multiif.h"
 #include "version_win32.h"
+#include "rand.h"
 
 /* The last #include file should be: */
 #include "curl_memory.h"
@@ -81,7 +84,39 @@
 #endif
 #endif
 
-#if defined(CryptStringToBinary) && defined(CRYPT_STRING_HEX)
+#ifndef BCRYPT_CHACHA20_POLY1305_ALGORITHM
+#define BCRYPT_CHACHA20_POLY1305_ALGORITHM L"CHACHA20_POLY1305"
+#endif
+
+#ifndef BCRYPT_CHAIN_MODE_CCM
+#define BCRYPT_CHAIN_MODE_CCM L"ChainingModeCCM"
+#endif
+
+#ifndef BCRYPT_CHAIN_MODE_GCM
+#define BCRYPT_CHAIN_MODE_GCM L"ChainingModeGCM"
+#endif
+
+#ifndef BCRYPT_AES_ALGORITHM
+#define BCRYPT_AES_ALGORITHM L"AES"
+#endif
+
+#ifndef BCRYPT_SHA256_ALGORITHM
+#define BCRYPT_SHA256_ALGORITHM L"SHA256"
+#endif
+
+#ifndef BCRYPT_SHA384_ALGORITHM
+#define BCRYPT_SHA384_ALGORITHM L"SHA384"
+#endif
+
+/* Workaround broken compilers like MingW.
+   Return the number of elements in a statically sized array.
+*/
+#ifndef ARRAYSIZE
+#define ARRAYSIZE(A) (sizeof(A)/sizeof((A)[0]))
+#endif
+
+#if defined(CryptStringToBinary) && defined(CRYPT_STRING_HEX)   \
+  && !defined(DISABLE_SCHANNEL_CLIENT_CERT)
 #define HAS_CLIENT_CERT_PATH
 #endif
 
@@ -115,6 +150,10 @@
 
 #ifndef SP_PROT_TLS1_2_CLIENT
 #define SP_PROT_TLS1_2_CLIENT           0x00000800
+#endif
+
+#ifndef SP_PROT_TLS1_3_CLIENT
+#define SP_PROT_TLS1_3_CLIENT           0x00002000
 #endif
 
 #ifndef SCH_USE_STRONG_CRYPTO
@@ -171,7 +210,7 @@ static void InitSecBufferDesc(SecBufferDesc *desc, SecBuffer *BufArr,
 }
 
 static CURLcode
-set_ssl_version_min_max(SCHANNEL_CRED *schannel_cred, struct Curl_easy *data,
+set_ssl_version_min_max(DWORD *enabled_protocols, struct Curl_easy *data,
                         struct connectdata *conn)
 {
   long ssl_version = SSL_CONN_CONFIG(version);
@@ -181,23 +220,44 @@ set_ssl_version_min_max(SCHANNEL_CRED *schannel_cred, struct Curl_easy *data,
   switch(ssl_version_max) {
   case CURL_SSLVERSION_MAX_NONE:
   case CURL_SSLVERSION_MAX_DEFAULT:
-    ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
+
+    /* Windows Server 2022 and newer (including Windows 11) support TLS 1.3
+       built-in. Previous builds of Windows 10 had broken TLS 1.3
+       implementations that could be enabled via registry.
+    */
+    if(curlx_verify_windows_version(10, 0, 20348, PLATFORM_WINNT,
+                                    VERSION_GREATER_THAN_EQUAL)) {
+      ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_3;
+    }
+    else /* Windows 10 and older */
+      ssl_version_max = CURL_SSLVERSION_MAX_TLSv1_2;
+
     break;
   }
+
   for(; i <= (ssl_version_max >> 16); ++i) {
     switch(i) {
     case CURL_SSLVERSION_TLSv1_0:
-      schannel_cred->grbitEnabledProtocols |= SP_PROT_TLS1_0_CLIENT;
+      (*enabled_protocols) |= SP_PROT_TLS1_0_CLIENT;
       break;
     case CURL_SSLVERSION_TLSv1_1:
-      schannel_cred->grbitEnabledProtocols |= SP_PROT_TLS1_1_CLIENT;
+      (*enabled_protocols) |= SP_PROT_TLS1_1_CLIENT;
       break;
     case CURL_SSLVERSION_TLSv1_2:
-      schannel_cred->grbitEnabledProtocols |= SP_PROT_TLS1_2_CLIENT;
+      (*enabled_protocols) |= SP_PROT_TLS1_2_CLIENT;
       break;
     case CURL_SSLVERSION_TLSv1_3:
-      failf(data, "schannel: TLS 1.3 is not yet supported");
-      return CURLE_SSL_CONNECT_ERROR;
+
+      /* Windows Server 2022 and newer */
+      if(curlx_verify_windows_version(10, 0, 20348, PLATFORM_WINNT,
+                                      VERSION_GREATER_THAN_EQUAL)) {
+        (*enabled_protocols) |= SP_PROT_TLS1_3_CLIENT;
+        break;
+      }
+      else { /* Windows 10 and older */
+        failf(data, "schannel: TLS 1.3 not supported on Windows prior to 11");
+        return CURLE_SSL_CONNECT_ERROR;
+      }
     }
   }
   return CURLE_OK;
@@ -214,8 +274,12 @@ get_alg_id_by_name(char *name)
 {
   char tmp[LONGEST_ALG_ID] = { 0 };
   char *nameEnd = strchr(name, ':');
-  size_t n = nameEnd ? min((size_t)(nameEnd - name), LONGEST_ALG_ID - 1) : \
-    min(strlen(name), LONGEST_ALG_ID - 1);
+  size_t n = nameEnd ? (size_t)(nameEnd - name) : strlen(name);
+
+  /* reject too-long alg names */
+  if(n > (LONGEST_ALG_ID - 1))
+    return 0;
+
   strncpy(tmp, name, n);
   tmp[n] = 0;
   CIPHEROPTION(CALG_MD2);
@@ -325,13 +389,15 @@ get_alg_id_by_name(char *name)
   return 0;
 }
 
+#define NUM_CIPHERS 47 /* There are 47 options listed above */
+
 static CURLcode
 set_ssl_ciphers(SCHANNEL_CRED *schannel_cred, char *ciphers,
                 ALG_ID *algIds)
 {
   char *startCur = ciphers;
   int algCount = 0;
-  while(startCur && (0 != *startCur) && (algCount < NUMOF_CIPHERS)) {
+  while(startCur && (0 != *startCur) && (algCount < NUM_CIPHERS)) {
     long alg = strtol(startCur, 0, 0);
     if(!alg)
       alg = get_alg_id_by_name(startCur);
@@ -381,13 +447,13 @@ get_cert_location(TCHAR *path, DWORD *store_name, TCHAR **store_path,
   else if(_tcsncmp(path, TEXT("Users"), store_name_len) == 0)
     *store_name = CERT_SYSTEM_STORE_USERS;
   else if(_tcsncmp(path, TEXT("CurrentUserGroupPolicy"),
-                    store_name_len) == 0)
+                   store_name_len) == 0)
     *store_name = CERT_SYSTEM_STORE_CURRENT_USER_GROUP_POLICY;
   else if(_tcsncmp(path, TEXT("LocalMachineGroupPolicy"),
-                    store_name_len) == 0)
+                   store_name_len) == 0)
     *store_name = CERT_SYSTEM_STORE_LOCAL_MACHINE_GROUP_POLICY;
   else if(_tcsncmp(path, TEXT("LocalMachineEnterprise"),
-                    store_name_len) == 0)
+                   store_name_len) == 0)
     *store_name = CERT_SYSTEM_STORE_LOCAL_MACHINE_ENTERPRISE;
   else
     return CURLE_SSL_CERTPROBLEM;
@@ -417,46 +483,51 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
                                    int sockindex)
 {
   struct ssl_connect_data *connssl = &conn->ssl[sockindex];
-  SCHANNEL_CRED schannel_cred;
+
+#ifdef HAS_CLIENT_CERT_PATH
   PCCERT_CONTEXT client_certs[1] = { NULL };
+#endif
   SECURITY_STATUS sspi_status = SEC_E_OK;
   CURLcode result;
-  struct ssl_backend_data *backend = connssl->backend;
 
   /* setup Schannel API options */
-  memset(&schannel_cred, 0, sizeof(schannel_cred));
-  schannel_cred.dwVersion = SCHANNEL_CRED_VERSION;
+  DWORD flags = 0;
+  DWORD enabled_protocols = 0;
+
+  struct ssl_backend_data *backend = connssl->backend;
+
+  DEBUGASSERT(backend);
 
   if(conn->ssl_config.verifypeer) {
 #ifdef HAS_MANUAL_VERIFY_API
     if(backend->use_manual_cred_validation)
-      schannel_cred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION;
+      flags = SCH_CRED_MANUAL_CRED_VALIDATION;
     else
 #endif
-      schannel_cred.dwFlags = SCH_CRED_AUTO_CRED_VALIDATION;
+      flags = SCH_CRED_AUTO_CRED_VALIDATION;
 
     if(SSL_SET_OPTION(no_revoke)) {
-      schannel_cred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
+      flags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
         SCH_CRED_IGNORE_REVOCATION_OFFLINE;
 
       DEBUGF(infof(data, "schannel: disabled server certificate revocation "
                    "checks"));
     }
     else if(SSL_SET_OPTION(revoke_best_effort)) {
-      schannel_cred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
+      flags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
         SCH_CRED_IGNORE_REVOCATION_OFFLINE | SCH_CRED_REVOCATION_CHECK_CHAIN;
 
       DEBUGF(infof(data, "schannel: ignore revocation offline errors"));
     }
     else {
-      schannel_cred.dwFlags |= SCH_CRED_REVOCATION_CHECK_CHAIN;
+      flags |= SCH_CRED_REVOCATION_CHECK_CHAIN;
 
       DEBUGF(infof(data,
                    "schannel: checking server certificate revocation"));
     }
   }
   else {
-    schannel_cred.dwFlags = SCH_CRED_MANUAL_CRED_VALIDATION |
+    flags = SCH_CRED_MANUAL_CRED_VALIDATION |
       SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
       SCH_CRED_IGNORE_REVOCATION_OFFLINE;
     DEBUGF(infof(data,
@@ -464,15 +535,15 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
   }
 
   if(!conn->ssl_config.verifyhost) {
-    schannel_cred.dwFlags |= SCH_CRED_NO_SERVERNAME_CHECK;
+    flags |= SCH_CRED_NO_SERVERNAME_CHECK;
     DEBUGF(infof(data, "schannel: verifyhost setting prevents Schannel from "
                  "comparing the supplied target name with the subject "
                  "names in server certificates."));
   }
 
   if(!SSL_SET_OPTION(auto_client_cert)) {
-    schannel_cred.dwFlags &= ~SCH_CRED_USE_DEFAULT_CREDS;
-    schannel_cred.dwFlags |= SCH_CRED_NO_DEFAULT_CREDS;
+    flags &= ~SCH_CRED_USE_DEFAULT_CREDS;
+    flags |= SCH_CRED_NO_DEFAULT_CREDS;
     infof(data, "schannel: disabled automatic use of client certificate");
   }
   else
@@ -486,7 +557,7 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
   case CURL_SSLVERSION_TLSv1_2:
   case CURL_SSLVERSION_TLSv1_3:
   {
-    result = set_ssl_version_min_max(&schannel_cred, data, conn);
+    result = set_ssl_version_min_max(&enabled_protocols, data, conn);
     if(result != CURLE_OK)
       return result;
     break;
@@ -499,16 +570,6 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
     failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");
     return CURLE_SSL_CONNECT_ERROR;
   }
-
-  if(SSL_CONN_CONFIG(cipher_list)) {
-    result = set_ssl_ciphers(&schannel_cred, SSL_CONN_CONFIG(cipher_list),
-                             backend->algIds);
-    if(CURLE_OK != result) {
-      failf(data, "Unable to set ciphers to passed via SSL_CONN_CONFIG");
-      return result;
-    }
-  }
-
 
 #ifdef HAS_CLIENT_CERT_PATH
   /* client certificate */
@@ -535,7 +596,7 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
         return CURLE_OUT_OF_MEMORY;
 
       result = get_cert_location(cert_path, &cert_store_name,
-        &cert_store_path, &cert_thumbprint_str);
+                                 &cert_store_path, &cert_thumbprint_str);
 
       if(result && (data->set.ssl.primary.clientcert[0]!='\0'))
         fInCert = fopen(data->set.ssl.primary.clientcert, "rb");
@@ -550,18 +611,18 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
     }
 
     if((fInCert || blob) && (data->set.ssl.cert_type) &&
-        (!strcasecompare(data->set.ssl.cert_type, "P12"))) {
+       (!strcasecompare(data->set.ssl.cert_type, "P12"))) {
       failf(data, "schannel: certificate format compatibility error "
-              " for %s",
-              blob ? "(memory blob)" : data->set.ssl.primary.clientcert);
+            " for %s",
+            blob ? "(memory blob)" : data->set.ssl.primary.clientcert);
       curlx_unicodefree(cert_path);
       return CURLE_SSL_CERTPROBLEM;
     }
 
     if(fInCert || blob) {
       /* Reading a .P12 or .pfx file, like the example at bottom of
-           https://social.msdn.microsoft.com/Forums/windowsdesktop/
-                          en-US/3e7bc95f-b21a-4bcd-bd2c-7f996718cae5
+         https://social.msdn.microsoft.com/Forums/windowsdesktop/
+         en-US/3e7bc95f-b21a-4bcd-bd2c-7f996718cae5
       */
       CRYPT_DATA_BLOB datablob;
       WCHAR* pszPassword;
@@ -589,7 +650,7 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
         fclose(fInCert);
         if(!continue_reading) {
           failf(data, "schannel: Failed to read cert file %s",
-              data->set.ssl.primary.clientcert);
+                data->set.ssl.primary.clientcert);
           free(certdata);
           return CURLE_SSL_CERTPROBLEM;
         }
@@ -605,9 +666,10 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
       if(pszPassword) {
         if(pwd_len > 0)
           str_w_len = MultiByteToWideChar(CP_UTF8,
-             MB_ERR_INVALID_CHARS,
-             data->set.ssl.key_passwd, (int)pwd_len,
-             pszPassword, (int)(pwd_len + 1));
+                                          MB_ERR_INVALID_CHARS,
+                                          data->set.ssl.key_passwd,
+                                          (int)pwd_len,
+                                          pszPassword, (int)(pwd_len + 1));
 
         if((str_w_len >= 0) && (str_w_len <= (int)pwd_len))
           pszPassword[str_w_len] = 0;
@@ -643,9 +705,6 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
         CertCloseStore(cert_store, 0);
         return CURLE_SSL_CERTPROBLEM;
       }
-
-      schannel_cred.cCreds = 1;
-      schannel_cred.paCred = client_certs;
     }
     else {
       cert_store =
@@ -683,11 +742,7 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
 
       curlx_unicodefree(cert_path);
 
-      if(client_certs[0]) {
-        schannel_cred.cCreds = 1;
-        schannel_cred.paCred = client_certs;
-      }
-      else {
+      if(!client_certs[0]) {
         /* CRYPT_E_NOT_FOUND / E_INVALIDARG */
         CertCloseStore(cert_store, 0);
         return CURLE_SSL_CERTPROBLEM;
@@ -708,22 +763,270 @@ schannel_acquire_credential_handle(struct Curl_easy *data,
   if(!backend->cred) {
     failf(data, "schannel: unable to allocate memory");
 
+#ifdef HAS_CLIENT_CERT_PATH
     if(client_certs[0])
       CertFreeCertificateContext(client_certs[0]);
+#endif
 
     return CURLE_OUT_OF_MEMORY;
   }
   backend->cred->refcount = 1;
 
-  sspi_status =
-    s_pSecFn->AcquireCredentialsHandle(NULL, (TCHAR *)UNISP_NAME,
-                                       SECPKG_CRED_OUTBOUND, NULL,
-                                       &schannel_cred, NULL, NULL,
-                                       &backend->cred->cred_handle,
-                                       &backend->cred->time_stamp);
+  /* Windows 10, 1809 (a.k.a. Windows 10 build 17763) */
+  if(curlx_verify_windows_version(10, 0, 17763, PLATFORM_WINNT,
+                                  VERSION_GREATER_THAN_EQUAL)) {
 
+    char *ciphers13 = 0;
+
+    bool disable_aes_gcm_sha384 = FALSE;
+    bool disable_aes_gcm_sha256 = FALSE;
+    bool disable_chacha_poly = FALSE;
+    bool disable_aes_ccm_8_sha256 = FALSE;
+    bool disable_aes_ccm_sha256 = FALSE;
+
+    SCH_CREDENTIALS credentials = { 0 };
+    TLS_PARAMETERS tls_parameters = { 0 };
+    CRYPTO_SETTINGS crypto_settings[4] = { 0 };
+    UNICODE_STRING blocked_ccm_modes[1] = { 0 };
+    UNICODE_STRING blocked_gcm_modes[1] = { 0 };
+
+    int crypto_settings_idx = 0;
+
+
+    /* If TLS 1.3 ciphers are explictly listed, then
+     * disable all the ciphers and re-enable which
+     * ciphers the user has provided.
+     */
+    ciphers13 = SSL_CONN_CONFIG(cipher_list13);
+    if(ciphers13) {
+      const int remaining_ciphers = 5;
+
+      /* detect which remaining ciphers to enable
+         and then disable everything else.
+      */
+
+      char *startCur = ciphers13;
+      int algCount = 0;
+      char tmp[LONGEST_ALG_ID] = { 0 };
+      char *nameEnd;
+      size_t n;
+
+      disable_aes_gcm_sha384 = TRUE;
+      disable_aes_gcm_sha256 = TRUE;
+      disable_chacha_poly = TRUE;
+      disable_aes_ccm_8_sha256 = TRUE;
+      disable_aes_ccm_sha256 = TRUE;
+
+      while(startCur && (0 != *startCur) && (algCount < remaining_ciphers)) {
+        nameEnd = strchr(startCur, ':');
+        n = nameEnd ? (size_t)(nameEnd - startCur) : strlen(startCur);
+
+        /* reject too-long cipher names */
+        if(n > (LONGEST_ALG_ID - 1)) {
+          failf(data, "Cipher name too long, not checked.");
+          return CURLE_SSL_CIPHER;
+        }
+
+        strncpy(tmp, startCur, n);
+        tmp[n] = 0;
+
+        if(disable_aes_gcm_sha384
+           && !strcmp("TLS_AES_256_GCM_SHA384", tmp)) {
+          disable_aes_gcm_sha384 = FALSE;
+        }
+        else if(disable_aes_gcm_sha256
+                && !strcmp("TLS_AES_128_GCM_SHA256", tmp)) {
+          disable_aes_gcm_sha256 = FALSE;
+        }
+        else if(disable_chacha_poly
+                && !strcmp("TLS_CHACHA20_POLY1305_SHA256", tmp)) {
+          disable_chacha_poly = FALSE;
+        }
+        else if(disable_aes_ccm_8_sha256
+                && !strcmp("TLS_AES_128_CCM_8_SHA256", tmp)) {
+          disable_aes_ccm_8_sha256 = FALSE;
+        }
+        else if(disable_aes_ccm_sha256
+                && !strcmp("TLS_AES_128_CCM_SHA256", tmp)) {
+          disable_aes_ccm_sha256 = FALSE;
+        }
+        else {
+          failf(data, "Passed in an unknown TLS 1.3 cipher.");
+          return CURLE_SSL_CIPHER;
+        }
+
+        startCur = nameEnd;
+        if(startCur)
+          startCur++;
+
+        algCount++;
+      }
+    }
+
+    if(disable_aes_gcm_sha384 && disable_aes_gcm_sha256
+       && disable_chacha_poly && disable_aes_ccm_8_sha256
+       && disable_aes_ccm_sha256) {
+      failf(data, "All available TLS 1.3 ciphers were disabled.");
+      return CURLE_SSL_CIPHER;
+    }
+
+    /* Disable TLS_AES_128_CCM_8_SHA256 and/or TLS_AES_128_CCM_SHA256 */
+    if(disable_aes_ccm_8_sha256 || disable_aes_ccm_sha256) {
+      /*
+        Disallow AES_CCM algorithm.
+      */
+      blocked_ccm_modes[0].Length = sizeof(BCRYPT_CHAIN_MODE_CCM);
+      blocked_ccm_modes[0].MaximumLength = sizeof(BCRYPT_CHAIN_MODE_CCM);
+      blocked_ccm_modes[0].Buffer = (PWSTR)BCRYPT_CHAIN_MODE_CCM;
+
+      crypto_settings[crypto_settings_idx].eAlgorithmUsage =
+        TlsParametersCngAlgUsageCipher;
+      crypto_settings[crypto_settings_idx].rgstrChainingModes =
+        blocked_ccm_modes;
+      crypto_settings[crypto_settings_idx].cChainingModes =
+        ARRAYSIZE(blocked_ccm_modes);
+      crypto_settings[crypto_settings_idx].strCngAlgId.Length =
+        sizeof(BCRYPT_AES_ALGORITHM);
+      crypto_settings[crypto_settings_idx].strCngAlgId.MaximumLength =
+        sizeof(BCRYPT_AES_ALGORITHM);
+      crypto_settings[crypto_settings_idx].strCngAlgId.Buffer =
+        (PWSTR)BCRYPT_AES_ALGORITHM;
+
+      /* only disabling one of the CCM modes */
+      if(disable_aes_ccm_8_sha256 != disable_aes_ccm_sha256) {
+        if(disable_aes_ccm_8_sha256)
+          crypto_settings[crypto_settings_idx].dwMinBitLength = 128;
+        else /* disable_aes_ccm_sha256 */
+          crypto_settings[crypto_settings_idx].dwMaxBitLength = 64;
+      }
+
+      crypto_settings_idx++;
+    }
+
+    /* Disable TLS_AES_256_GCM_SHA384 and/or TLS_AES_128_GCM_SHA256 */
+    if(disable_aes_gcm_sha384 || disable_aes_gcm_sha256) {
+
+      /*
+        Disallow AES_GCM algorithm
+      */
+      blocked_gcm_modes[0].Length = sizeof(BCRYPT_CHAIN_MODE_GCM);
+      blocked_gcm_modes[0].MaximumLength = sizeof(BCRYPT_CHAIN_MODE_GCM);
+      blocked_gcm_modes[0].Buffer = (PWSTR)BCRYPT_CHAIN_MODE_GCM;
+
+      /* if only one is disabled, then explictly disable the
+         digest cipher suite (sha384 or sha256) */
+      if(disable_aes_gcm_sha384 != disable_aes_gcm_sha256) {
+        crypto_settings[crypto_settings_idx].eAlgorithmUsage =
+          TlsParametersCngAlgUsageDigest;
+        crypto_settings[crypto_settings_idx].strCngAlgId.Length =
+          sizeof(disable_aes_gcm_sha384 ?
+                 BCRYPT_SHA384_ALGORITHM : BCRYPT_SHA256_ALGORITHM);
+        crypto_settings[crypto_settings_idx].strCngAlgId.MaximumLength =
+          sizeof(disable_aes_gcm_sha384 ?
+                 BCRYPT_SHA384_ALGORITHM : BCRYPT_SHA256_ALGORITHM);
+        crypto_settings[crypto_settings_idx].strCngAlgId.Buffer =
+          (PWSTR)(disable_aes_gcm_sha384 ?
+                  BCRYPT_SHA384_ALGORITHM : BCRYPT_SHA256_ALGORITHM);
+      }
+      else { /* Disable both AES_GCM ciphers */
+        crypto_settings[crypto_settings_idx].eAlgorithmUsage =
+          TlsParametersCngAlgUsageCipher;
+        crypto_settings[crypto_settings_idx].strCngAlgId.Length =
+          sizeof(BCRYPT_AES_ALGORITHM);
+        crypto_settings[crypto_settings_idx].strCngAlgId.MaximumLength =
+          sizeof(BCRYPT_AES_ALGORITHM);
+        crypto_settings[crypto_settings_idx].strCngAlgId.Buffer =
+          (PWSTR)BCRYPT_AES_ALGORITHM;
+      }
+
+      crypto_settings[crypto_settings_idx].rgstrChainingModes =
+        blocked_gcm_modes;
+      crypto_settings[crypto_settings_idx].cChainingModes = 1;
+
+      crypto_settings_idx++;
+    }
+
+    /*
+      Disable ChaCha20-Poly1305.
+    */
+    if(disable_chacha_poly) {
+      crypto_settings[crypto_settings_idx].eAlgorithmUsage =
+        TlsParametersCngAlgUsageCipher;
+      crypto_settings[crypto_settings_idx].strCngAlgId.Length =
+        sizeof(BCRYPT_CHACHA20_POLY1305_ALGORITHM);
+      crypto_settings[crypto_settings_idx].strCngAlgId.MaximumLength =
+        sizeof(BCRYPT_CHACHA20_POLY1305_ALGORITHM);
+      crypto_settings[crypto_settings_idx].strCngAlgId.Buffer =
+        (PWSTR)BCRYPT_CHACHA20_POLY1305_ALGORITHM;
+      crypto_settings_idx++;
+    }
+
+    tls_parameters.pDisabledCrypto = crypto_settings;
+
+    /* The number of blocked suites */
+    tls_parameters.cDisabledCrypto = crypto_settings_idx;
+    credentials.pTlsParameters = &tls_parameters;
+    credentials.cTlsParameters = 1;
+
+    credentials.dwVersion = SCH_CREDENTIALS_VERSION;
+    credentials.dwFlags = flags | SCH_USE_STRONG_CRYPTO;
+
+    credentials.pTlsParameters->grbitDisabledProtocols =
+      (DWORD)~enabled_protocols;
+
+#ifdef HAS_CLIENT_CERT_PATH
+    if(client_certs[0]) {
+      credentials.cCreds = 1;
+      credentials.paCred = client_certs;
+    }
+#endif
+
+    sspi_status =
+      s_pSecFn->AcquireCredentialsHandle(NULL, (TCHAR*)UNISP_NAME,
+                                         SECPKG_CRED_OUTBOUND, NULL,
+                                         &credentials, NULL, NULL,
+                                         &backend->cred->cred_handle,
+                                         &backend->cred->time_stamp);
+  }
+  else {
+    /* Pre-Windows 10 1809 */
+    ALG_ID algIds[NUM_CIPHERS];
+    char *ciphers = SSL_CONN_CONFIG(cipher_list);
+    SCHANNEL_CRED schannel_cred = { 0 };
+    schannel_cred.dwVersion = SCHANNEL_CRED_VERSION;
+    schannel_cred.dwFlags = flags;
+    schannel_cred.grbitEnabledProtocols = enabled_protocols;
+
+    if(ciphers) {
+      result = set_ssl_ciphers(&schannel_cred, ciphers, algIds);
+      if(CURLE_OK != result) {
+        failf(data, "Unable to set ciphers to passed via SSL_CONN_CONFIG");
+        return result;
+      }
+    }
+    else {
+      schannel_cred.dwFlags = flags | SCH_USE_STRONG_CRYPTO;
+    }
+
+#ifdef HAS_CLIENT_CERT_PATH
+    if(client_certs[0]) {
+      schannel_cred.cCreds = 1;
+      schannel_cred.paCred = client_certs;
+    }
+#endif
+
+    sspi_status =
+      s_pSecFn->AcquireCredentialsHandle(NULL, (TCHAR*)UNISP_NAME,
+                                         SECPKG_CRED_OUTBOUND, NULL,
+                                         &schannel_cred, NULL, NULL,
+                                         &backend->cred->cred_handle,
+                                         &backend->cred->time_stamp);
+  }
+
+#ifdef HAS_CLIENT_CERT_PATH
   if(client_certs[0])
     CertFreeCertificateContext(client_certs[0]);
+#endif
 
   if(sspi_status != SEC_E_OK) {
     char buffer[STRERROR_LEN];
@@ -765,10 +1068,11 @@ schannel_connect_step1(struct Curl_easy *data, struct connectdata *conn,
 #ifdef ENABLE_IPV6
   struct in6_addr addr6;
 #endif
-  TCHAR *host_name;
   CURLcode result;
   char * const hostname = SSL_HOST_NAME();
   struct ssl_backend_data *backend = connssl->backend;
+
+  DEBUGASSERT(backend);
 
   DEBUGF(infof(data,
                "schannel: SSL/TLS connection with %s port %hu (step 1/3)",
@@ -846,10 +1150,21 @@ schannel_connect_step1(struct Curl_easy *data, struct connectdata *conn,
   }
 
   if(!backend->cred) {
+    char *snihost;
     result = schannel_acquire_credential_handle(data, conn, sockindex);
     if(result != CURLE_OK) {
       return result;
     }
+    /* A hostname associated with the credential is needed by
+       InitializeSecurityContext for SNI and other reasons. */
+    snihost = Curl_ssl_snihost(data, SSL_HOST_NAME(), NULL);
+    if(!snihost) {
+      failf(data, "Failed to set SNI");
+      return CURLE_SSL_CONNECT_ERROR;
+    }
+    backend->cred->sni_hostname = curlx_convert_UTF8_to_tchar(snihost);
+    if(!backend->cred->sni_hostname)
+      return CURLE_OUT_OF_MEMORY;
   }
 
   /* Warn if SNI is disabled due to use of an IP address */
@@ -891,14 +1206,14 @@ schannel_connect_step1(struct Curl_easy *data, struct connectdata *conn,
       alpn_buffer[cur++] = ALPN_H2_LENGTH;
       memcpy(&alpn_buffer[cur], ALPN_H2, ALPN_H2_LENGTH);
       cur += ALPN_H2_LENGTH;
-      infof(data, "schannel: ALPN, offering %s", ALPN_H2);
+      infof(data, VTLS_INFOF_ALPN_OFFER_1STR, ALPN_H2);
     }
 #endif
 
     alpn_buffer[cur++] = ALPN_HTTP_1_1_LENGTH;
     memcpy(&alpn_buffer[cur], ALPN_HTTP_1_1, ALPN_HTTP_1_1_LENGTH);
     cur += ALPN_HTTP_1_1_LENGTH;
-    infof(data, "schannel: ALPN, offering %s", ALPN_HTTP_1_1);
+    infof(data, VTLS_INFOF_ALPN_OFFER_1STR, ALPN_HTTP_1_1);
 
     *list_len = curlx_uitous(cur - list_start_index);
     *extension_len = *list_len + sizeof(unsigned int) + sizeof(unsigned short);
@@ -936,10 +1251,6 @@ schannel_connect_step1(struct Curl_easy *data, struct connectdata *conn,
     return CURLE_OUT_OF_MEMORY;
   }
 
-  host_name = curlx_convert_UTF8_to_tchar(hostname);
-  if(!host_name)
-    return CURLE_OUT_OF_MEMORY;
-
   /* Schannel InitializeSecurityContext:
      https://msdn.microsoft.com/en-us/library/windows/desktop/aa375924.aspx
 
@@ -948,12 +1259,11 @@ schannel_connect_step1(struct Curl_easy *data, struct connectdata *conn,
      us problems with inbuf regardless. https://github.com/curl/curl/issues/983
   */
   sspi_status = s_pSecFn->InitializeSecurityContext(
-    &backend->cred->cred_handle, NULL, host_name, backend->req_flags, 0, 0,
+    &backend->cred->cred_handle, NULL, backend->cred->sni_hostname,
+    backend->req_flags, 0, 0,
     (backend->use_alpn ? &inbuf_desc : NULL),
     0, &backend->ctxt->ctxt_handle,
     &outbuf_desc, &backend->ret_flags, &backend->ctxt->time_stamp);
-
-  curlx_unicodefree(host_name);
 
   if(sspi_status != SEC_I_CONTINUE_NEEDED) {
     char buffer[STRERROR_LEN];
@@ -1027,15 +1337,16 @@ schannel_connect_step2(struct Curl_easy *data, struct connectdata *conn,
   SECURITY_STATUS sspi_status = SEC_E_OK;
   CURLcode result;
   bool doread;
-  char * const hostname = SSL_HOST_NAME();
   const char *pubkey_ptr;
   struct ssl_backend_data *backend = connssl->backend;
+
+  DEBUGASSERT(backend);
 
   doread = (connssl->connecting_state != ssl_connect_2_writing) ? TRUE : FALSE;
 
   DEBUGF(infof(data,
                "schannel: SSL/TLS connection with %s port %hu (step 2/3)",
-               hostname, conn->remote_port));
+               SSL_HOST_NAME(), conn->remote_port));
 
   if(!backend->cred || !backend->ctxt)
     return CURLE_SSL_CONNECT_ERROR;
@@ -1083,7 +1394,6 @@ schannel_connect_step2(struct Curl_easy *data, struct connectdata *conn,
   }
 
   for(;;) {
-    TCHAR *host_name;
     if(doread) {
       /* read encrypted handshake data from socket */
       result = Curl_read_plain(conn->sock[sockindex],
@@ -1136,16 +1446,11 @@ schannel_connect_step2(struct Curl_easy *data, struct connectdata *conn,
     memcpy(inbuf[0].pvBuffer, backend->encdata_buffer,
            backend->encdata_offset);
 
-    host_name = curlx_convert_UTF8_to_tchar(hostname);
-    if(!host_name)
-      return CURLE_OUT_OF_MEMORY;
-
     sspi_status = s_pSecFn->InitializeSecurityContext(
       &backend->cred->cred_handle, &backend->ctxt->ctxt_handle,
-      host_name, backend->req_flags, 0, 0, &inbuf_desc, 0, NULL,
+      backend->cred->sni_hostname, backend->req_flags,
+      0, 0, &inbuf_desc, 0, NULL,
       &outbuf_desc, &backend->ret_flags, &backend->ctxt->time_stamp);
-
-    curlx_unicodefree(host_name);
 
     /* free buffer for received handshake data */
     Curl_safefree(inbuf[0].pvBuffer);
@@ -1279,7 +1584,7 @@ schannel_connect_step2(struct Curl_easy *data, struct connectdata *conn,
   if(pubkey_ptr) {
     result = pkp_pin_peer_pubkey(data, conn, sockindex, pubkey_ptr);
     if(result) {
-      failf(data, "SSL: public key does not match pinned public key!");
+      failf(data, "SSL: public key does not match pinned public key");
       return result;
     }
   }
@@ -1370,6 +1675,7 @@ schannel_connect_step3(struct Curl_easy *data, struct connectdata *conn,
   struct ssl_backend_data *backend = connssl->backend;
 
   DEBUGASSERT(ssl_connect_3 == connssl->connecting_state);
+  DEBUGASSERT(backend);
 
   DEBUGF(infof(data,
                "schannel: SSL/TLS connection with %s port %hu (step 3/3)",
@@ -1408,7 +1714,7 @@ schannel_connect_step3(struct Curl_easy *data, struct connectdata *conn,
     if(alpn_result.ProtoNegoStatus ==
        SecApplicationProtocolNegotiationStatus_Success) {
 
-      infof(data, "schannel: ALPN, server accepted to use %.*s",
+      infof(data, VTLS_INFOF_ALPN_ACCEPTED_LEN_1STR,
             alpn_result.ProtocolIdSize, alpn_result.ProtocolId);
 
 #ifdef USE_HTTP2
@@ -1425,7 +1731,7 @@ schannel_connect_step3(struct Curl_easy *data, struct connectdata *conn,
         }
     }
     else
-      infof(data, "ALPN, server did not agree to a protocol");
+      infof(data, VTLS_INFOF_NO_ALPN);
     Curl_multiuse_state(data, conn->negnpn == CURL_HTTP_VERSION_2 ?
                         BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
   }
@@ -1610,6 +1916,7 @@ schannel_connect_common(struct Curl_easy *data, struct connectdata *conn,
      */
     {
       struct ssl_backend_data *backend = connssl->backend;
+      DEBUGASSERT(backend);
       conn->sslContext = &backend->ctxt->ctxt_handle;
     }
 #endif
@@ -1639,6 +1946,8 @@ schannel_send(struct Curl_easy *data, int sockindex,
   SECURITY_STATUS sspi_status = SEC_E_OK;
   CURLcode result;
   struct ssl_backend_data *backend = connssl->backend;
+
+  DEBUGASSERT(backend);
 
   /* check if the maximum stream sizes were queried */
   if(backend->stream_sizes.cbMaximumMessage == 0) {
@@ -1787,6 +2096,8 @@ schannel_recv(struct Curl_easy *data, int sockindex,
      that it can hold all the bytes requested and some TLS record overhead. */
   size_t min_encdata_length = len + CURL_SCHANNEL_BUFFER_FREE_SIZE;
   struct ssl_backend_data *backend = connssl->backend;
+
+  DEBUGASSERT(backend);
 
   /****************************************************************************
    * Don't return or set backend->recv_unrecoverable_err unless in the cleanup.
@@ -1977,12 +2288,7 @@ schannel_recv(struct Curl_easy *data, int sockindex,
           infof(data, "schannel: can't renegotiate, an error is pending");
           goto cleanup;
         }
-        if(backend->encdata_offset) {
-          *err = CURLE_RECV_ERROR;
-          infof(data, "schannel: can't renegotiate, "
-                "encrypted data available");
-          goto cleanup;
-        }
+
         /* begin renegotiation */
         infof(data, "schannel: renegotiating SSL/TLS connection");
         connssl->state = ssl_connection_negotiating;
@@ -2122,6 +2428,8 @@ static bool schannel_data_pending(const struct connectdata *conn,
   const struct ssl_connect_data *connssl = &conn->ssl[sockindex];
   struct ssl_backend_data *backend = connssl->backend;
 
+  DEBUGASSERT(backend);
+
   if(connssl->use) /* SSL/TLS is in use */
     return (backend->decdata_offset > 0 ||
             (backend->encdata_offset > 0 && !backend->encdata_is_incomplete));
@@ -2138,6 +2446,7 @@ static void schannel_session_free(void *ptr)
     cred->refcount--;
     if(cred->refcount == 0) {
       s_pSecFn->FreeCredentialsHandle(&cred->cred_handle);
+      curlx_unicodefree(cred->sni_hostname);
       Curl_safefree(cred);
     }
   }
@@ -2157,6 +2466,7 @@ static int schannel_shutdown(struct Curl_easy *data, struct connectdata *conn,
   struct ssl_backend_data *backend = connssl->backend;
 
   DEBUGASSERT(data);
+  DEBUGASSERT(backend);
 
   if(connssl->use) {
     infof(data, "schannel: shutting down SSL/TLS connection with %s port %hu",
@@ -2170,7 +2480,6 @@ static int schannel_shutdown(struct Curl_easy *data, struct connectdata *conn,
     SecBuffer outbuf;
     SecBufferDesc outbuf_desc;
     CURLcode result;
-    TCHAR *host_name;
     DWORD dwshut = SCHANNEL_SHUTDOWN;
 
     InitSecBuffer(&Buffer, SECBUFFER_TOKEN, &dwshut, sizeof(dwshut));
@@ -2185,10 +2494,6 @@ static int schannel_shutdown(struct Curl_easy *data, struct connectdata *conn,
             Curl_sspi_strerror(sspi_status, buffer, sizeof(buffer)));
     }
 
-    host_name = curlx_convert_UTF8_to_tchar(hostname);
-    if(!host_name)
-      return CURLE_OUT_OF_MEMORY;
-
     /* setup output buffer */
     InitSecBuffer(&outbuf, SECBUFFER_EMPTY, NULL, 0);
     InitSecBufferDesc(&outbuf_desc, &outbuf, 1);
@@ -2196,7 +2501,7 @@ static int schannel_shutdown(struct Curl_easy *data, struct connectdata *conn,
     sspi_status = s_pSecFn->InitializeSecurityContext(
       &backend->cred->cred_handle,
       &backend->ctxt->ctxt_handle,
-      host_name,
+      backend->cred->sni_hostname,
       backend->req_flags,
       0,
       0,
@@ -2206,8 +2511,6 @@ static int schannel_shutdown(struct Curl_easy *data, struct connectdata *conn,
       &outbuf_desc,
       &backend->ret_flags,
       &backend->ctxt->time_stamp);
-
-    curlx_unicodefree(host_name);
 
     if((sspi_status == SEC_E_OK) || (sspi_status == SEC_I_CONTEXT_EXPIRED)) {
       /* send close message which is in output buffer */
@@ -2286,21 +2589,9 @@ static size_t schannel_version(char *buffer, size_t size)
 static CURLcode schannel_random(struct Curl_easy *data UNUSED_PARAM,
                                 unsigned char *entropy, size_t length)
 {
-  HCRYPTPROV hCryptProv = 0;
-
   (void)data;
 
-  if(!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL,
-                          CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
-    return CURLE_FAILED_INIT;
-
-  if(!CryptGenRandom(hCryptProv, (DWORD)length, entropy)) {
-    CryptReleaseContext(hCryptProv, 0UL);
-    return CURLE_FAILED_INIT;
-  }
-
-  CryptReleaseContext(hCryptProv, 0UL);
-  return CURLE_OK;
+  return Curl_win32_random(entropy, length);
 }
 
 static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
@@ -2313,6 +2604,8 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
 
   /* Result is returned to caller */
   CURLcode result = CURLE_SSL_PINNEDPUBKEYNOTMATCH;
+
+  DEBUGASSERT(backend);
 
   /* if a path wasn't specified, don't pin */
   if(!pinnedpubkey)
@@ -2359,7 +2652,7 @@ static CURLcode pkp_pin_peer_pubkey(struct Curl_easy *data,
                                   (const unsigned char *)pubkey->header,
                                   (size_t)(pubkey->end - pubkey->header));
     if(result) {
-      failf(data, "SSL: public key does not match pinned public key!");
+      failf(data, "SSL: public key does not match pinned public key");
     }
   } while(0);
 
@@ -2434,6 +2727,7 @@ static void *schannel_get_internals(struct ssl_connect_data *connssl,
 {
   struct ssl_backend_data *backend = connssl->backend;
   (void)info;
+  DEBUGASSERT(backend);
   return &backend->ctxt->ctxt_handle;
 }
 
@@ -2444,7 +2738,8 @@ const struct Curl_ssl Curl_ssl_schannel = {
 #ifdef HAS_MANUAL_VERIFY_API
   SSLSUPP_CAINFO_BLOB |
 #endif
-  SSLSUPP_PINNEDPUBKEY,
+  SSLSUPP_PINNEDPUBKEY |
+  SSLSUPP_TLS13_CIPHERSUITES,
 
   sizeof(struct ssl_backend_data),
 

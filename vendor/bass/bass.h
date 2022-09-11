@@ -1,6 +1,6 @@
 /*
 	BASS 2.4 C/C++ header file
-	Copyright (c) 1999-2021 Un4seen Developments Ltd.
+	Copyright (c) 1999-2022 Un4seen Developments Ltd.
 
 	See the BASS.CHM file for more detailed documentation
 */
@@ -104,6 +104,7 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_ERROR_BUSY		46	// the device is busy
 #define BASS_ERROR_UNSTREAMABLE	47	// unstreamable file
 #define BASS_ERROR_PROTOCOL	48	// unsupported protocol
+#define BASS_ERROR_DENIED	49	// access denied
 #define BASS_ERROR_UNKNOWN	-1	// some other mystery problem
 
 // BASS_SetConfig options
@@ -158,10 +159,10 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_CONFIG_REC_WASAPI		66
 #define BASS_CONFIG_ANDROID_AAUDIO	67
 #define BASS_CONFIG_SAMPLE_ONEHANDLE	69
-#define BASS_CONFIG_DEV_TIMEOUT		70
 #define BASS_CONFIG_NET_META		71
 #define BASS_CONFIG_NET_RESTRATE	72
 #define BASS_CONFIG_REC_DEFAULT		73
+#define BASS_CONFIG_NORAMP			74
 
 // BASS_SetConfigPtr options
 #define BASS_CONFIG_NET_AGENT		16
@@ -177,6 +178,10 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_IOS_SESSION_AMBIENT	4
 #define BASS_IOS_SESSION_SPEAKER	8
 #define BASS_IOS_SESSION_DISABLE	16
+#define BASS_IOS_SESSION_DEACTIVATE	32
+#define BASS_IOS_SESSION_AIRPLAY	64
+#define BASS_IOS_SESSION_BTHFP		128
+#define BASS_IOS_SESSION_BTA2DP		0x100
 
 // BASS_Init flags
 #define BASS_DEVICE_8BITS		1		// unused
@@ -374,9 +379,9 @@ typedef struct {
 #define BASS_ASYNCFILE			0x40000000	// read file asynchronously
 #define BASS_UNICODE			0x80000000	// UTF-16
 
-#define BASS_RECORD_PAUSE		0x8000	// start recording paused
 #define BASS_RECORD_ECHOCANCEL	0x2000
 #define BASS_RECORD_AGC			0x4000
+#define BASS_RECORD_PAUSE		0x8000	// start recording paused
 
 // DX7 voice allocation & management flags
 #define BASS_VAM_HARDWARE		1
@@ -424,6 +429,9 @@ typedef struct {
 #define BASS_CTYPE_MUSIC_XM		0x20003
 #define BASS_CTYPE_MUSIC_IT		0x20004
 #define BASS_CTYPE_MUSIC_MO3	0x00100 // MO3 flag
+
+// BASS_PluginLoad flags
+#define BASS_PLUGIN_PROC		1
 
 typedef struct {
 	DWORD ctype;		// channel type
@@ -592,6 +600,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_ATTRIB_USER			15
 #define BASS_ATTRIB_TAIL			16
 #define BASS_ATTRIB_PUSH_LIMIT		17
+#define BASS_ATTRIB_DOWNLOADPROC	18
 #define BASS_ATTRIB_MUSIC_AMPLIFY	0x100
 #define BASS_ATTRIB_MUSIC_PANSEP	0x101
 #define BASS_ATTRIB_MUSIC_PSCALER	0x102

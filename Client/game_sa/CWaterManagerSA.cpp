@@ -785,6 +785,8 @@ void CWaterManagerSA::SetOutsideWorldWaterLevel(float fLevel)
     MemPut<float>(0x6EFFA6, fLevel);
     // Collision
     MemPut<float>(0x6E873F, fLevel);
+    // Sound
+    MemPut<float>(0x6EA238, fLevel);
 }
 
 float CWaterManagerSA::GetWaveLevel()

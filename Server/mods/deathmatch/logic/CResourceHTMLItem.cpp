@@ -13,6 +13,12 @@
 // This parses it and converts into into a script
 
 #include "StdInc.h"
+#include "CResourceHTMLItem.h"
+#include "CResource.h"
+#include "CGame.h"
+#include "CMapManager.h"
+#include "lua/CLuaArguments.h"
+#include <core/CServerInterface.h>
 
 extern CServerInterface* g_pServerInterface;
 extern CGame*            g_pGame;
