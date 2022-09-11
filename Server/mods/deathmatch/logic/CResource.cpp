@@ -13,13 +13,36 @@
 //#define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
-#include "net/SimHeaders.h"
-#ifndef WIN32
-#include <utime.h>
+#include "CResource.h"
+#include "CResourceManager.h"
+#include "CResourceChecker.h"
+#include "CResourceHTMLItem.h"
+#include "CResourceConfigItem.h"
+#include "CResourceClientConfigItem.h"
+#include "CResourceClientFileItem.h"
+#include "CResourceScriptItem.h"
+#include "CResourceClientScriptItem.h"
+#include "CAccessControlListManager.h"
+#include "CScriptDebugging.h"
+#include "CMapManager.h"
+#include "CKeyBinds.h"
+#include "CIdArray.h"
+#include "CChecksum.h"
+#include "CHTTPD.h"
+#include "Utils.h"
+#include "packets/CResourceClientScriptsPacket.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include <net/SimHeaders.h>
+#include <zip.h>
+
+#ifdef WIN32
+    #include <zip/iowin32.h>
+#else
+    #include <utime.h>
 #endif
 
 #ifndef MAX_PATH
-#define MAX_PATH 260
+    #define MAX_PATH 260
 #endif
 
 int           do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath);
@@ -1106,6 +1129,8 @@ bool CResource::CreateVM(bool bEnableOOP)
         return false;
 
     m_pVM->SetScriptName(m_strResourceName.c_str());
+    m_pVM->LoadEmbeddedScripts();
+    m_pVM->RegisterModuleFunctions();
     return true;
 }
 
@@ -1155,6 +1180,8 @@ void CResource::DisplayInfo()            // duplicated for HTML
 
             for (CResource* pDependent : m_Dependents)
                 CLogger::LogPrintf("  %s\n", pDependent->GetName().c_str());
+
+            break;
         }
         case EResourceState::Stopping:
         {
@@ -1259,7 +1286,7 @@ bool CResource::HasGoneAway()
 // gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    // Always prefer the local resource directory, as scripts may 
+    // Always prefer the local resource directory, as scripts may
     // have added new files to the regular folder, rather than the zip
     strPath = m_strResourceDirectoryPath + szFilename;
     if (FileExists(strPath))
@@ -1268,7 +1295,7 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
     // If this is a zipped resource, try to use the unzipped file
     if (!IsResourceZip())
         return false;
-    
+
     strPath = m_strResourceCachePath + szFilename;
     return FileExists(strPath);
 }

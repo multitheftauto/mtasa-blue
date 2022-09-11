@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CChatEchoPacket.h"
+#include "CElement.h"
 
 bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
 {
@@ -29,8 +31,15 @@ bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
     size_t sizeMessage = m_strMessage.length();
     if (sizeMessage >= MIN_CHATECHO_LENGTH)
     {
+        if (BitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
+        {
+            // Write the message type
+            BitStream.Write(m_ucMessageType);
+        }
+
         // Write the string
         BitStream.Write(m_strMessage.c_str(), sizeMessage);
+
         return true;
     }
 

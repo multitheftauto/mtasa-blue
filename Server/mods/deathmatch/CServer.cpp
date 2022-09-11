@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CServer.h"
+#include "CGame.h"
+#include "CMainConfig.h"
 #define ALLOC_STATS_MODULE_NAME "deathmatch"
 #include "SharedUtil.hpp"
 #include "SharedUtil.Thread.h"

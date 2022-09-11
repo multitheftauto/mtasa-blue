@@ -99,6 +99,7 @@ public:
     virtual DWORD                     GetObjectRef(CObject* pObject) = 0;
     virtual DWORD                     GetObjectRef(DWORD* pGameInterface) = 0;
     virtual CObject*                  GetObjectFromRef(DWORD dwGameRef) = 0;
+    virtual CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool) = 0;
     virtual unsigned long             GetObjectCount() = 0;
 
     // Peds pool

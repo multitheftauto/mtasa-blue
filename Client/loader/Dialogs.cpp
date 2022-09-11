@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <sstream>
 
 static bool          bCancelPressed = false;
 static bool          bOkPressed = false;
@@ -18,7 +19,7 @@ static HWND          hwndSplash = NULL;
 static HWND          hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static HWND          hwndCrashedDialog = NULL;
-static HWND          hwndD3dDllDialog = NULL;
+static HWND          hwndGraphicsDllDialog = NULL;
 static HWND          hwndOptimusDialog = NULL;
 static HWND          hwndNoAvDialog = NULL;
 
@@ -58,16 +59,16 @@ const SDialogItemInfo g_CrashedDialogItems[] = {
     {-1},
 };
 
-const SDialogItemInfo g_D3dDllDialogItems[] = {
+const SDialogItemInfo g_GraphicsDllDialogItems[] = {
     {0, 0, _td("MTA: San Andreas - Warning")},
-    {IDC_D3DDLL_TEXT1, 0, _td("Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:")},
+    {IDC_D3DDLL_TEXT1, 0, _td("Your Grand Theft Auto: San Andreas install directory contains these files:")},
     {IDC_D3DDLL_TEXT2, 0,
-     _td("The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-         "It is recommended that you remove or rename d3d9.dll")},
-    {IDC_NO_ACTION, 1, _td("Use this d3d9.dll, but also show this warning on next start")},
-    {IDC_CHECK_NOT_AGAIN, 1, _td("Do not tell me about this d3d9.dll again")},
-    {IDC_APPLY_AUTOMATIC_CHANGES, 1, _td("Rename this d3d9.dll to d3d9.dll.bak")},
-    {IDC_BUTTON_SHOW_DIR, 0, _td("Show me the file")},
+     _td("These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+         "It is recommended that you remove or rename these files.")},
+    {IDC_NO_ACTION, 1, _td("Keep these files, but also show this warning on next start")},
+    {IDC_CHECK_NOT_AGAIN, 1, _td("Do not remind me about these files again")},
+    {IDC_APPLY_AUTOMATIC_CHANGES, 1, _td("Rename these files from *.dll to *.dll.bak")},
+    {IDC_BUTTON_SHOW_DIR, 0, _td("Show me these files")},
     {IDOK, 0, _td("Play MTA:SA")},
     {IDCANCEL, 0, dialogStringsQuit},
     {-1},
@@ -410,47 +411,42 @@ void HideCrashedDialog()
 
 ///////////////////////////////////////////////////////////////
 //
-// d3d dll dialog
+// Dialog for graphics libraries: d3d9.dll, dxgi.dll etc.
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
+void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrary>& offenders)
 {
-    // Calc hash of target file
-    SString    strFileHash;
-    MD5        md5;
-    CMD5Hasher Hasher;
-    if (Hasher.Calculate(strPath, md5))
-    {
-        char szHashResult[33];
-        Hasher.ConvertToHex(md5, szHashResult);
-        strFileHash = szHashResult;
-    }
-
-    // Maybe skip dialog
-    if (GetApplicationSetting("diagnostics", "d3d9-dll-last-hash") == strFileHash)
-    {
-        if (GetApplicationSetting("diagnostics", "d3d9-dll-not-again") == "yes")
-            return;
-    }
+    if (offenders.empty())
+        return;
 
     // Create and show dialog
-    if (!hwndD3dDllDialog)
+    if (!hwndGraphicsDllDialog)
     {
+        std::wstringstream libraryPaths;
+
+        for (std::size_t i = 0; i < offenders.size(); i++)
+        {
+            libraryPaths << FromUTF8(offenders[i].absoluteFilePath);
+
+            if ((i + 1) < offenders.size())
+                libraryPaths << "\r\n";
+        }
+
         SuspendSplash();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_SHOW_DIR;
-        hwndD3dDllDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc);
-        dassert((GetWindowLong(hwndD3dDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
-        InitDialogStrings(hwndD3dDllDialog, g_D3dDllDialogItems);
-        SetWindowTextW(GetDlgItem(hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH), FromUTF8(strPath));
-        SendMessage(GetDlgItem(hwndD3dDllDialog, IDC_NO_ACTION), BM_SETCHECK, BST_CHECKED, 1);
+        hwndGraphicsDllDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc);
+        dassert((GetWindowLong(hwndGraphicsDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        InitDialogStrings(hwndGraphicsDllDialog, g_GraphicsDllDialogItems);
+        SetWindowTextW(GetDlgItem(hwndGraphicsDllDialog, IDC_EDIT_GRAPHICS_DLL_PATH), libraryPaths.str().c_str());
+        SendMessage(GetDlgItem(hwndGraphicsDllDialog, IDC_NO_ACTION), BM_SETCHECK, BST_CHECKED, 1);
     }
-    SetForegroundWindow(hwndD3dDllDialog);
-    SetWindowPos(hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+    SetForegroundWindow(hwndGraphicsDllDialog);
+    SetWindowPos(hwndGraphicsDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
     // Wait for input
     while (!bCancelPressed && !bOkPressed && !bOtherPressed)
@@ -466,21 +462,28 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
         }
         Sleep(10);
     }
-    
+
     // Process input
-    bool doNotCheckAgainOption = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0) == BST_CHECKED;
-    SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", strFileHash);
-    SetApplicationSetting("diagnostics", "d3d9-dll-not-again", doNotCheckAgainOption ? "yes" : "no");
+    bool doNotCheckAgainOption = SendMessageA(GetDlgItem(hwndGraphicsDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0) == BST_CHECKED;
+
+    for (const GraphicsLibrary& library : offenders)
+    {
+        SetApplicationSetting("diagnostics", library.appLastHash, library.md5Hash);
+        SetApplicationSetting("diagnostics", library.appDontRemind, doNotCheckAgainOption ? "yes" : "no");
+    }
 
     if (bOkPressed)
     {
         if (!doNotCheckAgainOption)
         {
-            bool doRenameOption = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_APPLY_AUTOMATIC_CHANGES), BM_GETCHECK, 0, 0) == BST_CHECKED;
+            bool doRenameOption = SendMessageA(GetDlgItem(hwndGraphicsDllDialog, IDC_APPLY_AUTOMATIC_CHANGES), BM_GETCHECK, 0, 0) == BST_CHECKED;
 
             if (doRenameOption)
             {
-                FileRename(strPath, strPath + ".bak");
+                for (const GraphicsLibrary& library : offenders)
+                {
+                    FileRename(library.absoluteFilePath, library.absoluteFilePath + ".bak");
+                }
             }
         }
     }
@@ -490,13 +493,44 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
     }
     else if (bOtherPressed)
     {
-        if (ITEMIDLIST* pidl = ILCreateFromPathW(FromUTF8(strPath)))
+        // We grab the first offender's absolute file path to retrieve GTA's install directory
+        SString      gtaDirectory = ExtractPath(offenders.front().absoluteFilePath);
+        LPITEMIDLIST gtaDirectoryItem = ILCreateFromPathW(FromUTF8(gtaDirectory));
+
+        std::vector<LPITEMIDLIST> selectedItems;
+
+        if (gtaDirectoryItem != nullptr)
         {
-            SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
-            ILFree(pidl);
+            for (const GraphicsLibrary& library : offenders)
+            {
+                if (LPITEMIDLIST item = ILCreateFromPathW(FromUTF8(library.absoluteFilePath)); item != nullptr)
+                {
+                    selectedItems.emplace_back(item);
+                }
+            }
         }
-        else
-            ShellExecuteNonBlocking("open", ExtractPath(strPath));
+
+        bool useFallback = true;
+
+        if (gtaDirectoryItem != nullptr)
+        {
+            // Open a Windows Explorer window for the GTA install directory and select all offending graphic libraries
+            if (SUCCEEDED(SHOpenFolderAndSelectItems(gtaDirectoryItem, selectedItems.size(), const_cast<LPCITEMIDLIST*>(selectedItems.data()), 0)))
+            {
+                useFallback = false;
+            }
+
+            for (LPITEMIDLIST item : selectedItems)
+                ILFree(item);
+
+            ILFree(gtaDirectoryItem);
+        }
+
+        if (useFallback)
+        {
+            // Fallback: Open the parent directory with a shell command
+            ShellExecuteNonBlocking("open", gtaDirectory);
+        }
 
         ExitProcess(0);
     }
@@ -504,12 +538,12 @@ void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
     ResumeSplash();
 }
 
-void HideD3dDllDialog()
+void HideGraphicsDllDialog()
 {
-    if (hwndD3dDllDialog)
+    if (hwndGraphicsDllDialog)
     {
-        DestroyWindow(hwndD3dDllDialog);
-        hwndD3dDllDialog = NULL;
+        DestroyWindow(hwndGraphicsDllDialog);
+        hwndGraphicsDllDialog = NULL;
     }
 }
 
@@ -766,8 +800,8 @@ void TestDialogs()
 
 #if 1
     SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", "123" );
-    ShowD3dDllDialog( g_hInstance, "c:\\dummy path\\" );
-    HideD3dDllDialog();
+    ShowGraphicsDllDialog( g_hInstance, "c:\\dummy path\\" );
+    HideGraphicsDllDialog();
 #endif
 
 #if 1

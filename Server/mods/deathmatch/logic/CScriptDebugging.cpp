@@ -10,12 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CScriptDebugging.h"
+#include "packets/CDebugEchoPacket.h"
 
 extern CGame* g_pGame;
 
-CScriptDebugging::CScriptDebugging(CLuaManager* pLuaManager)
+CScriptDebugging::CScriptDebugging()
 {
-    m_pLuaManager = pLuaManager;
     m_uiLogFileLevel = 0;
     m_uiHtmlLogLevel = 0;
     m_pLogFile = NULL;
@@ -124,7 +125,8 @@ void CScriptDebugging::UpdateLogOutput()
             PrintLog(line.strText);
         }
         // Log to console
-        CLogger::LogPrintf("%s\n", line.strText.c_str());
+        CLogger::LogPrintf("%s", line.strText.c_str());
+        CLogger::LogPrintNoStamp("\n");
         // Tell the players
         Broadcast(CDebugEchoPacket(line.strText, line.uiMinimumDebugLevel, line.ucRed, line.ucGreen, line.ucBlue), line.uiMinimumDebugLevel);
     }

@@ -10,7 +10,7 @@
 
 #pragma once
 
-class CClientColCuboid : public CClientColShape
+class CClientColCuboid final : public CClientColShape
 {
     DECLARE_CLASS(CClientColCuboid, CClientColShape)
 public:

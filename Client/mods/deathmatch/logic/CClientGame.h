@@ -193,6 +193,7 @@ public:
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
+
     class CStoredWeaponSlot
     {
     public:
@@ -229,7 +230,7 @@ public:
     CClientGame(bool bLocalPlay = false);
     ~CClientGame();
 
-    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL, const char* szSecret = nullptr);
+    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
     bool StartLocalGame(eServerType Type, const char* szPassword = NULL);
     void SetupLocalGame(eServerType Type);
     // bool                                    StartGame                       ( void );
@@ -250,8 +251,6 @@ public:
 
     bool IsNickValid(const char* szNick);
     bool IsNametagValid(const char* szNick);
-
-    bool IsGettingIntoVehicle() { return m_bIsGettingIntoVehicle; };
 
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
@@ -344,10 +343,6 @@ public:
     unsigned char  GetDamageBodyPiece() { return m_ucDamageBodyPiece; }
     bool           GetDamageSent() { return m_bDamageSent; }
     void           SetDamageSent(bool b) { m_bDamageSent = b; }
-
-    void ProcessVehicleInOutKey(bool bPassenger);
-
-    void ResetVehicleInOut();
 
     void SetAllDimensions(unsigned short usDimension);
     void SetAllInteriors(unsigned char ucInterior);
@@ -444,8 +439,6 @@ public:
     void RestreamModel(unsigned short usModel);
     void RestreamWorld();
 
-    void TriggerDiscordJoin(SString strSecret);
-
 private:
     // CGUI Callbacks
     bool OnKeyDown(CGUIKeyEventArgs Args);
@@ -464,7 +457,6 @@ private:
 
     // Network update functions
     void DoVehicleInKeyCheck();
-    void UpdateVehicleInOut();
     void UpdatePlayerTarget();
     void UpdatePlayerWeapons();
     void UpdateTrailers();
@@ -544,6 +536,7 @@ private:
     static void StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
+    static void        StaticAudioZoneRadioSwitchHandler(DWORD dwStationID);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
@@ -583,6 +576,7 @@ private:
     bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
+    void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
 
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -725,18 +719,6 @@ private:
     bool m_bTriggeredIngameAndConnected;
     bool m_bGracefulDisconnect;
 
-    // Network update vars
-    unsigned long  m_ulLastVehicleInOutTime;
-    bool           m_bIsGettingOutOfVehicle;
-    bool           m_bIsGettingIntoVehicle;
-    bool           m_bIsJackingVehicle;
-    bool           m_bIsGettingJacked;
-    ElementID      m_VehicleInOutID;
-    unsigned char  m_ucVehicleInOutSeat;
-    bool           m_bNoNewVehicleTask;
-    ElementID      m_NoNewVehicleTaskReasonID;
-    CClientPlayer* m_pGettingJackedBy;
-
     CEntity*       m_pTargetedGameEntity;
     CClientEntity* m_pTargetedEntity;
     bool           m_bTargetSent;
@@ -824,7 +806,6 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
-    void UpdateDiscordState(); // If netc allows this function not to be here it would be better
 
 private:
     CEvents                                     m_Events;

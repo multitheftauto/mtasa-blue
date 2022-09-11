@@ -8,6 +8,9 @@
  *****************************************************************************/
 
 #pragma once
+
+#include "CElement.h"
+
 class CTrainTrackManager;
 
 struct STrackNode
@@ -27,7 +30,7 @@ struct STrackNode
     STrackNode() {}
 };
 
-class CTrainTrack : public CElement
+class CTrainTrack final : public CElement
 {
 public:
     CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
@@ -37,14 +40,14 @@ public:
     bool SetTrackNodePosition(uint nodeIndex, const CVector& position);
     bool GetTrackNodePosition(uint nodeIndex, CVector& position);
 
-    inline const std::vector<STrackNode>& GetNodes() const { return m_Nodes; }
-    inline std::size_t                    GetNumberOfNodes() const { return m_Nodes.size(); }
+    const std::vector<STrackNode>& GetNodes() const { return m_Nodes; }
+    std::size_t                    GetNumberOfNodes() const { return m_Nodes.size(); }
 
-    inline void SetLastNodesLinked(bool link) { m_LinkLastNodes = link; }
-    inline bool GetLastNodesLinked() { return m_LinkLastNodes; }
+    void SetLastNodesLinked(bool link) { m_LinkLastNodes = link; }
+    bool GetLastNodesLinked() { return m_LinkLastNodes; }
 
-    inline bool  IsDefault() { return m_DefaultTrackId != 0xFF; }
-    inline uchar GetDefaultTrackId() { return m_DefaultTrackId; }
+    bool  IsDefault() { return m_DefaultTrackId != 0xFF; }
+    uchar GetDefaultTrackId() { return m_DefaultTrackId; }
 
     virtual void Unlink() override {}
     bool         ReadSpecialData(const int iLine) override { return false; }

@@ -18,7 +18,7 @@
 #include <windows.h>
 #endif
 
-#include <bochs_internal/crc32.h>
+#include <bochs_internal/bochs_crc32.h>
 #include "CChecksum.h"
 #include "CSingularFileDownload.h"
 
@@ -28,7 +28,8 @@ public:
     CSingularFileDownloadManager();
     ~CSingularFileDownloadManager();
 
-    CSingularFileDownload* AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource, CChecksum checksum = CChecksum());
+    CSingularFileDownload* AddFile(CResource* pResource, const char* szName, const char* szNameShort, SString strHTTPURL, CResource* pRequestResource,
+                                   CChecksum checksum = CChecksum());
     void                   CancelResourceDownloads(CResource* pResource);
 
     void ClearList();

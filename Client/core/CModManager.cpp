@@ -207,7 +207,7 @@ void CModManager::Unload()
         CLocalGUI::GetSingleton().SetChatBoxVisible(true);
 
         // Reset the debugview status
-        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false);
+        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false, true);
         CLocalGUI::GetSingleton().GetDebugView()->Clear();
         CLocalGUI::GetSingleton().SetDebugViewVisible(false);
 
@@ -312,6 +312,14 @@ void CModManager::RefreshMods()
     // Clear the list, and load it again
     Clear();
     InitializeModList(CalcMTASAPath("mods\\"));
+}
+
+bool CModManager::TriggerCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) const
+{
+    if (!m_pClientBase || commandName == nullptr || commandNameLength == 0)
+        return false;
+
+    return m_pClientBase->ProcessCommand(commandName, commandNameLength, userdata, userdataSize);
 }
 
 void CModManager::InitializeModList(const char* szModFolderPath)

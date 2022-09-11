@@ -26,7 +26,7 @@ CONDITIONAL COMPILATION :
 
 #include "StdInc.h"
 #include "CrashHandler.h"
-#include "detours/include/detours.h"
+#include <SharedUtil.Detours.h>
 
 /*//////////////////////////////////////////////////////////////////////
                       File Scope Global Variables
@@ -101,19 +101,20 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
 
             // Stop the OS from turning off our handler
             // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
-            LONG(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (EXCEPTION_POINTERS*) = [](EXCEPTION_POINTERS * /*ExceptionInfo*/) -> LONG {
+            LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
+            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
                 // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
                 // our handler will not get removed.
                 return 0;
             };
+            static_assert(std::is_same_v<decltype(RedirectedSetUnhandledExceptionFilter), decltype(&SetUnhandledExceptionFilter)>,
+                          "invalid type of RedirectedSetUnhandledExceptionFilter");
 
-            DetourFunction(DetourFindFunction("Kernel32.dll", "SetUnhandledExceptionFilter"), reinterpret_cast<PBYTE>(RedirectedSetUnhandledExceptionFilter));
+            DetourLibraryFunction("kernel32.dll", "SetUnhandledExceptionFilter", RedirectedSetUnhandledExceptionFilter);
         }
     }
     return (TRUE);
 }
-
 
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
 {

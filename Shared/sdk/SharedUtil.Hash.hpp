@@ -13,6 +13,8 @@
 #include "sha2.hpp"
 #include <random>
 #include <algorithm>
+#include "SharedUtil.Hash.h"
+#include "SharedUtil.File.h"
 
 namespace bcrypt
 {

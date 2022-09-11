@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <array>
 
 DECLARE_ENUM(WSC_SECURITY_PROVIDER_HEALTH)
 IMPLEMENT_ENUM_BEGIN(WSC_SECURITY_PROVIDER_HEALTH)
@@ -321,7 +322,7 @@ void HandleResetSettings()
             FileRename(strSettingsFilename, strSettingsFilenameBak);
             FileDelete(strSettingsFilename);
 
-            //Also reset NVidia Optimus "remember option" to allow them to choose again
+            // Also reset NVidia Optimus "remember option" to allow them to choose again
             SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
 
             if (!FileExists(strSettingsFilename))
@@ -823,7 +824,7 @@ void CheckDataFiles()
     if (!VerifyEmbeddedSignature(PathJoin(strMTASAPath, MTA_EXE_NAME)))
     {
         SString strMessage(_("Main file is unsigned. Possible virus activity.\n\nSee online help if MTA does not work correctly."));
-        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_CONNECT_TO_PUBLIC) && !defined(MTA_DEBUG)
+        #if MTASA_VERSION_BUILD > 0 && defined(MTA_DM_PUBLIC_CONNECTIONS) && !defined(MTA_DEBUG)
         DisplayErrorMessageBox(strMessage, _E("CL29"), "maybe-virus1");
         #endif
     }
@@ -832,21 +833,14 @@ void CheckDataFiles()
     {
         const char* szMd5;
         const char* szFilename;
-    } integrityCheckList[] = {{"07668DD2BA04DBD5E826A14C25972B2C", "bass.dll"},
-                              {"0867D67B8F5A822D20EDA6D55ADE0089", "bass_aac.dll"},
-                              {"BD43C88917D6234FF962B6E88B648B8C", "bass_ac3.dll"},
-                              {"03FB421991634C85D7AA7A914506381E", "bass_fx.dll"},
-                              {"FFC2CA817B012FECE4CF62BB85162E68", "bassflac.dll"},
-                              {"0140838049533F988D8845AE522589FA", "bassmidi.dll"},
-                              {"7B00E76ABC6128AE2B29B2B7F77F49FC", "bassmix.dll"},
-                              {"4E35BA785CD3B37A3702E577510F39E3", "bassopus.dll"},
-                              {"0CE7A9F1930591C51B35BF6AA5EC7424", "basswma.dll"},
-                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},
-                              {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
-                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},
-                              {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
-                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},
-                              {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
+    } integrityCheckList[] = {{"F3B64CBF7DE8DBB7793EE211374BDF76", "bass.dll"},     {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
+                              {"07C11F7D8058F350ADF6FC9AB81B38AC", "bass_ac3.dll"}, {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
+                              {"9FF783BB73F8868FA6599CDE65ED21D7", "bassflac.dll"}, {"19CB1A88E49B8C7D126ACC8ABC574119", "bassmidi.dll"},
+                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},  {"26C74F5E9DF6C59DED3B09335E5D82AD", "bassopus.dll"},
+                              {"1A78628A8AB4B8DB0E336610A3ACF153", "basswebm.dll"}, {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},     {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
+                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},      {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
+                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},     {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
     for (int i = 0; i < NUMELMS(integrityCheckList); i++)
     {
         SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
@@ -870,14 +864,53 @@ void CheckDataFiles()
         }
     }
 
-    // Warning if d3d9.dll exists in the GTA install directory
-    if (SString filePath = PathJoin(strGTAPath, "d3d9.dll"); FileExists(filePath))
+    // Check for graphics libraries in the GTA/MTA install directory
     {
-        SString fileHash = CMD5Hasher::CalculateHexString(filePath);
-        WriteDebugEvent(SString("d3d9.dll in GTA:SA directory (md5: %s)", *fileHash));
+        // An array of pairs of: a registry prefix and a directory path
+        std::array<std::pair<const char*, SString>, 2> directoriesToCheck = {{
+            {"", strGTAPath},
+            {"mta-", PathJoin(strMTASAPath, "mta")}
+        }};
 
-        ShowD3dDllDialog(g_hInstance, filePath);
-        HideD3dDllDialog();
+        std::vector<GraphicsLibrary> offenders;
+
+        for (const std::pair<const char*, SString>& directory : directoriesToCheck)
+        {
+            for (const char* libraryName : {"d3d9", "dxgi"})
+            {
+                GraphicsLibrary library(libraryName);
+                library.absoluteFilePath = PathJoin(directory.second, library.stem + ".dll");
+
+                if (!FileExists(library.absoluteFilePath))
+                    continue;
+
+                library.appLastHash = SString("%s%s-dll-last-hash", directory.first, library.stem.c_str());
+                library.appDontRemind = SString("%s%s-dll-not-again", directory.first, library.stem.c_str());
+                library.md5Hash = CMD5Hasher::CalculateHexString(library.absoluteFilePath);
+                WriteDebugEvent(SString("Detected graphics library %s (md5: %s)", library.absoluteFilePath.c_str(), library.md5Hash.c_str()));
+
+                bool isProblematic = true;
+
+                if (GetApplicationSetting("diagnostics", library.appLastHash) == library.md5Hash)
+                {
+                    if (GetApplicationSetting("diagnostics", library.appDontRemind) == "yes")
+                    {
+                        isProblematic = false;
+                    }
+                }
+
+                if (isProblematic)
+                {
+                    offenders.emplace_back(std::move(library));
+                }
+            }
+        }
+
+        if (!offenders.empty())
+        {
+            ShowGraphicsDllDialog(g_hInstance, offenders);
+            HideGraphicsDllDialog();
+        }
     }
 
     // Remove old log files saved in the wrong place

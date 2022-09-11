@@ -8,6 +8,12 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+
+#include <vector>
+#include "SharedUtil.IntTypes.h"
+#include "SString.h"
+#include "WString.h"
 
 namespace SharedUtil
 {

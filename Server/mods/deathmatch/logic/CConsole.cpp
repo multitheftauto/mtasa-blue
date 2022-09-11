@@ -10,9 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CConsole.h"
+#include "Utils.h"
+#include "CLogger.h"
+#include "CAccessControlListManager.h"
+#include "CRegisteredCommands.h"
+#include "CPlayerManager.h"
+#include "CConsoleClient.h"
 
 CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands,
-                   CVehicleManager* pVehicleManager, CLuaManager* pLuaManager, CBanManager* pBanManager, CAccessControlListManager* pACLManager)
+                   CVehicleManager* pVehicleManager, CBanManager* pBanManager, CAccessControlListManager* pACLManager)
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -20,7 +27,6 @@ CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayer
     m_pPlayerManager = pPlayerManager;
     m_pRegisteredCommands = pRegisteredCommands;
     m_pVehicleManager = pVehicleManager;
-    m_pLuaManager = pLuaManager;
     m_pBanManager = pBanManager;
     m_pACLManager = pACLManager;
 }
