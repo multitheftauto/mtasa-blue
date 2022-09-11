@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -219,7 +221,7 @@ static CURLcode rtsp_done(struct Curl_easy *data,
 
   httpStatus = Curl_http_done(data, status, premature);
 
-  if(rtsp) {
+  if(rtsp && !status && !httpStatus) {
     /* Check the sequence numbers */
     long CSeq_sent = rtsp->CSeq_sent;
     long CSeq_recv = rtsp->CSeq_recv;

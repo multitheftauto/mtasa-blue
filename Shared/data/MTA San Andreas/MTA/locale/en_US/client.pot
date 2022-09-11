@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-05 20:20+0000\n"
+"POT-Creation-Date: 2022-08-17 08:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,2616 +17,6 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr ""
-
-#. Create window (with frame) if it will fit inside the screen resolution
-#: Client/core/CSettings.cpp:83
-msgid "SETTINGS"
-msgstr ""
-
-#: Client/core/CSettings.cpp:115
-msgid "Multiplayer"
-msgstr ""
-
-#: Client/core/CSettings.cpp:116
-msgid "Video"
-msgstr ""
-
-#: Client/core/CSettings.cpp:117
-msgid "Audio"
-msgstr ""
-
-#: Client/core/CSettings.cpp:118
-msgid "Binds"
-msgstr ""
-
-#: Client/core/CSettings.cpp:119
-msgid "Controls"
-msgstr ""
-
-#: Client/core/CSettings.cpp:120
-msgid "Interface"
-msgstr ""
-
-#: Client/core/CSettings.cpp:121
-msgid "Web Browser"
-msgstr ""
-
-#: Client/core/CSettings.cpp:122
-msgid "Advanced"
-msgstr ""
-
-#. Create buttons
-#. OK button
-#: Client/core/CSettings.cpp:126 Client/core/CSettings.cpp:4642
-#: Client/core/CVersionUpdater.cpp:1604 Client/core/CVersionUpdater.cpp:1820
-#: Client/core/CVersionUpdater.cpp:1913 Client/core/CVersionUpdater.cpp:1935
-#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:1965
-#: Client/core/CVersionUpdater.cpp:2117 Client/core/CVersionUpdater.cpp:2126
-#: Client/core/CVersionUpdater.cpp:2135 Client/core/CVersionUpdater.cpp:2149
-#: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
-msgid "OK"
-msgstr ""
-
-#. Cancel button
-#: Client/core/CSettings.cpp:131 Client/core/CSettings.cpp:4641
-#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
-#: Client/core/CVersionUpdater.cpp:1838 Client/loader/Dialogs.cpp:37
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/gui/CGUIMessageBox_Impl.cpp:68
-msgid "Cancel"
-msgstr ""
-
-#: Client/core/CSettings.cpp:146 Client/core/CSettings.cpp:337
-#: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:858
-msgid "Load defaults"
-msgstr ""
-
-#. *
-#. *  Controls tab
-#. *
-#: Client/core/CSettings.cpp:156 Client/core/CSettings.cpp:180
-msgid "Mouse sensitivity:"
-msgstr ""
-
-#. VerticalAimSensitivity
-#: Client/core/CSettings.cpp:156 Client/core/CSettings.cpp:198
-msgid "Vertical aim sensitivity:"
-msgstr ""
-
-#. Mouse Options
-#: Client/core/CSettings.cpp:159
-msgid "Mouse options"
-msgstr ""
-
-#: Client/core/CSettings.cpp:166
-msgid "Invert mouse vertically"
-msgstr ""
-
-#: Client/core/CSettings.cpp:170
-msgid "Steer with mouse"
-msgstr ""
-
-#: Client/core/CSettings.cpp:174
-msgid "Fly with mouse"
-msgstr ""
-
-#. Joypad options
-#: Client/core/CSettings.cpp:216
-msgid "Joypad options"
-msgstr ""
-
-#: Client/core/CSettings.cpp:229
-msgid "Standard controls (Mouse + Keyboard)"
-msgstr ""
-
-#: Client/core/CSettings.cpp:236
-msgid "Classic controls (Joypad)"
-msgstr ""
-
-#: Client/core/CSettings.cpp:273
-msgid "Dead Zone"
-msgstr ""
-
-#: Client/core/CSettings.cpp:278
-msgid "Saturation"
-msgstr ""
-
-#: Client/core/CSettings.cpp:284
-msgid "Use the 'Binds' tab for joypad buttons."
-msgstr ""
-
-#: Client/core/CSettings.cpp:323
-msgid "Left Stick"
-msgstr ""
-
-#: Client/core/CSettings.cpp:329
-msgid "Right Stick"
-msgstr ""
-
-#: Client/core/CSettings.cpp:344
-msgid "DESCRIPTION"
-msgstr ""
-
-#: Client/core/CSettings.cpp:345
-msgid "KEY"
-msgstr ""
-
-#: Client/core/CSettings.cpp:347
-msgid "ALT. KEY"
-msgstr ""
-
-#. *
-#. *    Multiplayer tab
-#. *
-#: Client/core/CSettings.cpp:352 Client/core/CSettings.cpp:355
-msgid "Nick:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:365
-msgid "Save server passwords"
-msgstr ""
-
-#: Client/core/CSettings.cpp:370
-msgid "Auto-refresh server browser"
-msgstr ""
-
-#: Client/core/CSettings.cpp:375
-msgid "Allow screen upload"
-msgstr ""
-
-#: Client/core/CSettings.cpp:380
-msgid "Allow external sounds"
-msgstr ""
-
-#: Client/core/CSettings.cpp:385
-msgid "Always show download window"
-msgstr ""
-
-#: Client/core/CSettings.cpp:390
-msgid "Use customized GTA:SA files"
-msgstr ""
-
-#: Client/core/CSettings.cpp:395
-msgid "Map rendering options"
-msgstr ""
-
-#: Client/core/CSettings.cpp:401 Client/core/CSettings.cpp:610
-msgid "Opacity:"
-msgstr ""
-
-#. *
-#. *  Audio tab
-#. *
-#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:430
-msgid "Master volume:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:449
-msgid "Radio volume:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:468
-msgid "SFX volume:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:487
-msgid "MTA volume:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:506
-msgid "Voice volume:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:547
-msgid "Play mode:"
-msgstr ""
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/core/CSettings.cpp:424 Client/core/CSettings.cpp:612
-#: Client/core/CSettings.cpp:873 Client/core/CSettings.cpp:1965
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr ""
-
-#: Client/core/CSettings.cpp:525
-msgid "Radio options"
-msgstr ""
-
-#: Client/core/CSettings.cpp:531
-msgid "Radio Equalizer"
-msgstr ""
-
-#: Client/core/CSettings.cpp:536
-msgid "Radio Auto-tune"
-msgstr ""
-
-#: Client/core/CSettings.cpp:541
-msgid "Usertrack options"
-msgstr ""
-
-#: Client/core/CSettings.cpp:555 Client/core/CSettings.cpp:3023
-msgid "Radio"
-msgstr ""
-
-#: Client/core/CSettings.cpp:556 Client/core/CSettings.cpp:3025
-msgid "Random"
-msgstr ""
-
-#: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:3027
-msgid "Sequential"
-msgstr ""
-
-#: Client/core/CSettings.cpp:560
-msgid "Automatic Media Scan"
-msgstr ""
-
-#: Client/core/CSettings.cpp:567
-msgid "Mute options"
-msgstr ""
-
-#: Client/core/CSettings.cpp:573
-msgid "Mute All sounds when minimized"
-msgstr ""
-
-#: Client/core/CSettings.cpp:578
-msgid "Mute Radio sounds when minimized"
-msgstr ""
-
-#: Client/core/CSettings.cpp:583
-msgid "Mute SFX sounds when minimized"
-msgstr ""
-
-#: Client/core/CSettings.cpp:588
-msgid "Mute MTA sounds when minimized"
-msgstr ""
-
-#: Client/core/CSettings.cpp:593
-msgid "Mute Voice sounds when minimized"
-msgstr ""
-
-#. *
-#. *  Video tab
-#. *
-#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:618
-msgid "Resolution:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:665
-msgid "FOV:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:681
-msgid "Draw Distance:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:699
-msgid "Brightness:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:717
-msgid "FX Quality:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:731
-msgid "Anisotropic filtering:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:758
-msgid "Anti-aliasing:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:772
-msgid "Aspect Ratio:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:630
-msgid "Windowed"
-msgstr ""
-
-#: Client/core/CSettings.cpp:636
-msgid "DPI aware"
-msgstr ""
-
-#: Client/core/CSettings.cpp:644 Client/core/CSettings.cpp:973
-#: Client/loader/MainFunctions.cpp:381
-msgid "Fullscreen mode:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:651 Client/core/CSettings.cpp:1564
-msgid "Standard"
-msgstr ""
-
-#: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:1566
-#: Client/loader/MainFunctions.cpp:381
-msgid "Borderless window"
-msgstr ""
-
-#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1568
-msgid "Borderless keep res"
-msgstr ""
-
-#: Client/core/CSettings.cpp:657
-msgid "Mip Mapping"
-msgstr ""
-
-#: Client/core/CSettings.cpp:725 Client/core/CSettings.cpp:1486
-msgid "Low"
-msgstr ""
-
-#: Client/core/CSettings.cpp:726 Client/core/CSettings.cpp:1488
-msgid "Medium"
-msgstr ""
-
-#: Client/core/CSettings.cpp:727 Client/core/CSettings.cpp:1055
-#: Client/core/CSettings.cpp:1490 Client/core/CSettings.cpp:3081
-msgid "High"
-msgstr ""
-
-#: Client/core/CSettings.cpp:728 Client/core/CSettings.cpp:1492
-msgid "Very high"
-msgstr ""
-
-#: Client/core/CSettings.cpp:743 Client/core/CSettings.cpp:766
-#: Client/core/CSettings.cpp:986 Client/core/CSettings.cpp:1040
-#: Client/core/CSettings.cpp:1171 Client/core/CSettings.cpp:1496
-#: Client/core/CSettings.cpp:3088 Client/core/CSettings.cpp:3120
-#: Client/core/CSettings.cpp:3142 Client/core/CSettings.cpp:4130
-msgid "Off"
-msgstr ""
-
-#: Client/core/CSettings.cpp:767 Client/core/CSettings.cpp:1498
-msgid "1x"
-msgstr ""
-
-#: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1500
-msgid "2x"
-msgstr ""
-
-#: Client/core/CSettings.cpp:769 Client/core/CSettings.cpp:1502
-msgid "3x"
-msgstr ""
-
-#: Client/core/CSettings.cpp:782 Client/core/CSettings.cpp:988
-#: Client/core/CSettings.cpp:1508 Client/core/CSettings.cpp:3090
-msgid "Auto"
-msgstr ""
-
-#: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1510
-msgid "4:3"
-msgstr ""
-
-#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1512
-msgid "16:10"
-msgstr ""
-
-#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1514
-msgid "16:9"
-msgstr ""
-
-#: Client/core/CSettings.cpp:788
-msgid "HUD Match Aspect Ratio"
-msgstr ""
-
-#: Client/core/CSettings.cpp:794
-msgid "Volumetric Shadows"
-msgstr ""
-
-#: Client/core/CSettings.cpp:798
-msgid "Grass effect"
-msgstr ""
-
-#: Client/core/CSettings.cpp:802
-msgid "Heat haze"
-msgstr ""
-
-#: Client/core/CSettings.cpp:806
-msgid "Tyre Smoke etc"
-msgstr ""
-
-#: Client/core/CSettings.cpp:810
-msgid "Render vehicles always in high detail"
-msgstr ""
-
-#: Client/core/CSettings.cpp:814
-msgid "Render peds always in high detail"
-msgstr ""
-
-#: Client/core/CSettings.cpp:819
-msgid "Full Screen Minimize"
-msgstr ""
-
-#: Client/core/CSettings.cpp:831
-msgid "Enable Device Selection Dialog"
-msgstr ""
-
-#: Client/core/CSettings.cpp:843
-msgid "Show unsafe resolutions"
-msgstr ""
-
-#: Client/core/CSettings.cpp:879
-msgid "Enable remote websites"
-msgstr ""
-
-#: Client/core/CSettings.cpp:884
-msgid "Enable Javascript on remote websites"
-msgstr ""
-
-#: Client/core/CSettings.cpp:889
-msgid "Custom blacklist"
-msgstr ""
-
-#: Client/core/CSettings.cpp:900 Client/core/CSettings.cpp:935
-msgid "Enter a domain e.g. google.com"
-msgstr ""
-
-#: Client/core/CSettings.cpp:908
-msgid "Block"
-msgstr ""
-
-#: Client/core/CSettings.cpp:916 Client/core/CSettings.cpp:951
-msgid "Domain"
-msgstr ""
-
-#: Client/core/CSettings.cpp:918 Client/core/CSettings.cpp:953
-msgid "Remove domain"
-msgstr ""
-
-#. Reset vecTemp
-#: Client/core/CSettings.cpp:924
-msgid "Custom whitelist"
-msgstr ""
-
-#: Client/core/CSettings.cpp:943 Client/cefweb/CWebsiteRequests.cpp:51
-msgid "Allow"
-msgstr ""
-
-#. Misc section label
-#: Client/core/CSettings.cpp:966
-msgid "Misc"
-msgstr ""
-
-#. Fast clothes loading
-#: Client/core/CSettings.cpp:972 Client/core/CSettings.cpp:979
-#: Client/core/CSettings.cpp:4660
-msgid "Fast CJ clothes loading:"
-msgstr ""
-
-#. Browser scan speed
-#: Client/core/CSettings.cpp:972 Client/core/CSettings.cpp:993
-#: Client/core/CSettings.cpp:4662
-msgid "Browser speed:"
-msgstr ""
-
-#. Single download
-#: Client/core/CSettings.cpp:972 Client/core/CSettings.cpp:1007
-#: Client/core/CSettings.cpp:4664
-msgid "Single connection:"
-msgstr ""
-
-#. Packet tag
-#: Client/core/CSettings.cpp:972 Client/core/CSettings.cpp:1020
-#: Client/core/CSettings.cpp:4666
-msgid "Packet tag:"
-msgstr ""
-
-#. Progress animation
-#: Client/core/CSettings.cpp:973 Client/core/CSettings.cpp:1033
-#: Client/core/CSettings.cpp:4668
-msgid "Progress animation:"
-msgstr ""
-
-#. Process priority
-#: Client/core/CSettings.cpp:973 Client/core/CSettings.cpp:1046
-#: Client/core/CSettings.cpp:4658
-msgid "Process priority:"
-msgstr ""
-
-#. Debug setting
-#: Client/core/CSettings.cpp:973 Client/core/CSettings.cpp:1060
-#: Client/core/CSettings.cpp:4670
-msgid "Debug setting:"
-msgstr ""
-
-#. Streaming memory
-#: Client/core/CSettings.cpp:974 Client/core/CSettings.cpp:1083
-#: Client/core/CSettings.cpp:4672
-msgid "Streaming memory:"
-msgstr ""
-
-#. Update build type
-#: Client/core/CSettings.cpp:974 Client/core/CSettings.cpp:1185
-msgid "Update build type:"
-msgstr ""
-
-#. UpdateAutoInstall
-#: Client/core/CSettings.cpp:974 Client/core/CSettings.cpp:1164
-msgid "Install important updates:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:987 Client/core/CSettings.cpp:1015
-#: Client/core/CSettings.cpp:1028 Client/core/CSettings.cpp:3092
-#: Client/core/CSettings.cpp:3108 Client/core/CSettings.cpp:3115
-msgid "On"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1000 Client/core/CSettings.cpp:3097
-msgid "Very slow"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1001 Client/core/CSettings.cpp:1014
-#: Client/core/CSettings.cpp:1027 Client/core/CSettings.cpp:1041
-#: Client/core/CSettings.cpp:1067 Client/core/CSettings.cpp:1079
-#: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:1192
-#: Client/core/CSettings.cpp:3099 Client/core/CSettings.cpp:3106
-#: Client/core/CSettings.cpp:3113 Client/core/CSettings.cpp:3122
-#: Client/core/CSettings.cpp:3135
-msgid "Default"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1002 Client/core/CSettings.cpp:3101
-msgid "Fast"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1053 Client/core/CSettings.cpp:3077
-msgid "Normal"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1054 Client/core/CSettings.cpp:3079
-msgid "Above normal"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1090
-msgid "Min"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1103
-msgid "Max"
-msgstr ""
-
-#. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1110
-msgid "Windows 8 compatibility:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1115
-msgid "16-bit color"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1120
-msgid "Mouse fix"
-msgstr ""
-
-#. Cache path info
-#: Client/core/CSettings.cpp:1138
-msgid "Client resource files:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1142
-msgid "Show in Explorer"
-msgstr ""
-
-#. Auto updater section label
-#: Client/core/CSettings.cpp:1157 Client/core/CSettings.cpp:1160
-msgid "Auto updater"
-msgstr ""
-
-#. Check for updates
-#: Client/core/CSettings.cpp:1198
-msgid "Check for update now"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1351
-msgid "Some settings will be changed when you next start MTA"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1352
-msgid ""
-"\n"
-"\n"
-"Do you want to restart now?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1355
-msgid "RESTART REQUIRED"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1357 Client/core/CSettings.cpp:1381
-#: Client/core/CSettings.cpp:4382 Client/core/CSettings.cpp:4449
-#: Client/core/CSettings.cpp:4498 Client/core/CQuestionBox.cpp:194
-#: Client/core/CVersionUpdater.cpp:1568 Client/core/CVersionUpdater.cpp:1586
-#: Client/core/CVersionUpdater.cpp:1855 Client/core/CVersionUpdater.cpp:1874
-#: Client/core/CMainMenu.cpp:1147 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:33
-msgid "No"
-msgstr ""
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/core/CSettings.cpp:1358 Client/core/CSettings.cpp:1382
-#: Client/core/CSettings.cpp:4383 Client/core/CSettings.cpp:4450
-#: Client/core/CSettings.cpp:4499 Client/core/CQuestionBox.cpp:195
-#: Client/core/CVersionUpdater.cpp:1569 Client/core/CVersionUpdater.cpp:1587
-#: Client/core/CVersionUpdater.cpp:1856 Client/core/CVersionUpdater.cpp:1875
-#: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
-msgid "Yes"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1375
-msgid "Some settings will be changed when you disconnect the current server"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1376
-msgid ""
-"\n"
-"\n"
-"Do you want to disconnect now?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1379
-msgid "DISCONNECT REQUIRED"
-msgstr ""
-
-#. Update the joystick name
-#: Client/core/CSettings.cpp:1688
-msgid "Joypad not detected  -  Check connections and restart game"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1879
-msgid "Binding axis"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1879
-msgid "Move an axis to bind, or escape to clear"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1956
-msgid "Language:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1956
-msgid "Skin:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1956
-msgid "Presets:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2005
-msgid "Chat"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2022
-msgid "Load"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2034
-msgid "Colors"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2035
-msgid "Layout"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2036 Client/core/CSettings.cpp:2282
-msgid "Options"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2042
-msgid "Chat Background"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2042
-msgid "Chat Text"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2042
-msgid "Input Background"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2042
-msgid "Input Text"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2065
-msgid "Lines:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2065
-msgid "Scale:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2065
-msgid "Width:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2068
-msgid "Size"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2117
-msgid "after"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2117
-msgid "for"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2117
-msgid "sec"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2120
-msgid "Fading"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2126
-msgid "Fade out old lines"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2166
-msgid "Horizontal:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2166
-msgid "Vertical:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2166
-msgid "Text-Align:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2166
-msgid "X-Offset:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2167
-msgid "Y-Offset:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2173
-msgid "Position"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2187 Client/core/CSettings.cpp:2215
-#: Client/core/CKeyBinds.cpp:186
-msgid "Left"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2188 Client/core/CSettings.cpp:2202
-msgid "Center"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2189 Client/core/CSettings.cpp:2216
-#: Client/core/CKeyBinds.cpp:187
-msgid "Right"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2201
-msgid "Top"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2203
-msgid "Bottom"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2251
-msgid "Font"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2288
-msgid "Hide background when not typing"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2293
-msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2298
-msgid "Allow server to flash the window"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2303
-msgid "Allow tray balloon notifications"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2308
-msgid "Chat text black/white outline"
-msgstr ""
-
-#. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2557 Client/core/CSettings.cpp:2564
-msgid "Press a key to bind, or escape to clear"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2558
-msgid "Binding a primary key"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2565
-msgid "Binding a secondary key"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2641
-msgid "GTA GAME CONTROLS"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2643
-msgid "MULTIPLAYER CONTROLS"
-msgstr ""
-
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#: Client/core/CSettings.cpp:2888 Client/core/CSettings.cpp:4062
-#: Client/core/CSettings.cpp:4090 Client/core/CSettings.cpp:4621
-#: Client/core/CCore.cpp:1187 Client/core/CCore.cpp:1200
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1273
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1295
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1352
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1401
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:816
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618
-#: Client/mods/deathmatch/logic/CClientGame.cpp:568
-#: Client/mods/deathmatch/logic/CClientGame.cpp:642
-#: Client/mods/deathmatch/logic/CClientGame.cpp:666
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1004
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1084
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1094
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1163
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1197
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1246
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:358
-#: Shared/sdk/SharedUtil.Misc.hpp:140
-msgid "Error"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2888 Client/core/CSettings.cpp:4621
-msgid "Your nickname contains invalid characters!"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3674
-msgid "Red:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3674
-msgid "Green:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3674
-msgid "Blue:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3674
-msgid "Transparency:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3677
-msgid "Color"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3754
-msgid "Preview"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4062
-msgid "Please disconnect before changing language"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4090
-msgid "Please disconnect before changing skin"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4376
-msgid ""
-"Volmetric shadows can cause some systems to slow down.\n"
-"\n"
-"Are you sure you want to enable them?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4380
-msgid "PERFORMANCE WARNING"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4400
-msgid ""
-"Screen upload is required by some servers for anti-cheat purposes.\n"
-"\n"
-"(The chat box and GUI is excluded from the upload)\n"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4402
-msgid "SCREEN UPLOAD INFORMATION"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4417
-msgid ""
-"Some scripts may play sounds, such as radio, from the internet.\n"
-"\n"
-"Disabling this setting may decrease network\n"
-"bandwidth consumption.\n"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4420
-msgid "EXTERNAL SOUNDS"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4441
-msgid ""
-"Some files in your GTA:SA data directory are customized.\n"
-"MTA will only use these modified files if this check box is ticked.\n"
-"\n"
-"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n"
-"\n"
-"Are you sure you want to use them?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4447 Client/core/CVersionUpdater.cpp:2078
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4490
-msgid ""
-"Enabling DPI awareness is an experimental feature and\n"
-"we only recommend it when you play MTA:SA on a scaled monitor.\n"
-"You may experience graphical issues if you enable this option.\n"
-"\n"
-"Are you sure you want to enable this option?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4496
-msgid "EXPERIMENTAL FEATURE"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4639
-msgid "Please enter a nickname"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4640
-msgid ""
-"Please enter a nickname to be used ingame.  \n"
-"This will be your name when you connect to and play in a server"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4658
-msgid "Very experimental feature."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4660
-msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4662
-msgid "Older routers may require a slower scan speed."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4664
-msgid "Switch on to use only one connection when downloading."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4666
-msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4668
-msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4670
-msgid "Select default always. (This setting is not saved)"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4672
-msgid "Maximum is usually best"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4674 Client/core/CSettings.cpp:4676
-msgid "Auto updater:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4674
-msgid "Select default unless you like filling out bug reports."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4676
-msgid "Select default to automatically install important updates."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4678
-msgid "16-bit color:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4678
-msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4680
-msgid "Mouse fix:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4680
-msgid "Mouse movement fix - May need PC restart"
-msgstr ""
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:696
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr ""
-
-#. Unknown command
-#: Client/core/CCommands.cpp:209
-msgid "Unknown command or cvar: "
-msgstr ""
-
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr ""
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:623
-msgid "Busy"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:623
-msgid "Can't check for updates right now"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1564 Client/core/CVersionUpdater.cpp:1584
-#: Client/core/CVersionUpdater.cpp:1602
-#, c-format
-msgid "MTA:SA %s required"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1565
-#, c-format
-msgid ""
-"An updated version of MTA:SA %s is required to join the selected server.\n"
-"\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1585
-#, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1603
-msgid ""
-"It is not possible to connect at this time.\n"
-"\n"
-"Please try later."
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1785
-msgid "Connecting"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1786 Client/core/CVersionUpdater.cpp:1802
-msgid "Please wait..."
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1801
-msgid "CHECKING"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1818 Client/core/CVersionUpdater.cpp:1911
-msgid "UPDATE CHECK"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1819
-msgid "No update needed"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1836
-msgid "DOWNLOADING"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1837
-msgid "waiting..."
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1853
-msgid "MANDATORY UPDATE"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1854
-msgid ""
-"To join this server, you must update MTA.\n"
-"\n"
-" Do you want to update now ?"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1872
-msgid "OPTIONAL UPDATE"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1873
-msgid ""
-"Server says an update is recommended, but not essential.\n"
-"\n"
-" Do you want to update now ?"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1912
-msgid ""
-"Update not currently avalable.\n"
-"\n"
-"Please check www.mtasa.com"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1933 Client/core/CVersionUpdater.cpp:2115
-msgid "ERROR SAVING"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
-msgid "Unable to create the file."
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1942 Client/core/CVersionUpdater.cpp:1951
-#: Client/core/CVersionUpdater.cpp:2124 Client/core/CVersionUpdater.cpp:2133
-msgid "ERROR DOWNLOADING"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:2125
-msgid "The downloaded file appears to be incorrect."
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1952 Client/core/CVersionUpdater.cpp:2134
-msgid "For some reason."
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1963 Client/core/CVersionUpdater.cpp:2147
-msgid "DOWNLOAD COMPLETE"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:1987
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:2085 Client/core/CVersionUpdater.cpp:2095
-msgid "Ok"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:2093
-msgid "ERROR"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:2094
-msgid ""
-"Some MTA:SA data files are missing.\n"
-"\n"
-"\n"
-"Please reinstall MTA:SA"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:2721
-#, c-format
-msgid "%3d %% completed"
-msgstr ""
-
-#: Client/core/CVersionUpdater.cpp:2723
-#, c-format
-msgid ""
-"\n"
-"\n"
-"Waiting for response  -  %-3d"
-msgstr ""
-
-#: Client/core/CCore.cpp:718 Client/loader/CInstallManager.cpp:756
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr ""
-
-#: Client/core/CCore.cpp:720 Shared/mods/deathmatch/logic/Utils.cpp:102
-msgid "Fatal error"
-msgstr ""
-
-#: Client/core/CCore.cpp:845
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
-
-#: Client/core/CCore.cpp:877
-#, c-format
-msgid "%s module is incorrect!"
-msgstr ""
-
-#: Client/core/CCore.cpp:1187
-msgid "Error executing URL"
-msgstr ""
-
-#: Client/core/CCore.cpp:1199
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr ""
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1284
-msgid "this help screen"
-msgstr ""
-
-#: Client/core/CCore.cpp:1285 Client/core/CCore.cpp:1286
-msgid "exits the application"
-msgstr ""
-
-#: Client/core/CCore.cpp:1287
-msgid "shows the version"
-msgstr ""
-
-#: Client/core/CCore.cpp:1288
-msgid "shows the time"
-msgstr ""
-
-#: Client/core/CCore.cpp:1289
-msgid "shows the hud"
-msgstr ""
-
-#: Client/core/CCore.cpp:1290
-msgid "shows all the binds"
-msgstr ""
-
-#: Client/core/CCore.cpp:1291
-msgid "shows your serial"
-msgstr ""
-
-#: Client/core/CCore.cpp:1300
-msgid "connects to a server (host port nick pass)"
-msgstr ""
-
-#: Client/core/CCore.cpp:1301
-msgid "connects to a previous server"
-msgstr ""
-
-#: Client/core/CCore.cpp:1302
-msgid "binds a key (key control)"
-msgstr ""
-
-#: Client/core/CCore.cpp:1303
-msgid "unbinds a key (key)"
-msgstr ""
-
-#: Client/core/CCore.cpp:1304
-msgid "copies the default gta controls"
-msgstr ""
-
-#: Client/core/CCore.cpp:1305
-msgid "outputs a screenshot"
-msgstr ""
-
-#: Client/core/CCore.cpp:1306
-msgid "immediately saves the config"
-msgstr ""
-
-#: Client/core/CCore.cpp:1308
-msgid "clears the debug view"
-msgstr ""
-
-#: Client/core/CCore.cpp:1309
-msgid "scrolls the chatbox upwards"
-msgstr ""
-
-#: Client/core/CCore.cpp:1310
-msgid "scrolls the chatbox downwards"
-msgstr ""
-
-#: Client/core/CCore.cpp:1311
-msgid "scrolls the debug view upwards"
-msgstr ""
-
-#: Client/core/CCore.cpp:1312
-msgid "scrolls the debug view downwards"
-msgstr ""
-
-#: Client/core/CCore.cpp:1315
-msgid "shows the memory statistics"
-msgstr ""
-
-#: Client/core/CCore.cpp:1316
-msgid "shows the frame timing graph"
-msgstr ""
-
-#: Client/core/CScreenShot.cpp:53
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:29
-msgid "***[ COMMAND HELP ]***\n"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:167
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:251
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:259 Client/core/CCommandFuncs.cpp:327
-msgid "connect: Bad port number"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:281 Client/core/CCommandFuncs.cpp:342
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:285 Client/core/CCommandFuncs.cpp:346
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:290
-msgid "connect: Failed to unload current mod"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:380
-msgid "Bound all controls from GTA"
-msgstr ""
-
-#: Client/core/CCommandFuncs.cpp:394
-msgid "Saved configuration file"
-msgstr ""
-
-#. Print it
-#: Client/core/CCommandFuncs.cpp:460
-#, c-format
-msgid "* Your serial is: %s"
-msgstr ""
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr ""
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr ""
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr ""
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:584
-msgid "CONNECTING"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1163
-msgid "Connection timed out"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1208
-msgid "Disconnected: unknown protocol error"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1212
-msgid "Disconnected: disconnected remotely"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1216
-msgid "Disconnected: connection lost remotely"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
-msgid "Disconnected: you are banned from this server"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
-msgid "Disconnected: disconnected from the server"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
-msgid "Disconnected: connection to the server was lost"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-msgid "Disconnected: connection was refused"
-msgstr ""
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr ""
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr ""
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid ""
-"The skin you selected could not be loaded, and the default skin also could "
-"not be loaded, please reinstall MTA."
-msgstr ""
-
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr ""
-
-#: Client/core/CCredits.cpp:32
-msgid "Programming"
-msgstr ""
-
-#: Client/core/CCredits.cpp:61
-msgid "Contributors"
-msgstr ""
-
-#: Client/core/CCredits.cpp:82
-msgid "Game Design / Scripting"
-msgstr ""
-
-#: Client/core/CCredits.cpp:102
-msgid "Language Localization"
-msgstr ""
-
-#: Client/core/CCredits.cpp:108
-msgid "Patch contributors"
-msgstr ""
-
-#: Client/core/CCredits.cpp:216
-msgid "Special Thanks"
-msgstr ""
-
-#: Client/core/CCredits.cpp:245
-msgid "This software makes use of the following libraries and software:"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:315
-msgid ""
-"You are using a feature-branch build! This is a test build only which cannot "
-"be used to connect to public servers!"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:334
-msgid ""
-"MTA will not receive updates on XP/Vista after July 2019.\n"
-"\n"
-"Upgrade Windows to play on the latest servers."
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:1141
-msgid ""
-"This will disconnect you from the current server.\n"
-"\n"
-"Are you sure you want to disconnect?"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:181
-msgid "Fire"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:182
-msgid "Next weapon"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:183
-msgid "Previous weapon"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:184
-msgid "Forwards"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:185
-msgid "Backwards"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Zoom in"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Zoom out"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Enter/Exit"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:191
-msgid "Change camera"
-msgstr ""
-
-#. 10
-#: Client/core/CKeyBinds.cpp:192
-msgid "Jump"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Sprint"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Look behind"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Crouch"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Action"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:197
-msgid "Walk"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Vehicle fire"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Vehicle secondary fire"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Vehicle left"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Vehicle right"
-msgstr ""
-
-#. 20
-#: Client/core/CKeyBinds.cpp:202
-msgid "Steer forwards/down"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Steer backwards/up"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Accelerate"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Brake/Reverse"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Radio next"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:207
-msgid "Radio previous"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Radio user track skip"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Horn"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Sub-mission"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Handbrake"
-msgstr ""
-
-#. 30
-#: Client/core/CKeyBinds.cpp:212
-msgid "Vehicle look left"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Vehicle look right"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Vehicle look behind"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Vehicle mouse look"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Special control left"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:217
-msgid "Special control right"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Special control down"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Special control up"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Aim weapon"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Conversation yes"
-msgstr ""
-
-#. 40
-#: Client/core/CKeyBinds.cpp:222
-msgid "Conversation no"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Group control forwards"
-msgstr ""
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Group control backwards"
-msgstr ""
-
-#. Create the window
-#: Client/core/ServerBrowser/CServerBrowser.cpp:85
-msgid "SERVER BROWSER"
-msgstr ""
-
-#. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-msgid "Internet"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:134
-msgid "Local"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:135
-msgid "Favourites"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:136
-msgid "Recent"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:191
-msgid ""
-"FOR QUICK CONNECT:\n"
-"\n"
-"Type the address and port into the address bar.\n"
-"Or select a server from the history list and press 'Connect'"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:203
-msgid "HELP"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:252
-msgid "Refresh"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:253
-msgid "Add Favorite"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:254
-#: Client/core/ServerBrowser/CServerBrowser.cpp:301
-#: Client/core/ServerBrowser/CServerBrowser.cpp:372
-msgid "Connect"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:212
-#: Client/core/ServerBrowser/CServerBrowser.cpp:255
-msgid "Server information"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:256
-msgid "Search servers"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:257
-msgid "Search players"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:213
-#: Client/core/ServerBrowser/CServerBrowser.cpp:258
-msgid "Start search"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:299
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1692
-msgid "Search players..."
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:422
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1690
-msgid "Search servers..."
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:453
-msgid "Name"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:454
-msgid "Players"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:455
-msgid "Ping"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:456
-msgid "Gamemode"
-msgstr ""
-
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr ""
-
-#. Include label
-#: Client/core/ServerBrowser/CServerBrowser.cpp:486
-msgid "Include:"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:492
-msgid "Empty"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:498
-msgid "Full"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:504
-msgid "Locked"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:516
-msgid "Offline"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:529
-msgid "Other Versions"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:550
-msgid "Back"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-#: Client/loader/Dialogs.cpp:36
-msgid "Help"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:741
-msgid "Loading..."
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1235
-#: Client/core/ServerBrowser/CServerBrowser.cpp:2177
-msgid "  ..loading.."
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1273
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1401
-msgid "No address specified!"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1286
-msgid "Unknown protocol"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1286
-msgid "Please use the mtasa:// protocol!"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1295
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1352
-#: Client/mods/deathmatch/logic/CClientGame.cpp:568
-#: Client/mods/deathmatch/logic/CClientGame.cpp:666
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1375
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/loader/MainFunctions.cpp:595 Client/loader/MainFunctions.cpp:602
-#: Client/loader/MainFunctions.cpp:1236
-msgid "Information"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1375
-msgid "You have to select a server to connect to."
-msgstr ""
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr ""
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr ""
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr ""
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr ""
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr ""
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr ""
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr ""
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr ""
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr ""
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr ""
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr ""
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr ""
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] ""
-msgstr[1] ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] ""
-msgstr[1] ""
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr ""
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr ""
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr ""
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr ""
-
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid ""
-"Could not initialize Direct3D9.\n"
-"\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr ""
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:230
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr ""
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:236
-msgid "Screenshot failed"
-msgstr ""
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
-msgid "Problem with graphics driver"
-msgstr ""
-
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr ""
-
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
-msgid "Installing update..."
-msgstr ""
-
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
-msgid "Extracting files..."
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:242
-msgid ""
-"Trouble restarting MTA:SA\n"
-"\n"
-"If the problem persists, open Task Manager and\n"
-"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n"
-"\n"
-"\n"
-"Try to launch MTA:SA again?"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:260
-msgid ""
-"Another instance of MTA is already running.\n"
-"\n"
-"If this problem persists, please restart your computer"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:263
-msgid ""
-"Another instance of MTA is already running.\n"
-"\n"
-"Do you want to terminate it?"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:287
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
-"Do you want to revert to an earlier version?"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:316
-msgid ""
-"There seems to be a problem launching MTA:SA.\n"
-"Resetting GTA settings can sometimes fix this problem.\n"
-"\n"
-"Do you want to reset GTA settings now?"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:331
-msgid ""
-"GTA settings have been reset.\n"
-"\n"
-"Press OK to continue."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:336
-#, c-format
-msgid "File could not be deleted: '%s'"
-msgstr ""
-
-#. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:344
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
-"Do you want to see some online help?"
-msgstr ""
-
-#. Inform user
-#: Client/loader/MainFunctions.cpp:380
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
-"Do you want to change the following setting?"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:423
-msgid ""
-"Are you having problems running MTA:SA?.\n"
-"\n"
-"Try disabling the following products for GTA and MTA:"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:457
-msgid ""
-"WARNING\n"
-"\n"
-"MTA:SA has detected unusual activity.\n"
-"Please run a virus scan to ensure your system is secure.\n"
-"\n"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:460
-#, c-format
-msgid "The detected file was:  %s\n"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:594
-msgid ""
-"An instance of GTA: San Andreas is already running. It needs to be "
-"terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:601
-msgid ""
-"Unable to terminate GTA: San Andreas. If the problem persists, please "
-"restart your computer."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:624
-msgid ""
-"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:630
-msgid ""
-"The path to your installation of GTA: San Andreas contains unsupported "
-"(unicode) characters. Please move your Grand Theft Auto: San Andreas "
-"installation to a compatible path that contains only standard ASCII "
-"characters and reinstall Multi Theft Auto: San Andreas."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:640
-msgid ""
-"The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-"contains a ';' (semicolon).\n"
-"\n"
-" If you experience problems when running MTA:SA,\n"
-" move your installation(s) to a path that does not contain a semicolon."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:780
-msgid ""
-"Load failed. Please ensure that the latest data files have been installed "
-"correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:789
-#, c-format
-msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:796
-#, c-format
-msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:806
-#, c-format
-msgid ""
-"Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:815
-#, c-format
-msgid "Main file has an incorrect name (%s)"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:826
-msgid ""
-"Main file is unsigned. Possible virus activity.\n"
-"\n"
-"See online help if MTA does not work correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:849
-msgid ""
-"Data files modified. Possible virus activity.\n"
-"\n"
-"See online help if MTA does not work correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:861
-msgid ""
-".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
-"directory.\n"
-"\n"
-"Remove these .asi files if you experience problems with MTA:SA."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:965
-msgid ""
-"File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:974
-msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:986
-msgid ""
-"MTA:SA is not compatible with Windows 'Safe Mode'.\n"
-"\n"
-"Please restart your PC.\n"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:1122
-msgid "Fix configuration issue"
-msgstr ""
-
-#. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1164
-msgid "Fix elevation required error"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:1171
-#, c-format
-msgid ""
-"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
-"the problem persists,contact MTA at www.multitheftauto.com. \n"
-"\n"
-"[%s]"
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:1236
-msgid ""
-"GTA: San Andreas may not have launched correctly. Do you want to terminate "
-"it?"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:35
-msgid "Quit"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:52
-msgid "MTA: San Andreas has encountered a problem"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:53
-msgid "Crash information"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:54
-msgid ""
-"Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:55
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:56
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:63
-msgid "MTA: San Andreas - Warning"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:64
-msgid ""
-"Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:66
-msgid ""
-"These files are not required and may interfere with the graphical features "
-"in this version of MTA:SA.\n"
-"\n"
-"It is recommended that you remove or rename these files."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:68
-msgid "Keep these files, but also show this warning on next start"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:69
-msgid "Do not remind me about these files again"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:70
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:71
-msgid "Show me these files"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:72
-msgid "Play MTA:SA"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:78
-msgid "MTA: San Andreas - Confusing options"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:79
-msgid "NVidia Optimus detected!"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:80
-msgid "Try each option and see what works:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:81
-msgid "A - Standard NVidia"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:82
-msgid "B - Alternate NVidia"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:83
-msgid "C - Standard NVidia with exe rename"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:84
-msgid "D - Alternate NVidia with exe rename"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:85
-msgid "E - Standard Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:86
-msgid "F - Alternate Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:87
-msgid "G - Standard Intel with exe rename"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:88
-msgid "H - Alternate Intel with exe rename"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:89
-msgid "If you get desperate, this might help:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:90
-msgid "If you have already selected an option that works, this might help:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:91
-msgid "Force windowed mode"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:92
-msgid "Don't show again"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:878
-msgid "MTA: San Andreas"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:100
-msgid "Warning: Could not detect anti-virus product"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:102
-msgid ""
-"MTA could not detect an anti-virus on your PC.\n"
-"\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n"
-"\n"
-"Press 'Help' for more information."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:105
-msgid "I have already installed an anti-virus"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:107
-msgid ""
-"I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
-msgid "Copying files..."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
-msgid "Copy finished early. Everything OK."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
-msgid "Finishing..."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
-msgid "Done!"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
-#, c-format
-msgid ""
-"MTA:SA needs Administrator access for the following task:\n"
-"\n"
-"  '%s'\n"
-"\n"
-"Please confirm in the next window."
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:344
-#, c-format
-msgid ""
-"MTA:SA could not complete the following task:\n"
-"\n"
-"  '%s'\n"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:394
-msgid ""
-"** The crash was caused by a graphics driver error **\n"
-"\n"
-"** Please update your graphics drivers **"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:500
-msgid "Install updated MTA:SA files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:520
-msgid ""
-"Could not update due to file conflicts. Please close other applications and "
-"retry"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:529
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:609
-msgid "Patch GTA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:812
-msgid "Missing file:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:816
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:937
-msgid "Update install settings"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1070
-msgid "Update compatibility settings"
-msgstr ""
-
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr ""
-
-#: Client/loader/Utils.cpp:1283
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr ""
-
-#: Client/loader/Utils.cpp:1713
-#, c-format
-msgid ""
-"New installation of %s detected.\n"
-"\n"
-"Do you want to copy your settings from %s ?"
-msgstr ""
-
-#: Client/loader/Utils.cpp:1752
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr ""
-
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr ""
-
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr ""
-
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr ""
-
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr ""
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr ""
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr ""
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr ""
-
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr ""
-
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid ""
-"The server requests the following websites in order to load them (later):"
-msgstr ""
-
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr ""
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr ""
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr ""
-
-#: Client/game_sa/CSettingsSA.cpp:800
-msgid "Can't find valid screen resolution."
-msgstr ""
-
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:876
-msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
@@ -2743,24 +133,151 @@ msgstr ""
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/mods/deathmatch/logic/CClientGame.cpp:569
+#: Client/mods/deathmatch/logic/CClientGame.cpp:643
+#: Client/mods/deathmatch/logic/CClientGame.cpp:667
+#: Client/mods/deathmatch/logic/CClientGame.cpp:689
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1005
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1085
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1164
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1198
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1259
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
+#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
+#: Client/loader/MainFunctions.cpp:816 Client/core/CCore.cpp:1188
+#: Client/core/CCore.cpp:1201 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421 Client/core/CSettings.cpp:2899
+#: Client/core/CSettings.cpp:4078 Client/core/CSettings.cpp:4106
+#: Client/core/CSettings.cpp:4637 Client/core/CGUI.cpp:87
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1273
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1295
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1352
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1401
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
+#: Client/mods/deathmatch/logic/CClientGame.cpp:569
+#: Client/mods/deathmatch/logic/CClientGame.cpp:667
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1295
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1352
+msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr ""
 
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:585
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:585
+msgid "Entering the game ..."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:643
+msgid ""
+"Not connected; please use Quick Connect or the 'connect' command to connect "
+"to a server."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:689
+msgid "The server is not installed"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:699
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1074
+msgid "Local Server"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:699
+msgid "Starting local server ..."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1005
 #, c-format
-msgid "%s of %s"
+msgid "You were kicked from the game ( %s )"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1074
+msgid "Connecting to local server..."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1085
+msgid "Error connecting to server."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+msgid "Connecting to local server timed out. See console for details."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1164
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1198
+msgid "Connection with the server was lost"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1209
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1213
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1225
+msgid "Disconnected: the server is currently full"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1229
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1233
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: invalid password specified"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1259
+msgid "MTA Client verification failed!"
 msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:475
@@ -2959,8 +476,52 @@ msgstr[1] ""
 msgid "Disconnected"
 msgstr ""
 
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr ""
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr ""
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr ""
+
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
+msgstr ""
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:424 Client/core/CSettings.cpp:612
+#: Client/core/CSettings.cpp:878 Client/core/CSettings.cpp:1976
+msgid "General"
 msgstr ""
 
 #. m_pTabs->CreateTab ( "Gamemode" );
@@ -2992,6 +553,12 @@ msgstr ""
 msgid "LAN"
 msgstr ""
 
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr ""
+
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
 msgstr ""
@@ -3004,79 +571,2516 @@ msgstr ""
 msgid "Start"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:584
-msgid "Entering the game ..."
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/loader/Dialogs.cpp:37 Client/gui/CGUIMessageBox_Impl.cpp:68
+#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
+#: Client/core/CVersionUpdater.cpp:1838 Client/core/CSettings.cpp:131
+#: Client/core/CSettings.cpp:4657
+msgid "Cancel"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:642
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
+#, c-format
 msgid ""
-"Not connected; please use Quick Connect or the 'connect' command to connect "
-"to a server."
+"MTA:SA needs Administrator access for the following task:\n"
+"\n"
+"  '%s'\n"
+"\n"
+"Please confirm in the next window."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-msgid "The server is not installed"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:698
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1073
-msgid "Local Server"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:698
-msgid "Starting local server ..."
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1004
+#: Client/loader/CInstallManager.cpp:344
 #, c-format
-msgid "You were kicked from the game ( %s )"
+msgid ""
+"MTA:SA could not complete the following task:\n"
+"\n"
+"  '%s'\n"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1073
-msgid "Connecting to local server..."
+#: Client/loader/CInstallManager.cpp:394
+msgid ""
+"** The crash was caused by a graphics driver error **\n"
+"\n"
+"** Please update your graphics drivers **"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1084
-msgid "Error connecting to server."
+#: Client/loader/CInstallManager.cpp:500
+msgid "Install updated MTA:SA files"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1094
-msgid "Connecting to local server timed out. See console for details."
+#: Client/loader/CInstallManager.cpp:520
+msgid ""
+"Could not update due to file conflicts. Please close other applications and "
+"retry"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1197
-msgid "Connection with the server was lost"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1224
-msgid "Disconnected: the server is currently full"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
-msgid "Disconnected: invalid password specified"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
-msgid "MTA Client verification failed!"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
+#: Client/loader/CInstallManager.cpp:529
 #, c-format
-msgid "Error: Could not start local server. [%s]"
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr ""
 
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:609
+msgid "Patch GTA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:719
 #, c-format
-msgid "Download error: %s"
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:812
+msgid "Missing file:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:816
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:937
+msgid "Update install settings"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1070
+msgid "Update compatibility settings"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:242
+msgid ""
+"Trouble restarting MTA:SA\n"
+"\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n"
+"\n"
+"\n"
+"Try to launch MTA:SA again?"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:260
+msgid ""
+"Another instance of MTA is already running.\n"
+"\n"
+"If this problem persists, please restart your computer"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:263
+msgid ""
+"Another instance of MTA is already running.\n"
+"\n"
+"Do you want to terminate it?"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:287
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to revert to an earlier version?"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:316
+msgid ""
+"There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n"
+"\n"
+"Do you want to reset GTA settings now?"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:331
+msgid ""
+"GTA settings have been reset.\n"
+"\n"
+"Press OK to continue."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:336
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr ""
+
+#. No settings to delete, or can't find them
+#: Client/loader/MainFunctions.cpp:344
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to see some online help?"
+msgstr ""
+
+#. Inform user
+#: Client/loader/MainFunctions.cpp:380
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Do you want to change the following setting?"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:644
+#: Client/core/CSettings.cpp:978
+msgid "Fullscreen mode:"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:652
+#: Client/core/CSettings.cpp:1576
+msgid "Borderless window"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:423
+msgid ""
+"Are you having problems running MTA:SA?.\n"
+"\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:457
+msgid ""
+"WARNING\n"
+"\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n"
+"\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:460
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:594
+msgid ""
+"An instance of GTA: San Andreas is already running. It needs to be "
+"terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:595 Client/loader/MainFunctions.cpp:602
+#: Client/loader/MainFunctions.cpp:1236
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1375
+#: Client/core/ServerBrowser/CServerInfo.cpp:319
+msgid "Information"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:601
+msgid ""
+"Unable to terminate GTA: San Andreas. If the problem persists, please "
+"restart your computer."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:624
+msgid ""
+"Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:630
+msgid ""
+"The path to your installation of GTA: San Andreas contains unsupported "
+"(unicode) characters. Please move your Grand Theft Auto: San Andreas "
+"installation to a compatible path that contains only standard ASCII "
+"characters and reinstall Multi Theft Auto: San Andreas."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:640
+msgid ""
+"The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n"
+"\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:780
+msgid ""
+"Load failed. Please ensure that the latest data files have been installed "
+"correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:789
+#, c-format
+msgid "Load failed. Please ensure that %s is installed correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:796
+#, c-format
+msgid "Load failed. Could not find gta_sa.exe in %s."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:806
+#, c-format
+msgid ""
+"Load failed. %s exists in the GTA directory. Please delete before continuing."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:815
+#, c-format
+msgid "Main file has an incorrect name (%s)"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:826
+msgid ""
+"Main file is unsigned. Possible virus activity.\n"
+"\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:849
+msgid ""
+"Data files modified. Possible virus activity.\n"
+"\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:861
+msgid ""
+".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation "
+"directory.\n"
+"\n"
+"Remove these .asi files if you experience problems with MTA:SA."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:965
+msgid ""
+"File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:974
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:986
+msgid ""
+"MTA:SA is not compatible with Windows 'Safe Mode'.\n"
+"\n"
+"Please restart your PC.\n"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:1122
+msgid "Fix configuration issue"
+msgstr ""
+
+#. Try to relaunch as admin if not done so already
+#: Client/loader/MainFunctions.cpp:1164
+msgid "Fix elevation required error"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:1171
+#, c-format
+msgid ""
+"Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
+"the problem persists,contact MTA at www.multitheftauto.com. \n"
+"\n"
+"[%s]"
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:1236
+msgid ""
+"GTA: San Andreas may not have launched correctly. Do you want to terminate "
+"it?"
+msgstr ""
+
+#: Client/loader/Install.cpp:92
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr ""
+
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
+msgid "Installing update..."
+msgstr ""
+
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
+msgid "Extracting files..."
+msgstr ""
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
+#: Client/core/CVersionUpdater.cpp:1569 Client/core/CVersionUpdater.cpp:1587
+#: Client/core/CVersionUpdater.cpp:1856 Client/core/CVersionUpdater.cpp:1875
+#: Client/core/CSettings.cpp:1363 Client/core/CSettings.cpp:1387
+#: Client/core/CSettings.cpp:4399 Client/core/CSettings.cpp:4466
+#: Client/core/CSettings.cpp:4515 Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "Yes"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:33 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1147 Client/core/CVersionUpdater.cpp:1568
+#: Client/core/CVersionUpdater.cpp:1586 Client/core/CVersionUpdater.cpp:1855
+#: Client/core/CVersionUpdater.cpp:1874 Client/core/CSettings.cpp:1362
+#: Client/core/CSettings.cpp:1386 Client/core/CSettings.cpp:4398
+#: Client/core/CSettings.cpp:4465 Client/core/CSettings.cpp:4514
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "No"
+msgstr ""
+
+#. Create buttons
+#. OK button
+#: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
+#: Client/core/CVersionUpdater.cpp:1604 Client/core/CVersionUpdater.cpp:1820
+#: Client/core/CVersionUpdater.cpp:1913 Client/core/CVersionUpdater.cpp:1935
+#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:1965
+#: Client/core/CVersionUpdater.cpp:2117 Client/core/CVersionUpdater.cpp:2126
+#: Client/core/CVersionUpdater.cpp:2135 Client/core/CVersionUpdater.cpp:2149
+#: Client/core/CSettings.cpp:126 Client/core/CSettings.cpp:4658
+msgid "OK"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:35
+msgid "Quit"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:36
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+msgid "Help"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:52
+msgid "MTA: San Andreas has encountered a problem"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:53
+msgid "Crash information"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:54
+msgid ""
+"Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:55
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:56
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:63
+msgid "MTA: San Andreas - Warning"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:64
+msgid ""
+"Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:66
+msgid ""
+"These files are not required and may interfere with the graphical features "
+"in this version of MTA:SA.\n"
+"\n"
+"It is recommended that you remove or rename these files."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:68
+msgid "Keep these files, but also show this warning on next start"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:69
+msgid "Do not remind me about these files again"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:70
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:71
+msgid "Show me these files"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:72
+msgid "Play MTA:SA"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:78
+msgid "MTA: San Andreas - Confusing options"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:79
+msgid "NVidia Optimus detected!"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:80
+msgid "Try each option and see what works:"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:81
+msgid "A - Standard NVidia"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:82
+msgid "B - Alternate NVidia"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:83
+msgid "C - Standard NVidia with exe rename"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:84
+msgid "D - Alternate NVidia with exe rename"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:85
+msgid "E - Standard Intel"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:86
+msgid "F - Alternate Intel"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:87
+msgid "G - Standard Intel with exe rename"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:88
+msgid "H - Alternate Intel with exe rename"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:89
+msgid "If you get desperate, this might help:"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:90
+msgid "If you have already selected an option that works, this might help:"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:91
+msgid "Force windowed mode"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:92
+msgid "Don't show again"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:837
+msgid "MTA: San Andreas"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:100
+msgid "Warning: Could not detect anti-virus product"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:102
+msgid ""
+"MTA could not detect an anti-virus on your PC.\n"
+"\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n"
+"\n"
+"Press 'Help' for more information."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:105
+msgid "I have already installed an anti-virus"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:107
+msgid ""
+"I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+msgid "Copying files..."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+msgid "Copy finished early. Everything OK."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+msgid "Finishing..."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+msgid "Done!"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr ""
+
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr ""
+
+#: Client/loader/Utils.cpp:1283
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr ""
+
+#: Client/loader/Utils.cpp:1713
+#, c-format
+msgid ""
+"New installation of %s detected.\n"
+"\n"
+"Do you want to copy your settings from %s ?"
+msgstr ""
+
+#: Client/loader/Utils.cpp:1752
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr ""
+
+#: Client/loader/Utils.cpp:1774
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr ""
+
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr ""
+
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr ""
+
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr ""
+
+#: Client/loader/Utils.cpp:1845
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr ""
+
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr ""
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr ""
+
+#: Client/core/CCore.cpp:721 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr ""
+
+#: Client/core/CCore.cpp:846
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr ""
+
+#: Client/core/CCore.cpp:878
+#, c-format
+msgid "%s module is incorrect!"
+msgstr ""
+
+#: Client/core/CCore.cpp:1188
+msgid "Error executing URL"
+msgstr ""
+
+#: Client/core/CCore.cpp:1200
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr ""
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1285
+msgid "this help screen"
+msgstr ""
+
+#: Client/core/CCore.cpp:1286 Client/core/CCore.cpp:1287
+msgid "exits the application"
+msgstr ""
+
+#: Client/core/CCore.cpp:1288
+msgid "shows the version"
+msgstr ""
+
+#: Client/core/CCore.cpp:1289
+msgid "shows the time"
+msgstr ""
+
+#: Client/core/CCore.cpp:1290
+msgid "shows the hud"
+msgstr ""
+
+#: Client/core/CCore.cpp:1291
+msgid "shows all the binds"
+msgstr ""
+
+#: Client/core/CCore.cpp:1292
+msgid "shows your serial"
+msgstr ""
+
+#: Client/core/CCore.cpp:1301
+msgid "connects to a server (host port nick pass)"
+msgstr ""
+
+#: Client/core/CCore.cpp:1302
+msgid "connects to a previous server"
+msgstr ""
+
+#: Client/core/CCore.cpp:1303
+msgid "binds a key (key control)"
+msgstr ""
+
+#: Client/core/CCore.cpp:1304
+msgid "unbinds a key (key)"
+msgstr ""
+
+#: Client/core/CCore.cpp:1305
+msgid "copies the default gta controls"
+msgstr ""
+
+#: Client/core/CCore.cpp:1306
+msgid "outputs a screenshot"
+msgstr ""
+
+#: Client/core/CCore.cpp:1307
+msgid "immediately saves the config"
+msgstr ""
+
+#: Client/core/CCore.cpp:1309
+msgid "clears the debug view"
+msgstr ""
+
+#: Client/core/CCore.cpp:1310
+msgid "scrolls the chatbox upwards"
+msgstr ""
+
+#: Client/core/CCore.cpp:1311
+msgid "scrolls the chatbox downwards"
+msgstr ""
+
+#: Client/core/CCore.cpp:1312
+msgid "scrolls the debug view upwards"
+msgstr ""
+
+#: Client/core/CCore.cpp:1313
+msgid "scrolls the debug view downwards"
+msgstr ""
+
+#: Client/core/CCore.cpp:1316
+msgid "shows the memory statistics"
+msgstr ""
+
+#: Client/core/CCore.cpp:1317
+msgid "shows the frame timing graph"
+msgstr ""
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr ""
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr ""
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr ""
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr ""
+
+#: Client/core/CMainMenu.cpp:315
+msgid ""
+"You are using a feature-branch build! This is a test build only which cannot "
+"be used to connect to public servers!"
+msgstr ""
+
+#: Client/core/CMainMenu.cpp:334
+msgid ""
+"MTA will not receive updates on XP/Vista after July 2019.\n"
+"\n"
+"Upgrade Windows to play on the latest servers."
+msgstr ""
+
+#: Client/core/CMainMenu.cpp:1141
+msgid ""
+"This will disconnect you from the current server.\n"
+"\n"
+"Are you sure you want to disconnect?"
+msgstr ""
+
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:623
+msgid "Busy"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:623
+msgid "Can't check for updates right now"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1564 Client/core/CVersionUpdater.cpp:1584
+#: Client/core/CVersionUpdater.cpp:1602
+#, c-format
+msgid "MTA:SA %s required"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1565
+#, c-format
+msgid ""
+"An updated version of MTA:SA %s is required to join the selected server.\n"
+"\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1585
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1603
+msgid ""
+"It is not possible to connect at this time.\n"
+"\n"
+"Please try later."
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1785
+msgid "Connecting"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1786 Client/core/CVersionUpdater.cpp:1802
+msgid "Please wait..."
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1801
+msgid "CHECKING"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1818 Client/core/CVersionUpdater.cpp:1911
+msgid "UPDATE CHECK"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1819
+msgid "No update needed"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1836
+msgid "DOWNLOADING"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1837
+msgid "waiting..."
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1853
+msgid "MANDATORY UPDATE"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1854
+msgid ""
+"To join this server, you must update MTA.\n"
+"\n"
+" Do you want to update now ?"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1872
+msgid "OPTIONAL UPDATE"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1873
+msgid ""
+"Server says an update is recommended, but not essential.\n"
+"\n"
+" Do you want to update now ?"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1912
+msgid ""
+"Update not currently avalable.\n"
+"\n"
+"Please check www.mtasa.com"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1933 Client/core/CVersionUpdater.cpp:2115
+msgid "ERROR SAVING"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
+msgid "Unable to create the file."
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1942 Client/core/CVersionUpdater.cpp:1951
+#: Client/core/CVersionUpdater.cpp:2124 Client/core/CVersionUpdater.cpp:2133
+msgid "ERROR DOWNLOADING"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:2125
+msgid "The downloaded file appears to be incorrect."
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1952 Client/core/CVersionUpdater.cpp:2134
+msgid "For some reason."
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1963 Client/core/CVersionUpdater.cpp:2147
+msgid "DOWNLOAD COMPLETE"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:1987
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:2078 Client/core/CSettings.cpp:4463
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:2085 Client/core/CVersionUpdater.cpp:2095
+msgid "Ok"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:2093
+msgid "ERROR"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:2094
+msgid ""
+"Some MTA:SA data files are missing.\n"
+"\n"
+"\n"
+"Please reinstall MTA:SA"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:2721
+#, c-format
+msgid "%3d %% completed"
+msgstr ""
+
+#: Client/core/CVersionUpdater.cpp:2723
+#, c-format
+msgid ""
+"\n"
+"\n"
+"Waiting for response  -  %-3d"
+msgstr ""
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr ""
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr ""
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr ""
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr ""
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr ""
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr ""
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr ""
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr ""
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr ""
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr ""
+
+#. Create window (with frame) if it will fit inside the screen resolution
+#: Client/core/CSettings.cpp:83
+msgid "SETTINGS"
+msgstr ""
+
+#: Client/core/CSettings.cpp:115
+msgid "Multiplayer"
+msgstr ""
+
+#: Client/core/CSettings.cpp:116
+msgid "Video"
+msgstr ""
+
+#: Client/core/CSettings.cpp:117
+msgid "Audio"
+msgstr ""
+
+#: Client/core/CSettings.cpp:118
+msgid "Binds"
+msgstr ""
+
+#: Client/core/CSettings.cpp:119
+msgid "Controls"
+msgstr ""
+
+#: Client/core/CSettings.cpp:120
+msgid "Interface"
+msgstr ""
+
+#: Client/core/CSettings.cpp:121
+msgid "Web Browser"
+msgstr ""
+
+#: Client/core/CSettings.cpp:122
+msgid "Advanced"
+msgstr ""
+
+#: Client/core/CSettings.cpp:146 Client/core/CSettings.cpp:337
+#: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:863
+msgid "Load defaults"
+msgstr ""
+
+#. *
+#. *  Controls tab
+#. *
+#: Client/core/CSettings.cpp:156 Client/core/CSettings.cpp:180
+msgid "Mouse sensitivity:"
+msgstr ""
+
+#. VerticalAimSensitivity
+#: Client/core/CSettings.cpp:156 Client/core/CSettings.cpp:198
+msgid "Vertical aim sensitivity:"
+msgstr ""
+
+#. Mouse Options
+#: Client/core/CSettings.cpp:159
+msgid "Mouse options"
+msgstr ""
+
+#: Client/core/CSettings.cpp:166
+msgid "Invert mouse vertically"
+msgstr ""
+
+#: Client/core/CSettings.cpp:170
+msgid "Steer with mouse"
+msgstr ""
+
+#: Client/core/CSettings.cpp:174
+msgid "Fly with mouse"
+msgstr ""
+
+#. Joypad options
+#: Client/core/CSettings.cpp:216
+msgid "Joypad options"
+msgstr ""
+
+#: Client/core/CSettings.cpp:229
+msgid "Standard controls (Mouse + Keyboard)"
+msgstr ""
+
+#: Client/core/CSettings.cpp:236
+msgid "Classic controls (Joypad)"
+msgstr ""
+
+#: Client/core/CSettings.cpp:273
+msgid "Dead Zone"
+msgstr ""
+
+#: Client/core/CSettings.cpp:278
+msgid "Saturation"
+msgstr ""
+
+#: Client/core/CSettings.cpp:284
+msgid "Use the 'Binds' tab for joypad buttons."
+msgstr ""
+
+#: Client/core/CSettings.cpp:323
+msgid "Left Stick"
+msgstr ""
+
+#: Client/core/CSettings.cpp:329
+msgid "Right Stick"
+msgstr ""
+
+#: Client/core/CSettings.cpp:344
+msgid "DESCRIPTION"
+msgstr ""
+
+#: Client/core/CSettings.cpp:345
+msgid "KEY"
+msgstr ""
+
+#: Client/core/CSettings.cpp:347
+msgid "ALT. KEY"
+msgstr ""
+
+#. *
+#. *    Multiplayer tab
+#. *
+#: Client/core/CSettings.cpp:352 Client/core/CSettings.cpp:355
+msgid "Nick:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:365
+msgid "Save server passwords"
+msgstr ""
+
+#: Client/core/CSettings.cpp:370
+msgid "Auto-refresh server browser"
+msgstr ""
+
+#: Client/core/CSettings.cpp:375
+msgid "Allow screen upload"
+msgstr ""
+
+#: Client/core/CSettings.cpp:380
+msgid "Allow external sounds"
+msgstr ""
+
+#: Client/core/CSettings.cpp:385
+msgid "Always show download window"
+msgstr ""
+
+#: Client/core/CSettings.cpp:390
+msgid "Use customized GTA:SA files"
+msgstr ""
+
+#: Client/core/CSettings.cpp:395
+msgid "Map rendering options"
+msgstr ""
+
+#: Client/core/CSettings.cpp:401 Client/core/CSettings.cpp:610
+msgid "Opacity:"
+msgstr ""
+
+#. *
+#. *  Audio tab
+#. *
+#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:430
+msgid "Master volume:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:449
+msgid "Radio volume:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:468
+msgid "SFX volume:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:421 Client/core/CSettings.cpp:487
+msgid "MTA volume:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:506
+msgid "Voice volume:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:547
+msgid "Play mode:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:525
+msgid "Radio options"
+msgstr ""
+
+#: Client/core/CSettings.cpp:531
+msgid "Radio Equalizer"
+msgstr ""
+
+#: Client/core/CSettings.cpp:536
+msgid "Radio Auto-tune"
+msgstr ""
+
+#: Client/core/CSettings.cpp:541
+msgid "Usertrack options"
+msgstr ""
+
+#: Client/core/CSettings.cpp:555 Client/core/CSettings.cpp:3034
+msgid "Radio"
+msgstr ""
+
+#: Client/core/CSettings.cpp:556 Client/core/CSettings.cpp:3036
+msgid "Random"
+msgstr ""
+
+#: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:3038
+msgid "Sequential"
+msgstr ""
+
+#: Client/core/CSettings.cpp:560
+msgid "Automatic Media Scan"
+msgstr ""
+
+#: Client/core/CSettings.cpp:567
+msgid "Mute options"
+msgstr ""
+
+#: Client/core/CSettings.cpp:573
+msgid "Mute All sounds when minimized"
+msgstr ""
+
+#: Client/core/CSettings.cpp:578
+msgid "Mute Radio sounds when minimized"
+msgstr ""
+
+#: Client/core/CSettings.cpp:583
+msgid "Mute SFX sounds when minimized"
+msgstr ""
+
+#: Client/core/CSettings.cpp:588
+msgid "Mute MTA sounds when minimized"
+msgstr ""
+
+#: Client/core/CSettings.cpp:593
+msgid "Mute Voice sounds when minimized"
+msgstr ""
+
+#. *
+#. *  Video tab
+#. *
+#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:618
+msgid "Resolution:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:665
+msgid "FOV:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:681
+msgid "Draw Distance:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:699
+msgid "Brightness:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:609 Client/core/CSettings.cpp:717
+msgid "FX Quality:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:731
+msgid "Anisotropic filtering:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:758
+msgid "Anti-aliasing:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:772
+msgid "Aspect Ratio:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:630
+msgid "Windowed"
+msgstr ""
+
+#: Client/core/CSettings.cpp:636
+msgid "DPI aware"
+msgstr ""
+
+#: Client/core/CSettings.cpp:651 Client/core/CSettings.cpp:1574
+msgid "Standard"
+msgstr ""
+
+#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1578
+msgid "Borderless keep res"
+msgstr ""
+
+#: Client/core/CSettings.cpp:657
+msgid "Mip Mapping"
+msgstr ""
+
+#: Client/core/CSettings.cpp:725 Client/core/CSettings.cpp:1491
+msgid "Low"
+msgstr ""
+
+#: Client/core/CSettings.cpp:726 Client/core/CSettings.cpp:1493
+msgid "Medium"
+msgstr ""
+
+#: Client/core/CSettings.cpp:727 Client/core/CSettings.cpp:1060
+#: Client/core/CSettings.cpp:1495 Client/core/CSettings.cpp:3092
+msgid "High"
+msgstr ""
+
+#: Client/core/CSettings.cpp:728 Client/core/CSettings.cpp:1497
+msgid "Very high"
+msgstr ""
+
+#: Client/core/CSettings.cpp:743 Client/core/CSettings.cpp:766
+#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1045
+#: Client/core/CSettings.cpp:1176 Client/core/CSettings.cpp:1501
+#: Client/core/CSettings.cpp:3099 Client/core/CSettings.cpp:3131
+#: Client/core/CSettings.cpp:3153 Client/core/CSettings.cpp:4146
+msgid "Off"
+msgstr ""
+
+#: Client/core/CSettings.cpp:767 Client/core/CSettings.cpp:1503
+msgid "1x"
+msgstr ""
+
+#: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1505
+msgid "2x"
+msgstr ""
+
+#: Client/core/CSettings.cpp:769 Client/core/CSettings.cpp:1507
+msgid "3x"
+msgstr ""
+
+#: Client/core/CSettings.cpp:782 Client/core/CSettings.cpp:993
+#: Client/core/CSettings.cpp:1513 Client/core/CSettings.cpp:3101
+msgid "Auto"
+msgstr ""
+
+#: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1515
+msgid "4:3"
+msgstr ""
+
+#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1517
+msgid "16:10"
+msgstr ""
+
+#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1519
+msgid "16:9"
+msgstr ""
+
+#: Client/core/CSettings.cpp:788
+msgid "HUD Match Aspect Ratio"
+msgstr ""
+
+#: Client/core/CSettings.cpp:794
+msgid "Volumetric Shadows"
+msgstr ""
+
+#: Client/core/CSettings.cpp:798
+msgid "Grass effect"
+msgstr ""
+
+#: Client/core/CSettings.cpp:802
+msgid "Heat haze"
+msgstr ""
+
+#: Client/core/CSettings.cpp:806
+msgid "Tyre Smoke etc"
+msgstr ""
+
+#: Client/core/CSettings.cpp:810
+msgid "Render vehicles always in high detail"
+msgstr ""
+
+#: Client/core/CSettings.cpp:814
+msgid "Render peds always in high detail"
+msgstr ""
+
+#: Client/core/CSettings.cpp:819
+msgid "Full Screen Minimize"
+msgstr ""
+
+#: Client/core/CSettings.cpp:831
+msgid "Enable Device Selection Dialog"
+msgstr ""
+
+#: Client/core/CSettings.cpp:843
+msgid "Show unsafe resolutions"
+msgstr ""
+
+#: Client/core/CSettings.cpp:855
+msgid "Corona rain reflections"
+msgstr ""
+
+#: Client/core/CSettings.cpp:884
+msgid "Enable remote websites"
+msgstr ""
+
+#: Client/core/CSettings.cpp:889
+msgid "Enable Javascript on remote websites"
+msgstr ""
+
+#: Client/core/CSettings.cpp:894
+msgid "Custom blacklist"
+msgstr ""
+
+#: Client/core/CSettings.cpp:905 Client/core/CSettings.cpp:940
+msgid "Enter a domain e.g. google.com"
+msgstr ""
+
+#: Client/core/CSettings.cpp:913
+msgid "Block"
+msgstr ""
+
+#: Client/core/CSettings.cpp:921 Client/core/CSettings.cpp:956
+msgid "Domain"
+msgstr ""
+
+#: Client/core/CSettings.cpp:923 Client/core/CSettings.cpp:958
+msgid "Remove domain"
+msgstr ""
+
+#. Reset vecTemp
+#: Client/core/CSettings.cpp:929
+msgid "Custom whitelist"
+msgstr ""
+
+#: Client/core/CSettings.cpp:948 Client/cefweb/CWebsiteRequests.cpp:51
+msgid "Allow"
+msgstr ""
+
+#. Misc section label
+#: Client/core/CSettings.cpp:971
+msgid "Misc"
+msgstr ""
+
+#. Fast clothes loading
+#: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:984
+#: Client/core/CSettings.cpp:4676
+msgid "Fast CJ clothes loading:"
+msgstr ""
+
+#. Browser scan speed
+#: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:998
+#: Client/core/CSettings.cpp:4678
+msgid "Browser speed:"
+msgstr ""
+
+#. Single download
+#: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:1012
+#: Client/core/CSettings.cpp:4680
+msgid "Single connection:"
+msgstr ""
+
+#. Packet tag
+#: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:1025
+#: Client/core/CSettings.cpp:4682
+msgid "Packet tag:"
+msgstr ""
+
+#. Progress animation
+#: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1038
+#: Client/core/CSettings.cpp:4684
+msgid "Progress animation:"
+msgstr ""
+
+#. Process priority
+#: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1051
+#: Client/core/CSettings.cpp:4674
+msgid "Process priority:"
+msgstr ""
+
+#. Debug setting
+#: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1065
+#: Client/core/CSettings.cpp:4686
+msgid "Debug setting:"
+msgstr ""
+
+#. Streaming memory
+#: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1088
+#: Client/core/CSettings.cpp:4688
+msgid "Streaming memory:"
+msgstr ""
+
+#. Update build type
+#: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1190
+msgid "Update build type:"
+msgstr ""
+
+#. UpdateAutoInstall
+#: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1169
+msgid "Install important updates:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1020
+#: Client/core/CSettings.cpp:1033 Client/core/CSettings.cpp:3103
+#: Client/core/CSettings.cpp:3119 Client/core/CSettings.cpp:3126
+msgid "On"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:3108
+msgid "Very slow"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1006 Client/core/CSettings.cpp:1019
+#: Client/core/CSettings.cpp:1032 Client/core/CSettings.cpp:1046
+#: Client/core/CSettings.cpp:1072 Client/core/CSettings.cpp:1084
+#: Client/core/CSettings.cpp:1177 Client/core/CSettings.cpp:1197
+#: Client/core/CSettings.cpp:3110 Client/core/CSettings.cpp:3117
+#: Client/core/CSettings.cpp:3124 Client/core/CSettings.cpp:3133
+#: Client/core/CSettings.cpp:3146
+msgid "Default"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:3112
+msgid "Fast"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1058 Client/core/CSettings.cpp:3088
+msgid "Normal"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1059 Client/core/CSettings.cpp:3090
+msgid "Above normal"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1095
+msgid "Min"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1108
+msgid "Max"
+msgstr ""
+
+#. Windows 8 compatibility
+#: Client/core/CSettings.cpp:1115
+msgid "Windows 8 compatibility:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1120
+msgid "16-bit color"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1125
+msgid "Mouse fix"
+msgstr ""
+
+#. Cache path info
+#: Client/core/CSettings.cpp:1143
+msgid "Client resource files:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1147
+msgid "Show in Explorer"
+msgstr ""
+
+#. Auto updater section label
+#: Client/core/CSettings.cpp:1162 Client/core/CSettings.cpp:1165
+msgid "Auto updater"
+msgstr ""
+
+#. Check for updates
+#: Client/core/CSettings.cpp:1203
+msgid "Check for update now"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1356
+msgid "Some settings will be changed when you next start MTA"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1357
+msgid ""
+"\n"
+"\n"
+"Do you want to restart now?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1360
+msgid "RESTART REQUIRED"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1380
+msgid "Some settings will be changed when you disconnect the current server"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1381
+msgid ""
+"\n"
+"\n"
+"Do you want to disconnect now?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1384
+msgid "DISCONNECT REQUIRED"
+msgstr ""
+
+#. Update the joystick name
+#: Client/core/CSettings.cpp:1698
+msgid "Joypad not detected  -  Check connections and restart game"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1890
+msgid "Binding axis"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1890
+msgid "Move an axis to bind, or escape to clear"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1967
+msgid "Language:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1967
+msgid "Skin:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:1967
+msgid "Presets:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2016
+msgid "Chat"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2033
+msgid "Load"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2045
+msgid "Colors"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2046
+msgid "Layout"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2047 Client/core/CSettings.cpp:2293
+msgid "Options"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2053
+msgid "Chat Background"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2053
+msgid "Chat Text"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2053
+msgid "Input Background"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2053
+msgid "Input Text"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2076
+msgid "Lines:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2076
+msgid "Scale:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2076
+msgid "Width:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2079
+msgid "Size"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2128
+msgid "after"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2128
+msgid "for"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2128
+msgid "sec"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2131
+msgid "Fading"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2137
+msgid "Fade out old lines"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2177
+msgid "Horizontal:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2177
+msgid "Vertical:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2177
+msgid "Text-Align:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2177
+msgid "X-Offset:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2178
+msgid "Y-Offset:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2184
+msgid "Position"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2198 Client/core/CSettings.cpp:2226
+#: Client/core/CKeyBinds.cpp:186
+msgid "Left"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2199 Client/core/CSettings.cpp:2213
+msgid "Center"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2200 Client/core/CSettings.cpp:2227
+#: Client/core/CKeyBinds.cpp:187
+msgid "Right"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2212
+msgid "Top"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2214
+msgid "Bottom"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2262
+msgid "Font"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2299
+msgid "Hide background when not typing"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2304
+msgid "Nickname completion using the \"Tab\" key"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2309
+msgid "Allow server to flash the window"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2314
+msgid "Allow tray balloon notifications"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2319
+msgid "Chat text black/white outline"
+msgstr ""
+
+#. Create a messagebox to notify the user
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. Create a messagebox to notify the user
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#: Client/core/CSettings.cpp:2568 Client/core/CSettings.cpp:2575
+msgid "Press a key to bind, or escape to clear"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2569
+msgid "Binding a primary key"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2576
+msgid "Binding a secondary key"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2652
+msgid "GTA GAME CONTROLS"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2654
+msgid "MULTIPLAYER CONTROLS"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2899 Client/core/CSettings.cpp:4637
+msgid "Your nickname contains invalid characters!"
+msgstr ""
+
+#: Client/core/CSettings.cpp:3690
+msgid "Red:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:3690
+msgid "Green:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:3690
+msgid "Blue:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:3690
+msgid "Transparency:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:3693
+msgid "Color"
+msgstr ""
+
+#: Client/core/CSettings.cpp:3770
+msgid "Preview"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4078
+msgid "Please disconnect before changing language"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4106
+msgid "Please disconnect before changing skin"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4392
+msgid ""
+"Volmetric shadows can cause some systems to slow down.\n"
+"\n"
+"Are you sure you want to enable them?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4396
+msgid "PERFORMANCE WARNING"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4416
+msgid ""
+"Screen upload is required by some servers for anti-cheat purposes.\n"
+"\n"
+"(The chat box and GUI is excluded from the upload)\n"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4418
+msgid "SCREEN UPLOAD INFORMATION"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4433
+msgid ""
+"Some scripts may play sounds, such as radio, from the internet.\n"
+"\n"
+"Disabling this setting may decrease network\n"
+"bandwidth consumption.\n"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4436
+msgid "EXTERNAL SOUNDS"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4457
+msgid ""
+"Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n"
+"\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n"
+"\n"
+"Are you sure you want to use them?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4506
+msgid ""
+"Enabling DPI awareness is an experimental feature and\n"
+"we only recommend it when you play MTA:SA on a scaled monitor.\n"
+"You may experience graphical issues if you enable this option.\n"
+"\n"
+"Are you sure you want to enable this option?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4512
+msgid "EXPERIMENTAL FEATURE"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4655
+msgid "Please enter a nickname"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4656
+msgid ""
+"Please enter a nickname to be used ingame.  \n"
+"This will be your name when you connect to and play in a server"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4674
+msgid "Very experimental feature."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4676
+msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4678
+msgid "Older routers may require a slower scan speed."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4680
+msgid "Switch on to use only one connection when downloading."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4682
+msgid "Tag network packets to help ISPs identify MTA traffic."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4684
+msgid "Spinning circle animation at the bottom of the screen"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4686
+msgid "Select default always. (This setting is not saved)"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4688
+msgid "Maximum is usually best"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4690 Client/core/CSettings.cpp:4692
+msgid "Auto updater:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4690
+msgid "Select default unless you like filling out bug reports."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4692
+msgid "Select default to automatically install important updates."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4694
+msgid "16-bit color:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4694
+msgid "Enable 16 bit color modes - Requires MTA restart"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4696
+msgid "Mouse fix:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4696
+msgid "Mouse movement fix - May need PC restart"
+msgstr ""
+
+#: Client/core/CScreenShot.cpp:53
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:181
+msgid "Fire"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:182
+msgid "Next weapon"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:183
+msgid "Previous weapon"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:184
+msgid "Forwards"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:185
+msgid "Backwards"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Zoom in"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Zoom out"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Enter/Exit"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:191
+msgid "Change camera"
+msgstr ""
+
+#. 10
+#: Client/core/CKeyBinds.cpp:192
+msgid "Jump"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Sprint"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Look behind"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Crouch"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Action"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:197
+msgid "Walk"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Vehicle fire"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Vehicle secondary fire"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Vehicle left"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Vehicle right"
+msgstr ""
+
+#. 20
+#: Client/core/CKeyBinds.cpp:202
+msgid "Steer forwards/down"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Steer backwards/up"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Accelerate"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Brake/Reverse"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Radio next"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:207
+msgid "Radio previous"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Radio user track skip"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Horn"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Sub-mission"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Handbrake"
+msgstr ""
+
+#. 30
+#: Client/core/CKeyBinds.cpp:212
+msgid "Vehicle look left"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Vehicle look right"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Vehicle look behind"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Vehicle mouse look"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Special control left"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:217
+msgid "Special control right"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Special control down"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Special control up"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Aim weapon"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Conversation yes"
+msgstr ""
+
+#. 40
+#: Client/core/CKeyBinds.cpp:222
+msgid "Conversation no"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Group control forwards"
+msgstr ""
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Group control backwards"
+msgstr ""
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid ""
+"The skin you selected could not be loaded, and the default skin also could "
+"not be loaded, please reinstall MTA."
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:29
+msgid "***[ COMMAND HELP ]***\n"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:167
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:251
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:259 Client/core/CCommandFuncs.cpp:327
+msgid "connect: Bad port number"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:281 Client/core/CCommandFuncs.cpp:342
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:285 Client/core/CCommandFuncs.cpp:346
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:290
+msgid "connect: Failed to unload current mod"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:380
+msgid "Bound all controls from GTA"
+msgstr ""
+
+#: Client/core/CCommandFuncs.cpp:394
+msgid "Saved configuration file"
+msgstr ""
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:460
+#, c-format
+msgid "* Your serial is: %s"
+msgstr ""
+
+#. Unknown command
+#: Client/core/CCommands.cpp:209
+msgid "Unknown command or cvar: "
+msgstr ""
+
+#: Client/core/CCredits.cpp:32
+msgid "Programming"
+msgstr ""
+
+#: Client/core/CCredits.cpp:61
+msgid "Contributors"
+msgstr ""
+
+#: Client/core/CCredits.cpp:82
+msgid "Game Design / Scripting"
+msgstr ""
+
+#: Client/core/CCredits.cpp:102
+msgid "Language Localization"
+msgstr ""
+
+#: Client/core/CCredits.cpp:108
+msgid "Patch contributors"
+msgstr ""
+
+#: Client/core/CCredits.cpp:216
+msgid "Special Thanks"
+msgstr ""
+
+#: Client/core/CCredits.cpp:245
+msgid "This software makes use of the following libraries and software:"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] ""
+msgstr[1] ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] ""
+msgstr[1] ""
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr ""
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr ""
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr ""
+
+#. Create the window
+#: Client/core/ServerBrowser/CServerBrowser.cpp:85
+msgid "SERVER BROWSER"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:134
+msgid "Local"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:135
+msgid "Favourites"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:136
+msgid "Recent"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:191
+msgid ""
+"FOR QUICK CONNECT:\n"
+"\n"
+"Type the address and port into the address bar.\n"
+"Or select a server from the history list and press 'Connect'"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:203
+msgid "HELP"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:212
+#: Client/core/ServerBrowser/CServerBrowser.cpp:252
+msgid "Refresh"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:212
+#: Client/core/ServerBrowser/CServerBrowser.cpp:253
+msgid "Add Favorite"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:212
+#: Client/core/ServerBrowser/CServerBrowser.cpp:254
+#: Client/core/ServerBrowser/CServerBrowser.cpp:301
+#: Client/core/ServerBrowser/CServerBrowser.cpp:372
+msgid "Connect"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:212
+#: Client/core/ServerBrowser/CServerBrowser.cpp:255
+msgid "Server information"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:213
+#: Client/core/ServerBrowser/CServerBrowser.cpp:256
+msgid "Search servers"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:213
+#: Client/core/ServerBrowser/CServerBrowser.cpp:257
+msgid "Search players"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:213
+#: Client/core/ServerBrowser/CServerBrowser.cpp:258
+msgid "Start search"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:299
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1692
+msgid "Search players..."
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:422
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1690
+msgid "Search servers..."
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:453
+msgid "Name"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:454
+msgid "Players"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:455
+msgid "Ping"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:456
+msgid "Gamemode"
+msgstr ""
+
+#. Player List Columns
+#. Column for player names
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+msgid "Player list"
+msgstr ""
+
+#. Include label
+#: Client/core/ServerBrowser/CServerBrowser.cpp:486
+msgid "Include:"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:492
+msgid "Empty"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:498
+msgid "Full"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:504
+msgid "Locked"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:516
+msgid "Offline"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:529
+msgid "Other Versions"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:550
+msgid "Back"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:741
+msgid "Loading..."
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1235
+#: Client/core/ServerBrowser/CServerBrowser.cpp:2177
+msgid "  ..loading.."
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1273
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1401
+msgid "No address specified!"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1286
+msgid "Unknown protocol"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1286
+msgid "Please use the mtasa:// protocol!"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1375
+msgid "You have to select a server to connect to."
+msgstr ""
+
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr ""
+
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr ""
+
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr ""
+
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr ""
+
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr ""
+
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr ""
+
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr ""
+
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr ""
+
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr ""
+
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr ""
+
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr ""
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr ""
+
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr ""
+
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr ""
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid ""
+"Could not initialize Direct3D9.\n"
+"\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr ""
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:230
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr ""
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:236
+msgid "Screenshot failed"
+msgstr ""
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
+msgid "Problem with graphics driver"
+msgstr ""
+
+#: Client/game_sa/CSettingsSA.cpp:759
+msgid "Can't find valid screen resolution."
+msgstr ""
+
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:835
+msgid "Are you sure you want to use this screen resolution?"
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid ""
+"The server requests the following websites in order to load them (later):"
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
 msgstr ""
 
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:100
+#: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
@@ -3087,22 +3091,22 @@ msgstr ""
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:116
+#: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
 msgstr ""
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:118
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
 msgstr ""
 
-#: Shared/sdk/SharedUtil.Misc.hpp:140
+#: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr ""
 
-#: Shared/sdk/SharedUtil.Misc.hpp:710
+#: Shared/sdk/SharedUtil.Misc.hpp:704
 msgid ""
 "Your browser will now display a web page with some help infomation.\n"
 "\n"

@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include <curl/curl.h>
@@ -29,6 +31,8 @@
  * and only compare strings we know are safe for this.
  *
  * The function is capable of comparing a-z case insensitively.
+ *
+ * Result is 1 if text matches and 0 if not.
  */
 
 #define strcasecompare(a,b) Curl_strcasecompare(a,b)
@@ -46,5 +50,7 @@ char Curl_raw_toupper(char in);
 
 void Curl_strntoupper(char *dest, const char *src, size_t n);
 void Curl_strntolower(char *dest, const char *src, size_t n);
+
+bool Curl_safecmp(char *a, char *b);
 
 #endif /* HEADER_CURL_STRCASE_H */

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerJoinDataPacket.h"
 
 bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream)
 {

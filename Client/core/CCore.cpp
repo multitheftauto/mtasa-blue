@@ -573,8 +573,9 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance(false);
-    pGameSettings->ResetPedsLODDistance(false);
+    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetPedsLODDistance();
+    pGameSettings->ResetCoronaReflectionsEnabled();
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);

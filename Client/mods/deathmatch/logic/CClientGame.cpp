@@ -442,6 +442,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
+    g_pMultiplayer->SetAudioZoneRadioSwitchHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -5292,10 +5293,14 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->RestoreFogDistance();
 
     // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
 
     // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetPedsLODDistance(true);
+
+    // Corona rain reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
 
     // Sun color
     g_pMultiplayer->ResetSunColor();
@@ -5398,6 +5403,12 @@ void CClientGame::ResetMapInfo()
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }
+
+    // Reset camera drunk/shake level
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
+
+    if (pPlayerInfo)
+        pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
     RestreamWorld();
 }
@@ -6685,7 +6696,9 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 //////////////////////////////////////////////////////////////////
 void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
-    if (m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
+    CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
+    
+    if (pPlayer && pPlayer->IsInVehicle())
     {
         // Do not change radio station if player is inside vehicle
         // because it is supposed to play own radio

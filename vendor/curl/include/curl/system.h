@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 /*
@@ -121,7 +123,7 @@
 #  define CURL_TYPEOF_CURL_SOCKLEN_T int
 
 #elif defined(__LCC__)
-#  if defined(__e2k__) /* MCST eLbrus C Compiler */
+#  if defined(__MCST__) /* MCST eLbrus Compiler Collection */
 #    define CURL_TYPEOF_CURL_OFF_T     long
 #    define CURL_FORMAT_CURL_OFF_T     "ld"
 #    define CURL_FORMAT_CURL_OFF_TU    "lu"

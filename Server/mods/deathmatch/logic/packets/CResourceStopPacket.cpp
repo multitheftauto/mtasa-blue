@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResourceStopPacket.h"
 
 CResourceStopPacket::CResourceStopPacket(unsigned short usID)
 {

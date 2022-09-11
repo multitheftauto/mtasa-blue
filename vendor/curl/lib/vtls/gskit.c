@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -74,6 +76,7 @@
 #include "connect.h" /* for the connect timeout */
 #include "select.h"
 #include "strcase.h"
+#include "timediff.h"
 #include "x509asn1.h"
 #include "curl_printf.h"
 
@@ -292,27 +295,6 @@ static CURLcode set_numeric(struct Curl_easy *data,
 }
 
 
-static CURLcode set_callback(struct Curl_easy *data,
-                             gsk_handle h, GSK_CALLBACK_ID id, void *info)
-{
-  char buffer[STRERROR_LEN];
-  int rc = gsk_attribute_set_callback(h, id, info);
-
-  switch(rc) {
-  case GSK_OK:
-    return CURLE_OK;
-  case GSK_ERROR_IO:
-    failf(data, "gsk_attribute_set_callback() I/O error: %s",
-          Curl_strerror(errno, buffer, sizeof(buffer)));
-    break;
-  default:
-    failf(data, "gsk_attribute_set_callback(): %s", gsk_strerror(rc));
-    break;
-  }
-  return CURLE_SSL_CONNECT_ERROR;
-}
-
-
 static CURLcode set_ciphers(struct Curl_easy *data,
                             gsk_handle h, unsigned int *protoflags)
 {
@@ -449,8 +431,7 @@ static CURLcode set_ciphers(struct Curl_easy *data,
 
 static int gskit_init(void)
 {
-  /* No initialisation needed. */
-
+  /* No initialization needed. */
   return 1;
 }
 
@@ -796,13 +777,13 @@ static CURLcode gskit_connect_step1(struct Curl_easy *data,
     BACKEND->localfd = sockpair[0];
     BACKEND->remotefd = sockpair[1];
     setsockopt(BACKEND->localfd, SOL_SOCKET, SO_RCVBUF,
-               (void *) sobufsize, sizeof(sobufsize));
+               (void *) &sobufsize, sizeof(sobufsize));
     setsockopt(BACKEND->remotefd, SOL_SOCKET, SO_RCVBUF,
-               (void *) sobufsize, sizeof(sobufsize));
+               (void *) &sobufsize, sizeof(sobufsize));
     setsockopt(BACKEND->localfd, SOL_SOCKET, SO_SNDBUF,
-               (void *) sobufsize, sizeof(sobufsize));
+               (void *) &sobufsize, sizeof(sobufsize));
     setsockopt(BACKEND->remotefd, SOL_SOCKET, SO_SNDBUF,
-               (void *) sobufsize, sizeof(sobufsize));
+               (void *) &sobufsize, sizeof(sobufsize));
     curlx_nonblock(BACKEND->localfd, TRUE);
     curlx_nonblock(BACKEND->remotefd, TRUE);
   }
@@ -976,11 +957,12 @@ static CURLcode gskit_connect_step2(struct Curl_easy *data,
 
   for(;;) {
     timediff_t timeout_ms = nonblocking? 0: Curl_timeleft(data, NULL, TRUE);
+    stmv.tv_sec = 0;
+    stmv.tv_usec = 0;
     if(timeout_ms < 0)
       timeout_ms = 0;
-    stmv.tv_sec = timeout_ms / 1000;
-    stmv.tv_usec = (timeout_ms - stmv.tv_sec * 1000) * 1000;
-    switch(QsoWaitForIOCompletion(BACKEND->iocport, &cstat, &stmv)) {
+    switch(QsoWaitForIOCompletion(BACKEND->iocport, &cstat,
+                                  curlx_mstotv(&stmv, timeout_ms))) {
     case 1:             /* Operation complete. */
       break;
     case -1:            /* An error occurred: handshake still in progress. */
@@ -1095,7 +1077,7 @@ static CURLcode gskit_connect_step3(struct Curl_easy *data,
     p = &x509.subjectPublicKeyInfo;
     result = Curl_pin_peer_pubkey(data, ptr, p->header, p->end - p->header);
     if(result) {
-      failf(data, "SSL: public key does not match pinned public key!");
+      failf(data, "SSL: public key does not match pinned public key");
       return result;
     }
   }
