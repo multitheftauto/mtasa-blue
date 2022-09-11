@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-08-17 08:23+0000\n"
-"PO-Revision-Date: 2022-08-17 08:41\n"
+"PO-Revision-Date: 2022-09-11 15:03\n"
 "Last-Translator: \n"
 "Language-Team: Estonian\n"
 "Language: et_EE\n"
@@ -884,7 +884,7 @@ msgstr "Sobib"
 
 #: Client/loader/Dialogs.cpp:35
 msgid "Quit"
-msgstr ""
+msgstr "Lõpeta"
 
 #: Client/loader/Dialogs.cpp:36
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
