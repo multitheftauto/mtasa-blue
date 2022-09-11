@@ -276,10 +276,6 @@ void CResource::Load()
         DECLARE_PROFILER_SECTION(OnPostLoadNoClientCacheScript)
     }
 
-    // Load the no cache scripts first
-    for (auto& item : m_NoClientCacheScriptList) {
-    }
-
     // Load the files that are queued in the list "to be loaded"
     list<CResourceFile*>::iterator iter = m_ResourceFiles.begin();
     for (; iter != m_ResourceFiles.end(); ++iter)
