@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -391,8 +393,8 @@ static CURLcode CONNECT(struct Curl_easy *data,
 
         if(!result)
           /* send to debug callback! */
-          result = Curl_debug(data, CURLINFO_HEADER_OUT,
-                              k->upload_fromhere, bytes_written);
+          Curl_debug(data, CURLINFO_HEADER_OUT,
+                     k->upload_fromhere, bytes_written);
 
         s->nsend -= bytes_written;
         k->upload_fromhere += bytes_written;

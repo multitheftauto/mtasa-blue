@@ -349,7 +349,7 @@ bool CMainConfig::Load()
 
     // Grab the server fps limit
     int iFPSTemp = 0;
-    iResult = GetInteger(m_pRootNode, "fpslimit", iFPSTemp, 0, 100);
+    iResult = GetInteger(m_pRootNode, "fpslimit", iFPSTemp, 0, std::numeric_limits<short>::max());
     if (iResult == IS_SUCCESS)
     {
         if (iFPSTemp == 0 || iFPSTemp >= 25)
@@ -929,7 +929,7 @@ bool CMainConfig::SetPassword(const char* szPassword, bool bSave)
 
 bool CMainConfig::SetFPSLimit(unsigned short usFPS, bool bSave)
 {
-    if (usFPS == 0 || (usFPS >= 25 && usFPS <= 100))
+    if (usFPS == 0 || (usFPS >= 25 && usFPS <= std::numeric_limits<short>::max()))
     {
         m_usFPSLimit = usFPS;
         if (bSave)
