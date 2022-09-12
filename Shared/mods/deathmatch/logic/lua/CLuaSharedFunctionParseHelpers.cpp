@@ -17,7 +17,12 @@ extern "C"
 
 #include "Enums.h"
 #include "physics/CLuaPhysicsShape.h"
-#include "CLuaSharedFunctionParseHelpers.h"
+#include "physics/CLuaPhysicsBaseManager.h"
+#include "physics/CLuaPhysicsRigidBodyManager.h"
+#include "physics/CLuaPhysicsStaticCollisionManager.h"
+#include "physics/CLuaPhysicsShapeManager.h"
+#include "lua/LuaCommon.h"
+#include "lua/CLuaMain.h"
 
 IMPLEMENT_ENUM_CLASS_BEGIN(ePhysicsElementType)
 ADD_ENUM(ePhysicsElementType::Unknown, "physics-unknown")
@@ -29,9 +34,39 @@ ADD_ENUM(ePhysicsElementType::ConvexShape, "physics-convex-shape")
 ADD_ENUM(ePhysicsElementType::BoxShape, "physics-box-shape")
 IMPLEMENT_ENUM_CLASS_END("physics-element-type")
 
+CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* luaVM)
+{
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsRigidBodyManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr, lua_State* luaVM)
+{
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsStaticCollisionManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
+{
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsShapeManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaVM)
+{
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+CLuaPhysicsWorldElement* UserDataCast(CLuaPhysicsWorldElement*, void* ptr, lua_State* luaVM)
+{
+    auto& pLuaMain = lua_getownercluamain(luaVM);
+    return pLuaMain.GetPhysicsWorldElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
 SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM)
 {
-    if (auto* pVar = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)nullptr, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CLuaPhysicsShape*)nullptr, ptr, luaVM))
         return EnumToString(pVar->GetType());
 
     return "";

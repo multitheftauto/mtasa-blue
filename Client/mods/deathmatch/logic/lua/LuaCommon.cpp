@@ -138,11 +138,11 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushvector(luaVM, *pVector);
     else if (CLuaMatrix* pMatrix = UserDataCast((CLuaMatrix*)pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
-    else if (auto pPhysicsShape = UserDataCast<CLuaPhysicsShape>((CLuaPhysicsShape*)nullptr, pData, luaVM))
+    else if (auto pPhysicsShape = UserDataCast((CLuaPhysicsShape*)nullptr, pData, luaVM))
         return lua_pushshape(luaVM, pPhysicsShape);
-    else if (auto pRigidBody = UserDataCast<CLuaPhysicsRigidBody>((CLuaPhysicsRigidBody*)nullptr, pData, luaVM))
+    else if (auto pRigidBody = UserDataCast((CLuaPhysicsRigidBody*)nullptr, pData, luaVM))
         return lua_pushrigidbody(luaVM, pRigidBody);
-    else if (auto pStaticCollision = UserDataCast<CLuaPhysicsStaticCollision>((CLuaPhysicsStaticCollision*)nullptr, pData, luaVM))
+    else if (auto pStaticCollision = UserDataCast((CLuaPhysicsStaticCollision*)nullptr, pData, luaVM))
         return lua_pushstaticcollision(luaVM, pStaticCollision);
 
     lua_pushobject(luaVM, NULL, pData);

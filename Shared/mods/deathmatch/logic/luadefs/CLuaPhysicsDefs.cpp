@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "CBulletPhysicsCommon.h"
 #include <CBulletPhysics.h>
 #include "CLuaPhysicsDefs.h"

@@ -14,7 +14,6 @@ class CLuaArgument;
 #include <variant>
 #include <SharedUtil.Template.h>
 #include "lua/CLuaOverloadParser.h"
-#include <lua/CLuaSharedFunctionParseHelpers.h>
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"

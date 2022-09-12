@@ -8,18 +8,15 @@
  *
  *****************************************************************************/
 
-#pragma once
 
-extern "C"
-{
-    #include "lua.h"
-}
-
+class lua_State;
 class CLuaPhysicsRigidBody;
 class CLuaPhysicsStaticCollision;
 class CLuaPhysicsShape;
 class CLuaPhysicsElement;
 class CLuaPhysicsWorldElement;
+
+#pragma once
 
 inline SString GetClassTypeName(CLuaPhysicsRigidBody*)
 {
@@ -38,39 +35,14 @@ inline SString GetClassTypeName(CLuaPhysicsElement*)
     return "physics-element";
 }
 
-template <class T>
-CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* luaVM)
-{
-    auto& pLuaMain = lua_getownercluamain(luaVM);
-    return pLuaMain.GetPhysicsRigidBodyManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
-}
+CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* luaVM);
 
-template <class T>
-CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr, lua_State* luaVM)
-{
-    auto& pLuaMain = lua_getownercluamain(luaVM);
-    return pLuaMain.GetPhysicsStaticCollisionManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
-}
+CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr, lua_State* luaVM);
 
-template <class T>
-CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM)
-{
-    auto& pLuaMain = lua_getownercluamain(luaVM);
-    return pLuaMain.GetPhysicsShapeManager()->GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
-}
+CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM);
 
-template <class T>
-CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaVM)
-{
-    auto& pLuaMain = lua_getownercluamain(luaVM);
-    return pLuaMain.GetPhysicsElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
-}
+CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaVM);
 
-template <class T>
-CLuaPhysicsWorldElement* UserDataCast(CLuaPhysicsWorldElement*, void* ptr, lua_State* luaVM)
-{
-    auto& pLuaMain = lua_getownercluamain(luaVM);
-    return pLuaMain.GetPhysicsWorldElementFromScriptID(reinterpret_cast<unsigned long>(ptr));
-}
+CLuaPhysicsWorldElement* UserDataCast(CLuaPhysicsWorldElement*, void* ptr, lua_State* luaVM);
 
 SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM);
