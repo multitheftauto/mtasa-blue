@@ -91,6 +91,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
+    m_bFocused = g_pCore->IsFocused();
+
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
 
@@ -2564,6 +2566,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
     m_Events.AddEvent("onClientRestore", "", NULL, false);
+    m_Events.AddEvent("onClientMTAFocusChange", "focused", NULL, false);
 
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
@@ -5400,6 +5403,12 @@ void CClientGame::ResetMapInfo()
         }
     }
 
+    // Reset camera drunk/shake level
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
+
+    if (pPlayerInfo)
+        pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
+
     RestreamWorld();
 }
 
@@ -6536,6 +6545,18 @@ void CClientGame::RestreamWorld()
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
     g_pGame->GetStreaming()->ReinitStreaming();
+}
+
+void CClientGame::OnWindowFocusChange(bool state)
+{
+    if (state == m_bFocused)
+        return;
+
+    m_bFocused = state;
+
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(state);
+    m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
 }
 
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)

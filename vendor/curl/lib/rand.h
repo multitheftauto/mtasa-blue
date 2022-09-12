@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -45,5 +47,11 @@ CURLcode Curl_rand(struct Curl_easy *data, unsigned char *rnd, size_t num);
  */
 CURLcode Curl_rand_hex(struct Curl_easy *data, unsigned char *rnd,
                        size_t num);
+
+#ifdef WIN32
+/* Random generator shared between the Schannel vtls and Curl_rand*()
+   functions */
+CURLcode Curl_win32_random(unsigned char *entropy, size_t length);
+#endif
 
 #endif /* HEADER_CURL_RAND_H */

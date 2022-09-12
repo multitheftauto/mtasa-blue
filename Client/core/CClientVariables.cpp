@@ -234,7 +234,7 @@ void CClientVariables::ValidateValues()
 
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
-    ClampValue("fps_limit", 0, 100);
+    ClampValue("fps_limit", 0, std::numeric_limits<short>::max());
     ClampValue("chat_font", 0, 3);
     ClampValue("chat_lines", 3, 62);
     ClampValue("chat_color", CColor(0, 0, 0, 0), CColor(255, 255, 255, 255));

@@ -14,8 +14,8 @@
     #include <net/ns_common.h>
 #endif
 
-typedef uint                       SSendHandle;
-typedef CAutoRefedPointer<CBuffer> CBufferRef;
+typedef uint                     SSendHandle;
+typedef std::shared_ptr<CBuffer> CBufferRef;
 
 namespace LatentTransfer
 {
@@ -198,8 +198,8 @@ protected:
     // Send variables
     std::vector<CLatentSendQueue*>           m_SendQueueList;
     std::map<NetPlayerID, CLatentSendQueue*> m_SendQueueMap;
-    CBufferRef*                              m_pBatchBufferRef;
-
+    CBufferRef                               m_pBatchBufferRef;
+    
     // Receive variables
     std::map<NetPlayerID, CLatentReceiver*> m_ReceiverMap;
 };

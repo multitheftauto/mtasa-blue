@@ -607,6 +607,10 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
         return IsVehicleSunGlareEnabled();
 
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
+        return IsCoronaZTestEnabled();
+ 
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -645,6 +649,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
+    {
+        SetCoronaZTestEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -661,6 +671,7 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
+    SetCoronaZTestEnabled(true);
     CVehicleSA::SetVehiclesSunGlareEnabled(false);
 
     std::map<std::string, SCheatSA*>::iterator it;
@@ -744,6 +755,27 @@ void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
 bool CGameSA::IsVehicleSunGlareEnabled()
 {
     return CVehicleSA::GetVehiclesSunGlareEnabled();
+}
+
+void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
+{
+    if (m_isCoronaZTestEnabled == isEnabled)
+        return;
+
+    if (isEnabled)
+    {
+        // Enable ZTest (PC)
+        MemPut<BYTE>(0x6FB17C + 0, 0xFF);
+        MemPut<BYTE>(0x6FB17C + 1, 0x51);
+        MemPut<BYTE>(0x6FB17C + 2, 0x20);
+    }
+    else
+    {
+        // Disable ZTest (PS2)
+        MemSet((void*)0x6FB17C, 0x90, 3);
+    }
+    
+    m_isCoronaZTestEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()
