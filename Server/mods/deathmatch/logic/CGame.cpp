@@ -64,7 +64,6 @@
 #include "../utils/CFunctionUseLogger.h"
 #include "Utils.h"
 #include "CStaticFunctionDefinitions.h"
-#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "CZipMaker.h"
 #include "version.h"

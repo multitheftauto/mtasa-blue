@@ -31,7 +31,6 @@
 #include "CHTTPD.h"
 #include "Utils.h"
 #include "packets/CResourceClientScriptsPacket.h"
-#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>

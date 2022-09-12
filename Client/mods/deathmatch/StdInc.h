@@ -109,7 +109,6 @@
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>
 #include "CEasingCurve.h"
-#include <lua/CLuaSharedFunctionParseHelpers.h>
 #include <lua/CLuaFunctionParseHelpers.h>
 #include <CScriptArgReader.h>
 #include <luadefs/CLuaDefs.h>

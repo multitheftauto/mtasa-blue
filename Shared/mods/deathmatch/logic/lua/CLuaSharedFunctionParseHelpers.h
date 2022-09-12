@@ -35,14 +35,14 @@ inline SString GetClassTypeName(CLuaPhysicsElement*)
     return "physics-element";
 }
 
-CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, void* ptr, lua_State* luaVM);
+CLuaPhysicsRigidBody* UserDataCast(CLuaPhysicsRigidBody*, lua_State* luaVM);
 
-CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, void* ptr, lua_State* luaVM);
+CLuaPhysicsStaticCollision* UserDataCast(CLuaPhysicsStaticCollision*, lua_State* luaVM);
 
-CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, void* ptr, lua_State* luaVM);
+CLuaPhysicsShape* UserDataCast(CLuaPhysicsShape*, lua_State* luaVM);
 
-CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, void* ptr, lua_State* luaVM);
+CLuaPhysicsElement* UserDataCast(CLuaPhysicsElement*, lua_State* luaVM);
 
-CLuaPhysicsWorldElement* UserDataCast(CLuaPhysicsWorldElement*, void* ptr, lua_State* luaVM);
+CLuaPhysicsWorldElement* UserDataCast(CLuaPhysicsWorldElement*, lua_State* luaVM);
 
 SString GetSharedUserDataClassName(void* ptr, lua_State* luaVM);

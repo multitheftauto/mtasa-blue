@@ -7,8 +7,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "CLuaFunctionParseHelpers.h"
+#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "CScriptArgReader.h"
 #include "CResource.h"
 #include "CResourceManager.h"

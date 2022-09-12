@@ -22,7 +22,6 @@
 #include "CMainConfig.h"
 #include "CResource.h"
 #include "CPerfStatManager.h"
-#include "lua/CLuaSharedFunctionParseHelpers.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "packets/CEntityAddPacket.h"
 #include "packets/CPlayerSpawnPacket.h"
