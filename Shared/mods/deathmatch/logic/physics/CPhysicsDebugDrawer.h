@@ -31,11 +31,11 @@ class CPhysicsDebugDrawer : public btIDebugDraw
     CVector         m_vecCameraPosition;
 
 public:
-    void  SetLineWidth(float fWidth) { m_fLineWidth = fWidth; }
+    void  SetLineWidth(float fWidth);
     float GetLineWidth() const { return m_fLineWidth; }
-    void  SetDrawDistance(float fDistance) { m_fDrawDistance = fDistance; }
+    void  SetDrawDistance(float fDistance);
     float GetDrawDistance() const { return m_fDrawDistance; }
-    void  SetCameraPosition(CVector& vecPosition) { m_vecCameraPosition = vecPosition; }
+    void  SetCameraPosition(CVector& vecPosition);
 
     void Clear();
 

@@ -255,7 +255,7 @@ public:
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
 
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
-    CBulletPhysics*                     GetPhysics() { return m_pPhysics.get(); }
+    CBulletPhysics*                     GetPhysics() const { return m_pPhysics.get(); }
 
     void JoinPlayer(CPlayer& Player);
     void InitialDataStream(CPlayer& Player);

@@ -281,7 +281,7 @@ public:
     CRPCFunctions*                GetRPCFunctions() { return m_pRPCFunctions; }
     CSingularFileDownloadManager* GetSingularFileDownloadManager() { return m_pSingularFileDownloadManager; };
     CServerInfo*                  GetServerInfo() { return m_ServerInfo.get(); }
-    CBulletPhysics*               GetPhysics() { return m_pPhysics.get(); }
+    CBulletPhysics*               GetPhysics() const { return m_pPhysics.get(); }
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
     CEvents*       GetEvents() { return &m_Events; }

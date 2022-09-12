@@ -32,8 +32,8 @@ void MotionState::setWorldTransform(const btTransform& centerOfMassWorldTrans)
     m_graphicsWorldTrans = centerOfMassWorldTrans * m_centerOfMassOffset;
 }
 
-std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::New(CLuaPhysicsShape* pPhysicsShape, const float fMass, CVector& vecLocalInertia,
-                                                                    CVector& vecCenterOfMass, MotionState* pMotionstate)
+std::unique_ptr<CPhysicsRigidBodyProxy> CPhysicsRigidBodyProxy::New(CLuaPhysicsShape* pPhysicsShape, const float fMass, const CVector& vecLocalInertia,
+                                                                    const CVector& vecCenterOfMass, MotionState* pMotionstate)
 {
     CPhysicsSharedLogic::SetPosition(pMotionstate->m_centerOfMassOffset, vecCenterOfMass);
     btCollisionShape* pCollisionShape = pPhysicsShape->InternalGetBtShape();

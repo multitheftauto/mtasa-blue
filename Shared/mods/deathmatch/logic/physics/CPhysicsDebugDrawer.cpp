@@ -13,6 +13,22 @@
 #include "CBulletPhysics.h"
 #include <Utils.h>
 
+
+void CPhysicsDebugDrawer::SetLineWidth(float fWidth)
+{
+    m_fLineWidth = fWidth;
+}
+
+void CPhysicsDebugDrawer::SetDrawDistance(float fDistance)
+{
+    m_fDrawDistance = fDistance;
+}
+
+void CPhysicsDebugDrawer::SetCameraPosition(CVector& vecPosition)
+{
+    m_vecCameraPosition = vecPosition;
+}
+
 void CPhysicsDebugDrawer::Clear()
 {
     m_vecLines.clear();
@@ -20,12 +36,12 @@ void CPhysicsDebugDrawer::Clear()
 
 void CPhysicsDebugDrawer::DrawLineInternal(const btVector3& from, const btVector3& to, const btVector3& lineColor)
 {
-    const CVector& vecFrom = CPhysicsSharedLogic::ConvertVector(from);
-    const CVector& vecTo = CPhysicsSharedLogic::ConvertVector(to);
+    const CVector vecFrom = CPhysicsSharedLogic::ConvertVector(from);
+    const CVector vecTo = CPhysicsSharedLogic::ConvertVector(to);
     const float    distance = DistanceBetweenPoints3D((vecFrom + vecTo) / 2, m_vecCameraPosition);
     if (distance < m_fDrawDistance)
     {
-        float alpha = 255 - distance / m_fDrawDistance * 255;
+        float alpha = 255.0f - distance / m_fDrawDistance * 255.0f;
         m_vecLines.emplace_back(vecFrom, vecTo, SColorARGB(Clamp(0.0f, alpha, 255.0f), lineColor.x() * 254.0f, lineColor.y() * 254.0f, lineColor.z() * 254.0f));
     }
 }

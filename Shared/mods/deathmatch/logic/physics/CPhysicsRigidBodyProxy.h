@@ -39,7 +39,7 @@ public:
 
     CPhysicsRigidBodyProxy(const btRigidBodyConstructionInfo& constructionInfo) : btRigidBody(constructionInfo){};
 
-    static std::unique_ptr<CPhysicsRigidBodyProxy> New(CLuaPhysicsShape* pPhysicsShape, const float fMass, CVector& vecLocalInertia, CVector& vecCenterOfMass,
+    static std::unique_ptr<CPhysicsRigidBodyProxy> New(CLuaPhysicsShape* pPhysicsShape, const float fMass, const CVector& vecLocalInertia, const CVector& vecCenterOfMass,
                                                        MotionState* pMotionstate);
 
     void SetEnabled(bool bEnabled);
