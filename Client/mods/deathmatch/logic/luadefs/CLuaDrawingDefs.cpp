@@ -1002,10 +1002,10 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
         // )
         argStream.ReadNumber(width);
         if (width > 4096)
-            argStream.SetCustomError("Expected number lower than 4096 at argument 1");
+            argStream.SetCustomError("Expected number <less/greater> than, or equal to 4096 at argument 1");
         argStream.ReadNumber(height);
         if (height > 4096)
-            argStream.SetCustomError("Expected number lower than 4096 at argument 2");
+            argStream.SetCustomError("Expected number <less/greater> than, or equal to 4096 at argument 1");
         argStream.ReadEnumString(renderFormat, RFORMAT_UNKNOWN);
         argStream.ReadEnumString(textureAddress, TADDRESS_WRAP);
         argStream.ReadEnumString(textureType, TTYPE_TEXTURE);
