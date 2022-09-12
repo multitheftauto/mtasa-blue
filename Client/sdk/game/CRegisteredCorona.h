@@ -33,6 +33,7 @@ public:
     virtual VOID     SetTexture(eCoronaType texture) = 0;
     virtual BYTE     GetFlareType() = 0;
     virtual VOID     SetFlareType(BYTE fFlareType) = 0;
+    virtual VOID     SetReflectionType(BYTE reflectionType) = 0;
     virtual DWORD    GetIdentifier() = 0;
     virtual DWORD    GetID() = 0;
     virtual VOID     Refresh() = 0;

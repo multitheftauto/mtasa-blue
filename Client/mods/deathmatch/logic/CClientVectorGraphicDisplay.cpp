@@ -40,7 +40,10 @@ void CClientVectorGraphicDisplay::Render()
         m_bIsCleared = false;
 
     if (HasUpdated())
-        UpdateTexture();
+    {
+        m_pVectorGraphic->OnUpdate();
+    }
+        
 }
 
 void CClientVectorGraphicDisplay::UpdateTexture()

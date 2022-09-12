@@ -9,6 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCustomWeapon.h"
+#include "CObjectManager.h"
+#include "CVehicle.h"
+#include "CPed.h"
 
 CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
     : CObject(pParent, pObjectManager, false)

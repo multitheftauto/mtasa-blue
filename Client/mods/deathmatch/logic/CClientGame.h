@@ -193,6 +193,7 @@ public:
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
+
     class CStoredWeaponSlot
     {
     public:
@@ -229,7 +230,7 @@ public:
     CClientGame(bool bLocalPlay = false);
     ~CClientGame();
 
-    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL, const char* szSecret = nullptr);
+    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
     bool StartLocalGame(eServerType Type, const char* szPassword = NULL);
     void SetupLocalGame(eServerType Type);
     // bool                                    StartGame                       ( void );
@@ -254,6 +255,8 @@ public:
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
+
+    bool IsWindowFocused() const { return m_bFocused; }
 
     // Accessors
 
@@ -438,7 +441,7 @@ public:
     void RestreamModel(unsigned short usModel);
     void RestreamWorld();
 
-    void TriggerDiscordJoin(SString strSecret);
+    void OnWindowFocusChange(bool state);
 
 private:
     // CGUI Callbacks
@@ -774,6 +777,7 @@ private:
     bool m_bBeingDeleted;            // To enable speedy disconnect
 
     bool m_bWasMinimized;
+    bool m_bFocused;
 
     // Cache for speeding up collision processing
 public:
@@ -807,7 +811,6 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
-    void UpdateDiscordState();            // If netc allows this function not to be here it would be better
 
 private:
     CEvents                                     m_Events;
