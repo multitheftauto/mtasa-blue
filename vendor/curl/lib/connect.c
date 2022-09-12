@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -470,8 +472,10 @@ static CURLcode bindlocal(struct Curl_easy *data,
     }
 
     if(--portnum > 0) {
-      infof(data, "Bind to local port %hu failed, trying next", port);
       port++; /* try next port */
+      if(port == 0)
+        break;
+      infof(data, "Bind to local port %hu failed, trying next", port - 1);
       /* We re-use/clobber the port variable here below */
       if(sock->sa_family == AF_INET)
         si4->sin_port = ntohs(port);
@@ -762,6 +766,13 @@ void Curl_updateconninfo(struct Curl_easy *data, struct connectdata *conn,
       Curl_conninfo_remote(data, conn, sockfd);
     Curl_conninfo_local(data, sockfd, local_ip, &local_port);
   } /* end of TCP-only section */
+#ifdef ENABLE_QUIC
+  else if(conn->transport == TRNSPRT_QUIC) {
+    if(!conn->bits.reuse)
+      Curl_conninfo_remote(data, conn, sockfd);
+    Curl_conninfo_local(data, sockfd, local_ip, &local_port);
+  }
+#endif
 
   /* persist connection info in session handle */
   Curl_persistconninfo(data, conn, local_ip, local_port);
@@ -899,6 +910,8 @@ CURLcode Curl_is_connected(struct Curl_easy *data,
         conn->tempsock[i] = CURL_SOCKET_BAD;
         post_SOCKS(data, conn, sockindex, connected);
         connkeep(conn, "HTTP/3 default");
+        if(conn->tempsock[other] != CURL_SOCKET_BAD)
+          Curl_quic_disconnect(data, conn, other);
         return CURLE_OK;
       }
       /* When a QUIC connect attempt fails, the better error explanation is in
@@ -1600,9 +1613,20 @@ CURLcode Curl_socket(struct Curl_easy *data,
    */
 
   addr->family = ai->ai_family;
-  addr->socktype = (conn->transport == TRNSPRT_TCP) ? SOCK_STREAM : SOCK_DGRAM;
-  addr->protocol = conn->transport != TRNSPRT_TCP ? IPPROTO_UDP :
-    ai->ai_protocol;
+  switch(conn->transport) {
+  case TRNSPRT_TCP:
+    addr->socktype = SOCK_STREAM;
+    addr->protocol = IPPROTO_TCP;
+    break;
+  case TRNSPRT_UNIX:
+    addr->socktype = SOCK_STREAM;
+    addr->protocol = IPPROTO_IP;
+    break;
+  default: /* UDP and QUIC */
+    addr->socktype = SOCK_DGRAM;
+    addr->protocol = IPPROTO_UDP;
+    break;
+  }
   addr->addrlen = ai->ai_addrlen;
 
   if(addr->addrlen > sizeof(struct Curl_sockaddr_storage))
@@ -1636,26 +1660,30 @@ CURLcode Curl_socket(struct Curl_easy *data,
   if(conn->transport == TRNSPRT_QUIC) {
     /* QUIC sockets need to be nonblocking */
     (void)curlx_nonblock(*sockfd, TRUE);
+    switch(addr->family) {
+#if defined(__linux__) && defined(IP_MTU_DISCOVER)
+    case AF_INET: {
+      int val = IP_PMTUDISC_DO;
+      (void)setsockopt(*sockfd, IPPROTO_IP, IP_MTU_DISCOVER, &val,
+                       sizeof(val));
+      break;
+    }
+#endif
+#if defined(__linux__) && defined(IPV6_MTU_DISCOVER)
+    case AF_INET6: {
+      int val = IPV6_PMTUDISC_DO;
+      (void)setsockopt(*sockfd, IPPROTO_IPV6, IPV6_MTU_DISCOVER, &val,
+                       sizeof(val));
+      break;
+    }
+#endif
+    }
   }
 
 #if defined(ENABLE_IPV6) && defined(HAVE_SOCKADDR_IN6_SIN6_SCOPE_ID)
   if(conn->scope_id && (addr->family == AF_INET6)) {
     struct sockaddr_in6 * const sa6 = (void *)&addr->sa_addr;
     sa6->sin6_scope_id = conn->scope_id;
-  }
-#endif
-
-#if defined(__linux__) && defined(IP_RECVERR)
-  if(addr->socktype == SOCK_DGRAM) {
-    int one = 1;
-    switch(addr->family) {
-    case AF_INET:
-      (void)setsockopt(*sockfd, SOL_IP, IP_RECVERR, &one, sizeof(one));
-      break;
-    case AF_INET6:
-      (void)setsockopt(*sockfd, SOL_IPV6, IPV6_RECVERR, &one, sizeof(one));
-      break;
-    }
   }
 #endif
 
