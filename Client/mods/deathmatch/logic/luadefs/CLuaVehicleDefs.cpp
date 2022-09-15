@@ -1366,8 +1366,12 @@ int CLuaVehicleDefs::GetTrainSpeed(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         float fSpeed;
+        bool bDirection;
         if (CStaticFunctionDefinitions::GetTrainSpeed(*pVehicle, fSpeed))
         {
+            CStaticFunctionDefinitions::GetTrainDirection(*pVehicle, bDirection);
+            if (!bDirection)
+                fSpeed = -fSpeed;
             lua_pushnumber(luaVM, fSpeed);
             return 1;
         }
