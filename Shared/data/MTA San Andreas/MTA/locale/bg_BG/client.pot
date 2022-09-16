@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-12 16:56+0000\n"
-"PO-Revision-Date: 2022-09-12 17:48\n"
+"POT-Creation-Date: 2022-09-16 23:24+0000\n"
+"PO-Revision-Date: 2022-09-16 23:33\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -152,7 +152,7 @@ msgstr "(Разработчик мод) принтира ИД-то на звуц
 #: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
 #: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
 #: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
-#: Client/loader/MainFunctions.cpp:816 Client/core/CCore.cpp:1188
+#: Client/loader/MainFunctions.cpp:818 Client/core/CCore.cpp:1188
 #: Client/core/CCore.cpp:1201 Client/core/CConnectManager.cpp:80
 #: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
 #: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
@@ -663,13 +663,13 @@ msgid "Another instance of MTA is already running.\n\n"
 msgstr "Друга инстанция на МТА се изпълянва.\n\n"
 "Искате ли да я спрете?"
 
-#: Client/loader/MainFunctions.cpp:287
+#: Client/loader/MainFunctions.cpp:288
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "Имате проблем с MTA:SA?.\n\n"
 "Искате ли да върнете на по-стара версия?"
 
-#: Client/loader/MainFunctions.cpp:316
+#: Client/loader/MainFunctions.cpp:318
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -677,48 +677,48 @@ msgstr "Изглежда, че има проблем със стартиране
 "Понякога рестартирането на настройките на GTA може да поправи проблема.\n\n"
 "Искате ли да рестартирате GTA настройките сега?"
 
-#: Client/loader/MainFunctions.cpp:331
+#: Client/loader/MainFunctions.cpp:333
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "GTA настройките бяха рестартирани.\n\n"
 "Натиснете ОК за да продължите."
 
-#: Client/loader/MainFunctions.cpp:336
+#: Client/loader/MainFunctions.cpp:338
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Файлът не е изтрит: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:344
+#: Client/loader/MainFunctions.cpp:346
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "Имате проблеми с MTA:SA?\n\n"
 "Искате ли да видите помощ онлайн?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:380
+#: Client/loader/MainFunctions.cpp:382
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "Имате проблем с MTA:SA?.\n\n"
 "Искате ли да промените тези настройки?"
 
-#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:644
+#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:644
 #: Client/core/CSettings.cpp:978
 msgid "Fullscreen mode:"
 msgstr "Режим на пълен екран:"
 
-#: Client/loader/MainFunctions.cpp:381 Client/core/CSettings.cpp:652
+#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:652
 #: Client/core/CSettings.cpp:1576
 msgid "Borderless window"
 msgstr "Прозорец без краища"
 
-#: Client/loader/MainFunctions.cpp:423
+#: Client/loader/MainFunctions.cpp:425
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "Имате проблем с МТА:SA?\n\n"
 "Опитайте се да спрете дадените продукти за GTA и МТА:"
 
-#: Client/loader/MainFunctions.cpp:457
+#: Client/loader/MainFunctions.cpp:459
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -726,35 +726,35 @@ msgstr "ВНИМАНИЕ\n\n"
 "MTA:SA засече странна дейност.\n"
 "Изпълнете вирусно сканиране, за да се обедите, че вашата система е защитена.\n\n"
 
-#: Client/loader/MainFunctions.cpp:460
+#: Client/loader/MainFunctions.cpp:462
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "Засеченият файл беше: %s\n"
 
-#: Client/loader/MainFunctions.cpp:594
+#: Client/loader/MainFunctions.cpp:596
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "Инстанция на GTA:San Andreas вече се изпълянва. Трябва да бъде спряна преди MTA:SA да бъде стартирана. Искате ли да направите това сега?"
 
-#: Client/loader/MainFunctions.cpp:595 Client/loader/MainFunctions.cpp:602
-#: Client/loader/MainFunctions.cpp:1236
+#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
+#: Client/loader/MainFunctions.cpp:1238
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
 msgstr "Информация"
 
-#: Client/loader/MainFunctions.cpp:601
+#: Client/loader/MainFunctions.cpp:603
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "Невъзможно спиране на GTA: San Andreas. Моля рестартирайте вашия компютър."
 
-#: Client/loader/MainFunctions.cpp:624
+#: Client/loader/MainFunctions.cpp:626
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Регистърни входове липсват. Моля преинсталирайте Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:630
+#: Client/loader/MainFunctions.cpp:632
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "Директорията за GTA: San Andreas съдържа знаци, които не се поддържат. (unicode) Моля преместете Grand Theft Auto: San Andreas на друго място, която съдържа само ASCII знаци и преинсталирайте Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:640
+#: Client/loader/MainFunctions.cpp:642
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
@@ -764,79 +764,79 @@ msgstr "Директорията за 'MTA:SA' или 'GTA: San Andreas'\n"
 "Ако имате проблеми с MTA:SA,\n"
 "преместете ги някъде, където го няма този знак."
 
-#: Client/loader/MainFunctions.cpp:780
+#: Client/loader/MainFunctions.cpp:782
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Зареждането провалено. Моля проверете дали последните дата файлове са инсталирани правилно."
 
-#: Client/loader/MainFunctions.cpp:789
+#: Client/loader/MainFunctions.cpp:791
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Зареждането провалено. Моля проверете дали %s е инсталирано правилно."
 
-#: Client/loader/MainFunctions.cpp:796
+#: Client/loader/MainFunctions.cpp:798
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Зареждането провалено. Не може да бъде открито gta_sa.exe в %s."
 
-#: Client/loader/MainFunctions.cpp:806
+#: Client/loader/MainFunctions.cpp:808
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Зареждането провалено. %s се състои в директорията на GTA. Моля изтрийте го преди да продължите."
 
-#: Client/loader/MainFunctions.cpp:815
+#: Client/loader/MainFunctions.cpp:817
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Главният файл има неправилно име (%s)"
 
-#: Client/loader/MainFunctions.cpp:826
+#: Client/loader/MainFunctions.cpp:828
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Главният файл е неподписан. Възможно вирусно действие.\n\n"
 "Вижте помощ онлайн ако МТА не работи правилно."
 
-#: Client/loader/MainFunctions.cpp:849
+#: Client/loader/MainFunctions.cpp:851
 msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Дата файловете са модифицирани. Възможно е вирусна дейност.\n\n"
 "Вижте помощ за това онлайн ако МТА не работи правилно."
 
-#: Client/loader/MainFunctions.cpp:861
+#: Client/loader/MainFunctions.cpp:863
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ".asi файловете в 'MTA:SA' или 'GTA: San Andreas' директорията.\n\n"
 "Премахнете тези .asi файлове ако имате проблеми с MTA:SA."
 
-#: Client/loader/MainFunctions.cpp:965
+#: Client/loader/MainFunctions.cpp:967
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Файловите версии се разминават. Преинсталирайте MTA:Sa ако имате проблеми.\n"
 
-#: Client/loader/MainFunctions.cpp:974
+#: Client/loader/MainFunctions.cpp:976
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Някои файлове липсват. Преинсталирайте МТА:SA ако имате проблеми.\n"
 
-#: Client/loader/MainFunctions.cpp:986
+#: Client/loader/MainFunctions.cpp:988
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "МТА:SA не може да се сработи с Windows 'Безопасен Режим'.\n\n"
 "Моля рестартирайте вашия компютър.\n"
 
-#: Client/loader/MainFunctions.cpp:1122
+#: Client/loader/MainFunctions.cpp:1124
 msgid "Fix configuration issue"
 msgstr "Поправи конфигурационен проблем"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1164
+#: Client/loader/MainFunctions.cpp:1166
 msgid "Fix elevation required error"
 msgstr "Коригирайте необходимата грешка"
 
-#: Client/loader/MainFunctions.cpp:1171
+#: Client/loader/MainFunctions.cpp:1173
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Невъзможно стартиране на Grand Theft Auto: San Andreas. Моля опитайте рестартиране или ако има проблем, посетете МТА в www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1236
+#: Client/loader/MainFunctions.cpp:1238
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas може да не е било пуснато правилно. Искате ли да го спрете?"
 
