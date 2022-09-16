@@ -805,6 +805,11 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
         outStatus.settings.bGrassEffect = false;
     }
 
+    if (outStatus.settings.iFXQuality < 2)
+    {
+        outStatus.settings.bDynamicPedShadows = false;
+    }
+
     // Display color depth
     D3DFORMAT BackBufferFormat = g_pDeviceState->CreationState.PresentationParameters.BackBufferFormat;
     if (BackBufferFormat >= D3DFMT_R5G6B5 && BackBufferFormat < D3DFMT_A8R3G3B2)
