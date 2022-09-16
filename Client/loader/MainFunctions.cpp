@@ -284,12 +284,14 @@ void HandleTrouble()
     if (CheckAndShowFileOpenFailureMessage())
         return;
 
+#if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     int iResponse = MessageBoxUTF8(NULL, _("Are you having problems running MTA:SA?.\n\nDo you want to revert to an earlier version?"),
                                    "MTA: San Andreas" + _E("CL07"), MB_YESNO | MB_ICONQUESTION | MB_TOPMOST);
     if (iResponse == IDYES)
     {
         BrowseToSolution("crashing-before-gtagame", TERMINATE_PROCESS);
     }
+#endif
 }
 
 //////////////////////////////////////////////////////////
