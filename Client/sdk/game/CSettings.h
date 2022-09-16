@@ -136,6 +136,9 @@ public:
     virtual void SetVolumetricShadowsEnabled(bool bEnable) = 0;
     virtual void SetVolumetricShadowsSuspended(bool bSuspended) = 0;
 
+    virtual bool IsDynamicPedShadowsEnabled() = 0;
+    virtual void SetDynamicPedShadowsEnabled(bool bEnable) = 0;
+
     virtual float        GetAspectRatioValue() = 0;
     virtual eAspectRatio GetAspectRatio() = 0;
     virtual void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true) = 0;

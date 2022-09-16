@@ -576,6 +576,8 @@ void CCore::ApplyGameSettings()
     pGameSettings->ResetVehiclesLODDistance();
     pGameSettings->ResetPedsLODDistance();
     pGameSettings->ResetCoronaReflectionsEnabled();
+    CVARS_GET("dynamic_ped_shadows", bVal);
+    pGameSettings->SetDynamicPedShadowsEnabled(bVal);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);

@@ -346,7 +346,6 @@ private:
     static unsigned long HOOKPOS_CHud_Draw_Caller;
     static unsigned long HOOKPOS_CRunningScript_Process;
     static unsigned long HOOKPOS_CExplosion_AddExplosion;
-    static unsigned long HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow;
     static unsigned long HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
     static unsigned long HOOKPOS_Trailer_BreakTowLink;
     static unsigned long HOOKPOS_CRadar__DrawRadarGangOverlay;
