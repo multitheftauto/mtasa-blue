@@ -43,6 +43,7 @@ workspace "MTASA"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
+	symbolspath "$(SolutionDir)Symbols\\$(Configuration)_$(Platform)\\$(ProjectName).pdb"
 
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
@@ -95,10 +96,6 @@ workspace "MTASA"
 		filter { "system:linux" }
 			linkoptions { "-s" }
 	end
-
-	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
-		os.mkdir("Build/Symbols")
-		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 
 	filter "system:windows"
 		toolset "v143"
