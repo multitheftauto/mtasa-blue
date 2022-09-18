@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-16 23:24+0000\n"
-"PO-Revision-Date: 2022-09-16 23:33\n"
+"PO-Revision-Date: 2022-09-18 07:32\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -947,7 +947,7 @@ msgstr "Bu dosyaları *.dll'den *.dll.bak'a yeniden adlandırın"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr "Bana bu dosyaları göster"
+msgstr "Dosyaları görüntüle"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
