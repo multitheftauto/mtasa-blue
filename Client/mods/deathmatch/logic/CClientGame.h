@@ -256,6 +256,8 @@ public:
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
 
+    bool IsWindowFocused() const { return m_bFocused; }
+
     // Accessors
 
     CVoiceRecorder*               GetVoiceRecorder() { return m_pVoiceRecorder; };
@@ -438,6 +440,8 @@ public:
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
     void RestreamWorld();
+
+    void OnWindowFocusChange(bool state);
 
 private:
     // CGUI Callbacks
@@ -773,6 +777,7 @@ private:
     bool m_bBeingDeleted;            // To enable speedy disconnect
 
     bool m_bWasMinimized;
+    bool m_bFocused;
 
     // Cache for speeding up collision processing
 public:
