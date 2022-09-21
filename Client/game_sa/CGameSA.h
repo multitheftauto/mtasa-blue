@@ -139,11 +139,6 @@ public:
         DEBUG_TRACE("CRadar     * GetRadar()");
         return m_pRadar;
     };
-    CRestart* GetRestart()
-    {
-        DEBUG_TRACE("CRestart    * GetRestart()");
-        return m_pRestart;
-    };
     CClock* GetClock()
     {
         DEBUG_TRACE("CClock     * GetClock()");
@@ -454,7 +449,6 @@ private:
     CPlayerInfo*                    m_pPlayerInfo;
     CProjectileInfo*                m_pProjectileInfo;
     CRadar*                         m_pRadar;
-    CRestart*                       m_pRestart;
     CClock*                         m_pClock;
     CCoronas*                       m_pCoronas;
     CCheckpoints*                   m_pCheckpoints;

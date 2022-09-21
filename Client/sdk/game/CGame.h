@@ -63,7 +63,6 @@ typedef void(InRenderer)();
 #include "CProjectileInfo.h"
 #include "CRadar.h"
 #include "CRenderWare.h"
-#include "CRestart.h"
 #include "CRopes.h"
 #include "CSettings.h"
 #include "CStats.h"
@@ -124,7 +123,6 @@ public:
     virtual CPlayerInfo*              GetPlayerInfo() = 0;
     virtual CProjectileInfo*          GetProjectileInfo() = 0;
     virtual CRadar*                   GetRadar() = 0;
-    virtual CRestart*                 GetRestart() = 0;
     virtual CClock*                   GetClock() = 0;
     virtual CCheckpoints*             GetCheckpoints() = 0;
     virtual CCoronas*                 GetCoronas() = 0;

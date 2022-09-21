@@ -105,7 +105,6 @@
 #include "CCivilianPedSA.h"
 #include "CObjectSA.h"
 #include "CBuildingSA.h"
-#include "CRestartSA.h"
 #include "CWaterManagerSA.h"
 #include "CPedDamageResponseSA.h"
 #include "CPedDamageResponseCalculatorSA.h"
