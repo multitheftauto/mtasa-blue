@@ -333,24 +333,7 @@ public:
     VOID         StartGame();
     VOID         SetSystemState(eSystemState State);
     eSystemState GetSystemState();
-    BOOL         IsNastyGame()
-    {
-        DEBUG_TRACE("BOOL     IsNastyGame (  )");
-        return *VAR_IsNastyGame;
-    };
-    VOID SetNastyGame(BOOL IsNasty)
-    {
-        DEBUG_TRACE("VOID     SetNastyGame ( BOOL IsNasty )");
-        *VAR_IsNastyGame = IsNasty ? true : false;
-    };
     VOID   Pause(bool bPaused);
-    bool   IsPaused();
-    bool   IsInForeground();
-    VOID   DisableRenderer(bool bDisabled);
-    VOID   TakeScreenshot(char* szFileName);
-    DWORD* GetMemoryValue(DWORD dwOffset);
-
-    VOID SetRenderHook(InRenderer* pInRenderer);
 
     void Initialize();
     void Reset();

@@ -14,8 +14,6 @@
 // use this to check if you're using SA or VC headers
 #define GTA_SA
 
-typedef void(InRenderer)();
-
 #include "Common.h"
 
 #include "C3DMarkers.h"
@@ -173,12 +171,6 @@ public:
     virtual VOID         SetSystemState(eSystemState State) = 0;
     virtual eSystemState GetSystemState() = 0;
     virtual VOID         Pause(bool bPaused) = 0;
-    virtual bool         IsPaused() = 0;
-    virtual bool         IsInForeground() = 0;
-    virtual VOID         DisableRenderer(bool bDisabled) = 0;
-    virtual VOID         SetRenderHook(InRenderer* pInRenderer) = 0;
-    virtual VOID         TakeScreenshot(char* szFileName) = 0;
-    virtual DWORD*       GetMemoryValue(DWORD dwOffset) = 0;
     virtual void         SetTimeScale(float fTimeScale) = 0;
     virtual float        GetFPS() = 0;
     virtual float        GetTimeStep() = 0;

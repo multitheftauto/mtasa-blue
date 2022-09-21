@@ -305,17 +305,6 @@ VOID CGameSA::Pause(bool bPaused)
 {
     *VAR_GamePaused = bPaused;
 }
-
-bool CGameSA::IsPaused()
-{
-    return *VAR_GamePaused;
-}
-
-bool CGameSA::IsInForeground()
-{
-    return *VAR_IsForegroundWindow;
-}
-
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
     DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
@@ -406,56 +395,6 @@ void CGameSA::SetGameSpeed(float fSpeed)
     MemPutFast<float>(0xB7CB64, fSpeed);
 }
 
-// this prevents some crashes (respawning mainly)
-VOID CGameSA::DisableRenderer(bool bDisabled)
-{
-    // ENABLED:
-    // 0053DF40   D915 2C13C800    FST DWORD PTR DS:[C8132C]
-    // DISABLED:
-    // 0053DF40   C3               RETN
-
-    if (bDisabled)
-    {
-        MemPut<BYTE>(0x53DF40, 0xC3);
-    }
-    else
-    {
-        MemPut<BYTE>(0x53DF40, 0xD9);
-    }
-}
-
-VOID CGameSA::SetRenderHook(InRenderer* pInRenderer)
-{
-    if (pInRenderer)
-        HookInstall((DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6);
-    else
-    {
-        MemPut<BYTE>(FUNC_CDebug_DebugDisplayTextBuffer, 0xC3);
-    }
-}
-
-VOID CGameSA::TakeScreenshot(char* szFileName)
-{
-    DWORD dwFunc = FUNC_JPegCompressScreenToFile;
-    _asm
-    {
-        mov     eax, CLASS_RwCamera
-        mov     eax, [eax]
-        push    szFileName
-        push    eax
-        call    dwFunc
-        add     esp,8
-    }
-}
-
-DWORD* CGameSA::GetMemoryValue(DWORD dwOffset)
-{
-    if (dwOffset <= MAX_MEMORY_OFFSET_1_0)
-        return (DWORD*)dwOffset;
-    else
-        return NULL;
-}
-
 void CGameSA::Reset()
 {
     // Things to do if the game was loaded
@@ -471,8 +410,6 @@ void CGameSA::Reset()
 
         Pause(false);            // We don't have to pause as the fadeout will stop the sound. Pausing it will make the fadein next start ugly
         m_pHud->Disable(false);
-
-        DisableRenderer(false);
 
         // Restore the HUD
         m_pHud->Disable(false);
