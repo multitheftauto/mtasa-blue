@@ -62,14 +62,9 @@ public:
     void RemoveReferencesToDeletedObject(CEntitySAInterface* entity);
     bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity, const SLineOfSightFlags flags,
                             SLineOfSightBuildingResult* pBuildingResult);
-    bool TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision);
-    // bool      ProcessLineOfSight        ( CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity );
     void  IgnoreEntity(CEntity* entity);
-    BYTE  GetLevelFromPosition(CVector* vecPosition);
-    float FindGroundZForPosition(float fX, float fY);
     float FindGroundZFor3DPosition(CVector* vecPosition);
     float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult);
-    void  LoadMapAroundPoint(CVector* vecPosition, float fRadius);
     bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags);
     bool  HasCollisionBeenLoaded(CVector* vecPosition);
     DWORD GetCurrentArea();

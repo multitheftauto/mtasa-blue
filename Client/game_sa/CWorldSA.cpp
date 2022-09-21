@@ -225,35 +225,6 @@ void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
     }
 }
 
-// THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED
-bool CWorldSA::TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision)
-{
-    // Create a CColLine for us
-    DWORD dwFunc = FUNC_CColLine_Constructor;
-    DWORD dwCColLine[10];            // I don't know how big CColLine is, so we'll just be safe
-    _asm
-    {
-        lea     ecx, dwCColLine
-        push    vecEnd
-        push    vecStart
-        call    dwFunc
-    }
-
-    // Now, lets make a CColSphere
-    BYTE byteColSphere[18];            // looks like its 18 bytes { vecPos, fSize, byteUnk, byteUnk, byteUnk }
-    dwFunc = FUNC_CColSphere_Set;
-    _asm
-    {
-        lea     ecx, byteColSphere
-        push    255
-        push    0
-        push    0
-        push    vecSphereCenter
-        push    fSphereRadius
-        call    dwFunc
-    }
-}
-
 void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, float& fY, float& fZ)
 {
     // Convert the given matrix to a padded matrix
@@ -398,38 +369,6 @@ void CWorldSA::IgnoreEntity(CEntity* pEntity)
         MemPutFast<DWORD>(VAR_IgnoredEntity, 0);
 }
 
-// technically this is in CTheZones
-BYTE CWorldSA::GetLevelFromPosition(CVector* vecPosition)
-{
-    DEBUG_TRACE("BYTE CWorldSA::GetLevelFromPosition(CVector * vecPosition)");
-    DWORD dwFunc = FUNC_GetLevelFromPosition;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunc
-        mov     bReturn, al
-        pop     eax
-    }
-    return bReturn;
-}
-
-float CWorldSA::FindGroundZForPosition(float fX, float fY)
-{
-    DEBUG_TRACE("FLOAT CWorldSA::FindGroundZForPosition(FLOAT fX, FLOAT fY)");
-    DWORD dwFunc = FUNC_FindGroundZFor3DCoord;
-    FLOAT fReturn = 0;
-    _asm
-    {
-        push    fY
-        push    fX
-        call    dwFunc
-        fstp    fReturn
-        add     esp, 8
-    }
-    return fReturn;
-}
-
 float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("FLOAT CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)");
@@ -458,40 +397,6 @@ float CWorldSA::FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult)
 
     auto CWorld_FindRoofZFor3DCoord = (float(__cdecl*)(float, float, float, bool*))0x569750;
     return CWorld_FindRoofZFor3DCoord(pvecPosition->fX, pvecPosition->fY, pvecPosition->fZ, pbOutResult);
-}
-
-void CWorldSA::LoadMapAroundPoint(CVector* vecPosition, FLOAT fRadius)
-{
-    DEBUG_TRACE("VOID CWorldSA::LoadMapAroundPoint(CVector * vecPosition, FLOAT fRadius)");
-    DWORD dwFunc = FUNC_CTimer_Stop;
-    _asm
-    {
-        call    dwFunc
-    }
-
-    dwFunc = FUNC_CRenderer_RequestObjectsInDirection;
-    _asm
-    {
-        push    32
-        push    fRadius
-        push    vecPosition
-        call    dwFunc
-        add     esp, 12
-    }
-
-    dwFunc = FUNC_CStreaming_LoadScene;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunc
-        add     esp, 4
-    }
-
-    dwFunc = FUNC_CTimer_Update;
-    _asm
-    {
-        call    dwFunc
-    }
 }
 
 bool CWorldSA::IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags)
