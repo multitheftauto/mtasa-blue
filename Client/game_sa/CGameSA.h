@@ -240,11 +240,6 @@ public:
         DEBUG_TRACE("CStats                   * GetStats()");
         return m_pStats;
     };
-    CFont* GetFont()
-    {
-        DEBUG_TRACE("CFont                    * GetFont()");
-        return m_pFont;
-    };
     CPathFind* GetPathFind()
     {
         DEBUG_TRACE("CPathFind                * GetPathFind()");
@@ -488,7 +483,6 @@ private:
     CAudioContainer*          m_pAudioContainer;
     CMenuManager*             m_pMenuManager;
     CStats*                   m_pStats;
-    CFont*                    m_pFont;
     CPathFind*                m_pPathFind;
     CPopulation*              m_pPopulation;
     CTaskManagementSystem*    m_pTaskManagementSystem;            // not used outside the game_sa

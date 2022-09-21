@@ -103,7 +103,6 @@ CGameSA::CGameSA()
     this->m_pWeather = new CWeatherSA();
     this->m_pMenuManager = new CMenuManagerSA();
     this->m_pStats = new CStatsSA();
-    this->m_pFont = new CFontSA();
     this->m_pPathFind = new CPathFindSA();
     this->m_pPopulation = new CPopulationSA();
     this->m_pTaskManagementSystem = new CTaskManagementSystemSA();
@@ -244,7 +243,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
     delete reinterpret_cast<CPopulationSA*>(m_pPopulation);
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
-    delete reinterpret_cast<CFontSA*>(m_pFont);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
     delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);

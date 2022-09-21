@@ -40,7 +40,6 @@ typedef void(InRenderer)();
 #include "CEventList.h"
 #include "CExplosionManager.h"
 #include "CFireManager.h"
-#include "CFont.h"
 #include "CFx.h"
 #include "CFxSystem.h"
 #include "CFxManager.h"
@@ -145,7 +144,6 @@ public:
     virtual CMenuManager*             GetMenuManager() = 0;
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
-    virtual CFont*                    GetFont() = 0;
     virtual CPathFind*                GetPathFind() = 0;
     virtual CPopulation*              GetPopulation() = 0;
     virtual CGameSettings*            GetSettings() = 0;
