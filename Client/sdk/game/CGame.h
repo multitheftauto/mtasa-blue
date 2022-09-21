@@ -70,7 +70,6 @@ typedef void(InRenderer)();
 #include "CStreaming.h"
 #include "CTaskManagementSystem.h"
 #include "CTasks.h"
-#include "CTheCarGenerators.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
 #include "CWeaponStatManager.h"

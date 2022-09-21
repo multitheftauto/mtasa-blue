@@ -51,7 +51,6 @@
 #include "CHudSA.h"
 #include "C3DMarkersSA.h"
 #include "CStatsSA.h"
-#include "CTheCarGeneratorsSA.h"
 #include "CPadSA.h"
 #include "CAERadioTrackManagerSA.h"
 #include "CWeatherSA.h"

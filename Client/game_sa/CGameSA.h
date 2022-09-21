@@ -214,11 +214,6 @@ public:
         DEBUG_TRACE("CPad     * GetPad()");
         return m_pPad;
     };
-    CTheCarGenerators* GetTheCarGenerators()
-    {
-        DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");
-        return m_pTheCarGenerators;
-    };
     CAERadioTrackManager* GetAERadioTrackManager()
     {
         DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");
@@ -492,7 +487,6 @@ private:
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
 
     CPad*                     m_pPad;
-    CTheCarGenerators*        m_pTheCarGenerators;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
     CAudioEngine*             m_pAudioEngine;
     CAEAudioHardware*         m_pAEAudioHardware;

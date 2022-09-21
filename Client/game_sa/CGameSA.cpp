@@ -99,7 +99,6 @@ CGameSA::CGameSA()
     this->m_pFireManager = new CFireManagerSA();
     this->m_p3DMarkers = new C3DMarkersSA();
     this->m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
-    this->m_pTheCarGenerators = new CTheCarGeneratorsSA();
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
     this->m_pMenuManager = new CMenuManagerSA();
@@ -250,7 +249,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
-    delete reinterpret_cast<CTheCarGeneratorsSA*>(m_pTheCarGenerators);
     delete reinterpret_cast<CPadSA*>(m_pPad);
     delete reinterpret_cast<C3DMarkersSA*>(m_p3DMarkers);
     delete reinterpret_cast<CFireManagerSA*>(m_pFireManager);
