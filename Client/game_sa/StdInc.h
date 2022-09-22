@@ -36,7 +36,6 @@
 #include "CPoolsSA.h"
 #include "CClockSA.h"
 #include "CRadarSA.h"
-#include "CMenuManagerSA.h"
 #include "CCameraSA.h"
 #include "CCheckpointsSA.h"
 #include "CRenderWareSA.h"

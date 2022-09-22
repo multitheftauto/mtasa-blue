@@ -101,7 +101,6 @@ CGameSA::CGameSA()
     this->m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
-    this->m_pMenuManager = new CMenuManagerSA();
     this->m_pStats = new CStatsSA();
     this->m_pPathFind = new CPathFindSA();
     this->m_pPopulation = new CPopulationSA();
@@ -244,7 +243,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPopulationSA*>(m_pPopulation);
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
-    delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
     delete reinterpret_cast<CPadSA*>(m_pPad);

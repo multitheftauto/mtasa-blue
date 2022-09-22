@@ -230,11 +230,6 @@ public:
         DEBUG_TRACE("CAudio     * GetAudioContainer()");
         return m_pAudioContainer;
     };
-    CMenuManager* GetMenuManager()
-    {
-        DEBUG_TRACE("CMenuManager         * GetMenuManager()");
-        return m_pMenuManager;
-    };
     CStats* GetStats()
     {
         DEBUG_TRACE("CStats                   * GetStats()");
@@ -464,7 +459,6 @@ private:
     CAEAudioHardware*         m_pAEAudioHardware;
     CAESoundManager*          m_pAESoundManager;
     CAudioContainer*          m_pAudioContainer;
-    CMenuManager*             m_pMenuManager;
     CStats*                   m_pStats;
     CPathFind*                m_pPathFind;
     CPopulation*              m_pPopulation;

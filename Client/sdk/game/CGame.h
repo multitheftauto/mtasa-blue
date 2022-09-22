@@ -45,7 +45,6 @@
 #include "CHandlingManager.h"
 #include "CHud.h"
 #include "CKeyGen.h"
-#include "CMenuManager.h"
 #include "CModelInfo.h"
 #include "CPad.h"
 #include "CPathFind.h"
@@ -139,7 +138,6 @@ public:
     virtual CAEAudioHardware*         GetAEAudioHardware() = 0;
     virtual CAESoundManager*          GetAESoundManager() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
-    virtual CMenuManager*             GetMenuManager() = 0;
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
     virtual CPathFind*                GetPathFind() = 0;
