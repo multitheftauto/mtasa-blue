@@ -59,11 +59,7 @@ public:
     CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped);
     ~CPedIntelligenceSA();
     CPedIntelligenceSAInterface*  GetInterface() { return this->internalInterface; }
-    bool                          IsRespondingToEvent();
-    int                           GetCurrentEventType();
-    CEvent*                       GetCurrentEvent();
     CTaskManager*                 GetTaskManager();
     bool                          TestForStealthKill(CPed* pPed, bool bUnk);
-    CTaskSimpleUseGunSAInterface* GetTaskUseGun();
     CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);
 };

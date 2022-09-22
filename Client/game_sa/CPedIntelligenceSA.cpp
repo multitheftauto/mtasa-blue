@@ -30,33 +30,6 @@ CTaskManager* CPedIntelligenceSA::GetTaskManager()
     return this->TaskManager;
 }
 
-
-bool CPedIntelligenceSA::IsRespondingToEvent()
-{
-    DWORD dwFunc = FUNC_IsRespondingToEvent;
-
-    return false;
-}
-
-int CPedIntelligenceSA::GetCurrentEventType()
-{
-    DWORD dwFunc = FUNC_GetCurrentEventType;
-    DWORD dwRet = 0;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwRet, eax
-    }
-    return dwRet;
-}
-
-CEvent* CPedIntelligenceSA::GetCurrentEvent()
-{
-    return NULL;
-}
-
 bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
 {
     bool  bReturn;
@@ -72,21 +45,6 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
         mov     bReturn, al
     }
     return bReturn;
-}
-
-CTaskSimpleUseGunSAInterface* CPedIntelligenceSA::GetTaskUseGun()
-{
-    CTaskSimpleUseGunSAInterface* pTaskUseGun;
-    DWORD                         dwThis = (DWORD)internalInterface;
-    DWORD                         dwFunc = FUNC_CPedIntelligence_GetTaskUseGun;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     pTaskUseGun, eax
-    }
-
-    return pTaskUseGun;
 }
 
 CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
