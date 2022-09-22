@@ -20,7 +20,6 @@
 
 namespace SharedUtil
 {
-
     struct KeyPair
     {
         SString publicKey, privateKey;

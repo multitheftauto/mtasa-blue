@@ -38,13 +38,14 @@ static char* GetFrameNodeName(RwFrame* frame)
 
 // Originally there was a possibility for this function to cause buffer overflow
 // It should be fixed here.
-template<size_t OutBuffSize>
-void GetNameAndDamage(const char* nodeName, char(&outName)[OutBuffSize], bool& outDamage) {
+template <size_t OutBuffSize>
+void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& outDamage)
+{
     const auto nodeNameLen = strlen(nodeName);
 
     const auto NodeNameEndsWith = [=](const char* with) {
         const auto withLen = strlen(with);
-        dassert(withLen <= nodeNameLen);
+        //dassert(withLen <= nodeNameLen);
         return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
                && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
     };
@@ -53,7 +54,8 @@ void GetNameAndDamage(const char* nodeName, char(&outName)[OutBuffSize], bool& o
     // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
     const auto TerminatedCopy = [&](size_t off) {
         dassert(nodeNameLen - off < OutBuffSize);
-        strncpy_s(outName, nodeName, std::min(nodeNameLen - off, OutBuffSize - 1)); // By providing `OutBuffSize - 1` it is ensured the array will be null terminated
+        strncpy_s(outName, nodeName,
+                  std::min(nodeNameLen - off, OutBuffSize - 1));            // By providing `OutBuffSize - 1` it is ensured the array will be null terminated
     };
 
     if (NodeNameEndsWith("_dam"))
@@ -64,9 +66,12 @@ void GetNameAndDamage(const char* nodeName, char(&outName)[OutBuffSize], bool& o
     else
     {
         outDamage = false;
-        if (NodeNameEndsWith("_l0") || NodeNameEndsWith("_L0")) {
+        if (NodeNameEndsWith("_l0") || NodeNameEndsWith("_L0"))
+        {
             TerminatedCopy(sizeof("_l0") - 1);
-        } else {
+        }
+        else
+        {
             dassert(nodeNameLen < OutBuffSize);
             strncpy_s(outName, OutBuffSize, nodeName, OutBuffSize - 1);
         }

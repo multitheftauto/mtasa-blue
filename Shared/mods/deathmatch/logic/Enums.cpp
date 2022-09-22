@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "Enums.h"
 
 IMPLEMENT_ENUM_BEGIN(EEventPriority::EEventPriorityType)
 ADD_ENUM(EEventPriority::LOW, "low")

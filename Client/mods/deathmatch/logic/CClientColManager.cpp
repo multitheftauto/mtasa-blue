@@ -174,7 +174,7 @@ void CClientColManager::HandleHitDetectionResult(bool bHit, CClientColShape* pSh
             pEntity->RemoveCollision(pShape);
 
             // Can we call the event?
-            if(!pEntity->IsBeingDeleted())
+            if (!pEntity->IsBeingDeleted())
             {
                 // Call the event
                 CLuaArguments Arguments;

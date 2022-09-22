@@ -288,6 +288,11 @@ DWORD       RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
 const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
+#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio    0x4D7198
+#define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio     0x4D71E7
+
+#define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles 0x6A6FF0
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -375,6 +380,7 @@ ObjectDamageHandler*                       m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*                        m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler*                m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*                   m_pDrivebyAnimationHandler = NULL;
+AudioZoneRadioSwitchHandler*               m_pAudioZoneRadioSwitchHandler = NULL;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -525,6 +531,11 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
+
+void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio();
+void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
+
+void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -754,6 +765,13 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
+
+    HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
+                (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
+    HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio,
+                (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
+
+    HookInstall(HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles, (DWORD)HOOK_CAutomobile__dmgDrawCarCollidingParticles, 0x91);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1520,6 +1538,16 @@ void CMultiplayerSA::InitHooks()
     for (auto uiAddr : shadowAddr)
         MemPut(uiAddr, &m_fShadowsOffset);
 
+    // Fix corona rain reflections aren't rendering (#2345)
+    // By using zBufferFar instead of zBufferNear for corona position
+    MemPut<BYTE>(0x6FB9A0, 0x1C);
+
+    // Skip check for disabled HUD
+    MemSet((void*)0x58FBC4, 0x90, 9);
+
+    // Show muzzle flash for last bullet in magazine
+    MemSet((void*)0x61ECD2, 0x90, 20);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -1532,6 +1560,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleWeapons();
 
     InitHooks_Streaming();
+    InitHooks_FrameRateFixes();
+    InitHooks_ObjectStreamerOptimization();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -2322,6 +2352,11 @@ void CMultiplayerSA::SetFxSystemDestructionHandler(FxSystemDestructionHandler* p
 void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler)
 {
     m_pDrivebyAnimationHandler = pHandler;
+}
+
+void CMultiplayerSA::SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler)
+{
+    m_pAudioZoneRadioSwitchHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -5321,9 +5356,10 @@ watercheck:
         add esp, 8
 
 rendercheck:
-        xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
-        cmp eax, [esp+0x88+8]
-        jnz fail
+        // NOTE: Causes some foliage not generating in certain places when uncommented (see also: PR #2679)
+        // xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
+        // cmp eax, [esp+0x88+8]
+        // jnz fail
 
         mov ax, [esi-0x10]
         mov edx, edi
@@ -6925,5 +6961,88 @@ void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
        call CWorld_ProcessPedsAfterPreRender
        call PostCWorld_ProcessPedsAfterPreRender
        jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
+    }
+}
+
+DWORD dwLastRequestedStation = -1;
+void  CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_ChangeStation(DWORD dwStationID)
+{
+    if (dwLastRequestedStation != dwStationID)
+    {
+        if (m_pAudioZoneRadioSwitchHandler)
+        {
+            m_pAudioZoneRadioSwitchHandler(dwStationID);
+        }
+    }
+    dwLastRequestedStation = dwStationID;
+}
+
+// Start radio after entering audio zone
+void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio()
+{
+    _asm
+    {
+        push    [esi+3]
+        call    CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_ChangeStation
+        add     esp, 4
+        pop     edi
+        pop     esi
+        pop     ebp
+        pop     ebx
+        add     esp, 36
+        retn
+    }
+}
+
+// Stop radio after leaving audio zone
+void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio()
+{
+    _asm
+    {
+        push    0
+        call    CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_ChangeStation
+        add     esp, 4
+        pop     edi
+        pop     esi
+        pop     ebp
+        pop     ebx
+        add     esp, 36
+        retn
+    }
+}
+
+static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, CVector& vecPosition, int count)
+{
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    if (pVehicle) {
+        SColor colors[4];
+        pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
+
+        RwColor color = {
+            colors[0].R * pVehicleInterface->m_fLighting,
+            colors[0].G * pVehicleInterface->m_fLighting,
+            colors[0].B * pVehicleInterface->m_fLighting,
+            0xFF
+        };
+
+        // Fx_c::AddDebris
+        ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);
+    }
+}
+
+const DWORD RETURN_CAutomobile__dmgDrawCarCollidingParticles = 0x6A7081;
+void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
+{
+    _asm
+    {
+        lea eax, [esp + 0x1C]
+        push ebp                // count
+        push eax                // pos
+        push edi                // vehicle
+        call AddVehicleColoredDebris
+        add esp, 12
+
+        jmp RETURN_CAutomobile__dmgDrawCarCollidingParticles
     }
 }

@@ -78,6 +78,8 @@ public:
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
+    void                InitHooks_FrameRateFixes();
+    void                InitHooks_ObjectStreamerOptimization();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -141,6 +143,7 @@ public:
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
     void SetPedStepHandler(PedStepHandler* pHandler);
     void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
+    void SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler);
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
@@ -293,6 +296,10 @@ public:
     eAnimGroup GetLastStaticAnimationGroupID() { return m_dwLastStaticAnimGroupID; }
     eAnimID    GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
     DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
+
+    unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
+    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
+    unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;

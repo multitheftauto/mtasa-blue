@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CZoneNames.h"
 
 static const char* const szUnknownZone = "Unknown";
 
