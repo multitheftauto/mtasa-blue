@@ -251,7 +251,6 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
 
         // Clear raw script from memory
         std::fill(strUTFScript.begin(), strUTFScript.end(), 0);
-        std::fill_n(const_cast<char*>(cpBuffer), uiSize, 0);
 
         if (loadFailed)
         {
