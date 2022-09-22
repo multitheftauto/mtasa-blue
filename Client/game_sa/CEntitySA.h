@@ -237,7 +237,6 @@ class CEntitySA : public virtual CEntity
 public:
     CEntitySAInterface* m_pInterface;
 
-    DWORD internalID;
     //  VOID                        SetModelAlpha ( int iAlpha );
 
     CEntitySA();
