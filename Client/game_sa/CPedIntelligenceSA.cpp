@@ -17,8 +17,6 @@ CPedIntelligenceSA::CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntellige
     this->ped = ped;
     CTaskManagerSAInterface* pTaskManagerInterface = (CTaskManagerSAInterface*)&(pedIntelligenceSAInterface->taskManager);
     this->TaskManager = new CTaskManagerSA(pTaskManagerInterface, this->ped);
-    CVehicleScannerSAInterface* pVehicleScannerInterface = (CVehicleScannerSAInterface*)&(pedIntelligenceSAInterface->vehicleScanner);
-    this->VehicleScanner = new CVehicleScannerSA(pVehicleScannerInterface);
 }
 
 CPedIntelligenceSA::~CPedIntelligenceSA()
@@ -32,10 +30,6 @@ CTaskManager* CPedIntelligenceSA::GetTaskManager()
     return this->TaskManager;
 }
 
-CVehicleScanner* CPedIntelligenceSA::GetVehicleScanner()
-{
-    return this->VehicleScanner;
-}
 
 bool CPedIntelligenceSA::IsRespondingToEvent()
 {

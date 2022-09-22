@@ -14,11 +14,9 @@
 #include <game/CPedIntelligence.h>
 #include "CEventSA.h"
 class CTaskManagerSA;
-class CVehicleScannerSA;
 class CTaskSimpleUseGunSAInterface;
 
 #include "CTaskManagerSA.h"
-#include "CVehicleScannerSA.h"
 
 #define FUNC_IsRespondingToEvent                    0x600DB0
 #define FUNC_GetCurrentEvent                        0x4ABE70
@@ -56,7 +54,6 @@ private:
     CPedIntelligenceSAInterface* internalInterface;
     CPed*                        ped;
     CTaskManagerSA*              TaskManager;
-    CVehicleScannerSA*           VehicleScanner;
 
 public:
     CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped);
@@ -66,7 +63,6 @@ public:
     int                           GetCurrentEventType();
     CEvent*                       GetCurrentEvent();
     CTaskManager*                 GetTaskManager();
-    CVehicleScanner*              GetVehicleScanner();
     bool                          TestForStealthKill(CPed* pPed, bool bUnk);
     CTaskSimpleUseGunSAInterface* GetTaskUseGun();
     CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);
