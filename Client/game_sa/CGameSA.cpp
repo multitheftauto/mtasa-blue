@@ -96,7 +96,6 @@ CGameSA::CGameSA()
     this->m_pWeather = new CWeatherSA();
     this->m_pStats = new CStatsSA();
     this->m_pPathFind = new CPathFindSA();
-    this->m_pPopulation = new CPopulationSA();
     this->m_pTaskManagementSystem = new CTaskManagementSystemSA();
     this->m_pSettings = new CSettingsSA();
     this->m_pCarEnterExit = new CCarEnterExitSA();
@@ -233,7 +232,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CTasksSA*>(m_pTasks);
     delete reinterpret_cast<CTaskManagementSystemSA*>(m_pTaskManagementSystem);
     delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
-    delete reinterpret_cast<CPopulationSA*>(m_pPopulation);
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);

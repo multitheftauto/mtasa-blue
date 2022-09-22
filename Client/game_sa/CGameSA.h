@@ -241,11 +241,6 @@ public:
         DEBUG_TRACE("CPathFind                * GetPathFind()");
         return m_pPathFind;
     };
-    CPopulation* GetPopulation()
-    {
-        DEBUG_TRACE("CPopulation              * GetPopulation()");
-        return m_pPopulation;
-    };
     CTaskManagementSystemSA* GetTaskManagementSystem()
     {
         DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");
@@ -454,7 +449,6 @@ private:
     CAudioContainer*          m_pAudioContainer;
     CStats*                   m_pStats;
     CPathFind*                m_pPathFind;
-    CPopulation*              m_pPopulation;
     CTaskManagementSystemSA*  m_pTaskManagementSystem;            // not used outside the game_sa
     CTasks*                   m_pTasks;
     CGameSettings*            m_pSettings;

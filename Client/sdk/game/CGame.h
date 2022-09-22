@@ -54,7 +54,6 @@
 #include "CPlayerInfo.h"
 #include "CPointLights.h"
 #include "CPools.h"
-#include "CPopulation.h"
 #include "CProjectile.h"
 #include "CProjectileInfo.h"
 #include "CRadar.h"
@@ -140,7 +139,6 @@ public:
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
     virtual CPathFind*                GetPathFind() = 0;
-    virtual CPopulation*              GetPopulation() = 0;
     virtual CGameSettings*            GetSettings() = 0;
     virtual CCarEnterExit*            GetCarEnterExit() = 0;
     virtual CControllerConfigManager* GetControllerConfigManager() = 0;
