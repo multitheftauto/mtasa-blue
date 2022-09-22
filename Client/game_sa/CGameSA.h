@@ -139,11 +139,6 @@ public:
         DEBUG_TRACE("CRadar     * GetRadar()");
         return m_pRadar;
     };
-    CRestart* GetRestart()
-    {
-        DEBUG_TRACE("CRestart    * GetRestart()");
-        return m_pRestart;
-    };
     CClock* GetClock()
     {
         DEBUG_TRACE("CClock     * GetClock()");
@@ -214,11 +209,6 @@ public:
         DEBUG_TRACE("CPad     * GetPad()");
         return m_pPad;
     };
-    CTheCarGenerators* GetTheCarGenerators()
-    {
-        DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");
-        return m_pTheCarGenerators;
-    };
     CAERadioTrackManager* GetAERadioTrackManager()
     {
         DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");
@@ -249,11 +239,6 @@ public:
     {
         DEBUG_TRACE("CStats                   * GetStats()");
         return m_pStats;
-    };
-    CFont* GetFont()
-    {
-        DEBUG_TRACE("CFont                    * GetFont()");
-        return m_pFont;
     };
     CPathFind* GetPathFind()
     {
@@ -348,24 +333,7 @@ public:
     VOID         StartGame();
     VOID         SetSystemState(eSystemState State);
     eSystemState GetSystemState();
-    BOOL         IsNastyGame()
-    {
-        DEBUG_TRACE("BOOL     IsNastyGame (  )");
-        return *VAR_IsNastyGame;
-    };
-    VOID SetNastyGame(BOOL IsNasty)
-    {
-        DEBUG_TRACE("VOID     SetNastyGame ( BOOL IsNasty )");
-        *VAR_IsNastyGame = IsNasty ? true : false;
-    };
     VOID   Pause(bool bPaused);
-    bool   IsPaused();
-    bool   IsInForeground();
-    VOID   DisableRenderer(bool bDisabled);
-    VOID   TakeScreenshot(char* szFileName);
-    DWORD* GetMemoryValue(DWORD dwOffset);
-
-    VOID SetRenderHook(InRenderer* pInRenderer);
 
     void Initialize();
     void Reset();
@@ -459,7 +427,6 @@ private:
     CPlayerInfo*                    m_pPlayerInfo;
     CProjectileInfo*                m_pProjectileInfo;
     CRadar*                         m_pRadar;
-    CRestart*                       m_pRestart;
     CClock*                         m_pClock;
     CCoronas*                       m_pCoronas;
     CCheckpoints*                   m_pCheckpoints;
@@ -492,7 +459,6 @@ private:
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
 
     CPad*                     m_pPad;
-    CTheCarGenerators*        m_pTheCarGenerators;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
     CAudioEngine*             m_pAudioEngine;
     CAEAudioHardware*         m_pAEAudioHardware;
@@ -500,7 +466,6 @@ private:
     CAudioContainer*          m_pAudioContainer;
     CMenuManager*             m_pMenuManager;
     CStats*                   m_pStats;
-    CFont*                    m_pFont;
     CPathFind*                m_pPathFind;
     CPopulation*              m_pPopulation;
     CTaskManagementSystem*    m_pTaskManagementSystem;            // not used outside the game_sa

@@ -291,10 +291,6 @@ public:
     char                                pAnimBlock[4];
 };
 
-/**
- * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
- */
-
 class CModelInfoSA : public CModelInfo
 {
 protected:
@@ -348,7 +344,6 @@ public:
     BYTE           GetVehicleType();
     VOID           Request(EModelRequestType requestType, const char* szTag);
     VOID           Remove();
-    BYTE           GetLevelFromPosition(CVector* vecPosition);
     BOOL           IsLoaded();
     BOOL           DoIsLoaded();
     BYTE           GetFlags();

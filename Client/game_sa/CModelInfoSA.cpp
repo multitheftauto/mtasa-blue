@@ -435,21 +435,6 @@ VOID CModelInfoSA::Remove()
     }
 }
 
-BYTE CModelInfoSA::GetLevelFromPosition(CVector* vecPosition)
-{
-    DEBUG_TRACE("BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )");
-    DWORD dwFunction = FUNC_GetLevelFromPosition;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunction
-        add     esp, 4
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
 BOOL CModelInfoSA::IsLoaded()
 {
     if (DoIsLoaded())
