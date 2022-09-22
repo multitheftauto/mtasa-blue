@@ -58,13 +58,8 @@ void COffsets::Initialize11()
     CWeatherSA::VAR_CurrentWeather = (unsigned char*)0xC81318;
     CWeatherSA::VAR_CurrentWeather_b = (unsigned char*)0xC81320;
     CWeatherSA::VAR_CurrentWeather_c = (unsigned char*)0xC8131C;
-    CWeatherSA::VAR_AmountOfRain = (float*)0x0C81324;
+    CWeatherSA::VAR_AmountOfRain = (float*)0xC81324;
     CWeatherSA::FUNC_IsRaining = 0x4ABF50;
-}
-
-void COffsets::Initialize20()
-{
-    // TODO
 }
 
 void COffsets::InitializeCommon10()
@@ -82,7 +77,7 @@ void COffsets::InitializeCommon10()
     CWeatherSA::VAR_CurrentWeather = (unsigned char*)0xC81318;
     CWeatherSA::VAR_CurrentWeather_b = (unsigned char*)0xC81320;
     CWeatherSA::VAR_CurrentWeather_c = (unsigned char*)0xC8131C;
-    CWeatherSA::VAR_AmountOfRain = (float*)0x0C81324;
+    CWeatherSA::VAR_AmountOfRain = (float*)0xC81324;
     CWeatherSA::FUNC_IsRaining = 0x4ABF50;
 
     CSettingsSA::FUNC_SetCurrentVideoMode = 0x745C70;            // may not be common?
