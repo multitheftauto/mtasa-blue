@@ -174,6 +174,8 @@ void CLatentTransferManager::AddSendBatchEnd()
 #ifndef MTA_CLIENT
     markerLatentEvent.SetAndStoreString(SString("BatchEnd (%d sends)", m_uiNumSends));
 #endif
+
+    m_pBatchBufferRef.reset();
 }
 
 ///////////////////////////////////////////////////////////////

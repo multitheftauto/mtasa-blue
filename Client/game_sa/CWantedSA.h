@@ -92,9 +92,7 @@ public:
     void                SetDontDelete(bool bDontDelete) { m_bDontDelete = bDontDelete; };
 
     // Exported methods
-    void SetMaximumWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevelNoFlash(DWORD dwWantedLevel);
     char GetWantedLevel() { return this->internalInterface->m_WantedLevel; };
-    void SetWantedLevelNoDrop(DWORD dwWantedLevel);
 };
