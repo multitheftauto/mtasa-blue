@@ -58,7 +58,7 @@ namespace SharedUtil
         SString mac;
         SString result;
 
-        CryptoPP::HMAC<HmacType> hmac(reinterpret_cast<CryptoPP::byte*>(key.c_str()), key.size());
+        CryptoPP::HMAC<HmacType> hmac(reinterpret_cast<const CryptoPP::byte*>(key.c_str()), key.size());
 
         CryptoPP::StringSource ssMac(value, true, new CryptoPP::HashFilter(hmac, new CryptoPP::StringSink(mac)));
         CryptoPP::StringSource ssResult(mac, true, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result)));
