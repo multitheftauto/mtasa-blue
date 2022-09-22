@@ -17,7 +17,7 @@ void CLuaCryptDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"md5", ArgumentParserWarn<false, Md5>},
         {"sha256", ArgumentParserWarn<false, Sha256>},
-        {"hash", ArgumentParser<Hash>},
+        {"hash", ArgumentParserWarn<false, Hash>},
         {"teaEncode", ArgumentParserWarn<false, TeaEncode>},
         {"teaDecode", ArgumentParserWarn<false, TeaDecode>},
         {"base64Encode", ArgumentParserWarn<false, Base64encode>},
@@ -126,7 +126,7 @@ std::variant<std::string, bool> CLuaCryptDefs::Hash(lua_State* const luaVM, Hash
         throw std::invalid_argument("Unknown algorithm");
 
     }
-    catch(std::exception& ex)
+    catch (std::exception& ex)
     {
         m_pScriptDebugging->LogWarning(luaVM, ex.what());
         return false;
