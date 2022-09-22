@@ -317,18 +317,10 @@ public:
         else
             return FALSE;
     };
-    BOOL IsGameLoaded()
-    {
-        DEBUG_TRACE("BOOL     IsGameLoaded (  )");
-        if (*VAR_IsGameLoaded)
-            return TRUE;
-        else
-            return FALSE;
-    };
-    VOID         StartGame();
-    VOID         SetSystemState(eSystemState State);
+    void         StartGame();
+    void         SetSystemState(eSystemState State);
     eSystemState GetSystemState();
-    VOID   Pause(bool bPaused);
+    void         Pause(bool bPaused);
 
     void Initialize();
     void Reset();
@@ -479,13 +471,8 @@ private:
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;
-    static unsigned long* VAR_IsGameLoaded;
-    static bool*          VAR_GamePaused;
     static bool*          VAR_IsForegroundWindow;
-    ;
     static unsigned long* VAR_SystemState;
-    static void*          VAR_StartGame;
-    static bool*          VAR_IsNastyGame;
     static float*         VAR_TimeScale;
     static float*         VAR_FPS;
     static float*         VAR_OldTimeStep;

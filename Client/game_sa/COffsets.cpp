@@ -47,12 +47,8 @@ void COffsets::Initialize11()
 {
     CGameSA::VAR_SystemTime = (unsigned long*)0xB7CB84;
     CGameSA::VAR_IsAtMenu = (unsigned long*)0xBA677B;
-    CGameSA::VAR_IsGameLoaded = (unsigned long*)0x86969C;
-    CGameSA::VAR_GamePaused = (bool*)0xB7CB49;
     CGameSA::VAR_IsForegroundWindow = (bool*)0x8D621C;
     CGameSA::VAR_SystemState = (unsigned long*)0xC8FC80;            // 1.01
-    CGameSA::VAR_StartGame = (void*)0x869641;
-    CGameSA::VAR_IsNastyGame = (bool*)0x68DD68;
     CGameSA::VAR_TimeScale = (float*)0xB7CB64;
     CGameSA::VAR_FPS = (float*)0xB7CB50;
     CGameSA::VAR_OldTimeStep = (float*)0xB7CB54;
@@ -75,12 +71,8 @@ void COffsets::InitializeCommon10()
 {
     CGameSA::VAR_SystemTime = (unsigned long*)0xB7CB84;
     CGameSA::VAR_IsAtMenu = (unsigned long*)0xBA677B;
-    CGameSA::VAR_IsGameLoaded = (unsigned long*)0x86969C;
-    CGameSA::VAR_GamePaused = (bool*)0xB7CB49;
     CGameSA::VAR_IsForegroundWindow = (bool*)0x8D621C;
     CGameSA::VAR_SystemState = (unsigned long*)0xC8D4C0;
-    CGameSA::VAR_StartGame = (void*)0x869641;
-    CGameSA::VAR_IsNastyGame = (bool*)0x68DD68;
     CGameSA::VAR_TimeScale = (float*)0xB7CB64;
     CGameSA::VAR_FPS = (float*)0xB7CB50;
     CGameSA::VAR_OldTimeStep = (float*)0xB7CB54;

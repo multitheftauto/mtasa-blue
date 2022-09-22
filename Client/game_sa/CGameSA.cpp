@@ -20,12 +20,8 @@
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
-unsigned long* CGameSA::VAR_IsGameLoaded;
-bool*          CGameSA::VAR_GamePaused;
 bool*          CGameSA::VAR_IsForegroundWindow;
 unsigned long* CGameSA::VAR_SystemState;
-void*          CGameSA::VAR_StartGame;
-bool*          CGameSA::VAR_IsNastyGame;
 float*         CGameSA::VAR_TimeScale;
 float*         CGameSA::VAR_FPS;
 float*         CGameSA::VAR_OldTimeStep;
@@ -64,19 +60,16 @@ CGameSA::CGameSA()
         case VERSION_11:
             COffsets::Initialize11();
             break;
-        case VERSION_20:
-            COffsets::Initialize20();
-            break;
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (int i = 0; i < modelInfoMax; i++)
+    for (unsigned int i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
 
     // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-    for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
         ObjectGroupsInfo[i].SetGroup(i);
     }
@@ -299,10 +292,11 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
         return NULL;
 }
 
-VOID CGameSA::Pause(bool bPaused)
+void CGameSA::Pause(bool bPaused)
 {
-    *VAR_GamePaused = bPaused;
+	MemPutFast<bool>(0xB7CB49, bPaused); // CTimer::m_UserPause
 }
+
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
     DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
@@ -321,21 +315,19 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  * Starts the game
  * \todo make addresses into constants
  */
-VOID CGameSA::StartGame()
+void CGameSA::StartGame()
 {
     DEBUG_TRACE("VOID CGameSA::StartGame()");
-    //  InitScriptInterface();
-    //*(BYTE *)VAR_StartGame = 1;
     this->SetSystemState(GS_INIT_PLAYING_GAME);
-    MemPutFast<BYTE>(0xB7CB49, 0);
-    MemPutFast<BYTE>(0xBA67A4, 0);
+    MemPutFast<BYTE>(0xB7CB49, 0); // CTimer::m_UserPause
+    MemPutFast<BYTE>(0xBA67A4, 0); // FrontEndMenuManager + 0x5C
 }
 
 /**
  * Sets the part of the game loading process the game is in.
  * @param dwState DWORD containing a valid state 0 - 9
  */
-VOID CGameSA::SetSystemState(eSystemState State)
+void CGameSA::SetSystemState(eSystemState State)
 {
     DEBUG_TRACE("VOID CGameSA::SetSystemState( eSystemState State )");
     *VAR_SystemState = (DWORD)State;
@@ -503,22 +495,22 @@ void CGameSA::SetTimeScale(float fTimeScale)
 
 unsigned char CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104;
+    return *(unsigned char*)0x8D5104; // CPostEffects::m_SpeedFXAlpha
 }
 
 void CGameSA::SetBlurLevel(unsigned char ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel);
+    MemPutFast<unsigned char>(0x8D5104, ucLevel); // CPostEffects::m_SpeedFXAlpha
 }
 
 unsigned long CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C;
+    return *(unsigned long*)0xB7015C; // CClock::ms_nMillisecondsPerGameMinute
 }
 
 void CGameSA::SetMinuteDuration(unsigned long ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime);
+    MemPutFast<unsigned long>(0xB7015C, ulTime); // CClock::ms_nMillisecondsPerGameMinute
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -837,7 +829,7 @@ void CGameSA::SetupBrokenModels()
 // Well, has it?
 bool CGameSA::HasCreditScreenFadedOut()
 {
-    BYTE ucAlpha = *(BYTE*)0xBAB320;
+    BYTE ucAlpha = *(BYTE*)0xBAB320; // CLoadingScreen::m_FadeAlpha
     bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
     return bCreditScreenFadedOut;
 }
@@ -875,7 +867,7 @@ void CGameSA::ResetAlphaTransparencies()
 // Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
 void CGameSA::DisableVSync()
 {
-    MemPutFast<BYTE>(0xBAB318, 0);
+    MemPutFast<BYTE>(0xBAB318, 0); // CLoadingScreen::m_bActive
 }
 CWeapon* CGameSA::CreateWeapon()
 {

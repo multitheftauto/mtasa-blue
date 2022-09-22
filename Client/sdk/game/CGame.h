@@ -164,11 +164,10 @@ public:
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;
-    virtual BOOL         IsGameLoaded() = 0;
-    virtual VOID         StartGame() = 0;
-    virtual VOID         SetSystemState(eSystemState State) = 0;
+    virtual void         StartGame() = 0;
+    virtual void         SetSystemState(eSystemState State) = 0;
     virtual eSystemState GetSystemState() = 0;
-    virtual VOID         Pause(bool bPaused) = 0;
+    virtual void         Pause(bool bPaused) = 0;
     virtual void         SetTimeScale(float fTimeScale) = 0;
     virtual float        GetFPS() = 0;
     virtual float        GetTimeStep() = 0;
