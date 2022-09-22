@@ -244,7 +244,7 @@ CTask* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInt
 // HOOKS
 __declspec(noinline) void OnMY_Task_Operator_Delete(CTaskSAInterface* pTaskInterface)
 {
-    ((CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem()))->RemoveTask(pTempTaskInterface);
+    pGame->GetTaskManagementSystem()->RemoveTask(pTempTaskInterface);
 }
 
 VOID _declspec(naked) HOOK_CTask_Operator_Delete()

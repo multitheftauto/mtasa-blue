@@ -63,7 +63,6 @@
 #include "CSettings.h"
 #include "CStats.h"
 #include "CStreaming.h"
-#include "CTaskManagementSystem.h"
 #include "CTasks.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"

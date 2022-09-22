@@ -102,6 +102,7 @@ struct SCheatSA
 };
 
 class CAnimBlendClumpDataSAInterface;
+class CTaskManagementSystemSA;
 
 class CGameSA : public CGame
 {
@@ -245,7 +246,7 @@ public:
         DEBUG_TRACE("CPopulation              * GetPopulation()");
         return m_pPopulation;
     };
-    CTaskManagementSystem* GetTaskManagementSystem()
+    CTaskManagementSystemSA* GetTaskManagementSystem()
     {
         DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");
         return m_pTaskManagementSystem;
@@ -454,7 +455,7 @@ private:
     CStats*                   m_pStats;
     CPathFind*                m_pPathFind;
     CPopulation*              m_pPopulation;
-    CTaskManagementSystem*    m_pTaskManagementSystem;            // not used outside the game_sa
+    CTaskManagementSystemSA*  m_pTaskManagementSystem;            // not used outside the game_sa
     CTasks*                   m_pTasks;
     CGameSettings*            m_pSettings;
     CCarEnterExit*            m_pCarEnterExit;
