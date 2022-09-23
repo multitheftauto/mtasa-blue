@@ -22,14 +22,27 @@ static uint    ms_uiWidth = 0;
 static uint    ms_uiHeight = 0;
 static void*   ms_pData = NULL;
 static uint    ms_uiDataSize = 0;
+static long long ms_lLastSaveTime = 0;
 static SString ms_strFileName;
 
+SString CScreenShot::PreScreenShot()
+{
+    ms_lLastSaveTime = GetTickCount64_();
+    return GetValidScreenshotFilename();
+}
+
+bool CScreenShot::IsRateLimited()
+{
+    return GetTickCount64_() - ms_lLastSaveTime < 1000;
+}
 
 void CScreenShot::PostScreenShot(const SString& strFileName)
 {
     // print a notice
     if (!strFileName.empty())
         g_pCore->GetConsole()->Printf(_("Screenshot taken: '%s'"), *strFileName);
+
+    g_pCore->GetGame()->GetHud()->Disable(CCore::GetSingleton().bScreenShotHUDWasDisabled);
 }
 
 void CScreenShot::SetPath(const char* szPath)

@@ -17,7 +17,9 @@
 class CScreenShot
 {
 public:
+    static SString PreScreenShot();
     static void    PostScreenShot(const SString& strFileName);
+    static bool    IsRateLimited();
     static void    SetPath(const char* szPath);
 
     static SString GetScreenShotPath(int iNumber);

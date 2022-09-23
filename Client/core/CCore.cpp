@@ -122,6 +122,7 @@ CCore::CCore()
     // Reset the screenshot flag
     bScreenShot = false;
     bHideGUIForScreenShot = false;
+    bScreenShotHUDWasDisabled = false;
 
     // No initial fps limit
     m_bDoneFrameRateLimit = false;
@@ -477,8 +478,15 @@ bool CCore::ClearChat()
 
 void CCore::TakeScreenShot(bool bCameraShot)
 {
+    if (CScreenShot::IsSaving() || CScreenShot::IsRateLimited())
+        return;
+
     bScreenShot = true;
     bHideGUIForScreenShot = bCameraShot;
+    bScreenShotHUDWasDisabled = g_pCore->GetGame()->GetHud()->IsDisabled();
+    if (bCameraShot)
+        g_pCore->GetGame()->GetHud()->Disable(true);
+
     SetScreenShotPath(bCameraShot);
 }
 

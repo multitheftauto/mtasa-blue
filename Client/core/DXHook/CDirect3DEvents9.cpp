@@ -24,7 +24,6 @@ bool g_bInMTAScene = false;
 
 // Variables used for screen shot saving
 static CBuffer   ms_ScreenShotBuffer;
-static long long ms_LastSaveTime = 0;
 // Other variables
 static uint                 ms_RequiredAnisotropicLevel = 1;
 static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
@@ -204,16 +203,11 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 void CDirect3DEvents9::CheckForScreenShot()
 {
     // Make a screenshot if needed
-    if (CCore::GetSingleton().bScreenShot && !CScreenShot::IsSaving())
+    if (CCore::GetSingleton().bScreenShot)
     {
-        // Max one screenshot per second
-        if (GetTickCount64_() - ms_LastSaveTime < 1000)
-            return;
-        ms_LastSaveTime = GetTickCount64_();
-
+        SString strFileName = CScreenShot::PreScreenShot();
         uint uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
         uint uiHeight = CDirect3DData::GetSingleton().GetViewportHeight();
-        SString strFileName = CScreenShot::GetValidScreenshotFilename();
 
         // Try to get the screen data
         SString strError;
