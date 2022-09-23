@@ -487,16 +487,11 @@ void CCore::SetScreenShotPath(bool bCameraShot)
     if (bCameraShot)
     {
         // Set the screenshot path to camera gallery path
-        char szDocumentsPath[MAX_PATH] = "";
-        HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, 0, szDocumentsPath);
-        if (SUCCEEDED(hr))
+        SString strGalleryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
+        if (DirectoryExists(strGalleryPath))
         {
-            SString strGalleryPath = PathJoin(szDocumentsPath, "GTA San Andreas User Files", "Gallery");
-            if (DirectoryExists(strGalleryPath))
-            {
-                CScreenShot::SetPath(strGalleryPath.c_str());
-                return;
-            }
+            CScreenShot::SetPath(strGalleryPath.c_str());
+            return;
         }
     }
 
