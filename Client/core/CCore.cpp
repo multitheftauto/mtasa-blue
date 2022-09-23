@@ -488,17 +488,15 @@ void CCore::SetScreenShotPath(bool bCameraShot)
     {
         // Set the screenshot path to camera gallery path
         SString strGalleryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
-        if (DirectoryExists(strGalleryPath))
-        {
-            CScreenShot::SetPath(strGalleryPath.c_str());
-            return;
-        }
+        CScreenShot::SetPath(strGalleryPath.c_str());
     }
-
-    // Set the screenshot path to this default library (screenshots shouldn't really be made outside mods)
-    std::string strScreenShotPath = CalcMTASAPath("screenshots");
-    CVARS_SET("screenshot_path", strScreenShotPath);
-    CScreenShot::SetPath(strScreenShotPath.c_str());
+    else
+    {
+        // Set the screenshot path to this default library (screenshots shouldn't really be made outside mods)
+        std::string strScreenShotPath = CalcMTASAPath("screenshots");
+        CVARS_SET("screenshot_path", strScreenShotPath);
+        CScreenShot::SetPath(strScreenShotPath.c_str());
+    }
 }
 
 void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
