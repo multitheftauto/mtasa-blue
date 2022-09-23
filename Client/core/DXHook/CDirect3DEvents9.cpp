@@ -132,7 +132,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 
     TIMING_CHECKPOINT("-OnPresent1");
     // Notify core
-    CCore::GetSingleton().DoPostFramePulse();
+    if (!CCore::GetSingleton().bHideGUIForScreenShot)
+        CCore::GetSingleton().DoPostFramePulse();
     TIMING_CHECKPOINT("+OnPresent2");
 
     // Restore in case script forgets
@@ -151,7 +152,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     }
 
     // Draw pre-GUI primitives
-    CGraphics::GetSingleton().DrawPreGUIQueue();
+    if (!CCore::GetSingleton().bHideGUIForScreenShot)
+        CGraphics::GetSingleton().DrawPreGUIQueue();
 
     // Maybe grab screen for upload
     CGraphics::GetSingleton().GetScreenGrabber()->DoPulse();
@@ -159,14 +161,17 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     if (bTookScreenShot && g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->OnPostScreenshot();
 
-    // Draw the GUI
-    CLocalGUI::GetSingleton().Draw();
+    if (!CCore::GetSingleton().bHideGUIForScreenShot)
+    {
+        // Draw the GUI
+        CLocalGUI::GetSingleton().Draw();
 
-    // Draw post-GUI primitives
-    CGraphics::GetSingleton().DrawPostGUIQueue();
+        // Draw post-GUI primitives
+        CGraphics::GetSingleton().DrawPostGUIQueue();
 
-    // Redraw the mouse cursor so it will always be over other elements
-    CLocalGUI::GetSingleton().DrawMouseCursor();
+        // Redraw the mouse cursor so it will always be over other elements
+        CLocalGUI::GetSingleton().DrawMouseCursor();
+    }
 
     CGraphics::GetSingleton().DidRenderScene();
 
@@ -208,9 +213,7 @@ void CDirect3DEvents9::CheckForScreenShot()
 
         uint uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
         uint uiHeight = CDirect3DData::GetSingleton().GetViewportHeight();
-
-        // Call the pre-screenshot function
-        SString strFileName = CScreenShot::PreScreenShot();
+        SString strFileName = CScreenShot::GetValidScreenshotFilename();
 
         // Try to get the screen data
         SString strError;
@@ -241,6 +244,7 @@ void CDirect3DEvents9::CheckForScreenShot()
         CScreenShot::PostScreenShot(strFileName);
 
         CCore::GetSingleton().bScreenShot = false;
+        CCore::GetSingleton().bHideGUIForScreenShot = false;
     }
 }
 

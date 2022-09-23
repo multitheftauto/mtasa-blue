@@ -127,7 +127,8 @@ public:
     void OnGameTimerUpdate();
 
     // Screenshots
-    void TakeScreenShot();
+    void TakeScreenShot(bool bCameraShot);
+    void SetScreenShotPath(bool bCameraShot);
 
     // GUI
     bool IsSettingsVisible();
@@ -229,6 +230,7 @@ public:
     SString GetConnectCommandFromURI(const char* szURI);
     void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
     bool    bScreenShot;
+    bool    bHideGUIForScreenShot;
     std::map<std::string, std::string>& GetCommandLineOptions() { return m_CommandLineOptions; }
     const char*                         GetCommandLineOption(const char* szOption);
     const char*                         GetCommandLineArgs() { return m_szCommandLineArgs; }

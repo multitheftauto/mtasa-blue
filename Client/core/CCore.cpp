@@ -121,6 +121,7 @@ CCore::CCore()
 
     // Reset the screenshot flag
     bScreenShot = false;
+    bHideGUIForScreenShot = false;
 
     // No initial fps limit
     m_bDoneFrameRateLimit = false;
@@ -474,9 +475,35 @@ bool CCore::ClearChat()
     return false;
 }
 
-void CCore::TakeScreenShot()
+void CCore::TakeScreenShot(bool bCameraShot)
 {
     bScreenShot = true;
+    bHideGUIForScreenShot = bCameraShot;
+    SetScreenShotPath(bCameraShot);
+}
+
+void CCore::SetScreenShotPath(bool bCameraShot)
+{
+    if (bCameraShot)
+    {
+        // Set the screenshot path to camera gallery path
+        char szDocumentsPath[MAX_PATH] = "";
+        HRESULT hr = SHGetFolderPathA(NULL, CSIDL_MYDOCUMENTS, NULL, 0, szDocumentsPath);
+        if (SUCCEEDED(hr))
+        {
+            SString strGalleryPath = PathJoin(szDocumentsPath, "GTA San Andreas User Files", "Gallery");
+            if (DirectoryExists(strGalleryPath))
+            {
+                CScreenShot::SetPath(strGalleryPath.c_str());
+                return;
+            }
+        }
+    }
+
+    // Set the screenshot path to this default library (screenshots shouldn't really be made outside mods)
+    std::string strScreenShotPath = CalcMTASAPath("screenshots");
+    CVARS_SET("screenshot_path", strScreenShotPath);
+    CScreenShot::SetPath(strScreenShotPath.c_str());
 }
 
 void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
@@ -928,11 +955,6 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
-
-    // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
-    std::string strScreenShotPath = CalcMTASAPath("screenshots");
-    CVARS_SET("screenshot_path", strScreenShotPath);
-    CScreenShot::SetPath(strScreenShotPath.c_str());
 }
 
 void CCore::CreateGUI()

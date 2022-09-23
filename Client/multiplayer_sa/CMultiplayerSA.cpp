@@ -293,6 +293,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles 0x6A6FF0
 
+#define HOOKPOS_CWeapon__TakePhotograph 0x73C26E
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -537,6 +539,8 @@ void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
 
 void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 
+void HOOK_CWeapon__TakePhotograph();
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -772,6 +776,8 @@ void CMultiplayerSA::InitHooks()
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
 
     HookInstall(HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles, (DWORD)HOOK_CAutomobile__dmgDrawCarCollidingParticles, 0x91);
+
+    HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -1547,6 +1553,9 @@ void CMultiplayerSA::InitHooks()
 
     // Show muzzle flash for last bullet in magazine
     MemSet((void*)0x61ECD2, 0x90, 20);
+
+    // Disable camera photos creation since we reimplement it (to have better quality)
+    MemSet((void*)0x705331, 0x90, 0x7053AF - 0x705331);
 
     InitHooks_CrashFixHacks();
 
@@ -7044,5 +7053,31 @@ void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
         add esp, 12
 
         jmp RETURN_CAutomobile__dmgDrawCarCollidingParticles
+    }
+}
+
+// Reimplement camera photo creation
+// to have better photo quality
+static void TakePhotograph()
+{
+    g_pCore->TakeScreenShot(true);
+}
+
+const DWORD RETURN_CWeapon__TakePhotograph = 0x73C273;
+void _declspec(naked) HOOK_CWeapon__TakePhotograph()
+{
+    _asm
+    {
+        // Restore instructions replaced by hook
+        add     esp, 8
+        test    edi, edi
+    }
+
+    TakePhotograph();
+
+    _asm
+    {
+        // Go back
+        jmp     RETURN_CWeapon__TakePhotograph
     }
 }
