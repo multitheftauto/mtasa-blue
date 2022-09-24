@@ -208,10 +208,6 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pMenuArea->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnMenuEnter, this));
     m_pMenuArea->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnMenuExit, this));
 
-    float fDrawSizeX = (335 / NATIVE_RES_X) * m_iMenuSizeX;            // Right aligned
-    float fDrawSizeY = (53 / NATIVE_RES_Y) * m_iMenuSizeY;
-    float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;
-    float fDrawPosY = 0.60f * m_iMenuSizeY;
     m_pLatestNews = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
     if (!m_pLatestNews->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), "latest_news.png")))
     {
@@ -220,14 +216,20 @@ CMainMenu::CMainMenu(CGUI* pManager)
         m_pLatestNews->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(pLanguage), "latest_news.png"));
     }
     m_pLatestNews->SetParent(m_pCanvas);
-    m_pLatestNews->SetPosition(CVector2D(fDrawPosX, fDrawPosY), false);
-    m_pLatestNews->SetSize(CVector2D(fDrawSizeX, fDrawSizeY), false);
     m_pLatestNews->SetProperty("InheritsAlpha", "False");
+    CVector2D vecNativeSize;
+    m_pLatestNews->GetNativeSize(vecNativeSize);
+    float fDrawSizeX = (vecNativeSize.fX / NATIVE_RES_X) * m_iMenuSizeX;
+    float fDrawSizeY = (vecNativeSize.fY / NATIVE_RES_Y) * m_iMenuSizeY;
+    m_pLatestNews->SetSize(CVector2D(fDrawSizeX, fDrawSizeY), false);
+    float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;            // Right aligned
+    float fDrawPosY = 0.61f * m_iMenuSizeY;
+    m_pLatestNews->SetPosition(CVector2D(fDrawPosX, fDrawPosY), false);
     m_pLatestNews->SetVisible(false);
 
     // Create news item stuff
     fDrawPosX -= 25;
-    fDrawPosY += fDrawSizeY - 8;
+    fDrawPosY += fDrawSizeY + 3;
     for (uint i = 0; i < CORE_MTA_NEWS_ITEMS; i++)
     {
         fDrawPosY += 20;
