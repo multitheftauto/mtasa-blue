@@ -137,10 +137,6 @@ bool IsValidFilePath(const char* szPath);
 bool IsValidOrganizationPath(const char* szPath);
 #endif
 
-unsigned int HexToInt(const char* szHex);
-bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
-bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
-
 inline float WrapAround(float fValue, float fHigh)
 {
     return fValue - (fHigh * floor(static_cast<float>(fValue / fHigh)));
