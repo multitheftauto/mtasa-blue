@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-24 16:53+0000\n"
+"POT-Creation-Date: 2022-09-24 17:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -158,9 +158,9 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
 #: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
 #: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
-#: Client/core/CConnectManager.cpp:421 Client/core/CSettings.cpp:2899
-#: Client/core/CSettings.cpp:4078 Client/core/CSettings.cpp:4106
-#: Client/core/CSettings.cpp:4637 Client/core/CGUI.cpp:87
+#: Client/core/CConnectManager.cpp:421 Client/core/CSettings.cpp:2898
+#: Client/core/CSettings.cpp:4077 Client/core/CSettings.cpp:4105
+#: Client/core/CSettings.cpp:4636 Client/core/CGUI.cpp:87
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
@@ -520,7 +520,7 @@ msgstr ""
 #. *
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 #: Client/core/CSettings.cpp:424 Client/core/CSettings.cpp:612
-#: Client/core/CSettings.cpp:878 Client/core/CSettings.cpp:1976
+#: Client/core/CSettings.cpp:878 Client/core/CSettings.cpp:1975
 msgid "General"
 msgstr ""
 
@@ -576,7 +576,7 @@ msgstr ""
 #: Client/loader/Dialogs.cpp:37 Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
 #: Client/core/CVersionUpdater.cpp:1838 Client/core/CSettings.cpp:131
-#: Client/core/CSettings.cpp:4657
+#: Client/core/CSettings.cpp:4656
 msgid "Cancel"
 msgstr ""
 
@@ -723,7 +723,7 @@ msgid "Fullscreen mode:"
 msgstr ""
 
 #: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:652
-#: Client/core/CSettings.cpp:1576
+#: Client/core/CSettings.cpp:1575
 msgid "Borderless window"
 msgstr ""
 
@@ -897,21 +897,21 @@ msgstr ""
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1151
 #: Client/core/CVersionUpdater.cpp:1569 Client/core/CVersionUpdater.cpp:1587
 #: Client/core/CVersionUpdater.cpp:1856 Client/core/CVersionUpdater.cpp:1875
-#: Client/core/CSettings.cpp:1363 Client/core/CSettings.cpp:1387
-#: Client/core/CSettings.cpp:4399 Client/core/CSettings.cpp:4466
-#: Client/core/CSettings.cpp:4515 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CSettings.cpp:1362 Client/core/CSettings.cpp:1386
+#: Client/core/CSettings.cpp:4398 Client/core/CSettings.cpp:4465
+#: Client/core/CSettings.cpp:4514 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr ""
 
 #: Client/loader/Dialogs.cpp:33 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1147 Client/core/CVersionUpdater.cpp:1568
+#: Client/core/CMainMenu.cpp:1150 Client/core/CVersionUpdater.cpp:1568
 #: Client/core/CVersionUpdater.cpp:1586 Client/core/CVersionUpdater.cpp:1855
-#: Client/core/CVersionUpdater.cpp:1874 Client/core/CSettings.cpp:1362
-#: Client/core/CSettings.cpp:1386 Client/core/CSettings.cpp:4398
-#: Client/core/CSettings.cpp:4465 Client/core/CSettings.cpp:4514
+#: Client/core/CVersionUpdater.cpp:1874 Client/core/CSettings.cpp:1361
+#: Client/core/CSettings.cpp:1385 Client/core/CSettings.cpp:4397
+#: Client/core/CSettings.cpp:4464 Client/core/CSettings.cpp:4513
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr ""
@@ -924,7 +924,7 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:1965
 #: Client/core/CVersionUpdater.cpp:2117 Client/core/CVersionUpdater.cpp:2126
 #: Client/core/CVersionUpdater.cpp:2135 Client/core/CVersionUpdater.cpp:2149
-#: Client/core/CSettings.cpp:126 Client/core/CSettings.cpp:4658
+#: Client/core/CSettings.cpp:126 Client/core/CSettings.cpp:4657
 msgid "OK"
 msgstr ""
 
@@ -1308,27 +1308,27 @@ msgstr ""
 msgid "CONSOLE"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:315
+#: Client/core/CMainMenu.cpp:319
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot "
 "be used to connect to public servers!"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:334
+#: Client/core/CMainMenu.cpp:338
 msgid ""
 "MTA will not receive updates on XP/Vista after July 2019.\n"
 "\n"
 "Upgrade Windows to play on the latest servers."
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1141
+#: Client/core/CMainMenu.cpp:1144
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
 "Are you sure you want to disconnect?"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1145
+#: Client/core/CMainMenu.cpp:1148
 msgid "DISCONNECT WARNING"
 msgstr ""
 
@@ -1452,7 +1452,7 @@ msgstr ""
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr ""
 
-#: Client/core/CVersionUpdater.cpp:2078 Client/core/CSettings.cpp:4463
+#: Client/core/CVersionUpdater.cpp:2078 Client/core/CSettings.cpp:4462
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr ""
 
@@ -1731,15 +1731,15 @@ msgstr ""
 msgid "Usertrack options"
 msgstr ""
 
-#: Client/core/CSettings.cpp:555 Client/core/CSettings.cpp:3034
+#: Client/core/CSettings.cpp:555 Client/core/CSettings.cpp:3033
 msgid "Radio"
 msgstr ""
 
-#: Client/core/CSettings.cpp:556 Client/core/CSettings.cpp:3036
+#: Client/core/CSettings.cpp:556 Client/core/CSettings.cpp:3035
 msgid "Random"
 msgstr ""
 
-#: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:3038
+#: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:3037
 msgid "Sequential"
 msgstr ""
 
@@ -1814,11 +1814,11 @@ msgstr ""
 msgid "DPI aware"
 msgstr ""
 
-#: Client/core/CSettings.cpp:651 Client/core/CSettings.cpp:1574
+#: Client/core/CSettings.cpp:651 Client/core/CSettings.cpp:1573
 msgid "Standard"
 msgstr ""
 
-#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1578
+#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1577
 msgid "Borderless keep res"
 msgstr ""
 
@@ -1826,57 +1826,57 @@ msgstr ""
 msgid "Mip Mapping"
 msgstr ""
 
-#: Client/core/CSettings.cpp:725 Client/core/CSettings.cpp:1491
+#: Client/core/CSettings.cpp:725 Client/core/CSettings.cpp:1490
 msgid "Low"
 msgstr ""
 
-#: Client/core/CSettings.cpp:726 Client/core/CSettings.cpp:1493
+#: Client/core/CSettings.cpp:726 Client/core/CSettings.cpp:1492
 msgid "Medium"
 msgstr ""
 
 #: Client/core/CSettings.cpp:727 Client/core/CSettings.cpp:1060
-#: Client/core/CSettings.cpp:1495 Client/core/CSettings.cpp:3092
+#: Client/core/CSettings.cpp:1494 Client/core/CSettings.cpp:3091
 msgid "High"
 msgstr ""
 
-#: Client/core/CSettings.cpp:728 Client/core/CSettings.cpp:1497
+#: Client/core/CSettings.cpp:728 Client/core/CSettings.cpp:1496
 msgid "Very high"
 msgstr ""
 
 #: Client/core/CSettings.cpp:743 Client/core/CSettings.cpp:766
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1045
-#: Client/core/CSettings.cpp:1176 Client/core/CSettings.cpp:1501
-#: Client/core/CSettings.cpp:3099 Client/core/CSettings.cpp:3131
-#: Client/core/CSettings.cpp:3153 Client/core/CSettings.cpp:4146
+#: Client/core/CSettings.cpp:1175 Client/core/CSettings.cpp:1500
+#: Client/core/CSettings.cpp:3098 Client/core/CSettings.cpp:3130
+#: Client/core/CSettings.cpp:3152 Client/core/CSettings.cpp:4145
 msgid "Off"
 msgstr ""
 
-#: Client/core/CSettings.cpp:767 Client/core/CSettings.cpp:1503
+#: Client/core/CSettings.cpp:767 Client/core/CSettings.cpp:1502
 msgid "1x"
 msgstr ""
 
-#: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1505
+#: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1504
 msgid "2x"
 msgstr ""
 
-#: Client/core/CSettings.cpp:769 Client/core/CSettings.cpp:1507
+#: Client/core/CSettings.cpp:769 Client/core/CSettings.cpp:1506
 msgid "3x"
 msgstr ""
 
 #: Client/core/CSettings.cpp:782 Client/core/CSettings.cpp:993
-#: Client/core/CSettings.cpp:1513 Client/core/CSettings.cpp:3101
+#: Client/core/CSettings.cpp:1512 Client/core/CSettings.cpp:3100
 msgid "Auto"
 msgstr ""
 
-#: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1515
+#: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1514
 msgid "4:3"
 msgstr ""
 
-#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1517
+#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1516
 msgid "16:10"
 msgstr ""
 
-#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1519
+#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1518
 msgid "16:9"
 msgstr ""
 
@@ -1968,91 +1968,91 @@ msgstr ""
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:984
-#: Client/core/CSettings.cpp:4676
+#: Client/core/CSettings.cpp:4675
 msgid "Fast CJ clothes loading:"
 msgstr ""
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:998
-#: Client/core/CSettings.cpp:4678
+#: Client/core/CSettings.cpp:4677
 msgid "Browser speed:"
 msgstr ""
 
 #. Single download
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:1012
-#: Client/core/CSettings.cpp:4680
+#: Client/core/CSettings.cpp:4679
 msgid "Single connection:"
 msgstr ""
 
 #. Packet tag
 #: Client/core/CSettings.cpp:977 Client/core/CSettings.cpp:1025
-#: Client/core/CSettings.cpp:4682
+#: Client/core/CSettings.cpp:4681
 msgid "Packet tag:"
 msgstr ""
 
 #. Progress animation
 #: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1038
-#: Client/core/CSettings.cpp:4684
+#: Client/core/CSettings.cpp:4683
 msgid "Progress animation:"
 msgstr ""
 
 #. Process priority
 #: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1051
-#: Client/core/CSettings.cpp:4674
+#: Client/core/CSettings.cpp:4673
 msgid "Process priority:"
 msgstr ""
 
 #. Debug setting
 #: Client/core/CSettings.cpp:978 Client/core/CSettings.cpp:1065
-#: Client/core/CSettings.cpp:4686
+#: Client/core/CSettings.cpp:4685
 msgid "Debug setting:"
 msgstr ""
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1088
-#: Client/core/CSettings.cpp:4688
+#: Client/core/CSettings.cpp:4687
 msgid "Streaming memory:"
 msgstr ""
 
 #. Update build type
-#: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1190
+#: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1189
 msgid "Update build type:"
 msgstr ""
 
 #. UpdateAutoInstall
-#: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1169
+#: Client/core/CSettings.cpp:979 Client/core/CSettings.cpp:1168
 msgid "Install important updates:"
 msgstr ""
 
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1020
-#: Client/core/CSettings.cpp:1033 Client/core/CSettings.cpp:3103
-#: Client/core/CSettings.cpp:3119 Client/core/CSettings.cpp:3126
+#: Client/core/CSettings.cpp:1033 Client/core/CSettings.cpp:3102
+#: Client/core/CSettings.cpp:3118 Client/core/CSettings.cpp:3125
 msgid "On"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:3108
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:3107
 msgid "Very slow"
 msgstr ""
 
 #: Client/core/CSettings.cpp:1006 Client/core/CSettings.cpp:1019
 #: Client/core/CSettings.cpp:1032 Client/core/CSettings.cpp:1046
 #: Client/core/CSettings.cpp:1072 Client/core/CSettings.cpp:1084
-#: Client/core/CSettings.cpp:1177 Client/core/CSettings.cpp:1197
-#: Client/core/CSettings.cpp:3110 Client/core/CSettings.cpp:3117
-#: Client/core/CSettings.cpp:3124 Client/core/CSettings.cpp:3133
-#: Client/core/CSettings.cpp:3146
+#: Client/core/CSettings.cpp:1176 Client/core/CSettings.cpp:1196
+#: Client/core/CSettings.cpp:3109 Client/core/CSettings.cpp:3116
+#: Client/core/CSettings.cpp:3123 Client/core/CSettings.cpp:3132
+#: Client/core/CSettings.cpp:3145
 msgid "Default"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:3112
+#: Client/core/CSettings.cpp:1007 Client/core/CSettings.cpp:3111
 msgid "Fast"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1058 Client/core/CSettings.cpp:3088
+#: Client/core/CSettings.cpp:1058 Client/core/CSettings.cpp:3087
 msgid "Normal"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1059 Client/core/CSettings.cpp:3090
+#: Client/core/CSettings.cpp:1059 Client/core/CSettings.cpp:3089
 msgid "Above normal"
 msgstr ""
 
@@ -2069,227 +2069,227 @@ msgstr ""
 msgid "Windows 8 compatibility:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1120
+#: Client/core/CSettings.cpp:1119
 msgid "16-bit color"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1125
+#: Client/core/CSettings.cpp:1124
 msgid "Mouse fix"
 msgstr ""
 
 #. Cache path info
-#: Client/core/CSettings.cpp:1143
+#: Client/core/CSettings.cpp:1142
 msgid "Client resource files:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1147
+#: Client/core/CSettings.cpp:1146
 msgid "Show in Explorer"
 msgstr ""
 
 #. Auto updater section label
-#: Client/core/CSettings.cpp:1162 Client/core/CSettings.cpp:1165
+#: Client/core/CSettings.cpp:1161 Client/core/CSettings.cpp:1164
 msgid "Auto updater"
 msgstr ""
 
 #. Check for updates
-#: Client/core/CSettings.cpp:1203
+#: Client/core/CSettings.cpp:1202
 msgid "Check for update now"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1356
+#: Client/core/CSettings.cpp:1355
 msgid "Some settings will be changed when you next start MTA"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1357
+#: Client/core/CSettings.cpp:1356
 msgid ""
 "\n"
 "\n"
 "Do you want to restart now?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1360
+#: Client/core/CSettings.cpp:1359
 msgid "RESTART REQUIRED"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1380
+#: Client/core/CSettings.cpp:1379
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1381
+#: Client/core/CSettings.cpp:1380
 msgid ""
 "\n"
 "\n"
 "Do you want to disconnect now?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1384
+#: Client/core/CSettings.cpp:1383
 msgid "DISCONNECT REQUIRED"
 msgstr ""
 
 #. Update the joystick name
-#: Client/core/CSettings.cpp:1698
+#: Client/core/CSettings.cpp:1697
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1890
+#: Client/core/CSettings.cpp:1889
 msgid "Binding axis"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1890
+#: Client/core/CSettings.cpp:1889
 msgid "Move an axis to bind, or escape to clear"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1967
+#: Client/core/CSettings.cpp:1966
 msgid "Language:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1967
+#: Client/core/CSettings.cpp:1966
 msgid "Skin:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1967
+#: Client/core/CSettings.cpp:1966
 msgid "Presets:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2016
+#: Client/core/CSettings.cpp:2015
 msgid "Chat"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2033
+#: Client/core/CSettings.cpp:2032
 msgid "Load"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2045
+#: Client/core/CSettings.cpp:2044
 msgid "Colors"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2046
+#: Client/core/CSettings.cpp:2045
 msgid "Layout"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2047 Client/core/CSettings.cpp:2293
+#: Client/core/CSettings.cpp:2046 Client/core/CSettings.cpp:2292
 msgid "Options"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2053
+#: Client/core/CSettings.cpp:2052
 msgid "Chat Background"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2053
+#: Client/core/CSettings.cpp:2052
 msgid "Chat Text"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2053
+#: Client/core/CSettings.cpp:2052
 msgid "Input Background"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2053
+#: Client/core/CSettings.cpp:2052
 msgid "Input Text"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2076
+#: Client/core/CSettings.cpp:2075
 msgid "Lines:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2076
+#: Client/core/CSettings.cpp:2075
 msgid "Scale:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2076
+#: Client/core/CSettings.cpp:2075
 msgid "Width:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2079
+#: Client/core/CSettings.cpp:2078
 msgid "Size"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2128
+#: Client/core/CSettings.cpp:2127
 msgid "after"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2128
+#: Client/core/CSettings.cpp:2127
 msgid "for"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2128
+#: Client/core/CSettings.cpp:2127
 msgid "sec"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2131
+#: Client/core/CSettings.cpp:2130
 msgid "Fading"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2137
+#: Client/core/CSettings.cpp:2136
 msgid "Fade out old lines"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2177
+#: Client/core/CSettings.cpp:2176
 msgid "Horizontal:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2177
+#: Client/core/CSettings.cpp:2176
 msgid "Vertical:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2177
+#: Client/core/CSettings.cpp:2176
 msgid "Text-Align:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2177
+#: Client/core/CSettings.cpp:2176
 msgid "X-Offset:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2178
+#: Client/core/CSettings.cpp:2177
 msgid "Y-Offset:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2184
+#: Client/core/CSettings.cpp:2183
 msgid "Position"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2198 Client/core/CSettings.cpp:2226
+#: Client/core/CSettings.cpp:2197 Client/core/CSettings.cpp:2225
 #: Client/core/CKeyBinds.cpp:186
 msgid "Left"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2199 Client/core/CSettings.cpp:2213
+#: Client/core/CSettings.cpp:2198 Client/core/CSettings.cpp:2212
 msgid "Center"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2200 Client/core/CSettings.cpp:2227
+#: Client/core/CSettings.cpp:2199 Client/core/CSettings.cpp:2226
 #: Client/core/CKeyBinds.cpp:187
 msgid "Right"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2212
+#: Client/core/CSettings.cpp:2211
 msgid "Top"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2214
+#: Client/core/CSettings.cpp:2213
 msgid "Bottom"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2262
+#: Client/core/CSettings.cpp:2261
 msgid "Font"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2299
+#: Client/core/CSettings.cpp:2298
 msgid "Hide background when not typing"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2304
+#: Client/core/CSettings.cpp:2303
 msgid "Nickname completion using the \"Tab\" key"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2309
+#: Client/core/CSettings.cpp:2308
 msgid "Allow server to flash the window"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2314
+#: Client/core/CSettings.cpp:2313
 msgid "Allow tray balloon notifications"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2319
+#: Client/core/CSettings.cpp:2318
 msgid "Chat text black/white outline"
 msgstr ""
 
@@ -2297,85 +2297,85 @@ msgstr ""
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2568 Client/core/CSettings.cpp:2575
+#: Client/core/CSettings.cpp:2567 Client/core/CSettings.cpp:2574
 msgid "Press a key to bind, or escape to clear"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2569
+#: Client/core/CSettings.cpp:2568
 msgid "Binding a primary key"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2576
+#: Client/core/CSettings.cpp:2575
 msgid "Binding a secondary key"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2652
+#: Client/core/CSettings.cpp:2651
 msgid "GTA GAME CONTROLS"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2654
+#: Client/core/CSettings.cpp:2653
 msgid "MULTIPLAYER CONTROLS"
 msgstr ""
 
-#: Client/core/CSettings.cpp:2899 Client/core/CSettings.cpp:4637
+#: Client/core/CSettings.cpp:2898 Client/core/CSettings.cpp:4636
 msgid "Your nickname contains invalid characters!"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3690
+#: Client/core/CSettings.cpp:3689
 msgid "Red:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3690
+#: Client/core/CSettings.cpp:3689
 msgid "Green:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3690
+#: Client/core/CSettings.cpp:3689
 msgid "Blue:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3690
+#: Client/core/CSettings.cpp:3689
 msgid "Transparency:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3693
+#: Client/core/CSettings.cpp:3692
 msgid "Color"
 msgstr ""
 
-#: Client/core/CSettings.cpp:3770
+#: Client/core/CSettings.cpp:3769
 msgid "Preview"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4078
+#: Client/core/CSettings.cpp:4077
 msgid "Please disconnect before changing language"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4106
+#: Client/core/CSettings.cpp:4105
 msgid "Please disconnect before changing skin"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4392
+#: Client/core/CSettings.cpp:4391
 msgid ""
 "Volmetric shadows can cause some systems to slow down.\n"
 "\n"
 "Are you sure you want to enable them?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4396
+#: Client/core/CSettings.cpp:4395
 msgid "PERFORMANCE WARNING"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4416
+#: Client/core/CSettings.cpp:4415
 msgid ""
 "Screen upload is required by some servers for anti-cheat purposes.\n"
 "\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4418
+#: Client/core/CSettings.cpp:4417
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4433
+#: Client/core/CSettings.cpp:4432
 msgid ""
 "Some scripts may play sounds, such as radio, from the internet.\n"
 "\n"
@@ -2383,11 +2383,11 @@ msgid ""
 "bandwidth consumption.\n"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4436
+#: Client/core/CSettings.cpp:4435
 msgid "EXTERNAL SOUNDS"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4457
+#: Client/core/CSettings.cpp:4456
 msgid ""
 "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n"
@@ -2397,7 +2397,7 @@ msgid ""
 "Are you sure you want to use them?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4506
+#: Client/core/CSettings.cpp:4505
 msgid ""
 "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
@@ -2406,77 +2406,77 @@ msgid ""
 "Are you sure you want to enable this option?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4512
+#: Client/core/CSettings.cpp:4511
 msgid "EXPERIMENTAL FEATURE"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4655
+#: Client/core/CSettings.cpp:4654
 msgid "Please enter a nickname"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4656
+#: Client/core/CSettings.cpp:4655
 msgid ""
 "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4674
+#: Client/core/CSettings.cpp:4673
 msgid "Very experimental feature."
 msgstr ""
 
-#: Client/core/CSettings.cpp:4676
+#: Client/core/CSettings.cpp:4675
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4678
+#: Client/core/CSettings.cpp:4677
 msgid "Older routers may require a slower scan speed."
 msgstr ""
 
-#: Client/core/CSettings.cpp:4680
+#: Client/core/CSettings.cpp:4679
 msgid "Switch on to use only one connection when downloading."
 msgstr ""
 
-#: Client/core/CSettings.cpp:4682
+#: Client/core/CSettings.cpp:4681
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr ""
 
-#: Client/core/CSettings.cpp:4684
+#: Client/core/CSettings.cpp:4683
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4686
+#: Client/core/CSettings.cpp:4685
 msgid "Select default always. (This setting is not saved)"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4688
+#: Client/core/CSettings.cpp:4687
 msgid "Maximum is usually best"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4690 Client/core/CSettings.cpp:4692
+#: Client/core/CSettings.cpp:4689 Client/core/CSettings.cpp:4691
 msgid "Auto updater:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4690
+#: Client/core/CSettings.cpp:4689
 msgid "Select default unless you like filling out bug reports."
 msgstr ""
 
-#: Client/core/CSettings.cpp:4692
+#: Client/core/CSettings.cpp:4691
 msgid "Select default to automatically install important updates."
 msgstr ""
 
-#: Client/core/CSettings.cpp:4694
+#: Client/core/CSettings.cpp:4693
 msgid "16-bit color:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4694
+#: Client/core/CSettings.cpp:4693
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4696
+#: Client/core/CSettings.cpp:4695
 msgid "Mouse fix:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4696
+#: Client/core/CSettings.cpp:4695
 msgid "Mouse movement fix - May need PC restart"
 msgstr ""
 
