@@ -57,8 +57,9 @@
   /* it is better to use FreeType memory routines instead of raw
      'malloc/free' */
 
-  typedef void *(* alloc_func)(void*, int, int);
-  typedef void (* free_func)(void*, void*);
+  typedef void* (*alloc_func)( void*, int, int );
+  typedef void  (*free_func) ( void*, void* );
+
 
   static void*
   ft_bzip2_alloc( FT_Memory  memory,

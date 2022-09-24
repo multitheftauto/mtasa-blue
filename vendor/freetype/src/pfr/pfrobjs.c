@@ -207,7 +207,7 @@
 
       pfrface->height = (FT_Short)( ( pfrface->units_per_EM * 12 ) / 10 );
       if ( pfrface->height < pfrface->ascender - pfrface->descender )
-        pfrface->height = (FT_Short)(pfrface->ascender - pfrface->descender);
+        pfrface->height = (FT_Short)( pfrface->ascender - pfrface->descender );
 
       if ( phy_font->num_strikes > 0 )
       {

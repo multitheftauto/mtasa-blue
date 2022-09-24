@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 /*
@@ -75,10 +77,6 @@
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 #include <openssl/pkcs12.h>
-
-#ifdef USE_AMISSL
-#include "amigaos.h"
-#endif
 
 #if (OPENSSL_VERSION_NUMBER >= 0x0090808fL) && !defined(OPENSSL_NO_OCSP)
 #include <openssl/ocsp.h>
@@ -208,9 +206,17 @@
      !defined(OPENSSL_IS_BORINGSSL))
 #define HAVE_SSL_CTX_SET_CIPHERSUITES
 #define HAVE_SSL_CTX_SET_POST_HANDSHAKE_AUTH
-/* SET_EC_CURVES is available under the same preconditions: see
- * https://www.openssl.org/docs/manmaster/man3/SSL_CTX_set1_groups.html
+#endif
+
+/*
+ * Whether SSL_CTX_set1_curves_list is available.
+ * OpenSSL: supported since 1.0.2, see
+ *   https://www.openssl.org/docs/manmaster/man3/SSL_CTX_set1_groups.html
+ * BoringSSL: supported since 5fd1807d95f7 (committed 2016-09-30)
+ * LibreSSL: since 2.5.3 (April 12, 2017)
  */
+#if (OPENSSL_VERSION_NUMBER >= 0x10002000L) ||  \
+  defined(OPENSSL_IS_BORINGSSL)
 #define HAVE_SSL_CTX_SET_EC_CURVES
 #endif
 
@@ -476,36 +482,19 @@ static CURLcode ossl_seed(struct Curl_easy *data)
   return CURLE_SSL_CONNECT_ERROR;
 #else
 
-#ifndef RANDOM_FILE
-  /* if RANDOM_FILE isn't defined, we only perform this if an option tells
-     us to! */
-  if(data->set.str[STRING_SSL_RANDOM_FILE])
-#define RANDOM_FILE "" /* doesn't matter won't be used */
+#ifdef RANDOM_FILE
+  RAND_load_file(RANDOM_FILE, RAND_LOAD_LENGTH);
+  if(rand_enough())
+    return CURLE_OK;
 #endif
-  {
-    /* let the option override the define */
-    RAND_load_file((data->set.str[STRING_SSL_RANDOM_FILE]?
-                    data->set.str[STRING_SSL_RANDOM_FILE]:
-                    RANDOM_FILE),
-                   RAND_LOAD_LENGTH);
-    if(rand_enough())
-      return CURLE_OK;
-  }
 
-#if defined(HAVE_RAND_EGD)
-  /* only available in OpenSSL 0.9.5 and later */
+#if defined(HAVE_RAND_EGD) && defined(EGD_SOCKET)
+  /* available in OpenSSL 0.9.5 and later */
   /* EGD_SOCKET is set at configure time or not at all */
-#ifndef EGD_SOCKET
-  /* If we don't have the define set, we only do this if the egd-option
-     is set */
-  if(data->set.str[STRING_SSL_EGDSOCKET])
-#define EGD_SOCKET "" /* doesn't matter won't be used */
-#endif
   {
     /* If there's an option and a define, the option overrides the
        define */
-    int ret = RAND_egd(data->set.str[STRING_SSL_EGDSOCKET]?
-                       data->set.str[STRING_SSL_EGDSOCKET]:EGD_SOCKET);
+    int ret = RAND_egd(EGD_SOCKET);
     if(-1 != ret) {
       if(rand_enough())
         return CURLE_OK;
@@ -548,7 +537,7 @@ static CURLcode ossl_seed(struct Curl_easy *data)
     }
   }
 
-  infof(data, "libcurl is now using a weak random seed!");
+  infof(data, "libcurl is now using a weak random seed");
   return (rand_enough() ? CURLE_OK :
           CURLE_SSL_CONNECT_ERROR /* confusing error code */);
 #endif
@@ -804,9 +793,10 @@ int cert_stuff(struct Curl_easy *data,
         SSL_CTX_use_certificate_chain_file(ctx, cert_file);
       if(cert_use_result != 1) {
         failf(data,
-              "could not load PEM client certificate, " OSSL_PACKAGE
+              "could not load PEM client certificate from %s, " OSSL_PACKAGE
               " error %s, "
               "(no key found, wrong pass phrase, or wrong file format?)",
+              (cert_blob ? "CURLOPT_SSLCERT_BLOB" : cert_file),
               ossl_strerror(ERR_get_error(), error_buffer,
                             sizeof(error_buffer)) );
         return 0;
@@ -824,9 +814,10 @@ int cert_stuff(struct Curl_easy *data,
         SSL_CTX_use_certificate_file(ctx, cert_file, file_type);
       if(cert_use_result != 1) {
         failf(data,
-              "could not load ASN1 client certificate, " OSSL_PACKAGE
+              "could not load ASN1 client certificate from %s, " OSSL_PACKAGE
               " error %s, "
               "(no key found, wrong pass phrase, or wrong file format?)",
+              (cert_blob ? "CURLOPT_SSLCERT_BLOB" : cert_file),
               ossl_strerror(ERR_get_error(), error_buffer,
                             sizeof(error_buffer)) );
         return 0;
@@ -879,8 +870,9 @@ int cert_stuff(struct Curl_easy *data,
           }
 
           if(SSL_CTX_use_certificate(ctx, params.cert) != 1) {
-            failf(data, "unable to set client certificate");
-            X509_free(params.cert);
+            failf(data, "unable to set client certificate [%s]",
+                  ossl_strerror(ERR_get_error(), error_buffer,
+                                sizeof(error_buffer)));
             return 0;
           }
           X509_free(params.cert); /* we don't need the handle any more... */
@@ -1003,11 +995,7 @@ int cert_stuff(struct Curl_easy *data,
   fail:
       EVP_PKEY_free(pri);
       X509_free(x509);
-#ifdef USE_AMISSL
-      sk_X509_pop_free(ca, Curl_amiga_X509_free);
-#else
       sk_X509_pop_free(ca, X509_free);
-#endif
       if(!cert_done)
         return 0; /* failure! */
       break;
@@ -1156,6 +1144,22 @@ int cert_stuff(struct Curl_easy *data,
     }
   }
   return 1;
+}
+
+CURLcode Curl_ossl_set_client_cert(struct Curl_easy *data, SSL_CTX *ctx,
+                                   char *cert_file,
+                                   const struct curl_blob *cert_blob,
+                                   const char *cert_type, char *key_file,
+                                   const struct curl_blob *key_blob,
+                                   const char *key_type, char *key_passwd)
+{
+  int rv = cert_stuff(data, ctx, cert_file, cert_blob, cert_type, key_file,
+                      key_blob, key_type, key_passwd);
+  if(rv != 1) {
+    return CURLE_SSL_CERTPROBLEM;
+  }
+
+  return CURLE_OK;
 }
 
 /* returns non-zero on failure */
@@ -1808,7 +1812,8 @@ CURLcode Curl_ossl_verifyhost(struct Curl_easy *data, struct connectdata *conn,
               memcpy(peer_CN, ASN1_STRING_get0_data(tmp), peerlen);
               peer_CN[peerlen] = '\0';
             }
-            result = CURLE_OUT_OF_MEMORY;
+            else
+              result = CURLE_OUT_OF_MEMORY;
           }
         }
         else /* not a UTF8 name */
@@ -1901,6 +1906,11 @@ static CURLcode verifystatus(struct Curl_easy *data,
   }
 
   ch = SSL_get_peer_cert_chain(backend->handle);
+  if(!ch) {
+    failf(data, "Could not get peer certificate chain");
+    result = CURLE_SSL_INVALIDCERTSTATUS;
+    goto end;
+  }
   st = SSL_CTX_get_cert_store(backend->ctx);
 
 #if ((OPENSSL_VERSION_NUMBER <= 0x1000201fL) /* Fixed after 1.0.2a */ || \
@@ -2632,7 +2642,7 @@ static CURLcode ossl_connect_step1(struct Curl_easy *data,
 #endif
   const long int ssl_version = SSL_CONN_CONFIG(version);
 #ifdef USE_OPENSSL_SRP
-  const enum CURL_TLSAUTH ssl_authtype = SSL_SET_OPTION(authtype);
+  const enum CURL_TLSAUTH ssl_authtype = SSL_SET_OPTION(primary.authtype);
 #endif
   char * const ssl_cert = SSL_SET_OPTION(primary.clientcert);
   const struct curl_blob *ssl_cert_blob = SSL_SET_OPTION(primary.cert_blob);
@@ -2643,7 +2653,7 @@ static CURLcode ossl_connect_step1(struct Curl_easy *data,
     (ca_info_blob ? NULL : SSL_CONN_CONFIG(CAfile));
   const char * const ssl_capath = SSL_CONN_CONFIG(CApath);
   const bool verifypeer = SSL_CONN_CONFIG(verifypeer);
-  const char * const ssl_crlfile = SSL_SET_OPTION(CRLfile);
+  const char * const ssl_crlfile = SSL_SET_OPTION(primary.CRLfile);
   char error_buffer[256];
   struct ssl_backend_data *backend = connssl->backend;
   bool imported_native_ca = false;
@@ -2820,14 +2830,14 @@ static CURLcode ossl_connect_step1(struct Curl_easy *data,
 
       memcpy(&protocols[cur], ALPN_H2, ALPN_H2_LENGTH);
       cur += ALPN_H2_LENGTH;
-      infof(data, "ALPN, offering %s", ALPN_H2);
+      infof(data, VTLS_INFOF_ALPN_OFFER_1STR, ALPN_H2);
     }
 #endif
 
     protocols[cur++] = ALPN_HTTP_1_1_LENGTH;
     memcpy(&protocols[cur], ALPN_HTTP_1_1, ALPN_HTTP_1_1_LENGTH);
     cur += ALPN_HTTP_1_1_LENGTH;
-    infof(data, "ALPN, offering %s", ALPN_HTTP_1_1);
+    infof(data, VTLS_INFOF_ALPN_OFFER_1STR, ALPN_HTTP_1_1);
 
     /* expects length prefixed preference ordered list of protocols in wire
      * format
@@ -2893,16 +2903,17 @@ static CURLcode ossl_connect_step1(struct Curl_easy *data,
 #endif
 
 #ifdef USE_OPENSSL_SRP
-  if(ssl_authtype == CURL_TLSAUTH_SRP) {
-    char * const ssl_username = SSL_SET_OPTION(username);
-
+  if((ssl_authtype == CURL_TLSAUTH_SRP) &&
+     Curl_allow_auth_to_host(data)) {
+    char * const ssl_username = SSL_SET_OPTION(primary.username);
+    char * const ssl_password = SSL_SET_OPTION(primary.password);
     infof(data, "Using TLS-SRP username: %s", ssl_username);
 
     if(!SSL_CTX_set_srp_username(backend->ctx, ssl_username)) {
       failf(data, "Unable to set SRP user name");
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
-    if(!SSL_CTX_set_srp_password(backend->ctx, SSL_SET_OPTION(password))) {
+    if(!SSL_CTX_set_srp_password(backend->ctx, ssl_password)) {
       failf(data, "failed setting SRP password");
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
@@ -3200,7 +3211,7 @@ static CURLcode ossl_connect_step1(struct Curl_easy *data,
     SSL_free(backend->handle);
   backend->handle = SSL_new(backend->ctx);
   if(!backend->handle) {
-    failf(data, "SSL: couldn't create a context (handle)!");
+    failf(data, "SSL: couldn't create a context (handle)");
     return CURLE_OUT_OF_MEMORY;
   }
 
@@ -3426,7 +3437,7 @@ static CURLcode ossl_connect_step2(struct Curl_easy *data,
       unsigned int len;
       SSL_get0_alpn_selected(backend->handle, &neg_protocol, &len);
       if(len) {
-        infof(data, "ALPN, server accepted to use %.*s", len, neg_protocol);
+        infof(data, VTLS_INFOF_ALPN_ACCEPTED_LEN_1STR, len, neg_protocol);
 
 #ifdef USE_HTTP2
         if(len == ALPN_H2_LENGTH &&
@@ -3441,7 +3452,7 @@ static CURLcode ossl_connect_step2(struct Curl_easy *data,
         }
       }
       else
-        infof(data, "ALPN, server did not agree to a protocol");
+        infof(data, VTLS_INFOF_NO_ALPN);
 
       Curl_multiuse_state(data, conn->negnpn == CURL_HTTP_VERSION_2 ?
                           BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
@@ -3891,7 +3902,7 @@ static CURLcode servercert(struct Curl_easy *data,
     if(!strict)
       return CURLE_OK;
 
-    failf(data, "SSL: couldn't get peer certificate!");
+    failf(data, "SSL: couldn't get peer certificate");
     return CURLE_PEER_FAILED_VERIFICATION;
   }
 
@@ -3931,7 +3942,7 @@ static CURLcode servercert(struct Curl_easy *data,
                          buffer, sizeof(buffer));
   if(rc) {
     if(strict)
-      failf(data, "SSL: couldn't get X509-issuer name!");
+      failf(data, "SSL: couldn't get X509-issuer name");
     result = CURLE_PEER_FAILED_VERIFICATION;
   }
   else {
@@ -4049,7 +4060,7 @@ static CURLcode servercert(struct Curl_easy *data,
   if(!result && ptr) {
     result = pkp_pin_peer_pubkey(data, backend->server_cert, ptr);
     if(result)
-      failf(data, "SSL: public key does not match pinned public key!");
+      failf(data, "SSL: public key does not match pinned public key");
   }
 
   X509_free(backend->server_cert);
@@ -4438,7 +4449,13 @@ static size_t ossl_version(char *buffer, size_t size)
                    (LIBRESSL_VERSION_NUMBER>>12)&0xff);
 #endif
 #elif defined(OPENSSL_IS_BORINGSSL)
+#ifdef CURL_BORINGSSL_VERSION
+  return msnprintf(buffer, size, "%s/%s",
+                   OSSL_PACKAGE,
+                   CURL_BORINGSSL_VERSION);
+#else
   return msnprintf(buffer, size, OSSL_PACKAGE);
+#endif
 #elif defined(HAVE_OPENSSL_VERSION) && defined(OPENSSL_VERSION_STRING)
   return msnprintf(buffer, size, "%s/%s",
                    OSSL_PACKAGE, OpenSSL_version(OPENSSL_VERSION_STRING));

@@ -133,7 +133,6 @@ public:
 
     virtual BYTE           GetVehicleType() = 0;
     virtual VOID           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
-    virtual BYTE           GetLevelFromPosition(CVector* vecPosition) = 0;
     virtual BOOL           IsLoaded() = 0;
     virtual BYTE           GetFlags() = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
@@ -204,6 +203,7 @@ public:
     virtual void      MakePedModel(char* szTexture) = 0;
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
+    virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;

@@ -229,6 +229,7 @@ public:
 
 struct CTimeInfoSAInterface
 {
+    CTimeInfoSAInterface() : m_nTimeOn(20), m_nTimeOff(6), m_wOtherTimeModel(0){};
     CTimeInfoSAInterface(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
     char  m_nTimeOn;
     char  m_nTimeOff;
@@ -290,10 +291,6 @@ public:
     char                                pAnimBlock[4];
 };
 
-/**
- * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
- */
-
 class CModelInfoSA : public CModelInfo
 {
 protected:
@@ -347,7 +344,6 @@ public:
     BYTE           GetVehicleType();
     VOID           Request(EModelRequestType requestType, const char* szTag);
     VOID           Remove();
-    BYTE           GetLevelFromPosition(CVector* vecPosition);
     BOOL           IsLoaded();
     BOOL           DoIsLoaded();
     BYTE           GetFlags();
@@ -425,6 +421,7 @@ public:
     void         MakePedModel(char* szTexture);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
+    void         MakeTimedObjectModel(ushort usBaseModelID);
     void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 

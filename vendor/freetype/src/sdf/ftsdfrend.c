@@ -298,15 +298,9 @@
       goto Exit;
     }
 
-    /* the rows and pitch must be valid after presetting the */
-    /* bitmap using outline                                  */
+    /* nothing to render */
     if ( !bitmap->rows || !bitmap->pitch )
-    {
-      FT_ERROR(( "ft_sdf_render: failed to preset bitmap\n" ));
-
-      error = FT_THROW( Cannot_Render_Glyph );
-      goto Exit;
-    }
+      return FT_Err_Ok;
 
     /* the padding will simply be equal to the `spread' */
     x_pad = sdf_module->spread;
@@ -525,13 +519,9 @@
       goto Exit;
     }
 
+    /* nothing to render */
     if ( !bitmap->rows || !bitmap->pitch )
-    {
-      FT_ERROR(( "ft_bsdf_render: invalid bitmap size\n" ));
-
-      error = FT_THROW( Invalid_Argument );
-      goto Exit;
-    }
+      return FT_Err_Ok;
 
     FT_Bitmap_New( &target );
 

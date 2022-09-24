@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -175,14 +177,17 @@ static size_t strlen_url(const char *url, bool relative)
  * the source URL accordingly.
  * URL encoding should be skipped for host names, otherwise IDN resolution
  * will fail.
+ *
+ * Returns TRUE if something was updated.
  */
-static void strcpy_url(char *output, const char *url, bool relative)
+static bool strcpy_url(char *output, const char *url, bool relative)
 {
   /* we must add this with whitespace-replacing */
   bool left = TRUE;
   const unsigned char *iptr;
   char *optr = output;
   const unsigned char *host_sep = (const unsigned char *) url;
+  bool changed = FALSE;
 
   if(!relative)
     host_sep = (const unsigned char *) find_host_sep(url);
@@ -204,6 +209,7 @@ static void strcpy_url(char *output, const char *url, bool relative)
       }
       else
         *optr++='+'; /* add a '+' here */
+      changed = TRUE;
       continue;
     }
 
@@ -212,6 +218,7 @@ static void strcpy_url(char *output, const char *url, bool relative)
 
     if(urlchar_needs_escaping(*iptr)) {
       msnprintf(optr, 4, "%%%02x", *iptr);
+      changed = TRUE;
       optr += 3;
     }
     else
@@ -219,6 +226,7 @@ static void strcpy_url(char *output, const char *url, bool relative)
   }
   *optr = 0; /* null-terminate output buffer */
 
+  return changed;
 }
 
 /*
@@ -228,7 +236,7 @@ static void strcpy_url(char *output, const char *url, bool relative)
  */
 bool Curl_is_absolute_url(const char *url, char *buf, size_t buflen)
 {
-  size_t i;
+  int i;
   DEBUGASSERT(!buf || (buflen > MAX_SCHEME_LEN));
   (void)buflen; /* only used in debug-builds */
   if(buf)
@@ -678,8 +686,8 @@ static CURLUcode hostname_check(struct Curl_URL *u, char *hostname)
 #endif
   }
   else {
-    /* letters from the second string is not ok */
-    len = strcspn(hostname, " \r\n");
+    /* letters from the second string are not ok */
+    len = strcspn(hostname, " \r\n\t/:#?!@");
     if(hlen != len)
       /* hostname with bad content */
       return CURLUE_BAD_HOSTNAME;
@@ -1144,7 +1152,7 @@ static CURLUcode parseurl(const char *url, CURLU *u, unsigned int flags)
 }
 
 /*
- * Parse the URL and, if successful, replace everyting in the Curl_URL struct.
+ * Parse the URL and, if successful, replace everything in the Curl_URL struct.
  */
 static CURLUcode parseurl_and_replace(const char *url, CURLU *u,
                                       unsigned int flags)
@@ -1436,6 +1444,19 @@ CURLUcode curl_url_get(CURLU *u, CURLUPart what,
       }
       *part = decoded;
     }
+    if(urlencode) {
+      /* worst case output length is 3x the original! */
+      char *newp = malloc(strlen(*part) * 3);
+      if(!newp)
+        return CURLUE_OUT_OF_MEMORY;
+      if(strcpy_url(newp, *part, TRUE)) { /* consider it relative */
+        free(*part);
+        *part = newp;
+      }
+      else
+        free(newp);
+    }
+
     return CURLUE_OK;
   }
   else
@@ -1496,6 +1517,10 @@ CURLUcode curl_url_set(CURLU *u, CURLUPart what,
     }
     if(storep && *storep) {
       Curl_safefree(*storep);
+    }
+    else if(!storep) {
+      free_urlhandle(u);
+      memset(u, 0, sizeof(struct Curl_URL));
     }
     return CURLUE_OK;
   }

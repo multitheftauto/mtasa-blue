@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
-using namespace std;
+#include "CColCircle.h"
+#include "CColManager.h"
+#include "CVector2D.h"
+#include "CSpatialDatabase.h"
+#include "Utils.h"
 
 CColCircle::CColCircle(CColManager* pManager, CElement* pParent, const CVector2D& vecPosition, float fRadius, bool bIsPartnered)
     : CColShape(pManager, pParent, bIsPartnered)

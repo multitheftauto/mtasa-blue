@@ -26,10 +26,8 @@ workspace "MTASA"
 
 	if os.host() == "macosx" then
 		platforms { "x64" }
-	elseif os.host() == "linux" then
-		platforms { "x86", "x64", "armhf", "arm64" }
 	else
-		platforms { "x86", "x64" }
+		platforms { "x86", "x64", "arm", "arm64" }
 	end
 
 	if _OPTIONS["gccprefix"] then
@@ -78,7 +76,7 @@ workspace "MTASA"
 		architecture "x86"
 	filter "platforms:x64"
 		architecture "x86_64"
-	filter "platforms:armhf"
+	filter "platforms:arm"
 		architecture "ARM"
 	filter "platforms:arm64"
 		architecture "ARM64"
@@ -99,8 +97,7 @@ workspace "MTASA"
 	end
 
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
-		os.mkdir("Build/Symbols")
-		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
+		symbolspath "$(SolutionDir)Symbols\\$(Configuration)_$(Platform)\\$(ProjectName).pdb"
 
 	filter "system:windows"
 		toolset "v143"
@@ -119,8 +116,11 @@ workspace "MTASA"
 		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
 
-	filter { "system:linux", "platforms:not arm*" }
+	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }
+
+	filter { "system:linux or macosx", "configurations:not Debug", "language:C++" }
+		buildoptions { "-fvisibility-inlines-hidden" }
 
 	filter { "system:linux", "platforms:x86 or x64" }
 		vectorextensions "SSE2"

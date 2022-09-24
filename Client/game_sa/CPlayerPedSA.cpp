@@ -45,7 +45,6 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
 
     this->Init();            // init our interfaces
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
-    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
     this->SetModelIndex(pedType);
@@ -99,7 +98,6 @@ CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 
     this->Init();
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
-    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
     this->SetType(PLAYER_PED);
     this->BeingDeleted = FALSE;
 

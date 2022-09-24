@@ -7,13 +7,13 @@ jobs:
   windows:
     strategy:
       matrix:
-        type: [release, debug]
-    name: windows-${{ matrix.type }}
+        platform: [win32, x64, arm64]
+    name: windows-${{ matrix.platform }}
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         id: cache-dxfiles
         with:
           path: utils/DXFiles
@@ -35,17 +35,8 @@ jobs:
       - name: Install data files
         run: utils\premake5 install_data
 
-      - name: Run Build [Release]
-        if: ${{ matrix.type == 'release' }}
-        run: win-build.bat
-        shell: cmd
-        env:
-          DXSDK_DIR: './utils/DXFiles/'
-          CI: 'true'
-
-      - name: Run Build [Debug]
-        if: ${{ matrix.type == 'debug' }}
-        run: win-build.bat Debug
+      - name: Run Build
+        run: win-build.bat release ${{ matrix.platform }}
         shell: cmd
         env:
           DXSDK_DIR: './utils/DXFiles/'
@@ -55,22 +46,12 @@ jobs:
         run: utils\premake5 compose_files
 
       - uses: actions/upload-artifact@master
-        if: ${{ matrix.type == 'release' }}
         with:
           name: InstallFiles
           path: InstallFiles/
 
-      - uses: actions/upload-artifact@master
-        if: ${{ matrix.type == 'debug' }}
-        with:
-          name: InstallFiles-debug
-          path: InstallFiles/
-
   macOS:
-    strategy:
-      matrix:
-        type: [release, debug]
-    name: macOS-${{ matrix.type }}
+    name: macOS
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v3
@@ -83,19 +64,18 @@ jobs:
         run: brew link --overwrite mysql
 
       - name: Run Build
-        run: ./linux-build.sh --config=${{ matrix.type }}
+        run: ./linux-build.sh
 
   linux:
     strategy:
       matrix:
-        type: [release, debug]
         architecture: [x64, arm64]
         include:
         - architecture: x64
           image-tag: latest
         - architecture: arm64
           image-tag: arm64
-    name: linux-${{ matrix.type }}-${{ matrix.architecture }}
+    name: linux-${{ matrix.architecture }}
     runs-on: ubuntu-latest
     container:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
@@ -103,4 +83,4 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Run Build
-        run: ./linux-build.sh --arch=${{ matrix.architecture }} --config=${{ matrix.type }}
+        run: ./linux-build.sh --arch=${{ matrix.architecture }}

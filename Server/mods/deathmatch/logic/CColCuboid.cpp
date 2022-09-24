@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CColCuboid.h"
 
 CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize) : CColShape(pManager, pParent)
 {

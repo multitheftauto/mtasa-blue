@@ -92,6 +92,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
+    m_bFocused = g_pCore->IsFocused();
+
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
 
@@ -442,6 +444,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
+    g_pMultiplayer->SetAudioZoneRadioSwitchHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -2564,6 +2567,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
     m_Events.AddEvent("onClientRestore", "", NULL, false);
+    m_Events.AddEvent("onClientMTAFocusChange", "focused", NULL, false);
 
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
@@ -5292,10 +5296,14 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->RestoreFogDistance();
 
     // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
 
     // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetPedsLODDistance(true);
+
+    // Corona rain reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
 
     // Sun color
     g_pMultiplayer->ResetSunColor();
@@ -5398,6 +5406,12 @@ void CClientGame::ResetMapInfo()
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }
+
+    // Reset camera drunk/shake level
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
+
+    if (pPlayerInfo)
+        pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
     RestreamWorld();
 }
@@ -6537,6 +6551,18 @@ void CClientGame::RestreamWorld()
     g_pGame->GetStreaming()->ReinitStreaming();
 }
 
+void CClientGame::OnWindowFocusChange(bool state)
+{
+    if (state == m_bFocused)
+        return;
+
+    m_bFocused = state;
+
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(state);
+    m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
+}
+
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
@@ -6685,7 +6711,9 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 //////////////////////////////////////////////////////////////////
 void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
-    if (m_pPlayerManager->GetLocalPlayer()->IsInVehicle())
+    CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
+    
+    if (pPlayer && pPlayer->IsInVehicle())
     {
         // Do not change radio station if player is inside vehicle
         // because it is supposed to play own radio
