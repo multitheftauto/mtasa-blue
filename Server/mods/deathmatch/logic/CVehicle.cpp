@@ -301,20 +301,28 @@ bool CVehicle::ReadSpecialData(const int iLine)
     char szTemp[256];
     if (GetCustomDataString("color", szTemp, 256, true))
     {
-        std::vector<SColorRGBA> vecColors;
-        unsigned char           ucCount;
+        uchar ucValues[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        char* sz1 = strtok(szTemp, ", ");
+        if (sz1)
+            ucValues[0] = atoi(sz1);
 
-        if (ColorStringToRGB(szTemp, SColorRGBA(0, 0, 0, 0), vecColors, ucCount))
+        int i;
+        for (i = 1; i < 12; i++)
         {
-            if (ucCount % 3 == 0)
-                m_Color.SetRGBColors(vecColors[0], vecColors[1], vecColors[2], vecColors[3]);
-            else
-                m_Color.SetPaletteColors(vecColors[0].R, vecColors[0].G, vecColors[0].B, vecColors[1].R);
+            char* szn = strtok(NULL, ", ");
+            if (!szn)
+                break;
+            ucValues[i] = atoi(szn);
+        }
+
+        if (i == 3 || i == 6 || i == 9 || i == 12)
+        {
+            m_Color.SetRGBColors(SColorRGBA(ucValues[0], ucValues[1], ucValues[2], 0), SColorRGBA(ucValues[3], ucValues[4], ucValues[5], 0),
+                                 SColorRGBA(ucValues[6], ucValues[7], ucValues[8], 0), SColorRGBA(ucValues[9], ucValues[10], ucValues[11], 0));
         }
         else
         {
-            CLogger::ErrorPrintf("Bad 'color' value specified in <vehicle> (line %u)\n", iLine);
-            return false;
+            m_Color.SetPaletteColors(ucValues[0], ucValues[1], ucValues[2], ucValues[3]);
         }
     }
 
