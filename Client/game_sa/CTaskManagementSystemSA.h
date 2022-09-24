@@ -16,12 +16,11 @@ class CTaskManagementSystemSA;
 #include "TaskSA.h"
 #include "TaskCarAccessoriesSA.h"
 #include "TaskCarSA.h"
-#include <game/CTaskManagementSystem.h>
 #include <list>
 
 #define FUNC_CTask_Operator_Delete          0x61A5B0
 
-class CTaskManagementSystemSA : public CTaskManagementSystem
+class CTaskManagementSystemSA
 {
 public:
     CTaskManagementSystemSA();

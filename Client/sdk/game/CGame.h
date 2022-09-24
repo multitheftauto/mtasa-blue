@@ -45,7 +45,6 @@
 #include "CHandlingManager.h"
 #include "CHud.h"
 #include "CKeyGen.h"
-#include "CMenuManager.h"
 #include "CModelInfo.h"
 #include "CPad.h"
 #include "CPathFind.h"
@@ -55,7 +54,6 @@
 #include "CPlayerInfo.h"
 #include "CPointLights.h"
 #include "CPools.h"
-#include "CPopulation.h"
 #include "CProjectile.h"
 #include "CProjectileInfo.h"
 #include "CRadar.h"
@@ -64,7 +62,6 @@
 #include "CSettings.h"
 #include "CStats.h"
 #include "CStreaming.h"
-#include "CTaskManagementSystem.h"
 #include "CTasks.h"
 #include "CVisibilityPlugins.h"
 #include "CWaterManager.h"
@@ -139,11 +136,9 @@ public:
     virtual CAEAudioHardware*         GetAEAudioHardware() = 0;
     virtual CAESoundManager*          GetAESoundManager() = 0;
     virtual CAudioContainer*          GetAudioContainer() = 0;
-    virtual CMenuManager*             GetMenuManager() = 0;
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
     virtual CPathFind*                GetPathFind() = 0;
-    virtual CPopulation*              GetPopulation() = 0;
     virtual CGameSettings*            GetSettings() = 0;
     virtual CCarEnterExit*            GetCarEnterExit() = 0;
     virtual CControllerConfigManager* GetControllerConfigManager() = 0;
@@ -166,11 +161,10 @@ public:
 
     virtual DWORD        GetSystemTime() = 0;
     virtual BOOL         IsAtMenu() = 0;
-    virtual BOOL         IsGameLoaded() = 0;
-    virtual VOID         StartGame() = 0;
-    virtual VOID         SetSystemState(eSystemState State) = 0;
+    virtual void         StartGame() = 0;
+    virtual void         SetSystemState(eSystemState State) = 0;
     virtual eSystemState GetSystemState() = 0;
-    virtual VOID         Pause(bool bPaused) = 0;
+    virtual void         Pause(bool bPaused) = 0;
     virtual void         SetTimeScale(float fTimeScale) = 0;
     virtual float        GetFPS() = 0;
     virtual float        GetTimeStep() = 0;
