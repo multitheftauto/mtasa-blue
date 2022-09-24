@@ -851,6 +851,11 @@ void CSettings::CreateGUI()
         fPosY -= 20.0f;
     }
 #endif
+
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
+
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -896,7 +901,14 @@ void CSettings::CreateGUI()
     m_pEditBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserBlacklistAdd->GetPosition(vecTemp);
     m_pEditBrowserBlacklistAdd->SetSize(CVector2D(191.0f, 22.0f));
-    m_pEditBrowserBlacklistAdd->SetText(_("Enter a domain e.g. google.com"));
+
+    m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
+    m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10, 3), false);
+    m_pLabelBrowserBlacklistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserBlacklistAdd->SetSize(CVector2D(1, 1), true);
+    m_pLabelBrowserBlacklistAdd->SetAlpha(0.7f);
+    m_pLabelBrowserBlacklistAdd->SetProperty("MousePassThroughEnabled", "True");
+    m_pLabelBrowserBlacklistAdd->SetProperty("DistributeCapturedInputs", "True");
 
     m_pButtonBrowserBlacklistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Block")));
     m_pButtonBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserBlacklistAdd->GetSize().fX + 2.0f, vecTemp.fY));
@@ -924,7 +936,14 @@ void CSettings::CreateGUI()
     m_pEditBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserWhitelistAdd->GetPosition(vecTemp);
     m_pEditBrowserWhitelistAdd->SetSize(CVector2D(191.0f, 22.0f));
-    m_pEditBrowserWhitelistAdd->SetText(_("Enter a domain e.g. google.com"));
+
+    m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
+    m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10, 3), false);
+    m_pLabelBrowserWhitelistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserWhitelistAdd->SetSize(CVector2D(1, 1), true);
+    m_pLabelBrowserWhitelistAdd->SetAlpha(0.7f);
+    m_pLabelBrowserWhitelistAdd->SetProperty("MousePassThroughEnabled", "True");
+    m_pLabelBrowserWhitelistAdd->SetProperty("DistributeCapturedInputs", "True");
 
     m_pButtonBrowserWhitelistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Allow")));
     m_pButtonBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserWhitelistAdd->GetSize().fX + 2.0f, vecTemp.fY));
@@ -1231,8 +1250,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
+    m_pEditBrowserBlacklistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddFocused, this));
+    m_pEditBrowserBlacklistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddDefocused, this));
     m_pButtonBrowserWhitelistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistAdd, this));
     m_pButtonBrowserWhitelistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemove, this));
+    m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
+    m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
 
     // Set up the events for advanced description
     m_pPriorityLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
@@ -1539,6 +1562,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("high_detail_peds", bHighDetailPeds);
     m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
 
+    // Corona rain reflections
+    bool bCoronaReflections;
+    CVARS_GET("corona_reflections", bCoronaReflections);
+    m_pCheckBoxCoronaReflections->SetSelected(bCoronaReflections);
+
     PopulateResolutionComboBox();
 
     // Fullscreen style
@@ -1763,6 +1791,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
+    CVARS_SET("corona_reflections", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
@@ -2660,7 +2689,7 @@ void CSettings::Initialize()
             if (controlBind->control != pControl)
                 continue;
 
-            if (!numMatches) // Primary key
+            if (!numMatches)            // Primary key
             {
                 // Add bind to the list
                 iBind = m_pBindsList->InsertRowAfter(iRowGame);
@@ -2672,7 +2701,7 @@ void CSettings::Initialize()
                 m_pBindsList->SetItemData(iBind, m_hPriKey, controlBind);
                 iGameRowCount++;
             }
-            else // Secondary key
+            else            // Secondary key
             {
                 for (size_t k = 0; k < SecKeyNum; k++)
                 {
@@ -2691,7 +2720,7 @@ void CSettings::Initialize()
         if (!numMatches)
         {
             iBind = m_pBindsList->InsertRowAfter(iRowGame);
-            m_pBindsList->SetItemText(iBind, m_hBind, pControl->szDescription);
+            m_pBindsList->SetItemText(iBind, m_hBind, _(pControl->szDescription));
             m_pBindsList->SetItemText(iBind, m_hPriKey, CORE_SETTINGS_NO_KEY);
             for (int k = 0; k < SecKeyNum; k++)
                 m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
@@ -3407,6 +3436,11 @@ void CSettings::SaveData()
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance(false);
+
+    // Corona rain reflections
+    bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
+    CVARS_SET("corona_reflections", bCoronaReflections);
+    gameSettings->ResetCoronaReflectionsEnabled();
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
@@ -4533,6 +4567,19 @@ bool CSettings::OnBrowserBlacklistRemove(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement)
+{
+    m_pLabelBrowserBlacklistAdd->SetVisible(false);
+    return true;
+}
+
+bool CSettings::OnBrowserBlacklistDomainAddDefocused(CGUIElement* pElement)
+{
+    if (m_pEditBrowserBlacklistAdd->GetText() == "")
+        m_pLabelBrowserBlacklistAdd->SetVisible(true);
+    return true;
+}
+
 bool CSettings::OnBrowserWhitelistAdd(CGUIElement* pElement)
 {
     SString strDomain = m_pEditBrowserWhitelistAdd->GetText();
@@ -4566,6 +4613,19 @@ bool CSettings::OnBrowserWhitelistRemove(CGUIElement* pElement)
         m_bBrowserListsChanged = true;
     }
 
+    return true;
+}
+
+bool CSettings::OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement)
+{
+    m_pLabelBrowserWhitelistAdd->SetVisible(false);
+    return true;
+}
+
+bool CSettings::OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement)
+{
+    if (m_pEditBrowserWhitelistAdd->GetText() == "")
+        m_pLabelBrowserWhitelistAdd->SetVisible(true);
     return true;
 }
 

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -461,12 +463,12 @@ Curl_cache_addr(struct Curl_easy *data,
 }
 
 #ifdef ENABLE_IPV6
-/* return a static IPv6 resolve for 'localhost' */
-static struct Curl_addrinfo *get_localhost6(int port)
+/* return a static IPv6 ::1 for the name */
+static struct Curl_addrinfo *get_localhost6(int port, const char *name)
 {
   struct Curl_addrinfo *ca;
   const size_t ss_size = sizeof(struct sockaddr_in6);
-  const size_t hostlen = strlen("localhost");
+  const size_t hostlen = strlen(name);
   struct sockaddr_in6 sa6;
   unsigned char ipv6[16];
   unsigned short port16 = (unsigned short)(port & 0xffff);
@@ -491,19 +493,19 @@ static struct Curl_addrinfo *get_localhost6(int port)
   ca->ai_addr = (void *)((char *)ca + sizeof(struct Curl_addrinfo));
   memcpy(ca->ai_addr, &sa6, ss_size);
   ca->ai_canonname = (char *)ca->ai_addr + ss_size;
-  strcpy(ca->ai_canonname, "localhost");
+  strcpy(ca->ai_canonname, name);
   return ca;
 }
 #else
-#define get_localhost6(x) NULL
+#define get_localhost6(x,y) NULL
 #endif
 
-/* return a static IPv4 resolve for 'localhost' */
-static struct Curl_addrinfo *get_localhost(int port)
+/* return a static IPv4 127.0.0.1 for the given name */
+static struct Curl_addrinfo *get_localhost(int port, const char *name)
 {
   struct Curl_addrinfo *ca;
   const size_t ss_size = sizeof(struct sockaddr_in);
-  const size_t hostlen = strlen("localhost");
+  const size_t hostlen = strlen(name);
   struct sockaddr_in sa;
   unsigned int ipv4;
   unsigned short port16 = (unsigned short)(port & 0xffff);
@@ -527,8 +529,8 @@ static struct Curl_addrinfo *get_localhost(int port)
   ca->ai_addr = (void *)((char *)ca + sizeof(struct Curl_addrinfo));
   memcpy(ca->ai_addr, &sa, ss_size);
   ca->ai_canonname = (char *)ca->ai_addr + ss_size;
-  strcpy(ca->ai_canonname, "localhost");
-  ca->ai_next = get_localhost6(port);
+  strcpy(ca->ai_canonname, name);
+  ca->ai_next = get_localhost6(port, name);
   return ca;
 }
 
@@ -579,6 +581,17 @@ bool Curl_host_is_ipnum(const char *hostname)
     )
     return TRUE;
   return FALSE;
+}
+
+
+/* return TRUE if 'part' is a case insentive tail of 'full' */
+static bool tailmatch(const char *full, const char *part)
+{
+  size_t plen = strlen(part);
+  size_t flen = strlen(full);
+  if(plen > flen)
+    return FALSE;
+  return strncasecompare(part, &full[flen - plen], plen);
 }
 
 /*
@@ -716,8 +729,9 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
       if(conn->ip_version == CURL_IPRESOLVE_V6 && !Curl_ipv6works(data))
         return CURLRESOLV_ERROR;
 
-      if(strcasecompare(hostname, "localhost"))
-        addr = get_localhost(port);
+      if(strcasecompare(hostname, "localhost") ||
+         tailmatch(hostname, ".localhost"))
+        addr = get_localhost(port, hostname);
 #ifndef CURL_DISABLE_DOH
       else if(allowDOH && data->set.doh && !ipnum)
         addr = Curl_doh(data, hostname, port, &respwait);
@@ -945,7 +959,7 @@ clean_up:
          less than 1! */
       alarm(1);
       rc = CURLRESOLV_TIMEDOUT;
-      failf(data, "Previous alarm fired off!");
+      failf(data, "Previous alarm fired off");
     }
     else
       alarm((unsigned int)alarm_set);
@@ -991,9 +1005,9 @@ static void freednsentry(void *freethis)
 /*
  * Curl_init_dnscache() inits a new DNS cache.
  */
-void Curl_init_dnscache(struct Curl_hash *hash)
+void Curl_init_dnscache(struct Curl_hash *hash, int size)
 {
-  Curl_hash_init(hash, 7, Curl_hash_str, Curl_str_key_compare,
+  Curl_hash_init(hash, size, Curl_hash_str, Curl_str_key_compare,
                  freednsentry);
 }
 
@@ -1131,7 +1145,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
 
         ai = Curl_str2addr(address, port);
         if(!ai) {
-          infof(data, "Resolve address '%s' found illegal!", address);
+          infof(data, "Resolve address '%s' found illegal", address);
           goto err;
         }
 
@@ -1150,7 +1164,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
       error = false;
    err:
       if(error) {
-        failf(data, "Couldn't parse CURLOPT_RESOLVE entry '%s'!",
+        failf(data, "Couldn't parse CURLOPT_RESOLVE entry '%s'",
               hostp->data);
         Curl_freeaddrinfo(head);
         return CURLE_SETOPT_OPTION_SYNTAX;
@@ -1167,8 +1181,8 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
       dns = Curl_hash_pick(data->dns.hostcache, entry_id, entry_len + 1);
 
       if(dns) {
-        infof(data, "RESOLVE %s:%d is - old addresses discarded!",
-                hostname, port);
+        infof(data, "RESOLVE %s:%d is - old addresses discarded",
+              hostname, port);
         /* delete old entry, there are two reasons for this
          1. old entry may have different addresses.
          2. even if entry with correct addresses is already in the cache,
@@ -1220,6 +1234,7 @@ CURLcode Curl_resolv_check(struct Curl_easy *data,
                            struct Curl_dns_entry **dns)
 {
 #if defined(CURL_DISABLE_DOH) && !defined(CURLRES_ASYNCH)
+  (void)data;
   (void)dns;
 #endif
 #ifndef CURL_DISABLE_DOH
@@ -1267,7 +1282,7 @@ CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_done)
   result = Curl_setup_conn(data, protocol_done);
 
   if(result) {
-    Curl_detach_connnection(data);
+    Curl_detach_connection(data);
     Curl_conncache_remove_conn(data, conn, TRUE);
     Curl_disconnect(data, conn, TRUE);
   }

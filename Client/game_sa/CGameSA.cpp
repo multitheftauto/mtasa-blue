@@ -99,12 +99,10 @@ CGameSA::CGameSA()
     this->m_pFireManager = new CFireManagerSA();
     this->m_p3DMarkers = new C3DMarkersSA();
     this->m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
-    this->m_pTheCarGenerators = new CTheCarGeneratorsSA();
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
     this->m_pMenuManager = new CMenuManagerSA();
     this->m_pStats = new CStatsSA();
-    this->m_pFont = new CFontSA();
     this->m_pPathFind = new CPathFindSA();
     this->m_pPopulation = new CPopulationSA();
     this->m_pTaskManagementSystem = new CTaskManagementSystemSA();
@@ -222,6 +220,7 @@ CGameSA::CGameSA()
     CFxSystemSA::StaticSetHooks();
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
+    CVehicleSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -244,12 +243,10 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
     delete reinterpret_cast<CPopulationSA*>(m_pPopulation);
     delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
-    delete reinterpret_cast<CFontSA*>(m_pFont);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
     delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
-    delete reinterpret_cast<CTheCarGeneratorsSA*>(m_pTheCarGenerators);
     delete reinterpret_cast<CPadSA*>(m_pPad);
     delete reinterpret_cast<C3DMarkersSA*>(m_p3DMarkers);
     delete reinterpret_cast<CFireManagerSA*>(m_pFireManager);
@@ -308,17 +305,6 @@ VOID CGameSA::Pause(bool bPaused)
 {
     *VAR_GamePaused = bPaused;
 }
-
-bool CGameSA::IsPaused()
-{
-    return *VAR_GamePaused;
-}
-
-bool CGameSA::IsInForeground()
-{
-    return *VAR_IsForegroundWindow;
-}
-
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
     DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
@@ -409,56 +395,6 @@ void CGameSA::SetGameSpeed(float fSpeed)
     MemPutFast<float>(0xB7CB64, fSpeed);
 }
 
-// this prevents some crashes (respawning mainly)
-VOID CGameSA::DisableRenderer(bool bDisabled)
-{
-    // ENABLED:
-    // 0053DF40   D915 2C13C800    FST DWORD PTR DS:[C8132C]
-    // DISABLED:
-    // 0053DF40   C3               RETN
-
-    if (bDisabled)
-    {
-        MemPut<BYTE>(0x53DF40, 0xC3);
-    }
-    else
-    {
-        MemPut<BYTE>(0x53DF40, 0xD9);
-    }
-}
-
-VOID CGameSA::SetRenderHook(InRenderer* pInRenderer)
-{
-    if (pInRenderer)
-        HookInstall((DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6);
-    else
-    {
-        MemPut<BYTE>(FUNC_CDebug_DebugDisplayTextBuffer, 0xC3);
-    }
-}
-
-VOID CGameSA::TakeScreenshot(char* szFileName)
-{
-    DWORD dwFunc = FUNC_JPegCompressScreenToFile;
-    _asm
-    {
-        mov     eax, CLASS_RwCamera
-        mov     eax, [eax]
-        push    szFileName
-        push    eax
-        call    dwFunc
-        add     esp,8
-    }
-}
-
-DWORD* CGameSA::GetMemoryValue(DWORD dwOffset)
-{
-    if (dwOffset <= MAX_MEMORY_OFFSET_1_0)
-        return (DWORD*)dwOffset;
-    else
-        return NULL;
-}
-
 void CGameSA::Reset()
 {
     // Things to do if the game was loaded
@@ -474,8 +410,6 @@ void CGameSA::Reset()
 
         Pause(false);            // We don't have to pause as the fadeout will stop the sound. Pausing it will make the fadein next start ugly
         m_pHud->Disable(false);
-
-        DisableRenderer(false);
 
         // Restore the HUD
         m_pHud->Disable(false);
@@ -603,6 +537,13 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
         return IsUnderWorldWarpEnabled();
 
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+        return IsVehicleSunGlareEnabled();
+
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
+        return IsCoronaZTestEnabled();
+ 
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -635,6 +576,18 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
+    {
+        SetVehicleSunGlareEnabled(bEnable);
+        return true;
+    }
+
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
+    {
+        SetCoronaZTestEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -651,6 +604,8 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
+    SetCoronaZTestEnabled(true);
+    CVehicleSA::SetVehiclesSunGlareEnabled(false);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -722,6 +677,38 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
     {
         m_JetpackWeapons[weaponType] = bEnabled;
     }
+}
+
+void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
+{
+    // State turning will be handled in hooks handler
+    CVehicleSA::SetVehiclesSunGlareEnabled(bEnabled);
+}
+
+bool CGameSA::IsVehicleSunGlareEnabled()
+{
+    return CVehicleSA::GetVehiclesSunGlareEnabled();
+}
+
+void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
+{
+    if (m_isCoronaZTestEnabled == isEnabled)
+        return;
+
+    if (isEnabled)
+    {
+        // Enable ZTest (PC)
+        MemPut<BYTE>(0x6FB17C + 0, 0xFF);
+        MemPut<BYTE>(0x6FB17C + 1, 0x51);
+        MemPut<BYTE>(0x6FB17C + 2, 0x20);
+    }
+    else
+    {
+        // Disable ZTest (PS2)
+        MemSet((void*)0x6FB17C, 0x90, 3);
+    }
+    
+    m_isCoronaZTestEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()

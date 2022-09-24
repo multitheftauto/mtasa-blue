@@ -60,6 +60,44 @@ bool CClientVectorGraphic::SetDocument(CXMLNode* node)
     return true;
 }
 
+bool CClientVectorGraphic::SetUpdateCallback(CLuaFunctionRef& funcRef)
+{
+    if (!VERIFY_FUNCTION(funcRef))
+        return false;
+
+    m_updateCallbackRef = funcRef;
+    return true;
+}
+
+bool CClientVectorGraphic::RemoveUpdateCallback()
+{
+    if (!std::holds_alternative<CLuaFunctionRef>(m_updateCallbackRef))
+        return false;
+
+    m_updateCallbackRef = false;
+    return true;
+}
+
+void CClientVectorGraphic::OnUpdate()
+{
+    m_pVectorGraphicDisplay->UpdateTexture();
+
+    if (std::holds_alternative<CLuaFunctionRef>(m_updateCallbackRef))
+    {
+        auto func = std::get<CLuaFunctionRef>(m_updateCallbackRef);
+        auto state = func.GetLuaVM();
+
+        if (VERIFY_FUNCTION(func) && state != NULL)
+        {
+            CLuaMain& luaMain = lua_getownercluamain(state);
+
+            CLuaArguments arguments;
+            arguments.PushElement(this);
+            arguments.Call(&luaMain, func);
+        }
+    }
+}
+
 void CClientVectorGraphic::Unlink()
 {
     m_bIsDestroyed = true;

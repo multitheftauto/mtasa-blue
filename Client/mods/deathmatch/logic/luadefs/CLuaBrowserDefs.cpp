@@ -886,7 +886,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     argStream.ReadVector2D(size);
     argStream.ReadBool(bIsLocal);
     argStream.ReadBool(bIsTransparent);
-    argStream.ReadBool(bIsRelative);
+    argStream.ReadBool(bIsRelative, false);
     argStream.ReadUserData(parent, nullptr);
 
     if (!argStream.HasErrors())

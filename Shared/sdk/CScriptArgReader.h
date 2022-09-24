@@ -8,14 +8,18 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
+
+#include "CVector2D.h"
 #include <limits>
 #include <type_traits>
 #include <cfloat>
 #include "CStringMap.h"
+#include "CScriptDebugging.h"
 
-#ifdef MTA_CLIENT
-    #include "CScriptDebugging.h"
+#ifndef MTA_CLIENT
+    #include "CGame.h"
 #endif
 
 /////////////////////////////////////////////////////////////////////////
@@ -797,7 +801,7 @@ protected:
 
         if (iArgument == LUA_TLIGHTUSERDATA)
         {
-            outValue = (T*)UserDataCast<T>((T*)0, lua_touserdata(m_luaVM, m_iIndex), m_luaVM);
+            outValue = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex), m_luaVM);
             if (outValue)
             {
                 m_iIndex++;
@@ -806,7 +810,7 @@ protected:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            outValue = (T*)UserDataCast<T>((T*)0, *((void**)lua_touserdata(m_luaVM, m_iIndex)), m_luaVM);
+            outValue = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex)), m_luaVM);
             if (outValue)
             {
                 m_iIndex++;
@@ -947,11 +951,11 @@ public:
             T* value = NULL;
             if (iArgumentType == LUA_TLIGHTUSERDATA)
             {
-                value = (T*)UserDataCast<T>((T*)0, lua_touserdata(m_luaVM, -1), m_luaVM);
+                value = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, -1), m_luaVM);
             }
             else if (iArgumentType == LUA_TUSERDATA)
             {
-                value = (T*)UserDataCast<T>((T*)0, *((void**)lua_touserdata(m_luaVM, -1)), m_luaVM);
+                value = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, -1)), m_luaVM);
             }
 
             if (value != NULL)
@@ -1151,7 +1155,7 @@ protected:
     void InternalReadPairKeyValue(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
     {
         lua_pushnil(m_luaVM);
-        
+
         while (lua_next(m_luaVM, iIndex) != 0)
         {
             std::pair<SString, SString> keyValue;
@@ -1284,12 +1288,12 @@ public:
         int iArgument = lua_type(m_luaVM, m_iIndex + iOffset);
         if (iArgument == LUA_TLIGHTUSERDATA)
         {
-            if (UserDataCast<T>((T*)0, lua_touserdata(m_luaVM, m_iIndex + iOffset), m_luaVM))
+            if (UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex + iOffset), m_luaVM))
                 return true;
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (UserDataCast<T>((T*)0, *((void**)lua_touserdata(m_luaVM, m_iIndex + iOffset)), m_luaVM))
+            if (UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex + iOffset)), m_luaVM))
                 return true;
         }
         return false;

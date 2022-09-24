@@ -91,7 +91,7 @@ public:
 
 public:
     bool state{false};
-    bool triggerState{false}; // true == "down", false == "up"
+    bool triggerState{false};            // true == "down", false == "up"
 };
 
 class CCommandBind : public CKeyBindWithState
@@ -103,7 +103,7 @@ public:
     std::string command;
     std::string arguments;
     std::string resource;
-    std::string originalScriptKey;                   // Original key set by script
+    std::string originalScriptKey;            // Original key set by script
     bool        wasCreatedByScript{false};
     bool        isReplacingScriptKey{false};            // true if script set key is not being used
 };

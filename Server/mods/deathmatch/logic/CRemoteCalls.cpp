@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRemoteCalls.h"
+#include "CGame.h"
 
 CRemoteCalls::CRemoteCalls()
 {

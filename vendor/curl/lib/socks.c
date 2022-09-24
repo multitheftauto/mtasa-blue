@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -326,7 +328,7 @@ CURLproxycode Curl_SOCKS4(const char *proxy_user,
     if(proxy_user) {
       size_t plen = strlen(proxy_user);
       if(plen >= (size_t)data->set.buffer_size - 8) {
-        failf(data, "Too long SOCKS proxy user name, can't use!");
+        failf(data, "Too long SOCKS proxy user name, can't use");
         return CURLPX_LONG_USER;
       }
       /* copy the proxy name WITH trailing zero */

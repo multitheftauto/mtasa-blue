@@ -624,8 +624,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
                 ${GetDLLVersionNumbers} "$SYSDIR\crypt32.dll" $0 $1 $2 $3
                 ${If} $2 == 7601
                     ${If} $3 < 18741
-                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "http://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
-                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "http://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
+                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "https://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
+                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "https://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
                     ${EndIf}
                 ${EndIf}
             ${EndIf}
@@ -782,7 +782,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             ${If} ${Errors}
                 ${GameExplorer_AddGame} all "$INSTDIR\Multi Theft Auto.exe" "$INSTDIR" "$INSTDIR\Multi Theft Auto.exe" ${GUID}
                 CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\${GUID}\SupportTasks\0
-                CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "http://wiki.multitheftauto.com/wiki/Client_Manual"
+                CreateShortcut "$APPDATA\Microsoft\Windows\GameExplorer\$0\SupportTasks\0\Client Manual.lnk" \ "https://wiki.multitheftauto.com/wiki/Client_Manual"
             ${EndIf}
         ${EndIf}
 
@@ -794,7 +794,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${LogText} "+Section begin - CLIENT GAME"
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
-        File "${FILES_ROOT}\mods\deathmatch\Client.dll"
+        File "${FILES_ROOT}\mods\deathmatch\client.dll"
         File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
         ${LogText} "-Section end - CLIENT GAME"
@@ -1056,27 +1056,38 @@ Section Uninstall
     Call un.DoServiceUninstall
     ; server CORE FILES
     Delete "$INSTDIR\server\core.dll"
-    Delete "$INSTDIR\server\xmll.dll"
     Delete "$INSTDIR\server\MTA Server.exe"
     Delete "$INSTDIR\server\net.dll"
-    Delete "$INSTDIR\server\libcurl.dll"
+    Delete "$INSTDIR\server\pthread.dll"
+    Delete "$INSTDIR\server\xmll.dll"
 
     ; server files
+    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
     Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
+    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
     Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
     Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthreadVC2.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pthread.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\sqlite3.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+
+    ; server x64 CORE FILES
+    Delete "$INSTDIR\server\MTA Server64.exe"
+    Delete "$INSTDIR\server\x64\core.dll"
+    Delete "$INSTDIR\server\x64\net.dll"
+    Delete "$INSTDIR\server\x64\pthread.dll"
+    Delete "$INSTDIR\server\x64\xmll.dll"
+
+    ; server x64 files
+    Delete "$INSTDIR\server\x64\dbconmy.dll"
+    Delete "$INSTDIR\server\x64\deathmatch.dll"
+    Delete "$INSTDIR\server\x64\libmysql.dll"
+    Delete "$INSTDIR\server\x64\lua5.1.dll"
+    Delete "$INSTDIR\server\x64\pcre3.dll"
+    RmDir "$INSTDIR\server\x64"
 
     Delete "$INSTDIR\Multi Theft Auto.exe"
     Delete "$INSTDIR\Multi Theft Auto.exe.dat"
     Delete "$INSTDIR\Uninstall.exe"
 
-    Delete "$INSTDIR\mods\deathmatch\Client.dll"
-    Delete "$INSTDIR\mods\deathmatch\lua5.1c.dll"
+    Delete "$INSTDIR\mods\deathmatch\client.dll"
     Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
     RmDir /r "$INSTDIR\MTA\cgui"

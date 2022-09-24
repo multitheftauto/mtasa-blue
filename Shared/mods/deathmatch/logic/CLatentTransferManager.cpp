@@ -9,10 +9,19 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLatentTransferManager.h"
+
 using namespace LatentTransfer;
 
 #ifndef MTA_CLIENT
-extern CTimeUsMarker<20> markerLatentEvent;
+    #include "CGame.h"
+    #include "CResource.h"
+    #include "CResourceManager.h"
+    #include "Utils.h"
+    #include <net/CNetServer.h>
+
+    extern CNetServer*       g_pNetServer;
+    extern CTimeUsMarker<20> markerLatentEvent;
 #endif
 
 ///////////////////////////////////////////////////////////////
@@ -116,11 +125,11 @@ void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitS
     uint uiBitStreamBitsUsed = pBitStream->GetNumberOfBitsUsed();
     uint uiBitStreamBytesUsed = (uiBitStreamBitsUsed + 7) >> 3;
 
-    // Make a buffer containing enough info to recreate ucPacketId+BitStream at the other end
-    m_pBatchBufferRef = new CBufferRef();
+    // Make a buffer containing enough info to recreate ucPacketId+BitStream at the other 
+    m_pBatchBufferRef = std::make_shared<CBuffer>();
 
-    CBuffer& buffer = *m_pBatchBufferRef->operator->();
-    CBufferWriteStream                    stream(buffer);
+    CBuffer& buffer = *m_pBatchBufferRef;
+    CBufferWriteStream stream(buffer);
     stream.Write(ucPacketId);
     stream.Write(uiBitStreamBitsUsed);
     uint uiHeadSize = buffer.GetSize();
@@ -150,7 +159,7 @@ SSendHandle CLatentTransferManager::AddSend(NetPlayerID remoteId, ushort usBitSt
     assert(m_pBatchBufferRef);
 
     CLatentSendQueue* pSendQueue = GetSendQueueForRemote(remoteId, usBitStreamVersion);
-    return pSendQueue->AddSend(*m_pBatchBufferRef, uiRate, CATEGORY_PACKET, pLuaMain, usResourceNetId);
+    return pSendQueue->AddSend(m_pBatchBufferRef, uiRate, CATEGORY_PACKET, pLuaMain, usResourceNetId);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -165,8 +174,8 @@ void CLatentTransferManager::AddSendBatchEnd()
 #ifndef MTA_CLIENT
     markerLatentEvent.SetAndStoreString(SString("BatchEnd (%d sends)", m_uiNumSends));
 #endif
-    assert(m_pBatchBufferRef);
-    SAFE_DELETE(m_pBatchBufferRef);
+
+    m_pBatchBufferRef.reset();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -382,7 +391,7 @@ void DoDeallocateNetBitStream(NetBitStreamInterface* pBitStream)
 bool DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetServerPacketPriority packetPriority,
                   NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering)
 {
-    return g_pNetServer->SendPacket(ucPacketID, remoteId, bitStream, FALSE, packetPriority, packetReliability, packetOrdering);
+    return g_pNetServer->SendPacket(ucPacketID, remoteId, bitStream, false, packetPriority, packetReliability, packetOrdering);
 }
 
 bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)

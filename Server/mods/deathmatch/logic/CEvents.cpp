@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEvents.h"
 
 CEvents::CEvents()
 {
@@ -30,7 +31,7 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
         // If bAllowRemoteTrigger has been altered, return
         if (pEvent->bAllowRemoteTrigger != bAllowRemoteTrigger)
             return false;
-        
+
         // Add pLuaMain to the vector, in case it's not already there
         if (!ListContains(pEvent->pLuaMainVector, pLuaMain))
             pEvent->pLuaMainVector.push_back(pLuaMain);
