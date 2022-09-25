@@ -28,25 +28,12 @@
 #define VAR_3DMarkerColorMission            0x68F958
 #define VAR_3DMarkerColorNormal             0x68F95C
 
-/**
- * \todo AT SOME POINT: Implement DrawAreaOnRadar
- */
 class CRadarSA : public CRadar
 {
 public:
     CRadarSA();
     ~CRadarSA();
     CMarker* CreateMarker(CVector* vecPosition);
-    CMarker* CreateMarker(CVehicle* vehicle);
-    CMarker* CreateMarker(CObject* object);
-    CMarker* CreateMarker(CPed* ped);
-
     CMarker* GetFreeMarker();
-    CMarker* GetMarker(DWORD dwMarkerID);
-
-    VOID ClearMarkerForEntity(CVehicle* vehicle);
-    VOID ClearMarkerForEntity(CObject* object);
-    VOID ClearMarkerForEntity(CPed* ped);
-
-    VOID DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color);
+    void DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color);
 };
