@@ -65,27 +65,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
         mov     dwReturn, eax
         add     esp, 0x3C
     }
-    /*
-        DWORD dwFunc = 0x0726D40;
-        DWORD dwReturn = 0;
-        _asm
-        {
-            push    0           // uses collision
-            push    5           // rotate rate
-            push    0x3F800000  // pulse (1.0)
-            push    1024        // period
-            push    255         // alpha
-            push    0           // blue
-            push    255         // green
-            push    255         // red
-            push    0x40000000      // size (2.0)
-            push    vecPosition // position
-            push    Identifier  // identifier
-            call    dwFunc
-            mov     dwReturn, eax
-            add     esp, 0x2C
-        }
-        */
+
     if (dwReturn)
     {
         for (int i = 0; i < MAX_3D_MARKERS; i++)
