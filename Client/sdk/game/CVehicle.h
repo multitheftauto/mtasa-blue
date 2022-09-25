@@ -119,13 +119,9 @@ public:
     virtual float GetTrainPosition() = 0;
     virtual void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true) = 0;
 
-    virtual bool CanPedEnterCar() = 0;
-    virtual bool CanPedJumpOutCar(CPed* pPed) = 0;
     virtual void AddVehicleUpgrade(DWORD dwModelID) = 0;
     virtual void RemoveVehicleUpgrade(DWORD dwModelID) = 0;
     virtual bool DoesSupportUpgrade(const SString& strFrameName) = 0;
-    virtual bool CanPedLeanOut(CPed* pPed) = 0;
-    virtual bool CanPedStepOutCar(bool bUnknown) = 0;
 
     virtual CDoor* GetDoor(unsigned char ucDoor) = 0;
     virtual void   OpenDoor(unsigned char ucDoor, float fRatio, bool bMakeNoise = false) = 0;
@@ -136,8 +132,6 @@ public:
     virtual bool   AreDoorsUndamageable() = 0;
     virtual void   SetDoorsUndamageable(bool bUndamageable) = 0;
 
-    virtual bool  CarHasRoof() = 0;
-    virtual void  ExtinguishCarFire() = 0;
     virtual DWORD GetBaseVehicleType() = 0;
 
     virtual void  SetBodyDirtLevel(float fDirtLevel) = 0;
@@ -145,21 +139,12 @@ public:
 
     virtual unsigned char GetCurrentGear() = 0;
     virtual float         GetGasPedal() = 0;
-    virtual float         GetHeightAboveRoad() = 0;
-    virtual float         GetSteerAngle() = 0;
     virtual bool          GetTowBarPos(CVector* pVector, CVehicle* pTrailer) = 0;
     virtual bool          GetTowHitchPos(CVector* pVector) = 0;
-    virtual bool          IsOnItsSide() = 0;
-    virtual bool          IsLawEnforcementVehicle() = 0;
-    virtual bool          IsPassenger(CPed* pPed) = 0;
-    virtual bool          IsSphereTouchingVehicle(CVector* vecOrigin, float fRadius) = 0;
     virtual bool          IsUpsideDown() = 0;
-    virtual void          MakeDirty(CColPoint* pPoint) = 0;
 
     virtual bool IsEngineBroken() = 0;
     virtual void SetEngineBroken(bool bEngineBroken) = 0;
-    virtual bool IsScriptLocked() = 0;
-    virtual void SetScriptLocked(bool bLocked) = 0;
 
     virtual void          PlaceBikeOnRoadProperly() = 0;
     virtual void          PlaceAutomobileOnRoadProperly() = 0;
@@ -168,12 +153,10 @@ public:
     virtual void          Fix() = 0;
     virtual bool          IsSirenOrAlarmActive() = 0;
     virtual void          SetSirenOrAlarmActive(bool bActive) = 0;
-    virtual DWORD*        GetMemoryValue(DWORD dwOffset) = 0;
     virtual void          SetAlpha(unsigned char ucAlpha) = 0;
     virtual unsigned char GetAlpha() = 0;
 
     virtual void BlowUp(CEntity* pCreator, unsigned long ulUnknown) = 0;
-    virtual void BlowUpCutSceneNoExtras(unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4) = 0;
 
     virtual CDamageManager* GetDamageManager() = 0;
     virtual void            FadeOut(bool bFadeOut) = 0;
@@ -264,10 +247,6 @@ public:
 
     virtual void GetTurretRotation(float* fHorizontal, float* fVertical) = 0;
     virtual void SetTurretRotation(float fHorizontal, float fVertical) = 0;
-
-    virtual unsigned char GetNumberGettingIn() = 0;
-    virtual unsigned char GetPassengerCount() = 0;
-    virtual unsigned char GetMaxPassengerCount() = 0;
 
     virtual bool IsSmokeTrailEnabled() = 0;
     virtual void SetSmokeTrailEnabled(bool bEnabled) = 0;
