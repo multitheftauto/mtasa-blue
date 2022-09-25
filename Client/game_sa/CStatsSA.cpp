@@ -41,34 +41,6 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     }
 }
 
-void CStatsSA::IncrementStat(unsigned short usIndex, float fAmmount)
-{
-    DWORD dwFunc = FUNC_IncrementStat;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
-}
-
-void CStatsSA::DecrementStat(unsigned short usIndex, float fAmmount)
-{
-    DWORD dwFunc = FUNC_DecrementStat;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
-}
-
 void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_SetStatValue;
