@@ -26,8 +26,6 @@ public:
     virtual CWanted* GetWanted() = 0;
     virtual float    GetFPSMoveHeading() = 0;
 
-    virtual void GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY) = 0;
-
     virtual void SetDoesNotGetTired(bool bDoesNotGetTired) = 0;
 
     virtual byte GetCamDrunkLevel() = 0;

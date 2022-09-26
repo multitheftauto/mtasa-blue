@@ -21,14 +21,6 @@ CWanted* CPlayerInfoSA::GetWanted()
     return wanted;
 }
 
-void CPlayerInfoSA::GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY)
-{
-    DEBUG_TRACE("void CPlayerInfoSA::GetCrossHair ( bool &bEnabled, float &fTargetX, float &fTargetY )");
-    bActivated = internalInterface->CrossHair.bActivated;
-    fTargetX = internalInterface->CrossHair.TargetX;
-    fTargetY = internalInterface->CrossHair.TargetY;
-}
-
 /**
  * Gets the amount of money the player has
  * @return DWORD containing the ammount of money the player has
