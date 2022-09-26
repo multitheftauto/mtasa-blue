@@ -102,6 +102,7 @@ struct SCheatSA
 };
 
 class CAnimBlendClumpDataSAInterface;
+class CTaskManagementSystemSA;
 
 class CGameSA : public CGame
 {
@@ -138,11 +139,6 @@ public:
     {
         DEBUG_TRACE("CRadar     * GetRadar()");
         return m_pRadar;
-    };
-    CRestart* GetRestart()
-    {
-        DEBUG_TRACE("CRestart    * GetRestart()");
-        return m_pRestart;
     };
     CClock* GetClock()
     {
@@ -214,11 +210,6 @@ public:
         DEBUG_TRACE("CPad     * GetPad()");
         return m_pPad;
     };
-    CTheCarGenerators* GetTheCarGenerators()
-    {
-        DEBUG_TRACE("CTheCarGenerators  * GetTheCarGenerators()");
-        return m_pTheCarGenerators;
-    };
     CAERadioTrackManager* GetAERadioTrackManager()
     {
         DEBUG_TRACE("CAERadioTrackManager * GetAERadioTrackManager()");
@@ -240,32 +231,17 @@ public:
         DEBUG_TRACE("CAudio     * GetAudioContainer()");
         return m_pAudioContainer;
     };
-    CMenuManager* GetMenuManager()
-    {
-        DEBUG_TRACE("CMenuManager         * GetMenuManager()");
-        return m_pMenuManager;
-    };
     CStats* GetStats()
     {
         DEBUG_TRACE("CStats                   * GetStats()");
         return m_pStats;
-    };
-    CFont* GetFont()
-    {
-        DEBUG_TRACE("CFont                    * GetFont()");
-        return m_pFont;
     };
     CPathFind* GetPathFind()
     {
         DEBUG_TRACE("CPathFind                * GetPathFind()");
         return m_pPathFind;
     };
-    CPopulation* GetPopulation()
-    {
-        DEBUG_TRACE("CPopulation              * GetPopulation()");
-        return m_pPopulation;
-    };
-    CTaskManagementSystem* GetTaskManagementSystem()
+    CTaskManagementSystemSA* GetTaskManagementSystem()
     {
         DEBUG_TRACE("CTaskManagementSystemSA * GetTaskManagementSystem()");
         return m_pTaskManagementSystem;
@@ -337,35 +313,10 @@ public:
         else
             return FALSE;
     };
-    BOOL IsGameLoaded()
-    {
-        DEBUG_TRACE("BOOL     IsGameLoaded (  )");
-        if (*VAR_IsGameLoaded)
-            return TRUE;
-        else
-            return FALSE;
-    };
-    VOID         StartGame();
-    VOID         SetSystemState(eSystemState State);
+    void         StartGame();
+    void         SetSystemState(eSystemState State);
     eSystemState GetSystemState();
-    BOOL         IsNastyGame()
-    {
-        DEBUG_TRACE("BOOL     IsNastyGame (  )");
-        return *VAR_IsNastyGame;
-    };
-    VOID SetNastyGame(BOOL IsNasty)
-    {
-        DEBUG_TRACE("VOID     SetNastyGame ( BOOL IsNasty )");
-        *VAR_IsNastyGame = IsNasty ? true : false;
-    };
-    VOID   Pause(bool bPaused);
-    bool   IsPaused();
-    bool   IsInForeground();
-    VOID   DisableRenderer(bool bDisabled);
-    VOID   TakeScreenshot(char* szFileName);
-    DWORD* GetMemoryValue(DWORD dwOffset);
-
-    VOID SetRenderHook(InRenderer* pInRenderer);
+    void         Pause(bool bPaused);
 
     void Initialize();
     void Reset();
@@ -459,7 +410,6 @@ private:
     CPlayerInfo*                    m_pPlayerInfo;
     CProjectileInfo*                m_pProjectileInfo;
     CRadar*                         m_pRadar;
-    CRestart*                       m_pRestart;
     CClock*                         m_pClock;
     CCoronas*                       m_pCoronas;
     CCheckpoints*                   m_pCheckpoints;
@@ -492,18 +442,14 @@ private:
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
 
     CPad*                     m_pPad;
-    CTheCarGenerators*        m_pTheCarGenerators;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
     CAudioEngine*             m_pAudioEngine;
     CAEAudioHardware*         m_pAEAudioHardware;
     CAESoundManager*          m_pAESoundManager;
     CAudioContainer*          m_pAudioContainer;
-    CMenuManager*             m_pMenuManager;
     CStats*                   m_pStats;
-    CFont*                    m_pFont;
     CPathFind*                m_pPathFind;
-    CPopulation*              m_pPopulation;
-    CTaskManagementSystem*    m_pTaskManagementSystem;            // not used outside the game_sa
+    CTaskManagementSystemSA*  m_pTaskManagementSystem;            // not used outside the game_sa
     CTasks*                   m_pTasks;
     CGameSettings*            m_pSettings;
     CCarEnterExit*            m_pCarEnterExit;
@@ -520,13 +466,8 @@ private:
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
     static unsigned long* VAR_IsAtMenu;
-    static unsigned long* VAR_IsGameLoaded;
-    static bool*          VAR_GamePaused;
     static bool*          VAR_IsForegroundWindow;
-    ;
     static unsigned long* VAR_SystemState;
-    static void*          VAR_StartGame;
-    static bool*          VAR_IsNastyGame;
     static float*         VAR_TimeScale;
     static float*         VAR_FPS;
     static float*         VAR_OldTimeStep;

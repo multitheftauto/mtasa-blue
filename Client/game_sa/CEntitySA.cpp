@@ -70,7 +70,6 @@ CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
     m_pInterface = NULL;
-    internalID = 0;
     BeingDeleted = false;
     DoNotRemoveFromGame = false;
     m_pStoredPointer = NULL;
