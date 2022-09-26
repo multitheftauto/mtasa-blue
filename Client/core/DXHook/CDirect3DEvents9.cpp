@@ -131,7 +131,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 
     TIMING_CHECKPOINT("-OnPresent1");
     // Notify core
-    if (!CCore::GetSingleton().bHideGUIForScreenShot)
+    if (!CScreenShot::ShouldGUIBeHidden())
         CCore::GetSingleton().DoPostFramePulse();
     TIMING_CHECKPOINT("+OnPresent2");
 
@@ -151,7 +151,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     }
 
     // Draw pre-GUI primitives
-    if (!CCore::GetSingleton().bHideGUIForScreenShot)
+    if (!CScreenShot::ShouldGUIBeHidden())
         CGraphics::GetSingleton().DrawPreGUIQueue();
 
     // Maybe grab screen for upload
@@ -160,7 +160,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     if (bTookScreenShot && g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->OnPostScreenshot();
 
-    if (!CCore::GetSingleton().bHideGUIForScreenShot)
+    if (!CScreenShot::ShouldGUIBeHidden())
     {
         // Draw the GUI
         CLocalGUI::GetSingleton().Draw();
@@ -203,7 +203,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 void CDirect3DEvents9::CheckForScreenShot()
 {
     // Make a screenshot if needed
-    if (CCore::GetSingleton().bScreenShot)
+    if (CScreenShot::ShouldScreenShotBeTaken())
     {
         SString strFileName = CScreenShot::PreScreenShot();
         uint uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
@@ -236,9 +236,6 @@ void CDirect3DEvents9::CheckForScreenShot()
 
         // Call the post-screenshot function
         CScreenShot::PostScreenShot(strFileName);
-
-        CCore::GetSingleton().bScreenShot = false;
-        CCore::GetSingleton().bHideGUIForScreenShot = false;
     }
 }
 

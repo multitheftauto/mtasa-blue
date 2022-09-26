@@ -17,6 +17,8 @@
 class CScreenShot
 {
 public:
+    static void    InitiateScreenShot(bool bCameraShot);
+    static void    SetScreenShotPath(bool bCameraShot);
     static SString PreScreenShot();
     static void    PostScreenShot(const SString& strFileName);
     static bool    IsRateLimited();
@@ -27,6 +29,8 @@ public:
     static int     GetScreenShots();
 
     static void  BeginSave(const char* szFileName, void* pData, uint uiDataSize, uint uiWidth, uint uiHeight);
+    static bool  ShouldScreenShotBeTaken();
+    static bool  ShouldGUIBeHidden();
     static bool  IsSaving();
     static DWORD ThreadProc(LPVOID lpdwThreadParam);
 };

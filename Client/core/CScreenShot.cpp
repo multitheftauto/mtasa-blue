@@ -24,16 +24,45 @@ static void*   ms_pData = NULL;
 static uint    ms_uiDataSize = 0;
 static long long ms_lLastSaveTime = 0;
 static SString ms_strFileName;
+static bool    ms_bScreenShot = false;
+static bool    ms_bHideGUIForScreenShot = false;
+static bool    ms_bScreenShotHUDWasDisabled = false;
+
+void CScreenShot::InitiateScreenShot(bool bCameraShot)
+{
+    if (IsSaving() || IsRateLimited())
+        return;
+
+    ms_bScreenShot = true;
+    ms_bHideGUIForScreenShot = bCameraShot;
+    ms_bScreenShotHUDWasDisabled = g_pCore->GetGame()->GetHud()->IsDisabled();
+    if (bCameraShot)
+        g_pCore->GetGame()->GetHud()->Disable(true);
+
+    SetScreenShotPath(bCameraShot);
+}
+
+void CScreenShot::SetScreenShotPath(bool bCameraShot)
+{
+    if (bCameraShot)
+    {
+        // Set the screenshot path to camera gallery path
+        SString strGalleryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
+        SetPath(strGalleryPath.c_str());
+    }
+    else
+    {
+        // Set the screenshot path to this default library (screenshots shouldn't really be made outside mods)
+        std::string strScreenShotPath = CalcMTASAPath("screenshots");
+        CVARS_SET("screenshot_path", strScreenShotPath);
+        SetPath(strScreenShotPath.c_str());
+    }
+}
 
 SString CScreenShot::PreScreenShot()
 {
     ms_lLastSaveTime = GetTickCount64_();
     return GetValidScreenshotFilename();
-}
-
-bool CScreenShot::IsRateLimited()
-{
-    return GetTickCount64_() - ms_lLastSaveTime < 1000;
 }
 
 void CScreenShot::PostScreenShot(const SString& strFileName)
@@ -42,7 +71,9 @@ void CScreenShot::PostScreenShot(const SString& strFileName)
     if (!strFileName.empty())
         g_pCore->GetConsole()->Printf(_("Screenshot taken: '%s'"), *strFileName);
 
-    g_pCore->GetGame()->GetHud()->Disable(CCore::GetSingleton().bScreenShotHUDWasDisabled);
+    g_pCore->GetGame()->GetHud()->Disable(ms_bScreenShotHUDWasDisabled);
+    ms_bScreenShot = false;
+    ms_bHideGUIForScreenShot = false;
 }
 
 void CScreenShot::SetPath(const char* szPath)
@@ -221,8 +252,22 @@ void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize
     }
 }
 
-// Static function
+bool CScreenShot::ShouldScreenShotBeTaken()
+{
+    return ms_bScreenShot;
+}
+
+bool CScreenShot::ShouldGUIBeHidden()
+{
+    return ms_bHideGUIForScreenShot;
+}
+
 bool CScreenShot::IsSaving()
 {
     return ms_bIsSaving;
+}
+
+bool CScreenShot::IsRateLimited()
+{
+    return GetTickCount64_() - ms_lLastSaveTime < 1000;
 }

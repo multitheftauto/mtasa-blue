@@ -7060,7 +7060,7 @@ void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
 // to have better photo quality
 static void TakePhotograph()
 {
-    g_pCore->TakeScreenShot(true);
+    g_pCore->InitiateScreenShot(true);
 }
 
 const DWORD RETURN_CWeapon__TakePhotograph = 0x73C273;

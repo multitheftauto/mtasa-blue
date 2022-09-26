@@ -119,11 +119,6 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
-    // Reset the screenshot flag
-    bScreenShot = false;
-    bHideGUIForScreenShot = false;
-    bScreenShotHUDWasDisabled = false;
-
     // No initial fps limit
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
@@ -476,35 +471,9 @@ bool CCore::ClearChat()
     return false;
 }
 
-void CCore::TakeScreenShot(bool bCameraShot)
+void CCore::InitiateScreenShot(bool bCameraShot)
 {
-    if (CScreenShot::IsSaving() || CScreenShot::IsRateLimited())
-        return;
-
-    bScreenShot = true;
-    bHideGUIForScreenShot = bCameraShot;
-    bScreenShotHUDWasDisabled = g_pCore->GetGame()->GetHud()->IsDisabled();
-    if (bCameraShot)
-        g_pCore->GetGame()->GetHud()->Disable(true);
-
-    SetScreenShotPath(bCameraShot);
-}
-
-void CCore::SetScreenShotPath(bool bCameraShot)
-{
-    if (bCameraShot)
-    {
-        // Set the screenshot path to camera gallery path
-        SString strGalleryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
-        CScreenShot::SetPath(strGalleryPath.c_str());
-    }
-    else
-    {
-        // Set the screenshot path to this default library (screenshots shouldn't really be made outside mods)
-        std::string strScreenShotPath = CalcMTASAPath("screenshots");
-        CVARS_SET("screenshot_path", strScreenShotPath);
-        CScreenShot::SetPath(strScreenShotPath.c_str());
-    }
+    CScreenShot::InitiateScreenShot(bCameraShot);
 }
 
 void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
