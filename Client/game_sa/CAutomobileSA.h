@@ -204,40 +204,12 @@ public:
     CAutomobileSA(CAutomobileSAInterface* automobile);
     ~CAutomobileSA();
 
-    bool  BurstTyre(DWORD dwTyreID);
-    bool  BreakTowLink();
-    void  BlowUpCar(CEntity* pEntity);
-    void  BlowUpCarsInPath();
-    void  CloseAllDoors();
-    void  CloseBoot();
-    float FindWheelWidth(bool bUnknown);
-    // void                    Fix ( void );
-    void  FixDoor(int iCarNodeIndex, eDoorsSA Door);
-    int   FixPanel(int iCarNodeIndex, ePanelsSA Panel);
-    bool  GetAllWheelsOffGround();
-    float GetCarPitch();
-    float GetCarRoll();
-    void  GetComponentWorldPosition(int iComponentID, CVector* pVector);
-    // float                   GetHeightAboveRoad ( void );  /* TODO */
-    DWORD      GetNumContactWheels();
-    float      GetRearHeightAboveRoad();
+    bool BurstTyre(DWORD dwTyreID);
+    bool BreakTowLink();
+
     bool       IsComponentPresent(int iComponentID);
-    bool       IsDoorClosed(eDoorsSA Door);
-    bool       IsDoorFullyOpen(eDoorsSA Door);
-    bool       IsDoorMissing(eDoorsSA Door);
-    bool       IsDoorReady(eDoorsSA Door);
-    bool       IsInAir();
-    bool       IsOpenTopCar();
-    void       PlaceOnRoadProperly();
-    void       PlayCarHorn();
-    void       PopBoot();
-    void       PopBootUsingPhysics();
-    void       PopDoor(int iCarNodeIndex, eDoorsSA Door, bool bUnknown);
-    void       PopPanel(int iCarNodeIndex, ePanelsSA Panel, bool bFallOffFast);
     void       ResetSuspension();
-    void       SetRandomDamage(bool bUnknown);
     void       SetTaxiLight(bool bState);
-    void       SetTotalDamage(bool bUnknown);
     CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown);
 
     CDoor* GetDoor(eDoors doorID);
