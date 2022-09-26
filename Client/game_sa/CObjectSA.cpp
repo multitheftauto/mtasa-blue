@@ -206,8 +206,6 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     }
 #endif
 
-    this->internalID = pGame->GetPools()->GetObjectRef((DWORD*)this->GetInterface());
-
     m_ucAlpha = 255;
 
     if (m_pInterface)

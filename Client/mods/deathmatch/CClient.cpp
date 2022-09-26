@@ -314,6 +314,11 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
     }
 }
 
+void CClient::OnWindowFocusChange(bool state)
+{
+    g_pClientGame->OnWindowFocusChange(state);
+}
+
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
 {
     // Format: "nickname [password]"

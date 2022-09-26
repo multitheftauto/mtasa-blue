@@ -16,7 +16,7 @@ CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CP
     DEBUG_TRACE("CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface * taskManagerInterface, CPed * ped)");
     this->ped = ped;
     this->internalInterface = taskManagerInterface;
-    this->m_pTaskManagementSystem = (CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem());
+    this->m_pTaskManagementSystem = pGame->GetTaskManagementSystem();
 }
 
 void CTaskManagerSA::RemoveTask(const int iTaskPriority)

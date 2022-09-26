@@ -271,35 +271,17 @@ public:
 
     CPlayerInfoSAInterface* GetInterface() { return internalInterface; }
 
-    CPlayerPed* GetPlayerPed();
     CWanted*    GetWanted();
     long        GetPlayerMoney();
     void        SetPlayerMoney(long lMoney, bool bInstant);
 
     void GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY);
 
-    VOID GivePlayerParachute();
-    VOID StreamParachuteWeapon(bool bAllowParachute);
-
-    short GetLastTimeEaten();
     void  SetLastTimeEaten(short sTime);
-
-    VOID MakePlayerSafe(BOOL boolSafe);
-    VOID CancelPlayerEnteringCars(CVehicle* vehicle);
-    VOID ArrestPlayer();
-    VOID KillPlayer();
-
-    CVehicle* GivePlayerRemoteControlledCar(eVehicleTypes vehicletype);            // these are really members of CRemote, but they make more sense here
-    VOID      TakeRemoteControlledCarFromPlayer();
-    CVehicle* GetPlayerRemoteControlledCar();
 
     float GetFPSMoveHeading();
 
-    bool GetDoesNotGetTired();
     void SetDoesNotGetTired(bool bDoesNotGetTired);
-
-    DWORD GetLastTimeBigGunFired();
-    void  SetLastTimeBigGunFired(DWORD dwTime);
 
     byte GetCamDrunkLevel();
     void SetCamDrunkLevel(byte level);
