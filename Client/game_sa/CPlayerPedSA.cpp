@@ -11,10 +11,6 @@
 
 #include "StdInc.h"
 
-/**
- * Constructor for CPlayerPedSA
- */
-
 static CPedClothesDesc*    pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
 static std::set<SString>   ms_DoneAnimBlockRefMap;
@@ -160,21 +156,6 @@ CWanted* CPlayerPedSA::GetWanted()
 
 float CPlayerPedSA::GetSprintEnergy()
 {
-    /*
-    OutputDebugString("GetSprintEnergy HACK\n");
-
-    m_pData->bCanBeDamaged = true;
-    m_pData->m_bRenderWeapon = true;
-    m_pData->m_bDontAllowWeaponChange = true;
-
-    ((CPedSAInterface*)GetInterface())->pedFlags.bUpdateAnimHeading = true;
-    ((CPedSAInterface*)GetInterface())->pedFlags.bHeadStuckInCollision = true;
-    ((CPedSAInterface*)GetInterface())->pedFlags.bDonePositionOutOfCollision = true;
-    ((CPedSAInterface*)GetInterface())->pedFlags.bIsRestoringGun = true;
-
-    RebuildPlayer ();
-    */
-
     return m_pData->m_fSprintEnergy;
 }
 
@@ -325,76 +306,6 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         call    dwFunc
     }
 }
-
-/**
- * Gets information on the player's wanted status
- * @return Pointer to a CWanted class containing the wanted information for the PlayerPed.
- */
-// CWanted   * CPlayerPedSA::GetWanted (  )
-//{
-// return internalInterface->Wanted;
-//}
-
-/**
- * Gets the current weapon type that the playerped is using
- * @return DWORD containing the current weapon type
- * \todo Check this is the weapon type, not the actual weapon ID (or whatever)
- */
-/*DWORD CPlayerPedSA::GetCurrentWeaponType (  )
-{
-    return internalInterface->CurrentWeapon;
-}*/
-
-/**
- * Gets the time the last shot was fired by the playerped
- * @return DWORD containing a system time value
- */
-/*DWORD CPlayerPedSA::GetLastShotTime (  )
-{
-    return internalInterface->LastShotTime;
-}
-*/
-/**
- * Checks if the player is stationary on foot
- * \todo Does this duplicate?
- * @return BOOL TRUE if the player is stationary on foot, FALSE otherwise
- */
-/*
-BOOL CPlayerPedSA::IsStationaryOnFoot (  )
-{
-    return internalInterface->StationaryOnFoot;
-}*/
-
-/**
- * Resets the played ped to their initial state
- * \note This also resets some global values, such as game speed
- */
-/*
-VOID CPlayerPedSA::ResetToInitialState (  )
-{
-    DWORD dwFunction = FUNC_SetInitialState;
-    DWORD dwThis = (DWORD)internalInterface;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunction
-    }
-}*/
-
-/**
- * Clears information related to the player targeting
- */
-/*
-VOID CPlayerPedSA::ClearWeaponTarget (  )
-{
-    DWORD dwFunction = FUNC_ClearWeaponTarget;
-    DWORD dwThis = (DWORD)internalInterface;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunction
-    }
-}*/
 
 ////////////////////////////////////////////////////////////////
 //

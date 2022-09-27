@@ -669,49 +669,6 @@ void CVehicleSA::SetTrainPosition(float fPosition, bool bRecalcOnRailDistance)
     }
 }
 
-bool CVehicleSA::CanPedEnterCar()
-{
-    DEBUG_TRACE("bool CVehicleSA::CanPedEnterCar ( void )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_CanPedEnterCar;
-    bool  bReturn = false;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-
-    return bReturn;
-}
-
-bool CVehicleSA::CanPedJumpOutCar(CPed* pPed)
-{
-    DEBUG_TRACE("bool CVehicleSA::CanPedJumpOutCar ( CPed* pPed )");
-
-    bool bReturn = false;
-
-    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
-
-    if (pPedSA)
-    {
-        DWORD            dwThis = (DWORD)m_pInterface;
-        CPedSAInterface* pPedInt = pPedSA->GetPedInterface();
-        DWORD            dwFunc = FUNC_CVehicle_CanPedJumpOutCar;
-
-        _asm
-        {
-            mov     ecx, dwThis
-            push    pPedInt
-            call    dwFunc
-            mov     bReturn, al
-        }
-    }
-
-    return bReturn;
-}
-
 CDoorSA* CVehicleSA::GetDoor(unsigned char ucDoor)
 {
     if (ucDoor <= 5)
@@ -823,81 +780,6 @@ bool CVehicleSA::DoesSupportUpgrade(const SString& strFrameName)
     return false;
 }
 
-bool CVehicleSA::CanPedLeanOut(CPed* pPed)
-{
-    DEBUG_TRACE("bool CVehicleSA::CanPedLeanOut ( CPed* pPed )");
-
-    bool bReturn = false;
-
-    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
-
-    if (pPedSA)
-    {
-        DWORD            dwThis = (DWORD)m_pInterface;
-        CPedSAInterface* pPedInt = pPedSA->GetPedInterface();
-        DWORD            dwFunc = FUNC_CVehicle_CanPedLeanOut;
-
-        _asm
-        {
-            mov     ecx, dwThis
-            push    pPedInt
-            call    dwFunc
-            mov     bReturn, al
-        }
-    }
-
-    return bReturn;
-}
-
-bool CVehicleSA::CanPedStepOutCar(bool bUnknown)
-{
-    DEBUG_TRACE("bool CVehicleSA::CanPedStepOutCar ( bool bUnknown )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwUnknown = (DWORD)bUnknown;
-    DWORD dwFunc = FUNC_CVehicle_CanPedStepOutCar;
-    bool  bReturn = false;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        push    dwUnknown
-        call    dwFunc
-        mov     bReturn, al
-    }
-
-    return bReturn;
-}
-
-bool CVehicleSA::CarHasRoof()
-{
-    DEBUG_TRACE("bool CVehicleSA::CarHasRoof ( void )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_CarHasRoof;
-    bool  bReturn = false;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-
-    return bReturn;
-}
-
-void CVehicleSA::ExtinguishCarFire()
-{
-    DEBUG_TRACE("void CVehicleSA::ExtinguishCarFire ( void )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_ExtinguishCarFire;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
-}
-
 DWORD CVehicleSA::GetBaseVehicleType()
 {
     DEBUG_TRACE("DWORD CVehicleSA::GetBaseVehicleType ( void )");
@@ -938,29 +820,6 @@ float CVehicleSA::GetGasPedal()
 {
     DEBUG_TRACE("float CVehicleSA::GetGasPedal ( void )");
     return GetVehicleInterface()->m_fGasPedal;
-}
-
-float CVehicleSA::GetHeightAboveRoad()
-{
-    DEBUG_TRACE("float CVehicleSA::GetHeightAboveRoad ( void )");
-    DWORD dwThis = (DWORD)GetVehicleInterface();
-    DWORD dwFunc = FUNC_CVehicle_GetHeightAboveRoad;
-    float fReturn;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        fstp    fReturn
-    }
-
-    return fReturn;
-}
-
-float CVehicleSA::GetSteerAngle()
-{
-    DEBUG_TRACE("float CVehicleSA::GetSteerAngle ( void )");
-    return GetVehicleInterface()->m_fSteerAngle;
 }
 
 bool CVehicleSA::GetTowBarPos(CVector* pVector, CVehicle* pTrailer)
@@ -1010,78 +869,6 @@ bool CVehicleSA::GetTowHitchPos(CVector* pVector)
     return bReturn;
 }
 
-bool CVehicleSA::IsOnItsSide()
-{
-    DEBUG_TRACE("bool CVehicleSA::IsOnItsSide ( void )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_IsOnItsSide;
-    bool  bReturn = false;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
-bool CVehicleSA::IsLawEnforcementVehicle()
-{
-    DEBUG_TRACE("bool CVehicleSA::IsLawEnforcementVehicle ( void )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_IsLawEnforcementVehicle;
-    bool  bReturn = false;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
-bool CVehicleSA::IsPassenger(CPed* pPed)
-{
-    DEBUG_TRACE("bool CVehicleSA::IsPassenger ( CPed* pPed )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_IsPassenger;
-    bool  bReturn = false;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        push    pPed
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
-bool CVehicleSA::IsSphereTouchingVehicle(CVector* vecOrigin, float fRadius)
-{
-    DEBUG_TRACE("bool CVehicleSA::IsSphereTouchingVehicle ( CVector * vecOrigin, float fRadius )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_IsSphereTouchingVehicle;
-    bool  bReturn = false;
-
-    _asm
-    {
-        push    eax
-
-        mov     ecx, dwThis
-        mov     eax, vecOrigin
-        push    fRadius
-        push    dword ptr [eax]
-        push    dword ptr [eax + 4]
-        push    dword ptr [eax + 8]
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
 bool CVehicleSA::IsUpsideDown()
 {
     DEBUG_TRACE("bool CVehicleSA::IsUpsideDown ( void )");
@@ -1097,20 +884,6 @@ bool CVehicleSA::IsUpsideDown()
     }
 
     return bReturn;
-}
-
-void CVehicleSA::MakeDirty(CColPoint* pPoint)
-{
-    DEBUG_TRACE("void CVehicleSA::MakeDirty ( CColPoint* pPoint )");
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CVehicle_MakeDirty;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        push    pPoint
-        call    dwFunc
-    }
 }
 
 void CVehicleSA::SetEngineOn(bool bEngineOn)
@@ -1298,14 +1071,6 @@ void CVehicleSA::SetSirenOrAlarmActive(bool bActive)
     ((CVehicleSAInterface*)this->GetInterface())->m_nVehicleFlags.bSirenOrAlarm = bActive;
 }
 
-DWORD* CVehicleSA::GetMemoryValue(DWORD dwOffset)
-{
-    if (dwOffset <= SIZEOF_CHELI)
-        return (DWORD*)((DWORD)(this->GetInterface()) + dwOffset);
-    else
-        return NULL;
-}
-
 FLOAT CVehicleSA::GetHealth()
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
@@ -1426,23 +1191,6 @@ void CVehicleSA::BlowUp(CEntity* pCreator, unsigned long ulUnknown)
     }
 }
 
-void CVehicleSA::BlowUpCutSceneNoExtras(unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4)
-{
-    CVehicleSAInterfaceVTBL* vehicleVTBL = (CVehicleSAInterfaceVTBL*)(this->GetInterface()->vtbl);
-    DWORD                    dwThis = (DWORD)m_pInterface;
-    DWORD                    dwFunc = vehicleVTBL->BlowUpCarCutSceneNoExtras;
-
-    _asm
-    {
-        push        ulUnknown1
-        push        ulUnknown2
-        push        ulUnknown3
-        push        ulUnknown4
-        mov         ecx, dwThis
-        call        dwFunc
-    }
-}
-
 void CVehicleSA::FadeOut(bool bFadeOut)
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
@@ -1454,21 +1202,6 @@ bool CVehicleSA::IsFadingOut()
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
     return vehicle->m_nVehicleFlags.bFadeOut;
-}
-
-unsigned char CVehicleSA::GetNumberGettingIn()
-{
-    return GetVehicleInterface()->m_nNumGettingIn;
-}
-
-unsigned char CVehicleSA::GetPassengerCount()
-{
-    return GetVehicleInterface()->m_nNumPassengers;
-}
-
-unsigned char CVehicleSA::GetMaxPassengerCount()
-{
-    return GetVehicleInterface()->m_nMaxPassengers;
 }
 
 void CVehicleSA::SetTowLink(CVehicle* pVehicle)

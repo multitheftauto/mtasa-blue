@@ -275,8 +275,6 @@ public:
     long        GetPlayerMoney();
     void        SetPlayerMoney(long lMoney, bool bInstant);
 
-    void GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY);
-
     void  SetLastTimeEaten(short sTime);
 
     float GetFPSMoveHeading();
