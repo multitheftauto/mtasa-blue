@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CScreenShot.cpp
- *  PURPOSE:     Screen capture file handling
+ *  PURPOSE:     Screen capturing
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -14,19 +14,27 @@
 
 extern CCore* g_pCore;
 
-static char szScreenShotPath[MAX_PATH] = {0};
+static CBuffer ms_ScreenShotBuffer;
+static char    ms_szScreenShotPath[MAX_PATH] = {0};
 
-// Variables used for saving the screen shot file on a separate thread
+static long long ms_lLastSaveTime = 0;
+static SString ms_strFileName;
+
+// If screenshot should be taken on the current frame
+static bool    ms_bScreenShot = false;
+
+// If GUI should be hidden on the current frame
+static bool    ms_bHideGUIForScreenShot = false;
+
+// If HUD was disabled on screenshot initiation
+static bool    ms_bScreenShotHUDWasDisabled = false;
+
+// Variables used for saving the screenshot file on a separate thread
 static bool    ms_bIsSaving = false;
 static uint    ms_uiWidth = 0;
 static uint    ms_uiHeight = 0;
 static void*   ms_pData = NULL;
 static uint    ms_uiDataSize = 0;
-static long long ms_lLastSaveTime = 0;
-static SString ms_strFileName;
-static bool    ms_bScreenShot = false;
-static bool    ms_bHideGUIForScreenShot = false;
-static bool    ms_bScreenShotHUDWasDisabled = false;
 
 void CScreenShot::InitiateScreenShot(bool bCameraShot)
 {
@@ -36,16 +44,11 @@ void CScreenShot::InitiateScreenShot(bool bCameraShot)
     ms_bScreenShot = true;
     ms_bHideGUIForScreenShot = bCameraShot;
     ms_bScreenShotHUDWasDisabled = g_pCore->GetGame()->GetHud()->IsDisabled();
-    if (bCameraShot)
-        g_pCore->GetGame()->GetHud()->Disable(true);
 
-    SetScreenShotPath(bCameraShot);
-}
-
-void CScreenShot::SetScreenShotPath(bool bCameraShot)
-{
     if (bCameraShot)
     {
+        g_pCore->GetGame()->GetHud()->Disable(true);
+
         // Set the screenshot path to camera gallery path
         SString strGalleryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
         SetPath(strGalleryPath.c_str());
@@ -53,8 +56,7 @@ void CScreenShot::SetScreenShotPath(bool bCameraShot)
     else
     {
         // Set the screenshot path to this default library (screenshots shouldn't really be made outside mods)
-        std::string strScreenShotPath = CalcMTASAPath("screenshots");
-        CVARS_SET("screenshot_path", strScreenShotPath);
+        SString strScreenShotPath = CalcMTASAPath("screenshots");
         SetPath(strScreenShotPath.c_str());
     }
 }
@@ -78,35 +80,10 @@ void CScreenShot::PostScreenShot(const SString& strFileName)
 
 void CScreenShot::SetPath(const char* szPath)
 {
-    strncpy(szScreenShotPath, szPath, MAX_PATH - 1);
+    strncpy(ms_szScreenShotPath, szPath, MAX_PATH - 1);
 
     // make sure the directory exists
     File::Mkdir(szPath);
-}
-
-int CScreenShot::GetScreenShots()
-{
-    int              iNumberOfFiles = 0;
-    HANDLE           hFind;
-    WIN32_FIND_DATAW fdFindData;
-    // Create a search string
-    SString strScreenShotName("%s\\mta-screen*.png", &szScreenShotPath[0]);
-    // Find the first match
-    hFind = FindFirstFileW(FromUTF8(strScreenShotName), &fdFindData);
-    // Check if the first match failed
-    if (hFind != INVALID_HANDLE_VALUE)
-    {
-        iNumberOfFiles++;
-        // Loop through and count the files
-        while (FindNextFileW(hFind, &fdFindData))
-        {
-            // Keep going until we find the last file
-            iNumberOfFiles++;
-        }
-    }
-    // Close the file handle
-    FindClose(hFind);
-    return iNumberOfFiles;
 }
 
 SString CScreenShot::GetValidScreenshotFilename()
@@ -114,46 +91,47 @@ SString CScreenShot::GetValidScreenshotFilename()
     // Get the system time
     SYSTEMTIME sysTime;
     GetLocalTime(&sysTime);
-    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png", &szScreenShotPath[0], sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour,
+    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png", &ms_szScreenShotPath[0], sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour,
                    sysTime.wMinute, sysTime.wSecond);
 }
 
-SString CScreenShot::GetScreenShotPath(int iNumber)
+// Take a screenshot if needed
+void CScreenShot::CheckForScreenShot()
 {
-    // Create a search string
-    SString          strScreenShotName("%s\\mta-screen*.png", &szScreenShotPath[0]);
-    HANDLE           hFind;
-    SString          strReturn = "";
-    WIN32_FIND_DATAW fdFindData;
-    int              i = 1;
-    // Find the first match
-    hFind = FindFirstFileW(FromUTF8(strScreenShotName), &fdFindData);
-    // Check if the first match failed
-    if (hFind != INVALID_HANDLE_VALUE)
+    if (!ms_bScreenShot)
+        return;
+
+    SString strFileName = PreScreenShot();
+    uint    uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
+    uint    uiHeight = CDirect3DData::GetSingleton().GetViewportHeight();
+
+    // Try to get the screen data
+    SString strError;
+    if (CGraphics::GetSingleton().GetScreenGrabber()->GetBackBufferPixels(uiWidth, uiHeight, ms_ScreenShotBuffer, strError))
     {
-        if (iNumber == 1)
+        // Validate data size
+        uint uiDataSize = ms_ScreenShotBuffer.GetSize();
+        uint uiReqDataSize = uiWidth * uiHeight * 4;
+
+        if (uiDataSize == uiReqDataSize)
         {
-            // We wanted the first file
-            strReturn = SString("%s\\%s", &szScreenShotPath[0], fdFindData.cFileName);
+            // Start the save thread
+            BeginSave(strFileName, ms_ScreenShotBuffer.GetData(), uiDataSize, uiWidth, uiHeight);
         }
         else
         {
-            // Loop through and find all occurences of the file
-            while (FindNextFileW(hFind, &fdFindData))
-            {
-                // Keep going until we find the last file
-                i++;
-                if (iNumber == i)
-                {
-                    strReturn = SString("%s\\%s", &szScreenShotPath[0], fdFindData.cFileName);
-                    break;
-                }
-            }
+            g_pCore->GetConsole()->Printf(_("Screenshot got %d bytes, but expected %d"), uiDataSize, uiReqDataSize);
+            strFileName = "";
         }
     }
-    FindClose(hFind);            // Close the file handle
-    // Get Return the file directory
-    return strReturn;
+    else
+    {
+        g_pCore->GetConsole()->Print(_("Screenshot failed") + SString(" (%s)", *strError));
+        strFileName = "";
+    }
+
+    // Call the post-screenshot function
+    PostScreenShot(strFileName);
 }
 
 // Callback for threaded save
@@ -239,7 +217,7 @@ void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize
     ms_uiWidth = uiWidth;
     ms_uiHeight = uiHeight;
 
-    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CScreenShot::ThreadProc, NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot thread.");
@@ -250,11 +228,6 @@ void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize
         SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
         ResumeThread(hThread);
     }
-}
-
-bool CScreenShot::ShouldScreenShotBeTaken()
-{
-    return ms_bScreenShot;
 }
 
 bool CScreenShot::ShouldGUIBeHidden()

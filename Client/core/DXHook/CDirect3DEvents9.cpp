@@ -22,8 +22,6 @@
 
 bool g_bInMTAScene = false;
 
-// Variables used for screen shot saving
-static CBuffer   ms_ScreenShotBuffer;
 // Other variables
 static uint                 ms_RequiredAnisotropicLevel = 1;
 static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
@@ -188,55 +186,9 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
 
     // Make a screenshot if needed
-    CheckForScreenShot();
+    CScreenShot::CheckForScreenShot();
 
     TIMING_CHECKPOINT("-OnPresent2");
-}
-
-/////////////////////////////////////////////////////////////
-//
-// CDirect3DEvents9::CheckForScreenShot
-//
-// Take a screenshot if required and able
-//
-/////////////////////////////////////////////////////////////
-void CDirect3DEvents9::CheckForScreenShot()
-{
-    // Make a screenshot if needed
-    if (CScreenShot::ShouldScreenShotBeTaken())
-    {
-        SString strFileName = CScreenShot::PreScreenShot();
-        uint uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
-        uint uiHeight = CDirect3DData::GetSingleton().GetViewportHeight();
-
-        // Try to get the screen data
-        SString strError;
-        if (CGraphics::GetSingleton().GetScreenGrabber()->GetBackBufferPixels(uiWidth, uiHeight, ms_ScreenShotBuffer, strError))
-        {
-            // Validate data size
-            uint uiDataSize = ms_ScreenShotBuffer.GetSize();
-            uint uiReqDataSize = uiWidth * uiHeight * 4;
-
-            if (uiDataSize == uiReqDataSize)
-            {
-                // Start the save thread
-                CScreenShot::BeginSave(strFileName, ms_ScreenShotBuffer.GetData(), uiDataSize, uiWidth, uiHeight);
-            }
-            else
-            {
-                g_pCore->GetConsole()->Printf(_("Screenshot got %d bytes, but expected %d"), uiDataSize, uiReqDataSize);
-                strFileName = "";
-            }
-        }
-        else
-        {
-            g_pCore->GetConsole()->Print(_("Screenshot failed") + SString(" (%s)", *strError));
-            strFileName = "";
-        }
-
-        // Call the post-screenshot function
-        CScreenShot::PostScreenShot(strFileName);
-    }
 }
 
 #define SAVE_RENDERSTATE_AND_SET( reg, value ) \
