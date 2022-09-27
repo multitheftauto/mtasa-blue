@@ -130,7 +130,6 @@ void CScreenShot::CheckForScreenShot()
         strFileName = "";
     }
 
-    // Call the post-screenshot function
     PostScreenShot(strFileName);
 }
 
