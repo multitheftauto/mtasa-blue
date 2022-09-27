@@ -57,4 +57,5 @@ public:
 
     IDirectInputDevice8A* m_pDevice;
     bool                  m_bDropDataIfInputGoesToGUI;
+    bool                  m_bIsMouse;
 };
