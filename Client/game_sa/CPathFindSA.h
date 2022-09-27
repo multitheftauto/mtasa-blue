@@ -32,18 +32,10 @@
 class CPathFindSA : public CPathFind
 {
 public:
-    CNodeAddress* FindNthNodeClosestToCoors(CVector* vecCoors, int iNodeNumber, int iType, CNodeAddress* pNodeAddress, float fDistance);
-    CPathNode*    GetPathNode(CNodeAddress* node);
-    CVector*      GetNodePosition(CPathNode* pNode, CVector* pPosition);
-    CVector*      GetNodePosition(CNodeAddress* pNode, CVector* pPosition);
     void          SwitchRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
     void          SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
 
     // Belong elsewhere - cpopulation and ccarctrl
     void SetPedDensity(float fPedDensity);
     void SetVehicleDensity(float fVehicleDensity);
-    void SetMaxPeds(int iMaxPeds);
-    void SetMaxPedsInterior(int iMaxPeds);
-    void SetMaxVehicles(int iMaxVehicles);
-    void SetAllRandomPedsThisType(int iType);
 };

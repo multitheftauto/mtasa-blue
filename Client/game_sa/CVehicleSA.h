@@ -528,13 +528,9 @@ public:
     float GetTrainPosition();
     void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true);
 
-    bool CanPedEnterCar();
-    bool CanPedJumpOutCar(CPed* pPed);
     void AddVehicleUpgrade(DWORD dwModelID);
     void RemoveVehicleUpgrade(DWORD dwModelID);
     bool DoesSupportUpgrade(const SString& strFrameName);
-    bool CanPedLeanOut(CPed* pPed);
-    bool CanPedStepOutCar(bool bUnknown);
 
     CDoorSA* GetDoor(unsigned char ucDoor);
     void     OpenDoor(unsigned char ucDoor, float fRatio, bool bMakeNoise = false);
@@ -545,8 +541,6 @@ public:
     bool     AreDoorsUndamageable() { return m_doorsUndamageable; }
     void     SetDoorsUndamageable(bool bUndamageable) { m_doorsUndamageable = bUndamageable; }
 
-    bool  CarHasRoof();
-    void  ExtinguishCarFire();
     DWORD GetBaseVehicleType();
 
     void  SetBodyDirtLevel(float fDirtLevel);
@@ -554,26 +548,17 @@ public:
 
     unsigned char GetCurrentGear();
     float         GetGasPedal();
-    // GetIsHandbrakeOn    Use CVehicleSAInterface value
-    float GetHeightAboveRoad();
-    float GetSteerAngle();
+
     bool  GetTowBarPos(CVector* pVector, CVehicle* pTrailer = NULL);
     bool  GetTowHitchPos(CVector* pVector);
-    bool  IsOnItsSide();
-    bool  IsLawEnforcementVehicle();
-    bool  IsPassenger(CPed* pPed);
-    bool  IsSphereTouchingVehicle(CVector* vecOrigin, float fRadius);
     bool  IsUpsideDown();
-    void  MakeDirty(CColPoint* pPoint);
-
+	
     CPed* GetDriver();
     CPed* GetPassenger(unsigned char ucSlot);
     bool  IsBeingDriven();
 
     bool IsEngineBroken() { return GetVehicleInterface()->m_nVehicleFlags.bEngineBroken; };
     void SetEngineBroken(bool bEngineBroken) { GetVehicleInterface()->m_nVehicleFlags.bEngineBroken = bEngineBroken; }
-    bool IsScriptLocked() { return GetVehicleInterface()->m_nVehicleFlags.bIsLocked; }
-    void SetScriptLocked(bool bLocked) { GetVehicleInterface()->m_nVehicleFlags.bIsLocked = bLocked; }
 
     void          PlaceBikeOnRoadProperly();
     void          PlaceAutomobileOnRoadProperly();
@@ -589,10 +574,8 @@ public:
     void   SetLandingGearPosition(float fPosition);
     bool   IsLandingGearDown();
     void   Fix();
-    DWORD* GetMemoryValue(DWORD dwOffset);
 
     void BlowUp(CEntity* pCreator, unsigned long ulUnknown);
-    void BlowUpCutSceneNoExtras(unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4);
 
     CDamageManager* GetDamageManager();
 
@@ -600,10 +583,6 @@ public:
     bool      BreakTowLink();
     CVehicle* GetTowedVehicle();
     CVehicle* GetTowedByVehicle();
-
-    // remove these, no longer used
-    BYTE GetRadioStation();
-    void SetRadioStation(BYTE bRadioStation);
 
     void FadeOut(bool bFadeOut);
     bool IsFadingOut();
@@ -671,10 +650,6 @@ public:
 
     void GetTurretRotation(float* fHorizontal, float* fVertical);
     void SetTurretRotation(float fHorizontal, float fVertical);
-
-    unsigned char GetNumberGettingIn();
-    unsigned char GetPassengerCount();
-    unsigned char GetMaxPassengerCount();
 
     bool IsSmokeTrailEnabled();
     void SetSmokeTrailEnabled(bool bEnabled);
