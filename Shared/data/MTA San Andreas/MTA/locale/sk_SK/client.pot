@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-24 16:53+0000\n"
-"PO-Revision-Date: 2022-09-24 18:06\n"
+"POT-Creation-Date: 2022-09-27 12:00+0000\n"
+"PO-Revision-Date: 2022-09-27 12:59\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -16,6 +16,616 @@ msgstr ""
 "X-Crowdin-Language: sk\n"
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
+
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr "Aktualizovať Aero nastavenie"
+
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr "Aktualizovať nastavenia Large Memory"
+
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr "Aktualizujte nastavenie DEP"
+
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr "Aktualizujte grafický ovládač"
+
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr "Opravte problémy so súbormi"
+
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "Skopírujte hlavný súbor, aby ste sa vyhli problémom s grafickým ovládačom"
+
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA potrebuje prístup administrátora pre nasledujúcu operáciu:\n\n"
+"'%s'\n\n"
+"Prosím potvrď v nasledujúcom okne."
+
+#: Client/loader/CInstallManager.cpp:344
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA nemôže dokončiť nasledovnú operáciu:\n\n"
+"'%s'\n"
+
+#: Client/loader/CInstallManager.cpp:394
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Pád bol spôsobený chybou grafického ovládača **\n\n"
+"** Aktualizuj prosím svoj grafický ovládač **"
+
+#: Client/loader/CInstallManager.cpp:500
+msgid "Install updated MTA:SA files"
+msgstr "Inštalovať aktualizované MTA:SA súbory"
+
+#: Client/loader/CInstallManager.cpp:520
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Nemožno aktualizovať kvôli konfliktom súborov. Zatvor prosím ostatné aplikácie a skús to znovu"
+
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
+#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
+#: Client/loader/MainFunctions.cpp:818
+#: Client/mods/deathmatch/logic/CClientGame.cpp:571
+#: Client/mods/deathmatch/logic/CClientGame.cpp:645
+#: Client/mods/deathmatch/logic/CClientGame.cpp:669
+#: Client/mods/deathmatch/logic/CClientGame.cpp:691
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1007
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1087
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1097
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1166
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CCore.cpp:1188 Client/core/CCore.cpp:1201
+#: Client/core/CSettings.cpp:2899 Client/core/CSettings.cpp:4078
+#: Client/core/CSettings.cpp:4106 Client/core/CSettings.cpp:4637
+#: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "Chyba"
+
+#: Client/loader/CInstallManager.cpp:529
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto nebolo správne nainštalované, prosím preinštaluj. %s"
+
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr "MTA:SA nemôže pokračovať, pretože nasledujúce súbory sú nesprávne:"
+
+#: Client/loader/CInstallManager.cpp:609
+msgid "Patch GTA"
+msgstr "Oprava GTA"
+
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:719
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA nemôže pokračovať pretože disk %s nemá dostatok voľného miesta."
+
+#: Client/loader/CInstallManager.cpp:812
+msgid "Missing file:"
+msgstr "Chýbajúce súbory:"
+
+#: Client/loader/CInstallManager.cpp:816
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Ak sa MTA nepodarí načítať, znova preinštalujte GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:937
+msgid "Update install settings"
+msgstr "Aktualizovať nastavenia inštalácie"
+
+#: Client/loader/CInstallManager.cpp:1070
+msgid "Update compatibility settings"
+msgstr "Aktualizujte nastavenia kompatibility"
+
+#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:751
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Hľadám Grand Theft Auto: San Andreas"
+
+#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:754
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Prosím spusti Grand Theft Auto: San Andreas"
+
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Vyber tvoje Grand Theft Auto: San Andreas inštalačné umiestnenie"
+
+#: Client/loader/Utils.cpp:1283
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Chyba pri načítaní %s modulu! (%s)"
+
+#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:775
+msgid "Copying files..."
+msgstr "Kopírujem súbory..."
+
+#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:780
+msgid "Copy finished early. Everything OK."
+msgstr "Kopírovanie skončilo skoro. Všetko OK."
+
+#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:785
+msgid "Finishing..."
+msgstr "Dokončujem..."
+
+#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:789
+msgid "Done!"
+msgstr "Hotovo!"
+
+#: Client/loader/Utils.cpp:1713
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Bola zistená nová inštalácia %s.\n\n"
+"Chcete skopírovať nastavenia z %s?"
+
+#: Client/loader/Utils.cpp:1752
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA mal problém s otvorením súboru '%s'"
+
+#: Client/loader/Utils.cpp:1774
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA zistilo chybu v súbore '%s'."
+
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA malo problém s načítaním modelu."
+
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Ak ste nedávno upravili gta3.img, skúste preinštalovať GTA:SA."
+
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA malo problém s pridaním upgradu do vozidla."
+
+#: Client/loader/Utils.cpp:1845
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA našlo chyby v súbore '%s'"
+
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Reštartoval sa váš počítač pri hraní MTA:SA?"
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr "Pred pokračovaním ukončite nasledujúce programy:"
+
+#: Client/loader/Install.cpp:92
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr "Chcete ukončiť MTA server a pokračovať v aktualizácii?"
+
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
+msgid "Installing update..."
+msgstr "Inštalujú sa aktualizácie..."
+
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
+msgid "Extracting files..."
+msgstr "Extrahovanie súborov..."
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
+#: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1363
+#: Client/core/CSettings.cpp:1387 Client/core/CSettings.cpp:4399
+#: Client/core/CSettings.cpp:4466 Client/core/CSettings.cpp:4515
+#: Client/core/CVersionUpdater.cpp:1569 Client/core/CVersionUpdater.cpp:1587
+#: Client/core/CVersionUpdater.cpp:1856 Client/core/CVersionUpdater.cpp:1875
+#: Client/core/CQuestionBox.cpp:195
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "Yes"
+msgstr "Áno"
+
+#: Client/loader/Dialogs.cpp:33 Client/core/CMainMenu.cpp:1147
+#: Client/core/CSettings.cpp:1362 Client/core/CSettings.cpp:1386
+#: Client/core/CSettings.cpp:4398 Client/core/CSettings.cpp:4465
+#: Client/core/CSettings.cpp:4514 Client/core/CVersionUpdater.cpp:1568
+#: Client/core/CVersionUpdater.cpp:1586 Client/core/CVersionUpdater.cpp:1855
+#: Client/core/CVersionUpdater.cpp:1874 Client/core/CQuestionBox.cpp:194
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "No"
+msgstr "Nie"
+
+#. Create buttons
+#. OK button
+#: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
+#: Client/core/CSettings.cpp:126 Client/core/CSettings.cpp:4658
+#: Client/core/CVersionUpdater.cpp:1604 Client/core/CVersionUpdater.cpp:1820
+#: Client/core/CVersionUpdater.cpp:1913 Client/core/CVersionUpdater.cpp:1935
+#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:1965
+#: Client/core/CVersionUpdater.cpp:2117 Client/core/CVersionUpdater.cpp:2126
+#: Client/core/CVersionUpdater.cpp:2135 Client/core/CVersionUpdater.cpp:2149
+msgid "OK"
+msgstr "OK"
+
+#: Client/loader/Dialogs.cpp:35
+msgid "Quit"
+msgstr "Ukončiť"
+
+#: Client/loader/Dialogs.cpp:36
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+msgid "Help"
+msgstr "Pomoc"
+
+#. Cancel button
+#: Client/loader/Dialogs.cpp:37 Client/gui/CGUIMessageBox_Impl.cpp:68
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CSettings.cpp:131 Client/core/CSettings.cpp:4657
+#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
+#: Client/core/CVersionUpdater.cpp:1838
+msgid "Cancel"
+msgstr "Zrušiť"
+
+#: Client/loader/Dialogs.cpp:52
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas narazil na problém"
+
+#: Client/loader/Dialogs.cpp:53
+msgid "Crash information"
+msgstr "Informácie o zlyhaní"
+
+#: Client/loader/Dialogs.cpp:54
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Začiarknutím políčka odošlete tieto informácie o zlyhaní vývojárom MTA pomocou „internetu“"
+
+#: Client/loader/Dialogs.cpp:55
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Ak tak urobíte, zvýši sa šanca na opravu tohto zlyhania."
+
+#: Client/loader/Dialogs.cpp:56
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Chcete reštartovať MTA: San Andreas?"
+
+#: Client/loader/Dialogs.cpp:63
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas – varovanie"
+
+#: Client/loader/Dialogs.cpp:64
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "Vaše GTA: San Andreas inštalačná složka obsahuje tieto súbory:"
+
+#: Client/loader/Dialogs.cpp:66
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "Tieto súbory nie sú povolené a môžu spôsobiť chybu s grafickou kartou v tejto verzii MTA:SA\n\n"
+"Doporučuje sa aby ste ich vymazali alebo premenovali"
+
+#: Client/loader/Dialogs.cpp:68
+msgid "Keep these files, but also show this warning on next start"
+msgstr "Ponechajte tieto súbory, ale nechajte aby vyskakovalo okno upozornenia pri každom štarte"
+
+#: Client/loader/Dialogs.cpp:69
+msgid "Do not remind me about these files again"
+msgstr "Nepripominajte mi problémy o týchtoch súborov"
+
+#: Client/loader/Dialogs.cpp:70
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "Premenujte tieto súbory ktoré majú koncovku .dll na .dll.bak"
+
+#: Client/loader/Dialogs.cpp:71
+msgid "Show me these files"
+msgstr "Ukažte mi tieto súbory"
+
+#: Client/loader/Dialogs.cpp:72
+msgid "Play MTA:SA"
+msgstr "Hrať MTA:SA"
+
+#: Client/loader/Dialogs.cpp:78
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas – mätúce možnosti"
+
+#: Client/loader/Dialogs.cpp:79
+msgid "NVidia Optimus detected!"
+msgstr "NVidia Optimus je rozpoznaná!"
+
+#: Client/loader/Dialogs.cpp:80
+msgid "Try each option and see what works:"
+msgstr "Vyskúšajte každú možnosť a uvidíte, čo funguje:"
+
+#: Client/loader/Dialogs.cpp:81
+msgid "A - Standard NVidia"
+msgstr "A - Štandardná NVidia"
+
+#: Client/loader/Dialogs.cpp:82
+msgid "B - Alternate NVidia"
+msgstr "B - Alternatívna NVidia"
+
+#: Client/loader/Dialogs.cpp:83
+msgid "C - Standard NVidia with exe rename"
+msgstr "C - Štandardná NVidia s exe premenovaním"
+
+#: Client/loader/Dialogs.cpp:84
+msgid "D - Alternate NVidia with exe rename"
+msgstr "D - Alternatívna NVidia s premenovaním exe"
+
+#: Client/loader/Dialogs.cpp:85
+msgid "E - Standard Intel"
+msgstr "E - Štandardný Intel"
+
+#: Client/loader/Dialogs.cpp:86
+msgid "F - Alternate Intel"
+msgstr "F - Alternatívny Intel"
+
+#: Client/loader/Dialogs.cpp:87
+msgid "G - Standard Intel with exe rename"
+msgstr "G - Štandardný Intel s premenovaním exe"
+
+#: Client/loader/Dialogs.cpp:88
+msgid "H - Alternate Intel with exe rename"
+msgstr "H - Alternatívny Intel s premenovaním exe"
+
+#: Client/loader/Dialogs.cpp:89
+msgid "If you get desperate, this might help:"
+msgstr "Ak ste zúfalí, môže vám pomôcť toto:"
+
+#: Client/loader/Dialogs.cpp:90
+msgid "If you have already selected an option that works, this might help:"
+msgstr "Ak ste už vybrali možnosť, ktorá funguje, môže vám pomôcť toto:"
+
+#: Client/loader/Dialogs.cpp:91
+msgid "Force windowed mode"
+msgstr "Vynútiť režim v okne"
+
+#: Client/loader/Dialogs.cpp:92
+msgid "Don't show again"
+msgstr "Nabudúce nezobrazovať"
+
+#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:837
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
+
+#: Client/loader/Dialogs.cpp:100
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Upozornenie: Nepodarilo sa zistiť antivírus"
+
+#: Client/loader/Dialogs.cpp:102
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA nedokázal rozpoznať antivírus vo vašom počítači.\n\n"
+"Vírusy zasahujú do MTA a zhoršujú váš herný zážitok.\n\n"
+"Ďalšie informácie získate stlačením tlačidla „Pomoc“."
+
+#: Client/loader/Dialogs.cpp:105
+msgid "I have already installed an anti-virus"
+msgstr "Už mám nainštalovaný antivírus"
+
+#: Client/loader/Dialogs.cpp:107
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Nebudem inštalovať antivírus.\n"
+"Chcem, aby môj počítač zaostal a bol súčasťou botnetu."
+
+#: Client/loader/MainFunctions.cpp:242
+msgid "Trouble restarting MTA:SA\n\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
+"Try to launch MTA:SA again?"
+msgstr "Problémy pri reštartovaní MTA:SA\n\n"
+"Ak problém pretrváva, otvor Správcu úloh a\n"
+"ukonči procesy 'gta_sa.exe' a 'Multi Theft Auto.exe'\n\n\n"
+"Pokúsiť sa spustiť MTA:SA znova?"
+
+#: Client/loader/MainFunctions.cpp:260
+msgid "Another instance of MTA is already running.\n\n"
+"If this problem persists, please restart your computer"
+msgstr "Iná súčasť MTA už beží.\n\n"
+"Ak tento problém pretrváva, reštartuj svoj počítač"
+
+#: Client/loader/MainFunctions.cpp:263
+msgid "Another instance of MTA is already running.\n\n"
+"Do you want to terminate it?"
+msgstr "Iná súčasť MTA už beží.\n\n"
+"Chceš ju ukončiť?"
+
+#: Client/loader/MainFunctions.cpp:288
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to revert to an earlier version?"
+msgstr "Máš problémy s behom MTA:SA?\n\n"
+"Povoliť návrat na staršiu verziu?"
+
+#: Client/loader/MainFunctions.cpp:318
+msgid "There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n\n"
+"Do you want to reset GTA settings now?"
+msgstr "Vypadá to že nastal problém pri spúšťaní MTA:SA.\n"
+"Resetnutie GTA nastavení niekedy tento problém vyrieši.\n\n"
+"Chceš resetovať GTA nastavenia teraz?"
+
+#: Client/loader/MainFunctions.cpp:333
+msgid "GTA settings have been reset.\n\n"
+"Press OK to continue."
+msgstr "GTA nastavenia boli resetované.\n\n"
+"Stlač OK pre pokračovanie."
+
+#: Client/loader/MainFunctions.cpp:338
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr "Súbor nemôže byť zmazaný: '%s'"
+
+#. No settings to delete, or can't find them
+#: Client/loader/MainFunctions.cpp:346
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to see some online help?"
+msgstr "Máš problémy so spustením MTA:SA?.\n\n"
+"Chceš si pozrieť nejakú pomoc online?"
+
+#. Inform user
+#: Client/loader/MainFunctions.cpp:382
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to change the following setting?"
+msgstr "Máte problémy so spustením MTA:SA?.\n\n"
+"Chcete zmeniť nasledujúce nastavenie?"
+
+#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:644
+#: Client/core/CSettings.cpp:978
+msgid "Fullscreen mode:"
+msgstr "Celá obrazovka:"
+
+#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:652
+#: Client/core/CSettings.cpp:1576
+msgid "Borderless window"
+msgstr "Okno bez okraja"
+
+#: Client/loader/MainFunctions.cpp:425
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr "Máte problémy so spustením MTA:SA?.\n\n\n"
+"Skúste zakázať nasledujúce produkty pre GTA a MTA:"
+
+#: Client/loader/MainFunctions.cpp:459
+msgid "WARNING\n\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n\n"
+msgstr "POZOR\n\n"
+"MTA:SA zistila nezvyčajnú aktivitu.\n"
+"Spustite antivírusovú kontrolu, aby ste sa uistili, že váš systém je bezpečný.\n\n"
+
+#: Client/loader/MainFunctions.cpp:462
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr "Rozpoznaný súbor bol: %s\n"
+
+#: Client/loader/MainFunctions.cpp:596
+msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr "Časť GTA: San Andreas je už spustená. Je potrebné ju pred štartom MTA:SA ukončiť. Chceš to urobiť teraz?"
+
+#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
+#: Client/loader/MainFunctions.cpp:1238
+#: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
+msgid "Information"
+msgstr "Informácia"
+
+#: Client/loader/MainFunctions.cpp:603
+msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
+msgstr "Nemožno ukončiť GTA: San Andreas. Ak problém pretrváva, reštartuj prosím svoj počítač."
+
+#: Client/loader/MainFunctions.cpp:626
+msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+msgstr "Záznamy v registroch chýbajú. Preinštaluj prosím Mutli Theft Auto: San Andreas."
+
+#: Client/loader/MainFunctions.cpp:632
+msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
+msgstr "Umiestnenie tvojej inštalácie GTA: San Andreas obsahuje nepodporované (unicode) znaky. Presuň prosím túto inštaláciu do kompatibilného umiestnenia ktoré obsahuje iba štandardné ASCII znaky a potom preinštaluj Multi Theft Auto: San Andreas."
+
+#: Client/loader/MainFunctions.cpp:642
+msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
+msgstr "Umiestnenie tvojej inštalácie 'MTA:SA' alebo 'GTA: San Andreas'\n"
+"obsahuje znak ';' (bodkočiarka).\n\n"
+"Pokiaľ budeš mať problémy pri spustení MTA:SA,\n"
+"presuň tvoju inštaláciu(e) do umiestnenie ktoré neobsahuje bodkočiarku."
+
+#: Client/loader/MainFunctions.cpp:782
+msgid "Load failed. Please ensure that the latest data files have been installed correctly."
+msgstr "Načítanie zlyhalo. Prosím uisti sa že posledné data súbory boli nainštalované správne."
+
+#: Client/loader/MainFunctions.cpp:791
+#, c-format
+msgid "Load failed. Please ensure that %s is installed correctly."
+msgstr "Načítanie zlyhalo. Uisti sa prosím že %s je nainštalovaný správne."
+
+#: Client/loader/MainFunctions.cpp:798
+#, c-format
+msgid "Load failed. Could not find gta_sa.exe in %s."
+msgstr "Načítanie zlyhalo. Nemožno nájsť gta_sa.exe v %s."
+
+#: Client/loader/MainFunctions.cpp:808
+#, c-format
+msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
+msgstr "Načítanie zlyhalo. %s existuje v GTA umiestnení. Zmaž ho prosím pred pokračovaním."
+
+#: Client/loader/MainFunctions.cpp:817
+#, c-format
+msgid "Main file has an incorrect name (%s)"
+msgstr "Hlavný súbor má nesprávny názov (%s)"
+
+#: Client/loader/MainFunctions.cpp:828
+msgid "Main file is unsigned. Possible virus activity.\n\n"
+"See online help if MTA does not work correctly."
+msgstr "Hlavný súbor je neupravený. Možná aktivita vírusu.\n\n"
+"Ak MTA nefunguje správne, pozrite si online pomoc."
+
+#: Client/loader/MainFunctions.cpp:851
+msgid "Data files modified. Possible virus activity.\n\n"
+"See online help if MTA does not work correctly."
+msgstr "Dátové súbory upravené. Možná aktivita vírusu.\n\n"
+"Ak MTA nefunguje správne, pozrite si online pomoc."
+
+#: Client/loader/MainFunctions.cpp:863
+msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
+"Remove these .asi files if you experience problems with MTA:SA."
+msgstr "Súbory .asi sú v inštalačnom adresári 'MTA:SA' alebo 'GTA: San Andreas'.\n\n"
+"Ak máte problémy s MTA:SA, odstráňte tieto súbory typu .asi."
+
+#: Client/loader/MainFunctions.cpp:967
+msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Chyba nesúladu verzie súboru. Ak sa vyskytnú problémy, preinštalujte MTA:SA.\n"
+
+#: Client/loader/MainFunctions.cpp:976
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Niektoré súbory chýbajú. Ak sa vyskytnú problémy, preinštalujte MTA:SA.\n"
+
+#: Client/loader/MainFunctions.cpp:988
+msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
+"Please restart your PC.\n"
+msgstr "MTA:SA nie je kompatibilný s „Núdzovým režimom“ systému Windows.\n\n"
+"Reštartujte počítač.\n"
+
+#: Client/loader/MainFunctions.cpp:1124
+msgid "Fix configuration issue"
+msgstr "Opravte problém s konfiguráciou"
+
+#. Try to relaunch as admin if not done so already
+#: Client/loader/MainFunctions.cpp:1166
+msgid "Fix elevation required error"
+msgstr "Opravte vyžadovanú chybu"
+
+#: Client/loader/MainFunctions.cpp:1173
+#, c-format
+msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
+"[%s]"
+msgstr "Nemožno spustiť Grand Theft Auto: San Andreas. Skús prosím reštart, alebo ak problém pretrváva, kontaktuj MTA na www.multitheftauto.com. \n\n"
+"[%s]"
+
+#: Client/loader/MainFunctions.cpp:1238
+msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
+msgstr "GTA: San Andreas sa možno nespustilo správne. Chceš ho ukončiť?"
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
@@ -132,43 +742,65 @@ msgstr "(Vývojársky mód) zobrazí col tvary"
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Vývojársky mód) zobrazí id svetových zvukov v okne debugu"
 
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#: Client/mods/deathmatch/logic/CClientGame.cpp:571
-#: Client/mods/deathmatch/logic/CClientGame.cpp:645
-#: Client/mods/deathmatch/logic/CClientGame.cpp:669
-#: Client/mods/deathmatch/logic/CClientGame.cpp:691
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1007
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1087
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1097
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1166
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
-#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
-#: Client/loader/MainFunctions.cpp:818 Client/core/CCore.cpp:1188
-#: Client/core/CCore.cpp:1201 Client/core/CConnectManager.cpp:80
-#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
-#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
-#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
-#: Client/core/CConnectManager.cpp:421 Client/core/CSettings.cpp:2899
-#: Client/core/CSettings.cpp:4078 Client/core/CSettings.cpp:4106
-#: Client/core/CSettings.cpp:4637 Client/core/CGUI.cpp:87
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "Chyba"
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "VYTVORIŤ HRU"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:424 Client/core/CSettings.cpp:612
+#: Client/core/CSettings.cpp:878 Client/core/CSettings.cpp:1976
+msgid "General"
+msgstr "Hlavné"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Zdroje"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Meno serveru:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Heslo:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Max hráčov:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Vysielanie:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "LAN"
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr "Internet"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Zvolené"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Všetko"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Štart"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:571
 #: Client/mods/deathmatch/logic/CClientGame.cpp:669
@@ -276,6 +908,41 @@ msgstr "Odpojené: pripojenie bolo odmietnuté"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1261
 msgid "MTA Client verification failed!"
 msgstr "Overenie MTA Klienta zlyhalo!"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Chyba sťahovania: %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Priebeh sťahovania mapy:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Priebeh sťahovania:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s z %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Odpoj sa pre zrušenie sťahovania"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Nemožno spustiť lokálny server. Pozri konzolu pre viac informácií."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Chyba: Nemožno spustiť lokálny server. [%s]"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:475
 msgid "Disconnected: Invalid nickname"
@@ -481,671 +1148,154 @@ msgstr[3] "%d Sekundy"
 msgid "Disconnected"
 msgstr "Odpojené"
 
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Nemožno spustiť lokálny server. Pozri konzolu pre viac informácií."
+#: Client/game_sa/CSettingsSA.cpp:759
+msgid "Can't find valid screen resolution."
+msgstr "Nedá sa nájsť platné rozlíšenie obrazovky."
 
-#: Client/mods/deathmatch/logic/CServer.cpp:182
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:835
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Naozaj chcete použiť toto rozlíšenie obrazovky?"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
+msgid "Problem with graphics driver"
+msgstr "Problém s grafickým ovládačom"
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Požiadavky stránky"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "Server si vyžiadal povolenie na načítanie týchto stránok (neskoršie):"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "NIKDY NEZADÁVAJTE CITLIVÉ INFORMÁCIE ABY VÁM NEBOLI UKRADNUTÉ"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Zapamätať rozhodnutie"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:948
+msgid "Allow"
+msgstr "Povoliť"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Zakázať"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Pripájanie zlyhalo. Neplatný nick!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Pripájanie zlyhalo. Neplatný hostiteľ!"
+
+#: Client/core/CConnectManager.cpp:126
 #, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Chyba: Nemožno spustiť lokálny server. [%s]"
+msgid "Connecting to %s at port %u failed!"
+msgstr "Pripájanie k %s na porte %u zlyhalo!"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Priebeh sťahovania mapy:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Priebeh sťahovania:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
 #, c-format
-msgid "%s of %s"
-msgstr "%s z %s"
+msgid "Connecting to %s:%u ..."
+msgstr "Pripájanie k %s:%u ..."
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Odpoj sa pre zrušenie sťahovania"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
 #, c-format
-msgid "Download error: %s"
-msgstr "Chyba sťahovania: %s"
+msgid "No such mod installed (%s)"
+msgstr "Nie je inštalovaný taký mód (%s)"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "VYTVORIŤ HRU"
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Chybná odpoveď servera (2)"
 
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:424 Client/core/CSettings.cpp:612
-#: Client/core/CSettings.cpp:878 Client/core/CSettings.cpp:1976
-msgid "General"
-msgstr "Hlavné"
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Chybná odpoveď servera (1)"
 
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Zdroje"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Meno serveru:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Heslo:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Max hráčov:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Vysielanie:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "LAN"
-
-#. Create the tabs
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-msgid "Internet"
-msgstr "Internet"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Zvolené"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Všetko"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Štart"
-
-#. Cancel button
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/loader/Dialogs.cpp:37 Client/gui/CGUIMessageBox_Impl.cpp:68
-#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
-#: Client/core/CVersionUpdater.cpp:1838 Client/core/CSettings.cpp:131
-#: Client/core/CSettings.cpp:4657
-msgid "Cancel"
-msgstr "Zrušiť"
-
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
+#: Client/core/CScreenShot.cpp:53
 #, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA potrebuje prístup administrátora pre nasledujúcu operáciu:\n\n"
-"'%s'\n\n"
-"Prosím potvrď v nasledujúcom okne."
+msgid "Screenshot taken: '%s'"
+msgstr "Screenshot zachytený: '%s'"
 
-#: Client/loader/CInstallManager.cpp:344
+#: Client/core/CCredits.cpp:32
+msgid "Programming"
+msgstr "Programovanie"
+
+#: Client/core/CCredits.cpp:61
+msgid "Contributors"
+msgstr "Prispievatelia"
+
+#: Client/core/CCredits.cpp:82
+msgid "Game Design / Scripting"
+msgstr "Herný Design / Scriptovanie"
+
+#: Client/core/CCredits.cpp:102
+msgid "Language Localization"
+msgstr "Jazyková lokalizácia"
+
+#: Client/core/CCredits.cpp:108
+msgid "Patch contributors"
+msgstr "Patch prispievatelia"
+
+#: Client/core/CCredits.cpp:216
+msgid "Special Thanks"
+msgstr "Špeciálne poďakovanie"
+
+#: Client/core/CCredits.cpp:245
+msgid "This software makes use of the following libraries and software:"
+msgstr "Tento software používa nasledujúce knižnice a software:"
+
+#: Client/core/CCommandFuncs.cpp:29
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ PRÍKAZY ]***\n"
+
+#: Client/core/CCommandFuncs.cpp:167
 #, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA nemôže dokončiť nasledovnú operáciu:\n\n"
-"'%s'\n"
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Práve je %d:%02d:%02d"
 
-#: Client/loader/CInstallManager.cpp:394
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Pád bol spôsobený chybou grafického ovládača **\n\n"
-"** Aktualizuj prosím svoj grafický ovládač **"
+#: Client/core/CCommandFuncs.cpp:251
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "connect: Správny tvar je 'connect <host> [<port> <nick> <pass>]'"
 
-#: Client/loader/CInstallManager.cpp:500
-msgid "Install updated MTA:SA files"
-msgstr "Inštalovať aktualizované MTA:SA súbory"
+#: Client/core/CCommandFuncs.cpp:259 Client/core/CCommandFuncs.cpp:327
+msgid "connect: Bad port number"
+msgstr "connect: Nesprávne číslo portu"
 
-#: Client/loader/CInstallManager.cpp:520
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Nemožno aktualizovať kvôli konfliktom súborov. Zatvor prosím ostatné aplikácie a skús to znovu"
-
-#: Client/loader/CInstallManager.cpp:529
+#: Client/core/CCommandFuncs.cpp:281 Client/core/CCommandFuncs.cpp:342
 #, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto nebolo správne nainštalované, prosím preinštaluj. %s"
+msgid "connect: Connecting to %s:%u..."
+msgstr "connect: Pripája sa k %s:%u..."
 
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "MTA:SA nemôže pokračovať, pretože nasledujúce súbory sú nesprávne:"
-
-#: Client/loader/CInstallManager.cpp:609
-msgid "Patch GTA"
-msgstr "Oprava GTA"
-
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:719
+#: Client/core/CCommandFuncs.cpp:285 Client/core/CCommandFuncs.cpp:346
 #, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA nemôže pokračovať pretože disk %s nemá dostatok voľného miesta."
+msgid "connect: could not connect to %s:%u!"
+msgstr "connect: nemôže sa pripojiť k %s:%u!"
 
-#: Client/loader/CInstallManager.cpp:812
-msgid "Missing file:"
-msgstr "Chýbajúce súbory:"
+#: Client/core/CCommandFuncs.cpp:290
+msgid "connect: Failed to unload current mod"
+msgstr "connect: Zlyhalo vypínanie aktuálneho modu"
 
-#: Client/loader/CInstallManager.cpp:816
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Ak sa MTA nepodarí načítať, znova preinštalujte GTA:SA"
+#: Client/core/CCommandFuncs.cpp:380
+msgid "Bound all controls from GTA"
+msgstr "Načítané všetky ovládania z GTA"
 
-#: Client/loader/CInstallManager.cpp:937
-msgid "Update install settings"
-msgstr "Aktualizovať nastavenia inštalácie"
+#: Client/core/CCommandFuncs.cpp:394
+msgid "Saved configuration file"
+msgstr "Konfiguračné súbory uložené"
 
-#: Client/loader/CInstallManager.cpp:1070
-msgid "Update compatibility settings"
-msgstr "Aktualizujte nastavenia kompatibility"
-
-#: Client/loader/MainFunctions.cpp:242
-msgid "Trouble restarting MTA:SA\n\n"
-"If the problem persists, open Task Manager and\n"
-"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-"Try to launch MTA:SA again?"
-msgstr "Problémy pri reštartovaní MTA:SA\n\n"
-"Ak problém pretrváva, otvor Správcu úloh a\n"
-"ukonči procesy 'gta_sa.exe' a 'Multi Theft Auto.exe'\n\n\n"
-"Pokúsiť sa spustiť MTA:SA znova?"
-
-#: Client/loader/MainFunctions.cpp:260
-msgid "Another instance of MTA is already running.\n\n"
-"If this problem persists, please restart your computer"
-msgstr "Iná súčasť MTA už beží.\n\n"
-"Ak tento problém pretrváva, reštartuj svoj počítač"
-
-#: Client/loader/MainFunctions.cpp:263
-msgid "Another instance of MTA is already running.\n\n"
-"Do you want to terminate it?"
-msgstr "Iná súčasť MTA už beží.\n\n"
-"Chceš ju ukončiť?"
-
-#: Client/loader/MainFunctions.cpp:288
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to revert to an earlier version?"
-msgstr "Máš problémy s behom MTA:SA?\n\n"
-"Povoliť návrat na staršiu verziu?"
-
-#: Client/loader/MainFunctions.cpp:318
-msgid "There seems to be a problem launching MTA:SA.\n"
-"Resetting GTA settings can sometimes fix this problem.\n\n"
-"Do you want to reset GTA settings now?"
-msgstr "Vypadá to že nastal problém pri spúšťaní MTA:SA.\n"
-"Resetnutie GTA nastavení niekedy tento problém vyrieši.\n\n"
-"Chceš resetovať GTA nastavenia teraz?"
-
-#: Client/loader/MainFunctions.cpp:333
-msgid "GTA settings have been reset.\n\n"
-"Press OK to continue."
-msgstr "GTA nastavenia boli resetované.\n\n"
-"Stlač OK pre pokračovanie."
-
-#: Client/loader/MainFunctions.cpp:338
+#. Print it
+#: Client/core/CCommandFuncs.cpp:460
 #, c-format
-msgid "File could not be deleted: '%s'"
-msgstr "Súbor nemôže byť zmazaný: '%s'"
-
-#. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:346
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to see some online help?"
-msgstr "Máš problémy so spustením MTA:SA?.\n\n"
-"Chceš si pozrieť nejakú pomoc online?"
-
-#. Inform user
-#: Client/loader/MainFunctions.cpp:382
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to change the following setting?"
-msgstr "Máte problémy so spustením MTA:SA?.\n\n"
-"Chcete zmeniť nasledujúce nastavenie?"
-
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:644
-#: Client/core/CSettings.cpp:978
-msgid "Fullscreen mode:"
-msgstr "Celá obrazovka:"
-
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:652
-#: Client/core/CSettings.cpp:1576
-msgid "Borderless window"
-msgstr "Okno bez okraja"
-
-#: Client/loader/MainFunctions.cpp:425
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Try disabling the following products for GTA and MTA:"
-msgstr "Máte problémy so spustením MTA:SA?.\n\n\n"
-"Skúste zakázať nasledujúce produkty pre GTA a MTA:"
-
-#: Client/loader/MainFunctions.cpp:459
-msgid "WARNING\n\n"
-"MTA:SA has detected unusual activity.\n"
-"Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "POZOR\n\n"
-"MTA:SA zistila nezvyčajnú aktivitu.\n"
-"Spustite antivírusovú kontrolu, aby ste sa uistili, že váš systém je bezpečný.\n\n"
-
-#: Client/loader/MainFunctions.cpp:462
-#, c-format
-msgid "The detected file was:  %s\n"
-msgstr "Rozpoznaný súbor bol: %s\n"
-
-#: Client/loader/MainFunctions.cpp:596
-msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "Časť GTA: San Andreas je už spustená. Je potrebné ju pred štartom MTA:SA ukončiť. Chceš to urobiť teraz?"
-
-#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1238
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
-msgid "Information"
-msgstr "Informácia"
-
-#: Client/loader/MainFunctions.cpp:603
-msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "Nemožno ukončiť GTA: San Andreas. Ak problém pretrváva, reštartuj prosím svoj počítač."
-
-#: Client/loader/MainFunctions.cpp:626
-msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Záznamy v registroch chýbajú. Preinštaluj prosím Mutli Theft Auto: San Andreas."
-
-#: Client/loader/MainFunctions.cpp:632
-msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "Umiestnenie tvojej inštalácie GTA: San Andreas obsahuje nepodporované (unicode) znaky. Presuň prosím túto inštaláciu do kompatibilného umiestnenia ktoré obsahuje iba štandardné ASCII znaky a potom preinštaluj Multi Theft Auto: San Andreas."
-
-#: Client/loader/MainFunctions.cpp:642
-msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-"contains a ';' (semicolon).\n\n"
-" If you experience problems when running MTA:SA,\n"
-" move your installation(s) to a path that does not contain a semicolon."
-msgstr "Umiestnenie tvojej inštalácie 'MTA:SA' alebo 'GTA: San Andreas'\n"
-"obsahuje znak ';' (bodkočiarka).\n\n"
-"Pokiaľ budeš mať problémy pri spustení MTA:SA,\n"
-"presuň tvoju inštaláciu(e) do umiestnenie ktoré neobsahuje bodkočiarku."
-
-#: Client/loader/MainFunctions.cpp:782
-msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Načítanie zlyhalo. Prosím uisti sa že posledné data súbory boli nainštalované správne."
-
-#: Client/loader/MainFunctions.cpp:791
-#, c-format
-msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Načítanie zlyhalo. Uisti sa prosím že %s je nainštalovaný správne."
-
-#: Client/loader/MainFunctions.cpp:798
-#, c-format
-msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Načítanie zlyhalo. Nemožno nájsť gta_sa.exe v %s."
-
-#: Client/loader/MainFunctions.cpp:808
-#, c-format
-msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "Načítanie zlyhalo. %s existuje v GTA umiestnení. Zmaž ho prosím pred pokračovaním."
-
-#: Client/loader/MainFunctions.cpp:817
-#, c-format
-msgid "Main file has an incorrect name (%s)"
-msgstr "Hlavný súbor má nesprávny názov (%s)"
-
-#: Client/loader/MainFunctions.cpp:828
-msgid "Main file is unsigned. Possible virus activity.\n\n"
-"See online help if MTA does not work correctly."
-msgstr "Hlavný súbor je neupravený. Možná aktivita vírusu.\n\n"
-"Ak MTA nefunguje správne, pozrite si online pomoc."
-
-#: Client/loader/MainFunctions.cpp:851
-msgid "Data files modified. Possible virus activity.\n\n"
-"See online help if MTA does not work correctly."
-msgstr "Dátové súbory upravené. Možná aktivita vírusu.\n\n"
-"Ak MTA nefunguje správne, pozrite si online pomoc."
-
-#: Client/loader/MainFunctions.cpp:863
-msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
-"Remove these .asi files if you experience problems with MTA:SA."
-msgstr "Súbory .asi sú v inštalačnom adresári 'MTA:SA' alebo 'GTA: San Andreas'.\n\n"
-"Ak máte problémy s MTA:SA, odstráňte tieto súbory typu .asi."
-
-#: Client/loader/MainFunctions.cpp:967
-msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Chyba nesúladu verzie súboru. Ak sa vyskytnú problémy, preinštalujte MTA:SA.\n"
-
-#: Client/loader/MainFunctions.cpp:976
-msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Niektoré súbory chýbajú. Ak sa vyskytnú problémy, preinštalujte MTA:SA.\n"
-
-#: Client/loader/MainFunctions.cpp:988
-msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
-"Please restart your PC.\n"
-msgstr "MTA:SA nie je kompatibilný s „Núdzovým režimom“ systému Windows.\n\n"
-"Reštartujte počítač.\n"
-
-#: Client/loader/MainFunctions.cpp:1124
-msgid "Fix configuration issue"
-msgstr "Opravte problém s konfiguráciou"
-
-#. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1166
-msgid "Fix elevation required error"
-msgstr "Opravte vyžadovanú chybu"
-
-#: Client/loader/MainFunctions.cpp:1173
-#, c-format
-msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
-"[%s]"
-msgstr "Nemožno spustiť Grand Theft Auto: San Andreas. Skús prosím reštart, alebo ak problém pretrváva, kontaktuj MTA na www.multitheftauto.com. \n\n"
-"[%s]"
-
-#: Client/loader/MainFunctions.cpp:1238
-msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "GTA: San Andreas sa možno nespustilo správne. Chceš ho ukončiť?"
-
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "Chcete ukončiť MTA server a pokračovať v aktualizácii?"
-
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
-msgid "Installing update..."
-msgstr "Inštalujú sa aktualizácie..."
-
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
-msgid "Extracting files..."
-msgstr "Extrahovanie súborov..."
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
-#: Client/core/CVersionUpdater.cpp:1569 Client/core/CVersionUpdater.cpp:1587
-#: Client/core/CVersionUpdater.cpp:1856 Client/core/CVersionUpdater.cpp:1875
-#: Client/core/CSettings.cpp:1363 Client/core/CSettings.cpp:1387
-#: Client/core/CSettings.cpp:4399 Client/core/CSettings.cpp:4466
-#: Client/core/CSettings.cpp:4515 Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "Yes"
-msgstr "Áno"
-
-#: Client/loader/Dialogs.cpp:33 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1147 Client/core/CVersionUpdater.cpp:1568
-#: Client/core/CVersionUpdater.cpp:1586 Client/core/CVersionUpdater.cpp:1855
-#: Client/core/CVersionUpdater.cpp:1874 Client/core/CSettings.cpp:1362
-#: Client/core/CSettings.cpp:1386 Client/core/CSettings.cpp:4398
-#: Client/core/CSettings.cpp:4465 Client/core/CSettings.cpp:4514
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "No"
-msgstr "Nie"
-
-#. Create buttons
-#. OK button
-#: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
-#: Client/core/CVersionUpdater.cpp:1604 Client/core/CVersionUpdater.cpp:1820
-#: Client/core/CVersionUpdater.cpp:1913 Client/core/CVersionUpdater.cpp:1935
-#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:1965
-#: Client/core/CVersionUpdater.cpp:2117 Client/core/CVersionUpdater.cpp:2126
-#: Client/core/CVersionUpdater.cpp:2135 Client/core/CVersionUpdater.cpp:2149
-#: Client/core/CSettings.cpp:126 Client/core/CSettings.cpp:4658
-msgid "OK"
-msgstr "OK"
-
-#: Client/loader/Dialogs.cpp:35
-msgid "Quit"
-msgstr "Ukončiť"
-
-#: Client/loader/Dialogs.cpp:36
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-msgid "Help"
-msgstr "Pomoc"
-
-#: Client/loader/Dialogs.cpp:52
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas narazil na problém"
-
-#: Client/loader/Dialogs.cpp:53
-msgid "Crash information"
-msgstr "Informácie o zlyhaní"
-
-#: Client/loader/Dialogs.cpp:54
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Začiarknutím políčka odošlete tieto informácie o zlyhaní vývojárom MTA pomocou „internetu“"
-
-#: Client/loader/Dialogs.cpp:55
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Ak tak urobíte, zvýši sa šanca na opravu tohto zlyhania."
-
-#: Client/loader/Dialogs.cpp:56
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Chcete reštartovať MTA: San Andreas?"
-
-#: Client/loader/Dialogs.cpp:63
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas – varovanie"
-
-#: Client/loader/Dialogs.cpp:64
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Vaše GTA: San Andreas inštalačná složka obsahuje tieto súbory:"
-
-#: Client/loader/Dialogs.cpp:66
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "Tieto súbory nie sú povolené a môžu spôsobiť chybu s grafickou kartou v tejto verzii MTA:SA\n\n"
-"Doporučuje sa aby ste ich vymazali alebo premenovali"
-
-#: Client/loader/Dialogs.cpp:68
-msgid "Keep these files, but also show this warning on next start"
-msgstr "Ponechajte tieto súbory, ale nechajte aby vyskakovalo okno upozornenia pri každom štarte"
-
-#: Client/loader/Dialogs.cpp:69
-msgid "Do not remind me about these files again"
-msgstr "Nepripominajte mi problémy o týchtoch súborov"
-
-#: Client/loader/Dialogs.cpp:70
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Premenujte tieto súbory ktoré majú koncovku .dll na .dll.bak"
-
-#: Client/loader/Dialogs.cpp:71
-msgid "Show me these files"
-msgstr "Ukažte mi tieto súbory"
-
-#: Client/loader/Dialogs.cpp:72
-msgid "Play MTA:SA"
-msgstr "Hrať MTA:SA"
-
-#: Client/loader/Dialogs.cpp:78
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas – mätúce možnosti"
-
-#: Client/loader/Dialogs.cpp:79
-msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus je rozpoznaná!"
-
-#: Client/loader/Dialogs.cpp:80
-msgid "Try each option and see what works:"
-msgstr "Vyskúšajte každú možnosť a uvidíte, čo funguje:"
-
-#: Client/loader/Dialogs.cpp:81
-msgid "A - Standard NVidia"
-msgstr "A - Štandardná NVidia"
-
-#: Client/loader/Dialogs.cpp:82
-msgid "B - Alternate NVidia"
-msgstr "B - Alternatívna NVidia"
-
-#: Client/loader/Dialogs.cpp:83
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - Štandardná NVidia s exe premenovaním"
-
-#: Client/loader/Dialogs.cpp:84
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - Alternatívna NVidia s premenovaním exe"
-
-#: Client/loader/Dialogs.cpp:85
-msgid "E - Standard Intel"
-msgstr "E - Štandardný Intel"
-
-#: Client/loader/Dialogs.cpp:86
-msgid "F - Alternate Intel"
-msgstr "F - Alternatívny Intel"
-
-#: Client/loader/Dialogs.cpp:87
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Štandardný Intel s premenovaním exe"
-
-#: Client/loader/Dialogs.cpp:88
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternatívny Intel s premenovaním exe"
-
-#: Client/loader/Dialogs.cpp:89
-msgid "If you get desperate, this might help:"
-msgstr "Ak ste zúfalí, môže vám pomôcť toto:"
-
-#: Client/loader/Dialogs.cpp:90
-msgid "If you have already selected an option that works, this might help:"
-msgstr "Ak ste už vybrali možnosť, ktorá funguje, môže vám pomôcť toto:"
-
-#: Client/loader/Dialogs.cpp:91
-msgid "Force windowed mode"
-msgstr "Vynútiť režim v okne"
-
-#: Client/loader/Dialogs.cpp:92
-msgid "Don't show again"
-msgstr "Nabudúce nezobrazovať"
-
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:837
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
-#: Client/loader/Dialogs.cpp:100
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Upozornenie: Nepodarilo sa zistiť antivírus"
-
-#: Client/loader/Dialogs.cpp:102
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA nedokázal rozpoznať antivírus vo vašom počítači.\n\n"
-"Vírusy zasahujú do MTA a zhoršujú váš herný zážitok.\n\n"
-"Ďalšie informácie získate stlačením tlačidla „Pomoc“."
-
-#: Client/loader/Dialogs.cpp:105
-msgid "I have already installed an anti-virus"
-msgstr "Už mám nainštalovaný antivírus"
-
-#: Client/loader/Dialogs.cpp:107
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Nebudem inštalovať antivírus.\n"
-"Chcem, aby môj počítač zaostal a bol súčasťou botnetu."
-
-#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Hľadám Grand Theft Auto: San Andreas"
-
-#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Prosím spusti Grand Theft Auto: San Andreas"
-
-#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
-msgid "Copying files..."
-msgstr "Kopírujem súbory..."
-
-#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
-msgid "Copy finished early. Everything OK."
-msgstr "Kopírovanie skončilo skoro. Všetko OK."
-
-#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
-msgid "Finishing..."
-msgstr "Dokončujem..."
-
-#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
-msgid "Done!"
-msgstr "Hotovo!"
-
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr "Aktualizovať Aero nastavenie"
-
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr "Aktualizovať nastavenia Large Memory"
-
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr "Aktualizujte nastavenie DEP"
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr "Aktualizujte grafický ovládač"
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr "Opravte problémy so súbormi"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Skopírujte hlavný súbor, aby ste sa vyhli problémom s grafickým ovládačom"
-
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Vyber tvoje Grand Theft Auto: San Andreas inštalačné umiestnenie"
-
-#: Client/loader/Utils.cpp:1283
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Chyba pri načítaní %s modulu! (%s)"
-
-#: Client/loader/Utils.cpp:1713
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Bola zistená nová inštalácia %s.\n\n"
-"Chcete skopírovať nastavenia z %s?"
-
-#: Client/loader/Utils.cpp:1752
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA mal problém s otvorením súboru '%s'"
-
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA zistilo chybu v súbore '%s'."
-
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA malo problém s načítaním modelu."
-
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Ak ste nedávno upravili gta3.img, skúste preinštalovať GTA:SA."
-
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA malo problém s pridaním upgradu do vozidla."
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA našlo chyby v súbore '%s'"
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Reštartoval sa váš počítač pri hraní MTA:SA?"
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr "Pred pokračovaním ukončite nasledujúce programy:"
+msgid "* Your serial is: %s"
+msgstr "* Tvoj serial je: %s"
 
 #: Client/core/CCore.cpp:721 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -1255,10 +1405,6 @@ msgstr "zobrazí štatistiky pamäte"
 msgid "shows the frame timing graph"
 msgstr "zobrazí graf časovania snímkov"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Chceš sa pozrieť na online pomoc o tomto probléme ?"
-
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
 msgstr "Os akcelerácie"
@@ -1266,11 +1412,6 @@ msgstr "Os akcelerácie"
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
 msgstr "Os brzdenia"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONZOLA"
 
 #: Client/core/CMainMenu.cpp:315
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -1291,199 +1432,6 @@ msgstr "Toto ťa odpojí z aktuálneho serveru.\n\n"
 #: Client/core/CMainMenu.cpp:1145
 msgid "DISCONNECT WARNING"
 msgstr "VAROVANIE O ODPOJENÍ"
-
-#: Client/core/CVersionUpdater.cpp:623
-msgid "Busy"
-msgstr "Zaneprázdnený"
-
-#: Client/core/CVersionUpdater.cpp:623
-msgid "Can't check for updates right now"
-msgstr "Momentálne nemôžem skontrolovať aktualizácie"
-
-#: Client/core/CVersionUpdater.cpp:1564 Client/core/CVersionUpdater.cpp:1584
-#: Client/core/CVersionUpdater.cpp:1602
-#, c-format
-msgid "MTA:SA %s required"
-msgstr "vyžadované MTA:SA %s"
-
-#: Client/core/CVersionUpdater.cpp:1565
-#, c-format
-msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr "Pre pripojenie na vybraný server je potrebné aktualizovať MTA:SA %s .\n\n"
-"Chceš stiahnuť a nainštalovať MTA:SA %s ?"
-
-#: Client/core/CVersionUpdater.cpp:1585
-#, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Chceš spustiť MTA:SA %s a pripojiť sa na tento server?"
-
-#: Client/core/CVersionUpdater.cpp:1603
-msgid "It is not possible to connect at this time.\n\n"
-"Please try later."
-msgstr "Nie je možné sa teraz pripojiť.\n\n"
-"Skúste to neskôr."
-
-#: Client/core/CVersionUpdater.cpp:1785
-msgid "Connecting"
-msgstr "Pripája sa"
-
-#: Client/core/CVersionUpdater.cpp:1786 Client/core/CVersionUpdater.cpp:1802
-msgid "Please wait..."
-msgstr "Prosím počkajte..."
-
-#: Client/core/CVersionUpdater.cpp:1801
-msgid "CHECKING"
-msgstr "KONTROLUJEM"
-
-#: Client/core/CVersionUpdater.cpp:1818 Client/core/CVersionUpdater.cpp:1911
-msgid "UPDATE CHECK"
-msgstr "KONTROLA AKTUALIZÁCIÍ"
-
-#: Client/core/CVersionUpdater.cpp:1819
-msgid "No update needed"
-msgstr "Nie je potreba aktualizácie"
-
-#: Client/core/CVersionUpdater.cpp:1836
-msgid "DOWNLOADING"
-msgstr "SŤAHOVANIE"
-
-#: Client/core/CVersionUpdater.cpp:1837
-msgid "waiting..."
-msgstr "Čakám..."
-
-#: Client/core/CVersionUpdater.cpp:1853
-msgid "MANDATORY UPDATE"
-msgstr "NUTNÝ UPDATE"
-
-#: Client/core/CVersionUpdater.cpp:1854
-msgid "To join this server, you must update MTA.\n\n"
-" Do you want to update now ?"
-msgstr "Pre pripojenie na tento server musíš aktualizovať MTA.\n\n"
-"Aktualizovať teraz?"
-
-#: Client/core/CVersionUpdater.cpp:1872
-msgid "OPTIONAL UPDATE"
-msgstr "VOLITEĽNÝ UPDATE"
-
-#: Client/core/CVersionUpdater.cpp:1873
-msgid "Server says an update is recommended, but not essential.\n\n"
-" Do you want to update now ?"
-msgstr "Server hovorí že je doporučené aktualizovať MTA, ale nie je to potrebné.\n\n"
-"Aktualizovať teraz?"
-
-#: Client/core/CVersionUpdater.cpp:1912
-msgid "Update not currently avalable.\n\n"
-"Please check www.mtasa.com"
-msgstr "Aktualizácia nie je momentálne k dispozícií.\n\n"
-"Skontroluj prosím www.mtasa.com"
-
-#: Client/core/CVersionUpdater.cpp:1933 Client/core/CVersionUpdater.cpp:2115
-msgid "ERROR SAVING"
-msgstr "CHYBA UKLADANIA"
-
-#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
-msgid "Unable to create the file."
-msgstr "Nepodarilo sa vytvoriť súbor."
-
-#: Client/core/CVersionUpdater.cpp:1942 Client/core/CVersionUpdater.cpp:1951
-#: Client/core/CVersionUpdater.cpp:2124 Client/core/CVersionUpdater.cpp:2133
-msgid "ERROR DOWNLOADING"
-msgstr "CHYBA SŤAHOVANIA"
-
-#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:2125
-msgid "The downloaded file appears to be incorrect."
-msgstr "Stiahnutý súbor sa zdá byť nekorektný."
-
-#: Client/core/CVersionUpdater.cpp:1952 Client/core/CVersionUpdater.cpp:2134
-msgid "For some reason."
-msgstr "Z nejakého dôvodu."
-
-#: Client/core/CVersionUpdater.cpp:1963 Client/core/CVersionUpdater.cpp:2147
-msgid "DOWNLOAD COMPLETE"
-msgstr "SŤAHOVANIE KOMPLETNÉ"
-
-#: Client/core/CVersionUpdater.cpp:1987
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr "- Neznámy problém v _DialogUpdateResult"
-
-#: Client/core/CVersionUpdater.cpp:2078 Client/core/CSettings.cpp:4463
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "UPRAVENÉ GTA:SA SÚBORY"
-
-#: Client/core/CVersionUpdater.cpp:2085 Client/core/CVersionUpdater.cpp:2095
-msgid "Ok"
-msgstr "Ok"
-
-#: Client/core/CVersionUpdater.cpp:2093
-msgid "ERROR"
-msgstr "CHYBA"
-
-#: Client/core/CVersionUpdater.cpp:2094
-msgid "Some MTA:SA data files are missing.\n\n\n"
-"Please reinstall MTA:SA"
-msgstr "Niektoré MTA:SA súbory chýbajú.\n\n\n"
-"Preinštaluj prosím MTA:SA"
-
-#: Client/core/CVersionUpdater.cpp:2721
-#, c-format
-msgid "%3d %% completed"
-msgstr "%3d %% dokončené"
-
-#: Client/core/CVersionUpdater.cpp:2723
-#, c-format
-msgid "\n\n"
-"Waiting for response  -  %-3d"
-msgstr "\n\n"
-"Čakám na odpoveď - %-3d"
-
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Slovenčina"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Pripájanie zlyhalo. Neplatný nick!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Pripájanie zlyhalo. Neplatný hostiteľ!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Pripájanie k %s na porte %u zlyhalo!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Pripájanie k %s:%u ..."
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Nie je inštalovaný taký mód (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Chybná odpoveď servera (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Chybná odpoveď servera (1)"
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "Novinky"
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "Navštíviť najnovšie oznámenie"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:83
@@ -1908,10 +1856,6 @@ msgstr "Odstrániť doménu"
 #: Client/core/CSettings.cpp:929
 msgid "Custom whitelist"
 msgstr "Vlastná biela listina"
-
-#: Client/core/CSettings.cpp:948 Client/cefweb/CWebsiteRequests.cpp:51
-msgid "Allow"
-msgstr "Povoliť"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:971
@@ -2345,6 +2289,10 @@ msgstr "Niektoré súbory vo vašom GTA:SA priečinku sú upravené.\n"
 "Nakoľko, UPRAVENÉ GTA:SA SÚBORY SÚ BLOKOVANÉ NA MNOHO SERVEROCH\n\n"
 "Ste si istý že chcete tieto súbory používať?"
 
+#: Client/core/CSettings.cpp:4463 Client/core/CVersionUpdater.cpp:2078
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "UPRAVENÉ GTA:SA SÚBORY"
+
 #: Client/core/CSettings.cpp:4506
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
@@ -2429,10 +2377,10 @@ msgstr "Oprava myši:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Oprava pohybu myši - Možno bude potrebné reštartovať počítač"
 
-#: Client/core/CScreenShot.cpp:53
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Screenshot zachytený: '%s'"
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Slovenčina"
 
 #: Client/core/CKeyBinds.cpp:181
 msgid "Fire"
@@ -2611,83 +2559,260 @@ msgstr "Skupinové ovládanie dozadu"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Vybraný skin nemôže byť načítaný ako aj predvolený skin, prosím preinštaluj MTA."
 
-#: Client/core/CCommandFuncs.cpp:29
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ PRÍKAZY ]***\n"
+#: Client/core/CVersionUpdater.cpp:623
+msgid "Busy"
+msgstr "Zaneprázdnený"
 
-#: Client/core/CCommandFuncs.cpp:167
+#: Client/core/CVersionUpdater.cpp:623
+msgid "Can't check for updates right now"
+msgstr "Momentálne nemôžem skontrolovať aktualizácie"
+
+#: Client/core/CVersionUpdater.cpp:1564 Client/core/CVersionUpdater.cpp:1584
+#: Client/core/CVersionUpdater.cpp:1602
 #, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Práve je %d:%02d:%02d"
+msgid "MTA:SA %s required"
+msgstr "vyžadované MTA:SA %s"
 
-#: Client/core/CCommandFuncs.cpp:251
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "connect: Správny tvar je 'connect <host> [<port> <nick> <pass>]'"
-
-#: Client/core/CCommandFuncs.cpp:259 Client/core/CCommandFuncs.cpp:327
-msgid "connect: Bad port number"
-msgstr "connect: Nesprávne číslo portu"
-
-#: Client/core/CCommandFuncs.cpp:281 Client/core/CCommandFuncs.cpp:342
+#: Client/core/CVersionUpdater.cpp:1565
 #, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "connect: Pripája sa k %s:%u..."
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr "Pre pripojenie na vybraný server je potrebné aktualizovať MTA:SA %s .\n\n"
+"Chceš stiahnuť a nainštalovať MTA:SA %s ?"
 
-#: Client/core/CCommandFuncs.cpp:285 Client/core/CCommandFuncs.cpp:346
+#: Client/core/CVersionUpdater.cpp:1585
 #, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "connect: nemôže sa pripojiť k %s:%u!"
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "Chceš spustiť MTA:SA %s a pripojiť sa na tento server?"
 
-#: Client/core/CCommandFuncs.cpp:290
-msgid "connect: Failed to unload current mod"
-msgstr "connect: Zlyhalo vypínanie aktuálneho modu"
+#: Client/core/CVersionUpdater.cpp:1603
+msgid "It is not possible to connect at this time.\n\n"
+"Please try later."
+msgstr "Nie je možné sa teraz pripojiť.\n\n"
+"Skúste to neskôr."
 
-#: Client/core/CCommandFuncs.cpp:380
-msgid "Bound all controls from GTA"
-msgstr "Načítané všetky ovládania z GTA"
+#: Client/core/CVersionUpdater.cpp:1785
+msgid "Connecting"
+msgstr "Pripája sa"
 
-#: Client/core/CCommandFuncs.cpp:394
-msgid "Saved configuration file"
-msgstr "Konfiguračné súbory uložené"
+#: Client/core/CVersionUpdater.cpp:1786 Client/core/CVersionUpdater.cpp:1802
+msgid "Please wait..."
+msgstr "Prosím počkajte..."
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:460
+#: Client/core/CVersionUpdater.cpp:1801
+msgid "CHECKING"
+msgstr "KONTROLUJEM"
+
+#: Client/core/CVersionUpdater.cpp:1818 Client/core/CVersionUpdater.cpp:1911
+msgid "UPDATE CHECK"
+msgstr "KONTROLA AKTUALIZÁCIÍ"
+
+#: Client/core/CVersionUpdater.cpp:1819
+msgid "No update needed"
+msgstr "Nie je potreba aktualizácie"
+
+#: Client/core/CVersionUpdater.cpp:1836
+msgid "DOWNLOADING"
+msgstr "SŤAHOVANIE"
+
+#: Client/core/CVersionUpdater.cpp:1837
+msgid "waiting..."
+msgstr "Čakám..."
+
+#: Client/core/CVersionUpdater.cpp:1853
+msgid "MANDATORY UPDATE"
+msgstr "NUTNÝ UPDATE"
+
+#: Client/core/CVersionUpdater.cpp:1854
+msgid "To join this server, you must update MTA.\n\n"
+" Do you want to update now ?"
+msgstr "Pre pripojenie na tento server musíš aktualizovať MTA.\n\n"
+"Aktualizovať teraz?"
+
+#: Client/core/CVersionUpdater.cpp:1872
+msgid "OPTIONAL UPDATE"
+msgstr "VOLITEĽNÝ UPDATE"
+
+#: Client/core/CVersionUpdater.cpp:1873
+msgid "Server says an update is recommended, but not essential.\n\n"
+" Do you want to update now ?"
+msgstr "Server hovorí že je doporučené aktualizovať MTA, ale nie je to potrebné.\n\n"
+"Aktualizovať teraz?"
+
+#: Client/core/CVersionUpdater.cpp:1912
+msgid "Update not currently avalable.\n\n"
+"Please check www.mtasa.com"
+msgstr "Aktualizácia nie je momentálne k dispozícií.\n\n"
+"Skontroluj prosím www.mtasa.com"
+
+#: Client/core/CVersionUpdater.cpp:1933 Client/core/CVersionUpdater.cpp:2115
+msgid "ERROR SAVING"
+msgstr "CHYBA UKLADANIA"
+
+#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
+msgid "Unable to create the file."
+msgstr "Nepodarilo sa vytvoriť súbor."
+
+#: Client/core/CVersionUpdater.cpp:1942 Client/core/CVersionUpdater.cpp:1951
+#: Client/core/CVersionUpdater.cpp:2124 Client/core/CVersionUpdater.cpp:2133
+msgid "ERROR DOWNLOADING"
+msgstr "CHYBA SŤAHOVANIA"
+
+#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:2125
+msgid "The downloaded file appears to be incorrect."
+msgstr "Stiahnutý súbor sa zdá byť nekorektný."
+
+#: Client/core/CVersionUpdater.cpp:1952 Client/core/CVersionUpdater.cpp:2134
+msgid "For some reason."
+msgstr "Z nejakého dôvodu."
+
+#: Client/core/CVersionUpdater.cpp:1963 Client/core/CVersionUpdater.cpp:2147
+msgid "DOWNLOAD COMPLETE"
+msgstr "SŤAHOVANIE KOMPLETNÉ"
+
+#: Client/core/CVersionUpdater.cpp:1987
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr "- Neznámy problém v _DialogUpdateResult"
+
+#: Client/core/CVersionUpdater.cpp:2085 Client/core/CVersionUpdater.cpp:2095
+msgid "Ok"
+msgstr "Ok"
+
+#: Client/core/CVersionUpdater.cpp:2093
+msgid "ERROR"
+msgstr "CHYBA"
+
+#: Client/core/CVersionUpdater.cpp:2094
+msgid "Some MTA:SA data files are missing.\n\n\n"
+"Please reinstall MTA:SA"
+msgstr "Niektoré MTA:SA súbory chýbajú.\n\n\n"
+"Preinštaluj prosím MTA:SA"
+
+#: Client/core/CVersionUpdater.cpp:2721
 #, c-format
-msgid "* Your serial is: %s"
-msgstr "* Tvoj serial je: %s"
+msgid "%3d %% completed"
+msgstr "%3d %% dokončené"
+
+#: Client/core/CVersionUpdater.cpp:2723
+#, c-format
+msgid "\n\n"
+"Waiting for response  -  %-3d"
+msgstr "\n\n"
+"Čakám na odpoveď - %-3d"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONZOLA"
 
 #. Unknown command
-#: Client/core/CCommands.cpp:209
+#: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
 msgstr "Neznámy príkaz alebo výraz"
 
-#: Client/core/CCredits.cpp:32
-msgid "Programming"
-msgstr "Programovanie"
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Chceš sa pozrieť na online pomoc o tomto probléme ?"
 
-#: Client/core/CCredits.cpp:61
-msgid "Contributors"
-msgstr "Prispievatelia"
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "Novinky"
 
-#: Client/core/CCredits.cpp:82
-msgid "Game Design / Scripting"
-msgstr "Herný Design / Scriptovanie"
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "Navštíviť najnovšie oznámenie"
 
-#: Client/core/CCredits.cpp:102
-msgid "Language Localization"
-msgstr "Jazyková lokalizácia"
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "SERVER JE PLNÝ"
 
-#: Client/core/CCredits.cpp:108
-msgid "Patch contributors"
-msgstr "Patch prispievatelia"
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "Názov:"
 
-#: Client/core/CCredits.cpp:216
-msgid "Special Thanks"
-msgstr "Špeciálne poďakovanie"
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Adresa servera:"
 
-#: Client/core/CCredits.cpp:245
-msgid "This software makes use of the following libraries and software:"
-msgstr "Tento software používa nasledujúce knižnice a software:"
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Herný mód:"
+
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Mapa:"
+
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Hráči:"
+
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Zaheslované:"
+
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Oneskorenie:"
+
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "Zoznam hráčov"
+
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Zavrieť"
+
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Pripojiť do hry"
+
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Prosím zadajte heslo pre tento server:"
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Pripojiť na server hneď keď sa uvolní slot."
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "PROSÍM ZADAJ HESLO K SERVERU"
+
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "Čas vypršal"
+
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "Zisťovanie..."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
@@ -2833,13 +2958,6 @@ msgstr "Odozva"
 msgid "Gamemode"
 msgstr "Herný mód"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "Zoznam hráčov"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2895,89 +3013,6 @@ msgstr "Prosím použi mtasa:// protokol!"
 msgid "You have to select a server to connect to."
 msgstr "Musíš zvoliť server na pripojenie."
 
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "SERVER JE PLNÝ"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "Názov:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Adresa servera:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Herný mód:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Mapa:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Hráči:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Zaheslované:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Oneskorenie:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Zavrieť"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Pripojiť do hry"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Prosím zadajte heslo pre tento server:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Pripojiť na server hneď keď sa uvolní slot."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "PROSÍM ZADAJ HESLO K SERVERU"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "Čas vypršal"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "Zisťovanie..."
-
 #: Client/core/DXHook/CDirect3DHook9.cpp:123
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
@@ -2994,40 +3029,6 @@ msgstr "Screenshot má %d bytov, ale má byť %d"
 #: Client/core/DXHook/CDirect3DEvents9.cpp:236
 msgid "Screenshot failed"
 msgstr "Screenshot zlyhal"
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
-msgid "Problem with graphics driver"
-msgstr "Problém s grafickým ovládačom"
-
-#: Client/game_sa/CSettingsSA.cpp:759
-msgid "Can't find valid screen resolution."
-msgstr "Nedá sa nájsť platné rozlíšenie obrazovky."
-
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:835
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Naozaj chcete použiť toto rozlíšenie obrazovky?"
-
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Požiadavky stránky"
-
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "Server si vyžiadal povolenie na načítanie týchto stránok (neskoršie):"
-
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "NIKDY NEZADÁVAJTE CITLIVÉ INFORMÁCIE ABY VÁM NEBOLI UKRADNUTÉ"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Zapamätať rozhodnutie"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Zakázať"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
