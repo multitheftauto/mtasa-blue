@@ -19,7 +19,6 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8(IDirectInputDevice8A* pDevice
     // Initialize our device member variable.
     m_pDevice = pDevice;
     m_bDropDataIfInputGoesToGUI = true;
-    m_bIsMouse = false;
 
     // Don't block joystick if GUI wants input (so same as XInput joystick)
     DIDEVICEINSTANCE didi;
@@ -32,21 +31,13 @@ CProxyDirectInputDevice8::CProxyDirectInputDevice8(IDirectInputDevice8A* pDevice
         uint uiHid = (didi.dwDevType >> 16) & 0xff;
 
         if (uiType == DI8DEVTYPE_GAMEPAD || uiType == DI8DEVTYPE_JOYSTICK)
-        {
             m_bDropDataIfInputGoesToGUI = false;
-        }  
-        else if (uiType == DI8DEVTYPE_MOUSE)
-        {
-            m_bIsMouse = true;
-        }
 
         WriteDebugEvent(SString("   CProxyDirectInputDevice8 Device:%08x  Type:0x%x  SubType:0x%x  HID:0x%x  ProductName:%s", pDevice, uiType, uiSubType, uiHid,
                                 didi.tszProductName));
     }
     else
-    {
         WriteDebugEvent(SString("   CProxyDirectInputDevice8 GetDeviceInfo failed:%08x", hResult));
-    }
 }
 
 CProxyDirectInputDevice8::~CProxyDirectInputDevice8()
@@ -131,24 +122,6 @@ HRESULT CProxyDirectInputDevice8::GetDeviceState(DWORD a, LPVOID b)
 
             return hResult;
         }
-    }
-
-    // HACK: Don't pass scroll wheel data to the game as it interfers with MTA key bindings
-    // Without this, zoom in/out with scroll wheel still happens when not bound to
-    // mouse wheel in MTA but bound in single player.
-    // A better option could be to instead give this data only when we want it (bound
-    // in MTA and when scrolling) to retain the proper smooth zoom, but it would require
-    // forcing the game to use this data even when not bound in single player.
-    if (m_bIsMouse)
-    {
-        hResult = m_pDevice->GetDeviceState(a, b);
-
-        DIMOUSESTATE2* mouseState = reinterpret_cast<DIMOUSESTATE2*>(b);
-        mouseState->lZ = 0;
-
-        m_pDevice->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), NULL, &dwNumItems, 0);
-
-        return hResult;
     }
 
     return m_pDevice->GetDeviceState(a, b);
