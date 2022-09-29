@@ -181,10 +181,8 @@ public:
 
     virtual class CPedSAInterface* GetPedInterface() = 0;
 
-    virtual void AttachPedToBike(CEntity* entity, CVector* vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType) = 0;
     virtual void DetachPedFromEntity() = 0;
 
-    virtual bool      CanSeeEntity(CEntity* entity, FLOAT fDistance) = 0;
     virtual CVehicle* GetVehicle() = 0;
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
@@ -209,7 +207,6 @@ public:
     virtual DWORD             GetType() = 0;
     virtual CPedIntelligence* GetPedIntelligence() = 0;
     virtual CPedSound*        GetPedSound() = 0;
-    virtual DWORD*            GetMemoryValue(DWORD dwOffset) = 0;
 
     virtual FLOAT       GetCurrentRotation() = 0;
     virtual FLOAT       GetTargetRotation() = 0;
