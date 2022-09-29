@@ -206,10 +206,6 @@ inline SString GetClassTypeName(CClientObject*)
 {
     return "object";
 }
-inline SString GetClassTypeName(CClientCivilian*)
-{
-    return "civilian";
-}
 inline SString GetClassTypeName(CClientPickup*)
 {
     return "pickup";

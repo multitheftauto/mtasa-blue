@@ -16,7 +16,6 @@
 
 #include <game/CExplosion.h>
 #include <game/CStats.h>
-#include "CPopulationMP.h"
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
@@ -194,7 +193,6 @@ public:
 
     virtual class CPed* GetContextSwitchedPed() = 0;
 
-    virtual class CPopulationMP* GetPopulationMP() = 0;
     virtual void                 PreventLeavingVehicles() = 0;
     virtual void                 HideRadar(bool bHide) = 0;
     virtual void                 SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;

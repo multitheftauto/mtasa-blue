@@ -31,7 +31,6 @@
 #include "multiplayer_shotsync.h"
 #include "CMultiplayerSA.h"
 #include "COffsets.h"
-#include "CPopulationSA.h"
 #include "CRemoteDataSA.h"
 #include "..\game_sa\CCameraSA.h"
 #include "..\game_sa\CEntitySA.h"

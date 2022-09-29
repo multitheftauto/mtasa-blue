@@ -600,38 +600,6 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
     return pPed;
 }
 
-CPed* CPoolsSA::AddCivilianPed(DWORD* pGameInterface)
-{
-    DEBUG_TRACE("CPed* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )");
-
-    CPedSA* pPed = NULL;
-
-    if (m_pedPool.ulCount < MAX_PEDS)
-    {
-        CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
-        if (pInterface)
-        {
-            // Extract the element index from the handle
-            DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
-            if (dwElementIndexInPool >= MAX_PEDS)
-            {
-                return nullptr;
-            }
-            CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-            if (pPed)
-            {
-                return pPed;
-            }
-            else
-            {
-                // create new  ped here
-            }
-        }
-    }
-
-    return pPed;
-}
-
 void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
 {
     DEBUG_TRACE("void CPoolsSA::RemovePed( CPed* pPed, bool bDelete )");
@@ -670,18 +638,6 @@ void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
                 delete pPlayerPed;
 
                 break;
-            }
-
-            default:
-            {
-                CCivilianPedSA* pCivPed = dynamic_cast<CCivilianPedSA*>(pPed);
-                if (pCivPed)
-                {
-                    if (!bDelete)
-                        pCivPed->SetDoNotRemoveFromGameWhenDeleted(true);
-                }
-
-                delete pCivPed;
             }
         }
 

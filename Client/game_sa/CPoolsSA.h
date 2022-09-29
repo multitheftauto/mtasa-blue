@@ -105,7 +105,6 @@ public:
     // Peds pool
     CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
-    CPed* AddCivilianPed(DWORD* pGameInterface);
 
 private:
     bool AddPedToPool(CClientPed* pClientPed, CPedSA* pPed);
