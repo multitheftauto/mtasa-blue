@@ -24,10 +24,6 @@ CPoolsSA::CPoolsSA()
     m_ulBuildingCount = 0;
 
     MemSetFast(&Buildings, 0, sizeof(CBuilding*) * MAX_BUILDINGS);
-
-    EntryInfoNodePool = new CEntryInfoNodePoolSA();
-    PointerNodeDoubleLinkPool = new CPointerNodeDoubleLinkPoolSA();
-    PointerNodeSingleLinkPool = new CPointerNodeSingleLinkPoolSA();
 }
 
 CPoolsSA::~CPoolsSA()
@@ -37,15 +33,6 @@ CPoolsSA::~CPoolsSA()
     DeleteAllPeds();
     DeleteAllObjects();
     DeleteAllBuildings();
-
-    if (EntryInfoNodePool)
-        delete EntryInfoNodePool;
-
-    if (PointerNodeDoubleLinkPool)
-        delete PointerNodeDoubleLinkPool;
-
-    if (PointerNodeSingleLinkPool)
-        delete PointerNodeSingleLinkPool;
 }
 
 void CPoolsSA::DeleteAllBuildings()
@@ -1374,67 +1361,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     return iOut;
 }
 
-CEntryInfoNodePool* CPoolsSA::GetEntryInfoNodePool()
-{
-    return EntryInfoNodePool;
-}
-
-int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces()
-{
-    DWORD dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CEntryInfoNodePool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
-}
-
-CPointerNodeDoubleLinkPool* CPoolsSA::GetPointerNodeDoubleLinkPool()
-{
-    return PointerNodeDoubleLinkPool;
-}
-
-int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces()
-{
-    DWORD dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeDoubleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
-}
-
-CPointerNodeSingleLinkPool* CPoolsSA::GetPointerNodeSingleLinkPool()
-{
-    return PointerNodeSingleLinkPool;
-}
-
 void CPoolsSA::InvalidateLocalPlayerClientEntity()
 {
     m_pedPool.arrayOfClientEntities[0] = {m_pedPool.arrayOfClientEntities[0].pEntity, nullptr};
-}
-
-int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces()
-{
-    DWORD dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeSingleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
 }
