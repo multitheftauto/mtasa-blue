@@ -21,24 +21,6 @@
 
 class CClientEntity;
 
-class CEntryInfoNodePoolSA : public CEntryInfoNodePool
-{
-public:
-    int GetNumberOfUsedSpaces();
-};
-
-class CPointerNodeDoubleLinkPoolSA : public CPointerNodeDoubleLinkPool
-{
-public:
-    int GetNumberOfUsedSpaces();
-};
-
-class CPointerNodeSingleLinkPoolSA : public CPointerNodeSingleLinkPool
-{
-public:
-    int GetNumberOfUsedSpaces();
-};
-
 // size of tPoolObjectFlags is 1 byte only
 union tPoolObjectFlags
 {
@@ -123,7 +105,6 @@ public:
     // Peds pool
     CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
-    CPed* AddCivilianPed(DWORD* pGameInterface);
 
 private:
     bool AddPedToPool(CClientPed* pClientPed, CPedSA* pPed);
@@ -157,11 +138,6 @@ public:
     int  GetPoolDefaultCapacity(ePools pool);
     int  GetPoolCapacity(ePools pool);
     void SetPoolCapacity(ePools pool, int iValue);
-
-    // stuff that really maybe should be elsewhere or not, perhaps
-    CEntryInfoNodePool*         GetEntryInfoNodePool();
-    CPointerNodeSingleLinkPool* GetPointerNodeSingleLinkPool();
-    CPointerNodeDoubleLinkPool* GetPointerNodeDoubleLinkPool();
 
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
@@ -201,10 +177,6 @@ private:
     unsigned long m_ulBuildingCount;
 
     bool m_bGetVehicleEnabled;
-
-    CEntryInfoNodePool*         EntryInfoNodePool;
-    CPointerNodeDoubleLinkPool* PointerNodeDoubleLinkPool;
-    CPointerNodeSingleLinkPool* PointerNodeSingleLinkPool;
 };
 
 #define FUNC_GetVehicle 0x54fff0

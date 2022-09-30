@@ -14,7 +14,6 @@
 #include <game/CGame.h>
 #include <multiplayer/CMultiplayer.h>
 
-#include "CPopulationSA.h"
 #include "multiplayersa_init.h"
 #include "CLimitsSA.h"
 
@@ -47,7 +46,6 @@ class CMultiplayerSA : public CMultiplayer
 
 private:
     CRemoteDataSA* RemoteData;
-    CPopulationSA* Population;
 
 public:
     ZERO_ON_NEW
@@ -89,7 +87,6 @@ public:
 
     CPed* GetContextSwitchedPed();
 
-    CPopulationMP* GetPopulationMP() { return Population; }
     void           PreventLeavingVehicles();
     void           HideRadar(bool bHide);
     void           SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLOAT fHeading);

@@ -560,8 +560,6 @@ CMultiplayerSA::CMultiplayerSA()
             break;
     }
 
-    Population = new CPopulationSA;
-
     CRemoteDataSA::Init();
 
     m_bExplosionsDisabled = false;

@@ -344,12 +344,10 @@ public:
     void             Init();
     void             SetModelIndex(DWORD dwModelIndex);
     void             RemoveGeometryRef();
-    void             AttachPedToBike(CEntity* entity, CVector* vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType);
     void             AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType,
                                        bool bChangeCamera);
     void             DetachPedFromEntity();
 
-    bool      CanSeeEntity(CEntity* entity, FLOAT fDistance);
     CVehicle* GetVehicle();
     void      Respawn(CVector* position, bool bCameraCut);
     bool      AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
@@ -375,7 +373,6 @@ public:
     CPedSound*        GetPedSound() { return m_pPedSound; }
     DWORD             GetType();
     void              SetType(DWORD dwType);
-    DWORD*            GetMemoryValue(DWORD dwOffset);
 
     virtual void RestoreLastGoodPhysicsState();
     FLOAT        GetCurrentRotation();
