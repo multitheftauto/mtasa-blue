@@ -95,7 +95,7 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     return vecTurnSpeed;
 }
 
-VOID CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)");
     DWORD dwFunc = FUNC_GetMoveSpeed;
@@ -117,7 +117,7 @@ VOID CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
     }
 }
 
-VOID CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
+void CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
 {
     DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
 
@@ -190,7 +190,7 @@ void CPhysicalSA::SetCenterOfMass(CVector& vecCenterOfMass)
     ((CPhysicalSAInterface*)this->GetInterface())->m_vecCenterOfMass = vecCenterOfMass;
 }
 
-VOID CPhysicalSA::ProcessCollision()
+void CPhysicalSA::ProcessCollision()
 {
     DEBUG_TRACE("VOID CPhysicalSA::ProcessCollision()");
     DWORD dwFunc = FUNC_ProcessCollision;

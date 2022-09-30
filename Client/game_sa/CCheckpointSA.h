@@ -44,24 +44,24 @@ public:
 
     CCheckpointSAInterface* GetInterface() { return internalInterface; }
 
-    VOID     SetPosition(CVector* vecPosition);
+    void     SetPosition(CVector* vecPosition);
     CVector* GetPosition();
-    VOID     SetPointDirection(CVector* vecPointDirection);
+    void     SetPointDirection(CVector* vecPointDirection);
     CVector* GetPointDirection();
     DWORD    GetType();                      // need enum?
-    VOID     SetType(WORD wType);            // doesn't work propperly (not virtualed)
+    void     SetType(WORD wType);            // doesn't work propperly (not virtualed)
     BOOL     IsActive();
-    VOID     Activate();
+    void     Activate();
     DWORD    GetIdentifier();
-    VOID     SetIdentifier(DWORD dwIdentifier);
+    void     SetIdentifier(DWORD dwIdentifier);
     SColor   GetColor();
-    VOID     SetColor(const SColor color);
-    VOID     SetPulsePeriod(WORD wPulsePeriod);
-    VOID     SetRotateRate(short RotateRate);
+    void     SetColor(const SColor color);
+    void     SetPulsePeriod(WORD wPulsePeriod);
+    void     SetRotateRate(short RotateRate);
     FLOAT    GetSize();
-    VOID     SetSize(FLOAT fSize);
-    VOID     SetCameraRange(FLOAT fCameraRange);
-    VOID     SetPulseFraction(FLOAT fPulseFraction);            // doesn't work propperly (not virtualed)
+    void     SetSize(FLOAT fSize);
+    void     SetCameraRange(FLOAT fCameraRange);
+    void     SetPulseFraction(FLOAT fPulseFraction);            // doesn't work propperly (not virtualed)
     FLOAT    GetPulseFraction();
-    VOID     Remove();
+    void     Remove();
 };

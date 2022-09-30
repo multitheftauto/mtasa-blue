@@ -28,7 +28,7 @@ CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPe
     MemSetFast(this->m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
 
-VOID CPedSA::SetInterface(CEntitySAInterface* intInterface)
+void CPedSA::SetInterface(CEntitySAInterface* intInterface)
 {
     m_pInterface = intInterface;
 }

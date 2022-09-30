@@ -54,7 +54,7 @@ public:
     CEntity*       GetExplosionCreator();
     CEntity*       GetExplodingEntity();
     BOOL           IsActive();
-    VOID           Remove();
+    void           Remove();
     float          GetExplosionForce();
     void           SetExplosionForce(float fForce);
     void           SetSilent(bool bSilent);

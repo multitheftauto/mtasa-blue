@@ -241,19 +241,19 @@ public:
 
     CEntitySA();
     CEntitySAInterface* GetInterface() { return m_pInterface; };
-    VOID                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
+    void                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
     bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }
     void UpdateRpHAnim();
     bool SetScaleInternal(const CVector& scale);
-    VOID SetPosition(float fX, float fY, float fZ);
-    VOID Teleport(float fX, float fY, float fZ);
-    VOID ProcessControl();
-    VOID SetupLighting();
-    VOID Render();
-    VOID SetOrientation(float fX, float fY, float fZ);
-    VOID FixBoatOrientation();            // eAi you might want to rename this
-    VOID SetPosition(CVector* vecPosition);
+    void SetPosition(float fX, float fY, float fZ);
+    void Teleport(float fX, float fY, float fZ);
+    void ProcessControl();
+    void SetupLighting();
+    void Render();
+    void SetOrientation(float fX, float fY, float fZ);
+    void FixBoatOrientation();            // eAi you might want to rename this
+    void SetPosition(CVector* vecPosition);
 
     void SetUnderwater(bool bUnderwater);
     bool GetUnderwater();
@@ -263,7 +263,7 @@ public:
     CVector*     GetPositionInternal();
     CMatrix*     GetMatrix(CMatrix* matrix);
     CMatrix*     GetMatrixInternal(CMatrix* matrix);
-    VOID         SetMatrix(CMatrix* matrix);
+    void         SetMatrix(CMatrix* matrix);
     WORD         GetModelIndex();
     eEntityType  GetEntityType();
     bool         IsOnScreen();
@@ -277,7 +277,7 @@ public:
 
     FLOAT GetDistanceFromCentreOfMassToBaseOfModel();
 
-    VOID          SetEntityStatus(eEntityStatus bStatus);
+    void          SetEntityStatus(eEntityStatus bStatus);
     eEntityStatus GetEntityStatus();
 
     RwFrame*  GetFrameFromId(int id);
@@ -288,16 +288,16 @@ public:
     BOOL BeingDeleted;                   // to prevent it trying to delete twice
     BOOL DoNotRemoveFromGame;            // when deleted, if this is true, it won't be removed from the game
 
-    VOID SetDoNotRemoveFromGameWhenDeleted(bool bDoNotRemoveFromGame) { DoNotRemoveFromGame = bDoNotRemoveFromGame; };
+    void SetDoNotRemoveFromGameWhenDeleted(bool bDoNotRemoveFromGame) { DoNotRemoveFromGame = bDoNotRemoveFromGame; };
     BOOL IsStatic() { return m_pInterface->bIsStatic; }
-    VOID SetStatic(BOOL bStatic) { m_pInterface->bIsStatic = bStatic; };
-    VOID SetUsesCollision(BOOL bUsesCollision) { m_pInterface->bUsesCollision = bUsesCollision; };
+    void SetStatic(BOOL bStatic) { m_pInterface->bIsStatic = bStatic; };
+    void SetUsesCollision(BOOL bUsesCollision) { m_pInterface->bUsesCollision = bUsesCollision; };
     BOOL IsBackfaceCulled() { return m_pInterface->bBackfaceCulled; };
-    VOID SetBackfaceCulled(BOOL bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
-    VOID SetAlpha(DWORD dwAlpha);
+    void SetBackfaceCulled(BOOL bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
+    void SetAlpha(DWORD dwAlpha);
 
-    VOID MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown);
-    VOID MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int iUnknown);
+    void MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown);
+    void MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int iUnknown);
 
     bool IsPlayingAnimation(char* szAnimName);
 

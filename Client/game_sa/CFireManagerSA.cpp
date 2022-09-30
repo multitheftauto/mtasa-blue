@@ -29,7 +29,7 @@ CFireManagerSA::~CFireManagerSA()
     }
 }
 
-VOID CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
+void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 {
     DEBUG_TRACE("VOID CFireManagerSA::ExtinguishPoint ( CVector & vecPosition, float fRadius )");
     FLOAT fX = vecPosition.fX;
@@ -105,7 +105,7 @@ CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIR
         return (CFire *)dwReturn;*/
 }
 
-VOID CFireManagerSA::ExtinguishAllFires()
+void CFireManagerSA::ExtinguishAllFires()
 {
     DEBUG_TRACE("VOID CFireManagerSA::ExtinguishAllFires (  )");
     CFireSA* fire;

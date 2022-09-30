@@ -53,23 +53,23 @@ private:
 
 public:
     BYTE          GetEngineStatus();
-    VOID          SetEngineStatus(BYTE bEngineState);
+    void          SetEngineStatus(BYTE bEngineState);
     BYTE          GetDoorStatus(eDoors bDoor);
-    VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent);
+    void          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent);
     BYTE          GetWheelStatus(eWheelPosition bWheel);
-    VOID          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
+    void          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
     BYTE          GetPanelStatus(BYTE bPanel);
     unsigned long GetPanelStatus();
-    VOID          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
+    void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
     void          SetPanelStatus(unsigned long ulStatus);
     BYTE          GetLightStatus(BYTE bLight);
     unsigned char GetLightStatus();
-    VOID          SetLightStatus(BYTE bLight, BYTE bLightStatus);
+    void          SetLightStatus(BYTE bLight, BYTE bLightStatus);
     void          SetLightStatus(unsigned char ucStatus);
     BYTE          GetAeroplaneCompStatus(BYTE CompID);
-    VOID          SetAeroplaneCompStatus(BYTE CompID, BYTE Status);
+    void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status);
 
-    VOID FuckCarCompletely(BOOL bKeepWheels);
+    void FuckCarCompletely(BOOL bKeepWheels);
 
     CDamageManagerSA(class CEntitySAInterface* intEntityInterface, CDamageManagerSAInterface* intInterface)
     {

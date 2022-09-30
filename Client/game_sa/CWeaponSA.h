@@ -56,18 +56,18 @@ private:
 public:
     CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot);
     eWeaponType  GetType();
-    VOID         SetType(eWeaponType type);
+    void         SetType(eWeaponType type);
     eWeaponState GetState();
     void         SetState(eWeaponState state);
     DWORD        GetAmmoInClip();
-    VOID         SetAmmoInClip(DWORD dwAmmoInClip);
+    void         SetAmmoInClip(DWORD dwAmmoInClip);
     DWORD        GetAmmoTotal();
-    VOID         SetAmmoTotal(DWORD dwAmmoTotal);
+    void         SetAmmoTotal(DWORD dwAmmoTotal);
 
     CPed*       GetPed();
     eWeaponSlot GetSlot();
 
-    VOID         SetAsCurrentWeapon();
+    void          SetAsCurrentWeapon();
     CWeaponInfo* GetInfo(eWeaponSkill skill) { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType, skill); };
     void         Destroy();
     void         Remove();

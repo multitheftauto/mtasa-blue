@@ -89,7 +89,7 @@ BOOL CDoorSA::IsFullyOpen()
  * @param fUnknown Not sure...
  * \todo Check what the parameter for Open does
  */
-VOID CDoorSA::Open(float fOpenRatio)
+void CDoorSA::Open(float fOpenRatio)
 {
     DEBUG_TRACE("VOID CDoorSA::Open ( float fOpenRatio )");
     DWORD dwFunction = FUNC_Open;

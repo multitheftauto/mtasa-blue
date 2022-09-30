@@ -362,7 +362,7 @@ CVehicleSA::~CVehicleSA()
     }
 }
 
-VOID CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
 {
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -1891,7 +1891,7 @@ bool CVehicleSA::GetVehiclesSunGlareEnabled()
 
 namespace
 {
-    VOID _MatrixConvertFromEulerAngles(CMatrix_Padded* matrixPadded, float fX, float fY, float fZ)
+    void _MatrixConvertFromEulerAngles(CMatrix_Padded* matrixPadded, float fX, float fY, float fZ)
     {
         int iUnknown = 0;
         if (matrixPadded)
@@ -1908,7 +1908,7 @@ namespace
             }
         }
     }
-    VOID _MatrixConvertToEulerAngles(CMatrix_Padded* matrixPadded, float& fX, float& fY, float& fZ)
+    void _MatrixConvertToEulerAngles(CMatrix_Padded* matrixPadded, float& fX, float& fY, float& fZ)
     {
         int iUnknown = 0;
         if (matrixPadded)

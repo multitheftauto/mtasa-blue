@@ -403,20 +403,20 @@ public:
     ~CCameraSA();
 
     CCameraSAInterface* GetInterface() { return internalInterface; };
-    VOID                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
-    VOID                TakeControl(CVector* position, int CamSwitchStyle);
-    VOID     Restore();
-    VOID     RestoreWithJumpCut();
+    void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
+    void                TakeControl(CVector* position, int CamSwitchStyle);
+    void     Restore();
+    void     RestoreWithJumpCut();
     CMatrix* GetMatrix(CMatrix* matrix);
-    VOID     SetMatrix(CMatrix* matrix);
-    VOID     Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
+    void     SetMatrix(CMatrix* matrix);
+    void     Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
     float    Find3rdPersonQuickAimPitch();
     BYTE     GetActiveCam();
 
     CCam*         GetCam(BYTE bCameraID);
     virtual CCam* GetCam(CCamSAInterface* camInterface);
 
-    VOID      SetWidescreen(BOOL bWidescreen);
+    void      SetWidescreen(BOOL bWidescreen);
     BOOL      GetWidescreen();
     bool      IsFading();
     int       GetFadingDirection();
@@ -429,8 +429,8 @@ public:
     void      GetCameraClip(bool& bObjects, bool& bVehicles);
     BYTE      GetCameraVehicleViewMode();
     BYTE      GetCameraPedViewMode();
-    VOID      SetCameraVehicleViewMode(BYTE dwCamMode);
-    VOID      SetCameraPedViewMode(BYTE dwCamMode);
+    void      SetCameraVehicleViewMode(BYTE dwCamMode);
+    void      SetCameraPedViewMode(BYTE dwCamMode);
     void      RestoreLastGoodState();
     void      SetShakeForce(float fShakeForce);
     float     GetShakeForce();
