@@ -405,12 +405,10 @@ public:
     CCameraSAInterface* GetInterface() { return internalInterface; };
     VOID                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
     VOID                TakeControl(CVector* position, int CamSwitchStyle);
-    VOID     TakeControlAttachToEntity(CEntity* TargetEntity, CEntity* AttachEntity, CVector* vecOffset, CVector* vecLookAt, float fTilt, int CamSwitchStyle);
     VOID     Restore();
     VOID     RestoreWithJumpCut();
     CMatrix* GetMatrix(CMatrix* matrix);
     VOID     SetMatrix(CMatrix* matrix);
-    VOID     SetCamPositionForFixedMode(CVector* vecPosition, CVector* vecUpOffset);
     VOID     Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
     float    Find3rdPersonQuickAimPitch();
     BYTE     GetActiveCam();
@@ -420,11 +418,6 @@ public:
 
     VOID      SetWidescreen(BOOL bWidescreen);
     BOOL      GetWidescreen();
-    FLOAT     GetCarZoom();
-    VOID      SetCarZoom(FLOAT fCarZoom);
-    bool      TryToStartNewCamMode(DWORD dwCamMode);
-    bool      ConeCastCollisionResolve(CVector* pPos, CVector* pLookAt, CVector* pDest, float rad, float minDist, float* pDist);
-    void      VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool bSmoothEnds);
     bool      IsFading();
     int       GetFadingDirection();
     void      Fade(float fFadeOutTime, int iOutOrIn);

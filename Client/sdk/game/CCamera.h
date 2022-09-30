@@ -115,24 +115,16 @@ public:
     // switchstyle 1 = smooth, 2 = cut
     virtual VOID      TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle) = 0;
     virtual VOID      TakeControl(CVector* position, int CamSwitchStyle) = 0;
-    virtual VOID      TakeControlAttachToEntity(CEntity* TargetEntity, CEntity* AttachEntity, CVector* vecOffset, CVector* vecLookAt, float fTilt,
-                                                int CamSwitchStyle) = 0;
     virtual VOID      Restore() = 0;
     virtual VOID      RestoreWithJumpCut() = 0;
     virtual CMatrix*  GetMatrix(CMatrix* matrix) = 0;
     virtual VOID      SetMatrix(CMatrix* matrix) = 0;
-    virtual VOID      SetCamPositionForFixedMode(CVector* vecPosition, CVector* vecUpOffset) = 0;
     virtual VOID      Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget) = 0;
     virtual float     Find3rdPersonQuickAimPitch() = 0;
     virtual BYTE      GetActiveCam() = 0;
     virtual CCam*     GetCam(BYTE bCameraID) = 0;
     virtual VOID      SetWidescreen(BOOL bWidescreen) = 0;
     virtual BOOL      GetWidescreen() = 0;
-    virtual float     GetCarZoom() = 0;
-    virtual VOID      SetCarZoom(float fCarZoom) = 0;
-    virtual bool      TryToStartNewCamMode(DWORD dwCamMode) = 0;
-    virtual bool      ConeCastCollisionResolve(CVector* pPos, CVector* pLookAt, CVector* pDest, float rad, float minDist, float* pDist) = 0;
-    virtual void      VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool bSmoothEnds) = 0;
     virtual bool      IsFading() = 0;
     virtual int       GetFadingDirection() = 0;
     virtual void      Fade(float fFadeOutTime, int iOutOrIn) = 0;
