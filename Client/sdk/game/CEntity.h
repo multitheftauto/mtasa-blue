@@ -71,7 +71,7 @@ public:
     virtual void                      SetMatrix(CMatrix* matrix) = 0;
     virtual WORD                      GetModelIndex() = 0;
     virtual eEntityType               GetEntityType() = 0;
-    virtual FLOAT                     GetDistanceFromCentreOfMassToBaseOfModel() = 0;
+    virtual float                     GetDistanceFromCentreOfMassToBaseOfModel() = 0;
     virtual void                      SetEntityStatus(eEntityStatus bStatus) = 0;
     virtual eEntityStatus             GetEntityStatus() = 0;
     virtual bool                      IsOnScreen() = 0;

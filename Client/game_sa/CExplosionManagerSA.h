@@ -28,7 +28,7 @@ public:
 
     CExplosion* AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition, unsigned int uiActivationDelay = 0,
                              bool bMakeSound = true, float fCamShake = -1.0f, bool bNoDamage = false);
-    void        RemoveAllExplosionsInArea(CVector* vecPosition, FLOAT fRadius);
+    void        RemoveAllExplosionsInArea(CVector* vecPosition, float fRadius);
     void        RemoveAllExplosions();
     CExplosion* GetExplosion(DWORD ID);
     CExplosion* FindFreeExplosion();

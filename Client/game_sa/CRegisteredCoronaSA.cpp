@@ -29,37 +29,37 @@ void CRegisteredCoronaSA::SetPosition(CVector* vector)
     MemCpyFast(&internalInterface->Coordinates, vector, sizeof(CVector));
 }
 
-FLOAT CRegisteredCoronaSA::GetSize()
+float CRegisteredCoronaSA::GetSize()
 {
     DEBUG_TRACE("FLOAT CRegisteredCoronaSA::GetSize()");
     return internalInterface->Size;
 }
 
-void CRegisteredCoronaSA::SetSize(FLOAT fSize)
+void CRegisteredCoronaSA::SetSize(float fSize)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetSize(FLOAT fSize)");
     internalInterface->Size = fSize;
 }
 
-FLOAT CRegisteredCoronaSA::GetRange()
+float CRegisteredCoronaSA::GetRange()
 {
     DEBUG_TRACE("FLOAT CRegisteredCoronaSA::GetRange()");
     return internalInterface->Range;
 }
 
-void CRegisteredCoronaSA::SetRange(FLOAT fRange)
+void CRegisteredCoronaSA::SetRange(float fRange)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetRange(FLOAT fRange)");
     internalInterface->Range = fRange;
 }
 
-FLOAT CRegisteredCoronaSA::GetPullTowardsCamera()
+float CRegisteredCoronaSA::GetPullTowardsCamera()
 {
     DEBUG_TRACE("FLOAT CRegisteredCoronaSA::GetPullTowardsCamera()");
     return internalInterface->PullTowardsCam;
 }
 
-void CRegisteredCoronaSA::SetPullTowardsCamera(FLOAT fPullTowardsCamera)
+void CRegisteredCoronaSA::SetPullTowardsCamera(float fPullTowardsCamera)
 {
     DEBUG_TRACE("VOID CRegisteredCoronaSA::SetPullTowardsCamera(FLOAT fPullTowardsCamera)");
     internalInterface->PullTowardsCam = fPullTowardsCamera;

@@ -22,12 +22,12 @@ class CRegisteredCorona
 public:
     virtual CVector* GetPosition() = 0;
     virtual void     SetPosition(CVector* vector) = 0;
-    virtual FLOAT    GetSize() = 0;
-    virtual void     SetSize(FLOAT fSize) = 0;
-    virtual FLOAT    GetRange() = 0;
-    virtual void     SetRange(FLOAT fRange) = 0;
-    virtual FLOAT    GetPullTowardsCamera() = 0;
-    virtual void     SetPullTowardsCamera(FLOAT fPullTowardsCamera) = 0;
+    virtual float    GetSize() = 0;
+    virtual void     SetSize(float fSize) = 0;
+    virtual float    GetRange() = 0;
+    virtual void     SetRange(float fRange) = 0;
+    virtual float    GetPullTowardsCamera() = 0;
+    virtual void     SetPullTowardsCamera(float fPullTowardsCamera) = 0;
     virtual void     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha) = 0;
     virtual void     SetTexture(RwTexture* texture) = 0;
     virtual void     SetTexture(eCoronaType texture) = 0;

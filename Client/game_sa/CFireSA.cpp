@@ -203,13 +203,13 @@ void CFireSA::Ignite()
     this->internalInterface->nNumGenerationsAllowed = 100;
 }
 
-FLOAT CFireSA::GetStrength()
+float CFireSA::GetStrength()
 {
     DEBUG_TRACE("FLOAT CFireSA::GetStrength (  )");
     return this->internalInterface->Strength;
 }
 
-void CFireSA::SetStrength(FLOAT fStrength)
+void CFireSA::SetStrength(float fStrength)
 {
     DEBUG_TRACE("VOID CFireSA::SetStrength ( FLOAT fStrength )");
     this->internalInterface->Strength = fStrength;

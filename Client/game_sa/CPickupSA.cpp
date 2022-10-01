@@ -52,13 +52,13 @@ void CPickupSA::SetType(ePickupType type)
     this->GetInterface()->Type = type;
 }
 
-FLOAT CPickupSA::GetCurrentValue()
+float CPickupSA::GetCurrentValue()
 {
     DEBUG_TRACE("FLOAT CPickupSA::GetCurrentValue()");
     return this->GetInterface()->CurrentValue;
 }
 
-void CPickupSA::SetCurrentValue(FLOAT fCurrentValue)
+void CPickupSA::SetCurrentValue(float fCurrentValue)
 {
     DEBUG_TRACE("VOID CPickupSA::SetCurrentValue(FLOAT fCurrentValue)");
     this->GetInterface()->CurrentValue = fCurrentValue;

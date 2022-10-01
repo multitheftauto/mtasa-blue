@@ -96,43 +96,43 @@ void C3DMarkerSA::SetRotateRate(short RotateRate)
     this->GetInterface()->m_nRotateRate = RotateRate;
 }
 
-FLOAT C3DMarkerSA::GetSize()
+float C3DMarkerSA::GetSize()
 {
     DEBUG_TRACE("FLOAT C3DMarkerSA::GetSize()");
     return this->GetInterface()->m_fSize;
 }
 
-void C3DMarkerSA::SetSize(FLOAT fSize)
+void C3DMarkerSA::SetSize(float fSize)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetSize(FLOAT fSize)");
     this->GetInterface()->m_fSize = fSize;
 }
 
-FLOAT C3DMarkerSA::GetBrightness()
+float C3DMarkerSA::GetBrightness()
 {
     DEBUG_TRACE("FLOAT C3DMarkerSA::GetBrightness()");
     return this->GetInterface()->m_fBrightness;
 }
 
-void C3DMarkerSA::SetBrightness(FLOAT fBrightness)
+void C3DMarkerSA::SetBrightness(float fBrightness)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetBrightness(FLOAT fBrightness)");
     this->GetInterface()->m_fBrightness = fBrightness;
 }
 
-void C3DMarkerSA::SetCameraRange(FLOAT fCameraRange)
+void C3DMarkerSA::SetCameraRange(float fCameraRange)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetCameraRange(FLOAT fCameraRange)");
     this->GetInterface()->m_fCameraRange = fCameraRange;
 }
 
-void C3DMarkerSA::SetPulseFraction(FLOAT fPulseFraction)
+void C3DMarkerSA::SetPulseFraction(float fPulseFraction)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetPulseFraction(FLOAT fPulseFraction)");
     this->GetInterface()->m_fPulseFraction = fPulseFraction;
 }
 
-FLOAT C3DMarkerSA::GetPulseFraction()
+float C3DMarkerSA::GetPulseFraction()
 {
     DEBUG_TRACE("FLOAT C3DMarkerSA::GetPulseFraction()");
     return this->GetInterface()->m_fPulseFraction;

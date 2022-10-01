@@ -373,10 +373,10 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("FLOAT CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)");
     DWORD dwFunc = FUNC_FindGroundZFor3DCoord;
-    FLOAT fReturn = 0;
-    FLOAT fX = vecPosition->fX;
-    FLOAT fY = vecPosition->fY;
-    FLOAT fZ = vecPosition->fZ;
+    float fReturn = 0;
+    float fX = vecPosition->fX;
+    float fY = vecPosition->fY;
+    float fZ = vecPosition->fZ;
     _asm
     {
         push    0

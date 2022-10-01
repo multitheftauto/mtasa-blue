@@ -31,7 +31,7 @@ public:
 
     WORD ReferenceIndex;
 
-    FLOAT       fBlipMarkerScale;
+    float       fBlipMarkerScale;
     WORD        nBlipScale;
     CEntryExit* pEntryExit;
 

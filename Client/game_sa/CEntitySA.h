@@ -113,7 +113,7 @@ class CSimpleTransformSAInterface            // 16 bytes
 {
 public:
     CVector m_translate;
-    FLOAT   m_heading;
+    float   m_heading;
 };
 
 class CPlaceableSAInterface            // 20 bytes
@@ -275,7 +275,7 @@ public:
     BYTE GetAreaCode();
     void SetAreaCode(BYTE areaCode);
 
-    FLOAT GetDistanceFromCentreOfMassToBaseOfModel();
+    float GetDistanceFromCentreOfMassToBaseOfModel();
 
     void          SetEntityStatus(eEntityStatus bStatus);
     eEntityStatus GetEntityStatus();

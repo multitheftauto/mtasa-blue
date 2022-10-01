@@ -27,10 +27,10 @@ public:
     short   m_nRotateRate;            // deg per frame (in either direction)
     CVector m_pos;
     CVector m_pointDir;
-    FLOAT   m_fPulseFraction;
-    FLOAT   m_fSize;
-    FLOAT   m_fCameraRange;
-    FLOAT   m_multiSize;
+    float   m_fPulseFraction;
+    float   m_fSize;
+    float   m_fCameraRange;
+    float   m_multiSize;
 };
 
 class CCheckpointSA : public CCheckpoint
@@ -58,10 +58,10 @@ public:
     void     SetColor(const SColor color);
     void     SetPulsePeriod(WORD wPulsePeriod);
     void     SetRotateRate(short RotateRate);
-    FLOAT    GetSize();
-    void     SetSize(FLOAT fSize);
-    void     SetCameraRange(FLOAT fCameraRange);
-    void     SetPulseFraction(FLOAT fPulseFraction);            // doesn't work propperly (not virtualed)
-    FLOAT    GetPulseFraction();
+    float    GetSize();
+    void     SetSize(float fSize);
+    void     SetCameraRange(float fCameraRange);
+    void     SetPulseFraction(float fPulseFraction);            // doesn't work propperly (not virtualed)
+    float    GetPulseFraction();
     void     Remove();
 };

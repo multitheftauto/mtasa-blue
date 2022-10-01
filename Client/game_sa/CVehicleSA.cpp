@@ -1071,13 +1071,13 @@ void CVehicleSA::SetSirenOrAlarmActive(bool bActive)
     ((CVehicleSAInterface*)this->GetInterface())->m_nVehicleFlags.bSirenOrAlarm = bActive;
 }
 
-FLOAT CVehicleSA::GetHealth()
+float CVehicleSA::GetHealth()
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
     return vehicle->m_nHealth;
 }
 
-void CVehicleSA::SetHealth(FLOAT fHealth)
+void CVehicleSA::SetHealth(float fHealth)
 {
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
     vehicle->m_nHealth = fHealth;
@@ -2179,13 +2179,13 @@ bool CVehicleSA::GetComponentVisible(const SString& vehicleComponent, bool& bOut
 void CVehicleSA::SetNitroLevel(float fLevel)
 {
     DWORD dwThis = (DWORD)GetInterface();
-    MemPutFast<FLOAT>(dwThis + 0x8A4, fLevel);
+    MemPutFast<float>(dwThis + 0x8A4, fLevel);
 }
 
 float CVehicleSA::GetNitroLevel()
 {
     DWORD dwThis = (DWORD)GetInterface();
-    float fLevel = *(FLOAT*)(dwThis + 0x8A4);
+    float fLevel = *(float*)(dwThis + 0x8A4);
     return fLevel;
 }
 

@@ -56,8 +56,8 @@ public:
 
     ePickupType  GetType();
     void         SetType(ePickupType type);
-    FLOAT        GetCurrentValue();
-    void         SetCurrentValue(FLOAT fCurrentValue);
+    float        GetCurrentValue();
+    void         SetCurrentValue(float fCurrentValue);
     void         SetRegenerationTime(DWORD dwTime);
     void         SetMoneyPerDay(WORD wMoneyPerDay);
     WORD         GetMoneyPerDay();

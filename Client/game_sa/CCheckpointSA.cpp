@@ -112,31 +112,31 @@ void CCheckpointSA::SetRotateRate(short RotateRate)
     }
 }
 
-FLOAT CCheckpointSA::GetSize()
+float CCheckpointSA::GetSize()
 {
     DEBUG_TRACE("FLOAT CCheckpointSA::GetSize()");
     return this->GetInterface()->m_fSize;
 }
 
-void CCheckpointSA::SetSize(FLOAT fSize)
+void CCheckpointSA::SetSize(float fSize)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetSize(FLOAT fSize)");
     this->GetInterface()->m_fSize = fSize;
 }
 
-void CCheckpointSA::SetCameraRange(FLOAT fCameraRange)
+void CCheckpointSA::SetCameraRange(float fCameraRange)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetCameraRange(FLOAT fCameraRange)");
     this->GetInterface()->m_fCameraRange = fCameraRange;
 }
 
-void CCheckpointSA::SetPulseFraction(FLOAT fPulseFraction)
+void CCheckpointSA::SetPulseFraction(float fPulseFraction)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetPulseFraction(FLOAT fPulseFraction)");
     this->GetInterface()->m_fPulseFraction = fPulseFraction;
 }
 
-FLOAT CCheckpointSA::GetPulseFraction()
+float CCheckpointSA::GetPulseFraction()
 {
     DEBUG_TRACE("FLOAT CCheckpointSA::GetPulseFraction()");
     return this->GetInterface()->m_fPulseFraction;

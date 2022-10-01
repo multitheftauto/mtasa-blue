@@ -155,8 +155,8 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
     {
         DEBUG_TRACE("VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwSound)");
         DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
-        FLOAT fSpeed = 1.0f;
-        FLOAT fVolumeChange = 0.0f;
+        float fSpeed = 1.0f;
+        float fVolumeChange = 0.0f;
         _asm
         {
             push    fSpeed

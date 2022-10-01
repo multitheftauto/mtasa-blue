@@ -46,9 +46,9 @@ public:
     virtual void     SetColor(const SColor color) = 0;
     virtual void     SetPulsePeriod(WORD wPulsePeriod) = 0;
     virtual void     SetRotateRate(short RotateRate) = 0;
-    virtual FLOAT    GetSize() = 0;
-    virtual void     SetSize(FLOAT fSize) = 0;
-    virtual void     SetCameraRange(FLOAT fCameraRange) = 0;
-    virtual FLOAT    GetPulseFraction() = 0;
+    virtual float    GetSize() = 0;
+    virtual void     SetSize(float fSize) = 0;
+    virtual void     SetCameraRange(float fCameraRange) = 0;
+    virtual float    GetPulseFraction() = 0;
     virtual void     Remove() = 0;
 };

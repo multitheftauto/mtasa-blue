@@ -30,7 +30,7 @@ CCheckpointsSA::~CCheckpointsSA()
 /**
  * \todo Update default color to SA's orange instead of VC's pink
  */
-CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, FLOAT fSize, FLOAT fPulseFraction,
+CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, float fSize, float fPulseFraction,
                                               const SColor color)
 {
     DEBUG_TRACE(

@@ -23,13 +23,13 @@ public:
     CVector    Coordinates;                  // Where is it exactly.
     DWORD      Identifier;                   // Should be unique for each corona. Address or something (0 = empty)
     RwTexture* pTex;                         // Pointer to the actual texture to be rendered
-    FLOAT      Size;                         // How big is this fellow
-    FLOAT      NormalAngle;                  // Is corona normal (if relevant) facing the camera?
-    FLOAT      Range;                        // How far away is this guy still visible
-    FLOAT      PullTowardsCam;               // How far away is the z value pulled towards camera.
-    FLOAT      HeightAboveGround;            // Stired so that we don't have to do a ProcessVerticalLine every frame
+    float      Size;                         // How big is this fellow
+    float      NormalAngle;                  // Is corona normal (if relevant) facing the camera?
+    float      Range;                        // How far away is this guy still visible
+    float      PullTowardsCam;               // How far away is the z value pulled towards camera.
+    float      HeightAboveGround;            // Stired so that we don't have to do a ProcessVerticalLine every frame
                                              // The following fields are used for trails behind coronas (glowy lights)
-    FLOAT FadeSpeed;                         // The speed the corona fades in and out ##SA##
+    float FadeSpeed;                         // The speed the corona fades in and out ##SA##
     BYTE  Red, Green, Blue;                  // Rendering colour.
     BYTE  Intensity;                         // 255 = full
     BYTE  FadedIntensity;                    // Intensity that lags behind the given intenisty and fades out if the LOS is blocked
@@ -61,12 +61,12 @@ public:
     CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface);
     CVector* GetPosition();
     void     SetPosition(CVector* vector);
-    FLOAT    GetSize();
-    void     SetSize(FLOAT fSize);
-    FLOAT    GetRange();
-    void     SetRange(FLOAT fRange);
-    FLOAT    GetPullTowardsCamera();
-    void     SetPullTowardsCamera(FLOAT fPullTowardsCamera);
+    float    GetSize();
+    void     SetSize(float fSize);
+    float    GetRange();
+    void     SetRange(float fRange);
+    float    GetPullTowardsCamera();
+    void     SetPullTowardsCamera(float fPullTowardsCamera);
     void     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha);
     void     SetTexture(RwTexture* texture);
     void     SetTexture(eCoronaType texture);

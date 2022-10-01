@@ -33,7 +33,7 @@ public:
     CEntitySAInterface* entityTarget;
     CEntitySAInterface* entityCreator;
     DWORD               nTimeToBurn;
-    FLOAT               Strength;
+    float               Strength;
     signed char         nNumGenerationsAllowed;
     BYTE                RemovalDist;
 
@@ -62,8 +62,8 @@ public:
     void            SetSilent(BOOL bSilent);
     BOOL            IsBeingExtinguished();
     void            Ignite();
-    FLOAT           GetStrength();
-    void            SetStrength(FLOAT fStrength);
+    float           GetStrength();
+    void            SetStrength(float fStrength);
     void            SetNumGenerationsAllowed(char generations);
     CFireInterface* GetInterface() { return this->internalInterface; }
 };

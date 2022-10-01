@@ -229,12 +229,12 @@ void CCameraSA::SetMatrix(CMatrix* matrix)
     }
 }
 
-void CCameraSA::Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget)
+void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget)
 {
     DEBUG_TRACE("VOID CCameraSA::Find3rdPersonCamTargetVector ( FLOAT fDistance, CVector * vecGunMuzzle, CVector * vecSource, CVector * vecTarget )");
-    FLOAT               fOriginX = vecGunMuzzle->fX;
-    FLOAT               fOriginY = vecGunMuzzle->fY;
-    FLOAT               fOriginZ = vecGunMuzzle->fZ;
+    float               fOriginX = vecGunMuzzle->fX;
+    float               fOriginY = vecGunMuzzle->fY;
+    float               fOriginZ = vecGunMuzzle->fZ;
     DWORD               dwFunc = FUNC_Find3rdPersonCamTargetVector;
     CCameraSAInterface* cameraInterface = this->GetInterface();
     _asm

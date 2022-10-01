@@ -26,8 +26,8 @@ public:
 
     virtual ePickupType  GetType() = 0;
     virtual void         SetType(ePickupType type) = 0;
-    virtual FLOAT        GetCurrentValue() = 0;
-    virtual void         SetCurrentValue(FLOAT fCurrentValue) = 0;
+    virtual float        GetCurrentValue() = 0;
+    virtual void         SetCurrentValue(float fCurrentValue) = 0;
     virtual void         SetRegenerationTime(DWORD dwTime) = 0;
     virtual void         SetMoneyPerDay(WORD wMoneyPerDay) = 0;
     virtual WORD         GetMoneyPerDay() = 0;

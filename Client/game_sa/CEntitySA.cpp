@@ -439,12 +439,12 @@ eEntityType CEntitySA::GetEntityType()
     return (eEntityType)m_pInterface->nType;
 }
 
-FLOAT CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
+float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     DEBUG_TRACE("FLOAT CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()");
     DWORD dwFunc = FUNC_GetDistanceFromCentreOfMassToBaseOfModel;
     DWORD dwThis = (DWORD)m_pInterface;
-    FLOAT fReturn;
+    float fReturn;
     _asm
     {
         mov     ecx, dwThis

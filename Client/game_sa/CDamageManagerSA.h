@@ -36,7 +36,7 @@
 class CDamageManagerSAInterface            // 28 bytes due to the way its packed (24 containing actual data)
 {
 public:
-    FLOAT fWheelDamageEffect;
+    float fWheelDamageEffect;
     BYTE  bEngineStatus;            // old - wont be used
     BYTE  Wheel[MAX_WHEELS];
     BYTE  Door[MAX_DOORS];

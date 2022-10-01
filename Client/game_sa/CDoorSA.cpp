@@ -15,12 +15,12 @@
  * \todo Find out what GetAngleOpenRatio actually does
  * @return FLOAT Not sure...
  */
-FLOAT CDoorSA::GetAngleOpenRatio()
+float CDoorSA::GetAngleOpenRatio()
 {
     DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
     DWORD dwFunction = FUNC_GetAngleOpenRatio;
     DWORD dwPointer = (DWORD)GetInterface();
-    FLOAT fReturn = 0.0f;
+    float fReturn = 0.0f;
 
     if (dwPointer != 0)
     {
