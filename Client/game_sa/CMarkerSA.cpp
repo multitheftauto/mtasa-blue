@@ -36,7 +36,7 @@ void CMarkerSA::Init()
  * Set the sprite used for this marker
  * @param wSprite a valid eMarkerSprite value. MARKER_SPRITE_NONE for the default sprite.
  */
-VOID CMarkerSA::SetSprite(eMarkerSprite Sprite = (eMarkerSprite)MARKER_SPRITE_NONE)
+void CMarkerSA::SetSprite(eMarkerSprite Sprite = (eMarkerSprite)MARKER_SPRITE_NONE)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetSprite ( eMarkerSprite Sprite = (eMarkerSprite)MARKER_SPRITE_NONE )");
     if (Sprite >= MARKER_SPRITE_NONE && Sprite <= MARKER_SPRITE_SPRAY)
@@ -48,7 +48,7 @@ VOID CMarkerSA::SetSprite(eMarkerSprite Sprite = (eMarkerSprite)MARKER_SPRITE_NO
 /**
  * Sets how the marker is displayed in-game
  */
-VOID CMarkerSA::SetDisplay(eMarkerDisplay wDisplay)
+void CMarkerSA::SetDisplay(eMarkerDisplay wDisplay)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetDisplay ( eMarkerDisplay wDisplay )");
     internalInterface->nBlipDisplayFlag = wDisplay;
@@ -58,7 +58,7 @@ VOID CMarkerSA::SetDisplay(eMarkerDisplay wDisplay)
  * Set the size of the sprite
  * @param wScale the relative size of the sprite. 1 is default.
  */
-VOID CMarkerSA::SetScale(WORD wScale = MARKER_SCALE_NORMAL)
+void CMarkerSA::SetScale(WORD wScale = MARKER_SCALE_NORMAL)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetScale ( WORD wScale = MARKER_SCALE_NORMAL)");
     internalInterface->nBlipScale = wScale;
@@ -69,7 +69,7 @@ VOID CMarkerSA::SetScale(WORD wScale = MARKER_SCALE_NORMAL)
  * Sets the color of the marker when MARKER_SPRITE_NONE is used
  * @param color eMarkerColor containing a valid colour id
  */
-VOID CMarkerSA::SetColor(eMarkerColor color)
+void CMarkerSA::SetColor(eMarkerColor color)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetColor ( eMarkerColor color )");
     if (color >= MARKER_COLOR_PLUM && color <= MARKER_COLOR_DARK_TURQUOISE)
@@ -91,7 +91,7 @@ VOID CMarkerSA::SetColor(eMarkerColor color)
  * Sets the color of the marker when MARKER_SPRITE_NONE is used
  * @param color RGBA containing a valid colour in RGBA format.
  */
-VOID CMarkerSA::SetColor(const SColor color)
+void CMarkerSA::SetColor(const SColor color)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetColor ( RGBA color )");
     // Convert to required rgba at the last moment
@@ -101,7 +101,7 @@ VOID CMarkerSA::SetColor(const SColor color)
 /**
  * \todo Complete CMarkerSA::Remove when CEntity is ready
  */
-VOID CMarkerSA::Remove()
+void CMarkerSA::Remove()
 {
     DEBUG_TRACE("VOID CMarkerSA::Remove ( )");
     internalInterface->BlipType = MARKER_TYPE_UNUSED;
@@ -119,13 +119,13 @@ BOOL CMarkerSA::IsActive()
         return FALSE;
 }
 
-VOID CMarkerSA::SetPosition(CVector* vecPosition)
+void CMarkerSA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetPosition ( CVector * vecPosition )");
     MemCpyFast(&internalInterface->position, vecPosition, sizeof(CVector));
 }
 
-VOID CMarkerSA::SetEntity(CVehicle* vehicle)
+void CMarkerSA::SetEntity(CVehicle* vehicle)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetEntity ( CVehicle * vehicle )");
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
@@ -134,7 +134,7 @@ VOID CMarkerSA::SetEntity(CVehicle* vehicle)
     internalInterface->BlipType = (BYTE)MARKER_TYPE_CAR;
 }
 
-VOID CMarkerSA::SetEntity(CPed* ped)
+void CMarkerSA::SetEntity(CPed* ped)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetEntity ( CPed * ped )");
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
@@ -143,7 +143,7 @@ VOID CMarkerSA::SetEntity(CPed* ped)
     internalInterface->BlipType = (BYTE)MARKER_TYPE_CHAR;
 }
 
-VOID CMarkerSA::SetEntity(CObject* object)
+void CMarkerSA::SetEntity(CObject* object)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetEntity ( CObject * object )");
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();

@@ -189,7 +189,7 @@ public:
     virtual void SetModelIndex(unsigned long ulModel) = 0;
     virtual void RemoveGeometryRef() = 0;
 
-    virtual FLOAT    GetHealth() = 0;
+    virtual float    GetHealth() = 0;
     virtual void     SetHealth(float fHealth) = 0;
     virtual float    GetArmor() = 0;
     virtual void     SetArmor(float fArmor) = 0;
@@ -208,10 +208,10 @@ public:
     virtual CPedIntelligence* GetPedIntelligence() = 0;
     virtual CPedSound*        GetPedSound() = 0;
 
-    virtual FLOAT       GetCurrentRotation() = 0;
-    virtual FLOAT       GetTargetRotation() = 0;
-    virtual void        SetCurrentRotation(FLOAT fRotation) = 0;
-    virtual void        SetTargetRotation(FLOAT fRotation) = 0;
+    virtual float       GetCurrentRotation() = 0;
+    virtual float       GetTargetRotation() = 0;
+    virtual void        SetCurrentRotation(float fRotation) = 0;
+    virtual void        SetTargetRotation(float fRotation) = 0;
     virtual eWeaponSlot GetCurrentWeaponSlot() = 0;
     virtual void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot) = 0;
 

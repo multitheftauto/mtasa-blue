@@ -31,7 +31,7 @@ public:
 
     WORD ReferenceIndex;
 
-    FLOAT       fBlipMarkerScale;
+    float       fBlipMarkerScale;
     WORD        nBlipScale;
     CEntryExit* pEntryExit;
 
@@ -57,17 +57,17 @@ public:
 
     void Init();
 
-    VOID                SetSprite(eMarkerSprite Sprite);
-    VOID                SetDisplay(eMarkerDisplay wDisplay);
-    VOID                SetScale(WORD wScale);
-    VOID                SetColor(eMarkerColor color);
-    VOID                SetColor(const SColor color);
-    VOID                Remove();
+    void                SetSprite(eMarkerSprite Sprite);
+    void                SetDisplay(eMarkerDisplay wDisplay);
+    void                SetScale(WORD wScale);
+    void                SetColor(eMarkerColor color);
+    void                SetColor(const SColor color);
+    void                Remove();
     BOOL                IsActive();
-    VOID                SetPosition(CVector* vecPosition);
-    VOID                SetEntity(CVehicle* vehicle);
-    VOID                SetEntity(CPed* ped);
-    VOID                SetEntity(CObject* object);
+    void                SetPosition(CVector* vecPosition);
+    void                SetEntity(CVehicle* vehicle);
+    void                SetEntity(CPed* ped);
+    void                SetEntity(CObject* object);
     CEntity*            GetEntity();
     CVector*            GetPosition();
     CMarkerSAInterface* GetInterface() { return internalInterface; };

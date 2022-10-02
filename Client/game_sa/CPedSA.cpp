@@ -28,7 +28,7 @@ CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPe
     MemSetFast(this->m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
 
-VOID CPedSA::SetInterface(CEntitySAInterface* intInterface)
+void CPedSA::SetInterface(CEntitySAInterface* intInterface)
 {
     m_pInterface = intInterface;
 }
@@ -149,16 +149,16 @@ bool CPedSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector
     return true;
 }
 
-void CPedSA::AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType,
+void CPedSA::AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, float fRotationLimit, eWeaponType weaponType,
                                bool bChangeCamera)
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
     DEBUG_TRACE("void CPedSA::AttachPedToEntity(CVehicle * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, eWeaponType weaponType)");
     DWORD dwFunc = FUNC_AttachPedToEntity;
     DWORD dwThis = (DWORD)this->GetInterface();
-    FLOAT fX = vector->fX;
-    FLOAT fY = vector->fY;
-    FLOAT fZ = vector->fZ;
+    float fX = vector->fX;
+    float fY = vector->fY;
+    float fZ = vector->fZ;
     BYTE  bPedType = ((CPedSAInterface*)GetInterface())->bPedType;
 
     // Hack the CPed type(?) to non-player so the camera doesn't get changed
@@ -209,10 +209,10 @@ void CPedSA::Respawn(CVector* position, bool bCameraCut)
     }
 
     DEBUG_TRACE("void CPedSA::Respawn(CVector * position)");
-    FLOAT fX = position->fX;
-    FLOAT fY = position->fY;
-    FLOAT fZ = position->fZ;
-    FLOAT fUnk = 1.0f;
+    float fX = position->fX;
+    float fY = position->fY;
+    float fZ = position->fZ;
+    float fUnk = 1.0f;
     DWORD dwFunc = FUNC_RestorePlayerStuffDuringResurrection;
     DWORD dwThis = (DWORD)this->GetInterface();
     _asm
@@ -253,7 +253,7 @@ void CPedSA::Respawn(CVector* position, bool bCameraCut)
     // OutputDebugString ( "Respawn!!!!" );
 }
 
-FLOAT CPedSA::GetHealth()
+float CPedSA::GetHealth()
 {
     return GetPedInterface()->fHealth;
 }
@@ -425,17 +425,17 @@ void CPedSA::RestoreLastGoodPhysicsState()
     SetTargetRotation(0);
 }
 
-FLOAT CPedSA::GetCurrentRotation()
+float CPedSA::GetCurrentRotation()
 {
     return GetPedInterface()->fCurrentRotation;
 }
 
-FLOAT CPedSA::GetTargetRotation()
+float CPedSA::GetTargetRotation()
 {
     return GetPedInterface()->fTargetRotation;
 }
 
-void CPedSA::SetCurrentRotation(FLOAT fRotation)
+void CPedSA::SetCurrentRotation(float fRotation)
 {
     GetPedInterface()->fCurrentRotation = fRotation;
 
@@ -444,7 +444,7 @@ void CPedSA::SetCurrentRotation(FLOAT fRotation)
     //  OutputDebugString(szDebug);
 }
 
-void CPedSA::SetTargetRotation(FLOAT fRotation)
+void CPedSA::SetTargetRotation(float fRotation)
 {
     GetPedInterface()->fTargetRotation = fRotation;
 }

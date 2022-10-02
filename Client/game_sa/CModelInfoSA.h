@@ -342,8 +342,8 @@ public:
     char* GetNameIfVehicle();
 
     BYTE           GetVehicleType();
-    VOID           Request(EModelRequestType requestType, const char* szTag);
-    VOID           Remove();
+    void           Request(EModelRequestType requestType, const char* szTag);
+    void           Remove();
     BOOL           IsLoaded();
     BOOL           DoIsLoaded();
     BYTE           GetFlags();
