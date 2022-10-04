@@ -1087,8 +1087,12 @@ void CKeyBinds::CallGTAControlBind(CGTAControlBind* pBind, bool bState)
     // If its keydown, or there isnt another bind for this control down
     if (bState || !GetMultiGTAControlState(pBind))
     {
+        // HACK: Are we're trying to ZOOM IN or ZOOM OUT using the mouse wheel?
+        bool bZoomWheel = m_bMouseWheel && (pBind->control->action == ZOOM_IN || pBind->control->action == ZOOM_OUT);
+
         // If this control is enabled
-        if (pBind->control->bEnabled)
+        // HACK: Prevent the game from using the mouse wheel to zoom *again* (it still does this itself)
+        if (pBind->control->bEnabled && !bZoomWheel)
         {
             pBind->control->bState = bState;
         }
