@@ -331,9 +331,6 @@ public:
     void SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
                        eVehicleAimDirection cInVehicleAimAnim, CVector* pSource, bool bInterpolateAim);
 
-    unsigned long GetMemoryValue(unsigned long ulOffset) { return (m_pPlayerPed) ? *m_pPlayerPed->GetMemoryValue(ulOffset) : 0; };
-    unsigned long GetGameBaseAddress() { return (m_pPlayerPed) ? (unsigned long)m_pPlayerPed->GetMemoryValue(0) : 0; };
-
     void Duck(bool bDuck);
     bool IsDucked();
 

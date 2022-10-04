@@ -37,7 +37,7 @@ void CRopesSA::RemoveEntityRope(CEntitySAInterface* pEntity)
 {
     CRopesSAInterface* pRope = nullptr;
 
-    for (uint i = 0; i <= ROPES_COUNT; i++)
+    for (uint i = 0; i < ROPES_COUNT; i++)
     {
         if (ms_aRopes[i].m_pRopeEntity == pEntity)
         {

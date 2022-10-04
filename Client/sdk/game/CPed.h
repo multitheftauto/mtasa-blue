@@ -181,17 +181,15 @@ public:
 
     virtual class CPedSAInterface* GetPedInterface() = 0;
 
-    virtual void AttachPedToBike(CEntity* entity, CVector* vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType) = 0;
     virtual void DetachPedFromEntity() = 0;
 
-    virtual bool      CanSeeEntity(CEntity* entity, FLOAT fDistance) = 0;
     virtual CVehicle* GetVehicle() = 0;
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
     virtual void SetModelIndex(unsigned long ulModel) = 0;
     virtual void RemoveGeometryRef() = 0;
 
-    virtual FLOAT    GetHealth() = 0;
+    virtual float    GetHealth() = 0;
     virtual void     SetHealth(float fHealth) = 0;
     virtual float    GetArmor() = 0;
     virtual void     SetArmor(float fArmor) = 0;
@@ -209,12 +207,11 @@ public:
     virtual DWORD             GetType() = 0;
     virtual CPedIntelligence* GetPedIntelligence() = 0;
     virtual CPedSound*        GetPedSound() = 0;
-    virtual DWORD*            GetMemoryValue(DWORD dwOffset) = 0;
 
-    virtual FLOAT       GetCurrentRotation() = 0;
-    virtual FLOAT       GetTargetRotation() = 0;
-    virtual void        SetCurrentRotation(FLOAT fRotation) = 0;
-    virtual void        SetTargetRotation(FLOAT fRotation) = 0;
+    virtual float       GetCurrentRotation() = 0;
+    virtual float       GetTargetRotation() = 0;
+    virtual void        SetCurrentRotation(float fRotation) = 0;
+    virtual void        SetTargetRotation(float fRotation) = 0;
     virtual eWeaponSlot GetCurrentWeaponSlot() = 0;
     virtual void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot) = 0;
 

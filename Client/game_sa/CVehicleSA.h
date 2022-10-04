@@ -499,7 +499,7 @@ public:
     virtual void OnChangingPosition(const CVector& vecNewPosition);
 
     // Override of CPhysicalSA::SetMoveSpeed to take trains into account
-    VOID SetMoveSpeed(CVector* vecMoveSpeed);
+    void SetMoveSpeed(CVector* vecMoveSpeed);
 
     bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
 

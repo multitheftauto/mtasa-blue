@@ -17,7 +17,7 @@ BYTE CDamageManagerSA::GetEngineStatus()
     return internalInterface->bEngineStatus;
 }
 
-VOID CDamageManagerSA::SetEngineStatus(BYTE bEngineState)
+void CDamageManagerSA::SetEngineStatus(BYTE bEngineState)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::SetEngineStatus ( BYTE bEngineState )");
     if (bEngineState > 250)
@@ -33,7 +33,7 @@ BYTE CDamageManagerSA::GetDoorStatus(eDoors bDoor)
     return NULL;
 }
 
-VOID CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent)
+void CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::SetDoorStatus ( eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent )");
 
@@ -91,7 +91,7 @@ BYTE CDamageManagerSA::GetWheelStatus(eWheelPosition bWheel)
     return NULL;
 }
 
-VOID CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus)
+void CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::SetWheelStatus ( eWheelPosition bWheel, BYTE bTireStatus )");
     if (bWheel < MAX_WHEELS)
@@ -104,7 +104,7 @@ VOID CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus)
     }
 }
 
-VOID CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
+void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
 {
     DEBUG_TRACE("BYTE CDamageManagerSA::SetPanelStatus ( BYTE bLight, BYTE bPanelStatus )");
 
@@ -202,7 +202,7 @@ unsigned long CDamageManagerSA::GetPanelStatus()
     return internalInterface->Panels;
 }
 
-VOID CDamageManagerSA::SetLightStatus(BYTE bLight, BYTE bLightStatus)
+void CDamageManagerSA::SetLightStatus(BYTE bLight, BYTE bLightStatus)
 {
     DEBUG_TRACE("BYTE CDamageManagerSA::SetLightStatus ( BYTE bLight, BYTE bLightStatus )");
     DWORD dwFunction = FUNC_SetLightStatus;
@@ -245,7 +245,7 @@ unsigned char CDamageManagerSA::GetLightStatus()
     return static_cast<unsigned char>(internalInterface->Lights);
 }
 
-VOID CDamageManagerSA::SetAeroplaneCompStatus(BYTE CompID, BYTE Status)
+void CDamageManagerSA::SetAeroplaneCompStatus(BYTE CompID, BYTE Status)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::SetAeroplaneCompStatus( BYTE CompID, BYTE Status)");
     DWORD dwFunction = FUNC_SetAeroplaneCompStatus;
@@ -277,7 +277,7 @@ BYTE CDamageManagerSA::GetAeroplaneCompStatus(BYTE CompID)
     return bReturn;
 }
 
-VOID CDamageManagerSA::FuckCarCompletely(BOOL bKeepWheels)
+void CDamageManagerSA::FuckCarCompletely(BOOL bKeepWheels)
 {
     DEBUG_TRACE("VOID CDamageManagerSA::FuckCarCompletely ( BOOL bKeepWheels )");
     DWORD dwFunc = FUNC_FuckCarCompletely;

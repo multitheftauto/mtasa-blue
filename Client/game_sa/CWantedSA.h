@@ -48,7 +48,7 @@ public:
     DWORD m_LastTimeWantedDecreased;
     DWORD m_LastTimeWantedLevelChanged;
     DWORD m_TimeOfParole;
-    FLOAT m_fMultiplier;            // New crimes have their wanted level contribution multiplied by this
+    float m_fMultiplier;            // New crimes have their wanted level contribution multiplied by this
     BYTE  m_nCopsInPursuit;
     BYTE  m_nMaxCopsInPursuit;
     BYTE  m_nMaxCopCarsInPursuit;

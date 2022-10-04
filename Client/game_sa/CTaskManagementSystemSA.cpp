@@ -13,7 +13,7 @@
 
 using namespace std;
 
-VOID HOOK_CTask_Operator_Delete();
+void HOOK_CTask_Operator_Delete();
 
 CTaskSAInterface* pTempTaskInterface = 0;
 
@@ -247,7 +247,7 @@ __declspec(noinline) void OnMY_Task_Operator_Delete(CTaskSAInterface* pTaskInter
     pGame->GetTaskManagementSystem()->RemoveTask(pTempTaskInterface);
 }
 
-VOID _declspec(naked) HOOK_CTask_Operator_Delete()
+void _declspec(naked) HOOK_CTask_Operator_Delete()
 {
     _asm
         {

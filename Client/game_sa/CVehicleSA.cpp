@@ -362,7 +362,7 @@ CVehicleSA::~CVehicleSA()
     }
 }
 
-VOID CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
+void CVehicleSA::SetMoveSpeed(CVector* vecMoveSpeed)
 {
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -1071,13 +1071,13 @@ void CVehicleSA::SetSirenOrAlarmActive(bool bActive)
     ((CVehicleSAInterface*)this->GetInterface())->m_nVehicleFlags.bSirenOrAlarm = bActive;
 }
 
-FLOAT CVehicleSA::GetHealth()
+float CVehicleSA::GetHealth()
 {
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
     return vehicle->m_nHealth;
 }
 
-void CVehicleSA::SetHealth(FLOAT fHealth)
+void CVehicleSA::SetHealth(float fHealth)
 {
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
     vehicle->m_nHealth = fHealth;
@@ -1891,7 +1891,7 @@ bool CVehicleSA::GetVehiclesSunGlareEnabled()
 
 namespace
 {
-    VOID _MatrixConvertFromEulerAngles(CMatrix_Padded* matrixPadded, float fX, float fY, float fZ)
+    void _MatrixConvertFromEulerAngles(CMatrix_Padded* matrixPadded, float fX, float fY, float fZ)
     {
         int iUnknown = 0;
         if (matrixPadded)
@@ -1908,7 +1908,7 @@ namespace
             }
         }
     }
-    VOID _MatrixConvertToEulerAngles(CMatrix_Padded* matrixPadded, float& fX, float& fY, float& fZ)
+    void _MatrixConvertToEulerAngles(CMatrix_Padded* matrixPadded, float& fX, float& fY, float& fZ)
     {
         int iUnknown = 0;
         if (matrixPadded)
@@ -2179,13 +2179,13 @@ bool CVehicleSA::GetComponentVisible(const SString& vehicleComponent, bool& bOut
 void CVehicleSA::SetNitroLevel(float fLevel)
 {
     DWORD dwThis = (DWORD)GetInterface();
-    MemPutFast<FLOAT>(dwThis + 0x8A4, fLevel);
+    MemPutFast<float>(dwThis + 0x8A4, fLevel);
 }
 
 float CVehicleSA::GetNitroLevel()
 {
     DWORD dwThis = (DWORD)GetInterface();
-    float fLevel = *(FLOAT*)(dwThis + 0x8A4);
+    float fLevel = *(float*)(dwThis + 0x8A4);
     return fLevel;
 }
 

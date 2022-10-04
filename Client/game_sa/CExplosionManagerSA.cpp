@@ -75,7 +75,7 @@ returnhere:
 /**
  * \todo Need to simulate this manually (loop and IsNear...)
  */
-VOID CExplosionManagerSA::RemoveAllExplosionsInArea(CVector* vecPosition, FLOAT fRadius)
+void CExplosionManagerSA::RemoveAllExplosionsInArea(CVector* vecPosition, float fRadius)
 {
     DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosionsInArea ( CVector * vecPosition, FLOAT fRadius )");
 
@@ -96,7 +96,7 @@ VOID CExplosionManagerSA::RemoveAllExplosionsInArea(CVector* vecPosition, FLOAT 
         }*/
 }
 
-VOID CExplosionManagerSA::RemoveAllExplosions()
+void CExplosionManagerSA::RemoveAllExplosions()
 {
     DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosions (  )");
     for (int i = 0; i < MAX_EXPLOSIONS; i++)

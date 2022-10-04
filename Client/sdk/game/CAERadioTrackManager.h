@@ -20,7 +20,7 @@ public:
     virtual BYTE  IsVehicleRadioActive() = 0;
     virtual char* GetRadioStationName(BYTE bStationID) = 0;
     virtual BOOL  IsRadioOn() = 0;
-    virtual VOID  SetBassSetting(DWORD dwBass) = 0;
-    virtual VOID  Reset() = 0;
-    virtual VOID  StartRadio(BYTE bStationID, BYTE bUnknown) = 0;
+    virtual void  SetBassSetting(DWORD dwBass) = 0;
+    virtual void  Reset() = 0;
+    virtual void  StartRadio(BYTE bStationID, BYTE bUnknown) = 0;
 };

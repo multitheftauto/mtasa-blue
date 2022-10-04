@@ -132,7 +132,7 @@ public:
     virtual char* GetNameIfVehicle() = 0;
 
     virtual BYTE           GetVehicleType() = 0;
-    virtual VOID           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
+    virtual void           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual BOOL           IsLoaded() = 0;
     virtual BYTE           GetFlags() = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
