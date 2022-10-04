@@ -28,7 +28,7 @@ C3DMarkersSA::~C3DMarkersSA()
     }
 }
 
-C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, FLOAT fSize, FLOAT fPulseFraction, BYTE r, BYTE g, BYTE b,
+C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b,
                                       BYTE a)
 {
     DEBUG_TRACE("C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector * vecPosition, FLOAT fSize, FLOAT fPulseFraction)");

@@ -19,9 +19,9 @@ CEvent* CEventListSA::FindClosestEvent(eEventType eventtype, CVector* vecPositio
     CVector* vecPos = (CVector*)vecPosition;
 
     DWORD dwFunction = FUNC_FindClosestEvent;
-    FLOAT fX = vecPos->fX;
-    FLOAT fY = vecPos->fY;
-    FLOAT fZ = vecPos->fZ;
+    float fX = vecPos->fX;
+    float fY = vecPos->fY;
+    float fZ = vecPos->fZ;
     DWORD dwReturn;
     _asm
     {

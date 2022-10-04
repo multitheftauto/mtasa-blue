@@ -29,7 +29,7 @@ public:
     C3DMarkersSA();
     ~C3DMarkersSA();
 
-    C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, FLOAT fSize, FLOAT fPulseFraction, BYTE r, BYTE g, BYTE b, BYTE a);
+    C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b, BYTE a);
     C3DMarker* FindFreeMarker();
     C3DMarker* FindMarker(DWORD Identifier);
 };

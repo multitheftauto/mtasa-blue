@@ -260,14 +260,14 @@ void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
 
 float CSettingsSA::GetMouseSensitivity()
 {
-    float fRawValue = *(FLOAT*)VAR_fMouseSensitivity;
+    float fRawValue = *(float*)VAR_fMouseSensitivity;
     return UnlerpClamped(MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX);            // Remap to 0-1
 }
 
 void CSettingsSA::SetMouseSensitivity(float fSensitivity)
 {
     float fRawValue = Lerp(MOUSE_SENSITIVITY_MIN, fSensitivity, MOUSE_SENSITIVITY_MAX);
-    MemPutFast<FLOAT>(VAR_fMouseSensitivity, fRawValue);
+    MemPutFast<float>(VAR_fMouseSensitivity, fRawValue);
 }
 
 unsigned int CSettingsSA::GetAntiAliasing()

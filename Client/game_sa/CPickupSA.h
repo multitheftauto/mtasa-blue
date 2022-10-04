@@ -51,26 +51,26 @@ public:
     CPickupSAInterface* GetInterface() { return internalInterface; };            // not to be exported
     CObject*            GetObject() { return object; };
 
-    VOID     SetPosition(CVector* vecPosition);
+    void     SetPosition(CVector* vecPosition);
     CVector* GetPosition(CVector* vecPosition);
 
     ePickupType  GetType();
-    VOID         SetType(ePickupType type);
-    FLOAT        GetCurrentValue();
-    VOID         SetCurrentValue(FLOAT fCurrentValue);
-    VOID         SetRegenerationTime(DWORD dwTime);
-    VOID         SetMoneyPerDay(WORD wMoneyPerDay);
+    void         SetType(ePickupType type);
+    float        GetCurrentValue();
+    void         SetCurrentValue(float fCurrentValue);
+    void         SetRegenerationTime(DWORD dwTime);
+    void         SetMoneyPerDay(WORD wMoneyPerDay);
     WORD         GetMoneyPerDay();
     WORD         GetModel();
-    VOID         SetModel(WORD wModelIndex);            // do not export
+    void         SetModel(WORD wModelIndex);            // do not export
     ePickupState GetState();
-    VOID         SetState(ePickupState bState);
+    void         SetState(ePickupState bState);
     BYTE         GetAmmo();
-    VOID         SetAmmo(BYTE bAmmo);
+    void         SetAmmo(BYTE bAmmo);
     long         GetMonetaryValue();
-    VOID         SetMonetaryValue(long lMonetaryValue);
+    void         SetMonetaryValue(long lMonetaryValue);
     BYTE         IsNearby();
-    VOID         GiveUsAPickUpObject(int ForcedObjectIndex = -1);
-    VOID         GetRidOfObjects();
-    VOID         Remove();
+    void         GiveUsAPickUpObject(int ForcedObjectIndex = -1);
+    void         GetRidOfObjects();
+    void         Remove();
 };

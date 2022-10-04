@@ -80,7 +80,7 @@ BOOL CExplosionSA::IsActive()
     return internalInterface->m_cExplosionActive;
 }
 
-VOID CExplosionSA::Remove()
+void CExplosionSA::Remove()
 {
     DEBUG_TRACE("VOID CExplosionSA::Remove (  )");
     internalInterface->m_cExplosionActive = 0;

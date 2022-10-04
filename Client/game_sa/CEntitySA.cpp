@@ -97,7 +97,7 @@ bool CEntitySA::SetScaleInternal(const CVector& scale)
 {
     this->internalInterface->ModelClump->SetAlpha(iAlpha);
 }*/
-VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
+void CEntitySA::SetPosition(float fX, float fY, float fZ)
 {
     // Remove & add to world?
     DEBUG_TRACE("VOID CEntitySA::SetPosition(float fX, float fY, float fZ)");
@@ -138,7 +138,7 @@ VOID CEntitySA::SetPosition(float fX, float fY, float fZ)
     }
 }
 
-VOID CEntitySA::Teleport(float fX, float fY, float fZ)
+void CEntitySA::Teleport(float fX, float fY, float fZ)
 {
     DEBUG_TRACE("VOID CEntitySA::Teleport ( float fX, float fY, float fZ )");
     if (m_pInterface->Placeable.matrix)
@@ -163,7 +163,7 @@ VOID CEntitySA::Teleport(float fX, float fY, float fZ)
     }
 }
 
-VOID CEntitySA::ProcessControl()
+void CEntitySA::ProcessControl()
 {
     DEBUG_TRACE("VOID CEntitySA::ProcessControl ( void )");
     DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
@@ -178,7 +178,7 @@ VOID CEntitySA::ProcessControl()
     }
 }
 
-VOID CEntitySA::SetupLighting()
+void CEntitySA::SetupLighting()
 {
     DEBUG_TRACE("VOID CEntitySA::SetupLighting ( )");
     DWORD dwFunc = m_pInterface->vtbl->SetupLighting;
@@ -193,7 +193,7 @@ VOID CEntitySA::SetupLighting()
     }
 }
 
-VOID CEntitySA::Render()
+void CEntitySA::Render()
 {
     DEBUG_TRACE("VOID CEntitySA::Render ( )");
     DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
@@ -215,7 +215,7 @@ VOID CEntitySA::Render()
         }*/
 }
 
-VOID CEntitySA::SetOrientation(float fX, float fY, float fZ)
+void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 {
     DEBUG_TRACE("VOID CEntitySA::SetOrientation ( float fX, float fY, float fZ )");
     pGame->GetWorld()->Remove(this, CEntity_SetOrientation);
@@ -255,7 +255,7 @@ VOID CEntitySA::SetOrientation(float fX, float fY, float fZ)
     pGame->GetWorld()->Add(this, CEntity_SetOrientation);
 }
 
-VOID CEntitySA::FixBoatOrientation()
+void CEntitySA::FixBoatOrientation()
 {
     DEBUG_TRACE("VOID CEntitySA::FixBoatOrientation ( void )");
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
@@ -277,7 +277,7 @@ VOID CEntitySA::FixBoatOrientation()
     pGame->GetWorld()->Add(this, CEntity_FixBoatOrientation);
 }
 
-VOID CEntitySA::SetPosition(CVector* vecPosition)
+void CEntitySA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID CEntitySA::SetPosition( CVector * vecPosition )");
     /*  FLOAT fX = vecPosition->fX;
@@ -370,7 +370,7 @@ CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
     }
 }
 
-VOID CEntitySA::SetMatrix(CMatrix* matrix)
+void CEntitySA::SetMatrix(CMatrix* matrix)
 {
     DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
 
@@ -439,12 +439,12 @@ eEntityType CEntitySA::GetEntityType()
     return (eEntityType)m_pInterface->nType;
 }
 
-FLOAT CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
+float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     DEBUG_TRACE("FLOAT CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()");
     DWORD dwFunc = FUNC_GetDistanceFromCentreOfMassToBaseOfModel;
     DWORD dwThis = (DWORD)m_pInterface;
-    FLOAT fReturn;
+    float fReturn;
     _asm
     {
         mov     ecx, dwThis
@@ -454,7 +454,7 @@ FLOAT CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
     return fReturn;
 }
 
-VOID CEntitySA::SetEntityStatus(eEntityStatus bStatus)
+void CEntitySA::SetEntityStatus(eEntityStatus bStatus)
 {
     DEBUG_TRACE("VOID CEntitySA::SetEntityStatus( eEntityStatus bStatus )");
     m_pInterface->nStatus = bStatus;
@@ -500,7 +500,7 @@ RwMatrix* CEntitySA::GetLTMFromId(int id)
     return (RwMatrix*)dwReturn;
 }
 
-VOID CEntitySA::SetAlpha(DWORD dwAlpha)
+void CEntitySA::SetAlpha(DWORD dwAlpha)
 {
     DEBUG_TRACE("VOID CEntitySA::SetAlpha(DWORD dwAlpha)");
     DWORD dwFunc = FUNC_SetRwObjectAlpha;
@@ -557,7 +557,7 @@ void CEntitySA::SetVisible(bool bVisible)
     m_pInterface->bIsVisible = bVisible;
 }
 
-VOID CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown)
+void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown)
 {
     CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
     if (matrixPadded)
@@ -575,7 +575,7 @@ VOID CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
     }
 }
 
-VOID CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int iUnknown)
+void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int iUnknown)
 {
     CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
     if (matrixPadded)
