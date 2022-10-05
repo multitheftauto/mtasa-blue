@@ -72,30 +72,6 @@ returnhere:
     return NULL;
 }
 
-/**
- * \todo Need to simulate this manually (loop and IsNear...)
- */
-void CExplosionManagerSA::RemoveAllExplosionsInArea(CVector* vecPosition, float fRadius)
-{
-    DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosionsInArea ( CVector * vecPosition, FLOAT fRadius )");
-
-    /*  DWORD dwFunction = FUNC_RemoveAllExplosionsInArea;
-        CVector * vecPos = (CVector *)vecPosition;
-        FLOAT fX = vecPos->fX;
-        FLOAT fY = vecPos->fY;
-        FLOAT fZ = vecPos->fZ;
-
-        _asm
-        {
-            push    fRadius
-            push    fZ
-            push    fY
-            push    fX
-            call    dwFunction
-            add     esp, 0x10
-        }*/
-}
-
 void CExplosionManagerSA::RemoveAllExplosions()
 {
     DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosions (  )");
