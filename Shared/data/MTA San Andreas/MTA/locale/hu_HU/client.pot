@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-05 18:45+0000\n"
-"PO-Revision-Date: 2022-10-05 18:52\n"
+"PO-Revision-Date: 2022-10-05 20:51\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -1821,7 +1821,7 @@ msgstr "Korona eső tükröződések"
 
 #: Client/core/CSettings.cpp:859
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dinamikus ped árnyékok"
 
 #: Client/core/CSettings.cpp:888
 msgid "Enable remote websites"
