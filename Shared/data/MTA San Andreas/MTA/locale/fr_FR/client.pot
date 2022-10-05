@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-05 18:45+0000\n"
-"PO-Revision-Date: 2022-10-05 18:52\n"
+"PO-Revision-Date: 2022-10-05 20:51\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -314,7 +314,7 @@ msgstr "MTA: San Andreas - Avertissement"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Votre répertoire d'installation de Grand Theft Auto: San Andreas contient les fichiers suivants :"
+msgstr "Votre répertoire d'installation de GTA: San Andreas contient les fichiers suivants:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
@@ -324,7 +324,7 @@ msgstr "Ces fichiers ne sont pas requis et pourraient interférer avec les fonct
 
 #: Client/loader/Dialogs.cpp:68
 msgid "Keep these files, but also show this warning on next start"
-msgstr "Garder ces fichiers, mais me montrer cet avertissement lors du prochain démarrage"
+msgstr "Garder ces fichiers, mais afficher cet avertissement au prochain lancement"
 
 #: Client/loader/Dialogs.cpp:69
 msgid "Do not remind me about these files again"
@@ -332,7 +332,7 @@ msgstr "Ne plus m'avertir à propos de ces fichiers"
 
 #: Client/loader/Dialogs.cpp:70
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Remomer ces fichiers de *.dll en *.dll.bak"
+msgstr "Renommer ces fichiers en *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
@@ -1814,11 +1814,11 @@ msgstr "Afficher toutes les résolutions"
 
 #: Client/core/CSettings.cpp:855
 msgid "Corona rain reflections"
-msgstr "Reflets de pluie des Corona"
+msgstr "Réflexions auréolées de la pluie"
 
 #: Client/core/CSettings.cpp:859
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Ombres dynamiques des piétons"
 
 #: Client/core/CSettings.cpp:888
 msgid "Enable remote websites"
