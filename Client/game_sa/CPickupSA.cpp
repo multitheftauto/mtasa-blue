@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPickupSA.h"
 
 CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 {

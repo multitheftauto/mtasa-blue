@@ -11,9 +11,7 @@
 
 #pragma once
 
-#include "Common.h"
 #include <game/CAudioEngine.h>
-#include "CVehicleSA.h"
 
 #define FUNC_ReportFrontendAudioEvent           0x506EA0
 #define FUNC_PreloadBeatTrack                   0x507F40

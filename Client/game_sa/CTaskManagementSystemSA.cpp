@@ -10,6 +10,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTaskManagementSystemSA.h"
+#include "TaskSA.h"
+#include "TaskBasicSA.h"
+#include "TaskCarAccessoriesSA.h"
+#include "TaskGoToSA.h"
+#include "TaskCarSA.h"
+#include "TaskJumpFallSA.h"
+#include "TaskSecondarySA.h"
+#include "TaskPhysicalResponseSA.h"
+#include "TaskIKSA.h"
+#include "TaskAttackSA.h"
 
 using namespace std;
 
@@ -36,10 +47,11 @@ CTaskManagementSystemSA::~CTaskManagementSystemSA()
     m_TaskList.clear();
 }
 
-CTask* CTaskManagementSystemSA::AddTask(CTaskSA* pTask)
+CTaskSA* CTaskManagementSystemSA::AddTask(CTaskSA* pTask)
 {
     if (!pTask)
         return NULL;
+
     assert(pTask->IsValid());
     STaskListItem* pItem = new STaskListItem;
     pItem->pTaskSA = pTask;
@@ -85,7 +97,7 @@ void CTaskManagementSystemSA::RemoveTask(CTaskSAInterface* pTaskInterface)
     }
 }
 
-CTask* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
+CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
 {
     // Return NULL if we got passed NULL
     if (pTaskInterface == 0)
@@ -132,7 +144,7 @@ CTask* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     return pTask;
 }
 
-CTask* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType)
+CTaskSA* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType)
 {
     CTaskSA* pTaskSA = NULL;
 

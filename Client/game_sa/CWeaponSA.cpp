@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CWeaponSA.h"
 
 CWeaponSA::CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot)
 {
@@ -92,6 +93,11 @@ void CWeaponSA::SetAsCurrentWeapon()
 {
     DEBUG_TRACE("VOID CWeaponSA::SetAsCurrentWeapon()");
     owner->SetCurrentWeaponSlot(m_weaponSlot);
+}
+
+CWeaponInfo* CWeaponSA::GetInfo(eWeaponSkill skill)
+{
+    return pGame->GetWeaponInfo(internalInterface->m_eWeaponType, skill);
 }
 
 void CWeaponSA::Remove()

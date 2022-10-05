@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "CGameSA.h"
 #include <game/CWeapon.h>
 #include <game/CPed.h>
 
@@ -24,15 +23,9 @@
 #define FUNC_CWeapon_DoBulletImpact                     0x73b550
 #define FUNC_CWeapon_GenerateDamageEvent                0x73a530
 #define FUNC_CWeapon_FireInstantHit                     0x73FB10
-
 #define FUNC_CWeaponInfo_GetWeaponReloadTime            0x743D70
-
 #define FUNC_CBirds_CheckForHit                         0x712E40
 #define FUNC_CShadows_CheckForHit                       0x707550
-
-extern CGameSA* pGame;
-class CWeaponSAInterface;
-class CWeaponStatSA;
 
 class CWeaponSAInterface
 {
@@ -68,7 +61,7 @@ public:
     eWeaponSlot GetSlot();
 
     void          SetAsCurrentWeapon();
-    CWeaponInfo* GetInfo(eWeaponSkill skill) { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType, skill); };
+    CWeaponInfo* GetInfo(eWeaponSkill skill);
     void         Destroy();
     void         Remove();
     void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed);

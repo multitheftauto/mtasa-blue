@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CClock.h>
-#include "Common.h"
 
 #define VAR_TimeMinutes                 0xB70152
 #define VAR_TimeHours                   0xB70153

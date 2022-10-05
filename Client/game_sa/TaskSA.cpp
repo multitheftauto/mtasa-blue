@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "TaskSA.h"
+#include "CTasksSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "CTaskManagerSA.h"
 
 DWORD dwTasksAlive = 0;
 DWORD dwTasksCreatedTotal = 0;

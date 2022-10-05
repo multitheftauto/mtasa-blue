@@ -14,7 +14,6 @@
 // R* have this info inside CMenuManager but I can't believe that makes much sense
 
 #include <game/CSettings.h>
-#include "Common.h"
 
 #define CLASS_CMenuManager      0xBA6748
 

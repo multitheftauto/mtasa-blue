@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTaskManagerSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "TaskSA.h"
 
 CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CPed* ped)
 {

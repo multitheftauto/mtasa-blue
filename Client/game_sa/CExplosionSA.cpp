@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CExplosionSA.h"
 
 eExplosionType CExplosionSA::GetExplosionType()
 {
@@ -34,11 +35,8 @@ void CExplosionSA::SetExplosionPosition(const CVector* vecPosition)
 CEntity* CExplosionSA::GetExplosionCreator()
 {
     DEBUG_TRACE("CEntity * CExplosionSA::GetExplosionCreator (  )");
-    // we create a temporary entity to take care of finding the type of entity it is
-    CEntitySA* entity = new CEntitySA;
-    entity->m_pInterface = this->GetInterface()->m_pEntExplosionOwner;
-    eEntityType entityType = entity->GetEntityType();
-    delete entity;
+
+    eEntityType entityType = (eEntityType)GetInterface()->m_pEntExplosionOwner->nType;
 
     CPools* pools = pGame->GetPools();
     switch (entityType)

@@ -12,7 +12,8 @@
 #pragma once
 
 #include <game/CExplosion.h>
-#include "CEntitySA.h"
+
+class CEntitySAInterface;
 
 class CExplosionSAInterface            // 124 bytes, ok
 {

@@ -14,6 +14,7 @@
 #include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
+#include "../game_sa/TaskBasicSA.h"
 
 extern CCoreInterface* g_pCore;
 

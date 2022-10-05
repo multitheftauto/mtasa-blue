@@ -14,13 +14,10 @@
 #include <game/CEventList.h>
 #include "CEventSA.h"
 
-#define FUNC_ClearEvent                     0x489F50
 #define FUNC_FindClosestEvent               0x489E70
-#define FUNC_GetEvent                       0x489F70
 
 #define ARRAY_CEvent                        0x7DAAB8
-
-#define MAX_EVENTS                  64
+#define MAX_EVENTS                  		64
 
 class CEventListSA : public CEventList
 {

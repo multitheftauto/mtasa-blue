@@ -80,29 +80,6 @@ CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIR
     }
 
     return fire;
-
-    //  CFire*  StartFire(CVector vecLocation, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, unsigned char bExtinguishEnabled=TRUE, CEntity* pStartedFireEntity =
-    //  NULL, unsigned int ArgBurnTime = FIRE_AVERAGE_BURNTIME, char NumGenerationsAllowed = 100, unsigned char bReportFire = true);
-
-    /*  DWORD dwFunc = FUNC_StartFire_Vec;
-        DWORD dwReturn = 0;
-        DWORD dwThis = CLASS_CFireManager;
-        _asm
-        {
-            mov     ecx, dwThis
-            push    0       // report fire
-            push    100     // generations
-            push    7000    // burn time
-            push    0       // creator entity
-            push    0
-            push    0
-            push    1       // extinguish enabled
-            push    fSize   // size
-            push    vecPosition
-            call    dwFunc
-            mov     dwReturn, eax
-        }
-        return (CFire *)dwReturn;*/
 }
 
 void CFireManagerSA::ExtinguishAllFires()

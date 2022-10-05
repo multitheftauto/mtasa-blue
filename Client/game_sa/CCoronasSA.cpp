@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCoronasSA.h"
+#include "CRegisteredCoronaSA.h"
 
 CCoronasSA::CCoronasSA()
 {

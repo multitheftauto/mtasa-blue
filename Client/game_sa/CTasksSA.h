@@ -12,21 +12,36 @@
 #pragma once
 
 #include <game/CTasks.h>
-#include "Common.h"
 
 class CTaskManagementSystemSA;
-class CVehicle;
-
-// task headers
-#include "TaskBasicSA.h"
-#include "TaskCarAccessoriesSA.h"
-#include "TaskGoToSA.h"
-#include "TaskCarSA.h"
-#include "TaskJumpFallSA.h"
-#include "TaskSecondarySA.h"
-#include "TaskPhysicalResponseSA.h"
-#include "TaskIKSA.h"
-#include "TaskAttackSA.h"
+class CTaskSimplePlayerOnFoot;
+class CTaskComplexFacial;
+class CTaskSimpleCarSetPedInAsDriver;
+class CTaskSimpleCarSetPedInAsPassenger;
+class CTaskSimpleCarSetPedOut;
+class CTaskComplexWanderStandard;
+class CTaskComplexEnterCarAsDriver;
+class CTaskComplexEnterCarAsPassenger;
+class CTaskComplexEnterBoatAsDriver;
+class CTaskComplexUseMobilePhone;
+class CTaskComplexLeaveCar;
+class CTaskSimpleDuck;
+class CTaskSimpleChoking;
+class CTaskSimpleClimb;
+class CTaskSimpleJetPack;
+class CTaskSimpleRunAnim;
+class CTaskSimpleRunNamedAnim;
+class CTaskComplexDie;
+class CTaskSimpleStealthKill;
+class CTaskSimpleDead;
+class CTaskSimpleBeHit;
+class CTaskComplexSunbathe;
+class CTaskSimpleIKChain;
+class CTaskSimpleIKLookAt;
+class CTaskSimpleTriggerLookAt;
+class CTaskSimpleGangDriveBy;
+class CTaskSimpleUseGun;
+class CTaskSimpleFight;
 
 class CTasksSA : public CTasks
 {

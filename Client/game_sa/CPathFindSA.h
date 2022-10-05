@@ -13,27 +13,19 @@
 
 #include <game/CPathFind.h>
 
-#define FUNC_FindNthNodeClosestToCoors          0x44F8C0
-#define FUNC_FindNodePointer                    0x420AC0
 #define FUNC_SwitchRoadsOffInArea               0x452C80
 #define FUNC_SwitchPedRoadsOffInArea            0x452F00
-
-#define FUNC_CPathNode_GetCoors                 0x420A10
 
 #define CLASS_CPathFind                         0x96F050
 
 #define VAR_PedDensityMultiplier                0x8D2530
-#define VAR_m_AllRandomPedsThisType             0x8D2534
-#define VAR_MaxNumberOfPedsInUse                0x8D2538
-#define VAR_NumberOfPedsInUseInterior           0x8D253C
 #define VAR_CarDensityMultiplier                0x8A5B20
-#define VAR_MaxNumberOfCarsInUse                0x8A5B24
 
 class CPathFindSA : public CPathFind
 {
 public:
-    void          SwitchRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
-    void          SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
+    void SwitchRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
+    void SwitchPedRoadsOffInArea(CVector* vecAreaCorner1, CVector* vecAreaCorner2, bool bEnable = false);
 
     // Belong elsewhere - cpopulation and ccarctrl
     void SetPedDensity(float fPedDensity);

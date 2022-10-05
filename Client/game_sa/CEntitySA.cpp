@@ -280,21 +280,6 @@ void CEntitySA::FixBoatOrientation()
 void CEntitySA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID CEntitySA::SetPosition( CVector * vecPosition )");
-    /*  FLOAT fX = vecPosition->fX;
-        FLOAT fY = vecPosition->fY;
-        FLOAT fZ = vecPosition->fZ;
-        DWORD dwFunc = 0x5A17B0;
-        DWORD dwThis = (DWORD) m_pInterface;
-        _asm
-        {
-            mov     ecx, dwThis
-            push 0
-            push fZ
-            push fY
-            push fX
-            call    dwFunc
-        }*/
-
     if (vecPosition)
         SetPosition(vecPosition->fX, vecPosition->fY, vecPosition->fZ);
 }

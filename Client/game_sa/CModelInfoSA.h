@@ -13,8 +13,8 @@
 
 #include <game/CModelInfo.h>
 #include <game/Common.h>
-
 #include "CRenderWareSA.h"
+
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
 
@@ -54,17 +54,12 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     FUNC_IsBmxModel                 0x4c5c20
 #define     FUNC_IsTrailerModel             0x4c5c50
 #define     FUNC_IsVehicleModelType         0x4c5c80
-
 #define     FUNC_RemoveModel                0x4089a0
 #define     FUNC_FlushRequestList           0x40E4E0
-
-#define     FUNC_HasVehicleUpgradeLoaded    0x407820
 #define     FUNC_RequestVehicleUpgrade      0x408C70
 
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
-#define     FUNC_CVehicleStructure_delete   0x4C9580
 
-#define     FUNC_AddPedModel                0x4c67a0
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
 
 class CBaseModelInfoSAInterface;

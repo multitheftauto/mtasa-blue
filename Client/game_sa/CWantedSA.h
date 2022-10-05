@@ -11,11 +11,7 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include "Common.h"
 #include <game/CWanted.h>
-#include <CVector.h>
 
 class CPedSAInterface;
 
@@ -23,9 +19,6 @@ class CPedSAInterface;
 #define FUNC_SetWantedLevel             0x562470
 #define FUNC_SetWantedLevelNoDrop       0x562570
 
-/**
- * \todo Fill with accessor functions and a constructor
- */
 #define MAX_CRIMES_QD       16
 #define MAX_COPS_PURSUIT    10
 

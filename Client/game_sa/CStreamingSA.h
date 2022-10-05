@@ -12,12 +12,10 @@
 #pragma once
 
 #include <game/CStreaming.h>
-#include "Common.h"
 
 #define FUNC_CStreaming__RequestModel                0x4087E0
 #define FUNC_LoadAllRequestedModels                  0x40EA10
 #define FUNC_CStreaming__HasVehicleUpgradeLoaded     0x407820
-#define FUNC_CStreaming_RequestAnimations            0x407120
 #define FUNC_CStreaming_RequestSpecialModel          0x409d10
 
 class CStreamingSA final : public CStreaming

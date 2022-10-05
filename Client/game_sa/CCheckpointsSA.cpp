@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCheckpointsSA.h"
+#include "CCheckpointSA.h"
 
 // constructor
 CCheckpointsSA::CCheckpointsSA()

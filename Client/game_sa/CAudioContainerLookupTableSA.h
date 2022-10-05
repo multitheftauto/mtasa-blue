@@ -11,11 +11,6 @@
 
 #pragma once
 
-#include <fstream>
-
-typedef unsigned char  uint8;
-typedef unsigned short uint16;
-
 struct SAudioLookupEntrySA;
 
 class CAudioContainerLookupTableSA
@@ -26,11 +21,9 @@ public:
 
     int                  CountIndex(eAudioLookupIndex index);
     SAudioLookupEntrySA* GetEntry(eAudioLookupIndex lookupIndex, uint8 bankIndex);
-    // SAudioLookupEntrySA* Next       ( bool goToNext );
 
 private:
     std::vector<SAudioLookupEntrySA*> m_Entries[9];
-    // std::vector<SAudioLookupEntrySA*>::iterator   m_CurrentEntry;
 };
 
 struct SAudioLookupEntrySA
