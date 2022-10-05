@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-27 12:00+0000\n"
-"PO-Revision-Date: 2022-09-27 12:59\n"
+"POT-Creation-Date: 2022-10-05 13:51+0000\n"
+"PO-Revision-Date: 2022-10-05 15:26\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -1146,7 +1146,7 @@ msgid "Are you sure you want to use this screen resolution?"
 msgstr "Apa anda yakin ingin menggunakan resolusi layar ini?"
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1379
 msgid "Problem with graphics driver"
 msgstr "Masalah dengan driver grafik"
 
