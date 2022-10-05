@@ -856,6 +856,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
     m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxDynamicPedShadows = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Dynamic ped shadows"), true));
+    m_pCheckBoxDynamicPedShadows->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
+    m_pCheckBoxDynamicPedShadows->AutoSize(NULL, 20.0f);
+
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -1567,6 +1571,14 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("corona_reflections", bCoronaReflections);
     m_pCheckBoxCoronaReflections->SetSelected(bCoronaReflections);
 
+    // Dynamic ped shadows
+    bool bDynamicPedShadows;
+    CVARS_GET("dynamic_ped_shadows", bDynamicPedShadows);
+    m_pCheckBoxDynamicPedShadows->SetSelected(bDynamicPedShadows);
+
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled(FxQuality >= 2);
+
     PopulateResolutionComboBox();
 
     // Fullscreen style
@@ -1792,6 +1804,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
     CVARS_SET("corona_reflections", false);
+    CVARS_SET("dynamic_ped_shadows", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
@@ -1799,6 +1812,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     gameSettings->SetAntiAliasing(1, true);
     gameSettings->ResetVehiclesLODDistance(false);
     gameSettings->ResetPedsLODDistance(false);
+    gameSettings->SetDynamicPedShadowsEnabled(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -3442,6 +3456,11 @@ void CSettings::SaveData()
     CVARS_SET("corona_reflections", bCoronaReflections);
     gameSettings->ResetCoronaReflectionsEnabled();
 
+    // Dynamic ped shadows
+    bool bDynamicPedShadows = m_pCheckBoxDynamicPedShadows->GetSelected();
+    CVARS_SET("dynamic_ped_shadows", bDynamicPedShadows);
+    gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
+
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
     {
@@ -4373,6 +4392,8 @@ bool CSettings::OnFxQualityChanged(CGUIElement* pElement)
         m_pCheckBoxGrass->SetEnabled(true);
     }
 
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled((int)pItem->GetData() >= 2);
     return true;
 }
 

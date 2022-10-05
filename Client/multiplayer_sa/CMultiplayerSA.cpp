@@ -28,7 +28,6 @@ unsigned long CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller;
 unsigned long CMultiplayerSA::HOOKPOS_CHud_Draw_Caller;
 unsigned long CMultiplayerSA::HOOKPOS_CRunningScript_Process;
 unsigned long CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion;
-unsigned long CMultiplayerSA::HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow;
 unsigned long CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
 unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
 unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
@@ -392,7 +391,6 @@ void HOOK_CStreaming_Update_Caller();
 void HOOK_CHud_Draw_Caller();
 void HOOK_CRunningScript_Process();
 void HOOK_CExplosion_AddExplosion();
-void HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
 void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
@@ -620,7 +618,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
     HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
     HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
-    HookInstall(HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow, (DWORD)HOOK_CRealTimeShadowManager__ReturnRealTimeShadow, 6);
     HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
@@ -1161,13 +1158,6 @@ void CMultiplayerSA::InitHooks()
     // Prevent the game deleting _any_ far away vehicles - will cause issues for population vehicles in the future
     MemPut<BYTE>(0x42CD10, 0xC3);
 
-    // DISABLE real-time shadows for peds
-    MemPut<BYTE>(0x5E68A0, 0xEB);
-
-    // and some more, just to be safe
-    // 00542483   EB 0B            JMP SHORT gta_sa.00542490
-    MemPut<BYTE>(0x542483, 0xEB);
-
     // DISABLE weapon pickups
     MemPut<BYTE>(0x5B47B0, 0xC3);
 
@@ -1181,12 +1171,6 @@ void CMultiplayerSA::InitHooks()
         MemPut < BYTE > ( 0x51D471, 0x10 );
         MemPut < BYTE > ( 0x51D472, 0x00 );
     */
-
-    // HACK to prevent RealTimeShadowManager crash
-    // 00542483     EB 0B          JMP SHORT gta_sa_u.00542490
-    /*
-    MemPut < BYTE > ( 0x542483, 0xEB );
-*/
 
     // InitShotsyncHooks();
 
@@ -1545,6 +1529,26 @@ void CMultiplayerSA::InitHooks()
 
     // Show muzzle flash for last bullet in magazine
     MemSet((void*)0x61ECD2, 0x90, 20);
+
+    // Fix ped real time shadows by processing them always like for a non player ped
+    // Change JZ to JMP instruction in CRealTimeShadowManager::GetRealTimeShadow()
+    MemPut<BYTE>(0x7069F5, 0xEB);
+
+    // Modify CRealTimeShadowManager::GetRealTimeShadow()
+    // Start iterating over shadow array from 0 instead 1 (so we will have max 16 shadows, not 15)
+    // Originally, first shadow from the shadow array is used for player ped only
+    // Array: CRealTimeShadowManager::pShadowData[16]
+    // Array size: 0x40 (16 elements)
+    // Array element size: 0x04
+    MemPut<BYTE>(0x7069FE, 0x08);
+
+    // Fix ped real time shadows do not render on some objects
+    // by skipping some entity flag check in CShadows::CastRealTimeShadowSectorList()
+    MemSet((void*)0x70A83B, 0x90, 6);
+
+    // Fix vehicle blob shadows and light textures do not render on some objects when vehicle is empty
+    // by skipping some entity flag check in CShadows::CastPlayerShadowSectorList()
+    MemSet((void*)0x70A4CB, 0x90, 6);
 
     InitHooks_CrashFixHacks();
 
@@ -2854,19 +2858,6 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         mov     edx, CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion
         add     edx, 6
         jmp     edx
-    }
-}
-
-void _declspec(naked) HOOK_CRealTimeShadowManager__ReturnRealTimeShadow()
-{
-    _asm
-    {
-        cmp     ecx, 0
-        jz      dontclear
-        mov     [ecx+308], 0
-        mov     [eax], 0
-dontclear:
-        retn    4
     }
 }
 
