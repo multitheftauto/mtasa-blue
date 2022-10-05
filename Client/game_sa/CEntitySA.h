@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "Common.h"
-#include "COffsets.h"
 #include <game/CEntity.h>
 #include <CMatrix.h>
 #include <CMatrix_Pad.h>
@@ -236,8 +234,6 @@ class CEntitySA : public virtual CEntity
 
 public:
     CEntitySAInterface* m_pInterface;
-
-    //  VOID                        SetModelAlpha ( int iAlpha );
 
     CEntitySA();
     CEntitySAInterface* GetInterface() { return m_pInterface; };

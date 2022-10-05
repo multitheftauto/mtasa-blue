@@ -11,9 +11,11 @@
 
 #pragma once
 
-#include "CGameSA.h"
 #include <game/CWeapon.h>
 #include <game/CPed.h>
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 #define FUNC_Shutdown                                   0x73A380
 #define FUNC_CWeapon_CheckForShootingVehicleOccupant    0x73f480
@@ -24,15 +26,9 @@
 #define FUNC_CWeapon_DoBulletImpact                     0x73b550
 #define FUNC_CWeapon_GenerateDamageEvent                0x73a530
 #define FUNC_CWeapon_FireInstantHit                     0x73FB10
-
 #define FUNC_CWeaponInfo_GetWeaponReloadTime            0x743D70
-
 #define FUNC_CBirds_CheckForHit                         0x712E40
 #define FUNC_CShadows_CheckForHit                       0x707550
-
-extern CGameSA* pGame;
-class CWeaponSAInterface;
-class CWeaponStatSA;
 
 class CWeaponSAInterface
 {

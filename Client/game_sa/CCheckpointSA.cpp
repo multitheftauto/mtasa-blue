@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCheckpointSA.h"
 
 void CCheckpointSA::SetPosition(CVector* vecPosition)
 {

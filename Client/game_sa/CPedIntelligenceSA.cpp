@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedIntelligenceSA.h"
+#include "CTaskManagerSA.h"
+#include "CTaskManagementSystemSA.h"
 
 CPedIntelligenceSA::CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped)
 {

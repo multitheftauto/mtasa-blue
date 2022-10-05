@@ -12,19 +12,10 @@
 #pragma once
 
 #include <game/CPedIntelligence.h>
-#include "CEventSA.h"
+
 class CTaskManagerSA;
-class CTaskSimpleUseGunSAInterface;
 
-#include "CTaskManagerSA.h"
-
-#define FUNC_IsRespondingToEvent                    0x600DB0
-#define FUNC_GetCurrentEvent                        0x4ABE70
-#define FUNC_GetCurrentEventType                    0x4ABE60
 #define FUNC_CPedIntelligence_TestForStealthKill    0x601E00
-#define FUNC_CPedIntelligence_GetTaskUseGun         0x600F70
-
-class CPed;
 
 class CFightManagerInterface
 {

@@ -12,8 +12,6 @@
 #pragma once
 
 #include <game/CCheckpoint.h>
-#include <CMatrix_Pad.h>
-#include "Common.h"
 
 class CCheckpointSAInterface
 {
@@ -39,7 +37,6 @@ private:
     CCheckpointSAInterface* internalInterface;
 
 public:
-    // constructor
     CCheckpointSA(CCheckpointSAInterface* checkpointInterface) { internalInterface = checkpointInterface; };
 
     CCheckpointSAInterface* GetInterface() { return internalInterface; }

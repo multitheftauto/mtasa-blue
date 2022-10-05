@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPickupsSA.h"
+#include "CPickupSA.h"
 
 CPickupsSA::CPickupsSA()
 {

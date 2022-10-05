@@ -11,10 +11,7 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <game/TaskAttack.h>
-
 #include "TaskSA.h"
 
 #define FUNC_CTaskSimpleGangDriveBy__Constructor        0x6217d0

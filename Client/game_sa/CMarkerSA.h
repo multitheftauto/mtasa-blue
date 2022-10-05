@@ -12,11 +12,7 @@
 #pragma once
 
 #include <game/CMarker.h>
-#include "Common.h"
 
-/**
- * \todo Ignore this class?
- */
 class CEntryExit;
 
 class CMarkerSAInterface
@@ -52,7 +48,6 @@ public:
 class CMarkerSA : public CMarker
 {
 public:
-    /* Our Functions */
     CMarkerSA(CMarkerSAInterface* markerInterface) { internalInterface = markerInterface; };
 
     void Init();

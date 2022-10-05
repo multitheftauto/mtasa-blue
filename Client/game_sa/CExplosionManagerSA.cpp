@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CExplosionManagerSA.h"
+#include "CExplosionSA.h"
 
 CExplosionManagerSA::CExplosionManagerSA()
 {

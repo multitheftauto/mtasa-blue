@@ -12,8 +12,6 @@
 #pragma once
 
 #include <game/CPedIK.h>
-#include "Common.h"
-#include <CVector.h>
 
 class CPedSAInterface;
 
