@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-27 12:00+0000\n"
+"POT-Creation-Date: 2022-10-05 13:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1194,7 +1194,7 @@ msgid "Are you sure you want to use this screen resolution?"
 msgstr ""
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1378
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1379
 msgid "Problem with graphics driver"
 msgstr ""
 
