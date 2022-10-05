@@ -13,9 +13,6 @@
 
 #include <game/CWeapon.h>
 #include <game/CPed.h>
-#include "CGameSA.h"
-
-extern CGameSA* pGame;
 
 #define FUNC_Shutdown                                   0x73A380
 #define FUNC_CWeapon_CheckForShootingVehicleOccupant    0x73f480
@@ -64,7 +61,7 @@ public:
     eWeaponSlot GetSlot();
 
     void          SetAsCurrentWeapon();
-    CWeaponInfo* GetInfo(eWeaponSkill skill) { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType, skill); };
+    CWeaponInfo* GetInfo(eWeaponSkill skill);
     void         Destroy();
     void         Remove();
     void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed);
