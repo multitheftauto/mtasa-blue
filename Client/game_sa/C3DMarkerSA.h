@@ -64,7 +64,7 @@ public:
     CVector* GetPosition();
     DWORD    GetType();                        // need enum?
     void     SetType(DWORD dwType);            // doesn't work propperly (not virtualed)
-    BOOL     IsActive();
+    bool     IsActive();
     DWORD    GetIdentifier();
     SharedUtil::SColor   GetColor();
     void     SetColor(const SharedUtil::SColor color);            // actually BGRA

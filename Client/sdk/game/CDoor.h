@@ -17,8 +17,8 @@ class CDoor
 {
 public:
     virtual float      GetAngleOpenRatio() = 0;
-    virtual BOOL       IsClosed() = 0;
-    virtual BOOL       IsFullyOpen() = 0;
+    virtual bool       IsClosed() = 0;
+    virtual bool       IsFullyOpen() = 0;
     virtual void       Open(float fRatio) = 0;
     virtual eDoorState GetDoorState() = 0;
 };

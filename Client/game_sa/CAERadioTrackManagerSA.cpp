@@ -56,10 +56,10 @@ char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
     return cReturn;
 }
 
-BOOL CAERadioTrackManagerSA::IsRadioOn()
+bool CAERadioTrackManagerSA::IsRadioOn()
 {
     DWORD dwFunc = FUNC_IsRadioOn;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager

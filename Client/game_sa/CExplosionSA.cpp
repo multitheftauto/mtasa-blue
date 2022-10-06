@@ -70,7 +70,7 @@ CEntity* CExplosionSA::GetExplodingEntity()
     return NULL;
 }
 
-BOOL CExplosionSA::IsActive()
+bool CExplosionSA::IsActive()
 {
     return internalInterface->m_cExplosionActive;
 }

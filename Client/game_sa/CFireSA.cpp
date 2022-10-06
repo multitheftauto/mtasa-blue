@@ -26,7 +26,7 @@ void CFireSA::Extinguish()
         mov     ecx, dwPointer
         call    dwFunction
     }
-    this->internalInterface->bActive = FALSE;
+    this->internalInterface->bActive = false;
 }
 
 /**
@@ -149,32 +149,32 @@ void CFireSA::SetTarget(CEntity* entity)
     }
 }
 
-BOOL CFireSA::IsIgnited()
+bool CFireSA::IsIgnited()
 {
     return internalInterface->bActive;
 }
 
-BOOL CFireSA::IsFree()
+bool CFireSA::IsFree()
 {
     if (!internalInterface->bActive && !internalInterface->bCreatedByScript)
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
-void CFireSA::SetSilent(BOOL bSilent)
+void CFireSA::SetSilent(bool bSilent)
 {
     internalInterface->bMakesNoise = !bSilent;
 }
 
-BOOL CFireSA::IsBeingExtinguished()
+bool CFireSA::IsBeingExtinguished()
 {
     return internalInterface->bBeingExtinguished;
 }
 
 void CFireSA::Ignite()
 {
-    this->internalInterface->bActive = TRUE;
+    this->internalInterface->bActive = true;
 
     CVector* vecPosition = this->GetPosition();
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;

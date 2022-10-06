@@ -322,27 +322,27 @@ public:
 
     bool IsPlayerModel();
 
-    BOOL IsBoat();
-    BOOL IsCar();
-    BOOL IsTrain();
-    BOOL IsHeli();
-    BOOL IsPlane();
-    BOOL IsBike();
-    BOOL IsFakePlane();
-    BOOL IsMonsterTruck();
-    BOOL IsQuadBike();
-    BOOL IsBmx();
-    BOOL IsTrailer();
+    bool IsBoat();
+    bool IsCar();
+    bool IsTrain();
+    bool IsHeli();
+    bool IsPlane();
+    bool IsBike();
+    bool IsFakePlane();
+    bool IsMonsterTruck();
+    bool IsQuadBike();
+    bool IsBmx();
+    bool IsTrailer();
     bool IsVehicle() const override;
-    BOOL IsUpgrade();
+    bool IsUpgrade();
 
     char* GetNameIfVehicle();
 
     BYTE           GetVehicleType();
     void           Request(EModelRequestType requestType, const char* szTag);
     void           Remove();
-    BOOL           IsLoaded();
-    BOOL           DoIsLoaded();
+    bool           IsLoaded();
+    bool           DoIsLoaded();
     BYTE           GetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
@@ -361,7 +361,7 @@ public:
     bool           SetTime(char cHourOn, char cHourOff);
     static void    StaticResetModelTimes();
 
-    void        SetAlphaTransparencyEnabled(BOOL bEnabled);
+    void        SetAlphaTransparencyEnabled(bool bEnabled);
     bool        IsAlphaTransparencyEnabled();
     void        ResetAlphaTransparency();
     static void StaticResetAlphaTransparencies();

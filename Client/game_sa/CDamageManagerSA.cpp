@@ -265,7 +265,7 @@ BYTE CDamageManagerSA::GetAeroplaneCompStatus(BYTE CompID)
     return bReturn;
 }
 
-void CDamageManagerSA::FuckCarCompletely(BOOL bKeepWheels)
+void CDamageManagerSA::FuckCarCompletely(bool bKeepWheels)
 {
     DWORD dwFunc = FUNC_FuckCarCompletely;
     DWORD dwPointer = (DWORD)internalInterface;

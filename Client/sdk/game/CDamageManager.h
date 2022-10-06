@@ -141,5 +141,5 @@ public:
     virtual BYTE          GetAeroplaneCompStatus(BYTE CompID) = 0;
     virtual void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status) = 0;            // component ids begin at 12 - probably
 
-    virtual void FuckCarCompletely(BOOL bKeepWheels) = 0;
+    virtual void FuckCarCompletely(bool bKeepWheels) = 0;
 };

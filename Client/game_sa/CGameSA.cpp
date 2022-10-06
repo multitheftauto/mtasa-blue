@@ -376,7 +376,7 @@ eSystemState CGameSA::GetSystemState()
  * This adds the local player to the ped pool, nothing else
  * @return BOOL TRUE if success, FALSE otherwise
  */
-BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
+bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
     CPoolsSA* pools = (CPoolsSA*)this->GetPools();
     if (pools)
@@ -391,9 +391,9 @@ BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
             return TRUE;
         }
 
-        return FALSE;
+        return false;
     }
-    return FALSE;
+    return true;
 }
 
 float CGameSA::GetGravity()

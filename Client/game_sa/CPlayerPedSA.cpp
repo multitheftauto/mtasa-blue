@@ -50,8 +50,8 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
     this->SetModelIndex(pedType);
-    this->BeingDeleted = FALSE;
-    this->DoNotRemoveFromGame = FALSE;
+    this->BeingDeleted = false;
+    this->DoNotRemoveFromGame = false;
     this->SetType(PLAYER_PED);
 
     // Allocate a player data struct and set it as the players
@@ -100,7 +100,7 @@ CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
     this->Init();
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     this->SetType(PLAYER_PED);
-    this->BeingDeleted = FALSE;
+    this->BeingDeleted = false;
 
     m_bIsLocal = true;
     DoNotRemoveFromGame = true;

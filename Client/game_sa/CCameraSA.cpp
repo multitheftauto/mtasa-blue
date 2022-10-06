@@ -279,16 +279,12 @@ CCam* CCameraSA::GetCam(CCamSAInterface* camInterface)
     return NULL;
 }
 
-void CCameraSA::SetWidescreen(BOOL bWidescreen)
+void CCameraSA::SetWidescreen(bool bWidescreen)
 {
-    CCameraSAInterface* cameraInterface = this->GetInterface();
-    if (bWidescreen == FALSE)
-        cameraInterface->m_WideScreenOn = false;
-    else
-        cameraInterface->m_WideScreenOn = true;
+    GetInterface()->m_WideScreenOn = bWidescreen;
 }
 
-BOOL CCameraSA::GetWidescreen()
+bool CCameraSA::GetWidescreen()
 {
     CCameraSAInterface* cameraInterface = this->GetInterface();
     return cameraInterface->m_WideScreenOn;

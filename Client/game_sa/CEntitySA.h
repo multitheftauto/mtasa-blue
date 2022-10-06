@@ -281,15 +281,15 @@ public:
 
     RpClump* GetRpClump();
 
-    BOOL BeingDeleted;                   // to prevent it trying to delete twice
-    BOOL DoNotRemoveFromGame;            // when deleted, if this is true, it won't be removed from the game
+    bool BeingDeleted;                   // to prevent it trying to delete twice
+    bool DoNotRemoveFromGame;            // when deleted, if this is true, it won't be removed from the game
 
     void SetDoNotRemoveFromGameWhenDeleted(bool bDoNotRemoveFromGame) { DoNotRemoveFromGame = bDoNotRemoveFromGame; };
-    BOOL IsStatic() { return m_pInterface->bIsStatic; }
-    void SetStatic(BOOL bStatic) { m_pInterface->bIsStatic = bStatic; };
-    void SetUsesCollision(BOOL bUsesCollision) { m_pInterface->bUsesCollision = bUsesCollision; };
-    BOOL IsBackfaceCulled() { return m_pInterface->bBackfaceCulled; };
-    void SetBackfaceCulled(BOOL bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
+    bool IsStatic() { return m_pInterface->bIsStatic; }
+    void SetStatic(bool bStatic) { m_pInterface->bIsStatic = bStatic; };
+    void SetUsesCollision(bool bUsesCollision) { m_pInterface->bUsesCollision = bUsesCollision; };
+    bool IsBackfaceCulled() { return m_pInterface->bBackfaceCulled; };
+    void SetBackfaceCulled(bool bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
     void SetAlpha(DWORD dwAlpha);
 
     void MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown);

@@ -44,9 +44,9 @@ void CCheckpointSA::SetType(WORD wType)
     this->GetInterface()->m_nType = wType;
 }
 
-BOOL CCheckpointSA::IsActive()
+bool CCheckpointSA::IsActive()
 {
-    return (BOOL)this->GetInterface()->m_bIsUsed;
+    return this->GetInterface()->m_bIsUsed;
 }
 
 void CCheckpointSA::Activate()

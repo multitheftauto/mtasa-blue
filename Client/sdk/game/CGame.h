@@ -152,7 +152,7 @@ public:
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
-    virtual BOOL         IsAtMenu() = 0;
+    virtual bool         IsAtMenu() = 0;
     virtual void         StartGame() = 0;
     virtual void         SetSystemState(eSystemState State) = 0;
     virtual eSystemState GetSystemState() = 0;
@@ -167,7 +167,7 @@ public:
     virtual void Reset() = 0;
     virtual void Terminate() = 0;
 
-    virtual BOOL InitLocalPlayer(class CClientPed* pClientPed) = 0;
+    virtual bool InitLocalPlayer(class CClientPed* pClientPed) = 0;
 
     virtual float GetGravity() = 0;
     virtual void  SetGravity(float fGravity) = 0;

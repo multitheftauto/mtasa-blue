@@ -29,7 +29,7 @@ public:
     BYTE  GetCurrentRadioStationID();
     BYTE  IsVehicleRadioActive();
     char* GetRadioStationName(BYTE bStationID);
-    BOOL  IsRadioOn();
+    bool  IsRadioOn();
     void  SetBassSetting(DWORD dwBass);
     void  Reset();
     void  StartRadio(BYTE bStationID, BYTE bUnknown);

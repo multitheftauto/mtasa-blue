@@ -17,16 +17,16 @@ void CMarkerSA::Init()
 {
     internalInterface->position = CVector(0, 0, 0);
     internalInterface->BlipType = (BYTE)MARKER_TYPE_COORDS;
-    internalInterface->bBlipRemain = FALSE;
+    internalInterface->bBlipRemain = false;
     //  internalInterface->nColour = MARKER_COLOR_BLUE;
     //  internalInterface->bBright = TRUE;
-    internalInterface->bTrackingBlip = TRUE;
-    internalInterface->bShortRange = FALSE;
-    internalInterface->bFriendly = FALSE;
+    internalInterface->bTrackingBlip = true;
+    internalInterface->bShortRange = false;
+    internalInterface->bFriendly = false;
     internalInterface->fBlipMarkerScale = 2.0f;
     internalInterface->PoolIndex = 0;
     internalInterface->nBlipScale = 2;
-    internalInterface->bBlipFade = FALSE;
+    internalInterface->bBlipFade = false;
     internalInterface->nBlipDisplayFlag = MARKER_DISPLAY_BLIPONLY;
     internalInterface->nBlipSprite = RADAR_SPRITE_NONE;
     #define COORD_BLIP_APPEARANCE_NORMAL 0
@@ -106,12 +106,9 @@ void CMarkerSA::Remove()
     internalInterface->bTrackingBlip = false;
 }
 
-BOOL CMarkerSA::IsActive()
+bool CMarkerSA::IsActive()
 {
-    if (internalInterface->BlipType != MARKER_TYPE_UNUSED)
-        return TRUE;
-    else
-        return FALSE;
+    return internalInterface->BlipType != MARKER_TYPE_UNUSED;
 }
 
 void CMarkerSA::SetPosition(CVector* vecPosition)

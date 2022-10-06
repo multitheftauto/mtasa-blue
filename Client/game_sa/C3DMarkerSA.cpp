@@ -50,9 +50,9 @@ void C3DMarkerSA::SetType(DWORD dwType)
     this->GetInterface()->m_nType = (unsigned short)(dwType);
 }
 
-BOOL C3DMarkerSA::IsActive()
+bool C3DMarkerSA::IsActive()
 {
-    return (BOOL)this->GetInterface()->m_bIsUsed;
+    return this->GetInterface()->m_bIsUsed;
 }
 
 DWORD C3DMarkerSA::GetIdentifier()

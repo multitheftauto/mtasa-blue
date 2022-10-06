@@ -57,7 +57,7 @@ CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, 
         fire->SetTarget(entityTarget);
         fire->SetStrength(fSize);
         fire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
-        fire->SetSilent(FALSE);
+        fire->SetSilent(false);
         fire->Ignite();
     }
 
@@ -73,7 +73,7 @@ CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIR
         fire->SetPosition(vecPosition);
         fire->SetStrength(fSize);
         fire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
-        fire->SetSilent(FALSE);
+        fire->SetSilent(false);
         fire->Ignite();
     }
 

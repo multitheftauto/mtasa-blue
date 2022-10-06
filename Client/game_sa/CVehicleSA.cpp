@@ -153,7 +153,7 @@ CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsig
 
     m_pInterface = reinterpret_cast<CEntitySAInterface*>(dwReturn);
 #if 0
-    this->BeingDeleted = FALSE;
+    this->BeingDeleted = false;
 
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
@@ -201,7 +201,7 @@ CVehicleSA::CVehicleSA(CVehicleSAInterface* pVehicleInterface)
 #if 0
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
-    this->BeingDeleted = FALSE;
+    this->BeingDeleted = false;
 
     // Store our CVehicleSA pointer in the vehicle's time of creation member (as it won't get modified later and as far as I know it isn't used for something important)
     GetVehicleInterface ()->m_pVehicle = this;
@@ -226,7 +226,7 @@ void CVehicleSA::Init()
 {
     m_pInterface->bStreamingDontDelete = true;
     m_pInterface->bDontStream = true;
-    this->BeingDeleted = FALSE;
+    this->BeingDeleted = false;
 
     // Store our CVehicleSA pointer in the vehicle's time of creation member (as it won't get modified later and as far as I know it isn't used for something
     // important)
@@ -934,11 +934,7 @@ CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
 
 bool CVehicleSA::IsBeingDriven()
 {
-    CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
-    if (GetVehicleInterface()->pDriver != NULL)
-        return TRUE;
-    else
-        return FALSE;
+    return GetVehicleInterface()->pDriver != NULL;
 }
 
 /**

@@ -126,8 +126,8 @@ public:
     virtual float     Find3rdPersonQuickAimPitch() = 0;
     virtual BYTE      GetActiveCam() = 0;
     virtual CCam*     GetCam(BYTE bCameraID) = 0;
-    virtual void      SetWidescreen(BOOL bWidescreen) = 0;
-    virtual BOOL      GetWidescreen() = 0;
+    virtual void      SetWidescreen(bool bWidescreen) = 0;
+    virtual bool      GetWidescreen() = 0;
     virtual bool      IsFading() = 0;
     virtual int       GetFadingDirection() = 0;
     virtual void      Fade(float fFadeOutTime, int iOutOrIn) = 0;

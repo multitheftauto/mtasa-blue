@@ -39,7 +39,7 @@ float CDoorSA::GetAngleOpenRatio()
  * Checks if the door is closed
  * @return BOOL TRUE if the door is closed, FALSE otherwise
  */
-BOOL CDoorSA::IsClosed()
+bool CDoorSA::IsClosed()
 {
     DWORD dwFunction = FUNC_IsClosed;
     DWORD dwPointer = (DWORD)GetInterface();
@@ -63,7 +63,7 @@ BOOL CDoorSA::IsClosed()
  * @return BOOL TRUE if the door is fully opened, FALSE if it is opening, is closed or is missing.
  * \todo Check what this returns if the door has been ripped off
  */
-BOOL CDoorSA::IsFullyOpen()
+bool CDoorSA::IsFullyOpen()
 {
     DWORD dwFunction = FUNC_IsFullyOpen;
     DWORD dwPointer = (DWORD)GetInterface();

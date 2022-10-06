@@ -16,7 +16,6 @@
 CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 {
     this->internalInterface = pickupInterface;
-    this->callback = 0;
     this->object = 0;
 }
 

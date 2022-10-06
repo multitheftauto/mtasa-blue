@@ -72,8 +72,8 @@ CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
     m_ucAlpha = 255;
 
     // Setup some flags
-    this->BeingDeleted = FALSE;
-    this->DoNotRemoveFromGame = FALSE;
+    this->BeingDeleted = false;
+    this->DoNotRemoveFromGame = false;
 
     if (m_pInterface)
     {
@@ -184,8 +184,8 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
         world->Add(m_pInterface, CObject_Constructor);
 
         // Setup some flags
-        this->BeingDeleted = FALSE;
-        this->DoNotRemoveFromGame = FALSE;
+        this->BeingDeleted = false;
+        this->DoNotRemoveFromGame = false;
         MemPutFast<BYTE>(dwObjectPtr + 316, 6);
         if (bBreakingDisabled)
         {

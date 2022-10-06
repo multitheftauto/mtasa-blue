@@ -44,7 +44,6 @@ class CPickupSA : public CPickup
 private:
     CPickupSAInterface* internalInterface;
     CObjectSA*          object;
-    CBPickup            callback;            // function to call when the pickup is picked up [not used yet/ever]
 public:
     CPickupSA(CPickupSAInterface* pickupInterface);
     CPickupSAInterface* GetInterface() { return internalInterface; };            // not to be exported
