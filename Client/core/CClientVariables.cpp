@@ -330,6 +330,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
     DEFAULT("high_detail_peds", 0);                                                   // Disable rendering high detail peds all the time
     DEFAULT("corona_reflections", 0);                                                 // Disable corona rain reflections
+    DEFAULT("dynamic_ped_shadows", 0);                                                // Disable dynamic ped shadows
     DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on
     DEFAULT("allow_screen_upload", 1);                                                // 0-off 1-on
     DEFAULT("allow_external_sounds", 1);                                              // 0-off 1-on
