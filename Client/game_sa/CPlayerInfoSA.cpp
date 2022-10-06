@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerInfoSA.h"
 
 CWanted* CPlayerInfoSA::GetWanted()
 {

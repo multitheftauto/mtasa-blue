@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFireManagerSA.h"
+#include "CFireSA.h"
 
 extern CGameSA* pGame;
 

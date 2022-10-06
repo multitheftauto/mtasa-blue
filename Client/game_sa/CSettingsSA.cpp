@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CSettingsSA.h"
+#include "CAudioEngineSA.h"
+#include "CCoronasSA.h"
+#include "CHudSA.h"
 
 static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;

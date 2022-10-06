@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "TaskBasicSA.h"
+#include "CPedSA.h"
 
 CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)
 {

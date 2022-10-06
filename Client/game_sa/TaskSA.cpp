@@ -11,9 +11,11 @@
 
 #include "StdInc.h"
 #include "TaskSA.h"
-#include "CTasksSA.h"
+#include "CPedIntelligenceSA.h"
+#include "CPedSA.h"
 #include "CTaskManagementSystemSA.h"
 #include "CTaskManagerSA.h"
+#include "CTasksSA.h"
 
 DWORD dwTasksAlive = 0;
 DWORD dwTasksCreatedTotal = 0;

@@ -13,10 +13,10 @@
 
 #include <game/CRenderWare.h>
 #include "CModelInfoSA.h"
-#include "CColModelSA.h"
 #include "CRenderWareSA.ShaderSupport.h"
 
 class CModelTexturesInfo;
+struct RpAtomic;
 
 class CRenderWareSA : public CRenderWare
 {

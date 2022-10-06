@@ -12,8 +12,8 @@
 #pragma once
 
 #include "Common.h"
-#include "CWanted.h"
-#include "CVehicle.h"
+
+class CWanted;
 
 class CPlayerInfo
 {

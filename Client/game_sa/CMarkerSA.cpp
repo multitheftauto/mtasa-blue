@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMarkerSA.h"
+#include "CPoolsSA.h"
 
 void CMarkerSA::Init()
 {
@@ -91,7 +93,7 @@ void CMarkerSA::SetColor(eMarkerColor color)
  * Sets the color of the marker when MARKER_SPRITE_NONE is used
  * @param color RGBA containing a valid colour in RGBA format.
  */
-void CMarkerSA::SetColor(const SColor color)
+void CMarkerSA::SetColor(const SharedUtil::SColor color)
 {
     DEBUG_TRACE("VOID CMarkerSA::SetColor ( RGBA color )");
     // Convert to required rgba at the last moment

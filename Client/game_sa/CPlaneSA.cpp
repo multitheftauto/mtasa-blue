@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlaneSA.h"
 
 CPlaneSA::CPlaneSA(CPlaneSAInterface* plane) : CAutomobileSA(plane)
 {

@@ -543,8 +543,6 @@ enum
 #define MAX_INT_STATS (MAX_INT_FLOAT_STATS - STATS_OFFSET)
 #define MAX_STATS (MAX_INT_STATS + MAX_FLOAT_STATS)
 
-enum eWeaponType;
-
 class CStats
 {
 public:

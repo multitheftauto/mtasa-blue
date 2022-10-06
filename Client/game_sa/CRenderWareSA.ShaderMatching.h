@@ -6,6 +6,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 #ifdef SHADER_DEBUG_OUTPUT
 class CShaderAndEntityPair;
 struct SWildcardMatchChain;

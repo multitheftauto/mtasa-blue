@@ -12,18 +12,19 @@
 #pragma once
 
 #include "Common.h"
-
 #include "CWeaponInfo.h"
-class CPed;
+
 class CColPoint;
-class CVector2D;
+class CPed;
 class CVector;
+class CVector2D;
 class CWeaponInfo;
 class CWeaponStat;
 enum ePedPieceTypes;
-struct SLineOfSightFlags;
 struct SLineOfSightBuildingResult;
+struct SLineOfSightFlags;
 struct SWeaponConfiguration;
+
 class CWeapon
 {
 public:

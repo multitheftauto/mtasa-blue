@@ -200,7 +200,7 @@ public:
     CAnimBlock*    m_pSunbatheAnimBlock;
     int            m_BeachAnimBlockIndex;
     int            m_SunbatheAnimBlockIndex;
-    CObject*       m_pTowel;
+    CObjectSAInterface* m_pTowel;
 };
 
 class CTaskComplexSunbatheSA : public virtual CTaskComplexSA, public virtual CTaskComplexSunbathe

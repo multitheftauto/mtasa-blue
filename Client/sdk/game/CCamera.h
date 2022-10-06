@@ -12,7 +12,10 @@
 #pragma once
 
 #include "CEntity.h"
-#include "CCam.h"
+
+class CMatrix;
+class CCam;
+struct RwMatrix;
 
 enum eCamMode
 {

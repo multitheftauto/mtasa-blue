@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEntitySA.h"
+#include "CFireSA.h"
+#include "CPoolsSA.h"
 
 /**
  * Put the fire out

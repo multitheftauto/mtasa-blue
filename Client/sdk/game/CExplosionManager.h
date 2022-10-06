@@ -11,10 +11,11 @@
 
 #pragma once
 
-#include <CVector.h>
-#include "CExplosion.h"
 #include "Common.h"
-#include "CEntity.h"
+
+class CEntity;
+class CExplosion;
+class CVector;
 
 class CExplosionManager
 {

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAERadioTrackManagerSA.h"
 
 BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
 {

@@ -13,13 +13,13 @@
 
 #include "Common.h"
 
-#include "CAutomobile.h"
-#include "CBoat.h"
-#include "CBike.h"
-#include "CBuilding.h"
-#include "CObject.h"
-#include "CPed.h"
-#include "CVehicle.h"
+class CBuilding;
+class CEntity;
+class CObject;
+class CPed;
+class CVector;
+class CVehicle;
+struct RpClump;
 
 enum ePools
 {

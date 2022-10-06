@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CRect.h>
+#include "CColModelSA.h"
+#include "CPhysicalSA.h"
+#include "CPoolsSA.h"
 
 CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {

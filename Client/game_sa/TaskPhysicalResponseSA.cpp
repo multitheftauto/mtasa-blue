@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "TaskPhysicalResponseSA.h"
+#include "CPedSA.h"
 
 // ##############################################################################
 // ## Name:    CTaskSimpleChoking

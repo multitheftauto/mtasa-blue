@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include <CVector.h>
 #include "Common.h"
+
+class CVector;
 
 /**
  * \todo fix SetColor/GetColor, the format is actually BGRA (strange)
@@ -42,8 +43,8 @@ public:
     virtual DWORD    GetType() = 0;            // need enum?
     virtual BOOL     IsActive() = 0;
     virtual DWORD    GetIdentifier() = 0;
-    virtual SColor   GetColor() = 0;
-    virtual void     SetColor(const SColor color) = 0;
+    virtual SharedUtil::SColor GetColor() = 0;
+    virtual void     SetColor(const SharedUtil::SColor color) = 0;
     virtual void     SetPulsePeriod(WORD wPulsePeriod) = 0;
     virtual void     SetRotateRate(short RotateRate) = 0;
     virtual float    GetSize() = 0;

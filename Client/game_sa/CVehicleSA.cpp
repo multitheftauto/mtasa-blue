@@ -10,11 +10,20 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_renderware.h"
+#include "CVehicleSA.h"
+#include "CAutomobileSA.h"
+#include "CCameraSA.h"
+#include "CColModelSA.h"
+#include "CFxManagerSA.h"
+#include "CFxSystemSA.h"
+#include "CProjectileInfoSA.h"
+#include "CTrainSA.h"
+#include "CVisibilityPluginsSA.h"
+#include "CWorldSA.h"
 
 extern CGameSA* pGame;
 bool            g_bVehiclePointerInvalid = false;
-
-#include "gamesa_renderware.h"
 
 static BOOL m_bVehicleSunGlare = false;
 _declspec(naked) void DoVehicleSunGlare(void* this_)
@@ -103,7 +112,7 @@ namespace
     void GetAllAtomicObjects(RwFrame* frame, std::vector<RwObject*>& result) { RwFrameForAllObjects(frame, (void*)GetAllAtomicObjectCB, &result); }
 }            // namespace
 
-CVehicleSA::CVehicleSA() : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0.0f, 0.0f, -1.0f), m_HeadLightColor(SColorRGBA(255, 255, 255, 255))
+CVehicleSA::CVehicleSA() : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0.0f, 0.0f, -1.0f), m_HeadLightColor(SharedUtil::SColorRGBA(255, 255, 255, 255))
 {
     assert(0);            // Never used ?
 }
@@ -112,7 +121,7 @@ CVehicleSA::CVehicleSA() : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0
  *\todo ASAP: Remove all the VC specific (SCM) function calls propperly
  */
 CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2)
-    : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0.0f, 0.0f, -1.0f), m_HeadLightColor(SColorRGBA(255, 255, 255, 255))
+    : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0.0f, 0.0f, -1.0f), m_HeadLightColor(SharedUtil::SColorRGBA(255, 255, 255, 255))
 {
     DEBUG_TRACE("CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )");
     // for SA, we can just call the following function and it should just work:
@@ -263,7 +272,7 @@ void CVehicleSA::Init()
     m_bIsDerailable = true;
     m_ucAlpha = 255;
     m_vecGravity = CVector(0.0f, 0.0f, -1.0f);
-    m_HeadLightColor = SColorRGBA(255, 255, 255, 255);
+    m_HeadLightColor = SharedUtil::SColorRGBA(255, 255, 255, 255);
 
     m_RGBColors[0] = CVehicleColor::GetRGBFromPaletteIndex(((CVehicleSAInterface*)(this->GetInterface()))->m_colour1);
     m_RGBColors[1] = CVehicleColor::GetRGBFromPaletteIndex(((CVehicleSAInterface*)(this->GetInterface()))->m_colour2);
@@ -978,7 +987,7 @@ void CVehicleSA::PlaceAutomobileOnRoadProperly()
     }
 }
 
-void CVehicleSA::SetColor(SColor color1, SColor color2, SColor color3, SColor color4, int)
+void CVehicleSA::SetColor(SharedUtil::SColor color1, SharedUtil::SColor color2, SharedUtil::SColor color3, SharedUtil::SColor color4, int)
 {
     m_RGBColors[0] = color1;
     m_RGBColors[1] = color2;
@@ -989,7 +998,7 @@ void CVehicleSA::SetColor(SColor color1, SColor color2, SColor color3, SColor co
     for (uint i = 0; i < NUMELMS(m_RGBColors); i++)
     {
         m_RGBColorsFixed[i] = m_RGBColors[i];
-        const SColor color = m_RGBColorsFixed[i];
+        const SharedUtil::SColor color = m_RGBColorsFixed[i];
         if (color == 0xFF00FF                // 255,   0, 255
             || color == 0x00FFFF             //   0,   0, 255
             || color == 0xFF00AF             // 255,   0, 175
@@ -1002,7 +1011,7 @@ void CVehicleSA::SetColor(SColor color1, SColor color2, SColor color3, SColor co
     }
 }
 
-void CVehicleSA::GetColor(SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA)
+void CVehicleSA::GetColor(SharedUtil::SColor* color1, SharedUtil::SColor* color2, SharedUtil::SColor* color3, SharedUtil::SColor* color4, bool bFixedForGTA)
 {
     if (!bFixedForGTA)
     {

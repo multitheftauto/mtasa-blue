@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBikeSA.h"
 
 CBikeSA::CBikeSA(CBikeSAInterface* bike)
 {

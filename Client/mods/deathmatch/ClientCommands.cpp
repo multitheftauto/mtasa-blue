@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWeapon.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 
 using std::list;
 using std::vector;

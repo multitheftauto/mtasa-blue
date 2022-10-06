@@ -306,7 +306,7 @@ public:
     unsigned long GetArrayID() { return m_ulArrayID; }
     void          SetArrayID(unsigned long ulID) { m_ulArrayID = ulID; }
 
-    RwMatrixTag* GetBoneRwMatrix(eBone boneId);
+    RwMatrix* GetBoneRwMatrix(eBone boneId);
     bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
     bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);

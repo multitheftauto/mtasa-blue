@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <fstream>
 #include "CAudioContainerLookupTableSA.h"
 
 CAudioContainerLookupTableSA::CAudioContainerLookupTableSA(const SString& strPath)

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "C3DMarkersSA.h"
 
 C3DMarkersSA::C3DMarkersSA()
 {

@@ -397,10 +397,10 @@ private:
     bool                             m_bIsDerailable;
     unsigned char                    m_ucAlpha;
     CVector                          m_vecGravity;
-    SColor                           m_HeadLightColor;
+    SharedUtil::SColor               m_HeadLightColor;
     RwObject                         m_WheelObjects[4];
-    SColor                           m_RGBColors[4];
-    SColor                           m_RGBColorsFixed[4];
+    SharedUtil::SColor               m_RGBColors[4];
+    SharedUtil::SColor               m_RGBColorsFixed[4];
     CDoorSA                          m_doors[6];
     bool                             m_bSwingingDoorsAllowed;
     SSirenInfo                       m_tSirenInfo;
@@ -486,8 +486,8 @@ public:
 
     void          PlaceBikeOnRoadProperly();
     void          PlaceAutomobileOnRoadProperly();
-    void          SetColor(SColor color1, SColor color2, SColor color3, SColor color4, int);
-    void          GetColor(SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA);
+    void          SetColor(SharedUtil::SColor color1, SharedUtil::SColor color2, SharedUtil::SColor color3, SharedUtil::SColor color4, int);
+    void          GetColor(SharedUtil::SColor* color1, SharedUtil::SColor* color2, SharedUtil::SColor* color3, SharedUtil::SColor* color4, bool bFixedForGTA);
     bool          IsSirenOrAlarmActive();
     void          SetSirenOrAlarmActive(bool bActive);
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
@@ -595,8 +595,8 @@ public:
     void GetGravity(CVector* pvecGravity) const { *pvecGravity = m_vecGravity; }
     void SetGravity(const CVector* pvecGravity);
 
-    SColor GetHeadLightColor() { return m_HeadLightColor; }
-    void   SetHeadLightColor(const SColor color) { m_HeadLightColor = color; }
+    SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
+    void   SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
     CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
@@ -627,8 +627,8 @@ public:
     unsigned char GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
     unsigned char GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
     DWORD         GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
-    SColor        GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
-    void          SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
+    SharedUtil::SColor        GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
+    void          SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
     {
         m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
     }
@@ -636,8 +636,8 @@ public:
     unsigned char                     GetVehicleCurrentSirenID() { return m_tSirenInfo.m_ucCurrentSirenID; }
     unsigned char                     GetSirenRandomiser() { return m_tSirenInfo.m_ucCurrentSirenRandomiser; }
     void                              SetSirenRandomiser(unsigned char ucSirenRandomiser) { m_tSirenInfo.m_ucCurrentSirenRandomiser = ucSirenRandomiser; }
-    void                              SetPointLightColour(SColor tPointLightColour) { m_tSirenInfo.m_tPointLightColour = tPointLightColour; }
-    SColor                            GetPointLightColour() { return m_tSirenInfo.m_tPointLightColour; }
+    void                              SetPointLightColour(SharedUtil::SColor tPointLightColour) { m_tSirenInfo.m_tPointLightColour = tPointLightColour; }
+    SharedUtil::SColor                GetPointLightColour() { return m_tSirenInfo.m_tPointLightColour; }
     bool                              IsSiren360EffectEnabled() { return m_tSirenInfo.m_b360Flag; }
     bool                              IsSirenLOSCheckEnabled() { return m_tSirenInfo.m_bDoLOSCheck; }
     bool                              IsSirenRandomiserEnabled() { return m_tSirenInfo.m_bUseRandomiser; }

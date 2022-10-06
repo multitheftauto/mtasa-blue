@@ -12,13 +12,14 @@
 #pragma once
 
 #include "Common.h"
-#include <CMatrix.h>
-#include <CVector.h>
-#include "RenderWare.h"
 
-#include <windows.h>
-
+class CEntitySAInterface;
+class CMatrix;
+class CVector;
 enum eBone;
+struct RpClump;
+struct RwFrame;
+struct RwMatrix;
 
 enum eEntityType
 {
@@ -109,7 +110,7 @@ public:
 
     virtual unsigned long GetArrayID() = 0;
 
-    virtual RwMatrixTag* GetBoneRwMatrix(eBone boneId) = 0;
+    virtual RwMatrix* GetBoneRwMatrix(eBone boneId) = 0;
     virtual bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
 
     virtual bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll) = 0;

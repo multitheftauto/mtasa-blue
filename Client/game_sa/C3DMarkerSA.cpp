@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "C3DMarkerSA.h"
 
 void C3DMarkerSA::GetMatrix(CMatrix* pMatrix)
 {
@@ -65,12 +66,12 @@ DWORD C3DMarkerSA::GetIdentifier()
     return this->GetInterface()->m_nIdentifier;
 }
 
-SColor C3DMarkerSA::GetColor()
+SharedUtil::SColor C3DMarkerSA::GetColor()
 {
     DEBUG_TRACE("RGBA C3DMarkerSA::GetColor()");
     // From ABGR
     unsigned long ulABGR = this->GetInterface()->rwColour;
-    SColor        color;
+    SharedUtil::SColor        color;
     color.A = (ulABGR >> 24) & 0xff;
     color.B = (ulABGR >> 16) & 0xff;
     color.G = (ulABGR >> 8) & 0xff;
@@ -78,7 +79,7 @@ SColor C3DMarkerSA::GetColor()
     return color;
 }
 
-void C3DMarkerSA::SetColor(const SColor color)
+void C3DMarkerSA::SetColor(const SharedUtil::SColor color)
 {
     // To ABGR
     this->GetInterface()->rwColour = (color.A << 24) | (color.B << 16) | (color.G << 8) | color.R;

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAutomobileSA.h"
 
 /**
  * \todo Spawn automobiles with engine off

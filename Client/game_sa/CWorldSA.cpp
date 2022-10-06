@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CWorldSA.h"
+#include "CPoolsSA.h"
 
 #define ARRAY_SurfaceInfos 0xB79538
 

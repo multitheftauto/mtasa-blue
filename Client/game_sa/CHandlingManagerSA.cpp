@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHandlingManagerSA.h"
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 

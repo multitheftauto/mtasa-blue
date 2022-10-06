@@ -51,8 +51,8 @@ public:
     void     Activate();
     DWORD    GetIdentifier();
     void     SetIdentifier(DWORD dwIdentifier);
-    SColor   GetColor();
-    void     SetColor(const SColor color);
+    SharedUtil::SColor   GetColor();
+    void     SetColor(const SharedUtil::SColor color);
     void     SetPulsePeriod(WORD wPulsePeriod);
     void     SetRotateRate(short RotateRate);
     float    GetSize();

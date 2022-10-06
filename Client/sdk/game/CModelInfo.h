@@ -10,15 +10,16 @@
  *****************************************************************************/
 
 #pragma once
-
-#include "Common.h"
-#include "RenderWare.h"
+#include <array>
 #include <CVector.h>
+#include "CAnimBlock.h"
+#include "Common.h"
 
-#include <windows.h>
-#include "CColModel.h"
-#include "CColStore.h"
+class CBaseModelInfoSAInterface;
+class CColModel;
 class CPedModelInfo;
+struct RpClump;
+struct RwObject;
 
 class CBoundingBox
 {

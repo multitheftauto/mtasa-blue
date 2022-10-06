@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWorld.h>
 
 extern CCoreInterface* g_pCore;
 

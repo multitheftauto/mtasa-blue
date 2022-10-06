@@ -11,11 +11,9 @@
 
 #pragma once
 
-#include <windows.h>
-#include <CVector.h>
-#include "CEntity.h"
-
+class CEntity;
 class CFireSAInterface;
+class CVector;
 
 class CFire
 {

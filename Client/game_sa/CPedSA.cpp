@@ -10,6 +10,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/TaskTypes.h>
+#include "CFireManagerSA.h"
+#include "CPedModelInfoSA.h"
+#include "CPedSA.h"
+#include "CPlayerInfoSA.h"
+#include "CProjectileInfoSA.h"
+#include "CTaskManagerSA.h"
+#include "CTasksSA.h"
+#include "CWeaponInfoSA.h"
+#include "CWeaponStatManagerSA.h"
+
 
 extern CGameSA* pGame;
 int             g_bOnlyUpdateRotations = false;

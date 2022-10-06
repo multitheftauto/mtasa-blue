@@ -11,13 +11,21 @@
 
 #pragma once
 
-#include "RenderWare.h"
-#include <list>
+#include <vector>
 
-class CD3DDUMMY;
 class CClientEntityBase;
-class CShaderItem;
+class CD3DDUMMY;
+class CMatrix;
 class CPixels;
+class CShaderItem;
+class SString;
+class CColModel;
+struct RpAtomicContainer;
+struct RwFrame;
+struct RwMatrix;
+struct RwTexDictionary;
+struct RwTexture;
+
 typedef CShaderItem CSHADERDUMMY;
 
 // A list of custom textures to add to a model's txd

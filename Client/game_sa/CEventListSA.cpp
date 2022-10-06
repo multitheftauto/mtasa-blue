@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEventListSA.h"
+#include "CEventDamageSA.h"
+#include "CEventGunShotSA.h"
 
 CEvent* CEventListSA::FindClosestEvent(eEventType eventtype, CVector* vecPosition)
 {
