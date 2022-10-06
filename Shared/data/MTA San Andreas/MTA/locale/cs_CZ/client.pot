@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-05 18:45+0000\n"
-"PO-Revision-Date: 2022-10-05 18:52\n"
+"PO-Revision-Date: 2022-10-06 07:51\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -1826,7 +1826,7 @@ msgstr "Odraz koróny v dešti"
 
 #: Client/core/CSettings.cpp:859
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dynamické stíny postav"
 
 #: Client/core/CSettings.cpp:888
 msgid "Enable remote websites"
