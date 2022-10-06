@@ -123,7 +123,6 @@ CVehicleSA::CVehicleSA() : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0
 CVehicleSA::CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2)
     : m_ucAlpha(255), m_bIsDerailable(true), m_vecGravity(0.0f, 0.0f, -1.0f), m_HeadLightColor(SharedUtil::SColorRGBA(255, 255, 255, 255))
 {
-    DEBUG_TRACE("CVehicleSA::CVehicleSA( eVehicleTypes dwModelID )");
     // for SA, we can just call the following function and it should just work:
     // CCarCtrl::CreateCarForScript(int,class CVector,unsigned char)
     //                              ModelID, Position, IsMissionVehicle
@@ -318,10 +317,8 @@ void CVehicleSA::Init()
     FinalizeFramesList();
 }
 
-// DESTRUCTOR
 CVehicleSA::~CVehicleSA()
 {
-    DEBUG_TRACE("CVehicleSA::~CVehicleSA()");
     if (!this->BeingDeleted)
     {
         if ((DWORD)m_pInterface->vtbl != VTBL_CPlaceable)
@@ -748,7 +745,6 @@ void CVehicleSA::LockDoors(bool bLocked)
 
 void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
 {
-    DEBUG_TRACE("void CVehicleSA::AddVehicleUpgrade ( DWORD dwModelID )");
     if (dwModelID >= 1000 && dwModelID <= 1193)
     {
         DWORD dwThis = (DWORD)m_pInterface;
@@ -765,7 +761,6 @@ void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
 
 void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
 {
-    DEBUG_TRACE("void CVehicleSA::RemoveVehicleUpgrade ( DWORD dwModelID )");
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CVehicle_RemoveVehicleUpgrade;
 
@@ -791,7 +786,6 @@ bool CVehicleSA::DoesSupportUpgrade(const SString& strFrameName)
 
 DWORD CVehicleSA::GetBaseVehicleType()
 {
-    DEBUG_TRACE("DWORD CVehicleSA::GetBaseVehicleType ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CVehicle_GetBaseVehicleType;
     DWORD dwReturn = 0;
@@ -809,31 +803,26 @@ DWORD CVehicleSA::GetBaseVehicleType()
 
 void CVehicleSA::SetBodyDirtLevel(float fDirtLevel)
 {
-    DEBUG_TRACE("void CVehicleSA::SetBodyDirtLevel ( float fDirtLevel )");
     GetVehicleInterface()->nBodyDirtLevel = fDirtLevel;
 }
 
 float CVehicleSA::GetBodyDirtLevel()
 {
-    DEBUG_TRACE("float CVehicleSA::GetBodyDirtLevel ( void )");
     return GetVehicleInterface()->nBodyDirtLevel;
 }
 
 unsigned char CVehicleSA::GetCurrentGear()
 {
-    DEBUG_TRACE("unsigned char CVehicleSA::GetCurrentGear ( void )");
     return GetVehicleInterface()->m_nCurrentGear;
 }
 
 float CVehicleSA::GetGasPedal()
 {
-    DEBUG_TRACE("float CVehicleSA::GetGasPedal ( void )");
     return GetVehicleInterface()->m_fGasPedal;
 }
 
 bool CVehicleSA::GetTowBarPos(CVector* pVector, CVehicle* pTrailer)
 {
-    DEBUG_TRACE("bool CVehicleSA::GetTowBarPos ( CVector* pVector )");
     CVehicleSAInterfaceVTBL* vehicleVTBL = (CVehicleSAInterfaceVTBL*)(m_pInterface->vtbl);
     DWORD                    dwThis = (DWORD)m_pInterface;
     DWORD                    dwFunc = vehicleVTBL->GetTowbarPos;
@@ -859,7 +848,6 @@ bool CVehicleSA::GetTowBarPos(CVector* pVector, CVehicle* pTrailer)
 
 bool CVehicleSA::GetTowHitchPos(CVector* pVector)
 {
-    DEBUG_TRACE("bool CVehicleSA::GetTowHitchPos ( CVector* pVector )");
     CVehicleSAInterfaceVTBL* vehicleVTBL = (CVehicleSAInterfaceVTBL*)(m_pInterface->vtbl);
     DWORD                    dwThis = (DWORD)m_pInterface;
     DWORD                    dwFunc = vehicleVTBL->GetTowHitchPos;
@@ -880,7 +868,6 @@ bool CVehicleSA::GetTowHitchPos(CVector* pVector)
 
 bool CVehicleSA::IsUpsideDown()
 {
-    DEBUG_TRACE("bool CVehicleSA::IsUpsideDown ( void )");
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CVehicle_IsUpsideDown;
     bool  bReturn = false;
@@ -897,7 +884,6 @@ bool CVehicleSA::IsUpsideDown()
 
 void CVehicleSA::SetEngineOn(bool bEngineOn)
 {
-    DEBUG_TRACE("void CVehicleSA::SetEngineOn ( bool bEngineOn )");
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwEngineOn = (DWORD)bEngineOn;
     DWORD dwFunc = FUNC_CVehicle_SetEngineOn;
@@ -912,7 +898,6 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
 
 CPed* CVehicleSA::GetDriver()
 {
-    DEBUG_TRACE("CPed* CVehicleSA::GetDriver ( void )");
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
 
     CPedSAInterface* pDriver = GetVehicleInterface()->pDriver;
@@ -929,7 +914,6 @@ CPed* CVehicleSA::GetDriver()
 
 CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
 {
-    DEBUG_TRACE("CPed* CVehicleSA::GetPassenger ( unsigned char ucSlot )");
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
 
     if (ucSlot < 8)
@@ -950,7 +934,6 @@ CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
 
 bool CVehicleSA::IsBeingDriven()
 {
-    DEBUG_TRACE("bool CVehicleSA::IsBeingDriven()");
     CVehicleSAInterface* vehicle = (CVehicleSAInterface*)this->GetInterface();
     if (GetVehicleInterface()->pDriver != NULL)
         return TRUE;
@@ -963,7 +946,6 @@ bool CVehicleSA::IsBeingDriven()
  */
 void CVehicleSA::PlaceBikeOnRoadProperly()
 {
-    DEBUG_TRACE("void CVehicleSA::PlaceBikeOnRoadProperly()");
     DWORD dwFunc = FUNC_Bike_PlaceOnRoadProperly;
     DWORD dwBike = (DWORD)this->GetInterface();
 
@@ -976,7 +958,6 @@ void CVehicleSA::PlaceBikeOnRoadProperly()
 
 void CVehicleSA::PlaceAutomobileOnRoadProperly()
 {
-    DEBUG_TRACE("void CVehicleSA::PlaceAutomobileOnRoadProperly()");
     DWORD dwFunc = FUNC_Automobile_PlaceOnRoadProperly;
     DWORD dwAutomobile = (DWORD)this->GetInterface();
 
@@ -1032,7 +1013,6 @@ void CVehicleSA::GetColor(SharedUtil::SColor* color1, SharedUtil::SColor* color2
 // works with firetrucks & tanks
 void CVehicleSA::GetTurretRotation(float* fHorizontal, float* fVertical)
 {
-    DEBUG_TRACE("void * CVehicleSA::GetTurretRotation ( float * fHorizontal, float * fVertical )");
     // This is coded in asm because for some reason it was failing to compile
     // correctly with normal c++.
     DWORD vehicleInterface = (DWORD)this->GetInterface();
@@ -1054,7 +1034,6 @@ void CVehicleSA::GetTurretRotation(float* fHorizontal, float* fVertical)
 
 void CVehicleSA::SetTurretRotation(float fHorizontal, float fVertical)
 {
-    DEBUG_TRACE("void * CVehicleSA::SetTurretRotation ( float fHorizontal, float fVertical )");
     //*(float *)(this->GetInterface() + 2380) = fHorizontal;
     //*(float *)(this->GetInterface() + 2384) = fVertical;
     DWORD vehicleInterface = (DWORD)this->GetInterface();
@@ -1150,7 +1129,6 @@ bool CVehicleSA::IsLandingGearDown()
 
 void CVehicleSA::Fix()
 {
-    DEBUG_TRACE("void CVehicleSA::Fix ( void )");
     DWORD dwThis = (DWORD)GetInterface();
 
     DWORD       dwFunc = 0;
@@ -1179,7 +1157,6 @@ void CVehicleSA::Fix()
 
 CDamageManager* CVehicleSA::GetDamageManager()
 {
-    DEBUG_TRACE("CDamageManager * CVehicleSA::GetDamageManager()");
     return this->m_pDamageManager;
 }
 
@@ -1215,7 +1192,6 @@ bool CVehicleSA::IsFadingOut()
 
 void CVehicleSA::SetTowLink(CVehicle* pVehicle)
 {
-    DEBUG_TRACE("void CVehicleSA::SetTowLink ( CVehicle* pVehicle )");
     // We can't use the vtable func, because it teleports the trailer parallel to the vehicle => make our own one (see #1655)
 
     CVehicleSA* towingVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
@@ -1234,7 +1210,6 @@ void CVehicleSA::SetTowLink(CVehicle* pVehicle)
 
 bool CVehicleSA::BreakTowLink()
 {
-    DEBUG_TRACE("bool CVehicleSA::BreakTowLink ( void )");
     DWORD dwThis = (DWORD)GetInterface();
 
     CVehicleSAInterfaceVTBL* vehicleVTBL = (CVehicleSAInterfaceVTBL*)(GetInterface()->vtbl);
@@ -1253,7 +1228,6 @@ bool CVehicleSA::BreakTowLink()
 
 CVehicle* CVehicleSA::GetTowedVehicle()
 {
-    DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* trailerVehicle = GetVehicleInterface()->m_trailerVehicle;
 
     if (trailerVehicle)
@@ -1267,7 +1241,6 @@ CVehicle* CVehicleSA::GetTowedVehicle()
 
 CVehicle* CVehicleSA::GetTowedByVehicle()
 {
-    DEBUG_TRACE("CVehicle * CVehicleSA::GetTowedVehicle ( void )");
     CVehicleSAInterface* towingVehicle = GetVehicleInterface()->m_towingVehicle;
 
     if (towingVehicle)
@@ -1549,7 +1522,6 @@ int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
 {
-    DEBUG_TRACE("void CVehicleSA::SetTaxiLight ( bool bLightOn )");
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwState = (DWORD)bLightOn;
     DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;

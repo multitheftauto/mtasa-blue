@@ -26,7 +26,6 @@ void  HOOK_Camera_CollisionDetection();
 
 CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
 {
-    DEBUG_TRACE("CCameraSA::CCameraSA(CCameraSAInterface * cameraInterface)");
     this->internalInterface = cameraInterface;
     for (int i = 0; i < MAX_CAMS; i++)
         this->Cams[i] = new CCamSA(&this->internalInterface->Cams[i]);
@@ -45,7 +44,6 @@ CCameraSA::~CCameraSA()
 
 void CCameraSA::Restore()
 {
-    DEBUG_TRACE("VOID CCameraSA::Restore()");
     DWORD               dwFunc = FUNC_Restore;
     CCameraSAInterface* cameraInterface = this->GetInterface();
     _asm
@@ -57,7 +55,6 @@ void CCameraSA::Restore()
 
 void CCameraSA::RestoreWithJumpCut()
 {
-    DEBUG_TRACE("VOID CCameraSA::RestoreWithJumpCut()");
     CCameraSAInterface* cameraInterface = this->GetInterface();
     DWORD               dwFunc = 0x50BD40;
     _asm
@@ -78,8 +75,6 @@ void CCameraSA::RestoreWithJumpCut()
  */
 void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle)
 {
-    DEBUG_TRACE("VOID CCameraSA::TakeControl(CEntity * entity, eCamMode CamMode, int CamSwitchStyle)");
-
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(entity);
     if (!pEntitySA)
         return;
@@ -102,7 +97,6 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
 
 void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
 {
-    DEBUG_TRACE("VOID CCameraSA::TakeControl(CVector * position, int CamSwitchStyle)");
     CCameraSAInterface* cameraInterface = this->GetInterface();
     // __thiscall
     CVector vecOffset;
@@ -191,8 +185,6 @@ void CCameraSA::RestoreLastGoodState()
 
 CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 {
-    DEBUG_TRACE("CMatrix * CCameraSA::GetMatrix ( CMatrix * matrix )");
-    // CCameraSAInterface * pCamInterface = this->GetInterface();
     CMatrix_Padded* pCamMatrix = &this->GetInterface()->m_cameraMatrix;            // ->Placeable.matrix;
     if (pCamMatrix)
     {
@@ -216,7 +208,6 @@ CMatrix* CCameraSA::GetMatrix(CMatrix* matrix)
 
 void CCameraSA::SetMatrix(CMatrix* matrix)
 {
-    DEBUG_TRACE("VOID CCameraSA::SetMatrix ( CMatrix * matrix )");
     CMatrix_Padded* pCamMatrix = this->GetInterface()->Placeable.matrix;
     if (pCamMatrix)
     {
@@ -229,7 +220,6 @@ void CCameraSA::SetMatrix(CMatrix* matrix)
 
 void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget)
 {
-    DEBUG_TRACE("VOID CCameraSA::Find3rdPersonCamTargetVector ( FLOAT fDistance, CVector * vecGunMuzzle, CVector * vecSource, CVector * vecTarget )");
     float               fOriginX = vecGunMuzzle->fX;
     float               fOriginY = vecGunMuzzle->fY;
     float               fOriginZ = vecGunMuzzle->fZ;
@@ -250,7 +240,6 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
 
 float CCameraSA::Find3rdPersonQuickAimPitch()
 {
-    DEBUG_TRACE("float CCameraSA::Find3rdPersonQuickAimPitch ( void )");
     float               fReturn;
     DWORD               dwFunc = FUNC_Find3rdPersonQuickAimPitch;
     CCameraSAInterface* cameraInterface = this->GetInterface();
@@ -265,15 +254,12 @@ float CCameraSA::Find3rdPersonQuickAimPitch()
 
 BYTE CCameraSA::GetActiveCam()
 {
-    DEBUG_TRACE("BYTE CCameraSA::GetActiveCam()");
     CCameraSAInterface* cameraInterface = this->GetInterface();
     return cameraInterface->ActiveCam;
 }
 
 CCam* CCameraSA::GetCam(BYTE bCameraID)
 {
-    DEBUG_TRACE("CCam * CCameraSA::GetCam(BYTE bCameraID)");
-
     if (bCameraID < MAX_CAMS)
         return Cams[bCameraID];
 
@@ -295,7 +281,6 @@ CCam* CCameraSA::GetCam(CCamSAInterface* camInterface)
 
 void CCameraSA::SetWidescreen(BOOL bWidescreen)
 {
-    DEBUG_TRACE("VOID CCameraSA::SetWidescreen(BOOL bWidescreen)");
     CCameraSAInterface* cameraInterface = this->GetInterface();
     if (bWidescreen == FALSE)
         cameraInterface->m_WideScreenOn = false;
@@ -305,7 +290,6 @@ void CCameraSA::SetWidescreen(BOOL bWidescreen)
 
 BOOL CCameraSA::GetWidescreen()
 {
-    DEBUG_TRACE("BOOL CCameraSA::GetWidescreen()");
     CCameraSAInterface* cameraInterface = this->GetInterface();
     return cameraInterface->m_WideScreenOn;
 }

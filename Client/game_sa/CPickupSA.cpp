@@ -15,7 +15,6 @@
 
 CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 {
-    DEBUG_TRACE("CPickupSA::CPickupSA(CPickupSAInterface * pickupInterface)");
     this->internalInterface = pickupInterface;
     this->callback = 0;
     this->object = 0;
@@ -23,7 +22,6 @@ CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 
 void CPickupSA::SetPosition(CVector* vecPosition)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetPosition(CVector * vecPosition)");
     this->GetInterface()->bIsPickupNearby = 0;
 
     CPickupSAInterface* iPickup = this->GetInterface();
@@ -34,7 +32,6 @@ void CPickupSA::SetPosition(CVector* vecPosition)
 
 CVector* CPickupSA::GetPosition(CVector* vecPosition)
 {
-    DEBUG_TRACE("CVector * CPickupSA::GetPosition(CVector * vecPosition)");
     CPickupSAInterface* iPickup = this->GetInterface();
     vecPosition->fX = iPickup->CoorsX / 8.0f;
     vecPosition->fY = iPickup->CoorsY / 8.0f;
@@ -44,103 +41,86 @@ CVector* CPickupSA::GetPosition(CVector* vecPosition)
 
 ePickupType CPickupSA::GetType()
 {
-    DEBUG_TRACE("ePickupType CPickupSA::GetType()");
     return (ePickupType)this->GetInterface()->Type;
 }
 
 void CPickupSA::SetType(ePickupType type)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetType(ePickupType type)");
     this->GetInterface()->Type = type;
 }
 
 float CPickupSA::GetCurrentValue()
 {
-    DEBUG_TRACE("FLOAT CPickupSA::GetCurrentValue()");
     return this->GetInterface()->CurrentValue;
 }
 
 void CPickupSA::SetCurrentValue(float fCurrentValue)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetCurrentValue(FLOAT fCurrentValue)");
     this->GetInterface()->CurrentValue = fCurrentValue;
 }
 
 void CPickupSA::SetRegenerationTime(DWORD dwTime)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetRegenerationTime(DWORD dwTime)");
     this->GetInterface()->RegenerationTime = dwTime;
 }
 
 void CPickupSA::SetMoneyPerDay(WORD wMoneyPerDay)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetMoneyPerDay(WORD wMoneyPerDay)");
     this->GetInterface()->MoneyPerDay = wMoneyPerDay;
 }
 
 WORD CPickupSA::GetMoneyPerDay()
 {
-    DEBUG_TRACE("WORD CPickupSA::GetMoneyPerDay()");
     return this->GetInterface()->MoneyPerDay;
 }
 
 WORD CPickupSA::GetModel()
 {
-    DEBUG_TRACE("WORD CPickupSA::GetModel()");
     return this->GetInterface()->MI;
 }
 
 void CPickupSA::SetModel(WORD wModelIndex)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetModel(WORD wModelIndex)");
     this->GetInterface()->MI = wModelIndex;
 }
 
 ePickupState CPickupSA::GetState()
 {
-    DEBUG_TRACE("ePickupState CPickupSA::GetState()");
     return (ePickupState)this->GetInterface()->State;
 }
 
 void CPickupSA::SetState(ePickupState bState)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetState(ePickupState bState)");
     this->GetInterface()->State = (BYTE)bState;
 }
 
 BYTE CPickupSA::GetAmmo()
 {
-    DEBUG_TRACE("BYTE CPickupSA::GetAmmo()");
     return this->GetInterface()->bNoAmmo;
 }
 
 void CPickupSA::SetAmmo(BYTE bAmmo)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetAmmo(BYTE bAmmo)");
     this->GetInterface()->bNoAmmo = bAmmo;
 }
 
 long CPickupSA::GetMonetaryValue()
 {
-    DEBUG_TRACE("long CPickupSA::GetMonetaryValue()");
     return this->GetInterface()->MonetaryValue;
 }
 
 void CPickupSA::SetMonetaryValue(long lMonetaryValue)
 {
-    DEBUG_TRACE("VOID CPickupSA::SetMonetaryValue(long lMonetaryValue)");
     this->GetInterface()->MonetaryValue = lMonetaryValue;
 }
 
 BYTE CPickupSA::IsNearby()
 {
-    DEBUG_TRACE("BYTE CPickupSA::IsNearby()");
     return this->GetInterface()->bIsPickupNearby;
 }
 
 void CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
 {
-    DEBUG_TRACE("VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)");
     DWORD GiveUsAPickUpObject = FUNC_GIVEUSAPICKUP;
     DWORD dwObject = (DWORD) & (this->GetInterface()->pObject);
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -165,7 +145,6 @@ void CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
 
 void CPickupSA::GetRidOfObjects()
 {
-    DEBUG_TRACE("VOID CPickupSA::GetRidOfObjects()");
     if (this->GetInterface()->pObject)
         ((CWorldSA*)pGame->GetWorld())->Remove(this->GetInterface()->pObject, CPickup_Destructor);
 

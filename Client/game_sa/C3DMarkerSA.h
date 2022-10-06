@@ -13,7 +13,6 @@
 
 #include <game/C3DMarker.h>
 #include <CMatrix_Pad.h>
-#include "Common.h"
 
 #define FUNC_DeleteMarkerObject 0x722390
 
@@ -55,7 +54,6 @@ private:
     C3DMarkerSAInterface* internalInterface;
 
 public:
-    // constructor
     C3DMarkerSA(C3DMarkerSAInterface* markerInterface) { internalInterface = markerInterface; };
 
     C3DMarkerSAInterface* GetInterface() { return internalInterface; }

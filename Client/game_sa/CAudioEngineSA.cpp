@@ -157,7 +157,6 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)            // may prevent a crash
     {
-        DEBUG_TRACE("VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwSound)");
         DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
         float fSpeed = 1.0f;
         float fVolumeChange = 0.0f;
@@ -224,7 +223,6 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0)            // may prevent a crash
     {
-        DEBUG_TRACE("VOID CAudioEngineSA::PlayBeatTrack ( short iTrack )");
         DWORD dwFunc = FUNC_PreloadBeatTrack;
         DWORD dwTrack = iTrack;
         _asm

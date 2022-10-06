@@ -68,7 +68,6 @@ struct CFileObjectInstance
 
 CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
 {
-    DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
     this->SetInterface(objectInterface);
     m_ucAlpha = 255;
 
@@ -86,8 +85,6 @@ CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
 
 CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 {
-    DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
-
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
     DWORD dwThis = 0;
@@ -221,8 +218,6 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 
 CObjectSA::~CObjectSA()
 {
-    DEBUG_TRACE("CObjectSA::~CObjectSA( )");
-    // OutputDebugString("Attempting to destroy Object\n");
     if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
         CEntitySAInterface* pInterface = GetInterface();

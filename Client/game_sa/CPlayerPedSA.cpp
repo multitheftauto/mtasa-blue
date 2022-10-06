@@ -24,7 +24,6 @@ static std::set<SString>   ms_DoneAnimBlockRefMap;
 
 CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
 {
-    DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( ePedModel pedType )");
     // based on CPlayerPed::SetupPlayerPed (R*)
     DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
     DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
@@ -95,7 +94,6 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
 
 CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 {
-    DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( CPedSAInterface * ped )");
     // based on CPlayerPed::SetupPlayerPed (R*)
     this->SetInterface((CEntitySAInterface*)pPlayer);
 
@@ -126,7 +124,6 @@ CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 
 CPlayerPedSA::~CPlayerPedSA()
 {
-    DEBUG_TRACE("CPlayerPedSA::~CPlayerPedSA( )");
     if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
         DWORD dwInterface = (DWORD)m_pInterface;

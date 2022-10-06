@@ -13,7 +13,6 @@
 
 #include <game/CWeaponInfo.h>
 #include <CVector.h>
-#include "Common.h"
 
 // Flame shot array for flamethrower flames and maybe molotovs
 #define ARRAY_CFlameShotInfo                0xC89690
@@ -96,7 +95,6 @@ private:
     CWeaponInfoSAInterface* internalInterface;
 
 public:
-    // constructor
     CWeaponInfoSA(CWeaponInfoSAInterface* weaponInfoInterface, eWeaponType weaponType)
     {
         internalInterface = weaponInfoInterface;

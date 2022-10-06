@@ -67,7 +67,6 @@ CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
 
 BOOL CModelInfoSA::IsBoat()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBoat ( )");
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -83,7 +82,6 @@ BOOL CModelInfoSA::IsBoat()
 
 BOOL CModelInfoSA::IsCar()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsCar ( )");
     DWORD dwFunction = FUNC_IsCarModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -99,7 +97,6 @@ BOOL CModelInfoSA::IsCar()
 
 BOOL CModelInfoSA::IsTrain()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsTrain ( )");
     DWORD dwFunction = FUNC_IsTrainModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -115,7 +112,6 @@ BOOL CModelInfoSA::IsTrain()
 
 BOOL CModelInfoSA::IsHeli()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsHeli ( )");
     DWORD dwFunction = FUNC_IsHeliModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -131,7 +127,6 @@ BOOL CModelInfoSA::IsHeli()
 
 BOOL CModelInfoSA::IsPlane()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsPlane ( )");
     DWORD dwFunction = FUNC_IsPlaneModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -147,7 +142,6 @@ BOOL CModelInfoSA::IsPlane()
 
 BOOL CModelInfoSA::IsBike()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBike ( )");
     DWORD dwFunction = FUNC_IsBikeModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -163,7 +157,6 @@ BOOL CModelInfoSA::IsBike()
 
 BOOL CModelInfoSA::IsFakePlane()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsFakePlane ( )");
     DWORD dwFunction = FUNC_IsFakePlaneModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -179,7 +172,6 @@ BOOL CModelInfoSA::IsFakePlane()
 
 BOOL CModelInfoSA::IsMonsterTruck()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsMonsterTruck ( )");
     DWORD dwFunction = FUNC_IsMonsterTruckModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -195,7 +187,6 @@ BOOL CModelInfoSA::IsMonsterTruck()
 
 BOOL CModelInfoSA::IsQuadBike()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsQuadBike ( )");
     DWORD dwFunction = FUNC_IsQuadBikeModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -211,7 +202,6 @@ BOOL CModelInfoSA::IsQuadBike()
 
 BOOL CModelInfoSA::IsBmx()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBmx ( )");
     DWORD dwFunction = FUNC_IsBmxModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -227,7 +217,6 @@ BOOL CModelInfoSA::IsBmx()
 
 BOOL CModelInfoSA::IsTrailer()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsTrailer ( )");
     DWORD dwFunction = FUNC_IsTrailerModel;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = 0;
@@ -243,7 +232,6 @@ BOOL CModelInfoSA::IsTrailer()
 
 BYTE CModelInfoSA::GetVehicleType()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsVehicle ( )");
     // This function will return a vehicle type for vehicles or 0xFF on failure
     DWORD dwFunction = FUNC_IsVehicleModelType;
     DWORD ModelID = m_dwModelID;
@@ -281,9 +269,6 @@ BOOL CModelInfoSA::IsUpgrade()
 
 char* CModelInfoSA::GetNameIfVehicle()
 {
-    DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
-    //  if(this->IsVehicle())
-    //  {
     DWORD dwModelInfo = (DWORD)ARRAY_ModelInfo;
     DWORD dwFunc = FUNC_CText_Get;
     DWORD ModelID = m_dwModelID;
@@ -312,8 +297,6 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     eax
         }
     return (char*)dwReturn;
-    //  }
-    //  return NULL;
 }
 
 uint CModelInfoSA::GetAnimFileIndex()
@@ -335,7 +318,6 @@ uint CModelInfoSA::GetAnimFileIndex()
 
 void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
 {
-    DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
     if (IsLoaded())
         return;
@@ -401,8 +383,6 @@ void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
 
 void CModelInfoSA::Remove()
 {
-    DEBUG_TRACE("VOID CModelInfoSA::Remove ( )");
-
     // Don't remove if GTA refers to it somehow.
     // Or we'll screw up SA's map for example.
 
@@ -459,8 +439,6 @@ BOOL CModelInfoSA::IsLoaded()
 
 BOOL CModelInfoSA::DoIsLoaded()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::DoIsLoaded ( )");
-
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
     BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 

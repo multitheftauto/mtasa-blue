@@ -26,5 +26,4 @@
 
 // Game includes
 #include "HookSystem.h"
-#include "Common.h"
 #include "gamesa_init.h"

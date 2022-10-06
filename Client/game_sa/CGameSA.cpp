@@ -116,7 +116,6 @@ CGameSA::CGameSA()
         ObjectGroupsInfo[i].SetGroup(i);
     }
 
-    DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
     this->m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
@@ -303,8 +302,6 @@ CGameSA::~CGameSA()
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 {
-    DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
-
     if ((skill == WEAPONSKILL_STD && weapon >= WEAPONTYPE_UNARMED && weapon < WEAPONTYPE_LAST_WEAPONTYPE) ||
         (skill != WEAPONSKILL_STD && weapon >= WEAPONTYPE_PISTOL && weapon <= WEAPONTYPE_TEC9))
     {
@@ -339,7 +336,6 @@ void CGameSA::Pause(bool bPaused)
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
     if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
@@ -357,7 +353,6 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  */
 void CGameSA::StartGame()
 {
-    DEBUG_TRACE("VOID CGameSA::StartGame()");
     this->SetSystemState(GS_INIT_PLAYING_GAME);
     MemPutFast<BYTE>(0xB7CB49, 0); // CTimer::m_UserPause
     MemPutFast<BYTE>(0xBA67A4, 0); // FrontEndMenuManager + 0x5C
@@ -369,13 +364,11 @@ void CGameSA::StartGame()
  */
 void CGameSA::SetSystemState(eSystemState State)
 {
-    DEBUG_TRACE("VOID CGameSA::SetSystemState( eSystemState State )");
     *VAR_SystemState = (DWORD)State;
 }
 
 eSystemState CGameSA::GetSystemState()
 {
-    DEBUG_TRACE("eSystemState CGameSA::GetSystemState( )");
     return (eSystemState)*VAR_SystemState;
 }
 
@@ -385,8 +378,6 @@ eSystemState CGameSA::GetSystemState()
  */
 BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
-    DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
-
     CPoolsSA* pools = (CPoolsSA*)this->GetPools();
     if (pools)
     {
@@ -933,7 +924,6 @@ CPed* CGameSA::GetPedContext()
 
 CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
 {
-    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
         return &ObjectGroupsInfo[ucObjectGroup];
 

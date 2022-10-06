@@ -17,7 +17,6 @@ extern CGameSA* pGame;
 
 CFireManagerSA::CFireManagerSA()
 {
-    DEBUG_TRACE("CFireManagerSA::CFireManagerSA()");
     for (int i = 0; i < MAX_FIRES; i++)
         this->Fires[i] = new CFireSA(
             (CFireSAInterface*)(CLASS_CFireManager + 40 * i));            // + 4 because thats the position of CFire array in CFireManager (see source)
@@ -33,7 +32,6 @@ CFireManagerSA::~CFireManagerSA()
 
 void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 {
-    DEBUG_TRACE("VOID CFireManagerSA::ExtinguishPoint ( CVector & vecPosition, float fRadius )");
     float fX = vecPosition.fX;
     float fY = vecPosition.fY;
     float fZ = vecPosition.fZ;
@@ -52,7 +50,6 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 
 CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
-    DEBUG_TRACE("CFire * CFireManagerSA::StartFire ( CEntity * entityTarget, CEntity * entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )");
     CFire* fire = this->FindFreeFire();
 
     if (fire != NULL)
@@ -69,7 +66,6 @@ CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, 
 
 CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
-    DEBUG_TRACE("CFire * CFireManagerSA::StartFire ( CVector & vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )");
     CFire* fire = this->FindFreeFire();
 
     if (fire != NULL)
@@ -86,7 +82,6 @@ CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIR
 
 void CFireManagerSA::ExtinguishAllFires()
 {
-    DEBUG_TRACE("VOID CFireManagerSA::ExtinguishAllFires (  )");
     CFireSA* fire;
     for (int i = 0; i < MAX_FIRES; i++)
     {
@@ -98,7 +93,6 @@ void CFireManagerSA::ExtinguishAllFires()
 
 CFire* CFireManagerSA::GetFire(DWORD ID)
 {
-    DEBUG_TRACE("CFire * CFireManagerSA::GetFire ( DWORD ID )");
     if (ID < MAX_FIRES)
         return Fires[ID];
     else
@@ -107,13 +101,11 @@ CFire* CFireManagerSA::GetFire(DWORD ID)
 
 DWORD CFireManagerSA::GetFireCount()
 {
-    DEBUG_TRACE("DWORD CFireManagerSA::GetFireCount (  )");
     return *(DWORD*)CLASS_CFireManager;
 }
 
 CFire* CFireManagerSA::FindFreeFire()
 {
-    DEBUG_TRACE("CFire * CFireManagerSA::FindFreeFire (  )");
     CFireSA* fire;
     for (int i = 0; i < MAX_FIRES; i++)
     {
@@ -126,7 +118,6 @@ CFire* CFireManagerSA::FindFreeFire()
 
 CFire* CFireManagerSA::GetFire(CFireSAInterface* fire)
 {
-    DEBUG_TRACE("CFire * CFireManagerSA::GetFire ( CFireSAInterface * fire )");
     DWORD dwID = ((DWORD)fire - CLASS_CFireManager + 4) / sizeof(CFireSAInterface);
     return GetFire(dwID);
 }

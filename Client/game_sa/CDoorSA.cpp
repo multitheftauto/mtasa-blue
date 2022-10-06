@@ -18,7 +18,6 @@
  */
 float CDoorSA::GetAngleOpenRatio()
 {
-    DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
     DWORD dwFunction = FUNC_GetAngleOpenRatio;
     DWORD dwPointer = (DWORD)GetInterface();
     float fReturn = 0.0f;
@@ -42,7 +41,6 @@ float CDoorSA::GetAngleOpenRatio()
  */
 BOOL CDoorSA::IsClosed()
 {
-    DEBUG_TRACE("BOOL CDoorSA::IsClosed (  )");
     DWORD dwFunction = FUNC_IsClosed;
     DWORD dwPointer = (DWORD)GetInterface();
     BYTE  bReturn = 0;
@@ -67,7 +65,6 @@ BOOL CDoorSA::IsClosed()
  */
 BOOL CDoorSA::IsFullyOpen()
 {
-    DEBUG_TRACE("BOOL CDoorSA::IsFullyOpen (  )");
     DWORD dwFunction = FUNC_IsFullyOpen;
     DWORD dwPointer = (DWORD)GetInterface();
     BYTE  bReturn = 0;
@@ -92,7 +89,6 @@ BOOL CDoorSA::IsFullyOpen()
  */
 void CDoorSA::Open(float fOpenRatio)
 {
-    DEBUG_TRACE("VOID CDoorSA::Open ( float fOpenRatio )");
     DWORD dwFunction = FUNC_Open;
     DWORD dwPointer = (DWORD)GetInterface();
 
