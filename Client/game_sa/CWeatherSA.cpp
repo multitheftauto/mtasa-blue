@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CWeatherSA.h"
 
 unsigned char* CWeatherSA::VAR_CWeather__ForcedWeatherType;
 unsigned char* CWeatherSA::VAR_CWeather__OldWeatherType;

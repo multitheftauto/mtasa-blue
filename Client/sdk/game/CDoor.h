@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <windows.h>
-
 #include "Common.h"
 
 class CDoor

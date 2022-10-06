@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDoorSA.h"
 
 /**
  * \todo Find out what GetAngleOpenRatio actually does

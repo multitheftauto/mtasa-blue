@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTrailerSA.h"
 
 CTrailerSA::CTrailerSA(CTrailerSAInterface* trailer) : CAutomobileSA(trailer)
 {

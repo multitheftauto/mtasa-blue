@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CPickupsSA.h"
 #include "CPickupSA.h"
+#include "CWorldSA.h"
 
 CPickupsSA::CPickupsSA()
 {

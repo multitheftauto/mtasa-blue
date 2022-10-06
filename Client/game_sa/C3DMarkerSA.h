@@ -68,8 +68,8 @@ public:
     void     SetType(DWORD dwType);            // doesn't work propperly (not virtualed)
     BOOL     IsActive();
     DWORD    GetIdentifier();
-    SColor   GetColor();
-    void     SetColor(const SColor color);            // actually BGRA
+    SharedUtil::SColor   GetColor();
+    void     SetColor(const SharedUtil::SColor color);            // actually BGRA
     void     SetPulsePeriod(WORD wPulsePeriod);
     void     SetRotateRate(short RotateRate);
     float    GetSize();

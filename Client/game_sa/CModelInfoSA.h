@@ -11,12 +11,14 @@
 
 #pragma once
 
-#include <game/CModelInfo.h>
 #include <game/Common.h>
+#include <game/CModelInfo.h>
 #include "CRenderWareSA.h"
 
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
+struct CColModelSAInterface;
+struct RpMaterial;
 
 #define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
 
@@ -87,7 +89,7 @@ public:
     DWORD Shutdown;                              // ()
     DWORD DeleteRwObject;                        // ()           - Not defined in the base
     DWORD GetRwModelType;                        // ()           - Not defined in the base
-    DWORD CreateInstance_;                       // (RwMatrixTag*)   - Not defined in the base
+    DWORD CreateInstance_;                       // (RwMatrix*)   - Not defined in the base
     DWORD CreateInstance;                        // ()           - Not defined in the base
     DWORD SetAnimFile;                           // (char const*)
     DWORD ConvertAnimFileIndex;                  // ()

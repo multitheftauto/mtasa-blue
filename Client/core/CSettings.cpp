@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
+#include <game/CSettings.h>
 
 using namespace std;
 

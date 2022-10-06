@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CRenderWare.h>
+#include <game/CSettings.h>
 #include "CRenderItem.EffectCloner.h"
 
 // Type of vertex used to emulate StretchRect for SwiftShader bug

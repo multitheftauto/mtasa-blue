@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 #include "CWeaponSA.h"
+#include "CColPointSA.h"
+#include "CPlayerPedSA.h"
+#include "CWeaponStatManagerSA.h"
+#include "CWeaponStatSA.h"
+#include "CWorldSA.h"
 
 CWeaponSA::CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot)
 {

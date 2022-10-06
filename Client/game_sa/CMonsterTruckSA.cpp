@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMonsterTruckSA.h"
 
 CMonsterTruckSA::CMonsterTruckSA(CMonsterTruckSAInterface* monstertruck) : CAutomobileSA(monstertruck)
 {

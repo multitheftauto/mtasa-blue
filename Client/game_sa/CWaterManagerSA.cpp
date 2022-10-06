@@ -10,7 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CWaterManagerSA.h"
+
 extern int ms_iNumNonDefaultAndNonZeroVertices;
+
+#define WATER_VISIBLE 1
+#define WATER_SHALLOW 2
 
 using namespace std;
 

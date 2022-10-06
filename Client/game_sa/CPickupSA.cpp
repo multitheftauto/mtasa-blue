@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CPickupSA.h"
+#include "CWorldSA.h"
 
 CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 {

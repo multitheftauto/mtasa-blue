@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <windows.h>
-
 // Not sure if R* used these
 #define DT_ENGINE_OK                    (0)
 #define DT_ENGINE_RADIATOR_BURST        (100)
@@ -91,7 +89,6 @@ enum eWheelPosition
     REAR_RIGHT_WHEEL,
 
     MAX_WHEELS
-
 };
 
 enum ePanels

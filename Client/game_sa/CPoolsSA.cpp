@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPoolsSA.h"
+#include "CBikeSA.h"
+#include "CBoatSA.h"
+#include "CPlayerPedSA.h"
+#include "CWorldSA.h"
 
 extern bool g_bVehiclePointerInvalid;
 

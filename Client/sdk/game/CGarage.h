@@ -11,13 +11,8 @@
 
 #pragma once
 
-#include "Common.h"
-#include <CVector.h>
-
-class CGarageInterface
-{
-public:
-};
+class CGarageSAInterface;
+class CVector;
 
 class CGarage
 {
@@ -33,5 +28,5 @@ public:
     virtual void SetOpen(bool bOpen) = 0;
     virtual bool IsOpen() const = 0;
 
-    virtual CGarageInterface* GetInterface() = 0;
+    virtual CGarageSAInterface* GetInterface() = 0;
 };

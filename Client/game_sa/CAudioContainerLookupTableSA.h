@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "CAudioContainerSA.h"
+
 struct SAudioLookupEntrySA;
 
 class CAudioContainerLookupTableSA

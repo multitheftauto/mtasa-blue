@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClockSA.h"
 
 extern CGameSA* pGame;
 

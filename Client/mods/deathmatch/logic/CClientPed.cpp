@@ -9,7 +9,28 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "game/CAnimBlendAssocGroup.h"
+#include <game/CAEVehicleAudioEntity.h>
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CAnimManager.h>
+#include <game/CCam.h>
+#include <game/CCarEnterExit.h>
+#include <game/CColPoint.h>
+#include <game/CPedIntelligence.h>
+#include <game/CPedSound.h>
+#include <game/CStreaming.h>
+#include <game/CTaskManager.h>
+#include <game/CTasks.h>
+#include <game/CVisibilityPlugins.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
+#include <game/TaskBasic.h>
+#include <game/TaskCar.h>
+#include <game/TaskCarAccessories.h>
+#include <game/TaskIK.h>
+#include <game/TaskJumpFall.h>
+#include <game/TaskPhysicalResponse.h>
+#include <game/TaskAttack.h>
 
 using std::list;
 using std::vector;

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBoatSA.h"
 
 CBoatSA::CBoatSA(CBoatSAInterface* boat)
 {

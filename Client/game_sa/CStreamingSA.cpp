@@ -10,8 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
-#include "CModelInfoSA.h"
+#include "CStreamingSA.h"
 
 // count: 26316 in unmodified game
 CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;

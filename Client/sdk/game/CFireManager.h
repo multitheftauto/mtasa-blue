@@ -11,9 +11,8 @@
 
 #pragma once
 
-#include <CVector.h>
-#include "CFire.h"
-#include "CEntity.h"
+class CFire;
+class CVector;
 
 class CFireManager
 {

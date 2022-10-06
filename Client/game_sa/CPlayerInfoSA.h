@@ -50,7 +50,7 @@ public:
     long         m_nStandStillTimer;                // 32
     DWORD        m_nHitAnimDelayTimer;              // 36
     float        m_fAttackButtonCounter;            // 40
-    CAutomobile* m_pDangerCar;                      // 44
+    CAutomobileSAInterface* m_pDangerCar;                      // 44
 
     DWORD m_bStoppedMoving : 1;            // 48
     DWORD m_bAdrenaline : 1;

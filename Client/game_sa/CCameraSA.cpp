@@ -10,9 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-/**
- * \todo Need to add other TakeControl functions
- */
+#include "CCameraSA.h"
 
 unsigned long CCameraSA::FUNC_RwFrameGetLTM;
 static bool   bCameraClipObjects;

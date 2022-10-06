@@ -80,6 +80,7 @@ enum eClientEntityType
     CCLIENTUNKNOWN,
 };
 
+class CEntity;
 class CClientColShape;
 class CClientPed;
 class CCustomData;

@@ -11,10 +11,10 @@
 
 #pragma once
 
-#include <windows.h>
-#include "CVehicle.h"
-
+class CEntity;
 class CEntitySAInterface;
+class CPhysical;
+class CVector;
 
 struct SWorldSoundEvent
 {

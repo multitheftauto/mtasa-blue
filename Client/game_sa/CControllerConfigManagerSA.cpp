@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CControllerConfigManagerSA.h"
 
 #define VAR_InputType       ( ( BYTE * ) ( 0xB6EC2E ) )
 #define VAR_MouseInverted   ( ( BYTE * ) ( 0xBA6745 ) )

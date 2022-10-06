@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CRegisteredCoronaSA.h"
+#include "CCoronasSA.h"
 
 CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface)
 {

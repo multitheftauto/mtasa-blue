@@ -11,18 +11,25 @@
 
 #pragma once
 
-#include "Common.h"
-#include "CColPoint.h"
-#include "CPhysical.h"
-#include "CDamageManager.h"
-#include "CHandlingManager.h"
-#include "CDoor.h"
-#include "CWeaponInfo.h"
-#include "CAEVehicleAudioEntity.h"
-
+#include <vector>
+#include <map>
 #include <CVector.h>
+#include "Common.h"
+#include "CPhysical.h"
+#include "CWeaponInfo.h"
+#include "CDamageManager.h"
 
-#include <windows.h>
+class CAEVehicleAudioEntity;
+class CColModel;
+class CDoor;
+class CEntity;
+class CFlyingHandlingEntry;
+class CHandlingEntry;
+class CMatrix;
+class CObject;
+class CPed;
+class SString;
+struct RwFrame;
 
 enum eWinchType
 {
@@ -43,11 +50,6 @@ enum eDoorLock : int32_t
     DOOR_LOCK_SKIP_SHUT_DOORS,
 };
 
-// forward declaration, avoid compile error
-class CPed;
-class CObject;
-class CColModel;
-
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST 6
 #define SIREN_ID_MAX 7
@@ -56,7 +58,7 @@ class CColModel;
 struct SSirenBeaconInfo
 {
     CVector m_vecSirenPositions;
-    SColor  m_RGBBeaconColour;
+    SharedUtil::SColor  m_RGBBeaconColour;
     DWORD   m_dwMinSirenAlpha;
 };
 struct SSirenInfo
@@ -73,7 +75,7 @@ struct SSirenInfo
     unsigned char                    m_ucCurrentSirenID;
     unsigned char                    m_ucCurrentSirenRandomiser;
     SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
-    SColor                           m_tPointLightColour;
+    SharedUtil::SColor               m_tPointLightColour;
 };
 
 struct SVehicleFrame
@@ -148,8 +150,9 @@ public:
 
     virtual void          PlaceBikeOnRoadProperly() = 0;
     virtual void          PlaceAutomobileOnRoadProperly() = 0;
-    virtual void          SetColor(SColor color1, SColor color2, SColor color3, SColor color4, int) = 0;
-    virtual void          GetColor(SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA) = 0;
+    virtual void          SetColor(SharedUtil::SColor color1, SharedUtil::SColor color2, SharedUtil::SColor color3, SharedUtil::SColor color4, int) = 0;
+    virtual void          GetColor(SharedUtil::SColor* color1, SharedUtil::SColor* color2, SharedUtil::SColor* color3, SharedUtil::SColor* color4,
+                                   bool bFixedForGTA) = 0;
     virtual void          Fix() = 0;
     virtual bool          IsSirenOrAlarmActive() = 0;
     virtual void          SetSirenOrAlarmActive(bool bActive) = 0;
@@ -281,14 +284,14 @@ public:
     virtual unsigned char                     GetVehicleSirenCount() = 0;
     virtual unsigned char                     GetVehicleSirenType() = 0;
     virtual DWORD                             GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) = 0;
-    virtual SColor                            GetVehicleSirenColour(unsigned char ucSirenCount) = 0;
-    virtual void                              SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour) = 0;
+    virtual SharedUtil::SColor                GetVehicleSirenColour(unsigned char ucSirenCount) = 0;
+    virtual void                              SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour) = 0;
     virtual void                              SetVehicleCurrentSirenID(unsigned char ucCurrentSirenID) = 0;
     virtual unsigned char                     GetVehicleCurrentSirenID() = 0;
     virtual unsigned char                     GetSirenRandomiser() = 0;
     virtual void                              SetSirenRandomiser(unsigned char ucSirenRandomiser) = 0;
-    virtual void                              SetPointLightColour(SColor tPointLightColour) = 0;
-    virtual SColor                            GetPointLightColour() = 0;
+    virtual void                              SetPointLightColour(SharedUtil::SColor tPointLightColour) = 0;
+    virtual SharedUtil::SColor                GetPointLightColour() = 0;
     virtual bool                              IsSiren360EffectEnabled() = 0;
     virtual bool                              IsSirenLOSCheckEnabled() = 0;
     virtual bool                              IsSirenRandomiserEnabled() = 0;

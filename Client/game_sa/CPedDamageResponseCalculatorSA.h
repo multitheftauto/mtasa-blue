@@ -13,6 +13,11 @@
 
 #include <game/CPedDamageResponseCalculator.h>
 
+class CEntity;
+class CEntitySAInterface;
+class CPed;
+class CPedDamageResponse;
+
 #define FUNC_CPedDamageResponseCalculator_Constructor               0x4ad3f0
 #define FUNC_CPedDamageResponseCalculator_Destructor                0x4ad420
 #define FUNC_CPedDamageResponseCalculator_ComputeDamageResponse     0x4b5ac0

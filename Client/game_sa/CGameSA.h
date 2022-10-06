@@ -11,12 +11,13 @@
 
 #pragma once
 #include <game/CGame.h>
-#include "CModelInfoSA.h"
-#include "CObjectGroupPhysicalPropertiesSA.h"
+#include <game/RenderWare.h>
 #include "CFxManagerSA.h"
-#include <game/CStreaming.h>
+#include "CModelInfoSA.h"
+#include "CStreamingSA.h"
 
 class CAnimBlendClumpDataSAInterface;
+class CObjectGroupPhysicalPropertiesSA;
 class CTaskManagementSystemSA;
 
 extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
@@ -289,7 +290,6 @@ private:
     CFireManager*                   m_pFireManager;
     CGarages*                       m_pGarages;
     CHud*                           m_pHud;
-    CWanted*                        m_pWanted;
     CWeather*                       m_pWeather;
     CWorld*                         m_pWorld;
     CCamera*                        m_pCamera;

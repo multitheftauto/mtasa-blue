@@ -10,8 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CRect.h>
 #include "gamesa_renderware.h"
 #include "BoneNode_cSA.h"
+#include "CColModelSA.h"
+#include "CEntitySA.h"
+#include "CVehicleSA.h"
+#include "CWorldSA.h"
+#include "CMatrixSA.h"
 
 extern CGameSA* pGame;
 
@@ -596,7 +602,7 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
     else return false;
 }
 
-RwMatrixTag* CEntitySA::GetBoneRwMatrix(eBone boneId)
+RwMatrix* CEntitySA::GetBoneRwMatrix(eBone boneId)
 {
     RpClump* clump = GetRpClump();
     if (!clump)
@@ -613,7 +619,7 @@ RwMatrixTag* CEntitySA::GetBoneRwMatrix(eBone boneId)
 
 bool CEntitySA::SetBoneMatrix(eBone boneId, const CMatrix& matrix)
 {
-    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (rwBoneMatrix)
     {
         CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
@@ -674,7 +680,7 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
 
 bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
 {
-    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (rwBoneMatrix)
     {
         const RwV3d& pos = rwBoneMatrix->pos;
@@ -687,7 +693,7 @@ bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
 // NOTE: The position will be reset if UpdateElementRpHAnim is called after this.
 bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
 {
-    RwMatrixTag* rwBoneMatrix = GetBoneRwMatrix(boneId);
+    RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (rwBoneMatrix)
     {
         CMatrixSAInterface boneMatrix(rwBoneMatrix, false);

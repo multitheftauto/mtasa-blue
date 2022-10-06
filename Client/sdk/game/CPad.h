@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <windows.h>
-
 // Set values to 128 unless otherwise specified
 class CControllerState
 {

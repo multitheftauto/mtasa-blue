@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CObjectSA.h"
+#include "CPoolsSA.h"
+#include "CRopesSA.h"
+#include "CWorldSA.h"
 
 //#define MTA_USE_BUILDINGS_AS_OBJECTS
 

@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 #include "TaskAttackSA.h"
+#include "CEntitySA.h"
+#include "CPedSA.h"
 
 CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage,
                                                    char nDrivebyStyle, bool bSeatRHS)

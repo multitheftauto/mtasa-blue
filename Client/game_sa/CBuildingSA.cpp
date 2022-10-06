@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBuildingSA.h"
+#include "CWorldSA.h"
 
 CBuildingSA::CBuildingSA(CBuildingSAInterface* objectInterface)
 {

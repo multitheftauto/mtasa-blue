@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHudSA.h"
 
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};

@@ -10,9 +10,7 @@
 
 #pragma once
 #include <game/CWeaponStat.h>
-
-class CWeaponInfoSA;
-class CWeaponInfoSAInterface;
+#include "CWeaponInfoSA.h"
 
 class CWeaponStatSA : public CWeaponStat
 {

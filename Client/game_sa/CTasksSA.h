@@ -13,35 +13,35 @@
 
 #include <game/CTasks.h>
 
-class CTaskManagementSystemSA;
-class CTaskSimplePlayerOnFoot;
+class CTaskComplexDie;
+class CTaskComplexEnterBoatAsDriver;
+class CTaskComplexEnterCarAsDriver;
+class CTaskComplexEnterCarAsPassenger;
 class CTaskComplexFacial;
+class CTaskComplexLeaveCar;
+class CTaskComplexSunbathe;
+class CTaskComplexUseMobilePhone;
+class CTaskComplexWanderStandard;
+class CTaskManagementSystemSA;
+class CTaskSimpleBeHit;
 class CTaskSimpleCarSetPedInAsDriver;
 class CTaskSimpleCarSetPedInAsPassenger;
 class CTaskSimpleCarSetPedOut;
-class CTaskComplexWanderStandard;
-class CTaskComplexEnterCarAsDriver;
-class CTaskComplexEnterCarAsPassenger;
-class CTaskComplexEnterBoatAsDriver;
-class CTaskComplexUseMobilePhone;
-class CTaskComplexLeaveCar;
-class CTaskSimpleDuck;
 class CTaskSimpleChoking;
 class CTaskSimpleClimb;
-class CTaskSimpleJetPack;
-class CTaskSimpleRunAnim;
-class CTaskSimpleRunNamedAnim;
-class CTaskComplexDie;
-class CTaskSimpleStealthKill;
 class CTaskSimpleDead;
-class CTaskSimpleBeHit;
-class CTaskComplexSunbathe;
+class CTaskSimpleDuck;
+class CTaskSimpleFight;
+class CTaskSimpleGangDriveBy;
 class CTaskSimpleIKChain;
 class CTaskSimpleIKLookAt;
+class CTaskSimpleJetPack;
+class CTaskSimplePlayerOnFoot;
+class CTaskSimpleRunAnim;
+class CTaskSimpleRunNamedAnim;
+class CTaskSimpleStealthKill;
 class CTaskSimpleTriggerLookAt;
-class CTaskSimpleGangDriveBy;
 class CTaskSimpleUseGun;
-class CTaskSimpleFight;
 
 class CTasksSA : public CTasks
 {

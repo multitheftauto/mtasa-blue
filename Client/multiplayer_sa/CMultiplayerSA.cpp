@@ -10,7 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "game/CAnimBlendAssocGroup.h"
+#include <game/CWorld.h>
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CPedDamageResponse.h>
+#include <game/CEventList.h>
+#include <game/CEventDamage.h>
+
+class CEventDamageSAInterface;
 
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;

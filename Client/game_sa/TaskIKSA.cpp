@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "TaskIKSA.h"
+#include "CEntitySA.h"
 #include "CTaskManagementSystemSA.h"
 
 extern CGameSA* pGame;

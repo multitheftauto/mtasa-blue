@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRopesSA.h"
+
 DWORD dwDurationAddress = 0x558D1El;
 
 CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface(*)[8])0xB768B8;

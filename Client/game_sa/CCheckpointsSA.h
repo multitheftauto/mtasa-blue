@@ -33,6 +33,6 @@ public:
     ~CCheckpointsSA();
 
     CCheckpoint* CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, float fSize, float fPulseFraction,
-                                  const SColor color);
+                                  const SharedUtil::SColor color);
     CCheckpoint* FindFreeMarker();
 };

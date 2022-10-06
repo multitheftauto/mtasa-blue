@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAnimBlendAssocGroupSA.h"
+#include "CAnimManagerSA.h"
+#include "CPlayerInfoSA.h"
+#include "CPlayerPedSA.h"
+#include "CWorldSA.h"
+
+class CPedClothesDesc;
 
 static CPedClothesDesc*    pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;

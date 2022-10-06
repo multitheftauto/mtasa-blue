@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBmxSA.h"
 
 CBmxSA::CBmxSA(CBmxSAInterface* bmx)
 {

@@ -11,24 +11,19 @@
 
 #pragma once
 
-class CTaskManager;
-
+#include <memory>
 #include "Common.h"
 #include "CPhysical.h"
-#include "CWeapon.h"
-#include "CPedIntelligence.h"
-#include "CPedSound.h"
-#include "CPedIK.h"
-#include <CVector2D.h>
 
-#include <windows.h>
-
-// forward declaration, avoid compile error
-class CVehicle;
 class CObject;
-class CWeaponStat;
-
+class CPedIK;
 class CPedIKSAInterface;
+class CPedIntelligence;
+class CPedSound;
+class CTaskManager;
+class CVehicle;
+class CWeapon;
+class CWeaponStat;
 
 enum ePedPieceTypes
 {

@@ -20,6 +20,8 @@
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
 
+class CEntitySAInterface;
+
 struct SRwResourceStats
 {
     uint uiTextures;

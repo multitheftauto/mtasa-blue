@@ -11,6 +11,8 @@
 #pragma once
 
 #include <list>
+#include <game/CWeaponStatManager.h>
+#include "CWeaponStatSA.h"
 
 // Straight out of CGameSA.h
 #define     CLASSSIZE_WeaponInfo            112         // ##SA##

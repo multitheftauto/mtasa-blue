@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 #include "CExplosionSA.h"
+#include "CEntitySA.h"
+#include "CVehicleSA.h"
 
 eExplosionType CExplosionSA::GetExplosionType()
 {

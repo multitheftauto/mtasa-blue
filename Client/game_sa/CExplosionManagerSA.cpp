@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CExplosionManagerSA.h"
 #include "CExplosionSA.h"
+#include "CEntitySA.h"
 
 CExplosionManagerSA::CExplosionManagerSA()
 {

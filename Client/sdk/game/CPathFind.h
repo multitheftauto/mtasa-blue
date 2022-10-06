@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <CVector.h>
+class CVector;
 
 // This class can be used to retrieve a CPathNode if required, using GetPathNode(..)
 class CNodeAddress

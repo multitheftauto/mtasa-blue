@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <game/RenderWare.h>
 #include <game/CAnimBlendAssociation.h>
 #include "CAnimBlendNodeSA.h"
 

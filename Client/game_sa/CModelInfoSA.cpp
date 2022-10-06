@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 #include "gamesa_renderware.h"
+#include "CModelInfoSA.h"
+#include "CColModelSA.h"
+#include "CColStoreSA.h"
+#include "CPedModelInfoSA.h"
+#include "CPedSA.h"
+#include "CWorldSA.h"
 
 extern CGameSA* pGame;
 

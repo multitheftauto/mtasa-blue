@@ -56,7 +56,7 @@ public:
     void                SetDisplay(eMarkerDisplay wDisplay);
     void                SetScale(WORD wScale);
     void                SetColor(eMarkerColor color);
-    void                SetColor(const SColor color);
+    void                SetColor(const SharedUtil::SColor color);
     void                Remove();
     BOOL                IsActive();
     void                SetPosition(CVector* vecPosition);

@@ -11,11 +11,10 @@
 
 #pragma once
 
-#include <windows.h>
-#include <CVector.h>
 #include "Common.h"
 
 class CObject;
+class CVector;
 
 class CPickup
 {

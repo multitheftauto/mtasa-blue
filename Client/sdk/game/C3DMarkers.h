@@ -11,8 +11,7 @@
 
 #pragma once
 
-#include <CVector.h>
-#include "C3DMarker.h"
+class C3DMarker;
 
 class C3DMarkers
 {

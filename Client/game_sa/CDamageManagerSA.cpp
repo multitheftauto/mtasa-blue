@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDamageManagerSA.h"
 
 BYTE CDamageManagerSA::GetEngineStatus()
 {

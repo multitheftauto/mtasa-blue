@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 #include "CCheckpointSA.h"
+#include "C3DMarkerSA.h"
+#include "C3DMarkersSA.h"
 
 void CCheckpointSA::SetPosition(CVector* vecPosition)
 {
@@ -72,12 +74,12 @@ void CCheckpointSA::SetIdentifier(DWORD dwIdentifier)
     this->GetInterface()->m_nIdentifier = dwIdentifier;
 }
 
-SColor CCheckpointSA::GetColor()
+SharedUtil::SColor CCheckpointSA::GetColor()
 {
     DEBUG_TRACE("RGBA CCheckpointSA::GetColor()");
     // From ABGR
     unsigned long ulABGR = this->GetInterface()->rwColour;
-    SColor        color;
+    SharedUtil::SColor        color;
     color.A = (ulABGR >> 24) & 0xff;
     color.B = (ulABGR >> 16) & 0xff;
     color.G = (ulABGR >> 8) & 0xff;
@@ -85,7 +87,7 @@ SColor CCheckpointSA::GetColor()
     return color;
 }
 
-void CCheckpointSA::SetColor(const SColor color)
+void CCheckpointSA::SetColor(const SharedUtil::SColor color)
 {
     DEBUG_TRACE("VOID CCheckpointSA::SetColor(RGBA color)");
     // To ABGR

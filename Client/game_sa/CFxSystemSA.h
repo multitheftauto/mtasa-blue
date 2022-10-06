@@ -12,6 +12,7 @@
 #pragma once
 
 #include <game/CFxSystem.h>
+#include <game/RenderWare.h>
 
 #define FUNC_FxSystem_c__PlayAndKill            		0x4AA3D0
 #define VAR_FxSystemUpdateCullDistMultiplier            0x4AB032

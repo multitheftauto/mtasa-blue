@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include <CVector.h>
 class CColPointSAInterface;
+class CVector;
 
 // Collision stored surface type
 struct EColSurface
