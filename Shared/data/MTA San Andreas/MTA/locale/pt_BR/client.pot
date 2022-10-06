@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-05 18:45+0000\n"
-"PO-Revision-Date: 2022-10-05 18:52\n"
+"PO-Revision-Date: 2022-10-06 01:06\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -1818,7 +1818,7 @@ msgstr "Reflexos de chuva"
 
 #: Client/core/CSettings.cpp:859
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Sombras dinâmicas do ped"
 
 #: Client/core/CSettings.cpp:888
 msgid "Enable remote websites"
