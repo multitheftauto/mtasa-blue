@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPickupSA.h"
+#include "CWorldSA.h"
 
 CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 {
@@ -19,7 +21,7 @@ CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
     this->object = 0;
 }
 
-VOID CPickupSA::SetPosition(CVector* vecPosition)
+void CPickupSA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID CPickupSA::SetPosition(CVector * vecPosition)");
     this->GetInterface()->bIsPickupNearby = 0;
@@ -46,31 +48,31 @@ ePickupType CPickupSA::GetType()
     return (ePickupType)this->GetInterface()->Type;
 }
 
-VOID CPickupSA::SetType(ePickupType type)
+void CPickupSA::SetType(ePickupType type)
 {
     DEBUG_TRACE("VOID CPickupSA::SetType(ePickupType type)");
     this->GetInterface()->Type = type;
 }
 
-FLOAT CPickupSA::GetCurrentValue()
+float CPickupSA::GetCurrentValue()
 {
     DEBUG_TRACE("FLOAT CPickupSA::GetCurrentValue()");
     return this->GetInterface()->CurrentValue;
 }
 
-VOID CPickupSA::SetCurrentValue(FLOAT fCurrentValue)
+void CPickupSA::SetCurrentValue(float fCurrentValue)
 {
     DEBUG_TRACE("VOID CPickupSA::SetCurrentValue(FLOAT fCurrentValue)");
     this->GetInterface()->CurrentValue = fCurrentValue;
 }
 
-VOID CPickupSA::SetRegenerationTime(DWORD dwTime)
+void CPickupSA::SetRegenerationTime(DWORD dwTime)
 {
     DEBUG_TRACE("VOID CPickupSA::SetRegenerationTime(DWORD dwTime)");
     this->GetInterface()->RegenerationTime = dwTime;
 }
 
-VOID CPickupSA::SetMoneyPerDay(WORD wMoneyPerDay)
+void CPickupSA::SetMoneyPerDay(WORD wMoneyPerDay)
 {
     DEBUG_TRACE("VOID CPickupSA::SetMoneyPerDay(WORD wMoneyPerDay)");
     this->GetInterface()->MoneyPerDay = wMoneyPerDay;
@@ -88,7 +90,7 @@ WORD CPickupSA::GetModel()
     return this->GetInterface()->MI;
 }
 
-VOID CPickupSA::SetModel(WORD wModelIndex)
+void CPickupSA::SetModel(WORD wModelIndex)
 {
     DEBUG_TRACE("VOID CPickupSA::SetModel(WORD wModelIndex)");
     this->GetInterface()->MI = wModelIndex;
@@ -100,7 +102,7 @@ ePickupState CPickupSA::GetState()
     return (ePickupState)this->GetInterface()->State;
 }
 
-VOID CPickupSA::SetState(ePickupState bState)
+void CPickupSA::SetState(ePickupState bState)
 {
     DEBUG_TRACE("VOID CPickupSA::SetState(ePickupState bState)");
     this->GetInterface()->State = (BYTE)bState;
@@ -112,7 +114,7 @@ BYTE CPickupSA::GetAmmo()
     return this->GetInterface()->bNoAmmo;
 }
 
-VOID CPickupSA::SetAmmo(BYTE bAmmo)
+void CPickupSA::SetAmmo(BYTE bAmmo)
 {
     DEBUG_TRACE("VOID CPickupSA::SetAmmo(BYTE bAmmo)");
     this->GetInterface()->bNoAmmo = bAmmo;
@@ -124,7 +126,7 @@ long CPickupSA::GetMonetaryValue()
     return this->GetInterface()->MonetaryValue;
 }
 
-VOID CPickupSA::SetMonetaryValue(long lMonetaryValue)
+void CPickupSA::SetMonetaryValue(long lMonetaryValue)
 {
     DEBUG_TRACE("VOID CPickupSA::SetMonetaryValue(long lMonetaryValue)");
     this->GetInterface()->MonetaryValue = lMonetaryValue;
@@ -136,7 +138,7 @@ BYTE CPickupSA::IsNearby()
     return this->GetInterface()->bIsPickupNearby;
 }
 
-VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
+void CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
 {
     DEBUG_TRACE("VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)");
     DWORD GiveUsAPickUpObject = FUNC_GIVEUSAPICKUP;
@@ -161,7 +163,7 @@ VOID CPickupSA::GiveUsAPickUpObject(int ForcedObjectIndex)
     }
 }
 
-VOID CPickupSA::GetRidOfObjects()
+void CPickupSA::GetRidOfObjects()
 {
     DEBUG_TRACE("VOID CPickupSA::GetRidOfObjects()");
     if (this->GetInterface()->pObject)
@@ -175,7 +177,7 @@ VOID CPickupSA::GetRidOfObjects()
     }
 }
 
-VOID CPickupSA::Remove()
+void CPickupSA::Remove()
 {
     DWORD dwFunc = FUNC_CPickup_Remove;
     DWORD dwThis = (DWORD)this->GetInterface();

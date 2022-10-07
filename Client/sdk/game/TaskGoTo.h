@@ -12,7 +12,8 @@
 #pragma once
 
 #include "Task.h"
-#include "CPathFind.h"
+
+class CNodeAddress;
 
 enum
 {

@@ -11,9 +11,28 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
-#include "game/CAnimBlendAssocGroup.h"
-#include "game/CAnimBlendAssociation.h"
-#include "game/CAnimBlendHierarchy.h"
+#include <game/C3DMarkers.h>
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CAnimBlendAssociation.h>
+#include <game/CAnimBlendHierarchy.h>
+#include <game/CAnimManager.h>
+#include <game/CColPoint.h>
+#include <game/CEventDamage.h>
+#include <game/CExplosionManager.h>
+#include <game/CFire.h>
+#include <game/CGarage.h>
+#include <game/CGarages.h>
+#include <game/CPathFind.h>
+#include <game/CPedIntelligence.h>
+#include <game/CPlayerInfo.h>
+#include <game/CSettings.h>
+#include <game/CStreaming.h>
+#include <game/CTaskManager.h>
+#include <game/CWanted.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStatManager.h>
+#include <game/CWeather.h>
+#include <game/Task.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 

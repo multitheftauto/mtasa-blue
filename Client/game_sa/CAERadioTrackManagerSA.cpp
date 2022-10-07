@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAERadioTrackManagerSA.h"
 
 BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
 {
@@ -73,7 +74,7 @@ BOOL CAERadioTrackManagerSA::IsRadioOn()
     return bReturn;
 }
 
-VOID CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
+void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
 {
     DEBUG_TRACE("VOID CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)");
     DWORD dwFunc = FUNC_SetBassSetting;
@@ -86,7 +87,7 @@ VOID CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
     }
 }
 
-VOID CAERadioTrackManagerSA::Reset()
+void CAERadioTrackManagerSA::Reset()
 {
     DEBUG_TRACE("VOID CAERadioTrackManagerSA::Reset()");
     DWORD dwFunc = FUNC_Reset;
@@ -97,7 +98,7 @@ VOID CAERadioTrackManagerSA::Reset()
     }
 }
 
-VOID CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
+void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
 {
     DEBUG_TRACE("VOID CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)");
     DWORD dwFunc = FUNC_StartRadio;

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CExplosionManagerSA.h"
+#include "CExplosionSA.h"
+#include "CEntitySA.h"
 
 CExplosionManagerSA::CExplosionManagerSA()
 {
@@ -72,31 +75,7 @@ returnhere:
     return NULL;
 }
 
-/**
- * \todo Need to simulate this manually (loop and IsNear...)
- */
-VOID CExplosionManagerSA::RemoveAllExplosionsInArea(CVector* vecPosition, FLOAT fRadius)
-{
-    DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosionsInArea ( CVector * vecPosition, FLOAT fRadius )");
-
-    /*  DWORD dwFunction = FUNC_RemoveAllExplosionsInArea;
-        CVector * vecPos = (CVector *)vecPosition;
-        FLOAT fX = vecPos->fX;
-        FLOAT fY = vecPos->fY;
-        FLOAT fZ = vecPos->fZ;
-
-        _asm
-        {
-            push    fRadius
-            push    fZ
-            push    fY
-            push    fX
-            call    dwFunction
-            add     esp, 0x10
-        }*/
-}
-
-VOID CExplosionManagerSA::RemoveAllExplosions()
+void CExplosionManagerSA::RemoveAllExplosions()
 {
     DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosions (  )");
     for (int i = 0; i < MAX_EXPLOSIONS; i++)

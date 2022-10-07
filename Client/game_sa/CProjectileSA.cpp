@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProjectileSA.h"
+#include "CProjectileInfoSA.h"
+#include "CWorldSA.h"
 
 CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObjectSA(projectileInterface)
 {

@@ -10,13 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTaskManagerSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "TaskSA.h"
 
 CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CPed* ped)
 {
     DEBUG_TRACE("CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface * taskManagerInterface, CPed * ped)");
     this->ped = ped;
     this->internalInterface = taskManagerInterface;
-    this->m_pTaskManagementSystem = (CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem());
+    this->m_pTaskManagementSystem = pGame->GetTaskManagementSystem();
 }
 
 void CTaskManagerSA::RemoveTask(const int iTaskPriority)

@@ -10,10 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClockSA.h"
 
 extern CGameSA* pGame;
 
-VOID CClockSA::Set(BYTE bHour, BYTE bMinute)
+void CClockSA::Set(BYTE bHour, BYTE bMinute)
 {
     DEBUG_TRACE("VOID CClockSA::Set ( BYTE bHour, BYTE bMinute )");
     if (bMinute >= 0 && bMinute <= 60 && bHour >= 0 && bHour <= 23)
@@ -24,7 +25,7 @@ VOID CClockSA::Set(BYTE bHour, BYTE bMinute)
     }
 }
 
-VOID CClockSA::Get(BYTE* bHour, BYTE* bMinute)
+void CClockSA::Get(BYTE* bHour, BYTE* bMinute)
 {
     DEBUG_TRACE("VOID CClockSA::Get ( BYTE * bHour, BYTE * bMinute )");
     *bMinute = *(BYTE*)VAR_TimeMinutes;

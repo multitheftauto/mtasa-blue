@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFxSystemSA.h"
+#include "CFxSystemBPSA.h"
 
 // Variables used in the hooks
 static CFxSystemSAInterface*  ms_pUsingFxSystemSAInterface = NULL;

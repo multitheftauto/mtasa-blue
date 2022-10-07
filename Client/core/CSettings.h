@@ -162,6 +162,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxHighDetailPeds;
     CGUICheckBox*  m_pCheckBoxBlur;
     CGUICheckBox*  m_pCheckBoxCoronaReflections;
+    CGUICheckBox*  m_pCheckBoxDynamicPedShadows;
     CGUILabel*     m_pFieldOfViewLabel;
     CGUIScrollBar* m_pFieldOfView;
     CGUILabel*     m_pFieldOfViewValueLabel;

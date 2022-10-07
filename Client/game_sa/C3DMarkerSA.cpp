@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "C3DMarkerSA.h"
 
 void C3DMarkerSA::GetMatrix(CMatrix* pMatrix)
 {
@@ -29,7 +30,7 @@ void C3DMarkerSA::SetMatrix(CMatrix* pMatrix)
     MemCpyFast(&mat->vUp, &pMatrix->vUp, sizeof(CVector));
 }
 
-VOID C3DMarkerSA::SetPosition(CVector* vecPosition)
+void C3DMarkerSA::SetPosition(CVector* vecPosition)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetPosition(CVector * vecPosition)");
     this->GetInterface()->m_mat.vPos = *vecPosition;
@@ -47,7 +48,7 @@ DWORD C3DMarkerSA::GetType()
     return this->GetInterface()->m_nType;
 }
 
-VOID C3DMarkerSA::SetType(DWORD dwType)
+void C3DMarkerSA::SetType(DWORD dwType)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetType(DWORD dwType)");
     this->GetInterface()->m_nType = (unsigned short)(dwType);
@@ -65,12 +66,12 @@ DWORD C3DMarkerSA::GetIdentifier()
     return this->GetInterface()->m_nIdentifier;
 }
 
-SColor C3DMarkerSA::GetColor()
+SharedUtil::SColor C3DMarkerSA::GetColor()
 {
     DEBUG_TRACE("RGBA C3DMarkerSA::GetColor()");
     // From ABGR
     unsigned long ulABGR = this->GetInterface()->rwColour;
-    SColor        color;
+    SharedUtil::SColor        color;
     color.A = (ulABGR >> 24) & 0xff;
     color.B = (ulABGR >> 16) & 0xff;
     color.G = (ulABGR >> 8) & 0xff;
@@ -78,73 +79,73 @@ SColor C3DMarkerSA::GetColor()
     return color;
 }
 
-VOID C3DMarkerSA::SetColor(const SColor color)
+void C3DMarkerSA::SetColor(const SharedUtil::SColor color)
 {
     // To ABGR
     this->GetInterface()->rwColour = (color.A << 24) | (color.B << 16) | (color.G << 8) | color.R;
 }
 
-VOID C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)
+void C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)");
     this->GetInterface()->m_nPulsePeriod = wPulsePeriod;
 }
 
-VOID C3DMarkerSA::SetRotateRate(short RotateRate)
+void C3DMarkerSA::SetRotateRate(short RotateRate)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetRotateRate(short RotateRate)");
     this->GetInterface()->m_nRotateRate = RotateRate;
 }
 
-FLOAT C3DMarkerSA::GetSize()
+float C3DMarkerSA::GetSize()
 {
     DEBUG_TRACE("FLOAT C3DMarkerSA::GetSize()");
     return this->GetInterface()->m_fSize;
 }
 
-VOID C3DMarkerSA::SetSize(FLOAT fSize)
+void C3DMarkerSA::SetSize(float fSize)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetSize(FLOAT fSize)");
     this->GetInterface()->m_fSize = fSize;
 }
 
-FLOAT C3DMarkerSA::GetBrightness()
+float C3DMarkerSA::GetBrightness()
 {
     DEBUG_TRACE("FLOAT C3DMarkerSA::GetBrightness()");
     return this->GetInterface()->m_fBrightness;
 }
 
-VOID C3DMarkerSA::SetBrightness(FLOAT fBrightness)
+void C3DMarkerSA::SetBrightness(float fBrightness)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetBrightness(FLOAT fBrightness)");
     this->GetInterface()->m_fBrightness = fBrightness;
 }
 
-VOID C3DMarkerSA::SetCameraRange(FLOAT fCameraRange)
+void C3DMarkerSA::SetCameraRange(float fCameraRange)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetCameraRange(FLOAT fCameraRange)");
     this->GetInterface()->m_fCameraRange = fCameraRange;
 }
 
-VOID C3DMarkerSA::SetPulseFraction(FLOAT fPulseFraction)
+void C3DMarkerSA::SetPulseFraction(float fPulseFraction)
 {
     DEBUG_TRACE("VOID C3DMarkerSA::SetPulseFraction(FLOAT fPulseFraction)");
     this->GetInterface()->m_fPulseFraction = fPulseFraction;
 }
 
-FLOAT C3DMarkerSA::GetPulseFraction()
+float C3DMarkerSA::GetPulseFraction()
 {
     DEBUG_TRACE("FLOAT C3DMarkerSA::GetPulseFraction()");
     return this->GetInterface()->m_fPulseFraction;
 }
 
-VOID C3DMarkerSA::Disable()
+void C3DMarkerSA::Disable()
 {
     DEBUG_TRACE("VOID C3DMarkerSA::Disable ()");
     this->GetInterface()->m_nIdentifier = 0;
 }
 
-VOID C3DMarkerSA::DeleteMarkerObject()
+void C3DMarkerSA::DeleteMarkerObject()
 {
     if (this->GetInterface()->m_pRwObject)
     {
@@ -164,7 +165,7 @@ VOID C3DMarkerSA::DeleteMarkerObject()
     }
 }
 
-VOID C3DMarkerSA::Reset()
+void C3DMarkerSA::Reset()
 {
     this->internalInterface->m_lastPosition = this->internalInterface->m_mat.vPos;
 }

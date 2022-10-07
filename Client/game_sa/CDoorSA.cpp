@@ -10,17 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDoorSA.h"
 
 /**
  * \todo Find out what GetAngleOpenRatio actually does
  * @return FLOAT Not sure...
  */
-FLOAT CDoorSA::GetAngleOpenRatio()
+float CDoorSA::GetAngleOpenRatio()
 {
     DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
     DWORD dwFunction = FUNC_GetAngleOpenRatio;
     DWORD dwPointer = (DWORD)GetInterface();
-    FLOAT fReturn = 0.0f;
+    float fReturn = 0.0f;
 
     if (dwPointer != 0)
     {
@@ -89,7 +90,7 @@ BOOL CDoorSA::IsFullyOpen()
  * @param fUnknown Not sure...
  * \todo Check what the parameter for Open does
  */
-VOID CDoorSA::Open(float fOpenRatio)
+void CDoorSA::Open(float fOpenRatio)
 {
     DEBUG_TRACE("VOID CDoorSA::Open ( float fOpenRatio )");
     DWORD dwFunction = FUNC_Open;

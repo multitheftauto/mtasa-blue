@@ -10,11 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEntitySA.h"
+#include "CFireSA.h"
+#include "CPoolsSA.h"
 
 /**
  * Put the fire out
  */
-VOID CFireSA::Extinguish()
+void CFireSA::Extinguish()
 {
     DEBUG_TRACE("VOID CFireSA::Extinguish (  )");
     DWORD dwFunction = FUNC_Extinguish;
@@ -42,7 +45,7 @@ CVector* CFireSA::GetPosition()
  * @param vecPosition CVector * containing the desired position for the fire.
  * @see CFireSA::SetTarget
  */
-VOID CFireSA::SetPosition(CVector& vecPosition)
+void CFireSA::SetPosition(CVector& vecPosition)
 {
     DEBUG_TRACE("VOID CFireSA::SetPosition ( CVector & vecPosition )");
     this->internalInterface->entityTarget = 0;
@@ -53,7 +56,7 @@ VOID CFireSA::SetPosition(CVector& vecPosition)
  * Set the time that the fire will be extinguished.
  * @param dwTime DWORD containing the time that the fire will be extinguished.  This is in game-time units which can be got from CGame::GetSystemTime;
  */
-VOID CFireSA::SetTimeToBurnOut(DWORD dwTime)
+void CFireSA::SetTimeToBurnOut(DWORD dwTime)
 {
     DEBUG_TRACE("VOID CFireSA::SetTimeToBurnOut ( DWORD dwTime )");
     internalInterface->nTimeToBurn = dwTime;
@@ -139,7 +142,7 @@ CEntity* CFireSA::GetEntityOnFire()
     return TargetEntity;
 }
 
-VOID CFireSA::SetTarget(CEntity* entity)
+void CFireSA::SetTarget(CEntity* entity)
 {
     DEBUG_TRACE("VOID CFireSA::SetTarget ( CEntity * entity  )");
 
@@ -170,7 +173,7 @@ BOOL CFireSA::IsFree()
         return FALSE;
 }
 
-VOID CFireSA::SetSilent(BOOL bSilent)
+void CFireSA::SetSilent(BOOL bSilent)
 {
     DEBUG_TRACE("VOID CFireSA::SetSilent ( BOOL bSilent )");
     internalInterface->bMakesNoise = !bSilent;
@@ -182,7 +185,7 @@ BOOL CFireSA::IsBeingExtinguished()
     return internalInterface->bBeingExtinguished;
 }
 
-VOID CFireSA::Ignite()
+void CFireSA::Ignite()
 {
     DEBUG_TRACE("VOID CFireSA::Ignite( )");
     this->internalInterface->bActive = TRUE;
@@ -203,19 +206,19 @@ VOID CFireSA::Ignite()
     this->internalInterface->nNumGenerationsAllowed = 100;
 }
 
-FLOAT CFireSA::GetStrength()
+float CFireSA::GetStrength()
 {
     DEBUG_TRACE("FLOAT CFireSA::GetStrength (  )");
     return this->internalInterface->Strength;
 }
 
-VOID CFireSA::SetStrength(FLOAT fStrength)
+void CFireSA::SetStrength(float fStrength)
 {
     DEBUG_TRACE("VOID CFireSA::SetStrength ( FLOAT fStrength )");
     this->internalInterface->Strength = fStrength;
 }
 
-VOID CFireSA::SetNumGenerationsAllowed(char generations)
+void CFireSA::SetNumGenerationsAllowed(char generations)
 {
     DEBUG_TRACE("VOID CFireSA::SetNumGenerationsAllowed ( char generations )");
     this->internalInterface->nNumGenerationsAllowed = generations;

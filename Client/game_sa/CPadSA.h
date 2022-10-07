@@ -12,9 +12,6 @@
 #pragma once
 
 #include <game/CPad.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include "Common.h"
 
 #define MAX_HORN_HISTORY        5
 #define STEERINGBUFFERLENGTH    10
@@ -73,15 +70,15 @@ public:
 
     CControllerState* GetCurrentControllerState(CControllerState* ControllerState);
     CControllerState* GetLastControllerState(CControllerState* ControllerState);
-    VOID              SetCurrentControllerState(CControllerState* ControllerState);
-    VOID              SetLastControllerState(CControllerState* ControllerState);
-    VOID              Store();
-    VOID              Restore();
+    void              SetCurrentControllerState(CControllerState* ControllerState);
+    void              SetLastControllerState(CControllerState* ControllerState);
+    void              Store();
+    void              Restore();
     bool              IsEnabled();
-    VOID              Disable(bool bDisable);
-    VOID              Clear();
+    void              Disable(bool bDisable);
+    void              Clear();
     CPadSAInterface*  GetInterface() { return this->internalInterface; };
-    VOID              SetHornHistoryValue(bool value);
+    void              SetHornHistoryValue(bool value);
     long              GetAverageWeapon();
     void              SetLastTimeTouched(DWORD dwTime);
 

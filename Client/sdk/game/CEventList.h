@@ -12,12 +12,13 @@
 #pragma once
 
 #include "Common.h"
-#include "CEvent.h"
-#include <CVector.h>
 
+class CEntity;
+class CEvent;
 class CEventDamage;
-class CEventGunShot;
 class CEventDamageSAInterface;
+class CEventGunShot;
+class CVector;
 
 class CEventList
 {

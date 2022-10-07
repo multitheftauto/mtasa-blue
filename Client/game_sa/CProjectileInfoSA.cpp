@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProjectileInfoSA.h"
+#include "CWorldSA.h"
+#include "CVehicleSA.h"
 
 extern CGameSA* pGame;
 /**

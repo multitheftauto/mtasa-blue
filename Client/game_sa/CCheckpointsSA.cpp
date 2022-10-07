@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCheckpointsSA.h"
+#include "CCheckpointSA.h"
 
 // constructor
 CCheckpointsSA::CCheckpointsSA()
@@ -30,8 +32,8 @@ CCheckpointsSA::~CCheckpointsSA()
 /**
  * \todo Update default color to SA's orange instead of VC's pink
  */
-CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, FLOAT fSize, FLOAT fPulseFraction,
-                                              const SColor color)
+CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, float fSize, float fPulseFraction,
+                                              const SharedUtil::SColor color)
 {
     DEBUG_TRACE(
         "CCheckpoint * CCheckpointsSA::CreateCheckpoint(DWORD Identifier, DWORD wType, CVector * vecPosition, CVector * vecPointDir, FLOAT fSize, FLOAT "

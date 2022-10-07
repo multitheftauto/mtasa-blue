@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "TaskSA.h"
+#include "CPedIntelligenceSA.h"
+#include "CPedSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "CTaskManagerSA.h"
+#include "CTasksSA.h"
 
 DWORD dwTasksAlive = 0;
 DWORD dwTasksCreatedTotal = 0;
@@ -78,7 +84,7 @@ void CTaskSA::SetParent(CTask* pParent)
 
 CTask* CTaskSA::GetSubTask()
 {
-    static CTaskManagementSystemSA* s_pTaskManagementSystem = (CTaskManagementSystemSA*)pGame->GetTaskManagementSystem();
+    static CTaskManagementSystemSA* s_pTaskManagementSystem = pGame->GetTaskManagementSystem();
 
     DEBUG_TRACE("CTask * CTaskSA::GetSubTask()");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
@@ -357,7 +363,7 @@ CTask* CTaskComplexSA::CreateNextSubTask(CPed* pPed)
             mov     dwReturn, eax
         }
     }
-    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask((CTaskSAInterface*)dwReturn);
+    return pGame->GetTaskManagementSystem()->GetTask((CTaskSAInterface*)dwReturn);
 }
 
 CTask* CTaskComplexSA::CreateFirstSubTask(CPed* pPed)
@@ -382,7 +388,7 @@ CTask* CTaskComplexSA::CreateFirstSubTask(CPed* pPed)
             mov     dwReturn, eax
         }
     }
-    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask((CTaskSAInterface*)dwReturn);
+    return pGame->GetTaskManagementSystem()->GetTask((CTaskSAInterface*)dwReturn);
 }
 
 CTask* CTaskComplexSA::ControlSubTask(CPed* pPed)
@@ -407,5 +413,5 @@ CTask* CTaskComplexSA::ControlSubTask(CPed* pPed)
             mov     dwReturn, eax
         }
     }
-    return ((CTaskManagementSystemSA*)pGame->GetTaskManagementSystem())->GetTask((CTaskSAInterface*)dwReturn);
+    return pGame->GetTaskManagementSystem()->GetTask((CTaskSAInterface*)dwReturn);
 }

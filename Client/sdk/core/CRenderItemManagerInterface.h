@@ -130,6 +130,7 @@ struct SDxStatus
         bool         bHighDetailPeds;
         bool         bBlur;
         bool         bCoronaReflections;
+        bool         bDynamicPedShadows;
     } settings;
 };
 

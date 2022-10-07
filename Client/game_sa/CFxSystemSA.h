@@ -12,28 +12,9 @@
 #pragma once
 
 #include <game/CFxSystem.h>
+#include <game/RenderWare.h>
 
-#define FUNC_FxSystem_c__AddParticle            0x004AA440
-#define FUNC_FxSystem_c__AttachToBone           0x004AA400
-#define FUNC_FxSystem_c__CopyParentMatrix       0x004AA890
-#define FUNC_FxSystem_c__DoFxAudio              0x004AAC90
-#define FUNC_FxSystem_c__EnablePrim             0x004AA610
-#define FUNC_FxSystem_c__Exit                   0x004AA840
-#define FUNC_FxSystem_c__GetBoundingSphereWld   0x004AAAD0
-#define FUNC_FxSystem_c__GetCompositeMatrix     0x007F18F0
-#define FUNC_FxSystem_c__GetPlayStatus          0x004AA900
-#define FUNC_FxSystem_c__Init                   0x004AA750
-#define FUNC_FxSystem_c__IsVisible              0x004AAF30
-#define FUNC_FxSystem_c__Kill                   0x004AA3F0
-#define FUNC_FxSystem_c__Play                   0x004AA2F0
-#define FUNC_FxSystem_c__PlayAndKill            0x004AA3D0
-#define FUNC_FxSystem_c__SetConstTime           0x004AA6C0
-#define FUNC_FxSystem_c__SetLocalParticles      0x004AA910
-#define FUNC_FxSystem_c__SetMatrix              0x004AA630
-#define FUNC_FxSystem_c__SetOffsetPos           0x004AA660
-#define FUNC_FxSystem_c__SetRateMult            0x004AA6F0
-#define FUNC_FxSystem_c__Stop                   0x004AA390
-#define FUNC_FxSystem_c__Update                 0x004AAF70
+#define FUNC_FxSystem_c__PlayAndKill            		0x4AA3D0
 #define VAR_FxSystemUpdateCullDistMultiplier            0x4AB032
 #define VAR_FxCreateParticleCullDistMultiplierA         0x4A4247
 #define VAR_FxCreateParticleCullDistMultiplierB         0x4A4255

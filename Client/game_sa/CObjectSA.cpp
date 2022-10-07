@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CObjectSA.h"
+#include "CPoolsSA.h"
+#include "CRopesSA.h"
+#include "CWorldSA.h"
 
 //#define MTA_USE_BUILDINGS_AS_OBJECTS
 
@@ -205,8 +209,6 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
         this->SetInterface(NULL);
     }
 #endif
-
-    this->internalID = pGame->GetPools()->GetObjectRef((DWORD*)this->GetInterface());
 
     m_ucAlpha = 255;
 

@@ -23,6 +23,8 @@
     #include "packets/CPlayerDisconnectedPacket.h"
 #endif
 
+class CMatrix;
+
 // Vector math
 inline float DistanceBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2)
 {

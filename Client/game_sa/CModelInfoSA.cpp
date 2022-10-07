@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 #include "gamesa_renderware.h"
+#include "CModelInfoSA.h"
+#include "CColModelSA.h"
+#include "CColStoreSA.h"
+#include "CPedModelInfoSA.h"
+#include "CPedSA.h"
+#include "CWorldSA.h"
 
 extern CGameSA* pGame;
 
@@ -327,7 +333,7 @@ uint CModelInfoSA::GetAnimFileIndex()
     return uiReturn;
 }
 
-VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
+void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
 {
     DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
@@ -393,7 +399,7 @@ VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
     }
 }
 
-VOID CModelInfoSA::Remove()
+void CModelInfoSA::Remove()
 {
     DEBUG_TRACE("VOID CModelInfoSA::Remove ( )");
 
@@ -433,21 +439,6 @@ VOID CModelInfoSA::Remove()
             pGame->GetStreaming()->RemoveModel(m_dwModelID);
         }
     }
-}
-
-BYTE CModelInfoSA::GetLevelFromPosition(CVector* vecPosition)
-{
-    DEBUG_TRACE("BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )");
-    DWORD dwFunction = FUNC_GetLevelFromPosition;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunction
-        add     esp, 4
-        mov     bReturn, al
-    }
-    return bReturn;
 }
 
 BOOL CModelInfoSA::IsLoaded()
@@ -537,7 +528,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
-    FLOAT fReturn = 0;
+    float fReturn = 0;
     _asm {
         mov     eax, ModelID
 

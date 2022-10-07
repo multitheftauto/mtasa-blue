@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPoolsSA.h"
+#include "CBikeSA.h"
+#include "CBoatSA.h"
+#include "CPlayerPedSA.h"
+#include "CWorldSA.h"
 
 extern bool g_bVehiclePointerInvalid;
 
@@ -24,10 +29,6 @@ CPoolsSA::CPoolsSA()
     m_ulBuildingCount = 0;
 
     MemSetFast(&Buildings, 0, sizeof(CBuilding*) * MAX_BUILDINGS);
-
-    EntryInfoNodePool = new CEntryInfoNodePoolSA();
-    PointerNodeDoubleLinkPool = new CPointerNodeDoubleLinkPoolSA();
-    PointerNodeSingleLinkPool = new CPointerNodeSingleLinkPoolSA();
 }
 
 CPoolsSA::~CPoolsSA()
@@ -37,15 +38,6 @@ CPoolsSA::~CPoolsSA()
     DeleteAllPeds();
     DeleteAllObjects();
     DeleteAllBuildings();
-
-    if (EntryInfoNodePool)
-        delete EntryInfoNodePool;
-
-    if (PointerNodeDoubleLinkPool)
-        delete PointerNodeDoubleLinkPool;
-
-    if (PointerNodeSingleLinkPool)
-        delete PointerNodeSingleLinkPool;
 }
 
 void CPoolsSA::DeleteAllBuildings()
@@ -613,38 +605,6 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
     return pPed;
 }
 
-CPed* CPoolsSA::AddCivilianPed(DWORD* pGameInterface)
-{
-    DEBUG_TRACE("CPed* CPoolsSA::AddCivilianPed ( DWORD* pGameInterface )");
-
-    CPedSA* pPed = NULL;
-
-    if (m_pedPool.ulCount < MAX_PEDS)
-    {
-        CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
-        if (pInterface)
-        {
-            // Extract the element index from the handle
-            DWORD dwElementIndexInPool = GetPedPoolIndex((std::uint8_t*)pInterface);
-            if (dwElementIndexInPool >= MAX_PEDS)
-            {
-                return nullptr;
-            }
-            CPedSA* pPed = m_pedPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-            if (pPed)
-            {
-                return pPed;
-            }
-            else
-            {
-                // create new  ped here
-            }
-        }
-    }
-
-    return pPed;
-}
-
 void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
 {
     DEBUG_TRACE("void CPoolsSA::RemovePed( CPed* pPed, bool bDelete )");
@@ -683,18 +643,6 @@ void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
                 delete pPlayerPed;
 
                 break;
-            }
-
-            default:
-            {
-                CCivilianPedSA* pCivPed = dynamic_cast<CCivilianPedSA*>(pPed);
-                if (pCivPed)
-                {
-                    if (!bDelete)
-                        pCivPed->SetDoNotRemoveFromGameWhenDeleted(true);
-                }
-
-                delete pCivPed;
             }
         }
 
@@ -1374,67 +1322,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     return iOut;
 }
 
-CEntryInfoNodePool* CPoolsSA::GetEntryInfoNodePool()
-{
-    return EntryInfoNodePool;
-}
-
-int CEntryInfoNodePoolSA::GetNumberOfUsedSpaces()
-{
-    DWORD dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CEntryInfoNodePool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
-}
-
-CPointerNodeDoubleLinkPool* CPoolsSA::GetPointerNodeDoubleLinkPool()
-{
-    return PointerNodeDoubleLinkPool;
-}
-
-int CPointerNodeDoubleLinkPoolSA::GetNumberOfUsedSpaces()
-{
-    DWORD dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeDoubleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
-}
-
-CPointerNodeSingleLinkPool* CPoolsSA::GetPointerNodeSingleLinkPool()
-{
-    return PointerNodeSingleLinkPool;
-}
-
 void CPoolsSA::InvalidateLocalPlayerClientEntity()
 {
     m_pedPool.arrayOfClientEntities[0] = {m_pedPool.arrayOfClientEntities[0].pEntity, nullptr};
-}
-
-int CPointerNodeSingleLinkPoolSA::GetNumberOfUsedSpaces()
-{
-    DWORD dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-    int   iOut = 0;
-    _asm
-    {
-        mov     ecx, CLASS_CPtrNodeSingleLinkPool
-        mov     ecx, [ecx]
-        call    dwFunc
-        mov     iOut, eax
-    }
-
-    return iOut;
 }

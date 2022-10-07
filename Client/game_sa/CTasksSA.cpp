@@ -10,6 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTasksSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "TaskSA.h"
+#include "TaskBasicSA.h"
+#include "TaskCarAccessoriesSA.h"
+#include "TaskGoToSA.h"
+#include "TaskCarSA.h"
+#include "TaskJumpFallSA.h"
+#include "TaskSecondarySA.h"
+#include "TaskPhysicalResponseSA.h"
+#include "TaskIKSA.h"
+#include "TaskAttackSA.h"
 
 CTasksSA::CTasksSA(CTaskManagementSystemSA* pTaskManagementSystem)
 {

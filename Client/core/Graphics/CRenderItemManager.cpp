@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CRenderWare.h>
+#include <game/CSettings.h>
 #include "CRenderItem.EffectCloner.h"
 
 // Type of vertex used to emulate StretchRect for SwiftShader bug
@@ -784,6 +786,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.bHighDetailPeds = false;
     outStatus.settings.bBlur = true;
     outStatus.settings.bCoronaReflections = false;
+    outStatus.settings.bDynamicPedShadows = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
@@ -797,12 +800,18 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
     CVARS_GET("blur", outStatus.settings.bBlur);
     CVARS_GET("corona_reflections", outStatus.settings.bCoronaReflections);
+    CVARS_GET("dynamic_ped_shadows", outStatus.settings.bDynamicPedShadows);
 
     if (outStatus.settings.iFXQuality == 0)
     {
         // These are always off with low fx quality
         outStatus.settings.bVolumetricShadows = false;
         outStatus.settings.bGrassEffect = false;
+    }
+
+    if (outStatus.settings.iFXQuality < 2)
+    {
+        outStatus.settings.bDynamicPedShadows = false;
     }
 
     // Display color depth

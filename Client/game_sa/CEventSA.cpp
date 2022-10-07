@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEventSA.h"
+#include "CPoolsSA.h"
 
 eEventEntityType CEventSA::GetType()
 {
