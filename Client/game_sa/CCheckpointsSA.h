@@ -28,7 +28,6 @@ private:
     CCheckpointSA* Checkpoints[MAX_CHECKPOINTS];
 
 public:
-    // constructor
     CCheckpointsSA();
     ~CCheckpointsSA();
 

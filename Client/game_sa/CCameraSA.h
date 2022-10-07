@@ -408,8 +408,8 @@ public:
     CCam*         GetCam(BYTE bCameraID);
     virtual CCam* GetCam(CCamSAInterface* camInterface);
 
-    void      SetWidescreen(BOOL bWidescreen);
-    BOOL      GetWidescreen();
+    void      SetWidescreen(bool bWidescreen);
+    bool      GetWidescreen();
     bool      IsFading();
     int       GetFadingDirection();
     void      Fade(float fFadeOutTime, int iOutOrIn);

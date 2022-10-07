@@ -54,7 +54,7 @@ public:
     void           SetExplosionPosition(const CVector* vecPosition);
     CEntity*       GetExplosionCreator();
     CEntity*       GetExplodingEntity();
-    BOOL           IsActive();
+    bool           IsActive();
     void           Remove();
     float          GetExplosionForce();
     void           SetExplosionForce(float fForce);

@@ -14,12 +14,10 @@
 
 CMonsterTruckSA::CMonsterTruckSA(CMonsterTruckSAInterface* monstertruck) : CAutomobileSA(monstertruck)
 {
-    DEBUG_TRACE("CMonsterTruckSA::CMonsterTruckSA( CMonsterTruckSAInterface * monstertruck )");
     this->m_pInterface = monstertruck;
 }
 
 CMonsterTruckSA::CMonsterTruckSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2)
     : CAutomobileSA(dwModelID, ucVariation, ucVariation2)
 {
-    DEBUG_TRACE("CMonsterTruckSA::CMonsterTruckSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
 }

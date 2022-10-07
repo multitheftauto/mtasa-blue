@@ -21,26 +21,22 @@ unsigned long CWeatherSA::FUNC_IsRaining;
 
 unsigned char CWeatherSA::Get()
 {
-    DEBUG_TRACE("unsigned char CWeatherSA::Get ( void )");
     return (unsigned char)*VAR_CWeather__ForcedWeatherType;
 }
 
 void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
 {
-    DEBUG_TRACE("void CWeatherSA::Set ( unsigned char primary, unsigned char secondary )");
     *VAR_CWeather__OldWeatherType = static_cast<unsigned char>(primary);
     *VAR_CWeather__NewWeatherType = static_cast<unsigned char>(secondary);
 }
 
 void CWeatherSA::Release()
 {
-    DEBUG_TRACE("void CWeatherSA::Release ( void )");
     *VAR_CWeather__ForcedWeatherType = 0xFF;
 }
 
 bool CWeatherSA::IsRaining()
 {
-    DEBUG_TRACE("bool CWeatherSA::IsRaining ( void )");
     DWORD dwFunc = FUNC_IsRaining;
     bool  bReturn = false;
     _asm

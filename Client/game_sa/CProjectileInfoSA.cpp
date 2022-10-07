@@ -15,12 +15,12 @@
 #include "CVehicleSA.h"
 
 extern CGameSA* pGame;
+
 /**
  * This destroys all the projectiles in the world
  */
 void CProjectileInfoSA::RemoveAllProjectiles()
 {
-    DEBUG_TRACE("void CProjectileInfoSA::RemoveAllProjectiles (  )");
     DWORD dwFunction = FUNC_RemoveAllProjectiles;
     _asm
     {
@@ -36,7 +36,6 @@ void CProjectileInfoSA::RemoveAllProjectiles()
  */
 CProjectile* CProjectileInfoSA::GetProjectile(DWORD ID)
 {
-    DEBUG_TRACE("CProjectile * CProjectileInfoSA::GetProjectile ( DWORD ID )");
     if (ID >= 0 && ID < 32)
         return (CProjectile*)(ARRAY_CProjectile + ID * sizeof(CProjectile*));
     else
@@ -125,8 +124,6 @@ CProjectileInfo* CProjectileInfoSA::GetProjectileInfo(DWORD dwIndex)
 
 bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity)
 {
-    DEBUG_TRACE("bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOffset, float fForce )");
-
     DWORD               dwFunction = FUNC_AddProjectile;
     DWORD               dwReturn = 0;
     CEntitySAInterface* creatorVC = NULL;

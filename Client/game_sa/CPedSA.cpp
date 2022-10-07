@@ -27,15 +27,11 @@ int             g_bOnlyUpdateRotations = false;
 
 CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL), m_iCustomMoveAnim(0)
 {
-    DEBUG_TRACE("CPedSA::CPedSA(  )");
-
     MemSetFast(this->m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
 
 CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPedInterface(pPedInterface), m_pPedSound(NULL), m_iCustomMoveAnim(0)
 {
-    DEBUG_TRACE("CPedSA::CPedSA( CPedSAInterface * pedInterface )");
-
     MemSetFast(this->m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
 
@@ -78,7 +74,6 @@ CPedSA::~CPedSA()
 
 void CPedSA::Init()
 {
-    DEBUG_TRACE("void CPedSA::Init()");
     CPedSAInterface* pedInterface = GetPedInterface();
 
     DWORD dwPedIntelligence = 0;
@@ -102,7 +97,6 @@ void CPedSA::Init()
 
 void CPedSA::SetModelIndex(DWORD dwModelIndex)
 {
-    DEBUG_TRACE("void CPedSA::SetModelIndex ( DWORD dwModelIndex )");
     DWORD dwFunction = FUNC_SetModelIndex;
     DWORD dwThis = (DWORD)this->GetInterface();
     _asm
@@ -133,7 +127,6 @@ void CPedSA::RemoveGeometryRef()
 
 bool CPedSA::IsInWater()
 {
-    DEBUG_TRACE("bool CPedSA::IsInWater ()");
     CTask* pTask = this->m_pPedIntelligence->GetTaskManager()->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
     return (pTask && (pTask->GetTaskType() == TASK_COMPLEX_IN_WATER));
 }
@@ -164,7 +157,6 @@ void CPedSA::AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigne
                                bool bChangeCamera)
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
-    DEBUG_TRACE("void CPedSA::AttachPedToEntity(CVehicle * entity, CVector * vector, unsigned short sUnk, FLOAT fUnk, eWeaponType weaponType)");
     DWORD dwFunc = FUNC_AttachPedToEntity;
     DWORD dwThis = (DWORD)this->GetInterface();
     float fX = vector->fX;
@@ -196,7 +188,6 @@ void CPedSA::AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigne
 
 CVehicle* CPedSA::GetVehicle()
 {
-    DEBUG_TRACE("CVehicle * CPedSA::GetVehicle()");
     if (((CPedSAInterface*)this->GetInterface())->pedFlags.bInVehicle)
     {
         CVehicleSAInterface* vehicle = (CVehicleSAInterface*)(((CPedSAInterface*)this->GetInterface())->CurrentObjective);
@@ -219,7 +210,6 @@ void CPedSA::Respawn(CVector* position, bool bCameraCut)
         MemSet((void*)0x4422EA, 0x90, 20);
     }
 
-    DEBUG_TRACE("void CPedSA::Respawn(CVector * position)");
     float fX = position->fX;
     float fY = position->fY;
     float fZ = position->fZ;

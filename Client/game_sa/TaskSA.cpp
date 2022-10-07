@@ -22,7 +22,6 @@ DWORD dwTasksCreatedTotal = 0;
 
 CTaskSA::CTaskSA()
 {
-    DEBUG_TRACE("CTaskSA::CTaskSA()");
     Parent = 0;
     TaskInterface = 0;
     dwTasksCreatedTotal++;
@@ -32,14 +31,12 @@ CTaskSA::CTaskSA()
 
 CTaskSA::~CTaskSA()
 {
-    DEBUG_TRACE("CTaskSA::~CTaskSA()");
     dwTasksAlive--;
 }
 
 // alocate memory for the task (ammount nSize)
 void CTaskSA::CreateTaskInterface(size_t nSize)
 {
-    DEBUG_TRACE("void CTaskSA::CreateTaskInterface(size_t nSize)");
 
     // Safety margin. I see GTA allocate more than we do for some tasks. We could create
     // crashes by not allocating enough. Better to potentially waste 12 bytes.
@@ -61,7 +58,6 @@ void CTaskSA::CreateTaskInterface(size_t nSize)
 
 CTask* CTaskSA::Clone()
 {
-    DEBUG_TRACE("CTask * CTaskSA::Clone() ");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwFunc = this->GetInterface()->VTBL->Clone;
     DWORD dwReturn = 0;
@@ -86,7 +82,6 @@ CTask* CTaskSA::GetSubTask()
 {
     static CTaskManagementSystemSA* s_pTaskManagementSystem = pGame->GetTaskManagementSystem();
 
-    DEBUG_TRACE("CTask * CTaskSA::GetSubTask()");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwFunc = this->GetInterface()->VTBL->GetSubTask;
     DWORD dwReturn = 0;
@@ -101,7 +96,6 @@ CTask* CTaskSA::GetSubTask()
 
 bool CTaskSA::IsSimpleTask()
 {
-    DEBUG_TRACE("bool CTaskSA::IsSimpleTask()");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwFunc = this->GetInterface()->VTBL->IsSimpleTask;
     bool  bReturn = 0;
@@ -116,7 +110,6 @@ bool CTaskSA::IsSimpleTask()
 
 int CTaskSA::GetTaskType()
 {
-    DEBUG_TRACE("int CTaskSA::GetTaskType()");
     CTaskSAInterface* pTaskInterface = this->GetInterface();
 
     DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
@@ -139,7 +132,6 @@ int CTaskSA::GetTaskType()
  */
 void CTaskSA::StopTimer(const CEvent* pEvent)
 {
-    DEBUG_TRACE("void CTaskSA::StopTimer(const CEvent* pEvent)");
     DWORD dwThisInterface = (DWORD)this->GetInterface();
     DWORD dwFunc = this->GetInterface()->VTBL->StopTimer;
     if (dwFunc != 0x82263A && dwFunc)
@@ -158,7 +150,6 @@ void CTaskSA::StopTimer(const CEvent* pEvent)
  */
 bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent)
 {
-    DEBUG_TRACE("bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent)");
 
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
@@ -185,7 +176,6 @@ bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEven
 
 const char* CTaskSA::GetTaskName()
 {
-    DEBUG_TRACE("char * CTaskSA::GetTaskName()");
     int iTaskType = GetTaskType();
     if (iTaskType != NO_TASK_TYPE)
         if (TaskNames[iTaskType].szName)
@@ -198,7 +188,6 @@ const char* CTaskSA::GetTaskName()
 
 void CTaskSA::Destroy()
 {
-    DEBUG_TRACE("void CTaskSA::Destroy()");
 
     if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
         return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
@@ -233,7 +222,6 @@ void CTaskSA::Destroy()
 
 void CTaskSA::DestroyJustThis()
 {
-    DEBUG_TRACE("void CTaskSA::DestroyJustThis()");
 
     if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
         return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
@@ -258,7 +246,6 @@ void CTaskSA::SetAsSecondaryPedTask(CPed* pPed, const int iType)
 
 bool CTaskSimpleSA::ProcessPed(CPed* pPed)
 {
-    DEBUG_TRACE("bool CTaskSimpleSA::ProcessPed(CPed* pPed)");
 
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
@@ -283,8 +270,6 @@ bool CTaskSimpleSA::ProcessPed(CPed* pPed)
 
 bool CTaskSimpleSA::SetPedPosition(CPed* pPed)
 {
-    DEBUG_TRACE("bool CTaskSimpleSA::SetPedPosition(CPed* pPed)");
-
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
         return false;
@@ -314,14 +299,12 @@ bool CTaskSimpleSA::SetPedPosition(CPed* pPed)
 /*
 CTaskComplexSA::CTaskComplexSA()
 {
-    DEBUG_TRACE("CTaskComplexSA::CTaskComplexSA()");
 //  this->m_pSubTask = 0;
 }
 */
 
 void CTaskComplexSA::SetSubTask(CTask* pSubTask)
 {
-    DEBUG_TRACE("void CTaskComplexSA::SetSubTask(CTask* pSubTask)");
     /*  if(this->m_pSubTask)
             delete this->m_pSubTask;
         else
@@ -343,8 +326,6 @@ void CTaskComplexSA::SetSubTask(CTask* pSubTask)
 
 CTask* CTaskComplexSA::CreateNextSubTask(CPed* pPed)
 {
-    DEBUG_TRACE("CTask * CTaskComplexSA::CreateNextSubTask(CPed* pPed)");
-
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
         return NULL;
@@ -368,8 +349,6 @@ CTask* CTaskComplexSA::CreateNextSubTask(CPed* pPed)
 
 CTask* CTaskComplexSA::CreateFirstSubTask(CPed* pPed)
 {
-    DEBUG_TRACE("CTask * CTaskComplexSA::CreateFirstSubTask(CPed* pPed)");
-
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
         return NULL;
@@ -393,8 +372,6 @@ CTask* CTaskComplexSA::CreateFirstSubTask(CPed* pPed)
 
 CTask* CTaskComplexSA::ControlSubTask(CPed* pPed)
 {
-    DEBUG_TRACE("CTask * CTaskComplexSA::ControlSubTask(CPed* pPed)");
-
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
         return NULL;

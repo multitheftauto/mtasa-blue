@@ -58,7 +58,7 @@ public:
     void                SetColor(eMarkerColor color);
     void                SetColor(const SharedUtil::SColor color);
     void                Remove();
-    BOOL                IsActive();
+    bool                IsActive();
     void                SetPosition(CVector* vecPosition);
     void                SetEntity(CVehicle* vehicle);
     void                SetEntity(CPed* ped);

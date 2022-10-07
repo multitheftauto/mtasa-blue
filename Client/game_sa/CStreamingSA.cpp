@@ -80,7 +80,7 @@ void CStreamingSA::RemoveModel(std::uint32_t model)
     function(model);
 }
 
-void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
+void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* szTag)
 {
     TIMEUS startTime = GetTimeUs();
 
@@ -101,7 +101,7 @@ void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* 
     }
 }
 
-BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
+bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 {
     if (IsUpgradeModelId(dwModelID))
     {
@@ -119,13 +119,12 @@ BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-        BOOL  bReturn = 0;
+        bool bReturn = 0;
         _asm
         {
             push    dwModelID
             call    dwFunc
-            movzx   eax, al
-            mov     bReturn, eax
+            mov     bReturn, al
             pop     eax
         }
 

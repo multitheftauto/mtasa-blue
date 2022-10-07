@@ -28,8 +28,6 @@ CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObj
 
 CProjectileSA::~CProjectileSA()
 {
-    DEBUG_TRACE("CProjectileSA::~CProjectileSA( )");
-
     this->BeingDeleted = true;
     /*
     //OutputDebugString("Attempting to destroy Object\n");

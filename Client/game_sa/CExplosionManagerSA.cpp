@@ -16,7 +16,6 @@
 
 CExplosionManagerSA::CExplosionManagerSA()
 {
-    DEBUG_TRACE("CExplosionManagerSA::CExplosionManagerSA()");
     for (int i = 0; i < MAX_EXPLOSIONS; i++)
         Explosions[i] = new CExplosionSA((CExplosionSAInterface*)(ARRAY_Explosions + i * sizeof(CExplosionSAInterface)));
 }
@@ -35,7 +34,6 @@ CExplosionManagerSA::~CExplosionManagerSA()
 CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition,
                                               unsigned int uiActivationDelay, bool bMakeSound, float fCamShake, bool bNoDamage)
 {
-    DEBUG_TRACE("CExplosion * CExplosionManagerSA::AddExplosion ( eExplosionType explosiontype, CVector * vecPosition, CEntity * creator = NULL)");
     DWORD       dwExplodingEntityInterface = (pExplodingEntity) ? (DWORD)pExplodingEntity->GetInterface() : 0;
     DWORD       dwOwnerInterface = (pOwner) ? (DWORD)pOwner->GetInterface() : 0;
     float       fX = vecPosition.fX, fY = vecPosition.fY, fZ = vecPosition.fZ;
@@ -77,7 +75,6 @@ returnhere:
 
 void CExplosionManagerSA::RemoveAllExplosions()
 {
-    DEBUG_TRACE("VOID CExplosionManagerSA::RemoveAllExplosions (  )");
     for (int i = 0; i < MAX_EXPLOSIONS; i++)
         if (Explosions[i]->IsActive())
             Explosions[i]->Remove();
@@ -85,13 +82,11 @@ void CExplosionManagerSA::RemoveAllExplosions()
 
 CExplosion* CExplosionManagerSA::GetExplosion(DWORD ID)
 {
-    DEBUG_TRACE("CExplosion * CExplosionManagerSA::GetExplosion ( DWORD ID )");
     return Explosions[ID];
 }
 
 CExplosion* CExplosionManagerSA::FindFreeExplosion()
 {
-    DEBUG_TRACE("CExplosion * CExplosionManagerSA::FindFreeExplosion (  )");
     for (int i = 0; i < MAX_EXPLOSIONS; i++)
         if (!Explosions[i]->IsActive())
             return Explosions[i];

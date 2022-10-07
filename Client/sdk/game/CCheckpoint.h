@@ -41,7 +41,7 @@ public:
     virtual void     SetPointDirection(CVector* vecPointDirection) = 0;
     virtual CVector* GetPointDirection() = 0;
     virtual DWORD    GetType() = 0;            // need enum?
-    virtual BOOL     IsActive() = 0;
+    virtual bool     IsActive() = 0;
     virtual DWORD    GetIdentifier() = 0;
     virtual SharedUtil::SColor GetColor() = 0;
     virtual void     SetColor(const SharedUtil::SColor color) = 0;

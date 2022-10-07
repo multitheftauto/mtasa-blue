@@ -16,7 +16,6 @@
 
 CPickupsSA::CPickupsSA()
 {
-    DEBUG_TRACE("CPickupsSA::CPickupsSA()");
     for (int i = 0; i < MAX_PICKUPS; i++)
         Pickups[i] = new CPickupSA((CPickupSAInterface*)(ARRAY_PICKUPS + i * sizeof(CPickupSAInterface)));
 }
@@ -31,15 +30,11 @@ CPickupsSA::~CPickupsSA()
 
 CPickup* CPickupsSA::GetPickup(DWORD ID)
 {
-    DEBUG_TRACE("CPickup * CPickupsSA::GetPickup(DWORD ID)");
     return (CPickup*)Pickups[ID];
 }
 
 CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer)
 {
-    DEBUG_TRACE(
-        "CPickup * CPickupsSA::CreatePickup(CVector * position, DWORD ModelIndex, ePickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE "
-        "bPingOutOfPlayer)");
     DWORD      FreeSlot = 0;
     bool       bFoundFreeSlot = false;
     CPickupSA* pickup;

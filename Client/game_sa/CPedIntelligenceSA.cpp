@@ -30,7 +30,6 @@ CPedIntelligenceSA::~CPedIntelligenceSA()
 
 CTaskManager* CPedIntelligenceSA::GetTaskManager()
 {
-    DEBUG_TRACE("CTaskManager * CPedSA::GetTaskManager( void )");
     return this->TaskManager;
 }
 

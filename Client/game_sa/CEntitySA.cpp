@@ -99,14 +99,9 @@ bool CEntitySA::SetScaleInternal(const CVector& scale)
     return true;
 }
 
-/*VOID CEntitySA::SetModelAlpha ( int iAlpha )
-{
-    this->internalInterface->ModelClump->SetAlpha(iAlpha);
-}*/
 void CEntitySA::SetPosition(float fX, float fY, float fZ)
 {
     // Remove & add to world?
-    DEBUG_TRACE("VOID CEntitySA::SetPosition(float fX, float fY, float fZ)");
     CVector* vecPos;
     if (m_pInterface->Placeable.matrix)
     {
@@ -146,7 +141,6 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
 
 void CEntitySA::Teleport(float fX, float fY, float fZ)
 {
-    DEBUG_TRACE("VOID CEntitySA::Teleport ( float fX, float fY, float fZ )");
     if (m_pInterface->Placeable.matrix)
     {
         SetPosition(fX, fY, fZ);
@@ -171,7 +165,6 @@ void CEntitySA::Teleport(float fX, float fY, float fZ)
 
 void CEntitySA::ProcessControl()
 {
-    DEBUG_TRACE("VOID CEntitySA::ProcessControl ( void )");
     DWORD dwFunc = m_pInterface->vtbl->ProcessControl;
     DWORD dwThis = (DWORD)m_pInterface;
     if (dwFunc)
@@ -186,7 +179,6 @@ void CEntitySA::ProcessControl()
 
 void CEntitySA::SetupLighting()
 {
-    DEBUG_TRACE("VOID CEntitySA::SetupLighting ( )");
     DWORD dwFunc = m_pInterface->vtbl->SetupLighting;
     DWORD dwThis = (DWORD)m_pInterface;
     if (dwFunc)
@@ -201,7 +193,6 @@ void CEntitySA::SetupLighting()
 
 void CEntitySA::Render()
 {
-    DEBUG_TRACE("VOID CEntitySA::Render ( )");
     DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
@@ -223,7 +214,6 @@ void CEntitySA::Render()
 
 void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 {
-    DEBUG_TRACE("VOID CEntitySA::SetOrientation ( float fX, float fY, float fZ )");
     pGame->GetWorld()->Remove(this, CEntity_SetOrientation);
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_SetOrientation;
@@ -263,7 +253,6 @@ void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 
 void CEntitySA::FixBoatOrientation()
 {
-    DEBUG_TRACE("VOID CEntitySA::FixBoatOrientation ( void )");
     pGame->GetWorld()->Remove(this, CEntity_FixBoatOrientation);
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x446F90;
@@ -285,7 +274,6 @@ void CEntitySA::FixBoatOrientation()
 
 void CEntitySA::SetPosition(CVector* vecPosition)
 {
-    DEBUG_TRACE("VOID CEntitySA::SetPosition( CVector * vecPosition )");
     if (vecPosition)
         SetPosition(vecPosition->fX, vecPosition->fY, vecPosition->fZ);
 }
@@ -319,7 +307,6 @@ CVector* CEntitySA::GetPosition()
 
 CVector* CEntitySA::GetPositionInternal()
 {
-    DEBUG_TRACE("CVector * CEntitySA::GetPosition( )");
     if (m_pInterface->Placeable.matrix)
         return &m_pInterface->Placeable.matrix->vPos;
     else
@@ -346,7 +333,6 @@ CMatrix* CEntitySA::GetMatrix(CMatrix* matrix)
 
 CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 {
-    DEBUG_TRACE("CMatrix * CEntitySA::GetMatrix ( CMatrix * matrix )");
     if (m_pInterface->Placeable.matrix && matrix)
     {
         MemCpyFast(&matrix->vFront, &m_pInterface->Placeable.matrix->vFront, sizeof(CVector));
@@ -363,8 +349,6 @@ CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
 
 void CEntitySA::SetMatrix(CMatrix* matrix)
 {
-    DEBUG_TRACE("VOID CEntitySA::SetMatrix ( CMatrix * matrix )");
-
     if (m_pInterface->Placeable.matrix && matrix)
     {
         OnChangingPosition(matrix->vPos);
@@ -420,19 +404,16 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
 
 WORD CEntitySA::GetModelIndex()
 {
-    DEBUG_TRACE("WORD CEntitySA::GetModelIndex ()");
     return m_pInterface->m_nModelIndex;
 }
 
 eEntityType CEntitySA::GetEntityType()
 {
-    DEBUG_TRACE("eEntityType CEntitySA::GetEntityType ()");
     return (eEntityType)m_pInterface->nType;
 }
 
 float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
-    DEBUG_TRACE("FLOAT CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()");
     DWORD dwFunc = FUNC_GetDistanceFromCentreOfMassToBaseOfModel;
     DWORD dwThis = (DWORD)m_pInterface;
     float fReturn;
@@ -447,13 +428,11 @@ float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
 
 void CEntitySA::SetEntityStatus(eEntityStatus bStatus)
 {
-    DEBUG_TRACE("VOID CEntitySA::SetEntityStatus( eEntityStatus bStatus )");
     m_pInterface->nStatus = bStatus;
 }
 
 eEntityStatus CEntitySA::GetEntityStatus()
 {
-    DEBUG_TRACE("eEntityStatus CEntitySA::GetEntityStatus( )");
     return (eEntityStatus)m_pInterface->nStatus;
 }
 
@@ -493,7 +472,6 @@ RwMatrix* CEntitySA::GetLTMFromId(int id)
 
 void CEntitySA::SetAlpha(DWORD dwAlpha)
 {
-    DEBUG_TRACE("VOID CEntitySA::SetAlpha(DWORD dwAlpha)");
     DWORD dwFunc = FUNC_SetRwObjectAlpha;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
