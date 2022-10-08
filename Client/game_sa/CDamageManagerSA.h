@@ -60,7 +60,7 @@ public:
     BYTE          GetAeroplaneCompStatus(BYTE CompID);
     void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status);
 
-    void FuckCarCompletely(BOOL bKeepWheels);
+    void FuckCarCompletely(bool bKeepWheels);
 
     CDamageManagerSA(class CEntitySAInterface* intEntityInterface, CDamageManagerSAInterface* intInterface)
     {

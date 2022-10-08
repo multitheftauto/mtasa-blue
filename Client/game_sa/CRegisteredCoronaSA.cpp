@@ -15,61 +15,51 @@
 
 CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface)
 {
-    DEBUG_TRACE("CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface * coronaInterface)");
     internalInterface = coronaInterface;
 }
 
 CVector* CRegisteredCoronaSA::GetPosition()
 {
-    DEBUG_TRACE("CVector * CRegisteredCoronaSA::GetPosition()");
     return &internalInterface->Coordinates;
 }
 
 void CRegisteredCoronaSA::SetPosition(CVector* vector)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetPosition(CVector * vector)");
     MemCpyFast(&internalInterface->Coordinates, vector, sizeof(CVector));
 }
 
 float CRegisteredCoronaSA::GetSize()
 {
-    DEBUG_TRACE("FLOAT CRegisteredCoronaSA::GetSize()");
     return internalInterface->Size;
 }
 
 void CRegisteredCoronaSA::SetSize(float fSize)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetSize(FLOAT fSize)");
     internalInterface->Size = fSize;
 }
 
 float CRegisteredCoronaSA::GetRange()
 {
-    DEBUG_TRACE("FLOAT CRegisteredCoronaSA::GetRange()");
     return internalInterface->Range;
 }
 
 void CRegisteredCoronaSA::SetRange(float fRange)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetRange(FLOAT fRange)");
     internalInterface->Range = fRange;
 }
 
 float CRegisteredCoronaSA::GetPullTowardsCamera()
 {
-    DEBUG_TRACE("FLOAT CRegisteredCoronaSA::GetPullTowardsCamera()");
     return internalInterface->PullTowardsCam;
 }
 
 void CRegisteredCoronaSA::SetPullTowardsCamera(float fPullTowardsCamera)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetPullTowardsCamera(FLOAT fPullTowardsCamera)");
     internalInterface->PullTowardsCam = fPullTowardsCamera;
 }
 
 void CRegisteredCoronaSA::SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)");
     internalInterface->Red = Red;
     internalInterface->Green = Green;
     internalInterface->Blue = Blue;
@@ -79,13 +69,11 @@ void CRegisteredCoronaSA::SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha)
 
 void CRegisteredCoronaSA::SetTexture(RwTexture* texture)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetTexture(RwTexture * texture)");
     internalInterface->pTex = texture;
 }
 
 void CRegisteredCoronaSA::SetTexture(eCoronaType texture)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetTexture(eCoronaType texture)");
     CCoronasSA* coronas = ((CCoronasSA*)pGame->GetCoronas());
     RwTexture*  tex = coronas->GetTexture(texture);
     if (tex)
@@ -98,13 +86,11 @@ void CRegisteredCoronaSA::SetTexture(eCoronaType texture)
  */
 BYTE CRegisteredCoronaSA::GetFlareType()
 {
-    DEBUG_TRACE("BYTE CRegisteredCoronaSA::GetFlareType()");
     return internalInterface->FlareType;
 }
 
 void CRegisteredCoronaSA::SetFlareType(BYTE fFlareType)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::SetFlareType(BYTE fFlareType)");
     internalInterface->FlareType = fFlareType;
 }
 
@@ -115,13 +101,11 @@ void CRegisteredCoronaSA::SetReflectionType(BYTE reflectionType)
 
 DWORD CRegisteredCoronaSA::GetID()
 {
-    DEBUG_TRACE("DWORD CRegisteredCoronaSA::GetID()");
     return ((DWORD)internalInterface - ARRAY_CORONAS) / sizeof(CRegisteredCoronaSAInterface);
 }
 
 void CRegisteredCoronaSA::Init(DWORD Identifier)
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::Init(DWORD Identifier)");
     internalInterface->Identifier = Identifier;
     this->SetSize(2.5f);
     internalInterface->bIsAttachedToEntity = false;
@@ -142,7 +126,6 @@ void CRegisteredCoronaSA::Init(DWORD Identifier)
 
 void CRegisteredCoronaSA::Refresh()
 {
-    DEBUG_TRACE("VOID CRegisteredCoronaSA::Refresh()");
     internalInterface->JustCreated = 1;
 }
 

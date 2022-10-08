@@ -24,8 +24,6 @@ CCoreInterface* g_pCore = NULL;
 // in order for proper initialization to occur.
 MTAEXPORT CGame* GetGameInterface(CCoreInterface* pCore)
 {
-    DEBUG_TRACE("CGame * GetGameInterface()");
-
     g_pNet = pCore->GetNetwork();
     assert(g_pNet);
 

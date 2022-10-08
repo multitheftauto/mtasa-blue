@@ -14,8 +14,6 @@
 
 CWanted* CPlayerInfoSA::GetWanted()
 {
-    DEBUG_TRACE("CWanted * CPlayerInfoSA::GetWanted ( )");
-
     if (!wanted)
         wanted = new CWantedSA(this->internalInterface->PlayerPedData.m_Wanted);
 
@@ -28,7 +26,6 @@ CWanted* CPlayerInfoSA::GetWanted()
  */
 long CPlayerInfoSA::GetPlayerMoney()
 {
-    DEBUG_TRACE("unsigned long CPlayerInfoSA::GetPlayerMoney ( void )");
     // return internalInterface->DisplayScore;
     return *(long*)(0xB7CE50);
 }
@@ -39,7 +36,6 @@ long CPlayerInfoSA::GetPlayerMoney()
  */
 void CPlayerInfoSA::SetPlayerMoney(long lMoney, bool bInstant)
 {
-    DEBUG_TRACE("void CPlayerInfoSA::SetPlayerMoney ( unsigned long ulMoney, bool bInstant )");
     MemPutFast<long>(0xB7CE50, lMoney);
 
     if (bInstant)

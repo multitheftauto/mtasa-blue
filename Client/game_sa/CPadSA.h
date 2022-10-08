@@ -65,7 +65,6 @@ private:
     CPadSAInterface  StoredPad;
 
 public:
-    // constructor
     CPadSA(CPadSAInterface* padInterface) { this->internalInterface = padInterface; };
 
     CControllerState* GetCurrentControllerState(CControllerState* ControllerState);

@@ -14,13 +14,11 @@
 
 CBoatSA::CBoatSA(CBoatSAInterface* boat)
 {
-    DEBUG_TRACE("CBoatSA::CBoatSA( CBoatSAInterface * boat )");
     this->m_pInterface = boat;
 }
 
 CBoatSA::CBoatSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)
 {
-    DEBUG_TRACE("CBoatSA::CBoatSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
     /*if(this->internalInterface)
     {
         // create the actual vehicle

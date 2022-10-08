@@ -32,8 +32,6 @@ CTaskComplexEnterCarSA::CTaskComplexEnterCarSA(CVehicle* pTargetVehicle, const b
 
 CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle) : CTaskComplexEnterCarSA(pTargetVehicle, true, false, false, false)
 {
-    DEBUG_TRACE("CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTargetVehicle)");
-
     CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
     if (pTargetVehicleSA)
@@ -52,10 +50,6 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTarget
             call    dwFunc
         }
     }
-    else
-    {
-        DEBUG_TRACE("pTargetVehicleSA was invalid!");
-    }
 }
 
 // ##############################################################################
@@ -66,8 +60,6 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTarget
 CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle, const int iTargetSeat, const bool bCarryOnAfterFallingOff)
     : CTaskComplexEnterCarSA(pTargetVehicle, false, false, false, false)
 {
-    DEBUG_TRACE("CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* pTargetVehicle)");
-
     CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
     if (pTargetVehicleSA)
@@ -92,10 +84,6 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* p
             pop     edx
         }
     }
-    else
-    {
-        DEBUG_TRACE("pTargetVehicleSA was invalid!");
-    }
 }
 
 // ##############################################################################
@@ -105,8 +93,6 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* p
 
 CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle) : CTaskComplexSA()
 {
-    DEBUG_TRACE("CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTargetVehicle)");
-
     CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
     if (pTargetVehicleSA)
@@ -125,10 +111,6 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTarg
             call    dwFunc
         }
     }
-    else
-    {
-        DEBUG_TRACE("pTargetVehicleSA was invalid!");
-    }
 }
 
 // ##############################################################################
@@ -140,10 +122,6 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const i
                                                const bool bForceGetOut)
     : CTaskComplexSA()
 {
-    DEBUG_TRACE(
-        "CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA( CVehicle* pTargetVehicle, const int iTargetDoor, const int iDelayTime, const bool bSensibleLeaveCar, "
-        "const bool bForceGetOut )");
-
     CVehicleSA* pTargetVehicleSA = dynamic_cast<CVehicleSA*>(pTargetVehicle);
 
     if (pTargetVehicleSA)
@@ -175,9 +153,5 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const i
             call    dwFunc
             pop     ebx
         }
-    }
-    else
-    {
-        DEBUG_TRACE("pTargetVehicleSA was invalid!");
     }
 }

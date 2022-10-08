@@ -17,10 +17,6 @@
 CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage,
                                                    char nDrivebyStyle, bool bSeatRHS)
 {
-    DEBUG_TRACE(
-        "CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA ( CEntity *pTargetEntity, const CVector *pVecTarget, float fAbortRange, char FrequencyPercentage, "
-        "char nDrivebyStyle, bool bSeatRHS )");
-
     this->CreateTaskInterface(sizeof(CTaskSimpleGangDriveBySAInterface));
     if (!IsValid())
         return;
@@ -42,10 +38,6 @@ CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const
 
 CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate)
 {
-    DEBUG_TRACE(
-        "CTaskSimpleUseGunSA::CTaskSimpleUseGunSA ( CEntity *pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate "
-        ")");
-
     this->CreateTaskInterface(sizeof(CTaskSimpleUseGunSAInterface));
     if (!IsValid())
         return;
@@ -445,8 +437,6 @@ void CTaskSimpleUseGunSA::StartCountDown(unsigned char a, bool b)
 
 CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod)
 {
-    DEBUG_TRACE("CTaskSimpleFightSA::CTaskSimpleFightSA ( CEntity *pTargetEntity, int nCommand, unsigned int nIdlePeriod )");
-
     this->CreateTaskInterface(sizeof(CTaskSimpleFightSAInterface));
     if (!IsValid())
         return;

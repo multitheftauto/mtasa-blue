@@ -43,6 +43,3 @@ public:
     virtual void         GiveUsAPickUpObject(int ForcedObjectIndex = -1) = 0;
     virtual void         GetRidOfObjects() = 0;
 };
-
-// not used
-typedef BOOL (*CBPickup)(CPickup*);

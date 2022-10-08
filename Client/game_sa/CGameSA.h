@@ -178,12 +178,9 @@ public:
         return *VAR_SystemTime;
     }
 
-    BOOL IsAtMenu()
+    bool IsAtMenu()
     {
-        if (*VAR_IsAtMenu)
-            return TRUE;
-        else
-            return FALSE;
+        return *VAR_IsAtMenu != 0;
     }
 
     void         StartGame();
@@ -204,7 +201,7 @@ public:
     float GetTimeScale();
     void  SetTimeScale(float fTimeScale);
 
-    BOOL InitLocalPlayer(class CClientPed* pClientPed);
+    bool InitLocalPlayer(class CClientPed* pClientPed);
 
     float GetGravity();
     void  SetGravity(float fGravity);

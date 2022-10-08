@@ -15,13 +15,11 @@
 
 eEventEntityType CEventSA::GetType()
 {
-    DEBUG_TRACE("eEventEntityType CEventSA::GetType (  )");
     return m_pInterface->m_eEventType;
 }
 
 CEntity* CEventSA::GetEntity()
 {
-    DEBUG_TRACE("CEntity * CEventSA::GetEntity (  )");
     if (this->GetEntityType() == EVENT_NULL)
         return NULL;
 
@@ -47,18 +45,15 @@ CEntity* CEventSA::GetEntity()
 
 eEventEntity CEventSA::GetEntityType()
 {
-    DEBUG_TRACE("eEventEntity CEventSA::GetEntityType (  )");
     return m_pInterface->m_eEventEntity;
 }
 
 CEntity* CEventSA::GetCommittedBy()
 {
-    DEBUG_TRACE("CEntity * CEventSA::GetCommittedBy (  )");
     return m_pInterface->m_pCommitedBy;
 }
 
 CVector* CEventSA::GetPosition()
 {
-    DEBUG_TRACE("CVector * CEventSA::GetPosition (  )");
     return &m_pInterface->m_vecEventPosition;
 }

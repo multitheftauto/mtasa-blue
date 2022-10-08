@@ -32,7 +32,7 @@ public:
     virtual void     SetColor(eMarkerColor color) = 0;
     virtual void     SetColor(const SharedUtil::SColor color) = 0;
     virtual void     Remove() = 0;
-    virtual BOOL     IsActive() = 0;
+    virtual bool     IsActive() = 0;
     virtual void     SetPosition(CVector* vecPosition) = 0;
     virtual void     SetEntity(CVehicle* vehicle) = 0;
     virtual void     SetEntity(CPed* ped) = 0;

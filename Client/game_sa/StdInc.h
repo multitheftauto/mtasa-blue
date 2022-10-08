@@ -1,6 +1,12 @@
 
 // Pragmas
+
+// illegal instruction size
+// The instruction did not have a form with the specified size. The smallest legal size was used.
 #pragma warning (disable:4409)
+
+// 'class1' : inherits 'class2::member' via dominance
+// Two or more members have the same name. The one in class2 is inherited because it is a base class for the other classes that contained this member.
 #pragma warning (disable:4250)
 
 #include <windows.h>
@@ -26,5 +32,4 @@
 
 // Game includes
 #include "HookSystem.h"
-#include "Common.h"
 #include "gamesa_init.h"

@@ -16,13 +16,11 @@
 
 eExplosionType CExplosionSA::GetExplosionType()
 {
-    DEBUG_TRACE("eExplosionType CExplosionSA::GetExplosionType (  )");
     return internalInterface->m_ExplosionType;
 }
 
 CVector* CExplosionSA::GetExplosionPosition()
 {
-    DEBUG_TRACE("CVector * CExplosionSA::GetExplosionPosition (  )");
     return &internalInterface->m_vecPosition;
 }
 
@@ -36,8 +34,6 @@ void CExplosionSA::SetExplosionPosition(const CVector* vecPosition)
  */
 CEntity* CExplosionSA::GetExplosionCreator()
 {
-    DEBUG_TRACE("CEntity * CExplosionSA::GetExplosionCreator (  )");
-
     eEntityType entityType = (eEntityType)GetInterface()->m_pEntExplosionOwner->nType;
 
     CPools* pools = pGame->GetPools();
@@ -74,68 +70,57 @@ CEntity* CExplosionSA::GetExplodingEntity()
     return NULL;
 }
 
-BOOL CExplosionSA::IsActive()
+bool CExplosionSA::IsActive()
 {
-    DEBUG_TRACE("BOOL CExplosionSA::IsActive (  )");
     return internalInterface->m_cExplosionActive;
 }
 
 void CExplosionSA::Remove()
 {
-    DEBUG_TRACE("VOID CExplosionSA::Remove (  )");
     internalInterface->m_cExplosionActive = 0;
 }
 
 float CExplosionSA::GetExplosionForce()
 {
-    DEBUG_TRACE("FLOAT CExplosionSA::GetExplosionForce()");
     return this->GetInterface()->m_fExplosionForce;
 }
 
 void CExplosionSA::SetExplosionForce(float fForce)
 {
-    DEBUG_TRACE("VOID CExplosionSA::SetExplosionForce(FLOAT fForce)");
     this->GetInterface()->m_fExplosionForce = fForce;
 }
 
 void CExplosionSA::SetSilent(bool bSilent)
 {
-    DEBUG_TRACE("VOID CExplosionSA::SetSilent(BOOL bSilent)");
     this->GetInterface()->m_bMakeSound = !bSilent;
 }
 
 unsigned long CExplosionSA::GetActivationTimer()
 {
-    DEBUG_TRACE("DWORD CExplosionSA::GetActivationTimer()");
     return this->GetInterface()->m_ActivationTime;
 }
 
 void CExplosionSA::SetActivationTimer(unsigned long ulActivationTime)
 {
-    DEBUG_TRACE("VOID CExplosionSA::SetActivationTimer( DWORD dwActivationTime )");
     this->GetInterface()->m_ActivationTime = ulActivationTime;
 }
 
 DWORD CExplosionSA::GetExpiryTime()
 {
-    DEBUG_TRACE("DWORD CExplosionSA::GetExpiryTime()");
     return this->GetInterface()->m_TimeExpires;
 }
 
 void CExplosionSA::SetExpiryTime(DWORD dwExpiryTime)
 {
-    DEBUG_TRACE("VOID CExplosionSA::SetExpiryTime( DWORD dwExpiryTime )");
     this->GetInterface()->m_TimeExpires = dwExpiryTime;
 }
 
 float CExplosionSA::GetExplosionRadius()
 {
-    DEBUG_TRACE("FLOAT CExplosionSA::GetExplosionRadius()");
     return this->GetInterface()->m_fExplosionRadius;
 }
 
 void CExplosionSA::SetExplosionRadius(float fRadius)
 {
-    DEBUG_TRACE("VOID CExplosionSA::SetExplosionRadius( FLOAT fRadius )");
     this->GetInterface()->m_fExplosionRadius = fRadius;
 }

@@ -25,7 +25,6 @@ private:
     C3DMarkerSA* Markers[MAX_3D_MARKERS];
 
 public:
-    // constructor
     C3DMarkersSA();
     ~C3DMarkersSA();
 

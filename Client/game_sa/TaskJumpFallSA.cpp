@@ -15,10 +15,6 @@
 CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
                                        const bool bForceClimb)
 {
-    DEBUG_TRACE(
-        "CTaskSimpleClimbSA::CTaskSimpleClimbSA ( CEntity *pClimbEnt, const CVector &vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight, "
-        "const bool bForceClimb )");
-
     this->CreateTaskInterface(sizeof(CTaskSimpleClimbSAInterface));
     if (!IsValid())
         return;
@@ -45,7 +41,6 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTar
 
 CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float fCruiseHeight, int nHoverTime)
 {
-    DEBUG_TRACE("CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector *pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0)");
     this->CreateTaskInterface(sizeof(CTaskSimpleJetPackSAInterface));
     if (!IsValid())
         return;

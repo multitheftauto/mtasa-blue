@@ -88,11 +88,11 @@ public:
     virtual void SetVisible(bool bVisible) = 0;
 
     virtual void SetDoNotRemoveFromGameWhenDeleted(bool bDoNotRemoveFromGame) = 0;
-    virtual void SetUsesCollision(BOOL bUsesCollision) = 0;
-    virtual BOOL IsBackfaceCulled() = 0;
-    virtual void SetBackfaceCulled(BOOL bBackfaceCulled) = 0;
-    virtual BOOL IsStatic() = 0;
-    virtual void SetStatic(BOOL bStatic) = 0;
+    virtual void SetUsesCollision(bool bUsesCollision) = 0;
+    virtual bool IsBackfaceCulled() = 0;
+    virtual void SetBackfaceCulled(bool bBackfaceCulled) = 0;
+    virtual bool IsStatic() = 0;
+    virtual void SetStatic(bool bStatic) = 0;
     virtual void SetAlpha(DWORD dwAlpha) = 0;
 
     virtual void MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown) = 0;

@@ -54,10 +54,10 @@ public:
     CEntity*        GetCreator();
     CEntity*        GetEntityOnFire();
     void            SetTarget(CEntity* entity);
-    BOOL            IsIgnited();
-    BOOL            IsFree();
-    void            SetSilent(BOOL bSilent);
-    BOOL            IsBeingExtinguished();
+    bool            IsIgnited();
+    bool            IsFree();
+    void            SetSilent(bool bSilent);
+    bool            IsBeingExtinguished();
     void            Ignite();
     float           GetStrength();
     void            SetStrength(float fStrength);

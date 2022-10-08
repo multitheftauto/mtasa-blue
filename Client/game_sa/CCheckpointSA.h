@@ -47,7 +47,7 @@ public:
     CVector* GetPointDirection();
     DWORD    GetType();                      // need enum?
     void     SetType(WORD wType);            // doesn't work propperly (not virtualed)
-    BOOL     IsActive();
+    bool     IsActive();
     void     Activate();
     DWORD    GetIdentifier();
     void     SetIdentifier(DWORD dwIdentifier);
