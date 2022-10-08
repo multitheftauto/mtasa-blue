@@ -14,11 +14,12 @@
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
 #include <game/RenderWareD3D.h>
-
+#include "CRenderWareSA.h"
+#include "CColModelSA.h"
+#include "CFileLoaderSA.h"
+#include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
-#include "CRenderWareSA.ShaderMatching.h"
-#include "CFileLoaderSA.h"
 
 extern CGameSA* pGame;
 

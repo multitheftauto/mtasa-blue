@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWeapon.h>
 
 using std::list;
 using std::vector;

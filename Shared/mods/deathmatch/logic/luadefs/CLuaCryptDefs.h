@@ -20,7 +20,8 @@ public:
 
     static std::string Md5(std::string strMd5);
 
-    static std::string Hash(EHashFunctionType hashFunction, std::string strSourceData);
+    static std::variant<std::string, bool> Hash(lua_State* const luaVM, HashFunctionType hashFunction, std::string strSourceData,
+                                                std::optional<std::unordered_map<std::string, std::string>> options);
 
     static std::string                                           TeaEncode(std::string str, std::string key);
     static std::string                                           TeaDecode(std::string str, std::string key);

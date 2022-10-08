@@ -13,13 +13,13 @@
 
 #include "Common.h"
 
-#include "CAutomobile.h"
-#include "CBoat.h"
-#include "CBike.h"
-#include "CBuilding.h"
-#include "CObject.h"
-#include "CPed.h"
-#include "CVehicle.h"
+class CBuilding;
+class CEntity;
+class CObject;
+class CPed;
+class CVector;
+class CVehicle;
+struct RpClump;
 
 enum ePools
 {
@@ -59,24 +59,6 @@ struct SClientEntity
     CClientEntity* pClientEntity;
 };
 
-class CEntryInfoNodePool
-{
-public:
-    virtual int GetNumberOfUsedSpaces() = 0;
-};
-
-class CPointerNodeSingleLinkPool
-{
-public:
-    virtual int GetNumberOfUsedSpaces() = 0;
-};
-
-class CPointerNodeDoubleLinkPool
-{
-public:
-    virtual int GetNumberOfUsedSpaces() = 0;
-};
-
 class CPools
 {
 public:
@@ -105,7 +87,6 @@ public:
     // Peds pool
     virtual CPed* AddPed(class CClientPed* pClientPed, ePedModel ePedType) = 0;
     virtual CPed* AddPed(class CClientPed* pClientPed, DWORD* pGameInterface) = 0;
-    virtual CPed* AddCivilianPed(DWORD* pGameInterface) = 0;
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
@@ -128,10 +109,6 @@ public:
     virtual int  GetPoolDefaultCapacity(ePools pool) = 0;
     virtual int  GetPoolCapacity(ePools pool) = 0;
     virtual void SetPoolCapacity(ePools pool, int iValue) = 0;
-
-    virtual CEntryInfoNodePool*         GetEntryInfoNodePool() = 0;
-    virtual CPointerNodeSingleLinkPool* GetPointerNodeSingleLinkPool() = 0;
-    virtual CPointerNodeDoubleLinkPool* GetPointerNodeDoubleLinkPool() = 0;
 
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;

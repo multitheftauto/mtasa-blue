@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeather.h>
+#include <game/CGarages.h>
+#include <game/CGarage.h>
+#include <game/CClock.h>
+#include <game/CWeaponStatManager.h>
 #include "CWorldRPCs.h"
 
 void CWorldRPCs::LoadFunctions()

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProjectileSA.h"
+#include "CProjectileInfoSA.h"
+#include "CWorldSA.h"
 
 CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObjectSA(projectileInterface)
 {
@@ -25,8 +28,6 @@ CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObj
 
 CProjectileSA::~CProjectileSA()
 {
-    DEBUG_TRACE("CProjectileSA::~CProjectileSA( )");
-
     this->BeingDeleted = true;
     /*
     //OutputDebugString("Attempting to destroy Object\n");

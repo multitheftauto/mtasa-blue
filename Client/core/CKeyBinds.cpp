@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CPed.h>
+#include <game/CPedIntelligence.h>
+#include <game/CPools.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 
 const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NONE, 0},
                                  {"mouse2", VK_RBUTTON, GTA_KEY_RMOUSE, DATA_NONE, 0},

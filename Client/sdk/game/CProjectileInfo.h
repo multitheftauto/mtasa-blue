@@ -11,8 +11,11 @@
 
 #pragma once
 
-class CProjectile;
+class CEntity;
 class CPlayerPed;
+class CProjectile;
+class CVector;
+
 class CProjectileInfo
 {
 public:

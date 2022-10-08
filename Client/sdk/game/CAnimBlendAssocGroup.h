@@ -13,11 +13,11 @@
 
 typedef unsigned char BYTE;
 typedef unsigned long AssocGroupId;
+class CAnimBlendAssocGroupSAInterface;
 class CAnimBlendAssociation;
 class CAnimBlendStaticAssociation;
-struct RpClump;
 class CAnimBlock;
-class CAnimBlendAssocGroupSAInterface;
+struct RpClump;
 
 enum class eAnimGroup : int
 {
