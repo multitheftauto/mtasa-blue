@@ -853,10 +853,6 @@ void CSettings::CreateGUI()
     }
 #endif
 
-    m_pCheckBoxBlur = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Motion Blur"), true));
-    m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
-    m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
-
     m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
     m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
     m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
@@ -864,6 +860,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxDynamicPedShadows = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Dynamic ped shadows"), true));
     m_pCheckBoxDynamicPedShadows->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
     m_pCheckBoxDynamicPedShadows->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxBlur = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Motion Blur"), true));
+    m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
+    m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
     vecTemp.fY += 10;
 
