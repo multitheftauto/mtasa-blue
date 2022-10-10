@@ -51,6 +51,7 @@ void CLuaElementDefs::LoadFunctions()
         {"hasElementData", HasElementData},
         {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
+        {"getElementLighting", ArgumentParser<GetElementLighting>},
         {"isElementOnScreen", IsElementOnScreen},
         {"getElementHealth", GetElementHealth},
         {"getElementModel", GetElementModel},
@@ -156,6 +157,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getDimension", "getElementDimension");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
+    lua_classfunction(luaVM, "getLighting", "getElementLighting");
     lua_classfunction(luaVM, "getHealth", "getElementHealth");
     lua_classfunction(luaVM, "getModel", "getElementModel");
     lua_classfunction(luaVM, "getLowLOD", "getLowLODElement");
@@ -1306,6 +1308,33 @@ int CLuaElementDefs::GetElementAlpha(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* entity)
+{
+    switch (entity->GetType())
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        {
+            CPlayerPed* Ped = static_cast<CClientPed*>(entity)->GetGamePlayer();
+            if (Ped) return Ped->GetLighting();
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CVehicle* Vehicle = static_cast<CClientVehicle*>(entity)->GetGameVehicle();
+            if (Vehicle) return Vehicle->GetLighting();
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CObject* Object = static_cast<CClientObject*>(entity)->GetGameObject();
+            if (Object) return Object->GetLighting();
+            break;
+        }
+    }
+    return false;
 }
 
 int CLuaElementDefs::GetElementHealth(lua_State* luaVM)

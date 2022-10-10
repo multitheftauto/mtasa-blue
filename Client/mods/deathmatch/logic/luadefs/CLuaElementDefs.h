@@ -53,6 +53,7 @@ public:
     LUA_DECLARE(IsElementLocal);
     LUA_DECLARE(GetElementAttachedOffsets);
     LUA_DECLARE(GetElementAlpha);
+    static std::variant<bool, float> GetElementLighting(CClientEntity* entity);
     LUA_DECLARE(IsElementOnScreen);
     LUA_DECLARE(GetElementHealth);
     LUA_DECLARE(IsElementStreamedIn);
