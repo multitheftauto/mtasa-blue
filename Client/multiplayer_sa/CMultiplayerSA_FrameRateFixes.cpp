@@ -188,11 +188,10 @@ static void _declspec(naked) HOOK_CPhysical__ApplyAirResistance()
     }
 }
 
-static unsigned int RETURN_VehicleRapidStopFix;
 template <unsigned int returnAddress>
 static void _declspec(naked) HOOK_VehicleRapidStopFix()
 {
-    RETURN_VehicleRapidStopFix = returnAddress;
+    static unsigned int RETURN_VehicleRapidStopFix = returnAddress;
     _asm {
         fld ds:[0xC2B9CC]           // mod_HandlingManager.m_fWheelFriction
         fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
