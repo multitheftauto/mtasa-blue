@@ -18,7 +18,6 @@ constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
 #define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
 const unsigned int RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
-
 void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 {
     _asm {
@@ -71,6 +70,134 @@ static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
         fdiv kOriginalTimeStep      // 1.666f
         fadd [esi+0x84C]
         jmp RETURN_CHeli__ProcessFlyingCarStuff
+    }
+}
+
+#define HOOKPOS_CClouds__MovingFog_Update 0x716BA6
+#define HOOKSIZE_CClouds__MovingFog_Update 0x16
+static const unsigned int RETURN_CClouds__MovingFog_Update = 0x716BBC;
+static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
+{
+    _asm {
+        fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd [esi]
+        fstp [esi]
+        fld [esp+0x18]
+        fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        jmp RETURN_CClouds__MovingFog_Update
+    }
+}
+
+#define HOOKPOS_CFallingGlassPane__Update_A 0x71AABF
+#define HOOKSIZE_CFallingGlassPane__Update_A 0x6
+static const unsigned int RETURN_CFallingGlassPane__Update_A = 0x71AAC5;
+static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
+{
+    _asm {
+        fld [esp+0x28]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [esp+0x28]
+        fld [esp+0x24]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [esp+0x24]
+        fld [esp+0x20]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd [esi]
+        jmp RETURN_CFallingGlassPane__Update_A
+    }
+}
+
+#define HOOKPOS_CFallingGlassPane__Update_B 0x71AAEA
+#define HOOKSIZE_CFallingGlassPane__Update_B 0x6
+static const unsigned int RETURN_CFallingGlassPane__Update_B = 0x71AAF0;
+static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
+{
+    _asm {
+        fld [eax]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax]
+        fld [eax+0x4]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x4]
+        fld [eax+0x8]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x8]
+        mov ecx, [eax]
+        mov [esp+0x2C], ecx
+        jmp RETURN_CFallingGlassPane__Update_B
+    }
+}
+
+#define HOOKPOS_CFallingGlassPane__Update_C 0x71AB29
+#define HOOKSIZE_CFallingGlassPane__Update_C 0x6
+static const unsigned int RETURN_CFallingGlassPane__Update_C = 0x71AB2F;
+static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
+{
+    _asm {
+        fld [eax]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax]
+        fld [eax+0x4]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x4]
+        fld [eax+0x8]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x8]
+        mov edx, [eax]
+        mov [esp+0x38], edx
+        jmp RETURN_CFallingGlassPane__Update_C
+    }
+}
+
+#define HOOKPOS_CPhysical__ApplyAirResistance 0x544D29
+#define HOOKSIZE_CPhysical__ApplyAirResistance 5
+static const unsigned int RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
+static void _declspec(naked) HOOK_CPhysical__ApplyAirResistance()
+{
+    _asm {
+        fld ds:[0x862CD0]           // 0.99000001f
+        fld ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        mov eax, 0x822130           // powf
+        call eax
+
+        fld st(0)
+        fmul [esi+0x50]
+        fstp [esi+0x50]
+
+        fld st(0)
+        fmul [esi+0x54]
+        fstp [esi+0x54]
+
+        fmul [esi+0x58]
+        fstp [esi+0x58]
+        jmp RETURN_CPhysical__ApplyAirResistance
+    }
+}
+
+static unsigned int RETURN_VehicleRapidStopFix;
+template <unsigned int returnAddress>
+static void _declspec(naked) HOOK_VehicleRapidStopFix()
+{
+    RETURN_VehicleRapidStopFix = returnAddress;
+    _asm {
+        fld ds:[0xC2B9CC]           // mod_HandlingManager.m_fWheelFriction
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        jmp RETURN_VehicleRapidStopFix
     }
 }
 
@@ -470,6 +597,26 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CCamera__Process);
     EZHookInstall(CHeli__ProcessFlyingCarStuff);
+    EZHookInstall(CClouds__MovingFog_Update);
+    EZHookInstall(CFallingGlassPane__Update_A);
+    EZHookInstall(CFallingGlassPane__Update_B);
+    EZHookInstall(CFallingGlassPane__Update_C);
+    EZHookInstall(CPhysical__ApplyAirResistance);
+
+    // CVehicle::ProcessWheel
+    HookInstall(0x6D6E69, (DWORD)HOOK_VehicleRapidStopFix<0x6D6E6F>, 6);
+    HookInstall(0x6D6EA8, (DWORD)HOOK_VehicleRapidStopFix<0x6D6EAE>, 6);
+
+    // CVehicle::ProcessBikeWheel
+    HookInstall(0x6D767F, (DWORD)HOOK_VehicleRapidStopFix<0x6D7685>, 6);
+    HookInstall(0x6D76AB, (DWORD)HOOK_VehicleRapidStopFix<0x6D76B1>, 6);
+    HookInstall(0x6D76CD, (DWORD)HOOK_VehicleRapidStopFix<0x6D76D3>, 6);
+
+    // CCam::Process_FollowCar_SA
+    MemSet((void*)0x524FD7, 0x90, 0x1B);
+
+    // CVehicle::ProcessBoatControl
+    MemPut(0x6DC23F, &kOriginalTimeStep);
 
     // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);
