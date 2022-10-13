@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-06 09:21+0000\n"
-"PO-Revision-Date: 2022-10-06 09:37\n"
+"PO-Revision-Date: 2022-10-13 14:05\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -1819,7 +1819,7 @@ msgstr "Korona yağış parıltısı"
 
 #: Client/core/CSettings.cpp:860
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dinamik piyada kölgələri"
 
 #: Client/core/CSettings.cpp:889
 msgid "Enable remote websites"
