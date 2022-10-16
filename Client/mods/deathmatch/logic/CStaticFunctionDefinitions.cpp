@@ -1518,7 +1518,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (!bContinue)
             {
                 // Change canceled
-                Vehicle.SetModelBlocking(usCurrentModel, 255, 255);
+                Vehicle.SetModelBlocking(usCurrentModel, 255, 255, Entity.IsLocalEntity());
                 return false;
             }
 
