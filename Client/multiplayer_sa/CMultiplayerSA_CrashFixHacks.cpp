@@ -10,10 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CAnimManager.h>
 #include "../game_sa/CTrainSA.h"
 #include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
+#include "../game_sa/TaskBasicSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -1461,10 +1463,10 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
     // Crash will occur at offset 0xCFCD6
     OnCrashAverted(32);
     CAnimBlendAssociationSAInterface* pAnimAssoc = pInterface->pAnimBlendAssociation;
-    CAnimBlendSequenceSAInterface* pAnimSequence = pInterface->pAnimSequence;
-    CAnimBlendHierarchySAInterface* pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
+    CAnimBlendSequenceSAInterface*    pAnimSequence = pInterface->pAnimSequence;
+    CAnimBlendHierarchySAInterface*   pAnimHierarchy = pAnimAssoc->pAnimHierarchy;
 
-    bool bSequenceExistsInHierarchy = false;
+    bool                           bSequenceExistsInHierarchy = false;
     CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
     for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
     {
@@ -1477,13 +1479,12 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
     }
 
     LogEvent(588, "GetCurrentTranslation", "Incorrect endKeyFrameIndex",
-        SString("m_endKeyFrameId = %d | pAnimAssoc = %p | GroupID = %d | AnimID = %d | \
+             SString("m_endKeyFrameId = %d | pAnimAssoc = %p | GroupID = %d | AnimID = %d | \
                 pAnimSeq = %p | BoneID = %d | BoneHash = %u | \
                 pAnimHier = %p | HierHash = %u | SequenceExistsInHierarchy: %s",
-            pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID,
-            pAnimSequence, pAnimSequence->m_boneId, pAnimSequence->m_hash, pAnimHierarchy,
-            pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"), 588);
-
+                     pInterface->m_endKeyFrameId, pAnimAssoc, pAnimAssoc->sAnimGroup, pAnimAssoc->sAnimID, pAnimSequence, pAnimSequence->m_boneId,
+                     pAnimSequence->m_hash, pAnimHierarchy, pAnimHierarchy->uiHashKey, bSequenceExistsInHierarchy ? "Yes" : "No"),
+             588);
 }
 
 // Hook info
@@ -1518,7 +1519,6 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         retn    8
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1688,7 +1688,7 @@ static void _cdecl LOG_CVehicleModelInfo__LoadVehicleColours(int location, const
 #define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_1         0x5B6B20
 #define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_1        5
 static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6B25;
-static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1     = 0x5B6D04;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6D04;
 
 static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 {
@@ -1722,7 +1722,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 #define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_2         0x5B6CAA
 #define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_2        5
 static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6CAF;
-static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2     = 0x5B6D04;
+static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6D04;
 
 static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 {
@@ -1785,6 +1785,49 @@ static void _declspec(naked) HOOK_CPlaceName__Process()
     }
 }
 
+static void LOG_CWorld__FindObjectsKindaCollidingSectorList(unsigned int modelId)
+{
+    CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[modelId];
+    if (!pModelInfo)
+    {
+        LogEvent(840, "Model info missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt model: %d", modelId), 5601);
+        return;
+    }
+
+    if (!pModelInfo->pColModel)
+    {
+        LogEvent(840, "Col model missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt col model: %d", modelId), 5601);
+    }
+}
+
+#define HOOKPOS_CWorld__FindObjectsKindaCollidingSectorList 0x56508C
+#define HOOKSIZE_CWorld__FindObjectsKindaCollidingSectorList 0xA
+static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0x565096;
+static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
+static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
+{
+    _asm {
+        mov eax, [edx*4+0xA9B0C8]   // CModelInfo::ms_modelInfoPtrs
+        test eax, eax
+        jz skip
+
+        mov ecx, [eax+0x14]         // m_pColModel
+        test ecx, ecx
+        jz skip
+
+        jmp RETURN_CWorld__FindObjectsKindaCollidingSectorList
+
+    skip:
+        pushad
+        push edx
+        call LOG_CWorld__FindObjectsKindaCollidingSectorList
+        add esp, 4
+        popad
+
+        jmp RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -1839,6 +1882,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CVehicleModelInfo__LoadVehicleColours_1);
     EZHookInstall(CVehicleModelInfo__LoadVehicleColours_2);
     EZHookInstall(CPlaceName__Process);
+    EZHookInstall(CWorld__FindObjectsKindaCollidingSectorList);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

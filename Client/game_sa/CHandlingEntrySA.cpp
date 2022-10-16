@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHandlingEntrySA.h"
+#include "CHandlingManagerSA.h"
 
 CHandlingEntrySA::CHandlingEntrySA()
 {

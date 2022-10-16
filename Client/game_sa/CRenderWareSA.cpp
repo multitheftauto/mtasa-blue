@@ -14,11 +14,12 @@
 #include "StdInc.h"
 #define RWFUNC_IMPLEMENT
 #include <game/RenderWareD3D.h>
-
+#include "CRenderWareSA.h"
+#include "CColModelSA.h"
+#include "CFileLoaderSA.h"
+#include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
-#include "CRenderWareSA.ShaderMatching.h"
-#include "CFileLoaderSA.h"
 
 extern CGameSA* pGame;
 
@@ -300,12 +301,13 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 //
 void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList)
 {
-    RpClumpForAllAtomics(pClump,
-                         [](RpAtomic* pAtomic, void* pData) {
-                             reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
-                             return true;
-                         },
-                         &outAtomicList);
+    RpClumpForAllAtomics(
+        pClump,
+        [](RpAtomic* pAtomic, void* pData) {
+            reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
+            return true;
+        },
+        &outAtomicList);
 }
 
 //
@@ -352,9 +354,9 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 // Replaces a vehicle/weapon/ped model
 void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction)
 {
-    auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*) (CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
-    auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*) (CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
-    auto CBaseModelInfo_SetClump = (void(__thiscall*) (CBaseModelInfoSAInterface * pThis, RpClump * clump))dwSetClumpFunction;
+    auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
+    auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
+    auto CBaseModelInfo_SetClump = (void(__thiscall*)(CBaseModelInfoSAInterface * pThis, RpClump * clump)) dwSetClumpFunction;
 
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
     if (pModelInfo)
@@ -469,7 +471,7 @@ typedef struct
 bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
 {
     SAtomicsReplacer* pData = reinterpret_cast<SAtomicsReplacer*>(data);
-    SRelatedModelInfo relatedModelInfo = { 0 };
+    SRelatedModelInfo relatedModelInfo = {0};
     relatedModelInfo.pClump = pData->pClump;
     relatedModelInfo.bDeleteOldRwObject = true;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);

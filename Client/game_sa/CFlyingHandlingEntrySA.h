@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CFlyingHandlingEntry.h>
-#include "Common.h"
 
 struct tFlyingHandlingDataSA
 {

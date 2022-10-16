@@ -251,7 +251,7 @@ unsigned long CServer::Thread_Run()
     if (m_pLibrary->Load(m_strDLLFile))
     {
         // Grab the entrypoint
-        typedef int(Main_t)(int, char* []);
+        typedef int(Main_t)(int, char*[]);
         Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>(m_pLibrary->GetProcedureAddress("Run"));
         if (pfnEntryPoint)
         {

@@ -9,6 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CPointLights.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeapon.h>
+#include <game/CColPoint.h>
+#include <game/CFx.h>
+#include <game/CWorld.h>
 
 CClientWeapon::CClientWeapon(CClientManager* pManager, ElementID ID, eWeaponType type)
     : ClassInit(this), CClientObject(pManager, ID, CClientPickupManager::GetWeaponModel(type), false)

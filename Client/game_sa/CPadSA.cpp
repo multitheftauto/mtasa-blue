@@ -10,42 +10,37 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPadSA.h"
 
 CControllerState* CPadSA::GetCurrentControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("CControllerState * CPadSA::GetCurrentControllerState(CControllerState * ControllerState)");
     MemCpyFast(ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
     return ControllerState;
 }
 
 CControllerState* CPadSA::GetLastControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("CControllerState * CPadSA::GetLastControllerState(CControllerState * ControllerState)");
     MemCpyFast(ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
     return ControllerState;
 }
 
-VOID CPadSA::SetCurrentControllerState(CControllerState* ControllerState)
+void CPadSA::SetCurrentControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("VOID CPadSA::SetCurrentControllerState(CControllerState * ControllerState)");
     MemCpyFast(&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
 }
 
-VOID CPadSA::SetLastControllerState(CControllerState* ControllerState)
+void CPadSA::SetLastControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("VOID CPadSA::SetLastControllerState(CControllerState * ControllerState)");
     MemCpyFast(&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
 }
 
-VOID CPadSA::Store()
+void CPadSA::Store()
 {
-    DEBUG_TRACE("VOID CPadSA::Store()");
     MemCpyFast(&this->StoredPad, this->internalInterface, sizeof(CPadSAInterface));
 }
 
-VOID CPadSA::Restore()
+void CPadSA::Restore()
 {
-    DEBUG_TRACE("VOID CPadSA::Restore()");
     MemCpyFast(this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
 }
 
@@ -55,7 +50,7 @@ bool CPadSA::IsEnabled()
     return bEnabled;
 }
 
-VOID CPadSA::Disable(bool bDisable)
+void CPadSA::Disable(bool bDisable)
 {
     if (bDisable)
         MemPut<BYTE>(FUNC_CPad_UpdatePads, 0xC3);
@@ -65,14 +60,14 @@ VOID CPadSA::Disable(bool bDisable)
     // this->internalInterface->DisablePlayerControls = bDisable;
 }
 
-VOID CPadSA::Clear()
+void CPadSA::Clear()
 {
     CControllerState cs;            // create a null controller (class is inited to null)
     SetCurrentControllerState(&cs);
     SetLastControllerState(&cs);
 }
 
-VOID CPadSA::SetHornHistoryValue(bool value)
+void CPadSA::SetHornHistoryValue(bool value)
 {
     internalInterface->iCurrHornHistory++;
     if (internalInterface->iCurrHornHistory >= MAX_HORN_HISTORY)

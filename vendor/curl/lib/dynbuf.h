@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2020 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -74,7 +76,7 @@ int Curl_dyn_vprintf(struct dynbuf *dyn, const char *format, va_list ap_save);
 #define DYN_DOH_CNAME       256
 #define DYN_PAUSE_BUFFER    (64 * 1024 * 1024)
 #define DYN_HAXPROXY        2048
-#define DYN_HTTP_REQUEST    (128*1024)
+#define DYN_HTTP_REQUEST    (1024*1024)
 #define DYN_H2_HEADERS      (128*1024)
 #define DYN_H2_TRAILERS     (128*1024)
 #define DYN_APRINTF         8000000

@@ -10,8 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
-#include "CModelInfoSA.h"
+#include "CStreamingSA.h"
 
 // count: 26316 in unmodified game
 CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;
@@ -74,7 +73,14 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
 }
 
-void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
+void CStreamingSA::RemoveModel(std::uint32_t model)
+{
+    using Signature = void(__cdecl*)(std::uint32_t);
+    const auto function = reinterpret_cast<Signature>(0x4089A0);
+    function(model);
+}
+
+void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* szTag)
 {
     TIMEUS startTime = GetTimeUs();
 
@@ -95,7 +101,7 @@ void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* 
     }
 }
 
-BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
+bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 {
     if (IsUpgradeModelId(dwModelID))
     {
@@ -113,13 +119,12 @@ BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-        BOOL  bReturn = 0;
+        bool bReturn = 0;
         _asm
         {
             push    dwModelID
             call    dwFunc
-            movzx   eax, al
-            mov     bReturn, eax
+            mov     bReturn, al
             pop     eax
         }
 
@@ -151,4 +156,14 @@ void CStreamingSA::ReinitStreaming()
     Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
 
     reinitStreaming();
+}
+
+void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
+{
+    (reinterpret_cast<void(__cdecl*)(std::uint32_t)>(0x40E120))(memoryToCleanInBytes);
+}
+
+std::uint32_t CStreamingSA::GetMemoryUsed() const
+{
+    return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
 }

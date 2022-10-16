@@ -11,6 +11,12 @@
 
 #include "StdInc.h"
 #include "gamesa_renderware.h"
+#include "CModelInfoSA.h"
+#include "CColModelSA.h"
+#include "CColStoreSA.h"
+#include "CPedModelInfoSA.h"
+#include "CPedSA.h"
+#include "CWorldSA.h"
 
 extern CGameSA* pGame;
 
@@ -26,6 +32,21 @@ std::unordered_map<DWORD, unsigned short>                             CModelInfo
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
+static constexpr size_t    RESOURCE_ID_COL = 25000;
+
+static void CBaseModelInfo_SetColModel(CBaseModelInfoSAInterface* self, CColModelSAInterface* colModel, bool applyToPairedModel)
+{
+    using Signature = void(__thiscall*)(CBaseModelInfoSAInterface*, CColModelSAInterface*, bool);
+    auto function = reinterpret_cast<Signature>(0x4C4BC0);
+    function(self, colModel, applyToPairedModel);
+}
+
+static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
+{
+    using Signature = void(__cdecl*)(int, const CColModelSAInterface*);
+    auto function = reinterpret_cast<Signature>(0x5B2C20);
+    function(idx, colModel);
+}
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -39,29 +60,16 @@ CModelInfoSA::CModelInfoSA()
     m_bAddedRefForCollision = false;
 }
 
-CModelInfoSA::CModelInfoSA(DWORD dwModelID)
-{
-    this->m_dwModelID = dwModelID;
-    m_pInterface = ppModelInfo[m_dwModelID];
-    m_dwReferences = 0;
-    m_dwPendingInterfaceRef = 0;
-    m_pOriginalColModelInterface = NULL;
-    m_pCustomClump = NULL;
-    m_pCustomColModel = NULL;
-    m_bAddedRefForCollision = false;
-}
-
 CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
 {
     return m_pInterface = ppModelInfo[m_dwModelID];
 }
 
-BOOL CModelInfoSA::IsBoat()
+bool CModelInfoSA::IsBoat()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBoat ( )");
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool bReturn = false;
     _asm
     {
         push    ModelID
@@ -69,15 +77,14 @@ BOOL CModelInfoSA::IsBoat()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsCar()
+bool CModelInfoSA::IsCar()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsCar ( )");
     DWORD dwFunction = FUNC_IsCarModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -85,15 +92,14 @@ BOOL CModelInfoSA::IsCar()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsTrain()
+bool CModelInfoSA::IsTrain()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsTrain ( )");
     DWORD dwFunction = FUNC_IsTrainModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -101,15 +107,14 @@ BOOL CModelInfoSA::IsTrain()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsHeli()
+bool CModelInfoSA::IsHeli()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsHeli ( )");
     DWORD dwFunction = FUNC_IsHeliModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -117,15 +122,14 @@ BOOL CModelInfoSA::IsHeli()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsPlane()
+bool CModelInfoSA::IsPlane()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsPlane ( )");
     DWORD dwFunction = FUNC_IsPlaneModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -133,15 +137,14 @@ BOOL CModelInfoSA::IsPlane()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsBike()
+bool CModelInfoSA::IsBike()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBike ( )");
     DWORD dwFunction = FUNC_IsBikeModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -149,15 +152,14 @@ BOOL CModelInfoSA::IsBike()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsFakePlane()
+bool CModelInfoSA::IsFakePlane()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsFakePlane ( )");
     DWORD dwFunction = FUNC_IsFakePlaneModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -165,15 +167,14 @@ BOOL CModelInfoSA::IsFakePlane()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsMonsterTruck()
+bool CModelInfoSA::IsMonsterTruck()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsMonsterTruck ( )");
     DWORD dwFunction = FUNC_IsMonsterTruckModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -181,15 +182,14 @@ BOOL CModelInfoSA::IsMonsterTruck()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsQuadBike()
+bool CModelInfoSA::IsQuadBike()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsQuadBike ( )");
     DWORD dwFunction = FUNC_IsQuadBikeModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -197,15 +197,14 @@ BOOL CModelInfoSA::IsQuadBike()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsBmx()
+bool CModelInfoSA::IsBmx()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBmx ( )");
     DWORD dwFunction = FUNC_IsBmxModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -213,15 +212,14 @@ BOOL CModelInfoSA::IsBmx()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsTrailer()
+bool CModelInfoSA::IsTrailer()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsTrailer ( )");
     DWORD dwFunction = FUNC_IsTrailerModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -229,16 +227,15 @@ BOOL CModelInfoSA::IsTrailer()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
 BYTE CModelInfoSA::GetVehicleType()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsVehicle ( )");
     // This function will return a vehicle type for vehicles or 0xFF on failure
     DWORD dwFunction = FUNC_IsVehicleModelType;
     DWORD ModelID = m_dwModelID;
-    BYTE bReturn = -1;
+    BYTE  bReturn = -1;
     _asm
     {
         push    ModelID
@@ -265,16 +262,13 @@ bool CModelInfoSA::IsPlayerModel()
     return (GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1);
 }
 
-BOOL CModelInfoSA::IsUpgrade()
+bool CModelInfoSA::IsUpgrade()
 {
     return m_dwModelID >= 1000 && m_dwModelID <= 1193;
 }
 
 char* CModelInfoSA::GetNameIfVehicle()
 {
-    DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
-    //  if(this->IsVehicle())
-    //  {
     DWORD dwModelInfo = (DWORD)ARRAY_ModelInfo;
     DWORD dwFunc = FUNC_CText_Get;
     DWORD ModelID = m_dwModelID;
@@ -303,8 +297,6 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     eax
         }
     return (char*)dwReturn;
-    //  }
-    //  return NULL;
 }
 
 uint CModelInfoSA::GetAnimFileIndex()
@@ -324,9 +316,8 @@ uint CModelInfoSA::GetAnimFileIndex()
     return uiReturn;
 }
 
-VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
+void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
 {
-    DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
     if (IsLoaded())
         return;
@@ -390,10 +381,8 @@ VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
     }
 }
 
-VOID CModelInfoSA::Remove()
+void CModelInfoSA::Remove()
 {
-    DEBUG_TRACE("VOID CModelInfoSA::Remove ( )");
-
     // Don't remove if GTA refers to it somehow.
     // Or we'll screw up SA's map for example.
 
@@ -427,34 +416,12 @@ VOID CModelInfoSA::Remove()
             RestoreColModel();
 
             // Remove the model.
-            DWORD dwFunction = FUNC_RemoveModel;
-            DWORD ModelID = m_dwModelID;
-            _asm
-            {
-                push    ModelID
-                call    dwFunction
-                add     esp, 4
-            }
+            pGame->GetStreaming()->RemoveModel(m_dwModelID);
         }
     }
 }
 
-BYTE CModelInfoSA::GetLevelFromPosition(CVector* vecPosition)
-{
-    DEBUG_TRACE("BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )");
-    DWORD dwFunction = FUNC_GetLevelFromPosition;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunction
-        add     esp, 4
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
-BOOL CModelInfoSA::IsLoaded()
+bool CModelInfoSA::IsLoaded()
 {
     if (DoIsLoaded())
     {
@@ -470,12 +437,10 @@ BOOL CModelInfoSA::IsLoaded()
     return false;
 }
 
-BOOL CModelInfoSA::DoIsLoaded()
+bool CModelInfoSA::DoIsLoaded()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::DoIsLoaded ( )");
-
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
-    BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
+    bool bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 
     if (m_dwModelID < pGame->GetBaseIDforTXD())
     {
@@ -541,7 +506,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
-    FLOAT fReturn = 0;
+    float fReturn = 0;
     _asm {
         mov     eax, ModelID
 
@@ -669,7 +634,8 @@ void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
         fDistance = std::min(fDistance, fMaximumValue);
     }
 #endif
-    if (!bOverrideMaxDistance) {
+    if (!bOverrideMaxDistance)
+    {
         // Limit to 325.f as it goes horrible after that
         fDistance = std::min(fDistance, 325.f);
     }
@@ -783,7 +749,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     std::set<unsigned short>::iterator it;
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(*it);
+        pGame->GetStreaming()->RemoveModel(*it);
         pGame->GetStreaming()->GetStreamingInfoFromModelId(*it)->loadState = 0;
     }
 }
@@ -857,7 +823,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
     }
 }
 
-void CModelInfoSA::SetAlphaTransparencyEnabled(BOOL bEnabled)
+void CModelInfoSA::SetAlphaTransparencyEnabled(bool bEnabled)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -1003,14 +969,14 @@ unsigned int CModelInfoSA::GetNumRemaps()
 
 void* CModelInfoSA::GetVehicleSuspensionData()
 {
-    return GetInterface()->pColModel->pColData->pSuspensionLines;
+    return GetInterface()->pColModel->m_data->m_suspensionLines;
 }
 
 void* CModelInfoSA::SetVehicleSuspensionData(void* pSuspensionLines)
 {
-    CColDataSA* pColData = GetInterface()->pColModel->pColData;
-    void*       pOrigSuspensionLines = pColData->pSuspensionLines;
-    pColData->pSuspensionLines = pSuspensionLines;
+    CColDataSA* pColData = GetInterface()->pColModel->m_data;
+    void*       pOrigSuspensionLines = pColData->m_suspensionLines;
+    pColData->m_suspensionLines = reinterpret_cast<CColLineSA*>(pSuspensionLines);
     return pOrigSuspensionLines;
 }
 
@@ -1106,7 +1072,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return; // Early out in case the model doesn't have any dummies modified
+        return;            // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
@@ -1124,7 +1090,8 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 void CModelInfoSA::ResetAllVehicleDummies()
 {
     CGame* game = g_pCore->GetGame();
-    for (auto& info : ms_ModelDefaultDummiesPosition) {
+    for (auto& info : ms_ModelDefaultDummiesPosition)
+    {
         CModelInfo* modelInfo = game->GetModelInfo(info.first);
         if (modelInfo)
             modelInfo->ResetVehicleDummies(false);
@@ -1257,7 +1224,7 @@ void CModelInfoSA::RestoreOriginalModel()
     // Are we loaded?
     if (IsLoaded())
     {
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(static_cast<unsigned short>(m_dwModelID));
+        pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
 
     // Reset the stored custom vehicle clump
@@ -1287,57 +1254,39 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
     // Do the following only if we're loaded
     m_pInterface = ppModelInfo[m_dwModelID];
+
     if (m_pInterface)
     {
         // If no collision model has been set before, store the original in case we want to restore it
         if (!m_pOriginalColModelInterface)
-            m_pOriginalColModelInterface = m_pInterface->pColModel;
-
-        // Apply some low-level hacks
-        pColModelInterface->level = 0xA9;
-
-        // Call SetColModel
-        DWORD dwFunc = FUNC_SetColModel;
-        DWORD ModelID = m_dwModelID;
-        _asm
         {
-            mov     ecx, ModelID
-
-            push    eax
-            mov     eax, dword ptr[ARRAY_ModelInfo]
-            mov     ecx, dword ptr[eax + ecx*4]
-            pop     eax
-
-            push    1
-            push    pColModelInterface
-            call    dwFunc
+            m_pOriginalColModelInterface = m_pInterface->pColModel;
+            m_originalFlags = m_pInterface->flags;
         }
 
-        // FUNC_SetColModel resets bDoWeOwnTheColModel
+        // Apply some low-level hacks
+        pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
+
+        CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, true);
+        CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
+
+        // SetColModel sets bDoWeOwnTheColModel if the last parameter is truthy
         m_pInterface->bDoWeOwnTheColModel = false;
         m_pInterface->bCollisionWasStreamedWithModel = false;
 
-        // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
-        DWORD func = 0x5B2C20;
-        _asm
-        {
-            push    pColModelInterface
-            push    ModelID
-            call    func
-            add     esp, 8
-        }
-
         // Set some lighting for this collision if not already present
-        CColDataSA* pColData = pColModelInterface->pColData;
+        CColDataSA* pColData = pColModelInterface->m_data;
+
         if (pColData)
         {
-            for (uint i = 0; i < pColData->numColTriangles; i++)
+            for (uint i = 0; i < pColData->m_numTriangles; i++)
             {
-                CColTriangleSA* pTriangle = pColData->pColTriangles + i;
-                if (pTriangle->lighting.night == 0 && pTriangle->lighting.day == 0)
+                CColTriangleSA* pTriangle = pColData->m_triangles + i;
+
+                if (pTriangle->m_lighting.night == 0 && pTriangle->m_lighting.day == 0)
                 {
-                    pTriangle->lighting.night = 1;
-                    pTriangle->lighting.day = 12;
+                    pTriangle->m_lighting.night = 1;
+                    pTriangle->m_lighting.day = 12;
                 }
             }
         }
@@ -1346,46 +1295,28 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
 void CModelInfoSA::RestoreColModel()
 {
-    // Are we loaded?
     m_pInterface = ppModelInfo[m_dwModelID];
-    if (m_pInterface)
+
+    // Restore original collision model and flags
+    if (m_pInterface && m_pOriginalColModelInterface && m_pCustomColModel)
     {
-        // We only have to store if the collision model was set
-        // Also only if we have a col model set
-        if (m_pOriginalColModelInterface && m_pCustomColModel)
+        CBaseModelInfo_SetColModel(m_pInterface, m_pOriginalColModelInterface, true);
+        CColAccel_addCacheCol(m_dwModelID, m_pInterface->pColModel);
+
+        m_pInterface->flags = m_originalFlags;
+
+        // Force the game to load the original collision model data, if we applied a custom collision model before
+        // there was any object/building, which would've provoked CColStore to request it.
+        if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
         {
-            DWORD dwFunc = FUNC_SetColModel;
-            DWORD dwOriginalColModelInterface = (DWORD)m_pOriginalColModelInterface;
-            DWORD ModelID = m_dwModelID;
-            _asm
-            {
-                mov     ecx, ModelID
-
-                push    eax
-                mov     eax, dword ptr[ARRAY_ModelInfo]
-                mov     ecx, dword ptr[eax + ecx*4]
-                pop     eax
-
-                push    1
-                push    dwOriginalColModelInterface
-                call    dwFunc
-            }
-
-            // public: static void __cdecl CColAccel::addCacheCol(int, class CColModel const &)
-            DWORD func = 0x5B2C20;
-            _asm
-            {
-                push    dwOriginalColModelInterface
-                push    ModelID
-                call    func
-                add     esp, 8
-            }
-            // (IJs) Document this function some time
+            pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
         }
     }
 
     // We currently have no custom model loaded
-    m_pCustomColModel = NULL;
+    m_pCustomColModel = nullptr;
+    m_pOriginalColModelInterface = nullptr;
+    m_originalFlags = 0;
 
     // Remove ref added for collision
     if (m_bAddedRefForCollision)
@@ -1407,6 +1338,48 @@ void CModelInfoSA::MakeCustomModel()
     if (m_pCustomColModel)
     {
         SetColModel(m_pCustomColModel);
+    }
+}
+
+void CModelInfoSA::AddColRef()
+{
+    CColModelSAInterface* originalColModel = nullptr;
+
+    // Always increase the reference count for the collision slot of the original collision model,
+    // to prevent the game logic from deleting the original when we restore it.
+    if (m_pOriginalColModelInterface && m_pCustomColModel)
+    {
+        originalColModel = m_pOriginalColModelInterface;
+    }
+    else
+    {
+        originalColModel = GetInterface()->pColModel;
+    }
+
+    if (originalColModel)
+    {
+        pGame->GetCollisionStore()->AddRef(originalColModel->m_sphere.m_collisionSlot);
+    }
+}
+
+void CModelInfoSA::RemoveColRef()
+{
+    CColModelSAInterface* originalColModel = nullptr;
+
+    // Always decrease the reference count for the collision slot of the original collision model,
+    // to prevent the game logic from deleting the original when we restore it.
+    if (m_pOriginalColModelInterface && m_pCustomColModel)
+    {
+        originalColModel = m_pOriginalColModelInterface;
+    }
+    else
+    {
+        originalColModel = GetInterface()->pColModel;
+    }
+
+    if (originalColModel)
+    {
+        pGame->GetCollisionStore()->RemoveRef(originalColModel->m_sphere.m_collisionSlot);
     }
 }
 
@@ -1484,6 +1457,24 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
+void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
+{
+    CTimeModelInfoSAInterface* m_pInterface = new CTimeModelInfoSAInterface();
+
+    CTimeModelInfoSAInterface* pBaseObjectInfo = static_cast<CTimeModelInfoSAInterface*>(ppModelInfo[usBaseID]);
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CTimeModelInfoSAInterface));
+    m_pInterface->usNumberOfRefs = 0;
+    m_pInterface->pRwObject = nullptr;
+    m_pInterface->usUnknown = 65535;
+    m_pInterface->usDynamicIndex = 65535;
+    m_pInterface->timeInfo.m_wOtherTimeModel = 0;
+    
+    ppModelInfo[m_dwModelID] = m_pInterface;
+
+    m_dwParentID = usBaseID;
+    CopyStreamingInfoFromModel(usBaseID);
+}
+
 void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 {
     CVehicleModelInfoSAInterface* m_pInterface = new CVehicleModelInfoSAInterface();
@@ -1505,6 +1496,25 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
+
+    switch (GetModelType())
+    {
+        case eModelInfoType::VEHICLE:
+            delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::PED:
+            delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::ATOMIC:
+            delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::TIME:
+            delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        default:
+            break;
+    }
+
     ppModelInfo[m_dwModelID] = nullptr;
     pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
 }

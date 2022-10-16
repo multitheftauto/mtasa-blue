@@ -12,7 +12,8 @@
 #pragma once
 
 #include "CPed.h"
-#include "CWanted.h"
+
+class CWanted;
 
 class CPlayerPed : public virtual CPed
 {

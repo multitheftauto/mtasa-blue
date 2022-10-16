@@ -1,4 +1,18 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaElementDefsShared.cpp
+ *  PURPOSE:     Lua element definitions class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
+#include "luadefs/CLuaElementDefs.h"
+#include "CScriptArgReader.h"
+#include "CStaticFunctionDefinitions.h"
 
 int CLuaElementDefs::GetElementData(lua_State* luaVM)
 {
@@ -59,8 +73,8 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
 #else
     CElement* pElement;
 #endif
-    SString   strKey;
-    bool      bInherit;
+    SString strKey;
+    bool    bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

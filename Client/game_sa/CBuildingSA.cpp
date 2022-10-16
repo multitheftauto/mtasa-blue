@@ -10,16 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBuildingSA.h"
+#include "CWorldSA.h"
 
 CBuildingSA::CBuildingSA(CBuildingSAInterface* objectInterface)
 {
-    DEBUG_TRACE("CBuildingSA::CBuildingSA(CBuildingSAInterface * objectInterface)");
     this->SetInterface(objectInterface);
 }
 
 CBuildingSA::CBuildingSA(DWORD dwModel)
 {
-    DEBUG_TRACE("CBuildingSA::CBuildingSA( DWORD dwModel )");
     /*
     DWORD CBuilding_operator_new = FUNC_CBuilding_operator_new;
     DWORD CBuilding_constructor = FUNC_CBuilding_Constructor;
@@ -155,7 +155,6 @@ CBuildingSA::CBuildingSA(DWORD dwModel)
 
 CBuildingSA::~CBuildingSA()
 {
-    DEBUG_TRACE("CBuildingSA::~CBuildingSA( )");
     if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
         DWORD dwInterface = (DWORD)this->GetInterface();

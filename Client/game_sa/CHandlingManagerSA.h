@@ -23,14 +23,14 @@ public:
     CHandlingManagerSA();
     ~CHandlingManagerSA();
 
-    CHandlingEntry* CreateHandlingData();
+    CHandlingEntry*       CreateHandlingData();
     CFlyingHandlingEntry* CreateFlyingHandlingData();
-    CBoatHandlingEntry* CreateBoatHandlingData();
+    CBoatHandlingEntry*   CreateBoatHandlingData();
     CBikeHandlingEntry*   CreateBikeHandlingData();
 
-    const CHandlingEntry* GetOriginalHandlingData(eVehicleTypes eModel);
+    const CHandlingEntry*       GetOriginalHandlingData(eVehicleTypes eModel);
     const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(eVehicleTypes eModel);
-    const CBoatHandlingEntry* GetOriginalBoatHandlingData(eVehicleTypes eModel);
+    const CBoatHandlingEntry*   GetOriginalBoatHandlingData(eVehicleTypes eModel);
     const CBikeHandlingEntry*   GetOriginalBikeHandlingData(eVehicleTypes eModel);
 
     eHandlingTypes GetHandlingID(eVehicleTypes eModel);

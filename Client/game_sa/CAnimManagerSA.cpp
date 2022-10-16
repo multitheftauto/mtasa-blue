@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAnimBlendAssocGroupSA.h"
+#include "CAnimBlendHierarchySA.h"
+#include "CAnimBlockSA.h"
+#include "CAnimManagerSA.h"
+#include "CAnimBlendSequenceSA.h"
+#include "CKeyGenSA.h"
 
 using std::list;
 

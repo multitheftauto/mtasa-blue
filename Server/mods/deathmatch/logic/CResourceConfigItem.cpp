@@ -15,6 +15,10 @@
 // is provided by giving out the root xml node.
 
 #include "StdInc.h"
+#include "CResourceConfigItem.h"
+#include "CResource.h"
+#include "CLogger.h"
+#include <core/CServerInterface.h>
 
 extern CServerInterface* g_pServerInterface;
 

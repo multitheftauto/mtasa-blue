@@ -13,9 +13,6 @@
 
 #include <game/CProjectileInfo.h>
 #include "CProjectileSA.h"
-#include "Common.h"
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 #define PROJECTILE_COUNT                    32
 #define PROJECTILE_INFO_COUNT               32
