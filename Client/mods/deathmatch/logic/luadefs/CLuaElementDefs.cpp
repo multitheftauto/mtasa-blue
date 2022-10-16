@@ -1317,22 +1317,24 @@ std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* ent
         case CCLIENTPED:
         case CCLIENTPLAYER:
         {
-            CPlayerPed* Ped = static_cast<CClientPed*>(entity)->GetGamePlayer();
-            if (Ped) return Ped->GetLighting();
+            CPlayerPed* ped = static_cast<CClientPed*>(entity)->GetGamePlayer();
+            if (ped) return ped->GetLighting();
             break;
         }
         case CCLIENTVEHICLE:
         {
-            CVehicle* Vehicle = static_cast<CClientVehicle*>(entity)->GetGameVehicle();
-            if (Vehicle) return Vehicle->GetLighting();
+            CVehicle* vehicle = static_cast<CClientVehicle*>(entity)->GetGameVehicle();
+            if (vehicle) return vehicle->GetLighting();
             break;
         }
         case CCLIENTOBJECT:
         {
-            CObject* Object = static_cast<CClientObject*>(entity)->GetGameObject();
-            if (Object) return Object->GetLighting();
+            CObject* object = static_cast<CClientObject*>(entity)->GetGameObject();
+            if (object) return object->GetLighting();
             break;
         }
+        default:
+            break;
     }
     return false;
 }
