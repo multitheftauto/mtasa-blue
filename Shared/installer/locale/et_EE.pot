@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-04-19 18:24\n"
-"PO-Revision-Date: 2022-09-24 16:38\n"
+"POT-Creation-Date: 2022-10-16 15:29\n"
+"PO-Revision-Date: 2022-10-16 16:30\n"
 "Last-Translator: \n"
 "Language-Team: Estonian\n"
 "Language: et_EE\n"
@@ -18,17 +18,17 @@ msgstr ""
 "X-Crowdin-File-ID: 89\n"
 
 #. GET_XPVISTA_PLEASE
-#: Shared/installer/nightly.nsi:188
+#: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
 msgstr "Allalaaditud MTA:SA versioon ei toeta Windows XP-d ega Vistat. Laadige alla alternatiivne versioon saidilt www.mtasa.com."
 
 #. GET_MASTER_PLEASE
-#: Shared/installer/nightly.nsi:189
+#: Shared/installer/nightly.nsi:208
 msgid "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
 msgstr "MTA:SA versioon on mõeldud Windowsi vanade versioonide jaoks. Laadige alla uusim versioon aadressilt www.mtasa.com."
 
 #. WELCOME_TEXT
-#: Shared/installer/nightly.nsi:190
+#: Shared/installer/nightly.nsi:209
 msgid "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n"
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
@@ -39,17 +39,17 @@ msgstr "See rakendus aitab sul läbida  $(^Name) ${REVISION_TAG} paigaldamise v�
 "Vajutage Edasi kui soovite jätkata"
 
 #. HEADER_Text
-#: Shared/installer/nightly.nsi:194
+#: Shared/installer/nightly.nsi:213
 msgid "Grand Theft Auto: San Andreas location"
 msgstr "Grand Theft Auto: San Andrease asukoht"
 
 #. DIRECTORY_Text_Dest
-#: Shared/installer/nightly.nsi:195
+#: Shared/installer/nightly.nsi:214
 msgid "Grand Theft Auto: San Andreas folder"
 msgstr "Grand Theft Auto: San Andrease kaust"
 
 #. DIRECTORY_Text_Top
-#: Shared/installer/nightly.nsi:196
+#: Shared/installer/nightly.nsi:215
 msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
@@ -62,152 +62,152 @@ msgstr "Palun vali oma Grand Theft Auto: San Andrease kaust.$\n"
 "Vajuta Paigalda, et alustada paigaldamisega."
 
 #. DESC_Section10
-#: Shared/installer/nightly.nsi:199
+#: Shared/installer/nightly.nsi:218
 msgid "Create a Start Menu group for installed applications"
 msgstr "Tee Start Menüü grupp paigaldatud rakendustele"
 
 #. DESC_Section11
-#: Shared/installer/nightly.nsi:200
+#: Shared/installer/nightly.nsi:219
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
 msgstr "Tee desktopi lühitee MTA:SA rakendusele."
 
 #. DESC_Section12
-#: Shared/installer/nightly.nsi:201
+#: Shared/installer/nightly.nsi:220
 msgid "Register mtasa:// protocol for browser clickable-ness."
 msgstr "Registreeri mtasa:// protokoll brauserite jaoks."
 
 #. DESC_Section13
-#: Shared/installer/nightly.nsi:202
+#: Shared/installer/nightly.nsi:221
 msgid "Add to Windows Games Explorer (if present)."
 msgstr "Lisa Windowsi Mängude hulka (kui on olemas)."
 
 #. DESC_DirectX
-#: Shared/installer/nightly.nsi:203
+#: Shared/installer/nightly.nsi:222
 msgid "Install or update DirectX (if required)."
 msgstr "Paigalda või uuenda DirectX (Kui on nõutud)."
 
 #. DESC_Section1
-#: Shared/installer/nightly.nsi:204
+#: Shared/installer/nightly.nsi:223
 msgid "The core components required to run Multi Theft Auto."
 msgstr "Põhilised kompondendid, mida vaja Multi Theft Auto käivitamiseks."
 
 #. DESC_Section2
-#: Shared/installer/nightly.nsi:205
+#: Shared/installer/nightly.nsi:224
 msgid "The MTA:SA modification, allowing you to play online."
 msgstr "See on MTA:SA modifikatsioon, mis lubab sul mängida onlainis."
 
 #. DESC_SectionGroupServer
-#: Shared/installer/nightly.nsi:208
+#: Shared/installer/nightly.nsi:227
 msgid "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
 msgstr "Multi Theft Auto server. See lubab sul luua enda mänguserverit. Nõuab internetiühendust."
 
 #. DESC_Section4
-#: Shared/installer/nightly.nsi:209
+#: Shared/installer/nightly.nsi:228
 msgid "The Multi Theft Auto server. This is a required component."
 msgstr "Multi Theft Auto server. See on nõutud komponent."
 
 #. DESC_Section5
-#: Shared/installer/nightly.nsi:210
+#: Shared/installer/nightly.nsi:229
 msgid "The MTA:SA modification for the server."
 msgstr "MTA:SA modifikatsioon serveri jaoks."
 
 #. DESC_Section6
-#: Shared/installer/nightly.nsi:211
+#: Shared/installer/nightly.nsi:230
 msgid "This is a set of required resources for your server."
 msgstr "See on kogum ressursse sinu mänguserveri jaoks."
 
 #. DESC_Section7
-#: Shared/installer/nightly.nsi:212
+#: Shared/installer/nightly.nsi:231
 msgid "This is an optional set of gamemodes and maps for your server."
 msgstr "See on valikuline kogum mängutüüpe ja kaarte sinu mänguserveri jaoks."
 
 #. DESC_Section8
-#: Shared/installer/nightly.nsi:213
+#: Shared/installer/nightly.nsi:232
 msgid "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
 msgstr "MTA:SA 1.0 Kaardi Loomise Rakendus. See aitab sul luua sinu enda kaarte, mida saab kasutada mängutüüpides."
 
 #. DESC_Section9
-#: Shared/installer/nightly.nsi:214
+#: Shared/installer/nightly.nsi:233
 msgid "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
 msgstr "See on SDK, et luua mooduleid MTA serverile. Paigaldada ainult kui oskad hästi C++ keelt!"
 
 #. DESC_SectionGroupDev
-#: Shared/installer/nightly.nsi:216
+#: Shared/installer/nightly.nsi:235
 msgid "Development code and tools that aid in the creation of mods for Multi Theft Auto"
 msgstr "Arendamise kood ja tööriistad, mis aitavad luua modifikatsioone Multi Theft Auto jaoks"
 
 #. DESC_SectionGroupClient
-#: Shared/installer/nightly.nsi:217
+#: Shared/installer/nightly.nsi:236
 msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "Klient on rakendus, millega saad mängida Multi Theft Auto serveris"
 
 #. INST_CLIENTSERVER
-#: Shared/installer/nightly.nsi:417
+#: Shared/installer/nightly.nsi:439
 msgid "Client and Server"
 msgstr "Klient ja Server"
 
 #. INST_SERVER
-#: Shared/installer/nightly.nsi:418
+#: Shared/installer/nightly.nsi:440
 msgid "Server only"
 msgstr "Ainult server"
 
 #. INST_STARTMENU_GROUP
-#: Shared/installer/nightly.nsi:432
+#: Shared/installer/nightly.nsi:454
 msgid "Start menu group"
 msgstr "Start menüü grupp"
 
 #. INST_DESKTOP_ICON
-#: Shared/installer/nightly.nsi:433
+#: Shared/installer/nightly.nsi:455
 msgid "Desktop icon"
 msgstr "Desktopi ikoon"
 
 #. INST_PROTOCOL
-#: Shared/installer/nightly.nsi:434
+#: Shared/installer/nightly.nsi:456
 msgid "Register mtasa:// protocol"
 msgstr "Registreeri mtasa:// protokoll"
 
 #. INST_GAMES_EXPLORER
-#: Shared/installer/nightly.nsi:435
+#: Shared/installer/nightly.nsi:457
 msgid "Add to Games Explorer"
 msgstr "Lisa Games Exploreri"
 
 #. INST_DIRECTX
-#: Shared/installer/nightly.nsi:436
+#: Shared/installer/nightly.nsi:458
 msgid "Install DirectX"
 msgstr "Paigalda DirectX"
 
 #. INST_SEC_CLIENT
-#: Shared/installer/nightly.nsi:470
+#: Shared/installer/nightly.nsi:492
 msgid "Game client"
 msgstr "Mängu klient"
 
 #. INST_SEC_SERVER
-#: Shared/installer/nightly.nsi:471
+#: Shared/installer/nightly.nsi:493
 msgid "Dedicated server"
 msgstr "Virtuaalserver"
 
 #. INST_SEC_CORE
-#: Shared/installer/nightly.nsi:472
+#: Shared/installer/nightly.nsi:494
 msgid "Core components"
 msgstr "Põhilised komponendid"
 
 #. INST_SEC_GAME
-#: Shared/installer/nightly.nsi:473
+#: Shared/installer/nightly.nsi:495
 msgid "Game module"
 msgstr "Mängu moodul"
 
 #. INFO_INPLACE_UPGRADE
-#: Shared/installer/nightly.nsi:475
+#: Shared/installer/nightly.nsi:497
 msgid "Performing in-place upgrade..."
 msgstr "Uuendan..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: Shared/installer/nightly.nsi:476
+#: Shared/installer/nightly.nsi:498
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Uuendan õiguseid. See võib võtta paar minutit..."
 
 #. MSGBOX_INVALID_GTASA
-#: Shared/installer/nightly.nsi:477
+#: Shared/installer/nightly.nsi:499
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -216,42 +216,42 @@ msgstr "Nõutud Windowsi versiooni Grand Theft Auto: San Andreasest ei leitud.$\
 "Palun paigaldage uuesti kui rakendusega on hiljem probleeme."
 
 #. INST_SEC_CORE_RESOURCES
-#: Shared/installer/nightly.nsi:480
+#: Shared/installer/nightly.nsi:502
 msgid "Core Resources"
 msgstr "Põhilised ressursid"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: Shared/installer/nightly.nsi:481
+#: Shared/installer/nightly.nsi:503
 msgid "Optional Resources"
 msgstr "Valikulised ressursid"
 
 #. INST_SEC_EDITOR
-#: Shared/installer/nightly.nsi:482
+#: Shared/installer/nightly.nsi:504
 msgid "Editor"
 msgstr "Redaktor"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:957
+#: Shared/installer/nightly.nsi:979
 msgid "Development"
 msgstr "Arendus"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1005
+#: Shared/installer/nightly.nsi:1027
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) on edukalt teie arvutist eemaldatud."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1012
+#: Shared/installer/nightly.nsi:1034
 msgid "Uninstallation has failed!"
 msgstr "Eemaldamine ebaõnnestus!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1020
+#: Shared/installer/nightly.nsi:1042
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Kas oled kindel, et soovid eemaldada $(^Name) ja kõik selle komponendid?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1021
+#: Shared/installer/nightly.nsi:1043
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -260,32 +260,32 @@ msgstr "Desinstallimine enne värskendamist?$\\r$\n"
 "Seadete uuendamiseks ja säilitamiseks käivitage uus installer."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1034
+#: Shared/installer/nightly.nsi:1056
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Kas sooviksid jätta mõned failid nagu ressursid, pildid ja serveri seaded? Kui vajutate ei siis kõik ressursid, pildid ja serveri seaded kustutatakse ära."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1143
+#: Shared/installer/nightly.nsi:1165
 msgid "This installer requires admin access, try again"
 msgstr "Paigaldamine nõuab administraatori õiguseid, proovige uuesti"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1144
+#: Shared/installer/nightly.nsi:1166
 msgid "This uninstaller requires admin access, try again"
 msgstr "Eemaldamis rakendus vajab administraatori õiguseid, proovige uuesti"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1145
+#: Shared/installer/nightly.nsi:1167
 msgid "Logon service not running, aborting!"
 msgstr "Sisselogimise teenus ei tööta, katkestan!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1146
+#: Shared/installer/nightly.nsi:1168
 msgid "Unable to elevate"
 msgstr "Ei suuda tõsta"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1742
+#: Shared/installer/nightly.nsi:1764
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -296,7 +296,7 @@ msgstr "Erinev versioon MTA-st ($1) on juba paigaldatud valitud kausta.$\n"
 "Oled kindel, et tahad MTA $1 üle kirjutada asukohas $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1746
+#: Shared/installer/nightly.nsi:1768
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -307,7 +307,7 @@ msgstr "MTA-d ei saa paigaldada samasse kausta, kus on GTA:SA.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1749
+#: Shared/installer/nightly.nsi:1771
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -316,7 +316,7 @@ msgstr "Valitud kaust ei eksisteeri.$\n"
 "Palun vali GTA:SA paigaldamise kaust"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1751
+#: Shared/installer/nightly.nsi:1773
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -325,17 +325,17 @@ msgstr "Ei suuda leida paigaldatud GTA:SA kaustast $GTA_DIR $\n"
 "Oled kindel, et tahad jätkata ?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1869
+#: Shared/installer/nightly.nsi:1891
 msgid "Choose Install Location"
 msgstr "Vali paigaldamise asukoht"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1870
+#: Shared/installer/nightly.nsi:1892
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Vali kaust kuhu paigaldada ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1871
+#: Shared/installer/nightly.nsi:1893
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -346,62 +346,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} paigaldatakse järnevasse kaus
 "Vajuta Edasi et jätkata."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1873
+#: Shared/installer/nightly.nsi:1895
 msgid "Destination Folder"
 msgstr "Soovitud kaust"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1874
+#: Shared/installer/nightly.nsi:1896
 msgid "Browse..."
 msgstr "Sirvi..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1875
+#: Shared/installer/nightly.nsi:1897
 msgid "Default"
 msgstr "Tavaline"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1876
+#: Shared/installer/nightly.nsi:1898
 msgid "Last used"
 msgstr "Viimati kasutatud"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1877
+#: Shared/installer/nightly.nsi:1899
 msgid "Custom"
 msgstr "Kohandatud"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2055
+#: Shared/installer/nightly.nsi:2077
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Vali kaust kuhu installida ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2073
+#: Shared/installer/nightly.nsi:2095
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Hoiatus: Muu versioon MTA-st ($1) on juba paigaldatud valitud kausta."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2074
+#: Shared/installer/nightly.nsi:2096
 msgid "Installation type:  Upgrade"
 msgstr "Paigaldamise tüüp: Uuendus"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2317
+#: Shared/installer/nightly.nsi:2339
 msgid "Online update"
 msgstr "Võrgu uuendus"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2318
+#: Shared/installer/nightly.nsi:2340
 msgid "Checking for update information"
 msgstr "Kontrollib uuenduste informatsiooni"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2319
+#: Shared/installer/nightly.nsi:2341
 msgid "Checking for installer update information..."
 msgstr "Kontrollib uuenduste informatsiooni..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2320
+#: Shared/installer/nightly.nsi:2342
 msgid "Please ensure your firewall is not blocking"
 msgstr "Ole kindel, et teie tulemüür ei blokeeri"
 
