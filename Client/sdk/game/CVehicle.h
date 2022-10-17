@@ -198,7 +198,7 @@ public:
     virtual bool           GetTyresDontBurst() = 0;
     virtual unsigned short GetAdjustablePropertyValue() = 0;
     virtual float          GetHeliRotorSpeed() = 0;
-    virtual float          GetPlaneRotorSpeed() const = 0;
+    virtual float          GetPlaneRotorSpeed() = 0;
     virtual unsigned long  GetExplodeTime() = 0;
 
     virtual char  GetNitroCount() = 0;
