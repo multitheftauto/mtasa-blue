@@ -3903,12 +3903,8 @@ void CClientVehicle::SetHeadLightColor(const SColor color)
     #define INFO(x) g_pCore->GetConsole()->Printf x
     #define WARN(x) g_pCore->GetConsole()->Printf x
 #else
-    #define INFO(x) \
-        { \
-        }
-    #define WARN(x) \
-        { \
-        }
+    #define INFO(x)    {}
+    #define WARN(x)    {}
 #endif
 
 std::string GetPlayerName(CClientPed* pClientPed)
