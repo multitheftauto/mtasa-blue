@@ -85,8 +85,6 @@ static_assert(sizeof(CPlaneSAInterface) == 0xA04, "Invalid size for CPlaneSAInte
 
 class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
 {
-private:
-    //  CBoatSAInterface        * internalInterface;
 public:
     CPlaneSA(CPlaneSAInterface* plane);
     CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);

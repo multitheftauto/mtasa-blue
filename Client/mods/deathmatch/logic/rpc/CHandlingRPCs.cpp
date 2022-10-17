@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CHandlingEntry.h>
 #include "CHandlingRPCs.h"
 #include "net/SyncStructures.h"
 

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_init.h"
 #define DECLARE_PROFILER_SECTION_gamesa_init
 #include "profiler/SharedUtil.Profiler.h"
 
@@ -23,8 +24,6 @@ CCoreInterface* g_pCore = NULL;
 // in order for proper initialization to occur.
 MTAEXPORT CGame* GetGameInterface(CCoreInterface* pCore)
 {
-    DEBUG_TRACE("CGame * GetGameInterface()");
-
     g_pNet = pCore->GetNetwork();
     assert(g_pNet);
 

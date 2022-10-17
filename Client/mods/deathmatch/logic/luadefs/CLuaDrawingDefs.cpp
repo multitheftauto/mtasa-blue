@@ -1712,6 +1712,14 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_pushboolean(luaVM, dxStatus.settings.bHighDetailPeds);
         lua_settable(luaVM, -3);
 
+        lua_pushstring(luaVM, "SettingCoronaReflections");
+        lua_pushboolean(luaVM, dxStatus.settings.bCoronaReflections);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "SettingDynamicPedShadows");
+        lua_pushboolean(luaVM, dxStatus.settings.bDynamicPedShadows);
+        lua_settable(luaVM, -3);
+
         lua_pushstring(luaVM, "TotalPhysicalMemory");
         lua_pushnumber(luaVM, static_cast<lua_Number>(SharedUtil::GetWMITotalPhysicalMemory()) / 1024.0 / 1024.0);
         lua_settable(luaVM, -3);

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHandlingManagerSA.h"
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
@@ -8343,7 +8344,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[0].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[0].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[0].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[0].vecTurnResistance = CVector(0.998f, 0.998, 0.995);
+    m_OriginalFlyingHandlingData[0].vecTurnResistance = CVector(0.998f, 0.998f, 0.995f);
     m_OriginalFlyingHandlingData[0].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[1].iVehicleID = 187;
@@ -8362,7 +8363,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[1].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[1].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[1].fMoveResistance = 0.995f;
-    m_OriginalFlyingHandlingData[1].vecTurnResistance = CVector(1.000f, 1.000, 0.998);
+    m_OriginalFlyingHandlingData[1].vecTurnResistance = CVector(1.000f, 1.000f, 0.998f);
     m_OriginalFlyingHandlingData[1].vecSpeedResistance = CVector(0.0f, 0.0f, 10.0f);
 
     m_OriginalFlyingHandlingData[2].iVehicleID = 188;
@@ -8381,7 +8382,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[2].fGearDownL = 1.2f;
     m_OriginalFlyingHandlingData[2].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[2].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[2].vecTurnResistance = CVector(0.998f, 0.998, 0.990);
+    m_OriginalFlyingHandlingData[2].vecTurnResistance = CVector(0.998f, 0.998f, 0.990f);
     m_OriginalFlyingHandlingData[2].vecSpeedResistance = CVector(10.0f, 20.0f, 0.0f);
 
     m_OriginalFlyingHandlingData[3].iVehicleID = 189;
@@ -8400,7 +8401,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[3].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[3].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[3].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[3].vecTurnResistance = CVector(0.998f, 0.998, 0.990);
+    m_OriginalFlyingHandlingData[3].vecTurnResistance = CVector(0.998f, 0.998f, 0.990f);
     m_OriginalFlyingHandlingData[3].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[4].iVehicleID = 190;
@@ -8419,7 +8420,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[4].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[4].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[4].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[4].vecTurnResistance = CVector(0.9985f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[4].vecTurnResistance = CVector(0.9985f, 0.997f, 0.995f);
     m_OriginalFlyingHandlingData[4].vecSpeedResistance = CVector(20.0f, 30.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[5].iVehicleID = 191;
@@ -8438,7 +8439,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[5].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[5].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[5].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[5].vecTurnResistance = CVector(0.997f, 0.997, 0.997);
+    m_OriginalFlyingHandlingData[5].vecTurnResistance = CVector(0.997f, 0.997f, 0.997f);
     m_OriginalFlyingHandlingData[5].vecSpeedResistance = CVector(10.0f, 5.0f, 5.0f);
 
     m_OriginalFlyingHandlingData[6].iVehicleID = 192;
@@ -8457,7 +8458,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[6].fGearDownL = 1.7f;
     m_OriginalFlyingHandlingData[6].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[6].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[6].vecTurnResistance = CVector(0.998f, 0.996, 0.995);
+    m_OriginalFlyingHandlingData[6].vecTurnResistance = CVector(0.998f, 0.996f, 0.995f);
     m_OriginalFlyingHandlingData[6].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[7].iVehicleID = 193;
@@ -8476,7 +8477,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[7].fGearDownL = 1.3f;
     m_OriginalFlyingHandlingData[7].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[7].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[7].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[7].vecTurnResistance = CVector(0.998f, 0.997f, 0.995f);
     m_OriginalFlyingHandlingData[7].vecSpeedResistance = CVector(10.0f, 10.0f, 40.0f);
 
     m_OriginalFlyingHandlingData[8].iVehicleID = 194;
@@ -8495,7 +8496,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[8].fGearDownL = 1.3f;
     m_OriginalFlyingHandlingData[8].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[8].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[8].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[8].vecTurnResistance = CVector(0.998f, 0.997f, 0.995f);
     m_OriginalFlyingHandlingData[8].vecSpeedResistance = CVector(20.0f, 100.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[9].iVehicleID = 195;
@@ -8514,7 +8515,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[9].fGearDownL = 1.5f;
     m_OriginalFlyingHandlingData[9].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[9].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[9].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[9].vecTurnResistance = CVector(0.998f, 0.997f, 0.995f);
     m_OriginalFlyingHandlingData[9].vecSpeedResistance = CVector(20.0f, 100.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[10].iVehicleID = 196;
@@ -8533,7 +8534,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[10].fGearDownL = 1.5f;
     m_OriginalFlyingHandlingData[10].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[10].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[10].vecTurnResistance = CVector(0.998f, 0.997, 0.995);
+    m_OriginalFlyingHandlingData[10].vecTurnResistance = CVector(0.998f, 0.997f, 0.995f);
     m_OriginalFlyingHandlingData[10].vecSpeedResistance = CVector(20.0f, 100.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[11].iVehicleID = 197;
@@ -8552,7 +8553,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[11].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[11].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[11].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[11].vecTurnResistance = CVector(0.998f, 0.998, 0.995);
+    m_OriginalFlyingHandlingData[11].vecTurnResistance = CVector(0.998f, 0.998f, 0.995f);
     m_OriginalFlyingHandlingData[11].vecSpeedResistance = CVector(20.0f, 50.0f, 20.0f);
 
     m_OriginalFlyingHandlingData[12].iVehicleID = 198;
@@ -8571,7 +8572,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[12].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[12].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[12].fMoveResistance = 0.998f;
-    m_OriginalFlyingHandlingData[12].vecTurnResistance = CVector(0.980f, 0.980, 0.990);
+    m_OriginalFlyingHandlingData[12].vecTurnResistance = CVector(0.980f, 0.980f, 0.990f);
     m_OriginalFlyingHandlingData[12].vecSpeedResistance = CVector(1.0f, 1.0f, 10.0f);
 
     m_OriginalFlyingHandlingData[13].iVehicleID = 199;
@@ -8590,7 +8591,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[13].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[13].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[13].fMoveResistance = 0.998f;
-    m_OriginalFlyingHandlingData[13].vecTurnResistance = CVector(0.980f, 0.980, 0.990);
+    m_OriginalFlyingHandlingData[13].vecTurnResistance = CVector(0.980f, 0.980f, 0.990f);
     m_OriginalFlyingHandlingData[13].vecSpeedResistance = CVector(1.0f, 1.0f, 10.0f);
 
     m_OriginalFlyingHandlingData[14].iVehicleID = 200;
@@ -8609,7 +8610,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[14].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[14].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[14].fMoveResistance = 0.9985f;
-    m_OriginalFlyingHandlingData[14].vecTurnResistance = CVector(0.992f, 0.992, 0.996);
+    m_OriginalFlyingHandlingData[14].vecTurnResistance = CVector(0.992f, 0.992f, 0.996f);
     m_OriginalFlyingHandlingData[14].vecSpeedResistance = CVector(0.5f, 0.5f, 10.0f);
 
     m_OriginalFlyingHandlingData[15].iVehicleID = 201;
@@ -8628,7 +8629,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[15].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[15].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[15].fMoveResistance = 0.9985f;
-    m_OriginalFlyingHandlingData[15].vecTurnResistance = CVector(0.992f, 0.992, 0.996);
+    m_OriginalFlyingHandlingData[15].vecTurnResistance = CVector(0.992f, 0.992f, 0.996f);
     m_OriginalFlyingHandlingData[15].vecSpeedResistance = CVector(1.5f, 1.5f, 10.0f);
 
     m_OriginalFlyingHandlingData[16].iVehicleID = 202;
@@ -8647,7 +8648,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[16].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[16].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[16].fMoveResistance = 0.9985f;
-    m_OriginalFlyingHandlingData[16].vecTurnResistance = CVector(0.992f, 0.992, 0.996);
+    m_OriginalFlyingHandlingData[16].vecTurnResistance = CVector(0.992f, 0.992f, 0.996f);
     m_OriginalFlyingHandlingData[16].vecSpeedResistance = CVector(0.5f, 0.5f, 10.0f);
 
     m_OriginalFlyingHandlingData[17].iVehicleID = 203;
@@ -8666,7 +8667,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[17].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[17].fWindMult = 0.2f;
     m_OriginalFlyingHandlingData[17].fMoveResistance = 0.9985f;
-    m_OriginalFlyingHandlingData[17].vecTurnResistance = CVector(0.992f, 0.992, 0.992);
+    m_OriginalFlyingHandlingData[17].vecTurnResistance = CVector(0.992f, 0.992f, 0.992f);
     m_OriginalFlyingHandlingData[17].vecSpeedResistance = CVector(2.0f, 2.0f, 7.0f);
 
     m_OriginalFlyingHandlingData[18].iVehicleID = 204;
@@ -8685,7 +8686,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[18].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[18].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[18].fMoveResistance = 0.9985f;
-    m_OriginalFlyingHandlingData[18].vecTurnResistance = CVector(0.992f, 0.992, 0.995);
+    m_OriginalFlyingHandlingData[18].vecTurnResistance = CVector(0.992f, 0.992f, 0.995f);
     m_OriginalFlyingHandlingData[18].vecSpeedResistance = CVector(2.0f, 2.0f, 10.0f);
 
     m_OriginalFlyingHandlingData[19].iVehicleID = 205;
@@ -8704,7 +8705,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[19].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[19].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[19].fMoveResistance = 0.9985f;
-    m_OriginalFlyingHandlingData[19].vecTurnResistance = CVector(0.992f, 0.992, 0.995);
+    m_OriginalFlyingHandlingData[19].vecTurnResistance = CVector(0.992f, 0.992f, 0.995f);
     m_OriginalFlyingHandlingData[19].vecSpeedResistance = CVector(2.0f, 2.0f, 10.0f);
 
     m_OriginalFlyingHandlingData[20].iVehicleID = 206;
@@ -8723,7 +8724,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[20].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[20].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[20].fMoveResistance = 0.9985f;
-    m_OriginalFlyingHandlingData[20].vecTurnResistance = CVector(0.992f, 0.992, 0.995);
+    m_OriginalFlyingHandlingData[20].vecTurnResistance = CVector(0.992f, 0.992f, 0.995f);
     m_OriginalFlyingHandlingData[20].vecSpeedResistance = CVector(2.0f, 2.0f, 10.0f);
 
     m_OriginalFlyingHandlingData[21].iVehicleID = 207;
@@ -8742,7 +8743,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[21].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[21].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[21].fMoveResistance = 1.0f;
-    m_OriginalFlyingHandlingData[21].vecTurnResistance = CVector(0.998f, 0.996, 0.990);
+    m_OriginalFlyingHandlingData[21].vecTurnResistance = CVector(0.998f, 0.996f, 0.990f);
     m_OriginalFlyingHandlingData[21].vecSpeedResistance = CVector(10.0f, 40.0f, 10.0f);
 
     m_OriginalFlyingHandlingData[22].iVehicleID = 208;
@@ -8761,7 +8762,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[22].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[22].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[22].fMoveResistance = 0.989f;
-    m_OriginalFlyingHandlingData[22].vecTurnResistance = CVector(0.850f, 0.860, 0.992);
+    m_OriginalFlyingHandlingData[22].vecTurnResistance = CVector(0.850f, 0.860f, 0.992f);
     m_OriginalFlyingHandlingData[22].vecSpeedResistance = CVector(0.0f, 0.0f, 7.0f);
 
     m_OriginalFlyingHandlingData[23].iVehicleID = 209;
@@ -8780,7 +8781,7 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
     m_OriginalFlyingHandlingData[23].fGearDownL = 1.0f;
     m_OriginalFlyingHandlingData[23].fWindMult = 0.1f;
     m_OriginalFlyingHandlingData[23].fMoveResistance = 0.989f;
-    m_OriginalFlyingHandlingData[23].vecTurnResistance = CVector(0.880f, 0.880, 0.998);
+    m_OriginalFlyingHandlingData[23].vecTurnResistance = CVector(0.880f, 0.880f, 0.998f);
     m_OriginalFlyingHandlingData[23].vecSpeedResistance = CVector(0.0f, 0.0f, 5.0f);
 
     // Boats handling

@@ -11,9 +11,28 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
-#include "game/CAnimBlendAssocGroup.h"
-#include "game/CAnimBlendAssociation.h"
-#include "game/CAnimBlendHierarchy.h"
+#include <game/C3DMarkers.h>
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CAnimBlendAssociation.h>
+#include <game/CAnimBlendHierarchy.h>
+#include <game/CAnimManager.h>
+#include <game/CColPoint.h>
+#include <game/CEventDamage.h>
+#include <game/CExplosionManager.h>
+#include <game/CFire.h>
+#include <game/CGarage.h>
+#include <game/CGarages.h>
+#include <game/CPathFind.h>
+#include <game/CPedIntelligence.h>
+#include <game/CPlayerInfo.h>
+#include <game/CSettings.h>
+#include <game/CStreaming.h>
+#include <game/CTaskManager.h>
+#include <game/CWanted.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStatManager.h>
+#include <game/CWeather.h>
+#include <game/Task.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -91,6 +110,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_dwWanted = 0;
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
+
+    m_bFocused = g_pCore->IsFocused();
 
     m_bCursorEventsEnabled = false;
     m_bInitiallyFadedOut = true;
@@ -2565,6 +2586,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientRender", "", NULL, false);
     m_Events.AddEvent("onClientMinimize", "", NULL, false);
     m_Events.AddEvent("onClientRestore", "", NULL, false);
+    m_Events.AddEvent("onClientMTAFocusChange", "focused", NULL, false);
 
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
@@ -5293,10 +5315,14 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->RestoreFogDistance();
 
     // Vehicles LOD distance
-    g_pGame->GetSettings()->ResetVehiclesLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
 
     // Peds LOD distance
-    g_pGame->GetSettings()->ResetPedsLODDistanceFromScript();
+    g_pGame->GetSettings()->ResetPedsLODDistance(true);
+
+    // Corona rain reflections
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
 
     // Sun color
     g_pMultiplayer->ResetSunColor();
@@ -5399,6 +5425,12 @@ void CClientGame::ResetMapInfo()
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
     }
+
+    // Reset camera drunk/shake level
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
+
+    if (pPlayerInfo)
+        pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
     RestreamWorld();
 }
@@ -6536,6 +6568,18 @@ void CClientGame::RestreamWorld()
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
     g_pGame->GetStreaming()->ReinitStreaming();
+}
+
+void CClientGame::OnWindowFocusChange(bool state)
+{
+    if (state == m_bFocused)
+        return;
+
+    m_bFocused = state;
+
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(state);
+    m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
 }
 
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAnimBlendHierarchySA.h"
+#include "CAnimBlockSA.h"
+#include "CAnimManagerSA.h"
 
 int CAnimBlockSAInterface::GetIndex()
 {

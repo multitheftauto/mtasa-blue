@@ -11,18 +11,12 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-
 #include <game/CRenderWare.h>
-
 #include "CModelInfoSA.h"
-#include "CColModelSA.h"
-#include "Common.h"
-#include <windows.h>
-#include <stdio.h>
 #include "CRenderWareSA.ShaderSupport.h"
 
 class CModelTexturesInfo;
+struct RpAtomic;
 
 class CRenderWareSA : public CRenderWare
 {

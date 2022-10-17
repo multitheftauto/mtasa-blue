@@ -12,11 +12,7 @@
 #pragma once
 
 #include <game/CMarker.h>
-#include "Common.h"
 
-/**
- * \todo Ignore this class?
- */
 class CEntryExit;
 
 class CMarkerSAInterface
@@ -31,7 +27,7 @@ public:
 
     WORD ReferenceIndex;
 
-    FLOAT       fBlipMarkerScale;
+    float       fBlipMarkerScale;
     WORD        nBlipScale;
     CEntryExit* pEntryExit;
 
@@ -52,22 +48,21 @@ public:
 class CMarkerSA : public CMarker
 {
 public:
-    /* Our Functions */
     CMarkerSA(CMarkerSAInterface* markerInterface) { internalInterface = markerInterface; };
 
     void Init();
 
-    VOID                SetSprite(eMarkerSprite Sprite);
-    VOID                SetDisplay(eMarkerDisplay wDisplay);
-    VOID                SetScale(WORD wScale);
-    VOID                SetColor(eMarkerColor color);
-    VOID                SetColor(const SColor color);
-    VOID                Remove();
-    BOOL                IsActive();
-    VOID                SetPosition(CVector* vecPosition);
-    VOID                SetEntity(CVehicle* vehicle);
-    VOID                SetEntity(CPed* ped);
-    VOID                SetEntity(CObject* object);
+    void                SetSprite(eMarkerSprite Sprite);
+    void                SetDisplay(eMarkerDisplay wDisplay);
+    void                SetScale(WORD wScale);
+    void                SetColor(eMarkerColor color);
+    void                SetColor(const SharedUtil::SColor color);
+    void                Remove();
+    bool                IsActive();
+    void                SetPosition(CVector* vecPosition);
+    void                SetEntity(CVehicle* vehicle);
+    void                SetEntity(CPed* ped);
+    void                SetEntity(CObject* object);
     CEntity*            GetEntity();
     CVector*            GetPosition();
     CMarkerSAInterface* GetInterface() { return internalInterface; };

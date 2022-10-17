@@ -11,8 +11,6 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <game/TaskBasic.h>
 
 #include "TaskSA.h"
@@ -202,7 +200,7 @@ public:
     CAnimBlock*    m_pSunbatheAnimBlock;
     int            m_BeachAnimBlockIndex;
     int            m_SunbatheAnimBlockIndex;
-    CObject*       m_pTowel;
+    CObjectSAInterface* m_pTowel;
 };
 
 class CTaskComplexSunbatheSA : public virtual CTaskComplexSA, public virtual CTaskComplexSunbathe

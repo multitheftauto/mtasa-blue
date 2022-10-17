@@ -13,24 +13,10 @@
 
 #include <game/CHud.h>
 #include <CVector.h>
-#include "Common.h"
 
-#define FUNC_GetRidOfAllHudMessages 0x588a50
-#define FUNC_SetHelpMessage         0x588be0
-#define FUNC_SetVehicleName         0x588f50
-#define FUNC_SetZoneName            0x588bb0
-#define FUNC_SetBigMessage          0x588fc0
-
-#define FUNC_DrawBarChart           0x728640
-#define FUNC_CalcScreenCoors        0x70CE30
-#define FUNC_Draw2DPolygon          0x7285B0
 #define FUNC_Draw                   0x58FAE0
 
-#define VAR_DisableHud              0xC8A7C1
 #define VAR_DisableClock            0xBAA400
-
-#define VAR_VehicleNamePtr          0xA0FC98
-#define VAR_ZoneNamePtr             0x97537C
 
 #define VAR_AspectRatioMult         0x859524
 #define VAR_CameraCrosshairScale    0x866C74
@@ -67,15 +53,8 @@ class CHudSA : public CHud
 {
 public:
     CHudSA();
-    VOID SetHelpMessage(char* szMessage);
-    VOID SetBigMessage(char* szBigMessage);
-    VOID SetVehicleName(char* szName);
-    VOID SetZoneName(char* szName);
-    VOID Disable(bool bDisabled);
+    void Disable(bool bDisabled);
     bool IsDisabled();
-    VOID DrawBarChart(float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor);
-    bool CalcScreenCoors(CVector* vecPosition1, CVector* vecPosition2, float* fX, float* fY, bool bSetting1, bool bSetting2);
-    void Draw2DPolygon(float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor);
     void SetComponentVisible(eHudComponent component, bool bVisible);
     bool IsComponentVisible(eHudComponent component);
     void AdjustComponents(float fAspectRatio);

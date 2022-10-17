@@ -157,21 +157,4 @@ public:
     void  SetLighting(float fLighting);
 
     void SetFrozen(bool bFrozen);
-
-    /*
-    VOID        SetMassMultiplier(FLOAT fMassMultiplier);
-    FLOAT       GetMassMultiplier();
-
-    BOOL        GetExtraHeavy();
-    VOID        SetExtraHeavy(BOOL bExtraHeavy);
-    BOOL        GetDoGravity();
-    VOID        SetDoGravity(BOOL bDoGravity);
-    BOOL        GetInfiniteMass();
-    VOID        SetInfiniteMass(BOOL bInfiniteMass);
-    BOOL        GetPositionFrozen();
-    VOID        SetPositionFrozen(BOOL bPositionFrozen);
-    BYTE        GetLastMaterialToHaveBeenStandingOn();
-
-    BYTE        GetLevel();
-    VOID        SetLevel(BYTE LivesInThisLevel);*/
 };

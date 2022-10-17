@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCamSA.h"
 
 CEntity* CCamSA::GetTargetEntity() const
 {

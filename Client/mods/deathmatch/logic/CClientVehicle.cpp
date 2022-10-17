@@ -9,6 +9,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CBike.h>
+#include <game/CBikeHandlingEntry.h>
+#include <game/CBoat.h>
+#include <game/CBoatHandlingEntry.h>
+#include <game/CDoor.h>
+#include <game/CFlyingHandlingEntry.h>
+#include <game/CHandlingEntry.h>
+#include <game/CHandlingManager.h>
+#include <game/CStreaming.h>
 
 using std::list;
 

@@ -15,6 +15,7 @@ class CClientVehicle;
 
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
+#include <game/CModelInfo.h>
 
 #include "CClientCommon.h"
 #include "CClientCamera.h"
@@ -24,6 +25,10 @@ class CClientVehicle;
 #include "CClientVehicleManager.h"
 #include "CVehicleUpgrades.h"
 #include "CClientModel.h"
+
+class CBikeHandlingEntry;
+class CBoatHandlingEntry;
+class CClientProjectile;
 
 #define INVALID_PASSENGER_SEAT 0xFF
 #define DEFAULT_VEHICLE_HEALTH 1000
@@ -139,7 +144,6 @@ struct SVehicleComponentData
     bool    m_bScaleChanged;
     bool    m_bVisible;
 };
-class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
 {
