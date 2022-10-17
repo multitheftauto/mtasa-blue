@@ -636,7 +636,7 @@ public:
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
     unsigned short GetAdjustablePropertyValue() { return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
     float          GetHeliRotorSpeed() { return *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124); };
-    float          GetPlaneRotorSpeed();
+    float          GetPlaneRotorSpeed() const;
     unsigned long  GetExplodeTime() { return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240); };
 
     char  GetNitroCount() { return GetVehicleInterface()->m_nNitroBoosts; }
