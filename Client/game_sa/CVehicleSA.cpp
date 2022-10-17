@@ -617,7 +617,7 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
     pInterface->m_fPropSpeed = fSpeed;
 }
 
-float CVehicleSA::GetPlaneRotorSpeed()
+float CVehicleSA::GetPlaneRotorSpeed() const
 {
     auto pInterface = static_cast<CPlaneSAInterface*>(GetVehicleInterface());
     return pInterface->m_fPropSpeed;
