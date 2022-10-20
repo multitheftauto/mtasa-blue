@@ -5414,6 +5414,8 @@ void CClientGame::ResetMapInfo()
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
     RestreamWorld();
+
+    ReinitMarkers();
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
@@ -6549,6 +6551,11 @@ void CClientGame::RestreamWorld()
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
     g_pGame->GetStreaming()->ReinitStreaming();
+}
+
+void CClientGame::ReinitMarkers()
+{
+    g_pGame->Get3DMarkers()->ReinitMarkers();
 }
 
 void CClientGame::OnWindowFocusChange(bool state)

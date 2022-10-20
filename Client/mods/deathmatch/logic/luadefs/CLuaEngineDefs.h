@@ -61,6 +61,7 @@ public:
     static bool                                            EngineRestreamWorld(lua_State* const luaVM);
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
+    static bool                                            EngineReinitMarkers(lua_State* const luaVM);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

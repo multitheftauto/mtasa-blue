@@ -440,6 +440,7 @@ public:
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
     void RestreamWorld();
+    void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
 

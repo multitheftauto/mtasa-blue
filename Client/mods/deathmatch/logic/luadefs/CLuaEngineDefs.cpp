@@ -63,6 +63,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
+        {"engineReinitMarkers", ArgumentParser<EngineReinitMarkers>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2056,5 +2057,11 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
     g_pClientGame->RestreamWorld();
+    return true;
+}
+
+bool CLuaEngineDefs::EngineReinitMarkers(lua_State* const luaVM)
+{
+    g_pClientGame->ReinitMarkers();
     return true;
 }
