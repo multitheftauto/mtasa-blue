@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-06 09:21+0000\n"
-"PO-Revision-Date: 2022-10-06 09:37\n"
+"POT-Creation-Date: 2022-10-21 14:34+0000\n"
+"PO-Revision-Date: 2022-10-21 15:25\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -17,207 +17,42 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr "更新 Aero 设置"
+#. Create buttons
+#. OK button
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:34
+#: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
+#: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
+#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
+#: Client/core/CVersionUpdater.cpp:2118 Client/core/CVersionUpdater.cpp:2127
+#: Client/core/CVersionUpdater.cpp:2136 Client/core/CVersionUpdater.cpp:2150
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4680
+msgid "OK"
+msgstr "确定"
 
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr "更新 大型内存设置"
+#. Cancel button
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:37
+#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4679
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+msgid "Cancel"
+msgstr "取消"
 
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr "更新DEP数据执行保护设置"
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr "更新显卡驱动依赖"
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr "修复文件问题"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "复制主要的可执行文件以避免显卡驱动问题"
-
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA 需要管理员权限运行以下任务:\n\n"
-"     '%s'\n\n"
-"请在下一个窗口中确认指令."
-
-#: Client/loader/CInstallManager.cpp:344
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA 无法完成以下任务:\n\n"
-"'%s'\n"
-
-#: Client/loader/CInstallManager.cpp:394
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** 崩溃的原因为显卡错误 **\n\n"
-"** 请更新驱动 **"
-
-#: Client/loader/CInstallManager.cpp:500
-msgid "Install updated MTA:SA files"
-msgstr "安装已更新的 MTA:SA 文件"
-
-#: Client/loader/CInstallManager.cpp:520
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "本次更新由于文件冲突导致失败. 请关掉其他程序后再试"
-
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
-#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
-#: Client/loader/MainFunctions.cpp:818
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1191 Client/core/CCore.cpp:1204
-#: Client/core/CSettings.cpp:2914 Client/core/CSettings.cpp:4098
-#: Client/core/CSettings.cpp:4126 Client/core/CSettings.cpp:4659
-#: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "错误"
-
-#: Client/loader/CInstallManager.cpp:529
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto 没有被正确安装, 请重新安装. %s"
-
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "MTA:SA 无法继续执行，因为以下文件不正确："
-
-#: Client/loader/CInstallManager.cpp:609
-msgid "Patch GTA"
-msgstr "重新修补GTA"
-
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:722
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "由于驱动器 %s 没有足够的空间,MTA:SA 无法继续运行."
-
-#: Client/loader/CInstallManager.cpp:812
-msgid "Missing file:"
-msgstr "缺少以下文件："
-
-#: Client/loader/CInstallManager.cpp:816
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "若MTA加载失败，请重新安装GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:937
-msgid "Update install settings"
-msgstr "更新安装设置"
-
-#: Client/loader/CInstallManager.cpp:1070
-msgid "Update compatibility settings"
-msgstr "更新兼容性设置"
-
-#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:751
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "搜索Grand Theft Auto: San Andreas"
-
-#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:754
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "请启动Grand Theft Auto San Andreas"
-
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "请选择 侠盗猎车手:圣安地列斯的安装目录"
-
-#: Client/loader/Utils.cpp:1283
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "在读取 %s 模块时出错! (%s)"
-
-#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:775
-msgid "Copying files..."
-msgstr "复制文件..."
-
-#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:780
-msgid "Copy finished early. Everything OK."
-msgstr "文件提前复制完毕.所有数据正常."
-
-#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:785
-msgid "Finishing..."
-msgstr "正在完成..."
-
-#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:789
-msgid "Done!"
-msgstr "已完成!"
-
-#: Client/loader/Utils.cpp:1713
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "检测到最近安装的 %s.\n\n"
-"你想把配置文件从%s复制到这里吗?"
-
-#: Client/loader/Utils.cpp:1752
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA 在打开 '%s' 文件时遇到问题."
-
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA 缺少 '%s' 文件."
-
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA 在加载模型文件时遇到问题."
-
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "如果您最近修改了gta3.img，请尝试重新安装GTA:SA。"
-
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA 在改装车辆时遇到问题."
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA 在以下文件找到错误 '%s'"
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "你在运行MTA:SA的时候重启电脑了吗?"
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr "请在运行前关闭以下程序:"
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:32
+#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
+#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
+#: Client/core/CSettings.cpp:1368 Client/core/CSettings.cpp:1392
+#: Client/core/CSettings.cpp:4421 Client/core/CSettings.cpp:4488
+#: Client/core/CSettings.cpp:4537 Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "Yes"
+msgstr "是"
 
 #: Client/loader/Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
@@ -231,202 +66,6 @@ msgstr "安装更新中..."
 msgid "Extracting files..."
 msgstr "解压文件中..."
 
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1368
-#: Client/core/CSettings.cpp:1392 Client/core/CSettings.cpp:4421
-#: Client/core/CSettings.cpp:4488 Client/core/CSettings.cpp:4537
-#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
-#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "Yes"
-msgstr "是"
-
-#: Client/loader/Dialogs.cpp:33 Client/core/CMainMenu.cpp:1147
-#: Client/core/CSettings.cpp:1367 Client/core/CSettings.cpp:1391
-#: Client/core/CSettings.cpp:4420 Client/core/CSettings.cpp:4487
-#: Client/core/CSettings.cpp:4536 Client/core/CVersionUpdater.cpp:1569
-#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
-#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "No"
-msgstr "否"
-
-#. Create buttons
-#. OK button
-#: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4680
-#: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
-#: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
-#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
-#: Client/core/CVersionUpdater.cpp:2118 Client/core/CVersionUpdater.cpp:2127
-#: Client/core/CVersionUpdater.cpp:2136 Client/core/CVersionUpdater.cpp:2150
-msgid "OK"
-msgstr "确定"
-
-#: Client/loader/Dialogs.cpp:35
-msgid "Quit"
-msgstr "退出"
-
-#: Client/loader/Dialogs.cpp:36
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-msgid "Help"
-msgstr "帮助"
-
-#. Cancel button
-#: Client/loader/Dialogs.cpp:37 Client/gui/CGUIMessageBox_Impl.cpp:68
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4679
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
-#: Client/core/CVersionUpdater.cpp:1839
-msgid "Cancel"
-msgstr "取消"
-
-#: Client/loader/Dialogs.cpp:52
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas 遇到了问题"
-
-#: Client/loader/Dialogs.cpp:53
-msgid "Crash information"
-msgstr "崩溃信息"
-
-#: Client/loader/Dialogs.cpp:54
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "勾选本选项以使用‘互联网’将本崩溃信息发送到MTA开发团队"
-
-#: Client/loader/Dialogs.cpp:55
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "这样做可以增加修复此崩溃的机会。"
-
-#: Client/loader/Dialogs.cpp:56
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "您想要重新启动MTA: San Andreas 吗?"
-
-#: Client/loader/Dialogs.cpp:63
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - 警告"
-
-#: Client/loader/Dialogs.cpp:64
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:66
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:68
-msgid "Keep these files, but also show this warning on next start"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:69
-msgid "Do not remind me about these files again"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:70
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:71
-msgid "Show me these files"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:72
-msgid "Play MTA:SA"
-msgstr "启动 MTA:SA"
-
-#: Client/loader/Dialogs.cpp:78
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - 不明确的选项"
-
-#: Client/loader/Dialogs.cpp:79
-msgid "NVidia Optimus detected!"
-msgstr "检测到显卡支持NVidia Optimus技术!"
-
-#: Client/loader/Dialogs.cpp:80
-msgid "Try each option and see what works:"
-msgstr "尝试每一个选项再看哪种模式可以正常运行:"
-
-#: Client/loader/Dialogs.cpp:81
-msgid "A - Standard NVidia"
-msgstr "A - 标准 NVidia 模式"
-
-#: Client/loader/Dialogs.cpp:82
-msgid "B - Alternate NVidia"
-msgstr "B - 备用 NVidia 模式"
-
-#: Client/loader/Dialogs.cpp:83
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - 标准NVidia及重命名exe模式"
-
-#: Client/loader/Dialogs.cpp:84
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - 备用NVidia及重命名exe模式"
-
-#: Client/loader/Dialogs.cpp:85
-msgid "E - Standard Intel"
-msgstr "E - 标准Intel模式"
-
-#: Client/loader/Dialogs.cpp:86
-msgid "F - Alternate Intel"
-msgstr "F - 备用Intel模式"
-
-#: Client/loader/Dialogs.cpp:87
-msgid "G - Standard Intel with exe rename"
-msgstr "G - 标准Intel及重命名exe模式"
-
-#: Client/loader/Dialogs.cpp:88
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - 备用Intel及重命名exe模式"
-
-#: Client/loader/Dialogs.cpp:89
-msgid "If you get desperate, this might help:"
-msgstr "如果以上模式都没法玩让你痛不欲生, 这个模式或许能拯救你:"
-
-#: Client/loader/Dialogs.cpp:90
-msgid "If you have already selected an option that works, this might help:"
-msgstr "如果您已经选择了一个有效的选项，这可能会有所帮助："
-
-#: Client/loader/Dialogs.cpp:91
-msgid "Force windowed mode"
-msgstr "强制窗口化模式"
-
-#: Client/loader/Dialogs.cpp:92
-msgid "Don't show again"
-msgstr "不再显示"
-
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:851
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
-#: Client/loader/Dialogs.cpp:100
-msgid "Warning: Could not detect anti-virus product"
-msgstr "警告:没有检测出反病毒软件"
-
-#: Client/loader/Dialogs.cpp:102
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA 没有在当前计算机检测出反病毒软件.\n\n"
-"计算机病毒会影响 MTA 以及降低你的游戏体验\n\n"
-"点击 '帮助' 以获得更多信息."
-
-#: Client/loader/Dialogs.cpp:105
-msgid "I have already installed an anti-virus"
-msgstr "我已安装杀毒软件"
-
-#: Client/loader/Dialogs.cpp:107
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "朕才不安装反病毒软件.\n"
-"朕就喜欢慢点的电脑顺便成为僵尸网络的一份子."
-
 #: Client/loader/MainFunctions.cpp:242
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
@@ -436,6 +75,44 @@ msgstr "重启 MTA:SA 时出现问题\n\n"
 "如果问题继续存在,打开资源管理器并\n"
 "结束 'gta_sa.exe' 和 'Multi Theft Auto.exe' 进程\n\n\n"
 "再次尝试启动 MTA:SA ?"
+
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:818
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/core/CCore.cpp:1191
+#: Client/core/CCore.cpp:1204 Client/core/CSettings.cpp:2914
+#: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4126
+#: Client/core/CSettings.cpp:4659 Client/core/CGUI.cpp:87
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CClientGame.cpp:590
+#: Client/mods/deathmatch/logic/CClientGame.cpp:664
+#: Client/mods/deathmatch/logic/CClientGame.cpp:688
+#: Client/mods/deathmatch/logic/CClientGame.cpp:710
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "错误"
 
 #: Client/loader/MainFunctions.cpp:260
 msgid "Another instance of MTA is already running.\n\n"
@@ -626,514 +303,327 @@ msgstr "无法启动 GTA:SA.  请尝试重新启动, 如果问题持续存在,�
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "侠盗猎车手: 圣安地列斯没有正常启动.你想要关闭它吗?"
 
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "此版本已经过期"
+#: Client/loader/Dialogs.cpp:33 Client/core/CVersionUpdater.cpp:1569
+#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
+#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1147 Client/core/CSettings.cpp:1367
+#: Client/core/CSettings.cpp:1391 Client/core/CSettings.cpp:4420
+#: Client/core/CSettings.cpp:4487 Client/core/CSettings.cpp:4536
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "No"
+msgstr "否"
 
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "从服务器断开连接"
+#: Client/loader/Dialogs.cpp:35
+msgid "Quit"
+msgstr "退出"
 
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "显示用户标签"
+#: Client/loader/Dialogs.cpp:36
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+msgid "Help"
+msgstr "帮助"
 
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "显示聊天框"
+#: Client/loader/Dialogs.cpp:52
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas 遇到了问题"
 
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "显示网络统计信息"
+#: Client/loader/Dialogs.cpp:53
+msgid "Crash information"
+msgstr "崩溃信息"
 
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "打开聊天输入框"
+#: Client/loader/Dialogs.cpp:54
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "勾选本选项以使用‘互联网’将本崩溃信息发送到MTA开发团队"
 
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "与其他玩家发送语音"
+#: Client/loader/Dialogs.cpp:55
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "这样做可以增加修复此崩溃的机会。"
 
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "以乘员方式进入车辆"
+#: Client/loader/Dialogs.cpp:56
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "您想要重新启动MTA: San Andreas 吗?"
 
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "下一雷达频道"
+#: Client/loader/Dialogs.cpp:63
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - 警告"
 
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "上一电台频道"
+#: Client/loader/Dialogs.cpp:64
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "启用雷达视角"
+#: Client/loader/Dialogs.cpp:66
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "放大雷达"
+#: Client/loader/Dialogs.cpp:68
+msgid "Keep these files, but also show this warning on next start"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "缩小雷达"
+#: Client/loader/Dialogs.cpp:69
+msgid "Do not remind me about these files again"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "雷达向北移动"
+#: Client/loader/Dialogs.cpp:70
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "雷达向南移动"
+#: Client/loader/Dialogs.cpp:71
+msgid "Show me these files"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "雷达向东移动"
+#: Client/loader/Dialogs.cpp:72
+msgid "Play MTA:SA"
+msgstr "启动 MTA:SA"
 
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "雷达向西移动"
+#: Client/loader/Dialogs.cpp:78
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - 不明确的选项"
 
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "连接雷达"
+#: Client/loader/Dialogs.cpp:79
+msgid "NVidia Optimus detected!"
+msgstr "检测到显卡支持NVidia Optimus技术!"
 
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "降低雷达不透明度"
+#: Client/loader/Dialogs.cpp:80
+msgid "Try each option and see what works:"
+msgstr "尝试每一个选项再看哪种模式可以正常运行:"
 
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "增加雷达不透明度"
+#: Client/loader/Dialogs.cpp:81
+msgid "A - Standard NVidia"
+msgstr "A - 标准 NVidia 模式"
 
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "吸附雷达帮助"
+#: Client/loader/Dialogs.cpp:82
+msgid "B - Alternate NVidia"
+msgstr "B - 备用 NVidia 模式"
 
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "向目标对象发送信息"
+#: Client/loader/Dialogs.cpp:83
+msgid "C - Standard NVidia with exe rename"
+msgstr "C - 标准NVidia及重命名exe模式"
 
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "当进入载具时切换下一个武器"
+#: Client/loader/Dialogs.cpp:84
+msgid "D - Alternate NVidia with exe rename"
+msgstr "D - 备用NVidia及重命名exe模式"
 
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "当进入载具时切换上一个武器"
+#: Client/loader/Dialogs.cpp:85
+msgid "E - Standard Intel"
+msgstr "E - 标准Intel模式"
 
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "当前服务器的输出信息"
+#: Client/loader/Dialogs.cpp:86
+msgid "F - Alternate Intel"
+msgstr "F - 备用Intel模式"
 
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "定义文字显示的标度系数"
+#: Client/loader/Dialogs.cpp:87
+msgid "G - Standard Intel with exe rename"
+msgstr "G - 标准Intel及重命名exe模式"
 
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(开发模式) shows the colshapes"
+#: Client/loader/Dialogs.cpp:88
+msgid "H - Alternate Intel with exe rename"
+msgstr "H - 备用Intel及重命名exe模式"
 
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(开发模式) prints world sound ids into the debug window"
+#: Client/loader/Dialogs.cpp:89
+msgid "If you get desperate, this might help:"
+msgstr "如果以上模式都没法玩让你痛不欲生, 这个模式或许能拯救你:"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "服务器主机"
+#: Client/loader/Dialogs.cpp:90
+msgid "If you have already selected an option that works, this might help:"
+msgstr "如果您已经选择了一个有效的选项，这可能会有所帮助："
 
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
-#: Client/core/CSettings.cpp:883 Client/core/CSettings.cpp:1991
-msgid "General"
-msgstr "常规"
+#: Client/loader/Dialogs.cpp:91
+msgid "Force windowed mode"
+msgstr "强制窗口化模式"
 
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "资源"
+#: Client/loader/Dialogs.cpp:92
+msgid "Don't show again"
+msgstr "不再显示"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "服务器名称:"
+#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:851
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "密码:"
+#: Client/loader/Dialogs.cpp:100
+msgid "Warning: Could not detect anti-virus product"
+msgstr "警告:没有检测出反病毒软件"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "最大允许玩家:"
+#: Client/loader/Dialogs.cpp:102
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA 没有在当前计算机检测出反病毒软件.\n\n"
+"计算机病毒会影响 MTA 以及降低你的游戏体验\n\n"
+"点击 '帮助' 以获得更多信息."
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "广播:"
+#: Client/loader/Dialogs.cpp:105
+msgid "I have already installed an anti-virus"
+msgstr "我已安装杀毒软件"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "本地局域网"
+#: Client/loader/Dialogs.cpp:107
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "朕才不安装反病毒软件.\n"
+"朕就喜欢慢点的电脑顺便成为僵尸网络的一份子."
 
-#. Create the tabs
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-msgid "Internet"
-msgstr "互联网"
+#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "搜索Grand Theft Auto: San Andreas"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "已选择"
+#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "请启动Grand Theft Auto San Andreas"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "所有"
+#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+msgid "Copying files..."
+msgstr "复制文件..."
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "开启"
+#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+msgid "Copy finished early. Everything OK."
+msgstr "文件提前复制完毕.所有数据正常."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "无效的昵称! 请去设置画面那里设定一个新昵称!"
+#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+msgid "Finishing..."
+msgstr "正在完成..."
 
-#. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
-#: Client/core/CConnectManager.cpp:148
-msgid "CONNECTING"
-msgstr "连接中"
+#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+msgid "Done!"
+msgstr "已完成!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
-msgid "Entering the game ..."
-msgstr "进入游戏中 ..."
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "请选择 侠盗猎车手:圣安地列斯的安装目录"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "未连接; 请使用快速连接或者 'connect' 命令来连接服务器."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
-msgid "The server is not installed"
-msgstr "服务器未被安装"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
-msgid "Local Server"
-msgstr "本地服务器"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
-msgid "Starting local server ..."
-msgstr "正在启用本地服务器 ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#: Client/loader/Utils.cpp:1182 Client/loader/CInstallManager.cpp:329
 #, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "您已经被踢出游戏 ( %s )"
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA 需要管理员权限运行以下任务:\n\n"
+"     '%s'\n\n"
+"请在下一个窗口中确认指令."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
-msgid "Connecting to local server..."
-msgstr "正在连接到本地服务器..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
-msgid "Error connecting to server."
-msgstr "连接到服务器时发生错误."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
-msgid "Connecting to local server timed out. See console for details."
-msgstr "连接本地服务器超时.请在console中查看详细内容"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
-#: Client/core/CConnectManager.cpp:263
-msgid "Connection timed out"
-msgstr "连接已超时"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
-msgid "Connection with the server was lost"
-msgstr "与服务器丢失连接"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1230
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-msgid "Disconnected: unknown protocol error"
-msgstr "已断开连接: 未知协议错误"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1234
-#: Client/core/CConnectManager.cpp:285
-msgid "Disconnected: disconnected remotely"
-msgstr "已断开连接: 服务器主动断开连接"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1238
-#: Client/core/CConnectManager.cpp:289
-msgid "Disconnected: connection lost remotely"
-msgstr "已断开连接: 与服务器连接中断"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
-#: Client/core/CConnectManager.cpp:293
-msgid "Disconnected: you are banned from this server"
-msgstr "已断开连接: 你已被该服务器封禁 (Banned)"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1246
-msgid "Disconnected: the server is currently full"
-msgstr "断开连接:服务器满载"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1250
-#: Client/core/CConnectManager.cpp:300
-msgid "Disconnected: disconnected from the server"
-msgstr "已断开连接: 从服务器断开连接"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
-#: Client/core/CConnectManager.cpp:304
-msgid "Disconnected: connection to the server was lost"
-msgstr "已断开连接: 与服务器的连接已中断"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
-msgid "Disconnected: invalid password specified"
-msgstr "断开连接: 无效的密码"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
-#: Client/core/CConnectManager.cpp:311
-msgid "Disconnected: connection was refused"
-msgstr "已断开连接: 服务器拒绝连接"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
-msgid "MTA Client verification failed!"
-msgstr "MTA客户端验证失败!"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#: Client/loader/Utils.cpp:1283
 #, c-format
-msgid "Download error: %s"
-msgstr "下载错误: %s"
+msgid "Error loading %s module! (%s)"
+msgstr "在读取 %s 模块时出错! (%s)"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "地图下载进度:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "下载进度:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#: Client/loader/Utils.cpp:1713
 #, c-format
-msgid "%s of %s"
-msgstr "%s 之 %s"
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "检测到最近安装的 %s.\n\n"
+"你想把配置文件从%s复制到这里吗?"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "断开连接以取消下载"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "无法启动本地服务器.请在 console 中查看详细信息"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
+#: Client/loader/Utils.cpp:1752
 #, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "错误: 无法启动本地服务器. [%s]"
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA 在打开 '%s' 文件时遇到问题."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
-msgid "Disconnected: Invalid nickname"
-msgstr "断开连接: 无效的昵称"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
-msgid "Disconnect from server"
-msgstr "与服务器断开连接"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
+#: Client/loader/Utils.cpp:1774
 #, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "断开连接: 序列号被封禁.\n"
-"原因: %s"
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA 缺少 '%s' 文件."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA 在加载模型文件时遇到问题."
+
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "如果您最近修改了gta3.img，请尝试重新安装GTA:SA。"
+
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA 在改装车辆时遇到问题."
+
+#: Client/loader/Utils.cpp:1845
 #, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "断开连接: 您被封禁.\n"
-"原因: %s"
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA 在以下文件找到错误 '%s'"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "你在运行MTA:SA的时候重启电脑了吗?"
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr "请在运行前关闭以下程序:"
+
+#: Client/loader/CInstallManager.cpp:344
 #, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "断开连接: 账号被封禁.\n"
-"原因: %s"
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA 无法完成以下任务:\n\n"
+"'%s'\n"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
-msgid "Disconnected: Version mismatch"
-msgstr "断开连接: 游戏版本不对应"
+#: Client/loader/CInstallManager.cpp:394
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** 崩溃的原因为显卡错误 **\n\n"
+"** 请更新驱动 **"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "断开连接: 过多玩家同时进入服务器,请等候几分钟后再进入."
+#: Client/loader/CInstallManager.cpp:500
+msgid "Install updated MTA:SA files"
+msgstr "安装已更新的 MTA:SA 文件"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
+#: Client/loader/CInstallManager.cpp:520
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "本次更新由于文件冲突导致失败. 请关掉其他程序后再试"
+
+#: Client/loader/CInstallManager.cpp:529
 #, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "断开连接: 服务器来自不同的分支.\n"
-"相关信息: %s"
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto 没有被正确安装, 请重新安装. %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr "MTA:SA 无法继续执行，因为以下文件不正确："
+
+#: Client/loader/CInstallManager.cpp:609
+msgid "Patch GTA"
+msgstr "重新修补GTA"
+
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:722
 #, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "断开连接: 版本已损坏.\n"
-"相关信息: %s"
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "由于驱动器 %s 没有足够的空间,MTA:SA 无法继续运行."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "断开连接: 用户版本比服务器版本旧.\n"
-"相关信息: %s"
+#: Client/loader/CInstallManager.cpp:812
+msgid "Missing file:"
+msgstr "缺少以下文件："
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "断开连接: 用户版本比服务器版本新.\n"
-"相关信息: %s"
+#: Client/loader/CInstallManager.cpp:816
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "若MTA加载失败，请重新安装GTA:SA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
-msgid "Disconnected: Nick already in use"
-msgstr "断开连接: 昵称已有人使用"
+#: Client/loader/CInstallManager.cpp:937
+msgid "Update install settings"
+msgstr "更新安装设置"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
-msgid "Disconnected: Player element could not be created."
-msgstr "断开连接：无法创建玩家元素。"
+#: Client/loader/CInstallManager.cpp:1070
+msgid "Update compatibility settings"
+msgstr "更新兼容性设置"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "断开连接: 服务器拒绝连接: %s"
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr "更新 Aero 设置"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
-msgid "Disconnected: Serial verification failed"
-msgstr "断开连接: 序列验证失败"
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr "更新 大型内存设置"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "断开连接: 数据不同步 %s"
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr "更新DEP数据执行保护设置"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "断开连接: 您已经被 %s 踢出服务器(KICKED)"
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr "更新显卡驱动依赖"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "断开连接: 您已经被 %s 禁止进入服务器"
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr "修复文件问题"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "断开连接：服务器已关闭或重启"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
-msgid "You were kicked from the game"
-msgstr "您已经被踢出游戏"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "此服务器要求未修改的 gta_sa.exe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
-msgid "Please replace gta_sa.exe"
-msgstr "请替换 gta_sa.exe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr "此服务器不允许使用 自定义的D3D9.DLLs"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "从 GTA 目录中删除 D3D9.DLL 并 重新启动 MTA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-msgid "This server does not allow virtual machines"
-msgstr "此服务器不允许使用 虚拟机"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
-msgid "This server requires driver signing to be enabled"
-msgstr "此服务器要求启用驱动程序签名"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
-msgid "Please restart your PC"
-msgstr "重启你的电脑"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
-msgid "This server has detected missing anti-cheat components"
-msgstr "此服务器检测到缺少反作弊组件"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
-msgid "Try restarting MTA"
-msgstr "尝试重启MTA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "此服务器要求 原版的 gta3.img 和 gta_int.img"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
-msgid "Please replace gta3.img or gta_int.img"
-msgstr "请替换 gta3.img 或 gta_int.img"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
-msgid "This server does not allow Wine"
-msgstr "此服务器不允许使用 Linux Wine"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr "确保没有其他程序正在修改 MTA:SA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "Time Remaining: "
-msgstr "剩余时间"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d 天"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 时"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 分"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d 秒"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
-msgid "Disconnected"
-msgstr "断开连接"
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "复制主要的可执行文件以避免显卡驱动问题"
 
 #: Client/game_sa/CSettingsSA.cpp:773
 msgid "Can't find valid screen resolution."
@@ -1144,72 +634,365 @@ msgstr "无法找到有效的屏幕分辨率."
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "您确定要使用这个分辨率吗？"
 
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1380
-msgid "Problem with graphics driver"
-msgstr "显卡驱动出现问题"
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr ""
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "网站请求"
-
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "本服务器需要（稍后）加载如下网站："
-
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "请勿输入敏感信息，谨防泄密"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "记住选项"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:953
-msgid "Allow"
-msgstr "允许"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "拒绝"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "连接失败。使用了不可用的昵称!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "连接失败。服务器地址无效!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "连接 %s 所在端口 %u 失败!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "正在连接到 %s:%u ..."
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "未安装指定的 Mod (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "意外的服务器响应 (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "意外的服务器响应 (1)"
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "查看目前新闻文章"
 
 #: Client/core/CScreenShot.cpp:53
 #, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "已截图: '%s'"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "加速轴"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "制动轴"
+
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "未知的命令或控制台变量:"
+
+#: Client/core/CVersionUpdater.cpp:624
+msgid "Busy"
+msgstr "正忙"
+
+#: Client/core/CVersionUpdater.cpp:624
+msgid "Can't check for updates right now"
+msgstr "当前暂时无法检查更新"
+
+#: Client/core/CVersionUpdater.cpp:1565 Client/core/CVersionUpdater.cpp:1585
+#: Client/core/CVersionUpdater.cpp:1603
+#, c-format
+msgid "MTA:SA %s required"
+msgstr "要求 MTA:SA %s"
+
+#: Client/core/CVersionUpdater.cpp:1566
+#, c-format
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr "该服务器需要更高的 MTA:SA %s 版本.\n\n"
+"你希望下载并且安装 MTA:SA %s 吗?"
+
+#: Client/core/CVersionUpdater.cpp:1586
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "你希望启动 MTA:SA %s 并连接到此服务器吗 ?"
+
+#: Client/core/CVersionUpdater.cpp:1604
+msgid "It is not possible to connect at this time.\n\n"
+"Please try later."
+msgstr "系统当前无法连接.\n\n"
+"请稍后再试."
+
+#: Client/core/CVersionUpdater.cpp:1786
+msgid "Connecting"
+msgstr "正在连接"
+
+#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
+msgid "Please wait..."
+msgstr "请稍候..."
+
+#: Client/core/CVersionUpdater.cpp:1802
+msgid "CHECKING"
+msgstr "检查中"
+
+#: Client/core/CVersionUpdater.cpp:1819 Client/core/CVersionUpdater.cpp:1912
+msgid "UPDATE CHECK"
+msgstr "检查更新"
+
+#: Client/core/CVersionUpdater.cpp:1820
+msgid "No update needed"
+msgstr "无最新更新"
+
+#: Client/core/CVersionUpdater.cpp:1837
+msgid "DOWNLOADING"
+msgstr "下载中"
+
+#: Client/core/CVersionUpdater.cpp:1838
+msgid "waiting..."
+msgstr "正在等待..."
+
+#: Client/core/CVersionUpdater.cpp:1854
+msgid "MANDATORY UPDATE"
+msgstr "强制更新"
+
+#: Client/core/CVersionUpdater.cpp:1855
+msgid "To join this server, you must update MTA.\n\n"
+" Do you want to update now ?"
+msgstr "您需要更新MTA版本以登录该服务器.\n\n"
+"你想现在更新吗?"
+
+#: Client/core/CVersionUpdater.cpp:1873
+msgid "OPTIONAL UPDATE"
+msgstr "可选更新"
+
+#: Client/core/CVersionUpdater.cpp:1874
+msgid "Server says an update is recommended, but not essential.\n\n"
+" Do you want to update now ?"
+msgstr "服务器称推荐更新版本, 但并不强制更新.\n\n"
+"你想现在更新吗 ?"
+
+#: Client/core/CVersionUpdater.cpp:1913
+msgid "Update not currently avalable.\n\n"
+"Please check www.mtasa.com"
+msgstr "当前无可用更新.\n\n"
+"详情查看 www.mtasa.com"
+
+#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
+msgid "ERROR SAVING"
+msgstr "保存错误"
+
+#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
+msgid "Unable to create the file."
+msgstr "未能创建文件"
+
+#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:1952
+#: Client/core/CVersionUpdater.cpp:2125 Client/core/CVersionUpdater.cpp:2134
+msgid "ERROR DOWNLOADING"
+msgstr "下载错误"
+
+#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:2126
+msgid "The downloaded file appears to be incorrect."
+msgstr "下载的文件校检不正确"
+
+#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:2135
+msgid "For some reason."
+msgstr "由于某些原因."
+
+#: Client/core/CVersionUpdater.cpp:1964 Client/core/CVersionUpdater.cpp:2148
+msgid "DOWNLOAD COMPLETE"
+msgstr "下载完毕"
+
+#: Client/core/CVersionUpdater.cpp:1988
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr " - 在 _DialogUpdateResult 出现未知错误"
+
+#: Client/core/CVersionUpdater.cpp:2079 Client/core/CSettings.cpp:4485
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "定制的 GTA:SA 文件"
+
+#: Client/core/CVersionUpdater.cpp:2086 Client/core/CVersionUpdater.cpp:2096
+msgid "Ok"
+msgstr "确定"
+
+#: Client/core/CVersionUpdater.cpp:2094
+msgid "ERROR"
+msgstr "错误"
+
+#: Client/core/CVersionUpdater.cpp:2095
+msgid "Some MTA:SA data files are missing.\n\n\n"
+"Please reinstall MTA:SA"
+msgstr "部分 MTA:SA 数据文件已丢失.\n\n\n"
+"请重新安装 MTA:SA"
+
+#: Client/core/CVersionUpdater.cpp:2722
+#, c-format
+msgid "%3d %% completed"
+msgstr "%3d %% 完成"
+
+#: Client/core/CVersionUpdater.cpp:2724
+#, c-format
+msgid "\n\n"
+"Waiting for response  -  %-3d"
+msgstr "\n\n"
+"等待响应   -   %-3d"
+
+#: Client/core/CKeyBinds.cpp:186
+msgid "Fire"
+msgstr "开火"
+
+#: Client/core/CKeyBinds.cpp:187
+msgid "Next weapon"
+msgstr "下一个武器"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Previous weapon"
+msgstr "上一个武器"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Forwards"
+msgstr "前进"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Backwards"
+msgstr "后退"
+
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2213
+#: Client/core/CSettings.cpp:2241
+msgid "Left"
+msgstr "左移"
+
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2215
+#: Client/core/CSettings.cpp:2242
+msgid "Right"
+msgstr "右移"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Zoom in"
+msgstr "放大"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Zoom out"
+msgstr "缩小"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Enter/Exit"
+msgstr "进入/离开"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Change camera"
+msgstr "切换镜头"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:197
+msgid "Jump"
+msgstr "跳跃"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Sprint"
+msgstr "冲刺"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Look behind"
+msgstr "向后看"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Crouch"
+msgstr "蹲下"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Action"
+msgstr "行动"
+
+#: Client/core/CKeyBinds.cpp:202
+msgid "Walk"
+msgstr "步行"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Vehicle fire"
+msgstr "在载具里开火"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Vehicle secondary fire"
+msgstr "向载具副驾驶席的方向开火"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Vehicle left"
+msgstr "载具向左"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Vehicle right"
+msgstr "载具向右"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:207
+msgid "Steer forwards/down"
+msgstr "控制向前/向下驾驶"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Steer backwards/up"
+msgstr "控制向后/向下驾驶"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Accelerate"
+msgstr "油门"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Brake/Reverse"
+msgstr "刹车/倒车"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Radio next"
+msgstr "下一个电台"
+
+#: Client/core/CKeyBinds.cpp:212
+msgid "Radio previous"
+msgstr "上一个电台"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Radio user track skip"
+msgstr "跳过用户本地电台"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Horn"
+msgstr "鸣笛"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Sub-mission"
+msgstr "激活特殊车辆任务"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Handbrake"
+msgstr "手刹"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:217
+msgid "Vehicle look left"
+msgstr "载具里向左看"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Vehicle look right"
+msgstr "载具里向右看"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Vehicle look behind"
+msgstr "载具里向后看"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Vehicle mouse look"
+msgstr "载具里使用鼠标观察"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Special control left"
+msgstr "特殊控制 向左"
+
+#: Client/core/CKeyBinds.cpp:222
+msgid "Special control right"
+msgstr "特殊控制 向右"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Special control down"
+msgstr "特殊控制 向下"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Special control up"
+msgstr "特殊控制 向上"
+
+#: Client/core/CKeyBinds.cpp:225
+msgid "Aim weapon"
+msgstr "武器瞄准"
+
+#: Client/core/CKeyBinds.cpp:226
+msgid "Conversation yes"
+msgstr "对话中选择肯定对方"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:227
+msgid "Conversation no"
+msgstr "对话中选择否定对方"
+
+#: Client/core/CKeyBinds.cpp:228
+msgid "Group control forwards"
+msgstr "小组控制 前进"
+
+#: Client/core/CKeyBinds.cpp:229
+msgid "Group control backwards"
+msgstr "小组控制 后退"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "简体中文"
 
 #: Client/core/CCredits.cpp:32
 msgid "Programming"
@@ -1239,50 +1022,34 @@ msgstr "特别鸣谢"
 msgid "This software makes use of the following libraries and software:"
 msgstr "本软件利用以下程序库和软件:"
 
-#: Client/core/CCommandFuncs.cpp:30
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ 指令帮助 ]***\n"
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "你希望查看一些与此问题相关的在线帮助吗?"
 
-#: Client/core/CCommandFuncs.cpp:168
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* 当前时间为 %d:%02d:%02d"
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "您当前正在使用一个分支版本的客户端！测试版本的客户端不能被用来连接公共服务器！"
 
-#: Client/core/CCommandFuncs.cpp:252
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "连接: 指令为 'connect <服务器地址> [<端口> <昵称> <密码>]'"
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA 在2019年7月份之后 不再更新XP/Vista版本\n"
+"更新Windows 来玩服务器"
 
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
-msgid "connect: Bad port number"
-msgstr "连接: 无效的端口号"
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "这将会使你断开与当前服务器的连接。\n\n"
+"你确定要断开连接吗?"
 
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "连接: 正在连接到 %s:%u..."
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "断开连接警告"
 
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "连接: 无法连接到 %s:%u!"
-
-#: Client/core/CCommandFuncs.cpp:291
-msgid "connect: Failed to unload current mod"
-msgstr "连接: 卸载当前 mod 失败"
-
-#: Client/core/CCommandFuncs.cpp:381
-msgid "Bound all controls from GTA"
-msgstr "绑定 GTA 所有的控制设置"
-
-#: Client/core/CCommandFuncs.cpp:395
-msgid "Saved configuration file"
-msgstr "已保存的配置文件"
-
-#. Print it
-#: Client/core/CCommandFuncs.cpp:461
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* 您的序列号为 : %s"
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "控制台"
 
 #: Client/core/CCore.cpp:724 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -1392,33 +1159,50 @@ msgstr "显示内存统计信息"
 msgid "shows the frame timing graph"
 msgstr "显示帧数图表"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "加速轴"
+#: Client/core/CCommandFuncs.cpp:30
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ 指令帮助 ]***\n"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "制动轴"
+#: Client/core/CCommandFuncs.cpp:168
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* 当前时间为 %d:%02d:%02d"
 
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "您当前正在使用一个分支版本的客户端！测试版本的客户端不能被用来连接公共服务器！"
+#: Client/core/CCommandFuncs.cpp:252
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "连接: 指令为 'connect <服务器地址> [<端口> <昵称> <密码>]'"
 
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA 在2019年7月份之后 不再更新XP/Vista版本\n"
-"更新Windows 来玩服务器"
+#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+msgid "connect: Bad port number"
+msgstr "连接: 无效的端口号"
 
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "这将会使你断开与当前服务器的连接。\n\n"
-"你确定要断开连接吗?"
+#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "连接: 正在连接到 %s:%u..."
 
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "断开连接警告"
+#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "连接: 无法连接到 %s:%u!"
+
+#: Client/core/CCommandFuncs.cpp:291
+msgid "connect: Failed to unload current mod"
+msgstr "连接: 卸载当前 mod 失败"
+
+#: Client/core/CCommandFuncs.cpp:381
+msgid "Bound all controls from GTA"
+msgstr "绑定 GTA 所有的控制设置"
+
+#: Client/core/CCommandFuncs.cpp:395
+msgid "Saved configuration file"
+msgstr "已保存的配置文件"
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:461
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* 您的序列号为 : %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1601,6 +1385,15 @@ msgstr "语音音量:"
 #: Client/core/CSettings.cpp:423 Client/core/CSettings.cpp:548
 msgid "Play mode:"
 msgstr "游戏模式:"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
+#: Client/core/CSettings.cpp:883 Client/core/CSettings.cpp:1991
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+msgid "General"
+msgstr "常规"
 
 #: Client/core/CSettings.cpp:526
 msgid "Radio options"
@@ -1847,6 +1640,10 @@ msgstr "移除域名"
 #: Client/core/CSettings.cpp:934
 msgid "Custom whitelist"
 msgstr "自定义白名单"
+
+#: Client/core/CSettings.cpp:953 Client/cefweb/CWebsiteRequests.cpp:51
+msgid "Allow"
+msgstr "允许"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:976
@@ -2132,19 +1929,9 @@ msgstr "Y轴偏移："
 msgid "Position"
 msgstr "位置"
 
-#: Client/core/CSettings.cpp:2213 Client/core/CSettings.cpp:2241
-#: Client/core/CKeyBinds.cpp:191
-msgid "Left"
-msgstr "左移"
-
 #: Client/core/CSettings.cpp:2214 Client/core/CSettings.cpp:2228
 msgid "Center"
 msgstr "中心"
-
-#: Client/core/CSettings.cpp:2215 Client/core/CSettings.cpp:2242
-#: Client/core/CKeyBinds.cpp:192
-msgid "Right"
-msgstr "右移"
 
 #: Client/core/CSettings.cpp:2227
 msgid "Top"
@@ -2279,10 +2066,6 @@ msgstr "有些文件在你的GTA:SA数据目录是定制的.\n"
 "但是,定制的GTA:SA文件被许多服务器过滤\n\n"
 "你确定你想使用它们吗?"
 
-#: Client/core/CSettings.cpp:4485 Client/core/CVersionUpdater.cpp:2079
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "定制的 GTA:SA 文件"
-
 #: Client/core/CSettings.cpp:4528
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
@@ -2367,352 +2150,106 @@ msgstr "鼠标修正:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "鼠标移动修正 - 可能需要重启计算机"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "简体中文"
-
-#: Client/core/CKeyBinds.cpp:186
-msgid "Fire"
-msgstr "开火"
-
-#: Client/core/CKeyBinds.cpp:187
-msgid "Next weapon"
-msgstr "下一个武器"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Previous weapon"
-msgstr "上一个武器"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Forwards"
-msgstr "前进"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Backwards"
-msgstr "后退"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Zoom in"
-msgstr "放大"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Zoom out"
-msgstr "缩小"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Enter/Exit"
-msgstr "进入/离开"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Change camera"
-msgstr "切换镜头"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:197
-msgid "Jump"
-msgstr "跳跃"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Sprint"
-msgstr "冲刺"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Look behind"
-msgstr "向后看"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Crouch"
-msgstr "蹲下"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Action"
-msgstr "行动"
-
-#: Client/core/CKeyBinds.cpp:202
-msgid "Walk"
-msgstr "步行"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Vehicle fire"
-msgstr "在载具里开火"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Vehicle secondary fire"
-msgstr "向载具副驾驶席的方向开火"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Vehicle left"
-msgstr "载具向左"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Vehicle right"
-msgstr "载具向右"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:207
-msgid "Steer forwards/down"
-msgstr "控制向前/向下驾驶"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Steer backwards/up"
-msgstr "控制向后/向下驾驶"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Accelerate"
-msgstr "油门"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Brake/Reverse"
-msgstr "刹车/倒车"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Radio next"
-msgstr "下一个电台"
-
-#: Client/core/CKeyBinds.cpp:212
-msgid "Radio previous"
-msgstr "上一个电台"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Radio user track skip"
-msgstr "跳过用户本地电台"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Horn"
-msgstr "鸣笛"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Sub-mission"
-msgstr "激活特殊车辆任务"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Handbrake"
-msgstr "手刹"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:217
-msgid "Vehicle look left"
-msgstr "载具里向左看"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Vehicle look right"
-msgstr "载具里向右看"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Vehicle look behind"
-msgstr "载具里向后看"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Vehicle mouse look"
-msgstr "载具里使用鼠标观察"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Special control left"
-msgstr "特殊控制 向左"
-
-#: Client/core/CKeyBinds.cpp:222
-msgid "Special control right"
-msgstr "特殊控制 向右"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Special control down"
-msgstr "特殊控制 向下"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Special control up"
-msgstr "特殊控制 向上"
-
-#: Client/core/CKeyBinds.cpp:225
-msgid "Aim weapon"
-msgstr "武器瞄准"
-
-#: Client/core/CKeyBinds.cpp:226
-msgid "Conversation yes"
-msgstr "对话中选择肯定对方"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:227
-msgid "Conversation no"
-msgstr "对话中选择否定对方"
-
-#: Client/core/CKeyBinds.cpp:228
-msgid "Group control forwards"
-msgstr "小组控制 前进"
-
-#: Client/core/CKeyBinds.cpp:229
-msgid "Group control backwards"
-msgstr "小组控制 后退"
-
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "您选定的皮肤以及系统默认皮肤均无法载入，请重新安装 MTA 。"
 
-#: Client/core/CVersionUpdater.cpp:624
-msgid "Busy"
-msgstr "正忙"
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "连接失败。使用了不可用的昵称!"
 
-#: Client/core/CVersionUpdater.cpp:624
-msgid "Can't check for updates right now"
-msgstr "当前暂时无法检查更新"
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "连接失败。服务器地址无效!"
 
-#: Client/core/CVersionUpdater.cpp:1565 Client/core/CVersionUpdater.cpp:1585
-#: Client/core/CVersionUpdater.cpp:1603
+#: Client/core/CConnectManager.cpp:126
 #, c-format
-msgid "MTA:SA %s required"
-msgstr "要求 MTA:SA %s"
+msgid "Connecting to %s at port %u failed!"
+msgstr "连接 %s 所在端口 %u 失败!"
 
-#: Client/core/CVersionUpdater.cpp:1566
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
 #, c-format
-msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr "该服务器需要更高的 MTA:SA %s 版本.\n\n"
-"你希望下载并且安装 MTA:SA %s 吗?"
+msgid "Connecting to %s:%u ..."
+msgstr "正在连接到 %s:%u ..."
 
-#: Client/core/CVersionUpdater.cpp:1586
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+msgid "CONNECTING"
+msgstr "连接中"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
+msgid "Connection timed out"
+msgstr "连接已超时"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1230
+msgid "Disconnected: unknown protocol error"
+msgstr "已断开连接: 未知协议错误"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1234
+msgid "Disconnected: disconnected remotely"
+msgstr "已断开连接: 服务器主动断开连接"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1238
+msgid "Disconnected: connection lost remotely"
+msgstr "已断开连接: 与服务器连接中断"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
+msgid "Disconnected: you are banned from this server"
+msgstr "已断开连接: 你已被该服务器封禁 (Banned)"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1250
+msgid "Disconnected: disconnected from the server"
+msgstr "已断开连接: 从服务器断开连接"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+msgid "Disconnected: connection to the server was lost"
+msgstr "已断开连接: 与服务器的连接已中断"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+msgid "Disconnected: connection was refused"
+msgstr "已断开连接: 服务器拒绝连接"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
 #, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "你希望启动 MTA:SA %s 并连接到此服务器吗 ?"
+msgid "No such mod installed (%s)"
+msgstr "未安装指定的 Mod (%s)"
 
-#: Client/core/CVersionUpdater.cpp:1604
-msgid "It is not possible to connect at this time.\n\n"
-"Please try later."
-msgstr "系统当前无法连接.\n\n"
-"请稍后再试."
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "意外的服务器响应 (2)"
 
-#: Client/core/CVersionUpdater.cpp:1786
-msgid "Connecting"
-msgstr "正在连接"
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "意外的服务器响应 (1)"
 
-#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
-msgid "Please wait..."
-msgstr "请稍候..."
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "无法初始化 Direct3D9 。\n\n"
+"请确认您已正确安装了 DirectX 最终用户运行时以及\n"
+"最新的系统更新包。"
 
-#: Client/core/CVersionUpdater.cpp:1802
-msgid "CHECKING"
-msgstr "检查中"
-
-#: Client/core/CVersionUpdater.cpp:1819 Client/core/CVersionUpdater.cpp:1912
-msgid "UPDATE CHECK"
-msgstr "检查更新"
-
-#: Client/core/CVersionUpdater.cpp:1820
-msgid "No update needed"
-msgstr "无最新更新"
-
-#: Client/core/CVersionUpdater.cpp:1837
-msgid "DOWNLOADING"
-msgstr "下载中"
-
-#: Client/core/CVersionUpdater.cpp:1838
-msgid "waiting..."
-msgstr "正在等待..."
-
-#: Client/core/CVersionUpdater.cpp:1854
-msgid "MANDATORY UPDATE"
-msgstr "强制更新"
-
-#: Client/core/CVersionUpdater.cpp:1855
-msgid "To join this server, you must update MTA.\n\n"
-" Do you want to update now ?"
-msgstr "您需要更新MTA版本以登录该服务器.\n\n"
-"你想现在更新吗?"
-
-#: Client/core/CVersionUpdater.cpp:1873
-msgid "OPTIONAL UPDATE"
-msgstr "可选更新"
-
-#: Client/core/CVersionUpdater.cpp:1874
-msgid "Server says an update is recommended, but not essential.\n\n"
-" Do you want to update now ?"
-msgstr "服务器称推荐更新版本, 但并不强制更新.\n\n"
-"你想现在更新吗 ?"
-
-#: Client/core/CVersionUpdater.cpp:1913
-msgid "Update not currently avalable.\n\n"
-"Please check www.mtasa.com"
-msgstr "当前无可用更新.\n\n"
-"详情查看 www.mtasa.com"
-
-#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
-msgid "ERROR SAVING"
-msgstr "保存错误"
-
-#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
-msgid "Unable to create the file."
-msgstr "未能创建文件"
-
-#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:1952
-#: Client/core/CVersionUpdater.cpp:2125 Client/core/CVersionUpdater.cpp:2134
-msgid "ERROR DOWNLOADING"
-msgstr "下载错误"
-
-#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:2126
-msgid "The downloaded file appears to be incorrect."
-msgstr "下载的文件校检不正确"
-
-#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:2135
-msgid "For some reason."
-msgstr "由于某些原因."
-
-#: Client/core/CVersionUpdater.cpp:1964 Client/core/CVersionUpdater.cpp:2148
-msgid "DOWNLOAD COMPLETE"
-msgstr "下载完毕"
-
-#: Client/core/CVersionUpdater.cpp:1988
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr " - 在 _DialogUpdateResult 出现未知错误"
-
-#: Client/core/CVersionUpdater.cpp:2086 Client/core/CVersionUpdater.cpp:2096
-msgid "Ok"
-msgstr "确定"
-
-#: Client/core/CVersionUpdater.cpp:2094
-msgid "ERROR"
-msgstr "错误"
-
-#: Client/core/CVersionUpdater.cpp:2095
-msgid "Some MTA:SA data files are missing.\n\n\n"
-"Please reinstall MTA:SA"
-msgstr "部分 MTA:SA 数据文件已丢失.\n\n\n"
-"请重新安装 MTA:SA"
-
-#: Client/core/CVersionUpdater.cpp:2722
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
 #, c-format
-msgid "%3d %% completed"
-msgstr "%3d %% 完成"
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "截图包含 %d 个字节，但实际预期为 %d"
 
-#: Client/core/CVersionUpdater.cpp:2724
-#, c-format
-msgid "\n\n"
-"Waiting for response  -  %-3d"
-msgstr "\n\n"
-"等待响应   -   %-3d"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "控制台"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "未知的命令或控制台变量:"
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "你希望查看一些与此问题相关的在线帮助吗?"
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr ""
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "查看目前新闻文章"
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "截图失败"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
@@ -2855,6 +2392,12 @@ msgstr "正在尝试搜索局域网内的服务器"
 msgid "SERVER BROWSER"
 msgstr "服务器浏览器"
 
+#. Create the tabs
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+msgid "Internet"
+msgstr "互联网"
+
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
 msgstr "本地"
@@ -2993,26 +2536,482 @@ msgstr "未知协议"
 msgid "Please use the mtasa:// protocol!"
 msgstr "请使用 mtasa:// 协议格式!"
 
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/mods/deathmatch/logic/CClientGame.cpp:590
+#: Client/mods/deathmatch/logic/CClientGame.cpp:688
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "无效的昵称! 请去设置画面那里设定一个新昵称!"
+
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "你需要选择一个服务器来连接。"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "无法初始化 Direct3D9 。\n\n"
-"请确认您已正确安装了 DirectX 最终用户运行时以及\n"
-"最新的系统更新包。"
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "网站请求"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "本服务器需要（稍后）加载如下网站："
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "请勿输入敏感信息，谨防泄密"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "记住选项"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "拒绝"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1380
+msgid "Problem with graphics driver"
+msgstr "显卡驱动出现问题"
+
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "此版本已经过期"
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "从服务器断开连接"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "显示用户标签"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "显示聊天框"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "显示网络统计信息"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "open the chat input"
+msgstr "打开聊天输入框"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "transmits voice to other players"
+msgstr "与其他玩家发送语音"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "enters a car as passenger"
+msgstr "以乘员方式进入车辆"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "next radio channel"
+msgstr "下一雷达频道"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "previous radio channel"
+msgstr "上一电台频道"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "enables the radar view"
+msgstr "启用雷达视角"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar in"
+msgstr "放大雷达"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "zooms the radar out"
+msgstr "缩小雷达"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar north"
+msgstr "雷达向北移动"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar south"
+msgstr "雷达向南移动"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar east"
+msgstr "雷达向东移动"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "moves the radar west"
+msgstr "雷达向西移动"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "attaches the radar"
+msgstr "连接雷达"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "reduces radar opacity"
+msgstr "降低雷达不透明度"
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "increases radar opacity"
+msgstr "增加雷达不透明度"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "toggles radar help text"
+msgstr "吸附雷达帮助"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "sends a message to the targetted player"
+msgstr "向目标对象发送信息"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "当进入载具时切换下一个武器"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "当进入载具时切换上一个武器"
+
+#: Client/mods/deathmatch/CClient.cpp:82
+msgid "outputs info about the current server"
+msgstr "当前服务器的输出信息"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:85
+msgid "defines the scale multiplier of all text-displays"
+msgstr "定义文字显示的标度系数"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) shows the colshapes"
+msgstr "(开发模式) shows the colshapes"
+
+#: Client/mods/deathmatch/CClient.cpp:93
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(开发模式) prints world sound ids into the debug window"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "无法启动本地服务器.请在 console 中查看详细信息"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "截图包含 %d 个字节，但实际预期为 %d"
+msgid "Error: Could not start local server. [%s]"
+msgstr "错误: 无法启动本地服务器. [%s]"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "截图失败"
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "服务器主机"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "资源"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "服务器名称:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "密码:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "最大允许玩家:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "广播:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "本地局域网"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "已选择"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "所有"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "开启"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "地图下载进度:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "下载进度:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s 之 %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "断开连接以取消下载"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
+msgid "Disconnected: Invalid nickname"
+msgstr "断开连接: 无效的昵称"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
+msgid "Disconnect from server"
+msgstr "与服务器断开连接"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "断开连接: 序列号被封禁.\n"
+"原因: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "断开连接: 您被封禁.\n"
+"原因: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "断开连接: 账号被封禁.\n"
+"原因: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
+msgid "Disconnected: Version mismatch"
+msgstr "断开连接: 游戏版本不对应"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "断开连接: 过多玩家同时进入服务器,请等候几分钟后再进入."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "断开连接: 服务器来自不同的分支.\n"
+"相关信息: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "断开连接: 版本已损坏.\n"
+"相关信息: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "断开连接: 用户版本比服务器版本旧.\n"
+"相关信息: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "断开连接: 用户版本比服务器版本新.\n"
+"相关信息: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+msgid "Disconnected: Nick already in use"
+msgstr "断开连接: 昵称已有人使用"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
+msgid "Disconnected: Player element could not be created."
+msgstr "断开连接：无法创建玩家元素。"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "断开连接: 服务器拒绝连接: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
+msgid "Disconnected: Serial verification failed"
+msgstr "断开连接: 序列验证失败"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "断开连接: 数据不同步 %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "断开连接: 您已经被 %s 踢出服务器(KICKED)"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "断开连接: 您已经被 %s 禁止进入服务器"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "断开连接：服务器已关闭或重启"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
+msgid "You were kicked from the game"
+msgstr "您已经被踢出游戏"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "此服务器要求未修改的 gta_sa.exe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+msgid "Please replace gta_sa.exe"
+msgstr "请替换 gta_sa.exe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "此服务器不允许使用 自定义的D3D9.DLLs"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "从 GTA 目录中删除 D3D9.DLL 并 重新启动 MTA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
+msgid "This server does not allow virtual machines"
+msgstr "此服务器不允许使用 虚拟机"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+msgid "This server requires driver signing to be enabled"
+msgstr "此服务器要求启用驱动程序签名"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+msgid "Please restart your PC"
+msgstr "重启你的电脑"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+msgid "This server has detected missing anti-cheat components"
+msgstr "此服务器检测到缺少反作弊组件"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+msgid "Try restarting MTA"
+msgstr "尝试重启MTA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "此服务器要求 原版的 gta3.img 和 gta_int.img"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "请替换 gta3.img 或 gta_int.img"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+msgid "This server does not allow Wine"
+msgstr "此服务器不允许使用 Linux Wine"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "确保没有其他程序正在修改 MTA:SA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "Time Remaining: "
+msgstr "剩余时间"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d 天"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d 时"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d 分"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d 秒"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
+msgid "Disconnected"
+msgstr "断开连接"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "下载错误: %s"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+msgid "Entering the game ..."
+msgstr "进入游戏中 ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:664
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "未连接; 请使用快速连接或者 'connect' 命令来连接服务器."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:710
+msgid "The server is not installed"
+msgstr "服务器未被安装"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:720
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+msgid "Local Server"
+msgstr "本地服务器"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:720
+msgid "Starting local server ..."
+msgstr "正在启用本地服务器 ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "您已经被踢出游戏 ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+msgid "Connecting to local server..."
+msgstr "正在连接到本地服务器..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
+msgid "Error connecting to server."
+msgstr "连接到服务器时发生错误."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
+msgid "Connecting to local server timed out. See console for details."
+msgstr "连接本地服务器超时.请在console中查看详细内容"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
+msgid "Connection with the server was lost"
+msgstr "与服务器丢失连接"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1246
+msgid "Disconnected: the server is currently full"
+msgstr "断开连接:服务器满载"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
+msgid "Disconnected: invalid password specified"
+msgstr "断开连接: 无效的密码"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+msgid "MTA Client verification failed!"
+msgstr "MTA客户端验证失败!"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
