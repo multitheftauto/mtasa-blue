@@ -516,7 +516,13 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* vecPosition)
         // 2> GetAnimHierarchyFromSkinClump (0x734A40) -> 0x734A58
         // 3> CPed::GetBonePosition (0x5E4280) -> 0x5E42AD
         // 4> CPedSA::GetBonePosition
-        LogEvent(850, "Model not loaded", "CPedSA::GetBonePosition", SString("No RwObject for model:%d", entity->m_nModelIndex), 5420);
+        static int limiter = 0;
+
+        if (limiter < 10)
+        {
+            LogEvent(850, "Model not loaded", "CPedSA::GetBonePosition", SString("No RwObject for model:%d", entity->m_nModelIndex), 5420);
+            ++limiter;
+        }
     }
     else
     {
