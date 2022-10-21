@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-06 09:21+0000\n"
-"PO-Revision-Date: 2022-10-06 09:37\n"
+"POT-Creation-Date: 2022-10-21 14:34+0000\n"
+"PO-Revision-Date: 2022-10-21 15:25\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -17,207 +17,42 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr "Installatie-instellingen vernieuwen "
+#. Create buttons
+#. OK button
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:34
+#: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
+#: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
+#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
+#: Client/core/CVersionUpdater.cpp:2118 Client/core/CVersionUpdater.cpp:2127
+#: Client/core/CVersionUpdater.cpp:2136 Client/core/CVersionUpdater.cpp:2150
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4680
+msgid "OK"
+msgstr "OK"
 
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr "Grote geheugen instelling vernieuwen"
+#. Cancel button
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:37
+#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4679
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+msgid "Cancel"
+msgstr "Annuleren"
 
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr "DEP instellingen vernieuwen"
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr "Overeenstemming grafisch stuurprogramma vernieuwen"
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr "Bestandsprobleem oplossen"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Kopieer de hoofd-executable om problemen met het grafisch stuurprogramma te voorkomen"
-
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA heeft Administrator toegang nodig voor de volgende opdracht:\n\n"
-"  '%s'\n\n"
-"Gelieve te bevestigen in het volgende venster."
-
-#: Client/loader/CInstallManager.cpp:344
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA kon te volgende opdracht niet afwerken:\n\n"
-"  '%s'\n"
-
-#: Client/loader/CInstallManager.cpp:394
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** De crash werd veroorzaakt door een grafische driver fout **\n\n"
-"** Gelieve uw grafische driver te updaten **"
-
-#: Client/loader/CInstallManager.cpp:500
-msgid "Install updated MTA:SA files"
-msgstr "Geüpdatet MTA:SA bestanden installeren"
-
-#: Client/loader/CInstallManager.cpp:520
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Kon niet updaten door bestandsconflicten. Gelieve andere toepassingen te sluiten en opnieuw te proberen"
-
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
-#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
-#: Client/loader/MainFunctions.cpp:818
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1191 Client/core/CCore.cpp:1204
-#: Client/core/CSettings.cpp:2914 Client/core/CSettings.cpp:4098
-#: Client/core/CSettings.cpp:4126 Client/core/CSettings.cpp:4659
-#: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "Fout"
-
-#: Client/loader/CInstallManager.cpp:529
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto werd niet correct geïnstalleerd, gelieve te herinstalleren. %s"
-
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "MTA:SA kan niet doorgaan omdat de volgende bestanden niet juist zijn:"
-
-#: Client/loader/CInstallManager.cpp:609
-msgid "Patch GTA"
-msgstr "Fix GTA"
-
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:722
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA kan niet verdergaan omdat schijf %s niet genoeg ruimte heeft."
-
-#: Client/loader/CInstallManager.cpp:812
-msgid "Missing file:"
-msgstr "Ontbrekend bestand:"
-
-#: Client/loader/CInstallManager.cpp:816
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Als MTA niet kan starten, gelieve GTA:SA te herinstalleren"
-
-#: Client/loader/CInstallManager.cpp:937
-msgid "Update install settings"
-msgstr "Installatie instellingen vernieuwen"
-
-#: Client/loader/CInstallManager.cpp:1070
-msgid "Update compatibility settings"
-msgstr "Compatibiliteitsinstellingen vernieuwen"
-
-#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:751
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Grand Theft Auto San Andreas zoeken..."
-
-#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:754
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Gelieve Grand Theft Auto San Andreas te starten"
-
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Selecteer uw Grand Theft Auto: San Andreas installatie pad"
-
-#: Client/loader/Utils.cpp:1283
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Fout bij het laden van %s module! (%s)"
-
-#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:775
-msgid "Copying files..."
-msgstr "Bestanden kopiëren..."
-
-#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:780
-msgid "Copy finished early. Everything OK."
-msgstr "Kopie is vroeger klaar. Alles OK."
-
-#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:785
-msgid "Finishing..."
-msgstr "Voltooien..."
-
-#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:789
-msgid "Done!"
-msgstr "Klaar!"
-
-#: Client/loader/Utils.cpp:1713
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Nieuwe installatie van %s ontdekt.\n\n"
-"Wilt u uw instelling van %s kopiëren?"
-
-#: Client/loader/Utils.cpp:1752
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA kon het bestand '%s' niet openen"
-
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "Het bestand '%s' ontbreekt in uw GTA:SA installatie."
-
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA kon een model niet laden."
-
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Als je onlangs gta3.img hebt aangepast, probeer dan GTA:SA opnieuw te installeren."
-
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA kon geen vehicle upgrade toevoegen."
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA heeft fouten gevonden in het bestand '%s'"
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Is uw computer herstart tijdens het spelen van MTA:SA?"
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr "Gelieve de volgende programma's te beëindigen voor u verdergaat:"
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:32
+#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
+#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
+#: Client/core/CSettings.cpp:1368 Client/core/CSettings.cpp:1392
+#: Client/core/CSettings.cpp:4421 Client/core/CSettings.cpp:4488
+#: Client/core/CSettings.cpp:4537 Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "Yes"
+msgstr "Ja"
 
 #: Client/loader/Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
@@ -231,202 +66,6 @@ msgstr "Update installeren..."
 msgid "Extracting files..."
 msgstr "Bestanden uitpakken..."
 
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:32 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1368
-#: Client/core/CSettings.cpp:1392 Client/core/CSettings.cpp:4421
-#: Client/core/CSettings.cpp:4488 Client/core/CSettings.cpp:4537
-#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
-#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "Yes"
-msgstr "Ja"
-
-#: Client/loader/Dialogs.cpp:33 Client/core/CMainMenu.cpp:1147
-#: Client/core/CSettings.cpp:1367 Client/core/CSettings.cpp:1391
-#: Client/core/CSettings.cpp:4420 Client/core/CSettings.cpp:4487
-#: Client/core/CSettings.cpp:4536 Client/core/CVersionUpdater.cpp:1569
-#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
-#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "No"
-msgstr "Nee"
-
-#. Create buttons
-#. OK button
-#: Client/loader/Dialogs.cpp:34 Client/gui/CGUIMessageBox_Impl.cpp:64
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4680
-#: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
-#: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
-#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
-#: Client/core/CVersionUpdater.cpp:2118 Client/core/CVersionUpdater.cpp:2127
-#: Client/core/CVersionUpdater.cpp:2136 Client/core/CVersionUpdater.cpp:2150
-msgid "OK"
-msgstr "OK"
-
-#: Client/loader/Dialogs.cpp:35
-msgid "Quit"
-msgstr "Afsluiten"
-
-#: Client/loader/Dialogs.cpp:36
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-msgid "Help"
-msgstr "Help"
-
-#. Cancel button
-#: Client/loader/Dialogs.cpp:37 Client/gui/CGUIMessageBox_Impl.cpp:68
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4679
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
-#: Client/core/CVersionUpdater.cpp:1839
-msgid "Cancel"
-msgstr "Annuleren"
-
-#: Client/loader/Dialogs.cpp:52
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas is tegen een probleem aangelopen"
-
-#: Client/loader/Dialogs.cpp:53
-msgid "Crash information"
-msgstr "Crash informatie"
-
-#: Client/loader/Dialogs.cpp:54
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Vink dit vakje aan om deze crash info te verzenden naar de MTA ontwikkelaars via het 'internet'"
-
-#: Client/loader/Dialogs.cpp:55
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Dit vergroot de kans dat deze crash wordt opgelost."
-
-#: Client/loader/Dialogs.cpp:56
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Wilt u MTA: San Andreas herstarten?"
-
-#: Client/loader/Dialogs.cpp:63
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Waarschuwing"
-
-#: Client/loader/Dialogs.cpp:64
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:66
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:68
-msgid "Keep these files, but also show this warning on next start"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:69
-msgid "Do not remind me about these files again"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:70
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:71
-msgid "Show me these files"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:72
-msgid "Play MTA:SA"
-msgstr "Speel MTA:SA"
-
-#: Client/loader/Dialogs.cpp:78
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - verwarrende opties"
-
-#: Client/loader/Dialogs.cpp:79
-msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus gedecteerd!"
-
-#: Client/loader/Dialogs.cpp:80
-msgid "Try each option and see what works:"
-msgstr "Probeer iedere mogelijkheid en kijk wat er werkt:"
-
-#: Client/loader/Dialogs.cpp:81
-msgid "A - Standard NVidia"
-msgstr "A - Standaard NVidia"
-
-#: Client/loader/Dialogs.cpp:82
-msgid "B - Alternate NVidia"
-msgstr "B - Alternatief NVidia"
-
-#: Client/loader/Dialogs.cpp:83
-msgid "C - Standard NVidia with exe rename"
-msgstr "C- Standaard NVidia en exe hernoemen"
-
-#: Client/loader/Dialogs.cpp:84
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - Alternatief NVidia en exe hernoemen"
-
-#: Client/loader/Dialogs.cpp:85
-msgid "E - Standard Intel"
-msgstr "E - Standaard Intel"
-
-#: Client/loader/Dialogs.cpp:86
-msgid "F - Alternate Intel"
-msgstr "F - Alternatief Intel"
-
-#: Client/loader/Dialogs.cpp:87
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Standaard Intel en exe hernoemen"
-
-#: Client/loader/Dialogs.cpp:88
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternatief Intel en exe hernoemen"
-
-#: Client/loader/Dialogs.cpp:89
-msgid "If you get desperate, this might help:"
-msgstr "Als u wanhopig wordt, dit helpt mogelijks:"
-
-#: Client/loader/Dialogs.cpp:90
-msgid "If you have already selected an option that works, this might help:"
-msgstr "Als je al een optie hebt geselecteerd die werkt, kan dit helpen:"
-
-#: Client/loader/Dialogs.cpp:91
-msgid "Force windowed mode"
-msgstr "Venstermodus forceren"
-
-#: Client/loader/Dialogs.cpp:92
-msgid "Don't show again"
-msgstr "Niet meer tonen"
-
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:851
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
-#: Client/loader/Dialogs.cpp:100
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Waarschuwing: Kon geen anti-virus software detecteren"
-
-#: Client/loader/Dialogs.cpp:102
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA kon geen anti-virus software detecteren op uw PC.\n\n"
-"Virussen storen MTA en degraderen uw gebruikservaring.\n\n"
-"Druk 'Help' voor meer informatie."
-
-#: Client/loader/Dialogs.cpp:105
-msgid "I have already installed an anti-virus"
-msgstr "Ik heb al een anti-virus software"
-
-#: Client/loader/Dialogs.cpp:107
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "I zal geen anti-virus software installeren.\n"
-"I wil dat mijn PC sloom is en deel uitmaakt van een botnet."
-
 #: Client/loader/MainFunctions.cpp:242
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
@@ -436,6 +75,44 @@ msgstr "Moeite met herstarten van MTA:SA\n\n"
 "Als het probleem aanhoudt, open taakbeheer en\n"
 "stop de 'gta_sa.exe' and 'Multi Theft Auto.exe' processen\n\n\n"
 "MTA:SA proberen te herstarten?"
+
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:818
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/core/CCore.cpp:1191
+#: Client/core/CCore.cpp:1204 Client/core/CSettings.cpp:2914
+#: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4126
+#: Client/core/CSettings.cpp:4659 Client/core/CGUI.cpp:87
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CClientGame.cpp:590
+#: Client/mods/deathmatch/logic/CClientGame.cpp:664
+#: Client/mods/deathmatch/logic/CClientGame.cpp:688
+#: Client/mods/deathmatch/logic/CClientGame.cpp:710
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "Fout"
 
 #: Client/loader/MainFunctions.cpp:260
 msgid "Another instance of MTA is already running.\n\n"
@@ -626,518 +303,327 @@ msgstr "Kon Grand Theft Auto: San Andreas niet starten.  Probleem te herstarten,
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas is mogelijks niet correct gestart. Wilt u het beëindigen?"
 
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "Deze versie is verlopen."
+#: Client/loader/Dialogs.cpp:33 Client/core/CVersionUpdater.cpp:1569
+#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
+#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1147 Client/core/CSettings.cpp:1367
+#: Client/core/CSettings.cpp:1391 Client/core/CSettings.cpp:4420
+#: Client/core/CSettings.cpp:4487 Client/core/CSettings.cpp:4536
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "No"
+msgstr "Nee"
 
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "Verbinding verbroken"
+#: Client/loader/Dialogs.cpp:35
+msgid "Quit"
+msgstr "Afsluiten"
 
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "toon de naamplaatjes"
+#: Client/loader/Dialogs.cpp:36
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+msgid "Help"
+msgstr "Help"
 
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "toont de chatbox"
+#: Client/loader/Dialogs.cpp:52
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas is tegen een probleem aangelopen"
 
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "toont de netwerk statistieken"
+#: Client/loader/Dialogs.cpp:53
+msgid "Crash information"
+msgstr "Crash informatie"
 
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "opent de chat invoer"
+#: Client/loader/Dialogs.cpp:54
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Vink dit vakje aan om deze crash info te verzenden naar de MTA ontwikkelaars via het 'internet'"
 
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "zend stem uit naar andere spelers"
+#: Client/loader/Dialogs.cpp:55
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Dit vergroot de kans dat deze crash wordt opgelost."
 
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "stapt in een auto als passagier"
+#: Client/loader/Dialogs.cpp:56
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Wilt u MTA: San Andreas herstarten?"
 
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "volgende radio zender"
+#: Client/loader/Dialogs.cpp:63
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Waarschuwing"
 
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "vorige radio zender"
+#: Client/loader/Dialogs.cpp:64
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "zet de radar zicht aan"
+#: Client/loader/Dialogs.cpp:66
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "zoomt de radar in"
+#: Client/loader/Dialogs.cpp:68
+msgid "Keep these files, but also show this warning on next start"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "zoomt de radar uit"
+#: Client/loader/Dialogs.cpp:69
+msgid "Do not remind me about these files again"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "verplaatst de radar naar het noorden"
+#: Client/loader/Dialogs.cpp:70
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "verplaatst de radar naar het zuiden"
+#: Client/loader/Dialogs.cpp:71
+msgid "Show me these files"
+msgstr ""
 
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "verplaats de radar naar het oosten"
+#: Client/loader/Dialogs.cpp:72
+msgid "Play MTA:SA"
+msgstr "Speel MTA:SA"
 
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "verplaatst de radar naar het westen"
+#: Client/loader/Dialogs.cpp:78
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - verwarrende opties"
 
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "zet de radar vast"
+#: Client/loader/Dialogs.cpp:79
+msgid "NVidia Optimus detected!"
+msgstr "NVidia Optimus gedecteerd!"
 
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "Verlaagt de radar transparantie"
+#: Client/loader/Dialogs.cpp:80
+msgid "Try each option and see what works:"
+msgstr "Probeer iedere mogelijkheid en kijk wat er werkt:"
 
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "verlaagt de radar transparantie"
+#: Client/loader/Dialogs.cpp:81
+msgid "A - Standard NVidia"
+msgstr "A - Standaard NVidia"
 
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "toont radar help tekst"
+#: Client/loader/Dialogs.cpp:82
+msgid "B - Alternate NVidia"
+msgstr "B - Alternatief NVidia"
 
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "zend een bericht naar een bepaalde speler"
+#: Client/loader/Dialogs.cpp:83
+msgid "C - Standard NVidia with exe rename"
+msgstr "C- Standaard NVidia en exe hernoemen"
 
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "verander naar een volgend wapen wanneer je in een voertuig zit"
+#: Client/loader/Dialogs.cpp:84
+msgid "D - Alternate NVidia with exe rename"
+msgstr "D - Alternatief NVidia en exe hernoemen"
 
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "verander naar een vorig wapen wanneer je in een voertuig zit"
+#: Client/loader/Dialogs.cpp:85
+msgid "E - Standard Intel"
+msgstr "E - Standaard Intel"
 
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "toont informatie omtrent de huidige server"
+#: Client/loader/Dialogs.cpp:86
+msgid "F - Alternate Intel"
+msgstr "F - Alternatief Intel"
 
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "bepaald de schaal vermenigvuldiger van alle tekst-voorstellingen"
+#: Client/loader/Dialogs.cpp:87
+msgid "G - Standard Intel with exe rename"
+msgstr "G - Standaard Intel en exe hernoemen"
 
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(Ontwikkelingsmodus) toont alle colvormen"
+#: Client/loader/Dialogs.cpp:88
+msgid "H - Alternate Intel with exe rename"
+msgstr "H - Alternatief Intel en exe hernoemen"
 
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Ontwikkelingsmodus) toont geluid-ids in een debug venster"
+#: Client/loader/Dialogs.cpp:89
+msgid "If you get desperate, this might help:"
+msgstr "Als u wanhopig wordt, dit helpt mogelijks:"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "HOST SPEL"
+#: Client/loader/Dialogs.cpp:90
+msgid "If you have already selected an option that works, this might help:"
+msgstr "Als je al een optie hebt geselecteerd die werkt, kan dit helpen:"
 
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
-#: Client/core/CSettings.cpp:883 Client/core/CSettings.cpp:1991
-msgid "General"
-msgstr "Algemeen"
+#: Client/loader/Dialogs.cpp:91
+msgid "Force windowed mode"
+msgstr "Venstermodus forceren"
 
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Bronnen"
+#: Client/loader/Dialogs.cpp:92
+msgid "Don't show again"
+msgstr "Niet meer tonen"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Server naam:"
+#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:851
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Wachtwoord:"
+#: Client/loader/Dialogs.cpp:100
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Waarschuwing: Kon geen anti-virus software detecteren"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Max spelers:"
+#: Client/loader/Dialogs.cpp:102
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA kon geen anti-virus software detecteren op uw PC.\n\n"
+"Virussen storen MTA en degraderen uw gebruikservaring.\n\n"
+"Druk 'Help' voor meer informatie."
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Uitzenden:"
+#: Client/loader/Dialogs.cpp:105
+msgid "I have already installed an anti-virus"
+msgstr "Ik heb al een anti-virus software"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "LAN"
+#: Client/loader/Dialogs.cpp:107
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "I zal geen anti-virus software installeren.\n"
+"I wil dat mijn PC sloom is en deel uitmaakt van een botnet."
 
-#. Create the tabs
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-msgid "Internet"
-msgstr "Internet"
+#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Grand Theft Auto San Andreas zoeken..."
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Geselecteerde"
+#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Gelieve Grand Theft Auto San Andreas te starten"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Alle"
+#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+msgid "Copying files..."
+msgstr "Bestanden kopiëren..."
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Start"
+#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+msgid "Copy finished early. Everything OK."
+msgstr "Kopie is vroeger klaar. Alles OK."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Ongeldige gebruikersnaam! Gelieve naar Instellingen te gaan en een nieuwe instellen!"
+#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+msgid "Finishing..."
+msgstr "Voltooien..."
 
-#. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
-#: Client/core/CConnectManager.cpp:148
-msgid "CONNECTING"
-msgstr "VERBINDEN"
+#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+msgid "Done!"
+msgstr "Klaar!"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
-msgid "Entering the game ..."
-msgstr "Spel aan het joinen ..."
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Selecteer uw Grand Theft Auto: San Andreas installatie pad"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Niet verbonden; gelieve Quick Connect of het 'connect' commando te gebruiken om te verbinden met een server."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
-msgid "The server is not installed"
-msgstr "De server is niet geïnstalleerd"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
-msgid "Local Server"
-msgstr "Lokale Server"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
-msgid "Starting local server ..."
-msgstr "Lokale server aan het starten ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#: Client/loader/Utils.cpp:1182 Client/loader/CInstallManager.cpp:329
 #, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "U werd uit het spel gegooid ( %s )"
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA heeft Administrator toegang nodig voor de volgende opdracht:\n\n"
+"  '%s'\n\n"
+"Gelieve te bevestigen in het volgende venster."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
-msgid "Connecting to local server..."
-msgstr "Verbinden met lokale server..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
-msgid "Error connecting to server."
-msgstr "Fout bij het verbinden met de server."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Verbinden met de lokale server duurde te lang. Zie console voor details."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
-#: Client/core/CConnectManager.cpp:263
-msgid "Connection timed out"
-msgstr "Verbinden duurde te lang"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
-msgid "Connection with the server was lost"
-msgstr "Verbinden met de server werd verloren"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1230
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-msgid "Disconnected: unknown protocol error"
-msgstr "Verbinding verbroken: onbekende protocol fout"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1234
-#: Client/core/CConnectManager.cpp:285
-msgid "Disconnected: disconnected remotely"
-msgstr "Verbinding verbroken: verbroken op afstand"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1238
-#: Client/core/CConnectManager.cpp:289
-msgid "Disconnected: connection lost remotely"
-msgstr "Verbinding verbroken: verbinding verloren op afstand"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
-#: Client/core/CConnectManager.cpp:293
-msgid "Disconnected: you are banned from this server"
-msgstr "Verbinding verbroken: u bent verbannen van deze server"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1246
-msgid "Disconnected: the server is currently full"
-msgstr "Verbinding verbroken: de server zit momenteel vol"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1250
-#: Client/core/CConnectManager.cpp:300
-msgid "Disconnected: disconnected from the server"
-msgstr "Verbinding verbroken: verbinding verbroken met de server"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
-#: Client/core/CConnectManager.cpp:304
-msgid "Disconnected: connection to the server was lost"
-msgstr "Verbinding verbroken: verbinding naar de server is verbroken"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
-msgid "Disconnected: invalid password specified"
-msgstr "Verbinding verbroken: verkeerd paswoord ingevoerd"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
-#: Client/core/CConnectManager.cpp:311
-msgid "Disconnected: connection was refused"
-msgstr "Verbinding verbroken: verbinding geweigerd"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
-msgid "MTA Client verification failed!"
-msgstr "MTA Client verificatie mislukt!"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#: Client/loader/Utils.cpp:1283
 #, c-format
-msgid "Download error: %s"
-msgstr "Download fout: %s"
+msgid "Error loading %s module! (%s)"
+msgstr "Fout bij het laden van %s module! (%s)"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Kaart download vooruitgang:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Download Vooruitgang:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#: Client/loader/Utils.cpp:1713
 #, c-format
-msgid "%s of %s"
-msgstr "%s van %s"
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Nieuwe installatie van %s ontdekt.\n\n"
+"Wilt u uw instelling van %s kopiëren?"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Verbreek de verbinding om het downloaden te stoppen"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Kon lokale server niet starten. Bekijk de console voor details."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
+#: Client/loader/Utils.cpp:1752
 #, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Fout: Kon lokale server niet starten. [%s]"
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA kon het bestand '%s' niet openen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
-msgid "Disconnected: Invalid nickname"
-msgstr "Verbinding verbroken: Ongeldige gebruikersnaam"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
-msgid "Disconnect from server"
-msgstr "Verbinding verbroken"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
+#: Client/loader/Utils.cpp:1774
 #, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "Verbinding verbroken: Serienummer is verbannen.\n"
-"Reason: %s"
+msgid "GTA:SA is missing the file '%s'."
+msgstr "Het bestand '%s' ontbreekt in uw GTA:SA installatie."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA kon een model niet laden."
+
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Als je onlangs gta3.img hebt aangepast, probeer dan GTA:SA opnieuw te installeren."
+
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA kon geen vehicle upgrade toevoegen."
+
+#: Client/loader/Utils.cpp:1845
 #, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "Verbinding verbroken: U werd verbannen.\n"
-" Reden: %s"
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA heeft fouten gevonden in het bestand '%s'"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Is uw computer herstart tijdens het spelen van MTA:SA?"
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr "Gelieve de volgende programma's te beëindigen voor u verdergaat:"
+
+#: Client/loader/CInstallManager.cpp:344
 #, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "Verbinding verbroken: Account is verbannen.\n"
-"Reden: %s"
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA kon te volgende opdracht niet afwerken:\n\n"
+"  '%s'\n"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
-msgid "Disconnected: Version mismatch"
-msgstr "Verbinding verbroken: Versies komen niet overeen"
+#: Client/loader/CInstallManager.cpp:394
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** De crash werd veroorzaakt door een grafische driver fout **\n\n"
+"** Gelieve uw grafische driver te updaten **"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Verbinding verbroken: Teveel aanmeldingen. Een minuut wachten alstublieft, probeer het dan opnieuw."
+#: Client/loader/CInstallManager.cpp:500
+msgid "Install updated MTA:SA files"
+msgstr "Geüpdatet MTA:SA bestanden installeren"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
+#: Client/loader/CInstallManager.cpp:520
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Kon niet updaten door bestandsconflicten. Gelieve andere toepassingen te sluiten en opnieuw te proberen"
+
+#: Client/loader/CInstallManager.cpp:529
 #, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "Verbinding verbroken: Server van andere tak.\n"
-"Informatie: %s"
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto werd niet correct geïnstalleerd, gelieve te herinstalleren. %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr "MTA:SA kan niet doorgaan omdat de volgende bestanden niet juist zijn:"
+
+#: Client/loader/CInstallManager.cpp:609
+msgid "Patch GTA"
+msgstr "Fix GTA"
+
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:722
 #, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "Verbinding verbroken: Slechte versie.\n"
-"Informatie: %s"
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA kan niet verdergaan omdat schijf %s niet genoeg ruimte heeft."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "Verbinding verbroken: Server draait een nieuwere versie.\n"
-"Informatie: %s"
+#: Client/loader/CInstallManager.cpp:812
+msgid "Missing file:"
+msgstr "Ontbrekend bestand:"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "Verbinding verbroken: Server draait een oudere versie.\n"
-"Informatie: %s"
+#: Client/loader/CInstallManager.cpp:816
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Als MTA niet kan starten, gelieve GTA:SA te herinstalleren"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
-msgid "Disconnected: Nick already in use"
-msgstr "Verbinding verbroken: Gebruikersnaam al in gebruik"
+#: Client/loader/CInstallManager.cpp:937
+msgid "Update install settings"
+msgstr "Installatie instellingen vernieuwen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
-msgid "Disconnected: Player element could not be created."
-msgstr "Verbinding verbroken: Spelerelement kon niet worden aangemaakt."
+#: Client/loader/CInstallManager.cpp:1070
+msgid "Update compatibility settings"
+msgstr "Compatibiliteitsinstellingen vernieuwen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Verbinding verbroken: server weigerde de verbinding: %s"
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr "Installatie-instellingen vernieuwen "
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
-msgid "Disconnected: Serial verification failed"
-msgstr "Verbinding verbroken: Serienummer verificatie mislukt"
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr "Grote geheugen instelling vernieuwen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "Verbinding verbroken: Verbindings-desynchronisatie %s"
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr "DEP instellingen vernieuwen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "Verbinding verbroken: U werd uit de server gegooid door %s"
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr "Overeenstemming grafisch stuurprogramma vernieuwen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "Verbinding verbroken: U werd verbannen door %s"
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr "Bestandsprobleem oplossen"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "Verbinding verbroken: Server is uitgezet of wordt opnieuw opgestart"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
-msgid "You were kicked from the game"
-msgstr "U werd uit het spel gegooid"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Deze server vereist een originele gta_sa.exe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
-msgid "Please replace gta_sa.exe"
-msgstr "Gelieve gta_sa.exe te vervangen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Deze server staat aangepaste D3D9.DLLs niet toe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "Verwijder D3D9.DLL uit je GTA-installatiemap en herstart MTA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-msgid "This server does not allow virtual machines"
-msgstr "Deze server staat geen virtuele machines toe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
-msgid "This server requires driver signing to be enabled"
-msgstr "Deze server vereist de naleving van digitaal ondertekende stuurprogramma's (\"Driver Signing Enforcement\" moet aan staan)"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
-msgid "Please restart your PC"
-msgstr "Herstart je computer"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
-msgid "This server has detected missing anti-cheat components"
-msgstr "Deze server heeft ontbrekende anti-cheat componenten gedetecteerd"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
-msgid "Try restarting MTA"
-msgstr "Probeer MTA opnieuw te starten"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Deze server vereist originele versies van gta3.img en gta_int.img"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
-msgid "Please replace gta3.img or gta_int.img"
-msgstr "Gelieve gta3.img of gta_int.img te vervangen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
-msgid "This server does not allow Wine"
-msgstr "Deze server staat Wine niet toe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Zorg ervoor dat geen ander programma MTA:SA (of diens geheugen) aanpast"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "Time Remaining: "
-msgstr "Resterende Tijd: "
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dag"
-msgstr[1] "%d dagen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d uur"
-msgstr[1] "%d uren"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuut"
-msgstr[1] "%d minuten"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d seconde"
-msgstr[1] "%d seconden"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
-msgid "Disconnected"
-msgstr "Verbinding verbroken"
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "Kopieer de hoofd-executable om problemen met het grafisch stuurprogramma te voorkomen"
 
 #: Client/game_sa/CSettingsSA.cpp:773
 msgid "Can't find valid screen resolution."
@@ -1148,72 +634,365 @@ msgstr "Kan geen geschikte schermresolutie vinden."
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Bent u zeker dat u deze schermresolutie wilt gebruiken?"
 
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1380
-msgid "Problem with graphics driver"
-msgstr "Probleem met het stuurprogramma van je videokaart"
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr ""
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Website verzoeken"
-
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "De server vraagt toestemming om de volgende websites (later) te laden:"
-
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "NOOIT GEVOELIGE GEGEVENS INGEVEN ZODAT ZE NIET GESTOLEN WORDEN"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Mijn keuze onthouden"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:953
-msgid "Allow"
-msgstr "Toestaan"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Weigeren"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Verbinding mislukt. Ongeldige gebruikersnaam opgegeven!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Verbinding mislukt. Ongeldige host opgegeven!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Verbinding met %s op poort %u is mislukt!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Verbinden met %s:%u ..."
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Geen dergelijke mod geïnstalleerd (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Slecht antwoord van de server (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Slecht antwoord van de server (1)"
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "Bezoek laatste nieuwsartikel"
 
 #: Client/core/CScreenShot.cpp:53
 #, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "Screensshot gemaakt: '%s'"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Versnel Assen"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Vertraag Assen"
+
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Command of cvar onbekend: "
+
+#: Client/core/CVersionUpdater.cpp:624
+msgid "Busy"
+msgstr "Bezig"
+
+#: Client/core/CVersionUpdater.cpp:624
+msgid "Can't check for updates right now"
+msgstr "Kan momenteel niet op updates controleren"
+
+#: Client/core/CVersionUpdater.cpp:1565 Client/core/CVersionUpdater.cpp:1585
+#: Client/core/CVersionUpdater.cpp:1603
+#, c-format
+msgid "MTA:SA %s required"
+msgstr "MTA:SA %s nodig"
+
+#: Client/core/CVersionUpdater.cpp:1566
+#, c-format
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr "Een nieuwere versie van MTA:SA %s is nodig om de geselecteerde server binnen te komen.\n\n"
+"Wilt u de nieuwere versie van MTA:SA %s downloaden en installeren?"
+
+#: Client/core/CVersionUpdater.cpp:1586
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "Wilt u MTA:SA %s starten en verbinden met deze server?"
+
+#: Client/core/CVersionUpdater.cpp:1604
+msgid "It is not possible to connect at this time.\n\n"
+"Please try later."
+msgstr "Op dit moment is het niet mogelijk te verbinden.\n\n"
+"Probeer het later nog een keer."
+
+#: Client/core/CVersionUpdater.cpp:1786
+msgid "Connecting"
+msgstr "Aan het verbinden"
+
+#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
+msgid "Please wait..."
+msgstr "Gelieve te wachten..."
+
+#: Client/core/CVersionUpdater.cpp:1802
+msgid "CHECKING"
+msgstr "CONTROLEREN"
+
+#: Client/core/CVersionUpdater.cpp:1819 Client/core/CVersionUpdater.cpp:1912
+msgid "UPDATE CHECK"
+msgstr "ZOEKEN NAAR UPDATES"
+
+#: Client/core/CVersionUpdater.cpp:1820
+msgid "No update needed"
+msgstr "Geen update nodig"
+
+#: Client/core/CVersionUpdater.cpp:1837
+msgid "DOWNLOADING"
+msgstr "AAN HET DOWNLOADEN"
+
+#: Client/core/CVersionUpdater.cpp:1838
+msgid "waiting..."
+msgstr "wachten..."
+
+#: Client/core/CVersionUpdater.cpp:1854
+msgid "MANDATORY UPDATE"
+msgstr "VERPLICHTE UPDATE"
+
+#: Client/core/CVersionUpdater.cpp:1855
+msgid "To join this server, you must update MTA.\n\n"
+" Do you want to update now ?"
+msgstr "Om deze server te joinen moet u MTA updaten.\n\n"
+" Wilt u nu updaten?"
+
+#: Client/core/CVersionUpdater.cpp:1873
+msgid "OPTIONAL UPDATE"
+msgstr "OPTIONELE UPDATE"
+
+#: Client/core/CVersionUpdater.cpp:1874
+msgid "Server says an update is recommended, but not essential.\n\n"
+" Do you want to update now ?"
+msgstr "De server raad een update aan, dit is echter niet noodzakelijk.\n\n"
+" Wilt u nu updaten?"
+
+#: Client/core/CVersionUpdater.cpp:1913
+msgid "Update not currently avalable.\n\n"
+"Please check www.mtasa.com"
+msgstr "Update momenteel niet beschikbaar.\n\n"
+"Gelieve www.mtasa.com te raadplegen"
+
+#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
+msgid "ERROR SAVING"
+msgstr "ERROR BIJ HET OPSLAAN"
+
+#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
+msgid "Unable to create the file."
+msgstr "Kon het bestand niet maken."
+
+#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:1952
+#: Client/core/CVersionUpdater.cpp:2125 Client/core/CVersionUpdater.cpp:2134
+msgid "ERROR DOWNLOADING"
+msgstr "FOUT BIJ HET DOWNLOADEN"
+
+#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:2126
+msgid "The downloaded file appears to be incorrect."
+msgstr "Het gedownloade bestand lijkt verkeerd."
+
+#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:2135
+msgid "For some reason."
+msgstr "Om de een of andere reden."
+
+#: Client/core/CVersionUpdater.cpp:1964 Client/core/CVersionUpdater.cpp:2148
+msgid "DOWNLOAD COMPLETE"
+msgstr "DOWNLOAD VOLTOOID"
+
+#: Client/core/CVersionUpdater.cpp:1988
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr " - Onbekend probleem in _DialogUpdateResult"
+
+#: Client/core/CVersionUpdater.cpp:2079 Client/core/CSettings.cpp:4485
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "GEWIJZIGDE GTA:SA BESTANDEN"
+
+#: Client/core/CVersionUpdater.cpp:2086 Client/core/CVersionUpdater.cpp:2096
+msgid "Ok"
+msgstr "Oké"
+
+#: Client/core/CVersionUpdater.cpp:2094
+msgid "ERROR"
+msgstr "FOUT"
+
+#: Client/core/CVersionUpdater.cpp:2095
+msgid "Some MTA:SA data files are missing.\n\n\n"
+"Please reinstall MTA:SA"
+msgstr "Sommige MTA:SA data bestanden ontbreken.\n\n\n"
+"Gelieve MTA:SA te herinstalleren"
+
+#: Client/core/CVersionUpdater.cpp:2722
+#, c-format
+msgid "%3d %% completed"
+msgstr "%3d %% voltooid"
+
+#: Client/core/CVersionUpdater.cpp:2724
+#, c-format
+msgid "\n\n"
+"Waiting for response  -  %-3d"
+msgstr "\n\n"
+"Wachten op antwoord  -  %-3d"
+
+#: Client/core/CKeyBinds.cpp:186
+msgid "Fire"
+msgstr "Schiet"
+
+#: Client/core/CKeyBinds.cpp:187
+msgid "Next weapon"
+msgstr "Volgend wapen"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Previous weapon"
+msgstr "Vorig wapen"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Forwards"
+msgstr "Voorwaarts"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Backwards"
+msgstr "Achterwaarts"
+
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2213
+#: Client/core/CSettings.cpp:2241
+msgid "Left"
+msgstr "Links"
+
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2215
+#: Client/core/CSettings.cpp:2242
+msgid "Right"
+msgstr "Rechts"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Zoom in"
+msgstr "Inzoomen"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Zoom out"
+msgstr "Uitzoomen"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Enter/Exit"
+msgstr "Instappen/Uitstappen"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Change camera"
+msgstr "Camera veranderen"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:197
+msgid "Jump"
+msgstr "Spring"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Sprint"
+msgstr "Sprint"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Look behind"
+msgstr "Kijk achterom"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Crouch"
+msgstr "Bukken"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Action"
+msgstr "Actie"
+
+#: Client/core/CKeyBinds.cpp:202
+msgid "Walk"
+msgstr "Lopen"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Vehicle fire"
+msgstr "Schieten uit voertuig"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Vehicle secondary fire"
+msgstr "Alternatief schieten uit voertuig"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Vehicle left"
+msgstr "Voertuig links"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Vehicle right"
+msgstr "Voertuig rechts"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:207
+msgid "Steer forwards/down"
+msgstr "Stuur vooruit/naar beneden"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Steer backwards/up"
+msgstr "Stuur vooruit/omhoog"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Accelerate"
+msgstr "Versnellen"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Brake/Reverse"
+msgstr "Rem/Achteruit"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Radio next"
+msgstr "Volgend radio station"
+
+#: Client/core/CKeyBinds.cpp:212
+msgid "Radio previous"
+msgstr "Vorig radio station"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Radio user track skip"
+msgstr "User Track Player nummer overslaan"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Horn"
+msgstr "Claxon"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Sub-mission"
+msgstr "Sub-missie"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Handbrake"
+msgstr "Handrem"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:217
+msgid "Vehicle look left"
+msgstr "Voertuig kijk links"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Vehicle look right"
+msgstr "Voertuig kijk rechts"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Vehicle look behind"
+msgstr "Voertuig kijk achterom"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Vehicle mouse look"
+msgstr "Voertuig muis kijk"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Special control left"
+msgstr "Speciale controle links"
+
+#: Client/core/CKeyBinds.cpp:222
+msgid "Special control right"
+msgstr "Speciale controle rechts"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Special control down"
+msgstr "Special controle beneden"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Special control up"
+msgstr "Speciale controle omhoog"
+
+#: Client/core/CKeyBinds.cpp:225
+msgid "Aim weapon"
+msgstr "Richt wapen"
+
+#: Client/core/CKeyBinds.cpp:226
+msgid "Conversation yes"
+msgstr "Accepteer gesprek"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:227
+msgid "Conversation no"
+msgstr "Geen gesprek voeren"
+
+#: Client/core/CKeyBinds.cpp:228
+msgid "Group control forwards"
+msgstr "Groepbesturing vooruit"
+
+#: Client/core/CKeyBinds.cpp:229
+msgid "Group control backwards"
+msgstr "Groepsbesturing achteruit"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Nederlands"
 
 #: Client/core/CCredits.cpp:32
 msgid "Programming"
@@ -1243,50 +1022,34 @@ msgstr "Met bijzondere dank aan"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Deze software maakt gebruik van de volgende bibliotheken en software:"
 
-#: Client/core/CCommandFuncs.cpp:30
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ COMMANDO HULP ]***\n"
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Wilt u online ondersteuning voor dit probleem?"
 
-#: Client/core/CCommandFuncs.cpp:168
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* De tijd is %d:%02d:%02d"
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Je draait een testversie uit de feature-branch! Deze is alleen voor testdoeleinden en kan niet gebruikt worden om verbinding te maken met reguliere servers"
 
-#: Client/core/CCommandFuncs.cpp:252
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "connect: Syntaxis is 'connect <host> [<port> <nick> <pass>]'"
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA zal na Juli 2019 geen updates meer uitbrengen voor gebruikers op Windows XP/Vista.\n\n"
+"Upgrade je versie van Windows om te kunnen blijven spelen op de nieuwste servers."
 
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
-msgid "connect: Bad port number"
-msgstr "connect: Foutief poort nummer"
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Dit zal de verbinding met de huidige server verbreken.\n\n"
+"Weet je zeker dat je de verbinding wilt verbreken?"
 
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "connect: Verbinden met %s:%u..."
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "VERBINDINGSWAARSCHUWING"
 
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "connect: Kan niet verbinden naar %s:%u!"
-
-#: Client/core/CCommandFuncs.cpp:291
-msgid "connect: Failed to unload current mod"
-msgstr "connect: Kan huidige mod niet stoppen"
-
-#: Client/core/CCommandFuncs.cpp:381
-msgid "Bound all controls from GTA"
-msgstr "Elke besturing staat aan van GTA"
-
-#: Client/core/CCommandFuncs.cpp:395
-msgid "Saved configuration file"
-msgstr "Configuratiebestand opgeslagen"
-
-#. Print it
-#: Client/core/CCommandFuncs.cpp:461
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Uw serial is: %s"
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "CONSOLE"
 
 #: Client/core/CCore.cpp:724 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -1396,33 +1159,50 @@ msgstr "Toont de geheugenstatistieken"
 msgid "shows the frame timing graph"
 msgstr "toont de frame tijdsgrafiek"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Versnel Assen"
+#: Client/core/CCommandFuncs.cpp:30
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ COMMANDO HULP ]***\n"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Vertraag Assen"
+#: Client/core/CCommandFuncs.cpp:168
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* De tijd is %d:%02d:%02d"
 
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Je draait een testversie uit de feature-branch! Deze is alleen voor testdoeleinden en kan niet gebruikt worden om verbinding te maken met reguliere servers"
+#: Client/core/CCommandFuncs.cpp:252
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "connect: Syntaxis is 'connect <host> [<port> <nick> <pass>]'"
 
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA zal na Juli 2019 geen updates meer uitbrengen voor gebruikers op Windows XP/Vista.\n\n"
-"Upgrade je versie van Windows om te kunnen blijven spelen op de nieuwste servers."
+#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+msgid "connect: Bad port number"
+msgstr "connect: Foutief poort nummer"
 
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Dit zal de verbinding met de huidige server verbreken.\n\n"
-"Weet je zeker dat je de verbinding wilt verbreken?"
+#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "connect: Verbinden met %s:%u..."
 
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "VERBINDINGSWAARSCHUWING"
+#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "connect: Kan niet verbinden naar %s:%u!"
+
+#: Client/core/CCommandFuncs.cpp:291
+msgid "connect: Failed to unload current mod"
+msgstr "connect: Kan huidige mod niet stoppen"
+
+#: Client/core/CCommandFuncs.cpp:381
+msgid "Bound all controls from GTA"
+msgstr "Elke besturing staat aan van GTA"
+
+#: Client/core/CCommandFuncs.cpp:395
+msgid "Saved configuration file"
+msgstr "Configuratiebestand opgeslagen"
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:461
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Uw serial is: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1605,6 +1385,15 @@ msgstr "Stem volume:"
 #: Client/core/CSettings.cpp:423 Client/core/CSettings.cpp:548
 msgid "Play mode:"
 msgstr "Afspeel modus:"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
+#: Client/core/CSettings.cpp:883 Client/core/CSettings.cpp:1991
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+msgid "General"
+msgstr "Algemeen"
 
 #: Client/core/CSettings.cpp:526
 msgid "Radio options"
@@ -1851,6 +1640,10 @@ msgstr "Domein verwijderen"
 #: Client/core/CSettings.cpp:934
 msgid "Custom whitelist"
 msgstr "Aangepaste whitelist"
+
+#: Client/core/CSettings.cpp:953 Client/cefweb/CWebsiteRequests.cpp:51
+msgid "Allow"
+msgstr "Toestaan"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:976
@@ -2135,19 +1928,9 @@ msgstr "Y-Positie:"
 msgid "Position"
 msgstr "Positie"
 
-#: Client/core/CSettings.cpp:2213 Client/core/CSettings.cpp:2241
-#: Client/core/CKeyBinds.cpp:191
-msgid "Left"
-msgstr "Links"
-
 #: Client/core/CSettings.cpp:2214 Client/core/CSettings.cpp:2228
 msgid "Center"
 msgstr "Middelpunt"
-
-#: Client/core/CSettings.cpp:2215 Client/core/CSettings.cpp:2242
-#: Client/core/CKeyBinds.cpp:192
-msgid "Right"
-msgstr "Rechts"
 
 #: Client/core/CSettings.cpp:2227
 msgid "Top"
@@ -2282,10 +2065,6 @@ msgstr "Sommige bestanden in uw GTA:SA data map zijn gewijzigd.\n"
 "Echter, GEWIJZIGDE GTA:SA BESTANDEN ZIJN GEBLOKEERD DOOR VEEL SERVERS\n\n"
 "Weet u zeker dat u ze wilt gebruiken?"
 
-#: Client/core/CSettings.cpp:4485 Client/core/CVersionUpdater.cpp:2079
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "GEWIJZIGDE GTA:SA BESTANDEN"
-
 #: Client/core/CSettings.cpp:4528
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
@@ -2368,352 +2147,106 @@ msgstr "Aanwijzer fixen:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Beweging aanwijzer fixen - Uw PC moet mogelijks herstart worden"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Nederlands"
-
-#: Client/core/CKeyBinds.cpp:186
-msgid "Fire"
-msgstr "Schiet"
-
-#: Client/core/CKeyBinds.cpp:187
-msgid "Next weapon"
-msgstr "Volgend wapen"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Previous weapon"
-msgstr "Vorig wapen"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Forwards"
-msgstr "Voorwaarts"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Backwards"
-msgstr "Achterwaarts"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Zoom in"
-msgstr "Inzoomen"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Zoom out"
-msgstr "Uitzoomen"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Enter/Exit"
-msgstr "Instappen/Uitstappen"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Change camera"
-msgstr "Camera veranderen"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:197
-msgid "Jump"
-msgstr "Spring"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Sprint"
-msgstr "Sprint"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Look behind"
-msgstr "Kijk achterom"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Crouch"
-msgstr "Bukken"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Action"
-msgstr "Actie"
-
-#: Client/core/CKeyBinds.cpp:202
-msgid "Walk"
-msgstr "Lopen"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Vehicle fire"
-msgstr "Schieten uit voertuig"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Vehicle secondary fire"
-msgstr "Alternatief schieten uit voertuig"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Vehicle left"
-msgstr "Voertuig links"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Vehicle right"
-msgstr "Voertuig rechts"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:207
-msgid "Steer forwards/down"
-msgstr "Stuur vooruit/naar beneden"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Steer backwards/up"
-msgstr "Stuur vooruit/omhoog"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Accelerate"
-msgstr "Versnellen"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Brake/Reverse"
-msgstr "Rem/Achteruit"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Radio next"
-msgstr "Volgend radio station"
-
-#: Client/core/CKeyBinds.cpp:212
-msgid "Radio previous"
-msgstr "Vorig radio station"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Radio user track skip"
-msgstr "User Track Player nummer overslaan"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Horn"
-msgstr "Claxon"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Sub-mission"
-msgstr "Sub-missie"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Handbrake"
-msgstr "Handrem"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:217
-msgid "Vehicle look left"
-msgstr "Voertuig kijk links"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Vehicle look right"
-msgstr "Voertuig kijk rechts"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Vehicle look behind"
-msgstr "Voertuig kijk achterom"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Vehicle mouse look"
-msgstr "Voertuig muis kijk"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Special control left"
-msgstr "Speciale controle links"
-
-#: Client/core/CKeyBinds.cpp:222
-msgid "Special control right"
-msgstr "Speciale controle rechts"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Special control down"
-msgstr "Special controle beneden"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Special control up"
-msgstr "Speciale controle omhoog"
-
-#: Client/core/CKeyBinds.cpp:225
-msgid "Aim weapon"
-msgstr "Richt wapen"
-
-#: Client/core/CKeyBinds.cpp:226
-msgid "Conversation yes"
-msgstr "Accepteer gesprek"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:227
-msgid "Conversation no"
-msgstr "Geen gesprek voeren"
-
-#: Client/core/CKeyBinds.cpp:228
-msgid "Group control forwards"
-msgstr "Groepbesturing vooruit"
-
-#: Client/core/CKeyBinds.cpp:229
-msgid "Group control backwards"
-msgstr "Groepsbesturing achteruit"
-
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Het gekozen thema kon niet geladen worden, en het standaard uiterlijk kon ook niet geladen worden, gelieve MTA te herinstalleren."
 
-#: Client/core/CVersionUpdater.cpp:624
-msgid "Busy"
-msgstr "Bezig"
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Verbinding mislukt. Ongeldige gebruikersnaam opgegeven!"
 
-#: Client/core/CVersionUpdater.cpp:624
-msgid "Can't check for updates right now"
-msgstr "Kan momenteel niet op updates controleren"
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Verbinding mislukt. Ongeldige host opgegeven!"
 
-#: Client/core/CVersionUpdater.cpp:1565 Client/core/CVersionUpdater.cpp:1585
-#: Client/core/CVersionUpdater.cpp:1603
+#: Client/core/CConnectManager.cpp:126
 #, c-format
-msgid "MTA:SA %s required"
-msgstr "MTA:SA %s nodig"
+msgid "Connecting to %s at port %u failed!"
+msgstr "Verbinding met %s op poort %u is mislukt!"
 
-#: Client/core/CVersionUpdater.cpp:1566
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
 #, c-format
-msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr "Een nieuwere versie van MTA:SA %s is nodig om de geselecteerde server binnen te komen.\n\n"
-"Wilt u de nieuwere versie van MTA:SA %s downloaden en installeren?"
+msgid "Connecting to %s:%u ..."
+msgstr "Verbinden met %s:%u ..."
 
-#: Client/core/CVersionUpdater.cpp:1586
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+msgid "CONNECTING"
+msgstr "VERBINDEN"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
+msgid "Connection timed out"
+msgstr "Verbinden duurde te lang"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1230
+msgid "Disconnected: unknown protocol error"
+msgstr "Verbinding verbroken: onbekende protocol fout"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1234
+msgid "Disconnected: disconnected remotely"
+msgstr "Verbinding verbroken: verbroken op afstand"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1238
+msgid "Disconnected: connection lost remotely"
+msgstr "Verbinding verbroken: verbinding verloren op afstand"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
+msgid "Disconnected: you are banned from this server"
+msgstr "Verbinding verbroken: u bent verbannen van deze server"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1250
+msgid "Disconnected: disconnected from the server"
+msgstr "Verbinding verbroken: verbinding verbroken met de server"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+msgid "Disconnected: connection to the server was lost"
+msgstr "Verbinding verbroken: verbinding naar de server is verbroken"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+msgid "Disconnected: connection was refused"
+msgstr "Verbinding verbroken: verbinding geweigerd"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
 #, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Wilt u MTA:SA %s starten en verbinden met deze server?"
+msgid "No such mod installed (%s)"
+msgstr "Geen dergelijke mod geïnstalleerd (%s)"
 
-#: Client/core/CVersionUpdater.cpp:1604
-msgid "It is not possible to connect at this time.\n\n"
-"Please try later."
-msgstr "Op dit moment is het niet mogelijk te verbinden.\n\n"
-"Probeer het later nog een keer."
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Slecht antwoord van de server (2)"
 
-#: Client/core/CVersionUpdater.cpp:1786
-msgid "Connecting"
-msgstr "Aan het verbinden"
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Slecht antwoord van de server (1)"
 
-#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
-msgid "Please wait..."
-msgstr "Gelieve te wachten..."
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Was niet in staat om Direct3D9 te initialiseren.\n\n"
+"Gelieve ervoor te zorgen dat de DirectX End-User Runtime en\n"
+"laatste Windows Service Packs correct geïnstalleerd zijn."
 
-#: Client/core/CVersionUpdater.cpp:1802
-msgid "CHECKING"
-msgstr "CONTROLEREN"
-
-#: Client/core/CVersionUpdater.cpp:1819 Client/core/CVersionUpdater.cpp:1912
-msgid "UPDATE CHECK"
-msgstr "ZOEKEN NAAR UPDATES"
-
-#: Client/core/CVersionUpdater.cpp:1820
-msgid "No update needed"
-msgstr "Geen update nodig"
-
-#: Client/core/CVersionUpdater.cpp:1837
-msgid "DOWNLOADING"
-msgstr "AAN HET DOWNLOADEN"
-
-#: Client/core/CVersionUpdater.cpp:1838
-msgid "waiting..."
-msgstr "wachten..."
-
-#: Client/core/CVersionUpdater.cpp:1854
-msgid "MANDATORY UPDATE"
-msgstr "VERPLICHTE UPDATE"
-
-#: Client/core/CVersionUpdater.cpp:1855
-msgid "To join this server, you must update MTA.\n\n"
-" Do you want to update now ?"
-msgstr "Om deze server te joinen moet u MTA updaten.\n\n"
-" Wilt u nu updaten?"
-
-#: Client/core/CVersionUpdater.cpp:1873
-msgid "OPTIONAL UPDATE"
-msgstr "OPTIONELE UPDATE"
-
-#: Client/core/CVersionUpdater.cpp:1874
-msgid "Server says an update is recommended, but not essential.\n\n"
-" Do you want to update now ?"
-msgstr "De server raad een update aan, dit is echter niet noodzakelijk.\n\n"
-" Wilt u nu updaten?"
-
-#: Client/core/CVersionUpdater.cpp:1913
-msgid "Update not currently avalable.\n\n"
-"Please check www.mtasa.com"
-msgstr "Update momenteel niet beschikbaar.\n\n"
-"Gelieve www.mtasa.com te raadplegen"
-
-#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
-msgid "ERROR SAVING"
-msgstr "ERROR BIJ HET OPSLAAN"
-
-#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
-msgid "Unable to create the file."
-msgstr "Kon het bestand niet maken."
-
-#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:1952
-#: Client/core/CVersionUpdater.cpp:2125 Client/core/CVersionUpdater.cpp:2134
-msgid "ERROR DOWNLOADING"
-msgstr "FOUT BIJ HET DOWNLOADEN"
-
-#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:2126
-msgid "The downloaded file appears to be incorrect."
-msgstr "Het gedownloade bestand lijkt verkeerd."
-
-#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:2135
-msgid "For some reason."
-msgstr "Om de een of andere reden."
-
-#: Client/core/CVersionUpdater.cpp:1964 Client/core/CVersionUpdater.cpp:2148
-msgid "DOWNLOAD COMPLETE"
-msgstr "DOWNLOAD VOLTOOID"
-
-#: Client/core/CVersionUpdater.cpp:1988
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr " - Onbekend probleem in _DialogUpdateResult"
-
-#: Client/core/CVersionUpdater.cpp:2086 Client/core/CVersionUpdater.cpp:2096
-msgid "Ok"
-msgstr "Oké"
-
-#: Client/core/CVersionUpdater.cpp:2094
-msgid "ERROR"
-msgstr "FOUT"
-
-#: Client/core/CVersionUpdater.cpp:2095
-msgid "Some MTA:SA data files are missing.\n\n\n"
-"Please reinstall MTA:SA"
-msgstr "Sommige MTA:SA data bestanden ontbreken.\n\n\n"
-"Gelieve MTA:SA te herinstalleren"
-
-#: Client/core/CVersionUpdater.cpp:2722
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
 #, c-format
-msgid "%3d %% completed"
-msgstr "%3d %% voltooid"
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Screenshot heeft %d bytes, maar verwachtte %d"
 
-#: Client/core/CVersionUpdater.cpp:2724
-#, c-format
-msgid "\n\n"
-"Waiting for response  -  %-3d"
-msgstr "\n\n"
-"Wachten op antwoord  -  %-3d"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "CONSOLE"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Command of cvar onbekend: "
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Wilt u online ondersteuning voor dit probleem?"
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr ""
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "Bezoek laatste nieuwsartikel"
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "Screenshot mislukt"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
@@ -2858,6 +2391,12 @@ msgstr "Probeert LAN servers te vinden"
 msgid "SERVER BROWSER"
 msgstr "SERVER BROWSER"
 
+#. Create the tabs
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+msgid "Internet"
+msgstr "Internet"
+
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
 msgstr "Lokaal"
@@ -2996,26 +2535,486 @@ msgstr "Onbekend protocol"
 msgid "Please use the mtasa:// protocol!"
 msgstr "Gebruik a.u.b. het mtasa:// protocol!"
 
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/mods/deathmatch/logic/CClientGame.cpp:590
+#: Client/mods/deathmatch/logic/CClientGame.cpp:688
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Ongeldige gebruikersnaam! Gelieve naar Instellingen te gaan en een nieuwe instellen!"
+
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Je moet een server selecteren om mee te verbinden."
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Was niet in staat om Direct3D9 te initialiseren.\n\n"
-"Gelieve ervoor te zorgen dat de DirectX End-User Runtime en\n"
-"laatste Windows Service Packs correct geïnstalleerd zijn."
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Website verzoeken"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "De server vraagt toestemming om de volgende websites (later) te laden:"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "NOOIT GEVOELIGE GEGEVENS INGEVEN ZODAT ZE NIET GESTOLEN WORDEN"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Mijn keuze onthouden"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Weigeren"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1380
+msgid "Problem with graphics driver"
+msgstr "Probleem met het stuurprogramma van je videokaart"
+
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "Deze versie is verlopen."
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "Verbinding verbroken"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "toon de naamplaatjes"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "toont de chatbox"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "toont de netwerk statistieken"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "open the chat input"
+msgstr "opent de chat invoer"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "transmits voice to other players"
+msgstr "zend stem uit naar andere spelers"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "enters a car as passenger"
+msgstr "stapt in een auto als passagier"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "next radio channel"
+msgstr "volgende radio zender"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "previous radio channel"
+msgstr "vorige radio zender"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "enables the radar view"
+msgstr "zet de radar zicht aan"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar in"
+msgstr "zoomt de radar in"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "zooms the radar out"
+msgstr "zoomt de radar uit"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar north"
+msgstr "verplaatst de radar naar het noorden"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar south"
+msgstr "verplaatst de radar naar het zuiden"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar east"
+msgstr "verplaats de radar naar het oosten"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "moves the radar west"
+msgstr "verplaatst de radar naar het westen"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "attaches the radar"
+msgstr "zet de radar vast"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "reduces radar opacity"
+msgstr "Verlaagt de radar transparantie"
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "increases radar opacity"
+msgstr "verlaagt de radar transparantie"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "toggles radar help text"
+msgstr "toont radar help tekst"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "sends a message to the targetted player"
+msgstr "zend een bericht naar een bepaalde speler"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "verander naar een volgend wapen wanneer je in een voertuig zit"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "verander naar een vorig wapen wanneer je in een voertuig zit"
+
+#: Client/mods/deathmatch/CClient.cpp:82
+msgid "outputs info about the current server"
+msgstr "toont informatie omtrent de huidige server"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:85
+msgid "defines the scale multiplier of all text-displays"
+msgstr "bepaald de schaal vermenigvuldiger van alle tekst-voorstellingen"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) shows the colshapes"
+msgstr "(Ontwikkelingsmodus) toont alle colvormen"
+
+#: Client/mods/deathmatch/CClient.cpp:93
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(Ontwikkelingsmodus) toont geluid-ids in een debug venster"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Kon lokale server niet starten. Bekijk de console voor details."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Screenshot heeft %d bytes, maar verwachtte %d"
+msgid "Error: Could not start local server. [%s]"
+msgstr "Fout: Kon lokale server niet starten. [%s]"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Screenshot mislukt"
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "HOST SPEL"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Bronnen"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Server naam:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Wachtwoord:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Max spelers:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Uitzenden:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "LAN"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Geselecteerde"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Alle"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Start"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Kaart download vooruitgang:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Download Vooruitgang:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s van %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Verbreek de verbinding om het downloaden te stoppen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
+msgid "Disconnected: Invalid nickname"
+msgstr "Verbinding verbroken: Ongeldige gebruikersnaam"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
+msgid "Disconnect from server"
+msgstr "Verbinding verbroken"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "Verbinding verbroken: Serienummer is verbannen.\n"
+"Reason: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "Verbinding verbroken: U werd verbannen.\n"
+" Reden: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Verbinding verbroken: Account is verbannen.\n"
+"Reden: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
+msgid "Disconnected: Version mismatch"
+msgstr "Verbinding verbroken: Versies komen niet overeen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "Verbinding verbroken: Teveel aanmeldingen. Een minuut wachten alstublieft, probeer het dan opnieuw."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Verbinding verbroken: Server van andere tak.\n"
+"Informatie: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "Verbinding verbroken: Slechte versie.\n"
+"Informatie: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "Verbinding verbroken: Server draait een nieuwere versie.\n"
+"Informatie: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "Verbinding verbroken: Server draait een oudere versie.\n"
+"Informatie: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+msgid "Disconnected: Nick already in use"
+msgstr "Verbinding verbroken: Gebruikersnaam al in gebruik"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
+msgid "Disconnected: Player element could not be created."
+msgstr "Verbinding verbroken: Spelerelement kon niet worden aangemaakt."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Verbinding verbroken: server weigerde de verbinding: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
+msgid "Disconnected: Serial verification failed"
+msgstr "Verbinding verbroken: Serienummer verificatie mislukt"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Verbinding verbroken: Verbindings-desynchronisatie %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Verbinding verbroken: U werd uit de server gegooid door %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Verbinding verbroken: U werd verbannen door %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "Verbinding verbroken: Server is uitgezet of wordt opnieuw opgestart"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
+msgid "You were kicked from the game"
+msgstr "U werd uit het spel gegooid"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "Deze server vereist een originele gta_sa.exe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+msgid "Please replace gta_sa.exe"
+msgstr "Gelieve gta_sa.exe te vervangen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "Deze server staat aangepaste D3D9.DLLs niet toe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "Verwijder D3D9.DLL uit je GTA-installatiemap en herstart MTA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
+msgid "This server does not allow virtual machines"
+msgstr "Deze server staat geen virtuele machines toe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+msgid "This server requires driver signing to be enabled"
+msgstr "Deze server vereist de naleving van digitaal ondertekende stuurprogramma's (\"Driver Signing Enforcement\" moet aan staan)"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+msgid "Please restart your PC"
+msgstr "Herstart je computer"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+msgid "This server has detected missing anti-cheat components"
+msgstr "Deze server heeft ontbrekende anti-cheat componenten gedetecteerd"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+msgid "Try restarting MTA"
+msgstr "Probeer MTA opnieuw te starten"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "Deze server vereist originele versies van gta3.img en gta_int.img"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "Gelieve gta3.img of gta_int.img te vervangen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+msgid "This server does not allow Wine"
+msgstr "Deze server staat Wine niet toe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "Zorg ervoor dat geen ander programma MTA:SA (of diens geheugen) aanpast"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "Time Remaining: "
+msgstr "Resterende Tijd: "
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dag"
+msgstr[1] "%d dagen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d uur"
+msgstr[1] "%d uren"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuut"
+msgstr[1] "%d minuten"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d seconde"
+msgstr[1] "%d seconden"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
+msgid "Disconnected"
+msgstr "Verbinding verbroken"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Download fout: %s"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+msgid "Entering the game ..."
+msgstr "Spel aan het joinen ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:664
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Niet verbonden; gelieve Quick Connect of het 'connect' commando te gebruiken om te verbinden met een server."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:710
+msgid "The server is not installed"
+msgstr "De server is niet geïnstalleerd"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:720
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+msgid "Local Server"
+msgstr "Lokale Server"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:720
+msgid "Starting local server ..."
+msgstr "Lokale server aan het starten ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "U werd uit het spel gegooid ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+msgid "Connecting to local server..."
+msgstr "Verbinden met lokale server..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
+msgid "Error connecting to server."
+msgstr "Fout bij het verbinden met de server."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Verbinden met de lokale server duurde te lang. Zie console voor details."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
+msgid "Connection with the server was lost"
+msgstr "Verbinden met de server werd verloren"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1246
+msgid "Disconnected: the server is currently full"
+msgstr "Verbinding verbroken: de server zit momenteel vol"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
+msgid "Disconnected: invalid password specified"
+msgstr "Verbinding verbroken: verkeerd paswoord ingevoerd"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+msgid "MTA Client verification failed!"
+msgstr "MTA Client verificatie mislukt!"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
