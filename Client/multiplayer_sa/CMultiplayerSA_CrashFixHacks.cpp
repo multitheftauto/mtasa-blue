@@ -1830,6 +1830,37 @@ static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// RpClumpForAllAtomics
+//
+// Adds a nullptr check for the clump object pointer.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x749B70 | 8B 44 24 04 | mov  eax, [esp+arg_0]
+// >>> 0x749B74 | 53          | push ebx
+// >>> 0x749B75 | 55          | push ebp
+//     0x749B76 | 56          | push esi
+#define HOOKPOS_RpClumpForAllAtomics         0x749B70
+#define HOOKSIZE_RpClumpForAllAtomics        6
+static DWORD CONTINUE_RpClumpForAllAtomics = 0x749B76;
+
+static void _declspec(naked) HOOK_RpClumpForAllAtomics()
+{
+    _asm
+    {
+        mov     eax, [esp+4]    // RpClump* clump
+        test    eax, eax
+        jnz     continueAfterFixLocation
+        retn
+
+        continueAfterFixLocation:
+        push    ebx
+        push    ebp
+        jmp     CONTINUE_RpClumpForAllAtomics
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1883,6 +1914,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CVehicleModelInfo__LoadVehicleColours_2);
     EZHookInstall(CPlaceName__Process);
     EZHookInstall(CWorld__FindObjectsKindaCollidingSectorList);
+    EZHookInstall(RpClumpForAllAtomics);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
