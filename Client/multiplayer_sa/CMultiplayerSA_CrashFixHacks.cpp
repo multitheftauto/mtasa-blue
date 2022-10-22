@@ -10,10 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CAnimManager.h>
 #include "../game_sa/CTrainSA.h"
 #include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
+#include "../game_sa/TaskBasicSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -1783,6 +1785,49 @@ static void _declspec(naked) HOOK_CPlaceName__Process()
     }
 }
 
+static void LOG_CWorld__FindObjectsKindaCollidingSectorList(unsigned int modelId)
+{
+    CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[modelId];
+    if (!pModelInfo)
+    {
+        LogEvent(840, "Model info missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt model: %d", modelId), 5601);
+        return;
+    }
+
+    if (!pModelInfo->pColModel)
+    {
+        LogEvent(840, "Col model missing", "CWorld__FindObjectsKindaCollidingSectorList", SString("Corrupt col model: %d", modelId), 5601);
+    }
+}
+
+#define HOOKPOS_CWorld__FindObjectsKindaCollidingSectorList 0x56508C
+#define HOOKSIZE_CWorld__FindObjectsKindaCollidingSectorList 0xA
+static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0x565096;
+static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
+static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
+{
+    _asm {
+        mov eax, [edx*4+0xA9B0C8]   // CModelInfo::ms_modelInfoPtrs
+        test eax, eax
+        jz skip
+
+        mov ecx, [eax+0x14]         // m_pColModel
+        test ecx, ecx
+        jz skip
+
+        jmp RETURN_CWorld__FindObjectsKindaCollidingSectorList
+
+    skip:
+        pushad
+        push edx
+        call LOG_CWorld__FindObjectsKindaCollidingSectorList
+        add esp, 4
+        popad
+
+        jmp RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -1837,6 +1882,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CVehicleModelInfo__LoadVehicleColours_1);
     EZHookInstall(CVehicleModelInfo__LoadVehicleColours_2);
     EZHookInstall(CPlaceName__Process);
+    EZHookInstall(CWorld__FindObjectsKindaCollidingSectorList);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;

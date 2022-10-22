@@ -128,6 +128,8 @@ struct SDxStatus
         float        fFieldOfView;
         bool         bHighDetailVehicles;
         bool         bHighDetailPeds;
+        bool         bCoronaReflections;
+        bool         bDynamicPedShadows;
     } settings;
 };
 

@@ -11,7 +11,6 @@
 
 #pragma once
 
-typedef unsigned long DWORD;
 class CVector;
 
 class CRopes

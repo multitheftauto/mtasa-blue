@@ -50,6 +50,13 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
+        case eModelInfoType::TIME:
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeTimedObjectModel(usParentID);
+                return true;
+            }
+            break;
         case eModelInfoType::VEHICLE:
             if (g_pClientGame->GetVehicleManager()->IsValidModel(usParentID))
             {
@@ -108,6 +115,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             break;
         }
         case eModelInfoType::ATOMIC:
+        case eModelInfoType::TIME:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
             unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();

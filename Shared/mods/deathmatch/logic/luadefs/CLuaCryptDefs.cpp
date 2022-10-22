@@ -54,9 +54,88 @@ std::string CLuaCryptDefs::Sha256(std::string strSourceData)
     return GenerateSha256HexString(strSourceData);
 }
 
-std::string CLuaCryptDefs::Hash(EHashFunctionType hashFunction, std::string strSourceData)
+std::variant<std::string, bool> CLuaCryptDefs::Hash(lua_State* const luaVM, HashFunctionType hashFunction, std::string strSourceData,
+                                                    std::optional<std::unordered_map<std::string, std::string>> options)
 {
-    return GenerateHashHexString(hashFunction, strSourceData).ToLower();
+    try
+    {
+        switch (hashFunction)
+        {
+            case HashFunctionType::MD5:
+                return SharedUtil::Hash<CryptoPP::MD5>(strSourceData).ToLower();
+
+            case HashFunctionType::SHA1:
+                return SharedUtil::Hash<CryptoPP::SHA1>(strSourceData).ToLower();
+
+            case HashFunctionType::SHA224:
+                return SharedUtil::Hash<CryptoPP::SHA224>(strSourceData).ToLower();
+
+            case HashFunctionType::SHA256:
+                return SharedUtil::Hash<CryptoPP::SHA256>(strSourceData).ToLower();
+
+            case HashFunctionType::SHA384:
+                return SharedUtil::Hash<CryptoPP::SHA384>(strSourceData).ToLower();
+
+            case HashFunctionType::SHA512:
+                return SharedUtil::Hash<CryptoPP::SHA512>(strSourceData).ToLower();
+
+            case HashFunctionType::HMAC:
+
+                // check does option table exists
+                if (!options.has_value())
+                    throw std::invalid_argument("Invalid value for fields 'key' and 'algorithm'");
+
+                // vars
+                std::unordered_map<std::string, std::string>& optionsMap = options.value();
+                std::string&                                  key = optionsMap["key"];
+                std::string&                                  algorithm = optionsMap["algorithm"];
+                HmacAlgorithm                                 hmacAlgorithm;
+
+                // check does key option is empty
+                if (key.empty())
+                    throw std::invalid_argument("Invalid value for field 'key'");
+
+                // check does algorithm option is empty
+                if (algorithm.empty())
+                    throw std::invalid_argument("Invalid value for field 'algorithm'");
+
+                // Parse algorithm string to enum
+                StringToEnum(algorithm, hmacAlgorithm);
+
+                // process
+                switch (hmacAlgorithm)
+                {
+                    case HmacAlgorithm::MD5:
+                        return SharedUtil::Hmac<CryptoPP::MD5>(strSourceData, key).ToLower();
+
+                    case HmacAlgorithm::SHA1:
+                        return SharedUtil::Hmac<CryptoPP::SHA1>(strSourceData, key).ToLower();
+
+                    case HmacAlgorithm::SHA224:
+                        return SharedUtil::Hmac<CryptoPP::SHA224>(strSourceData, key).ToLower();
+
+                    case HmacAlgorithm::SHA256:
+                        return SharedUtil::Hmac<CryptoPP::SHA256>(strSourceData, key).ToLower();
+
+                    case HmacAlgorithm::SHA384:
+                        return SharedUtil::Hmac<CryptoPP::SHA384>(strSourceData, key).ToLower();
+
+                    case HmacAlgorithm::SHA512:
+                        return SharedUtil::Hmac<CryptoPP::SHA512>(strSourceData, key).ToLower();
+
+                }
+
+                throw std::invalid_argument("Invalid hmac algorithm");
+        }
+
+        throw std::invalid_argument("Unknown algorithm");
+
+    }
+    catch (std::exception& ex)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, ex.what());
+        return false;
+    }
 }
 
 std::string CLuaCryptDefs::TeaEncode(std::string str, std::string key)

@@ -11,6 +11,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRenderWareSA.ShaderSupport.h"
 #include "CRenderWareSA.ShaderMatching.h"
 
 #define ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName        0x06FDF40

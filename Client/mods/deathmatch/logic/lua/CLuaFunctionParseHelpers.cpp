@@ -7,6 +7,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 
 //
 // enum values <-> script strings
@@ -663,6 +664,7 @@ IMPLEMENT_ENUM_CLASS_BEGIN(eModelInfoType)
 ADD_ENUM(eModelInfoType::PED, "ped")
 ADD_ENUM(eModelInfoType::ATOMIC, "object")
 ADD_ENUM(eModelInfoType::VEHICLE, "vehicle")
+ADD_ENUM(eModelInfoType::TIME, "timed-object")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects

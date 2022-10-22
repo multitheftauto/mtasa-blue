@@ -10,6 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CClock.h>
+#include <game/CFireManager.h>
+#include <game/CGarage.h>
+#include <game/CGarages.h>
+#include <game/CHandlingEntry.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
+#include <game/CWeather.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
 

@@ -12,11 +12,7 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-
 #include <game/RenderWare.h>
-#include <windows.h>
-#include <stdio.h>
 
 struct CColModelSAInterface;
 

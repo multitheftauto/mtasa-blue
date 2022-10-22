@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
 #include "SharedUtil.Thread.h"

@@ -13,6 +13,7 @@ class CClientModel;
 #pragma once
 
 #include <list>
+#include "game/CModelInfo.h"
 
 class CResource;
 class CClientManager;
@@ -23,15 +24,15 @@ class CClientModel final
 
 public:
     CClientModel(CClientManager* pManager, int iModelID, eModelInfoType eModelType);
-    ~CClientModel(void);
+    ~CClientModel();
 
-    int              GetModelID(void) const { return m_iModelID; };
-    eModelInfoType   GetModelType(void) const { return m_eModelType; };
+    int              GetModelID() const { return m_iModelID; };
+    eModelInfoType   GetModelType() const { return m_eModelType; };
     bool             Allocate(ushort usParentID);
-    bool             Deallocate(void);
+    bool             Deallocate();
     void             RestoreEntitiesUsingThisModel();
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
-    CResource*       GetParentResource(void) const { return m_pParentResource; }
+    CResource*       GetParentResource() const { return m_pParentResource; }
 
 protected:
     CClientManager* m_pManager;
