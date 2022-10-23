@@ -657,7 +657,7 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         auto modelManager = m_pManager->GetModelManager();
-        if (modelManager->Remove(iModelID))
+        if (modelManager->RemoveClientModel(iModelID))
         {
             lua_pushboolean(luaVM, true);
             return 1;

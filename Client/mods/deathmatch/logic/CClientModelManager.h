@@ -29,6 +29,7 @@ public:
 
     void Add(const std::shared_ptr<CClientModel>& pModel);
     bool Remove(const int modelId);
+    bool RemoveClientModel(const int modelId);
 
     int GetFirstFreeModelID(void);
 

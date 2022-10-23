@@ -58,6 +58,18 @@ bool CClientModelManager::Remove(const int modelId)
     return false;
 }
 
+bool CClientModelManager::RemoveClientModel(const int modelId)
+{
+    if (m_Models[modelId] == nullptr)
+        return false;
+
+    // Model was allocated clientside
+    if (!m_Models[modelId]->GetParentResource())
+        return false;
+
+    return Remove(modelId);
+}
+
 int CClientModelManager::GetFirstFreeModelID(void)
 {
     const unsigned int MAX_MODEL_ID = g_pGame->GetBaseIDforTXD();
