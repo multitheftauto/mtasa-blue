@@ -1861,6 +1861,64 @@ static void _declspec(naked) HOOK_RpClumpForAllAtomics()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// RpAnimBlendClumpGetFirstAssociation
+//
+// Adds a nullptr check for the clump object pointer.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x4D6A70 | 8B 0D 78 F8 B5 00 | mov ecx, ds:_ClumpOffset
+//     0x4D6A76 | 8B 44 24 04       | mov eax, [esp+4]
+#define HOOKPOS_RpAnimBlendClumpGetFirstAssociation         0x4D6A70
+#define HOOKSIZE_RpAnimBlendClumpGetFirstAssociation        6
+static DWORD CONTINUE_RpAnimBlendClumpGetFirstAssociation = 0x4D6A76;
+
+static void _declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
+{
+    _asm
+    {
+        mov     eax, [esp+4]            // RpClump* clump
+        test    eax, eax
+        jnz     continueAfterFixLocation
+        retn
+
+        continueAfterFixLocation:
+        mov     ecx, ds:[0xB5F878]
+        jmp     CONTINUE_RpAnimBlendClumpGetFirstAssociation
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAnimManager::BlendAnimation
+//
+// Adds a nullptr check for the clump object pointer.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x4D4610 | 83 EC 14          | sub esp, 14h
+// >>> 0x4D4613 | 8B 4C 24 18       | mov ecx, [esp+18h]
+//     0x4D4617 | 8B 15 34 EA B4 00 | mov edx, CAnimManager::ms_aAnimAssocGroups
+#define HOOKPOS_CAnimManager__BlendAnimation         0x4D4610
+#define HOOKSIZE_CAnimManager__BlendAnimation        7
+static DWORD CONTINUE_CAnimManager__BlendAnimation = 0x4D4617;
+
+static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
+{
+    _asm
+    {
+        mov     eax, [esp+4]            // RpClump* clump
+        test    eax, eax
+        jnz     continueAfterFixLocation
+        retn
+
+        continueAfterFixLocation:
+        sub     esp, 14h
+        mov     ecx, [esp+18h]
+        jmp     CONTINUE_CAnimManager__BlendAnimation
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1915,6 +1973,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CPlaceName__Process);
     EZHookInstall(CWorld__FindObjectsKindaCollidingSectorList);
     EZHookInstall(RpClumpForAllAtomics);
+    EZHookInstall(RpAnimBlendClumpGetFirstAssociation);
+    EZHookInstall(CAnimManager__BlendAnimation);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
