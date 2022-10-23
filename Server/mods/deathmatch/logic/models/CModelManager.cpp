@@ -40,7 +40,7 @@ void CModelManager::RegisterModel(CModelBase* pModelHandler)
 
 bool CModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModel)
 {
-    if (uiNewModelID >= MAX_GAME_MODELS)
+    if (uiNewModelID >= MAX_GAME_MODELS || uiParentModel >= MAX_GAME_MODELS)
         return false;
 
     CModelBase* pParentModel = m_vModels[uiParentModel];
