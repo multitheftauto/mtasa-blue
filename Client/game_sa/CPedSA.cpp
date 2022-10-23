@@ -531,20 +531,24 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* vecPosition)
 CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* vecPosition)
 {
     ApplySwimAndSlopeRotations();
-    DWORD dwFunc = FUNC_GetTransformedBonePosition;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
+    CEntitySAInterface* entity = GetInterface();
+
+    // NOTE(botder): A crash used to occur at 0x7C51A8 in RpHAnimIDGetIndex, because the clump pointer might have been null
+    // for a broken model.
+    if (entity->m_pRwObject != nullptr)
     {
-        push    1
-        push    bone
-        push    vecPosition
-        mov     ecx, dwThis
-        call    dwFunc
+        // void __thiscall CPed::GetTransformedBonePosition(struct RwV3d &, unsigned int, bool)
+        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
+        const auto GameFunction = reinterpret_cast<Signature>(FUNC_GetTransformedBonePosition);
+        GameFunction(entity, vecPosition, bone, true);
     }
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
-    if (!IsValidPosition(*vecPosition))* vecPosition = *GetPosition();
+    if (!IsValidPosition(*vecPosition))
+    {
+        *vecPosition = *GetPosition();
+    }
 
     return vecPosition;
 }

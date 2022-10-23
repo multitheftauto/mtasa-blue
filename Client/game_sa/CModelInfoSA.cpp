@@ -1191,32 +1191,44 @@ void CModelInfoSA::ResetAllVehiclesWheelSizes()
     ms_VehicleModelDefaultWheelSizes.clear();
 }
 
-void CModelInfoSA::SetCustomModel(RpClump* pClump)
+bool CModelInfoSA::SetCustomModel(RpClump* pClump)
 {
-    // Error
-    if (pClump == NULL)
-        return;
-
-    // Store the custom clump
-    m_pCustomClump = pClump;
+    if (!pClump)
+        return false;
 
     // Replace the model if we're loaded.
+    bool success = false;
+
     if (IsLoaded())
     {
         switch (GetModelType())
         {
             case eModelInfoType::PED:
-                return pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                success = pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                break;
             case eModelInfoType::WEAPON:
-                return pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                break;
             case eModelInfoType::VEHICLE:
-                return pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                break;
             case eModelInfoType::ATOMIC:
             case eModelInfoType::LOD_ATOMIC:
             case eModelInfoType::TIME:
-                return pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+                break;
+            default:
+                break;
         }
     }
+
+    if (success)
+    {
+        // Store the custom clump
+        m_pCustomClump = pClump;
+    }
+
+    return success;
 }
 
 void CModelInfoSA::RestoreOriginalModel()
