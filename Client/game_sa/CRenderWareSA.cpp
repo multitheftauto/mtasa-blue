@@ -417,7 +417,10 @@ bool CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
     // NOTE(botder): The game logic requires the animation hierarchy to be present (read: it's not a corrupt model),
     // otherwise it will crash (offset 0x3c51a8).
     if (!GetAnimHierarchyFromClump(pNew))
+    {
+        LogEvent(851, "Model not replaced", "CRenderWareSA::ReplacePedModel", SString("No anim hierarchy for ped model:%d", usModelID), 5421);
         return false;
+    }
 
     return ReplaceModel(pNew, usModelID, FUNC_LoadPedModel);
 }
