@@ -16,6 +16,8 @@
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
 #include "../game_sa/TaskBasicSA.h"
+#include "../game_sa/CFxSystemBPSA.h"
+#include "../game_sa/CFxSystemSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -1919,6 +1921,77 @@ static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// FxSystemBP_c::Load
+//
+// Remove every FxEmitter without a main texture (because of non-standard /models/effects.fxp),
+// because the game logic expects AT LEAST one texture at index 0 ("main texture").
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+//     0x5C0A14 | 5E                   | pop  esi
+// >>> 0x5C0A15 | 5D                   | pop  ebp
+// >>> 0x5C0A16 | 32 C0                | xor  al, al
+// >>> 0x5C0A18 | 5B                   | pop  ebx
+// >>> 0x5C0A19 | 64 89 0D 00 00 00 00 | mov  large fs:0, ecx
+// >>> 0x5C0A20 | 81 C4 E8 05 00 00    | add  esp, 5E8h
+// >>> 0x5C0A26 | C2 0C 00             | retn 0Ch
+#define HOOKPOS_FxSystemBP_c__Load  0x5C0A15
+#define HOOKSIZE_FxSystemBP_c__Load 19
+
+static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* blueprint)
+{
+    if (!blueprint->cNumOfPrims)
+        return;
+
+    char count = blueprint->cNumOfPrims;
+    char last = count - 1;
+
+    static int logger = 0;
+
+    for (char i = last; i >= 0; i--)
+    {
+        if (blueprint->pPrims[i]->m_apTextures[0])
+            continue;
+
+        if (logger < 10)
+        {
+            LogEvent(4480, "Missing main texture for FxEmitter", "FxSystemBP_c::Load", SString("index: %d, hash: %p", (int)i, blueprint->szNameHash), 7710);
+            ++logger;
+        }
+
+        blueprint->pPrims[i] = nullptr;
+        --count;
+
+        if (i != last)
+        {
+            --last;
+            std::swap(blueprint->pPrims[i], blueprint->pPrims[last]);
+        }
+    }
+
+    blueprint->cNumOfPrims = count;
+}
+
+static void _declspec(naked) HOOK_FxSystemBP_c__Load()
+{
+    _asm
+    {
+        pushad
+        push    ebp
+        call    POST_PROCESS_FxSystemBP_c__Load
+        add     esp, 4
+        popad
+
+        pop     ebp
+        xor     al, al
+        pop     ebx
+    //  mov     large fs:0, ecx
+        add     esp, 5E8h
+        retn    0Ch
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1975,6 +2048,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(RpClumpForAllAtomics);
     EZHookInstall(RpAnimBlendClumpGetFirstAssociation);
     EZHookInstall(CAnimManager__BlendAnimation);
+    EZHookInstall(FxSystemBP_c__Load);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
