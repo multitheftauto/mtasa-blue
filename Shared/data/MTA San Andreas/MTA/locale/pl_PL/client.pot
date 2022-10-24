@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-21 14:34+0000\n"
-"PO-Revision-Date: 2022-10-24 08:22\n"
+"PO-Revision-Date: 2022-10-24 09:31\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -370,7 +370,7 @@ msgstr "Zmień nazwy tych plików z *.dll na *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:71
 msgid "Show me these files"
-msgstr "Otwórz folder"
+msgstr "Pokaż mi te pliki"
 
 #: Client/loader/Dialogs.cpp:72
 msgid "Play MTA:SA"
