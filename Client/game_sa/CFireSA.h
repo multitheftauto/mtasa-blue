@@ -12,15 +12,14 @@
 #pragma once
 
 #include <game/CFire.h>
-#include "Common.h"
-#include "CEntitySA.h"
 
-#define FUNC_Extinguish                 0x5393F0        //  ##SA##
-#define FUNC_CreateFxSysForStrength     0x539360        //  ##SA##
+class CEntitySAInterface;
+class FxSystem_c;
 
-class FxSystem_c;            // we don't actually define this anywhere
+#define FUNC_Extinguish                 0x5393F0
+#define FUNC_CreateFxSysForStrength     0x539360
 
-class CFireSAInterface : public CFireInterface
+class CFireSAInterface
 {
 public:
     BYTE                bActive : 1;
@@ -36,8 +35,7 @@ public:
     float               Strength;
     signed char         nNumGenerationsAllowed;
     BYTE                RemovalDist;
-
-    FxSystem_c* m_fxSysPtr;
+    FxSystem_c* 		m_fxSysPtr;
 };
 
 class CFireSA : public CFire
@@ -46,7 +44,6 @@ private:
     CFireSAInterface* internalInterface;
 
 public:
-    // constructor
     CFireSA(CFireSAInterface* fireInterface) { this->internalInterface = fireInterface; }
 
     void            Extinguish();
@@ -57,13 +54,13 @@ public:
     CEntity*        GetCreator();
     CEntity*        GetEntityOnFire();
     void            SetTarget(CEntity* entity);
-    BOOL            IsIgnited();
-    BOOL            IsFree();
-    void            SetSilent(BOOL bSilent);
-    BOOL            IsBeingExtinguished();
+    bool            IsIgnited();
+    bool            IsFree();
+    void            SetSilent(bool bSilent);
+    bool            IsBeingExtinguished();
     void            Ignite();
     float           GetStrength();
     void            SetStrength(float fStrength);
     void            SetNumGenerationsAllowed(char generations);
-    CFireInterface* GetInterface() { return this->internalInterface; }
+    CFireSAInterface* GetInterface() { return this->internalInterface; }
 };

@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CWeather.h>
-#include "Common.h"
 
 class CWeatherSA : public CWeather
 {

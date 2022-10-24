@@ -14,19 +14,11 @@
 #include <game/CRadar.h>
 #include "CMarkerSA.h"
 
-/**
- * \todo GAME RELEASE: Update CMarker array see 0x585fe0 for example
- */
-#define ARRAY_CMarker                       0xBA86F0 // ##SA##
-#define MAX_MARKERS                         175 // ##SA##
+#define ARRAY_CMarker                       0xBA86F0
+#define MAX_MARKERS                         175
 
-// 005853d0      public: static void __cdecl CRadar::DrawAreaOnRadar(class CRect const &,class CRGBA const &,bool)
 #define FUNC_DrawAreaOnRadar                0x5853d0
-// 00583820        public: static int __cdecl CRadar::SetCoordBlip(enum eBlipType,class CVector,unsigned int,enum eBlipDisplay,char *)
 #define FUNC_SetCoordBlip                   0x583820
-
-#define VAR_3DMarkerColorMission            0x68F958
-#define VAR_3DMarkerColorNormal             0x68F95C
 
 class CRadarSA : public CRadar
 {
@@ -35,5 +27,5 @@ public:
     ~CRadarSA();
     CMarker* CreateMarker(CVector* vecPosition);
     CMarker* GetFreeMarker();
-    void DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color);
+    void DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color);
 };

@@ -12,7 +12,8 @@
 #pragma once
 
 #include <game/CExplosion.h>
-#include "CEntitySA.h"
+
+class CEntitySAInterface;
 
 class CExplosionSAInterface            // 124 bytes, ok
 {
@@ -53,7 +54,7 @@ public:
     void           SetExplosionPosition(const CVector* vecPosition);
     CEntity*       GetExplosionCreator();
     CEntity*       GetExplodingEntity();
-    BOOL           IsActive();
+    bool           IsActive();
     void           Remove();
     float          GetExplosionForce();
     void           SetExplosionForce(float fForce);

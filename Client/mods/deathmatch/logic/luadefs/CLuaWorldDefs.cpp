@@ -8,6 +8,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
+#include <game/CWeather.h>
+#include <game/CColPoint.h>
+#include <game/CCoronas.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()

@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAESoundManagerSA.h"
+#include "CAudioEngineSA.h"
+#include "CPhysicalSA.h"
+#include "CSettingsSA.h"
 
 #define HOOKPOS_CAEAmbienceTrackManager_CheckForPause       0x4D6E21
 DWORD RETURN_CAEAmbienceTrackManager_CheckForPause = 0x4D6E27;
@@ -153,7 +157,6 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)            // may prevent a crash
     {
-        DEBUG_TRACE("VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwSound)");
         DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
         float fSpeed = 1.0f;
         float fVolumeChange = 0.0f;
@@ -220,7 +223,6 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0)            // may prevent a crash
     {
-        DEBUG_TRACE("VOID CAudioEngineSA::PlayBeatTrack ( short iTrack )");
         DWORD dwFunc = FUNC_PreloadBeatTrack;
         DWORD dwTrack = iTrack;
         _asm

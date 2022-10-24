@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCameraSA.h"
+#include "CEntitySA.h"
+#include "COffsets.h"
+#include "CSettingsSA.h"
+#include "CWeatherSA.h"
 
 void COffsets::Initialize10EU()
 {

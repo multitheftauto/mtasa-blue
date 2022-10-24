@@ -12,10 +12,9 @@
 #pragma once
 
 #include "Common.h"
-#include <CVector.h>
 
-#include <windows.h>
-#include "RenderWare.h"
+class CVector;
+struct RwTexture;
 
 class CRegisteredCorona
 {

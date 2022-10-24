@@ -10,14 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAutomobileSA.h"
 
 /**
  * \todo Spawn automobiles with engine off
  */
 CAutomobileSA::CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)
 {
-    DEBUG_TRACE("CAutomobileSA::CAutomobileSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
-
     // create our mirror classes
     for (int i = 0; i < MAX_DOORS; i++)
         this->door[i] = new CDoorSA(&((CAutomobileSAInterface*)this->GetInterface())->m_doors[i]);
@@ -26,7 +25,6 @@ CAutomobileSA::CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation,
 
 CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* automobile)
 {
-    DEBUG_TRACE("CAutomobileSA::CAutomobileSA( CAutomobileSAInterface * automobile )");
     // just so it can be passed on to CVehicle
 }
 
@@ -41,7 +39,6 @@ CAutomobileSA::~CAutomobileSA()
 
 bool CAutomobileSA::BurstTyre(DWORD dwTyreID)
 {
-    DEBUG_TRACE("bool CAutomobileSA::BurstTyre ( DWORD dwTyreID )");
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CAutomobile_BurstTyre;
     bool  bReturn;
@@ -59,7 +56,6 @@ bool CAutomobileSA::BurstTyre(DWORD dwTyreID)
 
 bool CAutomobileSA::BreakTowLink()
 {
-    DEBUG_TRACE("bool CAutomobileSA::BreakTowLink ( void )");
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CAutomobile_BreakTowLink;
     bool  bReturn;
@@ -76,7 +72,6 @@ bool CAutomobileSA::BreakTowLink()
 
 bool CAutomobileSA::IsComponentPresent(int iComponentID)
 {
-    DEBUG_TRACE("bool CAutomobileSA::IsComponentPresent ( int iComponentID )");
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CAutomobile_IsComponentPresent;
     bool  bReturn;
@@ -94,7 +89,6 @@ bool CAutomobileSA::IsComponentPresent(int iComponentID)
 
 void CAutomobileSA::ResetSuspension()
 {
-    DEBUG_TRACE("void CAutomobileSA::ResetSuspension ( void )");
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CAutomobile_ResetSuspension;
 
@@ -107,7 +101,6 @@ void CAutomobileSA::ResetSuspension()
 
 void CAutomobileSA::SetTaxiLight(bool bState)
 {
-    DEBUG_TRACE("void CAutomobileSA::SetTaxiLight ( bool bState )");
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwState = (DWORD)bState;
     DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;
@@ -122,7 +115,6 @@ void CAutomobileSA::SetTaxiLight(bool bState)
 
 CPhysical* CAutomobileSA::SpawnFlyingComponent(int iCarNodeIndex, int iUnknown)
 {
-    DEBUG_TRACE("CPhysical* CAutomobileSA::SpawnFlyingComponent ( int iCarNodeIndex, int iUnknown )");
     DWORD      dwThis = (DWORD)GetInterface();
     DWORD      dwFunc = FUNC_CAutomobile_SpawnFlyingComponent;
     CPhysical* pReturn;
@@ -141,6 +133,5 @@ CPhysical* CAutomobileSA::SpawnFlyingComponent(int iCarNodeIndex, int iUnknown)
 
 CDoor* CAutomobileSA::GetDoor(eDoors doorID)
 {
-    DEBUG_TRACE("CDoor * CAutomobileSA::GetDoor(eDoors doorID)");
     return this->door[doorID];
 }

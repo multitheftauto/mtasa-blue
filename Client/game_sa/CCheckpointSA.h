@@ -12,8 +12,6 @@
 #pragma once
 
 #include <game/CCheckpoint.h>
-#include <CMatrix_Pad.h>
-#include "Common.h"
 
 class CCheckpointSAInterface
 {
@@ -39,7 +37,6 @@ private:
     CCheckpointSAInterface* internalInterface;
 
 public:
-    // constructor
     CCheckpointSA(CCheckpointSAInterface* checkpointInterface) { internalInterface = checkpointInterface; };
 
     CCheckpointSAInterface* GetInterface() { return internalInterface; }
@@ -50,12 +47,12 @@ public:
     CVector* GetPointDirection();
     DWORD    GetType();                      // need enum?
     void     SetType(WORD wType);            // doesn't work propperly (not virtualed)
-    BOOL     IsActive();
+    bool     IsActive();
     void     Activate();
     DWORD    GetIdentifier();
     void     SetIdentifier(DWORD dwIdentifier);
-    SColor   GetColor();
-    void     SetColor(const SColor color);
+    SharedUtil::SColor   GetColor();
+    void     SetColor(const SharedUtil::SColor color);
     void     SetPulsePeriod(WORD wPulsePeriod);
     void     SetRotateRate(short RotateRate);
     float    GetSize();

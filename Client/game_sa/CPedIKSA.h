@@ -12,8 +12,6 @@
 #pragma once
 
 #include <game/CPedIK.h>
-#include "Common.h"
-#include <CVector.h>
 
 class CPedSAInterface;
 
@@ -69,7 +67,6 @@ private:
     CPedIKSAInterface* internalInterface;
 
 public:
-    // constructor
     CPedIKSA(CPedIKSAInterface* ikInterface) { internalInterface = ikInterface; };
 
     // r*'s functions

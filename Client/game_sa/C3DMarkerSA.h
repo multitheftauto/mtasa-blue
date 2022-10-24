@@ -13,7 +13,6 @@
 
 #include <game/C3DMarker.h>
 #include <CMatrix_Pad.h>
-#include "Common.h"
 
 #define FUNC_DeleteMarkerObject 0x722390
 
@@ -55,7 +54,6 @@ private:
     C3DMarkerSAInterface* internalInterface;
 
 public:
-    // constructor
     C3DMarkerSA(C3DMarkerSAInterface* markerInterface) { internalInterface = markerInterface; };
 
     C3DMarkerSAInterface* GetInterface() { return internalInterface; }
@@ -66,10 +64,10 @@ public:
     CVector* GetPosition();
     DWORD    GetType();                        // need enum?
     void     SetType(DWORD dwType);            // doesn't work propperly (not virtualed)
-    BOOL     IsActive();
+    bool     IsActive();
     DWORD    GetIdentifier();
-    SColor   GetColor();
-    void     SetColor(const SColor color);            // actually BGRA
+    SharedUtil::SColor   GetColor();
+    void     SetColor(const SharedUtil::SColor color);            // actually BGRA
     void     SetPulsePeriod(WORD wPulsePeriod);
     void     SetRotateRate(short RotateRate);
     float    GetSize();

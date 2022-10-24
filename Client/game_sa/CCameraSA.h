@@ -12,30 +12,22 @@
 #pragma once
 
 #include <game/CCamera.h>
+#include <CMatrix_Pad.h>
 #include "CCamSA.h"
 #include "CGarageSA.h"
 #include "CEntitySA.h"
-#include "COffsets.h"
 
-#include <CMatrix_Pad.h>
-
-#define FUNC_TakeControl                    0x50C7C0 // ##SA##
+#define FUNC_TakeControl                    0x50C7C0
 #define FUNC_TakeControlNoEntity            0x50C8B0
-#define FUNC_TakeControlAttachToEntity      0x50C910
 #define FUNC_Restore                        0x50B930
-#define FUNC_SetCamPositionForFixedMode     0x50BEC0
-#define FUNC_ConeCastCollisionResolve       0x51A5D0
 
-#define FUNC_Find3rdPersonCamTargetVector   0x514970 //##SA##
+#define FUNC_Find3rdPersonCamTargetVector   0x514970
 #define FUNC_Find3rdPersonQuickAimPitch     0x50AD40
-#define FUNC_TryToStartNewCamMode           0x467AAD
-#define FUNC_VectorTrackLinear              0x50D1D0
 #define FUNC_GetFadingDirection             0x50ADF0
 #define FUNC_GetFading                      0x50ADE0
 #define FUNC_Fade                           0x50AC20
 #define FUNC_SetFadeColour                  0x50BF00
 
-#define VAR_ActiveCam                       0x7E46FE
 #define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
 #define VAR_VehicleCameraView               0xB6F0DC
 #define VAR_PedCameraView                   0xB6F0F0
@@ -416,8 +408,8 @@ public:
     CCam*         GetCam(BYTE bCameraID);
     virtual CCam* GetCam(CCamSAInterface* camInterface);
 
-    void      SetWidescreen(BOOL bWidescreen);
-    BOOL      GetWidescreen();
+    void      SetWidescreen(bool bWidescreen);
+    bool      GetWidescreen();
     bool      IsFading();
     int       GetFadingDirection();
     void      Fade(float fFadeOutTime, int iOutOrIn);

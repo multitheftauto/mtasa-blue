@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHudSA.h"
 
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
@@ -37,7 +38,6 @@ CHudSA::CHudSA()
 
 void CHudSA::Disable(bool bDisabled)
 {
-    DEBUG_TRACE("VOID CHudSA::Disable ( bool bDisabled )");
     if (bDisabled)
         MemPut<BYTE>(FUNC_Draw, 0xC3);
     else

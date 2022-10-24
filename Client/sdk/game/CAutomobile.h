@@ -11,10 +11,11 @@
 
 #pragma once
 
-#include "CDamageManager.h"
-#include "CDoor.h"
 #include "Common.h"
 #include "CVehicle.h"
+
+class CPhysical;
+class CDoor;
 
 class CAutomobile : public virtual CVehicle
 {

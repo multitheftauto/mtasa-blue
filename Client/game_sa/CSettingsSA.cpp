@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CSettingsSA.h"
+#include "CAudioEngineSA.h"
+#include "CCoronasSA.h"
+#include "CHudSA.h"
 
 static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
@@ -43,6 +47,7 @@ CSettingsSA::CSettingsSA()
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
+    m_bDynamicPedShadowsEnabled = false;
     m_bCoronaReflectionsViaScript = false;
     SetAspectRatio(ASPECT_RATIO_4_3);
     HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
@@ -328,6 +333,16 @@ void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
     m_bVolumetricShadowsSuspended = bSuspended;
 }
 
+bool CSettingsSA::IsDynamicPedShadowsEnabled()
+{
+    return m_bDynamicPedShadowsEnabled;
+}
+
+void CSettingsSA::SetDynamicPedShadowsEnabled(bool bEnable)
+{
+    m_bDynamicPedShadowsEnabled = bEnable;
+}
+
 //
 // Volumetric shadow hooks
 //
@@ -359,8 +374,7 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
         // Handle all calls from CPed::PreRenderAfterTest
         if (dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680)
     {
-        // Always use blob shadows for peds as realtime shadows are disabled in MTA (context switching issues)
-        dwFxQualityValue = 0;
+        dwFxQualityValue = pGame->GetSettings()->IsDynamicPedShadowsEnabled() ? 2 : 0;
     }
 }
 

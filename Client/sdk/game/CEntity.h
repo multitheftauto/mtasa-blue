@@ -12,13 +12,14 @@
 #pragma once
 
 #include "Common.h"
-#include <CMatrix.h>
-#include <CVector.h>
-#include "RenderWare.h"
 
-#include <windows.h>
-
+class CEntitySAInterface;
+class CMatrix;
+class CVector;
 enum eBone;
+struct RpClump;
+struct RwFrame;
+struct RwMatrix;
 
 enum eEntityType
 {
@@ -87,11 +88,11 @@ public:
     virtual void SetVisible(bool bVisible) = 0;
 
     virtual void SetDoNotRemoveFromGameWhenDeleted(bool bDoNotRemoveFromGame) = 0;
-    virtual void SetUsesCollision(BOOL bUsesCollision) = 0;
-    virtual BOOL IsBackfaceCulled() = 0;
-    virtual void SetBackfaceCulled(BOOL bBackfaceCulled) = 0;
-    virtual BOOL IsStatic() = 0;
-    virtual void SetStatic(BOOL bStatic) = 0;
+    virtual void SetUsesCollision(bool bUsesCollision) = 0;
+    virtual bool IsBackfaceCulled() = 0;
+    virtual void SetBackfaceCulled(bool bBackfaceCulled) = 0;
+    virtual bool IsStatic() = 0;
+    virtual void SetStatic(bool bStatic) = 0;
     virtual void SetAlpha(DWORD dwAlpha) = 0;
 
     virtual void MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown) = 0;
@@ -109,7 +110,7 @@ public:
 
     virtual unsigned long GetArrayID() = 0;
 
-    virtual RwMatrixTag* GetBoneRwMatrix(eBone boneId) = 0;
+    virtual RwMatrix* GetBoneRwMatrix(eBone boneId) = 0;
     virtual bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
 
     virtual bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll) = 0;

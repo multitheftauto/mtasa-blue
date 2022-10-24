@@ -13,24 +13,10 @@
 
 #include <game/CHud.h>
 #include <CVector.h>
-#include "Common.h"
 
-#define FUNC_GetRidOfAllHudMessages 0x588a50
-#define FUNC_SetHelpMessage         0x588be0
-#define FUNC_SetVehicleName         0x588f50
-#define FUNC_SetZoneName            0x588bb0
-#define FUNC_SetBigMessage          0x588fc0
-
-#define FUNC_DrawBarChart           0x728640
-#define FUNC_CalcScreenCoors        0x70CE30
-#define FUNC_Draw2DPolygon          0x7285B0
 #define FUNC_Draw                   0x58FAE0
 
-#define VAR_DisableHud              0xC8A7C1
 #define VAR_DisableClock            0xBAA400
-
-#define VAR_VehicleNamePtr          0xA0FC98
-#define VAR_ZoneNamePtr             0x97537C
 
 #define VAR_AspectRatioMult         0x859524
 #define VAR_CameraCrosshairScale    0x866C74

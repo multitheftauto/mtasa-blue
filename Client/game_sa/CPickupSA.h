@@ -14,11 +14,11 @@
 #include <game/CPickup.h>
 #include "CObjectSA.h"
 
-#define FUNC_GIVEUSAPICKUP      0x4567e0
-#define FUNC_CPickup_Remove     0x4556C0
-
 class CObjectSAInterface;
 class CObjectSA;
+
+#define FUNC_GIVEUSAPICKUP      0x4567e0
+#define FUNC_CPickup_Remove     0x4556C0
 
 class CPickupSAInterface
 {
@@ -44,9 +44,7 @@ class CPickupSA : public CPickup
 private:
     CPickupSAInterface* internalInterface;
     CObjectSA*          object;
-    CBPickup            callback;            // function to call when the pickup is picked up [not used yet/ever]
 public:
-    // constructor
     CPickupSA(CPickupSAInterface* pickupInterface);
     CPickupSAInterface* GetInterface() { return internalInterface; };            // not to be exported
     CObject*            GetObject() { return object; };

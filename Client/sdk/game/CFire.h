@@ -11,14 +11,9 @@
 
 #pragma once
 
-#include <windows.h>
-#include <CVector.h>
-#include "CEntity.h"
-
-class CFireInterface
-{
-public:
-};
+class CEntity;
+class CFireSAInterface;
+class CVector;
 
 class CFire
 {
@@ -31,12 +26,12 @@ public:
     virtual CEntity*        GetCreator() = 0;
     virtual CEntity*        GetEntityOnFire() = 0;
     virtual void            SetTarget(CEntity* entity) = 0;
-    virtual BOOL            IsIgnited() = 0;
-    virtual void            SetSilent(BOOL bSilent) = 0;
-    virtual BOOL            IsBeingExtinguished() = 0;
+    virtual bool            IsIgnited() = 0;
+    virtual void            SetSilent(bool bSilent) = 0;
+    virtual bool            IsBeingExtinguished() = 0;
     virtual void            Ignite() = 0;
     virtual float           GetStrength() = 0;
     virtual void            SetStrength(float fStrength) = 0;
     virtual void            SetNumGenerationsAllowed(char generations) = 0;
-    virtual CFireInterface* GetInterface() = 0;
+    virtual CFireSAInterface* GetInterface() = 0;
 };

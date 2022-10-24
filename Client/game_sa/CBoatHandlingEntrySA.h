@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CBoatHandlingEntry.h>
-#include "Common.h"
 
 struct tBoatHandlingDataSA
 {

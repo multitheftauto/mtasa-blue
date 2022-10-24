@@ -11,71 +11,63 @@
 
 #pragma once
 
-// use this to check if you're using SA or VC headers
-#define GTA_SA
-
+#include <memory>
+#include <map>
+#include <SString.h>
 #include "Common.h"
-
-#include "C3DMarkers.h"
-#include "CAERadioTrackManager.h"
-#include "CAnimBlendAssociation.h"
-#include "CAnimBlock.h"
-#include "CAnimManager.h"
-#include "CAudioEngine.h"
-#include "CAEAudioHardware.h"
-#include "CAESoundManager.h"
-#include "CAEVehicleAudioEntity.h"
-#include "CAudioContainer.h"
-#include "CCam.h"
-#include "CCamera.h"
-#include "CCarEnterExit.h"
-#include "CClock.h"
-#include "CCheckpoints.h"
-#include "CControllerConfigManager.h"
-#include "CCoronas.h"
-#include "CEventDamage.h"
-#include "CEventGunShot.h"
-#include "CEventList.h"
-#include "CExplosionManager.h"
-#include "CFireManager.h"
-#include "CFx.h"
-#include "CFxSystem.h"
-#include "CFxManager.h"
-#include "CGarages.h"
-#include "CHandlingManager.h"
-#include "CHud.h"
-#include "CKeyGen.h"
-#include "CModelInfo.h"
-#include "CPad.h"
-#include "CPathFind.h"
-#include "CPedDamageResponse.h"
-#include "CPedModelInfo.h"
-#include "CPickups.h"
-#include "CPlayerInfo.h"
-#include "CPointLights.h"
-#include "CPools.h"
-#include "CProjectile.h"
-#include "CProjectileInfo.h"
-#include "CRadar.h"
-#include "CRenderWare.h"
-#include "CRopes.h"
-#include "CSettings.h"
-#include "CStats.h"
-#include "CStreaming.h"
-#include "CTasks.h"
-#include "CVisibilityPlugins.h"
-#include "CWaterManager.h"
-#include "CWeaponStatManager.h"
-#include "CWeather.h"
 #include "CWeaponInfo.h"
-#include "CWorld.h"
-#include "TaskCarAccessories.h"
-#include "CObjectGroupPhysicalProperties.h"
-#include "CColStore.h"
 
-#include <windows.h>
-
+class C3DMarkers;
+class CAEAudioHardware;
+class CAERadioTrackManager;
+class CAESoundManager;
+class CAnimBlendAssocGroup;
+class CAnimManager;
+class CAudioContainer;
+class CAudioEngine;
+class CCamera;
+class CCarEnterExit;
+class CCheckpoints;
+class CClock;
+class CColStore;           
+class CControllerConfigManager;
+class CCoronas;
+class CEventList;
+class CExplosionManager;
+class CFireManager;
+class CFx;
+class CFxManager;
+class CGameSettings;
+class CGarages;
+class CHandlingManager;
+class CHud;
+class CKeyGen;
+class CModelInfo;
+class CObjectGroupPhysicalProperties;
+class CPad;
+class CPathFind;
+class CPed;
+class CPickups;
+class CPlayerInfo;
+class CPointLights;
+class CPools;
+class CProjectileInfo;
+class CRadar;
+class CRenderWare;
+class CRopes;
+class CStats;
+class CStreaming;
+class CTasks;
+class CVisibilityPlugins;
+class CWaterManager;
+class CWeapon;
+class CWeaponInfo;
+class CWeaponStat;
+class CWeaponStatManager;
+class CWeather;
+class CWorld;
 enum eEntityType;
+enum ePedPieceTypes;
 
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
 typedef void(PostWeaponFireHandler)();
@@ -160,7 +152,7 @@ public:
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
 
     virtual DWORD        GetSystemTime() = 0;
-    virtual BOOL         IsAtMenu() = 0;
+    virtual bool         IsAtMenu() = 0;
     virtual void         StartGame() = 0;
     virtual void         SetSystemState(eSystemState State) = 0;
     virtual eSystemState GetSystemState() = 0;
@@ -175,7 +167,7 @@ public:
     virtual void Reset() = 0;
     virtual void Terminate() = 0;
 
-    virtual BOOL InitLocalPlayer(class CClientPed* pClientPed) = 0;
+    virtual bool InitLocalPlayer(class CClientPed* pClientPed) = 0;
 
     virtual float GetGravity() = 0;
     virtual void  SetGravity(float fGravity) = 0;

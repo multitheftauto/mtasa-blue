@@ -11,11 +11,10 @@
 
 #pragma once
 
-#include <windows.h>
-#include <CVector.h>
 #include "Common.h"
 
 class CObject;
+class CVector;
 
 class CPickup
 {
@@ -44,6 +43,3 @@ public:
     virtual void         GiveUsAPickUpObject(int ForcedObjectIndex = -1) = 0;
     virtual void         GetRidOfObjects() = 0;
 };
-
-// not used
-typedef BOOL (*CBPickup)(CPickup*);

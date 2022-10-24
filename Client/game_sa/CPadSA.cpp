@@ -10,42 +10,37 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPadSA.h"
 
 CControllerState* CPadSA::GetCurrentControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("CControllerState * CPadSA::GetCurrentControllerState(CControllerState * ControllerState)");
     MemCpyFast(ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
     return ControllerState;
 }
 
 CControllerState* CPadSA::GetLastControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("CControllerState * CPadSA::GetLastControllerState(CControllerState * ControllerState)");
     MemCpyFast(ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
     return ControllerState;
 }
 
 void CPadSA::SetCurrentControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("VOID CPadSA::SetCurrentControllerState(CControllerState * ControllerState)");
     MemCpyFast(&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
 }
 
 void CPadSA::SetLastControllerState(CControllerState* ControllerState)
 {
-    DEBUG_TRACE("VOID CPadSA::SetLastControllerState(CControllerState * ControllerState)");
     MemCpyFast(&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
 }
 
 void CPadSA::Store()
 {
-    DEBUG_TRACE("VOID CPadSA::Store()");
     MemCpyFast(&this->StoredPad, this->internalInterface, sizeof(CPadSAInterface));
 }
 
 void CPadSA::Restore()
 {
-    DEBUG_TRACE("VOID CPadSA::Restore()");
     MemCpyFast(this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
 }
 

@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "Common.h"
-#include "COffsets.h"
 #include <game/CEntity.h>
 #include <CMatrix.h>
 #include <CMatrix_Pad.h>
@@ -237,8 +235,6 @@ class CEntitySA : public virtual CEntity
 public:
     CEntitySAInterface* m_pInterface;
 
-    //  VOID                        SetModelAlpha ( int iAlpha );
-
     CEntitySA();
     CEntitySAInterface* GetInterface() { return m_pInterface; };
     void                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
@@ -285,15 +281,15 @@ public:
 
     RpClump* GetRpClump();
 
-    BOOL BeingDeleted;                   // to prevent it trying to delete twice
-    BOOL DoNotRemoveFromGame;            // when deleted, if this is true, it won't be removed from the game
+    bool BeingDeleted;                   // to prevent it trying to delete twice
+    bool DoNotRemoveFromGame;            // when deleted, if this is true, it won't be removed from the game
 
     void SetDoNotRemoveFromGameWhenDeleted(bool bDoNotRemoveFromGame) { DoNotRemoveFromGame = bDoNotRemoveFromGame; };
-    BOOL IsStatic() { return m_pInterface->bIsStatic; }
-    void SetStatic(BOOL bStatic) { m_pInterface->bIsStatic = bStatic; };
-    void SetUsesCollision(BOOL bUsesCollision) { m_pInterface->bUsesCollision = bUsesCollision; };
-    BOOL IsBackfaceCulled() { return m_pInterface->bBackfaceCulled; };
-    void SetBackfaceCulled(BOOL bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
+    bool IsStatic() { return m_pInterface->bIsStatic; }
+    void SetStatic(bool bStatic) { m_pInterface->bIsStatic = bStatic; };
+    void SetUsesCollision(bool bUsesCollision) { m_pInterface->bUsesCollision = bUsesCollision; };
+    bool IsBackfaceCulled() { return m_pInterface->bBackfaceCulled; };
+    void SetBackfaceCulled(bool bBackfaceCulled) { m_pInterface->bBackfaceCulled = bBackfaceCulled; };
     void SetAlpha(DWORD dwAlpha);
 
     void MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown);
@@ -310,7 +306,7 @@ public:
     unsigned long GetArrayID() { return m_ulArrayID; }
     void          SetArrayID(unsigned long ulID) { m_ulArrayID = ulID; }
 
-    RwMatrixTag* GetBoneRwMatrix(eBone boneId);
+    RwMatrix* GetBoneRwMatrix(eBone boneId);
     bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
     bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);

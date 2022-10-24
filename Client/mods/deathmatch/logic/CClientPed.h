@@ -21,6 +21,10 @@ class CClientPed;
 #include "CClientModel.h"
 #include <memory>
 
+#include <game/CPad.h>
+#include <game/TaskTypes.h>
+
+class CAnimBlock;
 class CClientCamera;
 class CClientManager;
 class CClientModelRequestManager;
@@ -28,8 +32,9 @@ class CClientPed;
 class CClientPedManager;
 class CClientPlayer;
 class CClientPlayerClothes;
-class CClientVehicle;
 class CClientProjectile;
+class CClientVehicle;
+class CTask;
 
 enum eDelayedSyncData
 {

@@ -15,7 +15,7 @@
 
 class CEntitySAInterface;
 
-#define ARRAY_CORONAS               0xC3E058 // ##SA##
+#define ARRAY_CORONAS               0xC3E058
 
 class CRegisteredCoronaSAInterface            // coronas are 104 bytes long, and theres 56 of them
 {
@@ -49,9 +49,6 @@ public:
     CEntitySAInterface* pEntityAttachedTo;
 };
 
-/**
- * \todo Add support for setting WhiteCore, OnlyFromBelow and AttachedToEntity
- */
 class CRegisteredCoronaSA : public CRegisteredCorona
 {
 private:

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "C3DMarkerSA.h"
 
 void C3DMarkerSA::GetMatrix(CMatrix* pMatrix)
 {
@@ -31,46 +32,39 @@ void C3DMarkerSA::SetMatrix(CMatrix* pMatrix)
 
 void C3DMarkerSA::SetPosition(CVector* vecPosition)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetPosition(CVector * vecPosition)");
     this->GetInterface()->m_mat.vPos = *vecPosition;
 }
 
 CVector* C3DMarkerSA::GetPosition()
 {
-    DEBUG_TRACE("CVector * C3DMarkerSA::GetPosition()");
     return &this->GetInterface()->m_mat.vPos;
 }
 
 DWORD C3DMarkerSA::GetType()
 {
-    DEBUG_TRACE("DWORD C3DMarkerSA::GetType()");
     return this->GetInterface()->m_nType;
 }
 
 void C3DMarkerSA::SetType(DWORD dwType)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetType(DWORD dwType)");
     this->GetInterface()->m_nType = (unsigned short)(dwType);
 }
 
-BOOL C3DMarkerSA::IsActive()
+bool C3DMarkerSA::IsActive()
 {
-    DEBUG_TRACE("BOOL C3DMarkerSA::IsActive()");
-    return (BOOL)this->GetInterface()->m_bIsUsed;
+    return this->GetInterface()->m_bIsUsed;
 }
 
 DWORD C3DMarkerSA::GetIdentifier()
 {
-    DEBUG_TRACE("DWORD C3DMarkerSA::GetIdentifier()");
     return this->GetInterface()->m_nIdentifier;
 }
 
-SColor C3DMarkerSA::GetColor()
+SharedUtil::SColor C3DMarkerSA::GetColor()
 {
-    DEBUG_TRACE("RGBA C3DMarkerSA::GetColor()");
     // From ABGR
     unsigned long ulABGR = this->GetInterface()->rwColour;
-    SColor        color;
+    SharedUtil::SColor        color;
     color.A = (ulABGR >> 24) & 0xff;
     color.B = (ulABGR >> 16) & 0xff;
     color.G = (ulABGR >> 8) & 0xff;
@@ -78,7 +72,7 @@ SColor C3DMarkerSA::GetColor()
     return color;
 }
 
-void C3DMarkerSA::SetColor(const SColor color)
+void C3DMarkerSA::SetColor(const SharedUtil::SColor color)
 {
     // To ABGR
     this->GetInterface()->rwColour = (color.A << 24) | (color.B << 16) | (color.G << 8) | color.R;
@@ -86,61 +80,51 @@ void C3DMarkerSA::SetColor(const SColor color)
 
 void C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)");
     this->GetInterface()->m_nPulsePeriod = wPulsePeriod;
 }
 
 void C3DMarkerSA::SetRotateRate(short RotateRate)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetRotateRate(short RotateRate)");
     this->GetInterface()->m_nRotateRate = RotateRate;
 }
 
 float C3DMarkerSA::GetSize()
 {
-    DEBUG_TRACE("FLOAT C3DMarkerSA::GetSize()");
     return this->GetInterface()->m_fSize;
 }
 
 void C3DMarkerSA::SetSize(float fSize)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetSize(FLOAT fSize)");
     this->GetInterface()->m_fSize = fSize;
 }
 
 float C3DMarkerSA::GetBrightness()
 {
-    DEBUG_TRACE("FLOAT C3DMarkerSA::GetBrightness()");
     return this->GetInterface()->m_fBrightness;
 }
 
 void C3DMarkerSA::SetBrightness(float fBrightness)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetBrightness(FLOAT fBrightness)");
     this->GetInterface()->m_fBrightness = fBrightness;
 }
 
 void C3DMarkerSA::SetCameraRange(float fCameraRange)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetCameraRange(FLOAT fCameraRange)");
     this->GetInterface()->m_fCameraRange = fCameraRange;
 }
 
 void C3DMarkerSA::SetPulseFraction(float fPulseFraction)
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::SetPulseFraction(FLOAT fPulseFraction)");
     this->GetInterface()->m_fPulseFraction = fPulseFraction;
 }
 
 float C3DMarkerSA::GetPulseFraction()
 {
-    DEBUG_TRACE("FLOAT C3DMarkerSA::GetPulseFraction()");
     return this->GetInterface()->m_fPulseFraction;
 }
 
 void C3DMarkerSA::Disable()
 {
-    DEBUG_TRACE("VOID C3DMarkerSA::Disable ()");
     this->GetInterface()->m_nIdentifier = 0;
 }
 
@@ -155,12 +139,6 @@ void C3DMarkerSA::DeleteMarkerObject()
             mov     ecx, dwThis
             call    dwFunc
         }
-
-        // OutputDebugString ( "Object destroyed!" );
-    }
-    else
-    {
-        // OutputDebugString ( "No object to destroy!" );
     }
 }
 

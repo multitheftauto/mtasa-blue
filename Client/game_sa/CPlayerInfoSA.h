@@ -12,29 +12,7 @@
 #pragma once
 
 #include <game/CPlayerInfo.h>
-#include "Common.h"
 #include "CPlayerPedSA.h"
-
-#define FUNC_MakePlayerSafe                         0x56e870
-#define FUNC_CancelPlayerEnteringCars               0x56e860
-#define FUNC_ArrestPlayer                           0x56e5d0
-#define FUNC_KillPlayer                             0x56e580
-
-#define FUNC_TakeRemoteControlledCarFromPlayer      0x45ae80
-#define FUNC_GivePlayerRemoteControlledCar          0x442020
-#define FUNC_TakeRemoteControlOfCar                 0x45ad40
-#define FUNC_StreamParachuteWeapon                  0x56eb30
-#define FUNC_GivePlayerParachute                    0x56ec40
-
-/**
- * \todo Implement FUNC_TakeRemoteControlOfCar, FUNC_StreamParachuteWeapon and FUNC_StreamParachuteWeapon
- */
-
-#define VAR_PlayerPed                               0x94AD28
-#define VAR_PlayerRCCar                             0x94AD2C
-#define VAR_PlayerMoney                             0x94ADC8
-
-#define NUM_CHARS_IN_NAME                           34
 
 /**
  * \todo Confirm that AssocGroupId is a DWORD
@@ -72,7 +50,7 @@ public:
     long         m_nStandStillTimer;                // 32
     DWORD        m_nHitAnimDelayTimer;              // 36
     float        m_fAttackButtonCounter;            // 40
-    CAutomobile* m_pDangerCar;                      // 44
+    CAutomobileSAInterface* m_pDangerCar;                      // 44
 
     DWORD m_bStoppedMoving : 1;            // 48
     DWORD m_bAdrenaline : 1;
@@ -221,7 +199,7 @@ public:
     long  HavocCaused;              // A counter going up when the player does bad stuff.
     short TimeLastEaten;            // A counter that starts at 5000, increases by 1 every minute
 
-    FLOAT CurrentChaseValue;            // How 'ill' is the chase at the moment
+    float CurrentChaseValue;            // How 'ill' is the chase at the moment
 
     // 'Special' abilities that gets awarded during the game
     bool DoesNotGetTired;

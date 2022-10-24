@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDoorSA.h"
 
 /**
  * \todo Find out what GetAngleOpenRatio actually does
@@ -17,7 +18,6 @@
  */
 float CDoorSA::GetAngleOpenRatio()
 {
-    DEBUG_TRACE("FLOAT CDoorSA::GetAngleOpenRatio ( )");
     DWORD dwFunction = FUNC_GetAngleOpenRatio;
     DWORD dwPointer = (DWORD)GetInterface();
     float fReturn = 0.0f;
@@ -39,9 +39,8 @@ float CDoorSA::GetAngleOpenRatio()
  * Checks if the door is closed
  * @return BOOL TRUE if the door is closed, FALSE otherwise
  */
-BOOL CDoorSA::IsClosed()
+bool CDoorSA::IsClosed()
 {
-    DEBUG_TRACE("BOOL CDoorSA::IsClosed (  )");
     DWORD dwFunction = FUNC_IsClosed;
     DWORD dwPointer = (DWORD)GetInterface();
     BYTE  bReturn = 0;
@@ -64,9 +63,8 @@ BOOL CDoorSA::IsClosed()
  * @return BOOL TRUE if the door is fully opened, FALSE if it is opening, is closed or is missing.
  * \todo Check what this returns if the door has been ripped off
  */
-BOOL CDoorSA::IsFullyOpen()
+bool CDoorSA::IsFullyOpen()
 {
-    DEBUG_TRACE("BOOL CDoorSA::IsFullyOpen (  )");
     DWORD dwFunction = FUNC_IsFullyOpen;
     DWORD dwPointer = (DWORD)GetInterface();
     BYTE  bReturn = 0;
@@ -91,7 +89,6 @@ BOOL CDoorSA::IsFullyOpen()
  */
 void CDoorSA::Open(float fOpenRatio)
 {
-    DEBUG_TRACE("VOID CDoorSA::Open ( float fOpenRatio )");
     DWORD dwFunction = FUNC_Open;
     DWORD dwPointer = (DWORD)GetInterface();
 

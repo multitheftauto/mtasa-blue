@@ -10,12 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CRect.h>
+#include "CRadarSA.h"
 
 CMarkerSA* Markers[MAX_MARKERS];
 
 CRadarSA::CRadarSA()
 {
-    DEBUG_TRACE("CRadarSA::CRadarSA (  )");
     for (int i = 0; i < MAX_MARKERS; i++)
         Markers[i] = new CMarkerSA((CMarkerSAInterface*)(ARRAY_CMarker + i * sizeof(CMarkerSAInterface)));
 }
@@ -31,7 +32,6 @@ CRadarSA::~CRadarSA()
 
 CMarker* CRadarSA::CreateMarker(CVector* vecPosition)
 {
-    DEBUG_TRACE("CMarker * CRadarSA::CreateMarker(CVector * vecPosition)");
     CMarkerSA* marker;
     marker = (CMarkerSA*)this->GetFreeMarker();
     if (marker)
@@ -45,7 +45,6 @@ CMarker* CRadarSA::CreateMarker(CVector* vecPosition)
 
 CMarker* CRadarSA::GetFreeMarker()
 {
-    DEBUG_TRACE("CMarker * CRadarSA::GetFreeMarker(  )");
     int Index;
     Index = 0;
     while ((Index < MAX_MARKERS) && (Markers[Index]->GetInterface()->bTrackingBlip))
@@ -58,7 +57,7 @@ CMarker* CRadarSA::GetFreeMarker()
         return Markers[Index];
 }
 
-void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color)
+void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color)
 {
     // Convert color to required abgr at the last moment
     unsigned long abgr = color.A << 24 | color.B << 16 | color.G << 8 | color.R;

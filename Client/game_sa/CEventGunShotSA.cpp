@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEventGunShotSA.h"
+#include "CEntitySA.h"
 
 CEventGunShotSA::CEventGunShotSA(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1)
 {

@@ -14,7 +14,6 @@
 // R* have this info inside CMenuManager but I can't believe that makes much sense
 
 #include <game/CSettings.h>
-#include "Common.h"
 
 #define CLASS_CMenuManager      0xBA6748
 
@@ -86,6 +85,7 @@ private:
     CSettingsSAInterface* m_pInterface;
     bool                  m_bVolumetricShadowsEnabled;
     bool                  m_bVolumetricShadowsSuspended;
+    bool                  m_bDynamicPedShadowsEnabled;
     eAspectRatio          m_AspectRatio;
     int                   m_iDesktopWidth;
     int                   m_iDesktopHeight;
@@ -139,6 +139,9 @@ public:
     bool IsVolumetricShadowsEnabled();
     void SetVolumetricShadowsEnabled(bool bEnable);
     void SetVolumetricShadowsSuspended(bool bSuspended);
+
+    bool IsDynamicPedShadowsEnabled();
+    void SetDynamicPedShadowsEnabled(bool bEnable);
 
     float        GetAspectRatioValue();
     eAspectRatio GetAspectRatio();

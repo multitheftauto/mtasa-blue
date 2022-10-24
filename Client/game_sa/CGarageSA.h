@@ -11,13 +11,9 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include <game/CGarage.h>
-#include "CEntitySA.h"
-#include "CAutomobileSA.h"
 
-class CGarageSAInterface : public CGarageInterface
+class CGarageSAInterface
 {
 public:
     CVector vecPosition;                           //  0
@@ -52,7 +48,7 @@ public:
     void SetOpen(bool bOpen);
     bool IsOpen() const;
 
-    CGarageInterface* GetInterface() { return this->internalInterface; }
+    CGarageSAInterface* GetInterface() { return this->internalInterface; }
 
 private:
     CGarageSAInterface* internalInterface;

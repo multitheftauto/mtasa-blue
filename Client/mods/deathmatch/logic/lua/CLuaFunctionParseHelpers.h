@@ -10,6 +10,9 @@
 
 // Forward declare enum reflection stuff
 #include <gui/CGUIEnumDefs.h>
+#include <game/CAudioEngine.h>
+#include <game/CRenderWare.h>
+#include <game/CHud.h>
 #include <type_traits>
 
 enum eLuaType

@@ -12,9 +12,6 @@
 #pragma once
 
 #include <game/CPad.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include "Common.h"
 
 #define MAX_HORN_HISTORY        5
 #define STEERINGBUFFERLENGTH    10
@@ -68,7 +65,6 @@ private:
     CPadSAInterface  StoredPad;
 
 public:
-    // constructor
     CPadSA(CPadSAInterface* padInterface) { this->internalInterface = padInterface; };
 
     CControllerState* GetCurrentControllerState(CControllerState* ControllerState);
