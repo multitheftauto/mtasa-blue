@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-21 14:34+0000\n"
-"PO-Revision-Date: 2022-10-21 15:25\n"
+"PO-Revision-Date: 2022-10-24 08:22\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -1025,7 +1025,7 @@ msgstr "To oprogramowanie korzysta z poniższych bibliotek i technologii:"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Czy chcesz uzyskać pomoc online w sprawie tego problemu ?"
+msgstr "Czy chcesz uzyskać pomoc dla tego problemu w trybie online?"
 
 #: Client/core/CMainMenu.cpp:315
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -1607,7 +1607,7 @@ msgstr "Odbicia deszczu koronowego"
 
 #: Client/core/CSettings.cpp:860
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dynamiczne cienie postaci"
 
 #: Client/core/CSettings.cpp:889
 msgid "Enable remote websites"
