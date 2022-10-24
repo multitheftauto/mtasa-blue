@@ -2060,8 +2060,7 @@ bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
     return true;
 }
 
-bool CLuaEngineDefs::EngineReinitMarkers(lua_State* const luaVM)
+void CLuaEngineDefs::EngineReinitMarkers()
 {
     g_pClientGame->ReinitMarkers();
-    return true;
 }
