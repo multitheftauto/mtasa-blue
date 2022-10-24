@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-21 14:34+0000\n"
-"PO-Revision-Date: 2022-10-21 15:26\n"
+"POT-Creation-Date: 2022-10-24 23:38+0000\n"
+"PO-Revision-Date: 2022-10-24 23:42\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -2572,7 +2572,7 @@ msgid "Deny"
 msgstr "Reddet"
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1380
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
 msgid "Problem with graphics driver"
 msgstr "Grafik sürücüsü ile problem"
 
