@@ -125,11 +125,11 @@ C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
 
 void C3DMarkersSA::ReinitMarkers()
 {
-    typedef int(__cdecl * Function_ShutdownMarkers)();
-    Function_ShutdownMarkers shutdownMarkers = (Function_ShutdownMarkers)(0x722710);
+    using Function_ShutdownMarkers = void(__cdecl *)();
+    auto shutdownMarkers = reinterpret_cast<Function_ShutdownMarkers>(0x722710);
 
-    typedef int(__cdecl * Function_InitMarkers)();
-    Function_InitMarkers initMarkers = (Function_InitMarkers)(0x724E40);
+    using Function_InitMarkers = void(__cdecl*)();
+    auto initMarkers = reinterpret_cast<Function_InitMarkers>(0x724E40);
 
     shutdownMarkers();
     initMarkers();
