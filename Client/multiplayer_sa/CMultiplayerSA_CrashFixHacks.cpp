@@ -1963,8 +1963,8 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
 
         if (i != last)
         {
-            --last;
             std::swap(blueprint->pPrims[i], blueprint->pPrims[last]);
+            --last;
         }
     }
 
