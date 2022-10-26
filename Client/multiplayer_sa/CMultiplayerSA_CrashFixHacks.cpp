@@ -1937,6 +1937,20 @@ static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
 #define HOOKPOS_FxSystemBP_c__Load  0x5C0A15
 #define HOOKSIZE_FxSystemBP_c__Load 19
 
+static void LOG_FxSystemBP_c__Load()
+{
+    static bool once = false;
+
+    if (once)
+        return;
+
+    once = true;
+    OnCrashAverted(33);
+
+    SString effectsMD5 = CMD5Hasher::CalculateHexString(PathJoin(GetLaunchPath(), "models", "effects.fxp"));
+    LogEvent(4481, "Crash averted", "FxSystemBP_c::Load", *SString("effects.fxp (%s)", *effectsMD5), 7711);
+}
+
 static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* blueprint)
 {
     if (!blueprint->cNumOfPrims)
@@ -1945,18 +1959,10 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
     char count = blueprint->cNumOfPrims;
     char last = count - 1;
 
-    static int logger = 0;
-
     for (char i = last; i >= 0; i--)
     {
         if (blueprint->pPrims[i]->m_apTextures[0])
             continue;
-
-        if (logger < 10)
-        {
-            LogEvent(4480, "Missing main texture for FxEmitter", "FxSystemBP_c::Load", SString("index: %d, hash: %p", (int)i, blueprint->szNameHash), 7710);
-            ++logger;
-        }
 
         blueprint->pPrims[i] = nullptr;
         --count;
@@ -1968,7 +1974,11 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
         }
     }
 
-    blueprint->cNumOfPrims = count;
+    if (blueprint->cNumOfPrims != count)
+    {
+        LOG_FxSystemBP_c__Load();
+        blueprint->cNumOfPrims = count;
+    }
 }
 
 static void _declspec(naked) HOOK_FxSystemBP_c__Load()
