@@ -13,7 +13,6 @@
 
 #include "Common.h"
 
-class CBuilding;
 class CEntity;
 class CObject;
 class CPed;
@@ -97,7 +96,6 @@ public:
     virtual unsigned long GetPedCount() = 0;
 
     // Others
-    virtual CBuilding* AddBuilding(DWORD dwModelID) = 0;
     virtual CVehicle*  AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
                                 uchar ucTrackId = 0xFF) = 0;
 

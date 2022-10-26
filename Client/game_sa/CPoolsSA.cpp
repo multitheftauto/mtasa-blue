@@ -28,9 +28,6 @@ CPoolsSA::CPoolsSA()
     m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
 
     m_bGetVehicleEnabled = true;
-    m_ulBuildingCount = 0;
-
-    MemSetFast(&Buildings, 0, sizeof(CBuilding*) * MAX_BUILDINGS);
 }
 
 CPoolsSA::~CPoolsSA()
@@ -39,20 +36,6 @@ CPoolsSA::~CPoolsSA()
     DeleteAllVehicles();
     DeleteAllPeds();
     DeleteAllObjects();
-    DeleteAllBuildings();
-}
-
-void CPoolsSA::DeleteAllBuildings()
-{
-    /*
-    for ( int i = 0; i < MAX_BUILDINGS; i++ )
-    {
-    if ( Buildings [i] )
-    {
-    RemoveBuilding ( Buildings [i] );
-    }
-    }
-    */
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -758,26 +741,6 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
         if (pThePedEntity)
         {
             return pThePedEntity->pClientEntity;
-        }
-    }
-    return NULL;
-}
-
-CBuilding* CPoolsSA::AddBuilding(DWORD dwModelID)
-{
-    if (m_ulBuildingCount <= MAX_BUILDINGS)
-    {
-        for (int i = 0; i < MAX_BUILDINGS; i++)
-        {
-            if (Buildings[i] == 0)
-            {
-                CBuildingSA* pBuilding = new CBuildingSA(dwModelID);
-                Buildings[i] = pBuilding;
-                pBuilding->SetArrayID(i);
-                m_ulBuildingCount++;
-
-                return pBuilding;
-            }
         }
     }
     return NULL;

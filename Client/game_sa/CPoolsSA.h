@@ -124,8 +124,6 @@ public:
     uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
-    CBuilding* AddBuilding(DWORD dwModelID);
-    void       DeleteAllBuildings();
     CVehicle*  AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
 
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
@@ -170,9 +168,6 @@ private:
     CPoolSAInterface<CPedSAInterface>**                              m_ppPedPoolInterface;
     CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
     CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
-
-    CBuildingSA*  Buildings[MAX_BUILDINGS];
-    unsigned long m_ulBuildingCount;
 
     bool m_bGetVehicleEnabled;
 };
