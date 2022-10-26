@@ -34,7 +34,6 @@
 #include "CRemoteDataSA.h"
 #include "..\game_sa\CCameraSA.h"
 #include "..\game_sa\CEntitySA.h"
-#include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\core\CCrashDumpWriter.h"
 

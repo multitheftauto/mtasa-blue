@@ -12,17 +12,19 @@
 #include "StdInc.h"
 #include <game/TaskTypes.h>
 #include "CFireManagerSA.h"
+#include "CGameSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPedSA.h"
 #include "CPlayerInfoSA.h"
 #include "CProjectileInfoSA.h"
+#include "CStatsSA.h"
 #include "CTaskManagerSA.h"
 #include "CTasksSA.h"
 #include "CWeaponInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 
-
 extern CGameSA* pGame;
+
 int             g_bOnlyUpdateRotations = false;
 
 CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL), m_iCustomMoveAnim(0)

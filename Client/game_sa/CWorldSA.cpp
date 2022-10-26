@@ -10,8 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CWorldSA.h"
+#include <multiplayer/CMultiplayer.h>
+#include <core/CCoreInterface.h>
+#include "CGameSA.h"
 #include "CPoolsSA.h"
+#include "CWorldSA.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 #define ARRAY_SurfaceInfos 0xB79538
 

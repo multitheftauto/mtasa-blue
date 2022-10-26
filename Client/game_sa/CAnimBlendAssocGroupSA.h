@@ -14,6 +14,7 @@
 #include <game/CAnimBlendAssocGroup.h>
 #include "CAnimBlendStaticAssociationSA.h"
 
+class CAnimBlendAssociationSAInterface;
 class CAnimBlockSA;
 class CAnimBlockSAInterface;
 class CAnimManagerSA;

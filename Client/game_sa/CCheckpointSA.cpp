@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCheckpointSA.h"
 #include "C3DMarkerSA.h"
 #include "C3DMarkersSA.h"
+#include "CCheckpointSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 void CCheckpointSA::SetPosition(CVector* vecPosition)
 {

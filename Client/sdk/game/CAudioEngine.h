@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include "Common.h"
+#include "CWeaponInfo.h"
+
 class CEntity;
 class CEntitySAInterface;
 class CPhysical;

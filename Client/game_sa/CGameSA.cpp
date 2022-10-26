@@ -59,6 +59,8 @@
 #include "CWorldSA.h"
 #include "D3DResourceSystemSA.h"
 
+extern CGameSA* pGame;
+
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;

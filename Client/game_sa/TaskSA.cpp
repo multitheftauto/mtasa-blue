@@ -10,12 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "TaskSA.h"
+#include "CGameSA.h"
 #include "CPedIntelligenceSA.h"
 #include "CPedSA.h"
 #include "CTaskManagementSystemSA.h"
 #include "CTaskManagerSA.h"
 #include "CTasksSA.h"
+#include "TaskSA.h"
+
+extern CGameSA* pGame;
 
 DWORD dwTasksAlive = 0;
 DWORD dwTasksCreatedTotal = 0;

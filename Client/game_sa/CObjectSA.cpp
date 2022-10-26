@@ -10,10 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
 #include "CObjectSA.h"
 #include "CPoolsSA.h"
 #include "CRopesSA.h"
 #include "CWorldSA.h"
+
+extern CGameSA* pGame;
 
 //#define MTA_USE_BUILDINGS_AS_OBJECTS
 

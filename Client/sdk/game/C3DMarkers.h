@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "Common.h"
+
 class C3DMarker;
 
 class C3DMarkers

@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
 #include "CMarkerSA.h"
 #include "CPoolsSA.h"
+
+extern CGameSA* pGame;
 
 void CMarkerSA::Init()
 {

@@ -73,6 +73,6 @@ public:
 
     bool IsActive();
 
-    void  SetCounter(DWORD dwCounter) { internalInterface->dwCounter = dwCounter + pGame->GetSystemTime(); }
-    DWORD GetCounter() { return internalInterface->dwCounter - pGame->GetSystemTime(); }
+    void  SetCounter(DWORD dwCounter);
+    DWORD GetCounter();
 };

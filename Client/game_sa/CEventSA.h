@@ -11,7 +11,10 @@
 
 #pragma once
 
+#include <game/Common.h>
 #include <game/CEvent.h>
+
+class CEntity;
 
 class CEventSAInterface
 {

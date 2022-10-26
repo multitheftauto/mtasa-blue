@@ -10,14 +10,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "gamesa_renderware.h"
-#include "CModelInfoSA.h"
+#include <core/CCoreInterface.h>
 #include "CColModelSA.h"
 #include "CColStoreSA.h"
+#include "CGameSA.h"
+#include "CModelInfoSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPedSA.h"
 #include "CWorldSA.h"
+#include "gamesa_renderware.h"
 
+extern CCoreInterface* g_pCore;
 extern CGameSA* pGame;
 
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;

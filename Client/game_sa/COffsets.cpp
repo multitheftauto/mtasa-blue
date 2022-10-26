@@ -15,6 +15,7 @@
 #include "COffsets.h"
 #include "CSettingsSA.h"
 #include "CWeatherSA.h"
+#include "CGameSA.h"
 
 void COffsets::Initialize10EU()
 {

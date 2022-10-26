@@ -13,6 +13,8 @@
 
 #include <game/CEventGunShot.h>
 
+class CEntity;
+
 #define FUNC_CEventGunShot_Constructor  0x4ac610
 #define FUNC_CEventGunShot_Destructor   0x4ac720
 

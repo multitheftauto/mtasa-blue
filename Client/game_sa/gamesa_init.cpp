@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "gamesa_init.h"
+#include "CGameSA.h"
 #define DECLARE_PROFILER_SECTION_gamesa_init
 #include "profiler/SharedUtil.Profiler.h"
 

@@ -25,7 +25,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CLASS_CPlayerInfo               0xB7CD98
 #define CLASS_CCamera                   0xB6F028
 #define CLASS_CPad                      0xB73458
-#define CLASS_CGarages                  0x96C048
 #define CLASS_CFx                       0xa9ae00
 #define CLASS_CFxManager                0xA9AE80
 #define CLASS_CMenuManager              0xBA6748

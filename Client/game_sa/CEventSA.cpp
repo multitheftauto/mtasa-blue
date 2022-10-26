@@ -11,7 +11,10 @@
 
 #include "StdInc.h"
 #include "CEventSA.h"
+#include "CGameSA.h"
 #include "CPoolsSA.h"
+
+extern CGameSA* pGame;
 
 eEventEntityType CEventSA::GetType()
 {

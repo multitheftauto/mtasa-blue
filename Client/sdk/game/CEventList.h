@@ -12,6 +12,7 @@
 #pragma once
 
 #include "Common.h"
+#include "CPed.h"
 
 class CEntity;
 class CEventDamage;

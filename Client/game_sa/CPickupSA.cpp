@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
 #include "CPickupSA.h"
 #include "CWorldSA.h"
+
+extern CGameSA* pGame;
 
 CPickupSA::CPickupSA(CPickupSAInterface* pickupInterface)
 {

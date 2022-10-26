@@ -10,9 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
 #include "CProjectileInfoSA.h"
-#include "CWorldSA.h"
 #include "CVehicleSA.h"
+#include "CWorldSA.h"
 
 extern CGameSA* pGame;
 
@@ -204,4 +205,14 @@ void CProjectileInfoSA::SetTarget(CEntity* pEntity)
 bool CProjectileInfoSA::IsActive()
 {
     return (internalInterface->bProjectileActive == 1 && internalInterface->dwProjectileType != 0);
+}
+
+void CProjectileInfoSA::SetCounter(DWORD dwCounter)
+{
+    internalInterface->dwCounter = dwCounter + pGame->GetSystemTime();
+}
+
+DWORD CProjectileInfoSA::GetCounter()
+{
+    return internalInterface->dwCounter - pGame->GetSystemTime();
 }

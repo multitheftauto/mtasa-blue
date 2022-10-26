@@ -14,6 +14,8 @@
 #include <game/TaskAttack.h>
 #include "TaskSA.h"
 
+class CWeaponInfo;
+
 #define FUNC_CTaskSimpleGangDriveBy__Constructor        0x6217d0
 #define FUNC_CTaskSimpleUseGun__Constructor             0x61de60
 #define FUNC_CTaskSimpleUseGun_ControlGun               0x61e040
