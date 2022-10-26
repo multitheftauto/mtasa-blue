@@ -1947,8 +1947,9 @@ static void LOG_FxSystemBP_c__Load()
     once = true;
     OnCrashAverted(33);
 
-    SString effectsMD5 = CMD5Hasher::CalculateHexString(PathJoin(GetLaunchPath(), "models", "effects.fxp"));
-    LogEvent(4481, "Crash averted", "FxSystemBP_c::Load", *SString("effects.fxp (%s)", *effectsMD5), 7711);
+    SString     effectsMD5 = CMD5Hasher::CalculateHexString(PathJoin(GetLaunchPath(), "models", "effects.fxp"));
+    const char* isModified = (effectsMD5 == "6143A72E8FF2974DB14F65DF65D952B0") ? "standard" : "non-standard";
+    LogEvent(4481, "Crash averted", "FxSystemBP_c::Load", *SString("effects.fxp (%s, %s)", isModified, *effectsMD5), 7711);
 }
 
 static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* blueprint)
