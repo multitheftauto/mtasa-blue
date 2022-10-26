@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-24 23:38+0000\n"
-"PO-Revision-Date: 2022-10-24 23:41\n"
+"PO-Revision-Date: 2022-10-26 08:37\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -348,12 +348,12 @@ msgstr "MTA: San Andreas - Ostrzeżenie"
 
 #: Client/loader/Dialogs.cpp:64
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Katalog instalacyjny Grand Theft Auto: San Andreas zawiera następujące pliki:"
+msgstr "Katalog instalacyjny GTA: San Andreas zawiera następujące pliki:"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "Pliki te nie są wymagane i mogą zakłócać działanie funkcji graficznych w tej wersji MTA:SA.\n\n"
+msgstr "Pliki te nie są wymagane i mogą zakłócać działanie funkcji graficznych w tej wersji MTA.\n\n"
 "Zaleca się usunięcie lub zmianę nazwy tych plików."
 
 #: Client/loader/Dialogs.cpp:68
