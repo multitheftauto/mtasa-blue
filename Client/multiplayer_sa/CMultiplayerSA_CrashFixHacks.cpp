@@ -2003,6 +2003,34 @@ static void _declspec(naked) HOOK_FxSystemBP_c__Load()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// FxPrim_c::Enable
+//
+// Add a null-pointer check for the ecx object. This hook is a side-effect of the hook for
+// FxSystemBP_c::Load above.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x4A9F50 | 8A 44 24 04 | mov  al, [esp+4]
+// >>> 0x4A9F54 | 88 41 0C    | mov  [ecx+0xC], al
+// >>> 0x4A9F57 | C2 04 00    | retn 4
+#define HOOKPOS_FxPrim_c__Enable  0x4A9F50
+#define HOOKSIZE_FxPrim_c__Enable 10
+
+static void _declspec(naked) HOOK_FxPrim_c__Enable()
+{
+    _asm
+    {
+        test    ecx, ecx
+        jz      returnFromFunction
+        mov     al, [esp+4]
+        mov     [ecx+0xC], al
+
+        returnFromFunction:
+        retn    4
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2060,6 +2088,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(RpAnimBlendClumpGetFirstAssociation);
     EZHookInstall(CAnimManager__BlendAnimation);
     EZHookInstall(FxSystemBP_c__Load);
+    EZHookInstall(FxPrim_c__Enable);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
