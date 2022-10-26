@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CEventList.h>
-#include "CEventSA.h"
 
 class CEventListSA : public CEventList
 {
