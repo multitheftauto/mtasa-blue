@@ -81,7 +81,6 @@ CEntitySA::CEntitySA()
     BeingDeleted = false;
     DoNotRemoveFromGame = false;
     m_pStoredPointer = NULL;
-    m_ulArrayID = INVALID_POOL_ARRAY_ID;
 }
 
 void CEntitySA::UpdateRpHAnim()
