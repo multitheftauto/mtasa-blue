@@ -128,20 +128,6 @@ void C3DMarkerSA::Disable()
     this->GetInterface()->m_nIdentifier = 0;
 }
 
-void C3DMarkerSA::DeleteMarkerObject()
-{
-    if (this->GetInterface()->m_pRwObject)
-    {
-        DWORD dwFunc = FUNC_DeleteMarkerObject;
-        DWORD dwThis = (DWORD)this->GetInterface();
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
-    }
-}
-
 void C3DMarkerSA::Reset()
 {
     this->internalInterface->m_lastPosition = this->internalInterface->m_mat.vPos;
