@@ -67,9 +67,6 @@ public:
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
-    virtual DWORD                      GetVehicleRef(CVehicle* pVehicle) = 0;
-    virtual DWORD                      GetVehicleRef(DWORD* pGameInterface) = 0;
-    virtual CVehicle*                  GetVehicleFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long              GetVehicleCount() = 0;
 
     // Objects pool
@@ -77,9 +74,6 @@ public:
     virtual void     RemoveObject(CObject* pObject, bool bDelete = true) = 0;
 
     virtual SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface) = 0;
-    virtual DWORD                     GetObjectRef(CObject* pObject) = 0;
-    virtual DWORD                     GetObjectRef(DWORD* pGameInterface) = 0;
-    virtual CObject*                  GetObjectFromRef(DWORD dwGameRef) = 0;
     virtual CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool) = 0;
     virtual unsigned long             GetObjectCount() = 0;
 
@@ -89,9 +83,6 @@ public:
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
-
-    virtual DWORD         GetPedRef(CPed* pPed) = 0;
-    virtual DWORD         GetPedRef(DWORD* pGameInterface) = 0;
     virtual CPed*         GetPedFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long GetPedCount() = 0;
 

@@ -74,9 +74,6 @@ private:
 public:
     void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
     SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
-    DWORD                      GetVehicleRef(CVehicle* pVehicle);
-    DWORD                      GetVehicleRef(DWORD* pGameInterface);
-    CVehicle*                  GetVehicleFromRef(DWORD dwGameRef);
     unsigned long              GetVehicleCount()
     {
         return m_vehiclePool.ulCount;
@@ -93,9 +90,6 @@ private:
 public:
     void                      RemoveObject(CObject* pObject, bool bDelete = true);
     SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface);
-    DWORD                     GetObjectRef(CObject* pObject);
-    DWORD                     GetObjectRef(DWORD* pGameInterface);
-    CObject*                  GetObjectFromRef(DWORD dwGameRef);
     CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool);
     unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
     void                      DeleteAllObjects();
@@ -109,11 +103,7 @@ private:
 
 public:
     void RemovePed(CPed* ped, bool bDelete = true);
-
     SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
-
-    DWORD            GetPedRef(CPed* pPed);
-    DWORD            GetPedRef(DWORD* pGameInterface);
     CPed*            GetPedFromRef(DWORD dwGameRef);
     CPedSAInterface* GetPedInterface(DWORD dwGameRef);            // game_sa specific
     unsigned long    GetPedCount() { return m_pedPool.ulCount; }
@@ -172,15 +162,7 @@ private:
     bool m_bGetVehicleEnabled;
 };
 
-#define FUNC_GetVehicle 0x54fff0
-#define FUNC_GetVehicleRef 0x54ffc0
-//#define FUNC_GetVehicleCount              0x429510
 #define FUNC_GetPed 0x54ff90
-#define FUNC_GetPedRef 0x54ff60
-//#define FUNC_GetPedCount                  0x4A7440
-#define FUNC_GetObject 0x550050
-#define FUNC_GetObjectRef 0x550020
-//#define FUNC_GetObjectCount                   0x4A74D0
 
 #define CLASS_CPool_Vehicle 0xB74494
 #define CLASS_CPool_Ped 0xB74490

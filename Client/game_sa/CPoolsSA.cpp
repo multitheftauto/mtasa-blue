@@ -196,73 +196,6 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
     return nullptr;
 }
 
-DWORD CPoolsSA::GetVehicleRef(CVehicle* pVehicle)
-{
-    DWORD       dwRef = 0;
-    CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
-    if (pVehicleSA)
-    {
-        CVehicleSAInterface* pInterface = pVehicleSA->GetVehicleInterface();
-        DWORD                dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-DWORD CPoolsSA::GetVehicleRef(DWORD* pGameInterface)
-{
-    DWORD                dwRef = 0;
-    CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-CVehicle* CPoolsSA::GetVehicleFromRef(DWORD dwGameRef)
-{
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetVehicle;
-
-    _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Vehicle]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CVehicleSAInterface* pInterface = (CVehicleSAInterface*)dwReturn;
-    if (pInterface)
-    {
-        DWORD       dwElementIndexInPool = dwGameRef >> 8;
-        CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-        if (pVehicle)
-        {
-            return pVehicle;
-        }
-    }
-
-    return NULL;
-}
-
 void CPoolsSA::DeleteAllVehicles()
 {
     while (m_vehiclePool.ulCount > 0)
@@ -377,74 +310,6 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
         }
     }
     return nullptr;
-}
-
-DWORD CPoolsSA::GetObjectRef(CObject* pObject)
-{
-    DWORD      dwRef = 0;
-    CObjectSA* pObjectSA = dynamic_cast<CObjectSA*>(pObject);
-    if (pObjectSA)
-    {
-        CObjectSAInterface* pInterface = pObjectSA->GetObjectInterface();
-        DWORD               dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-DWORD CPoolsSA::GetObjectRef(DWORD* pGameInterface)
-{
-    DWORD               dwRef = 0;
-    CObjectSAInterface* pInterface = reinterpret_cast<CObjectSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-CObject* CPoolsSA::GetObjectFromRef(DWORD dwGameRef)
-{
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetObject;
-
-    _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Object]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CObjectSAInterface* pInterface = (CObjectSAInterface*)dwReturn;
-
-    if (pInterface)
-    {
-        DWORD      dwElementIndexInPool = dwGameRef >> 8;
-        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-        if (pObject)
-        {
-            return pObject;
-        }
-    }
-
-    return NULL;
 }
 
 CObject* CPoolsSA::GetObjectFromIndex(std::uint32_t elementIndexInPool)
@@ -614,44 +479,6 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
         }
     }
     return nullptr;
-}
-
-DWORD CPoolsSA::GetPedRef(CPed* pPed)
-{
-    DWORD   dwRef = 0;
-    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
-    if (pPedSA)
-    {
-        CPedSAInterface* pInterface = pPedSA->GetPedInterface();
-        DWORD            dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-DWORD CPoolsSA::GetPedRef(DWORD* pGameInterface)
-{
-    DWORD            dwRef = 0;
-    CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-    return dwRef;
 }
 
 CPed* CPoolsSA::GetPedFromRef(DWORD dwGameRef)
