@@ -1196,38 +1196,36 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
     if (!pClump)
         return false;
 
-    // Replace the model if we're loaded.
+    if (!IsLoaded())
+    {
+        // Wait for the game to eventually stream-in the model and then try to replace it (via MakeCustomModel).
+        m_pCustomClump = pClump;
+        return true;
+    }
+
     bool success = false;
 
-    if (IsLoaded())
+    switch (GetModelType())
     {
-        switch (GetModelType())
-        {
-            case eModelInfoType::PED:
-                success = pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
-                break;
-            case eModelInfoType::WEAPON:
-                success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
-                break;
-            case eModelInfoType::VEHICLE:
-                success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
-                break;
-            case eModelInfoType::ATOMIC:
-            case eModelInfoType::LOD_ATOMIC:
-            case eModelInfoType::TIME:
-                success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
-                break;
-            default:
-                break;
-        }
+        case eModelInfoType::PED:
+            success = pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::WEAPON:
+            success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::VEHICLE:
+            success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::ATOMIC:
+        case eModelInfoType::LOD_ATOMIC:
+        case eModelInfoType::TIME:
+            success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        default:
+            break;
     }
 
-    if (success)
-    {
-        // Store the custom clump
-        m_pCustomClump = pClump;
-    }
-
+    m_pCustomClump = success ? pClump : nullptr;
     return success;
 }
 
