@@ -13,7 +13,14 @@
 
 #include "Task.h"
 
-class CNodeAddress;
+class CNodeAddress
+{
+public:
+    short sRegion;
+    short sIndex;
+
+    CNodeAddress() { sRegion = -1; }
+};
 
 enum
 {

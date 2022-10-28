@@ -136,7 +136,6 @@ public:
     CAESoundManager*                GetAESoundManager() override { return m_pAESoundManager; }
     CAudioContainer*                GetAudioContainer() { return m_pAudioContainer; }
     CStats*                         GetStats() { return m_pStats; }
-    CPathFind*                      GetPathFind() { return m_pPathFind; }
     CTaskManagementSystemSA*        GetTaskManagementSystem() { return m_pTaskManagementSystem; }
     CTasks*                         GetTasks() { return m_pTasks; }
     CGameSettings*                  GetSettings() { return m_pSettings; }
@@ -316,7 +315,6 @@ private:
     CAESoundManager*          m_pAESoundManager;
     CAudioContainer*          m_pAudioContainer;
     CStats*                   m_pStats;
-    CPathFind*                m_pPathFind;
     CTaskManagementSystemSA*  m_pTaskManagementSystem;            // not used outside the game_sa
     CTasks*                   m_pTasks;
     CGameSettings*            m_pSettings;
