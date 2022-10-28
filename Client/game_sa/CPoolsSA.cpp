@@ -97,55 +97,6 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
     return pVehicle;
 }
 
-CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface)
-{
-    CVehicleSA* pVehicle = NULL;
-
-    if (m_vehiclePool.ulCount < MAX_VEHICLES)
-    {
-        CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
-
-        if (pInterface)
-        {
-            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
-            if (dwElementIndexInPool >= MAX_VEHICLES)
-            {
-                return nullptr;
-            }
-            pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-            if (pVehicle)
-            {
-                return pVehicle;
-            }
-            else
-            {
-                switch ((VehicleClass)pInterface->m_vehicleClass)
-                {
-                    case VehicleClass::BOAT:
-                        pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
-                        break;
-                    case VehicleClass::BMX:
-                    case VehicleClass::BIKE:
-                        pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
-                        break;
-                    default:
-                        pVehicle = new CVehicleSA(pInterface);
-                        break;
-                }
-
-                if (!AddVehicleToPool(pClientVehicle, pVehicle))
-                {
-                    delete pVehicle;
-                    pVehicle = NULL;
-                }
-            }
-        }
-    }
-
-    return pVehicle;
-}
-
 void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
 {
     static bool bIsDeletingVehicleAlready = false;

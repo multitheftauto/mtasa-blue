@@ -11,13 +11,16 @@
 
 #pragma once
 
-#include "Common.h"
-
+class CClientEntity;
 class CEntity;
+class CEntitySAInterface;
 class CObject;
+class CObjectSA;
 class CPed;
+class CPedSA;
 class CVector;
 class CVehicle;
+class CVehicleSA;
 struct RpClump;
 
 enum ePools
@@ -45,12 +48,6 @@ enum ePools
     MAX_POOLS
 };
 
-class CClientEntity;
-class CPedSA;
-class CVehicleSA;
-class CObjectSA;
-class CEntitySAInterface;
-
 template <class T>
 struct SClientEntity
 {
@@ -63,7 +60,6 @@ class CPools
 public:
     // Vehicles pool
     virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2) = 0;
-    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, DWORD* pGameInterface) = 0;
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
