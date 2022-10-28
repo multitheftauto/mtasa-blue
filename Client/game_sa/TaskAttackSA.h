@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector2D.h>
 #include <game/TaskAttack.h>
 #include "TaskSA.h"
 

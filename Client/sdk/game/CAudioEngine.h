@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include "Common.h"
 #include "CWeaponInfo.h"
 

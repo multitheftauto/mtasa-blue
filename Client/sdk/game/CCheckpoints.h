@@ -12,6 +12,7 @@
 #pragma once
 
 class CCheckpoint;
+class CVector;
 
 class CCheckpoints
 {

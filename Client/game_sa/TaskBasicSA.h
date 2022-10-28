@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CPed.h>
 #include <game/TaskBasic.h>
 #include "TaskSA.h"

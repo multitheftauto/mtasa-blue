@@ -14,6 +14,7 @@
 #include "Common.h"
 
 class C3DMarker;
+class CVector;
 
 class C3DMarkers
 {

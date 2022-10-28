@@ -14,6 +14,7 @@
 class CFxSystem;
 class CFxSystemBPSAInterface;
 class CFxSystemSAInterface;
+class CVector;
 struct RwMatrix;
 
 class CFxManager

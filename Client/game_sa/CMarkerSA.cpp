@@ -10,10 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CGameSA.h"
+#include <CVector.h>
 #include "CMarkerSA.h"
-
-extern CGameSA* pGame;
 
 void CMarkerSA::Init()
 {
