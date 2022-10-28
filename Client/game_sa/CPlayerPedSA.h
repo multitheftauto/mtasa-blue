@@ -47,9 +47,6 @@ public:
 
     CWanted* GetWanted();
 
-    float GetSprintEnergy();
-    void  SetSprintEnergy(float fSprintEnergy);
-
     void SetInitialState();
 
     eMoveAnim GetMoveAnim();

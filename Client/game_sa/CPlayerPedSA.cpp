@@ -165,16 +165,6 @@ CWanted* CPlayerPedSA::GetWanted()
     return m_pWanted;
 }
 
-float CPlayerPedSA::GetSprintEnergy()
-{
-    return m_pData->m_fSprintEnergy;
-}
-
-void CPlayerPedSA::SetSprintEnergy(float fSprintEnergy)
-{
-    m_pData->m_fSprintEnergy = fSprintEnergy;
-}
-
 void CPlayerPedSA::SetInitialState()
 {
     DWORD dwUnknown = 1;
