@@ -485,11 +485,7 @@ void CEntitySA::SetAlpha(DWORD dwAlpha)
 
 bool CEntitySA::IsOnScreen()
 {
-    /**(BYTE *)0x534540 = 0x83;
-    MemPut < BYTE > ( 0x534541, 0xEC );
-    MemPut < BYTE > ( 0x534542, 0x10 );
-*/
-    DWORD dwFunc = FUNC_IsVisible;            // FUNC_IsOnScreen;
+    DWORD dwFunc = FUNC_IsVisible;
     DWORD dwThis = (DWORD)m_pInterface;
     bool  bReturn = false;
     _asm
@@ -498,11 +494,6 @@ bool CEntitySA::IsOnScreen()
         call    dwFunc
         mov     bReturn, al
     }
-    /*
-        MemPut < BYTE > ( 0x534540, 0xB0 );
-        MemPut < BYTE > ( 0x534541, 0x01 );
-        MemPut < BYTE > ( 0x534542, 0xC3 );
-    */
     return bReturn;
 }
 

@@ -25,7 +25,6 @@
 #define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840
 #define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40
 
-#define FUNC_IsOnScreen                                     0x534540
 #define FUNC_IsVisible                                      0x536BC0
 
 // not in CEntity really
