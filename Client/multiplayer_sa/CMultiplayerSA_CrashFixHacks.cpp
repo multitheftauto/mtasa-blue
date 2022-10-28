@@ -1937,6 +1937,21 @@ static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
 #define HOOKPOS_FxSystemBP_c__Load  0x5C0A15
 #define HOOKSIZE_FxSystemBP_c__Load 19
 
+static void LOG_FxSystemBP_c__Load()
+{
+    static bool once = false;
+
+    if (once)
+        return;
+
+    once = true;
+    OnCrashAverted(33);
+
+    SString     effectsMD5 = CMD5Hasher::CalculateHexString(PathJoin(GetLaunchPath(), "models", "effects.fxp"));
+    const char* isModified = (effectsMD5 == "6143A72E8FF2974DB14F65DF65D952B0") ? "standard" : "non-standard";
+    LogEvent(4481, "Crash averted", "FxSystemBP_c::Load", *SString("effects.fxp (%s, %s)", isModified, *effectsMD5), 7711);
+}
+
 static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* blueprint)
 {
     if (!blueprint->cNumOfPrims)
@@ -1945,18 +1960,10 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
     char count = blueprint->cNumOfPrims;
     char last = count - 1;
 
-    static int logger = 0;
-
     for (char i = last; i >= 0; i--)
     {
         if (blueprint->pPrims[i]->m_apTextures[0])
             continue;
-
-        if (logger < 10)
-        {
-            LogEvent(4480, "Missing main texture for FxEmitter", "FxSystemBP_c::Load", SString("index: %d, hash: %p", (int)i, blueprint->szNameHash), 7710);
-            ++logger;
-        }
 
         blueprint->pPrims[i] = nullptr;
         --count;
@@ -1968,7 +1975,11 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
         }
     }
 
-    blueprint->cNumOfPrims = count;
+    if (blueprint->cNumOfPrims != count)
+    {
+        LOG_FxSystemBP_c__Load();
+        blueprint->cNumOfPrims = count;
+    }
 }
 
 static void _declspec(naked) HOOK_FxSystemBP_c__Load()
@@ -1987,6 +1998,34 @@ static void _declspec(naked) HOOK_FxSystemBP_c__Load()
     //  mov     large fs:0, ecx
         add     esp, 5E8h
         retn    0Ch
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// FxPrim_c::Enable
+//
+// Add a null-pointer check for the ecx object. This hook is a side-effect of the hook for
+// FxSystemBP_c::Load above.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x4A9F50 | 8A 44 24 04 | mov  al, [esp+4]
+// >>> 0x4A9F54 | 88 41 0C    | mov  [ecx+0xC], al
+// >>> 0x4A9F57 | C2 04 00    | retn 4
+#define HOOKPOS_FxPrim_c__Enable  0x4A9F50
+#define HOOKSIZE_FxPrim_c__Enable 10
+
+static void _declspec(naked) HOOK_FxPrim_c__Enable()
+{
+    _asm
+    {
+        test    ecx, ecx
+        jz      returnFromFunction
+        mov     al, [esp+4]
+        mov     [ecx+0xC], al
+
+        returnFromFunction:
+        retn    4
     }
 }
 
@@ -2049,6 +2088,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(RpAnimBlendClumpGetFirstAssociation);
     EZHookInstall(CAnimManager__BlendAnimation);
     EZHookInstall(FxSystemBP_c__Load);
+    EZHookInstall(FxPrim_c__Enable);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
