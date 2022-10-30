@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-24 23:38+0000\n"
-"PO-Revision-Date: 2022-10-24 23:41\n"
+"POT-Creation-Date: 2022-10-30 19:33+0000\n"
+"PO-Revision-Date: 2022-10-30 20:09\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -98,17 +98,17 @@ msgstr "يتم مواجهة مشاكل أثناء إعادة تشغيل MTA:SA\n
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Client/mods/deathmatch/logic/CClientGame.cpp:589
+#: Client/mods/deathmatch/logic/CClientGame.cpp:663
+#: Client/mods/deathmatch/logic/CClientGame.cpp:687
+#: Client/mods/deathmatch/logic/CClientGame.cpp:709
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1025
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1105
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1115
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1218
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1267
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -434,7 +434,7 @@ msgstr "إجبار وضع النافذة"
 msgid "Don't show again"
 msgstr "لا تظهر ذلك مرة آخرى"
 
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:851
+#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:856
 msgid "MTA: San Andreas"
 msgstr "ملتي تيڤت اوتو: سان أندرياس"
 
@@ -624,12 +624,12 @@ msgstr "إصلاح مشكلات الملف"
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "أنسخ الملف التنفيذي لتجنب مشاكل برنامج تشغيل الرسوميات"
 
-#: Client/game_sa/CSettingsSA.cpp:773
+#: Client/game_sa/CSettingsSA.cpp:778
 msgid "Can't find valid screen resolution."
 msgstr "لا يمكن العثور على دقة شاشة صالحة"
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:849
+#: Client/game_sa/CSettingsSA.cpp:854
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "هل أنت متأكد من أنك تريد استخدام دقة الشاشة هذه؟"
 
@@ -2175,47 +2175,47 @@ msgstr "الاتصال بـ %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:605
 msgid "CONNECTING"
 msgstr "جاري الاتصال"
 
 #: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
 msgid "Connection timed out"
 msgstr "انتهت مهلة الاتصال"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1230
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1229
 msgid "Disconnected: unknown protocol error"
 msgstr "قطع الإتصال: خطأ في بروتوكول غير معروف"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1234
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1233
 msgid "Disconnected: disconnected remotely"
 msgstr "قطع الإتصال: قطع الإتصال عن بعد"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1238
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
 msgid "Disconnected: connection lost remotely"
 msgstr "قطع الاتصال: فقد الاتصال عن بُعد"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
 msgid "Disconnected: you are banned from this server"
 msgstr "قطع الاتصال: أنت محظور من الدخول إلى هذا الخادم"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1250
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
 msgid "Disconnected: disconnected from the server"
 msgstr "قطع الاتصال: قطع الاتصال من الخادم"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
 msgid "Disconnected: connection to the server was lost"
 msgstr "قطع الاتصال: تم فقد الاتصال بالخادم"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
 msgid "Disconnected: connection was refused"
 msgstr "قطع الإتصال: تم رفض الإتصال"
 
@@ -2547,8 +2547,8 @@ msgstr "الرجاء إستخدام بروتوكول mtasa://!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
+#: Client/mods/deathmatch/logic/CClientGame.cpp:589
+#: Client/mods/deathmatch/logic/CClientGame.cpp:687
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "أسم غير صحيح! الرجاء الذهاب الى الإعدادات و وضع اسم جديد !"
 
@@ -2988,57 +2988,57 @@ msgstr "قطع الإتصال"
 msgid "Download error: %s"
 msgstr "خطأ في التحميل:  %s"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:605
 msgid "Entering the game ..."
 msgstr "جاري الدخول الى اللعبة..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
+#: Client/mods/deathmatch/logic/CClientGame.cpp:663
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "غير متصل، يرجى استخدم 'الاتصال السريع' او استخدم الامر connect للاتصال بخادم"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
+#: Client/mods/deathmatch/logic/CClientGame.cpp:709
 msgid "The server is not installed"
 msgstr "الخادم غير مثبت"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1094
 msgid "Local Server"
 msgstr "سيرفر محلي"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
 msgid "Starting local server ..."
 msgstr "جاري تشغيل سيرفر محلي..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1025
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "تم طردك من اللعبة ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1094
 msgid "Connecting to local server..."
 msgstr "جاري الاتصال بالخادم المحلي..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1105
 msgid "Error connecting to server."
 msgstr "خطأ في الاتصال بالسيرفر"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1115
 msgid "Connecting to local server timed out. See console for details."
 msgstr "انتهت مهلة الأتصال بالخادم المحلي. انظر للـ Console لمزيد من التفاصيل"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1218
 msgid "Connection with the server was lost"
 msgstr "لقد فقد الإتصال بالخادم"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1246
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
 msgid "Disconnected: the server is currently full"
 msgstr "قطع الإتصال: الخادم ممتلئ حالياً"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
 msgid "Disconnected: invalid password specified"
 msgstr "قطع الأتصال: كلمة المرور المدخلة غير صحيحة"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 msgid "MTA Client verification failed!"
 msgstr "فشل التحقق من العميل MTA !"
 
