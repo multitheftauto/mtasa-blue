@@ -1923,8 +1923,8 @@ static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
 //
 // FxSystemBP_c::Load
 //
-// Remove every FxEmitter without a main texture (because of non-standard /models/effects.fxp),
-// because the game logic expects AT LEAST one texture at index 0 ("main texture").
+// Remove every FxEmitter without a main texture because the game logic expects AT LEAST
+// one texture at index 0 ("main texture").
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 //     0x5C0A14 | 5E                   | pop  esi
@@ -1936,21 +1936,6 @@ static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
 // >>> 0x5C0A26 | C2 0C 00             | retn 0Ch
 #define HOOKPOS_FxSystemBP_c__Load  0x5C0A15
 #define HOOKSIZE_FxSystemBP_c__Load 19
-
-static void LOG_FxSystemBP_c__Load()
-{
-    static bool once = false;
-
-    if (once)
-        return;
-
-    once = true;
-    OnCrashAverted(33);
-
-    SString     effectsMD5 = CMD5Hasher::CalculateHexString(PathJoin(GetLaunchPath(), "models", "effects.fxp"));
-    const char* isModified = (effectsMD5 == "6143A72E8FF2974DB14F65DF65D952B0") ? "standard" : "non-standard";
-    LogEvent(4481, "Crash averted", "FxSystemBP_c::Load", *SString("effects.fxp (%s, %s)", isModified, *effectsMD5), 7709);
-}
 
 static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* blueprint)
 {
@@ -1977,7 +1962,7 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
 
     if (blueprint->cNumOfPrims != count)
     {
-        LOG_FxSystemBP_c__Load();
+        OnCrashAverted(33);
         blueprint->cNumOfPrims = count;
     }
 }
@@ -2005,7 +1990,7 @@ static void _declspec(naked) HOOK_FxSystemBP_c__Load()
 //
 // FxPrim_c::Enable
 //
-// Add a null-pointer check for the ecx object. This hook is a side-effect of the hook for
+// Add a null-pointer check for the ecx pointer. This hook is a side-effect of the hook for
 // FxSystemBP_c::Load above.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
