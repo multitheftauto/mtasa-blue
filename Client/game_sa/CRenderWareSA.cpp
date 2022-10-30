@@ -12,15 +12,19 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CMatrix.h>
+#include <core/CCoreInterface.h>
 #define RWFUNC_IMPLEMENT
 #include <game/RenderWareD3D.h>
-#include "CRenderWareSA.h"
 #include "CColModelSA.h"
 #include "CFileLoaderSA.h"
+#include "CGameSA.h"
+#include "CRenderWareSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 
+extern CCoreInterface* g_pCore;
 extern CGameSA* pGame;
 
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts

@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPickupsSA.h"
+#include "CGameSA.h"
 #include "CPickupSA.h"
+#include "CPickupsSA.h"
 #include "CWorldSA.h"
+
+extern CGameSA* pGame;
 
 CPickupsSA::CPickupsSA()
 {

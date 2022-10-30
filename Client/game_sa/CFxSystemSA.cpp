@@ -10,8 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CFxSystemSA.h"
+#include <CMatrix.h>
 #include "CFxSystemBPSA.h"
+#include "CFxSystemSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 // Variables used in the hooks
 static CFxSystemSAInterface*  ms_pUsingFxSystemSAInterface = NULL;

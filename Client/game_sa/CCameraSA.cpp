@@ -11,6 +11,9 @@
 
 #include "StdInc.h"
 #include "CCameraSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 unsigned long CCameraSA::FUNC_RwFrameGetLTM;
 static bool   bCameraClipObjects;

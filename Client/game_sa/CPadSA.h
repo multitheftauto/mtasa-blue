@@ -78,12 +78,5 @@ public:
     void              Clear();
     CPadSAInterface*  GetInterface() { return this->internalInterface; };
     void              SetHornHistoryValue(bool value);
-    long              GetAverageWeapon();
     void              SetLastTimeTouched(DWORD dwTime);
-
-    uint GetDrunkInputDelay() { return internalInterface->DrunkDrivingBufferUsed; };
-    void SetDrunkInputDelay(uint inputDelay)
-    {
-        internalInterface->DrunkDrivingBufferUsed = inputDelay;
-    };            // Does not work yet, guess it's caused by MTA's control logic
 };

@@ -25,6 +25,7 @@ struct RwFrame;
 struct RwMatrix;
 struct RwTexDictionary;
 struct RwTexture;
+struct RpClump;
 
 typedef CShaderItem CSHADERDUMMY;
 

@@ -12,8 +12,11 @@
 #include "StdInc.h"
 #include "CAESoundManagerSA.h"
 #include "CAudioEngineSA.h"
+#include "CGameSA.h"
 #include "CPhysicalSA.h"
 #include "CSettingsSA.h"
+
+extern CGameSA* pGame;
 
 #define HOOKPOS_CAEAmbienceTrackManager_CheckForPause       0x4D6E21
 DWORD RETURN_CAEAmbienceTrackManager_CheckForPause = 0x4D6E27;

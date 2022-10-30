@@ -12,8 +12,11 @@
 #include "StdInc.h"
 #include <CRect.h>
 #include "CColModelSA.h"
+#include "CGameSA.h"
 #include "CPhysicalSA.h"
 #include "CPoolsSA.h"
+
+extern CGameSA* pGame;
 
 CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {

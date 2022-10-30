@@ -13,6 +13,8 @@
 
 #include "Common.h"
 
+class CVector;
+
 enum eWeaponSkill
 {
     WEAPONSKILL_POOR = 0,

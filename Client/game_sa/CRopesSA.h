@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CRopes.h>
 
 #define ROPES_COUNT    8

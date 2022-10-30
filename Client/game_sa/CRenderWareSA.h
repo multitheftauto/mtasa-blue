@@ -15,8 +15,12 @@
 #include "CModelInfoSA.h"
 #include "CRenderWareSA.ShaderSupport.h"
 
+class CMatchChannelManager;
 class CModelTexturesInfo;
 struct RpAtomic;
+struct SShaderReplacementStats;
+struct STexInfo;
+struct STexTag;
 
 class CRenderWareSA : public CRenderWare
 {

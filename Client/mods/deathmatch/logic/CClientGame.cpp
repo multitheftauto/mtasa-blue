@@ -22,7 +22,6 @@
 #include <game/CFire.h>
 #include <game/CGarage.h>
 #include <game/CGarages.h>
-#include <game/CPathFind.h>
 #include <game/CPedIntelligence.h>
 #include <game/CPlayerInfo.h>
 #include <game/CSettings.h>
@@ -3283,14 +3282,6 @@ void CClientGame::Event_OnIngame()
 
     g_pMultiplayer->DeleteAndDisableGangTags();
 
-    // Switch off peds and traffic
-    SFixedArray<CVector, 5> vecs = {CVector(-100000.0f, -100000.0f, -100000.0f), CVector(100000.0f, 100000.0f, 100000.0f),
-                                    CVector(-100000.0f, -100000.0f, -100000.0f), CVector(100000.0f, 100000.0f, 100000.0f), CVector(0, 0, 0)};
-    g_pGame->GetPathFind()->SwitchRoadsOffInArea(&vecs[0], &vecs[1]);
-    g_pGame->GetPathFind()->SwitchPedRoadsOffInArea(&vecs[2], &vecs[3]);
-    g_pGame->GetPathFind()->SetPedDensity(0.0f);
-    g_pGame->GetPathFind()->SetVehicleDensity(0.0f);
-
     g_pGame->GetWorld()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
@@ -3302,7 +3293,8 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
 
     // This is to prevent the 'white arrows in checkpoints' bug (#274)
-    g_pGame->Get3DMarkers()->CreateMarker(87654, (e3DMarkerType)5, &vecs[4], 1, 0.2f, 0, 0, 0, 0);
+    CVector pos(0, 0, 0);
+    g_pGame->Get3DMarkers()->CreateMarker(87654, (e3DMarkerType)5, &pos, 1, 0.2f, 0, 0, 0, 0);
 
     // Stop us getting 4 stars if we visit the SF or LV
     // g_pGame->GetPlayerInfo()->GetWanted()->SetMaximumWantedLevel ( 0 );

@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CFireManagerSA.h"
 #include "CFireSA.h"
+#include "CGameSA.h"
 
 extern CGameSA* pGame;
 

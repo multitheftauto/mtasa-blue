@@ -9,8 +9,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CWeaponStatSA.h"
+#include "CGameSA.h"
 #include "CWeaponStatManagerSA.h"
+#include "CWeaponStatSA.h"
+
+extern CGameSA* pGame;
 
 CWeaponStatSA::CWeaponStatSA(eWeaponType weaponType, eWeaponSkill skillLevel)
 {

@@ -23,7 +23,6 @@ public:
 
     void Release();
 
-    bool  IsRaining();
     float GetAmountOfRain();
     void  SetAmountOfRain(float fAmount);
     void  ResetAmountOfRain();
@@ -33,6 +32,4 @@ private:
     static unsigned char* VAR_CWeather__OldWeatherType;
     static unsigned char* VAR_CWeather__NewWeatherType;
     static float*         VAR_CWeather__Rain;
-
-    static unsigned long FUNC_IsRaining;
 };

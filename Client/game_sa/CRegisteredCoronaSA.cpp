@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRegisteredCoronaSA.h"
 #include "CCoronasSA.h"
+#include "CGameSA.h"
+#include "CRegisteredCoronaSA.h"
+
+extern CGameSA* pGame;
 
 CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface)
 {
