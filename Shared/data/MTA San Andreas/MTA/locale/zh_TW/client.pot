@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-24 23:38+0000\n"
-"PO-Revision-Date: 2022-10-24 23:42\n"
+"POT-Creation-Date: 2022-10-30 19:33+0000\n"
+"PO-Revision-Date: 2022-10-30 20:09\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -98,17 +98,17 @@ msgstr "重啟MTA:SA時有故障\n\n"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Client/mods/deathmatch/logic/CClientGame.cpp:589
+#: Client/mods/deathmatch/logic/CClientGame.cpp:663
+#: Client/mods/deathmatch/logic/CClientGame.cpp:687
+#: Client/mods/deathmatch/logic/CClientGame.cpp:709
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1025
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1105
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1115
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1218
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1267
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -436,7 +436,7 @@ msgstr "強制窗口模式"
 msgid "Don't show again"
 msgstr "以後不再顯示"
 
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:851
+#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:856
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -626,12 +626,12 @@ msgstr "修復文件問題"
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "複製主可執行檔，以避免圖形驅動程式問題"
 
-#: Client/game_sa/CSettingsSA.cpp:773
+#: Client/game_sa/CSettingsSA.cpp:778
 msgid "Can't find valid screen resolution."
 msgstr "無法找到有效的螢幕分辨率。"
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:849
+#: Client/game_sa/CSettingsSA.cpp:854
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "你確定你想要使用此螢幕分辨率?"
 
@@ -2178,47 +2178,47 @@ msgstr "正在連線至 %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:605
 msgid "CONNECTING"
 msgstr "連接中"
 
 #: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1185
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1184
 msgid "Connection timed out"
 msgstr "連線已逾時"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1230
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1229
 msgid "Disconnected: unknown protocol error"
 msgstr "連線中斷: 未知的協定錯誤"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1234
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1233
 msgid "Disconnected: disconnected remotely"
 msgstr "連線中斷: 遠程連線中斷"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1238
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
 msgid "Disconnected: connection lost remotely"
 msgstr "連線中斷: 伺服器連線中斷"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
 msgid "Disconnected: you are banned from this server"
 msgstr "連線中斷: 你已經被封鎖禁止進入該伺服器"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1250
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
 msgid "Disconnected: disconnected from the server"
 msgstr "連線中斷: 伺服器連線中斷"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
 msgid "Disconnected: connection to the server was lost"
 msgstr "連線中斷: 與伺服器的連線已遺失"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1262
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
 msgid "Disconnected: connection was refused"
 msgstr "連線中斷: 連線已被拒絕"
 
@@ -2540,8 +2540,8 @@ msgstr "請使用 mtasa:// protocol!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:590
-#: Client/mods/deathmatch/logic/CClientGame.cpp:688
+#: Client/mods/deathmatch/logic/CClientGame.cpp:589
+#: Client/mods/deathmatch/logic/CClientGame.cpp:687
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "無效的暱稱! 請去設置那裏設定新的暱稱!"
 
@@ -2961,57 +2961,57 @@ msgstr "已中斷連線"
 msgid "Download error: %s"
 msgstr "下載錯誤: %s"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:605
 msgid "Entering the game ..."
 msgstr "進入遊戲中..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:664
+#: Client/mods/deathmatch/logic/CClientGame.cpp:663
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "未連線；請使用'快速連線'或'連線'指令去連線到伺服器。"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:710
+#: Client/mods/deathmatch/logic/CClientGame.cpp:709
 msgid "The server is not installed"
 msgstr "此伺服器並未安裝完成"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1094
 msgid "Local Server"
 msgstr "本地伺服器"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:720
+#: Client/mods/deathmatch/logic/CClientGame.cpp:719
 msgid "Starting local server ..."
 msgstr "啟動本地伺服器中..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1026
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1025
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "你從遊戲中被剔除了 ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1095
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1094
 msgid "Connecting to local server..."
 msgstr "正在連線至本地伺服器..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1106
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1105
 msgid "Error connecting to server."
 msgstr "連線到伺服器時發生錯誤。"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1116
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1115
 msgid "Connecting to local server timed out. See console for details."
 msgstr "連線到本地伺服器逾時，請查看控制台以詳細了解。"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1219
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1218
 msgid "Connection with the server was lost"
 msgstr "與伺服器的連線已遺失"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1246
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
 msgid "Disconnected: the server is currently full"
 msgstr "連線中斷: 該伺服器目前滿人"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1258
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
 msgid "Disconnected: invalid password specified"
 msgstr "連線中斷: 指定的密碼無效"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 msgid "MTA Client verification failed!"
 msgstr "MTA 客戶端驗證失敗"
 
