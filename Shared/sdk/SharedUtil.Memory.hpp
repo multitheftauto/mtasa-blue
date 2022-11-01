@@ -25,10 +25,6 @@
 
 namespace SharedUtil
 {
-#ifdef _WIN32
-    static HANDLE g_process = GetCurrentProcess();
-#endif
-
     bool TryGetProcessMemoryStats(ProcessMemoryStats& out)
     {
         out = {};
@@ -44,14 +40,15 @@ namespace SharedUtil
 
         static std::vector<char> workingSetBuffer(2048 * sizeof(PSAPI_WORKING_SET_BLOCK) + sizeof(PSAPI_WORKING_SET_INFORMATION));
         auto                     workingSetInfo = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(workingSetBuffer.data());
-        BOOL                     success = QueryWorkingSet(g_process, workingSetBuffer.data(), workingSetBuffer.size());
+        HANDLE                   process = GetCurrentProcess();
+        BOOL                     success = QueryWorkingSet(process, workingSetBuffer.data(), workingSetBuffer.size());
 
         if (!success && GetLastError() == ERROR_BAD_LENGTH)
         {
             workingSetInfo->NumberOfEntries += 64;            // Insurance in case the number of entries changes.
             workingSetBuffer.resize(workingSetInfo->NumberOfEntries * sizeof(PSAPI_WORKING_SET_BLOCK) + sizeof(PSAPI_WORKING_SET_INFORMATION));
             workingSetInfo = reinterpret_cast<PSAPI_WORKING_SET_INFORMATION*>(workingSetBuffer.data());
-            success = QueryWorkingSet(g_process, workingSetBuffer.data(), workingSetBuffer.size());
+            success = QueryWorkingSet(process, workingSetBuffer.data(), workingSetBuffer.size());
         }
 
         if (success)
@@ -84,7 +81,7 @@ namespace SharedUtil
         {
             PROCESS_MEMORY_COUNTERS_EX memoryInfo{};
 
-            if (!GetProcessMemoryInfo(g_process, reinterpret_cast<PPROCESS_MEMORY_COUNTERS>(&memoryInfo), sizeof(memoryInfo)))
+            if (!GetProcessMemoryInfo(process, reinterpret_cast<PPROCESS_MEMORY_COUNTERS>(&memoryInfo), sizeof(memoryInfo)))
                 return false;
 
             out.residentMemorySize = memoryInfo.WorkingSetSize;
