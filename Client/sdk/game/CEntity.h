@@ -108,8 +108,6 @@ public:
     virtual bool IsStaticWaitingForCollision() = 0;
     virtual void SetStaticWaitingForCollision(bool bStatic) = 0;
 
-    virtual unsigned long GetArrayID() = 0;
-
     virtual RwMatrix* GetBoneRwMatrix(eBone boneId) = 0;
     virtual bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
 

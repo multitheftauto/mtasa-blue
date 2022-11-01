@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include "gamesa_renderware.h"
 #include "CFileLoaderSA.h"
+#include "CModelInfoSA.h"
 
 CFileLoaderSA::CFileLoaderSA()
 {

@@ -10,11 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPoolsSA.h"
 #include "CBikeSA.h"
 #include "CBoatSA.h"
+#include "CGameSA.h"
 #include "CPlayerPedSA.h"
+#include "CPoolsSA.h"
 #include "CWorldSA.h"
+
+extern CGameSA* pGame;
 
 extern bool g_bVehiclePointerInvalid;
 
@@ -25,9 +28,6 @@ CPoolsSA::CPoolsSA()
     m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
 
     m_bGetVehicleEnabled = true;
-    m_ulBuildingCount = 0;
-
-    MemSetFast(&Buildings, 0, sizeof(CBuilding*) * MAX_BUILDINGS);
 }
 
 CPoolsSA::~CPoolsSA()
@@ -36,20 +36,6 @@ CPoolsSA::~CPoolsSA()
     DeleteAllVehicles();
     DeleteAllPeds();
     DeleteAllObjects();
-    DeleteAllBuildings();
-}
-
-void CPoolsSA::DeleteAllBuildings()
-{
-    /*
-    for ( int i = 0; i < MAX_BUILDINGS; i++ )
-    {
-    if ( Buildings [i] )
-    {
-    RemoveBuilding ( Buildings [i] );
-    }
-    }
-    */
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -111,55 +97,6 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
     return pVehicle;
 }
 
-CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface)
-{
-    CVehicleSA* pVehicle = NULL;
-
-    if (m_vehiclePool.ulCount < MAX_VEHICLES)
-    {
-        CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
-
-        if (pInterface)
-        {
-            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
-            if (dwElementIndexInPool >= MAX_VEHICLES)
-            {
-                return nullptr;
-            }
-            pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-            if (pVehicle)
-            {
-                return pVehicle;
-            }
-            else
-            {
-                switch ((VehicleClass)pInterface->m_vehicleClass)
-                {
-                    case VehicleClass::BOAT:
-                        pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
-                        break;
-                    case VehicleClass::BMX:
-                    case VehicleClass::BIKE:
-                        pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
-                        break;
-                    default:
-                        pVehicle = new CVehicleSA(pInterface);
-                        break;
-                }
-
-                if (!AddVehicleToPool(pClientVehicle, pVehicle))
-                {
-                    delete pVehicle;
-                    pVehicle = NULL;
-                }
-            }
-        }
-    }
-
-    return pVehicle;
-}
-
 void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
 {
     static bool bIsDeletingVehicleAlready = false;
@@ -208,73 +145,6 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
         }
     }
     return nullptr;
-}
-
-DWORD CPoolsSA::GetVehicleRef(CVehicle* pVehicle)
-{
-    DWORD       dwRef = 0;
-    CVehicleSA* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
-    if (pVehicleSA)
-    {
-        CVehicleSAInterface* pInterface = pVehicleSA->GetVehicleInterface();
-        DWORD                dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-DWORD CPoolsSA::GetVehicleRef(DWORD* pGameInterface)
-{
-    DWORD                dwRef = 0;
-    CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetVehicleRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-CVehicle* CPoolsSA::GetVehicleFromRef(DWORD dwGameRef)
-{
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetVehicle;
-
-    _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Vehicle]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CVehicleSAInterface* pInterface = (CVehicleSAInterface*)dwReturn;
-    if (pInterface)
-    {
-        DWORD       dwElementIndexInPool = dwGameRef >> 8;
-        CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-        if (pVehicle)
-        {
-            return pVehicle;
-        }
-    }
-
-    return NULL;
 }
 
 void CPoolsSA::DeleteAllVehicles()
@@ -391,74 +261,6 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
         }
     }
     return nullptr;
-}
-
-DWORD CPoolsSA::GetObjectRef(CObject* pObject)
-{
-    DWORD      dwRef = 0;
-    CObjectSA* pObjectSA = dynamic_cast<CObjectSA*>(pObject);
-    if (pObjectSA)
-    {
-        CObjectSAInterface* pInterface = pObjectSA->GetObjectInterface();
-        DWORD               dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-DWORD CPoolsSA::GetObjectRef(DWORD* pGameInterface)
-{
-    DWORD               dwRef = 0;
-    CObjectSAInterface* pInterface = reinterpret_cast<CObjectSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetObjectRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-CObject* CPoolsSA::GetObjectFromRef(DWORD dwGameRef)
-{
-    DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetObject;
-
-    _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Object]
-        push    dwGameRef
-        call    dwFunction
-        add     esp, 0x4
-        mov     dwReturn, eax
-    }
-
-    CObjectSAInterface* pInterface = (CObjectSAInterface*)dwReturn;
-
-    if (pInterface)
-    {
-        DWORD      dwElementIndexInPool = dwGameRef >> 8;
-        CObjectSA* pObject = m_objectPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-
-        if (pObject)
-        {
-            return pObject;
-        }
-    }
-
-    return NULL;
 }
 
 CObject* CPoolsSA::GetObjectFromIndex(std::uint32_t elementIndexInPool)
@@ -630,44 +432,6 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
     return nullptr;
 }
 
-DWORD CPoolsSA::GetPedRef(CPed* pPed)
-{
-    DWORD   dwRef = 0;
-    CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
-    if (pPedSA)
-    {
-        CPedSAInterface* pInterface = pPedSA->GetPedInterface();
-        DWORD            dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-
-    return dwRef;
-}
-
-DWORD CPoolsSA::GetPedRef(DWORD* pGameInterface)
-{
-    DWORD            dwRef = 0;
-    CPedSAInterface* pInterface = reinterpret_cast<CPedSAInterface*>(pGameInterface);
-    if (pInterface)
-    {
-        DWORD dwFunc = FUNC_GetPedRef;
-        _asm
-        {
-            push    pInterface
-            call    dwFunc
-            add     esp, 0x4
-            mov     dwRef, eax
-        }
-    }
-    return dwRef;
-}
-
 CPed* CPoolsSA::GetPedFromRef(DWORD dwGameRef)
 {
     CPedSAInterface* pInterface = this->GetPedInterface(dwGameRef);
@@ -755,26 +519,6 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
         if (pThePedEntity)
         {
             return pThePedEntity->pClientEntity;
-        }
-    }
-    return NULL;
-}
-
-CBuilding* CPoolsSA::AddBuilding(DWORD dwModelID)
-{
-    if (m_ulBuildingCount <= MAX_BUILDINGS)
-    {
-        for (int i = 0; i < MAX_BUILDINGS; i++)
-        {
-            if (Buildings[i] == 0)
-            {
-                CBuildingSA* pBuilding = new CBuildingSA(dwModelID);
-                Buildings[i] = pBuilding;
-                pBuilding->SetArrayID(i);
-                m_ulBuildingCount++;
-
-                return pBuilding;
-            }
         }
     }
     return NULL;

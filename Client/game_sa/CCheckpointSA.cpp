@@ -10,9 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCheckpointSA.h"
 #include "C3DMarkerSA.h"
 #include "C3DMarkersSA.h"
+#include "CCheckpointSA.h"
 
 void CCheckpointSA::SetPosition(CVector* vecPosition)
 {
@@ -131,16 +131,4 @@ void CCheckpointSA::Remove()
     this->GetInterface()->m_bIsUsed = false;
     this->GetInterface()->m_nType = 257;
     this->GetInterface()->rwColour = 0;
-    C3DMarkerSA* pMarker = (C3DMarkerSA*)(((C3DMarkersSA*)pGame->Get3DMarkers())->FindMarker(this->GetIdentifier()));
-    if (pMarker)
-    {
-        // pMarker->Disable();
-        // pMarker->DeleteMarkerObject();
-    }
-    else
-    {
-        #ifdef MTA_DEBUG
-        // OutputDebugString ( "Couldn't find marker for checkpoint!" );
-        #endif
-    }
 }

@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CEventDamageSA.h"
 #include "CEntitySA.h"
+#include "CEventDamageSA.h"
+#include "CGameSA.h"
 #include "CPoolsSA.h"
+
+extern CGameSA* pGame;
 
 CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4)
 {

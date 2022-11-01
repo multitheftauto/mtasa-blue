@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CTaskManagerSA.h"
+#include "CGameSA.h"
 #include "CTaskManagementSystemSA.h"
+#include "CTaskManagerSA.h"
 #include "TaskSA.h"
+
+extern CGameSA* pGame;
 
 CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CPed* ped)
 {

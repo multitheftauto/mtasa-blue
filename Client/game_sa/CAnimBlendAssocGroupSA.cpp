@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
 #include "CAnimBlendAssocGroupSA.h"
 #include "CAnimBlockSA.h"
+
+extern CCoreInterface* g_pCore;
 
 CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface)
 {

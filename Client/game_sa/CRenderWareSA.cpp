@@ -12,15 +12,19 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CMatrix.h>
+#include <core/CCoreInterface.h>
 #define RWFUNC_IMPLEMENT
 #include <game/RenderWareD3D.h>
-#include "CRenderWareSA.h"
 #include "CColModelSA.h"
 #include "CFileLoaderSA.h"
+#include "CGameSA.h"
+#include "CRenderWareSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 
+extern CCoreInterface* g_pCore;
 extern CGameSA* pGame;
 
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
@@ -362,7 +366,7 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
     if (pModelInfo)
     {
         RpClump* pOldClump = (RpClump*)pModelInfo->GetRwObject();
-        if (!DoContainTheSameGeometry(pNew, pOldClump, NULL))
+        if (pOldClump != pNew && !DoContainTheSameGeometry(pNew, pOldClump, NULL))
         {
             if (pModelInfo->IsVehicle())
             {
@@ -392,11 +396,10 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
             CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
             RpClumpDestroy(pOldClump);
-            return true;
         }
     }
 
-    return false;
+    return true;
 }
 
 // Replaces a vehicle model
@@ -501,7 +504,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
     {
         RpAtomic* pOldAtomic = (RpAtomic*)pModelInfo->GetRwObject();
 
-        if (!DoContainTheSameGeometry(pNew, NULL, pOldAtomic))
+        if (reinterpret_cast<RpClump*>(pOldAtomic) != pNew && !DoContainTheSameGeometry(pNew, NULL, pOldAtomic))
         {
             // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
             RpClump* pCopy = RpClumpClone(pNew);
@@ -516,11 +519,10 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
 
             // Get rid of the now empty copied clump
             RpClumpDestroy(pCopy);
-            return true;
         }
     }
 
-    return false;
+    return true;
 }
 
 // Replaces all atomics in a vehicle

@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CColModel.h>
 #include <game/CColPoint.h>
 #include "CCompressedVectorSA.h"

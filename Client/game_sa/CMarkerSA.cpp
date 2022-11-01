@@ -10,8 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CVector.h>
 #include "CMarkerSA.h"
-#include "CPoolsSA.h"
 
 void CMarkerSA::Init()
 {
@@ -31,7 +31,7 @@ void CMarkerSA::Init()
     internalInterface->nBlipSprite = RADAR_SPRITE_NONE;
     #define COORD_BLIP_APPEARANCE_NORMAL 0
     internalInterface->nCoordBlipAppearance = COORD_BLIP_APPEARANCE_NORMAL;
-    internalInterface->pEntryExit = NULL;
+    internalInterface->pEntryExit = nullptr;
 }
 
 /**
@@ -114,47 +114,6 @@ bool CMarkerSA::IsActive()
 void CMarkerSA::SetPosition(CVector* vecPosition)
 {
     MemCpyFast(&internalInterface->position, vecPosition, sizeof(CVector));
-}
-
-void CMarkerSA::SetEntity(CVehicle* vehicle)
-{
-    CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
-    DWORD     dwID = pPools->GetVehicleRef((CVehicle*)vehicle);
-    internalInterface->PoolIndex = dwID;
-    internalInterface->BlipType = (BYTE)MARKER_TYPE_CAR;
-}
-
-void CMarkerSA::SetEntity(CPed* ped)
-{
-    CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
-    DWORD     dwID = pPools->GetPedRef((CPed*)ped);
-    internalInterface->PoolIndex = dwID;
-    internalInterface->BlipType = (BYTE)MARKER_TYPE_CHAR;
-}
-
-void CMarkerSA::SetEntity(CObject* object)
-{
-    CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
-    DWORD     dwID = pPools->GetObjectRef((CObject*)object);
-    internalInterface->PoolIndex = dwID;
-    internalInterface->BlipType = (eMarkerType)MARKER_TYPE_OBJECT;
-}
-
-CEntity* CMarkerSA::GetEntity()
-{
-    CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
-
-    switch (internalInterface->BlipType)
-    {
-        case MARKER_TYPE_CAR:
-            return (CEntity*)pPools->GetVehicleFromRef((DWORD)internalInterface->PoolIndex);
-        case MARKER_TYPE_CHAR:
-            return (CEntity*)pPools->GetPedFromRef((DWORD)internalInterface->PoolIndex);
-        case MARKER_TYPE_OBJECT:
-            return (CEntity*)pPools->GetObjectFromRef((DWORD)internalInterface->PoolIndex);
-        default:
-            return NULL;
-    }
 }
 
 CVector* CMarkerSA::GetPosition()

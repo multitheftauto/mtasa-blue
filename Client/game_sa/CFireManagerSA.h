@@ -13,6 +13,7 @@
 
 #include <game/CFireManager.h>
 
+class CEntity;
 class CFireSA;
 class CFireSAInterface;
 

@@ -12,7 +12,10 @@
 #include "StdInc.h"
 #include "CEntitySA.h"
 #include "CFireSA.h"
+#include "CGameSA.h"
 #include "CPoolsSA.h"
+
+extern CGameSA* pGame;
 
 /**
  * Put the fire out

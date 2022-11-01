@@ -10,10 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CSettingsSA.h"
+#include <core/CCoreInterface.h>
 #include "CAudioEngineSA.h"
 #include "CCoronasSA.h"
+#include "CGameSA.h"
 #include "CHudSA.h"
+#include "CSettingsSA.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;

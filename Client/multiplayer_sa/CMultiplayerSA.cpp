@@ -1572,6 +1572,7 @@ void CMultiplayerSA::InitHooks()
 
     InitHooks_Streaming();
     InitHooks_FrameRateFixes();
+    InitHooks_ProjectileCollisionFix();
     InitHooks_ObjectStreamerOptimization();
 }
 

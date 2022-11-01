@@ -13,6 +13,7 @@
 
 #include <game/CPedIntelligence.h>
 
+class CPedSAInterface;
 class CTaskManagerSA;
 
 #define FUNC_CPedIntelligence_TestForStealthKill    0x601E00

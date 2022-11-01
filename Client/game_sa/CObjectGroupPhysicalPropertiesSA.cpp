@@ -10,8 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CFxSystemBPSA.h"
+#include "CGameSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
 
 extern CGameSA* pGame;
 
