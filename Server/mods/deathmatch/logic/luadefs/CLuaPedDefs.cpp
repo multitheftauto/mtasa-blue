@@ -179,7 +179,7 @@ int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
     lua_newtable(luaVM);
-    for (unsigned short i = 0; i <= 312; i++)
+    for (unsigned short i = 0; i <= 313; i++)
     {
         if (CPlayerManager::IsValidPlayerModel(i))
         {

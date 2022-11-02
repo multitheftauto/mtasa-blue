@@ -486,7 +486,7 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
         if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;
-            if (i < 313)
+            if (i < 314)
                 memStatsInfo.modelInfo.uiPlayerModels_0_312++;
             else if (i < 318)
                 memStatsInfo.modelInfo.uiUnknown_313_317++;

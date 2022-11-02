@@ -827,6 +827,7 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[310].MakePedModel("BBTHIN");
     ModelInfo[311].MakePedModel("SMOKEV");
     ModelInfo[312].MakePedModel("PSYCHO");
+    ModelInfo[313].MakePedModel("BB");
     /* Hot-coffee only models
     ModelInfo[313].MakePedModel ( "GANGRL2" );
     ModelInfo[314].MakePedModel ( "MECGRL2" );

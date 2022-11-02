@@ -246,7 +246,7 @@ void CClientModelCacheManagerImpl::ProcessPlayerList(std::map<ushort, float>& ou
         CClientPlayer* pPlayer = *iter;
         ushort         usModelId = (ushort)pPlayer->GetModel();
 
-        if (usModelId < 7 || usModelId > 312)
+        if (usModelId < 7 || usModelId > 313)
             continue;
 
         // Check if currently within distance
@@ -323,7 +323,7 @@ void CClientModelCacheManagerImpl::ProcessPedList(std::map<ushort, float>& outNe
         CClientPed*  pPed = *iter;
         const ushort usModelId = (ushort)pPed->GetModel();
 
-        if (usModelId < 7 || usModelId > 312)
+        if (usModelId < 7 || usModelId > 313)
             continue;
 
         // Check if currently within distance
