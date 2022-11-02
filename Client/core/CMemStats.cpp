@@ -486,10 +486,10 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
         if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;
-            if (i < 314)
-                memStatsInfo.modelInfo.uiPlayerModels_0_313++;
+            if (i < 313)
+                memStatsInfo.modelInfo.uiPlayerModels_0_312++;
             else if (i < 318)
-                memStatsInfo.modelInfo.uiUnknown_314_317++;
+                memStatsInfo.modelInfo.uiUnknown_313_317++;
             else if (i < 373)
                 memStatsInfo.modelInfo.uiWeaponModels_318_372++;
             else if (i < 400)
@@ -892,8 +892,8 @@ void CMemStats::CreateTables()
         table.SetColumnWidths("90,50,50:R,60:R");
         table.SetNumberColors("^1", strNumberColorsModels);
         table.AddRow(HEADER1("Models in memory") "| |" HEADER1("Change") "|" HEADER1("Count"));
-        table.AddRow(SString("0-312|(Players)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_313, m_MemStatsNow.modelInfo.uiPlayerModels_0_313));
-        table.AddRow(SString("313-317| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_314_317, m_MemStatsNow.modelInfo.uiUnknown_314_317));
+        table.AddRow(SString("0-312|(Players)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPlayerModels_0_312, m_MemStatsNow.modelInfo.uiPlayerModels_0_312));
+        table.AddRow(SString("313-317| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_313_317, m_MemStatsNow.modelInfo.uiUnknown_313_317));
         table.AddRow(SString("318-372|(Weapons)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiWeaponModels_318_372, m_MemStatsNow.modelInfo.uiWeaponModels_318_372));
         table.AddRow(SString("373-399| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_373_399, m_MemStatsNow.modelInfo.uiUnknown_373_399));
         table.AddRow(SString("400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611));

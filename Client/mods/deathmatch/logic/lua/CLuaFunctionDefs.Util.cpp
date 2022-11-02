@@ -16,7 +16,7 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
     lua_newtable(luaVM);
 
     // Gather GTASA default skins
-    for (int i = 0; i <= 313; i++)
+    for (int i = 0; i <= 312; i++)
     {
         if (CClientPlayerManager::IsValidModel(i))
         {

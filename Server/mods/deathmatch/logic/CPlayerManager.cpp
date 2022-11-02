@@ -331,21 +331,12 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
 
 bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 {
-    if (model > 313)
+    if (model > 312)
         return false;            // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
 
     switch (model)
     {
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 8:
-        case 42:
-        case 65:
-        case 74:
-        case 86:
-        case 119:
+        case 74: //Missing skin
         case 149:
         case 208:
         case 273:

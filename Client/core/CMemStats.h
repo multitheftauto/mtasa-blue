@@ -40,8 +40,8 @@ struct SMemStatsInfo
         uint uiArray[14];
         struct
         {
-            uint uiPlayerModels_0_313;
-            uint uiUnknown_314_317;
+            uint uiPlayerModels_0_312;
+            uint uiUnknown_313_317;
             uint uiWeaponModels_318_372;
             uint uiUnknown_373_399;
             uint uiVehicles_400_611;

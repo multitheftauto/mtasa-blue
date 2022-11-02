@@ -790,12 +790,17 @@ void CGameSA::SetupSpecialCharacters()
 {
     ModelInfo[1].MakePedModel("TRUTH");
     ModelInfo[2].MakePedModel("MACCER");
-    // ModelInfo[190].MakePedModel ( "BARBARA" );
-    // ModelInfo[191].MakePedModel ( "HELENA" );
-    // ModelInfo[192].MakePedModel ( "MICHELLE" );
-    // ModelInfo[193].MakePedModel ( "KATIE" );
-    // ModelInfo[194].MakePedModel ( "MILLIE" );
-    // ModelInfo[195].MakePedModel ( "DENISE" );
+
+    ModelInfo[3].MakePedModel("CDEPUT");
+    ModelInfo[4].MakePedModel("SFPDM1");
+    ModelInfo[5].MakePedModel("BB");
+    ModelInfo[6].MakePedModel("WFYCRP");
+    ModelInfo[8].MakePedModel("WMYCD2");
+    ModelInfo[42].MakePedModel("SUZIE");
+    ModelInfo[65].MakePedModel("VWMYAP");
+    ModelInfo[86].MakePedModel("VHFYST");
+    ModelInfo[119].MakePedModel("LVPDM1");
+
     ModelInfo[265].MakePedModel("TENPEN");
     ModelInfo[266].MakePedModel("PULASKI");
     ModelInfo[267].MakePedModel("HERN");
@@ -804,6 +809,8 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[270].MakePedModel("SWEET");
     ModelInfo[271].MakePedModel("RYDER");
     ModelInfo[272].MakePedModel("FORELLI");
+    ModelInfo[273].MakePedModel("MEDIATR");
+    ModelInfo[289].MakePedModel("SOMYAP");
     ModelInfo[290].MakePedModel("ROSE");
     ModelInfo[291].MakePedModel("PAUL");
     ModelInfo[292].MakePedModel("CESAR");
@@ -827,7 +834,14 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[310].MakePedModel("BBTHIN");
     ModelInfo[311].MakePedModel("SMOKEV");
     ModelInfo[312].MakePedModel("PSYCHO");
-    ModelInfo[313].MakePedModel("BB");
+
+
+    // ModelInfo[190].MakePedModel ( "BARBARA" );
+    // ModelInfo[191].MakePedModel ( "HELENA" );
+    // ModelInfo[192].MakePedModel ( "MICHELLE" );
+    // ModelInfo[193].MakePedModel ( "KATIE" );
+    // ModelInfo[194].MakePedModel ( "MILLIE" );
+    // ModelInfo[195].MakePedModel ( "DENISE" );
     /* Hot-coffee only models
     ModelInfo[313].MakePedModel ( "GANGRL2" );
     ModelInfo[314].MakePedModel ( "MECGRL2" );
