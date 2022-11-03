@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-30 19:33+0000\n"
-"PO-Revision-Date: 2022-10-30 20:09\n"
+"PO-Revision-Date: 2022-11-03 21:53\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -1603,11 +1603,11 @@ msgstr "Rodyti netinkamas ekrano raiškas"
 
 #: Client/core/CSettings.cpp:856
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Vainiko lietaus atspindžiai"
 
 #: Client/core/CSettings.cpp:860
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dinamiški pėsčiųjų šešėliai"
 
 #: Client/core/CSettings.cpp:889
 msgid "Enable remote websites"
