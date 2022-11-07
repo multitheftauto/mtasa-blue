@@ -7066,12 +7066,9 @@ void _declspec(naked) HOOK_CWeapon__TakePhotograph()
         // Restore instructions replaced by hook
         add     esp, 8
         test    edi, edi
-    }
 
-    TakePhotograph();
+        call    TakePhotograph
 
-    _asm
-    {
         // Go back
         jmp     RETURN_CWeapon__TakePhotograph
     }
