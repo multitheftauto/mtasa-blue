@@ -7053,14 +7053,13 @@ void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
     }
 }
 
-// Disable camera collisions for projectiles and vehicle parts
+// Disable camera collisions for projectiles and detached vehicle parts
 const DWORD RETURN_CCollision__CheckCameraCollisionObjects = 0x41AB98;
 const DWORD RETURN_CCollision__CheckCameraCollisionObjects_2 = 0x41AC26;
-CEntitySAInterface* pLastCameraCollisionCheckObjectEntity = NULL;
 
-static bool CanEntityCollideWithCamera()
+bool CanEntityCollideWithCamera(CEntitySAInterface* pEntity)
 {
-    switch (pLastCameraCollisionCheckObjectEntity->m_nModelIndex)
+    switch (pEntity->m_nModelIndex)
     {
         // projectiles
         case 342: // grenade
@@ -7086,31 +7085,18 @@ void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
     _asm
     {
         // Restore instructions replaced by hook
-        jz      loc_41AC26
+        jz      out2
         movsx   edx, word ptr [esi+22h]
 
         // Do our stuff
-        mov     pLastCameraCollisionCheckObjectEntity, esi // pEntity
-        jmp     after
-        
-    loc_41AC26:
-        jmp RETURN_CCollision__CheckCameraCollisionObjects_2
+        push    esi // pEntity
+        call    CanEntityCollideWithCamera
+        add     esp, 4
+        test    al, al
+        jnz     out1
+        jmp     RETURN_CCollision__CheckCameraCollisionObjects_2
 
-    after:
-    }
-
-    if (CanEntityCollideWithCamera())
-    {
-        _asm
-        {
-            jmp RETURN_CCollision__CheckCameraCollisionObjects
-        }
-    }
-    else
-    {
-        _asm
-        {
-            jmp RETURN_CCollision__CheckCameraCollisionObjects_2
-        }
+    out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
+    out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
     }
 }
