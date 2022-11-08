@@ -37,7 +37,7 @@ class CLuaMain            //: public CClient
 {
 public:
     ZERO_ON_NEW
-    CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP);
+    CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP, ELuaVersion luaVersion);
     ~CLuaMain();
 
     bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);
@@ -101,6 +101,7 @@ private:
     static SString                                  ms_strExpectedUndumpHash;
 
     bool m_bEnableOOP;
+    ELuaVersion m_LuaVersion = ELuaVersion::VLUA_5_1;
 
 public:
     CFastHashMap<const void*, CRefInfo> m_CallbackTable;

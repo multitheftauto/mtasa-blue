@@ -38,7 +38,7 @@ class CResource
 {
 public:
     CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-              const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
+              const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP, ELuaVersion luaVersion);
     ~CResource();
 
     unsigned short GetNetID() { return m_usNetID; };
@@ -130,6 +130,8 @@ private:
     CMtaVersion          m_strMinClientReq;
     bool                 m_bOOPEnabled;
     int                  m_iDownloadPriorityGroup;
+
+    ELuaVersion m_LuaVersion = ELuaVersion::VLUA_5_1;
 
     // To control cursor show/hide
     static int m_iShowingCursor;

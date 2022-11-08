@@ -28,6 +28,13 @@ CLuaManager::CLuaManager(CClientGame* pClientGame)
     m_pGUIManager = pClientGame->GetGUIManager();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands();
 
+    // Vlua libraries are located in deathmatch mod folder
+    const SString strDeathmatchPath = CalcMTASAPath("mods\\deathmatch");    
+    SetDllDirectory(strDeathmatchPath);
+
+    // Init Vlua library
+    VluaL_init();
+
     // Ensure lua was compiled with apichecks
     #ifdef NDEBUG
         #error "NDEBUG should not be defined"
@@ -54,12 +61,15 @@ CLuaManager::~CLuaManager()
 
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();
+
+    // Close Vlua library
+    VluaL_close();
 }
 
-CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP)
+CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP, ELuaVersion luaVersion)
 {
     // Create it and add it to the list over VM's
-    CLuaMain* pLuaMain = new CLuaMain(this, pResourceOwner, bEnableOOP);
+    CLuaMain* pLuaMain = new CLuaMain(this, pResourceOwner, bEnableOOP, luaVersion);
     m_virtualMachines.push_back(pLuaMain);
     pLuaMain->InitVM();
     return pLuaMain;

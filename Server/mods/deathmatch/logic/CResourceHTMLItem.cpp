@@ -298,7 +298,7 @@ bool CResourceHTMLItem::Start()
              fwrite ( m_szBuffer, 1, strlen(m_szBuffer), debug );
              fclose ( debug );*/
 
-        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(m_resource, m_bOOPEnabled);
+        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(m_resource, m_bOOPEnabled, m_resource->GetLuaVersion());
         m_pVM->LoadEmbeddedScripts();
         m_pVM->RegisterModuleFunctions();
         m_pVM->LoadScript(strScript.c_str());

@@ -5060,6 +5060,14 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         bitStream.ReadBit(bEnableOOP);
     }
 
+    ELuaVersion luaVersion = ELuaVersion::VLUA_5_1;
+    if (bitStream.Can(eBitStreamVersion::ResourceLuaVersion))
+    {
+        unsigned char ucVersion;
+        if (bitStream.Read(ucVersion))
+            luaVersion = static_cast<ELuaVersion>(ucVersion);
+    }
+
     int iDownloadPriorityGroup = 0;
     if (bitStream.Version() >= 0x62)
     {
@@ -5081,7 +5089,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     bool bFatalError = false;
 
     CResource* pResource = g_pClientGame->m_pResourceManager->Add(usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq,
-                                                                  strMinClientReq, bEnableOOP);
+                                                                  strMinClientReq, bEnableOOP, luaVersion);
     if (pResource)
     {
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);

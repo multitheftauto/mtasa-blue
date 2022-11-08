@@ -207,6 +207,20 @@ bool CResource::Load()
                 m_bOOPEnabledInMetaXml = StringToBool(pNodeClientOOP->GetTagContent().c_str());
             }
 
+            m_LuaVersion = ELuaVersion::VLUA_5_1;
+            m_ClientLuaVersion = ELuaVersion::VLUA_5_1;
+            CXMLNode* pNodeLua = pRoot->FindSubNode("lua", 0);
+
+            if (pNodeLua)
+            {
+                if (CXMLAttribute* pAttr = pNodeLua->GetAttributes().Find("server"))
+                    m_LuaVersion = pAttr->GetValue() == "luau" ? ELuaVersion::VLUA_U : ELuaVersion::VLUA_5_1;
+                if (CXMLAttribute* pAttr = pNodeLua->GetAttributes().Find("client"))
+                    m_ClientLuaVersion = pAttr->GetValue() == "luau" ? ELuaVersion::VLUA_U : ELuaVersion::VLUA_5_1;
+                if (CXMLAttribute* pAttr = pNodeLua->GetAttributes().Find("both"))
+                    m_LuaVersion = m_ClientLuaVersion = pAttr->GetValue() == "luau" ? ELuaVersion::VLUA_U : ELuaVersion::VLUA_5_1;
+            }
+
             m_iDownloadPriorityGroup = 0;
             CXMLNode* pNodeDownloadPriorityGroup = pRoot->FindSubNode("download_priority_group", 0);
 
@@ -1121,7 +1135,7 @@ bool CResource::CreateVM(bool bEnableOOP)
 {
     if (!m_pVM)
     {
-        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(this, bEnableOOP);
+        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(this, bEnableOOP, m_LuaVersion);
         m_pResourceManager->NotifyResourceVMOpen(this, m_pVM);
     }
 

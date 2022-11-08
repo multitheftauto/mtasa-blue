@@ -57,6 +57,9 @@ CLuaManager::CLuaManager(CObjectManager* pObjectManager, CPlayerManager* pPlayer
     m_pMapManager = pMapManager;
     m_pEvents = pEvents;
 
+    // Init Vlua library
+    VluaL_init();
+
     // Create our lua dynamic module manager
     m_pLuaModuleManager = new CLuaModuleManager(this);
     m_pLuaModuleManager->SetScriptDebugging(g_pGame->GetScriptDebugging());
@@ -86,15 +89,18 @@ CLuaManager::~CLuaManager()
 
     // Destroy the module manager
     delete m_pLuaModuleManager;
+
+    // Close Vlua library
+    VluaL_close();
 }
 
-CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP)
+CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP, ELuaVersion version)
 {
     // Create it and add it to the list over VM's
     CLuaMain* pLuaMain = new CLuaMain(this, m_pObjectManager, m_pPlayerManager, m_pVehicleManager, m_pBlipManager, m_pRadarAreaManager, m_pMapManager,
                                       pResourceOwner, bEnableOOP);
     m_virtualMachines.push_back(pLuaMain);
-    pLuaMain->Initialize();
+    pLuaMain->Initialize(version);
 
     return pLuaMain;
 }

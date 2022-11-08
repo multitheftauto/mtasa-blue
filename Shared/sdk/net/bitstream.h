@@ -540,6 +540,10 @@ enum class eBitStreamVersion : unsigned short
     // 2023-10-12
     CPlayerJoinCompletePacket_ServerName,
 
+    // Add lua version support
+    // 2022-11-09
+    ResourceLuaVersion,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
