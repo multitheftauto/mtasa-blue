@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-30 19:33+0000\n"
-"PO-Revision-Date: 2022-10-30 20:09\n"
+"PO-Revision-Date: 2022-11-09 05:23\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -1603,11 +1603,11 @@ msgstr "展示不安全的模式"
 
 #: Client/core/CSettings.cpp:856
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "雨天燈光粒子反射"
 
 #: Client/core/CSettings.cpp:860
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "人物動態陰影"
 
 #: Client/core/CSettings.cpp:889
 msgid "Enable remote websites"
