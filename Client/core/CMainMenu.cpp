@@ -800,7 +800,7 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
     if (!m_pHoveredItem)
         return true;
 
-    if (Args.button != LeftButton && m_pHoveredItem->menuType != MENU_ITEM_QUICK_CONNECT)
+    if (Args.button != LeftButton)
         return true;
 
     // For detecting startup problems
@@ -826,7 +826,7 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
             OnDisconnectButtonClick(pElement);
             break;
         case MENU_ITEM_QUICK_CONNECT:
-            OnQuickConnectButtonClick(pElement, Args.button == LeftButton);
+            OnQuickConnectButtonClick(pElement);
             break;
         case MENU_ITEM_BROWSE_SERVERS:
             OnBrowseServersButtonClick(pElement);
@@ -853,23 +853,14 @@ bool CMainMenu::OnMenuClick(CGUIMouseEventArgs Args)
     return true;
 }
 
-bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement, bool left)
+bool CMainMenu::OnQuickConnectButtonClick(CGUIElement* pElement)
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
-    // If we're right clicking, execute special command
-    if (!left)
-    {
-        std::string command;
-        CVARS_GET("_beta_qc_rightclick_command", command);
-        g_pCore->GetCommands()->Execute(command.data());
-        return true;
-    }
+    CCommands::GetSingleton().Execute("reconnect", "");
 
-    m_ServerBrowser.SetVisible(true);
-    m_ServerBrowser.OnQuickConnectButtonClick();
     return true;
 }
 
