@@ -353,7 +353,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("browser_remote_javascript", true);                                       // Execute javascript on remote websites?
     DEFAULT("filter_duplicate_log_lines", true);                                      // Filter duplicate log lines for debug view and clientscript.log
     DEFAULT("always_show_transferbox", false);            // Should the transfer box always be visible for downloads? (and ignore scripted control)
-    DEFAULT("_beta_qc_rightclick_command", _S("reconnect"));            // Command to run when right clicking quick connect (beta - can be removed at any time)
+    DEFAULT("_beta_qc_rightclick_command", _S(""));            // Command to run when right clicking quick connect (beta - can be removed at any time)
 
     if (!Exists("locale"))
     {
