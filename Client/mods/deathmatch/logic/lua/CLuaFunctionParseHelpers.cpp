@@ -7,6 +7,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 
 //
 // enum values <-> script strings

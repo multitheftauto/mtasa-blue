@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CAnimBlendStaticAssociation.h>
-#include "Common.h"
 
 #define FUNC_CAnimBlendStaticAssociation_Initialize 0x4CEC20
 

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CColPoint.h>
+#include <game/CObjectGroupPhysicalProperties.h>
+#include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)

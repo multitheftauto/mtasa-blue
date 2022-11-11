@@ -12,6 +12,10 @@
 #include <gui/CGUIEnumDefs.h>
 #include <type_traits>"
 #include "lua/CLuaSharedFunctionParseHelpers.h"
+#include <game/CAudioEngine.h>
+#include <game/CRenderWare.h>
+#include <game/CHud.h>
+#include <type_traits>
 
 enum eLuaType
 {
@@ -206,10 +210,6 @@ inline SString GetClassTypeName(CClientRadarMarker*)
 inline SString GetClassTypeName(CClientObject*)
 {
     return "object";
-}
-inline SString GetClassTypeName(CClientCivilian*)
-{
-    return "civilian";
 }
 inline SString GetClassTypeName(CClientPickup*)
 {

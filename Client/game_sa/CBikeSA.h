@@ -14,8 +14,6 @@
 #include <game/CBike.h>
 #include "CVehicleSA.h"
 
-#define FUNC_CBike_PlaceOnRoadProperly              0x6BEEB0
-
 struct sRideAnimData
 {
     int32 iAnimGroup;

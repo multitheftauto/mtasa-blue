@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CStatsSA.h"
 
 float CStatsSA::GetStatValue(unsigned short usIndex)
 {
@@ -30,34 +31,6 @@ float CStatsSA::GetStatValue(unsigned short usIndex)
 void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_ModifyStat;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
-}
-
-void CStatsSA::IncrementStat(unsigned short usIndex, float fAmmount)
-{
-    DWORD dwFunc = FUNC_IncrementStat;
-    DWORD dwStatIndex = usIndex;
-
-    _asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
-}
-
-void CStatsSA::DecrementStat(unsigned short usIndex, float fAmmount)
-{
-    DWORD dwFunc = FUNC_DecrementStat;
     DWORD dwStatIndex = usIndex;
 
     _asm
