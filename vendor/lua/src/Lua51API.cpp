@@ -91,6 +91,9 @@ static struct
     VLUA_IMPORT_FN(int, luaL_error) (struct lua_State *L, const char *fmt, ...);
     VLUA_IMPORT_FN(int, luaL_callmeta) (struct lua_State *L, int obj, const char *e);
 
+    VLUA_IMPORT_FN(void, luaL_where) (lua_State* L, int lvl);
+    VLUA_IMPORT_FN(void, lua_concat) (lua_State *L, int n);
+
     // Debug
 #if defined(LUA_USE_APICHECK)
     VLUA_IMPORT_FN(int, luaX_is_apicheck_enabled)();
@@ -219,6 +222,9 @@ bool VLua51_init()
         g_Lua51.luaL_loadbuffer,
         g_Lua51.luaL_error,
         g_Lua51.luaL_callmeta,
+
+        g_Lua51.luaL_where,
+        g_Lua51.lua_concat,
 
     #if defined(LUA_USE_APICHECK)
         g_Lua51.luaX_is_apicheck_enabled

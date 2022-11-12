@@ -25,7 +25,7 @@ typedef struct luaL_Reg {
 
 #define luaL_callmeta(L,obj,e) VluaL_callmeta((L), (obj), (e))
 
-
+#define luaL_where(L,lvl) VluaL_where((L), (lvl))
 
 
 #define luaL_typename(L,i)	lua_typename(L, lua_type(L,(i)))

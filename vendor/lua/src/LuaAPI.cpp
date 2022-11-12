@@ -332,10 +332,16 @@ int (Vlua_ncallresult) (lua_State* L)
     return Vlua_StateClasses[VLUA_VERSION_IDX]->Vlua_ncallresult(L);
 }
 
-int   (Vlua_error) (lua_State *L)
+int (Vlua_error) (lua_State *L)
 {
     VLUA_CHECK_STATE();
     return Vlua_StateClasses[VLUA_VERSION_IDX]->Vlua_error(L);
+}
+
+VLUA_API void (Vlua_concat)(lua_State* L, int n)
+{
+    VLUA_CHECK_STATE();
+    Vlua_StateClasses[VLUA_VERSION_IDX]->Vlua_concat(L, n);
 }
 
 int (Vlua_gc) (lua_State *L, int what, int data)
@@ -461,6 +467,12 @@ int (VluaL_callmeta) (struct lua_State *L, int obj, const char *e)
 {
     VLUA_CHECK_STATE();
     return Vlua_StateClasses[VLUA_VERSION_IDX]->VluaL_callmeta(L, obj, e);
+}
+
+void (VluaL_where) (lua_State* L, int lvl)
+{
+    VLUA_CHECK_STATE();
+    Vlua_StateClasses[VLUA_VERSION_IDX]->VluaL_where(L, lvl);
 }
 
 #if defined(LUA_USE_APICHECK)

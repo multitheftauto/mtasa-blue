@@ -105,6 +105,8 @@
 
 #define lua_error(L) Vlua_error((L))
 
+#define lua_concat(L,n) Vlua_concat((L), (n))
+
 /*
 ** garbage-collection function and options
 */
