@@ -19,6 +19,8 @@ LUA_API int lua_getstackgap(lua_State* L)
 
 LUA_API void lua_addtotalbytes(lua_State *L, int n)
 {
-	global_State *g = L->global;
-    g->totalbytes += n;
+	// We cannot just add a bytes number. See lstate.cpp line 99.
+	// TODO: Find the solution
+	//global_State *g = L->global;
+    //g->totalbytes += n;
 }
