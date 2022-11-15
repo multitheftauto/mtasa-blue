@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-30 19:33+0000\n"
-"PO-Revision-Date: 2022-10-30 20:09\n"
+"POT-Creation-Date: 2022-11-15 06:18+0000\n"
+"PO-Revision-Date: 2022-11-15 06:58\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -199,7 +199,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Hình như GTA: San Andreas đang chạy. Bạn cần phải tắt GTA: San Andreas đi thì mới có thể chơi MTA:SA. Bạn có muốn tắt GTA: San Andreas không?"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1238
+#: Client/loader/MainFunctions.cpp:1240
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
@@ -257,49 +257,49 @@ msgid "Main file is unsigned. Possible virus activity.\n\n"
 msgstr "File chính không được xác nhận. Có thể bị xem là vi-rút.\n\n"
 "Tìm trợ giúp trên mạng nếu MTA không chạy được."
 
-#: Client/loader/MainFunctions.cpp:851
+#: Client/loader/MainFunctions.cpp:853
 msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "File dữ liệu đã bị sửa. Có thể ảnh hưởng bởi vi-rút.\n\n"
 "Tìm trợ giúp trên mạng nếu MTA không chạy được."
 
-#: Client/loader/MainFunctions.cpp:863
+#: Client/loader/MainFunctions.cpp:865
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "Các file có đuôi .asi đang ở trong thư mục cài đặt 'MTA:SA' hoặc 'GTA: San Andreas'.\n\n"
 "Xóa những file có đuôi .asi nếu bạn gặp lỗi khi chạy MTA:SA."
 
-#: Client/loader/MainFunctions.cpp:967
+#: Client/loader/MainFunctions.cpp:969
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Lỗi phiên bản file không trùng khớp. Cài đặt lại MTA:SA nếu bạn có bất kì lỗi gì.\n"
 
-#: Client/loader/MainFunctions.cpp:976
+#: Client/loader/MainFunctions.cpp:978
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Một số file bị thiếu. Cài đặt lại MTA:SA nếu bạn gặp lỗi.\n"
 
-#: Client/loader/MainFunctions.cpp:988
+#: Client/loader/MainFunctions.cpp:990
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA: SA không tương thích với Chế độ an toàn của Windows.\n\n"
 "Vui lòng khởi động lại PC của bạn.\n"
 
-#: Client/loader/MainFunctions.cpp:1124
+#: Client/loader/MainFunctions.cpp:1126
 msgid "Fix configuration issue"
 msgstr "Khắc phục sự cố cấu hình"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1166
+#: Client/loader/MainFunctions.cpp:1168
 msgid "Fix elevation required error"
 msgstr "Sửa lỗi yêu cầu elevation"
 
-#: Client/loader/MainFunctions.cpp:1173
+#: Client/loader/MainFunctions.cpp:1175
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Không thể chạy Grand Theft Auto: San Andreas.  Thử khởi động lại, nếu vẫn còn bị lỗi, hay truy cập MTA tại mtasa.vn hoặc www.multitheftauto.com để nhờ sự trợ giúp. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1238
+#: Client/loader/MainFunctions.cpp:1240
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas bị lỗi khi chạy. Bạn có muốn tắt nó không?"
 
