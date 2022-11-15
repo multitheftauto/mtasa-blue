@@ -842,7 +842,7 @@ void CheckDataFiles()
                               {"1A78628A8AB4B8DB0E336610A3ACF153", "basswebm.dll"}, {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
                               {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},     {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
                               {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},      {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
-                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},     {"ADFB6D7B61E301761C700652B6FE7CCD", "XInput9_1_0_mta.dll"}};
+                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},     {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
     for (int i = 0; i < NUMELMS(integrityCheckList); i++)
     {
         SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
