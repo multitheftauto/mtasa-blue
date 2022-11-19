@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 06:18+0000\n"
-"PO-Revision-Date: 2022-11-15 06:58\n"
+"POT-Creation-Date: 2022-11-19 16:14+0000\n"
+"PO-Revision-Date: 2022-11-19 16:24\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #. Create buttons
 #. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:34
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:129
 #: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
 #: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
 #: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
@@ -30,7 +30,7 @@ msgid "OK"
 msgstr "Đồng ý"
 
 #. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:37
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:132
 #: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
 #: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
 #: Client/core/CSettings.cpp:4679
@@ -44,7 +44,7 @@ msgstr "Hủy"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:32
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:127
 #: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
 #: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
 #: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
@@ -58,11 +58,11 @@ msgstr "Có"
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr "Bạn có muốn tắt MTA Server và tiếp tục cập nhật không?"
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:897
 msgid "Installing update..."
 msgstr "Đang cài đặt bản cập nhật..."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:905
 msgid "Extracting files..."
 msgstr "Đang giải nén file..."
 
@@ -303,7 +303,7 @@ msgstr "Không thể chạy Grand Theft Auto: San Andreas.  Thử khởi động
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas bị lỗi khi chạy. Bạn có muốn tắt nó không?"
 
-#: Client/loader/Dialogs.cpp:33 Client/core/CVersionUpdater.cpp:1569
+#: Client/loader/Dialogs.cpp:128 Client/core/CVersionUpdater.cpp:1569
 #: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
 #: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
 #: Client/core/CMainMenu.cpp:1147 Client/core/CSettings.cpp:1367
@@ -313,137 +313,137 @@ msgstr "GTA: San Andreas bị lỗi khi chạy. Bạn có muốn tắt nó khôn
 msgid "No"
 msgstr "Không"
 
-#: Client/loader/Dialogs.cpp:35
+#: Client/loader/Dialogs.cpp:130
 msgid "Quit"
 msgstr "Thoát"
 
-#: Client/loader/Dialogs.cpp:36
+#: Client/loader/Dialogs.cpp:131
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
 msgid "Help"
 msgstr "Trợ giúp"
 
-#: Client/loader/Dialogs.cpp:52
+#: Client/loader/Dialogs.cpp:147
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas đã gặp sự cố"
 
-#: Client/loader/Dialogs.cpp:53
+#: Client/loader/Dialogs.cpp:148
 msgid "Crash information"
 msgstr "Thông tin lỗi xung đột"
 
-#: Client/loader/Dialogs.cpp:54
+#: Client/loader/Dialogs.cpp:149
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "Tích vào ô để gửi thông tin lỗi xung đột này đến nhà phát triển MTA thông qua 'internet'"
 
-#: Client/loader/Dialogs.cpp:55
+#: Client/loader/Dialogs.cpp:150
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "Bằng việc làm vậy thì lỗi xung đột sẽ được sửa sớm nhất có thể."
 
-#: Client/loader/Dialogs.cpp:56
+#: Client/loader/Dialogs.cpp:151
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "Bạn có muốn khởi động lại MTA: San Andreas ?"
 
-#: Client/loader/Dialogs.cpp:63
+#: Client/loader/Dialogs.cpp:158
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - Cảnh báo"
 
-#: Client/loader/Dialogs.cpp:64
+#: Client/loader/Dialogs.cpp:159
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:66
+#: Client/loader/Dialogs.cpp:161
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:68
+#: Client/loader/Dialogs.cpp:163
 msgid "Keep these files, but also show this warning on next start"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:69
+#: Client/loader/Dialogs.cpp:164
 msgid "Do not remind me about these files again"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:70
+#: Client/loader/Dialogs.cpp:165
 msgid "Rename these files from *.dll to *.dll.bak"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:71
+#: Client/loader/Dialogs.cpp:166
 msgid "Show me these files"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:72
+#: Client/loader/Dialogs.cpp:167
 msgid "Play MTA:SA"
 msgstr "Chơi MTA:SA"
 
-#: Client/loader/Dialogs.cpp:78
+#: Client/loader/Dialogs.cpp:173
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - Các tùy chọn dễ gây nhầm lẫn"
 
-#: Client/loader/Dialogs.cpp:79
+#: Client/loader/Dialogs.cpp:174
 msgid "NVidia Optimus detected!"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:80
+#: Client/loader/Dialogs.cpp:175
 msgid "Try each option and see what works:"
 msgstr "Hãy thử từng tùy chọn và xem xem cái nào chạy được:"
 
-#: Client/loader/Dialogs.cpp:81
+#: Client/loader/Dialogs.cpp:176
 msgid "A - Standard NVidia"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:82
+#: Client/loader/Dialogs.cpp:177
 msgid "B - Alternate NVidia"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:83
+#: Client/loader/Dialogs.cpp:178
 msgid "C - Standard NVidia with exe rename"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:84
+#: Client/loader/Dialogs.cpp:179
 msgid "D - Alternate NVidia with exe rename"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:85
+#: Client/loader/Dialogs.cpp:180
 msgid "E - Standard Intel"
 msgstr "E - Intel chuẩn"
 
-#: Client/loader/Dialogs.cpp:86
+#: Client/loader/Dialogs.cpp:181
 msgid "F - Alternate Intel"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:87
+#: Client/loader/Dialogs.cpp:182
 msgid "G - Standard Intel with exe rename"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:88
+#: Client/loader/Dialogs.cpp:183
 msgid "H - Alternate Intel with exe rename"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:89
+#: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
 msgstr "Nếu bạn không tìm ra cách giải quyết, cái này có thể giúp ích cho bạn:"
 
-#: Client/loader/Dialogs.cpp:90
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:91
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "Bắt buộc ở chế độ cửa sổ"
 
-#: Client/loader/Dialogs.cpp:92
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:856
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:856
 msgid "MTA: San Andreas"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:100
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Cảnh báo: Không tìm thấy chương trình diệt vi-rút"
 
-#: Client/loader/Dialogs.cpp:102
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -451,37 +451,37 @@ msgstr "MTA không tìm thấy phần mềm diệt vi-rút trong máy tính củ
 "Vi-rút có thể làm ảnh hưởng đến MTA và làm giảm trải nghiệm khi chơi game.\n\n"
 "Nhấn 'Trợ giúp' để xem thêm."
 
-#: Client/loader/Dialogs.cpp:105
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "Tôi đã cài đặt phần mềm diệt vi-rút"
 
-#: Client/loader/Dialogs.cpp:107
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "Tôi sẽ không cài đặt phầm mềm diệt vi-rút.\n"
 "Tôi muốn máy tính của tôi bị lag và là một phần của botnet."
 
-#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+#: Client/loader/Dialogs.cpp:886 Client/loader/Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Đang tìm Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+#: Client/loader/Dialogs.cpp:889 Client/loader/Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Hãy bắt đầu khởi động Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+#: Client/loader/Dialogs.cpp:910 Client/loader/Utils.cpp:1605
 msgid "Copying files..."
 msgstr "Đang sao chép file..."
 
-#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+#: Client/loader/Dialogs.cpp:915 Client/loader/Utils.cpp:1665
 msgid "Copy finished early. Everything OK."
 msgstr "Việc sao chép được hoàn thành sớm. Mọi thứ đều TỐT."
 
-#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+#: Client/loader/Dialogs.cpp:920 Client/loader/Utils.cpp:1671
 msgid "Finishing..."
 msgstr "Đang hoàn thành..."
 
-#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1673
 msgid "Done!"
 msgstr "Xong!"
 
