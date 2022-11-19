@@ -934,8 +934,9 @@ void TestDialogs()
 #endif
 
 #if 1
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", "123" );
-    ShowGraphicsDllDialog( g_hInstance, "c:\\dummy path\\" );
+    SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", "123");
+    std::vector<GraphicsLibrary> offenders{GraphicsLibrary{"dummy"}};
+    ShowGraphicsDllDialog(g_hInstance, offenders);
     HideGraphicsDllDialog();
 #endif
 
