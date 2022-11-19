@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 06:18+0000\n"
-"PO-Revision-Date: 2022-11-15 06:55\n"
+"POT-Creation-Date: 2022-11-19 16:14+0000\n"
+"PO-Revision-Date: 2022-11-19 16:21\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #. Create buttons
 #. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:34
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:129
 #: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
 #: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
 #: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
@@ -30,7 +30,7 @@ msgid "OK"
 msgstr "TAMAM"
 
 #. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:37
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:132
 #: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
 #: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
 #: Client/core/CSettings.cpp:4679
@@ -44,7 +44,7 @@ msgstr "İptal et"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:32
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:127
 #: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
 #: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
 #: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
@@ -58,11 +58,11 @@ msgstr "Evet"
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr "MTA Sunucusunu sonlandırmak ve güncellemeye devam etmek istiyor musunuz?"
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:897
 msgid "Installing update..."
 msgstr "Güncelleme kuruluyor..."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:905
 msgid "Extracting files..."
 msgstr "Dosyalar çıkarılıyor..."
 
@@ -303,7 +303,7 @@ msgstr "Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Gta: San Andreas doğru çalıştıralamadı. Yok etmek istermisiniz ?"
 
-#: Client/loader/Dialogs.cpp:33 Client/core/CVersionUpdater.cpp:1569
+#: Client/loader/Dialogs.cpp:128 Client/core/CVersionUpdater.cpp:1569
 #: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
 #: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
 #: Client/core/CMainMenu.cpp:1147 Client/core/CSettings.cpp:1367
@@ -313,138 +313,138 @@ msgstr "Gta: San Andreas doğru çalıştıralamadı. Yok etmek istermisiniz ?"
 msgid "No"
 msgstr "Hayır"
 
-#: Client/loader/Dialogs.cpp:35
+#: Client/loader/Dialogs.cpp:130
 msgid "Quit"
 msgstr "Çık"
 
-#: Client/loader/Dialogs.cpp:36
+#: Client/loader/Dialogs.cpp:131
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
 msgid "Help"
 msgstr "Yardım"
 
-#: Client/loader/Dialogs.cpp:52
+#: Client/loader/Dialogs.cpp:147
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas bir problemle karşılaştı"
 
-#: Client/loader/Dialogs.cpp:53
+#: Client/loader/Dialogs.cpp:148
 msgid "Crash information"
 msgstr "Çökme bilgisi"
 
-#: Client/loader/Dialogs.cpp:54
+#: Client/loader/Dialogs.cpp:149
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "Çökme bilgisini 'internet' aracılığı ile MTA geliştiricilerine göndemek için kutucuğu işaretleyin"
 
-#: Client/loader/Dialogs.cpp:55
+#: Client/loader/Dialogs.cpp:150
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "Bunu yapmak bu çökmenin onarılma ihtimalini arttırır."
 
-#: Client/loader/Dialogs.cpp:56
+#: Client/loader/Dialogs.cpp:151
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "MTA: San Andreas'ı yeniden başlatmak istiyor musunuz?"
 
-#: Client/loader/Dialogs.cpp:63
+#: Client/loader/Dialogs.cpp:158
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - Uyarı"
 
-#: Client/loader/Dialogs.cpp:64
+#: Client/loader/Dialogs.cpp:159
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
 msgstr "Grand Theft Auto: San Andreas kurulum dizininiz şu dosyaları içeriyor:"
 
-#: Client/loader/Dialogs.cpp:66
+#: Client/loader/Dialogs.cpp:161
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
 msgstr "Bu dosyalar gerekli değildir ve MTA:SA'nın bu sürümündeki grafik özellikleri etkileyebilir.\n\n"
 "Bu dosyaları kaldırmanız veya yeniden adlandırmanız önerilir."
 
-#: Client/loader/Dialogs.cpp:68
+#: Client/loader/Dialogs.cpp:163
 msgid "Keep these files, but also show this warning on next start"
 msgstr "Bu dosyaları saklayın, ancak bir sonraki başlatmada bu uyarıyı da göster"
 
-#: Client/loader/Dialogs.cpp:69
+#: Client/loader/Dialogs.cpp:164
 msgid "Do not remind me about these files again"
 msgstr "Bana bu dosyaları bir daha hatırlatma"
 
-#: Client/loader/Dialogs.cpp:70
+#: Client/loader/Dialogs.cpp:165
 msgid "Rename these files from *.dll to *.dll.bak"
 msgstr "Bu dosyaları *.dll'den *.dll.bak'a yeniden adlandırın"
 
-#: Client/loader/Dialogs.cpp:71
+#: Client/loader/Dialogs.cpp:166
 msgid "Show me these files"
 msgstr "Dosyaları görüntüle"
 
-#: Client/loader/Dialogs.cpp:72
+#: Client/loader/Dialogs.cpp:167
 msgid "Play MTA:SA"
 msgstr "MTA:SA Oyna"
 
-#: Client/loader/Dialogs.cpp:78
+#: Client/loader/Dialogs.cpp:173
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - Şaşırtıcı özellikler"
 
-#: Client/loader/Dialogs.cpp:79
+#: Client/loader/Dialogs.cpp:174
 msgid "NVidia Optimus detected!"
 msgstr "NVidia Optimus algılandı!"
 
-#: Client/loader/Dialogs.cpp:80
+#: Client/loader/Dialogs.cpp:175
 msgid "Try each option and see what works:"
 msgstr "Her seçeneği dene ve neyin işlediğini gör:"
 
-#: Client/loader/Dialogs.cpp:81
+#: Client/loader/Dialogs.cpp:176
 msgid "A - Standard NVidia"
 msgstr "A - Standart NVidia"
 
-#: Client/loader/Dialogs.cpp:82
+#: Client/loader/Dialogs.cpp:177
 msgid "B - Alternate NVidia"
 msgstr "B - Alternatif NVidia"
 
-#: Client/loader/Dialogs.cpp:83
+#: Client/loader/Dialogs.cpp:178
 msgid "C - Standard NVidia with exe rename"
 msgstr "C - Standart NVidia exe adlandırılması ile"
 
-#: Client/loader/Dialogs.cpp:84
+#: Client/loader/Dialogs.cpp:179
 msgid "D - Alternate NVidia with exe rename"
 msgstr "D - Alternatif NVidia exe adlandırılması ile"
 
-#: Client/loader/Dialogs.cpp:85
+#: Client/loader/Dialogs.cpp:180
 msgid "E - Standard Intel"
 msgstr "E - Standart Intel"
 
-#: Client/loader/Dialogs.cpp:86
+#: Client/loader/Dialogs.cpp:181
 msgid "F - Alternate Intel"
 msgstr "F - Alternatif Intel"
 
-#: Client/loader/Dialogs.cpp:87
+#: Client/loader/Dialogs.cpp:182
 msgid "G - Standard Intel with exe rename"
 msgstr "G - Standart Intel exe adlandırılması ile"
 
-#: Client/loader/Dialogs.cpp:88
+#: Client/loader/Dialogs.cpp:183
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - Alternatif Intel exe adlandırılması ile"
 
-#: Client/loader/Dialogs.cpp:89
+#: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
 msgstr "Eğer hangisini seçeceğinizi bilmiyorsanız, bu size yardımcı olabilir:"
 
-#: Client/loader/Dialogs.cpp:90
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr "Çalışan bir seçenek belirlediyseniz, bu yardımcı olabilir:"
 
-#: Client/loader/Dialogs.cpp:91
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "Pencere moduna zorla"
 
-#: Client/loader/Dialogs.cpp:92
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "Bir daha gösterme"
 
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:856
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:856
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:100
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Uyarı: Anti-virüs programı bulunamadı"
 
-#: Client/loader/Dialogs.cpp:102
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -452,37 +452,37 @@ msgstr "MTA bilgisayarınızda anti-virüs programı bulamadı.\n\n"
 "Virüsler, MTA ile çakışır ve oyun deneyiminizi düşürür.\n\n"
 "Daha fazla bilgi için 'Yardım' butonuna basın."
 
-#: Client/loader/Dialogs.cpp:105
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "Ben zaten önceden anti-virüs kurdum"
 
-#: Client/loader/Dialogs.cpp:107
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "Anti-virüs kurmayacağım.\n"
 "Bilgisayarımın yavaşlamasını ve botnetin bir parçası olmasını istiyorum."
 
-#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+#: Client/loader/Dialogs.cpp:886 Client/loader/Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto: San Andreas aranıyor"
 
-#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+#: Client/loader/Dialogs.cpp:889 Client/loader/Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Lütfen Grand Theft Auto: San Andreas'ı başlatın"
 
-#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+#: Client/loader/Dialogs.cpp:910 Client/loader/Utils.cpp:1605
 msgid "Copying files..."
 msgstr "Dosyalar kopyalanıyor..."
 
-#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+#: Client/loader/Dialogs.cpp:915 Client/loader/Utils.cpp:1665
 msgid "Copy finished early. Everything OK."
 msgstr "Kopyalama işlemi erken bitti. Her şey yolunda."
 
-#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+#: Client/loader/Dialogs.cpp:920 Client/loader/Utils.cpp:1671
 msgid "Finishing..."
 msgstr "Tamamlanıyor..."
 
-#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1673
 msgid "Done!"
 msgstr "Bitti!"
 
