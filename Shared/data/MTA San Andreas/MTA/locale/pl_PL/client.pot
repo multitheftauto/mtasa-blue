@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 06:18+0000\n"
-"PO-Revision-Date: 2022-11-15 06:57\n"
+"POT-Creation-Date: 2022-11-19 16:14+0000\n"
+"PO-Revision-Date: 2022-11-19 16:23\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #. Create buttons
 #. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:34
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:129
 #: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
 #: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
 #: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
@@ -30,7 +30,7 @@ msgid "OK"
 msgstr "OK"
 
 #. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:37
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:132
 #: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
 #: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
 #: Client/core/CSettings.cpp:4679
@@ -44,7 +44,7 @@ msgstr "Anuluj"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:32
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:127
 #: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
 #: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
 #: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
@@ -58,11 +58,11 @@ msgstr "Tak"
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr "Czy chcesz wyłączyć MTA Server i kontynuować aktualizację?"
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:897
 msgid "Installing update..."
 msgstr "Instalowanie aktualizacji..."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:905
 msgid "Extracting files..."
 msgstr "Wypakowywanie plików..."
 
@@ -303,7 +303,7 @@ msgstr "Nie udało się uruchomić Grand Theft Auto: San Andreas.  Spróbuj uruc
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Gra GTA: San Andreas mogła nie uruchomić się prawidłowo. Czy chcesz ją wyłączyć?"
 
-#: Client/loader/Dialogs.cpp:33 Client/core/CVersionUpdater.cpp:1569
+#: Client/loader/Dialogs.cpp:128 Client/core/CVersionUpdater.cpp:1569
 #: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
 #: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
 #: Client/core/CMainMenu.cpp:1147 Client/core/CSettings.cpp:1367
@@ -313,138 +313,138 @@ msgstr "Gra GTA: San Andreas mogła nie uruchomić się prawidłowo. Czy chcesz 
 msgid "No"
 msgstr "Nie"
 
-#: Client/loader/Dialogs.cpp:35
+#: Client/loader/Dialogs.cpp:130
 msgid "Quit"
 msgstr "Zakończ"
 
-#: Client/loader/Dialogs.cpp:36
+#: Client/loader/Dialogs.cpp:131
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
 msgid "Help"
 msgstr "Pomoc"
 
-#: Client/loader/Dialogs.cpp:52
+#: Client/loader/Dialogs.cpp:147
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas napotkało problem"
 
-#: Client/loader/Dialogs.cpp:53
+#: Client/loader/Dialogs.cpp:148
 msgid "Crash information"
 msgstr "Informacje o zawieszeniu się programu"
 
-#: Client/loader/Dialogs.cpp:54
+#: Client/loader/Dialogs.cpp:149
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "Zaznacz to pole aby wysłać informacje w trybie online o zawieszeniu się programu do deweloperów MTA"
 
-#: Client/loader/Dialogs.cpp:55
+#: Client/loader/Dialogs.cpp:150
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "Wykonanie tej czynności zwiększy szanse na naprawienie tego błędu."
 
-#: Client/loader/Dialogs.cpp:56
+#: Client/loader/Dialogs.cpp:151
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "Czy chcesz uruchomić ponownie MTA: San Andreas?"
 
-#: Client/loader/Dialogs.cpp:63
+#: Client/loader/Dialogs.cpp:158
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - Ostrzeżenie"
 
-#: Client/loader/Dialogs.cpp:64
+#: Client/loader/Dialogs.cpp:159
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
 msgstr "Katalog instalacyjny GTA: San Andreas zawiera następujące pliki:"
 
-#: Client/loader/Dialogs.cpp:66
+#: Client/loader/Dialogs.cpp:161
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
 msgstr "Pliki te nie są wymagane i mogą zakłócać działanie funkcji graficznych w tej wersji MTA.\n\n"
 "Zaleca się usunięcie lub zmianę nazwy tych plików."
 
-#: Client/loader/Dialogs.cpp:68
+#: Client/loader/Dialogs.cpp:163
 msgid "Keep these files, but also show this warning on next start"
 msgstr "Zachowaj te pliki, ale pokaż również to ostrzeżenie przy następnym uruchomieniu"
 
-#: Client/loader/Dialogs.cpp:69
+#: Client/loader/Dialogs.cpp:164
 msgid "Do not remind me about these files again"
 msgstr "Nie przypominaj mi więcej o tych plikach"
 
-#: Client/loader/Dialogs.cpp:70
+#: Client/loader/Dialogs.cpp:165
 msgid "Rename these files from *.dll to *.dll.bak"
 msgstr "Zmień nazwy tych plików z *.dll na *.dll.bak"
 
-#: Client/loader/Dialogs.cpp:71
+#: Client/loader/Dialogs.cpp:166
 msgid "Show me these files"
 msgstr "Pokaż mi te pliki"
 
-#: Client/loader/Dialogs.cpp:72
+#: Client/loader/Dialogs.cpp:167
 msgid "Play MTA:SA"
 msgstr "Uruchom MTA:SA"
 
-#: Client/loader/Dialogs.cpp:78
+#: Client/loader/Dialogs.cpp:173
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - Mylące opcje"
 
-#: Client/loader/Dialogs.cpp:79
+#: Client/loader/Dialogs.cpp:174
 msgid "NVidia Optimus detected!"
 msgstr "Wykryto platformę NVidia Optimus!"
 
-#: Client/loader/Dialogs.cpp:80
+#: Client/loader/Dialogs.cpp:175
 msgid "Try each option and see what works:"
 msgstr "Wypróbuj każdą opcję i zobacz, która z nich działa najlepiej na Twoim komputerze:"
 
-#: Client/loader/Dialogs.cpp:81
+#: Client/loader/Dialogs.cpp:176
 msgid "A - Standard NVidia"
 msgstr "A - Standardowa NVidia"
 
-#: Client/loader/Dialogs.cpp:82
+#: Client/loader/Dialogs.cpp:177
 msgid "B - Alternate NVidia"
 msgstr "B - Alternatywna NVidia"
 
-#: Client/loader/Dialogs.cpp:83
+#: Client/loader/Dialogs.cpp:178
 msgid "C - Standard NVidia with exe rename"
 msgstr "C - Standardowa NVidia ze zmianą nazwy pliku exe"
 
-#: Client/loader/Dialogs.cpp:84
+#: Client/loader/Dialogs.cpp:179
 msgid "D - Alternate NVidia with exe rename"
 msgstr "C - Alternatywna NVidia ze zmianą nazwy pliku exe"
 
-#: Client/loader/Dialogs.cpp:85
+#: Client/loader/Dialogs.cpp:180
 msgid "E - Standard Intel"
 msgstr "E - Standardowy Intel"
 
-#: Client/loader/Dialogs.cpp:86
+#: Client/loader/Dialogs.cpp:181
 msgid "F - Alternate Intel"
 msgstr "F - Alternatywny Intel"
 
-#: Client/loader/Dialogs.cpp:87
+#: Client/loader/Dialogs.cpp:182
 msgid "G - Standard Intel with exe rename"
 msgstr "G - Standardowy Intel ze zmianą nazwy pliku exe"
 
-#: Client/loader/Dialogs.cpp:88
+#: Client/loader/Dialogs.cpp:183
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - Alternatywny Intel ze zmianą nazwy pliku exe"
 
-#: Client/loader/Dialogs.cpp:89
+#: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
 msgstr "W razie problemów, poniższa opcja może Ci pomóc:"
 
-#: Client/loader/Dialogs.cpp:90
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr "Jeśli wybrałeś już opcję która działa, to poniższe może pomóc:"
 
-#: Client/loader/Dialogs.cpp:91
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "Wymuś tryb okienkowy"
 
-#: Client/loader/Dialogs.cpp:92
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "Nie pokazuj więcej"
 
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:856
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:856
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:100
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Ostrzeżenie: Nie wykryto oprogramowania antywirusowego"
 
-#: Client/loader/Dialogs.cpp:102
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -452,37 +452,37 @@ msgstr "MTA nie wykryło oprogramowania antywirusowego na Twoim komputerze.\n\n"
 "Wirusy wpływają na działanie MTA i zmniejszają komfort grania.\n\n"
 "Kliknij 'Pomoc' aby dowiedzieć się więcej."
 
-#: Client/loader/Dialogs.cpp:105
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "Już mam odpowiedni program antywirusowy"
 
-#: Client/loader/Dialogs.cpp:107
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "Nie zainstaluję programu antywirusowego.\n"
 "Jestem doświadczonym użytkownikiem komputerów i nie straszne mi wirusy!"
 
-#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+#: Client/loader/Dialogs.cpp:886 Client/loader/Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Wyszukiwanie Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+#: Client/loader/Dialogs.cpp:889 Client/loader/Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Proszę włączyć Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+#: Client/loader/Dialogs.cpp:910 Client/loader/Utils.cpp:1605
 msgid "Copying files..."
 msgstr "Kopiuję pliki..."
 
-#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+#: Client/loader/Dialogs.cpp:915 Client/loader/Utils.cpp:1665
 msgid "Copy finished early. Everything OK."
 msgstr "Kopiowanie zakończone przed czasem. Wszystko w porządku."
 
-#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+#: Client/loader/Dialogs.cpp:920 Client/loader/Utils.cpp:1671
 msgid "Finishing..."
 msgstr "Kończenie..."
 
-#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1673
 msgid "Done!"
 msgstr "Gotowe!"
 
