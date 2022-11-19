@@ -11,11 +11,11 @@
 
 #pragma once
 
-#include "RenderWare.h"
-
 class CFxSystem;
-class CFxSystemSAInterface;
 class CFxSystemBPSAInterface;
+class CFxSystemSAInterface;
+class CVector;
+struct RwMatrix;
 
 class CFxManager
 {

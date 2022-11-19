@@ -10,7 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "game/CAnimBlendAssocGroup.h"
+#include <game/CWorld.h>
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CPedDamageResponse.h>
+#include <game/CEventList.h>
+#include <game/CEventDamage.h>
+
+class CEventDamageSAInterface;
 
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
@@ -28,7 +34,6 @@ unsigned long CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller;
 unsigned long CMultiplayerSA::HOOKPOS_CHud_Draw_Caller;
 unsigned long CMultiplayerSA::HOOKPOS_CRunningScript_Process;
 unsigned long CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion;
-unsigned long CMultiplayerSA::HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow;
 unsigned long CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
 unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
 unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
@@ -288,8 +293,6 @@ DWORD       RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
 const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
-#define HOOKPOS_CHud_RenderHealthBar 0x5892AF
-
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio    0x4D7198
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio     0x4D71E7
 
@@ -394,7 +397,6 @@ void HOOK_CStreaming_Update_Caller();
 void HOOK_CHud_Draw_Caller();
 void HOOK_CRunningScript_Process();
 void HOOK_CExplosion_AddExplosion();
-void HOOK_CRealTimeShadowManager__ReturnRealTimeShadow();
 void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
@@ -534,8 +536,6 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
 
-void HOOK_CHud_RenderHealthBar();
-
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio();
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
 
@@ -563,8 +563,6 @@ CMultiplayerSA::CMultiplayerSA()
             COffsetsMP::Initialize20();
             break;
     }
-
-    Population = new CPopulationSA;
 
     CRemoteDataSA::Init();
 
@@ -626,7 +624,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
     HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
     HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
-    HookInstall(HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow, (DWORD)HOOK_CRealTimeShadowManager__ReturnRealTimeShadow, 6);
     HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
@@ -770,8 +767,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 
-    HookInstall(HOOKPOS_CHud_RenderHealthBar, (DWORD)HOOK_CHud_RenderHealthBar, 9);
-
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio,
@@ -817,6 +812,9 @@ void CMultiplayerSA::InitHooks()
 
     // DISABLE CRoadBlocks::GenerateRoadblocks
     MemPut<BYTE>(0x4629E0, 0xC3);
+
+    // Disable CPopulation::RemovePed
+    MemPut<BYTE>(0x610F20, 0xC3);
 
     // Temporary hack for disabling hand up
     /*
@@ -1169,13 +1167,6 @@ void CMultiplayerSA::InitHooks()
     // Prevent the game deleting _any_ far away vehicles - will cause issues for population vehicles in the future
     MemPut<BYTE>(0x42CD10, 0xC3);
 
-    // DISABLE real-time shadows for peds
-    MemPut<BYTE>(0x5E68A0, 0xEB);
-
-    // and some more, just to be safe
-    // 00542483   EB 0B            JMP SHORT gta_sa.00542490
-    MemPut<BYTE>(0x542483, 0xEB);
-
     // DISABLE weapon pickups
     MemPut<BYTE>(0x5B47B0, 0xC3);
 
@@ -1189,12 +1180,6 @@ void CMultiplayerSA::InitHooks()
         MemPut < BYTE > ( 0x51D471, 0x10 );
         MemPut < BYTE > ( 0x51D472, 0x00 );
     */
-
-    // HACK to prevent RealTimeShadowManager crash
-    // 00542483     EB 0B          JMP SHORT gta_sa_u.00542490
-    /*
-    MemPut < BYTE > ( 0x542483, 0xEB );
-*/
 
     // InitShotsyncHooks();
 
@@ -1551,6 +1536,29 @@ void CMultiplayerSA::InitHooks()
     // Skip check for disabled HUD
     MemSet((void*)0x58FBC4, 0x90, 9);
 
+    // Show muzzle flash for last bullet in magazine
+    MemSet((void*)0x61ECD2, 0x90, 20);
+
+    // Fix ped real time shadows by processing them always like for a non player ped
+    // Change JZ to JMP instruction in CRealTimeShadowManager::GetRealTimeShadow()
+    MemPut<BYTE>(0x7069F5, 0xEB);
+
+    // Modify CRealTimeShadowManager::GetRealTimeShadow()
+    // Start iterating over shadow array from 0 instead 1 (so we will have max 16 shadows, not 15)
+    // Originally, first shadow from the shadow array is used for player ped only
+    // Array: CRealTimeShadowManager::pShadowData[16]
+    // Array size: 0x40 (16 elements)
+    // Array element size: 0x04
+    MemPut<BYTE>(0x7069FE, 0x08);
+
+    // Fix ped real time shadows do not render on some objects
+    // by skipping some entity flag check in CShadows::CastRealTimeShadowSectorList()
+    MemSet((void*)0x70A83B, 0x90, 6);
+
+    // Fix vehicle blob shadows and light textures do not render on some objects when vehicle is empty
+    // by skipping some entity flag check in CShadows::CastPlayerShadowSectorList()
+    MemSet((void*)0x70A4CB, 0x90, 6);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
@@ -1563,6 +1571,9 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleWeapons();
 
     InitHooks_Streaming();
+    InitHooks_FrameRateFixes();
+    InitHooks_ProjectileCollisionFix();
+    InitHooks_ObjectStreamerOptimization();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -2857,19 +2868,6 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         mov     edx, CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion
         add     edx, 6
         jmp     edx
-    }
-}
-
-void _declspec(naked) HOOK_CRealTimeShadowManager__ReturnRealTimeShadow()
-{
-    _asm
-    {
-        cmp     ecx, 0
-        jz      dontclear
-        mov     [ecx+308], 0
-        mov     [eax], 0
-dontclear:
-        retn    4
     }
 }
 
@@ -5357,9 +5355,10 @@ watercheck:
         add esp, 8
 
 rendercheck:
-        xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
-        cmp eax, [esp+0x88+8]
-        jnz fail
+        // NOTE: Causes some foliage not generating in certain places when uncommented (see also: PR #2679)
+        // xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
+        // cmp eax, [esp+0x88+8]
+        // jnz fail
 
         mov ax, [esi-0x10]
         mov edx, edi
@@ -6961,29 +6960,6 @@ void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
        call CWorld_ProcessPedsAfterPreRender
        call PostCWorld_ProcessPedsAfterPreRender
        jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
-    }
-}
-
-const DWORD RETURN_CHud_RenderHealthBar = 0x5892B8;
-const DWORD RETURN_CHud_RenderHealthBarNoRender = 0x58939E;
-void _declspec(naked) HOOK_CHud_RenderHealthBar()
-{
-    __asm {
-        //(CTimer::m_snTimeInMilliseconds / 250) % 2
-        mov eax, 0xB7CB84
-        mov eax, [eax]
-        xor edx, edx
-        mov ecx, 250
-        div ecx
-        xor edx, edx
-        mov ecx, 2
-        div ecx
-        test edx, edx
-        jz norender
-        jmp RETURN_CHud_RenderHealthBar
-
-norender:
-        jmp RETURN_CHud_RenderHealthBarNoRender
     }
 }
 

@@ -15,13 +15,108 @@ static bool          bCancelPressed = false;
 static bool          bOkPressed = false;
 static bool          bOtherPressed = false;
 static int           iOtherCode = 0;
-static HWND          hwndSplash = NULL;
+static WNDCLASS      splashWindowClass{};
+static HWND          splashWindow{};
 static HWND          hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static HWND          hwndCrashedDialog = NULL;
 static HWND          hwndGraphicsDllDialog = NULL;
 static HWND          hwndOptimusDialog = NULL;
 static HWND          hwndNoAvDialog = NULL;
+
+/**
+ * @brief Automatically destroys a window on scope-exit.
+ */
+struct WindowScope
+{
+    WindowScope(HWND handle_) noexcept : handle(handle_) {}
+
+    ~WindowScope() noexcept { DestroyWindow(handle); }
+
+    [[nodiscard]] HWND Release() noexcept { return std::exchange(handle, nullptr); }
+
+    HWND handle{};
+};
+
+/**
+ * @brief Provides a compatible memory-only device context for a bitmap handle and
+ *        automatically destroys the device context and bitmap on scope-exit.
+ */
+struct BitmapScope
+{
+    BitmapScope(HDC deviceContext_, HBITMAP bitmap_) noexcept : bitmap(bitmap_)
+    {
+        if (bitmap != nullptr)
+        {
+            if (deviceContext = CreateCompatibleDC(deviceContext_))
+            {
+                previousObject = SelectObject(deviceContext, bitmap_);
+            }
+        }
+    }
+
+    ~BitmapScope() noexcept
+    {
+        if (previousObject && previousObject != HGDI_ERROR)
+            SelectObject(deviceContext, previousObject);
+
+        if (deviceContext)
+            DeleteDC(deviceContext);
+
+        if (bitmap)
+            DeleteObject(bitmap);
+    }
+
+    HDC     deviceContext{};
+    HGDIOBJ previousObject{};
+    HBITMAP bitmap{};
+};
+
+/**
+ * @brief Returns the dots per inch (dpi) value for the specified window.
+ */
+UINT GetWindowDpi(HWND window)
+{
+    // Minimum version: Windows 10, version 1607
+    using GetDpiForWindow_t = UINT(WINAPI*)(HWND);
+
+    static GetDpiForWindow_t Win32GetDpiForWindow = ([] {
+        HMODULE user32 = LoadLibrary("user32");
+        return user32 ? reinterpret_cast<GetDpiForWindow_t>(static_cast<void*>(GetProcAddress(user32, "GetDpiForWindow"))) : nullptr;
+    })();
+
+    if (Win32GetDpiForWindow)
+        return Win32GetDpiForWindow(window);
+
+    HDC  screenDC = GetDC(NULL);
+    auto x = static_cast<UINT>(GetDeviceCaps(screenDC, LOGPIXELSX));
+    ReleaseDC(NULL, screenDC);
+    return x;
+}
+
+/**
+ * @brief Returns the width and height of the primary monitor.
+ */
+SIZE GetPrimaryMonitorSize()
+{
+    POINT    zero{};
+    HMONITOR primaryMonitor = MonitorFromPoint(zero, MONITOR_DEFAULTTOPRIMARY);
+
+    MONITORINFO monitorInfo{};
+    monitorInfo.cbSize = sizeof(monitorInfo);
+    GetMonitorInfo(primaryMonitor, &monitorInfo);
+
+    const RECT& work = monitorInfo.rcWork;
+    return {work.right - work.left, work.bottom - work.top};
+}
+
+/**
+ * @brief Scales the value from the default screen dpi (96) to the provided dpi.
+ */
+LONG ScaleToDpi(LONG value, UINT dpi)
+{
+    return static_cast<LONG>(ceil(value * static_cast<float>(dpi) / USER_DEFAULT_SCREEN_DPI));
+}
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -188,23 +283,63 @@ int CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void ShowSplash(HINSTANCE hInstance)
 {
 #ifndef MTA_DEBUG
-    if (!hwndSplash)
+    if (splashWindowClass.hInstance != hInstance)
     {
-        hwndSplash = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc);
-
-        HWND hBitmap = GetDlgItem(hwndSplash, IDC_SPLASHBITMAP);
-        RECT splashRect;
-        GetWindowRect(hBitmap, &splashRect);
-        int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-        int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-        int iWindowWidth = splashRect.right - splashRect.left;
-        int iWindowHeight = splashRect.bottom - splashRect.top;
-
-        // Adjust and center the window (to be DPI-aware)
-        SetWindowPos(hwndSplash, NULL, (iScreenWidth - iWindowWidth) / 2, (iScreenHeight - iWindowHeight) / 2, iWindowWidth, iWindowHeight, 0);
+        splashWindowClass.lpfnWndProc = DefWindowProc;
+        splashWindowClass.hInstance = hInstance;
+        splashWindowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
+        splashWindowClass.lpszClassName = TEXT("SplashWindow");
+        RegisterClass(&splashWindowClass);
     }
-    SetForegroundWindow(hwndSplash);
-    SetWindowPos(hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+
+    if (splashWindow)
+    {
+        ShowWindow(splashWindow, SW_SHOW);
+    }
+    else
+    {
+        WindowScope window(CreateWindowEx(WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW, splashWindowClass.lpszClassName, NULL, WS_POPUP | WS_VISIBLE,
+                                          0, 0, 0, 0, NULL, NULL, hInstance, NULL));
+
+        if (!window.handle)
+            return;
+
+        UINT dpi = GetWindowDpi(window.handle);
+        SIZE monitorSize = GetPrimaryMonitorSize();
+
+        POINT origin{};
+        SIZE  windowSize{ScaleToDpi(500, dpi), ScaleToDpi(245, dpi)};
+        origin.x = (monitorSize.cx - windowSize.cx) / 2;
+        origin.y = (monitorSize.cy - windowSize.cy) / 2;
+
+        HDC windowHDC = GetWindowDC(window.handle);
+        {
+            BitmapScope unscaled(windowHDC, LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_BITMAP1)));
+
+            if (!unscaled.bitmap)
+                return;
+
+            BitmapScope scaled(windowHDC, CreateCompatibleBitmap(windowHDC, windowSize.cx, windowSize.cy));
+
+            if (!scaled.bitmap)
+                return;
+
+            BITMAP bitmap{};
+            GetObject(unscaled.bitmap, sizeof(bitmap), &bitmap);
+
+            // Draw the unscaled bitmap to the window-scaled bitmap.
+            SetStretchBltMode(scaled.deviceContext, HALFTONE);
+            StretchBlt(scaled.deviceContext, 0, 0, windowSize.cx, windowSize.cy, unscaled.deviceContext, 0, 0, bitmap.bmWidth, bitmap.bmHeight, SRCCOPY);
+
+            // Update the splash window and draw the scaled bitmap.
+            POINT         zero{};
+            BLENDFUNCTION blend{AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
+            UpdateLayeredWindow(window.handle, windowHDC, &origin, &windowSize, scaled.deviceContext, &zero, RGB(0, 0, 0), &blend, 0);
+        }
+        ReleaseDC(window.handle, windowHDC);
+
+        splashWindow = window.Release();
+    }
 
     // Drain messages to allow for repaint in case picture bits were lost during previous operations
     MSG msg;
@@ -224,10 +359,10 @@ void ShowSplash(HINSTANCE hInstance)
 //
 void HideSplash()
 {
-    if (hwndSplash)
+    if (splashWindow)
     {
-        DestroyWindow(hwndSplash);
-        hwndSplash = NULL;
+        DestroyWindow(splashWindow);
+        splashWindow = {};
     }
 }
 
@@ -236,9 +371,9 @@ void HideSplash()
 //
 void SuspendSplash()
 {
-    if (hwndSplash)
+    if (splashWindow)
     {
-        ShowWindow(hwndSplash, SW_HIDE);
+        ShowWindow(splashWindow, SW_HIDE);
     }
 }
 
@@ -247,7 +382,7 @@ void SuspendSplash()
 //
 void ResumeSplash()
 {
-    if (hwndSplash)
+    if (splashWindow)
     {
         HideSplash();
         ShowSplash(g_hInstance);
@@ -799,8 +934,9 @@ void TestDialogs()
 #endif
 
 #if 1
-    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", "123" );
-    ShowGraphicsDllDialog( g_hInstance, "c:\\dummy path\\" );
+    SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", "123");
+    std::vector<GraphicsLibrary> offenders{GraphicsLibrary{"dummy"}};
+    ShowGraphicsDllDialog(g_hInstance, offenders);
     HideGraphicsDllDialog();
 #endif
 

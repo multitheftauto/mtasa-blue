@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <ShellScalingApi.h>
 
 /*
     IMPORTANT
@@ -21,6 +22,43 @@
 
     (set flag.new_client_exe on the build server to generate new exe)
 */
+
+/**
+ * @brief Applies the highest available form of DPI awareness for this process.
+ */
+void ApplyDpiAwareness()
+{
+    // Minimum version: Windows 10, version 1607
+    using SetProcessDpiAwarenessContext_t = BOOL(WINAPI*)(DPI_AWARENESS_CONTEXT value);
+
+    static SetProcessDpiAwarenessContext_t Win32SetProcessDpiAwarenessContext = ([] {
+        HMODULE user32 = LoadLibrary("user32");
+        return user32 ? reinterpret_cast<SetProcessDpiAwarenessContext_t>(static_cast<void*>(GetProcAddress(user32, "SetProcessDpiAwarenessContext"))) : nullptr;
+    })();
+
+    if (Win32SetProcessDpiAwarenessContext)
+    {
+        Win32SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+        return;
+    }
+
+    // Minimum version: Windows 8.1
+    using SetProcessDpiAwareness_t = HRESULT(WINAPI*)(PROCESS_DPI_AWARENESS value);
+
+    static SetProcessDpiAwareness_t Win32SetProcessDpiAwareness = ([] {
+        HMODULE shcore = LoadLibrary("shcore");
+        return shcore ? reinterpret_cast<SetProcessDpiAwareness_t>(static_cast<void*>(GetProcAddress(shcore, "SetProcessDpiAwareness"))) : nullptr;
+    })();
+
+    if (Win32SetProcessDpiAwareness)
+    {
+        Win32SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
+        return;
+    }
+
+    // Minimum version: Windows Vista
+    SetProcessDPIAware();
+}
 
 ///////////////////////////////////////////////////////////////
 //
@@ -36,6 +74,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         BrowseToSolution("launch-xpsp3-check", ASK_GO_ONLINE, "This version of MTA requires Windows XP SP3 or later");
         return 1;
     }
+
+    ApplyDpiAwareness();
 
     // Load the loader.dll and continue the load
 #ifdef MTA_DEBUG

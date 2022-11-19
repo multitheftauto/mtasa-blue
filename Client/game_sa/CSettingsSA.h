@@ -14,7 +14,6 @@
 // R* have this info inside CMenuManager but I can't believe that makes much sense
 
 #include <game/CSettings.h>
-#include "Common.h"
 
 #define CLASS_CMenuManager      0xBA6748
 
@@ -86,6 +85,7 @@ private:
     CSettingsSAInterface* m_pInterface;
     bool                  m_bVolumetricShadowsEnabled;
     bool                  m_bVolumetricShadowsSuspended;
+    bool                  m_bDynamicPedShadowsEnabled;
     eAspectRatio          m_AspectRatio;
     int                   m_iDesktopWidth;
     int                   m_iDesktopHeight;
@@ -140,6 +140,9 @@ public:
     void SetVolumetricShadowsEnabled(bool bEnable);
     void SetVolumetricShadowsSuspended(bool bSuspended);
 
+    bool IsDynamicPedShadowsEnabled();
+    void SetDynamicPedShadowsEnabled(bool bEnable);
+
     float        GetAspectRatioValue();
     eAspectRatio GetAspectRatio();
     void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true);
@@ -160,8 +163,7 @@ public:
     float GetFieldOfViewVehicleMax();
 
     void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript);
-    void ResetVehiclesLODDistance(bool bFromScript);
-    void ResetVehiclesLODDistanceFromScript();
+    void ResetVehiclesLODDistance(bool bForceDefault = false);
     void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance);
 
     void ResetCoronaReflectionsEnabled();
@@ -170,8 +172,7 @@ public:
     void Save();
 
     void  SetPedsLODDistance(float fPedsLODDistance, bool bFromScript);
-    void  ResetPedsLODDistance(bool bFromScript);
-    void  ResetPedsLODDistanceFromScript();
+    void  ResetPedsLODDistance(bool bForceDefault = false);
     float GetPedsLODDistance();
 
     static void StaticSetHooks();

@@ -1,3 +1,13 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/D3DResourceSystemSA.cpp
+ * 
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ * 
+ *****************************************************************************/
+
 #include "StdInc.h"
 #include "D3DResourceSystemSA.h"
 

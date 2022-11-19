@@ -11,10 +11,13 @@
 
 #pragma once
 
-#include "CHandlingEntry.h"
-#include "CFlyingHandlingEntry.h"
-#include "CBoatHandlingEntry.h"
-#include "CBikeHandlingEntry.h"
+#include <string>
+#include "Common.h"
+
+class CBikeHandlingEntry;
+class CBoatHandlingEntry;
+class CFlyingHandlingEntry;
+class CHandlingEntry;
 
 class CHandlingManager
 {

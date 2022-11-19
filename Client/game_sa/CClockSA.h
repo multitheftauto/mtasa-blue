@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CClock.h>
-#include "Common.h"
 
 #define VAR_TimeMinutes                 0xB70152
 #define VAR_TimeHours                   0xB70153
@@ -21,6 +20,6 @@
 class CClockSA : public CClock
 {
 public:
-    VOID Set(BYTE bHour, BYTE bMinute);
-    VOID Get(BYTE* bHour, BYTE* bMinute);
+    void Set(BYTE bHour, BYTE bMinute);
+    void Get(BYTE* bHour, BYTE* bMinute);
 };

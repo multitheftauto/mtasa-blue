@@ -11,117 +11,14 @@
 
 #pragma once
 
-#include "Common.h"
-#include "CAudioEngineSA.h"
 #include <game/CAEVehicleAudioEntity.h>
+#include "CAudioEngineSA.h"
 
-#define FUNC_CAEVehicleAudioEntity__RequestBankSlot                                    0x4F4D10
-#define FUNC_CAEVehicleAudioEntity__StoppedUsingBankSlot                               0x4F4DF0
-#define FUNC_CAEVehicleAudioEntity__DoesBankSlotContainThisBank                        0x4F4E30
-#define FUNC_CAEVehicleAudioEntity__DemandBankSlot                                     0x4F4E60
-#define FUNC_CAEVehicleAudioEntity__StaticService                                      0x4F4EC0
-#define FUNC_CAEVehicleAudioEntity__StaticGetPlayerVehicleAudioSettingsForRadio        0x4F4ED0
-#define FUNC_CAEVehicleAudioEntity__EnableHelicoptors                                  0x4F4EE0
-#define FUNC_CAEVehicleAudioEntity__DisableHelicoptors                                 0x4F4EF0
-#define FUNC_CAEVehicleAudioEntity__GetVehicleTypeForAudio                             0x4F4F00
-#define FUNC_CAEVehicleAudioEntity__IsAccInhibited                                     0x4F4F70
-#define FUNC_CAEVehicleAudioEntity__IsAccInhibitedBackwards                            0x4F4FC0
-#define FUNC_CAEVehicleAudioEntity__IsAccInhibitedForLowSpeed                          0x4F4FF0
-#define FUNC_CAEVehicleAudioEntity__IsAccInhibitedForTime                              0x4F5020
-#define FUNC_CAEVehicleAudioEntity__InhibitAccForTime                                  0x4F5030
-#define FUNC_CAEVehicleAudioEntity__IsCrzInhibitedForTime                              0x4F5050
-#define FUNC_CAEVehicleAudioEntity__InhibitCrzForTime                                  0x4F5060
-#define FUNC_CAEVehicleAudioEntity__GetAccelAndBrake                                   0x4F5080
-#define FUNC_CAEVehicleAudioEntity__GetVolumeForDummyIdle                              0x4F51F0
-#define FUNC_CAEVehicleAudioEntity__GetFrequencyForDummyIdle                           0x4F5310
-#define FUNC_CAEVehicleAudioEntity__GetVolumeForDummyRev                               0x4F53D0
-#define FUNC_CAEVehicleAudioEntity__GetFrequencyForDummyRev                            0x4F54F0
-#define FUNC_CAEVehicleAudioEntity__CancelVehicleEngineSound                           0x4F55C0
-#define FUNC_CAEVehicleAudioEntity__UpdateVehicleEngineSound                           0x4F56D0
 #define FUNC_CAEVehicleAudioEntity__JustGotInVehicleAsDriver                           0x4F5700
 #define FUNC_CAEVehicleAudioEntity__TurnOnRadioForVehicle                              0x4F5B20
-#define FUNC_CAEVehicleAudioEntity__TurnOffRadioForVehicle                             0x4F5B60
-#define FUNC_CAEVehicleAudioEntity__PlayerAboutToExitVehicleAsDriver                   0x4F5BA0
-#define FUNC_CAEVehicleAudioEntity__DisableHelicoptor                                  0x4F5BF0
-#define FUNC_CAEVehicleAudioEntity__EnableHelicoptor                                   0x4F5C00
-#define FUNC_CAEVehicleAudioEntity__GetVehicleAudioSettings                            0x4F5C10
-#define FUNC_CAEVehicleAudioEntity__CopHeli                                            0x4F5C40
-#define FUNC_CAEVehicleAudioEntity__GetFreqForIdle                                     0x4F5C60
-#define FUNC_CAEVehicleAudioEntity__GetVolForPlayerEngineSound                         0x4F5D00
-#define FUNC_CAEVehicleAudioEntity__JustFinishedAccelerationLoop                       0x4F5E50
-#define FUNC_CAEVehicleAudioEntity__UpdateGasPedalAudio                                0x4F5EB0
-#define FUNC_CAEVehicleAudioEntity__GetVehicleDriveWheelSkidValue                      0x4F5F30
-#define FUNC_CAEVehicleAudioEntity__GetVehicleNonDriveWheelSkidValue                   0x4F6000
-#define FUNC_CAEVehicleAudioEntity__GetBaseVolumeForBicycleTyre                        0x4F60B0
-#define FUNC_CAEVehicleAudioEntity__GetFlyingMetalVolume                               0x4F6150
-#define FUNC_CAEVehicleAudioEntity__GetHornState                                       0x4F61E0
-#define FUNC_CAEVehicleAudioEntity__GetSirenState                                      0x4F62A0
-#define FUNC_CAEVehicleAudioEntity__StopGenericEngineSound                             0x4F6320
-#define FUNC_CAEVehicleAudioEntity__CAEVehicleAudioEntity                              0x4F63E0
-#define FUNC_CAEVehicleAudioEntity__AddAudioEvent                                      0x4F6420
-#define FUNC_CAEVehicleAudioEntity__AddAudioEvent_1                                    0x4F7580 // (renamed)
-#define FUNC_CAEVehicleAudioEntity__Initialise                                         0x4F7670
-#define FUNC_CAEVehicleAudioEntity__RequestNewPlayerCarEngineSound                     0x4F7A50
-#define FUNC_CAEVehicleAudioEntity__StartVehicleEngineSound                            0x4F7F20
-#define FUNC_CAEVehicleAudioEntity__GetFreqForPlayerEngineSound                        0x4F8070
-#define FUNC_CAEVehicleAudioEntity__PlaySkidSound                                      0x4F8360
-#define FUNC_CAEVehicleAudioEntity__PlayRoadNoiseSound                                 0x4F84D0
-#define FUNC_CAEVehicleAudioEntity__PlayFlatTyreSound                                  0x4F8650
-#define FUNC_CAEVehicleAudioEntity__PlayReverseSound                                   0x4F87D0
-#define FUNC_CAEVehicleAudioEntity__ProcessVehicleFlatTyre                             0x4F8940
-#define FUNC_CAEVehicleAudioEntity__ProcessVehicleRoadNoise                            0x4F8B00
-#define FUNC_CAEVehicleAudioEntity__ProcessReverseGear                                 0x4F8DF0
-#define FUNC_CAEVehicleAudioEntity__ProcessVehicleSkidding                             0x4F8F10
-#define FUNC_CAEVehicleAudioEntity__ProcessRainOnVehicle                               0x4F92C0
-#define FUNC_CAEVehicleAudioEntity__PlayAircraftSound                                  0x4F93C0
-#define FUNC_CAEVehicleAudioEntity__GetAircraftNearPosition                            0x4F96A0
-#define FUNC_CAEVehicleAudioEntity__PlayBicycleSound                                   0x4F9710
-#define FUNC_CAEVehicleAudioEntity__PlayHornOrSiren                                    0x4F99D0
-#define FUNC_CAEVehicleAudioEntity__UpdateBoatSound                                    0x4F9E90
-#define FUNC_CAEVehicleAudioEntity__ProcessBoatMovingOverWater                         0x4FA0C0
-#define FUNC_CAEVehicleAudioEntity__UpdateTrainSound                                   0x4FA1C0
-#define FUNC_CAEVehicleAudioEntity__ProcessTrainTrackSound                             0x4FA3F0
-#define FUNC_CAEVehicleAudioEntity__PlayTrainBrakeSound                                0x4FA630
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyRCPlane                                0x4FA7C0
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyRCHeli                                 0x4FAA80
-#define FUNC_CAEVehicleAudioEntity__UpdateGenericVehicleSound                          0x4FAD40
-#define FUNC_CAEVehicleAudioEntity__ProcessEngineDamage                                0x4FAE20
-#define FUNC_CAEVehicleAudioEntity__ProcessNitro                                       0x4FB070
-#define FUNC_CAEVehicleAudioEntity__ProcessMovingParts                                 0x4FB260
-#define FUNC_CAEVehicleAudioEntity__UpdateParameters                                   0x4FB6C0
-#define FUNC_CAEVehicleAudioEntity__Terminate                                          0x4FB8C0
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerVehicleEngine                         0x4FBB10
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyStateTransition                        0x4FCA10
 #define FUNC_CAEVehicleAudioEntity__JustGotOutOfVehicleAsDriver                        0x4FCF40
-#define FUNC_CAEVehicleAudioEntity__JustWreckedVehicle                                 0x4FD0B0
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerProp                                  0x4FD290
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyProp                                   0x4FD8F0
 #define FUNC_CAEVehicleAudioEntity__ProcessAIProp                                      0x4FDFD0
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerHeli                                  0x4FE420
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyHeli                                   0x4FE940
 #define FUNC_CAEVehicleAudioEntity__ProcessAIHeli                                      0x4FEE20
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerSeaPlane                              0x4FF320
-#define FUNC_CAEVehicleAudioEntity__ProcessDummySeaPlane                               0x4FF7C0
-#define FUNC_CAEVehicleAudioEntity__ProcessGenericJet                                  0x4FF900
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyBicycle                                0x4FFDC0
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerBicycle                               0x500040
-#define FUNC_CAEVehicleAudioEntity__ProcessVehicleSirenAlarmHorn                       0x5002C0
-#define FUNC_CAEVehicleAudioEntity__ProcessBoatEngine                                  0x5003A0
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyTrainEngine                            0x500710
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerTrainBrakes                           0x500AB0
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerCombine                               0x500CE0
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyRCCar                                  0x500DC0
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyHovercraft                             0x500F50
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyGolfCart                               0x501270
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyVehicleEngine                          0x501480
-#define FUNC_CAEVehicleAudioEntity__ProcessPlayerJet                                   0x501650
-#define FUNC_CAEVehicleAudioEntity__ProcessDummyJet                                    0x501960
-#define FUNC_CAEVehicleAudioEntity__ProcessSpecialVehicle                              0x501AB0
-#define FUNC_CAEVehicleAudioEntity__ProcessAircraft                                    0x501C50
-#define FUNC_CAEVehicleAudioEntity__ProcessVehicle                                     0x501E10
-#define FUNC_CAEVehicleAudioEntity__Service                                            0x502280
-
-#define VAR_CAEVehicleAudioEntity__s_pPlayerDriver                                     0xB6B990
 
 struct tVehicleAudioSettings
 {

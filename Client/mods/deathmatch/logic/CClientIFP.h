@@ -14,6 +14,8 @@
 #include "CFileReader.h"
 #include "CIFPAnimations.h"
 
+class CAnimBlendSequence;
+
 class CClientIFP final : public CClientEntity, CFileReader
 {
 public:

@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CWeapon.h>
+
 int                g_iDamageEventLimit = -1;
 extern float       g_fApplyDamageLastAmount;
 extern CClientPed* g_pApplyDamageLastDamagedPed;

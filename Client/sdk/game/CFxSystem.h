@@ -11,7 +11,9 @@
 
 #pragma once
 
-#include "RenderWare.h"
+class CMatrix;
+class CVector;
+
 class CFxSystem
 {
 public:
