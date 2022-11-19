@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-15 06:18+0000\n"
-"PO-Revision-Date: 2022-11-15 06:58\n"
+"POT-Creation-Date: 2022-11-19 16:14+0000\n"
+"PO-Revision-Date: 2022-11-19 16:24\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #. Create buttons
 #. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:34
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:129
 #: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
 #: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
 #: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
@@ -30,7 +30,7 @@ msgid "OK"
 msgstr "确定"
 
 #. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:37
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:132
 #: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
 #: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
 #: Client/core/CSettings.cpp:4679
@@ -44,7 +44,7 @@ msgstr "取消"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:32
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:127
 #: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
 #: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
 #: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1148
@@ -58,11 +58,11 @@ msgstr "是"
 msgid "Do you want to terminate the MTA Server and continue updating?"
 msgstr "你希望关闭MTA服务端以安装更新吗？"
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:762
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:897
 msgid "Installing update..."
 msgstr "安装更新中..."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:770
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:905
 msgid "Extracting files..."
 msgstr "解压文件中..."
 
@@ -303,7 +303,7 @@ msgstr "无法启动 GTA:SA.  请尝试重新启动, 如果问题持续存在,�
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "侠盗猎车手: 圣安地列斯没有正常启动.你想要关闭它吗?"
 
-#: Client/loader/Dialogs.cpp:33 Client/core/CVersionUpdater.cpp:1569
+#: Client/loader/Dialogs.cpp:128 Client/core/CVersionUpdater.cpp:1569
 #: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
 #: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
 #: Client/core/CMainMenu.cpp:1147 Client/core/CSettings.cpp:1367
@@ -313,137 +313,137 @@ msgstr "侠盗猎车手: 圣安地列斯没有正常启动.你想要关闭它吗
 msgid "No"
 msgstr "否"
 
-#: Client/loader/Dialogs.cpp:35
+#: Client/loader/Dialogs.cpp:130
 msgid "Quit"
 msgstr "退出"
 
-#: Client/loader/Dialogs.cpp:36
+#: Client/loader/Dialogs.cpp:131
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
 msgid "Help"
 msgstr "帮助"
 
-#: Client/loader/Dialogs.cpp:52
+#: Client/loader/Dialogs.cpp:147
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas 遇到了问题"
 
-#: Client/loader/Dialogs.cpp:53
+#: Client/loader/Dialogs.cpp:148
 msgid "Crash information"
 msgstr "崩溃信息"
 
-#: Client/loader/Dialogs.cpp:54
+#: Client/loader/Dialogs.cpp:149
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "勾选本选项以使用‘互联网’将本崩溃信息发送到MTA开发团队"
 
-#: Client/loader/Dialogs.cpp:55
+#: Client/loader/Dialogs.cpp:150
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "这样做可以增加修复此崩溃的机会。"
 
-#: Client/loader/Dialogs.cpp:56
+#: Client/loader/Dialogs.cpp:151
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "您想要重新启动MTA: San Andreas 吗?"
 
-#: Client/loader/Dialogs.cpp:63
+#: Client/loader/Dialogs.cpp:158
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - 警告"
 
-#: Client/loader/Dialogs.cpp:64
+#: Client/loader/Dialogs.cpp:159
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:66
+#: Client/loader/Dialogs.cpp:161
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:68
+#: Client/loader/Dialogs.cpp:163
 msgid "Keep these files, but also show this warning on next start"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:69
+#: Client/loader/Dialogs.cpp:164
 msgid "Do not remind me about these files again"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:70
+#: Client/loader/Dialogs.cpp:165
 msgid "Rename these files from *.dll to *.dll.bak"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:71
+#: Client/loader/Dialogs.cpp:166
 msgid "Show me these files"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:72
+#: Client/loader/Dialogs.cpp:167
 msgid "Play MTA:SA"
 msgstr "启动 MTA:SA"
 
-#: Client/loader/Dialogs.cpp:78
+#: Client/loader/Dialogs.cpp:173
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - 不明确的选项"
 
-#: Client/loader/Dialogs.cpp:79
+#: Client/loader/Dialogs.cpp:174
 msgid "NVidia Optimus detected!"
 msgstr "检测到显卡支持NVidia Optimus技术!"
 
-#: Client/loader/Dialogs.cpp:80
+#: Client/loader/Dialogs.cpp:175
 msgid "Try each option and see what works:"
 msgstr "尝试每一个选项再看哪种模式可以正常运行:"
 
-#: Client/loader/Dialogs.cpp:81
+#: Client/loader/Dialogs.cpp:176
 msgid "A - Standard NVidia"
 msgstr "A - 标准 NVidia 模式"
 
-#: Client/loader/Dialogs.cpp:82
+#: Client/loader/Dialogs.cpp:177
 msgid "B - Alternate NVidia"
 msgstr "B - 备用 NVidia 模式"
 
-#: Client/loader/Dialogs.cpp:83
+#: Client/loader/Dialogs.cpp:178
 msgid "C - Standard NVidia with exe rename"
 msgstr "C - 标准NVidia及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:84
+#: Client/loader/Dialogs.cpp:179
 msgid "D - Alternate NVidia with exe rename"
 msgstr "D - 备用NVidia及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:85
+#: Client/loader/Dialogs.cpp:180
 msgid "E - Standard Intel"
 msgstr "E - 标准Intel模式"
 
-#: Client/loader/Dialogs.cpp:86
+#: Client/loader/Dialogs.cpp:181
 msgid "F - Alternate Intel"
 msgstr "F - 备用Intel模式"
 
-#: Client/loader/Dialogs.cpp:87
+#: Client/loader/Dialogs.cpp:182
 msgid "G - Standard Intel with exe rename"
 msgstr "G - 标准Intel及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:88
+#: Client/loader/Dialogs.cpp:183
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - 备用Intel及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:89
+#: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
 msgstr "如果以上模式都没法玩让你痛不欲生, 这个模式或许能拯救你:"
 
-#: Client/loader/Dialogs.cpp:90
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr "如果您已经选择了一个有效的选项，这可能会有所帮助："
 
-#: Client/loader/Dialogs.cpp:91
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "强制窗口化模式"
 
-#: Client/loader/Dialogs.cpp:92
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "不再显示"
 
-#: Client/loader/Dialogs.cpp:99 Client/game_sa/CSettingsSA.cpp:856
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:856
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:100
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "警告:没有检测出反病毒软件"
 
-#: Client/loader/Dialogs.cpp:102
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -451,37 +451,37 @@ msgstr "MTA 没有在当前计算机检测出反病毒软件.\n\n"
 "计算机病毒会影响 MTA 以及降低你的游戏体验\n\n"
 "点击 '帮助' 以获得更多信息."
 
-#: Client/loader/Dialogs.cpp:105
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "我已安装杀毒软件"
 
-#: Client/loader/Dialogs.cpp:107
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "朕才不安装反病毒软件.\n"
 "朕就喜欢慢点的电脑顺便成为僵尸网络的一份子."
 
-#: Client/loader/Dialogs.cpp:751 Client/loader/Utils.cpp:747
+#: Client/loader/Dialogs.cpp:886 Client/loader/Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "搜索Grand Theft Auto: San Andreas"
 
-#: Client/loader/Dialogs.cpp:754 Client/loader/Utils.cpp:749
+#: Client/loader/Dialogs.cpp:889 Client/loader/Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "请启动Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:775 Client/loader/Utils.cpp:1605
+#: Client/loader/Dialogs.cpp:910 Client/loader/Utils.cpp:1605
 msgid "Copying files..."
 msgstr "复制文件..."
 
-#: Client/loader/Dialogs.cpp:780 Client/loader/Utils.cpp:1665
+#: Client/loader/Dialogs.cpp:915 Client/loader/Utils.cpp:1665
 msgid "Copy finished early. Everything OK."
 msgstr "文件提前复制完毕.所有数据正常."
 
-#: Client/loader/Dialogs.cpp:785 Client/loader/Utils.cpp:1671
+#: Client/loader/Dialogs.cpp:920 Client/loader/Utils.cpp:1671
 msgid "Finishing..."
 msgstr "正在完成..."
 
-#: Client/loader/Dialogs.cpp:789 Client/loader/Utils.cpp:1673
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1673
 msgid "Done!"
 msgstr "已完成!"
 
