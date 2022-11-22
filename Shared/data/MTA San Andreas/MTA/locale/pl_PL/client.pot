@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-19 16:14+0000\n"
-"PO-Revision-Date: 2022-11-19 16:23\n"
+"PO-Revision-Date: 2022-11-22 10:26\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -1603,7 +1603,7 @@ msgstr "Pokaż niezgodne rozdzielczości"
 
 #: Client/core/CSettings.cpp:856
 msgid "Corona rain reflections"
-msgstr "Odbicia deszczu koronowego"
+msgstr "Refleksy koron podczas deszczu"
 
 #: Client/core/CSettings.cpp:860
 msgid "Dynamic ped shadows"
