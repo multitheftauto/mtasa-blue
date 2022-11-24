@@ -4,9 +4,9 @@ premake.modules.install_bulletphysics = {}
 
 -- Config variables
 local BULLETPHYSICS_BASEURL = "https://github.com/bulletphysics/bullet3/archive/refs/tags/"
-local BULLETPHYSICS_FILENAME = "3.22b"
+local BULLETPHYSICS_FILENAME = "3.24"
 local BULLETPHYSICS_PATH = "vendor/bulletphysics3d"
-local BULLETPHYSICS_HASH = "b295cc1805f7c9a34269f9d01df5d219e86318ec60fd95afcddfa6c50240448f"
+local BULLETPHYSICS_HASH = "1179bcc5cdaf7f73f92f5e8495eaadd6a7216e78cad22f1027e9ce49b7a0bfbe"
 
 newaction {
 	trigger = "install_bulletphysics",
