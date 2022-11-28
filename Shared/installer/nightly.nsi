@@ -2599,17 +2599,17 @@ FunctionEnd
 
 Function MTAInitFileNamesAndPaths
 	# Shortcuts names
-	StrCpy $ClientShortcutName "MTA San Andreas.lnk"
-	StrCpy $ServerShortcutName "MTA Server.lnk"
-	StrCpy $UninstallShortcutName "Uninstall MTA San Andreas.lnk"
+	StrCpy $ClientShortcutName "MTA San Andreas"
+	StrCpy $ServerShortcutName "MTA Server"
+	StrCpy $UninstallShortcutName "Uninstall MTA San Andreas"
 	# Shostcuts paths
 	StrCpy $StartMenuMTAFolderPath "$SMPROGRAMS\MTA San Andreas ${0.0}"
-	StrCpy $StartMenuClientShortcutPath "$StartMenuMTAFolderPath\$ClientShortcutName"
-	StrCpy $StartMenuServerShortcutPath "$StartMenuMTAFolderPath\$ServerShortcutName"
-	StrCpy $StartMenuUninstallShortcutPath "$StartMenuMTAFolderPath\$UninstallShortcutName"
+	StrCpy $StartMenuClientShortcutPath "$StartMenuMTAFolderPath\${ClientShortcutName}.lnk"
+	StrCpy $StartMenuServerShortcutPath "$StartMenuMTAFolderPath\${ServerShortcutName}.lnk"
+	StrCpy $StartMenuUninstallShortcutPath "$StartMenuMTAFolderPath\${$UninstallShortcutName}.lnk"
 	# Shortcut names for desktop and start menu are different and can't be safely unified.
 	# Obvious fix is to roll 1 update where all shortcuts will be deleted and replaced with a unified names.
-	StrCpy $DesktopClientShortcutPath "$DESKTOP\$ClientShortcutName${0.0}"
+	StrCpy $DesktopClientShortcutPath "$DESKTOP\${ClientShortcutName} ${0.0}.lnk"
 	# Exe names
 	StrCpy $ClientExeName "Multi Theft Auto.exe"
 	StrCpy $ServerExeName "MTA Server.exe"
