@@ -10,7 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <net/CNet.h>
 #include "gamesa_init.h"
+#include "CGameSA.h"
 #define DECLARE_PROFILER_SECTION_gamesa_init
 #include "profiler/SharedUtil.Profiler.h"
 

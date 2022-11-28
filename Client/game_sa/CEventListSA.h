@@ -12,13 +12,9 @@
 #pragma once
 
 #include <game/CEventList.h>
-#include "CEventSA.h"
 
 class CEventListSA : public CEventList
 {
 public:
     CEventDamage* GetEventDamage(CEventDamageSAInterface* pInterface);
-
-    CEventDamage* CreateEventDamage(CEntity* pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4);
-    CEventGunShot* CreateEventGunShot(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1);
 };

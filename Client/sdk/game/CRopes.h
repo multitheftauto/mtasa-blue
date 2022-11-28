@@ -12,6 +12,7 @@
 #pragma once
 
 class CVector;
+class CEntitySAInterface;
 
 class CRopes
 {

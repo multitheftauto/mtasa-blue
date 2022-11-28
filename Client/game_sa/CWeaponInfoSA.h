@@ -14,6 +14,8 @@
 #include <game/CWeaponInfo.h>
 #include <CVector.h>
 
+class CEntitySAInterface;
+
 // Flame shot array for flamethrower flames and maybe molotovs
 #define ARRAY_CFlameShotInfo                0xC89690
 #define MAX_FLAME_SHOT_INFOS                100

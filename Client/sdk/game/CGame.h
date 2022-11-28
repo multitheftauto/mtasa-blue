@@ -130,7 +130,6 @@ public:
     virtual CAudioContainer*          GetAudioContainer() = 0;
     virtual CStats*                   GetStats() = 0;
     virtual CTasks*                   GetTasks() = 0;
-    virtual CPathFind*                GetPathFind() = 0;
     virtual CGameSettings*            GetSettings() = 0;
     virtual CCarEnterExit*            GetCarEnterExit() = 0;
     virtual CControllerConfigManager* GetControllerConfigManager() = 0;

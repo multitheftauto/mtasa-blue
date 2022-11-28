@@ -398,7 +398,7 @@ public:
     void SetVoice(const char* szVoiceType, const char* szVoice);
 
     // Custom collision related functions
-    void SetCustomModel(RpClump* pClump) override;
+    bool SetCustomModel(RpClump* pClump) override;
     void RestoreOriginalModel() override;
     void SetColModel(CColModel* pColModel) override;
     void RestoreColModel() override;

@@ -4,16 +4,21 @@
 #pragma once
 
 //
-// To compile a client:
+// To compile a client for development and debugging purposes:
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
-//      2. Use netc.dll from the latest unstable build (nightly.mtasa.com)
+//      2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/netc.dll (preferably run utils/buildactions/install_data.lua)
 //
+// To compile a client for mass consumption by players (releasing your own "MTA fork"):
+//      1. set MTASA_VERSION_TYPE to VERSION_TYPE_UNSTABLE
+//      2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/netc.dll (preferably run utils/buildactions/install_data.lua)
 //
-// To compile a public server:
+// Per the above, take note of AC constraints of building a custom client or fork (see https://wiki.multitheftauto.com/wiki/Forks)
+//
+// To compile a public server (players that use official MTA client can connect, as long you don't introduce incompatible patches):
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
 //      2. Use net.dll/net.so from the latest untested/rc/release (nightly.mtasa.com)
 //
-// To compile a custom server:
+// To compile a custom server (only custom build players can connect):
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
 //      2. Use net.dll/net.so from the latest unstable (nightly.mtasa.com)
 

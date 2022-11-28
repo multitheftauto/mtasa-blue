@@ -12,17 +12,19 @@
 #include "StdInc.h"
 #include <game/TaskTypes.h>
 #include "CFireManagerSA.h"
+#include "CGameSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPedSA.h"
 #include "CPlayerInfoSA.h"
 #include "CProjectileInfoSA.h"
+#include "CStatsSA.h"
 #include "CTaskManagerSA.h"
 #include "CTasksSA.h"
 #include "CWeaponInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 
-
 extern CGameSA* pGame;
+
 int             g_bOnlyUpdateRotations = false;
 
 CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL), m_iCustomMoveAnim(0)
@@ -508,28 +510,14 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* vecPosition)
     ApplySwimAndSlopeRotations();
     CEntitySAInterface* entity = GetInterface();
 
-    if (entity->m_pRwObject == nullptr)
-    {
-        // NOTE(botder): Crash occurs at 0x749B7B in RpClumpForAllAtomics, because the clump is a null pointer.
-        // Call stack:
-        // 1> RpClumpForAllAtomics (0x749B70)
-        // 2> GetAnimHierarchyFromSkinClump (0x734A40) -> 0x734A58
-        // 3> CPed::GetBonePosition (0x5E4280) -> 0x5E42AD
-        // 4> CPedSA::GetBonePosition
-        static int limiter = 0;
-
-        if (limiter < 10)
-        {
-            LogEvent(850, "Model not loaded", "CPedSA::GetBonePosition", SString("No RwObject for model:%d", entity->m_nModelIndex), 5420);
-            ++limiter;
-        }
-    }
-    else
+    // NOTE(botder): A crash used to occur at 0x749B7B in RpClumpForAllAtomics, because the clump pointer might have been null
+    // for a broken model.
+    if (entity->m_pRwObject != nullptr)
     {
         // void __thiscall CPed::GetBonePosition(struct RwV3d &, unsigned int, bool)
-        using GetBonePosition_t = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
-        const auto GetBonePosition_f = reinterpret_cast<GetBonePosition_t>(FUNC_GetBonePosition);
-        GetBonePosition_f(entity, vecPosition, bone, true);
+        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
+        const auto GameFunction = reinterpret_cast<Signature>(FUNC_GetBonePosition);
+        GameFunction(entity, vecPosition, bone, true);
     }
 
     // Clamp to a sane range as this function can occasionally return massive values,
@@ -545,20 +533,24 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* vecPosition)
 CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* vecPosition)
 {
     ApplySwimAndSlopeRotations();
-    DWORD dwFunc = FUNC_GetTransformedBonePosition;
-    DWORD dwThis = (DWORD)this->GetInterface();
-    _asm
+    CEntitySAInterface* entity = GetInterface();
+
+    // NOTE(botder): A crash used to occur at 0x7C51A8 in RpHAnimIDGetIndex, because the clump pointer might have been null
+    // for a broken model.
+    if (entity->m_pRwObject != nullptr)
     {
-        push    1
-        push    bone
-        push    vecPosition
-        mov     ecx, dwThis
-        call    dwFunc
+        // void __thiscall CPed::GetTransformedBonePosition(struct RwV3d &, unsigned int, bool)
+        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
+        const auto GameFunction = reinterpret_cast<Signature>(FUNC_GetTransformedBonePosition);
+        GameFunction(entity, vecPosition, bone, true);
     }
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
-    if (!IsValidPosition(*vecPosition))* vecPosition = *GetPosition();
+    if (!IsValidPosition(*vecPosition))
+    {
+        *vecPosition = *GetPosition();
+    }
 
     return vecPosition;
 }

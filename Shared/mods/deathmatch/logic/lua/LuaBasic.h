@@ -44,6 +44,8 @@ namespace lua
 
     inline void Push(lua_State* L, nullptr_t) { lua_pushnil(L); }
 
+    inline void Push(lua_State* L, const char* value) { lua_pushstring(L, value); }
+
     inline void Push(lua_State* L, const std::string& value) { lua_pushlstring(L, value.data(), value.length()); }
 
     inline void Push(lua_State* L, const std::string_view& value) { lua_pushlstring(L, value.data(), value.length()); }

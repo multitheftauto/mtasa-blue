@@ -11,16 +11,14 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/TaskJumpFall.h>
 #include <game/CTasks.h>
 #include "TaskSA.h"
 
 // temporary
 class CAnimBlendAssociation;
-#ifndef RpClump
-// class RpClump;
 class FxSystem_c;
-#endif
 
 #define FUNC_CTaskSimpleClimb__Constructor                          0x67A110
 #define FUNC_CTaskSimpleJetPack__Constructor                        0x67B4E0

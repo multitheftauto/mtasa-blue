@@ -10,14 +10,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "gamesa_renderware.h"
-#include "CModelInfoSA.h"
+#include <core/CCoreInterface.h>
 #include "CColModelSA.h"
 #include "CColStoreSA.h"
+#include "CGameSA.h"
+#include "CModelInfoSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPedSA.h"
 #include "CWorldSA.h"
+#include "gamesa_renderware.h"
 
+extern CCoreInterface* g_pCore;
 extern CGameSA* pGame;
 
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
@@ -1191,32 +1194,42 @@ void CModelInfoSA::ResetAllVehiclesWheelSizes()
     ms_VehicleModelDefaultWheelSizes.clear();
 }
 
-void CModelInfoSA::SetCustomModel(RpClump* pClump)
+bool CModelInfoSA::SetCustomModel(RpClump* pClump)
 {
-    // Error
-    if (pClump == NULL)
-        return;
+    if (!pClump)
+        return false;
 
-    // Store the custom clump
-    m_pCustomClump = pClump;
-
-    // Replace the model if we're loaded.
-    if (IsLoaded())
+    if (!IsLoaded())
     {
-        switch (GetModelType())
-        {
-            case eModelInfoType::PED:
-                return pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case eModelInfoType::WEAPON:
-                return pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case eModelInfoType::VEHICLE:
-                return pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case eModelInfoType::ATOMIC:
-            case eModelInfoType::LOD_ATOMIC:
-            case eModelInfoType::TIME:
-                return pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
-        }
+        // Wait for the game to eventually stream-in the model and then try to replace it (via MakeCustomModel).
+        m_pCustomClump = pClump;
+        return true;
     }
+
+    bool success = false;
+
+    switch (GetModelType())
+    {
+        case eModelInfoType::PED:
+            success = pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::WEAPON:
+            success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::VEHICLE:
+            success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::ATOMIC:
+        case eModelInfoType::LOD_ATOMIC:
+        case eModelInfoType::TIME:
+            success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        default:
+            break;
+    }
+
+    m_pCustomClump = success ? pClump : nullptr;
+    return success;
 }
 
 void CModelInfoSA::RestoreOriginalModel()

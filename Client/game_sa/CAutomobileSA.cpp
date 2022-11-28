@@ -87,32 +87,6 @@ bool CAutomobileSA::IsComponentPresent(int iComponentID)
     return bReturn;
 }
 
-void CAutomobileSA::ResetSuspension()
-{
-    DWORD dwThis = (DWORD)GetInterface();
-    DWORD dwFunc = FUNC_CAutomobile_ResetSuspension;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
-}
-
-void CAutomobileSA::SetTaxiLight(bool bState)
-{
-    DWORD dwThis = (DWORD)GetInterface();
-    DWORD dwState = (DWORD)bState;
-    DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;
-
-    _asm
-    {
-        mov     ecx, dwThis
-        push    dwState
-        call    dwFunc
-    }
-}
-
 CPhysical* CAutomobileSA::SpawnFlyingComponent(int iCarNodeIndex, int iUnknown)
 {
     DWORD      dwThis = (DWORD)GetInterface();

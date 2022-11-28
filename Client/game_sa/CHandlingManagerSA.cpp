@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
 #include "CHandlingManagerSA.h"
+
+extern CCoreInterface* g_pCore;
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 

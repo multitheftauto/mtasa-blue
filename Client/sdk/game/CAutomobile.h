@@ -26,8 +26,6 @@ public:
     virtual bool  BreakTowLink() = 0;
     virtual bool  IsComponentPresent(int iComponentID) = 0;
 
-    virtual void       ResetSuspension() = 0;
-    virtual void       SetTaxiLight(bool bState) = 0;
     virtual void       SetTowLink(CVehicle* pVehicle, bool bRemoveAdd) = 0;
     virtual CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown) = 0;
 

@@ -11,11 +11,15 @@
 
 #include "StdInc.h"
 #include "CAnimBlendAssocGroupSA.h"
+#include "CAnimBlendAssociationSA.h"
 #include "CAnimBlendHierarchySA.h"
+#include "CAnimBlendSequenceSA.h"
 #include "CAnimBlockSA.h"
 #include "CAnimManagerSA.h"
-#include "CAnimBlendSequenceSA.h"
+#include "CGameSA.h"
 #include "CKeyGenSA.h"
+
+extern CGameSA* pGame;
 
 using std::list;
 
