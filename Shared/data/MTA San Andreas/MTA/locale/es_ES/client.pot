@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-25 21:33+0000\n"
-"PO-Revision-Date: 2022-11-25 21:34\n"
+"POT-Creation-Date: 2022-11-28 18:37+0000\n"
+"PO-Revision-Date: 2022-11-28 18:42\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -2515,16 +2515,16 @@ msgstr "Iniciar"
 msgid "Problem with graphics driver"
 msgstr "Problema con el driver de la tarjeta gráfica"
 
-#: Client/game_sa/CSettingsSA.cpp:778
+#: Client/game_sa/CSettingsSA.cpp:782
 msgid "Can't find valid screen resolution."
 msgstr "No se puede encontrar una resolución válida."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:854
+#: Client/game_sa/CSettingsSA.cpp:858
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "¿Estás seguro de que quieres utilizar esta resolución?"
 
-#: Client/game_sa/CSettingsSA.cpp:856 Client/loader/Dialogs.cpp:194
+#: Client/game_sa/CSettingsSA.cpp:860 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
