@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-25 21:33+0000\n"
-"PO-Revision-Date: 2022-11-25 21:39\n"
+"POT-Creation-Date: 2022-11-28 18:37+0000\n"
+"PO-Revision-Date: 2022-11-28 18:46\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -2504,16 +2504,16 @@ msgstr "Bắt đầu"
 msgid "Problem with graphics driver"
 msgstr "Vấn đề với trình điều khiển đồ họa"
 
-#: Client/game_sa/CSettingsSA.cpp:778
+#: Client/game_sa/CSettingsSA.cpp:782
 msgid "Can't find valid screen resolution."
 msgstr "Không thấy độ phân giải màn hình hợp lệ."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:854
+#: Client/game_sa/CSettingsSA.cpp:858
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Bạn có chắc chắn muốn sử dụng độ phân giải màn hình này không?"
 
-#: Client/game_sa/CSettingsSA.cpp:856 Client/loader/Dialogs.cpp:194
+#: Client/game_sa/CSettingsSA.cpp:860 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
 msgstr ""
 
