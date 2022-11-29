@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-29 16:10+0000\n"
-"PO-Revision-Date: 2022-11-29 16:21\n"
+"PO-Revision-Date: 2022-11-29 17:20\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -808,7 +808,7 @@ msgstr "Dynamické stíny postav"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Rozmazání při pohybu"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
