@@ -14,6 +14,7 @@
 #include <game/CPedIK.h>
 
 class CPedSAInterface;
+struct RwV3d;
 
 /**** STRAIGHT FROM R* *****/
 // Ped IK flags

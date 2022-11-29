@@ -10,10 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CSettingsSA.h"
+#include <core/CCoreInterface.h>
 #include "CAudioEngineSA.h"
 #include "CCoronasSA.h"
+#include "CGameSA.h"
 #include "CHudSA.h"
+#include "CSettingsSA.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
@@ -327,6 +332,10 @@ bool CSettingsSA::IsVolumetricShadowsEnabled()
 void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
 {
     m_bVolumetricShadowsEnabled = bEnable;
+
+    // Disable rendering ped real time shadows when they sit on bikes
+    // if vehicle volumetric shadows are disabled because it looks a bit weird
+    MemPut<BYTE>(0x5E682A + 1, bEnable);
 }
 
 void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)

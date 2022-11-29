@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CBoatHandlingEntry.h>
 
 struct tBoatHandlingDataSA

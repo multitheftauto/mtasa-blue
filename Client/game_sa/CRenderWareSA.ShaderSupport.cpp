@@ -11,8 +11,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRenderWareSA.ShaderSupport.h"
+#include <core/CCoreInterface.h>
+#include "CGameSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
+#include "CRenderWareSA.ShaderSupport.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 #define ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName        0x06FDF40
 #define ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName     0x06FED49

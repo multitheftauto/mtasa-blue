@@ -11,9 +11,13 @@
 
 #pragma once
 
+#include <CVector.h>
+#include <game/CPed.h>
 #include <game/TaskBasic.h>
-
 #include "TaskSA.h"
+
+class CVehicleSAInterface;
+class CObjectSAInterface;
 
 #define FUNC_CTaskComplexUseMobilePhone__Constructor        0x6348A0
 #define FUNC_CTaskSimpleRunAnim__Constructor                0x61A900

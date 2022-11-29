@@ -10,18 +10,21 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CTasksSA.h"
+#include "CGameSA.h"
 #include "CTaskManagementSystemSA.h"
-#include "TaskSA.h"
+#include "CTasksSA.h"
+#include "TaskAttackSA.h"
 #include "TaskBasicSA.h"
 #include "TaskCarAccessoriesSA.h"
-#include "TaskGoToSA.h"
 #include "TaskCarSA.h"
-#include "TaskJumpFallSA.h"
-#include "TaskSecondarySA.h"
-#include "TaskPhysicalResponseSA.h"
+#include "TaskGoToSA.h"
 #include "TaskIKSA.h"
-#include "TaskAttackSA.h"
+#include "TaskJumpFallSA.h"
+#include "TaskPhysicalResponseSA.h"
+#include "TaskSA.h"
+#include "TaskSecondarySA.h"
+
+extern CGameSA* pGame;
 
 CTasksSA::CTasksSA(CTaskManagementSystemSA* pTaskManagementSystem)
 {

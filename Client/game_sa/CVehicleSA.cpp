@@ -10,19 +10,21 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "gamesa_renderware.h"
-#include "CVehicleSA.h"
 #include "CAutomobileSA.h"
 #include "CCameraSA.h"
 #include "CColModelSA.h"
 #include "CFxManagerSA.h"
 #include "CFxSystemSA.h"
+#include "CGameSA.h"
 #include "CProjectileInfoSA.h"
 #include "CTrainSA.h"
+#include "CVehicleSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CWorldSA.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
+
 bool            g_bVehiclePointerInvalid = false;
 
 static BOOL m_bVehicleSunGlare = false;

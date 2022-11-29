@@ -13,6 +13,7 @@
 #include "CAnimBlendAssociationSA.h"
 #include "CAnimBlendHierarchySA.h"
 #include "CAnimManagerSA.h"
+#include "CGameSA.h"
 
 extern CGameSA* pGame;
 

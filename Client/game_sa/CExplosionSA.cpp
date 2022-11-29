@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CExplosionSA.h"
 #include "CEntitySA.h"
+#include "CExplosionSA.h"
+#include "CGameSA.h"
 #include "CVehicleSA.h"
+
+extern CGameSA* pGame;
 
 eExplosionType CExplosionSA::GetExplosionType()
 {

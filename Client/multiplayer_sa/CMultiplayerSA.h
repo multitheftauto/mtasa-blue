@@ -77,6 +77,7 @@ public:
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
     void                InitHooks_FrameRateFixes();
+    void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
