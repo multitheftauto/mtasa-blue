@@ -52,6 +52,7 @@ CSettingsSA::CSettingsSA()
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
+    m_bBlurViaScript = false;
     m_bDynamicPedShadowsEnabled = false;
     m_bCoronaReflectionsViaScript = false;
     SetAspectRatio(ASPECT_RATIO_4_3);
@@ -659,6 +660,27 @@ float CSettingsSA::GetPedsLODDistance()
 
 ////////////////////////////////////////////////
 //
+// Blur
+//
+// When blur is controlled by script changing this option
+// in settings doesn't produce any effect
+//
+////////////////////////////////////////////////
+void CSettingsSA::ResetBlurEnabled()
+{
+    if (m_bBlurViaScript)
+        return;
+
+    bool bEnabled;
+    g_pCore->GetCVars()->Get("blur", bEnabled);
+    pGame->SetBlurLevel(bEnabled ? DEFAULT_BLUR_LEVEL : 0);
+}
+
+void CSettingsSA::SetBlurControlledByScript(bool bByScript)
+{
+    m_bBlurViaScript = bByScript;
+}
+
 // Corona rain reflections
 //
 // When corona reflections are controlled by script changing this option
