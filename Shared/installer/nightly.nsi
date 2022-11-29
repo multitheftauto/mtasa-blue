@@ -2604,12 +2604,12 @@ Function MTAInitFileNamesAndPaths
 	StrCpy $UninstallShortcutName "Uninstall MTA San Andreas"
 	# Shostcuts paths
 	StrCpy $StartMenuMTAFolderPath "$SMPROGRAMS\MTA San Andreas ${0.0}"
-	StrCpy $StartMenuClientShortcutPath "$StartMenuMTAFolderPath\${ClientShortcutName}.lnk"
-	StrCpy $StartMenuServerShortcutPath "$StartMenuMTAFolderPath\${ServerShortcutName}.lnk"
-	StrCpy $StartMenuUninstallShortcutPath "$StartMenuMTAFolderPath\${$UninstallShortcutName}.lnk"
+	StrCpy $StartMenuClientShortcutPath "$StartMenuMTAFolderPath\$ClientShortcutName.lnk"
+	StrCpy $StartMenuServerShortcutPath "$StartMenuMTAFolderPath\$ServerShortcutName.lnk"
+	StrCpy $StartMenuUninstallShortcutPath "$StartMenuMTAFolderPath\$UninstallShortcutName.lnk"
 	# Shortcut names for desktop and start menu are different and can't be safely unified.
 	# Obvious fix is to roll 1 update where all shortcuts will be deleted and replaced with a unified names.
-	StrCpy $DesktopClientShortcutPath "$DESKTOP\${ClientShortcutName} ${0.0}.lnk"
+	StrCpy $DesktopClientShortcutPath "$DESKTOP\$ClientShortcutName ${0.0}.lnk"
 	# Exe names
 	StrCpy $ClientExeName "Multi Theft Auto.exe"
 	StrCpy $ServerExeName "MTA Server.exe"
