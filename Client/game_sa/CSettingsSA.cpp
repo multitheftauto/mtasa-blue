@@ -331,6 +331,10 @@ bool CSettingsSA::IsVolumetricShadowsEnabled()
 void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
 {
     m_bVolumetricShadowsEnabled = bEnable;
+
+    // Disable rendering ped real time shadows when they sit on bikes
+    // if vehicle volumetric shadows are disabled because it looks a bit weird
+    MemPut<BYTE>(0x5E682A + 1, bEnable);
 }
 
 void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
