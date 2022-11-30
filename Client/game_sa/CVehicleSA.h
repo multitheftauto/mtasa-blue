@@ -9,12 +9,10 @@
  *
  *****************************************************************************/
 
-class CVehicleSA;
-
 #pragma once
 
+#include <game/RenderWare.h>
 #include <game/CVehicle.h>
-
 #include "CPedSA.h"
 #include "CPhysicalSA.h"
 #include "CPoolsSA.h"
@@ -23,6 +21,9 @@ class CVehicleSA;
 #include "CDoorSA.h"
 #include "CColPointSA.h"
 #include "CAEVehicleAudioEntitySA.h"
+
+class CFxSystemSAInterface;
+struct RwTexture;
 
 #define SIZEOF_CHELI                            2584
 

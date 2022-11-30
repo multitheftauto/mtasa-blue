@@ -813,6 +813,9 @@ void CMultiplayerSA::InitHooks()
     // DISABLE CRoadBlocks::GenerateRoadblocks
     MemPut<BYTE>(0x4629E0, 0xC3);
 
+    // Disable CPopulation::RemovePed
+    MemPut<BYTE>(0x610F20, 0xC3);
+
     // Temporary hack for disabling hand up
     /*
     MemPut < BYTE > ( 0x62AEE7, 0x90 );
@@ -1569,6 +1572,7 @@ void CMultiplayerSA::InitHooks()
 
     InitHooks_Streaming();
     InitHooks_FrameRateFixes();
+    InitHooks_ProjectileCollisionFix();
     InitHooks_ObjectStreamerOptimization();
 }
 

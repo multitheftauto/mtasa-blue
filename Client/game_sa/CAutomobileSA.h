@@ -19,7 +19,6 @@
 #define FUNC_CAutomobile_BurstTyre                  0x6A32B0
 #define FUNC_CAutomobile_BreakTowLink               0x6A4400
 #define FUNC_CAutomobile_IsComponentPresent         0x6A2250
-#define FUNC_CAutomobile_ResetSuspension            0x6A2AE0
 #define FUNC_CAutomobile_SetTaxiLight               0x6A3740
 #define FUNC_CAutomobile_SpawnFlyingComponent       0x6A8580
 
@@ -176,8 +175,6 @@ public:
     bool BreakTowLink();
 
     bool       IsComponentPresent(int iComponentID);
-    void       ResetSuspension();
-    void       SetTaxiLight(bool bState);
     CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown);
 
     CDoor* GetDoor(eDoors doorID);

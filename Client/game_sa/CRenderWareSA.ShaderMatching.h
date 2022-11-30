@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "CRenderWareSA.ShaderSupport.h"
+
 #ifdef SHADER_DEBUG_OUTPUT
 class CShaderAndEntityPair;
 struct SWildcardMatchChain;

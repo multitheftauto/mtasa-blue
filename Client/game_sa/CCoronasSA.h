@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <game/Common.h>
 #include <game/CCoronas.h>
 
 class CRegisteredCorona;

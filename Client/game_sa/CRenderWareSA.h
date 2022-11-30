@@ -15,8 +15,12 @@
 #include "CModelInfoSA.h"
 #include "CRenderWareSA.ShaderSupport.h"
 
+class CMatchChannelManager;
 class CModelTexturesInfo;
 struct RpAtomic;
+struct SShaderReplacementStats;
+struct STexInfo;
+struct STexTag;
 
 class CRenderWareSA : public CRenderWare
 {
@@ -57,7 +61,7 @@ public:
     unsigned int LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics);
 
     // Replaces all atomics for a specific model
-    void ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID);
+    bool ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) override;
 
     // Replaces all atomics in a clump
     void ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics);
@@ -72,14 +76,14 @@ public:
     void AddAllAtomics(RpClump* pDst, RpClump* pSrc);
 
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
-    void ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID);
+    bool ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) override;
 
     // Replaces a CClumpModelInfo clump with a new clump
-    void ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID);
+    bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
 
-    void ReplacePedModel(RpClump* pNew, unsigned short usModelID);
+    bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
 
-    void ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
+    bool ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')

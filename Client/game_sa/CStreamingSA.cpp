@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
 #include "CStreamingSA.h"
+#include "CModelInfoSA.h"
+
+extern CCoreInterface* g_pCore;
 
 // count: 26316 in unmodified game
 CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;

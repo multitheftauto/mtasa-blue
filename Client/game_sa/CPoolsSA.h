@@ -14,7 +14,6 @@
 #include "CPedSA.h"
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
-#include "CBuildingSA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
@@ -67,7 +66,6 @@ public:
 
     // Vehicles pool
     CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
-    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface);
 
 private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
@@ -75,9 +73,6 @@ private:
 public:
     void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
     SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
-    DWORD                      GetVehicleRef(CVehicle* pVehicle);
-    DWORD                      GetVehicleRef(DWORD* pGameInterface);
-    CVehicle*                  GetVehicleFromRef(DWORD dwGameRef);
     unsigned long              GetVehicleCount()
     {
         return m_vehiclePool.ulCount;
@@ -94,9 +89,6 @@ private:
 public:
     void                      RemoveObject(CObject* pObject, bool bDelete = true);
     SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface);
-    DWORD                     GetObjectRef(CObject* pObject);
-    DWORD                     GetObjectRef(DWORD* pGameInterface);
-    CObject*                  GetObjectFromRef(DWORD dwGameRef);
     CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool);
     unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
     void                      DeleteAllObjects();
@@ -110,11 +102,7 @@ private:
 
 public:
     void RemovePed(CPed* ped, bool bDelete = true);
-
     SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
-
-    DWORD            GetPedRef(CPed* pPed);
-    DWORD            GetPedRef(DWORD* pGameInterface);
     CPed*            GetPedFromRef(DWORD dwGameRef);
     CPedSAInterface* GetPedInterface(DWORD dwGameRef);            // game_sa specific
     unsigned long    GetPedCount() { return m_pedPool.ulCount; }
@@ -125,8 +113,6 @@ public:
     uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
-    CBuilding* AddBuilding(DWORD dwModelID);
-    void       DeleteAllBuildings();
     CVehicle*  AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
 
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
@@ -172,21 +158,10 @@ private:
     CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
     CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
 
-    CBuildingSA*  Buildings[MAX_BUILDINGS];
-    unsigned long m_ulBuildingCount;
-
     bool m_bGetVehicleEnabled;
 };
 
-#define FUNC_GetVehicle 0x54fff0
-#define FUNC_GetVehicleRef 0x54ffc0
-//#define FUNC_GetVehicleCount              0x429510
 #define FUNC_GetPed 0x54ff90
-#define FUNC_GetPedRef 0x54ff60
-//#define FUNC_GetPedCount                  0x4A7440
-#define FUNC_GetObject 0x550050
-#define FUNC_GetObjectRef 0x550020
-//#define FUNC_GetObjectCount                   0x4A74D0
 
 #define CLASS_CPool_Vehicle 0xB74494
 #define CLASS_CPool_Ped 0xB74490

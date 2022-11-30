@@ -329,6 +329,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("tyre_smoke_enabled", 1);                                                 // Enable tyre smoke
     DEFAULT("high_detail_vehicles", 0);                                               // Disable rendering high detail vehicles all the time
     DEFAULT("high_detail_peds", 0);                                                   // Disable rendering high detail peds all the time
+    DEFAULT("blur", 1);                                                               // Enable blur
     DEFAULT("corona_reflections", 0);                                                 // Disable corona rain reflections
     DEFAULT("dynamic_ped_shadows", 0);                                                // Disable dynamic ped shadows
     DEFAULT("fast_clothes_loading", 1);                                               // 0-off 1-auto 2-on

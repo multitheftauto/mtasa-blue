@@ -10,12 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CWeaponSA.h"
 #include "CColPointSA.h"
+#include "CGameSA.h"
 #include "CPlayerPedSA.h"
+#include "CWeaponSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CWeaponStatSA.h"
 #include "CWorldSA.h"
+
+extern CGameSA* pGame;
 
 CWeaponSA::CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot)
 {
@@ -346,7 +349,7 @@ bool CWeaponSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEn
         push vecStart
         call dwFunction
     }
-    bool bReturn = g_pCore->GetGame()->GetWorld()->ProcessLineOfSight(vecStart, vecEnd, colCollision, CollisionEntity, flags, pBuildingResult);
+    bool bReturn = pGame->GetWorld()->ProcessLineOfSight(vecStart, vecEnd, colCollision, CollisionEntity, flags, pBuildingResult);
     _asm
     {
         add esp, 10h
