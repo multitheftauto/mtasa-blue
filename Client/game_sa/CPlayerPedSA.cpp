@@ -29,7 +29,7 @@ static CPedClothesDesc*    pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
 static std::set<SString>   ms_DoneAnimBlockRefMap;
 
-CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
+CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
 {
     // based on CPlayerPed::SetupPlayerPed (R*)
     DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
@@ -56,7 +56,7 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
-    this->SetModelIndex(pedType);
+    this->SetModelIndex(nModelIndex);
     this->BeingDeleted = false;
     this->DoNotRemoveFromGame = false;
     this->SetType(PLAYER_PED);

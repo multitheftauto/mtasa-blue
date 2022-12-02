@@ -317,12 +317,12 @@ inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
     return true;
 }
 
-CPed* CPoolsSA::AddPed(CClientPed* pClientPed, ePedModel ePedType)
+CPed* CPoolsSA::AddPed(CClientPed* pClientPed, unsigned int nModelIndex)
 {
     CPedSA* pPed = NULL;
     if (m_pedPool.ulCount < MAX_PEDS)
     {
-        pPed = new CPlayerPedSA(ePedType);
+        pPed = new CPlayerPedSA(nModelIndex);
         if (!AddPedToPool(pClientPed, pPed))
         {
             delete pPed;
