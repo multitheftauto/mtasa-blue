@@ -137,7 +137,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             unsigned short         usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
             unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
-                                      [=](auto& element) { element.SetModelBlocking(usParentID, 255, 255, element.IsLocalEntity()); });
+                                      [=](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
             break;
         }
     }

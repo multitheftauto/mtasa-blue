@@ -1504,7 +1504,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (!CClientVehicleManager::IsValidModel(usModel))
                 return false;
 
-            Vehicle.SetModelBlocking(usModel, 255, 255, Entity.IsLocalEntity());
+            Vehicle.SetModelBlocking(usModel, 255, 255);
 
             CLuaArguments Arguments;
             Arguments.PushNumber(usCurrentModel);
@@ -1518,7 +1518,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (!bContinue)
             {
                 // Change canceled
-                Vehicle.SetModelBlocking(usCurrentModel, 255, 255, Entity.IsLocalEntity());
+                Vehicle.SetModelBlocking(usCurrentModel, 255, 255);
                 return false;
             }
 

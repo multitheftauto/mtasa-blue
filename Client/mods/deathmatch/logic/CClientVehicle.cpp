@@ -1006,7 +1006,7 @@ void CClientVehicle::SetTurretRotation(float fHorizontal, float fVertical)
     m_fTurretVertical = fVertical;
 }
 
-void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, bool restoreHandling)
+void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
 {
     // Different vehicle ID than we have now?
     if (m_usModel != usModel)
@@ -1068,7 +1068,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
 
         // Reset handling to fit the vehicle
-        if (restoreHandling)
+        if (IsLocalEntity())
         {
             ushort usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
