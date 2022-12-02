@@ -12,15 +12,19 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CMatrix.h>
+#include <core/CCoreInterface.h>
 #define RWFUNC_IMPLEMENT
 #include <game/RenderWareD3D.h>
-#include "CRenderWareSA.h"
 #include "CColModelSA.h"
 #include "CFileLoaderSA.h"
+#include "CGameSA.h"
+#include "CRenderWareSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 
+extern CCoreInterface* g_pCore;
 extern CGameSA* pGame;
 
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
@@ -352,7 +356,7 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 }
 
 // Replaces a vehicle/weapon/ped model
-void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction)
+bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction)
 {
     auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
     auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
@@ -362,7 +366,7 @@ void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
     if (pModelInfo)
     {
         RpClump* pOldClump = (RpClump*)pModelInfo->GetRwObject();
-        if (!DoContainTheSameGeometry(pNew, pOldClump, NULL))
+        if (pOldClump != pNew && !DoContainTheSameGeometry(pNew, pOldClump, NULL))
         {
             if (pModelInfo->IsVehicle())
             {
@@ -394,24 +398,34 @@ void CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             RpClumpDestroy(pOldClump);
         }
     }
+
+    return true;
 }
 
 // Replaces a vehicle model
-void CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID)
 {
-    ReplaceModel(pNew, usModelID, FUNC_LoadVehicleModel);
+    return ReplaceModel(pNew, usModelID, FUNC_LoadVehicleModel);
 }
 
 // Replaces a weapon model
-void CRenderWareSA::ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID)
 {
-    ReplaceModel(pNew, usModelID, FUNC_LoadWeaponModel);
+    return ReplaceModel(pNew, usModelID, FUNC_LoadWeaponModel);
 }
 
 // Replaces a ped model
-void CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
 {
-    ReplaceModel(pNew, usModelID, FUNC_LoadPedModel);
+    // NOTE(botder): The game logic requires the animation hierarchy to be present (read: it's not a corrupt model),
+    // otherwise it will crash (offset 0x3c51a8).
+    if (!GetAnimHierarchyFromClump(pNew))
+    {
+        LogEvent(851, "Model not replaced", "CRenderWareSA::ReplacePedModel", SString("No anim hierarchy for ped model:%d", usModelID), 5421);
+        return false;
+    }
+
+    return ReplaceModel(pNew, usModelID, FUNC_LoadPedModel);
 }
 
 // Reads and parses a COL3 file
@@ -482,13 +496,15 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     return true;
 }
 
-void CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
+
     if (pModelInfo)
     {
         RpAtomic* pOldAtomic = (RpAtomic*)pModelInfo->GetRwObject();
-        if (!DoContainTheSameGeometry(pNew, NULL, pOldAtomic))
+
+        if (reinterpret_cast<RpClump*>(pOldAtomic) != pNew && !DoContainTheSameGeometry(pNew, NULL, pOldAtomic))
         {
             // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
             RpClump* pCopy = RpClumpClone(pNew);
@@ -505,6 +521,8 @@ void CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
             RpClumpDestroy(pCopy);
         }
     }
+
+    return true;
 }
 
 // Replaces all atomics in a vehicle

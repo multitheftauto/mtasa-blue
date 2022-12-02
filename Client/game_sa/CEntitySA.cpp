@@ -11,13 +11,15 @@
 
 #include "StdInc.h"
 #include <CRect.h>
-#include "gamesa_renderware.h"
 #include "BoneNode_cSA.h"
+#include "CAnimBlendAssociationSA.h"
 #include "CColModelSA.h"
 #include "CEntitySA.h"
+#include "CGameSA.h"
+#include "CMatrixSA.h"
 #include "CVehicleSA.h"
 #include "CWorldSA.h"
-#include "CMatrixSA.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
 
@@ -79,7 +81,6 @@ CEntitySA::CEntitySA()
     BeingDeleted = false;
     DoNotRemoveFromGame = false;
     m_pStoredPointer = NULL;
-    m_ulArrayID = INVALID_POOL_ARRAY_ID;
 }
 
 void CEntitySA::UpdateRpHAnim()
@@ -484,11 +485,7 @@ void CEntitySA::SetAlpha(DWORD dwAlpha)
 
 bool CEntitySA::IsOnScreen()
 {
-    /**(BYTE *)0x534540 = 0x83;
-    MemPut < BYTE > ( 0x534541, 0xEC );
-    MemPut < BYTE > ( 0x534542, 0x10 );
-*/
-    DWORD dwFunc = FUNC_IsVisible;            // FUNC_IsOnScreen;
+    DWORD dwFunc = FUNC_IsVisible;
     DWORD dwThis = (DWORD)m_pInterface;
     bool  bReturn = false;
     _asm
@@ -497,11 +494,6 @@ bool CEntitySA::IsOnScreen()
         call    dwFunc
         mov     bReturn, al
     }
-    /*
-        MemPut < BYTE > ( 0x534540, 0xB0 );
-        MemPut < BYTE > ( 0x534541, 0x01 );
-        MemPut < BYTE > ( 0x534542, 0xC3 );
-    */
     return bReturn;
 }
 

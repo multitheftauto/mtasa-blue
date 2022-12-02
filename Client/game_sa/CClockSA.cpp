@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CClockSA.h"
+#include "CGameSA.h"
 
 extern CGameSA* pGame;
 

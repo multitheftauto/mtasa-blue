@@ -25,7 +25,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CLASS_CPlayerInfo               0xB7CD98
 #define CLASS_CCamera                   0xB6F028
 #define CLASS_CPad                      0xB73458
-#define CLASS_CGarages                  0x96C048
 #define CLASS_CFx                       0xa9ae00
 #define CLASS_CFxManager                0xA9AE80
 #define CLASS_CMenuManager              0xBA6748
@@ -137,7 +136,6 @@ public:
     CAESoundManager*                GetAESoundManager() override { return m_pAESoundManager; }
     CAudioContainer*                GetAudioContainer() { return m_pAudioContainer; }
     CStats*                         GetStats() { return m_pStats; }
-    CPathFind*                      GetPathFind() { return m_pPathFind; }
     CTaskManagementSystemSA*        GetTaskManagementSystem() { return m_pTaskManagementSystem; }
     CTasks*                         GetTasks() { return m_pTasks; }
     CGameSettings*                  GetSettings() { return m_pSettings; }
@@ -317,7 +315,6 @@ private:
     CAESoundManager*          m_pAESoundManager;
     CAudioContainer*          m_pAudioContainer;
     CStats*                   m_pStats;
-    CPathFind*                m_pPathFind;
     CTaskManagementSystemSA*  m_pTaskManagementSystem;            // not used outside the game_sa
     CTasks*                   m_pTasks;
     CGameSettings*            m_pSettings;

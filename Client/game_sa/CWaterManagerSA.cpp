@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
 #include "CWaterManagerSA.h"
+
+extern CCoreInterface* g_pCore;
 
 extern int ms_iNumNonDefaultAndNonZeroVertices;
 

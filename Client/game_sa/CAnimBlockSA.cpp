@@ -13,6 +13,9 @@
 #include "CAnimBlendHierarchySA.h"
 #include "CAnimBlockSA.h"
 #include "CAnimManagerSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 int CAnimBlockSAInterface::GetIndex()
 {

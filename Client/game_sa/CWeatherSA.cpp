@@ -17,8 +17,6 @@ unsigned char* CWeatherSA::VAR_CWeather__OldWeatherType;
 unsigned char* CWeatherSA::VAR_CWeather__NewWeatherType;
 float*         CWeatherSA::VAR_CWeather__Rain;
 
-unsigned long CWeatherSA::FUNC_IsRaining;
-
 unsigned char CWeatherSA::Get()
 {
     return (unsigned char)*VAR_CWeather__ForcedWeatherType;
@@ -33,18 +31,6 @@ void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
 void CWeatherSA::Release()
 {
     *VAR_CWeather__ForcedWeatherType = 0xFF;
-}
-
-bool CWeatherSA::IsRaining()
-{
-    DWORD dwFunc = FUNC_IsRaining;
-    bool  bReturn = false;
-    _asm
-    {
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
 }
 
 float CWeatherSA::GetAmountOfRain()

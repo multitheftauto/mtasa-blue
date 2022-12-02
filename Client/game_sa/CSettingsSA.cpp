@@ -10,10 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CSettingsSA.h"
+#include <core/CCoreInterface.h>
 #include "CAudioEngineSA.h"
 #include "CCoronasSA.h"
+#include "CGameSA.h"
 #include "CHudSA.h"
+#include "CSettingsSA.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
@@ -47,6 +52,7 @@ CSettingsSA::CSettingsSA()
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
+    m_bBlurViaScript = false;
     m_bDynamicPedShadowsEnabled = false;
     m_bCoronaReflectionsViaScript = false;
     SetAspectRatio(ASPECT_RATIO_4_3);
@@ -326,6 +332,10 @@ bool CSettingsSA::IsVolumetricShadowsEnabled()
 void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
 {
     m_bVolumetricShadowsEnabled = bEnable;
+
+    // Disable rendering ped real time shadows when they sit on bikes
+    // if vehicle volumetric shadows are disabled because it looks a bit weird
+    MemPut<BYTE>(0x5E682A + 1, bEnable);
 }
 
 void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
@@ -650,6 +660,27 @@ float CSettingsSA::GetPedsLODDistance()
 
 ////////////////////////////////////////////////
 //
+// Blur
+//
+// When blur is controlled by script changing this option
+// in settings doesn't produce any effect
+//
+////////////////////////////////////////////////
+void CSettingsSA::ResetBlurEnabled()
+{
+    if (m_bBlurViaScript)
+        return;
+
+    bool bEnabled;
+    g_pCore->GetCVars()->Get("blur", bEnabled);
+    pGame->SetBlurLevel(bEnabled ? DEFAULT_BLUR_LEVEL : 0);
+}
+
+void CSettingsSA::SetBlurControlledByScript(bool bByScript)
+{
+    m_bBlurViaScript = bByScript;
+}
+
 // Corona rain reflections
 //
 // When corona reflections are controlled by script changing this option

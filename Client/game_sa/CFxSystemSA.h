@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CFxSystem.h>
 #include <game/RenderWare.h>
 
@@ -32,7 +33,9 @@ public:
 };
 static_assert(sizeof(CAEFireAudioEntitySAInterface) == 0x88, "Invalid size for CAEFireAudioEntitySAInterface");
 
+class FxInfoSAInterface;
 class CFxSystemBPSAInterface;
+
 class CFxSystemSAInterface            // Internal SA Name: FxSystem_c
 {
 public:
@@ -97,16 +100,41 @@ protected:
     float                 m_fDrawDistance;
 };
 
-// FxEmitter stuff
-class CFxEmitterBPSAInterface
+class FxInfoManagerSAInterface
 {
 public:
-    void*  vtbl;                          // 0x00
-    char   pad[0x34];                     // 0x04
-    ushort usFadeNearDistance;            // 0x38
-    ushort usFadeFarDistance;             // 0x3A
-    // TODO the rest
+    uint32_t           m_nNumInfos;                     // 0x00
+    FxInfoSAInterface* m_pInfos;                        // 0x04
+    uint8_t            m_nFirstMovementInfo;            // 0x08
+    uint8_t            m_nFirstRenderInfo;              // 0x09
 };
+static_assert(sizeof(FxInfoManagerSAInterface) == 0xC, "Invalid size for FxInfoManagerSAInterface");
+
+class FxPrimBPSAInterface
+{
+public:
+    void*                    vtbl;                                  // 0x00
+    uint8_t                  field_4;                               // 0x04
+    uint8_t                  m_nSrcBlendId;                         // 0x05
+    uint8_t                  m_nDstBlendId;                         // 0x06
+    uint8_t                  m_bAlphaOn;                            // 0x07
+    void*                    m_pCompressedInitialMatrix;            // 0x08
+    RwTexture*               m_apTextures[4];                       // 0x0C
+    void*                    field_1C;                              // 0x1C
+    uint32_t                 particlesList[3];                      // 0x20 -- List_c
+    FxInfoManagerSAInterface m_infoManager;                         // 0x2C
+};
+static_assert(sizeof(FxPrimBPSAInterface) == 0x38, "Invalid size for FxPrimBPSAInterface");
+
+class CFxEmitterBPSAInterface : public FxPrimBPSAInterface
+{
+public:
+    uint16_t m_nLodStart;                       // 0x38
+    uint16_t m_nLodEnd;                         // 0x3A
+    bool     m_bHasInfoFlatData;                // 0x3C
+    bool     m_bHasInfoHeatHazeData;            // 0x3C
+};
+static_assert(sizeof(CFxEmitterBPSAInterface) == 0x40, "Invalid size for CFxEmitterBPSAInterface");
 
 class CFxEmitterSAInterface
 {

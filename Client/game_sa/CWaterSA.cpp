@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CVector.h>
 #include "CWaterSA.h"
 #include "CWaterManagerSA.h"
 

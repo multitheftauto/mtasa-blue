@@ -10,11 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
 #include "CAnimBlendAssocGroupSA.h"
 #include "CAnimManagerSA.h"
+#include "CGameSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPlayerPedSA.h"
 #include "CWorldSA.h"
+
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 class CPedClothesDesc;
 
@@ -156,16 +163,6 @@ CPlayerPedSA::~CPlayerPedSA()
 CWanted* CPlayerPedSA::GetWanted()
 {
     return m_pWanted;
-}
-
-float CPlayerPedSA::GetSprintEnergy()
-{
-    return m_pData->m_fSprintEnergy;
-}
-
-void CPlayerPedSA::SetSprintEnergy(float fSprintEnergy)
-{
-    m_pData->m_fSprintEnergy = fSprintEnergy;
 }
 
 void CPlayerPedSA::SetInitialState()

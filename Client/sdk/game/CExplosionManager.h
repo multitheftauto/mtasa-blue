@@ -12,6 +12,7 @@
 #pragma once
 
 #include "Common.h"
+#include "CExplosion.h"
 
 class CEntity;
 class CExplosion;

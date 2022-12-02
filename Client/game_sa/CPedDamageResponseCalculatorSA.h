@@ -12,6 +12,7 @@
 #pragma once
 
 #include <game/CPedDamageResponseCalculator.h>
+#include <game/CPed.h>
 
 class CEntity;
 class CEntitySAInterface;

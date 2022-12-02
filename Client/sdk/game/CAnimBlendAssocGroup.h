@@ -11,13 +11,14 @@
 
 #pragma once
 
-typedef unsigned char BYTE;
-typedef unsigned long AssocGroupId;
 class CAnimBlendAssocGroupSAInterface;
 class CAnimBlendAssociation;
+class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociation;
 class CAnimBlock;
 struct RpClump;
+typedef unsigned char BYTE;
+typedef unsigned long AssocGroupId;
 
 enum class eAnimGroup : int
 {

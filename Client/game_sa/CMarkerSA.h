@@ -60,10 +60,6 @@ public:
     void                Remove();
     bool                IsActive();
     void                SetPosition(CVector* vecPosition);
-    void                SetEntity(CVehicle* vehicle);
-    void                SetEntity(CPed* ped);
-    void                SetEntity(CObject* object);
-    CEntity*            GetEntity();
     CVector*            GetPosition();
     CMarkerSAInterface* GetInterface() { return internalInterface; };
 

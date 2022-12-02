@@ -75,11 +75,6 @@ void CPadSA::SetHornHistoryValue(bool value)
     internalInterface->bHornHistory[internalInterface->iCurrHornHistory] = value;
 }
 
-long CPadSA::GetAverageWeapon()
-{
-    return internalInterface->AverageWeapon;
-}
-
 void CPadSA::SetLastTimeTouched(DWORD dwTime)
 {
     internalInterface->LastTimeTouched = dwTime;
