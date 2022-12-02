@@ -14,7 +14,7 @@
 
 CBikeSA::CBikeSA(CBikeSAInterface* bike)
 {
-    this->m_pInterface = bike;
+    m_pInterface = bike;
 }
 
 CBikeSA::CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)

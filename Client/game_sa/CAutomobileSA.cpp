@@ -19,7 +19,7 @@ CAutomobileSA::CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation,
 {
     // create our mirror classes
     for (int i = 0; i < MAX_DOORS; i++)
-        this->door[i] = new CDoorSA(&((CAutomobileSAInterface*)this->GetInterface())->m_doors[i]);
+        door[i] = new CDoorSA(&((CAutomobileSAInterface*)GetInterface())->m_doors[i]);
 
 }
 
@@ -32,8 +32,8 @@ CAutomobileSA::~CAutomobileSA()
 {
     for (int i = 0; i < MAX_DOORS; i++)
     {
-        if (this->door[i])
-            delete this->door[i];
+        if (door[i])
+            delete door[i];
     }
 }
 
@@ -107,5 +107,5 @@ CPhysical* CAutomobileSA::SpawnFlyingComponent(int iCarNodeIndex, int iUnknown)
 
 CDoor* CAutomobileSA::GetDoor(eDoors doorID)
 {
-    return this->door[doorID];
+    return door[doorID];
 }

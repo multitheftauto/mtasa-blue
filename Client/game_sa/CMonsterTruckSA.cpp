@@ -14,7 +14,7 @@
 
 CMonsterTruckSA::CMonsterTruckSA(CMonsterTruckSAInterface* monstertruck) : CAutomobileSA(monstertruck)
 {
-    this->m_pInterface = monstertruck;
+    m_pInterface = monstertruck;
 }
 
 CMonsterTruckSA::CMonsterTruckSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2)

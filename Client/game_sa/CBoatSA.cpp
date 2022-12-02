@@ -14,7 +14,7 @@
 
 CBoatSA::CBoatSA(CBoatSAInterface* boat)
 {
-    this->m_pInterface = boat;
+    m_pInterface = boat;
 }
 
 CBoatSA::CBoatSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)

@@ -14,7 +14,7 @@
 
 CPlaneSA::CPlaneSA(CPlaneSAInterface* plane) : CAutomobileSA(plane)
 {
-    this->m_pInterface = plane;
+    m_pInterface = plane;
 }
 
 CPlaneSA::CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CAutomobileSA(dwModelID, ucVariation, ucVariation2)

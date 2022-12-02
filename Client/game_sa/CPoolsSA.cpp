@@ -434,7 +434,7 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 
 CPed* CPoolsSA::GetPedFromRef(DWORD dwGameRef)
 {
-    CPedSAInterface* pInterface = this->GetPedInterface(dwGameRef);
+    CPedSAInterface* pInterface = GetPedInterface(dwGameRef);
     if (pInterface)
     {
         // Extract the element index from the handle

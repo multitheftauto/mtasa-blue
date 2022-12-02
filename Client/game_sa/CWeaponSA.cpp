@@ -22,8 +22,8 @@ extern CGameSA* pGame;
 
 CWeaponSA::CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot)
 {
-    this->owner = ped;
-    this->m_weaponSlot = weaponSlot;
+    owner = ped;
+    m_weaponSlot = weaponSlot;
     internalInterface = weaponInterface;
 }
 
@@ -38,42 +38,42 @@ void CWeaponSA::Destroy()
 
 eWeaponType CWeaponSA::GetType()
 {
-    return this->internalInterface->m_eWeaponType;
+    return internalInterface->m_eWeaponType;
 };
 
 void CWeaponSA::SetType(eWeaponType type)
 {
-    this->internalInterface->m_eWeaponType = type;
+    internalInterface->m_eWeaponType = type;
 }
 
 eWeaponState CWeaponSA::GetState()
 {
-    return this->internalInterface->m_eState;
+    return internalInterface->m_eState;
 }
 
 void CWeaponSA::SetState(eWeaponState state)
 {
-    this->internalInterface->m_eState = state;
+    internalInterface->m_eState = state;
 }
 
 DWORD CWeaponSA::GetAmmoInClip()
 {
-    return this->internalInterface->m_nAmmoInClip;
+    return internalInterface->m_nAmmoInClip;
 }
 
 void CWeaponSA::SetAmmoInClip(DWORD dwAmmoInClip)
 {
-    this->internalInterface->m_nAmmoInClip = dwAmmoInClip;
+    internalInterface->m_nAmmoInClip = dwAmmoInClip;
 }
 
 DWORD CWeaponSA::GetAmmoTotal()
 {
-    return this->internalInterface->m_nAmmoTotal;
+    return internalInterface->m_nAmmoTotal;
 }
 
 void CWeaponSA::SetAmmoTotal(DWORD dwAmmoTotal)
 {
-    this->internalInterface->m_nAmmoTotal = dwAmmoTotal;
+    internalInterface->m_nAmmoTotal = dwAmmoTotal;
 }
 
 CPed* CWeaponSA::GetPed()
@@ -99,7 +99,7 @@ CWeaponInfo* CWeaponSA::GetInfo(eWeaponSkill skill)
 void CWeaponSA::Remove()
 {
     DWORD dwFunc = FUNC_Shutdown;
-    DWORD dwThis = (DWORD)this->internalInterface;
+    DWORD dwThis = (DWORD)internalInterface;
     _asm
     {
         mov     ecx, dwThis
@@ -109,7 +109,7 @@ void CWeaponSA::Remove()
     // If the removed weapon was the currently active weapon, switch to empty-handed
     if (owner->GetCurrentWeaponSlot() == m_weaponSlot)
     {
-        CWeaponInfo* pInfo = pGame->GetWeaponInfo(this->internalInterface->m_eWeaponType);
+        CWeaponInfo* pInfo = pGame->GetWeaponInfo(internalInterface->m_eWeaponType);
         if (pInfo)
         {
             int iModel = pInfo->GetModel();

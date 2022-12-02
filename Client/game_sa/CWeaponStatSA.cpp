@@ -18,16 +18,16 @@ extern CGameSA* pGame;
 CWeaponStatSA::CWeaponStatSA(eWeaponType weaponType, eWeaponSkill skillLevel)
 {
     // For Data Storage and won't apply changes.
-    this->pWeaponStats = new CWeaponInfoSAInterface();
     this->weaponType = weaponType;
     this->skillLevel = skillLevel;
+    pWeaponStats = new CWeaponInfoSAInterface();
 }
 CWeaponStatSA::CWeaponStatSA(CWeaponInfoSA* pWeaponInfo, eWeaponType weaponType, eWeaponSkill skillLevel)
 {
     // For scripting API and applies changes..
-    this->pWeaponStats = pWeaponInfo->GetInterface();
     this->weaponType = weaponType;
     this->skillLevel = skillLevel;
+    pWeaponStats = pWeaponInfo->GetInterface();
 }
 CWeaponStatSA::~CWeaponStatSA()
 {
@@ -35,12 +35,12 @@ CWeaponStatSA::~CWeaponStatSA()
 
 eWeaponType CWeaponStatSA::GetWeaponType()
 {
-    return this->weaponType;
+    return weaponType;
 }
 
 eWeaponSkill CWeaponStatSA::GetWeaponSkillLevel()
 {
-    return this->skillLevel;
+    return skillLevel;
 }
 
 void CWeaponStatSA::SetWeaponType(eWeaponType weaponType)
