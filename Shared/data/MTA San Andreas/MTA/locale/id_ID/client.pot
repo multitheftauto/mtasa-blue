@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-29 16:10+0000\n"
-"PO-Revision-Date: 2022-11-29 16:21\n"
+"POT-Creation-Date: 2022-12-03 15:59+0000\n"
+"PO-Revision-Date: 2022-12-03 16:10\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -16,6 +16,831 @@ msgstr ""
 "X-Crowdin-Language: id\n"
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
+
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "Versi ini sudah kadaluarsa."
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "memutuskan dari permainan"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "menampilkan tanda nama"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "menampilkan kotak obrolan"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "menunjukkan statistik jaringan"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "open the chat input"
+msgstr "membuka input obrolan"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "transmits voice to other players"
+msgstr "mentransmisikan suara ke pemain lain"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "enters a car as passenger"
+msgstr "masuk ke mobil sebagai penumpang"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "next radio channel"
+msgstr "saluran radio selanjutnya"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "previous radio channel"
+msgstr "saluran radio sebelumnya"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "enables the radar view"
+msgstr "mengaktifkan tampilan radar"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar in"
+msgstr "memperbesar radar"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "zooms the radar out"
+msgstr "memperkecil radar"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar north"
+msgstr "memindahkan radar ke arah utara"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar south"
+msgstr "memindahkan radar ke arah selatan"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar east"
+msgstr "memindahkan radar ke arah timur"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "moves the radar west"
+msgstr "memindahkan radar ke arah barat"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "attaches the radar"
+msgstr "melampirkan radar"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "reduces radar opacity"
+msgstr "mengurangi opasitas radar"
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "increases radar opacity"
+msgstr "meningkatkan opasitas radar"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "toggles radar help text"
+msgstr "memunculkan teks bantuan radar"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "sends a message to the targetted player"
+msgstr "mengirim pesan ke pemain yang dituju"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "mengganti ke senjata selanjutnya ketika di dalam kendaraan"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "mengganti ke senjata sebelumnya ketika di dalam kendaraan"
+
+#: Client/mods/deathmatch/CClient.cpp:82
+msgid "outputs info about the current server"
+msgstr "mengeluarkan info tentang server"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:85
+msgid "defines the scale multiplier of all text-displays"
+msgstr "menetapkan skala perkalian dari semua tampilan teks"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) shows the colshapes"
+msgstr "(Mode pengembangan) menampilkan colshapes"
+
+#: Client/mods/deathmatch/CClient.cpp:93
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(Mode pengembangan) mencetak suara dunia ids ke jendela debug"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Kesalahan pengunduhan: %s"
+
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/mods/deathmatch/logic/CClientGame.cpp:588
+#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1192
+#: Client/core/CCore.cpp:1205 Client/core/CSettings.cpp:2924
+#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
+#: Client/core/CSettings.cpp:4674
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
+#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
+#: Client/loader/MainFunctions.cpp:818
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "Kesalahan"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Tidak dapat memulai server lokal. Lihat konsol untuk lebih rinci."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Kesalahan: Tidak dapat memulai server lokal. [%s]"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "BUAT SERVER"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
+#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2001
+msgid "General"
+msgstr "Umum"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Sumber"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Nama server:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Kata sandi:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Jlh maks pemain:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Penyiaran:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "LAN"
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr "Internet"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Terpilih"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Semua"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Mulai"
+
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:132
+#: Client/gui/CGUIMessageBox_Impl.cpp:68
+msgid "Cancel"
+msgstr "Batal"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
+msgid "Disconnected: Invalid nickname"
+msgstr "Terputus: Namanya tidak valid"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
+msgid "Disconnect from server"
+msgstr "Terputus dari server"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "Terputus: Serialnya telah dilarang.\n"
+"Alasan: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "Terputus: Anda telah dilarang.\n"
+"Alasan: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Terputus: Akunnya telah dilarang.\n"
+"Alasan: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
+msgid "Disconnected: Version mismatch"
+msgstr "Terputus: Versi tidak cocok"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "Terputus: Terlalu banyak yang bergabung. Mohon tunggu semenit, lalu sambungkan ulang."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Terputus: Server dari cabang lainnya.\n"
+"Informasi: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "Terputus: Versi yang buruk.\n"
+"Informasi: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "Terputus: Server sedang menjalankan build yang lebih baru.\n"
+"Informasi: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "Terputus: Server sedang menjalankan build yang lebih lama.\n"
+"Informasi: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+msgid "Disconnected: Nick already in use"
+msgstr "Terputus: Nama telah digunakan"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
+msgid "Disconnected: Player element could not be created."
+msgstr "Koneksi Putus: Pemain elemen tidak bisa dibuat."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Terputus: Server menolak sambungan: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
+msgid "Disconnected: Serial verification failed"
+msgstr "Terputus: Verifikasi serial gagal"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Terputus: Desinkronisasi koneksi %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Terputus: Anda diusir oleh %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Terputus: Anda dilarang oleh %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "Terputus: Server mati atau sedang memulai ulang"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
+msgid "You were kicked from the game"
+msgstr "Anda diusir dari permainan"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "Server ini membutuhkan sebuah gta_sa.exe yang tidak termodifikasi"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+msgid "Please replace gta_sa.exe"
+msgstr "Mohon mengganti gta_sa.exe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "Server ini tidak mengizinkan untuk custom D3D9.DLL"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "Hapus D3D9.DLL dari ruang instalasi GTA anda dan mulai ulang MTA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
+msgid "This server does not allow virtual machines"
+msgstr "Server ini tidak mengizinkan untuk memakai mesin virtual"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+msgid "This server requires driver signing to be enabled"
+msgstr "Server ini membutuhkan driver signing untuk diaktifkan"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+msgid "Please restart your PC"
+msgstr "Mohon mulai ulang PC anda"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+msgid "This server has detected missing anti-cheat components"
+msgstr "Server ini telah mendeteksi komponen anti-cheat tidak ada"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+msgid "Try restarting MTA"
+msgstr "Coba mulai ulang MTA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "Server ini membutuhkan sebuah gta3.img dan gta_int.img yang tidak dimodifikasi"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "Mohon ganti gta3.img atau gta_int.img"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+msgid "This server does not allow Wine"
+msgstr "Server ini tidak megizinkan menggunakan Wine"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "Pastikan tidak ada program lain yang memodifikasi MTA:SA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "Time Remaining: "
+msgstr "Waktu Tersisa: "
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d hari"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d jam"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d menit"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d detik"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
+msgid "Disconnected"
+msgstr "Terputus"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Kemajuan pengunduhan peta:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Kemajuan Pengunduhan:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s dari %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Putuskan untuk membatalkan pengunduhan"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:588
+#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Nickname tidak valid! Harap pergi ke Pengaturan dan tulis yang baru!"
+
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr "MENYAMBUNGKAN"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+msgid "Entering the game ..."
+msgstr "Memasuki permainan ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Tidak tersambung; silakan gunakan Sambungan Cepat atau perintah 'connect' untuk menyambungkan ke server."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+msgid "The server is not installed"
+msgstr "Server tidak terpasang"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Local Server"
+msgstr "Server Lokal"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+msgid "Starting local server ..."
+msgstr "Memulai server lokal ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "Anda diusir dari permainan ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Connecting to local server..."
+msgstr "Menyambungkan ke server lokal..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+msgid "Error connecting to server."
+msgstr "Kesalahan saat menyambung ke server."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Terputus saat menyambung ke server lokal. Lihat konsol untuk lebih rinci."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr "Koneksi terputus"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+msgid "Connection with the server was lost"
+msgstr "Sambungan dengan server hilang"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr "Terputus: kesalahan protokol tidak diketahui"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr "Terputus: diputuskan dari jarak jauh"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr "Terputus: koneksi hilang dari jarak jauh"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr "Terputus: anda dilarang dari server ini"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+msgid "Disconnected: the server is currently full"
+msgstr "Terputus: server sedang penuh"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr "Terputus: terputus dari server"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr "Terputus: koneksi dengan server hilang"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+msgid "Disconnected: invalid password specified"
+msgstr "Terputus: kata sandi yang diberikan tidak valid"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr "Terputus: koneksi ditolak"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+msgid "MTA Client verification failed!"
+msgstr "Verifikasi klien MTA gagal!"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Bahasa Indonesia"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONSOL"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Apakah anda ingin melihat beberapa bantuan daring tentang masalah ini ?"
+
+#: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1569
+#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
+#: Client/core/CVersionUpdater.cpp:1875 Client/core/CSettings.cpp:1371
+#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
+#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
+#: Client/core/CMainMenu.cpp:1147 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/loader/Dialogs.cpp:128
+msgid "No"
+msgstr "Tidak"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1570
+#: Client/core/CVersionUpdater.cpp:1588 Client/core/CVersionUpdater.cpp:1857
+#: Client/core/CVersionUpdater.cpp:1876 Client/core/CSettings.cpp:1372
+#: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
+#: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
+#: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/loader/Dialogs.cpp:127 Client/gui/CGUIMessageBox_Impl.cpp:72
+msgid "Yes"
+msgstr "Ya"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Sumbu Akselerasi"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Sumbu Rem"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Proses penyambungan gagal. Nama yang diberikan tidak valid!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Proses penyambungan gagal. Pengelola yang diberikan tidak valid!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Proses penyambungan ke %s pada port %u gagal!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Menyambungkan ke %s:%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Tidak ada mod yang terpasang (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Respon server tidak baik (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Respon server tidak baik (1)"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Skin yang kamu pilih tidak dapat dimuat, dan skin default juga tidak dapat dimuat, silakan pasang ulang MTA."
+
+#: Client/core/CKeyBinds.cpp:186
+msgid "Fire"
+msgstr "Tembak"
+
+#: Client/core/CKeyBinds.cpp:187
+msgid "Next weapon"
+msgstr "Senjata berikutnya"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Previous weapon"
+msgstr "Senjata sebelumnya"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Forwards"
+msgstr "Bergerak ke depan"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Backwards"
+msgstr "Bergerak ke belakang"
+
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2223
+#: Client/core/CSettings.cpp:2251
+msgid "Left"
+msgstr "Bergerak ke kiri"
+
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2225
+#: Client/core/CSettings.cpp:2252
+msgid "Right"
+msgstr "Bergerak ke kanan"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Zoom in"
+msgstr "Perbesar"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Zoom out"
+msgstr "Perkecil"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Enter/Exit"
+msgstr "Masuk/Keluar"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Change camera"
+msgstr "Ganti kamera"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:197
+msgid "Jump"
+msgstr "Lompat"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Sprint"
+msgstr "Lari"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Look behind"
+msgstr "Lihat ke belakang"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Crouch"
+msgstr "Jongkok"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Action"
+msgstr "Aksi"
+
+#: Client/core/CKeyBinds.cpp:202
+msgid "Walk"
+msgstr "Jalan"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Vehicle fire"
+msgstr "Tembak dari kendaraan"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Vehicle secondary fire"
+msgstr "Tembak sekunder dari kendaraan"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Vehicle left"
+msgstr "Setir kendaraan ke kiri"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Vehicle right"
+msgstr "Setir kendaraan ke kanan"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:207
+msgid "Steer forwards/down"
+msgstr "Setir ke depan/ke bawah"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Steer backwards/up"
+msgstr "Setir ke belakang/ke atas"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Accelerate"
+msgstr "Akselerasi"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Brake/Reverse"
+msgstr "Rem/Mundur"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Radio next"
+msgstr "Radio selanjutnya"
+
+#: Client/core/CKeyBinds.cpp:212
+msgid "Radio previous"
+msgstr "Radio sebelumnya"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Radio user track skip"
+msgstr "Lewati track radio pengguna"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Horn"
+msgstr "Klakson"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Sub-mission"
+msgstr "Sub-misi"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Handbrake"
+msgstr "Rem tangan"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:217
+msgid "Vehicle look left"
+msgstr "Kendaraan melihat ke kiri"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Vehicle look right"
+msgstr "Kendaraan melihat ke kanan"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Vehicle look behind"
+msgstr "Kendaraan melihat ke belakang"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Vehicle mouse look"
+msgstr "Tampilan mouse kendaraan"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Special control left"
+msgstr "Kendali spesial kiri"
+
+#: Client/core/CKeyBinds.cpp:222
+msgid "Special control right"
+msgstr "Kendali spesial kanan"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Special control down"
+msgstr "Kendali spesial bawah"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Special control up"
+msgstr "Kendali spesial atas"
+
+#: Client/core/CKeyBinds.cpp:225
+msgid "Aim weapon"
+msgstr "Bidik senjata"
+
+#: Client/core/CKeyBinds.cpp:226
+msgid "Conversation yes"
+msgstr "Percakapan ya"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:227
+msgid "Conversation no"
+msgstr "Percakapan tidak"
+
+#: Client/core/CKeyBinds.cpp:228
+msgid "Group control forwards"
+msgstr "Kontrol grup ke depan"
+
+#: Client/core/CKeyBinds.cpp:229
+msgid "Group control backwards"
+msgstr "Kontrol grup ke belakang"
 
 #: Client/core/CCredits.cpp:32
 msgid "Programming"
@@ -45,107 +870,118 @@ msgstr "Terima Kasih Khusus"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Perangkat lunak ini menggunakan library dan perangkat lunak berikut:"
 
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Skin yang kamu pilih tidak dapat dimuat, dan skin default juga tidak dapat dimuat, silakan pasang ulang MTA."
+#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA tidak dapat dilanjutkan karena drive %s tidak mempunyai ruang yang cukup."
 
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#: Client/core/CGUI.cpp:87 Client/core/CConnectManager.cpp:80
-#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
-#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
-#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
-#: Client/core/CConnectManager.cpp:421 Client/core/CSettings.cpp:2924
-#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/CCore.cpp:1192
-#: Client/core/CCore.cpp:1205 Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
-#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
-#: Client/loader/MainFunctions.cpp:818
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "Kesalahan"
+#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Kesalahan fatal"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Sumbu Akselerasi"
+#: Client/core/CCore.cpp:850
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "UNTUK MEMPERBAIKI, HAPUS BERKAS INI:"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Sumbu Rem"
+#: Client/core/CCore.cpp:882
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "Modul %s salah!"
 
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Anda menggunakan fitur build cabang! Ini hanyalah sebuah tes build yang tidak dapat digunakan untuk menyambungkan ke server publik!"
+#: Client/core/CCore.cpp:1192
+msgid "Error executing URL"
+msgstr "Kesalahan menjalankan URL"
 
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA tidak akan menerima pembaharuan di XP/Vista setelah July 2019.\n"
-"Perbarui Windows untuk bermain di server terbaru."
+#: Client/core/CCore.cpp:1204
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Terjadi kesalahan dalam menjalankan mod tersebut dalam baris perintah ('%s')"
 
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Ini akan memutuskan anda dari server ini.\n\n"
-"Apakah anda yakin ingin memutuskan?"
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1289
+msgid "this help screen"
+msgstr "layar bantuan ini"
 
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "PERINGATAN PEMUTUSAN"
+#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
+msgid "exits the application"
+msgstr "keluar dari aplikasi"
 
-#: Client/core/CMainMenu.cpp:1147 Client/core/CVersionUpdater.cpp:1569
-#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
-#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
-#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
-#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
-#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:128
-msgid "No"
-msgstr "Tidak"
+#: Client/core/CCore.cpp:1292
+msgid "shows the version"
+msgstr "menampilkan versi"
 
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/core/CMainMenu.cpp:1148 Client/core/CVersionUpdater.cpp:1570
-#: Client/core/CVersionUpdater.cpp:1588 Client/core/CVersionUpdater.cpp:1857
-#: Client/core/CVersionUpdater.cpp:1876 Client/core/CQuestionBox.cpp:195
-#: Client/core/CSettings.cpp:1372 Client/core/CSettings.cpp:1396
-#: Client/core/CSettings.cpp:4436 Client/core/CSettings.cpp:4503
-#: Client/core/CSettings.cpp:4552 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:127 Client/gui/CGUIMessageBox_Impl.cpp:72
-msgid "Yes"
-msgstr "Ya"
+#: Client/core/CCore.cpp:1293
+msgid "shows the time"
+msgstr "menampilkan waktu"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Bahasa Indonesia"
+#: Client/core/CCore.cpp:1294
+msgid "shows the hud"
+msgstr "menampilkan hud"
+
+#: Client/core/CCore.cpp:1295
+msgid "shows all the binds"
+msgstr "menampilkan semua ikatan"
+
+#: Client/core/CCore.cpp:1296
+msgid "shows your serial"
+msgstr "menampilkan serial anda"
+
+#: Client/core/CCore.cpp:1305
+msgid "connects to a server (host port nick pass)"
+msgstr "menyambungkan ke server (host port nama sandi)"
+
+#: Client/core/CCore.cpp:1306
+msgid "connects to a previous server"
+msgstr "menyambungkan ke server sebelumnya"
+
+#: Client/core/CCore.cpp:1307
+msgid "binds a key (key control)"
+msgstr "mengikat sebuah tombol (tombol kontrol)"
+
+#: Client/core/CCore.cpp:1308
+msgid "unbinds a key (key)"
+msgstr "melepas ikatan sebuah tombol (tombol)"
+
+#: Client/core/CCore.cpp:1309
+msgid "copies the default gta controls"
+msgstr "menyalin kontrol default gta"
+
+#: Client/core/CCore.cpp:1310
+msgid "outputs a screenshot"
+msgstr "mengeluarkan sebuah tangkapan layar"
+
+#: Client/core/CCore.cpp:1311
+msgid "immediately saves the config"
+msgstr "langsung menyimpan pengaturan"
+
+#: Client/core/CCore.cpp:1313
+msgid "clears the debug view"
+msgstr "membersihkan tampilan debug"
+
+#: Client/core/CCore.cpp:1314
+msgid "scrolls the chatbox upwards"
+msgstr "menggulung kotak obrolan ke atas"
+
+#: Client/core/CCore.cpp:1315
+msgid "scrolls the chatbox downwards"
+msgstr "menggulung kotak obrolan ke bawah"
+
+#: Client/core/CCore.cpp:1316
+msgid "scrolls the debug view upwards"
+msgstr "menggulung tampilan debug ke atas"
+
+#: Client/core/CCore.cpp:1317
+msgid "scrolls the debug view downwards"
+msgstr "menggulung tampilan debug ke bawah"
+
+#: Client/core/CCore.cpp:1320
+msgid "shows the memory statistics"
+msgstr "menampilkan statistik penyimpanan"
+
+#: Client/core/CCore.cpp:1321
+msgid "shows the frame timing graph"
+msgstr "menampilkan grafik frame waktu"
 
 #: Client/core/CVersionUpdater.cpp:624
 msgid "Busy"
@@ -198,15 +1034,6 @@ msgstr "Menyambungkan"
 #: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
 msgid "Please wait..."
 msgstr "Mohon tunggu..."
-
-#. Cancel button
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
-#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4694
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/loader/Dialogs.cpp:132 Client/gui/CGUIMessageBox_Impl.cpp:68
-msgid "Cancel"
-msgstr "Batal"
 
 #: Client/core/CVersionUpdater.cpp:1802
 msgid "CHECKING"
@@ -312,109 +1139,6 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Sedang menunggu respon  -  %-3d"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONSOL"
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Apakah anda ingin melihat beberapa bantuan daring tentang masalah ini ?"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Perintah tidak dikenal atau cvar: "
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "BERITA"
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "Kunjungi artikel berita terbaru"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Proses penyambungan gagal. Nama yang diberikan tidak valid!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Proses penyambungan gagal. Pengelola yang diberikan tidak valid!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Proses penyambungan ke %s pada port %u gagal!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Menyambungkan ke %s:%u ..."
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-msgid "CONNECTING"
-msgstr "MENYAMBUNGKAN"
-
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-msgid "Connection timed out"
-msgstr "Koneksi terputus"
-
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
-msgid "Disconnected: unknown protocol error"
-msgstr "Terputus: kesalahan protokol tidak diketahui"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
-msgid "Disconnected: disconnected remotely"
-msgstr "Terputus: diputuskan dari jarak jauh"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
-msgid "Disconnected: connection lost remotely"
-msgstr "Terputus: koneksi hilang dari jarak jauh"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-msgid "Disconnected: you are banned from this server"
-msgstr "Terputus: anda dilarang dari server ini"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
-msgid "Disconnected: disconnected from the server"
-msgstr "Terputus: terputus dari server"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
-msgid "Disconnected: connection to the server was lost"
-msgstr "Terputus: koneksi dengan server hilang"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
-msgid "Disconnected: connection was refused"
-msgstr "Terputus: koneksi ditolak"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Tidak ada mod yang terpasang (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Respon server tidak baik (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Respon server tidak baik (1)"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -597,15 +1321,6 @@ msgstr "Volume suara:"
 #: Client/core/CSettings.cpp:423 Client/core/CSettings.cpp:548
 msgid "Play mode:"
 msgstr "Mode putar:"
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
-#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2001
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr "Umum"
 
 #: Client/core/CSettings.cpp:526
 msgid "Radio options"
@@ -1155,19 +1870,9 @@ msgstr "Y-Offset:"
 msgid "Position"
 msgstr "Posisi"
 
-#: Client/core/CSettings.cpp:2223 Client/core/CSettings.cpp:2251
-#: Client/core/CKeyBinds.cpp:191
-msgid "Left"
-msgstr "Bergerak ke kiri"
-
 #: Client/core/CSettings.cpp:2224 Client/core/CSettings.cpp:2238
 msgid "Center"
 msgstr "Tengah"
-
-#: Client/core/CSettings.cpp:2225 Client/core/CSettings.cpp:2252
-#: Client/core/CKeyBinds.cpp:192
-msgid "Right"
-msgstr "Bergerak ke kanan"
 
 #: Client/core/CSettings.cpp:2237
 msgid "Top"
@@ -1390,290 +2095,10 @@ msgstr "Penetapan gerakan mouse - Mungkin PC perlu dimulai ulang"
 msgid "Screenshot taken: '%s'"
 msgstr "Tangkapan layar terambil: '%s'"
 
-#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA tidak dapat dilanjutkan karena drive %s tidak mempunyai ruang yang cukup."
-
-#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Kesalahan fatal"
-
-#: Client/core/CCore.cpp:850
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "UNTUK MEMPERBAIKI, HAPUS BERKAS INI:"
-
-#: Client/core/CCore.cpp:882
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "Modul %s salah!"
-
-#: Client/core/CCore.cpp:1192
-msgid "Error executing URL"
-msgstr "Kesalahan menjalankan URL"
-
-#: Client/core/CCore.cpp:1204
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Terjadi kesalahan dalam menjalankan mod tersebut dalam baris perintah ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1289
-msgid "this help screen"
-msgstr "layar bantuan ini"
-
-#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
-msgid "exits the application"
-msgstr "keluar dari aplikasi"
-
-#: Client/core/CCore.cpp:1292
-msgid "shows the version"
-msgstr "menampilkan versi"
-
-#: Client/core/CCore.cpp:1293
-msgid "shows the time"
-msgstr "menampilkan waktu"
-
-#: Client/core/CCore.cpp:1294
-msgid "shows the hud"
-msgstr "menampilkan hud"
-
-#: Client/core/CCore.cpp:1295
-msgid "shows all the binds"
-msgstr "menampilkan semua ikatan"
-
-#: Client/core/CCore.cpp:1296
-msgid "shows your serial"
-msgstr "menampilkan serial anda"
-
-#: Client/core/CCore.cpp:1305
-msgid "connects to a server (host port nick pass)"
-msgstr "menyambungkan ke server (host port nama sandi)"
-
-#: Client/core/CCore.cpp:1306
-msgid "connects to a previous server"
-msgstr "menyambungkan ke server sebelumnya"
-
-#: Client/core/CCore.cpp:1307
-msgid "binds a key (key control)"
-msgstr "mengikat sebuah tombol (tombol kontrol)"
-
-#: Client/core/CCore.cpp:1308
-msgid "unbinds a key (key)"
-msgstr "melepas ikatan sebuah tombol (tombol)"
-
-#: Client/core/CCore.cpp:1309
-msgid "copies the default gta controls"
-msgstr "menyalin kontrol default gta"
-
-#: Client/core/CCore.cpp:1310
-msgid "outputs a screenshot"
-msgstr "mengeluarkan sebuah tangkapan layar"
-
-#: Client/core/CCore.cpp:1311
-msgid "immediately saves the config"
-msgstr "langsung menyimpan pengaturan"
-
-#: Client/core/CCore.cpp:1313
-msgid "clears the debug view"
-msgstr "membersihkan tampilan debug"
-
-#: Client/core/CCore.cpp:1314
-msgid "scrolls the chatbox upwards"
-msgstr "menggulung kotak obrolan ke atas"
-
-#: Client/core/CCore.cpp:1315
-msgid "scrolls the chatbox downwards"
-msgstr "menggulung kotak obrolan ke bawah"
-
-#: Client/core/CCore.cpp:1316
-msgid "scrolls the debug view upwards"
-msgstr "menggulung tampilan debug ke atas"
-
-#: Client/core/CCore.cpp:1317
-msgid "scrolls the debug view downwards"
-msgstr "menggulung tampilan debug ke bawah"
-
-#: Client/core/CCore.cpp:1320
-msgid "shows the memory statistics"
-msgstr "menampilkan statistik penyimpanan"
-
-#: Client/core/CCore.cpp:1321
-msgid "shows the frame timing graph"
-msgstr "menampilkan grafik frame waktu"
-
-#: Client/core/CKeyBinds.cpp:186
-msgid "Fire"
-msgstr "Tembak"
-
-#: Client/core/CKeyBinds.cpp:187
-msgid "Next weapon"
-msgstr "Senjata berikutnya"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Previous weapon"
-msgstr "Senjata sebelumnya"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Forwards"
-msgstr "Bergerak ke depan"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Backwards"
-msgstr "Bergerak ke belakang"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Zoom in"
-msgstr "Perbesar"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Zoom out"
-msgstr "Perkecil"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Enter/Exit"
-msgstr "Masuk/Keluar"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Change camera"
-msgstr "Ganti kamera"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:197
-msgid "Jump"
-msgstr "Lompat"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Sprint"
-msgstr "Lari"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Look behind"
-msgstr "Lihat ke belakang"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Crouch"
-msgstr "Jongkok"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Action"
-msgstr "Aksi"
-
-#: Client/core/CKeyBinds.cpp:202
-msgid "Walk"
-msgstr "Jalan"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Vehicle fire"
-msgstr "Tembak dari kendaraan"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Vehicle secondary fire"
-msgstr "Tembak sekunder dari kendaraan"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Vehicle left"
-msgstr "Setir kendaraan ke kiri"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Vehicle right"
-msgstr "Setir kendaraan ke kanan"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:207
-msgid "Steer forwards/down"
-msgstr "Setir ke depan/ke bawah"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Steer backwards/up"
-msgstr "Setir ke belakang/ke atas"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Accelerate"
-msgstr "Akselerasi"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Brake/Reverse"
-msgstr "Rem/Mundur"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Radio next"
-msgstr "Radio selanjutnya"
-
-#: Client/core/CKeyBinds.cpp:212
-msgid "Radio previous"
-msgstr "Radio sebelumnya"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Radio user track skip"
-msgstr "Lewati track radio pengguna"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Horn"
-msgstr "Klakson"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Sub-mission"
-msgstr "Sub-misi"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Handbrake"
-msgstr "Rem tangan"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:217
-msgid "Vehicle look left"
-msgstr "Kendaraan melihat ke kiri"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Vehicle look right"
-msgstr "Kendaraan melihat ke kanan"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Vehicle look behind"
-msgstr "Kendaraan melihat ke belakang"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Vehicle mouse look"
-msgstr "Tampilan mouse kendaraan"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Special control left"
-msgstr "Kendali spesial kiri"
-
-#: Client/core/CKeyBinds.cpp:222
-msgid "Special control right"
-msgstr "Kendali spesial kanan"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Special control down"
-msgstr "Kendali spesial bawah"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Special control up"
-msgstr "Kendali spesial atas"
-
-#: Client/core/CKeyBinds.cpp:225
-msgid "Aim weapon"
-msgstr "Bidik senjata"
-
-#: Client/core/CKeyBinds.cpp:226
-msgid "Conversation yes"
-msgstr "Percakapan ya"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:227
-msgid "Conversation no"
-msgstr "Percakapan tidak"
-
-#: Client/core/CKeyBinds.cpp:228
-msgid "Group control forwards"
-msgstr "Kontrol grup ke depan"
-
-#: Client/core/CKeyBinds.cpp:229
-msgid "Group control backwards"
-msgstr "Kontrol grup ke belakang"
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Perintah tidak dikenal atau cvar: "
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
@@ -1720,79 +2145,40 @@ msgstr "Berkas konfigurasi telah tersimpan"
 msgid "* Your serial is: %s"
 msgstr "* Serial anda adalah: %s"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Tidak dapat menginisialisasi Direct3D9.\n\n"
-"Pastikan bahwa DirectX End-User Runtime dan\n"
-"Windows Service Packs yang terbaru telah terpasang dengan benar."
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Anda menggunakan fitur build cabang! Ini hanyalah sebuah tes build yang tidak dapat digunakan untuk menyambungkan ke server publik!"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Tangkapan layar mempunyai %d byte, tetapi seharusnya %d"
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA tidak akan menerima pembaharuan di XP/Vista setelah July 2019.\n"
+"Perbarui Windows untuk bermain di server terbaru."
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Tangkapan layar gagal"
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Ini akan memutuskan anda dari server ini.\n\n"
+"Apakah anda yakin ingin memutuskan?"
 
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Diam"
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "PERINGATAN PEMUTUSAN"
 
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "pemainpemain"
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "BERITA"
 
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "pada"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "serverserver"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Meminta daftar master server (%lu ms telah lewat)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "List master server tidak dapat diurai."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "List master server tidak dapat diperoleh."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Daftar cadangan server)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "Tidak dapat mengikat soket LAN-broadcast"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "Mencoba untuk menemukan server LAN"
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "Kunjungi artikel berita terbaru"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
 msgstr "PENJELAJAH SERVER"
-
-#. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-msgid "Internet"
-msgstr "Internet"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
@@ -1944,13 +2330,6 @@ msgstr "Protokol tidak dikenal"
 msgid "Please use the mtasa:// protocol!"
 msgstr "Mohon gunakan protokol mtasa://!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Nickname tidak valid! Harap pergi ke Pengaturan dan tulis yang baru!"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
@@ -2045,6 +2424,69 @@ msgstr "Terputus"
 msgid "Querying..."
 msgstr "Sedang query..."
 
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Diam"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "pemainpemain"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "pada"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "serverserver"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Meminta daftar master server (%lu ms telah lewat)"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "List master server tidak dapat diurai."
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "List master server tidak dapat diperoleh."
+
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Daftar cadangan server)"
+
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Tidak dapat mengikat soket LAN-broadcast"
+
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "Mencoba untuk menemukan server LAN"
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Tidak dapat menginisialisasi Direct3D9.\n\n"
+"Pastikan bahwa DirectX End-User Runtime dan\n"
+"Windows Service Packs yang terbaru telah terpasang dengan benar."
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Tangkapan layar mempunyai %d byte, tetapi seharusnya %d"
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "Tangkapan layar gagal"
+
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
 msgstr "Permintaan website"
@@ -2065,490 +2507,183 @@ msgstr "Ingat keputusan"
 msgid "Deny"
 msgstr "Tolak"
 
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "Versi ini sudah kadaluarsa."
-
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "memutuskan dari permainan"
-
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "menampilkan tanda nama"
-
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "menampilkan kotak obrolan"
-
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "menunjukkan statistik jaringan"
-
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "membuka input obrolan"
-
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "mentransmisikan suara ke pemain lain"
-
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "masuk ke mobil sebagai penumpang"
-
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "saluran radio selanjutnya"
-
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "saluran radio sebelumnya"
-
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "mengaktifkan tampilan radar"
-
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "memperbesar radar"
-
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "memperkecil radar"
-
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "memindahkan radar ke arah utara"
-
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "memindahkan radar ke arah selatan"
-
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "memindahkan radar ke arah timur"
-
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "memindahkan radar ke arah barat"
-
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "melampirkan radar"
-
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "mengurangi opasitas radar"
-
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "meningkatkan opasitas radar"
-
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "memunculkan teks bantuan radar"
-
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "mengirim pesan ke pemain yang dituju"
-
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "mengganti ke senjata selanjutnya ketika di dalam kendaraan"
-
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "mengganti ke senjata sebelumnya ketika di dalam kendaraan"
-
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "mengeluarkan info tentang server"
-
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "menetapkan skala perkalian dari semua tampilan teks"
-
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(Mode pengembangan) menampilkan colshapes"
-
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Mode pengembangan) mencetak suara dunia ids ke jendela debug"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
-msgid "Disconnected: Invalid nickname"
-msgstr "Terputus: Namanya tidak valid"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
-msgid "Disconnect from server"
-msgstr "Terputus dari server"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
-#, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "Terputus: Serialnya telah dilarang.\n"
-"Alasan: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
-#, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "Terputus: Anda telah dilarang.\n"
-"Alasan: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
-#, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "Terputus: Akunnya telah dilarang.\n"
-"Alasan: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
-msgid "Disconnected: Version mismatch"
-msgstr "Terputus: Versi tidak cocok"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Terputus: Terlalu banyak yang bergabung. Mohon tunggu semenit, lalu sambungkan ulang."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
-#, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "Terputus: Server dari cabang lainnya.\n"
-"Informasi: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
-#, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "Terputus: Versi yang buruk.\n"
-"Informasi: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "Terputus: Server sedang menjalankan build yang lebih baru.\n"
-"Informasi: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "Terputus: Server sedang menjalankan build yang lebih lama.\n"
-"Informasi: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
-msgid "Disconnected: Nick already in use"
-msgstr "Terputus: Nama telah digunakan"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
-msgid "Disconnected: Player element could not be created."
-msgstr "Koneksi Putus: Pemain elemen tidak bisa dibuat."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Terputus: Server menolak sambungan: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
-msgid "Disconnected: Serial verification failed"
-msgstr "Terputus: Verifikasi serial gagal"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "Terputus: Desinkronisasi koneksi %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "Terputus: Anda diusir oleh %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "Terputus: Anda dilarang oleh %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "Terputus: Server mati atau sedang memulai ulang"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
-msgid "You were kicked from the game"
-msgstr "Anda diusir dari permainan"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Server ini membutuhkan sebuah gta_sa.exe yang tidak termodifikasi"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
-msgid "Please replace gta_sa.exe"
-msgstr "Mohon mengganti gta_sa.exe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Server ini tidak mengizinkan untuk custom D3D9.DLL"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "Hapus D3D9.DLL dari ruang instalasi GTA anda dan mulai ulang MTA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-msgid "This server does not allow virtual machines"
-msgstr "Server ini tidak mengizinkan untuk memakai mesin virtual"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
-msgid "This server requires driver signing to be enabled"
-msgstr "Server ini membutuhkan driver signing untuk diaktifkan"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
-msgid "Please restart your PC"
-msgstr "Mohon mulai ulang PC anda"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
-msgid "This server has detected missing anti-cheat components"
-msgstr "Server ini telah mendeteksi komponen anti-cheat tidak ada"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
-msgid "Try restarting MTA"
-msgstr "Coba mulai ulang MTA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Server ini membutuhkan sebuah gta3.img dan gta_int.img yang tidak dimodifikasi"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
-msgid "Please replace gta3.img or gta_int.img"
-msgstr "Mohon ganti gta3.img atau gta_int.img"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
-msgid "This server does not allow Wine"
-msgstr "Server ini tidak megizinkan menggunakan Wine"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Pastikan tidak ada program lain yang memodifikasi MTA:SA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "Time Remaining: "
-msgstr "Waktu Tersisa: "
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d hari"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d jam"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d menit"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d detik"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
-msgid "Disconnected"
-msgstr "Terputus"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Tidak dapat memulai server lokal. Lihat konsol untuk lebih rinci."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Kesalahan: Tidak dapat memulai server lokal. [%s]"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Kesalahan pengunduhan: %s"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-msgid "Entering the game ..."
-msgstr "Memasuki permainan ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Tidak tersambung; silakan gunakan Sambungan Cepat atau perintah 'connect' untuk menyambungkan ke server."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-msgid "The server is not installed"
-msgstr "Server tidak terpasang"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Local Server"
-msgstr "Server Lokal"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-msgid "Starting local server ..."
-msgstr "Memulai server lokal ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "Anda diusir dari permainan ( %s )"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Connecting to local server..."
-msgstr "Menyambungkan ke server lokal..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-msgid "Error connecting to server."
-msgstr "Kesalahan saat menyambung ke server."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Terputus saat menyambung ke server lokal. Lihat konsol untuk lebih rinci."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-msgid "Connection with the server was lost"
-msgstr "Sambungan dengan server hilang"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
-msgid "Disconnected: the server is currently full"
-msgstr "Terputus: server sedang penuh"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
-msgid "Disconnected: invalid password specified"
-msgstr "Terputus: kata sandi yang diberikan tidak valid"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
-msgid "MTA Client verification failed!"
-msgstr "Verifikasi klien MTA gagal!"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Kemajuan pengunduhan peta:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Kemajuan Pengunduhan:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s dari %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Putuskan untuk membatalkan pengunduhan"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "BUAT SERVER"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Sumber"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Nama server:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Kata sandi:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Jlh maks pemain:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Penyiaran:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "LAN"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Terpilih"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Semua"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Mulai"
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
-msgid "Problem with graphics driver"
-msgstr "Masalah dengan driver grafik"
-
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "Tidak dapat menemukan resolusi layar yang valid."
-
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Apa anda yakin ingin menggunakan resolusi layar ini?"
-
-#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+#: Client/loader/Dialogs.cpp:130
+msgid "Quit"
+msgstr "Keluar"
+
+#: Client/loader/Dialogs.cpp:147
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas telah mengalami sebuah kesalahan"
+
+#: Client/loader/Dialogs.cpp:148
+msgid "Crash information"
+msgstr "Informasi kerusakan"
+
+#: Client/loader/Dialogs.cpp:149
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Centang kotak untuk mengirim info kerusakan ini kpd pengembang MTA menggunakan 'internet'"
+
+#: Client/loader/Dialogs.cpp:150
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Hal ini akan meningkatkan kemungkinan kerusakan ini diperbaiki."
+
+#: Client/loader/Dialogs.cpp:151
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Apakah anda ingin memulai ulang MTA: San Andreas ?"
+
+#: Client/loader/Dialogs.cpp:158
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Peringatan"
+
+#: Client/loader/Dialogs.cpp:159
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "Direktori pemasangan Grand Theft Auto: San Andreas anda yang berisi berkas ini:"
+
+#: Client/loader/Dialogs.cpp:161
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "Berkas ini tidak diperlukan dan mungkin mengganggu ciri grafik dari versi MTA:SA ini.\n\n"
+"Dianjurkan agar anda menghapus atau mengganti nama berkas ini."
+
+#: Client/loader/Dialogs.cpp:163
+msgid "Keep these files, but also show this warning on next start"
+msgstr "Simpan berkas ini, tetapi juga tunjukkan peringatan ini saat mulai selanjutnya"
+
+#: Client/loader/Dialogs.cpp:164
+msgid "Do not remind me about these files again"
+msgstr "Jangan ingatkan saya lagi tentang berkas ini lagi"
+
+#: Client/loader/Dialogs.cpp:165
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "Ganti nama berkas ini dari *.dll ke *.dll.bak"
+
+#: Client/loader/Dialogs.cpp:166
+msgid "Show me these files"
+msgstr "Tunjukkan berkas berkas ini"
+
+#: Client/loader/Dialogs.cpp:167
+msgid "Play MTA:SA"
+msgstr "Mainkan MTA:SA"
+
+#: Client/loader/Dialogs.cpp:173
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - Opsi yang membingungkan"
+
+#: Client/loader/Dialogs.cpp:174
+msgid "NVidia Optimus detected!"
+msgstr "NVidia Optimus terdeteksi!"
+
+#: Client/loader/Dialogs.cpp:175
+msgid "Try each option and see what works:"
+msgstr "Coba setiap pilihan dan lihat apa yang bekerja:"
+
+#: Client/loader/Dialogs.cpp:176
+msgid "A - Standard NVidia"
+msgstr "A - NVidia standar"
+
+#: Client/loader/Dialogs.cpp:177
+msgid "B - Alternate NVidia"
+msgstr "B - NVidia alternatif"
+
+#: Client/loader/Dialogs.cpp:178
+msgid "C - Standard NVidia with exe rename"
+msgstr "C - NVidia standar dengan penggantian nama exe"
+
+#: Client/loader/Dialogs.cpp:179
+msgid "D - Alternate NVidia with exe rename"
+msgstr "D - NVidia alternatif dengan penggantian nama exe"
+
+#: Client/loader/Dialogs.cpp:180
+msgid "E - Standard Intel"
+msgstr "E - Intel standar"
+
+#: Client/loader/Dialogs.cpp:181
+msgid "F - Alternate Intel"
+msgstr "F - Intel alternatif"
+
+#: Client/loader/Dialogs.cpp:182
+msgid "G - Standard Intel with exe rename"
+msgstr "G - Intel standar dengan penggantian nama exe"
+
+#: Client/loader/Dialogs.cpp:183
+msgid "H - Alternate Intel with exe rename"
+msgstr "H - Intel alternatif dengan penggantian nama exe"
+
+#: Client/loader/Dialogs.cpp:184
+msgid "If you get desperate, this might help:"
+msgstr "Jika anda tidak tahu, ini mungkin membantu:"
+
+#: Client/loader/Dialogs.cpp:185
+msgid "If you have already selected an option that works, this might help:"
+msgstr "Jika anda sudah memilih opsi yang berhasil, ini mungkin membantu:"
+
+#: Client/loader/Dialogs.cpp:186
+msgid "Force windowed mode"
+msgstr "Paksa jadi mode jendela"
+
+#: Client/loader/Dialogs.cpp:187
+msgid "Don't show again"
+msgstr "Jangan lihatkan lagi"
+
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "Apakah anda ingin mengakhiri Server MTA dan melanjutkan pembaruan?"
+#: Client/loader/Dialogs.cpp:195
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Peringatan: Tidak dapat mendeteksi produk anti-virus"
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Memasang pembaruan..."
+#: Client/loader/Dialogs.cpp:197
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA tidak dapat mendeteksi anti-virus di PC anda.\n\n"
+"Virus mengganggu MTA dan menurunkan pengalaman bermain anda.\n\n"
+"Tekan 'Bantuan' untuk informasi lebih lanjut."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Mengekstrak berkas..."
+#: Client/loader/Dialogs.cpp:200
+msgid "I have already installed an anti-virus"
+msgstr "Saya sudah memasang anti-virus"
 
-#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:890
+#: Client/loader/Dialogs.cpp:202
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Saya tidak akan memasang anti-virus.\n"
+"Saya mau PC saya untuk lag dan menjadi bagian dari botnet."
+
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Mencari Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:893
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Silakan mulai Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Pilih direktori pemasangan Grand Theft Auto: San Andreas anda"
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:187
+msgid "Installing update..."
+msgstr "Memasang pembaruan..."
 
-#: Client/loader/Utils.cpp:1182 Client/loader/CInstallManager.cpp:329
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:287
+msgid "Extracting files..."
+msgstr "Mengekstrak berkas..."
+
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1605
+msgid "Copying files..."
+msgstr "Menyalin berkas..."
+
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1665
+msgid "Copy finished early. Everything OK."
+msgstr "Penyalinan selesai lebih awal. Semuanya OK."
+
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1671
+msgid "Finishing..."
+msgstr "Menyelesaikan..."
+
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1673
+msgid "Done!"
+msgstr "Selesai!"
+
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2556,69 +2691,6 @@ msgid "MTA:SA needs Administrator access for the following task:\n\n"
 msgstr "MTA:SA membutuhkan akses Administrator untuk tugas berikut:\n\n"
 "  '%s'\n\n"
 "Silakan konfirmasi di jendela berikutnya."
-
-#: Client/loader/Utils.cpp:1283
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Kesalahan memuat modul %s! (%s)"
-
-#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:914
-msgid "Copying files..."
-msgstr "Menyalin berkas..."
-
-#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:919
-msgid "Copy finished early. Everything OK."
-msgstr "Penyalinan selesai lebih awal. Semuanya OK."
-
-#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:924
-msgid "Finishing..."
-msgstr "Menyelesaikan..."
-
-#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:928
-msgid "Done!"
-msgstr "Selesai!"
-
-#: Client/loader/Utils.cpp:1713
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Pemasangan baru dari %s terdeteksi.\n\n"
-"Apakah anda ingin menyalin pengaturan dari %s ?"
-
-#: Client/loader/Utils.cpp:1752
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA mengalami masalah saat membuka berkas '%s'"
-
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA kehilangan berkas '%s'."
-
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA mengalami masalah saat memuat model."
-
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Jika anda belakangan ini memodifikasi gta3.img, coba pasang ulang GTA:SA."
-
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA mengalami masalah saat menambah peningkatan ke sebuah kendaraan."
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA menemukan kesalahan di dalam berkas '%s'"
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Apakah komputer anda memulai ulang saat bermain MTA:SA?"
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr "Mohon akhiri program berikut sebelum melanjutkan:"
 
 #: Client/loader/CInstallManager.cpp:344
 #, c-format
@@ -2669,6 +2741,86 @@ msgstr "Perbarui pengaturan pemasangan"
 #: Client/loader/CInstallManager.cpp:1070
 msgid "Update compatibility settings"
 msgstr "Perbarui pengaturan kompatibilitas"
+
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Pilih direktori pemasangan Grand Theft Auto: San Andreas anda"
+
+#: Client/loader/Utils.cpp:1283
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Kesalahan memuat modul %s! (%s)"
+
+#: Client/loader/Utils.cpp:1713
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Pemasangan baru dari %s terdeteksi.\n\n"
+"Apakah anda ingin menyalin pengaturan dari %s ?"
+
+#: Client/loader/Utils.cpp:1752
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA mengalami masalah saat membuka berkas '%s'"
+
+#: Client/loader/Utils.cpp:1774
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA kehilangan berkas '%s'."
+
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA mengalami masalah saat memuat model."
+
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Jika anda belakangan ini memodifikasi gta3.img, coba pasang ulang GTA:SA."
+
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA mengalami masalah saat menambah peningkatan ke sebuah kendaraan."
+
+#: Client/loader/Utils.cpp:1845
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA menemukan kesalahan di dalam berkas '%s'"
+
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Apakah komputer anda memulai ulang saat bermain MTA:SA?"
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr "Mohon akhiri program berikut sebelum melanjutkan:"
+
+#: Client/loader/Install.cpp:92
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr "Apakah anda ingin mengakhiri Server MTA dan melanjutkan pembaruan?"
+
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr "Perbarui pengaturan Aero"
+
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr "Perbarui pengaturan Memori Besar"
+
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr "Perbarui pengaturan DEP"
+
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr "Perbarui pemenuhan grafik driver"
+
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr "Perbaiki masalah berkas"
+
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "Salin eksekusi utama untuk menghindari masalah driver grafis"
 
 #: Client/loader/MainFunctions.cpp:242
 msgid "Trouble restarting MTA:SA\n\n"
@@ -2852,170 +3004,19 @@ msgstr "Tidak dapat memulai Grand Theft Auto: San Andreas.  Silakan coba untuk m
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas mungkin tidak diluncurkan dengan benar. Apakah anda ingin mengakhirinya?"
 
-#: Client/loader/Dialogs.cpp:130
-msgid "Quit"
-msgstr "Keluar"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "Tidak dapat menemukan resolusi layar yang valid."
 
-#: Client/loader/Dialogs.cpp:147
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas telah mengalami sebuah kesalahan"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Apa anda yakin ingin menggunakan resolusi layar ini?"
 
-#: Client/loader/Dialogs.cpp:148
-msgid "Crash information"
-msgstr "Informasi kerusakan"
-
-#: Client/loader/Dialogs.cpp:149
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Centang kotak untuk mengirim info kerusakan ini kpd pengembang MTA menggunakan 'internet'"
-
-#: Client/loader/Dialogs.cpp:150
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Hal ini akan meningkatkan kemungkinan kerusakan ini diperbaiki."
-
-#: Client/loader/Dialogs.cpp:151
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Apakah anda ingin memulai ulang MTA: San Andreas ?"
-
-#: Client/loader/Dialogs.cpp:158
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Peringatan"
-
-#: Client/loader/Dialogs.cpp:159
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Direktori pemasangan Grand Theft Auto: San Andreas anda yang berisi berkas ini:"
-
-#: Client/loader/Dialogs.cpp:161
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "Berkas ini tidak diperlukan dan mungkin mengganggu ciri grafik dari versi MTA:SA ini.\n\n"
-"Dianjurkan agar anda menghapus atau mengganti nama berkas ini."
-
-#: Client/loader/Dialogs.cpp:163
-msgid "Keep these files, but also show this warning on next start"
-msgstr "Simpan berkas ini, tetapi juga tunjukkan peringatan ini saat mulai selanjutnya"
-
-#: Client/loader/Dialogs.cpp:164
-msgid "Do not remind me about these files again"
-msgstr "Jangan ingatkan saya lagi tentang berkas ini lagi"
-
-#: Client/loader/Dialogs.cpp:165
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Ganti nama berkas ini dari *.dll ke *.dll.bak"
-
-#: Client/loader/Dialogs.cpp:166
-msgid "Show me these files"
-msgstr "Tunjukkan berkas berkas ini"
-
-#: Client/loader/Dialogs.cpp:167
-msgid "Play MTA:SA"
-msgstr "Mainkan MTA:SA"
-
-#: Client/loader/Dialogs.cpp:173
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Opsi yang membingungkan"
-
-#: Client/loader/Dialogs.cpp:174
-msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus terdeteksi!"
-
-#: Client/loader/Dialogs.cpp:175
-msgid "Try each option and see what works:"
-msgstr "Coba setiap pilihan dan lihat apa yang bekerja:"
-
-#: Client/loader/Dialogs.cpp:176
-msgid "A - Standard NVidia"
-msgstr "A - NVidia standar"
-
-#: Client/loader/Dialogs.cpp:177
-msgid "B - Alternate NVidia"
-msgstr "B - NVidia alternatif"
-
-#: Client/loader/Dialogs.cpp:178
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - NVidia standar dengan penggantian nama exe"
-
-#: Client/loader/Dialogs.cpp:179
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - NVidia alternatif dengan penggantian nama exe"
-
-#: Client/loader/Dialogs.cpp:180
-msgid "E - Standard Intel"
-msgstr "E - Intel standar"
-
-#: Client/loader/Dialogs.cpp:181
-msgid "F - Alternate Intel"
-msgstr "F - Intel alternatif"
-
-#: Client/loader/Dialogs.cpp:182
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Intel standar dengan penggantian nama exe"
-
-#: Client/loader/Dialogs.cpp:183
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Intel alternatif dengan penggantian nama exe"
-
-#: Client/loader/Dialogs.cpp:184
-msgid "If you get desperate, this might help:"
-msgstr "Jika anda tidak tahu, ini mungkin membantu:"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "If you have already selected an option that works, this might help:"
-msgstr "Jika anda sudah memilih opsi yang berhasil, ini mungkin membantu:"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "Force windowed mode"
-msgstr "Paksa jadi mode jendela"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "Don't show again"
-msgstr "Jangan lihatkan lagi"
-
-#: Client/loader/Dialogs.cpp:195
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Peringatan: Tidak dapat mendeteksi produk anti-virus"
-
-#: Client/loader/Dialogs.cpp:197
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA tidak dapat mendeteksi anti-virus di PC anda.\n\n"
-"Virus mengganggu MTA dan menurunkan pengalaman bermain anda.\n\n"
-"Tekan 'Bantuan' untuk informasi lebih lanjut."
-
-#: Client/loader/Dialogs.cpp:200
-msgid "I have already installed an anti-virus"
-msgstr "Saya sudah memasang anti-virus"
-
-#: Client/loader/Dialogs.cpp:202
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Saya tidak akan memasang anti-virus.\n"
-"Saya mau PC saya untuk lag dan menjadi bagian dari botnet."
-
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr "Perbarui pengaturan Aero"
-
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr "Perbarui pengaturan Memori Besar"
-
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr "Perbarui pengaturan DEP"
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr "Perbarui pemenuhan grafik driver"
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr "Perbaiki masalah berkas"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Salin eksekusi utama untuk menghindari masalah driver grafis"
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
+msgid "Problem with graphics driver"
+msgstr "Masalah dengan driver grafik"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
