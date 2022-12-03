@@ -1068,35 +1068,32 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
 
         // Reset handling to fit the vehicle
-        if (IsLocalEntity())
+        ushort usHandlingModelID = usModel;
+        if (usHandlingModelID < 400 || usHandlingModelID > 611)
+            usHandlingModelID = m_pModelInfo->GetParentID();
+
+        m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)usHandlingModelID);
+        m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
+
+        m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData((eVehicleTypes)usHandlingModelID);
+        m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
+
+        m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData((eVehicleTypes)usHandlingModelID);
+        if (m_pOriginalBoatHandlingEntry)
         {
-            ushort usHandlingModelID = usModel;
-            if (usHandlingModelID < 400 || usHandlingModelID > 611)
-                usHandlingModelID = m_pModelInfo->GetParentID();
+            if (!m_pBoatHandlingEntry)
+                m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
 
-            m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)usHandlingModelID);
-            m_pHandlingEntry->Assign(m_pOriginalHandlingEntry);
+            m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
+        }
 
-            m_pOriginalFlyingHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalFlyingHandlingData((eVehicleTypes)usHandlingModelID);
-            m_pFlyingHandlingEntry->Assign(m_pOriginalFlyingHandlingEntry);
+        m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData((eVehicleTypes)usHandlingModelID);
+        if (m_pOriginalBikeHandlingEntry)
+        {
+            if (!m_pBikeHandlingEntry)
+                m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
 
-            m_pOriginalBoatHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBoatHandlingData((eVehicleTypes)usHandlingModelID);
-            if (m_pOriginalBoatHandlingEntry)
-            {
-                if (!m_pBoatHandlingEntry)
-                    m_pBoatHandlingEntry = g_pGame->GetHandlingManager()->CreateBoatHandlingData();
-
-                m_pBoatHandlingEntry->Assign(m_pOriginalBoatHandlingEntry);
-            }
-
-            m_pOriginalBikeHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalBikeHandlingData((eVehicleTypes)usHandlingModelID);
-            if (m_pOriginalBikeHandlingEntry)
-            {
-                if (!m_pBikeHandlingEntry)
-                    m_pBikeHandlingEntry = g_pGame->GetHandlingManager()->CreateBikeHandlingData();
-
-                m_pBikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
-            }
+            m_pBikeHandlingEntry->Assign(m_pOriginalBikeHandlingEntry);
         }
 
         ApplyHandling();
