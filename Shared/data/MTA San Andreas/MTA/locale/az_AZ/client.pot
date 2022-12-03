@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-29 16:10+0000\n"
-"PO-Revision-Date: 2022-11-29 16:21\n"
+"POT-Creation-Date: 2022-12-03 15:59+0000\n"
+"PO-Revision-Date: 2022-12-03 16:10\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -16,6 +16,835 @@ msgstr ""
 "X-Crowdin-Language: az\n"
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
+
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "Bu versiya köhnəlib."
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "serverdən ayırılma"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "ad etiketlərini göstər"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "söhbət pəncərəsini göstər"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "bağlantı statistikasını göstər"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "open the chat input"
+msgstr "söhbət sətirini aç"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "transmits voice to other players"
+msgstr "səsivizi digər oyunçulara ötür"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "enters a car as passenger"
+msgstr "Nəqliyyat: Sərnişin kimi otur"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "next radio channel"
+msgstr "növbəti radiostansiya"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "previous radio channel"
+msgstr "əvvəlki radiostansiya"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "enables the radar view"
+msgstr "Radar: Göstər/Gizlət"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar in"
+msgstr "Radar: Böyüt"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "zooms the radar out"
+msgstr "Radar: Kiçilt"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar north"
+msgstr "Radar: Şimala daşı"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar south"
+msgstr "Radar: Güneyə daşı"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar east"
+msgstr "Radar: Şərqə daşı"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "moves the radar west"
+msgstr "Radar: Qərbə daşı"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "attaches the radar"
+msgstr "Radar: Özüvə bağla"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "reduces radar opacity"
+msgstr "Radar: Şəffaflıq -"
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "increases radar opacity"
+msgstr "Radar: Şəffaflıq +"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "toggles radar help text"
+msgstr "Radar: Kömək mətnini göstər/gizlət"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "sends a message to the targetted player"
+msgstr "seçilmiş oyunçuya məktub göndərir"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "Nəqliyyat: Növbəti silah"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "Nəqliyyat: Əvvəlki silah"
+
+#: Client/mods/deathmatch/CClient.cpp:82
+msgid "outputs info about the current server"
+msgstr "cari server haqqında məlumat verir"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:85
+msgid "defines the scale multiplier of all text-displays"
+msgstr "mətnin ekranda göstərmə ölçüsünün təyin edilməsi"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) shows the colshapes"
+msgstr "(İnşaatcılıq rejimi) colshapeləri göstər"
+
+#: Client/mods/deathmatch/CClient.cpp:93
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(İnşaatcılıq rejimi) debug pəncərəsinə oyun səs id-lərini yazın"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Yükləmə xətası: %s"
+
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/mods/deathmatch/logic/CClientGame.cpp:588
+#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1192
+#: Client/core/CCore.cpp:1205 Client/core/CSettings.cpp:2924
+#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
+#: Client/core/CSettings.cpp:4674
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
+#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
+#: Client/loader/MainFunctions.cpp:818
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "Xəta"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Yerli server başlatıla bilmədi. Məlumat üçün konsola baxın."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Xəta: Yerli server başlatıla bilmədi. [%s]"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "SERVER QURAŞDIR"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
+#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2001
+msgid "General"
+msgstr "Ümumi"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Resurslar"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Server adı:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Şifrə:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Maks oyunçu:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Yayım:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "LAN"
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr "İnternet"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Seçilib"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Hamısı"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Başlat"
+
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:132
+#: Client/gui/CGUIMessageBox_Impl.cpp:68
+msgid "Cancel"
+msgstr "Ləğv et"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
+msgid "Disconnected: Invalid nickname"
+msgstr "Bağlantı kəsildi: yanlış ləqəb"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
+msgid "Disconnect from server"
+msgstr "Serverdən ayırılma"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "Bağlantı kəsildi. Serial nömrəviz qadağalanıb.\n"
+"Səbəb: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "Bağlantı kəsildi: Siz qadağalandını.\n"
+"Səbəb: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Bağlantı kəsildi: Hesab qadağalanıb.\n"
+"Səbəb: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
+msgid "Disconnected: Version mismatch"
+msgstr "Bağlantı kəsildi: Versiyalar uyğun deyil"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "Bağlantı kəsildi: Qoşulma fludları. Zəhmət olmasa bir dəqiqə gözləyin, və sonra yenidən cəhd edin."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Bağlantı kəsildi: Server fərqli versiyalıdır.\n"
+"Məlumat: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "Bağlantı kəsildi: Yanlış versiya.\n"
+"Məlumat: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "Bağlantı kesildi: Server daha yeni versiyada işləyir.\n"
+"Məlumat: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "Bağlantı kəsildi: Server daha köhnə versiyada işləyir.\n"
+"Məlumat: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+msgid "Disconnected: Nick already in use"
+msgstr "Bağlantı kəsildi: Bu ləqəb işlənilir"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
+msgid "Disconnected: Player element could not be created."
+msgstr "Bağlantı kəsildi: Oyunçu elementi yaradıla bilmir."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Bağlantı kəsildi: Server bağlantını kəsdi: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
+msgid "Disconnected: Serial verification failed"
+msgstr "Bağlantı kəsildi: Serial nömrəsinin yoxlanışı alınmadı"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Bağlantı kəsildi: Bağlantı sinxronizasiya xətası%s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Bağlantı kəsildi: %s tərəfindən təpikləndinız"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Bağlantı kəsildi: %s tərəfindən qadağalandınız"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "Bağlantı kəsildi: Server söndürüldü, yada yenidən başlanır"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
+msgid "You were kicked from the game"
+msgstr "Sizi serverdən təpiklədilər"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "Bu server dəyişilməmiş gta_sa.exe tələb eləyir"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+msgid "Please replace gta_sa.exe"
+msgstr "Zəhmət olmasa gta_sa.exe sənədini dəyişin"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "Bu server xüsusi D3D9.DLL işlətməyə icazə vermir"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "GTA qovluğundan D3D9.DLL sənədini silin, və MTA-nı yenidən başlatın"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
+msgid "This server does not allow virtual machines"
+msgstr "Bu server virtual maşınlara icazə vermir"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+msgid "This server requires driver signing to be enabled"
+msgstr "Bu server driver imzası qoşulu olmasını tələb eləyir"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+msgid "Please restart your PC"
+msgstr "Zəhmət olmasa, kompüterivizi yenidən başlatın"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+msgid "This server has detected missing anti-cheat components"
+msgstr "Bu server itkin anti-cheat komponentləri aşkar etdi"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+msgid "Try restarting MTA"
+msgstr "MTA-nı yenidən başlatın"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "Bu server dəyişilməmiş gta3.img və gta_int.img tələb eləyir"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "Zəhmət olmasa, gta3.img yada gta_int.img sənədini dəyişin"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+msgid "This server does not allow Wine"
+msgstr "Bu server Wine tətbiqinə icazə vermir"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "Başqa heç bir proqram MTA: SA-nı dəyişdirmədiyini yoxlayın"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "Time Remaining: "
+msgstr "Qalan vaxt: "
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d gün"
+msgstr[1] "%d gün"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d saat"
+msgstr[1] "%d saat"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d dəqiqə"
+msgstr[1] "%d dəqiqə"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d saniyə"
+msgstr[1] "%d saniyə"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
+msgid "Disconnected"
+msgstr "Bağlantı kəsildi"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Xəritə yükləmə tərəqqisi:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Yükləmə tərəqqisi:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s'dan %s'ı"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Yükləməni dayandırmaq üçün serverdən ayırılın"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:588
+#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Yanlış ləqəb daxil olunub! Zəhmət olmasa, seçimləri açın və ləqəbi dəyişin!"
+
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr "QOŞULUR"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+msgid "Entering the game ..."
+msgstr "Oyuna qoşulur..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Qoşula bilmədi; zəhmət olmasa Tez Qoşul və ya 'connect' kodunu işlədib bir serverə qoşulun."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+msgid "The server is not installed"
+msgstr "Server quraşdırılmıyıb"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Local Server"
+msgstr "Yerli Server"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+msgid "Starting local server ..."
+msgstr "Yerli server başlanılır ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "Sizi serverdən təpiklədilər ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Connecting to local server..."
+msgstr "Yerli serverə qoşulma gedir..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+msgid "Error connecting to server."
+msgstr "Serverə qoşularkən xəta baş verdi."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Yerli serverə qoşulma vaxtı bitdi. Ətraflı məlumat üçün konsola baxın."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr "Bağlantı vaxtı bitdi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+msgid "Connection with the server was lost"
+msgstr "Server ilə bağlantı itdi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr "Bağlantı kəsildi: naməlum protokol xətası"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr "Bağlantı kəsildi: uzaqdan qoşulma kəsildi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr "Bağlantı kəsildi: uzaqdan qoşulma itdi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr "Bağlantı kəsildi: siz serverdən qadağalandınız"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+msgid "Disconnected: the server is currently full"
+msgstr "Bağlantı kəsildi: server hal hazırda doludur"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr "Bağlantı kəsildi: server ilə olan bağlantı kəsildi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr "Bağlantı kəsildi: server ilə bağlantı itdi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+msgid "Disconnected: invalid password specified"
+msgstr "Bağlantı kəsildi: yanlış şifrə daxil olunub"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr "Bağlantı kəsildi: bağlantı rədd edildi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+msgid "MTA Client verification failed!"
+msgstr "MTA klient yoxlanması alınmadı"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Azərbaycanca"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONSOL"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Bu problemlə bağlı onlayn yardım görmək istəyirsiniz?"
+
+#: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1569
+#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
+#: Client/core/CVersionUpdater.cpp:1875 Client/core/CSettings.cpp:1371
+#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
+#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
+#: Client/core/CMainMenu.cpp:1147 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/loader/Dialogs.cpp:128
+msgid "No"
+msgstr "Xeyr"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1570
+#: Client/core/CVersionUpdater.cpp:1588 Client/core/CVersionUpdater.cpp:1857
+#: Client/core/CVersionUpdater.cpp:1876 Client/core/CSettings.cpp:1372
+#: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
+#: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
+#: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/loader/Dialogs.cpp:127 Client/gui/CGUIMessageBox_Impl.cpp:72
+msgid "Yes"
+msgstr "Bəli"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Sürətlənmə oxu"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Əyləc oxu"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Bağlantı alınmadı. Yanlış ləqəb daxil olunub!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Bağlantı alınmadı. Daxil edilmiş server ünvanı yanlışdır!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "%u portunda %s bağlantısı alınmadı!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "%s:%u serverinə qoşulur ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "(%s) adlı mod quraşdırılmayıb"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Serverdən yanlış cavab(2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Serverdən yanlış cavab(1)"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Seçdiyiniz üslub yüklənə bilmədi, həmçinin standart üslub yüklənilə bilmədi. Zəhmət olmasa, MTA-nı yenidən quraşdırın."
+
+#: Client/core/CKeyBinds.cpp:186
+msgid "Fire"
+msgstr "Atəş"
+
+#: Client/core/CKeyBinds.cpp:187
+msgid "Next weapon"
+msgstr "Növbəti silah"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Previous weapon"
+msgstr "Əvvəlki silah"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Forwards"
+msgstr "İrəli"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Backwards"
+msgstr "Geri"
+
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2223
+#: Client/core/CSettings.cpp:2251
+msgid "Left"
+msgstr "Sol"
+
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2225
+#: Client/core/CSettings.cpp:2252
+msgid "Right"
+msgstr "Sağ"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Zoom in"
+msgstr "Yaxınlaşdır"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Zoom out"
+msgstr "Uzaqlaşdır"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Enter/Exit"
+msgstr "Giriş/Çıxış"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Change camera"
+msgstr "Kameranı dəyişdir"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:197
+msgid "Jump"
+msgstr "Hoppan"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Sprint"
+msgstr "Qaçış"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Look behind"
+msgstr "Arxaya bax"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Crouch"
+msgstr "Əyil"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Action"
+msgstr "Hərəkət"
+
+#: Client/core/CKeyBinds.cpp:202
+msgid "Walk"
+msgstr "Yeriş"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Vehicle fire"
+msgstr "Nəqliyyat: Atəş"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Vehicle secondary fire"
+msgstr "Nəqliyyat: İkinci atəş"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Vehicle left"
+msgstr "Nəqliyyat: Sola"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Vehicle right"
+msgstr "Nəqliyyat: Sağa"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:207
+msgid "Steer forwards/down"
+msgstr "Nəqliyyat: İrəli/Aşağı əyilməsi"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Steer backwards/up"
+msgstr "Nəqliyyat: Geriyə/Yuxarıya əyilməsi"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Accelerate"
+msgstr "Nəqliyyat: İrəli"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Brake/Reverse"
+msgstr "Nəqliyyat: Əyləc/Geri"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Radio next"
+msgstr "Növbəti radiostansiya"
+
+#: Client/core/CKeyBinds.cpp:212
+msgid "Radio previous"
+msgstr "Əvvəlki radiostansiya"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Radio user track skip"
+msgstr "Növbəti radiostansiyaya hoppan"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Horn"
+msgstr "Siqnal"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Sub-mission"
+msgstr "Nəqliyyat: Asqı/Şassi"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Handbrake"
+msgstr "Nəqliyyat: Əl əyləci"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:217
+msgid "Vehicle look left"
+msgstr "Nəqliyyat: Sola bax"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Vehicle look right"
+msgstr "Nəqliyyat: Sağa bax"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Vehicle look behind"
+msgstr "Nəqliyyat: Geriyə bax"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Vehicle mouse look"
+msgstr "Nəqliyyat: Siçan görünüşü"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Special control left"
+msgstr "Nəqliyyat: Xüsusi sola"
+
+#: Client/core/CKeyBinds.cpp:222
+msgid "Special control right"
+msgstr "Nəqliyyat: Xüsusi sağa"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Special control down"
+msgstr "Nəqliyyat: Xüsusi aşağı"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Special control up"
+msgstr "Nəqliyyat: Xüsusi yuxarı"
+
+#: Client/core/CKeyBinds.cpp:225
+msgid "Aim weapon"
+msgstr "Silah nişangahı"
+
+#: Client/core/CKeyBinds.cpp:226
+msgid "Conversation yes"
+msgstr "Qrup: razılaşmaq"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:227
+msgid "Conversation no"
+msgstr "Qrup: razılaşmamaq"
+
+#: Client/core/CKeyBinds.cpp:228
+msgid "Group control forwards"
+msgstr "Qrup: irəli"
+
+#: Client/core/CKeyBinds.cpp:229
+msgid "Group control backwards"
+msgstr "Qrup: geri"
 
 #: Client/core/CCredits.cpp:32
 msgid "Programming"
@@ -45,107 +874,118 @@ msgstr "Xüsusi təşəkkürlər"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Bu proqram aşağıdakı kitabxanalardan və proqram təminatlarını istifadə edir:"
 
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Seçdiyiniz üslub yüklənə bilmədi, həmçinin standart üslub yüklənilə bilmədi. Zəhmət olmasa, MTA-nı yenidən quraşdırın."
+#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA davam edə bilməz, çünki %s diskində kifayət qədər yer yoxdur."
 
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#: Client/core/CGUI.cpp:87 Client/core/CConnectManager.cpp:80
-#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
-#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
-#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
-#: Client/core/CConnectManager.cpp:421 Client/core/CSettings.cpp:2924
-#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/CCore.cpp:1192
-#: Client/core/CCore.cpp:1205 Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
-#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
-#: Client/loader/MainFunctions.cpp:818
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "Xəta"
+#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Ölümcül xəta"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Sürətlənmə oxu"
+#: Client/core/CCore.cpp:850
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "DÜZƏLTMƏK ÜÇÜN BU SƏNƏDİ SİLİN:"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Əyləc oxu"
+#: Client/core/CCore.cpp:882
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s modulu yanlışdır!"
 
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Siz 'feature-brand' quruluşundan istifadə edirsiniz! Bu test quruluşudur, və bu quruluşla adi serverlərə qoşulmaq mümkün deyil!"
+#: Client/core/CCore.cpp:1192
+msgid "Error executing URL"
+msgstr "URL icra edərkən xəta baş verdi"
 
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA 2019-cu ilin iyul ayından sonra XP/Vista-ya yeniləmələr almayacaq\n\n"
-"Yeni serverlərdə oynamaq üçün Windows-u yeniləyin."
+#: Client/core/CCore.cpp:1204
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Əmr sətirində daxil edilmiş modu işə salma xətası ('%s')"
 
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Bu sizi qoşulduğuvuz serverdən ayıracaq.\n\n"
-"Ayrılmaq istəyinizə əminsiniz?"
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1289
+msgid "this help screen"
+msgstr "bu yardım səhifəsi"
 
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "AYIRILMA XƏBƏRDARLIĞI"
+#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
+msgid "exits the application"
+msgstr "tətbiqdən çıxır"
 
-#: Client/core/CMainMenu.cpp:1147 Client/core/CVersionUpdater.cpp:1569
-#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
-#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
-#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
-#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
-#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:128
-msgid "No"
-msgstr "Xeyr"
+#: Client/core/CCore.cpp:1292
+msgid "shows the version"
+msgstr "versiyanı göstərir"
 
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/core/CMainMenu.cpp:1148 Client/core/CVersionUpdater.cpp:1570
-#: Client/core/CVersionUpdater.cpp:1588 Client/core/CVersionUpdater.cpp:1857
-#: Client/core/CVersionUpdater.cpp:1876 Client/core/CQuestionBox.cpp:195
-#: Client/core/CSettings.cpp:1372 Client/core/CSettings.cpp:1396
-#: Client/core/CSettings.cpp:4436 Client/core/CSettings.cpp:4503
-#: Client/core/CSettings.cpp:4552 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:127 Client/gui/CGUIMessageBox_Impl.cpp:72
-msgid "Yes"
-msgstr "Bəli"
+#: Client/core/CCore.cpp:1293
+msgid "shows the time"
+msgstr "vaxtı göstərir"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Azərbaycanca"
+#: Client/core/CCore.cpp:1294
+msgid "shows the hud"
+msgstr "interfeysi göstərir"
+
+#: Client/core/CCore.cpp:1295
+msgid "shows all the binds"
+msgstr "bütün bağlı düymələri göstərir"
+
+#: Client/core/CCore.cpp:1296
+msgid "shows your serial"
+msgstr "serial nömrəvizi göstərir"
+
+#: Client/core/CCore.cpp:1305
+msgid "connects to a server (host port nick pass)"
+msgstr "serverə qoşulur (ip, port, ləqəb, şifrə)"
+
+#: Client/core/CCore.cpp:1306
+msgid "connects to a previous server"
+msgstr "əvvəlki serverə qoşulur"
+
+#: Client/core/CCore.cpp:1307
+msgid "binds a key (key control)"
+msgstr "düyməni bağlayır (düymə idarəetmə)"
+
+#: Client/core/CCore.cpp:1308
+msgid "unbinds a key (key)"
+msgstr "düyməni sıfırlayır (düymə)"
+
+#: Client/core/CCore.cpp:1309
+msgid "copies the default gta controls"
+msgstr "standart gta seçimlərini bura köçürür"
+
+#: Client/core/CCore.cpp:1310
+msgid "outputs a screenshot"
+msgstr "ekran şəkilini çəkir"
+
+#: Client/core/CCore.cpp:1311
+msgid "immediately saves the config"
+msgstr "seçimləri saxlayır"
+
+#: Client/core/CCore.cpp:1313
+msgid "clears the debug view"
+msgstr "debug pəncərəsini təmizləyir"
+
+#: Client/core/CCore.cpp:1314
+msgid "scrolls the chatbox upwards"
+msgstr "söhbət pəncərəsini yuxarı sürüşdürür"
+
+#: Client/core/CCore.cpp:1315
+msgid "scrolls the chatbox downwards"
+msgstr "söhbət pəncərəsini aşağı sürüşdürür"
+
+#: Client/core/CCore.cpp:1316
+msgid "scrolls the debug view upwards"
+msgstr "debug pəncərəsini yuxarı sürüşdürür"
+
+#: Client/core/CCore.cpp:1317
+msgid "scrolls the debug view downwards"
+msgstr "debug pəncərəsini aşağı sürüşdürür"
+
+#: Client/core/CCore.cpp:1320
+msgid "shows the memory statistics"
+msgstr "yaddaş istifadəsi statistikalarını göstərir"
+
+#: Client/core/CCore.cpp:1321
+msgid "shows the frame timing graph"
+msgstr "frame-time qrafikini göstərir"
 
 #: Client/core/CVersionUpdater.cpp:624
 msgid "Busy"
@@ -198,15 +1038,6 @@ msgstr "Qoşulur"
 #: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
 msgid "Please wait..."
 msgstr "Zəhmət olmasa gözləyin..."
-
-#. Cancel button
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
-#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4694
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/loader/Dialogs.cpp:132 Client/gui/CGUIMessageBox_Impl.cpp:68
-msgid "Cancel"
-msgstr "Ləğv et"
 
 #: Client/core/CVersionUpdater.cpp:1802
 msgid "CHECKING"
@@ -312,109 +1143,6 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Cavab gözlənilir %-3d"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONSOL"
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Bu problemlə bağlı onlayn yardım görmək istəyirsiniz?"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Naməlum əmr və ya cvar:"
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "XƏBƏRLƏR"
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "Son xəbərlərə baxın"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Bağlantı alınmadı. Yanlış ləqəb daxil olunub!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Bağlantı alınmadı. Daxil edilmiş server ünvanı yanlışdır!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "%u portunda %s bağlantısı alınmadı!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "%s:%u serverinə qoşulur ..."
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-msgid "CONNECTING"
-msgstr "QOŞULUR"
-
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-msgid "Connection timed out"
-msgstr "Bağlantı vaxtı bitdi"
-
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
-msgid "Disconnected: unknown protocol error"
-msgstr "Bağlantı kəsildi: naməlum protokol xətası"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
-msgid "Disconnected: disconnected remotely"
-msgstr "Bağlantı kəsildi: uzaqdan qoşulma kəsildi"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
-msgid "Disconnected: connection lost remotely"
-msgstr "Bağlantı kəsildi: uzaqdan qoşulma itdi"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-msgid "Disconnected: you are banned from this server"
-msgstr "Bağlantı kəsildi: siz serverdən qadağalandınız"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
-msgid "Disconnected: disconnected from the server"
-msgstr "Bağlantı kəsildi: server ilə olan bağlantı kəsildi"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
-msgid "Disconnected: connection to the server was lost"
-msgstr "Bağlantı kəsildi: server ilə bağlantı itdi"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
-msgid "Disconnected: connection was refused"
-msgstr "Bağlantı kəsildi: bağlantı rədd edildi"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "(%s) adlı mod quraşdırılmayıb"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Serverdən yanlış cavab(2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Serverdən yanlış cavab(1)"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -597,15 +1325,6 @@ msgstr "Avaz səviyyəsi:"
 #: Client/core/CSettings.cpp:423 Client/core/CSettings.cpp:548
 msgid "Play mode:"
 msgstr "Oynatma rejimi:"
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
-#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2001
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr "Ümumi"
 
 #: Client/core/CSettings.cpp:526
 msgid "Radio options"
@@ -1155,19 +1874,9 @@ msgstr "Y Sürüşdürməsi:"
 msgid "Position"
 msgstr "Yerləşim"
 
-#: Client/core/CSettings.cpp:2223 Client/core/CSettings.cpp:2251
-#: Client/core/CKeyBinds.cpp:191
-msgid "Left"
-msgstr "Sol"
-
 #: Client/core/CSettings.cpp:2224 Client/core/CSettings.cpp:2238
 msgid "Center"
 msgstr "Mərkəz"
-
-#: Client/core/CSettings.cpp:2225 Client/core/CSettings.cpp:2252
-#: Client/core/CKeyBinds.cpp:192
-msgid "Right"
-msgstr "Sağ"
 
 #: Client/core/CSettings.cpp:2237
 msgid "Top"
@@ -1392,290 +2101,10 @@ msgstr "Siçan hərəkətini düzəlt - Kompüterin yenidən başlanması tələ
 msgid "Screenshot taken: '%s'"
 msgstr "Ekran şəkili çəkildi: '%s'"
 
-#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA davam edə bilməz, çünki %s diskində kifayət qədər yer yoxdur."
-
-#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Ölümcül xəta"
-
-#: Client/core/CCore.cpp:850
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "DÜZƏLTMƏK ÜÇÜN BU SƏNƏDİ SİLİN:"
-
-#: Client/core/CCore.cpp:882
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s modulu yanlışdır!"
-
-#: Client/core/CCore.cpp:1192
-msgid "Error executing URL"
-msgstr "URL icra edərkən xəta baş verdi"
-
-#: Client/core/CCore.cpp:1204
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Əmr sətirində daxil edilmiş modu işə salma xətası ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1289
-msgid "this help screen"
-msgstr "bu yardım səhifəsi"
-
-#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
-msgid "exits the application"
-msgstr "tətbiqdən çıxır"
-
-#: Client/core/CCore.cpp:1292
-msgid "shows the version"
-msgstr "versiyanı göstərir"
-
-#: Client/core/CCore.cpp:1293
-msgid "shows the time"
-msgstr "vaxtı göstərir"
-
-#: Client/core/CCore.cpp:1294
-msgid "shows the hud"
-msgstr "interfeysi göstərir"
-
-#: Client/core/CCore.cpp:1295
-msgid "shows all the binds"
-msgstr "bütün bağlı düymələri göstərir"
-
-#: Client/core/CCore.cpp:1296
-msgid "shows your serial"
-msgstr "serial nömrəvizi göstərir"
-
-#: Client/core/CCore.cpp:1305
-msgid "connects to a server (host port nick pass)"
-msgstr "serverə qoşulur (ip, port, ləqəb, şifrə)"
-
-#: Client/core/CCore.cpp:1306
-msgid "connects to a previous server"
-msgstr "əvvəlki serverə qoşulur"
-
-#: Client/core/CCore.cpp:1307
-msgid "binds a key (key control)"
-msgstr "düyməni bağlayır (düymə idarəetmə)"
-
-#: Client/core/CCore.cpp:1308
-msgid "unbinds a key (key)"
-msgstr "düyməni sıfırlayır (düymə)"
-
-#: Client/core/CCore.cpp:1309
-msgid "copies the default gta controls"
-msgstr "standart gta seçimlərini bura köçürür"
-
-#: Client/core/CCore.cpp:1310
-msgid "outputs a screenshot"
-msgstr "ekran şəkilini çəkir"
-
-#: Client/core/CCore.cpp:1311
-msgid "immediately saves the config"
-msgstr "seçimləri saxlayır"
-
-#: Client/core/CCore.cpp:1313
-msgid "clears the debug view"
-msgstr "debug pəncərəsini təmizləyir"
-
-#: Client/core/CCore.cpp:1314
-msgid "scrolls the chatbox upwards"
-msgstr "söhbət pəncərəsini yuxarı sürüşdürür"
-
-#: Client/core/CCore.cpp:1315
-msgid "scrolls the chatbox downwards"
-msgstr "söhbət pəncərəsini aşağı sürüşdürür"
-
-#: Client/core/CCore.cpp:1316
-msgid "scrolls the debug view upwards"
-msgstr "debug pəncərəsini yuxarı sürüşdürür"
-
-#: Client/core/CCore.cpp:1317
-msgid "scrolls the debug view downwards"
-msgstr "debug pəncərəsini aşağı sürüşdürür"
-
-#: Client/core/CCore.cpp:1320
-msgid "shows the memory statistics"
-msgstr "yaddaş istifadəsi statistikalarını göstərir"
-
-#: Client/core/CCore.cpp:1321
-msgid "shows the frame timing graph"
-msgstr "frame-time qrafikini göstərir"
-
-#: Client/core/CKeyBinds.cpp:186
-msgid "Fire"
-msgstr "Atəş"
-
-#: Client/core/CKeyBinds.cpp:187
-msgid "Next weapon"
-msgstr "Növbəti silah"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Previous weapon"
-msgstr "Əvvəlki silah"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Forwards"
-msgstr "İrəli"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Backwards"
-msgstr "Geri"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Zoom in"
-msgstr "Yaxınlaşdır"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Zoom out"
-msgstr "Uzaqlaşdır"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Enter/Exit"
-msgstr "Giriş/Çıxış"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Change camera"
-msgstr "Kameranı dəyişdir"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:197
-msgid "Jump"
-msgstr "Hoppan"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Sprint"
-msgstr "Qaçış"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Look behind"
-msgstr "Arxaya bax"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Crouch"
-msgstr "Əyil"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Action"
-msgstr "Hərəkət"
-
-#: Client/core/CKeyBinds.cpp:202
-msgid "Walk"
-msgstr "Yeriş"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Vehicle fire"
-msgstr "Nəqliyyat: Atəş"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Vehicle secondary fire"
-msgstr "Nəqliyyat: İkinci atəş"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Vehicle left"
-msgstr "Nəqliyyat: Sola"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Vehicle right"
-msgstr "Nəqliyyat: Sağa"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:207
-msgid "Steer forwards/down"
-msgstr "Nəqliyyat: İrəli/Aşağı əyilməsi"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Steer backwards/up"
-msgstr "Nəqliyyat: Geriyə/Yuxarıya əyilməsi"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Accelerate"
-msgstr "Nəqliyyat: İrəli"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Brake/Reverse"
-msgstr "Nəqliyyat: Əyləc/Geri"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Radio next"
-msgstr "Növbəti radiostansiya"
-
-#: Client/core/CKeyBinds.cpp:212
-msgid "Radio previous"
-msgstr "Əvvəlki radiostansiya"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Radio user track skip"
-msgstr "Növbəti radiostansiyaya hoppan"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Horn"
-msgstr "Siqnal"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Sub-mission"
-msgstr "Nəqliyyat: Asqı/Şassi"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Handbrake"
-msgstr "Nəqliyyat: Əl əyləci"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:217
-msgid "Vehicle look left"
-msgstr "Nəqliyyat: Sola bax"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Vehicle look right"
-msgstr "Nəqliyyat: Sağa bax"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Vehicle look behind"
-msgstr "Nəqliyyat: Geriyə bax"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Vehicle mouse look"
-msgstr "Nəqliyyat: Siçan görünüşü"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Special control left"
-msgstr "Nəqliyyat: Xüsusi sola"
-
-#: Client/core/CKeyBinds.cpp:222
-msgid "Special control right"
-msgstr "Nəqliyyat: Xüsusi sağa"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Special control down"
-msgstr "Nəqliyyat: Xüsusi aşağı"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Special control up"
-msgstr "Nəqliyyat: Xüsusi yuxarı"
-
-#: Client/core/CKeyBinds.cpp:225
-msgid "Aim weapon"
-msgstr "Silah nişangahı"
-
-#: Client/core/CKeyBinds.cpp:226
-msgid "Conversation yes"
-msgstr "Qrup: razılaşmaq"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:227
-msgid "Conversation no"
-msgstr "Qrup: razılaşmamaq"
-
-#: Client/core/CKeyBinds.cpp:228
-msgid "Group control forwards"
-msgstr "Qrup: irəli"
-
-#: Client/core/CKeyBinds.cpp:229
-msgid "Group control backwards"
-msgstr "Qrup: geri"
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Naməlum əmr və ya cvar:"
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
@@ -1722,81 +2151,40 @@ msgstr "Konfiqurasiya sənədi yadda saxlanıldı"
 msgid "* Your serial is: %s"
 msgstr "* Serial nömrəniz: %s"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Direct3D9 başladıla bilmədi.\n\n"
-"Zəhmət olmasa DirectX End-User Runtime və\n"
-"son çıxan Windows Service Pack quraşdırın."
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Siz 'feature-brand' quruluşundan istifadə edirsiniz! Bu test quruluşudur, və bu quruluşla adi serverlərə qoşulmaq mümkün deyil!"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ekran şəkili %d bayt oldu, amma %d olması tələb olunur"
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA 2019-cu ilin iyul ayından sonra XP/Vista-ya yeniləmələr almayacaq\n\n"
+"Yeni serverlərdə oynamaq üçün Windows-u yeniləyin."
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Ekran şəkili alınmadı"
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Bu sizi qoşulduğuvuz serverdən ayıracaq.\n\n"
+"Ayrılmaq istəyinizə əminsiniz?"
 
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Aktiv deyil"
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "AYIRILMA XƏBƏRDARLIĞI"
 
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "oyunçu"
-msgstr[1] "oyunçu"
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "XƏBƏRLƏR"
 
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "açıq"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "server"
-msgstr[1] "server"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Server siyahısı alınır. (%lu ms keçdi)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "Master-server siyahısı alınmadı."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "Master-server siyahı məlumatı alına bilmədi."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Yedəklənmiş server siyahısı)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "LAN-yayın soketi birləşdirilə bilmədi"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "LAN serverləri axtarılı"
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "Son xəbərlərə baxın"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
 msgstr "SERVERLƏR PƏNCƏRƏSİ"
-
-#. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-msgid "Internet"
-msgstr "İnternet"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
@@ -1948,13 +2336,6 @@ msgstr "Naməlum protokol"
 msgid "Please use the mtasa:// protocol!"
 msgstr "Zəhmət olmasa mtasa:// protokolundan istifadə edin!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Yanlış ləqəb daxil olunub! Zəhmət olmasa, seçimləri açın və ləqəbi dəyişin!"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
@@ -2049,6 +2430,71 @@ msgstr "Bağlantı vaxtı bitdi"
 msgid "Querying..."
 msgstr "Sorğulanır..."
 
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Aktiv deyil"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "oyunçu"
+msgstr[1] "oyunçu"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "açıq"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "server"
+msgstr[1] "server"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Server siyahısı alınır. (%lu ms keçdi)"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "Master-server siyahısı alınmadı."
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "Master-server siyahı məlumatı alına bilmədi."
+
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Yedəklənmiş server siyahısı)"
+
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "LAN-yayın soketi birləşdirilə bilmədi"
+
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "LAN serverləri axtarılı"
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Direct3D9 başladıla bilmədi.\n\n"
+"Zəhmət olmasa DirectX End-User Runtime və\n"
+"son çıxan Windows Service Pack quraşdırın."
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Ekran şəkili %d bayt oldu, amma %d olması tələb olunur"
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "Ekran şəkili alınmadı"
+
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
 msgstr "Website istəkləri"
@@ -2069,494 +2515,183 @@ msgstr "Qərarı xatırla"
 msgid "Deny"
 msgstr "Rədd et"
 
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "Bu versiya köhnəlib."
-
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "serverdən ayırılma"
-
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "ad etiketlərini göstər"
-
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "söhbət pəncərəsini göstər"
-
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "bağlantı statistikasını göstər"
-
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "söhbət sətirini aç"
-
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "səsivizi digər oyunçulara ötür"
-
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "Nəqliyyat: Sərnişin kimi otur"
-
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "növbəti radiostansiya"
-
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "əvvəlki radiostansiya"
-
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "Radar: Göstər/Gizlət"
-
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "Radar: Böyüt"
-
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "Radar: Kiçilt"
-
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "Radar: Şimala daşı"
-
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "Radar: Güneyə daşı"
-
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "Radar: Şərqə daşı"
-
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "Radar: Qərbə daşı"
-
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "Radar: Özüvə bağla"
-
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "Radar: Şəffaflıq -"
-
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "Radar: Şəffaflıq +"
-
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "Radar: Kömək mətnini göstər/gizlət"
-
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "seçilmiş oyunçuya məktub göndərir"
-
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "Nəqliyyat: Növbəti silah"
-
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "Nəqliyyat: Əvvəlki silah"
-
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "cari server haqqında məlumat verir"
-
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "mətnin ekranda göstərmə ölçüsünün təyin edilməsi"
-
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(İnşaatcılıq rejimi) colshapeləri göstər"
-
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(İnşaatcılıq rejimi) debug pəncərəsinə oyun səs id-lərini yazın"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
-msgid "Disconnected: Invalid nickname"
-msgstr "Bağlantı kəsildi: yanlış ləqəb"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
-msgid "Disconnect from server"
-msgstr "Serverdən ayırılma"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
-#, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "Bağlantı kəsildi. Serial nömrəviz qadağalanıb.\n"
-"Səbəb: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
-#, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "Bağlantı kəsildi: Siz qadağalandını.\n"
-"Səbəb: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
-#, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "Bağlantı kəsildi: Hesab qadağalanıb.\n"
-"Səbəb: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
-msgid "Disconnected: Version mismatch"
-msgstr "Bağlantı kəsildi: Versiyalar uyğun deyil"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Bağlantı kəsildi: Qoşulma fludları. Zəhmət olmasa bir dəqiqə gözləyin, və sonra yenidən cəhd edin."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
-#, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "Bağlantı kəsildi: Server fərqli versiyalıdır.\n"
-"Məlumat: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
-#, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "Bağlantı kəsildi: Yanlış versiya.\n"
-"Məlumat: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "Bağlantı kesildi: Server daha yeni versiyada işləyir.\n"
-"Məlumat: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "Bağlantı kəsildi: Server daha köhnə versiyada işləyir.\n"
-"Məlumat: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
-msgid "Disconnected: Nick already in use"
-msgstr "Bağlantı kəsildi: Bu ləqəb işlənilir"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
-msgid "Disconnected: Player element could not be created."
-msgstr "Bağlantı kəsildi: Oyunçu elementi yaradıla bilmir."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Bağlantı kəsildi: Server bağlantını kəsdi: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
-msgid "Disconnected: Serial verification failed"
-msgstr "Bağlantı kəsildi: Serial nömrəsinin yoxlanışı alınmadı"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "Bağlantı kəsildi: Bağlantı sinxronizasiya xətası%s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "Bağlantı kəsildi: %s tərəfindən təpikləndinız"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "Bağlantı kəsildi: %s tərəfindən qadağalandınız"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "Bağlantı kəsildi: Server söndürüldü, yada yenidən başlanır"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
-msgid "You were kicked from the game"
-msgstr "Sizi serverdən təpiklədilər"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Bu server dəyişilməmiş gta_sa.exe tələb eləyir"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
-msgid "Please replace gta_sa.exe"
-msgstr "Zəhmət olmasa gta_sa.exe sənədini dəyişin"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Bu server xüsusi D3D9.DLL işlətməyə icazə vermir"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "GTA qovluğundan D3D9.DLL sənədini silin, və MTA-nı yenidən başlatın"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-msgid "This server does not allow virtual machines"
-msgstr "Bu server virtual maşınlara icazə vermir"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
-msgid "This server requires driver signing to be enabled"
-msgstr "Bu server driver imzası qoşulu olmasını tələb eləyir"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
-msgid "Please restart your PC"
-msgstr "Zəhmət olmasa, kompüterivizi yenidən başlatın"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
-msgid "This server has detected missing anti-cheat components"
-msgstr "Bu server itkin anti-cheat komponentləri aşkar etdi"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
-msgid "Try restarting MTA"
-msgstr "MTA-nı yenidən başlatın"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Bu server dəyişilməmiş gta3.img və gta_int.img tələb eləyir"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
-msgid "Please replace gta3.img or gta_int.img"
-msgstr "Zəhmət olmasa, gta3.img yada gta_int.img sənədini dəyişin"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
-msgid "This server does not allow Wine"
-msgstr "Bu server Wine tətbiqinə icazə vermir"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Başqa heç bir proqram MTA: SA-nı dəyişdirmədiyini yoxlayın"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "Time Remaining: "
-msgstr "Qalan vaxt: "
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d gün"
-msgstr[1] "%d gün"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d saat"
-msgstr[1] "%d saat"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d dəqiqə"
-msgstr[1] "%d dəqiqə"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d saniyə"
-msgstr[1] "%d saniyə"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
-msgid "Disconnected"
-msgstr "Bağlantı kəsildi"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Yerli server başlatıla bilmədi. Məlumat üçün konsola baxın."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Xəta: Yerli server başlatıla bilmədi. [%s]"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Yükləmə xətası: %s"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-msgid "Entering the game ..."
-msgstr "Oyuna qoşulur..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Qoşula bilmədi; zəhmət olmasa Tez Qoşul və ya 'connect' kodunu işlədib bir serverə qoşulun."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-msgid "The server is not installed"
-msgstr "Server quraşdırılmıyıb"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Local Server"
-msgstr "Yerli Server"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-msgid "Starting local server ..."
-msgstr "Yerli server başlanılır ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "Sizi serverdən təpiklədilər ( %s )"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Connecting to local server..."
-msgstr "Yerli serverə qoşulma gedir..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-msgid "Error connecting to server."
-msgstr "Serverə qoşularkən xəta baş verdi."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Yerli serverə qoşulma vaxtı bitdi. Ətraflı məlumat üçün konsola baxın."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-msgid "Connection with the server was lost"
-msgstr "Server ilə bağlantı itdi"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
-msgid "Disconnected: the server is currently full"
-msgstr "Bağlantı kəsildi: server hal hazırda doludur"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
-msgid "Disconnected: invalid password specified"
-msgstr "Bağlantı kəsildi: yanlış şifrə daxil olunub"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
-msgid "MTA Client verification failed!"
-msgstr "MTA klient yoxlanması alınmadı"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Xəritə yükləmə tərəqqisi:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Yükləmə tərəqqisi:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s'dan %s'ı"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Yükləməni dayandırmaq üçün serverdən ayırılın"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "SERVER QURAŞDIR"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Resurslar"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Server adı:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Şifrə:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Maks oyunçu:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Yayım:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "LAN"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Seçilib"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Hamısı"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Başlat"
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
-msgid "Problem with graphics driver"
-msgstr "Ekran-kartı drayver xətası"
-
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "Uyğun görüntü imkanı tapılmadı."
-
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Bu görüntü imkanını işlətməyinizdə əminsiniz?"
-
-#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+#: Client/loader/Dialogs.cpp:130
+msgid "Quit"
+msgstr "Çıx"
+
+#: Client/loader/Dialogs.cpp:147
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas problemlə qarşılaşdı"
+
+#: Client/loader/Dialogs.cpp:148
+msgid "Crash information"
+msgstr "Çökmə məlumatı"
+
+#: Client/loader/Dialogs.cpp:149
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Çökmə məlumatını 'internet' vasitəsi ilə MTA inşaatçılarına göndərmək üçün quş qoyun"
+
+#: Client/loader/Dialogs.cpp:150
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Bu addımla çökmə səbəbinin düzəliş şansını artıra bilərsiniz."
+
+#: Client/loader/Dialogs.cpp:151
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "MTA: San Andreas tətbiqini yenidən başlatmaq istəyirsiniz?"
+
+#: Client/loader/Dialogs.cpp:158
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Xəbərdarlıq"
+
+#: Client/loader/Dialogs.cpp:159
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "Sizin Grand Theft Auto: San Andreas quraşdırma qovluğunda göstərilmiş sənəd var:"
+
+#: Client/loader/Dialogs.cpp:161
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "Bu sənəd lazım deyil və MTA-nın bu versiyasındakı qrafiki xüsisiyyətlikləri ilə problem yarada bilər.\n\n"
+"Göstərilmiş sənədinin silməniz vəya yenidən adlandırmanız tələb olunur."
+
+#: Client/loader/Dialogs.cpp:163
+msgid "Keep these files, but also show this warning on next start"
+msgstr "Göstərilmiş sənədi işlət, və mənə gələn dəfə bu xəbərdarlıqı göstər"
+
+#: Client/loader/Dialogs.cpp:164
+msgid "Do not remind me about these files again"
+msgstr "Bu sənəd haqqında xəbərdarlıq göstərmə"
+
+#: Client/loader/Dialogs.cpp:165
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "Sənədi *.dll yerinə *.dll.bak adlandır"
+
+#: Client/loader/Dialogs.cpp:166
+msgid "Show me these files"
+msgstr "Mənə sənədi göstər"
+
+#: Client/loader/Dialogs.cpp:167
+msgid "Play MTA:SA"
+msgstr "MTA:SA Oyna"
+
+#: Client/loader/Dialogs.cpp:173
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - Çaşqın seçimlər"
+
+#: Client/loader/Dialogs.cpp:174
+msgid "NVidia Optimus detected!"
+msgstr "NVidia Optimus aşkarlandı!"
+
+#: Client/loader/Dialogs.cpp:175
+msgid "Try each option and see what works:"
+msgstr "Hər seçimi dənə və nəyin işlədiyini gör:"
+
+#: Client/loader/Dialogs.cpp:176
+msgid "A - Standard NVidia"
+msgstr "A - Standard NVidia"
+
+#: Client/loader/Dialogs.cpp:177
+msgid "B - Alternate NVidia"
+msgstr "B - Alternativ NVidia"
+
+#: Client/loader/Dialogs.cpp:178
+msgid "C - Standard NVidia with exe rename"
+msgstr "C - Standart NVidia exe yenidən adlandırılması ilə"
+
+#: Client/loader/Dialogs.cpp:179
+msgid "D - Alternate NVidia with exe rename"
+msgstr "D - Alternativ NVidia exe yenidən adlandırılması ilə"
+
+#: Client/loader/Dialogs.cpp:180
+msgid "E - Standard Intel"
+msgstr "E - Standart Intel"
+
+#: Client/loader/Dialogs.cpp:181
+msgid "F - Alternate Intel"
+msgstr "F - Alternativ Intel"
+
+#: Client/loader/Dialogs.cpp:182
+msgid "G - Standard Intel with exe rename"
+msgstr "G - Standart Intel exe yenidən adlandırılması ilə"
+
+#: Client/loader/Dialogs.cpp:183
+msgid "H - Alternate Intel with exe rename"
+msgstr "H - Alternativ Intel exe yenidən adlandırılması ilə"
+
+#: Client/loader/Dialogs.cpp:184
+msgid "If you get desperate, this might help:"
+msgstr "Ümidsiz olsanız, bu sizə kömək edə bilər:"
+
+#: Client/loader/Dialogs.cpp:185
+msgid "If you have already selected an option that works, this might help:"
+msgstr "İşləyən bir seçim təyin etmisinizsə, bu kömək edə bilər:"
+
+#: Client/loader/Dialogs.cpp:186
+msgid "Force windowed mode"
+msgstr "Məcburi pəncərə rejimi"
+
+#: Client/loader/Dialogs.cpp:187
+msgid "Don't show again"
+msgstr "Yenidən göstərmə"
+
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "MTA Serverini dayandırmaq və yeniləməyə davam etmək istəyirsiniz?"
+#: Client/loader/Dialogs.cpp:195
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Xəbərdarlıq: Anti-virus programı aşkarlanmadı"
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Yeniləmə quraşdırılır..."
+#: Client/loader/Dialogs.cpp:197
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA kompüterivizdə anti-virus programı tapa bilmədi.\n\n"
+"Viruslar MTA-ya müdaxilə edə bilər və oyununuzu korlaya bilər.\n\n"
+"Daha çox məlumat üçün 'Kömək' düyməsinə basın."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Sənədlər çıxarılır..."
+#: Client/loader/Dialogs.cpp:200
+msgid "I have already installed an anti-virus"
+msgstr "Mənim anti-virusum var"
 
-#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:890
+#: Client/loader/Dialogs.cpp:202
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Anti-virüs yükləməyəcəm.\n"
+"Kompüterimin donması ve botnetin parçası omlmağını istəyirəm."
+
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:747
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto San Andreas axtarılır..."
 
-#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:893
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:749
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Zəhmət olmasa Grand Theft Auto San Andreas'i başlat"
 
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Grand Theft Auto: San Andreas quraşdırma qovluğunu seçin"
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:187
+msgid "Installing update..."
+msgstr "Yeniləmə quraşdırılır..."
 
-#: Client/loader/Utils.cpp:1182 Client/loader/CInstallManager.cpp:329
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:287
+msgid "Extracting files..."
+msgstr "Sənədlər çıxarılır..."
+
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1605
+msgid "Copying files..."
+msgstr "Sənədlər köçürülür..."
+
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1665
+msgid "Copy finished early. Everything OK."
+msgstr "Köçürtmə tamamlandı. Hər şey yaxşıdır."
+
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1671
+msgid "Finishing..."
+msgstr "Tamamlanır..."
+
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1673
+msgid "Done!"
+msgstr "Hazırdır!"
+
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2564,69 +2699,6 @@ msgid "MTA:SA needs Administrator access for the following task:\n\n"
 msgstr "MTA:SA cari tapşırıq üçün idarəçi haqqını tələb eləyir:\n\n"
 "'%s'\n\n"
 "Zəhmət olmasa sonrakı pəncərədə icazə verin."
-
-#: Client/loader/Utils.cpp:1283
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "%s modulunun yüklənməsində xəta baş verdi! (%s)"
-
-#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:914
-msgid "Copying files..."
-msgstr "Sənədlər köçürülür..."
-
-#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:919
-msgid "Copy finished early. Everything OK."
-msgstr "Köçürtmə tamamlandı. Hər şey yaxşıdır."
-
-#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:924
-msgid "Finishing..."
-msgstr "Tamamlanır..."
-
-#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:928
-msgid "Done!"
-msgstr "Hazırdır!"
-
-#: Client/loader/Utils.cpp:1713
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "%s yeni quraşdırma versiyası aşkarlandı.\n\n"
-"%s -dən seçimlərinizi köçürtmək istəyirsiniz?"
-
-#: Client/loader/Utils.cpp:1752
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA '%s' sənədini oxuyanda xəta baş verdi"
-
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA '%s' sənədini tapa bilmədi."
-
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA modeli yükləyə bilmədi."
-
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Bu yaxınlarda gta3.img sənədini dəyişdirmisinizsə, GTA: SA-nı yenidən quraşdırmağa cəhd edin."
-
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA: SA nəqliyyata yığdırma əlavə edərkən problemlə üzləşdi."
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA '%s' sənədində xətalar tapdı"
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "MTA:SA oynayarkən kompüteriniz yenidən başladı?"
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr "Zəhmət olmasa davam etməzdən əvvəl tələb olunan proqramları sonlandırın:"
 
 #: Client/loader/CInstallManager.cpp:344
 #, c-format
@@ -2677,6 +2749,86 @@ msgstr "Yükləmə seçimlərini yenilə"
 #: Client/loader/CInstallManager.cpp:1070
 msgid "Update compatibility settings"
 msgstr "Uyğunluq seçimlərini yenilə"
+
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Grand Theft Auto: San Andreas quraşdırma qovluğunu seçin"
+
+#: Client/loader/Utils.cpp:1283
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "%s modulunun yüklənməsində xəta baş verdi! (%s)"
+
+#: Client/loader/Utils.cpp:1713
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "%s yeni quraşdırma versiyası aşkarlandı.\n\n"
+"%s -dən seçimlərinizi köçürtmək istəyirsiniz?"
+
+#: Client/loader/Utils.cpp:1752
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA '%s' sənədini oxuyanda xəta baş verdi"
+
+#: Client/loader/Utils.cpp:1774
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA '%s' sənədini tapa bilmədi."
+
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA modeli yükləyə bilmədi."
+
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Bu yaxınlarda gta3.img sənədini dəyişdirmisinizsə, GTA: SA-nı yenidən quraşdırmağa cəhd edin."
+
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA: SA nəqliyyata yığdırma əlavə edərkən problemlə üzləşdi."
+
+#: Client/loader/Utils.cpp:1845
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA '%s' sənədində xətalar tapdı"
+
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "MTA:SA oynayarkən kompüteriniz yenidən başladı?"
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr "Zəhmət olmasa davam etməzdən əvvəl tələb olunan proqramları sonlandırın:"
+
+#: Client/loader/Install.cpp:92
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr "MTA Serverini dayandırmaq və yeniləməyə davam etmək istəyirsiniz?"
+
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr "Aero seçimlərinin yenilənməsi"
+
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr "Geniş yaddaş seçimlərini yenilə"
+
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr "DEP seçimlərinin yenilənməsi"
+
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr "Video-drayveri yeniləyin"
+
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr "Sənəd problemlərini düzəldin"
+
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "Ekran-kartı problemlərinin qarşısını almaq üçün əsas icra olunan sənədi köçürt"
 
 #: Client/loader/MainFunctions.cpp:242
 msgid "Trouble restarting MTA:SA\n\n"
@@ -2861,170 +3013,19 @@ msgstr "Grand Theft Auto: San Andreas başlanıla bilmədi. Zəhmət olmasa yeni
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas düzgün başlana bilmədi. Dayandırmaq istəyirsiniz?"
 
-#: Client/loader/Dialogs.cpp:130
-msgid "Quit"
-msgstr "Çıx"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "Uyğun görüntü imkanı tapılmadı."
 
-#: Client/loader/Dialogs.cpp:147
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas problemlə qarşılaşdı"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Bu görüntü imkanını işlətməyinizdə əminsiniz?"
 
-#: Client/loader/Dialogs.cpp:148
-msgid "Crash information"
-msgstr "Çökmə məlumatı"
-
-#: Client/loader/Dialogs.cpp:149
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Çökmə məlumatını 'internet' vasitəsi ilə MTA inşaatçılarına göndərmək üçün quş qoyun"
-
-#: Client/loader/Dialogs.cpp:150
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Bu addımla çökmə səbəbinin düzəliş şansını artıra bilərsiniz."
-
-#: Client/loader/Dialogs.cpp:151
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "MTA: San Andreas tətbiqini yenidən başlatmaq istəyirsiniz?"
-
-#: Client/loader/Dialogs.cpp:158
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Xəbərdarlıq"
-
-#: Client/loader/Dialogs.cpp:159
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Sizin Grand Theft Auto: San Andreas quraşdırma qovluğunda göstərilmiş sənəd var:"
-
-#: Client/loader/Dialogs.cpp:161
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "Bu sənəd lazım deyil və MTA-nın bu versiyasındakı qrafiki xüsisiyyətlikləri ilə problem yarada bilər.\n\n"
-"Göstərilmiş sənədinin silməniz vəya yenidən adlandırmanız tələb olunur."
-
-#: Client/loader/Dialogs.cpp:163
-msgid "Keep these files, but also show this warning on next start"
-msgstr "Göstərilmiş sənədi işlət, və mənə gələn dəfə bu xəbərdarlıqı göstər"
-
-#: Client/loader/Dialogs.cpp:164
-msgid "Do not remind me about these files again"
-msgstr "Bu sənəd haqqında xəbərdarlıq göstərmə"
-
-#: Client/loader/Dialogs.cpp:165
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Sənədi *.dll yerinə *.dll.bak adlandır"
-
-#: Client/loader/Dialogs.cpp:166
-msgid "Show me these files"
-msgstr "Mənə sənədi göstər"
-
-#: Client/loader/Dialogs.cpp:167
-msgid "Play MTA:SA"
-msgstr "MTA:SA Oyna"
-
-#: Client/loader/Dialogs.cpp:173
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Çaşqın seçimlər"
-
-#: Client/loader/Dialogs.cpp:174
-msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus aşkarlandı!"
-
-#: Client/loader/Dialogs.cpp:175
-msgid "Try each option and see what works:"
-msgstr "Hər seçimi dənə və nəyin işlədiyini gör:"
-
-#: Client/loader/Dialogs.cpp:176
-msgid "A - Standard NVidia"
-msgstr "A - Standard NVidia"
-
-#: Client/loader/Dialogs.cpp:177
-msgid "B - Alternate NVidia"
-msgstr "B - Alternativ NVidia"
-
-#: Client/loader/Dialogs.cpp:178
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - Standart NVidia exe yenidən adlandırılması ilə"
-
-#: Client/loader/Dialogs.cpp:179
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - Alternativ NVidia exe yenidən adlandırılması ilə"
-
-#: Client/loader/Dialogs.cpp:180
-msgid "E - Standard Intel"
-msgstr "E - Standart Intel"
-
-#: Client/loader/Dialogs.cpp:181
-msgid "F - Alternate Intel"
-msgstr "F - Alternativ Intel"
-
-#: Client/loader/Dialogs.cpp:182
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Standart Intel exe yenidən adlandırılması ilə"
-
-#: Client/loader/Dialogs.cpp:183
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternativ Intel exe yenidən adlandırılması ilə"
-
-#: Client/loader/Dialogs.cpp:184
-msgid "If you get desperate, this might help:"
-msgstr "Ümidsiz olsanız, bu sizə kömək edə bilər:"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "If you have already selected an option that works, this might help:"
-msgstr "İşləyən bir seçim təyin etmisinizsə, bu kömək edə bilər:"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "Force windowed mode"
-msgstr "Məcburi pəncərə rejimi"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "Don't show again"
-msgstr "Yenidən göstərmə"
-
-#: Client/loader/Dialogs.cpp:195
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Xəbərdarlıq: Anti-virus programı aşkarlanmadı"
-
-#: Client/loader/Dialogs.cpp:197
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA kompüterivizdə anti-virus programı tapa bilmədi.\n\n"
-"Viruslar MTA-ya müdaxilə edə bilər və oyununuzu korlaya bilər.\n\n"
-"Daha çox məlumat üçün 'Kömək' düyməsinə basın."
-
-#: Client/loader/Dialogs.cpp:200
-msgid "I have already installed an anti-virus"
-msgstr "Mənim anti-virusum var"
-
-#: Client/loader/Dialogs.cpp:202
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Anti-virüs yükləməyəcəm.\n"
-"Kompüterimin donması ve botnetin parçası omlmağını istəyirəm."
-
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr "Aero seçimlərinin yenilənməsi"
-
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr "Geniş yaddaş seçimlərini yenilə"
-
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr "DEP seçimlərinin yenilənməsi"
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr "Video-drayveri yeniləyin"
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr "Sənəd problemlərini düzəldin"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Ekran-kartı problemlərinin qarşısını almaq üçün əsas icra olunan sənədi köçürt"
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
+msgid "Problem with graphics driver"
+msgstr "Ekran-kartı drayver xətası"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
