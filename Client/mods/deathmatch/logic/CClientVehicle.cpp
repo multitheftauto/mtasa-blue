@@ -1068,7 +1068,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         m_ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
 
         // Reset handling to fit the vehicle
-        if (IsLocalEntity())
+        if (IsLocalEntity() || !(usModel < 400 || usModel > 611))
         {
             ushort usHandlingModelID = usModel;
             if (usHandlingModelID < 400 || usHandlingModelID > 611)
