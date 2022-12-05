@@ -231,7 +231,7 @@ inline SString GetClassTypeName(CClientPed*)
 }
 inline SString GetClassTypeName(CRemoteCall*)
 {
-    return "remotecall";
+    return "request";
 }
 inline SString GetClassTypeName(CClientProjectile*)
 {
