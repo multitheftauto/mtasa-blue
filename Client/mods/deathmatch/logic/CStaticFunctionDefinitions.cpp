@@ -2806,10 +2806,13 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
         if (ucVariant2 == 255 && ucVariant == 255)
             CClientVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
-        CClientVehicle* pVehicle = new CDeathmatchVehicle(m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariation, ucVariation2);
+        CClientVehicle* pVehicle = new CDeathmatchVehicle(m_pManager, NULL, INVALID_ELEMENT_ID, usModel, ucVariation, ucVariation2);;
 
         pVehicle->SetParent(Resource.GetResourceDynamicEntity());
         pVehicle->SetPosition(vecPosition);
+
+        CLuaArguments Arguments;
+        pVehicle->CallEvent("onClientVehicleCreate", Arguments, true);
 
         pVehicle->SetRotationDegrees(vecRotation);
         if (szRegPlate)
