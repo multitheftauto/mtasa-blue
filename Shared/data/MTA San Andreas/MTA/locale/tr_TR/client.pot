@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-03 15:59+0000\n"
-"PO-Revision-Date: 2022-12-05 18:20\n"
+"PO-Revision-Date: 2022-12-05 19:20\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -1527,7 +1527,7 @@ msgstr "Dinamik ped gölgeleri"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr "Hareket Bulanıklığı"
+msgstr "Hareket bulanıklılığı"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
