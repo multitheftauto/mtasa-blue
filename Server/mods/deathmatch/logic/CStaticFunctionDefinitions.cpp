@@ -4864,7 +4864,7 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
         pVehicle->SetRespawnRotationDegrees(vecRotation);
 
         CLuaArguments Arguments;
-        pVehicle->CallEvent("onVehicleCreate", Arguments);
+        pVehicle->CallEvent("onClientVehicleCreated", Arguments);
 
         if (szRegPlate && szRegPlate[0])
             pVehicle->SetRegPlate(szRegPlate);

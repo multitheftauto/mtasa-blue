@@ -2528,7 +2528,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPedStep", "foot", nullptr, false);
 
     // Vehicle events
-    m_Events.AddEvent("onClientVehicleCreate", "", NULL, false);
+    m_Events.AddEvent("onClientVehicleCreated", "", NULL, false);
     m_Events.AddEvent("onClientVehicleRespawn", "", NULL, false);
     m_Events.AddEvent("onClientVehicleEnter", "player, seat", NULL, false);
     m_Events.AddEvent("onClientVehicleExit", "player, seat", NULL, false);

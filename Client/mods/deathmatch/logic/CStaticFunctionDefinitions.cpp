@@ -2812,7 +2812,7 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
         pVehicle->SetPosition(vecPosition);
 
         CLuaArguments Arguments;
-        pVehicle->CallEvent("onClientVehicleCreate", Arguments, true);
+        pVehicle->CallEvent("onClientVehicleCreated", Arguments, true);
 
         pVehicle->SetRotationDegrees(vecRotation);
         if (szRegPlate)
