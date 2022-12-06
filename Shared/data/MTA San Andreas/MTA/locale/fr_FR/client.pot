@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-03 15:59+0000\n"
-"PO-Revision-Date: 2022-12-05 23:19\n"
+"PO-Revision-Date: 2022-12-06 00:19\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -1523,7 +1523,7 @@ msgstr "Fumée des pneus, etc"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr "Ombres dynamiques des piétons"
+msgstr "Ombrage dynamique des piétons"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
