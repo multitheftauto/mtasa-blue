@@ -14,13 +14,13 @@
 #undef GetFirstChild
 #include <core/CWebViewInterface.h>
 #include <core/CWebBrowserEventsInterface.h>
-#include <cef3/include/cef_app.h>
-#include <cef3/include/cef_browser.h>
-#include <cef3/include/cef_client.h>
-#include <cef3/include/cef_render_handler.h>
-#include <cef3/include/cef_life_span_handler.h>
-#include <cef3/include/cef_context_menu_handler.h>
-#include <cef3/include/cef_resource_request_handler.h>
+#include <cef3/cef/include/cef_app.h>
+#include <cef3/cef/include/cef_browser.h>
+#include <cef3/cef/include/cef_client.h>
+#include <cef3/cef/include/cef_render_handler.h>
+#include <cef3/cef/include/cef_life_span_handler.h>
+#include <cef3/cef/include/cef_context_menu_handler.h>
+#include <cef3/cef/include/cef_resource_request_handler.h>
 #include <SString.h>
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
@@ -59,6 +59,7 @@ public:
     SString            GetURL();
     const SString&     GetTitle();
     void               SetRenderingPaused(bool bPaused);
+    const bool         GetRenderingPaused() const;
     void               Focus(bool state = true);
     IDirect3DTexture9* GetTexture() { return static_cast<IDirect3DTexture9*>(m_pWebBrowserRenderItem->m_pD3DTexture); }
     void               ClearTexture();
@@ -130,7 +131,8 @@ public:
                              const CefString& failedURL) override;
 
     // CefRequestHandler methods
-    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture, bool isRedirect) override;
+    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture,
+                                bool isRedirect) override;
     virtual CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
                                                                            CefRefPtr<CefRequest> request, bool is_navigation, bool is_download,
                                                                            const CefString& request_initiator, bool& disable_default_handling) override
@@ -140,7 +142,7 @@ public:
 
     // CefResourceRequestHandler
     virtual CefResourceRequestHandler::ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
-                                                                CefRefPtr<CefRequestCallback> callback) override;
+                                                                        CefRefPtr<CefCallback> callback) override;
 
     // CefLifeSpawnHandler methods
     virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
@@ -156,8 +158,8 @@ public:
                             bool& suppress_message) override;
 
     // CefDialogHandler methods
-    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name,
-                              const std::vector<CefString>& accept_types, int selected_accept_filter, CefRefPtr<CefFileDialogCallback> callback) override;
+    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                              const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback) override;
 
     // CefDisplayHandler methods
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -176,6 +178,7 @@ private:
 
     bool                       m_bBeingDestroyed;
     bool                       m_bIsLocal;
+    bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
     POINT                      m_vecMousePosition;
     bool                       m_mouseButtonStates[3];

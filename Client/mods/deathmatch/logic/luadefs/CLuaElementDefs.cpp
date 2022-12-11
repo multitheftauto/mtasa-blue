@@ -51,6 +51,7 @@ void CLuaElementDefs::LoadFunctions()
         {"hasElementData", HasElementData},
         {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
+        {"getElementLighting", ArgumentParser<GetElementLighting>},
         {"isElementOnScreen", IsElementOnScreen},
         {"getElementHealth", GetElementHealth},
         {"getElementModel", GetElementModel},
@@ -156,6 +157,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getDimension", "getElementDimension");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
+    lua_classfunction(luaVM, "getLighting", "getElementLighting");
     lua_classfunction(luaVM, "getHealth", "getElementHealth");
     lua_classfunction(luaVM, "getModel", "getElementModel");
     lua_classfunction(luaVM, "getLowLOD", "getLowLODElement");
@@ -954,34 +956,34 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
-    std::optional<unsigned short> interior, std::optional<unsigned short> dimension)
+CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
+                                                            std::optional<unsigned short> dimension)
 {
-    const auto typeHash = (type.has_value() && !type.value().empty()) ?
-        CClientEntity::GetTypeHashFromString(type.value()) : 0;
-        
+    const auto typeHash = (type.has_value() && !type.value().empty()) ? CClientEntity::GetTypeHashFromString(type.value()) : 0;
+
     CClientEntityResult result;
-    GetClientSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
+    GetClientSpatialDatabase()->SphereQuery(result, CSphere{pos, radius});
 
     // Remove elements that do not match the criterias
-    result.erase(std::remove_if(result.begin(), result.end(), [&, radiusSq = radius * radius](CElement* pElement) {
-        // Check if element is within the sphere, becuase the spatial database is 2D
-        CVector elementPos;
-        pElement->GetPosition(elementPos);
-        if ((elementPos - pos).LengthSquared() > radiusSq)
-            return true;
+    if (interior || dimension || typeHash)
+    {
+        result.erase(std::remove_if(result.begin(), result.end(), [&, radiusSq = radius * radius](CElement* pElement) {
+            if (typeHash && typeHash != pElement->GetTypeHash())
+                return true;
 
-        if (typeHash && typeHash != pElement->GetTypeHash())
-            return true;
+            if (interior.has_value() && interior != pElement->GetInterior())
+                return true;
 
-        if (interior.has_value() && interior != pElement->GetInterior())
-            return true;
+            if (dimension.has_value() && dimension != pElement->GetDimension())
+                return true;
 
-        if (dimension.has_value() && dimension != pElement->GetDimension())
-            return true;
+            // Check if element is within the sphere, because the spatial database is 2D
+            if ((pElement->GetPosition() - pos).LengthSquared() > radiusSq)
+                return true;
 
-        return pElement->IsBeingDeleted();
-    }), result.end());
+            return pElement->IsBeingDeleted();
+        }), result.end());
+    }
 
     return result;
 }
@@ -1308,6 +1310,35 @@ int CLuaElementDefs::GetElementAlpha(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* entity)
+{
+    switch (entity->GetType())
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        {
+            CPlayerPed* ped = static_cast<CClientPed*>(entity)->GetGamePlayer();
+            if (ped) return ped->GetLighting();
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CVehicle* vehicle = static_cast<CClientVehicle*>(entity)->GetGameVehicle();
+            if (vehicle) return vehicle->GetLighting();
+            break;
+        }
+        case CCLIENTOBJECT:
+        {
+            CObject* object = static_cast<CClientObject*>(entity)->GetGameObject();
+            if (object) return object->GetLighting();
+            break;
+        }
+        default:
+            break;
+    }
+    return false;
 }
 
 int CLuaElementDefs::GetElementHealth(lua_State* luaVM)

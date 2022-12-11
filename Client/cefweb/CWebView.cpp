@@ -10,8 +10,8 @@
 #include "StdInc.h"
 #include "CWebView.h"
 #include "CAjaxResourceHandler.h"
-#include <cef3/include/cef_parser.h>
-#include <cef3/include/cef_task.h>
+#include <cef3/cef/include/cef_parser.h>
+#include <cef3/cef/include/cef_task.h>
 #include "CWebDevTools.h"
 
 CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent)
@@ -52,12 +52,8 @@ void CWebView::Initialise()
     browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
     browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
-    browserSettings.universal_access_from_file_urls =
-        cef_state_t::STATE_DISABLED;            // Also filtered by resource interceptor, but set this nevertheless
-    browserSettings.file_access_from_file_urls = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
 
-    browserSettings.plugins = cef_state_t::STATE_DISABLED;
     if (!m_bIsLocal)
     {
         bool bEnabledJavascript = g_pCore->GetWebCore()->GetRemoteJavascriptEnabled();
@@ -159,16 +155,21 @@ const SString& CWebView::GetTitle()
 void CWebView::SetRenderingPaused(bool bPaused)
 {
     if (m_pWebView)
+    {
         m_pWebView->GetHost()->WasHidden(bPaused);
+        m_bIsRenderingPaused = bPaused;
+    }
+}
+
+const bool CWebView::GetRenderingPaused() const
+{
+    return m_pWebView ? m_bIsRenderingPaused : false;
 }
 
 void CWebView::Focus(bool state)
 {
     if (m_pWebView)
-    {
         m_pWebView->GetHost()->SetFocus(state);
-        m_pWebView->GetHost()->SendFocusEvent(state);
-    }
 
     if (state)
         g_pCore->GetWebCore()->SetFocusedWebView(this);
@@ -450,7 +451,8 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
                 return;
 
             result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
-    }, this);
+        },
+        this);
 
     return result;
 }
@@ -496,7 +498,8 @@ bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
                 return;
 
             result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
-    }, this);
+        },
+        this);
 
     return result;
 }
@@ -816,7 +819,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 //                                                                //
 ////////////////////////////////////////////////////////////////////
 CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
-                                                              CefRefPtr<CefRequestCallback> callback)
+                                                                      CefRefPtr<CefCallback> callback)
 {
     // Mostly the same as CWebView::OnBeforeBrowse
     CefURLParts urlParts;
@@ -973,8 +976,8 @@ bool CWebView::OnJSDialog(CefRefPtr<CefBrowser> browser, const CefString& origin
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
-bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name,
-                            const std::vector<CefString>& accept_types, int selected_accept_filter, CefRefPtr<CefFileDialogCallback> callback)
+bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                            const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback)
 {
     // Don't show the dialog
     return true;

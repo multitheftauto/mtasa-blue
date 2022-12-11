@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "SharedUtil.IntTypes.h"
 #include <sys/timeb.h>
 #include <pthread.h>
 
@@ -21,6 +22,8 @@ struct timeval
     long tv_usec; /* and microseconds */
 };
 #endif
+#else
+    #include <sys/time.h>
 #endif
 
 namespace SharedUtil

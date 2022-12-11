@@ -28,7 +28,6 @@
 // SDK includes
 #include <core/CLocalizationInterface.h>
 #include <core/CTrayIconInterface.h>
-#include <core/CDiscordManagerInterface.h>
 #include <core/CCoreInterface.h>
 #include <core/CExceptionInformation.h>
 #include <xml/CXML.h>
@@ -163,4 +162,4 @@
 #include "logic/CResource.h"
 #include "logic/CStaticFunctionDefinitions.h"
 #include "logic/CResourceFileDownloadManager.h"
-#include "../../version.h"
+#include "version.h"

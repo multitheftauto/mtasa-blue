@@ -11,9 +11,10 @@
 
 #pragma once
 
+#include <game/CRenderWare.h>
 #include "CClientEntity.h"
 
-class CClientTXD : public CClientEntity
+class CClientTXD final : public CClientEntity
 {
     DECLARE_CLASS(CClientTXD, CClientEntity)
 public:

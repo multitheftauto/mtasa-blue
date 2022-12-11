@@ -10,9 +10,21 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehiclePuresyncPacket.h"
+#include "CVehicleManager.h"
+#include "CGame.h"
+#include "CTrainTrackManager.h"
+#include "CWeaponNames.h"
+#include "Utils.h"
+#include "lua/CLuaFunctionParseHelpers.h"
 #include "net/SyncStructures.h"
 
 extern CGame* g_pGame;
+
+CVehiclePuresyncPacket::CVehiclePuresyncPacket(CPlayer* pPlayer)
+{
+    m_pSourceElement = pPlayer;
+}
 
 //
 // NOTE: Any changes to this function will require similar changes to CSimVehiclePuresyncPacket::Read()

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -32,6 +34,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <time.h>
 
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
@@ -55,13 +58,6 @@
 
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#ifdef TIME_WITH_SYS_TIME
-#include <time.h>
-#endif
-#else
-#ifdef HAVE_TIME_H
-#include <time.h>
-#endif
 #endif
 
 #ifdef WIN32
@@ -208,46 +204,6 @@ struct timeval {
 #endif /* HAVE_SEND */
 
 
-#if 0
-#if defined(HAVE_RECVFROM)
-/*
- * Currently recvfrom is only used on udp sockets.
- */
-#if !defined(RECVFROM_TYPE_ARG1) || \
-    !defined(RECVFROM_TYPE_ARG2) || \
-    !defined(RECVFROM_TYPE_ARG3) || \
-    !defined(RECVFROM_TYPE_ARG4) || \
-    !defined(RECVFROM_TYPE_ARG5) || \
-    !defined(RECVFROM_TYPE_ARG6) || \
-    !defined(RECVFROM_TYPE_RETV)
-  /* */
-  Error Missing_definition_of_return_and_arguments_types_of_recvfrom
-  /* */
-#else
-#define sreadfrom(s,b,bl,f,fl) (ssize_t)recvfrom((RECVFROM_TYPE_ARG1)  (s),  \
-                                                 (RECVFROM_TYPE_ARG2 *)(b),  \
-                                                 (RECVFROM_TYPE_ARG3)  (bl), \
-                                                 (RECVFROM_TYPE_ARG4)  (0),  \
-                                                 (RECVFROM_TYPE_ARG5 *)(f),  \
-                                                 (RECVFROM_TYPE_ARG6 *)(fl))
-#endif
-#else /* HAVE_RECVFROM */
-#ifndef sreadfrom
-  /* */
-  Error Missing_definition_of_macro_sreadfrom
-  /* */
-#endif
-#endif /* HAVE_RECVFROM */
-
-
-#ifdef RECVFROM_TYPE_ARG6_IS_VOID
-#  define RECVFROM_ARG6_T int
-#else
-#  define RECVFROM_ARG6_T RECVFROM_TYPE_ARG6
-#endif
-#endif /* if 0 */
-
-
 /*
  * Function-like macro definition used to close a socket.
  */
@@ -312,6 +268,14 @@ struct timeval {
 #  define HAVE_BOOL_T
 #endif
 
+/* the type we use for storing a single boolean bit */
+#ifdef _MSC_VER
+typedef bool bit;
+#define BIT(x) bool x
+#else
+typedef unsigned int bit;
+#define BIT(x) bit x:1
+#endif
 
 /*
  * Redefine TRUE and FALSE too, to catch current use. With this
@@ -328,35 +292,6 @@ struct timeval {
 #endif
 
 #include "curl_ctype.h"
-
-/*
- * Typedef to 'int' if sig_atomic_t is not an available 'typedefed' type.
- */
-
-#ifndef HAVE_SIG_ATOMIC_T
-typedef int sig_atomic_t;
-#define HAVE_SIG_ATOMIC_T
-#endif
-
-
-/*
- * Convenience SIG_ATOMIC_T definition
- */
-
-#ifdef HAVE_SIG_ATOMIC_T_VOLATILE
-#define SIG_ATOMIC_T static sig_atomic_t
-#else
-#define SIG_ATOMIC_T static volatile sig_atomic_t
-#endif
-
-
-/*
- * Default return type for signal handlers.
- */
-
-#ifndef RETSIGTYPE
-#define RETSIGTYPE void
-#endif
 
 
 /*

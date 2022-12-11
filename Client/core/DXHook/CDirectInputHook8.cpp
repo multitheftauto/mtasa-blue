@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "detours/include/detours.h"
+#include <SharedUtil.Detours.h>
 
 template <>
 CDirectInputHook8* CSingleton<CDirectInputHook8>::m_pSingleton = NULL;
@@ -74,11 +74,7 @@ HRESULT CDirectInputHook8::API_DirectInput8Create(HINSTANCE hinst, DWORD dwVersi
 
 bool CDirectInputHook8::ApplyHook()
 {
-    // Hook DirectInput8Create.
-    m_pfnDirectInputCreate = reinterpret_cast<pDirectInputCreate>(
-        DetourFunction(DetourFindFunction("DINPUT8.DLL", "DirectInput8Create"), reinterpret_cast<PBYTE>(API_DirectInput8Create)));
-
-    return true;
+    return DetourLibraryFunction("dinput8.dll", "DirectInput8Create", m_pfnDirectInputCreate, API_DirectInput8Create);
 }
 
 bool CDirectInputHook8::RemoveHook()
@@ -86,8 +82,7 @@ bool CDirectInputHook8::RemoveHook()
     // Make sure we should be doing this.
     if (m_pfnDirectInputCreate != NULL)
     {
-        // Unhook Direct3DCreate9.
-        DetourRemove(reinterpret_cast<PBYTE>(m_pfnDirectInputCreate), reinterpret_cast<PBYTE>(API_DirectInput8Create));
+        UndoFunctionDetour(m_pfnDirectInputCreate, API_DirectInput8Create);
 
         // Unset our hook variable.
         m_pfnDirectInputCreate = NULL;

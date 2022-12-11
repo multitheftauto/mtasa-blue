@@ -13,7 +13,7 @@
 CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
     m_pSoundManager = pManager->GetSoundManager();
-    m_pAudio = NULL;
+    m_pAudio = nullptr;
 
     SetTypeName("sound");
 
@@ -26,7 +26,7 @@ CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(t
     m_bPan = true;
     m_fPan = 0.0f;
 
-    m_pBuffer = NULL;
+    m_pBuffer = nullptr;
     m_uiFrameNumberCreated = g_pClientGame->GetFrameCount();
 }
 
@@ -436,7 +436,7 @@ bool CClientSound::SetLooped(bool bLoop)
 {
     if (m_bLoop == bLoop)
         return false;
-        
+
     m_bLoop = bLoop;
     m_SimulatedPlayPosition.SetLooped(bLoop);
 
@@ -643,6 +643,30 @@ bool CClientSound::IsFxEffectEnabled(uint uiFxEffect)
     return m_EnabledEffects[uiFxEffect] ? true : false;
 }
 
+bool CClientSound::SetFxEffectParameters(uint uiFxEffect, void* params)
+{
+    if (uiFxEffect >= NUMELMS(m_EnabledEffects))
+        return false;
+
+    if (m_pAudio)
+        if (m_pAudio->SetFxParameters(uiFxEffect, params))
+            return true;
+
+    return false;
+}
+
+bool CClientSound::GetFxEffectParameters(uint uiFxEffect, void* params)
+{
+    if (uiFxEffect >= NUMELMS(m_EnabledEffects))
+        return false;
+
+    if (m_pAudio)
+        if (m_pAudio->GetFxParameters(uiFxEffect, params))
+            return true;
+
+    return false;
+}
+
 ////////////////////////////////////////////////////////////
 //
 // CClientSound::Process3D
@@ -726,7 +750,7 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         }
         else if (eventInfo.type == SOUND_EVENT_STREAM_RESULT)
         {
-            // Call onClientSoundStream LUA event
+            // Call onClientSoundStream Lua event
             CLuaArguments Arguments;
             Arguments.PushBoolean(eventInfo.bBool);
             Arguments.PushNumber(eventInfo.dNumber);

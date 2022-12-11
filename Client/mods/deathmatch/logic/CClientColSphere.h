@@ -10,7 +10,7 @@
 
 #pragma once
 
-class CClientColSphere : public CClientColShape
+class CClientColSphere final : public CClientColShape
 {
     DECLARE_CLASS(CClientColSphere, CClientColShape)
 public:

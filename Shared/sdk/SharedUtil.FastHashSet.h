@@ -8,6 +8,9 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+
+#include <tuple>
 
 #if WITH_ALLOC_TRACKING
     #define CFastHashSet std::CSet

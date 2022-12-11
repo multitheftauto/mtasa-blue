@@ -8,8 +8,18 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#include "SharedUtil.File.h"
+#include "SharedUtil.Defines.h"
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Buffer.h"
+#include <algorithm>
 
 #ifdef WIN32
+    #ifndef NOMINMAX
+    #define NOMINMAX
+    #endif
+    #include "Windows.h"
     #include "shellapi.h"
     #include "shlobj.h"
     #include <shlwapi.h>
@@ -17,6 +27,8 @@
 #else
     #include <dirent.h>
     #include <sys/stat.h>
+    #include <unistd.h>
+    #include <limits.h>
 #endif
 
 //
@@ -107,7 +119,7 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
         return false;
 
     DWORD numBytesToRead = fileSize - static_cast<DWORD>(offset);
-    
+
     if (static_cast<size_t>(numBytesToRead) > maxSize)
         numBytesToRead = static_cast<DWORD>(maxSize);
 
@@ -133,7 +145,7 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     return true;
 #else
     struct stat64 info;
-    
+
     if (stat64(filePath, &info) != 0)
         return false;
 
@@ -419,8 +431,8 @@ SString SharedUtil::GetSystemCurrentDirectory()
         return GetSystemLongPathName(ToUTF8(szResult));
     return ToUTF8(szResult);
 #else
-    char szBuffer[MAX_PATH];
-    getcwd(szBuffer, MAX_PATH - 1);
+    char szBuffer[PATH_MAX];
+    getcwd(szBuffer, PATH_MAX - 1);
     return szBuffer;
 #endif
 }

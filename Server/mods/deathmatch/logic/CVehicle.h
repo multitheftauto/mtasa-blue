@@ -136,6 +136,13 @@ struct SSirenInfo
     SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
 };
 
+enum class VehicleBlowState : unsigned char
+{
+    INTACT,
+    AWAITING_EXPLOSION_SYNC,
+    BLOWN,
+};
+
 class CTrainTrack;
 
 class CVehicle final : public CElement
@@ -187,7 +194,7 @@ public:
     void           SetTurnSpeed(const CVector& vecTurnSpeed) { m_vecTurnSpeed = vecTurnSpeed; };
 
     float GetHealth() { return m_fHealth; };
-    void  SetHealth(float fHealth) { m_fHealth = fHealth; };
+    void  SetHealth(float fHealth);
     float GetLastSyncedHealth() { return m_fLastSyncedHealthHealth; };
     void  SetLastSyncedHealth(float fHealth) { m_fLastSyncedHealthHealth = fHealth; };
 
@@ -322,8 +329,8 @@ public:
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);
     void Respawn();
 
-    void                  GenerateHandlingData();
-    CHandlingEntry*       GetHandlingData() { return m_pHandlingEntry; };
+    void            GenerateHandlingData();
+    CHandlingEntry* GetHandlingData() { return m_pHandlingEntry; };
 
     uint GetTimeSinceLastPush() { return (uint)(CTickCount::Now(true) - m_LastPushedTime).ToLongLong(); }
     void ResetLastPushTime() { m_LastPushedTime = CTickCount::Now(true); }
@@ -337,9 +344,14 @@ public:
 
     void ResetDoors();
     void ResetDoorsWheelsPanelsLights();
-    void SetIsBlown(bool bBlown);
-    bool GetIsBlown();
+
     bool IsBlowTimerFinished();
+    void ResetExplosionTimer();
+
+    bool             IsBlown() const noexcept { return m_blowState != VehicleBlowState::INTACT; }
+    void             SetBlowState(VehicleBlowState state);
+    VehicleBlowState GetBlowState() const noexcept { return m_blowState; }
+
     void StopIdleTimer();
     void RestartIdleTimer();
     bool IsIdleTimerRunning();
@@ -368,6 +380,8 @@ private:
     float          m_fLastSyncedHealthHealth;
     CTickCount     m_llBlowTime;
     CTickCount     m_llIdleTime;
+
+    VehicleBlowState m_blowState = VehicleBlowState::INTACT;
 
     unsigned char m_ucMaxPassengersOverride;
 

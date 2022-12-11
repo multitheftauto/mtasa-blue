@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerClothes.h"
 
 static const SPlayerClothingType g_clothesNames[PLAYER_CLOTHING_SLOTS] = {
     {"Torso"},           {"Hair"},     {"Legs"},       {"Shoes"},       {"Left Upper Arm"}, {"Left Lower Arm"}, {"Right Upper Arm"},
@@ -308,6 +309,9 @@ const SPlayerClothing* CPlayerClothes::GetClothing(unsigned char ucType)
 
 void CPlayerClothes::AddClothes(const char* szTexture, const char* szModel, unsigned char ucType)
 {
+    if (ucType >= PLAYER_CLOTHING_SLOTS)
+        return;
+
     const SPlayerClothing* pClothing = GetClothing(szTexture, szModel, ucType);
     if (pClothing && pClothing != m_Clothes[ucType])
     {
@@ -318,6 +322,9 @@ void CPlayerClothes::AddClothes(const char* szTexture, const char* szModel, unsi
 
 bool CPlayerClothes::RemoveClothes(unsigned char ucType)
 {
+    if (ucType >= PLAYER_CLOTHING_SLOTS)
+        return false;
+
     // Do we have any set clothes on this slot?
     if (m_Clothes[ucType])
     {

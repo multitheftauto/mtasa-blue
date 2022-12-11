@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CSettings.h>
 
 using std::vector;
 
@@ -41,6 +42,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_bUseCEGUI = false;
     m_iCVarsRevision = -1;
     m_bVisible = false;
+    m_bInputBlocked = false;
     m_bInputVisible = false;
     m_pFont = m_pManager->GetClearFont();
     m_pDXFont = NULL;
@@ -149,8 +151,8 @@ void CChat::LoadCVars()
 //
 void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
 {
-    // Are we visible?
-    if (!m_bVisible)
+    // Are we visible and is input blocked?
+    if (!m_bVisible && m_bInputBlocked)
         return;
 
     // Is it time to update all the chat related cvars?
@@ -163,6 +165,19 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
 
     bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
     DrawInputLine(bUsingOutline);
+
+    if (m_bInputVisible)
+    {
+        // ChrML: Hack so chatbox input always works. It might get unfocused..
+        if (!m_pBackground->IsActive())
+        {
+            m_pBackground->Activate();
+        }
+    }
+
+    // Are we visible?
+    if (!m_bVisible)
+        return;
 
     // Get drawList for the chat box text
     SDrawList drawList;
@@ -206,9 +221,8 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
             if (m_iReportCount < 5)
             {
                 m_iReportCount++;
-                SString strAdapterName = g_pDeviceState->AdapterState.Name;
                 AddReportLog(6532, SString("Chat rt chatSize:%2.0f %2.0f   rtsize:%d %d   card:%s", chatSize.fX, chatSize.fY, iRenderTargetSizeX,
-                                           iRenderTargetSizeY, *strAdapterName));
+                                           iRenderTargetSizeY, g_pDeviceState->AdapterState.Name.c_str()));
             }
         }
         m_iCacheTextureRevision = -1;            // Make sure the graphics will be updated
@@ -291,15 +305,6 @@ void CChat::GetDrawList(SDrawList& outDrawList, bool bUsingOutline)
         m_pBackground->SetVisible(true);
         m_pBackground->Render();
         m_pBackground->SetVisible(false);
-    }
-
-    if (m_bInputVisible)
-    {
-        // ChrML: Hack so chatbox input always works. It might get unfocused..
-        if (!m_pBackground->IsActive())
-        {
-            m_pBackground->Activate();
-        }
     }
 
     // Used for render clipping in CChat::DrawTextString
@@ -771,17 +776,18 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
     return true;
 }
 
-void CChat::SetVisible(bool bVisible)
+void CChat::SetVisible(bool bVisible, bool bInputBlocked)
 {
     m_bVisible = bVisible;
-    // If hiding chat, also reset chat input line
-    if (!m_bVisible)
+    m_bInputBlocked = bInputBlocked;
+
+    if (m_bInputBlocked)
         SetInputVisible(false);
 }
 
 void CChat::SetInputVisible(bool bVisible)
 {
-    if (!IsVisible())
+    if (m_bInputBlocked)
         bVisible = false;
 
     if (!bVisible)
