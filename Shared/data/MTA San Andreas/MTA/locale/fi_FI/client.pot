@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 15:40+0000\n"
-"PO-Revision-Date: 2022-12-12 15:44\n"
+"POT-Creation-Date: 2022-12-12 16:01+0000\n"
+"PO-Revision-Date: 2022-12-12 16:44\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -168,8 +168,8 @@ msgstr "Latausvirhe: %s"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/loader/CInstallManager.cpp:510 Client/loader/CInstallManager.cpp:519
-#: Client/loader/CInstallManager.cpp:608 Client/loader/MainFunctions.cpp:246
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
 #: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
 #: Client/loader/MainFunctions.cpp:818
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -874,7 +874,7 @@ msgstr "Erityiskiitokset"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Tämä ohjelma käyttää hyväksi seuraavia kirjastoja ja ohjelmia:"
 
-#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:746
+#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA ei voi jatkaa, koska %s levyllä ei ole tarpeeksi tilaa."
@@ -2686,7 +2686,7 @@ msgstr "Viimeistellään…"
 msgid "Done!"
 msgstr "Valmis!"
 
-#: Client/loader/CInstallManager.cpp:319 Client/loader/Utils.cpp:1182
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2695,53 +2695,53 @@ msgstr "MTA:SA tarvitsee järjestelmänvalvojan käyttöoikeudet seuraavaan teht
 "  '%s'\n\n"
 "Vahvista seuraavassa ikkunassa."
 
-#: Client/loader/CInstallManager.cpp:334
+#: Client/loader/CInstallManager.cpp:344
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA ei voinut suorittaa seuraavaa tehtävää:\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:384
+#: Client/loader/CInstallManager.cpp:394
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Ohjelma kaatui grafiikka-ajurin virheen myötä **\n\n"
 "** Ole hyvä ja päivitä grafiikka-ajurisi **"
 
-#: Client/loader/CInstallManager.cpp:490
+#: Client/loader/CInstallManager.cpp:500
 msgid "Install updated MTA:SA files"
 msgstr "Asenna päivitetyt MTA:SA-tiedostot"
 
-#: Client/loader/CInstallManager.cpp:510
+#: Client/loader/CInstallManager.cpp:520
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Päivitys epäonnistui tiedostojen välisen ristiriidan takia. Ole hyvä ja sulje muut sovellukset ja kokeile uudelleen."
 
-#: Client/loader/CInstallManager.cpp:519
+#: Client/loader/CInstallManager.cpp:529
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Autoa ei ole asennettu oikein, ole hyvä ja asenna se uudelleen. %s"
 
-#: Client/loader/CInstallManager.cpp:574 Client/loader/CInstallManager.cpp:606
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "MTA:SA ei pysty jatkamaan, koska seuraavat tiedostot ovat virheellisiä:"
 
-#: Client/loader/CInstallManager.cpp:599
+#: Client/loader/CInstallManager.cpp:609
 msgid "Patch GTA"
 msgstr "Korjaa GTA"
 
-#: Client/loader/CInstallManager.cpp:802
+#: Client/loader/CInstallManager.cpp:812
 msgid "Missing file:"
 msgstr "Puuttuva tiedosto:"
 
-#: Client/loader/CInstallManager.cpp:806
+#: Client/loader/CInstallManager.cpp:816
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Jos MTA ei lataudu, asenna GTA:SA uudelleen"
 
-#: Client/loader/CInstallManager.cpp:927
+#: Client/loader/CInstallManager.cpp:937
 msgid "Update install settings"
 msgstr "Päivitä asennusasetukset"
 
-#: Client/loader/CInstallManager.cpp:1060
+#: Client/loader/CInstallManager.cpp:1070
 msgid "Update compatibility settings"
 msgstr "Päivitä yhteensopivuusasetukset"
 
