@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 15:40+0000\n"
-"PO-Revision-Date: 2022-12-12 15:47\n"
+"POT-Creation-Date: 2022-12-12 16:01+0000\n"
+"PO-Revision-Date: 2022-12-12 16:48\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -168,8 +168,8 @@ msgstr "Erro de download: %s"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/loader/CInstallManager.cpp:510 Client/loader/CInstallManager.cpp:519
-#: Client/loader/CInstallManager.cpp:608 Client/loader/MainFunctions.cpp:246
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
 #: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
 #: Client/loader/MainFunctions.cpp:818
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -874,7 +874,7 @@ msgstr "Agradecimentos especiais"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Este software faz uso das seguintes bibliotecas e software:"
 
-#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:746
+#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "O MTA:SA não pôde continuar com a instalação porque o disco %s não possui espaço suficiente."
@@ -2692,7 +2692,7 @@ msgstr "Concluindo..."
 msgid "Done!"
 msgstr "Pronto!"
 
-#: Client/loader/CInstallManager.cpp:319 Client/loader/Utils.cpp:1182
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2701,53 +2701,53 @@ msgstr "MTA:SA precisa de acesso do administrador para a seguinte tarefa:\n\n"
 "  '%s'\n\n"
 "Por favor confirme na próxima janela."
 
-#: Client/loader/CInstallManager.cpp:334
+#: Client/loader/CInstallManager.cpp:344
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "O MTA:SA não pôde completar a seguinte tarefa:\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:384
+#: Client/loader/CInstallManager.cpp:394
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** O travamento foi causado por uma falha no driver de vídeo **\n\n"
 "** Atualize o driver da sua placa de vídeo **"
 
-#: Client/loader/CInstallManager.cpp:490
+#: Client/loader/CInstallManager.cpp:500
 msgid "Install updated MTA:SA files"
 msgstr "A instalação atualizou os arquivos do MTA:SA"
 
-#: Client/loader/CInstallManager.cpp:510
+#: Client/loader/CInstallManager.cpp:520
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Não foi possível realizar a atualização devido a conflitos entre arquivos. Feche todos os outros programas e tente novamente"
 
-#: Client/loader/CInstallManager.cpp:519
+#: Client/loader/CInstallManager.cpp:529
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "O Multi Theft Auto não foi instalado corretamente. Reinstale por favor. %s"
 
-#: Client/loader/CInstallManager.cpp:574 Client/loader/CInstallManager.cpp:606
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "O MTA:SA não pôde continuar porque os seguintes arquivos estão incorretos:"
 
-#: Client/loader/CInstallManager.cpp:599
+#: Client/loader/CInstallManager.cpp:609
 msgid "Patch GTA"
 msgstr "Corrigir GTA"
 
-#: Client/loader/CInstallManager.cpp:802
+#: Client/loader/CInstallManager.cpp:812
 msgid "Missing file:"
 msgstr "Faltando arquivo:"
 
-#: Client/loader/CInstallManager.cpp:806
+#: Client/loader/CInstallManager.cpp:816
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Se o MTA falhar ao carregar, por favor reinstale o GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:927
+#: Client/loader/CInstallManager.cpp:937
 msgid "Update install settings"
 msgstr "Atualizar as configurações de instalação"
 
-#: Client/loader/CInstallManager.cpp:1060
+#: Client/loader/CInstallManager.cpp:1070
 msgid "Update compatibility settings"
 msgstr "Atualizar configurações de compatibilidade"
 
