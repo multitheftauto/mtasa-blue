@@ -8,6 +8,7 @@
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_UNSTABLE
 //      2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/netc.dll (preferably run utils/buildactions/install_data.lua)
 // Per the above, take note of AC constraints of building a fork (see https://wiki.multitheftauto.com/wiki/Forks)
+// If you wish to get past "15% AC" constraints and use "official MTA full anticheat", read this new article: https://wiki.multitheftauto.com/wiki/Forks_Full_AC
 //
 // To compile a client for development and debugging purposes (e.g to avoid AC kicks for attaching a debugger like WinDbg):
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
