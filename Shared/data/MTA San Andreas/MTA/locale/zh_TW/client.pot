@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-03 15:59+0000\n"
-"PO-Revision-Date: 2022-12-03 16:05\n"
+"POT-Creation-Date: 2022-12-12 15:40+0000\n"
+"PO-Revision-Date: 2022-12-12 15:43\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -168,8 +168,8 @@ msgstr "下載錯誤: %s"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
+#: Client/loader/CInstallManager.cpp:510 Client/loader/CInstallManager.cpp:519
+#: Client/loader/CInstallManager.cpp:608 Client/loader/MainFunctions.cpp:246
 #: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
 #: Client/loader/MainFunctions.cpp:818
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -870,7 +870,7 @@ msgstr "特別感謝"
 msgid "This software makes use of the following libraries and software:"
 msgstr "這個軟體曾使用到以下函式和軟體來協助："
 
-#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
+#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:746
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTASA不能繼續,因為磁碟機 %s 空間不足"
@@ -2685,7 +2685,7 @@ msgstr "正在完成..."
 msgid "Done!"
 msgstr "完成!"
 
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
+#: Client/loader/CInstallManager.cpp:319 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2694,53 +2694,53 @@ msgstr "MTA:SA 需要為以下的任務提供管理員權限:\n\n"
 " '%s'\n\n"
 "請在下一個窗口進行確定。"
 
-#: Client/loader/CInstallManager.cpp:344
+#: Client/loader/CInstallManager.cpp:334
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA 無法完成下列的任務:\n\n"
 " '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:394
+#: Client/loader/CInstallManager.cpp:384
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** 造成崩潰的原因是一個來自於圖形驅動程式的錯誤 **\n\n"
 "** 請更新你的顯示卡圖形驅動程式 **"
 
-#: Client/loader/CInstallManager.cpp:500
+#: Client/loader/CInstallManager.cpp:490
 msgid "Install updated MTA:SA files"
 msgstr "安裝已更新的 MTA:SA 文件"
 
-#: Client/loader/CInstallManager.cpp:520
+#: Client/loader/CInstallManager.cpp:510
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "由於文件衝突導致無法更新，請關閉其他軟體並重試"
 
-#: Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:519
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "MTA 並沒有被正確安裝，請重新安裝。%s"
 
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+#: Client/loader/CInstallManager.cpp:574 Client/loader/CInstallManager.cpp:606
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "MTA:SA因為下列檔案錯誤而無法繼續運行："
 
-#: Client/loader/CInstallManager.cpp:609
+#: Client/loader/CInstallManager.cpp:599
 msgid "Patch GTA"
 msgstr "修補GTA"
 
-#: Client/loader/CInstallManager.cpp:812
+#: Client/loader/CInstallManager.cpp:802
 msgid "Missing file:"
 msgstr "遺失檔案:"
 
-#: Client/loader/CInstallManager.cpp:816
+#: Client/loader/CInstallManager.cpp:806
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "如果MTA載入失敗，請重新安裝 GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:937
+#: Client/loader/CInstallManager.cpp:927
 msgid "Update install settings"
 msgstr "更新安裝設定"
 
-#: Client/loader/CInstallManager.cpp:1070
+#: Client/loader/CInstallManager.cpp:1060
 msgid "Update compatibility settings"
 msgstr "更新相容性設置"
 
