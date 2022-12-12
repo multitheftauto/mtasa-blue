@@ -978,7 +978,9 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
                 return true;
 
             // Check if element is within the sphere, because the spatial database is 2D
-            if ((pElement->GetPosition() - pos).LengthSquared() > radiusSq)
+            CVector elementPos;
+            pElement->GetPosition(elementPos);
+            if ((elementPos - pos).LengthSquared() > radiusSq)
                 return true;
 
             return pElement->IsBeingDeleted();
