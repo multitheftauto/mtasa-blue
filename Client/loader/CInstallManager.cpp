@@ -99,6 +99,16 @@ void CInstallManager::InitSequencer()
         CR "update_end: "                                                          ////// End of 'update game' //////
         CR "            CALL SwitchBackFromTempExe "                               //
         CR " "                                                                     //
+        CR "gta_version_check:"                                                    ////// Start of 'gta version check' //////
+        CR "            CALL ProcessGtaVersionCheck "                              //
+        CR "            IF LastResult == ok GOTO gta_version_end: "                //
+        CR "            IF LastResult == quit GOTO do_quit: "                      //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO gta_version_check: "              //
+        CR "            GOTO do_quit: "                                            // If changes as admin failed, then quit
+        CR "gta_version_end: "                                                     ////// End of 'gta version check' //////
+        CR " "                                                                     //
         CR "newlayout_check:"                                                      ////// Start of 'new layout check' //////
         CR "            CALL ProcessLayoutChecks "                                 //
         CR "            IF LastResult == ok GOTO newlayout_end: "                  //
