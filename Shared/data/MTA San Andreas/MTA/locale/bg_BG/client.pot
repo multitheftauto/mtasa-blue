@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 15:40+0000\n"
-"PO-Revision-Date: 2022-12-12 15:43\n"
+"POT-Creation-Date: 2022-12-12 16:01+0000\n"
+"PO-Revision-Date: 2022-12-12 16:43\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -168,8 +168,8 @@ msgstr "Грешка при изтегляне: %s"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/loader/CInstallManager.cpp:510 Client/loader/CInstallManager.cpp:519
-#: Client/loader/CInstallManager.cpp:608 Client/loader/MainFunctions.cpp:246
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
 #: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
 #: Client/loader/MainFunctions.cpp:818
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -874,7 +874,7 @@ msgstr "Специални Благодарности"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Този софтуер използва следните библиотеки и софтуери:"
 
-#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:746
+#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA не може да продължи, защото драйв %s няма достатъчно пространство."
@@ -2685,7 +2685,7 @@ msgstr "Завършване..."
 msgid "Done!"
 msgstr "Готово!"
 
-#: Client/loader/CInstallManager.cpp:319 Client/loader/Utils.cpp:1182
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2694,53 +2694,53 @@ msgstr "MTA:SA има нужда от Администраторски прав�
 "'%s'\n\n"
 "Моля потвърдете в следващия прозорец."
 
-#: Client/loader/CInstallManager.cpp:334
+#: Client/loader/CInstallManager.cpp:344
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA не упся да завърши следните задачи:\n\n"
 "'%s'\n"
 
-#: Client/loader/CInstallManager.cpp:384
+#: Client/loader/CInstallManager.cpp:394
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Крашът беше предизвикан от проблеми с графическите драйвъри **\n\n"
 "** Моля обновете графическите си драйвъри **"
 
-#: Client/loader/CInstallManager.cpp:490
+#: Client/loader/CInstallManager.cpp:500
 msgid "Install updated MTA:SA files"
 msgstr "Инсталирайте обновените MTA:SA файлове"
 
-#: Client/loader/CInstallManager.cpp:510
+#: Client/loader/CInstallManager.cpp:520
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Актуализирането не възможно поради файлови конфликти. Моля спрете другите приложения и опитайте"
 
-#: Client/loader/CInstallManager.cpp:519
+#: Client/loader/CInstallManager.cpp:529
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Mutli Theft Auto не беше инсталиран правилно, моля преинсталирайте. %s"
 
-#: Client/loader/CInstallManager.cpp:574 Client/loader/CInstallManager.cpp:606
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:599
+#: Client/loader/CInstallManager.cpp:609
 msgid "Patch GTA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:802
+#: Client/loader/CInstallManager.cpp:812
 msgid "Missing file:"
 msgstr "Липсващ файл:"
 
-#: Client/loader/CInstallManager.cpp:806
+#: Client/loader/CInstallManager.cpp:816
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Ако MTA не успее да зареди, моля преинсталирайте GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:927
+#: Client/loader/CInstallManager.cpp:937
 msgid "Update install settings"
 msgstr "Обновете инсталиращите настройки"
 
-#: Client/loader/CInstallManager.cpp:1060
+#: Client/loader/CInstallManager.cpp:1070
 msgid "Update compatibility settings"
 msgstr "Обновете съвместимите настройки"
 
