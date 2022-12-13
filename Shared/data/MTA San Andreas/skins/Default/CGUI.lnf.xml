@@ -72,6 +72,46 @@
             </FrameComponent>
         </ImagerySection>
 
+        <ImagerySection name="Button">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="ButtonTopLeft" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="ButtonTopRight" />
+                <Image type="BottomLeftCorner" imageset="CGUI-Images" image="ButtonBottomLeft" />
+                <Image type="BottomRightCorner" imageset="CGUI-Images" image="ButtonBottomRight" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="ButtonLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="ButtonTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="ButtonRight" />
+                <Image type="BottomEdge" imageset="CGUI-Images" image="ButtonBottom" />
+                <Image type="Background" imageset="CGUI-Images" image="ButtonCenter" />
+            </FrameComponent>
+        </ImagerySection>
+        
+        <ImagerySection name="SButton">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="SButtonTopLeft" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="SButtonTopRight" />
+                <Image type="BottomLeftCorner" imageset="CGUI-Images" image="SButtonBottomLeft" />
+                <Image type="BottomRightCorner" imageset="CGUI-Images" image="SButtonBottomRight" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="SButtonLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="SButtonTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="SButtonRight" />
+                <Image type="BottomEdge" imageset="CGUI-Images" image="SButtonBottom" />
+                <Image type="Background" imageset="CGUI-Images" image="SButtonCenter" />
+            </FrameComponent>
+        </ImagerySection>
+
     </WidgetLook>
 
     <WidgetLook name="CGUI/ScrollablePane">
@@ -163,7 +203,7 @@
             <Layer>
                 <Section section="caption" />
 		            <Section section="selected">
-                    <!--<Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />-->
+                    <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
 		            </Section>
             </Layer>
         </StateImagery>
@@ -179,7 +219,7 @@
             <Layer>
                 <Section section="caption" />
 		<Section section="main">
-	                <Colours topLeft="FF303030" topRight="FF303030" bottomLeft="FF303030" bottomRight="FF303030" />
+	                <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
 		</Section>
             </Layer>
         </StateImagery>
@@ -199,12 +239,12 @@
                     <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
 		                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
                 </Area>
-                <Image type="TopLeftCorner" imageset="CGUI-Images" image="Frame2TopLeft" />
-                <Image type="TopRightCorner" imageset="CGUI-Images" image="Frame2TopRight" />
-                <Image type="LeftEdge" imageset="CGUI-Images" image="Frame2Left" />
-                <Image type="TopEdge" imageset="CGUI-Images" image="Frame2Top" />
-                <Image type="RightEdge" imageset="CGUI-Images" image="Frame2Right" />
-                <Image type="Background" imageset="CGUI-Images" image="Frame2Background" />
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="TabTopLeft" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="TabTopRight" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="TabLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="TabTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="TabRight" />
+                <Image type="Background" imageset="CGUI-Images" image="TabBackground" />
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="inactive_frame">
@@ -215,12 +255,12 @@
                     <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
 		                <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
                 </Area>
-                <Image type="TopLeftCorner" imageset="CGUI-Images" image="FrameTopLeft" />
-                <Image type="TopRightCorner" imageset="CGUI-Images" image="FrameTopRight" />
-                <Image type="LeftEdge" imageset="CGUI-Images" image="FrameLeft" />
-                <Image type="TopEdge" imageset="CGUI-Images" image="FrameTop" />
-                <Image type="RightEdge" imageset="CGUI-Images" image="FrameRight" />
-                <Image type="Background" imageset="CGUI-Images" image="GenericBrush" />
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="TabTopLeft" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="TabTopRight" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="TabLeft" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="TabTop" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="TabRight" />
+                <Image type="Background" imageset="CGUI-Images" image="TabBackground" />
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="label">
@@ -238,7 +278,7 @@
         <StateImagery name="Normal">
             <Layer>
                 <Section section="inactive_frame">
-                    <Colours topLeft="FF171717" topRight="FF171717" bottomLeft="FF171717" bottomRight="FF171717" />
+                    <Colours topLeft="FF888888" topRight="FF888888" bottomLeft="FF888888" bottomRight="FF888888" />
                 </Section>
                 <Section section="label">
                     <ColourProperty name="NormalTextColour" />
@@ -247,8 +287,8 @@
         </StateImagery>
         <StateImagery name="Hover">
             <Layer>
-                <Section section="inactive_frame">
-                    <Colours topLeft="FF303030" topRight="FF303030" bottomLeft="FF303030" bottomRight="FF303030" />
+                <Section section="frame">
+                    <Colours topLeft="FFDDDDDD" topRight="FFDDDDDD" bottomLeft="FFDDDDDD" bottomRight="FFDDDDDD" />
                 </Section>
                 <Section section="label">
                     <ColourProperty name="HoverTextColour" />
@@ -258,7 +298,7 @@
         <StateImagery name="Selected">
             <Layer>
                 <Section section="frame">
-                    <Colours topLeft="FFEEEEEE" topRight="FFEEEEEE" bottomLeft="FFEEEEEE" bottomRight="FFEEEEEE" />
+                    <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
                 </Section>
                 <Section section="label">
                     <ColourProperty name="PushedTextColour" />
@@ -336,10 +376,10 @@
     </WidgetLook>
 
     <WidgetLook name="CGUI/Button">
-        <Property name="NormalTextColour" value="FF7C7C7C" />
-        <Property name="HoverTextColour" value="FFFFFFFF" />
-        <Property name="PushedTextColour" value="FF7C7C7C" />
-        <Property name="DisabledTextColour" value="FF383838" />
+        <Property name="NormalTextColour" value="FFAAAAAA" />
+        <Property name="HoverTextColour" value="FFAAAAFF" />
+        <Property name="PushedTextColour" value="FFFFFFFF" />
+        <Property name="DisabledTextColour" value="FF666666" />
         <Property name="WantsMultiClickEvents" value="False" />
         <ImagerySection name="label">
             <TextComponent>
@@ -355,8 +395,8 @@
         </ImagerySection>
         <StateImagery name="Normal">
             <Layer>
-                <Section look="CGUI/Shared" section="Frame2">
-                    <Colours topLeft="FF606060" topRight="FF606060" bottomLeft="FF606060" bottomRight="FF606060" />
+                <Section look="CGUI/Shared" section="SButton">
+                    <Colours topLeft="FF888888" topRight="FF888888" bottomLeft="FF888888" bottomRight="FF888888" />
                 </Section>
                 <Section section="label">
                     <ColourProperty name="NormalTextColour" />
@@ -365,7 +405,7 @@
         </StateImagery>
         <StateImagery name="Hover">
             <Layer>
-                <Section look="CGUI/Shared" section="Frame2">
+                <Section look="CGUI/Shared" section="Button">
 
                 </Section>
                 <Section section="label">
@@ -375,7 +415,7 @@
         </StateImagery>
         <StateImagery name="Pushed">
             <Layer>
-                <Section look="CGUI/Shared" section="Frame2">
+                <Section look="CGUI/Shared" section="Button">
 
                 </Section>
                 <Section section="label">
@@ -385,8 +425,8 @@
         </StateImagery>
         <StateImagery name="Disabled">
             <Layer>
-                <Section look="CGUI/Shared" section="Frame2">
-                    <Colours topLeft="FF282828" topRight="FF282828" bottomLeft="FF282828" bottomRight="FF282828" />
+                <Section look="CGUI/Shared" section="SButton">
+                    <Colours topLeft="FF444444" topRight="FF444444" bottomLeft="FF444444" bottomRight="FF444444" />
                 </Section>
                 <Section section="label">
                     <ColourProperty name="DisabledTextColour" />
@@ -469,7 +509,27 @@
                 <Image type="RightEdge" imageset="CGUI-Images" image="Frame2Right" />
                 <Image type="BottomEdge" imageset="CGUI-Images" image="Frame2Bottom" />
                 <Image type="Background" imageset="CGUI-Images" image="Frame2Background" />
-              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+              <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
+            </FrameComponent>
+        </ImagerySection>
+        <ImagerySection name="withtitle_frame_active">
+            <FrameComponent>
+                <Area>
+                    <Dim type="LeftEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="TopEdge"><AbsoluteDim value="0" /></Dim>
+                    <Dim type="RightEdge"><UnifiedDim scale="1" type="RightEdge" /></Dim>
+                    <Dim type="BottomEdge"><UnifiedDim scale="1" type="BottomEdge" /></Dim>
+                </Area>
+                <Image type="TopLeftCorner" imageset="CGUI-Images" image="Frame2TopLeft" />
+                <Image type="TopRightCorner" imageset="CGUI-Images" image="Frame2TopRight" />
+                <Image type="BottomLeftCorner" imageset="CGUI-Images" image="Frame2BottomLeft" />
+                <Image type="BottomRightCorner" imageset="CGUI-Images" image="Frame2BottomRight" />
+                <Image type="LeftEdge" imageset="CGUI-Images" image="Frame2Left" />
+                <Image type="TopEdge" imageset="CGUI-Images" image="Frame2Top" />
+                <Image type="RightEdge" imageset="CGUI-Images" image="Frame2Right" />
+                <Image type="BottomEdge" imageset="CGUI-Images" image="Frame2Bottom" />
+                <Image type="Background" imageset="CGUI-Images" image="Frame2Background" />
+              <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="notitle_frame">
@@ -489,7 +549,7 @@
                 <Image type="RightEdge" imageset="CGUI-Images" image="Frame2Right" />
                 <Image type="BottomEdge" imageset="CGUI-Images" image="Frame2Bottom" />
                 <Image type="Background" imageset="CGUI-Images" image="Frame2Background" />
-              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+              <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="withtitle_noframe_client_area">
@@ -509,7 +569,7 @@
                 <Image type="RightEdge" imageset="CGUI-Images" image="Frame2Right" />
                 <Image type="BottomEdge" imageset="CGUI-Images" image="Frame2Bottom" />
                 <Image type="Background" imageset="CGUI-Images" image="Frame2Background" />
-              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+              <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
             </FrameComponent>
         </ImagerySection>
         <ImagerySection name="notitle_noframe_client_area">
@@ -529,12 +589,12 @@
                 <Image type="RightEdge" imageset="CGUI-Images" image="Frame2Right" />
                 <Image type="BottomEdge" imageset="CGUI-Images" image="Frame2Bottom" />
                 <Image type="Background" imageset="CGUI-Images" image="Frame2Background" />
-              <Colours topLeft="FF202020" topRight="FF202020" bottomLeft="FF202020" bottomRight="FF202020" />
+              <Colours topLeft="FFFFFFFF" topRight="FFFFFFFF" bottomLeft="FFFFFFFF" bottomRight="FFFFFFFF" />
             </FrameComponent>
         </ImagerySection>
         <StateImagery name="ActiveWithTitleWithFrame">
             <Layer>
-                <Section section="withtitle_frame" />
+                <Section section="withtitle_frame_active" />
             </Layer>
         </StateImagery>
         <StateImagery name="InactiveWithTitleWithFrame">
@@ -717,8 +777,8 @@
                 <Area>
                     <Dim type="LeftEdge" ><AbsoluteDim value="0" /></Dim>
                     <Dim type="TopEdge" ><AbsoluteDim value="0" /></Dim>
-                    <Dim type="Width" ><UnifiedDim scale="0.9" type="Width" /></Dim>
-                    <Dim type="Height" ><UnifiedDim scale="0.9" type="Height" /></Dim>
+                    <Dim type="Width" ><UnifiedDim scale="1" type="Width" /></Dim>
+                    <Dim type="Height" ><UnifiedDim scale="1" type="Height" /></Dim>
                 </Area>
                 <Image imageset="CGUI-Images" image="ScrollbarThumb" />
               <!--<Colours topLeft="FFC1D1DA" topRight="FFC1D1DA" bottomLeft="FFC1D1DA" bottomRight="FFC1D1DA" />-->
