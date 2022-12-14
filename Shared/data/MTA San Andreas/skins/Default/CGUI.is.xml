@@ -88,7 +88,7 @@
     <Image Name="EWSizingCursorImage" XPos="15" YPos="106" Width="22" Height="11" />
     <Image Name="FrameTopLeftSquared" XPos="71" YPos="164" Width="8" Height="8" />
     <Image Name="HorzScrollContainer" XPos="42" YPos="70" Width="24" Height="20" />
-    <Image Name="NSSizingCursorImage" XPos="0" YPos="103" Width="0" Height="23" />
+    <Image Name="NSSizingCursorImage" XPos="1" YPos="103" Width="9" Height="23" />
     <Image Name="ProgressBottomRight" XPos="53" YPos="39" Width="10" Height="7" />
     <Image Name="TitleBarTopSelected" XPos="2" YPos="249" Width="22" Height="5" />
     <Image Name="VertScrollContainer" XPos="0" YPos="42" Width="19" Height="24" />
