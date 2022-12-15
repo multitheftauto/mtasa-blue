@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-12 16:01+0000\n"
-"PO-Revision-Date: 2022-12-12 16:44\n"
+"POT-Creation-Date: 2022-12-15 12:43+0000\n"
+"PO-Revision-Date: 2022-12-15 13:37\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -132,17 +132,10 @@ msgstr "(Fejlesztői mód) colshapes-ek megjelenítése"
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Fejlesztői mód) kiírja az alap játék hangjainak azonosítóját a debug chatbe"
 
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Letöltés hiba: %s"
-
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:588
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
@@ -155,23 +148,23 @@ msgstr "Letöltés hiba: %s"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1217
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1266
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:818
+#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:618 Client/core/CSettings.cpp:2924
+#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
+#: Client/core/CSettings.cpp:4674 Client/core/CGUI.cpp:87
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1192
-#: Client/core/CCore.cpp:1205 Client/core/CSettings.cpp:2924
-#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674
+#: Client/core/CCore.cpp:1192 Client/core/CCore.cpp:1205
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/loader/MainFunctions.cpp:246
-#: Client/loader/MainFunctions.cpp:261 Client/loader/MainFunctions.cpp:263
-#: Client/loader/MainFunctions.cpp:818
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -185,75 +178,6 @@ msgstr "Nem sikerült elindítani a helyi szervert. Információkért nyisd meg 
 #, c-format
 msgid "Error: Could not start local server. [%s]"
 msgstr "Hiba: Nem sikerült a helyi szerver indítása. [%s]"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "SZERVER INDÍTÁS"
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
-#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2001
-msgid "General"
-msgstr "Általános"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Erőforrások"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Szerver neve:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Jelszó:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Max játékos:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Sugárzás:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "Helyi hálózat"
-
-#. Create the tabs
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-msgid "Internet"
-msgstr "Internet"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Kijelölve"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Összes"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Indítás"
-
-#. Cancel button
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
-#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:132
-#: Client/gui/CGUIMessageBox_Impl.cpp:68
-msgid "Cancel"
-msgstr "Mégse"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
 msgid "Disconnected: Invalid nickname"
@@ -578,29 +502,458 @@ msgstr "Lecsatlakozva: a kapcsolat visszautasítva"
 msgid "MTA Client verification failed!"
 msgstr "MTA kliens ellenőrzése nem sikerült!"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Magyar"
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Letöltés hiba: %s"
 
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONZOL"
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "SZERVER INDÍTÁS"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Szeretnél néhány online tanácsot kapni erről a hibáról?"
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
+#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2001
+msgid "General"
+msgstr "Általános"
 
-#: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1569
-#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
-#: Client/core/CVersionUpdater.cpp:1875 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CMainMenu.cpp:1147 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:128
-msgid "No"
-msgstr "Nem"
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Erőforrások"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Szerver neve:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Jelszó:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Max játékos:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Sugárzás:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "Helyi hálózat"
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr "Internet"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Kijelölve"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Összes"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Indítás"
+
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/loader/Dialogs.cpp:132 Client/gui/CGUIMessageBox_Impl.cpp:68
+#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4694
+msgid "Cancel"
+msgstr "Mégse"
+
+#: Client/loader/MainFunctions.cpp:242
+msgid "Trouble restarting MTA:SA\n\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
+"Try to launch MTA:SA again?"
+msgstr "Probléma lépett fel az MTA:SA újraindításával\n\n"
+"Ha ez a probléma továbbra is fenn áll, nyisd meg a feladatkezelőt\n"
+"és zárd be a 'gta_sa.exe' és 'Multi Theft Auto.exe' folyamatokat.\n\n\n"
+"Megpróbálod újraindítani az MTA:SA-t?"
+
+#: Client/loader/MainFunctions.cpp:260
+msgid "Another instance of MTA is already running.\n\n"
+"If this problem persists, please restart your computer"
+msgstr "Egy másik példánya az MTA-nak fut.\n\n"
+"Ha ez a probléma továbbra is fenn áll, indítsd újra a számítógéped."
+
+#: Client/loader/MainFunctions.cpp:263
+msgid "Another instance of MTA is already running.\n\n"
+"Do you want to terminate it?"
+msgstr "Egy másik példánya az MTA-nak már fut.\n\n"
+"Leakarod állítani?"
+
+#: Client/loader/MainFunctions.cpp:288
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to revert to an earlier version?"
+msgstr "Problémád akadt az MTA:SA futtatásával?\n\n"
+"Akarod hogy a játék egy régebbi verzióját telepítse?"
+
+#: Client/loader/MainFunctions.cpp:318
+msgid "There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n\n"
+"Do you want to reset GTA settings now?"
+msgstr "Úgy tűnik, hogy probléma akadt az MTA:SA elindításával.\n"
+"A GTA beállításainak resetelése megoldhatja ezt a problémát.\n\n"
+"Akarod resetelni a GTA beállításait most?"
+
+#: Client/loader/MainFunctions.cpp:333
+msgid "GTA settings have been reset.\n\n"
+"Press OK to continue."
+msgstr "GTA beállításai resetelve.\n\n"
+"Nyomd meg az OK gombot."
+
+#: Client/loader/MainFunctions.cpp:338
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr "Fájl nem törölhető: '%s'"
+
+#. No settings to delete, or can't find them
+#: Client/loader/MainFunctions.cpp:346
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to see some online help?"
+msgstr "Problémád akadt az MTA:SA futtatásával?.\n\n"
+"Szeretnél online segítséget kapni?"
+
+#. Inform user
+#: Client/loader/MainFunctions.cpp:382
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to change the following setting?"
+msgstr "Problémáid vannak az MTA:SA futtatásával?.\n\n"
+"Szeretnéd megváltoztatni a következő beállításokat?"
+
+#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:645
+#: Client/core/CSettings.cpp:987
+msgid "Fullscreen mode:"
+msgstr "Teljes képernyős mód:"
+
+#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:653
+#: Client/core/CSettings.cpp:1598
+msgid "Borderless window"
+msgstr "Keret nélküli ablak"
+
+#: Client/loader/MainFunctions.cpp:425
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr "Problémáid vannak az MTA:SA futtatásával?.\n\n"
+"Próbáld meg kikapcsolni a következő programokat a GTA és az MTA miatt:"
+
+#: Client/loader/MainFunctions.cpp:459
+msgid "WARNING\n\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n\n"
+msgstr "FIGYELEM\n"
+" \n"
+" MTA:SA szokatlan tevékenységet észlelt.\n"
+" Kérjük, futtass egy víruskeresést, amely biztosítja, hogy a rendszer biztonságos.\n\n"
+
+#: Client/loader/MainFunctions.cpp:462
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr "Az észlelt fájl volt: %s\n"
+
+#: Client/loader/MainFunctions.cpp:596
+msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr "Egy példánya a GTA: San Andreas-nak már fut. Le kell állítani, mielőtt az MTA:SA elindítható. Leakarja állítani most?"
+
+#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
+#: Client/loader/MainFunctions.cpp:1240
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
+#: Client/core/ServerBrowser/CServerInfo.cpp:319
+msgid "Information"
+msgstr "Információ"
+
+#: Client/loader/MainFunctions.cpp:603
+msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
+msgstr "Nem lehet leállítani a GTA: San Andreas-t. Ha a probléma továbbra is fennáll, indítsa újra a számítógépet."
+
+#: Client/loader/MainFunctions.cpp:626
+msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+msgstr "Registry bejegyzések hiányoznak. Telepítse újra a Multi Theft Auto: San Andreas-t."
+
+#: Client/loader/MainFunctions.cpp:632
+msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
+msgstr "A GTA: San Andreas útja nem támogatott (Unicode) karaktereket tartalmaz. Kérjük helyezze a Grand Theft Auto: San Andreas telepítését egy kompatibilis útra, amely csak szabványos ASCII karaktereket tartalmaz és telepítse újra a Multi Theft Auto: San Andreas-t."
+
+#: Client/loader/MainFunctions.cpp:642
+msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
+msgstr "A telepítési útvonala 'MTA:SA' vagy 'GTA: San Andreas'\n"
+"tartalmaz ';' (pontosvessző).\n\n"
+"Ezzel problémák merülhetnek fel, ha fut az MTA:SA,\n"
+"Helyezze át egy pontosvesszőt nem tartalmazó útvonalra.'"
+
+#: Client/loader/MainFunctions.cpp:782
+msgid "Load failed. Please ensure that the latest data files have been installed correctly."
+msgstr "Betöltés sikertelen. Győződjön meg arról, hogy a legfrissebb data fájlok vannak telepítve."
+
+#: Client/loader/MainFunctions.cpp:791
+#, c-format
+msgid "Load failed. Please ensure that %s is installed correctly."
+msgstr "Betöltés sikertelen. Győződjön meg arról, hogy a %s jól van-e telepítve."
+
+#: Client/loader/MainFunctions.cpp:798
+#, c-format
+msgid "Load failed. Could not find gta_sa.exe in %s."
+msgstr "Betöltés sikertelen. Nem találom a gta_sa.exe-t itt %s."
+
+#: Client/loader/MainFunctions.cpp:808
+#, c-format
+msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
+msgstr "Betöltés sikertelen. %s létezik a GTA könyvtárban. Kérjük törölje a folytatás előtt."
+
+#: Client/loader/MainFunctions.cpp:817
+#, c-format
+msgid "Main file has an incorrect name (%s)"
+msgstr "Az alap fájlnak helytelen a neve (%s)"
+
+#: Client/loader/MainFunctions.cpp:828
+msgid "Main file is unsigned. Possible virus activity.\n\n"
+"See online help if MTA does not work correctly."
+msgstr "Az alap fájl aláíratlan. Lehetséges vírus aktivitása.\n\n"
+"Nézd meg az online segítséget, ha az MTA nem működik megfelelően."
+
+#: Client/loader/MainFunctions.cpp:853
+msgid "Data files modified. Possible virus activity.\n\n"
+"See online help if MTA does not work correctly."
+msgstr "Az adatfájlok módosultak. Lehetséges vírus aktivitása.\n\n"
+"Nézd meg az online segítséget, ha az MTA nem működik megfelelően."
+
+#: Client/loader/MainFunctions.cpp:865
+msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
+"Remove these .asi files if you experience problems with MTA:SA."
+msgstr ".asi fájlok vannak az 'MTA:SA' vagy a 'GTA: San Andreas' telepítési könyvtárban.\n\n"
+"Törölje ezeket a fájlokat, ha problémája van az MTA:SA-val."
+
+#: Client/loader/MainFunctions.cpp:969
+msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Fájl verzió hiba. Telepítse újra az MTA:SA-t, ha problémák merülnének fel.\n"
+
+#: Client/loader/MainFunctions.cpp:978
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Egyes fájlok hiányoznak. Telepítse újra az MTA: SA-t, ha problémák merülnek fel.\n"
+
+#: Client/loader/MainFunctions.cpp:990
+msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
+"Please restart your PC.\n"
+msgstr "MTA:SA nem kompatibilis a Windows 'Csökkentett módjával'.\n\n"
+"Kérlek indítsd újra a számítógéped.\n"
+
+#: Client/loader/MainFunctions.cpp:1126
+msgid "Fix configuration issue"
+msgstr "Konfigurációs probléma helyreállítás"
+
+#. Try to relaunch as admin if not done so already
+#: Client/loader/MainFunctions.cpp:1168
+msgid "Fix elevation required error"
+msgstr "Szükséges hibák javítása"
+
+#: Client/loader/MainFunctions.cpp:1175
+#, c-format
+msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
+"[%s]"
+msgstr "Nem lehet elindítani a Grand Theft Auto: San Andreas-t. Kérjük, próbálja meg újraindítani, vagy ha a probléma továbbra is fennáll, lépjen\n"
+" kapcsolatba az MTA-val itt: www.multitheftauto.com.\n\n"
+"[%s]"
+
+#: Client/loader/MainFunctions.cpp:1240
+msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
+msgstr "GTA: San Andreas nem indult el megfelelően. Szeretnéd ezt megszüntetni?"
+
+#: Client/loader/CExePatchedStatus.cpp:153
+msgid "Update Aero setting"
+msgstr "Aero beállítás frissítés"
+
+#: Client/loader/CExePatchedStatus.cpp:155
+msgid "Update Large Memory setting"
+msgstr "Nagy Memória beállítás frissítés"
+
+#: Client/loader/CExePatchedStatus.cpp:157
+msgid "Update DEP setting"
+msgstr "DEP beállítás frissítés"
+
+#: Client/loader/CExePatchedStatus.cpp:159
+msgid "Update graphics driver compliance"
+msgstr "Grafikus driver teljesítése frissítés"
+
+#: Client/loader/CExePatchedStatus.cpp:161
+#: Client/loader/CExePatchedStatus.cpp:163
+msgid "Fix file issues"
+msgstr "Fájlproblémák fixálása"
+
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "Fő exe másolása a grafikus driver hibáinak elkerülésére"
+
+#: Client/loader/Install.cpp:92
+msgid "Do you want to terminate the MTA Server and continue updating?"
+msgstr "Leszeretnéd állítani az MTA szervert és folytatni a frissítést?"
+
+#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:901
+msgid "Installing update..."
+msgstr "Frissítés telepítése..."
+
+#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:909
+msgid "Extracting files..."
+msgstr "Fájlok kicsomagolása..."
+
+#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA-nak rendszergazda jogosultság kell a következő feladathoz:\n\n"
+"'%s'\n\n"
+"Kérlek fogadd el a következő ablakban."
+
+#: Client/loader/CInstallManager.cpp:344
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA nem tudta befejezni a feladatot:\n\n"
+"'%s'\n"
+
+#: Client/loader/CInstallManager.cpp:394
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** A crash-t a grafikus driver hibája okozta **\n\n"
+"** Kérlek frissítsd a grafikus drivered **"
+
+#: Client/loader/CInstallManager.cpp:500
+msgid "Install updated MTA:SA files"
+msgstr "Frissített MTA:SA fájlok telepítése"
+
+#: Client/loader/CInstallManager.cpp:520
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Nem lehet frissíteni egy fájl ütközése miatt. Kérlek zárj be minden egyéb alkalmazást és próbáld újra."
+
+#: Client/loader/CInstallManager.cpp:529
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto nem lett megfelelően telepítve, kérlek telepítsd újra. %s"
+
+#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr "Az MTA:SA nem tudja folytatni, mert a következő fájlok hibásak:"
+
+#: Client/loader/CInstallManager.cpp:609
+msgid "Patch GTA"
+msgstr "GTA frissítése"
+
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:723
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA nem folytatható, mert a %s meghajtón nincs elég hely."
+
+#: Client/loader/CInstallManager.cpp:812
+msgid "Missing file:"
+msgstr "Hiányzó fájl:"
+
+#: Client/loader/CInstallManager.cpp:816
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Ha az MTA nem tud betölteni, telepítse újra a GTA:SA-t"
+
+#: Client/loader/CInstallManager.cpp:937
+msgid "Update install settings"
+msgstr "Telepítési beállítások frissítés"
+
+#: Client/loader/CInstallManager.cpp:1070
+msgid "Update compatibility settings"
+msgstr "Kompatibilitási beállítások frissítés"
+
+#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:890
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Keresése: Grand Theft Auto San Andreas"
+
+#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:893
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Kérem indítsd el a Grand Theft Auto San Andreas-t"
+
+#: Client/loader/Utils.cpp:813
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Válaszd ki a Grand Theft Auto: San Andreas főkönyvtárát"
+
+#: Client/loader/Utils.cpp:1283
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Hibás betöltés: %s modul! (%s)"
+
+#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:914
+msgid "Copying files..."
+msgstr "Fájl másolás..."
+
+#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:919
+msgid "Copy finished early. Everything OK."
+msgstr "Másolás befejezve. Minden OK."
+
+#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:924
+msgid "Finishing..."
+msgstr "Befejezés..."
+
+#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:928
+msgid "Done!"
+msgstr "Kész!"
+
+#: Client/loader/Utils.cpp:1713
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Új telepítés %s észlelt.\n"
+" \n"
+" Szeretné másolni a beállításokat innen %s ?"
+
+#: Client/loader/Utils.cpp:1752
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "A GTA:SA összeomlott a következő fájl megnyitásakor '%s'"
+
+#: Client/loader/Utils.cpp:1774
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "Hiányzó GTA:SA fájl '%s'."
+
+#: Client/loader/Utils.cpp:1799
+msgid "GTA:SA had trouble loading a model."
+msgstr "A GTA:SA összeomlott modell betöltés közben."
+
+#: Client/loader/Utils.cpp:1801
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Ha nemrégiben módosítottad a gta3.img fájlod, telepítsd újra a GTA:SA-t."
+
+#: Client/loader/Utils.cpp:1826
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "A GTA:SA összeomlott jármű tuningolás miatt."
+
+#: Client/loader/Utils.cpp:1845
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA hibákat talált a '%s' fájlban"
+
+#: Client/loader/Utils.cpp:1918
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Újrainduljon a számítógép miközben játszik az MTA:SA-val?"
+
+#: Client/loader/Utils.cpp:1983
+msgid "Please terminate the following programs before continuing:"
+msgstr "Kérjük állítsa le a következő programokat a folytatás előtt:"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -608,384 +961,201 @@ msgstr "Nem"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1570
-#: Client/core/CVersionUpdater.cpp:1588 Client/core/CVersionUpdater.cpp:1857
-#: Client/core/CVersionUpdater.cpp:1876 Client/core/CSettings.cpp:1372
+#: Client/loader/Dialogs.cpp:127 Client/gui/CGUIMessageBox_Impl.cpp:72
+#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
+#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
+#: Client/core/CQuestionBox.cpp:195 Client/core/CSettings.cpp:1372
 #: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
 #: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
 #: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:127 Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
 msgstr "Igen"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Gyorsulás"
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Lassulás"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Kapcsolódás sikertelen. A megadott felhasználónév érvénytelen!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Kapcsolódás sikertelen. A megadott hoszt érvénytelen!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Kapcsolódás ide %s:%u sikertelen!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Csatlakozás ide %s:%u ..."
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Nincs ilyen mód telepítve (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Nincs szerver válasz (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Nincs szerver válasz (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "A kinézet amit választottál nem betölthető, és az alap kinézet sem tölthető be, kérlek telepítsd újra az MTA-t."
-
-#: Client/core/CKeyBinds.cpp:186
-msgid "Fire"
-msgstr "Tűz"
-
-#: Client/core/CKeyBinds.cpp:187
-msgid "Next weapon"
-msgstr "Következő fegyver"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Previous weapon"
-msgstr "Előző fegyver"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Forwards"
-msgstr "Előre"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Backwards"
-msgstr "Hátra"
-
-#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2223
-#: Client/core/CSettings.cpp:2251
-msgid "Left"
-msgstr "Balra"
-
-#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2225
-#: Client/core/CSettings.cpp:2252
-msgid "Right"
-msgstr "Jobbra"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Zoom in"
-msgstr "Nagyítás"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Zoom out"
-msgstr "Kicsinyítés"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Enter/Exit"
-msgstr "Beszállás/Kiszállás"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Change camera"
-msgstr "Kamera váltása"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:197
-msgid "Jump"
-msgstr "Ugrás"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Sprint"
-msgstr "Futás"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Look behind"
-msgstr "Hátranézés"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Crouch"
-msgstr "Guggolás"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Action"
-msgstr "Akció"
-
-#: Client/core/CKeyBinds.cpp:202
-msgid "Walk"
-msgstr "Séta"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Vehicle fire"
-msgstr "Jármű fegyvere"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Vehicle secondary fire"
-msgstr "Jármű másodlagos fegyvere"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Vehicle left"
-msgstr "Balra kanyarodás"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Vehicle right"
-msgstr "Jobbra kanyarodás"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:207
-msgid "Steer forwards/down"
-msgstr "Irányítás előre/lefele"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Steer backwards/up"
-msgstr "Irányítás hátra/felfele"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Accelerate"
-msgstr "Gáz"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Brake/Reverse"
-msgstr "Fék/Tolatás"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Radio next"
-msgstr "Következő rádió csatorna"
-
-#: Client/core/CKeyBinds.cpp:212
-msgid "Radio previous"
-msgstr "Előző rádió csatorna"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Radio user track skip"
-msgstr "Egyedi zene átugrása"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Horn"
-msgstr "Duda"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Sub-mission"
-msgstr "Mellékküldetés"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Handbrake"
-msgstr "Kézifék"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:217
-msgid "Vehicle look left"
-msgstr "Járműből balra nézés"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Vehicle look right"
-msgstr "Járműből jobbra nézés"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Vehicle look behind"
-msgstr "Járműből hátra nézés"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Vehicle mouse look"
-msgstr "Járműben egérhasználat"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Special control left"
-msgstr "Speciális irányítás balra"
-
-#: Client/core/CKeyBinds.cpp:222
-msgid "Special control right"
-msgstr "Speciális irányítás jobbra"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Special control down"
-msgstr "Speciális irányítás le"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Special control up"
-msgstr "Speciális irányítás fel"
-
-#: Client/core/CKeyBinds.cpp:225
-msgid "Aim weapon"
-msgstr "Célzás"
-
-#: Client/core/CKeyBinds.cpp:226
-msgid "Conversation yes"
-msgstr "Társalgás: igen"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:227
-msgid "Conversation no"
-msgstr "Társalgás: nem"
-
-#: Client/core/CKeyBinds.cpp:228
-msgid "Group control forwards"
-msgstr "Csoportos irányítás előre"
-
-#: Client/core/CKeyBinds.cpp:229
-msgid "Group control backwards"
-msgstr "Csoportos irányítás hátra"
-
-#: Client/core/CCredits.cpp:32
-msgid "Programming"
-msgstr "Programozás"
-
-#: Client/core/CCredits.cpp:61
-msgid "Contributors"
-msgstr "Közreműködők"
-
-#: Client/core/CCredits.cpp:82
-msgid "Game Design / Scripting"
-msgstr "Játék Dizájn / Scriptelés"
-
-#: Client/core/CCredits.cpp:102
-msgid "Language Localization"
-msgstr "Honosítás"
-
-#: Client/core/CCredits.cpp:108
-msgid "Patch contributors"
-msgstr "Javítás közreműködői"
-
-#: Client/core/CCredits.cpp:216
-msgid "Special Thanks"
-msgstr "Külön köszönet:"
-
-#: Client/core/CCredits.cpp:245
-msgid "This software makes use of the following libraries and software:"
-msgstr "Ez a szoftver a következő könyvtárakat és szoftvereket használja:"
-
-#: Client/core/CCore.cpp:723 Client/loader/CInstallManager.cpp:756
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA nem folytatható, mert a %s meghajtón nincs elég hely."
-
-#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Végzetes hiba"
-
-#: Client/core/CCore.cpp:850
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "A helyreállításhoz töröld ezt a fájlt:"
-
-#: Client/core/CCore.cpp:882
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s modul hibás!"
-
-#: Client/core/CCore.cpp:1192
-msgid "Error executing URL"
-msgstr "Hiba történt az URL megnyitásakor"
-
-#: Client/core/CCore.cpp:1204
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Hiba a módban, az alábbi parancssorban ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1289
-msgid "this help screen"
-msgstr "segítség"
-
-#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
-msgid "exits the application"
-msgstr "kilépés az alkalmazásból"
-
-#: Client/core/CCore.cpp:1292
-msgid "shows the version"
-msgstr "verzió mutatása"
-
-#: Client/core/CCore.cpp:1293
-msgid "shows the time"
-msgstr "idő mutatása"
-
-#: Client/core/CCore.cpp:1294
-msgid "shows the hud"
-msgstr "hud mutatása"
-
-#: Client/core/CCore.cpp:1295
-msgid "shows all the binds"
-msgstr "bindek mutatása"
-
-#: Client/core/CCore.cpp:1296
-msgid "shows your serial"
-msgstr "serial mutatása"
-
-#: Client/core/CCore.cpp:1305
-msgid "connects to a server (host port nick pass)"
-msgstr "kapcsolódás a szerverre (hoszt port felhasználónév jelszó)"
-
-#: Client/core/CCore.cpp:1306
-msgid "connects to a previous server"
-msgstr "kapcsolódás az előző szerverhez"
-
-#: Client/core/CCore.cpp:1307
-msgid "binds a key (key control)"
-msgstr "Egy gomb bebindelése (billentyűzet)"
-
-#: Client/core/CCore.cpp:1308
-msgid "unbinds a key (key)"
-msgstr "Egy gomb unbindelése (billentyűzet)"
-
-#: Client/core/CCore.cpp:1309
-msgid "copies the default gta controls"
-msgstr "alap gta irányítási beállítások másolása"
-
-#: Client/core/CCore.cpp:1310
-msgid "outputs a screenshot"
-msgstr "kiad egy screenshotot"
-
-#: Client/core/CCore.cpp:1311
-msgid "immediately saves the config"
-msgstr "konfig mentése azonnal"
-
-#: Client/core/CCore.cpp:1313
-msgid "clears the debug view"
-msgstr "debug chat tisztítás"
-
-#: Client/core/CCore.cpp:1314
-msgid "scrolls the chatbox upwards"
-msgstr "chatbox görgetése felfelé"
-
-#: Client/core/CCore.cpp:1315
-msgid "scrolls the chatbox downwards"
-msgstr "chatbox görgetése lefelé"
-
-#: Client/core/CCore.cpp:1316
-msgid "scrolls the debug view upwards"
-msgstr "a debug chat felfelé görgetése"
-
-#: Client/core/CCore.cpp:1317
-msgid "scrolls the debug view downwards"
-msgstr "a debug chat lefelé görgetése"
-
-#: Client/core/CCore.cpp:1320
-msgid "shows the memory statistics"
-msgstr "memória statisztika mutatása"
-
-#: Client/core/CCore.cpp:1321
-msgid "shows the frame timing graph"
-msgstr "frame grafikon mutatása"
+#: Client/loader/Dialogs.cpp:128 Client/core/CVersionUpdater.cpp:1569
+#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
+#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/CMainMenu.cpp:1147
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "No"
+msgstr "Nem"
+
+#. Create buttons
+#. OK button
+#: Client/loader/Dialogs.cpp:129 Client/gui/CGUIMessageBox_Impl.cpp:64
+#: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
+#: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
+#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
+#: Client/core/CVersionUpdater.cpp:2118 Client/core/CVersionUpdater.cpp:2127
+#: Client/core/CVersionUpdater.cpp:2136 Client/core/CVersionUpdater.cpp:2150
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4695
+msgid "OK"
+msgstr "Oké"
+
+#: Client/loader/Dialogs.cpp:130
+msgid "Quit"
+msgstr "Kilépés"
+
+#: Client/loader/Dialogs.cpp:131
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+msgid "Help"
+msgstr "Segítség"
+
+#: Client/loader/Dialogs.cpp:147
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas hibát észlelt"
+
+#: Client/loader/Dialogs.cpp:148
+msgid "Crash information"
+msgstr "Crash információ"
+
+#: Client/loader/Dialogs.cpp:149
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Jelölje be a jelölőnégyzetet, ha szeretne küldeni crash információkat a fejlesztőknek az internet segítségével"
+
+#: Client/loader/Dialogs.cpp:150
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Ha így tesz, növeli az esélyét a crash kijavításának."
+
+#: Client/loader/Dialogs.cpp:151
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Szeretné újraindítani az MTA: San Andreas-t ?"
+
+#: Client/loader/Dialogs.cpp:158
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Figyelmeztetés"
+
+#: Client/loader/Dialogs.cpp:159
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "A Grand Theft Auto: San Andreas telepítési könyvtára a következő fájlokat tartalmazza:"
+
+#: Client/loader/Dialogs.cpp:161
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "Ezek a fájlok nem szükségesek, és zavarhatják az MTA:SA jelen verziójának grafikus funkcióit.\n\n"
+"Javasoljuk, hogy távolítsa el vagy nevezze át ezeket a fájlokat."
+
+#: Client/loader/Dialogs.cpp:163
+msgid "Keep these files, but also show this warning on next start"
+msgstr "Őrizze meg ezeket a fájlokat, de a következő indításkor is jelenítse meg ezt a figyelmeztetést"
+
+#: Client/loader/Dialogs.cpp:164
+msgid "Do not remind me about these files again"
+msgstr "Ne emlékeztessen többet ezekre a fájlokra"
+
+#: Client/loader/Dialogs.cpp:165
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "Nevezze át ezeket a fájlokat *.dll-ről *.dll.bak-ra"
+
+#: Client/loader/Dialogs.cpp:166
+msgid "Show me these files"
+msgstr "Mutasd meg ezeket a fájlokat"
+
+#: Client/loader/Dialogs.cpp:167
+msgid "Play MTA:SA"
+msgstr "MTA:SA elindítása"
+
+#: Client/loader/Dialogs.cpp:173
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - Zavaros beállítások"
+
+#: Client/loader/Dialogs.cpp:174
+msgid "NVidia Optimus detected!"
+msgstr "NVidia Optimus észlelve!"
+
+#: Client/loader/Dialogs.cpp:175
+msgid "Try each option and see what works:"
+msgstr "Próbálj meg minden lehetőséget, és lássuk mi működik:"
+
+#: Client/loader/Dialogs.cpp:176
+msgid "A - Standard NVidia"
+msgstr "A - Szabványos NVidia"
+
+#: Client/loader/Dialogs.cpp:177
+msgid "B - Alternate NVidia"
+msgstr "B - Alternatív NVidia"
+
+#: Client/loader/Dialogs.cpp:178
+msgid "C - Standard NVidia with exe rename"
+msgstr "C - Standard NVidia exe átnevezéssel"
+
+#: Client/loader/Dialogs.cpp:179
+msgid "D - Alternate NVidia with exe rename"
+msgstr "C - Alternatív NVidia exe átnevezéssel"
+
+#: Client/loader/Dialogs.cpp:180
+msgid "E - Standard Intel"
+msgstr "E - Szabványos Intel"
+
+#: Client/loader/Dialogs.cpp:181
+msgid "F - Alternate Intel"
+msgstr "F - Alternatív Intel"
+
+#: Client/loader/Dialogs.cpp:182
+msgid "G - Standard Intel with exe rename"
+msgstr "G - Standard Intel exe átnevezéssel"
+
+#: Client/loader/Dialogs.cpp:183
+msgid "H - Alternate Intel with exe rename"
+msgstr "H - Alternatív Intel exe átnevezéssel"
+
+#: Client/loader/Dialogs.cpp:184
+msgid "If you get desperate, this might help:"
+msgstr "Ha kétségbeesett, ez segíthet:"
+
+#: Client/loader/Dialogs.cpp:185
+msgid "If you have already selected an option that works, this might help:"
+msgstr "Ha már kiválasztottál egy működő opciót, ez segíthet:"
+
+#: Client/loader/Dialogs.cpp:186
+msgid "Force windowed mode"
+msgstr "Kényszer ablakos mód"
+
+#: Client/loader/Dialogs.cpp:187
+msgid "Don't show again"
+msgstr "Ne jelenjen meg többször"
+
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
+
+#: Client/loader/Dialogs.cpp:195
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Figyelem: Nem található anti-vírus termék"
+
+#: Client/loader/Dialogs.cpp:197
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "Az MTA nem talált anti-vírus terméket a számítógépen.\n\n"
+"A vírusok zavarják az MTA-t és rontják a játékélményt.\n\n"
+"Nyomja meg a 'Segítség' gombot a további információkért."
+
+#: Client/loader/Dialogs.cpp:200
+msgid "I have already installed an anti-virus"
+msgstr "Van telepítve anti-vírus termék"
+
+#: Client/loader/Dialogs.cpp:202
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Nem fogok telepíteni anti-vírus terméket.\n"
+"Azt akarom, hogy a PC laggoljon, és része legyen egy botnet hálózatnak."
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONZOL"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "HÍREK"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "Nézd meg a legfrissebb híreket"
 
 #: Client/core/CVersionUpdater.cpp:624
 msgid "Busy"
@@ -1018,18 +1188,6 @@ msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
 msgstr "Nem lehetséges, hogy csatlakozz erre a szerverre jelen pillanatban.\n\n"
 "Kérlek próbálkozz később."
-
-#. Create buttons
-#. OK button
-#: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
-#: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
-#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
-#: Client/core/CVersionUpdater.cpp:2118 Client/core/CVersionUpdater.cpp:2127
-#: Client/core/CVersionUpdater.cpp:2136 Client/core/CVersionUpdater.cpp:2150
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4695
-#: Client/loader/Dialogs.cpp:129 Client/gui/CGUIMessageBox_Impl.cpp:64
-msgid "OK"
-msgstr "Oké"
 
 #: Client/core/CVersionUpdater.cpp:1786
 msgid "Connecting"
@@ -1143,6 +1301,20 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Várakozás a válaszra - %-3d"
+
+#: Client/core/CScreenShot.cpp:53
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Screenshot létrehozva: '%s"
+
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Ismeretlen parancs vagy beállítás: "
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Szeretnél néhány online tanácsot kapni erről a hibáról?"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1425,19 +1597,9 @@ msgstr "Ablakos mód"
 msgid "DPI aware"
 msgstr "DPI felismerés"
 
-#: Client/core/CSettings.cpp:645 Client/core/CSettings.cpp:987
-#: Client/loader/MainFunctions.cpp:383
-msgid "Fullscreen mode:"
-msgstr "Teljes képernyős mód:"
-
 #: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:1596
 msgid "Standard"
 msgstr "Alap"
-
-#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1598
-#: Client/loader/MainFunctions.cpp:383
-msgid "Borderless window"
-msgstr "Keret nélküli ablak"
 
 #: Client/core/CSettings.cpp:654 Client/core/CSettings.cpp:1600
 msgid "Borderless keep res"
@@ -1874,9 +2036,19 @@ msgstr "Y-Eltolás:"
 msgid "Position"
 msgstr "Pozíció:"
 
+#: Client/core/CSettings.cpp:2223 Client/core/CSettings.cpp:2251
+#: Client/core/CKeyBinds.cpp:191
+msgid "Left"
+msgstr "Balra"
+
 #: Client/core/CSettings.cpp:2224 Client/core/CSettings.cpp:2238
 msgid "Center"
 msgstr "Közép"
+
+#: Client/core/CSettings.cpp:2225 Client/core/CSettings.cpp:2252
+#: Client/core/CKeyBinds.cpp:192
+msgid "Right"
+msgstr "Jobbra"
 
 #: Client/core/CSettings.cpp:2237
 msgid "Top"
@@ -2096,15 +2268,30 @@ msgstr "Egér fixálás:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Egér mozgás fixálás - PC újraindítást igényelhet"
 
-#: Client/core/CScreenShot.cpp:53
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Screenshot létrehozva: '%s"
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Te egy olyan MTA:SA-t használsz, ami a későbbiekben lesz hivatalosan kiadva! Ez egy teszt verzió, amellyel nem tudsz felcsatlakozni publikus szerverekre!"
 
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Ismeretlen parancs vagy beállítás: "
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA nem kap frissítéseket XP-re/Vistára 2019 július után.\n\n"
+"Frissítsd a Windowst hogy játszhass a legújabb szervereken."
+
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Ezzel lefogsz csatlakozni a jelenlegi szerverről.\n\n"
+"Biztos vagy benne, hogy lecsatlakozol?"
+
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "LECSATLAKOZÁS FIGYELMEZTETÉS"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Magyar"
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
@@ -2151,35 +2338,424 @@ msgstr "Konfigurációs fájl elmentve"
 msgid "* Your serial is: %s"
 msgstr "* A te serialod: %s"
 
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Te egy olyan MTA:SA-t használsz, ami a későbbiekben lesz hivatalosan kiadva! Ez egy teszt verzió, amellyel nem tudsz felcsatlakozni publikus szerverekre!"
+#: Client/core/CCredits.cpp:32
+msgid "Programming"
+msgstr "Programozás"
 
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA nem kap frissítéseket XP-re/Vistára 2019 július után.\n\n"
-"Frissítsd a Windowst hogy játszhass a legújabb szervereken."
+#: Client/core/CCredits.cpp:61
+msgid "Contributors"
+msgstr "Közreműködők"
 
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Ezzel lefogsz csatlakozni a jelenlegi szerverről.\n\n"
-"Biztos vagy benne, hogy lecsatlakozol?"
+#: Client/core/CCredits.cpp:82
+msgid "Game Design / Scripting"
+msgstr "Játék Dizájn / Scriptelés"
 
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "LECSATLAKOZÁS FIGYELMEZTETÉS"
+#: Client/core/CCredits.cpp:102
+msgid "Language Localization"
+msgstr "Honosítás"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "HÍREK"
+#: Client/core/CCredits.cpp:108
+msgid "Patch contributors"
+msgstr "Javítás közreműködői"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "Nézd meg a legfrissebb híreket"
+#: Client/core/CCredits.cpp:216
+msgid "Special Thanks"
+msgstr "Külön köszönet:"
+
+#: Client/core/CCredits.cpp:245
+msgid "This software makes use of the following libraries and software:"
+msgstr "Ez a szoftver a következő könyvtárakat és szoftvereket használja:"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "A kinézet amit választottál nem betölthető, és az alap kinézet sem tölthető be, kérlek telepítsd újra az MTA-t."
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Kapcsolódás sikertelen. A megadott felhasználónév érvénytelen!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Kapcsolódás sikertelen. A megadott hoszt érvénytelen!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Kapcsolódás ide %s:%u sikertelen!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Csatlakozás ide %s:%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Nincs ilyen mód telepítve (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Nincs szerver válasz (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Nincs szerver válasz (1)"
+
+#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Végzetes hiba"
+
+#: Client/core/CCore.cpp:850
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "A helyreállításhoz töröld ezt a fájlt:"
+
+#: Client/core/CCore.cpp:882
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s modul hibás!"
+
+#: Client/core/CCore.cpp:1192
+msgid "Error executing URL"
+msgstr "Hiba történt az URL megnyitásakor"
+
+#: Client/core/CCore.cpp:1204
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Hiba a módban, az alábbi parancssorban ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1289
+msgid "this help screen"
+msgstr "segítség"
+
+#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
+msgid "exits the application"
+msgstr "kilépés az alkalmazásból"
+
+#: Client/core/CCore.cpp:1292
+msgid "shows the version"
+msgstr "verzió mutatása"
+
+#: Client/core/CCore.cpp:1293
+msgid "shows the time"
+msgstr "idő mutatása"
+
+#: Client/core/CCore.cpp:1294
+msgid "shows the hud"
+msgstr "hud mutatása"
+
+#: Client/core/CCore.cpp:1295
+msgid "shows all the binds"
+msgstr "bindek mutatása"
+
+#: Client/core/CCore.cpp:1296
+msgid "shows your serial"
+msgstr "serial mutatása"
+
+#: Client/core/CCore.cpp:1305
+msgid "connects to a server (host port nick pass)"
+msgstr "kapcsolódás a szerverre (hoszt port felhasználónév jelszó)"
+
+#: Client/core/CCore.cpp:1306
+msgid "connects to a previous server"
+msgstr "kapcsolódás az előző szerverhez"
+
+#: Client/core/CCore.cpp:1307
+msgid "binds a key (key control)"
+msgstr "Egy gomb bebindelése (billentyűzet)"
+
+#: Client/core/CCore.cpp:1308
+msgid "unbinds a key (key)"
+msgstr "Egy gomb unbindelése (billentyűzet)"
+
+#: Client/core/CCore.cpp:1309
+msgid "copies the default gta controls"
+msgstr "alap gta irányítási beállítások másolása"
+
+#: Client/core/CCore.cpp:1310
+msgid "outputs a screenshot"
+msgstr "kiad egy screenshotot"
+
+#: Client/core/CCore.cpp:1311
+msgid "immediately saves the config"
+msgstr "konfig mentése azonnal"
+
+#: Client/core/CCore.cpp:1313
+msgid "clears the debug view"
+msgstr "debug chat tisztítás"
+
+#: Client/core/CCore.cpp:1314
+msgid "scrolls the chatbox upwards"
+msgstr "chatbox görgetése felfelé"
+
+#: Client/core/CCore.cpp:1315
+msgid "scrolls the chatbox downwards"
+msgstr "chatbox görgetése lefelé"
+
+#: Client/core/CCore.cpp:1316
+msgid "scrolls the debug view upwards"
+msgstr "a debug chat felfelé görgetése"
+
+#: Client/core/CCore.cpp:1317
+msgid "scrolls the debug view downwards"
+msgstr "a debug chat lefelé görgetése"
+
+#: Client/core/CCore.cpp:1320
+msgid "shows the memory statistics"
+msgstr "memória statisztika mutatása"
+
+#: Client/core/CCore.cpp:1321
+msgid "shows the frame timing graph"
+msgstr "frame grafikon mutatása"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Gyorsulás"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Lassulás"
+
+#: Client/core/CKeyBinds.cpp:186
+msgid "Fire"
+msgstr "Tűz"
+
+#: Client/core/CKeyBinds.cpp:187
+msgid "Next weapon"
+msgstr "Következő fegyver"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Previous weapon"
+msgstr "Előző fegyver"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Forwards"
+msgstr "Előre"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Backwards"
+msgstr "Hátra"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Zoom in"
+msgstr "Nagyítás"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Zoom out"
+msgstr "Kicsinyítés"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Enter/Exit"
+msgstr "Beszállás/Kiszállás"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Change camera"
+msgstr "Kamera váltása"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:197
+msgid "Jump"
+msgstr "Ugrás"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Sprint"
+msgstr "Futás"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Look behind"
+msgstr "Hátranézés"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Crouch"
+msgstr "Guggolás"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Action"
+msgstr "Akció"
+
+#: Client/core/CKeyBinds.cpp:202
+msgid "Walk"
+msgstr "Séta"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Vehicle fire"
+msgstr "Jármű fegyvere"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Vehicle secondary fire"
+msgstr "Jármű másodlagos fegyvere"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Vehicle left"
+msgstr "Balra kanyarodás"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Vehicle right"
+msgstr "Jobbra kanyarodás"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:207
+msgid "Steer forwards/down"
+msgstr "Irányítás előre/lefele"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Steer backwards/up"
+msgstr "Irányítás hátra/felfele"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Accelerate"
+msgstr "Gáz"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Brake/Reverse"
+msgstr "Fék/Tolatás"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Radio next"
+msgstr "Következő rádió csatorna"
+
+#: Client/core/CKeyBinds.cpp:212
+msgid "Radio previous"
+msgstr "Előző rádió csatorna"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Radio user track skip"
+msgstr "Egyedi zene átugrása"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Horn"
+msgstr "Duda"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Sub-mission"
+msgstr "Mellékküldetés"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Handbrake"
+msgstr "Kézifék"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:217
+msgid "Vehicle look left"
+msgstr "Járműből balra nézés"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Vehicle look right"
+msgstr "Járműből jobbra nézés"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Vehicle look behind"
+msgstr "Járműből hátra nézés"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Vehicle mouse look"
+msgstr "Járműben egérhasználat"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Special control left"
+msgstr "Speciális irányítás balra"
+
+#: Client/core/CKeyBinds.cpp:222
+msgid "Special control right"
+msgstr "Speciális irányítás jobbra"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Special control down"
+msgstr "Speciális irányítás le"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Special control up"
+msgstr "Speciális irányítás fel"
+
+#: Client/core/CKeyBinds.cpp:225
+msgid "Aim weapon"
+msgstr "Célzás"
+
+#: Client/core/CKeyBinds.cpp:226
+msgid "Conversation yes"
+msgstr "Társalgás: igen"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:227
+msgid "Conversation no"
+msgstr "Társalgás: nem"
+
+#: Client/core/CKeyBinds.cpp:228
+msgid "Group control forwards"
+msgstr "Csoportos irányítás előre"
+
+#: Client/core/CKeyBinds.cpp:229
+msgid "Group control backwards"
+msgstr "Csoportos irányítás hátra"
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Screenshot készítve %d bájt, de körülbelül %d"
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "Screenshot készítése sikertelen"
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Nem lehet inicializálni Direct3D9.\n\n"
+"Kérlek ellenőrizd le, hogy a legújabb DirectX és\n"
+"Windows Service Pack fel van-e telepítve."
+
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Tétlen"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "játékos"
+msgstr[1] "játékosok"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "és"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "szerver"
+msgstr[1] "szerverek"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Mester szerver lista lekérdezése (%lu ms eltelt)"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "A mester szerver lista nem elemezhető."
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "A mester szerver lista nem található."
+
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Backup szerver lista)"
+
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Nem lehet összekötni: LAN-broadcast socket"
+
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "Kísérlet a LAN szerverek felfedézésre"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2309,11 +2885,6 @@ msgstr "Egyéb verziók"
 msgid "Back"
 msgstr "Vissza"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-#: Client/loader/Dialogs.cpp:131
-msgid "Help"
-msgstr "Segítség"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:741
 msgid "Loading..."
 msgstr "Betöltés..."
@@ -2335,13 +2906,6 @@ msgstr "Ismeretlen protokoll"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1291
 msgid "Please use the mtasa:// protocol!"
 msgstr "Kérlek használd az mtasa:// protokoll-t!"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1240
-msgid "Information"
-msgstr "Információ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
@@ -2430,71 +2994,6 @@ msgstr "Időtúllépés"
 msgid "Querying..."
 msgstr "Lekérdezés…"
 
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Tétlen"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "játékos"
-msgstr[1] "játékosok"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "és"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "szerver"
-msgstr[1] "szerverek"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Mester szerver lista lekérdezése (%lu ms eltelt)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "A mester szerver lista nem elemezhető."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "A mester szerver lista nem található."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Backup szerver lista)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "Nem lehet összekötni: LAN-broadcast socket"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "Kísérlet a LAN szerverek felfedézésre"
-
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Nem lehet inicializálni Direct3D9.\n\n"
-"Kérlek ellenőrizd le, hogy a legújabb DirectX és\n"
-"Windows Service Pack fel van-e telepítve."
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Screenshot készítve %d bájt, de körülbelül %d"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Screenshot készítése sikertelen"
-
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
 msgstr "Weboldal lekérések"
@@ -2515,505 +3014,10 @@ msgstr "Döntés megjegyzése"
 msgid "Deny"
 msgstr "Megtagad"
 
-#: Client/loader/Dialogs.cpp:130
-msgid "Quit"
-msgstr "Kilépés"
-
-#: Client/loader/Dialogs.cpp:147
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas hibát észlelt"
-
-#: Client/loader/Dialogs.cpp:148
-msgid "Crash information"
-msgstr "Crash információ"
-
-#: Client/loader/Dialogs.cpp:149
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Jelölje be a jelölőnégyzetet, ha szeretne küldeni crash információkat a fejlesztőknek az internet segítségével"
-
-#: Client/loader/Dialogs.cpp:150
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Ha így tesz, növeli az esélyét a crash kijavításának."
-
-#: Client/loader/Dialogs.cpp:151
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Szeretné újraindítani az MTA: San Andreas-t ?"
-
-#: Client/loader/Dialogs.cpp:158
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Figyelmeztetés"
-
-#: Client/loader/Dialogs.cpp:159
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "A Grand Theft Auto: San Andreas telepítési könyvtára a következő fájlokat tartalmazza:"
-
-#: Client/loader/Dialogs.cpp:161
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "Ezek a fájlok nem szükségesek, és zavarhatják az MTA:SA jelen verziójának grafikus funkcióit.\n\n"
-"Javasoljuk, hogy távolítsa el vagy nevezze át ezeket a fájlokat."
-
-#: Client/loader/Dialogs.cpp:163
-msgid "Keep these files, but also show this warning on next start"
-msgstr "Őrizze meg ezeket a fájlokat, de a következő indításkor is jelenítse meg ezt a figyelmeztetést"
-
-#: Client/loader/Dialogs.cpp:164
-msgid "Do not remind me about these files again"
-msgstr "Ne emlékeztessen többet ezekre a fájlokra"
-
-#: Client/loader/Dialogs.cpp:165
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Nevezze át ezeket a fájlokat *.dll-ről *.dll.bak-ra"
-
-#: Client/loader/Dialogs.cpp:166
-msgid "Show me these files"
-msgstr "Mutasd meg ezeket a fájlokat"
-
-#: Client/loader/Dialogs.cpp:167
-msgid "Play MTA:SA"
-msgstr "MTA:SA elindítása"
-
-#: Client/loader/Dialogs.cpp:173
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Zavaros beállítások"
-
-#: Client/loader/Dialogs.cpp:174
-msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus észlelve!"
-
-#: Client/loader/Dialogs.cpp:175
-msgid "Try each option and see what works:"
-msgstr "Próbálj meg minden lehetőséget, és lássuk mi működik:"
-
-#: Client/loader/Dialogs.cpp:176
-msgid "A - Standard NVidia"
-msgstr "A - Szabványos NVidia"
-
-#: Client/loader/Dialogs.cpp:177
-msgid "B - Alternate NVidia"
-msgstr "B - Alternatív NVidia"
-
-#: Client/loader/Dialogs.cpp:178
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - Standard NVidia exe átnevezéssel"
-
-#: Client/loader/Dialogs.cpp:179
-msgid "D - Alternate NVidia with exe rename"
-msgstr "C - Alternatív NVidia exe átnevezéssel"
-
-#: Client/loader/Dialogs.cpp:180
-msgid "E - Standard Intel"
-msgstr "E - Szabványos Intel"
-
-#: Client/loader/Dialogs.cpp:181
-msgid "F - Alternate Intel"
-msgstr "F - Alternatív Intel"
-
-#: Client/loader/Dialogs.cpp:182
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Standard Intel exe átnevezéssel"
-
-#: Client/loader/Dialogs.cpp:183
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternatív Intel exe átnevezéssel"
-
-#: Client/loader/Dialogs.cpp:184
-msgid "If you get desperate, this might help:"
-msgstr "Ha kétségbeesett, ez segíthet:"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "If you have already selected an option that works, this might help:"
-msgstr "Ha már kiválasztottál egy működő opciót, ez segíthet:"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "Force windowed mode"
-msgstr "Kényszer ablakos mód"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "Don't show again"
-msgstr "Ne jelenjen meg többször"
-
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
-#: Client/loader/Dialogs.cpp:195
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Figyelem: Nem található anti-vírus termék"
-
-#: Client/loader/Dialogs.cpp:197
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "Az MTA nem talált anti-vírus terméket a számítógépen.\n\n"
-"A vírusok zavarják az MTA-t és rontják a játékélményt.\n\n"
-"Nyomja meg a 'Segítség' gombot a további információkért."
-
-#: Client/loader/Dialogs.cpp:200
-msgid "I have already installed an anti-virus"
-msgstr "Van telepítve anti-vírus termék"
-
-#: Client/loader/Dialogs.cpp:202
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Nem fogok telepíteni anti-vírus terméket.\n"
-"Azt akarom, hogy a PC laggoljon, és része legyen egy botnet hálózatnak."
-
-#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:747
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Keresése: Grand Theft Auto San Andreas"
-
-#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:749
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Kérem indítsd el a Grand Theft Auto San Andreas-t"
-
-#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:187
-msgid "Installing update..."
-msgstr "Frissítés telepítése..."
-
-#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:287
-msgid "Extracting files..."
-msgstr "Fájlok kicsomagolása..."
-
-#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1605
-msgid "Copying files..."
-msgstr "Fájl másolás..."
-
-#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1665
-msgid "Copy finished early. Everything OK."
-msgstr "Másolás befejezve. Minden OK."
-
-#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1671
-msgid "Finishing..."
-msgstr "Befejezés..."
-
-#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1673
-msgid "Done!"
-msgstr "Kész!"
-
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA-nak rendszergazda jogosultság kell a következő feladathoz:\n\n"
-"'%s'\n\n"
-"Kérlek fogadd el a következő ablakban."
-
-#: Client/loader/CInstallManager.cpp:344
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA nem tudta befejezni a feladatot:\n\n"
-"'%s'\n"
-
-#: Client/loader/CInstallManager.cpp:394
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** A crash-t a grafikus driver hibája okozta **\n\n"
-"** Kérlek frissítsd a grafikus drivered **"
-
-#: Client/loader/CInstallManager.cpp:500
-msgid "Install updated MTA:SA files"
-msgstr "Frissített MTA:SA fájlok telepítése"
-
-#: Client/loader/CInstallManager.cpp:520
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Nem lehet frissíteni egy fájl ütközése miatt. Kérlek zárj be minden egyéb alkalmazást és próbáld újra."
-
-#: Client/loader/CInstallManager.cpp:529
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto nem lett megfelelően telepítve, kérlek telepítsd újra. %s"
-
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "Az MTA:SA nem tudja folytatni, mert a következő fájlok hibásak:"
-
-#: Client/loader/CInstallManager.cpp:609
-msgid "Patch GTA"
-msgstr "GTA frissítése"
-
-#: Client/loader/CInstallManager.cpp:812
-msgid "Missing file:"
-msgstr "Hiányzó fájl:"
-
-#: Client/loader/CInstallManager.cpp:816
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Ha az MTA nem tud betölteni, telepítse újra a GTA:SA-t"
-
-#: Client/loader/CInstallManager.cpp:937
-msgid "Update install settings"
-msgstr "Telepítési beállítások frissítés"
-
-#: Client/loader/CInstallManager.cpp:1070
-msgid "Update compatibility settings"
-msgstr "Kompatibilitási beállítások frissítés"
-
-#: Client/loader/Utils.cpp:813
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Válaszd ki a Grand Theft Auto: San Andreas főkönyvtárát"
-
-#: Client/loader/Utils.cpp:1283
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Hibás betöltés: %s modul! (%s)"
-
-#: Client/loader/Utils.cpp:1713
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Új telepítés %s észlelt.\n"
-" \n"
-" Szeretné másolni a beállításokat innen %s ?"
-
-#: Client/loader/Utils.cpp:1752
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "A GTA:SA összeomlott a következő fájl megnyitásakor '%s'"
-
-#: Client/loader/Utils.cpp:1774
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "Hiányzó GTA:SA fájl '%s'."
-
-#: Client/loader/Utils.cpp:1799
-msgid "GTA:SA had trouble loading a model."
-msgstr "A GTA:SA összeomlott modell betöltés közben."
-
-#: Client/loader/Utils.cpp:1801
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Ha nemrégiben módosítottad a gta3.img fájlod, telepítsd újra a GTA:SA-t."
-
-#: Client/loader/Utils.cpp:1826
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "A GTA:SA összeomlott jármű tuningolás miatt."
-
-#: Client/loader/Utils.cpp:1845
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA hibákat talált a '%s' fájlban"
-
-#: Client/loader/Utils.cpp:1918
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Újrainduljon a számítógép miközben játszik az MTA:SA-val?"
-
-#: Client/loader/Utils.cpp:1983
-msgid "Please terminate the following programs before continuing:"
-msgstr "Kérjük állítsa le a következő programokat a folytatás előtt:"
-
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "Leszeretnéd állítani az MTA szervert és folytatni a frissítést?"
-
-#: Client/loader/CExePatchedStatus.cpp:153
-msgid "Update Aero setting"
-msgstr "Aero beállítás frissítés"
-
-#: Client/loader/CExePatchedStatus.cpp:155
-msgid "Update Large Memory setting"
-msgstr "Nagy Memória beállítás frissítés"
-
-#: Client/loader/CExePatchedStatus.cpp:157
-msgid "Update DEP setting"
-msgstr "DEP beállítás frissítés"
-
-#: Client/loader/CExePatchedStatus.cpp:159
-msgid "Update graphics driver compliance"
-msgstr "Grafikus driver teljesítése frissítés"
-
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
-msgid "Fix file issues"
-msgstr "Fájlproblémák fixálása"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Fő exe másolása a grafikus driver hibáinak elkerülésére"
-
-#: Client/loader/MainFunctions.cpp:242
-msgid "Trouble restarting MTA:SA\n\n"
-"If the problem persists, open Task Manager and\n"
-"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-"Try to launch MTA:SA again?"
-msgstr "Probléma lépett fel az MTA:SA újraindításával\n\n"
-"Ha ez a probléma továbbra is fenn áll, nyisd meg a feladatkezelőt\n"
-"és zárd be a 'gta_sa.exe' és 'Multi Theft Auto.exe' folyamatokat.\n\n\n"
-"Megpróbálod újraindítani az MTA:SA-t?"
-
-#: Client/loader/MainFunctions.cpp:260
-msgid "Another instance of MTA is already running.\n\n"
-"If this problem persists, please restart your computer"
-msgstr "Egy másik példánya az MTA-nak fut.\n\n"
-"Ha ez a probléma továbbra is fenn áll, indítsd újra a számítógéped."
-
-#: Client/loader/MainFunctions.cpp:263
-msgid "Another instance of MTA is already running.\n\n"
-"Do you want to terminate it?"
-msgstr "Egy másik példánya az MTA-nak már fut.\n\n"
-"Leakarod állítani?"
-
-#: Client/loader/MainFunctions.cpp:288
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to revert to an earlier version?"
-msgstr "Problémád akadt az MTA:SA futtatásával?\n\n"
-"Akarod hogy a játék egy régebbi verzióját telepítse?"
-
-#: Client/loader/MainFunctions.cpp:318
-msgid "There seems to be a problem launching MTA:SA.\n"
-"Resetting GTA settings can sometimes fix this problem.\n\n"
-"Do you want to reset GTA settings now?"
-msgstr "Úgy tűnik, hogy probléma akadt az MTA:SA elindításával.\n"
-"A GTA beállításainak resetelése megoldhatja ezt a problémát.\n\n"
-"Akarod resetelni a GTA beállításait most?"
-
-#: Client/loader/MainFunctions.cpp:333
-msgid "GTA settings have been reset.\n\n"
-"Press OK to continue."
-msgstr "GTA beállításai resetelve.\n\n"
-"Nyomd meg az OK gombot."
-
-#: Client/loader/MainFunctions.cpp:338
-#, c-format
-msgid "File could not be deleted: '%s'"
-msgstr "Fájl nem törölhető: '%s'"
-
-#. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:346
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to see some online help?"
-msgstr "Problémád akadt az MTA:SA futtatásával?.\n\n"
-"Szeretnél online segítséget kapni?"
-
-#. Inform user
-#: Client/loader/MainFunctions.cpp:382
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to change the following setting?"
-msgstr "Problémáid vannak az MTA:SA futtatásával?.\n\n"
-"Szeretnéd megváltoztatni a következő beállításokat?"
-
-#: Client/loader/MainFunctions.cpp:425
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Try disabling the following products for GTA and MTA:"
-msgstr "Problémáid vannak az MTA:SA futtatásával?.\n\n"
-"Próbáld meg kikapcsolni a következő programokat a GTA és az MTA miatt:"
-
-#: Client/loader/MainFunctions.cpp:459
-msgid "WARNING\n\n"
-"MTA:SA has detected unusual activity.\n"
-"Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "FIGYELEM\n"
-" \n"
-" MTA:SA szokatlan tevékenységet észlelt.\n"
-" Kérjük, futtass egy víruskeresést, amely biztosítja, hogy a rendszer biztonságos.\n\n"
-
-#: Client/loader/MainFunctions.cpp:462
-#, c-format
-msgid "The detected file was:  %s\n"
-msgstr "Az észlelt fájl volt: %s\n"
-
-#: Client/loader/MainFunctions.cpp:596
-msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "Egy példánya a GTA: San Andreas-nak már fut. Le kell állítani, mielőtt az MTA:SA elindítható. Leakarja állítani most?"
-
-#: Client/loader/MainFunctions.cpp:603
-msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "Nem lehet leállítani a GTA: San Andreas-t. Ha a probléma továbbra is fennáll, indítsa újra a számítógépet."
-
-#: Client/loader/MainFunctions.cpp:626
-msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Registry bejegyzések hiányoznak. Telepítse újra a Multi Theft Auto: San Andreas-t."
-
-#: Client/loader/MainFunctions.cpp:632
-msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "A GTA: San Andreas útja nem támogatott (Unicode) karaktereket tartalmaz. Kérjük helyezze a Grand Theft Auto: San Andreas telepítését egy kompatibilis útra, amely csak szabványos ASCII karaktereket tartalmaz és telepítse újra a Multi Theft Auto: San Andreas-t."
-
-#: Client/loader/MainFunctions.cpp:642
-msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-"contains a ';' (semicolon).\n\n"
-" If you experience problems when running MTA:SA,\n"
-" move your installation(s) to a path that does not contain a semicolon."
-msgstr "A telepítési útvonala 'MTA:SA' vagy 'GTA: San Andreas'\n"
-"tartalmaz ';' (pontosvessző).\n\n"
-"Ezzel problémák merülhetnek fel, ha fut az MTA:SA,\n"
-"Helyezze át egy pontosvesszőt nem tartalmazó útvonalra.'"
-
-#: Client/loader/MainFunctions.cpp:782
-msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Betöltés sikertelen. Győződjön meg arról, hogy a legfrissebb data fájlok vannak telepítve."
-
-#: Client/loader/MainFunctions.cpp:791
-#, c-format
-msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Betöltés sikertelen. Győződjön meg arról, hogy a %s jól van-e telepítve."
-
-#: Client/loader/MainFunctions.cpp:798
-#, c-format
-msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Betöltés sikertelen. Nem találom a gta_sa.exe-t itt %s."
-
-#: Client/loader/MainFunctions.cpp:808
-#, c-format
-msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "Betöltés sikertelen. %s létezik a GTA könyvtárban. Kérjük törölje a folytatás előtt."
-
-#: Client/loader/MainFunctions.cpp:817
-#, c-format
-msgid "Main file has an incorrect name (%s)"
-msgstr "Az alap fájlnak helytelen a neve (%s)"
-
-#: Client/loader/MainFunctions.cpp:828
-msgid "Main file is unsigned. Possible virus activity.\n\n"
-"See online help if MTA does not work correctly."
-msgstr "Az alap fájl aláíratlan. Lehetséges vírus aktivitása.\n\n"
-"Nézd meg az online segítséget, ha az MTA nem működik megfelelően."
-
-#: Client/loader/MainFunctions.cpp:853
-msgid "Data files modified. Possible virus activity.\n\n"
-"See online help if MTA does not work correctly."
-msgstr "Az adatfájlok módosultak. Lehetséges vírus aktivitása.\n\n"
-"Nézd meg az online segítséget, ha az MTA nem működik megfelelően."
-
-#: Client/loader/MainFunctions.cpp:865
-msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
-"Remove these .asi files if you experience problems with MTA:SA."
-msgstr ".asi fájlok vannak az 'MTA:SA' vagy a 'GTA: San Andreas' telepítési könyvtárban.\n\n"
-"Törölje ezeket a fájlokat, ha problémája van az MTA:SA-val."
-
-#: Client/loader/MainFunctions.cpp:969
-msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Fájl verzió hiba. Telepítse újra az MTA:SA-t, ha problémák merülnének fel.\n"
-
-#: Client/loader/MainFunctions.cpp:978
-msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Egyes fájlok hiányoznak. Telepítse újra az MTA: SA-t, ha problémák merülnek fel.\n"
-
-#: Client/loader/MainFunctions.cpp:990
-msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
-"Please restart your PC.\n"
-msgstr "MTA:SA nem kompatibilis a Windows 'Csökkentett módjával'.\n\n"
-"Kérlek indítsd újra a számítógéped.\n"
-
-#: Client/loader/MainFunctions.cpp:1126
-msgid "Fix configuration issue"
-msgstr "Konfigurációs probléma helyreállítás"
-
-#. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1168
-msgid "Fix elevation required error"
-msgstr "Szükséges hibák javítása"
-
-#: Client/loader/MainFunctions.cpp:1175
-#, c-format
-msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
-"[%s]"
-msgstr "Nem lehet elindítani a Grand Theft Auto: San Andreas-t. Kérjük, próbálja meg újraindítani, vagy ha a probléma továbbra is fennáll, lépjen\n"
-" kapcsolatba az MTA-val itt: www.multitheftauto.com.\n\n"
-"[%s]"
-
-#: Client/loader/MainFunctions.cpp:1240
-msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "GTA: San Andreas nem indult el megfelelően. Szeretnéd ezt megszüntetni?"
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
+msgid "Problem with graphics driver"
+msgstr "Probléma a grafikus illesztőprogrammal"
 
 #: Client/game_sa/CSettingsSA.cpp:804
 msgid "Can't find valid screen resolution."
@@ -3023,11 +3027,6 @@ msgstr "Nem található érvényes képernyőfelbontás."
 #: Client/game_sa/CSettingsSA.cpp:880
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Biztos benne, hogy szeretné használni ezt a képernyő felbontását?"
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
-msgid "Problem with graphics driver"
-msgstr "Probléma a grafikus illesztőprogrammal"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
