@@ -19,7 +19,7 @@ CClientGif::CClientGif(CClientManager* pManager, ElementID ID, CGifItem* p_GifIt
 {
     SetTypeName("gif");
     m_pManager = pManager;
-    stride = GetRenderItem()->m_uiSizeX * 4;
+    m_bStride = GetRenderItem()->m_uiSizeX * 4;
     UpdateTick();
     m_pGifDisplay = std::make_unique<CClientGifDisplay>(m_pManager->GetDisplayManager(), this);
 }
@@ -29,51 +29,51 @@ CClientGif::~CClientGif(){
 }
 
 void CClientGif::Register(std::vector<unsigned char*>&& frms, std::vector<int>&& dls) {
-    frames = std::move(frms);
-    delays = std::move(dls);
-    defaultDelays = delays;
+    m_bFrames = std::move(frms);
+    m_bDelays = std::move(dls);
+    m_bDefaultDelays = m_bDelays;
     m_pGifDisplay->UpdateTexture();
 }
 
 void CClientGif::Next(){
-    if (showing >= GetImageCount()) {
-        showing = 1;
+    if (m_bShowing >= GetImageCount()) {
+        m_bShowing = 1;
     }else{
-        showing++;
+        m_bShowing++;
     }
 }
 
 void CClientGif::Unlink(){
-    for (unsigned char* frame : frames) {
+    for (unsigned char* frame : m_bFrames) {
         if (frame) {
             delete[] frame;
         }
     }
-    frames.clear();
-    delays.clear();
-    defaultDelays.clear();
+    m_bFrames.clear();
+    m_bDelays.clear();
+    m_bDefaultDelays.clear();
     m_bIsDestoryed = true;
     CClientRenderElement::Unlink();
 }
 
 CClientGifLoader::CClientGifLoader(SString& data) {
-    buffer = reinterpret_cast<uint8_t*>(data.data());
-    size = (long)((unsigned long)data.size());
+    m_pBuffer = reinterpret_cast<uint8_t*>(data.data());
+    m_bSize = (long)((unsigned long)data.size());
 }
 
 CClientGifLoader::CClientGifLoader(uint8_t* data,unsigned long dataSize) {
-    buffer = data;
-    size = (long)dataSize;
+    m_pBuffer = data;
+    m_bSize = (long)dataSize;
 }
 
 CClientGifLoader::CClientGifLoader(char* data) {
-    buffer = reinterpret_cast<uint8_t*>(data);
-    size = (long)((unsigned long)strlen(data));
+    m_pBuffer = reinterpret_cast<uint8_t*>(data);
+    m_bSize = (long)((unsigned long)strlen(data));
 }
 
 void CClientGifLoader::CreateFrame(std::vector<unsigned char*>& frames, std::vector<int>& delays) {
-    long frameStride = width*4;
-    long frameSize = frameStride*height;
+    long frameStride = m_bWidth*4;
+    long frameSize = frameStride*m_bHeight;
     unsigned char* frame = new unsigned char[frameSize];
     memset(frame, 0, frameSize);
     uint32_t x;
@@ -86,56 +86,56 @@ void CClientGifLoader::CreateFrame(std::vector<unsigned char*>& frames, std::vec
     uint32_t* pDecoder;
     uint32_t* pPrevious;
     #define ARGB(i) ( \
-        (address[i] == transparent) ? \
+        (m_pAddress[i] == m_bTransparent) ? \
         0 : \
         ( \
-            (uint32_t)pallete[address[i]].r << 16 | \
-            (uint32_t)pallete[address[i]].g << 8 | \
-            (uint32_t)pallete[address[i]].b << 0 | \
+            (uint32_t)m_pPallete[m_pAddress[i]].r << 16 | \
+            (uint32_t)m_pPallete[m_pAddress[i]].g << 8 | \
+            (uint32_t)m_pPallete[m_pAddress[i]].b << 0 | \
             0xff000000 \
         ) \
     )
-    if (!frameNumber) {
-        frameCount = ((frameCount < 0) ? -frameCount : frameCount)*height;
-        frameCount = (frameCount < 0xffff) ? frameCount : 0xffff;
-        dstSource = (uint32_t)(width*height);
-        palleteDecoder = calloc(sizeof(uint32_t),dstSource);
-        palleteDecoderPrevious = calloc(sizeof(uint32_t),dstSource);
+    if (!m_bFrameNumber) {
+        m_bFrameCount = ((m_bFrameCount < 0) ? -m_bFrameCount : m_bFrameCount)*m_bHeight;
+        m_bFrameCount = (m_bFrameCount < 0xffff) ? m_bFrameCount : 0xffff;
+        dstSource = (uint32_t)(m_bWidth*m_bHeight);
+        m_pPalleteDecoder = calloc(sizeof(uint32_t),dstSource);
+        m_pPalleteDecoderPrevious = calloc(sizeof(uint32_t),dstSource);
     }
-    pDecoder = (uint32_t*)palleteDecoder;
-    dstSource = (uint32_t)(width*rect.top + rect.left);
-    inter = (!(iterator = interlaced ? 0 : 4)) ? 4 : 5;
+    pDecoder = (uint32_t*)m_pPalleteDecoder;
+    dstSource = (uint32_t)(m_bWidth*m_bRect.top + m_bRect.left);
+    inter = (!(iterator = m_bInterlaced ? 0 : 4)) ? 4 : 5;
     for (source = -1; iterator < inter; iterator++) {
-        for (yoffset = 16U >> ((iterator > 1) ? iterator : 0), y = (8 >> iterator) & 7; y < (uint32_t)rect.height; y += yoffset) {
-            for (x = 0; x < (uint32_t)rect.width; x++) {
-                if (transparent != (long)address[++source]) {
-                    pDecoder[(uint32_t)width*y + x + dstSource] = ARGB(source);
+        for (yoffset = 16U >> ((iterator > 1) ? iterator : 0), y = (8 >> iterator) & 7; y < (uint32_t)m_bRect.height; y += yoffset) {
+            for (x = 0; x < (uint32_t)m_bRect.width; x++) {
+                if (m_bTransparent != (long)m_pAddress[++source]) {
+                    pDecoder[(uint32_t)m_bWidth*y + x + dstSource] = ARGB(source);
                 }
             }
         }
     }
-    memcpy((uint32_t*)frame, pDecoder, sizeof(uint32_t)*(uint32_t)width*(uint32_t)height); // copy pixels to frame
-    if ((mode == CGif_Previous) && !last) {
-        rect.width = width;
-        rect.height = height;
-        mode = CGif_Background;
+    memcpy((uint32_t*)frame, pDecoder, sizeof(uint32_t)*(uint32_t)m_bWidth*(uint32_t)m_bHeight); // copy pixels to frame
+    if ((m_bMode == CGif_Previous) && !m_bLast) {
+        m_bRect.width = m_bWidth;
+        m_bRect.height = m_bHeight;
+        m_bMode = CGif_Background;
         dstSource = 0;
     }else{
-        last = (mode == CGif_Previous) ? last : (unsigned long)(frameNumber + 1);
-        pDecoder = (uint32_t*)((mode == CGif_Previous) ? palleteDecoder : palleteDecoderPrevious);
-        pPrevious = (uint32_t*)((mode == CGif_Previous) ? palleteDecoderPrevious : palleteDecoder);
-        for (x = (uint32_t)(width*height);--x;pDecoder[x - 1] = pPrevious[x - 1]);
+        m_bLast = (m_bMode == CGif_Previous) ? m_bLast : (unsigned long)(m_bFrameNumber + 1);
+        pDecoder = (uint32_t*)((m_bMode == CGif_Previous) ? m_pPalleteDecoder : m_pPalleteDecoderPrevious);
+        pPrevious = (uint32_t*)((m_bMode == CGif_Previous) ? m_pPalleteDecoderPrevious : m_pPalleteDecoder);
+        for (x = (uint32_t)(m_bWidth*m_bHeight);--x;pDecoder[x - 1] = pPrevious[x - 1]);
     }
-    if (mode == CGif_Background) {
-        for (address[0] = (uint8_t)((transparent >= 0) ? transparent : background), y = 0, pDecoder = (uint32_t*)palleteDecoder; y < (uint32_t)rect.height; y++) {
-            for (x = 0; x < (uint32_t)rect.width; x++) {
-                pDecoder[(uint32_t)width*y + x + dstSource] = ARGB(0);
+    if (m_bMode == CGif_Background) {
+        for (m_pAddress[0] = (uint8_t)((m_bTransparent >= 0) ? m_bTransparent : m_bBackground), y = 0, pDecoder = (uint32_t*)m_pPalleteDecoder; y < (uint32_t)m_bRect.height; y++) {
+            for (x = 0; x < (uint32_t)m_bRect.width; x++) {
+                pDecoder[(uint32_t)m_bWidth*y + x + dstSource] = ARGB(0);
             }
         }
     }
     #undef ARGB
     frames.push_back(frame);
-    delays.push_back((int)delay);
+    delays.push_back((int)m_bDelay);
 }
 
 void CClientGifLoader::Load(std::vector<unsigned char*>& frames,std::vector<int>& delays,long skip) {
@@ -145,8 +145,8 @@ void CClientGifLoader::Load(std::vector<unsigned char*>& frames,std::vector<int>
     const uint8_t endOfBufferMark = 0x3b;
     const uint8_t graphicControlMark = 0xf9;
     const uint8_t appMetadataMark = 0xff;
-    if (!buffer) {
-        error = true;
+    if (!m_pBuffer) {
+        m_bError = true;
         return;
     }
     #pragma pack(push,1)
@@ -157,7 +157,7 @@ void CClientGifLoader::Load(std::vector<unsigned char*>& frames,std::vector<int>
         uint8_t  flags;
         uint8_t  background;
         uint8_t  aspectRatio;
-    }* header = (struct GlobalHeader*)buffer;
+    }* header = (struct GlobalHeader*)m_pBuffer;
     struct FrameHeader {
         uint16_t x;
         uint16_t y;
@@ -176,7 +176,7 @@ void CClientGifLoader::Load(std::vector<unsigned char*>& frames,std::vector<int>
     uint8_t* decoder;
     if ( // check if header is : `GIF89a` or `GIF87a`
         !header ||
-        (size <= (long)sizeof(*header)) ||
+        (m_bSize <= (long)sizeof(*header)) ||
         (*(decoder = header->head) != 71) ||
         decoder[1] != 73 ||
         decoder[2] != 70 ||
@@ -185,68 +185,68 @@ void CClientGifLoader::Load(std::vector<unsigned char*>& frames,std::vector<int>
         (decoder[4] != 55 && decoder[4] != 57) ||
         decoder[5] != 97
     ){
-        error = true;
+        m_bError = true;
         return;
     }
-    format = decoder[4] ? "GIF87a" : "GIF89a";
+    m_bFormat = decoder[4] ? "GIF87a" : "GIF89a";
     decoder = (uint8_t*)(header + 1) + LoadHeader(header->flags, 0, 0, 0, 0, 0L) * 3L;
-    if ((size -= decoder - (uint8_t*)header) <= 0) {
-        error = true;
+    if ((m_bSize -= decoder - (uint8_t*)header) <= 0) {
+        m_bError = true;
         return;
     }
-    width = _SWAP(header->width);
-    height = _SWAP(header->height);
+    m_bWidth = _SWAP(header->width);
+    m_bHeight = _SWAP(header->height);
     for (
-        address = decoder,
-        background = header->background,
-        blen = --size;
+        m_pAddress = decoder,
+        m_bBackground = header->background,
+        blen = --m_bSize;
         blen >= 0 &&
-        ((desc = *address++) != endOfBufferMark);
-        blen = SkipChunk(&address,blen) - 1
+        ((desc = *m_pAddress++) != endOfBufferMark);
+        blen = SkipChunk(&m_pAddress,blen) - 1
     ){
         if (desc == frameHeaderMark) {
-            frameHeader = (struct FrameHeader*)address;
-            if (LoadHeader(header->flags, &address, (void**)&pallete,frameHeader->flags,&blen,sizeof(*frameHeader)) <= 0) {
+            frameHeader = (struct FrameHeader*)m_pAddress;
+            if (LoadHeader(header->flags, &m_pAddress, (void**)&m_pPallete,frameHeader->flags,&blen,sizeof(*frameHeader)) <= 0) {
                 break;
             }
-            rect.width = _SWAP(frameHeader->width);
-            rect.height = _SWAP(frameHeader->height);
-            rect.left = (rect.width > rect.left) ? rect.width : rect.left;
-            rect.top = (rect.height > rect.top) ? rect.height : rect.top;
-            frameNumber++;
+            m_bRect.width = _SWAP(frameHeader->width);
+            m_bRect.height = _SWAP(frameHeader->height);
+            m_bRect.left = (m_bRect.width > m_bRect.left) ? m_bRect.width : m_bRect.left;
+            m_bRect.top = (m_bRect.height > m_bRect.top) ? m_bRect.height : m_bRect.top;
+            m_bFrameNumber++;
         }
     }
-    blen = rect.left*rect.top*(long)sizeof(*address);
-    GIF_ALLOCATE(address, (unsigned long)(blen + Blen + 2),1);
-    frameCount = (desc != endOfBufferMark) ? -frameNumber : frameNumber;
+    blen = m_bRect.left*m_bRect.top*(long)sizeof(*m_pAddress);
+    GIF_ALLOCATE(m_pAddress, (unsigned long)(blen + Blen + 2),1);
+    m_bFrameCount = (desc != endOfBufferMark) ? -m_bFrameNumber : m_bFrameNumber;
     for (
-        address += Blen,
-        frameNumber = -1;
+        m_pAddress += Blen,
+        m_bFrameNumber = -1;
         blen &&
-        (skip < ((frameCount < 0) ? -frameCount : frameCount)) && size >= 0;
-        size = (desc != endOfBufferMark) ? ((desc != frameHeaderMark) || (skip > frameNumber)) ? SkipChunk(&decoder,size) - 1 : size - 1 : -1
+        (skip < ((m_bFrameCount < 0) ? -m_bFrameCount : m_bFrameCount)) && m_bSize >= 0;
+        m_bSize = (desc != endOfBufferMark) ? ((desc != frameHeaderMark) || (skip > m_bFrameNumber)) ? SkipChunk(&decoder,m_bSize) - 1 : m_bSize - 1 : -1
     ){
         if ((desc = *decoder++) == frameHeaderMark) { // found a frame
-            interlaced = !!((frameHeader = (struct FrameHeader*)decoder)->flags & 0x40);
-            *(void**)&pallete = (void*)(header + 1);
-            palleteSize = LoadHeader(header->flags, &decoder, (void**)&pallete, frameHeader->flags, &size, sizeof(*frameHeader));
+            m_bInterlaced = !!((frameHeader = (struct FrameHeader*)decoder)->flags & 0x40);
+            *(void**)&m_pPallete = (void*)(header + 1);
+            m_bPalleteSize = LoadHeader(header->flags, &decoder, (void**)&m_pPallete, frameHeader->flags, &m_bSize, sizeof(*frameHeader));
             if (
-                (skip <= ++frameNumber) &&
+                (skip <= ++m_bFrameNumber) &&
                 (
-                    (palleteSize <= 0) ||
-                    LoadFrame(&decoder,&size,address,address + blen) < 0
+                    (m_bPalleteSize <= 0) ||
+                    LoadFrame(&decoder,&m_bSize,m_pAddress,m_pAddress + blen) < 0
                 )
             ){
-                size = -(frameNumber--) - 1; // failed to load frame
-            }else if (skip <= frameNumber) {
-                rect.left = _SWAP(frameHeader->x);
-                rect.top = _SWAP(frameHeader->y);
-                rect.width = _SWAP(frameHeader->width);
-                rect.height = _SWAP(frameHeader->height);
-                delay = (graphicControl) ? _SWAP(graphicControl->delay) : 0;
-                transparent = (graphicControl && (graphicControl->flags & 0x01)) ? graphicControl->transparent : -1;
-                delay = ((graphicControl && (graphicControl->flags & 0x02)) ? -delay - 1 : delay)*10;
-                mode = (graphicControl && !(graphicControl->flags & 0x10)) ? (graphicControl->flags & 0x0c) >> 2 : CGif_None;
+                m_bSize = -(m_bFrameNumber--) - 1; // failed to load frame
+            }else if (skip <= m_bFrameNumber) {
+                m_bRect.left = _SWAP(frameHeader->x);
+                m_bRect.top = _SWAP(frameHeader->y);
+                m_bRect.width = _SWAP(frameHeader->width);
+                m_bRect.height = _SWAP(frameHeader->height);
+                m_bDelay = (graphicControl) ? _SWAP(graphicControl->delay) : 0;
+                m_bTransparent = (graphicControl && (graphicControl->flags & 0x01)) ? graphicControl->transparent : -1;
+                m_bDelay = ((graphicControl && (graphicControl->flags & 0x02)) ? -m_bDelay - 1 : m_bDelay)*10;
+                m_bMode = (graphicControl && !(graphicControl->flags & 0x10)) ? (graphicControl->flags & 0x0c) >> 2 : CGif_None;
                 graphicControl = 0;
                 CreateFrame(frames,delays); // creating frame plain
             }
@@ -256,12 +256,12 @@ void CClientGifLoader::Load(std::vector<unsigned char*>& frames,std::vector<int>
             }
         }
     }
-    address -= Blen;
-    GIF_ALLOCATE(address, (unsigned long)(blen + Blen + 2), 0);
+    m_pAddress -= Blen;
+    GIF_ALLOCATE(m_pAddress, (unsigned long)(blen + Blen + 2), 0);
 }
 
 bool CClientGifLoader::operator!() {
-    return buffer ? error : false;
+    return m_pBuffer ? m_bError : false;
 }
 
 long CClientGifLoader::SkipChunk(uint8_t** buffer, long size){
