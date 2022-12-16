@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include "CClientVectorGraphic.h"
+#include "CClientGif.h"
 
 ////////////////////////////////////////////////////////////////
 //
@@ -29,6 +30,7 @@ CClientRenderElementManager::CClientRenderElementManager(CClientManager* pClient
     m_uiStatsScreenSourceCount = 0;
     m_uiStatsWebBrowserCount = 0;
     m_uiStatsVectorGraphicCount = 0;
+    m_uiStatsGifCount = 0;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -274,6 +276,35 @@ CClientVectorGraphic* CClientRenderElementManager::CreateVectorGraphic(uint widt
 
 ////////////////////////////////////////////////////////////////
 //
+// CClientRenderElementManager::CreateGif
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CClientGif* CClientRenderElementManager::CreateGif(uint width, uint height)
+{
+    // Create the item
+    CGifItem* pGifItem = m_pRenderItemManager->CreateGif(width, height);
+
+    // Check create worked
+    if (!pGifItem)
+    {
+        return nullptr;
+    }
+
+    // Create the element
+    CClientGif* pGifElement = new CClientGif(m_pClientManager, INVALID_ELEMENT_ID, pGifItem);
+
+    // Add to this manager's list
+    MapSet(m_ItemElementMap, pGifElement->GetRenderItem(), pGifElement);
+
+    m_uiStatsGifCount++;
+
+    return pGifElement;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CClientRenderElementManager::FindAutoTexture
 //
 // Find texture by unique name. Create if not found.
@@ -342,6 +373,8 @@ void CClientRenderElementManager::Remove(CClientRenderElement* pElement)
         m_uiStatsWebBrowserCount--;
     else if (pElement->IsA(CClientVectorGraphic::GetClassId()))
         m_uiStatsVectorGraphicCount--;
+    else if (pElement->IsA(CClientGif::GetClassId()))
+        m_uiStatsGifCount--;
     else if (pElement->IsA(CClientTexture::GetClassId()))
         m_uiStatsTextureCount--;
 
