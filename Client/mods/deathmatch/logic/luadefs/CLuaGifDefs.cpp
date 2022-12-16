@@ -117,7 +117,7 @@ int CLuaGifDefs::GifCreate(lua_State* luaVM) {
             lua_pushboolean(luaVM,false);
             return 1;
         }
-        CClientGif* gif = g_pClientGame->GetManager()->GetRenderElementManager()->CreateGif(width,height);
+        CClientGif* gif = g_pClientGame->GetManager()->GetRenderElementManager()->CreateGif(width, height);
         if (!gif) {
             m_pScriptDebugging->LogError(luaVM, "error while creating gif");
             lua_pushboolean(luaVM, false);
