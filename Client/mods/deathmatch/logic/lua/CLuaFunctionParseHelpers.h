@@ -489,6 +489,11 @@ inline SString GetClassTypeName(CClientVectorGraphic*)
     return "svg";
 }
 
+inline SString GetClassTypeName(CClientGif*)
+{
+    return "gif";
+}
+
 //
 // CResource from userdata
 //
