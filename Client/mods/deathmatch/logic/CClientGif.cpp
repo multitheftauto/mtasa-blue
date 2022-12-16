@@ -28,7 +28,7 @@ CClientGif::~CClientGif(){
     Unlink();
 }
 
-void CClientGif::Register(std::vector<unsigned char*>&& frms, std::vector<int>&& dls) {
+void CClientGif::Register(std::vector<std::vector<unsigned char>>&& frms,std::vector<int>& dls) {
     m_bFrames = std::move(frms);
     m_bDelays = std::move(dls);
     m_bDefaultDelays = m_bDelays;
@@ -44,10 +44,8 @@ void CClientGif::Next(){
 }
 
 void CClientGif::Unlink(){
-    for (unsigned char* frame : m_bFrames) {
-        if (frame) {
-            delete[] frame;
-        }
+    for (std::vector<unsigned char>& frame : m_bFrames) {
+        frame.clear();
     }
     m_bFrames.clear();
     m_bDelays.clear();
@@ -71,11 +69,11 @@ CClientGifLoader::CClientGifLoader(char* data) {
     m_bSize = (long)((unsigned long)strlen(data));
 }
 
-void CClientGifLoader::CreateFrame(std::vector<unsigned char*>& frames, std::vector<int>& delays) {
+void CClientGifLoader::CreateFrame(std::vector<std::vector<unsigned char>>& frames,std::vector<int>& delays) {
     long frameStride = m_bWidth*4;
     long frameSize = frameStride*m_bHeight;
-    unsigned char* frame = new unsigned char[frameSize];
-    memset(frame, 0, frameSize);
+    std::vector<unsigned char> frame;
+    for (long i = 0; i < frameSize; i++, frame.push_back(0));
     uint32_t x;
     uint32_t y;
     uint32_t yoffset;
@@ -114,7 +112,7 @@ void CClientGifLoader::CreateFrame(std::vector<unsigned char*>& frames, std::vec
             }
         }
     }
-    memcpy((uint32_t*)frame, pDecoder, sizeof(uint32_t)*(uint32_t)m_bWidth*(uint32_t)m_bHeight); // copy pixels to frame
+    memcpy((uint32_t*)frame.data(), pDecoder, sizeof(uint32_t)*(uint32_t)m_bWidth*(uint32_t)m_bHeight);
     if ((m_bMode == CGif_Previous) && !m_bLast) {
         m_bRect.width = m_bWidth;
         m_bRect.height = m_bHeight;
@@ -134,11 +132,11 @@ void CClientGifLoader::CreateFrame(std::vector<unsigned char*>& frames, std::vec
         }
     }
     #undef ARGB
-    frames.push_back(frame);
+    frames.push_back(std::move(frame));
     delays.push_back((int)m_bDelay);
 }
 
-void CClientGifLoader::Load(std::vector<unsigned char*>& frames,std::vector<int>& delays,long skip) {
+void CClientGifLoader::Load(std::vector<std::vector<unsigned char>>& frames,std::vector<int>& delays,long skip) {
     const long Blen = (1 << 12)*sizeof(uint32_t);
     const uint8_t extensionHeaderMark = 0x21;
     const uint8_t frameHeaderMark = 0x2c;
