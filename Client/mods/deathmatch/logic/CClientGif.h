@@ -122,7 +122,7 @@ private:
     uint                                       frameCount = 0;
     uint                                       stride;
     uint                                       showing = 1;
-    double                                     tick = (double)GetTickCount64_();
+    double                                     tick = 0;
     bool                                       playing = false;
     bool                                       m_bIsDestoryed = false;
     std::string                                error = "";
