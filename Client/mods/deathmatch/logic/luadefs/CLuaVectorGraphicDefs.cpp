@@ -126,7 +126,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
         g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
 
     if (!vectorGraphic)
-        return false;
+        return nullptr;
 
     if (pathOrRawData.has_value())
     {
