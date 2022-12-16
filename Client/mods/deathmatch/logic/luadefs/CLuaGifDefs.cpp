@@ -97,7 +97,7 @@ int CLuaGifDefs::GifCreate(lua_State* luaVM) {
         }else{
             loader = CClientGifLoader(buffer);
         }
-        std::vector<unsigned char*> frames;
+        std::vector<std::vector<unsigned char>> frames;
         std::vector<int> delays;
         loader.Load(frames, delays, 0L);
         if (!loader) {
