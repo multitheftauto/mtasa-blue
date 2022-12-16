@@ -84,7 +84,7 @@ public:
     CClientGif(CClientManager*, ElementID, CGifItem*);
     ~CClientGif();
     virtual void                 Unlink() override;
-    void                         Register(std::vector<unsigned char*>,std::vector<int>);
+    void                         Register(std::vector<unsigned char*>&&,std::vector<int>&&);
     CResource*                   GetResource() { return m_pResource; }
     void                         SetResource(CResource* resource) { m_pResource = resource; }
     eClientEntityType            GetType() const { return CCLIENTGIF; }
