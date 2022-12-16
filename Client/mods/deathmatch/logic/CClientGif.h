@@ -37,13 +37,13 @@ public:
     CClientGifLoader(char*);
     void        CreateFrame(std::vector<unsigned char*>&,std::vector<int>&);
     void        Load(std::vector<unsigned char*>&,std::vector<int>&,long);
-    uint8_t*    GetBuffer() { return buffer; }
-    long&       GetWidth() { return width; }
-    long&       GetHeight() { return height; }
-    long&       GetDelay() { return delay; }
-    long&       GetFrameNumber() { return frameNumber; }
-    long&       GetFrameCount() { return frameCount; }
-    SString     GetFormat() { return format; }
+    uint8_t*    GetBuffer() { return m_pBuffer; }
+    long&       GetWidth() { return m_bWidth; }
+    long&       GetHeight() { return m_bHeight; }
+    long&       GetDelay() { return m_bDelay; }
+    long&       GetFrameNumber() { return m_bFrameNumber; }
+    long&       GetFrameCount() { return m_bFrameCount; }
+    SString     GetFormat() { return m_bFormat; }
     bool        operator!();
 
     static long SkipChunk(uint8_t**, long);
@@ -55,26 +55,26 @@ private:
         uint8_t r;
         uint8_t g;
         uint8_t b;
-    }* pallete;
-    SString        format = "Undefined";
-    uint8_t*       buffer = nullptr;
-    uint8_t*       address = nullptr;
-    void*          palleteDecoder = nullptr;
-    void*          palleteDecoderPrevious = nullptr;
-    long           size = 0;
-    long           width = 0;
-    long           height = 0;
-    long           palleteSize = 0;
-    long           background = 0;
-    long           transparent = 0;
-    long           interlaced = 0;
-    long           delay = 0;
-    long           frameNumber = 0;
-    long           frameCount = 0;
-    long           mode = CGif_None;
-    unsigned long  last = 0;
-    CClientGifRect rect = {0,0,0,0};
-    bool           error = false;
+    }* m_pPallete;
+    SString        m_bFormat = "Undefined";
+    uint8_t*       m_pBuffer = nullptr;
+    uint8_t*       m_pAddress = nullptr;
+    void*          m_pPalleteDecoder = nullptr;
+    void*          m_pPalleteDecoderPrevious = nullptr;
+    long           m_bSize = 0;
+    long           m_bWidth = 0;
+    long           m_bHeight = 0;
+    long           m_bPalleteSize = 0;
+    long           m_bBackground = 0;
+    long           m_bTransparent = 0;
+    long           m_bInterlaced = 0;
+    long           m_bDelay = 0;
+    long           m_bFrameNumber = 0;
+    long           m_bFrameCount = 0;
+    long           m_bMode = CGif_None;
+    unsigned long  m_bLast = 0;
+    CClientGifRect m_bRect = {0,0,0,0};
+    bool           m_bError = false;
 };
 
 class CClientGif final : public CClientTexture {
@@ -90,40 +90,39 @@ public:
     eClientEntityType            GetType() const { return CCLIENTGIF; }
     CGifItem*                    GetRenderItem() const { return static_cast<CGifItem*>(m_pRenderItem); }
     CClientGifDisplay*           GetDisplay() const { return m_pGifDisplay.get(); }
-    std::vector<unsigned char*>  GetFrames() const { return frames; }
-    uint                         GetStride() const { return stride; }
-    uint                         GetShowingFrame() const { return showing; }
-    uint                         GetFrameDelay(const uint& id) const { return delays[(id < 1 ? showing : (id > GetImageCount() ? showing : id)) - 1]; }
-    uint                         GetFrameDefaultDelay(const uint& id) const { return defaultDelays[(id < 1 ? showing : (id > GetImageCount() ? showing : id)) - 1]; }
-    int                          GetImageCount() const { return frames.size(); }
-    double                       GetTick() const { return tick; }
-    unsigned char*               GetFrame() const { return showing <= GetImageCount() ? frames[showing - 1] : nullptr; }
-    SString                      GetFormat() const { return format; }
-    uint                         GetFrameCount() const { return frameCount; }
-    void                         SetFrameDelay(const uint& id, const uint32_t& delay) { delays[(id < 1 ? showing : (id > GetImageCount() ? (showing) : id)) - 1] = delay; }
-    void                         SetFormat(const SString& fmt) { if (!fmt.empty()) format = fmt; }
-    void                         SetFrameCount(const uint& count) { frameCount = count; }
-    void                         UpdateTick() { tick = (double)GetTickCount64_(); }
-    void                         Play() { playing = true; }
-    void                         Stop() { playing = false; }
+    std::vector<unsigned char*>  GetFrames() const { return m_bFrames; }
+    uint                         GetStride() const { return m_bStride; }
+    uint                         GetShowingFrame() const { return m_bShowing; }
+    uint                         GetFrameDelay(const uint& id) const { return m_bDelays[(id < 1 ? m_bShowing : (id > GetImageCount() ? m_bShowing : id)) - 1]; }
+    uint                         GetFrameDefaultDelay(const uint& id) const { return m_bDefaultDelays[(id < 1 ? m_bShowing : (id > GetImageCount() ? m_bShowing : id)) - 1]; }
+    int                          GetImageCount() const { return m_bFrames.size(); }
+    double                       GetTick() const { return m_bTick; }
+    unsigned char*               GetFrame() const { return m_bShowing <= GetImageCount() ? m_bFrames[m_bShowing - 1] : nullptr; }
+    SString                      GetFormat() const { return m_bFormat; }
+    uint                         GetFrameCount() const { return m_bFrameCount; }
+    void                         SetFrameDelay(const uint& id, const uint32_t& delay) { m_bDelays[(id < 1 ? m_bShowing : (id > GetImageCount() ? (m_bShowing) : id)) - 1] = delay; }
+    void                         SetFormat(const SString& fmt) { if (!fmt.empty()) m_bFormat = fmt; }
+    void                         SetFrameCount(const uint& count) { m_bFrameCount = count; }
+    void                         UpdateTick() { m_bTick = (double)GetTickCount64_(); }
+    void                         Play() { m_bPlaying = true; }
+    void                         Stop() { m_bPlaying = false; }
     void                         Next();
-    void                         NavigateToThumbnail() { showing = 1; }
-    bool                         IsPlaying() const { return playing; }
+    void                         NavigateToThumbnail() { m_bShowing = 1; }
+    bool                         IsPlaying() const { return m_bPlaying; }
     bool                         IsDestoryed() const { return m_bIsDestoryed; }
 
 private:
     CResource*                                 m_pResource = nullptr;
     CClientManager*                            m_pManager;
     std::unique_ptr<CClientGifDisplay>         m_pGifDisplay;
-    SString                                    format = "Undefined";
-    std::vector<unsigned char*>                frames;
-    std::vector<int>                           defaultDelays;
-    std::vector<int>                           delays;
-    uint                                       frameCount = 0;
-    uint                                       stride;
-    uint                                       showing = 1;
-    double                                     tick = 0;
-    bool                                       playing = false;
+    SString                                    m_bFormat = "Undefined";
+    std::vector<unsigned char*>                m_bFrames;
+    std::vector<int>                           m_bDefaultDelays;
+    std::vector<int>                           m_bDelays;
+    uint                                       m_bFrameCount = 0;
+    uint                                       m_bStride;
+    uint                                       m_bShowing = 1;
+    double                                     m_bTick = 0;
+    bool                                       m_bPlaying = false;
     bool                                       m_bIsDestoryed = false;
-    std::string                                error = "";
 };
