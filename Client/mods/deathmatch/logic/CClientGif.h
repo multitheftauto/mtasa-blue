@@ -90,16 +90,16 @@ public:
     eClientEntityType            GetType() const { return CCLIENTGIF; }
     CGifItem*                    GetRenderItem() const { return static_cast<CGifItem*>(m_pRenderItem); }
     CClientGifDisplay*           GetDisplay() const { return m_pGifDisplay.get(); }
-    std::vector<unsigned char*>& GetFrames() { return frames; }
-    uint                         GetStride() { return stride; }
-    uint                         GetShowingFrame() { return showing; }
-    uint                         GetFrameDelay(const uint& id) { return delays[(id < 1 ? showing : (id > GetImageCount() ? showing : id)) - 1]; }
-    uint                         GetFrameDefaultDelay(const uint& id) { return defaultDelays[(id < 1 ? showing : (id > GetImageCount() ? showing : id)) - 1]; }
-    int                          GetImageCount() { return frames.size(); }
-    double&                      GetTick() { return tick; }
-    unsigned char*               GetFrame() { return showing <= GetImageCount() ? frames[showing - 1] : nullptr; }
-    SString&                     GetFormat() { return format; }
-    uint                         GetFrameCount() { return frameCount; }
+    std::vector<unsigned char*>  GetFrames() const { return frames; }
+    uint                         GetStride() const { return stride; }
+    uint                         GetShowingFrame() const { return showing; }
+    uint                         GetFrameDelay(const uint& id) const { return delays[(id < 1 ? showing : (id > GetImageCount() ? showing : id)) - 1]; }
+    uint                         GetFrameDefaultDelay(const uint& id) const { return defaultDelays[(id < 1 ? showing : (id > GetImageCount() ? showing : id)) - 1]; }
+    int                          GetImageCount() const { return frames.size(); }
+    double                       GetTick() const { return tick; }
+    unsigned char*               GetFrame() const { return showing <= GetImageCount() ? frames[showing - 1] : nullptr; }
+    SString                      GetFormat() const { return format; }
+    uint                         GetFrameCount() const { return frameCount; }
     void                         SetFrameDelay(const uint& id, const uint32_t& delay) { delays[(id < 1 ? showing : (id > GetImageCount() ? (showing) : id)) - 1] = delay; }
     void                         SetFormat(const SString& fmt) { if (!fmt.empty()) format = fmt; }
     void                         SetFrameCount(const uint& count) { frameCount = count; }
@@ -108,7 +108,7 @@ public:
     void                         Stop() { playing = false; }
     void                         Next();
     void                         NavigateToThumbnail() { showing = 1; }
-    bool                         IsPlaying() { return playing; }
+    bool                         IsPlaying() const { return playing; }
     bool                         IsDestoryed() const { return m_bIsDestoryed; }
 
 private:
