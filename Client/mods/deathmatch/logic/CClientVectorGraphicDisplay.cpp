@@ -104,7 +104,7 @@ void CClientVectorGraphicDisplay::ClearTexture()
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
-    if (SUCCEEDED(surface->LockRect(&LockedRect, nullptr, 0)))
+    if (SUCCEEDED(surface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
     {
         std::memset(LockedRect.pBits, 0x0, LockedRect.Pitch * pVectorGraphicItem->m_uiSurfaceSizeY);
 
