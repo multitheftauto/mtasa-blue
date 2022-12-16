@@ -28,7 +28,7 @@ CClientGif::~CClientGif(){
     Unlink();
 }
 
-void CClientGif::Register(std::vector<unsigned char*> frms, std::vector<int> dls) {
+void CClientGif::Register(std::vector<unsigned char*>&& frms, std::vector<int>&& dls) {
     frames = frms;
     delays = dls;
     defaultDelays = dls;
