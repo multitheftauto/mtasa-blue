@@ -125,8 +125,8 @@ int CLuaGifDefs::GifCreate(lua_State* luaVM) {
         }
         gif->SetParent(resource->GetResourceDynamicEntity());
         gif->SetResource(resource);
-        gif->Register(std::move(frames),std::move(delays));
         gif->SetFrameCount(frames.size());
+        gif->Register(std::move(frames),std::move(delays));
         gif->SetFormat(loader.GetFormat());
         lua_pushelement(luaVM, gif);
         return 1;
