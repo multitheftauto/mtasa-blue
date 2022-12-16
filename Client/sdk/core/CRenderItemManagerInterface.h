@@ -162,7 +162,7 @@ public:
     virtual CScreenSourceItem*  CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
     virtual CWebBrowserItem*    CreateWebBrowser(uint uiSizeX, uint uiSizeY) = 0;
     virtual CVectorGraphicItem* CreateVectorGraphic(uint uiSizeX, uint uiSizeY) = 0;
-    virtual CGifItem*           CreateGif(uint uiSizeX,uint uiSizeY) = 0;
+    virtual CGifItem*           CreateGif(uint uiSizeX, uint uiSizeY) = 0;
     virtual bool                SetRenderTarget(CRenderTargetItem* pItem, bool bClear) = 0;
     virtual void                EnableSetRenderTargetOldVer(bool bEnable) = 0;
     virtual bool                IsSetRenderTargetEnabledOldVer() = 0;
