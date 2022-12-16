@@ -20,6 +20,7 @@ CClientGif::CClientGif(CClientManager* pManager, ElementID ID, CGifItem* p_GifIt
     SetTypeName("gif");
     m_pManager = pManager;
     stride = GetRenderItem()->m_uiSizeX * 4;
+    UpdateTick();
     m_pGifDisplay = std::make_unique<CClientGifDisplay>(m_pManager->GetDisplayManager(), this);
 }
 
