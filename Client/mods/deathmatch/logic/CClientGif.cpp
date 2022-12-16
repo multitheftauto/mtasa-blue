@@ -31,7 +31,7 @@ CClientGif::~CClientGif(){
 void CClientGif::Register(std::vector<unsigned char*>&& frms, std::vector<int>&& dls) {
     frames = std::move(frms);
     delays = std::move(dls);
-    defaultDelays = dls;
+    defaultDelays = delays;
     m_pGifDisplay->UpdateTexture();
 }
 
