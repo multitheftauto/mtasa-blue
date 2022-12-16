@@ -55,21 +55,21 @@ void CClientGifDisplay::UpdateTexture(){
     IDirect3DDevice9* device = pGifItem->m_pDevice;
     // Lock Surface
     D3DLOCKED_RECT LockedRect;
-    ZeroMemory(&LockedRect, sizeof(D3DLOCKED_RECT));
-    surface->LockRect(&LockedRect, nullptr, 0);
-    // Unlock Surface
-    unsigned char* frame = m_pGif->GetFrame();
-    if (frame){
-        uint stride = m_pGif->GetStride();
-        auto surfaceData = static_cast<byte*>(LockedRect.pBits);
-        auto data = static_cast<const byte*>(frame);
-        for (int i = 0; i < pGifItem->m_uiSizeY; i++) {
-            memcpy(surfaceData,data,stride);
-            data += stride;
-            surfaceData += LockedRect.Pitch;
+    if (SUCCEEDED(surface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD))) {
+        // Unlock Surface
+        unsigned char* frame = m_pGif->GetFrame();
+        if (frame){
+            uint stride = m_pGif->GetStride();
+            auto surfaceData = static_cast<byte*>(LockedRect.pBits);
+            auto data = static_cast<const byte*>(frame);
+            for (int i = 0; i < pGifItem->m_uiSizeY; i++) {
+                memcpy(surfaceData,data,stride);
+                data += stride;
+                surfaceData += LockedRect.Pitch;
+            }
         }
+        surface->UnlockRect();
     }
-    surface->UnlockRect();
 }
 
 void CClientGifDisplay::ClearTexture(){
