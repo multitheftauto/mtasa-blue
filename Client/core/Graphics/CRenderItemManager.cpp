@@ -173,6 +173,32 @@ CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint hei
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::CreateGif
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CGifItem* CRenderItemManager::CreateGif(uint width, uint height)
+{
+    if (!CanCreateRenderItem(CGifItem::GetClassId()))
+        return nullptr;
+
+    CGifItem* pVectorItem = new CGifItem;
+    pVectorItem->PostConstruct(this, width, height);
+
+    if (!pVectorItem->IsValid())
+    {
+        SAFE_RELEASE(pVectorItem);
+        return nullptr;
+    }
+
+    UpdateMemoryUsage();
+
+    return pVectorItem;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::CreateRenderTarget
 //
 //
