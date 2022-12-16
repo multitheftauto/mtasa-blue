@@ -151,7 +151,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             if (!didLoad)
             {
                 delete vectorGraphic;
-                return false;
+                return nullptr;
             }
         }
         else
@@ -177,7 +177,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 if (!didLoad)
                 {
                     delete vectorGraphic;
-                    return false;
+                    return nullptr;
                 }
             }
             else
@@ -185,7 +185,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 delete vectorGraphic;
 
                 m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (invalid file path) [%s]", pathOrRawData.value().c_str()));
-                return false;
+                return nullptr;
             }
         }
     }
