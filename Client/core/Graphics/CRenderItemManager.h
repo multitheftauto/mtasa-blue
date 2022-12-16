@@ -33,6 +33,7 @@ public:
     virtual CRenderTargetItem*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false);
     virtual CScreenSourceItem*  CreateScreenSource(uint uiSizeX, uint uiSizeY);
     virtual CVectorGraphicItem* CreateVectorGraphic(uint width, uint height);
+    virtual CGifItem*           CreateGif(uint width,uint height);
     virtual CWebBrowserItem*    CreateWebBrowser(uint uiSizeX, uint uiSizeY);
     virtual bool                SetRenderTarget(CRenderTargetItem* pItem, bool bClear);
     virtual void                EnableSetRenderTargetOldVer(bool bEnable);
