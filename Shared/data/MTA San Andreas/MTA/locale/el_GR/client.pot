@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-15 13:36\n"
+"PO-Revision-Date: 2022-12-19 11:27\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -1579,7 +1579,7 @@ msgstr "Φίλτρο ανισοτροπίας:"
 
 #: Client/core/CSettings.cpp:611 Client/core/CSettings.cpp:759
 msgid "Anti-aliasing:"
-msgstr "Ευκρίνεια Κυρτών Γραμμών (Anti-aliasing):"
+msgstr "Ευκρίνεια Κυρτών Γραμμών (AA):"
 
 #: Client/core/CSettings.cpp:611 Client/core/CSettings.cpp:773
 msgid "Aspect Ratio:"
