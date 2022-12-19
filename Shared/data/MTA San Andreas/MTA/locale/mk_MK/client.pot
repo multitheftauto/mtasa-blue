@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-15 13:38\n"
+"PO-Revision-Date: 2022-12-19 11:27\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -340,7 +340,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "Time Remaining: "
-msgstr "Преостанато време:~"
+msgstr "Преостанато време: "
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
 #, c-format
@@ -665,7 +665,7 @@ msgstr "ПРЕДУПРЕДУВАЊЕ\n\n"
 #: Client/loader/MainFunctions.cpp:462
 #, c-format
 msgid "The detected file was:  %s\n"
-msgstr "Детектираниот фајл е: ~ ~%s\n"
+msgstr "Детектираниот фајл е: %s\n"
 
 #: Client/loader/MainFunctions.cpp:596
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
@@ -697,8 +697,8 @@ msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 " move your installation(s) to a path that does not contain a semicolon."
 msgstr "Линкот до инсталацијата на 'MTA:SA' или 'GTA: San Andreas'\n"
 "содржи ';' (точказапирка).\n\n"
-"~Доколку имате проблеми со MTA:SA,\n"
-"~преместете ја инсталацијата во друг линк што не содржи точказапирка."
+" Доколку имате проблеми со MTA:SA,\n"
+" преместете ја инсталацијата во друг линк што не содржи точказапирка."
 
 #: Client/loader/MainFunctions.cpp:782
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -769,7 +769,7 @@ msgstr "Поправете ја грешката"
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr "Grand Theft Auto: San Andreas не може да се стартува. ~ ~ Рестартирајте, или ако проблемот продолжи, контактирајте ги MTA на www.multitheftauto.com. \n\n"
+msgstr "Grand Theft Auto: San Andreas не може да се стартува.  Рестартирајте, или ако проблемот продолжи, контактирајте ги MTA на www.multitheftauto.com. \n\n"
 "[%s]"
 
 #: Client/loader/MainFunctions.cpp:1240
@@ -819,7 +819,7 @@ msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
 msgstr "MTA:SA бара дозвола за следнава задача:\n\n"
-"~~'%s'\n\n"
+"  '%s'\n\n"
 "Ве молиме потврдете во следниов прозор."
 
 #: Client/loader/CInstallManager.cpp:344
@@ -827,7 +827,7 @@ msgstr "MTA:SA бара дозвола за следнава задача:\n\n"
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA неможе се да ја изврши следнава задача:\n\n"
-"~ ~ '%s'\n"
+"  '%s'\n"
 
 #: Client/loader/CInstallManager.cpp:394
 msgid "** The crash was caused by a graphics driver error **\n\n"
@@ -1221,7 +1221,7 @@ msgstr "ЗАДОЛЖИТЕЛНА НАДГРАДБА"
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
 msgstr "За да влезете во серверот, треба да ја ажурирате MTA.\n\n"
-"~ Сакате ли да ја ажурирате сега?"
+" Сакате ли да ја ажурирате сега?"
 
 #: Client/core/CVersionUpdater.cpp:1873
 msgid "OPTIONAL UPDATE"
@@ -1231,7 +1231,7 @@ msgstr "ОПТИОНАЛНО АЖУРИРАЊЕ"
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
 msgstr "Серверот препорачува надградба, но не е опходна.\n\n"
-"~ Дали сакате да надградите сега ?"
+" Дали сакате да надградите сега ?"
 
 #: Client/core/CVersionUpdater.cpp:1913
 msgid "Update not currently avalable.\n\n"
@@ -1266,7 +1266,7 @@ msgstr "Симнувањето е Успешно"
 
 #: Client/core/CVersionUpdater.cpp:1988
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr "~ - Непознат проблем во _DialogUpdateResult"
+msgstr " - Непознат проблем во _DialogUpdateResult"
 
 #: Client/core/CVersionUpdater.cpp:2079 Client/core/CSettings.cpp:4500
 msgid "CUSTOMIZED GTA:SA FILES"
@@ -1296,7 +1296,7 @@ msgstr "%3d %% комплетирарно"
 msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
-"Се чека одговор ~ ~ - ~ ~ %-3d"
+"Се чека одговор  -  %-3d"
 
 #: Client/core/CScreenShot.cpp:53
 #, c-format
@@ -1914,7 +1914,7 @@ msgstr "ДИСКОНЕКТИРАЊЕ Е ЗАДОЛЖИТЕЛНО"
 #. Update the joystick name
 #: Client/core/CSettings.cpp:1720
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Joypad не е детектиран ~ ~-~ ~Проверете ја конекцијата и рестартирајте ја играта"
+msgstr "Joypad не е детектиран  -  Проверете ја конекцијата и рестартирајте ја играта"
 
 #: Client/core/CSettings.cpp:1915
 msgid "Binding axis"
@@ -2196,7 +2196,7 @@ msgstr "Ве молиме внесете име"
 #: Client/core/CSettings.cpp:4693
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "Ве молиме внесете име што ќе биде употребувано во играта.~ ~\n"
+msgstr "Ве молиме внесете име што ќе биде употребувано во играта.  \n"
 "Ова ќе виде вашето име кога ќе се конектирате и играте на серверот"
 
 #: Client/core/CSettings.cpp:4711
@@ -2882,7 +2882,7 @@ msgstr "Се вчитува..."
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1240
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2182
 msgid "  ..loading.."
-msgstr "~ ~ ..се вчитува..."
+msgstr "  ..се вчитува.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
