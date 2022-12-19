@@ -301,6 +301,8 @@ namespace
         {"getElementLighting", "1.5.8-9.21367"},
         {"setChatboxCharacterLimit", "1.5.8-9.21476"},
         {"getChatboxCharacterLimit", "1.5.8-9.21476"},
+
+        // Features added in 1.6.0
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -416,6 +418,8 @@ namespace
         {"onElementInteriorChange", "1.5.8-9.20837"},
         {"onPlayerResourceStart", "1.5.8-9.20957"},
         {"getProcessMemoryStats", "1.5.8-9.21389"},
+
+        // Features added in 1.6.0
     };
 
     //
