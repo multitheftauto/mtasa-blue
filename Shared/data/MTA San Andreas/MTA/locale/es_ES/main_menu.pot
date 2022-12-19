@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2022-09-24 16:37\n"
+"PO-Revision-Date: 2022-12-19 16:17\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -27,7 +27,7 @@ msgstr "Desconectar"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr "Explorador de servidores"
+msgstr "Servidores"
 
 #. Found in the main menu navigation
 msgid "Host game"
