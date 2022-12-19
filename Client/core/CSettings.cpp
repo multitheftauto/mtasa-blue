@@ -909,10 +909,10 @@ void CSettings::CreateGUI()
     m_pEditBrowserBlacklistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserBlacklistAdd->GetPosition(vecTemp);
-    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(191.0f, 22.0f));
+    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(209.0f, 22.0f));
 
     m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
-    m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10, 3), false);
+    m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
     m_pLabelBrowserBlacklistAdd->SetTextColor(0, 0, 0);
     m_pLabelBrowserBlacklistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserBlacklistAdd->SetAlpha(0.7f);
@@ -921,12 +921,12 @@ void CSettings::CreateGUI()
 
     m_pButtonBrowserBlacklistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Block")));
     m_pButtonBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserBlacklistAdd->GetSize().fX + 2.0f, vecTemp.fY));
-    m_pButtonBrowserBlacklistAdd->SetSize(CVector2D(64.0f, 22.0f));
+    m_pButtonBrowserBlacklistAdd->SetSize(CVector2D(90.0f, 22.0f));
 
     m_pGridBrowserBlacklist = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTabBrowser));
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
-    m_pGridBrowserBlacklist->SetSize(CVector2D(256.0f, 150.0f));
+    m_pGridBrowserBlacklist->SetSize(CVector2D(300.0f, 150.0f));
     m_pGridBrowserBlacklist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserBlacklistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
@@ -936,7 +936,7 @@ void CSettings::CreateGUI()
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);            // Reset vecTemp
 
     m_pLabelBrowserCustomWhitelist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom whitelist")));
-    m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(292.0f, vecTemp.fY));
+    m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(vecTemp.fX + 300.0f + 19.0f, vecTemp.fY));
     m_pLabelBrowserCustomWhitelist->GetPosition(vecTemp);
     m_pLabelBrowserCustomWhitelist->AutoSize(NULL, 20.0f);
     m_pLabelBrowserCustomWhitelist->SetFont("default-bold-small");
@@ -944,10 +944,10 @@ void CSettings::CreateGUI()
     m_pEditBrowserWhitelistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserWhitelistAdd->GetPosition(vecTemp);
-    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(191.0f, 22.0f));
+    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(209.0f, 22.0f));
 
     m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
-    m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10, 3), false);
+    m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
     m_pLabelBrowserWhitelistAdd->SetTextColor(0, 0, 0);
     m_pLabelBrowserWhitelistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserWhitelistAdd->SetAlpha(0.7f);
@@ -956,12 +956,12 @@ void CSettings::CreateGUI()
 
     m_pButtonBrowserWhitelistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Allow")));
     m_pButtonBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserWhitelistAdd->GetSize().fX + 2.0f, vecTemp.fY));
-    m_pButtonBrowserWhitelistAdd->SetSize(CVector2D(64.0f, 22.0f));
+    m_pButtonBrowserWhitelistAdd->SetSize(CVector2D(90.0f, 22.0f));
 
     m_pGridBrowserWhitelist = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTabBrowser));
     m_pGridBrowserWhitelist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserWhitelist->GetPosition(vecTemp);
-    m_pGridBrowserWhitelist->SetSize(CVector2D(256.0f, 150.0f));
+    m_pGridBrowserWhitelist->SetSize(CVector2D(300.0f, 150.0f));
     m_pGridBrowserWhitelist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserWhitelistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
