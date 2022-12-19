@@ -7,9 +7,9 @@ project "lunasvg"
 	floatingpoint "Fast"
 	rtti "Off"
 
-	defines { 
-		"LUNASVG_EXPORT", 
-		"LUNASVG_SHARED", 
+	defines {
+		"LUNASVG_EXPORT",
+		"LUNASVG_SHARED",
 		"_CRT_SECURE_NO_WARNINGS"
 	}
 
@@ -23,16 +23,15 @@ project "lunasvg"
 		["*"] = "premake5.lua"
 	}
 
-	files { 
+	files {
 		"premake5.lua",
 		"**.cpp",
 		"**.h",
 		"**.c"
 	}
 
-	includedirs { 
-		"3rdparty/plutovg", 
-		"3rdparty/software", 
-		"source", 
+	includedirs {
+		"3rdparty/plutovg",
+		"source",
 		"include"
 	}
