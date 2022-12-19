@@ -1128,13 +1128,13 @@ void CSettings::CreateGUI()
     m_pWin8ColorCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("16-bit color")));
     m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8ColorCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fX += 110;
+    vecTemp.fX += 140;
 
     m_pWin8MouseCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Mouse fix")));
     m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8MouseCheckBox->AutoSize(NULL, 20.0f);
     vecTemp.fY += fLineHeight;
-    vecTemp.fX -= 110;
+    vecTemp.fX -= 140;
 
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
