@@ -7,7 +7,9 @@
  *  PURPOSE:     source file for the custom weapon stats manager.
  *
  *****************************************************************************/
+
 #include "StdInc.h"
+#include "CWeaponStatManagerSA.h"
 
 sWeaponInfo CWeaponStatManagerSA::OriginalPoorWeaponData[WEAPONTYPE_MAX + 1];
 sWeaponInfo CWeaponStatManagerSA::OriginalNormalWeaponData[WEAPONTYPE_MAX + 1];

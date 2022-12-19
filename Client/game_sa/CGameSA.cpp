@@ -13,19 +13,58 @@
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
 #include "SharedUtil.MemAccess.hpp"
-#include "D3DResourceSystemSA.h"
-#include "CFileLoaderSA.h"
+#include "C3DMarkersSA.h"
+#include "CAEAudioHardwareSA.h"
+#include "CAERadioTrackManagerSA.h"
+#include "CAESoundManagerSA.h"
+#include "CAnimManagerSA.h"
+#include "CAudioContainerSA.h"
+#include "CCameraSA.h"
+#include "CCarEnterExitSA.h"
+#include "CCheckpointsSA.h"
+#include "CClockSA.h"
 #include "CColStoreSA.h"
+#include "CControllerConfigManagerSA.h"
+#include "CCoronasSA.h"
+#include "CEventListSA.h"
+#include "CExplosionManagerSA.h"
+#include "CFileLoaderSA.h"
+#include "CFireManagerSA.h"
+#include "CFxSA.h"
+#include "CFxSystemSA.h"
+#include "CGameSA.h"
+#include "CGaragesSA.h"
+#include "CHandlingManagerSA.h"
+#include "CHudSA.h"
+#include "CKeyGenSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
+#include "COffsets.h"
+#include "CPadSA.h"
+#include "CPickupsSA.h"
+#include "CPlayerInfoSA.h"
+#include "CPointLightsSA.h"
+#include "CProjectileInfoSA.h"
+#include "CRadarSA.h"
+#include "CRopesSA.h"
+#include "CSettingsSA.h"
+#include "CStatsSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "CTasksSA.h"
+#include "CVisibilityPluginsSA.h"
+#include "CWaterManagerSA.h"
+#include "CWeaponInfoSA.h"
+#include "CWeaponStatManagerSA.h"
+#include "CWeatherSA.h"
+#include "CWorldSA.h"
+#include "D3DResourceSystemSA.h"
+
+extern CGameSA* pGame;
 
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
-unsigned long* CGameSA::VAR_IsGameLoaded;
-bool*          CGameSA::VAR_GamePaused;
 bool*          CGameSA::VAR_IsForegroundWindow;
 unsigned long* CGameSA::VAR_SystemState;
-void*          CGameSA::VAR_StartGame;
-bool*          CGameSA::VAR_IsNastyGame;
 float*         CGameSA::VAR_TimeScale;
 float*         CGameSA::VAR_FPS;
 float*         CGameSA::VAR_OldTimeStep;
@@ -64,24 +103,20 @@ CGameSA::CGameSA()
         case VERSION_11:
             COffsets::Initialize11();
             break;
-        case VERSION_20:
-            COffsets::Initialize20();
-            break;
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (int i = 0; i < modelInfoMax; i++)
+    for (unsigned int i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
 
     // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-    for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
         ObjectGroupsInfo[i].SetGroup(i);
     }
 
-    DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
     this->m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
@@ -101,10 +136,7 @@ CGameSA::CGameSA()
     this->m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
-    this->m_pMenuManager = new CMenuManagerSA();
     this->m_pStats = new CStatsSA();
-    this->m_pPathFind = new CPathFindSA();
-    this->m_pPopulation = new CPopulationSA();
     this->m_pTaskManagementSystem = new CTaskManagementSystemSA();
     this->m_pSettings = new CSettingsSA();
     this->m_pCarEnterExit = new CCarEnterExitSA();
@@ -241,10 +273,7 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CTasksSA*>(m_pTasks);
     delete reinterpret_cast<CTaskManagementSystemSA*>(m_pTaskManagementSystem);
     delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
-    delete reinterpret_cast<CPopulationSA*>(m_pPopulation);
-    delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
-    delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
     delete reinterpret_cast<CPadSA*>(m_pPad);
@@ -272,8 +301,6 @@ CGameSA::~CGameSA()
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 {
-    DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
-
     if ((skill == WEAPONSKILL_STD && weapon >= WEAPONTYPE_UNARMED && weapon < WEAPONTYPE_LAST_WEAPONTYPE) ||
         (skill != WEAPONSKILL_STD && weapon >= WEAPONTYPE_PISTOL && weapon <= WEAPONTYPE_TEC9))
     {
@@ -301,13 +328,13 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
         return NULL;
 }
 
-VOID CGameSA::Pause(bool bPaused)
+void CGameSA::Pause(bool bPaused)
 {
-    *VAR_GamePaused = bPaused;
+	MemPutFast<bool>(0xB7CB49, bPaused); // CTimer::m_UserPause
 }
+
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
     if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
@@ -323,29 +350,24 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  * Starts the game
  * \todo make addresses into constants
  */
-VOID CGameSA::StartGame()
+void CGameSA::StartGame()
 {
-    DEBUG_TRACE("VOID CGameSA::StartGame()");
-    //  InitScriptInterface();
-    //*(BYTE *)VAR_StartGame = 1;
     this->SetSystemState(GS_INIT_PLAYING_GAME);
-    MemPutFast<BYTE>(0xB7CB49, 0);
-    MemPutFast<BYTE>(0xBA67A4, 0);
+    MemPutFast<BYTE>(0xB7CB49, 0); // CTimer::m_UserPause
+    MemPutFast<BYTE>(0xBA67A4, 0); // FrontEndMenuManager + 0x5C
 }
 
 /**
  * Sets the part of the game loading process the game is in.
  * @param dwState DWORD containing a valid state 0 - 9
  */
-VOID CGameSA::SetSystemState(eSystemState State)
+void CGameSA::SetSystemState(eSystemState State)
 {
-    DEBUG_TRACE("VOID CGameSA::SetSystemState( eSystemState State )");
     *VAR_SystemState = (DWORD)State;
 }
 
 eSystemState CGameSA::GetSystemState()
 {
-    DEBUG_TRACE("eSystemState CGameSA::GetSystemState( )");
     return (eSystemState)*VAR_SystemState;
 }
 
@@ -353,10 +375,8 @@ eSystemState CGameSA::GetSystemState()
  * This adds the local player to the ped pool, nothing else
  * @return BOOL TRUE if success, FALSE otherwise
  */
-BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
+bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
-    DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
-
     CPoolsSA* pools = (CPoolsSA*)this->GetPools();
     if (pools)
     {
@@ -370,9 +390,9 @@ BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
             return TRUE;
         }
 
-        return FALSE;
+        return false;
     }
-    return FALSE;
+    return true;
 }
 
 float CGameSA::GetGravity()
@@ -505,22 +525,22 @@ void CGameSA::SetTimeScale(float fTimeScale)
 
 unsigned char CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104;
+    return *(unsigned char*)0x8D5104; // CPostEffects::m_SpeedFXAlpha
 }
 
 void CGameSA::SetBlurLevel(unsigned char ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel);
+    MemPutFast<unsigned char>(0x8D5104, ucLevel); // CPostEffects::m_SpeedFXAlpha
 }
 
 unsigned long CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C;
+    return *(unsigned long*)0xB7015C; // CClock::ms_nMillisecondsPerGameMinute
 }
 
 void CGameSA::SetMinuteDuration(unsigned long ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime);
+    MemPutFast<unsigned long>(0xB7015C, ulTime); // CClock::ms_nMillisecondsPerGameMinute
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -839,7 +859,7 @@ void CGameSA::SetupBrokenModels()
 // Well, has it?
 bool CGameSA::HasCreditScreenFadedOut()
 {
-    BYTE ucAlpha = *(BYTE*)0xBAB320;
+    BYTE ucAlpha = *(BYTE*)0xBAB320; // CLoadingScreen::m_FadeAlpha
     bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
     return bCreditScreenFadedOut;
 }
@@ -877,7 +897,7 @@ void CGameSA::ResetAlphaTransparencies()
 // Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
 void CGameSA::DisableVSync()
 {
-    MemPutFast<BYTE>(0xBAB318, 0);
+    MemPutFast<BYTE>(0xBAB318, 0); // CLoadingScreen::m_bActive
 }
 CWeapon* CGameSA::CreateWeapon()
 {
@@ -903,7 +923,6 @@ CPed* CGameSA::GetPedContext()
 
 CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
 {
-    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
         return &ObjectGroupsInfo[ucObjectGroup];
 

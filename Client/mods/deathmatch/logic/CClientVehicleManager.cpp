@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/TaskCar.h>
 
 using std::list;
 using std::vector;

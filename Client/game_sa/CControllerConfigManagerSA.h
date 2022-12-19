@@ -24,7 +24,6 @@ class CControllerConfigManagerSA : public CControllerConfigManager
 {
 public:
     CControllerConfigManagerSA();
-    // CControllerConfigManager
     void  SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType);
     int   GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType);
     int   GetNumOfSettingsForAction(eControllerAction action);

@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CPointLights.h>
 
 CClientPointLights::CClientPointLights(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {

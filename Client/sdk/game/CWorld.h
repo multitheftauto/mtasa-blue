@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include "CEntity.h"
-#include "CColPoint.h"
+class CEntitySAInterface;
+class CVector;
+class CColPoint;
 
 struct SLineOfSightFlags
 {

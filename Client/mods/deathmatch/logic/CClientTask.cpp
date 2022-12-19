@@ -9,6 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CTaskManager.h>
+#include <game/CTasks.h>
+#include <game/TaskBasic.h>
+#include <game/TaskGoTo.h>
+#include <game/TaskJumpFall.h>
+#include <game/TaskPhysicalResponse.h>
 
 using std::list;
 

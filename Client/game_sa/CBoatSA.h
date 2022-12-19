@@ -40,7 +40,6 @@ class CBoatSA : public virtual CBoat, public virtual CVehicleSA
 {
 private:
     CBoatHandlingEntrySA* m_pBoatHandlingData = nullptr;
-    //  CBoatSAInterface        * internalInterface;
 public:
     CBoatSA(CBoatSAInterface* boat);
     CBoatSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);

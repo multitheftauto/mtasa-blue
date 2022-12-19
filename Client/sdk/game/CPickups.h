@@ -12,10 +12,9 @@
 #pragma once
 
 #include "Common.h"
-#include "CPickup.h"
-#include <CVector.h>
 
-#include <windows.h>
+class CPickup;
+class CVector;
 
 class CPickups
 {
