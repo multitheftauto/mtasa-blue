@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-15 13:40\n"
+"PO-Revision-Date: 2022-12-19 11:27\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -1328,7 +1328,7 @@ msgstr "Daudzspēlētāju"
 
 #: Client/core/CSettings.cpp:117
 msgid "Video"
-msgstr "_Video"
+msgstr "Video"
 
 #: Client/core/CSettings.cpp:118
 msgid "Audio"
