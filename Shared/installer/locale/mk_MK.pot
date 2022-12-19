@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-16 15:29\n"
-"PO-Revision-Date: 2022-10-16 16:29\n"
+"PO-Revision-Date: 2022-12-19 11:27\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -124,7 +124,7 @@ msgstr "Ова е оптимален сет од модови за игри и �
 #. DESC_Section8
 #: Shared/installer/nightly.nsi:232
 msgid "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-msgstr "Едиторот на мапа за MTA:SA 1.0. ~ ~ Ова може да се употреби за креирање на мапи во модовите на игри за MTA."
+msgstr "Едиторот на мапа за MTA:SA 1.0.  Ова може да се употреби за креирање на мапи во модовите на игри за MTA."
 
 #. DESC_Section9
 #: Shared/installer/nightly.nsi:233
@@ -293,7 +293,7 @@ msgid "A different major version of MTA ($1) already exists at that path.$\n"
 msgstr "Поинаква поголема верзија од MTA ($1) веќе постои во таа локација.$\n"
 "$\n"
 "МТА е дизајнирана за поголеми верзии за да бидат инсталирана во ралзични локации.$\n"
-"~Дали сте сигурни дека сакате да ја пребришете MTA $1 во $INSTDIR ?"
+" Дали сте сигурни дека сакате да ја пребришете MTA $1 во $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
 #: Shared/installer/nightly.nsi:1768
@@ -343,7 +343,7 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} ќе се инсталира во следниот фолдер.$\n"
 "За да инсталирате во различен фолдер кликнете Пребарување и селектирајте го другиот фолдер.$\n"
 "$\n"
-"~Кликнете Следно за да продолжите."
+" Кликнете Следно за да продолжите."
 
 #. INST_CHOOSE_LOC3
 #: Shared/installer/nightly.nsi:1895
@@ -383,7 +383,7 @@ msgstr "Предупредување: Поинаква поголема верз
 #. INST_LOC_UPGRADE
 #: Shared/installer/nightly.nsi:2096
 msgid "Installation type:  Upgrade"
-msgstr "Вид на инсталација: ~ ~ Надградба"
+msgstr "Вид на инсталација:  Надградба"
 
 #. NETTEST_TITLE1
 #: Shared/installer/nightly.nsi:2339
