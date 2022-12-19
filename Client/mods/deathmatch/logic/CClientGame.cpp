@@ -11,9 +11,27 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
-#include "game/CAnimBlendAssocGroup.h"
-#include "game/CAnimBlendAssociation.h"
-#include "game/CAnimBlendHierarchy.h"
+#include <game/C3DMarkers.h>
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CAnimBlendAssociation.h>
+#include <game/CAnimBlendHierarchy.h>
+#include <game/CAnimManager.h>
+#include <game/CColPoint.h>
+#include <game/CEventDamage.h>
+#include <game/CExplosionManager.h>
+#include <game/CFire.h>
+#include <game/CGarage.h>
+#include <game/CGarages.h>
+#include <game/CPedIntelligence.h>
+#include <game/CPlayerInfo.h>
+#include <game/CSettings.h>
+#include <game/CStreaming.h>
+#include <game/CTaskManager.h>
+#include <game/CWanted.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStatManager.h>
+#include <game/CWeather.h>
+#include <game/Task.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -44,7 +62,6 @@ CVector             g_vecBulletFireEndPosition;
 
 #define DEFAULT_GRAVITY              0.008f
 #define DEFAULT_GAME_SPEED           1.0f
-#define DEFAULT_BLUR_LEVEL           36
 #define DEFAULT_JETPACK_MAXHEIGHT    100
 #define DEFAULT_AIRCRAFT_MAXHEIGHT   800
 #define DEFAULT_AIRCRAFT_MAXVELOCITY 1.5f
@@ -3264,14 +3281,6 @@ void CClientGame::Event_OnIngame()
 
     g_pMultiplayer->DeleteAndDisableGangTags();
 
-    // Switch off peds and traffic
-    SFixedArray<CVector, 5> vecs = {CVector(-100000.0f, -100000.0f, -100000.0f), CVector(100000.0f, 100000.0f, 100000.0f),
-                                    CVector(-100000.0f, -100000.0f, -100000.0f), CVector(100000.0f, 100000.0f, 100000.0f), CVector(0, 0, 0)};
-    g_pGame->GetPathFind()->SwitchRoadsOffInArea(&vecs[0], &vecs[1]);
-    g_pGame->GetPathFind()->SwitchPedRoadsOffInArea(&vecs[2], &vecs[3]);
-    g_pGame->GetPathFind()->SetPedDensity(0.0f);
-    g_pGame->GetPathFind()->SetVehicleDensity(0.0f);
-
     g_pGame->GetWorld()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
@@ -3283,7 +3292,8 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);
 
     // This is to prevent the 'white arrows in checkpoints' bug (#274)
-    g_pGame->Get3DMarkers()->CreateMarker(87654, (e3DMarkerType)5, &vecs[4], 1, 0.2f, 0, 0, 0, 0);
+    CVector pos(0, 0, 0);
+    g_pGame->Get3DMarkers()->CreateMarker(87654, (e3DMarkerType)5, &pos, 1, 0.2f, 0, 0, 0, 0);
 
     // Stop us getting 4 stars if we visit the SF or LV
     // g_pGame->GetPlayerInfo()->GetWanted()->SetMaximumWantedLevel ( 0 );
@@ -5301,6 +5311,10 @@ void CClientGame::ResetMapInfo()
     // Peds LOD distance
     g_pGame->GetSettings()->ResetPedsLODDistance(true);
 
+    // Blur
+    g_pGame->GetSettings()->SetBlurControlledByScript(false);
+    g_pGame->GetSettings()->ResetBlurEnabled();
+
     // Corona rain reflections
     g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
     g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
@@ -5363,13 +5377,6 @@ void CClientGame::ResetMapInfo()
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
-
-    // Restore blur
-#ifdef MTA_DEBUG
-    g_pGame->SetBlurLevel(0);
-#else
-    g_pGame->SetBlurLevel(DEFAULT_BLUR_LEVEL);
-#endif
 
     // Close all garages
     CGarage*  pGarage = NULL;

@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <multiplayer/CMultiplayer.h>
+#include <core/CCoreInterface.h>
+#include "CGameSA.h"
+#include "CPoolsSA.h"
+#include "CWorldSA.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 #define ARRAY_SurfaceInfos 0xB79538
 
@@ -126,8 +134,6 @@ void _declspec(naked) HOOK_FallenCars()
 
 void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
 {
-    DEBUG_TRACE("VOID CWorldSA::Add ( CEntity * pEntity )");
-
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(pEntity);
 
     if (pEntitySA)
@@ -151,7 +157,6 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
 
 void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
 {
-    DEBUG_TRACE("VOID CWorldSA::Add ( CEntitySAInterface * entityInterface )");
     DWORD dwFunction = FUNC_Add;
     if ((DWORD)entityInterface->vtbl == VTBL_CPlaceable)
     {
@@ -168,8 +173,6 @@ void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
 
 void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
 {
-    DEBUG_TRACE("VOID CWorldSA::Remove ( CEntity * entity )");
-
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(pEntity);
 
     if (pEntitySA)
@@ -193,7 +196,6 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
 
 void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
 {
-    DEBUG_TRACE("VOID CWorldSA::Remove ( CEntitySAInterface * entityInterface )");
     if ((DWORD)entityInterface->vtbl == VTBL_CPlaceable)
     {
         SString strMessage("Caller: %i ", CallerId);
@@ -252,7 +254,6 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
 bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
                                   const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult)
 {
-    DEBUG_TRACE("VOID CWorldSA::ProcessLineOfSight(CVector * vecStart, CVector * vecEnd, CColPoint * colCollision, CEntity * CollisionEntity)");
     DWORD dwPadding[100];            // stops the function missbehaving and overwriting the return address
     dwPadding[0] = 0;                // prevent the warning and eventual compiler optimizations from removing it
 
@@ -359,8 +360,6 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
 
 void CWorldSA::IgnoreEntity(CEntity* pEntity)
 {
-    DEBUG_TRACE("VOID CWorldSA::IgnoreEntity(CEntity * entity)");
-
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(pEntity);
 
     if (pEntitySA)
@@ -371,12 +370,11 @@ void CWorldSA::IgnoreEntity(CEntity* pEntity)
 
 float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
 {
-    DEBUG_TRACE("FLOAT CWorldSA::FindGroundZFor3DPosition(CVector * vecPosition)");
     DWORD dwFunc = FUNC_FindGroundZFor3DCoord;
-    FLOAT fReturn = 0;
-    FLOAT fX = vecPosition->fX;
-    FLOAT fY = vecPosition->fY;
-    FLOAT fZ = vecPosition->fZ;
+    float fReturn = 0;
+    float fX = vecPosition->fX;
+    float fY = vecPosition->fY;
+    float fZ = vecPosition->fZ;
     _asm
     {
         push    0
@@ -393,8 +391,6 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
 
 float CWorldSA::FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult)
 {
-    DEBUG_TRACE("FLOAT CWorldSA::FindRoofZFor3DCoord(float x, float y, float z, bool * pbOutResult)");
-
     auto CWorld_FindRoofZFor3DCoord = (float(__cdecl*)(float, float, float, bool*))0x569750;
     return CWorld_FindRoofZFor3DCoord(pvecPosition->fX, pvecPosition->fY, pvecPosition->fZ, pbOutResult);
 }

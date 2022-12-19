@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCameraSA.h"
+#include "CEntitySA.h"
+#include "COffsets.h"
+#include "CSettingsSA.h"
+#include "CWeatherSA.h"
+#include "CGameSA.h"
 
 void COffsets::Initialize10EU()
 {
@@ -55,11 +61,10 @@ void COffsets::Initialize11()
     CGameSA::VAR_TimeStep = (float*)0xB7CB5C;
     CGameSA::VAR_Framelimiter = (unsigned long*)0xC1704C;
 
-    CWeatherSA::VAR_CurrentWeather = (unsigned char*)0xC81318;
-    CWeatherSA::VAR_CurrentWeather_b = (unsigned char*)0xC81320;
-    CWeatherSA::VAR_CurrentWeather_c = (unsigned char*)0xC8131C;
-    CWeatherSA::VAR_AmountOfRain = (float*)0xC81324;
-    CWeatherSA::FUNC_IsRaining = 0x4ABF50;
+    CWeatherSA::VAR_CWeather__ForcedWeatherType = (unsigned char*)0xC81318;
+    CWeatherSA::VAR_CWeather__OldWeatherType = (unsigned char*)0xC81320;
+    CWeatherSA::VAR_CWeather__NewWeatherType = (unsigned char*)0xC8131C;
+    CWeatherSA::VAR_CWeather__Rain = (float*)0xC81324;
 }
 
 void COffsets::InitializeCommon10()
@@ -74,11 +79,10 @@ void COffsets::InitializeCommon10()
     CGameSA::VAR_TimeStep = (float*)0xB7CB5C;
     CGameSA::VAR_Framelimiter = (unsigned long*)0xC1704C;
 
-    CWeatherSA::VAR_CurrentWeather = (unsigned char*)0xC81318;
-    CWeatherSA::VAR_CurrentWeather_b = (unsigned char*)0xC81320;
-    CWeatherSA::VAR_CurrentWeather_c = (unsigned char*)0xC8131C;
-    CWeatherSA::VAR_AmountOfRain = (float*)0xC81324;
-    CWeatherSA::FUNC_IsRaining = 0x4ABF50;
+    CWeatherSA::VAR_CWeather__ForcedWeatherType = (unsigned char*)0xC81318;
+    CWeatherSA::VAR_CWeather__OldWeatherType = (unsigned char*)0xC81320;
+    CWeatherSA::VAR_CWeather__NewWeatherType = (unsigned char*)0xC8131C;
+    CWeatherSA::VAR_CWeather__Rain = (float*)0xC81324;
 
     CSettingsSA::FUNC_SetCurrentVideoMode = 0x745C70;            // may not be common?
 

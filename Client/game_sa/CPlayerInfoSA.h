@@ -12,29 +12,7 @@
 #pragma once
 
 #include <game/CPlayerInfo.h>
-#include "Common.h"
 #include "CPlayerPedSA.h"
-
-#define FUNC_MakePlayerSafe                         0x56e870
-#define FUNC_CancelPlayerEnteringCars               0x56e860
-#define FUNC_ArrestPlayer                           0x56e5d0
-#define FUNC_KillPlayer                             0x56e580
-
-#define FUNC_TakeRemoteControlledCarFromPlayer      0x45ae80
-#define FUNC_GivePlayerRemoteControlledCar          0x442020
-#define FUNC_TakeRemoteControlOfCar                 0x45ad40
-#define FUNC_StreamParachuteWeapon                  0x56eb30
-#define FUNC_GivePlayerParachute                    0x56ec40
-
-/**
- * \todo Implement FUNC_TakeRemoteControlOfCar, FUNC_StreamParachuteWeapon and FUNC_StreamParachuteWeapon
- */
-
-#define VAR_PlayerPed                               0x94AD28
-#define VAR_PlayerRCCar                             0x94AD2C
-#define VAR_PlayerMoney                             0x94ADC8
-
-#define NUM_CHARS_IN_NAME                           34
 
 /**
  * \todo Confirm that AssocGroupId is a DWORD
@@ -62,8 +40,8 @@ public:
     CPedSAInterface* m_ArrestingOfficer;            // actually CCopPed *        // 8
 
     CVector2D m_vecFightMovement;            // 12
-    FLOAT     m_moveBlendRatio;              // 20
-    FLOAT     m_fSprintEnergy;               // 24
+    float     m_moveBlendRatio;              // 20
+    float     m_fSprintEnergy;               // 24
     // FLOAT m_fSprintControlCounter; // Removed arbitatrily to aligned next byte, should be here really
     BYTE         m_nChosenWeapon;                   // 28
     BYTE         m_nCarDangerCounter;               // 29
@@ -71,8 +49,8 @@ public:
     BYTE         m_pad1;                            // 31
     long         m_nStandStillTimer;                // 32
     DWORD        m_nHitAnimDelayTimer;              // 36
-    FLOAT        m_fAttackButtonCounter;            // 40
-    CAutomobile* m_pDangerCar;                      // 44
+    float        m_fAttackButtonCounter;            // 40
+    CAutomobileSAInterface* m_pDangerCar;                      // 44
 
     DWORD m_bStoppedMoving : 1;            // 48
     DWORD m_bAdrenaline : 1;
@@ -100,7 +78,7 @@ public:
     BYTE  m_nDrugLevel;                        // 70
     BYTE  m_nScriptLimitToGangSize;            // 71
 
-    FLOAT m_fBreath;            // for holding breath (ie underwater) // 72
+    float m_fBreath;            // for holding breath (ie underwater) // 72
 
     // once a set of melee weapon anims have been loaded and referenced for the player
     // we need to remember what we've referenced
@@ -108,14 +86,14 @@ public:
     // this set is for the player's extra hand combo they can learn
     AssocGroupId m_MeleeWeaponAnimReferencedExtra;
 
-    FLOAT m_fFPSMoveHeading;
-    FLOAT m_fLookPitch;
-    FLOAT m_fSkateBoardSpeed;
-    FLOAT m_fSkateBoardLean;
+    float m_fFPSMoveHeading;
+    float m_fLookPitch;
+    float m_fSkateBoardSpeed;
+    float m_fSkateBoardLean;
 
     DWORD* m_pSpecialAtomic;            // was rpAtomic
-    FLOAT  m_fGunSpinSpeed;
-    FLOAT  m_fGunSpinAngle;
+    float  m_fGunSpinSpeed;
+    float  m_fGunSpinAngle;
 
     DWORD   m_LastTimeFiring;
     DWORD   m_nTargetBone;
@@ -133,7 +111,7 @@ public:
     BYTE  m_playersGangActive;
     BYTE  m_waterCoverPerc;
     BYTE  m_pad4;
-    FLOAT m_waterHeight;
+    float m_waterHeight;
 
     // used for doing lock-on with HS missiles
     DWORD               m_FireHSMissilePressedTime;
@@ -197,31 +175,31 @@ public:
 
     // working counters to calculate how long player managed stuff
     DWORD nCarTwoWheelCounter;            // how long has player's car been on two wheels
-    FLOAT fCarTwoWheelDist;
+    float fCarTwoWheelDist;
     DWORD nCarLess3WheelCounter;            // how long has player's car been on less than 3 wheels
     DWORD nBikeRearWheelCounter;            // how long has player's bike been on rear wheel only
-    FLOAT fBikeRearWheelDist;
+    float fBikeRearWheelDist;
     DWORD nBikeFrontWheelCounter;            // how long has player's bike been on front wheel only
-    FLOAT fBikeFrontWheelDist;
+    float fBikeFrontWheelDist;
     DWORD nTempBufferCounter;            // so wheels can leave the ground for a few frames without stopping above counters
     // best values for the script to check - will be zero most of the time, only value
     // when finished trick - script should retreve value then reset to zero
     DWORD nBestCarTwoWheelsTimeMs;
-    FLOAT fBestCarTwoWheelsDistM;
+    float fBestCarTwoWheelsDistM;
     DWORD nBestBikeWheelieTimeMs;
-    FLOAT fBestBikeWheelieDistM;
+    float fBestBikeWheelieDistM;
     DWORD nBestBikeStoppieTimeMs;
-    FLOAT fBestBikeStoppieDistM;
+    float fBestBikeStoppieDistM;
 
     WORD  CarDensityForCurrentZone;
-    FLOAT RoadDensityAroundPlayer;            // 1.0f for an average city.
+    float RoadDensityAroundPlayer;            // 1.0f for an average city.
 
     DWORD TimeOfLastCarExplosionCaused;
     long  ExplosionMultiplier;
     long  HavocCaused;              // A counter going up when the player does bad stuff.
     short TimeLastEaten;            // A counter that starts at 5000, increases by 1 every minute
 
-    FLOAT CurrentChaseValue;            // How 'ill' is the chase at the moment
+    float CurrentChaseValue;            // How 'ill' is the chase at the moment
 
     // 'Special' abilities that gets awarded during the game
     bool DoesNotGetTired;
@@ -274,8 +252,6 @@ public:
     CWanted*    GetWanted();
     long        GetPlayerMoney();
     void        SetPlayerMoney(long lMoney, bool bInstant);
-
-    void GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY);
 
     void  SetLastTimeEaten(short sTime);
 

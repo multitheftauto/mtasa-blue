@@ -15,6 +15,8 @@ class CClientDFF;
 #include <list>
 #include "CClientEntity.h"
 
+struct RpClump;
+
 struct SLoadedClumpInfo
 {
     SLoadedClumpInfo() : bTriedLoad(false), pClump(NULL) {}

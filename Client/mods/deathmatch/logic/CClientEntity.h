@@ -46,7 +46,6 @@ enum eClientEntityType
     CCLIENTVEHICLE,
     CCLIENTRADARMARKER,
     CCLIENTOBJECT,
-    CCLIENTCIVILIAN,
     CCLIENTPICKUP,
     CCLIENTRADARAREA,
     CCLIENTMARKER,
@@ -81,6 +80,7 @@ enum eClientEntityType
     CCLIENTUNKNOWN,
 };
 
+class CEntity;
 class CClientColShape;
 class CClientPed;
 class CCustomData;
@@ -98,7 +98,6 @@ enum eCClientEntityClassTypes
 {
     CLASS_CClientEntity,
     CLASS_CClientCamera,
-    CLASS_CClientCivilian,
     CLASS_CClientColModel,
     CLASS_CClientDFF,
     CLASS_CClientGUIElement,

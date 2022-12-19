@@ -10,6 +10,9 @@
 
 // Forward declare enum reflection stuff
 #include <gui/CGUIEnumDefs.h>
+#include <game/CAudioEngine.h>
+#include <game/CRenderWare.h>
+#include <game/CHud.h>
 #include <type_traits>
 
 enum eLuaType
@@ -206,10 +209,6 @@ inline SString GetClassTypeName(CClientObject*)
 {
     return "object";
 }
-inline SString GetClassTypeName(CClientCivilian*)
-{
-    return "civilian";
-}
 inline SString GetClassTypeName(CClientPickup*)
 {
     return "pickup";
@@ -232,7 +231,7 @@ inline SString GetClassTypeName(CClientPed*)
 }
 inline SString GetClassTypeName(CRemoteCall*)
 {
-    return "remotecall";
+    return "request";
 }
 inline SString GetClassTypeName(CClientProjectile*)
 {
