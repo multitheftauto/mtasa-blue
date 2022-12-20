@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Imageset Name="CGUI-Images" Imagefile="CGUI.png" NativeHorzRes="800" NativeVertRes="600" >
+<Imageset Name="CGUI-Images" Imagefile="..\..\..\..\..\..\Program Files (x86)\MTA San Andreas 1.5\skins\Default New\CGUI.png" NativeHorzRes="800" NativeVertRes="600" >
     <Image Name="TabTop" XPos="75" YPos="128" Width="20" Height="7" />
     <Image Name="TabLeft" XPos="71" YPos="135" Width="4" Height="26" />
     <Image Name="FrameTop" XPos="44" YPos="164" Width="16" Height="8" />
@@ -35,7 +35,7 @@
     <Image Name="SmallUpArrow" XPos="20" YPos="66" Width="5" Height="3" />
     <Image Name="ButtonTopLeft" XPos="36" YPos="128" Width="5" Height="5" />
     <Image Name="CheckboxHover" XPos="89" YPos="19" Width="15" Height="16" />
-    <Image Name="Frame2TopLeft" XPos="1" YPos="128" Width="5" Height="5" />
+    <Image Name="Frame2TopLeft" XPos="36" YPos="128" Width="5" Height="5" />
     <Image Name="FrameTopRight" XPos="60" YPos="164" Width="8" Height="8" />
     <Image Name="ProgressRight" XPos="53" YPos="38" Width="10" Height="1" />
     <Image Name="SButtonBottom" XPos="6" YPos="191" Width="22" Height="6" />
