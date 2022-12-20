@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Imageset Name="CGUI-Images" Imagefile="..\..\..\..\..\..\Program Files (x86)\MTA San Andreas 1.5\skins\Default New\CGUI.png" NativeHorzRes="800" NativeVertRes="600" >
+<Imageset Name="CGUI-Images" Imagefile="CGUI.png" NativeHorzRes="800" NativeVertRes="600" >
     <Image Name="TabTop" XPos="75" YPos="128" Width="20" Height="7" />
     <Image Name="TabLeft" XPos="71" YPos="135" Width="4" Height="26" />
     <Image Name="FrameTop" XPos="44" YPos="164" Width="16" Height="8" />
