@@ -176,7 +176,7 @@ private:
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
-    bool                       m_bBeingDestroyed;
+    std::atomic_bool           m_bBeingDestroyed;
     bool                       m_bIsLocal;
     bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
@@ -192,8 +192,6 @@ private:
     {
         bool                    changed = false;
         std::mutex              dataMutex;
-        std::mutex              cvMutex;
-        std::condition_variable cv;
 
         const void*                buffer;
         int                        width, height;
