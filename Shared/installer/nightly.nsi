@@ -762,6 +762,12 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\skins\Lighter black\CGUI.png"
             File "${FILES_ROOT}\skins\Lighter black\CGUI.xml"
 
+            SetOutPath "$INSTDIR\skins\Default New"
+            File "${FILES_ROOT}\skins\Default New\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Default New\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Default New\CGUI.png"
+            File "${FILES_ROOT}\skins\Default New\CGUI.xml"
+
             SetOutPath "$INSTDIR\MTA\cgui"
             File "${FILES_ROOT}\mta\cgui\Falagard.xsd"
             File "${FILES_ROOT}\mta\cgui\Font.xsd"
