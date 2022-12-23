@@ -169,6 +169,7 @@ CCredits::CCredits()
         "FrankZZ\n"
         "Gothem\n"
         "GRascm\n"
+        "gta191977649\n"
         "GTX / Timic3\n"
         "guix\n"
         "JeViCo\n"
