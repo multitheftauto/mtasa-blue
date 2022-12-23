@@ -172,6 +172,7 @@ CCredits::CCredits()
         "gta191977649\n"
         "GTX / Timic3\n"
         "guix\n"
+        "Inder00\n"
         "JeViCo\n"
         "John_Michael\n"
         "JR10\n"
