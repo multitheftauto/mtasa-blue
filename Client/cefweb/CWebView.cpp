@@ -41,8 +41,11 @@ CWebView::~CWebView()
             g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
     }
 
+    // Make sure we don't dead lock the CEF render thread
+    ResumeCefThread();
+
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = nullptr;
+    m_pWebView = nullptr;    
 
     OutputDebugLine("CWebView::~CWebView");
 }
@@ -76,6 +79,9 @@ void CWebView::CloseBrowser()
 {
     // CefBrowserHost::CloseBrowser calls the destructor after the browser has been destroyed
     m_bBeingDestroyed = true;
+
+    // Make sure we don't dead lock the CEF render thread
+    ResumeCefThread();
 
     if (m_pWebView)
         m_pWebView->GetHost()->CloseBrowser(true);
@@ -200,7 +206,7 @@ void CWebView::UpdateTexture()
 
     auto pSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
     if (m_bBeingDestroyed || !pSurface)
-        return;
+        m_RenderData.changed = m_RenderData.popupShown = false;
 
     // Discard current buffer if size doesn't match
     // This happens when resizing the browser as OnPaint is called asynchronously
@@ -281,6 +287,9 @@ void CWebView::UpdateTexture()
             pSurface->UnlockRect();
         }
     }
+
+    m_RenderData.cefThreadState = ECefThreadState::Running;
+    m_RenderData.cefThreadCv.notify_all();
 }
 
 void CWebView::ExecuteJavascript(const SString& strJavascriptCode)
@@ -447,6 +456,8 @@ void CWebView::Resize(const CVector2D& size)
     // Send resize event to CEF
     if (m_pWebView)
         m_pWebView->GetHost()->WasResized();
+
+    ResumeCefThread();
 }
 
 CVector2D CWebView::GetSize()
@@ -709,6 +720,10 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     m_RenderData.height = height;
     m_RenderData.dirtyRects = dirtyRects;
     m_RenderData.changed = true;
+
+    // Wait for the main thread to handle drawing the texture
+    m_RenderData.cefThreadState = ECefThreadState::Wait;    
+    m_RenderData.cefThreadCv.wait(lock, [&](){ return m_RenderData.cefThreadState == ECefThreadState::Running; });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -1066,4 +1081,15 @@ void CWebView::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 {
     // Show no context menu
     model->Clear();
+}
+
+void CWebView::ResumeCefThread()
+{
+    {
+        // It's recommended to unlock a mutex before the cv notifying to avoid a possible pessimization
+        std::unique_lock<std::mutex> lock(m_RenderData.dataMutex);
+        m_RenderData.cefThreadState = ECefThreadState::Running;
+    }
+
+    m_RenderData.cefThreadCv.notify_all();
 }

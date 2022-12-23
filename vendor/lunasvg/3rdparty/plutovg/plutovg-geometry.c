@@ -327,14 +327,13 @@ void plutovg_path_add_rect(plutovg_path_t* path, double x, double y, double w, d
     plutovg_path_close(path);
 }
 
-#define KAPPA 0.5522847498
 void plutovg_path_add_round_rect(plutovg_path_t* path, double x, double y, double w, double h, double rx, double ry)
 {
     double right = x + w;
     double bottom = y + h;
 
-    double cpx = rx * KAPPA;
-    double cpy = ry * KAPPA;
+    double cpx = rx * plutovg_kappa;
+    double cpy = ry * plutovg_kappa;
 
     plutovg_path_move_to(path, x, y+ry);
     plutovg_path_cubic_to(path, x, y+ry-cpy, x+rx-cpx, y, x+rx, y);
@@ -355,8 +354,8 @@ void plutovg_path_add_ellipse(plutovg_path_t* path, double cx, double cy, double
     double right = cx + rx;
     double bottom = cy + ry;
 
-    double cpx = rx * KAPPA;
-    double cpy = ry * KAPPA;
+    double cpx = rx * plutovg_kappa;
+    double cpy = ry * plutovg_kappa;
 
     plutovg_path_move_to(path, cx, top);
     plutovg_path_cubic_to(path, cx+cpx, top, right, cy-cpy, right, cy);

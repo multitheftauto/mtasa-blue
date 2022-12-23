@@ -1,21 +1,27 @@
 #include "property.h"
 #include "styledelement.h"
+#include "lunasvg.h"
 
+#include <algorithm>
 #include <cmath>
 
 namespace lunasvg {
 
-const Color Color::Black{0, 0, 0, 1};
-const Color Color::White{1, 1, 1, 1};
-const Color Color::Red{1, 0, 0, 1};
-const Color Color::Green{0, 1, 0, 1};
-const Color Color::Blue{0, 0, 1, 1};
-const Color Color::Yellow{1, 1, 0, 1};
-const Color Color::Transparent{0, 0, 0, 0};
+const Color Color::Black(0xFF000000);
+const Color Color::White(0xFFFFFFFF);
+const Color Color::Transparent(0x00000000);
 
-Color::Color(double r, double g, double b, double a)
-    : r(r), g(g), b(b), a(a)
+Color& Color::combine(double opacity)
 {
+    *this = combined(opacity);
+    return *this;
+}
+
+Color Color::combined(double opacity) const
+{
+    auto rgb = m_value & 0x00FFFFFF;
+    auto a = static_cast<int>(std::clamp(opacity * alpha(), 0.0, 255.0));
+    return Color(rgb | a << 24);
 }
 
 Paint::Paint(const Color& color)
@@ -38,6 +44,11 @@ const Rect Rect::Invalid{0, 0, -1, -1};
 
 Rect::Rect(double x, double y, double w, double h)
     : x(x), y(y), w(w), h(h)
+{
+}
+
+Rect::Rect(const Box& box)
+    : x(box.x), y(box.y), w(box.w), h(box.h)
 {
 }
 
@@ -87,6 +98,11 @@ Rect& Rect::unite(const Rect& rect)
 
 Transform::Transform(double m00, double m10, double m01, double m11, double m02, double m12)
     : m00(m00), m10(m10), m01(m01), m11(m11), m02(m02), m12(m12)
+{
+}
+
+Transform::Transform(const Matrix& matrix)
+    : m00(matrix.a), m10(matrix.b), m01(matrix.c), m11(matrix.d), m02(matrix.e), m12(matrix.f)
 {
 }
 
