@@ -155,6 +155,7 @@ CCredits::CCredits()
         "bum8hj\n"
         "correaAlex\n"
         "CubedDeath\n"
+        "darkdrifter\n"
         "Deihim007\n"
         "delinx\n"
         "DetectedStorm\n"
