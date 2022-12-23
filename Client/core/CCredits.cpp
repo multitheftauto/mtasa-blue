@@ -152,6 +152,7 @@ CCredits::CCredits()
         "Audifire\n"
         "BCG2000\n"
         "Bonus1702\n"
+        "bum8hj\n"
         "correaAlex\n"
         "CubedDeath\n"
         "Deihim007\n"
