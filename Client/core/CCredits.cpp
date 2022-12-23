@@ -150,6 +150,7 @@ CCredits::CCredits()
         "ApeLsiN4eG\n"
         "asturel\n"
         "Audifire\n"
+        "BCG2000\n"
         "Bonus1702\n"
         "correaAlex\n"
         "CubedDeath\n"
