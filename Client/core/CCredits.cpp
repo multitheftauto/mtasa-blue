@@ -207,6 +207,7 @@ CCredits::CCredits()
         "TFP-dev\n"
         "theSarrum\n"
         "Totto8492\n"
+        "turret001\n"
         "tvc\n"
         "x0rh4x\n"
         "xerox8521\n"
