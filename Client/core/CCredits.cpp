@@ -186,6 +186,7 @@ CCredits::CCredits()
         "LosFaul\n"
         "lucasc190\n"
         "MCvarial\n"
+        "Merlin\n"
         "mickdermack\n"
         "NeO_D-Power\n"
         "Patrick2562\n"
