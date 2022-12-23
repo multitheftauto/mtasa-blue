@@ -201,6 +201,7 @@ CCredits::CCredits()
         "SDraw\n"
         "se16n\n"
         "Sergeanur\n"
+        "starmakers\n"
         "-ffs-Sniper\n"
         "STR6\n"
         "TAPL-93\n"
