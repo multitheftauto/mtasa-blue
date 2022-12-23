@@ -204,6 +204,7 @@ CCredits::CCredits()
         "STR6\n"
         "TAPL-93\n"
         "tederis\n"
+        "TFP-dev\n"
         "theSarrum\n"
         "Totto8492\n"
         "tvc\n"
