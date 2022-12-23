@@ -185,6 +185,7 @@ CCredits::CCredits()
         "Lordmau5\n"
         "LosFaul\n"
         "lucasc190\n"
+        "matheustkn\n"
         "MCvarial\n"
         "Merlin\n"
         "mickdermack\n"
