@@ -296,6 +296,11 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio    0x4D7198
 #define HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio     0x4D71E7
 
+#define HOOKPOS_GrainEffect_NightModifier 0x704EE8
+#define HOOKPOS_GrainEffect_InfraredModifier 0x704F59
+#define HOOKPOS_GrainEffect_RainModifier 0x705078
+#define HOOKPOS_GrainEffect_OverlayModifier 0x705091
+
 #define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles 0x6A6FF0
 
 CPed*         pContextSwitchedPed = 0;
@@ -837,10 +842,10 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 
-    HookInstallCall(0x704EE8, (DWORD)HOOK_GrainEffect<GrainEffect::NightModifier>);
-    HookInstallCall(0x704F59, (DWORD)HOOK_GrainEffect<GrainEffect::InfraredModifier>);
-    HookInstallCall(0x705078, (DWORD)HOOK_GrainEffect<GrainEffect::RainModifier>);
-    HookInstallCall(0x705091, (DWORD)HOOK_GrainEffect<GrainEffect::OverlayModifier>);
+    HookInstallCall(HOOKPOS_GrainEffect_NightModifier, (DWORD)HOOK_GrainEffect<GrainEffect::NightModifier>);
+    HookInstallCall(HOOKPOS_GrainEffect_InfraredModifier, (DWORD)HOOK_GrainEffect<GrainEffect::InfraredModifier>);
+    HookInstallCall(HOOKPOS_GrainEffect_RainModifier, (DWORD)HOOK_GrainEffect<GrainEffect::RainModifier>);
+    HookInstallCall(HOOKPOS_GrainEffect_OverlayModifier, (DWORD)HOOK_GrainEffect<GrainEffect::OverlayModifier>);
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
