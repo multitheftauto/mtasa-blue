@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-24 14:34\n"
+"PO-Revision-Date: 2022-12-24 15:34\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -797,7 +797,7 @@ msgstr "تحديث إعداد Aero"
 
 #: Client/loader/CExePatchedStatus.cpp:155
 msgid "Update Large Memory setting"
-msgstr "تحديث إعدادات الذاكرة الكبيرة"
+msgstr "تحديث إعداد الذاكرة العشوائية \"Large\""
 
 #: Client/loader/CExePatchedStatus.cpp:157
 msgid "Update DEP setting"
@@ -814,11 +814,11 @@ msgstr "إصلاح مشكلات الملف"
 
 #: Client/loader/CExePatchedStatus.cpp:164
 msgid "Copy main executable to avoid graphic driver issues"
-msgstr "أنسخ الملف التنفيذي لتجنب مشاكل برنامج تشغيل الرسوميات"
+msgstr "أنسخ الملف التنفيذي لتجنب مشاكل تعريف الرسوميات"
 
 #: Client/loader/Install.cpp:92
 msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "هل تريد إيقاف خادم الـ MTA و مواصلة التحديث؟"
+msgstr "هل تريد إيقاف خادم MTA و مواصلة التحديث؟"
 
 #: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -826,14 +826,14 @@ msgstr "جاري تثبيت التحديث..."
 
 #: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
-msgstr "جاري إستخراج الملفات..."
+msgstr "جاري استخراج الملفات..."
 
 #: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
-msgstr "MTA:SA تحتاج الى صلاحيات المسؤول للوظيفة التالية:\n\n"
+msgstr "MTA:SA تحتاج إلى صلاحيات المسؤول للوظيفة التالية:\n\n"
 "  '%s'\n\n"
 "الرجاء التأكيد في النافذة التالية."
 
@@ -856,7 +856,7 @@ msgstr "تثبيت ملفات MTA:SA محدثة"
 
 #: Client/loader/CInstallManager.cpp:520
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "تعذر تحديث بسبب تضارب الملفات. الرجاء إغلاق أي برامج آخرى وإعادة المحاولة"
+msgstr "تعذر تحديث بسبب تعارض الملفات. الرجاء إغلاق أي برامج أخرى وإعادة المحاولة"
 
 #: Client/loader/CInstallManager.cpp:529
 #, c-format
@@ -878,11 +878,11 @@ msgstr "MTA:SA لا يمكن أن يستمر لأن القرص %s ليس به م
 
 #: Client/loader/CInstallManager.cpp:812
 msgid "Missing file:"
-msgstr "الملف مفقود:"
+msgstr "ملف مفقود:"
 
 #: Client/loader/CInstallManager.cpp:816
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "إذا فشل تشغيل MTA ، قم بإعادة تثبيت GTA:SA"
+msgstr "إذا فشل تشغيل MTA، أعد تثبيت GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:937
 msgid "Update install settings"
@@ -915,15 +915,15 @@ msgstr "جاري نسخ الملفات..."
 
 #: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
-msgstr "الأنتهاء من النسخ في وقت مبكر. كل شي جاهز."
+msgstr "تم إكمال نسخ الملفات مبكرًا. كل شيء على مايرام."
 
 #: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
-msgstr "يتم الآن الإنهاء..."
+msgstr "جاري الإنتهاء..."
 
 #: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:928
 msgid "Done!"
-msgstr "!تم"
+msgstr "تم!"
 
 #: Client/loader/Utils.cpp:1713
 #, c-format
@@ -948,7 +948,7 @@ msgstr "GTA:SA عانت من مشكلة اثناء تحميل الموديل."
 
 #: Client/loader/Utils.cpp:1801
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "إذا قمت بتعديل gta3.img مؤخراً، حاول إعادة تثبيت GTA: SA."
+msgstr "إذا قمت بتعديل gta3.img مؤخرًا، حاول إعادة تثبيت GTA:SA."
 
 #: Client/loader/Utils.cpp:1826
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -961,11 +961,11 @@ msgstr "GTA:SA وجدت أخطاء في الملف '%s'"
 
 #: Client/loader/Utils.cpp:1918
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "هل عملت اعادة تشغيل للعبة عندما كانت MTA:SA تعمل؟"
+msgstr "هل تمت إعادة تشغيل جهاز الكمبيوتر الخاص بك عند لعب MTA: SA؟"
 
 #: Client/loader/Utils.cpp:1983
 msgid "Please terminate the following programs before continuing:"
-msgstr "الرجاء أيقاف البرامج التالية قبل الاستمرار:"
+msgstr "الرجاء إيقاف البرامج التالية قبل الاستمرار:"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -1126,7 +1126,7 @@ msgstr "إجبار وضع النافذة"
 
 #: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
-msgstr "لا تظهر ذلك مرة آخرى"
+msgstr "لا تظهر ذلك مرة أخرى"
 
 #: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
@@ -1187,7 +1187,7 @@ msgstr "مطلوب MTA:SA %s"
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr "هناك نسخة محدثة من MTA:SA %s مطلوبة من أجل الدخول الى الخادم المختار.\n\n"
+msgstr "هناك نسخة محدثة من MTA:SA %s مطلوبة من أجل الدخول إلى الخادم المختار.\n\n"
 "هل تود تحميل وتثبيت MTA:SA %s؟"
 
 #: Client/core/CVersionUpdater.cpp:1586
@@ -2997,7 +2997,7 @@ msgstr "يرجى إدخال كلمة المرور الخاصة بالخادم:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "الدخول الى الخادم في حين إيجاد فرصة متاحة."
+msgstr "الدخول إلى الخادم في حين إيجاد فرصة متاحة."
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
