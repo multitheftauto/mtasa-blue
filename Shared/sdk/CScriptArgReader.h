@@ -59,7 +59,8 @@ public:
             // The string received may not actually be a number
             if (!lua_isnumber(m_luaVM, m_iIndex))
             {
-                SetCustomWarning("Expected number, got non-convertible string. This warning may be an error in future versions.");
+                SetCustomError("Expected number, got non-convertible string", "Bad argument");
+                return;
             }
 
             // Returns 0 even if the string cannot be parsed as a number
@@ -103,7 +104,8 @@ public:
             // The string received may not actually be a number
             if (!lua_isnumber(m_luaVM, m_iIndex))
             {
-                SetCustomWarning("Expected number, got non-convertible string. This warning may be an error in future versions.");
+                SetCustomError("Expected number, got non-convertible string", "Bad argument");
+                return;
             }
 
             // Returns 0 even if the string cannot be parsed as a number
