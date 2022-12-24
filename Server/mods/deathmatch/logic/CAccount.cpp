@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAccount.h"
+#include "CAccountManager.h"
+#include "CIdArray.h"
+#include "CClient.h"
 
 CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword, int iUserID,
                    const std::string& strIP, const std::string& strSerial, const SString& strHttpPassAppend)

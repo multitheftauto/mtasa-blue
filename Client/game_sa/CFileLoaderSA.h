@@ -1,5 +1,13 @@
 #pragma once
 
+#include "CVector.h"
+#include "CVector4D.h"
+
+class CEntitySAInterface;
+struct RpAtomic;
+struct RpClump;
+struct RwStream;
+
 struct SRelatedModelInfo
 {
     RpClump* pClump;

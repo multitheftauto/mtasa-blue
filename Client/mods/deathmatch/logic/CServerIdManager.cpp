@@ -188,7 +188,7 @@ void CServerIdManagerImpl::SaveServerIdMap(bool bWait)
     ms_ServerIdMap = m_ServerIdMap;
 
     // Start save thread
-    HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CServerIdManagerImpl::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL);
+    HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CServerIdManagerImpl::StaticThreadProc), NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         g_pCore->GetConsole()->Printf("Could not create server-ids save thread.");

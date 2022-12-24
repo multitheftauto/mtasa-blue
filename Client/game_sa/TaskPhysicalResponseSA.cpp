@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
+#include "CPedSA.h"
+#include "TaskPhysicalResponseSA.h"
+
+extern CGameSA* pGame;
 
 // ##############################################################################
 // ## Name:    CTaskSimpleChoking

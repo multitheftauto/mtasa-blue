@@ -118,4 +118,8 @@ public:
                                uchar ucPass1Blue, uchar ucPass1Alpha);
     static bool SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier);
     static bool SetGrainLevel(uchar ucLevel);
+                               
+    static bool SetCoronaReflectionsEnabled(uchar ucEnabled);
+    static uchar GetCoronaReflectionsEnabled();
+    static bool ResetCoronaReflectionsEnabled();
 };

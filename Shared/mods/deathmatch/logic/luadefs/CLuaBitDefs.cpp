@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaBitDefs.h"
+#include "CScriptArgReader.h"
 
 #define mask(n) ((1 << (n)) - 1)
 

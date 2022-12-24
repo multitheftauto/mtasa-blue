@@ -158,8 +158,8 @@ public:
                             bool& suppress_message) override;
 
     // CefDialogHandler methods
-    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name,
-                              const std::vector<CefString>& accept_types, int selected_accept_filter, CefRefPtr<CefFileDialogCallback> callback) override;
+    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                              const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback) override;
 
     // CefDisplayHandler methods
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -176,7 +176,7 @@ private:
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
-    bool                       m_bBeingDestroyed;
+    std::atomic_bool           m_bBeingDestroyed;
     bool                       m_bIsLocal;
     bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
@@ -192,8 +192,6 @@ private:
     {
         bool                    changed = false;
         std::mutex              dataMutex;
-        std::mutex              cvMutex;
-        std::condition_variable cv;
 
         const void*                buffer;
         int                        width, height;

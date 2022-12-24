@@ -40,7 +40,10 @@ void CClientVectorGraphicDisplay::Render()
         m_bIsCleared = false;
 
     if (HasUpdated())
-        UpdateTexture();
+    {
+        m_pVectorGraphic->OnUpdate();
+    }
+        
 }
 
 void CClientVectorGraphicDisplay::UpdateTexture()
@@ -77,7 +80,7 @@ void CClientVectorGraphicDisplay::UpdateTexture()
     auto surfaceData = static_cast<byte*>(LockedRect.pBits);
     auto sourceData = static_cast<const byte*>(bitmap.data());
 
-    for (int y = 0; y < bitmap.height(); ++y)
+    for (uint32_t y = 0; y < bitmap.height(); ++y)
     {
         memcpy(surfaceData, sourceData, bitmap.width() * 4);            // 4 bytes per pixel
 

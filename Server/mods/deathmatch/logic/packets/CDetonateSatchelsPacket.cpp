@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDetonateSatchelsPacket.h"
+#include "CPlayer.h"
 
 CDetonateSatchelsPacket::CDetonateSatchelsPacket()
 {

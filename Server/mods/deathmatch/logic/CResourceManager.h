@@ -14,13 +14,14 @@
 
 #pragma once
 
-#include "CResource.h"
+#include "SResourceStartOptions.h"
 #include "CElement.h"
 #include "ehs/ehs.h"
 #include <list>
 
-class CResource;
 #define INVALID_RESOURCE_NET_ID     0xFFFF
+
+class CResource;
 
 class CResourceManager
 {
@@ -41,7 +42,7 @@ private:
         CResource*            pResource;
         eResourceQueue        eQueue;
         SResourceStartOptions StartOptions;
-        vector<SString>       dependents;
+        std::vector<SString>  dependents;
     };
 
 public:
@@ -125,7 +126,7 @@ private:
     unsigned int            m_uiResourceLoadedCount;
     unsigned int            m_uiResourceFailedCount;
     bool                    m_bResourceListChanged;
-    list<CResource*>        m_resourcesToStartAfterRefresh;
+    std::list<CResource*>   m_resourcesToStartAfterRefresh;
 
     // Maps to speed things up
     CFastHashMap<CResource*, lua_State*> m_ResourceLuaStateMap;
