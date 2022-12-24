@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-24 13:37\n"
+"PO-Revision-Date: 2022-12-24 14:34\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -292,7 +292,7 @@ msgstr "هذا الخادم يتطلب ملف gta_sa.exe غير معدل مسب�
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
 msgid "Please replace gta_sa.exe"
-msgstr "يرجى إستبدال gta_sa.exe"
+msgstr "يرجى استبدال gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "This server does not allow custom D3D9.DLLs"
@@ -300,23 +300,23 @@ msgstr "هذا الخادم لا يسمح بملفات D3D9.DLL معدلة مس�
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "أزل ملف D3D9.DLL من مجلد لعبة GTA ثم قم بإعادة تشغيل MTA"
+msgstr "قم بإزالة ملف D3D9.DLL من مجلد GTA ثم قم أعيد تشغيل MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
 msgid "This server does not allow virtual machines"
-msgstr "هذا الخادم لا يسمح بالأجهزة الإفتراضية"
+msgstr "هذا الخادم لا يسمح بالأجهزة الافتراضية"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
 msgid "This server requires driver signing to be enabled"
-msgstr "هذا الخادم يتطلب \"driver signing\" الى أن يكون مفعل"
+msgstr "هذا الخادم يتطلب أن يكون \"driver signing\" مفعلًا"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
 msgid "Please restart your PC"
-msgstr "يرجى إعادة تشغيل جهاز الكمبيوتر"
+msgstr "الرجاء إعادة تشغيل جهاز الكمبيوتر"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
 msgid "This server has detected missing anti-cheat components"
-msgstr "إكتشف هذا الخادم أن بعض مكونات مكافحة الغش مفقودة"
+msgstr "اكتشف هذا الخادم أن بعض مكونات مكافحة الغش مفقودة"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
 msgid "Try restarting MTA"
@@ -336,7 +336,7 @@ msgstr "هذا الخادم لا يسمح بالمشغل الإفتراضي Wine
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "يرجى التأكد من عدم وجود أي برامج آخرى تقوم بتعديل MTA:SA"
+msgstr "الرجاء التأكد من عدم وجود أي برامج أخرى تقوم بتعديل MTA:SA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "Time Remaining: "
@@ -370,8 +370,8 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d دقيقة"
 msgstr[1] "%d دقيقة"
-msgstr[2] "%d دقيقة"
-msgstr[3] "%d دقيقة"
+msgstr[2] "%d دقيقتان"
+msgstr[3] "%d دقائق"
 msgstr[4] "%d دقيقة"
 msgstr[5] "%d دقيقة"
 
@@ -380,8 +380,8 @@ msgstr[5] "%d دقيقة"
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d ثانية"
-msgstr[1] "%d ثواني"
-msgstr[2] "%d ثواني"
+msgstr[1] "%d ثانية"
+msgstr[2] "%d ثانيتان"
 msgstr[3] "%d ثواني"
 msgstr[4] "%d ثواني"
 msgstr[5] "%d ثواني"
@@ -397,7 +397,7 @@ msgstr "تقدم تحميل الخريطة:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr "تقدًم التحميل:"
+msgstr "تقدم التحميل:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
@@ -416,7 +416,7 @@ msgstr "اقطع الاتصال حتى تلغي التحميل"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "أسم غير صحيح! الرجاء الذهاب الى الإعدادات و وضع اسم جديد !"
+msgstr "اسم غير صحيح! الرجاء الذهاب إلى الإعدادات ووضع اسم جديد!"
 
 #. Display the status box
 #: Client/mods/deathmatch/logic/CClientGame.cpp:604
@@ -426,11 +426,11 @@ msgstr "جاري الاتصال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:604
 msgid "Entering the game ..."
-msgstr "جاري الدخول الى اللعبة..."
+msgstr "جاري الدخول إلى اللعبة ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "غير متصل، يرجى استخدم 'الاتصال السريع' او استخدم الامر connect للاتصال بخادم"
+msgstr "غير متصل؛ يرجى استخدم 'الاتصال السريع' أو استخدم الأمر connect للاتصال بخادم."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:708
 msgid "The server is not installed"
@@ -443,7 +443,7 @@ msgstr "سيرفر محلي"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:718
 msgid "Starting local server ..."
-msgstr "جاري تشغيل سيرفر محلي..."
+msgstr "جاري تشغيل خادم محلي ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1024
 #, c-format
@@ -456,11 +456,11 @@ msgstr "جاري الاتصال بالخادم المحلي..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1104
 msgid "Error connecting to server."
-msgstr "خطأ في الاتصال بالسيرفر"
+msgstr "خطأ خلال الاتصال بالخادم."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1114
 msgid "Connecting to local server timed out. See console for details."
-msgstr "انتهت مهلة الاتصال بالخادم المحلي. انظر للـ Console لمزيد من التفاصيل"
+msgstr "انتهت مهلة الاتصال بالخادم المحلي. انظر إلى Console لمزيد من التفاصيل."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1183
 #: Client/core/CConnectManager.cpp:263
@@ -484,7 +484,7 @@ msgstr "قطع الاتصال: قطع الاتصال عن بعد"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1236
 #: Client/core/CConnectManager.cpp:289
 msgid "Disconnected: connection lost remotely"
-msgstr "قطع الاتصال: فقد الاتصال عن بُعد"
+msgstr "قطع الاتصال: فقد الاتصال عن بعد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1240
 #: Client/core/CConnectManager.cpp:293
@@ -493,7 +493,7 @@ msgstr "قطع الاتصال: أنت محظور من الدخول إلى هذا
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1244
 msgid "Disconnected: the server is currently full"
-msgstr "قطع الاتصال: الخادم ممتلئ حالياً"
+msgstr "قطع الاتصال: الخادم ممتلئ حاليًا"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1248
 #: Client/core/CConnectManager.cpp:300
@@ -516,13 +516,13 @@ msgstr "قطع الاتصال: تم رفض الاتصال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 msgid "MTA Client verification failed!"
-msgstr "فشل التحقق من العميل MTA !"
+msgstr "فشل التحقق من العميل MTA!"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr "خطأ في التحميل:  %s"
+msgstr "خطأ خلال التنزيل: %s"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -545,7 +545,7 @@ msgstr "الموارد"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "إسم الخادم: "
+msgstr "اسم الخادم:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
@@ -598,21 +598,22 @@ msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr "يتم مواجهة مشاكل أثناء إعادة تشغيل MTA:SA\n\n"
-"اذا استمرت المشكلة قم بفتح مدير المهام و\n"
+msgstr "توجد مشاكل في أثناء إعادة تشغيل MTA:SA\n\n"
+"إذا استمرت المشكلة قم بفتح مدير المهام و\n"
 "أوقف عملية 'gta_sa.exe' و 'Multi Theft Auto.exe'\n\n\n"
 "إعادة محاولة تشغيل MTA:SA؟"
 
 #: Client/loader/MainFunctions.cpp:260
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
-msgstr "لعبة MTA تعمل مسبقًا، اذا تكررت المشكلة يرجى اعادة تشغيل الكمبيوتر"
+msgstr "لعبة MTA تعمل مسبقًا بالفعل.\n\n"
+"إذا تكررت المشكلة يرجى اعادة تشغيل الكمبيوتر"
 
 #: Client/loader/MainFunctions.cpp:263
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr "لعبة MTA تعمل مسبقًا\n\n"
-"هل تريد أيقافها ؟"
+msgstr "لعبة MTA تعمل مسبقًا بالفعل.\n\n"
+"هل تريد إيقافها؟"
 
 #: Client/loader/MainFunctions.cpp:288
 msgid "Are you having problems running MTA:SA?.\n\n"
@@ -624,15 +625,15 @@ msgstr "هل تواجه مشاكل في تشغيل MTA؟ \n\n"
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
-msgstr "يبدو أن هناك مشكلة أثناء تشغيل لعبة MTA:SA.\n"
-"إعادة تهيئة الإعدادات قد يكون الحل.\n\n"
-"هل تريد إعادة تهيئة إعدادات GTA الآن?"
+msgstr "يبدو أن هناك مشكلة خلال تشغيل MTA:SA.\n"
+"إعادة تعيين الإعدادات قد يكون الحل بعض الأحيان.\n\n"
+"هل تريد إعادة تهيئة إعدادات GTA الآن؟"
 
 #: Client/loader/MainFunctions.cpp:333
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
-msgstr "تم إعادة تهيئة إعدادات GTA.\n\n"
-"اضغط موافق للاستمرار."
+msgstr "تمت إعادة تعيين إعدادات GTA.\n\n"
+"اضغط حسنا للاستمرار."
 
 #: Client/loader/MainFunctions.cpp:338
 #, c-format
@@ -650,8 +651,8 @@ msgstr "هل لديك مشاكل في تشغيل MTA:SA؟.\n\n"
 #: Client/loader/MainFunctions.cpp:382
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr "هل تواجه مشاكل في تشغيل MTA:SA؟\n\n"
-"هل تود تغيير الإعدادات التالية؟"
+msgstr "هل تواجه مشاكل في تشغيل MTA:SA؟.\n\n"
+"هل تود تغيير الإعداد التالي؟"
 
 #: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:645
 #: Client/core/CSettings.cpp:987
@@ -667,15 +668,15 @@ msgstr "نافذة بلا حدود"
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "هل تواجه مشاكل في تشغيل MTA:SA؟\n\n"
-"قم بتجربة إيقاف جميع منتجات GTA و MTA التالية:"
+"جرب تعطيل جميع منتجات GTA و MTA التالية:"
 
 #: Client/loader/MainFunctions.cpp:459
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
 msgstr "تحذير\n\n"
-"MTA:SA كشفت عن نشاطات غير إعتيادية.\n"
-"الرجاء تشغيل نظام فحص الفيروسات للتأكد من أمان جهازك.\n\n"
+"MTA:SA كشفت عن نشاطات غير اعتيادية.\n"
+"الرجاء تشغيل فحص مكافحة الفيروسات للتأكد من أمان جهازك.\n\n"
 
 #: Client/loader/MainFunctions.cpp:462
 #, c-format
@@ -684,7 +685,7 @@ msgstr "الملف المكتشف هو: %s\n"
 
 #: Client/loader/MainFunctions.cpp:596
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "يوجد نسخة تعمل من جراند تيڤت أوتو: سان اندرياس بالفعل تعمل. يجب أن يتم إنهاؤها لتتم MTA:SA بالتشغيل. هل تريد فعل ذلك الآن؟"
+msgstr "يوجد نسخة تعمل من جراند تيڤت أوتو: سان أندرياس بالفعل قيد العمل. يجب أن يتم إنهاؤها قبل تشغيل MTA:SA. هل تريد فعل ذلك الآن؟"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
 #: Client/loader/MainFunctions.cpp:1240
@@ -699,7 +700,7 @@ msgstr "هناك مشكلة في إيقاف GTA: San Andreas. إذا تكررت 
 
 #: Client/loader/MainFunctions.cpp:626
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "مدخلات الرجستري (محرر التسجيل) مفقودة. يرجى إعادة تثبيت ملتي تيڤت أوتو: سان اندرياس."
+msgstr "مدخلات الرجستري (محرر التسجيل) مفقودة. يرجى إعادة تثبيت ملتي تيڤت أوتو: سان أندرياس."
 
 #: Client/loader/MainFunctions.cpp:632
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
@@ -741,34 +742,34 @@ msgstr "الملف الرئيسي يحمل اسم خاطئ (%s)"
 #: Client/loader/MainFunctions.cpp:828
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr "هذا الملف غير مسجل. إحتمال نشاط فيروسي.\n\n"
-"انظر التعليمات عبر الانترنت إذا كانت MTA لا تعمل بشكل صحيح."
+msgstr "هذا الملف غير موقع. احتمال نشاط فيروسي.\n\n"
+"انظر التعليمات عبر الإنترنت إذا كانت MTA لا تعمل بشكل صحيح."
 
 #: Client/loader/MainFunctions.cpp:853
 msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr "ملفات البيانات تم تعديلها. إحتمال نشاط فيروسي.\n\n"
-"انظر التعليمات عبر الانترنت إذا كانت MTA لا تعمل بشكل صحيح."
+msgstr "ملفات البيانات تم تعديلها. احتمال نشاط فيروسي.\n\n"
+"انظر التعليمات عبر الإنترنت إذا كانت MTA لا تعمل بشكل صحيح."
 
 #: Client/loader/MainFunctions.cpp:865
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
-msgstr "ملف .asi. موجودة في مجلد التثبيت لـ 'MTA:SA' او 'GTA:San Andreas'  \n\n"
-"قم بحذف ملفات .asi اذا كنت تواجه مشاكلة مع MTA:SA."
+msgstr "ملف asi. موجودة في مجلد التثبيت لـ 'MTA: SA' أو 'GTA: San Andreas'\n\n"
+"قم بإزالة ملفات asi. إذا كنت تواجه مشاكل مع MTA: SA."
 
 #: Client/loader/MainFunctions.cpp:969
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "إصدار الملف لا يتطابق. اعد تثبيت MTA:SA إن كنت تواجهت مشاكل.\n"
+msgstr "إصدار الملف لا يتطابق. أعد تثبيت MTA: SA إن كنت تواجه مشاكل.\n"
 
 #: Client/loader/MainFunctions.cpp:978
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "بعض الملفات مفقودة. قم بإعادة تثبيت MTA:SA اذا واجهت مشاكل.\n"
+msgstr "بعض الملفات مفقودة. أعد تثبيت MTA:SA إذا واجهت مشاكل.\n"
 
 #: Client/loader/MainFunctions.cpp:990
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr "MTA:SA لا تتوافق مع \"وضع الآمان\" في الويندوز.\n\n"
-"يرجى اعادة تشغيل حاسوبك.\n"
+msgstr "MTA:SA غير متوافقة مع \"وضع الأمان\" في الويندوز.\n\n"
+"الرجاء إعادة تشغيل جهازك.\n"
 
 #: Client/loader/MainFunctions.cpp:1126
 msgid "Fix configuration issue"
@@ -788,7 +789,7 @@ msgstr "تعذر تشغيل Grand Theft Auto: San Andreas. الرجاء محاو
 
 #: Client/loader/MainFunctions.cpp:1240
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "من المحتمل أن لا تكون GTA: San Andreas قد اشتغلت بشكل صحيح. هل تريد إنهائها؟"
+msgstr "من المحتمل ألا تكون GTA: San Andreas قد اشتغلت بشكل صحيح. هل تريد إنهاءها؟"
 
 #: Client/loader/CExePatchedStatus.cpp:153
 msgid "Update Aero setting"
@@ -1113,7 +1114,7 @@ msgstr "Intel - H البديل مع تسمية exe"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
-msgstr "اذا تشتت، هذا قد يساعد:"
+msgstr "إذا تشتت، هذا قد يساعد:"
 
 #: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
@@ -3059,7 +3060,7 @@ msgstr "خطأ فادح (%u). إذا استمرت هذه المشكلة، يرج
 #: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "خطأ بروتوكول  (%u). اذا استمرت هذه المشكلة، يرجى مراجعة mtasa.com للحصول على الدعم."
+msgstr "خطأ بروتوكول  (%u). إذا استمرت هذه المشكلة، يرجى مراجعة mtasa.com للحصول على الدعم."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
@@ -3073,5 +3074,5 @@ msgstr "لم يتم تثبيت Multi Theft Auto بشكل صحيح، الرجاء
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "سوف يعرض المتصفح الآن صفحة ويب مع بعض المعلومات للمساعدة.\n\n"
-"((Ctrl + V) اذا فشل تحميل الصفحة الصق عنوان الموقع في متصفح الويب الخاص بك)"
+"((Ctrl + V) إذا فشل تحميل الصفحة الصق عنوان الموقع في متصفح الويب الخاص بك)"
 
