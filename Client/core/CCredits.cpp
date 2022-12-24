@@ -207,7 +207,7 @@ CCredits::CCredits()
         "-ffs-Sniper\n"
         "STR6\n"
         "TAPL-93\n"
-        "tederis\n"
+        "TEDERIs\n"
         "TFP-dev\n"
         "theSarrum\n"
         "Totto8492\n"
