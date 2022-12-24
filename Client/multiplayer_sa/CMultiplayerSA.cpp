@@ -661,9 +661,9 @@ float OverlayModifier::fMultiplier = 1.0f;
 }
 
 template <typename T>
-int _cdecl HOOK_GrainEffect(char a1, char a2)
+int __cdecl HOOK_GrainEffect(BYTE ucLevel, BYTE ucUpdate)
 {
-    return T::ApplyEffect(a1, a2);
+    return T::ApplyEffect(ucLevel, ucUpdate);
 }
 
 void CMultiplayerSA::InitHooks()
