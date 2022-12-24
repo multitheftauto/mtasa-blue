@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-24 15:34\n"
+"PO-Revision-Date: 2022-12-24 16:36\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1032,15 +1032,15 @@ msgstr "هذا الفعل سيزيد من فرصة تصليح فشل التشغ�
 
 #: Client/loader/Dialogs.cpp:151
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "هل تريد إعادة تشغيل MTA:سان اندرس ؟"
+msgstr "هل تريد إعادة تشغيل MTA: San Andreas؟"
 
 #: Client/loader/Dialogs.cpp:158
 msgid "MTA: San Andreas - Warning"
-msgstr "MTA:سان اندرس - تحذير"
+msgstr "MTA: San Andreas - تحذير"
 
 #: Client/loader/Dialogs.cpp:159
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "مسار تثبيت Grand Theft Auto: San Andreas الخاص بك يحوي هذه الملفات:"
+msgstr "مسار تثبيت Grand Theft Auto: San Andreas الخاص بك يحتوي هذه الملفات:"
 
 #: Client/loader/Dialogs.cpp:161
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
