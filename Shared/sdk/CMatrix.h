@@ -16,7 +16,6 @@
 #include <array>
 #include <cassert>
 
-
 /**
  * Contains full positional data for a point
  */
@@ -280,10 +279,7 @@ public:
     // Set matrix translational part
     void SetPosition(const CVector& vecPosition) { vPos = vecPosition; }
 
-    CVector GetScale() const
-    {
-        return CVector(vRight.Length(), vFront.Length(), vUp.Length());
-    }
+    CVector GetScale() const { return CVector(vRight.Length(), vFront.Length(), vUp.Length()); }
 
     void SetScale(const CVector& vecScale)
     {
@@ -330,12 +326,7 @@ public:
 
     std::array<std::array<float, 4>, 4> To4x4Array() const noexcept
     {
-        return {
-            vRight.fX, vRight.fY, vRight.fZ, 0.0f,
-            vFront.fX, vFront.fY, vFront.fZ, 0.0f,
-            vUp.fX,    vUp.fY,    vUp.fZ,    0.0f,
-            vPos.fX,   vPos.fY,   vPos.fZ,   1.0f
-        };
+        return {vRight.fX, vRight.fY, vRight.fZ, 0.0f, vFront.fX, vFront.fY, vFront.fZ, 0.0f, vUp.fX, vUp.fY, vUp.fZ, 0.0f, vPos.fX, vPos.fY, vPos.fZ, 1.0f};
     }
 
     enum EMatrixAxes

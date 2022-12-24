@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include "game/CStreaming.h"
 
 #define INVALID_ARCHIVE_ID 0xFF
 

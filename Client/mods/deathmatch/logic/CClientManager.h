@@ -14,7 +14,6 @@ class CClientManager;
 
 #include "CAntiCheat.h"
 #include "CClientCamera.h"
-#include "CClientCivilianManager.h"
 #include "CClientColModelManager.h"
 #include "CClientDFFManager.h"
 #include "CClientEntity.h"
@@ -61,7 +60,6 @@ public:
 
     CAntiCheat&                  GetAntiCheat() { return m_AntiCheat; }
     CClientCamera*               GetCamera() { return m_pCamera; }
-    CClientCivilianManager*      GetCivilianManager() { return m_pCivilianManager; }
     CClientColModelManager*      GetColModelManager() { return m_pColModelManager; }
     CClientDFFManager*           GetDFFManager() { return m_pDFFManager; }
     CClientGUIManager*           GetGUIManager() { return m_pGUIManager; }
@@ -103,9 +101,9 @@ public:
     bool IsBeingDeleted() { return m_bBeingDeleted; }
     void SetGameUnloadedFlag() { m_bGameUnloadedFlag = true; }
 
-    void           InvalidateEntity(CClientEntity* pEntity);
-    void           RestoreEntity(CClientEntity* pEntity);
-    void           UnreferenceEntity(CClientEntity* pEntity);
+    void InvalidateEntity(CClientEntity* pEntity);
+    void RestoreEntity(CClientEntity* pEntity);
+    void UnreferenceEntity(CClientEntity* pEntity);
 
     void OnUpdateStreamPosition(CClientStreamElement* pElement);
     void OnLowLODElementCreated();
@@ -114,7 +112,6 @@ public:
 private:
     CAntiCheat                   m_AntiCheat;
     CClientCamera*               m_pCamera;
-    CClientCivilianManager*      m_pCivilianManager;
     CClientColModelManager*      m_pColModelManager;
     CClientDFFManager*           m_pDFFManager;
     CClientGUIManager*           m_pGUIManager;

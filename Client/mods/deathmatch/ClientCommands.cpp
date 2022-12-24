@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWeapon.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 
 using std::list;
 using std::vector;
@@ -149,7 +152,7 @@ void COMMAND_ShowChat(const char* szCmdLine)
 {
     int  iCmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
     bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : !g_pCore->IsChatVisible();
-    g_pCore->SetChatVisible(bShow);
+    g_pCore->SetChatVisible(bShow, !bShow);
 }
 
 void COMMAND_ShowNetstat(const char* szCmdLine)
@@ -983,15 +986,6 @@ void COMMAND_Debug(const char* szCmdLine)
     __debugbreak();
 
     return;
-
-    CPools* pPools = g_pGame->GetPools();
-    int     iEntryInfoNodeEntries = pPools->GetEntryInfoNodePool()->GetNumberOfUsedSpaces();
-    int     iPointerNodeSingleLinkEntries = pPools->GetPointerNodeSingleLinkPool()->GetNumberOfUsedSpaces();
-    int     iPointerNodeDoubleLinkEntries = pPools->GetPointerNodeDoubleLinkPool()->GetNumberOfUsedSpaces();
-
-    g_pCore->GetConsole()->Printf("entry info: %i", iEntryInfoNodeEntries);
-    g_pCore->GetConsole()->Printf("single node: %i", iPointerNodeSingleLinkEntries);
-    g_pCore->GetConsole()->Printf("dbl node: %i", iPointerNodeDoubleLinkEntries);
 }
 
 #include "CVehicleNames.h"
@@ -1035,6 +1029,12 @@ void COMMAND_Debug4(const char* szCmdLine)
     g_pClientGame->StartPlayback();
     return;
 }
+
+void COMMAND_TimeStep(const char* szCmdLine)
+{
+    g_pCore->GetConsole()->Printf("TimeStep: %f", *(float*)0xB7CB5C); // CTimer::ms_fTimeStep
+}
+
 #endif
 
 void COMMAND_ShowCollision(const char* szCmdLine)

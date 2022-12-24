@@ -44,7 +44,6 @@ public:
     LUA_DECLARE(EngineSetAsynchronousLoading);
     LUA_DECLARE(EngineApplyShaderToWorldTexture);
     LUA_DECLARE(EngineRemoveShaderFromWorldTexture);
-    static uint EngineGetModelTXDID(uint uiDffModelID);
     LUA_DECLARE(EngineGetModelNameFromID);
     LUA_DECLARE(EngineGetModelIDFromName);
     LUA_DECLARE(EngineGetModelTextureNames);
@@ -59,6 +58,7 @@ public:
     LUA_DECLARE(EngineSetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
+    static uint EngineGetModelTXDID(uint uiDffModelID);
     static CClientIMG* EngineLoadIMG(lua_State* const luaVM, std::string strFilePath);
     static bool EngineAddImage(CClientIMG* pImg);
     static bool EngineRemoveImage(CClientIMG* pImg);
@@ -68,7 +68,7 @@ public:
     static bool EngineRestoreDFFImage(uint uiModelID);
     static bool EngineRestoreTXDImage(uint uiModelID);
     static std::vector<std::string_view> EngineImageGetFileList(CClientIMG* pImg);
-    static std::string              EngineImageGetFile(CClientIMG* pImg, std::variant<size_t, std::string_view> file);
+    static std::string EngineImageGetFile(CClientIMG* pImg, std::variant<size_t, std::string_view> file);
     static bool EngineRestreamWorld(lua_State* const luaVM);
     static bool EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);

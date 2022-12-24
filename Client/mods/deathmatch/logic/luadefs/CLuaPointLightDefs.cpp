@@ -14,14 +14,8 @@
 void CLuaPointLightDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createLight", CreateLight},
-        {"getLightType", GetLightType},
-        {"getLightRadius", GetLightRadius},
-        {"setLightRadius", SetLightRadius},
-        {"getLightColor", GetLightColor},
-        {"setLightColor", SetLightColor},
-        {"getLightDirection", GetLightDirection},
-        {"setLightDirection", SetLightDirection},
+        {"createLight", CreateLight},     {"getLightType", GetLightType},   {"getLightRadius", GetLightRadius},       {"setLightRadius", SetLightRadius},
+        {"getLightColor", GetLightColor}, {"setLightColor", SetLightColor}, {"getLightDirection", GetLightDirection}, {"setLightDirection", SetLightDirection},
     };
 
     // Add functions

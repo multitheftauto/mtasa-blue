@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/CStreaming.h"
 
 CClientIMGManager::CClientIMGManager(CClientManager* pManager)
 {

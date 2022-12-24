@@ -10,9 +10,24 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResourceChecker.h"
 #include "CResourceChecker.Data.h"
+#include "CResource.h"
+#include "CLogger.h"
+#include "CStaticFunctionDefinitions.h"
+#include <core/CServerInterface.h>
 #include <clocale>
-extern CNetServer* g_pRealNetServer;
+
+#ifndef WIN32
+    #include <limits.h>
+
+    #ifndef MAX_PATH
+        #define MAX_PATH PATH_MAX
+    #endif
+#endif
+
+extern CNetServer*       g_pRealNetServer;
+extern CServerInterface* g_pServerInterface;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -34,7 +49,7 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
     m_upgradedFullPathList.clear();
 
     // Check each file in the resource
-    list<CResourceFile*>::iterator iterf = pResource->IterBegin();
+    std::list<CResourceFile*>::iterator iterf = pResource->IterBegin();
     for (; iterf != pResource->IterEnd(); iterf++)
     {
         CResourceFile* pResourceFile = *iterf;
@@ -722,7 +737,8 @@ void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionNam
 //
 //
 ///////////////////////////////////////////////////////////////
-ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow, CMtaVersion& strOutVersion)
+ECheckerWhatType CResourceChecker::GetLuaFunctionNameUpgradeInfo(const string& strFunctionName, bool bClientScript, string& strOutHow,
+                                                                 CMtaVersion& strOutVersion)
 {
     static CHashMap<SString, SDeprecatedItem*> clientUpgradeInfoMap;
     static CHashMap<SString, SDeprecatedItem*> serverUpgradeInfoMap;
@@ -1124,8 +1140,8 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 // Also calculates version requirements these days
 //
 ///////////////////////////////////////////////////////////////
-void CResourceChecker::LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, CMtaVersion& strOutReqClientVersion, CMtaVersion& strOutReqServerVersion,
-                                          SString& strOutReqClientReason, SString& strOutReqServerReason)
+void CResourceChecker::LogUpgradeWarnings(CResource* pResource, const string& strResourceZip, CMtaVersion& strOutReqClientVersion,
+                                          CMtaVersion& strOutReqServerVersion, SString& strOutReqClientReason, SString& strOutReqServerReason)
 {
     m_bUpgradeScripts = false;
     CheckResourceForIssues(pResource, strResourceZip);

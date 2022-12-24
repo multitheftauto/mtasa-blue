@@ -39,8 +39,8 @@ typedef UINT32 uint32_t;
 #define POLARSSL_ERR_SHA1_FILE_IO_ERROR                -0x0076  /**< Read/write error in file. */
 
 #if !defined(POLARSSL_SHA1_ALT)
-// Regular implementation
-//
+    // Regular implementation
+    //
 
 #ifdef __cplusplus
 extern "C"

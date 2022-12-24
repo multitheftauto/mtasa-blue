@@ -115,7 +115,6 @@ struct nth_element_impl<0, T, Ts...>
 template <std::size_t I, typename... Ts>
 using nth_element_t = typename nth_element_impl<I, Ts...>::type;
 
-
 // common_variant
 // common_variant builds a single variant from types or variants
 //  bool, bool -> variant<bool>
@@ -179,7 +178,6 @@ struct common_variant<std::variant<Ts...>, T>
     using type = typename common_variant<T, std::variant<Ts...>>::type;
 };
 
-
 // Variant + Variant = Combined Variant
 // This recursively calls itself and deconstructs the first variant, while
 // adding the first type in the first variant to the second variant (via the T + variant overload)
@@ -194,7 +192,6 @@ struct common_variant<std::variant<T, Ts...>, std::variant<Us...>>
 struct dummy_type
 {
 };
-
 
 // n_tuple: Constructs a tuple of size N (with dummy_type as parameter types)
 //  n_tuple<2>::type == std::tuple<dummy_type, dummy_type>
@@ -244,7 +241,8 @@ struct pad_func_with_func
 // By using n_tuple, we build a Tuple of exactly the amout of parameters that need to be added to Func, which
 // is then applied via the impl function above
 template <typename Ret, typename... Args, auto (*Func)(Args...)->Ret, typename RetB, typename... ArgsB, auto (*FuncB)(ArgsB...)->RetB>
-struct pad_func_with_func<Func, FuncB> : pad_func_with_func_impl<Func, typename n_tuple<std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args),
-                                                                                        std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args) == 0>::type>
+struct pad_func_with_func<Func, FuncB>
+    : pad_func_with_func_impl<Func, typename n_tuple<std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args),
+                                                     std::max(sizeof...(Args), sizeof...(ArgsB)) - sizeof...(Args) == 0>::type>
 {
 };

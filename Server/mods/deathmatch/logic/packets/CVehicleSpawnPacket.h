@@ -9,8 +9,6 @@
  *
  *****************************************************************************/
 
-class CVehicleSpawnPacket;
-
 #pragma once
 
 #include "CPacket.h"

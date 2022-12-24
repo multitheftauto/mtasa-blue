@@ -10,10 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "Fileapi.h"
+#include <core/CCoreInterface.h>
+#include "CStreamingSA.h"
 #include "CModelInfoSA.h"
+#include "Fileapi.h"
 #include "processthreadsapi.h"
 
+extern CCoreInterface* g_pCore;
+
+// count: 26316 in unmodified game
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
 HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010; // Contains open files
 CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8; // [8][0x30]
@@ -79,7 +84,14 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
 }
 
-void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
+void CStreamingSA::RemoveModel(std::uint32_t model)
+{
+    using Signature = void(__cdecl*)(std::uint32_t);
+    const auto function = reinterpret_cast<Signature>(0x4089A0);
+    function(model);
+}
+
+void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* szTag)
 {
     TIMEUS startTime = GetTimeUs();
 
@@ -100,7 +112,7 @@ void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* 
     }
 }
 
-BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
+bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 {
     if (IsUpgradeModelId(dwModelID))
     {
@@ -118,13 +130,12 @@ BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-        BOOL  bReturn = 0;
+        bool bReturn = 0;
         _asm
         {
             push    dwModelID
             call    dwFunc
-            movzx   eax, al
-            mov     bReturn, eax
+            mov     bReturn, al
             pop     eax
         }
 
@@ -291,4 +302,14 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
 
     // Well done
     ResumeThread(*phStreamingThread);
+}
+
+void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
+{
+    (reinterpret_cast<void(__cdecl*)(std::uint32_t)>(0x40E120))(memoryToCleanInBytes);
+}
+
+std::uint32_t CStreamingSA::GetMemoryUsed() const
+{
+    return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
 }

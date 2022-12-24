@@ -11,6 +11,9 @@
 
 #include <StdInc.h>
 #include <net/SyncStructures.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
 
 extern CClientGame* g_pClientGame;
 CTickRateSettings   g_TickRateSettings;
@@ -1547,9 +1550,15 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
     pPlayerModel->GetControllerState(ControllerState);
     WriteFullKeysync(ControllerState, BitStream);
 
+    // Use parent model ID for non-standard vehicle model IDs.
+    // This avoids a mismatch between client and server, ensuring doors and damage sync correctly.
+    int iModelID = pVehicle->GetModel();
+    if (iModelID < 400 || iModelID > 611)
+        iModelID = pVehicle->GetModelInfo()->GetParentID();
+
     // Write the clientside model
     if (BitStream.Version() >= 0x05F)
-        BitStream.Write((int)pVehicle->GetModel());
+        BitStream.Write(iModelID);
 
     // Grab the vehicle position
     CVector vecPosition;
@@ -1768,7 +1777,7 @@ bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamIn
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -1819,7 +1828,7 @@ bool CNetAPI::ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInt
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -1981,11 +1990,15 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
     {
         // Write our target
         ElementID      ID = INVALID_ELEMENT_ID;
-        CClientPlayer* pPlayer = pCamera->GetFocusedPlayer();
-        if (!pPlayer)
-            pPlayer = g_pClientGame->GetLocalPlayer();
-        if (!pPlayer->IsLocalEntity())
-            ID = pPlayer->GetID();
+        CClientEntity* pTarget = pCamera->GetFocusedPlayer();
+
+        if (!pTarget)
+            pTarget = pCamera->GetTargetEntity();
+
+        if (!pTarget)
+            pTarget = g_pClientGame->GetLocalPlayer();
+        if (!pTarget->IsLocalEntity())
+            ID = pTarget->GetID();
 
         BitStream.Write(ID);
     }
@@ -1993,9 +2006,6 @@ void CNetAPI::WriteCameraSync(NetBitStreamInterface& BitStream)
 
 void CNetAPI::RPC(eServerRPCFunctions ID, NetBitStreamInterface* pBitStream)
 {
-    if (g_pClientGame->IsServerRPCFunctionDisabled(ID))
-        return;
-
     NetBitStreamInterface* pRPCBitStream = g_pNet->AllocateNetBitStream();
     if (pRPCBitStream)
     {

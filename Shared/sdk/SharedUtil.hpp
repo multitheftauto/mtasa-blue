@@ -24,3 +24,4 @@
 #include "SharedUtil.Profiling.hpp"
 #include "SharedUtil.Logging.hpp"
 #include "SharedUtil.AsyncTaskScheduler.hpp"
+#include "SharedUtil.Memory.hpp"

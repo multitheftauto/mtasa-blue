@@ -27,6 +27,8 @@
 #else
     #include <dirent.h>
     #include <sys/stat.h>
+    #include <unistd.h>
+    #include <limits.h>
 #endif
 
 //
@@ -429,8 +431,8 @@ SString SharedUtil::GetSystemCurrentDirectory()
         return GetSystemLongPathName(ToUTF8(szResult));
     return ToUTF8(szResult);
 #else
-    char szBuffer[MAX_PATH];
-    getcwd(szBuffer, MAX_PATH - 1);
+    char szBuffer[PATH_MAX];
+    getcwd(szBuffer, PATH_MAX - 1);
     return szBuffer;
 #endif
 }

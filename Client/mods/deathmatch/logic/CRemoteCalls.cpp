@@ -26,8 +26,7 @@ CRemoteCalls::~CRemoteCalls()
 }
 
 CRemoteCall* CRemoteCalls::Call(const char* szURL, CLuaArguments* fetchArguments, CLuaMain* luaMain, const CLuaFunctionRef& iFunction,
-                               const SString& strQueueName,
-                        const SHttpRequestOptions& options)
+                                const SString& strQueueName, const SHttpRequestOptions& options)
 {
     CRemoteCall* pRemoteCall = new CRemoteCall(szURL, fetchArguments, luaMain, iFunction, strQueueName, options);
 

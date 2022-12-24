@@ -38,7 +38,6 @@ CClientManager::CClientManager()
     m_pTeamManager = new CClientTeamManager;
     m_pDisplayManager = new CClientDisplayManager;
     m_pVehicleManager = new CClientVehicleManager(this);
-    m_pCivilianManager = new CClientCivilianManager(this);
     m_pCamera = new CClientCamera(this);
     m_pPedManager = new CClientPedManager(this);
     m_pResourceManager = new CResourceManager;
@@ -103,9 +102,6 @@ CClientManager::~CClientManager()
 
     delete m_pCamera;
     m_pCamera = NULL;
-
-    delete m_pCivilianManager;
-    m_pCivilianManager = NULL;
 
     delete m_pVehicleManager;
     m_pVehicleManager = NULL;

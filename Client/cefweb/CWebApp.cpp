@@ -9,8 +9,8 @@
 #include "StdInc.h"
 #include "CWebApp.h"
 
-#include <cef3/include/wrapper/cef_stream_resource_handler.h>
-#include <cef3/include/cef_parser.h>
+#include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
+#include <cef3/cef/include/cef_parser.h>
 #include "CAjaxResourceHandler.h"
 
 CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
