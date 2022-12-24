@@ -79,6 +79,7 @@ public:
     void                InitHooks_FrameRateFixes();
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
+    void                InitHooks_Postprocess();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
