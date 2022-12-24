@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CClock.h>
+#include <game/CWeather.h>
 
 CBlendedWeather::CBlendedWeather()
 {

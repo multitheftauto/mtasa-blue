@@ -23,7 +23,6 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
-#include "CDiscordManagerInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -174,8 +173,6 @@ public:
     virtual SString     GetBlueCopyrightString() = 0;
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
-
-    virtual CDiscordManagerInterface* GetDiscordManager() = 0;
 
     virtual bool IsChatInputBlocked() = 0;
 };

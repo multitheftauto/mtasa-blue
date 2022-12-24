@@ -14,7 +14,6 @@
 #include <game/CGame.h>
 #include <multiplayer/CMultiplayer.h>
 
-#include "CPopulationSA.h"
 #include "multiplayersa_init.h"
 #include "CLimitsSA.h"
 
@@ -47,7 +46,6 @@ class CMultiplayerSA : public CMultiplayer
 
 private:
     CRemoteDataSA* RemoteData;
-    CPopulationSA* Population;
 
 public:
     ZERO_ON_NEW
@@ -78,6 +76,9 @@ public:
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
+    void                InitHooks_FrameRateFixes();
+    void                InitHooks_ProjectileCollisionFix();
+    void                InitHooks_ObjectStreamerOptimization();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -87,7 +88,6 @@ public:
 
     CPed* GetContextSwitchedPed();
 
-    CPopulationMP* GetPopulationMP() { return Population; }
     void           PreventLeavingVehicles();
     void           HideRadar(bool bHide);
     void           SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLOAT fHeading);
@@ -141,6 +141,7 @@ public:
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
     void SetPedStepHandler(PedStepHandler* pHandler);
     void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
+    void SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler);
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
@@ -294,6 +295,10 @@ public:
     eAnimID    GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
     DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
+    unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
+    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
+    unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
+
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;
     static char* ms_PlayerImgCachePtr;
@@ -339,7 +344,6 @@ private:
     static unsigned long HOOKPOS_CHud_Draw_Caller;
     static unsigned long HOOKPOS_CRunningScript_Process;
     static unsigned long HOOKPOS_CExplosion_AddExplosion;
-    static unsigned long HOOKPOS_CRealTimeShadowManager__ReturnRealTimeShadow;
     static unsigned long HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
     static unsigned long HOOKPOS_Trailer_BreakTowLink;
     static unsigned long HOOKPOS_CRadar__DrawRadarGangOverlay;

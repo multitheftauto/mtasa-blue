@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedIKSA.h"
 
 RwV3d& CPedIKSAInterface::XaxisIK = *(RwV3d*)0x8D232C;
 RwV3d& CPedIKSAInterface::YaxisIK = *(RwV3d*)0x8D2338;

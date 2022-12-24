@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CColPoint.h>
+#include <game/CObjectGroupPhysicalProperties.h>
+#include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
@@ -621,17 +624,25 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                                 break;
                         }
                     }
-                    pModel->Allocate(usParentID);
-                    pModel->SetParentResource(pResource);
 
-                    lua_pushinteger(luaVM, iModelID);
-                    return 1;
+                    if (pModel->Allocate(usParentID))
+                    {
+                        pModel->SetParentResource(pResource);
+
+                        lua_pushinteger(luaVM, iModelID);
+                        return 1;
+                    }
+
+                    m_pManager->GetModelManager()->Remove(pModel);
+                    argStream.SetCustomError("Expected valid original model ID at argument 2");
                 }
             }
-            else
-                m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
         }
     }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

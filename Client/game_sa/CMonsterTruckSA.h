@@ -22,7 +22,6 @@ class CMonsterTruckSAInterface : public CAutomobileSAInterface
 class CMonsterTruckSA : public CMonsterTruck, public CAutomobileSA
 {
 private:
-    //  CBoatSAInterface        * internalInterface;
 public:
     CMonsterTruckSA(CMonsterTruckSAInterface* monstertruck);
     CMonsterTruckSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);

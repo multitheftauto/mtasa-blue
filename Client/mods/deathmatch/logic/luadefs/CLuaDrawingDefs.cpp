@@ -966,12 +966,12 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
     //  element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
     SString         strFilePath;
     CPixels         pixels;
-    int             width;
-    int             height;
+    int             width = 0;
+    int             height = 0;
     ERenderFormat   renderFormat;
-    bool            bMipMaps;
+    bool            bMipMaps = true;
     ETextureAddress textureAddress;
-    ETextureType    textureType;
+    ETextureType    textureType = TTYPE_TEXTURE;
     int             depth = 1;
 
     CScriptArgReader argStream(luaVM);
@@ -1358,7 +1358,7 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
         else if (argStream.NextCouldBeNumber())
         {
             // float(s)
-            float fBuffer[16];
+            float fBuffer[16]{};
             uint  i;
             for (i = 0; i < NUMELMS(fBuffer);)
             {
@@ -1373,7 +1373,7 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
         else if (argStream.NextIsTable())
         {
             // table (of floats)
-            float fBuffer[16];
+            float fBuffer[16]{};
             uint  i = 0;
 
             lua_pushnil(luaVM);            // Loop through our table, beginning at the first key
@@ -1710,6 +1710,18 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
 
         lua_pushstring(luaVM, "SettingHighDetailPeds");
         lua_pushboolean(luaVM, dxStatus.settings.bHighDetailPeds);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "SettingBlur");
+        lua_pushboolean(luaVM, dxStatus.settings.bBlur);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "SettingCoronaReflections");
+        lua_pushboolean(luaVM, dxStatus.settings.bCoronaReflections);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "SettingDynamicPedShadows");
+        lua_pushboolean(luaVM, dxStatus.settings.bDynamicPedShadows);
         lua_settable(luaVM, -3);
 
         lua_pushstring(luaVM, "TotalPhysicalMemory");
@@ -2050,7 +2062,7 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
                                         const std::optional<float> lineWidth, const std::optional<unsigned int> iterations)
 {
     // Greater than 4, crash the game
-    if (iterations == 0 || iterations > 4)
+    if (iterations.has_value() && (*iterations == 0 || *iterations > 4))
         throw std::invalid_argument("Iterations must be between 1 and 4");
 
     if (!color)

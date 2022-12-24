@@ -398,7 +398,7 @@ void LayoutShape::render(RenderState& state) const
     if(visibility == Visibility::Hidden)
         return;
 
-    BlendInfo info{clipper, masker, 1.0, Rect::Invalid};
+    BlendInfo info{clipper, masker, opacity, Rect::Invalid};
     RenderState newState(this, state.mode());
     newState.transform = transform * state.transform;
     newState.beginGroup(state, info);
@@ -479,14 +479,14 @@ void RenderState::endGroup(RenderState& state, const BlendInfo& info)
     state.canvas->blend(canvas.get(), BlendMode::Src_Over, m_mode == RenderMode::Display ? info.opacity : 1.0);
 }
 
-LayoutContext::LayoutContext(const ParseDocument* document, LayoutSymbol* root)
-    : m_document(document), m_root(root)
+LayoutContext::LayoutContext(const TreeBuilder* builder, LayoutSymbol* root)
+    : m_builder(builder), m_root(root)
 {
 }
 
 Element* LayoutContext::getElementById(const std::string& id) const
 {
-    return m_document->getElementById(id);
+    return m_builder->getElementById(id);
 }
 
 LayoutObject* LayoutContext::getResourcesById(const std::string& id) const
@@ -517,7 +517,7 @@ LayoutMask* LayoutContext::getMasker(const std::string& id)
         return static_cast<LayoutMask*>(ref);
 
     auto element = getElementById(id);
-    if(element == nullptr || element->id != ElementId::Mask)
+    if(element == nullptr || element->id != ElementID::Mask)
         return nullptr;
 
     auto masker = static_cast<MaskElement*>(element)->getMasker(this);
@@ -534,7 +534,7 @@ LayoutClipPath* LayoutContext::getClipper(const std::string& id)
         return static_cast<LayoutClipPath*>(ref);
 
     auto element = getElementById(id);
-    if(element == nullptr || element->id != ElementId::ClipPath)
+    if(element == nullptr || element->id != ElementID::ClipPath)
         return nullptr;
 
     auto clipper = static_cast<ClipPathElement*>(element)->getClipper(this);
@@ -551,7 +551,7 @@ LayoutMarker* LayoutContext::getMarker(const std::string& id)
         return static_cast<LayoutMarker*>(ref);
 
     auto element = getElementById(id);
-    if(element == nullptr || element->id != ElementId::Marker)
+    if(element == nullptr || element->id != ElementID::Marker)
         return nullptr;
 
     auto marker = static_cast<MarkerElement*>(element)->getMarker(this);
@@ -584,7 +584,7 @@ FillData LayoutContext::fillData(const StyledElement* element)
     FillData fillData;
     fillData.painter = getPainter(fill.ref());
     fillData.color = fill.color();
-    fillData.opacity = element->opacity() * element->fill_opacity();
+    fillData.opacity = element->fill_opacity();
     fillData.fillRule = element->fill_rule();
     return fillData;
 }
@@ -637,7 +637,7 @@ StrokeData LayoutContext::strokeData(const StyledElement* element)
     StrokeData strokeData;
     strokeData.painter = getPainter(stroke.ref());
     strokeData.color = stroke.color();
-    strokeData.opacity = element->opacity() * element->stroke_opacity();
+    strokeData.opacity = element->stroke_opacity();
     strokeData.width = lengthContex.valueForLength(element->stroke_width(), LengthMode::Both);
     strokeData.miterlimit = element->stroke_miterlimit();
     strokeData.cap = element->stroke_linecap();

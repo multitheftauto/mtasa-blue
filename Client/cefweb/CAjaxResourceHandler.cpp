@@ -64,7 +64,7 @@ bool CAjaxResourceHandler::ReadResponse(void* data_out, int bytes_to_read, int& 
     {
         bytes_read = 0;
         m_callback = callback;
-        callback->Continue();
+
         return true;
     }
 

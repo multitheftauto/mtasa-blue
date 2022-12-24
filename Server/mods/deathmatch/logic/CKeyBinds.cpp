@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CKeyBinds.h"
+#include "CPlayer.h"
 
 static const SFixedArray<SBindableKey, 106> g_bkKeys = {{{"mouse1"},
                                                          {"mouse2"},
@@ -224,7 +226,7 @@ bool CKeyBinds::Remove(CKeyBind* pKeyBind)
 
 void CKeyBinds::Clear(eKeyBindType bindType)
 {
-    list<CKeyBind*>::iterator iter = m_List.begin();
+    std::list<CKeyBind*>::iterator iter = m_List.begin();
     while (iter != m_List.end())
     {
         if ((!(*iter)->IsBeingDeleted() && bindType == KEY_BIND_UNDEFINED) || (*iter)->GetType() == bindType)
@@ -300,10 +302,10 @@ bool CKeyBinds::ProcessKey(const char* szKey, bool bHitState, eKeyBindType bindT
     }
 
     m_bProcessingKey = true;
-    bool                      bFound = false;
-    CKeyBind*                 pKeyBind = NULL;
-    list<CKeyBind*>           cloneList = m_List;
-    list<CKeyBind*>::iterator iter = cloneList.begin();
+    bool                           bFound = false;
+    CKeyBind*                      pKeyBind = NULL;
+    std::list<CKeyBind*>           cloneList = m_List;
+    std::list<CKeyBind*>::iterator iter = cloneList.begin();
     for (; iter != cloneList.end(); ++iter)
     {
         pKeyBind = *iter;
@@ -389,10 +391,10 @@ bool CKeyBinds::AddKeyFunction(const SBindableKey* pKey, bool bHitState, CLuaMai
 
 bool CKeyBinds::RemoveKeyFunction(const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction)
 {
-    bool                      bFound = false;
-    CKeyFunctionBind*         pBind = NULL;
-    list<CKeyBind*>           cloneList = m_List;
-    list<CKeyBind*>::iterator iter = cloneList.begin();
+    bool                           bFound = false;
+    CKeyFunctionBind*              pBind = NULL;
+    std::list<CKeyBind*>           cloneList = m_List;
+    std::list<CKeyBind*>::iterator iter = cloneList.begin();
     while (iter != cloneList.end())
     {
         if (!(*iter)->IsBeingDeleted() && (*iter)->GetType() == KEY_BIND_FUNCTION)
@@ -429,9 +431,9 @@ bool CKeyBinds::RemoveKeyFunction(const char* szKey, CLuaMain* pLuaMain, bool bC
 
 bool CKeyBinds::KeyFunctionExists(const char* szKey, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction)
 {
-    bool                      bFound = false;
-    list<CKeyBind*>           cloneList = m_List;
-    list<CKeyBind*>::iterator iter = cloneList.begin();
+    bool                           bFound = false;
+    std::list<CKeyBind*>           cloneList = m_List;
+    std::list<CKeyBind*>::iterator iter = cloneList.begin();
     for (; iter != cloneList.end(); ++iter)
     {
         if ((*iter)->GetType() == KEY_BIND_FUNCTION)
@@ -457,9 +459,9 @@ bool CKeyBinds::KeyFunctionExists(const char* szKey, CLuaMain* pLuaMain, bool bC
 
 void CKeyBinds::RemoveAllKeys(CLuaMain* pLuaMain)
 {
-    CKeyBind*                 pBind = NULL;
-    list<CKeyBind*>           cloneList = m_List;
-    list<CKeyBind*>::iterator iter = cloneList.begin();
+    CKeyBind*                      pBind = NULL;
+    std::list<CKeyBind*>           cloneList = m_List;
+    std::list<CKeyBind*>::iterator iter = cloneList.begin();
     while (iter != cloneList.end())
     {
         pBind = *iter;
@@ -527,10 +529,10 @@ bool CKeyBinds::AddControlFunction(const SBindableGTAControl* pControl, bool bHi
 
 bool CKeyBinds::RemoveControlFunction(const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction)
 {
-    bool                      bFound = false;
-    CControlFunctionBind*     pBind = NULL;
-    list<CKeyBind*>           cloneList = m_List;
-    list<CKeyBind*>::iterator iter = cloneList.begin();
+    bool                           bFound = false;
+    CControlFunctionBind*          pBind = NULL;
+    std::list<CKeyBind*>           cloneList = m_List;
+    std::list<CKeyBind*>::iterator iter = cloneList.begin();
     while (iter != cloneList.end())
     {
         if ((*iter)->GetType() == KEY_BIND_CONTROL_FUNCTION)
@@ -566,9 +568,9 @@ bool CKeyBinds::RemoveControlFunction(const char* szControl, CLuaMain* pLuaMain,
 
 bool CKeyBinds::ControlFunctionExists(const char* szControl, CLuaMain* pLuaMain, bool bCheckHitState, bool bHitState, const CLuaFunctionRef& iLuaFunction)
 {
-    bool                      bFound = false;
-    list<CKeyBind*>           cloneList = m_List;
-    list<CKeyBind*>::iterator iter = cloneList.begin();
+    bool                           bFound = false;
+    std::list<CKeyBind*>           cloneList = m_List;
+    std::list<CKeyBind*>::iterator iter = cloneList.begin();
     for (; iter != cloneList.end(); ++iter)
     {
         if ((*iter)->GetType() == KEY_BIND_CONTROL_FUNCTION)
@@ -611,7 +613,7 @@ bool CKeyBinds::IsMouse(const SBindableKey* pKey)
 
 void CKeyBinds::RemoveDeletedBinds()
 {
-    list<CKeyBind*>::iterator iter = m_List.begin();
+    std::list<CKeyBind*>::iterator iter = m_List.begin();
     while (iter != m_List.end())
     {
         if ((*iter)->IsBeingDeleted())

@@ -18,6 +18,7 @@
 #include "CEvents.h"
 #include <list>
 #include <cstring>
+#include "Enums.h"
 #include "CElementGroup.h"
 
 // Used to check fast version of getElementsByType
@@ -40,13 +41,13 @@
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 #define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
 
+class CLuaMain;
+
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
-// List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot final : public std::vector<CElement*>, public CRefCountableST
-{
-};
+typedef std::vector<CElement*> CElementListSnapshot;
+typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 class CElement
 {
@@ -155,7 +156,7 @@ public:
     CChildListType ::const_iterator         IterEnd() { return m_Children.end(); };
     CChildListType ::const_reverse_iterator IterReverseBegin() { return m_Children.rbegin(); };
     CChildListType ::const_reverse_iterator IterReverseEnd() { return m_Children.rend(); };
-    CElementListSnapshot*                   GetChildrenListSnapshot();
+    CElementListSnapshotRef                 GetChildrenListSnapshot();
 
     static uint        GetTypeHashFromString(const SString& strTypeName);
     EElementType       GetType() { return m_iType; };
@@ -256,12 +257,12 @@ protected:
 
     CVector m_vecPosition;
 
-    unsigned int          m_uiTypeHash;
-    std::string           m_strTypeName;
-    std::string           m_strName;
-    CChildListType        m_Children;
-    CElementListSnapshot* m_pChildrenListSnapshot;
-    uint                  m_uiChildrenListSnapshotRevision;
+    unsigned int            m_uiTypeHash;
+    std::string             m_strTypeName;
+    std::string             m_strName;
+    CChildListType          m_Children;
+    CElementListSnapshotRef m_pChildrenListSnapshot;
+    uint                    m_uiChildrenListSnapshotRevision;
 
     std::list<class CPerPlayerEntity*> m_ElementReferenced;
     std::list<class CColShape*>        m_Collisions;

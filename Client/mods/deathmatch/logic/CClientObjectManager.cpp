@@ -91,7 +91,7 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
 {
-    if (ulObjectModel >= g_pGame->GetBaseIDforTXD())
+    if (ulObjectModel >= static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
         return false;
 
     // Clothes and hands cause crash (Github #424)
@@ -229,10 +229,23 @@ void CClientObjectManager::OnDestruction(CClientObject* pObject)
 
 void CClientObjectManager::UpdateLimitInfo()
 {
+    m_iEntryInfoNodeEntries = g_pMultiplayer->EntryInfoNodePool_NoOfUsedSpaces();
+    m_iPointerNodeSingleLinkEntries = g_pMultiplayer->PtrNodeSingleLinkPool_NoOfUsedSpaces();
+    m_iPointerNodeDoubleLinkEntries = g_pMultiplayer->PtrNodeDoubleLinkPool_NoOfUsedSpaces();
+
+    /*
     CPools* pPools = g_pGame->GetPools();
-    m_iEntryInfoNodeEntries = pPools->GetEntryInfoNodePool()->GetNumberOfUsedSpaces();
-    m_iPointerNodeSingleLinkEntries = pPools->GetPointerNodeSingleLinkPool()->GetNumberOfUsedSpaces();
-    m_iPointerNodeDoubleLinkEntries = pPools->GetPointerNodeDoubleLinkPool()->GetNumberOfUsedSpaces();
+    unsigned int nEntryInfoNodeEntries = pPools->GetEntryInfoNodePool()->GetNumberOfUsedSpaces();
+    unsigned int nPointerNodeSingleLinkEntries = pPools->GetPointerNodeSingleLinkPool()->GetNumberOfUsedSpaces();
+    unsigned int nPointerNodeDoubleLinkEntries = pPools->GetPointerNodeDoubleLinkPool()->GetNumberOfUsedSpaces();
+    
+    g_pCore->ChatPrintf("%d = %d ### %d = %d ### %d = %d", false, nEntryInfoNodeEntries, m_iEntryInfoNodeEntries, nPointerNodeSingleLinkEntries,
+                        m_iPointerNodeSingleLinkEntries, nPointerNodeDoubleLinkEntries, m_iPointerNodeDoubleLinkEntries);
+
+    assert(nEntryInfoNodeEntries == m_iEntryInfoNodeEntries);
+    assert(nPointerNodeSingleLinkEntries == m_iPointerNodeSingleLinkEntries);
+    assert(nPointerNodeDoubleLinkEntries == m_iPointerNodeDoubleLinkEntries);
+    */
 }
 
 bool CClientObjectManager::StaticIsObjectLimitReached()
