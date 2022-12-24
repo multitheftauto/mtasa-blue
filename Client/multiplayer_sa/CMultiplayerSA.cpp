@@ -660,12 +660,6 @@ float OverlayModifier::fMultiplier = 1.0f;
 
 }
 
-template <typename T>
-int __cdecl HOOK_GrainEffect(BYTE ucLevel, BYTE ucUpdate)
-{
-    return T::ApplyEffect(ucLevel, ucUpdate);
-}
-
 void CMultiplayerSA::InitHooks()
 {
     InitKeysyncHooks();
@@ -842,10 +836,10 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
     HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
 
-    HookInstallCall(HOOKPOS_GrainEffect_NightModifier, (DWORD)HOOK_GrainEffect<GrainEffect::NightModifier>);
-    HookInstallCall(HOOKPOS_GrainEffect_InfraredModifier, (DWORD)HOOK_GrainEffect<GrainEffect::InfraredModifier>);
-    HookInstallCall(HOOKPOS_GrainEffect_RainModifier, (DWORD)HOOK_GrainEffect<GrainEffect::RainModifier>);
-    HookInstallCall(HOOKPOS_GrainEffect_OverlayModifier, (DWORD)HOOK_GrainEffect<GrainEffect::OverlayModifier>);
+    HookInstallCall(HOOKPOS_GrainEffect_NightModifier, (DWORD)GrainEffect::NightModifier::ApplyEffect);
+    HookInstallCall(HOOKPOS_GrainEffect_InfraredModifier, (DWORD)GrainEffect::InfraredModifier::ApplyEffect);
+    HookInstallCall(HOOKPOS_GrainEffect_RainModifier, (DWORD)GrainEffect::RainModifier::ApplyEffect);
+    HookInstallCall(HOOKPOS_GrainEffect_OverlayModifier, (DWORD)GrainEffect::OverlayModifier::ApplyEffect);
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
@@ -4084,7 +4078,7 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
     if (bNoiseEnabled)
     {
-        HookInstallCall(0x704EE8, (DWORD)HOOK_GrainEffect<GrainEffect::NightModifier>);
+        HookInstallCall(0x704EE8, (DWORD)GrainEffect::NightModifier::ApplyEffect);
     }
     else
     {
@@ -4104,7 +4098,7 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
     if (bNoiseEnabled)
     {
-        HookInstallCall(0x704F59, (DWORD)HOOK_GrainEffect<GrainEffect::InfraredModifier>);
+        HookInstallCall(0x704F59, (DWORD)GrainEffect::InfraredModifier::ApplyEffect);
     }
     else
     {
