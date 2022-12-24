@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-24 12:34\n"
+"PO-Revision-Date: 2022-12-24 13:37\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -27,15 +27,15 @@ msgstr "انقطع الاتصال من اللعبة"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
-msgstr "اظهار الألقاب"
+msgstr "إظهار الألقاب"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
-msgstr "اظهار مربخ الدردشة"
+msgstr "إظهار صندوق الدردشة"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
-msgstr "اظهار إحصائيات الشبكة"
+msgstr "إظهار إحصائيات الشبكة"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
@@ -48,15 +48,15 @@ msgstr "ينقل الصوت للاعبين آخرين"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
-msgstr "يدخل بسيارة كراكب"
+msgstr "يدخل السيارة كراكب"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
-msgstr "القناة التالية للراديو"
+msgstr "قناة الراديو التالية"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
-msgstr "القناة السابقة للراديو"
+msgstr "قناة الراديو السابقة"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
@@ -96,7 +96,7 @@ msgstr "تقليل شفافية الرادار"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases radar opacity"
-msgstr "يزيد شفافية للرادار"
+msgstr "زيادة شفافية الرادار"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles radar help text"
@@ -108,15 +108,15 @@ msgstr "إرسال رسالة للاعب محدد"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "التغيير الى السلاح التالي أثناء ركوب مركبة"
+msgstr "التغيير إلى السلاح التالي خلال التواجد في مركبة"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "التغيير الى السلاح السابق أثناء ركوب مركبة"
+msgstr "التغيير إلى السلاح السابق خلال التواجد في مركبة"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr "يظهر معلومات عن الخادم الحالي"
+msgstr "إظهار معلومات عن الخادم الحالي"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
@@ -126,11 +126,11 @@ msgstr "يعرف المقاس لكل النصوص"
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
-msgstr "(وضع التطوير) وضع التطوير يظهر الـ colshape"
+msgstr "(وضع التطوير) يظهر الـ colshape"
 
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(وضع التطوير)يطبع ارقام اصوات العالم في إطار التصحيح"
+msgstr "(وضع التطوير) يطبع أرقام أصوات العالم في نافذة التصحيح"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -181,81 +181,81 @@ msgstr "خطأ: تعذر تشغيل الخادم المحلي. [%s]"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
 msgid "Disconnected: Invalid nickname"
-msgstr "قطع الأتصال: الاسم المستعار غير صالح"
+msgstr "قطع الاتصال: الاسم المستعار غير صالح"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
 msgid "Disconnect from server"
-msgstr "انقطع الأتصال من الخادم"
+msgstr "انقطع الاتصال من الخادم"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "قطع الأتصال: الرقم التسلسلي (السيريال) محظور.\n"
+msgstr "قطع الاتصال: الرقم التسلسلي (السيريال) محظور.\n"
 "السبب: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr "قطع الأتصال: أنت محظور.\n"
+msgstr "قطع الاتصال: أنت محظور.\n"
 "السبب: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "قطع الأتصال: الحساب محظور.\n"
+msgstr "قطع الاتصال: الحساب محظور.\n"
 "السبب: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
 msgid "Disconnected: Version mismatch"
-msgstr "قطع الأتصال: عدم تطابق الإصدار"
+msgstr "قطع الاتصال: عدم تطابق الإصدار"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "قطع الأتصال: مضاد التكرار. الرجاء الانتظار دقيقة ثم الاتصال مرة اخرى."
+msgstr "قطع الاتصال: مضاد التكرار. الرجاء الانتظار دقيقة ثم الاتصال مرة اخرى."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr "قطع الأتصال: الخادم من أفرع مختلفة.\n"
+msgstr "قطع الاتصال: الخادم من أفرع مختلفة.\n"
 "المعلومات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr "قطع الأتصال: نسخة سيئة.\n"
+msgstr "قطع الاتصال: نسخة سيئة.\n"
 "معلومات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr "قطع الأتصال: الخادم يعمل على نسخة حديثة.\n"
+msgstr "قطع الاتصال: الخادم يعمل على نسخة حديثة.\n"
 "معلومات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "قطع الأتصال: الخادم يعمل على نسخة قديمة.\n"
+msgstr "قطع الاتصال: الخادم يعمل على نسخة قديمة.\n"
 "المعلومات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
 msgid "Disconnected: Nick already in use"
-msgstr "قطع الأتصال: الأسم المستعار مستخدم"
+msgstr "قطع الاتصال: الاسم المستعار مستخدم بالفعل"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 msgid "Disconnected: Player element could not be created."
-msgstr "قطع الإتصال: تعذر إنشاء عنصر اللاعب."
+msgstr "قطع الاتصال: تعذر إنشاء عنصر اللاعب."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
-msgstr "تم الفصل: الخادم رفض الإتصال: %s"
+msgstr "قطع الاتصال: الخادم رفض الاتصال: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
 msgid "Disconnected: Serial verification failed"
@@ -287,7 +287,7 @@ msgstr "تم طردك من اللعبة"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "هذا الخادم يتطلب ملف gta_sa.exe غير معدل مسبقاً"
+msgstr "هذا الخادم يتطلب ملف gta_sa.exe غير معدل مسبقًا"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
@@ -296,7 +296,7 @@ msgstr "يرجى إستبدال gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "هذا الخادم لا يسمح بملفات D3D9.DLL معدلة مسبقاً"
+msgstr "هذا الخادم لا يسمح بملفات D3D9.DLL معدلة مسبقًا"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
@@ -324,7 +324,7 @@ msgstr "حاول إعادة تشغيل MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "هذا الخادم يتطلب نسخة من gta3.img و gta_int.img غير معدل عليهم مسبقاً"
+msgstr "هذا الخادم يتطلب نسخة من gta3.img و gta_int.img غير معدل عليهم مسبقًا"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
 msgid "Please replace gta3.img or gta_int.img"
@@ -389,7 +389,7 @@ msgstr[5] "%d ثواني"
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
 msgid "Disconnected"
-msgstr "قطع الإتصال"
+msgstr "قطع الاتصال"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -409,7 +409,7 @@ msgstr "%s من %s"
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr "اقطع الأتصال حتى تلغي التحميل"
+msgstr "اقطع الاتصال حتى تلغي التحميل"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:588
 #: Client/mods/deathmatch/logic/CClientGame.cpp:686
@@ -460,7 +460,7 @@ msgstr "خطأ في الاتصال بالسيرفر"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1114
 msgid "Connecting to local server timed out. See console for details."
-msgstr "انتهت مهلة الأتصال بالخادم المحلي. انظر للـ Console لمزيد من التفاصيل"
+msgstr "انتهت مهلة الاتصال بالخادم المحلي. انظر للـ Console لمزيد من التفاصيل"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1183
 #: Client/core/CConnectManager.cpp:263
@@ -469,17 +469,17 @@ msgstr "انتهت مهلة الاتصال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1217
 msgid "Connection with the server was lost"
-msgstr "لقد فقد الإتصال بالخادم"
+msgstr "لقد فقد الاتصال بالخادم"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1228
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
 msgid "Disconnected: unknown protocol error"
-msgstr "قطع الإتصال: خطأ في بروتوكول غير معروف"
+msgstr "قطع الاتصال: خطأ في بروتوكول غير معروف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1232
 #: Client/core/CConnectManager.cpp:285
 msgid "Disconnected: disconnected remotely"
-msgstr "قطع الإتصال: قطع الإتصال عن بعد"
+msgstr "قطع الاتصال: قطع الاتصال عن بعد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1236
 #: Client/core/CConnectManager.cpp:289
@@ -493,7 +493,7 @@ msgstr "قطع الاتصال: أنت محظور من الدخول إلى هذا
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1244
 msgid "Disconnected: the server is currently full"
-msgstr "قطع الإتصال: الخادم ممتلئ حالياً"
+msgstr "قطع الاتصال: الخادم ممتلئ حالياً"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1248
 #: Client/core/CConnectManager.cpp:300
@@ -507,12 +507,12 @@ msgstr "قطع الاتصال: تم فقد الاتصال بالخادم"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1256
 msgid "Disconnected: invalid password specified"
-msgstr "قطع الأتصال: كلمة المرور المدخلة غير صحيحة"
+msgstr "قطع الاتصال: كلمة المرور المدخلة غير صحيحة"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1260
 #: Client/core/CConnectManager.cpp:311
 msgid "Disconnected: connection was refused"
-msgstr "قطع الإتصال: تم رفض الإتصال"
+msgstr "قطع الاتصال: تم رفض الاتصال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 msgid "MTA Client verification failed!"
@@ -1145,7 +1145,7 @@ msgstr "MTA تعذرت الكشف عن مكافح فيروسات في هذا ا�
 
 #: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
-msgstr "انا قد ثبت مكافح فيروسات مسبقاً"
+msgstr "انا قد ثبت مكافح فيروسات مسبقًا"
 
 #: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
@@ -1202,7 +1202,7 @@ msgstr "لا يمكن الدخول في هذا الوقت. \n\n"
 
 #: Client/core/CVersionUpdater.cpp:1786
 msgid "Connecting"
-msgstr "جاري الإتصال"
+msgstr "جاري الاتصال"
 
 #: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
 msgid "Please wait..."
@@ -1696,7 +1696,7 @@ msgstr "دخان"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "ظلال الشخصيات الديناميكية"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
@@ -1728,7 +1728,7 @@ msgstr "إنعكاسات المطر"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
-msgstr "السماح بالأتصال بالمواقع الألكترونية"
+msgstr "السماح بالاتصال بالمواقع الألكترونية"
 
 #: Client/core/CSettings.cpp:898
 msgid "Enable Javascript on remote websites"
@@ -1914,7 +1914,7 @@ msgstr "يلزم إعادة التشغيل"
 
 #: Client/core/CSettings.cpp:1389
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "بعض الإعدادات ستتغير عندما تقطع الإتصال من الخادم الحالي"
+msgstr "بعض الإعدادات ستتغير عندما تقطع الاتصال من الخادم الحالي"
 
 #: Client/core/CSettings.cpp:1390
 msgid "\n\n"
@@ -1924,12 +1924,12 @@ msgstr "\n\n"
 
 #: Client/core/CSettings.cpp:1393
 msgid "DISCONNECT REQUIRED"
-msgstr "يلزم قطع الإتصال"
+msgstr "يلزم قطع الاتصال"
 
 #. Update the joystick name
 #: Client/core/CSettings.cpp:1720
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "لم يتم العثور على عصا التحكم - الرجاء التحقق من الإتصال وإعادة تشغيل اللعبة"
+msgstr "لم يتم العثور على عصا التحكم - الرجاء التحقق من الاتصال وإعادة تشغيل اللعبة"
 
 #: Client/core/CSettings.cpp:1915
 msgid "Binding axis"
@@ -2147,11 +2147,11 @@ msgstr "معاينة"
 
 #: Client/core/CSettings.cpp:4113
 msgid "Please disconnect before changing language"
-msgstr "يرجى قطع الإتصال من بالخادم قبل تغيير اللغة"
+msgstr "يرجى قطع الاتصال من بالخادم قبل تغيير اللغة"
 
 #: Client/core/CSettings.cpp:4141
 msgid "Please disconnect before changing skin"
-msgstr "يرجى قطع الإتصال عن الخادم قبل تغيير الشخصية"
+msgstr "يرجى قطع الاتصال عن الخادم قبل تغيير الشخصية"
 
 #: Client/core/CSettings.cpp:4429
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
@@ -2166,8 +2166,8 @@ msgstr "تحذير بالنسبة للأداء"
 #: Client/core/CSettings.cpp:4453
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
-msgstr "رفع صورة الشاشة قد تكون الزامية لبعض الخوادم لأسباب تتعلق بمكافحة الغش.\n\n"
-"(مربع الدردشة وواجهة اللعبة مستبعدتان عن الرفع)\n"
+msgstr "رفع لقطة من الشاشة قد تكون إلزامية لبعض الخوادم لأسباب تتعلق بمكافحة الغش.\n\n"
+"(مربع الدردشة وواجهة اللعبة مستبعدتان من اللقطة)\n"
 
 #: Client/core/CSettings.cpp:4455
 msgid "SCREEN UPLOAD INFORMATION"
@@ -2189,9 +2189,9 @@ msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
 "Are you sure you want to use them?"
-msgstr "بعض الملفات في مسار لعبة GTA:SA معدل عليها مسبقاً.\n"
+msgstr "بعض الملفات في مسار لعبة GTA:SA معدل عليها مسبقًا.\n"
 "MTA ستقوم بإستخدامها فقط إذا قمت بتفعيل الخيار.\n\n"
-"ولكن، الملفات المعدل عليها مسبقاً محظورة من قبل الكثير من الخوادم.\n\n"
+"ولكن، الملفات المعدل عليها مسبقًا محظورة من قبل الكثير من الخوادم.\n\n"
 "هل أنت متأكد بأنك تريد استخدامهم؟"
 
 #: Client/core/CSettings.cpp:4543
@@ -2280,7 +2280,7 @@ msgstr "إصلاح حركة الفأرة - قد يتطلب إعادة تشغيل
 
 #: Client/core/CMainMenu.cpp:315
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "أنت تستخدم نسخة تجريبية! هذه نسخة بناء فقط لا يمكن من خلالها الإتصال بالسيرفرات العامة!"
+msgstr "أنت تستخدم نسخة تجريبية! هذه نسخة بناء فقط لا يمكن من خلالها الاتصال بالسيرفرات العامة!"
 
 #: Client/core/CMainMenu.cpp:334
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
@@ -2323,7 +2323,7 @@ msgstr "الاتصال: خطأ في رقم المنفذ"
 #: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "الإتصال: جاري الإتصال بـ %s:%u..."
+msgstr "الاتصال: جاري الاتصال بـ %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
 #, c-format
@@ -2500,11 +2500,11 @@ msgstr "ينظف عرض تصحيح الأخطاء"
 
 #: Client/core/CCore.cpp:1314
 msgid "scrolls the chatbox upwards"
-msgstr "تمرير مربع الشات للأعلى"
+msgstr "تمرير صندوق الدردشة للأعلى"
 
 #: Client/core/CCore.cpp:1315
 msgid "scrolls the chatbox downwards"
-msgstr "ينزل مربع الدردشة إلى الأسفل"
+msgstr "تمرير صندوق الدردشة للأسفل"
 
 #: Client/core/CCore.cpp:1316
 msgid "scrolls the debug view upwards"
@@ -3005,7 +3005,7 @@ msgstr "الرجاء إدخال كلمة المرور الخاصة بالخاد�
 #. The server has timed out
 #: Client/core/ServerBrowser/CServerInfo.cpp:402
 msgid "Timed Out"
-msgstr "انتهت مهلة الإتصال"
+msgstr "انتهت مهلة الاتصال"
 
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:431
