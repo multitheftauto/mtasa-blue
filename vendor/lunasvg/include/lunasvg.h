@@ -38,13 +38,18 @@
 
 namespace lunasvg {
 
-class Box
+class Rect;
+class Matrix;
+
+class LUNASVG_API Box
 {
 public:
     Box() = default;
-    Box(double x, double y, double w, double h)
-        : x(x), y(y), w(w), h(h)
-    {}
+    Box(double x, double y, double w, double h);
+    Box(const Rect& rect);
+
+    Box& transform(const Matrix& matrix);
+    Box transformed(const Matrix& matrix) const;
 
 public:
     double x{0};
@@ -53,13 +58,36 @@ public:
     double h{0};
 };
 
-class Matrix
+class Transform;
+
+class LUNASVG_API Matrix
 {
 public:
     Matrix() = default;
-    Matrix(double a, double b, double c, double d, double e, double f)
-        : a(a), b(b), c(c), d(d), e(e), f(f)
-    {}
+    Matrix(double a, double b, double c, double d, double e, double f);
+    Matrix(const Transform& transform);
+
+    Matrix& rotate(double angle);
+    Matrix& rotate(double angle, double cx, double cy);
+    Matrix& scale(double sx, double sy);
+    Matrix& shear(double shx, double shy);
+    Matrix& translate(double tx, double ty);
+    Matrix& transform(double a, double b, double c, double d, double e, double f);
+    Matrix& identity();
+    Matrix& invert();
+
+    Matrix& operator*=(const Matrix& matrix);
+    Matrix& premultiply(const Matrix& matrix);
+    Matrix& postmultiply(const Matrix& matrix);
+
+    Matrix inverted() const;
+    Matrix operator*(const Matrix& matrix) const;
+
+    static Matrix rotated(double angle);
+    static Matrix rotated(double angle, double cx, double cy);
+    static Matrix scaled(double sx, double sy);
+    static Matrix sheared(double shx, double shy);
+    static Matrix translated(double tx, double ty);
 
 public:
     double a{1};
@@ -74,7 +102,7 @@ class LUNASVG_API Bitmap
 {
 public:
     /**
-     * @note Default bitmap format is RGBA (non-premultiplied).
+     * @note Bitmap format is ARGB Premultiplied.
      */
     Bitmap();
     Bitmap(std::uint8_t* data, std::uint32_t width, std::uint32_t height, std::uint32_t stride);
@@ -87,7 +115,12 @@ public:
     std::uint32_t width() const;
     std::uint32_t height() const;
     std::uint32_t stride() const;
-    bool valid() const;
+
+    void clear(std::uint32_t color);
+    void convert(int ri, int gi, int bi, int ai, bool unpremultiply);
+    void convertToRGBA() { convert(0, 1, 2, 3, true); }
+
+    bool valid() const { return !!m_impl; }
 
 private:
     struct Impl;
@@ -129,62 +162,10 @@ public:
     static std::unique_ptr<Document> loadFromData(const char* data);
 
     /**
-     * @brief Pre-Rotates the document matrix clockwise around the current origin
-     * @param angle - rotation angle, in degrees
-     * @return this
+     * @brief Sets the current transformation matrix of the document
+     * @param matrix - current transformation matrix
      */
-    Document* rotate(double angle);
-
-    /**
-     * @brief Pre-Rotates the document matrix clockwise around the given point
-     * @param angle - rotation angle, in degrees
-     * @param cx - horizontal translation
-     * @param cy - vertical translation
-     * @return this
-     */
-    Document* rotate(double angle, double cx, double cy);
-
-    /**
-     * @brief Pre-Scales the document matrix by sx horizontally and sy vertically
-     * @param sx - horizontal scale factor
-     * @param sy - vertical scale factor
-     * @return this
-     */
-    Document* scale(double sx, double sy);
-
-    /**
-     * @brief Pre-Shears the document matrix by shx horizontally and shy vertically
-     * @param shx - horizontal skew factor, in degree
-     * @param shy - vertical skew factor, in degree
-     * @return this
-     */
-    Document* shear(double shx, double shy);
-
-    /**
-     * @brief Pre-Translates the document matrix by tx horizontally and ty vertically
-     * @param tx - horizontal translation
-     * @param ty - vertical translation
-     * @return this
-     */
-    Document* translate(double tx, double ty);
-
-    /**
-     * @brief Pre-Multiplies the document matrix by Matrix(a, b, c, d, e, f)
-     * @param a - horizontal scale factor
-     * @param b - horizontal skew factor
-     * @param c - vertical skew factor
-     * @param d - vertical scale factor
-     * @param e - horizontal translation
-     * @param f - vertical translation
-     * @return this
-     */
-    Document* transform(double a, double b, double c, double d, double e, double f);
-
-    /**
-     * @brief Resets the document matrix to identity
-     * @return this
-     */
-    Document* identity();
+    void setMatrix(const Matrix& matrix);
 
     /**
      * @brief Returns the current transformation matrix of the document
@@ -214,9 +195,8 @@ public:
      * @brief Renders the document to a bitmap
      * @param matrix - the current transformation matrix
      * @param bitmap - target image on which the content will be drawn
-     * @param backgroundColor - background color in 0xRRGGBBAA format
      */
-    void render(Bitmap bitmap, const Matrix& matrix = Matrix{}, std::uint32_t backgroundColor = 0x00000000) const;
+    void render(Bitmap bitmap, const Matrix& matrix = Matrix{}) const;
 
     /**
      * @brief Renders the document to a bitmap

@@ -5,47 +5,47 @@
 namespace lunasvg {
 
 SVGElement::SVGElement()
-    : GraphicsElement(ElementId::Svg)
+    : GraphicsElement(ElementID::Svg)
 {
 }
 
 Length SVGElement::x() const
 {
-    auto& value = get(PropertyId::X);
+    auto& value = get(PropertyID::X);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length SVGElement::y() const
 {
-    auto& value = get(PropertyId::Y);
+    auto& value = get(PropertyID::Y);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length SVGElement::width() const
 {
-    auto& value = get(PropertyId::Width);
+    auto& value = get(PropertyID::Width);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::HundredPercent);
 }
 
 Length SVGElement::height() const
 {
-    auto& value = get(PropertyId::Height);
+    auto& value = get(PropertyID::Height);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::HundredPercent);
 }
 
 Rect SVGElement::viewBox() const
 {
-    auto& value = get(PropertyId::ViewBox);
+    auto& value = get(PropertyID::ViewBox);
     return Parser::parseViewBox(value);
 }
 
 PreserveAspectRatio SVGElement::preserveAspectRatio() const
 {
-    auto& value = get(PropertyId::PreserveAspectRatio);
+    auto& value = get(PropertyID::PreserveAspectRatio);
     return Parser::parsePreserveAspectRatio(value);
 }
 
-std::unique_ptr<LayoutSymbol> SVGElement::layoutDocument(const ParseDocument* document) const
+std::unique_ptr<LayoutSymbol> SVGElement::build(const TreeBuilder* builder) const
 {
     if(isDisplayNone())
         return nullptr;
@@ -73,7 +73,7 @@ std::unique_ptr<LayoutSymbol> SVGElement::layoutDocument(const ParseDocument* do
     root->clip = isOverflowHidden() ? preserveAspectRatio.getClip(_w, _h, viewBox) : Rect::Invalid;
     root->opacity = opacity();
 
-    LayoutContext context(document, root.get());
+    LayoutContext context(builder, root.get());
     root->masker = context.getMasker(mask());
     root->clipper = context.getClipper(clip_path());
     layoutChildren(&context, root.get());
