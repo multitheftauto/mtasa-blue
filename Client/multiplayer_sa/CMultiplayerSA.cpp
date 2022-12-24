@@ -595,7 +595,7 @@ namespace GrainEffect
 {
 
 static BYTE ucGrainEnabled = FALSE;
-static DWORD dwGrainStrength = 1.0f;
+static DWORD dwGrainStrength = 1;
 
 struct MasterModifier
 {
