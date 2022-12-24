@@ -17,6 +17,7 @@ project "Multiplayer SA"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/sparsehash/src/",
 		}
@@ -36,7 +37,7 @@ project "Multiplayer SA"
 		"*.cpp"
 	}
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

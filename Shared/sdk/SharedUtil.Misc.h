@@ -22,7 +22,6 @@
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
 
-
 namespace SharedUtil
 {
     class CArgMap;
@@ -202,7 +201,7 @@ namespace SharedUtil
     };
     struct SThreadCPUTimesStore : SThreadCPUTimes
     {
-        SThreadCPUTimesStore(){}
+        SThreadCPUTimesStore() {}
         uint64 ullPrevCPUMeasureTimeMs = 0;
         uint64 ullPrevUserTimeUs = 0;
         uint64 ullPrevKernelTimeUs = 0;
@@ -245,6 +244,10 @@ namespace SharedUtil
     // Buffer identification
     bool IsLuaCompiledScript(const void* pData, uint uiLength);
     bool IsLuaObfuscatedScript(const void* pData, uint uiLength);
+
+    // Return a pointer to the (shifted) trimmed string
+    // @ref https://stackoverflow.com/a/26984026
+    char* Trim(char* szText);
 
     //
     // Some templates
@@ -460,14 +463,9 @@ namespace SharedUtil
     //
     class SColor
     {
-        // No shifting allowed to access the color channel information
-        void operator>>(int) const;
-        void operator<<(int) const;
-        void operator>>=(int);
-        void operator<<=(int);
-
     public:
-        union {
+        union
+        {
             struct
             {
                 unsigned char B, G, R, A;
@@ -475,7 +473,8 @@ namespace SharedUtil
             unsigned long ulARGB;
         };
 
-        SColor() {}
+        SColor() : ulARGB(0) {}
+
         SColor(unsigned long ulValue) { ulARGB = ulValue; }
 
         operator unsigned long() const { return ulARGB; }
@@ -678,8 +677,8 @@ namespace SharedUtil
         // Out
         operator const char*() const { return szData; }
 
-        // Shake it all about
-        void Encrypt();
+        // Returns a pointer to a null-terminated character array
+        const char* c_str() const noexcept { return &szData[0]; }
     };
 
     ///////////////////////////////////////////////////////////////
@@ -1516,37 +1515,6 @@ namespace SharedUtil
 
         std::map<uint, bool> idMap;
         char                 cDefaultType;
-    };
-
-    ///////////////////////////////////////////////////////////////
-    //
-    // CRefCountableST
-    //
-    // Reference counting base class
-    //
-    ///////////////////////////////////////////////////////////////
-    class CRefCountableST
-    {
-        int m_iRefCount;
-
-    protected:
-        virtual ~CRefCountableST() {}
-
-    public:
-        CRefCountableST() : m_iRefCount(1) {}
-
-        void AddRef() { ++m_iRefCount; }
-
-        void Release()
-        {
-            assert(m_iRefCount > 0);
-            bool bLastRef = --m_iRefCount == 0;
-
-            if (!bLastRef)
-                return;
-
-            delete this;
-        }
     };
 
     ///////////////////////////////////////////////////////////////

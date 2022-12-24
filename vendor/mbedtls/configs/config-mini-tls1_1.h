@@ -1,7 +1,10 @@
-/*
- *  Minimal configuration for TLS 1.1 (RFC 4346)
+/**
+ * \file config-mini-tls1_1.h
  *
- *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
+ * \brief Minimal configuration for TLS 1.1 (RFC 4346)
+ */
+/*
+ *  Copyright The Mbed TLS Contributors
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -15,8 +18,6 @@
  *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
- *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 /*
  * Minimal configuration for TLS 1.1 (RFC 4346), implementing only the
@@ -70,6 +71,20 @@
 /* For testing with compat.sh */
 #define MBEDTLS_FS_IO
 
+/* These defines are present so that the config modifying scripts can enable
+ * them during tests/scripts/test-ref-configs.pl */
+//#define MBEDTLS_USE_PSA_CRYPTO
+//#define MBEDTLS_PSA_CRYPTO_C
+
+/* With MBEDTLS_PSA_CRYPTO_C, importing an RSA key requires MBEDTLS_PK_WRITE_C */
+#if defined(MBEDTLS_PSA_CRYPTO_C)
+#define MBEDTLS_PK_WRITE_C
+#endif
 #include "mbedtls/check_config.h"
+
+/* Error messages and TLS debugging traces
+ * (huge code size increase, needed for tests/ssl-opt.sh) */
+//#define MBEDTLS_DEBUG_C
+//#define MBEDTLS_ERROR_C
 
 #endif /* MBEDTLS_CONFIG_H */

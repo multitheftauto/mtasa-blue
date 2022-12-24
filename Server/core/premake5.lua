@@ -10,6 +10,7 @@ project "Core"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/google-breakpad/src",
 			"../../vendor/sparsehash/current/src/",
@@ -40,9 +41,10 @@ project "Core"
 		excludes { "CExceptionInformation_Impl.cpp" }
 
 	filter "system:linux"
-		links { "ncursesw", "breakpad", "rt" }
+		links { "breakpad", "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
+		linkoptions { "-l:libncursesw.so.5" }
 
 	filter "system:macosx"
 		links { "ncurses", "breakpad", "CoreFoundation.framework" }
@@ -54,3 +56,9 @@ project "Core"
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
+
+	filter "platforms:arm"
+		targetdir(buildpath("server/arm"))
+
+	filter "platforms:arm64"
+		targetdir(buildpath("server/arm64"))

@@ -13,6 +13,9 @@
 
 #include "Task.h"
 
+class CEntity;
+class CVector;
+
 class CTaskSimpleGangDriveBy : public virtual CTaskSimple
 {
 public:

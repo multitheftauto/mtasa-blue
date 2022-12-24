@@ -1,7 +1,10 @@
-/*
- *  Minimal configuration for TLS 1.2 with PSK and AES-CCM ciphersuites
+/**
+ * \file config-ccm-psk-tls1_2.h
  *
- *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
+ * \brief Minimal configuration for TLS 1.2 with PSK and AES-CCM ciphersuites
+ */
+/*
+ *  Copyright The Mbed TLS Contributors
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -15,16 +18,18 @@
  *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
- *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 /*
  * Minimal configuration for TLS 1.2 with PSK and AES-CCM ciphersuites
+ *
  * Distinguishing features:
- * - no bignum, no PK, no X509
- * - fully modern and secure (provided the pre-shared keys have high entropy)
- * - very low record overhead with CCM-8
- * - optimized for low RAM usage
+ * - Optimized for small code size, low bandwidth (on a reliable transport),
+ *   and low RAM usage.
+ * - No asymmetric cryptography (no certificates, no Diffie-Hellman key
+ *   exchange).
+ * - Fully modern and secure (provided the pre-shared keys are generated and
+ *   stored securely).
+ * - Very low record overhead with CCM-8.
  *
  * See README.txt for usage instructions.
  */
@@ -35,11 +40,7 @@
 //#define MBEDTLS_HAVE_TIME /* Optionally used in Hello messages */
 /* Other MBEDTLS_HAVE_XXX flags irrelevant for this configuration */
 
-/* mbed TLS feature support */
-#define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
-#define MBEDTLS_SSL_PROTO_TLS1_2
-
-/* mbed TLS modules */
+/* Mbed TLS modules */
 #define MBEDTLS_AES_C
 #define MBEDTLS_CCM_C
 #define MBEDTLS_CIPHER_C
@@ -52,18 +53,9 @@
 #define MBEDTLS_SSL_SRV_C
 #define MBEDTLS_SSL_TLS_C
 
-/* Save RAM at the expense of ROM */
-#define MBEDTLS_AES_ROM_TABLES
-
-/* Save some RAM by adjusting to your exact needs */
-#define MBEDTLS_PSK_MAX_LEN    16 /* 128-bits keys are generally enough */
-
-/*
- * You should adjust this to the exact number of sources you're using: default
- * is the "platform_entropy_poll" source, but you may want to add other ones
- * Minimum is 2 for the entropy test suite.
- */
-#define MBEDTLS_ENTROPY_MAX_SOURCES 2
+/* TLS protocol feature support */
+#define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
+#define MBEDTLS_SSL_PROTO_TLS1_2
 
 /*
  * Use only CCM_8 ciphersuites, and
@@ -78,7 +70,30 @@
  * both ends of the connection!  (See comments in "mbedtls/ssl.h".)
  * The optimal size here depends on the typical size of records.
  */
-#define MBEDTLS_SSL_MAX_CONTENT_LEN             512
+#define MBEDTLS_SSL_MAX_CONTENT_LEN             1024
+
+/* Save RAM at the expense of ROM */
+#define MBEDTLS_AES_ROM_TABLES
+
+/* Save some RAM by adjusting to your exact needs */
+#define MBEDTLS_PSK_MAX_LEN    16 /* 128-bits keys are generally enough */
+
+/*
+ * You should adjust this to the exact number of sources you're using: default
+ * is the "platform_entropy_poll" source, but you may want to add other ones
+ * Minimum is 2 for the entropy test suite.
+ */
+#define MBEDTLS_ENTROPY_MAX_SOURCES 2
+
+/* These defines are present so that the config modifying scripts can enable
+ * them during tests/scripts/test-ref-configs.pl */
+//#define MBEDTLS_USE_PSA_CRYPTO
+//#define MBEDTLS_PSA_CRYPTO_C
+
+/* Error messages and TLS debugging traces
+ * (huge code size increase, needed for tests/ssl-opt.sh) */
+//#define MBEDTLS_DEBUG_C
+//#define MBEDTLS_ERROR_C
 
 #include "mbedtls/check_config.h"
 

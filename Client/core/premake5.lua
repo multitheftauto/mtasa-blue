@@ -11,11 +11,12 @@ project "Client Core"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			".",
 			"../sdk",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-9d",
+			"../../vendor/jpeg-9e",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
@@ -53,7 +54,7 @@ project "Client Core"
 		"PNG_SETJMP_NOT_SUPPORTED"
 	}
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

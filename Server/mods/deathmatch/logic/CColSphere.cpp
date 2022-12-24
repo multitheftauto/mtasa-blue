@@ -10,8 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
-using namespace std;
+#include "CColSphere.h"
+#include "Utils.h"
 
 CColSphere::CColSphere(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, bool bIsPartnered)
     : CColShape(pManager, pParent, bIsPartnered)

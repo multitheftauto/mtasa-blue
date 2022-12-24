@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHudSA.h"
 
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
@@ -35,91 +36,8 @@ CHudSA::CHudSA()
     MemPut<DWORD>(0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale);
 }
 
-VOID CHudSA::SetHelpMessage(char* szMessage)
+void CHudSA::Disable(bool bDisabled)
 {
-    DEBUG_TRACE("VOID CHudSA::SetHelpMessage( char * szMessage )");
-    wchar_t szHelp[255] = {'\0'};
-    MultiByteToWideChar(CP_ACP, 0, szMessage, -1, szHelp, 255);
-
-    DWORD dwFunction = FUNC_SetHelpMessage;
-    _asm
-    {
-        push    0
-        push    1
-        lea     eax, szHelp
-        push    eax
-        call    dwFunction
-        add     esp, 0xC
-    }
-}
-
-/**
- * \todo Find out what param 2 is
- */
-VOID CHudSA::SetBigMessage(char* szBigMessage)
-{
-    DEBUG_TRACE("VOID CHudSA::SetBigMessage( char * szBigMessage )");
-    wchar_t wszBigMessage[255] = {'\0'};
-    MultiByteToWideChar(CP_ACP, 0, szBigMessage, -1, wszBigMessage, 255);
-
-    DWORD dwFunction = FUNC_SetBigMessage;
-    _asm
-    {
-        push    10 // what is this param?
-        lea     eax, wszBigMessage
-        push    eax
-        call    dwFunction
-        add     esp, 8
-    }
-}
-
-/**
- * \todo Fix: doesn't work
- */
-VOID CHudSA::SetVehicleName(char* szName)
-{
-    DEBUG_TRACE("VOID CHudSA::SetVehicleName( char * szName )");
-    char* szVehicleNamePtr = (char*)VAR_VehicleNamePtr;
-    if (szName != 0)
-    {
-        //          wchar_t szHelp[255] = {'\0'};
-        // MultiByteToWideChar(CP_ACP, 0, szMessage, -1, szHelp, 255);
-        if (strlen(szName) < 50)
-        {
-            strcpy(szVehicleName, szName);
-            szVehicleNamePtr = szVehicleName;
-        }
-    }
-    else
-    {
-        MemPutFast<DWORD>(VAR_VehicleNamePtr, 0);
-    }
-}
-
-/**
- * \todo Fix: doesn't work
- */
-VOID CHudSA::SetZoneName(char* szName)
-{
-    DEBUG_TRACE("VOID CHudSA::SetZoneName( char * szName )");
-    char* szZoneNamePtr = (char*)VAR_ZoneNamePtr;
-    if (szName != 0)
-    {
-        if (strlen(szName) < 50)
-        {
-            strcpy(szZoneName, szName);
-            szZoneNamePtr = szZoneName;
-        }
-    }
-    else
-    {
-        MemPutFast<DWORD>(VAR_ZoneNamePtr, 0);
-    }
-}
-
-VOID CHudSA::Disable(bool bDisabled)
-{
-    DEBUG_TRACE("VOID CHudSA::Disable ( bool bDisabled )");
     if (bDisabled)
         MemPut<BYTE>(FUNC_Draw, 0xC3);
     else
@@ -135,66 +53,6 @@ VOID CHudSA::Disable(bool bDisabled)
 bool CHudSA::IsDisabled()
 {
     return *(BYTE*)FUNC_Draw == 0xC3;
-}
-
-VOID CHudSA::DrawBarChart(float fX, float fY, DWORD dwWidth, DWORD dwHeight, float fPercentage, DWORD dwForeColor, DWORD dwBorderColor)
-{
-    DWORD dwFunc = FUNC_DrawBarChart;
-    _asm
-    {
-        push    dwBorderColor
-        push    dwForeColor
-        push    1
-        push    0
-        push    0
-        push    fPercentage
-        push    dwHeight
-        push    dwWidth
-        push    fY
-        push    fX
-        call    dwFunc
-        add     esp, 0x28
-    }
-}
-
-bool CHudSA::CalcScreenCoors(CVector* vecPosition1, CVector* vecPosition2, float* fX, float* fY, bool bSetting1, bool bSetting2)
-{
-    DWORD dwFunc = 0x71DA00;
-    bool  bReturn = false;
-    _asm
-    {
-        //push  bSetting2
-        //push  bSetting1
-        push    fY
-        push    fX
-        push    vecPosition2
-        push    vecPosition1
-        call    dwFunc
-        add     esp, 0x18
-        sub     esp, 8
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
-void CHudSA::Draw2DPolygon(float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, float fX4, float fY4, DWORD dwColor)
-{
-    DWORD dwFunc = FUNC_Draw2DPolygon;
-    _asm
-    {
-        lea     eax, dwColor
-        push    eax
-        push    fY4
-        push    fX4
-        push    fY3
-        push    fX3
-        push    fY2
-        push    fX2
-        push    fY1
-        push    fX1
-        call    dwFunc
-        add     esp, 36
-    }
 }
 
 //

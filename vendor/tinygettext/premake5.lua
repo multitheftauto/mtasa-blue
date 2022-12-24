@@ -3,7 +3,10 @@ project "tinygettext"
 	kind "StaticLib"
 	targetname "tinygettext"
 
-	includedirs { "." }
+	includedirs {
+		"../../Shared/sdk",
+		".",
+	}
 
 	vpaths {
 		["Headers/*"] = "**.hpp",
@@ -17,7 +20,7 @@ project "tinygettext"
 		"*.cpp"
 	}
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:windows"

@@ -12,7 +12,15 @@
 #pragma once
 
 #include "Task.h"
-#include "CPathFind.h"
+
+class CNodeAddress
+{
+public:
+    short sRegion;
+    short sIndex;
+
+    CNodeAddress() { sRegion = -1; }
+};
 
 enum
 {

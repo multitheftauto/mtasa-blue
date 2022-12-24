@@ -78,8 +78,12 @@ class PCRECPP_EXP_DEFN Arg {
   PCRE_MAKE_PARSER(unsigned int,       parse_uint);
   PCRE_MAKE_PARSER(long,               parse_long);
   PCRE_MAKE_PARSER(unsigned long,      parse_ulong);
+#if 1
   PCRE_MAKE_PARSER(long long,          parse_longlong);
+#endif
+#if 1
   PCRE_MAKE_PARSER(unsigned long long, parse_ulonglong);
+#endif
   PCRE_MAKE_PARSER(float,              parse_float);
   PCRE_MAKE_PARSER(double,             parse_double);
   PCRE_MAKE_PARSER(std::string,        parse_string);
@@ -153,11 +157,12 @@ MAKE_INTEGER_PARSER(int,                int)       /* Don't use semicolons   */
 MAKE_INTEGER_PARSER(unsigned int,       uint)      /* after these statement  */
 MAKE_INTEGER_PARSER(long,               long)      /* because they can cause */
 MAKE_INTEGER_PARSER(unsigned long,      ulong)     /* compiler warnings if   */
-                                                   /* the checking level is  */
+#if 1                          /* the checking level is  */
 MAKE_INTEGER_PARSER(long long,          longlong)  /* turned up high enough. */
-                                                   /*                        */
-                                                   /*                        */
+#endif                                             /*                        */
+#if 1                         /*                        */
 MAKE_INTEGER_PARSER(unsigned long long, ulonglong) /*                        */
+#endif
 
 #undef PCRE_IS_SET
 #undef PCRE_SET_OR_CLEAR

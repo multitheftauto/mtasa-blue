@@ -11,6 +11,10 @@
 
 #include "StdInc.h"
 #include "CDatabaseType.h"
+#include "CDatabaseManager.h"
+#include "CRegistry.h"
+#include "CPerfStatModule.h"
+#include "lua/CLuaArguments.h"
 
 ///////////////////////////////////////////////////////////////
 //
@@ -240,8 +244,8 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
         int status;
         while ((status = sqlite3_step(pStmt)) == SQLITE_ROW)
         {
-            pResult->Data.push_back(vector<CRegistryResultCell>(pResult->nColumns));
-            vector<CRegistryResultCell>& row = pResult->Data.back();
+            pResult->Data.push_back(std::vector<CRegistryResultCell>(pResult->nColumns));
+            std::vector<CRegistryResultCell>& row = pResult->Data.back();
             for (int i = 0; i < pResult->nColumns; i++)
             {
                 CRegistryResultCell& cell = row[i];

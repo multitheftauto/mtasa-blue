@@ -18,4 +18,4 @@ namespace mtasa
     using namespace std::string_view_literals;
 
     static inline auto CMD_ALWAYS_SHOW_TRANSFERBOX = "cvar_always_show_transferbox"sv;
-}
+}            // namespace mtasa

@@ -1,7 +1,7 @@
 /*
  *  Blowfish implementation
  *
- *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
+ *  Copyright The Mbed TLS Contributors
  *  SPDX-License-Identifier: Apache-2.0
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -15,8 +15,6 @@
  *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
- *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 /*
  *  The Blowfish block cipher was designed by Bruce Schneier in 1993.
@@ -25,47 +23,22 @@
  *
  */
 
-#if !defined(MBEDTLS_CONFIG_FILE)
-#include "mbedtls/config.h"
-#else
-#include MBEDTLS_CONFIG_FILE
-#endif
+#include "common.h"
 
 #if defined(MBEDTLS_BLOWFISH_C)
 
 #include "mbedtls/blowfish.h"
+#include "mbedtls/platform_util.h"
 
 #include <string.h>
 
 #if !defined(MBEDTLS_BLOWFISH_ALT)
 
-/* Implementation that should never be optimized out by the compiler */
-static void mbedtls_zeroize( void *v, size_t n ) {
-    volatile unsigned char *p = (unsigned char*)v; while( n-- ) *p++ = 0;
-}
-
-/*
- * 32-bit integer manipulation macros (big endian)
- */
-#ifndef GET_UINT32_BE
-#define GET_UINT32_BE(n,b,i)                            \
-{                                                       \
-    (n) = ( (uint32_t) (b)[(i)    ] << 24 )             \
-        | ( (uint32_t) (b)[(i) + 1] << 16 )             \
-        | ( (uint32_t) (b)[(i) + 2] <<  8 )             \
-        | ( (uint32_t) (b)[(i) + 3]       );            \
-}
-#endif
-
-#ifndef PUT_UINT32_BE
-#define PUT_UINT32_BE(n,b,i)                            \
-{                                                       \
-    (b)[(i)    ] = (unsigned char) ( (n) >> 24 );       \
-    (b)[(i) + 1] = (unsigned char) ( (n) >> 16 );       \
-    (b)[(i) + 2] = (unsigned char) ( (n) >>  8 );       \
-    (b)[(i) + 3] = (unsigned char) ( (n)       );       \
-}
-#endif
+/* Parameter validation macros */
+#define BLOWFISH_VALIDATE_RET( cond )                                       \
+    MBEDTLS_INTERNAL_VALIDATE_RET( cond, MBEDTLS_ERR_BLOWFISH_BAD_INPUT_DATA )
+#define BLOWFISH_VALIDATE( cond )                                           \
+    MBEDTLS_INTERNAL_VALIDATE( cond )
 
 static const uint32_t P[MBEDTLS_BLOWFISH_ROUNDS + 2] = {
         0x243F6A88L, 0x85A308D3L, 0x13198A2EL, 0x03707344L,
@@ -83,13 +56,13 @@ static uint32_t F( mbedtls_blowfish_context *ctx, uint32_t x )
    unsigned short a, b, c, d;
    uint32_t  y;
 
-   d = (unsigned short)(x & 0xFF);
+   d = MBEDTLS_BYTE_0( x );
    x >>= 8;
-   c = (unsigned short)(x & 0xFF);
+   c = MBEDTLS_BYTE_0( x );
    x >>= 8;
-   b = (unsigned short)(x & 0xFF);
+   b = MBEDTLS_BYTE_0( x );
    x >>= 8;
-   a = (unsigned short)(x & 0xFF);
+   a = MBEDTLS_BYTE_0( x );
    y = ctx->S[0][a] + ctx->S[1][b];
    y = y ^ ctx->S[2][c];
    y = y + ctx->S[3][d];
@@ -157,6 +130,7 @@ static void blowfish_dec( mbedtls_blowfish_context *ctx, uint32_t *xl, uint32_t 
 
 void mbedtls_blowfish_init( mbedtls_blowfish_context *ctx )
 {
+    BLOWFISH_VALIDATE( ctx != NULL );
     memset( ctx, 0, sizeof( mbedtls_blowfish_context ) );
 }
 
@@ -165,22 +139,26 @@ void mbedtls_blowfish_free( mbedtls_blowfish_context *ctx )
     if( ctx == NULL )
         return;
 
-    mbedtls_zeroize( ctx, sizeof( mbedtls_blowfish_context ) );
+    mbedtls_platform_zeroize( ctx, sizeof( mbedtls_blowfish_context ) );
 }
 
 /*
  * Blowfish key schedule
  */
-int mbedtls_blowfish_setkey( mbedtls_blowfish_context *ctx, const unsigned char *key,
-                     unsigned int keybits )
+int mbedtls_blowfish_setkey( mbedtls_blowfish_context *ctx,
+                             const unsigned char *key,
+                             unsigned int keybits )
 {
     unsigned int i, j, k;
     uint32_t data, datal, datar;
+    BLOWFISH_VALIDATE_RET( ctx != NULL );
+    BLOWFISH_VALIDATE_RET( key != NULL );
 
-    if( keybits < MBEDTLS_BLOWFISH_MIN_KEY_BITS || keybits > MBEDTLS_BLOWFISH_MAX_KEY_BITS ||
-        ( keybits % 8 ) )
+    if( keybits < MBEDTLS_BLOWFISH_MIN_KEY_BITS    ||
+        keybits > MBEDTLS_BLOWFISH_MAX_KEY_BITS    ||
+        keybits % 8 != 0 )
     {
-        return( MBEDTLS_ERR_BLOWFISH_INVALID_KEY_LENGTH );
+        return( MBEDTLS_ERR_BLOWFISH_BAD_INPUT_DATA );
     }
 
     keybits >>= 3;
@@ -235,9 +213,14 @@ int mbedtls_blowfish_crypt_ecb( mbedtls_blowfish_context *ctx,
                     unsigned char output[MBEDTLS_BLOWFISH_BLOCKSIZE] )
 {
     uint32_t X0, X1;
+    BLOWFISH_VALIDATE_RET( ctx != NULL );
+    BLOWFISH_VALIDATE_RET( mode == MBEDTLS_BLOWFISH_ENCRYPT ||
+                           mode == MBEDTLS_BLOWFISH_DECRYPT );
+    BLOWFISH_VALIDATE_RET( input  != NULL );
+    BLOWFISH_VALIDATE_RET( output != NULL );
 
-    GET_UINT32_BE( X0, input,  0 );
-    GET_UINT32_BE( X1, input,  4 );
+    X0 = MBEDTLS_GET_UINT32_BE( input,  0 );
+    X1 = MBEDTLS_GET_UINT32_BE( input,  4 );
 
     if( mode == MBEDTLS_BLOWFISH_DECRYPT )
     {
@@ -248,8 +231,8 @@ int mbedtls_blowfish_crypt_ecb( mbedtls_blowfish_context *ctx,
         blowfish_enc( ctx, &X0, &X1 );
     }
 
-    PUT_UINT32_BE( X0, output,  0 );
-    PUT_UINT32_BE( X1, output,  4 );
+    MBEDTLS_PUT_UINT32_BE( X0, output,  0 );
+    MBEDTLS_PUT_UINT32_BE( X1, output,  4 );
 
     return( 0 );
 }
@@ -267,6 +250,12 @@ int mbedtls_blowfish_crypt_cbc( mbedtls_blowfish_context *ctx,
 {
     int i;
     unsigned char temp[MBEDTLS_BLOWFISH_BLOCKSIZE];
+    BLOWFISH_VALIDATE_RET( ctx != NULL );
+    BLOWFISH_VALIDATE_RET( mode == MBEDTLS_BLOWFISH_ENCRYPT ||
+                           mode == MBEDTLS_BLOWFISH_DECRYPT );
+    BLOWFISH_VALIDATE_RET( iv != NULL );
+    BLOWFISH_VALIDATE_RET( length == 0 || input  != NULL );
+    BLOWFISH_VALIDATE_RET( length == 0 || output != NULL );
 
     if( length % MBEDTLS_BLOWFISH_BLOCKSIZE )
         return( MBEDTLS_ERR_BLOWFISH_INVALID_INPUT_LENGTH );
@@ -321,7 +310,19 @@ int mbedtls_blowfish_crypt_cfb64( mbedtls_blowfish_context *ctx,
                        unsigned char *output )
 {
     int c;
-    size_t n = *iv_off;
+    size_t n;
+
+    BLOWFISH_VALIDATE_RET( ctx != NULL );
+    BLOWFISH_VALIDATE_RET( mode == MBEDTLS_BLOWFISH_ENCRYPT ||
+                           mode == MBEDTLS_BLOWFISH_DECRYPT );
+    BLOWFISH_VALIDATE_RET( iv     != NULL );
+    BLOWFISH_VALIDATE_RET( iv_off != NULL );
+    BLOWFISH_VALIDATE_RET( length == 0 || input  != NULL );
+    BLOWFISH_VALIDATE_RET( length == 0 || output != NULL );
+
+    n = *iv_off;
+    if( n >= 8 )
+        return( MBEDTLS_ERR_BLOWFISH_BAD_INPUT_DATA );
 
     if( mode == MBEDTLS_BLOWFISH_DECRYPT )
     {
@@ -369,7 +370,17 @@ int mbedtls_blowfish_crypt_ctr( mbedtls_blowfish_context *ctx,
                        unsigned char *output )
 {
     int c, i;
-    size_t n = *nc_off;
+    size_t n;
+    BLOWFISH_VALIDATE_RET( ctx != NULL );
+    BLOWFISH_VALIDATE_RET( nonce_counter != NULL );
+    BLOWFISH_VALIDATE_RET( stream_block  != NULL );
+    BLOWFISH_VALIDATE_RET( nc_off != NULL );
+    BLOWFISH_VALIDATE_RET( length == 0 || input  != NULL );
+    BLOWFISH_VALIDATE_RET( length == 0 || output != NULL );
+
+    n = *nc_off;
+    if( n >= 8 )
+        return( MBEDTLS_ERR_BLOWFISH_BAD_INPUT_DATA );
 
     while( length-- )
     {
