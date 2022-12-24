@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedIntelligenceSA.h"
+#include "CPedSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "CTaskManagerSA.h"
 
 CPedIntelligenceSA::CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped)
 {
@@ -26,7 +30,6 @@ CPedIntelligenceSA::~CPedIntelligenceSA()
 
 CTaskManager* CPedIntelligenceSA::GetTaskManager()
 {
-    DEBUG_TRACE("CTaskManager * CPedSA::GetTaskManager( void )");
     return this->TaskManager;
 }
 

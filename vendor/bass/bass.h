@@ -169,6 +169,7 @@ typedef DWORD HPLUGIN;		// plugin handle
 #define BASS_CONFIG_NET_PROXY		17
 #define BASS_CONFIG_IOS_NOTIFY		46
 #define BASS_CONFIG_LIBSSL			64
+#define BASS_CONFIG_FILENAME		75
 
 #define BASS_CONFIG_THREAD			0x40000000 // flag: thread-specific setting
 
@@ -360,21 +361,24 @@ typedef struct {
 #define BASS_MUSIC_NOSAMPLE		0x100000 // don't load the samples
 
 // Speaker assignment flags
-#define BASS_SPEAKER_FRONT	0x1000000	// front speakers
-#define BASS_SPEAKER_REAR	0x2000000	// rear/side speakers
-#define BASS_SPEAKER_CENLFE	0x3000000	// center & LFE speakers (5.1)
-#define BASS_SPEAKER_REAR2	0x4000000	// rear center speakers (7.1)
-#define BASS_SPEAKER_N(n)	((n)<<24)	// n'th pair of speakers (max 15)
-#define BASS_SPEAKER_LEFT	0x10000000	// modifier: left
-#define BASS_SPEAKER_RIGHT	0x20000000	// modifier: right
-#define BASS_SPEAKER_FRONTLEFT	BASS_SPEAKER_FRONT|BASS_SPEAKER_LEFT
-#define BASS_SPEAKER_FRONTRIGHT	BASS_SPEAKER_FRONT|BASS_SPEAKER_RIGHT
-#define BASS_SPEAKER_REARLEFT	BASS_SPEAKER_REAR|BASS_SPEAKER_LEFT
-#define BASS_SPEAKER_REARRIGHT	BASS_SPEAKER_REAR|BASS_SPEAKER_RIGHT
-#define BASS_SPEAKER_CENTER		BASS_SPEAKER_CENLFE|BASS_SPEAKER_LEFT
-#define BASS_SPEAKER_LFE		BASS_SPEAKER_CENLFE|BASS_SPEAKER_RIGHT
-#define BASS_SPEAKER_REAR2LEFT	BASS_SPEAKER_REAR2|BASS_SPEAKER_LEFT
-#define BASS_SPEAKER_REAR2RIGHT	BASS_SPEAKER_REAR2|BASS_SPEAKER_RIGHT
+#define BASS_SPEAKER_FRONT		0x1000000	// front speakers
+#define BASS_SPEAKER_REAR		0x2000000	// rear speakers
+#define BASS_SPEAKER_CENLFE		0x3000000	// center & LFE speakers (5.1)
+#define BASS_SPEAKER_SIDE		0x4000000	// side speakers (7.1)
+#define BASS_SPEAKER_N(n)		((n)<<24)	// n'th pair of speakers (max 15)
+#define BASS_SPEAKER_LEFT		0x10000000	// modifier: left
+#define BASS_SPEAKER_RIGHT		0x20000000	// modifier: right
+#define BASS_SPEAKER_FRONTLEFT	BASS_SPEAKER_FRONT | BASS_SPEAKER_LEFT
+#define BASS_SPEAKER_FRONTRIGHT	BASS_SPEAKER_FRONT | BASS_SPEAKER_RIGHT
+#define BASS_SPEAKER_REARLEFT	BASS_SPEAKER_REAR | BASS_SPEAKER_LEFT
+#define BASS_SPEAKER_REARRIGHT	BASS_SPEAKER_REAR | BASS_SPEAKER_RIGHT
+#define BASS_SPEAKER_CENTER		BASS_SPEAKER_CENLFE | BASS_SPEAKER_LEFT
+#define BASS_SPEAKER_LFE		BASS_SPEAKER_CENLFE | BASS_SPEAKER_RIGHT
+#define BASS_SPEAKER_SIDELEFT	BASS_SPEAKER_SIDE | BASS_SPEAKER_LEFT
+#define BASS_SPEAKER_SIDERIGHT	BASS_SPEAKER_SIDE | BASS_SPEAKER_RIGHT
+#define BASS_SPEAKER_REAR2		BASS_SPEAKER_SIDE
+#define BASS_SPEAKER_REAR2LEFT	BASS_SPEAKER_SIDELEFT
+#define BASS_SPEAKER_REAR2RIGHT	BASS_SPEAKER_SIDERIGHT
 
 #define BASS_ASYNCFILE			0x40000000	// read file asynchronously
 #define BASS_UNICODE			0x80000000	// UTF-16
@@ -453,8 +457,8 @@ typedef struct {
 // 3D vector (for 3D positions/velocities/orientations)
 typedef struct BASS_3DVECTOR {
 #ifdef __cplusplus
-	BASS_3DVECTOR() {};
-	BASS_3DVECTOR(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {};
+	BASS_3DVECTOR() {}
+	BASS_3DVECTOR(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 #endif
 	float x;	// +=right, -=left
 	float y;	// +=up, -=down
@@ -601,6 +605,8 @@ RETURN : TRUE = continue recording, FALSE = stop */
 #define BASS_ATTRIB_TAIL			16
 #define BASS_ATTRIB_PUSH_LIMIT		17
 #define BASS_ATTRIB_DOWNLOADPROC	18
+#define BASS_ATTRIB_VOLDSP			19
+#define BASS_ATTRIB_VOLDSP_PRIORITY	20
 #define BASS_ATTRIB_MUSIC_AMPLIFY	0x100
 #define BASS_ATTRIB_MUSIC_PANSEP	0x101
 #define BASS_ATTRIB_MUSIC_PSCALER	0x102
@@ -617,7 +623,7 @@ RETURN : TRUE = continue recording, FALSE = stop */
 // BASS_ChannelGetData flags
 #define BASS_DATA_AVAILABLE	0			// query how much data is buffered
 #define BASS_DATA_NOREMOVE	0x10000000	// flag: don't remove data from recording buffer
-#define BASS_DATA_FIXED		0x20000000	// flag: return 8.24 fixed-point data
+#define BASS_DATA_FIXED		0x20000000	// unused
 #define BASS_DATA_FLOAT		0x40000000	// flag: return floating-point sample data
 #define BASS_DATA_FFT256	0x80000000	// 256 sample FFT
 #define BASS_DATA_FFT512	0x80000001	// 512 FFT
@@ -1065,6 +1071,7 @@ DWORD BASSDEF(BASS_ChannelFlags)(DWORD handle, DWORD flags, DWORD mask);
 BOOL BASSDEF(BASS_ChannelLock)(DWORD handle, BOOL lock);
 BOOL BASSDEF(BASS_ChannelFree)(DWORD handle);
 BOOL BASSDEF(BASS_ChannelPlay)(DWORD handle, BOOL restart);
+BOOL BASSDEF(BASS_ChannelStart)(DWORD handle);
 BOOL BASSDEF(BASS_ChannelStop)(DWORD handle);
 BOOL BASSDEF(BASS_ChannelPause)(DWORD handle);
 BOOL BASSDEF(BASS_ChannelUpdate)(DWORD handle, DWORD length);

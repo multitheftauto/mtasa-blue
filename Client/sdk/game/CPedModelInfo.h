@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "CModelInfo.h"
-
 typedef unsigned long AssocGroupId;
 
 class CPedModelInfo

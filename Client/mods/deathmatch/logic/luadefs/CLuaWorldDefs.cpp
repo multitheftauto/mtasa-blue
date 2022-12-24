@@ -8,6 +8,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
+#include <game/CWeather.h>
+#include <game/CColPoint.h>
+#include <game/CCoronas.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()
@@ -711,7 +715,8 @@ int CLuaWorldDefs::SetBlurLevel(lua_State* luaVM)
 
 int CLuaWorldDefs::ResetBlurLevel(lua_State* luaVM)
 {
-    g_pGame->SetBlurLevel(36);
+    g_pGame->GetSettings()->SetBlurControlledByScript(false);
+    g_pGame->GetSettings()->ResetBlurEnabled();
     lua_pushboolean(luaVM, true);
     return 1;
 }

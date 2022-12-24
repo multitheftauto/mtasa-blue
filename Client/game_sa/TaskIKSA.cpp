@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEntitySA.h"
+#include "CGameSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "TaskIKSA.h"
 
 extern CGameSA* pGame;
 

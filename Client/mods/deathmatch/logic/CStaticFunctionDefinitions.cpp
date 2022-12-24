@@ -10,6 +10,24 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CAnimManager.h>
+#include <game/CClock.h>
+#include <game/CColPoint.h>
+#include <game/CFireManager.h>
+#include <game/CFx.h>
+#include <game/CGarage.h>
+#include <game/CGarages.h>
+#include <game/CHandlingEntry.h>
+#include <game/CHandlingManager.h>
+#include <game/CPlayerInfo.h>
+#include <game/CRopes.h>
+#include <game/CSettings.h>
+#include <game/CTaskManager.h>
+#include <game/CWanted.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
+#include <game/Task.h>
 
 using std::list;
 
@@ -3697,6 +3715,7 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Enti
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetCollisionEnabled(bEnabled);
@@ -3723,6 +3742,7 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith(CClientEntity& Entity,
         case CCLIENTPLAYER:
         case CCLIENTPED:
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         case CCLIENTVEHICLE:
         {
             switch (ThisEntity.GetType())
@@ -3730,6 +3750,7 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith(CClientEntity& Entity,
                 case CCLIENTPLAYER:
                 case CCLIENTPED:
                 case CCLIENTOBJECT:
+                case CCLIENTWEAPON:
                 case CCLIENTVEHICLE:
                 {
                     Entity.SetCollidableWith(&ThisEntity, bCanCollide);
@@ -6544,6 +6565,7 @@ bool CStaticFunctionDefinitions::GetGarageBoundingBox(unsigned char ucGarageID, 
 
 bool CStaticFunctionDefinitions::SetBlurLevel(unsigned char ucLevel)
 {
+    g_pGame->GetSettings()->SetBlurControlledByScript(true);
     g_pGame->SetBlurLevel(ucLevel);
     return true;
 }

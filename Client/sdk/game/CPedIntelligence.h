@@ -11,11 +11,9 @@
 
 #pragma once
 
-#include "CTaskManager.h"
-#include "CEvent.h"
-
 class CPed;
 class CTaskSAInterface;
+class CTaskManager;
 
 class CPedIntelligence
 {

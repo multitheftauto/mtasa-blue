@@ -11,22 +11,7 @@
 
 #pragma once
 
-#include "Common.h"
 #include <game/CAERadioTrackManager.h>
-
-#ifdef GTASA_30
-
-#define FUNC_GetCurrentRadioStationID   0x4F3E10
-#define FUNC_IsVehicleRadioActive       0x4F5260
-#define FUNC_GetRadioStationName        0x4F3DA0
-#define FUNC_IsRadioOn                  0x4F3D70
-#define FUNC_SetBassSetting             0x4F3D00
-#define FUNC_Reset                      0x4F3900
-#define FUNC_StartRadio                 0x4F6F60
-
-#define CLASS_CAERadioTrackManager      0x93AB00
-
-#else
 
 #define FUNC_GetCurrentRadioStationID   0x4E83F0
 #define FUNC_IsVehicleRadioActive       0x4E9800
@@ -38,16 +23,14 @@
 
 #define CLASS_CAERadioTrackManager      0x8CB6F8
 
-#endif
-
 class CAERadioTrackManagerSA : public CAERadioTrackManager
 {
 public:
     BYTE  GetCurrentRadioStationID();
     BYTE  IsVehicleRadioActive();
     char* GetRadioStationName(BYTE bStationID);
-    BOOL  IsRadioOn();
-    VOID  SetBassSetting(DWORD dwBass);
-    VOID  Reset();
-    VOID  StartRadio(BYTE bStationID, BYTE bUnknown);
+    bool  IsRadioOn();
+    void  SetBassSetting(DWORD dwBass);
+    void  Reset();
+    void  StartRadio(BYTE bStationID, BYTE bUnknown);
 };
