@@ -111,7 +111,7 @@ CCredits::CCredits()
 
         "Enes \"cleopatra\" Akıllıok\n"
         "Nawaf \"xLive\" Alqarni\n"
-        "Nicolás \"PlatinMTA\" Barrios\n"
+        "Nicolás \"Platin\" Barrios\n"
         "Amine \"UndR\" Bidah\n"
         "Lukasz \"W\" Biegaj\n"
         "Pacal \"buepas\" Buerklin\n"
