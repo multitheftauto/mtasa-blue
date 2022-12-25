@@ -270,6 +270,7 @@ CCredits::CCredits()
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
         "FreeType (https://freetype.org/)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
+        "libjpeg (https://libjpeg.sourceforge.net/)\n"
         "libpcre (https://www.pcre.org/)\n"
         "libpng (http://www.libpng.org/)\n"
         "Lua (https://www.lua.org/)\n"
