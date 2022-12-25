@@ -266,6 +266,7 @@ CCredits::CCredits()
         "CRC-32 (https://bochs.sourceforge.io/)\n"
         "cryptopp (https://cryptopp.com/)\n"
         "cURL (https://curl.se/)\n"
+        "Detours (https://github.com/microsoft/Detours)\n"
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
         "libpcre (https://www.pcre.org/)\n"
