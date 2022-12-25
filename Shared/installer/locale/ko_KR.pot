@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-16 15:29\n"
-"PO-Revision-Date: 2022-10-16 16:29\n"
+"POT-Creation-Date: 2022-12-25 21:54\n"
+"PO-Revision-Date: 2022-12-25 22:55\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -231,27 +231,27 @@ msgid "Editor"
 msgstr "편집자"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:979
+#: Shared/installer/nightly.nsi:980
 msgid "Development"
 msgstr "발달"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1027
+#: Shared/installer/nightly.nsi:1028
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) 가 컴퓨터에서 성공적으로 제거되었습니다."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1034
+#: Shared/installer/nightly.nsi:1035
 msgid "Uninstallation has failed!"
 msgstr "제거에 실패했습니다!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1042
+#: Shared/installer/nightly.nsi:1043
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "$(^Name) 와 모든 구성 요소를 완전히 제거하시겠습니까?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1043
+#: Shared/installer/nightly.nsi:1044
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -260,32 +260,32 @@ msgstr "업데이트하기 전에 제거하시겠습니까?$\\r$\n"
 "새 설치 관리자를 실행하여 설정을 업그레이드하고 보존합니다."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1057
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "데이터 파일(예: 리소스, 스크린샷 및 서버 구성) 을 유지하시겠습니까? 아니요를 클릭하면 만든 리소스, 구성 또는 스크린샷이 손실됩니다."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1165
+#: Shared/installer/nightly.nsi:1166
 msgid "This installer requires admin access, try again"
 msgstr "이 설치 관리자는 관리자 액세스가 필요하며 다시 시도하십시오."
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1166
+#: Shared/installer/nightly.nsi:1167
 msgid "This uninstaller requires admin access, try again"
 msgstr "이 제거 프로그램은 관리자 액세스가 필요하며 다시 시도하십시오."
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1167
+#: Shared/installer/nightly.nsi:1168
 msgid "Logon service not running, aborting!"
 msgstr "로그온 서비스가 실행되고 있지 않고 중단되었습니다!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1168
+#: Shared/installer/nightly.nsi:1169
 msgid "Unable to elevate"
 msgstr "상승할 수 없음"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1764
+#: Shared/installer/nightly.nsi:1765
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -296,7 +296,7 @@ msgstr "MTA ($1) 의 다른 주요 버전이 이미 해당 경로에 존재합�
 " $INSTDIR에 MTA $1을 덮어 쓰시겠습니까?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1768
+#: Shared/installer/nightly.nsi:1769
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -304,31 +304,31 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 msgstr ""
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1771
+#: Shared/installer/nightly.nsi:1772
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
 msgstr ""
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1773
+#: Shared/installer/nightly.nsi:1774
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
 msgstr ""
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1891
+#: Shared/installer/nightly.nsi:1892
 msgid "Choose Install Location"
 msgstr ""
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1892
+#: Shared/installer/nightly.nsi:1893
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr ""
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1893
+#: Shared/installer/nightly.nsi:1894
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -336,62 +336,62 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 msgstr ""
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1895
+#: Shared/installer/nightly.nsi:1896
 msgid "Destination Folder"
 msgstr ""
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1896
+#: Shared/installer/nightly.nsi:1897
 msgid "Browse..."
 msgstr ""
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1897
+#: Shared/installer/nightly.nsi:1898
 msgid "Default"
 msgstr "기본값"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1898
+#: Shared/installer/nightly.nsi:1899
 msgid "Last used"
 msgstr ""
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1899
+#: Shared/installer/nightly.nsi:1900
 msgid "Custom"
 msgstr ""
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2077
+#: Shared/installer/nightly.nsi:2078
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr ""
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2095
+#: Shared/installer/nightly.nsi:2096
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr ""
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2096
+#: Shared/installer/nightly.nsi:2097
 msgid "Installation type:  Upgrade"
 msgstr ""
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2339
+#: Shared/installer/nightly.nsi:2340
 msgid "Online update"
 msgstr ""
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2340
+#: Shared/installer/nightly.nsi:2341
 msgid "Checking for update information"
 msgstr ""
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2341
+#: Shared/installer/nightly.nsi:2342
 msgid "Checking for installer update information..."
 msgstr ""
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2342
+#: Shared/installer/nightly.nsi:2343
 msgid "Please ensure your firewall is not blocking"
 msgstr ""
 
