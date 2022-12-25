@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-15 13:37\n"
+"POT-Creation-Date: 2022-12-25 20:55+0000\n"
+"PO-Revision-Date: 2022-12-25 21:54\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -159,7 +159,7 @@ msgstr "（デベロップメントモード）世界音IDをデバッグウイ�
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1192 Client/core/CCore.cpp:1205
+#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
@@ -851,7 +851,7 @@ msgstr "次のファイルは正しくないため、MTA:SAは続行できませ
 msgid "Patch GTA"
 msgstr "GTAをパッチする"
 
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:723
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "%s ドライブスペースが不足しているため、MTA:SAは続行ことができません。"
@@ -2396,111 +2396,111 @@ msgstr "無効なサーバーレスポンス (2)"
 msgid "Bad server response (1)"
 msgstr "無効なサーバー返答でした (1)"
 
-#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "致命的なエラー"
 
-#: Client/core/CCore.cpp:850
+#: Client/core/CCore.cpp:891
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "修正するには、このファイルを消してください："
 
-#: Client/core/CCore.cpp:882
+#: Client/core/CCore.cpp:923
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s モジュールは正しくありません！"
 
-#: Client/core/CCore.cpp:1192
+#: Client/core/CCore.cpp:1233
 msgid "Error executing URL"
 msgstr "URL実行エラー"
 
-#: Client/core/CCore.cpp:1204
+#: Client/core/CCore.cpp:1245
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "コマンドラインに記入されたMODの実行が失敗しました ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1289
+#: Client/core/CCore.cpp:1333
 msgid "this help screen"
 msgstr "このヘルプ画面"
 
-#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
+#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
 msgid "exits the application"
 msgstr "アプリケーションを終了する"
 
-#: Client/core/CCore.cpp:1292
+#: Client/core/CCore.cpp:1336
 msgid "shows the version"
 msgstr "バージョンを表示する"
 
-#: Client/core/CCore.cpp:1293
+#: Client/core/CCore.cpp:1337
 msgid "shows the time"
 msgstr "時間を表示する"
 
-#: Client/core/CCore.cpp:1294
+#: Client/core/CCore.cpp:1338
 msgid "shows the hud"
 msgstr "HUDを表示する"
 
-#: Client/core/CCore.cpp:1295
+#: Client/core/CCore.cpp:1339
 msgid "shows all the binds"
 msgstr "すべてのバインドを表示する"
 
-#: Client/core/CCore.cpp:1296
+#: Client/core/CCore.cpp:1340
 msgid "shows your serial"
 msgstr "シリアル番号を表示する"
 
-#: Client/core/CCore.cpp:1305
+#: Client/core/CCore.cpp:1349
 msgid "connects to a server (host port nick pass)"
 msgstr "サーバーに接続する (ホスト ポート ニックネーム パスワード)"
 
-#: Client/core/CCore.cpp:1306
+#: Client/core/CCore.cpp:1350
 msgid "connects to a previous server"
 msgstr "以前のサーバーに接続する"
 
-#: Client/core/CCore.cpp:1307
+#: Client/core/CCore.cpp:1351
 msgid "binds a key (key control)"
 msgstr "キーをバインドします (キーコントローラ)"
 
-#: Client/core/CCore.cpp:1308
+#: Client/core/CCore.cpp:1352
 msgid "unbinds a key (key)"
 msgstr "キーバインドを削除します (キー)"
 
-#: Client/core/CCore.cpp:1309
+#: Client/core/CCore.cpp:1353
 msgid "copies the default gta controls"
 msgstr "GTA: San Andreasのデフォルトコントロールをコピーする"
 
-#: Client/core/CCore.cpp:1310
+#: Client/core/CCore.cpp:1354
 msgid "outputs a screenshot"
 msgstr "スクリーンショットを出す"
 
-#: Client/core/CCore.cpp:1311
+#: Client/core/CCore.cpp:1355
 msgid "immediately saves the config"
 msgstr "設定をすぐに保存する"
 
-#: Client/core/CCore.cpp:1313
+#: Client/core/CCore.cpp:1357
 msgid "clears the debug view"
 msgstr "デバッグスクリーンを消す"
 
-#: Client/core/CCore.cpp:1314
+#: Client/core/CCore.cpp:1358
 msgid "scrolls the chatbox upwards"
 msgstr "チャットボックスを上にスクロールする"
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1359
 msgid "scrolls the chatbox downwards"
 msgstr "チャットボックスを下にスクロールする"
 
-#: Client/core/CCore.cpp:1316
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the debug view upwards"
 msgstr "デバッグを上にスクロールする"
 
-#: Client/core/CCore.cpp:1317
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the debug view downwards"
 msgstr "デバッグを下にスクロールする"
 
-#: Client/core/CCore.cpp:1320
+#: Client/core/CCore.cpp:1364
 msgid "shows the memory statistics"
 msgstr "メモリデータを表示する"
 
-#: Client/core/CCore.cpp:1321
+#: Client/core/CCore.cpp:1365
 msgid "shows the frame timing graph"
 msgstr "FPSグラフを表示する"
 
