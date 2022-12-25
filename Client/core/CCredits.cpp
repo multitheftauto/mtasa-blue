@@ -258,6 +258,7 @@ CCredits::CCredits()
     m_strCredits +=
         "\n"
         "BASS (https://www.un4seen.com/bass.html)\n"
+        "bcrypt (https://www.openwall.com/crypt/)\n"
         "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
         "bzip2 (http://bzip.org/)\n"
         "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
