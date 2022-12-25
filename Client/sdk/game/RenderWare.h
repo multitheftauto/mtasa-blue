@@ -82,7 +82,7 @@ struct RwSphere
     float radius;
 };
 
-struct RwMatrixTag
+struct RwMatrix
 {
     /* These are padded to be 16 byte quantities per line */
     RwV3d         right;
@@ -94,8 +94,6 @@ struct RwMatrixTag
     RwV3d         pos;
     std::uint32_t pad3;
 };
-
-typedef RwMatrixTag RwMatrix;
 
 struct RtQuat
 {
@@ -452,7 +450,8 @@ struct RwBuffer
     void*        ptr;
     unsigned int size;
 };
-union RwStreamTypeData {
+union RwStreamTypeData
+{
     struct
     {
         unsigned int position;

@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "CGame.h"
+#include "packets/CPlayerDisconnectedPacket.h"
 
 SThreadCPUTimesStore g_SyncThreadCPUTimes;
 uint                 g_uiNetSentByteCounter = 0;

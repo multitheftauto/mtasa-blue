@@ -7,6 +7,10 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "CPad.h"
+
 struct SSimVehicleDamageInfo
 {
     SFixedArray<unsigned char, MAX_DOORS>  m_ucDoorStates;

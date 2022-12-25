@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
+#include "HookSystem.h"
 
 BYTE* CreateJump(DWORD dwFrom, DWORD dwTo, BYTE* ByteArray)
 {

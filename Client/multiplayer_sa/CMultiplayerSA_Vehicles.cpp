@@ -72,7 +72,6 @@ static void _declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 //     0x4F77D6 | F3 A5                 | rep movsd
 //     0x4F77D8 | 8B CA                 | mov ecx, edx;
 
-
 static CVehicleSAInterface* pRequestSoundSettingsVehicle = 0;
 tVehicleAudioSettings*      pVehicleAudioSettings = nullptr;
 

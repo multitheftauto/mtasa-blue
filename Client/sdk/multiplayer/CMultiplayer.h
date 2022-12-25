@@ -16,10 +16,11 @@
 
 #include <game/CExplosion.h>
 #include <game/CStats.h>
-#include "CPopulationMP.h"
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
+
+class CEntitySAInterface;
 
 struct SRwResourceStats
 {
@@ -121,6 +122,7 @@ typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
+typedef void(AudioZoneRadioSwitchHandler)(DWORD dwStationID);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
@@ -193,7 +195,6 @@ public:
 
     virtual class CPed* GetContextSwitchedPed() = 0;
 
-    virtual class CPopulationMP* GetPopulationMP() = 0;
     virtual void                 PreventLeavingVehicles() = 0;
     virtual void                 HideRadar(bool bHide) = 0;
     virtual void                 SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
@@ -246,6 +247,7 @@ public:
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
     virtual void  SetPedStepHandler(PedStepHandler* pHandler) = 0;
     virtual void  SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) = 0;
+    virtual void  SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler) = 0;
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
     virtual bool  HasSkyColor() = 0;
@@ -386,6 +388,10 @@ public:
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 
     virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
-    virtual eAnimID GetLastStaticAnimationID() = 0;
-    virtual DWORD GetLastAnimArrayAddress() = 0;
+    virtual eAnimID    GetLastStaticAnimationID() = 0;
+    virtual DWORD      GetLastAnimArrayAddress() = 0;
+
+    virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
 };
