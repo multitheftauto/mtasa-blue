@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-25 20:55+0000\n"
-"PO-Revision-Date: 2022-12-25 21:54\n"
+"POT-Creation-Date: 2022-12-25 21:54+0000\n"
+"PO-Revision-Date: 2022-12-25 22:54\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -150,9 +150,9 @@ msgstr "(Λειτουργία ανάπτυξης) εκτυπώνει τα παγ
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:818
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/core/CSettings.cpp:2924
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:815
+#: Client/loader/CInstallManager.cpp:530 Client/loader/CInstallManager.cpp:539
+#: Client/loader/CInstallManager.cpp:628 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
 #: Client/core/CSettings.cpp:4674 Client/core/CGUI.cpp:87
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
@@ -672,7 +672,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Μια αναφορά του GTA: San Andreas είναι ήδη σε λειτουργία. Πρέπει να τερματιστεί πριν ξεκινήσει το MTA:SA. Θέλετε να το κάνετε τώρα;"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1240
+#: Client/loader/MainFunctions.cpp:1173
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -700,79 +700,79 @@ msgstr "Η διαδρομή για την εγκατάσταση του 'MTA:SA'
 "Αν αντιμετωπίζετε προβλήματα κατά την εκτέλεση του MTA:SA,\n"
 "μετακινήστε την εγκατάσταση ή τις εγκαταστάσεις σας σε μια διαδρομή που δεν περιέχει ερωτηματικό."
 
-#: Client/loader/MainFunctions.cpp:782
+#: Client/loader/MainFunctions.cpp:779
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Η φόρτωση απέτυχε. Βεβαιωθείτε ότι τα τελευταία αρχεία δεδομένων έχουν εγκατασταθεί σωστά."
 
-#: Client/loader/MainFunctions.cpp:791
+#: Client/loader/MainFunctions.cpp:788
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Η φόρτωση απέτυχε. Βεβαιωθείτε ότι το %s έχει εγκατασταθεί σωστά."
 
-#: Client/loader/MainFunctions.cpp:798
+#: Client/loader/MainFunctions.cpp:795
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Η φόρτωση απέτυχε. Δεν ήταν δυνατή η εύρεση του gta_sa.exe στο %s."
 
-#: Client/loader/MainFunctions.cpp:808
+#: Client/loader/MainFunctions.cpp:805
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Η φόρτωση απέτυχε. %s υπάρχει στον προορισμό του GTA. Παρακαλώ διαγράψτε πριν συνεχίσετε."
 
-#: Client/loader/MainFunctions.cpp:817
+#: Client/loader/MainFunctions.cpp:814
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Το κύριο αρχείο έχει ένα λάθος όνομα (%s)"
 
-#: Client/loader/MainFunctions.cpp:828
+#: Client/loader/MainFunctions.cpp:825
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Το κύριο αρχείο δεν είναι υπογεγραμμένο. Πιθανή δραστηριότητα ιού.\n\n"
 "Ανατρέξτε στην ηλεκτρονική βοήθεια, εάν το MTA δεν λειτουργεί σωστά."
 
-#: Client/loader/MainFunctions.cpp:853
+#: Client/loader/MainFunctions.cpp:850
 msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Τα αρχεία δεδομένων τροποποιηθηκαν. Πιθανή δραστηριότητα ιού.\n\n"
 "Ανατρέξτε στην ηλεκτρονική βοήθεια, εάν το MTA δεν λειτουργεί σωστά."
 
-#: Client/loader/MainFunctions.cpp:865
+#: Client/loader/MainFunctions.cpp:862
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "Αρχεία .asi βρίσκονται στον προορισμό εγκατάστασης του 'MTA:SA' ή του 'GTA: San Andreas'.\n\n"
 "Καταργήστε αυτά τα αρχεία .asi αν αντιμετωπίσετε προβλήματα με το MTA:SA."
 
-#: Client/loader/MainFunctions.cpp:969
+#: Client/loader/MainFunctions.cpp:966
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Σφάλμα αναντιστοιχίας έκδοσης αρχείου. Επανεγκαταστήστε το MTA:SA αν αντιμετωπίσετε προβλήματα.\n"
 
-#: Client/loader/MainFunctions.cpp:978
+#: Client/loader/MainFunctions.cpp:975
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Κάποια αρχεία λείπουν. Επανεγκαταστήστε το MTA:SA αν αντιμετωπίσετε προβλήματα.\n"
 
-#: Client/loader/MainFunctions.cpp:990
+#: Client/loader/MainFunctions.cpp:987
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "Το MTA:SA δεν είναι συμβατό με την 'ασφαλή λειτουργία' των Windows.\n\n"
 "Κάντε επανεκκίνηση του υπολογιστή σας.\n"
 
-#: Client/loader/MainFunctions.cpp:1126
+#: Client/loader/MainFunctions.cpp:1073
 msgid "Fix configuration issue"
 msgstr "Επίλυση ζητήματος διαμόρφωσης"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1168
+#: Client/loader/MainFunctions.cpp:1111
 msgid "Fix elevation required error"
 msgstr "Επιδιόρθωση σφάλματος ανύψωσης"
 
-#: Client/loader/MainFunctions.cpp:1175
+#: Client/loader/MainFunctions.cpp:1118
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Δεν ήταν δυνατή η εκκίνηση του Grand Theft Auto: San Andreas.   Παρακαλώ δοκιμάστε να κάνετε επανεκκίνηση ή εάν το πρόβλημα παραμένει, επικοινωνήστε με το MTA στη διεύθυνση www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1240
+#: Client/loader/MainFunctions.cpp:1173
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Το GTA: San Andreas μπορεί να μην έχει ξεκινήσει σωστά. Θέλετε να το τερματίσετε;"
 
@@ -813,7 +813,7 @@ msgstr "Εγκατάσταση ενημέρωσης..."
 msgid "Extracting files..."
 msgstr "Εξαγωγή αρχείων..."
 
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
+#: Client/loader/CInstallManager.cpp:339 Client/loader/Utils.cpp:932
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -822,133 +822,137 @@ msgstr "Το MTA:SA χρειάζεται άδεια διαχειριστή γι�
 "  '%s'\n\n"
 "Παρακαλώ επιβεβαιώστε το επόμενο παράθυρο."
 
-#: Client/loader/CInstallManager.cpp:344
+#: Client/loader/CInstallManager.cpp:354
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "Το MTA:SA δεν μπόρεσε να ολοκληρώσει την ακόλουθη εργασία:\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:394
+#: Client/loader/CInstallManager.cpp:404
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Το crash προκλήθηκε από ένα σφάλμα στον οδηγό γραφικών **\n\n"
 "** Παρακαλώ αναβαθμίστε του οδηγούς γραφικών σας **"
 
-#: Client/loader/CInstallManager.cpp:500
+#: Client/loader/CInstallManager.cpp:510
 msgid "Install updated MTA:SA files"
 msgstr "Εγκατάσταση αναβαθμισμένων MTA:SA αρχείων"
 
-#: Client/loader/CInstallManager.cpp:520
+#: Client/loader/CInstallManager.cpp:530
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Δεν είναι δυνατή η αναβάθμιση λόγω αντικρουόμενων αρχείων. Παρακαλώ κλείστε τις άλλες εφαρμογές και ξαναπροσπαθήστε"
 
-#: Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:539
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Το Multi Theft Auto δεν έχει εγκατασταθεί σωστά, παρακαλώ επανεγκαταστήστε. %s"
 
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+#: Client/loader/CInstallManager.cpp:594 Client/loader/CInstallManager.cpp:626
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "Το MTA:SA δεν μπορεί να συνεχιστεί επειδή τα ακόλουθα αρχεία είναι λανθασμένα:"
 
-#: Client/loader/CInstallManager.cpp:609
+#: Client/loader/CInstallManager.cpp:619
 msgid "Patch GTA"
 msgstr "Ενημέρωση GTA"
 
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:764
+#: Client/loader/CInstallManager.cpp:766 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "Το MTA:SA δεν είναι δυνατό να συνεχίσει διότι ο οδηγός %s δεν έχει αρκετό χώρο."
 
-#: Client/loader/CInstallManager.cpp:812
+#: Client/loader/CInstallManager.cpp:822
 msgid "Missing file:"
 msgstr "Χαμένο αρχείο:"
 
-#: Client/loader/CInstallManager.cpp:816
+#: Client/loader/CInstallManager.cpp:826
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Εάν το MTA αποτύχει να φορτώσει, παρακαλώ επανεγκαταστήστε το GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:937
+#: Client/loader/CInstallManager.cpp:947
 msgid "Update install settings"
 msgstr "Αναβάθμιση ρυθμίσεων εγκατάστασης"
 
-#: Client/loader/CInstallManager.cpp:1070
+#: Client/loader/CInstallManager.cpp:1080
 msgid "Update compatibility settings"
 msgstr "Αναβάθμιση ρυθμίσεων συμβατότητας"
 
-#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:890
+#: Client/loader/CInstallManager.cpp:1106
+msgid "Move incompatible files"
+msgstr ""
+
+#: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Ψάχνοντας για το Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:893
+#: Client/loader/Utils.cpp:499 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Παρακαλώ ξεκινήστε το Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:813
+#: Client/loader/Utils.cpp:563
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Επιλέξτε τον προορισμό εγκατάστασης του Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:1283
+#: Client/loader/Utils.cpp:1033
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Σφάλμα κατά τη φόρτωση του %s δομοστοιχείου! (%s)"
 
-#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1355 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Αντιγραφή αρχείων..."
 
-#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1415 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "Η αντιγραφή ολοκληρώθηκε νωρίς. Όλα εντάξει."
 
-#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Τελειώνοντας..."
 
-#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1423 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "Έγινε!"
 
-#: Client/loader/Utils.cpp:1713
+#: Client/loader/Utils.cpp:1463
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Νέα εγκατάσταση του %s ανιχνεύθηκε.\n\n"
 "Θέλετε να αντιγράψετε τις ρυθμίσεις σας από το %s ;"
 
-#: Client/loader/Utils.cpp:1752
+#: Client/loader/Utils.cpp:1502
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "To GTA:SA αντιμετώπισε πρόβλημα με το άνοιγμα του αρχείου '%s'"
 
-#: Client/loader/Utils.cpp:1774
+#: Client/loader/Utils.cpp:1524
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "Στο GTA:SA λείπει το αρχείο '%s'."
 
-#: Client/loader/Utils.cpp:1799
+#: Client/loader/Utils.cpp:1549
 msgid "GTA:SA had trouble loading a model."
 msgstr "Το GTA:SA αντιμετώπισε πρόβλημα κατά τη φόρτωση ενός μοντέλου."
 
-#: Client/loader/Utils.cpp:1801
+#: Client/loader/Utils.cpp:1551
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Αν τροποποιήσατε πρόσφατα το gta3.img, δοκιμάστε να επανεγκαταστήσετε το GTA:SA."
 
-#: Client/loader/Utils.cpp:1826
+#: Client/loader/Utils.cpp:1576
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "Το GTA:SA αντιμετώπισε πρόβλημα στην προσθήκη αναβάθμισης σε ένα όχημα."
 
-#: Client/loader/Utils.cpp:1845
+#: Client/loader/Utils.cpp:1595
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "Το GTA:SA βρήκε σφάλματα στο αρχείο '%s'"
 
-#: Client/loader/Utils.cpp:1918
+#: Client/loader/Utils.cpp:1667
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Έγινε επανεκκίνηση του υπολογιστή σας κατά την αναπαραγωγή του MTA:SA;"
 
-#: Client/loader/Utils.cpp:1983
+#: Client/loader/Utils.cpp:1732
 msgid "Please terminate the following programs before continuing:"
 msgstr "Παρακαλείστε να τερματίσετε τα ακόλουθα προγράμματα πριν συνεχίσετε:"
 
