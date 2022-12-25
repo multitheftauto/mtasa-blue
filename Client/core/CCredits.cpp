@@ -285,6 +285,7 @@ CCredits::CCredits()
         "pthreads-win32 (https://sourceware.org/pthreads-win32/)\n"
         "RakNet (http://www.jenkinssoftware.com/)\n"
         "SA Limit adjuster source code (Credits to Sacky)\n"
+        "sparsehash (https://github.com/sparsehash/sparsehash)\n"
         "speex (https://www.speex.org/)\n"
         "SQLite (https://www.sqlite.org/)\n"
         "tinygettext (https://github.com/tinygettext/tinygettext/)\n"
