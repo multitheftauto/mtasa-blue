@@ -18,6 +18,8 @@
 #include "packets/CPedStopSyncPacket.h"
 #include "CGame.h"
 #include "CColManager.h"
+#include "CSpatialDatabase.h"
+#include "CPlayerCamera.h"
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {
