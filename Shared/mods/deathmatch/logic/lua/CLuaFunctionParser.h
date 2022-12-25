@@ -143,7 +143,7 @@ struct CLuaFunctionParserBase
 
     // Pop should remove a T from the Lua Stack after verifying that it is a valid type
     template <typename T>
-    inline T Pop(lua_State* L, int& index)
+    T Pop(lua_State* L, int& index)
     {
         if (!TypeMatch<T>(L, index))
         {
