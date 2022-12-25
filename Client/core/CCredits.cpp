@@ -257,6 +257,7 @@ CCredits::CCredits()
     m_strCredits += _("This software makes use of the following libraries and software:");
     m_strCredits +=
         "\n"
+        "BASS (https://www.un4seen.com/bass.html)\n"
         "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
         "bzip2 (http://bzip.org/)\n"
         "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
