@@ -278,6 +278,7 @@ CCredits::CCredits()
         "Lua (https://www.lua.org/)\n"
         "lunasvg (https://github.com/sammycage/lunasvg)\n"
         "mbedtls (https://github.com/Mbed-TLS/mbedtls)\n"
+        "minizip (https://www.winimage.com/zLibDll/minizip.html)\n"
         "mysql-connector-c (https://downloads.mysql.com/archives/c-c/)\n"
         "nvapi (https://developer.nvidia.com/rtx/path-tracing/nvapi/get-started)\n"
         "pme by Zac Hansen\n"
