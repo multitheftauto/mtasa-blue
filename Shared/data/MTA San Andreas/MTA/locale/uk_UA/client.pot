@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-15 13:39\n"
+"POT-Creation-Date: 2022-12-25 20:55+0000\n"
+"PO-Revision-Date: 2022-12-25 21:55\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -159,7 +159,7 @@ msgstr "(Режим розробки) писати ідентифікатори 
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1192 Client/core/CCore.cpp:1205
+#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
@@ -863,7 +863,7 @@ msgstr "MTA:SA не може продовжити, оскільки такі ф�
 msgid "Patch GTA"
 msgstr "Шлях GTA"
 
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:723
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "Для інсталяції MTA:SA бракує вільного місця на диску %s."
@@ -2406,111 +2406,111 @@ msgstr "Хибна відповідь сервера (2)"
 msgid "Bad server response (1)"
 msgstr "Хибна відповідь сервера (1)"
 
-#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Фатальна помилка"
 
-#: Client/core/CCore.cpp:850
+#: Client/core/CCore.cpp:891
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "ЩОБ ВИПРАВИТИ, ВИЛУЧІТЬ ЦЕЙ ФАЙЛ:"
 
-#: Client/core/CCore.cpp:882
+#: Client/core/CCore.cpp:923
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "Модуль %s хибний!"
 
-#: Client/core/CCore.cpp:1192
+#: Client/core/CCore.cpp:1233
 msgid "Error executing URL"
 msgstr "Помилка виконання URL"
 
-#: Client/core/CCore.cpp:1204
+#: Client/core/CCore.cpp:1245
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Помилка запуску мода, визначеного в командному рядку ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1289
+#: Client/core/CCore.cpp:1333
 msgid "this help screen"
 msgstr "ця сторінка допомоги"
 
-#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
+#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
 msgid "exits the application"
 msgstr "вийти із застосунку"
 
-#: Client/core/CCore.cpp:1292
+#: Client/core/CCore.cpp:1336
 msgid "shows the version"
 msgstr "показати версію MTA"
 
-#: Client/core/CCore.cpp:1293
+#: Client/core/CCore.cpp:1337
 msgid "shows the time"
 msgstr "показати поточний час"
 
-#: Client/core/CCore.cpp:1294
+#: Client/core/CCore.cpp:1338
 msgid "shows the hud"
 msgstr "показати інтерфейс гравця"
 
-#: Client/core/CCore.cpp:1295
+#: Client/core/CCore.cpp:1339
 msgid "shows all the binds"
 msgstr "показати всі налаштування клавіш"
 
-#: Client/core/CCore.cpp:1296
+#: Client/core/CCore.cpp:1340
 msgid "shows your serial"
 msgstr "показати ваш серійний номер"
 
-#: Client/core/CCore.cpp:1305
+#: Client/core/CCore.cpp:1349
 msgid "connects to a server (host port nick pass)"
 msgstr "під'єднатися до сервера (адрес, порт, нік, пароль)"
 
-#: Client/core/CCore.cpp:1306
+#: Client/core/CCore.cpp:1350
 msgid "connects to a previous server"
 msgstr "під'єднатися до останнього відвіданого сервера"
 
-#: Client/core/CCore.cpp:1307
+#: Client/core/CCore.cpp:1351
 msgid "binds a key (key control)"
 msgstr "призначити клавішу управління"
 
-#: Client/core/CCore.cpp:1308
+#: Client/core/CCore.cpp:1352
 msgid "unbinds a key (key)"
 msgstr "видалити задачу з клавіші"
 
-#: Client/core/CCore.cpp:1309
+#: Client/core/CCore.cpp:1353
 msgid "copies the default gta controls"
 msgstr "скопіювати налаштування з GTA:SA"
 
-#: Client/core/CCore.cpp:1310
+#: Client/core/CCore.cpp:1354
 msgid "outputs a screenshot"
 msgstr "зробити знімок екрана"
 
-#: Client/core/CCore.cpp:1311
+#: Client/core/CCore.cpp:1355
 msgid "immediately saves the config"
 msgstr "зберегти налаштування"
 
-#: Client/core/CCore.cpp:1313
+#: Client/core/CCore.cpp:1357
 msgid "clears the debug view"
 msgstr "почистити вікно зневадження (debug)"
 
-#: Client/core/CCore.cpp:1314
+#: Client/core/CCore.cpp:1358
 msgid "scrolls the chatbox upwards"
 msgstr "прокрутити чат вгору"
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1359
 msgid "scrolls the chatbox downwards"
 msgstr "прокрутити чат вниз"
 
-#: Client/core/CCore.cpp:1316
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the debug view upwards"
 msgstr "прокрутити вікно зневадження вгору"
 
-#: Client/core/CCore.cpp:1317
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the debug view downwards"
 msgstr "прокрутити вікно зневадження вниз"
 
-#: Client/core/CCore.cpp:1320
+#: Client/core/CCore.cpp:1364
 msgid "shows the memory statistics"
 msgstr "показати статистику використання пам'яті"
 
-#: Client/core/CCore.cpp:1321
+#: Client/core/CCore.cpp:1365
 msgid "shows the frame timing graph"
 msgstr "показати графік продуктивності"
 
