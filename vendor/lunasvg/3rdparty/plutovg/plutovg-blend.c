@@ -418,7 +418,6 @@ static void blend_solid(plutovg_surface_t* surface, plutovg_operator_t op, const
     }
 }
 
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define BUFFER_SIZE 1024
 static void blend_linear_gradient(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_rle_t* rle, const gradient_data_t* gradient)
 {
@@ -445,7 +444,7 @@ static void blend_linear_gradient(plutovg_surface_t* surface, plutovg_operator_t
         int x = spans->x;
         while(length)
         {
-            int l = MIN(length, BUFFER_SIZE);
+            int l = plutovg_min(length, BUFFER_SIZE);
             fetch_linear_gradient(buffer, &v, gradient, spans->y, x, l);
             uint32_t* target = (uint32_t*)(surface->data + spans->y * surface->stride) + x;
             func(target, l, buffer, spans->coverage);
@@ -479,7 +478,7 @@ static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t
         int x = spans->x;
         while(length)
         {
-            int l = MIN(length, BUFFER_SIZE);
+            int l = plutovg_min(length, BUFFER_SIZE);
             fetch_radial_gradient(buffer, &v, gradient, spans->y, x, l);
             uint32_t* target = (uint32_t*)(surface->data + spans->y * surface->stride) + x;
             func(target, l, buffer, spans->coverage);
@@ -491,7 +490,6 @@ static void blend_radial_gradient(plutovg_surface_t* surface, plutovg_operator_t
     }
 }
 
-#define CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : (hi) < (v) ? (hi) : (v))
 #define FIXED_SCALE (1 << 16)
 static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_t op, const plutovg_rle_t* rle, const texture_data_t* texture)
 {
@@ -520,13 +518,13 @@ static void blend_transformed_argb(plutovg_surface_t* surface, plutovg_operator_
         const int coverage = (spans->coverage * texture->const_alpha) >> 8;
         while(length)
         {
-            int l = MIN(length, BUFFER_SIZE);
+            int l = plutovg_min(length, BUFFER_SIZE);
             const uint32_t* end = buffer + l;
             uint32_t* b = buffer;
             while(b < end)
             {
-                int px = CLAMP(x >> 16, 0, image_width - 1);
-                int py = CLAMP(y >> 16, 0, image_height - 1);
+                int px = plutovg_clamp(x >> 16, 0, image_width - 1);
+                int py = plutovg_clamp(y >> 16, 0, image_height - 1);
                 *b = ((const uint32_t*)(texture->data + py * texture->stride))[px];
 
                 x += fdx;
@@ -614,7 +612,7 @@ static void blend_untransformed_tiled_argb(plutovg_surface_t* surface, plutovg_o
         const int coverage = (spans->coverage * texture->const_alpha) >> 8;
         while(length)
         {
-            int l = MIN(image_width - sx, length);
+            int l = plutovg_min(image_width - sx, length);
             if(BUFFER_SIZE < l)
                 l = BUFFER_SIZE;
             const uint32_t* src = (const uint32_t*)(texture->data + sy * texture->stride) + sx;
@@ -658,7 +656,7 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
         int length = spans->len;
         while(length)
         {
-            int l = MIN(length, BUFFER_SIZE);
+            int l = plutovg_min(length, BUFFER_SIZE);
             const uint32_t* end = buffer + l;
             uint32_t* b = buffer;
             int px16 = x % (image_width << 16);
@@ -696,13 +694,13 @@ static void blend_transformed_tiled_argb(plutovg_surface_t* surface, plutovg_ope
 
 void plutovg_blend(plutovg_t* pluto, const plutovg_rle_t* rle)
 {
-    plutovg_paint_t* source = pluto->state->source;
+    plutovg_paint_t* source = &pluto->state->paint;
     if(source->type == plutovg_paint_type_color)
-        plutovg_blend_color(pluto, rle, source->color);
+        plutovg_blend_color(pluto, rle, &source->color);
     else if(source->type == plutovg_paint_type_gradient)
-        plutovg_blend_gradient(pluto, rle, source->gradient);
+        plutovg_blend_gradient(pluto, rle, &source->gradient);
     else
-        plutovg_blend_texture(pluto, rle, source->texture);
+        plutovg_blend_texture(pluto, rle, &source->texture);
 }
 
 void plutovg_blend_color(plutovg_t* pluto, const plutovg_rle_t* rle, const plutovg_color_t* color)

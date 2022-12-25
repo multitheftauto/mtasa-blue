@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <CMatrix.h>
+#include <game/CCamera.h>
 #include "CClientCommon.h"
 #include "CClientEntity.h"
 
