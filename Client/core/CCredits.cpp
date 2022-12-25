@@ -289,6 +289,7 @@ CCredits::CCredits()
         "speex (https://www.speex.org/)\n"
         "SQLite (https://www.sqlite.org/)\n"
         "tinygettext (https://github.com/tinygettext/tinygettext/)\n"
+        "tinyxml (https://sourceforge.net/projects/tinyxml/)\n"
         "UnRAR (https://www.rarlab.com/)\n"
         "zlib (https://zlib.net/)\n";
 
