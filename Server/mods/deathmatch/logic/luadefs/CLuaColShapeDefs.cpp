@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaColShapeDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CColCircle.h"
+#include "CColCuboid.h"
+#include "CColRectangle.h"
+#include "CColPolygon.h"
+#include "CColTube.h"
 
 void CLuaColShapeDefs::LoadFunctions()
 {
@@ -642,7 +650,7 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
         CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
-        CVector2D          vecPoint;
+        CVector2D    vecPoint;
         if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
         {
             lua_pushnumber(luaVM, vecPoint.fX);

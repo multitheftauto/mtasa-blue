@@ -9,16 +9,13 @@
 
 struct SEffectInvariant
 {
-    SString      strFile;
+    SString         strFile;
     EffectMacroList macros;
 
-    bool operator ==(const SEffectInvariant& e) const
-    {
-        return strFile == e.strFile && macros == e.macros;
-    }
+    bool operator==(const SEffectInvariant& e) const { return strFile == e.strFile && macros == e.macros; }
 };
 
-template<>
+template <>
 struct std::hash<SEffectInvariant>
 {
     size_t operator()(const SEffectInvariant& entry) const
@@ -30,7 +27,7 @@ struct std::hash<SEffectInvariant>
         for (const auto& [name, definition] : entry.macros)
         {
             // Hash function from boost
-            uiHash ^= std::hash<SString>{}(name)       + 0x9e3779b9 + (uiHash << 6) + (uiHash >> 2);
+            uiHash ^= std::hash<SString>{}(name) + 0x9e3779b9 + (uiHash << 6) + (uiHash >> 2);
             uiHash ^= std::hash<SString>{}(definition) + 0x9e3779b9 + (uiHash << 6) + (uiHash >> 2);
         }
 
@@ -50,13 +47,15 @@ class CEffectCloner
 public:
     CEffectCloner(CRenderItemManager* pManager);
     void         DoPulse();
-    CEffectWrap* CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug, const EffectMacroList& macros);
+    CEffectWrap* CreateD3DEffect(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, bool bDebug,
+                                 const EffectMacroList& macros);
     void         ReleaseD3DEffect(CEffectWrap* pD3DEffect);
-private:
-    void         MaybeTidyUp(bool bForceDrasticMeasures = false);
 
-    CElapsedTime                                            m_TidyupTimer;
-    CRenderItemManager*                                     m_pManager;
-    std::unordered_map<SEffectInvariant, CEffectTemplate*>  m_ValidMap;      // Active and files not changed since first created
-    std::vector<CEffectTemplate*>                           m_OldList;       // Active but files changed since first created
+private:
+    void MaybeTidyUp(bool bForceDrasticMeasures = false);
+
+    CElapsedTime                                           m_TidyupTimer;
+    CRenderItemManager*                                    m_pManager;
+    std::unordered_map<SEffectInvariant, CEffectTemplate*> m_ValidMap;            // Active and files not changed since first created
+    std::vector<CEffectTemplate*>                          m_OldList;             // Active but files changed since first created
 };

@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedStartSyncPacket.h"
+#include "CPed.h"
 
 bool CPedStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
 {

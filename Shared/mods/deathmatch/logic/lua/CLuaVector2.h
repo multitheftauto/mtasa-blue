@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "CVector2D.h"
+
 class CLuaVector2D : public CVector2D
 {
 public:

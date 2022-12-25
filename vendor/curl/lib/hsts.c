@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2020 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2020 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,10 +18,12 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 /*
  * The Strict-Transport-Security header is defined in RFC 6797:
- * https://tools.ietf.org/html/rfc6797
+ * https://datatracker.ietf.org/doc/html/rfc6797
  */
 #include "curl_setup.h"
 
@@ -35,7 +37,7 @@
 #include "sendf.h"
 #include "strtoofft.h"
 #include "parsedate.h"
-#include "rand.h"
+#include "fopen.h"
 #include "rename.h"
 #include "strtoofft.h"
 
@@ -49,6 +51,7 @@
 #define MAX_HSTS_HOSTLENSTR "256"
 #define MAX_HSTS_DATELEN 64
 #define MAX_HSTS_DATELENSTR "64"
+#define UNLIMITED "unlimited"
 
 #ifdef DEBUGBUILD
 /* to play well with debug builds, we can *set* a fixed time this will
@@ -113,16 +116,25 @@ static CURLcode hsts_create(struct hsts *h,
                             curl_off_t expires)
 {
   struct stsentry *sts = hsts_entry();
+  char *duphost;
+  size_t hlen;
   if(!sts)
     return CURLE_OUT_OF_MEMORY;
 
-  sts->expires = expires;
-  sts->includeSubDomains = subdomains;
-  sts->host = strdup(hostname);
-  if(!sts->host) {
+  duphost = strdup(hostname);
+  if(!duphost) {
     free(sts);
     return CURLE_OUT_OF_MEMORY;
   }
+
+  hlen = strlen(duphost);
+  if(duphost[hlen - 1] == '.')
+    /* strip off trailing any dot */
+    duphost[--hlen] = 0;
+
+  sts->host = duphost;
+  sts->expires = expires;
+  sts->includeSubDomains = subdomains;
   Curl_llist_insert_next(&h->list, h->list.tail, sts, &sts->node);
   return CURLE_OK;
 }
@@ -144,7 +156,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
     return CURLE_OK;
 
   do {
-    while(*p && ISSPACE(*p))
+    while(*p && ISBLANK(*p))
       p++;
     if(Curl_strncasecompare("max-age=", p, 8)) {
       bool quoted = FALSE;
@@ -155,7 +167,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
         return CURLE_BAD_FUNCTION_ARGUMENT;
 
       p += 8;
-      while(*p && ISSPACE(*p))
+      while(*p && ISBLANK(*p))
         p++;
       if(*p == '\"') {
         p++;
@@ -188,7 +200,7 @@ CURLcode Curl_hsts_parse(struct hsts *h, const char *hostname,
         p++;
     }
 
-    while(*p && ISSPACE(*p))
+    while(*p && ISBLANK(*p))
       p++;
     if(*p == ';')
       p++;
@@ -237,10 +249,21 @@ struct stsentry *Curl_hsts(struct hsts *h, const char *hostname,
                            bool subdomain)
 {
   if(h) {
+    char buffer[MAX_HSTS_HOSTLEN + 1];
     time_t now = time(NULL);
     size_t hlen = strlen(hostname);
     struct Curl_llist_element *e;
     struct Curl_llist_element *n;
+
+    if((hlen > MAX_HSTS_HOSTLEN) || !hlen)
+      return NULL;
+    memcpy(buffer, hostname, hlen);
+    if(hostname[hlen-1] == '.')
+      /* remove the trailing dot */
+      --hlen;
+    buffer[hlen] = 0;
+    hostname = buffer;
+
     for(e = h->list.head; e; e = n) {
       struct stsentry *sts = e->ptr;
       n = e->next;
@@ -283,13 +306,17 @@ static CURLcode hsts_push(struct Curl_easy *data,
   e.namelen = strlen(sts->host);
   e.includeSubDomains = sts->includeSubDomains;
 
-  result = Curl_gmtime((time_t)sts->expires, &stamp);
-  if(result)
-    return result;
+  if(sts->expires != TIME_T_MAX) {
+    result = Curl_gmtime((time_t)sts->expires, &stamp);
+    if(result)
+      return result;
 
-  msnprintf(e.expire, sizeof(e.expire), "%d%02d%02d %02d:%02d:%02d",
-            stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
-            stamp.tm_hour, stamp.tm_min, stamp.tm_sec);
+    msnprintf(e.expire, sizeof(e.expire), "%d%02d%02d %02d:%02d:%02d",
+              stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
+              stamp.tm_hour, stamp.tm_min, stamp.tm_sec);
+  }
+  else
+    strcpy(e.expire, UNLIMITED);
 
   sc = data->set.hsts_write(data, &e, i,
                             data->set.hsts_write_userp);
@@ -303,14 +330,18 @@ static CURLcode hsts_push(struct Curl_easy *data,
 static CURLcode hsts_out(struct stsentry *sts, FILE *fp)
 {
   struct tm stamp;
-  CURLcode result = Curl_gmtime((time_t)sts->expires, &stamp);
-  if(result)
-    return result;
-
-  fprintf(fp, "%s%s \"%d%02d%02d %02d:%02d:%02d\"\n",
-          sts->includeSubDomains ? ".": "", sts->host,
-          stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
-          stamp.tm_hour, stamp.tm_min, stamp.tm_sec);
+  if(sts->expires != TIME_T_MAX) {
+    CURLcode result = Curl_gmtime((time_t)sts->expires, &stamp);
+    if(result)
+      return result;
+    fprintf(fp, "%s%s \"%d%02d%02d %02d:%02d:%02d\"\n",
+            sts->includeSubDomains ? ".": "", sts->host,
+            stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
+            stamp.tm_hour, stamp.tm_min, stamp.tm_sec);
+  }
+  else
+    fprintf(fp, "%s%s \"%s\"\n",
+            sts->includeSubDomains ? ".": "", sts->host, UNLIMITED);
   return CURLE_OK;
 }
 
@@ -325,8 +356,7 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
   struct Curl_llist_element *n;
   CURLcode result = CURLE_OK;
   FILE *out;
-  char *tempstore;
-  unsigned char randsuffix[9];
+  char *tempstore = NULL;
 
   if(!h)
     /* no cache activated */
@@ -340,17 +370,8 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
     /* marked as read-only, no file or zero length file name */
     goto skipsave;
 
-  if(Curl_rand_hex(data, randsuffix, sizeof(randsuffix)))
-    return CURLE_FAILED_INIT;
-
-  tempstore = aprintf("%s.%s.tmp", file, randsuffix);
-  if(!tempstore)
-    return CURLE_OUT_OF_MEMORY;
-
-  out = fopen(tempstore, FOPEN_WRITETEXT);
-  if(!out)
-    result = CURLE_WRITE_ERROR;
-  else {
+  result = Curl_fopen(data, file, &out, &tempstore);
+  if(!result) {
     fputs("# Your HSTS cache. https://curl.se/docs/hsts.html\n"
           "# This file was generated by libcurl! Edit at your own risk.\n",
           out);
@@ -362,10 +383,10 @@ CURLcode Curl_hsts_save(struct Curl_easy *data, struct hsts *h,
         break;
     }
     fclose(out);
-    if(!result && Curl_rename(tempstore, file))
+    if(!result && tempstore && Curl_rename(tempstore, file))
       result = CURLE_WRITE_ERROR;
 
-    if(result)
+    if(result && tempstore)
       unlink(tempstore);
   }
   free(tempstore);
@@ -403,7 +424,8 @@ static CURLcode hsts_add(struct hsts *h, char *line)
               "%" MAX_HSTS_HOSTLENSTR "s \"%" MAX_HSTS_DATELENSTR "[^\"]\"",
               host, date);
   if(2 == rc) {
-    time_t expires = Curl_getdate_capped(date);
+    time_t expires = strcmp(date, UNLIMITED) ? Curl_getdate_capped(date) :
+      TIME_T_MAX;
     CURLcode result;
     char *p = host;
     bool subdomain = FALSE;
@@ -430,7 +452,7 @@ static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
     CURLSTScode sc;
     DEBUGASSERT(h);
     do {
-      char buffer[257];
+      char buffer[MAX_HSTS_HOSTLEN + 1];
       struct curl_hstsentry e;
       e.name = buffer;
       e.namelen = sizeof(buffer)-1;
@@ -456,7 +478,7 @@ static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
           return result;
       }
       else if(sc == CURLSTS_FAIL)
-        return CURLE_BAD_FUNCTION_ARGUMENT;
+        return CURLE_ABORTED_BY_CALLBACK;
     } while(sc == CURLSTS_OK);
   }
   return CURLE_OK;
@@ -464,8 +486,7 @@ static CURLcode hsts_pull(struct Curl_easy *data, struct hsts *h)
 
 /*
  * Load the HSTS cache from the given file. The text based line-oriented file
- * format is documented here:
- * https://github.com/curl/curl/wiki/HSTS
+ * format is documented here: https://curl.se/docs/hsts.html
  *
  * This function only returns error on major problems that prevent hsts
  * handling to work completely. It will ignore individual syntactical errors

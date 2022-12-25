@@ -18,6 +18,8 @@ extern "C"
     #include "lauxlib.h"
 }
 
+#include "luadefs/CLuaDefs.h"
+
 class CLuaVector3Defs : public CLuaDefs
 {
 public:
@@ -42,8 +44,7 @@ public:
     LUA_DECLARE(GetY);
     LUA_DECLARE(GetZ);
 
-    static std::variant<CVector, bool> IntersectsSegmentTriangle(
-        CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2);
+    static std::variant<CVector, bool> IntersectsSegmentTriangle(CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2);
 
     LUA_DECLARE(Add);
     LUA_DECLARE(Sub);

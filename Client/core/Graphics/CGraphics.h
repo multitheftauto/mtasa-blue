@@ -161,8 +161,7 @@ public:
 
     void DrawWiredSphere(CVector vecPosition, float radius, SColor color, float fLineWidth, int iterations);
 
-
-    bool IsValidPrimitiveSize (int iNumVertives, D3DPRIMITIVETYPE eType);
+    bool IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType);
 
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
 
@@ -315,15 +314,15 @@ private:
 
     struct sDrawQueuePrimitive
     {
-        D3DPRIMITIVETYPE                eType;
-        std::vector<PrimitiveVertice>*  pVecVertices;
+        D3DPRIMITIVETYPE               eType;
+        std::vector<PrimitiveVertice>* pVecVertices;
     };
 
     struct sDrawQueuePrimitiveMaterial
     {
-        D3DPRIMITIVETYPE                        eType;
-        CMaterialItem*                          pMaterial;
-        std::vector<PrimitiveMaterialVertice>*  pVecVertices;
+        D3DPRIMITIVETYPE                       eType;
+        CMaterialItem*                         pMaterial;
+        std::vector<PrimitiveMaterialVertice>* pVecVertices;
     };
 
     struct sDrawQueueItem
@@ -333,7 +332,8 @@ private:
         std::wstring   wstrText;
 
         // Queue item data based on the eType.
-        union {
+        union
+        {
             sDrawQueueLine              Line;
             sDrawQueueText              Text;
             sDrawQueueRect              Rect;

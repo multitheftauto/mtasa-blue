@@ -11,12 +11,14 @@
 
 #pragma once
 
-#include <game/CModelInfo.h>
 #include <game/Common.h>
-
+#include <game/CModelInfo.h>
 #include "CRenderWareSA.h"
+
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
+struct CColModelSAInterface;
+struct RpMaterial;
 
 #define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
 
@@ -54,19 +56,13 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     FUNC_IsBmxModel                 0x4c5c20
 #define     FUNC_IsTrailerModel             0x4c5c50
 #define     FUNC_IsVehicleModelType         0x4c5c80
-
 #define     FUNC_RemoveModel                0x4089a0
 #define     FUNC_FlushRequestList           0x40E4E0
-
-#define     FUNC_HasVehicleUpgradeLoaded    0x407820
 #define     FUNC_RequestVehicleUpgrade      0x408C70
 
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
-#define     FUNC_CVehicleStructure_delete   0x4C9580
 
-#define     FUNC_AddPedModel                0x4c67a0
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
-
 
 class CBaseModelInfoSAInterface;
 class CModelInfoSAInterface
@@ -77,7 +73,7 @@ public:
     static CBaseModelInfoSAInterface*  GetModelInfo(int index) { return ms_modelInfoPtrs[index]; }
 };
 
-    /**
+/**
  * \todo Fill this class with info from R*
  */
 class CBaseModelInfo_SA_VTBL
@@ -93,7 +89,7 @@ public:
     DWORD Shutdown;                              // ()
     DWORD DeleteRwObject;                        // ()           - Not defined in the base
     DWORD GetRwModelType;                        // ()           - Not defined in the base
-    DWORD CreateInstance_;                       // (RwMatrixTag*)   - Not defined in the base
+    DWORD CreateInstance_;                       // (RwMatrix*)   - Not defined in the base
     DWORD CreateInstance;                        // ()           - Not defined in the base
     DWORD SetAnimFile;                           // (char const*)
     DWORD ConvertAnimFileIndex;                  // ()
@@ -230,6 +226,7 @@ public:
 
 struct CTimeInfoSAInterface
 {
+    CTimeInfoSAInterface() : m_nTimeOn(20), m_nTimeOff(6), m_wOtherTimeModel(0){};
     CTimeInfoSAInterface(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
     char  m_nTimeOn;
     char  m_nTimeOff;
@@ -246,8 +243,7 @@ class CVehicleModelVisualInfoSAInterface            // Not sure about this name.
 {
 public:
     CVector vecDummies[15];
-    char m_sUpgrade[18];
-
+    char    m_sUpgrade[18];
 };
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -274,7 +270,7 @@ public:
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
     char                                pad3[464];
-    char                                pDirtMaterial[64]; // *RwMaterial
+    char                                pDirtMaterial[64];            // *RwMaterial
     char                                pad4[64];
     char                                primColors[8];
     char                                secondColors[8];
@@ -291,10 +287,6 @@ public:
     char                                pad5[2];
     char                                pAnimBlock[4];
 };
-
-/**
- * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
- */
 
 class CModelInfoSA : public CModelInfo
 {
@@ -330,28 +322,27 @@ public:
 
     bool IsPlayerModel();
 
-    BOOL IsBoat();
-    BOOL IsCar();
-    BOOL IsTrain();
-    BOOL IsHeli();
-    BOOL IsPlane();
-    BOOL IsBike();
-    BOOL IsFakePlane();
-    BOOL IsMonsterTruck();
-    BOOL IsQuadBike();
-    BOOL IsBmx();
-    BOOL IsTrailer();
+    bool IsBoat();
+    bool IsCar();
+    bool IsTrain();
+    bool IsHeli();
+    bool IsPlane();
+    bool IsBike();
+    bool IsFakePlane();
+    bool IsMonsterTruck();
+    bool IsQuadBike();
+    bool IsBmx();
+    bool IsTrailer();
     bool IsVehicle() const override;
-    BOOL IsUpgrade();
+    bool IsUpgrade();
 
     char* GetNameIfVehicle();
 
     BYTE           GetVehicleType();
-    VOID           Request(EModelRequestType requestType, const char* szTag);
-    VOID           Remove();
-    BYTE           GetLevelFromPosition(CVector* vecPosition);
-    BOOL           IsLoaded();
-    BOOL           DoIsLoaded();
+    void           Request(EModelRequestType requestType, const char* szTag);
+    void           Remove();
+    bool           IsLoaded();
+    bool           DoIsLoaded();
     BYTE           GetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
@@ -370,7 +361,7 @@ public:
     bool           SetTime(char cHourOn, char cHourOff);
     static void    StaticResetModelTimes();
 
-    void        SetAlphaTransparencyEnabled(BOOL bEnabled);
+    void        SetAlphaTransparencyEnabled(bool bEnabled);
     bool        IsAlphaTransparencyEnabled();
     void        ResetAlphaTransparency();
     static void StaticResetAlphaTransparencies();
@@ -407,7 +398,7 @@ public:
     void SetVoice(const char* szVoiceType, const char* szVoice);
 
     // Custom collision related functions
-    void SetCustomModel(RpClump* pClump) override;
+    bool SetCustomModel(RpClump* pClump) override;
     void RestoreOriginalModel() override;
     void SetColModel(CColModel* pColModel) override;
     void RestoreColModel() override;
@@ -424,10 +415,11 @@ public:
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void MakePedModel(char* szTexture);
-    void MakeObjectModel(ushort usBaseModelID);
-    void MakeVehicleAutomobile(ushort usBaseModelID);
-    void DeallocateModel(void);
+    void         MakePedModel(char* szTexture);
+    void         MakeObjectModel(ushort usBaseModelID);
+    void         MakeVehicleAutomobile(ushort usBaseModelID);
+    void         MakeTimedObjectModel(ushort usBaseModelID);
+    void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }

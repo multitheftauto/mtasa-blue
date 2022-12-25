@@ -10,14 +10,28 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CConsoleCommands.h"
+#include "CAccount.h"
+#include "CResourceManager.h"
+#include "CConsole.h"
+#include "CAccessControlListManager.h"
+#include "Utils.h"
+#include "packets/CChatEchoPacket.h"
+#include "packets/CPlayerChangeNickPacket.h"
+#include "CStaticFunctionDefinitions.h"
+#include "version.h"
+#include "ASE.h"
+#include "CDatabaseManager.h"
+#include "CGame.h"
+#include "CMainConfig.h"
 
 extern CGame* g_pGame;
 
 // Helper functions
-static string GetAdminNameForLog(CClient* pClient)
+static std::string GetAdminNameForLog(CClient* pClient)
 {
-    string strName = pClient->GetNick();
-    string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName() : "no account";
+    std::string strName = pClient->GetNick();
+    std::string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName() : "no account";
     if (strName == strAccountName)
         return strName;
     return SString("%s(%s)", strName.c_str(), strAccountName.c_str());
@@ -1289,7 +1303,7 @@ bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient
         pEchoClient->SendConsole("help [command]");
 
         // Loop through all added commands
-        int                                    iCount = 0;
+        int iCount = 0;
         for (CConsoleCommand* command : pConsole->CommandsList())
         {
             // Add a new line every third command

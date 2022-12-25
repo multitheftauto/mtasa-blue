@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
@@ -488,7 +489,6 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
     // Draw mode changing?
     if (bDrawModeChanging || bBlendModeChanging)
     {
-
         // Flush old
         if (m_CurDrawMode == EDrawMode::DX_SPRITE)
         {
@@ -844,8 +844,8 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
 }
 
 void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
-                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward, const CVector& vecFaceToward,
-                                         bool bPostGUI)
+                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward,
+                                         const CVector& vecFaceToward, bool bPostGUI)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -955,7 +955,8 @@ void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertice
         m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
 }
 
-void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI)
+void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
+                                              bool bPostGUI)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
@@ -2392,7 +2393,6 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
     return true;
 }
 
-
 namespace
 {
     //
@@ -2509,7 +2509,7 @@ namespace
         }
         return wireModel;
     }
-}            // namespace WireShpere
+}            // namespace
 
 void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColor color, float fLineWidth, int iterations)
 {

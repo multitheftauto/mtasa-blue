@@ -12,28 +12,27 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 
-static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{
-    "chat_font",
-    "chat_lines",
-    "chat_color",
-    "chat_text_color",
-    "chat_input_color",
-    "chat_input_prefix_color",
-    "chat_input_text_color",
-    "chat_scale",
-    "chat_position_offset_x",
-    "chat_position_offset_y",
-    "chat_position_horizontal",
-    "chat_position_vertical",
-    "chat_text_alignment",
-    "chat_width",
-    "chat_css_style_text",
-    "chat_css_style_background",
-    "chat_line_life",
-    "chat_line_fade_out",
-    "chat_use_cegui",
-    "text_scale"
-}};
+static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{"chat_font",
+                                                                                         "chat_lines",
+                                                                                         "chat_color",
+                                                                                         "chat_text_color",
+                                                                                         "chat_input_color",
+                                                                                         "chat_input_prefix_color",
+                                                                                         "chat_input_text_color",
+                                                                                         "chat_scale",
+                                                                                         "chat_position_offset_x",
+                                                                                         "chat_position_offset_y",
+                                                                                         "chat_position_horizontal",
+                                                                                         "chat_position_vertical",
+                                                                                         "chat_text_alignment",
+                                                                                         "chat_width",
+                                                                                         "chat_css_style_text",
+                                                                                         "chat_css_style_background",
+                                                                                         "chat_line_life",
+                                                                                         "chat_line_fade_out",
+                                                                                         "chat_use_cegui",
+                                                                                         "text_scale",
+                                                                                         "chat_text_outline"}};
 
 void CLuaGUIDefs::LoadFunctions()
 {
@@ -711,7 +710,7 @@ int CLuaGUIDefs::GUICreateWindow(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(titleBarText);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -745,7 +744,7 @@ int CLuaGUIDefs::GUICreateLabel(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -780,7 +779,7 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(path);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -832,7 +831,7 @@ int CLuaGUIDefs::GUICreateButton(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -865,7 +864,7 @@ int CLuaGUIDefs::GUICreateProgressBar(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -902,7 +901,7 @@ int CLuaGUIDefs::GUICreateCheckBox(lua_State* luaVM)
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
     argStream.ReadBool(selected);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -937,7 +936,7 @@ int CLuaGUIDefs::GUICreateRadioButton(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -972,7 +971,7 @@ int CLuaGUIDefs::GUICreateEdit(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1007,7 +1006,7 @@ int CLuaGUIDefs::GUICreateMemo(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1040,7 +1039,7 @@ int CLuaGUIDefs::GUICreateGridList(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1073,7 +1072,7 @@ int CLuaGUIDefs::GUICreateScrollPane(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1108,7 +1107,7 @@ int CLuaGUIDefs::GUICreateScrollBar(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadBool(horizontal);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1141,7 +1140,7 @@ int CLuaGUIDefs::GUICreateTabPanel(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1763,7 +1762,7 @@ int CLuaGUIDefs::GUIGetSize(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(theElement);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -1799,7 +1798,7 @@ int CLuaGUIDefs::GUIGetPosition(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(guiElement);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2089,7 +2088,7 @@ int CLuaGUIDefs::GUISetSize(lua_State* luaVM)
     argStream.ReadUserData(guiElement);
     argStream.ReadNumber(width);
     argStream.ReadNumber(height);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2117,7 +2116,7 @@ int CLuaGUIDefs::GUISetPosition(lua_State* luaVM)
     argStream.ReadUserData(guiElement);
     argStream.ReadNumber(x);
     argStream.ReadNumber(y);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2239,7 +2238,7 @@ int CLuaGUIDefs::GUIGridListSetColumnWidth(lua_State* luaVM)
     argStream.ReadUserData<CGUIGridList>(guiGridlist);
     argStream.ReadNumber(columnIndex);
     argStream.ReadNumber(width);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2265,7 +2264,7 @@ int CLuaGUIDefs::GUIGridListGetColumnWidth(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIGridList>(pGridList);
     argStream.ReadNumber(columnIndex);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -3190,7 +3189,7 @@ int CLuaGUIDefs::GUIEditSetMasked(lua_State* luaVM)
 
 int CLuaGUIDefs::GUIEditIsMasked(lua_State* luaVM)
 {
-    //bool guiEditIsMasked(element theElement)
+    // bool guiEditIsMasked(element theElement)
     CClientGUIElement* theElement;
 
     CScriptArgReader argStream(luaVM);
@@ -3654,6 +3653,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
     //* chat_line_fade_out - Returns how long takes for text to fade out
     //* chat_use_cegui - Returns whether CEGUI is used to render the chatbox
     //* text_scale - Returns text scale
+    //* chat_text_outline - Returns whether text black/white outline is used
 
     CScriptArgReader  argStream(luaVM);
     CCVarsInterface*  pCVars = g_pCore->GetCVars();
@@ -3679,11 +3679,8 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
             if (bAll || !stricmp(g_chatboxLayoutCVars[i], strCVarArg))
             {
                 // Push color values into a table
-                if (g_chatboxLayoutCVars[i] == "chat_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_text_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_input_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" ||
-                    g_chatboxLayoutCVars[i] == "chat_input_text_color")
+                if (g_chatboxLayoutCVars[i] == "chat_color" || g_chatboxLayoutCVars[i] == "chat_text_color" || g_chatboxLayoutCVars[i] == "chat_input_color" ||
+                    g_chatboxLayoutCVars[i] == "chat_input_prefix_color" || g_chatboxLayoutCVars[i] == "chat_input_text_color")
                 {
                     pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
                     if (!strCVarValue.empty())
@@ -3767,7 +3764,7 @@ int CLuaGUIDefs::GUICreateComboBox(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(caption);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -3953,7 +3950,7 @@ int CLuaGUIDefs::GUIComboBoxGetItemCount(lua_State* luaVM)
 {
     // int guiComboBoxGetItemCount( element comboBox )
     CClientGUIElement* comboBox;
-    CScriptArgReader argStream(luaVM);
+    CScriptArgReader   argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
 
     if (!argStream.HasErrors())
@@ -3974,8 +3971,8 @@ int CLuaGUIDefs::GUIComboBoxSetOpen(lua_State* luaVM)
 {
     // bool guiComboBoxSetOpen( element comboBox, bool state)
     CClientGUIElement* comboBox;
-    bool state;
-    CScriptArgReader argStream(luaVM);
+    bool               state;
+    CScriptArgReader   argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
     argStream.ReadBool(state);
 
@@ -3996,7 +3993,7 @@ int CLuaGUIDefs::GUIComboBoxIsOpen(lua_State* luaVM)
 {
     // bool guiComboBoxIsOpen( element comboBox )
     CClientGUIElement* comboBox;
-    CScriptArgReader argStream(luaVM);
+    CScriptArgReader   argStream(luaVM);
     argStream.ReadUserData<CGUIComboBox>(comboBox);
 
     if (!argStream.HasErrors())

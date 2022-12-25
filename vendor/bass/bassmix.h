@@ -1,6 +1,6 @@
 /*
 	BASSmix 2.4 C/C++ header file
-	Copyright (c) 2005-2021 Un4seen Developments Ltd.
+	Copyright (c) 2005-2022 Un4seen Developments Ltd.
 
 	See the BASSMIX.CHM file for more detailed documentation
 */
@@ -12,6 +12,11 @@
 
 #if BASSVERSION!=0x204
 #error conflicting BASS and BASSmix versions
+#endif
+
+#ifdef __OBJC__
+typedef int BOOL32;
+#define BOOL BOOL32 // override objc's BOOL
 #endif
 
 #ifdef __cplusplus
@@ -28,19 +33,21 @@ extern "C" {
 #define BASS_CONFIG_SPLIT_BUFFER	0x10610
 
 // BASS_Mixer_StreamCreate flags
-#define BASS_MIXER_END			0x10000	// end the stream when there are no sources
-#define BASS_MIXER_NONSTOP		0x20000	// don't stall when there are no sources
-#define BASS_MIXER_RESUME		0x1000	// resume stalled immediately upon new/unpaused source
-#define BASS_MIXER_POSEX		0x2000	// enable BASS_Mixer_ChannelGetPositionEx support
+#define BASS_MIXER_RESUME			0x1000	// resume stalled immediately upon new/unpaused source
+#define BASS_MIXER_POSEX			0x2000	// enable BASS_Mixer_ChannelGetPositionEx support
+#define BASS_MIXER_NOSPEAKER		0x4000	// ignore speaker arrangement
+#define BASS_MIXER_QUEUE			0x8000	// queue sources
+#define BASS_MIXER_END				0x10000	// end the stream when there are no sources
+#define BASS_MIXER_NONSTOP			0x20000	// don't stall when there are no sources
 
 // BASS_Mixer_StreamAddChannel/Ex flags
-#define BASS_MIXER_CHAN_ABSOLUTE		0x1000	// start is an absolute position
+#define BASS_MIXER_CHAN_ABSOLUTE	0x1000	// start is an absolute position
 #define BASS_MIXER_CHAN_BUFFER		0x2000	// buffer data for BASS_Mixer_ChannelGetData/Level
 #define BASS_MIXER_CHAN_LIMIT		0x4000	// limit mixer processing to the amount available from this source
 #define BASS_MIXER_CHAN_MATRIX		0x10000	// matrix mixing
 #define BASS_MIXER_CHAN_PAUSE		0x20000	// don't process the source
 #define BASS_MIXER_CHAN_DOWNMIX		0x400000 // downmix to stereo/mono
-#define BASS_MIXER_CHAN_NORAMPIN		0x800000 // don't ramp-in the start
+#define BASS_MIXER_CHAN_NORAMPIN	0x800000 // don't ramp-in the start
 #define BASS_MIXER_BUFFER		BASS_MIXER_CHAN_BUFFER
 #define BASS_MIXER_LIMIT		BASS_MIXER_CHAN_LIMIT
 #define BASS_MIXER_MATRIX		BASS_MIXER_CHAN_MATRIX
@@ -51,9 +58,11 @@ extern "C" {
 // Mixer attributes
 #define BASS_ATTRIB_MIXER_LATENCY	0x15000
 #define BASS_ATTRIB_MIXER_THREADS	0x15001
+#define BASS_ATTRIB_MIXER_VOL		0x15002
 
 // Additional BASS_Mixer_ChannelIsActive return values
 #define BASS_ACTIVE_WAITING			5
+#define BASS_ACTIVE_QUEUED			6
 
 // BASS_Split_StreamCreate flags
 #define BASS_SPLIT_SLAVE		0x1000	// only read buffered data
@@ -79,15 +88,19 @@ typedef struct {
 // Additional sync types
 #define BASS_SYNC_MIXER_ENVELOPE		0x10200
 #define BASS_SYNC_MIXER_ENVELOPE_NODE	0x10201
+#define BASS_SYNC_MIXER_QUEUE			0x10202
 
 // Additional BASS_Mixer_ChannelSetPosition flag
 #define BASS_POS_MIXER_RESET	0x10000 // flag: clear mixer's playback buffer
+
+// Additional BASS_Mixer_ChannelGetPosition mode
+#define BASS_POS_MIXER_DELAY	5
 
 // BASS_CHANNELINFO types
 #define BASS_CTYPE_STREAM_MIXER	0x10800
 #define BASS_CTYPE_STREAM_SPLIT	0x10801
 
-DWORD BASSMIXDEF(BASS_Mixer_GetVersion)();
+DWORD BASSMIXDEF(BASS_Mixer_GetVersion)(void);
 
 HSTREAM BASSMIXDEF(BASS_Mixer_StreamCreate)(DWORD freq, DWORD chans, DWORD flags);
 BOOL BASSMIXDEF(BASS_Mixer_StreamAddChannel)(HSTREAM handle, DWORD channel, DWORD flags);
@@ -122,6 +135,10 @@ DWORD BASSMIXDEF(BASS_Split_StreamGetAvailable)(DWORD handle);
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __OBJC__
+#undef BOOL
 #endif
 
 #endif

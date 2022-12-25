@@ -10,9 +10,9 @@
 // Vertex type used by the primitives batcher
 struct sPrimitiveMaterial
 {
-    D3DPRIMITIVETYPE                        eType;
-    CMaterialItem*                          pMaterial;
-    std::vector<PrimitiveMaterialVertice>*  pVecVertices;
+    D3DPRIMITIVETYPE                       eType;
+    CMaterialItem*                         pMaterial;
+    std::vector<PrimitiveMaterialVertice>* pVecVertices;
 };
 //
 // Batches primitives drawing

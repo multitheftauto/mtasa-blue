@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "Common.h"
 #include <game/CAEAudioHardware.h>
 
 #define FUNC_CAEAudioHardware__IsSoundBankLoaded                            0x4D88C0
