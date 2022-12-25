@@ -46,21 +46,6 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_DIALOG1 DIALOGEX 0, 0, 333, 151
-STYLE DS_SETFONT | DS_CENTER | WS_POPUP | WS_VISIBLE
-EXSTYLE WS_EX_TOOLWINDOW
-FONT 8, "MS Sans Serif", 0, 0, 0x0
-BEGIN
-    CONTROL         IDB_BITMAP1,IDC_SPLASHBITMAP,"Static",SS_BITMAP,0,0,333,151
-END
-
-
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -117,15 +102,15 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Play MTA:SA",IDOK,153,209,67,14
     PUSHBUTTON      "Quit",IDCANCEL,245,209,67,14
-    CTEXT           "Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:",IDC_D3DDLL_TEXT1,31,26,310,17
-    EDITTEXT        IDC_EDIT_D3DDLL_PATH,31,46,310,14,ES_CENTER | ES_AUTOHSCROLL | ES_READONLY
-    CTEXT           "The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename d3d9.dll",IDC_D3DDLL_TEXT2,14,81,345,33
+    CTEXT           "Your Grand Theft Auto: San Andreas install directory contains one of these files:",IDC_D3DDLL_TEXT1,31,18,310,17 
+    EDITTEXT        IDC_EDIT_GRAPHICS_DLL_PATH,31,30,310,50,ES_CENTER | ES_AUTOHSCROLL | ES_AUTOVSCROLL | ES_READONLY | ES_MULTILINE | WS_VSCROLL
+    CTEXT           "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\nIt is recommended that you remove or rename these files.",IDC_D3DDLL_TEXT2,14,91,345,33
     GROUPBOX        "",IDC_STATIC,7,7,359,122
     GROUPBOX        "",IDC_STATIC,7,142,359,43
-    CONTROL         " Use this d3d9.dll, but also show this warning on next start",IDC_NO_ACTION,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,151,228,10
-    CONTROL         " Do not tell me about this d3d9.dll again",IDC_CHECK_NOT_AGAIN,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,161,228,10
-    CONTROL         " Rename this d3d9.dll to d3d9.dll.bak",IDC_APPLY_AUTOMATIC_CHANGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,171,228,10
-    PUSHBUTTON      "Show me the file",IDC_BUTTON_SHOW_DIR,61,209,67,14
+    CONTROL         " Keep these files, but also show this warning on next start",IDC_NO_ACTION,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,151,228,10
+    CONTROL         " Do not remind me about these files again",IDC_CHECK_NOT_AGAIN,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,161,228,10
+    CONTROL         " Rename these files from *.dll to *.dll.bak",IDC_APPLY_AUTOMATIC_CHANGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,61,171,228,10
+    PUSHBUTTON      "Show me these files",IDC_BUTTON_SHOW_DIR,56,209,77,14
 END
 
 IDD_OPTIMUS_DIALOG DIALOGEX 0, 0, 238, 260

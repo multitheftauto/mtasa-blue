@@ -11,8 +11,8 @@
 
 #pragma once
 
+#include <CVector2D.h>
 #include <game/TaskSecondary.h>
-
 #include "TaskSA.h"
 
 // typedef int CAnimBlendAssociation       ;

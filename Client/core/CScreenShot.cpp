@@ -16,6 +16,7 @@ extern CCore* g_pCore;
 
 static char szScreenShotPath[MAX_PATH] = {0};
 static bool bIsChatVisible = false;
+static bool bIsChatInputBlocked = false;
 static bool bIsDebugVisible = false;
 
 // Variables used for saving the screen shot file on a separate thread
@@ -30,12 +31,13 @@ static SString ms_strFileName;
 SString CScreenShot::PreScreenShot()
 {
     bIsChatVisible = g_pCore->IsChatVisible();
+    bIsChatInputBlocked = g_pCore->IsChatInputBlocked();
     bIsDebugVisible = g_pCore->IsDebugVisible();
 
     // make the chat and debug windows invisible
     if (ms_bHideChatBox)
     {
-        g_pCore->SetChatVisible(false);
+        g_pCore->SetChatVisible(false, true);
         g_pCore->SetDebugVisible(false);
     }
 
@@ -51,7 +53,7 @@ void CScreenShot::PostScreenShot(const SString& strFileName)
         g_pCore->GetConsole()->Printf(_("Screenshot taken: '%s'"), *strFileName);
 
     // make the chat and debug windows visible again
-    g_pCore->SetChatVisible(bIsChatVisible);
+    g_pCore->SetChatVisible(bIsChatVisible, bIsChatInputBlocked);
     g_pCore->SetDebugVisible(bIsDebugVisible);
 }
 

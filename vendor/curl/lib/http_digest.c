@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -56,18 +58,17 @@ CURLcode Curl_input_digest(struct Curl_easy *data,
     digest = &data->state.digest;
   }
 
-  if(!checkprefix("Digest", header))
+  if(!checkprefix("Digest", header) || !ISBLANK(header[6]))
     return CURLE_BAD_CONTENT_ENCODING;
 
   header += strlen("Digest");
-  while(*header && ISSPACE(*header))
+  while(*header && ISBLANK(*header))
     header++;
 
   return Curl_auth_decode_digest_http_message(header, digest);
 }
 
 CURLcode Curl_output_digest(struct Curl_easy *data,
-                            struct connectdata *conn,
                             bool proxy,
                             const unsigned char *request,
                             const unsigned char *uripath)
@@ -97,16 +98,16 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
 #else
     digest = &data->state.proxydigest;
     allocuserpwd = &data->state.aptr.proxyuserpwd;
-    userp = conn->http_proxy.user;
-    passwdp = conn->http_proxy.passwd;
+    userp = data->state.aptr.proxyuser;
+    passwdp = data->state.aptr.proxypasswd;
     authp = &data->state.authproxy;
 #endif
   }
   else {
     digest = &data->state.digest;
     allocuserpwd = &data->state.aptr.userpwd;
-    userp = conn->user;
-    passwdp = conn->passwd;
+    userp = data->state.aptr.user;
+    passwdp = data->state.aptr.passwd;
     authp = &data->state.authhost;
   }
 
@@ -147,7 +148,8 @@ CURLcode Curl_output_digest(struct Curl_easy *data,
     tmp = strchr((char *)uripath, '?');
     if(tmp) {
       size_t urilen = tmp - (char *)uripath;
-      path = (unsigned char *) aprintf("%.*s", urilen, uripath);
+      /* typecast is fine here since the value is always less than 32 bits */
+      path = (unsigned char *) aprintf("%.*s", (int)urilen, uripath);
     }
   }
   if(!tmp)

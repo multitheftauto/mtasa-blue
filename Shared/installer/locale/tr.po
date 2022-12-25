@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-03 05:23\n"
-"PO-Revision-Date: 2018-04-15 12:51+0000\n"
+"PO-Revision-Date: 2021-06-07 19:35+0000\n"
 "Last-Translator: Mert <mert.mte@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: tr\n"
@@ -12,9 +12,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; Talidan; WindowsOttoman; RaceXtreme; Oguzcan; ccw; Eren Yücel; Cynydlan; TRFURKAN; velona77; Wickness\n"
-"X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1523796677.0\n"
+"Translators: Furkan Özden; Avenger; Mert \"MaXenon\"; Darkneblade; Semih; Oguzcan Uyar; Colegon; Samurai; Mert; Talidan; WindowsOttoman; RaceXtreme; ccw; Oguzcan; qaisjp; Eren Yücel; Cynydlan; Wickness; TRFURKAN; daaeernil; velona77\n"
+"X-Generator: Pootle 2.5.1.3\n"
+"X-POOTLE-MTIME: 1623094559.000000\n"
 
 #. GET_XPVISTA_PLEASE
 #: ../Shared/installer/nightly.nsi:183
@@ -47,9 +47,9 @@ msgid ""
 msgstr ""
 "Bu sihirbaz kurulum ve güncelleştirme için size eşlik edecek. $(^Name) ${REVISION_TAG}\n"
 "\n"
-"Kurulum başlamadan önce arka planda çalışan uygulamaları kapatmanız önerilir. Setup.\n"
+"Kurulum başlamadan önce arka planda çalışan uygulamaları kapatmanız önerilir.\n"
 "\n"
-"[Admin access may be requested for Vista and up]\n"
+"[Vista ve üzeri sürümler için yönetici onayı gerekebilir.]\n"
 "\n"
 "Devam etmek için tıklayın."
 
@@ -265,7 +265,7 @@ msgstr "Çekirdek Dosyaları"
 #. INST_SEC_OPTIONAL_RESOURCES
 #: ../Shared/installer/nightly.nsi:473
 msgid "Optional Resources"
-msgstr "Opyisonal Kanyaklar"
+msgstr "Opyisonel Kaynaklar"
 
 #. INST_SEC_EDITOR
 #: ../Shared/installer/nightly.nsi:474
@@ -292,7 +292,7 @@ msgstr "Kaldırma hatası oluştu !"
 msgid ""
 "Are you sure you want to completely remove $(^Name) and all of its "
 "components?"
-msgstr "Tamamen $(^Name) bileşenlerini kaldırmak istiyormusunuz"
+msgstr "$(^Name) bileşenlerini tamamen kaldırmak istediğinize emin misiniz?"
 
 #. UNINST_REQUEST_NOTE
 #: ../Shared/installer/nightly.nsi:1033
@@ -349,7 +349,7 @@ msgstr "Bu kurucu admin ulaşımı istiyor , tekrar deneyin"
 #. UAC_RIGHTS3
 #: ../Shared/installer/nightly.nsi:1183
 msgid "Logon service not running, aborting!"
-msgstr "Oturum Açma hizmeti iptal, çalışmıyor!"
+msgstr "Oturum Açma hizmeti çalışmıyor, iptal ediliyor!"
 
 #. UAC_RIGHTS4
 #: ../Shared/installer/nightly.nsi:1184

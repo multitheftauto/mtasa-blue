@@ -52,6 +52,7 @@ typedef enum
 
 #endif  //defined(__cplusplus) && (defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__))
 #if defined(__cplusplus) && defined(__d3d11_h__)
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FUNCTION NAME: NvAPI_D3D11_CreateDevice
@@ -62,7 +63,11 @@ typedef enum
 //!                argument (D3D_FEATURE_LEVEL supported by the device) that the function fills in. This argument
 //!                can contain -1 (NVAPI_DEVICE_FEATURE_LEVEL_NULL), if the requested featureLevel is less than DirecX 10.0.
 //!
-//! SUPPORTED OS:  Windows Vista and higher
+//!            NOTE: When NvAPI_D3D11_CreateDevice is called with 10+ feature level we have an issue on few set of
+//!                  tesla hardware (G80/G84/G86/G92/G94/G96) which does not support all feature level 10+ functionality
+//!                  e.g. calling driver with mismatch between RenderTarget and Depth Buffer. App developers should
+//!                  take into consideration such limitation when using NVAPI on such tesla hardwares.
+//! SUPPORTED OS:  Windows 7 and higher
 //!
 //!
 //! \since Release: 185
@@ -86,10 +91,10 @@ typedef enum
 NVAPI_INTERFACE NvAPI_D3D11_CreateDevice(IDXGIAdapter* pAdapter,
                                          D3D_DRIVER_TYPE DriverType,
                                          HMODULE Software,
-										 NvU32 Flags,
+                                         UINT Flags,
                                          CONST D3D_FEATURE_LEVEL *pFeatureLevels,
-										 NvU32 FeatureLevels,
-										 NvU32 SDKVersion,
+                                         UINT FeatureLevels,
+                                         UINT SDKVersion,
                                          ID3D11Device **ppDevice,
                                          D3D_FEATURE_LEVEL *pFeatureLevel,
                                          ID3D11DeviceContext **ppImmediateContext,
@@ -98,6 +103,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateDevice(IDXGIAdapter* pAdapter,
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 #if defined(__cplusplus) && defined(__d3d11_h__)
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FUNCTION NAME: NvAPI_D3D11_CreateDeviceAndSwapChain
@@ -109,7 +115,7 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateDevice(IDXGIAdapter* pAdapter,
 //!                in. This argument can contain -1 (NVAPI_DEVICE_FEATURE_LEVEL_NULL), if the requested featureLevel
 //!                is less than DirectX 10.0.
 //!
-//! SUPPORTED OS:  Windows Vista and higher
+//! SUPPORTED OS:  Windows 7 and higher
 //!
 //!
 //! \since Release: 185
@@ -135,10 +141,10 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateDevice(IDXGIAdapter* pAdapter,
 NVAPI_INTERFACE NvAPI_D3D11_CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter,
                                          D3D_DRIVER_TYPE DriverType,
                                          HMODULE Software,
-										 NvU32 Flags,
+                                         UINT Flags,
                                          CONST D3D_FEATURE_LEVEL *pFeatureLevels,
-										 NvU32 FeatureLevels,
-										 NvU32 SDKVersion,
+                                         UINT FeatureLevels,
+                                         UINT SDKVersion,
                                          CONST DXGI_SWAP_CHAIN_DESC *pSwapChainDesc,
                                          IDXGISwapChain **ppSwapChain,
                                          ID3D11Device **ppDevice,
@@ -150,27 +156,28 @@ NVAPI_INTERFACE NvAPI_D3D11_CreateDeviceAndSwapChain(IDXGIAdapter* pAdapter,
 
 #endif //defined(__cplusplus) && defined(__d3d11_h__)
 #if defined(__cplusplus) && defined(__d3d11_h__)
+
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FUNCTION NAME: NvAPI_D3D11_SetDepthBoundsTest
 //
 //!   DESCRIPTION: This function enables/disables the depth bounds test
 //!
-//! SUPPORTED OS:  Windows Vista and higher
+//! SUPPORTED OS:  Windows 7 and higher
 //!
 //!
-//! \param [in]        pDev         The device to set depth bounds test
-//! \param [in]        bEnable      Enable(non-zero)/disable(zero) the depth bounds test
-//! \param [in]        fMinDepth    The minimum depth for depth bounds test
-//! \param [in]        fMaxDepth    The maximum depth for depth bounds test
-//!                                 The valid values for fMinDepth and fMaxDepth
-//!                                 are such that 0 <= fMinDepth <= fMaxDepth <= 1
+//! \param [in]        pDeviceOrContext   The device or device context to set depth bounds test
+//! \param [in]        bEnable            Enable(non-zero)/disable(zero) the depth bounds test
+//! \param [in]        fMinDepth          The minimum depth for depth bounds test
+//! \param [in]        fMaxDepth          The maximum depth for depth bounds test
+//!                                       The valid values for fMinDepth and fMaxDepth
+//!                                       are such that 0 <= fMinDepth <= fMaxDepth <= 1
 //!
 //! \return  ::NVAPI_OK if the depth bounds test was correcly enabled or disabled
 //!
 //! \ingroup dx
 ///////////////////////////////////////////////////////////////////////////////
-NVAPI_INTERFACE NvAPI_D3D11_SetDepthBoundsTest(ID3D11Device *pDev,
+NVAPI_INTERFACE NvAPI_D3D11_SetDepthBoundsTest(IUnknown* pDeviceOrContext,
                                                NvU32 bEnable,
                                                float fMinDepth,
                                                float fMaxDepth);
