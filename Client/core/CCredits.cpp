@@ -262,7 +262,7 @@ CCredits::CCredits()
         "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
         "bzip2 (http://www.bzip.org/)\n"
         "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
-        "CEGUI (http://www.cegui.org.uk/)\n"
+        "CEGUI (http://cegui.org.uk/)\n"
         "CRC-32 (https://bochs.sourceforge.io/)\n"
         "cURL (https://curl.se/)\n"
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
