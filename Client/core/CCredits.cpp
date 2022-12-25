@@ -282,6 +282,7 @@ CCredits::CCredits()
         "nvapi (https://developer.nvidia.com/rtx/path-tracing/nvapi/get-started)\n"
         "pme by Zac Hansen\n"
         "PortAudio (http://www.portaudio.com/)\n"
+        "pthreads-win32 (https://sourceware.org/pthreads-win32/)\n"
         "RakNet (http://www.jenkinssoftware.com/)\n"
         "SA Limit adjuster source code (Credits to Sacky)\n"
         "speex (https://www.speex.org/)\n"
