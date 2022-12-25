@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,8 +19,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -67,13 +65,11 @@ struct Curl_hash *Curl_global_host_cache_init(void);
 
 struct Curl_dns_entry {
   struct Curl_addrinfo *addr;
-  /* timestamp == 0 -- permanent CURLOPT_RESOLVE entry (doesn't time out) */
+  /* timestamp == 0 -- CURLOPT_RESOLVE entry, doesn't timeout */
   time_t timestamp;
   /* use-counter, use Curl_resolv_unlock to release reference */
   long inuse;
 };
-
-bool Curl_host_is_ipnum(const char *hostname);
 
 /*
  * Curl_resolv() returns an entry with the info for the specified host
@@ -89,21 +85,21 @@ enum resolve_t {
   CURLRESOLV_RESOLVED =  0,
   CURLRESOLV_PENDING  =  1
 };
-enum resolve_t Curl_resolv(struct Curl_easy *data,
+enum resolve_t Curl_resolv(struct connectdata *conn,
                            const char *hostname,
                            int port,
                            bool allowDOH,
                            struct Curl_dns_entry **dnsentry);
-enum resolve_t Curl_resolv_timeout(struct Curl_easy *data,
+enum resolve_t Curl_resolv_timeout(struct connectdata *conn,
                                    const char *hostname, int port,
                                    struct Curl_dns_entry **dnsentry,
                                    timediff_t timeoutms);
 
-#ifdef ENABLE_IPV6
+#ifdef CURLRES_IPV6
 /*
  * Curl_ipv6works() returns TRUE if IPv6 seems to work.
  */
-bool Curl_ipv6works(struct Curl_easy *data);
+bool Curl_ipv6works(struct connectdata *conn);
 #else
 #define Curl_ipv6works(x) FALSE
 #endif
@@ -112,7 +108,7 @@ bool Curl_ipv6works(struct Curl_easy *data);
  * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
  */
-bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn);
+bool Curl_ipvalid(struct connectdata *conn);
 
 
 /*
@@ -121,7 +117,7 @@ bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn);
  * name resolve layers (selected at build-time). They all take this same set
  * of arguments
  */
-struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
+struct Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
                                        const char *hostname,
                                        int port,
                                        int *waitp);
@@ -131,8 +127,8 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 void Curl_resolv_unlock(struct Curl_easy *data,
                         struct Curl_dns_entry *dns);
 
-/* init a new dns cache */
-void Curl_init_dnscache(struct Curl_hash *hash, int hashsize);
+/* init a new dns cache and return success */
+int Curl_mk_dnscache(struct Curl_hash *hash);
 
 /* prune old entries from the DNS cache */
 void Curl_hostcache_prune(struct Curl_easy *data);
@@ -140,10 +136,19 @@ void Curl_hostcache_prune(struct Curl_easy *data);
 /* Return # of addresses in a Curl_addrinfo struct */
 int Curl_num_addresses(const struct Curl_addrinfo *addr);
 
+#if defined(CURLDEBUG) && defined(HAVE_GETNAMEINFO)
+int curl_dogetnameinfo(GETNAMEINFO_QUAL_ARG1 GETNAMEINFO_TYPE_ARG1 sa,
+                       GETNAMEINFO_TYPE_ARG2 salen,
+                       char *host, GETNAMEINFO_TYPE_ARG46 hostlen,
+                       char *serv, GETNAMEINFO_TYPE_ARG46 servlen,
+                       GETNAMEINFO_TYPE_ARG7 flags,
+                       int line, const char *source);
+#endif
+
 /* IPv4 threadsafe resolve function used for synch and asynch builds */
 struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname, int port);
 
-CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_connect);
+CURLcode Curl_once_resolved(struct connectdata *conn, bool *protocol_connect);
 
 /*
  * Curl_addrinfo_callback() is used when we build with any asynch specialty.
@@ -151,7 +156,7 @@ CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_connect);
  * status is CURL_ASYNC_SUCCESS. Twiddles fields in conn to indicate async
  * request completed whether successful or failed.
  */
-CURLcode Curl_addrinfo_callback(struct Curl_easy *data,
+CURLcode Curl_addrinfo_callback(struct connectdata *conn,
                                 int status,
                                 struct Curl_addrinfo *ai);
 
@@ -172,7 +177,7 @@ void Curl_printable_address(const struct Curl_addrinfo *ip,
  * use, or we'll leak memory!
  */
 struct Curl_dns_entry *
-Curl_fetch_addr(struct Curl_easy *data,
+Curl_fetch_addr(struct connectdata *conn,
                 const char *hostname,
                 int port);
 
@@ -235,10 +240,10 @@ void Curl_hostcache_clean(struct Curl_easy *data, struct Curl_hash *hash);
  * Populate the cache with specified entries from CURLOPT_RESOLVE.
  */
 CURLcode Curl_loadhostpairs(struct Curl_easy *data);
-CURLcode Curl_resolv_check(struct Curl_easy *data,
+
+CURLcode Curl_resolv_check(struct connectdata *conn,
                            struct Curl_dns_entry **dns);
-int Curl_resolv_getsock(struct Curl_easy *data,
+int Curl_resolv_getsock(struct connectdata *conn,
                         curl_socket_t *socks);
 
-CURLcode Curl_resolver_error(struct Curl_easy *data);
 #endif /* HEADER_CURL_HOSTIP_H */

@@ -10,12 +10,35 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CGameSA.h"
-#include "CProjectileInfoSA.h"
-#include "CVehicleSA.h"
-#include "CWorldSA.h"
 
 extern CGameSA* pGame;
+/**
+ * This destroys all the projectiles in the world
+ */
+void CProjectileInfoSA::RemoveAllProjectiles()
+{
+    DEBUG_TRACE("void CProjectileInfoSA::RemoveAllProjectiles (  )");
+    DWORD dwFunction = FUNC_RemoveAllProjectiles;
+    _asm
+    {
+        call    dwFunction
+    }
+}
+
+/**
+ * Gets a projectile class for a specific projectile ID
+ * @param ID valid projectile ID (0-31)
+ * @return CProjectile * for the requested projectile, or NULL if the projectile slot is empty or the ID is invalid
+ * \todo Check this CProjectile array is how it says in the function
+ */
+CProjectile* CProjectileInfoSA::GetProjectile(DWORD ID)
+{
+    DEBUG_TRACE("CProjectile * CProjectileInfoSA::GetProjectile ( DWORD ID )");
+    if (ID >= 0 && ID < 32)
+        return (CProjectile*)(ARRAY_CProjectile + ID * sizeof(CProjectile*));
+    else
+        return NULL;
+}
 
 CProjectile* CProjectileInfoSA::GetProjectile(void* projectilePointer)
 {
@@ -71,6 +94,16 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
     }
 }
 
+CProjectileInfo* CProjectileInfoSA::GetNextFreeProjectileInfo()
+{
+    for (int i = 0; i < PROJECTILE_INFO_COUNT; i++)
+    {
+        if (projectileInfo[i]->internalInterface->dwProjectileType == 0)
+            return projectileInfo[i];
+    }
+    return NULL;
+}
+
 CProjectileInfo* CProjectileInfoSA::GetProjectileInfo(DWORD dwIndex)
 {
     return projectileInfo[dwIndex];
@@ -89,10 +122,12 @@ CProjectileInfo* CProjectileInfoSA::GetProjectileInfo(DWORD dwIndex)
 
 bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity)
 {
+    DEBUG_TRACE("bool CProjectileInfoSA::AddProjectile ( CEntity * creator, eWeaponType eWeapon, CVector vecOffset, float fForce )");
+
     DWORD               dwFunction = FUNC_AddProjectile;
     DWORD               dwReturn = 0;
-    CEntitySAInterface* creatorVC = nullptr;
-    if (creator != nullptr)
+    CEntitySAInterface* creatorVC = NULL;
+    if (creator != NULL)
     {
         CEntitySA* pCreatorSA = dynamic_cast<CEntitySA*>(creator);
         if (pCreatorSA)
@@ -102,9 +137,9 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
         }
     }
 
-    CEntitySAInterface* targetVC = nullptr;
+    CEntitySAInterface* targetVC = NULL;
 
-    if (targetEntity != nullptr)
+    if (targetEntity != NULL)
     {
         CEntitySA* pTargetEntitySA = dynamic_cast<CEntitySA*>(targetEntity);
         if (pTargetEntitySA)
@@ -130,14 +165,14 @@ bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVe
 
         pop     eax
     }
-    pGame->GetWorld()->IgnoreEntity(nullptr);
+    pGame->GetWorld()->IgnoreEntity(NULL);
     return dwReturn != 0;
 }
 
 CEntity* CProjectileInfoSA::GetTarget()
 {
     CEntitySAInterface* pTargetInterface = internalInterface->pEntProjectileTarget;
-    CEntity*            pTarget = nullptr;
+    CEntity*            pTarget = NULL;
     if (pTargetInterface)
     {
         switch (pTargetInterface->nType)
@@ -169,14 +204,4 @@ void CProjectileInfoSA::SetTarget(CEntity* pEntity)
 bool CProjectileInfoSA::IsActive()
 {
     return (internalInterface->bProjectileActive == 1 && internalInterface->dwProjectileType != 0);
-}
-
-void CProjectileInfoSA::SetCounter(DWORD dwCounter)
-{
-    internalInterface->dwCounter = dwCounter + pGame->GetSystemTime();
-}
-
-DWORD CProjectileInfoSA::GetCounter()
-{
-    return internalInterface->dwCounter - pGame->GetSystemTime();
 }

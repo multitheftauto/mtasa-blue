@@ -79,17 +79,8 @@ function os.expanddir_wildcard(from, to)
 	if not dir then return end
 
 	-- TODO: Optimize this
-	if not os.copydir(dir, to) then
-		errormsg("ERROR: Couldn't copy directory", ("\nTried to copy %s to %s"):format(dir, to))
-		os.exit(1)
-		return
-	end
-
-	if not os.rmdir(dir) then
-		errormsg("ERROR: Couldn't remove directory", ("\nTried to remove %s"):format(dir))
-		os.exit(1)
-		return
-	end
+	os.copydir(dir, to)
+	os.rmdir(dir)
 end
 
 function os.sha256_file(path)
@@ -119,37 +110,21 @@ function os.extract_archive(archive_path, target_path, override)
 	local flags = override and "-aoa" or "-aos"
 
 	if os.host() == "windows" then
-		return os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
+		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	else
-		if not os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path) then
-			return os.executef("unzip \"%s\" -d \"%s\"", archive_path, target_path)
-		end
+		os.executef("7z x \"%s\" %s -o\"%s\"", archive_path, flags, target_path)
 	end
-
-	return false
 end
 
 function http.download_print_errors(url, file, options)
 	local result_str, response_code = http.download(url, file, options)
 	if result_str ~= "OK" then
-		errormsg("ERROR: Download failed", "\nFailed to download " .. url .. "\n" .. result_str .. " (" .. response_code .. ")" )
+		print( "\nERROR: Failed to download " .. url .. "\n" .. result_str .. " (" .. response_code .. ")" )
 		if response_code == 0 then
 			-- No response code means server was unreachable
-			errormsg("NOTICE: Server was unreachable", "\nCheck server address is correct and that premake5 is not blocked by firewall rules")
+			print( "Check premake5 is not blocked by firewall rules" )
 		end
 		return false
 	end
 	return true
-end
-
-function errormsg(title, message)
-	term.pushColor(term.red)
-	io.write(title)
-	if message then
-		term.setTextColor(term.purple)
-		print(" " .. message)
-	else
-		print()
-	end
-	term.popColor()
 end

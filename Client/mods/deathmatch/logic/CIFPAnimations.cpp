@@ -9,9 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include <game/CAnimBlendHierarchy.h>
-#include <game/CAnimBlendSequence.h>
-#include <game/CAnimManager.h>
+#include "game/CAnimBlendSequence.h"
+#include "game/CAnimBlendHierarchy.h"
 
 CIFPAnimations::~CIFPAnimations()
 {

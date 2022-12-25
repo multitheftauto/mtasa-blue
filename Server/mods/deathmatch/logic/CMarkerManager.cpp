@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CMarkerManager.h"
-#include "Utils.h"
 
 CMarkerManager::CMarkerManager(CColManager* pColManager)
 {

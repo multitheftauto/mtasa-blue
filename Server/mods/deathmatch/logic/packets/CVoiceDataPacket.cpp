@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVoiceDataPacket.h"
-#include "CPlayer.h"
 
 CVoiceDataPacket::CVoiceDataPacket()
 {

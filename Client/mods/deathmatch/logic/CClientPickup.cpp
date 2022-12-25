@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include <game/CPickups.h>
-#include <game/CPickup.h>
 
 extern CClientGame* g_pClientGame;
 

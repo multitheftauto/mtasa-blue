@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,8 +19,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -37,7 +35,7 @@
  *
  * This is STUPID BLOCKING behavior
  */
-int Curl_blockread_all(struct Curl_easy *data,
+int Curl_blockread_all(struct connectdata *conn,
                        curl_socket_t sockfd,
                        char *buf,
                        ssize_t buffersize,
@@ -54,7 +52,7 @@ CURLproxycode Curl_SOCKS4(const char *proxy_name,
                           const char *hostname,
                           int remote_port,
                           int sockindex,
-                          struct Curl_easy *data,
+                          struct connectdata *conn,
                           bool *done);
 
 /*
@@ -66,15 +64,15 @@ CURLproxycode Curl_SOCKS5(const char *proxy_name,
                           const char *hostname,
                           int remote_port,
                           int sockindex,
-                          struct Curl_easy *data,
+                          struct connectdata *conn,
                           bool *done);
 
 #if defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI)
 /*
- * This function handles the SOCKS5 GSS-API negotiation and initialization
+ * This function handles the SOCKS5 GSS-API negotiation and initialisation
  */
 CURLcode Curl_SOCKS5_gssapi_negotiate(int sockindex,
-                                      struct Curl_easy *data);
+                                      struct connectdata *conn);
 #endif
 
 #endif /* CURL_DISABLE_PROXY */

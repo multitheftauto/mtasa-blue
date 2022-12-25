@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -69,7 +67,7 @@
  * Forward declarations.
  */
 
-static CURLcode dict_do(struct Curl_easy *data, bool *done);
+static CURLcode dict_do(struct connectdata *conn, bool *done);
 
 /*
  * DICT protocol handler.
@@ -91,20 +89,19 @@ const struct Curl_handler Curl_handler_dict = {
   ZERO_NULL,                            /* disconnect */
   ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
-  ZERO_NULL,                            /* attach connection */
   PORT_DICT,                            /* defport */
   CURLPROTO_DICT,                       /* protocol */
   CURLPROTO_DICT,                       /* family */
   PROTOPT_NONE | PROTOPT_NOURLQUERY     /* flags */
 };
 
-static char *unescape_word(const char *inputbuff)
+static char *unescape_word(struct Curl_easy *data, const char *inputbuff)
 {
   char *newp = NULL;
   char *dictp;
   size_t len;
 
-  CURLcode result = Curl_urldecode(inputbuff, 0, &newp, &len,
+  CURLcode result = Curl_urldecode(data, inputbuff, 0, &newp, &len,
                                    REJECT_NADA);
   if(!newp || result)
     return NULL;
@@ -132,9 +129,10 @@ static char *unescape_word(const char *inputbuff)
 }
 
 /* sendf() sends formatted data to the server */
-static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
+static CURLcode sendf(curl_socket_t sockfd, struct connectdata *conn,
                       const char *fmt, ...)
 {
+  struct Curl_easy *data = conn->data;
   ssize_t bytes_written;
   size_t write_len;
   CURLcode result = CURLE_OK;
@@ -153,7 +151,7 @@ static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
 
   for(;;) {
     /* Write the buffer to the socket */
-    result = Curl_write(data, sockfd, sptr, write_len, &bytes_written);
+    result = Curl_write(conn, sockfd, sptr, write_len, &bytes_written);
 
     if(result)
       break;
@@ -175,7 +173,7 @@ static CURLcode sendf(curl_socket_t sockfd, struct Curl_easy *data,
   return result;
 }
 
-static CURLcode dict_do(struct Curl_easy *data, bool *done)
+static CURLcode dict_do(struct connectdata *conn, bool *done)
 {
   char *word;
   char *eword;
@@ -185,12 +183,16 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
   char *nthdef = NULL; /* This is not part of the protocol, but required
                           by RFC 2229 */
   CURLcode result = CURLE_OK;
-  struct connectdata *conn = data->conn;
+  struct Curl_easy *data = conn->data;
   curl_socket_t sockfd = conn->sock[FIRSTSOCKET];
 
   char *path = data->state.up.path;
 
   *done = TRUE; /* unconditionally */
+
+  if(conn->bits.user_passwd) {
+    /* AUTH is missing */
+  }
 
   if(strncasecompare(path, DICT_MATCH, sizeof(DICT_MATCH)-1) ||
      strncasecompare(path, DICT_MATCH2, sizeof(DICT_MATCH2)-1) ||
@@ -213,22 +215,22 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
       }
     }
 
-    if(!word || (*word == (char)0)) {
-      infof(data, "lookup word is missing");
+    if((word == NULL) || (*word == (char)0)) {
+      infof(data, "lookup word is missing\n");
       word = (char *)"default";
     }
-    if(!database || (*database == (char)0)) {
+    if((database == NULL) || (*database == (char)0)) {
       database = (char *)"!";
     }
-    if(!strategy || (*strategy == (char)0)) {
+    if((strategy == NULL) || (*strategy == (char)0)) {
       strategy = (char *)".";
     }
 
-    eword = unescape_word(word);
+    eword = unescape_word(data, word);
     if(!eword)
       return CURLE_OUT_OF_MEMORY;
 
-    result = sendf(sockfd, data,
+    result = sendf(sockfd, conn,
                    "CLIENT " LIBCURL_NAME " " LIBCURL_VERSION "\r\n"
                    "MATCH "
                    "%s "    /* database */
@@ -264,19 +266,19 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
       }
     }
 
-    if(!word || (*word == (char)0)) {
-      infof(data, "lookup word is missing");
+    if((word == NULL) || (*word == (char)0)) {
+      infof(data, "lookup word is missing\n");
       word = (char *)"default";
     }
-    if(!database || (*database == (char)0)) {
+    if((database == NULL) || (*database == (char)0)) {
       database = (char *)"!";
     }
 
-    eword = unescape_word(word);
+    eword = unescape_word(data, word);
     if(!eword)
       return CURLE_OUT_OF_MEMORY;
 
-    result = sendf(sockfd, data,
+    result = sendf(sockfd, conn,
                    "CLIENT " LIBCURL_NAME " " LIBCURL_VERSION "\r\n"
                    "DEFINE "
                    "%s "     /* database */
@@ -304,7 +306,7 @@ static CURLcode dict_do(struct Curl_easy *data, bool *done)
         if(ppath[i] == ':')
           ppath[i] = ' ';
       }
-      result = sendf(sockfd, data,
+      result = sendf(sockfd, conn,
                      "CLIENT " LIBCURL_NAME " " LIBCURL_VERSION "\r\n"
                      "%s\r\n"
                      "QUIT\r\n", ppath);

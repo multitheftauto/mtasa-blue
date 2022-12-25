@@ -9,10 +9,15 @@
  *
  *****************************************************************************/
 
+class CEntityAddPacket;
+
 #pragma once
 
-#include "CPacket.h"
+#include "../packets/CPacket.h"
 #include <vector>
+#include "../CGame.h"
+
+extern CGame* g_pGame;
 
 class CEntityAddPacket final : public CPacket
 {

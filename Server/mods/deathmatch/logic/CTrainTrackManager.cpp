@@ -8,7 +8,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CTrainTrackManager.h"
 #include "CTrainTrack.h"
 #include <TrackNodes.h>
 #include <algorithm>

@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCameraSyncPacket.h"
-#include "CPlayerCamera.h"
-#include "CPlayer.h"
-#include <net/SyncStructures.h>
 
 bool CCameraSyncPacket::Read(NetBitStreamInterface& BitStream)
 {

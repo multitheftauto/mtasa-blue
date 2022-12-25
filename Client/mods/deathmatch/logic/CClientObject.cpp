@@ -268,14 +268,10 @@ void CClientObject::SetModel(unsigned short usModel)
         m_pModelInfo = g_pGame->GetModelInfo(usModel);
         UpdateSpatialData();
 
-        // Create the object if we're streamed in
-        if (IsStreamedIn())
+        // Request the new model so we can recreate when it's done
+        if (m_pModelRequester->Request(usModel, this))
         {
-            // Request the new model so we can recreate when it's done
-            if (m_pModelRequester->Request(usModel, this))
-            {
-                Create();
-            }
+            Create();
         }
     }
 }

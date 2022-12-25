@@ -1,10 +1,15 @@
-require 'utils'
-
 premake.modules.install_resources = {}
 
--- Config variables
-local RESOURCES_URL = "https://mirror-cdn.multitheftauto.com/mtasa/resources/mtasa-resources-latest.zip"
-local EXTRACT_DIR = "Bin/server/mods/deathmatch/resources/"
+local unzip = function(zip_path, target_path)
+	zip_path = path.translate(zip_path)
+	target_path = path.translate(target_path)
+
+	if os.host() == "windows" then
+		os.executef("call \"utils\\7z\\7za.exe\" x \"%s\" -aoa -o\"%s\"", zip_path, target_path)
+	else
+		os.executef("unzip \"%s\" -d \"%s\"", zip_path, target_path)
+	end
+end
 
 newaction {
 	trigger = "install_resources",
@@ -12,24 +17,13 @@ newaction {
 	
 	execute = function()
 		-- Download resources
-		if not http.download_print_errors(RESOURCES_URL, "temp_resources.zip") then
-			os.exit(1)
-			return
-		end
+		http.download("http://mirror.mtasa.com/mtasa/resources/mtasa-resources-latest.zip", "temp_resources.zip")
 		
 		-- Extract resources
-		if not os.extract_archive("temp_resources.zip", EXTRACT_DIR, true) then
-			errormsg("ERROR: Couldn't unzip resources")
-			os.exit(1)
-			return
-		end
-
+		unzip("temp_resources.zip", "Bin/server/mods/deathmatch/resources/")
+		
 		-- Cleanup
-		if not os.remove("temp_resources.zip") then
-			errormsg("ERROR: Couldn't delete downloaded resources zip file")
-			os.exit(1)
-			return
-		end
+		os.remove("temp_resources.zip")
 	end
 }
 

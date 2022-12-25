@@ -7,8 +7,8 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2018, Bill Nagel <wnagel@tycoint.com>, Exacq Technologies
- * Copyright (C) 2018 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2014, Bill Nagel <wnagel@tycoint.com>, Exacq Technologies
+ * Copyright (C) 2018 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,8 +20,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -246,12 +244,12 @@ struct smb_tree_disconnect {
 #endif /* BUILDING_CURL_SMB_C */
 
 #if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE) && \
-    (SIZEOF_CURL_OFF_T > 4)
+    (CURL_SIZEOF_CURL_OFF_T > 4)
 
 extern const struct Curl_handler Curl_handler_smb;
 extern const struct Curl_handler Curl_handler_smbs;
 
 #endif /* CURL_DISABLE_SMB && USE_CURL_NTLM_CORE &&
-          SIZEOF_CURL_OFF_T > 4 */
+          CURL_SIZEOF_CURL_OFF_T > 4 */
 
 #endif /* HEADER_CURL_SMB_H */

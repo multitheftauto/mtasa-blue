@@ -44,7 +44,6 @@ private:
     void ExecuteHandler(PFNCOMMAND pfnHandler, const char* szParameters);
 
     std::list<COMMANDENTRY*> m_CommandList;
-    CElapsedTime             m_FpsLimitTimer;
 
     pfnExecuteCommandHandler m_pfnExecuteHandler;
 };

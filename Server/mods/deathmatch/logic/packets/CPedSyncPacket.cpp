@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPedSyncPacket.h"
 
 CPedSyncPacket::CPedSyncPacket(SyncData& ReadData)
 {

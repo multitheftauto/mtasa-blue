@@ -11,10 +11,8 @@
 
 #include "StdInc.h"
 #include "CCrashHandler.h"
-#include "version.h"
-#ifdef WIN32
-    #include "CExceptionInformation_Impl.h"
-#else
+#include <string>
+#ifndef WIN32
     #include <execinfo.h>
 #endif
 
@@ -26,20 +24,19 @@
         #include <ncurses.h>
     #endif
 
-extern "C" WINDOW* m_wndMenu;
-extern "C" WINDOW* m_wndInput;
-extern "C" bool    g_bNoCurses;
-extern bool        g_bSilent;
+    extern "C" WINDOW* m_wndMenu;
+    extern "C" WINDOW* m_wndInput;
+    extern "C" bool    g_bNoCurses;
 
     #ifdef __APPLE__
         #include <client/mac/handler/exception_handler.h>
-bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded);
+        bool           DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded);
     #else
         #include <client/linux/handler/exception_handler.h>
-bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded);
+        bool           DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* context, bool succeeded);
     #endif
 
-static SString ms_strDumpPathFilename;
+    static SString ms_strDumpPathFilename;
 #endif
 // clang-format on
 
@@ -79,10 +76,10 @@ void CCrashHandler::Init(const SString& strInServerPath)
     signal(SIGSEGV, HandleExceptionGlobal);
         #else
             #ifdef __APPLE__
-    static google_breakpad::ExceptionHandler eh(ms_strDumpPath, NULL, DumpCallback, NULL, true, NULL);
+                static google_breakpad::ExceptionHandler eh(ms_strDumpPath, NULL, DumpCallback, NULL, true, NULL);
             #else
-    google_breakpad::MinidumpDescriptor descriptor(ms_strDumpPath);
-    static google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback, NULL, true, -1);
+                google_breakpad::MinidumpDescriptor      descriptor(ms_strDumpPath);
+                static google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback, NULL, true, -1);
             #endif
         #endif
     #endif
@@ -142,7 +139,7 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     }
 }
 
-    // Linux/Mac crash callback when using google-breakpad
+// Linux/Mac crash callback when using google-breakpad
 #ifdef __APPLE__
 bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded)
 {
@@ -233,7 +230,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
                 strModuleName = "unknown";
 
             #ifdef _WIN64
-            strModuleName += "64";
+                strModuleName += "64";
             #endif
 
             SString strFilename("server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),

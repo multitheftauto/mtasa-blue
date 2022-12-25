@@ -13,9 +13,6 @@
 
 #include "CColShape.h"
 
-class CColManager;
-class CVector2D;
-
 class CColCircle : public CColShape
 {
 public:

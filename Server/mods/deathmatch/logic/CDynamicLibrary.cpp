@@ -11,7 +11,6 @@
 
 #include <StdInc.h>
 #include "CDynamicLibrary.h"
-#include "CLogger.h"
 
 CDynamicLibrary::CDynamicLibrary()
 {

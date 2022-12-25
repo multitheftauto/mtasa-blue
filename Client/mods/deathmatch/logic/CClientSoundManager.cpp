@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CSettings.h>
 #include "CBassAudio.h"
 
 using SharedUtil::CalcMTASAPath;
@@ -38,8 +37,6 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
         g_pCore->GetConsole()->Printf("BASS ERROR %d in PluginLoad AC3", BASS_ErrorGetCode());
     if (!BASS_PluginLoad("bassopus.dll", 0) && BASS_ErrorGetCode() != BASS_ERROR_ALREADY)
         g_pCore->GetConsole()->Printf("BASS ERROR %d in PluginLoad OPUS", BASS_ErrorGetCode());
-    if (!BASS_PluginLoad("basswebm.dll", 0) && BASS_ErrorGetCode() != BASS_ERROR_ALREADY)
-        g_pCore->GetConsole()->Printf("BASS ERROR %d in PluginLoad WEBM", BASS_ErrorGetCode());
 
     BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0);
     BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);            // Allow playlists
@@ -137,7 +134,7 @@ CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIs
     else if (bIsRawData)
     {
         size_t size = strSound.size();
-        void*  pMemory = new char[size];
+        void* pMemory = new char[size];
         memcpy(pMemory, strSound.data(), size);
         if (pSound->Play((void*)pMemory, size, bLoop))
             return pSound;
@@ -173,7 +170,7 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
     else if (bIsRawData)
     {
         size_t size = strSound.size();
-        void*  pMemory = new char[size];
+        void* pMemory = new char[size];
         memcpy(pMemory, strSound.data(), size);
         if (pSound->Play3D((void*)pMemory, size, bLoop))
         {

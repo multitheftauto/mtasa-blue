@@ -10,14 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVehicle.h"
-#include "CVehicleManager.h"
-#include "CHandlingManager.h"
-#include "CElementRefManager.h"
-#include "CGame.h"
-#include "packets/CVehicleInOutPacket.h"
-#include "CBandwidthSettings.h"
-#include "Utils.h"
 
 extern CGame* g_pGame;
 
@@ -188,7 +180,6 @@ CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
         CVector vecRotationDegrees;
         GetRotationDegrees(vecRotationDegrees);
         pTemp->SetRotationDegrees(vecRotationDegrees);
-        pTemp->SetBlowState(m_blowState);
         pTemp->SetHealth(GetHealth());
         pTemp->SetColor(GetColor());
         pTemp->SetUpgrades(GetUpgrades());
@@ -526,14 +517,6 @@ void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
     m_ucVariant2 = ucVariant2;
 }
 
-void CVehicle::SetHealth(float fHealth)
-{
-    if (fHealth < 0.0f || IsBlown())
-        fHealth = 0.0f;
-
-    m_fHealth = fHealth;
-}
-
 CVehicleColor& CVehicle::RandomizeColor()
 {
     // Grab a random color for this vehicle and return it
@@ -757,8 +740,8 @@ bool CVehicle::SetTowedByVehicle(CVehicle* pVehicle)
 
 void CVehicle::SpawnAt(const CVector& vecPosition, const CVector& vecRotation)
 {
-    SetBlowState(VehicleBlowState::INTACT);
     SetHealth(GetRespawnHealth());
+    SetIsBlown(false);
     StopIdleTimer();
     ResetDoorsWheelsPanelsLights();
     SetLandingGearDown(true);
@@ -906,23 +889,18 @@ void CVehicle::ResetDoorsWheelsPanelsLights()
     memset(&m_ucLightStates[0], 0, sizeof(m_ucLightStates));
 }
 
+// For blow respawn timer
+void CVehicle::SetIsBlown(bool bBlown)
+{
+    if (!bBlown)
+        m_llBlowTime = CTickCount(0LL);
+    else
+        m_llBlowTime = CTickCount::Now();
+}
+
 bool CVehicle::IsBlowTimerFinished()
 {
-    return (m_blowState == VehicleBlowState::BLOWN) && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
-}
-
-void CVehicle::ResetExplosionTimer()
-{
-    if (m_blowState == VehicleBlowState::BLOWN)
-        m_llBlowTime = CTickCount::Now();
-}
-
-void CVehicle::SetBlowState(VehicleBlowState state)
-{
-    m_blowState = state;
-
-    if (state == VehicleBlowState::BLOWN)
-        m_llBlowTime = CTickCount::Now();
+    return GetIsBlown() && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
 }
 
 void CVehicle::StopIdleTimer()

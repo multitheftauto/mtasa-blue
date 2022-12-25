@@ -12,9 +12,10 @@
 #pragma once
 
 #include <game/CPedIK.h>
+#include "Common.h"
+#include <CVector.h>
 
 class CPedSAInterface;
-struct RwV3d;
 
 /**** STRAIGHT FROM R* *****/
 // Ped IK flags
@@ -68,6 +69,7 @@ private:
     CPedIKSAInterface* internalInterface;
 
 public:
+    // constructor
     CPedIKSA(CPedIKSAInterface* ikInterface) { internalInterface = ikInterface; };
 
     // r*'s functions

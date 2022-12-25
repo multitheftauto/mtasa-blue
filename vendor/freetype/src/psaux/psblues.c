@@ -506,8 +506,7 @@
             /* guarantee minimum of 1 pixel overshoot */
             dsNew = FT_MIN(
                       cf2_fixedRound( bottomHintEdge->dsCoord ),
-                      SUB_INT32( blues->zone[i].dsFlatEdge,
-                                 cf2_intToFixed( 1 ) ) );
+                      blues->zone[i].dsFlatEdge - cf2_intToFixed( 1 ) );
           }
 
           else

@@ -30,6 +30,14 @@ enum
     CHECK_SERVICE_RESTART_GAME = 8,
 };
 
+#ifndef PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON
+    #define PROCESS_CREATION_MITIGATION_POLICY_EXTENSION_POINT_DISABLE_ALWAYS_ON       (0x00000001ui64 << 32)
+    #define PROCESS_CREATION_MITIGATION_POLICY_PROHIBIT_DYNAMIC_CODE_ALWAYS_ON         (0x00000001ui64 << 36)
+    #define PROCESS_CREATION_MITIGATION_POLICY_FONT_DISABLE_ALWAYS_ON                  (0x00000001ui64 << 48)
+    #define PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_NO_REMOTE_ALWAYS_ON          (0x00000001ui64 << 52)
+    #define PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON    (0x00000001ui64 << 60)
+#endif
+
 struct SOSVersionInfo
 {
     DWORD dwMajor;
@@ -57,12 +65,17 @@ struct SPEFileOffsets
     } sections[1];
 };
 
+// Loads the given dll into hProcess. Returns 0 on failure or the handle to the
+// remote dll module on success.
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath);
+void    InsertWinMainBlock(HANDLE hProcess);
+void    RemoveWinMainBlock(HANDLE hProcess);
+void    ApplyLoadingCrashPatch(HANDLE hProcess);
+
 void TerminateGTAIfRunning();
 bool IsGTARunning();
 void TerminateOtherMTAIfRunning();
 bool IsOtherMTARunning();
-
-std::vector<DWORD> GetGTAProcessList();
 
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
@@ -114,7 +127,7 @@ void               ForbodenProgramsMessage();
 bool               VerifyEmbeddedSignature(const SString& strFilename);
 void               LogSettings();
 SString            PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter);
-bool               IsDeviceSelectionDialogOpen(DWORD processID);
+bool               IsDeviceSelectionDialogOpen(DWORD dwThreadId);
 std::vector<DWORD> MyEnumProcesses(bool bInclude64bit = false, bool bIncludeCurrent = false);
 SString            GetProcessPathFilename(DWORD processID);
 SString            GetProcessFilename(DWORD processID);
@@ -196,20 +209,58 @@ typedef struct _SYSTEM_PROCESS_IMAGE_NAME_INFORMATION
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
 
-void* LoadFunction(const char* szLibName, const char* szFunctionName);
+#ifdef DONT_ASSIST_ANTI_VIRUS
 
-#define _DEFFUNCTION(lib, name) \
-    using FUNC_##name = decltype(&name); \
-    inline FUNC_##name __##name(void) \
-    { \
-        static FUNC_##name pfn = NULL; \
-        if (!pfn) \
-            pfn = (FUNC_##name)LoadFunction(lib, #name); \
-        return pfn; \
-    }
+    #define _VirtualAllocEx         VirtualAllocEx
+    #define _VirtualProtectEx       VirtualProtectEx
+    #define _VirtualFreeEx          VirtualFreeEx
+    #define _ReadProcessMemory      ReadProcessMemory
+    #define _WriteProcessMemory     WriteProcessMemory
+    #define _CreateProcessW         CreateProcessW
+    #define _CreateRemoteThread     CreateRemoteThread
 
-#define DEFFUNCTION(lib, name) _DEFFUNCTION(lib, name)
+#else
 
-#define _NtQuerySystemInformation __NtQuerySystemInformation()
+void* LoadFunction(const char* szLibName, const char* c, const char* a, const char* b);
 
-DEFFUNCTION("ntdll", NtQuerySystemInformation)
+    #define _DEFFUNCTION( lib, name, a,b,c ) \
+        using FUNC_##name = decltype(&name); \
+        inline FUNC_##name __##name ( void ) \
+        { \
+            static FUNC_##name pfn = NULL; \
+            if ( !pfn ) \
+                pfn = (FUNC_##name)LoadFunction ( lib, #c, #a, #b ); \
+            return pfn; \
+        }
+
+    #define DEFFUNCTION( lib, a,b,c )    _DEFFUNCTION( lib, a##b##c, a,b,c )
+
+    #define _VirtualAllocEx                 __VirtualAllocEx()
+    #define _VirtualProtectEx               __VirtualProtectEx()
+    #define _VirtualFreeEx                  __VirtualFreeEx()
+    #define _ReadProcessMemory              __ReadProcessMemory()
+    #define _WriteProcessMemory             __WriteProcessMemory()
+    #define _CreateProcessW                 __CreateProcessW()
+    #define _CreateRemoteThread             __CreateRemoteThread()
+    #define _WscGetSecurityProviderHealth   __WscGetSecurityProviderHealth()
+    #define _InitializeProcThreadAttributeList  __InitializeProcThreadAttributeList()
+    #define _DeleteProcThreadAttributeList      __DeleteProcThreadAttributeList()
+    #define _UpdateProcThreadAttribute          __UpdateProcThreadAttribute()
+    #define _QueryFullProcessImageNameW         __QueryFullProcessImageNameW()
+    #define _NtQuerySystemInformation           __NtQuerySystemInformation()
+
+DEFFUNCTION("kernel32", Virt, ualAll, ocEx)
+DEFFUNCTION("kernel32", Virt, ualPro, tectEx)
+DEFFUNCTION("kernel32", Virt, ualFre, eEx)
+DEFFUNCTION("kernel32", Read, Proces, sMemory)
+DEFFUNCTION("kernel32", Writ, eProce, ssMemory)
+DEFFUNCTION("kernel32", Crea, teProc, essW)
+DEFFUNCTION("kernel32", Crea, teRemo, teThread)
+DEFFUNCTION("Wscapi", WscGetSecurityProviderHeal, t, h)
+DEFFUNCTION("kernel32", Initiali, zeProcT, hreadAttributeList)
+DEFFUNCTION("kernel32", Dele, teProcT, hreadAttributeList)
+DEFFUNCTION("kernel32", Upda, teProcT, hreadAttribute)
+DEFFUNCTION("kernel32", QueryFullProcessImageNam, e, W)
+DEFFUNCTION("ntdll", NtQuerySystemInformati, o, n)
+
+#endif

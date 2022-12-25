@@ -11,9 +11,11 @@
 
 #pragma once
 
+#include <windows.h>
+
 class CClock
 {
 public:
-    virtual void Set(BYTE bHour, BYTE bMinute) = 0;
-    virtual void Get(BYTE* bHour, BYTE* bMinute) = 0;
+    virtual VOID Set(BYTE bHour, BYTE bMinute) = 0;
+    virtual VOID Get(BYTE* bHour, BYTE* bMinute) = 0;
 };

@@ -20,6 +20,7 @@ project "Deathmatch"
 			"../../../vendor/zlib",
 			"../../../vendor/pcre",
 			"../../../vendor/json-c",
+			"../../../vendor/bob_withers",
 			"../../../vendor/lua/src",
 			"../../../Shared/gta",
 			"../../../Shared/mods/deathmatch/logic",
@@ -69,9 +70,3 @@ project "Deathmatch"
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
-
-	filter "platforms:arm"
-		targetdir(buildpath("server/arm"))
-
-	filter "platforms:arm64"
-		targetdir(buildpath("server/arm64"))

@@ -2,6 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by loader.rc
 //
+#define IDD_DIALOG1                     103
 #define IDB_BITMAP1                     105
 #define IDD_PROGRESS_DIALOG             111
 #define IDD_CRASHED_DIALOG              114
@@ -14,7 +15,7 @@
 #define IDC_SEND_DESC_STATIC            1006
 #define IDC_RESTART_QUESTION_STATIC     1007
 #define IDC_CRASH_INFO_EDIT             1009
-#define IDC_EDIT_GRAPHICS_DLL_PATH      1011
+#define IDC_EDIT_D3DDLL_PATH            1011
 #define IDC_CHECK_NOT_AGAIN             1012
 #define IDC_BUTTON_SHOW_DIR             1013
 #define IDC_RADIO1                      1014

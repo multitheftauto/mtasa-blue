@@ -412,12 +412,6 @@
     {
       FT_Bool  isPair = cf2_hint_isPair( &hintmap->edge[i] );
 
-      /* final amount to move edge or edge pair */
-      CF2_Fixed  move = 0;
-
-      CF2_Fixed  dsCoord_i;
-      CF2_Fixed  dsCoord_j;
-
 
       /* index of upper edge (same value for ghost hint) */
       j = isPair ? i + 1 : i;
@@ -428,14 +422,11 @@
       FT_ASSERT( cf2_hint_isLocked( &hintmap->edge[i] ) ==
                    cf2_hint_isLocked( &hintmap->edge[j] ) );
 
-      dsCoord_i = hintmap->edge[i].dsCoord;
-      dsCoord_j = hintmap->edge[j].dsCoord;
-
       if ( !cf2_hint_isLocked( &hintmap->edge[i] ) )
       {
         /* hint edge is not locked, we can adjust it */
-        CF2_Fixed  fracDown = cf2_fixedFraction( dsCoord_i );
-        CF2_Fixed  fracUp   = cf2_fixedFraction( dsCoord_j );
+        CF2_Fixed  fracDown = cf2_fixedFraction( hintmap->edge[i].dsCoord );
+        CF2_Fixed  fracUp   = cf2_fixedFraction( hintmap->edge[j].dsCoord );
 
         /* calculate all four possibilities; moves down are negative */
         CF2_Fixed  downMoveDown = 0 - fracDown;
@@ -451,6 +442,9 @@
         CF2_Fixed  moveUp   = FT_MIN( downMoveUp, upMoveUp );
         /* smallest move down */
         CF2_Fixed  moveDown = FT_MAX( downMoveDown, upMoveDown );
+
+        /* final amount to move edge or edge pair */
+        CF2_Fixed  move;
 
         CF2_Fixed  downMinCounter = CF2_MIN_COUNTER;
         CF2_Fixed  upMinCounter   = CF2_MIN_COUNTER;
@@ -473,14 +467,16 @@
         /* is there room to move up?                                    */
         /* there is if we are at top of array or the next edge is at or */
         /* beyond proposed move up?                                     */
-        if ( j >= hintmap->count - 1                         ||
+        if ( j >= hintmap->count - 1                ||
              hintmap->edge[j + 1].dsCoord >=
-               ADD_INT32( dsCoord_j, moveUp + upMinCounter ) )
+               ADD_INT32( hintmap->edge[j].dsCoord,
+                          moveUp + upMinCounter )   )
         {
           /* there is room to move up; is there also room to move down? */
-          if ( i == 0                                              ||
+          if ( i == 0                                   ||
                hintmap->edge[i - 1].dsCoord <=
-                 ADD_INT32( dsCoord_i, moveDown - downMinCounter ) )
+                 ADD_INT32( hintmap->edge[i].dsCoord,
+                            moveDown - downMinCounter ) )
           {
             /* move smaller absolute amount */
             move = ( -moveDown < moveUp ) ? moveDown : moveUp;  /* optimum */
@@ -491,9 +487,10 @@
         else
         {
           /* is there room to move down? */
-          if ( i == 0                                              ||
+          if ( i == 0                                   ||
                hintmap->edge[i - 1].dsCoord <=
-                 ADD_INT32( dsCoord_i, moveDown - downMinCounter ) )
+                 ADD_INT32( hintmap->edge[i].dsCoord,
+                            moveDown - downMinCounter ) )
           {
             move     = moveDown;
             /* true if non-optimum move */
@@ -527,21 +524,17 @@
         }
 
         /* move the edge(s) */
-        hintmap->edge[i].dsCoord = ADD_INT32( dsCoord_i, move );
+        hintmap->edge[i].dsCoord = ADD_INT32( hintmap->edge[i].dsCoord,
+                                              move );
         if ( isPair )
-          hintmap->edge[j].dsCoord = ADD_INT32( dsCoord_j, move );
+          hintmap->edge[j].dsCoord = ADD_INT32( hintmap->edge[j].dsCoord,
+                                                move );
       }
 
-      /* assert there are no overlaps in device space;     */
-      /* ignore tests if there was overflow (that is, if   */
-      /* operands have the same sign but the sum does not) */
+      /* assert there are no overlaps in device space */
       FT_ASSERT( i == 0                                                   ||
-                 ( ( dsCoord_i ^ move ) >= 0                    &&
-                   ( dsCoord_i ^ hintmap->edge[i].dsCoord ) < 0 )         ||
                  hintmap->edge[i - 1].dsCoord <= hintmap->edge[i].dsCoord );
       FT_ASSERT( i < j                                                ||
-                 ( ( dsCoord_j ^ move ) >= 0                    &&
-                   ( dsCoord_j ^ hintmap->edge[j].dsCoord ) < 0 )     ||
                  hintmap->edge[i].dsCoord <= hintmap->edge[j].dsCoord );
 
       /* adjust the scales, avoiding divide by zero */
@@ -1029,17 +1022,10 @@
       }
     }
 
-#ifdef FT_DEBUG_LEVEL_TRACE
-    if ( initialMap )
-    {
-      FT_TRACE6(( "flags: [p]air [g]host [t]op"
-                  " [b]ottom [L]ocked [S]ynthetic\n" ));
-      FT_TRACE6(( "Initial hintmap" ));
-    }
-    else
-      FT_TRACE6(( "Hints:" ));
-#endif
-
+    FT_TRACE6(( "%s\n", initialMap ? "flags: [p]air [g]host [t]op"
+                                     " [b]ottom [L]ocked [S]ynthetic\n"
+                                     "Initial hintmap"
+                                   : "Hints:" ));
     cf2_hintmap_dump( hintmap );
 
     /*

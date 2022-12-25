@@ -10,28 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CConsoleCommands.h"
-#include "CAccount.h"
-#include "CResourceManager.h"
-#include "CConsole.h"
-#include "CAccessControlListManager.h"
-#include "Utils.h"
-#include "packets/CChatEchoPacket.h"
-#include "packets/CPlayerChangeNickPacket.h"
-#include "CStaticFunctionDefinitions.h"
-#include "version.h"
-#include "ASE.h"
-#include "CDatabaseManager.h"
-#include "CGame.h"
-#include "CMainConfig.h"
 
 extern CGame* g_pGame;
 
 // Helper functions
-static std::string GetAdminNameForLog(CClient* pClient)
+static string GetAdminNameForLog(CClient* pClient)
 {
-    std::string strName = pClient->GetNick();
-    std::string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName() : "no account";
+    string strName = pClient->GetNick();
+    string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName() : "no account";
     if (strName == strAccountName)
         return strName;
     return SString("%s(%s)", strName.c_str(), strAccountName.c_str());
@@ -354,7 +340,7 @@ bool CConsoleCommands::Say(CConsole* pConsole, const char* szInArguments, CClien
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
-                            Arguments.PushNumber(MESSAGE_TYPE_PLAYER);            // Normal chat
+                            Arguments.PushNumber(0);            // Normal chat
                             bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                             if (bContinue)
                             {
@@ -489,7 +475,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
-                            Arguments.PushNumber(MESSAGE_TYPE_TEAM);            // Team chat
+                            Arguments.PushNumber(2);            // Team chat
                             bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                             if (bContinue)
                             {
@@ -502,7 +488,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                                 list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
                                 for (; iter != pTeam->PlayersEnd(); iter++)
                                 {
-                                    (*iter)->Send(CChatEchoPacket(strEcho, ucRed, ucGreen, ucBlue, true, MESSAGE_TYPE_TEAM));
+                                    (*iter)->Send(CChatEchoPacket(strEcho, ucRed, ucGreen, ucBlue, true));
                                 }
                                 // Call onChatMessage if players chat message was delivered
                                 CLuaArguments Arguments2;
@@ -602,7 +588,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         if (bContinue)
                                         {
                                             // Send it to the player
-                                            pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
+                                            pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO));
 
                                             // Send a reponse to the player who sent it
                                             pEchoClient->SendEcho(SString("-> %s: %s", pPlayer->GetNick(), szMessage));
@@ -615,7 +601,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         CLogger::LogPrintf("CONSOLEMSG: %s to %s: %s\n", szNick, pPlayer->GetNick(), szMessage);
 
                                         // Send it to the player
-                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
+                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO));
                                         break;
                                     }
                                     case CClient::CLIENT_SCRIPT:
@@ -624,7 +610,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                         CLogger::LogPrintf("SCRIPTMSG: %s to %s: %s\n", szNick, pPlayer->GetNick(), szMessage);
 
                                         // Send it to the player
-                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
+                                        pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO));
                                         break;
                                     }
                                     default:
@@ -694,8 +680,8 @@ bool CConsoleCommands::Me(CConsole* pConsole, const char* szArguments, CClient* 
                     if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
                     {
                         CLuaArguments Arguments;
-                        Arguments.PushString(szArguments);                    // text
-                        Arguments.PushNumber(MESSAGE_TYPE_ACTION);            // Me chat
+                        Arguments.PushString(szArguments);            // text
+                        Arguments.PushNumber(1);                      // Me chat
                         bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                         if (bContinue)
                         {
@@ -703,7 +689,7 @@ bool CConsoleCommands::Me(CConsole* pConsole, const char* szArguments, CClient* 
                             CLogger::LogPrintf("CHAT: %s\n", strEcho.c_str());
 
                             // Broadcast the message to all clients
-                            pConsole->GetPlayerManager()->BroadcastOnlyJoined(CChatEchoPacket(strEcho, CHATCOLOR_ME, false, MESSAGE_TYPE_ACTION));
+                            pConsole->GetPlayerManager()->BroadcastOnlyJoined(CChatEchoPacket(strEcho, CHATCOLOR_ME));
 
                             // Call onChatMessage if players chat message was delivered
                             CPlayer*      pPlayer = static_cast<CPlayer*>(pClient);
@@ -1303,7 +1289,7 @@ bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient
         pEchoClient->SendConsole("help [command]");
 
         // Loop through all added commands
-        int iCount = 0;
+        int                                    iCount = 0;
         for (CConsoleCommand* command : pConsole->CommandsList())
         {
             // Add a new line every third command

@@ -16,6 +16,37 @@
 #include <MTAPlatform.h>
 #include <Common.h>
 
+/*** va_pass() (passing of ... variable length arguments ***/
+template <unsigned char count>
+struct SVaPassNext
+{
+    SVaPassNext<count - 1> big;
+    unsigned long          dw;
+};
+template <>
+struct SVaPassNext<0>
+{
+};
+// SVaPassNext - is generator of structure of any size at compile time.
+
+class CVaPassNext
+{
+public:
+    SVaPassNext<50> svapassnext;
+    CVaPassNext(va_list& args)
+    {
+        try
+        {            // to avoid access violation
+            memcpy(&svapassnext, args, sizeof(svapassnext));
+        }
+        catch (...)
+        {
+        }
+    }
+};
+#define va_pass(valist) CVaPassNext(valist).svapassnext
+/*** va_pass() (passing of ... variable length arguments ***/
+
 // Min and max number of characters in player nicknames (this must match the client's)
 #define MIN_PLAYER_NICK_LENGTH 1
 #define MAX_PLAYER_NICK_LENGTH 22
@@ -29,9 +60,9 @@
 // Min number of characters in passwords
 #define MIN_PASSWORD_LENGTH 1
 
-// Min and max number of characters in chat messages (the message itself, not including player nick)
+// Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1
-#define MAX_CHAT_LENGTH 255
+#define MAX_CHAT_LENGTH 96
 
 // Min and max number of characters in a console command
 #define MIN_COMMAND_LENGTH 1
@@ -39,7 +70,7 @@
 
 // Min and max number of characters in chat echos
 #define MIN_CHATECHO_LENGTH 1
-#define MAX_CHATECHO_LENGTH (MAX_CHAT_LENGTH + MAX_PLAYER_NICK_LENGTH + 2) // +2 is for ": " between player nick and the message
+#define MAX_CHATECHO_LENGTH 128
 
 // Min and max number of characters in outputChatBox from the server
 #define MIN_OUTPUTCHATBOX_LENGTH 1

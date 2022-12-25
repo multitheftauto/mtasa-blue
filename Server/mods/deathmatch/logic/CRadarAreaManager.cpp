@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRadarAreaManager.h"
-#include "Utils.h"
 
 CRadarAreaManager::CRadarAreaManager()
 {

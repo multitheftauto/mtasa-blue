@@ -10,11 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaCameraDefs.h"
-#include "CStaticFunctionDefinitions.h"
-#include "CScriptArgReader.h"
-
-#define MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"
 
 void CLuaCameraDefs::LoadFunctions()
 {
@@ -197,9 +192,6 @@ int CLuaCameraDefs::setCameraTarget(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
     argStream.ReadUserData(pTarget, NULL);
-
-    if (pTarget && pTarget->GetType() != CElement::PLAYER)
-        MinServerReqCheck(argStream, MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
 
     if (!argStream.HasErrors())
     {

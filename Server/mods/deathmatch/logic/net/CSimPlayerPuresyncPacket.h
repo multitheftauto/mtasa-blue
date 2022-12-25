@@ -7,10 +7,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-#include <net/SyncStructures.h>
-
 class CSimPacket
 {
 public:

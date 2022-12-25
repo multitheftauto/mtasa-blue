@@ -10,19 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <CRect.h>
-#include "CColModelSA.h"
-#include "CGameSA.h"
-#include "CPhysicalSA.h"
-#include "CPoolsSA.h"
-
-extern CGameSA* pGame;
 
 CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->m_sphere.m_radius;
+    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->boundingBox.fRadius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
     pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
@@ -72,6 +65,7 @@ CVector* CPhysicalSA::GetTurnSpeed(CVector* vecTurnSpeed)
 
 CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
 {
+    DEBUG_TRACE("CVector * CPhysicalSA::GetMoveSpeed(CVector * vecMoveSpeed)");
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)this->GetInterface());
     DWORD dwReturn = 0;
@@ -87,6 +81,7 @@ CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
 
 CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
 {
+    DEBUG_TRACE("CVector * CPhysicalSA::GetTurnSpeed(CVector * vecTurnSpeed)");
     DWORD dwFunc = FUNC_GetTurnSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)this->GetInterface());
     DWORD dwReturn = 0;
@@ -100,8 +95,9 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     return vecTurnSpeed;
 }
 
-void CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
+VOID CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
 {
+    DEBUG_TRACE("VOID CPhysicalSA::SetMoveSpeed(CVector * vecMoveSpeed)");
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)this->GetInterface());
     DWORD dwReturn = 0;
@@ -121,8 +117,10 @@ void CPhysicalSA::SetMoveSpeed(CVector* vecMoveSpeed)
     }
 }
 
-void CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
+VOID CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
 {
+    DEBUG_TRACE("VOID CPhysicalSA::SetTurnSpeed(CVector * vecTurnSpeed)");
+
     ((CPhysicalSAInterface*)this->GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
@@ -182,18 +180,20 @@ void CPhysicalSA::SetBuoyancyConstant(float fBuoyancyConstant)
     ((CPhysicalSAInterface*)this->GetInterface())->m_fBuoyancyConstant = fBuoyancyConstant;
 }
 
-void CPhysicalSA::GetCenterOfMass(CVector& vecCenterOfMass)
+void CPhysicalSA::GetCenterOfMass(CVector & vecCenterOfMass)
 {
     vecCenterOfMass = ((CPhysicalSAInterface*)this->GetInterface())->m_vecCenterOfMass;
 }
 
-void CPhysicalSA::SetCenterOfMass(CVector& vecCenterOfMass)
+
+void CPhysicalSA::SetCenterOfMass(CVector & vecCenterOfMass)
 {
     ((CPhysicalSAInterface*)this->GetInterface())->m_vecCenterOfMass = vecCenterOfMass;
 }
 
-void CPhysicalSA::ProcessCollision()
+VOID CPhysicalSA::ProcessCollision()
 {
+    DEBUG_TRACE("VOID CPhysicalSA::ProcessCollision()");
     DWORD dwFunc = FUNC_ProcessCollision;
     DWORD dwThis = (DWORD)this->GetInterface();
 
@@ -263,14 +263,24 @@ CEntity* CPhysicalSA::GetAttachedEntity()
 
 void CPhysicalSA::AttachEntityToEntity(CPhysical& Entity, const CVector& vecPosition, const CVector& vecRotation)
 {
-    CPhysicalSA& EntitySA = dynamic_cast<CPhysicalSA&>(Entity);
-	DWORD        dwEntityInterface = (DWORD)EntitySA.GetInterface();
+    DEBUG_TRACE("void CPhysicalSA::AttachEntityToEntity(CPhysical& Entity, const CVector& vecPosition, const CVector& vecRotation)");
 
-	InternalAttachEntityToEntity(dwEntityInterface, &vecPosition, &vecRotation);
+    try
+    {
+        CPhysicalSA& EntitySA = dynamic_cast<CPhysicalSA&>(Entity);
+        DWORD        dwEntityInterface = (DWORD)EntitySA.GetInterface();
+
+        InternalAttachEntityToEntity(dwEntityInterface, &vecPosition, &vecRotation);
+    }
+    catch (...)
+    {
+        DEBUG_TRACE("Invalid Entity argument detected");
+    }
 }
 
 void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, bool bUnk)
 {
+    DEBUG_TRACE("void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnk, bool bUnk)");
     DWORD dwFunc = FUNC_DetatchEntityFromEntity;
     DWORD dwThis = (DWORD)this->GetInterface();
 
@@ -292,6 +302,7 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
 
 bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation)
 {
+    DEBUG_TRACE("bool CPhysicalSA::AttachEntityToEntity(CPhysical * entityToAttach, CVector * vecPosition, CVector * vecRotation)");
     DWORD dwFunc = FUNC_AttachEntityToEntity;
     DWORD dwThis = (DWORD)this->GetInterface();
     DWORD dwReturn = 0;

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -39,9 +37,12 @@ curl_share_init(void)
 {
   struct Curl_share *share = calloc(1, sizeof(struct Curl_share));
   if(share) {
-    share->magic = CURL_GOOD_SHARE;
     share->specifier |= (1<<CURL_LOCK_DATA_SHARE);
-    Curl_init_dnscache(&share->hostcache, 23);
+
+    if(Curl_mk_dnscache(&share->hostcache)) {
+      free(share);
+      return NULL;
+    }
   }
 
   return share;
@@ -57,9 +58,6 @@ curl_share_setopt(struct Curl_share *share, CURLSHoption option, ...)
   curl_unlock_function unlockfunc;
   void *ptr;
   CURLSHcode res = CURLSHE_OK;
-
-  if(!GOOD_SHARE_HANDLE(share))
-    return CURLSHE_INVALID;
 
   if(share->dirty)
     /* don't allow setting options while one or more handles are already
@@ -186,7 +184,7 @@ curl_share_setopt(struct Curl_share *share, CURLSHoption option, ...)
 CURLSHcode
 curl_share_cleanup(struct Curl_share *share)
 {
-  if(!GOOD_SHARE_HANDLE(share))
+  if(share == NULL)
     return CURLSHE_INVALID;
 
   if(share->lockfunc)
@@ -220,7 +218,6 @@ curl_share_cleanup(struct Curl_share *share)
 
   if(share->unlockfunc)
     share->unlockfunc(NULL, CURL_LOCK_DATA_SHARE, share->clientdata);
-  share->magic = 0;
   free(share);
 
   return CURLSHE_OK;
@@ -233,7 +230,7 @@ Curl_share_lock(struct Curl_easy *data, curl_lock_data type,
 {
   struct Curl_share *share = data->share;
 
-  if(!share)
+  if(share == NULL)
     return CURLSHE_INVALID;
 
   if(share->specifier & (1<<type)) {
@@ -250,7 +247,7 @@ Curl_share_unlock(struct Curl_easy *data, curl_lock_data type)
 {
   struct Curl_share *share = data->share;
 
-  if(!share)
+  if(share == NULL)
     return CURLSHE_INVALID;
 
   if(share->specifier & (1<<type)) {

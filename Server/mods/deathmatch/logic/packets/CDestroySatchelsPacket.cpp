@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CDestroySatchelsPacket.h"
-#include "CElement.h"
 
 CDestroySatchelsPacket::CDestroySatchelsPacket()
 {

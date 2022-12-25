@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CKeyGenSA.h"
 
 unsigned int CKeyGenSA::GetKey(const char* szString, int iLength)
 {

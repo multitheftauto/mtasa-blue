@@ -490,7 +490,7 @@ Integer MihailescuProvablePrime(RandomNumberGenerator &rng, unsigned int pbits)
 		// progression p = p_0 + \lambda * q2 = p_0 + 2 * \lambda * q,
 		// with q the recursively generated prime above. We will be able
 		// to use Lucas tets for proving primality. A trick of Quisquater
-		// allows taking q > cubic_root(p) rather than square_root: this
+		// allows taking q > cubic_root(p) rather then square_root: this
 		// decreases the recursion.
 
 		p.Randomize(rng, minP, maxP, Integer::ANY, 1, q2);
@@ -646,8 +646,6 @@ bool SolveModularQuadraticEquation(Integer &r1, Integer &r2, const Integer &a, c
 Integer ModularRoot(const Integer &a, const Integer &dp, const Integer &dq,
 					const Integer &p, const Integer &q, const Integer &u)
 {
-	// GCC warning bug, https://stackoverflow.com/q/12842306/608639
-#ifdef _OPENMP
 	Integer p2, q2;
 	#pragma omp parallel
 		#pragma omp sections
@@ -657,11 +655,6 @@ Integer ModularRoot(const Integer &a, const Integer &dp, const Integer &dq,
 			#pragma omp section
 				q2 = ModularExponentiation((a % q), dq, q);
 		}
-#else
-	const Integer p2 = ModularExponentiation((a % p), dp, p);
-	const Integer q2 = ModularExponentiation((a % q), dq, q);
-#endif
-
 	return CRT(p2, p, q2, q, u);
 }
 
@@ -847,7 +840,7 @@ Integer Lucas(const Integer &e, const Integer &pIn, const Integer &n)
 	return m.ConvertOut(v);
 }
 
-// This is Peter Montgomery's unpublished Lucas sequence evaluation algorithm.
+// This is Peter Montgomery's unpublished Lucas sequence evalutation algorithm.
 // The total number of multiplies and squares used is less than the binary
 // algorithm (see above).  Unfortunately I can't get it to run as fast as
 // the binary algorithm because of the extra overhead.
@@ -1004,10 +997,8 @@ Integer Lucas(const Integer &n, const Integer &P, const Integer &modulus)
 
 Integer InverseLucas(const Integer &e, const Integer &m, const Integer &p, const Integer &q, const Integer &u)
 {
-
-	// GCC warning bug, https://stackoverflow.com/q/12842306/608639
-#ifdef _OPENMP
-	Integer d = (m*m-4), p2, q2;
+	Integer d = (m*m-4);
+	Integer p2, q2;
 	#pragma omp parallel
 		#pragma omp sections
 		{
@@ -1022,15 +1013,6 @@ Integer InverseLucas(const Integer &e, const Integer &m, const Integer &p, const
 				q2 = Lucas(EuclideanMultiplicativeInverse(e,q2), m, q);
 			}
 		}
-#else
-	const Integer d = (m*m-4);
-	const Integer t1 = p-Jacobi(d,p);
-	const Integer p2 = Lucas(EuclideanMultiplicativeInverse(e,t1), m, p);
-
-	const Integer t2 = q-Jacobi(d,q);
-	const Integer q2 = Lucas(EuclideanMultiplicativeInverse(e,t2), m, q);
-#endif
-
 	return CRT(p2, p, q2, q, u);
 }
 

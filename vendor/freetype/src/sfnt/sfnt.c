@@ -4,7 +4,7 @@
  *
  *   Single object library component.
  *
- * Copyright (C) 1996-2022 by
+ * Copyright (C) 1996-2020 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -27,7 +27,6 @@
 #include "ttcmap.c"
 #include "ttcolr.c"
 #include "ttcpal.c"
-#include "ttsvg.c"
 
 #include "ttkern.c"
 #include "ttload.c"

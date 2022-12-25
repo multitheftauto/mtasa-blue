@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVehicleColorManager.h"
-#include "CVehicleDefaultColors.h"
-#include "Utils.h"
 
 CVehicleColor CVehicleColors::GetRandomColor()
 {
@@ -24,8 +21,8 @@ CVehicleColor CVehicleColors::GetRandomColor()
         unsigned int uiRandomIndex = GetRandom(0, uiSize - 1);
 
         // Grab the random color we got off the list
-        unsigned int                       uiIndex = 0;
-        std::list<CVehicleColor>::iterator iter = m_Colors.begin();
+        unsigned int                  uiIndex = 0;
+        list<CVehicleColor>::iterator iter = m_Colors.begin();
         for (; iter != m_Colors.end(); ++iter)
         {
             if (uiIndex == uiRandomIndex)

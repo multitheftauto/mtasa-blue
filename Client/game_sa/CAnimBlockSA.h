@@ -12,6 +12,7 @@
 #pragma once
 
 #include <game/CAnimBlock.h>
+#include "Common.h"
 
 class CAnimBlendAssocGroupSA;
 

@@ -88,15 +88,15 @@ public:
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
 
-    void               SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
-    void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
+    void           SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
+    void           LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
-    bool               IsOOPEnabled() { return m_bOOPEnabled; }
-    void               HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
-    bool               IsWaitingForInitialDownloads();
-    int                GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
-    void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+    bool           IsOOPEnabled() { return m_bOOPEnabled; }
+    void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
+    bool           IsWaitingForInitialDownloads();
+    int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
+    void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
 private:
     unsigned short       m_usNetID;

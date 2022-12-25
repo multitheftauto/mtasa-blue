@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CAccessControlList.h"
-#include "CAccessControlListManager.h"
-#include "CIdArray.h"
-#include "CGame.h"
 
 CAccessControlList::CAccessControlList(const char* szACLName, CAccessControlListManager* pACLManager)
 {
@@ -25,7 +21,7 @@ CAccessControlList::CAccessControlList(const char* szACLName, CAccessControlList
 CAccessControlList::~CAccessControlList()
 {
     CIdArray::PushUniqueId(this, EIdClass::ACL, m_uiScriptID);
-    std::list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
+    list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
     for (; iter != m_Rights.end(); iter++)
     {
         delete *iter;
@@ -53,7 +49,7 @@ CAccessControlListRight* CAccessControlList::GetRight(const char* szRightName, C
 {
     unsigned int uiHash = HashString(szRightName);
 
-    std::list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
+    list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
     for (; iter != m_Rights.end(); iter++)
     {
         CAccessControlListRight* pACLRight = *iter;
@@ -73,7 +69,7 @@ bool CAccessControlList::RemoveRight(const char* szRightName, CAccessControlList
 {
     unsigned int uiHash = HashString(szRightName);
 
-    std::list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
+    list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
     for (; iter != m_Rights.end(); iter++)
     {
         CAccessControlListRight* pACLRight = *iter;
@@ -102,7 +98,7 @@ void CAccessControlList::WriteToXMLNode(CXMLNode* pNode)
     pAttribute->SetValue(m_strACLName);
 
     // Loop through each right and write it to the ACL
-    std::list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
+    list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
     for (; iter != m_Rights.end(); iter++)
     {
         CAccessControlListRight* pRight = *iter;

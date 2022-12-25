@@ -9,8 +9,6 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
-#include "CGame.h"
-#include "CMainConfig.h"
 
 volatile bool CNetBufferWatchDog::ms_bBlockOutgoingSyncPackets = false;
 volatile bool CNetBufferWatchDog::ms_bBlockIncomingSyncPackets = false;

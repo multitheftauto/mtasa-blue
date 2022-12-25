@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  * RFC4178 Simple and Protected GSS-API Negotiation Mechanism
  *
@@ -132,7 +130,7 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
                                                       TEXT(SP_NAME_NEGOTIATE),
                                                       &SecurityPackage);
     if(nego->status != SEC_E_OK) {
-      failf(data, "SSPI: couldn't get auth info");
+      failf(data, "SSPI: couldn't get auth info\n");
       return CURLE_AUTH_ERROR;
     }
 
@@ -193,7 +191,8 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
 
     /* Ensure we have a valid challenge message */
     if(!chlg) {
-      infof(data, "SPNEGO handshake failure (empty challenge message)");
+      infof(data, "SPNEGO handshake failure (empty challenge message)\n");
+
       return CURLE_BAD_CONTENT_ENCODING;
     }
 
@@ -303,19 +302,27 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
  *
  * Returns CURLE_OK on success.
  */
-CURLcode Curl_auth_create_spnego_message(struct negotiatedata *nego,
+CURLcode Curl_auth_create_spnego_message(struct Curl_easy *data,
+                                         struct negotiatedata *nego,
                                          char **outptr, size_t *outlen)
 {
+  CURLcode result;
+
   /* Base64 encode the already generated response */
-  CURLcode result = Curl_base64_encode((const char *) nego->output_token,
-                                       nego->output_token_length, outptr,
-                                       outlen);
-  if(!result && (!*outptr || !*outlen)) {
+  result = Curl_base64_encode(data,
+                              (const char *) nego->output_token,
+                              nego->output_token_length,
+                              outptr, outlen);
+
+  if(result)
+    return result;
+
+  if(!*outptr || !*outlen) {
     free(*outptr);
-    result = CURLE_REMOTE_ACCESS_DENIED;
+    return CURLE_REMOTE_ACCESS_DENIED;
   }
 
-  return result;
+  return CURLE_OK;
 }
 
 /*

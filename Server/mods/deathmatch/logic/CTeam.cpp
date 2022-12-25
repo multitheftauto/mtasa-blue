@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CTeam.h"
-#include "CLogger.h"
-#include "Utils.h"
-#include "lua/LuaCommon.h"
 
 CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
     : CElement(pParent)

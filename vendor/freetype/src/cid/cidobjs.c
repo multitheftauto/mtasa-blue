@@ -4,7 +4,7 @@
  *
  *   CID objects manager (body).
  *
- * Copyright (C) 1996-2022 by
+ * Copyright (C) 1996-2020 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -157,14 +157,10 @@
   cid_size_request( FT_Size          size,
                     FT_Size_Request  req )
   {
-    FT_Error  error;
-
     PSH_Globals_Funcs  funcs;
 
 
-    error = FT_Request_Metrics( size->face, req );
-    if ( error )
-      goto Exit;
+    FT_Request_Metrics( size->face, req );
 
     funcs = cid_size_get_globals_funcs( (CID_Size)size );
 
@@ -174,8 +170,7 @@
                         size->metrics.y_scale,
                         0, 0 );
 
-  Exit:
-    return error;
+    return FT_Err_Ok;
   }
 
 
@@ -216,7 +211,7 @@
     /* release subrs */
     if ( face->subrs )
     {
-      FT_UInt  n;
+      FT_Int  n;
 
 
       for ( n = 0; n < cid->num_dicts; n++ )
@@ -484,7 +479,11 @@
 
 
     /* set default property values, cf. `ftt1drv.h' */
+#ifdef T1_CONFIG_OPTION_OLD_ENGINE
+    driver->hinting_engine = FT_HINTING_FREETYPE;
+#else
     driver->hinting_engine = FT_HINTING_ADOBE;
+#endif
 
     driver->no_stem_darkening = TRUE;
 

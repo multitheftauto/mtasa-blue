@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CHandlingEntry.h"
 
 CHandlingEntry::CHandlingEntry(tHandlingData* pOriginal)
 {

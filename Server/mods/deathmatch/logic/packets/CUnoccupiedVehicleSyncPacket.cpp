@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CUnoccupiedVehicleSyncPacket.h"
-#include "CGame.h"
-#include "CVehicleManager.h"
 
 CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket()
 {

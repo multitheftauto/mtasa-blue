@@ -10,7 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CWeaponNames.h"
+
+using namespace std;
 
 char szWeaponNameEmpty[] = "";
 

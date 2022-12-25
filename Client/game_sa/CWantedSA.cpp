@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CWantedSA.h"
 
 CWantedSA::CWantedSA()
 {
@@ -38,6 +37,17 @@ CWantedSA::~CWantedSA()
     }
 }
 
+void CWantedSA::SetMaximumWantedLevel(DWORD dwWantedLevel)
+{
+    DWORD dwFunc = FUNC_SetMaximumWantedLevel;
+    _asm
+    {
+        push    dwWantedLevel
+        call    dwFunc
+        add     esp, 4
+    }
+}
+
 void CWantedSA::SetWantedLevel(DWORD dwWantedLevel)
 {
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -54,4 +64,16 @@ void CWantedSA::SetWantedLevelNoFlash(DWORD dwWantedLevel)
     DWORD dwLastTimeChanged = internalInterface->m_LastTimeWantedLevelChanged;
     SetWantedLevel(dwWantedLevel);
     internalInterface->m_LastTimeWantedLevelChanged = dwLastTimeChanged;
+}
+
+void CWantedSA::SetWantedLevelNoDrop(DWORD dwWantedLevel)
+{
+    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwFunc = FUNC_SetWantedLevelNoDrop;
+    _asm
+    {
+        mov     ecx, dwThis
+        push    dwWantedLevel
+        call    dwFunc
+    }
 }

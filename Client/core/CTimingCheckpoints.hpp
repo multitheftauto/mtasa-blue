@@ -7,8 +7,6 @@
  *
  *****************************************************************************/
 
-#include <game/CClock.h>
-
 //
 // Temp file for debugging purposes only
 //

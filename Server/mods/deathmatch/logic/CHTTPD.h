@@ -13,12 +13,10 @@
 
 #pragma once
 
-#include "CConnectHistory.h"
 #include <string>
 #include <list>
-#include <ehs/ehs.h>
 
-class CResource;
+#include "ehs/ehs.h"
 
 class CHTTPD : public EHS
 {
@@ -49,13 +47,13 @@ private:
 
     bool m_bStartedServer;
 
-    class CAccount*             m_pGuestAccount;
-    std::map<string, long long> m_LoggedInMap;
-    CConnectHistory             m_BruteForceProtect;
-    CConnectHistory             m_HttpDosProtect;
-    std::set<SString>           m_HttpDosExcludeMap;
-    std::mutex                  m_mutexHttpDosProtect;
-    std::mutex                  m_mutexLoggedInMap;
-    SString                     m_strWarnMessageForIp;
-    CElapsedTime                m_WarnMessageTimer;
+    class CAccount*        m_pGuestAccount;
+    map<string, long long> m_LoggedInMap;
+    CConnectHistory        m_BruteForceProtect;
+    CConnectHistory        m_HttpDosProtect;
+    std::set<SString>      m_HttpDosExcludeMap;
+    std::mutex             m_mutexHttpDosProtect;
+    std::mutex             m_mutexLoggedInMap;
+    SString                m_strWarnMessageForIp;
+    CElapsedTime           m_WarnMessageTimer;
 };

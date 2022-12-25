@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CObject.h"
-#include "CLogger.h"
-#include "Utils.h"
 
 extern CGame* g_pGame;
 

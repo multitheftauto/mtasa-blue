@@ -17,4 +17,3 @@
 #if defined(SHARED_UTIL_WITH_SYS_INFO)
     #include "SharedUtil.SysInfo.hpp"
 #endif
-#include "SharedUtil.Memory.hpp"

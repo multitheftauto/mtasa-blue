@@ -11,7 +11,10 @@
 
 #pragma once
 
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <game/TaskCar.h>
+
 #include "CVehicleSA.h"
 #include "TaskSA.h"
 

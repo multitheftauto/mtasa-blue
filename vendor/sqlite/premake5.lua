@@ -15,7 +15,5 @@ project "sqlite"
 		"*.c"
 	}
 
-	defines { "SQLITE_ENABLE_MATH_FUNCTIONS", "SQLITE_ENABLE_JSON1" }
-
 	filter {"system:windows"}
 		disablewarnings { "4996" }

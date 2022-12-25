@@ -11,7 +11,7 @@
 
 #pragma once
 
-class CVector;
+#include <CVector.h>
 
 // ### MODELFLAGS ###
 // 1st digit

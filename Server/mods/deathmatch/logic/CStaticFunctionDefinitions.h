@@ -13,14 +13,6 @@ class CStaticFunctionDefinitions;
 
 #pragma once
 
-#include "CVehicle.h"
-#include "CRegistry.h"
-#include "lua/CLuaFunctionParseHelpers.h"
-#include <optional>
-
-class CVector2D;
-struct SLineOfSightFlags;
-
 class CStaticFunctionDefinitions
 {
 public:
@@ -153,6 +145,7 @@ public:
                             unsigned short usDimension, CTeam* pTeam = NULL);
     static bool SetPlayerMuted(CElement* pElement, bool bMuted);
     static bool SetPlayerBlurLevel(CElement* pElement, unsigned char ucLevel);
+    static bool SetPlayerDiscordJoinParams(CElement* pElement, SString& strKey, SString& strPartyId, uint uiPartySize, uint uiPartyMax);
     static bool RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword);
     static bool SetPlayerName(CElement* pElement, const char* szName);
     static bool DetonateSatchels(CElement* pElement);
@@ -296,7 +289,7 @@ public:
 
     // Vehicle set functions
     static bool FixVehicle(CElement* pElement);
-    static bool BlowVehicle(CElement* pElement, std::optional<bool> withExplosion);
+    static bool BlowVehicle(CElement* pElement);
     static bool SetVehicleColor(CElement* pElement, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CElement* pElement, bool bLandingGearDown);
     static bool SetVehicleLocked(CElement* pElement, bool bLocked);
@@ -452,14 +445,14 @@ public:
     static bool UsePickup(CElement* pElement, CPlayer* pPlayer);
 
     // Shape create funcs
-    static class CColCircle*    CreateColCircle(CResource* pResource, const CVector2D& vecPosition, float fRadius);
-    static class CColCuboid*    CreateColCuboid(CResource* pResource, const CVector& vecPosition, const CVector& vecSize);
-    static class CColSphere*    CreateColSphere(CResource* pResource, const CVector& vecPosition, float fRadius);
-    static class CColRectangle* CreateColRectangle(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize);
-    static class CColPolygon*   CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList);
-    static class CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
-    static bool                 IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
-    static void                 RefreshColShapeColliders(CColShape* pColShape);
+    static CColCircle*    CreateColCircle(CResource* pResource, const CVector2D& vecPosition, float fRadius);
+    static CColCuboid*    CreateColCuboid(CResource* pResource, const CVector& vecPosition, const CVector& vecSize);
+    static CColSphere*    CreateColSphere(CResource* pResource, const CVector& vecPosition, float fRadius);
+    static CColRectangle* CreateColRectangle(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize);
+    static CColPolygon*   CreateColPolygon(CResource* pResource, const std::vector<CVector2D>& vecPointList);
+    static CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
+    static bool           IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
+    static void           RefreshColShapeColliders(CColShape* pColShape);
 
     // Shape get functions
     static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
@@ -569,9 +562,9 @@ public:
                               CLuaMain* pLuaMain);
     static void OutputChatBox(const char* szText, const std::vector<CPlayer*>& sendList, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
                               bool bColorCoded);
-    static void OutputConsole(const char* szText, CElement* pElement);
+    static bool OutputConsole(const char* szText, CElement* pElement);
     static bool SetServerPassword(const SString& strPassword, bool bSave);
-    static void ClearChatBox(CElement* pElement);
+    static bool ClearChatBox(CElement* pElement);
 
     // General world get funcs
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMinute);
@@ -736,7 +729,7 @@ public:
     static bool ShowCursor(CElement* pElement, CLuaMain* pLuaMain, bool bShow, bool bToggleControls);
 
     // Chat funcs
-    static bool ShowChat(CElement* pElement, bool bShow, bool bInputBlocked);
+    static bool ShowChat(CElement* pElement, bool bShow);
 
     // Misc funcs
     static bool ResetMapInfo(CElement* pElement);

@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CAnimManager.h>
 #include "CPedRPCs.h"
 #include "net/SyncStructures.h"
 

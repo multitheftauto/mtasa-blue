@@ -7,7 +7,7 @@
  *  PURPOSE:     CefApp implementation
  *
  *****************************************************************************/
-#include <cef3/cef/include/cef_app.h>
+#include <cef3/include/cef_app.h>
 #include <string>
 #include <sstream>
 #include "V8Helpers.h"

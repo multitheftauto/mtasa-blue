@@ -36,17 +36,13 @@ public:
     // GenerateChecksumFromFile returns either a CChecksum or an error message.
     static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
-        // Reset error number before using it to report an error
-        errno = 0;
-
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
 
-        if (!result.ulCRC && errno)
+        if (!result.ulCRC)
             return SString("CRC could not open file: %s", std::strerror(errno));
 
         bool success = CMD5Hasher().Calculate(strFilename, result.md5);
-
         if (!success)
             return SString("MD5 could not open file: %s", std::strerror(errno));
 

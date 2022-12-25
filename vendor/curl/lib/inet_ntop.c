@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2022  Internet Software Consortium.
+ * Copyright (C) 1996-2019  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,8 +13,6 @@
  * FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- *
- * SPDX-License-Identifier: ISC
  */
 /*
  * Original code by Paul Vixie. "curlified" by Gisle Vanem.
@@ -42,7 +40,7 @@
 #define INT16SZ          2
 
 /*
- * Format an IPv4 address, more or less like inet_ntop().
+ * Format an IPv4 address, more or less like inet_ntoa().
  *
  * Returns `dst' (as a const)
  * Note:
@@ -136,7 +134,7 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
 
     /* Are we following an initial run of 0x00s or any real hex?
      */
-    if(i)
+    if(i != 0)
       *tp++ = ':';
 
     /* Is this address an encapsulated IPv4?

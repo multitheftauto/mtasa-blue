@@ -248,7 +248,7 @@ void SharedUtil::UpdateModuleTickCount64()
 //
 #if defined(__APPLE__)
 
-    // Apple / Darwin platforms with Mach monotonic clock support
+// Apple / Darwin platforms with Mach monotonic clock support
 #include <mach/mach_time.h>
 unsigned long GetTickCountInternal()
 {
@@ -281,7 +281,7 @@ unsigned long GetTickCountInternal()
     ** in any case the time starting point does not change once that the
     ** system has started up.
     */
-    struct timeval  now;
+    struct timeval now;
     struct timespec tsnow;
     if (0 == clock_gettime(CLOCK_MONOTONIC, &tsnow))
     {
@@ -306,7 +306,7 @@ unsigned long GetTickCountInternal()
 
 #else
 
-    // Win32 platforms
+// Win32 platforms
 #include <Mmsystem.h>
 #pragma comment(lib, "Winmm.lib")
 unsigned long GetTickCountInternal()
@@ -346,7 +346,7 @@ typedef long long LONGLONG;
 
 TIMEUS SharedUtil::GetTimeUs()
 {
-    static bool    bInitialized = false;
+    static bool bInitialized = false;
     static timeval t1;
     if (!bInitialized)
     {

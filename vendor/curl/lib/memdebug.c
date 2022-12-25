@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -57,23 +55,8 @@ struct memdebug {
  */
 
 FILE *curl_dbg_logfile = NULL;
-static bool registered_cleanup = FALSE; /* atexit registered cleanup */
 static bool memlimit = FALSE; /* enable memory limit */
 static long memsize = 0;  /* set number of mallocs allowed */
-
-/* LeakSantizier (LSAN) calls _exit() instead of exit() when a leak is detected
-   on exit so the logfile must be closed explicitly or data could be lost.
-   Though _exit() does not call atexit handlers such as this, LSAN's call to
-   _exit() comes after the atexit handlers are called. curl/curl#6620 */
-static void curl_dbg_cleanup(void)
-{
-  if(curl_dbg_logfile &&
-     curl_dbg_logfile != stderr &&
-     curl_dbg_logfile != stdout) {
-    fclose(curl_dbg_logfile);
-  }
-  curl_dbg_logfile = NULL;
-}
 
 /* this sets the log file name */
 void curl_dbg_memdebug(const char *logname)
@@ -89,8 +72,6 @@ void curl_dbg_memdebug(const char *logname)
       setbuf(curl_dbg_logfile, (char *)NULL);
 #endif
   }
-  if(!registered_cleanup)
-    registered_cleanup = !atexit(curl_dbg_cleanup);
 }
 
 /* This function sets the number of malloc() calls that should return
@@ -110,13 +91,15 @@ static bool countcheck(const char *func, int line, const char *source)
      should not be made */
   if(memlimit && source) {
     if(!memsize) {
-      /* log to file */
-      curl_dbg_log("LIMIT %s:%d %s reached memlimit\n",
-                   source, line, func);
-      /* log to stderr also */
-      fprintf(stderr, "LIMIT %s:%d %s reached memlimit\n",
-              source, line, func);
-      fflush(curl_dbg_logfile); /* because it might crash now */
+      if(source) {
+        /* log to file */
+        curl_dbg_log("LIMIT %s:%d %s reached memlimit\n",
+                     source, line, func);
+        /* log to stderr also */
+        fprintf(stderr, "LIMIT %s:%d %s reached memlimit\n",
+                source, line, func);
+        fflush(curl_dbg_logfile); /* because it might crash now */
+      }
       errno = ENOMEM;
       return TRUE; /* RETURN ERROR! */
     }
@@ -129,8 +112,7 @@ static bool countcheck(const char *func, int line, const char *source)
   return FALSE; /* allow this */
 }
 
-ALLOC_FUNC void *curl_dbg_malloc(size_t wantedsize,
-                                 int line, const char *source)
+void *curl_dbg_malloc(size_t wantedsize, int line, const char *source)
 {
   struct memdebug *mem;
   size_t size;
@@ -156,8 +138,8 @@ ALLOC_FUNC void *curl_dbg_malloc(size_t wantedsize,
   return (mem ? mem->mem : NULL);
 }
 
-ALLOC_FUNC void *curl_dbg_calloc(size_t wanted_elements, size_t wanted_size,
-                                 int line, const char *source)
+void *curl_dbg_calloc(size_t wanted_elements, size_t wanted_size,
+                      int line, const char *source)
 {
   struct memdebug *mem;
   size_t size, user_size;
@@ -184,8 +166,7 @@ ALLOC_FUNC void *curl_dbg_calloc(size_t wanted_elements, size_t wanted_size,
   return (mem ? mem->mem : NULL);
 }
 
-ALLOC_FUNC char *curl_dbg_strdup(const char *str,
-                                 int line, const char *source)
+char *curl_dbg_strdup(const char *str, int line, const char *source)
 {
   char *mem;
   size_t len;
@@ -209,8 +190,7 @@ ALLOC_FUNC char *curl_dbg_strdup(const char *str,
 }
 
 #if defined(WIN32) && defined(UNICODE)
-ALLOC_FUNC wchar_t *curl_dbg_wcsdup(const wchar_t *str,
-                                    int line, const char *source)
+wchar_t *curl_dbg_wcsdup(const wchar_t *str, int line, const char *source)
 {
   wchar_t *mem;
   size_t wsiz, bsiz;
@@ -413,8 +393,8 @@ int curl_dbg_sclose(curl_socket_t sockfd, int line, const char *source)
   return res;
 }
 
-ALLOC_FUNC FILE *curl_dbg_fopen(const char *file, const char *mode,
-                                int line, const char *source)
+FILE *curl_dbg_fopen(const char *file, const char *mode,
+                    int line, const char *source)
 {
   FILE *res = fopen(file, mode);
 
@@ -425,8 +405,8 @@ ALLOC_FUNC FILE *curl_dbg_fopen(const char *file, const char *mode,
   return res;
 }
 
-ALLOC_FUNC FILE *curl_dbg_fdopen(int filedes, const char *mode,
-                                 int line, const char *source)
+FILE *curl_dbg_fdopen(int filedes, const char *mode,
+                      int line, const char *source)
 {
   FILE *res = fdopen(filedes, mode);
   if(source)

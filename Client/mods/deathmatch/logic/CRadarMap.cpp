@@ -358,7 +358,6 @@ void CRadarMap::InternalSetRadarEnabled(bool bEnabled)
     if (bEnabled)
     {
         m_bChatVisible = g_pCore->IsChatVisible();
-        m_bChatInputBlocked = g_pCore->IsChatInputBlocked();
         m_bDebugVisible = g_pCore->IsDebugVisible();
 
         g_pGame->GetHud()->Disable(true);
@@ -370,7 +369,7 @@ void CRadarMap::InternalSetRadarEnabled(bool bEnabled)
     {
         g_pGame->GetHud()->Disable(false);
         g_pMultiplayer->HideRadar(false);
-        g_pCore->SetChatVisible(m_bChatVisible, m_bChatInputBlocked);
+        g_pCore->SetChatVisible(m_bChatVisible);
         g_pCore->SetDebugVisible(m_bDebugVisible);
     }
 }

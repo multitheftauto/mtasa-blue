@@ -52,9 +52,9 @@ public:
 #define va_pass(valist) CVaPassNext(valist).svapassnext
 /*** va_pass() (passing of ... variable length arguments ***/
 
-// Min and max number of characters in chat messages (the message itself, not including player nick)
+// Min and max number of characters in chat messages
 #define MIN_CHAT_LENGTH 1
-#define MAX_CHAT_LENGTH 255
+#define MAX_CHAT_LENGTH 96
 
 // Min and max number of characters in a console command
 #define MIN_COMMAND_LENGTH 1
@@ -62,7 +62,7 @@ public:
 
 // Min and max number of characters in chat echos
 #define MIN_CHATECHO_LENGTH 1
-#define MAX_CHATECHO_LENGTH (MAX_CHAT_LENGTH + MAX_PLAYER_NICK_LENGTH + 2) // +2 is for ": " between player nick and the message
+#define MAX_CHATECHO_LENGTH 128
 
 // Min and max number of characters in outputChatBox from the server
 #define MIN_OUTPUTCHATBOX_LENGTH 1

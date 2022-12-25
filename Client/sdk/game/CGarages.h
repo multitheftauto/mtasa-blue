@@ -11,7 +11,8 @@
 
 #pragma once
 
-class CGarage;
+#include "CGarage.h"
+#include "Common.h"
 
 #define MAX_GARAGES 50
 

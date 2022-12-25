@@ -96,8 +96,7 @@ public:
     void DestroyJustThis();
 };
 
-union UCTask
-{
+union UCTask {
     CTask*   pTask;
     CTaskSA* pTaskSA;
 };

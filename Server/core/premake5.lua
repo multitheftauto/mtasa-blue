@@ -41,10 +41,9 @@ project "Core"
 		excludes { "CExceptionInformation_Impl.cpp" }
 
 	filter "system:linux"
-		links { "breakpad", "rt" }
+		links { "ncursesw", "breakpad", "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
-		linkoptions { "-l:libncursesw.so.5" }
 
 	filter "system:macosx"
 		links { "ncurses", "breakpad", "CoreFoundation.framework" }
@@ -56,9 +55,3 @@ project "Core"
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
-
-	filter "platforms:arm"
-		targetdir(buildpath("server/arm"))
-
-	filter "platforms:arm64"
-		targetdir(buildpath("server/arm64"))

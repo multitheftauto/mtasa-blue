@@ -9,8 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include <game/CAnimBlendAssocGroup.h>
-#include <game/CAnimManager.h>
+#include "game/CAnimBlendAssocGroup.h"
 
 std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input)
 {
@@ -102,8 +101,7 @@ bool CIFPEngine::EngineRestoreAnimation(CClientEntity* pEntity, const SString& s
     return false;
 }
 
-bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInterface* pOriginalHierarchyInterface,
-                                      CAnimBlendHierarchySAInterface* pAnimHierarchyInterface)
+bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInterface* pOriginalHierarchyInterface, CAnimBlendHierarchySAInterface* pAnimHierarchyInterface)
 {
     CAnimManager* pAnimationManager = g_pGame->GetAnimManager();
     RpClump*      pClump = Ped.GetClump();
@@ -120,7 +118,7 @@ bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInte
             }
 
             eAnimGroup iGroupID = pCurrentAnimAssociation->GetAnimGroup();
-            eAnimID    iAnimID = pCurrentAnimAssociation->GetAnimID();
+            eAnimID iAnimID = pCurrentAnimAssociation->GetAnimID();
             if (iGroupID < eAnimGroup::ANIM_GROUP_DEFAULT && iAnimID < eAnimID::ANIM_ID_WALK)
             {
                 return true;

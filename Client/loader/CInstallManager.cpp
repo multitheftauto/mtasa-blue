@@ -155,16 +155,6 @@ void CInstallManager::InitSequencer()
         CR " "                                                                     //
         CR "appcompat_end: "                                                       ////// End of 'AppCompat checks' //////
         CR " "                                                                     //
-        CR "winmm_check: "                                                         ////// Start of 'winmm checks' //////
-        CR "            CALL ProcessWinmmChecks "                                  // Make changes to comply with winmm requirements
-        CR "            IF LastResult == ok GOTO winmm_end: "                      //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO winmm_check: "                    //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "winmm_end: "                                                           ////// End of 'winmm checks' //////
-        CR " "                                                                     //
         CR "            CALL ChangeFromAdmin "                                     //
         CR "            CALL InstallNewsItems "                                    // Install pending news
         CR "            GOTO launch: "                                             //
@@ -621,8 +611,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         }
         else
         {
-            AddReportLog(
-                5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s' %s", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
+            AddReportLog(5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s' %s", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
             SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
             strMessage += "\n\n" + strGtaExe;
             strMessage += "\n\n" + _("Error") + SString(" %d", result);
@@ -1081,33 +1070,6 @@ SString CInstallManager::_ProcessAppCompatChecks()
             return "fail";
         }
     }
-    return "ok";
-}
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_ProcessWinmmChecks
-//
-// Ensure winmm.dll does not exist in the gta directory
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessWinmmChecks()
-{
-    SString filePath = PathJoin(GetGTAPath(), "winmm.dll");
-
-    if (FileExists(filePath))
-    {
-        SString filePathBak = PathJoin(GetGTAPath(), "winmm.dll.backup");
-        FileDelete(filePathBak);
-        FileRename(filePath, filePathBak);
-
-        if (FileExists(filePath))
-        {
-            m_strAdminReason = _("Move incompatible files");
-            return "fail";
-        }
-    }
-
     return "ok";
 }
 

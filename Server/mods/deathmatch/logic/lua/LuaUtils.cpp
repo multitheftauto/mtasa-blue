@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "LuaUtils.h"
-#include "LuaCommon.h"
 
 SString GetDebugMessage(lua_State* luaVM)
 {

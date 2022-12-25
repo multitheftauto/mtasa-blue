@@ -4,7 +4,7 @@
  *
  *   OpenType and CFF data/program tables loader (body).
  *
- * Copyright (C) 1996-2022 by
+ * Copyright (C) 1996-2020 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -356,9 +356,9 @@
 
       data_size = (FT_ULong)( idx->count + 1 ) * offsize;
 
-      if ( FT_QNEW_ARRAY( idx->offsets, idx->count + 1 ) ||
-           FT_STREAM_SEEK( idx->start + idx->hdr_size )  ||
-           FT_FRAME_ENTER( data_size )                   )
+      if ( FT_NEW_ARRAY( idx->offsets, idx->count + 1 ) ||
+           FT_STREAM_SEEK( idx->start + idx->hdr_size ) ||
+           FT_FRAME_ENTER( data_size )                  )
         goto Exit;
 
       poff   = idx->offsets;
@@ -400,7 +400,7 @@
 
   /* Allocate a table containing pointers to an index's elements. */
   /* The `pool' argument makes this function convert the index    */
-  /* entries to C-style strings (this is, null-terminated).       */
+  /* entries to C-style strings (this is, NULL-terminated).       */
   static FT_Error
   cff_index_get_pointers( CFF_Index   idx,
                           FT_Byte***  table,
@@ -427,7 +427,7 @@
     new_size = idx->data_size + idx->count;
 
     if ( idx->count > 0                                &&
-         !FT_QNEW_ARRAY( tbl, idx->count + 1 )         &&
+         !FT_NEW_ARRAY( tbl, idx->count + 1 )          &&
          ( !pool || !FT_ALLOC( new_bytes, new_size ) ) )
     {
       FT_ULong  n, cur_offset;
@@ -622,7 +622,7 @@
     FT_Byte*    bytes;
     FT_ULong    byte_len;
     FT_Error    error;
-    FT_String*  name = NULL;
+    FT_String*  name = 0;
 
 
     if ( !idx->stream )  /* CFF2 does not include a name index */
@@ -634,9 +634,10 @@
     if ( error )
       goto Exit;
 
-    if ( !FT_QALLOC( name, byte_len + 1 ) )
+    if ( !FT_ALLOC( name, byte_len + 1 ) )
     {
-      FT_MEM_COPY( name, bytes, byte_len );
+      if ( byte_len )
+        FT_MEM_COPY( name, bytes, byte_len );
       name[byte_len] = 0;
     }
     cff_index_forget_element( idx, &bytes );
@@ -771,7 +772,8 @@
 
     case 3:
       /* first, compare to the cache */
-      if ( glyph_index - fdselect->cache_first < fdselect->cache_count )
+      if ( (FT_UInt)( glyph_index - fdselect->cache_first ) <
+                        fdselect->cache_count )
       {
         fd = fdselect->cache_fd;
         break;
@@ -834,6 +836,7 @@
   {
     FT_Error   error   = FT_Err_Ok;
     FT_UInt    i;
+    FT_Long    j;
     FT_UShort  max_cid = 0;
 
 
@@ -851,10 +854,9 @@
 
     /* When multiple GIDs map to the same CID, we choose the lowest */
     /* GID.  This is not described in any spec, but it matches the  */
-    /* behaviour of recent Acroread versions.  The loop stops when  */
-    /* the unsigned index wraps around after reaching zero.         */
-    for ( i = num_glyphs - 1; i < num_glyphs; i-- )
-      charset->cids[charset->sids[i]] = (FT_UShort)i;
+    /* behaviour of recent Acroread versions.                       */
+    for ( j = (FT_Long)num_glyphs - 1; j >= 0; j-- )
+      charset->cids[charset->sids[j]] = (FT_UShort)j;
 
     charset->max_cid    = max_cid;
     charset->num_glyphs = num_glyphs;
@@ -930,7 +932,7 @@
         goto Exit;
 
       /* Allocate memory for sids. */
-      if ( FT_QNEW_ARRAY( charset->sids, num_glyphs ) )
+      if ( FT_NEW_ARRAY( charset->sids, num_glyphs ) )
         goto Exit;
 
       /* assign the .notdef glyph */
@@ -1016,14 +1018,14 @@
       case 0:
         if ( num_glyphs > 229 )
         {
-          FT_ERROR(( "cff_charset_load: implicit charset larger than\n" ));
-          FT_ERROR(( "predefined charset (Adobe ISO-Latin)\n" ));
+          FT_ERROR(( "cff_charset_load: implicit charset larger than\n"
+                     "predefined charset (Adobe ISO-Latin)\n" ));
           error = FT_THROW( Invalid_File_Format );
           goto Exit;
         }
 
         /* Allocate memory for sids. */
-        if ( FT_QNEW_ARRAY( charset->sids, num_glyphs ) )
+        if ( FT_NEW_ARRAY( charset->sids, num_glyphs ) )
           goto Exit;
 
         /* Copy the predefined charset into the allocated memory. */
@@ -1034,14 +1036,14 @@
       case 1:
         if ( num_glyphs > 166 )
         {
-          FT_ERROR(( "cff_charset_load: implicit charset larger than\n" ));
-          FT_ERROR(( "predefined charset (Adobe Expert)\n" ));
+          FT_ERROR(( "cff_charset_load: implicit charset larger than\n"
+                     "predefined charset (Adobe Expert)\n" ));
           error = FT_THROW( Invalid_File_Format );
           goto Exit;
         }
 
         /* Allocate memory for sids. */
-        if ( FT_QNEW_ARRAY( charset->sids, num_glyphs ) )
+        if ( FT_NEW_ARRAY( charset->sids, num_glyphs ) )
           goto Exit;
 
         /* Copy the predefined charset into the allocated memory.     */
@@ -1052,14 +1054,14 @@
       case 2:
         if ( num_glyphs > 87 )
         {
-          FT_ERROR(( "cff_charset_load: implicit charset larger than\n" ));
-          FT_ERROR(( "predefined charset (Adobe Expert Subset)\n" ));
+          FT_ERROR(( "cff_charset_load: implicit charset larger than\n"
+                     "predefined charset (Adobe Expert Subset)\n" ));
           error = FT_THROW( Invalid_File_Format );
           goto Exit;
         }
 
         /* Allocate memory for sids. */
-        if ( FT_QNEW_ARRAY( charset->sids, num_glyphs ) )
+        if ( FT_NEW_ARRAY( charset->sids, num_glyphs ) )
           goto Exit;
 
         /* Copy the predefined charset into the allocated memory.     */
@@ -1085,6 +1087,7 @@
       FT_FREE( charset->cids );
       charset->format = 0;
       charset->offset = 0;
+      charset->sids   = 0;
     }
 
     return error;
@@ -1138,8 +1141,6 @@
     {
       FT_UInt   vsOffset;
       FT_UInt   format;
-      FT_UInt   dataCount;
-      FT_UInt   regionCount;
       FT_ULong  regionListOffset;
 
 
@@ -1162,16 +1163,16 @@
       }
 
       /* read top level fields */
-      if ( FT_READ_ULONG( regionListOffset ) ||
-           FT_READ_USHORT( dataCount )       )
+      if ( FT_READ_ULONG( regionListOffset )   ||
+           FT_READ_USHORT( vstore->dataCount ) )
         goto Exit;
 
       /* make temporary copy of item variation data offsets; */
       /* we'll parse region list first, then come back       */
-      if ( FT_QNEW_ARRAY( dataOffsetArray, dataCount ) )
+      if ( FT_NEW_ARRAY( dataOffsetArray, vstore->dataCount ) )
         goto Exit;
 
-      for ( i = 0; i < dataCount; i++ )
+      for ( i = 0; i < vstore->dataCount; i++ )
       {
         if ( FT_READ_ULONG( dataOffsetArray[i] ) )
           goto Exit;
@@ -1180,23 +1181,19 @@
       /* parse regionList and axisLists */
       if ( FT_STREAM_SEEK( vsOffset + regionListOffset ) ||
            FT_READ_USHORT( vstore->axisCount )           ||
-           FT_READ_USHORT( regionCount )                 )
+           FT_READ_USHORT( vstore->regionCount )         )
         goto Exit;
 
-      vstore->regionCount = 0;
-      if ( FT_QNEW_ARRAY( vstore->varRegionList, regionCount ) )
+      if ( FT_NEW_ARRAY( vstore->varRegionList, vstore->regionCount ) )
         goto Exit;
 
-      for ( i = 0; i < regionCount; i++ )
+      for ( i = 0; i < vstore->regionCount; i++ )
       {
         CFF_VarRegion*  region = &vstore->varRegionList[i];
 
 
-        if ( FT_QNEW_ARRAY( region->axisList, vstore->axisCount ) )
+        if ( FT_NEW_ARRAY( region->axisList, vstore->axisCount ) )
           goto Exit;
-
-        /* keep track of how many axisList to deallocate on error */
-        vstore->regionCount++;
 
         for ( j = 0; j < vstore->axisCount; j++ )
         {
@@ -1217,11 +1214,10 @@
       }
 
       /* use dataOffsetArray now to parse varData items */
-      vstore->dataCount = 0;
-      if ( FT_QNEW_ARRAY( vstore->varData, dataCount ) )
+      if ( FT_NEW_ARRAY( vstore->varData, vstore->dataCount ) )
         goto Exit;
 
-      for ( i = 0; i < dataCount; i++ )
+      for ( i = 0; i < vstore->dataCount; i++ )
       {
         CFF_VarData*  data = &vstore->varData[i];
 
@@ -1240,11 +1236,8 @@
         if ( FT_READ_USHORT( data->regionIdxCount ) )
           goto Exit;
 
-        if ( FT_QNEW_ARRAY( data->regionIndices, data->regionIdxCount ) )
+        if ( FT_NEW_ARRAY( data->regionIndices, data->regionIdxCount ) )
           goto Exit;
-
-        /* keep track of how many regionIndices to deallocate on error */
-        vstore->dataCount++;
 
         for ( j = 0; j < data->regionIdxCount; j++ )
         {
@@ -1329,9 +1322,9 @@
 
       /* increase or allocate `blend_stack' and reset `blend_top'; */
       /* prepare to append `numBlends' values to the buffer        */
-      if ( FT_QREALLOC( subFont->blend_stack,
-                        subFont->blend_alloc,
-                        subFont->blend_alloc + size ) )
+      if ( FT_REALLOC( subFont->blend_stack,
+                       subFont->blend_alloc,
+                       subFont->blend_alloc + size ) )
         goto Exit;
 
       subFont->blend_top    = subFont->blend_stack + subFont->blend_used;
@@ -1444,7 +1437,9 @@
 
     /* prepare buffer for the blend vector */
     len = varData->regionIdxCount + 1;    /* add 1 for default component */
-    if ( FT_QRENEW_ARRAY( blend->BV, blend->lenBV, len ) )
+    if ( FT_REALLOC( blend->BV,
+                     blend->lenBV * sizeof( *blend->BV ),
+                     len * sizeof( *blend->BV ) ) )
       goto Exit;
 
     blend->lenBV = len;
@@ -1461,8 +1456,10 @@
       if ( master == 0 )
       {
         blend->BV[master] = FT_FIXED_ONE;
-        FT_TRACE4(( "   build blend vector len %d\n", len ));
-        FT_TRACE4(( "   [ %f ", blend->BV[master] / 65536.0 ));
+        FT_TRACE4(( "   build blend vector len %d\n"
+                    "   [ %f ",
+                    len,
+                    blend->BV[master] / 65536.0 ));
         continue;
       }
 
@@ -1546,7 +1543,9 @@
     if ( lenNDV != 0 )
     {
       /* user has set a normalized vector */
-      if ( FT_QRENEW_ARRAY( blend->lastNDV, blend->lenNDV, lenNDV ) )
+      if ( FT_REALLOC( blend->lastNDV,
+                       blend->lenNDV * sizeof ( *NDV ),
+                       lenNDV * sizeof ( *NDV ) ) )
         goto Exit;
 
       FT_MEM_COPY( blend->lastNDV,
@@ -1828,8 +1827,7 @@
         /* Construct code to GID mapping from code to SID mapping */
         /* and charset.                                           */
 
-        encoding->offset = offset; /* used in cff_face_init */
-        encoding->count  = 0;
+        encoding->count = 0;
 
         error = cff_charset_compute_cids( charset, num_glyphs,
                                           stream->memory );
@@ -2365,8 +2363,8 @@
       if ( font->name_index.count > 1 )
       {
         FT_ERROR(( "cff_font_load:"
-                   " invalid CFF font with multiple subfonts\n" ));
-        FT_ERROR(( "              "
+                   " invalid CFF font with multiple subfonts\n"
+                   "              "
                    " in SFNT wrapper\n" ));
         error = FT_THROW( Invalid_File_Format );
         goto Exit;

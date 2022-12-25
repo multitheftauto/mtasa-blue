@@ -10,11 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCoronasSA.h"
-#include "CRegisteredCoronaSA.h"
 
 CCoronasSA::CCoronasSA()
 {
+    DEBUG_TRACE("CCoronasSA::CCoronasSA()");
     for (int i = 0; i < MAX_CORONAS; i++)
     {
         Coronas[i] = new CRegisteredCoronaSA((CRegisteredCoronaSAInterface*)(ARRAY_CORONAS + i * sizeof(CRegisteredCoronaSAInterface)));
@@ -31,11 +30,13 @@ CCoronasSA::~CCoronasSA()
 
 CRegisteredCorona* CCoronasSA::GetCorona(DWORD ID)
 {
+    DEBUG_TRACE("CRegisteredCorona * CCoronasSA::GetCorona(DWORD ID)");
     return (CRegisteredCorona*)this->Coronas[ID];
 }
 
 CRegisteredCorona* CCoronasSA::CreateCorona(DWORD Identifier, CVector* position)
 {
+    DEBUG_TRACE("CRegisteredCorona * CCoronasSA::CreateCorona(DWORD Identifier, CVector * position)");
     CRegisteredCoronaSA* corona;
     corona = (CRegisteredCoronaSA*)this->FindCorona(Identifier);
 
@@ -59,6 +60,7 @@ CRegisteredCorona* CCoronasSA::CreateCorona(DWORD Identifier, CVector* position)
 
 CRegisteredCorona* CCoronasSA::FindFreeCorona()
 {
+    DEBUG_TRACE("CRegisteredCorona * CCoronasSA::FindFreeCorona()");
     for (int i = 2; i < MAX_CORONAS; i++)
     {
         if (Coronas[i]->GetIdentifier() == 0)
@@ -71,6 +73,8 @@ CRegisteredCorona* CCoronasSA::FindFreeCorona()
 
 CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
 {
+    DEBUG_TRACE("CRegisteredCorona * CCoronasSA::FindCorona(DWORD Identifier)");
+
     for (int i = 0; i < MAX_CORONAS; i++)
     {
         if (Coronas[i]->GetIdentifier() == Identifier)
@@ -83,6 +87,7 @@ CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
 
 RwTexture* CCoronasSA::GetTexture(eCoronaType type)
 {
+    DEBUG_TRACE("RwTexture * CCoronasSA::GetTexture(eCoronaType type)");
     if (type < MAX_CORONA_TEXTURES)
         return (RwTexture*)(*(DWORD*)(ARRAY_CORONA_TEXTURES + type * sizeof(DWORD)));
     else
@@ -102,50 +107,4 @@ void CCoronasSA::DisableSunAndMoon(bool bDisabled)
         MemPut<BYTE>(FUNC_DoSunAndMoon, byteOriginal);
         byteOriginal = 0;
     }
-}
-
-/*
-    Enable or disable corona rain reflections.
-    ucEnabled:
-     0 - disabled
-     1 - enabled
-     2 - force enabled (render even if there is no rain)
-*/
-void CCoronasSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
-{
-    m_ucCoronaReflectionsEnabled = ucEnabled;
-
-    if (ucEnabled == 0)
-    {
-        // Disable corona rain reflections
-        // Return out CCoronas::RenderReflections()
-        MemPut<BYTE>(0x6FB630, 0xC3);
-    }
-    else
-    {
-        // Enable corona rain reflections
-        // Re-enable CCoronas::RenderReflections()
-        MemPut<BYTE>(0x6FB630, 0xD9);
-    }
-
-    if (ucEnabled == 2)
-    {
-        // Force enable corona reflections (render even if there is no rain)
-        // Disable fWetGripScale check
-        MemPut<BYTE>(0x6FB645, 0xEB);
-
-        // Patch "fld fWetGripScale" to "fld fOne"
-        MemCpy((void*)0x6FB906, "\x24\x86\x85\x00", 4);
-    }
-    else
-    {
-        // Restore patched code
-        MemPut<BYTE>(0x6FB645, 0x7A);
-        MemCpy((void*)0x6FB906, "\x08\x13\xC8\x00", 4);
-    }
-}
-
-unsigned char CCoronasSA::GetCoronaReflectionsEnabled()
-{
-    return m_ucCoronaReflectionsEnabled;
 }

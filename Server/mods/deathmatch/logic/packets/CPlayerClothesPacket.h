@@ -36,5 +36,5 @@ public:
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
 
 private:
-    std::vector<SPlayerClothes*> m_List;
+    vector<SPlayerClothes*> m_List;
 };

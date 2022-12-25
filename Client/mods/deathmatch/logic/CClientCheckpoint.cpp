@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include <game/CCheckpoint.h>
-#include <game/CCheckpoints.h>
 
 CClientCheckpoint::CClientCheckpoint(CClientMarker* pThis)
 {

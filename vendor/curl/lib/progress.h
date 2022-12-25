@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,8 +19,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -42,14 +40,14 @@ typedef enum {
   TIMER_LAST /* must be last */
 } timerid;
 
-int Curl_pgrsDone(struct Curl_easy *data);
+int Curl_pgrsDone(struct connectdata *);
 void Curl_pgrsStartNow(struct Curl_easy *data);
 void Curl_pgrsSetDownloadSize(struct Curl_easy *data, curl_off_t size);
 void Curl_pgrsSetUploadSize(struct Curl_easy *data, curl_off_t size);
 void Curl_pgrsSetDownloadCounter(struct Curl_easy *data, curl_off_t size);
 void Curl_pgrsSetUploadCounter(struct Curl_easy *data, curl_off_t size);
 void Curl_ratelimit(struct Curl_easy *data, struct curltime now);
-int Curl_pgrsUpdate(struct Curl_easy *data);
+int Curl_pgrsUpdate(struct connectdata *);
 void Curl_pgrsResetTransferSizes(struct Curl_easy *data);
 struct curltime Curl_pgrsTime(struct Curl_easy *data, timerid timer);
 timediff_t Curl_pgrsLimitWaitTime(curl_off_t cursize,

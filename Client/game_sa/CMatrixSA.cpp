@@ -1,14 +1,13 @@
 #include "StdInc.h"
-#include "CMatrixSA.h"
 
 CMatrixSAInterface::CMatrixSAInterface(CMatrixSAInterface const& matrix)
 {
     ((void(__thiscall*)(CMatrixSAInterface*, CMatrixSAInterface const&))0x59BCF0)(this, matrix);
 }
 
-CMatrixSAInterface::CMatrixSAInterface(RwMatrix* matrix, bool temporary)
+CMatrixSAInterface::CMatrixSAInterface(RwMatrixTag* matrix, bool temporary)
 {
-    ((void(__thiscall*)(CMatrixSAInterface*, RwMatrix*, bool))0x59C050)(this, matrix, temporary);
+    ((void(__thiscall*)(CMatrixSAInterface*, RwMatrixTag*, bool))0x59C050)(this, matrix, temporary);
 }
 
 // destructor detaches matrix if attached

@@ -28,6 +28,7 @@ public:
     virtual void           GetBrowseVersionMaps(std::map<SString, int>& outBlockedVersionMap, std::map<SString, int>& outAllowedVersionMap) = 0;
     virtual void           GetNewsSettings(SString& strOutOldestPost, uint& uiOutMaxHistoryLength) = 0;
     virtual const SString& GetDebugFilterString() = 0;
+    virtual void           OnMainMenuFullyVisible() = 0;
 };
 
 CVersionUpdaterInterface* GetVersionUpdater();

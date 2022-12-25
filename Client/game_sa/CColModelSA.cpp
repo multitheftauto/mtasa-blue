@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CColModelSA.h"
 
 CColModelSA::CColModelSA()
 {

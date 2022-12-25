@@ -12,15 +12,7 @@
 #pragma once
 
 #include "Task.h"
-
-class CNodeAddress
-{
-public:
-    short sRegion;
-    short sIndex;
-
-    CNodeAddress() { sRegion = -1; }
-};
+#include "CPathFind.h"
 
 enum
 {

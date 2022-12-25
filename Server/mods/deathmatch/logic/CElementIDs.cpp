@@ -10,7 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CElementIDs.h"
+
+using namespace std;
 
 CStack<ElementID, MAX_SERVER_ELEMENTS - 2>  CElementIDs::m_UniqueIDs;
 SFixedArray<CElement*, MAX_SERVER_ELEMENTS> CElementIDs::m_Elements;

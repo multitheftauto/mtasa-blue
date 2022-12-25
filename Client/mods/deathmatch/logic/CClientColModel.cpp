@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CColModel.h>
 
 CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -33,7 +32,7 @@ CClientColModel::~CClientColModel()
     RestoreAll();
 
     if (m_pColModel)
-        m_pColModel->Destroy();
+        delete m_pColModel;
 }
 
 bool CClientColModel::Load(bool isRaw, SString input)

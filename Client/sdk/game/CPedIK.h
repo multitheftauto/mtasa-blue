@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include <windows.h>
+#include <CVector.h>
+
 // Structure containing current state of limb
 struct LimbOrientation
 {

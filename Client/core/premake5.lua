@@ -16,7 +16,7 @@ project "Client Core"
 			"../sdk",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
-			"../../vendor/jpeg-9e",
+			"../../vendor/jpeg-9d",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
@@ -54,7 +54,7 @@ project "Client Core"
 		"PNG_SETJMP_NOT_SUPPORTED"
 	}
 
-	filter "architecture:not x86"
+	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

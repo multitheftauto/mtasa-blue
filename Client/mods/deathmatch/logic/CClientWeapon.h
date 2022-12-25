@@ -11,7 +11,6 @@
 #pragma once
 
 #include <game/CWeaponInfo.h>
-#include <game/CWorld.h>
 #include "CClientObject.h"
 
 class CClientManager;

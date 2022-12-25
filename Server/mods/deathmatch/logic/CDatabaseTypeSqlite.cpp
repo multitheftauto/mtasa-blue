@@ -11,8 +11,6 @@
 
 #include "StdInc.h"
 #include "CDatabaseType.h"
-#include "CDatabaseManager.h"
-#include "CPerfStatManager.h"
 
 ///////////////////////////////////////////////////////////////
 //

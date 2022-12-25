@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CSettings.h>
 #include "CTileBatcher.h"
 #include "CLine3DBatcher.h"
 #include "CMaterialLine3DBatcher.h"
@@ -489,6 +488,7 @@ void CGraphics::CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMod
     // Draw mode changing?
     if (bDrawModeChanging || bBlendModeChanging)
     {
+
         // Flush old
         if (m_CurDrawMode == EDrawMode::DX_SPRITE)
         {
@@ -844,8 +844,8 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
 }
 
 void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
-                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward,
-                                         const CVector& vecFaceToward, bool bPostGUI)
+                                         float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bUseFaceToward, const CVector& vecFaceToward,
+                                         bool bPostGUI)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -858,10 +858,10 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
 
     // Add it to the queue
     if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
-        m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
+        m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward,
                                                    vecFaceToward);
     else
-        m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
+        m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bUseFaceToward,
                                                   vecFaceToward);
 }
 
@@ -955,8 +955,7 @@ void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertice
         m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
 }
 
-void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
-                                              bool bPostGUI)
+void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI)
 {
     // Prevent queuing when minimized
     if (g_pCore->IsWindowMinimized())
@@ -1099,7 +1098,7 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
 
 void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY,
                                  unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation,
-                                 float fRotationCenterX, float fRotationCenterY, float fLineHeight)
+                                 float fRotationCenterX, float fRotationCenterY)
 {
     if (!szText || !m_pDXSprite)
         return;
@@ -1180,8 +1179,7 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
         CSplitStringW splitLines(wstrText, L"\n");
         int           iNumLines = splitLines.size();
 
-        if (fLineHeight == 0.0f)
-            fLineHeight = GetDXFontHeight(fScaleY, pDXFont);
+        float fLineHeight = GetDXFontHeight(fScaleY, pDXFont);
         float fTotalHeight = iNumLines * fLineHeight;
 
         // Y position of text
@@ -2393,6 +2391,7 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
     return true;
 }
 
+
 namespace
 {
     //
@@ -2509,7 +2508,7 @@ namespace
         }
         return wireModel;
     }
-}            // namespace
+}            // namespace WireShpere
 
 void CGraphics::DrawWiredSphere(CVector vecPosition, float fRadius, SColor color, float fLineWidth, int iterations)
 {

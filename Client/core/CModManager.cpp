@@ -207,7 +207,7 @@ void CModManager::Unload()
         CLocalGUI::GetSingleton().SetChatBoxVisible(true);
 
         // Reset the debugview status
-        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false, true);
+        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false);
         CLocalGUI::GetSingleton().GetDebugView()->Clear();
         CLocalGUI::GetSingleton().SetDebugViewVisible(false);
 

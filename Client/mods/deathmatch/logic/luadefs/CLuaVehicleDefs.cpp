@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CHandlingEntry.h>
-#include <game/CHandlingManager.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaVehicleDefs::LoadFunctions()
@@ -94,7 +92,7 @@ void CLuaVehicleDefs::LoadFunctions()
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
         {"fixVehicle", FixVehicle},
-        {"blowVehicle", ArgumentParserWarn<false, BlowVehicle>},
+        {"blowVehicle", BlowVehicle},
         {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
         {"setVehicleColor", SetVehicleColor},
         {"setVehicleLandingGearDown", SetVehicleLandingGearDown},
@@ -185,7 +183,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getNitroLevel", "getVehicleNitroLevel");
     lua_classfunction(luaVM, "getDirection", "getTrainDirection");
     lua_classfunction(luaVM, "getTrainSpeed", "getTrainSpeed");
-    // lua_classfunction(luaVM, "getTrack", "getTrainTrack");
+    //lua_classfunction(luaVM, "getTrack", "getTrainTrack");
     lua_classfunction(luaVM, "getTrainPosition", "getTrainPosition");
     lua_classfunction(luaVM, "getName", "getVehicleName");
     lua_classfunction(luaVM, "getVehicleType", "getVehicleType");
@@ -271,7 +269,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setNitroLevel", "setVehicleNitroLevel");
     lua_classfunction(luaVM, "setDirection", "setTrainDirection");
     lua_classfunction(luaVM, "setTrainSpeed", "setTrainSpeed");
-    // lua_classfunction(luaVM, "setTrack", "setTrainTrack");
+    //lua_classfunction(luaVM, "setTrack", "setTrainTrack");
     lua_classfunction(luaVM, "setTrainPosition", "setTrainPosition");
     lua_classfunction(luaVM, "setDerailable", "setTrainDerailable");
     lua_classfunction(luaVM, "setDerailed", "setTrainDerailed");
@@ -330,7 +328,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "towedByVehicle", NULL, "getVehicleTowedByVehicle");
     lua_classvariable(luaVM, "direction", "setTrainDirection", "getTrainDirection");
     lua_classvariable(luaVM, "trainSpeed", "setTrainSpeed", "getTrainSpeed");
-    // lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
+    //lua_classvariable(luaVM, "track", "setTrainTrack", "getTrainTrack");
     lua_classvariable(luaVM, "trainPosition", "setTrainPosition", "getTrainPosition");
     lua_classvariable(luaVM, "derailable", "setTrainDerailable", "isTrainDerailable");
     lua_classvariable(luaVM, "derailed", "setTrainDerailed", "isTrainDerailed");
@@ -1550,9 +1548,30 @@ int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)
     return 1;
 }
 
+int CLuaVehicleDefs::BlowVehicle(lua_State* luaVM)
+{
+    CClientEntity*   pEntity = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::BlowVehicle(*pEntity))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 bool CLuaVehicleDefs::IsVehicleBlown(CClientVehicle* vehicle)
 {
-    return vehicle->IsBlown();
+    return vehicle->IsVehicleBlown();
 }
 
 int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)
@@ -4095,8 +4114,7 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
     return pVehicle->GetWheelFrictionState(wheel);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short  vehicleModel,
-                                                                                                              eVehicleDummies dummy)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy)
 {
     CVector position;
 
@@ -4144,9 +4162,4 @@ std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClient
 bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
 {
     return vehicle->ResetDummyPositions();
-}
-
-bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion)
-{
-    return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }

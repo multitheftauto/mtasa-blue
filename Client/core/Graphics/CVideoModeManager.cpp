@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
-#include <game/CSettings.h>
 
 ///////////////////////////////////////////////////////////////
 //
@@ -58,6 +57,7 @@ private:
     unsigned long  m_ulForceBackBufferWidth;
     unsigned long  m_ulForceBackBufferHeight;
     unsigned long  m_ulForceBackBufferColorDepth;
+    unsigned long  m_ulFullScreenRefreshRate;
     HWND           m_hDeviceWindow;
     CGameSettings* m_pGameSettings;
     unsigned long  m_ulMonitorCount;
@@ -134,8 +134,8 @@ void CVideoModeManager::PreCreateDevice(D3DPRESENT_PARAMETERS* pp)
     m_bNextWindowed = m_bCurrentWindowed;
     m_iNextFullscreenStyle = m_iCurrentFullscreenStyle;
 
-    // Set refresh rate to default (automatic)
-    pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    // Remember this for later
+    m_ulFullScreenRefreshRate = pp->FullScreen_RefreshRateInHz;
 
     if (IsDisplayModeWindowed())
     {
@@ -146,6 +146,7 @@ void CVideoModeManager::PreCreateDevice(D3DPRESENT_PARAMETERS* pp)
         SetWindowLong(m_hDeviceWindow, GWL_STYLE, WS_POPUP);
         MoveWindow(m_hDeviceWindow, iPosX, iPosY, pp->BackBufferWidth, pp->BackBufferHeight, TRUE);
         pp->Windowed = true;
+        pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
     else if (IsDisplayModeFullScreenWindow())
     {
@@ -154,6 +155,7 @@ void CVideoModeManager::PreCreateDevice(D3DPRESENT_PARAMETERS* pp)
         SetWindowLong(m_hDeviceWindow, GWL_STYLE, WS_POPUP);
         MoveWindow(m_hDeviceWindow, rc.left, rc.top, pp->BackBufferWidth, pp->BackBufferHeight, TRUE);
         pp->Windowed = true;
+        pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
 
     if (pp->SwapEffect == D3DSWAPEFFECT_FLIP && IsDisplayModeWindowed())
@@ -198,7 +200,7 @@ void CVideoModeManager::PreReset(D3DPRESENT_PARAMETERS* pp)
 
     pp->BackBufferWidth = m_ulForceBackBufferWidth;
     pp->BackBufferHeight = m_ulForceBackBufferHeight;
-    pp->FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    pp->FullScreen_RefreshRateInHz = pp->Windowed ? D3DPRESENT_RATE_DEFAULT : m_ulFullScreenRefreshRate;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -268,7 +270,7 @@ void CVideoModeManager::OnGainFocus()
             dmScreenSettings.dmPelsHeight = m_ulForceBackBufferHeight;
             dmScreenSettings.dmBitsPerPel = m_ulForceBackBufferColorDepth;
             dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
-            dmScreenSettings.dmDisplayFrequency = D3DPRESENT_RATE_DEFAULT;
+            dmScreenSettings.dmDisplayFrequency = m_ulFullScreenRefreshRate;
 
             if (ChangeDisplaySettingsEx(GetCurrentAdapterDeviceName(), &dmScreenSettings, NULL, CDS_FULLSCREEN, NULL) != DISP_CHANGE_SUCCESSFUL)
                 return;

@@ -127,7 +127,7 @@ THE SOFTWARE.
       toc->count = FT_MIN( stream->size >> 4, 9 );
     }
 
-    if ( FT_QNEW_ARRAY( face->toc.tables, toc->count ) )
+    if ( FT_NEW_ARRAY( face->toc.tables, toc->count ) )
       return error;
 
     tables = face->toc.tables;
@@ -238,7 +238,7 @@ THE SOFTWARE.
       {
         for ( j = 0; j < sizeof ( tableNames ) / sizeof ( tableNames[0] );
               j++ )
-          if ( tables[i].type == 1UL << j )
+          if ( tables[i].type == (FT_UInt)( 1 << j ) )
             name = tableNames[j];
 
         FT_TRACE4(( "  %d: type=%s, format=0x%lX,"
@@ -501,8 +501,8 @@ THE SOFTWARE.
     if ( FT_READ_ULONG_LE( format ) )
       goto Bail;
 
-    FT_TRACE4(( "pcf_get_properties:\n" ));
-    FT_TRACE4(( "  format: 0x%lX (%s)\n",
+    FT_TRACE4(( "pcf_get_properties:\n"
+                "  format: 0x%lX (%s)\n",
                 format,
                 PCF_BYTE_ORDER( format ) == MSBFirst ? "MSB" : "LSB" ));
 
@@ -540,7 +540,7 @@ THE SOFTWARE.
 
     face->nprops = (int)nprops;
 
-    if ( FT_QNEW_ARRAY( props, nprops ) )
+    if ( FT_NEW_ARRAY( props, nprops ) )
       goto Bail;
 
     for ( i = 0; i < nprops; i++ )
@@ -607,13 +607,13 @@ THE SOFTWARE.
     }
 
     /* allocate one more byte so that we have a final null byte */
-    if ( FT_QALLOC( strings, string_size + 1 )  ||
-         FT_STREAM_READ( strings, string_size ) )
+    if ( FT_NEW_ARRAY( strings, string_size + 1 ) )
       goto Bail;
 
-    strings[string_size] = '\0';
+    error = FT_Stream_Read( stream, (FT_Byte*)strings, string_size );
+    if ( error )
+      goto Bail;
 
-    /* zero out in case of failure */
     if ( FT_NEW_ARRAY( properties, nprops ) )
       goto Bail;
 
@@ -697,8 +697,8 @@ THE SOFTWARE.
     if ( FT_READ_ULONG_LE( format ) )
       goto Bail;
 
-    FT_TRACE4(( "pcf_get_metrics:\n" ));
-    FT_TRACE4(( "  format: 0x%lX (%s, %s)\n",
+    FT_TRACE4(( "pcf_get_metrics:\n"
+                "  format: 0x%lX (%s, %s)\n",
                 format,
                 PCF_BYTE_ORDER( format ) == MSBFirst ? "MSB" : "LSB",
                 PCF_FORMAT_MATCH( format, PCF_COMPRESSED_METRICS ) ?
@@ -767,7 +767,7 @@ THE SOFTWARE.
 
     face->nmetrics = nmetrics + 1;
 
-    if ( FT_QNEW_ARRAY( face->metrics, face->nmetrics ) )
+    if ( FT_NEW_ARRAY( face->metrics, face->nmetrics ) )
       return error;
 
     /* we handle glyph index 0 later on */
@@ -840,16 +840,17 @@ THE SOFTWARE.
 
     FT_Stream_ExitFrame( stream );
 
-    FT_TRACE4(( "pcf_get_bitmaps:\n" ));
-    FT_TRACE4(( "  format: 0x%lX\n", format ));
-    FT_TRACE4(( "          (%s, %s,\n",
+    FT_TRACE4(( "pcf_get_bitmaps:\n"
+                "  format: 0x%lX\n"
+                "          (%s, %s,\n"
+                "           padding=%d bit%s, scanning=%d bit%s)\n",
+                format,
                 PCF_BYTE_ORDER( format ) == MSBFirst
                   ? "most significant byte first"
                   : "least significant byte first",
                 PCF_BIT_ORDER( format ) == MSBFirst
                   ? "most significant bit first"
-                  : "least significant bit first" ));
-    FT_TRACE4(( "           padding=%d bit%s, scanning=%d bit%s)\n",
+                  : "least significant bit first",
                 8 << PCF_GLYPH_PAD_INDEX( format ),
                 ( 8 << PCF_GLYPH_PAD_INDEX( format ) ) == 1 ? "" : "s",
                 8 << PCF_SCAN_UNIT_INDEX( format ),
@@ -1000,8 +1001,8 @@ THE SOFTWARE.
     if ( FT_READ_ULONG_LE( format ) )
       goto Bail;
 
-    FT_TRACE4(( "pcf_get_encodings:\n" ));
-    FT_TRACE4(( "  format: 0x%lX (%s)\n",
+    FT_TRACE4(( "pcf_get_encodings:\n"
+                "  format: 0x%lX (%s)\n",
                 format,
                 PCF_BYTE_ORDER( format ) == MSBFirst ? "MSB" : "LSB" ));
 
@@ -1020,11 +1021,11 @@ THE SOFTWARE.
         goto Bail;
     }
 
-    FT_TRACE4(( "  firstCol 0x%X, lastCol 0x%X\n",
-                enc->firstCol, enc->lastCol ));
-    FT_TRACE4(( "  firstRow 0x%X, lastRow 0x%X\n",
-                enc->firstRow, enc->lastRow ));
-    FT_TRACE4(( "  defaultChar 0x%X\n",
+    FT_TRACE4(( "  firstCol 0x%X, lastCol 0x%X\n"
+                "  firstRow 0x%X, lastRow 0x%X\n"
+                "  defaultChar 0x%X\n",
+                enc->firstCol, enc->lastCol,
+                enc->firstRow, enc->lastRow,
                 enc->defaultChar ));
 
     /* sanity checks; we limit numbers of rows and columns to 256 */
@@ -1033,6 +1034,16 @@ THE SOFTWARE.
          enc->firstRow > enc->lastRow ||
          enc->lastRow  > 0xFF         )
       return FT_THROW( Invalid_Table );
+
+    nencoding = (FT_ULong)( enc->lastCol - enc->firstCol + 1 ) *
+                (FT_ULong)( enc->lastRow - enc->firstRow + 1 );
+
+    if ( FT_NEW_ARRAY( enc->offset, nencoding ) )
+      goto Bail;
+
+    error = FT_Stream_EnterFrame( stream, 2 * nencoding );
+    if ( error )
+      goto Exit;
 
     FT_TRACE5(( "\n" ));
 
@@ -1053,13 +1064,6 @@ THE SOFTWARE.
       defaultCharRow = enc->firstRow;
       defaultCharCol = enc->firstCol;
     }
-
-    nencoding = (FT_ULong)( enc->lastCol - enc->firstCol + 1 ) *
-                (FT_ULong)( enc->lastRow - enc->firstRow + 1 );
-
-    error = FT_Stream_EnterFrame( stream, 2 * nencoding );
-    if ( error )
-      goto Bail;
 
     /*
      * FreeType mandates that glyph index 0 is the `undefined glyph', which
@@ -1084,8 +1088,8 @@ THE SOFTWARE.
     if ( defaultCharEncodingOffset == 0xFFFF )
     {
       FT_TRACE0(( "pcf_get_encodings:"
-                  " No glyph for default character,\n" ));
-      FT_TRACE0(( "                  "
+                  " No glyph for default character,\n"
+                  "                  "
                   " setting it to the first glyph of the font\n" ));
       defaultCharEncodingOffset = 1;
     }
@@ -1096,8 +1100,8 @@ THE SOFTWARE.
       if ( defaultCharEncodingOffset >= face->nmetrics )
       {
         FT_TRACE0(( "pcf_get_encodings:"
-                    " Invalid glyph index for default character,\n" ));
-        FT_TRACE0(( "                  "
+                    " Invalid glyph index for default character,\n"
+                    "                  "
                     " setting it to the first glyph of the font\n" ));
         defaultCharEncodingOffset = 1;
       }
@@ -1105,9 +1109,6 @@ THE SOFTWARE.
 
     /* copy metrics of default character to index 0 */
     face->metrics[0] = face->metrics[defaultCharEncodingOffset];
-
-    if ( FT_QNEW_ARRAY( enc->offset, nencoding ) )
-      goto Bail;
 
     /* now loop over all values */
     offset = enc->offset;
@@ -1130,6 +1131,11 @@ THE SOFTWARE.
       }
     }
     FT_Stream_ExitFrame( stream );
+
+    return error;
+
+  Exit:
+    FT_FREE( enc->offset );
 
   Bail:
     return error;
@@ -1202,10 +1208,10 @@ THE SOFTWARE.
     if ( FT_READ_ULONG_LE( format ) )
       goto Bail;
 
-    FT_TRACE4(( "pcf_get_accel%s:\n",
+    FT_TRACE4(( "pcf_get_accel%s:\n"
+                "  format: 0x%lX (%s, %s)\n",
                 type == PCF_BDF_ACCELERATORS ? " (getting BDF accelerators)"
-                                             : "" ));
-    FT_TRACE4(( "  format: 0x%lX (%s, %s)\n",
+                                             : "",
                 format,
                 PCF_BYTE_ORDER( format ) == MSBFirst ? "MSB" : "LSB",
                 PCF_FORMAT_MATCH( format, PCF_ACCEL_W_INKBOUNDS ) ?
@@ -1227,16 +1233,16 @@ THE SOFTWARE.
     }
 
     FT_TRACE5(( "  noOverlap=%s, constantMetrics=%s,"
-                " terminalFont=%s, constantWidth=%s\n",
+                " terminalFont=%s, constantWidth=%s\n"
+                "  inkInside=%s, inkMetrics=%s, drawDirection=%s\n"
+                "  fontAscent=%ld, fontDescent=%ld, maxOverlap=%ld\n",
                 accel->noOverlap ? "yes" : "no",
                 accel->constantMetrics ? "yes" : "no",
                 accel->terminalFont ? "yes" : "no",
-                accel->constantWidth ? "yes" : "no" ));
-    FT_TRACE5(( "  inkInside=%s, inkMetrics=%s, drawDirection=%s\n",
+                accel->constantWidth ? "yes" : "no",
                 accel->inkInside ? "yes" : "no",
                 accel->inkMetrics ? "yes" : "no",
-                accel->drawDirection ? "RTL" : "LTR" ));
-    FT_TRACE5(( "  fontAscent=%ld, fontDescent=%ld, maxOverlap=%ld\n",
+                accel->drawDirection ? "RTL" : "LTR",
                 accel->fontAscent,
                 accel->fontDescent,
                 accel->maxOverlap ));
@@ -1363,7 +1369,7 @@ THE SOFTWARE.
       char*  s;
 
 
-      if ( FT_QALLOC( face->style_name, len ) )
+      if ( FT_ALLOC( face->style_name, len ) )
         return error;
 
       s = face->style_name;
@@ -1527,7 +1533,7 @@ THE SOFTWARE.
           {
             l += ft_strlen( foundry_prop->value.atom ) + 1;
 
-            if ( FT_QALLOC( root->family_name, l ) )
+            if ( FT_NEW_ARRAY( root->family_name, l ) )
               goto Exit;
 
             ft_strcpy( root->family_name, foundry_prop->value.atom );
@@ -1536,7 +1542,7 @@ THE SOFTWARE.
           }
           else
           {
-            if ( FT_QALLOC( root->family_name, l ) )
+            if ( FT_NEW_ARRAY( root->family_name, l ) )
               goto Exit;
 
             ft_strcpy( root->family_name, prop->value.atom );
@@ -1560,13 +1566,15 @@ THE SOFTWARE.
       root->num_glyphs = (FT_Long)face->nmetrics;
 
       root->num_fixed_sizes = 1;
-      if ( FT_NEW( root->available_sizes ) )
+      if ( FT_NEW_ARRAY( root->available_sizes, 1 ) )
         goto Exit;
 
       {
         FT_Bitmap_Size*  bsize = root->available_sizes;
         FT_Short         resolution_x = 0, resolution_y = 0;
 
+
+        FT_ZERO( bsize );
 
         /* for simplicity, we take absolute values of integer properties */
 
@@ -1608,7 +1616,7 @@ THE SOFTWARE.
         else
         {
           /* this is a heuristical value */
-          bsize->width = ( bsize->height * 2 + 1 ) / 3;
+          bsize->width = (FT_Short)FT_MulDiv( bsize->height, 2, 3 );
         }
 
         prop = pcf_find_property( face, "POINT_SIZE" );

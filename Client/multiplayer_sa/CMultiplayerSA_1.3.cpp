@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CWorld.h>
 
 extern CCoreInterface* g_pCore;
 
@@ -201,7 +200,6 @@ void CMultiplayerSA::InitHooks_13()
     InitHooks_Files();
     InitHooks_Weapons();
     InitHooks_Peds();
-    InitHooks_ObjectCollision();
     InitHooks_VehicleCollision();
     InitHooks_VehicleDummies();
     InitHooks_Vehicles();
@@ -238,6 +236,8 @@ void CMultiplayerSA::InitMemoryCopies_13()
     // Fixes
     // MemPut < BYTE > ( 0x685AC1, 0xEB );
     // MemPut < BYTE > ( 0x685C2D, 0xEB );
+
+    MemPut<BYTE>(0x0706AB0, 0xC3);            // Skip CRealTimeShadowManager::Update
 }
 
 // Siren Stuff

@@ -11,7 +11,7 @@
 #include <Windows.h>
 #include "CCefApp.h"
 #include <string>
-#include <cef3/cef/include/cef_sandbox_win.h>
+#include <cef3/include/cef_sandbox_win.h>
 
 //#define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX

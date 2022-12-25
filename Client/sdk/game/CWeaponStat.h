@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #pragma once
-#include "CWeaponInfo.h"
-
-class CVector;
 
 class CWeaponStat
 {

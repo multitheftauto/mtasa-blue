@@ -10,18 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CGameSA.h"
-#include "CTaskManagementSystemSA.h"
-#include "CTaskManagerSA.h"
-#include "TaskSA.h"
-
-extern CGameSA* pGame;
 
 CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CPed* ped)
 {
+    DEBUG_TRACE("CTaskManagerSA::CTaskManagerSA(CTaskManagerSAInterface * taskManagerInterface, CPed * ped)");
     this->ped = ped;
     this->internalInterface = taskManagerInterface;
-    this->m_pTaskManagementSystem = pGame->GetTaskManagementSystem();
+    this->m_pTaskManagementSystem = (CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem());
 }
 
 void CTaskManagerSA::RemoveTask(const int iTaskPriority)
@@ -34,6 +29,8 @@ void CTaskManagerSA::RemoveTask(const int iTaskPriority)
 
 void CTaskManagerSA::SetTask(CTaskSA* pTaskPrimary, const int iTaskPriority, const bool bForceNewTask)
 {
+    DEBUG_TRACE("void CTaskManagerSA::SetTask(CTask* pTaskPrimary, const int iTaskPriority, const bool bForceNewTask)");
+
     DWORD             dwFunc = FUNC_SetTask;
     CTaskSAInterface* taskInterface = NULL;
     if (pTaskPrimary)
@@ -54,12 +51,14 @@ void CTaskManagerSA::SetTask(CTaskSA* pTaskPrimary, const int iTaskPriority, con
 
 CTask* CTaskManagerSA::GetTask(const int iTaskPriority)
 {
+    DEBUG_TRACE("CTask* CTaskManagerSA::GetTask(const int iTaskPriority)");
     CTaskManagerSAInterface* pTaskManagerInterface = this->GetInterface();
     return m_pTaskManagementSystem->GetTask(pTaskManagerInterface->m_tasks[iTaskPriority]);
 }
 
 CTask* CTaskManagerSA::GetActiveTask()
 {
+    DEBUG_TRACE("CTask* CTaskManagerSA::GetActiveTask()");
     DWORD dwFunc = FUNC_GetActiveTask;
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -79,6 +78,7 @@ CTask* CTaskManagerSA::GetActiveTask()
 
 CTask* CTaskManagerSA::GetSimplestActiveTask()
 {
+    DEBUG_TRACE("CTask* CTaskManagerSA::GetSimplestActiveTask()");
     DWORD dwFunc = FUNC_GetSimplestActiveTask;
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -96,6 +96,7 @@ CTask* CTaskManagerSA::GetSimplestActiveTask()
 
 CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
 {
+    DEBUG_TRACE("CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)");
     DWORD dwFunc = FUNC_GetSimplestTask;
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -113,6 +114,7 @@ CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
 
 CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
 {
+    DEBUG_TRACE("CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)");
     DWORD dwFunc = FUNC_FindActiveTaskByType;
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -130,6 +132,7 @@ CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
 
 CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
 {
+    DEBUG_TRACE("CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)");
     DWORD dwFunc = FUNC_FindTaskByType;
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)this->GetInterface();
@@ -153,6 +156,7 @@ void CTaskManagerSA::RemoveTaskSecondary(const int iTaskPriority)
 
 void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
 {
+    DEBUG_TRACE("void CTaskManagerSA::SetTaskSecondary(CTask* pTaskSecondary, const int iType)");
     DWORD             dwFunc = FUNC_SetTaskSecondary;
     CTaskSAInterface* taskInterface = NULL;
     if (pTaskSecondary)
@@ -172,6 +176,7 @@ void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
  */
 CTask* CTaskManagerSA::GetTaskSecondary(const int iType)
 {
+    DEBUG_TRACE("CTask* CTaskManagerSA::GetTaskSecondary(const int iType)");
     if (iType < TASK_SECONDARY_MAX)
         return m_pTaskManagementSystem->GetTask(this->GetInterface()->m_tasksSecondary[iType]);
     else
@@ -180,6 +185,7 @@ CTask* CTaskManagerSA::GetTaskSecondary(const int iType)
 
 bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)
 {
+    DEBUG_TRACE("bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)");
     DWORD dwFunc = FUNC_HasTaskSecondary;
     bool  bReturn = false;
     _asm
@@ -193,6 +199,7 @@ bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)
 
 void CTaskManagerSA::ClearTaskEventResponse()
 {
+    DEBUG_TRACE("void CTaskManagerSA::ClearTaskEventResponse()");
     DWORD dwFunc = FUNC_ClearTaskEventResponse;
     _asm
     {
@@ -202,6 +209,7 @@ void CTaskManagerSA::ClearTaskEventResponse()
 
 void CTaskManagerSA::Flush(const int iPriority)
 {
+    DEBUG_TRACE("void CTaskManagerSA::Flush(bool bImmediately)");
     for (int i = 0; i < TASK_PRIORITY_MAX; i++)
     {
         CTask* pTask = GetTask(i);

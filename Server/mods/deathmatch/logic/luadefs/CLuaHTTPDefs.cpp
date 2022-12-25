@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaHTTPDefs.h"
-#include "CScriptArgReader.h"
-#include "CResourceHTMLItem.h"
 
 void CLuaHTTPDefs::LoadFunctions(lua_State* luaVM)
 {

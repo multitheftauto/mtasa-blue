@@ -9,8 +9,8 @@
 #include "StdInc.h"
 #include "CWebApp.h"
 
-#include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
-#include <cef3/cef/include/cef_parser.h>
+#include <cef3/include/wrapper/cef_stream_resource_handler.h>
+#include <cef3/include/cef_parser.h>
 #include "CAjaxResourceHandler.h"
 
 CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
@@ -31,9 +31,6 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     command_line->AppendSwitch("disable-gpu");
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
-
-    // browser-signin switch(or lack thereof) produces crashes when GOOGLE API keys are present in the OS registry
-    command_line->AppendSwitchWithValue("allow-browser-signin", "false");
 
     if (process_type.empty())
     {

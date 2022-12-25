@@ -8,7 +8,6 @@
  *
  *****************************************************************************/
 #include <StdInc.h>
-#include <game/CPointLights.h>
 
 CClientSearchLight::CClientSearchLight(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientStreamElement(pManager->GetLightStreamer(), ID)
 {

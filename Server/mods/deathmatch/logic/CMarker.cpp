@@ -10,16 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CMarker.h"
-#include "CMarkerManager.h"
-#include "CColCircle.h"
-#include "CColSphere.h"
-#include "CResource.h"
-#include "CLogger.h"
-#include "Utils.h"
-#include "CGame.h"
-#include "packets/CElementRPCPacket.h"
-#include <net/rpc_enums.h>
 
 CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent) : CPerPlayerEntity(pParent)
 {

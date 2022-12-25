@@ -10,14 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CFireManagerSA.h"
-#include "CFireSA.h"
-#include "CGameSA.h"
 
 extern CGameSA* pGame;
 
 CFireManagerSA::CFireManagerSA()
 {
+    DEBUG_TRACE("CFireManagerSA::CFireManagerSA()");
     for (int i = 0; i < MAX_FIRES; i++)
         this->Fires[i] = new CFireSA(
             (CFireSAInterface*)(CLASS_CFireManager + 40 * i));            // + 4 because thats the position of CFire array in CFireManager (see source)
@@ -31,11 +29,12 @@ CFireManagerSA::~CFireManagerSA()
     }
 }
 
-void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
+VOID CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 {
-    float fX = vecPosition.fX;
-    float fY = vecPosition.fY;
-    float fZ = vecPosition.fZ;
+    DEBUG_TRACE("VOID CFireManagerSA::ExtinguishPoint ( CVector & vecPosition, float fRadius )");
+    FLOAT fX = vecPosition.fX;
+    FLOAT fY = vecPosition.fY;
+    FLOAT fZ = vecPosition.fZ;
     DWORD dwFunction = FUNC_ExtinguishPoint;
 
     _asm
@@ -51,6 +50,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 
 CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
+    DEBUG_TRACE("CFire * CFireManagerSA::StartFire ( CEntity * entityTarget, CEntity * entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )");
     CFire* fire = this->FindFreeFire();
 
     if (fire != NULL)
@@ -58,7 +58,7 @@ CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, 
         fire->SetTarget(entityTarget);
         fire->SetStrength(fSize);
         fire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
-        fire->SetSilent(false);
+        fire->SetSilent(FALSE);
         fire->Ignite();
     }
 
@@ -67,6 +67,7 @@ CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, 
 
 CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
+    DEBUG_TRACE("CFire * CFireManagerSA::StartFire ( CVector & vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE )");
     CFire* fire = this->FindFreeFire();
 
     if (fire != NULL)
@@ -74,15 +75,39 @@ CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIR
         fire->SetPosition(vecPosition);
         fire->SetStrength(fSize);
         fire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
-        fire->SetSilent(false);
+        fire->SetSilent(FALSE);
         fire->Ignite();
     }
 
     return fire;
+
+    //  CFire*  StartFire(CVector vecLocation, float fFireSize=DEFAULT_FIRE_PARTICLE_SIZE, unsigned char bExtinguishEnabled=TRUE, CEntity* pStartedFireEntity =
+    //  NULL, unsigned int ArgBurnTime = FIRE_AVERAGE_BURNTIME, char NumGenerationsAllowed = 100, unsigned char bReportFire = true);
+
+    /*  DWORD dwFunc = FUNC_StartFire_Vec;
+        DWORD dwReturn = 0;
+        DWORD dwThis = CLASS_CFireManager;
+        _asm
+        {
+            mov     ecx, dwThis
+            push    0       // report fire
+            push    100     // generations
+            push    7000    // burn time
+            push    0       // creator entity
+            push    0
+            push    0
+            push    1       // extinguish enabled
+            push    fSize   // size
+            push    vecPosition
+            call    dwFunc
+            mov     dwReturn, eax
+        }
+        return (CFire *)dwReturn;*/
 }
 
-void CFireManagerSA::ExtinguishAllFires()
+VOID CFireManagerSA::ExtinguishAllFires()
 {
+    DEBUG_TRACE("VOID CFireManagerSA::ExtinguishAllFires (  )");
     CFireSA* fire;
     for (int i = 0; i < MAX_FIRES; i++)
     {
@@ -94,6 +119,7 @@ void CFireManagerSA::ExtinguishAllFires()
 
 CFire* CFireManagerSA::GetFire(DWORD ID)
 {
+    DEBUG_TRACE("CFire * CFireManagerSA::GetFire ( DWORD ID )");
     if (ID < MAX_FIRES)
         return Fires[ID];
     else
@@ -102,11 +128,13 @@ CFire* CFireManagerSA::GetFire(DWORD ID)
 
 DWORD CFireManagerSA::GetFireCount()
 {
+    DEBUG_TRACE("DWORD CFireManagerSA::GetFireCount (  )");
     return *(DWORD*)CLASS_CFireManager;
 }
 
 CFire* CFireManagerSA::FindFreeFire()
 {
+    DEBUG_TRACE("CFire * CFireManagerSA::FindFreeFire (  )");
     CFireSA* fire;
     for (int i = 0; i < MAX_FIRES; i++)
     {
@@ -119,6 +147,7 @@ CFire* CFireManagerSA::FindFreeFire()
 
 CFire* CFireManagerSA::GetFire(CFireSAInterface* fire)
 {
+    DEBUG_TRACE("CFire * CFireManagerSA::GetFire ( CFireSAInterface * fire )");
     DWORD dwID = ((DWORD)fire - CLASS_CFireManager + 4) / sizeof(CFireSAInterface);
     return GetFire(dwID);
 }

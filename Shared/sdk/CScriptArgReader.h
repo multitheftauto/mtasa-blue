@@ -8,18 +8,14 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
 #pragma once
-
-#include "CVector2D.h"
 #include <limits>
 #include <type_traits>
 #include <cfloat>
 #include "CStringMap.h"
-#include "CScriptDebugging.h"
 
-#ifndef MTA_CLIENT
-    #include "CGame.h"
+#ifdef MTA_CLIENT
+    #include "CScriptDebugging.h"
 #endif
 
 /////////////////////////////////////////////////////////////////////////
@@ -157,7 +153,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = static_cast<CVector2D&>(*pVector);
+                    outValue = *pVector;
                     return;
                 }
                 outValue = CVector2D();
@@ -218,7 +214,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = static_cast<CVector2D&>(*pVector);
+                    outValue = *pVector;
                     return;
                 }
                 outValue = CVector2D();
@@ -283,7 +279,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = static_cast<CVector&>(*pVector);
+                    outValue = *pVector;
                     return;
                 }
                 outValue = CVector();
@@ -332,7 +328,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = static_cast<CVector&>(*pVector);
+                    outValue = *pVector;
                     return;
                 }
                 outValue = CVector();
@@ -385,7 +381,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = static_cast<CVector4D&>(*pVector);
+                    outValue = *pVector;
                     return;
                 }
                 outValue = CVector4D();
@@ -422,7 +418,7 @@ public:
                 ReadUserData(pVector);
                 if (pVector)
                 {
-                    outValue = static_cast<CVector4D&>(*pVector);
+                    outValue = *pVector;
                     return;
                 }
                 outValue = CVector4D();
@@ -468,7 +464,7 @@ public:
             ReadUserData(pMatrix);
             if (pMatrix)
             {
-                outValue = static_cast<CMatrix&>(*pMatrix);
+                outValue = *pMatrix;
                 return;
             }
             outValue = CMatrix();
@@ -801,7 +797,7 @@ protected:
 
         if (iArgument == LUA_TLIGHTUSERDATA)
         {
-            outValue = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex), m_luaVM);
+            outValue = (T*)UserDataCast<T>((T*)0, lua_touserdata(m_luaVM, m_iIndex), m_luaVM);
             if (outValue)
             {
                 m_iIndex++;
@@ -810,7 +806,7 @@ protected:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            outValue = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex)), m_luaVM);
+            outValue = (T*)UserDataCast<T>((T*)0, *((void**)lua_touserdata(m_luaVM, m_iIndex)), m_luaVM);
             if (outValue)
             {
                 m_iIndex++;
@@ -951,11 +947,11 @@ public:
             T* value = NULL;
             if (iArgumentType == LUA_TLIGHTUSERDATA)
             {
-                value = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, -1), m_luaVM);
+                value = (T*)UserDataCast<T>((T*)0, lua_touserdata(m_luaVM, -1), m_luaVM);
             }
             else if (iArgumentType == LUA_TUSERDATA)
             {
-                value = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, -1)), m_luaVM);
+                value = (T*)UserDataCast<T>((T*)0, *((void**)lua_touserdata(m_luaVM, -1)), m_luaVM);
             }
 
             if (value != NULL)
@@ -1105,7 +1101,7 @@ protected:
                 // Dumb number -> string convertion to avoid stack perturbations
                 if (keyType == LUA_TNUMBER)
                 {
-                    char       s[LUAI_MAXNUMBER2STR];
+                    char s[LUAI_MAXNUMBER2STR];
                     lua_Number n = lua_tonumber(m_luaVM, -2);
                     lua_number2str(s, n);
 
@@ -1124,6 +1120,8 @@ protected:
     // Reads { key, value } as a pair
     void InternalReadPairTable(std::vector<std::pair<SString, SString>>& outPairs, int iIndex)
     {
+        std::pair<SString, SString> keyValue;
+
         // lua_next has a bug after it calling findindex internally
         // But we have to iterate sequentially right now. So luaL_getn is the solution.
         for (int i = 1; i <= luaL_getn(m_luaVM, iIndex); ++i)
@@ -1138,8 +1136,6 @@ protected:
 
                 lua_pushnumber(m_luaVM, 2);
                 lua_gettable(m_luaVM, -3);
-
-                std::pair<SString, SString> keyValue;
 
                 if (InternalReadPair(keyValue))
                     outPairs.push_back(std::move(keyValue));
@@ -1156,10 +1152,9 @@ protected:
     {
         lua_pushnil(m_luaVM);
 
+        std::pair<SString, SString> keyValue;
         while (lua_next(m_luaVM, iIndex) != 0)
         {
-            std::pair<SString, SString> keyValue;
-
             if (InternalReadPair(keyValue))
                 outPairs.push_back(std::move(keyValue));
 
@@ -1288,12 +1283,12 @@ public:
         int iArgument = lua_type(m_luaVM, m_iIndex + iOffset);
         if (iArgument == LUA_TLIGHTUSERDATA)
         {
-            if (UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex + iOffset), m_luaVM))
+            if (UserDataCast<T>((T*)0, lua_touserdata(m_luaVM, m_iIndex + iOffset), m_luaVM))
                 return true;
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex + iOffset)), m_luaVM))
+            if (UserDataCast<T>((T*)0, *((void**)lua_touserdata(m_luaVM, m_iIndex + iOffset)), m_luaVM))
                 return true;
         }
         return false;

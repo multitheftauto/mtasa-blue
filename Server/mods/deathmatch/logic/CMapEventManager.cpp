@@ -10,14 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CMapEventManager.h"
-#include "CMapEvent.h"
-#include "lua/CLuaMain.h"
-#include "CGame.h"
-#include "CDebugHookManager.h"
-#include "CScriptDebugging.h"
-#include "CDummy.h"
-#include "CPerfStatManager.h"
 
 CMapEventManager::CMapEventManager()
 {

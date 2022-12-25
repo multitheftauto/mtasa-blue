@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "TaskGoToSA.h"
 
 // ##############################################################################
 // ## Name:    CTaskComplexWander
@@ -20,6 +19,7 @@
 
 int CTaskComplexWanderSA::GetWanderType()
 {
+    DEBUG_TRACE("int CTaskComplexWander::GetWanderType()");
     CTaskSAInterface* pTaskInterface = this->GetInterface();
     DWORD             dwFunc = ((TaskComplexWanderVTBL*)pTaskInterface->VTBL)->GetWanderType;
     int               iReturn = NO_WANDER_TYPE;
@@ -53,6 +53,7 @@ CNodeAddress* CTaskComplexWanderSA::GetLastNode()
 
 CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)
 {
+    DEBUG_TRACE("CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)");
     this->CreateTaskInterface(sizeof(CTaskComplexWanderStandardSAInterface));
     if (!IsValid())
         return;

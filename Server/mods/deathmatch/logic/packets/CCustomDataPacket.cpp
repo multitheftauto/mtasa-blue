@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCustomDataPacket.h"
-#include "CCustomData.h"
 
 CCustomDataPacket::CCustomDataPacket()
 {

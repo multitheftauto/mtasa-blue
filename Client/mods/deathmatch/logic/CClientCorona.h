@@ -38,9 +38,6 @@ public:
     float GetSize() const { return m_fSize; };
     void  SetSize(float fSize) { m_fSize = fSize; };
 
-    void SetReflectionEnabled(bool bEnabled) { m_bReflectionEnabled = bEnabled; };
-    bool IsReflectionEnabled() const { return m_bReflectionEnabled; };
-
 protected:
     bool IsStreamedIn() { return m_bStreamedIn; };
     void StreamIn();
@@ -56,6 +53,5 @@ private:
     bool             m_bVisible;
     float            m_fSize;
     SColor           m_Color;
-    bool             m_bReflectionEnabled;
     CCoronas*        m_pCoronas;
 };

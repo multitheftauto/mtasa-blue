@@ -11,8 +11,6 @@
 
 #pragma once
 
-class CAnimBlendSequenceSAInterface;
-
 class CAnimBlendSequence
 {
 public:

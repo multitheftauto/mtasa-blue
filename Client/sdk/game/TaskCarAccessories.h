@@ -13,8 +13,6 @@
 
 #include "Task.h"
 
-class CVehicle;
-
 class CTaskSimpleCarSetPedInAsDriver : public virtual CTaskSimple
 {
 public:

@@ -4,7 +4,7 @@
  *
  *   Type 1 font loader (body).
  *
- * Copyright (C) 1996-2022 by
+ * Copyright (C) 1996-2020 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -117,9 +117,6 @@
         goto Exit;
 
       blend->num_default_design_vector = 0;
-      blend->weight_vector             = NULL;
-      blend->default_weight_vector     = NULL;
-      blend->design_pos[0]             = NULL;
 
       face->blend = blend;
     }
@@ -133,10 +130,13 @@
 
 
         /* allocate the blend `private' and `font_info' dictionaries */
-        if ( FT_NEW_ARRAY( blend->font_infos[1], num_designs ) ||
-             FT_NEW_ARRAY( blend->privates  [1], num_designs ) ||
-             FT_NEW_ARRAY( blend->bboxes    [1], num_designs ) )
+        if ( FT_NEW_ARRAY( blend->font_infos[1], num_designs     ) ||
+             FT_NEW_ARRAY( blend->privates  [1], num_designs     ) ||
+             FT_NEW_ARRAY( blend->bboxes    [1], num_designs     ) ||
+             FT_NEW_ARRAY( blend->weight_vector, num_designs * 2 ) )
           goto Exit;
+
+        blend->default_weight_vector = blend->weight_vector + num_designs;
 
         blend->font_infos[0] = &face->type1.font_info;
         blend->privates  [0] = &face->type1.private_dict;
@@ -162,6 +162,21 @@
         goto Fail;
 
       blend->num_axis = num_axis;
+    }
+
+    /* allocate the blend design pos table if needed */
+    num_designs = blend->num_designs;
+    num_axis    = blend->num_axis;
+    if ( num_designs && num_axis && blend->design_pos[0] == 0 )
+    {
+      FT_UInt  n;
+
+
+      if ( FT_NEW_ARRAY( blend->design_pos[0], num_designs * num_axis ) )
+        goto Exit;
+
+      for ( n = 1; n < num_designs; n++ )
+        blend->design_pos[n] = blend->design_pos[0] + num_axis * n;
     }
 
   Exit:
@@ -565,7 +580,7 @@
   {
     FT_Error  error;
     PS_Blend  blend = face->blend;
-    FT_UInt   n;
+    FT_UInt   n, p;
     FT_Fixed  final_blends[T1_MAX_MM_DESIGNS];
 
 
@@ -584,7 +599,7 @@
       PS_DesignMap  map     = blend->design_map + n;
       FT_Long*      designs = map->design_points;
       FT_Fixed*     blends  = map->blend_points;
-      FT_Int        p, before  = -1, after = -1;
+      FT_Int        before  = -1, after = -1;
 
 
       /* use a default value if we don't have a coordinate */
@@ -593,7 +608,7 @@
       else
         design = ( designs[map->num_points - 1] - designs[0] ) / 2;
 
-      for ( p = 0; p < (FT_Int)map->num_points; p++ )
+      for ( p = 0; p < (FT_UInt)map->num_points; p++ )
       {
         FT_Long  p_design = designs[p];
 
@@ -607,11 +622,11 @@
 
         if ( design < p_design )
         {
-          after = p;
+          after = (FT_Int)p;
           break;
         }
 
-        before = p;
+        before = (FT_Int)p;
       }
 
       /* now interpolate if necessary */
@@ -836,7 +851,7 @@
         FT_FREE( name );
       }
 
-      if ( FT_QALLOC( blend->axis_names[n], len + 1 ) )
+      if ( FT_ALLOC( blend->axis_names[n], len + 1 ) )
         goto Exit;
 
       name = (FT_Byte*)blend->axis_names[n];
@@ -857,14 +872,12 @@
   {
     T1_TokenRec  design_tokens[T1_MAX_MM_DESIGNS];
     FT_Int       num_designs;
-    FT_Int       num_axis = 0; /* make compiler happy */
-    T1_Parser    parser   = &loader->parser;
-    FT_Memory    memory   = face->root.memory;
-    FT_Error     error    = FT_Err_Ok;
-    FT_Fixed*    design_pos[T1_MAX_MM_DESIGNS];
+    FT_Int       num_axis;
+    T1_Parser    parser = &loader->parser;
 
+    FT_Error     error = FT_Err_Ok;
+    PS_Blend     blend;
 
-    design_pos[0] = NULL;
 
     /* get the array of design tokens -- compute number of designs */
     T1_ToTokenArray( parser, design_tokens,
@@ -886,9 +899,11 @@
     {
       FT_Byte*  old_cursor = parser->root.cursor;
       FT_Byte*  old_limit  = parser->root.limit;
-      FT_Int    n, nn;
-      PS_Blend  blend;
+      FT_Int    n;
 
+
+      blend    = face->blend;
+      num_axis = 0;  /* make compiler happy */
 
       FT_TRACE4(( " [" ));
 
@@ -922,13 +937,7 @@
                                      (FT_UInt)num_axis );
           if ( error )
             goto Exit;
-
-          /* allocate a blend design pos table */
-          if ( FT_QNEW_ARRAY( design_pos[0], num_designs * num_axis ) )
-            goto Exit;
-
-          for ( nn = 1; nn < num_designs; nn++ )
-            design_pos[nn] = design_pos[0] + num_axis * nn;
+          blend = face->blend;
         }
         else if ( n_axis != num_axis )
         {
@@ -946,8 +955,8 @@
 
           parser->root.cursor = token2->start;
           parser->root.limit  = token2->limit;
-          design_pos[n][axis] = T1_ToFixed( parser, 0 );
-          FT_TRACE4(( " %f", (double)design_pos[n][axis] / 65536 ));
+          blend->design_pos[n][axis] = T1_ToFixed( parser, 0 );
+          FT_TRACE4(( " %f", (double)blend->design_pos[n][axis] / 65536 ));
         }
         FT_TRACE4(( "]" )) ;
       }
@@ -956,21 +965,9 @@
 
       loader->parser.root.cursor = old_cursor;
       loader->parser.root.limit  = old_limit;
-
-      /* a valid BlendDesignPosition has been parsed */
-      blend = face->blend;
-      if ( blend->design_pos[0] )
-        FT_FREE( blend->design_pos[0] );
-
-      for ( n = 0; n < num_designs; n++ )
-      {
-        blend->design_pos[n] = design_pos[n];
-        design_pos[n]        = NULL;
-      }
     }
 
   Exit:
-    FT_FREE( design_pos[0] );
     loader->parser.root.error = error;
   }
 
@@ -1047,7 +1044,7 @@
       }
 
       /* allocate design map data */
-      if ( FT_QNEW_ARRAY( map->design_points, num_points * 2 ) )
+      if ( FT_NEW_ARRAY( map->design_points, num_points * 2 ) )
         goto Exit;
       map->blend_points = map->design_points + num_points;
       map->num_points   = (FT_Byte)num_points;
@@ -1091,7 +1088,6 @@
     T1_TokenRec  design_tokens[T1_MAX_MM_DESIGNS];
     FT_Int       num_designs;
     FT_Error     error  = FT_Err_Ok;
-    FT_Memory    memory = face->root.memory;
     T1_Parser    parser = &loader->parser;
     PS_Blend     blend  = face->blend;
     T1_Token     token;
@@ -1126,18 +1122,12 @@
     else if ( blend->num_designs != (FT_UInt)num_designs )
     {
       FT_ERROR(( "parse_weight_vector:"
-                 " /BlendDesignPosition and /WeightVector have\n" ));
-      FT_ERROR(( "                    "
+                 " /BlendDesignPosition and /WeightVector have\n"
+                 "                    "
                  " different number of elements\n" ));
       error = FT_THROW( Invalid_File_Format );
       goto Exit;
     }
-
-    if ( !blend->weight_vector )
-      if ( FT_QNEW_ARRAY( blend->weight_vector, num_designs * 2 ) )
-        goto Exit;
-
-    blend->default_weight_vector = blend->weight_vector + num_designs;
 
     old_cursor = parser->root.cursor;
     old_limit  = parser->root.limit;
@@ -1317,9 +1307,9 @@
     else
     {
       FT_TRACE1(( "t1_load_keyword: ignoring keyword `%s'"
-                  " which is not valid at this point\n",
+                  " which is not valid at this point\n"
+                  "                 (probably due to missing keywords)\n",
                  field->ident ));
-      FT_TRACE1(( "                 (probably due to missing keywords)\n" ));
       error = FT_Err_Ok;
     }
 
@@ -1530,8 +1520,8 @@
 
       /* we use a T1_Table to store our charnames */
       loader->num_chars = encode->num_chars = array_size;
-      if ( FT_QNEW_ARRAY( encode->char_index, array_size )    ||
-           FT_QNEW_ARRAY( encode->char_name,  array_size )    ||
+      if ( FT_NEW_ARRAY( encode->char_index, array_size )     ||
+           FT_NEW_ARRAY( encode->char_name,  array_size )     ||
            FT_SET_ERROR( psaux->ps_table_funcs->init(
                            char_table, array_size, memory ) ) )
       {
@@ -1772,7 +1762,7 @@
 
       if ( !loader->subrs_hash )
       {
-        if ( FT_QNEW( loader->subrs_hash ) )
+        if ( FT_NEW( loader->subrs_hash ) )
           goto Fail;
 
         error = ft_hash_num_init( loader->subrs_hash, memory );
@@ -1868,7 +1858,7 @@
         }
 
         /* t1_decrypt() shouldn't write to base -- make temporary copy */
-        if ( FT_QALLOC( temp, size ) )
+        if ( FT_ALLOC( temp, size ) )
           goto Fail;
         FT_MEM_COPY( temp, base, size );
         psaux->t1_decrypt( temp, size, 4330 );
@@ -2057,9 +2047,9 @@
         name_table->elements[n][len] = '\0';
 
         /* record index of /.notdef */
-        if ( *cur == '.'                                                &&
+        if ( *cur == '.'                                              &&
              ft_strcmp( ".notdef",
-                        (const char*)( name_table->elements[n] ) ) == 0 )
+                        (const char*)(name_table->elements[n]) ) == 0 )
         {
           notdef_index = n;
           notdef_found = 1;
@@ -2078,7 +2068,7 @@
           }
 
           /* t1_decrypt() shouldn't write to base -- make temporary copy */
-          if ( FT_QALLOC( temp, size ) )
+          if ( FT_ALLOC( temp, size ) )
             goto Fail;
           FT_MEM_COPY( temp, base, size );
           psaux->t1_decrypt( temp, size, 4330 );
@@ -2331,8 +2321,8 @@
       /* in valid Type 1 fonts we don't see `RD' or `-|' directly */
       /* since those tokens are handled by parse_subrs and        */
       /* parse_charstrings                                        */
-      else if ( *cur == 'R' && cur + 6 < limit && *( cur + 1 ) == 'D' &&
-                have_integer                                          )
+      else if ( *cur == 'R' && cur + 6 < limit && *(cur + 1) == 'D' &&
+                have_integer )
       {
         FT_ULong  s;
         FT_Byte*  b;
@@ -2344,8 +2334,8 @@
         have_integer = 0;
       }
 
-      else if ( *cur == '-' && cur + 6 < limit && *( cur + 1 ) == '|' &&
-                have_integer                                          )
+      else if ( *cur == '-' && cur + 6 < limit && *(cur + 1) == '|' &&
+                have_integer )
       {
         FT_ULong  s;
         FT_Byte*  b;
@@ -2588,15 +2578,7 @@
          ( !face->blend->num_designs || !face->blend->num_axis ) )
       T1_Done_Blend( face );
 
-    /* the font may have no valid WeightVector */
-    if ( face->blend && !face->blend->weight_vector )
-      T1_Done_Blend( face );
-
-    /* the font may have no valid BlendDesignPositions */
-    if ( face->blend && !face->blend->design_pos[0] )
-      T1_Done_Blend( face );
-
-    /* the font may have no valid BlendDesignMap */
+    /* another safety check */
     if ( face->blend )
     {
       FT_UInt  i;

@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CEntitySA.h"
-#include "CGameSA.h"
-#include "CTaskManagementSystemSA.h"
-#include "TaskIKSA.h"
 
 extern CGameSA* pGame;
 
@@ -85,7 +81,7 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
 
 CTaskSimpleIKManagerSA::CTaskSimpleIKManagerSA()
 {
-    this->m_pTaskManagementSystem = pGame->GetTaskManagementSystem();
+    this->m_pTaskManagementSystem = (CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem());
 }
 
 int CTaskSimpleIKManagerSA::AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int slotID)

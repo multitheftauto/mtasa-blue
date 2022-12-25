@@ -10,11 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaElementDefs.h"
-#include "CStaticFunctionDefinitions.h"
-#include "CScriptArgReader.h"
-#include "CDummy.h"
-#include "Utils.h"
 
 void CLuaElementDefs::LoadFunctions()
 {
@@ -1018,18 +1013,17 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
-                                                       std::optional<unsigned short> dimension)
+CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
+    std::optional<unsigned short> interior, std::optional<unsigned short> dimension)
 {
-    const auto typeHash = (type.has_value() && !type.value().empty()) ? CElement::GetTypeHashFromString(type.value()) : 0;
+    const auto typeHash = (type.has_value() && !type.value().empty()) ?
+        CElement::GetTypeHashFromString(type.value()) : 0;
 
     CElementResult result;
-    GetSpatialDatabase()->SphereQuery(result, CSphere{pos, radius});
+    GetSpatialDatabase()->SphereQuery(result, CSphere{ pos, radius });
 
-    // Remove elements that do not match the criterias
-    if (interior || dimension || typeHash)
-    {
-        result.erase(std::remove_if(result.begin(), result.end(), [&, radiusSq = radius * radius](CElement* pElement) {
+    if (interior || dimension || typeHash) {
+        result.erase(std::remove_if(result.begin(), result.end(), [&](CElement* pElement) {
             if (typeHash && typeHash != pElement->GetTypeHash())
                 return true;
 
@@ -1039,12 +1033,9 @@ CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius
             if (dimension.has_value() && dimension != pElement->GetDimension())
                 return true;
 
-            // Check if element is within the sphere, because the spatial database is 2D
-            if ((pElement->GetPosition() - pos).LengthSquared() > radiusSq)
-                return true;
-
             return pElement->IsBeingDeleted();
-        }), result.end());
+            }), result.end()
+        );
     }
 
     return result;
@@ -1584,7 +1575,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
         {
             // Warn and truncate if key is too long
             m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                         *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
@@ -1619,7 +1610,7 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
         {
             // Warn and truncate if key is too long
             m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                         *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
@@ -1699,7 +1690,7 @@ int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
     //  bool hasElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
     SString   strKey;
-    CPlayer*  pPlayer;
+    CPlayer* pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

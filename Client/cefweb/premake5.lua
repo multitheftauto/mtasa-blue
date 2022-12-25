@@ -14,12 +14,12 @@ project "Client Webbrowser"
 			"../../Shared/sdk",
 			".",
 			"../sdk",
-			"../../vendor/cef3/cef",
+			"../../vendor/cef3",
 			"../../vendor/sparsehash/src/"
 		}
 
 	libdirs {
-		"../../vendor/cef3/cef/Release"
+		"../../vendor/cef3/Release"
 	}
 
 
@@ -46,7 +46,7 @@ project "Client Webbrowser"
 		"PSAPI_VERSION=1"
 	}
 
-	filter "architecture:not x86"
+	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

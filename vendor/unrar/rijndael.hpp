@@ -2,7 +2,11 @@
 #define _RIJNDAEL_H_
 
 /**************************************************************************
- * This code is based on Szymon Stefanek public domain AES implementation *
+ * This code is based on Szymon Stefanek AES implementation:              *
+ * http://www.esat.kuleuven.ac.be/~rijmen/rijndael/rijndael-cpplib.tar.gz *
+ *                                                                        *
+ * Dynamic tables generation is based on the Brian Gladman's work:        *
+ * http://fp.gladman.plus.com/cryptography_technology/rijndael            *
  **************************************************************************/
 
 #define _MAX_KEY_COLUMNS (256/32)

@@ -40,9 +40,6 @@ public:
     LUA_DECLARE(IsInsideColShape);
     LUA_DECLARE(GetColShapeType);
 
-    static bool SetShowCollision(bool state);
-    static bool IsShowCollisionsEnabled();
-
     static CLuaMultiReturn<float, float> GetColPolygonHeight(CClientColPolygon* pColPolygon);
-    static bool                          SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
+    static bool                     SetColPolygonHeight(CClientColPolygon* pColPolygon, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 };

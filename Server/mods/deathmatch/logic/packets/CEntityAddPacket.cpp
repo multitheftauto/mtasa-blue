@@ -10,22 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CEntityAddPacket.h"
-#include "CColShape.h"
-#include "CColCuboid.h"
-#include "CColCircle.h"
-#include "CColPolygon.h"
-#include "CColRectangle.h"
-#include "CColTube.h"
-#include "CDummy.h"
-#include "CPickup.h"
-#include "CMarker.h"
-#include "CBlip.h"
-#include "CRadarArea.h"
-#include "CWater.h"
-#include "CVehicleManager.h"
-#include "CHandlingManager.h"
-#include "CGame.h"
 
 //
 // Temporary helper functions for fixing crashes on pre r6459 clients.
@@ -455,24 +439,6 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     SVehicleHealthSync health;
                     health.data.fValue = pVehicle->GetHealth();
                     BitStream.Write(&health);
-
-                    // Blow state
-                    if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
-                    {
-                        unsigned char blowState = 0;
-
-                        switch (pVehicle->GetBlowState())
-                        {
-                            case VehicleBlowState::AWAITING_EXPLOSION_SYNC:
-                                blowState = 1;
-                                break;
-                            case VehicleBlowState::BLOWN:
-                                blowState = 2;
-                                break;
-                        }
-
-                        BitStream.WriteBits(&blowState, 2);
-                    }
 
                     // Color
                     CVehicleColor& vehColor = pVehicle->GetColor();

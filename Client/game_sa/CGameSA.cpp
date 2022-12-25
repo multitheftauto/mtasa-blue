@@ -13,58 +13,18 @@
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
 #include "SharedUtil.MemAccess.hpp"
-#include "C3DMarkersSA.h"
-#include "CAEAudioHardwareSA.h"
-#include "CAERadioTrackManagerSA.h"
-#include "CAESoundManagerSA.h"
-#include "CAnimManagerSA.h"
-#include "CAudioContainerSA.h"
-#include "CCameraSA.h"
-#include "CCarEnterExitSA.h"
-#include "CCheckpointsSA.h"
-#include "CClockSA.h"
-#include "CColStoreSA.h"
-#include "CControllerConfigManagerSA.h"
-#include "CCoronasSA.h"
-#include "CEventListSA.h"
-#include "CExplosionManagerSA.h"
-#include "CFileLoaderSA.h"
-#include "CFireManagerSA.h"
-#include "CFxSA.h"
-#include "CFxSystemSA.h"
-#include "CGameSA.h"
-#include "CGaragesSA.h"
-#include "CHandlingManagerSA.h"
-#include "CHudSA.h"
-#include "CKeyGenSA.h"
-#include "CObjectGroupPhysicalPropertiesSA.h"
-#include "COffsets.h"
-#include "CPadSA.h"
-#include "CPickupsSA.h"
-#include "CPlayerInfoSA.h"
-#include "CPointLightsSA.h"
-#include "CProjectileInfoSA.h"
-#include "CRadarSA.h"
-#include "CRopesSA.h"
-#include "CSettingsSA.h"
-#include "CStatsSA.h"
-#include "CTaskManagementSystemSA.h"
-#include "CTasksSA.h"
-#include "CVisibilityPluginsSA.h"
-#include "CWaterManagerSA.h"
-#include "CWeaponInfoSA.h"
-#include "CWeaponStatManagerSA.h"
-#include "CWeatherSA.h"
-#include "CWorldSA.h"
 #include "D3DResourceSystemSA.h"
-
-extern CGameSA* pGame;
+#include "CFileLoaderSA.h"
 
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
 unsigned long* CGameSA::VAR_IsAtMenu;
+unsigned long* CGameSA::VAR_IsGameLoaded;
+bool*          CGameSA::VAR_GamePaused;
 bool*          CGameSA::VAR_IsForegroundWindow;
 unsigned long* CGameSA::VAR_SystemState;
+void*          CGameSA::VAR_StartGame;
+bool*          CGameSA::VAR_IsNastyGame;
 float*         CGameSA::VAR_TimeScale;
 float*         CGameSA::VAR_FPS;
 float*         CGameSA::VAR_OldTimeStep;
@@ -103,20 +63,24 @@ CGameSA::CGameSA()
         case VERSION_11:
             COffsets::Initialize11();
             break;
+        case VERSION_20:
+            COffsets::Initialize20();
+            break;
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (unsigned int i = 0; i < modelInfoMax; i++)
+    for (int i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
 
     // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-    for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    for (int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
         ObjectGroupsInfo[i].SetGroup(i);
     }
 
+    DEBUG_TRACE("CGameSA::CGameSA()");
     this->m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
     this->m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
     this->m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
@@ -134,9 +98,14 @@ CGameSA::CGameSA()
     this->m_pFireManager = new CFireManagerSA();
     this->m_p3DMarkers = new C3DMarkersSA();
     this->m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
+    this->m_pTheCarGenerators = new CTheCarGeneratorsSA();
     this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     this->m_pWeather = new CWeatherSA();
+    this->m_pMenuManager = new CMenuManagerSA();
     this->m_pStats = new CStatsSA();
+    this->m_pFont = new CFontSA();
+    this->m_pPathFind = new CPathFindSA();
+    this->m_pPopulation = new CPopulationSA();
     this->m_pTaskManagementSystem = new CTaskManagementSystemSA();
     this->m_pSettings = new CSettingsSA();
     this->m_pCarEnterExit = new CCarEnterExitSA();
@@ -157,7 +126,6 @@ CGameSA::CGameSA()
     this->m_pWaterManager = new CWaterManagerSA();
     this->m_pWeaponStatsManager = new CWeaponStatManagerSA();
     this->m_pPointLights = new CPointLightsSA();
-    this->m_collisionStore = new CColStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -228,7 +196,6 @@ CGameSA::CGameSA()
     m_pPools->SetPoolCapacity(ENV_MAP_ATOMIC_POOL, 4000);                                     // Default is 1024
     m_pPools->SetPoolCapacity(SPEC_MAP_MATERIAL_POOL, 16000);                                 // Default is 4096
     m_pPools->SetPoolCapacity(ENTRY_INFO_NODE_POOL, MAX_ENTRY_INFO_NODES);                    // Default is 500
-    m_pPools->SetPoolCapacity(POINTER_SINGLE_LINK_POOL, MAX_POINTER_SINGLE_LINKS);            // Default is 70000
     m_pPools->SetPoolCapacity(POINTER_DOUBLE_LINK_POOL, MAX_POINTER_DOUBLE_LINKS);            // Default is 3200
     dassert(m_pPools->GetPoolCapacity(POINTER_SINGLE_LINK_POOL) == MAX_POINTER_SINGLE_LINKS);
 
@@ -252,7 +219,6 @@ CGameSA::CGameSA()
     CFxSystemSA::StaticSetHooks();
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
-    CVehicleSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -273,9 +239,14 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CTasksSA*>(m_pTasks);
     delete reinterpret_cast<CTaskManagementSystemSA*>(m_pTaskManagementSystem);
     delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
+    delete reinterpret_cast<CPopulationSA*>(m_pPopulation);
+    delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
+    delete reinterpret_cast<CFontSA*>(m_pFont);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
+    delete reinterpret_cast<CMenuManagerSA*>(m_pMenuManager);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
+    delete reinterpret_cast<CTheCarGeneratorsSA*>(m_pTheCarGenerators);
     delete reinterpret_cast<CPadSA*>(m_pPad);
     delete reinterpret_cast<C3DMarkersSA*>(m_p3DMarkers);
     delete reinterpret_cast<CFireManagerSA*>(m_pFireManager);
@@ -293,7 +264,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAEAudioHardwareSA*>(m_pAEAudioHardware);
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
-    delete static_cast<CColStoreSA*>(m_collisionStore);
 
     delete[] ModelInfo;
     delete[] ObjectGroupsInfo;
@@ -301,6 +271,8 @@ CGameSA::~CGameSA()
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 {
+    DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
+
     if ((skill == WEAPONSKILL_STD && weapon >= WEAPONTYPE_UNARMED && weapon < WEAPONTYPE_LAST_WEAPONTYPE) ||
         (skill != WEAPONSKILL_STD && weapon >= WEAPONTYPE_PISTOL && weapon <= WEAPONTYPE_TEC9))
     {
@@ -328,13 +300,24 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
         return NULL;
 }
 
-void CGameSA::Pause(bool bPaused)
+VOID CGameSA::Pause(bool bPaused)
 {
-	MemPutFast<bool>(0xB7CB49, bPaused); // CTimer::m_UserPause
+    *VAR_GamePaused = bPaused;
+}
+
+bool CGameSA::IsPaused()
+{
+    return *VAR_GamePaused;
+}
+
+bool CGameSA::IsInForeground()
+{
+    return *VAR_IsForegroundWindow;
 }
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
+    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
     if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
@@ -350,24 +333,29 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  * Starts the game
  * \todo make addresses into constants
  */
-void CGameSA::StartGame()
+VOID CGameSA::StartGame()
 {
+    DEBUG_TRACE("VOID CGameSA::StartGame()");
+    //  InitScriptInterface();
+    //*(BYTE *)VAR_StartGame = 1;
     this->SetSystemState(GS_INIT_PLAYING_GAME);
-    MemPutFast<BYTE>(0xB7CB49, 0); // CTimer::m_UserPause
-    MemPutFast<BYTE>(0xBA67A4, 0); // FrontEndMenuManager + 0x5C
+    MemPutFast<BYTE>(0xB7CB49, 0);
+    MemPutFast<BYTE>(0xBA67A4, 0);
 }
 
 /**
  * Sets the part of the game loading process the game is in.
  * @param dwState DWORD containing a valid state 0 - 9
  */
-void CGameSA::SetSystemState(eSystemState State)
+VOID CGameSA::SetSystemState(eSystemState State)
 {
+    DEBUG_TRACE("VOID CGameSA::SetSystemState( eSystemState State )");
     *VAR_SystemState = (DWORD)State;
 }
 
 eSystemState CGameSA::GetSystemState()
 {
+    DEBUG_TRACE("eSystemState CGameSA::GetSystemState( )");
     return (eSystemState)*VAR_SystemState;
 }
 
@@ -375,8 +363,10 @@ eSystemState CGameSA::GetSystemState()
  * This adds the local player to the ped pool, nothing else
  * @return BOOL TRUE if success, FALSE otherwise
  */
-bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
+BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
+    DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
+
     CPoolsSA* pools = (CPoolsSA*)this->GetPools();
     if (pools)
     {
@@ -390,9 +380,9 @@ bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
             return TRUE;
         }
 
-        return false;
+        return FALSE;
     }
-    return true;
+    return FALSE;
 }
 
 float CGameSA::GetGravity()
@@ -415,6 +405,56 @@ void CGameSA::SetGameSpeed(float fSpeed)
     MemPutFast<float>(0xB7CB64, fSpeed);
 }
 
+// this prevents some crashes (respawning mainly)
+VOID CGameSA::DisableRenderer(bool bDisabled)
+{
+    // ENABLED:
+    // 0053DF40   D915 2C13C800    FST DWORD PTR DS:[C8132C]
+    // DISABLED:
+    // 0053DF40   C3               RETN
+
+    if (bDisabled)
+    {
+        MemPut<BYTE>(0x53DF40, 0xC3);
+    }
+    else
+    {
+        MemPut<BYTE>(0x53DF40, 0xD9);
+    }
+}
+
+VOID CGameSA::SetRenderHook(InRenderer* pInRenderer)
+{
+    if (pInRenderer)
+        HookInstall((DWORD)FUNC_CDebug_DebugDisplayTextBuffer, (DWORD)pInRenderer, 6);
+    else
+    {
+        MemPut<BYTE>(FUNC_CDebug_DebugDisplayTextBuffer, 0xC3);
+    }
+}
+
+VOID CGameSA::TakeScreenshot(char* szFileName)
+{
+    DWORD dwFunc = FUNC_JPegCompressScreenToFile;
+    _asm
+    {
+        mov     eax, CLASS_RwCamera
+        mov     eax, [eax]
+        push    szFileName
+        push    eax
+        call    dwFunc
+        add     esp,8
+    }
+}
+
+DWORD* CGameSA::GetMemoryValue(DWORD dwOffset)
+{
+    if (dwOffset <= MAX_MEMORY_OFFSET_1_0)
+        return (DWORD*)dwOffset;
+    else
+        return NULL;
+}
+
 void CGameSA::Reset()
 {
     // Things to do if the game was loaded
@@ -430,6 +470,8 @@ void CGameSA::Reset()
 
         Pause(false);            // We don't have to pause as the fadeout will stop the sound. Pausing it will make the fadein next start ugly
         m_pHud->Disable(false);
+
+        DisableRenderer(false);
 
         // Restore the HUD
         m_pHud->Disable(false);
@@ -525,22 +567,22 @@ void CGameSA::SetTimeScale(float fTimeScale)
 
 unsigned char CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104; // CPostEffects::m_SpeedFXAlpha
+    return *(unsigned char*)0x8D5104;
 }
 
 void CGameSA::SetBlurLevel(unsigned char ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel); // CPostEffects::m_SpeedFXAlpha
+    MemPutFast<unsigned char>(0x8D5104, ucLevel);
 }
 
 unsigned long CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C; // CClock::ms_nMillisecondsPerGameMinute
+    return *(unsigned long*)0xB7015C;
 }
 
 void CGameSA::SetMinuteDuration(unsigned long ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime); // CClock::ms_nMillisecondsPerGameMinute
+    MemPutFast<unsigned long>(0xB7015C, ulTime);
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -556,13 +598,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
 
     if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
         return IsUnderWorldWarpEnabled();
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-        return IsVehicleSunGlareEnabled();
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-        return IsCoronaZTestEnabled();
- 
 
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
@@ -596,18 +631,6 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-    {
-        SetVehicleSunGlareEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-    {
-        SetCoronaZTestEnabled(bEnable);
-        return true;
-    }
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -624,8 +647,6 @@ void CGameSA::ResetCheats()
     SetMoonEasterEggEnabled(false);
     SetExtraAirResistanceEnabled(true);
     SetUnderWorldWarpEnabled(true);
-    SetCoronaZTestEnabled(true);
-    CVehicleSA::SetVehiclesSunGlareEnabled(false);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -697,38 +718,6 @@ void CGameSA::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
     {
         m_JetpackWeapons[weaponType] = bEnabled;
     }
-}
-
-void CGameSA::SetVehicleSunGlareEnabled(bool bEnabled)
-{
-    // State turning will be handled in hooks handler
-    CVehicleSA::SetVehiclesSunGlareEnabled(bEnabled);
-}
-
-bool CGameSA::IsVehicleSunGlareEnabled()
-{
-    return CVehicleSA::GetVehiclesSunGlareEnabled();
-}
-
-void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
-{
-    if (m_isCoronaZTestEnabled == isEnabled)
-        return;
-
-    if (isEnabled)
-    {
-        // Enable ZTest (PC)
-        MemPut<BYTE>(0x6FB17C + 0, 0xFF);
-        MemPut<BYTE>(0x6FB17C + 1, 0x51);
-        MemPut<BYTE>(0x6FB17C + 2, 0x20);
-    }
-    else
-    {
-        // Disable ZTest (PS2)
-        MemSet((void*)0x6FB17C, 0x90, 3);
-    }
-    
-    m_isCoronaZTestEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()
@@ -859,7 +848,7 @@ void CGameSA::SetupBrokenModels()
 // Well, has it?
 bool CGameSA::HasCreditScreenFadedOut()
 {
-    BYTE ucAlpha = *(BYTE*)0xBAB320; // CLoadingScreen::m_FadeAlpha
+    BYTE ucAlpha = *(BYTE*)0xBAB320;
     bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
     return bCreditScreenFadedOut;
 }
@@ -897,7 +886,7 @@ void CGameSA::ResetAlphaTransparencies()
 // Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
 void CGameSA::DisableVSync()
 {
-    MemPutFast<BYTE>(0xBAB318, 0); // CLoadingScreen::m_bActive
+    MemPutFast<BYTE>(0xBAB318, 0);
 }
 CWeapon* CGameSA::CreateWeapon()
 {
@@ -923,6 +912,7 @@ CPed* CGameSA::GetPedContext()
 
 CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
 {
+    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
         return &ObjectGroupsInfo[ucObjectGroup];
 

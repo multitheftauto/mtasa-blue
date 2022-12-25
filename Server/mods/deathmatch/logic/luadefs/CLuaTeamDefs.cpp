@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaTeamDefs.h"
-#include "CLuaGenericDefs.h"
-#include "CStaticFunctionDefinitions.h"
-#include "CScriptArgReader.h"
 
 void CLuaTeamDefs::LoadFunctions()
 {
@@ -49,7 +45,7 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getFromName", "getTeamFromName");
     lua_classfunction(luaVM, "countPlayers", "countPlayersInTeam");
     lua_classfunction(luaVM, "getPlayers", "getPlayersInTeam");
-    lua_classfunction(luaVM, "outputChat", "outputChatBox", ArgumentParserWarn<false, CLuaGenericDefs::OOP_OutputChatBox>);
+    lua_classfunction(luaVM, "outputChat", "outputChatBox", CLuaFunctionDefs::OOP_OutputChatBox);
 
     lua_classfunction(luaVM, "getFriendlyFire", "getTeamFriendlyFire");
     lua_classfunction(luaVM, "getName", "getTeamName");

@@ -12,13 +12,10 @@ class CClientPickup;
 
 #pragma once
 
-#include <game/CObject.h>
 #include "CClientPickupManager.h"
 #include "CClientEntity.h"
 #include "CClientColShape.h"
 #include "CClientColCallback.h"
-
-class CPickup;
 
 class CClientPickup final : public CClientStreamElement, private CClientColCallback
 {
@@ -105,9 +102,9 @@ public:
     CEntity*       GetGameEntity() { return m_pObject; }
     const CEntity* GetGameEntity() const { return m_pObject; }
 
-    void GetPosition(CVector& vecPosition) const override;
-    void SetPosition(const CVector& vecPosition);
-    void SetModel(unsigned short usModel);
+    void           GetPosition(CVector& vecPosition) const override;
+    void           SetPosition(const CVector& vecPosition);
+    void           SetModel(unsigned short usModel);
 
     void AttachTo(CClientEntity* pEntity) override;
 

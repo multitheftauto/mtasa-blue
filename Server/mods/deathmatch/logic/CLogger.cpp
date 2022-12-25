@@ -10,10 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLogger.h"
-#include "core/CServerInterface.h"
 
-#define MAX_STRING_LENGTH 2048
+using namespace std;
 
 FILE*            CLogger::m_pLogFile = NULL;
 FILE*            CLogger::m_pAuthFile = NULL;
@@ -23,23 +21,18 @@ SString          CLogger::m_strCaptureBuffer;
 bool             CLogger::m_bCaptureConsole = false;
 CCriticalSection CLogger::m_CaptureBufferMutex;
 
-extern CServerInterface* g_pServerInterface;
-
-void CLogger::LogPrintvf(const char* format, va_list vlist)
-{
-    std::array<char, MAX_STRING_LENGTH> buffer{};
-    VSNPRINTF(buffer.data(), buffer.size(), format, vlist);
-
-    // Timestamp and send to the console and logfile
-    HandleLogPrint(true, "", buffer.data(), true, true, false);
-}
-
+#define MAX_STRING_LENGTH 2048
 void CLogger::LogPrintf(const char* szFormat, ...)
 {
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
     va_list marker;
     va_start(marker, szFormat);
-    LogPrintvf(szFormat, marker);
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
+
+    // Timestamp and send to the console and logfile
+    HandleLogPrint(true, "", szBuffer, true, true, false);
 }
 
 void CLogger::LogPrint(const char* szText)
@@ -89,19 +82,15 @@ void CLogger::LogPrintNoStamp(const char* szText)
 
 void CLogger::ErrorPrintf(const char* szFormat, ...)
 {
+    // Compose the formatted message
+    char    szBuffer[MAX_STRING_LENGTH];
     va_list marker;
     va_start(marker, szFormat);
-    ErrorPrintvf(szFormat, marker);
+    VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
-}
-
-void CLogger::ErrorPrintvf(const char* format, va_list vlist)
-{
-    std::array<char, MAX_STRING_LENGTH> buffer{};
-    VSNPRINTF(buffer.data(), buffer.size(), format, vlist);
 
     // Timestamp and send to the console and logfile
-    HandleLogPrint(true, "ERROR: ", buffer.data(), true, true, false);
+    HandleLogPrint(true, "ERROR: ", szBuffer, true, true, false);
 }
 
 void CLogger::DebugPrintf(const char* szFormat, ...)
@@ -242,8 +231,8 @@ void CLogger::HandleLogPrint(bool bTimeStamp, const char* szPrePend, const char*
         ProgressDotsEnd();
 
     // Put the timestamp at the beginning of the string
-    std::string strOutputShort;
-    std::string strOutputLong;
+    string strOutputShort;
+    string strOutputLong;
     if (bTimeStamp)
     {
         strOutputShort = SString("[%s] ", *GetLocalTimeString());

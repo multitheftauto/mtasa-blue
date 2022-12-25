@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCameraSpatialDatabase.h"
-#include "CPlayerCamera.h"
 #include "RTree.h"
 
 namespace

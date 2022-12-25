@@ -60,7 +60,7 @@ public:
 
     // Debug info for garbage collected files
     const SLuaDebugInfo& GetLuaDebugInfo() { return m_LuaDebugInfo; };
-    void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
+    void SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
 
 private:
     void DoResourceFileCheck();

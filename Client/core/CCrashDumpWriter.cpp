@@ -11,8 +11,6 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
-#include <game/CPools.h>
-#include <game/CRenderWare.h>
 #include <multiplayer/CMultiplayer.h>
 
 #define LOG_EVENT_SIZE 200

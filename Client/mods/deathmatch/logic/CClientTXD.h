@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <game/CRenderWare.h>
 #include "CClientEntity.h"
 
 class CClientTXD final : public CClientEntity

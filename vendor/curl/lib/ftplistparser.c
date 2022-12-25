@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -270,11 +268,11 @@ static int ftp_pl_get_permission(const char *str)
   return permissions;
 }
 
-static CURLcode ftp_pl_insert_finfo(struct Curl_easy *data,
+static CURLcode ftp_pl_insert_finfo(struct connectdata *conn,
                                     struct fileinfo *infop)
 {
   curl_fnmatch_callback compare;
-  struct WildcardData *wc = &data->wildcard;
+  struct WildcardData *wc = &conn->data->wildcard;
   struct ftp_wc *ftpwc = wc->protdata;
   struct Curl_llist *llist = &wc->filelist;
   struct ftp_parselist_data *parser = ftpwc->parser;
@@ -295,13 +293,13 @@ static CURLcode ftp_pl_insert_finfo(struct Curl_easy *data,
                           str + parser->offsets.user : NULL;
 
   /* get correct fnmatch callback */
-  compare = data->set.fnmatch;
+  compare = conn->data->set.fnmatch;
   if(!compare)
     compare = Curl_fnmatch;
 
   /* filter pattern-corresponding filenames */
-  Curl_set_in_callback(data, true);
-  if(compare(data->set.fnmatch_data, wc->pattern,
+  Curl_set_in_callback(conn->data, true);
+  if(compare(conn->data->set.fnmatch_data, wc->pattern,
              finfo->filename) == 0) {
     /* discard symlink which is containing multiple " -> " */
     if((finfo->filetype == CURLFILETYPE_SYMLINK) && finfo->strings.target &&
@@ -312,7 +310,7 @@ static CURLcode ftp_pl_insert_finfo(struct Curl_easy *data,
   else {
     add = FALSE;
   }
-  Curl_set_in_callback(data, false);
+  Curl_set_in_callback(conn->data, false);
 
   if(add) {
     Curl_llist_insert_next(llist, llist->tail, finfo, &infop->list);
@@ -329,8 +327,8 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
                           void *connptr)
 {
   size_t bufflen = size*nmemb;
-  struct Curl_easy *data = (struct Curl_easy *)connptr;
-  struct ftp_wc *ftpwc = data->wildcard.protdata;
+  struct connectdata *conn = (struct connectdata *)connptr;
+  struct ftp_wc *ftpwc = conn->data->wildcard.protdata;
   struct ftp_parselist_data *parser = ftpwc->parser;
   struct fileinfo *infop;
   struct curl_fileinfo *finfo;
@@ -422,11 +420,11 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
               char *endptr = finfo->b_data + 6;
               /* here we can deal with directory size, pass the leading
                  whitespace and then the digits */
-              while(ISBLANK(*endptr))
+              while(ISSPACE(*endptr))
                 endptr++;
               while(ISDIGIT(*endptr))
                 endptr++;
-              if(*endptr) {
+              if(*endptr != 0) {
                 parser->error = CURLE_FTP_BAD_FILE_LIST;
                 goto fail;
               }
@@ -730,7 +728,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
             finfo->b_data[parser->item_offset + parser->item_length - 1] = 0;
             parser->offsets.filename = parser->item_offset;
             parser->state.UNIX.main = PL_UNIX_FILETYPE;
-            result = ftp_pl_insert_finfo(data, infop);
+            result = ftp_pl_insert_finfo(conn, infop);
             if(result) {
               parser->error = result;
               goto fail;
@@ -742,7 +740,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
             finfo->b_data[parser->item_offset + parser->item_length - 1] = 0;
             parser->offsets.filename = parser->item_offset;
             parser->state.UNIX.main = PL_UNIX_FILETYPE;
-            result = ftp_pl_insert_finfo(data, infop);
+            result = ftp_pl_insert_finfo(conn, infop);
             if(result) {
               parser->error = result;
               goto fail;
@@ -837,7 +835,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
           else if(c == '\n') {
             finfo->b_data[parser->item_offset + parser->item_length - 1] = 0;
             parser->offsets.symlink_target = parser->item_offset;
-            result = ftp_pl_insert_finfo(data, infop);
+            result = ftp_pl_insert_finfo(conn, infop);
             if(result) {
               parser->error = result;
               goto fail;
@@ -849,7 +847,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
           if(c == '\n') {
             finfo->b_data[parser->item_offset + parser->item_length - 1] = 0;
             parser->offsets.symlink_target = parser->item_offset;
-            result = ftp_pl_insert_finfo(data, infop);
+            result = ftp_pl_insert_finfo(conn, infop);
             if(result) {
               parser->error = result;
               goto fail;
@@ -894,7 +892,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
         parser->item_length++;
         switch(parser->state.NT.sub.time) {
         case PL_WINNT_TIME_PRESPACE:
-          if(!ISBLANK(c)) {
+          if(!ISSPACE(c)) {
             parser->state.NT.sub.time = PL_WINNT_TIME_TIME;
           }
           break;
@@ -968,7 +966,8 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
           else if(c == '\n') {
             parser->offsets.filename = parser->item_offset;
             finfo->b_data[finfo->b_used - 1] = 0;
-            result = ftp_pl_insert_finfo(data, infop);
+            parser->offsets.filename = parser->item_offset;
+            result = ftp_pl_insert_finfo(conn, infop);
             if(result) {
               parser->error = result;
               goto fail;
@@ -980,7 +979,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
         case PL_WINNT_FILENAME_WINEOL:
           if(c == '\n') {
             parser->offsets.filename = parser->item_offset;
-            result = ftp_pl_insert_finfo(data, infop);
+            result = ftp_pl_insert_finfo(conn, infop);
             if(result) {
               parser->error = result;
               goto fail;

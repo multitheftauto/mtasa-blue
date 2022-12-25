@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CDummy.h"
-#include "CGroups.h"
-#include "CGame.h"
 
 CDummy::CDummy(CGroups* pGroups, CElement* pParent) : CElement(pParent)
 {

@@ -11,9 +11,6 @@
 
 #pragma once
 
-class CEntity;
-class CVector;
-
 class CCam
 {
 public:

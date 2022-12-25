@@ -1,4 +1,4 @@
-/* Copyright (c) 2000, 2012, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (C) 2000 MySQL AB
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA  */
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA  */
 
 
 #ifndef _my_xml_h
@@ -51,15 +51,8 @@ typedef struct xml_stack_st
   int flags;
   enum my_xml_node_type current_node_type;
   char errstr[128];
-
-  struct {
-    char static_buffer[128];
-    char *buffer;
-    size_t buffer_size;
-    char *start;
-    char *end;
-  } attr;
-
+  char attr[128];
+  char *attrend;
   const char *beg;
   const char *cur;
   const char *end;

@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCamSA.h"
-#include "CGameSA.h"
-
-extern CGameSA* pGame;
 
 CEntity* CCamSA::GetTargetEntity() const
 {

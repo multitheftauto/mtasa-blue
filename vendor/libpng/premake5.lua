@@ -18,8 +18,7 @@ project "libpng"
 		"*.c"
 	}
 
-	filter "architecture:not x86"
+	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
-	
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

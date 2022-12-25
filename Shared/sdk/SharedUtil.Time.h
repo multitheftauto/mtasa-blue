@@ -215,9 +215,15 @@ namespace SharedUtil
     class CElapsedTimeHD
     {
     public:
-        CElapsedTimeHD() { Reset(); }
+        CElapsedTimeHD()
+        {
+            Reset();
+        }
 
-        void Reset() { m_resetTime = DoGetTickCount(); }
+        void Reset()
+        {
+            m_resetTime = DoGetTickCount();
+        }
 
         // Returns time in milliseconds since last reset
         double Get()
@@ -227,7 +233,10 @@ namespace SharedUtil
         }
 
     protected:
-        std::chrono::high_resolution_clock::time_point DoGetTickCount() { return std::chrono::high_resolution_clock::now(); }
+        std::chrono::high_resolution_clock::time_point DoGetTickCount()
+        {
+            return std::chrono::high_resolution_clock::now();
+        }
 
         std::chrono::high_resolution_clock::time_point m_resetTime;
     };

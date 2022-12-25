@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVehicleInOutPacket.h"
-#include "CGame.h"
 
 CVehicleInOutPacket::CVehicleInOutPacket()
 {

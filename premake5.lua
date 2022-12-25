@@ -4,6 +4,7 @@ require "compose_files"
 require "install_data"
 require "install_resources"
 require "install_cef"
+require "install_discord"
 require "install_unifont"
 
 -- Set CI Build global
@@ -15,23 +16,12 @@ else
 end
 GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 
-newoption {
-	trigger     = "gccprefix",
-	value       = "PREFIX",
-	description = "Prefix to be prepended to commands used by the GCC toolchain (for cross-building)",
-}
-
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 
+	platforms { "x86", "x64"}
 	if os.host() == "macosx" then
-		platforms { "x64" }
-	else
-		platforms { "x86", "x64", "arm", "arm64" }
-	end
-
-	if _OPTIONS["gccprefix"] then
-		gccprefix(_OPTIONS["gccprefix"])
+		removeplatforms { "x86" }
 	end
 
 	targetprefix ""
@@ -76,10 +66,6 @@ workspace "MTASA"
 		architecture "x86"
 	filter "platforms:x64"
 		architecture "x86_64"
-	filter "platforms:arm"
-		architecture "ARM"
-	filter "platforms:arm64"
-		architecture "ARM64"
 
 	filter "configurations:Debug"
 		defines { "MTA_DEBUG" }
@@ -97,11 +83,11 @@ workspace "MTASA"
 	end
 
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
-		symbolspath "$(SolutionDir)Symbols\\$(Configuration)_$(Platform)\\$(ProjectName).pdb"
+		os.mkdir("Build/Symbols")
+		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
 
 	filter "system:windows"
-		toolset "v143"
-		preferredtoolarchitecture "x86_64"
+		toolset "v142"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		buildoptions { "/Zc:__cplusplus" }
@@ -116,14 +102,9 @@ workspace "MTASA"
 		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
 
-	filter { "system:linux or macosx", "configurations:not Debug" }
-		buildoptions { "-fvisibility=hidden" }
-
-	filter { "system:linux or macosx", "configurations:not Debug", "language:C++" }
-		buildoptions { "-fvisibility-inlines-hidden" }
-
-	filter { "system:linux", "platforms:x86 or x64" }
+	filter "system:linux"
 		vectorextensions "SSE2"
+		buildoptions { "-fvisibility=hidden" }
 
 	-- Only build the client on Windows
 	if os.target() == "windows" then
@@ -137,7 +118,6 @@ workspace "MTASA"
 		include "Client/gui"
 		include "Client/launch"
 		include "Client/loader"
-		include "Client/loader-proxy"
 		include "Client/multiplayer_sa"
 		include "Client/mods/deathmatch"
 
@@ -150,14 +130,13 @@ workspace "MTASA"
 		include "vendor/portaudio"
 		include "vendor/cef3"
 		include "vendor/freetype"
-		include "vendor/jpeg-9e"
+		include "vendor/jpeg-9d"
 		include "vendor/ksignals"
 		include "vendor/libpng"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
 		include "vendor/detours"
-		include "vendor/lunasvg"
 	end
 
 	filter {}

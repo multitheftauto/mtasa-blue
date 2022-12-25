@@ -10,14 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPlayerJoinCompletePacket.h"
-#include "CGame.h"
-#include "CMainConfig.h"
-#include <net/SyncStructures.h>
 
 CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
 {
     m_PlayerID = INVALID_ELEMENT_ID;
+    m_ucNumberOfPlayers = 0;
     m_RootElementID = INVALID_ELEMENT_ID;
     m_ucHTTPDownloadType = HTTP_DOWNLOAD_DISABLED;
     m_usHTTPDownloadPort = 0;
@@ -29,12 +26,13 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
     m_uiBitrate = 0;
 }
 
-CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType,
-                                                     unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient,
-                                                     int iEnableClientChecks, bool bVoiceEnabled, unsigned char ucSampleRate, unsigned char ucVoiceQuality,
-                                                     unsigned int uiBitrate)
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, unsigned char ucNumberOfPlayers, ElementID RootElementID,
+                                                     eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL,
+                                                     int iHTTPMaxConnectionsPerClient, int iEnableClientChecks, bool bVoiceEnabled, unsigned char ucSampleRate,
+                                                     unsigned char ucVoiceQuality, unsigned int uiBitrate)
 {
     m_PlayerID = PlayerID;
+    m_ucNumberOfPlayers = ucNumberOfPlayers;
     m_RootElementID = RootElementID;
     m_ucHTTPDownloadType = ucHTTPDownloadType;
     m_iHTTPMaxConnectionsPerClient = iHTTPMaxConnectionsPerClient;
@@ -61,13 +59,7 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, Element
 bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
 {
     BitStream.Write(m_PlayerID);
-
-    // For protocol backwards compatibility: write a non-zero single byte value.
-    // This used to hold the number of players, it was never used on the client side,
-    // and it caused protocol error 14 whenever the value wrapped back to zero (uint32_t -> uint8_t).
-    uint8_t numPlayers = 1;
-    BitStream.Write(numPlayers);
-
+    BitStream.Write(m_ucNumberOfPlayers);
     BitStream.Write(m_RootElementID);
 
     // Transmit server requirement for the client to check settings

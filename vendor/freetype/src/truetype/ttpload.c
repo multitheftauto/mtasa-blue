@@ -4,7 +4,7 @@
  *
  *   TrueType-specific tables loader (body).
  *
- * Copyright (C) 1996-2022 by
+ * Copyright (C) 1996-2020 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -98,15 +98,28 @@
       goto Exit;
     }
 
-    shift = face->header.Index_To_Loc_Format != 0 ? 2 : 1;
-
-    if ( table_len > 0x10000UL << shift )
+    if ( face->header.Index_To_Loc_Format != 0 )
     {
-      FT_TRACE2(( "table too large\n" ));
-      table_len = 0x10000UL << shift;
-    }
+      shift = 2;
 
-    face->num_locations = table_len >> shift;
+      if ( table_len >= 0x40000L )
+      {
+        FT_TRACE2(( "table too large\n" ));
+        table_len = 0x3FFFFL;
+      }
+      face->num_locations = table_len >> shift;
+    }
+    else
+    {
+      shift = 1;
+
+      if ( table_len >= 0x20000L )
+      {
+        FT_TRACE2(( "table too large\n" ));
+        table_len = 0x1FFFFL;
+      }
+      face->num_locations = table_len >> shift;
+    }
 
     if ( face->num_locations != (FT_ULong)face->root.num_glyphs + 1 )
     {
@@ -114,7 +127,7 @@
                   face->num_locations - 1, face->root.num_glyphs ));
 
       /* we only handle the case where `maxp' gives a larger value */
-      if ( face->num_locations < (FT_ULong)face->root.num_glyphs + 1 )
+      if ( face->num_locations <= (FT_ULong)face->root.num_glyphs )
       {
         FT_ULong  new_loca_len =
                     ( (FT_ULong)face->root.num_glyphs + 1 ) << shift;
@@ -224,11 +237,10 @@
     if ( pos1 > face->glyf_len )
     {
       FT_TRACE1(( "tt_face_get_location:"
-                  " too large offset (0x%08lx) found for glyph index %d,\n",
-                  pos1, gindex ));
-      FT_TRACE1(( "                     "
+                  " too large offset (0x%08lx) found for glyph index %d,\n"
+                  "                     "
                   " exceeding the end of `glyf' table (0x%08lx)\n",
-                  face->glyf_len ));
+                  pos1, gindex, face->glyf_len ));
       *asize = 0;
       return 0;
     }
@@ -239,21 +251,19 @@
       if ( gindex == face->num_locations - 2 )
       {
         FT_TRACE1(( "tt_face_get_location:"
-                    " too large size (%ld bytes) found for glyph index %d,\n",
-                    pos2 - pos1, gindex ));
-        FT_TRACE1(( "                     "
+                    " too large size (%ld bytes) found for glyph index %d,\n"
+                    "                     "
                     " truncating at the end of `glyf' table to %ld bytes\n",
-                    face->glyf_len - pos1 ));
+                    pos2 - pos1, gindex, face->glyf_len - pos1 ));
         pos2 = face->glyf_len;
       }
       else
       {
         FT_TRACE1(( "tt_face_get_location:"
-                    " too large offset (0x%08lx) found for glyph index %d,\n",
-                    pos2, gindex + 1 ));
-        FT_TRACE1(( "                     "
+                    " too large offset (0x%08lx) found for glyph index %d,\n"
+                    "                     "
                     " exceeding the end of `glyf' table (0x%08lx)\n",
-                    face->glyf_len ));
+                    pos2, gindex + 1, face->glyf_len ));
         *asize = 0;
         return 0;
       }
@@ -334,7 +344,7 @@
 
     face->cvt_size = table_len / 2;
 
-    if ( FT_QNEW_ARRAY( face->cvt, face->cvt_size ) )
+    if ( FT_NEW_ARRAY( face->cvt, face->cvt_size ) )
       goto Exit;
 
     if ( FT_FRAME_ENTER( face->cvt_size * 2L ) )
@@ -498,14 +508,6 @@
   }
 
 
-  FT_COMPARE_DEF( int )
-  compare_ppem( const void*  a,
-                const void*  b )
-  {
-    return **(FT_Byte**)a - **(FT_Byte**)b;
-  }
-
-
   /**************************************************************************
    *
    * @Function:
@@ -555,6 +557,12 @@
     num_records = FT_NEXT_USHORT( p );
     record_size = FT_NEXT_ULONG( p );
 
+    /* The maximum number of bytes in an hdmx device record is the */
+    /* maximum number of glyphs + 2; this is 0xFFFF + 2, thus      */
+    /* explaining why `record_size' is a long (which we read as    */
+    /* unsigned long for convenience).  In practice, two bytes are */
+    /* sufficient to hold the size value.                          */
+    /*                                                             */
     /* There are at least two fonts, HANNOM-A and HANNOM-B version */
     /* 2.0 (2005), which get this wrong: The upper two bytes of    */
     /* the size value are set to 0xFF instead of 0x00.  We catch   */
@@ -563,45 +571,31 @@
     if ( record_size >= 0xFFFF0000UL )
       record_size &= 0xFFFFU;
 
-    FT_TRACE2(( "Hdmx " ));
-
     /* The limit for `num_records' is a heuristic value. */
-    if ( num_records > 255 || num_records == 0 )
+    if ( num_records > 255              ||
+         ( num_records > 0            &&
+           ( record_size > 0x10001L ||
+             record_size < 4        ) ) )
     {
-      FT_TRACE2(( "with unreasonable %u records rejected\n", num_records ));
+      error = FT_THROW( Invalid_File_Format );
       goto Fail;
     }
 
-    /* Out-of-spec tables are rejected.  The record size must be */
-    /* equal to the number of glyphs + 2 + 32-bit padding.       */
-    if ( (FT_Long)record_size != ( ( face->root.num_glyphs + 2 + 3 ) & ~3 ) )
-    {
-      FT_TRACE2(( "with record size off by %ld bytes rejected\n",
-                  (FT_Long)record_size -
-                    ( ( face->root.num_glyphs + 2 + 3 ) & ~3 ) ));
-      goto Fail;
-    }
-
-    if ( FT_QNEW_ARRAY( face->hdmx_records, num_records ) )
+    if ( FT_NEW_ARRAY( face->hdmx_record_sizes, num_records ) )
       goto Fail;
 
     for ( nn = 0; nn < num_records; nn++ )
     {
       if ( p + record_size > limit )
         break;
-      face->hdmx_records[nn] = p;
-      p                     += record_size;
-    }
 
-    /* The records must be already sorted by ppem but it does not */
-    /* hurt to make sure so that the binary search works later.   */
-    ft_qsort( face->hdmx_records, nn, sizeof ( FT_Byte* ), compare_ppem );
+      face->hdmx_record_sizes[nn] = p[0];
+      p                          += record_size;
+    }
 
     face->hdmx_record_count = nn;
     face->hdmx_table_size   = table_size;
     face->hdmx_record_size  = record_size;
-
-    FT_TRACE2(( "%ux%lu loaded\n", num_records, record_size ));
 
   Exit:
     return error;
@@ -620,7 +614,7 @@
     FT_Memory  memory = stream->memory;
 
 
-    FT_FREE( face->hdmx_records );
+    FT_FREE( face->hdmx_record_sizes );
     FT_FRAME_RELEASE( face->hdmx_table );
   }
 
@@ -628,34 +622,27 @@
   /**************************************************************************
    *
    * Return the advance width table for a given pixel size if it is found
-   * in the font's `hdmx' table (if any).  The records must be sorted for
-   * the binary search to work properly.
+   * in the font's `hdmx' table (if any).
    */
   FT_LOCAL_DEF( FT_Byte* )
   tt_face_get_device_metrics( TT_Face  face,
                               FT_UInt  ppem,
                               FT_UInt  gindex )
   {
-    FT_UInt   min    = 0;
-    FT_UInt   max    = face->hdmx_record_count;
-    FT_UInt   mid;
-    FT_Byte*  result = NULL;
+    FT_UInt   nn;
+    FT_Byte*  result      = NULL;
+    FT_ULong  record_size = face->hdmx_record_size;
+    FT_Byte*  record      = FT_OFFSET( face->hdmx_table, 8 );
 
 
-    while ( min < max )
-    {
-      mid = ( min + max ) >> 1;
-
-      if ( face->hdmx_records[mid][0] > ppem )
-        max = mid;
-      else if ( face->hdmx_records[mid][0] < ppem )
-        min = mid + 1;
-      else
+    for ( nn = 0; nn < face->hdmx_record_count; nn++ )
+      if ( face->hdmx_record_sizes[nn] == ppem )
       {
-        result = face->hdmx_records[mid] + 2 + gindex;
+        gindex += 2;
+        if ( gindex < record_size )
+          result = record + nn * record_size + gindex;
         break;
       }
-    }
 
     return result;
   }

@@ -7,9 +7,6 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
-#include "Utils.h"
-#include "CVehicleManager.h"
-#include "CWeaponNames.h"
 
 CSimVehiclePuresyncPacket::CSimVehiclePuresyncPacket(ElementID PlayerID, ushort usPlayerLatency, uchar ucPlayerSyncTimeContext, bool bPlayerHasOccupiedVehicle,
                                                      ushort usVehicleGotModel, uchar ucPlayerGotOccupiedVehicleSeat, uchar ucPlayerGotWeaponType,

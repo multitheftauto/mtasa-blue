@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1997 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1997 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -44,7 +42,7 @@ struct Curl_tree *Curl_splay(struct curltime i,
 {
   struct Curl_tree N, *l, *r, *y;
 
-  if(!t)
+  if(t == NULL)
     return t;
   N.smaller = N.larger = NULL;
   l = r = &N;
@@ -52,14 +50,14 @@ struct Curl_tree *Curl_splay(struct curltime i,
   for(;;) {
     long comp = compare(i, t->key);
     if(comp < 0) {
-      if(!t->smaller)
+      if(t->smaller == NULL)
         break;
       if(compare(i, t->smaller->key) < 0) {
         y = t->smaller;                           /* rotate smaller */
         t->smaller = y->larger;
         y->larger = t;
         t = y;
-        if(!t->smaller)
+        if(t->smaller == NULL)
           break;
       }
       r->smaller = t;                               /* link smaller */
@@ -67,14 +65,14 @@ struct Curl_tree *Curl_splay(struct curltime i,
       t = t->smaller;
     }
     else if(comp > 0) {
-      if(!t->larger)
+      if(t->larger == NULL)
         break;
       if(compare(i, t->larger->key) > 0) {
         y = t->larger;                          /* rotate larger */
         t->larger = y->smaller;
         y->smaller = t;
         t = y;
-        if(!t->larger)
+        if(t->larger == NULL)
           break;
       }
       l->larger = t;                              /* link larger */
@@ -103,13 +101,13 @@ struct Curl_tree *Curl_splayinsert(struct curltime i,
                                    struct Curl_tree *node)
 {
   static const struct curltime KEY_NOTUSED = {
-    ~0, -1
+    (time_t)-1, (unsigned int)-1
   }; /* will *NEVER* appear */
 
-  if(!node)
+  if(node == NULL)
     return t;
 
-  if(t) {
+  if(t != NULL) {
     t = Curl_splay(i, t);
     if(compare(i, t->key) == 0) {
       /* There already exists a node in the tree with the very same key. Build
@@ -127,7 +125,7 @@ struct Curl_tree *Curl_splayinsert(struct curltime i,
     }
   }
 
-  if(!t) {
+  if(t == NULL) {
     node->smaller = node->larger = NULL;
   }
   else if(compare(i, t->key) < 0) {
@@ -156,7 +154,7 @@ struct Curl_tree *Curl_splaygetbest(struct curltime i,
                                     struct Curl_tree *t,
                                     struct Curl_tree **removed)
 {
-  static const struct curltime tv_zero = {0, 0};
+  static struct curltime tv_zero = {0, 0};
   struct Curl_tree *x;
 
   if(!t) {
@@ -213,7 +211,7 @@ int Curl_splayremove(struct Curl_tree *t,
                      struct Curl_tree **newroot)
 {
   static const struct curltime KEY_NOTUSED = {
-    ~0, -1
+    (time_t)-1, (unsigned int)-1
   }; /* will *NEVER* appear */
   struct Curl_tree *x;
 
@@ -264,7 +262,7 @@ int Curl_splayremove(struct Curl_tree *t,
   }
   else {
     /* Remove the root node */
-    if(!t->smaller)
+    if(t->smaller == NULL)
       x = t->larger;
     else {
       x = Curl_splay(removenode->key, t->smaller);

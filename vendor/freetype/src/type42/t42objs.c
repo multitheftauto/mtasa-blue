@@ -4,7 +4,7 @@
  *
  *   Type 42 objects manager (body).
  *
- * Copyright (C) 2002-2022 by
+ * Copyright (C) 2002-2020 by
  * Roberto Alameda.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -44,8 +44,14 @@
 
     parser = &loader.parser;
 
-    face->ttf_data = NULL;
-    face->ttf_size = 0;
+    if ( FT_ALLOC( face->ttf_data, 12 ) )
+      goto Exit;
+
+    /* while parsing the font we always update `face->ttf_size' so that */
+    /* even in case of buggy data (which might lead to premature end of */
+    /* scanning without causing an error) the call to `FT_Open_Face' in */
+    /* `T42_Face_Init' passes the correct size                          */
+    face->ttf_size = 12;
 
     error = t42_parser_init( parser,
                              face->root.stream,
@@ -146,11 +152,6 @@
 
   Exit:
     t42_loader_done( &loader );
-    if ( error )
-    {
-      FT_FREE( face->ttf_data );
-      face->ttf_size = 0;
-    }
     return error;
   }
 
@@ -509,8 +510,7 @@
 
 
     error = FT_New_Size( t42face->ttf_face, &ttsize );
-    if ( !error )
-      t42size->ttsize = ttsize;
+    t42size->ttsize = ttsize;
 
     FT_Activate_Size( ttsize );
 
@@ -582,7 +582,6 @@
     FT_Face        face    = t42slot->face;
     T42_Face       t42face = (T42_Face)face;
     FT_GlyphSlot   ttslot;
-    FT_Memory      memory  = face->memory;
     FT_Error       error   = FT_Err_Ok;
 
 
@@ -594,14 +593,8 @@
     else
     {
       error = FT_New_GlyphSlot( t42face->ttf_face, &ttslot );
-      if ( !error )
-        slot->ttslot = ttslot;
+      slot->ttslot = ttslot;
     }
-
-    /* share the loader so that the autohinter can see it */
-    FT_GlyphLoader_Done( slot->ttslot->internal->loader );
-    FT_FREE( slot->ttslot->internal );
-    slot->ttslot->internal = t42slot->internal;
 
     return error;
   }
@@ -613,8 +606,6 @@
     T42_GlyphSlot  slot = (T42_GlyphSlot)t42slot;
 
 
-    /* do not destroy the inherited internal structure just yet */
-    slot->ttslot->internal = NULL;
     FT_Done_GlyphSlot( slot->ttslot );
   }
 

@@ -12,8 +12,6 @@
 
 #include <map>
 
-class CBuildingRemoval;
-
 class CBuildingRemovalManager
 {
 public:
@@ -22,9 +20,8 @@ public:
     void CreateBuildingRemoval(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior);
     void ClearBuildingRemovals();
     void RestoreWorldModel(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior);
-
-    std::multimap<unsigned short, CBuildingRemoval*>::const_iterator IterBegin() { return m_BuildingRemovals.begin(); };
-    std::multimap<unsigned short, CBuildingRemoval*>::const_iterator IterEnd() { return m_BuildingRemovals.end(); };
+    multimap<unsigned short, CBuildingRemoval*>::const_iterator IterBegin() { return m_BuildingRemovals.begin(); };
+    multimap<unsigned short, CBuildingRemoval*>::const_iterator IterEnd() { return m_BuildingRemovals.end(); };
 
 private:
     std::multimap<unsigned short, CBuildingRemoval*> m_BuildingRemovals;

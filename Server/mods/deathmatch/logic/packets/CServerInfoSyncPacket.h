@@ -31,8 +31,7 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 
 private:
-    union
-    {
+    union {
         uint8 m_ActualInfo;
         struct
         {

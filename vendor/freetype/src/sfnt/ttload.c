@@ -5,7 +5,7 @@
  *   Load the basic TrueType tables, i.e., tables that can be either in
  *   TTF or OTF fonts (body).
  *
- * Copyright (C) 1996-2022 by
+ * Copyright (C) 1996-2020 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -205,6 +205,7 @@
 
       if ( FT_STREAM_READ_FIELDS( table_dir_entry_fields, &table ) )
       {
+        nn--;
         FT_TRACE2(( "check_table_dir:"
                     " can read only %d table%s in font (instead of %d)\n",
                     nn, nn == 1 ? "" : "s", sfnt->num_tables ));
@@ -415,9 +416,9 @@
          FT_FRAME_ENTER( sfnt.num_tables * 16L ) )
       goto Exit;
 
-    FT_TRACE2(( "\n" ));
-    FT_TRACE2(( "  tag    offset    length   checksum\n" ));
-    FT_TRACE2(( "  ----------------------------------\n" ));
+    FT_TRACE2(( "\n"
+                "  tag    offset    length   checksum\n"
+                "  ----------------------------------\n" ));
 
     valid_entries = 0;
     for ( nn = 0; nn < sfnt.num_tables; nn++ )
@@ -504,8 +505,7 @@
 
     FT_FRAME_EXIT();
 
-    FT_TRACE2(( "table directory loaded\n" ));
-    FT_TRACE2(( "\n" ));
+    FT_TRACE2(( "table directory loaded\n\n" ));
 
   Exit:
     return error;
@@ -794,8 +794,8 @@
       if ( maxProfile->maxTwilightPoints > ( 0xFFFFU - 4 ) )
       {
         FT_TRACE0(( "tt_face_load_maxp:"
-                    " too much twilight points in `maxp' table;\n" ));
-        FT_TRACE0(( "                  "
+                    " too much twilight points in `maxp' table;\n"
+                    "                  "
                     " some glyphs might be rendered incorrectly\n" ));
 
         maxProfile->maxTwilightPoints = 0xFFFFU - 4;
@@ -836,8 +836,6 @@
     FT_ULong      table_pos, table_len;
     FT_ULong      storage_start, storage_limit;
     TT_NameTable  table;
-    TT_Name       names    = NULL;
-    TT_LangTag    langTags = NULL;
 
     static const FT_Frame_Field  name_table_fields[] =
     {
@@ -918,13 +916,13 @@
       storage_start += 2 + 4 * table->numLangTagRecords;
 
       /* allocate language tag records array */
-      if ( FT_QNEW_ARRAY( langTags, table->numLangTagRecords ) ||
-           FT_FRAME_ENTER( table->numLangTagRecords * 4 )      )
+      if ( FT_NEW_ARRAY( table->langTags, table->numLangTagRecords ) ||
+           FT_FRAME_ENTER( table->numLangTagRecords * 4 )            )
         goto Exit;
 
       /* load language tags */
       {
-        TT_LangTag  entry = langTags;
+        TT_LangTag  entry = table->langTags;
         TT_LangTag  limit = FT_OFFSET( entry, table->numLangTagRecords );
 
 
@@ -940,13 +938,7 @@
             /* invalid entry; ignore it */
             entry->stringLength = 0;
           }
-
-          /* mark the string as not yet loaded */
-          entry->string = NULL;
         }
-
-        table->langTags = langTags;
-        langTags        = NULL;
       }
 
       FT_FRAME_EXIT();
@@ -955,15 +947,14 @@
     }
 
     /* allocate name records array */
-    if ( FT_QNEW_ARRAY( names, table->numNameRecords ) ||
-         FT_FRAME_ENTER( table->numNameRecords * 12 )  )
+    if ( FT_NEW_ARRAY( table->names, table->numNameRecords ) ||
+         FT_FRAME_ENTER( table->numNameRecords * 12 )        )
       goto Exit;
 
     /* load name records */
     {
-      TT_Name  entry = names;
+      TT_Name  entry = table->names;
       FT_UInt  count = table->numNameRecords;
-      FT_UInt  valid = 0;
 
 
       for ( ; count > 0; count-- )
@@ -996,20 +987,15 @@
           }
         }
 
-        /* mark the string as not yet converted */
-        entry->string = NULL;
-
-        valid++;
         entry++;
       }
 
       /* reduce array size to the actually used elements */
-      FT_MEM_QRENEW_ARRAY( names,
-                           table->numNameRecords,
-                           valid );
-      table->names          = names;
-      names                 = NULL;
-      table->numNameRecords = valid;
+      count = (FT_UInt)( entry - table->names );
+      (void)FT_RENEW_ARRAY( table->names,
+                            table->numNameRecords,
+                            count );
+      table->numNameRecords = count;
     }
 
     FT_FRAME_EXIT();
@@ -1018,8 +1004,6 @@
     face->num_names = (FT_UShort)table->numNameRecords;
 
   Exit:
-    FT_FREE( names );
-    FT_FREE( langTags );
     return error;
   }
 
@@ -1327,12 +1311,6 @@
     if ( FT_STREAM_READ_FIELDS( post_fields, post ) )
       return error;
 
-    if ( post->FormatType != 0x00030000L &&
-         post->FormatType != 0x00025000L &&
-         post->FormatType != 0x00020000L &&
-         post->FormatType != 0x00010000L )
-      return FT_THROW( Invalid_Post_Table_Format );
-
     /* we don't load the glyph names, we do that in another */
     /* module (ttpost).                                     */
 
@@ -1432,8 +1410,8 @@
     FT_Error   error;
     FT_Memory  memory = stream->memory;
 
-    FT_UShort      j, num_ranges;
-    TT_GaspRange   gasp_ranges = NULL;
+    FT_UInt        j,num_ranges;
+    TT_GaspRange   gaspranges = NULL;
 
 
     /* the gasp table is optional */
@@ -1444,8 +1422,8 @@
     if ( FT_FRAME_ENTER( 4L ) )
       goto Exit;
 
-    face->gasp.version = FT_GET_USHORT();
-    num_ranges         = FT_GET_USHORT();
+    face->gasp.version   = FT_GET_USHORT();
+    face->gasp.numRanges = FT_GET_USHORT();
 
     FT_FRAME_EXIT();
 
@@ -1457,31 +1435,29 @@
       goto Exit;
     }
 
-    FT_TRACE3(( "numRanges: %hu\n", num_ranges ));
+    num_ranges = face->gasp.numRanges;
+    FT_TRACE3(( "numRanges: %u\n", num_ranges ));
 
-    if ( FT_QNEW_ARRAY( gasp_ranges, num_ranges ) ||
-         FT_FRAME_ENTER( num_ranges * 4L )        )
+    if ( FT_QNEW_ARRAY( face->gasp.gaspRanges, num_ranges ) ||
+         FT_FRAME_ENTER( num_ranges * 4L )                  )
       goto Exit;
+
+    gaspranges = face->gasp.gaspRanges;
 
     for ( j = 0; j < num_ranges; j++ )
     {
-      gasp_ranges[j].maxPPEM  = FT_GET_USHORT();
-      gasp_ranges[j].gaspFlag = FT_GET_USHORT();
+      gaspranges[j].maxPPEM  = FT_GET_USHORT();
+      gaspranges[j].gaspFlag = FT_GET_USHORT();
 
       FT_TRACE3(( "gaspRange %d: rangeMaxPPEM %5d, rangeGaspBehavior 0x%x\n",
                   j,
-                  gasp_ranges[j].maxPPEM,
-                  gasp_ranges[j].gaspFlag ));
+                  gaspranges[j].maxPPEM,
+                  gaspranges[j].gaspFlag ));
     }
-
-    face->gasp.gaspRanges = gasp_ranges;
-    gasp_ranges           = NULL;
-    face->gasp.numRanges  = num_ranges;
 
     FT_FRAME_EXIT();
 
   Exit:
-    FT_FREE( gasp_ranges );
     return error;
   }
 

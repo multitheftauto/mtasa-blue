@@ -14,11 +14,6 @@ class CAccountManager;
 #pragma once
 
 #include "CAccount.h"
-#include "CConnectHistory.h"
-
-class CDbJobData;
-class CDatabaseManager;
-
 typedef uint SDbConnectionId;
 
 #define GUEST_ACCOUNT_NAME          "guest"

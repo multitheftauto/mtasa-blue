@@ -17,8 +17,6 @@ class CMarkerManager;
 #include "CMarker.h"
 #include <list>
 
-class CMarker;
-
 class CMarkerManager
 {
     friend class CMarker;
@@ -34,8 +32,8 @@ public:
     unsigned int Count() { return static_cast<unsigned int>(m_Markers.size()); };
     bool         Exists(CMarker* pMarker);
 
-    std::list<CMarker*>::const_iterator IterBegin() { return m_Markers.begin(); };
-    std::list<CMarker*>::const_iterator IterEnd() { return m_Markers.end(); };
+    list<CMarker*>::const_iterator IterBegin() { return m_Markers.begin(); };
+    list<CMarker*>::const_iterator IterEnd() { return m_Markers.end(); };
 
     static int           StringToType(const char* szString);
     static bool          TypeToString(unsigned int uiType, char* szString);
@@ -46,6 +44,6 @@ private:
     void AddToList(CMarker* pMarker) { m_Markers.push_back(pMarker); };
     void RemoveFromList(CMarker* pMarker);
 
-    CColManager*        m_pColManager;
-    std::list<CMarker*> m_Markers;
+    CColManager*   m_pColManager;
+    list<CMarker*> m_Markers;
 };

@@ -1,11 +1,15 @@
 /* gzlib.c -- zlib functions common to reading and writing gzip files
- * Copyright (C) 2004-2019 Mark Adler
+ * Copyright (C) 2004-2017 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
+#ifdef __APPLE__
+  #include <unistd.h>
+#endif
+
 #include "gzguts.h"
 
-#if defined(_WIN32) && !defined(__BORLANDC__)
+#if defined(_WIN32) && !defined(__BORLANDC__) && !defined(__MINGW32__)
 #  define LSEEK _lseeki64
 #else
 #if defined(_LARGEFILE64_SOURCE) && _LFS64_LARGEFILE-0
@@ -30,7 +34,7 @@ local gzFile gz_open OF((const void *, int, const char *));
 
    The gz_strwinerror function does not change the current setting of
    GetLastError. */
-char ZLIB_INTERNAL *gz_strwinerror(error)
+char ZLIB_INTERNAL *gz_strwinerror (error)
      DWORD error;
 {
     static char buf[1024];
@@ -81,8 +85,6 @@ local void gz_reset(state)
         state->past = 0;            /* have not read past end yet */
         state->how = LOOK;          /* look for gzip header */
     }
-    else                            /* for writing ... */
-        state->reset = 0;           /* no deflateReset pending */
     state->seek = 0;                /* no seek request pending */
     gz_error(state, Z_OK, NULL);    /* clear error */
     state->x.pos = 0;               /* no uncompressed data yet */
@@ -399,7 +401,7 @@ z_off64_t ZEXPORT gzseek64(file, offset, whence)
     /* if within raw area while reading, just go there */
     if (state->mode == GZ_READ && state->how == COPY &&
             state->x.pos + offset >= 0) {
-        ret = LSEEK(state->fd, offset - (z_off64_t)state->x.have, SEEK_CUR);
+        ret = LSEEK(state->fd, offset - state->x.have, SEEK_CUR);
         if (ret == -1)
             return -1;
         state->x.have = 0;

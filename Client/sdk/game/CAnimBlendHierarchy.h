@@ -12,7 +12,6 @@
 #pragma once
 
 class CAnimBlendHierarchySAInterface;
-class CAnimBlendSequenceSAInterface;
 
 class CAnimBlendHierarchy
 {

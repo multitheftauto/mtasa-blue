@@ -11,11 +11,11 @@
 
 #pragma once
 
-#include <CVector2D.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <game/TaskAttack.h>
-#include "TaskSA.h"
 
-class CWeaponInfo;
+#include "TaskSA.h"
 
 #define FUNC_CTaskSimpleGangDriveBy__Constructor        0x6217d0
 #define FUNC_CTaskSimpleUseGun__Constructor             0x61de60

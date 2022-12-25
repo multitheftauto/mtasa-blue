@@ -7,10 +7,7 @@
  *  PURPOSE:
  *
  *****************************************************************************/
-
 #include "StdInc.h"
-#include "CBuildingRemovalManager.h"
-#include "CBuildingRemoval.h"
 
 CBuildingRemovalManager::CBuildingRemovalManager()
 {
@@ -76,7 +73,13 @@ void CBuildingRemovalManager::RestoreWorldModel(unsigned short usModel, float fR
         if (pFind)
         {
             const CVector& vecRemovalPos = pFind->GetPosition();
-            float          fDistance = (vecPos - vecRemovalPos).Length();
+            // Grab distances across each axis
+            float fDistanceX = vecPos.fX - vecRemovalPos.fX;
+            float fDistanceY = vecPos.fY - vecRemovalPos.fY;
+            float fDistanceZ = vecPos.fZ - vecRemovalPos.fZ;
+
+            // Square root 'em
+            float fDistance = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
 
             if (fDistance <= pFind->GetRadius() && (cInterior == -1 || pFind->GetInterior() == cInterior))
             {

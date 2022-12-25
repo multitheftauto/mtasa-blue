@@ -11,16 +11,16 @@
 
 #pragma once
 
-#include <CVector.h>
 #include <game/CFire.h>
+#include "Common.h"
+#include "CEntitySA.h"
 
-class CEntitySAInterface;
-class FxSystem_c;
+#define FUNC_Extinguish                 0x5393F0        //  ##SA##
+#define FUNC_CreateFxSysForStrength     0x539360        //  ##SA##
 
-#define FUNC_Extinguish                 0x5393F0
-#define FUNC_CreateFxSysForStrength     0x539360
+class FxSystem_c;            // we don't actually define this anywhere
 
-class CFireSAInterface
+class CFireSAInterface : public CFireInterface
 {
 public:
     BYTE                bActive : 1;
@@ -33,10 +33,11 @@ public:
     CEntitySAInterface* entityTarget;
     CEntitySAInterface* entityCreator;
     DWORD               nTimeToBurn;
-    float               Strength;
+    FLOAT               Strength;
     signed char         nNumGenerationsAllowed;
     BYTE                RemovalDist;
-    FxSystem_c* 		m_fxSysPtr;
+
+    FxSystem_c* m_fxSysPtr;
 };
 
 class CFireSA : public CFire
@@ -45,23 +46,24 @@ private:
     CFireSAInterface* internalInterface;
 
 public:
+    // constructor
     CFireSA(CFireSAInterface* fireInterface) { this->internalInterface = fireInterface; }
 
-    void            Extinguish();
+    VOID            Extinguish();
     CVector*        GetPosition();
-    void            SetPosition(CVector& vecPosition);
-    void            SetTimeToBurnOut(DWORD dwTime);
+    VOID            SetPosition(CVector& vecPosition);
+    VOID            SetTimeToBurnOut(DWORD dwTime);
     DWORD           GetTimeToBurnOut();
     CEntity*        GetCreator();
     CEntity*        GetEntityOnFire();
-    void            SetTarget(CEntity* entity);
-    bool            IsIgnited();
-    bool            IsFree();
-    void            SetSilent(bool bSilent);
-    bool            IsBeingExtinguished();
-    void            Ignite();
-    float           GetStrength();
-    void            SetStrength(float fStrength);
-    void            SetNumGenerationsAllowed(char generations);
-    CFireSAInterface* GetInterface() { return this->internalInterface; }
+    VOID            SetTarget(CEntity* entity);
+    BOOL            IsIgnited();
+    BOOL            IsFree();
+    VOID            SetSilent(BOOL bSilent);
+    BOOL            IsBeingExtinguished();
+    VOID            Ignite();
+    FLOAT           GetStrength();
+    VOID            SetStrength(FLOAT fStrength);
+    VOID            SetNumGenerationsAllowed(char generations);
+    CFireInterface* GetInterface() { return this->internalInterface; }
 };

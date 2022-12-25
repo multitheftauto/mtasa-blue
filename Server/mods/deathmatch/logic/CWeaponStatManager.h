@@ -10,17 +10,13 @@
 
 #pragma once
 
-#include "CCommon.h"
 #include <list>
-
- // Straight out of CGameSA.h
+#include "CCommon.h"
+// Straight out of CGameSA.h
 #define     CLASSSIZE_WeaponInfo            112         // ##SA##
 #define     NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
-
-class CWeaponStat;
-
 struct sWeaponInfo
 {
     eFireType fire_type;            // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)

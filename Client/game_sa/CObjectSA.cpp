@@ -10,13 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CGameSA.h"
-#include "CObjectSA.h"
-#include "CPoolsSA.h"
-#include "CRopesSA.h"
-#include "CWorldSA.h"
 
-extern CGameSA* pGame;
+//#define MTA_USE_BUILDINGS_AS_OBJECTS
 
 static void CObject_PreRender(CObjectSAInterface* objectInterface)
 {
@@ -69,12 +64,13 @@ struct CFileObjectInstance
 
 CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
 {
+    DEBUG_TRACE("CObjectSA::CObjectSA(CObjectSAInterface * objectInterface)");
     this->SetInterface(objectInterface);
     m_ucAlpha = 255;
 
     // Setup some flags
-    this->BeingDeleted = false;
-    this->DoNotRemoveFromGame = false;
+    this->BeingDeleted = FALSE;
+    this->DoNotRemoveFromGame = FALSE;
 
     if (m_pInterface)
     {
@@ -86,6 +82,90 @@ CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
 
 CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 {
+    DEBUG_TRACE("CObjectSA::CObjectSA( DWORD dwModel )");
+
+    CWorldSA* world = (CWorldSA*)pGame->GetWorld();
+
+    DWORD dwThis = 0;
+
+#ifdef MTA_USE_BUILDINGS_AS_OBJECTS
+
+    DWORD               dwFunc = 0x538090;            // CFileLoader__LoadObjectInstance
+    CFileObjectInstance fileLoader;
+    MemSetFast(&fileLoader, 0, sizeof(CFileObjectInstance));
+    fileLoader.modelId = dwModel;
+    fileLoader.rr = 1;
+    fileLoader.areaNumber = 0;
+    fileLoader.flags = -1;
+
+    _asm
+    {
+        push    0
+        lea     ecx, fileLoader
+        push    ecx
+        call    dwFunc
+        add     esp, 8
+        mov     dwThis, eax
+    }
+
+    this->SetInterface((CEntitySAInterface*)dwThis);
+
+    MemPutFast<DWORD>(0xBCC0E0, dwThis);
+    MemPutFast<DWORD>(0xBCC0D8, 1);
+
+    dwFunc = 0x404DE0;            // CIplStore__SetupRelatedIpls
+    DWORD dwTemp = 0;
+    char  szTemp[255];
+    strcpy(szTemp, "moo");
+
+    _asm
+    {
+        push    0xBCC0E0
+        push    -1
+        lea     eax, szTemp
+        push    eax
+        call    dwFunc
+        add     esp, 0xC
+        mov     dwTemp, eax
+    }
+
+    dwFunc = 0x5B51E0;            // AddBuildingInstancesToWorld
+    _asm
+    {
+        push    dwTemp
+        call    dwFunc
+        add     esp, 4
+    }
+
+    dwFunc = 0x405110;            // CIplStore__RemoveRelatedIpls
+    _asm
+    {
+        push    -1
+        call    dwFunc
+        add     esp, 4
+    }
+
+    // VITAL to get colmodels to appear
+    // this gets the level for a colmodel (colmodel+40)
+    dwFunc = 0x4107A0;
+    _asm
+    {
+        mov     eax, dwModel
+
+        push    ecx
+        mov     ecx, dword ptr[ARRAY_ModelInfo]
+        mov     eax, dword ptr[ecx + eax*4]
+        pop     ecx
+
+        mov     eax, [eax+20]
+        movzx   eax, byte ptr [eax+40]
+        push    eax
+        call    dwFunc
+        add     esp, 4
+    }
+
+#else
+
     DWORD CObjectCreate = FUNC_CObject_Create;
     DWORD dwObjectPtr = 0;
     _asm
@@ -96,17 +176,15 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
         add     esp, 8
         mov     dwObjectPtr, eax
     }
-
     if (dwObjectPtr)
     {
         this->SetInterface((CEntitySAInterface*)dwObjectPtr);
 
-        CWorldSA* world = (CWorldSA*)pGame->GetWorld();
         world->Add(m_pInterface, CObject_Constructor);
 
         // Setup some flags
-        this->BeingDeleted = false;
-        this->DoNotRemoveFromGame = false;
+        this->BeingDeleted = FALSE;
+        this->DoNotRemoveFromGame = FALSE;
         MemPutFast<BYTE>(dwObjectPtr + 316, 6);
         if (bBreakingDisabled)
         {
@@ -124,8 +202,11 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     else
     {
         // The exception handler doesn't work for some reason, so do this
-        this->SetInterface(nullptr);
+        this->SetInterface(NULL);
     }
+#endif
+
+    this->internalID = pGame->GetPools()->GetObjectRef((DWORD*)this->GetInterface());
 
     m_ucAlpha = 255;
 
@@ -138,6 +219,8 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 
 CObjectSA::~CObjectSA()
 {
+    DEBUG_TRACE("CObjectSA::~CObjectSA( )");
+    // OutputDebugString("Attempting to destroy Object\n");
     if (!this->BeingDeleted && DoNotRemoveFromGame == false)
     {
         CEntitySAInterface* pInterface = GetInterface();
@@ -157,11 +240,34 @@ CObjectSA::~CObjectSA()
                     push    1            // delete too
                     call    dwFunc
                 }
+
+#ifdef MTA_USE_BUILDINGS_AS_OBJECTS
+                DWORD dwModelID = this->internalInterface->m_nModelIndex;
+                // REMOVE ref to colstore thingy
+                dwFunc = 0x4107D0;
+                _asm
+                {
+                    mov     eax, dwModelID
+
+                    push    ecx
+                    mov     ecx, dword ptr[ARRAY_ModelInfo]
+                    mov     eax, dword ptr[ecx + eax*4]
+                    pop     ecx
+
+                    mov     eax, [eax+20]
+                    movzx   eax, byte ptr [eax+40]
+                    push    eax
+                    call    dwFunc
+                    add     esp, 4
+                }
+#endif
             }
         }
 
         this->BeingDeleted = true;
         ((CPoolsSA*)pGame->GetPools())->RemoveObject((CObject*)(CObjectSA*)this);
+
+        // OutputDebugString("Destroying Object\n");
     }
 }
 
@@ -235,19 +341,19 @@ void CObjectSA::SetModelIndex(unsigned long ulModel)
     DWORD dwFunc = this->GetInterface()->vtbl->DeleteRwObject;
     DWORD dwThis = (DWORD)this->GetInterface();
     _asm
-    {
+        {
         mov     ecx, dwThis
         call    dwFunc
-    }
+        }
 
     // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
     dwFunc = this->GetInterface()->vtbl->SetModelIndex;
     _asm
-    {
+        {
         mov     ecx, dwThis
         push    ulModel
         call    dwFunc
-    }
+        }
 
     CheckForGangTag();
 }

@@ -21,26 +21,27 @@
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
+class SString;
 class CAnimBlendAssocGroup;
-class CAnimBlendAssocGroupSAInterface;
-class CAnimBlendAssociation;
-class CAnimBlendAssociationSAInterface;
 class CAnimBlendHierarchy;
-class CAnimBlendHierarchySAInterface;
 class CAnimBlendSequence;
-class CAnimBlendSequenceSAInterface;
+class CAnimBlock;
+class CAnimBlendAssociation;
 class CAnimBlendStaticAssociation;
 class CAnimBlendStaticAssociationSAInterface;
-class CAnimBlock;
-class CAnimBlockSAInterface;
 class CClientPed;
-class SString;
-enum class eAnimGroup;
-enum class eAnimID;
-struct AnimAssocDefinition;
-struct AnimDescriptor;
 struct RpClump;
 struct RwStream;
+struct AnimAssocDefinition;
+struct AnimDescriptor;
+
+class CAnimBlendAssocGroupSAInterface;
+class CAnimBlendAssociationSAInterface;
+class CAnimBlendHierarchySAInterface;
+class CAnimBlendSequenceSAInterface;
+class CAnimBlockSAInterface;
+enum class eAnimGroup;
+enum class eAnimID;
 
 class CAnimManager
 {
@@ -50,8 +51,8 @@ public:
     typedef std::unique_ptr<CAnimBlendAssociation>       AnimBlendAssoc_type;
     typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
     typedef std::unique_ptr<CAnimBlendAssocGroup>        AnimAssocGroup_type;
-    virtual void                                         Initialize() = 0;
-    virtual void                                         Shutdown() = 0;
+    virtual void Initialize() = 0;
+    virtual void Shutdown() = 0;
 
     virtual int GetNumAnimations() = 0;
     virtual int GetNumAnimBlocks() = 0;

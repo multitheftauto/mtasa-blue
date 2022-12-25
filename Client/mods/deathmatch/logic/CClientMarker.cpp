@@ -180,7 +180,6 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClientCheckpoint*>(m_pMarker)->SetCheckpointType(CClientCheckpoint::TYPE_RING);
-            return;
         }
 
         // Or current type is a ring and new type is a checkpoint?
@@ -188,7 +187,6 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClientCheckpoint*>(m_pMarker)->SetCheckpointType(CClientCheckpoint::TYPE_NORMAL);
-            return;
         }
 
         // Current type is a cylinder and new type is an arrow
@@ -196,7 +194,6 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClient3DMarker*>(m_pMarker)->Set3DMarkerType(CClient3DMarker::TYPE_ARROW);
-            return;
         }
 
         // Current type is an arrow and new type is an cylinder
@@ -204,7 +201,6 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClient3DMarker*>(m_pMarker)->Set3DMarkerType(CClient3DMarker::TYPE_CYLINDER);
-            return;
         }
 
         // No easy way of changing the type. Different classes. Remember position and color and recreate it.
@@ -221,9 +217,6 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
 
         // Create a new one of the correct type
         CreateOfType(eType);
-
-        // Reset stored position to re-apply last position (fixes issue #2194)
-        m_vecPosition = {};
 
         // Set the properties back
         SetPosition(vecPosition);

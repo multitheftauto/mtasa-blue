@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPlayerNetworkStatusPacket.h"
 
 bool CPlayerNetworkStatusPacket::Read(NetBitStreamInterface& BitStream)
 {

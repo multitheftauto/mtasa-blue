@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl AND ISC
  *
  ***************************************************************************/
 
@@ -33,24 +31,25 @@
 #include "memdebug.h"
 
 /* figure out the path to work with in this particular request */
-CURLcode Curl_getworkingpath(struct Curl_easy *data,
+CURLcode Curl_getworkingpath(struct connectdata *conn,
                              char *homedir,  /* when SFTP is used */
                              char **path) /* returns the  allocated
                                              real path to work with */
 {
+  struct Curl_easy *data = conn->data;
   char *real_path = NULL;
   char *working_path;
   size_t working_path_len;
   CURLcode result =
-    Curl_urldecode(data->state.up.path, 0, &working_path,
+    Curl_urldecode(data, data->state.up.path, 0, &working_path,
                    &working_path_len, REJECT_ZERO);
   if(result)
     return result;
 
   /* Check for /~/, indicating relative to the user's home directory */
-  if(data->conn->handler->protocol & CURLPROTO_SCP) {
+  if(conn->handler->protocol & CURLPROTO_SCP) {
     real_path = malloc(working_path_len + 1);
-    if(!real_path) {
+    if(real_path == NULL) {
       free(working_path);
       return CURLE_OUT_OF_MEMORY;
     }
@@ -60,11 +59,11 @@ CURLcode Curl_getworkingpath(struct Curl_easy *data,
     else
       memcpy(real_path, working_path, 1 + working_path_len);
   }
-  else if(data->conn->handler->protocol & CURLPROTO_SFTP) {
+  else if(conn->handler->protocol & CURLPROTO_SFTP) {
     if((working_path_len > 1) && (working_path[1] == '~')) {
       size_t homelen = strlen(homedir);
       real_path = malloc(homelen + working_path_len + 1);
-      if(!real_path) {
+      if(real_path == NULL) {
         free(working_path);
         return CURLE_OUT_OF_MEMORY;
       }
@@ -80,7 +79,7 @@ CURLcode Curl_getworkingpath(struct Curl_easy *data,
     }
     else {
       real_path = malloc(working_path_len + 1);
-      if(!real_path) {
+      if(real_path == NULL) {
         free(working_path);
         return CURLE_OUT_OF_MEMORY;
       }
@@ -122,8 +121,7 @@ CURLcode Curl_get_pathname(const char **cpp, char **path, char *homedir)
   bool relativePath = false;
   static const char WHITESPACE[] = " \t\r\n";
 
-  DEBUGASSERT(homedir);
-  if(!*cp || !homedir) {
+  if(!*cp) {
     *cpp = NULL;
     *path = NULL;
     return CURLE_QUOTE_ERROR;
@@ -133,7 +131,7 @@ CURLcode Curl_get_pathname(const char **cpp, char **path, char *homedir)
   /* Allocate enough space for home directory and filename + separator */
   fullPathLength = strlen(cp) + strlen(homedir) + 2;
   *path = malloc(fullPathLength);
-  if(!*path)
+  if(*path == NULL)
     return CURLE_OUT_OF_MEMORY;
 
   /* Check for quoted filenames */
@@ -172,7 +170,7 @@ CURLcode Curl_get_pathname(const char **cpp, char **path, char *homedir)
   else {
     /* Read to end of filename - either to whitespace or terminator */
     end = strpbrk(cp, WHITESPACE);
-    if(!end)
+    if(end == NULL)
       end = strchr(cp, '\0');
     /* return pointer to second parameter if it exists */
     *cpp = end + strspn(end, WHITESPACE);

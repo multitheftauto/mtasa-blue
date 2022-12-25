@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCustomWeaponManager.h"
 
 CCustomWeaponManager::CCustomWeaponManager()
 {

@@ -158,6 +158,7 @@ CClientEntity::~CClientEntity()
     if (!g_pClientGame->IsBeingDeleted())
         CClientEntityRefManager::OnEntityDelete(this);
 
+    SAFE_RELEASE(m_pChildrenListSnapshot);
     g_pCore->GetGraphics()->GetRenderItemManager()->RemoveClientEntityRefs(this);
     g_pCore->UpdateDummyProgress();
 }
@@ -778,8 +779,11 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
     // Call it on all our children
     if (!m_Children.empty())
     {
-        for (CClientEntity* pEntity : *GetChildrenListSnapshot())
+        CElementListSnapshot* pList = GetChildrenListSnapshot();
+        pList->AddRef();            // Keep list alive during use
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
         {
+            CClientEntity* pEntity = *iter;
             if (!pEntity->IsBeingDeleted())
             {
                 if (!pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents() || !pEntity->m_Children.empty())
@@ -790,6 +794,7 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
                 }
             }
         }
+        pList->Release();
     }
 }
 
@@ -1091,7 +1096,7 @@ bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break;            // This should not be possible, but you never know
+                break; // This should not be possible, but you never know
         }
 
         return false;
@@ -1208,8 +1213,6 @@ unsigned int CClientEntity::GetTypeID(const char* szTypeName)
         return CCLIENTSOUND;
     else if (strcmp(szTypeName, "light") == 0)
         return CCLIENTPOINTLIGHTS;
-    else if (strcmp(szTypeName, "svg") == 0)
-        return CCLIENTVECTORGRAPHIC;
     else
         return CCLIENTUNKNOWN;
 }
@@ -1300,17 +1303,7 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     {
         pEntity->SetAreaCode(ucInterior);
     }
-
-    unsigned char ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
-
-    if (ucOldInterior != ucInterior)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushNumber(ucOldInterior);
-        Arguments.PushNumber(ucInterior);
-        CallEvent("onClientElementInteriorChange", Arguments, true);
-    }
 }
 
 bool CClientEntity::IsOnScreen()
@@ -1600,21 +1593,25 @@ float CClientEntity::GetDistanceBetweenBoundingSpheres(CClientEntity* pOther)
 //
 // Ensure children list snapshot is up to date and return it
 //
-CElementListSnapshotRef CClientEntity::GetChildrenListSnapshot()
+CElementListSnapshot* CClientEntity::GetChildrenListSnapshot()
 {
     // See if list needs updating
     if (m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL)
     {
         m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
 
+        // Detach old
+        SAFE_RELEASE(m_pChildrenListSnapshot);
+
         // Make new
-        m_pChildrenListSnapshot = std::make_shared<CElementListSnapshot>();
+        m_pChildrenListSnapshot = new CElementListSnapshot();
 
         // Fill it up
         m_pChildrenListSnapshot->reserve(m_Children.size());
-
-        for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
+        for (CChildListType::const_iterator iter = m_Children.begin(); iter != m_Children.end(); iter++)
+        {
             m_pChildrenListSnapshot->push_back(*iter);
+        }
     }
 
     return m_pChildrenListSnapshot;

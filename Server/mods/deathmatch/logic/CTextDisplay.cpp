@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CTextDisplay.h"
-#include "CIdArray.h"
-#include "lua/LuaCommon.h"
 
 CTextDisplay::CTextDisplay()
 {

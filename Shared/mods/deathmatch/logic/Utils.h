@@ -12,18 +12,15 @@
 #pragma once
 
 #ifdef MTA_CLIENT
-    extern CLocalizationInterface* g_pLocalization;
+extern CLocalizationInterface* g_pLocalization;
 #else
-    #include <CVector.h>
-    #include <CVector2D.h>
-    #include <net/bitstream.h>
-    #include <cmath>
-    #include "CCommon.h"
-    #include "CPad.h"
-    #include "packets/CPlayerDisconnectedPacket.h"
+#include <CVector.h>
+#include <CVector2D.h>
+#include <net/bitstream.h>
+#include <cmath>
+#include "CCommon.h"
+#include "CPad.h"
 #endif
-
-class CMatrix;
 
 // Vector math
 inline float DistanceBetweenPoints2D(const CVector& vecPosition1, const CVector& vecPosition2)
@@ -328,5 +325,5 @@ void DeletePointersAndClearList(T& elementList)
 
 // for debug
 #if defined(MTA_DEBUG) && defined(MTA_CLIENT)
-bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
 #endif

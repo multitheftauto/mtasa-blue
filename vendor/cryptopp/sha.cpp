@@ -1,39 +1,29 @@
 // sha.cpp - modified by Wei Dai from Steve Reid's public domain sha1.c
 
-//    Steve Reid implemented SHA-1. Wei Dai implemented SHA-2. Jeffrey
-//    Walton implemented Intel SHA extensions based on Intel articles and code
-//    by Sean Gulley. Jeffrey Walton implemented ARM SHA-1 and SHA-256 based
-//    on ARM code and code from Johannes Schneiders, Skip Hovsmith and
-//    Barry O'Rourke. Jeffrey Walton and Bill Schmidt implemented Power8
-//    SHA-256 and SHA-512. All code is in the public domain.
+//    Steve Reid implemented SHA-1. Wei Dai implemented SHA-2. Jeffrey Walton
+//    implemented Intel SHA extensions based on Intel articles and code by
+//    Sean Gulley. Jeffrey Walton implemented ARM SHA based on ARM code and
+//    code from Johannes Schneiders, Skip Hovsmith and Barry O'Rourke.
+//    All code is in the public domain.
 
-//    In August 2017 JW reworked the internals to align all the
-//    implementations. Formerly all hashes were software based, IterHashBase
-//    handled endian conversions, and IterHashBase dispatched a single to
-//    block SHA{N}::Transform. SHA{N}::Transform then performed the single
-//    block hashing. It was repeated for multiple blocks.
+//     In August 2017 JW reworked the internals to align all the implementations.
+//    Formerly all hashes were software based, IterHashBase handled endian conversions,
+//    and IterHashBase dispatched a single to block SHA{N}::Transform. SHA{N}::Transform
+//    then performed the single block hashing. It was repeated for multiple blocks.
 //
-//    The rework added SHA{N}::HashMultipleBlocks (class) and
-//    SHA{N}_HashMultipleBlocks (free standing). There are also hardware
-//    accelerated variations. Callers enter SHA{N}::HashMultipleBlocks (class)
-//    and the function calls SHA{N}_HashMultipleBlocks (free standing) or
-//    SHA{N}_HashBlock (free standing) as a fallback.
+//    The rework added SHA{N}::HashMultipleBlocks (class) and SHA{N}_HashMultipleBlocks
+//    (free standing). There are also hardware accelerated variations. Callers enter
+//    SHA{N}::HashMultipleBlocks (class), and the function calls SHA{N}_HashMultipleBlocks
+//    (free standing) or SHA{N}_HashBlock (free standing) as a fallback.
 //
-//    An added wrinkle is hardware is little endian, C++ is big endian, and
-//    callers use big endian, so SHA{N}_HashMultipleBlock accepts a ByteOrder
-//    for the incoming data arrangement. Hardware based SHA{N}_HashMultipleBlock
-//    can often perform the endian swap much easier by setting an EPI mask.
-//    Endian swap incurs no penalty on Intel SHA, and 4-instruction penalty on
-//    ARM SHA. Under C++ the full software based swap penalty is incurred due
-//    to use of ReverseBytes().
+//    An added wrinkle is hardware is little endian, C++ is big endian, and callers use
+//    big endian, so SHA{N}_HashMultipleBlock accepts a ByteOrder for the incoming data
+//    arrangement. Hardware based SHA{N}_HashMultipleBlock can often perform the endian
+//    swap much easier by setting an EPI mask. Endian swap incurs no penalty on Intel SHA,
+//    and 4-instruction penalty on ARM SHA. Under C++ the full software based swap penalty
+//    is incurred due to use of ReverseBytes().
 //
-//    In May 2019 JW added Cryptogams ARMv7 and NEON implementations for SHA1,
-//    SHA256 and SHA512. The Cryptogams code closed a performance gap on modern
-//    32-bit ARM devices. Cryptogams is Andy Polyakov's project used to create
-//    high speed crypto algorithms and share them with other developers. Andy's
-//    code runs 30% to 50% faster than C/C++ code. The Cryptogams code can be
-//    disabled in config_asm.h. An example of integrating Andy's code is at
-//    https://wiki.openssl.org/index.php/Cryptogams_SHA.
+//    The rework also removed the hacked-in pointers to implementations.
 
 // use "cl /EP /P /DCRYPTOPP_GENERATE_X64_MASM sha.cpp" to generate MASM code
 
@@ -66,22 +56,12 @@ extern void SHA1_HashMultipleBlocks_SHANI(word32 *state, const word32 *data, siz
 extern void SHA256_HashMultipleBlocks_SHANI(word32 *state, const word32 *data, size_t length, ByteOrder order);
 #endif
 
-#if CRYPTOGAMS_ARM_SHA1
-extern "C" void cryptogams_sha1_block_data_order(word32* state, const word32 *data, size_t blocks);
-extern "C" void cryptogams_sha1_block_data_order_neon(word32* state, const word32 *data, size_t blocks);
-#endif
-
 #if CRYPTOPP_ARM_SHA1_AVAILABLE
 extern void SHA1_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t length, ByteOrder order);
 #endif
 
 #if CRYPTOPP_ARM_SHA2_AVAILABLE
 extern void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t length, ByteOrder order);
-#endif
-
-#if CRYPTOGAMS_ARM_SHA256
-extern "C" void cryptogams_sha256_block_data_order(word32* state, const word32 *data, size_t blocks);
-extern "C" void cryptogams_sha256_block_data_order_neon(word32* state, const word32 *data, size_t blocks);
 #endif
 
 #if CRYPTOPP_ARM_SHA512_AVAILABLE
@@ -91,11 +71,6 @@ extern void SHA512_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, s
 #if CRYPTOPP_POWER8_SHA_AVAILABLE
 extern void SHA256_HashMultipleBlocks_POWER8(word32 *state, const word32 *data, size_t length, ByteOrder order);
 extern void SHA512_HashMultipleBlocks_POWER8(word64 *state, const word64 *data, size_t length, ByteOrder order);
-#endif
-
-#if CRYPTOGAMS_ARM_SHA512
-extern "C" void cryptogams_sha512_block_data_order(word64* state, const word64 *data, size_t blocks);
-extern "C" void cryptogams_sha512_block_data_order_neon(word64* state, const word64 *data, size_t blocks);
 #endif
 
 // We add extern to export table to sha_simd.cpp, but it
@@ -257,15 +232,6 @@ std::string SHA1::AlgorithmProvider() const
     if (HasSSE2())
         return "SSE2";
 #endif
-#if CRYPTOGAMS_ARM_SHA1
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-        return "NEON";
-    else
-# endif
-    if (HasARMv7())
-        return "ARMv7";
-#endif
 #if CRYPTOPP_ARM_SHA1_AVAILABLE
     if (HasSHA1())
         return "ARMv8";
@@ -294,34 +260,6 @@ void SHA1::Transform(word32 *state, const word32 *data)
         return;
     }
 #endif
-// Disabled at the moment due to MDC and SEAL failures
-#if CRYPTOGAMS_ARM_SHA1 && 0
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-    {
-#  if defined(CRYPTOPP_LITTLE_ENDIAN)
-        word32 dataBuf[16];
-        ByteReverse(dataBuf, data, SHA1::BLOCKSIZE);
-        cryptogams_sha1_block_data_order_neon(state, dataBuf, 1);
-#  else
-        cryptogams_sha1_block_data_order_neon(state, data, 1);
-#  endif
-        return;
-    }
-    else
-# endif
-    if (HasARMv7())
-    {
-# if defined(CRYPTOPP_LITTLE_ENDIAN)
-        word32 dataBuf[16];
-        ByteReverse(dataBuf, data, SHA1::BLOCKSIZE);
-        cryptogams_sha1_block_data_order(state, data, 1);
-# else
-        cryptogams_sha1_block_data_order(state, data, 1);
-# endif
-        return;
-    }
-#endif
 #if CRYPTOPP_ARM_SHA1_AVAILABLE
     if (HasSHA1())
     {
@@ -342,21 +280,6 @@ size_t SHA1::HashMultipleBlocks(const word32 *input, size_t length)
     if (HasSHA())
     {
         SHA1_HashMultipleBlocks_SHANI(m_state, input, length, BIG_ENDIAN_ORDER);
-        return length & (SHA1::BLOCKSIZE - 1);
-    }
-#endif
-#if CRYPTOGAMS_ARM_SHA1
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-    {
-        cryptogams_sha1_block_data_order_neon(m_state, input, length / SHA1::BLOCKSIZE);
-        return length & (SHA1::BLOCKSIZE - 1);
-    }
-    else
-# endif
-    if (HasARMv7())
-    {
-        cryptogams_sha1_block_data_order(m_state, input, length / SHA1::BLOCKSIZE);
         return length & (SHA1::BLOCKSIZE - 1);
     }
 #endif
@@ -472,15 +395,6 @@ std::string SHA256_AlgorithmProvider()
 #if CRYPTOPP_SSE2_ASM_AVAILABLE
     if (HasSSE2())
         return "SSE2";
-#endif
-#if CRYPTOGAMS_ARM_SHA256
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-        return "NEON";
-    else
-# endif
-    if (HasARMv7())
-        return "ARMv7";
 #endif
 #if CRYPTOPP_ARM_SHA2_AVAILABLE
     if (HasSHA2())
@@ -825,14 +739,12 @@ INTEL_NOPREFIX
     ATT_PREFIX
     :
     : "c" (state), "d" (data), "S" (SHA256_K+48), "D" (len)
-    #if CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X64
+    #if CRYPTOPP_BOOL_X64
         , "m" (workspace[0])
     #endif
-    : "memory", "cc", "%eax", "%xmm0", "%xmm1", PERCENT_REG(AS_REG_7)
-    #if CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X64
+    : "memory", "cc", "%eax"
+    #if CRYPTOPP_BOOL_X64
         , "%rbx", "%r8", "%r10"
-    #else
-        , "%ebx"
     #endif
     );
 #endif
@@ -864,34 +776,6 @@ void SHA256::Transform(word32 *state, const word32 *data)
     if (HasSHA())
     {
         SHA256_HashMultipleBlocks_SHANI(state, data, SHA256::BLOCKSIZE, LITTLE_ENDIAN_ORDER);
-        return;
-    }
-#endif
-// Disabled at the moment due to MDC and SEAL failures
-#if CRYPTOGAMS_ARM_SHA256 && 0
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-    {
-#  if defined(CRYPTOPP_LITTLE_ENDIAN)
-        word32 dataBuf[16];
-        ByteReverse(dataBuf, data, SHA256::BLOCKSIZE);
-        cryptogams_sha256_block_data_order_neon(state, dataBuf, 1);
-#  else
-        cryptogams_sha256_block_data_order_neon(state, data, 1);
-#  endif
-        return;
-    }
-    else
-# endif
-    if (HasARMv7())
-    {
-# if defined(CRYPTOPP_LITTLE_ENDIAN)
-        word32 dataBuf[16];
-        ByteReverse(dataBuf, data, SHA256::BLOCKSIZE);
-        cryptogams_sha256_block_data_order(state, data, 1);
-# else
-        cryptogams_sha256_block_data_order(state, data, 1);
-# endif
         return;
     }
 #endif
@@ -931,21 +815,6 @@ size_t SHA256::HashMultipleBlocks(const word32 *input, size_t length)
         const size_t res = length & (SHA256::BLOCKSIZE - 1);
         SHA256_HashMultipleBlocks_SSE2(m_state, input, length-res);
         return res;
-    }
-#endif
-#if CRYPTOGAMS_ARM_SHA256
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-    {
-        cryptogams_sha256_block_data_order_neon(m_state, input, length / SHA256::BLOCKSIZE);
-        return length & (SHA256::BLOCKSIZE - 1);
-    }
-    else
-# endif
-    if (HasARMv7())
-    {
-        cryptogams_sha256_block_data_order(m_state, input, length / SHA256::BLOCKSIZE);
-        return length & (SHA256::BLOCKSIZE - 1);
     }
 #endif
 #if CRYPTOPP_ARM_SHA2_AVAILABLE
@@ -1004,21 +873,6 @@ size_t SHA224::HashMultipleBlocks(const word32 *input, size_t length)
         return res;
     }
 #endif
-#if CRYPTOGAMS_ARM_SHA256
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-    {
-        cryptogams_sha256_block_data_order_neon(m_state, input, length / SHA256::BLOCKSIZE);
-        return length & (SHA256::BLOCKSIZE - 1);
-    }
-    else
-# endif
-    if (HasARMv7())
-    {
-        cryptogams_sha256_block_data_order(m_state, input, length / SHA256::BLOCKSIZE);
-        return length & (SHA256::BLOCKSIZE - 1);
-    }
-#endif
 #if CRYPTOPP_ARM_SHA2_AVAILABLE
     if (HasSHA2())
     {
@@ -1062,15 +916,6 @@ std::string SHA512_AlgorithmProvider()
 #if CRYPTOPP_SSE2_ASM_AVAILABLE
     if (HasSSE2())
         return "SSE2";
-#endif
-#if CRYPTOGAMS_ARM_SHA512
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-        return "NEON";
-    else
-# endif
-    if (HasARMv7())
-        return "ARMv7";
 #endif
 #if (CRYPTOPP_POWER8_SHA_AVAILABLE)
     if (HasSHA512())
@@ -1296,9 +1141,7 @@ void CRYPTOPP_FASTCALL SHA512_HashBlock_SSE2(word64 *state, const word64 *data)
     ATT_PREFIX
         :
         : "a" (SHA512_K), "c" (state), "d" (data)
-        : "%ebx", "%esi", "%edi", "%mm0", "%mm1", "%mm2", "%mm3", "%mm4", "%mm5",
-          "%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7",
-          "memory", "cc"
+        : "%esi", "%edi", "memory", "cc"
     );
 #else
     AS1(    pop        edi)
@@ -1377,33 +1220,6 @@ void SHA512::Transform(word64 *state, const word64 *data)
     if (HasSSE2())
     {
         SHA512_HashBlock_SSE2(state, data);
-        return;
-    }
-#endif
-#if CRYPTOGAMS_ARM_SHA512
-# if CRYPTOPP_ARM_NEON_AVAILABLE
-    if (HasNEON())
-    {
-#  if (CRYPTOPP_LITTLE_ENDIAN)
-        word64 dataBuf[16];
-        ByteReverse(dataBuf, data, SHA512::BLOCKSIZE);
-        cryptogams_sha512_block_data_order_neon(state, dataBuf, 1);
-#  else
-        cryptogams_sha512_block_data_order_neon(state, data, 1);
-#  endif
-        return;
-    }
-    else
-# endif
-    if (HasARMv7())
-    {
-# if (CRYPTOPP_LITTLE_ENDIAN)
-        word64 dataBuf[16];
-        ByteReverse(dataBuf, data, SHA512::BLOCKSIZE);
-        cryptogams_sha512_block_data_order(state, dataBuf, 1);
-# else
-        cryptogams_sha512_block_data_order(state, data, 1);
-# endif
         return;
     }
 #endif

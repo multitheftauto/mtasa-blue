@@ -10,13 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CEntityRemovePacket.h"
-#include "CElement.h"
 
 bool CEntityRemovePacket::Write(NetBitStreamInterface& BitStream) const
 {
     // Write each entity type then id to it
-    std::vector<CElement*>::const_iterator iter = m_List.begin();
+    vector<CElement*>::const_iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)
     {
         BitStream.Write((*iter)->GetID());

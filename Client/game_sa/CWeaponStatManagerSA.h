@@ -11,21 +11,18 @@
 #pragma once
 
 #include <list>
-#include <game/CWeaponStatManager.h>
-#include "CWeaponStatSA.h"
 
 // Straight out of CGameSA.h
 #define     CLASSSIZE_WeaponInfo            112         // ##SA##
 #define     NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
 #define     NUM_WeaponInfosOtherSkill       11
 #define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
-
 struct sWeaponInfo
 {
     eFireType fire_type;            // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)
 
-    float target_range;            // max targeting range
-    float weapon_range;            // absolute gun range / default melee attack range
+    FLOAT target_range;            // max targeting range
+    FLOAT weapon_range;            // absolute gun range / default melee attack range
     int   model;                   // modelinfo id
     int   model2;                  // second modelinfo id
 
@@ -46,25 +43,25 @@ struct sWeaponInfo
     // skill settings
     eWeaponSkill skill_level;                     // what's the skill level of this weapontype
     int          required_skill_level;            // what stat level is required for this skill level
-    float        accuracy;                        // modify accuracy of weapon
-    float        move_speed;                      // how fast can move with weapon
+    FLOAT        accuracy;                        // modify accuracy of weapon
+    FLOAT        move_speed;                      // how fast can move with weapon
 
     // anim timings
-    float anim_loop_start;                  // start of animation loop
-    float anim_loop_stop;                   // end of animation loop
-    float anim_loop_bullet_fire;            // time in animation when weapon should be fired
+    FLOAT anim_loop_start;                  // start of animation loop
+    FLOAT anim_loop_stop;                   // end of animation loop
+    FLOAT anim_loop_bullet_fire;            // time in animation when weapon should be fired
 
-    float anim2_loop_start;                  // start of animation2 loop
-    float anim2_loop_stop;                   // end of animation2 loop
-    float anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
+    FLOAT anim2_loop_start;                  // start of animation2 loop
+    FLOAT anim2_loop_stop;                   // end of animation2 loop
+    FLOAT anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
 
-    float anim_breakout_time;            // time after which player can break out of attack and run off
+    FLOAT anim_breakout_time;            // time after which player can break out of attack and run off
 
     // projectile/area effect specific info
-    float firing_speed;            // speed of projectile
-    float radius;                  // radius affected
-    float life_span;               // time taken for shot to dissipate
-    float spread;                  // angle inside which shots are created
+    FLOAT firing_speed;            // speed of projectile
+    FLOAT radius;                  // radius affected
+    FLOAT life_span;               // time taken for shot to dissipate
+    FLOAT spread;                  // angle inside which shots are created
 
     short aim_offset;            // index into array of aiming offsets
     //////////////////////////////////

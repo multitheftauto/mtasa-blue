@@ -22,6 +22,8 @@ class CPlaneSAInterface : public CAutomobileSAInterface
 
 class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
 {
+private:
+    //  CBoatSAInterface        * internalInterface;
 public:
     CPlaneSA(CPlaneSAInterface* plane);
     CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);

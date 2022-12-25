@@ -4,7 +4,7 @@
  *
  *   Embedded resource forks accessor (body).
  *
- * Copyright (C) 2004-2022 by
+ * Copyright (C) 2004-2020 by
  * Masatake YAMATO and Redhat K.K.
  *
  * FT_Raccess_Get_HeaderInfo() and raccess_guess_darwin_hfsplus() are
@@ -167,11 +167,16 @@
   }
 
 
-  FT_COMPARE_DEF( int )
-  ft_raccess_sort_ref_by_id( const void*  a,
-                             const void*  b )
+  static int
+  ft_raccess_sort_ref_by_id( FT_RFork_Ref*  a,
+                             FT_RFork_Ref*  b )
   {
-    return  ( (FT_RFork_Ref*)a )->res_id - ( (FT_RFork_Ref*)b )->res_id;
+    if ( a->res_id < b->res_id )
+      return -1;
+    else if ( a->res_id > b->res_id )
+      return 1;
+    else
+      return 0;
   }
 
 
@@ -251,7 +256,7 @@
         if ( error )
           return error;
 
-        if ( FT_QNEW_ARRAY( ref, *count ) )
+        if ( FT_NEW_ARRAY( ref, *count ) )
           return error;
 
         for ( j = 0; j < *count; j++ )
@@ -289,7 +294,8 @@
           ft_qsort( ref,
                     (size_t)*count,
                     sizeof ( FT_RFork_Ref ),
-                    ft_raccess_sort_ref_by_id );
+                    ( int(*)(const void*,
+                             const void*) )ft_raccess_sort_ref_by_id );
 
           FT_TRACE3(( "             -- sort resources by their ids --\n" ));
 
@@ -299,7 +305,7 @@
                         j, ref[j].res_id, ref[j].offset ));
         }
 
-        if ( FT_QNEW_ARRAY( offsets_internal, *count ) )
+        if ( FT_NEW_ARRAY( offsets_internal, *count ) )
           goto Exit;
 
         /* XXX: duplicated reference ID,
@@ -402,17 +408,17 @@
                                 FT_Long    *result_offset );
 
 
-  CONST_FT_RFORK_RULE_ARRAY_BEGIN( ft_raccess_guess_table,
-                                                      ft_raccess_guess_rec )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( apple_double,      apple_double )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( apple_single,      apple_single )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( darwin_ufs_export, darwin_ufs_export )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( darwin_newvfs,     darwin_newvfs )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( darwin_hfsplus,    darwin_hfsplus )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( vfat,              vfat )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( linux_cap,         linux_cap )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( linux_double,      linux_double )
-  CONST_FT_RFORK_RULE_ARRAY_ENTRY( linux_netatalk,    linux_netatalk )
+  CONST_FT_RFORK_RULE_ARRAY_BEGIN(ft_raccess_guess_table,
+                                  ft_raccess_guess_rec)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(apple_double,      apple_double)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(apple_single,      apple_single)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(darwin_ufs_export, darwin_ufs_export)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(darwin_newvfs,     darwin_newvfs)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(darwin_hfsplus,    darwin_hfsplus)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(vfat,              vfat)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(linux_cap,         linux_cap)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(linux_double,      linux_double)
+  CONST_FT_RFORK_RULE_ARRAY_ENTRY(linux_netatalk,    linux_netatalk)
   CONST_FT_RFORK_RULE_ARRAY_END
 
 
@@ -602,7 +608,7 @@
     if ( base_file_len + 6 > FT_INT_MAX )
       return FT_THROW( Array_Too_Large );
 
-    if ( FT_QALLOC( newpath, base_file_len + 6 ) )
+    if ( FT_ALLOC( newpath, base_file_len + 6 ) )
       return error;
 
     FT_MEM_COPY( newpath, base_file_name, base_file_len );
@@ -638,7 +644,7 @@
     if ( base_file_len + 18 > FT_INT_MAX )
       return FT_THROW( Array_Too_Large );
 
-    if ( FT_QALLOC( newpath, base_file_len + 18 ) )
+    if ( FT_ALLOC( newpath, base_file_len + 18 ) )
       return error;
 
     FT_MEM_COPY( newpath, base_file_name, base_file_len );
@@ -868,11 +874,13 @@
     const char*  tmp;
     const char*  slash;
     size_t       new_length;
-    FT_Error     error;
+    FT_Error     error = FT_Err_Ok;
+
+    FT_UNUSED( error );
 
 
     new_length = ft_strlen( original_name ) + ft_strlen( insertion );
-    if ( FT_QALLOC( new_name, new_length + 1 ) )
+    if ( FT_ALLOC( new_name, new_length + 1 ) )
       return NULL;
 
     tmp = ft_strrchr( original_name, '/' );

@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CColPointSA.h"
 
 CColPointSA::CColPointSA()
 {

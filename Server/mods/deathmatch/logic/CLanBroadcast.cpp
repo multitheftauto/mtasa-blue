@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLanBroadcast.h"
-#include "version.h"
 
 CLanBroadcast::CLanBroadcast(unsigned short usServerPort)
 {

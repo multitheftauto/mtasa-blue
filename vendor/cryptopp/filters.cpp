@@ -87,7 +87,7 @@ bool Filter::Flush(bool hardFlush, int propagation, bool blocking)
 		if (OutputFlush(1, hardFlush, propagation, blocking))
 			return true;
 		// fall through
-	default: ;
+	default: ;;
 	}
 	return false;
 }
@@ -104,7 +104,7 @@ bool Filter::MessageSeriesEnd(int propagation, bool blocking)
 		if (ShouldPropagateMessageSeriesEnd() && OutputMessageSeriesEnd(1, propagation, blocking))
 			return true;
 		// fall through
-	default: ;
+	default: ;;
 	}
 	return false;
 }
@@ -595,9 +595,7 @@ StreamTransformationFilter::StreamTransformationFilter(StreamTransformation &c, 
 	m_isSpecial = m_cipher.IsLastBlockSpecial() && m_mandatoryBlockSize > 1;
 	m_reservedBufferSize = STDMAX(2*m_mandatoryBlockSize, m_optimalBufferSize);
 
-	FilterWithBufferedInput::IsolatedInitialize(
-		MakeParameters
-			(Name::BlockPaddingScheme(), padding));
+	IsolatedInitialize(MakeParameters(Name::BlockPaddingScheme(), padding));
 }
 
 StreamTransformationFilter::StreamTransformationFilter(StreamTransformation &c, BufferedTransformation *attachment, BlockPaddingScheme padding, bool authenticated)
@@ -618,9 +616,7 @@ StreamTransformationFilter::StreamTransformationFilter(StreamTransformation &c, 
 	m_isSpecial = m_cipher.IsLastBlockSpecial() && m_mandatoryBlockSize > 1;
 	m_reservedBufferSize = STDMAX(2*m_mandatoryBlockSize, m_optimalBufferSize);
 
-	FilterWithBufferedInput::IsolatedInitialize(
-		MakeParameters
-			(Name::BlockPaddingScheme(), padding));
+	IsolatedInitialize(MakeParameters(Name::BlockPaddingScheme(), padding));
 }
 
 size_t StreamTransformationFilter::LastBlockSize(StreamTransformation &c, BlockPaddingScheme padding)
@@ -701,7 +697,7 @@ void StreamTransformationFilter::LastPut(const byte *inString, size_t length)
 	// This block is new to StreamTransformationFilter. It is somewhat of a hack and was
 	//  added for OCB mode; see GitHub Issue 515. The rub with OCB is, its a block cipher
 	//  and the last block size can be 0. However, "last block = 0" is not the 0 predicated
-	//  in the original code. In the original code 0 means "nothing special" so
+	//  in the original code. In the orginal code 0 means "nothing special" so
 	//  DEFAULT_PADDING is applied. OCB's 0 literally means a final block size can be 0 or
 	//  non-0; and no padding is needed in either case because OCB has its own scheme (see
 	//  handling of P_* and A_*).
@@ -893,10 +889,7 @@ HashVerificationFilter::HashVerificationFilter(HashTransformation &hm, BufferedT
 	: FilterWithBufferedInput(attachment)
 	, m_hashModule(hm), m_flags(0), m_digestSize(0), m_verified(false)
 {
-	FilterWithBufferedInput::IsolatedInitialize(
-		MakeParameters
-			(Name::HashVerificationFilterFlags(), flags)
-			(Name::TruncatedDigestSize(), truncatedDigestSize));
+	IsolatedInitialize(MakeParameters(Name::HashVerificationFilterFlags(), flags)(Name::TruncatedDigestSize(), truncatedDigestSize));
 }
 
 void HashVerificationFilter::InitializeDerivedAndReturnNewSizes(const NameValuePairs &parameters, size_t &firstSize, size_t &blockSize, size_t &lastSize)
@@ -1001,11 +994,7 @@ AuthenticatedDecryptionFilter::AuthenticatedDecryptionFilter(AuthenticatedSymmet
 	, m_streamFilter(c, new OutputProxy(*this, false), padding, true)
 {
 	CRYPTOPP_ASSERT(!c.IsForwardTransformation() || c.IsSelfInverting());
-	FilterWithBufferedInput::IsolatedInitialize(
-		MakeParameters
-			(Name::BlockPaddingScheme(), padding)
-			(Name::AuthenticatedDecryptionFilterFlags(), flags)
-			(Name::TruncatedDigestSize(), truncatedDigestSize));
+	IsolatedInitialize(MakeParameters(Name::BlockPaddingScheme(), padding)(Name::AuthenticatedDecryptionFilterFlags(), flags)(Name::TruncatedDigestSize(), truncatedDigestSize));
 }
 
 void AuthenticatedDecryptionFilter::InitializeDerivedAndReturnNewSizes(const NameValuePairs &parameters, size_t &firstSize, size_t &blockSize, size_t &lastSize)
@@ -1090,9 +1079,7 @@ SignatureVerificationFilter::SignatureVerificationFilter(const PK_Verifier &veri
 	: FilterWithBufferedInput(attachment)
 	, m_verifier(verifier), m_flags(0), m_verified(0)
 {
-	FilterWithBufferedInput::IsolatedInitialize(
-		MakeParameters
-			(Name::SignatureVerificationFilterFlags(), flags));
+	IsolatedInitialize(MakeParameters(Name::SignatureVerificationFilterFlags(), flags));
 }
 
 void SignatureVerificationFilter::InitializeDerivedAndReturnNewSizes(const NameValuePairs &parameters, size_t &firstSize, size_t &blockSize, size_t &lastSize)

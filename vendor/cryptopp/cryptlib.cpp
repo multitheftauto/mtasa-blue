@@ -16,6 +16,7 @@
 #ifndef CRYPTOPP_IMPORTS
 
 #include "cryptlib.h"
+#include "misc.h"
 #include "filters.h"
 #include "algparam.h"
 #include "fips140.h"
@@ -25,7 +26,6 @@
 #include "secblock.h"
 #include "smartptr.h"
 #include "stdcpp.h"
-#include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
 
@@ -333,20 +333,20 @@ void RandomNumberGenerator::GenerateIntoBufferedTransformation(BufferedTransform
 	}
 }
 
-size_t KeyDerivationFunction::MinDerivedKeyLength() const
+size_t KeyDerivationFunction::MinDerivedLength() const
 {
 	return 0;
 }
 
-size_t KeyDerivationFunction::MaxDerivedKeyLength() const
+size_t KeyDerivationFunction::MaxDerivedLength() const
 {
 	return static_cast<size_t>(-1);
 }
 
-void KeyDerivationFunction::ThrowIfInvalidDerivedKeyLength(size_t length) const
+void KeyDerivationFunction::ThrowIfInvalidDerivedLength(size_t length) const
 {
 	if (!IsValidDerivedLength(length))
-		throw InvalidDerivedKeyLength(GetAlgorithm().AlgorithmName(), length);
+		throw InvalidDerivedLength(GetAlgorithm().AlgorithmName(), length);
 }
 
 void KeyDerivationFunction::SetParameters(const NameValuePairs& params) {
@@ -405,9 +405,8 @@ RandomNumberGenerator & NullRNG()
 
 bool HashTransformation::TruncatedVerify(const byte *digest, size_t digestLength)
 {
-	// Allocate at least 1 for calculated to avoid triggering diagnostics
 	ThrowIfInvalidTruncatedSize(digestLength);
-	SecByteBlock calculated(digestLength ? digestLength : 1);
+	SecByteBlock calculated(digestLength);
 	TruncatedFinal(calculated, digestLength);
 	return VerifyBufsEqual(calculated, digest, digestLength);
 }
@@ -647,12 +646,7 @@ size_t BufferedTransformation::TransferMessagesTo2(BufferedTransformation &targe
 
 			while (AnyRetrievable())
 			{
-				// MaxRetrievable() instead of LWORD_MAX due to GH #962. If
-				// the target calls CreatePutSpace(), then the allocation
-				// size will be LWORD_MAX. That happens when target is a
-				// ByteQueue. Maybe ByteQueue should check the size, and if
-				// it is LWORD_MAX or -1, then use a default like 4096.
-				transferredBytes = MaxRetrievable();
+				transferredBytes = LWORD_MAX;
 				blockedBytes = TransferTo2(target, transferredBytes, channel, blocking);
 				if (blockedBytes > 0)
 					return blockedBytes;
@@ -748,12 +742,6 @@ size_t BufferedTransformation::ChannelPutWord32(const std::string &channel, word
 	return ChannelPut(channel, m_buf, 4, blocking);
 }
 
-size_t BufferedTransformation::ChannelPutWord64(const std::string &channel, word64 value, ByteOrder order, bool blocking)
-{
-	PutWord(false, order, m_buf, value);
-	return ChannelPut(channel, m_buf, 8, blocking);
-}
-
 size_t BufferedTransformation::PutWord16(word16 value, ByteOrder order, bool blocking)
 {
 	return ChannelPutWord16(DEFAULT_CHANNEL, value, order, blocking);
@@ -764,20 +752,22 @@ size_t BufferedTransformation::PutWord32(word32 value, ByteOrder order, bool blo
 	return ChannelPutWord32(DEFAULT_CHANNEL, value, order, blocking);
 }
 
-size_t BufferedTransformation::PutWord64(word64 value, ByteOrder order, bool blocking)
-{
-	return ChannelPutWord64(DEFAULT_CHANNEL, value, order, blocking);
-}
+// Issue 340
+#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wconversion"
+# pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
 
 size_t BufferedTransformation::PeekWord16(word16 &value, ByteOrder order) const
 {
 	byte buf[2] = {0, 0};
 	size_t len = Peek(buf, 2);
 
-	if (order == BIG_ENDIAN_ORDER)
-		value = word16((buf[0] << 8) | buf[1]);
+	if (order)
+		value = (buf[0] << 8) | buf[1];
 	else
-		value = word16((buf[1] << 8) | buf[0]);
+		value = (buf[1] << 8) | buf[0];
 
 	return len;
 }
@@ -787,32 +777,18 @@ size_t BufferedTransformation::PeekWord32(word32 &value, ByteOrder order) const
 	byte buf[4] = {0, 0, 0, 0};
 	size_t len = Peek(buf, 4);
 
-	if (order == BIG_ENDIAN_ORDER)
-		value = word32((buf[0] << 24) | (buf[1] << 16) |
-		               (buf[2] << 8)  | (buf[3] << 0));
+	if (order)
+		value = (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf [3];
 	else
-		value = word32((buf[3] << 24) | (buf[2] << 16) |
-		               (buf[1] << 8)  | (buf[0] << 0));
+		value = (buf[3] << 24) | (buf[2] << 16) | (buf[1] << 8) | buf [0];
 
 	return len;
 }
 
-size_t BufferedTransformation::PeekWord64(word64 &value, ByteOrder order) const
-{
-	byte buf[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-	size_t len = Peek(buf, 8);
-
-	if (order == BIG_ENDIAN_ORDER)
-		value = ((word64)buf[0] << 56) | ((word64)buf[1] << 48) | ((word64)buf[2] << 40) |
-		        ((word64)buf[3] << 32) | ((word64)buf[4] << 24) | ((word64)buf[5] << 16) |
-		        ((word64)buf[6] << 8)  |  (word64)buf[7];
-	else
-		value = ((word64)buf[7] << 56) | ((word64)buf[6] << 48) | ((word64)buf[5] << 40) |
-		        ((word64)buf[4] << 32) | ((word64)buf[3] << 24) | ((word64)buf[2] << 16) |
-		        ((word64)buf[1] << 8)  |  (word64)buf[0];
-
-	return len;
-}
+// Issue 340
+#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
+# pragma GCC diagnostic pop
+#endif
 
 size_t BufferedTransformation::GetWord16(word16 &value, ByteOrder order)
 {
@@ -822,11 +798,6 @@ size_t BufferedTransformation::GetWord16(word16 &value, ByteOrder order)
 size_t BufferedTransformation::GetWord32(word32 &value, ByteOrder order)
 {
 	return (size_t)Skip(PeekWord32(value, order));
-}
-
-size_t BufferedTransformation::GetWord64(word64 &value, ByteOrder order)
-{
-	return (size_t)Skip(PeekWord64(value, order));
 }
 
 void BufferedTransformation::Attach(BufferedTransformation *newAttachment)
@@ -1018,7 +989,7 @@ int LibraryVersion(CRYPTOPP_NOINLINE_DOTDOTDOT)
 class NullNameValuePairs : public NameValuePairs
 {
 public:
-	NullNameValuePairs() {}    //  Clang complains a default ctor must be available
+	NullNameValuePairs() {}    //  Clang complains a default ctor must be avilable
 	bool GetVoidValue(const char *name, const std::type_info &valueType, void *pValue) const
 		{CRYPTOPP_UNUSED(name); CRYPTOPP_UNUSED(valueType); CRYPTOPP_UNUSED(pValue); return false;}
 };

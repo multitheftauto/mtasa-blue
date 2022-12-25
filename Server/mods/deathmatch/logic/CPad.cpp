@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPad.h"
 
 static const SGTAControl g_gtaControls[] = {{"fire", FIRE, CONTROL_FOOT},
                                             {"next_weapon", NEXT_WEAPON, CONTROL_FOOT},

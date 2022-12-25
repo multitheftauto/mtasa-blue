@@ -34,6 +34,7 @@ project "unrar"
 		"find.cpp",
 		"getbits.cpp",
 		"global.cpp",
+		"isnt.cpp",
 		"list.cpp",
 		"match.cpp",
 		"options.cpp",
@@ -66,6 +67,3 @@ project "unrar"
 		"threadpool.cpp",
 		"ui.cpp"
 	}
-
-	filter "system:Windows*"
-		files { "isnt.cpp" }

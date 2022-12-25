@@ -193,7 +193,6 @@ public:
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
-
     class CStoredWeaponSlot
     {
     public:
@@ -230,7 +229,7 @@ public:
     CClientGame(bool bLocalPlay = false);
     ~CClientGame();
 
-    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL);
+    bool StartGame(const char* szNick, const char* szPassword, eServerType Type = SERVER_TYPE_NORMAL, const char* szSecret = nullptr);
     bool StartLocalGame(eServerType Type, const char* szPassword = NULL);
     void SetupLocalGame(eServerType Type);
     // bool                                    StartGame                       ( void );
@@ -255,8 +254,6 @@ public:
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
-
-    bool IsWindowFocused() const { return m_bFocused; }
 
     // Accessors
 
@@ -441,7 +438,7 @@ public:
     void RestreamModel(unsigned short usModel);
     void RestreamWorld();
 
-    void OnWindowFocusChange(bool state);
+    void TriggerDiscordJoin(SString strSecret);
 
 private:
     // CGUI Callbacks
@@ -540,7 +537,6 @@ private:
     static void StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
 
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
-    static void        StaticAudioZoneRadioSwitchHandler(DWORD dwStationID);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
@@ -580,7 +576,6 @@ private:
     bool        WorldSoundHandler(const SWorldSoundEvent& event);
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
-    void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
 
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -777,7 +772,6 @@ private:
     bool m_bBeingDeleted;            // To enable speedy disconnect
 
     bool m_bWasMinimized;
-    bool m_bFocused;
 
     // Cache for speeding up collision processing
 public:
@@ -811,6 +805,7 @@ private:
     // Debug class. Empty in release.
 public:
     CFoo m_Foo;
+    void UpdateDiscordState(); // If netc allows this function not to be here it would be better
 
 private:
     CEvents                                     m_Events;

@@ -11,17 +11,15 @@
 
 #pragma once
 
-class CClientEntity;
-class CEntity;
-class CEntitySAInterface;
-class CObject;
-class CObjectSA;
-class CPed;
-class CPedSA;
-class CVector;
-class CVehicle;
-class CVehicleSA;
-struct RpClump;
+#include "Common.h"
+
+#include "CAutomobile.h"
+#include "CBoat.h"
+#include "CBike.h"
+#include "CBuilding.h"
+#include "CObject.h"
+#include "CPed.h"
+#include "CVehicle.h"
 
 enum ePools
 {
@@ -48,6 +46,12 @@ enum ePools
     MAX_POOLS
 };
 
+class CClientEntity;
+class CPedSA;
+class CVehicleSA;
+class CObjectSA;
+class CEntitySAInterface;
+
 template <class T>
 struct SClientEntity
 {
@@ -55,14 +59,36 @@ struct SClientEntity
     CClientEntity* pClientEntity;
 };
 
+class CEntryInfoNodePool
+{
+public:
+    virtual int GetNumberOfUsedSpaces() = 0;
+};
+
+class CPointerNodeSingleLinkPool
+{
+public:
+    virtual int GetNumberOfUsedSpaces() = 0;
+};
+
+class CPointerNodeDoubleLinkPool
+{
+public:
+    virtual int GetNumberOfUsedSpaces() = 0;
+};
+
 class CPools
 {
 public:
     // Vehicles pool
     virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2) = 0;
+    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, DWORD* pGameInterface) = 0;
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
+    virtual DWORD                      GetVehicleRef(CVehicle* pVehicle) = 0;
+    virtual DWORD                      GetVehicleRef(DWORD* pGameInterface) = 0;
+    virtual CVehicle*                  GetVehicleFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long              GetVehicleCount() = 0;
 
     // Objects pool
@@ -70,19 +96,27 @@ public:
     virtual void     RemoveObject(CObject* pObject, bool bDelete = true) = 0;
 
     virtual SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface) = 0;
+    virtual DWORD                     GetObjectRef(CObject* pObject) = 0;
+    virtual DWORD                     GetObjectRef(DWORD* pGameInterface) = 0;
+    virtual CObject*                  GetObjectFromRef(DWORD dwGameRef) = 0;
     virtual CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool) = 0;
     virtual unsigned long             GetObjectCount() = 0;
 
     // Peds pool
     virtual CPed* AddPed(class CClientPed* pClientPed, ePedModel ePedType) = 0;
     virtual CPed* AddPed(class CClientPed* pClientPed, DWORD* pGameInterface) = 0;
+    virtual CPed* AddCivilianPed(DWORD* pGameInterface) = 0;
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
+
+    virtual DWORD         GetPedRef(CPed* pPed) = 0;
+    virtual DWORD         GetPedRef(DWORD* pGameInterface) = 0;
     virtual CPed*         GetPedFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long GetPedCount() = 0;
 
     // Others
+    virtual CBuilding* AddBuilding(DWORD dwModelID) = 0;
     virtual CVehicle*  AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
                                 uchar ucTrackId = 0xFF) = 0;
 
@@ -94,6 +128,10 @@ public:
     virtual int  GetPoolDefaultCapacity(ePools pool) = 0;
     virtual int  GetPoolCapacity(ePools pool) = 0;
     virtual void SetPoolCapacity(ePools pool, int iValue) = 0;
+
+    virtual CEntryInfoNodePool*         GetEntryInfoNodePool() = 0;
+    virtual CPointerNodeSingleLinkPool* GetPointerNodeSingleLinkPool() = 0;
+    virtual CPointerNodeDoubleLinkPool* GetPointerNodeDoubleLinkPool() = 0;
 
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;

@@ -11,25 +11,20 @@
 
 #pragma once
 
-#include <game/Common.h>
 #include <game/CCoronas.h>
-
-class CRegisteredCorona;
-class CRegisteredCoronaSA;
-struct RwTexture;
+#include "CRegisteredCoronaSA.h"
 
 #define FUNC_DoSunAndMoon           0x6FC5A0
 
-#define MAX_CORONAS                 64
+#define MAX_CORONAS                 64 // ##SA##
 #define MAX_CORONA_TEXTURES         9
-#define ARRAY_CORONAS               0xC3E058 // also in CRegisteredCoronasSA.h
-#define ARRAY_CORONA_TEXTURES       0xC3E000
+#define ARRAY_CORONAS               0xC3E058 // also in CRegisteredCoronasSA.h ##SA##
+#define ARRAY_CORONA_TEXTURES       0xC3E000 // ##SA##
 
 class CCoronasSA : public CCoronas
 {
 private:
     CRegisteredCoronaSA* Coronas[MAX_CORONAS];
-    unsigned char m_ucCoronaReflectionsEnabled;
 
 public:
     CCoronasSA();
@@ -42,7 +37,4 @@ public:
     RwTexture*         GetTexture(eCoronaType type);
 
     void DisableSunAndMoon(bool bDisabled);
-
-    void SetCoronaReflectionsEnabled(unsigned char ucEnabled);
-    unsigned char GetCoronaReflectionsEnabled();
 };

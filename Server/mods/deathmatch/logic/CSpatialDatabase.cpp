@@ -9,8 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CSpatialDatabase.h"
-#include "CElement.h"
 #include "RTree.h"
 
 // Define our tree type

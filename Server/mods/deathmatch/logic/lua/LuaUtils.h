@@ -10,7 +10,4 @@
  *****************************************************************************/
 
 #pragma once
-
-struct lua_State;
-
 SString GetDebugMessage(lua_State* luaVM);

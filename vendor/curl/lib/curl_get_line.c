@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,14 +18,12 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * SPDX-License-Identifier: curl
- *
  ***************************************************************************/
 
 #include "curl_setup.h"
 
 #if !defined(CURL_DISABLE_COOKIES) || !defined(CURL_DISABLE_ALTSVC) ||  \
-  !defined(CURL_DISABLE_HSTS) || !defined(CURL_DISABLE_NETRC)
+  defined(USE_HSTS)
 
 #include "curl_get_line.h"
 #include "curl_memory.h"
@@ -33,8 +31,8 @@
 #include "memdebug.h"
 
 /*
- * Curl_get_line() makes sure to only return complete whole lines that fit in
- * 'len' bytes and end with a newline.
+ * get_line() makes sure to only return complete whole lines that fit in 'len'
+ * bytes and end with a newline.
  */
 char *Curl_get_line(char *buf, int len, FILE *input)
 {

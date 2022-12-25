@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2016 - 2022, Steve Holme, <steve_holme@hotmail.com>.
+ * Copyright (C) 2016 - 2020, Steve Holme, <steve_holme@hotmail.com>.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -60,7 +58,7 @@ CURLcode Curl_win32_init(long flags)
     wVersionRequested = MAKEWORD(2, 2);
     res = WSAStartup(wVersionRequested, &wsaData);
 
-    if(res)
+    if(res != 0)
       /* Tell the user that we couldn't find a usable */
       /* winsock.dll.     */
       return CURLE_FAILED_INIT;
@@ -104,9 +102,7 @@ CURLcode Curl_win32_init(long flags)
       Curl_if_nametoindex = pIfNameToIndex;
   }
 
-  /* curlx_verify_windows_version must be called during init at least once
-     because it has its own initialization routine. */
-  if(curlx_verify_windows_version(6, 0, 0, PLATFORM_WINNT,
+  if(curlx_verify_windows_version(6, 0, PLATFORM_WINNT,
                                   VERSION_GREATER_THAN_EQUAL)) {
     Curl_isVistaOrGreater = TRUE;
   }
@@ -200,7 +196,7 @@ HMODULE Curl_load_library(LPCTSTR filename)
       pLoadLibraryEx(filename, NULL, LOAD_WITH_ALTERED_SEARCH_PATH) :
       LoadLibrary(filename);
   }
-  /* Detect if KB2533623 is installed, as LOAD_LIBRARY_SEARCH_SYSTEM32 is only
+  /* Detect if KB2533623 is installed, as LOAD_LIBARY_SEARCH_SYSTEM32 is only
      supported on Windows Vista, Windows Server 2008, Windows 7 and Windows
      Server 2008 R2 with this patch or natively on Windows 8 and above */
   else if(pLoadLibraryEx && GetProcAddress(hKernel32, "AddDllDirectory")) {

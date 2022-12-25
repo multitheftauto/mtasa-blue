@@ -20,7 +20,7 @@ project "tinygettext"
 		"*.cpp"
 	}
 
-	filter "architecture:not x86"
+	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:windows"

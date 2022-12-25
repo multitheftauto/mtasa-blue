@@ -6,8 +6,7 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
-#include "StdInc.h"
+#include <StdInc.h>
 #include "LuaBasic.h"
 
 namespace lua
@@ -21,10 +20,11 @@ namespace lua
         return outValue;
     }
 
+
     template <>
     std::string_view PopPrimitive<std::string_view>(lua_State* L, std::size_t& index)
     {
-        uint             uiLength = lua_strlen(L, index);
+        uint        uiLength = lua_strlen(L, index);
         std::string_view outValue(lua_tostring(L, index++), uiLength);
         return outValue;
     }
@@ -100,4 +100,4 @@ namespace lua
     {
         return lua_touserdata(L, index++);
     }
-}            // namespace lua
+}            // namespace mta::impl

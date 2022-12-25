@@ -30,18 +30,16 @@ public:
 	/// \param attachment a BufferedTransformation to attach to this object
 	/// \param padding the character to use as padding
 	/// \pre log2base must be between 1 and 7 inclusive
-	/// \throw InvalidArgument if log2base is not between 1 and 7
+	/// \throws InvalidArgument if log2base is not between 1 and 7
 	BaseN_Encoder(const byte *alphabet, int log2base, BufferedTransformation *attachment=NULLPTR, int padding=-1)
 		: m_alphabet(NULLPTR), m_padding(0), m_bitsPerChar(0)
 		, m_outputBlockSize(0), m_bytePos(0), m_bitPos(0)
 	{
 		Detach(attachment);
-		BaseN_Encoder::IsolatedInitialize(
-			MakeParameters
-				(Name::EncodingLookupArray(), alphabet)
-				(Name::Log2Base(), log2base)
-				(Name::Pad(), padding != -1)
-				(Name::PaddingByte(), byte(padding)));
+		IsolatedInitialize(MakeParameters(Name::EncodingLookupArray(), alphabet)
+			(Name::Log2Base(), log2base)
+			(Name::Pad(), padding != -1)
+			(Name::PaddingByte(), byte(padding)));
 	}
 
 	void IsolatedInitialize(const NameValuePairs &parameters);
@@ -80,10 +78,7 @@ public:
 		, m_outputBlockSize(0), m_bytePos(0), m_bitPos(0)
 	{
 		Detach(attachment);
-		BaseN_Decoder::IsolatedInitialize(
-			MakeParameters
-				(Name::DecodingLookupArray(), lookup)
-				(Name::Log2Base(), log2base));
+		IsolatedInitialize(MakeParameters(Name::DecodingLookupArray(), lookup)(Name::Log2Base(), log2base));
 	}
 
 	void IsolatedInitialize(const NameValuePairs &parameters);
@@ -126,11 +121,9 @@ public:
 		: m_groupSize(0), m_counter(0)
 	{
 		Detach(attachment);
-		Grouper::IsolatedInitialize(
-			MakeParameters
-				(Name::GroupSize(), groupSize)
-				(Name::Separator(), ConstByteArrayParameter(separator))
-				(Name::Terminator(), ConstByteArrayParameter(terminator)));
+		IsolatedInitialize(MakeParameters(Name::GroupSize(), groupSize)
+			(Name::Separator(), ConstByteArrayParameter(separator))
+			(Name::Terminator(), ConstByteArrayParameter(terminator)));
 	}
 
 	void IsolatedInitialize(const NameValuePairs &parameters);

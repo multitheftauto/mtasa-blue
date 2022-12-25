@@ -114,11 +114,11 @@ public:
 	void SetDeflateLevel(int deflateLevel);
 
 	/// \brief Retrieves the deflation level
-	/// \return the level of deflation
+	/// \returns the level of deflation
 	int GetDeflateLevel() const {return m_deflateLevel;}
 
 	/// \brief Retrieves the window size
-	/// \return the windows size
+	/// \returns the windows size
 	int GetLog2WindowSize() const {return m_log2WindowSize;}
 
 	void IsolatedInitialize(const NameValuePairs &parameters);

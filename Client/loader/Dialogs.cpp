@@ -9,114 +9,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <sstream>
 
 static bool          bCancelPressed = false;
 static bool          bOkPressed = false;
 static bool          bOtherPressed = false;
 static int           iOtherCode = 0;
-static WNDCLASS      splashWindowClass{};
-static HWND          splashWindow{};
+static HWND          hwndSplash = NULL;
 static HWND          hwndProgressDialog = NULL;
 static unsigned long ulProgressStartTime = 0;
 static HWND          hwndCrashedDialog = NULL;
-static HWND          hwndGraphicsDllDialog = NULL;
+static HWND          hwndD3dDllDialog = NULL;
 static HWND          hwndOptimusDialog = NULL;
 static HWND          hwndNoAvDialog = NULL;
-
-/**
- * @brief Automatically destroys a window on scope-exit.
- */
-struct WindowScope
-{
-    WindowScope(HWND handle_) noexcept : handle(handle_) {}
-
-    ~WindowScope() noexcept { DestroyWindow(handle); }
-
-    [[nodiscard]] HWND Release() noexcept { return std::exchange(handle, nullptr); }
-
-    HWND handle{};
-};
-
-/**
- * @brief Provides a compatible memory-only device context for a bitmap handle and
- *        automatically destroys the device context and bitmap on scope-exit.
- */
-struct BitmapScope
-{
-    BitmapScope(HDC deviceContext_, HBITMAP bitmap_) noexcept : bitmap(bitmap_)
-    {
-        if (bitmap != nullptr)
-        {
-            if (deviceContext = CreateCompatibleDC(deviceContext_))
-            {
-                previousObject = SelectObject(deviceContext, bitmap_);
-            }
-        }
-    }
-
-    ~BitmapScope() noexcept
-    {
-        if (previousObject && previousObject != HGDI_ERROR)
-            SelectObject(deviceContext, previousObject);
-
-        if (deviceContext)
-            DeleteDC(deviceContext);
-
-        if (bitmap)
-            DeleteObject(bitmap);
-    }
-
-    HDC     deviceContext{};
-    HGDIOBJ previousObject{};
-    HBITMAP bitmap{};
-};
-
-/**
- * @brief Returns the dots per inch (dpi) value for the specified window.
- */
-UINT GetWindowDpi(HWND window)
-{
-    // Minimum version: Windows 10, version 1607
-    using GetDpiForWindow_t = UINT(WINAPI*)(HWND);
-
-    static GetDpiForWindow_t Win32GetDpiForWindow = ([] {
-        HMODULE user32 = LoadLibrary("user32");
-        return user32 ? reinterpret_cast<GetDpiForWindow_t>(static_cast<void*>(GetProcAddress(user32, "GetDpiForWindow"))) : nullptr;
-    })();
-
-    if (Win32GetDpiForWindow)
-        return Win32GetDpiForWindow(window);
-
-    HDC  screenDC = GetDC(NULL);
-    auto x = static_cast<UINT>(GetDeviceCaps(screenDC, LOGPIXELSX));
-    ReleaseDC(NULL, screenDC);
-    return x;
-}
-
-/**
- * @brief Returns the width and height of the primary monitor.
- */
-SIZE GetPrimaryMonitorSize()
-{
-    POINT    zero{};
-    HMONITOR primaryMonitor = MonitorFromPoint(zero, MONITOR_DEFAULTTOPRIMARY);
-
-    MONITORINFO monitorInfo{};
-    monitorInfo.cbSize = sizeof(monitorInfo);
-    GetMonitorInfo(primaryMonitor, &monitorInfo);
-
-    const RECT& work = monitorInfo.rcWork;
-    return {work.right - work.left, work.bottom - work.top};
-}
-
-/**
- * @brief Scales the value from the default screen dpi (96) to the provided dpi.
- */
-LONG ScaleToDpi(LONG value, UINT dpi)
-{
-    return static_cast<LONG>(ceil(value * static_cast<float>(dpi) / USER_DEFAULT_SCREEN_DPI));
-}
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -154,16 +58,16 @@ const SDialogItemInfo g_CrashedDialogItems[] = {
     {-1},
 };
 
-const SDialogItemInfo g_GraphicsDllDialogItems[] = {
+const SDialogItemInfo g_D3dDllDialogItems[] = {
     {0, 0, _td("MTA: San Andreas - Warning")},
-    {IDC_D3DDLL_TEXT1, 0, _td("Your Grand Theft Auto: San Andreas install directory contains these files:")},
+    {IDC_D3DDLL_TEXT1, 0, _td("Your Grand Theft Auto: San Andreas install directory contains a d3d9.dll file:")},
     {IDC_D3DDLL_TEXT2, 0,
-     _td("These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-         "It is recommended that you remove or rename these files.")},
-    {IDC_NO_ACTION, 1, _td("Keep these files, but also show this warning on next start")},
-    {IDC_CHECK_NOT_AGAIN, 1, _td("Do not remind me about these files again")},
-    {IDC_APPLY_AUTOMATIC_CHANGES, 1, _td("Rename these files from *.dll to *.dll.bak")},
-    {IDC_BUTTON_SHOW_DIR, 0, _td("Show me these files")},
+     _td("The file is not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+         "It is recommended that you remove or rename d3d9.dll")},
+    {IDC_NO_ACTION, 1, _td("Use this d3d9.dll, but also show this warning on next start")},
+    {IDC_CHECK_NOT_AGAIN, 1, _td("Do not tell me about this d3d9.dll again")},
+    {IDC_APPLY_AUTOMATIC_CHANGES, 1, _td("Rename this d3d9.dll to d3d9.dll.bak")},
+    {IDC_BUTTON_SHOW_DIR, 0, _td("Show me the file")},
     {IDOK, 0, _td("Play MTA:SA")},
     {IDCANCEL, 0, dialogStringsQuit},
     {-1},
@@ -283,67 +187,23 @@ int CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void ShowSplash(HINSTANCE hInstance)
 {
 #ifndef MTA_DEBUG
-    if (splashWindowClass.hInstance != hInstance)
+    if (!hwndSplash)
     {
-        splashWindowClass.lpfnWndProc = DefWindowProc;
-        splashWindowClass.hInstance = hInstance;
-        splashWindowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-        splashWindowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110)); // IDI_ICON1 from Launcher
-        splashWindowClass.lpszClassName = TEXT("SplashWindow");
-        RegisterClass(&splashWindowClass);
+        hwndSplash = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), 0, DialogProc);
+
+        HWND hBitmap = GetDlgItem(hwndSplash, IDC_SPLASHBITMAP);
+        RECT splashRect;
+        GetWindowRect(hBitmap, &splashRect);
+        int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+        int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+        int iWindowWidth = splashRect.right - splashRect.left;
+        int iWindowHeight = splashRect.bottom - splashRect.top;
+
+        // Adjust and center the window (to be DPI-aware)
+        SetWindowPos(hwndSplash, NULL, (iScreenWidth - iWindowWidth) / 2, (iScreenHeight - iWindowHeight) / 2, iWindowWidth, iWindowHeight, 0);
     }
-
-    if (splashWindow)
-    {
-        ShowWindow(splashWindow, SW_SHOW);
-    }
-    else
-    {
-        WindowScope window(CreateWindowEx(WS_EX_LAYERED, splashWindowClass.lpszClassName, "Multi Theft Auto Launcher", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0,
-                                          NULL, NULL, hInstance, NULL));
-
-        if (!window.handle)
-            return;
-
-        UINT dpi = GetWindowDpi(window.handle);
-        SIZE monitorSize = GetPrimaryMonitorSize();
-
-        POINT origin{};
-        SIZE  windowSize{ScaleToDpi(500, dpi), ScaleToDpi(245, dpi)};
-        origin.x = (monitorSize.cx - windowSize.cx) / 2;
-        origin.y = (monitorSize.cy - windowSize.cy) / 2;
-
-        HDC windowHDC = GetWindowDC(window.handle);
-        {
-            BitmapScope unscaled(windowHDC, LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_BITMAP1)));
-
-            if (!unscaled.bitmap)
-                return;
-
-            BitmapScope scaled(windowHDC, CreateCompatibleBitmap(windowHDC, windowSize.cx, windowSize.cy));
-
-            if (!scaled.bitmap)
-                return;
-
-            BITMAP bitmap{};
-            GetObject(unscaled.bitmap, sizeof(bitmap), &bitmap);
-
-            // Draw the unscaled bitmap to the window-scaled bitmap.
-            SetStretchBltMode(scaled.deviceContext, HALFTONE);
-            StretchBlt(scaled.deviceContext, 0, 0, windowSize.cx, windowSize.cy, unscaled.deviceContext, 0, 0, bitmap.bmWidth, bitmap.bmHeight, SRCCOPY);
-
-            // Update the splash window and draw the scaled bitmap.
-            POINT         zero{};
-            BLENDFUNCTION blend{AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
-            UpdateLayeredWindow(window.handle, windowHDC, &origin, &windowSize, scaled.deviceContext, &zero, RGB(0, 0, 0), &blend, 0);
-        }
-        ReleaseDC(window.handle, windowHDC);
-
-        splashWindow = window.Release();
-    }
-
-    SetForegroundWindow(splashWindow);
-    SetWindowPos(splashWindow, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+    SetForegroundWindow(hwndSplash);
+    SetWindowPos(hwndSplash, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
     // Drain messages to allow for repaint in case picture bits were lost during previous operations
     MSG msg;
@@ -363,10 +223,10 @@ void ShowSplash(HINSTANCE hInstance)
 //
 void HideSplash()
 {
-    if (splashWindow)
+    if (hwndSplash)
     {
-        DestroyWindow(splashWindow);
-        splashWindow = {};
+        DestroyWindow(hwndSplash);
+        hwndSplash = NULL;
     }
 }
 
@@ -375,9 +235,9 @@ void HideSplash()
 //
 void SuspendSplash()
 {
-    if (splashWindow)
+    if (hwndSplash)
     {
-        ShowWindow(splashWindow, SW_HIDE);
+        ShowWindow(hwndSplash, SW_HIDE);
     }
 }
 
@@ -386,7 +246,7 @@ void SuspendSplash()
 //
 void ResumeSplash()
 {
-    if (splashWindow)
+    if (hwndSplash)
     {
         HideSplash();
         ShowSplash(g_hInstance);
@@ -550,42 +410,47 @@ void HideCrashedDialog()
 
 ///////////////////////////////////////////////////////////////
 //
-// Dialog for graphics libraries: d3d9.dll, dxgi.dll etc.
+// d3d dll dialog
 //
 //
 //
 ///////////////////////////////////////////////////////////////
-void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrary>& offenders)
+void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath)
 {
-    if (offenders.empty())
-        return;
+    // Calc hash of target file
+    SString    strFileHash;
+    MD5        md5;
+    CMD5Hasher Hasher;
+    if (Hasher.Calculate(strPath, md5))
+    {
+        char szHashResult[33];
+        Hasher.ConvertToHex(md5, szHashResult);
+        strFileHash = szHashResult;
+    }
+
+    // Maybe skip dialog
+    if (GetApplicationSetting("diagnostics", "d3d9-dll-last-hash") == strFileHash)
+    {
+        if (GetApplicationSetting("diagnostics", "d3d9-dll-not-again") == "yes")
+            return;
+    }
 
     // Create and show dialog
-    if (!hwndGraphicsDllDialog)
+    if (!hwndD3dDllDialog)
     {
-        std::wstringstream libraryPaths;
-
-        for (std::size_t i = 0; i < offenders.size(); i++)
-        {
-            libraryPaths << FromUTF8(offenders[i].absoluteFilePath);
-
-            if ((i + 1) < offenders.size())
-                libraryPaths << "\r\n";
-        }
-
         SuspendSplash();
         bCancelPressed = false;
         bOkPressed = false;
         bOtherPressed = false;
         iOtherCode = IDC_BUTTON_SHOW_DIR;
-        hwndGraphicsDllDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc);
-        dassert((GetWindowLong(hwndGraphicsDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
-        InitDialogStrings(hwndGraphicsDllDialog, g_GraphicsDllDialogItems);
-        SetWindowTextW(GetDlgItem(hwndGraphicsDllDialog, IDC_EDIT_GRAPHICS_DLL_PATH), libraryPaths.str().c_str());
-        SendMessage(GetDlgItem(hwndGraphicsDllDialog, IDC_NO_ACTION), BM_SETCHECK, BST_CHECKED, 1);
+        hwndD3dDllDialog = CreateDialogW(hInstance, MAKEINTRESOURCEW(IDD_D3DDLL_DIALOG), 0, DialogProc);
+        dassert((GetWindowLong(hwndD3dDllDialog, GWL_STYLE) & WS_VISIBLE) == 0);            // Should be Visible: False
+        InitDialogStrings(hwndD3dDllDialog, g_D3dDllDialogItems);
+        SetWindowTextW(GetDlgItem(hwndD3dDllDialog, IDC_EDIT_D3DDLL_PATH), FromUTF8(strPath));
+        SendMessage(GetDlgItem(hwndD3dDllDialog, IDC_NO_ACTION), BM_SETCHECK, BST_CHECKED, 1);
     }
-    SetForegroundWindow(hwndGraphicsDllDialog);
-    SetWindowPos(hwndGraphicsDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+    SetForegroundWindow(hwndD3dDllDialog);
+    SetWindowPos(hwndD3dDllDialog, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 
     // Wait for input
     while (!bCancelPressed && !bOkPressed && !bOtherPressed)
@@ -603,26 +468,19 @@ void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrar
     }
 
     // Process input
-    bool doNotCheckAgainOption = SendMessageA(GetDlgItem(hwndGraphicsDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0) == BST_CHECKED;
-
-    for (const GraphicsLibrary& library : offenders)
-    {
-        SetApplicationSetting("diagnostics", library.appLastHash, library.md5Hash);
-        SetApplicationSetting("diagnostics", library.appDontRemind, doNotCheckAgainOption ? "yes" : "no");
-    }
+    bool doNotCheckAgainOption = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_CHECK_NOT_AGAIN), BM_GETCHECK, 0, 0) == BST_CHECKED;
+    SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", strFileHash);
+    SetApplicationSetting("diagnostics", "d3d9-dll-not-again", doNotCheckAgainOption ? "yes" : "no");
 
     if (bOkPressed)
     {
         if (!doNotCheckAgainOption)
         {
-            bool doRenameOption = SendMessageA(GetDlgItem(hwndGraphicsDllDialog, IDC_APPLY_AUTOMATIC_CHANGES), BM_GETCHECK, 0, 0) == BST_CHECKED;
+            bool doRenameOption = SendMessageA(GetDlgItem(hwndD3dDllDialog, IDC_APPLY_AUTOMATIC_CHANGES), BM_GETCHECK, 0, 0) == BST_CHECKED;
 
             if (doRenameOption)
             {
-                for (const GraphicsLibrary& library : offenders)
-                {
-                    FileRename(library.absoluteFilePath, library.absoluteFilePath + ".bak");
-                }
+                FileRename(strPath, strPath + ".bak");
             }
         }
     }
@@ -632,44 +490,13 @@ void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrar
     }
     else if (bOtherPressed)
     {
-        // We grab the first offender's absolute file path to retrieve GTA's install directory
-        SString      gtaDirectory = ExtractPath(offenders.front().absoluteFilePath);
-        LPITEMIDLIST gtaDirectoryItem = ILCreateFromPathW(FromUTF8(gtaDirectory));
-
-        std::vector<LPITEMIDLIST> selectedItems;
-
-        if (gtaDirectoryItem != nullptr)
+        if (ITEMIDLIST* pidl = ILCreateFromPathW(FromUTF8(strPath)))
         {
-            for (const GraphicsLibrary& library : offenders)
-            {
-                if (LPITEMIDLIST item = ILCreateFromPathW(FromUTF8(library.absoluteFilePath)); item != nullptr)
-                {
-                    selectedItems.emplace_back(item);
-                }
-            }
+            SHOpenFolderAndSelectItems(pidl, 0, 0, 0);
+            ILFree(pidl);
         }
-
-        bool useFallback = true;
-
-        if (gtaDirectoryItem != nullptr)
-        {
-            // Open a Windows Explorer window for the GTA install directory and select all offending graphic libraries
-            if (SUCCEEDED(SHOpenFolderAndSelectItems(gtaDirectoryItem, selectedItems.size(), const_cast<LPCITEMIDLIST*>(selectedItems.data()), 0)))
-            {
-                useFallback = false;
-            }
-
-            for (LPITEMIDLIST item : selectedItems)
-                ILFree(item);
-
-            ILFree(gtaDirectoryItem);
-        }
-
-        if (useFallback)
-        {
-            // Fallback: Open the parent directory with a shell command
-            ShellExecuteNonBlocking("open", gtaDirectory);
-        }
+        else
+            ShellExecuteNonBlocking("open", ExtractPath(strPath));
 
         ExitProcess(0);
     }
@@ -677,12 +504,12 @@ void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrar
     ResumeSplash();
 }
 
-void HideGraphicsDllDialog()
+void HideD3dDllDialog()
 {
-    if (hwndGraphicsDllDialog)
+    if (hwndD3dDllDialog)
     {
-        DestroyWindow(hwndGraphicsDllDialog);
-        hwndGraphicsDllDialog = NULL;
+        DestroyWindow(hwndD3dDllDialog);
+        hwndD3dDllDialog = NULL;
     }
 }
 
@@ -938,10 +765,9 @@ void TestDialogs()
 #endif
 
 #if 1
-    SetApplicationSetting("diagnostics", "d3d9-dll-last-hash", "123");
-    std::vector<GraphicsLibrary> offenders{GraphicsLibrary{"dummy"}};
-    ShowGraphicsDllDialog(g_hInstance, offenders);
-    HideGraphicsDllDialog();
+    SetApplicationSetting ( "diagnostics", "d3d9-dll-last-hash", "123" );
+    ShowD3dDllDialog( g_hInstance, "c:\\dummy path\\" );
+    HideD3dDllDialog();
 #endif
 
 #if 1

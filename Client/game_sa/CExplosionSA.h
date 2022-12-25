@@ -11,33 +11,31 @@
 
 #pragma once
 
-#include <CVector.h>
 #include <game/CExplosion.h>
-
-class CEntitySAInterface;
+#include "CEntitySA.h"
 
 class CExplosionSAInterface            // 124 bytes, ok
 {
 public:
     eExplosionType      m_ExplosionType;
     CVector             m_vecPosition;
-    float               m_fExplosionRadius;
-    float               m_fExplosionPropagationRate;
+    FLOAT               m_fExplosionRadius;
+    FLOAT               m_fExplosionPropagationRate;
     CEntitySAInterface* m_pEntExplosionOwner;
     CEntitySAInterface* m_pExplodingEntity;            // 28
     DWORD               m_TimeExpires;
-    float               m_DamagePercentage;
+    FLOAT               m_DamagePercentage;
     BYTE                m_cExplosionActive;            // 36
     BYTE                m_nTriggerExplosionSfx;
     BYTE                m_bMakeSound;
-    float               m_ParticleTimer;              // 40
+    FLOAT               m_ParticleTimer;              // 40
     DWORD               m_ActivationTime;             // 44
-    float               m_fExplosionForce;            // 48
-    float               m_fGroundZ;
+    FLOAT               m_fExplosionForce;            // 48
+    FLOAT               m_fGroundZ;
     DWORD               m_fuelTime;
     CVector             m_fuelDir[3];
-    float               m_fuelOffsetDist[3];
-    float               m_fuelSpeed[3];
+    FLOAT               m_fuelOffsetDist[3];
+    FLOAT               m_fuelSpeed[3];
 };
 
 class CExplosionSA : public CExplosion
@@ -55,8 +53,8 @@ public:
     void           SetExplosionPosition(const CVector* vecPosition);
     CEntity*       GetExplosionCreator();
     CEntity*       GetExplodingEntity();
-    bool           IsActive();
-    void           Remove();
+    BOOL           IsActive();
+    VOID           Remove();
     float          GetExplosionForce();
     void           SetExplosionForce(float fForce);
     void           SetSilent(bool bSilent);

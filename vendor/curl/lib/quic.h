@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,8 +20,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * SPDX-License-Identifier: curl
- *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -33,36 +31,29 @@
 #ifdef USE_QUICHE
 #include "vquic/quiche.h"
 #endif
-#ifdef USE_MSH3
-#include "vquic/msh3.h"
-#endif
 
 #include "urldata.h"
 
 /* functions provided by the specific backends */
-CURLcode Curl_quic_connect(struct Curl_easy *data,
-                           struct connectdata *conn,
+CURLcode Curl_quic_connect(struct connectdata *conn,
                            curl_socket_t sockfd,
                            int sockindex,
                            const struct sockaddr *addr,
                            socklen_t addrlen);
-CURLcode Curl_quic_is_connected(struct Curl_easy *data,
-                                struct connectdata *conn,
+CURLcode Curl_quic_is_connected(struct connectdata *conn,
                                 int sockindex,
                                 bool *connected);
-void Curl_quic_ver(char *p, size_t len);
-CURLcode Curl_quic_done_sending(struct Curl_easy *data);
+int Curl_quic_ver(char *p, size_t len);
+CURLcode Curl_quic_done_sending(struct connectdata *conn);
 void Curl_quic_done(struct Curl_easy *data, bool premature);
 bool Curl_quic_data_pending(const struct Curl_easy *data);
-void Curl_quic_disconnect(struct Curl_easy *data,
-                          struct connectdata *conn, int tempindex);
-CURLcode Curl_quic_idle(struct Curl_easy *data);
+void Curl_quic_disconnect(struct connectdata *conn, int tempindex);
 
 #else /* ENABLE_QUIC */
 #define Curl_quic_done_sending(x)
 #define Curl_quic_done(x,y)
 #define Curl_quic_data_pending(x)
-#define Curl_quic_disconnect(x,y,z)
+#define Curl_quic_disconnect(x,y)
 #endif /* !ENABLE_QUIC */
 
 #endif /* HEADER_CURL_QUIC_H */

@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CWeapon.h>
 #include "lua/CLuaFunctionParser.h"
 #include "CMatrix_Pad.h"
 
@@ -73,7 +72,6 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedFootBloodEnabled", IsPedFootBloodEnabled},
         {"getPedCameraRotation", GetPedCameraRotation},
         {"getPedOxygenLevel", GetPedOxygenLevel},
-        {"isPedBleeding", ArgumentParser<IsPedBleeding>},
 
         {"setPedWeaponSlot", SetPedWeaponSlot},
         {"setPedRotation", SetPedRotation},
@@ -103,7 +101,6 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedReloadingWeapon", IsPedReloadingWeapon},
         {"setPedEnterVehicle", ArgumentParser<SetPedEnterVehicle>},
         {"setPedExitVehicle", ArgumentParser<SetPedExitVehicle>},
-        {"setPedBleeding", ArgumentParser<SetPedBleeding>},
     };
 
     // Add functions
@@ -168,7 +165,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
-    lua_classfunction(luaVM, "isBleeding", "isPedBleeding");
 
     lua_classfunction(luaVM, "setCanBeKnockedOffBike", "setPedCanBeKnockedOffBike");
     lua_classfunction(luaVM, "setAnalogControlState", "setPedAnalogControlState");
@@ -196,7 +192,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
     lua_classfunction(luaVM, "setEnterVehicle", "setPedEnterVehicle");
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
-    lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -221,7 +216,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
     lua_classvariable(luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classvariable(luaVM, "footBlood", "setPedFootBloodEnabled", NULL);
-    lua_classvariable(luaVM, "bleeding", "setPedBleeding", "isPedBleeding");
     lua_classvariable(luaVM, "targetCollision", nullptr, OOP_GetPedTargetCollision);
     lua_classvariable(luaVM, "targetEnd", nullptr, OOP_GetPedTargetEnd);
     lua_classvariable(luaVM, "targetStart", nullptr, OOP_GetPedTargetStart);
@@ -1023,7 +1017,8 @@ bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entit
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>>
+CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
@@ -1045,15 +1040,6 @@ bool CLuaPedDefs::UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* en
     if (theEntity)
     {
         theEntity->UpdateRpHAnim();
-
-        if (theEntity->GetModelIndex() == 0)            // CJ skin
-        {
-            RpClump* clump = theEntity->GetRpClump();
-            if (clump)
-            {
-                ((void(__cdecl*)(RpClump*))0x5DF560)(clump);            // CPed::ShoulderBoneRotation
-            }
-        }
         return true;
     }
     return false;
@@ -1501,11 +1487,6 @@ int CLuaPedDefs::IsPedFootBloodEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
-}
-
-bool CLuaPedDefs::IsPedBleeding(CClientPed* pPed)
-{
-    return pPed->IsBleeding();
 }
 
 int CLuaPedDefs::GetPedCameraRotation(lua_State* luaVM)
@@ -1969,12 +1950,6 @@ int CLuaPedDefs::SetPedFootBloodEnabled(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedBleeding(CClientPed* ped, bool bleeding)
-{
-    ped->SetBleeding(bleeding);
-    return true;
-}
-
 int CLuaPedDefs::SetPedCameraRotation(lua_State* luaVM)
 {
     //  bool setPedCameraRotation ( ped thePed, float cameraRotation )
@@ -2370,7 +2345,7 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
 bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
 {
     CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
-    bool            bPassenger = bOptPassenger.value_or(false);
+    bool bPassenger = bOptPassenger.value_or(false);
     return pPed->EnterVehicle(pVehicle, bPassenger);
 }
 

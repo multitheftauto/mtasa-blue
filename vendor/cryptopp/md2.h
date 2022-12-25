@@ -20,17 +20,15 @@ namespace Weak1 {
 class MD2 : public HashTransformation
 {
 public:
-	CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return "MD2";}
-
 	MD2();
 	void Update(const byte *input, size_t length);
 	void TruncatedFinal(byte *hash, size_t size);
 	unsigned int DigestSize() const {return DIGESTSIZE;}
 	unsigned int BlockSize() const {return BLOCKSIZE;}
-	std::string AlgorithmName() const {return StaticAlgorithmName();}
+	CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return "MD2";}
 
-	CRYPTOPP_CONSTANT(DIGESTSIZE = 16);
-	CRYPTOPP_CONSTANT(BLOCKSIZE = 16);
+	CRYPTOPP_CONSTANT(DIGESTSIZE = 16)
+	CRYPTOPP_CONSTANT(BLOCKSIZE = 16)
 
 private:
 	void Transform();

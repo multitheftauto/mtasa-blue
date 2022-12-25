@@ -14,10 +14,6 @@
 #include "integer.h"
 #include "misc.h"
 
-#include <string>
-#include <typeinfo>
-#include <exception>
-
 NAMESPACE_BEGIN(CryptoPP)
 
 /// \brief Used to pass byte array input as part of a NameValuePairs object
@@ -313,9 +309,9 @@ public:
 	virtual ~AlgorithmParametersBase() CRYPTOPP_THROW
 	{
 
-#if defined(CRYPTOPP_CXX17_UNCAUGHT_EXCEPTIONS)
+#if defined(CRYPTOPP_CXX17_EXCEPTIONS)
 		if (std::uncaught_exceptions() == 0)
-#elif defined(CRYPTOPP_CXX98_UNCAUGHT_EXCEPTION)
+#elif defined(CRYPTOPP_UNCAUGHT_EXCEPTION_AVAILABLE)
 		if (std::uncaught_exception() == false)
 #else
 		try
@@ -324,12 +320,10 @@ public:
 			if (m_throwIfNotUsed && !m_used)
 				throw ParameterNotUsed(m_name);
 		}
-#if !defined(CRYPTOPP_CXX98_UNCAUGHT_EXCEPTION)
-# if !defined(CRYPTOPP_CXX17_UNCAUGHT_EXCEPTIONS)
+#if !defined(CRYPTOPP_CXX17_EXCEPTIONS) && !defined(CRYPTOPP_UNCAUGHT_EXCEPTION_AVAILABLE)
 		catch(const Exception&)
 		{
 		}
-# endif
 #endif
 	}
 

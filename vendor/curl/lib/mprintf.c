@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1999 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1999 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,8 +17,6 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
- *
- * SPDX-License-Identifier: curl
  *
  *
  * Purpose:
@@ -67,6 +65,7 @@
  */
 
 #if (defined(__BORLANDC__) && (__BORLANDC__ >= 0x520)) || \
+    (defined(__WATCOMC__) && defined(__386__)) || \
     (defined(__POCC__) && defined(_MSC_VER)) || \
     (defined(_WIN32_WCE)) || \
     (defined(__MINGW32__)) || \
@@ -318,11 +317,6 @@ static int dprintf_Pass1(const char *format, struct va_stack *vto,
             flags |= FLAGS_PREC;
             precision = strtol(fmt, &fmt, 10);
           }
-          if((flags & (FLAGS_PREC | FLAGS_PRECPARAM)) ==
-             (FLAGS_PREC | FLAGS_PRECPARAM))
-            /* it is not permitted to use both kinds of precision for the same
-               argument */
-            return 1;
           break;
         case 'h':
           flags |= FLAGS_SHORT;
@@ -599,7 +593,7 @@ static int dprintf_formatf(
 
   /* Do the actual %-code parsing */
   if(dprintf_Pass1(format, vto, endpos, ap_save))
-    return 0;
+    return -1;
 
   end = &endpos[0]; /* the initial end-position from the list dprintf_Pass1()
                        created for us */
@@ -821,7 +815,7 @@ static int dprintf_formatf(
         size_t len;
 
         str = (char *) p->data.str;
-        if(!str) {
+        if(str == NULL) {
           /* Write null[] if there's space.  */
           if(prec == -1 || prec >= (long) sizeof(null) - 1) {
             str = null;
@@ -836,8 +830,6 @@ static int dprintf_formatf(
         }
         else if(prec != -1)
           len = (size_t)prec;
-        else if(*str == '\0')
-          len = 0;
         else
           len = strlen(str);
 
@@ -866,7 +858,7 @@ static int dprintf_formatf(
       {
         void *ptr;
         ptr = (void *) p->data.ptr;
-        if(ptr) {
+        if(ptr != NULL) {
           /* If the pointer is not NULL, write it as a %#x spec.  */
           base = 16;
           digits = (p->flags & FLAGS_UPPER)? upper_digits : lower_digits;
@@ -961,22 +953,11 @@ static int dprintf_formatf(
         else
           *fptr++ = 'f';
 
-        *fptr = 0; /* and a final null-termination */
+        *fptr = 0; /* and a final zero termination */
 
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
-#endif
         /* NOTE NOTE NOTE!! Not all sprintf implementations return number of
            output characters */
-#ifdef HAVE_SNPRINTF
-        (snprintf)(work, sizeof(work), formatbuf, p->data.dnum);
-#else
         (sprintf)(work, formatbuf, p->data.dnum);
-#endif
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
         DEBUGASSERT(strlen(work) <= sizeof(work));
         for(fptr = work; *fptr; fptr++)
           OUTCHAR(*fptr);
@@ -1034,14 +1015,11 @@ int curl_mvsnprintf(char *buffer, size_t maxlength, const char *format,
   info.max = maxlength;
 
   retcode = dprintf_formatf(&info, addbyter, format, ap_save);
-  if(info.max) {
+  if((retcode != -1) && info.max) {
     /* we terminate this with a zero byte */
-    if(info.max == info.length) {
+    if(info.max == info.length)
       /* we're at maximum, scrap the last letter */
       info.buffer[-1] = 0;
-      DEBUGASSERT(retcode);
-      retcode--; /* don't count the nul byte */
-    }
     else
       info.buffer[0] = 0;
   }
@@ -1077,12 +1055,13 @@ extern int Curl_dyn_vprintf(struct dynbuf *dyn,
 /* appends the formatted string, returns 0 on success, 1 on error */
 int Curl_dyn_vprintf(struct dynbuf *dyn, const char *format, va_list ap_save)
 {
+  int retcode;
   struct asprintf info;
   info.b = dyn;
   info.fail = 0;
 
-  (void)dprintf_formatf(&info, alloc_addbyter, format, ap_save);
-  if(info.fail) {
+  retcode = dprintf_formatf(&info, alloc_addbyter, format, ap_save);
+  if((-1 == retcode) || info.fail) {
     Curl_dyn_free(info.b);
     return 1;
   }
@@ -1091,14 +1070,15 @@ int Curl_dyn_vprintf(struct dynbuf *dyn, const char *format, va_list ap_save)
 
 char *curl_mvaprintf(const char *format, va_list ap_save)
 {
+  int retcode;
   struct asprintf info;
   struct dynbuf dyn;
   info.b = &dyn;
   Curl_dyn_init(info.b, DYN_APRINTF);
   info.fail = 0;
 
-  (void)dprintf_formatf(&info, alloc_addbyter, format, ap_save);
-  if(info.fail) {
+  retcode = dprintf_formatf(&info, alloc_addbyter, format, ap_save);
+  if((-1 == retcode) || info.fail) {
     Curl_dyn_free(info.b);
     return NULL;
   }

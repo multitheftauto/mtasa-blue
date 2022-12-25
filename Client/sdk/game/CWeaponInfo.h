@@ -12,8 +12,7 @@
 #pragma once
 
 #include "Common.h"
-
-class CVector;
+#include <CVector.h>
 
 enum eWeaponSkill
 {

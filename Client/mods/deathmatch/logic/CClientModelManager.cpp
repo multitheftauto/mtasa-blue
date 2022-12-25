@@ -49,9 +49,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     int modelId = pModel->GetModelID();
     if (m_Models[modelId] != nullptr)
     {
-        if (g_pGame->GetModelInfo(modelId))
-            m_Models[modelId]->RestoreEntitiesUsingThisModel();
-
+        m_Models[modelId]->RestoreEntitiesUsingThisModel();
         m_Models[modelId] = nullptr;
         m_modelCount--;
         return true;
@@ -75,11 +73,11 @@ int CClientModelManager::GetFirstFreeModelID(void)
 
 std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
 {
-    int32_t MAX_MODEL_ID = g_pGame->GetBaseIDforTXD();
-
+    const unsigned int MAX_MODEL_ID = g_pGame->GetBaseIDforTXD();
     if (iModelID < MAX_MODEL_ID)
+    {
         return m_Models[iModelID];
-
+    }
     return nullptr;
 }
 

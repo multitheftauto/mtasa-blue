@@ -10,6 +10,7 @@
 
 #include "strerror_override.h"
 
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,9 +19,6 @@
 #include "json_pointer.h"
 #include "strdup_compat.h"
 #include "vasprintf_compat.h"
-
-/* Avoid ctype.h and locale overhead */
-#define is_plain_digit(c) ((c) >= '0' && (c) <= '9')
 
 /**
  * JavaScript Object Notation (JSON) Pointer
@@ -49,7 +47,7 @@ static int is_valid_index(struct json_object *jo, const char *path, int32_t *idx
 	 */
 	if (len == 1)
 	{
-		if (is_plain_digit(path[0]))
+		if (isdigit((unsigned char)path[0]))
 		{
 			*idx = (path[0] - '0');
 			goto check_oob;
@@ -66,7 +64,7 @@ static int is_valid_index(struct json_object *jo, const char *path, int32_t *idx
 	/* RFC states base-10 decimals */
 	for (i = 0; i < len; i++)
 	{
-		if (!is_plain_digit(path[i]))
+		if (!isdigit((unsigned char)path[i]))
 		{
 			errno = EINVAL;
 			return 0;

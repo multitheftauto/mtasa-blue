@@ -4,8 +4,9 @@
 class EncodeFileName
 {
   private:
-    void AddFlags(byte Value,byte *EncName);
+    void AddFlags(int Value);
 
+    byte *EncName;
     byte Flags;
     uint FlagBits;
     size_t FlagsPos;

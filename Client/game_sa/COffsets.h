@@ -17,6 +17,7 @@ public:
     static void Initialize10EU();
     static void Initialize10US();
     static void Initialize11();
+    static void Initialize20();
 
 private:
     static void InitializeCommon10();

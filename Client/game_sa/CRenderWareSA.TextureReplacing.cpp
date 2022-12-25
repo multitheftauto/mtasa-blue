@@ -7,10 +7,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CGameSA.h"
 #include "gamesa_renderware.h"
-
-extern CGameSA* pGame;
 
 //
 // Info about the current state of a model's txd textures

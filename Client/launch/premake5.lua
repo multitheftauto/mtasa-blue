@@ -18,7 +18,7 @@ project "Client Launcher"
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources/*"] = "**.cpp",
-		["Resources/*"] = {"*.rc", "**.ico", "**.xml"},
+		["Resources/*"] = {"*.rc", "*.ico", "**.xml"},
 		["*"] = "premake5.lua"
 	}
 
@@ -31,14 +31,13 @@ project "Client Launcher"
 	filter "system:windows"
 		staticruntime "On"
 		files {
-			"NEU/gameicon_NEU.ico",
-			"NEU/Multi Theft Auto.gdf.xml",
+			"NEU/GDFImp.gdf.xml",
+			"GDFImp.rc",
 			"launch.rc",
-			"Multi Theft Auto.rc",
-			"resource/mtaicon.ico"
+			"mtaicon.ico"
 		}
-
-	filter "architecture:not x86"
+		
+	filter "architecture:x64"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

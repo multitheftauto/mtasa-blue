@@ -7,7 +7,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CGame.h>
 #include "CRenderWareSA.ShaderMatching.h"
 
 uint CMatchChannel::ms_uiIdCounter = 1;

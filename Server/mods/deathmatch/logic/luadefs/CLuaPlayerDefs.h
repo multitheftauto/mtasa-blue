@@ -61,6 +61,7 @@ public:
     LUA_DECLARE(SetPlayerNametagShowing);
     LUA_DECLARE(SetPlayerMuted);
     LUA_DECLARE(SetPlayerBlurLevel);
+    LUA_DECLARE(SetPlayerDiscordJoinParams);
     LUA_DECLARE(RedirectPlayer);
     LUA_DECLARE(SetPlayerName);
     LUA_DECLARE(DetonateSatchels);
@@ -96,7 +97,7 @@ public:
     LUA_DECLARE(ShowCursor);
 
     // Chat funcs
-    static bool ShowChat(CElement* pPlayer, bool bShow, std::optional<bool> optInputBlocked);
+    LUA_DECLARE(ShowChat);
 
     // Admin funcs
     LUA_DECLARE(KickPlayer);

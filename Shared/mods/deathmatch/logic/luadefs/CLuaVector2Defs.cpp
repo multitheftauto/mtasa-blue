@@ -10,11 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaVector2Defs.h"
-#include "CStaticFunctionDefinitions.h"
-#include "lua/LuaCommon.h"
-#include "lua/CLuaShared.h"
-#include "CScriptArgReader.h"
 
 void CLuaVector2Defs::AddClass(lua_State* luaVM)
 {

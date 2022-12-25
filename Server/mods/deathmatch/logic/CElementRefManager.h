@@ -7,7 +7,6 @@
  *  PURPOSE:     Help prevent invalid element pointers by removing refs when an element is deleted
  *
  *****************************************************************************/
-
 #pragma once
 
 #ifdef MTA_DEBUG
@@ -17,8 +16,6 @@
     #define ELEMENT_REF_DEBUG( ptr, desc ) \
         NULL
 #endif
-
-class CElement;
 
 //
 // CElementRefManager

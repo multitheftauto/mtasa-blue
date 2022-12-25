@@ -12,8 +12,7 @@
 #pragma once
 
 #include "CPed.h"
-
-class CWanted;
+#include "CWanted.h"
 
 class CPlayerPed : public virtual CPed
 {
@@ -21,6 +20,9 @@ public:
     virtual ~CPlayerPed(){};
 
     virtual CWanted* GetWanted() = 0;
+
+    virtual float GetSprintEnergy() = 0;
+    virtual void  SetSprintEnergy(float fSprintEnergy) = 0;
 
     virtual void SetInitialState() = 0;
 

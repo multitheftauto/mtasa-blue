@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CAnimBlendSequenceSA.h"
 
 void CAnimBlendSequenceSA::Initialize()
 {

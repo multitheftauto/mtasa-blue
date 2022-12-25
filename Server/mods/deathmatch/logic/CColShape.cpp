@@ -10,10 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CColShape.h"
-#include "CColManager.h"
-#include "CColCallback.h"
-#include "CStaticFunctionDefinitions.h"
 
 CColShape::CColShape(CColManager* pManager, CElement* pParent, bool bIsPartnered) : CElement(pParent)
 {
@@ -91,7 +87,7 @@ void CColShape::CallLeaveCallback(CElement& Element)
 
 bool CColShape::ColliderExists(CElement* pElement)
 {
-    std::list<CElement*>::iterator iter = m_Colliders.begin();
+    list<CElement*>::iterator iter = m_Colliders.begin();
     for (; iter != m_Colliders.end(); iter++)
     {
         if (*iter == pElement)
@@ -104,7 +100,7 @@ bool CColShape::ColliderExists(CElement* pElement)
 
 void CColShape::RemoveAllColliders()
 {
-    std::list<CElement*>::iterator iter = m_Colliders.begin();
+    list<CElement*>::iterator iter = m_Colliders.begin();
     for (; iter != m_Colliders.end(); iter++)
     {
         (*iter)->RemoveCollision(this);

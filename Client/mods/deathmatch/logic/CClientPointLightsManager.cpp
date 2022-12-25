@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CPointLights.h>
 
 using std::list;
 

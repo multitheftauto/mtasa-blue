@@ -4,7 +4,7 @@
  *
  *   Auto-fitter routines to compute global hinting values (body).
  *
- * Copyright (C) 2003-2022 by
+ * Copyright (C) 2003-2020 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -19,7 +19,6 @@
 #include "afglobal.h"
 #include "afranges.h"
 #include "afshaper.h"
-#include "afws-decl.h"
 #include <freetype/internal/ftdebug.h>
 
 
@@ -32,6 +31,11 @@
 #undef  FT_COMPONENT
 #define FT_COMPONENT  afglobal
 
+
+  /* get writing system specific header files */
+#undef  WRITING_SYSTEM
+#define WRITING_SYSTEM( ws, WS )  /* empty */
+#include "afwrtsys.h"
 
 #include "aferrors.h"
 
@@ -70,7 +74,7 @@
   af_writing_system_classes[] =
   {
 
-#include "afws-iter.h"
+#include "afwrtsys.h"
 
     NULL  /* do not remove */
   };
@@ -281,10 +285,10 @@
 
 #ifdef FT_DEBUG_LEVEL_TRACE
 
-    FT_TRACE4(( "\n" ));
-    FT_TRACE4(( "style coverage\n" ));
-    FT_TRACE4(( "==============\n" ));
-    FT_TRACE4(( "\n" ));
+    FT_TRACE4(( "\n"
+                "style coverage\n"
+                "==============\n"
+                "\n" ));
 
     for ( ss = 0; af_style_classes[ss]; ss++ )
     {
@@ -337,12 +341,10 @@
 
     /* we allocate an AF_FaceGlobals structure together */
     /* with the glyph_styles array                      */
-    if ( FT_QALLOC( globals,
-                    sizeof ( *globals ) +
-                      (FT_ULong)face->num_glyphs * sizeof ( FT_UShort ) ) )
+    if ( FT_ALLOC( globals,
+                   sizeof ( *globals ) +
+                     (FT_ULong)face->num_glyphs * sizeof ( FT_UShort ) ) )
       goto Exit;
-
-    FT_ZERO( &globals->metrics );
 
     globals->face                      = face;
     globals->glyph_count               = face->num_glyphs;
@@ -476,10 +478,6 @@
           {
             style = (AF_Style)( globals->glyph_styles[gindex] &
                                 AF_STYLE_UNASSIGNED           );
-            /* IMPORTANT: Clear the error code, see
-             * https://gitlab.freedesktop.org/freetype/freetype/-/issues/1063
-             */
-            error = FT_Err_Ok;
             goto Again;
           }
 

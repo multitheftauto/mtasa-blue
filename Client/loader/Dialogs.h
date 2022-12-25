@@ -8,10 +8,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-#include <vector>
-
 void ShowSplash(HINSTANCE hInstance);
 void HideSplash();
 
@@ -25,19 +21,8 @@ void StopPseudoProgress();
 SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage);
 void    HideCrashedDialog();
 
-struct GraphicsLibrary
-{
-    SString stem;            // filename without the final extension
-    SString absoluteFilePath;
-    SString md5Hash;
-    SString appLastHash;
-    SString appDontRemind;
-
-    explicit GraphicsLibrary(const char* libraryStemName) : stem(std::string(libraryStemName)) {}
-};
-
-void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrary>& offenders);
-void HideGraphicsDllDialog();
+void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath);
+void HideD3dDllDialog();
 
 void ShowOptimusDialog(HINSTANCE hInstance);
 void HideOptimusDialog();

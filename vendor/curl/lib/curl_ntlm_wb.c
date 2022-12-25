@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,8 +18,6 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
- * SPDX-License-Identifier: curl
- *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -30,7 +28,7 @@
 /*
  * NTLM details:
  *
- * https://davenport.sourceforge.net/ntlm.html
+ * https://davenport.sourceforge.io/ntlm.html
  * https://www.innovation.ch/java/ntlm.html
  */
 
@@ -331,15 +329,12 @@ done:
   return CURLE_REMOTE_ACCESS_DENIED;
 }
 
-CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
-                            struct connectdata *conn,
+CURLcode Curl_input_ntlm_wb(struct connectdata *conn,
                             bool proxy,
                             const char *header)
 {
   struct ntlmdata *ntlm = proxy ? &conn->proxyntlm : &conn->ntlm;
   curlntlm *state = proxy ? &conn->proxy_ntlm_state : &conn->http_ntlm_state;
-
-  (void) data;  /* In case it gets unused by nop log macros. */
 
   if(!checkprefix("NTLM", header))
     return CURLE_BAD_CONTENT_ENCODING;
@@ -357,17 +352,17 @@ CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
   }
   else {
     if(*state == NTLMSTATE_LAST) {
-      infof(data, "NTLM auth restarted");
+      infof(conn->data, "NTLM auth restarted\n");
       Curl_http_auth_cleanup_ntlm_wb(conn);
     }
     else if(*state == NTLMSTATE_TYPE3) {
-      infof(data, "NTLM handshake rejected");
+      infof(conn->data, "NTLM handshake rejected\n");
       Curl_http_auth_cleanup_ntlm_wb(conn);
       *state = NTLMSTATE_NONE;
       return CURLE_REMOTE_ACCESS_DENIED;
     }
     else if(*state >= NTLMSTATE_TYPE1) {
-      infof(data, "NTLM handshake failure (internal error)");
+      infof(conn->data, "NTLM handshake failure (internal error)\n");
       return CURLE_REMOTE_ACCESS_DENIED;
     }
 
@@ -381,8 +376,7 @@ CURLcode Curl_input_ntlm_wb(struct Curl_easy *data,
  * This is for creating ntlm header output by delegating challenge/response
  * to Samba's winbind daemon helper ntlm_auth.
  */
-CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
-                             bool proxy)
+CURLcode Curl_output_ntlm_wb(struct connectdata *conn, bool proxy)
 {
   /* point to the address of the pointer that holds the string to send to the
      server, which is for a plain host or for a HTTP proxy */
@@ -392,11 +386,12 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
   struct ntlmdata *ntlm;
   curlntlm *state;
   struct auth *authp;
+  struct Curl_easy *data = conn->data;
 
   CURLcode res = CURLE_OK;
 
   DEBUGASSERT(conn);
-  DEBUGASSERT(data);
+  DEBUGASSERT(conn->data);
 
   if(proxy) {
 #ifndef CURL_DISABLE_PROXY
@@ -404,7 +399,7 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     userp = conn->http_proxy.user;
     ntlm = &conn->proxyntlm;
     state = &conn->proxy_ntlm_state;
-    authp = &data->state.authproxy;
+    authp = &conn->data->state.authproxy;
 #else
     return CURLE_NOT_BUILT_IN;
 #endif
@@ -414,7 +409,7 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     userp = conn->user;
     ntlm = &conn->ntlm;
     state = &conn->http_ntlm_state;
-    authp = &data->state.authhost;
+    authp = &conn->data->state.authhost;
   }
   authp->done = FALSE;
 
@@ -428,8 +423,7 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     /* Use Samba's 'winbind' daemon to support NTLM authentication,
      * by delegating the NTLM challenge/response protocol to a helper
      * in ntlm_auth.
-     * https://web.archive.org/web/20190925164737
-     * /devel.squid-cache.org/ntlm/squid_helper_protocol.html
+     * http://devel.squid-cache.org/ntlm/squid_helper_protocol.html
      * https://www.samba.org/samba/docs/man/manpages-3/winbindd.8.html
      * https://www.samba.org/samba/docs/man/manpages-3/ntlm_auth.1.html
      * Preprocessor symbol 'NTLM_WB_ENABLED' is defined when this
@@ -439,10 +433,10 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
      * request handling process.
      */
     /* Create communication with ntlm_auth */
-    res = ntlm_wb_init(data, ntlm, userp);
+    res = ntlm_wb_init(conn->data, ntlm, userp);
     if(res)
       return res;
-    res = ntlm_wb_response(data, ntlm, "YR\n", *state);
+    res = ntlm_wb_response(conn->data, ntlm, "YR\n", *state);
     if(res)
       return res;
 
@@ -460,7 +454,7 @@ CURLcode Curl_output_ntlm_wb(struct Curl_easy *data, struct connectdata *conn,
     char *input = aprintf("TT %s\n", ntlm->challenge);
     if(!input)
       return CURLE_OUT_OF_MEMORY;
-    res = ntlm_wb_response(data, ntlm, input, *state);
+    res = ntlm_wb_response(conn->data, ntlm, input, *state);
     free(input);
     if(res)
       return res;

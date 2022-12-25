@@ -10,11 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
 #include "CDynamicLibrary.h"
-#include "core/CServerInterface.h"
-
-extern CServerInterface* g_pServerInterface;
 
 namespace
 {

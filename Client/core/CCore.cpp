@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
-#include <game/CSettings.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
@@ -22,6 +21,7 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -46,7 +46,7 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     return Win32LoadLibraryA("d3d8.dll");
 }
 
-CCore::CCore()
+CCore::CCore() : m_DiscordManager(new CDiscordManager())
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -67,6 +67,9 @@ CCore::CCore()
     CreateXML();
     ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
+
+    // Initialize discord manager
+    m_DiscordManager->Initialize();
 
     // Create a logger instance.
     m_pConsoleLogger = new CConsoleLogger();
@@ -435,11 +438,11 @@ void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned cha
     }
 }
 
-void CCore::SetChatVisible(bool bVisible, bool bInputBlocked)
+void CCore::SetChatVisible(bool bVisible)
 {
     if (m_pLocalGUI)
     {
-        m_pLocalGUI->SetChatBoxVisible(bVisible, bInputBlocked);
+        m_pLocalGUI->SetChatBoxVisible(bVisible);
     }
 }
 
@@ -448,15 +451,6 @@ bool CCore::IsChatVisible()
     if (m_pLocalGUI)
     {
         return m_pLocalGUI->IsChatBoxVisible();
-    }
-    return false;
-}
-
-bool CCore::IsChatInputBlocked()
-{
-    if (m_pLocalGUI)
-    {
-        return m_pLocalGUI->IsChatBoxInputBlocked();
     }
     return false;
 }
@@ -502,47 +496,6 @@ bool CCore::IsChatInputEnabled()
     }
 
     return false;
-}
-
-bool CCore::SetChatboxCharacterLimit(int charLimit)
-{
-    CChat* pChat = m_pLocalGUI->GetChat();
-
-    if (!pChat)
-        return false;
-
-    pChat->SetCharacterLimit(charLimit);
-    return true;
-}
-
-void CCore::ResetChatboxCharacterLimit()
-{
-    CChat* pChat = m_pLocalGUI->GetChat();
-
-    if (!pChat)
-        return;
-
-    pChat->SetCharacterLimit(pChat->GetDefaultCharacterLimit());
-}
-
-int CCore::GetChatboxCharacterLimit()
-{
-    CChat* pChat = m_pLocalGUI->GetChat();
-
-    if (!pChat)
-        return 0;
-
-    return pChat->GetCharacterLimit();
-}
-
-int CCore::GetChatboxMaxCharacterLimit()
-{
-    CChat* pChat = m_pLocalGUI->GetChat();
-
-    if (!pChat)
-        return 0;
-
-    return pChat->GetMaxCharacterLimit();
 }
 
 bool CCore::IsSettingsVisible()
@@ -615,12 +568,8 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetBlurEnabled();
-    pGameSettings->ResetVehiclesLODDistance();
-    pGameSettings->ResetPedsLODDistance();
-    pGameSettings->ResetCoronaReflectionsEnabled();
-    CVARS_GET("dynamic_ped_shadows", bVal);
-    pGameSettings->SetDynamicPedShadowsEnabled(bVal);
+    pGameSettings->ResetVehiclesLODDistance(false);
+    pGameSettings->ResetPedsLODDistance(false);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -631,6 +580,9 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (bConnected) m_DiscordManager->RegisterPlay(true);
+    else ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -827,6 +779,7 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
+            CCore::GetSingleton().ResetDiscordRichPresence();
         }
     }
 }
@@ -1321,9 +1274,6 @@ void CCore::OnModUnload()
 
     // Destroy tray icon
     m_pTrayIcon->DestroyTrayIcon();
-
-    // Reset chatbox character limit
-    ResetChatboxCharacterLimit();
 }
 
 void CCore::RegisterCommands()
@@ -2029,6 +1979,28 @@ uint CCore::GetMaxStreamingMemory()
 {
     CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
+}
+
+//
+// ResetDiscordRichPresence
+//
+void CCore::ResetDiscordRichPresence()
+{
+    time_t currentTime;
+    time(&currentTime);
+
+    // Set default parameters
+    SDiscordActivity activity;
+    activity.m_details = "In Main Menu";
+    activity.m_startTimestamp = currentTime;
+
+    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
+        if (res == DiscordRes_Ok)
+            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
+        else
+            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
+    });
+    m_DiscordManager->RegisterPlay(false);
 }
 
 //

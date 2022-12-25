@@ -12,6 +12,7 @@
 #pragma once
 
 #include <game/CBikeHandlingEntry.h>
+#include "Common.h"
 
 struct tBikeHandlingDataSA
 {
@@ -38,8 +39,8 @@ class CBikeHandlingEntrySA : public CBikeHandlingEntry
 public:
     CBikeHandlingEntrySA();
     CBikeHandlingEntrySA(tBikeHandlingDataSA* pOriginal);
-    void                 Assign(const CBikeHandlingEntry* pData);
-    void                 Recalculate();
+    void Assign(const CBikeHandlingEntry* pData);
+    void Recalculate();
     tBikeHandlingDataSA* GetInterface() { return &m_pBikeHandlingSA; };
 
 private:

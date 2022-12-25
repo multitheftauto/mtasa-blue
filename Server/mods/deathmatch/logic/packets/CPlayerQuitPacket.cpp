@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPlayerQuitPacket.h"
-#include <net/SyncStructures.h>
 
 CPlayerQuitPacket::CPlayerQuitPacket()
 {

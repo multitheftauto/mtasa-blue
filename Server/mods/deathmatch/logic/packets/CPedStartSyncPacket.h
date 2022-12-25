@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-
 class CPed;
 
 class CPedStartSyncPacket final : public CPacket

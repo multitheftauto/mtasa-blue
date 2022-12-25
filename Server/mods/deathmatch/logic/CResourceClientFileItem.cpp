@@ -13,7 +13,6 @@
 // It's task is to load and unload the script client side
 
 #include "StdInc.h"
-#include "CResourceClientFileItem.h"
 
 extern CGame* g_pGame;
 

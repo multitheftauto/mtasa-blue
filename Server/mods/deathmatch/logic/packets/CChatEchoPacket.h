@@ -22,27 +22,16 @@
 #define CHATCOLOR_ADMINSAY      131, 205, 241
 #define CHATCOLOR_CONSOLESAY    223, 149, 232
 
-enum eMessageType
-{
-    MESSAGE_TYPE_PLAYER,
-    MESSAGE_TYPE_ACTION,
-    MESSAGE_TYPE_TEAM,
-    MESSAGE_TYPE_PRIVATE,
-    MESSAGE_TYPE_INTERNAL
-};
-
 class CChatEchoPacket final : public CPacket
 {
 public:
-    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false,
-                    unsigned char ucMessageType = MESSAGE_TYPE_PLAYER)
+    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false)
     {
         m_strMessage = strMessage;
         m_ucRed = ucRed;
         m_ucGreen = ucGreen;
         m_ucBlue = ucBlue;
         m_bColorCoded = bColorCoded;
-        m_ucMessageType = ucMessageType;
     };
 
     // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
@@ -58,5 +47,4 @@ private:
     unsigned char m_ucBlue;
     SString       m_strMessage;
     bool          m_bColorCoded;
-    unsigned char m_ucMessageType;
 };

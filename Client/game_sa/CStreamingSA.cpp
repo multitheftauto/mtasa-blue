@@ -10,11 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <core/CCoreInterface.h>
-#include "CStreamingSA.h"
-#include "CModelInfoSA.h"
 
-extern CCoreInterface* g_pCore;
+#include "CModelInfoSA.h"
 
 // count: 26316 in unmodified game
 CStreamingInfo* CStreamingSA::ms_aInfoForModel = (CStreamingInfo*)CStreaming__ms_aInfoForModel;
@@ -77,14 +74,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
 }
 
-void CStreamingSA::RemoveModel(std::uint32_t model)
-{
-    using Signature = void(__cdecl*)(std::uint32_t);
-    const auto function = reinterpret_cast<Signature>(0x4089A0);
-    function(model);
-}
-
-void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* szTag)
+void CStreamingSA::LoadAllRequestedModels(BOOL bOnlyPriorityModels, const char* szTag)
 {
     TIMEUS startTime = GetTimeUs();
 
@@ -105,7 +95,7 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
     }
 }
 
-bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
+BOOL CStreamingSA::HasModelLoaded(DWORD dwModelID)
 {
     if (IsUpgradeModelId(dwModelID))
     {
@@ -123,12 +113,13 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-        bool bReturn = 0;
+        BOOL  bReturn = 0;
         _asm
         {
             push    dwModelID
             call    dwFunc
-            mov     bReturn, al
+            movzx   eax, al
+            mov     bReturn, eax
             pop     eax
         }
 
@@ -160,14 +151,4 @@ void CStreamingSA::ReinitStreaming()
     Function_ReInitStreaming reinitStreaming = (Function_ReInitStreaming)(0x40E560);
 
     reinitStreaming();
-}
-
-void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
-{
-    (reinterpret_cast<void(__cdecl*)(std::uint32_t)>(0x40E120))(memoryToCleanInBytes);
-}
-
-std::uint32_t CStreamingSA::GetMemoryUsed() const
-{
-    return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
 }

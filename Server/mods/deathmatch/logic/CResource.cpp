@@ -13,36 +13,13 @@
 //#define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
-#include "CResource.h"
-#include "CResourceManager.h"
-#include "CResourceChecker.h"
-#include "CResourceHTMLItem.h"
-#include "CResourceConfigItem.h"
-#include "CResourceClientConfigItem.h"
-#include "CResourceClientFileItem.h"
-#include "CResourceScriptItem.h"
-#include "CResourceClientScriptItem.h"
-#include "CAccessControlListManager.h"
-#include "CScriptDebugging.h"
-#include "CMapManager.h"
-#include "CKeyBinds.h"
-#include "CIdArray.h"
-#include "CChecksum.h"
-#include "CHTTPD.h"
-#include "Utils.h"
-#include "packets/CResourceClientScriptsPacket.h"
-#include "lua/CLuaFunctionParseHelpers.h"
-#include <net/SimHeaders.h>
-#include <zip.h>
-
-#ifdef WIN32
-    #include <zip/iowin32.h>
-#else
-    #include <utime.h>
+#include "net/SimHeaders.h"
+#ifndef WIN32
+#include <utime.h>
 #endif
 
 #ifndef MAX_PATH
-    #define MAX_PATH 260
+#define MAX_PATH 260
 #endif
 
 int           do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath);
@@ -1129,8 +1106,6 @@ bool CResource::CreateVM(bool bEnableOOP)
         return false;
 
     m_pVM->SetScriptName(m_strResourceName.c_str());
-    m_pVM->LoadEmbeddedScripts();
-    m_pVM->RegisterModuleFunctions();
     return true;
 }
 
@@ -1180,8 +1155,6 @@ void CResource::DisplayInfo()            // duplicated for HTML
 
             for (CResource* pDependent : m_Dependents)
                 CLogger::LogPrintf("  %s\n", pDependent->GetName().c_str());
-
-            break;
         }
         case EResourceState::Stopping:
         {
@@ -2369,49 +2342,24 @@ ResponseCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse*
     return HTTPRESPONSECODE_200_OK;
 }
 
-std::string Unescape(std::string_view sv)
+void Unescape(std::string& str)
 {
-    // Converts a character to a hexadecimal value
-    auto toHex = [](char c)
-    {
-        if (c >= '0' && c <= '9')
-            return c - '0';
-        if (c >= 'a' && c <= 'f')
-            return c - 'a' + 10;
-        if (c >= 'A' && c <= 'F')
-            return c - 'A' + 10;
-        return 0;
-    };
+    const char* pPercent = strchr(str.c_str(), '%');
 
-    std::string out;
-    // String can only shrink here
-    // as %?? is collapsed to a single char
-    out.reserve(sv.length());
-    auto it = sv.begin();
-    while (it != sv.end())
+    while (pPercent)
     {
-        if (*it == '%')
+        if (pPercent[1] && pPercent[2])
         {
-            // Avoid reading past the end
-            if (std::distance(it, sv.end()) < 3)
-            {
-                out.push_back(*it++);
-                continue;
-            }
-            // Skip %
-            ++it;
-            // Read two digits/letters and convert to char
-            uint8_t digit1 = toHex(*it++);
-            uint8_t digit2 = toHex(*it++);
-            out.push_back(static_cast<char>(digit1 * 0x10 + digit2));
+            int iCharCode = 0;
+            sscanf(&pPercent[1], "%02X", &iCharCode);
+            str.replace(pPercent - str.c_str(), 3, (char*)&iCharCode);
+            pPercent = strchr(pPercent + 3, '%');
         }
         else
         {
-            // Push normally
-            out.push_back(*it++);
+            break;
         }
     }
-    return out;
 }
 
 ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
@@ -2472,7 +2420,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
                 if (iKey >= 0 && iKey < MAX_INPUT_VARIABLES)
                 {
                     std::string strValue(pEqual + 1, pAnd - (pEqual + 1));
-                    strValue = Unescape(strValue);
+                    Unescape(strValue);
 
                     if (iKey + 1 > static_cast<int>(vecArguments.size()))
                         vecArguments.resize(iKey + 1);
@@ -2488,7 +2436,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         }
     }
 
-    strFuncName = Unescape(strFuncName);
+    Unescape(strFuncName);
 
     for (CExportedFunction& Exported : m_ExportedFunctions)
     {
@@ -2698,7 +2646,6 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
     }
 
     Unescape(strFile);
-    strFile = Unescape(strFile);
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -2731,7 +2678,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 }
                 else
                 {
-                    SString err = "That resource is not running.";
+                    SString err("Resource %s is not running.", m_strResourceName.c_str());
                     ipoHttpResponse->SetBody(err.c_str(), err.size());
                     return HTTPRESPONSECODE_401_UNAUTHORIZED;
                 }
@@ -2777,7 +2724,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
         }
     }
 
-    SString err = "That resource file could not be found in that resource.";
+    SString err("Cannot find a resource file named '%s' in the resource %s.", strFile.c_str(), m_strResourceName.c_str());
     ipoHttpResponse->SetBody(err.c_str(), err.size());
     return HTTPRESPONSECODE_404_NOTFOUND;
 }

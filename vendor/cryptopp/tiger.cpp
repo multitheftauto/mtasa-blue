@@ -34,10 +34,10 @@ void Tiger::InitState(HashWordType *state)
 	state[2] = W64LIT(0xF096A5B4C3B2E187);
 }
 
-void Tiger::TruncatedFinal(byte *digest, size_t digestSize)
+void Tiger::TruncatedFinal(byte *hash, size_t size)
 {
-	CRYPTOPP_ASSERT(digest != NULLPTR);
-	ThrowIfInvalidTruncatedSize(digestSize);
+	CRYPTOPP_ASSERT(hash != NULLPTR);
+	ThrowIfInvalidTruncatedSize(size);
 
 	PadLastBlock(56, 0x01);
 	CorrectEndianess(m_data, m_data, 56);
@@ -46,7 +46,7 @@ void Tiger::TruncatedFinal(byte *digest, size_t digestSize)
 
 	Transform(m_state, m_data);
 	CorrectEndianess(m_state, m_state, DigestSize());
-	memcpy(digest, m_state, digestSize);
+	memcpy(hash, m_state, size);
 
 	Restart();		// reinit for next use
 }

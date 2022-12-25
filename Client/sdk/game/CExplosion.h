@@ -11,8 +11,8 @@
 
 #pragma once
 
-class CEntity;
-class CVector;
+#include <CVector.h>
+#include "CEntity.h"
 
 enum eExplosionType
 {

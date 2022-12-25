@@ -10,12 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CObjectSyncPacket.h"
-#include <net/SyncStructures.h>
 
 CObjectSyncPacket::~CObjectSyncPacket()
 {
-    std::vector<SyncData*>::const_iterator iter = m_Syncs.begin();
+    vector<SyncData*>::const_iterator iter = m_Syncs.begin();
     for (; iter != m_Syncs.end(); ++iter)
     {
         delete *iter;
@@ -82,8 +80,8 @@ bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
 
 bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    bool                                   bSent = false;
-    std::vector<SyncData*>::const_iterator iter = m_Syncs.begin();
+    bool                              bSent = false;
+    vector<SyncData*>::const_iterator iter = m_Syncs.begin();
     // Write syncs
     for (; iter != m_Syncs.end(); ++iter)
     {

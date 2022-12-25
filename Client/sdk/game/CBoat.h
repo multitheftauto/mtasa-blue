@@ -13,8 +13,6 @@
 
 #include "CVehicle.h"
 
-class CBoatHandlingEntry;
-
 class CBoat : public virtual CVehicle
 {
 public:

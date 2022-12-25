@@ -1,5 +1,5 @@
 /* infback.c -- inflate using a call-back interface
- * Copyright (C) 1995-2022 Mark Adler
+ * Copyright (C) 1995-2016 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -66,7 +66,6 @@ int stream_size;
     state->window = window;
     state->wnext = 0;
     state->whave = 0;
-    state->sane = 1;
     return Z_OK;
 }
 
@@ -478,7 +477,6 @@ void FAR *out_desc;
             }
             Tracev((stderr, "inflate:       codes ok\n"));
             state->mode = LEN;
-                /* fallthrough */
 
         case LEN:
             /* use inflate_fast() if we have enough input and output */
@@ -606,27 +604,25 @@ void FAR *out_desc;
             break;
 
         case DONE:
-            /* inflate stream terminated properly */
+            /* inflate stream terminated properly -- write leftover output */
             ret = Z_STREAM_END;
+            if (left < state->wsize) {
+                if (out(out_desc, state->window, state->wsize - left))
+                    ret = Z_BUF_ERROR;
+            }
             goto inf_leave;
 
         case BAD:
             ret = Z_DATA_ERROR;
             goto inf_leave;
 
-        default:
-            /* can't happen, but makes compilers happy */
+        default:                /* can't happen, but makes compilers happy */
             ret = Z_STREAM_ERROR;
             goto inf_leave;
         }
 
-    /* Write leftover output and return unused input */
+    /* Return unused input */
   inf_leave:
-    if (left < state->wsize) {
-        if (out(out_desc, state->window, state->wsize - left) &&
-            ret == Z_STREAM_END)
-            ret = Z_BUF_ERROR;
-    }
     strm->next_in = next;
     strm->avail_in = have;
     return ret;

@@ -11,13 +11,11 @@
 
 #pragma once
 
-#include <CVector.h>
-#include <game/CPed.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <game/TaskBasic.h>
-#include "TaskSA.h"
 
-class CVehicleSAInterface;
-class CObjectSAInterface;
+#include "TaskSA.h"
 
 #define FUNC_CTaskComplexUseMobilePhone__Constructor        0x6348A0
 #define FUNC_CTaskSimpleRunAnim__Constructor                0x61A900
@@ -204,7 +202,7 @@ public:
     CAnimBlock*    m_pSunbatheAnimBlock;
     int            m_BeachAnimBlockIndex;
     int            m_SunbatheAnimBlockIndex;
-    CObjectSAInterface* m_pTowel;
+    CObject*       m_pTowel;
 };
 
 class CTaskComplexSunbatheSA : public virtual CTaskComplexSA, public virtual CTaskComplexSunbathe

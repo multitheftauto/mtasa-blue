@@ -13,9 +13,6 @@
 #include "CLuaDefs.h"
 #include "lua/CLuaFunctionParser.h"
 
-#include <SharedUtil.SysInfo.h>
-#include <SharedUtil.SysInfo.hpp>
-
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
@@ -217,12 +214,11 @@ int CLuaDrawingDefs::DxDrawLine3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 {
-    //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, [bool flipUV,] element material, int width [,
-    //  int color = white,
+    //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, element material, int width [, int color =
+    //  white,
     //                          float faceX, float faceY, float faceZ ] )
     CVector          vecBegin;
     CVector          vecEnd;
-    bool             bFlipUV;
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
@@ -233,7 +229,6 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecBegin);
     argStream.ReadVector3D(vecEnd);
-    argStream.ReadIfNextIsBool(bFlipUV, false);
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
@@ -246,8 +241,8 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bFlipUV,
-                                                         bUseFaceToward, vecFaceToward, bPostGUI);
+        g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), 0, 0, 1, 1, true, bUseFaceToward,
+                                                         vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -263,12 +258,11 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
 {
     //  bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float
     //  vsize,
-    //                                  [bool flipUV,] element material, int width, [int color = white, float faceX, float faceY, float faceZ ] )
+    //                                  element material, int width, [ int color = white, float faceX, float faceY, float faceZ ] )
     CVector          vecBegin;
     CVector          vecEnd;
     CVector2D        vecSectionPos;
     CVector2D        vecSectionSize;
-    bool             bFlipUV;
     CClientMaterial* pMaterial;
     float            fWidth;
     SColor           color;
@@ -281,7 +275,6 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     argStream.ReadVector3D(vecEnd);
     argStream.ReadVector2D(vecSectionPos);
     argStream.ReadVector2D(vecSectionSize);
-    argStream.ReadIfNextIsBool(bFlipUV, false);
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
@@ -295,7 +288,7 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         g_pCore->GetGraphics()->DrawMaterialLine3DQueued(vecBegin, vecEnd, fWidth, color, pMaterial->GetMaterialItem(), vecSectionPos.fX, vecSectionPos.fY,
-                                                         vecSectionSize.fX, vecSectionSize.fY, false, bFlipUV, bUseFaceToward, vecFaceToward, bPostGUI);
+                                                         vecSectionSize.fX, vecSectionSize.fY, false, bUseFaceToward, vecFaceToward, bPostGUI);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -329,7 +322,6 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
     bool               bSubPixelPositioning;
     float              fRotation;
     CVector2D          vecRotationOrigin;
-    float              fLineHeight;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strText);
@@ -367,7 +359,6 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
     argStream.ReadBool(bSubPixelPositioning, false);
     argStream.ReadNumber(fRotation, 0);
     argStream.ReadVector2D(vecRotationOrigin, CVector2D((vecTopLeft.fX + vecBottomRight.fX) * 0.5f, (vecTopLeft.fY + vecBottomRight.fY) * 0.5f));
-    argStream.ReadNumber(fLineHeight, 0);
 
     if (!argStream.HasErrors())
     {
@@ -383,8 +374,7 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
             ulFormat |= DT_NOCLIP;
 
         g_pCore->GetGraphics()->DrawStringQueued(vecTopLeft.fX, vecTopLeft.fY, vecBottomRight.fX, vecBottomRight.fY, color, strText, fScaleX, fScaleY, ulFormat,
-                                                 pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY,
-                                                 fLineHeight);
+                                                 pD3DXFont, bPostGUI, bColorCoded, bSubPixelPositioning, fRotation, vecRotationOrigin.fX, vecRotationOrigin.fY);
 
         lua_pushboolean(luaVM, true);
         return 1;
@@ -966,12 +956,12 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
     //  element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
     SString         strFilePath;
     CPixels         pixels;
-    int             width = 0;
-    int             height = 0;
+    int             width;
+    int             height;
     ERenderFormat   renderFormat;
-    bool            bMipMaps = true;
+    bool            bMipMaps;
     ETextureAddress textureAddress;
-    ETextureType    textureType = TTYPE_TEXTURE;
+    ETextureType    textureType;
     int             depth = 1;
 
     CScriptArgReader argStream(luaVM);
@@ -1358,7 +1348,7 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
         else if (argStream.NextCouldBeNumber())
         {
             // float(s)
-            float fBuffer[16]{};
+            float fBuffer[16];
             uint  i;
             for (i = 0; i < NUMELMS(fBuffer);)
             {
@@ -1373,7 +1363,7 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
         else if (argStream.NextIsTable())
         {
             // table (of floats)
-            float fBuffer[16]{};
+            float fBuffer[16];
             uint  i = 0;
 
             lua_pushnil(luaVM);            // Loop through our table, beginning at the first key
@@ -1711,23 +1701,6 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_pushstring(luaVM, "SettingHighDetailPeds");
         lua_pushboolean(luaVM, dxStatus.settings.bHighDetailPeds);
         lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "SettingBlur");
-        lua_pushboolean(luaVM, dxStatus.settings.bBlur);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "SettingCoronaReflections");
-        lua_pushboolean(luaVM, dxStatus.settings.bCoronaReflections);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "SettingDynamicPedShadows");
-        lua_pushboolean(luaVM, dxStatus.settings.bDynamicPedShadows);
-        lua_settable(luaVM, -3);
-
-        lua_pushstring(luaVM, "TotalPhysicalMemory");
-        lua_pushnumber(luaVM, static_cast<lua_Number>(SharedUtil::GetWMITotalPhysicalMemory()) / 1024.0 / 1024.0);
-        lua_settable(luaVM, -3);
-
         return 1;
     }
     else
@@ -2051,7 +2024,7 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
                                         const std::optional<float> lineWidth, const std::optional<unsigned int> iterations)
 {
     // Greater than 4, crash the game
-    if (iterations.has_value() && (*iterations == 0 || *iterations > 4))
+    if (iterations == 0 || iterations > 4)
         throw std::invalid_argument("Iterations must be between 1 and 4");
 
     if (!color)

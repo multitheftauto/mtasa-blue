@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CConnectHistory.h"
 
 CConnectHistory::CConnectHistory(unsigned long ulMaxConnections, unsigned long ulSamplePeriod, unsigned long ulBanLength)
 {
@@ -22,7 +21,7 @@ CConnectHistory::CConnectHistory(unsigned long ulMaxConnections, unsigned long u
 }
 
 // Add flood candidate connection attempt and return true if flooding is occurring
-bool CConnectHistory::AddConnect(const std::string& strIP)
+bool CConnectHistory::AddConnect(const string& strIP)
 {
     // See if banned first
     if (IsFlooding(strIP))
@@ -37,7 +36,7 @@ bool CConnectHistory::AddConnect(const std::string& strIP)
 }
 
 // Check if IP is currently flooding
-bool CConnectHistory::IsFlooding(const std::string& strIP)
+bool CConnectHistory::IsFlooding(const string& strIP)
 {
     // Delete the expired entries
     RemoveExpired();
@@ -60,7 +59,7 @@ bool CConnectHistory::IsFlooding(const std::string& strIP)
     return false;
 }
 
-CConnectHistoryItem& CConnectHistory::GetHistoryItem(const std::string& strIP)
+CConnectHistoryItem& CConnectHistory::GetHistoryItem(const string& strIP)
 {
     // Find existing
     HistoryItemMap::iterator iter = m_HistoryItemMap.find(strIP);

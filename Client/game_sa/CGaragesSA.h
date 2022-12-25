@@ -14,8 +14,6 @@
 #include <game/CGarages.h>
 #include "CGarageSA.h"
 
-#define CLASS_CGarages 0x96C048
-
 class CGaragesSAInterface
 {
 public:

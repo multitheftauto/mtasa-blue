@@ -1,14 +1,14 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  PURPOSE:     Support for profiler sections
+ *  FILE:
+ *  PURPOSE:
  *
  *
- *  Multi Theft Auto is available from https://multitheftauto.com/
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
 #pragma once
 
 //
@@ -19,7 +19,10 @@
 //
 //
 
-#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNSTABLE && defined(_DECLARE_PROFILER_SECTION)
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNSTABLE
+    #ifndef _DECLARE_PROFILER_SECTION
+        #error Test plugin missing
+    #endif
     #define DECLARE_PROFILER_SECTION(tag) \
         _DECLARE_PROFILER_SECTION(__FILE__, tag)
 #else

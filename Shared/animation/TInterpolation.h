@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include "CEasingCurve.h"
-
 template <typename T>
 class TInterpolation
 {

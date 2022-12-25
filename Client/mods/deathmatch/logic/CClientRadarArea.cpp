@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include <game/CRadar.h>
 
 CClientRadarArea::CClientRadarArea(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {

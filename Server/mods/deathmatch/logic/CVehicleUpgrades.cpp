@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVehicleUpgrades.h"
 
 char szUpgradeNameEmpty[] = "";
 

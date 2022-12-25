@@ -10,11 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "ASE.h"
-#include "version.h"
-#include "CLanBroadcast.h"
-#include "CPlayerManager.h"
-#include "CMainConfig.h"
 
 extern "C"
 {

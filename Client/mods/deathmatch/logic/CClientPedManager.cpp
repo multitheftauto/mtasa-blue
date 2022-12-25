@@ -9,7 +9,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CWeapon.h>
 
 using std::list;
 using std::vector;
@@ -51,6 +50,7 @@ void CClientPedManager::DoPulse(bool bDoStandardPulses)
         pPed->StreamedInPulse(bDoStandardPulses);
     }
 }
+
 
 CClientPed* CClientPedManager::Get(ElementID ID, bool bCheckPlayers)
 {
@@ -129,8 +129,9 @@ void CClientPedManager::RestreamPeds(unsigned short usModel)
 
 void CClientPedManager::RestreamAllPeds()
 {
-    for (auto& pPed : m_List)
+    for (auto& pPed: m_List)
     {
+
         // Streamed in and same vehicle ID?
         if (pPed->IsStreamedIn())
         {

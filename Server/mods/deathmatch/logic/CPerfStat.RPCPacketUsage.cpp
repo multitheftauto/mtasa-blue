@@ -10,9 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPerfStatManager.h"
-#include "CRPCFunctions.h"
-#include <net/rpc_enums.h>
 
 DECLARE_ENUM(eElementRPCFunctions);
 IMPLEMENT_ENUM_BEGIN(eElementRPCFunctions)

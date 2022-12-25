@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CCommandPacket.h"
 
 bool CCommandPacket::Read(NetBitStreamInterface& BitStream)
 {

@@ -10,10 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CAERadioTrackManagerSA.h"
 
 BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
 {
+    DEBUG_TRACE("BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()");
     DWORD dwFunc = FUNC_GetCurrentRadioStationID;
     BYTE  bReturn = 0;
     _asm
@@ -28,6 +28,7 @@ BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
 
 BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
 {
+    DEBUG_TRACE("BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()");
     DWORD dwFunc = FUNC_IsVehicleRadioActive;
     BYTE  bReturn = 0;
     _asm
@@ -42,6 +43,7 @@ BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
 
 char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
 {
+    DEBUG_TRACE("char * CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)");
     DWORD dwFunc = FUNC_GetRadioStationName;
     char* cReturn = 0;
     DWORD dwStationID = bStationID;
@@ -56,10 +58,11 @@ char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
     return cReturn;
 }
 
-bool CAERadioTrackManagerSA::IsRadioOn()
+BOOL CAERadioTrackManagerSA::IsRadioOn()
 {
+    DEBUG_TRACE("BOOL CAERadioTrackManagerSA::IsRadioOn()");
     DWORD dwFunc = FUNC_IsRadioOn;
-    bool  bReturn = false;
+    BYTE  bReturn = 0;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -70,8 +73,9 @@ bool CAERadioTrackManagerSA::IsRadioOn()
     return bReturn;
 }
 
-void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
+VOID CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
 {
+    DEBUG_TRACE("VOID CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)");
     DWORD dwFunc = FUNC_SetBassSetting;
     _asm
     {
@@ -82,8 +86,9 @@ void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
     }
 }
 
-void CAERadioTrackManagerSA::Reset()
+VOID CAERadioTrackManagerSA::Reset()
 {
+    DEBUG_TRACE("VOID CAERadioTrackManagerSA::Reset()");
     DWORD dwFunc = FUNC_Reset;
     _asm
     {
@@ -92,8 +97,9 @@ void CAERadioTrackManagerSA::Reset()
     }
 }
 
-void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
+VOID CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
 {
+    DEBUG_TRACE("VOID CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)");
     DWORD dwFunc = FUNC_StartRadio;
     DWORD dwStationID = bStationID;
     DWORD dwUnknown = bUnknown;

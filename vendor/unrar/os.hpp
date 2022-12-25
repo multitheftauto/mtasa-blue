@@ -36,11 +36,12 @@
 // re-definition warnings in third party projects.
 #ifndef UNICODE
 #define UNICODE
-#define _UNICODE // Set _T() macro to convert from narrow to wide strings.
 #endif
 
-#define WINVER _WIN32_WINNT_WINXP
-#define _WIN32_WINNT _WIN32_WINNT_WINXP
+#undef WINVER
+#undef _WIN32_WINNT
+#define WINVER 0x0501
+#define _WIN32_WINNT 0x0501
 
 #if !defined(ZIPSFX)
 #define RAR_SMP
@@ -78,11 +79,8 @@
   #include <direct.h>
   #include <intrin.h>
 
-  // Use SSE only for x86/x64, not ARM Windows.
-  #if defined(_M_IX86) || defined(_M_X64)
-    #define USE_SSE
-    #define SSE_ALIGNMENT 16
-  #endif
+  #define USE_SSE
+  #define SSE_ALIGNMENT 16
 #else
   #include <dirent.h>
 #endif // _MSC_VER
@@ -214,8 +212,7 @@
   #endif
 #endif
 
-// Unlike Apple x64, utimensat shall be available in all Apple M1 systems.
-#if _POSIX_C_SOURCE >= 200809L || defined(__APPLE__) && defined(__arm64__)
+#if _POSIX_C_SOURCE >= 200809L
   #define UNIX_TIME_NS // Nanosecond time precision in Unix.
 #endif
 

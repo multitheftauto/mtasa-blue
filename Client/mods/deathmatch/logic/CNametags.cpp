@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CColPoint.h>
 
 using std::list;
 

@@ -10,23 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CPlayer.h"
-#include "CElementRefManager.h"
-#include "CGame.h"
-#include "ASE.h"
-#include "CMapManager.h"
-#include "CPlayerCamera.h"
-#include "CKeyBinds.h"
-#include "CPerfStatManager.h"
-#include "CTickRateSettings.h"
-#include "CBandwidthSettings.h"
-#include "CUnoccupiedVehicleSync.h"
-#include "CScriptDebugging.h"
-#include "packets/CConsoleEchoPacket.h"
-#include "packets/CChatEchoPacket.h"
-#include "CWeaponStatManager.h"
-#include "Utils.h"
-#include "CSpatialDatabase.h"
 #include "net/SimHeaders.h"
 
 extern CGame* g_pGame;
@@ -232,7 +215,7 @@ bool CPlayer::UnsubscribeElementData(CElement* pElement)
 {
     bool erased = false;
 
-    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end();)
+    for (auto it = m_DataSubscriptions.begin(); it != m_DataSubscriptions.end(); )
     {
         if (it->first == pElement)
         {
@@ -313,7 +296,7 @@ uint CPlayer::Send(const CPacket& Packet)
         if (Packet.Write(*pBitStream))
         {
             uiBitsSent = pBitStream->GetNumberOfBitsUsed();
-            g_pGame->SendPacket(Packet.GetPacketID(), m_PlayerSocket, pBitStream, false, packetPriority, Reliability, Packet.GetPacketOrdering());
+            g_pGame->SendPacket(Packet.GetPacketID(), m_PlayerSocket, pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering());
         }
 
         // Destroy the bitstream
@@ -324,7 +307,7 @@ uint CPlayer::Send(const CPacket& Packet)
 
 void CPlayer::SendEcho(const char* szEcho)
 {
-    Send(CChatEchoPacket(szEcho, CHATCOLOR_MESSAGE, false, MESSAGE_TYPE_INTERNAL));
+    Send(CChatEchoPacket(szEcho, CHATCOLOR_MESSAGE));
 }
 
 void CPlayer::SendConsole(const char* szEcho)

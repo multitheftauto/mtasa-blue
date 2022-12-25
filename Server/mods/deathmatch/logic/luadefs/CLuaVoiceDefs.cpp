@@ -10,8 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaVoiceDefs.h"
-#include "CScriptArgReader.h"
 
 void CLuaVoiceDefs::LoadFunctions()
 {

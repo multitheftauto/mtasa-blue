@@ -11,15 +11,14 @@
 
 #pragma once
 
+enum eWeaponType;
+enum ePedPieceTypes;
 class CEntity;
+typedef unsigned long AssocGroupId;
+typedef unsigned long AnimationId;
 class CEventDamageSAInterface;
 class CPed;
 class CPedDamageResponse;
-enum ePedPieceTypes;
-enum eWeaponType;
-
-typedef unsigned long AnimationId;
-typedef unsigned long AssocGroupId;
 
 namespace EDamageReason
 {

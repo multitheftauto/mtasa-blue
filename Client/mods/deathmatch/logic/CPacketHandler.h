@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <filesystem>
 #include <CClientCommon.h>
 
 class CClientEntity;

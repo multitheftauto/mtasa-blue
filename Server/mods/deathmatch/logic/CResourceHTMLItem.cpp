@@ -13,12 +13,6 @@
 // This parses it and converts into into a script
 
 #include "StdInc.h"
-#include "CResourceHTMLItem.h"
-#include "CResource.h"
-#include "CGame.h"
-#include "CMapManager.h"
-#include "lua/CLuaArguments.h"
-#include <core/CServerInterface.h>
 
 extern CServerInterface* g_pServerInterface;
 extern CGame*            g_pGame;
@@ -126,8 +120,8 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
         args.PushString(ipoHttpRequest->sOriginalUri.c_str());            // url
         args.PushTable(&querystring);                                     // querystring
         args.PushAccount(account);
-        args.PushString(ipoHttpRequest->sBody);            // requestBody
-        args.PushString(sMethod);                          // method
+        args.PushString(ipoHttpRequest->sBody);                           // requestBody
+        args.PushString(sMethod);                                         // method
 
         // g_pGame->Lock(); // get the mutex (blocking)
         args.CallGlobal(m_pVM, "renderPage");
@@ -299,8 +293,6 @@ bool CResourceHTMLItem::Start()
              fclose ( debug );*/
 
         m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(m_resource, m_bOOPEnabled);
-        m_pVM->LoadEmbeddedScripts();
-        m_pVM->RegisterModuleFunctions();
         m_pVM->LoadScript(strScript.c_str());
         m_pVM->SetResourceFile(this);
         m_pVM->RegisterHTMLDFunctions();
@@ -343,8 +335,6 @@ void CResourceHTMLItem::GetMimeType(const char* szFilename)
             m_strMime = "image/jpg";
         else if (strcmp(pExtn, "js") == 0)
             m_strMime = "text/javascript";
-        else if (strcmp(pExtn, "map") == 0)
-            m_strMime = "application/json";
         else
             m_strMime = "text/html";
     }

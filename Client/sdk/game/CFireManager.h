@@ -11,16 +11,17 @@
 
 #pragma once
 
-class CFire;
-class CVector;
+#include <CVector.h>
+#include "CFire.h"
+#include "CEntity.h"
 
 class CFireManager
 {
 public:
-    virtual void ExtinguishPoint(CVector& vecPosition, float fRadius) = 0;
+    virtual VOID ExtinguishPoint(CVector& vecPosition, float fRadius) = 0;
     // doesn't work, use below instead
     // virtual CFire                 * StartFire ( CEntity * entityTarget, CEntity * entityCreator, float fSize )=0;
     virtual CFire* StartFire(CVector& vecPosition, float fSize) = 0;
-    virtual void   ExtinguishAllFires() = 0;
+    virtual VOID   ExtinguishAllFires() = 0;
     virtual CFire* GetFire(DWORD ID) = 0;
 };

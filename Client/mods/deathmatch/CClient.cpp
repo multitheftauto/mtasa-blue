@@ -49,7 +49,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->SetOfflineMod(false);
 
     // HACK FOR CHATBOX NOT VISIBLE. WILL CAUSE SAVING CHATBOX STATE NOT TO WORK
-    g_pCore->SetChatVisible(true, false);
+    g_pCore->SetChatVisible(true);
 
     // Register our local commands
     g_pCore->GetCommands()->SetExecuteHandler(COMMAND_Executed);
@@ -128,7 +128,6 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->GetCommands()->Add("debug2", "debug function 2", COMMAND_Debug2);
     pCore->GetCommands()->Add("debug3", "debug function 3", COMMAND_Debug3);
     pCore->GetCommands()->Add("debug4", "debug function 4", COMMAND_Debug4);
-    pCore->GetCommands()->Add("timestep", "timestep", COMMAND_TimeStep);
 #endif
 
     // Got any arguments?
@@ -178,8 +177,11 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
                     // g_pClientGame->EnablePacketRecorder ( "log.rec" );
                     // g_pCore->GetConsole ()->Echo ( "Packetlogger is logging to log.rec" );
 
+                    SString secret = g_pCore->GetDiscordManager()->GetJoinSecret();
+
                     // Start the game
-                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str());
+                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str(), CClientGame::SERVER_TYPE_NORMAL,
+                                             *secret);
                 }
                 else
                 {
@@ -314,9 +316,9 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
     }
 }
 
-void CClient::OnWindowFocusChange(bool state)
+void CClient::TriggerDiscordJoin(SString strSecret)
 {
-    g_pClientGame->OnWindowFocusChange(state);
+    g_pClientGame->TriggerDiscordJoin(strSecret);
 }
 
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)

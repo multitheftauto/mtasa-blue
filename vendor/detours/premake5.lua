@@ -28,5 +28,5 @@ project "detours"
     filter "system:not windows"
         flags { "ExcludeFromBuild" }
 
-    filter "architecture:not x86"
+    filter "architecture:x64"
         flags { "ExcludeFromBuild" }

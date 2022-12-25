@@ -10,21 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "Utils.h"
 
 #ifndef MTA_CLIENT
-    #include "CGame.h"
-    #include "packets/CPlayerDisconnectedPacket.h"
-    #include "net/SyncStructures.h"
+#include "net/SyncStructures.h"
 
-    #include <sys/types.h>  // For stat().
-    #include <sys/stat.h>   // For stat().
-
-    #ifndef WIN32
-        #include <sys/socket.h>
-        #include <netinet/in.h>
-        #include <arpa/inet.h>
-    #endif
+#include <sys/types.h>  // For stat().
+#include <sys/stat.h>   // For stat().
 #endif
 
 #ifdef MTA_CLIENT
@@ -168,7 +159,7 @@ void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector&
 
 void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
 {
-    in_addr in{};
+    in_addr in;
     in.s_addr = ulIP;
     char* szTemp = inet_ntoa(in);
     if (szTemp)
@@ -436,61 +427,74 @@ SString GetDataUnit(unsigned long long ullInput)
 }
 
 #ifdef MTA_DEBUG
-struct ReleaseVirtualMemory
+HMODULE RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 {
-    HANDLE process;
-
-    ReleaseVirtualMemory(HANDLE process_) : process(process_) {}
-
-    void operator()(void* p) const noexcept
+    /* Called correctly? */
+    if (szLibPath == NULL)
     {
-        if (p)
-            VirtualFreeEx(process, p, 0, MEM_RELEASE);
+        return 0;
     }
-};
 
-using VirtualMemoryScope = std::unique_ptr<void, ReleaseVirtualMemory>;
+    /* Allocate memory in the remote process for the library path */
+    HANDLE  hThread = 0;
+    void*   pLibPathRemote = NULL;
+    HMODULE hKernel32 = GetModuleHandle("Kernel32");
+    pLibPathRemote = VirtualAllocEx(hProcess, NULL, strlen(szLibPath) + 1, MEM_COMMIT, PAGE_READWRITE);
 
-bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
-{
-    if (!szLibPath || !szLibPath[0])
-        return false;
+    if (pLibPathRemote == NULL)
+    {
+        DWORD dwError = GetLastError();
+        return 0;
+    }
 
-    HMODULE kernel32 = GetModuleHandleA("kernel32");
+    /* Make sure pLibPathRemote is always freed */
+    __try
+    {
+        /* Write the DLL library path to the remote allocation */
+        DWORD byteswritten = 0;
+        WriteProcessMemory(hProcess, pLibPathRemote, (void*)szLibPath, strlen(szLibPath) + 1, &byteswritten);
 
-    if (!kernel32)
-        return false;
+        if (byteswritten != strlen(szLibPath) + 1)
+        {
+            return 0;
+        }
 
-    // Allocate memory in the remote process for the library path
-    size_t libraryPathSize = strlen(szLibPath) + 1;
-    void*  remoteLibraryPath = VirtualAllocEx(hProcess, nullptr, libraryPathSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+        /* Start a remote thread executing LoadLibraryA exported from Kernel32. Passing the
+           remotly allocated path buffer as an argument to that thread (and also to LoadLibraryA)
+           will make the remote process load the DLL into it's userspace (giving the DLL full
+           access to the game executable).*/
+        hThread =
+            CreateRemoteThread(hProcess, NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(GetProcAddress(hKernel32, "LoadLibraryA")), pLibPathRemote, 0, NULL);
 
-    if (!remoteLibraryPath)
-        return false;
+        if (hThread == 0)
+        {
+            return 0;
+        }
+    }
+    __finally
+    {
+        VirtualFreeEx(hProcess, pLibPathRemote, strlen(szLibPath) + 1, MEM_RELEASE);
+    }
 
-    VirtualMemoryScope remoteMemory(remoteLibraryPath, ReleaseVirtualMemory{hProcess});
+    /*  We wait for the created remote thread to finish executing. When it's done, the DLL
+        is loaded into the game's userspace, and we can destroy the thread-handle. We wait
+        5 seconds which is way longer than this should take to prevent this application
+        from deadlocking if something goes really wrong allowing us to kill the injected
+        game executable and avoid user inconvenience.*/
+    WaitForSingleObject(hThread, INFINITE);
 
-    // Write the DLL library path to the remote allocation
-    DWORD byteswritten = 0;
-    WriteProcessMemory(hProcess, remoteLibraryPath, static_cast<LPCVOID>(szLibPath), libraryPathSize, &byteswritten);
+    /* Get the handle of the remotely loaded DLL module */
+    DWORD hLibModule = 0;
+    GetExitCodeThread(hProcess, &hLibModule);
 
-    if (byteswritten != libraryPathSize)
-        return false;
+    // Wait for the LoadLibrary thread to finish
+    WaitForSingleObject(hThread, INFINITE);
 
-    // Start a remote thread executing LoadLibraryA exported from Kernel32. Passing the
-    // remotely allocated path buffer as an argument to that thread (and also to LoadLibraryA)
-    // will make the remote process load the DLL into it's userspace (giving the DLL full
-    // access to the game executable).
-    HANDLE remoteThread = CreateRemoteThread(
-        hProcess, nullptr, 0, static_cast<LPTHREAD_START_ROUTINE>(static_cast<void*>(GetProcAddress(kernel32, "LoadLibraryA"))), remoteLibraryPath, 0, nullptr);
+    /* Clean up the resources we used to inject the DLL */
+    VirtualFreeEx(hProcess, pLibPathRemote, strlen(szLibPath) + 1, MEM_RELEASE);
 
-    if (!remoteThread)
-        return false;
-
-    // We wait for the created remote thread to finish executing. When it's done, the DLL
-    // is loaded into the game's userspace, and we can destroy the thread-handle.
-    WaitForSingleObject(remoteThread, INFINITE);
-    return true;
+    /* Success */
+    return (HINSTANCE)(1);
 }
 
 #endif
@@ -610,7 +614,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         if (uiLength >= 4 && szColor[4] == 0)
         {
             // Make a RRGGBBAA string
-            unsigned char szTemp[12]{};
+            unsigned char szTemp[12];
             szTemp[0] = 'F';
             szTemp[1] = 'F';
             szTemp[2] = szColor[3];
@@ -631,7 +635,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         else if (uiLength >= 5 && szColor[5] == 0)
         {
             // Make a RRGGBBAA string
-            unsigned char szTemp[12]{};
+            unsigned char szTemp[12];
             szTemp[0] = szColor[4];
             szTemp[1] = szColor[4];
             szTemp[2] = szColor[3];
@@ -652,7 +656,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         else if (uiLength >= 7 && szColor[7] == 0)
         {
             // Make a RRGGBBAA string
-            unsigned char szTemp[12]{};
+            unsigned char szTemp[12];
             szTemp[0] = 'F';
             szTemp[1] = 'F';
             szTemp[2] = szColor[5];
@@ -673,7 +677,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         else if (uiLength >= 9 && szColor[9] == 0)
         {
             // Copy the string without the pre-#
-            unsigned char szTemp[12]{};
+            unsigned char szTemp[12];
             szTemp[0] = szColor[7];
             szTemp[1] = szColor[8];
             szTemp[2] = szColor[5];
@@ -764,7 +768,7 @@ bool ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& 
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;
@@ -819,7 +823,7 @@ bool ReadFullKeysync(CControllerState& ControllerState, NetBitStreamInterface& B
             sButtonSquare = (short)keys.data.ucButtonSquare;            // override controller state with analog data if present
 
         if (keys.data.ucButtonCross != 0)
-            sButtonCross = (short)keys.data.ucButtonCross;            // override controller state with analog data if present
+            sButtonCross = (short)keys.data.ucButtonCross;              // override controller state with analog data if present
     }
     ControllerState.ButtonSquare = sButtonSquare;
     ControllerState.ButtonCross = sButtonCross;

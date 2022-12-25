@@ -83,7 +83,6 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     if (m_pLuaVM)
     {
         m_pLuaVM->SetScriptName(szResourceName);
-        m_pLuaVM->LoadEmbeddedScripts();
     }
 }
 
@@ -266,15 +265,15 @@ void CResource::Load()
         }
     }
 
-    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front()) {
+    // Load the no cache scripts first
+    for (std::list<SNoClientCacheScript>::iterator iter = m_NoClientCacheScriptList.begin(); iter != m_NoClientCacheScriptList.end(); ++iter)
+    {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
-
-        auto& item = list.front();
+        const SNoClientCacheScript& item = *iter;
         GetVM()->LoadScriptFromBuffer(item.buffer.GetData(), item.buffer.GetSize(), item.strFilename);
-        item.buffer.ZeroClear();
-
         DECLARE_PROFILER_SECTION(OnPostLoadNoClientCacheScript)
     }
+    m_NoClientCacheScriptList.clear();
 
     // Load the files that are queued in the list "to be loaded"
     list<CResourceFile*>::iterator iter = m_ResourceFiles.begin();
@@ -325,20 +324,6 @@ void CResource::Load()
         CLuaArguments Arguments;
         Arguments.PushResource(this);
         m_pResourceEntity->CallEvent("onClientResourceStart", Arguments, true);
-
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-        if (pBitStream)
-        {
-            if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
-            {
-                // Write resource net ID
-                pBitStream->Write(GetNetID());
-
-                g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            }
-
-            g_pNet->DeallocateNetBitStream(pBitStream);
-        }
     }
     else
         assert(0);

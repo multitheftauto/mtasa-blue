@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <CMatrix.h>
-#include <game/CCamera.h>
 #include "CClientCommon.h"
 #include "CClientEntity.h"
 
@@ -62,12 +60,9 @@ public:
     void           SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoothTransition = false);
     void           SetFocus(CClientPlayer* pPlayer, eCamMode eMode, bool bSmoothTransition = false);
     void           SetFocusToLocalPlayer();
-    void           Reset();
 
-    void            SetCameraVehicleViewMode(eVehicleCamMode eMode);
-    void            SetCameraPedViewMode(ePedCamMode eMode);
-    eVehicleCamMode GetCameraVehicleViewMode();
-    ePedCamMode     GetCameraPedViewMode();
+    void            SetCameraViewMode(eVehicleCamMode eMode);
+    eVehicleCamMode GetCameraViewMode();
     void            SetCameraClip(bool bObjects, bool bVehicles);
     void            GetCameraClip(bool& bObjects, bool& bVehicles);
 

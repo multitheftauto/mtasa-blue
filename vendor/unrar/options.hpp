@@ -61,8 +61,7 @@ enum SAVECOPY_MODE {
 
 enum APPENDARCNAME_MODE
 {
-  APPENDARCNAME_NONE=0,APPENDARCNAME_DESTPATH,APPENDARCNAME_OWNSUBDIR,
-  APPENDARCNAME_OWNDIR
+  APPENDARCNAME_NONE=0,APPENDARCNAME_DESTPATH,APPENDARCNAME_OWNDIR
 };
 
 enum POWER_MODE {
@@ -116,11 +115,9 @@ class RAROptions
     RAR_CHARSET ErrlogCharset;
     RAR_CHARSET RedirectCharset;
 
-    wchar ArcPath[NM]; // For -ap<path>.
-    wchar ExclArcPath[NM]; // For -ep4<path> switch.
+    wchar ArcPath[NM];
     SecPassword Password;
     bool EncryptHeaders;
-    bool SkipEncrypted;
     
     bool ManualPassword; // Password entered manually during operation, might need to clean for next archive.
 
@@ -135,7 +132,6 @@ class RAROptions
     bool DisablePercentage;
     bool DisableCopyright;
     bool DisableDone;
-    bool DisableNames;
     bool PrintVersion;
     int Solid;
     int SolidCount;
@@ -150,7 +146,7 @@ class RAROptions
     Array<int64> NextVolSizes;
     uint CurVolNum;
     bool AllYes;
-    bool VerboseOutput; // -iv, display verbose output, used only in "WinRAR t" now.
+    bool MoreInfo; // -im, show more information, used only in "WinRAR t" now.
     bool DisableSortSolid;
     int ArcTime;
     int ConvertNames;
@@ -197,11 +193,7 @@ class RAROptions
     EXTTIME_MODE xctime;
     EXTTIME_MODE xatime;
     bool PreserveAtime;
-
-    // Read data from stdin and store in archive under a name specified here
-    // when archiving. Read an archive from stdin if any non-empty string
-    // is specified here when extracting.
-    wchar UseStdin[NM];
+    wchar CompressStdin[NM];
 
     uint Threads; // We use it to init hash even if RAR_SMP is not defined.
 

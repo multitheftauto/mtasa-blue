@@ -14,11 +14,11 @@
 #include <game/CPickup.h>
 #include "CObjectSA.h"
 
-class CObjectSAInterface;
-class CObjectSA;
-
 #define FUNC_GIVEUSAPICKUP      0x4567e0
 #define FUNC_CPickup_Remove     0x4556C0
+
+class CObjectSAInterface;
+class CObjectSA;
 
 class CPickupSAInterface
 {
@@ -44,31 +44,33 @@ class CPickupSA : public CPickup
 private:
     CPickupSAInterface* internalInterface;
     CObjectSA*          object;
+    CBPickup            callback;            // function to call when the pickup is picked up [not used yet/ever]
 public:
+    // constructor
     CPickupSA(CPickupSAInterface* pickupInterface);
     CPickupSAInterface* GetInterface() { return internalInterface; };            // not to be exported
     CObject*            GetObject() { return object; };
 
-    void     SetPosition(CVector* vecPosition);
+    VOID     SetPosition(CVector* vecPosition);
     CVector* GetPosition(CVector* vecPosition);
 
     ePickupType  GetType();
-    void         SetType(ePickupType type);
-    float        GetCurrentValue();
-    void         SetCurrentValue(float fCurrentValue);
-    void         SetRegenerationTime(DWORD dwTime);
-    void         SetMoneyPerDay(WORD wMoneyPerDay);
+    VOID         SetType(ePickupType type);
+    FLOAT        GetCurrentValue();
+    VOID         SetCurrentValue(FLOAT fCurrentValue);
+    VOID         SetRegenerationTime(DWORD dwTime);
+    VOID         SetMoneyPerDay(WORD wMoneyPerDay);
     WORD         GetMoneyPerDay();
     WORD         GetModel();
-    void         SetModel(WORD wModelIndex);            // do not export
+    VOID         SetModel(WORD wModelIndex);            // do not export
     ePickupState GetState();
-    void         SetState(ePickupState bState);
+    VOID         SetState(ePickupState bState);
     BYTE         GetAmmo();
-    void         SetAmmo(BYTE bAmmo);
+    VOID         SetAmmo(BYTE bAmmo);
     long         GetMonetaryValue();
-    void         SetMonetaryValue(long lMonetaryValue);
+    VOID         SetMonetaryValue(long lMonetaryValue);
     BYTE         IsNearby();
-    void         GiveUsAPickUpObject(int ForcedObjectIndex = -1);
-    void         GetRidOfObjects();
-    void         Remove();
+    VOID         GiveUsAPickUpObject(int ForcedObjectIndex = -1);
+    VOID         GetRidOfObjects();
+    VOID         Remove();
 };

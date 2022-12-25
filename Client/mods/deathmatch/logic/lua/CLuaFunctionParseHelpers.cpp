@@ -1,13 +1,14 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
+ *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.cpp
+ *  PURPOSE:
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CSettings.h>
 
 //
 // enum values <-> script strings
@@ -612,8 +613,8 @@ ADD_ENUM(SURFACE_PROPERTY_SOFTLANDING, "softlanding")
 // crash when enabling on surfaces without setting plants and trees
 // table at offset 0xC38070 contain information about which are read from plants.dat
 // i don't know did this will work on objects created by createObject function
-// ADD_ENUM(SURFACE_PROPERTY_CREATEOBJECTS, "createobjects")
-// ADD_ENUM(SURFACE_PROPERTY_CREATEPLANTS, "createplants")
+//ADD_ENUM(SURFACE_PROPERTY_CREATEOBJECTS, "createobjects")
+//ADD_ENUM(SURFACE_PROPERTY_CREATEPLANTS, "createplants")
 IMPLEMENT_ENUM_END("surface-property-type")
 
 IMPLEMENT_ENUM_BEGIN(eSurfaceAudio)
@@ -624,7 +625,7 @@ ADD_ENUM(SURFACE_AUDIO_GRAVEL, "gravel")
 ADD_ENUM(SURFACE_AUDIO_WOOD, "wood")
 ADD_ENUM(SURFACE_AUDIO_WATER, "water")
 ADD_ENUM(SURFACE_AUDIO_METAL, "metal")
-// ADD_ENUM(SURFACE_AUDIO_LONGGRASS, "longgrass") // same sound as grass
+//ADD_ENUM(SURFACE_AUDIO_LONGGRASS, "longgrass") // same sound as grass
 IMPLEMENT_ENUM_END("surface-audio-type")
 
 IMPLEMENT_ENUM_BEGIN(eSurfaceWheelEffect)
@@ -664,184 +665,7 @@ IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
 ADD_ENUM(eClientModelType::PED, "ped")
 ADD_ENUM(eClientModelType::OBJECT, "object")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
-ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
-
-// Sound effects
-IMPLEMENT_ENUM_BEGIN(eSoundEffectType)
-ADD_ENUM(BASS_FX_DX8_CHORUS, "chorus")
-ADD_ENUM(BASS_FX_DX8_COMPRESSOR, "compressor")
-ADD_ENUM(BASS_FX_DX8_DISTORTION, "distortion")
-ADD_ENUM(BASS_FX_DX8_ECHO, "echo")
-ADD_ENUM(BASS_FX_DX8_FLANGER, "flanger")
-ADD_ENUM(BASS_FX_DX8_GARGLE, "gargle")
-ADD_ENUM(BASS_FX_DX8_I3DL2REVERB, "i3dl2reverb")
-ADD_ENUM(BASS_FX_DX8_PARAMEQ, "parameq")
-ADD_ENUM(BASS_FX_DX8_REVERB, "reverb")
-IMPLEMENT_ENUM_END("soundeffect-type")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Chorus)
-ADD_ENUM(eSoundEffectParams::Chorus::WET_DRY_MIX, "wetDryMix")
-ADD_ENUM(eSoundEffectParams::Chorus::DEPTH, "depth")
-ADD_ENUM(eSoundEffectParams::Chorus::FEEDBACK, "feedback")
-ADD_ENUM(eSoundEffectParams::Chorus::FREQUENCY, "frequency")
-ADD_ENUM(eSoundEffectParams::Chorus::WAVEFORM, "waveform")
-ADD_ENUM(eSoundEffectParams::Chorus::DELAY, "delay")
-ADD_ENUM(eSoundEffectParams::Chorus::PHASE, "phase")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-chorus")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Compressor)
-ADD_ENUM(eSoundEffectParams::Compressor::GAIN, "gain")
-ADD_ENUM(eSoundEffectParams::Compressor::ATTACK, "attack")
-ADD_ENUM(eSoundEffectParams::Compressor::RELEASE, "release")
-ADD_ENUM(eSoundEffectParams::Compressor::THRESHOLD, "threshold")
-ADD_ENUM(eSoundEffectParams::Compressor::RATIO, "ratio")
-ADD_ENUM(eSoundEffectParams::Compressor::PREDELAY, "predelay")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-compressor")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Distortion)
-ADD_ENUM(eSoundEffectParams::Distortion::GAIN, "gain")
-ADD_ENUM(eSoundEffectParams::Distortion::EDGE, "edge")
-ADD_ENUM(eSoundEffectParams::Distortion::POST_EQ_CENTER_FREQUENCY, "postEQCenterFrequency")
-ADD_ENUM(eSoundEffectParams::Distortion::POST_EQ_BANDWIDTH, "postEQBandwidth")
-ADD_ENUM(eSoundEffectParams::Distortion::PRE_LOWPASS_CUTOFF, "preLowpassCutoff")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-distortion")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Echo)
-ADD_ENUM(eSoundEffectParams::Echo::WET_DRY_MIX, "wetDryMix")
-ADD_ENUM(eSoundEffectParams::Echo::FEEDBACK, "feedback")
-ADD_ENUM(eSoundEffectParams::Echo::LEFT_DELAY, "leftDelay")
-ADD_ENUM(eSoundEffectParams::Echo::RIGHT_DELAY, "rightDelay")
-ADD_ENUM(eSoundEffectParams::Echo::PAN_DELAY, "panDelay")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-echo")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Flanger)
-ADD_ENUM(eSoundEffectParams::Flanger::WET_DRY_MIX, "wetDryMix")
-ADD_ENUM(eSoundEffectParams::Flanger::DEPTH, "depth")
-ADD_ENUM(eSoundEffectParams::Flanger::FEEDBACK, "feedback")
-ADD_ENUM(eSoundEffectParams::Flanger::FREQUENCY, "frequency")
-ADD_ENUM(eSoundEffectParams::Flanger::WAVEFORM, "waveform")
-ADD_ENUM(eSoundEffectParams::Flanger::DELAY, "delay")
-ADD_ENUM(eSoundEffectParams::Flanger::PHASE, "phase")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-flanger")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Gargle)
-ADD_ENUM(eSoundEffectParams::Gargle::RATE_HZ, "rateHz")
-ADD_ENUM(eSoundEffectParams::Gargle::WAVE_SHAPE, "waveShape")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-gargle")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::I3DL2Reverb)
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::ROOM, "room")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::ROOM_HF, "roomHF")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::ROOM_ROLLOFF_FACTOR, "roomRolloffFactor")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DECAY_TIME, "decayTime")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DECAY_HF_RATIO, "decayHFRatio")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REFLECTIONS, "reflections")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REFLECTIONS_DELAY, "reflectionsDelay")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REVERB, "reverb")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::REVERB_DELAY, "reverbDelay")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DIFFUSION, "diffusion")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::DENSITY, "density")
-ADD_ENUM(eSoundEffectParams::I3DL2Reverb::HF_REFERENCE, "HFReference")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-i3dl2reverb")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::ParamEq)
-ADD_ENUM(eSoundEffectParams::ParamEq::CENTER, "center")
-ADD_ENUM(eSoundEffectParams::ParamEq::BANDWIDTH, "bandwidth")
-ADD_ENUM(eSoundEffectParams::ParamEq::GAIN, "gain")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-parameq")
-
-IMPLEMENT_ENUM_CLASS_BEGIN(eSoundEffectParams::Reverb)
-ADD_ENUM(eSoundEffectParams::Reverb::IN_GAIN, "inGain")
-ADD_ENUM(eSoundEffectParams::Reverb::REVERB_MIX, "reverbMix")
-ADD_ENUM(eSoundEffectParams::Reverb::REVERB_TIME, "reverbTime")
-ADD_ENUM(eSoundEffectParams::Reverb::HIGH_FREQ_RT_RATIO, "highFreqRTRatio")
-IMPLEMENT_ENUM_CLASS_END("soundeffect-params-reverb")
-
-//
-// CResource from userdata
-//
-CResource* UserDataCast(CResource* ptr, lua_State* luaState)
-{
-    return g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(ptr));
-}
-
-//
-// CXMLNode from userdata
-//
-CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState)
-{
-    return g_pCore->GetXML()->GetNodeFromID(reinterpret_cast<unsigned long>(ptr));
-}
-
-//
-// CLuaTimer from userdata
-//
-CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
-{
-    if (CLuaMain* luaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaState); luaMain)
-    {
-        return luaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
-    }
-
-    return nullptr;
-}
-
-//
-// CLuaVector2D from userdata
-//
-CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
-{
-    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
-// CLuaVector3D from userdata
-//
-CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
-{
-    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
-// CLuaVector4D from userdata
-//
-CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
-{
-    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
-// CLuaMatrix from userdata
-//
-CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
-{
-    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
-// CClientEntity from userdata
-//
-CClientEntity* UserDataToElementCast(CClientEntity* ptr, SharedUtil::ClassId classId, lua_State* luaState)
-{
-    CClientEntity* element = CElementIDs::GetElement(TO_ELEMENTID(ptr));
-
-    if (element == nullptr || element->IsBeingDeleted() || !element->IsA(classId))
-        return nullptr;
-
-    return element;
-}
-
-//
-// CRemoteCall from userdata
-//
-CRemoteCall* UserDataCast(CRemoteCall* ptr, lua_State* luaState)
-{
-    if (ptr && g_pClientGame->GetRemoteCalls()->CallExists(ptr))
-        return ptr;
-
-    return nullptr;
-}
 
 //
 // Get best guess at name of userdata type
@@ -849,7 +673,7 @@ CRemoteCall* UserDataCast(CRemoteCall* ptr, lua_State* luaState)
 SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
 {
     // Try element
-    if (CClientEntity* pClientElement = UserDataCast((CClientEntity*)ptr, nullptr))
+    if (CClientEntity* pClientElement = UserDataCast<CClientEntity>((CClientEntity*)NULL, ptr, NULL))
     {
         if (bFindElementType)
             // Try gui element first
@@ -861,19 +685,17 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
             return GetClassTypeName(pClientElement);
     }
 
-    if (auto* pVar = UserDataCast((CResource*)ptr, luaVM))            // Try resource
+    if (auto* pVar = UserDataCast<CResource>((CResource*)NULL, ptr, luaVM))            // Try resource
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))            // Try xml node
+    if (auto* pVar = UserDataCast<CXMLNode>((CXMLNode*)NULL, ptr, luaVM))            // Try xml node
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))            // Try timer
+    if (auto* pVar = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))            // Try 2D Vector
+    if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))            // Try 3D Vector
+    if (auto* pVar = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, ptr, luaVM))            // Try 3D Vector
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CRemoteCall*)ptr, luaVM))
+    if (auto* pVar = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, ptr, luaVM))
         return GetClassTypeName(pVar);
 
     return "";

@@ -10,12 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CAccessControlListGroup.h"
-#include "CAccessControlList.h"
-#include "CAccessControlListManager.h"
-#include "CGame.h"
-#include "CIdArray.h"
-#include "Utils.h"
 
 CAccessControlListGroup::CAccessControlListGroup(const char* szGroupName)
 {

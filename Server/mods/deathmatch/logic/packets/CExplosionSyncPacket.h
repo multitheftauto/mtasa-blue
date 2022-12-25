@@ -46,7 +46,4 @@ public:
     ElementID     m_OriginID;
     CVector       m_vecPosition;
     unsigned char m_ucType;
-
-    bool m_isVehicleResponsible = false;
-    bool m_blowVehicleWithoutExplosion = false;
 };

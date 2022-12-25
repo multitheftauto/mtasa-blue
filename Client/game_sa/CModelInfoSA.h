@@ -11,14 +11,13 @@
 
 #pragma once
 
-#include <game/Common.h>
 #include <game/CModelInfo.h>
-#include "CRenderWareSA.h"
+#include <game/Common.h>
 
+#include "CColModelSA.h"
+#include "CRenderWareSA.h"
 class CPedModelInfoSA;
 class CPedModelInfoSAInterface;
-struct CColModelSAInterface;
-struct RpMaterial;
 
 #define     RpGetFrame(__c)                 ((RwFrame*)(((RwObject *)(__c))->parent))
 
@@ -56,13 +55,20 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define     FUNC_IsBmxModel                 0x4c5c20
 #define     FUNC_IsTrailerModel             0x4c5c50
 #define     FUNC_IsVehicleModelType         0x4c5c80
+
 #define     FUNC_RemoveModel                0x4089a0
 #define     FUNC_FlushRequestList           0x40E4E0
+
+#define     FUNC_HasVehicleUpgradeLoaded    0x407820
 #define     FUNC_RequestVehicleUpgrade      0x408C70
 
 #define     FUNC_CVehicleModelInfo__GetNumRemaps        0x4C86B0
+#define     FUNC_CVehicleStructure_delete   0x4C9580
 
+#define     FUNC_SetColModel                0x4C4BC0
+#define     FUNC_AddPedModel                0x4c67a0
 #define     VAR_CTempColModels_ModelPed1    0x968DF0
+
 
 class CBaseModelInfoSAInterface;
 class CModelInfoSAInterface
@@ -73,7 +79,7 @@ public:
     static CBaseModelInfoSAInterface*  GetModelInfo(int index) { return ms_modelInfoPtrs[index]; }
 };
 
-/**
+    /**
  * \todo Fill this class with info from R*
  */
 class CBaseModelInfo_SA_VTBL
@@ -89,7 +95,7 @@ public:
     DWORD Shutdown;                              // ()
     DWORD DeleteRwObject;                        // ()           - Not defined in the base
     DWORD GetRwModelType;                        // ()           - Not defined in the base
-    DWORD CreateInstance_;                       // (RwMatrix*)   - Not defined in the base
+    DWORD CreateInstance_;                       // (RwMatrixTag*)   - Not defined in the base
     DWORD CreateInstance;                        // ()           - Not defined in the base
     DWORD SetAnimFile;                           // (char const*)
     DWORD ConvertAnimFileIndex;                  // ()
@@ -150,31 +156,23 @@ public:
     unsigned short usDynamicIndex : 16;            // +16
 
     // Flags used by CBaseModelInfo
-    union
-    {
-        std::uint16_t flags;
+    unsigned char bHasBeenPreRendered : 1;            // +18
+    unsigned char bAlphaTransparency : 1;
+    unsigned char bIsLod : 1;
+    unsigned char bDontWriteZBuffer : 1;
+    unsigned char bDontCastShadowsOn : 1;
+    unsigned char bDrawAdditive : 1;
+    unsigned char bDrawLast : 1;
+    unsigned char bDoWeOwnTheColModel : 1;
 
-        struct
-        {
-            unsigned char bHasBeenPreRendered : 1;            // +18
-            unsigned char bAlphaTransparency : 1;
-            unsigned char bIsLod : 1;
-            unsigned char bDontWriteZBuffer : 1;
-            unsigned char bDontCastShadowsOn : 1;
-            unsigned char bDrawAdditive : 1;
-            unsigned char bDrawLast : 1;
-            unsigned char bDoWeOwnTheColModel : 1;
-
-            unsigned char dwUnknownFlag25 : 1;            // +19
-            unsigned char dwUnknownFlag26 : 1;
-            unsigned char dwUnknownFlag27 : 1;
-            unsigned char bSwaysInWind : 1;
-            unsigned char bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
-            unsigned char bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
-            unsigned char bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
-            unsigned char bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
-        };
-    };
+    unsigned char dwUnknownFlag25 : 1;            // +19
+    unsigned char dwUnknownFlag26 : 1;
+    unsigned char dwUnknownFlag27 : 1;
+    unsigned char bSwaysInWind : 1;
+    unsigned char bCollisionWasStreamedWithModel : 1;            // CClumpModelInfo::SetCollisionWasStreamedWithModel(unsigned int)
+    unsigned char bDontCollideWithFlyer : 1;                     // CAtomicModelInfo::SetDontCollideWithFlyer(unsigned int)
+    unsigned char bHasComplexHierarchy : 1;                      // CClumpModelInfo::SetHasComplexHierarchy(unsigned int)
+    unsigned char bWetRoadReflection : 1;                        // CAtomicModelInfo::SetWetRoadReflection(unsigned int)
 
     CColModelSAInterface* pColModel;            // +20      CColModel: public CBoundingBox
 
@@ -226,7 +224,6 @@ public:
 
 struct CTimeInfoSAInterface
 {
-    CTimeInfoSAInterface() : m_nTimeOn(20), m_nTimeOff(6), m_wOtherTimeModel(0){};
     CTimeInfoSAInterface(char timeOn, char timeOff, short OtherTimeModel) : m_nTimeOn(timeOn), m_nTimeOff(timeOff), m_wOtherTimeModel(OtherTimeModel){};
     char  m_nTimeOn;
     char  m_nTimeOff;
@@ -243,7 +240,8 @@ class CVehicleModelVisualInfoSAInterface            // Not sure about this name.
 {
 public:
     CVector vecDummies[15];
-    char    m_sUpgrade[18];
+    char m_sUpgrade[18];
+
 };
 
 class CVehicleModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -270,7 +268,7 @@ public:
     float                               fSteeringAngle;
     CVehicleModelVisualInfoSAInterface* pVisualInfo;            // +92
     char                                pad3[464];
-    char                                pDirtMaterial[64];            // *RwMaterial
+    char                                pDirtMaterial[64]; // *RwMaterial
     char                                pad4[64];
     char                                primColors[8];
     char                                secondColors[8];
@@ -288,6 +286,10 @@ public:
     char                                pAnimBlock[4];
 };
 
+/**
+ * \todo Someone move GetLevelFromPosition out of here or delete it entirely please
+ */
+
 class CModelInfoSA : public CModelInfo
 {
 protected:
@@ -298,7 +300,6 @@ protected:
     DWORD                                                                        m_dwPendingInterfaceRef;
     CColModel*                                                                   m_pCustomColModel;
     CColModelSAInterface*                                                        m_pOriginalColModelInterface;
-    std::uint16_t                                                                m_originalFlags = 0;
     RpClump*                                                                     m_pCustomClump;
     static std::map<unsigned short, int>                                         ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                ms_ModelDefaultLodDistanceMap;
@@ -312,6 +313,7 @@ protected:
 
 public:
     CModelInfoSA();
+    CModelInfoSA(DWORD dwModelID);
 
     CBaseModelInfoSAInterface* GetInterface();
     CPedModelInfoSAInterface*  GetPedModelInfoInterface() { return reinterpret_cast<CPedModelInfoSAInterface*>(GetInterface()); }
@@ -322,27 +324,28 @@ public:
 
     bool IsPlayerModel();
 
-    bool IsBoat();
-    bool IsCar();
-    bool IsTrain();
-    bool IsHeli();
-    bool IsPlane();
-    bool IsBike();
-    bool IsFakePlane();
-    bool IsMonsterTruck();
-    bool IsQuadBike();
-    bool IsBmx();
-    bool IsTrailer();
+    BOOL IsBoat();
+    BOOL IsCar();
+    BOOL IsTrain();
+    BOOL IsHeli();
+    BOOL IsPlane();
+    BOOL IsBike();
+    BOOL IsFakePlane();
+    BOOL IsMonsterTruck();
+    BOOL IsQuadBike();
+    BOOL IsBmx();
+    BOOL IsTrailer();
     bool IsVehicle() const override;
-    bool IsUpgrade();
+    BOOL IsUpgrade();
 
     char* GetNameIfVehicle();
 
     BYTE           GetVehicleType();
-    void           Request(EModelRequestType requestType, const char* szTag);
-    void           Remove();
-    bool           IsLoaded();
-    bool           DoIsLoaded();
+    VOID           Request(EModelRequestType requestType, const char* szTag);
+    VOID           Remove();
+    BYTE           GetLevelFromPosition(CVector* vecPosition);
+    BOOL           IsLoaded();
+    BOOL           DoIsLoaded();
     BYTE           GetFlags();
     CBoundingBox*  GetBoundingBox();
     bool           IsValid();
@@ -361,7 +364,7 @@ public:
     bool           SetTime(char cHourOn, char cHourOff);
     static void    StaticResetModelTimes();
 
-    void        SetAlphaTransparencyEnabled(bool bEnabled);
+    void        SetAlphaTransparencyEnabled(BOOL bEnabled);
     bool        IsAlphaTransparencyEnabled();
     void        ResetAlphaTransparency();
     static void StaticResetAlphaTransparencies();
@@ -398,28 +401,21 @@ public:
     void SetVoice(const char* szVoiceType, const char* szVoice);
 
     // Custom collision related functions
-    bool SetCustomModel(RpClump* pClump) override;
-    void RestoreOriginalModel() override;
-    void SetColModel(CColModel* pColModel) override;
-    void RestoreColModel() override;
-    void MakeCustomModel() override;
-
-    // Increases the collision slot reference counter for the original collision model
-    void AddColRef() override;
-
-    // Decreases the collision slot reference counter for the original collision model
-    void RemoveColRef() override;
+    void SetCustomModel(RpClump* pClump);
+    void RestoreOriginalModel();
+    void SetColModel(CColModel* pColModel);
+    void RestoreColModel();
+    void MakeCustomModel();
 
     void SetModelID(DWORD dwModelID) { m_dwModelID = dwModelID; }
 
     RwObject* GetRwObject() { return m_pInterface ? m_pInterface->pRwObject : NULL; }
 
     // CModelInfoSA methods
-    void         MakePedModel(char* szTexture);
-    void         MakeObjectModel(ushort usBaseModelID);
-    void         MakeVehicleAutomobile(ushort usBaseModelID);
-    void         MakeTimedObjectModel(ushort usBaseModelID);
-    void         DeallocateModel(void);
+    void MakePedModel(char* szTexture);
+    void MakeObjectModel(ushort usBaseModelID);
+    void MakeVehicleAutomobile(ushort usBaseModelID);
+    void DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }

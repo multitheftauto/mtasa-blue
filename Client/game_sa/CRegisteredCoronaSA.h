@@ -11,12 +11,11 @@
 
 #pragma once
 
-#include <CVector.h>
 #include <game/CRegisteredCorona.h>
 
 class CEntitySAInterface;
 
-#define ARRAY_CORONAS               0xC3E058
+#define ARRAY_CORONAS               0xC3E058 // ##SA##
 
 class CRegisteredCoronaSAInterface            // coronas are 104 bytes long, and theres 56 of them
 {
@@ -24,13 +23,13 @@ public:
     CVector    Coordinates;                  // Where is it exactly.
     DWORD      Identifier;                   // Should be unique for each corona. Address or something (0 = empty)
     RwTexture* pTex;                         // Pointer to the actual texture to be rendered
-    float      Size;                         // How big is this fellow
-    float      NormalAngle;                  // Is corona normal (if relevant) facing the camera?
-    float      Range;                        // How far away is this guy still visible
-    float      PullTowardsCam;               // How far away is the z value pulled towards camera.
-    float      HeightAboveGround;            // Stired so that we don't have to do a ProcessVerticalLine every frame
+    FLOAT      Size;                         // How big is this fellow
+    FLOAT      NormalAngle;                  // Is corona normal (if relevant) facing the camera?
+    FLOAT      Range;                        // How far away is this guy still visible
+    FLOAT      PullTowardsCam;               // How far away is the z value pulled towards camera.
+    FLOAT      HeightAboveGround;            // Stired so that we don't have to do a ProcessVerticalLine every frame
                                              // The following fields are used for trails behind coronas (glowy lights)
-    float FadeSpeed;                         // The speed the corona fades in and out ##SA##
+    FLOAT FadeSpeed;                         // The speed the corona fades in and out ##SA##
     BYTE  Red, Green, Blue;                  // Rendering colour.
     BYTE  Intensity;                         // 255 = full
     BYTE  FadedIntensity;                    // Intensity that lags behind the given intenisty and fades out if the LOS is blocked
@@ -50,6 +49,9 @@ public:
     CEntitySAInterface* pEntityAttachedTo;
 };
 
+/**
+ * \todo Add support for setting WhiteCore, OnlyFromBelow and AttachedToEntity
+ */
 class CRegisteredCoronaSA : public CRegisteredCorona
 {
 private:
@@ -58,22 +60,21 @@ private:
 public:
     CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface);
     CVector* GetPosition();
-    void     SetPosition(CVector* vector);
-    float    GetSize();
-    void     SetSize(float fSize);
-    float    GetRange();
-    void     SetRange(float fRange);
-    float    GetPullTowardsCamera();
-    void     SetPullTowardsCamera(float fPullTowardsCamera);
-    void     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha);
-    void     SetTexture(RwTexture* texture);
-    void     SetTexture(eCoronaType texture);
+    VOID     SetPosition(CVector* vector);
+    FLOAT    GetSize();
+    VOID     SetSize(FLOAT fSize);
+    FLOAT    GetRange();
+    VOID     SetRange(FLOAT fRange);
+    FLOAT    GetPullTowardsCamera();
+    VOID     SetPullTowardsCamera(FLOAT fPullTowardsCamera);
+    VOID     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha);
+    VOID     SetTexture(RwTexture* texture);
+    VOID     SetTexture(eCoronaType texture);
     BYTE     GetFlareType();
-    void     SetFlareType(BYTE fFlareType);
-    void     SetReflectionType(BYTE reflectionType);
+    VOID     SetFlareType(BYTE fFlareType);
     DWORD    GetIdentifier() { return internalInterface->Identifier; }
     DWORD    GetID();
-    void     Init(DWORD Identifier);
-    void     Disable();
-    void     Refresh();
+    VOID     Init(DWORD Identifier);
+    VOID     Disable();
+    VOID     Refresh();
 };
