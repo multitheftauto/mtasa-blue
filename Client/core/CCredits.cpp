@@ -268,6 +268,7 @@ CCredits::CCredits()
         "cURL (https://curl.se/)\n"
         "Detours (https://github.com/microsoft/Detours)\n"
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
+        "FreeType (https://freetype.org/)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
         "libpcre (https://www.pcre.org/)\n"
         "libpng (http://www.libpng.org/)\n"
