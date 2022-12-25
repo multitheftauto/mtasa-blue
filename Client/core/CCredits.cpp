@@ -260,7 +260,7 @@ CCredits::CCredits()
         "BASS (https://www.un4seen.com/bass.html)\n"
         "bcrypt (https://www.openwall.com/crypt/)\n"
         "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
-        "bzip2 (http://bzip.org/)\n"
+        "bzip2 (http://www.bzip.org/)\n"
         "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
         "CEGUI (http://www.cegui.org.uk/)\n"
         "CRC-32 (https://bochs.sourceforge.io/)\n"
