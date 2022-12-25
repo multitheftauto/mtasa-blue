@@ -250,6 +250,7 @@ CCredits::CCredits()
         "Ren712\n"
         "StifflersMom\n"
         "The_GTA\n"
+        "trx\n"
         "\n"
         "\n";
 
