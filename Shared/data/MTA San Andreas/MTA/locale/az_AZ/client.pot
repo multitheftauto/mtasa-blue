@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-25 20:55+0000\n"
-"PO-Revision-Date: 2022-12-25 21:55\n"
+"POT-Creation-Date: 2022-12-25 21:54+0000\n"
+"PO-Revision-Date: 2022-12-25 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -150,9 +150,9 @@ msgstr "(İnşaatcılıq rejimi) debug pəncərəsinə oyun səs id-lərini yaz�
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:818
-#: Client/loader/CInstallManager.cpp:520 Client/loader/CInstallManager.cpp:529
-#: Client/loader/CInstallManager.cpp:618 Client/core/CSettings.cpp:2924
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:815
+#: Client/loader/CInstallManager.cpp:530 Client/loader/CInstallManager.cpp:539
+#: Client/loader/CInstallManager.cpp:628 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
 #: Client/core/CSettings.cpp:4674 Client/core/CGUI.cpp:87
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
@@ -672,7 +672,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Ayrı bir GTA:San Andreas tətbiqi artıq işləyir. MTA:SA-nın başladılması üçün bu tətbiqin dayandırılması tələb olunur. İndi bunu etmək istəyirsiniz?"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1240
+#: Client/loader/MainFunctions.cpp:1173
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -701,79 +701,79 @@ msgstr "'MTA:SA' və ya'GTA San Andreas' quraşdırma yolunda\n"
 "MTA:SA-nı başladarkən problem olsa,\n"
 "quraşdırma(ları)nızı nöqtəli vergül olmayan qovluqa daşıyın."
 
-#: Client/loader/MainFunctions.cpp:782
+#: Client/loader/MainFunctions.cpp:779
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Başlatmaq xətası. Ən son məlumat fayllarının düzgün quraşdırıldığını yoxlayın."
 
-#: Client/loader/MainFunctions.cpp:791
+#: Client/loader/MainFunctions.cpp:788
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Başlatmaq xətası. Zəhmət olmasa %s düzgün quraşdırıldığını yoxlayın."
 
-#: Client/loader/MainFunctions.cpp:798
+#: Client/loader/MainFunctions.cpp:795
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Başlatmaq xətası. gta_sa.exe %s qovluğunda tapılmadı."
 
-#: Client/loader/MainFunctions.cpp:808
+#: Client/loader/MainFunctions.cpp:805
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Başlatmaq xətası. Başlatmadan əvvəl GTA qovluğundakı %s faylını silin."
 
-#: Client/loader/MainFunctions.cpp:817
+#: Client/loader/MainFunctions.cpp:814
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Əsas sənədin yanlış adı var (%s)"
 
-#: Client/loader/MainFunctions.cpp:828
+#: Client/loader/MainFunctions.cpp:825
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Əsas sənəd imzasızdır. Bunun səbəbi kompüterinizdəki virus ola bilər\n\n"
 "MTA düzgün işləməsə, onlayn yardıma baxın."
 
-#: Client/loader/MainFunctions.cpp:853
+#: Client/loader/MainFunctions.cpp:850
 msgid "Data files modified. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Məlumat sənədləri dəyişdirilmişdir. Bunun səbəbi kompüterinizdəki virus ola bilər.\n\n"
 "MTA düzgün işləməsə, onlayn yardıma baxın."
 
-#: Client/loader/MainFunctions.cpp:865
+#: Client/loader/MainFunctions.cpp:862
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "'MTA: SA' və ya GTA: San Andreas qovluqlarında .asi uzantılı sənədlər var.\n\n"
 "MTA: SA ilə problemlə qarşılaşsanız .asi sənədlərini bu qovluqlardan silin."
 
-#: Client/loader/MainFunctions.cpp:969
+#: Client/loader/MainFunctions.cpp:966
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Sənəd versiyasının xətası. Problemi həll etmək üçün MTA: SA -nı yenidən quraşdırın.\n"
 
-#: Client/loader/MainFunctions.cpp:978
+#: Client/loader/MainFunctions.cpp:975
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Sənəd versiyasının xətası. Problemi həll etmək üçün MTA: SA -nı yenidən quraşdırın.\n"
 
-#: Client/loader/MainFunctions.cpp:990
+#: Client/loader/MainFunctions.cpp:987
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA Windows 'Təhlükəsizlik rejimində' işləmir.\n\n"
 "Zəhmət olmasa kompüterivizi yenidən başlatın.\n"
 
-#: Client/loader/MainFunctions.cpp:1126
+#: Client/loader/MainFunctions.cpp:1073
 msgid "Fix configuration issue"
 msgstr "Konfiqurasiya problemini həll edin"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1168
+#: Client/loader/MainFunctions.cpp:1111
 msgid "Fix elevation required error"
 msgstr "Səhvi düzəldərkən xəta baş verdi"
 
-#: Client/loader/MainFunctions.cpp:1175
+#: Client/loader/MainFunctions.cpp:1118
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Grand Theft Auto: San Andreas başlanıla bilmədi. Zəhmət olmasa yenidən cəhd edin, və ya problem davam edərsə, www.multitheftauto.com MTA ilə əlaqə saxlayın.\n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1240
+#: Client/loader/MainFunctions.cpp:1173
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas düzgün başlana bilmədi. Dayandırmaq istəyirsiniz?"
 
@@ -814,7 +814,7 @@ msgstr "Yeniləmə quraşdırılır..."
 msgid "Extracting files..."
 msgstr "Sənədlər çıxarılır..."
 
-#: Client/loader/CInstallManager.cpp:329 Client/loader/Utils.cpp:1182
+#: Client/loader/CInstallManager.cpp:339 Client/loader/Utils.cpp:932
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -823,133 +823,137 @@ msgstr "MTA:SA cari tapşırıq üçün idarəçi haqqını tələb eləyir:\n\n
 "'%s'\n\n"
 "Zəhmət olmasa sonrakı pəncərədə icazə verin."
 
-#: Client/loader/CInstallManager.cpp:344
+#: Client/loader/CInstallManager.cpp:354
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA cari tapşırıqı tamamlaya bilmir:\n\n"
 "'%s'\n"
 
-#: Client/loader/CInstallManager.cpp:394
+#: Client/loader/CInstallManager.cpp:404
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Xəta ekran-kartı drayverində çıxdı **\n\n"
 "** Zəhmət olmasa qrafik-kartı drayverini yeniləyin **"
 
-#: Client/loader/CInstallManager.cpp:500
+#: Client/loader/CInstallManager.cpp:510
 msgid "Install updated MTA:SA files"
 msgstr "Yenilənmiş MTA:SA sənədlərini quraşdır"
 
-#: Client/loader/CInstallManager.cpp:520
+#: Client/loader/CInstallManager.cpp:530
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Yenilənmə alınmadı. Zəhmət olmasa digər tətbiqləri bağlayın və yenidən cəhd edin"
 
-#: Client/loader/CInstallManager.cpp:529
+#: Client/loader/CInstallManager.cpp:539
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto düzgün quraşdırılmayıb, zəhmət olmasa yenidən quraşdırın. %s"
 
-#: Client/loader/CInstallManager.cpp:584 Client/loader/CInstallManager.cpp:616
+#: Client/loader/CInstallManager.cpp:594 Client/loader/CInstallManager.cpp:626
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "MTA:SA davam edə bilməz, çünki seçilmiş sənədlər yanlışdırlar:"
 
-#: Client/loader/CInstallManager.cpp:609
+#: Client/loader/CInstallManager.cpp:619
 msgid "Patch GTA"
 msgstr "GTA Düzəlişi"
 
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:764
+#: Client/loader/CInstallManager.cpp:766 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA davam edə bilməz, çünki %s diskində kifayət qədər yer yoxdur."
 
-#: Client/loader/CInstallManager.cpp:812
+#: Client/loader/CInstallManager.cpp:822
 msgid "Missing file:"
 msgstr "İtmiş sənəd:"
 
-#: Client/loader/CInstallManager.cpp:816
+#: Client/loader/CInstallManager.cpp:826
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "MTA yüklənə bilmirsə, zəhmət olmasa GTA:SA-nı yenidən quraşdırın"
 
-#: Client/loader/CInstallManager.cpp:937
+#: Client/loader/CInstallManager.cpp:947
 msgid "Update install settings"
 msgstr "Yükləmə seçimlərini yenilə"
 
-#: Client/loader/CInstallManager.cpp:1070
+#: Client/loader/CInstallManager.cpp:1080
 msgid "Update compatibility settings"
 msgstr "Uyğunluq seçimlərini yenilə"
 
-#: Client/loader/Utils.cpp:747 Client/loader/Dialogs.cpp:890
+#: Client/loader/CInstallManager.cpp:1106
+msgid "Move incompatible files"
+msgstr ""
+
+#: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto San Andreas axtarılır..."
 
-#: Client/loader/Utils.cpp:749 Client/loader/Dialogs.cpp:893
+#: Client/loader/Utils.cpp:499 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Zəhmət olmasa Grand Theft Auto San Andreas'i başlat"
 
-#: Client/loader/Utils.cpp:813
+#: Client/loader/Utils.cpp:563
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Grand Theft Auto: San Andreas quraşdırma qovluğunu seçin"
 
-#: Client/loader/Utils.cpp:1283
+#: Client/loader/Utils.cpp:1033
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "%s modulunun yüklənməsində xəta baş verdi! (%s)"
 
-#: Client/loader/Utils.cpp:1605 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1355 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Sənədlər köçürülür..."
 
-#: Client/loader/Utils.cpp:1665 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1415 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "Köçürtmə tamamlandı. Hər şey yaxşıdır."
 
-#: Client/loader/Utils.cpp:1671 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Tamamlanır..."
 
-#: Client/loader/Utils.cpp:1673 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1423 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "Hazırdır!"
 
-#: Client/loader/Utils.cpp:1713
+#: Client/loader/Utils.cpp:1463
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "%s yeni quraşdırma versiyası aşkarlandı.\n\n"
 "%s -dən seçimlərinizi köçürtmək istəyirsiniz?"
 
-#: Client/loader/Utils.cpp:1752
+#: Client/loader/Utils.cpp:1502
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA '%s' sənədini oxuyanda xəta baş verdi"
 
-#: Client/loader/Utils.cpp:1774
+#: Client/loader/Utils.cpp:1524
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA '%s' sənədini tapa bilmədi."
 
-#: Client/loader/Utils.cpp:1799
+#: Client/loader/Utils.cpp:1549
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA modeli yükləyə bilmədi."
 
-#: Client/loader/Utils.cpp:1801
+#: Client/loader/Utils.cpp:1551
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Bu yaxınlarda gta3.img sənədini dəyişdirmisinizsə, GTA: SA-nı yenidən quraşdırmağa cəhd edin."
 
-#: Client/loader/Utils.cpp:1826
+#: Client/loader/Utils.cpp:1576
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA: SA nəqliyyata yığdırma əlavə edərkən problemlə üzləşdi."
 
-#: Client/loader/Utils.cpp:1845
+#: Client/loader/Utils.cpp:1595
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA '%s' sənədində xətalar tapdı"
 
-#: Client/loader/Utils.cpp:1918
+#: Client/loader/Utils.cpp:1667
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "MTA:SA oynayarkən kompüteriniz yenidən başladı?"
 
-#: Client/loader/Utils.cpp:1983
+#: Client/loader/Utils.cpp:1732
 msgid "Please terminate the following programs before continuing:"
 msgstr "Zəhmət olmasa davam etməzdən əvvəl tələb olunan proqramları sonlandırın:"
 
