@@ -154,7 +154,7 @@ CCredits::CCredits()
         "Bonus1702\n"
         "correaAlex\n"
         "CubedDeath\n"
-        "darkdrifter\n"
+        "DarkDrifter Nacim\n"
         "Deihim007\n"
         "delinx\n"
         "DetectedStorm\n"
