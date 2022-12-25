@@ -42,8 +42,7 @@ void CClientVectorGraphicDisplay::Render()
     if (HasUpdated())
     {
         m_pVectorGraphic->OnUpdate();
-    }
-        
+    }        
 }
 
 void CClientVectorGraphicDisplay::UpdateTexture()
@@ -52,45 +51,40 @@ void CClientVectorGraphicDisplay::UpdateTexture()
         return;
 
     Document* svgDocument = m_pVectorGraphic->GetSVGDocument();
-
-    if (svgDocument == nullptr)
+    if (!svgDocument)
         return;
 
     CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
-
     if (!pVectorGraphicItem)
         return;
 
     IDirect3DSurface9* surface = m_pVectorGraphic->GetRenderItem()->m_pD3DRenderTargetSurface;
-
     if (!surface)
         return;
 
-    IDirect3DDevice9* device = pVectorGraphicItem->m_pDevice;
-
-    uint width = pVectorGraphicItem->m_uiSizeX;
-    uint height = pVectorGraphicItem->m_uiSizeY;
-
-    Bitmap bitmap = svgDocument->renderToBitmap(width, height);
+    Bitmap bitmap = svgDocument->renderToBitmap(pVectorGraphicItem->m_uiSizeX, pVectorGraphicItem->m_uiSizeY);
+    if (!bitmap.valid())
+        return;
 
     // Lock surface
     D3DLOCKED_RECT LockedRect;
-    surface->LockRect(&LockedRect, nullptr, 0);
-
-    auto surfaceData = static_cast<byte*>(LockedRect.pBits);
-    auto sourceData = static_cast<const byte*>(bitmap.data());
-
-    for (uint32_t y = 0; y < bitmap.height(); ++y)
+    if (SUCCEEDED(surface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
     {
-        memcpy(surfaceData, sourceData, bitmap.width() * 4);            // 4 bytes per pixel
+        auto surfaceData = static_cast<byte*>(LockedRect.pBits);
+        auto sourceData = static_cast<const byte*>(bitmap.data());
 
-        // advance row pointers
-        sourceData += bitmap.stride();
-        surfaceData += LockedRect.Pitch;
+        for (uint32_t y = 0; y < bitmap.height(); ++y)
+        {
+            memcpy(surfaceData, sourceData, bitmap.width() * 4);            // 4 bytes per pixel
+
+            // advance row pointers
+            sourceData += bitmap.stride();
+            surfaceData += LockedRect.Pitch;
+        }
+
+        // Unlock surface
+        surface->UnlockRect();
     }
-
-    // Unlock surface
-    surface->UnlockRect();
 
     m_bHasUpdated = false;
 }
@@ -101,25 +95,22 @@ void CClientVectorGraphicDisplay::ClearTexture()
         return;
 
     CVectorGraphicItem* pVectorGraphicItem = m_pVectorGraphic->GetRenderItem();
-
     if (!pVectorGraphicItem)
         return;
 
     IDirect3DSurface9* surface = pVectorGraphicItem->m_pD3DRenderTargetSurface;
-
     if (!surface)
         return;
 
-    IDirect3DDevice9* device = pVectorGraphicItem->m_pDevice;
-
     // Lock surface
     D3DLOCKED_RECT LockedRect;
-    surface->LockRect(&LockedRect, nullptr, 0);
+    if (SUCCEEDED(surface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
+    {
+        std::memset(LockedRect.pBits, 0x0, LockedRect.Pitch * pVectorGraphicItem->m_uiSurfaceSizeY);
 
-    device->ColorFill(surface, nullptr, D3DCOLOR_ARGB(0, 0, 0, 0));
-
-    // Unlock surface
-    surface->UnlockRect();
+        // Unlock surface
+        surface->UnlockRect();
+    }
 
     m_bIsCleared = true;
 }
