@@ -277,6 +277,7 @@ CCredits::CCredits()
         "libpng (http://www.libpng.org/)\n"
         "Lua (https://www.lua.org/)\n"
         "lunasvg (https://github.com/sammycage/lunasvg)\n"
+        "mbedtls (https://github.com/Mbed-TLS/mbedtls)\n"
         "PortAudio (http://www.portaudio.com/)\n"
         "RakNet (http://www.jenkinssoftware.com/)\n"
         "SA Limit adjuster source code (Credits to Sacky)\n"
