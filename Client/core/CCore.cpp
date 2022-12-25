@@ -574,6 +574,7 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
+    pGameSettings->ResetBlurEnabled();
     pGameSettings->ResetVehiclesLODDistance();
     pGameSettings->ResetPedsLODDistance();
     pGameSettings->ResetCoronaReflectionsEnabled();
