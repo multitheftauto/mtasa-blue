@@ -271,6 +271,7 @@ CCredits::CCredits()
         "FreeType (https://freetype.org/)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
         "json-c (https://github.com/json-c/json-c)\n"
+        "ksignals (https://github.com/xforce/ksignals)\n"
         "libjpeg (https://libjpeg.sourceforge.net/)\n"
         "libpcre (https://www.pcre.org/)\n"
         "libpng (http://www.libpng.org/)\n"
