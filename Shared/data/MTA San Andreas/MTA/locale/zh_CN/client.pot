@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-15 13:39\n"
+"POT-Creation-Date: 2022-12-25 20:55+0000\n"
+"PO-Revision-Date: 2022-12-25 21:55\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -159,7 +159,7 @@ msgstr "(开发模式) prints world sound ids into the debug window"
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1192 Client/core/CCore.cpp:1205
+#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
@@ -852,7 +852,7 @@ msgstr "MTA:SA 无法继续执行，因为以下文件不正确："
 msgid "Patch GTA"
 msgstr "重新修补GTA"
 
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:723
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "由于驱动器 %s 没有足够的空间,MTA:SA 无法继续运行."
@@ -2395,111 +2395,111 @@ msgstr "意外的服务器响应 (2)"
 msgid "Bad server response (1)"
 msgstr "意外的服务器响应 (1)"
 
-#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "致命错误"
 
-#: Client/core/CCore.cpp:850
+#: Client/core/CCore.cpp:891
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "请移除该文件修复问题："
 
-#: Client/core/CCore.cpp:882
+#: Client/core/CCore.cpp:923
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "模块 %s 不适用!"
 
-#: Client/core/CCore.cpp:1192
+#: Client/core/CCore.cpp:1233
 msgid "Error executing URL"
 msgstr "执行 URL 时出错"
 
-#: Client/core/CCore.cpp:1204
+#: Client/core/CCore.cpp:1245
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "执行命令行 ('%s') 对应的 Mod 时出错"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1289
+#: Client/core/CCore.cpp:1333
 msgid "this help screen"
 msgstr "此帮助画面"
 
-#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
+#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
 msgid "exits the application"
 msgstr "退出程序"
 
-#: Client/core/CCore.cpp:1292
+#: Client/core/CCore.cpp:1336
 msgid "shows the version"
 msgstr "显示版本号"
 
-#: Client/core/CCore.cpp:1293
+#: Client/core/CCore.cpp:1337
 msgid "shows the time"
 msgstr "显示时间"
 
-#: Client/core/CCore.cpp:1294
+#: Client/core/CCore.cpp:1338
 msgid "shows the hud"
 msgstr "显示 HUD 界面"
 
-#: Client/core/CCore.cpp:1295
+#: Client/core/CCore.cpp:1339
 msgid "shows all the binds"
 msgstr "显示所有绑定设置"
 
-#: Client/core/CCore.cpp:1296
+#: Client/core/CCore.cpp:1340
 msgid "shows your serial"
 msgstr "显示你的序列号"
 
-#: Client/core/CCore.cpp:1305
+#: Client/core/CCore.cpp:1349
 msgid "connects to a server (host port nick pass)"
 msgstr "连接到一个服务器 (服务器 端口 昵称 密码)"
 
-#: Client/core/CCore.cpp:1306
+#: Client/core/CCore.cpp:1350
 msgid "connects to a previous server"
 msgstr "连接到之前登陆过的服务器"
 
-#: Client/core/CCore.cpp:1307
+#: Client/core/CCore.cpp:1351
 msgid "binds a key (key control)"
 msgstr "绑定一个按键 (控制键)"
 
-#: Client/core/CCore.cpp:1308
+#: Client/core/CCore.cpp:1352
 msgid "unbinds a key (key)"
 msgstr "取消绑定按键 (key)"
 
-#: Client/core/CCore.cpp:1309
+#: Client/core/CCore.cpp:1353
 msgid "copies the default gta controls"
 msgstr "复制默认的 GTA 控制按键设置"
 
-#: Client/core/CCore.cpp:1310
+#: Client/core/CCore.cpp:1354
 msgid "outputs a screenshot"
 msgstr "输出截图"
 
-#: Client/core/CCore.cpp:1311
+#: Client/core/CCore.cpp:1355
 msgid "immediately saves the config"
 msgstr "立刻保存设置"
 
-#: Client/core/CCore.cpp:1313
+#: Client/core/CCore.cpp:1357
 msgid "clears the debug view"
 msgstr "清空调试视图"
 
-#: Client/core/CCore.cpp:1314
+#: Client/core/CCore.cpp:1358
 msgid "scrolls the chatbox upwards"
 msgstr "向上滚动聊天框"
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1359
 msgid "scrolls the chatbox downwards"
 msgstr "向下滚动聊天框"
 
-#: Client/core/CCore.cpp:1316
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the debug view upwards"
 msgstr "向上滚动调试视图"
 
-#: Client/core/CCore.cpp:1317
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the debug view downwards"
 msgstr "向下滚动调试视图"
 
-#: Client/core/CCore.cpp:1320
+#: Client/core/CCore.cpp:1364
 msgid "shows the memory statistics"
 msgstr "显示内存统计信息"
 
-#: Client/core/CCore.cpp:1321
+#: Client/core/CCore.cpp:1365
 msgid "shows the frame timing graph"
 msgstr "显示帧数图表"
 
