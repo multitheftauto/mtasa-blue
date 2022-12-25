@@ -280,6 +280,7 @@ CCredits::CCredits()
         "mbedtls (https://github.com/Mbed-TLS/mbedtls)\n"
         "mysql-connector-c (https://downloads.mysql.com/archives/c-c/)\n"
         "nvapi (https://developer.nvidia.com/rtx/path-tracing/nvapi/get-started)\n"
+        "pme by Zac Hansen\n"
         "PortAudio (http://www.portaudio.com/)\n"
         "RakNet (http://www.jenkinssoftware.com/)\n"
         "SA Limit adjuster source code (Credits to Sacky)\n"
