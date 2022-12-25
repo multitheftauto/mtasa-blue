@@ -20,8 +20,11 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "curl_setup.h"
+#include "ws.h"
 
 typedef enum {
   HTTPREQ_GET,
@@ -38,11 +41,24 @@ typedef enum {
 #include <nghttp2/nghttp2.h>
 #endif
 
+#if defined(_WIN32) && defined(ENABLE_QUIC)
+#include <stdint.h>
+#endif
+
 extern const struct Curl_handler Curl_handler_http;
 
 #ifdef USE_SSL
 extern const struct Curl_handler Curl_handler_https;
 #endif
+
+#ifdef USE_WEBSOCKETS
+extern const struct Curl_handler Curl_handler_ws;
+
+#ifdef USE_SSL
+extern const struct Curl_handler Curl_handler_wss;
+#endif
+#endif /* websockets */
+
 
 /* Header specific functions */
 bool Curl_compareheader(const char *headerline,  /* line to check */
@@ -163,6 +179,29 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data);
 struct h3out; /* see ngtcp2 */
 #endif
 
+#ifdef USE_MSH3
+#ifdef _WIN32
+#define msh3_lock CRITICAL_SECTION
+#define msh3_lock_initialize(lock) InitializeCriticalSection(lock)
+#define msh3_lock_uninitialize(lock) DeleteCriticalSection(lock)
+#define msh3_lock_acquire(lock) EnterCriticalSection(lock)
+#define msh3_lock_release(lock) LeaveCriticalSection(lock)
+#else /* !_WIN32 */
+#include <pthread.h>
+#define msh3_lock pthread_mutex_t
+#define msh3_lock_initialize(lock) { \
+  pthread_mutexattr_t attr; \
+  pthread_mutexattr_init(&attr); \
+  pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE); \
+  pthread_mutex_init(lock, &attr); \
+  pthread_mutexattr_destroy(&attr); \
+}
+#define msh3_lock_uninitialize(lock) pthread_mutex_destroy(lock)
+#define msh3_lock_acquire(lock) pthread_mutex_lock(lock)
+#define msh3_lock_release(lock) pthread_mutex_unlock(lock)
+#endif /* _WIN32 */
+#endif /* USE_MSH3 */
+
 /****************************************************************************
  * HTTP unique setup
  ***************************************************************************/
@@ -189,6 +228,10 @@ struct HTTP {
     HTTPSEND_BODY     /* sending body */
   } sending;
 
+#ifdef USE_WEBSOCKETS
+  struct websocket ws;
+#endif
+
 #ifndef CURL_DISABLE_HTTP
   struct dynbuf send_buffer; /* used if the request couldn't be sent in one
                                 chunk, points to an allocated send_buffer
@@ -198,13 +241,11 @@ struct HTTP {
   /*********** for HTTP/2 we store stream-local data here *************/
   int32_t stream_id; /* stream we are interested in */
 
-  bool bodystarted;
   /* We store non-final and final response headers here, per-stream */
   struct dynbuf header_recvbuf;
   size_t nread_header_recvbuf; /* number of bytes in header_recvbuf fed into
                                   upper layer */
   struct dynbuf trailer_recvbuf;
-  int status_code; /* HTTP status code */
   const uint8_t *pausedata; /* pointer to data received in on_data_chunk */
   size_t pauselen; /* the number of bytes left in data */
   bool close_handled; /* TRUE if stream closure is handled by libcurl */
@@ -215,6 +256,8 @@ struct HTTP {
   uint32_t error; /* HTTP/2 stream error code */
 #endif
 #if defined(USE_NGHTTP2) || defined(USE_NGHTTP3)
+  bool bodystarted;
+  int status_code; /* HTTP status code */
   bool closed; /* TRUE on HTTP2 stream close */
   char *mem;     /* points to a buffer in memory to store received data */
   size_t len;    /* size of the buffer 'mem' points to */
@@ -228,17 +271,35 @@ struct HTTP {
 #endif
 
 #ifdef ENABLE_QUIC
+#ifndef USE_MSH3
   /*********** for HTTP/3 we store stream-local data here *************/
   int64_t stream3_id; /* stream we are interested in */
+  uint64_t error3; /* HTTP/3 stream error code */
   bool firstheader;  /* FALSE until headers arrive */
   bool firstbody;  /* FALSE until body arrives */
   bool h3req;    /* FALSE until request is issued */
+#endif
   bool upload_done;
 #endif
 #ifdef USE_NGHTTP3
   size_t unacked_window;
   struct h3out *h3out; /* per-stream buffers for upload */
   struct dynbuf overflow; /* excess data received during a single Curl_read */
+#endif
+#ifdef USE_MSH3
+  struct MSH3_REQUEST *req;
+  msh3_lock recv_lock;
+  /* Receive Buffer (Headers and Data) */
+  uint8_t* recv_buf;
+  size_t recv_buf_alloc;
+  /* Receive Headers */
+  size_t recv_header_len;
+  bool recv_header_complete;
+  /* Receive Data */
+  size_t recv_data_len;
+  bool recv_data_complete;
+  /* General Receive Error */
+  CURLcode recv_error;
 #endif
 };
 

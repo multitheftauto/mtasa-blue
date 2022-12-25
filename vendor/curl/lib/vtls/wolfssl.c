@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 /*
@@ -324,7 +326,7 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
   }
 
   if(!req_method) {
-    failf(data, "SSL: couldn't create a method!");
+    failf(data, "SSL: couldn't create a method");
     return CURLE_OUT_OF_MEMORY;
   }
 
@@ -333,7 +335,7 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
   backend->ctx = SSL_CTX_new(req_method);
 
   if(!backend->ctx) {
-    failf(data, "SSL: couldn't create a context!");
+    failf(data, "SSL: couldn't create a context");
     return CURLE_OUT_OF_MEMORY;
   }
 
@@ -462,9 +464,9 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
     const char * const hostname = SSL_HOST_NAME();
     size_t hostname_len = strlen(hostname);
     if((hostname_len < USHRT_MAX) &&
-       (0 == Curl_inet_pton(AF_INET, hostname, &addr4)) &&
+       !Curl_inet_pton(AF_INET, hostname, &addr4)
 #ifdef ENABLE_IPV6
-       (0 == Curl_inet_pton(AF_INET6, hostname, &addr6))
+       && !Curl_inet_pton(AF_INET6, hostname, &addr6)
 #endif
       ) {
       size_t snilen;
@@ -503,7 +505,7 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
     SSL_free(backend->handle);
   backend->handle = SSL_new(backend->ctx);
   if(!backend->handle) {
-    failf(data, "SSL: couldn't create a context (handle)!");
+    failf(data, "SSL: couldn't create a handle");
     return CURLE_OUT_OF_MEMORY;
   }
 
@@ -526,12 +528,12 @@ wolfssl_connect_step1(struct Curl_easy *data, struct connectdata *conn,
 #ifdef USE_HTTP2
     if(data->state.httpwant >= CURL_HTTP_VERSION_2) {
       strcpy(protocols + strlen(protocols), ALPN_H2 ",");
-      infof(data, "ALPN, offering %s", ALPN_H2);
+      infof(data, VTLS_INFOF_ALPN_OFFER_1STR, ALPN_H2);
     }
 #endif
 
     strcpy(protocols + strlen(protocols), ALPN_HTTP_1_1);
-    infof(data, "ALPN, offering %s", ALPN_HTTP_1_1);
+    infof(data, VTLS_INFOF_ALPN_OFFER_1STR, ALPN_HTTP_1_1);
 
     if(wolfSSL_UseALPN(backend->handle, protocols,
                        (unsigned)strlen(protocols),
@@ -739,7 +741,7 @@ wolfssl_connect_step2(struct Curl_easy *data, struct connectdata *conn,
                                   (const unsigned char *)pubkey->header,
                                   (size_t)(pubkey->end - pubkey->header));
     if(result) {
-      failf(data, "SSL: public key does not match pinned public key!");
+      failf(data, "SSL: public key does not match pinned public key");
       return result;
     }
 #else
@@ -757,26 +759,25 @@ wolfssl_connect_step2(struct Curl_easy *data, struct connectdata *conn,
     rc = wolfSSL_ALPN_GetProtocol(backend->handle, &protocol, &protocol_len);
 
     if(rc == SSL_SUCCESS) {
-      infof(data, "ALPN, server accepted to use %.*s", protocol_len,
-            protocol);
+      infof(data, VTLS_INFOF_ALPN_ACCEPTED_LEN_1STR, protocol_len, protocol);
 
       if(protocol_len == ALPN_HTTP_1_1_LENGTH &&
          !memcmp(protocol, ALPN_HTTP_1_1, ALPN_HTTP_1_1_LENGTH))
-        conn->negnpn = CURL_HTTP_VERSION_1_1;
+        conn->alpn = CURL_HTTP_VERSION_1_1;
 #ifdef USE_HTTP2
       else if(data->state.httpwant >= CURL_HTTP_VERSION_2 &&
               protocol_len == ALPN_H2_LENGTH &&
               !memcmp(protocol, ALPN_H2, ALPN_H2_LENGTH))
-        conn->negnpn = CURL_HTTP_VERSION_2;
+        conn->alpn = CURL_HTTP_VERSION_2;
 #endif
       else
         infof(data, "ALPN, unrecognized protocol %.*s", protocol_len,
               protocol);
-      Curl_multiuse_state(data, conn->negnpn == CURL_HTTP_VERSION_2 ?
+      Curl_multiuse_state(data, conn->alpn == CURL_HTTP_VERSION_2 ?
                           BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
     }
     else if(rc == SSL_ALPN_NOT_FOUND)
-      infof(data, "ALPN, server did not agree to a protocol");
+      infof(data, VTLS_INFOF_NO_ALPN);
     else {
       failf(data, "ALPN, failure getting protocol, error %d", rc);
       return CURLE_SSL_CONNECT_ERROR;
@@ -810,8 +811,10 @@ wolfssl_connect_step3(struct Curl_easy *data, struct connectdata *conn,
 
   if(SSL_SET_OPTION(primary.sessionid)) {
     bool incache;
+    bool added = FALSE;
     void *old_ssl_sessionid = NULL;
-    SSL_SESSION *our_ssl_sessionid = SSL_get_session(backend->handle);
+    /* SSL_get1_session allocates memory that has to be freed. */
+    SSL_SESSION *our_ssl_sessionid = SSL_get1_session(backend->handle);
     bool isproxy = SSL_IS_PROXY() ? TRUE : FALSE;
 
     if(our_ssl_sessionid) {
@@ -831,11 +834,20 @@ wolfssl_connect_step3(struct Curl_easy *data, struct connectdata *conn,
                                        0, sockindex, NULL);
         if(result) {
           Curl_ssl_sessionid_unlock(data);
+          SSL_SESSION_free(our_ssl_sessionid);
           failf(data, "failed to store ssl session");
           return result;
         }
+        else {
+          added = TRUE;
+        }
       }
       Curl_ssl_sessionid_unlock(data);
+
+      if(!added) {
+        /* If the session info wasn't added to the cache, free our copy. */
+        SSL_SESSION_free(our_ssl_sessionid);
+      }
     }
   }
 
@@ -955,8 +967,7 @@ static ssize_t wolfssl_recv(struct Curl_easy *data,
 
 static void wolfssl_session_free(void *ptr)
 {
-  (void)ptr;
-  /* wolfSSL reuses sessions on own, no free */
+  SSL_SESSION_free(ptr);
 }
 
 

@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  * RFC2195 CRAM-MD5 authentication
  * RFC2595 Using TLS with IMAP, POP3 and ACAP
  * RFC2831 DIGEST-MD5 authentication
@@ -81,6 +83,7 @@
 #include "bufref.h"
 #include "curl_sasl.h"
 #include "warnless.h"
+#include "curl_ctype.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -624,7 +627,7 @@ static CURLcode imap_perform_authentication(struct Curl_easy *data,
       result = imap_perform_login(data, conn);
     else {
       /* Other mechanisms not supported */
-      infof(data, "No known authentication mechanisms supported!");
+      infof(data, "No known authentication mechanisms supported");
       result = CURLE_LOGIN_DENIED;
     }
   }
@@ -874,7 +877,7 @@ static CURLcode imap_state_servergreet_resp(struct Curl_easy *data,
     /* PREAUTH */
     struct imap_conn *imapc = &conn->proto.imapc;
     imapc->preauth = TRUE;
-    infof(data, "PREAUTH connection, already authenticated!");
+    infof(data, "PREAUTH connection, already authenticated");
   }
   else if(imapcode != IMAP_RESP_OK) {
     failf(data, "Got unexpected imap-server response");
@@ -1883,22 +1886,17 @@ static char *imap_atom(const char *str, bool escape_only)
  */
 static bool imap_is_bchar(char ch)
 {
+  /* Performing the alnum check with this macro is faster because of ASCII
+     arithmetic */
+  if(ISALNUM(ch))
+    return true;
+
   switch(ch) {
     /* bchar */
     case ':': case '@': case '/':
     /* bchar -> achar */
     case '&': case '=':
-    /* bchar -> achar -> uchar -> unreserved */
-    case '0': case '1': case '2': case '3': case '4': case '5': case '6':
-    case '7': case '8': case '9':
-    case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': case 'G':
-    case 'H': case 'I': case 'J': case 'K': case 'L': case 'M': case 'N':
-    case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T': case 'U':
-    case 'V': case 'W': case 'X': case 'Y': case 'Z':
-    case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g':
-    case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
-    case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':
-    case 'v': case 'w': case 'x': case 'y': case 'z':
+    /* bchar -> achar -> uchar -> unreserved (without alphanumeric) */
     case '-': case '.': case '_': case '~':
     /* bchar -> achar -> uchar -> sub-delims-sh */
     case '!': case '$': case '\'': case '(': case ')': case '*':

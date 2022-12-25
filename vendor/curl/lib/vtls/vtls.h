@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "curl_setup.h"
 
@@ -33,6 +35,17 @@ struct ssl_connect_data;
 #define SSLSUPP_HTTPS_PROXY  (1<<4) /* supports access via HTTPS proxies */
 #define SSLSUPP_TLS13_CIPHERSUITES (1<<5) /* supports TLS 1.3 ciphersuites */
 #define SSLSUPP_CAINFO_BLOB  (1<<6)
+
+#define ALPN_ACCEPTED "ALPN: server accepted "
+
+#define VTLS_INFOF_NO_ALPN                                      \
+  "ALPN: server did not agree on a protocol. Uses default."
+#define VTLS_INFOF_ALPN_OFFER_1STR              \
+  "ALPN: offers %s"
+#define VTLS_INFOF_ALPN_ACCEPTED_1STR           \
+  ALPN_ACCEPTED "%s"
+#define VTLS_INFOF_ALPN_ACCEPTED_LEN_1STR       \
+  ALPN_ACCEPTED "%.*s"
 
 struct Curl_ssl {
   /*
@@ -112,6 +125,9 @@ struct curl_slist *Curl_none_engines_list(struct Curl_easy *data);
 bool Curl_none_false_start(void);
 bool Curl_ssl_tls13_ciphersuites(void);
 
+CURLsslset Curl_init_sslset_nolock(curl_sslbackend id, const char *name,
+                                   const curl_ssl_backend ***avail);
+
 #include "openssl.h"        /* OpenSSL versions */
 #include "gtls.h"           /* GnuTLS versions */
 #include "nssg.h"           /* NSS versions */
@@ -184,7 +200,7 @@ void Curl_free_primary_ssl_config(struct ssl_primary_config *sslc);
    ssl_connect_2_writing. */
 int Curl_ssl_getsock(struct connectdata *conn, curl_socket_t *socks);
 
-int Curl_ssl_backend(void);
+curl_sslbackend Curl_ssl_backend(void);
 
 #ifdef USE_SSL
 int Curl_ssl_init(void);

@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CSettings.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
@@ -573,8 +574,12 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance(false);
-    pGameSettings->ResetPedsLODDistance(false);
+    pGameSettings->ResetBlurEnabled();
+    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetPedsLODDistance();
+    pGameSettings->ResetCoronaReflectionsEnabled();
+    CVARS_GET("dynamic_ped_shadows", bVal);
+    pGameSettings->SetDynamicPedShadowsEnabled(bVal);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -1145,9 +1150,6 @@ void CCore::DoPostFramePulse()
         ApplyGameSettings();
 
         m_pGUI->SelectInputHandlers(INPUT_CORE);
-
-        // Change the main thread affinity to first core
-        SetThreadAffinityMask(GetCurrentThread(), 0x1);
     }
 
     if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE

@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 /*
@@ -334,7 +336,7 @@ static SECStatus set_ciphers(struct Curl_easy *data, PRFileDesc *model,
     char name[MAX_CIPHER_LENGTH + 1];
     size_t len;
     bool found = FALSE;
-    while((*cipher) && (ISSPACE(*cipher)))
+    while((*cipher) && (ISBLANK(*cipher)))
       ++cipher;
 
     end = strpbrk(cipher, ":, ");
@@ -434,7 +436,7 @@ static char *dup_nickname(struct Curl_easy *data, const char *str)
   /* search the first slash; we require at least one slash in a file name */
   n = strchr(str, '/');
   if(!n) {
-    infof(data, "warning: certificate file name \"%s\" handled as nickname; "
+    infof(data, "WARNING: certificate file name \"%s\" handled as nickname; "
           "please use \"./%s\" to force file name", str, str);
     return strdup(str);
   }
@@ -848,7 +850,7 @@ static void HandshakeCallback(PRFileDesc *sock, void *arg)
   unsigned int buflen;
   SSLNextProtoState state;
 
-  if(!conn->bits.tls_enable_npn && !conn->bits.tls_enable_alpn) {
+  if(!conn->bits.tls_enable_alpn) {
     return;
   }
 
@@ -862,28 +864,28 @@ static void HandshakeCallback(PRFileDesc *sock, void *arg)
 #endif
     case SSL_NEXT_PROTO_NO_SUPPORT:
     case SSL_NEXT_PROTO_NO_OVERLAP:
-      infof(data, "ALPN/NPN, server did not agree to a protocol");
+      infof(data, VTLS_INFOF_NO_ALPN);
       return;
 #ifdef SSL_ENABLE_ALPN
     case SSL_NEXT_PROTO_SELECTED:
-      infof(data, "ALPN, server accepted to use %.*s", buflen, buf);
+      infof(data, VTLS_INFOF_ALPN_ACCEPTED_LEN_1STR, buflen, buf);
       break;
 #endif
-    case SSL_NEXT_PROTO_NEGOTIATED:
-      infof(data, "NPN, server accepted to use %.*s", buflen, buf);
+    default:
+      /* ignore SSL_NEXT_PROTO_NEGOTIATED */
       break;
     }
 
-#ifdef USE_NGHTTP2
+#ifdef USE_HTTP2
     if(buflen == ALPN_H2_LENGTH &&
        !memcmp(ALPN_H2, buf, ALPN_H2_LENGTH)) {
-      conn->negnpn = CURL_HTTP_VERSION_2;
+      conn->alpn = CURL_HTTP_VERSION_2;
     }
     else
 #endif
     if(buflen == ALPN_HTTP_1_1_LENGTH &&
        !memcmp(ALPN_HTTP_1_1, buf, ALPN_HTTP_1_1_LENGTH)) {
-      conn->negnpn = CURL_HTTP_VERSION_1_1;
+      conn->alpn = CURL_HTTP_VERSION_1_1;
     }
 
     /* This callback might get called when PR_Recv() is used within
@@ -891,7 +893,7 @@ static void HandshakeCallback(PRFileDesc *sock, void *arg)
      * be any "bundle" associated with the connection anymore.
      */
     if(conn->bundle)
-      Curl_multiuse_state(data, conn->negnpn == CURL_HTTP_VERSION_2 ?
+      Curl_multiuse_state(data, conn->alpn == CURL_HTTP_VERSION_2 ?
                           BUNDLE_MULTIPLEX : BUNDLE_NO_MULTIUSE);
   }
 }
@@ -934,8 +936,8 @@ static SECStatus CanFalseStartCallback(PRFileDesc *sock, void *client_data,
   if(cipherInfo.symCipher != ssl_calg_aes_gcm)
     goto end;
 
-  /* Enforce ALPN or NPN to do False Start, as an indicator of server
-   * compatibility. */
+  /* Enforce ALPN to do False Start, as an indicator of server
+     compatibility. */
   rv = SSL_HandshakeNegotiatedExtension(sock, ssl_app_layer_protocol_xtn,
                                         &negotiatedExtension);
   if(rv != SECSuccess || !negotiatedExtension) {
@@ -983,6 +985,9 @@ static void display_cert_info(struct Curl_easy *data,
   PR_Free(common_name);
 }
 
+/* A number of certs that will never occur in a real server handshake */
+#define TOO_MANY_CERTS 300
+
 static CURLcode display_conn_info(struct Curl_easy *data, PRFileDesc *sock)
 {
   CURLcode result = CURLE_OK;
@@ -1018,6 +1023,11 @@ static CURLcode display_conn_info(struct Curl_easy *data, PRFileDesc *sock)
         cert2 = CERT_FindCertIssuer(cert, now, certUsageSSLCA);
         while(cert2) {
           i++;
+          if(i >= TOO_MANY_CERTS) {
+            CERT_DestroyCertificate(cert2);
+            failf(data, "certificate loop");
+            return CURLE_SSL_CERTPROBLEM;
+          }
           if(cert2->isRoot) {
             CERT_DestroyCertificate(cert2);
             break;
@@ -1146,7 +1156,7 @@ static CURLcode cmp_peer_pubkey(struct ssl_connect_data *connssl,
   /* report the resulting status */
   switch(result) {
   case CURLE_OK:
-    infof(data, "pinned public key verified successfully!");
+    infof(data, "pinned public key verified successfully");
     break;
   case CURLE_SSL_PINNEDPUBKEYNOTMATCH:
     failf(data, "failed to verify pinned public key");
@@ -1748,7 +1758,7 @@ static CURLcode nss_load_ca_certificates(struct Curl_easy *data,
       PR_CloseDir(dir);
     }
     else
-      infof(data, "warning: CURLOPT_CAPATH not a directory (%s)", capath);
+      infof(data, "WARNING: CURLOPT_CAPATH not a directory (%s)", capath);
   }
 
   return CURLE_OK;
@@ -1985,11 +1995,11 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
   /* unless the user explicitly asks to allow the protocol vulnerability, we
      use the work-around */
   if(SSL_OptionSet(model, SSL_CBC_RANDOM_IV, ssl_cbc_random_iv) != SECSuccess)
-    infof(data, "warning: failed to set SSL_CBC_RANDOM_IV = %d",
+    infof(data, "WARNING: failed to set SSL_CBC_RANDOM_IV = %d",
           ssl_cbc_random_iv);
 #else
   if(ssl_cbc_random_iv)
-    infof(data, "warning: support for SSL_CBC_RANDOM_IV not compiled in");
+    infof(data, "WARNING: support for SSL_CBC_RANDOM_IV not compiled in");
 #endif
 
   if(SSL_CONN_CONFIG(cipher_list)) {
@@ -2000,7 +2010,7 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
   }
 
   if(!SSL_CONN_CONFIG(verifypeer) && SSL_CONN_CONFIG(verifyhost))
-    infof(data, "warning: ignoring value of ssl.verifyhost");
+    infof(data, "WARNING: ignoring value of ssl.verifyhost");
 
   /* bypass the default SSL_AuthCertificate() hook in case we do not want to
    * verify peer */
@@ -2020,20 +2030,20 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
     const CURLcode rv = nss_load_ca_certificates(data, conn, sockindex);
     if((rv == CURLE_SSL_CACERT_BADFILE) && !SSL_CONN_CONFIG(verifypeer))
       /* not a fatal error because we are not going to verify the peer */
-      infof(data, "warning: CA certificates failed to load");
+      infof(data, "WARNING: CA certificates failed to load");
     else if(rv) {
       result = rv;
       goto error;
     }
   }
 
-  if(SSL_SET_OPTION(CRLfile)) {
-    const CURLcode rv = nss_load_crl(SSL_SET_OPTION(CRLfile));
+  if(SSL_SET_OPTION(primary.CRLfile)) {
+    const CURLcode rv = nss_load_crl(SSL_SET_OPTION(primary.CRLfile));
     if(rv) {
       result = rv;
       goto error;
     }
-    infof(data, "  CRLfile: %s", SSL_SET_OPTION(CRLfile));
+    infof(data, "  CRLfile: %s", SSL_SET_OPTION(primary.CRLfile));
   }
 
   if(SSL_SET_OPTION(primary.clientcert)) {
@@ -2126,12 +2136,6 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
   }
 #endif
 
-#ifdef SSL_ENABLE_NPN
-  if(SSL_OptionSet(backend->handle, SSL_ENABLE_NPN, conn->bits.tls_enable_npn
-                   ? PR_TRUE : PR_FALSE) != SECSuccess)
-    goto error;
-#endif
-
 #ifdef SSL_ENABLE_ALPN
   if(SSL_OptionSet(backend->handle, SSL_ENABLE_ALPN, conn->bits.tls_enable_alpn
                    ? PR_TRUE : PR_FALSE) != SECSuccess)
@@ -2150,15 +2154,15 @@ static CURLcode nss_setup_connect(struct Curl_easy *data,
   }
 #endif
 
-#if defined(SSL_ENABLE_NPN) || defined(SSL_ENABLE_ALPN)
-  if(conn->bits.tls_enable_npn || conn->bits.tls_enable_alpn) {
+#if defined(SSL_ENABLE_ALPN)
+  if(conn->bits.tls_enable_alpn) {
     int cur = 0;
     unsigned char protocols[128];
 
 #ifdef USE_HTTP2
     if(data->state.httpwant >= CURL_HTTP_VERSION_2
 #ifndef CURL_DISABLE_PROXY
-      && (!SSL_IS_PROXY() || !conn->bits.tunnel_proxy)
+       && (!SSL_IS_PROXY() || !conn->bits.tunnel_proxy)
 #endif
       ) {
       protocols[cur++] = ALPN_H2_LENGTH;

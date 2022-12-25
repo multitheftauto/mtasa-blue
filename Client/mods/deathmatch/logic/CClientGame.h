@@ -193,6 +193,7 @@ public:
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
         NUM_GLITCHES
     };
+
     class CStoredWeaponSlot
     {
     public:
@@ -254,6 +255,8 @@ public:
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
+
+    bool IsWindowFocused() const { return m_bFocused; }
 
     // Accessors
 
@@ -437,6 +440,8 @@ public:
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
     void RestreamWorld();
+
+    void OnWindowFocusChange(bool state);
 
 private:
     // CGUI Callbacks
@@ -772,6 +777,7 @@ private:
     bool m_bBeingDeleted;            // To enable speedy disconnect
 
     bool m_bWasMinimized;
+    bool m_bFocused;
 
     // Cache for speeding up collision processing
 public:

@@ -10,6 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMainConfig.h"
+#include "CBandwidthSettings.h"
+#include "CTickRateSettings.h"
+#include "Utils.h"
+#include "ASE.h"
+#include "CGame.h"
+#include "CScriptDebugging.h"
+#include "CResourceManager.h"
+#include "CConsoleCommands.h"
+#include "CHTTPD.h"
+#include "CStaticFunctionDefinitions.h"
+
 #define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 
 extern CGame* g_pGame;
@@ -337,7 +349,7 @@ bool CMainConfig::Load()
 
     // Grab the server fps limit
     int iFPSTemp = 0;
-    iResult = GetInteger(m_pRootNode, "fpslimit", iFPSTemp, 0, 100);
+    iResult = GetInteger(m_pRootNode, "fpslimit", iFPSTemp, 0, std::numeric_limits<short>::max());
     if (iResult == IS_SUCCESS)
     {
         if (iFPSTemp == 0 || iFPSTemp >= 25)
@@ -362,7 +374,7 @@ bool CMainConfig::Load()
     // Grab the Quality for Voice
     iTemp = m_ucVoiceQuality;
     iResult = GetInteger(m_pRootNode, "voice_quality", iTemp, 0, 10);
-    m_ucVoiceQuality = Clamp(0, iTemp, 10);
+    m_ucVoiceQuality = static_cast<unsigned char>(Clamp(0, iTemp, 10));
 
     // Grab the bitrate for Voice [optional]
     iResult = GetInteger(m_pRootNode, "voice_bitrate", iTemp);
@@ -917,7 +929,7 @@ bool CMainConfig::SetPassword(const char* szPassword, bool bSave)
 
 bool CMainConfig::SetFPSLimit(unsigned short usFPS, bool bSave)
 {
-    if (usFPS == 0 || (usFPS >= 25 && usFPS <= 100))
+    if (usFPS == 0 || (usFPS >= 25 && usFPS <= std::numeric_limits<short>::max()))
     {
         m_usFPSLimit = usFPS;
         if (bSave)

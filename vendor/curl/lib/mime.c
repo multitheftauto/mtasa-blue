@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -29,8 +31,9 @@
 #include "urldata.h"
 #include "sendf.h"
 
-#if (!defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_MIME)) || \
-  !defined(CURL_DISABLE_SMTP) || !defined(CURL_DISABLE_IMAP)
+#if !defined(CURL_DISABLE_MIME) && (!defined(CURL_DISABLE_HTTP) ||      \
+                                    !defined(CURL_DISABLE_SMTP) ||      \
+                                    !defined(CURL_DISABLE_IMAP))
 
 #if defined(HAVE_LIBGEN_H) && defined(HAVE_BASENAME)
 #include <libgen.h>
@@ -1563,7 +1566,7 @@ CURLcode Curl_mime_set_subparts(curl_mimepart *part,
         root = root->parent->parent;
       if(subparts == root) {
         if(part->easy)
-          failf(part->easy, "Can't add itself as a subpart!");
+          failf(part->easy, "Can't add itself as a subpart");
         return CURLE_BAD_FUNCTION_ARGUMENT;
       }
     }
@@ -1922,8 +1925,8 @@ void Curl_mime_unpause(curl_mimepart *part)
 }
 
 
-#else /* !CURL_DISABLE_HTTP && !CURL_DISABLE_MIME ||
-         !CURL_DISABLE_SMTP || !CURL_DISABLE_IMAP */
+#else /* !CURL_DISABLE_MIME && (!CURL_DISABLE_HTTP ||
+                                !CURL_DISABLE_SMTP || !CURL_DISABLE_IMAP) */
 
 /* Mime not compiled in: define stubs for externally-referenced functions. */
 curl_mime *curl_mime_init(CURL *easy)

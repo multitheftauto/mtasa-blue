@@ -23,7 +23,7 @@ public:
     CVehicleColor GetRandomColor();
 
 private:
-    list<CVehicleColor> m_Colors;
+    std::list<CVehicleColor> m_Colors;
 };
 
 class CVehicleColorManager

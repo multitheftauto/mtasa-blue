@@ -15,6 +15,8 @@
 #include <string>
 #include "lua/CLuaArgument.h"
 
+class CClient;
+
 class CAccountPassword
 {
 public:

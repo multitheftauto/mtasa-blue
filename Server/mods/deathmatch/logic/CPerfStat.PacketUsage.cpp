@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
+#include "Enums.h"
+#include <net/CNetServer.h>
+
+extern CNetServer* g_pNetServer;
 
 ///////////////////////////////////////////////////////////////
 //

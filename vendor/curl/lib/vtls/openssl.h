@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -29,6 +31,7 @@
  * This header should only be needed to get included by vtls.c, openssl.c
  * and ngtcp2.c
  */
+#include <openssl/ssl.h>
 
 #include "urldata.h"
 
@@ -42,6 +45,16 @@ struct x509_st;
 CURLcode Curl_ossl_verifyhost(struct Curl_easy *data, struct connectdata *conn,
                               struct x509_st *server_cert);
 extern const struct Curl_ssl Curl_ssl_openssl;
+
+struct ssl_ctx_st;
+CURLcode Curl_ossl_set_client_cert(struct Curl_easy *data,
+                                   struct ssl_ctx_st *ctx, char *cert_file,
+                                   const struct curl_blob *cert_blob,
+                                   const char *cert_type, char *key_file,
+                                   const struct curl_blob *key_blob,
+                                   const char *key_type, char *key_passwd);
+
+CURLcode Curl_ossl_certchain(struct Curl_easy *data, SSL *ssl);
 
 #endif /* USE_OPENSSL */
 #endif /* HEADER_CURL_SSLUSE_H */

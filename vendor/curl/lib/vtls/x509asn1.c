@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -43,6 +45,7 @@
 #include <curl/curl.h>
 #include "urldata.h"
 #include "strcase.h"
+#include "curl_ctype.h"
 #include "hostcheck.h"
 #include "vtls/vtls.h"
 #include "sendf.h"
@@ -714,7 +717,7 @@ static ssize_t encodeDN(char *buf, size_t buflen, struct Curl_asn1Element *dn)
       /* Encode delimiter.
          If attribute has a short uppercase name, delimiter is ", ". */
       if(l) {
-        for(p3 = str; isupper(*p3); p3++)
+        for(p3 = str; ISUPPER(*p3); p3++)
           ;
         for(p3 = (*p3 || p3 - str > 2)? "/": ", "; *p3; p3++) {
           if(l < buflen)
@@ -945,6 +948,24 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
 
   /* Generate all information records for the public key. */
 
+  if(strcasecompare(algo, "ecPublicKey")) {
+    /*
+     * ECC public key is all the data, a value of type BIT STRING mapped to
+     * OCTET STRING and should not be parsed as an ASN.1 value.
+     */
+    const unsigned long len =
+      (unsigned long)((pubkey->end - pubkey->beg - 2) * 4);
+    if(!certnum)
+      infof(data, "   ECC Public Key (%lu bits)", len);
+    if(data->set.ssl.certinfo) {
+      char q[sizeof(len) * 8 / 3 + 1];
+      (void)msnprintf(q, sizeof(q), "%lu", len);
+      if(Curl_ssl_push_certinfo(data, certnum, "ECC Public Key", q))
+        return 1;
+    }
+    return do_pubkey_field(data, certnum, "ecPublicKey", pubkey);
+  }
+
   /* Get the public key (single element). */
   if(!getASN1Element(&pk, pubkey->beg + 1, pubkey->end))
     return 1;
@@ -971,14 +992,10 @@ static int do_pubkey(struct Curl_easy *data, int certnum,
     if(!certnum)
       infof(data, "   RSA Public Key (%lu bits)", len);
     if(data->set.ssl.certinfo) {
-      q = curl_maprintf("%lu", len);
-      if(q) {
-        CURLcode result =
-          Curl_ssl_push_certinfo(data, certnum, "RSA Public Key", q);
-        free((char *) q);
-        if(result)
-          return 1;
-      }
+      char r[sizeof(len) * 8 / 3 + 1];
+      msnprintf(r, sizeof(r), "%lu", len);
+      if(Curl_ssl_push_certinfo(data, certnum, "RSA Public Key", r))
+        return 1;
     }
     /* Generate coefficients. */
     if(do_pubkey_field(data, certnum, "rsa(n)", &elem))

@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAccountManager.h"
+#include "CGame.h"
+#include "CDatabaseManager.h"
+#include "CRegistry.h"
+#include "CMainConfig.h"
+#include "CIdArray.h"
+#include "CAccessControlListManager.h"
+#include "Utils.h"
 
 CAccountManager::CAccountManager(const SString& strDbPathFilename)
     : m_AccountProtect(6, 30000, 60000 * 1)            // Max of 6 attempts per 30 seconds, then 1 minute ignore

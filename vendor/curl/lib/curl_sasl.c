@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  * RFC2195 CRAM-MD5 authentication
  * RFC2617 Basic and Digest Access Authentication
  * RFC2831 DIGEST-MD5 authentication
@@ -670,7 +672,7 @@ CURLcode Curl_sasl_continue(struct SASL *sasl, struct Curl_easy *data,
 #endif
 
   case SASL_OAUTH2:
-    /* Create the authorisation message */
+    /* Create the authorization message */
     if(sasl->authused == SASL_MECH_OAUTHBEARER) {
       result = Curl_auth_create_oauth_bearer_message(conn->user,
                                                      hostname,

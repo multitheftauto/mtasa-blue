@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  *   'pingpong' is for generic back-and-forth support functions used by FTP,
  *   IMAP, POP3, SMTP and whatever more that likes them.
  *
@@ -293,7 +295,7 @@ CURLcode Curl_pp_readresp(struct Curl_easy *data,
        */
       if((ptr + pp->cache_size) > (buf + data->set.buffer_size + 1)) {
         failf(data, "cached response data too big to handle");
-        return CURLE_RECV_ERROR;
+        return CURLE_WEIRD_SERVER_REPLY;
       }
       memcpy(ptr, pp->cache, pp->cache_size);
       gotbytes = (ssize_t)pp->cache_size;
@@ -328,7 +330,7 @@ CURLcode Curl_pp_readresp(struct Curl_easy *data,
     else if(gotbytes <= 0) {
       keepon = FALSE;
       result = CURLE_RECV_ERROR;
-      failf(data, "response reading failed");
+      failf(data, "response reading failed (errno: %d)", SOCKERRNO);
     }
     else {
       /* we got a whole chunk of data, which can be anything from one
@@ -396,7 +398,8 @@ CURLcode Curl_pp_readresp(struct Curl_easy *data,
       }
       else if(keepon) {
 
-        if((perline == gotbytes) && (gotbytes > data->set.buffer_size/2)) {
+        if((perline == gotbytes) &&
+           (gotbytes > (ssize_t)data->set.buffer_size/2)) {
           /* We got an excessive line without newlines and we need to deal
              with it. We keep the first bytes of the line then we throw
              away the rest. */
