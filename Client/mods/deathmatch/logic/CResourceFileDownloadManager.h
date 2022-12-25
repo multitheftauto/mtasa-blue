@@ -30,12 +30,12 @@ public:
     bool IsTransferringInitialFiles() { return m_bIsTransferingFiles; }
 
 protected:
-    CTransferBox*          GetTransferBox() { return g_pClientGame->GetTransferBox(); };
-    void                   AddDownloadSize(int iSize);
-    bool                   DisableHttpServer(uint uiHttpServerIndex);
-    bool                   BeginResourceFileDownload(CDownloadableResource* pDownloadableResource, uint uiHttpServerIndex);
-    static void            StaticDownloadFinished(const SHttpDownloadResult& result);
-    void                   DownloadFinished(const SHttpDownloadResult& result);
+    CTransferBox* GetTransferBox() { return g_pClientGame->GetTransferBox(); };
+    void          AddDownloadSize(int iSize);
+    bool          DisableHttpServer(uint uiHttpServerIndex);
+    bool          BeginResourceFileDownload(CDownloadableResource* pDownloadableResource, uint uiHttpServerIndex);
+    static void   StaticDownloadFinished(const SHttpDownloadResult& result);
+    void          DownloadFinished(const SHttpDownloadResult& result);
 
     std::vector<CDownloadableResource*> m_PendingFileDownloadList;
     std::vector<CDownloadableResource*> m_ActiveFileDownloadList;

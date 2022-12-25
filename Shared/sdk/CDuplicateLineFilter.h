@@ -13,7 +13,6 @@
 #include <deque>
 #include "SharedUtil.IntTypes.h"
 
-
 template <class T>
 class CDuplicateLineFilter
 {
@@ -28,7 +27,6 @@ public:
     {
         m_uiMaxNumOfLinesInMatch = uiMaxNumOfLinesInMatch;
         m_uiMaxDelaySeconds = uiMaxDelaySeconds;
-        m_bIsMatching = false;
     }
 
     //////////////////////////////////////////////////////////
@@ -155,11 +153,11 @@ public:
 protected:
     std::deque<T>          m_History;
     std::list<SOutputLine> m_PendingOutput;
-    bool                   m_bIsMatching;               // true if matching a duplicate set
-    uint                   m_uiMatchSize;               // Number of lines in active match
-    uint                   m_uiMatchCurLine;            // Current line in active match
-    uint                   m_uiDupCount;                // Number of duplicates found for active match
-    time_t                 m_tLastOutputTime;
+    bool                   m_bIsMatching = false;            // true if matching a duplicate set
+    uint                   m_uiMatchSize = 0;                // Number of lines in active match
+    uint                   m_uiMatchCurLine = 0;             // Current line in active match
+    uint                   m_uiDupCount = 0;                 // Number of duplicates found for active match
+    time_t                 m_tLastOutputTime = 0;
     uint                   m_uiMaxNumOfLinesInMatch;            // Max number lines in a matching set
     uint                   m_uiMaxDelaySeconds;                 // Max seconds to delay outputting duplicated lines
 };

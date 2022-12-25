@@ -35,7 +35,8 @@ struct SMemStatsInfo
     SShaderReplacementStats             shaderReplacementStats;
     SModelCacheStats                    modelCacheStats;
 
-    union {
+    union
+    {
         uint uiArray[14];
         struct
         {

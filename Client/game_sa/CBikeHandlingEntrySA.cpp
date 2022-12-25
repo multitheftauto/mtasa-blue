@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBikeHandlingEntrySA.h"
 
 CBikeHandlingEntrySA::CBikeHandlingEntrySA()
 {

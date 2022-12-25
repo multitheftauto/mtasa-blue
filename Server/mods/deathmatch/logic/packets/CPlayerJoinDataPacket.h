@@ -42,8 +42,6 @@ public:
     const char* GetSerialUser() { return m_strSerialUser; }
     void        SetSerialUser(const char* szSerialUser) { m_strSerialUser.AssignLeft(szSerialUser, MAX_SERIAL_LENGTH); }
 
-    const char* GetDiscordJoinSecret() const { return (m_strDiscordSecret.length() > 64 ? "" : m_strDiscordSecret); }
-
     bool IsOptionalUpdateInfoRequired() { return m_bOptionalUpdateInfoRequired; }
 
 private:
@@ -56,5 +54,4 @@ private:
     MD5            m_Password;
     SString        m_strSerialUser;
     CMtaVersion    m_strPlayerVersion;
-    SString        m_strDiscordSecret;
 };

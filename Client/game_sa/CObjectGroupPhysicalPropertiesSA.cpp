@@ -10,14 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFxSystemBPSA.h"
+#include "CGameSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
+
 extern CGameSA* pGame;
 
 CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = *(CObjectGroupPhysicalPropertiesSAInterface**)(0x59F857 + 6);
 std::unordered_map<unsigned char, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
 
 CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA() : m_pInterface(nullptr)
-{}
+{
+}
 
 CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA(unsigned char ucObjectGroup) : m_ucObjectGroup(ucObjectGroup)
 {

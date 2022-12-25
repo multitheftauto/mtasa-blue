@@ -24,7 +24,7 @@ private:
 
     static std::variant<bool, std::string, CLuaArguments> GetServerConfigSetting(std::string name);
 
-    static bool SetServerPassword(std::optional<std::string> rawPassword);
+    static bool                                           SetServerPassword(std::optional<std::string> rawPassword);
     static std::variant<std::nullptr_t, std::string_view> GetServerPassword();
 
     static unsigned int GetServerHttpPort();

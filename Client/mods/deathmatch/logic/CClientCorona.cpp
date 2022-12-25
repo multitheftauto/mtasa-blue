@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CCoronas.h>
+#include <game/CRegisteredCorona.h>
 
 CClientCorona::CClientCorona(CClientMarker* pThis)
 {
@@ -21,6 +23,7 @@ CClientCorona::CClientCorona(CClientMarker* pThis)
     m_Color = SColorRGBA(255, 0, 0, 255);
     m_fSize = 4.0f;
     m_pCoronas = g_pGame->GetCoronas();
+    m_bReflectionEnabled = false;
 
     // Pick an unique identifier
     static unsigned long ulIdentifier = 0xFFFFFFFF;
@@ -75,6 +78,7 @@ void CClientCorona::DoPulse()
             color.A = 0;
         pCorona->SetColor(color.R, color.G, color.B, color.A);
         pCorona->SetSize(m_fSize);
+        pCorona->SetReflectionType(m_bReflectionEnabled);
     }
     else
     {

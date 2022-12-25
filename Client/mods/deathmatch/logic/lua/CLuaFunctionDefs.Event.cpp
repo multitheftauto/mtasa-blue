@@ -244,8 +244,8 @@ int CLuaFunctionDefs::TriggerServerEvent(lua_State* luaVM)
                     // Extra arguments begin at argument 3
                     if (pEntity)
                     {
-                        m_pScriptDebugging->LogError(luaVM, "clientside element '%s' at argument %u @ 'triggerServerEvent'",
-                                                     pEntity->GetTypeName().c_str(), i + 3);
+                        m_pScriptDebugging->LogError(luaVM, "clientside element '%s' at argument %u @ 'triggerServerEvent'", pEntity->GetTypeName().c_str(),
+                                                     i + 3);
                     }
                     else
                     {

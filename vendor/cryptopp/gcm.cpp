@@ -44,10 +44,6 @@ NAMESPACE_BEGIN(CryptoPP)
 #endif
 #endif  // CRYPTOPP_BOOL_X86 || CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X64
 
-// Clang __m128i casts, http://bugs.llvm.org/show_bug.cgi?id=20670
-#define M128_CAST(x) ((__m128i *)(void *)(x))
-#define CONST_M128_CAST(x) ((const __m128i *)(const void *)(x))
-
 word16 GCM_Base::s_reductionTable[256];
 volatile bool GCM_Base::s_reductionTableInitialized = false;
 
@@ -563,6 +559,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 #endif
 
 #if CRYPTOPP_SSE2_ASM_AVAILABLE
+
     case 1:        // SSE2 and 2K tables
         {
         #ifdef __GNUC__
@@ -729,10 +726,8 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
                 ATT_PREFIX
                     :
                     : "c" (data), "d" (len/16), "S" (hashBuffer), "D" (s_reductionTable)
-                    : "memory", "cc", "%eax"
-            #if CRYPTOPP_BOOL_X64
-                    , "%ebx", "%r11"
-            #endif
+                    : "memory", "cc", "%eax", "%ebx", PERCENT_REG(AS_REG_7), "%xmm0",
+                      "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5"
                 );
         #elif defined(CRYPTOPP_GENERATE_X64_MASM)
             pop rbx
@@ -808,7 +803,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
                 ATT_PREFIX
                     :
                     : "c" (data), "d" (len/16), "S" (hashBuffer)
-                    : "memory", "cc", "%edi", "%eax"
+                    : "memory", "cc", "%edi", "%eax", "%xmm0", "%xmm1"
                 );
         #elif defined(CRYPTOPP_GENERATE_X64_MASM)
             pop rdi

@@ -85,7 +85,9 @@ public:
     // the top and left values are always less than the bottom and right values.
     void FixIncorrectTopLeft()
     {
-        if (left > right) left = right - 1.0f;
-        if (top > bottom) top = bottom - 1.0f;
+        if (left > right)
+            left = right - 1.0f;
+        if (top > bottom)
+            top = bottom - 1.0f;
     }
 };
