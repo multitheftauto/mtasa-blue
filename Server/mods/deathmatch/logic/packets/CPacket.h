@@ -15,6 +15,7 @@ class CPacket;
 
 #include "../../Config.h"
 #include <net/CNetServer.h>
+#include <net/Packets.h>
 
 class CElement;
 class CPlayer;

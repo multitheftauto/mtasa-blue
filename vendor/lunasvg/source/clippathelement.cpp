@@ -5,13 +5,13 @@
 namespace lunasvg {
 
 ClipPathElement::ClipPathElement()
-    : GraphicsElement(ElementId::ClipPath)
+    : GraphicsElement(ElementID::ClipPath)
 {
 }
 
 Units ClipPathElement::clipPathUnits() const
 {
-    auto& value = get(PropertyId::ClipPathUnits);
+    auto& value = get(PropertyID::ClipPathUnits);
     return Parser::parseUnits(value, Units::UserSpaceOnUse);
 }
 

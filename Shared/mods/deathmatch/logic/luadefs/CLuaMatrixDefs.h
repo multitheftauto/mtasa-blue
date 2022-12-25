@@ -10,12 +10,15 @@
  *****************************************************************************/
 
 #pragma once
+
 extern "C"
 {
     #include "lua.h"
     #include "lualib.h"
     #include "lauxlib.h"
 }
+
+#include "luadefs/CLuaDefs.h"
 
 class CLuaMatrixDefs : public CLuaDefs
 {

@@ -595,5 +595,8 @@ namespace
         {true, "unbanSerial", "Please manually update this.  Refer to the wiki for details"},
         {true, "getBansXML", "Please manually update this.  Refer to the wiki for details"},
         {true, "canPlayerUseFunction", "Please manually update this.  Refer to the wiki for details"},
+
+        // Old Discord implementation (see #2499)
+        {true, "setPlayerDiscordJoinParams", "See GitHub PR #2499 for more details"},
     };
 }            // namespace

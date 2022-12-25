@@ -10,7 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
+#include "CWaterManagerSA.h"
+
+extern CCoreInterface* g_pCore;
+
 extern int ms_iNumNonDefaultAndNonZeroVertices;
+
+#define WATER_VISIBLE 1
+#define WATER_SHALLOW 2
 
 using namespace std;
 
@@ -785,6 +794,8 @@ void CWaterManagerSA::SetOutsideWorldWaterLevel(float fLevel)
     MemPut<float>(0x6EFFA6, fLevel);
     // Collision
     MemPut<float>(0x6E873F, fLevel);
+    // Sound
+    MemPut<float>(0x6EA238, fLevel);
 }
 
 float CWaterManagerSA::GetWaveLevel()

@@ -11,6 +11,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CPlayerInfo.h>
+#include <game/CSettings.h>
 #include <lua/CLuaFunctionParser.h>
 
 #define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"
@@ -65,6 +67,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getClip", "getCameraClip");
     lua_classfunction(luaVM, "getFarClipDistance", "getFarClipDistance");
     lua_classfunction(luaVM, "getNearClipDistance", "getNearClipDistance");
+    lua_classfunction(luaVM, "getType", ArgumentParser<GetElementType>);
 
     lua_classfunction(luaVM, "setPosition", OOP_SetCameraPosition);
     lua_classfunction(luaVM, "setRotation", OOP_SetCameraRotation);
@@ -88,6 +91,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "position", OOP_SetCameraPosition, OOP_GetCameraPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetCameraRotation, OOP_GetCameraRotation);
     lua_classvariable(luaVM, "matrix", NULL, OOP_GetCameraMatrix);
+    lua_classvariable(luaVM, "type", nullptr, ArgumentParser<GetElementType>);
 
     lua_registerstaticclass(luaVM, "Camera");
 }
@@ -594,4 +598,9 @@ int CLuaCameraDefs::OOP_SetCameraRotation(lua_State* luaVM)
     }
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+const SString& CLuaCameraDefs::GetElementType()
+{
+    return m_pManager->GetCamera()->GetTypeName();
 }

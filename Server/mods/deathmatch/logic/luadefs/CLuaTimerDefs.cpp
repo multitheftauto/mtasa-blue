@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaTimerDefs.h"
+#include "CScriptArgReader.h"
 
 void CLuaTimerDefs::LoadFunctions()
 {

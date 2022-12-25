@@ -27,15 +27,42 @@ namespace EHashFunction
 }
 using EHashFunction::EHashFunctionType;
 
+enum class HashFunctionType
+{
+    MD5,
+    SHA1,
+    SHA224,
+    SHA256,
+    SHA384,
+    SHA512,
+    HMAC,
+};
+
 enum class PasswordHashFunction
 {
     Bcrypt
 };
 
-enum class StringEncryptFunction
+enum class StringEncodeFunction
 {
     TEA,
     AES128,
+    RSA,
+};
+
+enum class KeyPairAlgorithm
+{
+    RSA
+};
+
+enum class HmacAlgorithm
+{
+    MD5,
+    SHA1,
+    SHA224,
+    SHA256,
+    SHA384,
+    SHA512,
 };
 
 namespace SharedUtil

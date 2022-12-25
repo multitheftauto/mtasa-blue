@@ -10,6 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CClock.h>
+#include <game/CFireManager.h>
+#include <game/CGarage.h>
+#include <game/CGarages.h>
+#include <game/CHandlingEntry.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
+#include <game/CWeather.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
 
@@ -348,16 +357,11 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     pPlayer->SetID(g_pClientGame->m_LocalID);
 
-    // Read out number of players
-    unsigned char ucNumberOfPlayers = 0;
-    bitStream.Read(ucNumberOfPlayers);
-
-    // Can't be 0
-    if (ucNumberOfPlayers == 0)
-    {
-        RaiseProtocolError(14);
-        return;
-    }
+    // For protocol backwards compatibility: read a single byte value.
+    // This used to hold the number of players, it was never used on the client side,
+    // and caused protocol error 14 whenever the player count was narrowed down to a single byte.
+    uint8_t numPlayers = 0;
+    bitStream.Read(numPlayers);
 
     // Read out the root element id
     ElementID RootElementID;
@@ -994,8 +998,6 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
         }
     }
-
-    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
@@ -1027,8 +1029,6 @@ void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
     {
         RaiseProtocolError(15);
     }
-
-    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
@@ -4999,6 +4999,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         return;
     }
 
+    bool bFatalError = false;
+
     CResource* pResource = g_pClientGame->m_pResourceManager->Add(usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq,
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
@@ -5047,61 +5049,80 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                         }
                         szChunkData[ucChunkSize] = NULL;
 
-                        bitStream.Read(ucChunkSubType);
-                        bitStream.Read(chunkChecksum.ulCRC);
-                        bitStream.Read((char*)chunkChecksum.md5.data, sizeof(chunkChecksum.md5.data));
-                        bitStream.Read(dChunkDataSize);
-
-                        uint uiDownloadSize = (uint)dChunkDataSize;
-                        uiTotalSizeProcessed += uiDownloadSize;
-                        if (uiTotalSizeProcessed / 1024 / 1024 > 50)
-                            g_pCore->UpdateDummyProgress(uiTotalSizeProcessed / 1024 / 1024, " MB");
-
-                        // Create the resource downloadable
-                        CDownloadableResource* pDownloadableResource = NULL;
-                        switch (ucChunkSubType)
+                        std::string strChunkData = szChunkData;
+                        // make the full file path (c:/path/to/mods/deathmatch/resources/resource/)
+                        std::string           strMetaPathTemp;
+                        std::string           strResPathTemp = pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, strMetaPathTemp);
+                        std::filesystem::path fsResPath = std::filesystem::path(strResPathTemp).lexically_normal();
+                        std::string           strResPath = fsResPath.string();
+                        // make the full file path (c:/path/to/mods/deathmatch/resources/resource/file.lua)
+                        std::string           strResFilePathTemp = strResPath + static_cast<char>(std::filesystem::path::preferred_separator) + strChunkData;
+                        std::filesystem::path fsResFilePath = std::filesystem::path(strResFilePathTemp).lexically_normal();
+                        std::string           strResFilePath = fsResFilePath.string();
+                        // check that full file path contains full resource path
+                        if (strResFilePath.rfind(strResPath.c_str(), 0) != 0)
                         {
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                            {
-                                bool bDownload = bitStream.ReadBit();
-                                pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData,
-                                                                                   uiDownloadSize, chunkChecksum, bDownload);
-
-                                break;
-                            }
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                                pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData,
-                                                                                   uiDownloadSize, chunkChecksum, true);
-
-                                break;
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                                pDownloadableResource = pResource->AddConfigFile(szChunkData, uiDownloadSize, chunkChecksum);
-
-                                break;
-                            default:
-
-                                break;
+                            bFatalError = true;
+                            AddReportLog(2081, SString("Path %s (expected %s)", strResFilePath.c_str(), strResPath.c_str()));
                         }
-
-                        // Does the Client and Server checksum differ?
-                        if (pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch())
+                        else
                         {
-                            // Delete the file that already exists
-                            FileDelete(pDownloadableResource->GetName());
-                            if (FileExists(pDownloadableResource->GetName()))
+                            bitStream.Read(ucChunkSubType);
+                            bitStream.Read(chunkChecksum.ulCRC);
+                            bitStream.Read((char*)chunkChecksum.md5.data, sizeof(chunkChecksum.md5.data));
+                            bitStream.Read(dChunkDataSize);
+
+                            uint uiDownloadSize = (uint)dChunkDataSize;
+                            uiTotalSizeProcessed += uiDownloadSize;
+                            if (uiTotalSizeProcessed / 1024 / 1024 > 50)
+                                g_pCore->UpdateDummyProgress(uiTotalSizeProcessed / 1024 / 1024, " MB");
+
+                            // Create the resource downloadable
+                            CDownloadableResource* pDownloadableResource = NULL;
+                            switch (ucChunkSubType)
                             {
-                                SString strMessage("Unable to delete old file %s", *ConformResourcePath(pDownloadableResource->GetName()));
-                                g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                                {
+                                    bool bDownload = bitStream.ReadBit();
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData,
+                                                                                       uiDownloadSize, chunkChecksum, bDownload);
+
+                                    break;
+                                }
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData,
+                                                                                       uiDownloadSize, chunkChecksum, true);
+
+                                    break;
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                                    pDownloadableResource = pResource->AddConfigFile(szChunkData, uiDownloadSize, chunkChecksum);
+
+                                    break;
+                                default:
+
+                                    break;
                             }
 
-                            // Is it downloadable now?
-                            if (pDownloadableResource->IsAutoDownload())
+                            // Does the Client and Server checksum differ?
+                            if (pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch())
                             {
-                                // Make sure the directory exists
-                                MakeSureDirExists(pDownloadableResource->GetName());
+                                // Delete the file that already exists
+                                FileDelete(pDownloadableResource->GetName());
+                                if (FileExists(pDownloadableResource->GetName()))
+                                {
+                                    SString strMessage("Unable to delete old file %s", *ConformResourcePath(pDownloadableResource->GetName()));
+                                    g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+                                }
 
-                                // Queue the file to be downloaded
-                                g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
+                                // Is it downloadable now?
+                                if (pDownloadableResource->IsAutoDownload())
+                                {
+                                    // Make sure the directory exists
+                                    MakeSureDirExists(pDownloadableResource->GetName());
+
+                                    // Queue the file to be downloaded
+                                    g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
+                                }
                             }
                         }
                     }
@@ -5116,17 +5137,25 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                 delete[] szChunkData;
                 szChunkData = NULL;
             }
+
+            if (bFatalError)
+            {
+                break;
+            }
         }
 
-        g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
-
-        // Are there any resources to being downloaded?
-        if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
+        if (!bFatalError)
         {
-            // Load the resource now
-            if (pResource->CanBeLoaded())
+            g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
+
+            // Are there any resources to being downloaded?
+            if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
             {
-                pResource->Load();
+                // Load the resource now
+                if (pResource->CanBeLoaded())
+                {
+                    pResource->Load();
+                }
             }
         }
     }
@@ -5136,6 +5165,11 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
     g_pCore->UpdateDummyProgress(0);
     totalSizeProcessedResetTimer.Reset();
+
+    if (bFatalError)
+    {
+        RaiseFatalError(2081);
+    }
 }
 
 void CPacketHandler::Packet_ResourceStop(NetBitStreamInterface& bitStream)
