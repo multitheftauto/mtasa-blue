@@ -347,6 +347,17 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pAddressFavoriteIcon[type]->SetAlpha(0.3f);
     m_pAddressFavoriteIcon[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFavouritesClick, this));
 
+    // Remove recent played icon
+    if (type == ServerBrowserTypes::RECENTLY_PLAYED)
+    {
+        m_pRemoveFromRecentIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pEditAddress[type]));
+        m_pRemoveFromRecentIcon[type]->SetPosition(CVector2D(fWidth - 40 - 8, (SB_BUTTON_SIZE_Y - 16) / 2), false);
+        m_pRemoveFromRecentIcon[type]->SetSize(CVector2D(16, 16), false);
+        m_pRemoveFromRecentIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\trashcan.png");
+        m_pRemoveFromRecentIcon[type]->SetAlpha(0.3f);
+        m_pRemoveFromRecentIcon[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnRemoveFromRecentClick, this));
+    }
+
     // History Combo
     fWidth = fWidth + COMBOBOX_ARROW_SIZE_X;
     m_pComboAddressHistory[type] = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(m_pTab[type], ""));
@@ -593,6 +604,8 @@ void CServerBrowser::DeleteTab(ServerBrowserType type)
     delete m_pComboAddressHistory[type];
 
     delete m_pAddressFavoriteIcon[type];
+    if (type == ServerBrowserTypes::RECENTLY_PLAYED)
+        delete m_pRemoveFromRecentIcon[type];
     delete m_pEditSearch[type];
     delete m_pButtonRefreshIcon[type];
 
@@ -761,6 +774,11 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_pGeneralHelpWindow->SetVisible(false);
         m_pQuickConnectHelpWindow->SetVisible(false);
         CServerInfo::GetSingletonPtr()->Hide();
+
+        for (uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        {
+            m_FlashSearchBox[i].uiCount = 0;
+        }
     }
 }
 
@@ -877,6 +895,9 @@ void CServerBrowser::UpdateServerList(ServerBrowserType Type, bool bClearServerL
 
     m_pServerList[Type]->ForceUpdate();
     pList->SetUpdated(false);
+
+    if (Type == ServerBrowserTypes::RECENTLY_PLAYED)
+        m_pRemoveFromRecentIcon[Type]->SetAlpha(0.3f);
 }
 
 void CServerBrowser::CreateHistoryList()
@@ -1132,6 +1153,8 @@ bool CServerBrowser::RemoveSelectedServerFromRecentlyPlayedList()
     m_pServerList[Type]->RemoveRow(iSelectedItem);
     SaveRecentlyPlayedList();
 
+    m_pRemoveFromRecentIcon[Type]->SetAlpha(0.3f);
+
     return true;
 }
 
@@ -1223,6 +1246,14 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
 
         // save the selected server
         m_iSelectedServer[Type] = iSelectedIndex;
+
+        if (Type == ServerBrowserTypes::RECENTLY_PLAYED)
+            m_pRemoveFromRecentIcon[Type]->SetAlpha(1.0f);
+    }
+    else
+    {
+        if (Type == ServerBrowserTypes::RECENTLY_PLAYED)
+            m_pRemoveFromRecentIcon[Type]->SetAlpha(0.3f);
     }
     return true;
 }
@@ -1419,6 +1450,11 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
         }
     }
     return true;
+}
+
+bool CServerBrowser::OnRemoveFromRecentClick(CGUIElement* pElement)
+{
+    return RemoveSelectedServerFromRecentlyPlayedList();
 }
 
 bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)

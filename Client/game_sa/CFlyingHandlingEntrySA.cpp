@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFlyingHandlingEntrySA.h"
 
 CFlyingHandlingEntrySA::CFlyingHandlingEntrySA()
 {

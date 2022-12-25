@@ -55,7 +55,7 @@ void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, voi
 {
     if (data == 0)
     {
-        CClientPlayerVoice* pVoice = static_cast<CClientPlayerVoice*>(user);
+        CClientPlayerVoice*         pVoice = static_cast<CClientPlayerVoice*>(user);
         std::lock_guard<std::mutex> lock(pVoice->m_Mutex);
 
         if (pVoice->m_bVoiceActive)

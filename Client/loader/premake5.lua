@@ -18,6 +18,7 @@ project "Loader"
 		"unrar", "d3d9",
 		"detours", "Imagehlp",
 		"../../vendor/nvapi/x86/nvapi.lib",
+		"cryptopp", "Wscapi",
 	}
 
 	pchheader "StdInc.h"
@@ -42,7 +43,7 @@ project "Loader"
 			"resource/splash.bmp"
 		}
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

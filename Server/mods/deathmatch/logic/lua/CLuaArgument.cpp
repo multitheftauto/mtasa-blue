@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaArgument.h"
+#include "CLuaArguments.h"
+#include "LuaCommon.h"
+#include "CGame.h"
+#include "CElementIDs.h"
+#include "CScriptDebugging.h"
+#include "CResourceManager.h"
 
 extern CGame* g_pGame;
 
@@ -455,7 +462,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             case LUA_TTABLE:
             {
                 m_pTableData = new CLuaArguments();
-                if(!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
+                if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
                     return false;
                 m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
@@ -512,7 +519,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
                 uint uiLength;
                 if (bitStream.ReadCompressed(uiLength) && uiLength > 0)
                 {
-                    if(!bitStream.CanReadNumberOfBytes(uiLength))
+                    if (!bitStream.CanReadNumberOfBytes(uiLength))
                         return false;
 
                     bitStream.AlignReadToByteBoundary();
@@ -975,7 +982,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                 m_iType = LUA_TNIL;
                 break;
             case json_type_boolean:
-                if (json_object_get_boolean(object) == TRUE)
+                if (json_object_get_boolean(object))
                     ReadBool(true);
                 else
                     ReadBool(false);

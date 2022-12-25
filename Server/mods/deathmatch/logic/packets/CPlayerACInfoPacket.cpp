@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerACInfoPacket.h"
 
 bool CPlayerACInfoPacket::Read(NetBitStreamInterface& BitStream)
 {

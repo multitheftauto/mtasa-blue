@@ -11,9 +11,7 @@
 
 #pragma once
 
-#include "Common.h"
 #include <game/CAudioEngine.h>
-#include "CVehicleSA.h"
 
 #define FUNC_ReportFrontendAudioEvent           0x506EA0
 #define FUNC_PreloadBeatTrack                   0x507F40
@@ -79,7 +77,8 @@ public:
     float               m_fTimeScale;                   // +80
     char                unk2;                           // +84 = 31488
     char                unk3;                           // +85 = 1005
-    union {
+    union
+    {
         unsigned short m_wEnvironmentFlags;
         struct
         {
@@ -117,25 +116,25 @@ class CAudioEngineSA : public CAudioEngine
 public:
     CAudioEngineSA(CAudioEngineSAInterface* pInterface);
 
-    VOID          PlayFrontEndSound(DWORD dwSound);
-    VOID          PlayBeatTrack(short iTrack);
-    VOID          SetEffectsMasterVolume(BYTE bVolume);            // 64 = max volume
-    VOID          SetMusicMasterVolume(BYTE bVolume);
-    VOID          ClearMissionAudio(int slot = 1);
-    VOID          PreloadMissionAudio(unsigned short usAudioEvent, int slot = 1);
+    void          PlayFrontEndSound(DWORD dwSound);
+    void          PlayBeatTrack(short iTrack);
+    void          SetEffectsMasterVolume(BYTE bVolume);            // 64 = max volume
+    void          SetMusicMasterVolume(BYTE bVolume);
+    void          ClearMissionAudio(int slot = 1);
+    void          PreloadMissionAudio(unsigned short usAudioEvent, int slot = 1);
     unsigned char GetMissionAudioLoadingStatus(int slot = 1);
     bool          IsMissionAudioSampleFinished(int slot = 1);
-    VOID          AttachMissionAudioToPhysical(CPhysical* physical, int slot = 1);
-    VOID          SetMissionAudioPosition(CVector* position, int slot = 1);
+    void          AttachMissionAudioToPhysical(CPhysical* physical, int slot = 1);
+    void          SetMissionAudioPosition(CVector* position, int slot = 1);
     bool          PlayLoadedMissionAudio(int slot = 1);
-    VOID          PauseAllSound(bool bPaused);
-    VOID          StopRadio();
-    VOID          StartRadio(unsigned int station);
+    void          PauseAllSound(bool bPaused);
+    void          StopRadio();
+    void          StartRadio(unsigned int station);
     void          PauseAmbientSounds(bool bPaused);
-    VOID          SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled);
+    void          SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled);
     bool          IsAmbientSoundEnabled(eAmbientSoundType eType);
     void          ResetAmbientSounds();
-    VOID          SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bEnabled, bool bImmediate);
+    void          SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bEnabled, bool bImmediate);
     bool          IsWorldSoundEnabled(uint uiGroup, uint uiIndex);
     void          ResetWorldSounds();
     void          SetWorldSoundHandler(WorldSoundHandler* pHandler);
