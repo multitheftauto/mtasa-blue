@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicleResyncPacket.h"
+#include "CVehicle.h"
 #include "net/SyncStructures.h"
 
 bool CVehicleResyncPacket::Read(NetBitStreamInterface& BitStream)

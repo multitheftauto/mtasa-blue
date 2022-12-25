@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAnimBlendHierarchySA.h"
+#include "CAnimManagerSA.h"
+#include "CAnimBlendSequenceSA.h"
 
 // Careful, GetIndex will not work for custom animations
 int CAnimBlendHierarchySAInterface::GetIndex()

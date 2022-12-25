@@ -46,7 +46,6 @@ enum eClientEntityType
     CCLIENTVEHICLE,
     CCLIENTRADARMARKER,
     CCLIENTOBJECT,
-    CCLIENTCIVILIAN,
     CCLIENTPICKUP,
     CCLIENTRADARAREA,
     CCLIENTMARKER,
@@ -77,9 +76,11 @@ enum eClientEntityType
     CCLIENTBROWSER,
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
+    CCLIENTVECTORGRAPHIC,
     CCLIENTUNKNOWN,
 };
 
+class CEntity;
 class CClientColShape;
 class CClientPed;
 class CCustomData;
@@ -90,16 +91,13 @@ class CLuaMain;
 class CMapEventManager;
 typedef CFastList<CClientEntity*> CChildListType;
 
-// List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot : public std::vector<CClientEntity*>, public CRefCountableST
-{
-};
+typedef std::vector<CClientEntity*> CElementListSnapshot;
+typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 enum eCClientEntityClassTypes
 {
     CLASS_CClientEntity,
     CLASS_CClientCamera,
-    CLASS_CClientCivilian,
     CLASS_CClientColModel,
     CLASS_CClientDFF,
     CLASS_CClientGUIElement,
@@ -138,6 +136,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientRenderTarget,
     CLASS_CClientScreenSource,
     CLASS_CClientWebBrowser,
+    CLASS_CClientVectorGraphic,
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
@@ -192,7 +191,7 @@ public:
 
     CChildListType ::const_iterator IterBegin() { return m_Children.begin(); }
     CChildListType ::const_iterator IterEnd() { return m_Children.end(); }
-    CElementListSnapshot*           GetChildrenListSnapshot();
+    CElementListSnapshotRef         GetChildrenListSnapshot();
 
     ElementID GetID() { return m_ID; };
     void      SetID(ElementID ID);
@@ -328,11 +327,11 @@ public:
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
 protected:
-    CClientManager*       m_pManager;
-    CClientEntity*        m_pParent;
-    CChildListType        m_Children;
-    CElementListSnapshot* m_pChildrenListSnapshot;
-    uint                  m_uiChildrenListSnapshotRevision;
+    CClientManager*         m_pManager;
+    CClientEntity*          m_pParent;
+    CChildListType          m_Children;
+    CElementListSnapshotRef m_pChildrenListSnapshot;
+    uint                    m_uiChildrenListSnapshotRevision;
 
     CCustomData* m_pCustomData;
 
