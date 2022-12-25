@@ -202,10 +202,10 @@ public:
     void SetChatFont(eChatFont Font);
     void OnModLoad();
 
-    void      SetCharacterLimit(int charLimit);
-    int       GetCharacterLimit() const { return m_iCharacterLimit; }
-    int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
-    int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
+    void          SetCharacterLimit(int charLimit);
+    int           GetCharacterLimit() const { return m_iCharacterLimit; }
+    constexpr int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
+    constexpr int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
 
 private:
     void LoadCVars();
@@ -297,8 +297,8 @@ protected:
 
     bool m_bNickCompletion;
 
-    int m_iCharacterLimit;
-    const int m_iDefaultCharacterLimit = 96;
-    const int m_iMaxCharacterLimit = 255;
-    const int m_iMaxInputLines = 5;
+    int                         m_iCharacterLimit;
+    static inline constexpr int m_iDefaultCharacterLimit = 96;
+    static inline constexpr int m_iMaxCharacterLimit = 255;
+    static inline constexpr int m_iMaxInputLines = 5;
 };
