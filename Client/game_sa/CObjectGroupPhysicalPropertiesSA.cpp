@@ -10,7 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFxSystemBPSA.h"
+#include "CGameSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
+
 extern CGameSA* pGame;
 
 CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = *(CObjectGroupPhysicalPropertiesSAInterface**)(0x59F857 + 6);

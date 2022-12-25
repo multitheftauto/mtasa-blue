@@ -11,6 +11,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CPlayerInfo.h>
+#include <game/CSettings.h>
 #include <lua/CLuaFunctionParser.h>
 
 #define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"

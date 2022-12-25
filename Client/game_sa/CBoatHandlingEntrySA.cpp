@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBoatHandlingEntrySA.h"
 
 CBoatHandlingEntrySA::CBoatHandlingEntrySA()
 {
