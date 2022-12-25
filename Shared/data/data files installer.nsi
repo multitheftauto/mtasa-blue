@@ -169,11 +169,11 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
 
-	SetOutPath "$INSTDIR\skins\Default New"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Default New\CGUI.is.xml"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Default New\CGUI.lnf.xml"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Default New\CGUI.png"
-    File "${FILES_ROOT}\MTA San Andreas\skins\Default New\CGUI.xml"
+	SetOutPath "$INSTDIR\skins\Default 2023"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.xml"
 	
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
