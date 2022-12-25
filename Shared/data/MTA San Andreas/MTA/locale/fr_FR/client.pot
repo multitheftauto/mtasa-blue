@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:43+0000\n"
-"PO-Revision-Date: 2022-12-15 13:35\n"
+"POT-Creation-Date: 2022-12-25 20:55+0000\n"
+"PO-Revision-Date: 2022-12-25 21:54\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -159,7 +159,7 @@ msgstr "(Mode développeur) affiche les world sound ids dans la fenêtre Debug"
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1192 Client/core/CCore.cpp:1205
+#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
 #: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
@@ -856,7 +856,7 @@ msgstr "MTA:SA ne peut pas poursuivre car les fichiers suivants sont incorrects:
 msgid "Patch GTA"
 msgstr "Mise à jour GTA"
 
-#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:723
+#: Client/loader/CInstallManager.cpp:756 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA ne peut pas continuer car il n'y a pas assez d'espace libre sur le lecteur %s."
@@ -2401,111 +2401,111 @@ msgstr "Réponse du serveur invalide (2)"
 msgid "Bad server response (1)"
 msgstr "Réponse du serveur invalide (1)"
 
-#: Client/core/CCore.cpp:725 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Erreur fatale"
 
-#: Client/core/CCore.cpp:850
+#: Client/core/CCore.cpp:891
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "Pour corriger ce problème, veuillez effacer ce fichier:"
 
-#: Client/core/CCore.cpp:882
+#: Client/core/CCore.cpp:923
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "Le module %s est incorrect!"
 
-#: Client/core/CCore.cpp:1192
+#: Client/core/CCore.cpp:1233
 msgid "Error executing URL"
 msgstr "Erreur d'exécution URL"
 
-#: Client/core/CCore.cpp:1204
+#: Client/core/CCore.cpp:1245
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Erreur d'exécution du mod spécifié dans la ligne de commande ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1289
+#: Client/core/CCore.cpp:1333
 msgid "this help screen"
 msgstr "cet écran d'aide"
 
-#: Client/core/CCore.cpp:1290 Client/core/CCore.cpp:1291
+#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
 msgid "exits the application"
 msgstr "quitte l'application"
 
-#: Client/core/CCore.cpp:1292
+#: Client/core/CCore.cpp:1336
 msgid "shows the version"
 msgstr "affiche la version"
 
-#: Client/core/CCore.cpp:1293
+#: Client/core/CCore.cpp:1337
 msgid "shows the time"
 msgstr "affiche l'heure"
 
-#: Client/core/CCore.cpp:1294
+#: Client/core/CCore.cpp:1338
 msgid "shows the hud"
 msgstr "affiche le HUD"
 
-#: Client/core/CCore.cpp:1295
+#: Client/core/CCore.cpp:1339
 msgid "shows all the binds"
 msgstr "affiche toutes les touches assignées"
 
-#: Client/core/CCore.cpp:1296
+#: Client/core/CCore.cpp:1340
 msgid "shows your serial"
 msgstr "affiche votre numéro de série"
 
-#: Client/core/CCore.cpp:1305
+#: Client/core/CCore.cpp:1349
 msgid "connects to a server (host port nick pass)"
 msgstr "connexion à un serveur ( <hôte> [<port> <pseudonyme> <mot de passe>] )"
 
-#: Client/core/CCore.cpp:1306
+#: Client/core/CCore.cpp:1350
 msgid "connects to a previous server"
 msgstr "connexion à un serveur précédent"
 
-#: Client/core/CCore.cpp:1307
+#: Client/core/CCore.cpp:1351
 msgid "binds a key (key control)"
 msgstr "assigne une touche"
 
-#: Client/core/CCore.cpp:1308
+#: Client/core/CCore.cpp:1352
 msgid "unbinds a key (key)"
 msgstr "désassigne une touche"
 
-#: Client/core/CCore.cpp:1309
+#: Client/core/CCore.cpp:1353
 msgid "copies the default gta controls"
 msgstr "copie les contrôles par défaut"
 
-#: Client/core/CCore.cpp:1310
+#: Client/core/CCore.cpp:1354
 msgid "outputs a screenshot"
 msgstr "capture d'écran"
 
-#: Client/core/CCore.cpp:1311
+#: Client/core/CCore.cpp:1355
 msgid "immediately saves the config"
 msgstr "enregistre la configuration"
 
-#: Client/core/CCore.cpp:1313
+#: Client/core/CCore.cpp:1357
 msgid "clears the debug view"
 msgstr "vide la console de débogage"
 
-#: Client/core/CCore.cpp:1314
+#: Client/core/CCore.cpp:1358
 msgid "scrolls the chatbox upwards"
 msgstr "fait défiler le tchat vers le haut"
 
-#: Client/core/CCore.cpp:1315
+#: Client/core/CCore.cpp:1359
 msgid "scrolls the chatbox downwards"
 msgstr "fait défiler le tchat vers le bas"
 
-#: Client/core/CCore.cpp:1316
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the debug view upwards"
 msgstr "fait défiler la console de débogage vers le haut"
 
-#: Client/core/CCore.cpp:1317
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the debug view downwards"
 msgstr "fait défiler la console de débogage vers le bas"
 
-#: Client/core/CCore.cpp:1320
+#: Client/core/CCore.cpp:1364
 msgid "shows the memory statistics"
 msgstr "affiche les statistiques mémoire"
 
-#: Client/core/CCore.cpp:1321
+#: Client/core/CCore.cpp:1365
 msgid "shows the frame timing graph"
 msgstr "affiche le diagramme de synchronisation de trame"
 
