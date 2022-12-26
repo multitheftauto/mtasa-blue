@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-25 21:54+0000\n"
-"PO-Revision-Date: 2022-12-25 22:54\n"
+"PO-Revision-Date: 2022-12-26 10:34\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -879,7 +879,7 @@ msgstr "Kompatibilitätseinstellungen aktualisieren"
 
 #: Client/loader/CInstallManager.cpp:1106
 msgid "Move incompatible files"
-msgstr ""
+msgstr "Verschiebe inkompatible Dateien"
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
