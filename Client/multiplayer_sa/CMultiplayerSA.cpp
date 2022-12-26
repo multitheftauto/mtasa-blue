@@ -1711,11 +1711,11 @@ void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
     }
 }
 
-void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color)
+void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bool isOriginal)
 {
-    // GTASA PC has 2 color filter, one of them is static color filter, and another one is blended by time cycle
+    // GTASA PC has 2 color filters, one of them is static color filter, and another one is blended by time cycle
     bool bUseTimeCycle = *(BYTE*)0x7036EC == 0xC1;
-    if (bUseTimeCycle){
+    if (bUseTimeCycle || isOriginal){ //If we are using color filter from time cycle or we specified color filter from time cycle
         SColorRGBA pass0SColor(*(float*)0xB7C518, *(float*)0xB7C51C, *(float*)0xB7C520, *(float*)0xB7C524);
         SColorRGBA pass1SColor(*(float*)0xB7C528, *(float*)0xB7C52C, *(float*)0xB7C530, *(float*)0xB7C534);
         dwPass0Color = pass0SColor.ulARGB;

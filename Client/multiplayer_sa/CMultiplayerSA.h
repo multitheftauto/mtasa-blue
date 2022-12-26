@@ -154,7 +154,7 @@ public:
     void  GetHeatHaze(SHeatHazeSettings& settings);
     void  ResetColorFilter();
     void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color);
-    void  GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color);
+    void  GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bool isOriginal);
     void  ResetHeatHaze();
     void  SetHeatHazeEnabled(bool bEnabled);
     void  ApplyHeatHazeEnabled();
