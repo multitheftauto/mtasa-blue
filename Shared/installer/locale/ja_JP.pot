@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-25 21:54\n"
-"PO-Revision-Date: 2022-12-25 22:55\n"
+"POT-Creation-Date: 2022-12-26 20:24\n"
+"PO-Revision-Date: 2022-12-26 20:54\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -231,27 +231,27 @@ msgid "Editor"
 msgstr "エディター"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:980
+#: Shared/installer/nightly.nsi:986
 msgid "Development"
 msgstr "開発"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1028
+#: Shared/installer/nightly.nsi:1034
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) は成功に削除されました。"
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1035
+#: Shared/installer/nightly.nsi:1041
 msgid "Uninstallation has failed!"
 msgstr "アンインストールが失敗しました！"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1043
+#: Shared/installer/nightly.nsi:1049
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "$(^Name)とともにコンポーネントを削除したいですか。"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1044
+#: Shared/installer/nightly.nsi:1050
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -260,32 +260,32 @@ msgstr "アップデートする前にアンインストールしますか?$\\r$
 "インストーラを実行すると自動的にアップデートできます。"
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1057
+#: Shared/installer/nightly.nsi:1063
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "個人的なものを保ったいですか。（資源、スクリーンショットとサーバーコンフィグレーション）？「いいえ」にクリックしたら、個人的なものを失います。"
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1166
+#: Shared/installer/nightly.nsi:1172
 msgid "This installer requires admin access, try again"
 msgstr "このインストーラはアドミンアクセスが必要です、もう一度始めてください"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1167
+#: Shared/installer/nightly.nsi:1173
 msgid "This uninstaller requires admin access, try again"
 msgstr "このアンインストーラはアドミンアクセスが必要です、もう一度試してください。"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1168
+#: Shared/installer/nightly.nsi:1174
 msgid "Logon service not running, aborting!"
 msgstr "Logonサービスは実行していません、中止します！"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1169
+#: Shared/installer/nightly.nsi:1175
 msgid "Unable to elevate"
 msgstr "上げることができません"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1765
+#: Shared/installer/nightly.nsi:1771
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -297,7 +297,7 @@ msgstr "そのパスに最新MTAバーションがあります。$\n"
 "$INSTDIRのMTA $1に上書きしますか？"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1769
+#: Shared/installer/nightly.nsi:1775
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -308,7 +308,7 @@ msgstr "MTAはGTA:SAと同じインストールフォルダーでインストー
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1772
+#: Shared/installer/nightly.nsi:1778
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -317,7 +317,7 @@ msgstr "そのパスは存在していません。$\n"
 "GTA：SAのインストールフォルダーを選んでください"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1774
+#: Shared/installer/nightly.nsi:1780
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -326,17 +326,17 @@ msgstr "$GTA_DIRにGTA:SAが見つかりませんでした。$\n"
 "とりあえず、続けますか。"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1892
+#: Shared/installer/nightly.nsi:1898
 msgid "Choose Install Location"
 msgstr "インストールフォルダーを選んでください"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1893
+#: Shared/installer/nightly.nsi:1899
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}のインストールしたいフォルダーを選んでください"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1894
+#: Shared/installer/nightly.nsi:1900
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -347,62 +347,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}は次のフォルダにイン�
 "　「次へ」にクリックして、続行してください。"
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1896
+#: Shared/installer/nightly.nsi:1902
 msgid "Destination Folder"
 msgstr "宛先フォルダー"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1897
+#: Shared/installer/nightly.nsi:1903
 msgid "Browse..."
 msgstr "ブラウズ..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1898
+#: Shared/installer/nightly.nsi:1904
 msgid "Default"
 msgstr "デフォルト"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1899
+#: Shared/installer/nightly.nsi:1905
 msgid "Last used"
 msgstr "前回利用"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1900
+#: Shared/installer/nightly.nsi:1906
 msgid "Custom"
 msgstr "カスタム"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2078
+#: Shared/installer/nightly.nsi:2084
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}のインストールフォルダを選んでください："
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2096
+#: Shared/installer/nightly.nsi:2102
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "警告：このパスにMTA ($1) 最新バーションが存在しています。"
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2097
+#: Shared/installer/nightly.nsi:2103
 msgid "Installation type:  Upgrade"
 msgstr "インストールタイプ： アップデート"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2340
+#: Shared/installer/nightly.nsi:2346
 msgid "Online update"
 msgstr "オンライン更新"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2341
+#: Shared/installer/nightly.nsi:2347
 msgid "Checking for update information"
 msgstr "更新情報を確認しています"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2342
+#: Shared/installer/nightly.nsi:2348
 msgid "Checking for installer update information..."
 msgstr "インストーラの更新情報を確認しています…"
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2343
+#: Shared/installer/nightly.nsi:2349
 msgid "Please ensure your firewall is not blocking"
 msgstr "ファイアウォールにブロックされていないのを確認してください"
 
