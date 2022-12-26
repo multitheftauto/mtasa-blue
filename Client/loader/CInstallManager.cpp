@@ -195,6 +195,7 @@ void CInstallManager::InitSequencer()
     m_pSequencer->AddFunction("ProcessExePatchChecks", &CInstallManager::_ProcessExePatchChecks);
     m_pSequencer->AddFunction("ProcessServiceChecks", &CInstallManager::_ProcessServiceChecks);
     m_pSequencer->AddFunction("ProcessAppCompatChecks", &CInstallManager::_ProcessAppCompatChecks);
+    m_pSequencer->AddFunction("ProcessWinmmChecks", &CInstallManager::_ProcessWinmmChecks);
     m_pSequencer->AddFunction("ChangeFromAdmin", &CInstallManager::_ChangeFromAdmin);
     m_pSequencer->AddFunction("InstallNewsItems", &CInstallManager::_InstallNewsItems);
     m_pSequencer->AddFunction("Quit", &CInstallManager::_Quit);
