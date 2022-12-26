@@ -159,6 +159,9 @@ public:
     LUA_DECLARE(GUIComboBoxIsOpen);
     LUA_DECLARE(GUIGetCursorType);
 
+    static bool GUISetChatboxCharacterLimit(int charLimit);
+    static int  GUIGetChatboxCharacterLimit();
+
 private:
     static void AddGuiElementClass(lua_State* luaVM);
     static void AddGuiFontClass(lua_State* luaVM);
