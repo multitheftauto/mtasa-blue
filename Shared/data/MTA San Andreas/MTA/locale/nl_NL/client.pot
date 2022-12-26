@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-25 21:54+0000\n"
-"PO-Revision-Date: 2022-12-25 22:55\n"
+"POT-Creation-Date: 2022-12-26 12:40+0000\n"
+"PO-Revision-Date: 2022-12-26 12:56\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -151,8 +151,8 @@ msgstr "(Ontwikkelingsmodus) toont geluid-ids in een debug venster"
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
 #: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:815
-#: Client/loader/CInstallManager.cpp:530 Client/loader/CInstallManager.cpp:539
-#: Client/loader/CInstallManager.cpp:628 Client/core/CSettings.cpp:2924
+#: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
+#: Client/loader/CInstallManager.cpp:629 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
 #: Client/core/CSettings.cpp:4674 Client/core/CGUI.cpp:87
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
@@ -813,7 +813,7 @@ msgstr "Update installeren..."
 msgid "Extracting files..."
 msgstr "Bestanden uitpakken..."
 
-#: Client/loader/CInstallManager.cpp:339 Client/loader/Utils.cpp:932
+#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:932
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -822,62 +822,62 @@ msgstr "MTA:SA heeft Administrator toegang nodig voor de volgende opdracht:\n\n"
 "  '%s'\n\n"
 "Gelieve te bevestigen in het volgende venster."
 
-#: Client/loader/CInstallManager.cpp:354
+#: Client/loader/CInstallManager.cpp:355
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA kon te volgende opdracht niet afwerken:\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:404
+#: Client/loader/CInstallManager.cpp:405
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** De crash werd veroorzaakt door een grafische driver fout **\n\n"
 "** Gelieve uw grafische driver te updaten **"
 
-#: Client/loader/CInstallManager.cpp:510
+#: Client/loader/CInstallManager.cpp:511
 msgid "Install updated MTA:SA files"
 msgstr "Geüpdatet MTA:SA bestanden installeren"
 
-#: Client/loader/CInstallManager.cpp:530
+#: Client/loader/CInstallManager.cpp:531
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Kon niet updaten door bestandsconflicten. Gelieve andere toepassingen te sluiten en opnieuw te proberen"
 
-#: Client/loader/CInstallManager.cpp:539
+#: Client/loader/CInstallManager.cpp:540
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto werd niet correct geïnstalleerd, gelieve te herinstalleren. %s"
 
-#: Client/loader/CInstallManager.cpp:594 Client/loader/CInstallManager.cpp:626
+#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "MTA:SA kan niet doorgaan omdat de volgende bestanden niet juist zijn:"
 
-#: Client/loader/CInstallManager.cpp:619
+#: Client/loader/CInstallManager.cpp:620
 msgid "Patch GTA"
 msgstr "Fix GTA"
 
-#: Client/loader/CInstallManager.cpp:766 Client/core/CCore.cpp:764
+#: Client/loader/CInstallManager.cpp:767 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA kan niet verdergaan omdat schijf %s niet genoeg ruimte heeft."
 
-#: Client/loader/CInstallManager.cpp:822
+#: Client/loader/CInstallManager.cpp:823
 msgid "Missing file:"
 msgstr "Ontbrekend bestand:"
 
-#: Client/loader/CInstallManager.cpp:826
+#: Client/loader/CInstallManager.cpp:827
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Als MTA niet kan starten, gelieve GTA:SA te herinstalleren"
 
-#: Client/loader/CInstallManager.cpp:947
+#: Client/loader/CInstallManager.cpp:948
 msgid "Update install settings"
 msgstr "Installatie instellingen vernieuwen"
 
-#: Client/loader/CInstallManager.cpp:1080
+#: Client/loader/CInstallManager.cpp:1081
 msgid "Update compatibility settings"
 msgstr "Compatibiliteitsinstellingen vernieuwen"
 
-#: Client/loader/CInstallManager.cpp:1106
+#: Client/loader/CInstallManager.cpp:1107
 msgid "Move incompatible files"
 msgstr ""
 
