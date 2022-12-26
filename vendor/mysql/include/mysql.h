@@ -1,4 +1,4 @@
-/* Copyright (C) 2000-2003 MySQL AB
+/* Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -11,61 +11,48 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
 /*
   This file defines the client API to MySQL and also the ABI of the
   dynamically linked libmysqlclient.
 
-  The ABI should never be changed in a released product of MySQL
+  The ABI should never be changed in a released product of MySQL,
   thus you need to take great care when changing the file. In case
-  the file is changed so the ABI is broken, you must also
-  update the SHAREDLIB_MAJOR_VERSION in configure.in .
-
+  the file is changed so the ABI is broken, you must also update
+  the SHARED_LIB_MAJOR_VERSION in cmake/mysql_version.cmake
 */
 
 #ifndef _mysql_h
 #define _mysql_h
 
-#ifdef _AIX           /* large-file support will break without this */
-#include <standards.h>
-#endif
-
-#ifdef __CYGWIN__     /* CYGWIN implements a UNIX API */
-#undef WIN
-#undef _WIN
-#undef _WIN32
-#undef _WIN64
-#undef __WIN__
-#endif
-
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-#ifndef _global_h				/* If not standard header */
+#ifndef MY_GLOBAL_INCLUDED                /* If not standard header */
+#ifndef MYSQL_ABI_CHECK
 #include <sys/types.h>
-#ifdef __LCC__
-#include <winsock2.h>				/* For windows */
 #endif
 typedef char my_bool;
-#if (defined(_WIN32) || defined(_WIN64)) && !defined(__WIN__)
-#define __WIN__
-#endif
-#if !defined(__WIN__)
+#if !defined(_WIN32)
 #define STDCALL
 #else
 #define STDCALL __stdcall
 #endif
 
 #ifndef my_socket_defined
-#ifdef __WIN__
+#ifdef _WIN32
+#include <windows.h>
+#ifdef WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
+#endif
 #define my_socket SOCKET
 #else
 typedef int my_socket;
-#endif /* __WIN__ */
+#endif /* _WIN32 */
 #endif /* my_socket_defined */
-#endif /* _global_h */
+#endif /* MY_GLOBAL_INCLUDED */
 
 #include "mysql_version.h"
 #include "mysql_com.h"
@@ -73,22 +60,30 @@ typedef int my_socket;
 
 #include "my_list.h" /* for LISTs used in 'MYSQL' and 'MYSQL_STMT' */
 
+/* Include declarations of plug-in API */
+#include "mysql/client_plugin.h"
+
+/*
+  Declare my_init() here because it is a documented C API function exported
+  from the client library. No need to include whole my_sys.h, however.
+*/
+
+my_bool my_init(void);
+
 extern unsigned int mysql_port;
 extern char *mysql_unix_port;
 
 #define CLIENT_NET_READ_TIMEOUT		365*24*3600	/* Timeout on read */
 #define CLIENT_NET_WRITE_TIMEOUT	365*24*3600	/* Timeout on write */
 
-#ifdef __NETWARE__
-#pragma pack(push, 8)		/* 8 byte alignment */
-#endif
-
 #define IS_PRI_KEY(n)	((n) & PRI_KEY_FLAG)
 #define IS_NOT_NULL(n)	((n) & NOT_NULL_FLAG)
 #define IS_BLOB(n)	((n) & BLOB_FLAG)
-#define IS_NUM(t)	((t) <= MYSQL_TYPE_INT24 || (t) == MYSQL_TYPE_YEAR || (t) == MYSQL_TYPE_NEWDECIMAL)
-#define IS_NUM_FIELD(f)	 ((f)->flags & NUM_FLAG)
-#define INTERNAL_NUM_FIELD(f) (((f)->type <= MYSQL_TYPE_INT24 && ((f)->type != MYSQL_TYPE_TIMESTAMP || (f)->length == 14 || (f)->length == 8)) || (f)->type == MYSQL_TYPE_YEAR)
+/**
+   Returns true if the value is a number which does not need quotes for
+   the sql_lex.cc parser to parse correctly.
+*/
+#define IS_NUM(t)	(((t) <= MYSQL_TYPE_INT24 && (t) != MYSQL_TYPE_TIMESTAMP) || (t) == MYSQL_TYPE_YEAR || (t) == MYSQL_TYPE_NEWDECIMAL)
 #define IS_LONGDATA(t) ((t) >= MYSQL_TYPE_TINY_BLOB && (t) <= MYSQL_TYPE_STRING)
 
 
@@ -119,10 +114,8 @@ typedef struct st_mysql_field {
 typedef char **MYSQL_ROW;		/* return data as array of strings */
 typedef unsigned int MYSQL_FIELD_OFFSET; /* offset to current field */
 
-#ifndef _global_h
-#if defined(NO_CLIENT_LONG_LONG)
-typedef unsigned long my_ulonglong;
-#elif defined (__WIN__)
+#ifndef MY_GLOBAL_INCLUDED
+#if defined (_WIN32)
 typedef unsigned __int64 my_ulonglong;
 #else
 typedef unsigned long long my_ulonglong;
@@ -157,7 +150,7 @@ typedef struct st_mysql_data {
   void *extension;
 } MYSQL_DATA;
 
-enum mysql_option 
+enum mysql_option
 {
   MYSQL_OPT_CONNECT_TIMEOUT, MYSQL_OPT_COMPRESS, MYSQL_OPT_NAMED_PIPE,
   MYSQL_INIT_COMMAND, MYSQL_READ_DEFAULT_FILE, MYSQL_READ_DEFAULT_GROUP,
@@ -167,8 +160,27 @@ enum mysql_option
   MYSQL_OPT_USE_REMOTE_CONNECTION, MYSQL_OPT_USE_EMBEDDED_CONNECTION,
   MYSQL_OPT_GUESS_CONNECTION, MYSQL_SET_CLIENT_IP, MYSQL_SECURE_AUTH,
   MYSQL_REPORT_DATA_TRUNCATION, MYSQL_OPT_RECONNECT,
-  MYSQL_OPT_SSL_VERIFY_SERVER_CERT
+  MYSQL_OPT_SSL_VERIFY_SERVER_CERT, MYSQL_PLUGIN_DIR, MYSQL_DEFAULT_AUTH,
+  MYSQL_OPT_BIND,
+  MYSQL_OPT_SSL_KEY, MYSQL_OPT_SSL_CERT,
+  MYSQL_OPT_SSL_CA, MYSQL_OPT_SSL_CAPATH, MYSQL_OPT_SSL_CIPHER,
+  MYSQL_OPT_SSL_CRL, MYSQL_OPT_SSL_CRLPATH,
+  MYSQL_OPT_CONNECT_ATTR_RESET, MYSQL_OPT_CONNECT_ATTR_ADD,
+  MYSQL_OPT_CONNECT_ATTR_DELETE,
+  MYSQL_SERVER_PUBLIC_KEY,
+  MYSQL_ENABLE_CLEARTEXT_PLUGIN,
+  MYSQL_OPT_CAN_HANDLE_EXPIRED_PASSWORDS,
+  MYSQL_OPT_SSL_ENFORCE,
+  MYSQL_OPT_MAX_ALLOWED_PACKET, MYSQL_OPT_NET_BUFFER_LENGTH,
+  MYSQL_OPT_TLS_VERSION,
+  MYSQL_OPT_SSL_MODE
 };
+
+/**
+  @todo remove the "extension", move st_mysql_options completely
+  out of mysql.h
+*/
+struct st_mysql_options_extention;
 
 struct st_mysql_options {
   unsigned int connect_timeout, read_timeout, write_timeout;
@@ -184,16 +196,28 @@ struct st_mysql_options {
   char *ssl_cipher;				/* cipher to use */
   char *shared_memory_base_name;
   unsigned long max_allowed_packet;
-  my_bool use_ssl;				/* if to use SSL or not */
+  my_bool use_ssl;                              /* Deprecated ! Former use_ssl */
   my_bool compress,named_pipe;
   my_bool unused1;
   my_bool unused2;
   my_bool unused3;
   my_bool unused4;
   enum mysql_option methods_to_use;
-  char *client_ip;
-  /* Refuse client connecting to server if it uses old (pre-4.1.1) protocol */
-  my_bool secure_auth;
+  union {
+    /*
+      The ip/hostname to use when authenticating
+      client against embedded server built with
+      grant tables - only used in embedded server
+    */
+    char *client_ip;
+
+    /*
+      The local address to bind when connecting to
+      remote server - not used in embedded server
+    */
+    char *bind_address;
+  } ci;
+  my_bool unused5;
   /* 0 - never report, 1 - always report (default) */
   my_bool report_data_truncation;
 
@@ -203,18 +227,25 @@ struct st_mysql_options {
   void (*local_infile_end)(void *);
   int (*local_infile_error)(void *, char *, unsigned int);
   void *local_infile_userdata;
-  void *extension;
+  struct st_mysql_options_extention *extension;
 };
 
-enum mysql_status 
+enum mysql_status
 {
-  MYSQL_STATUS_READY,MYSQL_STATUS_GET_RESULT,MYSQL_STATUS_USE_RESULT
+  MYSQL_STATUS_READY, MYSQL_STATUS_GET_RESULT, MYSQL_STATUS_USE_RESULT,
+  MYSQL_STATUS_STATEMENT_GET_RESULT
 };
 
-enum mysql_protocol_type 
+enum mysql_protocol_type
 {
   MYSQL_PROTOCOL_DEFAULT, MYSQL_PROTOCOL_TCP, MYSQL_PROTOCOL_SOCKET,
   MYSQL_PROTOCOL_PIPE, MYSQL_PROTOCOL_MEMORY
+};
+
+enum mysql_ssl_mode
+{
+  SSL_MODE_DISABLED= 1, SSL_MODE_PREFERRED, SSL_MODE_REQUIRED,
+  SSL_MODE_VERIFY_CA, SSL_MODE_VERIFY_IDENTITY
 };
 
 typedef struct character_set
@@ -267,7 +298,7 @@ typedef struct st_mysql
   const struct st_mysql_methods *methods;
   void *thd;
   /*
-    Points to boolean flag in MYSQL_RES  or MYSQL_STMT. We set this flag 
+    Points to boolean flag in MYSQL_RES  or MYSQL_STMT. We set this flag
     from mysql_stmt_close if close had to cancel result set of this object.
   */
   my_bool *unbuffered_fetch_owner;
@@ -291,7 +322,7 @@ typedef struct st_mysql_res {
   unsigned int	field_count, current_field;
   my_bool	eof;			/* Used by mysql_fetch_row */
   /* mysql_stmt_close() had to cancel this result */
-  my_bool       unbuffered_fetch_cancelled;  
+  my_bool       unbuffered_fetch_cancelled;
   void *extension;
 } MYSQL_RES;
 
@@ -300,6 +331,11 @@ typedef struct st_mysql_res {
 #define MYSQL_CLIENT
 #endif
 
+/*
+  Note: MYSQL_PARAMETERS and mysql_get_parameters() have been removed
+  in server 5.7. But we keep them here to not break compatibility in
+  Con/C 6.1 series.
+*/
 
 typedef struct st_mysql_parameters
 {
@@ -312,6 +348,8 @@ typedef struct st_mysql_parameters
 #define max_allowed_packet (*mysql_get_parameters()->p_max_allowed_packet)
 #define net_buffer_length (*mysql_get_parameters()->p_net_buffer_length)
 #endif
+
+MYSQL_PARAMETERS *STDCALL mysql_get_parameters(void);
 
 /*
   Set up and bring down the server; to ensure that applications will
@@ -333,7 +371,6 @@ void STDCALL mysql_server_end(void);
 #define mysql_library_init mysql_server_init
 #define mysql_library_end mysql_server_end
 
-MYSQL_PARAMETERS *STDCALL mysql_get_parameters(void);
 
 /*
   Set up and bring down a thread; these function should be called
@@ -375,7 +412,7 @@ my_bool		STDCALL mysql_ssl_set(MYSQL *mysql, const char *key,
 				      const char *cert, const char *ca,
 				      const char *capath, const char *cipher);
 const char *    STDCALL mysql_get_ssl_cipher(MYSQL *mysql);
-my_bool		STDCALL mysql_change_user(MYSQL *mysql, const char *user, 
+my_bool		STDCALL mysql_change_user(MYSQL *mysql, const char *user,
 					  const char *passwd, const char *db);
 MYSQL *		STDCALL mysql_real_connect(MYSQL *mysql, const char *host,
 					   const char *user,
@@ -396,6 +433,14 @@ MYSQL_RES *     STDCALL mysql_use_result(MYSQL *mysql);
 void        STDCALL mysql_get_character_set_info(MYSQL *mysql,
                            MY_CHARSET_INFO *charset);
 
+int STDCALL mysql_session_track_get_first(MYSQL *mysql,
+                                          enum enum_session_state_type type,
+                                          const char **data,
+                                          size_t *length);
+int STDCALL mysql_session_track_get_next(MYSQL *mysql,
+                                         enum enum_session_state_type type,
+                                         const char **data,
+                                         size_t *length);
 /* local infile support */
 
 #define LOCAL_INFILE_ERROR_LEN 512
@@ -437,6 +482,10 @@ MYSQL_RES *	STDCALL mysql_list_tables(MYSQL *mysql,const char *wild);
 MYSQL_RES *	STDCALL mysql_list_processes(MYSQL *mysql);
 int		STDCALL mysql_options(MYSQL *mysql,enum mysql_option option,
 				      const void *arg);
+int		STDCALL mysql_options4(MYSQL *mysql,enum mysql_option option,
+                                       const void *arg1, const void *arg2);
+int             STDCALL mysql_get_option(MYSQL *mysql, enum mysql_option option,
+                                         const void *arg);
 void		STDCALL mysql_free_result(MYSQL_RES *result);
 void		STDCALL mysql_data_seek(MYSQL_RES *result,
 					my_ulonglong offset);
@@ -456,15 +505,18 @@ unsigned long	STDCALL mysql_hex_string(char *to,const char *from,
 unsigned long STDCALL mysql_real_escape_string(MYSQL *mysql,
 					       char *to,const char *from,
 					       unsigned long length);
-void		STDCALL mysql_debug(const char *debug);
-void 		STDCALL myodbc_remove_escape(MYSQL *mysql,char *name);
-unsigned int	STDCALL mysql_thread_safe(void);
-my_bool		STDCALL mysql_embedded(void);
-my_bool         STDCALL mysql_read_query_result(MYSQL *mysql);
-
+unsigned long STDCALL mysql_real_escape_string_quote(MYSQL *mysql,
+                 char *to, const char *from,
+                 unsigned long length, char quote);
+void          STDCALL mysql_debug(const char *debug);
+void          STDCALL myodbc_remove_escape(MYSQL *mysql,char *name);
+unsigned int  STDCALL mysql_thread_safe(void);
+my_bool       STDCALL mysql_embedded(void);
+my_bool       STDCALL mysql_read_query_result(MYSQL *mysql);
+int           STDCALL mysql_reset_connection(MYSQL *mysql);
 
 /*
-  The following definitions are added for the enhanced 
+  The following definitions are added for the enhanced
   client-server protocol
 */
 
@@ -555,7 +607,7 @@ typedef struct st_mysql_bind
   /* output buffer length, must be set when fetching str/binary */
   unsigned long buffer_length;
   unsigned long offset;           /* offset position for char/binary fetch */
-  unsigned long	length_value;     /* Used if length is 0 */
+  unsigned long length_value;     /* Used if length is 0 */
   unsigned int	param_number;	  /* For null count and error messages */
   unsigned int  pack_length;	  /* Internal length for packed data */
   enum enum_field_types buffer_type;	/* buffer type */
@@ -566,6 +618,8 @@ typedef struct st_mysql_bind
   void *extension;
 } MYSQL_BIND;
 
+
+struct st_mysql_stmt_extension;
 
 /* statement handler */
 typedef struct st_mysql_stmt
@@ -582,7 +636,7 @@ typedef struct st_mysql_stmt
     mysql_stmt_fetch() calls this function to fetch one row (it's different
     for buffered, unbuffered and cursor fetch).
   */
-  int            (*read_row_func)(struct st_mysql_stmt *stmt, 
+  int            (*read_row_func)(struct st_mysql_stmt *stmt,
                                   unsigned char **row);
   /* copy of mysql->affected_rows after statement execution */
   my_ulonglong   affected_rows;
@@ -606,20 +660,20 @@ typedef struct st_mysql_stmt
   my_bool        bind_param_done;      /* input buffers were supplied */
   unsigned char  bind_result_done;     /* output buffers were supplied */
   /* mysql_stmt_close() had to cancel this result */
-  my_bool       unbuffered_fetch_cancelled;  
+  my_bool       unbuffered_fetch_cancelled;
   /*
-    Is set to true if we need to calculate field->max_length for 
+    Is set to true if we need to calculate field->max_length for
     metadata fields when doing mysql_stmt_store_result.
   */
-  my_bool       update_max_length;     
-  void *extension;
+  my_bool       update_max_length;
+  struct st_mysql_stmt_extension *extension;
 } MYSQL_STMT;
 
 enum enum_stmt_attr_type
 {
   /*
     When doing mysql_stmt_store_result calculate max_length attribute
-    of statement metadata. This is to be consistent with the old API, 
+    of statement metadata. This is to be consistent with the old API,
     where this was done automatically.
     In the new API we do that only by request because it slows down
     mysql_stmt_store_result sufficiently.
@@ -638,44 +692,12 @@ enum enum_stmt_attr_type
 };
 
 
-typedef struct st_mysql_methods
-{
-  my_bool (*read_query_result)(MYSQL *mysql);
-  my_bool (*advanced_command)(MYSQL *mysql,
-			      enum enum_server_command command,
-			      const unsigned char *header,
-			      unsigned long header_length,
-			      const unsigned char *arg,
-			      unsigned long arg_length,
-			      my_bool skip_check,
-                              MYSQL_STMT *stmt);
-  MYSQL_DATA *(*read_rows)(MYSQL *mysql,MYSQL_FIELD *mysql_fields,
-			   unsigned int fields);
-  MYSQL_RES * (*use_result)(MYSQL *mysql);
-  void (*fetch_lengths)(unsigned long *to, 
-			MYSQL_ROW column, unsigned int field_count);
-  void (*flush_use_result)(MYSQL *mysql, my_bool flush_all_results);
-#if !defined(MYSQL_SERVER) || defined(EMBEDDED_LIBRARY)
-  MYSQL_FIELD * (*list_fields)(MYSQL *mysql);
-  my_bool (*read_prepare_result)(MYSQL *mysql, MYSQL_STMT *stmt);
-  int (*stmt_execute)(MYSQL_STMT *stmt);
-  int (*read_binary_rows)(MYSQL_STMT *stmt);
-  int (*unbuffered_fetch)(MYSQL *mysql, char **row);
-  void (*free_embedded_thd)(MYSQL *mysql);
-  const char *(*read_statistics)(MYSQL *mysql);
-  my_bool (*next_result)(MYSQL *mysql);
-  int (*read_change_user_result)(MYSQL *mysql, char *buff, const char *passwd);
-  int (*read_rows_from_cursor)(MYSQL_STMT *stmt);
-#endif
-} MYSQL_METHODS;
-
-
 MYSQL_STMT * STDCALL mysql_stmt_init(MYSQL *mysql);
 int STDCALL mysql_stmt_prepare(MYSQL_STMT *stmt, const char *query,
                                unsigned long length);
 int STDCALL mysql_stmt_execute(MYSQL_STMT *stmt);
 int STDCALL mysql_stmt_fetch(MYSQL_STMT *stmt);
-int STDCALL mysql_stmt_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind_arg, 
+int STDCALL mysql_stmt_fetch_column(MYSQL_STMT *stmt, MYSQL_BIND *bind_arg,
                                     unsigned int column,
                                     unsigned long offset);
 int STDCALL mysql_stmt_store_result(MYSQL_STMT *stmt);
@@ -691,16 +713,16 @@ my_bool STDCALL mysql_stmt_bind_result(MYSQL_STMT * stmt, MYSQL_BIND * bnd);
 my_bool STDCALL mysql_stmt_close(MYSQL_STMT * stmt);
 my_bool STDCALL mysql_stmt_reset(MYSQL_STMT * stmt);
 my_bool STDCALL mysql_stmt_free_result(MYSQL_STMT *stmt);
-my_bool STDCALL mysql_stmt_send_long_data(MYSQL_STMT *stmt, 
+my_bool STDCALL mysql_stmt_send_long_data(MYSQL_STMT *stmt,
                                           unsigned int param_number,
-                                          const char *data, 
+                                          const char *data,
                                           unsigned long length);
 MYSQL_RES *STDCALL mysql_stmt_result_metadata(MYSQL_STMT *stmt);
 MYSQL_RES *STDCALL mysql_stmt_param_metadata(MYSQL_STMT *stmt);
 unsigned int STDCALL mysql_stmt_errno(MYSQL_STMT * stmt);
 const char *STDCALL mysql_stmt_error(MYSQL_STMT * stmt);
 const char *STDCALL mysql_stmt_sqlstate(MYSQL_STMT * stmt);
-MYSQL_ROW_OFFSET STDCALL mysql_stmt_row_seek(MYSQL_STMT *stmt, 
+MYSQL_ROW_OFFSET STDCALL mysql_stmt_row_seek(MYSQL_STMT *stmt,
                                              MYSQL_ROW_OFFSET offset);
 MYSQL_ROW_OFFSET STDCALL mysql_stmt_row_tell(MYSQL_STMT *stmt);
 void STDCALL mysql_stmt_data_seek(MYSQL_STMT *stmt, my_ulonglong offset);
@@ -724,29 +746,7 @@ void STDCALL mysql_close(MYSQL *sock);
 
 #define mysql_reload(mysql) mysql_refresh((mysql),REFRESH_GRANT)
 
-#ifdef USE_OLD_FUNCTIONS
-MYSQL *		STDCALL mysql_connect(MYSQL *mysql, const char *host,
-				      const char *user, const char *passwd);
-int		STDCALL mysql_create_db(MYSQL *mysql, const char *DB);
-int		STDCALL mysql_drop_db(MYSQL *mysql, const char *DB);
-#endif
 #define HAVE_MYSQL_REAL_CONNECT
-
-/*
-  The following functions are mainly exported because of mysqlbinlog;
-  They are not for general usage
-*/
-
-#define simple_command(mysql, command, arg, length, skip_check) \
-  (*(mysql)->methods->advanced_command)(mysql, command, 0,  \
-                                        0, arg, length, skip_check, NULL)
-#define stmt_command(mysql, command, arg, length, stmt) \
-  (*(mysql)->methods->advanced_command)(mysql, command, 0,  \
-                                        0, arg, length, 1, stmt)
-
-#ifdef __NETWARE__
-#pragma pack(pop)		/* restore alignment */
-#endif
 
 #ifdef	__cplusplus
 }

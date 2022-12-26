@@ -21,6 +21,10 @@ class CClientPed;
 #include "CClientModel.h"
 #include <memory>
 
+#include <game/CPad.h>
+#include <game/TaskTypes.h>
+
+class CAnimBlock;
 class CClientCamera;
 class CClientManager;
 class CClientModelRequestManager;
@@ -28,8 +32,9 @@ class CClientPed;
 class CClientPedManager;
 class CClientPlayer;
 class CClientPlayerClothes;
-class CClientVehicle;
 class CClientProjectile;
+class CClientVehicle;
+class CTask;
 
 enum eDelayedSyncData
 {
@@ -330,9 +335,6 @@ public:
     void SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
     void SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
                        eVehicleAimDirection cInVehicleAimAnim, CVector* pSource, bool bInterpolateAim);
-
-    unsigned long GetMemoryValue(unsigned long ulOffset) { return (m_pPlayerPed) ? *m_pPlayerPed->GetMemoryValue(ulOffset) : 0; };
-    unsigned long GetGameBaseAddress() { return (m_pPlayerPed) ? (unsigned long)m_pPlayerPed->GetMemoryValue(0) : 0; };
 
     void Duck(bool bDuck);
     bool IsDucked();

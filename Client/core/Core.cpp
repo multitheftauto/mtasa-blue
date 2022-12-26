@@ -38,6 +38,9 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
             ULONG heapInfo = 2;
             HeapSetInformation(GetProcessHeap(), HeapCompatibilityInformation, &heapInfo, sizeof(heapInfo));
 
+            // Group our processes and windows under a single taskbar button
+            SetCurrentProcessExplicitAppUserModelID(L"Multi Theft Auto");
+
             FileTranslator.GetGTARootDirectory(WorkingDirectory);
             SetCurrentDirectory(WorkingDirectory.c_str());
 

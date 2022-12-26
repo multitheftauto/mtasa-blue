@@ -11,6 +11,7 @@
 #pragma once
 
 #include <game/CAESoundManager.h>
+#include "CAudioEngineSA.h"
 
 #define CLASS_CAESoundManager                           0xB62CB0
 

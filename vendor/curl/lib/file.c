@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -69,6 +71,8 @@
 
 #if defined(WIN32) || defined(MSDOS) || defined(__EMX__)
 #define DOS_FILESYSTEM 1
+#elif defined(__amigaos4__)
+#define AMIGA_FILESYSTEM 1
 #endif
 
 #ifdef OPEN_NEEDS_ARG3
@@ -147,7 +151,7 @@ static CURLcode file_connect(struct Curl_easy *data, bool *done)
 #endif
   size_t real_path_len;
 
-  CURLcode result = Curl_urldecode(data, data->state.up.path, 0, &real_path,
+  CURLcode result = Curl_urldecode(data->state.up.path, 0, &real_path,
                                    &real_path_len, REJECT_ZERO);
   if(result)
     return result;
@@ -194,8 +198,33 @@ static CURLcode file_connect(struct Curl_easy *data, bool *done)
     return CURLE_URL_MALFORMAT;
   }
 
+  #ifdef AMIGA_FILESYSTEM
+  /*
+   * A leading slash in an AmigaDOS path denotes the parent
+   * directory, and hence we block this as it is relative.
+   * Absolute paths start with 'volumename:', so we check for
+   * this first. Failing that, we treat the path as a real unix
+   * path, but only if the application was compiled with -lunix.
+   */
+  fd = -1;
+  file->path = real_path;
+
+  if(real_path[0] == '/') {
+    extern int __unix_path_semantics;
+    if(strchr(real_path + 1, ':')) {
+      /* Amiga absolute path */
+      fd = open_readonly(real_path + 1, O_RDONLY);
+      file->path++;
+    }
+    else if(__unix_path_semantics) {
+      /* -lunix fallback */
+      fd = open_readonly(real_path, O_RDONLY);
+    }
+  }
+  #else
   fd = open_readonly(real_path, O_RDONLY);
   file->path = real_path;
+  #endif
 #endif
   file->freepath = real_path; /* free this when done */
 
@@ -234,7 +263,7 @@ static CURLcode file_disconnect(struct Curl_easy *data,
 {
   (void)dead_connection; /* not used */
   (void)conn;
-  return file_done(data, 0, 0);
+  return file_done(data, CURLE_OK, FALSE);
 }
 
 #ifdef DOS_FILESYSTEM

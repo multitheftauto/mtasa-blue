@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CProjectileInfo.h>
 
 #define AIRBOMB_MAX_LIFETIME 60000
 

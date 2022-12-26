@@ -23,7 +23,6 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
-#include "CDiscordManagerInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -175,9 +174,11 @@ public:
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
 
-    virtual CDiscordManagerInterface* GetDiscordManager() = 0;
-
     virtual bool IsChatInputBlocked() = 0;
+    virtual bool SetChatboxCharacterLimit(int charLimit) = 0;
+    virtual void ResetChatboxCharacterLimit() = 0;
+    virtual int  GetChatboxCharacterLimit() = 0;
+    virtual int  GetChatboxMaxCharacterLimit() = 0;
 };
 
 class CClientTime

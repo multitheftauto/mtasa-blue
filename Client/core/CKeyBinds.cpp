@@ -11,6 +11,11 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CPed.h>
+#include <game/CPedIntelligence.h>
+#include <game/CPools.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 
 const SBindableKey g_bkKeys[] = {{"mouse1", VK_LBUTTON, GTA_KEY_LMOUSE, DATA_NONE, 0},
                                  {"mouse2", VK_RBUTTON, GTA_KEY_RMOUSE, DATA_NONE, 0},
@@ -519,7 +524,7 @@ void CKeyBinds::Remove(CKeyBind* keyBind)
     const auto predicate = [keyBind](const KeyBindPtr& bind) { return bind.get() == keyBind; };
 
     if (auto iter = std::find_if(m_binds.begin(), m_binds.end(), predicate); iter != m_binds.end())
-        m_binds.erase(iter);
+        Remove(iter);
 }
 
 void CKeyBinds::Remove(KeyBindContainer::iterator& iter)
@@ -1920,9 +1925,17 @@ void CKeyBinds::DoPostFramePulse()
     {
         if (!bInVehicle)
         {
-            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;                                         // Fire
-            cs.RightShoulder2 = (g_bcControls[1].bState || (bAimingWeapon && g_bcControls[7].bState)) ? 255 : 0;            // Next Weapon / Zoom In
-            cs.LeftShoulder2 = (g_bcControls[2].bState || (bAimingWeapon && g_bcControls[8].bState)) ? 255 : 0;             // Previous Weapon / Zoom Out
+            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;     // Fire
+            if (bAimingWeapon)
+            {
+                cs.RightShoulder2 = g_bcControls[8].bState ? 255 : 0;            // Zoom Out
+                cs.LeftShoulder2 = g_bcControls[7].bState ? 255 : 0;             // Zoom In
+            }
+            else
+            {
+                cs.RightShoulder2 = g_bcControls[1].bState ? 255 : 0;            // Next Weapon
+                cs.LeftShoulder2 = g_bcControls[2].bState ? 255 : 0;             // Previous Weapon
+            }
 
             if (!ControlForwardsBackWards(cs))
             {

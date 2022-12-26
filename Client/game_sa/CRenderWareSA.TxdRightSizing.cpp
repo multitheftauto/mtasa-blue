@@ -12,8 +12,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
 #include <game/RenderWareD3D.h>
+#include "CGameSA.h"
 #include "gamesa_renderware.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 /////////////////////////////////////////////////////////////////////////////
 //

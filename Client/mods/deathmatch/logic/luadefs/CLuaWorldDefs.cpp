@@ -8,6 +8,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
+#include <game/CWeather.h>
+#include <game/CColPoint.h>
+#include <game/CCoronas.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()
@@ -52,6 +56,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"getMoonSize", GetMoonSize},
                                                                              {"getFPSLimit", GetFPSLimit},
                                                                              {"getBirdsEnabled", GetBirdsEnabled},
+                                                                             {"getCoronaReflectionsEnabled", ArgumentParser<GetCoronaReflectionsEnabled>},
 
                                                                              // World set funcs
                                                                              {"setTime", SetTime},
@@ -89,6 +94,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setPedTargetingMarkerEnabled", SetPedTargetingMarkerEnabled},
                                                                              {"setMoonSize", SetMoonSize},
                                                                              {"setFPSLimit", SetFPSLimit},
+                                                                             {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
@@ -99,6 +105,7 @@ void CLuaWorldDefs::LoadFunctions()
 
                                                                              // World reset funcs
                                                                              {"resetColorFilter", ArgumentParser<ResetColorFilter>},
+                                                                             {"resetCoronaReflectionsEnabled", ArgumentParser<ResetCoronaReflectionsEnabled>},
                                                                              {"resetSkyGradient", ResetSkyGradient},
                                                                              {"resetHeatHaze", ResetHeatHaze},
                                                                              {"resetWindVelocity", ResetWindVelocity},
@@ -686,7 +693,8 @@ int CLuaWorldDefs::SetBlurLevel(lua_State* luaVM)
 
 int CLuaWorldDefs::ResetBlurLevel(lua_State* luaVM)
 {
-    g_pGame->SetBlurLevel(36);
+    g_pGame->GetSettings()->SetBlurControlledByScript(false);
+    g_pGame->GetSettings()->ResetBlurEnabled();
     lua_pushboolean(luaVM, true);
     return 1;
 }
@@ -2001,4 +2009,26 @@ CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> CLuaWorl
         uColor0.R, uColor0.G, uColor0.B, uColor0.A,
         uColor1.R, uColor1.G, uColor1.B, uColor1.A,
     };
+}
+
+bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)
+{
+    if(ucEnabled > 2)
+        return false;
+
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(true);
+    g_pGame->GetCoronas()->SetCoronaReflectionsEnabled(ucEnabled);
+    return true;
+}
+
+uchar CLuaWorldDefs::GetCoronaReflectionsEnabled()
+{
+    return g_pGame->GetCoronas()->GetCoronaReflectionsEnabled();
+}
+
+bool CLuaWorldDefs::ResetCoronaReflectionsEnabled()
+{
+    g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(false);
+    g_pGame->GetSettings()->ResetCoronaReflectionsEnabled();
+    return true;
 }

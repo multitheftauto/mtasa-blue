@@ -30,6 +30,12 @@
 
 #define MTA_CEF_USERAGENT "Multi Theft Auto: San Andreas Client " MTA_DM_BUILDTAG_LONG
 
+enum class ECefThreadState
+{
+    Running = 0, // CEF thread is currently running
+    Wait // CEF thread is waiting for the main thread
+};
+
 class CWebView : public CWebViewInterface,
                  private CefClient,
                  private CefRenderHandler,
@@ -158,8 +164,8 @@ public:
                             bool& suppress_message) override;
 
     // CefDialogHandler methods
-    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name,
-                              const std::vector<CefString>& accept_types, int selected_accept_filter, CefRefPtr<CefFileDialogCallback> callback) override;
+    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                              const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback) override;
 
     // CefDisplayHandler methods
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -173,10 +179,12 @@ public:
                                      CefRefPtr<CefMenuModel> model) override;
 
 private:
+    void ResumeCefThread();
+
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
-    bool                       m_bBeingDestroyed;
+    std::atomic_bool           m_bBeingDestroyed;
     bool                       m_bIsLocal;
     bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
@@ -192,8 +200,8 @@ private:
     {
         bool                    changed = false;
         std::mutex              dataMutex;
-        std::mutex              cvMutex;
-        std::condition_variable cv;
+        ECefThreadState         cefThreadState = ECefThreadState::Running;
+        std::condition_variable cefThreadCv;
 
         const void*                buffer;
         int                        width, height;

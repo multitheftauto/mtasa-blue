@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2017 - 2021 Red Hat, Inc.
+ * Copyright (C) 2017 - 2022 Red Hat, Inc.
  *
  * Authors: Nikos Mavrogiannopoulos, Tomas Mraz, Stanislav Zidek,
  *          Robert Kolcun, Andreas Schneider
@@ -21,6 +21,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -31,10 +33,6 @@
 
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
-
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
 
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
@@ -81,18 +79,29 @@
 #include "multiif.h"
 #include "select.h"
 #include "warnless.h"
+#include "curl_path.h"
 
-/* for permission and open flags */
-#include <sys/types.h>
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
+#endif
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
+#endif
+#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
-#include "curl_path.h"
+
+/* in 0.10.0 or later, ignore deprecated warnings */
+#if defined(__GNUC__) &&                        \
+  (LIBSSH_VERSION_MINOR >= 10) ||               \
+  (LIBSSH_VERSION_MAJOR > 0)
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 /* A recent macro provided by libssh. Or make our own. */
 #ifndef SSH_STRING_FREE_CHAR
@@ -103,6 +112,14 @@
       x = NULL;                                 \
     }                                           \
   } while(0)
+#endif
+
+/* These stat values may not be the same as the user's S_IFMT / S_IFLNK */
+#ifndef SSH_S_IFMT
+#define SSH_S_IFMT   00170000
+#endif
+#ifndef SSH_S_IFLNK
+#define SSH_S_IFLNK  0120000
 #endif
 
 /* Local functions: */
@@ -946,10 +963,9 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
 
       rc = sftp_init(sshc->sftp_session);
       if(rc != SSH_OK) {
-        rc = sftp_get_error(sshc->sftp_session);
         failf(data, "Failure initializing sftp session: %s",
               ssh_get_error(sshc->ssh_session));
-        MOVE_TO_ERROR_STATE(sftp_error_to_CURLE(rc));
+        MOVE_TO_ERROR_STATE(sftp_error_to_CURLE(SSH_FX_FAILURE));
         break;
       }
       state(data, SSH_SFTP_REALPATH);
@@ -1468,8 +1484,8 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           memcpy(sshc->readdir_line, sshc->readdir_longentry,
                  sshc->readdir_currLen);
           if((sshc->readdir_attrs->flags & SSH_FILEXFER_ATTR_PERMISSIONS) &&
-             ((sshc->readdir_attrs->permissions & S_IFMT) ==
-              S_IFLNK)) {
+             ((sshc->readdir_attrs->permissions & SSH_S_IFMT) ==
+              SSH_S_IFLNK)) {
             sshc->readdir_linkPath = aprintf("%s%s", protop->path,
                                              sshc->readdir_filename);
 
@@ -1650,7 +1666,7 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
           if(from_t == CURL_OFFT_FLOW) {
             return CURLE_RANGE_ERROR;
           }
-          while(*ptr && (ISSPACE(*ptr) || (*ptr == '-')))
+          while(*ptr && (ISBLANK(*ptr) || (*ptr == '-')))
             ptr++;
           to_t = curlx_strtoofft(ptr, &ptr2, 0, &to);
           if(to_t == CURL_OFFT_FLOW) {
@@ -1962,6 +1978,13 @@ static CURLcode myssh_statemach_act(struct Curl_easy *data, bool *block)
       }
 
       ssh_disconnect(sshc->ssh_session);
+      if(!ssh_version(SSH_VERSION_INT(0, 10, 0))) {
+        /* conn->sock[FIRSTSOCKET] is closed by ssh_disconnect behind our back,
+           explicitly mark it as closed with the memdebug macro. This libssh
+           bug is fixed in 0.10.0. */
+        fake_sclose(conn->sock[FIRSTSOCKET]);
+        conn->sock[FIRSTSOCKET] = CURL_SOCKET_BAD;
+      }
 
       SSH_STRING_FREE_CHAR(sshc->homedir);
       data->state.most_recent_ftp_entrypath = NULL;
@@ -2053,6 +2076,9 @@ static int myssh_getsock(struct Curl_easy *data,
     bitmap |= GETSOCK_READSOCK(FIRSTSOCKET);
 
   if(conn->waitfor & KEEP_SEND)
+    bitmap |= GETSOCK_WRITESOCK(FIRSTSOCKET);
+
+  if(!conn->waitfor)
     bitmap |= GETSOCK_WRITESOCK(FIRSTSOCKET);
 
   return bitmap;
@@ -2687,7 +2713,7 @@ static void sftp_quote(struct Curl_easy *data)
    */
   cp = strchr(cmd, ' ');
   if(!cp) {
-    failf(data, "Syntax error in SFTP command. Supply parameter(s)!");
+    failf(data, "Syntax error in SFTP command. Supply parameter(s)");
     state(data, SSH_SFTP_CLOSE);
     sshc->nextstate = SSH_NO_STATE;
     sshc->actualcode = CURLE_QUOTE_ERROR;
@@ -2891,32 +2917,33 @@ static void sftp_quote_stat(struct Curl_easy *data)
     }
     sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_UIDGID;
   }
-  else if(strncasecompare(cmd, "atime", 5)) {
+  else if(strncasecompare(cmd, "atime", 5) ||
+          strncasecompare(cmd, "mtime", 5)) {
     time_t date = Curl_getdate_capped(sshc->quote_path1);
+    bool fail = FALSE;
     if(date == -1) {
+      failf(data, "incorrect date format for %.*s", 5, cmd);
+      fail = TRUE;
+    }
+#if SIZEOF_TIME_T > 4
+    else if(date > 0xffffffff) {
+      failf(data, "date overflow");
+      fail = TRUE; /* avoid setting a capped time */
+    }
+#endif
+    if(fail) {
       Curl_safefree(sshc->quote_path1);
       Curl_safefree(sshc->quote_path2);
-      failf(data, "Syntax error: incorrect access date format");
       state(data, SSH_SFTP_CLOSE);
       sshc->nextstate = SSH_NO_STATE;
       sshc->actualcode = CURLE_QUOTE_ERROR;
       return;
     }
-    sshc->quote_attrs->atime = (uint32_t)date;
-    sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_ACMODTIME;
-  }
-  else if(strncasecompare(cmd, "mtime", 5)) {
-    time_t date = Curl_getdate_capped(sshc->quote_path1);
-    if(date == -1) {
-      Curl_safefree(sshc->quote_path1);
-      Curl_safefree(sshc->quote_path2);
-      failf(data, "Syntax error: incorrect modification date format");
-      state(data, SSH_SFTP_CLOSE);
-      sshc->nextstate = SSH_NO_STATE;
-      sshc->actualcode = CURLE_QUOTE_ERROR;
-      return;
-    }
-    sshc->quote_attrs->mtime = (uint32_t)date;
+    if(strncasecompare(cmd, "atime", 5))
+      sshc->quote_attrs->atime = (uint32_t)date;
+    else /* mtime */
+      sshc->quote_attrs->mtime = (uint32_t)date;
+
     sshc->quote_attrs->flags |= SSH_FILEXFER_ATTR_ACMODTIME;
   }
 
@@ -2941,7 +2968,7 @@ void Curl_ssh_cleanup(void)
 
 void Curl_ssh_version(char *buffer, size_t buflen)
 {
-  (void)msnprintf(buffer, buflen, "libssh/%s", CURL_LIBSSH_VERSION);
+  (void)msnprintf(buffer, buflen, "libssh/%s", ssh_version(0));
 }
 
 #endif                          /* USE_LIBSSH */
