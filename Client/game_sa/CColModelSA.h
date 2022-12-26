@@ -11,7 +11,9 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CColModel.h>
+#include <game/CColPoint.h>
 #include "CCompressedVectorSA.h"
 
 #define FUNC_CColModel_Constructor      0x40FB60

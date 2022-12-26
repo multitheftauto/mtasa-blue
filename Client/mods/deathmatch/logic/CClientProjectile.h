@@ -12,10 +12,10 @@ class CClientProjectile;
 
 #pragma once
 
+#include <game/CProjectile.h>
 #include "CClientEntity.h"
 #include "CClientCommon.h"
 
-class CProjectile;
 class CProjectileInfo;
 class CClientEntity;
 class CVector;

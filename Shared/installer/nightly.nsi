@@ -34,6 +34,25 @@ Var ShowLastUsed
 Var PermissionsGroup
 Var PATCH_TARGET
 
+# Shortcuts names
+Var ClientShortcutName
+Var ServerShortcutName
+Var UninstallShortcutName
+# Shostcuts paths
+Var StartMenuMTAFolderPath
+Var StartMenuClientShortcutPath
+Var StartMenuServerShortcutPath
+Var StartMenuUninstallShortcutPath
+Var DesktopClientShortcutPath
+# Exe names
+Var ClientExeName
+Var ServerExeName
+Var UninstallExeName
+# Exe paths
+Var ClientExePath
+Var ServerExePath
+Var UninstallExePath
+
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
 !define GUID "{D32E69D8-716F-4E74-91CB-044DB9AA3F40}"
 
@@ -246,20 +265,6 @@ Function .onInit
 
     File /oname=$TEMP\image.bmp "connect.bmp"
 
-    ; #############################################
-    ; Remove old shortcuts put in rand(user,admin) startmenu by previous installers (shortcuts now go in all users)
-    SetShellVarContext current
-    ; Delete shortcuts
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
-    Delete "$DESKTOP\MTA San Andreas ${0.0}.lnk"
-
-    ; Delete shortcuts
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk"
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk"
-    RmDir /r "$SMPROGRAMS\\MTA San Andreas ${0.0}"
-    ; #############################################
-
     SetShellVarContext all
 
     ${LogSetFileName} "$APPDATA\MTA San Andreas All\Common\Installer" "nsis.log"
@@ -362,44 +367,61 @@ Function .onInstSuccess
 
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
-
+	
+	# Initilize variables holding paths and names
+	Call MTAInitFileNamesAndPaths
     ; Start menu items
     ${If} $CreateSMShortcuts == 1
-        CreateDirectory "$SMPROGRAMS\MTA San Andreas ${0.0}"
-
-        IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip1
-        SetOutPath "$INSTDIR"
-        Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Play MTA San Andreas.lnk"
-        CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk" "$INSTDIR\Multi Theft Auto.exe" \
-            "" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-            "" "Play Multi Theft Auto: San Andreas ${0.0}"
-        skip1:
-
-        IfFileExists "$INSTDIR\Server\MTA Server.exe" 0 skip2
-        SetOutPath "$INSTDIR\Server"
-        CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk" "$INSTDIR\Server\MTA Server.exe" \
-            "" "$INSTDIR\Server\MTA Server.exe" 2 SW_SHOWNORMAL \
-            "" "Run the Multi Theft Auto: San Andreas ${0.0} Server"
-        skip2:
-
-        IfFileExists "$INSTDIR\Uninstall.exe" 0 skip3
-        SetOutPath "$INSTDIR"
-        CreateShortCut "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk" "$INSTDIR\Uninstall.exe" \
-            "" "$INSTDIR\Uninstall.exe" 0 SW_SHOWNORMAL \
-            "" "Uninstall Multi Theft Auto: San Andreas ${0.0}"
-        skip3:
+		${IfNot} ${FileExists} "$StartMenuMTAFolderPath\*.*"
+			CreateDirectory $StartMenuMTAFolderPath
+		${EndIf}
+		# Either update or create Client shortcut
+		${If} ${FileExists} $StartMenuClientShortcutPath
+			Push $ClientExePath
+			Push $StartMenuClientShortcutPath
+			Call MTAUpdateShortсutTarget
+		${Else}
+			Push $ClientExePath
+			Push $ClientExePath
+			Push $StartMenuClientShortcutPath
+			Call MTACreateShortсut
+		${EndIf}
+		# Either update or create Server shortcut
+		${If} ${FileExists} $StartMenuServerShortcutPath
+			Push $ServerExeName
+			Push $StartMenuServerShortcutPath
+			Call MTAUpdateShortсutTarget
+		${Else}
+			Push $ServerExePath
+			Push $ServerExePath
+			Push $StartMenuServerShortcutPath
+			Call MTACreateShortсut
+		${EndIf}
+		# Either update or create Uninstall shortcut
+		${If} ${FileExists} $StartMenuUninstallShortcutPath
+			Push $UninstallExeName
+			Push $StartMenuUninstallShortcutPath
+			Call MTAUpdateShortсutTarget
+		${Else}
+			Push $UninstallExeName
+			Push $UninstallExeName
+			Push $StartMenuUninstallShortcutPath
+			Call MTACreateShortсut
+		${EndIf}
     ${EndIf}
 
     ${If} $CreateDesktopIcon == 1
-        IfFileExists "$INSTDIR\Multi Theft Auto.exe" 0 skip4
-        SetOutPath "$INSTDIR"
-        Delete "$DESKTOP\Play MTA San Andreas ${0.0}.lnk"
-        CreateShortCut "$DESKTOP\MTA San Andreas ${0.0}.lnk" "$INSTDIR\Multi Theft Auto.exe" \
-            "" "$INSTDIR\Multi Theft Auto.exe" 0 SW_SHOWNORMAL \
-            "" "Play Multi Theft Auto: San Andreas ${0.0}"
-        AccessControl::GrantOnFile "$DESKTOP\MTA San Andreas ${0.0}.lnk" "($PermissionsGroup)" "FullAccess"
-
-        skip4:
+		${If} ${FileExists} $DesktopClientShortcutPath
+			Push $ClientExePath
+			Push $DesktopClientShortcutPath
+			Call MTAUpdateShortсutTarget
+		${Else}
+			Push $ClientExePath
+			Push $ClientExePath
+			Push $DesktopClientShortcutPath
+			Call MTACreateShortсut
+		${EndIf}
+			AccessControl::GrantOnFile $DesktopClientShortcutPath "($PermissionsGroup)" "FullAccess"
     ${EndIf}
 
     ${If} $RegisterProtocol == 1
@@ -646,6 +668,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
         File "${FILES_ROOT}\mta\loader.dll"
+        File "${FILES_ROOT}\mta\winmm.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
         File "${FILES_ROOT}\mta\libwow64.dll"
@@ -2528,4 +2551,72 @@ Function SetPermissionsGroup
     ; Default to \LOCAL
     StrCpy $PermissionsGroup "S-1-2-0"
     ${LogText} "SetPermissionsGroup using '$PermissionsGroup'"
+FunctionEnd
+
+Function MTACreateShortсut
+	# path to a lnk.
+	Pop $2
+	# path to a target exe.
+	Pop $1
+	# path to an icon file.
+	Pop $0
+	# Link
+	# Target exe
+	# Command line parameters
+	# Icon file
+	# Icon index number
+	# Start options: SW_SHOWNORMAL, SW_SHOWMAXIMIZED, SW_SHOWMINIMIZED
+	# Keyboard shortcut
+	# Description
+	CreateShortCut $2 \
+		$1 \
+		"" \
+		$0 \
+		0 \
+		SW_SHOWNORMAL \
+		"" \
+		"Play Multi Theft Auto: San Andreas"
+	${If} ${Errors}
+		${LogText} "Error creating shortcut for EXE $2"
+	${EndIf}
+FunctionEnd
+
+Function MTAUpdateShortсutTarget
+	# Full path to a shortcut
+	Pop $0
+	# Full path to a target exe
+	Pop $1
+	ShellLink::GetShortCutTarget $0
+	# Get returned value of given shortcut target
+	Pop $2
+	${If} $2 == $1
+		Abort
+	${EndIf}
+	${LogText} "Changing shortcut target $0 to Exe $1"
+	ShellLink::SetShortCutTarget $0 $1
+	Pop $0
+	${LogText} "Changing shortcut target error: $0"
+FunctionEnd
+
+Function MTAInitFileNamesAndPaths
+	# Shortcuts names
+	StrCpy $ClientShortcutName "MTA San Andreas"
+	StrCpy $ServerShortcutName "MTA Server"
+	StrCpy $UninstallShortcutName "Uninstall MTA San Andreas"
+	# Shostcuts paths
+	StrCpy $StartMenuMTAFolderPath "$SMPROGRAMS\MTA San Andreas ${0.0}"
+	StrCpy $StartMenuClientShortcutPath "$StartMenuMTAFolderPath\$ClientShortcutName.lnk"
+	StrCpy $StartMenuServerShortcutPath "$StartMenuMTAFolderPath\$ServerShortcutName.lnk"
+	StrCpy $StartMenuUninstallShortcutPath "$StartMenuMTAFolderPath\$UninstallShortcutName.lnk"
+	# Shortcut names for desktop and start menu are different and can't be safely unified.
+	# Obvious fix is to roll 1 update where all shortcuts will be deleted and replaced with a unified names.
+	StrCpy $DesktopClientShortcutPath "$DESKTOP\$ClientShortcutName ${0.0}.lnk"
+	# Exe names
+	StrCpy $ClientExeName "Multi Theft Auto.exe"
+	StrCpy $ServerExeName "MTA Server.exe"
+	StrCpy $UninstallExeName "Uninstall.exe"
+	# Exe paths
+	StrCpy $ClientExePath "$INSTDIR\$ClientExeName"
+	StrCpy $ServerExePath "$INSTDIR\$ServerExeName"
+	StrCpy $UninstallExePath "$INSTDIR\$UninstallExeName"
 FunctionEnd
