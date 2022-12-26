@@ -1,18 +1,17 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CQuadBikeSA.cpp
- *  PURPOSE:     Quad bike vehicle entity
+ *  FILE:        game_sa/CHeliSA.cpp
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CQuadBikeSA.h"
+#include "CHeliSA.h"
 
-CQuadBikeSA::CQuadBikeSA(CQuadBikeSAInterface* pInterface)
+CHeliSA::CHeliSA(CHeliSAInterface* pInterface)
 {
     SetInterface(pInterface);
     Init();
