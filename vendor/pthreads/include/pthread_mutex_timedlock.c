@@ -6,40 +6,42 @@
  *
  * --------------------------------------------------------------------------
  *
- *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
- *      Contact Email: rpj@callisto.canberra.edu.au
- * 
+ *      Pthreads4w - POSIX Threads for Windows
+ *      Copyright 1998 John E. Bossom
+ *      Copyright 1999-2018, Pthreads4w contributors
+ *
+ *      Homepage: https://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
- *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
- *      This library is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU Lesser General Public
- *      License as published by the Free Software Foundation; either
- *      version 2 of the License, or (at your option) any later version.
- * 
- *      This library is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *      Lesser General Public License for more details.
- * 
- *      You should have received a copy of the GNU Lesser General Public
- *      License along with this library in the file COPYING.LIB;
- *      if not, write to the Free Software Foundation, Inc.,
- *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ *      https://sourceforge.net/p/pthreads4w/wiki/Contributors/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+#ifdef HAVE_CONFIG_H
+# include <config.h>
+#endif
 
 #include "pthread.h"
 #include "implement.h"
 
 
 static INLINE int
-ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
+__ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
      /*
       * ------------------------------------------------------
       * DESCRIPTION
@@ -52,7 +54,7 @@ ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
       *      block until it can successfully decrease the value or
       *      until interrupted by a signal.
       *
-      *      This routine is not a cancelation point.
+      *      This routine is not a cancellation point.
       *
       * RESULTS
       *              0               successfully signaled,
@@ -81,72 +83,75 @@ ptw32_timed_eventwait (HANDLE event, const struct timespec *abstime)
 	  /* 
 	   * Calculate timeout as milliseconds from current system time. 
 	   */
-	  milliseconds = ptw32_relmillisecs (abstime);
+	  milliseconds = __ptw32_relmillisecs (abstime);
 	}
 
       status = WaitForSingleObject (event, milliseconds);
 
-      if (status == WAIT_OBJECT_0)
-	{
-	  return 0;
-	}
-      else if (status == WAIT_TIMEOUT)
-	{
-	  return ETIMEDOUT;
-	}
-      else
-	{
-	  return EINVAL;
-	}
+      if (status != WAIT_OBJECT_0)
+        {
+          if (status == WAIT_TIMEOUT)
+            {
+              return ETIMEDOUT;
+            }
+          else
+            {
+              return EINVAL;
+            }
+        }
     }
 
   return 0;
 
-}				/* ptw32_timed_semwait */
+}				/* __ptw32_timed_semwait */
 
 
 int
 pthread_mutex_timedlock (pthread_mutex_t * mutex,
 			 const struct timespec *abstime)
 {
-  pthread_mutex_t mx;
-  int kind;
-  int result = 0;
-
   /*
    * Let the system deal with invalid pointers.
    */
+  pthread_mutex_t mx = *mutex;
+  int kind;
+  int result = 0;
+
+  if (mx == NULL)
+    {
+      return EINVAL;
+    }
 
   /*
    * We do a quick check to see if we need to do more work
    * to initialise a static mutex. We check
-   * again inside the guarded section of ptw32_mutex_check_need_init()
+   * again inside the guarded section of __ptw32_mutex_check_need_init()
    * to avoid race conditions.
    */
-  if (*mutex >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
+  if (mx >= PTHREAD_ERRORCHECK_MUTEX_INITIALIZER)
     {
-      if ((result = ptw32_mutex_check_need_init (mutex)) != 0)
+      if ((result = __ptw32_mutex_check_need_init (mutex)) != 0)
 	{
 	  return (result);
 	}
+      mx = *mutex;
     }
 
-  mx = *mutex;
   kind = mx->kind;
 
   if (kind >= 0)
     {
       if (mx->kind == PTHREAD_MUTEX_NORMAL)
         {
-          if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-		       (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-		       (PTW32_INTERLOCKED_LONG) 1) != 0)
+          if  ((__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG(
+		        (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+		        (__PTW32_INTERLOCKED_LONG) 1) != 0)
 	    {
-              while ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                              (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-			      (PTW32_INTERLOCKED_LONG) -1) != 0)
+              while  ((__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG(
+                               (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+			       (__PTW32_INTERLOCKED_LONG) -1) != 0)
                 {
-	          if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+	          if (0 != (result = __ptw32_timed_eventwait (mx->event, abstime)))
 		    {
 		      return result;
 		    }
@@ -157,10 +162,10 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
         {
           pthread_t self = pthread_self();
 
-          if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-                       (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-		       (PTW32_INTERLOCKED_LONG) 1,
-		       (PTW32_INTERLOCKED_LONG) 0) == 0)
+          if  ((__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
+                        (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+		        (__PTW32_INTERLOCKED_LONG) 1,
+		        (__PTW32_INTERLOCKED_LONG) 0) == 0)
 	    {
 	      mx->recursive_count = 1;
 	      mx->ownerThread = self;
@@ -180,11 +185,11 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	        }
 	      else
 	        {
-                  while ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                                  (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-			          (PTW32_INTERLOCKED_LONG) -1) != 0)
+                  while  ((__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG(
+                                   (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+			           (__PTW32_INTERLOCKED_LONG) -1) != 0)
                     {
-		      if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+		      if (0 != (result = __ptw32_timed_eventwait (mx->event, abstime)))
 		        {
 		          return result;
 		        }
@@ -203,11 +208,11 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
        * All types record the current owner thread.
        * The mutex is added to a per thread list when ownership is acquired.
        */
-      ptw32_robust_state_t* statePtr = &mx->robustNode->stateInconsistent;
+      __ptw32_robust_state_t* statePtr = &mx->robustNode->stateInconsistent;
 
-      if ((PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE == PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
-                                                 (PTW32_INTERLOCKED_LONGPTR)statePtr,
-                                                 (PTW32_INTERLOCKED_LONG)0))
+      if  ((__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_NOTRECOVERABLE ==  __PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
+                                                  (__PTW32_INTERLOCKED_LONGPTR)statePtr,
+                                                  (__PTW32_INTERLOCKED_LONG)0))
         {
           result = ENOTRECOVERABLE;
         }
@@ -219,23 +224,23 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 
           if (PTHREAD_MUTEX_NORMAL == kind)
             {
-              if ((PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-		           (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-		           (PTW32_INTERLOCKED_LONG) 1) != 0)
+              if  ((__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG(
+		            (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+		            (__PTW32_INTERLOCKED_LONG) 1) != 0)
 	        {
-                  while (0 == (result = ptw32_robust_mutex_inherit(mutex))
-                           && (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                                  (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-			          (PTW32_INTERLOCKED_LONG) -1) != 0)
+                  while (0 == (result = __ptw32_robust_mutex_inherit(mutex))
+                           &&  (__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG(
+                                   (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+			           (__PTW32_INTERLOCKED_LONG) -1) != 0)
                     {
-	              if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+	              if (0 != (result = __ptw32_timed_eventwait (mx->event, abstime)))
 		        {
 		          return result;
 		        }
-                      if ((PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE ==
-                                  PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
-                                    (PTW32_INTERLOCKED_LONGPTR)statePtr,
-                                    (PTW32_INTERLOCKED_LONG)0))
+                      if  ((__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_NOTRECOVERABLE ==
+                                   __PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
+                                     (__PTW32_INTERLOCKED_LONGPTR)statePtr,
+                                     (__PTW32_INTERLOCKED_LONG)0))
                         {
                           /* Unblock the next thread */
                           SetEvent(mx->event);
@@ -250,7 +255,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
                        * Add mutex to the per-thread robust mutex currently-held list.
                        * If the thread terminates, all mutexes in this list will be unlocked.
                        */
-                      ptw32_robust_mutex_add(mutex, self);
+                      __ptw32_robust_mutex_add(mutex, self);
                     }
 	        }
             }
@@ -258,17 +263,17 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
             {
               pthread_t self = pthread_self();
 
-              if (0 == (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
-                           (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-		           (PTW32_INTERLOCKED_LONG) 1,
-		           (PTW32_INTERLOCKED_LONG) 0))
+              if (0 ==  (__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(
+                            (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+		            (__PTW32_INTERLOCKED_LONG) 1,
+		            (__PTW32_INTERLOCKED_LONG) 0))
 	        {
 	          mx->recursive_count = 1;
                   /*
                    * Add mutex to the per-thread robust mutex currently-held list.
                    * If the thread terminates, all mutexes in this list will be unlocked.
                    */
-                  ptw32_robust_mutex_add(mutex, self);
+                  __ptw32_robust_mutex_add(mutex, self);
 	        }
               else
 	        {
@@ -285,21 +290,21 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
 	            }
 	          else
 	            {
-                      while (0 == (result = ptw32_robust_mutex_inherit(mutex))
-                               && (PTW32_INTERLOCKED_LONG) PTW32_INTERLOCKED_EXCHANGE_LONG(
-                                          (PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
-			                  (PTW32_INTERLOCKED_LONG) -1) != 0)
+                      while (0 == (result = __ptw32_robust_mutex_inherit(mutex))
+                               &&  (__PTW32_INTERLOCKED_LONG)  __PTW32_INTERLOCKED_EXCHANGE_LONG(
+                                           (__PTW32_INTERLOCKED_LONGPTR) &mx->lock_idx,
+			                   (__PTW32_INTERLOCKED_LONG) -1) != 0)
                         {
-		          if (0 != (result = ptw32_timed_eventwait (mx->event, abstime)))
+		          if (0 != (result = __ptw32_timed_eventwait (mx->event, abstime)))
 		            {
 		              return result;
 		            }
 		        }
 
-                      if ((PTW32_INTERLOCKED_LONG)PTW32_ROBUST_NOTRECOVERABLE ==
-                                  PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
-                                    (PTW32_INTERLOCKED_LONGPTR)statePtr,
-                                    (PTW32_INTERLOCKED_LONG)0))
+                      if  ((__PTW32_INTERLOCKED_LONG)__PTW32_ROBUST_NOTRECOVERABLE ==
+                                   __PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(
+                                     (__PTW32_INTERLOCKED_LONGPTR)statePtr,
+                                     (__PTW32_INTERLOCKED_LONG)0))
                         {
                           /* Unblock the next thread */
                           SetEvent(mx->event);
@@ -312,7 +317,7 @@ pthread_mutex_timedlock (pthread_mutex_t * mutex,
                            * Add mutex to the per-thread robust mutex currently-held list.
                            * If the thread terminates, all mutexes in this list will be unlocked.
                            */
-                          ptw32_robust_mutex_add(mutex, self);
+                          __ptw32_robust_mutex_add(mutex, self);
                         }
 	            }
 	        }

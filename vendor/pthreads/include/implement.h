@@ -7,43 +7,49 @@
  *
  * --------------------------------------------------------------------------
  *
- *      Pthreads-win32 - POSIX Threads Library for Win32
- *      Copyright(C) 1998 John E. Bossom
- *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- * 
- *      Contact Email: Ross.Johnson@homemail.com.au
- * 
+ *      Pthreads4w - POSIX Threads for Windows
+ *      Copyright 1998 John E. Bossom
+ *      Copyright 1999-2018, Pthreads4w contributors
+ *
+ *      Homepage: https://sourceforge.net/projects/pthreads4w/
+ *
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
- *      http://sources.redhat.com/pthreads-win32/contributors.html
- * 
- *      This library is free software; you can redistribute it and/or
- *      modify it under the terms of the GNU Lesser General Public
- *      License as published by the Free Software Foundation; either
- *      version 2 of the License, or (at your option) any later version.
- * 
- *      This library is distributed in the hope that it will be useful,
- *      but WITHOUT ANY WARRANTY; without even the implied warranty of
- *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *      Lesser General Public License for more details.
- * 
- *      You should have received a copy of the GNU Lesser General Public
- *      License along with this library in the file COPYING.LIB;
- *      if not, write to the Free Software Foundation, Inc.,
- *      59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
+ *
+ *      https://sourceforge.net/p/pthreads4w/wiki/Contributors/
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #if !defined(_IMPLEMENT_H)
 #define _IMPLEMENT_H
 
-#if !defined(_WIN32_WINNT)
-#define _WIN32_WINNT 0x0400
+#if !defined (__PTW32_CONFIG_H)
+# error "config.h was not #included"
 #endif
 
-#include <windows.h>
+#include <_ptw32.h>
 
+#if !defined(_WIN32_WINNT)
+# define _WIN32_WINNT 0x0400
+#endif
+
+#define WIN32_LEAN_AND_MEAN
+
+#include <windows.h>
+#include <sys/types.h>
 /*
  * In case windows.h doesn't define it (e.g. WinCE perhaps)
  */
@@ -52,117 +58,141 @@ typedef VOID (APIENTRY *PAPCFUNC)(DWORD dwParam);
 #endif
 
 /*
- * note: ETIMEDOUT is correctly defined in winsock.h
+ * Designed to allow error values to be set and retrieved in builds where
+ * MSCRT libraries are statically linked to DLLs.
+ *
+ * This does not handle the case where a static pthreads4w lib is linked
+ * to a static linked app. Compiling and linking pthreads.c with app.c
+ * as one does work with the right macros defined. See tests/Makefile
+ * for clues or just "cd tests && nmake clean VC-static".
  */
-#include <winsock.h>
-
-/*
- * In case ETIMEDOUT hasn't been defined above somehow.
- */
-#if !defined(ETIMEDOUT)
-#  define ETIMEDOUT 10060	/* This is the value in winsock.h. */
+#if ! defined(WINCE) && \
+    (( defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x0800 ) || \
+    ( defined(_MSC_VER) && _MSC_VER >= 1400 ))  /* MSVC8+ */
+#  if defined(__MINGW32__)
+__attribute__((unused))
+#  endif
+static int __ptw32_get_errno(void) { int err = 0; _get_errno(&err); return err; }
+#  define __PTW32_GET_ERRNO() __ptw32_get_errno()
+#  if defined(__MINGW32__)
+__attribute__((unused))
+#  endif
+static void __ptw32_set_errno(int err) { _set_errno(err); SetLastError(err); }
+#    define __PTW32_SET_ERRNO(err) __ptw32_set_errno(err)
+#else
+#  define __PTW32_GET_ERRNO() (errno)
+#  if defined(__MINGW32__)
+__attribute__((unused))
+#  endif
+static void __ptw32_set_errno(int err) { errno = err; SetLastError(err); }
+#    define __PTW32_SET_ERRNO(err) __ptw32_set_errno(err)
 #endif
 
 #if !defined(malloc)
-#include <malloc.h>
+# include <malloc.h>
 #endif
 
-#if defined(__CLEANUP_C)
+#if defined(__PTW32_CLEANUP_C)
 # include <setjmp.h>
 #endif
 
 #if !defined(INT_MAX)
-#include <limits.h>
+# include <limits.h>
 #endif
 
 /* use local include files during development */
 #include "semaphore.h"
 #include "sched.h"
 
-#if defined(HAVE_C_INLINE) || defined(__cplusplus)
-#define INLINE inline
-#else
+/* MSVC 7.1 doesn't like complex #if expressions */
 #define INLINE
-#endif
-
-#if defined(_MSC_VER) && _MSC_VER < 1300
-/*
- * MSVC 6 does not use the "volatile" qualifier
- */
-#define PTW32_INTERLOCKED_VOLATILE
-#else
-#define PTW32_INTERLOCKED_VOLATILE volatile
-#endif
-#define PTW32_INTERLOCKED_LONG long
-#define PTW32_INTERLOCKED_SIZE size_t
-#define PTW32_INTERLOCKED_PVOID PVOID
-#define PTW32_INTERLOCKED_LONGPTR PTW32_INTERLOCKED_VOLATILE long*
-#define PTW32_INTERLOCKED_SIZEPTR PTW32_INTERLOCKED_VOLATILE size_t*
-#define PTW32_INTERLOCKED_PVOID_PTR PTW32_INTERLOCKED_VOLATILE PVOID*
-
-#if defined(__MINGW64__) || defined(__MINGW32__)
-#  include <stdint.h>
-#elif defined(__BORLANDC__)
-#  define int64_t ULONGLONG
-#else
-#  define int64_t _int64
-#  if defined(_MSC_VER) && _MSC_VER < 1300
-     typedef long intptr_t;
+#if defined (__PTW32_BUILD_INLINED)
+#  if defined(HAVE_C_INLINE) || defined(__cplusplus)
+#    undef INLINE
+#    define INLINE inline
 #  endif
+#endif
+
+#if defined (__PTW32_CONFIG_MSVC6)
+# define  __PTW32_INTERLOCKED_VOLATILE
+#else
+# define  __PTW32_INTERLOCKED_VOLATILE volatile
+#endif
+
+#define  __PTW32_INTERLOCKED_LONG long
+#define  __PTW32_INTERLOCKED_PVOID PVOID
+#define  __PTW32_INTERLOCKED_LONGPTR  __PTW32_INTERLOCKED_VOLATILE long*
+#define  __PTW32_INTERLOCKED_PVOID_PTR  __PTW32_INTERLOCKED_VOLATILE PVOID*
+#if defined(_WIN64)
+#  define  __PTW32_INTERLOCKED_SIZE LONGLONG
+#  define  __PTW32_INTERLOCKED_SIZEPTR  __PTW32_INTERLOCKED_VOLATILE LONGLONG*
+#else
+#  define  __PTW32_INTERLOCKED_SIZE long
+#  define  __PTW32_INTERLOCKED_SIZEPTR  __PTW32_INTERLOCKED_VOLATILE long*
+#endif
+
+/*
+ * Don't allow the linker to optimize away dll.obj (dll.o) in static builds.
+ */
+#if defined (__PTW32_STATIC_LIB) && defined (__PTW32_BUILD) && !defined (__PTW32_TEST_SNEAK_PEEK)
+  void __ptw32_autostatic_anchor(void);
+# if defined(__GNUC__)
+    __attribute__((unused, used))
+# endif
+  static void (*local_autostatic_anchor)(void) = __ptw32_autostatic_anchor;
 #endif
 
 typedef enum
 {
   /*
    * This enumeration represents the state of the thread;
-   * The thread is still "alive" if the numeric value of the
+   * The thread is still valid if the numeric value of the
    * state is greater or equal "PThreadStateRunning".
    */
   PThreadStateInitial = 0,	/* Thread not running                   */
+  PThreadStateReuse,            /* In reuse pool.                       */
   PThreadStateRunning,		/* Thread alive & kicking               */
   PThreadStateSuspended,	/* Thread alive but suspended           */
   PThreadStateCancelPending,	/* Thread alive but                     */
-                                /* has cancelation pending.             */
+                                /* has cancellation pending.            */
   PThreadStateCanceling,	/* Thread alive but is                  */
                                 /* in the process of terminating        */
                                 /* due to a cancellation request        */
   PThreadStateExiting,		/* Thread alive but exiting             */
                                 /* due to an exception                  */
-  PThreadStateLast,             /* All handlers have been run and now   */
+  PThreadStateLast              /* All handlers have been run and now   */
                                 /* final cleanup can be done.           */
-  PThreadStateReuse             /* In reuse pool.                       */
 }
 PThreadState;
 
-typedef struct ptw32_mcs_node_t_     ptw32_mcs_local_node_t;
-typedef struct ptw32_mcs_node_t_*    ptw32_mcs_lock_t;
-typedef struct ptw32_robust_node_t_  ptw32_robust_node_t;
-typedef struct ptw32_thread_t_       ptw32_thread_t;
+typedef struct __ptw32_mcs_node_t_     __ptw32_mcs_local_node_t;
+typedef struct __ptw32_mcs_node_t_*    __ptw32_mcs_lock_t;
+typedef struct __ptw32_robust_node_t_  __ptw32_robust_node_t;
+typedef struct __ptw32_thread_t_       __ptw32_thread_t;
 
-
-struct ptw32_thread_t_
+struct __ptw32_thread_t_
 {
   unsigned __int64 seqNumber;	/* Process-unique thread sequence number */
   HANDLE threadH;		/* Win32 thread handle - POSIX thread is invalid if threadH == 0 */
   pthread_t ptHandle;		/* This thread's permanent pthread_t handle */
-  ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
+  __ptw32_thread_t * prevReuse;	/* Links threads on reuse stack */
   volatile PThreadState state;
-  ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
-  ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
+  __ptw32_mcs_lock_t threadLock;	/* Used for serialised access to public thread state */
+  __ptw32_mcs_lock_t stateLock;	/* Used for async-cancel safety */
   HANDLE cancelEvent;
   void *exitStatus;
   void *parms;
   void *keys;
   void *nextAssoc;
-#if defined(__CLEANUP_C)
+#if defined(__PTW32_CLEANUP_C)
   jmp_buf start_mark;		/* Jump buffer follows void* so should be aligned */
-#endif				/* __CLEANUP_C */
+#endif				/* __PTW32_CLEANUP_C */
 #if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */
-  ptw32_mcs_lock_t
+  __ptw32_mcs_lock_t
               robustMxListLock; /* robustMxList lock */
-  ptw32_robust_node_t*
+  __ptw32_robust_node_t*
                   robustMxList; /* List of currenty held robust mutexes */
   int ptErrno;
   int detachState;
@@ -170,7 +200,11 @@ struct ptw32_thread_t_
   int cancelState;
   int cancelType;
   int implicit:1;
-  DWORD thread;			/* Win32 thread ID */
+  DWORD thread;			/* Windows thread ID */
+#if defined(HAVE_CPU_AFFINITY)
+  size_t cpuset;		/* Thread CPU affinity set */
+#endif
+  char * name;                  /* Thread name */
 #if defined(_UWIN)
   DWORD dummy[5];
 #endif
@@ -178,10 +212,10 @@ struct ptw32_thread_t_
 };
 
 
-/* 
+/*
  * Special value to mark attribute objects as valid.
  */
-#define PTW32_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
+#define  __PTW32_ATTR_VALID ((unsigned long) 0xC4C0FFEE)
 
 struct pthread_attr_t_
 {
@@ -192,6 +226,8 @@ struct pthread_attr_t_
   struct sched_param param;
   int inheritsched;
   int contentionscope;
+  size_t cpuset;
+  char * thrname;
 #if defined(HAVE_SIGSET_T)
   sigset_t sigmask;
 #endif				/* HAVE_SIGSET_T */
@@ -209,15 +245,15 @@ struct pthread_attr_t_
 struct sem_t_
 {
   int value;
-  pthread_mutex_t lock;
+  __ptw32_mcs_lock_t lock;
   HANDLE sem;
 #if defined(NEED_SEM)
   int leftToUnblock;
 #endif
 };
 
-#define PTW32_OBJECT_AUTO_INIT ((void *)(size_t) -1)
-#define PTW32_OBJECT_INVALID   NULL
+#define  __PTW32_OBJECT_AUTO_INIT ((void *)(size_t) -1)
+#define  __PTW32_OBJECT_INVALID   NULL
 
 struct pthread_mutex_t_
 {
@@ -234,28 +270,28 @@ struct pthread_mutex_t_
   pthread_t ownerThread;
   HANDLE event;			/* Mutex release notification to waiting
 				   threads. */
-  ptw32_robust_node_t*
+  __ptw32_robust_node_t*
                     robustNode; /* Extra state for robust mutexes  */
 };
 
-enum ptw32_robust_state_t_
+enum __ptw32_robust_state_t_
 {
-  PTW32_ROBUST_CONSISTENT,
-  PTW32_ROBUST_INCONSISTENT,
-  PTW32_ROBUST_NOTRECOVERABLE
+   __PTW32_ROBUST_CONSISTENT,
+   __PTW32_ROBUST_INCONSISTENT,
+   __PTW32_ROBUST_NOTRECOVERABLE
 };
 
-typedef enum ptw32_robust_state_t_   ptw32_robust_state_t;
+typedef enum __ptw32_robust_state_t_   __ptw32_robust_state_t;
 
 /*
  * Node used to manage per-thread lists of currently-held robust mutexes.
  */
-struct ptw32_robust_node_t_
+struct __ptw32_robust_node_t_
 {
   pthread_mutex_t mx;
-  ptw32_robust_state_t stateInconsistent;
-  ptw32_robust_node_t* prev;
-  ptw32_robust_node_t* next;
+  __ptw32_robust_state_t stateInconsistent;
+  __ptw32_robust_node_t* prev;
+  __ptw32_robust_node_t* next;
 };
 
 struct pthread_mutexattr_t_
@@ -266,15 +302,15 @@ struct pthread_mutexattr_t_
 };
 
 /*
- * Possible values, other than PTW32_OBJECT_INVALID,
+ * Possible values, other than  __PTW32_OBJECT_INVALID,
  * for the "interlock" element in a spinlock.
  *
  * In this implementation, when a spinlock is initialised,
  * the number of cpus available to the process is checked.
  * If there is only one cpu then "interlock" is set equal to
- * PTW32_SPIN_USE_MUTEX and u.mutex is an initialised mutex.
+ *  __PTW32_SPIN_USE_MUTEX and u.mutex is an initialised mutex.
  * If the number of cpus is greater than 1 then "interlock"
- * is set equal to PTW32_SPIN_UNLOCKED and the number is
+ * is set equal to  __PTW32_SPIN_UNLOCKED and the number is
  * stored in u.cpus. This arrangement allows the spinlock
  * routines to attempt an InterlockedCompareExchange on "interlock"
  * immediately and, if that fails, to try the inferior mutex.
@@ -282,10 +318,10 @@ struct pthread_mutexattr_t_
  * "u.cpus" isn't used for anything yet, but could be used at
  * some point to optimise spinlock behaviour.
  */
-#define PTW32_SPIN_INVALID     (0)
-#define PTW32_SPIN_UNLOCKED    (1)
-#define PTW32_SPIN_LOCKED      (2)
-#define PTW32_SPIN_USE_MUTEX   (3)
+#define  __PTW32_SPIN_INVALID     (0)
+#define  __PTW32_SPIN_UNLOCKED    (1)
+#define  __PTW32_SPIN_LOCKED      (2)
+#define  __PTW32_SPIN_USE_MUTEX   (3)
 
 struct pthread_spinlock_t_
 {
@@ -300,10 +336,10 @@ struct pthread_spinlock_t_
 /*
  * MCS lock queue node - see ptw32_MCS_lock.c
  */
-struct ptw32_mcs_node_t_
+struct __ptw32_mcs_node_t_
 {
-  struct ptw32_mcs_node_t_ **lock;        /* ptr to tail of queue */
-  struct ptw32_mcs_node_t_  *next;        /* ptr to successor in queue */
+  struct __ptw32_mcs_node_t_ **lock;        /* ptr to tail of queue */
+  struct __ptw32_mcs_node_t_  *next;        /* ptr to successor in queue */
   HANDLE                     readyFlag;   /* set after lock is released by
                                              predecessor */
   HANDLE                     nextFlag;    /* set after 'next' ptr is set by
@@ -317,8 +353,8 @@ struct pthread_barrier_t_
   unsigned int nInitialBarrierHeight;
   int pshared;
   sem_t semBarrierBreeched;
-  ptw32_mcs_lock_t lock;
-  ptw32_mcs_local_node_t proxynode;
+  __ptw32_mcs_lock_t lock;
+  __ptw32_mcs_local_node_t proxynode;
 };
 
 struct pthread_barrierattr_t_
@@ -329,8 +365,8 @@ struct pthread_barrierattr_t_
 struct pthread_key_t_
 {
   DWORD key;
-  void (PTW32_CDECL *destructor) (void *);
-  ptw32_mcs_lock_t keyLock;
+  void  (__PTW32_CDECL *destructor) (void *);
+  __ptw32_mcs_lock_t keyLock;
   void *threads;
 };
 
@@ -340,7 +376,7 @@ typedef struct ThreadParms ThreadParms;
 struct ThreadParms
 {
   pthread_t tid;
-  void *(PTW32_CDECL *start) (void *);
+  void * (__PTW32_CDECL *start) (void *);
   void *arg;
 };
 
@@ -368,7 +404,7 @@ struct pthread_condattr_t_
   int pshared;
 };
 
-#define PTW32_RWLOCK_MAGIC 0xfacade2
+#define  __PTW32_RWLOCK_MAGIC 0xfacade2
 
 struct pthread_rwlock_t_
 {
@@ -385,6 +421,12 @@ struct pthread_rwlockattr_t_
 {
   int pshared;
 };
+
+typedef union
+{
+  char cpuset[CPU_SETSIZE/8];
+  size_t _cpuset;
+} _sched_cpu_set_vector_;
 
 typedef struct ThreadKeyAssoc ThreadKeyAssoc;
 
@@ -469,7 +511,7 @@ struct ThreadKeyAssoc
    *              The pthread_key_t->threads attribute is the head of
    *              a chain of associations that runs through the
    *              nextThreads link. This chain provides the 1 to many
-   *              relationship between a pthread_key_t and all the 
+   *              relationship between a pthread_key_t and all the
    *              PThreads that have called pthread_setspecific for
    *              this pthread_key_t.
    *
@@ -487,7 +529,7 @@ struct ThreadKeyAssoc
    *
    *
    */
-  ptw32_thread_t * thread;
+  __ptw32_thread_t * thread;
   pthread_key_t key;
   ThreadKeyAssoc *nextKey;
   ThreadKeyAssoc *nextThread;
@@ -496,7 +538,7 @@ struct ThreadKeyAssoc
 };
 
 
-#if defined(__CLEANUP_SEH)
+#if defined(__PTW32_CLEANUP_SEH)
 /*
  * --------------------------------------------------------------
  * MAKE_SOFTWARE_EXCEPTION
@@ -533,66 +575,63 @@ struct ThreadKeyAssoc
  */
 #define EXCEPTION_PTW32_SERVICES        \
      MAKE_SOFTWARE_EXCEPTION( SE_ERROR, \
-                              PTW32_SERVICES_FACILITY, \
-                              PTW32_SERVICES_ERROR )
+                               __PTW32_SERVICES_FACILITY, \
+                               __PTW32_SERVICES_ERROR )
 
-#define PTW32_SERVICES_FACILITY         0xBAD
-#define PTW32_SERVICES_ERROR            0xDEED
+#define  __PTW32_SERVICES_FACILITY         0xBAD
+#define  __PTW32_SERVICES_ERROR            0xDEED
 
-#endif /* __CLEANUP_SEH */
+#endif /* __PTW32_CLEANUP_SEH */
 
 /*
  * Services available through EXCEPTION_PTW32_SERVICES
- * and also used [as parameters to ptw32_throw()] as
+ * and also used [as parameters to __ptw32_throw()] as
  * generic exception selectors.
  */
 
-#define PTW32_EPS_EXIT                  (1)
-#define PTW32_EPS_CANCEL                (2)
+#define  __PTW32_EPS_EXIT                  (1)
+#define  __PTW32_EPS_CANCEL                (2)
 
 
 /* Useful macros */
-#define PTW32_MAX(a,b)  ((a)<(b)?(b):(a))
-#define PTW32_MIN(a,b)  ((a)>(b)?(b):(a))
+#define  __PTW32_MAX(a,b)  ((a)<(b)?(b):(a))
+#define  __PTW32_MIN(a,b)  ((a)>(b)?(b):(a))
 
 
 /* Declared in pthread_cancel.c */
-extern DWORD (*ptw32_register_cancelation) (PAPCFUNC, HANDLE, DWORD);
+extern DWORD (*__ptw32_register_cancellation) (PAPCFUNC, HANDLE, DWORD);
 
 /* Thread Reuse stack bottom marker. Must not be NULL or any valid pointer to memory. */
-#define PTW32_THREAD_REUSE_EMPTY ((ptw32_thread_t *)(size_t) 1)
+#define  __PTW32_THREAD_REUSE_EMPTY ((__ptw32_thread_t *)(size_t) 1)
 
-extern int ptw32_processInitialized;
-extern ptw32_thread_t * ptw32_threadReuseTop;
-extern ptw32_thread_t * ptw32_threadReuseBottom;
-extern pthread_key_t ptw32_selfThreadKey;
-extern pthread_key_t ptw32_cleanupKey;
-extern pthread_cond_t ptw32_cond_list_head;
-extern pthread_cond_t ptw32_cond_list_tail;
+extern int __ptw32_processInitialized;
+extern __ptw32_thread_t * __ptw32_threadReuseTop;
+extern __ptw32_thread_t * __ptw32_threadReuseBottom;
+extern pthread_key_t __ptw32_selfThreadKey;
+extern pthread_key_t __ptw32_cleanupKey;
+extern pthread_cond_t __ptw32_cond_list_head;
+extern pthread_cond_t __ptw32_cond_list_tail;
 
-extern int ptw32_mutex_default_kind;
+extern int __ptw32_mutex_default_kind;
 
-extern unsigned __int64 ptw32_threadSeqNumber;
+extern unsigned __int64 __ptw32_threadSeqNumber;
 
-extern int ptw32_concurrency;
+extern int __ptw32_concurrency;
 
-extern int ptw32_features;
+extern int __ptw32_features;
 
-extern ptw32_mcs_lock_t ptw32_thread_reuse_lock;
-extern ptw32_mcs_lock_t ptw32_mutex_test_init_lock;
-extern ptw32_mcs_lock_t ptw32_cond_list_lock;
-extern ptw32_mcs_lock_t ptw32_cond_test_init_lock;
-extern ptw32_mcs_lock_t ptw32_rwlock_test_init_lock;
-extern ptw32_mcs_lock_t ptw32_spinlock_test_init_lock;
+extern __ptw32_mcs_lock_t __ptw32_thread_reuse_lock;
+extern __ptw32_mcs_lock_t __ptw32_mutex_test_init_lock;
+extern __ptw32_mcs_lock_t __ptw32_cond_list_lock;
+extern __ptw32_mcs_lock_t __ptw32_cond_test_init_lock;
+extern __ptw32_mcs_lock_t __ptw32_rwlock_test_init_lock;
+extern __ptw32_mcs_lock_t __ptw32_spinlock_test_init_lock;
 
 #if defined(_UWIN)
 extern int pthread_count;
 #endif
 
-#if defined(__cplusplus)
-extern "C"
-{
-#endif				/* __cplusplus */
+__PTW32_BEGIN_C_DECLS
 
 /*
  * =====================
@@ -602,102 +641,86 @@ extern "C"
  * =====================
  */
 
-  int ptw32_is_attr (const pthread_attr_t * attr);
+  int __ptw32_is_attr (const pthread_attr_t * attr);
 
-  int ptw32_cond_check_need_init (pthread_cond_t * cond);
-  int ptw32_mutex_check_need_init (pthread_mutex_t * mutex);
-  int ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
+  int __ptw32_cond_check_need_init (pthread_cond_t * cond);
+  int __ptw32_mutex_check_need_init (pthread_mutex_t * mutex);
+  int __ptw32_rwlock_check_need_init (pthread_rwlock_t * rwlock);
+  int __ptw32_spinlock_check_need_init (pthread_spinlock_t * lock);
 
-  int ptw32_robust_mutex_inherit(pthread_mutex_t * mutex);
-  void ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self);
-  void ptw32_robust_mutex_remove(pthread_mutex_t* mutex, ptw32_thread_t* otp);
+  int __ptw32_robust_mutex_inherit(pthread_mutex_t * mutex);
+  void __ptw32_robust_mutex_add(pthread_mutex_t* mutex, pthread_t self);
+  void __ptw32_robust_mutex_remove(pthread_mutex_t* mutex, __ptw32_thread_t* otp);
 
   DWORD
-    ptw32_RegisterCancelation (PAPCFUNC callback,
+    __ptw32_Registercancellation (PAPCFUNC callback,
 			       HANDLE threadH, DWORD callback_arg);
 
-  int ptw32_processInitialize (void);
+  int __ptw32_processInitialize (void);
 
-  void ptw32_processTerminate (void);
+  void __ptw32_processTerminate (void);
 
-  void ptw32_threadDestroy (pthread_t tid);
+  void __ptw32_threadDestroy (pthread_t tid);
 
-  void ptw32_pop_cleanup_all (int execute);
+  void __ptw32_pop_cleanup_all (int execute);
 
-  pthread_t ptw32_new (void);
+  pthread_t __ptw32_new (void);
 
-  pthread_t ptw32_threadReusePop (void);
+  pthread_t __ptw32_threadReusePop (void);
 
-  void ptw32_threadReusePush (pthread_t thread);
+  void __ptw32_threadReusePush (pthread_t thread);
 
-  int ptw32_getprocessors (int *count);
+  int __ptw32_getprocessors (int *count);
 
-  int ptw32_setthreadpriority (pthread_t thread, int policy, int priority);
+  int __ptw32_setthreadpriority (pthread_t thread, int policy, int priority);
 
-  void ptw32_rwlock_cancelwrwait (void *arg);
+  void __ptw32_rwlock_cancelwrwait (void *arg);
 
-#if ! (defined (__MINGW64__) || defined(__MINGW32__)) || (defined(__MSVCRT__) && ! defined(__DMC__))
+#if ! defined (__MINGW32__) || (defined (__MSVCRT__) && ! defined (__DMC__))
   unsigned __stdcall
 #else
   void
 #endif
-    ptw32_threadStart (void *vthreadParms);
+    __ptw32_threadStart (void *vthreadParms);
 
-  void ptw32_callUserDestroyRoutines (pthread_t thread);
+  void __ptw32_callUserDestroyRoutines (pthread_t thread);
 
-  int ptw32_tkAssocCreate (ptw32_thread_t * thread, pthread_key_t key);
+  int __ptw32_tkAssocCreate (__ptw32_thread_t * thread, pthread_key_t key);
 
-  void ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
+  void __ptw32_tkAssocDestroy (ThreadKeyAssoc * assoc);
 
-  int ptw32_semwait (sem_t * sem);
+  int __ptw32_semwait (sem_t * sem);
 
-  DWORD ptw32_relmillisecs (const struct timespec * abstime);
+  DWORD __ptw32_relmillisecs (const struct timespec * abstime);
 
-  void ptw32_mcs_lock_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node);
+  void __ptw32_mcs_lock_acquire (__ptw32_mcs_lock_t * lock, __ptw32_mcs_local_node_t * node);
 
-  int ptw32_mcs_lock_try_acquire (ptw32_mcs_lock_t * lock, ptw32_mcs_local_node_t * node);
+  int __ptw32_mcs_lock_try_acquire (__ptw32_mcs_lock_t * lock, __ptw32_mcs_local_node_t * node);
 
-  void ptw32_mcs_lock_release (ptw32_mcs_local_node_t * node);
+  void __ptw32_mcs_lock_release (__ptw32_mcs_local_node_t * node);
 
-  void ptw32_mcs_node_transfer (ptw32_mcs_local_node_t * new_node, ptw32_mcs_local_node_t * old_node);
+  void __ptw32_mcs_node_transfer (__ptw32_mcs_local_node_t * new_node, __ptw32_mcs_local_node_t * old_node);
 
-#if defined(NEED_FTIME)
-  void ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);
-  void ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts);
-#endif
+  void __ptw32_timespec_to_filetime (const struct timespec *ts, FILETIME * ft);
 
-/* Declared in misc.c */
+  void __ptw32_filetime_to_timespec (const FILETIME * ft, struct timespec *ts);
+
+/* Declared in pthw32_calloc.c */
 #if defined(NEED_CALLOC)
-#define calloc(n, s) ptw32_calloc(n, s)
-  void *ptw32_calloc (size_t n, size_t s);
+#define calloc(n, s) __ptw32_calloc(n, s)
+  void *__ptw32_calloc (size_t n, size_t s);
 #endif
 
-/* Declared in private.c */
-#if defined(_MSC_VER)
-/*
- * Ignore the warning:
- * "C++ exception specification ignored except to indicate that
- * the function is not __declspec(nothrow)."
- */
-#pragma warning(disable:4290)
-#endif
-  void ptw32_throw (DWORD exception)
-#if defined(__CLEANUP_CXX)
-    throw(ptw32_exception_cancel,ptw32_exception_exit)
-#endif
-;
+/* Declared in ptw32_throw.c */
+void __ptw32_throw (DWORD exception);
 
-#if defined(__cplusplus)
-}
-#endif				/* __cplusplus */
-
+__PTW32_END_C_DECLS
 
 #if defined(_UWIN_)
 #   if defined(_MT)
-#       if defined(__cplusplus)
-extern "C"
-{
-#       endif
+
+__PTW32_BEGIN_C_DECLS
+
   _CRTIMP unsigned long __cdecl _beginthread (void (__cdecl *) (void *),
 					      unsigned, void *);
   _CRTIMP void __cdecl _endthread (void);
@@ -705,13 +728,15 @@ extern "C"
 						unsigned (__stdcall *) (void *),
 						void *, unsigned, unsigned *);
   _CRTIMP void __cdecl _endthreadex (unsigned);
-#       if defined(__cplusplus)
-}
-#       endif
+
+__PTW32_END_C_DECLS
+
 #   endif
 #else
-#       include <process.h>
+#   if ! defined(WINCE)
+#     include <process.h>
 #   endif
+#endif
 
 
 /*
@@ -746,9 +771,15 @@ extern "C"
  *
  * The above aren't available in Mingw32 as of gcc 4.5.2 so define our own.
  */
+#if defined(__cplusplus)
+# define  __PTW32_TO_VLONG64PTR(ptr) reinterpret_cast<volatile LONG64 *>(ptr)
+#else
+# define  __PTW32_TO_VLONG64PTR(ptr) (ptr)
+#endif
+
 #if defined(__GNUC__)
 # if defined(_WIN64)
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand)    \
+# define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(location, value, comparand) \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -760,7 +791,7 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-# define PTW32_INTERLOCKED_EXCHANGE_64(location, value)                    \
+# define  __PTW32_INTERLOCKED_EXCHANGE_64(location, value)                    \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -771,7 +802,7 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-# define PTW32_INTERLOCKED_EXCHANGE_ADD_64(location, value)                \
+# define  __PTW32_INTERLOCKED_EXCHANGE_ADD_64(location, value)                \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -783,9 +814,9 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-# define PTW32_INTERLOCKED_INCREMENT_64(location)                          \
+# define  __PTW32_INTERLOCKED_INCREMENT_64(location)                          \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = 1;                                   \
+       __PTW32_INTERLOCKED_LONG _temp = 1;                                    \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -795,9 +826,9 @@ extern "C"
         :"memory", "cc");                                                  \
       ++_temp;                                                             \
     })
-# define PTW32_INTERLOCKED_DECREMENT_64(location)                          \
+# define  __PTW32_INTERLOCKED_DECREMENT_64(location)                          \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = -1;                                  \
+       __PTW32_INTERLOCKED_LONG _temp = -1;                                   \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -808,7 +839,7 @@ extern "C"
       --_temp;                                                             \
     })
 #endif
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand)    \
+# define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -820,7 +851,7 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-# define PTW32_INTERLOCKED_EXCHANGE_LONG(location, value)                  \
+# define  __PTW32_INTERLOCKED_EXCHANGE_LONG(location, value)                  \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -831,7 +862,7 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-# define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(location, value)              \
+# define  __PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(location, value)              \
     ({                                                                     \
       __typeof (value) _result;                                            \
       __asm__ __volatile__                                                 \
@@ -843,9 +874,9 @@ extern "C"
         :"memory", "cc");                                                  \
       _result;                                                             \
     })
-# define PTW32_INTERLOCKED_INCREMENT_LONG(location)                        \
+# define  __PTW32_INTERLOCKED_INCREMENT_LONG(location)                        \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = 1;                                   \
+       __PTW32_INTERLOCKED_LONG _temp = 1;                                    \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -855,9 +886,9 @@ extern "C"
         :"memory", "cc");                                                  \
       ++_temp;                                                             \
     })
-# define PTW32_INTERLOCKED_DECREMENT_LONG(location)                        \
+# define  __PTW32_INTERLOCKED_DECREMENT_LONG(location)                        \
     ({                                                                     \
-      PTW32_INTERLOCKED_LONG _temp = -1;                                  \
+       __PTW32_INTERLOCKED_LONG _temp = -1;                                   \
       __asm__ __volatile__                                                 \
       (                                                                    \
         "lock\n\t"                                                         \
@@ -867,57 +898,57 @@ extern "C"
         :"memory", "cc");                                                  \
       --_temp;                                                             \
     })
-# define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(location, value, comparand) \
-    PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE((PTW32_INTERLOCKED_SIZEPTR)location, \
-                                            (PTW32_INTERLOCKED_SIZE)value, \
-                                            (PTW32_INTERLOCKED_SIZE)comparand)
-# define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
-    PTW32_INTERLOCKED_EXCHANGE_SIZE((PTW32_INTERLOCKED_SIZEPTR)location, \
-                                    (PTW32_INTERLOCKED_SIZE)value)
+# define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(location, value, comparand) \
+     __PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE ((__PTW32_INTERLOCKED_SIZEPTR)location, \
+                                             (__PTW32_INTERLOCKED_SIZE)value, \
+                                             (__PTW32_INTERLOCKED_SIZE)comparand)
+# define  __PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
+     __PTW32_INTERLOCKED_EXCHANGE_SIZE ((__PTW32_INTERLOCKED_SIZEPTR)location, \
+                                     (__PTW32_INTERLOCKED_SIZE)value)
 #else
 # if defined(_WIN64)
-#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_64 InterlockedCompareExchange64
-#   define PTW32_INTERLOCKED_EXCHANGE_64 InterlockedExchange64
-#   define PTW32_INTERLOCKED_EXCHANGE_ADD_64 InterlockedExchangeAdd64
-#   define PTW32_INTERLOCKED_INCREMENT_64 InterlockedIncrement64
-#   define PTW32_INTERLOCKED_DECREMENT_64 InterlockedDecrement64
+#   define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_64(p,v,c) InterlockedCompareExchange64 (__PTW32_TO_VLONG64PTR(p),(v),(c))
+#   define  __PTW32_INTERLOCKED_EXCHANGE_64(p,v) InterlockedExchange64 (__PTW32_TO_VLONG64PTR(p),(v))
+#   define  __PTW32_INTERLOCKED_EXCHANGE_ADD_64(p,v) InterlockedExchangeAdd64 (__PTW32_TO_VLONG64PTR(p),(v))
+#   define  __PTW32_INTERLOCKED_INCREMENT_64(p) InterlockedIncrement64 (__PTW32_TO_VLONG64PTR(p))
+#   define  __PTW32_INTERLOCKED_DECREMENT_64(p) InterlockedDecrement64 (__PTW32_TO_VLONG64PTR(p))
 # endif
-# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
-#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
+# if defined (__PTW32_CONFIG_MSVC6) && !defined(_WIN64)
+#  define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG(location, value, comparand) \
       ((LONG)InterlockedCompareExchange((PVOID *)(location), (PVOID)(value), (PVOID)(comparand)))
 # else
-#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG InterlockedCompareExchange
+#  define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG InterlockedCompareExchange
 # endif
-# define PTW32_INTERLOCKED_EXCHANGE_LONG InterlockedExchange
-# define PTW32_INTERLOCKED_EXCHANGE_ADD_LONG InterlockedExchangeAdd
-# define PTW32_INTERLOCKED_INCREMENT_LONG InterlockedIncrement
-# define PTW32_INTERLOCKED_DECREMENT_LONG InterlockedDecrement
-# if defined(_MSC_VER) && _MSC_VER < 1300 && !defined(_WIN64) /* MSVC 6 */
-#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
-#  define PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
+# define  __PTW32_INTERLOCKED_EXCHANGE_LONG(p,v) InterlockedExchange((p),(v))
+# define  __PTW32_INTERLOCKED_EXCHANGE_ADD_LONG(p,v) InterlockedExchangeAdd((p),(v))
+# define  __PTW32_INTERLOCKED_INCREMENT_LONG(p) InterlockedIncrement((p))
+# define  __PTW32_INTERLOCKED_DECREMENT_LONG(p) InterlockedDecrement((p))
+# if defined (__PTW32_CONFIG_MSVC6) && !defined(_WIN64)
+#  define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchange
+#  define  __PTW32_INTERLOCKED_EXCHANGE_PTR(location, value) \
     ((PVOID)InterlockedExchange((LPLONG)(location), (LONG)(value)))
 # else
-#  define PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR InterlockedCompareExchangePointer
-#  define PTW32_INTERLOCKED_EXCHANGE_PTR InterlockedExchangePointer
+#  define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_PTR(p,v,c) InterlockedCompareExchangePointer((p),(v),(c))
+#  define  __PTW32_INTERLOCKED_EXCHANGE_PTR(p,v) InterlockedExchangePointer((p),(v))
 # endif
 #endif
 #if defined(_WIN64)
-#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE PTW32_INTERLOCKED_COMPARE_EXCHANGE_64
-#   define PTW32_INTERLOCKED_EXCHANGE_SIZE PTW32_INTERLOCKED_EXCHANGE_64
-#   define PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE PTW32_INTERLOCKED_EXCHANGE_ADD_64
-#   define PTW32_INTERLOCKED_INCREMENT_SIZE PTW32_INTERLOCKED_INCREMENT_64
-#   define PTW32_INTERLOCKED_DECREMENT_SIZE PTW32_INTERLOCKED_DECREMENT_64
+#   define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(p,v,c)  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_64 (__PTW32_TO_VLONG64PTR(p),(v),(c))
+#   define  __PTW32_INTERLOCKED_EXCHANGE_SIZE(p,v)  __PTW32_INTERLOCKED_EXCHANGE_64 (__PTW32_TO_VLONG64PTR(p),(v))
+#   define  __PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE(p,v)  __PTW32_INTERLOCKED_EXCHANGE_ADD_64 (__PTW32_TO_VLONG64PTR(p),(v))
+#   define  __PTW32_INTERLOCKED_INCREMENT_SIZE(p)  __PTW32_INTERLOCKED_INCREMENT_64 (__PTW32_TO_VLONG64PTR(p))
+#   define  __PTW32_INTERLOCKED_DECREMENT_SIZE(p)  __PTW32_INTERLOCKED_DECREMENT_64 (__PTW32_TO_VLONG64PTR(p))
 #else
-#   define PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG
-#   define PTW32_INTERLOCKED_EXCHANGE_SIZE PTW32_INTERLOCKED_EXCHANGE_LONG
-#   define PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE PTW32_INTERLOCKED_EXCHANGE_ADD_LONG
-#   define PTW32_INTERLOCKED_INCREMENT_SIZE PTW32_INTERLOCKED_INCREMENT_LONG
-#   define PTW32_INTERLOCKED_DECREMENT_SIZE PTW32_INTERLOCKED_DECREMENT_LONG
+#   define  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_SIZE(p,v,c)  __PTW32_INTERLOCKED_COMPARE_EXCHANGE_LONG((p),(v),(c))
+#   define  __PTW32_INTERLOCKED_EXCHANGE_SIZE(p,v)  __PTW32_INTERLOCKED_EXCHANGE_LONG((p),(v))
+#   define  __PTW32_INTERLOCKED_EXCHANGE_ADD_SIZE(p,v)  __PTW32_INTERLOCKED_EXCHANGE_ADD_LONG((p),(v))
+#   define  __PTW32_INTERLOCKED_INCREMENT_SIZE(p)  __PTW32_INTERLOCKED_INCREMENT_LONG((p))
+#   define  __PTW32_INTERLOCKED_DECREMENT_SIZE(p)  __PTW32_INTERLOCKED_DECREMENT_LONG((p))
 #endif
 
 #if defined(NEED_CREATETHREAD)
 
-/* 
+/*
  * Macro uses args so we can cast start_proc to LPTHREAD_START_ROUTINE
  * in order to avoid warnings because of return type
  */

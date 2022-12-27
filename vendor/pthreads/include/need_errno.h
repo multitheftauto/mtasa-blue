@@ -24,7 +24,7 @@
 #error ERROR: Only Win32 targets supported!
 #endif
 
-#include <winsock.h>
+//#include <winsock.h>
 
 #if defined(__cplusplus)
 extern "C" {
@@ -59,20 +59,22 @@ extern "C" {
 #endif
 #endif
 
-#if !defined(PTW32_STATIC_LIB)
-#  if defined(PTW32_BUILD)
-#    define PTW32_DLLPORT __declspec (dllexport)
-#  else
-#    define PTW32_DLLPORT __declspec (dllimport)
-#  endif
-#else
-#  define PTW32_DLLPORT
+#if defined(__PTW32_STATIC_LIB) && defined(_MSC_VER) && _MSC_VER >= 1400
+#  define __PTW32_STATIC_TLSLIB
 #endif
+
+#if defined (__PTW32_STATIC_LIB) || defined (__PTW32_STATIC_TLSLIB)
+#  define  __PTW32_DLLPORT
+#elif defined (__PTW32_BUILD)
+#    define  __PTW32_DLLPORT __declspec (dllexport)
+#  else
+#    define  __PTW32_DLLPORT __declspec (dllimport)
+#  endif
 
 /* declare reference to errno */
 
 #if (defined(_MT) || defined(_MD) || defined(_DLL)) && !defined(_MAC)
-PTW32_DLLPORT int * __cdecl _errno(void);
+__PTW32_DLLPORT int * __cdecl _errno(void);
 #define errno   (*_errno())
 #else   /* ndef _MT && ndef _MD && ndef _DLL */
 _CRTIMP extern int errno;
@@ -114,27 +116,46 @@ _CRTIMP extern int errno;
 #define ERANGE          34
 #define EDEADLK         36
 
-/* defined differently in winsock.h on WinCE */
-#if !defined(ENAMETOOLONG)
-#define ENAMETOOLONG    38
-#endif
+/* defined differently in winsock.h on WinCE
+ * We don't use this value.
+ */
+//#if !defined(ENAMETOOLONG)
+//#define ENAMETOOLONG    38
+//#endif
 
 #define ENOLCK          39
 #define ENOSYS          40
 
-/* defined differently in winsock.h on WinCE */
-#if !defined(ENOTEMPTY)
-#define ENOTEMPTY       41
-#endif
+/* defined differently in winsock.h on WinCE
+ * We don't use this value.
+ */
+//#if !defined(ENOTEMPTY)
+//#define ENOTEMPTY       41
+//#endif
 
 #define EILSEQ          42
 
-/* POSIX 2008 - robust mutexes */
-#define EOWNERDEAD	43
-#define ENOTRECOVERABLE	44
+/*
+ * POSIX 2008 - robust mutexes.
+ */
+#if  __PTW32_VERSION_MAJOR > 2
+#  if !defined(EOWNERDEAD)
+#    define EOWNERDEAD 1000
+#  endif
+#  if !defined(ENOTRECOVERABLE)
+#    define ENOTRECOVERABLE 1001
+#  endif
+#else
+#  if !defined(EOWNERDEAD)
+#    define EOWNERDEAD 42
+#  endif
+#  if !defined(ENOTRECOVERABLE)
+#    define ENOTRECOVERABLE 43
+#  endif
+#endif
 
 /*
- * Support EDEADLOCK for compatibiity with older MS-C versions.
+ * Support EDEADLOCK for compatibility with older MS-C versions.
  */
 #define EDEADLOCK       EDEADLK
 

@@ -67,6 +67,6 @@ project "pthread"
 
 	filter "system:windows"
 		defines {
-			"HAVE_PTW32_CONFIG_H",
-			"PTW32_BUILD_INLINED"
+			"HAVE_CONFIG_H",
+			"__PTW32_BUILD_INLINED"
 		}
