@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CSettings.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeather.h>
 #include <game/CGarages.h>
@@ -184,6 +185,7 @@ void CWorldRPCs::SetBlurLevel(NetBitStreamInterface& bitStream)
     unsigned char ucLevel;
     if (bitStream.Read(ucLevel))
     {
+        g_pGame->GetSettings()->SetBlurControlledByScript(true);
         g_pGame->SetBlurLevel(ucLevel);
     }
 }

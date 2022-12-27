@@ -21,7 +21,7 @@ jobs:
 
       - name: Download DirectX
         if: steps.cache-dxfiles.outputs.cache-hit != 'true'
-        run: Invoke-WebRequest https://mirror.mtasa.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
+        run: Invoke-WebRequest https://mirror-cdn.multitheftauto.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
         shell: powershell
 
       - name: Extract DirectX

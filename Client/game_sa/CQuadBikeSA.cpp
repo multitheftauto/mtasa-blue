@@ -12,11 +12,8 @@
 #include "StdInc.h"
 #include "CQuadBikeSA.h"
 
-CQuadBikeSA::CQuadBikeSA(CQuadBikeSAInterface* quadbike) : CAutomobileSA(quadbike)
+CQuadBikeSA::CQuadBikeSA(CQuadBikeSAInterface* pInterface)
 {
-    this->m_pInterface = quadbike;
-}
-
-CQuadBikeSA::CQuadBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CAutomobileSA(dwModelID, ucVariation, ucVariation2)
-{
+    SetInterface(pInterface);
+    Init();
 }

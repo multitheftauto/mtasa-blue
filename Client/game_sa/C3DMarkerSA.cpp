@@ -32,38 +32,38 @@ void C3DMarkerSA::SetMatrix(CMatrix* pMatrix)
 
 void C3DMarkerSA::SetPosition(CVector* vecPosition)
 {
-    this->GetInterface()->m_mat.vPos = *vecPosition;
+    GetInterface()->m_mat.vPos = *vecPosition;
 }
 
 CVector* C3DMarkerSA::GetPosition()
 {
-    return &this->GetInterface()->m_mat.vPos;
+    return &GetInterface()->m_mat.vPos;
 }
 
 DWORD C3DMarkerSA::GetType()
 {
-    return this->GetInterface()->m_nType;
+    return GetInterface()->m_nType;
 }
 
 void C3DMarkerSA::SetType(DWORD dwType)
 {
-    this->GetInterface()->m_nType = (unsigned short)(dwType);
+    GetInterface()->m_nType = (unsigned short)(dwType);
 }
 
 bool C3DMarkerSA::IsActive()
 {
-    return this->GetInterface()->m_bIsUsed;
+    return GetInterface()->m_bIsUsed;
 }
 
 DWORD C3DMarkerSA::GetIdentifier()
 {
-    return this->GetInterface()->m_nIdentifier;
+    return GetInterface()->m_nIdentifier;
 }
 
 SharedUtil::SColor C3DMarkerSA::GetColor()
 {
     // From ABGR
-    unsigned long ulABGR = this->GetInterface()->rwColour;
+    unsigned long ulABGR = GetInterface()->rwColour;
     SharedUtil::SColor        color;
     color.A = (ulABGR >> 24) & 0xff;
     color.B = (ulABGR >> 16) & 0xff;
@@ -75,60 +75,60 @@ SharedUtil::SColor C3DMarkerSA::GetColor()
 void C3DMarkerSA::SetColor(const SharedUtil::SColor color)
 {
     // To ABGR
-    this->GetInterface()->rwColour = (color.A << 24) | (color.B << 16) | (color.G << 8) | color.R;
+    GetInterface()->rwColour = (color.A << 24) | (color.B << 16) | (color.G << 8) | color.R;
 }
 
 void C3DMarkerSA::SetPulsePeriod(WORD wPulsePeriod)
 {
-    this->GetInterface()->m_nPulsePeriod = wPulsePeriod;
+    GetInterface()->m_nPulsePeriod = wPulsePeriod;
 }
 
 void C3DMarkerSA::SetRotateRate(short RotateRate)
 {
-    this->GetInterface()->m_nRotateRate = RotateRate;
+    GetInterface()->m_nRotateRate = RotateRate;
 }
 
 float C3DMarkerSA::GetSize()
 {
-    return this->GetInterface()->m_fSize;
+    return GetInterface()->m_fSize;
 }
 
 void C3DMarkerSA::SetSize(float fSize)
 {
-    this->GetInterface()->m_fSize = fSize;
+    GetInterface()->m_fSize = fSize;
 }
 
 float C3DMarkerSA::GetBrightness()
 {
-    return this->GetInterface()->m_fBrightness;
+    return GetInterface()->m_fBrightness;
 }
 
 void C3DMarkerSA::SetBrightness(float fBrightness)
 {
-    this->GetInterface()->m_fBrightness = fBrightness;
+    GetInterface()->m_fBrightness = fBrightness;
 }
 
 void C3DMarkerSA::SetCameraRange(float fCameraRange)
 {
-    this->GetInterface()->m_fCameraRange = fCameraRange;
+    GetInterface()->m_fCameraRange = fCameraRange;
 }
 
 void C3DMarkerSA::SetPulseFraction(float fPulseFraction)
 {
-    this->GetInterface()->m_fPulseFraction = fPulseFraction;
+    GetInterface()->m_fPulseFraction = fPulseFraction;
 }
 
 float C3DMarkerSA::GetPulseFraction()
 {
-    return this->GetInterface()->m_fPulseFraction;
+    return GetInterface()->m_fPulseFraction;
 }
 
 void C3DMarkerSA::Disable()
 {
-    this->GetInterface()->m_nIdentifier = 0;
+    GetInterface()->m_nIdentifier = 0;
 }
 
 void C3DMarkerSA::Reset()
 {
-    this->internalInterface->m_lastPosition = this->internalInterface->m_mat.vPos;
+    internalInterface->m_lastPosition = internalInterface->m_mat.vPos;
 }

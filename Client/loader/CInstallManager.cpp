@@ -155,6 +155,16 @@ void CInstallManager::InitSequencer()
         CR " "                                                                     //
         CR "appcompat_end: "                                                       ////// End of 'AppCompat checks' //////
         CR " "                                                                     //
+        CR "winmm_check: "                                                         ////// Start of 'winmm checks' //////
+        CR "            CALL ProcessWinmmChecks "                                  // Make changes to comply with winmm requirements
+        CR "            IF LastResult == ok GOTO winmm_end: "                      //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO winmm_check: "                    //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "winmm_end: "                                                           ////// End of 'winmm checks' //////
+        CR " "                                                                     //
         CR "            CALL ChangeFromAdmin "                                     //
         CR "            CALL InstallNewsItems "                                    // Install pending news
         CR "            GOTO launch: "                                             //
@@ -185,6 +195,7 @@ void CInstallManager::InitSequencer()
     m_pSequencer->AddFunction("ProcessExePatchChecks", &CInstallManager::_ProcessExePatchChecks);
     m_pSequencer->AddFunction("ProcessServiceChecks", &CInstallManager::_ProcessServiceChecks);
     m_pSequencer->AddFunction("ProcessAppCompatChecks", &CInstallManager::_ProcessAppCompatChecks);
+    m_pSequencer->AddFunction("ProcessWinmmChecks", &CInstallManager::_ProcessWinmmChecks);
     m_pSequencer->AddFunction("ChangeFromAdmin", &CInstallManager::_ChangeFromAdmin);
     m_pSequencer->AddFunction("InstallNewsItems", &CInstallManager::_InstallNewsItems);
     m_pSequencer->AddFunction("Quit", &CInstallManager::_Quit);
@@ -1071,6 +1082,33 @@ SString CInstallManager::_ProcessAppCompatChecks()
             return "fail";
         }
     }
+    return "ok";
+}
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessWinmmChecks
+//
+// Ensure winmm.dll does not exist in the gta directory
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessWinmmChecks()
+{
+    SString filePath = PathJoin(GetGTAPath(), "winmm.dll");
+
+    if (FileExists(filePath))
+    {
+        SString filePathBak = PathJoin(GetGTAPath(), "winmm.dll.backup");
+        FileDelete(filePathBak);
+        FileRename(filePath, filePathBak);
+
+        if (FileExists(filePath))
+        {
+            m_strAdminReason = _("Move incompatible files");
+            return "fail";
+        }
+    }
+
     return "ok";
 }
 
