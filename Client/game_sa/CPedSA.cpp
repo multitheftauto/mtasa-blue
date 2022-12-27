@@ -303,9 +303,9 @@ DWORD CPedSA::GetType()
     return m_dwType;
 }
 
-void CPedSA::SetType(DWORD m_dwType)
+void CPedSA::SetType(DWORD dwType)
 {
-    m_dwType = m_dwType;
+    m_dwType = dwType;
 }
 
 void CPedSA::RemoveWeaponModel(int iModel)
