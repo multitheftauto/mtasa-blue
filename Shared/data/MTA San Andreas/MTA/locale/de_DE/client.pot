@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-26 12:40+0000\n"
-"PO-Revision-Date: 2022-12-26 12:55\n"
+"PO-Revision-Date: 2022-12-27 18:19\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -35,7 +35,7 @@ msgstr "Chatbox anzeigen"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
-msgstr "Netzwerkstatistiken anzeigen"
+msgstr "zeigt die Netzwerkstatistiken"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
