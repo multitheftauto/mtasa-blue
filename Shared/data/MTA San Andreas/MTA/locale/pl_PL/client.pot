@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-26 12:40+0000\n"
-"PO-Revision-Date: 2022-12-26 12:56\n"
+"PO-Revision-Date: 2022-12-27 12:34\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -1699,7 +1699,7 @@ msgstr "Dynamiczne cienie postaci"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Rozmycie obrazu w ruchu"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
