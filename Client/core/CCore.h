@@ -136,6 +136,7 @@ public:
     bool IsCursorControlsToggled() { return m_bCursorToggleControls; }
     void HideMainMenu();
     void SetCenterCursor(bool bEnabled);
+    void SetSystemCursorVisible(bool bVisible);
 
     void ShowServerInfo(unsigned int WindowType);
 

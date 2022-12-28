@@ -806,6 +806,16 @@ void CCore::SetCenterCursor(bool bEnabled)
         m_pSetCursorPosHook->DisableSetCursorPos();
 }
 
+// Changes visibility of the system mouse cursor within application window
+void CCore::SetSystemCursorVisible(bool bVisible)
+{
+    if (m_pMultiplayer)
+    {
+        m_pMultiplayer->AllowWindowsCursorShowing(bVisible);
+        ShowCursor(bVisible);
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////
 //
 // LoadModule
@@ -937,6 +947,12 @@ void CCore::InitGUI(IDirect3DDevice9* pDevice)
     std::string strScreenShotPath = CalcMTASAPath("screenshots");
     CVARS_SET("screenshot_path", strScreenShotPath);
     CScreenShot::SetPath(strScreenShotPath.c_str());
+
+    // Show system mouse cursor during game startup
+    SetSystemCursorVisible(true);
+
+    // Hide GUI mouse cursor during game startup
+    m_pGUI->SetCursorEnabled(false);
 }
 
 void CCore::CreateGUI()
@@ -1177,6 +1193,9 @@ void CCore::DoPostFramePulse()
             if (m_bFirstFrame)
             {
                 m_bFirstFrame = false;
+
+                // Make sure system mouse cursor is not visible
+                CCore::GetSingletonPtr()->SetSystemCursorVisible(false);
 
                 // Disable vsync while it's all dark
                 m_pGame->DisableVSync();

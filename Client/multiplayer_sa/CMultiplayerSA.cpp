@@ -1559,6 +1559,9 @@ void CMultiplayerSA::InitHooks()
     // by skipping some entity flag check in CShadows::CastPlayerShadowSectorList()
     MemSet((void*)0x70A4CB, 0x90, 6);
 
+    // Disable setting system mouse cursor position to the center on game init
+    MemSet((void*)0x748A01, 0x90, 0x748A23 - 0x748A01);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
