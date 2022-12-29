@@ -19,7 +19,7 @@ extern CGameSA* pGame;
 CFireManagerSA::CFireManagerSA()
 {
     for (int i = 0; i < MAX_FIRES; i++)
-        this->Fires[i] = new CFireSA(
+        Fires[i] = new CFireSA(
             (CFireSAInterface*)(CLASS_CFireManager + 40 * i));            // + 4 because thats the position of CFire array in CFireManager (see source)
 }
 
@@ -51,7 +51,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 
 CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
-    CFire* fire = this->FindFreeFire();
+    CFire* fire = FindFreeFire();
 
     if (fire != NULL)
     {
@@ -67,7 +67,7 @@ CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, 
 
 CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
-    CFire* fire = this->FindFreeFire();
+    CFire* fire = FindFreeFire();
 
     if (fire != NULL)
     {
@@ -86,7 +86,7 @@ void CFireManagerSA::ExtinguishAllFires()
     CFireSA* fire;
     for (int i = 0; i < MAX_FIRES; i++)
     {
-        fire = (CFireSA*)this->GetFire(i);
+        fire = (CFireSA*)GetFire(i);
         if (fire && fire->IsIgnited())
             fire->Extinguish();
     }
@@ -110,7 +110,7 @@ CFire* CFireManagerSA::FindFreeFire()
     CFireSA* fire;
     for (int i = 0; i < MAX_FIRES; i++)
     {
-        fire = (CFireSA*)this->GetFire(i);
+        fire = (CFireSA*)GetFire(i);
         if (fire && !fire->IsIgnited())
             return fire;
     }

@@ -504,6 +504,47 @@ bool CCore::IsChatInputEnabled()
     return false;
 }
 
+bool CCore::SetChatboxCharacterLimit(int charLimit)
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return false;
+
+    pChat->SetCharacterLimit(charLimit);
+    return true;
+}
+
+void CCore::ResetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return;
+
+    pChat->SetCharacterLimit(pChat->GetDefaultCharacterLimit());
+}
+
+int CCore::GetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetCharacterLimit();
+}
+
+int CCore::GetChatboxMaxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetMaxCharacterLimit();
+}
+
 bool CCore::IsSettingsVisible()
 {
     if (m_pLocalGUI)
@@ -1280,6 +1321,9 @@ void CCore::OnModUnload()
 
     // Destroy tray icon
     m_pTrayIcon->DestroyTrayIcon();
+
+    // Reset chatbox character limit
+    ResetChatboxCharacterLimit();
 }
 
 void CCore::RegisterCommands()
@@ -1685,6 +1729,21 @@ void CCore::ApplyCoreInitSettings()
         SetProcessDPIAware();
     }
 #endif
+
+    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
+    {
+        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
+        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+        std::string currentSkinName;
+        CVARS_GET("current_skin", currentSkinName);
+
+        if (currentSkinName == "Default")
+        {
+            CVARS_SET("current_skin", "Default 2023");
+        }
+
+        SetApplicationSettingInt("reset-settings-revision", 21486);
+    }
 }
 
 //
