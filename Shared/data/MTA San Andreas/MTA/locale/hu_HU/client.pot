@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-29 22:44+0000\n"
-"PO-Revision-Date: 2022-12-29 22:49\n"
+"PO-Revision-Date: 2022-12-29 23:49\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -801,7 +801,7 @@ msgstr "Fájlproblémák fixálása"
 
 #: Client/loader/CExePatchedStatus.cpp:170
 msgid "Use proxy loader"
-msgstr ""
+msgstr "Használjon proxy betöltőt"
 
 #: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
@@ -890,7 +890,7 @@ msgstr "Inkompatibilis fájlok áthelyezése"
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr ""
+msgstr "Törölje az inkompatibilis fájlokat"
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
