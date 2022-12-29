@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-26 12:40+0000\n"
-"PO-Revision-Date: 2022-12-26 12:56\n"
+"POT-Creation-Date: 2022-12-29 22:44+0000\n"
+"PO-Revision-Date: 2022-12-29 22:49\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -777,28 +777,32 @@ msgstr "Grand Theft Auto: San Andreas başlanıla bilmədi. Zəhmət olmasa yeni
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas düzgün başlana bilmədi. Dayandırmaq istəyirsiniz?"
 
-#: Client/loader/CExePatchedStatus.cpp:153
+#: Client/loader/CExePatchedStatus.cpp:158
 msgid "Update Aero setting"
 msgstr "Aero seçimlərinin yenilənməsi"
 
-#: Client/loader/CExePatchedStatus.cpp:155
+#: Client/loader/CExePatchedStatus.cpp:160
 msgid "Update Large Memory setting"
 msgstr "Geniş yaddaş seçimlərini yenilə"
 
-#: Client/loader/CExePatchedStatus.cpp:157
+#: Client/loader/CExePatchedStatus.cpp:162
 msgid "Update DEP setting"
 msgstr "DEP seçimlərinin yenilənməsi"
 
-#: Client/loader/CExePatchedStatus.cpp:159
+#: Client/loader/CExePatchedStatus.cpp:164
 msgid "Update graphics driver compliance"
 msgstr "Video-drayveri yeniləyin"
 
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
+#: Client/loader/CExePatchedStatus.cpp:166
+#: Client/loader/CExePatchedStatus.cpp:168
 msgid "Fix file issues"
 msgstr "Sənəd problemlərini düzəldin"
 
-#: Client/loader/CExePatchedStatus.cpp:164
+#: Client/loader/CExePatchedStatus.cpp:170
+msgid "Use proxy loader"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Ekran-kartı problemlərinin qarşısını almaq üçün əsas icra olunan sənədi köçürt"
 
@@ -878,8 +882,13 @@ msgstr "Yükləmə seçimlərini yenilə"
 msgid "Update compatibility settings"
 msgstr "Uyğunluq seçimlərini yenilə"
 
-#: Client/loader/CInstallManager.cpp:1107
+#: Client/loader/CInstallManager.cpp:1109
 msgid "Move incompatible files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1125
+#: Client/loader/CInstallManager.cpp:1141
+msgid "Delete incompatible files"
 msgstr ""
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
