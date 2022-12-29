@@ -199,6 +199,7 @@ public:
     virtual bool           GetTyresDontBurst() = 0;
     virtual unsigned short GetAdjustablePropertyValue() = 0;
     virtual float          GetHeliRotorSpeed() = 0;
+    virtual float          GetPlaneRotorSpeed() = 0;
     virtual unsigned long  GetExplodeTime() = 0;
 
     virtual char  GetNitroCount() = 0;
@@ -219,6 +220,7 @@ public:
     virtual void SetTyresDontBurst(bool bTyresDontBurst) = 0;
     virtual void SetAdjustablePropertyValue(unsigned short usAdjustableProperty) = 0;
     virtual void SetHeliRotorSpeed(float fSpeed) = 0;
+    virtual void SetPlaneRotorSpeed(float fSpeed) = 0;
     virtual void SetTaxiLightOn(bool bLightState) = 0;
     virtual void SetExplodeTime(unsigned long ulTime) = 0;
     virtual void SetRadioStatus(bool bStatus) = 0;

@@ -18,6 +18,7 @@
 #include "CGameSA.h"
 #include "CProjectileInfoSA.h"
 #include "CTrainSA.h"
+#include "CPlaneSA.h"
 #include "CVehicleSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CWorldSA.h"
@@ -485,6 +486,18 @@ void CVehicleSA::SetTrainSpeed(float fSpeed)
 {
     auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
     pInterface->m_fTrainSpeed = fSpeed;
+}
+
+void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
+{
+    auto pInterface = static_cast<CPlaneSAInterface*>(GetInterface());
+    pInterface->m_fPropSpeed = fSpeed;
+}
+
+float CVehicleSA::GetPlaneRotorSpeed() 
+{
+    auto pInterface = static_cast<CPlaneSAInterface*>(GetInterface());
+    return pInterface->m_fPropSpeed;
 }
 
 bool CVehicleSA::GetTrainDirection()
