@@ -1555,7 +1555,7 @@ float CClientVehicle::GetHeliRotorSpeed() const
     return m_fHeliRotorSpeed;
 }
 
-float CClientVehicle::GetPlaneRotorSpeed() const
+float CClientVehicle::GetPlaneRotorSpeed()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
         return m_pVehicle->GetPlaneRotorSpeed();

@@ -14,7 +14,6 @@
 #include <game/CPlane.h>
 #include "CAutomobileSA.h"
 
-
 enum ePlaneNodes
 {
     PLANE_NODE_NONE = 0,
@@ -49,7 +48,6 @@ class CPlaneSAInterface : public CAutomobileSAInterface
 {
     // + 2508 = undercarrige possition (float - 1.0 = up, 0.0 = down)
     // fill this
-    // Happy now?
 public:
     float        m_fLeftRightSkid;
     float        m_fSteeringUpDown;
@@ -79,7 +77,6 @@ public:
     FxSystem_c*  m_pSmokeParticle;
     uint32       m_nSmokeTimer;
     bool         m_bSmokeEjectorEnabled;
-
 };
 static_assert(sizeof(CPlaneSAInterface) == 0xA04, "Invalid size for CPlaneSAInterface");
 
