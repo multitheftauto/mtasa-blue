@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-26 12:40+0000\n"
-"PO-Revision-Date: 2022-12-27 12:34\n"
+"POT-Creation-Date: 2022-12-29 22:44+0000\n"
+"PO-Revision-Date: 2022-12-29 22:49\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -785,28 +785,32 @@ msgstr "Nie udało się uruchomić Grand Theft Auto: San Andreas.  Spróbuj uruc
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Gra GTA: San Andreas mogła nie uruchomić się prawidłowo. Czy chcesz ją wyłączyć?"
 
-#: Client/loader/CExePatchedStatus.cpp:153
+#: Client/loader/CExePatchedStatus.cpp:158
 msgid "Update Aero setting"
 msgstr "Zmień ustawienie Aero"
 
-#: Client/loader/CExePatchedStatus.cpp:155
+#: Client/loader/CExePatchedStatus.cpp:160
 msgid "Update Large Memory setting"
 msgstr "Zmień ustawienie Large Memory"
 
-#: Client/loader/CExePatchedStatus.cpp:157
+#: Client/loader/CExePatchedStatus.cpp:162
 msgid "Update DEP setting"
 msgstr "Zmień ustawienie funkcji DEP"
 
-#: Client/loader/CExePatchedStatus.cpp:159
+#: Client/loader/CExePatchedStatus.cpp:164
 msgid "Update graphics driver compliance"
 msgstr "Zmieć zgodność sterownika karty graficznej"
 
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
+#: Client/loader/CExePatchedStatus.cpp:166
+#: Client/loader/CExePatchedStatus.cpp:168
 msgid "Fix file issues"
 msgstr "Napraw błędy plików"
 
-#: Client/loader/CExePatchedStatus.cpp:164
+#: Client/loader/CExePatchedStatus.cpp:170
+msgid "Use proxy loader"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Skopiuj główny plik wykonywalny aby uniknąć problemów ze sterownikami"
 
@@ -886,9 +890,14 @@ msgstr "Zmień ustawienia instalacji"
 msgid "Update compatibility settings"
 msgstr "Zmień ustawienia zgodności"
 
-#: Client/loader/CInstallManager.cpp:1107
+#: Client/loader/CInstallManager.cpp:1109
 msgid "Move incompatible files"
 msgstr "Przenieś niekompatybilne pliki"
+
+#: Client/loader/CInstallManager.cpp:1125
+#: Client/loader/CInstallManager.cpp:1141
+msgid "Delete incompatible files"
+msgstr ""
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
