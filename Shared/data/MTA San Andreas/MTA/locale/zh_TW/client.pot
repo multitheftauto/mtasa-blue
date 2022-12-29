@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-26 12:40+0000\n"
-"PO-Revision-Date: 2022-12-26 12:55\n"
+"POT-Creation-Date: 2022-12-29 22:44+0000\n"
+"PO-Revision-Date: 2022-12-29 22:49\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -772,28 +772,32 @@ msgstr "無法啟動 GTA:SA，請嘗試重新啟動。若問題依然存在，�
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas 可能沒有正確地啟動。你想要現在終止它嗎?"
 
-#: Client/loader/CExePatchedStatus.cpp:153
+#: Client/loader/CExePatchedStatus.cpp:158
 msgid "Update Aero setting"
 msgstr "更新透明效果的設定"
 
-#: Client/loader/CExePatchedStatus.cpp:155
+#: Client/loader/CExePatchedStatus.cpp:160
 msgid "Update Large Memory setting"
 msgstr "更新大記憶體的設定"
 
-#: Client/loader/CExePatchedStatus.cpp:157
+#: Client/loader/CExePatchedStatus.cpp:162
 msgid "Update DEP setting"
 msgstr "更新DEP設置"
 
-#: Client/loader/CExePatchedStatus.cpp:159
+#: Client/loader/CExePatchedStatus.cpp:164
 msgid "Update graphics driver compliance"
 msgstr "更新顯示卡驅動程序合規"
 
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
+#: Client/loader/CExePatchedStatus.cpp:166
+#: Client/loader/CExePatchedStatus.cpp:168
 msgid "Fix file issues"
 msgstr "修復文件問題"
 
-#: Client/loader/CExePatchedStatus.cpp:164
+#: Client/loader/CExePatchedStatus.cpp:170
+msgid "Use proxy loader"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "複製主可執行檔，以避免圖形驅動程式問題"
 
@@ -873,8 +877,13 @@ msgstr "更新安裝設定"
 msgid "Update compatibility settings"
 msgstr "更新相容性設置"
 
-#: Client/loader/CInstallManager.cpp:1107
+#: Client/loader/CInstallManager.cpp:1109
 msgid "Move incompatible files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1125
+#: Client/loader/CInstallManager.cpp:1141
+msgid "Delete incompatible files"
 msgstr ""
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
