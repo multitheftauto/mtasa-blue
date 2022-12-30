@@ -11,6 +11,9 @@
 
 #include <StdInc.h>
 #include <net/SyncStructures.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
 
 extern CClientGame* g_pClientGame;
 CTickRateSettings   g_TickRateSettings;

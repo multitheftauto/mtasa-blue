@@ -12,6 +12,9 @@
 #include "StdInc.h"
 #define MULTIPLAYER_STATS
 
+#include <game/CWeaponStatManager.h>
+#include <game/CWeaponStat.h>
+
 // These includes have to be fixed!
 #include "../game_sa/CPlayerInfoSA.h"
 #include "../game_sa/CPedSA.h"

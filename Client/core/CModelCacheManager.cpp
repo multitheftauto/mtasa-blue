@@ -8,6 +8,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CStreaming.h>
+#include <game/CModelInfo.h>
+#include <game/CSettings.h>
 #include "CModelCacheManager.h"
 
 namespace

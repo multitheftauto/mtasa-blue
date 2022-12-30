@@ -473,6 +473,10 @@ enum class eBitStreamVersion : unsigned short
     // 2021-08-30 0x75
     OnPlayerResourceStart,
 
+    //
+    // 1.5.9 RELEASED - 2021-10-01
+    //
+
     // Remove "old" Discord implementation (#2499)
     // 2022-01-16 0x76
     Discord_Cleanup,
