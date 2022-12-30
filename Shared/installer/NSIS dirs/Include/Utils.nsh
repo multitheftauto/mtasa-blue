@@ -26,6 +26,24 @@
 
 
 ;----------------------------------------
+; Removes a registry key if there is only one subkey with particular name present.
+; IN ROOT_KEY: A root key like HKLM
+; IN GROUP_KEY: Any group key with subkeys
+; IN SUBKEY: Name of the subkey to check against
+;----------------------------------------
+!macro _RemoveRegistryGroupWithSingleKey ROOT_KEY GROUP_KEY SUBKEY
+  Push $0
+    EnumRegKey $0 ${ROOT_KEY} "${GROUP_KEY}" 0
+    StrCmp $0 "${SUBKEY}" 0 +4
+    EnumRegKey $0 ${ROOT_KEY} "${GROUP_KEY}" 1
+    StrCmp $0 "" 0 +2
+    DeleteRegKey ${ROOT_KEY} "${GROUP_KEY}"
+  Pop $0
+!macroend
+!define RemoveRegistryGroupWithSingleKey `!insertmacro _RemoveRegistryGroupWithSingleKey`
+
+
+;----------------------------------------
 ; In: FILENAME = filename
 ; Out: MAJOR.MINOR.RELEASE.BUILD
 ;----------------------------------------
