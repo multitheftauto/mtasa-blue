@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-25 21:54+0000\n"
+"POT-Creation-Date: 2022-12-30 00:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -152,8 +152,8 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
 #: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:815
-#: Client/loader/CInstallManager.cpp:530 Client/loader/CInstallManager.cpp:539
-#: Client/loader/CInstallManager.cpp:628 Client/core/CSettings.cpp:2924
+#: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
+#: Client/loader/CInstallManager.cpp:629 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
 #: Client/core/CSettings.cpp:4674 Client/core/CGUI.cpp:87
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
@@ -686,7 +686,7 @@ msgid ""
 msgstr ""
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1173
+#: Client/loader/MainFunctions.cpp:1174
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -769,32 +769,32 @@ msgid ""
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:966
+#: Client/loader/MainFunctions.cpp:967
 msgid ""
 "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:975
+#: Client/loader/MainFunctions.cpp:976
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:987
+#: Client/loader/MainFunctions.cpp:988
 msgid ""
 "MTA:SA is not compatible with Windows 'Safe Mode'.\n"
 "\n"
 "Please restart your PC.\n"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1073
+#: Client/loader/MainFunctions.cpp:1074
 msgid "Fix configuration issue"
 msgstr ""
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1111
+#: Client/loader/MainFunctions.cpp:1112
 msgid "Fix elevation required error"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1118
+#: Client/loader/MainFunctions.cpp:1119
 #, c-format
 msgid ""
 "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if "
@@ -803,34 +803,38 @@ msgid ""
 "[%s]"
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:1173
+#: Client/loader/MainFunctions.cpp:1174
 msgid ""
 "GTA: San Andreas may not have launched correctly. Do you want to terminate "
 "it?"
 msgstr ""
 
-#: Client/loader/CExePatchedStatus.cpp:153
+#: Client/loader/CExePatchedStatus.cpp:158
 msgid "Update Aero setting"
 msgstr ""
 
-#: Client/loader/CExePatchedStatus.cpp:155
+#: Client/loader/CExePatchedStatus.cpp:160
 msgid "Update Large Memory setting"
 msgstr ""
 
-#: Client/loader/CExePatchedStatus.cpp:157
+#: Client/loader/CExePatchedStatus.cpp:162
 msgid "Update DEP setting"
 msgstr ""
 
-#: Client/loader/CExePatchedStatus.cpp:159
+#: Client/loader/CExePatchedStatus.cpp:164
 msgid "Update graphics driver compliance"
 msgstr ""
 
-#: Client/loader/CExePatchedStatus.cpp:161
-#: Client/loader/CExePatchedStatus.cpp:163
+#: Client/loader/CExePatchedStatus.cpp:166
+#: Client/loader/CExePatchedStatus.cpp:168
 msgid "Fix file issues"
 msgstr ""
 
-#: Client/loader/CExePatchedStatus.cpp:164
+#: Client/loader/CExePatchedStatus.cpp:170
+msgid "Use proxy loader"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr ""
 
@@ -846,7 +850,7 @@ msgstr ""
 msgid "Extracting files..."
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:339 Client/loader/Utils.cpp:932
+#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:932
 #, c-format
 msgid ""
 "MTA:SA needs Administrator access for the following task:\n"
@@ -856,7 +860,7 @@ msgid ""
 "Please confirm in the next window."
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:354
+#: Client/loader/CInstallManager.cpp:355
 #, c-format
 msgid ""
 "MTA:SA could not complete the following task:\n"
@@ -864,59 +868,64 @@ msgid ""
 "  '%s'\n"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:404
+#: Client/loader/CInstallManager.cpp:405
 msgid ""
 "** The crash was caused by a graphics driver error **\n"
 "\n"
 "** Please update your graphics drivers **"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:510
+#: Client/loader/CInstallManager.cpp:511
 msgid "Install updated MTA:SA files"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:530
+#: Client/loader/CInstallManager.cpp:531
 msgid ""
 "Could not update due to file conflicts. Please close other applications and "
 "retry"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:539
+#: Client/loader/CInstallManager.cpp:540
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:594 Client/loader/CInstallManager.cpp:626
+#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:619
+#: Client/loader/CInstallManager.cpp:620
 msgid "Patch GTA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:766 Client/core/CCore.cpp:764
+#: Client/loader/CInstallManager.cpp:767 Client/core/CCore.cpp:764
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:822
+#: Client/loader/CInstallManager.cpp:823
 msgid "Missing file:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:826
+#: Client/loader/CInstallManager.cpp:827
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:947
+#: Client/loader/CInstallManager.cpp:948
 msgid "Update install settings"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1080
+#: Client/loader/CInstallManager.cpp:1081
 msgid "Update compatibility settings"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1106
+#: Client/loader/CInstallManager.cpp:1109
 msgid "Move incompatible files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1125
+#: Client/loader/CInstallManager.cpp:1141
+msgid "Delete incompatible files"
 msgstr ""
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890

@@ -1729,6 +1729,21 @@ void CCore::ApplyCoreInitSettings()
         SetProcessDPIAware();
     }
 #endif
+
+    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
+    {
+        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
+        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+        std::string currentSkinName;
+        CVARS_GET("current_skin", currentSkinName);
+
+        if (currentSkinName == "Default")
+        {
+            CVARS_SET("current_skin", "Default 2023");
+        }
+
+        SetApplicationSettingInt("reset-settings-revision", 21486);
+    }
 }
 
 //
