@@ -654,6 +654,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${EndIf}
         #############################################################
 
+        #############################################################
+        # Delete existing winmm.dll to prevent GTA process start conflicts
+        Delete "$INSTDIR\MTA\winmm.dll"
+        #############################################################
+
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
 
@@ -668,7 +673,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
         File "${FILES_ROOT}\mta\loader.dll"
-        File "${FILES_ROOT}\mta\winmm.dll"
+        File "${FILES_ROOT}\mta\mtasa.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
         File "${FILES_ROOT}\mta\libwow64.dll"
