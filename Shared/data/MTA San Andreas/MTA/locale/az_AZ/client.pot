@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-29 22:44+0000\n"
-"PO-Revision-Date: 2022-12-30 00:46\n"
+"POT-Creation-Date: 2022-12-30 00:48+0000\n"
+"PO-Revision-Date: 2022-12-30 01:43\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -672,7 +672,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Ayrı bir GTA:San Andreas tətbiqi artıq işləyir. MTA:SA-nın başladılması üçün bu tətbiqin dayandırılması tələb olunur. İndi bunu etmək istəyirsiniz?"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1173
+#: Client/loader/MainFunctions.cpp:1174
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -743,37 +743,37 @@ msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directo
 msgstr "'MTA: SA' və ya GTA: San Andreas qovluqlarında .asi uzantılı sənədlər var.\n\n"
 "MTA: SA ilə problemlə qarşılaşsanız .asi sənədlərini bu qovluqlardan silin."
 
-#: Client/loader/MainFunctions.cpp:966
+#: Client/loader/MainFunctions.cpp:967
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Sənəd versiyasının xətası. Problemi həll etmək üçün MTA: SA -nı yenidən quraşdırın.\n"
 
-#: Client/loader/MainFunctions.cpp:975
+#: Client/loader/MainFunctions.cpp:976
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Sənəd versiyasının xətası. Problemi həll etmək üçün MTA: SA -nı yenidən quraşdırın.\n"
 
-#: Client/loader/MainFunctions.cpp:987
+#: Client/loader/MainFunctions.cpp:988
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA Windows 'Təhlükəsizlik rejimində' işləmir.\n\n"
 "Zəhmət olmasa kompüterivizi yenidən başlatın.\n"
 
-#: Client/loader/MainFunctions.cpp:1073
+#: Client/loader/MainFunctions.cpp:1074
 msgid "Fix configuration issue"
 msgstr "Konfiqurasiya problemini həll edin"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1111
+#: Client/loader/MainFunctions.cpp:1112
 msgid "Fix elevation required error"
 msgstr "Səhvi düzəldərkən xəta baş verdi"
 
-#: Client/loader/MainFunctions.cpp:1118
+#: Client/loader/MainFunctions.cpp:1119
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Grand Theft Auto: San Andreas başlanıla bilmədi. Zəhmət olmasa yenidən cəhd edin, və ya problem davam edərsə, www.multitheftauto.com MTA ilə əlaqə saxlayın.\n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1173
+#: Client/loader/MainFunctions.cpp:1174
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas düzgün başlana bilmədi. Dayandırmaq istəyirsiniz?"
 
