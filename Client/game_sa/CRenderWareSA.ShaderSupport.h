@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "CRenderWareSA.h"
+
 #ifdef MTA_DEBUG
     // Comment out the lines below for your desired debug options
     //#define SHADER_DEBUG_CHECKS         // Do lots of validation which can slow a debug build

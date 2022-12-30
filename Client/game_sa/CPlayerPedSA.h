@@ -41,14 +41,11 @@ private:
     CWantedSA*                       m_pWanted;
 
 public:
-    CPlayerPedSA(ePedModel pedType);
+    CPlayerPedSA(unsigned int nModelIndex);
     CPlayerPedSA(CPlayerPedSAInterface* ped);
     ~CPlayerPedSA();
 
     CWanted* GetWanted();
-
-    float GetSprintEnergy();
-    void  SetSprintEnergy(float fSprintEnergy);
 
     void SetInitialState();
 

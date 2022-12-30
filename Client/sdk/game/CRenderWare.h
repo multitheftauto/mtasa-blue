@@ -25,6 +25,7 @@ struct RwFrame;
 struct RwMatrix;
 struct RwTexDictionary;
 struct RwTexture;
+struct RpClump;
 
 typedef CShaderItem CSHADERDUMMY;
 
@@ -86,14 +87,14 @@ public:
     virtual void             DestroyTexture(RwTexture* pTex) = 0;
     virtual void             ReplaceCollisions(CColModel* pColModel, unsigned short usModelID) = 0;
     virtual unsigned int     LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics) = 0;
-    virtual void             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;
+    virtual bool             ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) = 0;
     virtual void             ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics) = 0;
     virtual void             ReplaceWheels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szWheel) = 0;
     virtual void             RepositionAtomic(RpClump* pDst, RpClump* pSrc, const char* szName) = 0;
     virtual void             AddAllAtomics(RpClump* pDst, RpClump* pSrc) = 0;
-    virtual void             ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) = 0;
-    virtual void             ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) = 0;
-    virtual void             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
+    virtual bool             ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) = 0;
+    virtual bool             ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) = 0;
+    virtual bool             ReplacePedModel(RpClump* pNew, unsigned short usModelID) = 0;
     virtual bool             ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName) = 0;
     virtual void             PulseWorldTextureWatch() = 0;
     virtual void             GetModelTextureNames(std::vector<SString>& outNameList, ushort usModelID) = 0;

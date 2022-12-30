@@ -22,9 +22,6 @@ public:
 
     virtual CWanted* GetWanted() = 0;
 
-    virtual float GetSprintEnergy() = 0;
-    virtual void  SetSprintEnergy(float fSprintEnergy) = 0;
-
     virtual void SetInitialState() = 0;
 
     virtual eMoveAnim GetMoveAnim() = 0;

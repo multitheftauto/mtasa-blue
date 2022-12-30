@@ -10,11 +10,18 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
 #include "CAnimBlendAssocGroupSA.h"
 #include "CAnimManagerSA.h"
+#include "CGameSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPlayerPedSA.h"
 #include "CWorldSA.h"
+
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 class CPedClothesDesc;
 
@@ -22,7 +29,7 @@ static CPedClothesDesc*    pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
 static std::set<SString>   ms_DoneAnimBlockRefMap;
 
-CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
+CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
 {
     // based on CPlayerPed::SetupPlayerPed (R*)
     DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
@@ -43,16 +50,16 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
         call    CPlayerPedConstructor
     }
 
-    this->SetInterface((CEntitySAInterface*)dwPedPointer);
+    SetInterface((CEntitySAInterface*)dwPedPointer);
 
-    this->Init();            // init our interfaces
+    Init();            // init our interfaces
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
-    this->SetModelIndex(pedType);
-    this->BeingDeleted = false;
-    this->DoNotRemoveFromGame = false;
-    this->SetType(PLAYER_PED);
+    SetModelIndex(nModelIndex);
+    BeingDeleted = false;
+    DoNotRemoveFromGame = false;
+    SetType(PLAYER_PED);
 
     // Allocate a player data struct and set it as the players
     m_bIsLocal = false;
@@ -95,12 +102,12 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
 CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 {
     // based on CPlayerPed::SetupPlayerPed (R*)
-    this->SetInterface((CEntitySAInterface*)pPlayer);
+    SetInterface((CEntitySAInterface*)pPlayer);
 
-    this->Init();
+    Init();
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
-    this->SetType(PLAYER_PED);
-    this->BeingDeleted = false;
+    SetType(PLAYER_PED);
+    BeingDeleted = false;
 
     m_bIsLocal = true;
     DoNotRemoveFromGame = true;
@@ -124,11 +131,11 @@ CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 
 CPlayerPedSA::~CPlayerPedSA()
 {
-    if (!this->BeingDeleted && DoNotRemoveFromGame == false)
+    if (!BeingDeleted && DoNotRemoveFromGame == false)
     {
         DWORD dwInterface = (DWORD)m_pInterface;
 
-        if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
+        if ((DWORD)GetInterface()->vtbl != VTBL_CPlaceable)
         {
             CWorldSA* world = (CWorldSA*)pGame->GetWorld();
             world->Remove(m_pInterface, CPlayerPed_Destructor);
@@ -142,7 +149,7 @@ CPlayerPedSA::~CPlayerPedSA()
                 call    dwFunc
             }
         }
-        this->BeingDeleted = true;
+        BeingDeleted = true;
         ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
     }
 
@@ -156,16 +163,6 @@ CPlayerPedSA::~CPlayerPedSA()
 CWanted* CPlayerPedSA::GetWanted()
 {
     return m_pWanted;
-}
-
-float CPlayerPedSA::GetSprintEnergy()
-{
-    return m_pData->m_fSprintEnergy;
-}
-
-void CPlayerPedSA::SetSprintEnergy(float fSprintEnergy)
-{
-    m_pData->m_fSprintEnergy = fSprintEnergy;
 }
 
 void CPlayerPedSA::SetInitialState()
@@ -190,7 +187,7 @@ void CPlayerPedSA::SetInitialState()
 
 eMoveAnim CPlayerPedSA::GetMoveAnim()
 {
-    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)GetInterface();
     return (eMoveAnim)pedInterface->iMoveAnimGroup;
 }
 
@@ -299,7 +296,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     m_iCustomMoveAnim = iAnimGroup;
 
     // Set the the new move animation group now, although it does get updated through the hooks as well
-    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)GetInterface();
     pedInterface->iMoveAnimGroup = (int)iAnimGroup;
 
     DWORD dwThis = (DWORD)pedInterface;

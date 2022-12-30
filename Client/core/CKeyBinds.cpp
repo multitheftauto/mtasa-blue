@@ -1925,9 +1925,17 @@ void CKeyBinds::DoPostFramePulse()
     {
         if (!bInVehicle)
         {
-            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;                                         // Fire
-            cs.RightShoulder2 = (g_bcControls[1].bState || (bAimingWeapon && g_bcControls[7].bState)) ? 255 : 0;            // Next Weapon / Zoom In
-            cs.LeftShoulder2 = (g_bcControls[2].bState || (bAimingWeapon && g_bcControls[8].bState)) ? 255 : 0;             // Previous Weapon / Zoom Out
+            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;     // Fire
+            if (bAimingWeapon)
+            {
+                cs.RightShoulder2 = g_bcControls[8].bState ? 255 : 0;            // Zoom Out
+                cs.LeftShoulder2 = g_bcControls[7].bState ? 255 : 0;             // Zoom In
+            }
+            else
+            {
+                cs.RightShoulder2 = g_bcControls[1].bState ? 255 : 0;            // Next Weapon
+                cs.LeftShoulder2 = g_bcControls[2].bState ? 255 : 0;             // Previous Weapon
+            }
 
             if (!ControlForwardsBackWards(cs))
             {

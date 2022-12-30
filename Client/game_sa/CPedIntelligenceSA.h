@@ -13,6 +13,7 @@
 
 #include <game/CPedIntelligence.h>
 
+class CPedSAInterface;
 class CTaskManagerSA;
 
 #define FUNC_CPedIntelligence_TestForStealthKill    0x601E00
@@ -49,7 +50,7 @@ private:
 public:
     CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped);
     ~CPedIntelligenceSA();
-    CPedIntelligenceSAInterface*  GetInterface() { return this->internalInterface; }
+    CPedIntelligenceSAInterface*  GetInterface() { return internalInterface; }
     CTaskManager*                 GetTaskManager();
     bool                          TestForStealthKill(CPed* pPed, bool bUnk);
     CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);

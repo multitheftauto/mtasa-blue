@@ -175,6 +175,10 @@ public:
     virtual void        OnGameTimerUpdate() = 0;
 
     virtual bool IsChatInputBlocked() = 0;
+    virtual bool SetChatboxCharacterLimit(int charLimit) = 0;
+    virtual void ResetChatboxCharacterLimit() = 0;
+    virtual int  GetChatboxCharacterLimit() = 0;
+    virtual int  GetChatboxMaxCharacterLimit() = 0;
 };
 
 class CClientTime

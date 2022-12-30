@@ -14,8 +14,6 @@
 #include <game/C3DMarker.h>
 #include <CMatrix_Pad.h>
 
-#define FUNC_DeleteMarkerObject 0x722390
-
 class C3DMarkerSAInterface
 {
 public:
@@ -78,8 +76,7 @@ public:
     void     SetPulseFraction(float fPulseFraction);            // doesn't work propperly (not virtualed)
     float    GetPulseFraction();
     void     Disable();
-    void     DeleteMarkerObject();
     void     Reset();
-    void     SetActive() { this->internalInterface->m_bIsUsed = true; };
-    RpClump* GetRwObject() { return this->internalInterface->m_pRwObject; }
+    void     SetActive() { internalInterface->m_bIsUsed = true; }
+    RpClump* GetRwObject() { return internalInterface->m_pRwObject; }
 };

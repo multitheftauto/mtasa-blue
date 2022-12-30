@@ -12,20 +12,8 @@
 #include "StdInc.h"
 #include "CEventListSA.h"
 #include "CEventDamageSA.h"
-#include "CEventGunShotSA.h"
 
 CEventDamage* CEventListSA::GetEventDamage(CEventDamageSAInterface* pInterface)
 {
     return new CEventDamageSA(pInterface);
-}
-
-CEventDamage* CEventListSA::CreateEventDamage(CEntity* pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3,
-                                              bool b_4)
-{
-    return new CEventDamageSA(pEntity, i_1, weaponType, hitZone, uc_2, b_3, b_4);
-}
-
-CEventGunShot* CEventListSA::CreateEventGunShot(CEntity* pEntity, CVector& vecOrigin, CVector& vecTarget, bool b_1)
-{
-    return new CEventGunShotSA(pEntity, vecOrigin, vecTarget, b_1);
 }

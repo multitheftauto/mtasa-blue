@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CExplosion.h>
 
 class CEntitySAInterface;
@@ -45,9 +46,9 @@ private:
     CExplosionSAInterface* internalInterface;
 
 public:
-    CExplosionSA(CExplosionSAInterface* explosionInterface) { this->internalInterface = explosionInterface; }
+    CExplosionSA(CExplosionSAInterface* explosionInterface) { internalInterface = explosionInterface; }
 
-    CExplosionSAInterface* GetInterface() { return this->internalInterface; };
+    CExplosionSAInterface* GetInterface() { return internalInterface; };
 
     eExplosionType GetExplosionType();
     CVector*       GetExplosionPosition();

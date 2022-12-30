@@ -77,6 +77,12 @@ public:
         m_iRevision++;
         Node(strVariable)->SetTagContent(val);
     };
+    void Set(const std::string& strVariable, const char* val)
+    {
+        SAN;
+        m_iRevision++;
+        Node(strVariable)->SetTagContent(val);
+    };
     void Set(const std::string& strVariable, const std::string& val)
     {
         SAN;

@@ -34,9 +34,5 @@ public:
     virtual void     Remove() = 0;
     virtual bool     IsActive() = 0;
     virtual void     SetPosition(CVector* vecPosition) = 0;
-    virtual void     SetEntity(CVehicle* vehicle) = 0;
-    virtual void     SetEntity(CPed* ped) = 0;
-    virtual void     SetEntity(CObject* object) = 0;
-    virtual CEntity* GetEntity() = 0;
     virtual CVector* GetPosition() = 0;
 };

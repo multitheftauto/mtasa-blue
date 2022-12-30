@@ -126,7 +126,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
         g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
 
     if (!vectorGraphic)
-        return false;
+        return nullptr;
 
     if (pathOrRawData.has_value())
     {
@@ -151,7 +151,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             if (!didLoad)
             {
                 delete vectorGraphic;
-                return false;
+                return nullptr;
             }
         }
         else
@@ -177,7 +177,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 if (!didLoad)
                 {
                     delete vectorGraphic;
-                    return false;
+                    return nullptr;
                 }
             }
             else
@@ -185,7 +185,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 delete vectorGraphic;
 
                 m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (invalid file path) [%s]", pathOrRawData.value().c_str()));
-                return false;
+                return nullptr;
             }
         }
     }

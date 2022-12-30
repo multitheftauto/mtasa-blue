@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CRegisteredCoronaSA.h"
 #include "CCoronasSA.h"
+#include "CGameSA.h"
+#include "CRegisteredCoronaSA.h"
+
+extern CGameSA* pGame;
 
 CRegisteredCoronaSA::CRegisteredCoronaSA(CRegisteredCoronaSAInterface* coronaInterface)
 {
@@ -107,7 +110,7 @@ DWORD CRegisteredCoronaSA::GetID()
 void CRegisteredCoronaSA::Init(DWORD Identifier)
 {
     internalInterface->Identifier = Identifier;
-    this->SetSize(2.5f);
+    SetSize(2.5f);
     internalInterface->bIsAttachedToEntity = false;
     internalInterface->pEntityAttachedTo = NULL;
     internalInterface->NormalAngle = 0.0f;

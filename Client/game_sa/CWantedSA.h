@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <CVector.h>
+#include <game/Common.h>
 #include <game/CWanted.h>
 
 class CPedSAInterface;
@@ -80,12 +82,12 @@ public:
     ~CWantedSA();
 
     // Internal game_sa accessors
-    CWantedSAInterface* GetInterface() { return this->internalInterface; }
+    CWantedSAInterface* GetInterface() { return internalInterface; }
     bool                GetDontDelete() { return m_bDontDelete; };
     void                SetDontDelete(bool bDontDelete) { m_bDontDelete = bDontDelete; };
 
     // Exported methods
     void SetWantedLevel(DWORD dwWantedLevel);
     void SetWantedLevelNoFlash(DWORD dwWantedLevel);
-    char GetWantedLevel() { return this->internalInterface->m_WantedLevel; };
+    char GetWantedLevel() { return internalInterface->m_WantedLevel; };
 };

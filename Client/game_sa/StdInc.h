@@ -25,9 +25,6 @@
 #include <vector>
 
 // SDK includes
-#include <core/CCoreInterface.h>
-#include <net/CNet.h>
-#include <version.h>
 #include <ijsify.h>
 
 // Game includes

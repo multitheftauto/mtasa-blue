@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CFire.h>
 
 class CEntitySAInterface;
@@ -44,7 +45,7 @@ private:
     CFireSAInterface* internalInterface;
 
 public:
-    CFireSA(CFireSAInterface* fireInterface) { this->internalInterface = fireInterface; }
+    CFireSA(CFireSAInterface* fireInterface) { internalInterface = fireInterface; }
 
     void            Extinguish();
     CVector*        GetPosition();
@@ -62,5 +63,5 @@ public:
     float           GetStrength();
     void            SetStrength(float fStrength);
     void            SetNumGenerationsAllowed(char generations);
-    CFireSAInterface* GetInterface() { return this->internalInterface; }
+    CFireSAInterface* GetInterface() { return internalInterface; }
 };

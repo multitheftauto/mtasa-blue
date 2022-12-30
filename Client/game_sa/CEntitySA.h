@@ -25,7 +25,6 @@
 #define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840
 #define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40
 
-#define FUNC_IsOnScreen                                     0x534540
 #define FUNC_IsVisible                                      0x536BC0
 
 // not in CEntity really
@@ -303,9 +302,6 @@ public:
     bool IsStaticWaitingForCollision() { return m_pInterface->bIsStaticWaitingForCollision; }
     void SetStaticWaitingForCollision(bool bStatic) { m_pInterface->bIsStaticWaitingForCollision = bStatic; }
 
-    unsigned long GetArrayID() { return m_ulArrayID; }
-    void          SetArrayID(unsigned long ulID) { m_ulArrayID = ulID; }
-
     RwMatrix* GetBoneRwMatrix(eBone boneId);
     bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
@@ -321,7 +317,6 @@ private:
     static unsigned long FUNC_CClumpModelInfo__GetFrameFromId;
     static unsigned long FUNC_RwFrameGetLTM;
 
-    unsigned long m_ulArrayID;
     void*         m_pStoredPointer;
     CVector       m_LastGoodPosition;
 };

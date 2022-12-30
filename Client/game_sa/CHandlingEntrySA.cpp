@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
 #include "CHandlingEntrySA.h"
 #include "CHandlingManagerSA.h"
+
+extern CGameSA* pGame;
 
 CHandlingEntrySA::CHandlingEntrySA()
 {

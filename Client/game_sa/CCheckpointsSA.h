@@ -14,6 +14,7 @@
 #include <game/CCheckpoints.h>
 
 class CCheckpointSA;
+class CVector;
 
 // 00722c40      public: static class CCheckpoint * __cdecl CCheckpoints::PlaceMarker(unsigned int,unsigned short,class CVector &,class CVector &,float,unsigned
 // char,unsigned char,unsigned char,unsigned char,unsigned short,float,short)

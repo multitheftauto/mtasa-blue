@@ -167,6 +167,9 @@ public:
     virtual void  ResetPedsLODDistance(bool bForceDefault = false) = 0;
     virtual float GetPedsLODDistance() = 0;
 
+    virtual void ResetBlurEnabled() = 0;
+    virtual void SetBlurControlledByScript(bool bByScript) = 0;
+
     virtual void ResetCoronaReflectionsEnabled() = 0;
     virtual void SetCoronaReflectionsControlledByScript(bool bViaScript) = 0;
 

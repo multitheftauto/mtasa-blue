@@ -14,34 +14,34 @@
 
 CControllerState* CPadSA::GetCurrentControllerState(CControllerState* ControllerState)
 {
-    MemCpyFast(ControllerState, &this->internalInterface->NewState, sizeof(CControllerState));
+    MemCpyFast(ControllerState, &internalInterface->NewState, sizeof(CControllerState));
     return ControllerState;
 }
 
 CControllerState* CPadSA::GetLastControllerState(CControllerState* ControllerState)
 {
-    MemCpyFast(ControllerState, &this->internalInterface->OldState, sizeof(CControllerState));
+    MemCpyFast(ControllerState, &internalInterface->OldState, sizeof(CControllerState));
     return ControllerState;
 }
 
 void CPadSA::SetCurrentControllerState(CControllerState* ControllerState)
 {
-    MemCpyFast(&this->internalInterface->NewState, ControllerState, sizeof(CControllerState));
+    MemCpyFast(&internalInterface->NewState, ControllerState, sizeof(CControllerState));
 }
 
 void CPadSA::SetLastControllerState(CControllerState* ControllerState)
 {
-    MemCpyFast(&this->internalInterface->OldState, ControllerState, sizeof(CControllerState));
+    MemCpyFast(&internalInterface->OldState, ControllerState, sizeof(CControllerState));
 }
 
 void CPadSA::Store()
 {
-    MemCpyFast(&this->StoredPad, this->internalInterface, sizeof(CPadSAInterface));
+    MemCpyFast(&StoredPad, internalInterface, sizeof(CPadSAInterface));
 }
 
 void CPadSA::Restore()
 {
-    MemCpyFast(this->internalInterface, &this->StoredPad, sizeof(CPadSAInterface));
+    MemCpyFast(internalInterface, &StoredPad, sizeof(CPadSAInterface));
 }
 
 bool CPadSA::IsEnabled()
@@ -73,11 +73,6 @@ void CPadSA::SetHornHistoryValue(bool value)
     if (internalInterface->iCurrHornHistory >= MAX_HORN_HISTORY)
         internalInterface->iCurrHornHistory = 0;
     internalInterface->bHornHistory[internalInterface->iCurrHornHistory] = value;
-}
-
-long CPadSA::GetAverageWeapon()
-{
-    return internalInterface->AverageWeapon;
 }
 
 void CPadSA::SetLastTimeTouched(DWORD dwTime)
