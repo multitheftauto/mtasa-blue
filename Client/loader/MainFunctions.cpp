@@ -943,6 +943,7 @@ void CheckLibVersions()
                                 "MTA\\netc.dll",
                                 "MTA\\xmll.dll",
                                 "MTA\\game_sa.dll",
+                                "MTA\\mtasa.dll",
                                 "mods\\deathmatch\\client.dll",
                                 "mods\\deathmatch\\pcre3.dll"};
     SString     strReqFileVersion;
