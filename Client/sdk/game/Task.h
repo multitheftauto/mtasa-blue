@@ -13,15 +13,9 @@
 
 #include "TaskTypes.h"
 
-// these will end up in an enum once we have it
-//#define TASK_SIMPLE_CAR_SET_PED_IN_AS_PASSENGER   811
-//#define TASK_SIMPLE_CAR_SET_PED_IN_AS_DRIVER  812
-//#define TASK_SIMPLE_SET_PED_OUT                   816
-#define TASK_SIMPLE_DUCK                415
-
-#include "CPed.h"
-
 class CEvent;
+class CPed;
+class CTaskSAInterface;
 
 #define NO_TASK_TYPE            9999
 

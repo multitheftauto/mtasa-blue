@@ -7,19 +7,23 @@
  *  PURPOSE:     source file for the custom weapon stats manager.
  *
  *****************************************************************************/
+
 #include "StdInc.h"
+#include "CWeaponStatManagerSA.h"
 
 sWeaponInfo CWeaponStatManagerSA::OriginalPoorWeaponData[WEAPONTYPE_MAX + 1];
 sWeaponInfo CWeaponStatManagerSA::OriginalNormalWeaponData[WEAPONTYPE_MAX + 1];
 sWeaponInfo CWeaponStatManagerSA::OriginalHitmanWeaponData[WEAPONTYPE_MAX + 1];
+
 CWeaponStatManagerSA::CWeaponStatManagerSA()
 {
     Init();
     InitLists();
 }
+
 void CWeaponStatManagerSA::InitLists()
 {
-    CWeaponStatSA* pWeaponStat = NULL;
+    CWeaponStatSA* pWeaponStat = nullptr;
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
     for (int i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
@@ -44,6 +48,7 @@ void CWeaponStatManagerSA::InitLists()
         }
     }
 }
+
 // Don't call me for now seems to screw up rejoining
 void CWeaponStatManagerSA::ResetLists()
 {
@@ -51,7 +56,7 @@ void CWeaponStatManagerSA::ResetLists()
     if (m_WeaponData.size() == 0)
         return;
 
-    CWeaponStat* pWeaponStat = NULL;
+    CWeaponStat* pWeaponStat = nullptr;
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
     for (std::list<CWeaponStat*>::iterator iter = m_WeaponData.begin(); iter != m_WeaponData.end(); iter++)
     {
@@ -84,7 +89,7 @@ CWeaponStatManagerSA::~CWeaponStatManagerSA()
 
 void CWeaponStatManagerSA::CreateWeaponStat(CWeaponInfo* pInterface, eWeaponType weaponType, eWeaponSkill weaponSkill)
 {
-    CWeaponStatSA* pWeaponStat = NULL;
+    CWeaponStatSA* pWeaponStat = nullptr;
 
     // Storage for new weapon data ( for script use )
     pWeaponStat = new CWeaponStatSA(((CWeaponInfoSA*)(pInterface)), weaponType, weaponSkill);
@@ -94,7 +99,7 @@ void CWeaponStatManagerSA::CreateWeaponStat(CWeaponInfo* pInterface, eWeaponType
 
 CWeaponStat* CWeaponStatManagerSA::CreateWeaponStatUnlisted(eWeaponType weaponType, eWeaponSkill weaponSkill)
 {
-    CWeaponStatSA* pWeaponStat = NULL;
+    CWeaponStatSA* pWeaponStat = nullptr;
 
     // Storage for new weapon data ( for script use )
     pWeaponStat = new CWeaponStatSA(weaponType, weaponSkill);
@@ -111,7 +116,7 @@ CWeaponStat* CWeaponStatManagerSA::GetWeaponStats(eWeaponType type, eWeaponSkill
             return (*iter);
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CWeaponStat* CWeaponStatManagerSA::GetWeaponStatsFromSkillLevel(eWeaponType type, float fSkillLevel)
@@ -133,7 +138,7 @@ CWeaponStat* CWeaponStatManagerSA::GetWeaponStatsFromSkillLevel(eWeaponType type
         else
             return pStd;
     }
-    return NULL;
+    return nullptr;
 }
 
 CWeaponStat* CWeaponStatManagerSA::GetOriginalWeaponStats(eWeaponType type, eWeaponSkill skill)
@@ -145,7 +150,7 @@ CWeaponStat* CWeaponStatManagerSA::GetOriginalWeaponStats(eWeaponType type, eWea
             return (*iter);
         }
     }
-    return NULL;
+    return nullptr;
 }
 void CWeaponStatManagerSA::Init()
 {

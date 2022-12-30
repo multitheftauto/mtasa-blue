@@ -13,9 +13,52 @@
 #define ALLOC_STATS_MODULE_NAME "game_sa"
 #include "SharedUtil.hpp"
 #include "SharedUtil.MemAccess.hpp"
-#include "D3DResourceSystemSA.h"
-#include "CFileLoaderSA.h"
+#include "C3DMarkersSA.h"
+#include "CAEAudioHardwareSA.h"
+#include "CAERadioTrackManagerSA.h"
+#include "CAESoundManagerSA.h"
+#include "CAnimManagerSA.h"
+#include "CAudioContainerSA.h"
+#include "CCameraSA.h"
+#include "CCarEnterExitSA.h"
+#include "CCheckpointsSA.h"
+#include "CClockSA.h"
 #include "CColStoreSA.h"
+#include "CControllerConfigManagerSA.h"
+#include "CCoronasSA.h"
+#include "CEventListSA.h"
+#include "CExplosionManagerSA.h"
+#include "CFileLoaderSA.h"
+#include "CFireManagerSA.h"
+#include "CFxSA.h"
+#include "CFxSystemSA.h"
+#include "CGameSA.h"
+#include "CGaragesSA.h"
+#include "CHandlingManagerSA.h"
+#include "CHudSA.h"
+#include "CKeyGenSA.h"
+#include "CObjectGroupPhysicalPropertiesSA.h"
+#include "COffsets.h"
+#include "CPadSA.h"
+#include "CPickupsSA.h"
+#include "CPlayerInfoSA.h"
+#include "CPointLightsSA.h"
+#include "CProjectileInfoSA.h"
+#include "CRadarSA.h"
+#include "CRopesSA.h"
+#include "CSettingsSA.h"
+#include "CStatsSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "CTasksSA.h"
+#include "CVisibilityPluginsSA.h"
+#include "CWaterManagerSA.h"
+#include "CWeaponInfoSA.h"
+#include "CWeaponStatManagerSA.h"
+#include "CWeatherSA.h"
+#include "CWorldSA.h"
+#include "D3DResourceSystemSA.h"
+
+extern CGameSA* pGame;
 
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
 unsigned long* CGameSA::VAR_SystemTime;
@@ -74,49 +117,47 @@ CGameSA::CGameSA()
         ObjectGroupsInfo[i].SetGroup(i);
     }
 
-    DEBUG_TRACE("CGameSA::CGameSA()");
-    this->m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
-    this->m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
-    this->m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
-    this->m_pAudioContainer = new CAudioContainerSA();
-    this->m_pWorld = new CWorldSA();
-    this->m_pPools = new CPoolsSA();
-    this->m_pClock = new CClockSA();
-    this->m_pRadar = new CRadarSA();
-    this->m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
-    this->m_pCoronas = new CCoronasSA();
-    this->m_pCheckpoints = new CCheckpointsSA();
-    this->m_pPickups = new CPickupsSA();
-    this->m_pExplosionManager = new CExplosionManagerSA();
-    this->m_pHud = new CHudSA();
-    this->m_pFireManager = new CFireManagerSA();
-    this->m_p3DMarkers = new C3DMarkersSA();
-    this->m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
-    this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
-    this->m_pWeather = new CWeatherSA();
-    this->m_pStats = new CStatsSA();
-    this->m_pPathFind = new CPathFindSA();
-    this->m_pTaskManagementSystem = new CTaskManagementSystemSA();
-    this->m_pSettings = new CSettingsSA();
-    this->m_pCarEnterExit = new CCarEnterExitSA();
-    this->m_pControllerConfigManager = new CControllerConfigManagerSA();
-    this->m_pProjectileInfo = new CProjectileInfoSA();
-    this->m_pRenderWare = new CRenderWareSA(version);
-    this->m_pHandlingManager = new CHandlingManagerSA();
-    this->m_pEventList = new CEventListSA();
-    this->m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
-    this->m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);
-    this->m_pAnimManager = new CAnimManagerSA;
-    this->m_pStreaming = new CStreamingSA;
-    this->m_pVisibilityPlugins = new CVisibilityPluginsSA;
-    this->m_pKeyGen = new CKeyGenSA;
-    this->m_pRopes = new CRopesSA;
-    this->m_pFx = new CFxSA((CFxSAInterface*)CLASS_CFx);
-    this->m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)CLASS_CFxManager);
-    this->m_pWaterManager = new CWaterManagerSA();
-    this->m_pWeaponStatsManager = new CWeaponStatManagerSA();
-    this->m_pPointLights = new CPointLightsSA();
-    this->m_collisionStore = new CColStoreSA();
+    m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
+    m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
+    m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
+    m_pAudioContainer = new CAudioContainerSA();
+    m_pWorld = new CWorldSA();
+    m_pPools = new CPoolsSA();
+    m_pClock = new CClockSA();
+    m_pRadar = new CRadarSA();
+    m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
+    m_pCoronas = new CCoronasSA();
+    m_pCheckpoints = new CCheckpointsSA();
+    m_pPickups = new CPickupsSA();
+    m_pExplosionManager = new CExplosionManagerSA();
+    m_pHud = new CHudSA();
+    m_pFireManager = new CFireManagerSA();
+    m_p3DMarkers = new C3DMarkersSA();
+    m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
+    m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
+    m_pWeather = new CWeatherSA();
+    m_pStats = new CStatsSA();
+    m_pTaskManagementSystem = new CTaskManagementSystemSA();
+    m_pSettings = new CSettingsSA();
+    m_pCarEnterExit = new CCarEnterExitSA();
+    m_pControllerConfigManager = new CControllerConfigManagerSA();
+    m_pProjectileInfo = new CProjectileInfoSA();
+    m_pRenderWare = new CRenderWareSA(version);
+    m_pHandlingManager = new CHandlingManagerSA();
+    m_pEventList = new CEventListSA();
+    m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
+    m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);
+    m_pAnimManager = new CAnimManagerSA;
+    m_pStreaming = new CStreamingSA;
+    m_pVisibilityPlugins = new CVisibilityPluginsSA;
+    m_pKeyGen = new CKeyGenSA;
+    m_pRopes = new CRopesSA;
+    m_pFx = new CFxSA((CFxSAInterface*)CLASS_CFx);
+    m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)CLASS_CFxManager);
+    m_pWaterManager = new CWaterManagerSA();
+    m_pWeaponStatsManager = new CWeaponStatManagerSA();
+    m_pPointLights = new CPointLightsSA();
+    m_collisionStore = new CColStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -232,7 +273,6 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CTasksSA*>(m_pTasks);
     delete reinterpret_cast<CTaskManagementSystemSA*>(m_pTaskManagementSystem);
     delete reinterpret_cast<CHandlingManagerSA*>(m_pHandlingManager);
-    delete reinterpret_cast<CPathFindSA*>(m_pPathFind);
     delete reinterpret_cast<CStatsSA*>(m_pStats);
     delete reinterpret_cast<CWeatherSA*>(m_pWeather);
     delete reinterpret_cast<CAERadioTrackManagerSA*>(m_pCAERadioTrackManager);
@@ -261,8 +301,6 @@ CGameSA::~CGameSA()
 
 CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 {
-    DEBUG_TRACE("CWeaponInfo * CGameSA::GetWeaponInfo(eWeaponType weapon)");
-
     if ((skill == WEAPONSKILL_STD && weapon >= WEAPONTYPE_UNARMED && weapon < WEAPONTYPE_LAST_WEAPONTYPE) ||
         (skill != WEAPONSKILL_STD && weapon >= WEAPONTYPE_PISTOL && weapon <= WEAPONTYPE_TEC9))
     {
@@ -297,7 +335,6 @@ void CGameSA::Pause(bool bPaused)
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    DEBUG_TRACE("CModelInfo * CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)");
     if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
@@ -315,8 +352,7 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  */
 void CGameSA::StartGame()
 {
-    DEBUG_TRACE("VOID CGameSA::StartGame()");
-    this->SetSystemState(GS_INIT_PLAYING_GAME);
+    SetSystemState(GS_INIT_PLAYING_GAME);
     MemPutFast<BYTE>(0xB7CB49, 0); // CTimer::m_UserPause
     MemPutFast<BYTE>(0xBA67A4, 0); // FrontEndMenuManager + 0x5C
 }
@@ -327,13 +363,11 @@ void CGameSA::StartGame()
  */
 void CGameSA::SetSystemState(eSystemState State)
 {
-    DEBUG_TRACE("VOID CGameSA::SetSystemState( eSystemState State )");
     *VAR_SystemState = (DWORD)State;
 }
 
 eSystemState CGameSA::GetSystemState()
 {
-    DEBUG_TRACE("eSystemState CGameSA::GetSystemState( )");
     return (eSystemState)*VAR_SystemState;
 }
 
@@ -341,11 +375,9 @@ eSystemState CGameSA::GetSystemState()
  * This adds the local player to the ped pool, nothing else
  * @return BOOL TRUE if success, FALSE otherwise
  */
-BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
+bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
-    DEBUG_TRACE("BOOL CGameSA::InitLocalPlayer(  )");
-
-    CPoolsSA* pools = (CPoolsSA*)this->GetPools();
+    CPoolsSA* pools = (CPoolsSA*)GetPools();
     if (pools)
     {
         //* HACKED IN HERE FOR NOW *//
@@ -358,9 +390,9 @@ BOOL CGameSA::InitLocalPlayer(CClientPed* pClientPed)
             return TRUE;
         }
 
-        return FALSE;
+        return false;
     }
-    return FALSE;
+    return true;
 }
 
 float CGameSA::GetGravity()
@@ -891,7 +923,6 @@ CPed* CGameSA::GetPedContext()
 
 CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
 {
-    DEBUG_TRACE("CObjectGroupPhysicalProperties * CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)");
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
         return &ObjectGroupsInfo[ucObjectGroup];
 

@@ -10,23 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerInfoSA.h"
 
 CWanted* CPlayerInfoSA::GetWanted()
 {
-    DEBUG_TRACE("CWanted * CPlayerInfoSA::GetWanted ( )");
-
     if (!wanted)
-        wanted = new CWantedSA(this->internalInterface->PlayerPedData.m_Wanted);
+        wanted = new CWantedSA(internalInterface->PlayerPedData.m_Wanted);
 
     return wanted;
-}
-
-void CPlayerInfoSA::GetCrossHair(bool& bActivated, float& fTargetX, float& fTargetY)
-{
-    DEBUG_TRACE("void CPlayerInfoSA::GetCrossHair ( bool &bEnabled, float &fTargetX, float &fTargetY )");
-    bActivated = internalInterface->CrossHair.bActivated;
-    fTargetX = internalInterface->CrossHair.TargetX;
-    fTargetY = internalInterface->CrossHair.TargetY;
 }
 
 /**
@@ -35,7 +26,6 @@ void CPlayerInfoSA::GetCrossHair(bool& bActivated, float& fTargetX, float& fTarg
  */
 long CPlayerInfoSA::GetPlayerMoney()
 {
-    DEBUG_TRACE("unsigned long CPlayerInfoSA::GetPlayerMoney ( void )");
     // return internalInterface->DisplayScore;
     return *(long*)(0xB7CE50);
 }
@@ -46,7 +36,6 @@ long CPlayerInfoSA::GetPlayerMoney()
  */
 void CPlayerInfoSA::SetPlayerMoney(long lMoney, bool bInstant)
 {
-    DEBUG_TRACE("void CPlayerInfoSA::SetPlayerMoney ( unsigned long ulMoney, bool bInstant )");
     MemPutFast<long>(0xB7CE50, lMoney);
 
     if (bInstant)
@@ -55,7 +44,7 @@ void CPlayerInfoSA::SetPlayerMoney(long lMoney, bool bInstant)
 
 float CPlayerInfoSA::GetFPSMoveHeading()
 {
-    return this->GetInterface()->PlayerPedData.m_fFPSMoveHeading;
+    return GetInterface()->PlayerPedData.m_fFPSMoveHeading;
 }
 
 void CPlayerInfoSA::SetDoesNotGetTired(bool bDoesNotGetTired)

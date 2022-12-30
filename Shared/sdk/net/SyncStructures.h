@@ -19,6 +19,8 @@
 
 #ifndef MTA_CLIENT
     #include "CVehicle.h"
+#else
+    #include <game/CVehicle.h>
 #endif
 
 // Used to make sure that any position values we receive are at least half sane

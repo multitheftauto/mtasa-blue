@@ -8,47 +8,47 @@
 namespace lunasvg {
 
 UseElement::UseElement()
-    : GraphicsElement(ElementId::Use)
+    : GraphicsElement(ElementID::Use)
 {
 }
 
 Length UseElement::x() const
 {
-    auto& value = get(PropertyId::X);
+    auto& value = get(PropertyID::X);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length UseElement::y() const
 {
-    auto& value = get(PropertyId::Y);
+    auto& value = get(PropertyID::Y);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length UseElement::width() const
 {
-    auto& value = get(PropertyId::Width);
+    auto& value = get(PropertyID::Width);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::HundredPercent);
 }
 
 Length UseElement::height() const
 {
-    auto& value = get(PropertyId::Height);
+    auto& value = get(PropertyID::Height);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::HundredPercent);
 }
 
 std::string UseElement::href() const
 {
-    auto& value = get(PropertyId::Href);
+    auto& value = get(PropertyID::Href);
     return Parser::parseHref(value);
 }
 
 void UseElement::transferWidthAndHeight(Element* element) const
 {
-    auto& width = get(PropertyId::Width);
-    auto& height = get(PropertyId::Height);
+    auto& width = get(PropertyID::Width);
+    auto& height = get(PropertyID::Height);
 
-    element->set(PropertyId::Width, width, 0x0);
-    element->set(PropertyId::Height, height, 0x0);
+    element->set(PropertyID::Width, width, 0x0);
+    element->set(PropertyID::Height, height, 0x0);
 }
 
 void UseElement::layout(LayoutContext* context, LayoutContainer* current) const
@@ -69,15 +69,15 @@ void UseElement::layout(LayoutContext* context, LayoutContainer* current) const
     auto _x = lengthContext.valueForLength(x(), LengthMode::Width);
     auto _y = lengthContext.valueForLength(y(), LengthMode::Height);
 
-    auto transform = get(PropertyId::Transform);
+    auto transform = get(PropertyID::Transform);
     transform += "translate(";
     transform += std::to_string(_x);
     transform += ' ';
     transform += std::to_string(_y);
     transform += ')';
-    group->set(PropertyId::Transform, transform, 0x10);
+    group->set(PropertyID::Transform, transform, 0x10);
 
-    if(ref->id == ElementId::Svg || ref->id == ElementId::Symbol)
+    if(ref->id == ElementID::Svg || ref->id == ElementID::Symbol)
     {
         auto element = ref->cloneElement<SVGElement>();
         transferWidthAndHeight(element.get());

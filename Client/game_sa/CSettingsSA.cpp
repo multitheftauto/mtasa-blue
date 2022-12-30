@@ -10,6 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include "CAudioEngineSA.h"
+#include "CCoronasSA.h"
+#include "CGameSA.h"
+#include "CHudSA.h"
+#include "CSettingsSA.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA* pGame;
 
 static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
@@ -43,6 +52,8 @@ CSettingsSA::CSettingsSA()
     m_pInterface->bFrameLimiter = false;
     m_bVolumetricShadowsEnabled = false;
     m_bVolumetricShadowsSuspended = false;
+    m_bBlurViaScript = false;
+    m_bDynamicPedShadowsEnabled = false;
     m_bCoronaReflectionsViaScript = false;
     SetAspectRatio(ASPECT_RATIO_4_3);
     HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
@@ -260,14 +271,14 @@ void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
 
 float CSettingsSA::GetMouseSensitivity()
 {
-    float fRawValue = *(FLOAT*)VAR_fMouseSensitivity;
+    float fRawValue = *(float*)VAR_fMouseSensitivity;
     return UnlerpClamped(MOUSE_SENSITIVITY_MIN, fRawValue, MOUSE_SENSITIVITY_MAX);            // Remap to 0-1
 }
 
 void CSettingsSA::SetMouseSensitivity(float fSensitivity)
 {
     float fRawValue = Lerp(MOUSE_SENSITIVITY_MIN, fSensitivity, MOUSE_SENSITIVITY_MAX);
-    MemPutFast<FLOAT>(VAR_fMouseSensitivity, fRawValue);
+    MemPutFast<float>(VAR_fMouseSensitivity, fRawValue);
 }
 
 unsigned int CSettingsSA::GetAntiAliasing()
@@ -321,11 +332,25 @@ bool CSettingsSA::IsVolumetricShadowsEnabled()
 void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
 {
     m_bVolumetricShadowsEnabled = bEnable;
+
+    // Disable rendering ped real time shadows when they sit on bikes
+    // if vehicle volumetric shadows are disabled because it looks a bit weird
+    MemPut<BYTE>(0x5E682A + 1, bEnable);
 }
 
 void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
 {
     m_bVolumetricShadowsSuspended = bSuspended;
+}
+
+bool CSettingsSA::IsDynamicPedShadowsEnabled()
+{
+    return m_bDynamicPedShadowsEnabled;
+}
+
+void CSettingsSA::SetDynamicPedShadowsEnabled(bool bEnable)
+{
+    m_bDynamicPedShadowsEnabled = bEnable;
 }
 
 //
@@ -359,8 +384,7 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
         // Handle all calls from CPed::PreRenderAfterTest
         if (dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680)
     {
-        // Always use blob shadows for peds as realtime shadows are disabled in MTA (context switching issues)
-        dwFxQualityValue = 0;
+        dwFxQualityValue = pGame->GetSettings()->IsDynamicPedShadowsEnabled() ? 2 : 0;
     }
 }
 
@@ -636,6 +660,27 @@ float CSettingsSA::GetPedsLODDistance()
 
 ////////////////////////////////////////////////
 //
+// Blur
+//
+// When blur is controlled by script changing this option
+// in settings doesn't produce any effect
+//
+////////////////////////////////////////////////
+void CSettingsSA::ResetBlurEnabled()
+{
+    if (m_bBlurViaScript)
+        return;
+
+    bool bEnabled;
+    g_pCore->GetCVars()->Get("blur", bEnabled);
+    pGame->SetBlurLevel(bEnabled ? DEFAULT_BLUR_LEVEL : 0);
+}
+
+void CSettingsSA::SetBlurControlledByScript(bool bByScript)
+{
+    m_bBlurViaScript = bByScript;
+}
+
 // Corona rain reflections
 //
 // When corona reflections are controlled by script changing this option

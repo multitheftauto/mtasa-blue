@@ -13,9 +13,6 @@
 
 #include <game/CProjectileInfo.h>
 #include "CProjectileSA.h"
-#include "Common.h"
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 
 #define PROJECTILE_COUNT                    32
 #define PROJECTILE_INFO_COUNT               32
@@ -64,10 +61,8 @@ public:
 
     void             RemoveAllProjectiles();
     void             RemoveProjectile(CProjectileInfo* pProjectileInfo, CProjectile* pProjectile, bool bBlow = true);
-    CProjectile*     GetProjectile(DWORD ID);
     CProjectileInfo* GetProjectileInfo(void* projectileInfoInterface);
     CProjectileInfo* GetProjectileInfo(DWORD dwIndex);
-    CProjectileInfo* GetNextFreeProjectileInfo();
     bool             AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
     CProjectile*     GetProjectile(void* projectilePointer);
 
@@ -76,6 +71,6 @@ public:
 
     bool IsActive();
 
-    void  SetCounter(DWORD dwCounter) { internalInterface->dwCounter = dwCounter + pGame->GetSystemTime(); }
-    DWORD GetCounter() { return internalInterface->dwCounter - pGame->GetSystemTime(); }
+    void  SetCounter(DWORD dwCounter);
+    DWORD GetCounter();
 };

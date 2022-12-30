@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CWantedSA.h"
 
 CWantedSA::CWantedSA()
 {
@@ -39,7 +40,7 @@ CWantedSA::~CWantedSA()
 
 void CWantedSA::SetWantedLevel(DWORD dwWantedLevel)
 {
-    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_SetWantedLevel;
     _asm
     {
