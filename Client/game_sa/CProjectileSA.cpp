@@ -21,17 +21,17 @@ CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObj
 {
     internalInterface = projectileInterface;
     projectileInfo = NULL;
-    this->BeingDeleted = false;
-    this->DoNotRemoveFromGame = false;
-    this->internalInterface->bStreamingDontDelete = true;
-    this->internalInterface->bDontStream = true;
-    this->internalInterface->bRemoveFromWorld = false;
+    BeingDeleted = false;
+    DoNotRemoveFromGame = false;
+    internalInterface->bStreamingDontDelete = true;
+    internalInterface->bDontStream = true;
+    internalInterface->bRemoveFromWorld = false;
     m_bDestroyed = false;
 }
 
 CProjectileSA::~CProjectileSA()
 {
-    this->BeingDeleted = true;
+    BeingDeleted = true;
     /*
     //OutputDebugString("Attempting to destroy Object\n");
     if(!this->BeingDeleted && DoNotRemoveFromGame == false)

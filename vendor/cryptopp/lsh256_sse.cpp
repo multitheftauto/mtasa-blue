@@ -16,6 +16,9 @@
 #include "cpu.h"
 #include "misc.h"
 
+// Squash MS LNK4221 and libtool warnings
+extern const char LSH256_SSE_FNAME[] = __FILE__;
+
 #if defined(CRYPTOPP_SSSE3_AVAILABLE) && defined(CRYPTOPP_ENABLE_64BIT_SSE)
 
 #if defined(CRYPTOPP_SSSE3_AVAILABLE)

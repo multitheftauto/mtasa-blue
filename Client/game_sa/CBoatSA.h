@@ -36,17 +36,14 @@ public:
     uint32               pad10[106];                              // 1600
 };
 
-class CBoatSA : public virtual CBoat, public virtual CVehicleSA
+class CBoatSA final : public virtual CBoat, public virtual CVehicleSA
 {
 private:
     CBoatHandlingEntrySA* m_pBoatHandlingData = nullptr;
 public:
-    CBoatSA(CBoatSAInterface* boat);
-    CBoatSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CBoatSA(CBoatSAInterface* pInterface);
 
-    virtual ~CBoatSA(){};
-
-    CBoatSAInterface* GetBoatInterface() { return (CBoatSAInterface*)m_pInterface; }
+    CBoatSAInterface* GetBoatInterface() { return reinterpret_cast<CBoatSAInterface*>(GetInterface()); }
 
     CBoatHandlingEntry* GetBoatHandlingData();
     void                SetBoatHandlingData(CBoatHandlingEntry* pHandling);
