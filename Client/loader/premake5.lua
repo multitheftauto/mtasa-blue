@@ -18,7 +18,7 @@ project "Loader"
 		"unrar", "d3d9",
 		"detours", "Imagehlp",
 		"../../vendor/nvapi/x86/nvapi.lib",
-		"cryptopp",
+		"cryptopp", "Wscapi",
 	}
 
 	pchheader "StdInc.h"

@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedDamageResponseCalculatorSA.h"
+#include "CEntitySA.h"
+#include "CPedDamageResponseSA.h"
+#include "CPedSA.h"
 
 CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CEntity* pEntity, float fDamage, eWeaponType weaponType, ePedPieceTypes bodyPart, bool b_1)
 {

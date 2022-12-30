@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <fstream>
 #include "CAudioContainerLookupTableSA.h"
 
 CAudioContainerLookupTableSA::CAudioContainerLookupTableSA(const SString& strPath)
@@ -65,13 +66,3 @@ SAudioLookupEntrySA* CAudioContainerLookupTableSA::GetEntry(eAudioLookupIndex lo
 
     return m_Entries[lookupIndex][bankIndex];
 }
-
-/*
-SAudioLookupEntrySA* CAudioContainerLookupTableSA::Next ( bool goToNext )
-{
-    if ( goToNext )
-        return *++m_CurrentEntry;
-
-    return *m_CurrentEntry++;
-}
-*/

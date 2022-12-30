@@ -3,7 +3,7 @@
 namespace lunasvg {
 
 StyleElement::StyleElement()
-    : Element(ElementId::Style)
+    : Element(ElementID::Style)
 {
 }
 

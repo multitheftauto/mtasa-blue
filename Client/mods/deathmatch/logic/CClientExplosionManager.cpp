@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CExplosionManager.h>
 
 extern CClientGame* g_pClientGame;
 

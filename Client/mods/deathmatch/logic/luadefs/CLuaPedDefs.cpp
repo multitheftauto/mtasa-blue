@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWeapon.h>
 #include "lua/CLuaFunctionParser.h"
 #include "CMatrix_Pad.h"
 

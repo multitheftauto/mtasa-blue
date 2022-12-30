@@ -68,23 +68,27 @@ class Color
 {
 public:
     Color() = default;
-    Color(double r, double g, double b, double a = 1);
+    explicit Color(uint32_t value) : m_value(value) {}
+    Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) : m_value(a << 24 | r << 16 | g << 8 | b) {}
 
-    bool isNone() const { return  a == 0.0; }
+    uint8_t alpha() const { return (m_value >> 24) & 0xff; }
+    uint8_t red() const { return (m_value >> 16) & 0xff; }
+    uint8_t green() const { return (m_value >> 8) & 0xff; }
+    uint8_t blue() const { return (m_value >> 0) & 0xff; }
+
+    uint32_t value() const { return m_value; }
+
+    Color& combine(double opacity);
+    Color combined(double opacity) const;
+
+    bool isNone() const { return  m_value == 0; }
 
     static const Color Black;
     static const Color White;
-    static const Color Red;
-    static const Color Green;
-    static const Color Blue;
-    static const Color Yellow;
     static const Color Transparent;
 
-public:
-    double r{0};
-    double g{0};
-    double b{0};
-    double a{1};
+private:
+    uint32_t m_value{0};
 };
 
 class Paint
@@ -99,8 +103,8 @@ public:
     bool isNone() const { return m_ref.empty() && m_color.isNone(); }
 
 public:
-    Color m_color{Color::Transparent};
     std::string m_ref;
+    Color m_color{Color::Transparent};
 };
 
 class Point
@@ -116,11 +120,14 @@ public:
 
 using PointList = std::vector<Point>;
 
+class Box;
+
 class Rect
 {
 public:
     Rect() = default;
     Rect(double x, double y, double w, double h);
+    Rect(const Box& box);
 
     Rect operator&(const Rect& rect) const;
     Rect operator|(const Rect& rect) const;
@@ -141,11 +148,14 @@ public:
     double h{0};
 };
 
+class Matrix;
+
 class Transform
 {
 public:
     Transform() = default;
     Transform(double m00, double m10, double m01, double m11, double m02, double m12);
+    Transform(const Matrix& matrix);
 
     Transform inverted() const;
     Transform operator*(const Transform& transform) const;
