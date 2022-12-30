@@ -44,6 +44,30 @@
 
 
 ;----------------------------------------
+; Removes a directory if there is only one child directory with a particular name present.
+; IN PARENT_DIR: Path to the parent directory
+; IN DIRNAME: Name of the child directory to check against
+;----------------------------------------
+!macro _RmDirWithSingleChildDir PARENT_DIR DIRNAME
+  Push $0
+  Push $1
+    FindFirst $0 $1 "${PARENT_DIR}\*"
+      StrCmp $1 "" +4               ; [Delete] Either empty or it only contains our file
+      StrCmp $1 "." +5              ; [Next] Current directory
+      StrCmp $1 ".." +4             ; [Next] Parent directory
+      StrCmp $1 "${DIRNAME}" +3 +5  ; [Next] If matching, [Break] otherwise
+      RmDir /r "${PARENT_DIR}"
+      Goto +3                       ; [Break]
+      FindNext $0 $1
+      Goto -7                       ; [Continue]
+    FindClose $0
+  Pop $1
+  Pop $0
+!macroend
+!define RmDirWithSingleChildDir `!insertmacro _RmDirWithSingleChildDir`
+
+
+;----------------------------------------
 ; In: FILENAME = filename
 ; Out: MAJOR.MINOR.RELEASE.BUILD
 ;----------------------------------------

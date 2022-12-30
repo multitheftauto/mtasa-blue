@@ -1136,7 +1136,8 @@ Section Uninstall
     Delete "$INSTDIR\MTA\*.bin"
 
     RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
-    ; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
+    ; Delete "$APPDATA\MTA San Andreas All" if "Common" is the only directory in it.
+    ${RmDirWithSingleChildDir} "$APPDATA\MTA San Andreas All" "Common"
 
     DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
     DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
