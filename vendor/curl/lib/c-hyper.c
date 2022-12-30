@@ -54,6 +54,7 @@
 #include "multiif.h"
 #include "progress.h"
 #include "content_encoding.h"
+#include "ws.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -471,6 +472,24 @@ CURLcode Curl_hyper_stream(struct Curl_easy *data,
     if(result)
       break;
 
+    k->deductheadercount =
+      (100 <= http_status && 199 >= http_status)?k->headerbytecount:0;
+#ifdef USE_WEBSOCKETS
+    if(k->upgr101 == UPGR101_WS) {
+      if(http_status == 101) {
+        /* verify the response */
+        result = Curl_ws_accept(data);
+        if(result)
+          return result;
+      }
+      else {
+        failf(data, "Expected 101, got %u", k->httpcode);
+        result = CURLE_HTTP_RETURNED_ERROR;
+        break;
+      }
+    }
+#endif
+
     /* Curl_http_auth_act() checks what authentication methods that are
      * available and decides which one (if any) to use. It will set 'newurl'
      * if an auth method was picked. */
@@ -692,9 +711,18 @@ static int uploadstreamed(void *userdata, hyper_context *ctx,
     data->state.hresult = result;
     return HYPER_POLL_ERROR;
   }
-  if(!fillcount)
-    /* done! */
-    *chunk = NULL;
+  if(!fillcount) {
+    if((data->req.keepon & KEEP_SEND_PAUSE) != KEEP_SEND_PAUSE)
+      /* done! */
+      *chunk = NULL;
+    else {
+      /* paused, save a waker */
+      if(data->hyp.send_body_waker)
+        hyper_waker_free(data->hyp.send_body_waker);
+      data->hyp.send_body_waker = hyper_context_waker(ctx);
+      return HYPER_POLL_PENDING;
+    }
+  }
   else {
     hyper_buf *copy = hyper_buf_copy((uint8_t *)data->state.ulbuf, fillcount);
     if(copy)
@@ -909,12 +937,13 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
     result = CURLE_OUT_OF_MEMORY;
     goto error;
   }
-  if(conn->negnpn == CURL_HTTP_VERSION_2) {
+  if(conn->alpn == CURL_HTTP_VERSION_2) {
     hyper_clientconn_options_http2(options, 1);
     h2 = TRUE;
   }
   hyper_clientconn_options_set_preserve_header_case(options, 1);
   hyper_clientconn_options_set_preserve_header_order(options, 1);
+  hyper_clientconn_options_http1_allow_multiline_headers(options, 1);
 
   hyper_clientconn_options_exec(options, h->exec);
 
@@ -1004,10 +1033,8 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
     /* For HTTP/2, we show the Host: header as if we sent it, to make it look
        like for HTTP/1 but it isn't actually sent since :authority is then
        used. */
-    result = Curl_debug(data, CURLINFO_HEADER_OUT, data->state.aptr.host,
-                        strlen(data->state.aptr.host));
-    if(result)
-      goto error;
+    Curl_debug(data, CURLINFO_HEADER_OUT, data->state.aptr.host,
+               strlen(data->state.aptr.host));
   }
 
   if(data->state.aptr.proxyuserpwd) {
@@ -1115,6 +1142,9 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   if(result)
     goto error;
 
+  if(!result && conn->handler->protocol&(CURLPROTO_WS|CURLPROTO_WSS))
+    result = Curl_ws_request(data, headers);
+
   result = Curl_add_timecondition(data, headers);
   if(result)
     goto error;
@@ -1127,9 +1157,7 @@ CURLcode Curl_http(struct Curl_easy *data, bool *done)
   if(result)
     goto error;
 
-  result = Curl_debug(data, CURLINFO_HEADER_OUT, (char *)"\r\n", 2);
-  if(result)
-    goto error;
+  Curl_debug(data, CURLINFO_HEADER_OUT, (char *)"\r\n", 2);
 
   data->req.upload_chunky = FALSE;
   sendtask = hyper_clientconn_send(client, req);

@@ -539,6 +539,13 @@ static CURLcode readwrite_data(struct Curl_easy *data,
     bool is_http2 = ((conn->handler->protocol & PROTO_FAMILY_HTTP) &&
                      (conn->httpversion == 20));
 #endif
+    bool is_http3 =
+#ifdef ENABLE_QUIC
+      ((conn->handler->protocol & PROTO_FAMILY_HTTP) &&
+       (conn->httpversion == 30));
+#else
+      FALSE;
+#endif
 
     if(
 #ifdef USE_NGHTTP2
@@ -549,6 +556,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
          for a particular stream. */
       !is_http2 &&
 #endif
+      !is_http3 && /* Same reason mentioned above. */
       k->size != -1 && !k->header) {
       /* make sure we don't read too much */
       curl_off_t totalleft = k->size - k->bytecount;
@@ -596,6 +604,9 @@ static CURLcode readwrite_data(struct Curl_easy *data,
         DEBUGF(infof(data, "nread == 0, stream closed, bailing"));
       else
 #endif
+      if(is_http3 && !nread)
+        DEBUGF(infof(data, "nread == 0, stream closed, bailing"));
+      else
         DEBUGF(infof(data, "nread <= 0, server closed connection, bailing"));
       k->keepon &= ~KEEP_RECV;
       break;
@@ -753,7 +764,13 @@ static CURLcode readwrite_data(struct Curl_easy *data,
         if(nread < 0) /* this should be unusual */
           nread = 0;
 
-        k->keepon &= ~KEEP_RECV; /* we're done reading */
+        /* HTTP/3 over QUIC should keep reading until QUIC connection
+           is closed.  In contrast to HTTP/2 which can stop reading
+           from TCP connection, HTTP/3 over QUIC needs ACK from server
+           to ensure stream closure.  It should keep reading. */
+        if(!is_http3) {
+          k->keepon &= ~KEEP_RECV; /* we're done reading */
+        }
       }
 
       k->bytecount += nread;
@@ -1422,6 +1439,7 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   if(result)
     return result;
 
+  data->state.requests = 0;
   data->state.followlocation = 0; /* reset the location-follow counter */
   data->state.this_is_a_follow = FALSE; /* reset this */
   data->state.errorbuf = FALSE; /* no error has occurred */
@@ -1619,7 +1637,7 @@ CURLcode Curl_follow(struct Curl_easy *data,
 
   if((type != FOLLOW_RETRY) &&
      (data->req.httpcode != 401) && (data->req.httpcode != 407) &&
-     Curl_is_absolute_url(newurl, NULL, 0))
+     Curl_is_absolute_url(newurl, NULL, 0, FALSE))
     /* If this is not redirect due to a 401 or 407 response and an absolute
        URL: don't allow a custom port number */
     disallowport = TRUE;
@@ -1631,8 +1649,11 @@ CURLcode Curl_follow(struct Curl_easy *data,
                     CURLU_ALLOW_SPACE |
                     (data->set.path_as_is ? CURLU_PATH_AS_IS : 0));
   if(uc) {
-    if(type != FOLLOW_FAKE)
+    if(type != FOLLOW_FAKE) {
+      failf(data, "The redirect target URL could not be parsed: %s",
+            curl_url_strerror(uc));
       return Curl_uc_to_curlcode(uc);
+    }
 
     /* the URL could not be parsed for some reason, but since this is FAKE
        mode, just duplicate the field as-is */
@@ -1679,7 +1700,7 @@ CURLcode Curl_follow(struct Curl_easy *data,
           return Curl_uc_to_curlcode(uc);
         }
 
-        p = Curl_builtin_scheme(scheme);
+        p = Curl_builtin_scheme(scheme, CURL_ZERO_TERMINATED);
         if(p && (p->protocol != data->info.conn_protocol)) {
           infof(data, "Clear auth, redirects scheme from %s to %s",
                 data->info.conn_scheme, scheme);

@@ -442,6 +442,29 @@ static bool bad_domain(const char *domain)
 }
 
 /*
+  RFC 6265 section 4.1.1 says a server should accept this range:
+
+  cookie-octet    = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E
+
+  But Firefox and Chrome as of June 2022 accept space, comma and double-quotes
+  fine. The prime reason for filtering out control bytes is that some HTTP
+  servers return 400 for requests that contain such.
+*/
+static int invalid_octets(const char *p)
+{
+  /* Reject all bytes \x01 - \x1f (*except* \x09, TAB) + \x7f */
+  static const char badoctets[] = {
+    "\x01\x02\x03\x04\x05\x06\x07\x08\x0a"
+    "\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14"
+    "\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x7f"
+  };
+  size_t len;
+  /* scan for all the octets that are *not* in cookie-octet */
+  len = strcspn(p, badoctets);
+  return (p[len] != '\0');
+}
+
+/*
  * Curl_cookie_add
  *
  * Add a single cookie line to the cookie keeping object. Be aware that
@@ -514,7 +537,7 @@ Curl_cookie_add(struct Curl_easy *data,
     do {
       /* we have a <what>=<this> pair or a stand-alone word here */
       name[0] = what[0] = 0; /* init the buffers */
-      if(1 <= sscanf(ptr, "%" MAX_NAME_TXT "[^;\r\n=] =%"
+      if(1 <= sscanf(ptr, "%" MAX_NAME_TXT "[^;\t\r\n=] =%"
                      MAX_NAME_TXT "[^;\r\n]",
                      name, what)) {
         /*
@@ -568,6 +591,13 @@ Curl_cookie_add(struct Curl_easy *data,
         while(*whatptr && ISBLANK(*whatptr))
           whatptr++;
 
+        /* Reject cookies with a TAB inside the content */
+        if(strchr(whatptr, '\t')) {
+          freecookie(co);
+          infof(data, "cookie contains TAB, dropping");
+          return NULL;
+        }
+
         /*
          * Check if we have a reserved prefix set before anything else, as we
          * otherwise have to test for the prefix in both the cookie name and
@@ -592,6 +622,11 @@ Curl_cookie_add(struct Curl_easy *data,
           co->value = strdup(whatptr);
           done = TRUE;
           if(!co->name || !co->value) {
+            badcookie = TRUE;
+            break;
+          }
+          if(invalid_octets(whatptr) || invalid_octets(name)) {
+            infof(data, "invalid octets in name/value, cookie dropped");
             badcookie = TRUE;
             break;
           }
@@ -637,7 +672,7 @@ Curl_cookie_add(struct Curl_easy *data,
             break;
           }
         }
-        else if(strcasecompare("domain", name)) {
+        else if(strcasecompare("domain", name) && whatptr[0]) {
           bool is_ip;
 
           /*
@@ -1436,7 +1471,7 @@ struct Cookie *Curl_cookie_getlist(struct Curl_easy *data,
 
             matches++;
             if(matches >= MAX_COOKIE_SEND_AMOUNT) {
-              infof(data, "Included max number of cookies (%u) in request!",
+              infof(data, "Included max number of cookies (%zu) in request!",
                     matches);
               break;
             }

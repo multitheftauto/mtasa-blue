@@ -258,6 +258,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   struct quicsocket *qs = &conn->hequic[sockindex];
   char ipbuf[40];
   int port;
+  int rv;
 
 #ifdef DEBUG_QUICHE
   /* initialize debug log callback only once */
@@ -303,8 +304,16 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   if(result)
     return result;
 
+  qs->local_addrlen = sizeof(qs->local_addr);
+  rv = getsockname(sockfd, (struct sockaddr *)&qs->local_addr,
+                   &qs->local_addrlen);
+  if(rv == -1)
+    return CURLE_QUIC_CONNECT_ERROR;
+
   qs->conn = quiche_conn_new_with_tls((const uint8_t *) qs->scid,
-                                      sizeof(qs->scid), NULL, 0, addr, addrlen,
+                                      sizeof(qs->scid), NULL, 0,
+                                      (struct sockaddr *)&qs->local_addr,
+                                      qs->local_addrlen, addr, addrlen,
                                       qs->cfg, qs->ssl, false);
   if(!qs->conn) {
     failf(data, "can't create quiche connection");
@@ -407,6 +416,10 @@ static CURLcode quiche_has_connected(struct Curl_easy *data,
     qs->cfg = NULL;
     qs->conn = NULL;
   }
+  if(data->set.ssl.certinfo)
+    /* asked to gather certificate info */
+    (void)Curl_ossl_certchain(data, qs->ssl);
+
   return CURLE_OK;
   fail:
   quiche_h3_config_free(qs->h3config);
@@ -478,6 +491,8 @@ static CURLcode process_ingress(struct Curl_easy *data, int sockfd,
 
     recv_info.from = (struct sockaddr *) &from;
     recv_info.from_len = from_len;
+    recv_info.to = (struct sockaddr *) &qs->local_addr;
+    recv_info.to_len = qs->local_addrlen;
 
     recvd = quiche_conn_recv(qs->conn, buf, recvd, &recv_info);
     if(recvd == QUICHE_ERR_DONE)

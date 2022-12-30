@@ -11,6 +11,10 @@
 
 #include "StdInc.h"
 
+#include <game/CFireManager.h>
+#include <game/CProjectile.h>
+#include <game/CProjectileInfo.h>
+#include <game/CEventList.h>
 // These includes have to be fixed!
 #include "../game_sa/CPedSA.h"
 #include "../game_sa/CEventDamageSA.h"

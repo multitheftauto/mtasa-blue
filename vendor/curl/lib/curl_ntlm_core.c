@@ -29,7 +29,7 @@
 /*
  * NTLM details:
  *
- * https://davenport.sourceforge.io/ntlm.html
+ * https://davenport.sourceforge.net/ntlm.html
  * https://www.innovation.ch/java/ntlm.html
  */
 
@@ -60,17 +60,17 @@
 
 #if defined(USE_OPENSSL_DES) || defined(USE_WOLFSSL)
 
-#ifdef USE_WOLFSSL
+#if defined(USE_OPENSSL)
+#  include <openssl/des.h>
+#  include <openssl/md5.h>
+#  include <openssl/ssl.h>
+#  include <openssl/rand.h>
+#else
 #  include <wolfssl/options.h>
 #  include <wolfssl/openssl/des.h>
 #  include <wolfssl/openssl/md5.h>
 #  include <wolfssl/openssl/ssl.h>
 #  include <wolfssl/openssl/rand.h>
-#else
-#  include <openssl/des.h>
-#  include <openssl/md5.h>
-#  include <openssl/ssl.h>
-#  include <openssl/rand.h>
 #endif
 
 #  if (defined(OPENSSL_VERSION_NUMBER) && \

@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
+#include <game/CSettings.h>
 
 using namespace std;
 
@@ -807,13 +808,13 @@ void CSettings::CreateGUI()
     m_pCheckBoxTyreSmokeParticles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 90.0f));
     m_pCheckBoxTyreSmokeParticles->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
-    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
-    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+    m_pCheckBoxDynamicPedShadows = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Dynamic ped shadows"), true));
+    m_pCheckBoxDynamicPedShadows->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
+    m_pCheckBoxDynamicPedShadows->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
-    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
-    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+    m_pCheckBoxBlur = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Motion blur"), true));
+    m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
+    m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -852,8 +853,16 @@ void CSettings::CreateGUI()
     }
 #endif
 
+    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
+    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
+    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
+    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
-    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
     m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
 
     vecTemp.fY += 10;
@@ -1562,10 +1571,23 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("high_detail_peds", bHighDetailPeds);
     m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
 
+    // Blur
+    bool bBlur;
+    CVARS_GET("blur", bBlur);
+    m_pCheckBoxBlur->SetSelected(bBlur);
+
     // Corona rain reflections
     bool bCoronaReflections;
     CVARS_GET("corona_reflections", bCoronaReflections);
     m_pCheckBoxCoronaReflections->SetSelected(bCoronaReflections);
+
+    // Dynamic ped shadows
+    bool bDynamicPedShadows;
+    CVARS_GET("dynamic_ped_shadows", bDynamicPedShadows);
+    m_pCheckBoxDynamicPedShadows->SetSelected(bDynamicPedShadows);
+
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled(FxQuality >= 2);
 
     PopulateResolutionComboBox();
 
@@ -1791,7 +1813,9 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
+    CVARS_SET("blur", true);
     CVARS_SET("corona_reflections", false);
+    CVARS_SET("dynamic_ped_shadows", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
@@ -1799,6 +1823,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     gameSettings->SetAntiAliasing(1, true);
     gameSettings->ResetVehiclesLODDistance(false);
     gameSettings->ResetPedsLODDistance(false);
+    gameSettings->SetDynamicPedShadowsEnabled(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -3437,10 +3462,20 @@ void CSettings::SaveData()
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance(false);
 
+    // Blur
+    bool bBlur = m_pCheckBoxBlur->GetSelected();
+    CVARS_SET("blur", bBlur);
+    gameSettings->ResetBlurEnabled();
+
     // Corona rain reflections
     bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
     CVARS_SET("corona_reflections", bCoronaReflections);
     gameSettings->ResetCoronaReflectionsEnabled();
+
+    // Dynamic ped shadows
+    bool bDynamicPedShadows = m_pCheckBoxDynamicPedShadows->GetSelected();
+    CVARS_SET("dynamic_ped_shadows", bDynamicPedShadows);
+    gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
@@ -4373,6 +4408,8 @@ bool CSettings::OnFxQualityChanged(CGUIElement* pElement)
         m_pCheckBoxGrass->SetEnabled(true);
     }
 
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled((int)pItem->GetData() >= 2);
     return true;
 }
 
