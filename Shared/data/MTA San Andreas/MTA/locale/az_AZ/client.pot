@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-29 22:44+0000\n"
-"PO-Revision-Date: 2022-12-29 22:49\n"
+"PO-Revision-Date: 2022-12-30 00:46\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -800,7 +800,7 @@ msgstr "Sənəd problemlərini düzəldin"
 
 #: Client/loader/CExePatchedStatus.cpp:170
 msgid "Use proxy loader"
-msgstr ""
+msgstr "Proksi yükləyici işlət"
 
 #: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
@@ -884,12 +884,12 @@ msgstr "Uyğunluq seçimlərini yenilə"
 
 #: Client/loader/CInstallManager.cpp:1109
 msgid "Move incompatible files"
-msgstr ""
+msgstr "Uyğun olmayan faylları daşı"
 
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr ""
+msgstr "Uyğun olmayan faylları sil"
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -1700,7 +1700,7 @@ msgstr "Dinamik piyada kölgələri"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Hərəkət bulanıqlığı"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
