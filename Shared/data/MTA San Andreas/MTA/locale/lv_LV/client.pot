@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-30 00:48+0000\n"
-"PO-Revision-Date: 2022-12-30 18:19\n"
+"PO-Revision-Date: 2022-12-30 19:19\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -116,7 +116,7 @@ msgstr "pārmaina uz iepriekšējo ieroci atrodoties transportlīdzeklī"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr "parāda informāciju par pašreizējo serveri"
+msgstr "izvada informāciju par pašreizējo serveri"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
@@ -887,12 +887,12 @@ msgstr "Atjaunot saderības uzstādījumus"
 
 #: Client/loader/CInstallManager.cpp:1109
 msgid "Move incompatible files"
-msgstr ""
+msgstr "Nesaderīgu failu pārvietošana"
 
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr ""
+msgstr "Dzēst nesaderīgus failus"
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -1699,11 +1699,11 @@ msgstr "Riepu dūmi utml"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dynamic ped shadows"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Dzēst nesaderīgus failus"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
