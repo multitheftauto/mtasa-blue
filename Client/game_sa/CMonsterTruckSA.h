@@ -19,10 +19,10 @@ class CMonsterTruckSAInterface : public CAutomobileSAInterface
     // fill this
 };
 
-class CMonsterTruckSA : public CMonsterTruck, public CAutomobileSA
+class CMonsterTruckSA final : public virtual CMonsterTruck, public virtual CAutomobileSA
 {
-private:
 public:
-    CMonsterTruckSA(CMonsterTruckSAInterface* monstertruck);
-    CMonsterTruckSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CMonsterTruckSA(CMonsterTruckSAInterface* pInterface);
+
+    CMonsterTruckSAInterface* GetMonsterTruckInterface() { return reinterpret_cast<CMonsterTruckSAInterface*>(GetInterface()); }
 };

@@ -12,11 +12,8 @@
 #include "StdInc.h"
 #include "CTrailerSA.h"
 
-CTrailerSA::CTrailerSA(CTrailerSAInterface* trailer) : CAutomobileSA(trailer)
+CTrailerSA::CTrailerSA(CTrailerSAInterface* pInterface)
 {
-    this->m_pInterface = trailer;
-}
-
-CTrailerSA::CTrailerSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CAutomobileSA(dwModelID, ucVariation, ucVariation2)
-{
+    SetInterface(pInterface);
+    Init();
 }
