@@ -23,13 +23,13 @@ extern CGameSA* pGame;
 void CFireSA::Extinguish()
 {
     DWORD dwFunction = FUNC_Extinguish;
-    DWORD dwPointer = (DWORD)this->internalInterface;
+    DWORD dwPointer = (DWORD)internalInterface;
     _asm
     {
         mov     ecx, dwPointer
         call    dwFunction
     }
-    this->internalInterface->bActive = false;
+    internalInterface->bActive = false;
 }
 
 /**
@@ -48,7 +48,7 @@ CVector* CFireSA::GetPosition()
  */
 void CFireSA::SetPosition(CVector& vecPosition)
 {
-    this->internalInterface->entityTarget = 0;
+    internalInterface->entityTarget = 0;
     MemCpyFast(&internalInterface->vecPosition, &vecPosition, sizeof(CVector));
 }
 
@@ -177,11 +177,11 @@ bool CFireSA::IsBeingExtinguished()
 
 void CFireSA::Ignite()
 {
-    this->internalInterface->bActive = true;
+    internalInterface->bActive = true;
 
-    CVector* vecPosition = this->GetPosition();
+    CVector* vecPosition = GetPosition();
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;
-    DWORD    dwThis = (DWORD)this->internalInterface;
+    DWORD    dwThis = (DWORD)internalInterface;
     _asm
     {
         mov     ecx, dwThis
@@ -190,22 +190,22 @@ void CFireSA::Ignite()
         call    dwFunc
     }
 
-    this->internalInterface->bBeingExtinguished = 0;
-    this->internalInterface->bFirstGeneration = 1;
-    this->internalInterface->nNumGenerationsAllowed = 100;
+    internalInterface->bBeingExtinguished = 0;
+    internalInterface->bFirstGeneration = 1;
+    internalInterface->nNumGenerationsAllowed = 100;
 }
 
 float CFireSA::GetStrength()
 {
-    return this->internalInterface->Strength;
+    return internalInterface->Strength;
 }
 
 void CFireSA::SetStrength(float fStrength)
 {
-    this->internalInterface->Strength = fStrength;
+    internalInterface->Strength = fStrength;
 }
 
 void CFireSA::SetNumGenerationsAllowed(char generations)
 {
-    this->internalInterface->nNumGenerationsAllowed = generations;
+    internalInterface->nNumGenerationsAllowed = generations;
 }

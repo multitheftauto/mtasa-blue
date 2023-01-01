@@ -16,7 +16,7 @@ C3DMarkersSA::C3DMarkersSA()
 {
     for (int i = 0; i < MAX_3D_MARKERS; i++)
     {
-        this->Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
+        Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
     }
 }
 

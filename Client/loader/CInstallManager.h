@@ -44,6 +44,7 @@ protected:
     SString _ProcessExePatchChecks();
     SString _ProcessServiceChecks();
     SString _ProcessAppCompatChecks();
+    SString _ProcessWinmmChecks();
     SString _ChangeFromAdmin();
     SString _InstallNewsItems();
     SString _Quit();
