@@ -54,7 +54,7 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
-    this->m_dwModelID = 0xFFFFFFFF;
+    m_dwModelID = 0xFFFFFFFF;
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;

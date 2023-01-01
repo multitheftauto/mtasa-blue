@@ -235,8 +235,8 @@ private:
 public:
     CPlayerInfoSA(CPlayerInfoSAInterface* playerInfoInterface)
     {
-        this->internalInterface = playerInfoInterface;
-        this->wanted = NULL;            // we can't init it yet, as our interface hasn't been inited yet
+        internalInterface = playerInfoInterface;
+        wanted = NULL;            // we can't init it yet, as our interface hasn't been inited yet
     }
 
     ~CPlayerInfoSA()

@@ -28,6 +28,7 @@ SExePatchedStatus GetExePatchedStatus(bool bUseExeCopy)
     status.bNvightmare = UpdatePatchStatusNvightmare(strGTAEXEPath, PATCH_CHECK) == PATCH_CHECK_RESULT_ON;
     status.bAltModules = UpdatePatchStatusAltModules(strGTAEXEPath, PATCH_CHECK) == PATCH_CHECK_RESULT_ON;
     status.bEntryPoint = UpdatePatchStatusEntryPoint(strGTAEXEPath, PATCH_CHECK) == PATCH_CHECK_RESULT_ON;
+    status.bProxyLoader = UpdatePatchStatusProxyLoader(strGTAEXEPath, PATCH_CHECK) == PATCH_CHECK_RESULT_ON;
 
     return status;
 }
@@ -48,6 +49,7 @@ SExePatchedStatus GetExePatchRequirements()
     status.bNvightmare = GetApplicationSettingInt("nvhacks", "optimus-export-enablement") ? true : false;
     status.bAltModules = GetPatchRequirementAltModules();
     status.bEntryPoint = GetPatchRequirementEntryPoint();
+    status.bProxyLoader = true;
 
     return status;
 }
@@ -71,6 +73,7 @@ bool SetExePatchedStatus(bool bUseExeCopy, const SExePatchedStatus& status)
     bReqAdmin |= UpdatePatchStatusNvightmare(strGTAEXEPath, status.bNvightmare ? PATCH_SET_ON : PATCH_SET_OFF) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusAltModules(strGTAEXEPath, status.bAltModules ? PATCH_SET_ON : PATCH_SET_OFF) == PATCH_SET_RESULT_REQ_ADMIN;
     bReqAdmin |= UpdatePatchStatusEntryPoint(strGTAEXEPath, status.bEntryPoint ? PATCH_SET_ON : PATCH_SET_OFF) == PATCH_SET_RESULT_REQ_ADMIN;
+    bReqAdmin |= UpdatePatchStatusProxyLoader(strGTAEXEPath, status.bProxyLoader ? PATCH_SET_ON : PATCH_SET_OFF) == PATCH_SET_RESULT_REQ_ADMIN;
 
     return !bReqAdmin;
 }
@@ -98,6 +101,8 @@ bool ShouldUseExeCopy()
 
     if (RequiresAltTabFix())
         strUseCopyReason += " AltTabFix";
+
+    strUseCopyReason += "ProxyLoader";
 
     // Log reason for using proxy_sa
     static SString strUseCopyReasonPrevious;
@@ -161,6 +166,8 @@ SString GetPatchExeAdminReason(bool bUseExeCopy, const SExePatchedStatus& reqSta
         return _("Fix file issues");
     if (status.bEntryPoint != reqStatus.bEntryPoint)
         return _("Fix file issues");
+    if (status.bProxyLoader != reqStatus.bProxyLoader)
+        return _("Use proxy loader");
     return _("Copy main executable to avoid graphic driver issues");
 }
 
@@ -793,4 +800,86 @@ bool GetPatchRequirementEntryPoint()
             WriteDebugEvent("PatchRequirementEntryPoint: Need to change entry point");
     }
     return bMismatch;
+}
+
+//////////////////////////////////////////////////////////
+//
+// UpdatePatchStatusProxyLoader
+//
+// Replace import library name "winmm.dll" with "mtasa.dll" to load core.dll into the game
+// without interference from a preloaded winmm.dll in the system.
+//
+//////////////////////////////////////////////////////////
+EPatchResult UpdatePatchStatusProxyLoader(const SString& strGTAEXEPath, EPatchMode mode)
+{
+    const std::string    original = "winmm.dll";
+    const std::string    replacement = "mtasa.dll";
+    const std::streamoff baseOffset = 0x4a0000;
+
+    std::fstream   file(FromUTF8(strGTAEXEPath), std::ios::in | std::ios::binary);
+    std::streamoff position = 0;
+    bool           isPatched = false;
+
+	if (file)
+    {
+        file.seekg(baseOffset);
+
+        std::vector<char> buffer(0x3000, '\0');
+        file.read(buffer.data(), buffer.size());
+
+        auto iter = std::search(buffer.begin(), buffer.end(), original.begin(), original.end(), SearchPredicate);
+
+		if (iter == buffer.end())
+        {
+            iter = std::search(buffer.begin(), buffer.end(), replacement.begin(), replacement.end(), SearchPredicate);
+
+			if (iter != buffer.end())
+            {
+				// Replacement value found.
+                position = baseOffset + std::distance(buffer.begin(), iter);
+                isPatched = true;
+			}
+		}
+        else
+        {
+			// Original value found.
+            position = baseOffset + std::distance(buffer.begin(), iter);
+		}
+
+		file.close();
+	}
+    else
+    {
+        WriteDebugEvent("ProxyLoader: Unable to open target executable file");
+	}
+
+	if (mode == PATCH_CHECK)
+    {
+        return isPatched ? PATCH_CHECK_RESULT_ON : PATCH_CHECK_RESULT_OFF;
+	}
+
+	if (!position)
+    {
+        // Neither original nor replacement were found.
+        WriteDebugEventAndReport(9807, "ProxyLoader: Unable to open target executable file");
+    }
+
+	if (!isPatched)
+    {
+        // Change needed! Can't do this to gta_sa.exe
+        assert(!strGTAEXEPath.EndsWithI("gta_sa.exe"));
+
+		file.open(FromUTF8(strGTAEXEPath), std::ios::in | std::ios::out | std::ios::binary);
+        file.seekg(position);
+        file.write(replacement.c_str(), replacement.size());
+        file.close();
+
+        if (file.fail())
+        {
+            return PATCH_SET_RESULT_REQ_ADMIN;
+        }
+	}
+
+	WriteDebugEvent("Proxy loader patch: File update completed");
+    return PATCH_SET_RESULT_OK;
 }
