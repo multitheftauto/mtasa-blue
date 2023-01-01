@@ -137,6 +137,7 @@ workspace "MTASA"
 		include "Client/gui"
 		include "Client/launch"
 		include "Client/loader"
+		include "Client/loader-proxy"
 		include "Client/multiplayer_sa"
 		include "Client/mods/deathmatch"
 
