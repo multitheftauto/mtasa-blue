@@ -155,7 +155,6 @@ public:
 
     virtual BYTE           GetVehicleType() = 0;
     virtual void           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
-    virtual BYTE           GetLevelFromPosition(CVector* vecPosition) = 0;
     virtual bool           IsLoaded() = 0;
     virtual unsigned short GetFlags() = 0;
     virtual unsigned short GetOriginalFlags() = 0;

@@ -352,7 +352,6 @@ public:
     BYTE           GetVehicleType();
     void           Request(EModelRequestType requestType, const char* szTag);
     void           Remove();
-    BYTE           GetLevelFromPosition(CVector* vecPosition);
     bool           IsLoaded();
     bool           DoIsLoaded();
     unsigned short GetFlags();
