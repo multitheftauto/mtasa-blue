@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -377,7 +379,12 @@ static curl_off_t trspeed(curl_off_t size, /* number of bytes */
 {
   if(us < 1)
     return size * 1000000;
-  return (curl_off_t)((long double)size/us * 1000000);
+  else if(size < CURL_OFF_T_MAX/1000000)
+    return (size * 1000000) / us;
+  else if(us >= 1000000)
+    return size / (us / 1000000);
+  else
+    return CURL_OFF_T_MAX;
 }
 
 /* returns TRUE if it's time to show the progress meter */

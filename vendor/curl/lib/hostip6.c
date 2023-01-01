@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -50,7 +52,6 @@
 #include "hostip.h"
 #include "hash.h"
 #include "share.h"
-#include "strerror.h"
 #include "url.h"
 #include "inet_pton.h"
 #include "connect.h"
@@ -58,34 +59,6 @@
 #include "curl_printf.h"
 #include "curl_memory.h"
 #include "memdebug.h"
-
-/*
- * Curl_ipv6works() returns TRUE if IPv6 seems to work.
- */
-bool Curl_ipv6works(struct Curl_easy *data)
-{
-  if(data) {
-    /* the nature of most system is that IPv6 status doesn't come and go
-       during a program's lifetime so we only probe the first time and then we
-       have the info kept for fast re-use */
-    DEBUGASSERT(data);
-    DEBUGASSERT(data->multi);
-    return data->multi->ipv6_works;
-  }
-  else {
-    int ipv6_works = -1;
-    /* probe to see if we have a working IPv6 stack */
-    curl_socket_t s = socket(PF_INET6, SOCK_DGRAM, 0);
-    if(s == CURL_SOCKET_BAD)
-      /* an IPv6 address was requested but we can't get/use one */
-      ipv6_works = 0;
-    else {
-      ipv6_works = 1;
-      sclose(s);
-    }
-    return (ipv6_works>0)?TRUE:FALSE;
-  }
-}
 
 /*
  * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
@@ -123,8 +96,8 @@ static void dump_addrinfo(struct connectdata *conn,
  * non-ares version).
  *
  * Returns name information about the given hostname and port number. If
- * successful, the 'addrinfo' is returned and the forth argument will point to
- * memory we need to free after use. That memory *MUST* be freed with
+ * successful, the 'addrinfo' is returned and the fourth argument will point
+ * to memory we need to free after use. That memory *MUST* be freed with
  * Curl_freeaddrinfo(), nothing else.
  */
 struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
@@ -144,7 +117,7 @@ struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
 
   *waitp = 0; /* synchronous response only */
 
-  if(Curl_ipv6works(data))
+  if((data->conn->ip_version != CURL_IPRESOLVE_V4) && Curl_ipv6works(data))
     /* The stack seems to be IPv6-enabled */
     pf = PF_UNSPEC;
 

@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CConsole.h"
+#include "Utils.h"
+#include "CLogger.h"
+#include "CAccessControlListManager.h"
+#include "CRegisteredCommands.h"
+#include "CPlayerManager.h"
+#include "CConsoleClient.h"
 
 CConsole::CConsole(CBlipManager* pBlipManager, CMapManager* pMapManager, CPlayerManager* pPlayerManager, CRegisteredCommands* pRegisteredCommands,
                    CVehicleManager* pVehicleManager, CBanManager* pBanManager, CAccessControlListManager* pACLManager)

@@ -10,7 +10,9 @@
 
 #pragma once
 
+#include <game/C3DMarker.h>
 #include "CClientMarker.h"
+
 class CClientMarker;
 
 class CClient3DMarker : public CClientMarkerCommon

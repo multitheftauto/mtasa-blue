@@ -10,6 +10,8 @@
 
 #include "StdInc.h"
 #include "CFunctionUseLogger.h"
+#include "CGame.h"
+#include "CResourceManager.h"
 
 //
 // CFunctionUseLogger::CFunctionUseLogger

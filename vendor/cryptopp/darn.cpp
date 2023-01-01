@@ -15,7 +15,7 @@
 // GCC inline assembly or the builtin will fail the compile.
 
 // Inline assembler available in GCC 3.2 or above. For practical
-// purposes we check for GCC 4.0 or above. GCC imposters claim
+// purposes we check for GCC 4.0 or above. GCC impostors claim
 // to be GCC 4.2.1 so it will capture them, too. We exclude the
 // Apple machines because they are not Power9 and use a slightly
 // different syntax in their assembler.
@@ -176,11 +176,12 @@ void DARN::GenerateBlock(byte *output, size_t size)
         size -= i;
     }
 
+    // Output is aligned
     for (i = 0; i < size/4; i++)
         DARN32(output+i*4);
 
-    output += 4;
-    size -= 4;
+    output += i*4;
+    size -= i*4;
 
     if (size)
     {

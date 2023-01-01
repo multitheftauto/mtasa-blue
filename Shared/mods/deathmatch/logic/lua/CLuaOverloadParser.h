@@ -71,8 +71,7 @@ private:
     }
 
 public:
-    typename common_variant<Ret, Ret2>::type
-    static Call(typename common_variant<Args, Args2>::type... args)
+    typename common_variant<Ret, Ret2>::type static Call(typename common_variant<Args, Args2>::type... args)
     {
         ChosenFunction choice = MakeAllChoice<0>(args...);
         if (choice == ChosenFunction::FUNCA)

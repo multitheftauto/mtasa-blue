@@ -15,7 +15,6 @@
 #include "SString.h"
 #include "WString.h"
 
-
 namespace SharedUtil
 {
     //

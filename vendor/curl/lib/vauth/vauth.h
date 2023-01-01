@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2014 - 2021, Steve Holme, <steve_holme@hotmail.com>.
+ * Copyright (C) 2014 - 2022, Steve Holme, <steve_holme@hotmail.com>.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -51,6 +53,12 @@ struct gsasldata;
 #if defined(USE_WINDOWS_SSPI)
 #define GSS_ERROR(status) ((status) & 0x80000000)
 #endif
+
+/*
+ * Curl_auth_allowed_to_host() tells if authentication, cookies or other
+ * "sensitive data" can (still) be sent to this host.
+ */
+bool Curl_auth_allowed_to_host(struct Curl_easy *data);
 
 /* This is used to build a SPN string */
 #if !defined(USE_WINDOWS_SSPI)
@@ -194,6 +202,7 @@ CURLcode Curl_auth_create_gssapi_user_message(struct Curl_easy *data,
 /* This is used to generate a base64 encoded GSSAPI (Kerberos V5) security
    token message */
 CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
+                                                  const char *authzid,
                                                   const struct bufref *chlg,
                                                   struct kerberos5data *krb5,
                                                   struct bufref *out);
@@ -218,11 +227,10 @@ CURLcode Curl_auth_decode_spnego_message(struct Curl_easy *data,
 
 /* This is used to generate a base64 encoded SPNEGO (Negotiate) response
    message */
-CURLcode Curl_auth_create_spnego_message(struct Curl_easy *data,
-                                         struct negotiatedata *nego,
+CURLcode Curl_auth_create_spnego_message(struct negotiatedata *nego,
                                          char **outptr, size_t *outlen);
 
-/* This is used to clean up the SPNEGO specifiec data */
+/* This is used to clean up the SPNEGO specific data */
 void Curl_auth_cleanup_spnego(struct negotiatedata *nego);
 
 #endif /* USE_SPNEGO */

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CExplosionSyncPacket.h"
+#include "CPlayer.h"
+#include <net/SyncStructures.h>
 
 CExplosionSyncPacket::CExplosionSyncPacket()
 {

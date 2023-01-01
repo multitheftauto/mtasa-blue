@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaVector3Defs.h"
 #include "lua/CLuaFunctionParser.h"
+#include "lua/LuaCommon.h"
+#include "lua/CLuaShared.h"
+#include "CScriptArgReader.h"
 
 void CLuaVector3Defs::AddClass(lua_State* luaVM)
 {
@@ -61,7 +65,6 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "cross", "", Cross);
     lua_classfunction(luaVM, "dot", "", Dot);
     lua_classfunction(luaVM, "intersectsSegmentTriangle", "", ArgumentParser<IntersectsSegmentTriangle>);
-
 
     lua_classfunction(luaVM, "getLength", "", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", "", GetLengthSquared);
@@ -485,8 +488,7 @@ int CLuaVector3Defs::GetZ(lua_State* luaVM)
     return 1;
 }
 
-std::variant<CVector, bool> CLuaVector3Defs::IntersectsSegmentTriangle(
-    CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2)
+std::variant<CVector, bool> CLuaVector3Defs::IntersectsSegmentTriangle(CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2)
 {
     CVector intersectionPoint;
     if (origin.IntersectsSegmentTriangle(segmentDir, triVert0, triVert1, triVert2, &intersectionPoint))

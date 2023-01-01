@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #pragma once
+
 #include "CLuaDefs.h"
 #include "CSpatialDatabase.h"
 
@@ -45,8 +46,8 @@ public:
     LUA_DECLARE(getElementsByType);
     LUA_DECLARE(getElementInterior);
     LUA_DECLARE(getElementsWithinColShape);
-    static CElementResult getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type,
-        std::optional<unsigned short> interior, std::optional<unsigned short> dimension);
+    static CElementResult getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
+                                                 std::optional<unsigned short> dimension);
     LUA_DECLARE(getElementDimension);
     LUA_DECLARE(getElementZoneName);
     LUA_DECLARE(getElementColShape);
