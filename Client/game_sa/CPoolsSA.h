@@ -94,7 +94,7 @@ public:
     void                      DeleteAllObjects();
 
     // Peds pool
-    CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);
+    CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
 
 private:

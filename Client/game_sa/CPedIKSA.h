@@ -71,9 +71,9 @@ public:
     CPedIKSA(CPedIKSAInterface* ikInterface) { internalInterface = ikInterface; };
 
     // r*'s functions
-    void SetFlag(DWORD flag) { this->internalInterface->m_flags |= flag; }
-    void ClearFlag(DWORD flag) { this->internalInterface->m_flags &= ~flag; }
-    bool IsFlagSet(DWORD flag) { return ((this->internalInterface->m_flags & flag) > 0 ? 1 : 0); }
+    void SetFlag(DWORD flag) { internalInterface->m_flags |= flag; }
+    void ClearFlag(DWORD flag) { internalInterface->m_flags &= ~flag; }
+    bool IsFlagSet(DWORD flag) { return ((internalInterface->m_flags & flag) > 0 ? 1 : 0); }
 
     void RotateTorso(void* bone, LimbOrientation* orientation, bool flag);
 };

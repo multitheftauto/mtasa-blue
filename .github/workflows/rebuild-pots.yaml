@@ -65,19 +65,17 @@ jobs:
             git commit -m "Update installer en_US pot"
           fi
 
-          echo "::echo::on"
-
           # Check for local commits
           if [[ $(git diff --name-only "@{upstream}..") ]]
           then
-            echo "::set-output name=has_changes::true"
+            echo "has_changes=true" >> $GITHUB_ENV
           else
-            echo "::set-output name=has_changes::false"
+            echo "has_changes=false" >> $GITHUB_ENV
           fi
 
           # Get rid of all other changes
           git checkout -- .
           git clean -fd
-      - if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+      - if: ${{ env.has_changes == 'true' }}
         name: Push changes
         run: git push

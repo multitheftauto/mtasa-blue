@@ -77,6 +77,6 @@ public:
     float    GetPulseFraction();
     void     Disable();
     void     Reset();
-    void     SetActive() { this->internalInterface->m_bIsUsed = true; };
-    RpClump* GetRwObject() { return this->internalInterface->m_pRwObject; }
+    void     SetActive() { internalInterface->m_bIsUsed = true; }
+    RpClump* GetRwObject() { return internalInterface->m_pRwObject; }
 };
