@@ -8,7 +8,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaTrainTrackDefs.h"
 #include <lua/CLuaFunctionParser.h>
+
+#ifndef MTA_CLIENT
+    #include "CTrainTrackManager.h"
+    #include "CGame.h"
+#endif
 
 void CLuaTrainTrackDefs::LoadFunctions()
 {

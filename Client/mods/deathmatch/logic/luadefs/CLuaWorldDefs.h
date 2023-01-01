@@ -116,4 +116,8 @@ public:
     static bool ResetColorFilter();
     static bool SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha, uchar ucPass1Red, uchar ucPass1Green,
                                uchar ucPass1Blue, uchar ucPass1Alpha);
+                               
+    static bool SetCoronaReflectionsEnabled(uchar ucEnabled);
+    static uchar GetCoronaReflectionsEnabled();
+    static bool ResetCoronaReflectionsEnabled();
 };

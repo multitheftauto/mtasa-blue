@@ -8,6 +8,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CRenderWare.h>
 
 ////////////////////////////////////////////////////////////////
 //

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CConsoleEchoPacket.h"
 
 bool CConsoleEchoPacket::Write(NetBitStreamInterface& BitStream) const
 {

@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClientVectorGraphic.h"
 
 ////////////////////////////////////////////////////////////////
 //
@@ -27,6 +28,7 @@ CClientRenderElementManager::CClientRenderElementManager(CClientManager* pClient
     m_uiStatsRenderTargetCount = 0;
     m_uiStatsScreenSourceCount = 0;
     m_uiStatsWebBrowserCount = 0;
+    m_uiStatsVectorGraphicCount = 0;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -245,6 +247,33 @@ CClientWebBrowser* CClientRenderElementManager::CreateWebBrowser(uint uiSizeX, u
 
 ////////////////////////////////////////////////////////////////
 //
+// CClientRenderElementManager::CreateVectorGraphic
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CClientVectorGraphic* CClientRenderElementManager::CreateVectorGraphic(uint width, uint height)
+{
+    // Create the item
+    CVectorGraphicItem* pVectorGraphicItem = m_pRenderItemManager->CreateVectorGraphic(width, height);
+
+    // Check create worked
+    if (!pVectorGraphicItem)
+        return nullptr;
+
+    // Create the element
+    CClientVectorGraphic* pVectorGraphicElement = new CClientVectorGraphic(m_pClientManager, INVALID_ELEMENT_ID, pVectorGraphicItem);
+
+    // Add to this manager's list
+    MapSet(m_ItemElementMap, pVectorGraphicElement->GetRenderItem(), pVectorGraphicElement);
+
+    m_uiStatsVectorGraphicCount++;
+
+    return pVectorGraphicElement;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CClientRenderElementManager::FindAutoTexture
 //
 // Find texture by unique name. Create if not found.
@@ -311,6 +340,8 @@ void CClientRenderElementManager::Remove(CClientRenderElement* pElement)
         m_uiStatsScreenSourceCount--;
     else if (pElement->IsA(CClientWebBrowser::GetClassId()))
         m_uiStatsWebBrowserCount--;
+    else if (pElement->IsA(CClientVectorGraphic::GetClassId()))
+        m_uiStatsVectorGraphicCount--;
     else if (pElement->IsA(CClientTexture::GetClassId()))
         m_uiStatsTextureCount--;
 

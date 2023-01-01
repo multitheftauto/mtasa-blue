@@ -9,9 +9,14 @@
  *****************************************************************************/
 
 #pragma once
+
 #include "CCommon.h"
 #include "CCustomWeaponManager.h"
 #include "CWeaponStat.h"
+#include "CObject.h"
+#include "CPed.h"
+
+class CCustomWeaponManager;
 
 struct SLineOfSightFlags
 {

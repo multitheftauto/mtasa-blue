@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CSettings.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
@@ -21,7 +22,6 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
-#include "CDiscordManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -46,7 +46,7 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     return Win32LoadLibraryA("d3d8.dll");
 }
 
-CCore::CCore() : m_DiscordManager(new CDiscordManager())
+CCore::CCore()
 {
     // Initialize the global pointer
     g_pCore = this;
@@ -67,9 +67,6 @@ CCore::CCore() : m_DiscordManager(new CDiscordManager())
     CreateXML();
     ApplyCoreInitSettings();
     g_pLocalization = new CLocalization;
-
-    // Initialize discord manager
-    m_DiscordManager->Initialize();
 
     // Create a logger instance.
     m_pConsoleLogger = new CConsoleLogger();
@@ -507,6 +504,47 @@ bool CCore::IsChatInputEnabled()
     return false;
 }
 
+bool CCore::SetChatboxCharacterLimit(int charLimit)
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return false;
+
+    pChat->SetCharacterLimit(charLimit);
+    return true;
+}
+
+void CCore::ResetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return;
+
+    pChat->SetCharacterLimit(pChat->GetDefaultCharacterLimit());
+}
+
+int CCore::GetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetCharacterLimit();
+}
+
+int CCore::GetChatboxMaxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetMaxCharacterLimit();
+}
+
 bool CCore::IsSettingsVisible()
 {
     if (m_pLocalGUI)
@@ -577,8 +615,12 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
-    pGameSettings->ResetVehiclesLODDistance(false);
-    pGameSettings->ResetPedsLODDistance(false);
+    pGameSettings->ResetBlurEnabled();
+    pGameSettings->ResetVehiclesLODDistance();
+    pGameSettings->ResetPedsLODDistance();
+    pGameSettings->ResetCoronaReflectionsEnabled();
+    CVARS_GET("dynamic_ped_shadows", bVal);
+    pGameSettings->SetDynamicPedShadowsEnabled(bVal);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -589,11 +631,6 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
-
-    if (bConnected)
-        m_DiscordManager->RegisterPlay(true);
-    else
-        ResetDiscordRichPresence();
 }
 
 bool CCore::IsConnected()
@@ -790,7 +827,6 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
-            CCore::GetSingleton().ResetDiscordRichPresence();
         }
     }
 }
@@ -1155,9 +1191,6 @@ void CCore::DoPostFramePulse()
         ApplyGameSettings();
 
         m_pGUI->SelectInputHandlers(INPUT_CORE);
-
-        // Change the main thread affinity to first core
-        SetThreadAffinityMask(GetCurrentThread(), 0x1);
     }
 
     if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
@@ -1288,6 +1321,9 @@ void CCore::OnModUnload()
 
     // Destroy tray icon
     m_pTrayIcon->DestroyTrayIcon();
+
+    // Reset chatbox character limit
+    ResetChatboxCharacterLimit();
 }
 
 void CCore::RegisterCommands()
@@ -1329,6 +1365,8 @@ void CCore::RegisterCommands()
     m_pCommands->Add("showframegraph", _("shows the frame timing graph"), CCommandFuncs::ShowFrameGraph);
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
+
+    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
 }
 
 void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)
@@ -1429,7 +1467,22 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
     }
 
     const char* szCmdLine = GetCommandLine();
-    char        szCmdLineCopy[512];
+
+    // Skip the leading game executable path (starts and ends with a quotation mark).
+    if (szCmdLine[0] == '"')
+    {
+        if (const char* afterPath = strchr(szCmdLine + 1, '"'); afterPath != nullptr)
+        {
+            ++afterPath;
+
+            while (*afterPath && isspace(*afterPath))
+                ++afterPath;
+
+            szCmdLine = afterPath;
+        }
+    }
+    
+    char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 
     char*       pCmdLineEnd = szCmdLineCopy + strlen(szCmdLineCopy);
@@ -1691,6 +1744,21 @@ void CCore::ApplyCoreInitSettings()
         SetProcessDPIAware();
     }
 #endif
+
+    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
+    {
+        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
+        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+        std::string currentSkinName;
+        CVARS_GET("current_skin", currentSkinName);
+
+        if (currentSkinName == "Default")
+        {
+            CVARS_SET("current_skin", "Default 2023");
+        }
+
+        SetApplicationSettingInt("reset-settings-revision", 21486);
+    }
 }
 
 //
@@ -1991,28 +2059,6 @@ uint CCore::GetMaxStreamingMemory()
 {
     CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
-}
-
-//
-// ResetDiscordRichPresence
-//
-void CCore::ResetDiscordRichPresence()
-{
-    time_t currentTime;
-    time(&currentTime);
-
-    // Set default parameters
-    SDiscordActivity activity;
-    activity.m_details = "In Main Menu";
-    activity.m_startTimestamp = currentTime;
-
-    m_DiscordManager->UpdateActivity(activity, [](EDiscordRes res) {
-        if (res == DiscordRes_Ok)
-            WriteDebugEvent("[DISCORD]: Rich presence default parameters reset.");
-        else
-            WriteErrorEvent("[DISCORD]: Unable to reset rich presence default parameters.");
-    });
-    m_DiscordManager->RegisterPlay(false);
 }
 
 //

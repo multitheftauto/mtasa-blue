@@ -165,7 +165,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pVersion = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
     m_pVersion->LoadFromFile(CORE_MTA_VERSION);
     m_pVersion->SetParent(m_pCanvas);
-    m_pVersion->SetPosition(CVector2D(0.845f, 0.528f), true);
+    m_pVersion->SetPosition(CVector2D(0.855f, 0.512f), true);
     m_pVersion->SetSize(CVector2D((32 / NATIVE_RES_X) * m_iMenuSizeX, (32 / NATIVE_RES_Y) * m_iMenuSizeY), false);
     m_pVersion->SetProperty("InheritsAlpha", "False");
 
@@ -209,8 +209,8 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pMenuArea->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnMenuEnter, this));
     m_pMenuArea->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnMenuExit, this));
 
-    float fDrawSizeX = (365 / NATIVE_RES_X) * m_iMenuSizeX;            // Right aligned
-    float fDrawSizeY = (52 / NATIVE_RES_Y) * m_iMenuSizeY;
+    float fDrawSizeX = (335 / NATIVE_RES_X) * m_iMenuSizeX;            // Right aligned
+    float fDrawSizeY = (53 / NATIVE_RES_Y) * m_iMenuSizeY;
     float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;
     float fDrawPosY = 0.60f * m_iMenuSizeY;
     m_pLatestNews = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
@@ -450,13 +450,6 @@ void CMainMenu::Update()
 
     if (m_bIsFullyVisible)
     {
-        static bool versionUpdaterChecked = false;
-        if (!versionUpdaterChecked)
-        {
-            versionUpdaterChecked = true;
-            GetVersionUpdater()->OnMainMenuFullyVisible();
-        }
-
         // Grab our cursor position
         tagPOINT cursor;
         GetCursorPos(&cursor);

@@ -10,15 +10,16 @@
  *****************************************************************************/
 
 #pragma once
-
-#include "Common.h"
-#include "RenderWare.h"
+#include <array>
 #include <CVector.h>
+#include "CAnimBlock.h"
+#include "Common.h"
 
-#include <windows.h>
-#include "CColModel.h"
-#include "CColStore.h"
+class CBaseModelInfoSAInterface;
+class CColModel;
 class CPedModelInfo;
+struct RpClump;
+struct RwObject;
 
 class CBoundingBox
 {
@@ -137,25 +138,25 @@ public:
     virtual eModelInfoType GetModelType() = 0;
     virtual DWORD          GetModel() = 0;
     virtual bool           IsPlayerModel() = 0;
-    virtual BOOL           IsBoat() = 0;
-    virtual BOOL           IsCar() = 0;
-    virtual BOOL           IsTrain() = 0;
-    virtual BOOL           IsHeli() = 0;
-    virtual BOOL           IsPlane() = 0;
-    virtual BOOL           IsBike() = 0;
-    virtual BOOL           IsFakePlane() = 0;
-    virtual BOOL           IsMonsterTruck() = 0;
-    virtual BOOL           IsQuadBike() = 0;
-    virtual BOOL           IsBmx() = 0;
-    virtual BOOL           IsTrailer() = 0;
+    virtual bool           IsBoat() = 0;
+    virtual bool           IsCar() = 0;
+    virtual bool           IsTrain() = 0;
+    virtual bool           IsHeli() = 0;
+    virtual bool           IsPlane() = 0;
+    virtual bool           IsBike() = 0;
+    virtual bool           IsFakePlane() = 0;
+    virtual bool           IsMonsterTruck() = 0;
+    virtual bool           IsQuadBike() = 0;
+    virtual bool           IsBmx() = 0;
+    virtual bool           IsTrailer() = 0;
     virtual bool           IsVehicle() const = 0;
 
     virtual char* GetNameIfVehicle() = 0;
 
     virtual BYTE           GetVehicleType() = 0;
-    virtual VOID           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
+    virtual void           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual BYTE           GetLevelFromPosition(CVector* vecPosition) = 0;
-    virtual BOOL           IsLoaded() = 0;
+    virtual bool           IsLoaded() = 0;
     virtual unsigned short GetFlags() = 0;
     virtual unsigned short GetOriginalFlags() = 0;
     virtual void           SetFlags(unsigned short usFlags) = 0;
@@ -181,7 +182,7 @@ public:
 
     virtual float GetDistanceFromCentreOfMassToBaseOfModel() = 0;
 
-    virtual void SetAlphaTransparencyEnabled(BOOL bEnabled) = 0;
+    virtual void SetAlphaTransparencyEnabled(bool bEnabled) = 0;
     virtual bool IsAlphaTransparencyEnabled() = 0;
     virtual void ResetAlphaTransparency() = 0;
 
@@ -213,7 +214,7 @@ public:
     virtual void SetVoice(const char* szVoiceType, const char* szVoice) = 0;
 
     // Custom collision related functions
-    virtual void SetCustomModel(RpClump* pClump) = 0;
+    virtual bool SetCustomModel(RpClump* pClump) = 0;
     virtual void RestoreOriginalModel() = 0;
     virtual void SetColModel(CColModel* pColModel) = 0;
     virtual void RestoreColModel() = 0;
@@ -230,6 +231,7 @@ public:
     virtual void      MakePedModel(char* szTexture) = 0;
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
+    virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;
