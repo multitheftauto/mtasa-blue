@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-02 11:39+0000\n"
-"PO-Revision-Date: 2023-01-02 16:13\n"
+"PO-Revision-Date: 2023-01-02 17:14\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -811,7 +811,7 @@ msgstr "Résoudre les problème de fichiers"
 
 #: Client/loader/CExePatchedStatus.cpp:170
 msgid "Use proxy loader"
-msgstr ""
+msgstr "Utiliser le chargeur alternatif"
 
 #: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
