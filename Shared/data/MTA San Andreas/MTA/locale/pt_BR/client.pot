@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-02 11:39+0000\n"
-"PO-Revision-Date: 2023-01-02 12:20\n"
+"PO-Revision-Date: 2023-01-02 18:34\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -735,14 +735,18 @@ msgstr "O executável do GTA:SA apresenta uma assinatura diferente, portanto pod
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "O arquivo de dados %s está faltando. Possível atividade vírus.\n\n"
+"Considere reinstalar o Multi Theft Auto para sua segurança.\n"
+"Consulte a ajuda online se o MTA não funcionar corretamente."
 
 #: Client/loader/MainFunctions.cpp:863
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "O arquivo de dados %s foi modificado. Possível atividade vírus.\n\n"
+"Considere reinstalar o Multi Theft Auto para sua segurança.\n"
+"Consulte a ajuda online se o MTA não funcionar corretamente."
 
 #: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
