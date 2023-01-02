@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-02 11:39+0000\n"
-"PO-Revision-Date: 2023-01-02 12:19\n"
+"PO-Revision-Date: 2023-01-02 16:13\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -735,14 +735,18 @@ msgstr "Le fichier principal n'est pas signé, et pourrait être infecté.\n\n"
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Le fichier %s est manquant. Activité d'un virus possible.\n\n"
+"Envisagez de réinstaller Multi Theft Auto pour votre sécurité.\n"
+"Consultez l'aide en ligne si MTA ne fonctionne pas correctement."
 
 #: Client/loader/MainFunctions.cpp:863
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Le fichier %s est modifié. Activité d'un virus possible.\n\n"
+"Envisagez de réinstaller Multi Theft Auto pour votre sécurité.\n"
+"Consultez l'aide en ligne si MTA ne fonctionne pas correctement."
 
 #: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -896,7 +900,7 @@ msgstr "Déplacer les fichiers incompatibles"
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr ""
+msgstr "Supprimer les fichiers incompatibles"
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -1046,7 +1050,7 @@ msgstr "MTA: San Andreas - Avertissement"
 
 #: Client/loader/Dialogs.cpp:159
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Votre répertoire d'installation de GTA: San Andreas contient les fichiers suivants:"
+msgstr "Votre répertoire d'installation de Grand Theft Auto: San Andreas contient les fichiers suivants :"
 
 #: Client/loader/Dialogs.cpp:161
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
@@ -1060,11 +1064,11 @@ msgstr "Garder ces fichiers, mais afficher cet avertissement au prochain lanceme
 
 #: Client/loader/Dialogs.cpp:164
 msgid "Do not remind me about these files again"
-msgstr "Ne plus m'avertir à propos de ces fichiers"
+msgstr "Ne plus m'avertir à propos de ces fichiers à l'avenir"
 
 #: Client/loader/Dialogs.cpp:165
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Renommer ces fichiers en *.dll.bak"
+msgstr "Remomer ces fichiers de *.dll en *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:166
 msgid "Show me these files"
@@ -1703,7 +1707,7 @@ msgstr "Fumée des pneus, etc"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr "Ombrage dynamique des piétons"
+msgstr "Ombres dynamiques des piétons"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
@@ -1731,7 +1735,7 @@ msgstr "Toujours afficher les personnages en haute qualité"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr "Réflexions auréolées de la pluie"
+msgstr "Reflets de pluie des Corona"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
