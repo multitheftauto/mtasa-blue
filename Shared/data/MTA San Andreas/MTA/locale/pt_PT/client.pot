@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-02 11:39+0000\n"
-"PO-Revision-Date: 2023-01-02 12:20\n"
+"PO-Revision-Date: 2023-01-02 19:34\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -735,14 +735,18 @@ msgstr "O ficheiro principal não está assinado. Possível atividade de vírus.
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "O ficheiro de dados %s está faltando. Possível atividade de vírus.\n\n"
+"Considere reinstalar o Multi Theft Auto para a sua segurança.\n"
+"Consulte a ajuda online se o MTA não funcionar corretamente."
 
 #: Client/loader/MainFunctions.cpp:863
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "O ficheiro de dados %s está modificado. Possível atividade de vírus.\n\n"
+"Considere reinstalar o Multi Theft Auto para a sua segurança.\n"
+"Consulte a ajuda online se o MTA não funcionar corretamente."
 
 #: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -807,7 +811,7 @@ msgstr "Corrigir problemas de ficheiro"
 
 #: Client/loader/CExePatchedStatus.cpp:170
 msgid "Use proxy loader"
-msgstr ""
+msgstr "Utilizar o proxy loader"
 
 #: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
@@ -896,7 +900,7 @@ msgstr "Mover ficheiros incompatíveis"
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr ""
+msgstr "Deletar arquivos incompatíveis"
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
