@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 00:48+0000\n"
-"PO-Revision-Date: 2022-12-30 01:43\n"
+"POT-Creation-Date: 2023-01-02 11:39+0000\n"
+"PO-Revision-Date: 2023-01-02 12:20\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -680,7 +680,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Časť GTA: San Andreas je už spustená. Je potrebné ju pred štartom MTA:SA ukončiť. Chceš to urobiť teraz?"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -738,49 +738,57 @@ msgid "Main file is unsigned. Possible virus activity.\n\n"
 msgstr "Hlavný súbor je neupravený. Možná aktivita vírusu.\n\n"
 "Ak MTA nefunguje správne, pozrite si online pomoc."
 
-#: Client/loader/MainFunctions.cpp:850
-msgid "Data files modified. Possible virus activity.\n\n"
+#: Client/loader/MainFunctions.cpp:852
+#, c-format
+msgid "Data file %s is missing. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "Dátové súbory upravené. Možná aktivita vírusu.\n\n"
-"Ak MTA nefunguje správne, pozrite si online pomoc."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:862
+#: Client/loader/MainFunctions.cpp:863
+#, c-format
+msgid "Data file %s is modified. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "Súbory .asi sú v inštalačnom adresári 'MTA:SA' alebo 'GTA: San Andreas'.\n\n"
 "Ak máte problémy s MTA:SA, odstráňte tieto súbory typu .asi."
 
-#: Client/loader/MainFunctions.cpp:967
+#: Client/loader/MainFunctions.cpp:982
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Chyba nesúladu verzie súboru. Ak sa vyskytnú problémy, preinštalujte MTA:SA.\n"
 
-#: Client/loader/MainFunctions.cpp:976
+#: Client/loader/MainFunctions.cpp:991
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Niektoré súbory chýbajú. Ak sa vyskytnú problémy, preinštalujte MTA:SA.\n"
 
-#: Client/loader/MainFunctions.cpp:988
+#: Client/loader/MainFunctions.cpp:1003
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA nie je kompatibilný s „Núdzovým režimom“ systému Windows.\n\n"
 "Reštartujte počítač.\n"
 
-#: Client/loader/MainFunctions.cpp:1074
+#: Client/loader/MainFunctions.cpp:1089
 msgid "Fix configuration issue"
 msgstr "Opravte problém s konfiguráciou"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1112
+#: Client/loader/MainFunctions.cpp:1127
 msgid "Fix elevation required error"
 msgstr "Opravte vyžadovanú chybu"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1134
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Nemožno spustiť Grand Theft Auto: San Andreas. Skús prosím reštart, alebo ak problém pretrváva, kontaktuj MTA na www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas sa možno nespustilo správne. Chceš ho ukončiť?"
 
