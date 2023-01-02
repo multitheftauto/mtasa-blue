@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 00:48+0000\n"
-"PO-Revision-Date: 2022-12-30 01:43\n"
+"POT-Creation-Date: 2023-01-02 11:39+0000\n"
+"PO-Revision-Date: 2023-01-02 12:20\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -672,7 +672,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Há um processo do GTA: San Andreas em execução. Ele precisa ser encerrado para que o MTA:SA seja iniciado. Você deseja fazer isso agora?"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -730,49 +730,57 @@ msgid "Main file is unsigned. Possible virus activity.\n\n"
 msgstr "O executável do GTA:SA apresenta uma assinatura diferente, portanto pode conter um vírus.\n\n"
 "Se o MTA não funcionar corretamente, procure por ajuda online."
 
-#: Client/loader/MainFunctions.cpp:850
-msgid "Data files modified. Possible virus activity.\n\n"
+#: Client/loader/MainFunctions.cpp:852
+#, c-format
+msgid "Data file %s is missing. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "Alguns arquivos do GTA:SA foram alterados, portanto podem conter um vírus.\n\n"
-"Se o MTA não funcionar corretamente, procure por ajuda online."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:862
+#: Client/loader/MainFunctions.cpp:863
+#, c-format
+msgid "Data file %s is modified. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "Arquivos \".asi foram encontrados no diretório do MTA ou GTA:SA.\n\n"
 "Se o MTA não funcionar corretamente, é recomendado removê-los."
 
-#: Client/loader/MainFunctions.cpp:967
+#: Client/loader/MainFunctions.cpp:982
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Há arquivos incompatíveis com os desta versão. Se ocorrer problemas reinstale o MTA:SA.\n"
 
-#: Client/loader/MainFunctions.cpp:976
+#: Client/loader/MainFunctions.cpp:991
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Alguns arquivos estão faltando. Reinstale o MTA:SA se acontecer algum problema.\n"
 
-#: Client/loader/MainFunctions.cpp:988
+#: Client/loader/MainFunctions.cpp:1003
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "O MTA:SA não é compatível com o 'Modo Seguro' do Windows.\n\n"
 "Por favor, reinicie o seu computador.\n"
 
-#: Client/loader/MainFunctions.cpp:1074
+#: Client/loader/MainFunctions.cpp:1089
 msgid "Fix configuration issue"
 msgstr "Corrigir problema de configuração"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1112
+#: Client/loader/MainFunctions.cpp:1127
 msgid "Fix elevation required error"
 msgstr "Corrigir erro de elevação necessária"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1134
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Não foi possível iniciar o GTA: San Andreas.  Por favor reinicie seu computador, mas se o problema persistir, entre em contato em www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas pode não ter sido iniciado corretamente. Você deseja encerrá-lo?"
 
