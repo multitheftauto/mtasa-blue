@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 00:48+0000\n"
-"PO-Revision-Date: 2022-12-30 01:43\n"
+"POT-Creation-Date: 2023-01-02 11:39+0000\n"
+"PO-Revision-Date: 2023-01-02 12:20\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -672,7 +672,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Уште една копија од GTA: San Andreas е веќе вклучена и треба да се исклучи пред MTA:SA да биде стартувана.Дали сакате тоа да го направите сега?"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -730,49 +730,57 @@ msgid "Main file is unsigned. Possible virus activity.\n\n"
 msgstr "Главниот фајл е непотпишан. Можни вирусни активности.\n\n"
 "Побарајте онлјан помош доколку MTA не работи како што треба."
 
-#: Client/loader/MainFunctions.cpp:850
-msgid "Data files modified. Possible virus activity.\n\n"
+#: Client/loader/MainFunctions.cpp:852
+#, c-format
+msgid "Data file %s is missing. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "Дата фајловите се модифицрани.Можни вирусни активности.\n\n"
-"Побарајте онлјан помош доколку MTA не работи како што треба."
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:862
+#: Client/loader/MainFunctions.cpp:863
+#, c-format
+msgid "Data file %s is modified. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ".asi фајловите се лоцирани во инсталационот фолдер во 'MTA:SA' или 'GTA: San Andreas'.\n\n"
 "Избришете ги тие фајлови ако имате проблеми со MTA:SA"
 
-#: Client/loader/MainFunctions.cpp:967
+#: Client/loader/MainFunctions.cpp:982
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Грешка во фајловите на верзијата. Реинсталирајте ја MTA:SA доколку имате проблеми.\n"
 
-#: Client/loader/MainFunctions.cpp:976
+#: Client/loader/MainFunctions.cpp:991
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Некои фајлови се недостапни.Преинсталирајте ја MTA:SA доколку имате некој проблем.\n"
 
-#: Client/loader/MainFunctions.cpp:988
+#: Client/loader/MainFunctions.cpp:1003
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA не е компатибилен со Windows 'Safe Mode'.\n\n"
 "Ве молиме рестартирајте го компјутерот.\n"
 
-#: Client/loader/MainFunctions.cpp:1074
+#: Client/loader/MainFunctions.cpp:1089
 msgid "Fix configuration issue"
 msgstr "Поправете го проблемот со конфигурацијата"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1112
+#: Client/loader/MainFunctions.cpp:1127
 msgid "Fix elevation required error"
 msgstr "Поправете ја грешката"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1134
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Grand Theft Auto: San Andreas не може да се стартува.  Рестартирајте, или ако проблемот продолжи, контактирајте ги MTA на www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas не е вклучена коректно. Дали сакате да ја исклучите?"
 
