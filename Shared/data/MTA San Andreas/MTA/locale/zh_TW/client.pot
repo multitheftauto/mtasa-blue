@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 00:48+0000\n"
-"PO-Revision-Date: 2022-12-30 01:42\n"
+"POT-Creation-Date: 2023-01-02 11:39+0000\n"
+"PO-Revision-Date: 2023-01-02 12:19\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -668,7 +668,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "另一個GTA:SA正在運行，啟動MTA:SA前需要先終止它。你想要現在這麼做嗎?"
 
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -726,49 +726,57 @@ msgid "Main file is unsigned. Possible virus activity.\n\n"
 msgstr "主要文件是無符號。可能的病毒活動.\n\n"
 "請查看線上幫助，如果MTA不能正常工作。"
 
-#: Client/loader/MainFunctions.cpp:850
-msgid "Data files modified. Possible virus activity.\n\n"
+#: Client/loader/MainFunctions.cpp:852
+#, c-format
+msgid "Data file %s is missing. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "數據文件的修改。可能的病毒活動。\n\n"
-"請查看線上幫助，如果MTA不能正常工作。"
+msgstr ""
 
-#: Client/loader/MainFunctions.cpp:862
+#: Client/loader/MainFunctions.cpp:863
+#, c-format
+msgid "Data file %s is modified. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ".asi 檔是在 'MTA:SA' 或 ' GTA: San Andreas 安裝目錄。\n\n"
 "如果使用 MTA:SA 遇到了問題，請刪除這些.asi 檔。"
 
-#: Client/loader/MainFunctions.cpp:967
+#: Client/loader/MainFunctions.cpp:982
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "檔版本不匹配錯誤。如果您遇到問題，請重新安裝 MTA:SA。\n"
 
-#: Client/loader/MainFunctions.cpp:976
+#: Client/loader/MainFunctions.cpp:991
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "某些檔是缺掉的。如果您遇到問題，請重新安裝 MTA:SA。\n"
 
-#: Client/loader/MainFunctions.cpp:988
+#: Client/loader/MainFunctions.cpp:1003
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA無法在安全模式下執行。\n\n"
 "請重新啟動您的電腦。\n"
 
-#: Client/loader/MainFunctions.cpp:1074
+#: Client/loader/MainFunctions.cpp:1089
 msgid "Fix configuration issue"
 msgstr "修復設置問題"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1112
+#: Client/loader/MainFunctions.cpp:1127
 msgid "Fix elevation required error"
 msgstr "修復權限需求錯誤"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1134
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "無法啟動 GTA:SA，請嘗試重新啟動。若問題依然存在，請聯絡MTA網址 www.multitheftauto.com。\n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1174
+#: Client/loader/MainFunctions.cpp:1189
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas 可能沒有正確地啟動。你想要現在終止它嗎?"
 
