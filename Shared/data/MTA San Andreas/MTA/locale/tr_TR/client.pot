@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-02 11:39+0000\n"
-"PO-Revision-Date: 2023-01-02 12:19\n"
+"POT-Creation-Date: 2023-01-05 16:57+0000\n"
+"PO-Revision-Date: 2023-01-05 17:06\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -1308,12 +1308,12 @@ msgid "Some MTA:SA data files are missing.\n\n\n"
 msgstr "Bazı MTA:SA dosyaları bulunamıyor.\n\n\n"
 "Lütfen MTA:SA'yı tekrar yükleyin."
 
-#: Client/core/CVersionUpdater.cpp:2722
+#: Client/core/CVersionUpdater.cpp:2737
 #, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% tamamlandı"
 
-#: Client/core/CVersionUpdater.cpp:2724
+#: Client/core/CVersionUpdater.cpp:2739
 #, c-format
 msgid "\n\n"
 "Waiting for response  -  %-3d"
