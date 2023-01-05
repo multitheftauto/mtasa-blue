@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-02 11:39+0000\n"
+"POT-Creation-Date: 2023-01-05 16:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1362,12 +1362,12 @@ msgid ""
 "Please reinstall MTA:SA"
 msgstr ""
 
-#: Client/core/CVersionUpdater.cpp:2722
+#: Client/core/CVersionUpdater.cpp:2737
 #, c-format
 msgid "%3d %% completed"
 msgstr ""
 
-#: Client/core/CVersionUpdater.cpp:2724
+#: Client/core/CVersionUpdater.cpp:2739
 #, c-format
 msgid ""
 "\n"
