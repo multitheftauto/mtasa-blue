@@ -2299,6 +2299,21 @@ void CVersionUpdater::_ProcessPatchFileQuery()
 
     // Indicate what the server wants us to do
     m_ConditionMap.SetCondition("ProcessResponse", m_JobInfo.strStatus);
+
+    // Report update response
+    if (!m_JobInfo.strStatus.empty() && m_JobInfo.strStatus != "noupdate")
+    {
+        unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+        unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+        SString        playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
+                                     MTASA_VERSION_BUILD, netRev, netRel);
+        SString        updateBuildType;
+        CVARS_GET("update_build_type", updateBuildType);
+
+        AddReportLog(5060, SString("Processing patch file '%s' [%s, %s] with '%s' (version: %s, channel: %s)", m_JobInfo.strFilename.c_str(),
+                                   m_JobInfo.iFilesize.ToString().c_str(), m_JobInfo.strMD5.c_str(), m_JobInfo.strStatus.c_str(), playerVersion.c_str(),
+                                   updateBuildType.c_str()));
+    }
 }
 
 ///////////////////////////////////////////////////////////////
