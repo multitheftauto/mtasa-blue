@@ -60,7 +60,6 @@ CModelInfoSA::CModelInfoSA()
     m_pOriginalColModelInterface = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
-    m_bAddedRefForCollision = false;
 }
 
 CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
@@ -391,36 +390,15 @@ void CModelInfoSA::Remove()
 
     m_pInterface = ppModelInfo[m_dwModelID];
 
-    // Remove ref added for collision
-    if (m_bAddedRefForCollision)
-    {
-        m_bAddedRefForCollision = false;
-        if (m_pInterface->usNumberOfRefs > 0)
-            m_pInterface->usNumberOfRefs--;
-    }
-
     // Remove our reference
     if (m_pInterface->usNumberOfRefs > 0)
         m_pInterface->usNumberOfRefs--;
 
     // No references left?
-    if (m_pInterface->usNumberOfRefs == 0)
+    if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
     {
-        // We have a custom model?
-        if (m_pCustomClump)
-        {
-            // Mark us as unloaded. We manage the clump unloading.
-            // BYTE *ModelLoaded = (BYTE*)ARRAY_ModelLoaded;
-            // ModelLoaded[(m_dwModelID+m_dwModelID*4)<<2] = 0;
-        }
-        else
-        {
-            // Make our collision model original again before we unload.
-            RestoreColModel();
-
-            // Remove the model.
-            pGame->GetStreaming()->RemoveModel(m_dwModelID);
-        }
+        // Remove the model.
+        pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
 }
 
@@ -1249,15 +1227,6 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
     // Grab the interfaces
     CColModelSAInterface* pColModelInterface = pColModel->GetInterface();
 
-    if (!m_bAddedRefForCollision)
-    {
-        // Prevent this model from unloading while we have custom collision
-        ModelAddRef(BLOCKING, "for collision");
-        m_bAddedRefForCollision = true;
-    }
-
-    // Should always be loaded at this point
-
     // Skip setting if already done
     if (m_pCustomColModel == pColModel)
         return;
@@ -1330,13 +1299,6 @@ void CModelInfoSA::RestoreColModel()
     m_pCustomColModel = nullptr;
     m_pOriginalColModelInterface = nullptr;
     m_originalFlags = 0;
-
-    // Remove ref added for collision
-    if (m_bAddedRefForCollision)
-    {
-        m_bAddedRefForCollision = false;
-        RemoveRef();
-    }
 }
 
 void CModelInfoSA::MakeCustomModel()
