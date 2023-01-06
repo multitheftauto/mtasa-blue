@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-05 16:57+0000\n"
-"PO-Revision-Date: 2023-01-05 17:06\n"
+"PO-Revision-Date: 2023-01-06 21:20\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -735,14 +735,18 @@ msgstr "El archivo principal no está firmado. Es probable que lo haya causado u
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "El archivo tipo data %s no fue encontrado. Posible virus.\n\n"
+"Considera reinstalar Multi Theft Auto por tu seguridad.\n"
+"Busca ayuda en línea si MTA no funciona correctamente."
 
 #: Client/loader/MainFunctions.cpp:863
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "El archivo tipo data %s está modificado. Posible virus.\n\n"
+"Considera reinstalar Multi Theft Auto por tu seguridad.\n"
+"Busca ayuda en línea si MTA no funciona correctamente."
 
 #: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -807,7 +811,7 @@ msgstr "Arreglar problemas del archivo"
 
 #: Client/loader/CExePatchedStatus.cpp:170
 msgid "Use proxy loader"
-msgstr ""
+msgstr "Usar cargador de proxy"
 
 #: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
@@ -896,7 +900,7 @@ msgstr "Mover archivos incompatibles"
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr ""
+msgstr "Eliminando archivos incompatibles"
 
 #: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -1060,7 +1064,7 @@ msgstr "Mantenga estos archivos, pero también muestre esta advertencia en el pr
 
 #: Client/loader/Dialogs.cpp:164
 msgid "Do not remind me about these files again"
-msgstr "No me vuelvas a recordar estos archivos"
+msgstr "No me vuelvas a avisar sobre estos archivos de nuevo"
 
 #: Client/loader/Dialogs.cpp:165
 msgid "Rename these files from *.dll to *.dll.bak"
@@ -1703,7 +1707,7 @@ msgstr "Humo de las ruedas etc"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr "Sombras dinámicas de ped"
+msgstr "Sombras dinámicas de personaje"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
@@ -1731,7 +1735,7 @@ msgstr "Renderizar siempre los peds en alto detalle"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr "Reflejos de lluvia de Corona"
+msgstr "Reflejos de luces al llover"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
