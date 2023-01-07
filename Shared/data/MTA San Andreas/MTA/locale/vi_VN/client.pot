@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-05 16:57+0000\n"
-"PO-Revision-Date: 2023-01-05 17:07\n"
+"POT-Creation-Date: 2023-01-07 20:12+0000\n"
+"PO-Revision-Date: 2023-01-07 20:20\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -809,19 +809,30 @@ msgstr ""
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Sao chép main executable để tránh lỗi driver đồ họa"
 
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "Bạn có muốn tắt MTA Server và tiếp tục cập nhật không?"
+#: Client/loader/Install.cpp:257
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:418
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Đang cài đặt bản cập nhật..."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Đang giải nén file..."
 
-#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:932
+#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:935
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -894,78 +905,78 @@ msgstr ""
 msgid "Delete incompatible files"
 msgstr ""
 
-#: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
+#: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Đang tìm Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:499 Client/loader/Dialogs.cpp:893
+#: Client/loader/Utils.cpp:502 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Hãy bắt đầu khởi động Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:563
+#: Client/loader/Utils.cpp:566
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Chọn thư mục nơi cài đặt Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:1033
+#: Client/loader/Utils.cpp:1036
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Lỗi khi tải module %s ! (%s)"
 
-#: Client/loader/Utils.cpp:1355 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1361 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Đang sao chép file..."
 
-#: Client/loader/Utils.cpp:1415 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "Việc sao chép được hoàn thành sớm. Mọi thứ đều TỐT."
 
-#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1427 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Đang hoàn thành..."
 
-#: Client/loader/Utils.cpp:1423 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1429 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "Xong!"
 
-#: Client/loader/Utils.cpp:1463
+#: Client/loader/Utils.cpp:1469
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Đã phát hiện cài đặt mới của %s.\n\n"
 "Bạn có muốn sao chép các tùy chỉnh cài đặt của mình từ %s không?"
 
-#: Client/loader/Utils.cpp:1502
+#: Client/loader/Utils.cpp:1508
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA bị lỗi khi mở file '%s'"
 
-#: Client/loader/Utils.cpp:1524
+#: Client/loader/Utils.cpp:1530
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA bị thiếu file '%s'."
 
-#: Client/loader/Utils.cpp:1549
+#: Client/loader/Utils.cpp:1555
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA bị lỗi khi load model."
 
-#: Client/loader/Utils.cpp:1551
+#: Client/loader/Utils.cpp:1557
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Nếu như bạn đã chỉnh sửa file gta3.img, Hãy thử cài đặt lại GTA:SA."
 
-#: Client/loader/Utils.cpp:1576
+#: Client/loader/Utils.cpp:1582
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA bị lỗi khi thêm một nâng cấp cho xe cộ."
 
-#: Client/loader/Utils.cpp:1595
+#: Client/loader/Utils.cpp:1601
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA tìm thấy lỗi ở file '%s'"
 
-#: Client/loader/Utils.cpp:1667
+#: Client/loader/Utils.cpp:1683
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Máy tính bạn đã khởi động lại khi đang chơi MTA:SA?"
 
-#: Client/loader/Utils.cpp:1732
+#: Client/loader/Utils.cpp:1748
 msgid "Please terminate the following programs before continuing:"
 msgstr "Vui lòng tắt hẳn các chương trình sau trước khi tiếp tục:"
 
