@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-05 16:57+0000\n"
-"PO-Revision-Date: 2023-01-05 17:07\n"
+"POT-Creation-Date: 2023-01-07 20:12+0000\n"
+"PO-Revision-Date: 2023-01-07 20:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -811,19 +811,30 @@ msgstr ""
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "کپی کردن فایل اگزه اصلی جهت جلوگیری از بروز مشکلات درایور کارت گرافیک"
 
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "آیا می خواهید سرور ام تی ای رو ببندید و سپس بروزرسانی را ادامه دهید؟"
+#: Client/loader/Install.cpp:257
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:418
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "در حال نصب بروزرسانی..."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "در حال استخراج فایل ها..."
 
-#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:932
+#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:935
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -896,78 +907,78 @@ msgstr ""
 msgid "Delete incompatible files"
 msgstr ""
 
-#: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
+#: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "در حال جستجوی Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:499 Client/loader/Dialogs.cpp:893
+#: Client/loader/Utils.cpp:502 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "لطفا جی تی ای سن آندریاس را اجرا کنید."
 
-#: Client/loader/Utils.cpp:563
+#: Client/loader/Utils.cpp:566
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "محل نصب بازی Grand Theft Auto: San Andreas را انتخاب کنید"
 
-#: Client/loader/Utils.cpp:1033
+#: Client/loader/Utils.cpp:1036
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "خطا در هنگام بارگذاری ماژول %s ! (%s)"
 
-#: Client/loader/Utils.cpp:1355 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1361 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "در حال کپی فایل ها..."
 
-#: Client/loader/Utils.cpp:1415 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "کپی زود تمام شد. همه چی اوکیه."
 
-#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1427 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "در حال اتمام..."
 
-#: Client/loader/Utils.cpp:1423 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1429 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "تمام!"
 
-#: Client/loader/Utils.cpp:1463
+#: Client/loader/Utils.cpp:1469
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "نصب جدید %s شناسایی شد.\n\n"
 "آیا می خواهید تنظیمات خود را از %s کپی کنید؟"
 
-#: Client/loader/Utils.cpp:1502
+#: Client/loader/Utils.cpp:1508
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA برای باز کردن فایل '%s' مشکل داشت"
 
-#: Client/loader/Utils.cpp:1524
+#: Client/loader/Utils.cpp:1530
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA فایل '%s' را ندارد."
 
-#: Client/loader/Utils.cpp:1549
+#: Client/loader/Utils.cpp:1555
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA در بارگذاری یک مدل مشکل داشت."
 
-#: Client/loader/Utils.cpp:1551
+#: Client/loader/Utils.cpp:1557
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "اگر اخیراً gta3.img را تغییر داده‌اید، GTA:SA را دوباره نصب کنید."
 
-#: Client/loader/Utils.cpp:1576
+#: Client/loader/Utils.cpp:1582
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA برای افزودن یک ارتقاء به یک وسیله نقلیه مشکل داشت."
 
-#: Client/loader/Utils.cpp:1595
+#: Client/loader/Utils.cpp:1601
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA خطاهایی را در فایل '%s' پیدا کرد"
 
-#: Client/loader/Utils.cpp:1667
+#: Client/loader/Utils.cpp:1683
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "آیا کامپیوتر شما هنگام اجرای MTA:SA ریستارت شد؟"
 
-#: Client/loader/Utils.cpp:1732
+#: Client/loader/Utils.cpp:1748
 msgid "Please terminate the following programs before continuing:"
 msgstr "لطفاً قبل از ادامه برنامه های زیر را خاتمه دهید:"
 
