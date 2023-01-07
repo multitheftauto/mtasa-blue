@@ -501,7 +501,7 @@ SString CInstallManager::_InstallFiles()
     WatchDogReset();
 
     // Install new files
-    if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "no"))
+    if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "yes"))
     {
         if (!IsUserAdmin())
             AddReportLog(3048, SString("_InstallFiles: Install - trying as admin %s", ""));
@@ -1180,7 +1180,7 @@ SString CInstallManager::_InstallNewsItems()
         SetCurrentDirectory(strTargetDir);
 
         // Try to extract the files
-        if (!ExtractFiles(strFileLocation))
+        if (!ExtractFiles(strFileLocation, false))
         {
             // If extract failed and update file is an exe, try to run it
             if (ExtractExtension(strFileLocation).CompareI("exe"))
