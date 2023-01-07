@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-07 20:12+0000\n"
-"PO-Revision-Date: 2023-01-07 20:20\n"
+"PO-Revision-Date: 2023-01-07 21:20\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -287,7 +287,7 @@ msgstr "U werd uit het spel gegooid"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Deze server vereist een originele gta_sa.exe"
+msgstr "Deze server vereist een niet gewijzigde gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
@@ -308,11 +308,11 @@ msgstr "Deze server staat geen virtuele machines toe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
 msgid "This server requires driver signing to be enabled"
-msgstr "Deze server vereist de naleving van digitaal ondertekende stuurprogramma's (\"Driver Signing Enforcement\" moet aan staan)"
+msgstr "Deze server vereist dat ondertekende stuurprogramma's ingeschakeld zijn"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
 msgid "Please restart your PC"
-msgstr "Herstart je computer"
+msgstr "Start je PC opnieuw op"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
 msgid "This server has detected missing anti-cheat components"
@@ -324,7 +324,7 @@ msgstr "Probeer MTA opnieuw te starten"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Deze server vereist originele versies van gta3.img en gta_int.img"
+msgstr "Deze server vereist een onaangepaste gta3.img en gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
 msgid "Please replace gta3.img or gta_int.img"
@@ -336,7 +336,7 @@ msgstr "Deze server staat Wine niet toe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Zorg ervoor dat geen ander programma MTA:SA (of diens geheugen) aanpast"
+msgstr "Zorg ervoor dat geen ander programma MTA:SA aanpast"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "Time Remaining: "
@@ -652,7 +652,7 @@ msgstr "Randloos venster"
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "Heb je problemen met het uitvoeren van MTA:SA?.\n\n"
-"Probeer de volgende dingen voor GTA en MTA uit te schakelen:"
+"Probeer de volgende producten voor GTA en MTA uit te schakelen:"
 
 #: Client/loader/MainFunctions.cpp:459
 msgid "WARNING\n\n"
@@ -762,7 +762,7 @@ msgstr "Sommige bestanden onderbreken. Herinstalleer MTA:SA als u problemen onde
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA is niet compatibel met Windows 'Veilige Modus'.\n\n"
-"Herstart je computer in de normale modus.\n"
+"Herstart uw PC.\n"
 
 #: Client/loader/MainFunctions.cpp:1089
 msgid "Fix configuration issue"
@@ -818,7 +818,9 @@ msgstr "Kopieer de hoofd-executable om problemen met het grafisch stuurprogramma
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Het bestand '%s' is momenteel vergrendeld door %zu processen.\n\n"
+"Wilt u de volgende processen beëindigen en doorgaan met updaten?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:418
 #, c-format
@@ -826,7 +828,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Uw installatie is nu mogelijk beschadigd.\n\n"
+"%zu van %zu bestanden konden niet worden hersteld vanaf de back-up.\n\n"
+"U moet Multi Theft Auto opnieuw installeren vanaf www.multitheftauto.com\n"
+"of probeer de update uit te voeren met beheerdersrechten."
 
 #: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
