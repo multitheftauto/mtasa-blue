@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-05 16:57+0000\n"
-"PO-Revision-Date: 2023-01-05 17:06\n"
+"POT-Creation-Date: 2023-01-07 20:12+0000\n"
+"PO-Revision-Date: 2023-01-07 20:20\n"
 "Last-Translator: \n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -813,19 +813,30 @@ msgstr ""
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Kopier hoved-eksekverbar for at undgå problemer med grafik driver"
 
-#: Client/loader/Install.cpp:92
-msgid "Do you want to terminate the MTA Server and continue updating?"
-msgstr "Ønsker du at lukke MTA serveren ned og fortsætte opdatering?"
+#: Client/loader/Install.cpp:257
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
 
-#: Client/loader/Install.cpp:187 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:418
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Installerer opdatering..."
 
-#: Client/loader/Install.cpp:287 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Pakker filer ud..."
 
-#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:932
+#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:935
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -898,78 +909,78 @@ msgstr ""
 msgid "Delete incompatible files"
 msgstr ""
 
-#: Client/loader/Utils.cpp:497 Client/loader/Dialogs.cpp:890
+#: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Søger efter Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:499 Client/loader/Dialogs.cpp:893
+#: Client/loader/Utils.cpp:502 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Vær venlig at starte Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:563
+#: Client/loader/Utils.cpp:566
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Vælg din Grand Theft Auto: San Andreas installations mappe"
 
-#: Client/loader/Utils.cpp:1033
+#: Client/loader/Utils.cpp:1036
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Fejl i indlæsning af %s modul! (%s)"
 
-#: Client/loader/Utils.cpp:1355 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1361 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Kopiering af filer..."
 
-#: Client/loader/Utils.cpp:1415 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "Kopi blev færdig før tid. Alt er OK."
 
-#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1427 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Færdiggører..."
 
-#: Client/loader/Utils.cpp:1423 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1429 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "Færdig!"
 
-#: Client/loader/Utils.cpp:1463
+#: Client/loader/Utils.cpp:1469
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Ny installation af %s fundet.\n\n"
 "Ønsker du at kopiere dine indstillingere fra %s ?"
 
-#: Client/loader/Utils.cpp:1502
+#: Client/loader/Utils.cpp:1508
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA havde problemer med åbning af filen '%s'"
 
-#: Client/loader/Utils.cpp:1524
+#: Client/loader/Utils.cpp:1530
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA mangler filen '%s'."
 
-#: Client/loader/Utils.cpp:1549
+#: Client/loader/Utils.cpp:1555
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA havde problemer med indlæsning af en model."
 
-#: Client/loader/Utils.cpp:1551
+#: Client/loader/Utils.cpp:1557
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Hvis du for nylig har modificeret gta3.img, så prøv at geninstaller GTA:SA."
 
-#: Client/loader/Utils.cpp:1576
+#: Client/loader/Utils.cpp:1582
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA havde problemer med at tilføje en opgradering til et køretøj."
 
-#: Client/loader/Utils.cpp:1595
+#: Client/loader/Utils.cpp:1601
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA har fundet fejl i filen '%s'"
 
-#: Client/loader/Utils.cpp:1667
+#: Client/loader/Utils.cpp:1683
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Genstartede din computer imens du spillede MTA:SA?"
 
-#: Client/loader/Utils.cpp:1732
+#: Client/loader/Utils.cpp:1748
 msgid "Please terminate the following programs before continuing:"
 msgstr "Afslut venligst de følgende programmer for at fortsætte:"
 
