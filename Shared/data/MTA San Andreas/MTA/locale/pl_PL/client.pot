@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-07 20:12+0000\n"
-"PO-Revision-Date: 2023-01-07 20:20\n"
+"PO-Revision-Date: 2023-01-08 23:38\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -831,7 +831,9 @@ msgstr "Skopiuj główny plik wykonywalny aby uniknąć problemów ze sterownika
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Plik '%s' jest aktualnie zablokowany przez %zu procesów.\n\n"
+"Czy chcesz zakończyć powyższe procesy i kontynuować aktualizację?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:418
 #, c-format
@@ -839,7 +841,9 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Twoja instalacja może być uszkodzona.\n\n"
+"%zu z %zu plików nie może być przywróconych z kopii zapasowej.\n\n"
+"Powinieneś przeinstalować Multi Theft Auto z www.multitheftauto.com lub spróbować uruchomić aktualizację z prawami administratora."
 
 #: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
