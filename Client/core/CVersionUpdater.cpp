@@ -2301,7 +2301,7 @@ void CVersionUpdater::_ProcessPatchFileQuery()
     m_ConditionMap.SetCondition("ProcessResponse", m_JobInfo.strStatus);
 
     // Report update response
-    if (!m_JobInfo.strStatus.empty() && m_JobInfo.strStatus != "noupdate")
+    if (!m_JobInfo.strStatus.empty() && m_JobInfo.strStatus != "noupdate" && !_strnicmp("mtasa-", m_JobInfo.strFilename.c_str(), 6))
     {
         unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
         unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
