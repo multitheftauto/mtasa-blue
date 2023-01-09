@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-07 20:12+0000\n"
-"PO-Revision-Date: 2023-01-07 23:49\n"
+"POT-Creation-Date: 2023-01-09 18:40+0000\n"
+"PO-Revision-Date: 2023-01-09 18:48\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -819,7 +819,11 @@ msgstr "Használjon proxy betöltőt"
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Fő exe másolása a grafikus driver hibáinak elkerülésére"
 
-#: Client/loader/Install.cpp:257
+#: Client/loader/Install.cpp:255
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:262
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
@@ -828,7 +832,7 @@ msgstr "A '%s' fájlt jelenleg a %zu folyamat zárolta.\n\n"
 "Leállítja a következő folyamatokat, és folytatja a frissítést?\n\n"
 "%s"
 
-#: Client/loader/Install.cpp:418
+#: Client/loader/Install.cpp:422
 #, c-format
 msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
@@ -839,11 +843,11 @@ msgstr "Lehet, hogy a telepítés most sérült.\n\n"
 "Telepítse újra a Multi Theft Auto-t a www.multitheftauto.com webhelyről\n"
 "vagy próbálja meg futtatni a frissítést rendszergazdai jogokkal."
 
-#: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:776 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Frissítés telepítése..."
 
-#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:850 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Fájlok kicsomagolása..."
 
