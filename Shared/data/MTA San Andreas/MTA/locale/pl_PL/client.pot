@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-09 18:40+0000\n"
-"PO-Revision-Date: 2023-01-09 18:48\n"
+"PO-Revision-Date: 2023-01-09 19:50\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -828,7 +828,7 @@ msgstr "Skopiuj główny plik wykonywalny aby uniknąć problemów ze sterownika
 
 #: Client/loader/Install.cpp:255
 msgid "Unknown"
-msgstr ""
+msgstr "Nieznany"
 
 #: Client/loader/Install.cpp:262
 #, c-format
