@@ -24,7 +24,7 @@ static void ParseManifestMeta(std::ifstream& manifest, std::unordered_map<std::s
 {
     std::string line;
 
-    for (size_t i = 0; std::getline(manifest, line); ++i)
+    while (std::getline(manifest, line))
     {
         // Meta information ends after a single empty line.
         if (line.empty())

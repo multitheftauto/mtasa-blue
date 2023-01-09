@@ -26,20 +26,6 @@ void DisplayErrorMessageBox(const std::wstring& message, const std::wstring& err
     TerminateProcess(GetCurrentProcess(), 1);
 }
 
-auto GetKnownFolderPath(REFKNOWNFOLDERID id, DWORD flags = 0) -> std::filesystem::path
-{
-    wchar_t* path{};
-
-    if (HRESULT hr = SHGetKnownFolderPath(id, flags, nullptr, &path); SUCCEEDED(hr))
-    {
-        std::filesystem::path result(path);
-        CoTaskMemFree(path);
-        return result;
-    }
-
-    return {};
-}
-
 auto GetProcessPath() -> std::filesystem::path
 {
     std::wstring filePath(4096, L'\0');
