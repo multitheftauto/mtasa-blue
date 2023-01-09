@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-07 20:12+0000\n"
+"POT-Creation-Date: 2023-01-09 18:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -849,7 +849,11 @@ msgstr ""
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr ""
 
-#: Client/loader/Install.cpp:257
+#: Client/loader/Install.cpp:255
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:262
 #, c-format
 msgid ""
 "The file '%s' is currently locked by %zu processes.\n"
@@ -859,7 +863,7 @@ msgid ""
 "%s"
 msgstr ""
 
-#: Client/loader/Install.cpp:418
+#: Client/loader/Install.cpp:422
 #, c-format
 msgid ""
 "Your installation may be corrupt now.\n"
@@ -870,11 +874,11 @@ msgid ""
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:776 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr ""
 
-#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:850 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr ""
 
