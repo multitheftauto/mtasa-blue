@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-07 20:12+0000\n"
-"PO-Revision-Date: 2023-01-07 20:20\n"
+"POT-Creation-Date: 2023-01-09 18:40+0000\n"
+"PO-Revision-Date: 2023-01-09 18:49\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -817,14 +817,18 @@ msgstr "Izmantot starpniekserveru adreses"
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Kopēt galveno failu lai novērstu grafikas draivera problēmas"
 
-#: Client/loader/Install.cpp:257
+#: Client/loader/Install.cpp:255
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:262
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
 msgstr ""
 
-#: Client/loader/Install.cpp:418
+#: Client/loader/Install.cpp:422
 #, c-format
 msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
@@ -832,11 +836,11 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:772 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:776 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Instalē atjauninājumus..."
 
-#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:850 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Atspiež failus..."
 
