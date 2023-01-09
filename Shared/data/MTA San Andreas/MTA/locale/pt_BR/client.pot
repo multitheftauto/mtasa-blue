@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-09 18:40+0000\n"
-"PO-Revision-Date: 2023-01-09 18:49\n"
+"PO-Revision-Date: 2023-01-09 19:50\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -819,7 +819,7 @@ msgstr "Copiar o executável do SA para evitar problemas no driver de vídeo"
 
 #: Client/loader/Install.cpp:255
 msgid "Unknown"
-msgstr ""
+msgstr "Desconhecido"
 
 #: Client/loader/Install.cpp:262
 #, c-format
