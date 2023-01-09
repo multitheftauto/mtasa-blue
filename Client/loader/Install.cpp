@@ -249,7 +249,12 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
         if (!nameList.empty())
             nameList += '\n';
 
-        nameList += SString("   %s  [%lu]", GetProcessFilename(processId).c_str(), processId);
+        SString processName = GetProcessFilename(processId);
+
+        if (processName.empty())
+            processName = _("Unknown");
+
+        nameList += SString("   %s  [%lu]", processName.c_str(), processId);
     }
 
     int decision = MessageBoxUTF8(
@@ -266,7 +271,6 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
         if (!TerminateProcess(processId, 0))
         {
             AddReportLog(5055, SString("TerminateFileLockingProcesses: Failed to terminate process '%s' (%lu)", GetProcessPathFilename(processId), processId));
-            return false;
         }
     }
 

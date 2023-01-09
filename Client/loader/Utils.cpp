@@ -2054,7 +2054,10 @@ std::vector<DWORD> GetProcessListUsingFile(const WString& filePath)
 
         for (ULONG i = 0; i < fileInfo->NumberOfProcessIdsInList; i++)
         {
-            result.emplace_back(static_cast<DWORD>(fileInfo->ProcessIdList[i]));
+            auto processId = static_cast<DWORD>(fileInfo->ProcessIdList[i]);
+
+            if (processId)
+                result.emplace_back(processId);
         }
     }
 
