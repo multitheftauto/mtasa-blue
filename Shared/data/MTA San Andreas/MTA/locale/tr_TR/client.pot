@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-09 18:40+0000\n"
-"PO-Revision-Date: 2023-01-09 18:48\n"
+"PO-Revision-Date: 2023-01-09 19:50\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -819,14 +819,16 @@ msgstr "Ekran kartı sorunlarını önlemek için ana çalıştırılabiliri kop
 
 #: Client/loader/Install.cpp:255
 msgid "Unknown"
-msgstr ""
+msgstr "Bilinmeyen"
 
 #: Client/loader/Install.cpp:262
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "'%s' dosyası şu anda %zu işlemleri tarafından kilitlendi.\n\n"
+"Aşağıdaki süreçleri sonlandırmak ve güncellemeye devam etmek istiyor musunuz?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:422
 #, c-format
@@ -834,7 +836,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Kurulumunuz şimdi bozuk olabilir.\n\n"
+"%zu dosyalarından %zu yedekten geri yüklenemedi.\n\n"
+"Multi Theft Auto'yu www.multitheftauto.com adresinden yeniden yüklemeniz gerekir.\n"
+"veya güncellemeyi yönetici haklarıyla çalıştırmayı deneyin."
 
 #: Client/loader/Install.cpp:776 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
