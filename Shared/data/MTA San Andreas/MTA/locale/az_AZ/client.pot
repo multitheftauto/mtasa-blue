@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-09 18:40+0000\n"
-"PO-Revision-Date: 2023-01-10 17:55\n"
+"PO-Revision-Date: 2023-01-10 19:04\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -736,14 +736,18 @@ msgstr "Əsas sənəd imzasızdır. Bunun səbəbi kompüterinizdəki virus ola 
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "%s data faylı çatışmır. Mümkün virus fəaliyyəti ola bilər.\n\n"
+"Təhlükəsizliyiniz üçün Multi Theft Auto tətbiqini yenidən quraşdırmağı nəzərdə tutun.\n"
+"MTA düzgün işləmirsə, onlayn yardıma baxın."
 
 #: Client/loader/MainFunctions.cpp:863
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "%s data faylı dəyişdirilib. Mümkün virus fəaliyyəti ola bilər.\n\n"
+"Təhlükəsizliyiniz üçün Multi Theft Auto tətbiqini yenidən quraşdırmağı nəzərdə tutun.\n"
+"MTA düzgün işləmirsə, onlayn yardıma baxın."
 
 #: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -823,7 +827,9 @@ msgstr "Naməlum"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "'%s' faylı hal hazırda %zu prosesləri ilə kilidlənib.\n\n"
+"Aşağıdakı prosesləri dayandırıb yeniləməyə davam etmək istəyirsiniz?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:422
 #, c-format
@@ -831,7 +837,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Quraşdırmanız indi xarab ola bilər.\n\n"
+"%zu ədəd fayldan %zu ədəd fayl ehtiyat nüsxədən bərpa edilə bilmədi.\n\n"
+"Multi Theft Auto tətbiqini www.multitheftauto.com saytından yenidən quraşdırmalısınız\n"
+"və ya yeniləməni inzibatçı hüquqları ilə işə salın."
 
 #: Client/loader/Install.cpp:776 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
