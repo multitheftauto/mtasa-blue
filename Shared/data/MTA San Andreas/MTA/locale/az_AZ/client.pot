@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-09 18:40+0000\n"
-"PO-Revision-Date: 2023-01-09 18:49\n"
+"PO-Revision-Date: 2023-01-10 17:55\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -816,7 +816,7 @@ msgstr "Ekran-kartı problemlərinin qarşısını almaq üçün əsas icra olun
 
 #: Client/loader/Install.cpp:255
 msgid "Unknown"
-msgstr ""
+msgstr "Naməlum"
 
 #: Client/loader/Install.cpp:262
 #, c-format
