@@ -286,6 +286,45 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
 }
 
 /**
+ * @brief Creates a writable directory for any purpose.
+ * @param templateRoot The template path to a directory
+ * @return A path to a new directory, empty string on error
+*/
+static SString CreateWritableDirectory(const SString& templateRoot)
+{
+    SString fileName = ExtractFilename(templateRoot);
+
+    std::vector<SString> candidates{
+        MakeUniquePath(templateRoot),
+        PathJoin(GetMTATempPath(), "upcache", fileName),
+    };
+
+    const SString probeName = "probe.file";
+
+    for (const SString& candidate : candidates)
+    {
+        if (!MkDir(candidate))
+            continue;
+
+        DirectoryDeleteScope deleteCandidate(candidate);
+
+        const SString probeFile = PathJoin(candidate, probeName);
+
+        if (!FileSave(probeFile, probeName))
+            continue;
+
+        if (FileSize(probeFile) != probeName.size())
+            continue;
+
+        FileDelete(probeFile);
+        deleteCandidate.Release();
+        return candidate;
+    }
+
+    return {};
+}
+
+/**
  * @brief Retrieves the list of files for the update.
  * @param sourceRoot Path to the directory with update files
  * @param archivePath Optional path to the archive with the update files
@@ -554,11 +593,11 @@ static int RunInstall()
         return 0;
 
     // Create a backup directory for disaster recovery.
-    const SString backupRoot = MakeUniquePath(sourceRoot + "_bak_");
+    const SString backupRoot = CreateWritableDirectory(sourceRoot + "_bak_");
 
-    if (!MkDir(backupRoot))
+    if (backupRoot.empty())
     {
-        AddReportLog(5055, SString("RunInstall: Unable to create backup directory '%s'", backupRoot.c_str()));
+        AddReportLog(5055, SStringX("RunInstall: Unable to create writable backup directory"));
         return 3;
     }
 
@@ -859,12 +898,12 @@ SString CheckOnRestartCommand()
             SString strArchivePath, strArchiveName;
             strFile.Split("\\", &strArchivePath, &strArchiveName, -1);
 
-            SString strTempPath = MakeUniquePath(strArchivePath + "\\_" + strArchiveName + "_tmp_");
+            const SString sourceRoot = CreateWritableDirectory(strArchivePath + "\\_" + strArchiveName + "_tmp_");
 
-            if (!MkDir(strTempPath))
+            if (sourceRoot.empty())
                 return "FileError1";
 
-            if (!SetCurrentDirectory(strTempPath))
+            if (!SetCurrentDirectory(sourceRoot))
                 return "FileError2";
 
             // Start progress bar
