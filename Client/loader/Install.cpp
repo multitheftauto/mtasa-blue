@@ -435,11 +435,6 @@ static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
         AddReportLog(5055, SString("RunRollback: Rollback failed for %zu out of %zu files", disasterCounter, files.size()));
         OutputDebugLine(SString("RunRollback: Rollback failed for %zu out of %zu files", disasterCounter, files.size()));
     }
-    else
-    {
-        AddReportLog(5055, SString("RunRollback: Rollback succeeded for %zu files", files.size()));
-        OutputDebugLine(SString("RunRollback: Rollback succeeded for %zu files", files.size()));
-    }
     
     return disasterCounter;
 }
@@ -585,10 +580,7 @@ static int RunInstall()
     OutputDebugLine(SString("RunInstall: Installing %zu out of %zu files", files.size(), archiveFiles.size()));
 
     if (files.empty())
-    {
-        AddReportLog(5055, SString("RunInstall: Update is obsolete (%zu files skipped)", archiveFiles.size()));
         return 0;
-    }
 
     // Check if any executable or library is locked by any process and terminate it with the user's consent.
     for (const InstallableFile& file : files)
@@ -633,6 +625,12 @@ static int RunInstall()
             
             if (!success)
             {
+                if (!FileExists(file.targetFile.absolutePath))
+                {
+                    AddReportLog(5055, SString("RunInstall: Target file '%s' is missing (attempts: %d)", file.relativePath.c_str(), attempts));
+                    break;
+                }
+
                 if (attempts == 1)
                 {
                     // If the first attempt didn't work, check if any process is locking one of the files.
@@ -647,9 +645,14 @@ static int RunInstall()
 
         if (!success)
         {
-            bool exists = FileExists(file.targetFile.absolutePath);
-            AddReportLog(5055, SString("RunInstall: Unable to create backup of '%s' in '%s' (exists: %d, attempts: %d, checksums: %d)",
-                                       file.targetFile.c_str(), file.backupFile.c_str(), exists, attempts, checksums));
+            bool     targetExists = FileExists(file.targetFile.absolutePath);
+            uint64_t targetSize = FileSize(file.targetFile.absolutePath);
+            bool     backupExists = FileExists(file.backupFile.absolutePath);
+            uint64_t backupSize = FileSize(file.backupFile.absolutePath);
+            AddReportLog(5055, SString("RunInstall: Unable to create backup of '%s' (attempts: %d, checksums: %d, target: %d [size:%llu hash:%08x], backup: %d "
+                                       "[size: %llu hash:%08x])",
+                                       file.relativePath.c_str(), attempts, checksums, targetExists, targetSize, file.targetFile.checksum.value_or(0),
+                                       backupExists, backupSize, file.backupFile.checksum.value_or(0)));
             return 6;
         }
     }
@@ -696,6 +699,12 @@ static int RunInstall()
 
             if (!success)
             {
+                if (!FileExists(file.sourceFile.absolutePath))
+                {
+                    AddReportLog(5055, SString("RunInstall: Source file '%s' is missing (attempts: %d)", file.relativePath.c_str(), attempts));
+                    break;
+                }
+
                 if (attempts == 1)
                 {
                     // If the first attempt didn't work, check if any process is locking one of the files.
@@ -722,8 +731,8 @@ static int RunInstall()
         if (!success)
         {
             bool exists = FileExists(file.sourceFile.absolutePath);
-            AddReportLog(5055, SString("RunInstall: Unable to install '%s' to '%s' (exists: %d, attempts: %d, checksums: %d)", file.sourceFile.c_str(),
-                                       file.targetFile.c_str(), exists, attempts, checksums));
+            AddReportLog(5055, SString("RunInstall: Unable to install '%s' (exists: %d, attempts: %d, checksums: %d)", file.relativePath.c_str(), exists,
+                                       attempts, checksums));
             requiresRollback = true;
             break;
         }
