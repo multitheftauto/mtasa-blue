@@ -239,42 +239,50 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
     WString            filePath(absolutePath);
     std::vector<DWORD> processIds = GetProcessListUsingFile(filePath);
 
-    if (processIds.empty())
-        return true;
-
-    SString nameList;
-
-    for (DWORD processId : processIds)
+    while (true)
     {
-        if (!nameList.empty())
-            nameList += '\n';
+        if (processIds.empty())
+            return true;
 
-        SString processName = GetProcessFilename(processId);
+        SString nameList;
 
-        if (processName.empty())
-            processName = _("Unknown");
-
-        nameList += SString("   %s  [%lu]", processName.c_str(), processId);
-    }
-
-    int decision = MessageBoxUTF8(
-        nullptr,
-        SString(_("The file '%s' is currently locked by %zu processes.\n\nDo you want to terminate the following processes and continue updating?\n\n%s"),
-                displayName.c_str(), processIds.size(), nameList.c_str()),
-        "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST);
-
-    if (decision != IDYES)
-        return false;
-
-    for (DWORD processId : processIds)
-    {
-        if (!TerminateProcess(processId, 0))
+        for (DWORD processId : processIds)
         {
-            AddReportLog(5055, SString("TerminateFileLockingProcesses: Failed to terminate process '%s' (%lu)", GetProcessPathFilename(processId), processId));
-        }
-    }
+            if (!nameList.empty())
+                nameList += '\n';
 
-    return GetProcessListUsingFile(filePath).empty();
+            SString processName = GetProcessFilename(processId);
+
+            if (processName.empty())
+                processName = _("Unknown");
+
+            nameList += SString("   %s  [%lu]", processName.c_str(), processId);
+        }
+
+        int decision = MessageBoxUTF8(
+            nullptr,
+            SString(_("The file '%s' is currently locked by %zu processes.\n\nDo you want to terminate the following processes and continue updating?\n\n%s"),
+                    displayName.c_str(), processIds.size(), nameList.c_str()),
+            "MTA: San Andreas", MB_CANCELTRYCONTINUE | MB_ICONQUESTION | MB_TOPMOST);
+
+        processIds = GetProcessListUsingFile(filePath);
+
+        if (processIds.empty())
+            return true;
+
+        if (decision == IDTRYAGAIN)
+            continue;
+
+        if (decision != IDCONTINUE)
+            return false;
+
+        for (DWORD processId : processIds)
+        {
+            TerminateProcess(processId, 0);
+        }
+
+        processIds = GetProcessListUsingFile(filePath);
+    }
 }
 
 /**
