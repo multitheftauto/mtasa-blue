@@ -527,6 +527,11 @@ static int RunInstall()
         archivePath = MakeGenericPath(PathJoin(archiveDirectory, archiveFileName));
     }
 
+    if (!FileExists(archivePath))
+    {
+        AddReportLog(5055, SString("RunInstall: Source archive does not exist: '%s' (source: '%s')", archivePath.c_str(), sourceRoot.c_str()));
+    }
+
     const SString targetRoot = PathConform(GetMTASAPath());
 
     if (!DirectoryExists(targetRoot))
