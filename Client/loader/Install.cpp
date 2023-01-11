@@ -694,7 +694,7 @@ static int RunInstall()
             bool     backupExists = FileExists(file.backupFile.absolutePath);
             uint64_t backupSize = FileSize(file.backupFile.absolutePath);
             AddReportLog(5055, SString("RunInstall: Unable to create backup of '%s' (attempts: %d, checksums: %d, target: %d [size:%llu hash:%08x], backup: %d "
-                                       "[size: %llu hash:%08x])",
+                                       "[size:%llu hash:%08x])",
                                        file.relativePath.c_str(), attempts, checksums, targetExists, targetSize, file.targetFile.checksum.value_or(0),
                                        backupExists, backupSize, file.backupFile.checksum.value_or(0)));
             return 6;
@@ -828,6 +828,13 @@ static int RunInstall()
     }
 
     OutputDebugLine(SString("RunInstall: Installation of %zu files complete", files.size()));
+
+    // Switch to the source directory's parent to finally delete the source directory.
+    if (SetCurrentDirectory(ExtractPath(sourceRoot)))
+    {
+        DirectoryDeleteScope deleteSourceRoot(sourceRoot);
+    }
+
     return 0;
 }
 
@@ -903,6 +910,8 @@ SString CheckOnRestartCommand()
             if (sourceRoot.empty())
                 return "FileError1";
 
+            DirectoryDeleteScope deleteSourceRoot(sourceRoot);
+
             if (!SetCurrentDirectory(sourceRoot))
                 return "FileError2";
 
@@ -911,12 +920,19 @@ SString CheckOnRestartCommand()
                 StartPseudoProgress(g_hInstance, "MTA: San Andreas", _("Extracting files..."));
 
             // Try to extract the files
-            if (!ExtractFiles(strFile, true))
+            bool success = ExtractFiles(strFile, /* withManifest */ true);
+            
+            if (!success)
             {
                 // If extract failed and update file is an .exe or .msu, try to run it
                 if (ExtractExtension(strFile).EqualsI("exe") || ExtractExtension(strFile).EqualsI("msu"))
-                    ShellExecuteBlocking("open", strFile, strParameters.SplitRight("###"));
+                    success = ShellExecuteBlocking("open", strFile, strParameters.SplitRight("###"));
             }
+
+            if (!success)
+                return "FileError3";
+
+            deleteSourceRoot.Release();
 
             // Stop progress bar
             StopPseudoProgress();
