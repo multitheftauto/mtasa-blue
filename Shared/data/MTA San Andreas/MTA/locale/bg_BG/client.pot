@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-09 18:40+0000\n"
-"PO-Revision-Date: 2023-01-09 18:48\n"
+"POT-Creation-Date: 2023-01-12 20:00+0000\n"
+"PO-Revision-Date: 2023-01-12 20:05\n"
 "Last-Translator: \n"
 "Language-Team: Bulgarian\n"
 "Language: bg_BG\n"
@@ -136,7 +136,6 @@ msgstr "(Разработчик мод) принтира ИД-то на звуц
 #. Display an error, reset the error status and exit
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:588
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
 #: Client/mods/deathmatch/logic/CClientGame.cpp:686
@@ -148,36 +147,135 @@ msgstr "(Разработчик мод) принтира ИД-то на звуц
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1217
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1266
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
 #: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:815
 #: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
-#: Client/loader/CInstallManager.cpp:629 Client/core/CSettings.cpp:2924
-#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/CGUI.cpp:87
+#: Client/loader/CInstallManager.cpp:629 Client/core/CGUI.cpp:87
+#: Client/core/CSettings.cpp:2924 Client/core/CSettings.cpp:4113
+#: Client/core/CSettings.cpp:4141 Client/core/CSettings.cpp:4674
+#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "Грешка"
 
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Не успешно стартиране на локалния сървър. Вижте конзолата за детайли."
+#: Client/mods/deathmatch/logic/CClientGame.cpp:588
+#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Невалиден никнейм! Моля отидете в Настройки и задайте нов!"
 
-#: Client/mods/deathmatch/logic/CServer.cpp:182
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr "СВЪРЗВАНЕ"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+msgid "Entering the game ..."
+msgstr "Влизане в игра ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Не сте свързан; моля използвайте Бързо Свързване или 'свързване' командата за да влезнете в сървър."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+msgid "The server is not installed"
+msgstr "Сървърът не е инсталиран"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Local Server"
+msgstr "Локален сървър"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+msgid "Starting local server ..."
+msgstr "Стартиране на локален сървър ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
 #, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Грешка: Не успешно стартиране на локален сървър. [%s]"
+msgid "You were kicked from the game ( %s )"
+msgstr "Вие сте изхвърлен от играта ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Connecting to local server..."
+msgstr "Свързване към локален сървър..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+msgid "Error connecting to server."
+msgstr "Грешка при свързване към сървър."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Грешка при свързване към локален сървър. Вижте конзолата за детайли."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr "Просрочено време за връзка"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+msgid "Connection with the server was lost"
+msgstr "Връзката със сървъра бе загубена"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr "Връзката прекъсната : неизвестна по протокола грешка"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr "Връзката прекъсната: Връзката бе прекъсната дистанционно"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr "Разкачени: връзката прекъсна дистанционно"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr "Разкачени: вие сте баннати от този сървър"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+msgid "Disconnected: the server is currently full"
+msgstr "Отвързани: сървърът е пълен"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr "Разкачени: разкачени сте от сървъра"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr "Разкачени: връзката със сървъра се загуби"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+msgid "Disconnected: invalid password specified"
+msgstr "Отвързани: невалидна парола е въведена"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr "Разкачени: връзката със сървъра се отхвърли"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+msgid "MTA Client verification failed!"
+msgstr "МТА Клиента не успя да бъде верифициран!"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
 msgid "Disconnected: Invalid nickname"
@@ -375,139 +473,6 @@ msgstr[1] "%d секунди"
 msgid "Disconnected"
 msgstr "Отвързани"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Прогрес на изтегляне на картата:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Прогрес на изтегляне:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s от %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Отвържете се за да откажете изтеглянето"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Невалиден никнейм! Моля отидете в Настройки и задайте нов!"
-
-#. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-#: Client/core/CConnectManager.cpp:148
-msgid "CONNECTING"
-msgstr "СВЪРЗВАНЕ"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-msgid "Entering the game ..."
-msgstr "Влизане в игра ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Не сте свързан; моля използвайте Бързо Свързване или 'свързване' командата за да влезнете в сървър."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-msgid "The server is not installed"
-msgstr "Сървърът не е инсталиран"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Local Server"
-msgstr "Локален сървър"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-msgid "Starting local server ..."
-msgstr "Стартиране на локален сървър ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "Вие сте изхвърлен от играта ( %s )"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Connecting to local server..."
-msgstr "Свързване към локален сървър..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-msgid "Error connecting to server."
-msgstr "Грешка при свързване към сървър."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Грешка при свързване към локален сървър. Вижте конзолата за детайли."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/core/CConnectManager.cpp:263
-msgid "Connection timed out"
-msgstr "Просрочено време за връзка"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-msgid "Connection with the server was lost"
-msgstr "Връзката със сървъра бе загубена"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-msgid "Disconnected: unknown protocol error"
-msgstr "Връзката прекъсната : неизвестна по протокола грешка"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
-#: Client/core/CConnectManager.cpp:285
-msgid "Disconnected: disconnected remotely"
-msgstr "Връзката прекъсната: Връзката бе прекъсната дистанционно"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
-#: Client/core/CConnectManager.cpp:289
-msgid "Disconnected: connection lost remotely"
-msgstr "Разкачени: връзката прекъсна дистанционно"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-#: Client/core/CConnectManager.cpp:293
-msgid "Disconnected: you are banned from this server"
-msgstr "Разкачени: вие сте баннати от този сървър"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
-msgid "Disconnected: the server is currently full"
-msgstr "Отвързани: сървърът е пълен"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
-#: Client/core/CConnectManager.cpp:300
-msgid "Disconnected: disconnected from the server"
-msgstr "Разкачени: разкачени сте от сървъра"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
-#: Client/core/CConnectManager.cpp:304
-msgid "Disconnected: connection to the server was lost"
-msgstr "Разкачени: връзката със сървъра се загуби"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
-msgid "Disconnected: invalid password specified"
-msgstr "Отвързани: невалидна парола е въведена"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
-#: Client/core/CConnectManager.cpp:311
-msgid "Disconnected: connection was refused"
-msgstr "Разкачени: връзката със сървъра се отхвърли"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
-msgid "MTA Client verification failed!"
-msgstr "МТА Клиента не успя да бъде верифициран!"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Грешка при изтегляне: %s"
-
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "ХОСТ ИГРА"
@@ -570,12 +535,75 @@ msgstr "Старт"
 
 #. Cancel button
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/loader/Dialogs.cpp:132 Client/gui/CGUIMessageBox_Impl.cpp:68
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
-#: Client/core/CVersionUpdater.cpp:1839 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4694
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:132
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4694
+#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
+#: Client/core/CVersionUpdater.cpp:1840
 msgid "Cancel"
 msgstr "Откажи"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Не успешно стартиране на локалния сървър. Вижте конзолата за детайли."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Грешка: Не успешно стартиране на локален сървър. [%s]"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Грешка при изтегляне: %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Прогрес на изтегляне на картата:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Прогрес на изтегляне:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s от %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Отвържете се за да откажете изтеглянето"
+
+#. Create buttons
+#. OK button
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:129
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4695
+#: Client/core/CVersionUpdater.cpp:1606 Client/core/CVersionUpdater.cpp:1822
+#: Client/core/CVersionUpdater.cpp:1915 Client/core/CVersionUpdater.cpp:1937
+#: Client/core/CVersionUpdater.cpp:1955 Client/core/CVersionUpdater.cpp:1967
+#: Client/core/CVersionUpdater.cpp:2119 Client/core/CVersionUpdater.cpp:2128
+#: Client/core/CVersionUpdater.cpp:2137 Client/core/CVersionUpdater.cpp:2151
+msgid "OK"
+msgstr "ОК"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:127
+#: Client/core/CSettings.cpp:1372 Client/core/CSettings.cpp:1396
+#: Client/core/CSettings.cpp:4436 Client/core/CSettings.cpp:4503
+#: Client/core/CSettings.cpp:4552 Client/core/CQuestionBox.cpp:195
+#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
+#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
+#: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "Yes"
+msgstr "Да"
 
 #: Client/loader/MainFunctions.cpp:242
 msgid "Trouble restarting MTA:SA\n\n"
@@ -784,135 +812,6 @@ msgstr "Невъзможно стартиране на Grand Theft Auto: San And
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas може да не е било пуснато правилно. Искате ли да го спрете?"
 
-#: Client/loader/CExePatchedStatus.cpp:158
-msgid "Update Aero setting"
-msgstr "Актуализирай Аеро настройка"
-
-#: Client/loader/CExePatchedStatus.cpp:160
-msgid "Update Large Memory setting"
-msgstr "Актуализирай Голяма Паметна настройка"
-
-#: Client/loader/CExePatchedStatus.cpp:162
-msgid "Update DEP setting"
-msgstr "Актуализирай DEP настройка"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Update graphics driver compliance"
-msgstr "Актуализирай графични драйвъри"
-
-#: Client/loader/CExePatchedStatus.cpp:166
-#: Client/loader/CExePatchedStatus.cpp:168
-msgid "Fix file issues"
-msgstr "Поправи файлови проблеми"
-
-#: Client/loader/CExePatchedStatus.cpp:170
-msgid "Use proxy loader"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:171
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Копирай главна изпълнителна, за да предотврати проблеми с графическите драйвъри"
-
-#: Client/loader/Install.cpp:255
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:262
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:422
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/Install.cpp:776 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Инсталиране на актуализация..."
-
-#: Client/loader/Install.cpp:850 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Извличане на файлове..."
-
-#: Client/loader/CInstallManager.cpp:340 Client/loader/Utils.cpp:935
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA има нужда от Администраторски права, за да изпълни следните задачи:\n\n"
-"'%s'\n\n"
-"Моля потвърдете в следващия прозорец."
-
-#: Client/loader/CInstallManager.cpp:355
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA не упся да завърши следните задачи:\n\n"
-"'%s'\n"
-
-#: Client/loader/CInstallManager.cpp:405
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Крашът беше предизвикан от проблеми с графическите драйвъри **\n\n"
-"** Моля обновете графическите си драйвъри **"
-
-#: Client/loader/CInstallManager.cpp:511
-msgid "Install updated MTA:SA files"
-msgstr "Инсталирайте обновените MTA:SA файлове"
-
-#: Client/loader/CInstallManager.cpp:531
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Актуализирането не възможно поради файлови конфликти. Моля спрете другите приложения и опитайте"
-
-#: Client/loader/CInstallManager.cpp:540
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Mutli Theft Auto не беше инсталиран правилно, моля преинсталирайте. %s"
-
-#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:620
-msgid "Patch GTA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:767 Client/core/CCore.cpp:764
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA не може да продължи, защото драйв %s няма достатъчно пространство."
-
-#: Client/loader/CInstallManager.cpp:823
-msgid "Missing file:"
-msgstr "Липсващ файл:"
-
-#: Client/loader/CInstallManager.cpp:827
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Ако MTA не успее да зареди, моля преинсталирайте GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:948
-msgid "Update install settings"
-msgstr "Обновете инсталиращите настройки"
-
-#: Client/loader/CInstallManager.cpp:1081
-msgid "Update compatibility settings"
-msgstr "Обновете съвместимите настройки"
-
-#: Client/loader/CInstallManager.cpp:1109
-msgid "Move incompatible files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1125
-#: Client/loader/CInstallManager.cpp:1141
-msgid "Delete incompatible files"
-msgstr ""
-
 #: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Търсене на Grand Theft Auto San Andreas"
@@ -924,6 +823,15 @@ msgstr "Моля пуснете Grand Theft Auto San Andreas"
 #: Client/loader/Utils.cpp:566
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Посочете вашата директория на Grand Theft Auto: San Andreas"
+
+#: Client/loader/Utils.cpp:935 Client/loader/CInstallManager.cpp:340
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA има нужда от Администраторски права, за да изпълни следните задачи:\n\n"
+"'%s'\n\n"
+"Моля потвърдете в следващия прозорец."
 
 #: Client/loader/Utils.cpp:1036
 #, c-format
@@ -988,43 +896,15 @@ msgstr "Да не би компютърът ви да се е рестартир
 msgid "Please terminate the following programs before continuing:"
 msgstr "Моля спрете следните програми преди да продължите:"
 
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:127 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
-#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
-#: Client/core/CQuestionBox.cpp:195 Client/core/CSettings.cpp:1372
-#: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
-#: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
-#: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "Yes"
-msgstr "Да"
-
-#: Client/loader/Dialogs.cpp:128 Client/core/CVersionUpdater.cpp:1569
-#: Client/core/CVersionUpdater.cpp:1587 Client/core/CVersionUpdater.cpp:1856
-#: Client/core/CVersionUpdater.cpp:1875 Client/core/CQuestionBox.cpp:194
-#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
-#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
-#: Client/core/CSettings.cpp:4551 Client/core/CMainMenu.cpp:1147
+#: Client/loader/Dialogs.cpp:128 Client/core/CSettings.cpp:1371
+#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
+#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
+#: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1570
+#: Client/core/CVersionUpdater.cpp:1588 Client/core/CVersionUpdater.cpp:1857
+#: Client/core/CVersionUpdater.cpp:1876 Client/core/CMainMenu.cpp:1147
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "Не"
-
-#. Create buttons
-#. OK button
-#: Client/loader/Dialogs.cpp:129 Client/gui/CGUIMessageBox_Impl.cpp:64
-#: Client/core/CVersionUpdater.cpp:1605 Client/core/CVersionUpdater.cpp:1821
-#: Client/core/CVersionUpdater.cpp:1914 Client/core/CVersionUpdater.cpp:1936
-#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:1966
-#: Client/core/CVersionUpdater.cpp:2118 Client/core/CVersionUpdater.cpp:2127
-#: Client/core/CVersionUpdater.cpp:2136 Client/core/CVersionUpdater.cpp:2150
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4695
-msgid "OK"
-msgstr "ОК"
 
 #: Client/loader/Dialogs.cpp:130
 msgid "Quit"
@@ -1174,10 +1054,125 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Няма да инсталирам анти-вирусна програма.\n"
 "Искам компютърът ми да работи бавно и да бъде част от ботнет."
 
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "КОНЗОЛА"
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:848
+msgid "Installing update..."
+msgstr "Инсталиране на актуализация..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:924
+msgid "Extracting files..."
+msgstr "Извличане на файлове..."
+
+#: Client/loader/CExePatchedStatus.cpp:158
+msgid "Update Aero setting"
+msgstr "Актуализирай Аеро настройка"
+
+#: Client/loader/CExePatchedStatus.cpp:160
+msgid "Update Large Memory setting"
+msgstr "Актуализирай Голяма Паметна настройка"
+
+#: Client/loader/CExePatchedStatus.cpp:162
+msgid "Update DEP setting"
+msgstr "Актуализирай DEP настройка"
+
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Update graphics driver compliance"
+msgstr "Актуализирай графични драйвъри"
+
+#: Client/loader/CExePatchedStatus.cpp:166
+#: Client/loader/CExePatchedStatus.cpp:168
+msgid "Fix file issues"
+msgstr "Поправи файлови проблеми"
+
+#: Client/loader/CExePatchedStatus.cpp:170
+msgid "Use proxy loader"
+msgstr ""
+
+#: Client/loader/CExePatchedStatus.cpp:171
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "Копирай главна изпълнителна, за да предотврати проблеми с графическите драйвъри"
+
+#: Client/loader/Install.cpp:260
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:267
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
+
+#: Client/loader/Install.cpp:472
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:355
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA не упся да завърши следните задачи:\n\n"
+"'%s'\n"
+
+#: Client/loader/CInstallManager.cpp:405
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Крашът беше предизвикан от проблеми с графическите драйвъри **\n\n"
+"** Моля обновете графическите си драйвъри **"
+
+#: Client/loader/CInstallManager.cpp:511
+msgid "Install updated MTA:SA files"
+msgstr "Инсталирайте обновените MTA:SA файлове"
+
+#: Client/loader/CInstallManager.cpp:531
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Актуализирането не възможно поради файлови конфликти. Моля спрете другите приложения и опитайте"
+
+#: Client/loader/CInstallManager.cpp:540
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Mutli Theft Auto не беше инсталиран правилно, моля преинсталирайте. %s"
+
+#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:620
+msgid "Patch GTA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:767 Client/core/CCore.cpp:764
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA не може да продължи, защото драйв %s няма достатъчно пространство."
+
+#: Client/loader/CInstallManager.cpp:823
+msgid "Missing file:"
+msgstr "Липсващ файл:"
+
+#: Client/loader/CInstallManager.cpp:827
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Ако MTA не успее да зареди, моля преинсталирайте GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:948
+msgid "Update install settings"
+msgstr "Обновете инсталиращите настройки"
+
+#: Client/loader/CInstallManager.cpp:1081
+msgid "Update compatibility settings"
+msgstr "Обновете съвместимите настройки"
+
+#: Client/loader/CInstallManager.cpp:1109
+msgid "Move incompatible files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1125
+#: Client/loader/CInstallManager.cpp:1141
+msgid "Delete incompatible files"
+msgstr ""
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
@@ -1189,164 +1184,10 @@ msgstr ""
 msgid "Visit latest news article"
 msgstr ""
 
-#: Client/core/CVersionUpdater.cpp:624
-msgid "Busy"
-msgstr "Зает"
-
-#: Client/core/CVersionUpdater.cpp:624
-msgid "Can't check for updates right now"
-msgstr "Не може да провери за обновления сега"
-
-#: Client/core/CVersionUpdater.cpp:1565 Client/core/CVersionUpdater.cpp:1585
-#: Client/core/CVersionUpdater.cpp:1603
-#, c-format
-msgid "MTA:SA %s required"
-msgstr "МТА:SA %s е нужен"
-
-#: Client/core/CVersionUpdater.cpp:1566
-#, c-format
-msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr "Актуализирана версия на MTA:SA %s се изисква, за да се присъедините към избрания сървър.\n\n"
-"Искате ли да изтеглите и инсталирате MTA:SA %s ?"
-
-#: Client/core/CVersionUpdater.cpp:1586
-#, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Искате ли да пуснете MTA:SA %s и да се присъедините към този сървър ?"
-
-#: Client/core/CVersionUpdater.cpp:1604
-msgid "It is not possible to connect at this time.\n\n"
-"Please try later."
-msgstr "Не е възможно свързването в момента.\n\n"
-"Моля опитайте по-късно."
-
-#: Client/core/CVersionUpdater.cpp:1786
-msgid "Connecting"
-msgstr "Свързване"
-
-#: Client/core/CVersionUpdater.cpp:1787 Client/core/CVersionUpdater.cpp:1803
-msgid "Please wait..."
-msgstr "Моля изчакайте..."
-
-#: Client/core/CVersionUpdater.cpp:1802
-msgid "CHECKING"
-msgstr "ПРОВЕРЯВАНЕ"
-
-#: Client/core/CVersionUpdater.cpp:1819 Client/core/CVersionUpdater.cpp:1912
-msgid "UPDATE CHECK"
-msgstr "ПРОВЕРКА НА ОБНОВЛЕНИЕ"
-
-#: Client/core/CVersionUpdater.cpp:1820
-msgid "No update needed"
-msgstr "Няма нужда от обновяване"
-
-#: Client/core/CVersionUpdater.cpp:1837
-msgid "DOWNLOADING"
-msgstr "ИЗТЕГЛЯНЕ"
-
-#: Client/core/CVersionUpdater.cpp:1838
-msgid "waiting..."
-msgstr "чакане..."
-
-#: Client/core/CVersionUpdater.cpp:1854
-msgid "MANDATORY UPDATE"
-msgstr "ЗАДЪЛЖИТЕЛНО ОБНОВЛЕНИЕ"
-
-#: Client/core/CVersionUpdater.cpp:1855
-msgid "To join this server, you must update MTA.\n\n"
-" Do you want to update now ?"
-msgstr "За да се присъедините към този сървър трябва да актуализирате MTA.\n\n"
-"Искате ли да направите актуализацията сега ?"
-
-#: Client/core/CVersionUpdater.cpp:1873
-msgid "OPTIONAL UPDATE"
-msgstr "АКТУАЛИЗАЦИЯ ПО ИЗБОР"
-
-#: Client/core/CVersionUpdater.cpp:1874
-msgid "Server says an update is recommended, but not essential.\n\n"
-" Do you want to update now ?"
-msgstr "Сървърът твърди, че актуализацията е препоръчана, но не и задължителна.\n\n"
-"Искате ли да актуализирате сега ?"
-
-#: Client/core/CVersionUpdater.cpp:1913
-msgid "Update not currently avalable.\n\n"
-"Please check www.mtasa.com"
-msgstr "Актуализация невъзможна в момента.\n\n"
-"Моля посетете www.mtasa.com"
-
-#: Client/core/CVersionUpdater.cpp:1934 Client/core/CVersionUpdater.cpp:2116
-msgid "ERROR SAVING"
-msgstr "ГРЕШКА ПРИ ЗАПАМЕТЯВАНЕ"
-
-#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
-msgid "Unable to create the file."
-msgstr "Невъзможно създаване на файла."
-
-#: Client/core/CVersionUpdater.cpp:1943 Client/core/CVersionUpdater.cpp:1952
-#: Client/core/CVersionUpdater.cpp:2125 Client/core/CVersionUpdater.cpp:2134
-msgid "ERROR DOWNLOADING"
-msgstr "ГРЕШКА ПРИ ИЗТЕГЛЯНЕ"
-
-#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:2126
-msgid "The downloaded file appears to be incorrect."
-msgstr "Изтегленият файл не е правилен."
-
-#: Client/core/CVersionUpdater.cpp:1953 Client/core/CVersionUpdater.cpp:2135
-msgid "For some reason."
-msgstr "Поради някаква причина."
-
-#: Client/core/CVersionUpdater.cpp:1964 Client/core/CVersionUpdater.cpp:2148
-msgid "DOWNLOAD COMPLETE"
-msgstr "ИЗТЕГЛЯНЕТО ЗАВЪРШЕНО"
-
-#: Client/core/CVersionUpdater.cpp:1988
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr "- Проблем в _DialogUpdateResult"
-
-#: Client/core/CVersionUpdater.cpp:2079 Client/core/CSettings.cpp:4500
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "ПЕРСОНАЛИЗИРАНИ GTA:SA ФАЙЛОВЕ"
-
-#: Client/core/CVersionUpdater.cpp:2086 Client/core/CVersionUpdater.cpp:2096
-msgid "Ok"
-msgstr "Ок"
-
-#: Client/core/CVersionUpdater.cpp:2094
-msgid "ERROR"
-msgstr "ГРЕШКА"
-
-#: Client/core/CVersionUpdater.cpp:2095
-msgid "Some MTA:SA data files are missing.\n\n\n"
-"Please reinstall MTA:SA"
-msgstr "Някои MTA:SA дата файлове липсват.\n\n\n"
-"Моля преинсталирайте MTA:SA"
-
-#: Client/core/CVersionUpdater.cpp:2737
-#, c-format
-msgid "%3d %% completed"
-msgstr "%3d %% завършено"
-
-#: Client/core/CVersionUpdater.cpp:2739
-#, c-format
-msgid "\n\n"
-"Waiting for response  -  %-3d"
-msgstr "\n\n"
-"Изчакване на отговор - %-3d"
-
-#: Client/core/CScreenShot.cpp:53
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Екранна снимка заснета: '%s'"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Непозната команда или cvar: "
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Искате ли да видите помощ за този проблем онлайн?"
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Скинът, който избрахте не може да бъде зареден, също и обикновенният скин, моля преинсталирайте MTA."
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -2214,6 +2055,10 @@ msgstr "Някои файлове в директорията на GTA:SA са �
 "ПЕРСОНАЛИЗИРАНИТЕ GTA:SA СА БЛОКИРАНИ ОТ МНОГО СЪРВЪРИ\n\n"
 "Наистина ли искате да ги използвате?"
 
+#: Client/core/CSettings.cpp:4500 Client/core/CVersionUpdater.cpp:2080
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "ПЕРСОНАЛИЗИРАНИ GTA:SA ФАЙЛОВЕ"
+
 #: Client/core/CSettings.cpp:4543
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
@@ -2295,31 +2140,6 @@ msgstr "Оправяне на мишката:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Оправяне на движение на мишката - Може да се нуждае от рестарт на компютъра"
 
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Вие използвате тестов билд! Това е тестов билд, който не може да се свързва към публични сървъри!"
-
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "мта няма да има повече ъпдейти за xp/vista след юли 2019.\n\n"
-"обновете Уиндолса за да играете в най новите сървири."
-
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Това ще ви отвърже от текущия сървър.\n\n"
-"Сигурни ли сте, че искате да бъдете отвързани?"
-
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "ВНИМАНИЕ ЗА ОТВЪРЗВАНЕ"
-
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "български"
-
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ ПОМОЩ ЗА КОМАНДА ]***\n"
@@ -2364,72 +2184,6 @@ msgstr "Запазен конфигурационен файл"
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* Вашият serial е: %s"
-
-#: Client/core/CCredits.cpp:32
-msgid "Programming"
-msgstr "Програмиране"
-
-#: Client/core/CCredits.cpp:61
-msgid "Contributors"
-msgstr "Сътрудници"
-
-#: Client/core/CCredits.cpp:82
-msgid "Game Design / Scripting"
-msgstr "Дизайн на играта / Скриптване"
-
-#: Client/core/CCredits.cpp:102
-msgid "Language Localization"
-msgstr "Езиково Локализиране"
-
-#: Client/core/CCredits.cpp:108
-msgid "Patch contributors"
-msgstr "Сътрудници за пача"
-
-#: Client/core/CCredits.cpp:216
-msgid "Special Thanks"
-msgstr "Специални Благодарности"
-
-#: Client/core/CCredits.cpp:245
-msgid "This software makes use of the following libraries and software:"
-msgstr "Този софтуер използва следните библиотеки и софтуери:"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Скинът, който избрахте не може да бъде зареден, също и обикновенният скин, моля преинсталирайте MTA."
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Неуспешно свързване. Предоставен е невалиден никнейм!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Неуспешно свързване. Предоставен е невалиден хост!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Свързването към %s с порт %u неуспешно!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Свързване към %s%u ..."
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Няма такъв инсталиран мод (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Лош отговор на сървъра (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Лош отговор на сървъра (1)"
 
 #: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -2539,6 +2293,10 @@ msgstr "показва статистиките за паметта"
 msgid "shows the frame timing graph"
 msgstr "показва графата за кадрите"
 
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Искате ли да видите помощ за този проблем онлайн?"
+
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
 msgstr "Ускорителна Ос"
@@ -2546,6 +2304,243 @@ msgstr "Ускорителна Ос"
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
 msgstr "Спирачна Ос"
+
+#: Client/core/CCredits.cpp:32
+msgid "Programming"
+msgstr "Програмиране"
+
+#: Client/core/CCredits.cpp:61
+msgid "Contributors"
+msgstr "Сътрудници"
+
+#: Client/core/CCredits.cpp:82
+msgid "Game Design / Scripting"
+msgstr "Дизайн на играта / Скриптване"
+
+#: Client/core/CCredits.cpp:102
+msgid "Language Localization"
+msgstr "Езиково Локализиране"
+
+#: Client/core/CCredits.cpp:108
+msgid "Patch contributors"
+msgstr "Сътрудници за пача"
+
+#: Client/core/CCredits.cpp:216
+msgid "Special Thanks"
+msgstr "Специални Благодарности"
+
+#: Client/core/CCredits.cpp:245
+msgid "This software makes use of the following libraries and software:"
+msgstr "Този софтуер използва следните библиотеки и софтуери:"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "КОНЗОЛА"
+
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Непозната команда или cvar: "
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Неуспешно свързване. Предоставен е невалиден никнейм!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Неуспешно свързване. Предоставен е невалиден хост!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Свързването към %s с порт %u неуспешно!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Свързване към %s%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Няма такъв инсталиран мод (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Лош отговор на сървъра (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Лош отговор на сървъра (1)"
+
+#: Client/core/CVersionUpdater.cpp:625
+msgid "Busy"
+msgstr "Зает"
+
+#: Client/core/CVersionUpdater.cpp:625
+msgid "Can't check for updates right now"
+msgstr "Не може да провери за обновления сега"
+
+#: Client/core/CVersionUpdater.cpp:1566 Client/core/CVersionUpdater.cpp:1586
+#: Client/core/CVersionUpdater.cpp:1604
+#, c-format
+msgid "MTA:SA %s required"
+msgstr "МТА:SA %s е нужен"
+
+#: Client/core/CVersionUpdater.cpp:1567
+#, c-format
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr "Актуализирана версия на MTA:SA %s се изисква, за да се присъедините към избрания сървър.\n\n"
+"Искате ли да изтеглите и инсталирате MTA:SA %s ?"
+
+#: Client/core/CVersionUpdater.cpp:1587
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "Искате ли да пуснете MTA:SA %s и да се присъедините към този сървър ?"
+
+#: Client/core/CVersionUpdater.cpp:1605
+msgid "It is not possible to connect at this time.\n\n"
+"Please try later."
+msgstr "Не е възможно свързването в момента.\n\n"
+"Моля опитайте по-късно."
+
+#: Client/core/CVersionUpdater.cpp:1787
+msgid "Connecting"
+msgstr "Свързване"
+
+#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+msgid "Please wait..."
+msgstr "Моля изчакайте..."
+
+#: Client/core/CVersionUpdater.cpp:1803
+msgid "CHECKING"
+msgstr "ПРОВЕРЯВАНЕ"
+
+#: Client/core/CVersionUpdater.cpp:1820 Client/core/CVersionUpdater.cpp:1913
+msgid "UPDATE CHECK"
+msgstr "ПРОВЕРКА НА ОБНОВЛЕНИЕ"
+
+#: Client/core/CVersionUpdater.cpp:1821
+msgid "No update needed"
+msgstr "Няма нужда от обновяване"
+
+#: Client/core/CVersionUpdater.cpp:1838
+msgid "DOWNLOADING"
+msgstr "ИЗТЕГЛЯНЕ"
+
+#: Client/core/CVersionUpdater.cpp:1839
+msgid "waiting..."
+msgstr "чакане..."
+
+#: Client/core/CVersionUpdater.cpp:1855
+msgid "MANDATORY UPDATE"
+msgstr "ЗАДЪЛЖИТЕЛНО ОБНОВЛЕНИЕ"
+
+#: Client/core/CVersionUpdater.cpp:1856
+msgid "To join this server, you must update MTA.\n\n"
+" Do you want to update now ?"
+msgstr "За да се присъедините към този сървър трябва да актуализирате MTA.\n\n"
+"Искате ли да направите актуализацията сега ?"
+
+#: Client/core/CVersionUpdater.cpp:1874
+msgid "OPTIONAL UPDATE"
+msgstr "АКТУАЛИЗАЦИЯ ПО ИЗБОР"
+
+#: Client/core/CVersionUpdater.cpp:1875
+msgid "Server says an update is recommended, but not essential.\n\n"
+" Do you want to update now ?"
+msgstr "Сървърът твърди, че актуализацията е препоръчана, но не и задължителна.\n\n"
+"Искате ли да актуализирате сега ?"
+
+#: Client/core/CVersionUpdater.cpp:1914
+msgid "Update not currently avalable.\n\n"
+"Please check www.mtasa.com"
+msgstr "Актуализация невъзможна в момента.\n\n"
+"Моля посетете www.mtasa.com"
+
+#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
+msgid "ERROR SAVING"
+msgstr "ГРЕШКА ПРИ ЗАПАМЕТЯВАНЕ"
+
+#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
+msgid "Unable to create the file."
+msgstr "Невъзможно създаване на файла."
+
+#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:1953
+#: Client/core/CVersionUpdater.cpp:2126 Client/core/CVersionUpdater.cpp:2135
+msgid "ERROR DOWNLOADING"
+msgstr "ГРЕШКА ПРИ ИЗТЕГЛЯНЕ"
+
+#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:2127
+msgid "The downloaded file appears to be incorrect."
+msgstr "Изтегленият файл не е правилен."
+
+#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:2136
+msgid "For some reason."
+msgstr "Поради някаква причина."
+
+#: Client/core/CVersionUpdater.cpp:1965 Client/core/CVersionUpdater.cpp:2149
+msgid "DOWNLOAD COMPLETE"
+msgstr "ИЗТЕГЛЯНЕТО ЗАВЪРШЕНО"
+
+#: Client/core/CVersionUpdater.cpp:1989
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr "- Проблем в _DialogUpdateResult"
+
+#: Client/core/CVersionUpdater.cpp:2087 Client/core/CVersionUpdater.cpp:2097
+msgid "Ok"
+msgstr "Ок"
+
+#: Client/core/CVersionUpdater.cpp:2095
+msgid "ERROR"
+msgstr "ГРЕШКА"
+
+#: Client/core/CVersionUpdater.cpp:2096
+msgid "Some MTA:SA data files are missing.\n\n\n"
+"Please reinstall MTA:SA"
+msgstr "Някои MTA:SA дата файлове липсват.\n\n\n"
+"Моля преинсталирайте MTA:SA"
+
+#: Client/core/CVersionUpdater.cpp:2771
+#, c-format
+msgid "%3d %% completed"
+msgstr "%3d %% завършено"
+
+#: Client/core/CVersionUpdater.cpp:2773
+#, c-format
+msgid "\n\n"
+"Waiting for response  -  %-3d"
+msgstr "\n\n"
+"Изчакване на отговор - %-3d"
+
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Вие използвате тестов билд! Това е тестов билд, който не може да се свързва към публични сървъри!"
+
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "мта няма да има повече ъпдейти за xp/vista след юли 2019.\n\n"
+"обновете Уиндолса за да играете в най новите сървири."
+
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Това ще ви отвърже от текущия сървър.\n\n"
+"Сигурни ли сте, че искате да бъдете отвързани?"
+
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "ВНИМАНИЕ ЗА ОТВЪРЗВАНЕ"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "български"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2719,70 +2714,10 @@ msgstr "Група контроли напред"
 msgid "Group control backwards"
 msgstr "Група контроли назад"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#: Client/core/CScreenShot.cpp:53
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Екранната снимка получи %d байта, но очакваше %d"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Екранната снимка се провали"
-
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Не успя да се стартира Direct3D9.\n\n"
-"Моля проверете дали DirectX End-User Runtime и\n"
-"последният Windows Service Packs са инсталирани правилно."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Без работа"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "играч"
-msgstr[1] "играчи"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "включено"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "сървър"
-msgstr[1] "сървъри"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Изискване на главен сървър лист (%lu ms загубени)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "Главния сървър лист не може да бъде парснат."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "Главният сървър лист не може да бъде изкаран."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Бекъп сървър лист)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "Не може да се биндне LAN-излъчващия сокет"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "Опит да се намерят LAN сървъри"
+msgid "Screenshot taken: '%s'"
+msgstr "Екранна снимка заснета: '%s'"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2938,6 +2873,54 @@ msgstr "Моля използвайте mtasa:// протокола!"
 msgid "You have to select a server to connect to."
 msgstr "Трябва да изберете сървър, за който да се свържете,"
 
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Без работа"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "играч"
+msgstr[1] "играчи"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "включено"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "сървър"
+msgstr[1] "сървъри"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Изискване на главен сървър лист (%lu ms загубени)"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "Главния сървър лист не може да бъде парснат."
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "Главният сървър лист не може да бъде изкаран."
+
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Бекъп сървър лист)"
+
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Не може да се биндне LAN-излъчващия сокет"
+
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "Опит да се намерят LAN сървъри"
+
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
 #: Client/core/ServerBrowser/CServerInfo.cpp:302
@@ -3021,6 +3004,32 @@ msgstr "Времето Изтече"
 msgid "Querying..."
 msgstr "Заявка..."
 
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Екранната снимка получи %d байта, но очакваше %d"
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "Екранната снимка се провали"
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Не успя да се стартира Direct3D9.\n\n"
+"Моля проверете дали DirectX End-User Runtime и\n"
+"последният Windows Service Packs са инсталирани правилно."
+
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "Не може да се намери валидна екранна резолюция."
+
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Сигурни ли сте, че искате да използвате тази екранна резолюция?"
+
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
 msgstr "Заявки на уебсайта"
@@ -3045,15 +3054,6 @@ msgstr "Отхвърли"
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
 msgid "Problem with graphics driver"
 msgstr "Проблем с графичния драйвър"
-
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "Не може да се намери валидна екранна резолюция."
-
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Сигурни ли сте, че искате да използвате тази екранна резолюция?"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
