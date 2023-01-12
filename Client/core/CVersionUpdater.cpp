@@ -14,6 +14,7 @@
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
 #include "SharedUtil.Thread.h"
+#include <charconv>
 
 ///////////////////////////////////////////////////////////////
 //
@@ -2176,6 +2177,35 @@ void CVersionUpdater::_UseVersionQueryURLs()
     m_JobInfo.bShowDownloadPercent = false;
 }
 
+/**
+ * @brief Extracts the revision from an update file name.
+ * @param fileName Name of the file
+ * @param revision Revision of the update
+*/
+static bool GetRevisionFromFileName(std::string_view fileName, std::uint32_t& revision)
+{
+    revision = {};
+
+    // Example:                          mtasa-1.5.9-rc-21519-0-000-files-all-cksummed.rar
+    // Search for the delimiter before the revision ^^^^.
+    if (size_t revisionStart = fileName.find("-rc-"); revisionStart != std::string_view::npos)
+    {
+        revisionStart += 4;
+
+        // Example:                mtasa-1.5.9-rc-21519-0-000-files-all-cksummed.rar
+        // Search for the delimiter after the revision ^.
+        if (size_t revisionStop = fileName.find('-', revisionStart); revisionStop != std::string_view::npos)
+        {
+            std::string_view raw = fileName.substr(revisionStart, revisionStop - revisionStart);
+
+            if (auto [ptr, ec] = std::from_chars(raw.data(), raw.data() + raw.size(), revision); ec == std::errc{})
+                return true;
+        }
+    }
+
+    return false;
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CVersionUpdater::_ProcessPatchFileQuery
@@ -2303,16 +2333,20 @@ void CVersionUpdater::_ProcessPatchFileQuery()
     // Report update response
     if (!m_JobInfo.strStatus.empty() && m_JobInfo.strStatus != "noupdate" && !_strnicmp("mtasa-", m_JobInfo.strFilename.c_str(), 6))
     {
-        unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-        unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
-        SString        playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
-                                     MTASA_VERSION_BUILD, netRev, netRel);
-        SString        updateBuildType;
-        CVARS_GET("update_build_type", updateBuildType);
+        uint32_t revision{};
 
-        AddReportLog(5060, SString("Processing patch file '%s' [%s, %s] with '%s' (version: %s, channel: %s)", m_JobInfo.strFilename.c_str(),
-                                   m_JobInfo.iFilesize.ToString().c_str(), m_JobInfo.strMD5.c_str(), m_JobInfo.strStatus.c_str(), playerVersion.c_str(),
-                                   updateBuildType.c_str()));
+        if (GetRevisionFromFileName(m_JobInfo.strFilename, revision) && revision < MTASA_VERSION_BUILD)
+        {
+            unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+            unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+
+            SString playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
+                                  MTASA_VERSION_BUILD, netRev, netRel);
+
+            AddReportLog(5061, SString("Processing patch file '%s' [%s, %s] with '%s' (version: %s) from '%s'", m_JobInfo.strFilename.c_str(),
+                                       m_JobInfo.iFilesize.ToString().c_str(), m_JobInfo.strMD5.c_str(), m_JobInfo.strStatus.c_str(), playerVersion.c_str(),
+                                       m_strLastQueryURL.c_str()));
+        }
     }
 }
 
