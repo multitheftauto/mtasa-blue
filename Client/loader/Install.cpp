@@ -88,6 +88,9 @@ struct DirectoryDeleteScope
  */
 static bool ExtractSingleArchiveFile(const std::string& archivePath, const SString& targetRoot, const SString& fileName, char* password)
 {
+    if (archivePath.empty())
+        return false;
+
     RAROpenArchiveDataEx archiveData{};
     archiveData.ArcName = const_cast<char*>(archivePath.data());
     archiveData.OpenMode = RAR_OM_EXTRACT;
@@ -569,6 +572,7 @@ static int RunInstall()
     if (!FileExists(archivePath))
     {
         AddReportLog(5055, SString("RunInstall: Source archive does not exist: '%s' (source: '%s')", archivePath.c_str(), sourceRoot.c_str()));
+        archivePath = "";
     }
 
     const SString targetRoot = PathConform(GetMTASAPath());
@@ -905,9 +909,9 @@ SString CheckOnRestartCommand()
             SString strArchivePath, strArchiveName;
             strFile.Split("\\", &strArchivePath, &strArchiveName, -1);
 
-            const SString sourceRoot = CreateWritableDirectory(strArchivePath + "\\_" + strArchiveName + "_tmp_");
+            const SString sourceRoot = MakeUniquePath(strArchivePath + "\\_" + strArchiveName + "_tmp_");
 
-            if (sourceRoot.empty())
+            if (!MkDir(sourceRoot))
                 return "FileError1";
 
             DirectoryDeleteScope deleteSourceRoot(sourceRoot);
