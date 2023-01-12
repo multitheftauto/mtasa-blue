@@ -929,13 +929,13 @@ SString CheckOnRestartCommand()
                     success = ShellExecuteBlocking("open", strFile, strParameters.SplitRight("###"));
             }
 
+            // Stop progress bar
+            StopPseudoProgress();
+
             if (!success)
                 return "FileError3";
 
             deleteSourceRoot.Release();
-
-            // Stop progress bar
-            StopPseudoProgress();
 
             // If a new "Multi Theft Auto.exe" exists, let that complete the install
             if (FileExists(MTA_EXE_NAME_RELEASE))
