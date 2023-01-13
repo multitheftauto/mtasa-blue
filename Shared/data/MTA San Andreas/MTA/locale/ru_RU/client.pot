@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-12 20:00+0000\n"
-"PO-Revision-Date: 2023-01-12 20:06\n"
+"PO-Revision-Date: 2023-01-13 09:35\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -770,7 +770,9 @@ msgstr "Основной файл не подписан. Возможна вир
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Отсутствуют данные в файле %s. Возможно вирусное заражение.\n\n"
+"Попробуйте переустановить Multi Theft Auto для Вашей безопасности.\n"
+"Смотрите помощь в интернете, если МТА будет работать некорректно."
 
 #: Client/loader/MainFunctions.cpp:863
 #, c-format
