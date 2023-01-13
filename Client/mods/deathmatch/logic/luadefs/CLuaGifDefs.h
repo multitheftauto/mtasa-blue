@@ -21,8 +21,5 @@ public:
     static int  GifPlay(lua_State*);
     static int  GifStop(lua_State*);
     static int  GifNavigateToThumbnail(lua_State*);
-    static int  GifSetFrameDelay(lua_State*);
-    static int  GifGetFrameCount(lua_State*);
-    static int  GifGetFrameDefaultDelay(lua_State*);
     static int  IsGifPlaying(lua_State*);
 };
