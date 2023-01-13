@@ -23,10 +23,6 @@ public:
     static int  GifNavigateToThumbnail(lua_State*);
     static int  GifSetFrameDelay(lua_State*);
     static int  GifGetFrameCount(lua_State*);
-    static int  GifGetFrameDelay(lua_State*);
-    static int  GifGetShowingFrame(lua_State*);
     static int  GifGetFrameDefaultDelay(lua_State*);
-    static int  GifGetFormat(lua_State*);
-    static int  GifGetTick(lua_State*);
     static int  IsGifPlaying(lua_State*);
 };
