@@ -830,8 +830,8 @@ void CheckDataFiles()
 
     struct
     {
-        const char* szMd5;
-        const char* szFilename;
+        const char* expected;
+        const char* fileName;
     } integrityCheckList[] = {{"8E58FCC0672A66C827C6F90FA4B58538", "bass.dll"},            {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
                               {"07C11F7D8058F350ADF6FC9AB81B38AC", "bass_ac3.dll"},        {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
                               {"65F79B61AD377DE06D88FE40B1D70538", "bassflac.dll"},        {"9AAF837944A9763CD914AC7D31ABC8C7", "bassmidi.dll"},
@@ -842,13 +842,28 @@ void CheckDataFiles()
                               {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"},  {"1C9B45E87528B8BB8CFA884EA0099A85", "d3dcompiler_43.dll"},
                               {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},        {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
                               {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},            {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
-    for (int i = 0; i < NUMELMS(integrityCheckList); i++)
+
+    for (const auto& item : integrityCheckList)
     {
-        SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
-        if (!strMd5.CompareI(integrityCheckList[i].szMd5))
+        SString filePath = PathJoin(strMTASAPath, "mta", item.fileName);
+
+        if (!FileExists(filePath))
         {
-            DisplayErrorMessageBox(_("Data files modified. Possible virus activity.\n\nSee online help if MTA does not work correctly."), _E("CL30"),
-                                   "maybe-virus2");
+            SString message(_("Data file %s is missing. Possible virus activity.\n\nConsider reinstalling Multi Theft Auto for your security.\nSee online "
+                              "help if MTA does not work correctly."),
+                            item.fileName);
+            DisplayErrorMessageBox(message, _E("CL30"), "maybe-virus2");
+            break;
+        }
+
+        SString computed = CMD5Hasher::CalculateHexString(filePath);
+
+        if (!computed.CompareI(item.expected))
+        {
+            SString message(_("Data file %s is modified. Possible virus activity.\n\nConsider reinstalling Multi Theft Auto for your security.\nSee online "
+                              "help if MTA does not work correctly."),
+                            item.fileName);
+            DisplayErrorMessageBox(message, _E("CL30"), "maybe-virus2");
             break;
         }
     }
@@ -943,6 +958,7 @@ void CheckLibVersions()
                                 "MTA\\netc.dll",
                                 "MTA\\xmll.dll",
                                 "MTA\\game_sa.dll",
+                                "MTA\\mtasa.dll",
                                 "mods\\deathmatch\\client.dll",
                                 "mods\\deathmatch\\pcre3.dll"};
     SString     strReqFileVersion;

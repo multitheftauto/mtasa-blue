@@ -1,7 +1,7 @@
 project "Loader Proxy"
 	language "C++"
 	kind "SharedLib"
-	targetname "winmm"
+	targetname "mtasa"
 	targetdir(buildpath("mta"))
 	targetsuffix ""
 
@@ -15,7 +15,7 @@ project "Loader Proxy"
 	files {
 		"premake5.lua",
 		"exports.def",
-		"winmm.asm",
+		"mtasa.asm",
 		"setup.cpp",
 		"main.cpp",
 	}

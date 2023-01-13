@@ -31,11 +31,17 @@ wchar* ConvertPath(const wchar *SrcPath,wchar *DestPath,size_t DestSize)
     const wchar *s=DestPtr;
     if (s[0]!=0 && IsDriveDiv(s[1]))
       s+=2;
-    if (s[0]=='\\' && s[1]=='\\')
+
+    // Skip UNC Windows \\server\share\ or Unix //server/share/
+    if (IsPathDiv(s[0]) && IsPathDiv(s[1]))
     {
-      const wchar *Slash=wcschr(s+2,'\\');
-      if (Slash!=NULL && (Slash=wcschr(Slash+1,'\\'))!=NULL)
-        s=Slash+1;
+      uint SlashCount=0;
+      for (const wchar *t=s+2;*t!=0;t++)
+        if (IsPathDiv(*t) && ++SlashCount==2)
+        {
+          s=t+1; // Found two more path separators after leading two.
+          break;
+        }
     }
     for (const wchar *t=s;*t!=0;t++)
       if (IsPathDiv(*t))

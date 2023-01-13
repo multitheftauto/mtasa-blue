@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <array>
+#include <cryptopp/crc.h>
+#include <cryptopp/files.h>
 #include <tchar.h>
 #include <strsafe.h>
 #include <Tlhelp32.h>
@@ -560,7 +563,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 
     // Ask user to browse for GTA
     BROWSEINFOW bi = {0};
-    WString     strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
+    WString     strMessage(_("Select your Grand Theft Auto: San Andreas Installation Directory"));
     bi.lpszTitle = strMessage;
     LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
 
@@ -1007,8 +1010,8 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     GetApplicationSetting("mta-version-ext").Split(".", parts);
     if (parts.size() == 6)
     {
-        usNetRev = atoi(parts[4]);
-        usNetRel = atoi(parts[5]);
+        usNetRev = static_cast<unsigned short>(atoi(parts[4]));
+        usNetRel = static_cast<unsigned short>(atoi(parts[5]));
     }
 
     DWORD   dwLastError = 0;
@@ -1119,29 +1122,32 @@ bool Is32bitProcess(DWORD processID)
 // Terminate process from pid
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateProcess(DWORD dwProcessID, uint uiExitCode)
+bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 {
-    HMODULE hModule = GetLibraryHandle("kernel32.dll");
-    if (hModule)
-    {
-        typedef bool (*PFNTerminateProcess)(uint, uint);
-        PFNTerminateProcess pfnTerminateProcess = static_cast<PFNTerminateProcess>(static_cast<PVOID>(GetProcAddress(hModule, "NtTerminateProcess")));
+    bool success = false;
 
-        if (pfnTerminateProcess)
+    if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
+    {
+        using Signature = bool(*)(DWORD, UINT);
+        static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
+
+        if (NtTerminateProcess_)
         {
-            bool bResult = pfnTerminateProcess(dwProcessID, uiExitCode);
-            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, bResult));
-        }
-        else
-        {
-            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID);
-            if (hProcess)
-            {
-                TerminateProcess(hProcess, uiExitCode);
-                CloseHandle(hProcess);
-            }
+            success = NtTerminateProcess_(dwProcessID, uiExitCode);
+            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, success));
         }
     }
+
+    if (!success)
+    {
+        if (HANDLE handle = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID); handle)
+        {
+            success = TerminateProcess(handle, uiExitCode);
+            CloseHandle(handle);
+        }
+    }
+
+    return success;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1175,7 +1181,7 @@ bool CreateSingleInstanceMutex()
 ///////////////////////////////////////////////////////////////////////////
 void ReleaseSingleInstanceMutex()
 {
-    assert(g_hMutex);
+    // assert(g_hMutex);
     CloseHandle(g_hMutex);
     g_hMutex = NULL;
 }
@@ -1604,16 +1610,26 @@ void CheckAndShowImgProblems()
 // Load a library function
 //
 //////////////////////////////////////////////////////////
-void* LoadFunction(const char* szLibName, const char* szFunctionName)
+void* LoadFunction(const char* libraryName, const char* functionName)
 {
-    static std::map<SString, HMODULE> libMap;
-    HMODULE*                          phModule = MapFind(libMap, szLibName);
-    if (!phModule)
+    static std::map<std::string, HMODULE, std::less<>> libraries;
+
+    HMODULE handle{};
+
+    if (auto iter = libraries.find(libraryName); iter != libraries.end())
     {
-        MapSet(libMap, szLibName, LoadLibrary(szLibName));
-        phModule = MapFind(libMap, szLibName);
+        handle = iter->second;
     }
-    return static_cast<PVOID>(GetProcAddress(*phModule, szFunctionName));
+    else
+    {
+        if (handle = LoadLibraryA(libraryName))
+            libraries[libraryName] = handle;
+        else
+            return nullptr;
+    }
+
+    auto result = static_cast<void*>(GetProcAddress(handle, functionName));
+    return result;
 }
 
 //////////////////////////////////////////////////////////
@@ -1964,6 +1980,102 @@ bool WriteCompatibilityEntries(const WString& strProgName, const WString& strSub
 
     return bResult;
 }
+
+//////////////////////////////////////////////////////////
+//
+// GetProcessListUsingFile
+//
+// Returns a list of process ids with a handle a specific file.
+//
+//////////////////////////////////////////////////////////
+std::vector<DWORD> GetProcessListUsingFile(const WString& filePath)
+{
+    if (!_NtQueryInformationFile)
+        return {};
+
+    HANDLE fileHandle = CreateFileW(
+        /* FileName            */ filePath.c_str(),
+        /* DesiredAccess       */ FILE_READ_ATTRIBUTES,
+        /* ShareMode           */ FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        /* SecurityAttributes  */ nullptr,
+        /* CreationDisposition */ OPEN_EXISTING,
+        /* FlagsAndAttributes  */ 0,
+        /* TemplateFile        */ nullptr);
+
+    if (fileHandle == INVALID_HANDLE_VALUE)
+        return {};
+
+    HANDLE processHeap = GetProcessHeap();
+    SIZE_T heapSize = 8192;
+    auto   fileInfo = reinterpret_cast<PFILE_PROCESS_IDS_USING_FILE_INFORMATION>(HeapAlloc(processHeap, HEAP_ZERO_MEMORY, heapSize));
+
+    if (!fileInfo)
+    {
+        CloseHandle(fileHandle);
+        return {};
+    }
+
+    IO_STATUS_BLOCK ioStatus{};
+    NTSTATUS        status = _NtQueryInformationFile(
+        /* FileHandle           */ fileHandle,
+        /* IoStatusBlock        */ &ioStatus,
+        /* FileInformation      */ fileInfo,
+        /* Length               */ heapSize,
+        /* FileInformationClass */ 47 /* = FileProcessIdsUsingFileInformation */);
+
+    while (status == STATUS_INFO_LENGTH_MISMATCH)
+    {
+        heapSize *= 2;
+        auto reallocated = reinterpret_cast<PFILE_PROCESS_IDS_USING_FILE_INFORMATION>(HeapReAlloc(processHeap, HEAP_ZERO_MEMORY, fileInfo, heapSize));
+
+        if (!reallocated)
+        {
+            HeapFree(processHeap, 0, fileInfo);
+            CloseHandle(fileHandle);
+            return {};
+        }
+
+        fileInfo = reallocated;
+
+        status = _NtQueryInformationFile(
+            /* FileHandle           */ fileHandle,
+            /* IoStatusBlock        */ &ioStatus,
+            /* FileInformation      */ fileInfo,
+            /* Length               */ heapSize,
+            /* FileInformationClass */ 47 /* = FileProcessIdsUsingFileInformation */);
+    }
+
+    CloseHandle(fileHandle);
+    std::vector<DWORD> result;
+
+    if (NT_SUCCESS(status) && fileInfo->NumberOfProcessIdsInList > 0)
+    {
+        result.reserve(fileInfo->NumberOfProcessIdsInList);
+
+        for (ULONG i = 0; i < fileInfo->NumberOfProcessIdsInList; i++)
+        {
+            auto processId = static_cast<DWORD>(fileInfo->ProcessIdList[i]);
+
+            if (processId)
+                result.emplace_back(processId);
+        }
+    }
+
+    HeapFree(processHeap, 0, fileInfo);
+    return result;
+}
+
+auto ComputeCRC32(const char* filePath) -> uint32_t
+{
+    CryptoPP::CRC32                                         hash{};
+    std::array<CryptoPP::byte, CryptoPP::CRC32::DIGESTSIZE> bytes{};
+
+    CryptoPP::FileSource pass(filePath, true, new CryptoPP::HashFilter(hash, new CryptoPP::ArraySink(bytes.data(), bytes.size())));
+
+    uint32_t result{};
+    std::copy_n(bytes.data(), std::min(sizeof(result), bytes.size()), reinterpret_cast<uint8_t*>(&result));
+    return result;
+};
 
 //////////////////////////////////////////////////////////
 //

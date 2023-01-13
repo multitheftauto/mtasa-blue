@@ -195,6 +195,7 @@ void CInstallManager::InitSequencer()
     m_pSequencer->AddFunction("ProcessExePatchChecks", &CInstallManager::_ProcessExePatchChecks);
     m_pSequencer->AddFunction("ProcessServiceChecks", &CInstallManager::_ProcessServiceChecks);
     m_pSequencer->AddFunction("ProcessAppCompatChecks", &CInstallManager::_ProcessAppCompatChecks);
+    m_pSequencer->AddFunction("ProcessWinmmChecks", &CInstallManager::_ProcessWinmmChecks);
     m_pSequencer->AddFunction("ChangeFromAdmin", &CInstallManager::_ChangeFromAdmin);
     m_pSequencer->AddFunction("InstallNewsItems", &CInstallManager::_InstallNewsItems);
     m_pSequencer->AddFunction("Quit", &CInstallManager::_Quit);
@@ -500,7 +501,7 @@ SString CInstallManager::_InstallFiles()
     WatchDogReset();
 
     // Install new files
-    if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "no"))
+    if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "yes"))
     {
         if (!IsUserAdmin())
             AddReportLog(3048, SString("_InstallFiles: Install - trying as admin %s", ""));
@@ -1088,23 +1089,58 @@ SString CInstallManager::_ProcessAppCompatChecks()
 //
 // CInstallManager::_ProcessWinmmChecks
 //
-// Ensure winmm.dll does not exist in the gta directory
+// Ensure {winmm,mtasa}.dll does not exist in the wrong directory
 //
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessWinmmChecks()
 {
-    SString filePath = PathJoin(GetGTAPath(), "winmm.dll");
-
-    if (FileExists(filePath))
+    // Rename winmm.dll in the GTA directory.
     {
-        SString filePathBak = PathJoin(GetGTAPath(), "winmm.dll.backup");
-        FileDelete(filePathBak);
-        FileRename(filePath, filePathBak);
+        SString filePath = PathJoin(GetGTAPath(), "winmm.dll");
 
         if (FileExists(filePath))
         {
-            m_strAdminReason = _("Move incompatible files");
-            return "fail";
+            SString filePathBak = PathJoin(GetGTAPath(), "winmm.dll.backup");
+            FileDelete(filePathBak);
+            FileRename(filePath, filePathBak);
+
+            if (FileExists(filePath))
+            {
+                m_strAdminReason = _("Move incompatible files");
+                return "fail";
+            }
+        }
+    }
+
+    // Delete mtasa.dll in the GTA directory.
+    {
+        SString filePath = PathJoin(GetGTAPath(), "mtasa.dll");
+
+        if (FileExists(filePath))
+        {
+            FileDelete(filePath);
+
+            if (FileExists(filePath))
+            {
+                m_strAdminReason = _("Delete incompatible files");
+                return "fail";
+            }
+        }
+    }
+
+    // Delete winmm.dll in our MTA directory.
+    {
+        SString filePath = PathJoin(CalcMTASAPath("mta"), "winmm.dll");
+
+        if (FileExists(filePath))
+        {
+            FileDelete(filePath);
+
+            if (FileExists(filePath))
+            {
+                m_strAdminReason = _("Delete incompatible files");
+                return "fail";
+            }
         }
     }
 
@@ -1144,7 +1180,7 @@ SString CInstallManager::_InstallNewsItems()
         SetCurrentDirectory(strTargetDir);
 
         // Try to extract the files
-        if (!ExtractFiles(strFileLocation))
+        if (!ExtractFiles(strFileLocation, false))
         {
             // If extract failed and update file is an exe, try to run it
             if (ExtractExtension(strFileLocation).CompareI("exe"))
