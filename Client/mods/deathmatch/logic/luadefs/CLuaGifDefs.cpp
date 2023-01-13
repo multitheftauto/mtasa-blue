@@ -22,13 +22,6 @@ void CLuaGifDefs::LoadFunctions(){
         {"gifPlay", GifPlay},
         {"gifStop", GifStop},
         {"gifNavigateToThumbnail", GifNavigateToThumbnail},
-        {"gifSetFrameDelay", GifSetFrameDelay},
-        {"gifGetFrameCount", GifGetFrameCount},
-        {"gifGetFrameDelay", GifGetFrameDelay},
-        {"gifGetShowingFrame", GifGetShowingFrame},
-        {"gifGetFrameDefaultDelay", GifGetFrameDefaultDelay},
-        {"gifGetFormat", GifGetFormat},
-        {"gifGetTick", GifGetTick},
         {"isGifPlaying", IsGifPlaying},
     };
     for (const auto& [name, func] : functions)
@@ -40,13 +33,6 @@ void CLuaGifDefs::AddClass(lua_State* luaVM){
     lua_classfunction(luaVM, "play", "gifPlay");
     lua_classfunction(luaVM, "stop", "gifStop");
     lua_classfunction(luaVM, "navigateToThumbnail", "gifNavigateToThumbnail");
-    lua_classfunction(luaVM, "setFrameDelay", "gifSetFrameDelay");
-    lua_classfunction(luaVM, "getFrameCount", "gifGetFrameCount");
-    lua_classfunction(luaVM, "getFrameDelay", "gifGetFrameDelay");
-    lua_classfunction(luaVM, "getShowingFrame", "gifGetShowingFrame");
-    lua_classfunction(luaVM, "getFrameDefaultDelay", "gifGetFrameDefaultDelay");
-    lua_classfunction(luaVM, "getFormat", "gifGetFormat");
-    lua_classfunction(luaVM, "getTick", "gifGetTick");
     lua_classfunction(luaVM, "isPlaying", "isGifPlaying");
     lua_registerclass(luaVM, "Gif");
 }
@@ -189,148 +175,6 @@ int CLuaGifDefs::GifNavigateToThumbnail(lua_State* luaVM) {
     if (!argStream.HasErrors()) {
         gif->NavigateToThumbnail();
         lua_pushboolean(luaVM, true);
-        return 1;
-    }else{
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    lua_pushboolean(luaVM,false);
-    return 1;
-}
-
-int CLuaGifDefs::GifSetFrameDelay(lua_State* luaVM) {
-    CClientGif* gif = nullptr;
-    uint index = 0;
-    uint delay = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(gif);
-    if (!gif) {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM,false);
-        return 1;
-    }
-    argStream.ReadNumber(index,-1);
-    argStream.ReadNumber(delay);
-    if (!argStream.HasErrors()) {
-        gif->SetFrameDelay(index, delay);
-        lua_pushboolean(luaVM,true);
-        return 1;
-    }else{
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    lua_pushboolean(luaVM,false);
-    return 1;
-}
-
-int CLuaGifDefs::GifGetFrameCount(lua_State* luaVM) {
-    CClientGif* gif = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(gif);
-    if (!gif) {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM,false);
-        return 1;
-    }
-    if (!argStream.HasErrors()) {
-        lua_pushnumber(luaVM, gif->GetFrameCount());
-        return 1;
-    }else{
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    lua_pushboolean(luaVM,false);
-    return 1;
-}
-
-int CLuaGifDefs::GifGetFrameDelay(lua_State* luaVM) {
-    CClientGif* gif = nullptr;
-    uint index = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(gif);
-    if (!gif) {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM,false);
-        return 1;
-    }
-    argStream.ReadNumber(index,-1);
-    if (!argStream.HasErrors()) {
-        lua_pushnumber(luaVM, gif->GetFrameDelay(index));
-        return 1;
-    }else{
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    lua_pushboolean(luaVM,false);
-    return 1;
-}
-
-int CLuaGifDefs::GifGetShowingFrame(lua_State* luaVM){
-    CClientGif* gif = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(gif);
-    if (!gif) {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM,false);
-        return 1;
-    }
-    if (!argStream.HasErrors()) {
-        lua_pushnumber(luaVM, gif->GetShowingFrame());
-        return 1;
-    }else{
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    lua_pushboolean(luaVM,false);
-    return 1;
-}
-
-int CLuaGifDefs::GifGetFrameDefaultDelay(lua_State* luaVM) {
-    CClientGif* gif = nullptr;
-    uint index = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(gif);
-    if (!gif) {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM,false);
-        return 1;
-    }
-    argStream.ReadNumber(index,-1);
-    if (!argStream.HasErrors()) {
-        lua_pushnumber(luaVM, gif->GetFrameDefaultDelay(index));
-        return 1;
-    }else{
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    lua_pushboolean(luaVM,false);
-    return 1;
-}
-
-int CLuaGifDefs::GifGetFormat(lua_State* luaVM) {
-    CClientGif* gif = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(gif);
-    if (!gif) {
-        m_pScriptDebugging->LogCustom(luaVM,argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM,false);
-        return 1;
-    }
-    if (!argStream.HasErrors()) {
-        lua_pushstring(luaVM, gif->GetFormat().c_str());
-        return 1;
-    }else{
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    lua_pushboolean(luaVM,false);
-    return 1;
-}
-
-int CLuaGifDefs::GifGetTick(lua_State* luaVM) {
-    CClientGif* gif = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(gif);
-    if (!gif){
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-    if (!argStream.HasErrors()) {
-        lua_pushnumber(luaVM, gif->GetTick());
         return 1;
     }else{
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
