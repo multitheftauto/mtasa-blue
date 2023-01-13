@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-12 20:00+0000\n"
-"PO-Revision-Date: 2023-01-13 09:35\n"
+"PO-Revision-Date: 2023-01-13 10:35\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -770,7 +770,7 @@ msgstr "Основной файл не подписан. Возможна вир
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "Отсутствуют данные в файле %s. Возможно вирусное заражение.\n\n"
+msgstr "В файле %s отсутствуют данные. Возможно, вирусное заражение.\n\n"
 "Попробуйте переустановить Multi Theft Auto для Вашей безопасности.\n"
 "Смотрите помощь в интернете, если МТА будет работать некорректно."
 
@@ -779,7 +779,9 @@ msgstr "Отсутствуют данные в файле %s. Возможно �
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "В файле %s изменены данные. Возможно, вирусное заражение.\n\n"
+"Попробуйте переустановить Multi Theft Auto для Вашей безопасности.\n"
+"Смотрите помощь в интернете, если МТА будет работать некорректно."
 
 #: Client/loader/MainFunctions.cpp:877
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -1103,14 +1105,15 @@ msgstr "Скопируйте главный исполняемый файл чт
 
 #: Client/loader/Install.cpp:260
 msgid "Unknown"
-msgstr ""
+msgstr "Неизвестно"
 
 #: Client/loader/Install.cpp:267
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Файл '%s' используется %zu.\n"
+"Вы хотите завершить этот процесс и продолжить обновление?"
 
 #: Client/loader/Install.cpp:472
 #, c-format
@@ -1118,7 +1121,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Установка может быть повреждена.\n\n"
+"%zu из %zu файлов не удалось восстановить из резервной копии.\n"
+"Переустановите Multi Theft Auto с сайта www.multitheftauto.com\n"
+"или запустите обновление от имени администратора."
 
 #: Client/loader/CInstallManager.cpp:355
 #, c-format
