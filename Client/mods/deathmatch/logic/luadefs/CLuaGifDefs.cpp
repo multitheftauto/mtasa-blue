@@ -22,7 +22,7 @@ void CLuaGifDefs::LoadFunctions(){
         {"gifPlay", GifPlay},
         {"gifStop", GifStop},
         {"gifNavigateToThumbnail", GifNavigateToThumbnail},
-        {"isGifPlaying", IsGifPlaying},
+        {"gifIsPlaying", GifIsPlaying},
     };
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
@@ -183,7 +183,7 @@ int CLuaGifDefs::GifNavigateToThumbnail(lua_State* luaVM) {
     return 1;
 }
 
-int CLuaGifDefs::IsGifPlaying(lua_State* luaVM) {
+int CLuaGifDefs::GifIsPlaying(lua_State* luaVM) {
     CClientGif* gif = nullptr;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(gif);
