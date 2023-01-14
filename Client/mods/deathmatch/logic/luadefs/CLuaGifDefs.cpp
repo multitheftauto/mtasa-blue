@@ -21,7 +21,8 @@ void CLuaGifDefs::LoadFunctions(){
         {"gifCreate", GifCreate},
         {"gifPlay", GifPlay},
         {"gifStop", GifStop},
-        {"gifNavigateToThumbnail", GifNavigateToThumbnail},
+        {"gifSetProperty", GifSetProperty},
+        {"gifGetProperty", GifGetProperty},
         {"gifIsPlaying", GifIsPlaying},
     };
     for (const auto& [name, func] : functions)
@@ -32,8 +33,9 @@ void CLuaGifDefs::AddClass(lua_State* luaVM){
     lua_newclass(luaVM);
     lua_classfunction(luaVM, "play", "gifPlay");
     lua_classfunction(luaVM, "stop", "gifStop");
-    lua_classfunction(luaVM, "navigateToThumbnail", "gifNavigateToThumbnail");
-    lua_classfunction(luaVM, "isPlaying", "isGifPlaying");
+    lua_classfunction(luaVM, "setProperty", "gifSetProperty");
+    lua_classfunction(luaVM, "getProperty", "gifGetProperty");
+    lua_classfunction(luaVM, "isPlaying", "GifIsPlaying");
     lua_registerclass(luaVM, "Gif");
 }
 
@@ -163,23 +165,156 @@ int CLuaGifDefs::GifStop(lua_State* luaVM) {
     return 1;
 }
 
-int CLuaGifDefs::GifNavigateToThumbnail(lua_State* luaVM) {
+int CLuaGifDefs::GifSetProperty(lua_State* luaVM) {
     CClientGif* gif = nullptr;
+    int         frame = 0;
+    bool        readFrame = false;
+    SString     property;
+    SString     strValue;
+    int         numberValue = -1;
+    bool        readNumberValue = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(gif);
     if (!gif) {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM,false);
+        lua_pushboolean(luaVM, false);
         return 1;
     }
+    if (argStream.NextIsNumber()) {
+        argStream.ReadNumber(frame, 0);
+        readFrame = true;
+    }
+    argStream.ReadString(property);
+    if (argStream.NextIsNumber()) {
+        argStream.ReadNumber(numberValue);
+        readNumberValue = true;
+    }else{
+        argStream.ReadString(strValue);
+    }
     if (!argStream.HasErrors()) {
-        gif->NavigateToThumbnail();
-        lua_pushboolean(luaVM, true);
-        return 1;
+        bool success = false;
+        if (property.empty()) {
+            m_pScriptDebugging->LogError(luaVM, "property can't be empty");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+        if (readNumberValue) {
+            if (numberValue < 0) {
+                m_pScriptDebugging->LogError(luaVM, "property value can't be a negative number");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }else{
+            if (strValue.empty()) {
+                m_pScriptDebugging->LogError(luaVM, "property value can't be empty");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+        }
+        if (frame > 0) {
+            int frameCount = gif->GetFrameCount();
+            if (frame > frameCount){
+                m_pScriptDebugging->LogError(luaVM, "couldn't find frame");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            if (property == "delay") {
+                if (numberValue > -1){
+                    gif->SetFrameDelay(frame, numberValue);
+                    success = true;
+                }
+            }else{
+                m_pScriptDebugging->LogError(luaVM, "property doesn't exist for frame");
+            }
+        }else{
+            if (readFrame) {
+                m_pScriptDebugging->LogError(luaVM, "couldn't find frame");
+            }else{
+                if (property == "showing_frame"){
+                    if (numberValue > -1){
+                        gif->SetFrame(numberValue);
+                        success = true;
+                    }
+                }else{
+                    m_pScriptDebugging->LogError(luaVM, "property doesn't exist for gif");
+                }
+            }
+        }
+        if (success) {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
     }else{
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
-    lua_pushboolean(luaVM,false);
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGifDefs::GifGetProperty(lua_State* luaVM) {
+    CClientGif*      gif = nullptr;
+    int              frame = 0;
+    bool             readFrame = false;
+    SString          property;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(gif);
+    if (!gif){
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    if (argStream.NextIsNumber()){
+        argStream.ReadNumber(frame, 0);
+        readFrame = true;
+    }
+    argStream.ReadString(property);
+    if (!argStream.HasErrors()){
+        if (property.empty()){
+            m_pScriptDebugging->LogError(luaVM, "property can't be empty");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+        if (frame > 0){
+            int frameCount = gif->GetFrameCount();
+            if (frame > frameCount){
+                m_pScriptDebugging->LogError(luaVM, "couldn't find frame");
+                lua_pushboolean(luaVM, false);
+                return 1;
+            }
+            if (property == "delay"){
+                lua_pushnumber(luaVM, gif->GetFrameDelay(frame));
+                return 1;
+            }else if (property == "default_delay") {
+                lua_pushnumber(luaVM, gif->GetFrameDefaultDelay(frame));
+                return 1;
+            }else{
+                m_pScriptDebugging->LogError(luaVM, "property doesn't exist for frame");
+            }
+        }else{
+            if (readFrame){
+                m_pScriptDebugging->LogError(luaVM, "couldn't find frame");
+            }else{
+                if (property == "showing_frame"){
+                    lua_pushnumber(luaVM, gif->GetShowingFrame());
+                    return 1;
+                }else if (property == "frame_count"){
+                    lua_pushnumber(luaVM, gif->GetFrameCount());
+                    return 1;
+                }else if (property == "format"){
+                    lua_pushstring(luaVM, gif->GetFormat().c_str());
+                    return 1;
+                }else if (property == "tick"){
+                    lua_pushnumber(luaVM, gif->GetTick());
+                    return 1;
+                }else{
+                    m_pScriptDebugging->LogError(luaVM, "property doesn't exist for gif");
+                }
+            }
+        }
+    }else{
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+    lua_pushboolean(luaVM, false);
     return 1;
 }
 
