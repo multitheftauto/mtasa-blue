@@ -20,6 +20,7 @@ public:
     static int  GifCreate(lua_State*);
     static int  GifPlay(lua_State*);
     static int  GifStop(lua_State*);
-    static int  GifNavigateToThumbnail(lua_State*);
+    static int  GifSetProperty(lua_State*);
+    static int  GifGetProperty(lua_State*);
     static int  GifIsPlaying(lua_State*);
 };
