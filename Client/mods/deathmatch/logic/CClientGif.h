@@ -103,6 +103,7 @@ public:
     void                                    SetFrameDelay(const uint& id, const uint32_t& delay) { m_bDelays[(id < 1 ? m_bShowing : (id > GetImageCount() ? (m_bShowing) : id)) - 1] = delay; }
     void                                    SetFormat(const SString& fmt) { if (!fmt.empty()) m_bFormat = fmt; }
     void                                    SetFrameCount(const uint& count) { m_bFrameCount = count; }
+    void                                    SetFrame(const int& frame) { if (frame <= GetImageCount()) m_bShowing = 1; }
     void                                    UpdateTick() { m_bTick = (double)GetTickCount64_(); }
     void                                    Play() { m_bPlaying = true; }
     void                                    Stop() { m_bPlaying = false; }
