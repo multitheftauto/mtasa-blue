@@ -21,5 +21,5 @@ public:
     static int  GifPlay(lua_State*);
     static int  GifStop(lua_State*);
     static int  GifNavigateToThumbnail(lua_State*);
-    static int  IsGifPlaying(lua_State*);
+    static int  GifIsPlaying(lua_State*);
 };
