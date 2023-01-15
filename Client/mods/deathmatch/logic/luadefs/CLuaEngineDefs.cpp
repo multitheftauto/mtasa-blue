@@ -2058,6 +2058,11 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 
 bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
-    g_pClientGame->RestreamWorld();
+    bool bRestreamLODs;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bRestreamLODs, false);
+
+    g_pClientGame->RestreamWorld(bRestreamLODs);
     return true;
 }

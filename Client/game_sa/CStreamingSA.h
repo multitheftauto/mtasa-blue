@@ -30,6 +30,7 @@ public:
     CStreamingInfo* GetStreamingInfoFromModelId(uint32 id);
     void            MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
     std::uint32_t   GetMemoryUsed() const override;
+    void            RemoveBigBuildings();
 
 private:
     static CStreamingInfo* ms_aInfoForModel;            // count: 26316 in unmodified game

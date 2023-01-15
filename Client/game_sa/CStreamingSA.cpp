@@ -171,3 +171,11 @@ std::uint32_t CStreamingSA::GetMemoryUsed() const
 {
     return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
 }
+
+void CStreamingSA::RemoveBigBuildings()
+{
+    using Function_RemoveBigBuildings = void(__cdecl*)();
+    auto removeBigBuildings = reinterpret_cast<Function_RemoveBigBuildings>(0x4093B0);
+
+    removeBigBuildings();
+}
