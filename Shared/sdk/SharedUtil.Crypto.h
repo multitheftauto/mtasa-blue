@@ -13,11 +13,13 @@
 #include <cryptopp/rsa.h>
 #include <cryptopp/modes.h>
 #include <cryptopp/osrng.h>
+#include <cryptopp/hmac.h>
+#include <cryptopp/hex.h>
+#include <cryptopp/md5.h>
 #include "SString.h"
 
 namespace SharedUtil
 {
-
     struct KeyPair
     {
         SString publicKey, privateKey;
@@ -38,6 +40,32 @@ namespace SharedUtil
 
         return result;
     }
+
+    template <class HashType>
+    inline SString Hash(const SString& value)
+    {
+        SString  result;
+        HashType hashType{};
+
+        CryptoPP::StringSource ss(value, true, new CryptoPP::HashFilter(hashType, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result))));
+
+        return result;
+    }
+
+    template <class HmacType>
+    inline SString Hmac(const SString& value, const SString& key)
+    {
+        SString mac;
+        SString result;
+
+        CryptoPP::HMAC<HmacType> hmac(reinterpret_cast<const CryptoPP::byte*>(key.c_str()), key.size());
+
+        CryptoPP::StringSource ssMac(value, true, new CryptoPP::HashFilter(hmac, new CryptoPP::StringSink(mac)));
+        CryptoPP::StringSource ssResult(mac, true, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result)));
+
+        return result;
+    }
+
 
     inline KeyPair GenerateRsaKeyPair(const unsigned int size)
     {

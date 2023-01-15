@@ -13,6 +13,8 @@
 
 #include "CVehicle.h"
 
+class CBikeHandlingEntry;
+
 class CBike : public virtual CVehicle
 {
 public:

@@ -88,6 +88,7 @@ void InitRwFunctions(eGameVersion version)
             RwRasterCreate = (RwRasterCreate_t)0x007FB270;
             RwTextureCreate = (RwTextureCreate_t)0x007F3800;
             RpMaterialSetTexture = (RpMaterialSetTexture_t)0x0074DC10;
+            GetAnimHierarchyFromClump = (GetAnimHierarchyFromClump_t)0x734B10;
             GetAnimHierarchyFromSkinClump = (GetAnimHierarchyFromSkinClump_t)0x734A40;
             RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51E0;
             RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5160;
@@ -184,6 +185,7 @@ void InitRwFunctions(eGameVersion version)
             RwRasterCreate = (RwRasterCreate_t)0x007FB230;
             RwTextureCreate = (RwTextureCreate_t)0x007F37C0;
             RpMaterialSetTexture = (RpMaterialSetTexture_t)0x0074DBC0;
+            GetAnimHierarchyFromClump = (GetAnimHierarchyFromClump_t)0x734B10;
             GetAnimHierarchyFromSkinClump = (GetAnimHierarchyFromSkinClump_t)0x734A40;
             RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
             RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;

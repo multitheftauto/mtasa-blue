@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CCam.h>
 
 #define PI_2 6.283185307179586476925286766559f
 
@@ -487,12 +488,12 @@ void CClientCamera::RestoreEntity(CClientEntity* pEntity)
 
 void CClientCamera::SetCameraVehicleViewMode(eVehicleCamMode eMode)
 {
-    m_pCamera->SetCameraVehicleViewMode((unsigned short)eMode);
+    m_pCamera->SetCameraVehicleViewMode(static_cast<BYTE>(eMode));
 }
 
 void CClientCamera::SetCameraPedViewMode(ePedCamMode eMode)
 {
-    m_pCamera->SetCameraPedViewMode((unsigned short)eMode);
+    m_pCamera->SetCameraPedViewMode(static_cast<BYTE>(eMode));
 }
 
 eVehicleCamMode CClientCamera::GetCameraVehicleViewMode()

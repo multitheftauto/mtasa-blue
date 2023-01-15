@@ -12,6 +12,8 @@
    through scripting functions.
 */
 #include <StdInc.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 
 #define CS_NAN -32768
 

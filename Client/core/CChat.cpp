@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CSettings.h>
 
 using std::vector;
 
@@ -62,6 +63,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_ePositionVertical = Chat::Position::Vertical::TOP;
     m_eTextAlign = Chat::Text::Align::LEFT;
     m_iSelectedInputHistoryEntry = -1;
+    m_iCharacterLimit = m_iDefaultCharacterLimit;
 
     // Background area
     m_pBackground = m_pManager->CreateStaticImage();
@@ -165,6 +167,15 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
     DrawInputLine(bUsingOutline);
 
+    if (m_bInputVisible)
+    {
+        // ChrML: Hack so chatbox input always works. It might get unfocused..
+        if (!m_pBackground->IsActive())
+        {
+            m_pBackground->Activate();
+        }
+    }
+
     // Are we visible?
     if (!m_bVisible)
         return;
@@ -211,9 +222,8 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
             if (m_iReportCount < 5)
             {
                 m_iReportCount++;
-                SString strAdapterName = g_pDeviceState->AdapterState.Name;
                 AddReportLog(6532, SString("Chat rt chatSize:%2.0f %2.0f   rtsize:%d %d   card:%s", chatSize.fX, chatSize.fY, iRenderTargetSizeX,
-                                           iRenderTargetSizeY, *strAdapterName));
+                                           iRenderTargetSizeY, g_pDeviceState->AdapterState.Name.c_str()));
             }
         }
         m_iCacheTextureRevision = -1;            // Make sure the graphics will be updated
@@ -296,15 +306,6 @@ void CChat::GetDrawList(SDrawList& outDrawList, bool bUsingOutline)
         m_pBackground->SetVisible(true);
         m_pBackground->Render();
         m_pBackground->SetVisible(false);
-    }
-
-    if (m_bInputVisible)
-    {
-        // ChrML: Hack so chatbox input always works. It might get unfocused..
-        if (!m_pBackground->IsActive())
-        {
-            m_pBackground->Activate();
-        }
     }
 
     // Used for render clipping in CChat::DrawTextString
@@ -714,7 +715,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         {
                             // Check size if it's ok, then output
                             SString strOutput = strCurrentInput.replace(iFound, std::string::npos, strPlayerName);
-                            if (MbUTF8ToUTF16(strOutput).size() < CHAT_MAX_CHAT_LENGTH)
+                            if (MbUTF8ToUTF16(strOutput).size() < m_iCharacterLimit)
                             {
                                 bSuccess = true;
                                 m_strLastPlayerNamePart = strPlayerNamePart;
@@ -745,7 +746,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                 m_strLastPlayerName.clear();
 
             // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-            if (MbUTF8ToUTF16(m_strInputText).size() < CHAT_MAX_CHAT_LENGTH)
+            if (MbUTF8ToUTF16(m_strInputText).size() < m_iCharacterLimit)
             {
                 if (KeyboardArgs.codepoint >= 32)
                 {
@@ -865,7 +866,7 @@ void CChat::UpdateGUI()
     m_pBackground->SetSize(m_vecBackgroundSize);
 
     // Make sure there is enough room for all the lines
-    uint uiMaxNumLines = g_pCore->GetGraphics()->GetViewportHeight() / std::max(1.f, CChat::GetFontHeight(m_vecScale.fY)) - 3;
+    uint uiMaxNumLines = g_pCore->GetGraphics()->GetViewportHeight() / std::max(1.f, CChat::GetFontHeight(m_vecScale.fY)) - m_iMaxInputLines;
     if (m_uiNumLines > uiMaxNumLines)
         SetNumLines(uiMaxNumLines);
 
@@ -967,7 +968,7 @@ void CChat::SetInputText(const char* szText)
 
     CChatLine* pLine = NULL;
 
-    while (szRemainingText && m_InputLine.m_ExtraLines.size() < 3)
+    while (szRemainingText && m_InputLine.m_ExtraLines.size() < m_iMaxInputLines)
     {
         m_InputLine.m_ExtraLines.resize(m_InputLine.m_ExtraLines.size() + 1);
         CChatLine& line = *(m_InputLine.m_ExtraLines.end() - 1);
@@ -1075,6 +1076,11 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
                                                DT_LEFT | DT_TOP | DT_NOCLIP, g_pChat->m_pDXFont, bOutline);
         }
     }
+}
+
+void CChat::SetCharacterLimit(int charLimit)
+{
+    m_iCharacterLimit = charLimit;
 }
 
 CChatLine::CChatLine()

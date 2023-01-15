@@ -270,15 +270,15 @@ void CResource::Load()
         }
     }
 
-    // Load the no cache scripts first
-    for (std::list<SNoClientCacheScript>::iterator iter = m_NoClientCacheScriptList.begin(); iter != m_NoClientCacheScriptList.end(); ++iter)
-    {
+    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front()) {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
-        const SNoClientCacheScript& item = *iter;
+
+        auto& item = list.front();
         GetVM()->LoadScriptFromBuffer(item.buffer.GetData(), item.buffer.GetSize(), item.strFilename);
+        item.buffer.ZeroClear();
+
         DECLARE_PROFILER_SECTION(OnPostLoadNoClientCacheScript)
     }
-    m_NoClientCacheScriptList.clear();
 
     // Load the files that are queued in the list "to be loaded"
     list<CResourceFile*>::iterator iter = m_ResourceFiles.begin();

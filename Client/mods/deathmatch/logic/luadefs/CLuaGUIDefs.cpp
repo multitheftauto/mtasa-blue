@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutCVars = {{"chat_font",
                                                                                          "chat_lines",
@@ -30,7 +31,8 @@ static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS> g_chatboxLayoutC
                                                                                          "chat_line_life",
                                                                                          "chat_line_fade_out",
                                                                                          "chat_use_cegui",
-                                                                                         "text_scale"}};
+                                                                                         "text_scale",
+                                                                                         "chat_text_outline"}};
 
 void CLuaGUIDefs::LoadFunctions()
 {
@@ -47,6 +49,9 @@ void CLuaGUIDefs::LoadFunctions()
         {"isMainMenuActive", GUIIsMainMenuActive},
         {"isMTAWindowActive", GUIIsMTAWindowActive},
         {"isTransferBoxActive", GUIIsTransferBoxActive},
+
+        {"setChatboxCharacterLimit", ArgumentParser<GUISetChatboxCharacterLimit>},
+        {"getChatboxCharacterLimit", ArgumentParser<GUIGetChatboxCharacterLimit>},
 
         {"guiCreateWindow", GUICreateWindow},
         {"guiCreateLabel", GUICreateLabel},
@@ -238,6 +243,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isInputEnabled", "guiGetInputEnabled");
     lua_classfunction(luaVM, "getInputMode", "guiGetInputMode");
     lua_classfunction(luaVM, "getCursorType", "guiGetCursorType");
+    lua_classfunction(luaVM, "setChatboxCharacterLimit", "setChatboxCharacterLimit");
+    lua_classfunction(luaVM, "getChatboxCharacterLimit", "getChatboxCharacterLimit");
 
     lua_classfunction(luaVM, "getScreenSize", "guiGetScreenSize");
     lua_classfunction(luaVM, "getProperties", "guiGetProperties");
@@ -279,6 +286,7 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
     lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
+    lua_classvariable(luaVM, "chatboxCharacterLimit", "setChatboxCharacterLimit", "getChatboxCharacterLimit");
 
     lua_registerclass(luaVM, "GuiElement", "Element");
 }
@@ -702,7 +710,7 @@ int CLuaGUIDefs::GUICreateWindow(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(titleBarText);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -736,7 +744,7 @@ int CLuaGUIDefs::GUICreateLabel(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -771,7 +779,7 @@ int CLuaGUIDefs::GUICreateStaticImage(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(path);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -823,7 +831,7 @@ int CLuaGUIDefs::GUICreateButton(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -856,7 +864,7 @@ int CLuaGUIDefs::GUICreateProgressBar(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -893,7 +901,7 @@ int CLuaGUIDefs::GUICreateCheckBox(lua_State* luaVM)
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
     argStream.ReadBool(selected);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -928,7 +936,7 @@ int CLuaGUIDefs::GUICreateRadioButton(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -963,7 +971,7 @@ int CLuaGUIDefs::GUICreateEdit(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -998,7 +1006,7 @@ int CLuaGUIDefs::GUICreateMemo(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(text);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1031,7 +1039,7 @@ int CLuaGUIDefs::GUICreateGridList(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1064,7 +1072,7 @@ int CLuaGUIDefs::GUICreateScrollPane(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1099,7 +1107,7 @@ int CLuaGUIDefs::GUICreateScrollBar(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadBool(horizontal);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1132,7 +1140,7 @@ int CLuaGUIDefs::GUICreateTabPanel(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -1754,7 +1762,7 @@ int CLuaGUIDefs::GUIGetSize(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(theElement);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -1790,7 +1798,7 @@ int CLuaGUIDefs::GUIGetPosition(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(guiElement);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2080,7 +2088,7 @@ int CLuaGUIDefs::GUISetSize(lua_State* luaVM)
     argStream.ReadUserData(guiElement);
     argStream.ReadNumber(width);
     argStream.ReadNumber(height);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2108,7 +2116,7 @@ int CLuaGUIDefs::GUISetPosition(lua_State* luaVM)
     argStream.ReadUserData(guiElement);
     argStream.ReadNumber(x);
     argStream.ReadNumber(y);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2230,7 +2238,7 @@ int CLuaGUIDefs::GUIGridListSetColumnWidth(lua_State* luaVM)
     argStream.ReadUserData<CGUIGridList>(guiGridlist);
     argStream.ReadNumber(columnIndex);
     argStream.ReadNumber(width);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -2256,7 +2264,7 @@ int CLuaGUIDefs::GUIGridListGetColumnWidth(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData<CGUIGridList>(pGridList);
     argStream.ReadNumber(columnIndex);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
 
     if (!argStream.HasErrors())
     {
@@ -3645,6 +3653,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
     //* chat_line_fade_out - Returns how long takes for text to fade out
     //* chat_use_cegui - Returns whether CEGUI is used to render the chatbox
     //* text_scale - Returns text scale
+    //* chat_text_outline - Returns whether text black/white outline is used
 
     CScriptArgReader  argStream(luaVM);
     CCVarsInterface*  pCVars = g_pCore->GetCVars();
@@ -3755,7 +3764,7 @@ int CLuaGUIDefs::GUICreateComboBox(lua_State* luaVM)
     argStream.ReadVector2D(position);
     argStream.ReadVector2D(size);
     argStream.ReadString(caption);
-    argStream.ReadBool(relative);
+    argStream.ReadBool(relative, false);
     argStream.ReadUserData(parent, NULL);
 
     if (!argStream.HasErrors())
@@ -4055,4 +4064,25 @@ int CLuaGUIDefs::GUIGetCursorType(lua_State* luaVM)
     auto eType = CStaticFunctionDefinitions::GUIGetCursorType();
     lua_pushstring(luaVM, EnumToString(eType));
     return 1;
+}
+
+bool CLuaGUIDefs::GUISetChatboxCharacterLimit(int charLimit)
+{
+    if (charLimit == -1)
+    {
+        g_pCore->ResetChatboxCharacterLimit();
+        return true;
+    }
+
+    int maxCharLimit = g_pCore->GetChatboxMaxCharacterLimit();
+
+    if (charLimit < 0 || charLimit > maxCharLimit)
+        throw std::invalid_argument(SString("Character limit must be %s than, or equal to %i (got: %i)", (charLimit < 0) ? "greater" : "less", (charLimit < 0) ? 0 : maxCharLimit, charLimit));
+
+    return g_pCore->SetChatboxCharacterLimit(charLimit);
+}
+
+int CLuaGUIDefs::GUIGetChatboxCharacterLimit()
+{
+    return g_pCore->GetChatboxCharacterLimit();
 }

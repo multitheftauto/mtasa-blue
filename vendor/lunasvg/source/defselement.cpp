@@ -3,7 +3,7 @@
 namespace lunasvg {
 
 DefsElement::DefsElement()
-    : GraphicsElement(ElementId::Defs)
+    : GraphicsElement(ElementID::Defs)
 {
 }
 

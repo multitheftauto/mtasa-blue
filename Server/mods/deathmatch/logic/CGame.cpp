@@ -10,10 +10,63 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGame.h"
+#include "CAccessControlListManager.h"
+#include "ASE.h"
+#include "CPerfStatManager.h"
+#include "CSettings.h"
+#include "CZoneNames.h"
+#include "CRemoteCalls.h"
+#include "luadefs/CLuaDefs.h"
+#include "CRegistry.h"
+#include "CLanBroadcast.h"
+#include "CRegisteredCommands.h"
+#include "CTickRateSettings.h"
+#include "CBuildingRemovalManager.h"
+#include "CDebugHookManager.h"
+#include "CTrainTrackManager.h"
+#include "lua/CLuaCallback.h"
+#include "CWeaponStatManager.h"
+#include "CPedSync.h"
+#include "CHTTPD.h"
+#include "CBan.h"
+#include "CPlayerCamera.h"
+#include "CPacketTranslator.h"
+#include "CAccountManager.h"
+#include "CWaterManager.h"
+#include "CResourceManager.h"
+#include "CMapManager.h"
+#include "CMarkerManager.h"
+#include "CHandlingManager.h"
+#include "CScriptDebugging.h"
+#include "CBandwidthSettings.h"
+#include "CMainConfig.h"
+#include "CUnoccupiedVehicleSync.h"
+#include "CRegistryManager.h"
+#include "CLatentTransferManager.h"
+#include "CCommandFile.h"
+#include "packets/CVoiceEndPacket.h"
+#include "packets/CEntityAddPacket.h"
+#include "packets/CUpdateInfoPacket.h"
+#include "packets/CPlayerWastedPacket.h"
+#include "packets/CElementRPCPacket.h"
+#include "packets/CReturnSyncPacket.h"
+#include "packets/CPlayerNoSocketPacket.h"
+#include "packets/CPlayerConnectCompletePacket.h"
+#include "packets/CPlayerJoinCompletePacket.h"
+#include "packets/CPlayerResourceStartPacket.h"
+#include "packets/CPlayerNetworkStatusPacket.h"
+#include "packets/CPlayerListPacket.h"
+#include "packets/CPlayerClothesPacket.h"
 #include "../utils/COpenPortsTester.h"
 #include "../utils/CMasterServerAnnouncer.h"
 #include "../utils/CHqComms.h"
 #include "../utils/CFunctionUseLogger.h"
+#include "Utils.h"
+#include "CStaticFunctionDefinitions.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "CZipMaker.h"
+#include "version.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
 
@@ -30,6 +83,14 @@
 #define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
 #define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
 #define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
+
+#ifndef WIN32
+    #include <limits.h>
+    
+    #ifndef MAX_PATH
+        #define MAX_PATH PATH_MAX
+    #endif
+#endif
 
 CGame* g_pGame = NULL;
 
@@ -703,6 +764,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         MTA_DM_BUILDTAG_SHORT
 #ifdef ANY_x64
         " [64 bit]"
+#elif defined(ANY_arm)
+        " [arm]"
+#elif defined(ANY_arm64)
+        " [arm64]"
 #endif
         ,
         m_pMainConfig->GetServerName().c_str(), strServerIPList.empty() ? "auto" : strServerIPList.c_str(), usServerPort, pszLogFileName, uiMaxPlayers,
@@ -1198,12 +1263,6 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
-        case PACKET_ID_DISCORD_JOIN:
-        {
-            Packet_DiscordJoin(static_cast<CDiscordJoinPacket&>(Packet));
-            return true;
-        }
-
         case PACKET_ID_PLAYER_RESOURCE_START:
         {
             Packet_PlayerResourceStart(static_cast<CPlayerResourceStartPacket&>(Packet));
@@ -1239,15 +1298,11 @@ void CGame::JoinPlayer(CPlayer& Player)
 
     // Let him join
     Player.Send(CPlayerJoinCompletePacket(
-        Player.GetID(), m_pPlayerManager->Count(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
+        Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
         m_pMainConfig->GetHTTPDownloadURL().c_str(), m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
         m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(), m_pMainConfig->GetVoiceBitrate()));
 
     marker.Set("CPlayerJoinCompletePacket");
-
-    // Sync up server info on entry
-    if (Player.CanBitStream(eBitStreamVersion::Discord_InitialImplementation))
-        Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
 
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
@@ -1363,15 +1418,6 @@ void CGame::InitialDataStream(CPlayer& Player)
     Player.CallEvent("onPlayerJoin", Arguments);
 
     marker.Set("onPlayerJoin");
-
-    SString joinSecret = Player.GetDiscordJoinSecret();
-    if (joinSecret.length())
-    {
-        CLuaArguments Arguments;
-        Arguments.PushBoolean(true);
-        Arguments.PushString(joinSecret);
-        Player.CallEvent("onPlayerDiscordJoin", Arguments);
-    }
 
     // Register them on the lightweight sync manager.
     m_lightsyncManager.RegisterPlayer(&Player);
@@ -1527,7 +1573,6 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerACInfo", "aclist, size, md5, sha256", NULL, false);
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
-    m_Events.AddEvent("onPlayerDiscordJoin", "justConnected, secret", NULL, false);
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
 
     // Ped events
@@ -1535,6 +1580,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", NULL, false);
     m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
+    m_Events.AddEvent("onPedDamage", "loss", NULL, false);
 
     // Element events
     m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
@@ -1752,7 +1798,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strSerial, 0);
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
-                            pPlayer->SetDiscordJoinSecret(Packet.GetDiscordJoinSecret());
 
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
@@ -4003,18 +4048,6 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
         Arguments.PushNumber(Packet.m_ucType);             // 0-interruption began  1-interruption end
         Arguments.PushNumber(Packet.m_uiTicks);            // Ticks since interruption start
         pPlayer->CallEvent("onPlayerNetworkStatus", Arguments, NULL);
-    }
-}
-
-void CGame::Packet_DiscordJoin(CDiscordJoinPacket& Packet)
-{
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer)
-    {
-        CLuaArguments Arguments;
-        Arguments.PushBoolean(false);
-        Arguments.PushString(Packet.GetSecret());
-        pPlayer->CallEvent("onPlayerDiscordJoin", Arguments, NULL);
     }
 }
 

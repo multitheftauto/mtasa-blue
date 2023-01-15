@@ -22,9 +22,6 @@ void ListArchive(CommandData *Cmd)
       Cmd->Password.Clean(); // Clean user entered password before processing next archive.
 
     Archive Arc(Cmd);
-#ifdef _WIN_ALL
-    Arc.RemoveSequentialFlag();
-#endif
     if (!Arc.WOpen(ArcName))
       continue;
     bool FileMatched=true;
@@ -39,6 +36,7 @@ void ListArchive(CommandData *Cmd)
         {
           Arc.ViewComment();
           mprintf(L"\n%s: %s",St(MListArchive),Arc.FileName);
+
           mprintf(L"\n%s: ",St(MListDetails));
           uint SetCount=0;
           const wchar *Fmt=Arc.Format==RARFMT14 ? L"RAR 1.4":(Arc.Format==RARFMT15 ? L"RAR 4":L"RAR 5");
@@ -64,6 +62,16 @@ void ListArchive(CommandData *Cmd)
             mprintf(L"%s%s", SetCount++ > 0 ? L", ":L"", St(MListLock));
           if (Arc.Encrypted)
             mprintf(L"%s%s", SetCount++ > 0 ? L", ":L"", St(MListEncHead));
+
+          if (!Arc.MainHead.OrigName.empty())
+            mprintf(L"\n%s: %s",St(MOrigName),Arc.MainHead.OrigName.c_str());
+          if (Arc.MainHead.OrigCtime.IsSet())
+          {
+            wchar DateStr[50];
+            Arc.MainHead.OrigCtime.GetText(DateStr,ASIZE(DateStr),Technical);
+            mprintf(L"\n%s: %s",St(MOriginalTime),DateStr);
+          }
+
           mprintf(L"\n");
         }
 
@@ -310,17 +318,21 @@ void ListFileHeader(Archive &Arc,FileHeader &hd,bool &TitleShown,bool Verbose,bo
       mprintf(L"\n%12ls: %ls",St(MListPacked),PackSizeText);
       mprintf(L"\n%12ls: %ls",St(MListRatio),RatioStr);
     }
+    bool WinTitles=false;
+#ifdef _WIN_ALL
+    WinTitles=true;
+#endif
     if (hd.mtime.IsSet())
-      mprintf(L"\n%12ls: %ls",St(MListMtime),DateStr);
+      mprintf(L"\n%12ls: %ls",St(WinTitles ? MListModified:MListMtime),DateStr);
     if (hd.ctime.IsSet())
     {
       hd.ctime.GetText(DateStr,ASIZE(DateStr),true);
-      mprintf(L"\n%12ls: %ls",St(MListCtime),DateStr);
+      mprintf(L"\n%12ls: %ls",St(WinTitles ? MListCreated:MListCtime),DateStr);
     }
     if (hd.atime.IsSet())
     {
       hd.atime.GetText(DateStr,ASIZE(DateStr),true);
-      mprintf(L"\n%12ls: %ls",St(MListAtime),DateStr);
+      mprintf(L"\n%12ls: %ls",St(WinTitles ? MListAccessed:MListAtime),DateStr);
     }
     mprintf(L"\n%12ls: %ls",St(MListAttr),AttrStr);
     if (hd.FileHash.Type==HASH_CRC32)
@@ -376,15 +388,16 @@ void ListFileHeader(Archive &Arc,FileHeader &hd,bool &TitleShown,bool Verbose,bo
     {
       mprintf(L"\n%12ls: ",L"Unix owner");
       if (*hd.UnixOwnerName!=0)
-        mprintf(L"%ls:",GetWide(hd.UnixOwnerName));
+        mprintf(L"%ls",GetWide(hd.UnixOwnerName));
+      else
+        if (hd.UnixOwnerNumeric)
+          mprintf(L"#%d",hd.UnixOwnerID);
+      mprintf(L":");
       if (*hd.UnixGroupName!=0)
         mprintf(L"%ls",GetWide(hd.UnixGroupName));
-      if ((*hd.UnixOwnerName!=0 || *hd.UnixGroupName!=0) && (hd.UnixOwnerNumeric || hd.UnixGroupNumeric))
-        mprintf(L"  ");
-      if (hd.UnixOwnerNumeric)
-        mprintf(L"#%d:",hd.UnixOwnerID);
-      if (hd.UnixGroupNumeric)
-        mprintf(L"#%d:",hd.UnixGroupID);
+      else
+        if (hd.UnixGroupNumeric)
+          mprintf(L"#%d",hd.UnixGroupID);
     }
 
     mprintf(L"\n");

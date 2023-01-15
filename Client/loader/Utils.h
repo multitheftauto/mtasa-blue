@@ -9,6 +9,9 @@
  *
  *****************************************************************************/
 
+#undef CREATE_SUSPENDED
+#define CREATE_SUSPENDED 5
+
 extern HINSTANCE g_hInstance;
 
 enum ePathResult
@@ -29,14 +32,6 @@ enum
     CHECK_SERVICE_POST_CREATE = 7,
     CHECK_SERVICE_RESTART_GAME = 8,
 };
-
-#ifndef PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON
-    #define PROCESS_CREATION_MITIGATION_POLICY_EXTENSION_POINT_DISABLE_ALWAYS_ON       (0x00000001ui64 << 32)
-    #define PROCESS_CREATION_MITIGATION_POLICY_PROHIBIT_DYNAMIC_CODE_ALWAYS_ON         (0x00000001ui64 << 36)
-    #define PROCESS_CREATION_MITIGATION_POLICY_FONT_DISABLE_ALWAYS_ON                  (0x00000001ui64 << 48)
-    #define PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_NO_REMOTE_ALWAYS_ON          (0x00000001ui64 << 52)
-    #define PROCESS_CREATION_MITIGATION_POLICY_IMAGE_LOAD_PREFER_SYSTEM32_ALWAYS_ON    (0x00000001ui64 << 60)
-#endif
 
 struct SOSVersionInfo
 {
@@ -65,17 +60,12 @@ struct SPEFileOffsets
     } sections[1];
 };
 
-// Loads the given dll into hProcess. Returns 0 on failure or the handle to the
-// remote dll module on success.
-HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath);
-void    InsertWinMainBlock(HANDLE hProcess);
-void    RemoveWinMainBlock(HANDLE hProcess);
-void    ApplyLoadingCrashPatch(HANDLE hProcess);
-
 void TerminateGTAIfRunning();
 bool IsGTARunning();
 void TerminateOtherMTAIfRunning();
 bool IsOtherMTARunning();
+
+std::vector<DWORD> GetGTAProcessList();
 
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
@@ -99,13 +89,12 @@ void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason);
 
 void UpdateMTAVersionApplicationSetting(bool bQuiet = false);
 bool Is32bitProcess(DWORD processID);
-void TerminateProcess(DWORD dwProcessID, uint uiExitCode = 0);
+bool TerminateProcess(DWORD dwProcessID, uint uiExitCode = 0);
 
 bool CreateSingleInstanceMutex();
 void ReleaseSingleInstanceMutex();
 
-SString CheckOnRestartCommand();
-void    CleanDownloadCache();
+void CleanDownloadCache();
 
 HMODULE GetLibraryHandle(const SString& strFilename, DWORD* pdwOutLastError = NULL);
 void    FreeLibraryHandle();
@@ -127,13 +116,19 @@ void               ForbodenProgramsMessage();
 bool               VerifyEmbeddedSignature(const SString& strFilename);
 void               LogSettings();
 SString            PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter);
-bool               IsDeviceSelectionDialogOpen(DWORD dwThreadId);
+bool               IsDeviceSelectionDialogOpen(DWORD processID);
 std::vector<DWORD> MyEnumProcesses(bool bInclude64bit = false, bool bIncludeCurrent = false);
 SString            GetProcessPathFilename(DWORD processID);
 SString            GetProcessFilename(DWORD processID);
 void               WriteDebugEventAndReport(uint uiId, const SString& strText);
 WString            ReadCompatibilityEntries(const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags);
 bool               WriteCompatibilityEntries(const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags, const WString& strNewData);
+std::vector<DWORD> GetProcessListUsingFile(const WString& filePath);
+
+/**
+ * @brief Computes the CRC-32 checksum for a file.
+ */
+auto ComputeCRC32(const char* filePath) -> uint32_t;
 
 // Return false on read failure
 template <class T>
@@ -206,61 +201,32 @@ typedef struct _SYSTEM_PROCESS_IMAGE_NAME_INFORMATION
     UNICODE_STRING ImageName;
 } SYSTEM_PROCESS_IMAGE_NAME_INFORMATION, *PSYSTEM_PROCESS_IMAGE_NAME_INFORMATION;
 
-#undef CREATE_SUSPENDED
-#define CREATE_SUSPENDED 5
+// For NtQueryInformationFile
+typedef struct _FILE_PROCESS_IDS_USING_FILE_INFORMATION
+{
+    ULONG     NumberOfProcessIdsInList;
+    ULONG_PTR ProcessIdList[1];
+} FILE_PROCESS_IDS_USING_FILE_INFORMATION, *PFILE_PROCESS_IDS_USING_FILE_INFORMATION;
 
-#ifdef DONT_ASSIST_ANTI_VIRUS
+NTSTATUS NTAPI NtQueryInformationFile(HANDLE FileHandle, PIO_STATUS_BLOCK IoStatusBlock, PVOID FileInformation, ULONG Length,
+                                      UINT FileInformationClass /* FILE_INFORMATION_CLASS */);
 
-    #define _VirtualAllocEx         VirtualAllocEx
-    #define _VirtualProtectEx       VirtualProtectEx
-    #define _VirtualFreeEx          VirtualFreeEx
-    #define _ReadProcessMemory      ReadProcessMemory
-    #define _WriteProcessMemory     WriteProcessMemory
-    #define _CreateProcessW         CreateProcessW
-    #define _CreateRemoteThread     CreateRemoteThread
+void* LoadFunction(const char* libraryName, const char* functionName);
 
-#else
+#define _DEFFUNCTION(lib, name) \
+    using FUNC_##name = decltype(&name); \
+    inline FUNC_##name __##name(void) \
+    { \
+        static FUNC_##name pfn = NULL; \
+        if (!pfn) \
+            pfn = (FUNC_##name)LoadFunction(lib, #name); \
+        return pfn; \
+    }
 
-void* LoadFunction(const char* szLibName, const char* c, const char* a, const char* b);
+#define DEFFUNCTION(lib, name) _DEFFUNCTION(lib, name)
 
-    #define _DEFFUNCTION( lib, name, a,b,c ) \
-        using FUNC_##name = decltype(&name); \
-        inline FUNC_##name __##name ( void ) \
-        { \
-            static FUNC_##name pfn = NULL; \
-            if ( !pfn ) \
-                pfn = (FUNC_##name)LoadFunction ( lib, #c, #a, #b ); \
-            return pfn; \
-        }
+#define _NtQuerySystemInformation __NtQuerySystemInformation()
+#define _NtQueryInformationFile   __NtQueryInformationFile()
 
-    #define DEFFUNCTION( lib, a,b,c )    _DEFFUNCTION( lib, a##b##c, a,b,c )
-
-    #define _VirtualAllocEx                 __VirtualAllocEx()
-    #define _VirtualProtectEx               __VirtualProtectEx()
-    #define _VirtualFreeEx                  __VirtualFreeEx()
-    #define _ReadProcessMemory              __ReadProcessMemory()
-    #define _WriteProcessMemory             __WriteProcessMemory()
-    #define _CreateProcessW                 __CreateProcessW()
-    #define _CreateRemoteThread             __CreateRemoteThread()
-    #define _WscGetSecurityProviderHealth   __WscGetSecurityProviderHealth()
-    #define _InitializeProcThreadAttributeList  __InitializeProcThreadAttributeList()
-    #define _DeleteProcThreadAttributeList      __DeleteProcThreadAttributeList()
-    #define _UpdateProcThreadAttribute          __UpdateProcThreadAttribute()
-    #define _QueryFullProcessImageNameW         __QueryFullProcessImageNameW()
-    #define _NtQuerySystemInformation           __NtQuerySystemInformation()
-
-DEFFUNCTION("kernel32", Virt, ualAll, ocEx)
-DEFFUNCTION("kernel32", Virt, ualPro, tectEx)
-DEFFUNCTION("kernel32", Virt, ualFre, eEx)
-DEFFUNCTION("kernel32", Read, Proces, sMemory)
-DEFFUNCTION("kernel32", Writ, eProce, ssMemory)
-DEFFUNCTION("kernel32", Crea, teProc, essW)
-DEFFUNCTION("kernel32", Crea, teRemo, teThread)
-DEFFUNCTION("Wscapi", WscGetSecurityProviderHeal, t, h)
-DEFFUNCTION("kernel32", Initiali, zeProcT, hreadAttributeList)
-DEFFUNCTION("kernel32", Dele, teProcT, hreadAttributeList)
-DEFFUNCTION("kernel32", Upda, teProcT, hreadAttribute)
-DEFFUNCTION("kernel32", QueryFullProcessImageNam, e, W)
-DEFFUNCTION("ntdll", NtQuerySystemInformati, o, n)
-
-#endif
+DEFFUNCTION("ntdll", NtQuerySystemInformation)
+DEFFUNCTION("ntdll", NtQueryInformationFile)

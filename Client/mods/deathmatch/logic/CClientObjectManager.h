@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <game/CPools.h>
+
 class CClientManager;
 class CClientObject;
 class CObject;
