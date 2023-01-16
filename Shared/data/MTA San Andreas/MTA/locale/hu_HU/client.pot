@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-12 20:00+0000\n"
-"PO-Revision-Date: 2023-01-12 20:05\n"
+"PO-Revision-Date: 2023-01-16 18:35\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -1101,7 +1101,7 @@ msgstr "Fő exe másolása a grafikus driver hibáinak elkerülésére"
 
 #: Client/loader/Install.cpp:260
 msgid "Unknown"
-msgstr ""
+msgstr "Ismeretlen"
 
 #: Client/loader/Install.cpp:267
 #, c-format
