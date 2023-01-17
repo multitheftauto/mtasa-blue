@@ -12,10 +12,13 @@ class CClientPickup;
 
 #pragma once
 
+#include <game/CObject.h>
 #include "CClientPickupManager.h"
 #include "CClientEntity.h"
 #include "CClientColShape.h"
 #include "CClientColCallback.h"
+
+class CPickup;
 
 class CClientPickup final : public CClientStreamElement, private CClientColCallback
 {

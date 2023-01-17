@@ -1,0 +1,55 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the MTA San Andreas package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: MTA San Andreas 1.x\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-10 16:36+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#. Found in the main menu navigation
+msgid "Quick connect"
+msgstr ""
+
+#. Found in the main menu navigation
+msgid "Disconnect"
+msgstr ""
+
+#. Found in the main menu navigation
+msgid "Server browser"
+msgstr ""
+
+#. Found in the main menu navigation
+msgid "Host game"
+msgstr ""
+
+#. Found in the main menu navigation
+msgid "Map editor"
+msgstr ""
+
+#. Found in the main menu navigation
+msgid "Settings"
+msgstr ""
+
+#. Found in the main menu navigation
+msgid "About"
+msgstr ""
+
+#. Found in the main menu navigation
+msgid "Quit"
+msgstr ""
+
+#. Found in the main menu above the news listing
+msgid "The Latest News"
+msgstr ""

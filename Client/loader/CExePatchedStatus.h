@@ -16,12 +16,13 @@ struct SExePatchedStatus
     bool bNvightmare;
     bool bAltModules;
     bool bEntryPoint;
+    bool bProxyLoader;
 
     bool operator!=(const SExePatchedStatus& other) const { return !operator==(other); }
     bool operator==(const SExePatchedStatus& other) const
     {
         return bTimestamp == other.bTimestamp && bLargeMem == other.bLargeMem && bDep == other.bDep && bNvightmare == other.bNvightmare &&
-               bAltModules == other.bAltModules && bEntryPoint == other.bEntryPoint;
+               bAltModules == other.bAltModules && bEntryPoint == other.bEntryPoint && bProxyLoader == other.bProxyLoader;
     }
 };
 
@@ -59,3 +60,4 @@ bool              GetPatchRequirementAltModules();
 EPatchResult      UpdatePatchStatusAltModules(const SString& strGTAEXEPath, EPatchMode mode);
 bool              GetPatchRequirementEntryPoint();
 EPatchResult      UpdatePatchStatusEntryPoint(const SString& strGTAEXEPath, EPatchMode mode);
+EPatchResult      UpdatePatchStatusProxyLoader(const SString& strGTAEXEPath, EPatchMode mode);

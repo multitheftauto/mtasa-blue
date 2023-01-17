@@ -32,6 +32,8 @@ public:
     bool HandleException(CExceptionInformation* pExceptionInformation);
     void GetPlayerNames(std::vector<SString>& vPlayerNames);
 
+    void OnWindowFocusChange(bool state) override;
+
 private:
     struct InitializeArguments
     {
