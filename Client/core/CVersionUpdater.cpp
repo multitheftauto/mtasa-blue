@@ -2768,7 +2768,9 @@ int CVersionUpdater::_PollDownload()
                     }
                     if (m_JobInfo.bShowDownloadPercent)
                         GetQuestionBox().SetMessage(
-                            SString(_("%3d %% completed"), Round(m_JobInfo.uiBytesDownloaded * 100.f / std::max<float>(1, m_JobInfo.iFilesize))));
+                            SString(_("%3d %% completed"), (m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded)
+                                                               ? std::min<int>(100, Round(m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100))
+                                                               : 0));
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
                         GetQuestionBox().AppendMessage(SString(_("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000));
                     else
