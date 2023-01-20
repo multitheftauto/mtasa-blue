@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-12 20:00+0000\n"
-"PO-Revision-Date: 2023-01-12 20:05\n"
+"PO-Revision-Date: 2023-01-20 18:50\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -1098,14 +1098,16 @@ msgstr "Copiando el ejecutable principal para evitar problemas con el controlado
 
 #: Client/loader/Install.cpp:260
 msgid "Unknown"
-msgstr ""
+msgstr "Desconocido"
 
 #: Client/loader/Install.cpp:267
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "El archivo '%s' está actualmente bloqueado por %zu procesos.\n\n"
+"¿Desea finalizar los siguientes procesos y continuar con la actualización? \n\n"
+"%s"
 
 #: Client/loader/Install.cpp:472
 #, c-format
@@ -1113,7 +1115,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Su instalación puede estar corrupta ahora.\n\n"
+"%zu de %zu archivos no pudieron ser restaurados desde la copia de seguridad.\n\n"
+"Deberías reinstalar Multi Theft Auto desde www.multitheftauto.com\n"
+"o intentar correr la actualización con permisos de administrador."
 
 #: Client/loader/CInstallManager.cpp:355
 #, c-format
