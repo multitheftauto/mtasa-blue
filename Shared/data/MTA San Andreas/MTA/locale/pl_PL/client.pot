@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-12 20:00+0000\n"
-"PO-Revision-Date: 2023-01-12 20:06\n"
+"PO-Revision-Date: 2023-01-20 21:33\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -1099,7 +1099,7 @@ msgstr "Napraw błędy plików"
 
 #: Client/loader/CExePatchedStatus.cpp:170
 msgid "Use proxy loader"
-msgstr ""
+msgstr "Użyj proxy loader"
 
 #: Client/loader/CExePatchedStatus.cpp:171
 msgid "Copy main executable to avoid graphic driver issues"
@@ -1190,7 +1190,7 @@ msgstr "Przenieś niekompatybilne pliki"
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr ""
+msgstr "Usuń niekompatybilne pliki"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
