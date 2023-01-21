@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-12 20:00+0000\n"
-"PO-Revision-Date: 2023-01-12 20:05\n"
+"POT-Creation-Date: 2023-01-21 20:06+0000\n"
+"PO-Revision-Date: 2023-01-21 21:04\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -16,6 +16,48 @@ msgstr ""
 "X-Crowdin-Language: lt\n"
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
+msgid "Problem with graphics driver"
+msgstr "Problema su grafikos tvarkykle"
+
+#. Create buttons
+#. OK button
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CVersionUpdater.cpp:1606
+#: Client/core/CVersionUpdater.cpp:1822 Client/core/CVersionUpdater.cpp:1915
+#: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:1955
+#: Client/core/CVersionUpdater.cpp:1967 Client/core/CVersionUpdater.cpp:2119
+#: Client/core/CVersionUpdater.cpp:2128 Client/core/CVersionUpdater.cpp:2137
+#: Client/core/CVersionUpdater.cpp:2151 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4695 Client/loader/Dialogs.cpp:129
+msgid "OK"
+msgstr "Gerai"
+
+#. Cancel button
+#: Client/gui/CGUIMessageBox_Impl.cpp:68
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
+#: Client/core/CVersionUpdater.cpp:1840 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:132
+msgid "Cancel"
+msgstr "Atšaukti"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:195
+#: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1372
+#: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
+#: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
+#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:127
+msgid "Yes"
+msgstr "Taip"
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
@@ -132,6 +174,26 @@ msgstr "(Derinimo režimas) rodo 'colshapes'"
 msgid "(Development mode) prints world sound ids into the debug window"
 msgstr "(Derinimo režimas) parašo pasaulio garsų id į derinimo langą"
 
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Žemėlapio atsisiuntimo progresas:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Atsisiuntimo progresas:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s iš %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Atsijunkite norėdami atšaukti siuntimą"
+
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
 #. Show a message that the connection timed out and abort
@@ -149,22 +211,22 @@ msgstr "(Derinimo režimas) parašo pasaulio garsų id į derinimo langą"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:815
-#: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
-#: Client/loader/CInstallManager.cpp:629 Client/core/CGUI.cpp:87
-#: Client/core/CSettings.cpp:2924 Client/core/CSettings.cpp:4113
-#: Client/core/CSettings.cpp:4141 Client/core/CSettings.cpp:4674
 #: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2924
+#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
+#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:126
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:815
+#: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
+#: Client/loader/CInstallManager.cpp:629
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -481,6 +543,15 @@ msgstr[3] "%d sekundės"
 msgid "Disconnected"
 msgstr "Atjungta"
 
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Nepavyko paleisti vietinio serverio. Žvilgtelkite į konsolę, norėdami sužinoti detaliau."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Klaida: Nepavyko paleisti vietinio serverio. [%s]"
+
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "SUKURTI SERVERĮ"
@@ -541,647 +612,11 @@ msgstr "Visi"
 msgid "Start"
 msgstr "Pradėti"
 
-#. Cancel button
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:132
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4694
-#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
-#: Client/core/CVersionUpdater.cpp:1840
-msgid "Cancel"
-msgstr "Atšaukti"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Nepavyko paleisti vietinio serverio. Žvilgtelkite į konsolę, norėdami sužinoti detaliau."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Klaida: Nepavyko paleisti vietinio serverio. [%s]"
-
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
 msgstr "Atsisiuntimo klaida: %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Žemėlapio atsisiuntimo progresas:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Atsisiuntimo progresas:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s iš %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Atsijunkite norėdami atšaukti siuntimą"
-
-#. Create buttons
-#. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:129
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4695
-#: Client/core/CVersionUpdater.cpp:1606 Client/core/CVersionUpdater.cpp:1822
-#: Client/core/CVersionUpdater.cpp:1915 Client/core/CVersionUpdater.cpp:1937
-#: Client/core/CVersionUpdater.cpp:1955 Client/core/CVersionUpdater.cpp:1967
-#: Client/core/CVersionUpdater.cpp:2119 Client/core/CVersionUpdater.cpp:2128
-#: Client/core/CVersionUpdater.cpp:2137 Client/core/CVersionUpdater.cpp:2151
-msgid "OK"
-msgstr "Gerai"
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:127
-#: Client/core/CSettings.cpp:1372 Client/core/CSettings.cpp:1396
-#: Client/core/CSettings.cpp:4436 Client/core/CSettings.cpp:4503
-#: Client/core/CSettings.cpp:4552 Client/core/CQuestionBox.cpp:195
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "Yes"
-msgstr "Taip"
-
-#: Client/loader/MainFunctions.cpp:242
-msgid "Trouble restarting MTA:SA\n\n"
-"If the problem persists, open Task Manager and\n"
-"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-"Try to launch MTA:SA again?"
-msgstr "Problema paleidžiant MTA:SA\n\n"
-"Jei problema kartosis, atidarykite užduočių tvarkyklę ir\n"
-"sustabdykite 'gta_sa.exe' bei 'Multi Theft Auto.exe' procesus\n\n\n"
-"Ar norite pabandyti paleisti MTA:SA dar kartą?"
-
-#: Client/loader/MainFunctions.cpp:260
-msgid "Another instance of MTA is already running.\n\n"
-"If this problem persists, please restart your computer"
-msgstr "MTA jau yra paleistas.\n\n"
-"Jei problema kartosis, prašome perkrauti savo kompiuterį"
-
-#: Client/loader/MainFunctions.cpp:263
-msgid "Another instance of MTA is already running.\n\n"
-"Do you want to terminate it?"
-msgstr "MTA jau yra paleistas.\n\n"
-"Ar norite sunaikinti šį procesą?"
-
-#: Client/loader/MainFunctions.cpp:288
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to revert to an earlier version?"
-msgstr "Ar jūs turite problemų paleidžiant MTA:SA?.\n\n"
-"Norite sugražinti ankstesnę versiją?"
-
-#: Client/loader/MainFunctions.cpp:318
-msgid "There seems to be a problem launching MTA:SA.\n"
-"Resetting GTA settings can sometimes fix this problem.\n\n"
-"Do you want to reset GTA settings now?"
-msgstr "Atrtodo, jog yra problemų paleidžiant MTA:SA.\n"
-"Sugražinant numatytuosius GTA nustatymus kartais padeda sutvarkyti šią problemą.\n\n"
-"Ar norite sugražinti GTA nustatymus dabar?"
-
-#: Client/loader/MainFunctions.cpp:333
-msgid "GTA settings have been reset.\n\n"
-"Press OK to continue."
-msgstr "GTA nustatymai sugražinti.\n\n"
-"Spauskite Gerai."
-
-#: Client/loader/MainFunctions.cpp:338
-#, c-format
-msgid "File could not be deleted: '%s'"
-msgstr "Neišėjo ištrinti bylos: '%s'"
-
-#. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:346
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to see some online help?"
-msgstr "Ar turite problemų paleidžiant MTA:SA?.\n\n"
-"Norėtumėt pamatyti šiek tiek pagalbos tinkle?"
-
-#. Inform user
-#: Client/loader/MainFunctions.cpp:382
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to change the following setting?"
-msgstr "Turite problemų dėl MTA:SA paleidimo?.\n\n"
-"Norite pakeisti šiuos nustatymus?"
-
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:645
-#: Client/core/CSettings.cpp:987
-msgid "Fullscreen mode:"
-msgstr "Pilno ekrano režimas:"
-
-#: Client/loader/MainFunctions.cpp:383 Client/core/CSettings.cpp:653
-#: Client/core/CSettings.cpp:1598
-msgid "Borderless window"
-msgstr "Langas be kraštų"
-
-#: Client/loader/MainFunctions.cpp:425
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Try disabling the following products for GTA and MTA:"
-msgstr "Turite problemų dėl MTA:SA paleidimo?.\n\n"
-"Pabandykite išjungti šiuos produktus žaidimui GTA ir MTA:"
-
-#: Client/loader/MainFunctions.cpp:459
-msgid "WARNING\n\n"
-"MTA:SA has detected unusual activity.\n"
-"Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "ĮSPĖJIMAS\n\n"
-"MTA:SA aptiko neįprastą veiklą.\n"
-"Prašome paleisti virusų skenavimo programą, kad įsitikintumėte sistemos saugumu.\n\n"
-
-#: Client/loader/MainFunctions.cpp:462
-#, c-format
-msgid "The detected file was:  %s\n"
-msgstr "Aptiktas failas buvo: %s\n"
-
-#: Client/loader/MainFunctions.cpp:596
-msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "GTA: San Andreas jau yra paleistas. Šį procesą reikia sunaikinti prieš paleidžiant MTA:SA. Ar norite tai padaryti dabar?"
-
-#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1189
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
-msgid "Information"
-msgstr "Informacija"
-
-#: Client/loader/MainFunctions.cpp:603
-msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "Neįmanoma sunaikinti GTA: San Andreas proceso. Jei problema kartosis, prašome perkrauti savo kompiuterį."
-
-#: Client/loader/MainFunctions.cpp:626
-msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Trūksta reikalingų įvesčių registre. Prašome įdiegti Multi Theft Auto: San Andreas iš naujo."
-
-#: Client/loader/MainFunctions.cpp:632
-msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "Nurodyta vieta iki GTA: San Andreas susideda iš nepalaikomų simbolių. Prašome patraukti savo Grand Theft Auto: San Andreas įdiegimo aplanką į palaikomą vietą, kuri susideda tik iš standartinių ASCII simbolių ir įdiekite Multi Theft Auto: San Andreas iš naujo."
-
-#: Client/loader/MainFunctions.cpp:642
-msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-"contains a ';' (semicolon).\n\n"
-" If you experience problems when running MTA:SA,\n"
-" move your installation(s) to a path that does not contain a semicolon."
-msgstr "Vieta iki įdiegtos 'MTA:SA' ar 'GTA: San Andreas' versijos\n"
-"susideda iš ';' (kabliataškio).\n\n"
-"Jei patirsite problemų paleidžiant MTA:SA,\n"
-"patraukite savo žaidimą(us) į vietą, nesusidedančią iš kabliataškio."
-
-#: Client/loader/MainFunctions.cpp:779
-msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Įkėlimas nepavyko. Prašome įsitikinti, jog paskutinės data bylos buvo įdiegtos teisingai."
-
-#: Client/loader/MainFunctions.cpp:788
-#, c-format
-msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Įkėlimas nepavyko. Prašome įsitikinti, kad %s yra įdiegtas teisingai."
-
-#: Client/loader/MainFunctions.cpp:795
-#, c-format
-msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Įkėlimas nepavyko. Nerastas gta_sa.exe nurodytoje vietoje %s."
-
-#: Client/loader/MainFunctions.cpp:805
-#, c-format
-msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "Įkėlimas nepavyko. %s egzistuoja GTA direktorijoje. Prašome ištrinti prieš tęsiant."
-
-#: Client/loader/MainFunctions.cpp:814
-#, c-format
-msgid "Main file has an incorrect name (%s)"
-msgstr "Pagrindinis failas yra blogai užvadintas (%s)"
-
-#: Client/loader/MainFunctions.cpp:825
-msgid "Main file is unsigned. Possible virus activity.\n\n"
-"See online help if MTA does not work correctly."
-msgstr "Pagrindinis failas yra nepatvirtintas. Galimas virusų aktyvumas.\n\n"
-"Peržiūrėkite pagalbą internete, jei MTA neveikia."
-
-#: Client/loader/MainFunctions.cpp:852
-#, c-format
-msgid "Data file %s is missing. Possible virus activity.\n\n"
-"Consider reinstalling Multi Theft Auto for your security.\n"
-"See online help if MTA does not work correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:863
-#, c-format
-msgid "Data file %s is modified. Possible virus activity.\n\n"
-"Consider reinstalling Multi Theft Auto for your security.\n"
-"See online help if MTA does not work correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:877
-msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
-"Remove these .asi files if you experience problems with MTA:SA."
-msgstr ".asi failai aptikti 'MTA:SA' arba 'GTA: San Andreas' aplankale.\n\n"
-"Ištrinkite .asi failus jei patirsite nesklandumų su MTA:SA."
-
-#: Client/loader/MainFunctions.cpp:982
-msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Neteisingos failo versijos klaida. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
-
-#: Client/loader/MainFunctions.cpp:991
-msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Trūksta kai kurių failų. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
-
-#: Client/loader/MainFunctions.cpp:1003
-msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
-"Please restart your PC.\n"
-msgstr "MTA:SA yra nepalaikomas su Windows 'Safe Mode'.\n\n"
-"Perkraukite savo PC.\n"
-
-#: Client/loader/MainFunctions.cpp:1089
-msgid "Fix configuration issue"
-msgstr "Sutaisyti konfigūracijos problemas"
-
-#. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1127
-msgid "Fix elevation required error"
-msgstr "Sutaisyti privilegijų reikalavimo klaidą"
-
-#: Client/loader/MainFunctions.cpp:1134
-#, c-format
-msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
-"[%s]"
-msgstr "Nepavyko paleisti Grand Theft Auto: San Andreas. Prašome paleisti iš naujo, arba, jei problema kartosis, susisiekti su MTA svetainėje www.multitheftauto.com. \n\n"
-"[%s]"
-
-#: Client/loader/MainFunctions.cpp:1189
-msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "GTA: San Andreas galėjo būti paleistas neteisingai. Ar norite sunaikinti šį procesą?"
-
-#: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Ieškoma Grand Theft Auto San Andreas"
-
-#: Client/loader/Utils.cpp:502 Client/loader/Dialogs.cpp:893
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Prašome paleisti Grand Theft Auto San Andreas"
-
-#: Client/loader/Utils.cpp:566
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Pasirinkite savo Grand Theft Auto: San Andreas įdiegimo aplanką"
-
-#: Client/loader/Utils.cpp:935 Client/loader/CInstallManager.cpp:340
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA reikalauja Administratoriaus teisių, kad galėtų:\n\n"
-"'%s'\n\n"
-"Prašome suteikti teises sekančiame žingsnyje."
-
-#: Client/loader/Utils.cpp:1036
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Klaida įkeliant %s modulį! (%s)"
-
-#: Client/loader/Utils.cpp:1361 Client/loader/Dialogs.cpp:914
-msgid "Copying files..."
-msgstr "Kopijuojamos bylos..."
-
-#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:919
-msgid "Copy finished early. Everything OK."
-msgstr "Kopijavimas baigtas anksti. Viskas pavyko."
-
-#: Client/loader/Utils.cpp:1427 Client/loader/Dialogs.cpp:924
-msgid "Finishing..."
-msgstr "Baigiama..."
-
-#: Client/loader/Utils.cpp:1429 Client/loader/Dialogs.cpp:928
-msgid "Done!"
-msgstr "Baigta!"
-
-#: Client/loader/Utils.cpp:1469
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Tai pirmas %s paleidimas.\n\n"
-"Ar norite nukopijuoti nustatymus iš %s ?"
-
-#: Client/loader/Utils.cpp:1508
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA nepavyko atidaryti failo '%s'"
-
-#: Client/loader/Utils.cpp:1530
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "Trūksta GTA:SA failo '%s'.  "
-
-#: Client/loader/Utils.cpp:1555
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA nepavyko įkelti modelio."
-
-#: Client/loader/Utils.cpp:1557
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Jei neseniai keitėte gta3.img, tada pabandykite perrašyti GTA:SA."
-
-#: Client/loader/Utils.cpp:1582
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA nepavyko pridėti patobulinimo mašinai."
-
-#: Client/loader/Utils.cpp:1601
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA surado klaidų faile '%s'"
-
-#: Client/loader/Utils.cpp:1683
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Ar jūsų kompiuteris persikrovė bežaidžiant MTA:SA?"
-
-#: Client/loader/Utils.cpp:1748
-msgid "Please terminate the following programs before continuing:"
-msgstr "Prašome išjungti sekančias programas prieš tęsdami darbą:"
-
-#: Client/loader/Dialogs.cpp:128 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1570
-#: Client/core/CVersionUpdater.cpp:1588 Client/core/CVersionUpdater.cpp:1857
-#: Client/core/CVersionUpdater.cpp:1876 Client/core/CMainMenu.cpp:1147
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "No"
-msgstr "Ne"
-
-#: Client/loader/Dialogs.cpp:130
-msgid "Quit"
-msgstr "Išeiti"
-
-#: Client/loader/Dialogs.cpp:131
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-msgid "Help"
-msgstr "Pagalba"
-
-#: Client/loader/Dialogs.cpp:147
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas aptiko problemą"
-
-#: Client/loader/Dialogs.cpp:148
-msgid "Crash information"
-msgstr "Lūžio informacija"
-
-#: Client/loader/Dialogs.cpp:149
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Pažymėkite varnelę, kad ši lūžio informacija būtų išsiųsta MTA kūrėjams internetu"
-
-#: Client/loader/Dialogs.cpp:150
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Taip padarius padidinsite šansus, jog šis lūžis nebepasikartotų ateityje."
-
-#: Client/loader/Dialogs.cpp:151
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Ar norite paleisti MTA: San Andreas iš naujo ?"
-
-#: Client/loader/Dialogs.cpp:158
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Perspėjimas"
-
-#: Client/loader/Dialogs.cpp:159
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Jūsų Grand Theft Auto: San Andreas įrašymo vietoje aptiktas d3d9.dll failas:"
-
-#: Client/loader/Dialogs.cpp:161
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "Šis failas yra nebūtinas ir gali sukelti nesklandumų su naujomis grafikos galimybėmis šioje MTA:SA versijoje.\n\n"
-"Rekomenduojama pašalinti arba pervadinti failą d3d9.dll."
-
-#: Client/loader/Dialogs.cpp:163
-msgid "Keep these files, but also show this warning on next start"
-msgstr "Naudoti d3d9.dll, bet taip pat parodyti šį įspėjimą kitą kartą paleidus"
-
-#: Client/loader/Dialogs.cpp:164
-msgid "Do not remind me about these files again"
-msgstr "Nebepriminti apie šiuos failus"
-
-#: Client/loader/Dialogs.cpp:165
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Pervadinti šiuos failus iš *.dll į *.dll.bak"
-
-#: Client/loader/Dialogs.cpp:166
-msgid "Show me these files"
-msgstr "Rodyti failus"
-
-#: Client/loader/Dialogs.cpp:167
-msgid "Play MTA:SA"
-msgstr "Žaisti MTA:SA"
-
-#: Client/loader/Dialogs.cpp:173
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Painūs nustatymai"
-
-#: Client/loader/Dialogs.cpp:174
-msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus aptikta!"
-
-#: Client/loader/Dialogs.cpp:175
-msgid "Try each option and see what works:"
-msgstr "Išbandykite kiekvieną nustatymą ir patrikrinkite, kuris veiks:"
-
-#: Client/loader/Dialogs.cpp:176
-msgid "A - Standard NVidia"
-msgstr "A - Standartinis NVidia"
-
-#: Client/loader/Dialogs.cpp:177
-msgid "B - Alternate NVidia"
-msgstr "B - Alternatyvus NVidia"
-
-#: Client/loader/Dialogs.cpp:178
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - Standartinis NVidia su exe pervadinimu"
-
-#: Client/loader/Dialogs.cpp:179
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - Alternatyvus NVidia su exe pervadinimu"
-
-#: Client/loader/Dialogs.cpp:180
-msgid "E - Standard Intel"
-msgstr "E - Standartinis Intel"
-
-#: Client/loader/Dialogs.cpp:181
-msgid "F - Alternate Intel"
-msgstr "F - Alternatyvus Intel"
-
-#: Client/loader/Dialogs.cpp:182
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Standartinis Intel su exe pervadinimu"
-
-#: Client/loader/Dialogs.cpp:183
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternatyvus Intel su exe pervadinimu"
-
-#: Client/loader/Dialogs.cpp:184
-msgid "If you get desperate, this might help:"
-msgstr "Jei pulsite į neviltį, tai gali jums padėti:"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "If you have already selected an option that works, this might help:"
-msgstr "Jei jau pasirinkote tinkamą parinktį, tai gali padėti:"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "Force windowed mode"
-msgstr "Priverstinai paleisti lange"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "Don't show again"
-msgstr "Nerodyti daugiau"
-
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
-#: Client/loader/Dialogs.cpp:195
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Perspėjimas: Nepavyko aptikti anti-virusinės sistemos"
-
-#: Client/loader/Dialogs.cpp:197
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA nepavyko aptikti anti-virusinės sistemos jūsų kompiuteryje.\n\n"
-"Virusai gali trigdyti MTA darbą ir sumažinti jūsų žaidimo malonumą.\n\n"
-"Spauskite 'Pagalba' detalesnei informacijai."
-
-#: Client/loader/Dialogs.cpp:200
-msgid "I have already installed an anti-virus"
-msgstr "Aš jau turiu įsirašęs anti-virusinę sistemą"
-
-#: Client/loader/Dialogs.cpp:202
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Aš neįsirašinėsiu anti-virsinės sistemos.\n"
-"Noriu, kad mano kompiuteris striginėtų ir būtų valdomas hakerių."
-
-#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:848
-msgid "Installing update..."
-msgstr "Įrašomas atnaujinimas..."
-
-#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:924
-msgid "Extracting files..."
-msgstr "Išskleidžiami failai..."
-
-#: Client/loader/CExePatchedStatus.cpp:158
-msgid "Update Aero setting"
-msgstr "Atnaujinti Aero nustatymą"
-
-#: Client/loader/CExePatchedStatus.cpp:160
-msgid "Update Large Memory setting"
-msgstr "Atnaujinti Didelės Atminties nustatymą"
-
-#: Client/loader/CExePatchedStatus.cpp:162
-msgid "Update DEP setting"
-msgstr "Atnaujinti DEP nustatymą"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Update graphics driver compliance"
-msgstr "Atnaujinti grafikos tvarkykles"
-
-#: Client/loader/CExePatchedStatus.cpp:166
-#: Client/loader/CExePatchedStatus.cpp:168
-msgid "Fix file issues"
-msgstr "Sutvarkyti failų problemas"
-
-#: Client/loader/CExePatchedStatus.cpp:170
-msgid "Use proxy loader"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:171
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Nukopijuoti pagrindinį exe failą, kad išvengt grafikos tvarkyklių nesklandumų"
-
-#: Client/loader/Install.cpp:260
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:267
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:472
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:355
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA negalėjo užbaigti šios užduoties:\n\n"
-"'%s'\n"
-
-#: Client/loader/CInstallManager.cpp:405
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Žaidimas lūžo dėl grafikos tvarkyklių klaidos **\n\n"
-"** Prašome atsinaujinti savo grafikos tvarkykles **"
-
-#: Client/loader/CInstallManager.cpp:511
-msgid "Install updated MTA:SA files"
-msgstr "Įdiegti atnaujintas MTA:SA bylas"
-
-#: Client/loader/CInstallManager.cpp:531
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Neįmanoma atnaujinti dėl konflikto bylose. Prašome uždaryti kitas programas ir bandyti iš naujo"
-
-#: Client/loader/CInstallManager.cpp:540
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto nebuvo tinkamai įrašytas, prašome įdiegti iš naujo. %s"
-
-#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "MTA:SA negali veikti, nes šie failai yra neteisingi:"
-
-#: Client/loader/CInstallManager.cpp:620
-msgid "Patch GTA"
-msgstr "Sutvarkyti GTA"
-
-#: Client/loader/CInstallManager.cpp:767 Client/core/CCore.cpp:764
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA negali tęsti darbo, nes diske %s nepakanka laisvos vietos."
-
-#: Client/loader/CInstallManager.cpp:823
-msgid "Missing file:"
-msgstr "Trūksta failo:"
-
-#: Client/loader/CInstallManager.cpp:827
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Jei MTA nepasileidžia, prašome perrašyti GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:948
-msgid "Update install settings"
-msgstr "Atnaujinti diegimo nustatymus"
-
-#: Client/loader/CInstallManager.cpp:1081
-msgid "Update compatibility settings"
-msgstr "Atnaujinti suderinamumo nustatymus"
-
-#: Client/loader/CInstallManager.cpp:1109
-msgid "Move incompatible files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1125
-#: Client/loader/CInstallManager.cpp:1141
-msgid "Delete incompatible files"
-msgstr ""
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
@@ -1193,10 +628,613 @@ msgstr "NAUJIENOS"
 msgid "Visit latest news article"
 msgstr "Peržiūrėkite paskutines naujienas"
 
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Nežinoma komanda arba veiksmažodis"
+
+#: Client/core/CCredits.cpp:32
+msgid "Programming"
+msgstr "Programavimas"
+
+#: Client/core/CCredits.cpp:61
+msgid "Contributors"
+msgstr "Pagalbininkai"
+
+#: Client/core/CCredits.cpp:82
+msgid "Game Design / Scripting"
+msgstr "Žaidimo Dizainas / Scenarijus"
+
+#: Client/core/CCredits.cpp:102
+msgid "Language Localization"
+msgstr "Kalbos Plėtra"
+
+#: Client/core/CCredits.cpp:108
+msgid "Patch contributors"
+msgstr "Atnaujinimų autoriai"
+
+#: Client/core/CCredits.cpp:216
+msgid "Special Thanks"
+msgstr "Ypatinga padėka"
+
+#: Client/core/CCredits.cpp:245
+msgid "This software makes use of the following libraries and software:"
+msgstr "Ši programinė įranga panaudoja sekančias bibliotekas ir programines įrangas:"
+
+#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:767
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA negali tęsti darbo, nes diske %s nepakanka laisvos vietos."
+
+#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Kritinė klaida"
+
+#: Client/core/CCore.cpp:891
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "KAD PATAISYTI, PAŠALINKITE FAILĄ:"
+
+#: Client/core/CCore.cpp:923
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s modulis yra neteisingas!"
+
+#: Client/core/CCore.cpp:1233
+msgid "Error executing URL"
+msgstr "Klaida vykdant URL"
+
+#: Client/core/CCore.cpp:1245
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Klaida veikiant modifikacijai nurodytoje komandos eilutėje ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1333
+msgid "this help screen"
+msgstr "šis pagalbos ekranas"
+
+#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
+msgid "exits the application"
+msgstr "išjungia programą"
+
+#: Client/core/CCore.cpp:1336
+msgid "shows the version"
+msgstr "rodo versiją"
+
+#: Client/core/CCore.cpp:1337
+msgid "shows the time"
+msgstr "rodo laiką"
+
+#: Client/core/CCore.cpp:1338
+msgid "shows the hud"
+msgstr "rodo vartotojo sąsają"
+
+#: Client/core/CCore.cpp:1339
+msgid "shows all the binds"
+msgstr "rodo visus mygtukų priskirimus"
+
+#: Client/core/CCore.cpp:1340
+msgid "shows your serial"
+msgstr "rodo jūsų serijinį numerį"
+
+#: Client/core/CCore.cpp:1349
+msgid "connects to a server (host port nick pass)"
+msgstr "jungiasi į serverį (adresas portas slapyvardis slaptažodis)"
+
+#: Client/core/CCore.cpp:1350
+msgid "connects to a previous server"
+msgstr "jungiasi į ankstesnį serverį"
+
+#: Client/core/CCore.cpp:1351
+msgid "binds a key (key control)"
+msgstr "priskiria mygtuką (mygtukas valdiklis)"
+
+#: Client/core/CCore.cpp:1352
+msgid "unbinds a key (key)"
+msgstr "pašalina priskirimą (mygtukas)"
+
+#: Client/core/CCore.cpp:1353
+msgid "copies the default gta controls"
+msgstr "nukopijuoja numatytuosius gta valdiklius"
+
+#: Client/core/CCore.cpp:1354
+msgid "outputs a screenshot"
+msgstr "padaro nuotrauką"
+
+#: Client/core/CCore.cpp:1355
+msgid "immediately saves the config"
+msgstr "nedelsiant išsaugo konfiguraciją"
+
+#: Client/core/CCore.cpp:1357
+msgid "clears the debug view"
+msgstr "išvalo derinimo vaizdą"
+
+#: Client/core/CCore.cpp:1358
+msgid "scrolls the chatbox upwards"
+msgstr "paslenka pokalbį aukštyn"
+
+#: Client/core/CCore.cpp:1359
+msgid "scrolls the chatbox downwards"
+msgstr "paslenka pokalbį žemyn"
+
+#: Client/core/CCore.cpp:1360
+msgid "scrolls the debug view upwards"
+msgstr "paslenka derinimo tekstą aukštyn"
+
+#: Client/core/CCore.cpp:1361
+msgid "scrolls the debug view downwards"
+msgstr "paslenka derinimo tekstą žemyn"
+
+#: Client/core/CCore.cpp:1364
+msgid "shows the memory statistics"
+msgstr "rodo atminties statistikas"
+
+#: Client/core/CCore.cpp:1365
+msgid "shows the frame timing graph"
+msgstr "rodo kadrų laiko grafiką"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Pagreičio Ašis"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Stabdymo Ašis"
+
+#: Client/core/CScreenShot.cpp:53
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Ekranas nufotografuotas: '%s'"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Prisijungimas nepavyko. Pateiktas netinkamas slapyvardis!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Prisijungimas nepavyko. Pateiktas netinkamas adresas!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Prisijungimas į %s su portu %u nepavyko!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Jungiamasi į %s:%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Tokia modifikacija nėra įdiegta (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Blogas atsakas iš serverio (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Blogas atsakas iš serverio (1)"
+
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Nepavyko įkelti jūsų pasirinktos išvaizdos bei numatytosios išvaizdos, prašome įdiegti MTA iš naujo."
+
+#: Client/core/CVersionUpdater.cpp:625
+msgid "Busy"
+msgstr "Užimta"
+
+#: Client/core/CVersionUpdater.cpp:625
+msgid "Can't check for updates right now"
+msgstr "Šiuo metu neįmanoma patikrinti atnaujinimų"
+
+#: Client/core/CVersionUpdater.cpp:1566 Client/core/CVersionUpdater.cpp:1586
+#: Client/core/CVersionUpdater.cpp:1604
+#, c-format
+msgid "MTA:SA %s required"
+msgstr "Reikalaujamas MTA:SA %s"
+
+#: Client/core/CVersionUpdater.cpp:1567
+#, c-format
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr "Patobulintos MTA:SA %s versijos atnaujinimas yra būtinas norint prisijungti į šį serverį.\n\n"
+"Ar norite atsisiųsti ir įdiegti MTA:SA %s ?"
+
+#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
+#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
+#: Client/core/CQuestionBox.cpp:194 Client/core/CMainMenu.cpp:1147
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/loader/Dialogs.cpp:128
+msgid "No"
+msgstr "Ne"
+
+#: Client/core/CVersionUpdater.cpp:1587
+#, c-format
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "Ar norite paleisti MTA:SA %s ir prisijungti į šį serverį ?"
+
+#: Client/core/CVersionUpdater.cpp:1605
+msgid "It is not possible to connect at this time.\n\n"
+"Please try later."
+msgstr "Šiuo metu prisijungti neįmanoma.\n\n"
+"Prašome bandyti vėliau."
+
+#: Client/core/CVersionUpdater.cpp:1787
+msgid "Connecting"
+msgstr "Jungiamasi"
+
+#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+msgid "Please wait..."
+msgstr "Prašome palaukti..."
+
+#: Client/core/CVersionUpdater.cpp:1803
+msgid "CHECKING"
+msgstr "TIKRINAMA"
+
+#: Client/core/CVersionUpdater.cpp:1820 Client/core/CVersionUpdater.cpp:1913
+msgid "UPDATE CHECK"
+msgstr "ATNAUJINIMO PATIKRINIMAS"
+
+#: Client/core/CVersionUpdater.cpp:1821
+msgid "No update needed"
+msgstr "Atnaujinimo nereikia"
+
+#: Client/core/CVersionUpdater.cpp:1838
+msgid "DOWNLOADING"
+msgstr "ATSISIUNČIAMA"
+
+#: Client/core/CVersionUpdater.cpp:1839
+msgid "waiting..."
+msgstr "laukiama..."
+
+#: Client/core/CVersionUpdater.cpp:1855
+msgid "MANDATORY UPDATE"
+msgstr "PRIVALOMAS ATNAUJINIMAS"
+
+#: Client/core/CVersionUpdater.cpp:1856
+msgid "To join this server, you must update MTA.\n\n"
+" Do you want to update now ?"
+msgstr "Jei norite prisijungti, privalote atnaujinti MTA.\n\n"
+"Ar norite atnaujinti dabar ?"
+
+#: Client/core/CVersionUpdater.cpp:1874
+msgid "OPTIONAL UPDATE"
+msgstr "NEPRIVALOMAS ATNAUJINIMAS"
+
+#: Client/core/CVersionUpdater.cpp:1875
+msgid "Server says an update is recommended, but not essential.\n\n"
+" Do you want to update now ?"
+msgstr "Serveris rekomenduoja atsinaujinti, bet tai nėra privaloma.\n\n"
+"Ar norite atsinaujinti dabar ?"
+
+#: Client/core/CVersionUpdater.cpp:1914
+msgid "Update not currently avalable.\n\n"
+"Please check www.mtasa.com"
+msgstr "Šiuo metu atnaujinimas nepasiekiamas.\n\n"
+"Patikrinkite www.mtasa.com"
+
+#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
+msgid "ERROR SAVING"
+msgstr "KLAIDŲ IŠSAUGOJIMAS"
+
+#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
+msgid "Unable to create the file."
+msgstr "Neįmanoma sukurti bylos."
+
+#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:1953
+#: Client/core/CVersionUpdater.cpp:2126 Client/core/CVersionUpdater.cpp:2135
+msgid "ERROR DOWNLOADING"
+msgstr "ATSISIUNTIMO KLAIDA"
+
+#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:2127
+msgid "The downloaded file appears to be incorrect."
+msgstr "Atsisiųstas failas yra neteisingas."
+
+#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:2136
+msgid "For some reason."
+msgstr "Dėl neaiškios priežasties."
+
+#: Client/core/CVersionUpdater.cpp:1965 Client/core/CVersionUpdater.cpp:2149
+msgid "DOWNLOAD COMPLETE"
+msgstr "ATSISIUNTIMAS BAIGTAS"
+
+#: Client/core/CVersionUpdater.cpp:1989
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr "- Nežinoma problema ties _DialogUpdateResult"
+
+#: Client/core/CVersionUpdater.cpp:2080 Client/core/CSettings.cpp:4500
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "PAKEISTOS GTA:SA BYLOS"
+
+#: Client/core/CVersionUpdater.cpp:2087 Client/core/CVersionUpdater.cpp:2097
+msgid "Ok"
+msgstr "Gerai"
+
+#: Client/core/CVersionUpdater.cpp:2095
+msgid "ERROR"
+msgstr "KLAIDA"
+
+#: Client/core/CVersionUpdater.cpp:2096
+msgid "Some MTA:SA data files are missing.\n\n\n"
+"Please reinstall MTA:SA"
+msgstr "Kai kurių MTA:SA data bylū trūksta.\n\n\n"
+"Prašome įdiegti MTA:SA iš naujo"
+
+#: Client/core/CVersionUpdater.cpp:2771
+#, c-format
+msgid "%3d %% completed"
+msgstr "%3d %% baigta"
+
+#: Client/core/CVersionUpdater.cpp:2773
+#, c-format
+msgid "\n\n"
+"Waiting for response  -  %-3d"
+msgstr "\n\n"
+"Laukiama atsakymo - %-3d"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Ar norite pamatyti šiek tiek pagalbos tinkle apie šia problemą ?"
+
+#: Client/core/CKeyBinds.cpp:186
+msgid "Fire"
+msgstr "Šaudymas"
+
+#: Client/core/CKeyBinds.cpp:187
+msgid "Next weapon"
+msgstr "Kitas ginklas"
+
+#: Client/core/CKeyBinds.cpp:188
+msgid "Previous weapon"
+msgstr "Ankstesnis ginklas"
+
+#: Client/core/CKeyBinds.cpp:189
+msgid "Forwards"
+msgstr "Pirmyn"
+
+#: Client/core/CKeyBinds.cpp:190
+msgid "Backwards"
+msgstr "Atgal"
+
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2223
+#: Client/core/CSettings.cpp:2251
+msgid "Left"
+msgstr "Kairėn"
+
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2225
+#: Client/core/CSettings.cpp:2252
+msgid "Right"
+msgstr "Dešinėn"
+
+#: Client/core/CKeyBinds.cpp:193
+msgid "Zoom in"
+msgstr "Priartinti"
+
+#: Client/core/CKeyBinds.cpp:194
+msgid "Zoom out"
+msgstr "Patolinti"
+
+#: Client/core/CKeyBinds.cpp:195
+msgid "Enter/Exit"
+msgstr "Įlipti/Išlipti"
+
+#: Client/core/CKeyBinds.cpp:196
+msgid "Change camera"
+msgstr "Pakeisti kamerą"
+
+#. 10
+#: Client/core/CKeyBinds.cpp:197
+msgid "Jump"
+msgstr "Šokti"
+
+#: Client/core/CKeyBinds.cpp:198
+msgid "Sprint"
+msgstr "Bėgti"
+
+#: Client/core/CKeyBinds.cpp:199
+msgid "Look behind"
+msgstr "Pažiūrėti atgal"
+
+#: Client/core/CKeyBinds.cpp:200
+msgid "Crouch"
+msgstr "Pritūpti"
+
+#: Client/core/CKeyBinds.cpp:201
+msgid "Action"
+msgstr "Veiksmas"
+
+#: Client/core/CKeyBinds.cpp:202
+msgid "Walk"
+msgstr "Eiti"
+
+#: Client/core/CKeyBinds.cpp:203
+msgid "Vehicle fire"
+msgstr "Transporto priemonės ugnis"
+
+#: Client/core/CKeyBinds.cpp:204
+msgid "Vehicle secondary fire"
+msgstr "Tr. priemonės antrinė ugnis"
+
+#: Client/core/CKeyBinds.cpp:205
+msgid "Vehicle left"
+msgstr "Pasukti tr. priemonę kairėn"
+
+#: Client/core/CKeyBinds.cpp:206
+msgid "Vehicle right"
+msgstr "Pasukti tr. priemonę dešinėn"
+
+#. 20
+#: Client/core/CKeyBinds.cpp:207
+msgid "Steer forwards/down"
+msgstr "Palinkti į priekį/žemyn"
+
+#: Client/core/CKeyBinds.cpp:208
+msgid "Steer backwards/up"
+msgstr "Palinkti atgal/aukštyn"
+
+#: Client/core/CKeyBinds.cpp:209
+msgid "Accelerate"
+msgstr "Didinti greitį"
+
+#: Client/core/CKeyBinds.cpp:210
+msgid "Brake/Reverse"
+msgstr "Stabdyti/Atgal"
+
+#: Client/core/CKeyBinds.cpp:211
+msgid "Radio next"
+msgstr "Sekanti radijo"
+
+#: Client/core/CKeyBinds.cpp:212
+msgid "Radio previous"
+msgstr "Ankstesnė radijo"
+
+#: Client/core/CKeyBinds.cpp:213
+msgid "Radio user track skip"
+msgstr "Praleisti user track dainą"
+
+#: Client/core/CKeyBinds.cpp:214
+msgid "Horn"
+msgstr "Garso signalas"
+
+#: Client/core/CKeyBinds.cpp:215
+msgid "Sub-mission"
+msgstr "Papildoma misija"
+
+#: Client/core/CKeyBinds.cpp:216
+msgid "Handbrake"
+msgstr "Rankinis stabdis"
+
+#. 30
+#: Client/core/CKeyBinds.cpp:217
+msgid "Vehicle look left"
+msgstr "Tr. priemonėje žiūrėti kairėn"
+
+#: Client/core/CKeyBinds.cpp:218
+msgid "Vehicle look right"
+msgstr "Tr. priemonėje žiūrėti dešinėn"
+
+#: Client/core/CKeyBinds.cpp:219
+msgid "Vehicle look behind"
+msgstr "Tr. priemonėje žiūrėti atgal"
+
+#: Client/core/CKeyBinds.cpp:220
+msgid "Vehicle mouse look"
+msgstr "Tr. priemonėje žvalgytis pele"
+
+#: Client/core/CKeyBinds.cpp:221
+msgid "Special control left"
+msgstr "Spec. valdiklis kairėn"
+
+#: Client/core/CKeyBinds.cpp:222
+msgid "Special control right"
+msgstr "Spec. valdiklis dešinėn"
+
+#: Client/core/CKeyBinds.cpp:223
+msgid "Special control down"
+msgstr "Spec. valdiklis žemyn"
+
+#: Client/core/CKeyBinds.cpp:224
+msgid "Special control up"
+msgstr "Spec. valdiklis aukštyn"
+
+#: Client/core/CKeyBinds.cpp:225
+msgid "Aim weapon"
+msgstr "Taikymasis ginklu"
+
+#: Client/core/CKeyBinds.cpp:226
+msgid "Conversation yes"
+msgstr "Atsakyti taip"
+
+#. 40
+#: Client/core/CKeyBinds.cpp:227
+msgid "Conversation no"
+msgstr "Atsakyti ne"
+
+#: Client/core/CKeyBinds.cpp:228
+msgid "Group control forwards"
+msgstr "Gaujos nurodymas pirmyn"
+
+#: Client/core/CKeyBinds.cpp:229
+msgid "Group control backwards"
+msgstr "Gaujos nurodymas atsitraukti"
+
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Naudojate kūrėjų versiją! Tai yra versija skirta testavimui ir negali būti naudojama prisijungimui į viešus serverius!"
+
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA negaus daugiau atnaujinimų Vista ir XP operacinėse sistemose po 2019 metų liepos mėnesio.\n\n"
+"Atnaujinkite Windows, kad galėtumėte žaisti naujausiuose serveriuose."
+
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Ketinate atsijungti iš serverio.\n\n"
+"Ar tikrai to norite?"
+
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "ATSIJUNGIMO PERSPĖJIMAS"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONSOLĖ"
+
+#: Client/core/CCommandFuncs.cpp:30
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ KOMANDOS PAGALBA ]***\n"
+
+#: Client/core/CCommandFuncs.cpp:168
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Šiuo metu yra %d:%02d:%02d"
+
+#: Client/core/CCommandFuncs.cpp:252
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "Prisijungti: Sintaksė yra 'connect <adresas> [<portas> <slapyvardis> <slaptažodis>]'"
+
+#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+msgid "connect: Bad port number"
+msgstr "prisijungti: Netinkamas porto numeris"
+
+#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "prisijungti: Jungiamasi į %s:%u..."
+
+#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "prisijungti: nepavyko prisijungti į %s:%u"
+
+#: Client/core/CCommandFuncs.cpp:291
+msgid "connect: Failed to unload current mod"
+msgstr "prisijungti: Nepavyko iškrauti dabartinės modifikacijos"
+
+#: Client/core/CCommandFuncs.cpp:381
+msgid "Bound all controls from GTA"
+msgstr "Įkelti visus valdymo nustatymus iš GTA"
+
+#: Client/core/CCommandFuncs.cpp:395
+msgid "Saved configuration file"
+msgstr "Konfigūracijos byla išsaugota"
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:461
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "Jūsų serijinis numeris yra: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1479,9 +1517,19 @@ msgstr "Paleisti lange"
 msgid "DPI aware"
 msgstr "Atsižvelgti į DPI"
 
+#: Client/core/CSettings.cpp:645 Client/core/CSettings.cpp:987
+#: Client/loader/MainFunctions.cpp:383
+msgid "Fullscreen mode:"
+msgstr "Pilno ekrano režimas:"
+
 #: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:1596
 msgid "Standard"
 msgstr "Standartinis"
+
+#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1598
+#: Client/loader/MainFunctions.cpp:383
+msgid "Borderless window"
+msgstr "Langas be kraštų"
 
 #: Client/core/CSettings.cpp:654 Client/core/CSettings.cpp:1600
 msgid "Borderless keep res"
@@ -1918,19 +1966,9 @@ msgstr "Y-Kompensacija:"
 msgid "Position"
 msgstr "Pozicija"
 
-#: Client/core/CSettings.cpp:2223 Client/core/CSettings.cpp:2251
-#: Client/core/CKeyBinds.cpp:191
-msgid "Left"
-msgstr "Kairėn"
-
 #: Client/core/CSettings.cpp:2224 Client/core/CSettings.cpp:2238
 msgid "Center"
 msgstr "Centre"
-
-#: Client/core/CSettings.cpp:2225 Client/core/CSettings.cpp:2252
-#: Client/core/CKeyBinds.cpp:192
-msgid "Right"
-msgstr "Dešinėn"
 
 #: Client/core/CSettings.cpp:2237
 msgid "Top"
@@ -2066,10 +2104,6 @@ msgstr "Kai kurie failai šio GTA:SA data aplanko vietoje yra pakeisti.\n"
 "Tačiau, PAKEISTOS GTA:SA BYLOS YRA BLOKUOJAMOS DAUGELIO SERVERIŲ\n\n"
 "Ar tikrai norite jas naudoti?"
 
-#: Client/core/CSettings.cpp:4500 Client/core/CVersionUpdater.cpp:2080
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "PAKEISTOS GTA:SA BYLOS"
-
 #: Client/core/CSettings.cpp:4543
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
@@ -2154,584 +2188,124 @@ msgstr "Pelės pataisymas:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Pelės valdymo pataisymas - Gali prireikti paleisti kompiuterį iš naujo"
 
-#: Client/core/CCommandFuncs.cpp:30
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ KOMANDOS PAGALBA ]***\n"
-
-#: Client/core/CCommandFuncs.cpp:168
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Šiuo metu yra %d:%02d:%02d"
-
-#: Client/core/CCommandFuncs.cpp:252
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "Prisijungti: Sintaksė yra 'connect <adresas> [<portas> <slapyvardis> <slaptažodis>]'"
-
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
-msgid "connect: Bad port number"
-msgstr "prisijungti: Netinkamas porto numeris"
-
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "prisijungti: Jungiamasi į %s:%u..."
-
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "prisijungti: nepavyko prisijungti į %s:%u"
-
-#: Client/core/CCommandFuncs.cpp:291
-msgid "connect: Failed to unload current mod"
-msgstr "prisijungti: Nepavyko iškrauti dabartinės modifikacijos"
-
-#: Client/core/CCommandFuncs.cpp:381
-msgid "Bound all controls from GTA"
-msgstr "Įkelti visus valdymo nustatymus iš GTA"
-
-#: Client/core/CCommandFuncs.cpp:395
-msgid "Saved configuration file"
-msgstr "Konfigūracijos byla išsaugota"
-
-#. Print it
-#: Client/core/CCommandFuncs.cpp:461
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "Jūsų serijinis numeris yra: %s"
-
-#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Kritinė klaida"
-
-#: Client/core/CCore.cpp:891
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "KAD PATAISYTI, PAŠALINKITE FAILĄ:"
-
-#: Client/core/CCore.cpp:923
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s modulis yra neteisingas!"
-
-#: Client/core/CCore.cpp:1233
-msgid "Error executing URL"
-msgstr "Klaida vykdant URL"
-
-#: Client/core/CCore.cpp:1245
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Klaida veikiant modifikacijai nurodytoje komandos eilutėje ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1333
-msgid "this help screen"
-msgstr "šis pagalbos ekranas"
-
-#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
-msgid "exits the application"
-msgstr "išjungia programą"
-
-#: Client/core/CCore.cpp:1336
-msgid "shows the version"
-msgstr "rodo versiją"
-
-#: Client/core/CCore.cpp:1337
-msgid "shows the time"
-msgstr "rodo laiką"
-
-#: Client/core/CCore.cpp:1338
-msgid "shows the hud"
-msgstr "rodo vartotojo sąsają"
-
-#: Client/core/CCore.cpp:1339
-msgid "shows all the binds"
-msgstr "rodo visus mygtukų priskirimus"
-
-#: Client/core/CCore.cpp:1340
-msgid "shows your serial"
-msgstr "rodo jūsų serijinį numerį"
-
-#: Client/core/CCore.cpp:1349
-msgid "connects to a server (host port nick pass)"
-msgstr "jungiasi į serverį (adresas portas slapyvardis slaptažodis)"
-
-#: Client/core/CCore.cpp:1350
-msgid "connects to a previous server"
-msgstr "jungiasi į ankstesnį serverį"
-
-#: Client/core/CCore.cpp:1351
-msgid "binds a key (key control)"
-msgstr "priskiria mygtuką (mygtukas valdiklis)"
-
-#: Client/core/CCore.cpp:1352
-msgid "unbinds a key (key)"
-msgstr "pašalina priskirimą (mygtukas)"
-
-#: Client/core/CCore.cpp:1353
-msgid "copies the default gta controls"
-msgstr "nukopijuoja numatytuosius gta valdiklius"
-
-#: Client/core/CCore.cpp:1354
-msgid "outputs a screenshot"
-msgstr "padaro nuotrauką"
-
-#: Client/core/CCore.cpp:1355
-msgid "immediately saves the config"
-msgstr "nedelsiant išsaugo konfiguraciją"
-
-#: Client/core/CCore.cpp:1357
-msgid "clears the debug view"
-msgstr "išvalo derinimo vaizdą"
-
-#: Client/core/CCore.cpp:1358
-msgid "scrolls the chatbox upwards"
-msgstr "paslenka pokalbį aukštyn"
-
-#: Client/core/CCore.cpp:1359
-msgid "scrolls the chatbox downwards"
-msgstr "paslenka pokalbį žemyn"
-
-#: Client/core/CCore.cpp:1360
-msgid "scrolls the debug view upwards"
-msgstr "paslenka derinimo tekstą aukštyn"
-
-#: Client/core/CCore.cpp:1361
-msgid "scrolls the debug view downwards"
-msgstr "paslenka derinimo tekstą žemyn"
-
-#: Client/core/CCore.cpp:1364
-msgid "shows the memory statistics"
-msgstr "rodo atminties statistikas"
-
-#: Client/core/CCore.cpp:1365
-msgid "shows the frame timing graph"
-msgstr "rodo kadrų laiko grafiką"
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Ar norite pamatyti šiek tiek pagalbos tinkle apie šia problemą ?"
-
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Pagreičio Ašis"
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Stabdymo Ašis"
-
-#: Client/core/CCredits.cpp:32
-msgid "Programming"
-msgstr "Programavimas"
-
-#: Client/core/CCredits.cpp:61
-msgid "Contributors"
-msgstr "Pagalbininkai"
-
-#: Client/core/CCredits.cpp:82
-msgid "Game Design / Scripting"
-msgstr "Žaidimo Dizainas / Scenarijus"
-
-#: Client/core/CCredits.cpp:102
-msgid "Language Localization"
-msgstr "Kalbos Plėtra"
-
-#: Client/core/CCredits.cpp:108
-msgid "Patch contributors"
-msgstr "Atnaujinimų autoriai"
-
-#: Client/core/CCredits.cpp:216
-msgid "Special Thanks"
-msgstr "Ypatinga padėka"
-
-#: Client/core/CCredits.cpp:245
-msgid "This software makes use of the following libraries and software:"
-msgstr "Ši programinė įranga panaudoja sekančias bibliotekas ir programines įrangas:"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONSOLĖ"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Nežinoma komanda arba veiksmažodis"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Prisijungimas nepavyko. Pateiktas netinkamas slapyvardis!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Prisijungimas nepavyko. Pateiktas netinkamas adresas!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Prisijungimas į %s su portu %u nepavyko!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Jungiamasi į %s:%u ..."
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Tokia modifikacija nėra įdiegta (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Blogas atsakas iš serverio (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Blogas atsakas iš serverio (1)"
-
-#: Client/core/CVersionUpdater.cpp:625
-msgid "Busy"
-msgstr "Užimta"
-
-#: Client/core/CVersionUpdater.cpp:625
-msgid "Can't check for updates right now"
-msgstr "Šiuo metu neįmanoma patikrinti atnaujinimų"
-
-#: Client/core/CVersionUpdater.cpp:1566 Client/core/CVersionUpdater.cpp:1586
-#: Client/core/CVersionUpdater.cpp:1604
-#, c-format
-msgid "MTA:SA %s required"
-msgstr "Reikalaujamas MTA:SA %s"
-
-#: Client/core/CVersionUpdater.cpp:1567
-#, c-format
-msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr "Patobulintos MTA:SA %s versijos atnaujinimas yra būtinas norint prisijungti į šį serverį.\n\n"
-"Ar norite atsisiųsti ir įdiegti MTA:SA %s ?"
-
-#: Client/core/CVersionUpdater.cpp:1587
-#, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Ar norite paleisti MTA:SA %s ir prisijungti į šį serverį ?"
-
-#: Client/core/CVersionUpdater.cpp:1605
-msgid "It is not possible to connect at this time.\n\n"
-"Please try later."
-msgstr "Šiuo metu prisijungti neįmanoma.\n\n"
-"Prašome bandyti vėliau."
-
-#: Client/core/CVersionUpdater.cpp:1787
-msgid "Connecting"
-msgstr "Jungiamasi"
-
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
-msgid "Please wait..."
-msgstr "Prašome palaukti..."
-
-#: Client/core/CVersionUpdater.cpp:1803
-msgid "CHECKING"
-msgstr "TIKRINAMA"
-
-#: Client/core/CVersionUpdater.cpp:1820 Client/core/CVersionUpdater.cpp:1913
-msgid "UPDATE CHECK"
-msgstr "ATNAUJINIMO PATIKRINIMAS"
-
-#: Client/core/CVersionUpdater.cpp:1821
-msgid "No update needed"
-msgstr "Atnaujinimo nereikia"
-
-#: Client/core/CVersionUpdater.cpp:1838
-msgid "DOWNLOADING"
-msgstr "ATSISIUNČIAMA"
-
-#: Client/core/CVersionUpdater.cpp:1839
-msgid "waiting..."
-msgstr "laukiama..."
-
-#: Client/core/CVersionUpdater.cpp:1855
-msgid "MANDATORY UPDATE"
-msgstr "PRIVALOMAS ATNAUJINIMAS"
-
-#: Client/core/CVersionUpdater.cpp:1856
-msgid "To join this server, you must update MTA.\n\n"
-" Do you want to update now ?"
-msgstr "Jei norite prisijungti, privalote atnaujinti MTA.\n\n"
-"Ar norite atnaujinti dabar ?"
-
-#: Client/core/CVersionUpdater.cpp:1874
-msgid "OPTIONAL UPDATE"
-msgstr "NEPRIVALOMAS ATNAUJINIMAS"
-
-#: Client/core/CVersionUpdater.cpp:1875
-msgid "Server says an update is recommended, but not essential.\n\n"
-" Do you want to update now ?"
-msgstr "Serveris rekomenduoja atsinaujinti, bet tai nėra privaloma.\n\n"
-"Ar norite atsinaujinti dabar ?"
-
-#: Client/core/CVersionUpdater.cpp:1914
-msgid "Update not currently avalable.\n\n"
-"Please check www.mtasa.com"
-msgstr "Šiuo metu atnaujinimas nepasiekiamas.\n\n"
-"Patikrinkite www.mtasa.com"
-
-#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
-msgid "ERROR SAVING"
-msgstr "KLAIDŲ IŠSAUGOJIMAS"
-
-#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
-msgid "Unable to create the file."
-msgstr "Neįmanoma sukurti bylos."
-
-#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:1953
-#: Client/core/CVersionUpdater.cpp:2126 Client/core/CVersionUpdater.cpp:2135
-msgid "ERROR DOWNLOADING"
-msgstr "ATSISIUNTIMO KLAIDA"
-
-#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:2127
-msgid "The downloaded file appears to be incorrect."
-msgstr "Atsisiųstas failas yra neteisingas."
-
-#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:2136
-msgid "For some reason."
-msgstr "Dėl neaiškios priežasties."
-
-#: Client/core/CVersionUpdater.cpp:1965 Client/core/CVersionUpdater.cpp:2149
-msgid "DOWNLOAD COMPLETE"
-msgstr "ATSISIUNTIMAS BAIGTAS"
-
-#: Client/core/CVersionUpdater.cpp:1989
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr "- Nežinoma problema ties _DialogUpdateResult"
-
-#: Client/core/CVersionUpdater.cpp:2087 Client/core/CVersionUpdater.cpp:2097
-msgid "Ok"
-msgstr "Gerai"
-
-#: Client/core/CVersionUpdater.cpp:2095
-msgid "ERROR"
-msgstr "KLAIDA"
-
-#: Client/core/CVersionUpdater.cpp:2096
-msgid "Some MTA:SA data files are missing.\n\n\n"
-"Please reinstall MTA:SA"
-msgstr "Kai kurių MTA:SA data bylū trūksta.\n\n\n"
-"Prašome įdiegti MTA:SA iš naujo"
-
-#: Client/core/CVersionUpdater.cpp:2771
-#, c-format
-msgid "%3d %% completed"
-msgstr "%3d %% baigta"
-
-#: Client/core/CVersionUpdater.cpp:2773
-#, c-format
-msgid "\n\n"
-"Waiting for response  -  %-3d"
-msgstr "\n\n"
-"Laukiama atsakymo - %-3d"
-
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Naudojate kūrėjų versiją! Tai yra versija skirta testavimui ir negali būti naudojama prisijungimui į viešus serverius!"
-
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA negaus daugiau atnaujinimų Vista ir XP operacinėse sistemose po 2019 metų liepos mėnesio.\n\n"
-"Atnaujinkite Windows, kad galėtumėte žaisti naujausiuose serveriuose."
-
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Ketinate atsijungti iš serverio.\n\n"
-"Ar tikrai to norite?"
-
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "ATSIJUNGIMO PERSPĖJIMAS"
-
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
 msgstr "Lietuvių"
 
-#: Client/core/CKeyBinds.cpp:186
-msgid "Fire"
-msgstr "Šaudymas"
-
-#: Client/core/CKeyBinds.cpp:187
-msgid "Next weapon"
-msgstr "Kitas ginklas"
-
-#: Client/core/CKeyBinds.cpp:188
-msgid "Previous weapon"
-msgstr "Ankstesnis ginklas"
-
-#: Client/core/CKeyBinds.cpp:189
-msgid "Forwards"
-msgstr "Pirmyn"
-
-#: Client/core/CKeyBinds.cpp:190
-msgid "Backwards"
-msgstr "Atgal"
-
-#: Client/core/CKeyBinds.cpp:193
-msgid "Zoom in"
-msgstr "Priartinti"
-
-#: Client/core/CKeyBinds.cpp:194
-msgid "Zoom out"
-msgstr "Patolinti"
-
-#: Client/core/CKeyBinds.cpp:195
-msgid "Enter/Exit"
-msgstr "Įlipti/Išlipti"
-
-#: Client/core/CKeyBinds.cpp:196
-msgid "Change camera"
-msgstr "Pakeisti kamerą"
-
-#. 10
-#: Client/core/CKeyBinds.cpp:197
-msgid "Jump"
-msgstr "Šokti"
-
-#: Client/core/CKeyBinds.cpp:198
-msgid "Sprint"
-msgstr "Bėgti"
-
-#: Client/core/CKeyBinds.cpp:199
-msgid "Look behind"
-msgstr "Pažiūrėti atgal"
-
-#: Client/core/CKeyBinds.cpp:200
-msgid "Crouch"
-msgstr "Pritūpti"
-
-#: Client/core/CKeyBinds.cpp:201
-msgid "Action"
-msgstr "Veiksmas"
-
-#: Client/core/CKeyBinds.cpp:202
-msgid "Walk"
-msgstr "Eiti"
-
-#: Client/core/CKeyBinds.cpp:203
-msgid "Vehicle fire"
-msgstr "Transporto priemonės ugnis"
-
-#: Client/core/CKeyBinds.cpp:204
-msgid "Vehicle secondary fire"
-msgstr "Tr. priemonės antrinė ugnis"
-
-#: Client/core/CKeyBinds.cpp:205
-msgid "Vehicle left"
-msgstr "Pasukti tr. priemonę kairėn"
-
-#: Client/core/CKeyBinds.cpp:206
-msgid "Vehicle right"
-msgstr "Pasukti tr. priemonę dešinėn"
-
-#. 20
-#: Client/core/CKeyBinds.cpp:207
-msgid "Steer forwards/down"
-msgstr "Palinkti į priekį/žemyn"
-
-#: Client/core/CKeyBinds.cpp:208
-msgid "Steer backwards/up"
-msgstr "Palinkti atgal/aukštyn"
-
-#: Client/core/CKeyBinds.cpp:209
-msgid "Accelerate"
-msgstr "Didinti greitį"
-
-#: Client/core/CKeyBinds.cpp:210
-msgid "Brake/Reverse"
-msgstr "Stabdyti/Atgal"
-
-#: Client/core/CKeyBinds.cpp:211
-msgid "Radio next"
-msgstr "Sekanti radijo"
-
-#: Client/core/CKeyBinds.cpp:212
-msgid "Radio previous"
-msgstr "Ankstesnė radijo"
-
-#: Client/core/CKeyBinds.cpp:213
-msgid "Radio user track skip"
-msgstr "Praleisti user track dainą"
-
-#: Client/core/CKeyBinds.cpp:214
-msgid "Horn"
-msgstr "Garso signalas"
-
-#: Client/core/CKeyBinds.cpp:215
-msgid "Sub-mission"
-msgstr "Papildoma misija"
-
-#: Client/core/CKeyBinds.cpp:216
-msgid "Handbrake"
-msgstr "Rankinis stabdis"
-
-#. 30
-#: Client/core/CKeyBinds.cpp:217
-msgid "Vehicle look left"
-msgstr "Tr. priemonėje žiūrėti kairėn"
-
-#: Client/core/CKeyBinds.cpp:218
-msgid "Vehicle look right"
-msgstr "Tr. priemonėje žiūrėti dešinėn"
-
-#: Client/core/CKeyBinds.cpp:219
-msgid "Vehicle look behind"
-msgstr "Tr. priemonėje žiūrėti atgal"
-
-#: Client/core/CKeyBinds.cpp:220
-msgid "Vehicle mouse look"
-msgstr "Tr. priemonėje žvalgytis pele"
-
-#: Client/core/CKeyBinds.cpp:221
-msgid "Special control left"
-msgstr "Spec. valdiklis kairėn"
-
-#: Client/core/CKeyBinds.cpp:222
-msgid "Special control right"
-msgstr "Spec. valdiklis dešinėn"
-
-#: Client/core/CKeyBinds.cpp:223
-msgid "Special control down"
-msgstr "Spec. valdiklis žemyn"
-
-#: Client/core/CKeyBinds.cpp:224
-msgid "Special control up"
-msgstr "Spec. valdiklis aukštyn"
-
-#: Client/core/CKeyBinds.cpp:225
-msgid "Aim weapon"
-msgstr "Taikymasis ginklu"
-
-#: Client/core/CKeyBinds.cpp:226
-msgid "Conversation yes"
-msgstr "Atsakyti taip"
-
-#. 40
-#: Client/core/CKeyBinds.cpp:227
-msgid "Conversation no"
-msgstr "Atsakyti ne"
-
-#: Client/core/CKeyBinds.cpp:228
-msgid "Group control forwards"
-msgstr "Gaujos nurodymas pirmyn"
-
-#: Client/core/CKeyBinds.cpp:229
-msgid "Group control backwards"
-msgstr "Gaujos nurodymas atsitraukti"
-
-#: Client/core/CScreenShot.cpp:53
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
 #, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Ekranas nufotografuotas: '%s'"
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Nuotraukos dydis %d baitų, bet tikėtasi %d"
+
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "Ekranvaizdis nepavyko"
+
+#: Client/core/DXHook/CDirect3DHook9.cpp:123
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Nepavyko paleisti Direct3D9.\n\n"
+"Prašome įsitikinti, kad DirectX End-User Runtime ir\n"
+"naujausi Windows Service Packs yra teisingai įrašyti."
+
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "SERVERIS PILNAS"
+
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "Pavadinimas:"
+
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Serverio Adresas:"
+
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Žaidimo Tipas:"
+
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Žemėlapis:"
+
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Žaidėjai:"
+
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Yra Slaptažodis:"
+
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Vėlavimas:"
+
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "Žaidėjų sąrašas"
+
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Uždaryti"
+
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Prisijungti į žaidimą"
+
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Pateikite serverio slaptažodį:"
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Prisijungti į serverį, kai tiktai atsiras vietos."
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "PRAŠOME PATEIKTI SERVERIO SLAPTAŽODĮ"
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
+#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
+#: Client/loader/MainFunctions.cpp:1189
+msgid "Information"
+msgstr "Informacija"
+
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "Baigėsi laikas"
+
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "Užklausiama..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2825,13 +2399,6 @@ msgstr "Delsa"
 msgid "Gamemode"
 msgstr "Žaidimo tipas"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "Žaidėjų sąrašas"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2860,6 +2427,11 @@ msgstr "Kitos Versijos"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:550
 msgid "Back"
 msgstr "Atgal"
+
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+#: Client/loader/Dialogs.cpp:131
+msgid "Help"
+msgstr "Pagalba"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:741
 msgid "Loading..."
@@ -2939,114 +2511,538 @@ msgstr "Neįmanoma pririšti LAN-transliavimo prievado"
 msgid "Attempting to discover LAN servers"
 msgstr "Bandoma surasti LAN serverius"
 
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "SERVERIS PILNAS"
+#: Client/loader/CExePatchedStatus.cpp:158
+msgid "Update Aero setting"
+msgstr "Atnaujinti Aero nustatymą"
 
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "Pavadinimas:"
+#: Client/loader/CExePatchedStatus.cpp:160
+msgid "Update Large Memory setting"
+msgstr "Atnaujinti Didelės Atminties nustatymą"
 
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Serverio Adresas:"
+#: Client/loader/CExePatchedStatus.cpp:162
+msgid "Update DEP setting"
+msgstr "Atnaujinti DEP nustatymą"
 
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Žaidimo Tipas:"
+#: Client/loader/CExePatchedStatus.cpp:164
+msgid "Update graphics driver compliance"
+msgstr "Atnaujinti grafikos tvarkykles"
 
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Žemėlapis:"
+#: Client/loader/CExePatchedStatus.cpp:166
+#: Client/loader/CExePatchedStatus.cpp:168
+msgid "Fix file issues"
+msgstr "Sutvarkyti failų problemas"
 
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Žaidėjai:"
+#: Client/loader/CExePatchedStatus.cpp:170
+msgid "Use proxy loader"
+msgstr ""
 
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Yra Slaptažodis:"
+#: Client/loader/CExePatchedStatus.cpp:171
+msgid "Copy main executable to avoid graphic driver issues"
+msgstr "Nukopijuoti pagrindinį exe failą, kad išvengt grafikos tvarkyklių nesklandumų"
 
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Vėlavimas:"
+#: Client/loader/Install.cpp:260
+msgid "Unknown"
+msgstr ""
 
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Uždaryti"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Prisijungti į žaidimą"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Pateikite serverio slaptažodį:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Prisijungti į serverį, kai tiktai atsiras vietos."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "PRAŠOME PATEIKTI SERVERIO SLAPTAŽODĮ"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "Baigėsi laikas"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "Užklausiama..."
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#: Client/loader/Install.cpp:267
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Nuotraukos dydis %d baitų, bet tikėtasi %d"
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Ekranvaizdis nepavyko"
+#: Client/loader/Install.cpp:472
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Nepavyko paleisti Direct3D9.\n\n"
-"Prašome įsitikinti, kad DirectX End-User Runtime ir\n"
-"naujausi Windows Service Packs yra teisingai įrašyti."
+#: Client/loader/Install.cpp:848 Client/loader/Dialogs.cpp:901
+msgid "Installing update..."
+msgstr "Įrašomas atnaujinimas..."
 
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "Nepavyksta rasti tinkamos ekrano raiškos."
+#: Client/loader/Install.cpp:924 Client/loader/Dialogs.cpp:909
+msgid "Extracting files..."
+msgstr "Išskleidžiami failai..."
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Ar tikrai norite naudoti šią ekrano raišką?"
+#: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Ieškoma Grand Theft Auto San Andreas"
+
+#: Client/loader/Utils.cpp:502 Client/loader/Dialogs.cpp:893
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Prašome paleisti Grand Theft Auto San Andreas"
+
+#: Client/loader/Utils.cpp:566
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Pasirinkite savo Grand Theft Auto: San Andreas įdiegimo aplanką"
+
+#: Client/loader/Utils.cpp:935 Client/loader/CInstallManager.cpp:340
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA reikalauja Administratoriaus teisių, kad galėtų:\n\n"
+"'%s'\n\n"
+"Prašome suteikti teises sekančiame žingsnyje."
+
+#: Client/loader/Utils.cpp:1036
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Klaida įkeliant %s modulį! (%s)"
+
+#: Client/loader/Utils.cpp:1361 Client/loader/Dialogs.cpp:914
+msgid "Copying files..."
+msgstr "Kopijuojamos bylos..."
+
+#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:919
+msgid "Copy finished early. Everything OK."
+msgstr "Kopijavimas baigtas anksti. Viskas pavyko."
+
+#: Client/loader/Utils.cpp:1427 Client/loader/Dialogs.cpp:924
+msgid "Finishing..."
+msgstr "Baigiama..."
+
+#: Client/loader/Utils.cpp:1429 Client/loader/Dialogs.cpp:928
+msgid "Done!"
+msgstr "Baigta!"
+
+#: Client/loader/Utils.cpp:1469
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Tai pirmas %s paleidimas.\n\n"
+"Ar norite nukopijuoti nustatymus iš %s ?"
+
+#: Client/loader/Utils.cpp:1508
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA nepavyko atidaryti failo '%s'"
+
+#: Client/loader/Utils.cpp:1530
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "Trūksta GTA:SA failo '%s'.  "
+
+#: Client/loader/Utils.cpp:1555
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA nepavyko įkelti modelio."
+
+#: Client/loader/Utils.cpp:1557
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Jei neseniai keitėte gta3.img, tada pabandykite perrašyti GTA:SA."
+
+#: Client/loader/Utils.cpp:1582
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA nepavyko pridėti patobulinimo mašinai."
+
+#: Client/loader/Utils.cpp:1601
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA surado klaidų faile '%s'"
+
+#: Client/loader/Utils.cpp:1683
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Ar jūsų kompiuteris persikrovė bežaidžiant MTA:SA?"
+
+#: Client/loader/Utils.cpp:1748
+msgid "Please terminate the following programs before continuing:"
+msgstr "Prašome išjungti sekančias programas prieš tęsdami darbą:"
+
+#: Client/loader/MainFunctions.cpp:242
+msgid "Trouble restarting MTA:SA\n\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
+"Try to launch MTA:SA again?"
+msgstr "Problema paleidžiant MTA:SA\n\n"
+"Jei problema kartosis, atidarykite užduočių tvarkyklę ir\n"
+"sustabdykite 'gta_sa.exe' bei 'Multi Theft Auto.exe' procesus\n\n\n"
+"Ar norite pabandyti paleisti MTA:SA dar kartą?"
+
+#: Client/loader/MainFunctions.cpp:260
+msgid "Another instance of MTA is already running.\n\n"
+"If this problem persists, please restart your computer"
+msgstr "MTA jau yra paleistas.\n\n"
+"Jei problema kartosis, prašome perkrauti savo kompiuterį"
+
+#: Client/loader/MainFunctions.cpp:263
+msgid "Another instance of MTA is already running.\n\n"
+"Do you want to terminate it?"
+msgstr "MTA jau yra paleistas.\n\n"
+"Ar norite sunaikinti šį procesą?"
+
+#: Client/loader/MainFunctions.cpp:288
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to revert to an earlier version?"
+msgstr "Ar jūs turite problemų paleidžiant MTA:SA?.\n\n"
+"Norite sugražinti ankstesnę versiją?"
+
+#: Client/loader/MainFunctions.cpp:318
+msgid "There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n\n"
+"Do you want to reset GTA settings now?"
+msgstr "Atrtodo, jog yra problemų paleidžiant MTA:SA.\n"
+"Sugražinant numatytuosius GTA nustatymus kartais padeda sutvarkyti šią problemą.\n\n"
+"Ar norite sugražinti GTA nustatymus dabar?"
+
+#: Client/loader/MainFunctions.cpp:333
+msgid "GTA settings have been reset.\n\n"
+"Press OK to continue."
+msgstr "GTA nustatymai sugražinti.\n\n"
+"Spauskite Gerai."
+
+#: Client/loader/MainFunctions.cpp:338
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr "Neišėjo ištrinti bylos: '%s'"
+
+#. No settings to delete, or can't find them
+#: Client/loader/MainFunctions.cpp:346
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to see some online help?"
+msgstr "Ar turite problemų paleidžiant MTA:SA?.\n\n"
+"Norėtumėt pamatyti šiek tiek pagalbos tinkle?"
+
+#. Inform user
+#: Client/loader/MainFunctions.cpp:382
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to change the following setting?"
+msgstr "Turite problemų dėl MTA:SA paleidimo?.\n\n"
+"Norite pakeisti šiuos nustatymus?"
+
+#: Client/loader/MainFunctions.cpp:425
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr "Turite problemų dėl MTA:SA paleidimo?.\n\n"
+"Pabandykite išjungti šiuos produktus žaidimui GTA ir MTA:"
+
+#: Client/loader/MainFunctions.cpp:459
+msgid "WARNING\n\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n\n"
+msgstr "ĮSPĖJIMAS\n\n"
+"MTA:SA aptiko neįprastą veiklą.\n"
+"Prašome paleisti virusų skenavimo programą, kad įsitikintumėte sistemos saugumu.\n\n"
+
+#: Client/loader/MainFunctions.cpp:462
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr "Aptiktas failas buvo: %s\n"
+
+#: Client/loader/MainFunctions.cpp:596
+msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr "GTA: San Andreas jau yra paleistas. Šį procesą reikia sunaikinti prieš paleidžiant MTA:SA. Ar norite tai padaryti dabar?"
+
+#: Client/loader/MainFunctions.cpp:603
+msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
+msgstr "Neįmanoma sunaikinti GTA: San Andreas proceso. Jei problema kartosis, prašome perkrauti savo kompiuterį."
+
+#: Client/loader/MainFunctions.cpp:626
+msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+msgstr "Trūksta reikalingų įvesčių registre. Prašome įdiegti Multi Theft Auto: San Andreas iš naujo."
+
+#: Client/loader/MainFunctions.cpp:632
+msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
+msgstr "Nurodyta vieta iki GTA: San Andreas susideda iš nepalaikomų simbolių. Prašome patraukti savo Grand Theft Auto: San Andreas įdiegimo aplanką į palaikomą vietą, kuri susideda tik iš standartinių ASCII simbolių ir įdiekite Multi Theft Auto: San Andreas iš naujo."
+
+#: Client/loader/MainFunctions.cpp:642
+msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
+msgstr "Vieta iki įdiegtos 'MTA:SA' ar 'GTA: San Andreas' versijos\n"
+"susideda iš ';' (kabliataškio).\n\n"
+"Jei patirsite problemų paleidžiant MTA:SA,\n"
+"patraukite savo žaidimą(us) į vietą, nesusidedančią iš kabliataškio."
+
+#: Client/loader/MainFunctions.cpp:779
+msgid "Load failed. Please ensure that the latest data files have been installed correctly."
+msgstr "Įkėlimas nepavyko. Prašome įsitikinti, jog paskutinės data bylos buvo įdiegtos teisingai."
+
+#: Client/loader/MainFunctions.cpp:788
+#, c-format
+msgid "Load failed. Please ensure that %s is installed correctly."
+msgstr "Įkėlimas nepavyko. Prašome įsitikinti, kad %s yra įdiegtas teisingai."
+
+#: Client/loader/MainFunctions.cpp:795
+#, c-format
+msgid "Load failed. Could not find gta_sa.exe in %s."
+msgstr "Įkėlimas nepavyko. Nerastas gta_sa.exe nurodytoje vietoje %s."
+
+#: Client/loader/MainFunctions.cpp:805
+#, c-format
+msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
+msgstr "Įkėlimas nepavyko. %s egzistuoja GTA direktorijoje. Prašome ištrinti prieš tęsiant."
+
+#: Client/loader/MainFunctions.cpp:814
+#, c-format
+msgid "Main file has an incorrect name (%s)"
+msgstr "Pagrindinis failas yra blogai užvadintas (%s)"
+
+#: Client/loader/MainFunctions.cpp:825
+msgid "Main file is unsigned. Possible virus activity.\n\n"
+"See online help if MTA does not work correctly."
+msgstr "Pagrindinis failas yra nepatvirtintas. Galimas virusų aktyvumas.\n\n"
+"Peržiūrėkite pagalbą internete, jei MTA neveikia."
+
+#: Client/loader/MainFunctions.cpp:852
+#, c-format
+msgid "Data file %s is missing. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:863
+#, c-format
+msgid "Data file %s is modified. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:877
+msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
+"Remove these .asi files if you experience problems with MTA:SA."
+msgstr ".asi failai aptikti 'MTA:SA' arba 'GTA: San Andreas' aplankale.\n\n"
+"Ištrinkite .asi failus jei patirsite nesklandumų su MTA:SA."
+
+#: Client/loader/MainFunctions.cpp:982
+msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Neteisingos failo versijos klaida. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
+
+#: Client/loader/MainFunctions.cpp:991
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Trūksta kai kurių failų. Perrašykite MTA:SA, jei patirsite nesklandumų.\n"
+
+#: Client/loader/MainFunctions.cpp:1003
+msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
+"Please restart your PC.\n"
+msgstr "MTA:SA yra nepalaikomas su Windows 'Safe Mode'.\n\n"
+"Perkraukite savo PC.\n"
+
+#: Client/loader/MainFunctions.cpp:1089
+msgid "Fix configuration issue"
+msgstr "Sutaisyti konfigūracijos problemas"
+
+#. Try to relaunch as admin if not done so already
+#: Client/loader/MainFunctions.cpp:1127
+msgid "Fix elevation required error"
+msgstr "Sutaisyti privilegijų reikalavimo klaidą"
+
+#: Client/loader/MainFunctions.cpp:1134
+#, c-format
+msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
+"[%s]"
+msgstr "Nepavyko paleisti Grand Theft Auto: San Andreas. Prašome paleisti iš naujo, arba, jei problema kartosis, susisiekti su MTA svetainėje www.multitheftauto.com. \n\n"
+"[%s]"
+
+#: Client/loader/MainFunctions.cpp:1189
+msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
+msgstr "GTA: San Andreas galėjo būti paleistas neteisingai. Ar norite sunaikinti šį procesą?"
+
+#: Client/loader/CInstallManager.cpp:355
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA negalėjo užbaigti šios užduoties:\n\n"
+"'%s'\n"
+
+#: Client/loader/CInstallManager.cpp:405
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Žaidimas lūžo dėl grafikos tvarkyklių klaidos **\n\n"
+"** Prašome atsinaujinti savo grafikos tvarkykles **"
+
+#: Client/loader/CInstallManager.cpp:511
+msgid "Install updated MTA:SA files"
+msgstr "Įdiegti atnaujintas MTA:SA bylas"
+
+#: Client/loader/CInstallManager.cpp:531
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Neįmanoma atnaujinti dėl konflikto bylose. Prašome uždaryti kitas programas ir bandyti iš naujo"
+
+#: Client/loader/CInstallManager.cpp:540
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto nebuvo tinkamai įrašytas, prašome įdiegti iš naujo. %s"
+
+#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
+msgid "MTA:SA cannot continue because the following files are incorrect:"
+msgstr "MTA:SA negali veikti, nes šie failai yra neteisingi:"
+
+#: Client/loader/CInstallManager.cpp:620
+msgid "Patch GTA"
+msgstr "Sutvarkyti GTA"
+
+#: Client/loader/CInstallManager.cpp:823
+msgid "Missing file:"
+msgstr "Trūksta failo:"
+
+#: Client/loader/CInstallManager.cpp:827
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Jei MTA nepasileidžia, prašome perrašyti GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:948
+msgid "Update install settings"
+msgstr "Atnaujinti diegimo nustatymus"
+
+#: Client/loader/CInstallManager.cpp:1081
+msgid "Update compatibility settings"
+msgstr "Atnaujinti suderinamumo nustatymus"
+
+#: Client/loader/CInstallManager.cpp:1109
+msgid "Move incompatible files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1125
+#: Client/loader/CInstallManager.cpp:1141
+msgid "Delete incompatible files"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:130
+msgid "Quit"
+msgstr "Išeiti"
+
+#: Client/loader/Dialogs.cpp:147
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas aptiko problemą"
+
+#: Client/loader/Dialogs.cpp:148
+msgid "Crash information"
+msgstr "Lūžio informacija"
+
+#: Client/loader/Dialogs.cpp:149
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Pažymėkite varnelę, kad ši lūžio informacija būtų išsiųsta MTA kūrėjams internetu"
+
+#: Client/loader/Dialogs.cpp:150
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Taip padarius padidinsite šansus, jog šis lūžis nebepasikartotų ateityje."
+
+#: Client/loader/Dialogs.cpp:151
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Ar norite paleisti MTA: San Andreas iš naujo ?"
+
+#: Client/loader/Dialogs.cpp:158
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Perspėjimas"
+
+#: Client/loader/Dialogs.cpp:159
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "Jūsų Grand Theft Auto: San Andreas įrašymo vietoje aptiktas d3d9.dll failas:"
+
+#: Client/loader/Dialogs.cpp:161
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "Šis failas yra nebūtinas ir gali sukelti nesklandumų su naujomis grafikos galimybėmis šioje MTA:SA versijoje.\n\n"
+"Rekomenduojama pašalinti arba pervadinti failą d3d9.dll."
+
+#: Client/loader/Dialogs.cpp:163
+msgid "Keep these files, but also show this warning on next start"
+msgstr "Naudoti d3d9.dll, bet taip pat parodyti šį įspėjimą kitą kartą paleidus"
+
+#: Client/loader/Dialogs.cpp:164
+msgid "Do not remind me about these files again"
+msgstr "Nebepriminti apie šiuos failus"
+
+#: Client/loader/Dialogs.cpp:165
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "Pervadinti šiuos failus iš *.dll į *.dll.bak"
+
+#: Client/loader/Dialogs.cpp:166
+msgid "Show me these files"
+msgstr "Rodyti failus"
+
+#: Client/loader/Dialogs.cpp:167
+msgid "Play MTA:SA"
+msgstr "Žaisti MTA:SA"
+
+#: Client/loader/Dialogs.cpp:173
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - Painūs nustatymai"
+
+#: Client/loader/Dialogs.cpp:174
+msgid "NVidia Optimus detected!"
+msgstr "NVidia Optimus aptikta!"
+
+#: Client/loader/Dialogs.cpp:175
+msgid "Try each option and see what works:"
+msgstr "Išbandykite kiekvieną nustatymą ir patrikrinkite, kuris veiks:"
+
+#: Client/loader/Dialogs.cpp:176
+msgid "A - Standard NVidia"
+msgstr "A - Standartinis NVidia"
+
+#: Client/loader/Dialogs.cpp:177
+msgid "B - Alternate NVidia"
+msgstr "B - Alternatyvus NVidia"
+
+#: Client/loader/Dialogs.cpp:178
+msgid "C - Standard NVidia with exe rename"
+msgstr "C - Standartinis NVidia su exe pervadinimu"
+
+#: Client/loader/Dialogs.cpp:179
+msgid "D - Alternate NVidia with exe rename"
+msgstr "D - Alternatyvus NVidia su exe pervadinimu"
+
+#: Client/loader/Dialogs.cpp:180
+msgid "E - Standard Intel"
+msgstr "E - Standartinis Intel"
+
+#: Client/loader/Dialogs.cpp:181
+msgid "F - Alternate Intel"
+msgstr "F - Alternatyvus Intel"
+
+#: Client/loader/Dialogs.cpp:182
+msgid "G - Standard Intel with exe rename"
+msgstr "G - Standartinis Intel su exe pervadinimu"
+
+#: Client/loader/Dialogs.cpp:183
+msgid "H - Alternate Intel with exe rename"
+msgstr "H - Alternatyvus Intel su exe pervadinimu"
+
+#: Client/loader/Dialogs.cpp:184
+msgid "If you get desperate, this might help:"
+msgstr "Jei pulsite į neviltį, tai gali jums padėti:"
+
+#: Client/loader/Dialogs.cpp:185
+msgid "If you have already selected an option that works, this might help:"
+msgstr "Jei jau pasirinkote tinkamą parinktį, tai gali padėti:"
+
+#: Client/loader/Dialogs.cpp:186
+msgid "Force windowed mode"
+msgstr "Priverstinai paleisti lange"
+
+#: Client/loader/Dialogs.cpp:187
+msgid "Don't show again"
+msgstr "Nerodyti daugiau"
+
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
+
+#: Client/loader/Dialogs.cpp:195
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Perspėjimas: Nepavyko aptikti anti-virusinės sistemos"
+
+#: Client/loader/Dialogs.cpp:197
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA nepavyko aptikti anti-virusinės sistemos jūsų kompiuteryje.\n\n"
+"Virusai gali trigdyti MTA darbą ir sumažinti jūsų žaidimo malonumą.\n\n"
+"Spauskite 'Pagalba' detalesnei informacijai."
+
+#: Client/loader/Dialogs.cpp:200
+msgid "I have already installed an anti-virus"
+msgstr "Aš jau turiu įsirašęs anti-virusinę sistemą"
+
+#: Client/loader/Dialogs.cpp:202
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Aš neįsirašinėsiu anti-virsinės sistemos.\n"
+"Noriu, kad mano kompiuteris striginėtų ir būtų valdomas hakerių."
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -3068,10 +3064,14 @@ msgstr "Prisiminti pasirinkimą"
 msgid "Deny"
 msgstr "Atšaukti"
 
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
-msgid "Problem with graphics driver"
-msgstr "Problema su grafikos tvarkykle"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "Nepavyksta rasti tinkamos ekrano raiškos."
+
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Ar tikrai norite naudoti šią ekrano raišką?"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
