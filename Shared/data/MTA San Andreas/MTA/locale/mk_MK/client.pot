@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-21 20:06+0000\n"
-"PO-Revision-Date: 2023-01-21 21:05\n"
+"POT-Creation-Date: 2023-01-22 10:59+0000\n"
+"PO-Revision-Date: 2023-01-22 11:05\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -2522,18 +2522,18 @@ msgstr ""
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Копирање на главниот извршен за да се избегнат проблеми со графичките драјвери"
 
-#: Client/loader/Install.cpp:260
+#: Client/loader/Install.cpp:262
 msgid "Unknown"
 msgstr ""
 
-#: Client/loader/Install.cpp:267
+#: Client/loader/Install.cpp:269
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
 msgstr ""
 
-#: Client/loader/Install.cpp:472
+#: Client/loader/Install.cpp:476
 #, c-format
 msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
@@ -2541,11 +2541,11 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:848 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:853 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Инсталирање на ажурирање"
 
-#: Client/loader/Install.cpp:924 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:935 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Извлекување на фајлови..."
 
