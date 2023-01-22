@@ -46,6 +46,9 @@ void AddLoaderProxyReport()
     if (winmm)
         FreeLibrary(winmm);
 
+    if (loaderSource == 1 && winmm && winmm == loaderHandle)
+        return;
+
     AddReportLog(7120, SString("winmm.dll @%lu %08X=%08X [h:%08X, s:%08X]", loaderSource, reinterpret_cast<DWORD>(loaderHandle), reinterpret_cast<DWORD>(winmm),
                                reinterpret_cast<DWORD>(mtasaGetLibraryHandle), reinterpret_cast<DWORD>(mtasaGetLibrarySource)));
 }
