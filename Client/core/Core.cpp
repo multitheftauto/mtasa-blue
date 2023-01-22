@@ -20,6 +20,36 @@ CLocalization* g_pLocalization = NULL;
 
 HINSTANCE g_hModule = NULL;
 
+void AddLoaderProxyReport()
+{
+    HMODULE loaderHandle = nullptr;
+    DWORD   loaderSource = 0;
+    HMODULE (*mtasaGetLibraryHandle)() = nullptr;
+    DWORD (*mtasaGetLibrarySource)() = nullptr;
+
+    if (HMODULE mtasa = LoadLibraryW(L"mtasa.dll"))
+    {
+        mtasaGetLibraryHandle = reinterpret_cast<decltype(mtasaGetLibraryHandle)>(GetProcAddress(mtasa, "mtasaGetLibraryHandle"));
+        mtasaGetLibrarySource = reinterpret_cast<decltype(mtasaGetLibrarySource)>(GetProcAddress(mtasa, "mtasaGetLibrarySource"));
+
+        if (mtasaGetLibraryHandle)
+            loaderHandle = mtasaGetLibraryHandle();
+
+        if (mtasaGetLibrarySource)
+            loaderSource = mtasaGetLibrarySource();
+
+        FreeLibrary(mtasa);
+    }
+
+    HMODULE winmm = LoadLibraryW(L"winmm.dll");
+
+    if (winmm)
+        FreeLibrary(winmm);
+
+    AddReportLog(7120, SString("winmm.dll @%lu %08X=%08X [h:%08X, s:%08X]", loaderSource, reinterpret_cast<DWORD>(loaderHandle), reinterpret_cast<DWORD>(winmm),
+                               reinterpret_cast<DWORD>(mtasaGetLibraryHandle), reinterpret_cast<DWORD>(mtasaGetLibrarySource)));
+}
+
 int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 {
     CFilePathTranslator FileTranslator;
@@ -48,6 +78,8 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
             // Meaning it will search the supplied path before the system and windows directory.
             // http://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
             SetDllDirectory(CalcMTASAPath("MTA"));
+
+            AddLoaderProxyReport();
 
             g_hModule = hModule;
             g_pCore = new CCore;
