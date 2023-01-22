@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-22 10:59+0000\n"
-"PO-Revision-Date: 2023-01-22 11:06\n"
+"POT-Creation-Date: 2023-01-22 15:44+0000\n"
+"PO-Revision-Date: 2023-01-22 15:52\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -2552,11 +2552,11 @@ msgstr "Sua instalação pode estar corrompida agora.\n\n"
 "%zu de %zu arquivos não puderam ser restaurados do backup.\n\n"
 "Você deve reinstalar o Multi Theft Auto a partir de www.multitheftauto.com ou tentar executar a atualização como administrador."
 
-#: Client/loader/Install.cpp:853 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Instalando atualização..."
 
-#: Client/loader/Install.cpp:935 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:928 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Extraindo arquivos..."
 
