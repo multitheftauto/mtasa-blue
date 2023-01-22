@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-22 10:59+0000\n"
-"PO-Revision-Date: 2023-01-22 11:05\n"
+"POT-Creation-Date: 2023-01-22 15:44+0000\n"
+"PO-Revision-Date: 2023-01-22 15:51\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -2564,11 +2564,11 @@ msgstr "Twoja instalacja może być uszkodzona.\n\n"
 "%zu z %zu plików nie może być przywróconych z kopii zapasowej.\n\n"
 "Powinieneś przeinstalować Multi Theft Auto z www.multitheftauto.com lub spróbować uruchomić aktualizację z prawami administratora."
 
-#: Client/loader/Install.cpp:853 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Instalowanie aktualizacji..."
 
-#: Client/loader/Install.cpp:935 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:928 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Wypakowywanie plików..."
 
