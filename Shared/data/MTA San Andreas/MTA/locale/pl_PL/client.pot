@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-21 20:06+0000\n"
-"PO-Revision-Date: 2023-01-21 21:05\n"
+"POT-Creation-Date: 2023-01-22 10:59+0000\n"
+"PO-Revision-Date: 2023-01-22 11:05\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -2541,11 +2541,11 @@ msgstr "Użyj proxy loader"
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Skopiuj główny plik wykonywalny aby uniknąć problemów ze sterownikami"
 
-#: Client/loader/Install.cpp:260
+#: Client/loader/Install.cpp:262
 msgid "Unknown"
 msgstr "Nieznany"
 
-#: Client/loader/Install.cpp:267
+#: Client/loader/Install.cpp:269
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
@@ -2554,7 +2554,7 @@ msgstr "Plik '%s' jest aktualnie zablokowany przez %zu procesów.\n\n"
 "Czy chcesz zakończyć powyższe procesy i kontynuować aktualizację?\n\n"
 "%s"
 
-#: Client/loader/Install.cpp:472
+#: Client/loader/Install.cpp:476
 #, c-format
 msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
@@ -2564,11 +2564,11 @@ msgstr "Twoja instalacja może być uszkodzona.\n\n"
 "%zu z %zu plików nie może być przywróconych z kopii zapasowej.\n\n"
 "Powinieneś przeinstalować Multi Theft Auto z www.multitheftauto.com lub spróbować uruchomić aktualizację z prawami administratora."
 
-#: Client/loader/Install.cpp:848 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:853 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Instalowanie aktualizacji..."
 
-#: Client/loader/Install.cpp:924 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:935 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Wypakowywanie plików..."
 
