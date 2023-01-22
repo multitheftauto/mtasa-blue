@@ -837,13 +837,6 @@ static int RunInstall()
     }
 
     OutputDebugLine(SString("RunInstall: Installation of %zu files complete", files.size()));
-
-    // Switch to the source directory's parent to finally delete the source directory.
-    if (SetCurrentDirectory(ExtractPath(sourceRoot)))
-    {
-        DirectoryDeleteScope deleteSourceRoot(sourceRoot);
-    }
-
     return 0;
 }
 
