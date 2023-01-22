@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-22 10:59+0000\n"
+"POT-Creation-Date: 2023-01-22 15:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2573,11 +2573,11 @@ msgid ""
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:853 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr ""
 
-#: Client/loader/Install.cpp:935 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:928 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr ""
 
