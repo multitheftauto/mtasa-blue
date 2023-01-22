@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-21 20:06+0000\n"
-"PO-Revision-Date: 2023-01-21 21:05\n"
+"POT-Creation-Date: 2023-01-22 10:59+0000\n"
+"PO-Revision-Date: 2023-01-22 11:05\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -2524,11 +2524,11 @@ msgstr ""
 msgid "Copy main executable to avoid graphic driver issues"
 msgstr "Kopieer de hoofd-executable om problemen met het grafisch stuurprogramma te voorkomen"
 
-#: Client/loader/Install.cpp:260
+#: Client/loader/Install.cpp:262
 msgid "Unknown"
 msgstr "Onbekend"
 
-#: Client/loader/Install.cpp:267
+#: Client/loader/Install.cpp:269
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
@@ -2537,7 +2537,7 @@ msgstr "Het bestand '%s' is momenteel vergrendeld door %zu processen.\n\n"
 "Wilt u de volgende processen beëindigen en doorgaan met updaten?\n\n"
 "%s"
 
-#: Client/loader/Install.cpp:472
+#: Client/loader/Install.cpp:476
 #, c-format
 msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
@@ -2548,11 +2548,11 @@ msgstr "Uw installatie is nu mogelijk beschadigd.\n\n"
 "U moet Multi Theft Auto opnieuw installeren vanaf www.multitheftauto.com\n"
 "of probeer de update uit te voeren met beheerdersrechten."
 
-#: Client/loader/Install.cpp:848 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:853 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Update installeren..."
 
-#: Client/loader/Install.cpp:924 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:935 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Bestanden uitpakken..."
 
