@@ -170,7 +170,7 @@ struct MainHeader:BaseBlock
   uint64 RRMaxSize;     // Maximum size of RR offset in locator extra field.
   size_t MetaNameMaxSize; // Maximum size of archive name in metadata extra field.
   std::wstring OrigName;  // Original archive name.
-  RarTime OrigCtime;      // Original archive creation time.
+  RarTime OrigTime;       // Original archive time.
 
   void Reset();
 };

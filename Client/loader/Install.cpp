@@ -18,6 +18,8 @@
 static std::string ROLLBACK_NAME = "rollback.step";
 static char        ARCHIVE_PASSWORD[] = "mta";
 
+constexpr DWORD OPERATION_RETRY_DELAY_IN_MS = 100;
+
 struct ChecksumFile
 {
     std::optional<uint32_t> checksum{};
@@ -410,6 +412,9 @@ static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
 
     for (InstallableFile& file : files)
     {
+        if (file.targetFile == file.backupFile)
+            continue;
+
         int  attempts = 0;
         int  checksums = 0;
         bool success = false;
@@ -447,8 +452,7 @@ static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
                     TerminateFileLockingProcesses(file.backupFile.absolutePath, file.relativePath);
                 }
 
-                // Wait for an arbitrary amount of time before retrying.
-                Sleep(100);
+                Sleep(OPERATION_RETRY_DELAY_IN_MS);
             }
         }
 
@@ -686,8 +690,7 @@ static int RunInstall()
                     TerminateFileLockingProcesses(file.backupFile.absolutePath, file.relativePath);
                 }
 
-                // Wait for an arbitrary amount of time before retrying.
-                Sleep(100);
+                Sleep(OPERATION_RETRY_DELAY_IN_MS);
             }
         }
 
@@ -760,8 +763,7 @@ static int RunInstall()
                     TerminateFileLockingProcesses(file.sourceFile.absolutePath, file.relativePath);
                 }
 
-                // Wait for an arbitrary amount of time before retrying.
-                Sleep(100);
+                Sleep(OPERATION_RETRY_DELAY_IN_MS);
             }
         }
 
@@ -778,6 +780,9 @@ static int RunInstall()
 
         if (!success)
         {
+            // Update the target file checksum for rollback, because we don't know if the target file was modified in the install process.
+            file.targetFile.ComputeChecksum();
+
             bool exists = FileExists(file.sourceFile.absolutePath);
             AddReportLog(5055, SString("RunInstall: Unable to install '%s' (exists: %d, attempts: %d, checksums: %d)", file.relativePath.c_str(), exists,
                                        attempts, checksums));
@@ -832,13 +837,6 @@ static int RunInstall()
     }
 
     OutputDebugLine(SString("RunInstall: Installation of %zu files complete", files.size()));
-
-    // Switch to the source directory's parent to finally delete the source directory.
-    if (SetCurrentDirectory(ExtractPath(sourceRoot)))
-    {
-        DirectoryDeleteScope deleteSourceRoot(sourceRoot);
-    }
-
     return 0;
 }
 
@@ -866,6 +864,9 @@ bool InstallFiles(bool showProgressWindow)
 
 bool ExtractFiles(const std::string& archivePath, bool withManifest)
 {
+    if (archivePath.empty() || !FileExists(archivePath))
+        return false;
+
     std::vector<ManifestFile> files;
 
     if (!ExtractArchiveFiles(archivePath, files, ARCHIVE_PASSWORD))
@@ -904,6 +905,9 @@ SString CheckOnRestartCommand()
             //
             // Update
             //
+
+            if (strFile.empty() || !FileExists(strFile))
+                return "FileMissing";
 
             // Make temp path name and go there
             SString strArchivePath, strArchiveName;
