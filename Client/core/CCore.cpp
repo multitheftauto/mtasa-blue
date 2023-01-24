@@ -1467,7 +1467,22 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
     }
 
     const char* szCmdLine = GetCommandLine();
-    char        szCmdLineCopy[512];
+
+    // Skip the leading game executable path (starts and ends with a quotation mark).
+    if (szCmdLine[0] == '"')
+    {
+        if (const char* afterPath = strchr(szCmdLine + 1, '"'); afterPath != nullptr)
+        {
+            ++afterPath;
+
+            while (*afterPath && isspace(*afterPath))
+                ++afterPath;
+
+            szCmdLine = afterPath;
+        }
+    }
+    
+    char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 
     char*       pCmdLineEnd = szCmdLineCopy + strlen(szCmdLineCopy);
