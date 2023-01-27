@@ -20,6 +20,7 @@
 #include <ShellScalingApi.h>
 
 constexpr std::wstring_view MTA_GTAEXE_NAME = L"gta_sa.exe";
+constexpr std::wstring_view EXPLORER_EXE_NAME = L"explorer.exe";
 
 #ifdef MTA_DEBUG
     constexpr std::wstring_view MTA_EXE_NAME = L"Multi Theft Auto_d.exe";
@@ -110,6 +111,17 @@ BOOL OnLibraryAttach()
     // Check if the name of the launcher process matches Multi Theft Auto.
     const std::wstring launcherName = launcherPath.filename().wstring();
 
+    if (IEqual(EXPLORER_EXE_NAME, launcherName))
+    {
+        DisplayErrorMessageBox(
+            L"Do not run this game from Windows Explorer."
+            L"\n\n"
+            L"Please launch the game through the Multi Theft Auto launcher executable. "
+            L"You can find the launcher either on your desktop or in the MTA:SA installation directory.",
+            L"CL53");
+        return FALSE;
+    }
+
     if (!IEqual(MTA_EXE_NAME, launcherName))
     {
         std::wstring message = L"Launcher executable has an incorrect name (" + launcherName +
@@ -117,7 +129,7 @@ BOOL OnLibraryAttach()
                                L"Please launch the game through the Multi Theft Auto launcher executable. "
                                L"You can find the launcher either on your desktop or in the MTA:SA installation directory.";
 
-        if (!DisplayWarningMessageBox(message, L"CL53"))
+        if (!DisplayWarningMessageBox(message, L"CL54"))
             return FALSE;
     }
 
@@ -132,7 +144,7 @@ BOOL OnLibraryAttach()
             L"\n\n"
             L"Please launch the game through the Multi Theft Auto launcher executable. "
             L"You can find the launcher either on your desktop or in the MTA:SA installation directory.",
-            L"CL54");
+            L"CL55");
         return FALSE;
     }
 
