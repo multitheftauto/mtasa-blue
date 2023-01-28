@@ -24,47 +24,181 @@ constexpr std::wstring_view EXPLORER_EXE_NAME = L"explorer.exe";
 
 #ifdef MTA_DEBUG
     constexpr std::wstring_view MTA_EXE_NAME = L"Multi Theft Auto_d.exe";
-    constexpr std::wstring_view MTA_DLL_NAME = L"core_d.dll";
+    constexpr std::wstring_view CORE_DLL_NAME = L"core_d.dll";
+    constexpr std::wstring_view NETC_DLL_NAME = L"netc_d.dll";
 #else
     constexpr std::wstring_view MTA_EXE_NAME = L"Multi Theft Auto.exe";
-    constexpr std::wstring_view MTA_DLL_NAME = L"core.dll";
+    constexpr std::wstring_view CORE_DLL_NAME = L"core.dll";
+    constexpr std::wstring_view NETC_DLL_NAME = L"netc.dll";
 #endif
 
 namespace fs = std::filesystem;
 
+VOID WINAPI MyGetStartupInfoA(LPSTARTUPINFOA startupInfo);
+
+BOOL OnLibraryDetach();
+BOOL OnLibraryAttach();
+
+auto SetImportProcAddress(const char* moduleName, const char* procedureName, FARPROC replacement) -> FARPROC;
 void DisplayErrorMessageBox(const std::wstring& message, const std::wstring& errorCode);
 bool DisplayWarningMessageBox(const std::wstring& message, const std::wstring& errorCode);
 auto PatchWinmmImports() -> int;
+auto GetSystemErrorMessage(DWORD errorCode) -> std::wstring;
 auto GetCurrentProcessPath() -> fs::path;
 auto GetParentProcessPath() -> fs::path;
 void ApplyDpiAwareness();
+auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring;
+auto MakeLauncherError(std::wstring message) -> std::wstring;
+auto MakeMissingFilesError(std::wstring message) -> std::wstring;
 
+HMODULE g_exe = nullptr;
 HMODULE g_core = nullptr;
+HMODULE g_netc = nullptr;
+
+VOID(WINAPI* Win32GetStartupInfoA)(LPSTARTUPINFOA) = nullptr;
 
 inline bool IEqual(std::wstring_view lhs, std::wstring_view rhs)
 {
     return (lhs.empty() && rhs.empty()) || !wcsnicmp(lhs.data(), rhs.data(), std::min<size_t>(lhs.length(), rhs.length()));
 }
 
+BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID)
+{
+    if (reason == DLL_PROCESS_ATTACH)
+    {
+        g_exe = GetModuleHandleW(nullptr);
+        DisableThreadLibraryCalls(dll);
+        return OnLibraryAttach();
+    }
+    else if (reason == DLL_PROCESS_DETACH)
+    {
+        return OnLibraryDetach();
+    }
+
+    return TRUE;
+}
+
+BOOL OnLibraryDetach()
+{
+    if (g_core)
+    {
+        FreeLibrary(g_core);
+        g_core = nullptr;
+    }
+
+    if (g_netc)
+    {
+        FreeLibrary(g_netc);
+        g_netc = nullptr;
+    }
+
+    return TRUE;
+}
+
 BOOL OnLibraryAttach()
 {
-    // First, apply dpi awareness for our message boxes.
+    // Apply dpi awareness for our message boxes.
     ApplyDpiAwareness();
 
-    // Abort if the current process is not the game executable.
-    if (!IEqual(MTA_GTAEXE_NAME, GetCurrentProcessPath().filename().wstring()))
-    {
-        DisplayErrorMessageBox(
-            L"Starting Multi Theft Auto has failed."
-            L"\n\n"
-            L"Please launch the game through the Multi Theft Auto launcher executable. "
-            L"You can find the launcher either on your desktop or in the MTA:SA installation directory.",
-            L"CL50");
+    // Replace the first called imported procedure from the executable.
+    FARPROC procedure = SetImportProcAddress("kernel32.dll", "GetStartupInfoA", reinterpret_cast<FARPROC>(MyGetStartupInfoA));
 
+    if (!procedure)
+    {
+        DisplayErrorMessageBox(MakeLauncherError(L"Failed to redirect start procedure."), L"CL50");
         return FALSE;
     }
 
-    // Second, patch the winmm.dll imports we've taken over with our mtasa.dll library back to the functions from the winmm.dll library.
+    Win32GetStartupInfoA = reinterpret_cast<decltype(Win32GetStartupInfoA)>(procedure);
+    return TRUE;
+}
+
+VOID OnGameLaunch()
+{
+    std::error_code ec{};
+
+    // MTA:SA launches GTA:SA process with the GTA:SA installation directory as the current directory.
+    // We can't use the path to the current executable, because it's not in the game directory anymore.
+    const fs::path gtaDirectory = fs::current_path(ec);
+
+    if (ec)
+    {
+        std::wstring message = L"Unable to determine working directory.";
+        DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL51");
+        return;
+    }
+
+    // Abort if the current process is not the game executable.
+    const std::wstring processName = GetCurrentProcessPath().filename().wstring();
+
+    if (!IEqual(MTA_GTAEXE_NAME, processName))
+    {
+        std::wstring message = L"Executable has an incorrect name (" + processName + L").";
+        DisplayErrorMessageBox(MakeLauncherError(message), L"CL52");
+        return;
+    }
+
+    // MTA:SA must be the parent launcher process in every case.
+    const fs::path launcherPath = GetParentProcessPath();
+
+    if (launcherPath.empty())
+    {
+        DisplayErrorMessageBox(MakeLauncherError(L"Unable to determine launcher executable."), L"CL53");
+        return;
+    }
+
+    // Check if the name of the launcher process matches Multi Theft Auto.
+    const std::wstring launcherName = launcherPath.filename().wstring();
+
+    if (IEqual(EXPLORER_EXE_NAME, launcherName))
+    {
+        DisplayErrorMessageBox(MakeLauncherError(L"Do not run this game from Windows Explorer."), L"CL54");
+        return;
+    }
+
+    if (!IEqual(MTA_EXE_NAME, launcherName))
+    {
+        std::wstring message = L"Launcher executable has an incorrect name (" + launcherName + L").";
+        
+        if (!DisplayWarningMessageBox(MakeLauncherError(message), L"CL54"))
+        {
+            ExitProcess(1);
+            return;
+        }
+    }
+
+    // Check if the MTA subdirectory exists.
+    const fs::path mtaRootDirectory = launcherPath.parent_path();
+    const fs::path mtaDirectory = mtaRootDirectory / "MTA";
+
+    if (!fs::is_directory(mtaDirectory, ec))
+    {
+        std::wstring message = L"MTA directory does not exist or user is unauthorized:\n" + mtaDirectory.wstring();
+        DisplayErrorMessageBox(MakeMissingFilesError(AppendSystemError(message, ec.value())), L"CL55");
+        return;
+    }
+
+    // Check if the netc.dll library exists in the MTA subdirectory.
+    const fs::path netcPath = mtaDirectory / NETC_DLL_NAME;
+
+    if (!fs::is_regular_file(netcPath, ec))
+    {
+        std::wstring message = L"Could not find or access the network library.";
+        DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL56");
+        return;
+    }
+
+    // Check if the core.dll library exists in the MTA subdirectory.
+    const fs::path corePath = mtaDirectory / CORE_DLL_NAME;
+
+    if (!fs::is_regular_file(corePath, ec))
+    {
+        std::wstring message = L"Could not find or access the core library.";
+        DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL57");
+        return;
+    }
+
+    // Patch the winmm.dll imports we've taken over with our mtasa.dll library back to the functions from the winmm.dll library.
     if (int error = PatchWinmmImports())
     {
         std::wstring message;
@@ -82,70 +216,23 @@ BOOL OnLibraryAttach()
                 break;
         }
 
-        message +=
-            L"\n\n"
-            L"Please ensure that both your MTA:SA and Windows installation are not missing files "
-            L"and your user is not lacking any permission to access these directories";
-        DisplayErrorMessageBox(message, L"CL51");
-        return FALSE;
+        DisplayErrorMessageBox(MakeMissingFilesError(message), L"CL58");
+        return;
     }
 
-    // MTA:SA launches GTA:SA process with the GTA:SA installation directory as the current directory.
-    // We can't use the path to the current executable, because it's not in the game directory anymore.
-    const fs::path gtaDirectory = fs::current_path();
+    // For dll searches, this call replaces the current directory entry and turns off 'SafeDllSearchMode'.
+    // Meaning it will search the supplied path before the system and windows directory.
+    // http://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
+    SetDllDirectoryW(mtaDirectory.wstring().c_str());
 
-    // MTA:SA must be the parent launcher process in every case.
-    const fs::path launcherPath = GetParentProcessPath();
+    // Load netc.dll library.
+    g_netc = LoadLibraryW(netcPath.wstring().c_str());
 
-    if (launcherPath.empty())
+    if (!g_netc)
     {
-        DisplayErrorMessageBox(
-            L"Unable to determine launcher executable."
-            L"\n\n"
-            L"Please launch the game through the Multi Theft Auto launcher executable. "
-            L"You can find the launcher either on your desktop or in the MTA:SA installation directory.",
-            L"CL52");
-        return FALSE;
-    }
-
-    // Check if the name of the launcher process matches Multi Theft Auto.
-    const std::wstring launcherName = launcherPath.filename().wstring();
-
-    if (IEqual(EXPLORER_EXE_NAME, launcherName))
-    {
-        DisplayErrorMessageBox(
-            L"Do not run this game from Windows Explorer."
-            L"\n\n"
-            L"Please launch the game through the Multi Theft Auto launcher executable. "
-            L"You can find the launcher either on your desktop or in the MTA:SA installation directory.",
-            L"CL53");
-        return FALSE;
-    }
-
-    if (!IEqual(MTA_EXE_NAME, launcherName))
-    {
-        std::wstring message = L"Launcher executable has an incorrect name (" + launcherName +
-                               L").\n\n"
-                               L"Please launch the game through the Multi Theft Auto launcher executable. "
-                               L"You can find the launcher either on your desktop or in the MTA:SA installation directory.";
-
-        if (!DisplayWarningMessageBox(message, L"CL54"))
-            return FALSE;
-    }
-
-    // Check if the core.dll library exists in the MTA subdirectory.
-    const fs::path launcherDirectory = launcherPath.parent_path();
-    const fs::path corePath = launcherDirectory / L"MTA" / MTA_DLL_NAME;
-
-    if (std::error_code ec{}; !fs::is_regular_file(corePath, ec))
-    {
-        DisplayErrorMessageBox(
-            L"Could not find the core library."
-            L"\n\n"
-            L"Please launch the game through the Multi Theft Auto launcher executable. "
-            L"You can find the launcher either on your desktop or in the MTA:SA installation directory.",
-            L"CL55");
-        return FALSE;
+        std::wstring message = L"Loading network library has failed.";
+        DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, GetLastError())), L"CL58");
+        return;
     }
 
     // Load core.dll library.
@@ -168,36 +255,57 @@ BOOL OnLibraryAttach()
             L"and that the latest DirectX is correctly installed.",
             L"CL24");
 #endif
-        return FALSE;
+        return;
     }
 
-    return TRUE;
+    // Set the path to the Multi Theft Auto directory.
+    void (*SetMTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetMTADirectory)>(GetProcAddress(g_core, "SetMTADirectory"));
+
+    if (SetMTADirectory)
+    {
+        std::wstring path = mtaRootDirectory.wstring();
+        SetMTADirectory(path.c_str(), path.size());
+    }
+
+    // Set the path to the GTA: San Andreas directory.
+    void (*SetGTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetGTADirectory)>(GetProcAddress(g_core, "SetGTADirectory"));
+
+    if (SetGTADirectory)
+    {
+        std::wstring path = gtaDirectory.wstring();
+        SetGTADirectory(path.c_str(), path.size());
+    }
+
+    // Initialize and run the core.
+    int (*InitializeCore)() = reinterpret_cast<decltype(InitializeCore)>(GetProcAddress(g_core, "InitializeCore"));
+
+    if (!InitializeCore)
+    {
+        std::wstring message = L"Core library is incompatible.";
+        DisplayErrorMessageBox(MakeMissingFilesError(message), L"CL59");
+        return;
+    }
+
+    int errorCode = InitializeCore();
+
+    if (errorCode)
+    {
+        std::wstring message = L"Core library failed to initialize (code: " + std::to_wstring(errorCode) + L").";
+        DisplayErrorMessageBox(MakeLauncherError(message), L"CL59");
+        return;
+    }
 }
 
-BOOL OnLibraryDetach()
+VOID WINAPI MyGetStartupInfoA(LPSTARTUPINFOA startupInfo)
 {
-    if (g_core)
-    {
-        FreeLibrary(g_core);
-        g_core = nullptr;
-    }
+    // Execute the original function with the given parameter.
+    Win32GetStartupInfoA(startupInfo);
 
-    return TRUE;
-}
+    // Restore the function pointer we've overriden to get here.
+    SetImportProcAddress("kernel32.dll", "GetStartupInfoA", reinterpret_cast<FARPROC>(Win32GetStartupInfoA));
 
-BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID)
-{
-    if (reason == DLL_PROCESS_ATTACH)
-    {
-        DisableThreadLibraryCalls(instance);
-        return OnLibraryAttach();
-    }
-    else if (reason == DLL_PROCESS_DETACH)
-    {
-        return OnLibraryDetach();
-    }
-
-    return TRUE;
+    // Run our startup code.
+    OnGameLaunch();
 }
 
 /**
@@ -207,6 +315,62 @@ EXTERN_C void noreturn()
 {
     // We should never enter this function.
     assert(false);
+}
+
+/**
+ * @brief Replaces an import library procedure with the given replacement function.
+ * @param moduleName Name of the import library (case-insensitive)
+ * @param procedureName Name of the procedure to be replaced (case-insensitive)
+ * @param replacement Function pointer to the replacement
+ * @return Previous function pointer on success, a null pointer otherwise
+*/
+auto SetImportProcAddress(const char* moduleName, const char* procedureName, FARPROC replacement) -> FARPROC
+{
+    auto base = reinterpret_cast<std::byte*>(g_exe);
+    auto dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
+    auto nt = reinterpret_cast<IMAGE_NT_HEADERS32*>(base + dos->e_lfanew);
+    auto descriptor = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(base + nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+
+    for (; descriptor->Name; ++descriptor)
+    {
+        auto name = reinterpret_cast<const char*>(base + descriptor->Name);
+
+        if (stricmp(moduleName, name))
+            continue;
+
+        auto nameTableEntry = reinterpret_cast<DWORD*>(base + descriptor->FirstThunk);
+        auto addressTableEntry = reinterpret_cast<FARPROC*>(nameTableEntry);
+
+        if (descriptor->OriginalFirstThunk)
+            nameTableEntry = reinterpret_cast<DWORD*>(base + descriptor->OriginalFirstThunk);
+
+        for (; *nameTableEntry; ++nameTableEntry, ++addressTableEntry)
+        {
+            if (IMAGE_SNAP_BY_ORDINAL(*nameTableEntry))
+            {
+                auto ordinal = reinterpret_cast<char const*>(IMAGE_ORDINAL(*nameTableEntry));
+
+                if (procedureName != ordinal)
+                    continue;
+            }
+            else
+            {
+                const char* importName = reinterpret_cast<IMAGE_IMPORT_BY_NAME*>(base + *nameTableEntry)->Name;
+
+                if (stricmp(procedureName, importName))
+                    continue;
+            }
+
+            DWORD protection;
+            VirtualProtect(addressTableEntry, sizeof(FARPROC), PAGE_READWRITE, &protection);
+            FARPROC old = *addressTableEntry;
+            *addressTableEntry = replacement;
+            VirtualProtect(addressTableEntry, sizeof(FARPROC), protection, &protection);
+            return old;
+        }
+    }
+
+    return nullptr;
 }
 
 /**
@@ -234,7 +398,7 @@ int DisplayMessageBox(const std::wstring& message, const std::wstring& errorCode
 void DisplayErrorMessageBox(const std::wstring& message, const std::wstring& errorCode)
 {
     DisplayMessageBox(message, errorCode, MB_OK | MB_ICONERROR);
-    TerminateProcess(GetCurrentProcess(), 1);
+    ExitProcess(1);
 }
 
 /**
@@ -400,7 +564,7 @@ auto LoadWinmmLibrary() -> HMODULE
 */
 auto PatchWinmmImports() -> int
 {
-    auto base = reinterpret_cast<std::byte*>(GetModuleHandleW(nullptr));
+    auto base = reinterpret_cast<std::byte*>(g_exe);
     auto dos = reinterpret_cast<IMAGE_DOS_HEADER*>(base);
     auto nt = reinterpret_cast<IMAGE_NT_HEADERS32*>(base + dos->e_lfanew);
     auto descriptor = reinterpret_cast<IMAGE_IMPORT_DESCRIPTOR*>(base + nt->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
@@ -459,6 +623,33 @@ auto PatchWinmmImports() -> int
 }
 
 /**
+ * @brief Transforms the numeric error code into a system-generated error string.
+*/
+auto GetSystemErrorMessage(DWORD errorCode) -> std::wstring
+{
+    if (!errorCode)
+        return {};
+
+    wchar_t* buffer = nullptr;
+
+    DWORD size = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, errorCode,
+                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
+
+    if (!size)
+        return {};
+
+    struct ReleaseBuffer
+    {
+        HLOCAL memory;
+        ~ReleaseBuffer() { LocalFree(memory); }
+    };
+
+    ReleaseBuffer deleter{buffer};
+    std::wstring message{buffer, size};
+    return message;
+}
+
+/**
  * @brief Applies the highest available form of DPI awareness for this process.
  */
 void ApplyDpiAwareness()
@@ -489,4 +680,64 @@ void ApplyDpiAwareness()
 
     // Minimum version: Windows Vista
     SetProcessDPIAware();
+}
+
+/**
+ * @brief Optionally appends a system error text to the message.
+ * @param message Message to append to
+ * @param errorCode System error code
+*/
+auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring
+{
+    std::wstring errorMessage = GetSystemErrorMessage(errorCode);
+
+    if (errorMessage.empty())
+        return message;
+
+    // Remove any whitespace characters at the end.
+    size_t length = errorMessage.find_last_not_of(L"\t\n\v\f\r ");
+
+    if (length == std::wstring::npos)
+        return message;
+
+    errorMessage.resize(length + 1);
+
+    if (!message.empty())
+        message += L"\n\n";
+
+    message += L"Error: ";
+    message += errorMessage;
+    return message;
+}
+
+/**
+ * @brief Composes an error message with the plea to launch MTA properly.
+ * @param message Message to append to
+*/
+auto MakeLauncherError(std::wstring message) -> std::wstring
+{
+    if (!message.empty())
+        message += L"\n\n";
+
+    message +=
+        L"Please launch the game through the Multi Theft Auto launcher executable. "
+        L"You can find the launcher either on your desktop or in the MTA:SA installation directory.";
+
+    return message;
+}
+
+/**
+ * @brief Composes an error message with the plea to fix missing or broken files.
+ * @param message Message to append to
+*/
+auto MakeMissingFilesError(std::wstring message) -> std::wstring
+{
+    if (!message.empty())
+        message += L"\n\n";
+
+    message +=
+        L"Please ensure that both your MTA:SA and Windows installation are not missing files "
+        L"and your user is not lacking any permission to access these directories";
+
+    return message;
 }
