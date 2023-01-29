@@ -56,17 +56,13 @@ auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring;
 auto MakeLauncherError(std::wstring message) -> std::wstring;
 auto MakeMissingFilesError(std::wstring message) -> std::wstring;
 void AddLaunchLog(const char* format, ...);
+bool IEqual(std::wstring_view lhs, std::wstring_view rhs);
 
 HMODULE g_exe = nullptr;
 HMODULE g_core = nullptr;
 HMODULE g_netc = nullptr;
 
 VOID(WINAPI* Win32GetStartupInfoA)(LPSTARTUPINFOA) = nullptr;
-
-inline bool IEqual(std::wstring_view lhs, std::wstring_view rhs)
-{
-    return (lhs.empty() && rhs.empty()) || !wcsnicmp(lhs.data(), rhs.data(), std::min<size_t>(lhs.length(), rhs.length()));
-}
 
 BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID)
 {
@@ -805,4 +801,18 @@ void AddLaunchLog(const char* format, ...)
     va_end(arguments);
 
     AddReportLog(5720, message);
+}
+
+/**
+ * @brief Compares two strings for equality (case-insensitive).
+*/
+bool IEqual(std::wstring_view lhs, std::wstring_view rhs)
+{
+    if (lhs.size() != rhs.size())
+        return false;
+
+    if (lhs.empty() && rhs.empty())
+        return true;
+
+    return !wcsnicmp(lhs.data(), rhs.data(), lhs.length());
 }
