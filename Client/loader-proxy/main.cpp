@@ -754,7 +754,9 @@ auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring
     if (!message.empty())
         message += L"\n\n";
 
-    message += L"Error: ";
+    message += L"Error (";
+    message += std::to_wstring(errorCode);
+    message += L"): ";
     message += errorMessage;
     return message;
 }
