@@ -55,6 +55,7 @@ void ApplyDirectoryInformation(HMODULE library, const std::wstring& mtaDirectory
 auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring;
 auto MakeLauncherError(std::wstring message) -> std::wstring;
 auto MakeMissingFilesError(std::wstring message) -> std::wstring;
+void AddLaunchLog(const char* format, ...);
 
 HMODULE g_exe = nullptr;
 HMODULE g_core = nullptr;
@@ -128,6 +129,7 @@ VOID OnGameLaunch()
 
     if (ec)
     {
+        AddLaunchLog("GTA:SA directory not found (%d): %s", ec.value(), ec.message().c_str());
         std::wstring message = L"Unable to determine working directory.";
         DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL51");
         return;
@@ -148,6 +150,7 @@ VOID OnGameLaunch()
 
     if (launcherPath.empty())
     {
+        AddLaunchLog("Unable to determine launcher executable");
         DisplayErrorMessageBox(MakeLauncherError(L"Unable to determine launcher executable."), L"CL53");
         return;
     }
@@ -178,6 +181,7 @@ VOID OnGameLaunch()
 
     if (!fs::is_directory(mtaDirectory, ec))
     {
+        AddLaunchLog("MTA subdirectory not found (%d): %s", ec.value(), ec.message().c_str());
         std::wstring message = L"MTA directory does not exist or user is unauthorized:\n" + mtaDirectory.wstring();
         DisplayErrorMessageBox(MakeMissingFilesError(AppendSystemError(message, ec.value())), L"CL55");
         return;
@@ -188,6 +192,7 @@ VOID OnGameLaunch()
 
     if (!fs::is_regular_file(netcPath, ec))
     {
+        AddLaunchLog("Network library not found (%d): %s", ec.value(), ec.message().c_str());
         std::wstring message = L"Could not find or access the network library.";
         DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL56");
         return;
@@ -198,6 +203,7 @@ VOID OnGameLaunch()
 
     if (!fs::is_regular_file(corePath, ec))
     {
+        AddLaunchLog("Core library not found (%d): %s", ec.value(), ec.message().c_str());
         std::wstring message = L"Could not find or access the core library.";
         DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL57");
         return;
@@ -221,6 +227,7 @@ VOID OnGameLaunch()
                 break;
         }
 
+        AddLaunchLog("Patching imports has failed (%d)", error);
         DisplayErrorMessageBox(MakeMissingFilesError(message), L"CL58");
         return;
     }
@@ -235,8 +242,10 @@ VOID OnGameLaunch()
 
     if (!g_netc)
     {
+        DWORD errorCode = GetLastError();
+        AddLaunchLog("Loading network library has failed (%d): %s", errorCode, std::system_category().message(errorCode).c_str());
         std::wstring message = L"Loading network library has failed.";
-        DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, GetLastError())), L"CL58");
+        DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, errorCode)), L"CL58");
         return;
     }
 
@@ -253,6 +262,7 @@ VOID OnGameLaunch()
 
     if (!CheckService)
     {
+        AddLaunchLog("Network procedure 'CheckService' not found");
         std::wstring message = L"Network library is incompatible.";
         DisplayErrorMessageBox(MakeLauncherError(message), L"CL58");
         return;
@@ -265,6 +275,9 @@ VOID OnGameLaunch()
 
     if (!g_core)
     {
+        DWORD errorCode = GetLastError();
+        AddLaunchLog("Loading core library has failed (%d): %s", errorCode, std::system_category().message(errorCode).c_str());
+
 #ifdef MTA_DEBUG
         DisplayErrorMessageBox(
             L"Loading debug core has failed."
@@ -290,6 +303,7 @@ VOID OnGameLaunch()
 
     if (!InitializeCore)
     {
+        AddLaunchLog("Core procedure 'InitializeCore' not found");
         std::wstring message = L"Core library is incompatible.";
         DisplayErrorMessageBox(MakeMissingFilesError(message), L"CL59");
         return;
@@ -299,6 +313,7 @@ VOID OnGameLaunch()
 
     if (errorCode)
     {
+        AddLaunchLog("Core initialization failed (%d)", errorCode);
         std::wstring message = L"Core library failed to initialize (code: " + std::to_wstring(errorCode) + L").";
         DisplayErrorMessageBox(MakeLauncherError(message), L"CL59");
         return;
@@ -774,4 +789,18 @@ auto MakeMissingFilesError(std::wstring message) -> std::wstring
         L"and your user is not lacking any permission to access these directories";
 
     return message;
+}
+
+/**
+ * @brief Logs a message for the loader proxy to track startup issues.
+*/
+void AddLaunchLog(const char* format, ...)
+{
+    va_list arguments;
+    va_start(arguments, format);
+    SString message;
+    message.vFormat(format, arguments);
+    va_end(arguments);
+
+    AddReportLog(5720, message);
 }
