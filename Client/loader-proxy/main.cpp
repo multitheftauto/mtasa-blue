@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #define WIN32_LEAN_AND_MEAN
+#define MTA_CLIENT
 
 #include <string>
 #include <filesystem>
@@ -18,6 +19,9 @@
 #include <tlhelp32.h>
 #include <ShlObj.h>
 #include <ShellScalingApi.h>
+#include <version.h>
+#include <SharedUtil.h>
+#include <SharedUtil.hpp>
 
 constexpr std::wstring_view MTA_GTAEXE_NAME = L"gta_sa.exe";
 constexpr std::wstring_view EXPLORER_EXE_NAME = L"explorer.exe";
@@ -47,6 +51,7 @@ auto GetSystemErrorMessage(DWORD errorCode) -> std::wstring;
 auto GetCurrentProcessPath() -> fs::path;
 auto GetParentProcessPath() -> fs::path;
 void ApplyDpiAwareness();
+void ApplyDirectoryInformation(HMODULE library, const std::wstring& mtaDirectory, const std::wstring& gtaDirectory);
 auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring;
 auto MakeLauncherError(std::wstring message) -> std::wstring;
 auto MakeMissingFilesError(std::wstring message) -> std::wstring;
@@ -225,7 +230,7 @@ VOID OnGameLaunch()
     // http://msdn.microsoft.com/en-us/library/ms682586%28VS.85%29.aspx
     SetDllDirectoryW(mtaDirectory.wstring().c_str());
 
-    // Load netc.dll library.
+    // Load and set up netc.dll library.
     g_netc = LoadLibraryW(netcPath.wstring().c_str());
 
     if (!g_netc)
@@ -235,7 +240,27 @@ VOID OnGameLaunch()
         return;
     }
 
-    // Load core.dll library.
+    ApplyDirectoryInformation(g_netc, mtaRootDirectory.wstring(), gtaDirectory.wstring());
+
+    void (*InitNetRev)(const char*, const char*, const char*) = reinterpret_cast<decltype(InitNetRev)>(GetProcAddress(g_netc, "InitNetRev"));
+
+    if (InitNetRev)
+    {
+        InitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
+    }
+
+    bool (*CheckService)(unsigned int) = reinterpret_cast<decltype(CheckService)>(GetProcAddress(g_netc, "CheckService"));
+
+    if (!CheckService)
+    {
+        std::wstring message = L"Network library is incompatible.";
+        DisplayErrorMessageBox(MakeLauncherError(message), L"CL58");
+        return;
+    }
+
+    CheckService(7 /* CHECK_SERVICE_POST_CREATE */);
+
+    // Load and set up core.dll library.
     g_core = LoadLibraryW(corePath.wstring().c_str());
 
     if (!g_core)
@@ -258,23 +283,7 @@ VOID OnGameLaunch()
         return;
     }
 
-    // Set the path to the Multi Theft Auto directory.
-    void (*SetMTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetMTADirectory)>(GetProcAddress(g_core, "SetMTADirectory"));
-
-    if (SetMTADirectory)
-    {
-        std::wstring path = mtaRootDirectory.wstring();
-        SetMTADirectory(path.c_str(), path.size());
-    }
-
-    // Set the path to the GTA: San Andreas directory.
-    void (*SetGTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetGTADirectory)>(GetProcAddress(g_core, "SetGTADirectory"));
-
-    if (SetGTADirectory)
-    {
-        std::wstring path = gtaDirectory.wstring();
-        SetGTADirectory(path.c_str(), path.size());
-    }
+    ApplyDirectoryInformation(g_core, mtaRootDirectory.wstring(), gtaDirectory.wstring());
 
     // Initialize and run the core.
     int (*InitializeCore)() = reinterpret_cast<decltype(InitializeCore)>(GetProcAddress(g_core, "InitializeCore"));
@@ -680,6 +689,31 @@ void ApplyDpiAwareness()
 
     // Minimum version: Windows Vista
     SetProcessDPIAware();
+}
+
+/**
+ * @brief Sets the directory path information for a module.
+ * @param library A module handle
+ * @param mtaDirectory Path to the MTA:SA root directory
+ * @param gtaDirectory Path to the GTA:SA root directory
+*/
+void ApplyDirectoryInformation(HMODULE library, const std::wstring& mtaDirectory, const std::wstring& gtaDirectory)
+{
+    // Set the path to the Multi Theft Auto directory.
+    void (*SetMTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetMTADirectory)>(GetProcAddress(library, "SetMTADirectory"));
+
+    if (SetMTADirectory)
+    {
+        SetMTADirectory(mtaDirectory.c_str(), mtaDirectory.size());
+    }
+
+    // Set the path to the GTA: San Andreas directory.
+    void (*SetGTADirectory)(const wchar_t*, size_t) = reinterpret_cast<decltype(SetGTADirectory)>(GetProcAddress(library, "SetGTADirectory"));
+
+    if (SetGTADirectory)
+    {
+        SetGTADirectory(gtaDirectory.c_str(), gtaDirectory.size());
+    }
 }
 
 /**

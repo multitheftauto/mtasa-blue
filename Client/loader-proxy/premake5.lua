@@ -18,6 +18,10 @@ project "Loader Proxy"
 		"main.cpp",
 	}
 
+	includedirs {
+		"../../Shared/sdk",
+	}
+
 	filter "system:windows"
 		linkoptions { "/SAFESEH:NO" }
 
