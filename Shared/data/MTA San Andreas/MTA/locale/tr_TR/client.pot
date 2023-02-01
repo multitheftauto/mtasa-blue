@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-01-22 15:58+0000\n"
-"PO-Revision-Date: 2023-01-22 16:50\n"
+"PO-Revision-Date: 2023-02-01 16:03\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -1611,7 +1611,7 @@ msgstr "Dinamik ped gölgeleri"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr "Hareket bulanıklılığı"
+msgstr "Hareket Bulanıklığı"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -2547,10 +2547,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr "Kurulumunuz şimdi bozuk olabilir.\n\n"
+msgstr "Kurulumunuz bozulmuş olabilir.\n\n"
 "%zu dosyalarından %zu yedekten geri yüklenemedi.\n\n"
-"Multi Theft Auto'yu www.multitheftauto.com adresinden yeniden yüklemeniz gerekir.\n"
-"veya güncellemeyi yönetici haklarıyla çalıştırmayı deneyin."
+"Multi Theft Auto'yu www.multitheftauto.com adresinden yeniden yüklemeyi\n"
+"veya güncellemeyi yönetici olarak çalıştırmayı deneyebilirsiniz."
 
 #: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -2794,7 +2794,7 @@ msgstr "Veri dosyası %s eksik. Olası virüs aktivitesi.\n\n"
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "Veri dosyası %s değiştirildi. Olası virüs etkinliği.\n\n"
+msgstr "Veri dosyası %s değiştirilmiş. Olası virüs etkinliği.\n\n"
 "Güvenliğiniz için Multi Theft Auto'yu yeniden yüklemeyi düşünün.\n"
 "MTA düzgün çalışmazsa çevrimiçi yardıma bakın."
 
@@ -2895,7 +2895,7 @@ msgstr "Uyumsuz dosyaları taşı"
 #: Client/loader/CInstallManager.cpp:1125
 #: Client/loader/CInstallManager.cpp:1141
 msgid "Delete incompatible files"
-msgstr "Uyumsuz dosyaları silme"
+msgstr "Uyumsuz dosyaları sil"
 
 #: Client/loader/Dialogs.cpp:130
 msgid "Quit"
