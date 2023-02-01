@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-12-30 15:53\n"
-"PO-Revision-Date: 2022-12-30 16:09\n"
+"PO-Revision-Date: 2023-02-01 17:17\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -33,10 +33,10 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr "Bu sihirbaz kurulum ve güncelleştirme için size eşlik edecek. $(^Name) ${REVISION_TAG}\n\n"
+msgstr "Bu sihirbaz $(^Name) ${REVISION_TAG} kurulum ve güncelleştirmesi için size yardım edecek. \n\n"
 "Kurulum başlamadan önce arka planda çalışan uygulamaları kapatmanız önerilir.\n\n"
 "[Vista ve üzeri sürümler için yönetici onayı gerekebilir.]\n\n"
-"Devam etmek için tıklayın."
+"Devam etmek için İleri tıklayın."
 
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:213
@@ -74,7 +74,7 @@ msgstr "MTA:SA masaüstü kısayolu oluştur."
 #. DESC_Section12
 #: Shared/installer/nightly.nsi:220
 msgid "Register mtasa:// protocol for browser clickable-ness."
-msgstr "Tarayıcınızda tıklanabilir mtasa:// protokolü için kaydolun."
+msgstr "Tarayıcınızda tıklanabilir mtasa:// protokolünü kaydet."
 
 #. DESC_Section13
 #: Shared/installer/nightly.nsi:221
@@ -218,7 +218,7 @@ msgstr "Geçerli bir Grand Theft Auto: San Andreas versiyonu bulunamadı.$\\r$\n
 #. INST_SEC_CORE_RESOURCES
 #: Shared/installer/nightly.nsi:502
 msgid "Core Resources"
-msgstr "Çekirdek Dosyaları"
+msgstr "Temel Kaynaklar"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: Shared/installer/nightly.nsi:503
