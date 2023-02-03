@@ -27,6 +27,7 @@
 #include <gui/CGUI.h>
 
 typedef bool (*pfnProcessMessage)(HWND, UINT, WPARAM, LPARAM);
+typedef void (*pfnHandleDroppedFiles)(std::vector<std::string>& files);
 
 class CMultiplayer;
 class CNet;
@@ -179,6 +180,8 @@ public:
     virtual void ResetChatboxCharacterLimit() = 0;
     virtual int  GetChatboxCharacterLimit() = 0;
     virtual int  GetChatboxMaxCharacterLimit() = 0;
+
+    virtual void SetDroppedFilesHandler(pfnHandleDroppedFiles pfnHandler) = 0;
 };
 
 class CClientTime

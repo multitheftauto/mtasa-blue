@@ -280,6 +280,9 @@ public:
     SString     GetBlueCopyrightString();
     bool        IsFirstFrame() const noexcept { return m_bFirstFrame; }
 
+    void                  SetDroppedFilesHandler(pfnHandleDroppedFiles pfnHandler) { m_pfnHandleDroppedFiles = pfnHandler; }
+    pfnHandleDroppedFiles GetDroppedFilesHandler() const { return m_pfnHandleDroppedFiles; }
+
 private:
     void ApplyCoreInitSettings();
 
@@ -377,4 +380,6 @@ private:
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
+
+    pfnHandleDroppedFiles m_pfnHandleDroppedFiles = nullptr;
 };

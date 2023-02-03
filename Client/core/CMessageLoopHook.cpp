@@ -113,32 +113,29 @@ void CMessageLoopHook::MaybeRefreshMsgQueue()
 
 void HandleFiles(WPARAM wParam)
 {
-    // DragQueryFile() takes a LPWSTR for the name so we need a TCHAR string
-    TCHAR szName[MAX_PATH];
+    TCHAR szName[MAX_PATH + 1] = {0};
 
-    // Here we cast the wParam as a HDROP handle to pass into the next functions
     HDROP hDrop = (HDROP)wParam;
 
-    // This functions has a couple functionalities.  If you pass in 0xFFFFFFFF in
-    // the second parameter then it returns the count of how many filers were drag
-    // and dropped.  Otherwise, the function fills in the szName string array with
-    // the current file being queried.
     int count = DragQueryFile(hDrop, 0xFFFFFFFF, szName, MAX_PATH);
 
-    // Here we go through all the files that were drag and dropped then display them
-    for (int i = 0; i < count; i++)
+    if (count > 0)
     {
-        // Grab the name of the file associated with index "i" in the list of files dropped.
-        // Be sure you know that the name is attached to the FULL path of the file.
-        DragQueryFile(hDrop, i, szName, MAX_PATH);
+        std::vector<std::string> files;
+        for (int i = 0; i < count; i++)
+        {
+            DragQueryFile(hDrop, i, szName, MAX_PATH);
+            files.push_back(szName);
+        }
 
-        // Bring up a message box that displays the current file being processed
-        MessageBox(GetForegroundWindow(), szName, "Current file received", MB_OK);
+        auto handler = g_pCore->GetDroppedFilesHandler();
+        if (handler)
+        {
+            handler(files);
+        }
     }
 
-    //// Finally, we destroy the HDROP handle so the extra memory
-    //// allocated by the application is released.
-    //DragFinish(hDrop);
+    DragFinish(hDrop);
 }
 
 

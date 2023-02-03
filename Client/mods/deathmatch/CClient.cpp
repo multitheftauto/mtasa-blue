@@ -13,6 +13,7 @@
 #define ALLOC_STATS_MODULE_NAME "client"
 #include "SharedUtil.hpp"
 #include <core/CClientCommands.h>
+#include "ClientDragAndDrop.h"
 
 CCoreInterface*         g_pCore = NULL;
 CLocalizationInterface* g_pLocalization = NULL;
@@ -51,6 +52,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     // HACK FOR CHATBOX NOT VISIBLE. WILL CAUSE SAVING CHATBOX STATE NOT TO WORK
     g_pCore->SetChatVisible(true, false);
 
+    g_pCore->SetDroppedFilesHandler(HandleDroppedFiles);
     // Register our local commands
     g_pCore->GetCommands()->SetExecuteHandler(COMMAND_Executed);
     g_pCore->GetCommands()->Add("disconnect", _("disconnect from the game"), COMMAND_Disconnect);
