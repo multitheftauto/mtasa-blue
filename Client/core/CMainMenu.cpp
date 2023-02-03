@@ -456,6 +456,10 @@ void CMainMenu::Update()
 
         HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
 
+        DragAcceptFiles(hookedWindow, TRUE);
+        ChangeWindowMessageFilter(WM_DROPFILES, MSGFLT_ADD);
+        ChangeWindowMessageFilter(0x0049, MSGFLT_ADD);
+
         tagPOINT windowPos = {0};
         ClientToScreen(hookedWindow, &windowPos);
 
