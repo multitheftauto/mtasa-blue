@@ -13,6 +13,8 @@
 
 #include <game/CFx.h>
 
+struct RwColor;
+
 #define FUNC_CFx_AddBlood                  0x49eb00
 #define FUNC_CFx_AddWood                   0x49ee10
 #define FUNC_CFx_AddSparks                 0x49f040
@@ -21,12 +23,6 @@
 #define FUNC_CFx_AddPunchImpact            0x49f670
 #define FUNC_CFx_AddDebris                 0x49f750
 #define FUNC_CFx_AddGlass                  0x49f970
-#define FUNC_CFx_AddWheelSpray             0x49fb30
-#define FUNC_CFx_AddWheelGrass             0x49ff20
-#define FUNC_CFx_AddWheelGravel            0x4a0170
-#define FUNC_CFx_AddWheelMud               0x4a03c0
-#define FUNC_CFx_AddWheelSand              0x4a0610
-#define FUNC_CFx_AddWheelDust              0x4a09c0
 #define FUNC_CFx_TriggerWaterHydrant       0x4a0d70
 #define FUNC_CFx_TriggerGunshot            0x4a0de0
 #define FUNC_CFx_TriggerTankFire           0x4a0fa0

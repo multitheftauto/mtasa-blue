@@ -22,7 +22,9 @@ void CLuaClientDefs::LoadFunctions()
         {"showChat", ArgumentParserWarn<false, ShowChat>},
         {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
         {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
-        {"clearDebugBox", ArgumentParser<ClearDebug>}
+        {"clearDebugBox", ArgumentParser<ClearDebug>},
+        {"isMTAWindowFocused", ArgumentParser<IsMTAWindowFocused>},
+        {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>}
     };
 
     for (const auto& [name, func] : functions)
@@ -69,4 +71,14 @@ bool CLuaClientDefs::ClearDebug()
 {
     g_pCore->DebugClear();
     return true;
+}
+
+bool CLuaClientDefs::IsMTAWindowFocused()
+{
+    return m_pClientGame->IsWindowFocused();
+}
+
+bool CLuaClientDefs::IsCapsLockEnabled()
+{
+    return ((::GetKeyState(VK_CAPITAL) & 0x0001) != 0);
 }

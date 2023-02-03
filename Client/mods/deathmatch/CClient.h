@@ -32,7 +32,7 @@ public:
     bool HandleException(CExceptionInformation* pExceptionInformation);
     void GetPlayerNames(std::vector<SString>& vPlayerNames);
 
-    void TriggerDiscordJoin(SString strSecret);
+    void OnWindowFocusChange(bool state) override;
 
 private:
     struct InitializeArguments

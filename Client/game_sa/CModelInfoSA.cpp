@@ -10,8 +10,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include "CColModelSA.h"
+#include "CColStoreSA.h"
+#include "CGameSA.h"
+#include "CModelInfoSA.h"
+#include "CPedModelInfoSA.h"
+#include "CPedSA.h"
+#include "CWorldSA.h"
 #include "gamesa_renderware.h"
 
+extern CCoreInterface* g_pCore;
 extern CGameSA* pGame;
 
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
@@ -26,7 +35,7 @@ std::unordered_map<DWORD, unsigned short>                             CModelInfo
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
-static constexpr size_t RESOURCE_ID_COL = 25000;
+static constexpr size_t    RESOURCE_ID_COL = 25000;
 
 static void CBaseModelInfo_SetColModel(CBaseModelInfoSAInterface* self, CColModelSAInterface* colModel, bool applyToPairedModel)
 {
@@ -45,7 +54,7 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
-    this->m_dwModelID = 0xFFFFFFFF;
+    m_dwModelID = 0xFFFFFFFF;
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;
@@ -59,12 +68,11 @@ CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
     return m_pInterface = ppModelInfo[m_dwModelID];
 }
 
-BOOL CModelInfoSA::IsBoat()
+bool CModelInfoSA::IsBoat()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBoat ( )");
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool bReturn = false;
     _asm
     {
         push    ModelID
@@ -72,15 +80,14 @@ BOOL CModelInfoSA::IsBoat()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsCar()
+bool CModelInfoSA::IsCar()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsCar ( )");
     DWORD dwFunction = FUNC_IsCarModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -88,15 +95,14 @@ BOOL CModelInfoSA::IsCar()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsTrain()
+bool CModelInfoSA::IsTrain()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsTrain ( )");
     DWORD dwFunction = FUNC_IsTrainModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -104,15 +110,14 @@ BOOL CModelInfoSA::IsTrain()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsHeli()
+bool CModelInfoSA::IsHeli()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsHeli ( )");
     DWORD dwFunction = FUNC_IsHeliModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -120,15 +125,14 @@ BOOL CModelInfoSA::IsHeli()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsPlane()
+bool CModelInfoSA::IsPlane()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsPlane ( )");
     DWORD dwFunction = FUNC_IsPlaneModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -136,15 +140,14 @@ BOOL CModelInfoSA::IsPlane()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsBike()
+bool CModelInfoSA::IsBike()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBike ( )");
     DWORD dwFunction = FUNC_IsBikeModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -152,15 +155,14 @@ BOOL CModelInfoSA::IsBike()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsFakePlane()
+bool CModelInfoSA::IsFakePlane()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsFakePlane ( )");
     DWORD dwFunction = FUNC_IsFakePlaneModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -168,15 +170,14 @@ BOOL CModelInfoSA::IsFakePlane()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsMonsterTruck()
+bool CModelInfoSA::IsMonsterTruck()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsMonsterTruck ( )");
     DWORD dwFunction = FUNC_IsMonsterTruckModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -184,15 +185,14 @@ BOOL CModelInfoSA::IsMonsterTruck()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsQuadBike()
+bool CModelInfoSA::IsQuadBike()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsQuadBike ( )");
     DWORD dwFunction = FUNC_IsQuadBikeModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -200,15 +200,14 @@ BOOL CModelInfoSA::IsQuadBike()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsBmx()
+bool CModelInfoSA::IsBmx()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsBmx ( )");
     DWORD dwFunction = FUNC_IsBmxModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -216,15 +215,14 @@ BOOL CModelInfoSA::IsBmx()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
-BOOL CModelInfoSA::IsTrailer()
+bool CModelInfoSA::IsTrailer()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsTrailer ( )");
     DWORD dwFunction = FUNC_IsTrailerModel;
     DWORD ModelID = m_dwModelID;
-    BYTE  bReturn = 0;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -232,16 +230,15 @@ BOOL CModelInfoSA::IsTrailer()
         mov     bReturn, al
         add     esp, 4
     }
-    return (BOOL)bReturn;
+    return bReturn;
 }
 
 BYTE CModelInfoSA::GetVehicleType()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::IsVehicle ( )");
     // This function will return a vehicle type for vehicles or 0xFF on failure
     DWORD dwFunction = FUNC_IsVehicleModelType;
     DWORD ModelID = m_dwModelID;
-    BYTE bReturn = -1;
+    BYTE  bReturn = -1;
     _asm
     {
         push    ModelID
@@ -268,16 +265,13 @@ bool CModelInfoSA::IsPlayerModel()
     return (GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1);
 }
 
-BOOL CModelInfoSA::IsUpgrade()
+bool CModelInfoSA::IsUpgrade()
 {
     return m_dwModelID >= 1000 && m_dwModelID <= 1193;
 }
 
 char* CModelInfoSA::GetNameIfVehicle()
 {
-    DEBUG_TRACE("char * CModelInfoSA::GetNameIfVehicle ( )");
-    //  if(this->IsVehicle())
-    //  {
     DWORD dwModelInfo = (DWORD)ARRAY_ModelInfo;
     DWORD dwFunc = FUNC_CText_Get;
     DWORD ModelID = m_dwModelID;
@@ -306,8 +300,6 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     eax
         }
     return (char*)dwReturn;
-    //  }
-    //  return NULL;
 }
 
 uint CModelInfoSA::GetAnimFileIndex()
@@ -327,9 +319,8 @@ uint CModelInfoSA::GetAnimFileIndex()
     return uiReturn;
 }
 
-VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
+void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
 {
-    DEBUG_TRACE("VOID CModelInfoSA::Request( BOOL bAndLoad, BOOL bWaitForLoad )");
     // don't bother loading it if it already is
     if (IsLoaded())
         return;
@@ -393,10 +384,8 @@ VOID CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
     }
 }
 
-VOID CModelInfoSA::Remove()
+void CModelInfoSA::Remove()
 {
-    DEBUG_TRACE("VOID CModelInfoSA::Remove ( )");
-
     // Don't remove if GTA refers to it somehow.
     // Or we'll screw up SA's map for example.
 
@@ -435,22 +424,7 @@ VOID CModelInfoSA::Remove()
     }
 }
 
-BYTE CModelInfoSA::GetLevelFromPosition(CVector* vecPosition)
-{
-    DEBUG_TRACE("BYTE CModelInfoSA::GetLevelFromPosition ( CVector * vecPosition )");
-    DWORD dwFunction = FUNC_GetLevelFromPosition;
-    BYTE  bReturn = 0;
-    _asm
-    {
-        push    vecPosition
-        call    dwFunction
-        add     esp, 4
-        mov     bReturn, al
-    }
-    return bReturn;
-}
-
-BOOL CModelInfoSA::IsLoaded()
+bool CModelInfoSA::IsLoaded()
 {
     if (DoIsLoaded())
     {
@@ -466,12 +440,10 @@ BOOL CModelInfoSA::IsLoaded()
     return false;
 }
 
-BOOL CModelInfoSA::DoIsLoaded()
+bool CModelInfoSA::DoIsLoaded()
 {
-    DEBUG_TRACE("BOOL CModelInfoSA::DoIsLoaded ( )");
-
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
-    BOOL bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
+    bool bLoaded = pGame->GetStreaming()->HasModelLoaded(m_dwModelID);
 
     if (m_dwModelID < pGame->GetBaseIDforTXD())
     {
@@ -537,7 +509,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
-    FLOAT fReturn = 0;
+    float fReturn = 0;
     _asm {
         mov     eax, ModelID
 
@@ -665,7 +637,8 @@ void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
         fDistance = std::min(fDistance, fMaximumValue);
     }
 #endif
-    if (!bOverrideMaxDistance) {
+    if (!bOverrideMaxDistance)
+    {
         // Limit to 325.f as it goes horrible after that
         fDistance = std::min(fDistance, 325.f);
     }
@@ -853,7 +826,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
     }
 }
 
-void CModelInfoSA::SetAlphaTransparencyEnabled(BOOL bEnabled)
+void CModelInfoSA::SetAlphaTransparencyEnabled(bool bEnabled)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -1102,7 +1075,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return; // Early out in case the model doesn't have any dummies modified
+        return;            // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
@@ -1120,7 +1093,8 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 void CModelInfoSA::ResetAllVehicleDummies()
 {
     CGame* game = g_pCore->GetGame();
-    for (auto& info : ms_ModelDefaultDummiesPosition) {
+    for (auto& info : ms_ModelDefaultDummiesPosition)
+    {
         CModelInfo* modelInfo = game->GetModelInfo(info.first);
         if (modelInfo)
             modelInfo->ResetVehicleDummies(false);
@@ -1220,32 +1194,42 @@ void CModelInfoSA::ResetAllVehiclesWheelSizes()
     ms_VehicleModelDefaultWheelSizes.clear();
 }
 
-void CModelInfoSA::SetCustomModel(RpClump* pClump)
+bool CModelInfoSA::SetCustomModel(RpClump* pClump)
 {
-    // Error
-    if (pClump == NULL)
-        return;
+    if (!pClump)
+        return false;
 
-    // Store the custom clump
-    m_pCustomClump = pClump;
-
-    // Replace the model if we're loaded.
-    if (IsLoaded())
+    if (!IsLoaded())
     {
-        switch (GetModelType())
-        {
-            case eModelInfoType::PED:
-                return pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case eModelInfoType::WEAPON:
-                return pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case eModelInfoType::VEHICLE:
-                return pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            case eModelInfoType::ATOMIC:
-            case eModelInfoType::LOD_ATOMIC:
-            case eModelInfoType::TIME:
-                return pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
-        }
+        // Wait for the game to eventually stream-in the model and then try to replace it (via MakeCustomModel).
+        m_pCustomClump = pClump;
+        return true;
     }
+
+    bool success = false;
+
+    switch (GetModelType())
+    {
+        case eModelInfoType::PED:
+            success = pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::WEAPON:
+            success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::VEHICLE:
+            success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        case eModelInfoType::ATOMIC:
+        case eModelInfoType::LOD_ATOMIC:
+        case eModelInfoType::TIME:
+            success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            break;
+        default:
+            break;
+    }
+
+    m_pCustomClump = success ? pClump : nullptr;
+    return success;
 }
 
 void CModelInfoSA::RestoreOriginalModel()
@@ -1486,6 +1470,24 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
+void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
+{
+    CTimeModelInfoSAInterface* m_pInterface = new CTimeModelInfoSAInterface();
+
+    CTimeModelInfoSAInterface* pBaseObjectInfo = static_cast<CTimeModelInfoSAInterface*>(ppModelInfo[usBaseID]);
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CTimeModelInfoSAInterface));
+    m_pInterface->usNumberOfRefs = 0;
+    m_pInterface->pRwObject = nullptr;
+    m_pInterface->usUnknown = 65535;
+    m_pInterface->usDynamicIndex = 65535;
+    m_pInterface->timeInfo.m_wOtherTimeModel = 0;
+    
+    ppModelInfo[m_dwModelID] = m_pInterface;
+
+    m_dwParentID = usBaseID;
+    CopyStreamingInfoFromModel(usBaseID);
+}
+
 void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 {
     CVehicleModelInfoSAInterface* m_pInterface = new CVehicleModelInfoSAInterface();
@@ -1507,6 +1509,25 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
+
+    switch (GetModelType())
+    {
+        case eModelInfoType::VEHICLE:
+            delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::PED:
+            delete reinterpret_cast<CPedModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::ATOMIC:
+            delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::TIME:
+            delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        default:
+            break;
+    }
+
     ppModelInfo[m_dwModelID] = nullptr;
     pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
 }

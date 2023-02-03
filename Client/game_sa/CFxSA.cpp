@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFxSA.h"
+#include "CEntitySA.h"
 
 using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
                                                 char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);

@@ -1,4 +1,4 @@
-/* Copyright (C) 2000 MySQL AB
+/* Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA */
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
-/* 
+/*
    Data structures for mysys/my_alloc.c (root memory allocator)
 */
 
@@ -23,11 +23,18 @@
 #define ALLOC_MAX_BLOCK_TO_DROP			4096
 #define ALLOC_MAX_BLOCK_USAGE_BEFORE_DROP	10
 
+/* PSI_memory_key */
+#include "mysql/psi/psi_memory.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct st_used_mem
 {				   /* struct for once_alloc (block) */
   struct st_used_mem *next;	   /* Next block in use */
-  size_t left;                     /* memory left in block  */
-  size_t size;                     /* size of block */
+  unsigned int	left;		   /* memory left in block  */
+  unsigned int	size;		   /* size of block */
 } USED_MEM;
 
 
@@ -40,12 +47,19 @@ typedef struct st_mem_root
   size_t min_malloc;
   size_t block_size;               /* initial block size */
   unsigned int block_num;          /* allocated blocks counter */
-  /* 
-     first free block in queue test counter (if it exceed 
+  /*
+     first free block in queue test counter (if it exceed
      MAX_BLOCK_USAGE_BEFORE_DROP block will be dropped in 'used' list)
   */
   unsigned int first_block_usage;
 
   void (*error_handler)(void);
+
+  PSI_memory_key m_psi_key;
 } MEM_ROOT;
+
+#ifdef  __cplusplus
+}
+#endif
+
 #endif

@@ -44,6 +44,6 @@ namespace SharedUtil
         DetourDetach(&reinterpret_cast<PVOID&>(target), replacement);
         return DetourTransactionCommit() == NO_ERROR;
     }
-}
+}            // namespace SharedUtil
 
 #endif

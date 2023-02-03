@@ -13,9 +13,10 @@
 
 #pragma once
 
+#include <CVector.h>
+#include <game/RenderWare.h>
 #include <game/CAnimBlendAssociation.h>
 #include "CAnimBlendNodeSA.h"
-#include "Common.h"
 
 class CAnimBlendAssocGroupSA;
 class CAnimBlendHierarchySAInterface;
@@ -93,7 +94,8 @@ public:
     float                           fSpeed;                         // 36
     float                           fTimeStep;                      // 40
     short                           sAnimID;                        // 44
-    union {
+    union
+    {
         struct
         {
             unsigned short m_bPlaying : 1;                    // Anim will stop playing if flag is not set
@@ -155,7 +157,7 @@ public:
     void                                 FreeAnimBlendNodeArray();
     CAnimBlendAssociationSAInterface*    GetInterface() { return m_pInterface; }
     eAnimGroup                           GetAnimGroup() { return static_cast<eAnimGroup>(m_pInterface->sAnimGroup); }
-    eAnimID                              GetAnimID() { return static_cast <eAnimID>(m_pInterface->sAnimID); }
+    eAnimID                              GetAnimID() { return static_cast<eAnimID>(m_pInterface->sAnimID); }
     std::unique_ptr<CAnimBlendHierarchy> GetAnimHierarchy();
 
     float GetBlendAmount() { return m_pInterface->fBlendAmount; }
