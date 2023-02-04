@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-22 15:58+0000\n"
-"PO-Revision-Date: 2023-01-22 16:52\n"
+"POT-Creation-Date: 2023-02-04 17:04+0000\n"
+"PO-Revision-Date: 2023-02-04 17:37\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -224,7 +224,7 @@ msgstr "Yükləməni dayandırmaq üçün serverdən ayırılın"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:829
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:844
 #: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
 #: Client/loader/CInstallManager.cpp:629
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -2285,7 +2285,7 @@ msgstr "SERVER ŞİFRƏSİNİ DAXİL EDİN"
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1203
+#: Client/loader/MainFunctions.cpp:1219
 msgid "Information"
 msgstr "Məlumat"
 
@@ -2751,37 +2751,37 @@ msgstr "'MTA:SA' və ya'GTA San Andreas' quraşdırma yolunda\n"
 "MTA:SA-nı başladarkən problem olsa,\n"
 "quraşdırma(ları)nızı nöqtəli vergül olmayan qovluqa daşıyın."
 
-#: Client/loader/MainFunctions.cpp:793
+#: Client/loader/MainFunctions.cpp:808
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Başlatmaq xətası. Ən son məlumat fayllarının düzgün quraşdırıldığını yoxlayın."
 
-#: Client/loader/MainFunctions.cpp:802
+#: Client/loader/MainFunctions.cpp:817
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Başlatmaq xətası. Zəhmət olmasa %s düzgün quraşdırıldığını yoxlayın."
 
-#: Client/loader/MainFunctions.cpp:809
+#: Client/loader/MainFunctions.cpp:824
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Başlatmaq xətası. gta_sa.exe %s qovluğunda tapılmadı."
 
-#: Client/loader/MainFunctions.cpp:819
+#: Client/loader/MainFunctions.cpp:834
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Başlatmaq xətası. Başlatmadan əvvəl GTA qovluğundakı %s faylını silin."
 
-#: Client/loader/MainFunctions.cpp:828
+#: Client/loader/MainFunctions.cpp:843
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Əsas sənədin yanlış adı var (%s)"
 
-#: Client/loader/MainFunctions.cpp:839
+#: Client/loader/MainFunctions.cpp:854
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Əsas sənəd imzasızdır. Bunun səbəbi kompüterinizdəki virus ola bilər\n\n"
 "MTA düzgün işləməsə, onlayn yardıma baxın."
 
-#: Client/loader/MainFunctions.cpp:866
+#: Client/loader/MainFunctions.cpp:882
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -2790,7 +2790,7 @@ msgstr "%s data faylı çatışmır. Mümkün virus fəaliyyəti ola bilər.\n\n
 "Təhlükəsizliyiniz üçün Multi Theft Auto tətbiqini yenidən quraşdırmağı nəzərdə tutun.\n"
 "MTA düzgün işləmirsə, onlayn yardıma baxın."
 
-#: Client/loader/MainFunctions.cpp:877
+#: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -2799,43 +2799,43 @@ msgstr "%s data faylı dəyişdirilib. Mümkün virus fəaliyyəti ola bilər.\n
 "Təhlükəsizliyiniz üçün Multi Theft Auto tətbiqini yenidən quraşdırmağı nəzərdə tutun.\n"
 "MTA düzgün işləmirsə, onlayn yardıma baxın."
 
-#: Client/loader/MainFunctions.cpp:891
+#: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "'MTA: SA' və ya GTA: San Andreas qovluqlarında .asi uzantılı sənədlər var.\n\n"
 "MTA: SA ilə problemlə qarşılaşsanız .asi sənədlərini bu qovluqlardan silin."
 
-#: Client/loader/MainFunctions.cpp:996
+#: Client/loader/MainFunctions.cpp:1012
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Sənəd versiyasının xətası. Problemi həll etmək üçün MTA: SA -nı yenidən quraşdırın.\n"
 
-#: Client/loader/MainFunctions.cpp:1005
+#: Client/loader/MainFunctions.cpp:1021
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Sənəd versiyasının xətası. Problemi həll etmək üçün MTA: SA -nı yenidən quraşdırın.\n"
 
-#: Client/loader/MainFunctions.cpp:1017
+#: Client/loader/MainFunctions.cpp:1033
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA Windows 'Təhlükəsizlik rejimində' işləmir.\n\n"
 "Zəhmət olmasa kompüterivizi yenidən başlatın.\n"
 
-#: Client/loader/MainFunctions.cpp:1103
+#: Client/loader/MainFunctions.cpp:1119
 msgid "Fix configuration issue"
 msgstr "Konfiqurasiya problemini həll edin"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1141
+#: Client/loader/MainFunctions.cpp:1157
 msgid "Fix elevation required error"
 msgstr "Səhvi düzəldərkən xəta baş verdi"
 
-#: Client/loader/MainFunctions.cpp:1148
+#: Client/loader/MainFunctions.cpp:1164
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Grand Theft Auto: San Andreas başlanıla bilmədi. Zəhmət olmasa yenidən cəhd edin, və ya problem davam edərsə, www.multitheftauto.com MTA ilə əlaqə saxlayın.\n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1203
+#: Client/loader/MainFunctions.cpp:1219
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas düzgün başlana bilmədi. Dayandırmaq istəyirsiniz?"
 
