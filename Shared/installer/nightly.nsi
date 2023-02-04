@@ -774,6 +774,18 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\skins\Default 2023\CGUI.png"
             File "${FILES_ROOT}\skins\Default 2023\CGUI.xml"
 
+            SetOutPath "$INSTDIR\skins\GWEN Blue"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.png"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.xml"
+
+            SetOutPath "$INSTDIR\skins\GWEN Orange"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.png"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.xml"
+
             SetOutPath "$INSTDIR\MTA\cgui"
             File "${FILES_ROOT}\mta\cgui\Falagard.xsd"
             File "${FILES_ROOT}\mta\cgui\Font.xsd"
