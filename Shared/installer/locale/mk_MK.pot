@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 15:53\n"
-"PO-Revision-Date: 2022-12-30 16:09\n"
+"POT-Creation-Date: 2023-02-04 17:22\n"
+"PO-Revision-Date: 2023-02-04 17:36\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -231,27 +231,27 @@ msgid "Editor"
 msgstr "Уредник"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:991
+#: Shared/installer/nightly.nsi:1003
 msgid "Development"
 msgstr "Развој"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1039
+#: Shared/installer/nightly.nsi:1051
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Име) беше успешно отстрането од вашиот компјутер."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1046
+#: Shared/installer/nightly.nsi:1058
 msgid "Uninstallation has failed!"
 msgstr "Деинсталирањето е неуспешно!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1054
+#: Shared/installer/nightly.nsi:1066
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Дали сте сигурни дека сакате комплетно да го отстраните $(^Име) и сите други компоненти?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1055
+#: Shared/installer/nightly.nsi:1067
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -260,32 +260,32 @@ msgstr "Деинсталирање пред надградување?$\\r$\n"
 "Вклучете ја новата инсталација за да надградете и вратете старите конфигурации."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1068
+#: Shared/installer/nightly.nsi:1080
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Дали сакате да ги задржите вашите фајлови (како на пример ресурси, слики и конфигурации од серверот)? Доколку притиснете не, било каква ресурса, конфигурација или слика што сте ги креирале ќе биде изгубена."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1179
+#: Shared/installer/nightly.nsi:1191
 msgid "This installer requires admin access, try again"
 msgstr "Инсталацијата бара пристап на админот, пробајте повторно "
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1180
+#: Shared/installer/nightly.nsi:1192
 msgid "This uninstaller requires admin access, try again"
 msgstr "Деинсталацијата бара пристап до админот, пробајте повторно"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1181
+#: Shared/installer/nightly.nsi:1193
 msgid "Logon service not running, aborting!"
 msgstr "Сервисот за логирање не е во употреба, исклучување!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1182
+#: Shared/installer/nightly.nsi:1194
 msgid "Unable to elevate"
 msgstr "Грешка во подигање"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1778
+#: Shared/installer/nightly.nsi:1790
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -296,7 +296,7 @@ msgstr "Поинаква поголема верзија од MTA ($1) веќе 
 " Дали сте сигурни дека сакате да ја пребришете MTA $1 во $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1782
+#: Shared/installer/nightly.nsi:1794
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -307,7 +307,7 @@ msgstr "MTA не може да се инсталира во истата дир�
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1785
+#: Shared/installer/nightly.nsi:1797
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -316,7 +316,7 @@ msgstr "Селектираниот фолдер не постои.$\n"
 "Ве молиме селектирајте го инсталациониот фолдер на GTA:SA"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1787
+#: Shared/installer/nightly.nsi:1799
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -325,17 +325,17 @@ msgstr "Не може да се најде инсталацијата на GTA:S
 "Дали сте сигурни дека сакате да продолжите ?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1905
+#: Shared/installer/nightly.nsi:1917
 msgid "Choose Install Location"
 msgstr "Изберете место за инсталација"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1906
+#: Shared/installer/nightly.nsi:1918
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Изберете фолдер во кој ќе инсталирате ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1907
+#: Shared/installer/nightly.nsi:1919
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -346,62 +346,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} ќе се инсталира �
 " Кликнете Следно за да продолжите."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1909
+#: Shared/installer/nightly.nsi:1921
 msgid "Destination Folder"
 msgstr "Дестинација на фолдерот"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1910
+#: Shared/installer/nightly.nsi:1922
 msgid "Browse..."
 msgstr "Пребарување..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1911
+#: Shared/installer/nightly.nsi:1923
 msgid "Default"
 msgstr "Стандарно"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1912
+#: Shared/installer/nightly.nsi:1924
 msgid "Last used"
 msgstr "Последно употребувано"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1913
+#: Shared/installer/nightly.nsi:1925
 msgid "Custom"
 msgstr "Обично"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2091
+#: Shared/installer/nightly.nsi:2103
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Селектирајте го фолдерот за да инсталирате ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} во:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2109
+#: Shared/installer/nightly.nsi:2121
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Предупредување: Поинаква поголема верзија од MTA ($1) веќе постои на тоа место."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2110
+#: Shared/installer/nightly.nsi:2122
 msgid "Installation type:  Upgrade"
 msgstr "Вид на инсталација:  Надградба"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2353
+#: Shared/installer/nightly.nsi:2365
 msgid "Online update"
 msgstr "Онлјан надградба"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2354
+#: Shared/installer/nightly.nsi:2366
 msgid "Checking for update information"
 msgstr "Проверка на информација за надградба"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2355
+#: Shared/installer/nightly.nsi:2367
 msgid "Checking for installer update information..."
 msgstr "Проверка на информација за надградба на инсталацијата"
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2356
+#: Shared/installer/nightly.nsi:2368
 msgid "Please ensure your firewall is not blocking"
 msgstr "Ве молиме осигурајте се вашиот firewall да не блокира"
 
