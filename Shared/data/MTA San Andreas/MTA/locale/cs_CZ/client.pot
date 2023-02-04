@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-22 15:58+0000\n"
-"PO-Revision-Date: 2023-01-22 16:50\n"
+"POT-Creation-Date: 2023-02-04 17:04+0000\n"
+"PO-Revision-Date: 2023-02-04 17:35\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -224,7 +224,7 @@ msgstr "Odpoj se pro zrušení stahování"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:829
+#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:844
 #: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
 #: Client/loader/CInstallManager.cpp:629
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -2293,7 +2293,7 @@ msgstr "PROSÍM VLOŽ HESLO SERVERU"
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1203
+#: Client/loader/MainFunctions.cpp:1219
 msgid "Information"
 msgstr "Informace"
 
@@ -2762,37 +2762,37 @@ msgstr "Cesta k tvé instalaci 'MTA:SA' nebo 'GTA: San Andreas'\n"
 " Pokud budeš mít potíže s MTA:SA,\n"
 " přesuň tvojí instalaci(e) do cesty, která neobsahuje středník."
 
-#: Client/loader/MainFunctions.cpp:793
+#: Client/loader/MainFunctions.cpp:808
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Načtení selhalo. Prosím zkontroluj zda jsou správně nainstalovány poslední data soubory."
 
-#: Client/loader/MainFunctions.cpp:802
+#: Client/loader/MainFunctions.cpp:817
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Načtení selhalo. Prosím zkontroluj že %s je nainstalován správně."
 
-#: Client/loader/MainFunctions.cpp:809
+#: Client/loader/MainFunctions.cpp:824
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Načtení selhalo. Nelze nalézt gta_sa.exe v %s."
 
-#: Client/loader/MainFunctions.cpp:819
+#: Client/loader/MainFunctions.cpp:834
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Načtení selhalo. %s existuje v GTA adresáři. Prosím o smazání před pokračováním."
 
-#: Client/loader/MainFunctions.cpp:828
+#: Client/loader/MainFunctions.cpp:843
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Hlavní soubor má nesprávné jméno (%s)"
 
-#: Client/loader/MainFunctions.cpp:839
+#: Client/loader/MainFunctions.cpp:854
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Hlavní soubor není podepsaný. Potenciální virová aktivita.\n\n"
 "Pokud MTA nepracuje správně, podívej se na online nápovědu."
 
-#: Client/loader/MainFunctions.cpp:866
+#: Client/loader/MainFunctions.cpp:882
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -2801,7 +2801,7 @@ msgstr "Datový soubor %s nelze najít. Problém mohl způsobit virus.\n\n"
 "Zvaž přeinstalování Multi Theft Auto v zájmu vlastní bezpečnosti.\n"
 "Pokud MTA nefunguje správně, přečti si online nápovědu."
 
-#: Client/loader/MainFunctions.cpp:877
+#: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
@@ -2810,43 +2810,43 @@ msgstr "Datový soubor %s je upraven. Problém mohl způsobit virus.\n\n"
 "Zvaž přeinstalování Multi Theft Auto v zájmu vlastní bezpečnosti.\n"
 "Pokud MTA nefunguje správně, přečti si online nápovědu."
 
-#: Client/loader/MainFunctions.cpp:891
+#: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "V instalačním adresáři 'MTA:SA' nebo 'GTA: San Andreas' se nachází .asi soubory.\n\n"
 "Pokud zaznamenáváte potíže s MTA:SA, odstraňte tyto .asi soubory."
 
-#: Client/loader/MainFunctions.cpp:996
+#: Client/loader/MainFunctions.cpp:1012
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Verze souboru se liší. Pokud zaznamenáváte problémy, přeinstalujte MTA:SA.\n"
 
-#: Client/loader/MainFunctions.cpp:1005
+#: Client/loader/MainFunctions.cpp:1021
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Některé soubory chybí. Pokud zaznamenáváte problémy, přeinstalujte MTA:SA.\n"
 
-#: Client/loader/MainFunctions.cpp:1017
+#: Client/loader/MainFunctions.cpp:1033
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA není kompatibilní s nouzovým režimem systému Windows.\n\n"
 "Prosím, restartujte svůj počítač.\n"
 
-#: Client/loader/MainFunctions.cpp:1103
+#: Client/loader/MainFunctions.cpp:1119
 msgid "Fix configuration issue"
 msgstr "Opravit problémy s konfigurací"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1141
+#: Client/loader/MainFunctions.cpp:1157
 msgid "Fix elevation required error"
 msgstr "Opravit chybu s potřebnou elevací"
 
-#: Client/loader/MainFunctions.cpp:1148
+#: Client/loader/MainFunctions.cpp:1164
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Nelze spustit Grand Theft Auto: San Andreas.  Prosím, zkus to znovu, nebo pokud problém přetrvává, kontaktuj MTA na www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1203
+#: Client/loader/MainFunctions.cpp:1219
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas se možná nespustilo správně. Chceš to ukončit?"
 
