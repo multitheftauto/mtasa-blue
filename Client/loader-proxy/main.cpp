@@ -23,7 +23,8 @@
 #include <SharedUtil.h>
 #include <SharedUtil.hpp>
 
-constexpr std::wstring_view MTA_GTAEXE_NAME = L"gta_sa.exe";
+constexpr std::wstring_view GTA_EXE_NAME = L"gta_sa.exe";
+constexpr std::wstring_view STEAM_GTA_EXE_NAME = L"gta-sa.exe";
 constexpr std::wstring_view EXPLORER_EXE_NAME = L"explorer.exe";
 
 #ifdef MTA_DEBUG
@@ -38,7 +39,7 @@ constexpr std::wstring_view EXPLORER_EXE_NAME = L"explorer.exe";
 
 namespace fs = std::filesystem;
 
-VOID WINAPI MyGetStartupInfoA(LPSTARTUPINFOA startupInfo);
+BOOL WINAPI MyGetVersionExA(LPOSVERSIONINFOA versionInfo);
 
 BOOL OnLibraryDetach();
 BOOL OnLibraryAttach();
@@ -62,7 +63,7 @@ HMODULE g_exe = nullptr;
 HMODULE g_core = nullptr;
 HMODULE g_netc = nullptr;
 
-VOID(WINAPI* Win32GetStartupInfoA)(LPSTARTUPINFOA) = nullptr;
+BOOL(WINAPI* Win32GetVersionExA)(LPOSVERSIONINFOA) = nullptr;
 
 BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID)
 {
@@ -103,7 +104,7 @@ BOOL OnLibraryAttach()
     ApplyDpiAwareness();
 
     // Replace the first called imported procedure from the executable.
-    FARPROC procedure = SetImportProcAddress("kernel32.dll", "GetStartupInfoA", reinterpret_cast<FARPROC>(MyGetStartupInfoA));
+    FARPROC procedure = SetImportProcAddress("kernel32.dll", "GetVersionExA", reinterpret_cast<FARPROC>(MyGetVersionExA));
 
     if (!procedure)
     {
@@ -111,7 +112,7 @@ BOOL OnLibraryAttach()
         return FALSE;
     }
 
-    Win32GetStartupInfoA = reinterpret_cast<decltype(Win32GetStartupInfoA)>(procedure);
+    Win32GetVersionExA = reinterpret_cast<decltype(Win32GetVersionExA)>(procedure);
     return TRUE;
 }
 
@@ -131,10 +132,25 @@ VOID OnGameLaunch()
         return;
     }
 
+    const fs::path gtaExe = gtaDirectory / GTA_EXE_NAME;
+
+    if (!fs::is_regular_file(gtaExe, ec))
+    {
+        const fs::path steamExe = gtaDirectory / STEAM_GTA_EXE_NAME;
+
+        if (std::error_code ignore; !fs::is_regular_file(steamExe, ignore))
+        {
+            AddLaunchLog("GTA:SA executable not found (%d): %s", ec.value(), ec.message().c_str());
+            std::wstring message = L"Game executable not found:\n" + gtaExe.wstring();
+            DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL51");
+            return;
+        }
+    }
+
     // Abort if the current process is not the game executable.
     const std::wstring processName = GetCurrentProcessPath().filename().wstring();
 
-    if (!IEqual(MTA_GTAEXE_NAME, processName))
+    if (!IEqual(GTA_EXE_NAME, processName))
     {
         std::wstring message = L"Executable has an incorrect name (" + processName + L").";
         DisplayErrorMessageBox(MakeLauncherError(message), L"CL52");
@@ -154,14 +170,14 @@ VOID OnGameLaunch()
     // Check if the name of the launcher process matches Multi Theft Auto.
     const std::wstring launcherName = launcherPath.filename().wstring();
 
-    if (IEqual(EXPLORER_EXE_NAME, launcherName))
-    {
-        DisplayErrorMessageBox(MakeLauncherError(L"Do not run this game from Windows Explorer."), L"CL54");
-        return;
-    }
-
     if (!IEqual(MTA_EXE_NAME, launcherName))
     {
+        if (IEqual(EXPLORER_EXE_NAME, launcherName))
+        {
+            DisplayErrorMessageBox(MakeLauncherError(L"Do not run this game from Windows Explorer."), L"CL54");
+            return;
+        }
+
         std::wstring message = L"Launcher executable has an incorrect name (" + launcherName + L").";
         
         if (!DisplayWarningMessageBox(MakeLauncherError(message), L"CL54"))
@@ -169,6 +185,17 @@ VOID OnGameLaunch()
             ExitProcess(1);
             return;
         }
+    }
+
+    // Check if models/gta3.img exists because the process will lock indefinitely otherwise.
+    const fs::path gtaImage = gtaDirectory / "models" / "gta3.img";
+
+    if (!fs::is_regular_file(gtaImage))
+    {
+        AddLaunchLog("gta3.img not found (%d): %s", ec.value(), ec.message().c_str());
+        std::wstring message = L"gta3.img not found:\n" + gtaImage.wstring();
+        DisplayErrorMessageBox(MakeLauncherError(AppendSystemError(message, ec.value())), L"CL51");
+        return;
     }
 
     // Check if the MTA subdirectory exists.
@@ -316,16 +343,18 @@ VOID OnGameLaunch()
     }
 }
 
-VOID WINAPI MyGetStartupInfoA(LPSTARTUPINFOA startupInfo)
+BOOL WINAPI MyGetVersionExA(LPOSVERSIONINFOA versionInfo)
 {
     // Execute the original function with the given parameter.
-    Win32GetStartupInfoA(startupInfo);
+    BOOL result = Win32GetVersionExA(versionInfo);
 
     // Restore the function pointer we've overriden to get here.
-    SetImportProcAddress("kernel32.dll", "GetStartupInfoA", reinterpret_cast<FARPROC>(Win32GetStartupInfoA));
+    SetImportProcAddress("kernel32.dll", "GetVersionExA", reinterpret_cast<FARPROC>(Win32GetVersionExA));
 
     // Run our startup code.
     OnGameLaunch();
+
+    return result;
 }
 
 /**
