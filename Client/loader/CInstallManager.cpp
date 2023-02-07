@@ -1007,6 +1007,16 @@ SString CInstallManager::_ProcessLayoutChecks()
         }
     }
 
+    // Remove proxy_sa.exe from GTA directory.
+    {
+        SString filePath = PathJoin(GetGTAPath(), "proxy_sa.exe");
+
+        if (FileExists(filePath))
+        {
+            FileDelete(filePath);
+        }
+    }
+
     //
     // Disk space check
     //
