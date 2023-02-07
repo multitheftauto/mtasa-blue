@@ -13,6 +13,7 @@
 #include <game/CSettings.h>
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
+#include "CFilePathTranslator.h"
 #include "SharedUtil.Thread.h"
 #include <charconv>
 

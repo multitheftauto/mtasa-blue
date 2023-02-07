@@ -1,16 +1,18 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        D3DStuff.cpp
+ *  FILE:        Client/loader/D3DStuff.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
-#include "d3d9.h"
-#include "nvapi/nvapi.h"
+#include "D3DStuff.h"
+#include "Utils.h"
+#include "Dialogs.h"
+#include <d3d9.h>
+#include <nvapi/nvapi.h>
 
 namespace
 {
