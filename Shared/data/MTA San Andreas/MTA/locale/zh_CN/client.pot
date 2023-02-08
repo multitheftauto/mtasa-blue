@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-04 17:04+0000\n"
-"PO-Revision-Date: 2023-02-04 17:36\n"
+"POT-Creation-Date: 2023-02-08 19:09+0000\n"
+"PO-Revision-Date: 2023-02-08 20:08\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -24,22 +24,22 @@ msgstr "显卡驱动出现问题"
 
 #. Create buttons
 #. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CVersionUpdater.cpp:1606
-#: Client/core/CVersionUpdater.cpp:1822 Client/core/CVersionUpdater.cpp:1915
-#: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:1955
-#: Client/core/CVersionUpdater.cpp:1967 Client/core/CVersionUpdater.cpp:2119
-#: Client/core/CVersionUpdater.cpp:2128 Client/core/CVersionUpdater.cpp:2137
-#: Client/core/CVersionUpdater.cpp:2151 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4695 Client/loader/Dialogs.cpp:129
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4695 Client/loader/Dialogs.cpp:133
 msgid "OK"
 msgstr "确定"
 
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
-#: Client/core/CVersionUpdater.cpp:1840 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:132
+#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
+#: Client/core/CVersionUpdater.cpp:1841 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:136
 msgid "Cancel"
 msgstr "取消"
 
@@ -49,13 +49,13 @@ msgstr "取消"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CVersionUpdater.cpp:1571
-#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
-#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:195
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CVersionUpdater.cpp:1572
+#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
+#: Client/core/CVersionUpdater.cpp:1878 Client/core/CQuestionBox.cpp:195
 #: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1372
 #: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
 #: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:127
+#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
 msgid "Yes"
 msgstr "是"
 
@@ -223,10 +223,9 @@ msgstr "断开连接以取消下载"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:844
-#: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
-#: Client/loader/CInstallManager.cpp:629
+#: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
+#: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:849
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -649,7 +648,7 @@ msgstr "特别鸣谢"
 msgid "This software makes use of the following libraries and software:"
 msgstr "本软件利用以下程序库和软件:"
 
-#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:767
+#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:1031
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "由于驱动器 %s 没有足够的空间,MTA:SA 无法继续运行."
@@ -813,162 +812,162 @@ msgstr "意外的服务器响应 (1)"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "您选定的皮肤以及系统默认皮肤均无法载入，请重新安装 MTA 。"
 
-#: Client/core/CVersionUpdater.cpp:625
+#: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
 msgstr "正忙"
 
-#: Client/core/CVersionUpdater.cpp:625
+#: Client/core/CVersionUpdater.cpp:626
 msgid "Can't check for updates right now"
 msgstr "当前暂时无法检查更新"
 
-#: Client/core/CVersionUpdater.cpp:1566 Client/core/CVersionUpdater.cpp:1586
-#: Client/core/CVersionUpdater.cpp:1604
+#: Client/core/CVersionUpdater.cpp:1567 Client/core/CVersionUpdater.cpp:1587
+#: Client/core/CVersionUpdater.cpp:1605
 #, c-format
 msgid "MTA:SA %s required"
 msgstr "要求 MTA:SA %s"
 
-#: Client/core/CVersionUpdater.cpp:1567
+#: Client/core/CVersionUpdater.cpp:1568
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr "该服务器需要更高的 MTA:SA %s 版本.\n\n"
 "你希望下载并且安装 MTA:SA %s 吗?"
 
-#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
-#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
+#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
+#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
 #: Client/core/CQuestionBox.cpp:194 Client/core/CMainMenu.cpp:1147
 #: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
 #: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
 #: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:128
+#: Client/loader/Dialogs.cpp:132
 msgid "No"
 msgstr "否"
 
-#: Client/core/CVersionUpdater.cpp:1587
+#: Client/core/CVersionUpdater.cpp:1588
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
 msgstr "你希望启动 MTA:SA %s 并连接到此服务器吗 ?"
 
-#: Client/core/CVersionUpdater.cpp:1605
+#: Client/core/CVersionUpdater.cpp:1606
 msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
 msgstr "系统当前无法连接.\n\n"
 "请稍后再试."
 
-#: Client/core/CVersionUpdater.cpp:1787
+#: Client/core/CVersionUpdater.cpp:1788
 msgid "Connecting"
 msgstr "正在连接"
 
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
 msgid "Please wait..."
 msgstr "请稍候..."
 
-#: Client/core/CVersionUpdater.cpp:1803
+#: Client/core/CVersionUpdater.cpp:1804
 msgid "CHECKING"
 msgstr "检查中"
 
-#: Client/core/CVersionUpdater.cpp:1820 Client/core/CVersionUpdater.cpp:1913
+#: Client/core/CVersionUpdater.cpp:1821 Client/core/CVersionUpdater.cpp:1914
 msgid "UPDATE CHECK"
 msgstr "检查更新"
 
-#: Client/core/CVersionUpdater.cpp:1821
+#: Client/core/CVersionUpdater.cpp:1822
 msgid "No update needed"
 msgstr "无最新更新"
 
-#: Client/core/CVersionUpdater.cpp:1838
+#: Client/core/CVersionUpdater.cpp:1839
 msgid "DOWNLOADING"
 msgstr "下载中"
 
-#: Client/core/CVersionUpdater.cpp:1839
+#: Client/core/CVersionUpdater.cpp:1840
 msgid "waiting..."
 msgstr "正在等待..."
 
-#: Client/core/CVersionUpdater.cpp:1855
+#: Client/core/CVersionUpdater.cpp:1856
 msgid "MANDATORY UPDATE"
 msgstr "强制更新"
 
-#: Client/core/CVersionUpdater.cpp:1856
+#: Client/core/CVersionUpdater.cpp:1857
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
 msgstr "您需要更新MTA版本以登录该服务器.\n\n"
 "你想现在更新吗?"
 
-#: Client/core/CVersionUpdater.cpp:1874
+#: Client/core/CVersionUpdater.cpp:1875
 msgid "OPTIONAL UPDATE"
 msgstr "可选更新"
 
-#: Client/core/CVersionUpdater.cpp:1875
+#: Client/core/CVersionUpdater.cpp:1876
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
 msgstr "服务器称推荐更新版本, 但并不强制更新.\n\n"
 "你想现在更新吗 ?"
 
-#: Client/core/CVersionUpdater.cpp:1914
+#: Client/core/CVersionUpdater.cpp:1915
 msgid "Update not currently avalable.\n\n"
 "Please check www.mtasa.com"
 msgstr "当前无可用更新.\n\n"
 "详情查看 www.mtasa.com"
 
-#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
+#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
 msgstr "保存错误"
 
-#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
+#: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:2119
 msgid "Unable to create the file."
 msgstr "未能创建文件"
 
-#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:1953
-#: Client/core/CVersionUpdater.cpp:2126 Client/core/CVersionUpdater.cpp:2135
+#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:1954
+#: Client/core/CVersionUpdater.cpp:2127 Client/core/CVersionUpdater.cpp:2136
 msgid "ERROR DOWNLOADING"
 msgstr "下载错误"
 
-#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:2127
+#: Client/core/CVersionUpdater.cpp:1946 Client/core/CVersionUpdater.cpp:2128
 msgid "The downloaded file appears to be incorrect."
 msgstr "下载的文件校检不正确"
 
-#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:2136
+#: Client/core/CVersionUpdater.cpp:1955 Client/core/CVersionUpdater.cpp:2137
 msgid "For some reason."
 msgstr "由于某些原因."
 
-#: Client/core/CVersionUpdater.cpp:1965 Client/core/CVersionUpdater.cpp:2149
+#: Client/core/CVersionUpdater.cpp:1966 Client/core/CVersionUpdater.cpp:2150
 msgid "DOWNLOAD COMPLETE"
 msgstr "下载完毕"
 
-#: Client/core/CVersionUpdater.cpp:1989
+#: Client/core/CVersionUpdater.cpp:1990
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - 在 _DialogUpdateResult 出现未知错误"
 
-#: Client/core/CVersionUpdater.cpp:2080 Client/core/CSettings.cpp:4500
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4500
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "定制的 GTA:SA 文件"
 
-#: Client/core/CVersionUpdater.cpp:2087 Client/core/CVersionUpdater.cpp:2097
+#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
 msgid "Ok"
 msgstr "确定"
 
-#: Client/core/CVersionUpdater.cpp:2095
+#: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
 msgstr "错误"
 
-#: Client/core/CVersionUpdater.cpp:2096
+#: Client/core/CVersionUpdater.cpp:2097
 msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
 msgstr "部分 MTA:SA 数据文件已丢失.\n\n\n"
 "请重新安装 MTA:SA"
 
-#: Client/core/CVersionUpdater.cpp:2771
+#: Client/core/CVersionUpdater.cpp:2772
 #, c-format
 msgid "%3d %% completed"
 msgstr "%3d %% 完成"
 
-#: Client/core/CVersionUpdater.cpp:2773
+#: Client/core/CVersionUpdater.cpp:2774
 #, c-format
 msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "等待响应   -   %-3d"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "你希望查看一些与此问题相关的在线帮助吗?"
 
@@ -1506,7 +1505,7 @@ msgid "DPI aware"
 msgstr "DPI 感知"
 
 #: Client/core/CSettings.cpp:645 Client/core/CSettings.cpp:987
-#: Client/loader/MainFunctions.cpp:383
+#: Client/loader/MainFunctions.cpp:388
 msgid "Fullscreen mode:"
 msgstr "全屏模式:"
 
@@ -1515,7 +1514,7 @@ msgid "Standard"
 msgstr "标准"
 
 #: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1598
-#: Client/loader/MainFunctions.cpp:383
+#: Client/loader/MainFunctions.cpp:388
 msgid "Borderless window"
 msgstr "无边框窗口"
 
@@ -2279,8 +2278,8 @@ msgstr "请输入服务器密码"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
-#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
+#: Client/loader/MainFunctions.cpp:1221
 msgid "Information"
 msgstr "信息"
 
@@ -2416,7 +2415,7 @@ msgid "Back"
 msgstr "返回"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
-#: Client/loader/Dialogs.cpp:131
+#: Client/loader/Dialogs.cpp:135
 msgid "Help"
 msgstr "帮助"
 
@@ -2492,47 +2491,18 @@ msgstr "无法绑定局域网广播套接字 (LAN-broadcast socket)"
 msgid "Attempting to discover LAN servers"
 msgstr "正在尝试搜索局域网内的服务器"
 
-#: Client/loader/CExePatchedStatus.cpp:158
-msgid "Update Aero setting"
-msgstr "更新 Aero 设置"
-
-#: Client/loader/CExePatchedStatus.cpp:160
-msgid "Update Large Memory setting"
-msgstr "更新 大型内存设置"
-
-#: Client/loader/CExePatchedStatus.cpp:162
-msgid "Update DEP setting"
-msgstr "更新DEP数据执行保护设置"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Update graphics driver compliance"
-msgstr "更新显卡驱动依赖"
-
-#: Client/loader/CExePatchedStatus.cpp:166
-#: Client/loader/CExePatchedStatus.cpp:168
-msgid "Fix file issues"
-msgstr "修复文件问题"
-
-#: Client/loader/CExePatchedStatus.cpp:170
-msgid "Use proxy loader"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:171
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "复制主要的可执行文件以避免显卡驱动问题"
-
-#: Client/loader/Install.cpp:262
+#: Client/loader/Install.cpp:265
 msgid "Unknown"
 msgstr ""
 
-#: Client/loader/Install.cpp:269
+#: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
 msgstr ""
 
-#: Client/loader/Install.cpp:476
+#: Client/loader/Install.cpp:479
 #, c-format
 msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
@@ -2540,27 +2510,27 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:906
 msgid "Installing update..."
 msgstr "安装更新中..."
 
-#: Client/loader/Install.cpp:928 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:914
 msgid "Extracting files..."
 msgstr "解压文件中..."
 
-#: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
+#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:895
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "搜索Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:502 Client/loader/Dialogs.cpp:893
+#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:898
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "请启动Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:566
+#: Client/loader/Utils.cpp:593
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "请选择 侠盗猎车手:圣安地列斯的安装目录"
 
-#: Client/loader/Utils.cpp:935 Client/loader/CInstallManager.cpp:340
+#: Client/loader/Utils.cpp:962 Client/loader/CInstallManager.cpp:361
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2569,70 +2539,70 @@ msgstr "MTA:SA 需要管理员权限运行以下任务:\n\n"
 "     '%s'\n\n"
 "请在下一个窗口中确认指令."
 
-#: Client/loader/Utils.cpp:1036
+#: Client/loader/Utils.cpp:1063
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "在读取 %s 模块时出错! (%s)"
 
-#: Client/loader/Utils.cpp:1361 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:919
 msgid "Copying files..."
 msgstr "复制文件..."
 
-#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:924
 msgid "Copy finished early. Everything OK."
 msgstr "文件提前复制完毕.所有数据正常."
 
-#: Client/loader/Utils.cpp:1427 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:929
 msgid "Finishing..."
 msgstr "正在完成..."
 
-#: Client/loader/Utils.cpp:1429 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:933
 msgid "Done!"
 msgstr "已完成!"
 
-#: Client/loader/Utils.cpp:1469
+#: Client/loader/Utils.cpp:1496
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "检测到最近安装的 %s.\n\n"
 "你想把配置文件从%s复制到这里吗?"
 
-#: Client/loader/Utils.cpp:1508
+#: Client/loader/Utils.cpp:1535
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA 在打开 '%s' 文件时遇到问题."
 
-#: Client/loader/Utils.cpp:1530
+#: Client/loader/Utils.cpp:1557
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA 缺少 '%s' 文件."
 
-#: Client/loader/Utils.cpp:1555
+#: Client/loader/Utils.cpp:1582
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA 在加载模型文件时遇到问题."
 
-#: Client/loader/Utils.cpp:1557
+#: Client/loader/Utils.cpp:1584
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "如果您最近修改了gta3.img，请尝试重新安装GTA:SA。"
 
-#: Client/loader/Utils.cpp:1582
+#: Client/loader/Utils.cpp:1609
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA 在改装车辆时遇到问题."
 
-#: Client/loader/Utils.cpp:1601
+#: Client/loader/Utils.cpp:1628
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA 在以下文件找到错误 '%s'"
 
-#: Client/loader/Utils.cpp:1683
+#: Client/loader/Utils.cpp:1710
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "你在运行MTA:SA的时候重启电脑了吗?"
 
-#: Client/loader/Utils.cpp:1748
+#: Client/loader/Utils.cpp:1775
 msgid "Please terminate the following programs before continuing:"
 msgstr "请在运行前关闭以下程序:"
 
-#: Client/loader/MainFunctions.cpp:242
+#: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -2642,25 +2612,25 @@ msgstr "重启 MTA:SA 时出现问题\n\n"
 "结束 'gta_sa.exe' 和 'Multi Theft Auto.exe' 进程\n\n\n"
 "再次尝试启动 MTA:SA ?"
 
-#: Client/loader/MainFunctions.cpp:260
+#: Client/loader/MainFunctions.cpp:265
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "另外一个 MTA 正在运行.\n\n"
 "如果问题持续出现,请重启你的计算机"
 
-#: Client/loader/MainFunctions.cpp:263
+#: Client/loader/MainFunctions.cpp:268
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "另外一个 MTA 正在运行.\n\n"
 "你想要关闭它吗?"
 
-#: Client/loader/MainFunctions.cpp:288
+#: Client/loader/MainFunctions.cpp:293
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "在运行 MTA:SA 时出现问题?.\n\n"
 "你希望恢复到早期的版本吗?"
 
-#: Client/loader/MainFunctions.cpp:318
+#: Client/loader/MainFunctions.cpp:323
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -2668,38 +2638,38 @@ msgstr "启动 MTA:SA时似乎出现了一点问题.\n"
 "重设GTA内部设置有时候会修复这个问题.\n\n"
 "你希望重设GTA设置吗?"
 
-#: Client/loader/MainFunctions.cpp:333
+#: Client/loader/MainFunctions.cpp:338
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "GTA 游戏设置已被重设t.\n\n"
 "点击确认继续."
 
-#: Client/loader/MainFunctions.cpp:338
+#: Client/loader/MainFunctions.cpp:343
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "指定文件不允许删除: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:346
+#: Client/loader/MainFunctions.cpp:351
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "在运行MTA:SA?.时遇到问题了吗?\n\n"
 "您需要到选项里修改设置吗?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:382
+#: Client/loader/MainFunctions.cpp:387
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "您在运行MTA:SA?. 的时候出现问题了吗\n\n"
 "您需要修改以下设置吗?"
 
-#: Client/loader/MainFunctions.cpp:425
+#: Client/loader/MainFunctions.cpp:430
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "您在运行MTA:SA?. 的时候出现问题了吗\n\n"
 "尝试为GTA和MTA关闭以下产品："
 
-#: Client/loader/MainFunctions.cpp:459
+#: Client/loader/MainFunctions.cpp:464
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -2707,28 +2677,28 @@ msgstr "警告\n\n"
 "MTA:SA 检测出一些非正常活动.\n"
 "请运行杀毒软件以确保你的系统安全.\n\n"
 
-#: Client/loader/MainFunctions.cpp:462
+#: Client/loader/MainFunctions.cpp:467
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "监测到的文件为: %s\n"
 
-#: Client/loader/MainFunctions.cpp:596
+#: Client/loader/MainFunctions.cpp:601
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "侠盗猎车手: 圣安地列斯的进程已经在运行,MTA:SA需要关闭它才能启动.你想现在结束掉这个进程吗?"
 
-#: Client/loader/MainFunctions.cpp:603
+#: Client/loader/MainFunctions.cpp:608
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "无法关闭侠盗猎车手: 圣安地列斯. 如果问题仍继续出现, 请重新启动计算机"
 
-#: Client/loader/MainFunctions.cpp:626
+#: Client/loader/MainFunctions.cpp:631
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "注册键值丢失.请重新安装 MTA:SA."
 
-#: Client/loader/MainFunctions.cpp:632
+#: Client/loader/MainFunctions.cpp:637
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "侠盗猎车手: 圣安地列斯的路径包含不支持的字符(unicode)。请移动你的GTA: San Andrea到一个只包含标准ASCII字符的目录并且重新安装MTA:SA"
 
-#: Client/loader/MainFunctions.cpp:642
+#: Client/loader/MainFunctions.cpp:647
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
@@ -2738,275 +2708,292 @@ msgstr "您指定的 'MTA:SA' 或者 '侠盗猎车手: 圣安地列斯'的安装
 "如果您有过对付 MTA:SA 问题的经验,\n"
 "请移动你的安装目录到一个没有包含分号的目录."
 
-#: Client/loader/MainFunctions.cpp:808
+#: Client/loader/MainFunctions.cpp:813
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "载入失败.请确保你最新的数据文件已经正确安装"
 
-#: Client/loader/MainFunctions.cpp:817
+#: Client/loader/MainFunctions.cpp:822
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "载入失败.请确保 %s 已经正确安装"
 
-#: Client/loader/MainFunctions.cpp:824
+#: Client/loader/MainFunctions.cpp:829
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "载入失败. 无法在 %s 里定位 gta_sa.exe."
 
-#: Client/loader/MainFunctions.cpp:834
+#: Client/loader/MainFunctions.cpp:839
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "载入失败. %s 在GTA目录已经存在.请在继续前删除"
 
-#: Client/loader/MainFunctions.cpp:843
+#: Client/loader/MainFunctions.cpp:848
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "主文件含有错误名称(%s)"
 
-#: Client/loader/MainFunctions.cpp:854
+#: Client/loader/MainFunctions.cpp:859
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "主文件未被签名. 出现本问题有可能是病毒导致的.\n\n"
 "若MTA无法正常运行请查看在线帮助."
 
-#: Client/loader/MainFunctions.cpp:882
+#: Client/loader/MainFunctions.cpp:887
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:893
+#: Client/loader/MainFunctions.cpp:898
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:907
+#: Client/loader/MainFunctions.cpp:912
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ".asi 文件存在于 'MTA:SA' 或 '侠盗猎车手: 圣安地列斯' 的安装目录.\n\n"
 "如果运行MTA:SA时遇到了问题请删除这些 .asi 文件."
 
-#: Client/loader/MainFunctions.cpp:1012
+#: Client/loader/MainFunctions.cpp:1017
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "文件版本不匹配导致出错.如果游戏时遇到了问题请重新安装MTA:SA.\n"
 
-#: Client/loader/MainFunctions.cpp:1021
+#: Client/loader/MainFunctions.cpp:1026
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "缺少部分文件. 如果在游戏时遇到了问题请重新安装MTA:SA.\n"
 
-#: Client/loader/MainFunctions.cpp:1033
+#: Client/loader/MainFunctions.cpp:1038
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA 与Windows的安全模式不兼容.\n\n"
 "请重启你的电脑.\n"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1125
 msgid "Fix configuration issue"
 msgstr "修复配置文件问题"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1157
+#: Client/loader/MainFunctions.cpp:1159
 msgid "Fix elevation required error"
 msgstr "修复高程要求错误"
 
-#: Client/loader/MainFunctions.cpp:1164
+#: Client/loader/MainFunctions.cpp:1166
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "无法启动 GTA:SA.  请尝试重新启动, 如果问题持续存在,请联系 MTA, 地址为 www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:1221
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "侠盗猎车手: 圣安地列斯没有正常启动.你想要关闭它吗?"
 
-#: Client/loader/CInstallManager.cpp:355
+#: Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA 无法完成以下任务:\n\n"
 "'%s'\n"
 
-#: Client/loader/CInstallManager.cpp:405
+#: Client/loader/CInstallManager.cpp:426
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** 崩溃的原因为显卡错误 **\n\n"
 "** 请更新驱动 **"
 
-#: Client/loader/CInstallManager.cpp:511
+#: Client/loader/CInstallManager.cpp:532
 msgid "Install updated MTA:SA files"
 msgstr "安装已更新的 MTA:SA 文件"
 
-#: Client/loader/CInstallManager.cpp:531
+#: Client/loader/CInstallManager.cpp:552
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "本次更新由于文件冲突导致失败. 请关掉其他程序后再试"
 
-#: Client/loader/CInstallManager.cpp:540
+#: Client/loader/CInstallManager.cpp:561
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto 没有被正确安装, 请重新安装. %s"
 
-#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
+#: Client/loader/CInstallManager.cpp:613
+msgid "Create GTA:SA junctions"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:651
+msgid "MTA:SA cannot launch because the following files are incorrect:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:657 Client/loader/CInstallManager.cpp:689
+#: Client/loader/CInstallManager.cpp:697 Client/loader/CInstallManager.cpp:764
+#: Client/loader/CInstallManager.cpp:811 Client/loader/CInstallManager.cpp:830
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "MTA:SA 无法继续执行，因为以下文件不正确："
 
-#: Client/loader/CInstallManager.cpp:620
-msgid "Patch GTA"
-msgstr "重新修补GTA"
+#: Client/loader/CInstallManager.cpp:666
+msgid "Copy MTA:SA files"
+msgstr ""
 
-#: Client/loader/CInstallManager.cpp:823
+#: Client/loader/CInstallManager.cpp:771
+msgid "Patch GTA:SA dependency"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:818
+msgid "Generate GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:837 Client/loader/CInstallManager.cpp:857
+msgid "Patch GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:850
+msgid "MTA:SA cannot continue because patching GTA:SA has failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1087
 msgid "Missing file:"
 msgstr "缺少以下文件："
 
-#: Client/loader/CInstallManager.cpp:827
+#: Client/loader/CInstallManager.cpp:1091
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "若MTA加载失败，请重新安装GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:948
+#: Client/loader/CInstallManager.cpp:1126
 msgid "Update install settings"
 msgstr "更新安装设置"
 
-#: Client/loader/CInstallManager.cpp:1081
+#: Client/loader/CInstallManager.cpp:1259
 msgid "Update compatibility settings"
 msgstr "更新兼容性设置"
 
-#: Client/loader/CInstallManager.cpp:1109
-msgid "Move incompatible files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1125
-#: Client/loader/CInstallManager.cpp:1141
-msgid "Delete incompatible files"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:130
+#: Client/loader/Dialogs.cpp:134
 msgid "Quit"
 msgstr "退出"
 
-#: Client/loader/Dialogs.cpp:147
+#: Client/loader/Dialogs.cpp:151
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas 遇到了问题"
 
-#: Client/loader/Dialogs.cpp:148
+#: Client/loader/Dialogs.cpp:152
 msgid "Crash information"
 msgstr "崩溃信息"
 
-#: Client/loader/Dialogs.cpp:149
+#: Client/loader/Dialogs.cpp:153
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "勾选本选项以使用‘互联网’将本崩溃信息发送到MTA开发团队"
 
-#: Client/loader/Dialogs.cpp:150
+#: Client/loader/Dialogs.cpp:154
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "这样做可以增加修复此崩溃的机会。"
 
-#: Client/loader/Dialogs.cpp:151
+#: Client/loader/Dialogs.cpp:155
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "您想要重新启动MTA: San Andreas 吗?"
 
-#: Client/loader/Dialogs.cpp:158
+#: Client/loader/Dialogs.cpp:162
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - 警告"
 
-#: Client/loader/Dialogs.cpp:159
+#: Client/loader/Dialogs.cpp:163
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:161
+#: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:163
+#: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:164
+#: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:165
+#: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:166
+#: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:167
+#: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
 msgstr "启动 MTA:SA"
 
-#: Client/loader/Dialogs.cpp:173
+#: Client/loader/Dialogs.cpp:177
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - 不明确的选项"
 
-#: Client/loader/Dialogs.cpp:174
+#: Client/loader/Dialogs.cpp:178
 msgid "NVidia Optimus detected!"
 msgstr "检测到显卡支持NVidia Optimus技术!"
 
-#: Client/loader/Dialogs.cpp:175
+#: Client/loader/Dialogs.cpp:179
 msgid "Try each option and see what works:"
 msgstr "尝试每一个选项再看哪种模式可以正常运行:"
 
-#: Client/loader/Dialogs.cpp:176
+#: Client/loader/Dialogs.cpp:180
 msgid "A - Standard NVidia"
 msgstr "A - 标准 NVidia 模式"
 
-#: Client/loader/Dialogs.cpp:177
+#: Client/loader/Dialogs.cpp:181
 msgid "B - Alternate NVidia"
 msgstr "B - 备用 NVidia 模式"
 
-#: Client/loader/Dialogs.cpp:178
+#: Client/loader/Dialogs.cpp:182
 msgid "C - Standard NVidia with exe rename"
 msgstr "C - 标准NVidia及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:179
+#: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate NVidia with exe rename"
 msgstr "D - 备用NVidia及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:180
+#: Client/loader/Dialogs.cpp:184
 msgid "E - Standard Intel"
 msgstr "E - 标准Intel模式"
 
-#: Client/loader/Dialogs.cpp:181
+#: Client/loader/Dialogs.cpp:185
 msgid "F - Alternate Intel"
 msgstr "F - 备用Intel模式"
 
-#: Client/loader/Dialogs.cpp:182
+#: Client/loader/Dialogs.cpp:186
 msgid "G - Standard Intel with exe rename"
 msgstr "G - 标准Intel及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:183
+#: Client/loader/Dialogs.cpp:187
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - 备用Intel及重命名exe模式"
 
-#: Client/loader/Dialogs.cpp:184
+#: Client/loader/Dialogs.cpp:188
 msgid "If you get desperate, this might help:"
 msgstr "如果以上模式都没法玩让你痛不欲生, 这个模式或许能拯救你:"
 
-#: Client/loader/Dialogs.cpp:185
+#: Client/loader/Dialogs.cpp:189
 msgid "If you have already selected an option that works, this might help:"
 msgstr "如果您已经选择了一个有效的选项，这可能会有所帮助："
 
-#: Client/loader/Dialogs.cpp:186
+#: Client/loader/Dialogs.cpp:190
 msgid "Force windowed mode"
 msgstr "强制窗口化模式"
 
-#: Client/loader/Dialogs.cpp:187
+#: Client/loader/Dialogs.cpp:191
 msgid "Don't show again"
 msgstr "不再显示"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:198 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:195
+#: Client/loader/Dialogs.cpp:199
 msgid "Warning: Could not detect anti-virus product"
 msgstr "警告:没有检测出反病毒软件"
 
-#: Client/loader/Dialogs.cpp:197
+#: Client/loader/Dialogs.cpp:201
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -3014,11 +3001,11 @@ msgstr "MTA 没有在当前计算机检测出反病毒软件.\n\n"
 "计算机病毒会影响 MTA 以及降低你的游戏体验\n\n"
 "点击 '帮助' 以获得更多信息."
 
-#: Client/loader/Dialogs.cpp:200
+#: Client/loader/Dialogs.cpp:204
 msgid "I have already installed an anti-virus"
 msgstr "我已安装杀毒软件"
 
-#: Client/loader/Dialogs.cpp:202
+#: Client/loader/Dialogs.cpp:206
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "朕才不安装反病毒软件.\n"
@@ -3076,7 +3063,7 @@ msgstr "连接错误"
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto 没有被正确安装. 请重新安装"
 
-#: Shared/sdk/SharedUtil.Misc.hpp:704
+#: Shared/sdk/SharedUtil.Misc.hpp:702
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "你的浏览器将会显示一个带有帮助信息的网页\n\n"
