@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-08 19:09+0000\n"
-"PO-Revision-Date: 2023-02-08 20:08\n"
+"POT-Creation-Date: 2023-02-08 20:34+0000\n"
+"PO-Revision-Date: 2023-02-08 21:07\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -224,7 +224,7 @@ msgstr "Avbryt anslutning för att avbryta nedladdning"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
-#: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:849
+#: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
@@ -2279,7 +2279,7 @@ msgstr "VÄNLIGEN SKRIV SERVERLÖSENORDET"
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
-#: Client/loader/MainFunctions.cpp:1221
+#: Client/loader/MainFunctions.cpp:1215
 msgid "Information"
 msgstr ""
 
@@ -2710,87 +2710,87 @@ msgstr "Sökvägen till din installation av 'MTA:SA' eller 'GTA: San Andreas'\n"
 " Om du får problem när du kör MTA:SA,\n"
 " flytta din(a) installation(er) till en sökväg som ej innehåller ett semikolon."
 
-#: Client/loader/MainFunctions.cpp:813
+#: Client/loader/MainFunctions.cpp:809
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Initiering misslyckades. Försäkra dig om att de senaste datafilerna installerats korrekt."
 
-#: Client/loader/MainFunctions.cpp:822
+#: Client/loader/MainFunctions.cpp:818
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Initiering misslyckades. Försäkra dig om att %s är installerat korrekt."
 
-#: Client/loader/MainFunctions.cpp:829
+#: Client/loader/MainFunctions.cpp:825
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Initiering misslyckades. gta_sa.exe kunde inte hittas i %s."
 
-#: Client/loader/MainFunctions.cpp:839
+#: Client/loader/MainFunctions.cpp:835
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Initiering misslyckades. %s finns i GTA sökvägen. Ta bort innan du fortsätter."
 
-#: Client/loader/MainFunctions.cpp:848
+#: Client/loader/MainFunctions.cpp:844
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Huvudfilen har ett felaktigt namn (%s)"
 
-#: Client/loader/MainFunctions.cpp:859
+#: Client/loader/MainFunctions.cpp:855
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Huvudfilen är osignerad. Möjlig virusaktivitet.\n\n"
 "Se onlinehjälp om MTA inte fungerar korrekt."
 
-#: Client/loader/MainFunctions.cpp:887
+#: Client/loader/MainFunctions.cpp:881
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:898
+#: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:912
+#: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr ".asi filer finns i katalogen \"MTA: SA\" eller \"GTA: San Andreas\".\n\n"
 "Ta bort dessa .asi-filer om du har problem med MTA: SA."
 
-#: Client/loader/MainFunctions.cpp:1017
+#: Client/loader/MainFunctions.cpp:1011
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Felaktigt fel i filversionen. Installera om MTA: SA om du upplever problem.\n"
 
-#: Client/loader/MainFunctions.cpp:1026
+#: Client/loader/MainFunctions.cpp:1020
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Vissa filer saknas. Installera om MTA: SA om du upplever problem.\n"
 
-#: Client/loader/MainFunctions.cpp:1038
+#: Client/loader/MainFunctions.cpp:1032
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA: SA är inte kompatibel med Windows Säkert läge.\n\n"
 "Vänligen starta om datorn.\n"
 
-#: Client/loader/MainFunctions.cpp:1125
+#: Client/loader/MainFunctions.cpp:1119
 msgid "Fix configuration issue"
 msgstr "Lös konfigurationsproblem"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1159
+#: Client/loader/MainFunctions.cpp:1153
 msgid "Fix elevation required error"
 msgstr "Fixa höjning krävs fel"
 
-#: Client/loader/MainFunctions.cpp:1166
+#: Client/loader/MainFunctions.cpp:1160
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Kunde inte starta Grand Theft Auto: San Andreas.  Prova att starta om, eller om problemet kvarstår, kontakta MTA på www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1221
+#: Client/loader/MainFunctions.cpp:1215
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas har kanske inte startats korrekt. Vill du avsluta det?"
 
