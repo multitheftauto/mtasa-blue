@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-04 17:04+0000\n"
-"PO-Revision-Date: 2023-02-04 17:35\n"
+"POT-Creation-Date: 2023-02-08 19:09+0000\n"
+"PO-Revision-Date: 2023-02-08 20:07\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -24,22 +24,22 @@ msgstr "Problemă cu placa grafică"
 
 #. Create buttons
 #. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CVersionUpdater.cpp:1606
-#: Client/core/CVersionUpdater.cpp:1822 Client/core/CVersionUpdater.cpp:1915
-#: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:1955
-#: Client/core/CVersionUpdater.cpp:1967 Client/core/CVersionUpdater.cpp:2119
-#: Client/core/CVersionUpdater.cpp:2128 Client/core/CVersionUpdater.cpp:2137
-#: Client/core/CVersionUpdater.cpp:2151 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4695 Client/loader/Dialogs.cpp:129
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4695 Client/loader/Dialogs.cpp:133
 msgid "OK"
 msgstr "OK"
 
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
-#: Client/core/CVersionUpdater.cpp:1840 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:132
+#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
+#: Client/core/CVersionUpdater.cpp:1841 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:136
 msgid "Cancel"
 msgstr "Anulează"
 
@@ -49,13 +49,13 @@ msgstr "Anulează"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CVersionUpdater.cpp:1571
-#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
-#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:195
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CVersionUpdater.cpp:1572
+#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
+#: Client/core/CVersionUpdater.cpp:1878 Client/core/CQuestionBox.cpp:195
 #: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1372
 #: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
 #: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:127
+#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
 msgid "Yes"
 msgstr "Da"
 
@@ -223,10 +223,9 @@ msgstr "Deconectează-te pentru a anula descărcarea"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/loader/MainFunctions.cpp:246 Client/loader/MainFunctions.cpp:261
-#: Client/loader/MainFunctions.cpp:263 Client/loader/MainFunctions.cpp:844
-#: Client/loader/CInstallManager.cpp:531 Client/loader/CInstallManager.cpp:540
-#: Client/loader/CInstallManager.cpp:629
+#: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
+#: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:849
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -657,7 +656,7 @@ msgstr "Mulțumiri speciale"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Acest software se folosește de următoarele:"
 
-#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:767
+#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:1031
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA nu poate continua deoarece partiţia %s nu are destul spaţiu."
@@ -821,162 +820,162 @@ msgstr "Răspuns invalid de la server (1)"
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
 msgstr "Tema selectată de tine nu a putut fi încărcată, iar tema implicită nu a putut fi nici ea încărcată, te rugăm reinstalează MTA."
 
-#: Client/core/CVersionUpdater.cpp:625
+#: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
 msgstr "Ocupat"
 
-#: Client/core/CVersionUpdater.cpp:625
+#: Client/core/CVersionUpdater.cpp:626
 msgid "Can't check for updates right now"
 msgstr "Nu se poate verifica pentru actualizări acum"
 
-#: Client/core/CVersionUpdater.cpp:1566 Client/core/CVersionUpdater.cpp:1586
-#: Client/core/CVersionUpdater.cpp:1604
+#: Client/core/CVersionUpdater.cpp:1567 Client/core/CVersionUpdater.cpp:1587
+#: Client/core/CVersionUpdater.cpp:1605
 #, c-format
 msgid "MTA:SA %s required"
 msgstr "MTA:SA %s necesar"
 
-#: Client/core/CVersionUpdater.cpp:1567
+#: Client/core/CVersionUpdater.cpp:1568
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
 msgstr "O versiune mai actuală de MTA:SA %s este necesară pentru a juca pe serverul selectat.\n\n"
 "Ești sigur că vrei să descarci și să instalezi MTA:SA %s?"
 
-#: Client/core/CVersionUpdater.cpp:1570 Client/core/CVersionUpdater.cpp:1588
-#: Client/core/CVersionUpdater.cpp:1857 Client/core/CVersionUpdater.cpp:1876
+#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
+#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
 #: Client/core/CQuestionBox.cpp:194 Client/core/CMainMenu.cpp:1147
 #: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
 #: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
 #: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:128
+#: Client/loader/Dialogs.cpp:132
 msgid "No"
 msgstr "Nu"
 
-#: Client/core/CVersionUpdater.cpp:1587
+#: Client/core/CVersionUpdater.cpp:1588
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
 msgstr "Vrei să pornești MTA:SA %s și să te conectezi la acest server?"
 
-#: Client/core/CVersionUpdater.cpp:1605
+#: Client/core/CVersionUpdater.cpp:1606
 msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
 msgstr "Nu este posibil să te conectezi în acest moment.\n\n"
 "Încearcă mai târziu."
 
-#: Client/core/CVersionUpdater.cpp:1787
+#: Client/core/CVersionUpdater.cpp:1788
 msgid "Connecting"
 msgstr "Se conectează"
 
-#: Client/core/CVersionUpdater.cpp:1788 Client/core/CVersionUpdater.cpp:1804
+#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
 msgid "Please wait..."
 msgstr "Așteaptă..."
 
-#: Client/core/CVersionUpdater.cpp:1803
+#: Client/core/CVersionUpdater.cpp:1804
 msgid "CHECKING"
 msgstr "SE VERIFICĂ"
 
-#: Client/core/CVersionUpdater.cpp:1820 Client/core/CVersionUpdater.cpp:1913
+#: Client/core/CVersionUpdater.cpp:1821 Client/core/CVersionUpdater.cpp:1914
 msgid "UPDATE CHECK"
 msgstr "VERIFICARE ACTUALIZARE"
 
-#: Client/core/CVersionUpdater.cpp:1821
+#: Client/core/CVersionUpdater.cpp:1822
 msgid "No update needed"
 msgstr "Nicio actualizare nu este necesară"
 
-#: Client/core/CVersionUpdater.cpp:1838
+#: Client/core/CVersionUpdater.cpp:1839
 msgid "DOWNLOADING"
 msgstr "SE DESCARCĂ"
 
-#: Client/core/CVersionUpdater.cpp:1839
+#: Client/core/CVersionUpdater.cpp:1840
 msgid "waiting..."
 msgstr "se așteaptă..."
 
-#: Client/core/CVersionUpdater.cpp:1855
+#: Client/core/CVersionUpdater.cpp:1856
 msgid "MANDATORY UPDATE"
 msgstr "ACTUALIZARE OBLIGATORIE"
 
-#: Client/core/CVersionUpdater.cpp:1856
+#: Client/core/CVersionUpdater.cpp:1857
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
 msgstr "Pentru a juca pe acest server trebuie să actualizezi MTA.\n\n"
 "Dorești să actualizezi acum?"
 
-#: Client/core/CVersionUpdater.cpp:1874
+#: Client/core/CVersionUpdater.cpp:1875
 msgid "OPTIONAL UPDATE"
 msgstr "ACTUALIZARE OPȚIONALĂ"
 
-#: Client/core/CVersionUpdater.cpp:1875
+#: Client/core/CVersionUpdater.cpp:1876
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
 msgstr "Serverul spune că o actualizare este recomandată, dar nu necesară.\n\n"
 "Dorești să actualizezi acum?"
 
-#: Client/core/CVersionUpdater.cpp:1914
+#: Client/core/CVersionUpdater.cpp:1915
 msgid "Update not currently avalable.\n\n"
 "Please check www.mtasa.com"
 msgstr "Actualizarea nu este disponibilă momentan.\n\n"
 "Vă rugăm verificați www.mtasa.com"
 
-#: Client/core/CVersionUpdater.cpp:1935 Client/core/CVersionUpdater.cpp:2117
+#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
 msgstr "EROARE SALVARE"
 
-#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
+#: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:2119
 msgid "Unable to create the file."
 msgstr "Nu s-a putut crea fișierul."
 
-#: Client/core/CVersionUpdater.cpp:1944 Client/core/CVersionUpdater.cpp:1953
-#: Client/core/CVersionUpdater.cpp:2126 Client/core/CVersionUpdater.cpp:2135
+#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:1954
+#: Client/core/CVersionUpdater.cpp:2127 Client/core/CVersionUpdater.cpp:2136
 msgid "ERROR DOWNLOADING"
 msgstr "EROARE DESCĂRCARE"
 
-#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:2127
+#: Client/core/CVersionUpdater.cpp:1946 Client/core/CVersionUpdater.cpp:2128
 msgid "The downloaded file appears to be incorrect."
 msgstr "Fișierul descărcat pare să fie incorect."
 
-#: Client/core/CVersionUpdater.cpp:1954 Client/core/CVersionUpdater.cpp:2136
+#: Client/core/CVersionUpdater.cpp:1955 Client/core/CVersionUpdater.cpp:2137
 msgid "For some reason."
 msgstr "Dintr-un anumit motiv."
 
-#: Client/core/CVersionUpdater.cpp:1965 Client/core/CVersionUpdater.cpp:2149
+#: Client/core/CVersionUpdater.cpp:1966 Client/core/CVersionUpdater.cpp:2150
 msgid "DOWNLOAD COMPLETE"
 msgstr "DESCĂRCARE COMPLETĂ"
 
-#: Client/core/CVersionUpdater.cpp:1989
+#: Client/core/CVersionUpdater.cpp:1990
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - Problemă necunoscută în _DialogUpdateResult"
 
-#: Client/core/CVersionUpdater.cpp:2080 Client/core/CSettings.cpp:4500
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4500
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "FIȘIERE GTA:SA MODIFICATE"
 
-#: Client/core/CVersionUpdater.cpp:2087 Client/core/CVersionUpdater.cpp:2097
+#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
 msgid "Ok"
 msgstr "Ok"
 
-#: Client/core/CVersionUpdater.cpp:2095
+#: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
 msgstr "EROARE"
 
-#: Client/core/CVersionUpdater.cpp:2096
+#: Client/core/CVersionUpdater.cpp:2097
 msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
 msgstr "Unele fișiere MTA:SA lipsesc.\n\n\n"
 "Te rugăm să reinstalezi MTA:SA"
 
-#: Client/core/CVersionUpdater.cpp:2771
+#: Client/core/CVersionUpdater.cpp:2772
 #, c-format
 msgid "%3d %% completed"
 msgstr "%3d%% complet"
 
-#: Client/core/CVersionUpdater.cpp:2773
+#: Client/core/CVersionUpdater.cpp:2774
 #, c-format
 msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Se așteaptă un răspuns - %-3d"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:690
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Doriți ajutor online pentru această problemă ?"
 
@@ -1514,7 +1513,7 @@ msgid "DPI aware"
 msgstr "DPI aware"
 
 #: Client/core/CSettings.cpp:645 Client/core/CSettings.cpp:987
-#: Client/loader/MainFunctions.cpp:383
+#: Client/loader/MainFunctions.cpp:388
 msgid "Fullscreen mode:"
 msgstr "Mod ecran complet:"
 
@@ -1523,7 +1522,7 @@ msgid "Standard"
 msgstr "Standard"
 
 #: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1598
-#: Client/loader/MainFunctions.cpp:383
+#: Client/loader/MainFunctions.cpp:388
 msgid "Borderless window"
 msgstr "Fereastră fără margini"
 
@@ -2287,8 +2286,8 @@ msgstr "INTRODU PAROLA SERVERULUI"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
-#: Client/loader/MainFunctions.cpp:597 Client/loader/MainFunctions.cpp:604
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
+#: Client/loader/MainFunctions.cpp:1221
 msgid "Information"
 msgstr "Informaţii"
 
@@ -2424,7 +2423,7 @@ msgid "Back"
 msgstr "Înapoi"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
-#: Client/loader/Dialogs.cpp:131
+#: Client/loader/Dialogs.cpp:135
 msgid "Help"
 msgstr "Ajutor"
 
@@ -2504,47 +2503,18 @@ msgstr "Nu se poate atașa socketul LAN-broadcast"
 msgid "Attempting to discover LAN servers"
 msgstr "Se încearcă descoperirea serverelor LAN"
 
-#: Client/loader/CExePatchedStatus.cpp:158
-msgid "Update Aero setting"
-msgstr "Actualizează setarea Aero"
-
-#: Client/loader/CExePatchedStatus.cpp:160
-msgid "Update Large Memory setting"
-msgstr "Actualizează setarea memoriei largi"
-
-#: Client/loader/CExePatchedStatus.cpp:162
-msgid "Update DEP setting"
-msgstr "Actualizează setarea DEP"
-
-#: Client/loader/CExePatchedStatus.cpp:164
-msgid "Update graphics driver compliance"
-msgstr "Actualizează conformitatea driverului grafic"
-
-#: Client/loader/CExePatchedStatus.cpp:166
-#: Client/loader/CExePatchedStatus.cpp:168
-msgid "Fix file issues"
-msgstr "Repară problemele fișierelor"
-
-#: Client/loader/CExePatchedStatus.cpp:170
-msgid "Use proxy loader"
-msgstr ""
-
-#: Client/loader/CExePatchedStatus.cpp:171
-msgid "Copy main executable to avoid graphic driver issues"
-msgstr "Copiază executabilul principal pentru a evita probleme cu driverul grafic"
-
-#: Client/loader/Install.cpp:262
+#: Client/loader/Install.cpp:265
 msgid "Unknown"
 msgstr ""
 
-#: Client/loader/Install.cpp:269
+#: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
 msgstr ""
 
-#: Client/loader/Install.cpp:476
+#: Client/loader/Install.cpp:479
 #, c-format
 msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
@@ -2552,27 +2522,27 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:846 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:906
 msgid "Installing update..."
 msgstr "Se instalează actualizarea..."
 
-#: Client/loader/Install.cpp:928 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:914
 msgid "Extracting files..."
 msgstr "Se extrag fișierele..."
 
-#: Client/loader/Utils.cpp:500 Client/loader/Dialogs.cpp:890
+#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:895
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Se caută Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:502 Client/loader/Dialogs.cpp:893
+#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:898
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Te rugăm lansează Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:566
+#: Client/loader/Utils.cpp:593
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Selectează directorul de instalare al Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:935 Client/loader/CInstallManager.cpp:340
+#: Client/loader/Utils.cpp:962 Client/loader/CInstallManager.cpp:361
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2581,70 +2551,70 @@ msgstr "MTA:SA necesită acces de administrator pentru următoarea sarcină:\n\n
 "'%s'\n\n"
 "Te rugăm confirmă în fereastra următoare."
 
-#: Client/loader/Utils.cpp:1036
+#: Client/loader/Utils.cpp:1063
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Eroare la încărcarea modulului %s! (%s)"
 
-#: Client/loader/Utils.cpp:1361 Client/loader/Dialogs.cpp:914
+#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:919
 msgid "Copying files..."
 msgstr "Se copiază fișierele..."
 
-#: Client/loader/Utils.cpp:1421 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:924
 msgid "Copy finished early. Everything OK."
 msgstr "Copierea s-a terminat rapid. Totul este OK."
 
-#: Client/loader/Utils.cpp:1427 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:929
 msgid "Finishing..."
 msgstr "Se finalizează..."
 
-#: Client/loader/Utils.cpp:1429 Client/loader/Dialogs.cpp:928
+#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:933
 msgid "Done!"
 msgstr "Finalizat!"
 
-#: Client/loader/Utils.cpp:1469
+#: Client/loader/Utils.cpp:1496
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "O nouă instalare a %s a fost detectată.\n\n"
 "Dorești să copiezi setările din %s?"
 
-#: Client/loader/Utils.cpp:1508
+#: Client/loader/Utils.cpp:1535
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA a întâmpinat probleme la deschiderea fișierului '%s'"
 
-#: Client/loader/Utils.cpp:1530
+#: Client/loader/Utils.cpp:1557
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA duce lipsă de fișierul '%s'."
 
-#: Client/loader/Utils.cpp:1555
+#: Client/loader/Utils.cpp:1582
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA a întâmpinat probleme la încărcarea unui model."
 
-#: Client/loader/Utils.cpp:1557
+#: Client/loader/Utils.cpp:1584
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Dacă ați modificat recent gta3.img, încercați să reinstalați GTA:SA."
 
-#: Client/loader/Utils.cpp:1582
+#: Client/loader/Utils.cpp:1609
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA a întâmpinat probleme la adăugarea de îmbunătățiri unui vehicul."
 
-#: Client/loader/Utils.cpp:1601
+#: Client/loader/Utils.cpp:1628
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA a găsit erori în fișierul '%s'"
 
-#: Client/loader/Utils.cpp:1683
+#: Client/loader/Utils.cpp:1710
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "S-a restartat calculatorul tău în timp ce jucai MTA:SA?"
 
-#: Client/loader/Utils.cpp:1748
+#: Client/loader/Utils.cpp:1775
 msgid "Please terminate the following programs before continuing:"
 msgstr "Te rugăm închide următoarele programe înainte de a continua:"
 
-#: Client/loader/MainFunctions.cpp:242
+#: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -2654,25 +2624,25 @@ msgstr "A apărut o problemă la repornirea MTA:SA\n\n"
 "oprește procesele 'gta_sa.exe' și 'Multi Theft Auto.exe'.\n\n\n"
 "Încearcă să relansezi MTA:SA?"
 
-#: Client/loader/MainFunctions.cpp:260
+#: Client/loader/MainFunctions.cpp:265
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "O altă instanță a MTA rulează deja.\n\n"
 "Dacă această problemă persistă, te rugăm restartează-ți calculatorul"
 
-#: Client/loader/MainFunctions.cpp:263
+#: Client/loader/MainFunctions.cpp:268
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "O altă instanță a MTA rulează deja.\n\n"
 "Dorești să o închizi?"
 
-#: Client/loader/MainFunctions.cpp:288
+#: Client/loader/MainFunctions.cpp:293
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "Ai probleme la rularea MTA:SA?\n\n"
 "Vrei să revi la o versiune anterioară?"
 
-#: Client/loader/MainFunctions.cpp:318
+#: Client/loader/MainFunctions.cpp:323
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -2680,38 +2650,38 @@ msgstr "Se pare că o problemă împiedică lansarea MTA:SA.\n"
 "Restabilirea setărilor inițiale a GTA poate rezolva uneori problema.\n\n"
 "Vrei să restabilești setările GTA acum?"
 
-#: Client/loader/MainFunctions.cpp:333
+#: Client/loader/MainFunctions.cpp:338
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "Setările GTA au fost restabilite.\n\n"
 "Apasă OK pentru a continua."
 
-#: Client/loader/MainFunctions.cpp:338
+#: Client/loader/MainFunctions.cpp:343
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Fișierul nu a putut fi șters: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:346
+#: Client/loader/MainFunctions.cpp:351
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "Ai probleme la rularea MTA:SA?\n\n"
 "Vrei să vezi niște ajutor on-line?"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:382
+#: Client/loader/MainFunctions.cpp:387
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "Aveți probleme atunci când rulați MTA:SA?\n\n"
 "Doriți să schimbați următoarele setări?"
 
-#: Client/loader/MainFunctions.cpp:425
+#: Client/loader/MainFunctions.cpp:430
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "Aveți probleme atunci când rulați MTA:SA?\n\n"
 "Încercați să dezactivați următoarele produse pentru GTA și MTA:"
 
-#: Client/loader/MainFunctions.cpp:459
+#: Client/loader/MainFunctions.cpp:464
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -2719,28 +2689,28 @@ msgstr "AVERTISMENT\n\n"
 "MTA:SA a detectat activități neobișnuite.\n"
 "Te rugăm rulează o scanare de detectare a virușilor pentru a te asigura că sistemul tău este în siguranță.\n\n"
 
-#: Client/loader/MainFunctions.cpp:462
+#: Client/loader/MainFunctions.cpp:467
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "Fișierul detectat a fost: %s\n"
 
-#: Client/loader/MainFunctions.cpp:596
+#: Client/loader/MainFunctions.cpp:601
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "O instanță a GTA: San Andreas rulează deja. Ea trebuie închisă înainte ca MTA:SA să file lansat. Vrei să o închizi acum?"
 
-#: Client/loader/MainFunctions.cpp:603
+#: Client/loader/MainFunctions.cpp:608
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "GTA: San Andreas nu poate fi închis. Dacă problema persistă te rugăm restartează-ți calculatorul."
 
-#: Client/loader/MainFunctions.cpp:626
+#: Client/loader/MainFunctions.cpp:631
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Intrările din registru lipsesc. Te rugăm reinstalează Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:632
+#: Client/loader/MainFunctions.cpp:637
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "Calea către dosarul tău cu instalarea GTA: San Andreas conține caractere nesuportate (unicode). Te rugăm mută instalarea Grand Theft Auto: San Andreas într-un loc compatibil care conține numai caractere standard de tip ASCII și reinstalează Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:642
+#: Client/loader/MainFunctions.cpp:647
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
@@ -2750,276 +2720,293 @@ msgstr "Calea către instalarea MTA: San Andreas sau instalarea GTA: San Andreas
 "Dacă întâmpinați probleme în timpul rulării MTA:SA,\n"
 "mutați-vă instalarea sau instalările într-un loc care nu conține acest simbol."
 
-#: Client/loader/MainFunctions.cpp:808
+#: Client/loader/MainFunctions.cpp:813
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Încărcarea a eșuat. Te rugăm asigură-te că ultimele fișiere cu date au fost instalate corect."
 
-#: Client/loader/MainFunctions.cpp:817
+#: Client/loader/MainFunctions.cpp:822
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Încărcarea a eșuat. Te rugăm asigură-te că %s este instalat corect."
 
-#: Client/loader/MainFunctions.cpp:824
+#: Client/loader/MainFunctions.cpp:829
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Încărcarea a eșuat. Nu s-a putut găsi 'gta_sa.exe' în %s."
 
-#: Client/loader/MainFunctions.cpp:834
+#: Client/loader/MainFunctions.cpp:839
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Încărcarea a eșuat. %s se află în directorul GTA. Te rugăm șterge-l înainte de a continua."
 
-#: Client/loader/MainFunctions.cpp:843
+#: Client/loader/MainFunctions.cpp:848
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Fișierul principal are un nume incorect (%s)"
 
-#: Client/loader/MainFunctions.cpp:854
+#: Client/loader/MainFunctions.cpp:859
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Fișierul principal este nesemnat. Posibilă activitate a virușilor.\n\n"
 "Vezi ajutor on-line dacă MTA nu funcționează corect."
 
-#: Client/loader/MainFunctions.cpp:882
+#: Client/loader/MainFunctions.cpp:887
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:893
+#: Client/loader/MainFunctions.cpp:898
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:907
+#: Client/loader/MainFunctions.cpp:912
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "S-au găsit fișiere .asi în directorul de instalare al MTA: San Andreas sau al GTA: San Andreas.\n\n"
 "Șterge aceste fișiere .asi dacă întâmpini probleme cu MTA:SA."
 
-#: Client/loader/MainFunctions.cpp:1012
+#: Client/loader/MainFunctions.cpp:1017
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Eroare de nepotrivire a versiunilor fișierelor. Reinstalează MTA:SA dacă întâmpini probleme.\n"
 
-#: Client/loader/MainFunctions.cpp:1021
+#: Client/loader/MainFunctions.cpp:1026
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Unele fișiere lipsesc. Reinstalează MTA:SA dacă întâmpini probleme.\n"
 
-#: Client/loader/MainFunctions.cpp:1033
+#: Client/loader/MainFunctions.cpp:1038
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA nu este compatibil cu Windows 'Safe Mode'.\n\n"
 "Vă rugăm să reporniți computerul.\n"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1125
 msgid "Fix configuration issue"
 msgstr "Repară problema de configurare"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1157
+#: Client/loader/MainFunctions.cpp:1159
 msgid "Fix elevation required error"
 msgstr "Remediați eroarea de elevație"
 
-#: Client/loader/MainFunctions.cpp:1164
+#: Client/loader/MainFunctions.cpp:1166
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Nu s-a putut porni Grand Theft Auto: San Andreas. Te rugăm încearcă să-ți restartezi calculatorul sau dacă problema persistă, să contactezi MTA la www.multitheftauto.com.\n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1219
+#: Client/loader/MainFunctions.cpp:1221
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Se poate ca GTA: San Andreas să nu fi fost lansat corect. Vrei să îl închizi?"
 
-#: Client/loader/CInstallManager.cpp:355
+#: Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA nu a reușit să termine următoarea sarcină:\n\n"
 "'%s'\n"
 
-#: Client/loader/CInstallManager.cpp:405
+#: Client/loader/CInstallManager.cpp:426
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Crashul a fost provocat de o eroare a driverului grafic **\n\n"
 "** Te rugăm actualizează-ți driverele grafice **"
 
-#: Client/loader/CInstallManager.cpp:511
+#: Client/loader/CInstallManager.cpp:532
 msgid "Install updated MTA:SA files"
 msgstr "Instalează fișierele MTA:SA actualizate"
 
-#: Client/loader/CInstallManager.cpp:531
+#: Client/loader/CInstallManager.cpp:552
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Nu s-a putut actualiza datorită conflictelor fișierelor. Te rugăm închide celelalte aplicații și reîncearcă"
 
-#: Client/loader/CInstallManager.cpp:540
+#: Client/loader/CInstallManager.cpp:561
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto nu a fost instalat corespunzător, te rugăm reinstalează-l. %s"
 
-#: Client/loader/CInstallManager.cpp:595 Client/loader/CInstallManager.cpp:627
+#: Client/loader/CInstallManager.cpp:613
+msgid "Create GTA:SA junctions"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:651
+msgid "MTA:SA cannot launch because the following files are incorrect:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:657 Client/loader/CInstallManager.cpp:689
+#: Client/loader/CInstallManager.cpp:697 Client/loader/CInstallManager.cpp:764
+#: Client/loader/CInstallManager.cpp:811 Client/loader/CInstallManager.cpp:830
 msgid "MTA:SA cannot continue because the following files are incorrect:"
 msgstr "MTA:SA nu poate continua deoarece următoarele fișiere sunt incorecte:"
 
-#: Client/loader/CInstallManager.cpp:620
-msgid "Patch GTA"
-msgstr "Patch-uie GTA"
+#: Client/loader/CInstallManager.cpp:666
+msgid "Copy MTA:SA files"
+msgstr ""
 
-#: Client/loader/CInstallManager.cpp:823
+#: Client/loader/CInstallManager.cpp:771
+msgid "Patch GTA:SA dependency"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:818
+msgid "Generate GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:837 Client/loader/CInstallManager.cpp:857
+msgid "Patch GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:850
+msgid "MTA:SA cannot continue because patching GTA:SA has failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1087
 msgid "Missing file:"
 msgstr "Fișier lipsă:"
 
-#: Client/loader/CInstallManager.cpp:827
+#: Client/loader/CInstallManager.cpp:1091
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Dacă MTA nu reușește să se încarce, te rugăm reinstalează GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:948
+#: Client/loader/CInstallManager.cpp:1126
 msgid "Update install settings"
 msgstr "Actualizează setările de instalare"
 
-#: Client/loader/CInstallManager.cpp:1081
+#: Client/loader/CInstallManager.cpp:1259
 msgid "Update compatibility settings"
 msgstr "Actualizează setările de compatibilitate"
 
-#: Client/loader/CInstallManager.cpp:1109
-msgid "Move incompatible files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1125
-#: Client/loader/CInstallManager.cpp:1141
-msgid "Delete incompatible files"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:130
+#: Client/loader/Dialogs.cpp:134
 msgid "Quit"
 msgstr "Ieșire"
 
-#: Client/loader/Dialogs.cpp:147
+#: Client/loader/Dialogs.cpp:151
 msgid "MTA: San Andreas has encountered a problem"
 msgstr "MTA: San Andreas a întâmpinat o problemă"
 
-#: Client/loader/Dialogs.cpp:148
+#: Client/loader/Dialogs.cpp:152
 msgid "Crash information"
 msgstr "Informații crash"
 
-#: Client/loader/Dialogs.cpp:149
+#: Client/loader/Dialogs.cpp:153
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
 msgstr "Bifează această casetă pentru a trimite aceste informații legate de crash către dezvoltatorii MTA folosind 'internetul'"
 
-#: Client/loader/Dialogs.cpp:150
+#: Client/loader/Dialogs.cpp:154
 msgid "Doing so will increase the chance of this crash being fixed."
 msgstr "Acest lucru va spori șansele ca acest crash să fie reparat."
 
-#: Client/loader/Dialogs.cpp:151
+#: Client/loader/Dialogs.cpp:155
 msgid "Do you want to restart MTA: San Andreas ?"
 msgstr "Ești sigur că vrei să repornești MTA: San Andreas?"
 
-#: Client/loader/Dialogs.cpp:158
+#: Client/loader/Dialogs.cpp:162
 msgid "MTA: San Andreas - Warning"
 msgstr "MTA: San Andreas - Avertisment"
 
-#: Client/loader/Dialogs.cpp:159
+#: Client/loader/Dialogs.cpp:163
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
 msgstr "Directorul tău Grand Theft Auto: San Andreas conține aceste fișiere:"
 
-#: Client/loader/Dialogs.cpp:161
+#: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
 msgstr "Aceste fișiere nu sunt necesare și pot interfera cu caracteristicile grafice ale MTA:SA.\n\n"
 "Este recomandat să ștergi sau să redenumești aceste fișiere."
 
-#: Client/loader/Dialogs.cpp:163
+#: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
 msgstr "Păstrează aceste fișiere, dar arată acest avertisment și la următoarea pornire"
 
-#: Client/loader/Dialogs.cpp:164
+#: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
 msgstr "Nu îmi reaminti despre aceste fișiere"
 
-#: Client/loader/Dialogs.cpp:165
+#: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
 msgstr "Redenumește aceste fișiere din *.dll în *.dll.bak"
 
-#: Client/loader/Dialogs.cpp:166
+#: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
 msgstr "Arată-mi fișierele"
 
-#: Client/loader/Dialogs.cpp:167
+#: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
 msgstr "Lansează MTA:SA"
 
-#: Client/loader/Dialogs.cpp:173
+#: Client/loader/Dialogs.cpp:177
 msgid "MTA: San Andreas - Confusing options"
 msgstr "MTA: San Andreas - Opțiuni derutante"
 
-#: Client/loader/Dialogs.cpp:174
+#: Client/loader/Dialogs.cpp:178
 msgid "NVidia Optimus detected!"
 msgstr "nVidia Optimus detectat!"
 
-#: Client/loader/Dialogs.cpp:175
+#: Client/loader/Dialogs.cpp:179
 msgid "Try each option and see what works:"
 msgstr "Încearcă fiecare opținue și vezi care funcționează:"
 
-#: Client/loader/Dialogs.cpp:176
+#: Client/loader/Dialogs.cpp:180
 msgid "A - Standard NVidia"
 msgstr "A - nVidia Standard"
 
-#: Client/loader/Dialogs.cpp:177
+#: Client/loader/Dialogs.cpp:181
 msgid "B - Alternate NVidia"
 msgstr "B - nVidia Alternativ"
 
-#: Client/loader/Dialogs.cpp:178
+#: Client/loader/Dialogs.cpp:182
 msgid "C - Standard NVidia with exe rename"
 msgstr "C - nVidia Standard cu redenumire executabil"
 
-#: Client/loader/Dialogs.cpp:179
+#: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate NVidia with exe rename"
 msgstr "D - nVidia Alternativ cu redenumire executabil"
 
-#: Client/loader/Dialogs.cpp:180
+#: Client/loader/Dialogs.cpp:184
 msgid "E - Standard Intel"
 msgstr "E - Intel Standard"
 
-#: Client/loader/Dialogs.cpp:181
+#: Client/loader/Dialogs.cpp:185
 msgid "F - Alternate Intel"
 msgstr "F - Intel Alternativ"
 
-#: Client/loader/Dialogs.cpp:182
+#: Client/loader/Dialogs.cpp:186
 msgid "G - Standard Intel with exe rename"
 msgstr "G - Intel Standard cu redenumire executabil"
 
-#: Client/loader/Dialogs.cpp:183
+#: Client/loader/Dialogs.cpp:187
 msgid "H - Alternate Intel with exe rename"
 msgstr "H - Intel Alternativ cu redenumire executabil"
 
-#: Client/loader/Dialogs.cpp:184
+#: Client/loader/Dialogs.cpp:188
 msgid "If you get desperate, this might help:"
 msgstr "Dacă devi disperat, asta te-ar putea ajuta:"
 
-#: Client/loader/Dialogs.cpp:185
+#: Client/loader/Dialogs.cpp:189
 msgid "If you have already selected an option that works, this might help:"
 msgstr "Dacă aţi selectat deja o opţiune care funcţionează, acest lucru ar putea ajuta:"
 
-#: Client/loader/Dialogs.cpp:186
+#: Client/loader/Dialogs.cpp:190
 msgid "Force windowed mode"
 msgstr "Forțează modul fereastră"
 
-#: Client/loader/Dialogs.cpp:187
+#: Client/loader/Dialogs.cpp:191
 msgid "Don't show again"
 msgstr "Nu arăta din nou"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:198 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:195
+#: Client/loader/Dialogs.cpp:199
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Avertisment: Nu a putut fi detectat niciun produs anti-virus"
 
-#: Client/loader/Dialogs.cpp:197
+#: Client/loader/Dialogs.cpp:201
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -3027,11 +3014,11 @@ msgstr "MTA nu a putut detecta niciun anti-virus pe calculatorul dumneavoastră.
 "Virușii interferează cu MTA și îți degradează experiența de joc.\n\n"
 "Apasă pe 'Ajutor' pentru mai multe informații."
 
-#: Client/loader/Dialogs.cpp:200
+#: Client/loader/Dialogs.cpp:204
 msgid "I have already installed an anti-virus"
 msgstr "Am deja un anti-virus instalat"
 
-#: Client/loader/Dialogs.cpp:202
+#: Client/loader/Dialogs.cpp:206
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "Nu voi instala un anti-virus."
@@ -3088,7 +3075,7 @@ msgstr "Eroare de conexiune"
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
 msgstr "Multi Theft Auto nu a fost instalat corect, te rugăm reinstalează-l."
 
-#: Shared/sdk/SharedUtil.Misc.hpp:704
+#: Shared/sdk/SharedUtil.Misc.hpp:702
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "Navigatorul tău va afișa acum o pagină web cu informații ajutătoare.\n\n"
