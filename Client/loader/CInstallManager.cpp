@@ -997,13 +997,18 @@ SString CInstallManager::_ProcessLayoutChecks()
             FileDelete(PathJoin(strOldDir, "logs", fileList[i]));
     }
 
-    // Remove winmm.dll from MTA subdirectory.
+    // Remove superfluous files from MTA subdirectory.
     {
-        SString filePath = PathJoin(CalcMTASAPath("mta"), "winmm.dll");
+        const SString mtaDir = CalcMTASAPath("mta");
 
-        if (FileExists(filePath))
+        for (const char* fileName : {"winmm.dll", "vea.dll", "vog.dll", "vvo.dll", "vvof.dll"})
         {
-            FileDelete(filePath);
+            SString filePath = PathJoin(mtaDir, fileName);
+
+            if (FileExists(filePath))
+            {
+                FileDelete(filePath);
+            }
         }
     }
 
