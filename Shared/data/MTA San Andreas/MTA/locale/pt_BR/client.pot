@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-08 20:34+0000\n"
-"PO-Revision-Date: 2023-02-09 13:06\n"
+"PO-Revision-Date: 2023-02-09 14:08\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -2866,7 +2866,7 @@ msgstr "Corrigir GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:850
 msgid "MTA:SA cannot continue because patching GTA:SA has failed:"
-msgstr "MTA:SA não pode continuar porque corrigir o GTA:SA falhou:"
+msgstr "MTA:SA não pode continuar porque a correção do GTA:SA falhou:"
 
 #: Client/loader/CInstallManager.cpp:1087
 msgid "Missing file:"
