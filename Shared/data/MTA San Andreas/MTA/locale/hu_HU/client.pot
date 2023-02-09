@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-08 20:34+0000\n"
-"PO-Revision-Date: 2023-02-08 21:06\n"
+"POT-Creation-Date: 2023-02-09 21:49+0000\n"
+"PO-Revision-Date: 2023-02-09 21:51\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -211,14 +211,14 @@ msgstr "Csatlakozz le, ha megakarod szakítani a letöltést."
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
+#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
@@ -652,116 +652,116 @@ msgstr "Külön köszönet:"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Ez a szoftver a következő könyvtárakat és szoftvereket használja:"
 
-#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:1031
+#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1031
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA nem folytatható, mert a %s meghajtón nincs elég hely."
 
-#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Végzetes hiba"
 
-#: Client/core/CCore.cpp:891
+#: Client/core/CCore.cpp:893
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "A helyreállításhoz töröld ezt a fájlt:"
 
-#: Client/core/CCore.cpp:923
+#: Client/core/CCore.cpp:925
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modul hibás!"
 
-#: Client/core/CCore.cpp:1233
+#: Client/core/CCore.cpp:1235
 msgid "Error executing URL"
 msgstr "Hiba történt az URL megnyitásakor"
 
-#: Client/core/CCore.cpp:1245
+#: Client/core/CCore.cpp:1247
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Hiba a módban, az alábbi parancssorban ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1335
 msgid "this help screen"
 msgstr "segítség"
 
-#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
 msgid "exits the application"
 msgstr "kilépés az alkalmazásból"
 
-#: Client/core/CCore.cpp:1336
+#: Client/core/CCore.cpp:1338
 msgid "shows the version"
 msgstr "verzió mutatása"
 
-#: Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1339
 msgid "shows the time"
 msgstr "idő mutatása"
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1340
 msgid "shows the hud"
 msgstr "hud mutatása"
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1341
 msgid "shows all the binds"
 msgstr "bindek mutatása"
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1342
 msgid "shows your serial"
 msgstr "serial mutatása"
 
-#: Client/core/CCore.cpp:1349
+#: Client/core/CCore.cpp:1351
 msgid "connects to a server (host port nick pass)"
 msgstr "kapcsolódás a szerverre (hoszt port felhasználónév jelszó)"
 
-#: Client/core/CCore.cpp:1350
+#: Client/core/CCore.cpp:1352
 msgid "connects to a previous server"
 msgstr "kapcsolódás az előző szerverhez"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1353
 msgid "binds a key (key control)"
 msgstr "Egy gomb bebindelése (billentyűzet)"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1354
 msgid "unbinds a key (key)"
 msgstr "Egy gomb unbindelése (billentyűzet)"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1355
 msgid "copies the default gta controls"
 msgstr "alap gta irányítási beállítások másolása"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1356
 msgid "outputs a screenshot"
 msgstr "kiad egy screenshotot"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1357
 msgid "immediately saves the config"
 msgstr "konfig mentése azonnal"
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1359
 msgid "clears the debug view"
 msgstr "debug chat tisztítás"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the chatbox upwards"
 msgstr "chatbox görgetése felfelé"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the chatbox downwards"
 msgstr "chatbox görgetése lefelé"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1362
 msgid "scrolls the debug view upwards"
 msgstr "a debug chat felfelé görgetése"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1363
 msgid "scrolls the debug view downwards"
 msgstr "a debug chat lefelé görgetése"
 
-#: Client/core/CCore.cpp:1364
+#: Client/core/CCore.cpp:1366
 msgid "shows the memory statistics"
 msgstr "memória statisztika mutatása"
 
-#: Client/core/CCore.cpp:1365
+#: Client/core/CCore.cpp:1367
 msgid "shows the frame timing graph"
 msgstr "frame grafikon mutatása"
 
@@ -2193,7 +2193,7 @@ msgstr "Screenshot készítve %d bájt, de körülbelül %d"
 msgid "Screenshot failed"
 msgstr "Screenshot készítése sikertelen"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
+#: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
