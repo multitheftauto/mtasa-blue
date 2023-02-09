@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-08 20:34+0000\n"
-"PO-Revision-Date: 2023-02-08 21:07\n"
+"POT-Creation-Date: 2023-02-09 21:49+0000\n"
+"PO-Revision-Date: 2023-02-09 21:52\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -211,14 +211,14 @@ msgstr "Avbryt anslutning för att avbryta nedladdning"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
+#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
@@ -652,116 +652,116 @@ msgstr "Stort tack till"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Denna programvara använder följande bibliotek och programvara:"
 
-#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:1031
+#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1031
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA kan inte fortsätta eftersom enheten %s inte har tillräckligt med utrymme."
 
-#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Allvarligt fel"
 
-#: Client/core/CCore.cpp:891
+#: Client/core/CCore.cpp:893
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "ATT FIX, FÖLJ DENNA FIL:"
 
-#: Client/core/CCore.cpp:923
+#: Client/core/CCore.cpp:925
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modul är inkorrekt!"
 
-#: Client/core/CCore.cpp:1233
+#: Client/core/CCore.cpp:1235
 msgid "Error executing URL"
 msgstr "Fel vid körning av URL"
 
-#: Client/core/CCore.cpp:1245
+#: Client/core/CCore.cpp:1247
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Fel vid körning av modifikation angiven i kommandoraden ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1335
 msgid "this help screen"
 msgstr "denna hjälpsida"
 
-#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
 msgid "exits the application"
 msgstr "avslutar applikationen"
 
-#: Client/core/CCore.cpp:1336
+#: Client/core/CCore.cpp:1338
 msgid "shows the version"
 msgstr "visar versionen"
 
-#: Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1339
 msgid "shows the time"
 msgstr "visar tiden"
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1340
 msgid "shows the hud"
 msgstr "visar hud"
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1341
 msgid "shows all the binds"
 msgstr "visar alla bindningar"
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1342
 msgid "shows your serial"
 msgstr "visar ditt serienummer"
 
-#: Client/core/CCore.cpp:1349
+#: Client/core/CCore.cpp:1351
 msgid "connects to a server (host port nick pass)"
 msgstr "ansluter till en server (host port nick lösen)"
 
-#: Client/core/CCore.cpp:1350
+#: Client/core/CCore.cpp:1352
 msgid "connects to a previous server"
 msgstr "ansluter till en föregående server"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1353
 msgid "binds a key (key control)"
 msgstr "binder en tangent (tangent kontroll)"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1354
 msgid "unbinds a key (key)"
 msgstr "friar en tangent (tangent)"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1355
 msgid "copies the default gta controls"
 msgstr "kopierar standard gta kontrollerna"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1356
 msgid "outputs a screenshot"
 msgstr "skapar en skärmdump"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1357
 msgid "immediately saves the config"
 msgstr "sparar konfigurationen direkt"
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1359
 msgid "clears the debug view"
 msgstr "rensar felsökningsvyn"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the chatbox upwards"
 msgstr "skrollar chattrutan uppåt"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the chatbox downwards"
 msgstr "skrollar chattrutan nedåt"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1362
 msgid "scrolls the debug view upwards"
 msgstr "skrollar felsökningsvyn uppåt"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1363
 msgid "scrolls the debug view downwards"
 msgstr "skrollar felsökningsvyn nedåt"
 
-#: Client/core/CCore.cpp:1364
+#: Client/core/CCore.cpp:1366
 msgid "shows the memory statistics"
 msgstr "visar minnesstatistik"
 
-#: Client/core/CCore.cpp:1365
+#: Client/core/CCore.cpp:1367
 msgid "shows the frame timing graph"
 msgstr "visar frame timing statistik"
 
@@ -2188,7 +2188,7 @@ msgstr "Skärmdump fick %d bytes, men väntade %d"
 msgid "Screenshot failed"
 msgstr "Skärmdump misslyckades"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
+#: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
