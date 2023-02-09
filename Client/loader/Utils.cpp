@@ -1,16 +1,19 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Utils.cpp
+ *  FILE:        Client/loader/Utils.cpp
  *  PURPOSE:     Loading utilities
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "Utils.h"
+#include "Main.h"
+#include "Dialogs.h"
 #include <array>
+#include <random>
 #include <cryptopp/crc.h>
 #include <cryptopp/files.h>
 #include <tchar.h>
@@ -18,7 +21,10 @@
 #include <Tlhelp32.h>
 #include <Softpub.h>
 #include <wintrust.h>
+#include <version.h>
 #pragma comment (lib, "wintrust")
+
+namespace fs = std::filesystem;
 
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
@@ -278,7 +284,7 @@ DWORD FindProcessId(const SString& processName)
 //
 // GetGTAProcessList
 //
-// Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
+// Get list of process id's with the image name ending in "gta_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
 std::vector<DWORD> GetGTAProcessList()
@@ -288,14 +294,11 @@ std::vector<DWORD> GetGTAProcessList()
     for (auto processId : MyEnumProcesses())
     {
         SString strPathFilename = GetProcessPathFilename(processId);
-        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME) || strPathFilename.EndsWith(MTA_HTAEXE_NAME))
+        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME))
             ListAddUnique(result, processId);
     }
 
     if (DWORD processId = FindProcessId(MTA_GTAEXE_NAME))
-        ListAddUnique(result, processId);
-
-    if (DWORD processId = FindProcessId(MTA_HTAEXE_NAME))
         ListAddUnique(result, processId);
 
     return result;
@@ -420,6 +423,30 @@ void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCo
         BrowseToSolution(strTroubleType, SHOW_MESSAGE_ONLY, strMessage, strErrorCode);
     else
         BrowseToSolution(strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage, strErrorCode);
+}
+
+auto GetMTARootDirectory() -> std::filesystem::path
+{
+    static const auto directory = fs::path{static_cast<std::string&&>(GetMTASAPath())};
+    return directory;
+}
+
+auto GetGameBaseDirectory() -> fs::path
+{
+    static const auto directory = fs::path{static_cast<std::string&&>(GetGTAPath())};
+    return directory;
+}
+
+auto GetGameLaunchDirectory() -> fs::path
+{
+    static const auto directory = fs::path{static_cast<std::string&&>(GetMTADataPath())} / "GTA San Andreas";
+    return directory;
+}
+
+auto GetGameExecutablePath() -> std::filesystem::path
+{
+    static const auto executable = GetGameLaunchDirectory() / MTA_GTAEXE_NAME;
+    return executable;
 }
 
 void SetMTASAPathSource(bool bReadFromRegistry)
@@ -1799,7 +1826,6 @@ void LogSettings()
     } const settings[] = {
         {false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, ""},
         {false, "general", "aero-enabled", ""},
-        {false, "general", "aero-changeable", ""},
         {false, "general", "driver-overrides-disabled", ""},
         {false, "general", "device-selection-disabled", ""},
         {false, "general", "customized-sa-files-using", ""},
@@ -2076,6 +2102,29 @@ auto ComputeCRC32(const char* filePath) -> uint32_t
     std::copy_n(bytes.data(), std::min(sizeof(result), bytes.size()), reinterpret_cast<uint8_t*>(&result));
     return result;
 };
+
+static constexpr std::string_view alphaNumericCharset{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"};
+
+auto GenerateRandomString(size_t length) -> std::string
+{
+    if (!length)
+        return {};
+
+    std::random_device                      engine;
+    std::uniform_int_distribution<uint16_t> distribution{0, static_cast<uint16_t>(alphaNumericCharset.size() - 1)};
+
+    std::array<uint16_t, 4096> bytes{};
+    length = std::min(bytes.size(), length);
+    std::generate_n(bytes.data(), length, [&] { return distribution(engine); });
+
+    std::string result;
+    result.reserve(length);
+
+    for (size_t i = 0; i < length; ++i)
+        result.push_back(alphaNumericCharset[bytes[i]]);
+
+    return result;
+}
 
 //////////////////////////////////////////////////////////
 //
