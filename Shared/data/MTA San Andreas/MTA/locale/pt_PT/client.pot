@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-08 20:34+0000\n"
-"PO-Revision-Date: 2023-02-08 21:07\n"
+"PO-Revision-Date: 2023-02-09 14:08\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -2834,11 +2834,11 @@ msgstr "Multi Theft Auto não foi instalado corretamente, por favor reinstale. %
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Criar junções GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:651
 msgid "MTA:SA cannot launch because the following files are incorrect:"
-msgstr ""
+msgstr "O MTA:SA não pode ser iniciado porque os seguintes ficheiros estão incorretos:"
 
 #: Client/loader/CInstallManager.cpp:657 Client/loader/CInstallManager.cpp:689
 #: Client/loader/CInstallManager.cpp:697 Client/loader/CInstallManager.cpp:764
@@ -2848,23 +2848,23 @@ msgstr "MTA:SA não pode continuar porque os seguintes ficheiros estão incorret
 
 #: Client/loader/CInstallManager.cpp:666
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Copiar ficheiros do MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:771
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Corrigir dependência do GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:818
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Gerar GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:837 Client/loader/CInstallManager.cpp:857
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Reparar GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:850
 msgid "MTA:SA cannot continue because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA não pode continuar porque o reparo do GTA:SA falhou:"
 
 #: Client/loader/CInstallManager.cpp:1087
 msgid "Missing file:"
