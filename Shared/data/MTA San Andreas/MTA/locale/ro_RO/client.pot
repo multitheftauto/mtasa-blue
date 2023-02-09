@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-08 20:34+0000\n"
-"PO-Revision-Date: 2023-02-08 21:06\n"
+"POT-Creation-Date: 2023-02-09 21:49+0000\n"
+"PO-Revision-Date: 2023-02-09 21:51\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -211,14 +211,14 @@ msgstr "Deconectează-te pentru a anula descărcarea"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
+#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
@@ -656,116 +656,116 @@ msgstr "Mulțumiri speciale"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Acest software se folosește de următoarele:"
 
-#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:1031
+#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1031
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA nu poate continua deoarece partiţia %s nu are destul spaţiu."
 
-#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Eroare fatală"
 
-#: Client/core/CCore.cpp:891
+#: Client/core/CCore.cpp:893
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "PENTRU A REMEDIA, ȘTERGE ACEST FIȘIER:"
 
-#: Client/core/CCore.cpp:923
+#: Client/core/CCore.cpp:925
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "Modulul %s este incorect!"
 
-#: Client/core/CCore.cpp:1233
+#: Client/core/CCore.cpp:1235
 msgid "Error executing URL"
 msgstr "Eroare la executarea URL-ului"
 
-#: Client/core/CCore.cpp:1245
+#: Client/core/CCore.cpp:1247
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Eroare la rularea modului specificat în comandă ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1335
 msgid "this help screen"
 msgstr "acest ecran de ajutor"
 
-#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
 msgid "exits the application"
 msgstr "iese din aplicație"
 
-#: Client/core/CCore.cpp:1336
+#: Client/core/CCore.cpp:1338
 msgid "shows the version"
 msgstr "arată versiunea"
 
-#: Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1339
 msgid "shows the time"
 msgstr "arată timpul"
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1340
 msgid "shows the hud"
 msgstr "arată HUD-ul"
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1341
 msgid "shows all the binds"
 msgstr "arată toate legăturile"
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1342
 msgid "shows your serial"
 msgstr "arată serialul tău"
 
-#: Client/core/CCore.cpp:1349
+#: Client/core/CCore.cpp:1351
 msgid "connects to a server (host port nick pass)"
 msgstr "te conectează la un server (host, port, nume, parolă)"
 
-#: Client/core/CCore.cpp:1350
+#: Client/core/CCore.cpp:1352
 msgid "connects to a previous server"
 msgstr "te conectează la un server precedent"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1353
 msgid "binds a key (key control)"
 msgstr "atașează o tastă (control de tastă)"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1354
 msgid "unbinds a key (key)"
 msgstr "eliberează o tastă (tastă)"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1355
 msgid "copies the default gta controls"
 msgstr "atașează controalele implicite din GTA"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1356
 msgid "outputs a screenshot"
 msgstr "creează o captură de ecran"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1357
 msgid "immediately saves the config"
 msgstr "salvează configurația imediat"
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1359
 msgid "clears the debug view"
 msgstr "curăță ecranul de depanare"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the chatbox upwards"
 msgstr "derulează fereastra de chat în sus"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the chatbox downwards"
 msgstr "derulează fereastra de chat în jos"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1362
 msgid "scrolls the debug view upwards"
 msgstr "derulează ecranul de depanare în sus"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1363
 msgid "scrolls the debug view downwards"
 msgstr "derulează ecranul de depanare în jos"
 
-#: Client/core/CCore.cpp:1364
+#: Client/core/CCore.cpp:1366
 msgid "shows the memory statistics"
 msgstr "arată statisticile despre memorie"
 
-#: Client/core/CCore.cpp:1365
+#: Client/core/CCore.cpp:1367
 msgid "shows the frame timing graph"
 msgstr "arată graficul cu timpii cadrului"
 
@@ -2196,7 +2196,7 @@ msgstr "Captura de ecran a înregistrat %d baiți, dar erau de așteptat %d"
 msgid "Screenshot failed"
 msgstr "Capturarea ecranului a eșuat"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
+#: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
