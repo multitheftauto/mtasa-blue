@@ -105,14 +105,26 @@ bool FileGenerator::LoadPatcherData(std::error_code& ec)
     // Load the patch base and verify its length.
     std::vector<unsigned char> base{};
 
-    if (!GetFileContent(m_patchBasePath, base, ec) || base.size() != SIZE_PATCH_BASE)
+    if (!GetFileContent(m_patchBasePath, base, ec))
         return false;
+
+    if (base.size() != SIZE_PATCH_BASE)
+    {
+        ec.assign(ERROR_BAD_LENGTH, std::system_category());
+        return false;
+    }
 
     // Load the patch diff and verify its length.
     std::vector<unsigned char> diff{};
 
-    if (!GetFileContent(m_patchDiffPath, diff, ec) || diff.size() != SIZE_PATCH_DIFF)
+    if (!GetFileContent(m_patchDiffPath, diff, ec))
         return false;
+
+    if (diff.size() != SIZE_PATCH_DIFF)
+    {
+        ec.assign(ERROR_BAD_LENGTH, std::system_category());
+        return false;
+    }
 
     // Reuncompression using future delta system.
     size_t index = 0;
@@ -125,7 +137,10 @@ bool FileGenerator::LoadPatcherData(std::error_code& ec)
 
     // Check if the patcher data has the correct checksum.
     if (GetFileBufferHash(diff) != HASH_PATCHER_DATA)
+    {
+        ec.assign(ERROR_DATA_CHECKSUM_ERROR, std::system_category());
         return false;
+    }
 
     m_data = std::move(diff);
     return true;
