@@ -427,19 +427,19 @@ void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCo
 
 auto GetMTARootDirectory() -> std::filesystem::path
 {
-    static const auto directory = fs::path{static_cast<std::string&&>(GetMTASAPath())};
+    static const auto directory = fs::path{FromUTF8(GetMTASAPath())};
     return directory;
 }
 
 auto GetGameBaseDirectory() -> fs::path
 {
-    static const auto directory = fs::path{static_cast<std::string&&>(GetGTAPath())};
+    static const auto directory = fs::path{FromUTF8(GetGTAPath())};
     return directory;
 }
 
 auto GetGameLaunchDirectory() -> fs::path
 {
-    static const auto directory = fs::path{static_cast<std::string&&>(GetMTADataPath())} / "GTA San Andreas";
+    static const auto directory = fs::path{FromUTF8(GetMTADataPath())} / "GTA San Andreas";
     return directory;
 }
 
@@ -2096,7 +2096,14 @@ auto ComputeCRC32(const char* filePath) -> uint32_t
     CryptoPP::CRC32                                         hash{};
     std::array<CryptoPP::byte, CryptoPP::CRC32::DIGESTSIZE> bytes{};
 
-    CryptoPP::FileSource pass(filePath, true, new CryptoPP::HashFilter(hash, new CryptoPP::ArraySink(bytes.data(), bytes.size())));
+    try
+    {
+        CryptoPP::FileSource pass(filePath, true, new CryptoPP::HashFilter(hash, new CryptoPP::ArraySink(bytes.data(), bytes.size())));
+    }
+    catch (const std::exception&)
+    {
+        return 0;
+    }
 
     uint32_t result{};
     std::copy_n(bytes.data(), std::min(sizeof(result), bytes.size()), reinterpret_cast<uint8_t*>(&result));
