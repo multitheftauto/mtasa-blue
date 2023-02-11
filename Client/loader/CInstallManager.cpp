@@ -624,10 +624,13 @@ SString CInstallManager::_PrepareLaunchLocation()
 
         if (std::error_code ec; !SafeCopyFile(sourcePath, targetPath, ec))
         {
-            const uintmax_t sourceSize = GetFileSize(sourcePath);
-            const uintmax_t targetSize = GetFileSize(targetPath);
-            AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(), sourceSize,
-                                       targetSize, isAdmin));
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t sourceSize = GetFileSize(sourcePath);
+                const uintmax_t targetSize = GetFileSize(targetPath);
+                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
+                                           sourceSize, targetSize, isAdmin));
+            }
         }
     }
 
@@ -639,22 +642,25 @@ SString CInstallManager::_PrepareLaunchLocation()
 
         if (std::error_code ec; !SafeCopyFile(sourcePath, targetPath, ec))
         {
-            const uintmax_t sourceSize = GetFileSize(sourcePath);
-            const uintmax_t targetSize = GetFileSize(targetPath);
-            AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(), sourceSize,
-                                       targetSize, isAdmin));
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t sourceSize = GetFileSize(sourcePath);
+                const uintmax_t targetSize = GetFileSize(targetPath);
+                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
+                                           sourceSize, targetSize, isAdmin));
+            }
 
             if (isAdmin)
             {
-                if (fs::exists(sourcePath, ec))
+                if (fs::is_regular_file(sourcePath, ec))
                 {
-                    SString strMessage(_("MTA:SA cannot launch because the following files are incorrect:"));
+                    SString strMessage(_("MTA:SA cannot launch because copying a file failed:"));
                     strMessage += "\n\n" + targetPath.string();
                     BrowseToSolution("copy-files", ASK_GO_ONLINE, strMessage);
                 }
                 else
                 {
-                    SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
+                    SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
                     strMessage += "\n\n" + sourcePath.string();
                     BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
                 }
@@ -686,7 +692,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
 
     if (!FileGenerator::IsPatchBase(patchBasePath))
     {
-        SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
+        SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
         strMessage += "\n\n" + patchBasePath.string();
         BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
         return "quit";
@@ -694,7 +700,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
 
     if (!FileGenerator::IsPatchDiff(patchDiffPath))
     {
-        SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
+        SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
         strMessage += "\n\n" + patchDiffPath.string();
         BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
         return "quit";
@@ -755,13 +761,16 @@ SString CInstallManager::_ProcessGtaDllCheck()
         if (gtasa.GenerateFile(std::to_string(i), dependecyPath, ec2))
             continue;
 
-        const uintmax_t fileSize = GetFileSize(dependecyPath);
-        AddReportLog(3052, SString("_ProcessGtaDllCheck: GenerateFile failed (err-1: %d, err-2: %d, size: %ju, admin: %d)", ec1.value(), ec2.value(), fileSize,
-                                   isAdmin));
+        if (IsErrorCodeLoggable(ec1) || IsErrorCodeLoggable(ec2))
+        {
+            const uintmax_t fileSize = GetFileSize(dependecyPath);
+            AddReportLog(3052, SString("_ProcessGtaDllCheck: GenerateFile failed (err-1: %d, err-2: %d, size: %ju, admin: %d)", ec1.value(), ec2.value(),
+                                       fileSize, isAdmin));
+        }
 
         if (isAdmin)
         {
-            SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
+            SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
             strMessage += "\n\n" + dependecyPath.string();
             BrowseToSolution(SString("gendep_error&name=%s", dependency.fileName), ASK_GO_ONLINE, strMessage);
             return "quit";
@@ -797,18 +806,26 @@ SString CInstallManager::_ProcessGtaVersionCheck()
     {
         if (ec)
         {
-            const uintmax_t fileSize = GetFileSize(gtaExePath);
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #1 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t fileSize = GetFileSize(gtaExePath);
+                AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #1 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            }
+
+            ec.clear();
         }
 
         if (!gtasa.GenerateFile("data", gtaExePath, ec))
         {
-            const uintmax_t fileSize = GetFileSize(gtaExePath);
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t fileSize = GetFileSize(gtaExePath);
+                AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            }
 
             if (isAdmin)
             {
-                SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
+                SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"));
                 strMessage += "\n\n" + gtaExePath.string();
                 BrowseToSolution(SString("gengta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
                 return "quit";
@@ -822,12 +839,15 @@ SString CInstallManager::_ProcessGtaVersionCheck()
 
         if (!patcher.Load(ec))
         {
-            const uintmax_t fileSize = GetFileSize(gtaExePath);
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #2 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t fileSize = GetFileSize(gtaExePath);
+                AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #2 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            }
 
             if (isAdmin)
             {
-                SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
+                SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is not loadable:"));
                 strMessage += "\n\n" + gtaExePath.string();
                 BrowseToSolution(SString("gengta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
                 return "quit";
@@ -842,12 +862,15 @@ SString CInstallManager::_ProcessGtaVersionCheck()
 
     if (!patcher.ApplyPatches(ec))
     {
-        const uintmax_t fileSize = GetFileSize(gtaExePath);
-        AddReportLog(3052, SString("_ProcessGtaVersionCheck: ApplyPatches failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+        if (IsErrorCodeLoggable(ec))
+        {
+            const uintmax_t fileSize = GetFileSize(gtaExePath);
+            AddReportLog(3052, SString("_ProcessGtaVersionCheck: ApplyPatches failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+        }
 
         if (isAdmin)
         {
-            SString strMessage(_("MTA:SA cannot continue because patching GTA:SA has failed:"));
+            SString strMessage(_("MTA:SA cannot launch because patching GTA:SA has failed:"));
             strMessage += "\n\n" + gtaExePath.string();
             BrowseToSolution(SString("patchgta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
             return "quit";
