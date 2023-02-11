@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-11 00:23+0000\n"
-"PO-Revision-Date: 2023-02-11 01:20\n"
+"POT-Creation-Date: 2023-02-11 16:10+0000\n"
+"PO-Revision-Date: 2023-02-11 16:34\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -660,7 +660,7 @@ msgstr "Особлива подяка"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Це програмне забезпечення використовує такі бібліотеки та ПЗ:"
 
-#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1054
+#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1057
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "Для інсталяції MTA:SA бракує вільного місця на диску %s."
@@ -2862,35 +2862,39 @@ msgstr ""
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:835
+#: Client/loader/CInstallManager.cpp:832
+msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:850
+#: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:857 Client/loader/CInstallManager.cpp:880
+#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:873
+#: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1110
+#: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
 msgstr "Не знайдено файл:"
 
-#: Client/loader/CInstallManager.cpp:1114
+#: Client/loader/CInstallManager.cpp:1117
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Переінсталюйте GTA:SA, якщо MTA не запускається"
 
-#: Client/loader/CInstallManager.cpp:1149
+#: Client/loader/CInstallManager.cpp:1152
 msgid "Update install settings"
 msgstr "Оновлення налаштувань інсталювань"
 
-#: Client/loader/CInstallManager.cpp:1282
+#: Client/loader/CInstallManager.cpp:1285
 msgid "Update compatibility settings"
 msgstr "Оновити налаштування сумісності"
 
