@@ -146,6 +146,11 @@ auto ComputeCRC32(const char* filePath) -> uint32_t;
  */
 auto GenerateRandomString(size_t length) -> std::string;
 
+/**
+ * @brief Checks if the error code is important enough to be logged.
+ */
+bool IsErrorCodeLoggable(const std::error_code& ec);
+
 // Return false on read failure
 template <class T>
 bool ReadFileValue(const SString& strFilename, T& value, uint uiOffset)

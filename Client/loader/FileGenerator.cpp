@@ -146,19 +146,19 @@ bool FileGenerator::LoadPatcherData(std::error_code& ec)
     return true;
 }
 
-auto FileGenerator::GetPatchBasePath() -> std::filesystem::path
+auto FileGenerator::GetPatchBasePath() -> fs::path
 {
     static const auto file = GetGameBaseDirectory() / L"audio" / L"CONFIG" / L"PakFiles.dat";
     return file;
 }
 
-auto FileGenerator::GetPatchDiffPath() -> std::filesystem::path
+auto FileGenerator::GetPatchDiffPath() -> fs::path
 {
     static const auto file = GetMTARootDirectory() / L"MTA" / L"data" / L"gta_sa_diff.dat";
     return file;
 }
 
-bool FileGenerator::IsPatchBase(const std::filesystem::path& filePath)
+bool FileGenerator::IsPatchBase(const fs::path& filePath)
 {
     std::error_code ec{};
     FileHash        hash{};
@@ -166,13 +166,17 @@ bool FileGenerator::IsPatchBase(const std::filesystem::path& filePath)
     if (GetFileHash(filePath, hash, ec) && hash == HASH_PATCH_BASE)
         return true;
 
-    uintmax_t fileSize = GetFileSize(filePath);
-    AddReportLog(5053, SString("IsPatchBase: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
-                               GetFileHashString(hash).c_str()));
+    if (IsErrorCodeLoggable(ec))
+    {
+        const uintmax_t fileSize = GetFileSize(filePath);
+        AddReportLog(5053, SString("IsPatchBase: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
+                                   GetFileHashString(hash).c_str()));
+    }
+
     return false;
 }
 
-bool FileGenerator::IsPatchDiff(const std::filesystem::path& filePath)
+bool FileGenerator::IsPatchDiff(const fs::path& filePath)
 {
     std::error_code ec{};
     FileHash        hash{};
@@ -180,8 +184,12 @@ bool FileGenerator::IsPatchDiff(const std::filesystem::path& filePath)
     if (GetFileHash(filePath, hash, ec) && hash == HASH_PATCH_DIFF)
         return true;
 
-    uintmax_t fileSize = GetFileSize(filePath);
-    AddReportLog(5053, SString("IsPatchDiff: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
-                               GetFileHashString(hash).c_str()));
+    if (IsErrorCodeLoggable(ec))
+    {
+        const uintmax_t fileSize = GetFileSize(filePath);
+        AddReportLog(5053, SString("IsPatchDiff: Incorrect file '%ls' (err: %d, size: %ju, hash: %s)", filePath.wstring().c_str(), ec.value(), fileSize,
+                                   GetFileHashString(hash).c_str()));
+    }
+
     return false;
 }
