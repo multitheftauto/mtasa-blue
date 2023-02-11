@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-11 00:23+0000\n"
-"PO-Revision-Date: 2023-02-11 01:20\n"
+"PO-Revision-Date: 2023-02-11 10:39\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -2838,11 +2838,11 @@ msgstr "GTA:SA-Kreuzungen erstellen"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA kann nicht gestartet werden, da das Kopieren einer Datei fehlgeschlagen ist:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA kann nicht gestartet werden, da eine MTA:SA Datei fehlerhaft ist oder fehlt:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -2850,7 +2850,7 @@ msgstr "MTA:SA-Dateien kopieren"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA kann nicht gestartet werden, da eine GTA:SA Datei fehlerhaft ist oder fehlt:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -2858,7 +2858,7 @@ msgstr "Patch GTA:SA-Abhängigkeit"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA kann nicht gestartet werden, da die GTA:SA Anwendung fehlerhaft ist oder fehlt:"
 
 #: Client/loader/CInstallManager.cpp:835
 msgid "Generate GTA:SA"
@@ -2866,7 +2866,7 @@ msgstr "GTA:SA generieren"
 
 #: Client/loader/CInstallManager.cpp:850
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA kann nicht gestartet werden, da die GTA:SA Anwendung nicht geladen werden kann:"
 
 #: Client/loader/CInstallManager.cpp:857 Client/loader/CInstallManager.cpp:880
 msgid "Patch GTA:SA"
@@ -2874,7 +2874,7 @@ msgstr "Aufnäher GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:873
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA kann nicht gestartet werden, da das Patchen von GTA:SA fehlgeschlagen ist:"
 
 #: Client/loader/CInstallManager.cpp:1110
 msgid "Missing file:"
