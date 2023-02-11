@@ -50,7 +50,10 @@ static bool Extract(const char* fileName, const fs::path& destination, const std
     HANDLE archiveHandle = RAROpenArchiveEx(&archiveData);
 
     if (!archiveHandle)
+    {
+        ec.assign(ERROR_FILE_CORRUPT, std::system_category());
         return false;
+    }
 
     bool result = false;
 
@@ -75,9 +78,14 @@ static bool Extract(const char* fileName, const fs::path& destination, const std
 
     RARCloseArchive(archiveHandle);
 
-    fs::remove(archivePath, ec);
-    ec.clear();
-    return result;
+    std::error_code ignore;
+    fs::remove(archivePath, ignore);
+
+    if (result)
+        return true;
+
+    ec.assign(ERROR_NOT_FOUND, std::system_category());
+    return false;
 }
 
 FileGenerator::FileGenerator() : m_patchBasePath(GetPatchBasePath()), m_patchDiffPath(GetPatchDiffPath())
