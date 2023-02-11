@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-09 21:49+0000\n"
-"PO-Revision-Date: 2023-02-09 21:51\n"
+"POT-Creation-Date: 2023-02-11 00:23+0000\n"
+"PO-Revision-Date: 2023-02-11 01:20\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -656,7 +656,7 @@ msgstr "Mulțumiri speciale"
 msgid "This software makes use of the following libraries and software:"
 msgstr "Acest software se folosește de următoarele:"
 
-#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1031
+#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1054
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA nu poate continua deoarece partiţia %s nu are destul spaţiu."
@@ -2834,49 +2834,59 @@ msgstr "Multi Theft Auto nu a fost instalat corespunzător, te rugăm reinstalea
 msgid "Create GTA:SA junctions"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:651
-msgid "MTA:SA cannot launch because the following files are incorrect:"
+#: Client/loader/CInstallManager.cpp:657
+msgid "MTA:SA cannot launch because copying a file failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:657 Client/loader/CInstallManager.cpp:689
-#: Client/loader/CInstallManager.cpp:697 Client/loader/CInstallManager.cpp:764
-#: Client/loader/CInstallManager.cpp:811 Client/loader/CInstallManager.cpp:830
-msgid "MTA:SA cannot continue because the following files are incorrect:"
-msgstr "MTA:SA nu poate continua deoarece următoarele fișiere sunt incorecte:"
+#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
+msgstr ""
 
-#: Client/loader/CInstallManager.cpp:666
+#: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:771
+#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:818
+#: Client/loader/CInstallManager.cpp:828
+msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:835
 msgid "Generate GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:837 Client/loader/CInstallManager.cpp:857
+#: Client/loader/CInstallManager.cpp:850
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:857 Client/loader/CInstallManager.cpp:880
 msgid "Patch GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:850
-msgid "MTA:SA cannot continue because patching GTA:SA has failed:"
+#: Client/loader/CInstallManager.cpp:873
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1087
+#: Client/loader/CInstallManager.cpp:1110
 msgid "Missing file:"
 msgstr "Fișier lipsă:"
 
-#: Client/loader/CInstallManager.cpp:1091
+#: Client/loader/CInstallManager.cpp:1114
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Dacă MTA nu reușește să se încarce, te rugăm reinstalează GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:1126
+#: Client/loader/CInstallManager.cpp:1149
 msgid "Update install settings"
 msgstr "Actualizează setările de instalare"
 
-#: Client/loader/CInstallManager.cpp:1259
+#: Client/loader/CInstallManager.cpp:1282
 msgid "Update compatibility settings"
 msgstr "Actualizează setările de compatibilitate"
 
