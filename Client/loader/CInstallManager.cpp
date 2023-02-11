@@ -827,6 +827,9 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             {
                 SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"));
                 strMessage += "\n\n" + gtaExePath.string();
+                strMessage +=
+                    "\n\n" +
+                    _("Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA.");
                 BrowseToSolution(SString("gengta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
                 return "quit";
             }
