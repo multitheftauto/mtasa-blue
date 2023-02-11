@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-11 16:10+0000\n"
-"PO-Revision-Date: 2023-02-11 16:34\n"
+"POT-Creation-Date: 2023-02-11 19:16+0000\n"
+"PO-Revision-Date: 2023-02-11 19:21\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -2904,7 +2904,7 @@ msgstr "Переустановите GTA:SA, если MTA не запускае�
 msgid "Update install settings"
 msgstr "Обновление настроек установки"
 
-#: Client/loader/CInstallManager.cpp:1285
+#: Client/loader/CInstallManager.cpp:1291
 msgid "Update compatibility settings"
 msgstr "Обновить настройки совместимости"
 
