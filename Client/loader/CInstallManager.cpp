@@ -1219,6 +1219,12 @@ SString CInstallManager::_ProcessAppCompatChecks()
     else
         removeList.push_back(L"NoDTToDITMouseBatch");
 
+    // Disable hybrid execution mode (x86 apps only) - ARM emulation settings.
+    if (IsNativeArm64Host())
+        addList.push_back(L"ARM64CHPEDISABLED");
+    else
+        removeList.push_back(L"ARM64CHPEDISABLED");
+
     // Details of reg keys to fiddle with
     struct
     {
