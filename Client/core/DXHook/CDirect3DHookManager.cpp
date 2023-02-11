@@ -38,7 +38,7 @@ void CDirect3DHookManager::ApplyHook()
     {
         const fs::path dll = g_gtaDirectory / "d3d9.dll";
 
-        if (std::error_code ignore{}; fs::exists(dll, ignore))
+        if (std::error_code ignore{}; fs::is_regular_file(dll, ignore))
         {
             d3d9 = LoadLibraryW(dll.wstring().c_str());
         }
