@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-11 19:16+0000\n"
-"PO-Revision-Date: 2023-02-11 19:21\n"
+"POT-Creation-Date: 2023-02-12 13:23+0000\n"
+"PO-Revision-Date: 2023-02-12 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -2522,19 +2522,19 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:906
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Instalē atjauninājumus..."
 
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:914
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Atspiež failus..."
 
-#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:895
+#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Meklē pēc Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:898
+#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Lūdzu palaidiet Grand Theft Auto San Andreas"
 
@@ -2556,19 +2556,19 @@ msgstr "MTA:SA ir nepieciešama Administratora piekļuve sekojošam uzdevumam:\n
 msgid "Error loading %s module! (%s)"
 msgstr "Kļūda ielādējot %s moduli! (%s)"
 
-#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Kopē failus..."
 
-#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "Kopēšana pabeigta. Viss kārtībā."
 
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:929
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Pabeidz..."
 
-#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:933
+#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "Gatavs!"
 
@@ -2973,54 +2973,38 @@ msgid "B - Alternate NVidia"
 msgstr "B - Alternatīvā NVidia"
 
 #: Client/loader/Dialogs.cpp:182
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - Standarta NVidia ar EXE pārsaukšanu"
+msgid "C - Standard Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - Alternatīvā NVidia ar EXE pārsaukšanu"
+msgid "D - Alternate Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:184
-msgid "E - Standard Intel"
-msgstr "E - Standarta Intel"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "F - Alternate Intel"
-msgstr "F- Alternatīvā Intel"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Standarta Intel ar EXE pārsaukšanu"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternatīvā Intel ar exe pārsaukšanu"
-
-#: Client/loader/Dialogs.cpp:188
 msgid "If you get desperate, this might help:"
 msgstr "Ja jūs nevarat atrisināt problēmu, šis var palīdzēt:"
 
-#: Client/loader/Dialogs.cpp:189
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr "Ja jūs jau esat izvēlējušies opciju kura darbojas, šim vajadzētu palīdzēt:"
 
-#: Client/loader/Dialogs.cpp:190
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "Piespiedu loga režīms"
 
-#: Client/loader/Dialogs.cpp:191
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "Nerādīt atkārtoti"
 
-#: Client/loader/Dialogs.cpp:198 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:199
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Brīdinājums: Nevarēja atrast antivīrusa programmu"
 
-#: Client/loader/Dialogs.cpp:201
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -3028,11 +3012,11 @@ msgstr "MTA nevarēja noteikt anti-vīrusa aplikāciju jūsu PC.\n\n"
 "Vīrusi sabojā MTA darbību un var samazināt veiktspēju.\n\n"
 "Nospiediet 'Help' vairāk informācijas iegūšanai."
 
-#: Client/loader/Dialogs.cpp:204
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "Esmu jau instalējis antivīrusu"
 
-#: Client/loader/Dialogs.cpp:206
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "Es neinstalēšu antivīrusu.\n"
