@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-11 19:16+0000\n"
-"PO-Revision-Date: 2023-02-11 19:21\n"
+"PO-Revision-Date: 2023-02-12 01:19\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -2862,7 +2862,7 @@ msgstr "O MTA:SA não pode ser iniciado porque o executável do GTA:SA está inc
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Por favor, verifique se o seu antivírus detectou um falso positivo, tente adicionar uma exceção para o executável do GTA:SA e reinicie o MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
