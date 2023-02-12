@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-08 20:34+0000\n"
+"POT-Creation-Date: 2023-02-11 19:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -212,14 +212,14 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1278
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/core/CCore.cpp:1233 Client/core/CCore.cpp:1246
+#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2924
 #: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:126
+#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
@@ -655,116 +655,116 @@ msgstr ""
 msgid "This software makes use of the following libraries and software:"
 msgstr ""
 
-#: Client/core/CCore.cpp:764 Client/loader/CInstallManager.cpp:1031
+#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1057
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
 
-#: Client/core/CCore.cpp:766 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr ""
 
-#: Client/core/CCore.cpp:891
+#: Client/core/CCore.cpp:893
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr ""
 
-#: Client/core/CCore.cpp:923
+#: Client/core/CCore.cpp:925
 #, c-format
 msgid "%s module is incorrect!"
 msgstr ""
 
-#: Client/core/CCore.cpp:1233
+#: Client/core/CCore.cpp:1235
 msgid "Error executing URL"
 msgstr ""
 
-#: Client/core/CCore.cpp:1245
+#: Client/core/CCore.cpp:1247
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr ""
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1335
 msgid "this help screen"
 msgstr ""
 
-#: Client/core/CCore.cpp:1334 Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
 msgid "exits the application"
 msgstr ""
 
-#: Client/core/CCore.cpp:1336
+#: Client/core/CCore.cpp:1338
 msgid "shows the version"
 msgstr ""
 
-#: Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1339
 msgid "shows the time"
 msgstr ""
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1340
 msgid "shows the hud"
 msgstr ""
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1341
 msgid "shows all the binds"
 msgstr ""
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1342
 msgid "shows your serial"
 msgstr ""
 
-#: Client/core/CCore.cpp:1349
+#: Client/core/CCore.cpp:1351
 msgid "connects to a server (host port nick pass)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1350
+#: Client/core/CCore.cpp:1352
 msgid "connects to a previous server"
 msgstr ""
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1353
 msgid "binds a key (key control)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1354
 msgid "unbinds a key (key)"
 msgstr ""
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1355
 msgid "copies the default gta controls"
 msgstr ""
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1356
 msgid "outputs a screenshot"
 msgstr ""
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1357
 msgid "immediately saves the config"
 msgstr ""
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1359
 msgid "clears the debug view"
 msgstr ""
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1360
 msgid "scrolls the chatbox upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1361
 msgid "scrolls the chatbox downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1362
 msgid "scrolls the debug view upwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1363
 msgid "scrolls the debug view downwards"
 msgstr ""
 
-#: Client/core/CCore.cpp:1364
+#: Client/core/CCore.cpp:1366
 msgid "shows the memory statistics"
 msgstr ""
 
-#: Client/core/CCore.cpp:1365
+#: Client/core/CCore.cpp:1367
 msgid "shows the frame timing graph"
 msgstr ""
 
@@ -2213,7 +2213,7 @@ msgstr ""
 msgid "Screenshot failed"
 msgstr ""
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:123
+#: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid ""
 "Could not initialize Direct3D9.\n"
 "\n"
@@ -2894,49 +2894,66 @@ msgstr ""
 msgid "Create GTA:SA junctions"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:651
-msgid "MTA:SA cannot launch because the following files are incorrect:"
+#: Client/loader/CInstallManager.cpp:657
+msgid "MTA:SA cannot launch because copying a file failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:657 Client/loader/CInstallManager.cpp:689
-#: Client/loader/CInstallManager.cpp:697 Client/loader/CInstallManager.cpp:764
-#: Client/loader/CInstallManager.cpp:811 Client/loader/CInstallManager.cpp:830
-msgid "MTA:SA cannot continue because the following files are incorrect:"
+#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:666
+#: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:771
+#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:818
+#: Client/loader/CInstallManager.cpp:828
+msgid ""
+"MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:832
+msgid ""
+"Please check your anti-virus for a false-positive detection, try to add an "
+"exception for the GTA:SA executable and restart MTA:SA."
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:837 Client/loader/CInstallManager.cpp:857
+#: Client/loader/CInstallManager.cpp:853
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:850
-msgid "MTA:SA cannot continue because patching GTA:SA has failed:"
+#: Client/loader/CInstallManager.cpp:876
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1087
+#: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1091
+#: Client/loader/CInstallManager.cpp:1117
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1126
+#: Client/loader/CInstallManager.cpp:1152
 msgid "Update install settings"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1259
+#: Client/loader/CInstallManager.cpp:1291
 msgid "Update compatibility settings"
 msgstr ""
 
