@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-11 19:16+0000\n"
-"PO-Revision-Date: 2023-02-11 19:20\n"
+"POT-Creation-Date: 2023-02-12 13:23+0000\n"
+"PO-Revision-Date: 2023-02-12 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -2518,19 +2518,19 @@ msgstr "Uw installatie is nu mogelijk beschadigd.\n\n"
 "U moet Multi Theft Auto opnieuw installeren vanaf www.multitheftauto.com\n"
 "of probeer de update uit te voeren met beheerdersrechten."
 
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:906
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Update installeren..."
 
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:914
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Bestanden uitpakken..."
 
-#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:895
+#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto San Andreas zoeken..."
 
-#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:898
+#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Gelieve Grand Theft Auto San Andreas te starten"
 
@@ -2552,19 +2552,19 @@ msgstr "MTA:SA heeft Administrator toegang nodig voor de volgende opdracht:\n\n"
 msgid "Error loading %s module! (%s)"
 msgstr "Fout bij het laden van %s module! (%s)"
 
-#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Bestanden kopiëren..."
 
-#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "Kopie is vroeger klaar. Alles OK."
 
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:929
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Voltooien..."
 
-#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:933
+#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "Klaar!"
 
@@ -2968,54 +2968,38 @@ msgid "B - Alternate NVidia"
 msgstr "B - Alternatief NVidia"
 
 #: Client/loader/Dialogs.cpp:182
-msgid "C - Standard NVidia with exe rename"
-msgstr "C- Standaard NVidia en exe hernoemen"
+msgid "C - Standard Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - Alternatief NVidia en exe hernoemen"
+msgid "D - Alternate Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:184
-msgid "E - Standard Intel"
-msgstr "E - Standaard Intel"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "F - Alternate Intel"
-msgstr "F - Alternatief Intel"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Standaard Intel en exe hernoemen"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternatief Intel en exe hernoemen"
-
-#: Client/loader/Dialogs.cpp:188
 msgid "If you get desperate, this might help:"
 msgstr "Als u wanhopig wordt, dit helpt mogelijks:"
 
-#: Client/loader/Dialogs.cpp:189
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr "Als je al een optie hebt geselecteerd die werkt, kan dit helpen:"
 
-#: Client/loader/Dialogs.cpp:190
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "Venstermodus forceren"
 
-#: Client/loader/Dialogs.cpp:191
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "Niet meer tonen"
 
-#: Client/loader/Dialogs.cpp:198 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:199
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Waarschuwing: Kon geen anti-virus software detecteren"
 
-#: Client/loader/Dialogs.cpp:201
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -3023,11 +3007,11 @@ msgstr "MTA kon geen anti-virus software detecteren op uw PC.\n\n"
 "Virussen storen MTA en degraderen uw gebruikservaring.\n\n"
 "Druk 'Help' voor meer informatie."
 
-#: Client/loader/Dialogs.cpp:204
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "Ik heb al een anti-virus software"
 
-#: Client/loader/Dialogs.cpp:206
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "I zal geen anti-virus software installeren.\n"
