@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-11 19:16+0000\n"
-"PO-Revision-Date: 2023-02-11 19:20\n"
+"POT-Creation-Date: 2023-02-12 13:23+0000\n"
+"PO-Revision-Date: 2023-02-12 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -2522,19 +2522,19 @@ msgstr "Su instalación puede estar corrupta ahora.\n\n"
 "Deberías reinstalar Multi Theft Auto desde www.multitheftauto.com\n"
 "o intentar correr la actualización con permisos de administrador."
 
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:906
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Instalando actualización..."
 
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:914
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Extrayendo archivos..."
 
-#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:895
+#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Buscando Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:898
+#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Por favor inicia Grand Theft Auto San Andreas"
 
@@ -2556,19 +2556,19 @@ msgstr "MTA:SA necesita acceso de Administrador para la siguiente tarea:\n\n"
 msgid "Error loading %s module! (%s)"
 msgstr "¡Error al cargar el módulo %s! (%s)"
 
-#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Copiando archivos..."
 
-#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "La copia termino pronto. Todo en orden."
 
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:929
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Finalizando..."
 
-#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:933
+#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "¡Listo!"
 
@@ -2977,54 +2977,38 @@ msgid "B - Alternate NVidia"
 msgstr "B - NVidia Alternativo"
 
 #: Client/loader/Dialogs.cpp:182
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - NVidia estándar con renombrado del ejecutable"
+msgid "C - Standard Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - NVidia alternativo con renombrado del ejecutable"
+msgid "D - Alternate Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:184
-msgid "E - Standard Intel"
-msgstr "E - Intel estándar"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "F - Alternate Intel"
-msgstr "F - Intel alternativo"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Intel estándar con renombrado del ejecutable"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Intel alternativo con renombrado del ejecutable"
-
-#: Client/loader/Dialogs.cpp:188
 msgid "If you get desperate, this might help:"
 msgstr "Si estás desesperado, esto puede ayudar:"
 
-#: Client/loader/Dialogs.cpp:189
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr "Si ya haz seleccionado una opción que funciona, esto podría ayudar:"
 
-#: Client/loader/Dialogs.cpp:190
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "Forzar modo ventana"
 
-#: Client/loader/Dialogs.cpp:191
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "No mostrar nuevamente"
 
-#: Client/loader/Dialogs.cpp:198 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:199
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Advertencia: no se detectó una solución antivirus"
 
-#: Client/loader/Dialogs.cpp:201
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -3032,11 +3016,11 @@ msgstr "MTA no ha podido encontrar un antivirus en tu equipo.\n\n"
 "Los virus pueden interfieren con MTA y pueden degradar tu experiencia de juego.\n\n"
 "Presiona 'Ayuda' para más información."
 
-#: Client/loader/Dialogs.cpp:204
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "Ya tengo instalado un antivirus"
 
-#: Client/loader/Dialogs.cpp:206
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "No instalaré un anti-virus.\n"
