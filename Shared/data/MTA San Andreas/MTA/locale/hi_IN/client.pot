@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-11 19:16+0000\n"
-"PO-Revision-Date: 2023-02-11 19:21\n"
+"POT-Creation-Date: 2023-02-12 13:23+0000\n"
+"PO-Revision-Date: 2023-02-12 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -2484,19 +2484,19 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:906
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr ""
 
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:914
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr ""
 
-#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:895
+#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr ""
 
-#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:898
+#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr ""
 
@@ -2516,19 +2516,19 @@ msgstr ""
 msgid "Error loading %s module! (%s)"
 msgstr ""
 
-#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:929
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr ""
 
-#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:933
+#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "समाप्त!"
 
@@ -2908,64 +2908,48 @@ msgid "B - Alternate NVidia"
 msgstr ""
 
 #: Client/loader/Dialogs.cpp:182
-msgid "C - Standard NVidia with exe rename"
+msgid "C - Standard Intel"
 msgstr ""
 
 #: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate NVidia with exe rename"
+msgid "D - Alternate Intel"
 msgstr ""
 
 #: Client/loader/Dialogs.cpp:184
-msgid "E - Standard Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:185
-msgid "F - Alternate Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:186
-msgid "G - Standard Intel with exe rename"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:187
-msgid "H - Alternate Intel with exe rename"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:188
 msgid "If you get desperate, this might help:"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:189
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:190
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:191
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "दोबारा न दिखाएं"
 
-#: Client/loader/Dialogs.cpp:198 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:199
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:201
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:204
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:206
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr ""
