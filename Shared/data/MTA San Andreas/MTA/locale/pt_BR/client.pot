@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-12 13:23+0000\n"
-"PO-Revision-Date: 2023-02-12 16:19\n"
+"PO-Revision-Date: 2023-02-12 17:19\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -2978,7 +2978,7 @@ msgstr "B - NVidia Alternativo"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr "C - Padrão Intel"
+msgstr "C - Intel Padrão"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
