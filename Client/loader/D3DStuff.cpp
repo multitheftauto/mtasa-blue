@@ -197,7 +197,6 @@ void BeginD3DStuff()
     else
     {
         SetApplicationSettingInt("nvhacks", "optimus-alt-startup", 0);
-        SetApplicationSettingInt("nvhacks", "optimus-rename-exe", 0);
         SetApplicationSettingInt("nvhacks", "optimus-export-enablement", 0);
         SetApplicationSettingInt("nvhacks", "optimus-force-windowed", 0);
     }
