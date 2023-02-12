@@ -1,14 +1,18 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Dialogs.cpp
+ *  FILE:        Client/loader/Dialogs.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "Dialogs.h"
+#include "resource.h"
+#include "Utils.h"
+#include "CInstallManager.h"
+#include "Main.h"
 #include <sstream>
 
 static bool          bCancelPressed = false;
@@ -771,6 +775,7 @@ void ShowOptimusDialog(HINSTANCE hInstance)
         ShellExecuteNonBlocking("open", PathJoin(GetMTASAPath(), MTA_EXE_NAME));
         TerminateProcess(GetCurrentProcess(), 0);
     }
+
     ResumeSplash();
 }
 

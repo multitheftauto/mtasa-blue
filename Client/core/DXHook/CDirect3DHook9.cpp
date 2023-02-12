@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDirect3DHook9.h"
 #include <SharedUtil.Detours.h>
 
 template <>

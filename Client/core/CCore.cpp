@@ -18,6 +18,8 @@
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
+#include "DXHook/CDirect3DHook9.h"
+#include "DXHook/CDirect3DHookManager.h"
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
@@ -1467,7 +1469,22 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
     }
 
     const char* szCmdLine = GetCommandLine();
-    char        szCmdLineCopy[512];
+
+    // Skip the leading game executable path (starts and ends with a quotation mark).
+    if (szCmdLine[0] == '"')
+    {
+        if (const char* afterPath = strchr(szCmdLine + 1, '"'); afterPath != nullptr)
+        {
+            ++afterPath;
+
+            while (*afterPath && isspace(*afterPath))
+                ++afterPath;
+
+            szCmdLine = afterPath;
+        }
+    }
+    
+    char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 
     char*       pCmdLineEnd = szCmdLineCopy + strlen(szCmdLineCopy);
@@ -1729,6 +1746,21 @@ void CCore::ApplyCoreInitSettings()
         SetProcessDPIAware();
     }
 #endif
+
+    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
+    {
+        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
+        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+        std::string currentSkinName;
+        CVARS_GET("current_skin", currentSkinName);
+
+        if (currentSkinName == "Default")
+        {
+            CVARS_SET("current_skin", "Default 2023");
+        }
+
+        SetApplicationSettingInt("reset-settings-revision", 21486);
+    }
 }
 
 //

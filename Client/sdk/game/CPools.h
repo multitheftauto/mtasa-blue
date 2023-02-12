@@ -74,7 +74,7 @@ public:
     virtual unsigned long             GetObjectCount() = 0;
 
     // Peds pool
-    virtual CPed* AddPed(class CClientPed* pClientPed, ePedModel ePedType) = 0;
+    virtual CPed* AddPed(class CClientPed* pClientPed, unsigned int nModelIndex) = 0;
     virtual CPed* AddPed(class CClientPed* pClientPed, DWORD* pGameInterface) = 0;
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
