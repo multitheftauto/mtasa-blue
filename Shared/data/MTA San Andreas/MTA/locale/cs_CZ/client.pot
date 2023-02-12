@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-11 19:16+0000\n"
-"PO-Revision-Date: 2023-02-11 19:20\n"
+"POT-Creation-Date: 2023-02-12 13:23+0000\n"
+"PO-Revision-Date: 2023-02-12 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -2534,19 +2534,19 @@ msgstr "Tvá instalace může být poškozená.\n\n"
 "Měl bys přeinstalovat Multi Theft Auto ze stránky www.multitheftauto.com\n"
 "nebo zkusit spustit aktualizaci s oprávněním administrátora."
 
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:906
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Instaluji aktualizace..."
 
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:914
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Rozbaluji soubory..."
 
-#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:895
+#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Hledám Grand Theft Auto San Andreas"
 
-#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:898
+#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Prosím spusť Grand Theft Auto San Andreas"
 
@@ -2568,19 +2568,19 @@ msgstr "MTA:SA potřebuje Administrátorská oprávnění pro následující ope
 msgid "Error loading %s module! (%s)"
 msgstr "Chyba při načítání %s modulu! (%s)"
 
-#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:919
+#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
 msgstr "Kopíruji soubory..."
 
-#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:924
+#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:919
 msgid "Copy finished early. Everything OK."
 msgstr "Kopírování zkončilo předčasně. Vše OK."
 
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:929
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:924
 msgid "Finishing..."
 msgstr "Dokončování..."
 
-#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:933
+#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:928
 msgid "Done!"
 msgstr "Hotovo!"
 
@@ -2989,54 +2989,38 @@ msgid "B - Alternate NVidia"
 msgstr "B - Alternativní NVidia"
 
 #: Client/loader/Dialogs.cpp:182
-msgid "C - Standard NVidia with exe rename"
-msgstr "C - Standardní NVidia s přejmenovaným .exe"
+msgid "C - Standard Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate NVidia with exe rename"
-msgstr "D - Alternativní NVidia s přejmenovaným .exe"
+msgid "D - Alternate Intel"
+msgstr ""
 
 #: Client/loader/Dialogs.cpp:184
-msgid "E - Standard Intel"
-msgstr "E - Standardní Intel"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "F - Alternate Intel"
-msgstr "F - Alternativní Intel"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "G - Standard Intel with exe rename"
-msgstr "G - Standardní Intel s přejmenovaným .exe"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "H - Alternate Intel with exe rename"
-msgstr "H - Alternativní Intel s přejmenovaným .exe"
-
-#: Client/loader/Dialogs.cpp:188
 msgid "If you get desperate, this might help:"
 msgstr "Pokud jsi zoufalý, toto ti může pomoct:"
 
-#: Client/loader/Dialogs.cpp:189
+#: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
 msgstr "Pokud jsi již vybral možnost, která funguje, tohle by mohlo pomoct:"
 
-#: Client/loader/Dialogs.cpp:190
+#: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
 msgstr "Vynutit režim v okně"
 
-#: Client/loader/Dialogs.cpp:191
+#: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
 msgstr "Znovu nezobrazovat"
 
-#: Client/loader/Dialogs.cpp:198 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
-#: Client/loader/Dialogs.cpp:199
+#: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Varování: Nebyl nalezen žádný antivirus"
 
-#: Client/loader/Dialogs.cpp:201
+#: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
@@ -3044,11 +3028,11 @@ msgstr "MTA nenalezlo žádný antivir na tvém počítači.\n\n"
 "Viry ovlivňují MTA a mohou kazit tvůj herní zážitek.\n\n"
 "Klikni na tlačíto 'Nápověda' pro více informací."
 
-#: Client/loader/Dialogs.cpp:204
+#: Client/loader/Dialogs.cpp:200
 msgid "I have already installed an anti-virus"
 msgstr "Antivir mám již nainstalovaný"
 
-#: Client/loader/Dialogs.cpp:206
+#: Client/loader/Dialogs.cpp:202
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "Nehodlám si antivir nainstalovat.\n"
