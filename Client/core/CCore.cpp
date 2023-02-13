@@ -18,6 +18,8 @@
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
+#include "DXHook/CDirect3DHook9.h"
+#include "DXHook/CDirect3DHookManager.h"
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>

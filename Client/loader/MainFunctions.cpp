@@ -1,15 +1,20 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/MainFunctions.cpp
+ *  FILE:        Client/loader/MainFunctions.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "MainFunctions.h"
+#include "Main.h"
+#include "Utils.h"
+#include "Dialogs.h"
+#include "D3DStuff.h"
 #include <array>
+#include <locale.h>
 
 DECLARE_ENUM(WSC_SECURITY_PROVIDER_HEALTH)
 IMPLEMENT_ENUM_BEGIN(WSC_SECURITY_PROVIDER_HEALTH)
@@ -663,7 +668,21 @@ void CheckAntiVirusStatus()
 
     // Get status from WSC
     WSC_SECURITY_PROVIDER_HEALTH health = (WSC_SECURITY_PROVIDER_HEALTH)-1;
-    WscGetSecurityProviderHealth(WSC_SECURITY_PROVIDER_ANTIVIRUS, &health);
+    {
+        using FunctionT = decltype(&WscGetSecurityProviderHealth);
+
+        static auto _WscGetSecurityProviderHealth = ([]() -> FunctionT {
+            if (HMODULE wscapi = LoadLibraryW(L"Wscapi.dll"))
+            {
+                return reinterpret_cast<FunctionT>(static_cast<void*>(GetProcAddress(wscapi, "WscGetSecurityProviderHealth")));
+            }
+
+            return nullptr;
+        })();
+
+        if (_WscGetSecurityProviderHealth)
+            _WscGetSecurityProviderHealth(WSC_SECURITY_PROVIDER_ANTIVIRUS, &health);
+    }
 
     // Dump results
     SString strStatus("AV health: %s (%d)", *EnumToString(health), health);
@@ -763,14 +782,25 @@ void CheckDataFiles()
     const char* dataFilesFiles[] = {"MTA\\cgui\\images\\background_logo.png",
                                     "MTA\\cgui\\images\\radarset\\up.png",
                                     "MTA\\cgui\\images\\busy_spinner.png",
+                                    "MTA\\data\\gta_sa_diff.dat",
                                     "MTA\\D3DX9_42.dll",
                                     "MTA\\D3DCompiler_42.dll",
+                                    "MTA\\d3dcompiler_43.dll",
+                                    "MTA\\d3dcompiler_47.dll",
                                     "MTA\\bass.dll",
+                                    "MTA\\bass_ac3.dll",
+                                    "MTA\\bassflac.dll",
+                                    "MTA\\bassmix.dll",
+                                    "MTA\\basswebm.dll",
+                                    "MTA\\bass_aac.dll",
                                     "MTA\\bass_fx.dll",
+                                    "MTA\\bassmidi.dll",
+                                    "MTA\\bassopus.dll",
+                                    "MTA\\basswma.dll",
                                     "MTA\\tags.dll",
                                     "MTA\\sa.dat",
-                                    "MTA\\XInput9_1_0_mta.dll",
-                                    "MTA\\vea.dll"};
+                                    "MTA\\xinput1_3_mta.dll",
+                                    "MTA\\XInput9_1_0_mta.dll"};
 
     for (uint i = 0; i < NUMELMS(dataFilesFiles); i++)
     {
@@ -830,25 +860,39 @@ void CheckDataFiles()
 
     struct
     {
-        const char* szMd5;
-        const char* szFilename;
+        const char* expected;
+        const char* fileName;
     } integrityCheckList[] = {{"8E58FCC0672A66C827C6F90FA4B58538", "bass.dll"},            {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
                               {"07C11F7D8058F350ADF6FC9AB81B38AC", "bass_ac3.dll"},        {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
                               {"65F79B61AD377DE06D88FE40B1D70538", "bassflac.dll"},        {"9AAF837944A9763CD914AC7D31ABC8C7", "bassmidi.dll"},
-                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},         {"26C74F5E9DF6C59DED3B09335E5D82AD", "bassopus.dll"},
-                              {"1A78628A8AB4B8DB0E336610A3ACF153", "basswebm.dll"},        {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
-                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},            {"309D860FC8137E5FE9E7056C33B4B8BE", "vea.dll"},
-                              {"0602F672BA595716E64EC4040E6DE376", "vog.dll"},             {"B37D7DF4A1430DB65AD3EA84801F9EC3", "vvo.dll"},
+                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},         {"75FCD499EE86AC9B234FF837D2080CDA", "bassopus.dll"},
+                              {"07852D9E8DB268D0187EDDBDD25A29E9", "basswebm.dll"},        {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},            {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
                               {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"},  {"1C9B45E87528B8BB8CFA884EA0099A85", "d3dcompiler_43.dll"},
-                              {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},        {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
-                              {"47FF3EE45DE53528F1AFD9F5982DF8C7", "vvof.dll"},            {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
-    for (int i = 0; i < NUMELMS(integrityCheckList); i++)
+                              {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},        {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
+                              {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
+
+    for (const auto& item : integrityCheckList)
     {
-        SString strMd5 = CMD5Hasher::CalculateHexString(PathJoin(strMTASAPath, "mta", integrityCheckList[i].szFilename));
-        if (!strMd5.CompareI(integrityCheckList[i].szMd5))
+        SString filePath = PathJoin(strMTASAPath, "mta", item.fileName);
+
+        if (!FileExists(filePath))
         {
-            DisplayErrorMessageBox(_("Data files modified. Possible virus activity.\n\nSee online help if MTA does not work correctly."), _E("CL30"),
-                                   "maybe-virus2");
+            SString message(_("Data file %s is missing. Possible virus activity.\n\nConsider reinstalling Multi Theft Auto for your security.\nSee online "
+                              "help if MTA does not work correctly."),
+                            item.fileName);
+            DisplayErrorMessageBox(message, _E("CL30"), "maybe-virus2");
+            break;
+        }
+
+        SString computed = CMD5Hasher::CalculateHexString(filePath);
+
+        if (!computed.CompareI(item.expected))
+        {
+            SString message(_("Data file %s is modified. Possible virus activity.\n\nConsider reinstalling Multi Theft Auto for your security.\nSee online "
+                              "help if MTA does not work correctly."),
+                            item.fileName);
+            DisplayErrorMessageBox(message, _E("CL30"), "maybe-virus2");
             break;
         }
     }
@@ -943,7 +987,7 @@ void CheckLibVersions()
                                 "MTA\\netc.dll",
                                 "MTA\\xmll.dll",
                                 "MTA\\game_sa.dll",
-                                "MTA\\mtasa.dll",
+                                "MTA\\" LOADER_PROXY_DLL_NAME,
                                 "mods\\deathmatch\\client.dll",
                                 "mods\\deathmatch\\pcre3.dll"};
     SString     strReqFileVersion;
@@ -1067,6 +1111,7 @@ int LaunchGame(SString strCmdLine)
     const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     SString       strMtaDir = PathJoin(strMTASAPath, "mta");
+    SString       strGTAEXEPath = GetGameExecutablePath().string();
 
     SetDllDirectory(strMtaDir);
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
@@ -1078,10 +1123,6 @@ int LaunchGame(SString strCmdLine)
     // Do some D3D things
     BeginD3DStuff();
     LogSettings();
-
-    // Use renamed exe if required
-    SString strGTAEXEPath = GetInstallManager()->MaybeRenameExe(strGTAPath);
-    SetCurrentDirectory(strGTAPath);
 
     WatchDogBeginSection("L2");                                     // Gets closed when loading screen is shown
     WatchDogBeginSection("L3");                                     // Gets closed when loading screen is shown, or a startup problem is handled elsewhere
@@ -1102,7 +1143,7 @@ int LaunchGame(SString strCmdLine)
     PROCESS_INFORMATION piLoadee = {0};
     DWORD               dwError;
     SString             strErrorContext;
-    if (FALSE == StartGtaProcess(strGTAEXEPath, strCmdLine, strMtaDir, &piLoadee, dwError, strErrorContext))
+    if (FALSE == StartGtaProcess(strGTAEXEPath, strCmdLine, strGTAPath, &piLoadee, dwError, strErrorContext))
     {
         WriteDebugEvent(SString("Loader - Process not created[%d (%s)]: %s", dwError, *strErrorContext, *strGTAEXEPath));
 
