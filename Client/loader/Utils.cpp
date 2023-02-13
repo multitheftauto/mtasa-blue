@@ -1835,7 +1835,6 @@ void LogSettings()
         {false, "nvhacks", "optimus-force-detection", ""},
         {false, "nvhacks", "optimus-export-enablement", ""},
         {false, "nvhacks", "optimus", ""},
-        {false, "nvhacks", "optimus-rename-exe", ""},
         {false, "nvhacks", "optimus-alt-startup", ""},
         {false, "nvhacks", "optimus-force-windowed", ""},
         {false, "nvhacks", "optimus-dialog-skip", ""},
@@ -2137,13 +2136,41 @@ bool IsErrorCodeLoggable(const std::error_code& ec)
 {
     switch (ec.value())
     {
-        case ERROR_SUCCESS:
         case ERROR_FILE_NOT_FOUND:
         case ERROR_PATH_NOT_FOUND:
             return false;
         default:
             return true;
     }
+}
+
+bool IsNativeArm64Host()
+{
+    static bool isArm64 = ([]
+    {
+        HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+
+        if (kernel32)
+        {
+            BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(GetProcAddress(kernel32, "IsWow64Process2"));
+
+            if (IsWow64Process2_)
+            {
+                USHORT processMachine;
+                USHORT nativeMachine;
+
+                if (IsWow64Process2_(GetCurrentProcess(), &processMachine, &nativeMachine))
+                {
+                    return nativeMachine == IMAGE_FILE_MACHINE_ARM64;
+                }
+            }
+        }
+        
+        return false;
+    })();
+
+    return isArm64;
 }
 
 //////////////////////////////////////////////////////////

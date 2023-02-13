@@ -827,6 +827,9 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             {
                 SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"));
                 strMessage += "\n\n" + gtaExePath.string();
+                strMessage +=
+                    "\n\n" +
+                    _("Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA.");
                 BrowseToSolution(SString("gengta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
                 return "quit";
             }
@@ -1215,6 +1218,12 @@ SString CInstallManager::_ProcessAppCompatChecks()
         addList.push_back(L"NoDTToDITMouseBatch");
     else
         removeList.push_back(L"NoDTToDITMouseBatch");
+
+    // Disable hybrid execution mode (x86 apps only) - ARM emulation settings.
+    if (IsNativeArm64Host())
+        addList.push_back(L"ARM64CHPEDISABLED");
+    else
+        removeList.push_back(L"ARM64CHPEDISABLED");
 
     // Details of reg keys to fiddle with
     struct

@@ -151,6 +151,11 @@ auto GenerateRandomString(size_t length) -> std::string;
  */
 bool IsErrorCodeLoggable(const std::error_code& ec);
 
+/**
+ * @brief Returns true if Windows is running on ARM64 architecture (via emulation).
+*/
+bool IsNativeArm64Host();
+
 // Return false on read failure
 template <class T>
 bool ReadFileValue(const SString& strFilename, T& value, uint uiOffset)
