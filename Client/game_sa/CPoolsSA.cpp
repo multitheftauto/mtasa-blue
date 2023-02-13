@@ -11,15 +11,20 @@
 
 #include "StdInc.h"
 #include "CBikeSA.h"
+#include "CBmxSA.h"
 #include "CBoatSA.h"
 #include "CGameSA.h"
+#include "CHeliSA.h"
+#include "CMonsterTruckSA.h"
+#include "CPlaneSA.h"
 #include "CPlayerPedSA.h"
 #include "CPoolsSA.h"
+#include "CQuadBikeSA.h"
+#include "CTrailerSA.h"
+#include "CTrainSA.h"
 #include "CWorldSA.h"
 
 extern CGameSA* pGame;
-
-extern bool g_bVehiclePointerInvalid;
 
 CPoolsSA::CPoolsSA()
 {
@@ -67,30 +72,61 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
 
 CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
 {
-    CVehicleSA* pVehicle = NULL;
+    CVehicleSA* pVehicle = nullptr;
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
+        MemSetFast((void*)VAR_CVehicle_Variation1, ucVariation, 1);
+        MemSetFast((void*)VAR_CVehicle_Variation2, ucVariation2, 1);
+
+        // CCarCtrl::CreateCarForScript
+        CVehicleSAInterface* pInterface = ((CVehicleSAInterface*(__cdecl*)(int, CVector, unsigned char))FUNC_CCarCtrlCreateCarForScript)(eVehicleType, CVector(0, 0, 0), 0);
+
         auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
 
         switch (vehicleClass)
         {
+            case VehicleClass::MONSTER_TRUCK:
+                pVehicle = new CMonsterTruckSA(reinterpret_cast<CMonsterTruckSAInterface*>(pInterface));
+                break;
+            case VehicleClass::QUAD:
+                pVehicle = new CQuadBikeSA(reinterpret_cast<CQuadBikeSAInterface*>(pInterface));
+                break;
+            case VehicleClass::HELI:
+                pVehicle = new CHeliSA(reinterpret_cast<CHeliSAInterface*>(pInterface));
+                break;
+            case VehicleClass::PLANE:
+                pVehicle = new CPlaneSA(reinterpret_cast<CPlaneSAInterface*>(pInterface));
+                break;
             case VehicleClass::BOAT:
-                pVehicle = new CBoatSA(eVehicleType, ucVariation, ucVariation2);
+                pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
+                break;
+            case VehicleClass::TRAIN:
+                pVehicle = new CTrainSA(reinterpret_cast<CTrainSAInterface*>(pInterface));
+                break;
+            case VehicleClass::BIKE:
+                pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
                 break;
             case VehicleClass::BMX:
-            case VehicleClass::BIKE:
-                pVehicle = new CBikeSA(eVehicleType, ucVariation, ucVariation2);
+                pVehicle = new CBmxSA(reinterpret_cast<CBmxSAInterface*>(pInterface));
+                break;
+            case VehicleClass::TRAILER:
+                pVehicle = new CTrailerSA(reinterpret_cast<CTrailerSAInterface*>(pInterface));
                 break;
             default:
-                pVehicle = new CVehicleSA(eVehicleType, ucVariation, ucVariation2);
+                pVehicle = new CAutomobileSA(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
                 break;
         }
 
-        if (!AddVehicleToPool(pClientVehicle, pVehicle))
+        if (pVehicle && AddVehicleToPool(pClientVehicle, pVehicle))
+        {
+            pVehicle->m_ucVariant = ucVariation;
+            pVehicle->m_ucVariant2 = ucVariation2;
+        }
+        else
         {
             delete pVehicle;
-            pVehicle = NULL;
+            pVehicle = nullptr;
         }
     }
 
@@ -317,12 +353,12 @@ inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
     return true;
 }
 
-CPed* CPoolsSA::AddPed(CClientPed* pClientPed, ePedModel ePedType)
+CPed* CPoolsSA::AddPed(CClientPed* pClientPed, unsigned int nModelIndex)
 {
     CPedSA* pPed = NULL;
     if (m_pedPool.ulCount < MAX_PEDS)
     {
-        pPed = new CPlayerPedSA(ePedType);
+        pPed = new CPlayerPedSA(nModelIndex);
         if (!AddPedToPool(pClientPed, pPed))
         {
             delete pPed;
@@ -434,7 +470,7 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 
 CPed* CPoolsSA::GetPedFromRef(DWORD dwGameRef)
 {
-    CPedSAInterface* pInterface = this->GetPedInterface(dwGameRef);
+    CPedSAInterface* pInterface = GetPedInterface(dwGameRef);
     if (pInterface)
     {
         // Extract the element index from the handle
@@ -538,8 +574,8 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
         }
     }
 
-    CVehicleSAInterface* pTrainBeginning = NULL;
-    CVehicleSAInterface* pTrainEnd = NULL;
+    CTrainSAInterface* pTrainBeginning = nullptr;
+    CTrainSAInterface* pTrainEnd = nullptr;
 
     float fX = vecPosition->fX;
     float fY = vecPosition->fY;
@@ -583,7 +619,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
 
         if (m_vehiclePool.ulCount < MAX_VEHICLES)
         {
-            trainHead = new CVehicleSA(pTrainBeginning);
+            trainHead = new CTrainSA(pTrainBeginning);
             if (!AddVehicleToPool(pClientVehicle, trainHead))
             {
                 delete trainHead;
@@ -599,10 +635,10 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
         {
             if (m_vehiclePool.ulCount < MAX_VEHICLES)
             {
-                CVehicleSAInterface* vehCarriage = carriage->GetNextCarriageInTrain();
+                CTrainSAInterface* vehCarriage = carriage->GetNextCarriageInTrain();
                 if (vehCarriage)
                 {
-                    carriage = new CVehicleSA(vehCarriage);
+                    carriage = new CTrainSA(vehCarriage);
                     if (!AddVehicleToPool(pClientVehicle, carriage))
                     {
                         delete carriage;
@@ -620,7 +656,10 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
     // Stops the train from moving at ludacrist speeds right after creation
     // due to some glitch in the node finding in CreateMissionTrain
     CVector vec(0, 0, 0);
-    trainHead->SetMoveSpeed(&vec);
+    if (trainHead)
+    {
+        trainHead->SetMoveSpeed(&vec);
+    } 
 
     return trainHead;
 }

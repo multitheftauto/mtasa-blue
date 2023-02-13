@@ -15,11 +15,11 @@
 
 CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)
 {
-    this->CreateTaskInterface(sizeof(CTaskComplexUseMobilePhoneSAInterface));
+    CreateTaskInterface(sizeof(CTaskComplexUseMobilePhoneSAInterface));
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskComplexUseMobilePhone__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
     {
@@ -33,11 +33,11 @@ CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const A
                                            const char* pTaskName, const bool bHoldLastFrame)
 {
     // TODO: Find out the real size
-    this->CreateTaskInterface(1024);
+    CreateTaskInterface(1024);
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskSimpleRunAnim__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
     {
@@ -57,11 +57,11 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA(const char* pAnimName, cons
                                                      const bool bHoldLastFrame)
 {
     // TODO: Find out the real size
-    this->CreateTaskInterface(sizeof(CTaskSimpleRunNamedAnimSAInterface));
+    CreateTaskInterface(sizeof(CTaskSimpleRunNamedAnimSAInterface));
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskSimpleRunNamedAnim__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
     {
@@ -84,11 +84,11 @@ CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const Asso
                                      const bool bFallToDeathOverRailing)
 {
     // TODO: Find out the real size
-    this->CreateTaskInterface(1024);
+    CreateTaskInterface(1024);
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskComplexDie__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
     {
@@ -109,11 +109,11 @@ CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const Asso
 CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, const AssocGroupId animGroup)
 {
     // TODO: Find out the real size
-    this->CreateTaskInterface(1024);
+    CreateTaskInterface(1024);
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskSimpleStealthKill__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPed->GetPedInterface();
 
     _asm
@@ -128,11 +128,11 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, con
 
 CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
 {
-    this->CreateTaskInterface(sizeof(CTaskSimpleDeadSAInterface));
+    CreateTaskInterface(sizeof(CTaskSimpleDeadSAInterface));
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskSimpleDead__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
     {
@@ -145,11 +145,11 @@ CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
 
 CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
 {
-    this->CreateTaskInterface(sizeof(CTaskSimpleBeHitSAInterface));
+    CreateTaskInterface(sizeof(CTaskSimpleBeHitSAInterface));
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskSimpleBeHit__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwPedInterface = (DWORD)pPedAttacker->GetPedInterface();
 
     _asm
@@ -166,11 +166,11 @@ CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBod
 CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStartStanding)
 {
     // TODO: Find out the real size
-    this->CreateTaskInterface(1024);
+    CreateTaskInterface(1024);
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskComplexSunbathe__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwObjectInterface = 0;
     if (pTowel)
         dwObjectInterface = (DWORD)pTowel->GetObjectInterface();
@@ -186,7 +186,7 @@ CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStar
 
 void CTaskComplexSunbatheSA::SetEndTime(DWORD dwTime)
 {
-    CTaskComplexSunbatheSAInterface* thisInterface = (CTaskComplexSunbatheSAInterface*)this->GetInterface();
+    CTaskComplexSunbatheSAInterface* thisInterface = (CTaskComplexSunbatheSAInterface*)GetInterface();
     thisInterface->m_BathingTimer.dwTimeEnd = dwTime;
 }
 
@@ -195,11 +195,11 @@ void CTaskComplexSunbatheSA::SetEndTime(DWORD dwTime)
 ////////////////////
 CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA()
 {
-    this->CreateTaskInterface(sizeof(CTaskSimplePlayerOnFootSAInterface));
+    CreateTaskInterface(sizeof(CTaskSimplePlayerOnFootSAInterface));
     if (!IsValid())
         return;
     DWORD dwFunc = (DWORD)FUNC_CTASKSimplePlayerOnFoot__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
     {
@@ -213,11 +213,11 @@ CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA()
 ////////////////////
 CTaskComplexFacialSA::CTaskComplexFacialSA()
 {
-    this->CreateTaskInterface(sizeof(CTaskComplexFacialSAInterface));
+    CreateTaskInterface(sizeof(CTaskComplexFacialSAInterface));
     if (!IsValid())
         return;
     DWORD dwFunc = (DWORD)FUNC_CTASKComplexFacial__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
     {
