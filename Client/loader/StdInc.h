@@ -1,32 +1,28 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/loader/StdInc.h
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
+ *****************************************************************************/
 
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <shlwapi.h>
+#include <stdio.h>
+#include <shellapi.h>
+#include <Wscapi.h>
+#include <shlobj.h>
+#include <Psapi.h>
+#include <winternl.h>
+
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_SYS_INFO
 #include "SharedUtil.h"
 
-#include "resource.h"
-#include <shlwapi.h>
-#include <stdio.h>
-#include "shellapi.h"
-#include <Wscapi.h>
-#include <shlobj.h>
-#include <Psapi.h>
-#include <time.h>
-#include <fstream>
-#include <winternl.h>
-
-#include "..\sdk\core\CLocalizationInterface.h"
+#include <core/CLocalizationInterface.h>
 extern CLocalizationInterface* g_pLocalization;
-
-#include "Main.h"
-#include "MainFunctions.h"
-#include "Install.h"
-#include "Utils.h"
-#include "Dialogs.h"
-#include "version.h"
-#include "CInstallManager.h"
-#include "D3DStuff.h"
-#include "CExePatchedStatus.h"
-#include "CFileGenerator.h"
