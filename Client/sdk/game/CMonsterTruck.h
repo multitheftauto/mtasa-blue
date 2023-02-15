@@ -11,8 +11,10 @@
 
 #pragma once
 
-#include "CVehicle.h"
+#include "CAutomobile.h"
 
-class CMonsterTruck : public CVehicle
+class CMonsterTruck : public virtual CAutomobile
 {
+public:
+	virtual ~CMonsterTruck(){};
 };

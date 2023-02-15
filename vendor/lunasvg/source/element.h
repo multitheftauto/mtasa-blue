@@ -8,7 +8,7 @@
 
 namespace lunasvg {
 
-enum class ElementId
+enum class ElementID
 {
     Unknown = 0,
     Star,
@@ -35,7 +35,7 @@ enum class ElementId
     Use
 };
 
-enum class PropertyId
+enum class PropertyID
 {
     Unknown = 0,
     Class,
@@ -108,7 +108,7 @@ enum class PropertyId
 
 struct Property
 {
-    PropertyId id;
+    PropertyID id;
     std::string value;
     int specificity;
 };
@@ -118,10 +118,11 @@ class PropertyList
 public:
     PropertyList() = default;
 
-    void set(PropertyId id, const std::string& value, int specificity);
-    Property* get(PropertyId id) const;
+    void set(PropertyID id, const std::string& value, int specificity);
+    Property* get(PropertyID id) const;
     void add(const Property& property);
     void add(const PropertyList& properties);
+    void clear() { m_properties.clear(); }
 
 private:
     std::vector<Property> m_properties;
@@ -164,15 +165,15 @@ using NodeList = std::list<std::unique_ptr<Node>>;
 class Element : public Node
 {
 public:
-    Element(ElementId id);
+    Element(ElementID id);
 
-    void set(PropertyId id, const std::string& value, int specificity);
-    const std::string& get(PropertyId id) const;
-    const std::string& find(PropertyId id) const;
-    bool has(PropertyId id) const;
+    void set(PropertyID id, const std::string& value, int specificity);
+    const std::string& get(PropertyID id) const;
+    const std::string& find(PropertyID id) const;
+    bool has(PropertyID id) const;
 
-    Element* previousSibling() const;
-    Element* nextSibling() const;
+    Element* previousElement() const;
+    Element* nextElement() const;
     Node* addChild(std::unique_ptr<Node> child);
     void layoutChildren(LayoutContext* context, LayoutContainer* current) const;
     Rect currentViewport() const;
@@ -208,7 +209,7 @@ public:
     }
 
 public:
-    ElementId id;
+    ElementID id;
     NodeList children;
     PropertyList properties;
 };

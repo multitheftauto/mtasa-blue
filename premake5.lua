@@ -98,8 +98,7 @@ workspace "MTASA"
 	end
 
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
-		os.mkdir("Build/Symbols")
-		linkoptions "/PDB:\"Symbols\\$(ProjectName).pdb\""
+		symbolspath "$(SolutionDir)Symbols\\$(Configuration)_$(Platform)\\$(ProjectName).pdb"
 
 	filter "system:windows"
 		toolset "v143"
@@ -139,6 +138,7 @@ workspace "MTASA"
 		include "Client/gui"
 		include "Client/launch"
 		include "Client/loader"
+		include "Client/loader-proxy"
 		include "Client/multiplayer_sa"
 		include "Client/mods/deathmatch"
 

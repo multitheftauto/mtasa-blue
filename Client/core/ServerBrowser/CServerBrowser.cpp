@@ -774,6 +774,11 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_pGeneralHelpWindow->SetVisible(false);
         m_pQuickConnectHelpWindow->SetVisible(false);
         CServerInfo::GetSingletonPtr()->Hide();
+
+        for (uint i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        {
+            m_FlashSearchBox[i].uiCount = 0;
+        }
     }
 }
 

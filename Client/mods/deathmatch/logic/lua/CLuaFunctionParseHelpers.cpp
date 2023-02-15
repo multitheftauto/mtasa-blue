@@ -7,6 +7,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 
 //
 // enum values <-> script strings
@@ -663,6 +664,7 @@ IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
 ADD_ENUM(eClientModelType::PED, "ped")
 ADD_ENUM(eClientModelType::OBJECT, "object")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
+ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects
@@ -870,6 +872,8 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))            // Try 3D Vector
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast((CRemoteCall*)ptr, luaVM))
         return GetClassTypeName(pVar);
 
     return "";
