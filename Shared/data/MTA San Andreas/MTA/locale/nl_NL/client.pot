@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-12 13:23+0000\n"
-"PO-Revision-Date: 2023-02-12 14:20\n"
+"POT-Creation-Date: 2023-02-15 05:20+0000\n"
+"PO-Revision-Date: 2023-02-15 06:19\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -644,11 +644,11 @@ msgstr "Taal Lokaliseren"
 msgid "Patch contributors"
 msgstr "Patch bijdragers"
 
-#: Client/core/CCredits.cpp:216
+#: Client/core/CCredits.cpp:215
 msgid "Special Thanks"
 msgstr "Met bijzondere dank aan"
 
-#: Client/core/CCredits.cpp:245
+#: Client/core/CCredits.cpp:244
 msgid "This software makes use of the following libraries and software:"
 msgstr "Deze software maakt gebruik van de volgende bibliotheken en software:"
 
