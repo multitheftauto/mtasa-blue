@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-12 13:23+0000\n"
-"PO-Revision-Date: 2023-02-12 23:04\n"
+"POT-Creation-Date: 2023-02-15 05:20+0000\n"
+"PO-Revision-Date: 2023-02-15 06:19\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -653,11 +653,11 @@ msgstr "Tłumacze"
 msgid "Patch contributors"
 msgstr "Twórcy łatek"
 
-#: Client/core/CCredits.cpp:216
+#: Client/core/CCredits.cpp:215
 msgid "Special Thanks"
 msgstr "Specjalne podziękowania dla"
 
-#: Client/core/CCredits.cpp:245
+#: Client/core/CCredits.cpp:244
 msgid "This software makes use of the following libraries and software:"
 msgstr "To oprogramowanie korzysta z poniższych bibliotek i technologii:"
 
