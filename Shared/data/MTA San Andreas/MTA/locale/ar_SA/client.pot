@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-12 13:23+0000\n"
-"PO-Revision-Date: 2023-02-12 14:20\n"
+"POT-Creation-Date: 2023-02-15 05:20+0000\n"
+"PO-Revision-Date: 2023-02-15 06:18\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -660,11 +660,11 @@ msgstr "أقاليم اللغة"
 msgid "Patch contributors"
 msgstr "المساهمين في البرمجة"
 
-#: Client/core/CCredits.cpp:216
+#: Client/core/CCredits.cpp:215
 msgid "Special Thanks"
 msgstr "شكر خاص"
 
-#: Client/core/CCredits.cpp:245
+#: Client/core/CCredits.cpp:244
 msgid "This software makes use of the following libraries and software:"
 msgstr "هذا البرنامج يقوم بإستخدام المكتبات والبرامج الأتية:"
 
