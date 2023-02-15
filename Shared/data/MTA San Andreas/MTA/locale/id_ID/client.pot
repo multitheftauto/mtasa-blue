@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-12 13:23+0000\n"
-"PO-Revision-Date: 2023-02-12 14:20\n"
+"POT-Creation-Date: 2023-02-15 05:20+0000\n"
+"PO-Revision-Date: 2023-02-15 06:20\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -640,11 +640,11 @@ msgstr "Lokalisasi Bahasa"
 msgid "Patch contributors"
 msgstr "Kontributor penambalan"
 
-#: Client/core/CCredits.cpp:216
+#: Client/core/CCredits.cpp:215
 msgid "Special Thanks"
 msgstr "Terima Kasih Khusus"
 
-#: Client/core/CCredits.cpp:245
+#: Client/core/CCredits.cpp:244
 msgid "This software makes use of the following libraries and software:"
 msgstr "Perangkat lunak ini menggunakan library dan perangkat lunak berikut:"
 
