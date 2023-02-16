@@ -1594,7 +1594,7 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         SDxStatus dxStatus;
         g_pCore->GetGraphics()->GetRenderItemManager()->GetDxStatus(dxStatus);
 
-        lua_createtable(luaVM, 0, 23);
+        lua_createtable(luaVM, 0, 24);
 
         lua_pushstring(luaVM, "TestMode");
         lua_pushstring(luaVM, EnumToString(dxStatus.testMode));
@@ -1729,7 +1729,7 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_settable(luaVM, -3);
 
         // diagnostic debug detection
-        
+
         EDiagnosticDebugType diagnosticDebug = g_pCore->GetDiagnosticDebug();
         std::string diagnosticDebugString;
 
