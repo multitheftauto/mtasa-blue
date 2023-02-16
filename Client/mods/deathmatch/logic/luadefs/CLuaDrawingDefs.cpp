@@ -1728,6 +1728,43 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_pushnumber(luaVM, static_cast<lua_Number>(SharedUtil::GetWMITotalPhysicalMemory()) / 1024.0 / 1024.0);
         lua_settable(luaVM, -3);
 
+        // diagnostic debug detection
+        
+        EDiagnosticDebugType diagnosticDebug = g_pCore->GetDiagnosticDebug();
+        std::string diagnosticDebugString;
+
+        switch (diagnosticDebug)
+        {
+            case EDiagnosticDebug::GRAPHICS_6734:
+                diagnosticDebugString = "#6734 Graphics";
+                break;
+            case EDiagnosticDebug::D3D_6732:
+                diagnosticDebugString = "#6732 D3D";
+                break;
+            case EDiagnosticDebug::LOG_TIMING_0000:
+                diagnosticDebugString = "#0000 Log timing";
+                break;
+            case EDiagnosticDebug::JOYSTICK_0000:
+                diagnosticDebugString = "#0000 Joystick";
+                break;
+            case EDiagnosticDebug::LUA_TRACE_0000:
+                diagnosticDebugString = "#0000 Lua trace";
+                break;
+            case EDiagnosticDebug::RESIZE_ALWAYS_0000:
+                diagnosticDebugString = "#0000 Resize always";
+                break;
+            case EDiagnosticDebug::RESIZE_NEVER_0000:
+                diagnosticDebugString = "#0000 Resize never";
+                break;
+            default:
+                diagnosticDebugString = "Default";
+                break;
+        }
+
+        lua_pushstring(luaVM, "SettingDebugMode");
+        lua_pushstring(luaVM, diagnosticDebugString.c_str());
+        lua_settable(luaVM, -3);
+
         return 1;
     }
     else
