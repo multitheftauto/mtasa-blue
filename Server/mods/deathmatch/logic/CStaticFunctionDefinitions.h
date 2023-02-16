@@ -169,7 +169,6 @@ public:
     static CElement* GetPedTarget(CPed* pPed);
     static bool      GetPedClothes(CPed* pPed, unsigned char ucType, SString& strOutTexture, SString& strOutModel);
     static bool      DoesPedHaveJetPack(CPed* pPed, bool& bHasJetPack);
-    static bool      IsPedOnGround(CPed* pPed, bool& bOnGround);
     static bool      GetPedFightingStyle(CPed* pPed, unsigned char& ucStyle);
     static bool      GetPedMoveAnim(CPed* pPed, unsigned int& iMoveAnim);
     static bool      GetPedGravity(CPed* pPed, float& fGravity);
@@ -269,7 +268,6 @@ public:
     static bool  IsVehicleDamageProof(CVehicle* pVehicle, bool& bDamageProof);
     static bool  IsVehicleFuelTankExplodable(CVehicle* pVehicle, bool& bExplodable);
     static bool  IsVehicleFrozen(CVehicle* pVehicle, bool& bFrozen);
-    static bool  IsVehicleOnGround(CVehicle* pVehicle, bool& bOnGround);
     static bool  GetVehicleEngineState(CVehicle* pVehicle, bool& bState);
     static bool  IsTrainDerailed(CVehicle* pVehicle, bool& bDerailed);
     static bool  IsTrainDerailable(CVehicle* pVehicle, bool& bDerailable);

@@ -35,7 +35,6 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedWeapon", GetPedWeapon},
         {"getPedClothes", GetPedClothes},
         {"isPedWearingJetpack", DoesPedHaveJetPack},            // introduced in 1.5.5-9.13846
-        {"isPedOnGround", IsPedOnGround},
         {"getPedFightingStyle", GetPedFightingStyle},
         {"getPedWalkingStyle", GetPedMoveAnim},
         {"getPedGravity", GetPedGravity},
@@ -109,7 +108,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "isDucked", "isPedDucked");
     lua_classfunction(luaVM, "isInWater", "isPedInWater");
-    lua_classfunction(luaVM, "isOnGround", "isPedOnGround");
     lua_classfunction(luaVM, "isInVehicle", "isPedInVehicle");
     lua_classfunction(luaVM, "isOnFire", "isPedOnFire");
     lua_classfunction(luaVM, "isChoking", "isPedChoking");
@@ -152,7 +150,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");
     lua_classvariable(luaVM, "inWater", NULL, "isPedInWater");
-    lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
     lua_classvariable(luaVM, "onFire", "setPedOnFire", "isPedOnFire");
     lua_classvariable(luaVM, "choking", "setPedChoking", "isPedChoking");
     lua_classvariable(luaVM, "doingGangDriveby", "setPedDoingGangDriveby", "isPedDoingGangDriveby");
@@ -925,29 +922,6 @@ int CLuaPedDefs::DoesPedHaveJetPack(lua_State* luaVM)
         if (CStaticFunctionDefinitions::DoesPedHaveJetPack(pPed, bHasJetPack))
         {
             lua_pushboolean(luaVM, bHasJetPack);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaPedDefs::IsPedOnGround(lua_State* luaVM)
-{
-    CPed* pPed;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        bool bOnGround;
-        if (CStaticFunctionDefinitions::IsPedOnGround(pPed, bOnGround))
-        {
-            lua_pushboolean(luaVM, bOnGround);
             return 1;
         }
     }

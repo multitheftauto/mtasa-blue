@@ -64,6 +64,7 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementDoubleSided", IsElementDoubleSided},
         {"getElementCollisionsEnabled", GetElementCollisionsEnabled},
         {"isElementFrozen", IsElementFrozen},
+        {"isElementOnGround", IsElementOnGround},
         {"getLowLODElement", GetLowLodElement},
         {"isElementLowLOD", IsElementLowLod},
         {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
@@ -123,6 +124,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isWithinColShape", "isElementWithinColShape");
     lua_classfunction(luaVM, "isWithinMarker", "isElementWithinMarker");
     lua_classfunction(luaVM, "isInWater", "isElementInWater");
+    lua_classfunction(luaVM, "isOnGround", "isElementOnGround");
     lua_classfunction(luaVM, "isFrozen", "isElementFrozen");
     lua_classfunction(luaVM, "isLowLOD", "isElementLowLOD");
     lua_classfunction(luaVM, "isDoubleSided", "isElementDoubleSided");
@@ -207,6 +209,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "syncedByLocalPlayer", NULL, "isElementSyncer");
     lua_classvariable(luaVM, "collisions", "setElementCollisionsEnabled", "getElementCollisionsEnabled");
     lua_classvariable(luaVM, "frozen", "setElementFrozen", "isElementFrozen");
+    lua_classvariable(luaVM, "onGround", NULL, "isElementOnGround");
     lua_classvariable(luaVM, "inWater", NULL, "isElementInWater");
     lua_classvariable(luaVM, "lowLOD", "setLowLODElement", "getLowLODElement");
     lua_classvariable(luaVM, "dimension", "setElementDimension", "getElementDimension");
@@ -1541,6 +1544,29 @@ int CLuaElementDefs::IsElementFrozen(lua_State* luaVM)
         if (CStaticFunctionDefinitions::IsElementFrozen(*pEntity, bFrozen))
         {
             lua_pushboolean(luaVM, bFrozen);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::IsElementOnGround(lua_State* luaVM)
+{
+    // Verify the argument
+    CClientEntity*   pEntity = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pEntity);
+
+    if (!argStream.HasErrors())
+    {
+        bool bOnGround;
+        if (CStaticFunctionDefinitions::IsElementOnGround(*pEntity, bOnGround))
+        {
+            lua_pushboolean(luaVM, bOnGround);
             return 1;
         }
     }

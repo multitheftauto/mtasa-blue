@@ -66,6 +66,7 @@ public:
     LUA_DECLARE(IsElementDoubleSided);
     LUA_DECLARE(GetElementCollisionsEnabled);
     LUA_DECLARE(IsElementFrozen);
+    LUA_DECLARE(IsElementOnGround);
     LUA_DECLARE(GetLowLodElement);
     LUA_DECLARE(IsElementLowLod);
     LUA_DECLARE(IsElementCallPropagationEnabled);

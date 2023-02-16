@@ -32,7 +32,6 @@ void CLuaPedDefs::LoadFunctions()
         {"isPedInVehicle", IsPedInVehicle},
         {"doesPedHaveJetPack", DoesPedHaveJetPack},
         {"isPedWearingJetpack", DoesPedHaveJetPack},            // introduced in 1.5.5-9.13846
-        {"isPedOnGround", IsPedOnGround},
         {"getPedTask", GetPedTask},
         {"getPedSimplestTask", GetPedSimplestTask},
         {"isPedDoingTask", IsPedDoingTask},
@@ -157,7 +156,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
     lua_classfunction(luaVM, "isInVehicle", "isPedInVehicle");
     lua_classfunction(luaVM, "isOnFire", "isPedOnFire");
-    lua_classfunction(luaVM, "isOnGround", "isPedOnGround");
     lua_classfunction(luaVM, "isTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classfunction(luaVM, "isDead", "isPedDead");
     lua_classfunction(luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled");
@@ -217,7 +215,6 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "headless", "setPedHeadless", "isPedHeadless");
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
     lua_classvariable(luaVM, "onFire", "setPedOnFire", "isPedOnFire");
-    lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
     lua_classvariable(luaVM, "targetingMarker", "setPedTargetingMarkerEnabled", "isPedTargetingMarkerEnabled");
     lua_classvariable(luaVM, "footBlood", "setPedFootBloodEnabled", NULL);
@@ -892,28 +889,6 @@ int CLuaPedDefs::DoesPedHaveJetPack(lua_State* luaVM)
         // Find out whether he has a jetpack or not and return it
         bool bHasJetPack = pPed->HasJetPack();
         lua_pushboolean(luaVM, bHasJetPack);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaPedDefs::IsPedOnGround(lua_State* luaVM)
-{
-    // Verify the argument
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
-    {
-        // Find out whether he's on the ground or not and return it
-        bool bOnGround = pPed->IsOnGround();
-        lua_pushboolean(luaVM, bOnGround);
         return 1;
     }
     else

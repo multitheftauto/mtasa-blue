@@ -926,6 +926,30 @@ bool CStaticFunctionDefinitions::IsElementFrozen(CClientEntity& Entity, bool& bF
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsElementOnGround(CClientEntity& Entity, bool& bOnGround)
+{
+    switch (Entity.GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        {
+            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            bOnGround = Ped.IsOnGround();
+            break;
+        }
+        case CCLIENTVEHICLE:
+        {
+            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            bOnGround = Vehicle.IsOnGround();
+            break;
+        }
+        default:
+            return false;
+    }
+
+    return true;
+}
+
 CClientDummy* CStaticFunctionDefinitions::CreateElement(CResource& Resource, const char* szTypeName, const char* szID)
 {
     assert(szTypeName);
