@@ -14,7 +14,7 @@
 #include <game/CSettings.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
-#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
+#include "Userenv.h"            // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
@@ -24,6 +24,7 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordRichPresence.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -141,15 +142,15 @@ CCore::CCore()
     m_pTrayIcon = new CTrayIcon();
 
     // Create discord rich presence
-    m_pDiscordRichPresence = new CDiscordRichPresence();
+    m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    // Destroy discord rich presence
-    delete m_pDiscordRichPresence;
+    // Reset discord rich presence
+    m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -640,7 +641,7 @@ void CCore::SetConnected(bool bConnected)
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
 
-    CDiscordInterface* discord = g_pCore->GetDiscord();
+    auto discord = g_pCore->GetDiscord();
     discord->SetPresenceState(bConnected ? "In-game" : "Main menu");
     discord->SetPresenceStartTimestamp(0);
     discord->SetPresenceDetails("");
@@ -653,7 +654,6 @@ void CCore::SetConnected(bool bConnected)
     }
 
     discord->UpdatePresence();
-    
 }
 
 bool CCore::IsConnected()
@@ -1504,7 +1504,7 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
             szCmdLine = afterPath;
         }
     }
-    
+
     char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 
@@ -1756,7 +1756,7 @@ void CCore::UpdateRecentlyPlayed()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)            // Windows Vista
     bool bValue;
     CVARS_GET("process_dpi_aware", bValue);
 
@@ -2344,4 +2344,9 @@ SString CCore::GetBlueCopyrightString()
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
+}
+
+std::shared_ptr<CDiscordRichPresence> CCore::GetDiscord()
+{
+    return m_pDiscordRichPresence;
 }

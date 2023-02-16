@@ -13,6 +13,7 @@
 class CDiscordInterface
 {
 public:
+    virtual ~CDiscordInterface() = default;
     virtual void UpdatePresence() = 0;
     virtual void SetPresenceState(const char* szState) = 0;
     virtual void SetPresenceDetails(const char* szDetails) = 0;

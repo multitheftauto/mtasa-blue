@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "discord_rpc.h"
+#include "CDiscordRichPresence.h"
 
 #define DEFAULT_APP_ID "727214310610436126"
 #define DEFAULT_APP_ASSET "mta_logo_round"
@@ -22,6 +23,7 @@ CDiscordRichPresence::CDiscordRichPresence()
 {
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
+
     m_strDiscordAppId = DEFAULT_APP_ID;
     m_strDiscordAppAsset = DEFAULT_APP_ASSET;
     m_strDiscordAppAssetSmall = DEFAULT_APP_ASSET_SMALL;
