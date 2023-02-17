@@ -61,9 +61,13 @@ void CDiscordRichPresence::SetPresenceState(const char* szState)
     m_strDiscordAppState = szState;
 }
 
-void CDiscordRichPresence::SetPresenceDetails(const char* szDetails)
+bool CDiscordRichPresence::SetPresenceDetails(const char* szDetails, bool bCustom)
 {
+    if (bCustom && !m_bAllowCustomDetails)
+        return false;
+
     m_strDiscordAppDetails = szDetails;
+    return true;
 }
 
 void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart)

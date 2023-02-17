@@ -288,8 +288,9 @@ CMainMenu::CMainMenu(CGUI* pManager)
     SetIsIngame(false);
 
     // Discord
-    g_pCore->GetDiscord()->SetPresenceState("Main menu");
-    g_pCore->GetDiscord()->UpdatePresence();
+    auto discord = g_pCore->GetDiscord();
+    discord->SetPresenceState("Main menu");
+    discord->UpdatePresence();
 
     // Store the pointer to the graphics subsystem
     m_pGraphics = CGraphics::GetSingletonPtr();

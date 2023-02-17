@@ -119,6 +119,7 @@
 #include <luadefs/CLuaColShapeDefs.h>
 #include <luadefs/CLuaCompatibilityDefs.h>
 #include <luadefs/CLuaDrawingDefs.h>
+#include <luadefs/CLuaDiscordDefs.h>
 #include <luadefs/CLuaEffectDefs.h>
 #include <luadefs/CLuaElementDefs.h>
 #include <luadefs/CLuaEngineDefs.h>

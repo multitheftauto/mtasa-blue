@@ -16,6 +16,6 @@ public:
     virtual ~CDiscordInterface() = default;
     virtual void UpdatePresence() = 0;
     virtual void SetPresenceState(const char* szState) = 0;
-    virtual void SetPresenceDetails(const char* szDetails) = 0;
+    virtual bool SetPresenceDetails(const char* szDetails, bool bCustom = false) = 0;
     virtual void SetPresenceStartTimestamp(const unsigned long ulStart) = 0;
 };

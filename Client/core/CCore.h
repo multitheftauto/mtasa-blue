@@ -103,7 +103,7 @@ public:
     CLocalizationInterface*               GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*                    GetWebCore();
     CTrayIconInterface*                   GetTrayIcon() { return m_pTrayIcon; };
-    std::shared_ptr<CDiscordRichPresence> GetDiscord();
+    std::shared_ptr<CDiscordInterface>    GetDiscord();
 
     void SaveConfig(bool bWaitUntilFinished = false);
 

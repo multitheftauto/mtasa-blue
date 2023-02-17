@@ -2346,7 +2346,7 @@ SString CCore::GetBlueCopyrightString()
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }
 
-std::shared_ptr<CDiscordRichPresence> CCore::GetDiscord()
+std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
 {
     return m_pDiscordRichPresence;
 }

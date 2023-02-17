@@ -22,7 +22,7 @@ public:
     // void SetApplicationId();
     void UpdatePresence();
     void SetPresenceState(const char* szState);
-    void SetPresenceDetails(const char* szDetails);
+    bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     void SetPresenceStartTimestamp(const unsigned long ulStart);
     // void SetPresenceTimestamp();
     // void SetPresenceImage();
@@ -40,4 +40,6 @@ private:
     std::string   m_strDiscordAppDetails;
     unsigned long m_uiDiscordAppStart;
     unsigned long m_uiDiscordAppEnd;
+
+    bool m_bAllowCustomDetails;
 };
