@@ -2,14 +2,17 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Install.cpp
+ *  FILE:        Client/loader/Install.cpp
  *  PURPOSE:     Handles the installation of updates for MTA
  *
  *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "Install.h"
+#include "Utils.h"
+#include "Dialogs.h"
+#include "Main.h"
 #include <unrar/dll.hpp>
 #include <optional>
 #include <memory>
