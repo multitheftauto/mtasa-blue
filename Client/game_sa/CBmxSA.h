@@ -19,11 +19,10 @@ class CBmxSAInterface : public CBikeSAInterface
     // fill this
 };
 
-class CBmxSA : public virtual CBmx, public virtual CBikeSA
+class CBmxSA final : public virtual CBmx, public virtual CBikeSA
 {
 public:
-    CBmxSA(CBmxSAInterface* bmx);
-    CBmxSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CBmxSA(CBmxSAInterface* pInterface);
 
-    virtual ~CBmxSA(){};
+    CBmxSAInterface* GetBmxInterface() { return reinterpret_cast<CBmxSAInterface*>(GetInterface()); }
 };

@@ -69,12 +69,12 @@ struct CFileObjectInstance
 
 CObjectSA::CObjectSA(CObjectSAInterface* objectInterface)
 {
-    this->SetInterface(objectInterface);
+    SetInterface(objectInterface);
     m_ucAlpha = 255;
 
     // Setup some flags
-    this->BeingDeleted = false;
-    this->DoNotRemoveFromGame = false;
+    BeingDeleted = false;
+    DoNotRemoveFromGame = false;
 
     if (m_pInterface)
     {
@@ -99,14 +99,14 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 
     if (dwObjectPtr)
     {
-        this->SetInterface((CEntitySAInterface*)dwObjectPtr);
+        SetInterface((CEntitySAInterface*)dwObjectPtr);
 
         CWorldSA* world = (CWorldSA*)pGame->GetWorld();
         world->Add(m_pInterface, CObject_Constructor);
 
         // Setup some flags
-        this->BeingDeleted = false;
-        this->DoNotRemoveFromGame = false;
+        BeingDeleted = false;
+        DoNotRemoveFromGame = false;
         MemPutFast<BYTE>(dwObjectPtr + 316, 6);
         if (bBreakingDisabled)
         {
@@ -124,7 +124,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     else
     {
         // The exception handler doesn't work for some reason, so do this
-        this->SetInterface(nullptr);
+        SetInterface(nullptr);
     }
 
     m_ucAlpha = 255;
@@ -138,7 +138,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
 
 CObjectSA::~CObjectSA()
 {
-    if (!this->BeingDeleted && DoNotRemoveFromGame == false)
+    if (!BeingDeleted && DoNotRemoveFromGame == false)
     {
         CEntitySAInterface* pInterface = GetInterface();
         if (pInterface)
@@ -160,7 +160,7 @@ CObjectSA::~CObjectSA()
             }
         }
 
-        this->BeingDeleted = true;
+        BeingDeleted = true;
         ((CPoolsSA*)pGame->GetPools())->RemoveObject((CObject*)(CObjectSA*)this);
     }
 }
@@ -168,7 +168,7 @@ CObjectSA::~CObjectSA()
 void CObjectSA::Explode()
 {
     DWORD dwFunc = FUNC_CObject_Explode;
-    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwThis = (DWORD)GetInterface();
 
     _asm
     {
@@ -221,19 +221,19 @@ void CObjectSA::Break()
 
 void CObjectSA::SetHealth(float fHealth)
 {
-    static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth = fHealth;
+    static_cast<CObjectSAInterface*>(GetInterface())->fHealth = fHealth;
 }
 
 float CObjectSA::GetHealth()
 {
-    return static_cast<CObjectSAInterface*>(this->GetInterface())->fHealth;
+    return static_cast<CObjectSAInterface*>(GetInterface())->fHealth;
 }
 
 void CObjectSA::SetModelIndex(unsigned long ulModel)
 {
     // Delete any existing RwObject first
-    DWORD dwFunc = this->GetInterface()->vtbl->DeleteRwObject;
-    DWORD dwThis = (DWORD)this->GetInterface();
+    DWORD dwFunc = GetInterface()->vtbl->DeleteRwObject;
+    DWORD dwThis = (DWORD)GetInterface();
     _asm
     {
         mov     ecx, dwThis
@@ -241,7 +241,7 @@ void CObjectSA::SetModelIndex(unsigned long ulModel)
     }
 
     // Jax: I'm not sure if using the vtbl is right (as ped and vehicle dont), but it works
-    dwFunc = this->GetInterface()->vtbl->SetModelIndex;
+    dwFunc = GetInterface()->vtbl->SetModelIndex;
     _asm
     {
         mov     ecx, dwThis
