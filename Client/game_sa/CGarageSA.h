@@ -39,7 +39,7 @@ public:
     CGarageSA(CGarageSAInterface* pInterface);
 
     void SetType(BYTE type);
-    BYTE GetType() const { return this->internalInterface->Type; }
+    BYTE GetType() const { return internalInterface->Type; }
 
     void GetPosition(CVector& vecPosition) const;
     void GetDirection(float& x1, float& y1, float& x2, float& y2) const;
@@ -49,7 +49,7 @@ public:
     void SetOpen(bool bOpen);
     bool IsOpen() const;
 
-    CGarageSAInterface* GetInterface() { return this->internalInterface; }
+    CGarageSAInterface* GetInterface() { return internalInterface; }
 
 private:
     CGarageSAInterface* internalInterface;
