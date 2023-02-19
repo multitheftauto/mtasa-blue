@@ -35,6 +35,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedWeapon", GetPedWeapon},
         {"getPedClothes", GetPedClothes},
         {"isPedWearingJetpack", DoesPedHaveJetPack},            // introduced in 1.5.5-9.13846
+        {"isPedOnGround", IsPedOnGround},
         {"getPedFightingStyle", GetPedFightingStyle},
         {"getPedWalkingStyle", GetPedMoveAnim},
         {"getPedGravity", GetPedGravity},
