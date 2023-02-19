@@ -22,6 +22,11 @@
     #include "SharedUtil.Tests.hpp"
 #endif
 
+#define WASM_API_EXTERN
+#define WASI_API_EXTERN
+#include <wasmtime/include/wasm.h>
+#include <wasmtime/include/wasmtime.h>
+
 CServerInterface* g_pServerInterface = NULL;
 CNetServer*       g_pNetServer = NULL;
 CNetServer*       g_pRealNetServer = NULL;
@@ -39,6 +44,7 @@ CServer::~CServer()
 
 void CServer::ServerInitialize(CServerInterface* pServerInterface)
 {
+    wasm_engine_t* engine = wasm_engine_new();
     m_pServerInterface = pServerInterface;
     g_pServerInterface = pServerInterface;
     g_pNetServer = pServerInterface->GetNetwork();
