@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-19 17:26+0000\n"
-"PO-Revision-Date: 2023-02-19 18:23\n"
+"POT-Creation-Date: 2023-02-19 19:53+0000\n"
+"PO-Revision-Date: 2023-02-19 20:19\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -2665,11 +2665,11 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Я не буду інсталювати антивірус.\n"
 "Я готовий до ризику стати частиною ботнету та лагів."
 
-#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:527
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Пошук Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:529
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Запустіть Grand Theft Auto San Andreas"
 
@@ -2681,19 +2681,19 @@ msgstr "Інсталяція оновлення..."
 msgid "Extracting files..."
 msgstr "Вилучення файлів..."
 
-#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1388
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1394
 msgid "Copying files..."
 msgstr "Копіювання файлів..."
 
-#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1448
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1454
 msgid "Copy finished early. Everything OK."
 msgstr "Копіювання завершено. Все в порядку."
 
-#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1454
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1460
 msgid "Finishing..."
 msgstr "Завершення..."
 
-#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1456
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
 msgid "Done!"
 msgstr "Готово!"
 
@@ -2886,7 +2886,7 @@ msgstr "Не вдалося запустити Grand Theft Auto: San Andreas.   
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Процес GTA: San Andreas не може бути запущений правильно. Ви хочете завершити його?"
 
-#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:962
+#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:968
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -3004,54 +3004,54 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Utils.cpp:593
+#: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Виберіть директорію з Grand Theft Auto: San Andreas"
 
-#: Client/loader/Utils.cpp:1063
+#: Client/loader/Utils.cpp:1069
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Помилка завантаження %s модуля! (%s)"
 
-#: Client/loader/Utils.cpp:1496
+#: Client/loader/Utils.cpp:1502
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Нова версія клієнта %s виявлена.\n\n"
 "Ви хочете скопіювати ваші налаштування з %s ?"
 
-#: Client/loader/Utils.cpp:1535
+#: Client/loader/Utils.cpp:1541
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA не зміг відкрити файл '%s'"
 
-#: Client/loader/Utils.cpp:1557
+#: Client/loader/Utils.cpp:1563
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA не знайшов файл '%s'"
 
-#: Client/loader/Utils.cpp:1582
+#: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA не зміг завантажити модель."
 
-#: Client/loader/Utils.cpp:1584
+#: Client/loader/Utils.cpp:1590
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Якщо ви недавно модифікували gta3.img, спробуйте переінсталювати GTA:SA."
 
-#: Client/loader/Utils.cpp:1609
+#: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA не зміг додати апґрейд транспортному засобу."
 
-#: Client/loader/Utils.cpp:1628
+#: Client/loader/Utils.cpp:1634
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA знайшов помилки в файлі '%s"
 
-#: Client/loader/Utils.cpp:1710
+#: Client/loader/Utils.cpp:1716
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Ваш комп'ютер перезавантажився під час гри в MTA:SA?"
 
-#: Client/loader/Utils.cpp:1775
+#: Client/loader/Utils.cpp:1781
 msgid "Please terminate the following programs before continuing:"
 msgstr "Завершіть наступні програми для продовження:"
 
