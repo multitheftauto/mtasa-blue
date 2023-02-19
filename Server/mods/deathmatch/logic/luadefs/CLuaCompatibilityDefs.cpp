@@ -41,6 +41,7 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"doesPlayerHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
         {"isPlayerInWater", CLuaElementDefs::isElementInWater},
         {"isPedInWater", CLuaElementDefs::isElementInWater},
+        {"isPlayerOnGround", CLuaPedDefs::IsPedOnGround},
         {"getPlayerFightingStyle", CLuaPedDefs::GetPedFightingStyle},
         {"getPlayerGravity", CLuaPedDefs::GetPedGravity},
         {"getPlayerContactElement", CLuaPedDefs::GetPedContactElement},
