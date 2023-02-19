@@ -73,7 +73,6 @@ public:
     static bool           IsElementCollidableWith(CClientEntity& Entity, CClientEntity& ThisEntity, bool& bCanCollide);
     static bool           GetElementCollisionsEnabled(CClientEntity& Entity);
     static bool           IsElementFrozen(CClientEntity& Entity, bool& bFrozen);
-    static bool           IsElementOnGround(CClientEntity& Entity, bool& bOnGround);
     static bool           GetLowLodElement(CClientEntity& Entity, CClientEntity*& pOutLowLodEntity);
     static bool           IsElementLowLod(CClientEntity& Entity, bool& bOutIsLowLod);
     static bool           IsElementCallPropagationEnabled(CClientEntity& Entity, bool& bOutEnabled);
