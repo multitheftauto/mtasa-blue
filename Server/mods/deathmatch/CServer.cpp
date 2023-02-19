@@ -137,14 +137,118 @@ extern "C"
 int initWasm()
 {
     static char global_heap_buf[512 * 1024];
-    char *      buffer, error_buf[128];
+    char      error_buf[128] = {};
+
+    char       buffer[101] = {
+        0x00,
+        0x61,
+        0x73,
+        0x6D,
+        0x01,
+        0x00,
+        0x00,
+        0x00,
+        0x01,
+        0x87,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x01,
+        0x60,
+        0x02,
+        0x7F,
+        0x7F,
+        0x01,
+        0x7F,
+        0x03,
+        0x82,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x01,
+        0x00,
+        0x04,
+        0x84,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x01,
+        0x70,
+        0x00,
+        0x00,
+        0x05,
+        0x83,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x01,
+        0x00,
+        0x01,
+        0x06,
+        0x81,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x00,
+        0x07,
+        0x95,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x02,
+        0x06,
+        0x6D,
+        0x65,
+        0x6D,
+        0x6F,
+        0x72,
+        0x79,
+        0x02,
+        0x00,
+        0x08,
+        0x5F,
+        0x5A,
+        0x33,
+        0x61,
+        0x64,
+        0x64,
+        0x69,
+        0x69,
+        0x00,
+        0x00,
+        0x0A,
+        0x8D,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x01,
+        0x87,
+        0x80,
+        0x80,
+        0x80,
+        0x00,
+        0x00,
+        0x20,
+        0x01,
+        0x20,
+        0x00,
+        0x6A,
+        0x0B};
+
     int         opt;
     char*       wasm_path = NULL;
 
     wasm_module_t        module = NULL;
     wasm_module_inst_t   module_inst = NULL;
     wasm_exec_env_t      exec_env = NULL;
-    uint32               buf_size, stack_size = 8092, heap_size = 8092;
+    uint32               buf_size = sizeof(buffer), stack_size = 8092, heap_size = 8092;
     wasm_function_inst_t func = NULL;
     wasm_function_inst_t func2 = NULL;
     char*                native_buffer = NULL;
@@ -213,36 +317,32 @@ int initWasm()
         goto fail;
     }
 
-    if (!(func = wasm_runtime_lookup_function(module_inst, "generate_float", NULL)))
+    if (!(func = wasm_runtime_lookup_function(module_inst, "_Z3addii", NULL)))
     {
         printf("The generate_float wasm function is not found.\n");
         goto fail;
     }
 
     wasm_val_t results[1];
-    results[0].kind = WASM_F32;
-    results[0].of.f32 = 0;
+    results[0].kind = WASM_I32;
+    results[0].of.i32 = 0;
 
-    wasm_val_t arguments[3];
+    wasm_val_t arguments[2];
     arguments[0].kind = WASM_I32;
-    arguments[0].of.i32 = 10;
-    arguments[1].kind = WASM_F64;
-    arguments[0].of.f64 = 0.000101;
-    arguments[2].kind = WASM_F32;
-    arguments[2].of.f32 = 300.002;
+    arguments[0].of.i32 = 6;
+    arguments[1].kind = WASM_I32;
+    arguments[1].of.i32 = 3;
     // pass 4 elements for function arguments
-    if (!wasm_runtime_call_wasm_a(exec_env, func, 1, results, 3, arguments))
+    if (!wasm_runtime_call_wasm_a(exec_env, func, 1, results, 2, arguments))
     {
-        printf("call wasm function generate_float failed. %s\n", wasm_runtime_get_exception(module_inst));
+        printf("call wasm function add failed. %s\n", wasm_runtime_get_exception(module_inst));
         goto fail;
     }
 
-    float ret_val;
-    ret_val = results[0].of.f32;
+    int ret_val = results[0].of.i32;
     printf(
-        "Native finished calling wasm function generate_float(), returned a "
-        "float value: %ff\n",
-        ret_val);
+        "Native finished calling wasm function add(), returned a "
+        "int value: %i\n", ret_val);
 
     // Next we will pass a buffer to the WASM function
     uint32 argv2[4];
