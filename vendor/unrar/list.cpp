@@ -65,10 +65,10 @@ void ListArchive(CommandData *Cmd)
 
           if (!Arc.MainHead.OrigName.empty())
             mprintf(L"\n%s: %s",St(MOrigName),Arc.MainHead.OrigName.c_str());
-          if (Arc.MainHead.OrigCtime.IsSet())
+          if (Arc.MainHead.OrigTime.IsSet())
           {
             wchar DateStr[50];
-            Arc.MainHead.OrigCtime.GetText(DateStr,ASIZE(DateStr),Technical);
+            Arc.MainHead.OrigTime.GetText(DateStr,ASIZE(DateStr),Technical);
             mprintf(L"\n%s: %s",St(MOriginalTime),DateStr);
           }
 

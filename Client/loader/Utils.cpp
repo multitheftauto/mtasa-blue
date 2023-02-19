@@ -1,16 +1,19 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Utils.cpp
+ *  FILE:        Client/loader/Utils.cpp
  *  PURPOSE:     Loading utilities
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "Utils.h"
+#include "Main.h"
+#include "Dialogs.h"
 #include <array>
+#include <random>
 #include <cryptopp/crc.h>
 #include <cryptopp/files.h>
 #include <tchar.h>
@@ -18,7 +21,10 @@
 #include <Tlhelp32.h>
 #include <Softpub.h>
 #include <wintrust.h>
+#include <version.h>
 #pragma comment (lib, "wintrust")
+
+namespace fs = std::filesystem;
 
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
@@ -278,7 +284,7 @@ DWORD FindProcessId(const SString& processName)
 //
 // GetGTAProcessList
 //
-// Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
+// Get list of process id's with the image name ending in "gta_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
 std::vector<DWORD> GetGTAProcessList()
@@ -288,14 +294,11 @@ std::vector<DWORD> GetGTAProcessList()
     for (auto processId : MyEnumProcesses())
     {
         SString strPathFilename = GetProcessPathFilename(processId);
-        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME) || strPathFilename.EndsWith(MTA_HTAEXE_NAME))
+        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME))
             ListAddUnique(result, processId);
     }
 
     if (DWORD processId = FindProcessId(MTA_GTAEXE_NAME))
-        ListAddUnique(result, processId);
-
-    if (DWORD processId = FindProcessId(MTA_HTAEXE_NAME))
         ListAddUnique(result, processId);
 
     return result;
@@ -420,6 +423,30 @@ void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCo
         BrowseToSolution(strTroubleType, SHOW_MESSAGE_ONLY, strMessage, strErrorCode);
     else
         BrowseToSolution(strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage, strErrorCode);
+}
+
+auto GetMTARootDirectory() -> std::filesystem::path
+{
+    static const auto directory = fs::path{FromUTF8(GetMTASAPath())};
+    return directory;
+}
+
+auto GetGameBaseDirectory() -> fs::path
+{
+    static const auto directory = fs::path{FromUTF8(GetGTAPath())};
+    return directory;
+}
+
+auto GetGameLaunchDirectory() -> fs::path
+{
+    static const auto directory = fs::path{FromUTF8(GetMTADataPath())} / "GTA San Andreas";
+    return directory;
+}
+
+auto GetGameExecutablePath() -> std::filesystem::path
+{
+    static const auto executable = GetGameLaunchDirectory() / MTA_GTAEXE_NAME;
+    return executable;
 }
 
 void SetMTASAPathSource(bool bReadFromRegistry)
@@ -1799,7 +1826,6 @@ void LogSettings()
     } const settings[] = {
         {false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, ""},
         {false, "general", "aero-enabled", ""},
-        {false, "general", "aero-changeable", ""},
         {false, "general", "driver-overrides-disabled", ""},
         {false, "general", "device-selection-disabled", ""},
         {false, "general", "customized-sa-files-using", ""},
@@ -1809,7 +1835,6 @@ void LogSettings()
         {false, "nvhacks", "optimus-force-detection", ""},
         {false, "nvhacks", "optimus-export-enablement", ""},
         {false, "nvhacks", "optimus", ""},
-        {false, "nvhacks", "optimus-rename-exe", ""},
         {false, "nvhacks", "optimus-alt-startup", ""},
         {false, "nvhacks", "optimus-force-windowed", ""},
         {false, "nvhacks", "optimus-dialog-skip", ""},
@@ -2070,12 +2095,83 @@ auto ComputeCRC32(const char* filePath) -> uint32_t
     CryptoPP::CRC32                                         hash{};
     std::array<CryptoPP::byte, CryptoPP::CRC32::DIGESTSIZE> bytes{};
 
-    CryptoPP::FileSource pass(filePath, true, new CryptoPP::HashFilter(hash, new CryptoPP::ArraySink(bytes.data(), bytes.size())));
+    try
+    {
+        CryptoPP::FileSource pass(filePath, true, new CryptoPP::HashFilter(hash, new CryptoPP::ArraySink(bytes.data(), bytes.size())));
+    }
+    catch (const std::exception&)
+    {
+        return 0;
+    }
 
     uint32_t result{};
     std::copy_n(bytes.data(), std::min(sizeof(result), bytes.size()), reinterpret_cast<uint8_t*>(&result));
     return result;
 };
+
+static constexpr std::string_view alphaNumericCharset{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"};
+
+auto GenerateRandomString(size_t length) -> std::string
+{
+    if (!length)
+        return {};
+
+    std::random_device                      engine;
+    std::uniform_int_distribution<uint16_t> distribution{0, static_cast<uint16_t>(alphaNumericCharset.size() - 1)};
+
+    std::array<uint16_t, 4096> bytes{};
+    length = std::min(bytes.size(), length);
+    std::generate_n(bytes.data(), length, [&] { return distribution(engine); });
+
+    std::string result;
+    result.reserve(length);
+
+    for (size_t i = 0; i < length; ++i)
+        result.push_back(alphaNumericCharset[bytes[i]]);
+
+    return result;
+}
+
+bool IsErrorCodeLoggable(const std::error_code& ec)
+{
+    switch (ec.value())
+    {
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
+            return false;
+        default:
+            return true;
+    }
+}
+
+bool IsNativeArm64Host()
+{
+    static bool isArm64 = ([]
+    {
+        HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+
+        if (kernel32)
+        {
+            BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(GetProcAddress(kernel32, "IsWow64Process2"));
+
+            if (IsWow64Process2_)
+            {
+                USHORT processMachine;
+                USHORT nativeMachine;
+
+                if (IsWow64Process2_(GetCurrentProcess(), &processMachine, &nativeMachine))
+                {
+                    return nativeMachine == IMAGE_FILE_MACHINE_ARM64;
+                }
+            }
+        }
+        
+        return false;
+    })();
+
+    return isArm64;
+}
 
 //////////////////////////////////////////////////////////
 //

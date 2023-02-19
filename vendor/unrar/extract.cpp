@@ -16,7 +16,18 @@ CmdExtract::CmdExtract(CommandData *Cmd)
   // Common for all archives involved. Set here instead of DoExtract()
   // to use in unrar.dll too. Allows to avoid LinksToDirs() calls
   // and save CPU time in no symlinks including ".." in target were extracted.
-  UpLinkExtracted=false;
+#if defined(_WIN_ALL)
+  // We can't expand symlink path components in another symlink target
+  // in Windows. We can't create symlinks in Android now. Even though we do not
+  // really need LinksToDirs() calls in these systems, we still call it
+  // for extra safety, but only if symlink with ".." in target was extracted.
+  ConvertSymlinkPaths=false;
+#else
+  // We enable it by default in Unix to care about the case when several
+  // archives are unpacked to same directory with several independent RAR runs.
+  // Worst case performance penalty for a lot of small files seems to be ~3%.
+  ConvertSymlinkPaths=true;
+#endif
 
   Unp=new Unpack(&DataIO);
 #ifdef RAR_SMP
@@ -486,6 +497,13 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
       
         if (!Cmd->Test) // While harmless, it is useless for 't'.
         {
+          // If reference source isn't selected, but target is selected,
+          // we unpack the source under the temporary name and then rename
+          // or copy it to target name. We do not unpack it under the target
+          // name immediately, because the same source can be used by multiple
+          // targets and it is possible that first target isn't unpacked
+          // for some reason. Also targets might have associated service blocks
+          // like ACLs. All this would complicate processing a lot.
           wcsncpyz(DestFileName,*Cmd->TempPath!=0 ? Cmd->TempPath:Cmd->ExtrPath,ASIZE(DestFileName));
           AddEndSlash(DestFileName,ASIZE(DestFileName));
           wcsncatz(DestFileName,L"__tmp_reference_source_",ASIZE(DestFileName));
@@ -627,7 +645,7 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
 #endif
 
     if (ExtrFile && Command!='P' && !Cmd->Test && !Cmd->AbsoluteLinks &&
-        UpLinkExtracted)
+        ConvertSymlinkPaths)
       ExtrFile=LinksToDirs(DestFileName,Cmd->ExtrPath,LastCheckedSymlink);
 
     File CurFile;
@@ -786,7 +804,7 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
             {
               bool UpLink;
               LinkSuccess=ExtractSymlink(Cmd,DataIO,Arc,DestFileName,UpLink);
-              UpLinkExtracted|=LinkSuccess && UpLink;
+              ConvertSymlinkPaths|=LinkSuccess && UpLink;
 
               // We do not actually need to reset the cache here if we cache
               // only the single last checked path, because at this point
@@ -1304,7 +1322,7 @@ void CmdExtract::ExtrCreateDir(Archive &Arc,const wchar *ArcFileName)
         DirExist=FileExist(DestFileName) && IsDir(GetFileAttr(DestFileName));
         if (!DirExist)
         {
-          if (!Cmd->AbsoluteLinks && UpLinkExtracted)
+          if (!Cmd->AbsoluteLinks && ConvertSymlinkPaths)
             LinksToDirs(DestFileName,Cmd->ExtrPath,LastCheckedSymlink);
           CreatePath(DestFileName,true,Cmd->DisableNames);
           MDCode=MakeDir(DestFileName,!Cmd->IgnoreGeneralAttr,Arc.FileHead.FileAttr);
@@ -1387,7 +1405,7 @@ bool CmdExtract::ExtrCreateFile(Archive &Arc,File &CurFile)
 
           MakeNameUsable(DestFileName,true);
 
-          if (!Cmd->AbsoluteLinks && UpLinkExtracted)
+          if (!Cmd->AbsoluteLinks && ConvertSymlinkPaths)
             LinksToDirs(DestFileName,Cmd->ExtrPath,LastCheckedSymlink);
           CreatePath(DestFileName,true,Cmd->DisableNames);
           if (FileCreate(Cmd,&CurFile,DestFileName,ASIZE(DestFileName),&UserReject,Arc.FileHead.UnpSize,&Arc.FileHead.mtime,true))
@@ -1499,6 +1517,8 @@ void CmdExtract::AnalyzeArchive(const wchar *ArcName,bool Volume,bool NewNumberi
         {
           if (!MatchFound && !Arc.FileHead.Solid) // Can start extraction from here.
           {
+            // We would gain nothing and unnecessarily complicate extraction
+            // by setting these values for first volume or first archived file.
             if (!FirstVolume)
               wcsncpyz(Analyze->StartName,NextName,ASIZE(Analyze->StartName));
             if (!FirstFile)
@@ -1510,6 +1530,10 @@ void CmdExtract::AnalyzeArchive(const wchar *ArcName,bool Volume,bool NewNumberi
           {
             MatchFound = true;
             PrevMatched = true;
+
+            // Reset the previously set early exit position, if any, because
+            // we found a new matched file.
+            Analyze->EndPos=0;
 
             // Matched file reference pointing at maybe non-matched source file.
             // Even though we know RedirName, we can't check if source file
@@ -1545,6 +1569,8 @@ void CmdExtract::AnalyzeArchive(const wchar *ArcName,bool Volume,bool NewNumberi
           {
             if (PrevMatched) // First non-matched item after matched.
             {
+              // We would gain nothing and unnecessarily complicate extraction
+              // by setting these values for first volume or first archived file.
               if (!FirstVolume)
                 wcsncpyz(Analyze->EndName,NextName,ASIZE(Analyze->EndName));
               if (!FirstFile)

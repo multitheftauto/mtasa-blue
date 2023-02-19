@@ -7,7 +7,7 @@ project "Loader Proxy"
 
 	vpaths {
 		["Headers/*"] = "**.h",
-		["Sources"] = { "*.cpp", "*.asm" },
+		["Sources"] = { "*.cpp" },
 		["Resources/*"] = "*.def",
 		["*"] = "premake5.lua"
 	}
@@ -15,9 +15,11 @@ project "Loader Proxy"
 	files {
 		"premake5.lua",
 		"exports.def",
-		"mtasa.asm",
-		"setup.cpp",
 		"main.cpp",
+	}
+
+	includedirs {
+		"../../Shared/sdk",
 	}
 
 	filter "system:windows"

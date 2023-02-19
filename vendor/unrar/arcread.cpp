@@ -1000,7 +1000,7 @@ void Archive::ProcessExtra50(RawRead *Raw,size_t ExtraSize,const BaseBlock *bb)
               {
                 std::vector<char> NameU((size_t)NameSize); // UTF-8 name.
                 Raw->GetB(&NameU[0],(size_t)NameSize);
-                // If starts from 0, the name was longer han reserved space
+                // If starts from 0, the name was longer than reserved space
                 // when saving this extra field.
                 if (NameU[0]!=0)
                 {
@@ -1014,11 +1014,11 @@ void Archive::ProcessExtra50(RawRead *Raw,size_t ExtraSize,const BaseBlock *bb)
             if ((Flags & MHEXTRA_METADATA_CTIME)!=0)
               if ((Flags & MHEXTRA_METADATA_UNIXTIME)!=0)
                 if ((Flags & MHEXTRA_METADATA_UNIX_NS)!=0)
-                  hd->OrigCtime.SetUnixNS(Raw->Get8());
+                  hd->OrigTime.SetUnixNS(Raw->Get8());
                 else
-                  hd->OrigCtime.SetUnix((time_t)Raw->Get4());
+                  hd->OrigTime.SetUnix((time_t)Raw->Get4());
               else
-                hd->OrigCtime.SetWin(Raw->Get8());
+                hd->OrigTime.SetWin(Raw->Get8());
           }
           break;
       }
