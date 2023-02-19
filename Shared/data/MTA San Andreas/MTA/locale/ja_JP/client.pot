@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-15 05:20+0000\n"
-"PO-Revision-Date: 2023-02-15 06:19\n"
+"POT-Creation-Date: 2023-02-19 17:26+0000\n"
+"PO-Revision-Date: 2023-02-19 18:22\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -17,47 +17,29 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
-msgid "Problem with graphics driver"
-msgstr "グラフィックドライバと問題があります"
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "ウェッブサイトリクエスト"
 
-#. Create buttons
-#. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CVersionUpdater.cpp:1607
-#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
-#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
-#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
-#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
-#: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4695 Client/loader/Dialogs.cpp:133
-msgid "OK"
-msgstr "OK"
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "後にロードするため、サーバーは次のウェッブサイトをリクエストしています："
 
-#. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
-#: Client/core/CVersionUpdater.cpp:1841 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4694 Client/loader/Dialogs.cpp:136
-msgid "Cancel"
-msgstr "キャンセル"
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "盗まらないように、個人情報を絶対書かないでください"
 
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CQuestionBox.cpp:195
-#: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1372
-#: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
-#: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
-msgid "Yes"
-msgstr "はい"
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "決定を保存する"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "有効"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "否定"
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
@@ -193,150 +175,6 @@ msgstr "%s の %s"
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
 msgstr "ダウンロードをキャンセルするには、切断してください"
-
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2924
-#: Client/core/CSettings.cpp:4113 Client/core/CSettings.cpp:4141
-#: Client/core/CSettings.cpp:4674 Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
-#: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "エラー"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "無効なニックネームです！ 設定でニックネームを変更してください！"
-
-#. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-#: Client/core/CConnectManager.cpp:148
-msgid "CONNECTING"
-msgstr "接続中"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
-msgid "Entering the game ..."
-msgstr "参加中。。。"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "接続していません；「クイックコネクト」や「connect」コマンドを利用して、サーバーに参加してください。"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-msgid "The server is not installed"
-msgstr "サーバーはインストールしていません"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Local Server"
-msgstr "ローカルサーバー"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-msgid "Starting local server ..."
-msgstr "ローカルサーバーを実行しています。。。"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "ゲームからキックされました （理由： %s）"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
-msgid "Connecting to local server..."
-msgstr "ローカルサーバーに接続中..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-msgid "Error connecting to server."
-msgstr "サーバー接続エラー。"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-msgid "Connecting to local server timed out. See console for details."
-msgstr "ローカルサーバの接続がタイムアウトしてしまいました。情報はコンソールにあります。"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/core/CConnectManager.cpp:263
-msgid "Connection timed out"
-msgstr "接続がタイムアウトしました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-msgid "Connection with the server was lost"
-msgstr "サーバーとの接続が失われてしまいました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-msgid "Disconnected: unknown protocol error"
-msgstr "切断：不明なプロトコルエラー"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
-#: Client/core/CConnectManager.cpp:285
-msgid "Disconnected: disconnected remotely"
-msgstr "接続切断：リモートから接続が切断されました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
-#: Client/core/CConnectManager.cpp:289
-msgid "Disconnected: connection lost remotely"
-msgstr "切断： リモートで接続が失われました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-#: Client/core/CConnectManager.cpp:293
-msgid "Disconnected: you are banned from this server"
-msgstr "切断： あなたはこのサーバーから禁止されました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
-msgid "Disconnected: the server is currently full"
-msgstr "切断：サーバーは現在満ちています"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
-#: Client/core/CConnectManager.cpp:300
-msgid "Disconnected: disconnected from the server"
-msgstr "切断： サーバーから切断されました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
-#: Client/core/CConnectManager.cpp:304
-msgid "Disconnected: connection to the server was lost"
-msgstr "切断：サーバーとの接続が失われました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
-msgid "Disconnected: invalid password specified"
-msgstr "切断：パスワードは無効です。"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
-#: Client/core/CConnectManager.cpp:311
-msgid "Disconnected: connection was refused"
-msgstr "切断： 接続が拒否されました"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
-msgid "MTA Client verification failed!"
-msgstr "MTAクライアント確認失敗！"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
 msgid "Disconnected: Invalid nickname"
@@ -530,6 +368,43 @@ msgstr[0] "%d 秒"
 msgid "Disconnected"
 msgstr "切断されました"
 
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/mods/deathmatch/logic/CClientGame.cpp:588
+#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
+#: Client/core/CSettings.cpp:2924 Client/core/CSettings.cpp:4113
+#: Client/core/CSettings.cpp:4141 Client/core/CSettings.cpp:4674
+#: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:127
+#: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
+#: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "エラー"
+
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 msgid "Could not start the local server. See console for details."
 msgstr "ローカルサーバーが実行できませんでした。詳しい情報はコンソールにあります。"
@@ -599,26 +474,145 @@ msgstr "全部"
 msgid "Start"
 msgstr "開始"
 
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
+#: Client/core/CVersionUpdater.cpp:1841 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4694 Client/gui/CGUIMessageBox_Impl.cpp:68
+#: Client/loader/Dialogs.cpp:136
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:588
+#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "無効なニックネームです！ 設定でニックネームを変更してください！"
+
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr "接続中"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+msgid "Entering the game ..."
+msgstr "参加中。。。"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "接続していません；「クイックコネクト」や「connect」コマンドを利用して、サーバーに参加してください。"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+msgid "The server is not installed"
+msgstr "サーバーはインストールしていません"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Local Server"
+msgstr "ローカルサーバー"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+msgid "Starting local server ..."
+msgstr "ローカルサーバーを実行しています。。。"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "ゲームからキックされました （理由： %s）"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+msgid "Connecting to local server..."
+msgstr "ローカルサーバーに接続中..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+msgid "Error connecting to server."
+msgstr "サーバー接続エラー。"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+msgid "Connecting to local server timed out. See console for details."
+msgstr "ローカルサーバの接続がタイムアウトしてしまいました。情報はコンソールにあります。"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr "接続がタイムアウトしました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+msgid "Connection with the server was lost"
+msgstr "サーバーとの接続が失われてしまいました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr "切断：不明なプロトコルエラー"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr "接続切断：リモートから接続が切断されました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr "切断： リモートで接続が失われました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr "切断： あなたはこのサーバーから禁止されました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+msgid "Disconnected: the server is currently full"
+msgstr "切断：サーバーは現在満ちています"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr "切断： サーバーから切断されました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr "切断：サーバーとの接続が失われました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+msgid "Disconnected: invalid password specified"
+msgstr "切断：パスワードは無効です。"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr "切断： 接続が拒否されました"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+msgid "MTA Client verification failed!"
+msgstr "MTAクライアント確認失敗！"
+
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
 msgstr "ダウンロードエラー： %s"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "お知らせ"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "有効な解像度が見つかりませんでした。"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171
-msgid "Visit latest news article"
-msgstr "最新ニュース記事を読む"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "この解像度を利用するに確かですか？"
 
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "不明なコマンド:"
+#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
+msgid "Problem with graphics driver"
+msgstr "グラフィックドライバと問題があります"
 
 #: Client/core/CCredits.cpp:32
 msgid "Programming"
@@ -647,6 +641,84 @@ msgstr "特別な感謝"
 #: Client/core/CCredits.cpp:244
 msgid "This software makes use of the following libraries and software:"
 msgstr "このソフトウェアが下記のライブラリやソフトウェアを利用しています:"
+
+#: Client/core/CScreenShot.cpp:53
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "スクリーンショットを撮影しました: '%s'"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "この問題についてにオンラインで調べたいですか？"
+
+#: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1371
+#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
+#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
+#: Client/core/CMainMenu.cpp:1147 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/loader/Dialogs.cpp:132
+msgid "No"
+msgstr "いいえ"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1572
+#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
+#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1372
+#: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
+#: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
+#: Client/core/CMainMenu.cpp:1148 Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
+msgid "Yes"
+msgstr "はい"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "コンソール"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "接続に失敗しました。無効なニックネームが記入されました!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "接続に失敗しました。無効なホストが記入されました!!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "%sの%u の接続が失敗しました！"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "%s:%u に接続中。。。"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "MODはインストールしていません (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "無効なサーバーレスポンス (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "無効なサーバー返答でした (1)"
+
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "不明なコマンド:"
 
 #: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1057
 #, c-format
@@ -760,216 +832,6 @@ msgstr "メモリデータを表示する"
 #: Client/core/CCore.cpp:1367
 msgid "shows the frame timing graph"
 msgstr "FPSグラフを表示する"
-
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "加速軸"
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "ブレーキ軸"
-
-#: Client/core/CScreenShot.cpp:53
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "スクリーンショットを撮影しました: '%s'"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "接続に失敗しました。無効なニックネームが記入されました!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "接続に失敗しました。無効なホストが記入されました!!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "%sの%u の接続が失敗しました！"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "%s:%u に接続中。。。"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "MODはインストールしていません (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "無効なサーバーレスポンス (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "無効なサーバー返答でした (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "選択したスキンとデフォルトのスキンをロードすることができませんでした。MTAを再インストールしてください。"
-
-#: Client/core/CVersionUpdater.cpp:626
-msgid "Busy"
-msgstr "忙しい"
-
-#: Client/core/CVersionUpdater.cpp:626
-msgid "Can't check for updates right now"
-msgstr "現在、アップデートチェックは出来ません"
-
-#: Client/core/CVersionUpdater.cpp:1567 Client/core/CVersionUpdater.cpp:1587
-#: Client/core/CVersionUpdater.cpp:1605
-#, c-format
-msgid "MTA:SA %s required"
-msgstr "MTA:SA %s が必要です"
-
-#: Client/core/CVersionUpdater.cpp:1568
-#, c-format
-msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
-"Do you want to download and install MTA:SA %s ?"
-msgstr "このサーバーに参加するために、MTA:SA %s の最新アップデートが必要です。\n\n"
-"MTA:SA %s をダウンロードして、インストールしますか？"
-
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CQuestionBox.cpp:194 Client/core/CMainMenu.cpp:1147
-#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
-#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
-#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:132
-msgid "No"
-msgstr "いいえ"
-
-#: Client/core/CVersionUpdater.cpp:1588
-#, c-format
-msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "MTA:SA %s を実行して、このサーバーに参加しますか？"
-
-#: Client/core/CVersionUpdater.cpp:1606
-msgid "It is not possible to connect at this time.\n\n"
-"Please try later."
-msgstr "現在、サーバーに接続することができません。\n\n"
-"後で、もう一回試してみてください。"
-
-#: Client/core/CVersionUpdater.cpp:1788
-msgid "Connecting"
-msgstr "接続中"
-
-#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
-msgid "Please wait..."
-msgstr "しばらくお待ちください。。。"
-
-#: Client/core/CVersionUpdater.cpp:1804
-msgid "CHECKING"
-msgstr "チェック中"
-
-#: Client/core/CVersionUpdater.cpp:1821 Client/core/CVersionUpdater.cpp:1914
-msgid "UPDATE CHECK"
-msgstr "アップデートチェック中"
-
-#: Client/core/CVersionUpdater.cpp:1822
-msgid "No update needed"
-msgstr "アップデートする必要はありません"
-
-#: Client/core/CVersionUpdater.cpp:1839
-msgid "DOWNLOADING"
-msgstr "ダウンロード中"
-
-#: Client/core/CVersionUpdater.cpp:1840
-msgid "waiting..."
-msgstr "待機中..."
-
-#: Client/core/CVersionUpdater.cpp:1856
-msgid "MANDATORY UPDATE"
-msgstr "義務的なアップデート"
-
-#: Client/core/CVersionUpdater.cpp:1857
-msgid "To join this server, you must update MTA.\n\n"
-" Do you want to update now ?"
-msgstr "このサーバーに参加するために、MTAをアップデートすることが必要です。\n\n"
-"今にアップデートしますか。"
-
-#: Client/core/CVersionUpdater.cpp:1875
-msgid "OPTIONAL UPDATE"
-msgstr "不要なアップデート"
-
-#: Client/core/CVersionUpdater.cpp:1876
-msgid "Server says an update is recommended, but not essential.\n\n"
-" Do you want to update now ?"
-msgstr "サーバーはアップデートは推奨されていますが、アップデート必要はありません。\n\n"
-"アップデートしますか？"
-
-#: Client/core/CVersionUpdater.cpp:1915
-msgid "Update not currently avalable.\n\n"
-"Please check www.mtasa.com"
-msgstr "現在、アップデートは不可能です。\n\n"
-"「www.mtasa.com 」にチェックしてください。"
-
-#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
-msgid "ERROR SAVING"
-msgstr "保存エラー"
-
-#: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:2119
-msgid "Unable to create the file."
-msgstr "ファイルを作成できません。"
-
-#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:1954
-#: Client/core/CVersionUpdater.cpp:2127 Client/core/CVersionUpdater.cpp:2136
-msgid "ERROR DOWNLOADING"
-msgstr "ダウンロードエラー"
-
-#: Client/core/CVersionUpdater.cpp:1946 Client/core/CVersionUpdater.cpp:2128
-msgid "The downloaded file appears to be incorrect."
-msgstr "ダウンロードしたファイルは無効のようです。"
-
-#: Client/core/CVersionUpdater.cpp:1955 Client/core/CVersionUpdater.cpp:2137
-msgid "For some reason."
-msgstr "なんとか。"
-
-#: Client/core/CVersionUpdater.cpp:1966 Client/core/CVersionUpdater.cpp:2150
-msgid "DOWNLOAD COMPLETE"
-msgstr "ダウンロード成功"
-
-#: Client/core/CVersionUpdater.cpp:1990
-msgid " - Unknown problem in _DialogUpdateResult"
-msgstr "- _DialogUpdateResult に不明なエラー "
-
-#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4500
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "カスタムGTA:SAファイル"
-
-#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
-msgid "Ok"
-msgstr "OK"
-
-#: Client/core/CVersionUpdater.cpp:2096
-msgid "ERROR"
-msgstr "エラー"
-
-#: Client/core/CVersionUpdater.cpp:2097
-msgid "Some MTA:SA data files are missing.\n\n\n"
-"Please reinstall MTA:SA"
-msgstr "MTA:SAファイルの一部が不足しています。\n\n\n"
-"MTA:SAを再インストールしてください"
-
-#: Client/core/CVersionUpdater.cpp:2772
-#, c-format
-msgid "%3d %% completed"
-msgstr "%3d %% 完了"
-
-#: Client/core/CVersionUpdater.cpp:2774
-#, c-format
-msgid "\n\n"
-"Waiting for response  -  %-3d"
-msgstr "\n\n"
-"返事を待っています - %-3d"
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "この問題についてにオンラインで調べたいですか？"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -1153,75 +1015,180 @@ msgstr "グループコントロール前方"
 msgid "Group control backwards"
 msgstr "グループコントロール後方"
 
-#: Client/core/CMainMenu.cpp:315
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "新機能ブランチを利用しています！これはテストビルドであるため、公共サーバーには接続できません！"
+#: Client/core/CVersionUpdater.cpp:626
+msgid "Busy"
+msgstr "忙しい"
 
-#: Client/core/CMainMenu.cpp:334
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "２０１９年７月以来、MTAはXP/Vistaのアップデートを停止します。\n\n"
-"新しいサーバーでプレイするためにWindowsをアップデートしてください。"
+#: Client/core/CVersionUpdater.cpp:626
+msgid "Can't check for updates right now"
+msgstr "現在、アップデートチェックは出来ません"
 
-#: Client/core/CMainMenu.cpp:1141
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "サーバーから切断されることになります。\n\n"
-"サーバーから切断に確かですか？"
-
-#: Client/core/CMainMenu.cpp:1145
-msgid "DISCONNECT WARNING"
-msgstr "切断警告"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "コンソール"
-
-#: Client/core/CCommandFuncs.cpp:30
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ コマンド ヘルプ ]***\n"
-
-#: Client/core/CCommandFuncs.cpp:168
+#: Client/core/CVersionUpdater.cpp:1567 Client/core/CVersionUpdater.cpp:1587
+#: Client/core/CVersionUpdater.cpp:1605
 #, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* 時間は %d:%02d:%02d"
+msgid "MTA:SA %s required"
+msgstr "MTA:SA %s が必要です"
 
-#: Client/core/CCommandFuncs.cpp:252
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "接続：'connect <ホスト> [<ポート> <ニック> <パスワード>]'"
-
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
-msgid "connect: Bad port number"
-msgstr "接続: 無効なポート番号"
-
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#: Client/core/CVersionUpdater.cpp:1568
 #, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "接続: %s:%uに接続している..."
+msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
+"Do you want to download and install MTA:SA %s ?"
+msgstr "このサーバーに参加するために、MTA:SA %s の最新アップデートが必要です。\n\n"
+"MTA:SA %s をダウンロードして、インストールしますか？"
 
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#: Client/core/CVersionUpdater.cpp:1588
 #, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "接続: %s:%u に接続できませんでした！"
+msgid "Do you want to launch MTA:SA %s and connect to this server ?"
+msgstr "MTA:SA %s を実行して、このサーバーに参加しますか？"
 
-#: Client/core/CCommandFuncs.cpp:291
-msgid "connect: Failed to unload current mod"
-msgstr "接続：現在MODをアンロードすることができませんでした"
+#: Client/core/CVersionUpdater.cpp:1606
+msgid "It is not possible to connect at this time.\n\n"
+"Please try later."
+msgstr "現在、サーバーに接続することができません。\n\n"
+"後で、もう一回試してみてください。"
 
-#: Client/core/CCommandFuncs.cpp:381
-msgid "Bound all controls from GTA"
-msgstr "全てのバインドはGTAからコピーされました"
+#. Create buttons
+#. OK button
+#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
+#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
+#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
+#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
+#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4695
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:133
+msgid "OK"
+msgstr "OK"
 
-#: Client/core/CCommandFuncs.cpp:395
-msgid "Saved configuration file"
-msgstr "保存した設定ファイル"
+#: Client/core/CVersionUpdater.cpp:1788
+msgid "Connecting"
+msgstr "接続中"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:461
+#: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
+msgid "Please wait..."
+msgstr "しばらくお待ちください。。。"
+
+#: Client/core/CVersionUpdater.cpp:1804
+msgid "CHECKING"
+msgstr "チェック中"
+
+#: Client/core/CVersionUpdater.cpp:1821 Client/core/CVersionUpdater.cpp:1914
+msgid "UPDATE CHECK"
+msgstr "アップデートチェック中"
+
+#: Client/core/CVersionUpdater.cpp:1822
+msgid "No update needed"
+msgstr "アップデートする必要はありません"
+
+#: Client/core/CVersionUpdater.cpp:1839
+msgid "DOWNLOADING"
+msgstr "ダウンロード中"
+
+#: Client/core/CVersionUpdater.cpp:1840
+msgid "waiting..."
+msgstr "待機中..."
+
+#: Client/core/CVersionUpdater.cpp:1856
+msgid "MANDATORY UPDATE"
+msgstr "義務的なアップデート"
+
+#: Client/core/CVersionUpdater.cpp:1857
+msgid "To join this server, you must update MTA.\n\n"
+" Do you want to update now ?"
+msgstr "このサーバーに参加するために、MTAをアップデートすることが必要です。\n\n"
+"今にアップデートしますか。"
+
+#: Client/core/CVersionUpdater.cpp:1875
+msgid "OPTIONAL UPDATE"
+msgstr "不要なアップデート"
+
+#: Client/core/CVersionUpdater.cpp:1876
+msgid "Server says an update is recommended, but not essential.\n\n"
+" Do you want to update now ?"
+msgstr "サーバーはアップデートは推奨されていますが、アップデート必要はありません。\n\n"
+"アップデートしますか？"
+
+#: Client/core/CVersionUpdater.cpp:1915
+msgid "Update not currently avalable.\n\n"
+"Please check www.mtasa.com"
+msgstr "現在、アップデートは不可能です。\n\n"
+"「www.mtasa.com 」にチェックしてください。"
+
+#: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
+msgid "ERROR SAVING"
+msgstr "保存エラー"
+
+#: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:2119
+msgid "Unable to create the file."
+msgstr "ファイルを作成できません。"
+
+#: Client/core/CVersionUpdater.cpp:1945 Client/core/CVersionUpdater.cpp:1954
+#: Client/core/CVersionUpdater.cpp:2127 Client/core/CVersionUpdater.cpp:2136
+msgid "ERROR DOWNLOADING"
+msgstr "ダウンロードエラー"
+
+#: Client/core/CVersionUpdater.cpp:1946 Client/core/CVersionUpdater.cpp:2128
+msgid "The downloaded file appears to be incorrect."
+msgstr "ダウンロードしたファイルは無効のようです。"
+
+#: Client/core/CVersionUpdater.cpp:1955 Client/core/CVersionUpdater.cpp:2137
+msgid "For some reason."
+msgstr "なんとか。"
+
+#: Client/core/CVersionUpdater.cpp:1966 Client/core/CVersionUpdater.cpp:2150
+msgid "DOWNLOAD COMPLETE"
+msgstr "ダウンロード成功"
+
+#: Client/core/CVersionUpdater.cpp:1990
+msgid " - Unknown problem in _DialogUpdateResult"
+msgstr "- _DialogUpdateResult に不明なエラー "
+
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4500
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "カスタムGTA:SAファイル"
+
+#: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
+msgid "Ok"
+msgstr "OK"
+
+#: Client/core/CVersionUpdater.cpp:2096
+msgid "ERROR"
+msgstr "エラー"
+
+#: Client/core/CVersionUpdater.cpp:2097
+msgid "Some MTA:SA data files are missing.\n\n\n"
+"Please reinstall MTA:SA"
+msgstr "MTA:SAファイルの一部が不足しています。\n\n\n"
+"MTA:SAを再インストールしてください"
+
+#: Client/core/CVersionUpdater.cpp:2772
 #, c-format
-msgid "* Your serial is: %s"
-msgstr "＊あなたのシリアル番号は： %s"
+msgid "%3d %% completed"
+msgstr "%3d %% 完了"
+
+#: Client/core/CVersionUpdater.cpp:2774
+#, c-format
+msgid "\n\n"
+"Waiting for response  -  %-3d"
+msgstr "\n\n"
+"返事を待っています - %-3d"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "加速軸"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "ブレーキ軸"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "お知らせ"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171
+msgid "Visit latest news article"
+msgstr "最新ニュース記事を読む"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1664,10 +1631,6 @@ msgstr "ドメインを消す"
 #: Client/core/CSettings.cpp:938
 msgid "Custom whitelist"
 msgstr "カスタムホワイトリスト"
-
-#: Client/core/CSettings.cpp:957 Client/cefweb/CWebsiteRequests.cpp:51
-msgid "Allow"
-msgstr "有効"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:980
@@ -2180,23 +2143,75 @@ msgstr "マウス移動修正 - パソコンを再起動するのが必要かも
 msgid "English"
 msgstr "日本語"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
+#: Client/core/CMainMenu.cpp:315
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "新機能ブランチを利用しています！これはテストビルドであるため、公共サーバーには接続できません！"
+
+#: Client/core/CMainMenu.cpp:334
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "２０１９年７月以来、MTAはXP/Vistaのアップデートを停止します。\n\n"
+"新しいサーバーでプレイするためにWindowsをアップデートしてください。"
+
+#: Client/core/CMainMenu.cpp:1141
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "サーバーから切断されることになります。\n\n"
+"サーバーから切断に確かですか？"
+
+#: Client/core/CMainMenu.cpp:1145
+msgid "DISCONNECT WARNING"
+msgstr "切断警告"
+
+#: Client/core/CCommandFuncs.cpp:30
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ コマンド ヘルプ ]***\n"
+
+#: Client/core/CCommandFuncs.cpp:168
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "スクリーンショットは %d バイトですが、%d が所期されました"
+msgid "* The time is %d:%02d:%02d"
+msgstr "* 時間は %d:%02d:%02d"
 
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "スクリーンショット失敗"
+#: Client/core/CCommandFuncs.cpp:252
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "接続：'connect <ホスト> [<ポート> <ニック> <パスワード>]'"
 
-#: Client/core/DXHook/CDirect3DHook9.cpp:124
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Direct3D9は初期化できませんでした。\n\n"
-"DirectX End-User Runtimeと\n"
-"最新Windowsサービスパックがインストール\n"
-"されているか確認してください。"
+#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+msgid "connect: Bad port number"
+msgstr "接続: 無効なポート番号"
+
+#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "接続: %s:%uに接続している..."
+
+#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "接続: %s:%u に接続できませんでした！"
+
+#: Client/core/CCommandFuncs.cpp:291
+msgid "connect: Failed to unload current mod"
+msgstr "接続：現在MODをアンロードすることができませんでした"
+
+#: Client/core/CCommandFuncs.cpp:381
+msgid "Bound all controls from GTA"
+msgstr "全てのバインドはGTAからコピーされました"
+
+#: Client/core/CCommandFuncs.cpp:395
+msgid "Saved configuration file"
+msgstr "保存した設定ファイル"
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:461
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "＊あなたのシリアル番号は： %s"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "選択したスキンとデフォルトのスキンをロードすることができませんでした。MTAを再インストールしてください。"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
@@ -2294,6 +2309,52 @@ msgstr "タイムアウト"
 #: Client/core/ServerBrowser/CServerInfo.cpp:431
 msgid "Querying..."
 msgstr "問い合わせています。。。"
+
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "待機中です"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "プレイヤープレイヤー"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "に"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "サーバーサーバー"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
+#, c-format
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "マスターリストをリクエストしています。(%lu ms 過ぎました)"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "マスターサーバーリストが解析できませんでした。"
+
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "マスターサーバーリストが取得できませんでした。"
+
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(バックアップサーバーリスト）"
+
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "LAN放送ソケットをバインドすることはできませんでした"
+
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "LANサーバーを検索中"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2447,162 +2508,179 @@ msgstr "「mtasa://」プロトコルを利用してください！"
 msgid "You have to select a server to connect to."
 msgstr "サーバーを選んでください。"
 
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "待機中です"
+#: Client/core/DXHook/CDirect3DHook9.cpp:124
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Direct3D9は初期化できませんでした。\n\n"
+"DirectX End-User Runtimeと\n"
+"最新Windowsサービスパックがインストール\n"
+"されているか確認してください。"
 
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "プレイヤープレイヤー"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "に"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "サーバーサーバー"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
+#: Client/core/DXHook/CDirect3DEvents9.cpp:231
 #, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "マスターリストをリクエストしています。(%lu ms 過ぎました)"
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "スクリーンショットは %d バイトですが、%d が所期されました"
 
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "マスターサーバーリストが解析できませんでした。"
+#: Client/core/DXHook/CDirect3DEvents9.cpp:237
+msgid "Screenshot failed"
+msgstr "スクリーンショット失敗"
 
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "マスターサーバーリストが取得できませんでした。"
+#: Client/loader/Dialogs.cpp:134
+msgid "Quit"
+msgstr "終了"
 
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(バックアップサーバーリスト）"
+#: Client/loader/Dialogs.cpp:151
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreasは問題が見つかりました"
 
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "LAN放送ソケットをバインドすることはできませんでした"
+#: Client/loader/Dialogs.cpp:152
+msgid "Crash information"
+msgstr "クラッシュ情報"
 
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "LANサーバーを検索中"
+#: Client/loader/Dialogs.cpp:153
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "MTAデベロッパーにこの情報を送るために、このチェックボックスにチェックしてください"
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
+#: Client/loader/Dialogs.cpp:154
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "すると、このクラッシュを修正する可能性が高くなります。"
+
+#: Client/loader/Dialogs.cpp:155
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "MTA: San Andreasを再起動しますか？"
+
+#: Client/loader/Dialogs.cpp:162
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - 警告"
+
+#: Client/loader/Dialogs.cpp:163
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "Grand Theft Auto: San Andreas がインストールされたフォルダーには以下のファイルが含まれています："
+
+#: Client/loader/Dialogs.cpp:165
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "これらのファイルがなくても問題なく作動しますが、ゲームと共に起動すると画面機能に影響を与える可能性があります。\n\n"
+"この一覧のファイルを削除か、ファイル名の変更、どちらかをお選ぶのがお勧めです。"
+
+#: Client/loader/Dialogs.cpp:167
+msgid "Keep these files, but also show this warning on next start"
+msgstr "この一覧のファイルを保留し、次回に起動するときも同じ警告を表示します。"
+
+#: Client/loader/Dialogs.cpp:168
+msgid "Do not remind me about these files again"
+msgstr "この警告をこれから表示しないようにします。"
+
+#: Client/loader/Dialogs.cpp:169
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "これらのファイル名を *.dll から *.dll.bak に変更します。"
+
+#: Client/loader/Dialogs.cpp:170
+msgid "Show me these files"
+msgstr "一覧のファイルをエクスプローラーから開きます。"
+
+#: Client/loader/Dialogs.cpp:171
+msgid "Play MTA:SA"
+msgstr "MTA:SAをプレイする"
+
+#: Client/loader/Dialogs.cpp:177
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - 紛らわしいオプション"
+
+#: Client/loader/Dialogs.cpp:178
+msgid "NVidia Optimus detected!"
+msgstr "NVidia Optimus が検出されました！"
+
+#: Client/loader/Dialogs.cpp:179
+msgid "Try each option and see what works:"
+msgstr "オプションを試してみてください:"
+
+#: Client/loader/Dialogs.cpp:180
+msgid "A - Standard NVidia"
+msgstr "A - NVIDIAスタンダード"
+
+#: Client/loader/Dialogs.cpp:181
+msgid "B - Alternate NVidia"
+msgstr "B - 別のNVIDIA"
+
+#: Client/loader/Dialogs.cpp:182
+msgid "C - Standard Intel"
 msgstr ""
 
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
+#: Client/loader/Dialogs.cpp:183
+msgid "D - Alternate Intel"
 msgstr ""
 
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
+#: Client/loader/Dialogs.cpp:184
+msgid "If you get desperate, this might help:"
+msgstr "絶望的な時に、これが助けてくれる："
 
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "アップデートインストール中。。。"
+#: Client/loader/Dialogs.cpp:185
+msgid "If you have already selected an option that works, this might help:"
+msgstr "動作できるオプションを選んだ場合は、これも助かるかもしれない："
 
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "ファイルを抽出中。。。"
+#: Client/loader/Dialogs.cpp:186
+msgid "Force windowed mode"
+msgstr "ウィンドウモードを強制"
 
-#: Client/loader/Utils.cpp:527 Client/loader/Dialogs.cpp:890
+#: Client/loader/Dialogs.cpp:187
+msgid "Don't show again"
+msgstr "二度と表示しない"
+
+#: Client/loader/Dialogs.cpp:195
+msgid "Warning: Could not detect anti-virus product"
+msgstr "警告： アンチウイルスソフトが見つかりませんでした"
+
+#: Client/loader/Dialogs.cpp:197
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTAはパソコンにアンチウイルスが見つかりませんでした。\n\n"
+"ウイルスはMTAと妨害し、ゲーム経験を悪くするもしれません。\n\n"
+"情報に関しては「ヘルプ」をクリックしてください。"
+
+#: Client/loader/Dialogs.cpp:200
+msgid "I have already installed an anti-virus"
+msgstr "私はもうアンチウイルスをインストールしています"
+
+#: Client/loader/Dialogs.cpp:202
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "私、アンチウイルスをインストールしません。\n"
+"パソコンが遅くなって、ボットネットの一部になってが良い。"
+
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:527
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto San Andreas を探しています"
 
-#: Client/loader/Utils.cpp:529 Client/loader/Dialogs.cpp:893
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:529
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Grand Theft Auto San Andreas をスタートしてください"
 
-#: Client/loader/Utils.cpp:593
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "GTA：San Andreasのインストールパスを選んでください"
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr "アップデートインストール中。。。"
 
-#: Client/loader/Utils.cpp:962 Client/loader/CInstallManager.cpp:361
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "下記のタスクをを完成するために、管理者アクセスが必要です\n\n"
-"  '%s'\n\n"
-"次のウインドウで確認してください。"
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr "ファイルを抽出中。。。"
 
-#: Client/loader/Utils.cpp:1063
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "%s モジュールの読み込みが失敗しました (%s)"
-
-#: Client/loader/Utils.cpp:1388 Client/loader/Dialogs.cpp:914
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1388
 msgid "Copying files..."
 msgstr "ファイルコピー中。。。"
 
-#: Client/loader/Utils.cpp:1448 Client/loader/Dialogs.cpp:919
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1448
 msgid "Copy finished early. Everything OK."
 msgstr "ファイルコピーが完成しました。全てはOKです。"
 
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:924
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1454
 msgid "Finishing..."
 msgstr "終了。。。"
 
-#: Client/loader/Utils.cpp:1456 Client/loader/Dialogs.cpp:928
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1456
 msgid "Done!"
 msgstr "完了です!"
-
-#: Client/loader/Utils.cpp:1496
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "%s の最新インストールを検出されました。\n\n"
-"%s から設定をコピーしますか？"
-
-#: Client/loader/Utils.cpp:1535
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SAは '%s' ファイル読み込みに失敗しました"
-
-#: Client/loader/Utils.cpp:1557
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SAが '%s' ファイルが不足しています。"
-
-#: Client/loader/Utils.cpp:1582
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SAはモデルを読み込みに失敗しました。"
-
-#: Client/loader/Utils.cpp:1584
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "最近「gta3.img」を変更した場合は、GTA:SAを再インストールしてみてください。"
-
-#: Client/loader/Utils.cpp:1609
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SAが車のアップグレードに失敗しました。"
-
-#: Client/loader/Utils.cpp:1628
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SAは「%s」ファイルにエラーを発見しました"
-
-#: Client/loader/Utils.cpp:1710
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "MTA:SAをプレイ中にパソコンを再起動しましたか？"
-
-#: Client/loader/Utils.cpp:1775
-msgid "Please terminate the following programs before continuing:"
-msgstr "続ける前に、次のプログラムを閉じてください："
 
 #: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
@@ -2793,6 +2871,15 @@ msgstr "GTA：San Andreasが実行できませんでした。 再起動してく
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA：San Andreas が正しく実行しなかったかもしれません。終了しますか？"
 
+#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:962
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "下記のタスクをを完成するために、管理者アクセスが必要です\n\n"
+"  '%s'\n\n"
+"次のウインドウで確認してください。"
+
 #: Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
@@ -2883,162 +2970,75 @@ msgstr "アップデートインストール設定"
 msgid "Update compatibility settings"
 msgstr "互換性設定アップデート"
 
-#: Client/loader/Dialogs.cpp:134
-msgid "Quit"
-msgstr "終了"
-
-#: Client/loader/Dialogs.cpp:151
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreasは問題が見つかりました"
-
-#: Client/loader/Dialogs.cpp:152
-msgid "Crash information"
-msgstr "クラッシュ情報"
-
-#: Client/loader/Dialogs.cpp:153
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "MTAデベロッパーにこの情報を送るために、このチェックボックスにチェックしてください"
-
-#: Client/loader/Dialogs.cpp:154
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "すると、このクラッシュを修正する可能性が高くなります。"
-
-#: Client/loader/Dialogs.cpp:155
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "MTA: San Andreasを再起動しますか？"
-
-#: Client/loader/Dialogs.cpp:162
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - 警告"
-
-#: Client/loader/Dialogs.cpp:163
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Grand Theft Auto: San Andreas がインストールされたフォルダーには以下のファイルが含まれています："
-
-#: Client/loader/Dialogs.cpp:165
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "これらのファイルがなくても問題なく作動しますが、ゲームと共に起動すると画面機能に影響を与える可能性があります。\n\n"
-"この一覧のファイルを削除か、ファイル名の変更、どちらかをお選ぶのがお勧めです。"
-
-#: Client/loader/Dialogs.cpp:167
-msgid "Keep these files, but also show this warning on next start"
-msgstr "この一覧のファイルを保留し、次回に起動するときも同じ警告を表示します。"
-
-#: Client/loader/Dialogs.cpp:168
-msgid "Do not remind me about these files again"
-msgstr "この警告をこれから表示しないようにします。"
-
-#: Client/loader/Dialogs.cpp:169
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "これらのファイル名を *.dll から *.dll.bak に変更します。"
-
-#: Client/loader/Dialogs.cpp:170
-msgid "Show me these files"
-msgstr "一覧のファイルをエクスプローラーから開きます。"
-
-#: Client/loader/Dialogs.cpp:171
-msgid "Play MTA:SA"
-msgstr "MTA:SAをプレイする"
-
-#: Client/loader/Dialogs.cpp:177
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - 紛らわしいオプション"
-
-#: Client/loader/Dialogs.cpp:178
-msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus が検出されました！"
-
-#: Client/loader/Dialogs.cpp:179
-msgid "Try each option and see what works:"
-msgstr "オプションを試してみてください:"
-
-#: Client/loader/Dialogs.cpp:180
-msgid "A - Standard NVidia"
-msgstr "A - NVIDIAスタンダード"
-
-#: Client/loader/Dialogs.cpp:181
-msgid "B - Alternate NVidia"
-msgstr "B - 別のNVIDIA"
-
-#: Client/loader/Dialogs.cpp:182
-msgid "C - Standard Intel"
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate Intel"
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:184
-msgid "If you get desperate, this might help:"
-msgstr "絶望的な時に、これが助けてくれる："
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
 
-#: Client/loader/Dialogs.cpp:185
-msgid "If you have already selected an option that works, this might help:"
-msgstr "動作できるオプションを選んだ場合は、これも助かるかもしれない："
+#: Client/loader/Utils.cpp:593
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "GTA：San Andreasのインストールパスを選んでください"
 
-#: Client/loader/Dialogs.cpp:186
-msgid "Force windowed mode"
-msgstr "ウィンドウモードを強制"
+#: Client/loader/Utils.cpp:1063
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "%s モジュールの読み込みが失敗しました (%s)"
 
-#: Client/loader/Dialogs.cpp:187
-msgid "Don't show again"
-msgstr "二度と表示しない"
+#: Client/loader/Utils.cpp:1496
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "%s の最新インストールを検出されました。\n\n"
+"%s から設定をコピーしますか？"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
+#: Client/loader/Utils.cpp:1535
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SAは '%s' ファイル読み込みに失敗しました"
 
-#: Client/loader/Dialogs.cpp:195
-msgid "Warning: Could not detect anti-virus product"
-msgstr "警告： アンチウイルスソフトが見つかりませんでした"
+#: Client/loader/Utils.cpp:1557
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SAが '%s' ファイルが不足しています。"
 
-#: Client/loader/Dialogs.cpp:197
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTAはパソコンにアンチウイルスが見つかりませんでした。\n\n"
-"ウイルスはMTAと妨害し、ゲーム経験を悪くするもしれません。\n\n"
-"情報に関しては「ヘルプ」をクリックしてください。"
+#: Client/loader/Utils.cpp:1582
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SAはモデルを読み込みに失敗しました。"
 
-#: Client/loader/Dialogs.cpp:200
-msgid "I have already installed an anti-virus"
-msgstr "私はもうアンチウイルスをインストールしています"
+#: Client/loader/Utils.cpp:1584
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "最近「gta3.img」を変更した場合は、GTA:SAを再インストールしてみてください。"
 
-#: Client/loader/Dialogs.cpp:202
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "私、アンチウイルスをインストールしません。\n"
-"パソコンが遅くなって、ボットネットの一部になってが良い。"
+#: Client/loader/Utils.cpp:1609
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SAが車のアップグレードに失敗しました。"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "ウェッブサイトリクエスト"
+#: Client/loader/Utils.cpp:1628
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SAは「%s」ファイルにエラーを発見しました"
 
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "後にロードするため、サーバーは次のウェッブサイトをリクエストしています："
+#: Client/loader/Utils.cpp:1710
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "MTA:SAをプレイ中にパソコンを再起動しましたか？"
 
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "盗まらないように、個人情報を絶対書かないでください"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "決定を保存する"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "否定"
-
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "有効な解像度が見つかりませんでした。"
-
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "この解像度を利用するに確かですか？"
+#: Client/loader/Utils.cpp:1775
+msgid "Please terminate the following programs before continuing:"
+msgstr "続ける前に、次のプログラムを閉じてください："
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
