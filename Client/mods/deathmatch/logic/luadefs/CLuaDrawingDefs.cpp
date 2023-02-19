@@ -1729,40 +1729,28 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_settable(luaVM, -3);
 
         // diagnostic debug detection
-
-        EDiagnosticDebugType diagnosticDebug = g_pCore->GetDiagnosticDebug();
-        std::string diagnosticDebugString;
-
-        switch (diagnosticDebug)
-        {
+        lua::Push(luaVM, "SettingDebugMode");
+        lua::Push(luaVM, []{
+            switch (g_pCore->GetDiagnosticDebug())
+            {
             case EDiagnosticDebug::GRAPHICS_6734:
-                diagnosticDebugString = "#6734 Graphics";
-                break;
+                return "#6734 Graphics";
             case EDiagnosticDebug::D3D_6732:
-                diagnosticDebugString = "#6732 D3D";
-                break;
+                return "#6732 D3D";
             case EDiagnosticDebug::LOG_TIMING_0000:
-                diagnosticDebugString = "#0000 Log timing";
-                break;
+                return "#0000 Log timing";
             case EDiagnosticDebug::JOYSTICK_0000:
-                diagnosticDebugString = "#0000 Joystick";
-                break;
+                return "#0000 Joystick";
             case EDiagnosticDebug::LUA_TRACE_0000:
-                diagnosticDebugString = "#0000 Lua trace";
-                break;
+                return "#0000 Lua trace";
             case EDiagnosticDebug::RESIZE_ALWAYS_0000:
-                diagnosticDebugString = "#0000 Resize always";
-                break;
+                return "#0000 Resize always";
             case EDiagnosticDebug::RESIZE_NEVER_0000:
-                diagnosticDebugString = "#0000 Resize never";
-                break;
+                return "#0000 Resize never";
             default:
-                diagnosticDebugString = "Default";
-                break;
-        }
-
-        lua_pushstring(luaVM, "SettingDebugMode");
-        lua_pushstring(luaVM, diagnosticDebugString.c_str());
+                return "Default";
+            }
+        }());
         lua_settable(luaVM, -3);
 
         return 1;
