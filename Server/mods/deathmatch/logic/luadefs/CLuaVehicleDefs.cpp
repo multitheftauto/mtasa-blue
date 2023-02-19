@@ -57,6 +57,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isVehicleDamageProof", IsVehicleDamageProof},
         {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
         {"isVehicleFrozen", IsVehicleFrozen},
+        {"isVehicleOnGround", IsVehicleOnGround},
         {"getVehicleEngineState", GetVehicleEngineState},
         {"isTrainDerailed", IsTrainDerailed},
         {"isTrainDerailable", IsTrainDerailable},
@@ -159,6 +160,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isDamageProof", "isVehicleDamageProof");
     lua_classfunction(luaVM, "isFuelTankExplodable", "isVehicleFuelTankExplodable");
     lua_classfunction(luaVM, "isLocked", "isVehicleLocked");
+    lua_classfunction(luaVM, "isOnGround", "isVehicleOnGround");
     lua_classfunction(luaVM, "isDerailable", "isTrainDerailable");
     lua_classfunction(luaVM, "isDerailed", "isTrainDerailed");
     lua_classfunction(luaVM, "isBlown", "isVehicleBlown");
@@ -268,6 +270,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
                       OOP_GetVehicleRespawnPosition);
     lua_classvariable(luaVM, "respawnRotation", "setVehicleRespawnRotation", "getVehicleRespawnRotation", SetVehicleRespawnRotation,
                       OOP_GetVehicleRespawnRotation);
+    lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "name", NULL, "getVehicleName");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
     lua_classvariable(luaVM, "sirens", NULL, "getVehicleSirens");
@@ -1529,6 +1532,29 @@ int CLuaVehicleDefs::IsVehicleFrozen(lua_State* luaVM)
         if (CStaticFunctionDefinitions::IsVehicleFrozen(pVehicle, bFrozen))
         {
             lua_pushboolean(luaVM, bFrozen);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::IsVehicleOnGround(lua_State* luaVM)
+{
+    CVehicle* pVehicle;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        bool bOnGround;
+        if (CStaticFunctionDefinitions::IsVehicleOnGround(pVehicle, bOnGround))
+        {
+            lua_pushboolean(luaVM, bOnGround);
             return 1;
         }
     }
