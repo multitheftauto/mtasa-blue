@@ -21,6 +21,7 @@
 #include "luadefs/CLuaVector3Defs.h"
 #include "luadefs/CLuaVector4Defs.h"
 #include "luadefs/CLuaXMLDefs.h"
+#include "luadefs/CLuaWasmDefs.h"
 
 class CLuaShared
 {

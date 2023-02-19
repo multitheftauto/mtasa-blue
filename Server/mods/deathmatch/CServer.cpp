@@ -295,6 +295,8 @@ int initWasm()
         goto fail;
     }
 
+    if (true)
+        return -1;
     module = wasm_runtime_load((uint8_t*)buffer, buf_size, error_buf, sizeof(error_buf));
     if (!module)
     {
