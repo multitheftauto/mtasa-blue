@@ -64,7 +64,7 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementDoubleSided", IsElementDoubleSided},
         {"getElementCollisionsEnabled", GetElementCollisionsEnabled},
         {"isElementFrozen", IsElementFrozen},
-        {"isElementOnGround", IsElementOnGround},
+        {"isElementOnGround", ArgumentParser<IsElementOnGround>},
         {"getLowLODElement", GetLowLodElement},
         {"isElementLowLOD", IsElementLowLod},
         {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
