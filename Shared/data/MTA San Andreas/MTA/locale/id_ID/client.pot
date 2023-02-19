@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-19 17:26+0000\n"
-"PO-Revision-Date: 2023-02-19 18:23\n"
+"POT-Creation-Date: 2023-02-19 19:53+0000\n"
+"PO-Revision-Date: 2023-02-19 20:19\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -2647,11 +2647,11 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Saya tidak akan memasang anti-virus.\n"
 "Saya mau PC saya untuk lag dan menjadi bagian dari botnet."
 
-#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:527
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Mencari Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:529
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Silakan mulai Grand Theft Auto San Andreas"
 
@@ -2663,19 +2663,19 @@ msgstr "Memasang pembaruan..."
 msgid "Extracting files..."
 msgstr "Mengekstrak berkas..."
 
-#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1388
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1394
 msgid "Copying files..."
 msgstr "Menyalin berkas..."
 
-#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1448
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1454
 msgid "Copy finished early. Everything OK."
 msgstr "Penyalinan selesai lebih awal. Semuanya OK."
 
-#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1454
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1460
 msgid "Finishing..."
 msgstr "Menyelesaikan..."
 
-#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1456
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
 msgid "Done!"
 msgstr "Selesai!"
 
@@ -2869,7 +2869,7 @@ msgstr "Tidak dapat memulai Grand Theft Auto: San Andreas.  Silakan coba untuk m
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas mungkin tidak diluncurkan dengan benar. Apakah anda ingin mengakhirinya?"
 
-#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:962
+#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:968
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2987,54 +2987,54 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Utils.cpp:593
+#: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Pilih direktori pemasangan Grand Theft Auto: San Andreas anda"
 
-#: Client/loader/Utils.cpp:1063
+#: Client/loader/Utils.cpp:1069
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Kesalahan memuat modul %s! (%s)"
 
-#: Client/loader/Utils.cpp:1496
+#: Client/loader/Utils.cpp:1502
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Pemasangan baru dari %s terdeteksi.\n\n"
 "Apakah anda ingin menyalin pengaturan dari %s ?"
 
-#: Client/loader/Utils.cpp:1535
+#: Client/loader/Utils.cpp:1541
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "GTA:SA mengalami masalah saat membuka berkas '%s'"
 
-#: Client/loader/Utils.cpp:1557
+#: Client/loader/Utils.cpp:1563
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "GTA:SA kehilangan berkas '%s'."
 
-#: Client/loader/Utils.cpp:1582
+#: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
 msgstr "GTA:SA mengalami masalah saat memuat model."
 
-#: Client/loader/Utils.cpp:1584
+#: Client/loader/Utils.cpp:1590
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Jika anda belakangan ini memodifikasi gta3.img, coba pasang ulang GTA:SA."
 
-#: Client/loader/Utils.cpp:1609
+#: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "GTA:SA mengalami masalah saat menambah peningkatan ke sebuah kendaraan."
 
-#: Client/loader/Utils.cpp:1628
+#: Client/loader/Utils.cpp:1634
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA menemukan kesalahan di dalam berkas '%s'"
 
-#: Client/loader/Utils.cpp:1710
+#: Client/loader/Utils.cpp:1716
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Apakah komputer anda memulai ulang saat bermain MTA:SA?"
 
-#: Client/loader/Utils.cpp:1775
+#: Client/loader/Utils.cpp:1781
 msgid "Please terminate the following programs before continuing:"
 msgstr "Mohon akhiri program berikut sebelum melanjutkan:"
 
