@@ -3558,6 +3558,14 @@ bool CStaticFunctionDefinitions::DoesPedHaveJetPack(CPed* pPed, bool& bHasJetPac
     return true;
 }
 
+bool CStaticFunctionDefinitions::IsPedOnGround(CPed* pPed, bool& bOnGround)
+{
+    assert(pPed);
+
+    bOnGround = pPed->IsOnGround();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetPedFightingStyle(CPed* pPed, unsigned char& ucStyle)
 {
     assert(pPed);
@@ -5233,6 +5241,14 @@ bool CStaticFunctionDefinitions::IsVehicleFrozen(CVehicle* pVehicle, bool& bFroz
 
     bFrozen = pVehicle->IsFrozen();
 
+    return true;
+}
+
+bool CStaticFunctionDefinitions::IsVehicleOnGround(CVehicle* pVehicle, bool& bOnGround)
+{
+    assert(pVehicle);
+
+    bOnGround = pVehicle->IsOnGround();
     return true;
 }
 
