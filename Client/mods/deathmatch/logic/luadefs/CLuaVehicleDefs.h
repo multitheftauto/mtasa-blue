@@ -54,6 +54,7 @@ public:
     LUA_DECLARE(IsVehicleDamageProof);
     LUA_DECLARE(IsVehicleFuelTankExplodable);
     LUA_DECLARE(IsVehicleFrozen);
+    LUA_DECLARE(IsVehicleOnGround);
     LUA_DECLARE(GetVehicleName);
     LUA_DECLARE(GetVehicleNameFromModel);
     LUA_DECLARE(GetVehicleAdjustableProperty);
