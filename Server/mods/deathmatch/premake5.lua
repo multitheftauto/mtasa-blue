@@ -26,13 +26,14 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
-			"../../../vendor/wasmtime/include/",
+			"../../../vendor/wasmtime/core/shared/utils",
+			"../../../vendor/wasmtime/core/shared/platform/windows",
 			"logic",
 			"utils",
 			"."
 		}
 
-	defines { "SDK_WITH_BCRYPT" }
+	defines { "SDK_WITH_BCRYPT", "WASM_RUNTIME_API_EXTERN=" }
 	links {
 		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt", "wasm-micro-runtime",
 		"advapi32", "userenv", "ntdll", "shell32", "ole32", "bcrypt",
@@ -54,6 +55,7 @@ project "Deathmatch"
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
 		-- Todo: Replace these two by using the CryptoPP functions instead
 		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp",
+		"../../../vendor/wasmtime/core/shared/utils"
 	}
 
 	filter "system:windows"

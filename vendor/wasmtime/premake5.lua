@@ -10,6 +10,8 @@ project "wasm-micro-runtime"
         "WASM_ENABLE_MINI_LOADER=0","WASM_DISABLE_HW_BOUND_CHECK=0","WASM_DISABLE_STACK_HW_BOUND_CHECK=0",
         "WASM_ENABLE_SIMD=1","WASM_GLOBAL_HEAP_SIZE=10485760","BH_PLATFORM_WINDOWS",
         "HAVE_STRUCT_TIMESPEC","BH_MALLOC=wasm_runtime_malloc","BH_FREE=wasm_runtime_free",
+        "WASM_RUNTIME_API_EXTERN=",
+        "WASM_API_EXTERN=",
     }
     
     files {
@@ -20,12 +22,12 @@ project "wasm-micro-runtime"
         "core/shared/utils/*.h",
         "core/shared/mem-alloc/*.c",
         "core/shared/mem-alloc/*.h",
+        "core/shared/mem-alloc/ems/*.c",
+        "core/shared/mem-alloc/ems/*.h",
         "core/iwasm/libraries/libc-builtin/*.c",
         "core/iwasm/libraries/libc-builtin/*.h",
         --"core/iwasm/libraries/libc-wasi/sandboxed-system-primitives/src/*.c",
         "core/iwasm/libraries/libc-wasi/sandboxed-system-primitives/src/*.h",
-        "core/shared/utils/*.c",
-        "core/shared/utils/*.h",
         "core/shared/libc-wasi/sandboxed-system-primitives/src/*.h",
         "core/shared/libc-wasi/sandboxed-system-primitives/src/*.c",
         "core/iwasm/common/*.h",
@@ -34,6 +36,15 @@ project "wasm-micro-runtime"
         "core/iwasm/interpret/*.h",
         "core/shared/platform/windows/*.h",
         "core/shared/platform/windows/*.c",
+        "core/iwasm/interpreter/*.h",
+        "core/iwasm/interpreter/*.c",
+        "core/iwasm/aot/arch/aot_reloc_x86_32.c",
+        "core/iwasm/common/arch/invokeNative_general.c",
+        -- E:/wasm micro runtime/core/iwasm/aot/arch/aot_reloc_x86_32.c
+        -- E:/MTASA Blue 2/vendor/wasmtime/core/iwasm/common/arch/invokeNative_general.c
+    }
+    removefiles {
+        "core/iwasm/interpreter/wasm_interp_classic.c"
     }
 
 	includedirs {
@@ -58,10 +69,4 @@ project "wasm-micro-runtime"
     }
 
     filter "system:windows"
-        includedirs { "../../../vendor/pthreads/include" }
-        links { "ws2_32", "pthread" }
-
-    filter "system:not windows"
-        buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
-        buildoptions { "-pthread" }
-        linkoptions { "-pthread" }
+        links { "ws2_32" }
