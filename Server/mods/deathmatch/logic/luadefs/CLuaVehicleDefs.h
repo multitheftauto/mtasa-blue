@@ -56,6 +56,7 @@ public:
     LUA_DECLARE(IsVehicleDamageProof);
     LUA_DECLARE(IsVehicleFuelTankExplodable);
     LUA_DECLARE(IsVehicleFrozen);
+    LUA_DECLARE(IsVehicleOnGround);
     LUA_DECLARE(GetVehicleEngineState);
     LUA_DECLARE(IsTrainDerailed);
     LUA_DECLARE(IsTrainDerailable);
