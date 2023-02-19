@@ -173,6 +173,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "isDamageProof", "isVehicleDamageProof");
     lua_classfunction(luaVM, "isLocked", "isVehicleLocked");
+    lua_classfunction(luaVM, "isOnGround", "isVehicleOnGround");
     lua_classfunction(luaVM, "isBlown", "isVehicleBlown");
     lua_classfunction(luaVM, "isFuelTankExplodable", "isVehicleFuelTankExplodable");
     lua_classfunction(luaVM, "isDerailed", "isTrainDerailed");
@@ -302,6 +303,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "blown", NULL, "isVehicleBlown");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
     lua_classvariable(luaVM, "gear", NULL, "getVehicleCurrentGear");
+    lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "damageProof", NULL, "isVehicleDamageProof");
     lua_classvariable(luaVM, "helicopterRotorSpeed", "setHelicopterRotorSpeed", "getHelicopterRotorSpeed");
     lua_classvariable(luaVM, "heliBladeCollisionsEnabled", "setHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled");
@@ -1197,6 +1199,25 @@ int CLuaVehicleDefs::IsVehicleFrozen(lua_State* luaVM)
     {
         bool bFrozen = pVehicle->IsFrozen();
         lua_pushboolean(luaVM, bFrozen);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::IsVehicleOnGround(lua_State* luaVM)
+{
+    CClientVehicle*  pVehicle = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        bool bOnGround = pVehicle->IsOnGround();
+        lua_pushboolean(luaVM, bOnGround);
         return 1;
     }
     else
