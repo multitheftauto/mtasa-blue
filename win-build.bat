@@ -50,9 +50,9 @@ IF /i [%2] == [Win32] (
 )
 
 rem Override MTASA_VERSION_TYPE for CI builds
-if /i [%CI%] == [true] (
-    for /f %%A in ("Shared\build_overrides.h") do set FILE_SIZE=%%~zA
+for /f %%A in ("Shared\build_overrides.h") do set FILE_SIZE=%%~zA
 
+if /i [%CI%] == [true] (
     if %FILE_SIZE% equ 0 (
         echo Overridden MTASA_VERSION_TYPE for CI builds
         (
