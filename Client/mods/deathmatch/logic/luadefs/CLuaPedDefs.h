@@ -42,6 +42,7 @@ public:
     LUA_DECLARE(IsPedDucked);
     LUA_DECLARE(IsPedInVehicle);
     LUA_DECLARE(DoesPedHaveJetPack);
+    LUA_DECLARE(IsPedOnGround);
     LUA_DECLARE(GetPedTask);
     LUA_DECLARE(GetPedSimplestTask);
     LUA_DECLARE(IsPedDoingTask);
