@@ -38,6 +38,7 @@ public:
     LUA_DECLARE(GetPedWeapon);
     LUA_DECLARE(GetPedClothes);
     LUA_DECLARE(DoesPedHaveJetPack);
+    LUA_DECLARE(IsPedOnGround);
     LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedMoveAnim);
     LUA_DECLARE(GetPedGravity);
