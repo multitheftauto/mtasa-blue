@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-19 17:26+0000\n"
-"PO-Revision-Date: 2023-02-19 18:22\n"
+"POT-Creation-Date: 2023-02-19 19:53+0000\n"
+"PO-Revision-Date: 2023-02-19 20:18\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -2655,11 +2655,11 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Nem fogok telepíteni anti-vírus terméket.\n"
 "Azt akarom, hogy a PC laggoljon, és része legyen egy botnet hálózatnak."
 
-#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:527
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
 msgid "Searching for Grand Theft Auto San Andreas"
 msgstr "Keresése: Grand Theft Auto San Andreas"
 
-#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:529
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
 msgid "Please start Grand Theft Auto San Andreas"
 msgstr "Kérem indítsd el a Grand Theft Auto San Andreas-t"
 
@@ -2671,19 +2671,19 @@ msgstr "Frissítés telepítése..."
 msgid "Extracting files..."
 msgstr "Fájlok kicsomagolása..."
 
-#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1388
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1394
 msgid "Copying files..."
 msgstr "Fájl másolás..."
 
-#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1448
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1454
 msgid "Copy finished early. Everything OK."
 msgstr "Másolás befejezve. Minden OK."
 
-#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1454
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1460
 msgid "Finishing..."
 msgstr "Befejezés..."
 
-#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1456
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
 msgid "Done!"
 msgstr "Kész!"
 
@@ -2883,7 +2883,7 @@ msgstr "Nem lehet elindítani a Grand Theft Auto: San Andreas-t. Kérjük, prób
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas nem indult el megfelelően. Szeretnéd ezt megszüntetni?"
 
-#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:962
+#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:968
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -3006,16 +3006,16 @@ msgstr "Lehet, hogy a telepítés most sérült.\n\n"
 "Telepítse újra a Multi Theft Auto-t a www.multitheftauto.com webhelyről\n"
 "vagy próbálja meg futtatni a frissítést rendszergazdai jogokkal."
 
-#: Client/loader/Utils.cpp:593
+#: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Válaszd ki a Grand Theft Auto: San Andreas főkönyvtárát"
 
-#: Client/loader/Utils.cpp:1063
+#: Client/loader/Utils.cpp:1069
 #, c-format
 msgid "Error loading %s module! (%s)"
 msgstr "Hibás betöltés: %s modul! (%s)"
 
-#: Client/loader/Utils.cpp:1496
+#: Client/loader/Utils.cpp:1502
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
@@ -3023,38 +3023,38 @@ msgstr "Új telepítés %s észlelt.\n"
 " \n"
 " Szeretné másolni a beállításokat innen %s ?"
 
-#: Client/loader/Utils.cpp:1535
+#: Client/loader/Utils.cpp:1541
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
 msgstr "A GTA:SA összeomlott a következő fájl megnyitásakor '%s'"
 
-#: Client/loader/Utils.cpp:1557
+#: Client/loader/Utils.cpp:1563
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
 msgstr "Hiányzó GTA:SA fájl '%s'."
 
-#: Client/loader/Utils.cpp:1582
+#: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
 msgstr "A GTA:SA összeomlott modell betöltés közben."
 
-#: Client/loader/Utils.cpp:1584
+#: Client/loader/Utils.cpp:1590
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
 msgstr "Ha nemrégiben módosítottad a gta3.img fájlod, telepítsd újra a GTA:SA-t."
 
-#: Client/loader/Utils.cpp:1609
+#: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
 msgstr "A GTA:SA összeomlott jármű tuningolás miatt."
 
-#: Client/loader/Utils.cpp:1628
+#: Client/loader/Utils.cpp:1634
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
 msgstr "GTA:SA hibákat talált a '%s' fájlban"
 
-#: Client/loader/Utils.cpp:1710
+#: Client/loader/Utils.cpp:1716
 msgid "Did your computer restart when playing MTA:SA?"
 msgstr "Újrainduljon a számítógép miközben játszik az MTA:SA-val?"
 
-#: Client/loader/Utils.cpp:1775
+#: Client/loader/Utils.cpp:1781
 msgid "Please terminate the following programs before continuing:"
 msgstr "Kérjük állítsa le a következő programokat a folytatás előtt:"
 
