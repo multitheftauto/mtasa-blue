@@ -1554,27 +1554,17 @@ int CLuaElementDefs::IsElementFrozen(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::IsElementOnGround(lua_State* luaVM)
-{
-    // Verify the argument
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-
-    if (!argStream.HasErrors())
+bool CLuaElementDefs::IsElementOnGround(CEntity* entity) {
+    switch (entity->GetType())
     {
-        bool bOnGround;
-        if (CStaticFunctionDefinitions::IsElementOnGround(*pEntity, bOnGround))
-        {
-            lua_pushboolean(luaVM, bOnGround);
-            return 1;
-        }
+    case CCLIENTPLAYER:
+    case CCLIENTPED:
+        return static_cast<CClientPed*>(entity)->IsOnGround();
+    case CCLIENTVEHICLE:
+        return static_cast<CClientVehicle*>(entity)->IsOnGround();
+    default:
+        throw std::invalid_argument{"Element type not supported"};
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
 }
 
 int CLuaElementDefs::IsElementStreamedIn(lua_State* luaVM)
