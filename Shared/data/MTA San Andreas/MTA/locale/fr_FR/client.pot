@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-19 19:53+0000\n"
-"PO-Revision-Date: 2023-02-19 20:18\n"
+"POT-Creation-Date: 2023-02-20 20:06+0000\n"
+"PO-Revision-Date: 2023-02-20 21:04\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -2300,7 +2300,7 @@ msgstr "VEUILLEZ SAISIR LE MOT DE PASSE DU SERVEUR"
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
-#: Client/loader/MainFunctions.cpp:1215
+#: Client/loader/MainFunctions.cpp:1223
 msgid "Information"
 msgstr "Information"
 
@@ -2861,23 +2861,23 @@ msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 msgstr "MTA:SA n'est pas compatible avec le Mode Sans Echec de Windows.\n\n"
 "Veuillez redémarrer votre ordinateur.\n"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1127
 msgid "Fix configuration issue"
 msgstr "Correction d'un problème de configuration"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1153
+#: Client/loader/MainFunctions.cpp:1161
 msgid "Fix elevation required error"
 msgstr "Correction de l'erreur d'élévation requise"
 
-#: Client/loader/MainFunctions.cpp:1160
+#: Client/loader/MainFunctions.cpp:1168
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Impossible de démarrer GTA: San Andreas.  Veuillez tenter de réinstaller, ou si le problème persiste, contactez l'équipe de MTA à l'adresse www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1215
+#: Client/loader/MainFunctions.cpp:1223
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas n'a peut-être pas démarré correctement. Voulez-vous l'arrêter?"
 
