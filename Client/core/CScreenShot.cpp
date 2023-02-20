@@ -24,6 +24,9 @@ static SString ms_strFileName;
 // If screenshot should be taken on the current frame
 static bool    ms_bScreenShot = false;
 
+// If screenshot was initiated by camera weapon shot
+static bool    ms_bCameraShot = false;
+
 // If GUI should be hidden on the current frame
 static bool    ms_bHideGUIForScreenShot = false;
 
@@ -43,6 +46,7 @@ void CScreenShot::InitiateScreenShot(bool bCameraShot)
         return;
 
     ms_bScreenShot = true;
+    ms_bCameraShot = bCameraShot;
     ms_bHideGUIForScreenShot = bCameraShot;
     ms_bScreenShotHUDWasDisabled = g_pCore->GetGame()->GetHud()->IsDisabled();
 
@@ -76,6 +80,7 @@ void CScreenShot::PostScreenShot(const SString& strFileName)
 
     g_pCore->GetGame()->GetHud()->Disable(ms_bScreenShotHUDWasDisabled);
     ms_bScreenShot = false;
+    ms_bCameraShot = false;
     ms_bHideGUIForScreenShot = false;
 }
 
@@ -216,6 +221,14 @@ void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize
     ms_uiDataSize = uiDataSize;
     ms_uiWidth = uiWidth;
     ms_uiHeight = uiHeight;
+
+    if (ms_bCameraShot)
+    {
+        // Save screenshots initiated by camera weapon on main thread
+        ms_bIsSaving = true;
+        ThreadProc(NULL);
+        return;
+    }
 
     HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
