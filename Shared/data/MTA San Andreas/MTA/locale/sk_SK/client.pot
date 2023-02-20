@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-19 19:53+0000\n"
-"PO-Revision-Date: 2023-02-19 20:19\n"
+"POT-Creation-Date: 2023-02-20 20:06+0000\n"
+"PO-Revision-Date: 2023-02-20 21:05\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -2308,7 +2308,7 @@ msgstr "PROSÍM ZADAJ HESLO K SERVERU"
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
-#: Client/loader/MainFunctions.cpp:1215
+#: Client/loader/MainFunctions.cpp:1223
 msgid "Information"
 msgstr "Informácia"
 
@@ -2869,23 +2869,23 @@ msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 msgstr "MTA:SA nie je kompatibilný s „Núdzovým režimom“ systému Windows.\n\n"
 "Reštartujte počítač.\n"
 
-#: Client/loader/MainFunctions.cpp:1119
+#: Client/loader/MainFunctions.cpp:1127
 msgid "Fix configuration issue"
 msgstr "Opravte problém s konfiguráciou"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1153
+#: Client/loader/MainFunctions.cpp:1161
 msgid "Fix elevation required error"
 msgstr "Opravte vyžadovanú chybu"
 
-#: Client/loader/MainFunctions.cpp:1160
+#: Client/loader/MainFunctions.cpp:1168
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Nemožno spustiť Grand Theft Auto: San Andreas. Skús prosím reštart, alebo ak problém pretrváva, kontaktuj MTA na www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1215
+#: Client/loader/MainFunctions.cpp:1223
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas sa možno nespustilo správne. Chceš ho ukončiť?"
 
