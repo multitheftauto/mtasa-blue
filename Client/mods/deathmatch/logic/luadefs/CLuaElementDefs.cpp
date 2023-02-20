@@ -1554,7 +1554,7 @@ int CLuaElementDefs::IsElementFrozen(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaElementDefs::IsElementOnGround(CEntity* entity) {
+bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity) {
     switch (entity->GetType())
     {
     case CCLIENTPLAYER:
