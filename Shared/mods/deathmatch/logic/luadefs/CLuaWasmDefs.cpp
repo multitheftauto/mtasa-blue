@@ -23,8 +23,8 @@
 
 static wasm_module_t      module = nullptr;
 static wasm_module_inst_t module_inst = nullptr;
-static uint32             stack_size = 8092;
-static uint32             heap_size = 8092;
+static uint32             stack_size = 80000092;
+static uint32             heap_size = 80000092;
 static char               error_buf[128] = {};
 static wasm_exec_env_t    exec_env = NULL;
 static wasm_function_inst_t      func = NULL;
@@ -57,6 +57,9 @@ static auto WasmLoadString(std::string code) -> int
 
 static auto WasmCall(std::string funcName, std::vector<double> args) -> double
 {
+    if (module_inst == nullptr)
+        return -2;
+
     if (!(func = wasm_runtime_lookup_function(module_inst, funcName.c_str(), NULL)))
     {
         printf("The %s wasm function is not found.\n", funcName.c_str());
@@ -79,7 +82,7 @@ static auto WasmCall(std::string funcName, std::vector<double> args) -> double
     if (!wasm_runtime_call_wasm_a(exec_env, func, 1, results, 2, arguments.data()))
     {
         printf("call wasm function add failed. %s\n", wasm_runtime_get_exception(module_inst));
-        return -1;
+        return -3;
     }
 
     return results[0].of.i32;
