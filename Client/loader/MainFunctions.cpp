@@ -1052,8 +1052,16 @@ BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandL
 
     if (bResult == FALSE)
     {
-        dwOutError = GetLastError();
-        strOutErrorContext = "ShellExecute";
+        STARTUPINFOW startupInfo{};
+        startupInfo.cb = sizeof(startupInfo);
+        bResult = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
+                                 *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
+
+        if (!bResult)
+        {
+            dwOutError = GetLastError();
+            strOutErrorContext = "CreateProcess";
+        }
     }
     else
     {
