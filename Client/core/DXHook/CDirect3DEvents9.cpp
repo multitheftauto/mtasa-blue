@@ -129,9 +129,11 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CGraphics::GetSingleton().OnZBufferModified();
 
     TIMING_CHECKPOINT("-OnPresent1");
+    // Make a screenshot if needed (before GUI)
+    CScreenShot::CheckForScreenShot(true);
+
     // Notify core
-    if (!CScreenShot::ShouldGUIBeHidden())
-        CCore::GetSingleton().DoPostFramePulse();
+    CCore::GetSingleton().DoPostFramePulse();
     TIMING_CHECKPOINT("+OnPresent2");
 
     // Restore in case script forgets
@@ -150,8 +152,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     }
 
     // Draw pre-GUI primitives
-    if (!CScreenShot::ShouldGUIBeHidden())
-        CGraphics::GetSingleton().DrawPreGUIQueue();
+    CGraphics::GetSingleton().DrawPreGUIQueue();
 
     // Maybe grab screen for upload
     CGraphics::GetSingleton().GetScreenGrabber()->DoPulse();
@@ -159,17 +160,14 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     if (bTookScreenShot && g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->OnPostScreenshot();
 
-    if (!CScreenShot::ShouldGUIBeHidden())
-    {
-        // Draw the GUI
-        CLocalGUI::GetSingleton().Draw();
+    // Draw the GUI
+    CLocalGUI::GetSingleton().Draw();
 
-        // Draw post-GUI primitives
-        CGraphics::GetSingleton().DrawPostGUIQueue();
+    // Draw post-GUI primitives
+    CGraphics::GetSingleton().DrawPostGUIQueue();
 
-        // Redraw the mouse cursor so it will always be over other elements
-        CLocalGUI::GetSingleton().DrawMouseCursor();
-    }
+    // Redraw the mouse cursor so it will always be over other elements
+    CLocalGUI::GetSingleton().DrawMouseCursor();
 
     CGraphics::GetSingleton().DidRenderScene();
 
@@ -186,8 +184,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     ms_DiagnosticDebug = CCore::GetSingleton().GetDiagnosticDebug();
     CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
 
-    // Make a screenshot if needed
-    CScreenShot::CheckForScreenShot();
+    // Make a screenshot if needed (after GUI)
+    CScreenShot::CheckForScreenShot(false);
 
     TIMING_CHECKPOINT("-OnPresent2");
 }

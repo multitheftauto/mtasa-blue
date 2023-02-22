@@ -15,162 +15,134 @@
 
 extern CCore* g_pCore;
 
+// If screenshot should be taken on current frame
+static bool ms_bScreenShot = false;
+
+static bool ms_bIsCameraShot = false;
+
+// If screenshot should be taken before MTA draws GUI etc.
+static bool ms_bBeforeGUI = false;
+
+static SString ms_strScreenDirectoryPath;
+
+// Last save time, seperated per given type
+// (normal screenshot or camera weapon initiated)
+static long long ms_lLastSaveTime[2] = {0, 0};
+
+// Variables which are also used in save thread
 static CBuffer ms_ScreenShotBuffer;
-static char    ms_szScreenShotPath[MAX_PATH] = {0};
-
-static long long ms_lLastSaveTime = 0;
-static SString ms_strFileName;
-
-// If screenshot should be taken on the current frame
-static bool    ms_bScreenShot = false;
-
-// If GUI should be hidden on the current frame
-static bool    ms_bHideGUIForScreenShot = false;
-
-// If HUD was disabled on screenshot initiation
-static bool    ms_bScreenShotHUDWasDisabled = false;
-
-// Variables used for saving the screenshot file on a separate thread
+static SString ms_strScreenShotPath;
 static bool    ms_bIsSaving = false;
 static uint    ms_uiWidth = 0;
 static uint    ms_uiHeight = 0;
-static void*   ms_pData = NULL;
-static uint    ms_uiDataSize = 0;
 
-void CScreenShot::InitiateScreenShot(bool bCameraShot)
+void CScreenShot::InitiateScreenShot(bool bIsCameraShot)
 {
-    if (IsSaving() || IsRateLimited())
+    if (ms_bScreenShot || ms_bIsSaving || IsRateLimited(bIsCameraShot))
         return;
 
     ms_bScreenShot = true;
-    ms_bHideGUIForScreenShot = bCameraShot;
-    ms_bScreenShotHUDWasDisabled = g_pCore->GetGame()->GetHud()->IsDisabled();
+    ms_bIsCameraShot = bIsCameraShot;
 
-    if (bCameraShot)
+    // Camera shots shouldn't have GUI
+    ms_bBeforeGUI = bIsCameraShot;
+
+    if (bIsCameraShot)
     {
-        g_pCore->GetGame()->GetHud()->Disable(true);
-
         // Set the screenshot path to camera gallery path
-        SString strGalleryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
-        SetPath(strGalleryPath.c_str());
+        ms_strScreenDirectoryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
     }
     else
     {
         // Set the screenshot path to this default library (screenshots shouldn't really be made outside mods)
-        SString strScreenShotPath = CalcMTASAPath("screenshots");
-        SetPath(strScreenShotPath.c_str());
+        ms_strScreenDirectoryPath = CalcMTASAPath("screenshots");
     }
 }
 
-SString CScreenShot::PreScreenShot()
-{
-    ms_lLastSaveTime = GetTickCount64_();
-    return GetValidScreenshotFilename();
-}
-
-void CScreenShot::PostScreenShot(const SString& strFileName)
-{
-    // print a notice
-    if (!strFileName.empty())
-        g_pCore->GetConsole()->Printf(_("Screenshot taken: '%s'"), *strFileName);
-
-    g_pCore->GetGame()->GetHud()->Disable(ms_bScreenShotHUDWasDisabled);
-    ms_bScreenShot = false;
-    ms_bHideGUIForScreenShot = false;
-}
-
-void CScreenShot::SetPath(const char* szPath)
-{
-    strncpy(ms_szScreenShotPath, szPath, MAX_PATH - 1);
-
-    // make sure the directory exists
-    File::Mkdir(szPath);
-}
-
-SString CScreenShot::GetValidScreenshotFilename()
+SString CScreenShot::GetScreenshotPath()
 {
     // Get the system time
     SYSTEMTIME sysTime;
     GetLocalTime(&sysTime);
-    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png", &ms_szScreenShotPath[0], sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour,
-                   sysTime.wMinute, sysTime.wSecond);
+    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png", *ms_strScreenDirectoryPath, sysTime.wYear, sysTime.wMonth, sysTime.wDay,
+                   sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
 }
 
-// Take a screenshot if needed
-void CScreenShot::CheckForScreenShot()
+//
+// Take a screenshot if needed.
+// @ bool bBeforeGUI: whenever we try to capture screenshot before GUI gets drawn
+// 
+void CScreenShot::CheckForScreenShot(bool bBeforeGUI)
 {
     if (!ms_bScreenShot)
         return;
 
-    SString strFileName = PreScreenShot();
-    uint    uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
-    uint    uiHeight = CDirect3DData::GetSingleton().GetViewportHeight();
+    if (ms_bBeforeGUI != bBeforeGUI)
+        return;
+
+    // Update last time of taken screenshot of given type
+    ms_lLastSaveTime[ms_bIsCameraShot] = GetTickCount64_();
+
+    ms_strScreenShotPath = GetScreenshotPath();
+    ms_uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
+    ms_uiHeight = CDirect3DData::GetSingleton().GetViewportHeight();
 
     // Try to get the screen data
     SString strError;
-    if (CGraphics::GetSingleton().GetScreenGrabber()->GetBackBufferPixels(uiWidth, uiHeight, ms_ScreenShotBuffer, strError))
+    if (CGraphics::GetSingleton().GetScreenGrabber()->GetBackBufferPixels(ms_uiWidth, ms_uiHeight, ms_ScreenShotBuffer, strError))
     {
         // Validate data size
         uint uiDataSize = ms_ScreenShotBuffer.GetSize();
-        uint uiReqDataSize = uiWidth * uiHeight * 4;
+        uint uiReqDataSize = ms_uiWidth * ms_uiHeight * 4;
 
         if (uiDataSize == uiReqDataSize)
         {
             // Start the save thread
-            BeginSave(strFileName, ms_ScreenShotBuffer.GetData(), uiDataSize, uiWidth, uiHeight);
+            StartSaveThread();
         }
         else
         {
             g_pCore->GetConsole()->Printf(_("Screenshot got %d bytes, but expected %d"), uiDataSize, uiReqDataSize);
-            strFileName = "";
+            ClearBuffer();
         }
     }
     else
     {
         g_pCore->GetConsole()->Print(_("Screenshot failed") + SString(" (%s)", *strError));
-        strFileName = "";
+        ClearBuffer();
     }
 
-    PostScreenShot(strFileName);
+    ms_bScreenShot = false;
 }
 
 // Callback for threaded save
-// Static function
 DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 {
-    unsigned long ulScreenHeight = ms_uiHeight;
-    unsigned long ulScreenWidth = ms_uiWidth;
-    uint          uiReqDataSize = ulScreenHeight * ulScreenWidth * 4;
-    uint          uiLinePitch = ulScreenWidth * 4;
-
-    if (uiReqDataSize != ms_uiDataSize)
-    {
-        ms_bIsSaving = false;
-        return 0;
-    }
+    uint uiLinePitch = ms_uiWidth * 4;
+    void* pData = ms_ScreenShotBuffer.GetData();
 
     // Create the screen data buffer
     BYTE** ppScreenData = NULL;
-    ppScreenData = new BYTE*[ulScreenHeight];
-    for (unsigned short y = 0; y < ulScreenHeight; y++)
+    ppScreenData = new BYTE*[ms_uiHeight];
+    for (unsigned short y = 0; y < ms_uiHeight; y++)
     {
-        ppScreenData[y] = new BYTE[ulScreenWidth * 4];
+        ppScreenData[y] = new BYTE[ms_uiWidth * 4];
     }
 
     // Copy the surface data into a row-based buffer for libpng
     #define BYTESPERPIXEL 4
-    unsigned long ulLineWidth = ulScreenWidth * 4;
-    for (unsigned int i = 0; i < ulScreenHeight; i++)
+    unsigned long ulLineWidth = ms_uiWidth * 4;
+    for (unsigned int i = 0; i < ms_uiHeight; i++)
     {
-        memcpy(ppScreenData[i], (BYTE*)ms_pData + i * uiLinePitch, ulLineWidth);
+        memcpy(ppScreenData[i], (BYTE*)pData + i * uiLinePitch, ulLineWidth);
         for (unsigned int j = 3; j < ulLineWidth; j += BYTESPERPIXEL)
         {
             ppScreenData[i][j] = 0xFF;
         }
     }
 
-    MakeSureDirExists(ms_strFileName);
-    FILE* file = File::Fopen(ms_strFileName, "wb");
+    MakeSureDirExists(ms_strScreenShotPath);
+    FILE* file = File::Fopen(ms_strScreenShotPath, "wb");
     if (file)
     {
         png_struct* png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
@@ -178,49 +150,43 @@ DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
         png_init_io(png_ptr, file);
         png_set_filter(png_ptr, 0, PNG_FILTER_NONE);
         png_set_compression_level(png_ptr, 1);
-        png_set_IHDR(png_ptr, info_ptr, ulScreenWidth, ulScreenHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+        png_set_IHDR(png_ptr, info_ptr, ms_uiWidth, ms_uiHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
                      PNG_FILTER_TYPE_DEFAULT);
         png_set_rows(png_ptr, info_ptr, ppScreenData);
         png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_BGR | PNG_TRANSFORM_STRIP_ALPHA, NULL);
         png_write_end(png_ptr, info_ptr);
         png_destroy_write_struct(&png_ptr, &info_ptr);
         fclose(file);
+
+        CCore::GetSingleton().GetConsole()->Printf(_("Screenshot taken: '%s'"), *ms_strScreenShotPath);
     }
     else
     {
-        CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot file '%s'", *ms_strFileName);
+        CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot file '%s'", *ms_strScreenShotPath);
     }
 
     // Clean up the screen data buffer
     if (ppScreenData)
     {
-        for (unsigned short y = 0; y < ulScreenHeight; y++)
+        for (unsigned short y = 0; y < ms_uiHeight; y++)
         {
             delete[] ppScreenData[y];
         }
         delete[] ppScreenData;
     }
 
+    ClearBuffer();
     ms_bIsSaving = false;
     return 0;
 }
 
-// Static function
-void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize, uint uiWidth, uint uiHeight)
+void CScreenShot::StartSaveThread()
 {
-    if (ms_bIsSaving)
-        return;
-
-    ms_strFileName = szFileName;
-    ms_pData = pData;
-    ms_uiDataSize = uiDataSize;
-    ms_uiWidth = uiWidth;
-    ms_uiHeight = uiHeight;
-
     HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
         CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot thread.");
+        ClearBuffer();
     }
     else
     {
@@ -230,17 +196,13 @@ void CScreenShot::BeginSave(const char* szFileName, void* pData, uint uiDataSize
     }
 }
 
-bool CScreenShot::ShouldGUIBeHidden()
+// Max one screenshot per second
+bool CScreenShot::IsRateLimited(bool bIsCameraShot)
 {
-    return ms_bHideGUIForScreenShot;
+    return GetTickCount64_() - ms_lLastSaveTime[bIsCameraShot] < 1000;
 }
 
-bool CScreenShot::IsSaving()
+void CScreenShot::ClearBuffer()
 {
-    return ms_bIsSaving;
-}
-
-bool CScreenShot::IsRateLimited()
-{
-    return GetTickCount64_() - ms_lLastSaveTime < 1000;
+    ms_ScreenShotBuffer.Clear();
 }
