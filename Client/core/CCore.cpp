@@ -474,9 +474,9 @@ bool CCore::ClearChat()
     return false;
 }
 
-void CCore::InitiateScreenShot(bool bCameraShot)
+void CCore::InitiateScreenShot(bool bIsCameraShot)
 {
-    CScreenShot::InitiateScreenShot(bCameraShot);
+    CScreenShot::InitiateScreenShot(bIsCameraShot);
 }
 
 void CCore::EnableChatInput(char* szCommand, DWORD dwColor)

@@ -131,7 +131,7 @@ public:
     int  GetChatboxMaxCharacterLimit();
 
     // Screenshot
-    void InitiateScreenShot(bool bCameraShot);
+    void InitiateScreenShot(bool bIsCameraShot);
 
     // GUI
     bool IsSettingsVisible();
