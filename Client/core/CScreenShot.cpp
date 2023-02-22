@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <game/CHud.h>
 #include <libpng/png.h>
 
 extern CCore* g_pCore;
