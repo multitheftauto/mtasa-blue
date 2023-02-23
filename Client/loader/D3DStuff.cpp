@@ -189,6 +189,16 @@ void BeginD3DStuff()
     SetApplicationSettingInt("nvhacks", "optimus", bDetectedOptimus);
     SetApplicationSettingInt("nvhacks", "nvidia", bDetectedNVidia);
 
+    if (int revision = GetApplicationSettingInt("nvhacks", "reset-revision"); revision < 21590)
+    {
+        SetApplicationSettingInt("nvhacks", "reset-revision", 21590);
+        SetApplicationSettingInt("nvhacks", "optimus-startup-option", 0);
+        SetApplicationSettingInt("nvhacks", "optimus-alt-startup", 0);
+        SetApplicationSettingInt("nvhacks", "optimus-export-enablement", 0);
+        SetApplicationSettingInt("nvhacks", "optimus-force-windowed", 0);
+        SetApplicationSettingInt("nvhacks", "optimus-remember-option", 0);
+    }
+
     if (bDetectedOptimus)
     {
         ShowOptimusDialog(g_hInstance);
@@ -197,7 +207,6 @@ void BeginD3DStuff()
     else
     {
         SetApplicationSettingInt("nvhacks", "optimus-alt-startup", 0);
-        SetApplicationSettingInt("nvhacks", "optimus-rename-exe", 0);
         SetApplicationSettingInt("nvhacks", "optimus-export-enablement", 0);
         SetApplicationSettingInt("nvhacks", "optimus-force-windowed", 0);
     }

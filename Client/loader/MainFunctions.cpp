@@ -820,7 +820,7 @@ void CheckDataFiles()
     }
 
     // Make sure the gta executable exists
-    if (!FileExists(PathJoin(strGTAPath, MTA_GTAEXE_NAME)))
+    if (!FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) && !FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME)))
     {
         DisplayErrorMessageBox(SString(_("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str()), _E("CL20"), "gta_sa-missing");
         return ExitProcess(EXIT_ERROR);
@@ -1052,8 +1052,16 @@ BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandL
 
     if (bResult == FALSE)
     {
-        dwOutError = GetLastError();
-        strOutErrorContext = "ShellExecute";
+        STARTUPINFOW startupInfo{};
+        startupInfo.cb = sizeof(startupInfo);
+        bResult = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
+                                 *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
+
+        if (!bResult)
+        {
+            dwOutError = GetLastError();
+            strOutErrorContext = "CreateProcess";
+        }
     }
     else
     {
