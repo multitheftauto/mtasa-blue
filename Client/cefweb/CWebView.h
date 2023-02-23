@@ -30,6 +30,12 @@
 
 #define MTA_CEF_USERAGENT "Multi Theft Auto: San Andreas Client " MTA_DM_BUILDTAG_LONG
 
+enum class ECefThreadState
+{
+    Running = 0, // CEF thread is currently running
+    Wait // CEF thread is waiting for the main thread
+};
+
 class CWebView : public CWebViewInterface,
                  private CefClient,
                  private CefRenderHandler,
@@ -173,6 +179,8 @@ public:
                                      CefRefPtr<CefMenuModel> model) override;
 
 private:
+    void ResumeCefThread();
+
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
@@ -192,6 +200,8 @@ private:
     {
         bool                    changed = false;
         std::mutex              dataMutex;
+        ECefThreadState         cefThreadState = ECefThreadState::Running;
+        std::condition_variable cefThreadCv;
 
         const void*                buffer;
         int                        width, height;

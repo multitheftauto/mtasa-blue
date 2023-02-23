@@ -168,6 +168,24 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\Default 2023"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\GWEN Blue"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\GWEN Orange"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.xml"
 	
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"

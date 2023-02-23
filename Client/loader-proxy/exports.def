@@ -1,0 +1,5 @@
+EXPORTS
+    timeBeginPeriod=noreturn
+    timeEndPeriod=noreturn
+    timeGetDevCaps=noreturn
+    timeGetTime=noreturn
