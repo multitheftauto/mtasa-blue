@@ -2,14 +2,13 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Install.Manifest.cpp
+ *  FILE:        Client/loader/Install.Manifest.cpp
  *  PURPOSE:     Handles loading and creating of manifest files for installation
  *
  *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
 #include "Install.h"
 #include <fstream>
 #include <iomanip>

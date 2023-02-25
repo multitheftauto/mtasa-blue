@@ -158,9 +158,7 @@ SString SharedUtil::CalcMTASAPath(const SString& strPath)
 bool SharedUtil::IsGTAProcess()
 {
     SString strLaunchPathFilename = GetLaunchPathFilename();
-    if (strLaunchPathFilename.EndsWithI("gta_sa.exe") || strLaunchPathFilename.EndsWithI("proxy_sa.exe"))
-        return true;
-    return false;
+    return strLaunchPathFilename.EndsWithI("gta_sa.exe");
 }
 
 //

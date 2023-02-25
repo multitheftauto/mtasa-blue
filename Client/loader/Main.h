@@ -1,22 +1,24 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Main.h
+ *  FILE:        Client/loader/Main.h
  *  PURPOSE:     MTA loader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
-#define MTA_GTAEXE_NAME "gta_sa.exe"
-#define MTA_HTAEXE_NAME "proxy_sa.exe"
+#define GTA_EXE_NAME            "gta_sa.exe"
+#define PROXY_GTA_EXE_NAME      "proxy_sa.exe"
+#define STEAM_GTA_EXE_NAME      "gta-sa.exe"
 #define MTA_GTA_KNOWN_FILE_NAME "models\\gta3.img"
-#define MTA_GUID "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD353}"
-#define URI_CONNECT 1
-#define MTA_EXE_NAME_RELEASE "Multi Theft Auto.exe"
+#define MTA_GUID                "Global\\{4962AF5F-5D82-412D-9CCA-AB8BB9DBD353}"
+#define URI_CONNECT             1
+#define MTA_EXE_NAME_RELEASE    "Multi Theft Auto.exe"
+#define LOADER_PROXY_DLL_NAME   "mtasa.dll"
 
 #ifdef MTA_DEBUG
     #define MTA_EXE_NAME            "Multi Theft Auto_d.exe"
