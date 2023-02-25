@@ -2,6 +2,7 @@ project "wasm-micro-runtime"
     language "C++"
     kind "SharedLib"
     toolset "clang"
+    cppdialect "C++14"
     
 	targetdir(buildpath("server/mods/deathmatch"))
 
@@ -22,16 +23,21 @@ project "wasm-micro-runtime"
         "WASM_ENABLE_MINI_LOADER=0","WASM_DISABLE_HW_BOUND_CHECK=0","WASM_DISABLE_STACK_HW_BOUND_CHECK=0",
         "WASM_ENABLE_SIMD=1","WASM_GLOBAL_HEAP_SIZE=10485760","BH_PLATFORM_WINDOWS",
         "HAVE_STRUCT_TIMESPEC","BH_MALLOC=wasm_runtime_malloc","BH_FREE=wasm_runtime_free",
+        "WASM_ENABLE_THREAD_MGR=1",
         --"WASM_ENABLE_UVWASI=1",
-        "WASM_ENABLE_LIBC_WASI=1",
+        --"WASM_ENABLE_LIBC_WASI=1",
+        --"WASM_ENABLE_LIBC_EMCC=1",
+        --"CONFIG_HAS_PTHREAD_CONDATTR_SETCLOCK=0",
         --[["WASM_RUNTIME_API_EXTERN=",
         "WASM_API_EXTERN=",
         "__cplusplus=201500L"]]
     }
     
     files {
-        "core/iwasm/aot/*.h",
-        "core/iwasm/aot/*.c",
+        "core/shared/platform/windows/*.h",
+        "core/shared/platform/windows/*.c",
+        --"core/iwasm/aot/*.h",
+        --"core/iwasm/aot/*.c",
         "core/iwasm/include/*.h",
         "core/shared/utils/*.c",
         "core/shared/utils/*.h",
@@ -41,20 +47,30 @@ project "wasm-micro-runtime"
         "core/shared/mem-alloc/ems/*.h",
         "core/iwasm/libraries/libc-builtin/*.c",
         "core/iwasm/libraries/libc-builtin/*.h",
-        --"core/iwasm/libraries/libc-wasi/sandboxed-system-primitives/src/*.c",
+        "core/iwasm/libraries/thread-mgr/*.c",
+        "core/iwasm/libraries/thread-mgr/*.h",
+        "core/iwasm/libraries/libc-wasi/*.c",
+        "core/iwasm/libraries/libc-wasi/*.h",
+        "core/iwasm/libraries/libc-wasi/sandboxed-system-primitives/src/*.c",
         "core/iwasm/libraries/libc-wasi/sandboxed-system-primitives/src/*.h",
         "core/shared/libc-wasi/sandboxed-system-primitives/src/*.h",
         "core/shared/libc-wasi/sandboxed-system-primitives/src/*.c",
+        "core/iwasm/common/arch/invokeNative_general.c",
+        "core/iwasm/common/arch/invokeNative_ia32.s",
+        "core/iwasm/common/arch/invokeNative_ia32.asm",
+
         "core/iwasm/common/*.h",
         "core/iwasm/common/*.c",
         "core/iwasm/interpret/*.c",
         "core/iwasm/interpret/*.h",
-        "core/shared/platform/windows/*.h",
-        "core/shared/platform/windows/*.c",
         "core/iwasm/interpreter/*.h",
         "core/iwasm/interpreter/*.c",
-        "core/iwasm/aot/arch/aot_reloc_x86_32.c",
-        "core/iwasm/common/arch/invokeNative_general.c",
+        --"core/iwasm/aot/arch/aot_reloc_x86_32.c",
+        -- \vendor\wasmtime\core\iwasm\aot\arch\aot_reloc_x86_32.c:6:
+        
+        -- IF WAMR_BUILD_INVOKE_NATIVE_GENERAL
+
+        -- END IF
     }
     removefiles {
         "core/iwasm/interpreter/wasm_interp_classic.c",

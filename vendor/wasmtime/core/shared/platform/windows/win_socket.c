@@ -5,7 +5,7 @@
 
 #include "platform_api_vmcore.h"
 #include "platform_api_extension.h"
-#include <WS2tcpip.h> // MTA SPECIFIC
+
 /* link with Ws2_32.lib */
 #pragma comment(lib, "ws2_32.lib")
 
