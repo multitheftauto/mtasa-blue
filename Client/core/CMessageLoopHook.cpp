@@ -553,7 +553,7 @@ void CMessageLoopHook::StartWindowMovement()
 
     LONG lExStyle = GetWindowLong(m_MovementDummyWindow, GWL_EXSTYLE);
     lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-    lExStyle |= WS_EX_LAYERED;
+    lExStyle |= WS_EX_LAYERED | WS_EX_TOOLWINDOW;
     SetWindowLong(m_MovementDummyWindow, GWL_EXSTYLE, lExStyle);
     SetLayeredWindowAttributes(m_MovementDummyWindow, 0, 140, LWA_ALPHA);
 
