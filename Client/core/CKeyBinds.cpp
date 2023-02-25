@@ -2014,6 +2014,9 @@ void CKeyBinds::DoPostFramePulse()
     {
         for (const KeyBindPtr& bind : m_binds)
         {
+            if (bind->isBeingDeleted || !bind->boundKey)
+                continue;
+
             switch (bind->type)
             {
                 case KeyBindType::COMMAND:
