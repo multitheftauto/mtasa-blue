@@ -248,7 +248,7 @@ int initWasm()
     wasm_module_t        module = NULL;
     wasm_module_inst_t   module_inst = NULL;
     wasm_exec_env_t      exec_env = NULL;
-    uint32               buf_size = sizeof(buffer), stack_size = 80000092, heap_size = 80000092;
+    uint32               buf_size = sizeof(buffer), stack_size = 800000092, heap_size = 800000092;
     wasm_function_inst_t func = NULL;
     wasm_function_inst_t func2 = NULL;
     char*                native_buffer = NULL;

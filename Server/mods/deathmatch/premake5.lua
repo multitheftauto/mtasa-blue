@@ -33,7 +33,7 @@ project "Deathmatch"
 			"."
 		}
 
-	defines { "SDK_WITH_BCRYPT", "WASM_RUNTIME_API_EXTERN=" }
+	defines { "SDK_WITH_BCRYPT" }
 	links {
 		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt", "wasm-micro-runtime",
 		"advapi32", "userenv", "ntdll", "shell32", "ole32", "bcrypt",

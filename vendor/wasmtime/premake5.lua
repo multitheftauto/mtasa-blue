@@ -1,17 +1,32 @@
 project "wasm-micro-runtime"
     language "C++"
-    kind "StaticLib"
+    kind "SharedLib"
+    toolset "clang"
     
-    language ("C")
+	targetdir(buildpath("server/mods/deathmatch"))
+
+	filter "system:windows"
+		links { "ws2_32", "pthread" }
+
+	filter "system:not windows"
+		buildoptions { "-Wno-narrowing" } -- We should fix the warnings at some point
+		buildoptions { "-pthread" }
+		linkoptions { "-pthread" }
+
+    filter {}
+
     defines {
         "WASM_ENABLE_INTERP=1","WASM_ENABLE_AOT=1","WASM_ENABLE_LIBC_BUILTIN=1",
-        "WASM_ENABLE_LIBC_WASI=0","BUILD_TARGET_X86_32","WASM_ENABLE_FAST_INTERP=1",
+        "BUILD_TARGET_X86_32","WASM_ENABLE_FAST_INTERP=1",
         "WASM_ENABLE_MULTI_MODULE=0","WASM_ENABLE_BULK_MEMORY=1","WASM_ENABLE_SHARED_MEMORY=0",
         "WASM_ENABLE_MINI_LOADER=0","WASM_DISABLE_HW_BOUND_CHECK=0","WASM_DISABLE_STACK_HW_BOUND_CHECK=0",
         "WASM_ENABLE_SIMD=1","WASM_GLOBAL_HEAP_SIZE=10485760","BH_PLATFORM_WINDOWS",
         "HAVE_STRUCT_TIMESPEC","BH_MALLOC=wasm_runtime_malloc","BH_FREE=wasm_runtime_free",
-        "WASM_RUNTIME_API_EXTERN=",
+        --"WASM_ENABLE_UVWASI=1",
+        "WASM_ENABLE_LIBC_WASI=1",
+        --[["WASM_RUNTIME_API_EXTERN=",
         "WASM_API_EXTERN=",
+        "__cplusplus=201500L"]]
     }
     
     files {
@@ -40,11 +55,10 @@ project "wasm-micro-runtime"
         "core/iwasm/interpreter/*.c",
         "core/iwasm/aot/arch/aot_reloc_x86_32.c",
         "core/iwasm/common/arch/invokeNative_general.c",
-        -- E:/wasm micro runtime/core/iwasm/aot/arch/aot_reloc_x86_32.c
-        -- E:/MTASA Blue 2/vendor/wasmtime/core/iwasm/common/arch/invokeNative_general.c
     }
     removefiles {
-        "core/iwasm/interpreter/wasm_interp_classic.c"
+        "core/iwasm/interpreter/wasm_interp_classic.c",
+        "core/iwasm/interpreter/wasm_mini_loader.c",
     }
 
 	includedirs {
@@ -63,10 +77,12 @@ project "wasm-micro-runtime"
 	}
 
     vpaths {
-        ["Headers/**"] = "**.h",
-        ["Sources/**"] = { "**.cpp", "**.c" },
+        ["Headers/*"] = "**.h",
+        ["Sources/*"] = { "**.c" },
         ["*"] = "premake5.lua"
     }
 
-    filter "system:windows"
-        links { "ws2_32" }
+
+    --warnings 'Off'
+    --buildoptions { "/Wall" }
+
