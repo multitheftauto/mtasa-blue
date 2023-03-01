@@ -14,8 +14,8 @@
 #define BIGE 0
 #define _SWAP(h) ((BIGE) ? ((uint16_t)(h << 8) | (h << 8)) : h)
 
-CClientGif::CClientGif(CClientManager* pManager, ElementID ID, CGifItem* p_GifItem)
-    : ClassInit(this), CClientTexture(pManager, ID, p_GifItem)
+CClientGif::CClientGif(CClientManager* pManager, ElementID ID, CGifItem* pGifItem)
+    : ClassInit(this), CClientTexture(pManager, ID, pGifItem)
 {
     SetTypeName("gif");
     m_pManager = pManager;
