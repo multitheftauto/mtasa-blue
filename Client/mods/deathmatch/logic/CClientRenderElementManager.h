@@ -37,7 +37,7 @@ public:
     CClientScreenSource*  CreateScreenSource(uint uiSizeX, uint uiSizeY);
     CClientWebBrowser*    CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
     CClientVectorGraphic* CreateVectorGraphic(uint width, uint height);
-    CClientGif*           CreateGif(uint width,uint height);
+    CClientGif*           CreateGif(uint width, uint height);
     CClientTexture*       FindAutoTexture(const SString& strFullFilePath, const SString& strUniqueName);
     void                  Remove(CClientRenderElement* pElement);
 
