@@ -19,7 +19,7 @@ class CClientGifDisplay final : public CClientDisplay
     friend class CClientDisplayManager;
 
 public:
-    CClientGifDisplay(CClientDisplayManager*, CClientGif*, int ID = DISPLAY_GIF);
+    CClientGifDisplay(CClientDisplayManager* pDisplayManager, CClientGif* pGif, int ID = DISPLAY_GIF);
     ~CClientGifDisplay() = default;
     eDisplayType GetType() { return DISPLAY_GIF; }
     void         Render();
@@ -28,6 +28,6 @@ public:
     bool         IsCleared() { return m_bIsCleared; }
 
 private:
-    CClientGif*         m_pGif;
-    bool                m_bIsCleared;
+    CClientGif* m_pGif;
+    bool        m_bIsCleared;
 };
