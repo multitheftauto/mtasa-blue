@@ -15,12 +15,15 @@
 class CLuaGifDefs : public CLuaDefs
 {
 public:
-    static void                                  LoadFunctions();
-    static void                                  AddClass(lua_State*);
-    static CClientGif*                           GifCreate(lua_State*, std::string);
-    static bool                                  GifPlay(CClientGif*);
-    static bool                                  GifStop(CClientGif*);
-    static bool                                  GifSetProperty(lua_State*, CClientGif*, std::string, std::variant<int, std::string>, std::optional<int>);
-    static std::variant<bool, std::string, int>  GifGetProperty(lua_State*, CClientGif*, std::string, std::optional<int>);
-    static bool                                  GifIsPlaying(CClientGif*);
+    static void LoadFunctions();
+    static void AddClass(lua_State* luaVM);
+
+    static CClientGif* GifCreate(lua_State* luaVM, std::string pathOrRawdata);
+    static bool        GifPlay(CClientGif* gif);
+    static bool        GifStop(CClientGif* gif);
+
+    static bool                                 GifSetProperty(lua_State* luaVM, CClientGif* gif, std::string property, std::variant<int, std::string> value, std::optional<int> frame);
+    static std::variant<bool, std::string, int> GifGetProperty(lua_State* luaVM, CClientGif* gif, std::string property, std::optional<int> frame);
+
+    static bool GifIsPlaying(CClientGif* gif);
 };
