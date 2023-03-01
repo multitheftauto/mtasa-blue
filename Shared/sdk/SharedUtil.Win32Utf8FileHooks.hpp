@@ -46,6 +46,12 @@ BUT
             and many more...
 */
 
+#ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
+    #include <filesystem>
+
+    extern std::filesystem::path g_gtaDirectory;
+#endif
+
 namespace SharedUtil
 {
     /////////////////////////////////////////////////////////////
@@ -83,6 +89,16 @@ namespace SharedUtil
     /////////////////////////////////////////////////////////////
     SString MakeSurePathIsUTF8(const SString& strOriginal)
     {
+    #ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
+        static SString gtaDirCP = g_gtaDirectory.string();
+        static SString gtaDirUTF8 = ToUTF8(g_gtaDirectory.wstring());
+        if (strOriginal.BeginsWithI(gtaDirCP))
+        {
+            SString tail = strOriginal.SubStr(gtaDirCP.length());
+            return PathJoin(gtaDirUTF8, tail);
+        }
+    #endif
+
         static SString strLaunchPathCP, strLaunchPathUTF8;
         if (strLaunchPathCP.empty())
         {
