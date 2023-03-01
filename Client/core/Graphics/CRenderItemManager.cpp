@@ -183,18 +183,18 @@ CGifItem* CRenderItemManager::CreateGif(uint width, uint height)
     if (!CanCreateRenderItem(CGifItem::GetClassId()))
         return nullptr;
 
-    CGifItem* pVectorItem = new CGifItem;
-    pVectorItem->PostConstruct(this, width, height);
+    CGifItem* pGifItem = new CGifItem;
+    pGifItem->PostConstruct(this, width, height);
 
-    if (!pVectorItem->IsValid())
+    if (!pGifItem->IsValid())
     {
-        SAFE_RELEASE(pVectorItem);
+        SAFE_RELEASE(pGifItem);
         return nullptr;
     }
 
     UpdateMemoryUsage();
 
-    return pVectorItem;
+    return pGifItem;
 }
 
 ////////////////////////////////////////////////////////////////
