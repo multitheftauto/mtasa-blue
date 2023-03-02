@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-25 17:41+0000\n"
-"PO-Revision-Date: 2023-02-25 18:32\n"
+"PO-Revision-Date: 2023-03-02 19:01\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -1187,7 +1187,7 @@ msgstr "Rallenta asse"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "NOTIZIE"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171
@@ -1225,7 +1225,7 @@ msgstr "Interfaccia"
 
 #: Client/core/CSettings.cpp:122
 msgid "Web Browser"
-msgstr ""
+msgstr "Browser Web"
 
 #: Client/core/CSettings.cpp:123
 msgid "Advanced"
@@ -1573,11 +1573,11 @@ msgstr "Fumo su ruote e altro"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Ombre dinamiche dei pedoni"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Sfuocatura di movimento"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -1601,7 +1601,7 @@ msgstr "Rendi i pedoni sempre in dettaglio"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Riflessi pioggia"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
@@ -2561,28 +2561,29 @@ msgstr "MTA: San Andreas - Attenzione"
 
 #: Client/loader/Dialogs.cpp:163
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "La tua cartella d'installazione di Grand Theft Auto: San Andreas ha questi file:"
 
 #: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Questi file non sono richiesti e potrebbero interferire con le caratteristiche grafiche in questa versione di MTA:SA.\n\n"
+"È raccomandato rimuovere o rinominare questi file."
 
 #: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Mantieni questi file, ma mostra questo avviso al prossimo avvio"
 
 #: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Non avvisare più di questi file"
 
 #: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Rinomina questi file da *.dll a *dll.bak"
 
 #: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
-msgstr ""
+msgstr "Mostra questi file"
 
 #: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
@@ -2610,11 +2611,11 @@ msgstr "B - NVidia Alternativo"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Intel Standard"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Intel Alternativo"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -2957,7 +2958,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "Impossibile avviare MTA:SA perchè il patching di GTA:SA è fallito:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -2977,14 +2978,16 @@ msgstr "Aggiorna impostazioni compatibilità"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Sconosciuto"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Il file '%s' iè bloccato da %zu processi.\n\n"
+"Terminare i seguenti processi e continuare l'aggiornamento?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -2992,7 +2995,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "La tua installazione potrebbe essere corrotta.\n\n"
+"%zu di %zu file non sono stati recuperati dal backup.\n\n"
+"Reinstallare Multi Theft Auto da www.multitheftauto.com o provare \n"
+"ad eseguire l'aggiornamento con i permessi di amministratore."
 
 #: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
