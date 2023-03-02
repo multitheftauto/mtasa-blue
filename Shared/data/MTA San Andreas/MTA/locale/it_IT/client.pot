@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-25 17:41+0000\n"
-"PO-Revision-Date: 2023-03-02 19:01\n"
+"PO-Revision-Date: 2023-03-02 20:01\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -2828,14 +2828,18 @@ msgstr "Il file principale non è certificato. Potrebbe esserci un virus.\n\n"
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Il file data %s è mancante. E' possibile che sia stato un virus.\n\n"
+"Si consiglia di reinstallare Multi Theft Auto per la vostra sicurezza.\n"
+"Cercare aiuto online se MTA non funziona correttamente."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Il file data %s è stato modificato. E' possibile che sia stato un virus.\n\n"
+"Si consiglia di reinstallare Multi Theft Auto per la vostra sicurezza.\n"
+"Cercare aiuto online se MTA non funziona correttamente."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2918,19 +2922,19 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA non si può avviare perchè la copia di un file è fallita:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA non si può avviare perchè un file di MTA:SA non è corretto o mancante:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Copia file di MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA non si può avviare perchè un file di GTA:SA non è corretto o mancante:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -2938,11 +2942,11 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA non si può avviare perchè l'eseguibile di GTA:SA non è corretto o mancante:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Si raccomanda di controllare l'antivirus per un falso positivo, provare ad aggiungere l'eseguibile di GTA:SA come eccezione e riavviare MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -2950,7 +2954,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA non si è avviato perchè l'eseguibile di GTA:SA non si carica:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
@@ -2958,7 +2962,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "Impossibile avviare MTA:SA perchè il patching di GTA:SA è fallito:"
+msgstr "MTA:SA non si può avviare perchè il patching di GTA:SA è fallito:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
