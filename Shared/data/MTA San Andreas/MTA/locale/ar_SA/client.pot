@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-25 17:41+0000\n"
-"PO-Revision-Date: 2023-03-03 03:16\n"
+"PO-Revision-Date: 2023-03-03 04:16\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -2859,7 +2859,9 @@ msgstr "ملف البيانات ٪ ذ مفقود. نشاط الفيروس الم
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "تم تعديل ملف البيانات٪ ذ. نشاط الفيروس المحتمل.\n\n"
+"ضع في اعتبارك إعادة تثبيت Multi Theft Auto من أجل أمنك.\n"
+"راجع التعليمات عبر الإنترنت إذا كان MTA لا يعمل بشكل صحيح"
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2950,7 +2952,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "نسخ ملفات MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
@@ -2962,11 +2964,11 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "لا يمكن تشغيل MTA: SA لأن المِلَفّ التنفيذي GTA: SA غير صحيح أو مفقود"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "يرجى التحقق من برنامَج مكافحة الفيروسات الخاص بك بحثًا عن اكتشاف إيجابي خاطئ حاول إضافة استثناء لـ GTA:SA القابل للتنفيذ وأعد تشغيل MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -2974,7 +2976,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "لا يمكن تشغيل MTA:SA لأن المِلَفّ التنفيذي GTA:SA غير قابل للتحميل"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
@@ -2982,7 +2984,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "لا يمكن تشغيل MTA:SA بسبب فشل تصحيح GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -3002,14 +3004,14 @@ msgstr "تحديث إعدادات التوافق"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "مجهول"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "هل تريد إنهاء العمليات التالية ومتابعة التحديث؟"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -3017,7 +3019,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "قد يكون التثبيت تآلفا الآن.\n\n"
+"تعذرت استعادة٪ zu من٪ zu من الملفات من النسخة الاحتياطية.\n\n"
+"يجب إعادة تثبيت Multi Theft Auto من www.multitheftauto.com\n"
+"أو حاول تشغيل التحديث بحقوق المسؤول."
 
 #: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
