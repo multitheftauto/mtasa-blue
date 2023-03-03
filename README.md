@@ -32,7 +32,7 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 ### IDE Setup
 
-If not using Visual Studio 2017, download and install the [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfigTeam.EditorConfig) plugin to automatically set up your IDE for the correct formatting.
+If not using Visual Studio 2022, download and install the [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfigTeam.EditorConfig) plugin to automatically set up your IDE for the correct formatting.
 
 ### Build Instructions
 
