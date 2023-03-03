@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-25 17:41+0000\n"
-"PO-Revision-Date: 2023-02-25 18:31\n"
+"PO-Revision-Date: 2023-03-03 03:16\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -2850,7 +2850,9 @@ msgstr "هذا الملف غير موقع. احتمال نشاط فيروسي.\n
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "ملف البيانات ٪ ذ مفقود. نشاط الفيروس المحتمل.\n\n"
+"ضع في اعتبارك إعادة تثبيت Multi Theft Auto من أجل أمانك\n"
+"راجع التعليمات الفورية إذا لم يعمل MTA بشكل صحيح"
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
@@ -2940,7 +2942,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "لا يمكن بَدْء تشغيل MTA SA بسبب فشل نسخ ملف:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
