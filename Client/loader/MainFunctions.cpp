@@ -1046,61 +1046,58 @@ void CheckLibVersions()
 BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandLine, const SString& lpCurrentDirectory,
                      LPPROCESS_INFORMATION lpProcessInformation, DWORD& dwOutError, SString& strOutErrorContext)
 {
+    STARTUPINFOW startupInfo{};
+    startupInfo.cb = sizeof(startupInfo);
+    BOOL wasProcessCreated = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
+                                            *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
+
+    if (wasProcessCreated)
+        return true;
+
     std::vector<DWORD> processIdListBefore = GetGTAProcessList();
-    // Start GTA
-    BOOL bResult = ShellExecuteNonBlocking("open", lpApplicationName, lpCommandLine, lpCurrentDirectory);
 
-    if (bResult == FALSE)
+    if (!ShellExecuteNonBlocking("open", lpApplicationName, lpCommandLine, lpCurrentDirectory))
     {
-        STARTUPINFOW startupInfo{};
-        startupInfo.cb = sizeof(startupInfo);
-        bResult = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
-                                 *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
-
-        if (!bResult)
-        {
-            dwOutError = GetLastError();
-            strOutErrorContext = "CreateProcess";
-        }
+        dwOutError = GetLastError();
+        strOutErrorContext = "ShellExecute";
+        return false;
     }
-    else
+
+    // Determine pid of new gta process
+    for (uint i = 0; i < 10; i++)
     {
-        // Determine pid of new gta process
-        for (uint i = 0; i < 10; i++)
+        std::vector<DWORD> processIdList = GetGTAProcessList();
+        for (DWORD pid : processIdList)
         {
-            std::vector<DWORD> processIdList = GetGTAProcessList();
-            for (DWORD pid : processIdList)
+            if (ListContains(processIdListBefore, pid))
             {
-                if (ListContains(processIdListBefore, pid))
-                {
-                    continue;
-                }
-                lpProcessInformation->dwProcessId = pid;
-                lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
-                break;
+                continue;
             }
-            if (lpProcessInformation->dwProcessId)
-                break;
-            Sleep(500);
+            lpProcessInformation->dwProcessId = pid;
+            lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
+            break;
         }
-
-        if (lpProcessInformation->dwProcessId == 0)
-        {
-            // Unable to get pid
-            dwOutError = ERROR_INVALID_FUNCTION;
-            strOutErrorContext = "FindPID";
-            bResult = false;
-        }
-        else if (lpProcessInformation->hProcess == nullptr)
-        {
-            // Unable to OpenProcess
-            dwOutError = ERROR_ELEVATION_REQUIRED;
-            strOutErrorContext = "OpenProcess";
-            bResult = false;
-        }
+        if (lpProcessInformation->dwProcessId)
+            break;
+        Sleep(500);
     }
 
-    return bResult;
+    if (lpProcessInformation->dwProcessId == 0)
+    {
+        // Unable to get pid
+        dwOutError = ERROR_INVALID_FUNCTION;
+        strOutErrorContext = "FindPID";
+        wasProcessCreated = false;
+    }
+    else if (lpProcessInformation->hProcess == nullptr)
+    {
+        // Unable to OpenProcess
+        dwOutError = ERROR_ELEVATION_REQUIRED;
+        strOutErrorContext = "OpenProcess";
+        wasProcessCreated = false;
+    }
+
+    return wasProcessCreated;
 }
 
 //////////////////////////////////////////////////////////
