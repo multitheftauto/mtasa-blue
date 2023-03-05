@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-25 17:41+0000\n"
-"PO-Revision-Date: 2023-02-27 15:20\n"
+"POT-Creation-Date: 2023-03-05 17:16+0000\n"
+"PO-Revision-Date: 2023-03-05 17:17\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2303,7 +2303,7 @@ msgstr "INTRODU PAROLA SERVERULUI"
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
-#: Client/loader/MainFunctions.cpp:1223
+#: Client/loader/MainFunctions.cpp:1220
 msgid "Information"
 msgstr "Informaţii"
 
@@ -2861,23 +2861,23 @@ msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 msgstr "MTA:SA nu este compatibil cu Windows 'Safe Mode'.\n\n"
 "Vă rugăm să reporniți computerul.\n"
 
-#: Client/loader/MainFunctions.cpp:1127
+#: Client/loader/MainFunctions.cpp:1124
 msgid "Fix configuration issue"
 msgstr "Repară problema de configurare"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1161
+#: Client/loader/MainFunctions.cpp:1158
 msgid "Fix elevation required error"
 msgstr "Remediați eroarea de elevație"
 
-#: Client/loader/MainFunctions.cpp:1168
+#: Client/loader/MainFunctions.cpp:1165
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Nu s-a putut porni Grand Theft Auto: San Andreas. Te rugăm încearcă să-ți restartezi calculatorul sau dacă problema persistă, să contactezi MTA la www.multitheftauto.com.\n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1223
+#: Client/loader/MainFunctions.cpp:1220
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Se poate ca GTA: San Andreas să nu fi fost lansat corect. Vrei să îl închizi?"
 
