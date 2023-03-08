@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-05 17:16+0000\n"
-"PO-Revision-Date: 2023-03-08 02:17\n"
+"PO-Revision-Date: 2023-03-08 03:17\n"
 "Last-Translator: \n"
 "Language-Team: Filipino\n"
 "Language: fil_PH\n"
@@ -72,171 +72,178 @@ msgstr "nagpapadala ng boses sa ibang mga manlalaro"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
-msgstr ""
+msgstr "pumapasok sa sasakyan bilang pasahero"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
-msgstr ""
+msgstr "susunod na channel ng radyo"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
-msgstr ""
+msgstr "naunang channel ng radyo"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr ""
+msgstr "pinapahintulutan ang view ng radar"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
-msgstr ""
+msgstr "nag-zozoom ng radar papasok"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the radar out"
-msgstr ""
+msgstr "nag-zozoom ng radar palabas"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the radar north"
-msgstr ""
+msgstr "ginagalaw ang radar paitaas"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the radar south"
-msgstr ""
+msgstr "ginagalaw ang radar paibaba"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the radar east"
-msgstr ""
+msgstr "ginagalaw ang radar pakanan"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the radar west"
-msgstr ""
+msgstr "ginagalaw ang radar pakaliwa"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
-msgstr ""
+msgstr "inilalagay ang radar"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
-msgstr ""
+msgstr "binabawasan ang linaw ng radar"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases radar opacity"
-msgstr ""
+msgstr "tinataasan ang linaw ng radar"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles radar help text"
-msgstr ""
+msgstr "binubuksan ang radar help text"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
-msgstr ""
+msgstr "nagpapadala ng mensahe sa target na player"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr ""
+msgstr "nagpapalit ng susunod na armas habang nasa sasakyan"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr ""
+msgstr "nagpapalit ng naunang armas habang nasa sasakyan"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "ipinapakita ang impormasyon tungkol sa kasalukuyang server"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr ""
+msgstr "tinutukoy ang scale multiplier ng lahat ng text-displays"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
-msgstr ""
+msgstr "(Development mode) ipinapakita ang colshapes"
 
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr ""
+msgstr "(Development mode) ipinapakita ang world sound ids sa debug window"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr ""
+msgstr "Progreso ng pagdownload ng mapa:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr ""
+msgstr "Progreso ng pagdownload:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:105
 #, c-format
 msgid "%s of %s"
-msgstr ""
+msgstr "%s ng %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr ""
+msgstr "Idiskonekta para kanselahin ang pagdownload"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
 msgid "Disconnected: Invalid nickname"
-msgstr ""
+msgstr "Nadiskonekta: Di-wastong pangalan"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
 msgid "Disconnect from server"
-msgstr ""
+msgstr "Idiskonekta mula sa server"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "Nadiskonekta: Ang serial ay pinagbawalan.\n"
+"Rason: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "Nadiskonekta: Ikaw ay pinagbawalan.\n"
+"Rason: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "Nadiskonekta: Ang account ay pinagbawalan.\n"
+"Rason: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
 msgid "Disconnected: Version mismatch"
-msgstr ""
+msgstr "Nadiskonekta: Ang bersyon ay hindi tugma"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr ""
+msgstr "Nadiskoneta: Napakaraming pagsali. Maghintay ng isang minuto at sumali ulit."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr ""
+msgstr "Nadiskonekta: Server mula sa iba't ibang sangay.\n"
+"Impormasyon: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr ""
+msgstr "Nadiskonekta: Masamang bersyon.\n"
+"Impormasyon: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr ""
+msgstr "Nadiskonekta: Ang server ay nagpapatakbo ng mas bagong build.\n"
+"Impormasyon: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr ""
+msgstr "Nadiskonekta: Ang server ay nagpapatakbo ng mas lumang build.\n"
+"Impormasyon: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
 msgid "Disconnected: Nick already in use"
-msgstr ""
+msgstr "Nadiskonekta: Ang pangalan ay kasalukuyang ginagamit"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 msgid "Disconnected: Player element could not be created."
