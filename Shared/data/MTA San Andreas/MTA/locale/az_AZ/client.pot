@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-05 17:16+0000\n"
-"PO-Revision-Date: 2023-03-05 17:19\n"
+"PO-Revision-Date: 2023-03-08 13:48\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -2611,11 +2611,11 @@ msgstr "B - Alternativ NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Standart Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Alternativ Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -2919,51 +2919,51 @@ msgstr "Multi Theft Auto düzgün quraşdırılmayıb, zəhmət olmasa yenidən 
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "GTA:SA qovşaqlarını yarat"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA başlamadı, çünki fayl köçürülə bilmədi:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA başladıla bilmədi, çünki MTA:SA faylı səhvdir və ya yoxdur:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "MTA:SA fayllarını köçürün"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA başladıla bilmədi, çünki GTA:SA faylı səhvdir və ya yoxdur:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "GTA:SA aslılığını yamaqla"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA başladıla bilmədi, çünki GTA:SA icrası səhvdir və ya yoxdur:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Zəhmət olmasa, antivirusunuzu yanlış-müsbət aşkarlama üçün yoxlayın, icra olunan GTA:SA üçün istisna əlavə etməyə çalışın və MTA:SA-nı yenidən başladın."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "GTA: SA yaradın"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA başladıla bilmədi, çünki GTA:SA icrası yüklənə bilmir:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "GTA:SA-nı yamaqla"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA başladıla bilmədi, çünki GTA:SA yamaqları uğursuz oldu:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
