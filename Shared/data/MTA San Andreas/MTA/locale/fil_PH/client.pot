@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-05 17:16+0000\n"
-"PO-Revision-Date: 2023-03-05 17:19\n"
+"PO-Revision-Date: 2023-03-08 02:17\n"
 "Last-Translator: \n"
 "Language-Team: Filipino\n"
 "Language: fil_PH\n"
@@ -19,56 +19,56 @@ msgstr ""
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr ""
+msgstr "Mga kahilingan na website"
 
 #: Client/cefweb/CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr ""
+msgstr "Ang server ay hinihiling ang mga sumusunod upang mag-load ang mga ito (mamaya):"
 
 #: Client/cefweb/CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr ""
+msgstr "HUWAG KAILANMAN MAGLALAGAY NG MGA SENSITIBONG DATOS UPANG MAPROTEKTAHAN ANG MGA ITO MULA SA PAGNAKAW"
 
 #: Client/cefweb/CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr ""
+msgstr "Tandaan ang desisyon"
 
 #: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
 msgid "Allow"
-msgstr ""
+msgstr "Payagan"
 
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr ""
+msgstr "Tanggihan"
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
-msgstr ""
+msgstr "Ang bersyon na ito ay nag-expire na."
 
 #: Client/mods/deathmatch/CClient.cpp:56
 msgid "disconnect from the game"
-msgstr ""
+msgstr "idiskonekta mula sa laro"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
-msgstr ""
+msgstr "ipinapakita ang mga pangalan"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
-msgstr ""
+msgstr "ipinapakita ang chatbox"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
-msgstr ""
+msgstr "ipinapakita ang istatistika ng network"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
-msgstr ""
+msgstr "buksan ang input ng chat"
 
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
-msgstr ""
+msgstr "nagpapadala ng boses sa ibang mga manlalaro"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
