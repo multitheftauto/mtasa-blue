@@ -4136,6 +4136,9 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
     assert(pPed);
     assert(pVehicle);
 
+    if (pVehicle->GetMaxPassengers() == VEHICLE_PASSENGERS_UNDEFINED)
+        return false;
+
     // Valid seat id for that vehicle?
     // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player on the first seat being the vehicle
     // syncer (Todo)
