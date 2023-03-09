@@ -1,0 +1,13 @@
+# top-most EditorConfig file
+root = true
+
+[*]
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{h,hpp,c,cpp,cc}]
+indent_style = space
+indent_size = 4
+
+[*.sh]
+end_of_line = lf

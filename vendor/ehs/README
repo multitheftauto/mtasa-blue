@@ -1,0 +1,12 @@
+
+
+This isn't really done yet.
+
+EHS is distributed under version 2.1 of the LGPL as described in COPYING.
+
+Check out INSTALL for installation notes.
+
+check out ehs_development_guide.txt for how to develop using EHS.
+
+check out building_for_windows.txt to see how to build for Visual Studio 6 (and
+probably a decent idea for how to do it for newer versions)

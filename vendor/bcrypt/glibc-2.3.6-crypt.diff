@@ -1,0 +1,52 @@
+--- glibc-2.3.6.orig/crypt/Makefile	2001-07-06 04:54:45 +0000
++++ glibc-2.3.6/crypt/Makefile	2004-02-27 00:23:48 +0000
+@@ -21,14 +21,14 @@
+ #
+ subdir	:= crypt
+ 
+-headers := crypt.h
++headers := crypt.h gnu-crypt.h ow-crypt.h
+ 
+ distribute := md5.h
+ 
+ extra-libs := libcrypt
+ extra-libs-others := $(extra-libs)
+ 
+-libcrypt-routines := crypt-entry md5-crypt md5 crypt crypt_util
++libcrypt-routines := crypt-entry md5-crypt md5 crypt crypt_util crypt_blowfish x86 crypt_gensalt wrapper
+ 
+ tests = cert md5test md5c-test
+ 
+--- glibc-2.3.6.orig/crypt/Versions	2000-03-04 00:47:30 +0000
++++ glibc-2.3.6/crypt/Versions	2004-02-27 00:25:15 +0000
+@@ -1,5 +1,6 @@
+ libcrypt {
+   GLIBC_2.0 {
+     crypt; crypt_r; encrypt; encrypt_r; fcrypt; setkey; setkey_r;
++    crypt_rn; crypt_ra; crypt_gensalt; crypt_gensalt_rn; crypt_gensalt_ra;
+   }
+ }
+--- glibc-2.3.6.orig/crypt/crypt-entry.c	2001-07-06 05:18:49 +0000
++++ glibc-2.3.6/crypt/crypt-entry.c	2004-02-27 00:12:32 +0000
+@@ -70,7 +70,7 @@ extern struct crypt_data _ufc_foobar;
+  */
+ 
+ char *
+-__crypt_r (key, salt, data)
++__des_crypt_r (key, salt, data)
+      const char *key;
+      const char *salt;
+      struct crypt_data * __restrict data;
+@@ -115,6 +115,7 @@ __crypt_r (key, salt, data)
+   _ufc_output_conversion_r (res[0], res[1], salt, data);
+   return data->crypt_3_buf;
+ }
++#if 0
+ weak_alias (__crypt_r, crypt_r)
+ 
+ char *
+@@ -147,3 +148,4 @@ __fcrypt (key, salt)
+   return crypt (key, salt);
+ }
+ #endif
++#endif

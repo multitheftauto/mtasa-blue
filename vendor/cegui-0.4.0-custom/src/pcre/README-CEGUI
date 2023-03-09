@@ -1,0 +1,10 @@
+CEGUI is embedding a copy of PCRE into itself via its own build system(s).
+
+The version of PCRE included here has been modified from the original
+distribution; the original UNIX build system has been removed, pcre.h has been
+pre-created from (removed file) pcre.in, and pcreconfig.h has been pre-created
+and edited from (removed file) config.h.in.  Additionally, various other test
+data, documentation, and source for utilities have been removed.
+
+For details about where to obtain the official releases of PCRE, please see the
+README file in this directory.

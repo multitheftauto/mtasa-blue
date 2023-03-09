@@ -1,0 +1,45 @@
+# Attributes
+*           text=auto
+*.c         text diff=cpp
+*.cc        text diff=cpp
+*.cpp       text diff=cpp
+*.cxx       text diff=cpp
+*.c++       text diff=cpp
+*.h         text diff=cpp
+*.hh        text diff=cpp
+*.hpp       text diff=cpp
+*.h++       text diff=cpp
+*.rc        text
+*.vcproj    text eol=crlf
+*.sln       text eol=crlf
+*.bat       text eol=crlf
+*.sh        text eol=lf
+*.lua       text
+*.xml       text
+*.yml       text
+*.txt       text
+*.lua       text
+*.nsi       text
+*.nsh       text
+*.xsd       text
+*.po        text
+*.ico       binary
+*.png       binary
+*.bmp       binary
+*.dll       binary
+*.so        binary
+*.dylib     binary
+*.a         binary
+*.lib       binary
+*.exe       binary
+*.out       binary
+*.app       binary
+*.dat       binary
+*.ttf       binary
+
+# Ignored files by `git archive`
+/.git-blame-ignore-revs export-ignore
+/.github                export-ignore
+/.gitattributes         export-ignore
+/.gitignore             export-ignore
+/.ignore                export-ignore

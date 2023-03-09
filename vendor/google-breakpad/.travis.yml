@@ -1,0 +1,26 @@
+# Travis build integration.
+# https://docs.travis-ci.com/
+language: cpp
+# TODO: add a clang build as well.
+compiler:
+ - gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-4.8
+      - g++-4.8
+# Travis sets CC/CXX to the system toolchain based on the `compiler`
+# selection. If clang is added, this should move to be set inside the
+# matrix.
+env:
+  - USE_CC=gcc-4.8 USE_CXX=g++-4.8
+before_install: ./scripts/travis-checkout.sh
+script: ./scripts/travis-build.sh
+# TODO: add mac support
+os:
+  - linux
+notifications:
+  email:
+    - google-breakpad-dev@googlegroups.com

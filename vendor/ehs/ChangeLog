@@ -1,0 +1,398 @@
+2003-10-28  xaxxon@banshee  <xaxxon@banshee>
+
+	* README:
+	lame readme file.  need to look at a well-done one and fix mine
+
+	* StaticSslLocking.h, ThreadAbstractionLayer.h, COPYING, DynamicSslLocking.cpp, DynamicSslLocking.h, EHS.cpp, EHS.h, NetworkAbstraction.h, SecureSocket.cpp, SecureSocket.h, Socket.cpp, Socket.h, SslError.cpp, SslError.h, StaticSslLocking.cpp:
+	Added LGPL stuff to each of the source files and updated COPYING to
+	include the LGPL
+
+	* EHS.cpp, Makefile.am, Samples/EHS_FormTest.cpp, SecureSocket.cpp, SecureSocket.h:
+	pre-1.1.  HTTPS is working, but I'm still hammering out all the
+	certificate stuff.  Changed some wording in EHS_FormTest I didn't like.
+
+2003-10-27  xaxxon@banshee  <xaxxon@banshee>
+
+	* ThreadAbstractionLayer.h:
+	macros for doing thread stuff compatibly between windows and UNIX
+
+	* Makefile, Makefile.am: Deleted Makefile and added Makefile.am
+
+	* EHS.cpp, EHS.h, Makefile, NetworkAbstraction.h, SecureSocket.cpp, SecureSocket.h, Socket.cpp, Socket.h, StaticSslLocking.h:
+	More stuff on the path to getting things ready for 1.1.  HTTPS still
+	doesn't work (I'm assuming), but it compiles.  Testing comes later.
+
+	* AUTHORS, COPYING, ChangeLog, DynamicSslLocking.cpp, DynamicSslLocking.h, EHS.cpp, EHS.h, INSTALL, NEWS, README, SecureSocket.cpp, Socket.cpp, SslError.cpp, SslError.h, StaticSslLocking.cpp, StaticSslLocking.h, config.h.in, configure.ac:
+	Bunch of new changes for version 1.1.  Includes autotools support and
+	preliminary HTTPS support.  HTTPS support is not yet functional.
+	./configure --with-debug --with-memory for debugging and memory tracking
+	info
+
+2003-07-22  xaxxon@banshee  <xaxxon@banshee>
+
+	* ehs_development_guide.rtf, ehs_development_guide.txt:
+	deleted out of date rtf file.  Added updated txt file for 1.1.x series EHS
+
+	* EHS.cpp, EHS.h, Samples/ehs_testharness.cpp:
+	bunch of changes.  Removed a ton of char* pointer manipulation.  Fixed
+	up the Regex PCRE wrapper usage.  Cleaned up a TON of code.  Fixed some
+	comments..
+
+2003-07-15  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h: temp checkin to get this elsewhere
+
+2003-07-14  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp: partial implementation of new split function
+
+2003-07-10  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h: updated to have doxygen-compatible comments
+
+2003-06-29  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp: just a smidgen.. got rid of some unused vars
+
+	* EHS.cpp, test.pl:
+	re-updated.  It now passes my regression tests that I didn't test
+	against before.
+
+2003-06-28  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h, Makefile:
+	moved to using my Regex class that wraps PCRE.  Simplified a LOT of stuff
+	it's so much nicer :)  Though it requires you get the wrapper too..
+	but I'll include it in the new version of EHS under the same license
+	so it's no big deal
+
+2003-06-22  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp:
+	updated an assert for 64-bit clean build.  Updated socket code to
+	set SO_REUSEADDR for immediate re-binding of ports after the
+	program exits
+
+2003-06-14  xaxxon@banshee  <xaxxon@banshee>
+
+	* ehs_development_guide.rtf: no more .doc and updated for EHS 1.0
+
+2003-06-06  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, test.pl: final final 1.0 checkin.  Here we go :) :) :D :)
+
+	* Test/test4.data, Test/test4.result: test data
+
+	* test.pl: test script for EHS
+
+	* EHS.cpp, EHS.h, Samples/ehs_testharness.cpp, Test/test1.result, Test/test3.result:
+	Final 1.0 checkin
+
+2003-06-04  xaxxon@banshee  <xaxxon@banshee>
+
+	* Test/test1.data, Test/test1.result, Test/test2.data, Test/test2.result, Test/test3.data, Test/test3.result:
+	working towards 1.0 -- creating test cases
+
+	* EHS.h, Makefile, Samples/ehs_testharness.cpp:
+	working towards 1.0.  Adding test cases.
+
+2003-06-01  xaxxon@banshee  <xaxxon@banshee>
+
+	* Samples/ehs_testharness.cpp: initial commit (??)
+
+2003-05-28  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.h, EHS.cpp:
+	0.9.9 -- so very very close to the esteemed 1.0 release.   This release checks a bunch of stuff to
+	make sure there's no memory leaking.  Between prints that occur on object creation and a hand-check
+	of all procedural heap allocations, I'm fairly confident it doesn't leak.
+
+2003-05-27  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp:
+	completed code review.  Next step is to do a check to see if things are properly handled on error
+	and that memory is cleared up properly.
+
+	* EHS.cpp:
+	major cleanups and EHS_DEBUG prints.  75% through a total code review
+
+	* EHS.cpp, EHS.h: small fix for vc++ 6
+
+	* EHS.cpp: little crap
+
+	* EHS.cpp, EHS.h:
+	put in a new EHS_DEBUG flag that prints out error messages when requests fail.  Also cleaned up the server behavior to be more compliant to spec.  It errors much more correctly on incorrect input.  More to come.
+
+2003-05-26  xaxxon@banshee  <xaxxon@banshee>
+
+	* exectest: it was just  a test... removing it now
+
+	* exectest: test file
+
+	* Makefile: oops.  Fixed some makefile foo
+
+	* EHS.cpp:
+	removed a bunch of print statements used for debugging while changing to PCRE
+
+	* EHS.cpp, Samples/ehs_uploader.cpp:
+	updated to work with new regex stuff and fixed up some stuff to make ehs_uploader more sane
+
+2003-05-25  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.h, Makefile, Samples/EHS_FormTest.cpp, Samples/EHS_TEST.cpp, Samples/ehs_uploader.cpp, EHS.cpp:
+	Booyah.  No more boost.  Not 100% sure on the multipart form attachments, but everything else is good.  PCRE is now the regex engine of choice.  This reduces memory usage, increases readability and simplicity of the library code, and makes it a lot easier to build, as PCRE is very straight forward.
+
+2003-04-11  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp: fix for Tru64
+
+2002-11-13  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h:
+	sort of works -- perl doesn't crash all the time, but I have to re-create
+	the interpreter each time.  It won't reuse it.
+
+2002-11-11  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.h: timeval issue resolved by including sys/time.h
+
+2002-10-27  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.h:
+	took out an unused object -- if it's needed I'll put it back in, but it
+	wasn't compiling properly and I couldn't find where it was needed..
+
+	* Makefile:
+	Whoops, last makefile didn't quite work.  This one should :)
+
+	* EHS.cpp: fixed deprecated fstream.h => fstream thing.
+
+2002-05-22  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp:
+	changed how it grabs pieces of a url from std::string stuff to boost::regex
+	stuff.  seems to actually work now :)
+
+	* EHS.h: added a new regex for grabbing the parts out of a path
+
+2002-05-01  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h:
+	removed dependency on stringstreams because it didn't work reliably across
+	different platforms
+
+2002-04-19  xaxxon@banshee  <xaxxon@banshee>
+
+	* Samples/EHS_FormTest.cpp, Samples/EHS_TEST.cpp, Samples/ehs_uploader.cpp:
+	big update.. getting closer to having the win client actually playing the game again (after so, so long)
+
+2002-04-17  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp: reordered in the *correct* order this time..
+
+	* EHS.cpp: changed order of init's for httpresponse constructor
+
+	* EHS.cpp, EHS.h:
+	bug fixes.. wasn't storing http response code properly and it was causing bad things
+
+	* EHS.cpp: fixed send length problem
+
+2002-04-17  m  <m@banshee>
+
+	* Samples/Windows/SimpleDlg/EHSTest.dsp:
+	Updated project settings to use correct path to boost libs for ALL configurations, oops.
+
+	* Samples/Windows/SimpleDlg/EHSTest.dsp:
+	Updated location of boost libs, now relative to sample and maintained in the project file, wahoo!
+
+2002-04-17  xaxxon@banshee  <xaxxon@banshee>
+
+	* Samples/Windows/SimpleDlg/EHSTestDlg.cpp, Samples/Windows/SimpleDlg/EHSTestDlg.h:
+	fixed for new api
+
+2002-04-17  m  <m@banshee>
+
+	* EHS.h: Needed a const on EHSLessThanStrings operator().
+
+	* EHS.h:
+	Pragma'ed away an annoying MS warning that names are truncated to 255 char's.  There's nothing we can do about it anyway...
+
+2002-04-16  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h: small changes to make windows work
+
+	* EHS.cpp: syntax error while commenting stuff out.. oopsies
+
+2002-04-15  xaxxon@banshee  <xaxxon@banshee>
+
+	* Samples/EHS_TEST.cpp:
+	had to slightly change sample code because api for SetBody changed
+
+	* EHS.h:
+	chagned API slightly -- no need to set return code in SetBody, because
+	it has to be returned from HandleRequest.. it was redundant
+
+	* EHS.cpp: took out a bunch of debugging prints and the like..
+
+2002-04-14  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.h: just a couple last second comment changes
+
+	* Makefile: pre-built libs for boost regex
+
+	* Makefile, Samples/EHS_FormTest.cpp, Samples/ehs_uploader.cpp:
+	new version that actually supports uploading files.  ehs_uploader is a test
+	program for handling uploaded files and dumping them out to local files.
+	updated formtest, as well, to the new API
+
+	* EHS.h:
+	finally a working version with file upload support.. this may be
+	a release version..
+
+	* EHS.cpp: finally a working version with file uploading capabilities..
+	this may be a release, not sure
+
+2002-03-12  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp: about to rip a chunk out, so this is a backup checkin
+
+2002-03-09  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp:
+	about to make substantial changes to the buffer processing.. backup checkin
+
+2002-03-08  m  <m@banshee>
+
+	* EHS.cpp, EHS.h, Samples/Windows/SimpleDlg/EHSTest.dsp:
+	Added a few "std::" as needed by VC.
+	Removed SGI_STL include path requirement from test project.
+	Added boost include path to test project.
+
+2002-03-08  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h:
+	merged in myron's changes/fixes.. oops.. forgot to build .. oh well
+
+	* Samples/ehs_formtest.dsp, Samples/ehs_test.dsp:
+	myron's .dsp files for building the unix samples under windows
+
+	* Makefile: fixed where boost regex lib is
+
+	* Makefile: modified to build the boost regex lib
+
+	* EHS.h, Makefile, Samples/EHS_FormTest.cpp, Samples/EHS_TEST.cpp:
+	modified for the new system.. using the boost stuff and not using the
+	SGI STL
+
+	* EHS.cpp:
+	Added the boost regex library and cut out 300 lines of code.  But it now
+	requires the boost regex library..
+
+2002-02-20  xaxxon@banshee  <xaxxon@banshee>
+
+	* Samples/EHS_TEST.cpp:
+	yet another backup commit.. stuff is still broken.  Working on getting keystroke messages down to the right objects.. not hard, just boring
+
+2002-01-30  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp:
+	fixed a couple errors introduced to the linux build while fixing the windows
+	build.
+
+2002-01-30  m  <m@banshee>
+
+	* EHS.cpp, EHS.h, Samples/Windows/SimpleDlg/EHSTest.dsp, Samples/Windows/SimpleDlg/EHSTestDlg.cpp:
+	Updated sample code to use new EHSServer abstraction.
+	Added HandleData() chain.
+	NOTE: It looks like there is a memory leak in a string allocated in the EHS() constructor.
+
+2002-01-30  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h, Makefile, Samples/EHS_FormTest.cpp, Samples/EHS_TEST.cpp:
+	Fairly major modifications to the basic structure.  Got rid of EHSInterface
+	and added EHSServer.  Just better modularization.. and updated the test
+	programs to use the new interface
+
+2002-01-17  m  <m@banshee>
+
+	* Samples/EHS_TEST.cpp: Added /a/b/ to test server, whooopteedoo.
+
+2002-01-17  xaxxon@banshee  <xaxxon@banshee>
+
+	* Makefile: Kinda need this.
+
+	* Samples/EHS_FormTest.cpp, Samples/EHS_TEST.cpp:
+	Updated samples to match new EHS changes.
+
+2002-01-17  m  <m@banshee>
+
+	* Samples/Windows/SimpleDlg/EHSTest.dsp, Samples/Windows/SimpleDlg/EHSTestDlg.cpp, Samples/Windows/SimpleDlg/EHSTestDlg.h:
+	Updated Windows sample to match latest EHS changes.  Builds and runs without errors.
+
+	* EHS.cpp, EHS.h:
+	Added EHS-specific utilities to EHS.h, including assert, trace, verify, and pragma message helpers.
+
+2002-01-17  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.h: grr.. sorry (again)
+
+	* EHS.cpp:
+	sorry.. here's a couple bug fixes and syntax fixes I forgot to check in..
+
+	oopsies :(
+
+2002-01-17  m  <m@banshee>
+
+	* Samples/Windows/SimpleDlg/EHSTest.cpp, Samples/Windows/SimpleDlg/EHSTest.dsp, Samples/Windows/SimpleDlg/EHSTest.dsw, Samples/Windows/SimpleDlg/EHSTest.h, Samples/Windows/SimpleDlg/EHSTest.rc, Samples/Windows/SimpleDlg/EHSTestDlg.cpp, Samples/Windows/SimpleDlg/EHSTestDlg.h, Samples/Windows/SimpleDlg/StdAfx.cpp, Samples/Windows/SimpleDlg/StdAfx.h, Samples/Windows/SimpleDlg/res/EHSTest.ico, Samples/Windows/SimpleDlg/res/EHSTest.rc2, Samples/Windows/SimpleDlg/resource.h:
+	Adding sample code that creates a simple dialog.  The text in the dialog will be served up using EHS.
+
+2002-01-15  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h, Samples/EHS_FormTest.cpp, Samples/EHS_TEST.cpp:
+	Linux works now.  Not sure about windows, but I didn't do much in the
+	way of platform specific stuff.  Added no-caching html header.  Added
+	EHSInterface class to allow classes to have a HandleRequest member without
+	each having to have a socket and thread associated with them.
+
+2002-01-13  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h:
+	Preliminary support for windows in both threaded and unthreaded modes.  Seems to work for windows, need to re-test for linux.
+
+2002-01-06  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h, Samples/EHS_FormTest.cpp, Samples/EHS_TEST.cpp:
+	finished with first revision of EHS (finally).  EHS.cpp and EHS.h are the
+	library files and are done at revision 0.1.  EHS_TEST.cpp and EHS_FormTest.cpp
+	are example/test programs for the EHS library and this is their initial check
+	in.
+
+2002-01-03  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h:
+	hey!  look at that.  All I have to do is write one more function
+	(EHSConnection::SendHttpResponse()) and it'll be ready for testing..
+	the code is still pretty ugly, but I think it'll actually be ready for
+	use..
+
+2002-01-01  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h:
+	still working on EHS.. but it's coming along well.  I already got the code
+	done for taking care of the request line, and I just typed in the code for
+	dealing with request headers.. and it compiles (but I have no idea
+	if any of it works..).   Now, all that's left is to read in the body and pass
+	it off to the virtual function.. oh.. and some testing.  And some better
+	error handling.. right now there's a few spots that just explode if you
+	send a bad HTTP request.. that's probably not good for building a stable game
+	engine, since if EHS crashes, it will bring down everything..
+
+2001-12-30  xaxxon@banshee  <xaxxon@banshee>
+
+	* EHS.cpp, EHS.h:
+	EHS - Embedded HTTP Server.  Used for embedding an HTTP server within
+	a c++ program.  I tried to find something like this already written, but
+	couldn't..
+
+
+	
