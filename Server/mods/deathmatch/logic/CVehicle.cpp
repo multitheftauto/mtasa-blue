@@ -618,6 +618,9 @@ bool CVehicle::SetOccupant(CPed* pPed, unsigned int uiSeat)
     static bool bAlreadySetting = false;
     if (!bAlreadySetting)
     {
+        if (uiSeat < MAX_VEHICLE_SEATS)
+            return false;
+
         // Set the Player
         if (m_pOccupants[uiSeat] != pPed)
         {
@@ -644,7 +647,7 @@ bool CVehicle::SetOccupant(CPed* pPed, unsigned int uiSeat)
         return true;
     }
 
-    return true;
+    return true; // return true? even if function didn't end successfully?
 }
 
 void CVehicle::SetSyncer(CPlayer* pPlayer)

@@ -406,6 +406,9 @@ CVehicle* CPed::SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat)
     static bool bAlreadyIn = false;
     if (!bAlreadyIn)
     {
+        if (uiSeat < MAX_VEHICLE_SEATS)
+            return m_pVehicle;
+
         // Store it
         m_pVehicle = pVehicle;
         m_uiVehicleSeat = uiSeat;
