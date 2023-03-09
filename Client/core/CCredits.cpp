@@ -167,6 +167,7 @@ CCredits::CCredits()
         "emre1702\n"
         "Fabio(GNR)\n"
         "fastman92\n"
+        "Fernando Rocha\n"
         "FrankZZ\n"
         "Gothem\n"
         "GRascm\n"
