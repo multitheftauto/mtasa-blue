@@ -214,6 +214,7 @@ CCredits::CCredits()
         "Totto8492\n"
         "turret001\n"
         "tvc\n"
+        "vahook\n"
         "x0rh4x\n"
         "xerox8521\n"
         "[GP_A]XetaQuake\n"
