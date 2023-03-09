@@ -647,7 +647,7 @@ bool CVehicle::SetOccupant(CPed* pPed, unsigned int uiSeat)
         return true;
     }
 
-    return true; // return true? even if function didn't end successfully?
+    return true;
 }
 
 void CVehicle::SetSyncer(CPlayer* pPlayer)
