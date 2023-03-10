@@ -1,274 +1,36 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Utils.cpp
+ *  FILE:        Client/loader/Utils.cpp
  *  PURPOSE:     Loading utilities
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "Utils.h"
+#include "Main.h"
+#include "Dialogs.h"
+#include <array>
+#include <random>
+#include <cryptopp/crc.h>
+#include <cryptopp/files.h>
 #include <tchar.h>
 #include <strsafe.h>
 #include <Tlhelp32.h>
 #include <Softpub.h>
 #include <wintrust.h>
+#include <version.h>
 #pragma comment (lib, "wintrust")
+
+namespace fs = std::filesystem;
 
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
 static HANDLE  g_hMutex = NULL;
 static HMODULE hLibraryModule = NULL;
 HINSTANCE      g_hInstance = NULL;
-
-///////////////////////////////////////////////////////////////////////////
-//
-// CallRemoteFunction
-//
-// Call a Kernel32 function in a remote process
-//
-///////////////////////////////////////////////////////////////////////////
-bool CallRemoteFunction(HANDLE hProcess, const SString& strFunctionName, const WString& strLibPath)
-{
-    const wchar_t* szLibPath = *strLibPath;
-    size_t         uiLibPathLength = strLibPath.length();
-
-    /* Allocate memory in the remote process for the library path */
-    HANDLE  hThread = 0;
-    void*   pLibPathRemote = NULL;
-    uint    uiLibPathSize = (uiLibPathLength + 1) * sizeof(wchar_t);
-    HMODULE hKernel32 = GetModuleHandle("Kernel32");
-    pLibPathRemote = _VirtualAllocEx(hProcess, NULL, uiLibPathSize, MEM_COMMIT, PAGE_READWRITE);
-
-    if (pLibPathRemote == NULL)
-    {
-        return 0;
-    }
-
-    /* Make sure pLibPathRemote is always freed */
-    __try
-    {
-        /* Write the DLL library path to the remote allocation */
-        DWORD byteswritten = 0;
-        _WriteProcessMemory(hProcess, pLibPathRemote, (void*)szLibPath, uiLibPathSize, &byteswritten);
-
-        if (byteswritten != uiLibPathSize)
-        {
-            return 0;
-        }
-
-        /* Start a remote thread executing LoadLibraryA exported from Kernel32. Passing the
-           remotely allocated path buffer as an argument to that thread (and also to LoadLibraryA)
-           will make the remote process load the DLL into it's userspace (giving the DLL full
-           access to the game executable).*/
-        LPTHREAD_START_ROUTINE pFunc = reinterpret_cast<LPTHREAD_START_ROUTINE>(GetProcAddress(hKernel32, strFunctionName));
-        if (!pFunc)
-            return 0;
-
-        hThread = _CreateRemoteThread(hProcess, NULL, 0, pFunc, pLibPathRemote, 0, NULL);
-
-        if (hThread == 0)
-        {
-            return 0;
-        }
-    }
-    __finally
-    {
-        _VirtualFreeEx(hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE);
-    }
-
-    /*  We wait for the created remote thread to finish executing. When it's done, the DLL
-        is loaded into the game's userspace, and we can destroy the thread-handle. We wait
-        5 seconds which is way longer than this should take to prevent this application
-        from deadlocking if something goes really wrong allowing us to kill the injected
-        game executable and avoid user inconvenience.*/
-    WaitForObject(hProcess, hThread, INFINITE, NULL);
-
-    /* Get the handle of the remotely loaded DLL module */
-    DWORD hLibModule = 0;
-    GetExitCodeThread(hThread, &hLibModule);
-
-    /* Clean up the resources we used to inject the DLL */
-    _VirtualFreeEx(hProcess, pLibPathRemote, uiLibPathSize, MEM_RELEASE);
-    return 1;
-}
-
-HMODULE RemoteLoadLibrary(HANDLE hProcess, const WString& strLibPath)
-{
-    // Stop GTA from starting prematurely (Some driver dlls can inadvertently resume the thread before we are ready)
-    InsertWinMainBlock(hProcess);
-    ApplyLoadingCrashPatch(hProcess);
-
-    // Ensure correct pthreadVC2.dll is gotted
-    CallRemoteFunction(hProcess, "SetDllDirectoryW", FromUTF8(ExtractPath(ToUTF8(strLibPath))));
-    CallRemoteFunction(hProcess, "LoadLibraryW", strLibPath);
-
-    // Allow GTA to continue
-    RemoveWinMainBlock(hProcess);
-    CheckService(CHECK_SERVICE_POST_CREATE);
-
-    /* Success */
-    return (HINSTANCE)(1);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// GetWinMainAddress
-//
-// Return address of GTA WinMain function
-//
-///////////////////////////////////////////////////////////////////////////
-uchar* GetWinMainAddress(HANDLE hProcess)
-{
-    #define WINMAIN_US  0x0748710
-    #define WINMAIN_EU  0x0748760
-
-    ushort buffer[1] = {0};
-    _ReadProcessMemory(hProcess, (void*)(WINMAIN_EU + 0x24), &buffer, sizeof(buffer), NULL);
-    if (buffer[0] == 0x0F75)            // jnz     short loc_748745
-        return (uchar*)WINMAIN_EU;
-    if (buffer[0] == 0xEF3B)            // cmp     ebp, edi
-        return (uchar*)WINMAIN_US;
-    return NULL;
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// WriteProcessMemoryChecked
-//
-// Poke bytes and do some checks as well
-//
-///////////////////////////////////////////////////////////////////////////
-void WriteProcessMemoryChecked(HANDLE hProcess, void* dest, const void* src, uint size, const void* oldvalues, bool bStopIfOldIncorrect)
-{
-    DWORD oldProt1;
-    _VirtualProtectEx(hProcess, dest, size, PAGE_EXECUTE_READWRITE, &oldProt1);
-
-    // Verify previous value was expected were written ok
-    if (oldvalues)
-    {
-        char   temp[30];
-        uint   numBytesToCheck = std::min(sizeof(temp), size);
-        SIZE_T numBytesRead = 0;
-        _ReadProcessMemory(hProcess, dest, temp, numBytesToCheck, &numBytesRead);
-        if (memcmp(temp, oldvalues, numBytesToCheck))
-        {
-            WriteDebugEvent(SString("Failed to verify %d old bytes in process", size));
-            if (bStopIfOldIncorrect)
-                return;
-        }
-    }
-
-    _WriteProcessMemory(hProcess, dest, src, size, NULL);
-
-    // Verify bytes were written ok
-    {
-        char   temp[30];
-        uint   numBytesToCheck = std::min(sizeof(temp), size);
-        SIZE_T numBytesRead = 0;
-        _ReadProcessMemory(hProcess, dest, temp, numBytesToCheck, &numBytesRead);
-        if (memcmp(temp, src, numBytesToCheck) || numBytesRead != numBytesToCheck)
-            WriteDebugEvent(SString("Failed to write %d bytes to process", size));
-    }
-
-    DWORD oldProt2;
-    _VirtualProtectEx(hProcess, dest, size, oldProt1, &oldProt2);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// InsertWinMainBlock
-//
-// Put an infinite loop at WinMain to stop GTA from running before we are ready
-//
-///////////////////////////////////////////////////////////////////////////
-void InsertWinMainBlock(HANDLE hProcess)
-{
-    // Get location of WinMain function
-    uchar* pWinMain = GetWinMainAddress(hProcess);
-    if (!pWinMain)
-        return;
-
-    WriteDebugEvent("Loader - InsertWinMainBlock");
-
-    {
-        const uchar oldCode[] = {
-            0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x81, 0xEC, 0x84, 0x00, 0x00, 0x00,            // WinMain  sub         esp,84h
-            0x53,                                                            //          push        ebx
-            0x6A, 0x02,                                                      //          push        2
-        };
-
-        const uchar newCode[] = {
-            0x3E, 0xA1, 0x7C, 0x71, 0x74, 0x00,            //      lp: mov         eax,dword ptr ds:[0074717Ch]
-            0x48,                                          //          dec         eax
-            0x74, 0xF7,                                    //          je          lp
-            0x6A, 0x02,                                    //          push        2                           orig
-            0xEB, 0x09,                                    //          jmp         cont
-            0x81, 0xEC, 0x84, 0x00, 0x00, 0x00,            // WinMain  sub         esp,84h                     orig
-            0x53,                                          //          push        ebx                         orig
-            0xEB, 0xEA,                                    //          jmp         lp
-        };                                                 //    cont:
-
-        WriteProcessMemoryChecked(hProcess, pWinMain - sizeof(newCode) + 9, newCode, sizeof(newCode), oldCode, true);
-    }
-
-    uchar* pFlag = (uchar*)0x74717C;
-    {
-        const uchar oldCode[] = {0x90, 0x90, 0x90, 0x90};
-        const uchar newCode[] = {1, 0, 0, 0};
-        WriteProcessMemoryChecked(hProcess, pFlag, newCode, sizeof(newCode), oldCode, false);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// RemoveWinMainBlock
-//
-// Remove infinite loop at WinMain which stopped GTA from running before we were ready
-//
-///////////////////////////////////////////////////////////////////////////
-void RemoveWinMainBlock(HANDLE hProcess)
-{
-    // Get location of WinMain function
-    uchar* pWinMain = GetWinMainAddress(hProcess);
-    if (!pWinMain)
-        return;
-
-    WriteDebugEvent("Loader - RemoveWinMainBlock");
-
-    uchar* pFlag = (uchar*)0x74717C;
-    {
-        const uchar oldCode[] = {1, 0, 0, 0};
-        const uchar newCode[] = {0, 0, 0, 0};
-        WriteProcessMemoryChecked(hProcess, pFlag, newCode, sizeof(newCode), oldCode, false);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////
-//
-// ApplyLoadingCrashPatch
-//
-// Modify GTA function IsAppAlreadyRunning() to avoid startup crash
-//
-///////////////////////////////////////////////////////////////////////////
-void ApplyLoadingCrashPatch(HANDLE hProcess)
-{
-    // Get location of code to modify
-    uchar* pAddress = GetWinMainAddress(hProcess);
-    if (!pAddress)
-        return;
-
-    WriteDebugEvent("Loader - ApplyLoadingCrashPatch");
-
-    pAddress -= 0x1E17;            // Offset from WinMain function
-
-    const uchar oldCode[] = {0xB7};
-    const uchar newCode[] = {0x37};
-    WriteProcessMemoryChecked(hProcess, pAddress, newCode, sizeof(newCode), oldCode, true);
-}
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -337,24 +99,21 @@ WString devicePathToWin32Path(const WString& strDevicePath)
 ///////////////////////////////////////////////////////////////////////////
 SString GetProcessPathFilename(DWORD processID)
 {
-    if (_QueryFullProcessImageNameW)
+    for (int i = 0; i < 2; i++)
     {
-        for (int i = 0; i < 2; i++)
+        HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
+        if (hProcess)
         {
-            HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
-            if (hProcess)
+            WCHAR szProcessName[MAX_PATH] = L"";
+            DWORD dwSize = NUMELMS(szProcessName);
+            DWORD bOk = QueryFullProcessImageNameW(hProcess, 0, szProcessName, &dwSize);
+            CloseHandle(hProcess);
+            if (bOk)
             {
-                WCHAR szProcessName[MAX_PATH] = L"";
-                DWORD dwSize = NUMELMS(szProcessName);
-                DWORD bOk = _QueryFullProcessImageNameW(hProcess, 0, szProcessName, &dwSize);
-                CloseHandle(hProcess);
-                if (bOk)
+                wchar_t szBuffer[MAX_PATH * 2] = L"";
+                if (GetLongPathNameW(szProcessName, szBuffer, NUMELMS(szBuffer) - 1))
                 {
-                    wchar_t szBuffer[MAX_PATH * 2] = L"";
-                    if (GetLongPathNameW(szProcessName, szBuffer, NUMELMS(szBuffer) - 1))
-                    {
-                        return ToUTF8(szBuffer);
-                    }
+                    return ToUTF8(szBuffer);
                 }
             }
         }
@@ -525,7 +284,7 @@ DWORD FindProcessId(const SString& processName)
 //
 // GetGTAProcessList
 //
-// Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
+// Get list of process id's with the image name ending in "gta_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
 std::vector<DWORD> GetGTAProcessList()
@@ -535,14 +294,18 @@ std::vector<DWORD> GetGTAProcessList()
     for (auto processId : MyEnumProcesses())
     {
         SString strPathFilename = GetProcessPathFilename(processId);
-        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME) || strPathFilename.EndsWith(MTA_HTAEXE_NAME))
+
+        if (strPathFilename.EndsWith(GTA_EXE_NAME) || strPathFilename.EndsWith(PROXY_GTA_EXE_NAME) || strPathFilename.EndsWith(STEAM_GTA_EXE_NAME))
             ListAddUnique(result, processId);
     }
 
-    if (DWORD processId = FindProcessId(MTA_GTAEXE_NAME))
+    if (DWORD processId = FindProcessId(GTA_EXE_NAME))
         ListAddUnique(result, processId);
 
-    if (DWORD processId = FindProcessId(MTA_HTAEXE_NAME))
+    if (DWORD processId = FindProcessId(PROXY_GTA_EXE_NAME))
+        ListAddUnique(result, processId);
+
+    if (DWORD processId = FindProcessId(STEAM_GTA_EXE_NAME))
         ListAddUnique(result, processId);
 
     return result;
@@ -667,6 +430,30 @@ void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCo
         BrowseToSolution(strTroubleType, SHOW_MESSAGE_ONLY, strMessage, strErrorCode);
     else
         BrowseToSolution(strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage, strErrorCode);
+}
+
+auto GetMTARootDirectory() -> std::filesystem::path
+{
+    static const auto directory = fs::path{FromUTF8(GetMTASAPath())};
+    return directory;
+}
+
+auto GetGameBaseDirectory() -> fs::path
+{
+    static const auto directory = fs::path{FromUTF8(GetGTAPath())};
+    return directory;
+}
+
+auto GetGameLaunchDirectory() -> fs::path
+{
+    static const auto directory = fs::path{FromUTF8(GetMTADataPath())} / "GTA San Andreas";
+    return directory;
+}
+
+auto GetGameExecutablePath() -> std::filesystem::path
+{
+    static const auto executable = GetGameLaunchDirectory() / GTA_EXE_NAME;
+    return executable;
 }
 
 void SetMTASAPathSource(bool bReadFromRegistry)
@@ -810,7 +597,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 
     // Ask user to browse for GTA
     BROWSEINFOW bi = {0};
-    WString     strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
+    WString     strMessage(_("Select your Grand Theft Auto: San Andreas Installation Directory"));
     bi.lpszTitle = strMessage;
     LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
 
@@ -888,8 +675,7 @@ bool HasGTAPath()
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
     {
-        SString strGTAEXEPath = PathJoin(strGTAPath, MTA_GTAEXE_NAME);
-        return FileExists(strGTAEXEPath);
+        return FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) || FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME));
     }
     return false;
 }
@@ -1257,8 +1043,8 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     GetApplicationSetting("mta-version-ext").Split(".", parts);
     if (parts.size() == 6)
     {
-        usNetRev = atoi(parts[4]);
-        usNetRel = atoi(parts[5]);
+        usNetRev = static_cast<unsigned short>(atoi(parts[4]));
+        usNetRel = static_cast<unsigned short>(atoi(parts[5]));
     }
 
     DWORD   dwLastError = 0;
@@ -1369,29 +1155,32 @@ bool Is32bitProcess(DWORD processID)
 // Terminate process from pid
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateProcess(DWORD dwProcessID, uint uiExitCode)
+bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 {
-    HMODULE hModule = GetLibraryHandle("kernel32.dll");
-    if (hModule)
-    {
-        typedef bool (*PFNTerminateProcess)(uint, uint);
-        PFNTerminateProcess pfnTerminateProcess = static_cast<PFNTerminateProcess>(static_cast<PVOID>(GetProcAddress(hModule, "NtTerminateProcess")));
+    bool success = false;
 
-        if (pfnTerminateProcess)
+    if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
+    {
+        using Signature = bool(*)(DWORD, UINT);
+        static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
+
+        if (NtTerminateProcess_)
         {
-            bool bResult = pfnTerminateProcess(dwProcessID, uiExitCode);
-            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, bResult));
-        }
-        else
-        {
-            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID);
-            if (hProcess)
-            {
-                TerminateProcess(hProcess, uiExitCode);
-                CloseHandle(hProcess);
-            }
+            success = NtTerminateProcess_(dwProcessID, uiExitCode);
+            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, success));
         }
     }
+
+    if (!success)
+    {
+        if (HANDLE handle = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID); handle)
+        {
+            success = TerminateProcess(handle, uiExitCode);
+            CloseHandle(handle);
+        }
+    }
+
+    return success;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1425,7 +1214,7 @@ bool CreateSingleInstanceMutex()
 ///////////////////////////////////////////////////////////////////////////
 void ReleaseSingleInstanceMutex()
 {
-    assert(g_hMutex);
+    // assert(g_hMutex);
     CloseHandle(g_hMutex);
     g_hMutex = NULL;
 }
@@ -1854,17 +1643,26 @@ void CheckAndShowImgProblems()
 // Load a library function
 //
 //////////////////////////////////////////////////////////
-void* LoadFunction(const char* szLibName, const char* c, const char* a, const char* b)
+void* LoadFunction(const char* libraryName, const char* functionName)
 {
-    static std::map<SString, HMODULE> libMap;
-    HMODULE*                          phModule = MapFind(libMap, szLibName);
-    if (!phModule)
+    static std::map<std::string, HMODULE, std::less<>> libraries;
+
+    HMODULE handle{};
+
+    if (auto iter = libraries.find(libraryName); iter != libraries.end())
     {
-        MapSet(libMap, szLibName, LoadLibrary(szLibName));
-        phModule = MapFind(libMap, szLibName);
+        handle = iter->second;
     }
-    SString strFunctionName("%s%s%s", a, b, c);
-    return static_cast<PVOID>(GetProcAddress(*phModule, strFunctionName));
+    else
+    {
+        if (handle = LoadLibraryA(libraryName))
+            libraries[libraryName] = handle;
+        else
+            return nullptr;
+    }
+
+    auto result = static_cast<void*>(GetProcAddress(handle, functionName));
+    return result;
 }
 
 //////////////////////////////////////////////////////////
@@ -2034,7 +1832,6 @@ void LogSettings()
     } const settings[] = {
         {false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, ""},
         {false, "general", "aero-enabled", ""},
-        {false, "general", "aero-changeable", ""},
         {false, "general", "driver-overrides-disabled", ""},
         {false, "general", "device-selection-disabled", ""},
         {false, "general", "customized-sa-files-using", ""},
@@ -2044,7 +1841,6 @@ void LogSettings()
         {false, "nvhacks", "optimus-force-detection", ""},
         {false, "nvhacks", "optimus-export-enablement", ""},
         {false, "nvhacks", "optimus", ""},
-        {false, "nvhacks", "optimus-rename-exe", ""},
         {false, "nvhacks", "optimus-alt-startup", ""},
         {false, "nvhacks", "optimus-force-windowed", ""},
         {false, "nvhacks", "optimus-dialog-skip", ""},
@@ -2123,24 +1919,28 @@ SString PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter)
 // Check if device dialog is currently open in multi-monitor situation
 //
 //////////////////////////////////////////////////////////
-BOOL CALLBACK MyEnumThreadWndProc(HWND hwnd, LPARAM lParam)
+BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     WINDOWINFO windowInfo;
     if (GetWindowInfo(hwnd, &windowInfo))
     {
         if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
         {
-            // Ensure dialog is not hidden by other applications
-            SetForegroundWindow(hwnd);
-            return false;
+            DWORD dwWindowProcessId = 0;
+            GetWindowThreadProcessId(hwnd, &dwWindowProcessId);
+            if (lParam == dwWindowProcessId)
+            {
+                SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+                return false;
+            }
         }
     }
     return true;
 }
 
-bool IsDeviceSelectionDialogOpen(DWORD dwThreadId)
+bool IsDeviceSelectionDialogOpen(DWORD processID)
 {
-    return !EnumThreadWindows(dwThreadId, MyEnumThreadWndProc, 0);
+    return !EnumWindows(MyEnumWindowsProc, processID);
 }
 
 //////////////////////////////////////////////////////////
@@ -2210,6 +2010,173 @@ bool WriteCompatibilityEntries(const WString& strProgName, const WString& strSub
     }
 
     return bResult;
+}
+
+//////////////////////////////////////////////////////////
+//
+// GetProcessListUsingFile
+//
+// Returns a list of process ids with a handle a specific file.
+//
+//////////////////////////////////////////////////////////
+std::vector<DWORD> GetProcessListUsingFile(const WString& filePath)
+{
+    if (!_NtQueryInformationFile)
+        return {};
+
+    HANDLE fileHandle = CreateFileW(
+        /* FileName            */ filePath.c_str(),
+        /* DesiredAccess       */ FILE_READ_ATTRIBUTES,
+        /* ShareMode           */ FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        /* SecurityAttributes  */ nullptr,
+        /* CreationDisposition */ OPEN_EXISTING,
+        /* FlagsAndAttributes  */ 0,
+        /* TemplateFile        */ nullptr);
+
+    if (fileHandle == INVALID_HANDLE_VALUE)
+        return {};
+
+    HANDLE processHeap = GetProcessHeap();
+    SIZE_T heapSize = 8192;
+    auto   fileInfo = reinterpret_cast<PFILE_PROCESS_IDS_USING_FILE_INFORMATION>(HeapAlloc(processHeap, HEAP_ZERO_MEMORY, heapSize));
+
+    if (!fileInfo)
+    {
+        CloseHandle(fileHandle);
+        return {};
+    }
+
+    IO_STATUS_BLOCK ioStatus{};
+    NTSTATUS        status = _NtQueryInformationFile(
+        /* FileHandle           */ fileHandle,
+        /* IoStatusBlock        */ &ioStatus,
+        /* FileInformation      */ fileInfo,
+        /* Length               */ heapSize,
+        /* FileInformationClass */ 47 /* = FileProcessIdsUsingFileInformation */);
+
+    while (status == STATUS_INFO_LENGTH_MISMATCH)
+    {
+        heapSize *= 2;
+        auto reallocated = reinterpret_cast<PFILE_PROCESS_IDS_USING_FILE_INFORMATION>(HeapReAlloc(processHeap, HEAP_ZERO_MEMORY, fileInfo, heapSize));
+
+        if (!reallocated)
+        {
+            HeapFree(processHeap, 0, fileInfo);
+            CloseHandle(fileHandle);
+            return {};
+        }
+
+        fileInfo = reallocated;
+
+        status = _NtQueryInformationFile(
+            /* FileHandle           */ fileHandle,
+            /* IoStatusBlock        */ &ioStatus,
+            /* FileInformation      */ fileInfo,
+            /* Length               */ heapSize,
+            /* FileInformationClass */ 47 /* = FileProcessIdsUsingFileInformation */);
+    }
+
+    CloseHandle(fileHandle);
+    std::vector<DWORD> result;
+
+    if (NT_SUCCESS(status) && fileInfo->NumberOfProcessIdsInList > 0)
+    {
+        result.reserve(fileInfo->NumberOfProcessIdsInList);
+
+        for (ULONG i = 0; i < fileInfo->NumberOfProcessIdsInList; i++)
+        {
+            auto processId = static_cast<DWORD>(fileInfo->ProcessIdList[i]);
+
+            if (processId)
+                result.emplace_back(processId);
+        }
+    }
+
+    HeapFree(processHeap, 0, fileInfo);
+    return result;
+}
+
+auto ComputeCRC32(const char* filePath) -> uint32_t
+{
+    CryptoPP::CRC32                                         hash{};
+    std::array<CryptoPP::byte, CryptoPP::CRC32::DIGESTSIZE> bytes{};
+
+    try
+    {
+        CryptoPP::FileSource pass(filePath, true, new CryptoPP::HashFilter(hash, new CryptoPP::ArraySink(bytes.data(), bytes.size())));
+    }
+    catch (const std::exception&)
+    {
+        return 0;
+    }
+
+    uint32_t result{};
+    std::copy_n(bytes.data(), std::min(sizeof(result), bytes.size()), reinterpret_cast<uint8_t*>(&result));
+    return result;
+};
+
+static constexpr std::string_view alphaNumericCharset{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"};
+
+auto GenerateRandomString(size_t length) -> std::string
+{
+    if (!length)
+        return {};
+
+    std::random_device                      engine;
+    std::uniform_int_distribution<uint16_t> distribution{0, static_cast<uint16_t>(alphaNumericCharset.size() - 1)};
+
+    std::array<uint16_t, 4096> bytes{};
+    length = std::min(bytes.size(), length);
+    std::generate_n(bytes.data(), length, [&] { return distribution(engine); });
+
+    std::string result;
+    result.reserve(length);
+
+    for (size_t i = 0; i < length; ++i)
+        result.push_back(alphaNumericCharset[bytes[i]]);
+
+    return result;
+}
+
+bool IsErrorCodeLoggable(const std::error_code& ec)
+{
+    switch (ec.value())
+    {
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
+            return false;
+        default:
+            return true;
+    }
+}
+
+bool IsNativeArm64Host()
+{
+    static bool isArm64 = ([]
+    {
+        HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+
+        if (kernel32)
+        {
+            BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(GetProcAddress(kernel32, "IsWow64Process2"));
+
+            if (IsWow64Process2_)
+            {
+                USHORT processMachine;
+                USHORT nativeMachine;
+
+                if (IsWow64Process2_(GetCurrentProcess(), &processMachine, &nativeMachine))
+                {
+                    return nativeMachine == IMAGE_FILE_MACHINE_ARM64;
+                }
+            }
+        }
+        
+        return false;
+    })();
+
+    return isArm64;
 }
 
 //////////////////////////////////////////////////////////

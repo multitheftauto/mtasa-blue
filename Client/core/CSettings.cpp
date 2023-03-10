@@ -808,13 +808,13 @@ void CSettings::CreateGUI()
     m_pCheckBoxTyreSmokeParticles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 90.0f));
     m_pCheckBoxTyreSmokeParticles->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
-    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
-    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+    m_pCheckBoxDynamicPedShadows = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Dynamic ped shadows"), true));
+    m_pCheckBoxDynamicPedShadows->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
+    m_pCheckBoxDynamicPedShadows->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
-    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
-    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+    m_pCheckBoxBlur = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Motion blur"), true));
+    m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
+    m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -853,13 +853,17 @@ void CSettings::CreateGUI()
     }
 #endif
 
-    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
-    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
-    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
+    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
+    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxDynamicPedShadows = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Dynamic ped shadows"), true));
-    m_pCheckBoxDynamicPedShadows->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
-    m_pCheckBoxDynamicPedShadows->AutoSize(NULL, 20.0f);
+    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
+    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
+    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
 
     vecTemp.fY += 10;
 
@@ -1567,6 +1571,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("high_detail_peds", bHighDetailPeds);
     m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
 
+    // Blur
+    bool bBlur;
+    CVARS_GET("blur", bBlur);
+    m_pCheckBoxBlur->SetSelected(bBlur);
+
     // Corona rain reflections
     bool bCoronaReflections;
     CVARS_GET("corona_reflections", bCoronaReflections);
@@ -1804,6 +1813,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
+    CVARS_SET("blur", true);
     CVARS_SET("corona_reflections", false);
     CVARS_SET("dynamic_ped_shadows", false);
     gameSettings->UpdateFieldOfViewFromSettings();
@@ -3451,6 +3461,11 @@ void CSettings::SaveData()
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance(false);
+
+    // Blur
+    bool bBlur = m_pCheckBoxBlur->GetSelected();
+    CVARS_SET("blur", bBlur);
+    gameSettings->ResetBlurEnabled();
 
     // Corona rain reflections
     bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();

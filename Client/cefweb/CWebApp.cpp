@@ -32,6 +32,9 @@ void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRe
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
 
+    // browser-signin switch(or lack thereof) produces crashes when GOOGLE API keys are present in the OS registry
+    command_line->AppendSwitchWithValue("allow-browser-signin", "false");
+
     if (process_type.empty())
     {
         command_line->AppendSwitchWithValue("autoplay-policy", "no-user-gesture-required");

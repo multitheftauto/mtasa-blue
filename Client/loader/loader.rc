@@ -122,13 +122,8 @@ BEGIN
     CTEXT           "NVidia Optimus detected!",IDC_OPTIMUS_TEXT1,19,19,196,9,WS_DISABLED
     CONTROL         " A - Standard NVidia",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,58,60,151,10
     CONTROL         " B - Alternate NVidia",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,58,73,151,10
-    CONTROL         " C - Standard NVidia with exe rename",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,58,86,155,10
-    CONTROL         " D - Alternate NVidia with exe rename",IDC_RADIO4,
-                    "Button",BS_AUTORADIOBUTTON,58,99,153,10
-    CONTROL         " E - Standard Intel",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,58,112,149,10
-    CONTROL         " F - Alternate Intel",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,58,126,151,10
-    CONTROL         " G - Standard Intel with exe rename",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,58,139,153,10
-    CONTROL         " H - Alternate Intel with exe rename",IDC_RADIO8,"Button",BS_AUTORADIOBUTTON,58,152,156,10
+    CONTROL         " C - Standard Intel",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,58,86,155,10
+    CONTROL         " D - Alternate Intel",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,58,99,153,10
     PUSHBUTTON      "Help",IDC_BUTTON_HELP,15,239,50,14
     CTEXT           "Try each option and see what works:",IDC_OPTIMUS_TEXT2,14,34,207,10
     GROUPBOX        "",IDC_STATIC,22,50,195,119

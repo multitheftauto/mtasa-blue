@@ -6,7 +6,7 @@
 
 namespace lunasvg {
 
-GeometryElement::GeometryElement(ElementId id)
+GeometryElement::GeometryElement(ElementID id)
     : GraphicsElement(id)
 {
 }
@@ -28,19 +28,20 @@ void GeometryElement::layout(LayoutContext* context, LayoutContainer* current) c
     shape->markerData = context->markerData(this, shape->path);
     shape->visibility = visibility();
     shape->clipRule = clip_rule();
+    shape->opacity = opacity();
     shape->masker = context->getMasker(mask());
     shape->clipper = context->getClipper(clip_path());
     current->addChild(std::move(shape));
 }
 
 PathElement::PathElement()
-    : GeometryElement(ElementId::Path)
+    : GeometryElement(ElementID::Path)
 {
 }
 
 Path PathElement::d() const
 {
-    auto& value = get(PropertyId::D);
+    auto& value = get(PropertyID::D);
     return Parser::parsePath(value);
 }
 
@@ -54,19 +55,19 @@ std::unique_ptr<Node> PathElement::clone() const
     return cloneElement<PathElement>();
 }
 
-PolyElement::PolyElement(ElementId id)
+PolyElement::PolyElement(ElementID id)
     : GeometryElement(id)
 {
 }
 
 PointList PolyElement::points() const
 {
-    auto& value = get(PropertyId::Points);
+    auto& value = get(PropertyID::Points);
     return Parser::parsePointList(value);
 }
 
 PolygonElement::PolygonElement()
-    : PolyElement(ElementId::Polygon)
+    : PolyElement(ElementID::Polygon)
 {
 }
 
@@ -91,7 +92,7 @@ std::unique_ptr<Node> PolygonElement::clone() const
 }
 
 PolylineElement::PolylineElement()
-    : PolyElement(ElementId::Polyline)
+    : PolyElement(ElementID::Polyline)
 {
 }
 
@@ -115,25 +116,25 @@ std::unique_ptr<Node> PolylineElement::clone() const
 }
 
 CircleElement::CircleElement()
-    : GeometryElement(ElementId::Circle)
+    : GeometryElement(ElementID::Circle)
 {
 }
 
 Length CircleElement::cx() const
 {
-    auto& value = get(PropertyId::Cx);
+    auto& value = get(PropertyID::Cx);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length CircleElement::cy() const
 {
-    auto& value = get(PropertyId::Cy);
+    auto& value = get(PropertyID::Cy);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length CircleElement::r() const
 {
-    auto& value = get(PropertyId::R);
+    auto& value = get(PropertyID::R);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::Zero);
 }
 
@@ -159,31 +160,31 @@ std::unique_ptr<Node> CircleElement::clone() const
 }
 
 EllipseElement::EllipseElement()
-    : GeometryElement(ElementId::Ellipse)
+    : GeometryElement(ElementID::Ellipse)
 {
 }
 
 Length EllipseElement::cx() const
 {
-    auto& value = get(PropertyId::Cx);
+    auto& value = get(PropertyID::Cx);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length EllipseElement::cy() const
 {
-    auto& value = get(PropertyId::Cy);
+    auto& value = get(PropertyID::Cy);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length EllipseElement::rx() const
 {
-    auto& value = get(PropertyId::Rx);
+    auto& value = get(PropertyID::Rx);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::Zero);
 }
 
 Length EllipseElement::ry() const
 {
-    auto& value = get(PropertyId::Ry);
+    auto& value = get(PropertyID::Ry);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::Zero);
 }
 
@@ -211,31 +212,31 @@ std::unique_ptr<Node> EllipseElement::clone() const
 }
 
 LineElement::LineElement()
-    : GeometryElement(ElementId::Line)
+    : GeometryElement(ElementID::Line)
 {
 }
 
 Length LineElement::x1() const
 {
-    auto& value = get(PropertyId::X1);
+    auto& value = get(PropertyID::X1);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length LineElement::y1() const
 {
-    auto& value = get(PropertyId::Y1);
+    auto& value = get(PropertyID::Y1);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length LineElement::x2() const
 {
-    auto& value = get(PropertyId::X2);
+    auto& value = get(PropertyID::X2);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length LineElement::y2() const
 {
-    auto& value = get(PropertyId::Y2);
+    auto& value = get(PropertyID::Y2);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
@@ -259,43 +260,43 @@ std::unique_ptr<Node> LineElement::clone() const
 }
 
 RectElement::RectElement()
-    : GeometryElement(ElementId::Rect)
+    : GeometryElement(ElementID::Rect)
 {
 }
 
 Length RectElement::x() const
 {
-    auto& value = get(PropertyId::X);
+    auto& value = get(PropertyID::X);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length RectElement::y() const
 {
-    auto& value = get(PropertyId::Y);
+    auto& value = get(PropertyID::Y);
     return Parser::parseLength(value, AllowNegativeLengths, Length::Zero);
 }
 
 Length RectElement::rx() const
 {
-    auto& value = get(PropertyId::Rx);
+    auto& value = get(PropertyID::Rx);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::Unknown);
 }
 
 Length RectElement::ry() const
 {
-    auto& value = get(PropertyId::Ry);
+    auto& value = get(PropertyID::Ry);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::Unknown);
 }
 
 Length RectElement::width() const
 {
-    auto& value = get(PropertyId::Width);
+    auto& value = get(PropertyID::Width);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::Zero);
 }
 
 Length RectElement::height() const
 {
-    auto& value = get(PropertyId::Height);
+    auto& value = get(PropertyID::Height);
     return Parser::parseLength(value, ForbidNegativeLengths, Length::Zero);
 }
 
