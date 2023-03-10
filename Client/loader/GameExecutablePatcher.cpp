@@ -268,8 +268,8 @@ class HighPerformanceGraphicsPatch final
         header->Name = EXPORT_DIRECTORY_VA + offset;
         {
             auto value = reinterpret_cast<char*>(base + offset);
-            strcpy(value, MTA_GTAEXE_NAME);
-            offset += sizeof(MTA_GTAEXE_NAME);
+            strcpy(value, GTA_EXE_NAME);
+            offset += sizeof(GTA_EXE_NAME);
         }
 
         // Write export names.
