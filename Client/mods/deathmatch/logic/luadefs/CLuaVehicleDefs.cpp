@@ -4164,9 +4164,7 @@ std::variant<bool, std::array<std::array<float, 3>, 4>> CLuaVehicleDefs::GetVehi
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        CVector entryPoint;
-
-        vehicle->GetEntryPoint(entryPoint, i);
+        CVector entryPoint = vehicle->GetEntryPoint(i);
 
         entryPoints[i] = {entryPoint.fX, entryPoint.fY, entryPoint.fZ};
     }
@@ -4185,11 +4183,7 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
 
     for (unsigned int i = 0; i < 4; i++)
     {
-        CVector entryPoint;
-
-        vehicle->GetEntryPoint(entryPoint, i);
-
-        entryPoints[i] = entryPoint;
+        entryPoints[i] = vehicle->GetEntryPoint(i);
     }
 
     return entryPoints;

@@ -13,6 +13,7 @@
 #include <game/CBikeHandlingEntry.h>
 #include <game/CBoat.h>
 #include <game/CBoatHandlingEntry.h>
+#include <game/CCarEnterExit.h>
 #include <game/CDoor.h>
 #include <game/CFlyingHandlingEntry.h>
 #include <game/CHandlingEntry.h>
@@ -4979,9 +4980,9 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
-void CClientVehicle::GetEntryPoint(CVector& entryPoint, int entryPointIndex)
+CVector CClientVehicle::GetEntryPoint(int entryPointIndex)
 {
-    const auto GetSADoorIndex = [entryPointIndex]()
+    const auto GetSADoorIndex = [&entryPointIndex]()
     {
         switch (entryPointIndex)
         {
@@ -4989,19 +4990,17 @@ void CClientVehicle::GetEntryPoint(CVector& entryPoint, int entryPointIndex)
                 return 10;
             case 1:
                 return 8;
-                break;
             case 2:
                 return 11;
-                break;
             case 3:
                 return 9;
-                break;
         }
 
         return 0;
     };
 
     unsigned int saDoorIndex = GetSADoorIndex();
+    CVector      entryPoint;
 
     if (saDoorIndex != 0)
     {
@@ -5009,4 +5008,6 @@ void CClientVehicle::GetEntryPoint(CVector& entryPoint, int entryPointIndex)
 
         g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(entryPoint, gameVehicle, saDoorIndex);
     }
+
+    return entryPoint;
 }
