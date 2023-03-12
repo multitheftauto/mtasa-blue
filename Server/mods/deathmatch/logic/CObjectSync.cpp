@@ -44,20 +44,30 @@ bool CObjectSync::ProcessPacket(CPacket& Packet)
     return false;
 }
 
-void CObjectSync::OverrideSyncer(CObject* pObject, CPlayer* pPlayer)
+void CObjectSync::OverrideSyncer(CObject* pObject, CPlayer* pPlayer, bool bPersist)
 {
     // If the object already has a syncer, tell him not to sync it anymore
     CPlayer* pSyncer = pObject->GetSyncer();
     if (pSyncer)
     {
         if (pSyncer == pPlayer)
+        {
+            if (bPersist == false)
+            {
+                SetSyncerAsPersistent(false);
+            }
+
             return;
+        }
 
         StopSync(pObject);
     }
 
     if (pPlayer)
+    {
         StartSync(pPlayer, pObject);
+        SetSyncerAsPersistent(bPersist);
+    }
 }
 
 void CObjectSync::Update()
@@ -90,7 +100,7 @@ void CObjectSync::UpdateObject(CObject* pObject)
     if (pSyncer)
     {
         // Does the syncer still near the object?
-        if (!IsPointNearPoint3D(pSyncer->GetPosition(), pObject->GetPosition(), MAX_PLAYER_SYNC_DISTANCE) ||
+        if (!IsSyncerPersistent() && !IsPointNearPoint3D(pSyncer->GetPosition(), pObject->GetPosition(), MAX_PLAYER_SYNC_DISTANCE) ||
             (pObject->GetDimension() != pSyncer->GetDimension()))
         {
             // Stop him from syncing it
@@ -143,6 +153,8 @@ void CObjectSync::StopSync(CObject* pObject)
 
     // Unmark him as the syncing player
     pObject->SetSyncer(NULL);
+
+    SetSyncerAsPersistent(false);
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;

@@ -56,19 +56,29 @@ bool CUnoccupiedVehicleSync::ProcessPacket(CPacket& Packet)
     return false;
 }
 
-void CUnoccupiedVehicleSync::OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer)
+void CUnoccupiedVehicleSync::OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer, bool bPersist)
 {
     CPlayer* pSyncer = pVehicle->GetSyncer();
     if (pSyncer)
     {
         if (pSyncer == pPlayer)
+        {
+            if (bPersist == false)
+            {
+                SetSyncerAsPersistent(false);
+            }
+
             return;
+        }
 
         StopSync(pVehicle);
     }
 
     if (pPlayer && !pVehicle->IsBeingDeleted())
+    {
+        SetSyncerAsPersistent(bPersist);
         StartSync(pPlayer, pVehicle);
+    }
 }
 
 void CUnoccupiedVehicleSync::Update()
@@ -121,7 +131,7 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
         if (pSyncer)
         {
             // He isn't close enough to the vehicle and in the right dimension?
-            if ((!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance)) ||
+            if (!IsSyncerPersistent() && (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance)) ||
                 (pVehicle->GetDimension() != pSyncer->GetDimension()))
             {
                 // Stop him from syncing it
@@ -205,6 +215,8 @@ void CUnoccupiedVehicleSync::StopSync(CVehicle* pVehicle)
 
     // Unmark him as the syncing player
     pVehicle->SetSyncer(NULL);
+
+    SetSyncerAsPersistent(false);
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;

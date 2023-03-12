@@ -23,7 +23,10 @@ public:
     void DoPulse();
     bool ProcessPacket(CPacket& Packet);
 
-    void OverrideSyncer(CPed* pPed, CPlayer* pPlayer);
+    void OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist = false);
+
+    void SetSyncerAsPersistent(bool bPersist) { m_bSyncPersist = bPersist; };
+    bool IsSyncerPersistent() { return m_bSyncPersist; };
 
 private:
     void     Update();
@@ -40,4 +43,6 @@ private:
     CPedManager*    m_pPedManager;
 
     CElapsedTime m_UpdateTimer;
+
+    bool m_bSyncPersist = false;
 };

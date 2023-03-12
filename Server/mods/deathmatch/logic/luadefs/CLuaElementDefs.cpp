@@ -2257,17 +2257,21 @@ int CLuaElementDefs::setElementSyncer(lua_State* luaVM)
     CElement* pElement;
     CPlayer*  pPlayer = NULL;
     bool      bEnable = true;
+    bool      bPersist = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     if (argStream.NextIsBool())
         argStream.ReadBool(bEnable);
     else
+    {
         argStream.ReadUserData(pPlayer);
+        argStream.ReadBool(bPersist, false);
+    }
 
     if (!argStream.HasErrors())
     {
-        bool bResult = CStaticFunctionDefinitions::SetElementSyncer(pElement, pPlayer, bEnable);
+        bool bResult = CStaticFunctionDefinitions::SetElementSyncer(pElement, pPlayer, bEnable, bPersist);
         lua_pushboolean(luaVM, bResult);
         return 1;
     }
