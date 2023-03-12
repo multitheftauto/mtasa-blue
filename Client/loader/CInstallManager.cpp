@@ -1,15 +1,23 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:
- *  PURPOSE:
+ *  FILE:        Client/loader/CInstallManager.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "CInstallManager.h"
+#include "Utils.h"
+#include "Main.h"
+#include "Dialogs.h"
+#include "Install.h"
+#include "GameExecutablePatcher.h"
+#include "FileGenerator.h"
+#include "FileSystem.h"
+
+namespace fs = std::filesystem;
 
 namespace
 {
@@ -75,9 +83,9 @@ void CInstallManager::InitSequencer()
 {
     #define CR "\n"
     SString strSource = CR "initial: "                                             // *** Starts here  by default
-        CR "            CALL CheckOnRestartCommand "                               //
+        CR "            CALL CheckOnRestartCommand "                               ////// Start of 'update game' //////
         CR "            IF LastResult != ok GOTO update_end: "                     //
-        CR " "                                                                     ////// Start of 'update game' //////
+        CR " "                                                                     //
         CR "            CALL MaybeSwitchToTempExe "                                // If update files comes with an .exe, switch to that for the install
         CR " "                                                                     //
         CR "copy_files: "                                                          //
@@ -99,22 +107,14 @@ void CInstallManager::InitSequencer()
         CR "update_end: "                                                          ////// End of 'update game' //////
         CR "            CALL SwitchBackFromTempExe "                               //
         CR " "                                                                     //
-        CR "gta_version_check:"                                                    ////// Start of 'gta version check' //////
-        CR "            CALL ProcessGtaVersionCheck "                              //
-        CR "            IF LastResult == ok GOTO gta_version_end: "                //
-        CR "            IF LastResult == quit GOTO do_quit: "                      //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO gta_version_check: "              //
-        CR "            GOTO do_quit: "                                            // If changes as admin failed, then quit
-        CR "gta_version_end: "                                                     ////// End of 'gta version check' //////
-        CR " "                                                                     //
         CR "newlayout_check:"                                                      ////// Start of 'new layout check' //////
         CR "            CALL ProcessLayoutChecks "                                 //
         CR "            IF LastResult == ok GOTO newlayout_end: "                  //
         CR " "                                                                     //
         CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
         CR "            IF LastResult == ok GOTO newlayout_check: "                //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
         CR "newlayout_end: "                                                       ////// End of 'new layout check' //////
         CR " "                                                                     //
         CR "langfile_check: "                                                      ////// Start of 'Lang file fix' //////
@@ -123,17 +123,47 @@ void CInstallManager::InitSequencer()
         CR " "                                                                     //
         CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
         CR "            IF LastResult == ok GOTO langfile_check: "                 //
+        CR "            CALL Quit "                                                //
         CR " "                                                                     //
         CR "langfile_end: "                                                        ////// End of 'Lang file fix' //////
         CR " "                                                                     //
-        CR "exepatch_check: "                                                      ////// Start of 'Exe patch fix' //////
-        CR "            CALL ProcessExePatchChecks "                               // Make changes to comply with requirements
-        CR "            IF LastResult == ok GOTO exepatch_end: "                   //
+        CR "prepare_launch_location:"                                              ////// Start of 'prepare launch location' //////
+        CR "            CALL PrepareLaunchLocation "                               //
+        CR "            IF LastResult == ok GOTO prepare_launch_location_end: "    //
         CR " "                                                                     //
         CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO exepatch_check: "                 //
+        CR "            IF LastResult == ok GOTO prepare_launch_location: "        //
+        CR "            CALL Quit "                                                //
         CR " "                                                                     //
-        CR "exepatch_end: "                                                        ////// End of 'Exe patch fix' //////
+        CR "prepare_launch_location_end:"                                          ////// End of 'prepare launch location' //////
+        CR " "                                                                     //
+        CR "gta_patch_check:"                                                      ////// Start of 'gta patch check' //////
+        CR "            CALL ProcessGtaPatchCheck "                                //
+        CR "            IF LastResult != ok GOTO do_quit: "                        // Switching to admin has zero impact
+        CR " "                                                                     //
+        CR "gta_patch_check_end:"                                                  ////// End of 'gta patch check' ////// 
+        CR " "                                                                     //
+        CR "gta_dll_check:"                                                        ////// Start of 'gta dll check' //////
+        CR "            CALL ProcessGtaDllCheck "                                  //
+        CR "            IF LastResult == ok GOTO gta_dll_end: "                    //
+        CR "            IF LastResult == quit GOTO do_quit: "                      //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO gta_dll_check: "                  //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "gta_dll_end: "                                                         ////// End of 'gta dll check' //////
+        CR " "                                                                     //
+        CR "gta_version_check:"                                                    ////// Start of 'gta version check' //////
+        CR "            CALL ProcessGtaVersionCheck "                              //
+        CR "            IF LastResult == ok GOTO gta_version_end: "                //
+        CR "            IF LastResult == quit GOTO do_quit: "                      //
+        CR " "                                                                     //
+        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO gta_version_check: "              //
+        CR "            CALL Quit "                                                //
+        CR " "                                                                     //
+        CR "gta_version_end: "                                                     ////// End of 'gta version check' //////
         CR " "                                                                     //
         CR "service_check: "                                                       ////// Start of 'Service checks' //////
         CR "            CALL ProcessServiceChecks "                                // Make changes to comply with service requirements
@@ -179,10 +209,12 @@ void CInstallManager::InitSequencer()
     m_pSequencer->AddFunction("InstallFiles", &CInstallManager::_InstallFiles);
     m_pSequencer->AddFunction("ChangeToAdmin", &CInstallManager::_ChangeToAdmin);
     m_pSequencer->AddFunction("ShowCopyFailDialog", &CInstallManager::_ShowCopyFailDialog);
+    m_pSequencer->AddFunction("PrepareLaunchLocation", &CInstallManager::_PrepareLaunchLocation);
+    m_pSequencer->AddFunction("ProcessGtaPatchCheck", &CInstallManager::_ProcessGtaPatchCheck);
+    m_pSequencer->AddFunction("ProcessGtaDllCheck", &CInstallManager::_ProcessGtaDllCheck);
     m_pSequencer->AddFunction("ProcessGtaVersionCheck", &CInstallManager::_ProcessGtaVersionCheck);
     m_pSequencer->AddFunction("ProcessLayoutChecks", &CInstallManager::_ProcessLayoutChecks);
     m_pSequencer->AddFunction("ProcessLangFileChecks", &CInstallManager::_ProcessLangFileChecks);
-    m_pSequencer->AddFunction("ProcessExePatchChecks", &CInstallManager::_ProcessExePatchChecks);
     m_pSequencer->AddFunction("ProcessServiceChecks", &CInstallManager::_ProcessServiceChecks);
     m_pSequencer->AddFunction("ProcessAppCompatChecks", &CInstallManager::_ProcessAppCompatChecks);
     m_pSequencer->AddFunction("ChangeFromAdmin", &CInstallManager::_ChangeFromAdmin);
@@ -490,7 +522,7 @@ SString CInstallManager::_InstallFiles()
     WatchDogReset();
 
     // Install new files
-    if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "no"))
+    if (!InstallFiles(m_pSequencer->GetVariable(HIDE_PROGRESS) != "yes"))
     {
         if (!IsUserAdmin())
             AddReportLog(3048, SString("_InstallFiles: Install - trying as admin %s", ""));
@@ -544,6 +576,217 @@ void MigrateFile(const SString& strFilenameOld, const SString& strFilenameNew)
 
 //////////////////////////////////////////////////////////
 //
+// CInstallManager::_PrepareLaunchLocation
+//
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_PrepareLaunchLocation()
+{
+    const bool isAdmin = IsUserAdmin();
+
+    // Ensure GTA exe is not running
+    TerminateGTAIfRunning();
+
+    const fs::path gtaDir = GetGameBaseDirectory();
+    const fs::path mtaDir = GetMTARootDirectory() / "MTA";
+    const fs::path launchDir = GetGameLaunchDirectory();
+
+#if 0
+    // NOTE(botder): We are not using this solution because creating directory junctions requires administrator privileges.
+    // Create GTA subdirectory junctions to our launch directory.
+    for (const char* directoryName : {"anim", "audio", "data", "models", "text"})
+    {
+        // Delete shortcuts that may be confusing to the eye.
+        const fs::path shortcutPath = (launchDir / directoryName).replace_extension(".lnk");
+
+        if (std::error_code ec; fs::exists(shortcutPath, ec))
+        {
+            if (!fs::remove(shortcutPath, ec))
+            {
+                OutputDebugLine(*SString("Failed to remove shortcut for %s (%d, %s)", directoryName, ec.value(), ec.message().c_str()));
+            }
+        }
+
+        if (std::error_code ec; !SetDirectoryJunction(gtaDir / directoryName, launchDir / directoryName, ec))
+        {
+            OutputDebugLine(*SString("Failed to create junction for %s (%d, %s)", directoryName, ec.value(), ec.message().c_str()));
+            m_strAdminReason = _("Create GTA:SA junctions");
+            return "fail";
+        }
+    }
+#endif
+
+    // Copy GTA dependencies to our launch directory.
+    for (const char* fileName : {"eax.dll", "ogg.dll", "vorbis.dll", "vorbisFile.dll"})
+    {
+        const fs::path sourcePath = gtaDir / fileName;
+        const fs::path targetPath = launchDir / fileName;
+
+        if (std::error_code ec; !SafeCopyFile(sourcePath, targetPath, ec))
+        {
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t sourceSize = GetFileSize(sourcePath);
+                const uintmax_t targetSize = GetFileSize(targetPath);
+                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
+                                           sourceSize, targetSize, isAdmin));
+            }
+        }
+    }
+
+    // Copy MTA dependencies to our launch directory.
+    for (const char* fileName : {LOADER_PROXY_DLL_NAME})
+    {
+        const fs::path sourcePath = mtaDir / fileName;
+        const fs::path targetPath = launchDir / fileName;
+
+        if (std::error_code ec; !SafeCopyFile(sourcePath, targetPath, ec))
+        {
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t sourceSize = GetFileSize(sourcePath);
+                const uintmax_t targetSize = GetFileSize(targetPath);
+                AddReportLog(3052, SString("_PrepareLaunchLocation: Copying '%s' failed (err: %d, size: %ju <=> %ju, admin: %d)", fileName, ec.value(),
+                                           sourceSize, targetSize, isAdmin));
+            }
+
+            if (isAdmin)
+            {
+                if (fs::is_regular_file(sourcePath, ec))
+                {
+                    SString strMessage(_("MTA:SA cannot launch because copying a file failed:"));
+                    strMessage += "\n\n" + targetPath.u8string();
+                    BrowseToSolution("copy-files", ASK_GO_ONLINE, strMessage);
+                }
+                else
+                {
+                    SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
+                    strMessage += "\n\n" + sourcePath.u8string();
+                    BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
+                }
+                
+                return "quit";
+            }
+            else
+            {
+                m_strAdminReason = _("Copy MTA:SA files");
+                return "fail";
+            }
+        }
+    }
+
+    return "ok";
+}
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessGtaPatchCheck
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessGtaPatchCheck()
+{
+    const fs::path patchBasePath = FileGenerator::GetPatchBasePath();
+    const fs::path patchDiffPath = FileGenerator::GetPatchDiffPath();
+
+    if (!FileGenerator::IsPatchBase(patchBasePath))
+    {
+        SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
+        strMessage += "\n\n" + patchBasePath.u8string();
+        BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
+        return "quit";
+    }
+
+    if (!FileGenerator::IsPatchDiff(patchDiffPath))
+    {
+        SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
+        strMessage += "\n\n" + patchDiffPath.u8string();
+        BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
+        return "quit";
+    }
+
+    return "ok";
+}
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::_ProcessGtaDllCheck
+//
+//
+//
+//////////////////////////////////////////////////////////
+SString CInstallManager::_ProcessGtaDllCheck()
+{
+    // Ensure GTA exe is not running
+    TerminateGTAIfRunning();
+
+    struct DependencyHash
+    {
+        const char* fileName;
+        FileHash    fileHash;
+    };
+
+    // clang-format off
+    constexpr std::array<DependencyHash, 4> dependencies{{
+        {"eax.dll",         FileHash{0xb2, 0xda, 0x4f, 0x1e, 0x47, 0xef, 0x80, 0x54, 0xc8, 0x39, 0x0e, 0xad, 0x0b, 0x97, 0xd1, 0xfb,
+                                     0xb0, 0xc5, 0x47, 0x24, 0x5b, 0x79, 0xb8, 0x86, 0x1c, 0xfa, 0x92, 0xce, 0x9e, 0xf1, 0x53, 0xfb}},
+        {"ogg.dll",         FileHash{0x4a, 0x4f, 0x65, 0x42, 0x7e, 0x01, 0x6b, 0x3c, 0x5a, 0xe0, 0xd2, 0x51, 0x7a, 0x69, 0xdb, 0x5f,
+                                     0x1c, 0xdc, 0x7a, 0x43, 0xd2, 0xc0, 0xa7, 0x95, 0x7e, 0x8d, 0xa5, 0xd6, 0xf3, 0x78, 0xf0, 0x63}},
+        {"vorbis.dll",      FileHash{0xfe, 0xfd, 0xa8, 0x50, 0xb6, 0x9e, 0x00, 0x7f, 0xce, 0xba, 0x64, 0x44, 0x83, 0xc7, 0x61, 0x6b,
+                                     0xc0, 0x7e, 0x9f, 0x17, 0x7f, 0xc6, 0x34, 0xfb, 0x74, 0xe1, 0x14, 0xf0, 0xd1, 0x5b, 0x0d, 0xb0}},
+        {"vorbisFile.dll",  FileHash{0xa0, 0x89, 0x23, 0x47, 0x90, 0x00, 0xce, 0xc3, 0x66, 0x96, 0x7f, 0xb8, 0x25, 0x9e, 0x09, 0x20,
+                                     0xb7, 0xaa, 0x18, 0x85, 0x97, 0x22, 0xc7, 0xdd, 0xa1, 0x41, 0x57, 0x26, 0xbe, 0xd4, 0x77, 0x4f}},
+    }};
+    // clang-format on
+
+    const fs::path launchDir = GetGameLaunchDirectory();
+    const bool     isAdmin = IsUserAdmin();
+    
+    FileGenerator gtasa{};
+
+    for (size_t i = 0; i < dependencies.size(); ++i)
+    {
+        const DependencyHash& dependency = dependencies[i];
+        std::filesystem::path dependecyPath = launchDir / dependency.fileName;
+
+        std::error_code ec1{};
+        FileHash        hash{};
+
+        if (GetFileHash(dependecyPath, hash, ec1) && hash == dependency.fileHash)
+            continue;
+
+        std::error_code ec2{};
+
+        if (gtasa.GenerateFile(std::to_string(i), dependecyPath, ec2))
+            continue;
+
+        if (IsErrorCodeLoggable(ec1) || IsErrorCodeLoggable(ec2))
+        {
+            const uintmax_t fileSize = GetFileSize(dependecyPath);
+            AddReportLog(3052, SString("_ProcessGtaDllCheck: GenerateFile failed (err-1: %d, err-2: %d, size: %ju, admin: %d)", ec1.value(), ec2.value(),
+                                       fileSize, isAdmin));
+        }
+
+        if (isAdmin)
+        {
+            SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
+            strMessage += "\n\n" + dependecyPath.u8string();
+            BrowseToSolution(SString("gendep_error&name=%s", dependency.fileName), ASK_GO_ONLINE, strMessage);
+            return "quit";
+        }
+        else
+        {
+            m_strAdminReason = _("Patch GTA:SA dependency");
+            return "fail";
+        }
+    }
+
+    return "ok";
+}
+
+//////////////////////////////////////////////////////////
+//
 // CInstallManager::_ProcessGtaVersionCheck
 //
 // Make sure gta exe is the correct version
@@ -551,79 +794,112 @@ void MigrateFile(const SString& strFilenameOld, const SString& strFilenameNew)
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessGtaVersionCheck()
 {
-    SString strGtaExe = PathJoin(GetGTAPath(), "gta_sa.exe");
-    SString strPatchBase = PathJoin(GetGTAPath(), "audio/CONFIG/PakFiles.dat");
-    SString strPatchDiff = PathJoin(GetMTASAPath(), "mta/data/gta_sa_diff.dat");
-    SString strGtaExeMd5 = "170B3A9108687B26DA2D8901C6948A18";
-    SString strPatchBaseMd5 = "DB1E657A3BAAFBB86CD1B715C5282C66";
-    // Reset any bytes MTA may have changed in gta_sa.exe
-    std::vector<CFileGenerator::SResetItem> gtaExeResetList = {
-        {0x0000008B, 1, {0x42}},                              // bTimestamp
-        {0x00000096, 1, {0x0F}},                              // bLargeMem
-        {0x000000DF, 1, {0x00}},                              // bDep
-        {0x000000F8, 8, {0x00}},                              // bNvightmare ExportDir
-        {0x004A1AD0, 96, {0x00}},                             // bNvightmare ExportTable
-        {0x004C4588, 4, {0x01, 0x00, 0x00, 0x00}},            // bNvightmare ExportValue
-    };
-    CFileGenerator fileGenerator(strGtaExe, strGtaExeMd5, gtaExeResetList, strPatchBase, strPatchDiff);
+    const fs::path gtaExePath = GetGameExecutablePath();
+    const bool     isAdmin = IsUserAdmin();
 
-    // Need to fix gta_sa.exe?
-    bool bGenerationRequired = fileGenerator.IsGenerationRequired();
-    SetApplicationSetting("gta-exe-md5", fileGenerator.GetCurrentTargetMd5());
-    if (!bGenerationRequired)
+    GameExecutablePatcher patcher{gtaExePath};
+    FileGenerator         gtasa{};
+
+    std::error_code ec{};
+
+    if (!patcher.Load(ec))
     {
-        AddReportLog(2053, "_ProcessGtaVersionCheck: No action required");
-        return "ok";
-    }
-
-    // Check required GTA file is correct
-    SString strPatchBaseCurrentMd5 = GenerateHashHexStringFromFile(EHashFunctionType::MD5, strPatchBase);
-    if (strPatchBaseCurrentMd5 != strPatchBaseMd5)
-    {
-        AddReportLog(5053, SString("_ProcessGtaVersionCheck: Incorrect file '%s' %d %s", *strPatchBase, (int)FileSize(strPatchBase), *strPatchBaseCurrentMd5));
-        SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
-        strMessage += "\n\n" + strPatchBase;
-        BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
-        return "quit";
-    }
-
-    // Ensure GTA exe is not running
-    TerminateGTAIfRunning();
-
-    // Backup current gta_sa.exe
-    SString strGTAExeBak = strGtaExe + ".bak";
-    if (!FileExists(strGTAExeBak))
-    {
-        FileCopy(strGtaExe, strGTAExeBak);
-    }
-
-    // Generate new gta_sa.exe
-    CFileGenerator::EResult result = fileGenerator.GenerateFile();
-
-    // Handle result
-    if (result != CFileGenerator::EResult::Success)
-    {
-        if (!IsUserAdmin())
+        if (ec)
         {
-            AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) - trying as admin %s", result, *fileGenerator.GetErrorRecords()));
-            m_strAdminReason = _("Patch GTA");
-            return "fail";
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t fileSize = GetFileSize(gtaExePath);
+                AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #1 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            }
+
+            ec.clear();
+        }
+
+        if (!gtasa.GenerateFile("data", gtaExePath, ec))
+        {
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t fileSize = GetFileSize(gtaExePath);
+                AddReportLog(3052, SString("_ProcessGtaVersionCheck: GenerateFile failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            }
+
+            if (isAdmin)
+            {
+                SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"));
+                strMessage += "\n\n" + gtaExePath.u8string();
+                strMessage +=
+                    "\n\n" +
+                    _("Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA.");
+                BrowseToSolution(SString("gengta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
+                return "quit";
+            }
+            else
+            {
+                m_strAdminReason = _("Generate GTA:SA");
+                return "fail";
+            }
+        }
+
+        if (!patcher.Load(ec))
+        {
+            if (IsErrorCodeLoggable(ec))
+            {
+                const uintmax_t fileSize = GetFileSize(gtaExePath);
+                AddReportLog(3052, SString("_ProcessGtaVersionCheck: Loading #2 failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+            }
+
+            if (isAdmin)
+            {
+                SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is not loadable:"));
+                strMessage += "\n\n" + gtaExePath.u8string();
+                BrowseToSolution(SString("gengta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
+                return "quit";
+            }
+            else
+            {
+                m_strAdminReason = _("Patch GTA:SA");
+                return "fail";
+            }
+        }
+    }
+
+    if (!patcher.ApplyPatches(ec))
+    {
+        if (IsErrorCodeLoggable(ec))
+        {
+            const uintmax_t fileSize = GetFileSize(gtaExePath);
+            AddReportLog(3052, SString("_ProcessGtaVersionCheck: ApplyPatches failed (err: %d, size: %ju, admin: %d)", ec.value(), fileSize, isAdmin));
+        }
+
+        if (isAdmin)
+        {
+            SString strMessage(_("MTA:SA cannot launch because patching GTA:SA has failed:"));
+            strMessage += "\n\n" + gtaExePath.u8string();
+            BrowseToSolution(SString("patchgta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
+            return "quit";
         }
         else
         {
-            AddReportLog(
-                5052, SString("_ProcessGtaVersionCheck: GenerateFile failed (%d) to generate '%s' %s", result, *strGtaExe, *fileGenerator.GetErrorRecords()));
-            SString strMessage(_("MTA:SA cannot continue because the following files are incorrect:"));
-            strMessage += "\n\n" + strGtaExe;
-            strMessage += "\n\n" + _("Error") + SString(" %d", result);
-            BrowseToSolution(SString("gengta_error&code=%d", result), ASK_GO_ONLINE, strMessage);
-            return "quit";
+            m_strAdminReason = _("Patch GTA:SA");
+            return "fail";
         }
     }
 
-    SetApplicationSetting("gta-exe-md5", fileGenerator.GetCurrentTargetMd5());
-    AddReportLog(2052, "_ProcessGtaVersionCheck: success");
+    SetApplicationSetting("gta-exe-md5", patcher.GenerateMD5());
     return "ok";
+}
+
+//////////////////////////////////////////////////////////
+//
+// CInstallManager::UpdateOptimusSymbolExport
+//
+// Try to restore or apply 'HighPerformanceGraphicsPatch'.
+// Return false if admin required
+//
+//////////////////////////////////////////////////////////
+bool CInstallManager::UpdateOptimusSymbolExport()
+{
+    return _ProcessGtaVersionCheck() == "ok";
 }
 
 //////////////////////////////////////////////////////////
@@ -747,6 +1023,31 @@ SString CInstallManager::_ProcessLayoutChecks()
             FileDelete(PathJoin(strOldDir, "logs", fileList[i]));
     }
 
+    // Remove superfluous files from MTA subdirectory.
+    {
+        const SString mtaDir = CalcMTASAPath("mta");
+
+        for (const char* fileName : {"winmm.dll", "vea.dll", "vog.dll", "vvo.dll", "vvof.dll"})
+        {
+            SString filePath = PathJoin(mtaDir, fileName);
+
+            if (FileExists(filePath))
+            {
+                FileDelete(filePath);
+            }
+        }
+    }
+
+    // Remove proxy_sa.exe from GTA directory.
+    {
+        SString filePath = PathJoin(GetGTAPath(), "proxy_sa.exe");
+
+        if (FileExists(filePath))
+        {
+            FileDelete(filePath);
+        }
+    }
+
     //
     // Disk space check
     //
@@ -837,92 +1138,6 @@ SString CInstallManager::_ProcessLangFileChecks()
 
 //////////////////////////////////////////////////////////
 //
-// CInstallManager::UpdateOptimusSymbolExport
-//
-// Try to update NvightmareChecks
-// Return false if admin required
-//
-//////////////////////////////////////////////////////////
-bool CInstallManager::UpdateOptimusSymbolExport()
-{
-    return _ProcessExePatchChecks() == "ok";
-}
-
-//////////////////////////////////////////////////////////
-//
-// MaybeRenameExe
-//
-// Figure out whether to use a renamed exe, and return filename to use.
-// Also tries file copy if required.
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::MaybeRenameExe(const SString& strGTAPath)
-{
-    // Try patch/copy (may fail if not admin)
-    _ProcessExePatchChecks();
-
-    SString strGTAEXEPath = PathJoin(strGTAPath, MTA_GTAEXE_NAME);
-    if (ShouldUseExeCopy())
-    {
-        // See if exe copy seems usable
-        SString strHTAEXEPath = PathJoin(strGTAPath, MTA_HTAEXE_NAME);
-        uint64  uiStdFileSize = FileSize(strGTAEXEPath);
-        if (uiStdFileSize && FileSize(strHTAEXEPath) > 10 * 1024 * 1024)
-            strGTAEXEPath = strHTAEXEPath;
-    }
-
-    return strGTAEXEPath;
-}
-
-//////////////////////////////////////////////////////////
-//
-// CInstallManager::_ProcessExePatchChecks
-//
-// Check which changes need to be made to the exe and make a copy if required
-//
-//////////////////////////////////////////////////////////
-SString CInstallManager::_ProcessExePatchChecks()
-{
-    if (!HasGTAPath())
-        return "ok";
-
-    SExePatchedStatus reqStatus = GetExePatchRequirements();
-
-    if (!ShouldUseExeCopy())
-    {
-        // Simple patching if won't be using a exe copy
-        if (!SetExePatchedStatus(false, reqStatus))
-        {
-            m_strAdminReason = GetPatchExeAdminReason(false, reqStatus);
-            return "fail";
-        }
-    }
-    else
-    {
-        // Bit more complercated if will be using a exe copy
-
-        // First check if we need to create/update the exe copy
-        if (GetExePatchedStatus(true) != reqStatus || GetExeFileSize(false) != GetExeFileSize(true))
-        {
-            // Copy
-            if (!CopyExe())
-            {
-                m_strAdminReason = GetPatchExeAdminReason(true, reqStatus);
-                return "fail";
-            }
-            // Apply patches
-            if (!SetExePatchedStatus(true, reqStatus))
-            {
-                m_strAdminReason = GetPatchExeAdminReason(true, reqStatus);
-                return "fail";
-            }
-        }
-    }
-    return "ok";
-}
-
-//////////////////////////////////////////////////////////
-//
 // CInstallManager::_ProcessServiceChecks
 //
 //
@@ -953,7 +1168,7 @@ SString CInstallManager::_ProcessAppCompatChecks()
     BOOL bIsWOW64 = false;            // 64bit OS
     IsWow64Process(GetCurrentProcess(), &bIsWOW64);
     uint    uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
-    WString strGTAExePathFilename = FromUTF8(GetUsingExePathFilename());
+    WString strGTAExePathFilename = GetGameExecutablePath().wstring();
     WString strMTAExePathFilename = FromUTF8(GetLaunchPathFilename());
     WString strCompatModeRegKey = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
     int     bWin816BitColorOption = GetApplicationSettingInt("Win8Color16");
@@ -1003,6 +1218,12 @@ SString CInstallManager::_ProcessAppCompatChecks()
         addList.push_back(L"NoDTToDITMouseBatch");
     else
         removeList.push_back(L"NoDTToDITMouseBatch");
+
+    // Disable hybrid execution mode (x86 apps only) - ARM emulation settings.
+    if (IsNativeArm64Host())
+        addList.push_back(L"ARM64CHPEDISABLED");
+    else
+        removeList.push_back(L"ARM64CHPEDISABLED");
 
     // Details of reg keys to fiddle with
     struct
@@ -1107,7 +1328,7 @@ SString CInstallManager::_InstallNewsItems()
         SetCurrentDirectory(strTargetDir);
 
         // Try to extract the files
-        if (!ExtractFiles(strFileLocation))
+        if (!ExtractFiles(strFileLocation, false))
         {
             // If extract failed and update file is an exe, try to run it
             if (ExtractExtension(strFileLocation).CompareI("exe"))
@@ -1141,5 +1362,5 @@ SString CInstallManager::_InstallNewsItems()
 SString CInstallManager::_Quit()
 {
     ExitProcess(0);
-    // return "ok";
+    return "ok";
 }

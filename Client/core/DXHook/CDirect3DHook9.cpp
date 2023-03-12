@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDirect3DHook9.h"
 #include <SharedUtil.Detours.h>
 
 template <>
@@ -84,7 +85,6 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
         CCore::GetSingleton().CreateMultiplayer();
         CCore::GetSingleton().CreateXML();
         CCore::GetSingleton().CreateGUI();
-        CCore::GetSingleton().ResetDiscordRichPresence();
     }
 
     // D3DX_SDK_VERSION checks

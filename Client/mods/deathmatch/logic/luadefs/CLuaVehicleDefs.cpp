@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CHandlingEntry.h>
+#include <game/CHandlingManager.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaVehicleDefs::LoadFunctions()

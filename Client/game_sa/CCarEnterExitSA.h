@@ -12,8 +12,6 @@
 #pragma once
 
 #include <game/CCarEnterExit.h>
-#include "CPedSA.h"
-#include "CVehicleSA.h"
 
 #define FUNC_GetNearestCarDoor                  0x6528F0
 #define FUNC_GetNearestCarPassengerDoor         0x650BB0

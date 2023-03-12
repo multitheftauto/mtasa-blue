@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include "CEntity.h"
-#include "CColPoint.h"
+class CEntitySAInterface;
+class CVector;
+class CColPoint;
 
 struct SLineOfSightFlags
 {
@@ -308,14 +309,9 @@ public:
     virtual void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
     virtual bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
-    // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED ----------v
-    virtual bool  TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision) = 0;
     virtual void  IgnoreEntity(CEntity* entity) = 0;
-    virtual BYTE  GetLevelFromPosition(CVector* vecPosition) = 0;
-    virtual float FindGroundZForPosition(float fX, float fY) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
     virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;
-    virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
     virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
     virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;
     virtual DWORD GetCurrentArea() = 0;

@@ -3,7 +3,7 @@ require 'utils'
 premake.modules.install_resources = {}
 
 -- Config variables
-local RESOURCES_URL = "https://mirror.mtasa.com/mtasa/resources/mtasa-resources-latest.zip"
+local RESOURCES_URL = "https://mirror-cdn.multitheftauto.com/mtasa/resources/mtasa-resources-latest.zip"
 local EXTRACT_DIR = "Bin/server/mods/deathmatch/resources/"
 
 newaction {

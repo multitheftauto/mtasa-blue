@@ -18,6 +18,8 @@ extern "C"
     #include "lauxlib.h"
 }
 
+#include "luadefs/CLuaDefs.h"
+
 class CLuaVector3Defs : public CLuaDefs
 {
 public:

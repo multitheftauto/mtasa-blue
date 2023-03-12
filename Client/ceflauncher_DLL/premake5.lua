@@ -22,9 +22,10 @@ project "CEFLauncher DLL"
 		"*.cpp"
 	}
 
-	links { "CEF",  "libcef.lib", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib" }
+	links { "delayimp", "CEF",  "libcef.lib", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib" }
+	linkoptions { "/DELAYLOAD:libcef.dll" }
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

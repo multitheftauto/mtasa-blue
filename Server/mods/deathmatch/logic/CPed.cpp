@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPed.h"
+#include "CPedManager.h"
+#include "CLogger.h"
+#include "Utils.h"
+#include "CStaticFunctionDefinitions.h"
 
 char szBodyPartNameEmpty[] = "";
 struct SBodyPartName
@@ -463,7 +468,7 @@ void CPed::SetSyncer(CPlayer* pPlayer)
             case VEHICLEACTION_ENTERING:
             {
                 CVehicle*     pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
+                unsigned char ucOccupiedSeat = static_cast<unsigned char>(GetOccupiedVehicleSeat());
                 // Does it have an occupant and is the occupant us?
                 if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
                 {

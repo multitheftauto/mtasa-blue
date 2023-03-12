@@ -11,6 +11,7 @@
 #include <StdInc.h>
 #include <Psapi.h>
 #include <game/CGame.h>
+#include <game/CPools.h>
 #include "CModelCacheManager.h"
 
 DECLARE_ENUM(ePools);
