@@ -4140,7 +4140,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
         return false;
 
     if (uiSeat > 0 && pVehicle->GetMaxPassengers() == VEHICLE_PASSENGERS_UNDEFINED)
-        return false
+        return false;
 
 
     // Valid seat id for that vehicle?
