@@ -1020,11 +1020,14 @@ CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
         }
     }
 
-    if (!IsLoaded())
-        Request(BLOCKING, "GetVehicleDummyDefaultPosition");
+    ModelAddRef(BLOCKING, "GetVehicleDummyDefaultPosition");
 
-    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return modelInfo->pVisualInfo->vecDummies[eDummy];
+    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
+    CVector vec = modelInfo->pVisualInfo->vecDummies[eDummy];
+
+    RemoveRef();
+
+    return vec;
 }
 
 CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
