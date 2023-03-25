@@ -2768,8 +2768,11 @@ int CVersionUpdater::_PollDownload()
                         return RES_OK;
                     }
                     if (m_JobInfo.bShowDownloadPercent)
-                        GetQuestionBox().SetMessage(
-                            SString(_("%3d %% completed"), Round(m_JobInfo.uiBytesDownloaded * 100.f / std::max<float>(1, m_JobInfo.iFilesize))));
+                    {
+                        const bool bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
+                        const float fDownloadedPercent = bIsDownloadedSizeRight ? Round(m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
+                        GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
+                    }
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
                         GetQuestionBox().AppendMessage(SString(_("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000));
                     else

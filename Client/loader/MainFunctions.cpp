@@ -820,7 +820,7 @@ void CheckDataFiles()
     }
 
     // Make sure the gta executable exists
-    if (!FileExists(PathJoin(strGTAPath, MTA_GTAEXE_NAME)))
+    if (!FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) && !FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME)))
     {
         DisplayErrorMessageBox(SString(_("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str()), _E("CL20"), "gta_sa-missing");
         return ExitProcess(EXIT_ERROR);
@@ -1046,53 +1046,58 @@ void CheckLibVersions()
 BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandLine, const SString& lpCurrentDirectory,
                      LPPROCESS_INFORMATION lpProcessInformation, DWORD& dwOutError, SString& strOutErrorContext)
 {
-    std::vector<DWORD> processIdListBefore = GetGTAProcessList();
-    // Start GTA
-    BOOL bResult = ShellExecuteNonBlocking("open", lpApplicationName, lpCommandLine, lpCurrentDirectory);
+    STARTUPINFOW startupInfo{};
+    startupInfo.cb = sizeof(startupInfo);
+    BOOL wasProcessCreated = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
+                                            *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
 
-    if (bResult == FALSE)
+    if (wasProcessCreated)
+        return true;
+
+    std::vector<DWORD> processIdListBefore = GetGTAProcessList();
+
+    if (!ShellExecuteNonBlocking("open", lpApplicationName, lpCommandLine, lpCurrentDirectory))
     {
         dwOutError = GetLastError();
         strOutErrorContext = "ShellExecute";
+        return false;
     }
-    else
+
+    // Determine pid of new gta process
+    for (uint i = 0; i < 10; i++)
     {
-        // Determine pid of new gta process
-        for (uint i = 0; i < 10; i++)
+        std::vector<DWORD> processIdList = GetGTAProcessList();
+        for (DWORD pid : processIdList)
         {
-            std::vector<DWORD> processIdList = GetGTAProcessList();
-            for (DWORD pid : processIdList)
+            if (ListContains(processIdListBefore, pid))
             {
-                if (ListContains(processIdListBefore, pid))
-                {
-                    continue;
-                }
-                lpProcessInformation->dwProcessId = pid;
-                lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
-                break;
+                continue;
             }
-            if (lpProcessInformation->dwProcessId)
-                break;
-            Sleep(500);
+            lpProcessInformation->dwProcessId = pid;
+            lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
+            break;
         }
-
-        if (lpProcessInformation->dwProcessId == 0)
-        {
-            // Unable to get pid
-            dwOutError = ERROR_INVALID_FUNCTION;
-            strOutErrorContext = "FindPID";
-            bResult = false;
-        }
-        else if (lpProcessInformation->hProcess == nullptr)
-        {
-            // Unable to OpenProcess
-            dwOutError = ERROR_ELEVATION_REQUIRED;
-            strOutErrorContext = "OpenProcess";
-            bResult = false;
-        }
+        if (lpProcessInformation->dwProcessId)
+            break;
+        Sleep(500);
     }
 
-    return bResult;
+    if (lpProcessInformation->dwProcessId == 0)
+    {
+        // Unable to get pid
+        dwOutError = ERROR_INVALID_FUNCTION;
+        strOutErrorContext = "FindPID";
+        wasProcessCreated = false;
+    }
+    else if (lpProcessInformation->hProcess == nullptr)
+    {
+        // Unable to OpenProcess
+        dwOutError = ERROR_ELEVATION_REQUIRED;
+        strOutErrorContext = "OpenProcess";
+        wasProcessCreated = false;
+    }
+
+    return wasProcessCreated;
 }
 
 //////////////////////////////////////////////////////////
@@ -1111,7 +1116,7 @@ int LaunchGame(SString strCmdLine)
     const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     SString       strMtaDir = PathJoin(strMTASAPath, "mta");
-    SString       strGTAEXEPath = GetGameExecutablePath().string();
+    SString       strGTAEXEPath = GetGameExecutablePath().u8string();
 
     SetDllDirectory(strMtaDir);
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())

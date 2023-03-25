@@ -185,6 +185,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             return 0;
     }
 
+    // Disable the system context menu by clicking on window bar (freezes the game).
+    // Disable right mouse button outside application window area (holding it over window bar freezes the game).
+    if (uMsg == WM_CONTEXTMENU || uMsg == WM_NCRBUTTONDOWN)
+    {
+        return 0;
+    }
+
     // Quit message?
     if (uMsg == WM_CLOSE)
     {
@@ -546,7 +553,7 @@ void CMessageLoopHook::StartWindowMovement()
 
     LONG lExStyle = GetWindowLong(m_MovementDummyWindow, GWL_EXSTYLE);
     lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-    lExStyle |= WS_EX_LAYERED;
+    lExStyle |= WS_EX_LAYERED | WS_EX_TOOLWINDOW;
     SetWindowLong(m_MovementDummyWindow, GWL_EXSTYLE, lExStyle);
     SetLayeredWindowAttributes(m_MovementDummyWindow, 0, 140, LWA_ALPHA);
 

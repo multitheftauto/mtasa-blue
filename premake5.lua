@@ -44,6 +44,7 @@ workspace "MTASA"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
+	flags "MultiProcessorCompile"
 
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
