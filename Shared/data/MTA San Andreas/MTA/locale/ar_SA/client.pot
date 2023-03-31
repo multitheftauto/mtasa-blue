@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-18 19:28+0000\n"
-"PO-Revision-Date: 2023-03-31 16:07\n"
+"PO-Revision-Date: 2023-03-31 17:17\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -484,9 +484,9 @@ msgstr "هذا الملف غير موقع. احتمال نشاط فيروسي.\n
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "ملف البيانات ٪ ذ مفقود. نشاط الفيروس المحتمل.\n\n"
+msgstr "ملف البيانات\"s%\" مفقود. يوجد نشاط فيروس محتمل.\n\n"
 "ضع في اعتبارك إعادة تثبيت Multi Theft Auto من أجل أمانك\n"
-"راجع التعليمات الفورية إذا لم يعمل MTA بشكل صحيح"
+"راجع التعليمات الأتية إذا لم يعمل MTA بشكل صحيح."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
@@ -627,7 +627,7 @@ msgstr "لا يمكن تشغيل MTA:SA لأن المِلَفّ التنفيذي
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "تصليح GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
