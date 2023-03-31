@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-18 19:28+0000\n"
-"PO-Revision-Date: 2023-03-18 19:37\n"
+"PO-Revision-Date: 2023-03-31 16:07\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -234,7 +234,7 @@ msgstr "B - البديل NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "Intel - cE العادي"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
@@ -619,7 +619,7 @@ msgstr "يرجى التحقق من برنامَج مكافحة الفيروسا�
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "تصنيع GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
