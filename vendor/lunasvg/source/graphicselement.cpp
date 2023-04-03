@@ -3,14 +3,14 @@
 
 namespace lunasvg {
 
-GraphicsElement::GraphicsElement(ElementId id)
+GraphicsElement::GraphicsElement(ElementID id)
     : StyledElement(id)
 {
 }
 
 Transform GraphicsElement::transform() const
 {
-    auto& value = get(PropertyId::Transform);
+    auto& value = get(PropertyID::Transform);
     return Parser::parseTransform(value);
 }
 

@@ -257,9 +257,9 @@ poly1305.cpp
 poly1305.h
 polynomi.cpp
 polynomi.h
-ppc_power7.cpp
-ppc_power8.cpp
-ppc_power9.cpp
+power7_ppc.cpp
+power8_ppc.cpp
+power9_ppc.cpp
 ppc_simd.cpp
 ppc_simd.h
 pssr.cpp
@@ -587,6 +587,7 @@ TestPrograms/test_32bit.cpp
 TestPrograms/test_64bit.cpp
 TestPrograms/test_arm_acle_header.cpp
 TestPrograms/test_arm_aes.cpp
+TestPrograms/test_arm_armv7.cpp
 TestPrograms/test_arm_asimd.cpp
 TestPrograms/test_arm_crc.cpp
 TestPrograms/test_arm_neon.cpp

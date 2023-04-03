@@ -53,7 +53,6 @@
 #include "CCore.h"
 #include "CDebugView.h"
 #include "CChat.h"
-#include <DXHook/CDirect3DHookManager.h>
 #include <DXHook/CDirectInputHookManager.h>
 #include <DXHook/CDirect3DEvents9.h>
 #include <DXHook/CProxyDirectInput8.h>

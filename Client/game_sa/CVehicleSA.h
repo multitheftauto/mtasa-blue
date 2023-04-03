@@ -23,6 +23,7 @@
 #include "CAEVehicleAudioEntitySA.h"
 
 class CFxSystemSAInterface;
+class CTrainSAInterface;
 struct RwTexture;
 
 #define SIZEOF_CHELI                            2584
@@ -390,34 +391,34 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
     friend class CPoolsSA;
 
 private:
-    CDamageManagerSA*                m_pDamageManager;
-    CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity;
-    CHandlingEntrySA*                m_pHandlingData;
-    CFlyingHandlingEntrySA*          m_pFlyingHandlingData;
-    void*                            m_pSuspensionLines;
-    bool                             m_bIsDerailable;
-    unsigned char                    m_ucAlpha;
-    CVector                          m_vecGravity;
-    SharedUtil::SColor               m_HeadLightColor;
-    RwObject                         m_WheelObjects[4];
+    CDamageManagerSA*                m_pDamageManager{nullptr};
+    CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity{nullptr};
+    CHandlingEntrySA*                m_pHandlingData{nullptr};
+    CFlyingHandlingEntrySA*          m_pFlyingHandlingData{nullptr};
+    void*                            m_pSuspensionLines{nullptr};
+    bool                             m_bIsDerailable{true};
+    unsigned char                    m_ucAlpha{255};
+    CVector                          m_vecGravity{0.0f, 0.0f, -1.0f};
+    SharedUtil::SColor               m_HeadLightColor{SharedUtil::SColorRGBA{255, 255, 255, 255}};
     SharedUtil::SColor               m_RGBColors[4];
     SharedUtil::SColor               m_RGBColorsFixed[4];
     CDoorSA                          m_doors[6];
-    bool                             m_bSwingingDoorsAllowed;
+    bool                             m_bSwingingDoorsAllowed{false};
     SSirenInfo                       m_tSirenInfo;
     std::map<SString, SVehicleFrame> m_ExtraFrames;
     unsigned char                    m_ucVariant;
     unsigned char                    m_ucVariant2;
-    unsigned char                    m_ucVariantCount;
-    bool                             m_doorsUndamageable = false;
+    unsigned char                    m_ucVariantCount{0};
+    bool                             m_doorsUndamageable{false};
 
     std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
 
 public:
-    CVehicleSA();
-    CVehicleSA(CVehicleSAInterface* vehicleInterface);
-    CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CVehicleSA() = default;
     ~CVehicleSA();
+
+    CVehicleSAInterface* GetVehicleInterface() { return reinterpret_cast<CVehicleSAInterface*>(GetInterface()); }
+
     void Init();
 
     // CEntitySA interface
@@ -428,10 +429,10 @@ public:
 
     bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
 
-    CVehicleSAInterface* GetNextCarriageInTrain();
+    CTrainSAInterface*   GetNextCarriageInTrain();
     CVehicle*            GetNextTrainCarriage();
     void                 SetNextTrainCarriage(CVehicle* pNext);
-    CVehicleSAInterface* GetPreviousCarriageInTrain();
+    CTrainSAInterface*   GetPreviousCarriageInTrain();
     CVehicle*            GetPreviousTrainCarriage();
     void                 SetPreviousTrainCarriage(CVehicle* pPrevious);
     float                GetDistanceToCarriage(CVehicle* pCarriage);
@@ -612,8 +613,6 @@ public:
     void RecalculateHandling();
 
     void* GetPrivateSuspensionLines();
-
-    CVehicleSAInterface* GetVehicleInterface() { return (CVehicleSAInterface*)m_pInterface; }
 
     bool DoesVehicleHaveSirens() { return m_tSirenInfo.m_bOverrideSirens; }
 

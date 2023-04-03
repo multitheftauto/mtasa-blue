@@ -967,20 +967,24 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
     // Remove elements that do not match the criterias
     if (interior || dimension || typeHash)
     {
-        result.erase(std::remove_if(result.begin(), result.end(),
-                                    [&](CElement* pElement) {
-                                        if (typeHash && typeHash != pElement->GetTypeHash())
-                                            return true;
+        result.erase(std::remove_if(result.begin(), result.end(), [&, radiusSq = radius * radius](CElement* pElement) {
+            if (typeHash && typeHash != pElement->GetTypeHash())
+                return true;
 
-                                        if (interior.has_value() && interior != pElement->GetInterior())
-                                            return true;
+            if (interior.has_value() && interior != pElement->GetInterior())
+                return true;
 
-                                        if (dimension.has_value() && dimension != pElement->GetDimension())
-                                            return true;
+            if (dimension.has_value() && dimension != pElement->GetDimension())
+                return true;
 
-                                        return pElement->IsBeingDeleted();
-                                    }),
-                     result.end());
+            // Check if element is within the sphere, because the spatial database is 2D
+            CVector elementPos;
+            pElement->GetPosition(elementPos);
+            if ((elementPos - pos).LengthSquared() > radiusSq)
+                return true;
+
+            return pElement->IsBeingDeleted();
+        }), result.end());
     }
 
     return result;

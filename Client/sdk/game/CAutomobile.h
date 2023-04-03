@@ -21,13 +21,4 @@ class CAutomobile : public virtual CVehicle
 {
 public:
     virtual ~CAutomobile(){};
-
-    virtual bool  BurstTyre(DWORD dwTyreID) = 0;
-    virtual bool  BreakTowLink() = 0;
-    virtual bool  IsComponentPresent(int iComponentID) = 0;
-
-    virtual void       SetTowLink(CVehicle* pVehicle, bool bRemoveAdd) = 0;
-    virtual CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown) = 0;
-
-    virtual CDoor* GetDoor(eDoors doorID) = 0;
 };
