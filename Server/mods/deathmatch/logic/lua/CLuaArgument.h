@@ -22,6 +22,8 @@ extern "C"
 
 class CElement;
 class CLuaArguments;
+class CLuaMain;
+class CResource;
 
 #define LUA_TTABLEREF 9
 #define LUA_TSTRING_LONG 10
@@ -48,13 +50,15 @@ public:
     void ReadElementID(ElementID ID);
     void ReadScriptID(uint uiScriptID);
     void ReadTable(class CLuaArguments* table);
-
+    
     int GetType() const { return m_iType; };
 
     bool               GetBoolean() const { return m_bBoolean; };
     lua_Number         GetNumber() const { return m_Number; };
     const std::string& GetString() { return m_strString; };
     void*              GetUserData() const { return m_pUserData; };
+    CResource*         GetFunctionResource() const { return m_pResource; };
+    int                GetFunctionReference() const { return m_iFunctionRef; };
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
 
@@ -66,6 +70,9 @@ public:
 
     bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 
+    static int CallFunction(lua_State* luaVM);
+    static int CleanupFunction(lua_State* luaVM);
+
 private:
     void LogUnableToPacketize(const char* szMessage) const;
 
@@ -75,6 +82,8 @@ private:
     std::string    m_strString;
     void*          m_pUserData;
     CLuaArguments* m_pTableData;
+    CResource*     m_pResource;
+    int            m_iFunctionRef;
     bool           m_bWeakTableRef;
 
 #ifdef MTA_DEBUG
