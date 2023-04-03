@@ -64,6 +64,15 @@ void CLatentReceiver::OnReceiveError(const SString& strMessage)
 ///////////////////////////////////////////////////////////////
 void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
 {
+    struct SScopedGuardInsideMark
+    {
+        explicit SScopedGuardInsideMark(CLatentReceiver* pReceiver) noexcept : m_pReceiver(pReceiver) { pReceiver->m_bInside = true; }
+        ~SScopedGuardInsideMark() noexcept { m_pReceiver->m_bInside = false; }
+
+    private:
+        CLatentReceiver* m_pReceiver;
+    } const ScopedInsideMark(this);
+
     //
     // Read header
     //

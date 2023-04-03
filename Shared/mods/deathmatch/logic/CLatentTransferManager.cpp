@@ -86,13 +86,18 @@ void CLatentTransferManager::RemoveRemote(NetPlayerID remoteId)
 {
     CLatentSendQueue* pSendQueue = FindSendQueueForRemote(remoteId);
     CLatentReceiver*  pReceiver = FindReceiverForRemote(remoteId);
-
     ListRemove(m_SendQueueList, pSendQueue);
     MapRemove(m_SendQueueMap, remoteId);
-    MapRemove(m_ReceiverMap, remoteId);
 
     SAFE_DELETE(pSendQueue);
-    SAFE_DELETE(pReceiver);
+    
+    if (pReceiver->IsInside())
+        pReceiver->SetDeferredDelete();
+    else
+    {
+        MapRemove(m_ReceiverMap, remoteId);
+        SAFE_DELETE(pReceiver);
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -293,6 +298,12 @@ void CLatentTransferManager::OnReceive(NetPlayerID remoteId, NetBitStreamInterfa
 {
     CLatentReceiver* pReceiver = GetReceiverForRemote(remoteId, pBitStream->Version());
     pReceiver->OnReceive(pBitStream);
+
+    if (pReceiver->IsDeferredDelete())
+    {
+        MapRemove(m_ReceiverMap, remoteId);
+        SAFE_DELETE(pReceiver);
+    }
 }
 
 ///////////////////////////////////////////////////////////////

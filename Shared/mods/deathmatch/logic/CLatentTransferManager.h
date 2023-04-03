@@ -141,11 +141,15 @@ protected:
 ///////////////////////////////////////////////////////////////
 class CLatentReceiver
 {
+    friend struct SScopedGuardInsideMark;
 public:
     ZERO_ON_NEW
     CLatentReceiver(NetPlayerID remoteId, ushort usBitStreamVersion);
     ~CLatentReceiver();
     void OnReceive(NetBitStreamInterface* pBitStream);
+    bool IsInside() const { return m_bInside; }
+    bool IsDeferredDelete() const { return m_bDeferredDelete; }
+    void SetDeferredDelete() { m_bDeferredDelete = true; }
 
 protected:
     void OnReceiveError(const SString& strMessage);
@@ -153,6 +157,8 @@ protected:
     const NetPlayerID m_RemoteId;
     const ushort      m_usBitStreamVersion;
     SReceiveItem      activeRx;
+    bool              m_bInside{};
+    bool              m_bDeferredDelete{};
 };
 
 ///////////////////////////////////////////////////////////////
