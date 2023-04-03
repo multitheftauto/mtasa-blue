@@ -55,6 +55,8 @@ public:
     lua_Number     GetNumber() const { return m_Number; };
     const SString& GetString() { return m_strString; };
     void*          GetUserData() const { return m_pUserData; };
+    CResource*     GetFunctionResource() const { return m_pResource; };
+    int            GetFunctionReference() const { return m_iFunctionRef; };
     CClientEntity* GetElement() const;
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
@@ -62,6 +64,9 @@ public:
     json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     char*        WriteToString(char* szBuffer, int length);
+
+    static int CallFunction(lua_State* luaVM);
+    static int CleanupFunction(lua_State* luaVM);
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;
@@ -73,6 +78,8 @@ private:
     SString        m_strString;
     void*          m_pUserData;
     CLuaArguments* m_pTableData;
+    CResource*     m_pResource;
+    int            m_iFunctionRef;
     bool           m_bWeakTableRef;
 
 #ifdef MTA_DEBUG
