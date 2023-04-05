@@ -91,7 +91,7 @@ void CLatentTransferManager::RemoveRemote(NetPlayerID remoteId)
 
     SAFE_DELETE(pSendQueue);
     
-    if (pReceiver->IsInside())
+    if (pReceiver && pReceiver->IsInside())
         pReceiver->SetDeferredDelete();
     else
     {
