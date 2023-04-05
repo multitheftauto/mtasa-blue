@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-03-18 19:28+0000\n"
-"PO-Revision-Date: 2023-03-31 17:17\n"
+"PO-Revision-Date: 2023-04-05 21:39\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -234,7 +234,7 @@ msgstr "B - البديل NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr "Intel - cE العادي"
+msgstr "Intel - C العادي"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
@@ -546,7 +546,8 @@ msgstr "مجهول"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "هل تريد إنهاء العمليات التالية ومتابعة التحديث؟"
+msgstr "الملف '٪ s' مؤمن حالياً بواسطة عمليات٪ zu.\n\n"
+"هل تريد إنهاء العمليات التالية ومتابعة التحديث؟"
 
 #: Client/loader/Install.cpp:479
 #, c-format
