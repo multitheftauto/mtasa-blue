@@ -33,10 +33,10 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
     if (pAttackerSA)
         pAttackerInterface = pAttackerSA->GetPedInterface();
 
-    this->CreateTaskInterface(sizeof(CTaskSimpleChokingSAInterface));
+    CreateTaskInterface(sizeof(CTaskSimpleChokingSAInterface));
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     _asm
     {
         mov     ecx, dwThisInterface
@@ -50,32 +50,32 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
 
 CPed* CTaskSimpleChokingSA::GetAttacker()
 {
-    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     SClientEntity<CPedSA>*         pPedClientEntity = pGame->GetPools()->GetPed((DWORD*)internalInterface->m_pAttacker);
     return pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
 }
 
 unsigned int CTaskSimpleChokingSA::GetTimeRemaining()
 {
-    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_nTimeRemaining;
 }
 
 unsigned int CTaskSimpleChokingSA::GetTimeStarted()
 {
-    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_nTimeStarted;
 }
 
 bool CTaskSimpleChokingSA::IsTeargas()
 {
-    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_bIsTeargas ? true : false;
 }
 
 bool CTaskSimpleChokingSA::IsFinished()
 {
-    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)this->GetInterface();
+    CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_bIsFinished;
 }
 
@@ -97,7 +97,7 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
     }
 
     // Call the func
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CTaskSimpleChoking__UpdateChoke;
     _asm
     {

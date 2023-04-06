@@ -42,12 +42,12 @@ public:
 class CWeaponSA : public CWeapon
 {
 private:
-    CWeaponSAInterface* internalInterface;
-    CPed*               owner;
+    CWeaponSAInterface* m_pInterface;
+    CPed*               m_pOwner;
     eWeaponSlot         m_weaponSlot;
 
 public:
-    CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot);
+    CWeaponSA(CWeaponSAInterface* pInterface, CPed* pOwner, eWeaponSlot weaponSlot);
     eWeaponType  GetType();
     void         SetType(eWeaponType type);
     eWeaponState GetState();

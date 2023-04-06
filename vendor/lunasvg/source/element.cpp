@@ -4,7 +4,7 @@
 
 namespace lunasvg {
 
-void PropertyList::set(PropertyId id, const std::string& value, int specificity)
+void PropertyList::set(PropertyID id, const std::string& value, int specificity)
 {
     auto property = get(id);
     if(property == nullptr)
@@ -21,7 +21,7 @@ void PropertyList::set(PropertyId id, const std::string& value, int specificity)
     property->value = value;
 }
 
-Property* PropertyList::get(PropertyId id) const
+Property* PropertyList::get(PropertyID id) const
 {
     auto data = m_properties.data();
     auto end = data + m_properties.size();
@@ -59,19 +59,19 @@ std::unique_ptr<Node> TextNode::clone() const
     return std::move(node);
 }
 
-Element::Element(ElementId id)
+Element::Element(ElementID id)
     : id(id)
 {
 }
 
-void Element::set(PropertyId id, const std::string& value, int specificity)
+void Element::set(PropertyID id, const std::string& value, int specificity)
 {
     properties.set(id, value, specificity);
 }
 
 static const std::string EmptyString;
 
-const std::string& Element::get(PropertyId id) const
+const std::string& Element::get(PropertyID id) const
 {
     auto property = properties.get(id);
     if(property == nullptr)
@@ -82,7 +82,7 @@ const std::string& Element::get(PropertyId id) const
 
 static const std::string InheritString{"inherit"};
 
-const std::string& Element::find(PropertyId id) const
+const std::string& Element::find(PropertyID id) const
 {
     auto element = this;
     do {
@@ -95,12 +95,12 @@ const std::string& Element::find(PropertyId id) const
     return EmptyString;
 }
 
-bool Element::has(PropertyId id) const
+bool Element::has(PropertyID id) const
 {
     return properties.get(id);
 }
 
-Element* Element::previousSibling() const
+Element* Element::previousElement() const
 {
     if(parent == nullptr)
         return nullptr;
@@ -122,7 +122,7 @@ Element* Element::previousSibling() const
     return nullptr;
 }
 
-Element* Element::nextSibling() const
+Element* Element::nextElement() const
 {
     if(parent == nullptr)
         return nullptr;
@@ -162,15 +162,15 @@ Rect Element::currentViewport() const
     if(parent == nullptr)
     {
         auto element = static_cast<const SVGElement*>(this);
-        if(element->has(PropertyId::ViewBox))
+        if(element->has(PropertyID::ViewBox))
             return element->viewBox(); 
-        return Rect{0, 0, 512, 512};
+        return Rect{0, 0, 300, 150};
     }
 
-    if(parent->id == ElementId::Svg)
+    if(parent->id == ElementID::Svg)
     {
         auto element = static_cast<SVGElement*>(parent);
-        if(element->has(PropertyId::ViewBox))
+        if(element->has(PropertyID::ViewBox))
             return element->viewBox();
 
         LengthContext lengthContext(element);

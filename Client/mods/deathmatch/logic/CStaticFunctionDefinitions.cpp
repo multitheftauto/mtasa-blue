@@ -21,6 +21,7 @@
 #include <game/CHandlingManager.h>
 #include <game/CPlayerInfo.h>
 #include <game/CRopes.h>
+#include <game/CSettings.h>
 #include <game/CTaskManager.h>
 #include <game/CWanted.h>
 #include <game/CWeapon.h>
@@ -6581,6 +6582,7 @@ bool CStaticFunctionDefinitions::GetGarageBoundingBox(unsigned char ucGarageID, 
 
 bool CStaticFunctionDefinitions::SetBlurLevel(unsigned char ucLevel)
 {
+    g_pGame->GetSettings()->SetBlurControlledByScript(true);
     g_pGame->SetBlurLevel(ucLevel);
     return true;
 }

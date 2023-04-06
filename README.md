@@ -1,6 +1,6 @@
-## Multi Theft Auto: San Andreas 
+## Multi Theft Auto: San Andreas
 
-[![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Unique servers online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Fservers-shields.io.json)](https://community.multitheftauto.com/index.php?p=servers) [![Unique players online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Fplayers-shields.io.json)](https://multitheftauto.com) [![Unique players last 24 hours](https://img.shields.io/endpoint?url=https%3A%2F%2Fmtasa.com%2Fapi%2Funique-players-shields.io.json)](https://multitheftauto.com) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://discord.com/invite/mtasa) [![Crowdin](https://badges.crowdin.net/e/f5dba7b9aa6594139af737c85d81d3aa/localized.svg)](https://multitheftauto.crowdin.com/multitheftauto)
+[![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Unique servers online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fservers-shields.io.json)](https://community.multitheftauto.com/index.php?p=servers) [![Unique players online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fplayers-shields.io.json)](https://multitheftauto.com) [![Unique players last 24 hours](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Funique-players-shields.io.json)](https://multitheftauto.com) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://discord.com/invite/mtasa) [![Crowdin](https://badges.crowdin.net/e/f5dba7b9aa6594139af737c85d81d3aa/localized.svg)](https://multitheftauto.crowdin.com/multitheftauto)
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
@@ -27,13 +27,15 @@ Using a framework based on resources has a number of advantages. It allows conte
 Our project's code repository can be found on the [multitheftauto/mtasa-blue](https://github.com/multitheftauto/mtasa-blue/) Git repository at [GitHub](https://github.com/). We are always looking for new developers, so if you're interested, here are some useful links:
 
 * [Coding guidelines](https://github.com/multitheftauto/mtasa-blue/blob/master/CONTRIBUTING.md#contributors-guide)
-* [Nightly Builds](https://nightly.mtasa.com/)
+* [Nightly Builds](https://nightly.multitheftauto.com/)
 * [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
 ### IDE Setup
-If not using Visual Studio 2017, download and install the [EditorConfig](https://visualstudiogallery.msdn.microsoft.com/c8bccfe2-650c-4b42-bc5c-845e21f96328) plugin to automatically set up your IDE for the correct formatting.
+
+If not using Visual Studio 2017, download and install the [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfigTeam.EditorConfig) plugin to automatically set up your IDE for the correct formatting.
 
 ### Build Instructions
+
 #### Windows
 
 Prerequisites
@@ -98,30 +100,31 @@ $ docker pull ghcr.io/multitheftauto/mtasa-blue-build:latest
 ```
 
 | Architecture | Docker image tag | Required build-time CLI-arguments |
-| ------------ | ---------------- | ------------------------------- |
-| x86          | latest           | `-e BUILD_ARCHITECTURE=x86`     |
-| x86_64       | latest           |                                 |
-| arm          | armhf            |                                 |
-| arm64        | arm64            |                                 |
-
+| ------------ | ---------------- | --------------------------------- |
+| x86          | latest           | `-e BUILD_ARCHITECTURE=x86`       |
+| x86_64       | latest           |                                   |
+| arm          | armhf            |                                   |
+| arm64        | arm64            |                                   |
 
 **Building with Docker**
 
 These examples assume that your current directory is the mtasa-blue checkout directory. You should also know that `/build` is the code directory required by our Docker images inside the container. If the current directory is not a valid git repository, it instead create a (shallow) clone of the mtasa-blue repository. After compiling, you will find the resulting binaries in `./Bin`. To build the unoptimised debug build, add `-e BUILD_CONFIG=debug` to the docker run arguments.
 
-| Architecture | Build command                                                                                |
-| ------------ | -------------------------------------------------------------------------------------------- |
+| Architecture | Build command                                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------------------------------------- |
 | x86          | ``` docker run --rm -v `pwd`:/build -e BUILD_ARCHITECTURE=x86 ghcr.io/multitheftauto/mtasa-blue-build:latest ``` |
 | x86_64       | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest ```                           |
 | arm          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:armhf ```                            |
 | arm64        | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:arm64 ```                            |
 
 ### Premake FAQ
+
 #### How to add new C++ source files?
-Execute `win-create-projects.bat`.
+
+Execute `win-create-projects.bat`
 
 ## License
 
-Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the LICENSE file for more details.
+Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the [LICENSE](./LICENSE) file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997–2022.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997–2023.

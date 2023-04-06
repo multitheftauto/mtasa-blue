@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #pragma once
+
+#include <game/CTrain.h>
 #include "CVehicleSA.h"
 #include "CDoorSA.h"
 
@@ -102,3 +104,11 @@ public:
     RwFrame*                        m_aTrainNodes[eTrainNode::NUM_NODES];
 };
 static_assert(sizeof(CTrainSAInterface) == 0x6AC, "Invalid size for CTrainSAInterface");
+
+class CTrainSA final : public virtual CTrain, public virtual CVehicleSA
+{
+public:
+    CTrainSA(CTrainSAInterface* pInterface);
+
+    CTrainSAInterface* GetTrainInterface() { return reinterpret_cast<CTrainSAInterface*>(GetInterface()); }
+};

@@ -654,6 +654,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${EndIf}
         #############################################################
 
+        #############################################################
+        # Delete existing winmm.dll to prevent GTA process start conflicts
+        Delete "$INSTDIR\MTA\winmm.dll"
+        #############################################################
+
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
 
@@ -668,6 +673,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
         File "${FILES_ROOT}\mta\loader.dll"
+        File "${FILES_ROOT}\mta\mtasa.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
         File "${FILES_ROOT}\mta\libwow64.dll"
@@ -728,10 +734,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\d3dx9_42.dll"
             File "${FILES_ROOT}\mta\D3DCompiler_42.dll"
             File "${FILES_ROOT}\mta\sa.dat"
-            File "${FILES_ROOT}\mta\vea.dll"
-            File "${FILES_ROOT}\mta\vog.dll"
-            File "${FILES_ROOT}\mta\vvo.dll"
-            File "${FILES_ROOT}\mta\vvof.dll"
             File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
             File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
 
@@ -761,6 +763,24 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\skins\Lighter black\CGUI.lnf.xml"
             File "${FILES_ROOT}\skins\Lighter black\CGUI.png"
             File "${FILES_ROOT}\skins\Lighter black\CGUI.xml"
+
+            SetOutPath "$INSTDIR\skins\Default 2023"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.png"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.xml"
+
+            SetOutPath "$INSTDIR\skins\GWEN Blue"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.png"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.xml"
+
+            SetOutPath "$INSTDIR\skins\GWEN Orange"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.png"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.xml"
 
             SetOutPath "$INSTDIR\MTA\cgui"
             File "${FILES_ROOT}\mta\cgui\Falagard.xsd"
@@ -1124,14 +1144,16 @@ Section Uninstall
     Delete "$INSTDIR\MTA\*.bin"
 
     RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
-    ; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
+    ; Delete "$APPDATA\MTA San Andreas All" if "Common" is the only directory in it.
+    ${RmDirWithSingleChildDir} "$APPDATA\MTA San Andreas All" "Common"
 
     DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
     DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
     DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
     DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
     DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
-    ; TODO if HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common is the only one left, delete it
+    ; Delete "SOFTWARE\Multi Theft Auto: San Andreas All" if "Common" is the only one left.
+    ${RemoveRegistryGroupWithSingleKey} HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "Common"
 
     ${GameExplorer_RemoveGame} ${GUID}
 
@@ -2599,17 +2621,17 @@ FunctionEnd
 
 Function MTAInitFileNamesAndPaths
 	# Shortcuts names
-	StrCpy $ClientShortcutName "MTA San Andreas.lnk"
-	StrCpy $ServerShortcutName "MTA Server.lnk"
-	StrCpy $UninstallShortcutName "Uninstall MTA San Andreas.lnk"
+	StrCpy $ClientShortcutName "MTA San Andreas"
+	StrCpy $ServerShortcutName "MTA Server"
+	StrCpy $UninstallShortcutName "Uninstall MTA San Andreas"
 	# Shostcuts paths
 	StrCpy $StartMenuMTAFolderPath "$SMPROGRAMS\MTA San Andreas ${0.0}"
-	StrCpy $StartMenuClientShortcutPath "$StartMenuMTAFolderPath\$ClientShortcutName"
-	StrCpy $StartMenuServerShortcutPath "$StartMenuMTAFolderPath\$ServerShortcutName"
-	StrCpy $StartMenuUninstallShortcutPath "$StartMenuMTAFolderPath\$UninstallShortcutName"
+	StrCpy $StartMenuClientShortcutPath "$StartMenuMTAFolderPath\$ClientShortcutName.lnk"
+	StrCpy $StartMenuServerShortcutPath "$StartMenuMTAFolderPath\$ServerShortcutName.lnk"
+	StrCpy $StartMenuUninstallShortcutPath "$StartMenuMTAFolderPath\$UninstallShortcutName.lnk"
 	# Shortcut names for desktop and start menu are different and can't be safely unified.
 	# Obvious fix is to roll 1 update where all shortcuts will be deleted and replaced with a unified names.
-	StrCpy $DesktopClientShortcutPath "$DESKTOP\$ClientShortcutName${0.0}"
+	StrCpy $DesktopClientShortcutPath "$DESKTOP\$ClientShortcutName ${0.0}.lnk"
 	# Exe names
 	StrCpy $ClientExeName "Multi Theft Auto.exe"
 	StrCpy $ServerExeName "MTA Server.exe"

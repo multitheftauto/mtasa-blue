@@ -784,6 +784,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
     outStatus.settings.bHighDetailPeds = false;
+    outStatus.settings.bBlur = true;
     outStatus.settings.bCoronaReflections = false;
     outStatus.settings.bDynamicPedShadows = false;
 
@@ -797,6 +798,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("fov", outStatus.settings.fFieldOfView);
     CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
     CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
+    CVARS_GET("blur", outStatus.settings.bBlur);
     CVARS_GET("corona_reflections", outStatus.settings.bCoronaReflections);
     CVARS_GET("dynamic_ped_shadows", outStatus.settings.bDynamicPedShadows);
 
