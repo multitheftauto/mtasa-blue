@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 08:39+0000\n"
-"PO-Revision-Date: 2023-04-07 08:47\n"
+"POT-Creation-Date: 2023-04-07 13:51+0000\n"
+"PO-Revision-Date: 2023-04-07 14:08\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -86,7 +86,7 @@ msgstr "接続に失敗しました。無効なニックネームが記入され
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Client/loader/CInstallManager.cpp:564 Client/loader/CInstallManager.cpp:573
 #: Client/mods/deathmatch/logic/CClientGame.cpp:588
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
 #: Client/mods/deathmatch/logic/CClientGame.cpp:686
@@ -180,7 +180,7 @@ msgstr "無効なサーバーレスポンス (2)"
 msgid "Bad server response (1)"
 msgstr "無効なサーバー返答でした (1)"
 
-#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1057
+#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1069
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "%s ドライブスペースが不足しているため、MTA:SAは続行ことができません。"
@@ -1893,7 +1893,7 @@ msgstr "無効なニックネームです！ 設定でニックネームを変�
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
-#: Client/loader/MainFunctions.cpp:1220
+#: Client/loader/MainFunctions.cpp:1217
 msgid "Information"
 msgstr "情報"
 
@@ -2203,37 +2203,37 @@ msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directo
 msgstr ".asiファイルは「MTA:SA」や「GTA:SA」のインストールパスに検出されました。\n\n"
 "MTAと問題があったら、このファイルを消してください。"
 
-#: Client/loader/MainFunctions.cpp:1011
+#: Client/loader/MainFunctions.cpp:1008
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "ファイルバージョンミスマッチエラー。MTA:SAと問題があったら、再インストールしてください。\n"
 
-#: Client/loader/MainFunctions.cpp:1020
+#: Client/loader/MainFunctions.cpp:1017
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "ファイル不足。問題があったら、MTA:SAを再インストールをしてください。\n"
 
-#: Client/loader/MainFunctions.cpp:1032
+#: Client/loader/MainFunctions.cpp:1029
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SAは「セーフモード」で実行できません。\n\n"
 "パソコンを再起動してください。\n"
 
-#: Client/loader/MainFunctions.cpp:1124
+#: Client/loader/MainFunctions.cpp:1121
 msgid "Fix configuration issue"
 msgstr "設定問題を修正する"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1158
+#: Client/loader/MainFunctions.cpp:1155
 msgid "Fix elevation required error"
 msgstr "アドミン問題を修正する"
 
-#: Client/loader/MainFunctions.cpp:1165
+#: Client/loader/MainFunctions.cpp:1162
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "GTA：San Andreasが実行できませんでした。 再起動してください。この問題が続いたら、MTAを「www.multitheftauto.com. 」までに連絡してください。 \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1220
+#: Client/loader/MainFunctions.cpp:1217
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA：San Andreas が正しく実行しなかったかもしれません。終了しますか？"
 
@@ -2249,7 +2249,7 @@ msgstr "Grand Theft Auto San Andreas をスタートしてください"
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "GTA：San Andreasのインストールパスを選んでください"
 
-#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
+#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:373
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2321,93 +2321,93 @@ msgstr "MTA:SAをプレイ中にパソコンを再起動しましたか？"
 msgid "Please terminate the following programs before continuing:"
 msgstr "続ける前に、次のプログラムを閉じてください："
 
-#: Client/loader/CInstallManager.cpp:376
+#: Client/loader/CInstallManager.cpp:388
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SAは下記のタスクを完成することができませんでした\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:426
+#: Client/loader/CInstallManager.cpp:438
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "＊＊グラフィックドライバの影響でゲームがクラッシュしました＊＊\n\n"
 "＊＊グラフィックドライバをアップデートしてください＊＊"
 
-#: Client/loader/CInstallManager.cpp:532
+#: Client/loader/CInstallManager.cpp:544
 msgid "Install updated MTA:SA files"
 msgstr "アプデートしたMTA:SAファイルをインストールする"
 
-#: Client/loader/CInstallManager.cpp:552
+#: Client/loader/CInstallManager.cpp:564
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "他のプログラムの影響でアプデートすることができませんでした。他のプログラムを閉じて、もう一回試してみてください"
 
-#: Client/loader/CInstallManager.cpp:561
+#: Client/loader/CInstallManager.cpp:573
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "MTAは完全にインストールできませんでした。再インストールしてください。 %s"
 
-#: Client/loader/CInstallManager.cpp:613
+#: Client/loader/CInstallManager.cpp:625
 msgid "Create GTA:SA junctions"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:657
+#: Client/loader/CInstallManager.cpp:669
 msgid "MTA:SA cannot launch because copying a file failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+#: Client/loader/CInstallManager.cpp:675 Client/loader/CInstallManager.cpp:715
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:672
+#: Client/loader/CInstallManager.cpp:684
 msgid "Copy MTA:SA files"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+#: Client/loader/CInstallManager.cpp:707 Client/loader/CInstallManager.cpp:785
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:780
+#: Client/loader/CInstallManager.cpp:792
 msgid "Patch GTA:SA dependency"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:828
+#: Client/loader/CInstallManager.cpp:840
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:832
+#: Client/loader/CInstallManager.cpp:844
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:838
+#: Client/loader/CInstallManager.cpp:850
 msgid "Generate GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:853
+#: Client/loader/CInstallManager.cpp:865
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
+#: Client/loader/CInstallManager.cpp:872 Client/loader/CInstallManager.cpp:895
 msgid "Patch GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:876
+#: Client/loader/CInstallManager.cpp:888
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1113
+#: Client/loader/CInstallManager.cpp:1125
 msgid "Missing file:"
 msgstr "不足ファイル:"
 
-#: Client/loader/CInstallManager.cpp:1117
+#: Client/loader/CInstallManager.cpp:1129
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "もしMTAがロードを失敗したら、GTA:SAを再インストールをしてください"
 
-#: Client/loader/CInstallManager.cpp:1152
+#: Client/loader/CInstallManager.cpp:1164
 msgid "Update install settings"
 msgstr "アップデートインストール設定"
 
-#: Client/loader/CInstallManager.cpp:1291
+#: Client/loader/CInstallManager.cpp:1303
 msgid "Update compatibility settings"
 msgstr "互換性設定アップデート"
 
@@ -2430,11 +2430,11 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:850 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "アップデートインストール中。。。"
 
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:932 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "ファイルを抽出中。。。"
 
