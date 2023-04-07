@@ -811,7 +811,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
         SetOutPath "$INSTDIR\MTA\locale\"
         File /r "${FILES_ROOT}\mta\locale\*.png"
-        File /r "${FILES_ROOT}\mta\locale\*.po"
+        File /r "${FILES_ROOT}\mta\locale\*.pot"
 
         SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\Multi Theft Auto.exe"
