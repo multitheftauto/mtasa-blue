@@ -1204,6 +1204,9 @@ void CClientGame::DoPulses()
 
             // Initialize the game
             g_pCore->GetGame()->Initialize();
+
+            // Save default streamer buffer size in IMG manager
+            m_pManager->GetIMGManager()->InitDefaultBufferSize();
         }
 
         unsigned char ucError = g_pNet->GetConnectionError();

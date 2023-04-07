@@ -502,7 +502,7 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive()
 {
-    return pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks > 0;
+    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -753,7 +753,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfoFromModelId(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
     }
 }
 
@@ -1435,10 +1435,10 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
 
 void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 {
-    CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseModelID);
-    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
+    CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
+    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
 
-    pTargetModelStreamingInfo->Reset();
+    *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
@@ -1529,7 +1529,7 @@ void CModelInfoSA::DeallocateModel(void)
     }
 
     ppModelInfo[m_dwModelID] = nullptr;
-    pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
+    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
