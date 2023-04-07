@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 18:26+0000\n"
-"PO-Revision-Date: 2023-04-07 19:37\n"
+"POT-Creation-Date: 2023-04-07 19:51+0000\n"
+"PO-Revision-Date: 2023-04-07 20:47\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -76,7 +76,7 @@ msgstr "Kết nối thất bại. Tài khoản không hợp lệ!"
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
 #: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
 #: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
 #: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
@@ -180,116 +180,116 @@ msgstr "Phản hồi của server kém (2)"
 msgid "Bad server response (1)"
 msgstr "Phản hồi của server kém (1)"
 
-#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1069
+#: Client/core/CCore.cpp:763 Client/loader/CInstallManager.cpp:1069
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA không thể tiếp tục vì ổ đĩa %s không đủ bộ nhớ lưu trữ."
 
-#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Lỗi nghiêm trọng"
 
-#: Client/core/CCore.cpp:893
+#: Client/core/CCore.cpp:890
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "ĐỂ SỬA, XÓA TỆP NÀY:"
 
-#: Client/core/CCore.cpp:925
+#: Client/core/CCore.cpp:922
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s mô-đun không hợp lệ!"
 
-#: Client/core/CCore.cpp:1235
+#: Client/core/CCore.cpp:1227
 msgid "Error executing URL"
 msgstr "Lỗi thực thi URL"
 
-#: Client/core/CCore.cpp:1247
+#: Client/core/CCore.cpp:1239
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Lỗi khi chạy mod được chỉ ra ở command line ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1327
 msgid "this help screen"
 msgstr "màn hình trợ giúp này"
 
-#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
 msgid "exits the application"
 msgstr "thoát khỏi ứng dụng"
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1330
 msgid "shows the version"
 msgstr "hiển thị phiên bản"
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1331
 msgid "shows the time"
 msgstr "hiển thị thời gian"
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1332
 msgid "shows the hud"
 msgstr "hiển thị hud"
 
-#: Client/core/CCore.cpp:1341
+#: Client/core/CCore.cpp:1333
 msgid "shows all the binds"
 msgstr "hiển thị tất cả các phím"
 
-#: Client/core/CCore.cpp:1342
+#: Client/core/CCore.cpp:1334
 msgid "shows your serial"
 msgstr "hiển thị mã serial của bạn"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1343
 msgid "connects to a server (host port nick pass)"
 msgstr "kết nối đến một server (host port nick pass)"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1344
 msgid "connects to a previous server"
 msgstr "kết nối với server trước đó đã dùng"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1345
 msgid "binds a key (key control)"
 msgstr "gán một phím (điều khiển phím)"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1346
 msgid "unbinds a key (key)"
 msgstr "bỏ gán một key (key)"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1347
 msgid "copies the default gta controls"
 msgstr "Sao chép các phím điều khiển mặc định của gta"
 
-#: Client/core/CCore.cpp:1356
+#: Client/core/CCore.cpp:1348
 msgid "outputs a screenshot"
 msgstr "Xuất ra một ảnh chụp màn hình"
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1349
 msgid "immediately saves the config"
 msgstr "Lưu các thông tin tùy chỉnh ngay"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1351
 msgid "clears the debug view"
 msgstr "xóa các chế độ xem gỡ lỗi"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1352
 msgid "scrolls the chatbox upwards"
 msgstr "kéo khung trò chuyện lên"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1353
 msgid "scrolls the chatbox downwards"
 msgstr "kéo khung trò chuyện xuống"
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1354
 msgid "scrolls the debug view upwards"
 msgstr "kéo khung xem debug lên"
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1355
 msgid "scrolls the debug view downwards"
 msgstr "kéo khung xem debug xuống"
 
-#: Client/core/CCore.cpp:1366
+#: Client/core/CCore.cpp:1358
 msgid "shows the memory statistics"
 msgstr "hiển thị thống kê bộ nhớ"
 
-#: Client/core/CCore.cpp:1367
+#: Client/core/CCore.cpp:1359
 msgid "shows the frame timing graph"
 msgstr "hiển thị biểu đồ khung thời gian"
 
@@ -1626,7 +1626,16 @@ msgid "\n\n"
 msgstr "\n\n"
 "Đang chờ phản hồi  -  %-3d"
 
-#: Client/core/CScreenShot.cpp:53
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Ảnh chụp màn hình có dung lượng %d bytes, nhưng yêu cầu phải đạt %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Lỗi! không thể chụp màn hình"
+
+#: Client/core/CScreenShot.cpp:160
 #, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "Ảnh đã được chụp: '%s'"
@@ -2032,15 +2041,6 @@ msgid "Could not initialize Direct3D9.\n\n"
 msgstr "Không thể thiết lập Direct3D9.\n\n"
 "Hãy chắc chắn rằng DirectX End-User Runtime và\n"
 "bản Windows Service Packs mới nhất đã được cài đặt."
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ảnh chụp màn hình có dung lượng %d bytes, nhưng yêu cầu phải đạt %d"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Lỗi! không thể chụp màn hình"
 
 #: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
