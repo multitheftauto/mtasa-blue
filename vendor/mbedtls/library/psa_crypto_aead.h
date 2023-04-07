@@ -71,10 +71,10 @@
  * \retval #PSA_SUCCESS Success.
  * \retval #PSA_ERROR_NOT_SUPPORTED
  *         \p alg is not supported.
- * \retval #PSA_ERROR_INSUFFICIENT_MEMORY
+ * \retval #PSA_ERROR_INSUFFICIENT_MEMORY \emptydescription
  * \retval #PSA_ERROR_BUFFER_TOO_SMALL
  *         ciphertext_size is too small.
- * \retval #PSA_ERROR_CORRUPTION_DETECTED
+ * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  */
 psa_status_t mbedtls_psa_aead_encrypt(
     const psa_key_attributes_t *attributes,
@@ -83,7 +83,7 @@ psa_status_t mbedtls_psa_aead_encrypt(
     const uint8_t *nonce, size_t nonce_length,
     const uint8_t *additional_data, size_t additional_data_length,
     const uint8_t *plaintext, size_t plaintext_length,
-    uint8_t *ciphertext, size_t ciphertext_size, size_t *ciphertext_length );
+    uint8_t *ciphertext, size_t ciphertext_size, size_t *ciphertext_length);
 
 /**
  * \brief Process an authenticated decryption operation.
@@ -134,10 +134,10 @@ psa_status_t mbedtls_psa_aead_encrypt(
  *         The cipher is not authentic.
  * \retval #PSA_ERROR_NOT_SUPPORTED
  *         \p alg is not supported.
- * \retval #PSA_ERROR_INSUFFICIENT_MEMORY
+ * \retval #PSA_ERROR_INSUFFICIENT_MEMORY \emptydescription
  * \retval #PSA_ERROR_BUFFER_TOO_SMALL
  *         plaintext_size is too small.
- * \retval #PSA_ERROR_CORRUPTION_DETECTED
+ * \retval #PSA_ERROR_CORRUPTION_DETECTED \emptydescription
  */
 psa_status_t mbedtls_psa_aead_decrypt(
     const psa_key_attributes_t *attributes,
@@ -146,6 +146,6 @@ psa_status_t mbedtls_psa_aead_decrypt(
     const uint8_t *nonce, size_t nonce_length,
     const uint8_t *additional_data, size_t additional_data_length,
     const uint8_t *ciphertext, size_t ciphertext_length,
-    uint8_t *plaintext, size_t plaintext_size, size_t *plaintext_length );
+    uint8_t *plaintext, size_t plaintext_size, size_t *plaintext_length);
 
-#endif /* PSA_CRYPTO_AEAD */
+#endif /* PSA_CRYPTO_AEAD_H */
