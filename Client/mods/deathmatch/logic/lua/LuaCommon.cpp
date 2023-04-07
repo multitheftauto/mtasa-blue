@@ -279,7 +279,7 @@ void lua_getclass(lua_State* luaVM, const char* szName)
     lua_pushstring(luaVM, szName);            // mt, class name
     lua_rawget(luaVM, -2);                    // mt, class
 
-    lua_remove(luaVM, -2);            // class
+    lua_remove(luaVM, -2);                    // class
 }
 
 void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParent)
@@ -295,7 +295,7 @@ void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParen
 
         lua_setfield(luaVM, -3, "__parent");            // class table, mt table
 
-        lua_pop(luaVM, 1);            // class table
+        lua_pop(luaVM, 1);                              // class table
     }
 
     lua_pushstring(luaVM, "mt");

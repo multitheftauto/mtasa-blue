@@ -1739,7 +1739,7 @@ void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int i
 void CMultiplayerSA::SetHeatHaze(const SHeatHazeSettings& settings)
 {
     if (settings.ucIntensity != 0)
-        DoSetHeatHazePokes(settings, 0, 24, 1.0f, 1.0f, false);            // 24 hrs
+        DoSetHeatHazePokes(settings, 0, 24, 1.0f, 1.0f, false);             // 24 hrs
     else
         DoSetHeatHazePokes(settings, 38, 39, 1.0f, 1.0f, false);            // 0 hrs
 
@@ -4089,7 +4089,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
     }
     else if (ucTrafficLightState == 9)
     {
-        ucDesignatedLightState = 4;            // Off
+        ucDesignatedLightState = 4;             // Off
     }
     else ucDesignatedLightState = 2;            // Red
 
@@ -4118,7 +4118,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
     }
     else if (ucTrafficLightState == 9)
     {
-        ucDesignatedLightState = 4;            // Off
+        ucDesignatedLightState = 4;             // Off
     }
     else ucDesignatedLightState = 2;            // Red
 
@@ -4141,8 +4141,14 @@ void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
     {
         ucDesignatedLightState = 0;
     }
-    else if (ucTrafficLightState == 9) { ucDesignatedLightState = 1; }
-    else { ucDesignatedLightState = 2; }
+    else if (ucTrafficLightState == 9)
+    {
+        ucDesignatedLightState = 1;
+    }
+    else
+    {
+        ucDesignatedLightState = 2;
+    }
 
     _asm
     {
@@ -6374,7 +6380,7 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill()
         mov pHeliKiller, esi
         mov pHitByHeli, edi
     }
-    // Call our event
+    //   Call our event
     if (CallHeliKillEvent() == false)
     {
         _asm
@@ -6561,7 +6567,7 @@ void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
     {
         mov     pDamagedObject, esi
     }
-    // we can't get attacker from here
+    //   we can't get attacker from here
     pObjectAttacker = NULL;
 
     if (TriggerObjectBreakEvent())
@@ -7014,16 +7020,13 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
 {
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
     CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
-    if (pVehicle) {
+    if (pVehicle)
+    {
         SColor colors[4];
         pVehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
 
-        RwColor color = {
-            colors[0].R * pVehicleInterface->m_fLighting,
-            colors[0].G * pVehicleInterface->m_fLighting,
-            colors[0].B * pVehicleInterface->m_fLighting,
-            0xFF
-        };
+        RwColor color = {colors[0].R * pVehicleInterface->m_fLighting, colors[0].G * pVehicleInterface->m_fLighting,
+                         colors[0].B * pVehicleInterface->m_fLighting, 0xFF};
 
         // Fx_c::AddDebris
         ((void(__thiscall*)(int, CVector&, RwColor&, float, int))0x49F750)(CLASS_CFx, vecPosition, color, 0.06f, count / 100 + 1);

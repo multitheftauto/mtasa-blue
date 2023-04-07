@@ -1483,7 +1483,7 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
             szCmdLine = afterPath;
         }
     }
-    
+
     char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 

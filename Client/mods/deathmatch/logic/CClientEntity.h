@@ -19,7 +19,7 @@ class CClientEntity;
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+// #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
 class CClientManager;
 
@@ -91,7 +91,7 @@ class CLuaMain;
 class CMapEventManager;
 typedef CFastList<CClientEntity*> CChildListType;
 
-typedef std::vector<CClientEntity*> CElementListSnapshot;
+typedef std::vector<CClientEntity*>           CElementListSnapshot;
 typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 enum eCClientEntityClassTypes

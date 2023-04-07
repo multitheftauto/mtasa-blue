@@ -949,12 +949,14 @@ SString SharedUtil::MakeGenericPath(const SString& uniqueFilePath)
 SString SharedUtil::ConformPathForSorting(const SString& strPathFilename)
 {
     SString strResult = strPathFilename;
-    std::transform(strResult.begin(), strResult.end(), strResult.begin(), [](int c) {
-        // Ignores locale and always does this:
-        if (c >= 'A' && c <= 'Z')
-            c = c - 'A' + 'a';
-        return c;
-    });
+    std::transform(strResult.begin(), strResult.end(), strResult.begin(),
+                   [](int c)
+                   {
+                       // Ignores locale and always does this:
+                       if (c >= 'A' && c <= 'Z')
+                           c = c - 'A' + 'a';
+                       return c;
+                   });
     return strResult;
 }
 

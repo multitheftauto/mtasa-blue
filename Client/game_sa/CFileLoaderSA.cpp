@@ -54,16 +54,18 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 {
     const auto nodeNameLen = strlen(nodeName);
 
-    const auto NodeNameEndsWith = [=](const char* with) {
+    const auto NodeNameEndsWith = [=](const char* with)
+    {
         const auto withLen = strlen(with);
-        //dassert(withLen <= nodeNameLen);
+        // dassert(withLen <= nodeNameLen);
         return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
                && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
     };
 
     // Copy `nodeName` into `outName` with `off` trimmed from the end
     // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
-    const auto TerminatedCopy = [&](size_t off) {
+    const auto TerminatedCopy = [&](size_t off)
+    {
         dassert(nodeNameLen - off < OutBuffSize);
         strncpy_s(outName, nodeName,
                   std::min(nodeNameLen - off, OutBuffSize - 1));            // By providing `OutBuffSize - 1` it is ensured the array will be null terminated

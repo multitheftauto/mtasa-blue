@@ -15,7 +15,7 @@
 #include <game/CFxSystem.h>
 #include <game/RenderWare.h>
 
-#define FUNC_FxSystem_c__PlayAndKill            		0x4AA3D0
+#define FUNC_FxSystem_c__PlayAndKill                    0x4AA3D0
 #define VAR_FxSystemUpdateCullDistMultiplier            0x4AB032
 #define VAR_FxCreateParticleCullDistMultiplierA         0x4A4247
 #define VAR_FxCreateParticleCullDistMultiplierB         0x4A4255

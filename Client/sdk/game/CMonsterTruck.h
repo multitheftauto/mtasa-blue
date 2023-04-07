@@ -16,5 +16,5 @@
 class CMonsterTruck : public virtual CAutomobile
 {
 public:
-	virtual ~CMonsterTruck(){};
+    virtual ~CMonsterTruck(){};
 };

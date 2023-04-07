@@ -437,7 +437,7 @@ enum
     CURRENT_WEAPON_SKILL,
     WEAPON_SKILLS,
 
-    PILOT_RANKING,            // 330
+    PILOT_RANKING,               // 330
 
     STRONGEST_GANG_1,            // 331
     STRONGEST_GANG_2,
@@ -472,7 +472,7 @@ enum
     STAT_INC_BOAT_SKILL,
     STAT_INC_BODY_MUSCLE,
     STAT_INC_BREATH_UNDERWATER,
-    STAT_INC_MAX_HEALTH,            // 11
+    STAT_INC_MAX_HEALTH,              // 11
 
     STAT_INC_PISTOL_SKILL,            // 12
     STAT_INC_PISTOL_SILENCED_SKILL,
@@ -486,11 +486,11 @@ enum
     STAT_INC_M4_SKILL,
     STAT_INC_SNIPERRIFLE_SKILL,            // 22
 
-    STAT_DEC_FAT,            // 23
+    STAT_DEC_FAT,                          // 23
     STAT_DEC_BODY_MUSCLE,
-    STAT_DEC_MAX_HEALTH,            // 25
+    STAT_DEC_MAX_HEALTH,                   // 25
 
-    STAT_EXERCISE_RATE_CYCLE,            // 26
+    STAT_EXERCISE_RATE_CYCLE,              // 26
     STAT_EXERCISE_RATE_CYCLE_SPRINT,
     STAT_EXERCISE_RATE_SWIM,
     STAT_EXERCISE_RATE_SWIM_SPRINT,

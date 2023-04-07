@@ -123,7 +123,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
-        bool bReturn = 0;
+        bool  bReturn = 0;
         _asm
         {
             push    dwModelID

@@ -80,7 +80,8 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
         MemSetFast((void*)VAR_CVehicle_Variation2, ucVariation2, 1);
 
         // CCarCtrl::CreateCarForScript
-        CVehicleSAInterface* pInterface = ((CVehicleSAInterface*(__cdecl*)(int, CVector, unsigned char))FUNC_CCarCtrlCreateCarForScript)(eVehicleType, CVector(0, 0, 0), 0);
+        CVehicleSAInterface* pInterface =
+            ((CVehicleSAInterface * (__cdecl*)(int, CVector, unsigned char)) FUNC_CCarCtrlCreateCarForScript)(eVehicleType, CVector(0, 0, 0), 0);
 
         auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
 
@@ -659,7 +660,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
     if (trainHead)
     {
         trainHead->SetMoveSpeed(&vec);
-    } 
+    }
 
     return trainHead;
 }
@@ -772,9 +773,9 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case COL_MODEL_POOL:
             return 10150;            // Modded to 12000  @ CGameSA.cpp
         case TASK_POOL:
-            return 500;            // Modded to 5000   @ CGameSA.cpp
+            return 500;              // Modded to 5000   @ CGameSA.cpp
         case EVENT_POOL:
-            return 200;            // Modded to 5000   @ CGameSA.cpp
+            return 200;              // Modded to 5000   @ CGameSA.cpp
         case TASK_ALLOCATOR_POOL:
             return 16;
         case PED_INTELLIGENCE_POOL:
