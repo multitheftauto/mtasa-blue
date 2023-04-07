@@ -263,3 +263,8 @@ project "mbedtls"
 
 	filter "system:windows"
 		links { "ws2_32" }
+
+	filter "architecture:not x86"
+		undefines {
+			"MBEDTLS_AESNI_C"
+		}
