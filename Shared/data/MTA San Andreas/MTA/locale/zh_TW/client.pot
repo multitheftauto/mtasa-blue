@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 13:51+0000\n"
-"PO-Revision-Date: 2023-04-07 16:08\n"
+"POT-Creation-Date: 2023-04-07 18:26+0000\n"
+"PO-Revision-Date: 2023-04-07 19:37\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -95,9 +95,9 @@ msgstr "連線失敗。無效的匿名ID!"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1104
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1114
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -132,37 +132,37 @@ msgid "Connection timed out"
 msgstr "連線已逾時"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
 msgid "Disconnected: unknown protocol error"
 msgstr "連線中斷: 未知的協定錯誤"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1235
 msgid "Disconnected: disconnected remotely"
 msgstr "連線中斷: 遠程連線中斷"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1239
 msgid "Disconnected: connection lost remotely"
 msgstr "連線中斷: 伺服器連線中斷"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
 msgid "Disconnected: you are banned from this server"
 msgstr "連線中斷: 你已經被封鎖禁止進入該伺服器"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
 msgid "Disconnected: disconnected from the server"
 msgstr "連線中斷: 伺服器連線中斷"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1255
 msgid "Disconnected: connection to the server was lost"
 msgstr "連線中斷: 與伺服器的連線已遺失"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1263
 msgid "Disconnected: connection was refused"
 msgstr "連線中斷: 連線已被拒絕"
 
@@ -2773,19 +2773,19 @@ msgstr "連線到伺服器時發生錯誤。"
 msgid "Connecting to local server timed out. See console for details."
 msgstr "連線到本地伺服器逾時，請查看控制台以詳細了解。"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
 msgid "Connection with the server was lost"
 msgstr "與伺服器的連線已遺失"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 msgid "Disconnected: the server is currently full"
 msgstr "連線中斷: 該伺服器目前滿人"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1259
 msgid "Disconnected: invalid password specified"
 msgstr "連線中斷: 指定的密碼無效"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 msgid "MTA Client verification failed!"
 msgstr "MTA 客戶端驗證失敗"
 
