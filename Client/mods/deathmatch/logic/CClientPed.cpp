@@ -537,21 +537,17 @@ void CClientPed::SetPosition(const CVector& vecPosition, bool bResetInterpolatio
         // Don't set the actual position if we're in a vehicle
         if (!GetRealOccupiedVehicle())
         {
-            // Set it only if we're not in a vehicle or not working on getting in/out
-            if (!m_pOccupiedVehicle || GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT)
+            // Is this the local player?
+            if (m_bIsLocalPlayer)
             {
-                // Is this the local player?
-                if (m_bIsLocalPlayer)
-                {
-                    // If move is big enough, do ground checks
-                    float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
-                    if (DistanceMoved > 50 && !IsFrozen() && bAllowGroundLoadFreeze)
-                        SetFrozenWaitingForGroundToLoad(true);
-                }
-
-                // Set the real position
-                m_pPlayerPed->SetPosition(const_cast<CVector*>(&vecPosition));
+                // If move is big enough, do ground checks
+                float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
+                if (DistanceMoved > 50 && !IsFrozen() && bAllowGroundLoadFreeze)
+                    SetFrozenWaitingForGroundToLoad(true);
             }
+
+            // Set the real position
+            m_pPlayerPed->SetPosition(const_cast<CVector*>(&vecPosition));
         }
     }
 
