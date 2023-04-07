@@ -1036,7 +1036,7 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
         if (!pColModel)
         {
             // Crash will occur at offset 00134134
-            CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfoFromModelId(usModelId);
+            CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfo(usModelId);
             SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
                                        pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel,
                                        pStreamingInfo->flg, pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks,
