@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-07 19:51+0000\n"
-"PO-Revision-Date: 2023-04-07 20:46\n"
+"PO-Revision-Date: 2023-04-07 23:06\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1814,7 +1814,7 @@ msgstr "البحث عن خوادم"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:453
 msgid "Name"
-msgstr "الأسم"
+msgstr "الاسم"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:454
 msgid "Players"
