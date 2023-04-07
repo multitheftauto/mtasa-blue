@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 13:51+0000\n"
-"PO-Revision-Date: 2023-04-07 16:08\n"
+"POT-Creation-Date: 2023-04-07 18:26+0000\n"
+"PO-Revision-Date: 2023-04-07 19:37\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -95,9 +95,9 @@ msgstr "Kết nối thất bại. Tài khoản không hợp lệ!"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1104
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1114
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -132,37 +132,37 @@ msgid "Connection timed out"
 msgstr "Hết thời gian kết nối"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
 msgid "Disconnected: unknown protocol error"
 msgstr "Ngắt kết nối: giao thức không hợp lệ"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1235
 msgid "Disconnected: disconnected remotely"
 msgstr "Ngắt kết nối: ngắt kết nối từ xa"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1239
 msgid "Disconnected: connection lost remotely"
 msgstr "Ngắt kết nối: mất kết nối từ xa"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
 msgid "Disconnected: you are banned from this server"
 msgstr "Ngắt kết nối: bạn bị cấm khỏi server này"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
 msgid "Disconnected: disconnected from the server"
 msgstr "Ngắt kết nối: ngắt kết nối khỏi server"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1255
 msgid "Disconnected: connection to the server was lost"
 msgstr "Đã ngắt kết nối: không thể kết nối đến server"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1263
 msgid "Disconnected: connection was refused"
 msgstr "Đã ngắt kết nối: kết nối đã bị từ chối"
 
@@ -2767,19 +2767,19 @@ msgstr "Lỗi khi kết nối đến server."
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Hết thời gian kết nối đến server cục bộ. Xem console để biết thêm thông tin."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
 msgid "Connection with the server was lost"
 msgstr "Không thể kết nối đến server"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 msgid "Disconnected: the server is currently full"
 msgstr "Đã ngắt kết nối: server hiện đã đầy người chơi"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1259
 msgid "Disconnected: invalid password specified"
 msgstr "Đã ngắt kết nối: mật khẩu không hợp lệ được chỉ định"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 msgid "MTA Client verification failed!"
 msgstr "Không thể xác minh Client MTA!"
 
