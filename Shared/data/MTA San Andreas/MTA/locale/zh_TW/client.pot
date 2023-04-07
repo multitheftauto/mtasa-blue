@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 18:26+0000\n"
-"PO-Revision-Date: 2023-04-07 19:37\n"
+"POT-Creation-Date: 2023-04-07 19:51+0000\n"
+"PO-Revision-Date: 2023-04-07 20:47\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -76,7 +76,7 @@ msgstr "連線失敗。無效的匿名ID!"
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
 #: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
 #: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
 #: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
@@ -180,116 +180,116 @@ msgstr "不當的伺服器回應 (2)"
 msgid "Bad server response (1)"
 msgstr "不當的伺服器回應 (1)"
 
-#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1069
+#: Client/core/CCore.cpp:763 Client/loader/CInstallManager.cpp:1069
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTASA不能繼續,因為磁碟機 %s 空間不足"
 
-#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "嚴重的錯誤"
 
-#: Client/core/CCore.cpp:893
+#: Client/core/CCore.cpp:890
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "為了修復問題，請移除該檔案："
 
-#: Client/core/CCore.cpp:925
+#: Client/core/CCore.cpp:922
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s 模組不正確！"
 
-#: Client/core/CCore.cpp:1235
+#: Client/core/CCore.cpp:1227
 msgid "Error executing URL"
 msgstr "執行網址時發生錯誤"
 
-#: Client/core/CCore.cpp:1247
+#: Client/core/CCore.cpp:1239
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "於運行模組發生錯誤，命令列 ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1327
 msgid "this help screen"
 msgstr "這個說明畫面"
 
-#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
 msgid "exits the application"
 msgstr "退出應用程式"
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1330
 msgid "shows the version"
 msgstr "顯示版本"
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1331
 msgid "shows the time"
 msgstr "顯示時間"
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1332
 msgid "shows the hud"
 msgstr "顯示 Hud"
 
-#: Client/core/CCore.cpp:1341
+#: Client/core/CCore.cpp:1333
 msgid "shows all the binds"
 msgstr "顯示所有綁定設置"
 
-#: Client/core/CCore.cpp:1342
+#: Client/core/CCore.cpp:1334
 msgid "shows your serial"
 msgstr "顯示你的序列"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1343
 msgid "connects to a server (host port nick pass)"
 msgstr "連線到一個伺服器 (伺服器 埠口 暱稱 密碼)"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1344
 msgid "connects to a previous server"
 msgstr "連線到前一次登入過的伺服器"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1345
 msgid "binds a key (key control)"
 msgstr "綁定一個按鍵 (控制鍵)"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1346
 msgid "unbinds a key (key)"
 msgstr "解除綁定按鍵 (按鍵)"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1347
 msgid "copies the default gta controls"
 msgstr "複製預設的GTA控制"
 
-#: Client/core/CCore.cpp:1356
+#: Client/core/CCore.cpp:1348
 msgid "outputs a screenshot"
 msgstr "輸出截圖"
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1349
 msgid "immediately saves the config"
 msgstr "立刻地儲存配置"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1351
 msgid "clears the debug view"
 msgstr "清除除錯視圖"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1352
 msgid "scrolls the chatbox upwards"
 msgstr "把對話框向上移"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1353
 msgid "scrolls the chatbox downwards"
 msgstr "把對話框向下移"
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1354
 msgid "scrolls the debug view upwards"
 msgstr "把除錯視圖向上移"
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1355
 msgid "scrolls the debug view downwards"
 msgstr "把除錯視圖向下移"
 
-#: Client/core/CCore.cpp:1366
+#: Client/core/CCore.cpp:1358
 msgid "shows the memory statistics"
 msgstr "顯示記憶體狀態"
 
-#: Client/core/CCore.cpp:1367
+#: Client/core/CCore.cpp:1359
 msgid "shows the frame timing graph"
 msgstr "顯示每秒幀數時間圖"
 
@@ -1631,7 +1631,16 @@ msgid "\n\n"
 msgstr "\n\n"
 "等待回應中  -  %-3d"
 
-#: Client/core/CScreenShot.cpp:53
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "截圖包含%d 個字節，但預期為 %d 字節"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "截圖失敗"
+
+#: Client/core/CScreenShot.cpp:160
 #, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "螢幕截圖已拍攝: '%s'"
@@ -2037,15 +2046,6 @@ msgid "Could not initialize Direct3D9.\n\n"
 msgstr "無法初始化 Direct3D9。\n\n"
 "請確保DirectX End-User Runtime 及\n"
 "最新的Windows 安全性更新是否已正確安裝。"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "截圖包含%d 個字節，但預期為 %d 字節"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "截圖失敗"
 
 #: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
