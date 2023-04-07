@@ -23,6 +23,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementByID", GetElementByID},
         {"getElementByIndex", GetElementByIndex},
         {"getElementData", GetElementData},
+        {"getAllElementData", ArgumentParserWarn<false, GetAllElementData>},
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
@@ -165,6 +166,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getAttachedTo", "getElementAttachedTo");
     lua_classfunction(luaVM, "getAttachedOffsets", "getElementAttachedOffsets");
     lua_classfunction(luaVM, "getData", "getElementData");
+    lua_classfunction(luaVM, "getAllData", "getAllElementData");
 
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setData", "setElementData");
