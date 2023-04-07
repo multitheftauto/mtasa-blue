@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-10 16:36+0000\n"
+"PO-Revision-Date: 2022-09-24 16:37\n"
+"Last-Translator: \n"
+"Language-Team: Chinese Traditional\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: zh-TW\n"
+"X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/main_menu.pot\n"
+"X-Crowdin-File-ID: 223\n"
+
+#. Found in the main menu navigation
+msgid "Quick connect"
+msgstr "快速連線"
+
+#. Found in the main menu navigation
+msgid "Disconnect"
+msgstr "離開伺服器"
+
+#. Found in the main menu navigation
+msgid "Server browser"
+msgstr "瀏覽伺服器"
+
+#. Found in the main menu navigation
+msgid "Host game"
+msgstr "本機伺服器"
+
+#. Found in the main menu navigation
+msgid "Map editor"
+msgstr "地圖編輯器"
+
+#. Found in the main menu navigation
+msgid "Settings"
+msgstr "設定"
+
+#. Found in the main menu navigation
+msgid "About"
+msgstr "關於"
+
+#. Found in the main menu navigation
+msgid "Quit"
+msgstr "退出"
+
+#. Found in the main menu above the news listing
+msgid "The Latest News"
+msgstr "最新消息"
+

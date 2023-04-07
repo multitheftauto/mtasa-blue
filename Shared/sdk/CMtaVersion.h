@@ -26,7 +26,7 @@ namespace SharedUtil
         CMtaVersion(const std::string& strString) : std::string(strString) {}
 
         // Assignment like SString
-                    operator const char*() const { return c_str(); }            // Auto assign to const char* without using c_str()
+        operator const char*() const { return c_str(); }            // Auto assign to const char* without using c_str()
         const char* operator*() const { return c_str(); }
 
         // Compare disregarding build type

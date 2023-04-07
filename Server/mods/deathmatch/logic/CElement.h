@@ -22,7 +22,7 @@
 #include "CElementGroup.h"
 
 // Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+// #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
 #define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
@@ -46,7 +46,7 @@ class CLuaMain;
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
-typedef std::vector<CElement*> CElementListSnapshot;
+typedef std::vector<CElement*>                CElementListSnapshot;
 typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 class CElement

@@ -31,7 +31,7 @@ public:
     SString              GetTranslators();
     std::vector<SString> GetAvailableLocales();
     bool                 IsLocalized();
-    SString              GetLanguageDirectory();
+    SString              GetLanguageDirectory(CLanguage* pLanguage = nullptr);
     SString              GetLanguageCode();
     SString              GetLanguageName();
     SString              ValidateLocale(SString strLocale);

@@ -206,8 +206,8 @@ public:
     SString strMap;                       // Map name
     SString strEndpoint;                  // IP:port as a string
 
-    int    m_iBuildType;              // 9=release
-    int    m_iBuildNumber;            // 00000 and up
+    int    m_iBuildType;                  // 9=release
+    int    m_iBuildNumber;                // 00000 and up
     ushort m_usHttpPort;
     uchar  m_ucSpecialFlags;
 

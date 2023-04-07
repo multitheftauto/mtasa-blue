@@ -245,10 +245,10 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
         else
             // Attempt to read the content, if we fail, delete the packet again
             if (!pTemp->Read(BitStream))
-        {
-            delete pTemp;
-            pTemp = NULL;
-        }
+            {
+                delete pTemp;
+                pTemp = NULL;
+            }
     }
 
     // Return the class
