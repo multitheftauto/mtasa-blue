@@ -416,16 +416,19 @@ bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
     bool                     wasBindFound = false;
     std::list<CCommandBind*> processedCommandBinds;
 
-    auto wasCommandBindProcessed = [&processedCommandBinds](CCommandBind* commandBind) {
-        auto iter = std::find_if(processedCommandBinds.begin(), processedCommandBinds.end(), [&](CCommandBind* processedCommandBind) {
-            if (processedCommandBind->triggerState != commandBind->triggerState)
-                return false;
+    auto wasCommandBindProcessed = [&processedCommandBinds](CCommandBind* commandBind)
+    {
+        auto iter = std::find_if(processedCommandBinds.begin(), processedCommandBinds.end(),
+                                 [&](CCommandBind* processedCommandBind)
+                                 {
+                                     if (processedCommandBind->triggerState != commandBind->triggerState)
+                                         return false;
 
-            if (processedCommandBind->command != commandBind->command)
-                return false;
+                                     if (processedCommandBind->command != commandBind->command)
+                                         return false;
 
-            return commandBind->arguments.empty() || processedCommandBind->arguments == commandBind->arguments;
-        });
+                                     return commandBind->arguments.empty() || processedCommandBind->arguments == commandBind->arguments;
+                                 });
         return iter != processedCommandBinds.end();
     };
 
@@ -549,9 +552,8 @@ void CKeyBinds::RemoveDeletedBinds()
 
 void CKeyBinds::ClearCommandsAndControls()
 {
-    const auto predicate = [](const KeyBindPtr& bind) {
-        return !bind->isBeingDeleted && bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION;
-    };
+    const auto predicate = [](const KeyBindPtr& bind)
+    { return !bind->isBeingDeleted && bind->type != KeyBindType::FUNCTION && bind->type != KeyBindType::CONTROL_FUNCTION; };
     RemoveBinds(m_binds, !m_bProcessingKeyStroke, predicate);
 }
 
@@ -669,7 +671,8 @@ bool CKeyBinds::RemoveCommand(const char* szKey, const char* szCommand, bool bCh
 
     std::string_view command{szCommand};
 
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             return false;
 
@@ -692,7 +695,8 @@ bool CKeyBinds::RemoveAllCommands(const char* szKey, bool bCheckState, bool bSta
     if (!szKey)
         return false;
 
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
             return false;
 
@@ -930,7 +934,8 @@ void CKeyBinds::UserChangeCommandBoundKey(CCommandBind* pBind, const SBindableKe
 //
 void CKeyBinds::SortCommandBinds()
 {
-    auto compare = [](const KeyBindPtr& lhs, const KeyBindPtr& rhs) {
+    auto compare = [](const KeyBindPtr& lhs, const KeyBindPtr& rhs)
+    {
         // Group command binds last
         if (lhs->type != KeyBindType::COMMAND && rhs->type == KeyBindType::COMMAND)
             return true;
@@ -1020,7 +1025,8 @@ bool CKeyBinds::RemoveGTAControl(const char* szKey, const char* szControl)
     if (!szKey || !szControl)
         return false;
 
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             return false;
 
@@ -1036,7 +1042,8 @@ bool CKeyBinds::RemoveAllGTAControls(const char* szKey)
     if (!szKey)
         return false;
 
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
             return false;
 
@@ -1331,7 +1338,8 @@ bool CKeyBinds::RemoveFunction(const char* szKey, KeyFunctionBindHandler Handler
 
 bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::FUNCTION)
             return false;
 
@@ -1348,7 +1356,8 @@ bool CKeyBinds::RemoveFunction(const SBindableKey* pKey, KeyFunctionBindHandler 
 
 bool CKeyBinds::RemoveAllFunctions(KeyFunctionBindHandler Handler)
 {
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::FUNCTION)
             return false;
 
@@ -1435,7 +1444,8 @@ bool CKeyBinds::RemoveControlFunction(const char* szControl, ControlFunctionBind
 
 bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunctionBindHandler Handler, bool bCheckState, bool bState)
 {
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
             return false;
 
@@ -1452,7 +1462,8 @@ bool CKeyBinds::RemoveControlFunction(SBindableGTAControl* pControl, ControlFunc
 
 bool CKeyBinds::RemoveAllControlFunctions(ControlFunctionBindHandler Handler)
 {
-    const auto predicate = [&](const KeyBindPtr& bind) {
+    const auto predicate = [&](const KeyBindPtr& bind)
+    {
         if (bind->isBeingDeleted || bind->type != KeyBindType::CONTROL_FUNCTION)
             return false;
 
@@ -1925,7 +1936,7 @@ void CKeyBinds::DoPostFramePulse()
     {
         if (!bInVehicle)
         {
-            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;     // Fire
+            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;            // Fire
             if (bAimingWeapon)
             {
                 cs.RightShoulder2 = g_bcControls[8].bState ? 255 : 0;            // Zoom Out
@@ -2187,7 +2198,8 @@ bool CKeyBinds::SaveToXML(CXMLNode* pMainNode)
 
         CXMLAttributes& attributes = bindNode->GetAttributes();
 
-        auto createAttribute = [&attributes](const char* key, const char* value) {
+        auto createAttribute = [&attributes](const char* key, const char* value)
+        {
             if (value && value[0])
             {
                 CXMLAttribute* attribute = attributes.Create(key);
@@ -2466,7 +2478,8 @@ void CKeyBinds::PrintBindsCommand(const char* szCmdLine)
 
     CConsoleInterface* console = m_pCore->GetConsole();
 
-    auto print = [console](const KeyBindPtr& bind) {
+    auto print = [console](const KeyBindPtr& bind)
+    {
         switch (bind->type)
         {
             case KeyBindType::COMMAND:

@@ -266,7 +266,8 @@ void CResource::Load()
         }
     }
 
-    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front()) {
+    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front())
+    {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
 
         auto& item = list.front();

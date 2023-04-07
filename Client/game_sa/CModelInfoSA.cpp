@@ -21,7 +21,7 @@
 #include "gamesa_renderware.h"
 
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
@@ -72,7 +72,7 @@ bool CModelInfoSA::IsBoat()
 {
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
-    bool bReturn = false;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -1481,7 +1481,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     m_pInterface->usUnknown = 65535;
     m_pInterface->usDynamicIndex = 65535;
     m_pInterface->timeInfo.m_wOtherTimeModel = 0;
-    
+
     ppModelInfo[m_dwModelID] = m_pInterface;
 
     m_dwParentID = usBaseID;

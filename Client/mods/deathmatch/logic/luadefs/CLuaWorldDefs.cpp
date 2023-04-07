@@ -2001,7 +2001,7 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
 
 bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)
 {
-    if(ucEnabled > 2)
+    if (ucEnabled > 2)
         return false;
 
     g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(true);

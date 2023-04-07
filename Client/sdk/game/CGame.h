@@ -29,7 +29,7 @@ class CCamera;
 class CCarEnterExit;
 class CCheckpoints;
 class CClock;
-class CColStore;           
+class CColStore;
 class CControllerConfigManager;
 class CCoronas;
 class CEventList;

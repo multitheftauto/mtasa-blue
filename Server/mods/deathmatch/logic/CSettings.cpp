@@ -241,7 +241,7 @@ CXMLNode* CSettings::Get(const char* szLocalResource, const char* szSetting, boo
         if (eStatus == Found)
             return pNode;            // Found
         else if (eStatus == NotFound)
-        {            // Not found, continue searching
+        {                            // Not found, continue searching
             // Try to get the value for the appropriate setting from the resource's meta XML file
             if (pSource)
                 pNode = Get(pSource, pStorage, pResource->GetName().c_str(), szLocalResource, szSetting, bDeleteNode, eStatus);
@@ -392,13 +392,13 @@ bool CSettings::HasPrefix(char cCharacter)
 {
     switch (cCharacter)
     {
-        case SETTINGS_PREFIX_PRIVATE:            // Private variable
+        case SETTINGS_PREFIX_PRIVATE:              // Private variable
             return true;
-        case SETTINGS_PREFIX_PUBLIC:            // Public variable
+        case SETTINGS_PREFIX_PUBLIC:               // Public variable
             return true;
         case SETTINGS_PREFIX_PROTECTED:            // Protected variable
             return true;
-        default:            // No variable
+        default:                                   // No variable
             return false;
     }
 }
@@ -408,13 +408,13 @@ CSettings::AccessType CSettings::GetAccessType(char cCharacter)
 {
     switch (cCharacter)
     {
-        case SETTINGS_PREFIX_PRIVATE:            // Private variable
+        case SETTINGS_PREFIX_PRIVATE:              // Private variable
             return CSettings::Private;
-        case SETTINGS_PREFIX_PUBLIC:            // Public variable
+        case SETTINGS_PREFIX_PUBLIC:               // Public variable
             return CSettings::Public;
         case SETTINGS_PREFIX_PROTECTED:            // Protected variable
             return CSettings::Protected;
-        default:            // Default variable (as declared in SETTINGS_NO_PREFIX)
+        default:                                   // Default variable (as declared in SETTINGS_NO_PREFIX)
             return SETTINGS_NO_PREFIX;
     }
 }
