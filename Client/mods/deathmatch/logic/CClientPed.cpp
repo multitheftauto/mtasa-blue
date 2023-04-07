@@ -2057,10 +2057,6 @@ void CClientPed::SetFrozenWaitingForGroundToLoad(bool bFrozen)
 
 CWeapon* CClientPed::GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent)
 {
-    // Multiply ammo with 10 if flamethrower to get the numbers correct.
-    if (weaponType == WEAPONTYPE_FLAMETHROWER)
-        uiAmmo *= 10;
-
     CWeapon* pWeapon = NULL;
     if (m_pPlayerPed)
     {

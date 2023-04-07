@@ -819,8 +819,6 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
         else
             bResult = false;
     }
-    else if (scheme == L"mtalocal")
-        bResult = false;            // Allow mtalocal:// URLs
     else
         bResult = true;             // Block other schemes
 
@@ -901,7 +899,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
         else
             return RV_CONTINUE;
     }
-    else if (scheme == L"mtalocal" || scheme == L"blob")
+    else if (scheme == L"blob")
     {
         return RV_CONTINUE;
     }

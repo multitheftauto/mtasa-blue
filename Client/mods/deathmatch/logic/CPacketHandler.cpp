@@ -3619,20 +3619,16 @@ retry:
                     if (icon <= RADAR_MARKER_LIMIT)
                         pBlip->SetSprite(icon);
 
-                    // Read out size and color if there's no icon
-                    if (icon == 0)
-                    {
-                        // Read out the size
-                        SIntegerSync<unsigned char, 5> size;
-                        bitStream.Read(&size);
+                    // Read out the size
+                    SIntegerSync<unsigned char, 5> size;
+                    bitStream.Read(&size);
 
-                        // Read out the color
-                        SColorSync color;
-                        bitStream.Read(&color);
+                    // Read out the color
+                    SColorSync color;
+                    bitStream.Read(&color);
 
-                        pBlip->SetScale(size);
-                        pBlip->SetColor(color);
-                    }
+                    pBlip->SetScale(size);
+                    pBlip->SetColor(color);
 
                     break;
                 }
