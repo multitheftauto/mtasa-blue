@@ -69,6 +69,17 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetModelFlag", ArgumentParser<EngineSetModelFlag>},
         {"engineResetModelFlags", ArgumentParser<EngineResetModelFlags>},
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
+        {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
+        {"engineImageLinkDFF", ArgumentParser<EngineImageLinkDFF>},
+        {"engineImageLinkTXD", ArgumentParser<EngineImageLinkTXD>},
+        {"engineRestoreDFFImage", ArgumentParser<EngineRestoreDFFImage>},
+        {"engineRestoreTXDImage", ArgumentParser<EngineRestoreTXDImage>},
+        {"engineAddImage", ArgumentParser<EngineAddImage>},
+        {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
+        {"engineImageGetFilesCount", ArgumentParser<EngineImageGetFilesCount>},
+        {"engineImageGetFiles", ArgumentParser<EngineImageGetFileList>},
+        {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
+        {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
 
@@ -95,6 +106,8 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
     lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
     lua_classfunction(luaVM, "setModelVisibleTime", "engineSetModelVisibleTime");
+    lua_classfunction(luaVM, "restoreDFFImage", "engineRestoreDFFImage");
+    lua_classfunction(luaVM, "restoreTXDImage", "engineRestoreTXDImage");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
@@ -119,6 +132,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     AddEngineColClass(luaVM);
     AddEngineTxdClass(luaVM);
     AddEngineDffClass(luaVM);
+    AddEngineImgClass(luaVM);
 }
 
 void CLuaEngineDefs::AddEngineColClass(lua_State* luaVM)
@@ -141,6 +155,26 @@ void CLuaEngineDefs::AddEngineTxdClass(lua_State* luaVM)
 
     lua_registerclass(luaVM, "EngineTXD", "Element");
 }
+
+void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
+{
+    lua_newclass(luaVM);
+
+    lua_classfunction(luaVM, "create", "engineLoadIMG");
+    lua_classfunction(luaVM, "add", "engineAddImage");
+    lua_classfunction(luaVM, "remove", "engineRemoveImage");
+    lua_classfunction(luaVM, "getFile", "engineImageGetFile");
+    lua_classfunction(luaVM, "getFiles", "engineImageGetFiles");
+    lua_classfunction(luaVM, "getFilesCount", "engineImageGetFilesCount");
+    lua_classfunction(luaVM, "linkTXD", "engineImageLinkTXD");
+    lua_classfunction(luaVM, "linkDFF", "engineImageLinkDFF");
+
+    lua_classvariable(luaVM, "filesCount", nullptr, ArgumentParser<EngineImageGetFilesCount>);
+    lua_classvariable(luaVM, "files", nullptr, ArgumentParser<EngineImageGetFileList>);
+
+    lua_registerclass(luaVM, "EngineIMG", "Element");
+}
+
 
 void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 {
@@ -526,6 +560,145 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strRelativeFilePath)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    // Get the resource we belong to
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return false;
+
+    std::string strFullPath;
+
+    if (CResourceManager::ParseResourcePathInput(strRelativeFilePath, pResource, &strFullPath))
+    {
+        // Grab the resource root entity
+        CClientEntity* pRoot = pResource->GetResourceIMGRoot();
+        // Create the img handle
+        CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
+
+        // Attempt loading the file
+        if (pImg->Load(std::move(strFullPath)))
+        {
+            // Success. Make it a child of the resource img root
+            pImg->SetParent(pRoot);
+
+            return pImg;
+        }
+        else
+        {
+            delete pImg;
+            throw std::invalid_argument("Error loading IMG");
+        }
+    }
+
+    throw std::invalid_argument("Bad file path");
+}
+
+bool CLuaEngineDefs::EngineAddImage(CClientIMG* pIMG)
+{
+    return pIMG->StreamEnable();
+}
+
+bool CLuaEngineDefs::EngineRemoveImage(CClientIMG* pIMG)
+{
+    return pIMG->StreamDisable();
+}
+
+uint CLuaEngineDefs::EngineImageGetFilesCount(CClientIMG* pIMG)
+{
+    return pIMG->GetFilesCount();
+}
+
+std::vector<std::string_view> CLuaEngineDefs::EngineImageGetFileList(CClientIMG* pIMG)
+{
+    const auto& fileInfos = pIMG->GetFileInfos();
+
+    std::vector<std::string_view> out;
+    out.reserve(fileInfos.size());
+
+    for (const auto& fileInfo : fileInfos)
+        out.emplace_back(fileInfo.szFileName);
+
+    return out;
+}
+
+static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<size_t, std::string_view> file)
+{
+    if (std::holds_alternative<size_t>(file))
+        return std::get<size_t>(file);
+
+    const auto fileName = std::get<std::string_view>(file);
+    if (const auto id = pIMG->GetFileID(fileName))
+        return id.value();
+    throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)fileName.length(), fileName.data()));
+}
+
+std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<size_t, std::string_view> file)
+{
+    std::string buffer;
+
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer)) // Get file might throw 
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    return buffer;
+}
+
+bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiModelID)
+{
+    if (uiModelID >= 20000)
+        throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
+
+    size_t fileID = ResolveIMGFileID(pIMG, file);
+    std::string buffer;
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
+        throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
+
+    return pIMG->LinkModel(uiModelID, fileID);
+}
+
+bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
+{
+    if (uiTxdID >= 5000)
+        throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
+
+    size_t fileID = ResolveIMGFileID(pIMG, file);
+    std::string buffer;
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
+        throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
+
+    return pIMG->LinkModel(20000 + uiTxdID, fileID);
+}
+
+bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
+{
+    if (uiModelID >= 20000)
+        throw std::invalid_argument("Expected model ID in range [0-19999] at argument 1");
+
+    if (CClientIMGManager::IsLinkableModel(uiModelID))
+        return m_pImgManager->RestoreModel(uiModelID);
+
+    return false;
+}
+
+bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
+{
+    if (uiModelID >= 5000)
+        throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
+
+    if (CClientIMGManager::IsLinkableModel(uiModelID))
+        return m_pImgManager->RestoreModel(20000 + uiModelID);
+
+    return false;
 }
 
 int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
@@ -1023,6 +1196,11 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
     // We failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
+{
+    return g_pGame->GetRenderWare()->GetTXDIDForModelID(uiModelID);
 }
 
 int CLuaEngineDefs::EngineGetModelNameFromID(lua_State* luaVM)

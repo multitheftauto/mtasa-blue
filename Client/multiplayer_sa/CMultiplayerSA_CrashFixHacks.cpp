@@ -1004,7 +1004,7 @@ inner:
     }
 }
 
-CStreamingInfo* GetStreamingInfoFromModelId(uint id)
+CStreamingInfo* GetStreamingInfo(uint id)
 {
     CStreamingInfo* pItemInfo = (CStreamingInfo*)(CStreaming__ms_aInfoForModel);
     return pItemInfo + id;

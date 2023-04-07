@@ -59,8 +59,8 @@ Var UninstallExePath
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "5"
-    !define MAINT_VER "9"
+    !define MINOR_VER "6"
+    !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -811,7 +811,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
         SetOutPath "$INSTDIR\MTA\locale\"
         File /r "${FILES_ROOT}\mta\locale\*.png"
-        File /r "${FILES_ROOT}\mta\locale\*.po"
+        File /r "${FILES_ROOT}\mta\locale\*.pot"
 
         SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\Multi Theft Auto.exe"

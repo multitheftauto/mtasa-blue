@@ -765,7 +765,7 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive()
 {
-    return pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks > 0;
+    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -1016,7 +1016,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfoFromModelId(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
     }
 }
 
@@ -1283,11 +1283,14 @@ CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
         }
     }
 
-    if (!IsLoaded())
-        Request(BLOCKING, "GetVehicleDummyDefaultPosition");
+    ModelAddRef(BLOCKING, "GetVehicleDummyDefaultPosition");
 
-    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return modelInfo->pVisualInfo->vecDummies[eDummy];
+    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
+    CVector vec = modelInfo->pVisualInfo->vecDummies[eDummy];
+
+    RemoveRef();
+
+    return vec;
 }
 
 CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
@@ -1371,11 +1374,7 @@ float CModelInfoSA::GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup)
     if (!IsVehicle())
         return 0.0f;
 
-    // Request model load right now if not loaded yet
-    if (!IsLoaded())
-        Request(BLOCKING, "GetVehicleWheelSize");
-
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
     switch (eWheelGroup)
     {
         case eResizableVehicleWheelGroup::FRONT_AXLE:
@@ -1392,11 +1391,7 @@ void CModelInfoSA::SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, 
     if (!IsVehicle())
         return;
 
-    // Request model load right now if not loaded yet
-    if (!IsLoaded())
-        Request(BLOCKING, "SetVehicleWheelSize");
-
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
 
     // Store default wheel sizes in map
     if (!MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
@@ -1549,6 +1544,9 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // SetColModel sets bDoWeOwnTheColModel if the last parameter is truthy
         m_pInterface->bDoWeOwnTheColModel = false;
 
+        // Fix random foliage on custom collisions by calling CPlantMgr::SetPlantFriendlyFlagInAtomicMI
+        (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(m_pInterface);
+
         // Set some lighting for this collision if not already present
         CColDataSA* pColData = pColModelInterface->m_data;
 
@@ -1697,10 +1695,10 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
 
 void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 {
-    CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseModelID);
-    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
+    CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
+    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
 
-    pTargetModelStreamingInfo->Reset();
+    *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
@@ -1791,7 +1789,7 @@ void CModelInfoSA::DeallocateModel(void)
     }
 
     ppModelInfo[m_dwModelID] = nullptr;
-    pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
+    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //

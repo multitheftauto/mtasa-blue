@@ -266,6 +266,10 @@ inline SString GetClassTypeName(CClientTXD*)
 {
     return "txd";
 }
+inline SString GetClassTypeName(CClientIMG*)
+{
+    return "img";
+}
 inline SString GetClassTypeName(CClientSound*)
 {
     return "sound";
