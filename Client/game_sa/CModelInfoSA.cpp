@@ -54,7 +54,7 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
-    this->m_dwModelID = 0xFFFFFFFF;
+    m_dwModelID = 0xFFFFFFFF;
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;
@@ -1730,7 +1730,9 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 {
     for (const auto& pair : ms_OriginalObjectPropertiesGroups)
     {
-        pGame->GetModelInfo(pair.first)->GetInterface()->usDynamicIndex = pair.second;
+        CBaseModelInfoSAInterface* pInterface = pGame->GetModelInfo(pair.first, true)->GetInterface();
+        if (pInterface)
+            pInterface->usDynamicIndex = pair.second;
     }
     ms_OriginalObjectPropertiesGroups.clear();
 }

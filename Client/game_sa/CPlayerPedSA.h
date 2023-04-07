@@ -41,7 +41,7 @@ private:
     CWantedSA*                       m_pWanted;
 
 public:
-    CPlayerPedSA(ePedModel pedType);
+    CPlayerPedSA(unsigned int nModelIndex);
     CPlayerPedSA(CPlayerPedSAInterface* ped);
     ~CPlayerPedSA();
 
