@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 13:51+0000\n"
+"POT-Creation-Date: 2023-04-07 18:26+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,9 +100,9 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1104
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1114
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1266
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
@@ -137,37 +137,37 @@ msgid "Connection timed out"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1228
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
 msgid "Disconnected: unknown protocol error"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1232
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1235
 msgid "Disconnected: disconnected remotely"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1236
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1239
 msgid "Disconnected: connection lost remotely"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
 msgid "Disconnected: you are banned from this server"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
 msgid "Disconnected: disconnected from the server"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1255
 msgid "Disconnected: connection to the server was lost"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1263
 msgid "Disconnected: connection was refused"
 msgstr ""
 
@@ -2848,19 +2848,19 @@ msgstr ""
 msgid "Connecting to local server timed out. See console for details."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1217
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
 msgid "Connection with the server was lost"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
 msgid "Disconnected: the server is currently full"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1259
 msgid "Disconnected: invalid password specified"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 msgid "MTA Client verification failed!"
 msgstr ""
 
