@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-07 13:51+0000\n"
-"PO-Revision-Date: 2023-04-07 14:08\n"
+"PO-Revision-Date: 2023-04-07 16:08\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -17,29 +17,29 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/core/CMainMenu.cpp:315
+#: Client/core/CMainMenu.cpp:321
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
 msgstr "Bạn đang sử dụng một feature-branch build! Đây là bản build thử nghiệm không thể kết nối đến một server mở!"
 
-#: Client/core/CMainMenu.cpp:334
+#: Client/core/CMainMenu.cpp:340
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
 msgstr "MTA hiện tại sẽ không phát hành các bản cập nhật dành cho XP/Vista sau Tháng 7/2019.\n"
 "Hãy nâng cấp Windows để chơi trên các máy chủ có phiên bản mới nhất."
 
-#: Client/core/CMainMenu.cpp:1141
+#: Client/core/CMainMenu.cpp:1146
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Thao tác này sẽ ngắt kết nối bạn khỏi server đang kết nối hiện tại.\n\n"
 "Bạn có chắc chắn muốn ngắt kết nối không?"
 
-#: Client/core/CMainMenu.cpp:1145
+#: Client/core/CMainMenu.cpp:1150
 msgid "DISCONNECT WARNING"
 msgstr "CẢNH BÁO NGẮT KẾT NỐI"
 
-#: Client/core/CMainMenu.cpp:1147 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
+#: Client/core/CMainMenu.cpp:1152 Client/core/CSettings.cpp:1370
+#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
+#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877
@@ -53,9 +53,9 @@ msgstr "Không"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/core/CMainMenu.cpp:1148 Client/core/CSettings.cpp:1372
-#: Client/core/CSettings.cpp:1396 Client/core/CSettings.cpp:4436
-#: Client/core/CSettings.cpp:4503 Client/core/CSettings.cpp:4552
+#: Client/core/CMainMenu.cpp:1153 Client/core/CSettings.cpp:1371
+#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
+#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
 #: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1572
 #: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
 #: Client/core/CVersionUpdater.cpp:1878
@@ -77,8 +77,8 @@ msgstr "Kết nối thất bại. Tài khoản không hợp lệ!"
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
-#: Client/core/CSettings.cpp:2924 Client/core/CSettings.cpp:4113
-#: Client/core/CSettings.cpp:4141 Client/core/CSettings.cpp:4674
+#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
+#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
 #: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
@@ -318,13 +318,13 @@ msgstr "Tiến"
 msgid "Backwards"
 msgstr "Lùi"
 
-#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2223
-#: Client/core/CSettings.cpp:2251
+#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2222
+#: Client/core/CSettings.cpp:2250
 msgid "Left"
 msgstr "Trái"
 
-#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2225
-#: Client/core/CSettings.cpp:2252
+#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2224
+#: Client/core/CSettings.cpp:2251
 msgid "Right"
 msgstr "Phải"
 
@@ -519,7 +519,7 @@ msgstr "Thiết lập nâng cao"
 
 #. Create buttons
 #. OK button
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4695
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4694
 #: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
 #: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
 #: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
@@ -530,7 +530,7 @@ msgid "OK"
 msgstr "Đồng ý"
 
 #. Cancel button
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4694
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4693
 #: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
 #: Client/core/CVersionUpdater.cpp:1841 Client/loader/Dialogs.cpp:136
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
@@ -687,7 +687,7 @@ msgstr "Chế độ:"
 #. * Webbrowser tab
 #. *
 #: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
-#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2001
+#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2000
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
 msgstr "Chung"
@@ -708,15 +708,15 @@ msgstr "Tự động điều chỉnh radio"
 msgid "Usertrack options"
 msgstr "Tùy chọn nhạc riêng"
 
-#: Client/core/CSettings.cpp:556 Client/core/CSettings.cpp:3059
+#: Client/core/CSettings.cpp:556 Client/core/CSettings.cpp:3058
 msgid "Radio"
 msgstr "Radio"
 
-#: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:3061
+#: Client/core/CSettings.cpp:557 Client/core/CSettings.cpp:3060
 msgid "Random"
 msgstr "Ngẫu nhiên"
 
-#: Client/core/CSettings.cpp:558 Client/core/CSettings.cpp:3063
+#: Client/core/CSettings.cpp:558 Client/core/CSettings.cpp:3062
 msgid "Sequential"
 msgstr "Liên tiếp"
 
@@ -796,16 +796,16 @@ msgstr ""
 msgid "Fullscreen mode:"
 msgstr "Toàn màn hình:"
 
-#: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:1596
+#: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:1595
 msgid "Standard"
 msgstr "Mặc định"
 
-#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1598
+#: Client/core/CSettings.cpp:653 Client/core/CSettings.cpp:1597
 #: Client/loader/MainFunctions.cpp:388
 msgid "Borderless window"
 msgstr "Cửa sổ không viền"
 
-#: Client/core/CSettings.cpp:654 Client/core/CSettings.cpp:1600
+#: Client/core/CSettings.cpp:654 Client/core/CSettings.cpp:1599
 msgid "Borderless keep res"
 msgstr "Không viền"
 
@@ -813,57 +813,57 @@ msgstr "Không viền"
 msgid "Mip Mapping"
 msgstr "Mip mapping"
 
-#: Client/core/CSettings.cpp:726 Client/core/CSettings.cpp:1500
+#: Client/core/CSettings.cpp:726 Client/core/CSettings.cpp:1499
 msgid "Low"
 msgstr "Thấp"
 
-#: Client/core/CSettings.cpp:727 Client/core/CSettings.cpp:1502
+#: Client/core/CSettings.cpp:727 Client/core/CSettings.cpp:1501
 msgid "Medium"
 msgstr "Trung bình"
 
 #: Client/core/CSettings.cpp:728 Client/core/CSettings.cpp:1069
-#: Client/core/CSettings.cpp:1504 Client/core/CSettings.cpp:3117
+#: Client/core/CSettings.cpp:1503 Client/core/CSettings.cpp:3116
 msgid "High"
 msgstr "Cao"
 
-#: Client/core/CSettings.cpp:729 Client/core/CSettings.cpp:1506
+#: Client/core/CSettings.cpp:729 Client/core/CSettings.cpp:1505
 msgid "Very high"
 msgstr "Rất cao"
 
 #: Client/core/CSettings.cpp:744 Client/core/CSettings.cpp:767
 #: Client/core/CSettings.cpp:1000 Client/core/CSettings.cpp:1054
-#: Client/core/CSettings.cpp:1185 Client/core/CSettings.cpp:1510
-#: Client/core/CSettings.cpp:3124 Client/core/CSettings.cpp:3156
-#: Client/core/CSettings.cpp:3178 Client/core/CSettings.cpp:4181
+#: Client/core/CSettings.cpp:1184 Client/core/CSettings.cpp:1509
+#: Client/core/CSettings.cpp:3123 Client/core/CSettings.cpp:3155
+#: Client/core/CSettings.cpp:3177 Client/core/CSettings.cpp:4180
 msgid "Off"
 msgstr "Tắt"
 
-#: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1512
+#: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1511
 msgid "1x"
 msgstr "1x"
 
-#: Client/core/CSettings.cpp:769 Client/core/CSettings.cpp:1514
+#: Client/core/CSettings.cpp:769 Client/core/CSettings.cpp:1513
 msgid "2x"
 msgstr "2x"
 
-#: Client/core/CSettings.cpp:770 Client/core/CSettings.cpp:1516
+#: Client/core/CSettings.cpp:770 Client/core/CSettings.cpp:1515
 msgid "3x"
 msgstr "3x"
 
 #: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1002
-#: Client/core/CSettings.cpp:1522 Client/core/CSettings.cpp:3126
+#: Client/core/CSettings.cpp:1521 Client/core/CSettings.cpp:3125
 msgid "Auto"
 msgstr "Tự động"
 
-#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1524
+#: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1523
 msgid "4:3"
 msgstr "4:3"
 
-#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1526
+#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1525
 msgid "16:10"
 msgstr "16:10"
 
-#: Client/core/CSettings.cpp:786 Client/core/CSettings.cpp:1528
+#: Client/core/CSettings.cpp:786 Client/core/CSettings.cpp:1527
 msgid "16:9"
 msgstr "16:9"
 
@@ -963,91 +963,91 @@ msgstr "Các tùy chọn"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:986 Client/core/CSettings.cpp:993
-#: Client/core/CSettings.cpp:4713
+#: Client/core/CSettings.cpp:4712
 msgid "Fast CJ clothes loading:"
 msgstr "Tốc độ load áo quần của CJ:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:986 Client/core/CSettings.cpp:1007
-#: Client/core/CSettings.cpp:4715
+#: Client/core/CSettings.cpp:4714
 msgid "Browser speed:"
 msgstr "Tốc độ duyệt web:"
 
 #. Single download
 #: Client/core/CSettings.cpp:986 Client/core/CSettings.cpp:1021
-#: Client/core/CSettings.cpp:4717
+#: Client/core/CSettings.cpp:4716
 msgid "Single connection:"
 msgstr "Kết nối đơn:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:986 Client/core/CSettings.cpp:1034
-#: Client/core/CSettings.cpp:4719
+#: Client/core/CSettings.cpp:4718
 msgid "Packet tag:"
 msgstr ""
 
 #. Progress animation
 #: Client/core/CSettings.cpp:987 Client/core/CSettings.cpp:1047
-#: Client/core/CSettings.cpp:4721
+#: Client/core/CSettings.cpp:4720
 msgid "Progress animation:"
 msgstr "Hiệu ứng khi Load:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:987 Client/core/CSettings.cpp:1060
-#: Client/core/CSettings.cpp:4711
+#: Client/core/CSettings.cpp:4710
 msgid "Process priority:"
 msgstr ""
 
 #. Debug setting
 #: Client/core/CSettings.cpp:987 Client/core/CSettings.cpp:1074
-#: Client/core/CSettings.cpp:4723
+#: Client/core/CSettings.cpp:4722
 msgid "Debug setting:"
 msgstr "Cài đặt debug:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:988 Client/core/CSettings.cpp:1097
-#: Client/core/CSettings.cpp:4725
+#: Client/core/CSettings.cpp:4724
 msgid "Streaming memory:"
 msgstr "Bộ nhớ streaming:"
 
 #. Update build type
-#: Client/core/CSettings.cpp:988 Client/core/CSettings.cpp:1199
+#: Client/core/CSettings.cpp:988 Client/core/CSettings.cpp:1198
 msgid "Update build type:"
 msgstr "Thể loại cập nhật:"
 
 #. UpdateAutoInstall
-#: Client/core/CSettings.cpp:988 Client/core/CSettings.cpp:1178
+#: Client/core/CSettings.cpp:988 Client/core/CSettings.cpp:1177
 msgid "Install important updates:"
 msgstr "Cài đặt các cập nhật quan trọng:"
 
 #: Client/core/CSettings.cpp:1001 Client/core/CSettings.cpp:1029
-#: Client/core/CSettings.cpp:1042 Client/core/CSettings.cpp:3128
-#: Client/core/CSettings.cpp:3144 Client/core/CSettings.cpp:3151
+#: Client/core/CSettings.cpp:1042 Client/core/CSettings.cpp:3127
+#: Client/core/CSettings.cpp:3143 Client/core/CSettings.cpp:3150
 msgid "On"
 msgstr "Bật"
 
-#: Client/core/CSettings.cpp:1014 Client/core/CSettings.cpp:3133
+#: Client/core/CSettings.cpp:1014 Client/core/CSettings.cpp:3132
 msgid "Very slow"
 msgstr "Rất chậm"
 
 #: Client/core/CSettings.cpp:1015 Client/core/CSettings.cpp:1028
 #: Client/core/CSettings.cpp:1041 Client/core/CSettings.cpp:1055
 #: Client/core/CSettings.cpp:1081 Client/core/CSettings.cpp:1093
-#: Client/core/CSettings.cpp:1186 Client/core/CSettings.cpp:1206
-#: Client/core/CSettings.cpp:3135 Client/core/CSettings.cpp:3142
-#: Client/core/CSettings.cpp:3149 Client/core/CSettings.cpp:3158
-#: Client/core/CSettings.cpp:3171
+#: Client/core/CSettings.cpp:1185 Client/core/CSettings.cpp:1205
+#: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3141
+#: Client/core/CSettings.cpp:3148 Client/core/CSettings.cpp:3157
+#: Client/core/CSettings.cpp:3170
 msgid "Default"
 msgstr "Mặc định"
 
-#: Client/core/CSettings.cpp:1016 Client/core/CSettings.cpp:3137
+#: Client/core/CSettings.cpp:1016 Client/core/CSettings.cpp:3136
 msgid "Fast"
 msgstr "Nhanh"
 
-#: Client/core/CSettings.cpp:1067 Client/core/CSettings.cpp:3113
+#: Client/core/CSettings.cpp:1067 Client/core/CSettings.cpp:3112
 msgid "Normal"
 msgstr "Bình thường"
 
-#: Client/core/CSettings.cpp:1068 Client/core/CSettings.cpp:3115
+#: Client/core/CSettings.cpp:1068 Client/core/CSettings.cpp:3114
 msgid "Above normal"
 msgstr "Trên mức bình thường"
 
@@ -1064,215 +1064,215 @@ msgstr "Tối đa"
 msgid "Windows 8 compatibility:"
 msgstr "Tương thích Windows 8:"
 
-#: Client/core/CSettings.cpp:1129
+#: Client/core/CSettings.cpp:1128
 msgid "16-bit color"
 msgstr "Màu 16 bit"
 
-#: Client/core/CSettings.cpp:1134
+#: Client/core/CSettings.cpp:1133
 msgid "Mouse fix"
 msgstr "Sửa chuột"
 
 #. Cache path info
-#: Client/core/CSettings.cpp:1152
+#: Client/core/CSettings.cpp:1151
 msgid "Client resource files:"
 msgstr ""
 
-#: Client/core/CSettings.cpp:1156
+#: Client/core/CSettings.cpp:1155
 msgid "Show in Explorer"
 msgstr "Hiển thị trong Explorer"
 
 #. Auto updater section label
-#: Client/core/CSettings.cpp:1171 Client/core/CSettings.cpp:1174
+#: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:1173
 msgid "Auto updater"
 msgstr "Tự động cập nhật"
 
 #. Check for updates
-#: Client/core/CSettings.cpp:1212
+#: Client/core/CSettings.cpp:1211
 msgid "Check for update now"
 msgstr "Kiểm tra cập nhật"
 
-#: Client/core/CSettings.cpp:1365
+#: Client/core/CSettings.cpp:1364
 msgid "Some settings will be changed when you next start MTA"
 msgstr "Một vài thiết lập sẽ được áp dụng vào lần tiếp theo bạn chạy MTA"
 
-#: Client/core/CSettings.cpp:1366
+#: Client/core/CSettings.cpp:1365
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
 "Bạn có muốn khởi động lại không?"
 
-#: Client/core/CSettings.cpp:1369
+#: Client/core/CSettings.cpp:1368
 msgid "RESTART REQUIRED"
 msgstr "CẦN KHỞI ĐỘNG LẠI"
 
-#: Client/core/CSettings.cpp:1389
+#: Client/core/CSettings.cpp:1388
 msgid "Some settings will be changed when you disconnect the current server"
 msgstr "Một vài cài đặt sẽ bị thay đổi khi bạn ngắt kết nối máy chủ hiện tại"
 
-#: Client/core/CSettings.cpp:1390
+#: Client/core/CSettings.cpp:1389
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
 "Bạn có muốn ngắt kết nối ngay?"
 
-#: Client/core/CSettings.cpp:1393
+#: Client/core/CSettings.cpp:1392
 msgid "DISCONNECT REQUIRED"
 msgstr "CẦN NGẮT KẾT NỐI"
 
 #. Update the joystick name
-#: Client/core/CSettings.cpp:1720
+#: Client/core/CSettings.cpp:1719
 msgid "Joypad not detected  -  Check connections and restart game"
 msgstr "Không tìm thấy Joypad  -  Kiểm tra đầu cắm và thử khởi động lại game"
 
-#: Client/core/CSettings.cpp:1915
+#: Client/core/CSettings.cpp:1914
 msgid "Binding axis"
 msgstr "Nút joystick"
 
-#: Client/core/CSettings.cpp:1915
+#: Client/core/CSettings.cpp:1914
 msgid "Move an axis to bind, or escape to clear"
 msgstr "Di chuyển joystick để gán nút, hoặc nhấn escape để xóa"
 
-#: Client/core/CSettings.cpp:1992
+#: Client/core/CSettings.cpp:1991
 msgid "Language:"
 msgstr "Ngôn ngữ:"
 
-#: Client/core/CSettings.cpp:1992
+#: Client/core/CSettings.cpp:1991
 msgid "Skin:"
 msgstr "Giao diện:"
 
-#: Client/core/CSettings.cpp:1992
+#: Client/core/CSettings.cpp:1991
 msgid "Presets:"
 msgstr "Thiết lập có sẵn:"
 
-#: Client/core/CSettings.cpp:2041
+#: Client/core/CSettings.cpp:2040
 msgid "Chat"
 msgstr "Trò chuyện"
 
-#: Client/core/CSettings.cpp:2058
+#: Client/core/CSettings.cpp:2057
 msgid "Load"
 msgstr "Tải"
 
-#: Client/core/CSettings.cpp:2070
+#: Client/core/CSettings.cpp:2069
 msgid "Colors"
 msgstr "Màu"
 
-#: Client/core/CSettings.cpp:2071
+#: Client/core/CSettings.cpp:2070
 msgid "Layout"
 msgstr "Bố trí"
 
-#: Client/core/CSettings.cpp:2072 Client/core/CSettings.cpp:2318
+#: Client/core/CSettings.cpp:2071 Client/core/CSettings.cpp:2317
 msgid "Options"
 msgstr "Tùy chọn khác"
 
-#: Client/core/CSettings.cpp:2078
+#: Client/core/CSettings.cpp:2077
 msgid "Chat Background"
 msgstr "Màu nền khung chat"
 
-#: Client/core/CSettings.cpp:2078
+#: Client/core/CSettings.cpp:2077
 msgid "Chat Text"
 msgstr "Màu chữ chat"
 
-#: Client/core/CSettings.cpp:2078
+#: Client/core/CSettings.cpp:2077
 msgid "Input Background"
 msgstr "Màu nền ô gõ chữ chat"
 
-#: Client/core/CSettings.cpp:2078
+#: Client/core/CSettings.cpp:2077
 msgid "Input Text"
 msgstr "Màu chữ gõ chat"
 
-#: Client/core/CSettings.cpp:2101
+#: Client/core/CSettings.cpp:2100
 msgid "Lines:"
 msgstr "Dòng:"
 
-#: Client/core/CSettings.cpp:2101
+#: Client/core/CSettings.cpp:2100
 msgid "Scale:"
 msgstr "Tỉ lệ:"
 
-#: Client/core/CSettings.cpp:2101
+#: Client/core/CSettings.cpp:2100
 msgid "Width:"
 msgstr "Chiều rộng:"
 
-#: Client/core/CSettings.cpp:2104
+#: Client/core/CSettings.cpp:2103
 msgid "Size"
 msgstr "Kích cỡ"
 
-#: Client/core/CSettings.cpp:2153
+#: Client/core/CSettings.cpp:2152
 msgid "after"
 msgstr "sau"
 
-#: Client/core/CSettings.cpp:2153
+#: Client/core/CSettings.cpp:2152
 msgid "for"
 msgstr "trong"
 
-#: Client/core/CSettings.cpp:2153
+#: Client/core/CSettings.cpp:2152
 msgid "sec"
 msgstr "giây"
 
-#: Client/core/CSettings.cpp:2156
+#: Client/core/CSettings.cpp:2155
 msgid "Fading"
 msgstr "Mờ dần"
 
-#: Client/core/CSettings.cpp:2162
+#: Client/core/CSettings.cpp:2161
 msgid "Fade out old lines"
 msgstr "Làm mờ các dòng cũ"
 
-#: Client/core/CSettings.cpp:2202
+#: Client/core/CSettings.cpp:2201
 msgid "Horizontal:"
 msgstr "Chiều ngang:"
 
-#: Client/core/CSettings.cpp:2202
+#: Client/core/CSettings.cpp:2201
 msgid "Vertical:"
 msgstr "Chiều dọc:"
 
-#: Client/core/CSettings.cpp:2202
+#: Client/core/CSettings.cpp:2201
 msgid "Text-Align:"
 msgstr "Căn chỉnh văn bản:"
 
-#: Client/core/CSettings.cpp:2202
+#: Client/core/CSettings.cpp:2201
 msgid "X-Offset:"
 msgstr "Tọa độ X:"
 
-#: Client/core/CSettings.cpp:2203
+#: Client/core/CSettings.cpp:2202
 msgid "Y-Offset:"
 msgstr "Tọa độ Y:"
 
-#: Client/core/CSettings.cpp:2209
+#: Client/core/CSettings.cpp:2208
 msgid "Position"
 msgstr "Vị trí"
 
-#: Client/core/CSettings.cpp:2224 Client/core/CSettings.cpp:2238
+#: Client/core/CSettings.cpp:2223 Client/core/CSettings.cpp:2237
 msgid "Center"
 msgstr "Trung tâm"
 
-#: Client/core/CSettings.cpp:2237
+#: Client/core/CSettings.cpp:2236
 msgid "Top"
 msgstr "Trên"
 
-#: Client/core/CSettings.cpp:2239
+#: Client/core/CSettings.cpp:2238
 msgid "Bottom"
 msgstr "Dưới"
 
-#: Client/core/CSettings.cpp:2287
+#: Client/core/CSettings.cpp:2286
 msgid "Font"
 msgstr "Phông chữ"
 
-#: Client/core/CSettings.cpp:2324
+#: Client/core/CSettings.cpp:2323
 msgid "Hide background when not typing"
 msgstr "Ẩn nền khi không gõ chữ"
 
-#: Client/core/CSettings.cpp:2329
+#: Client/core/CSettings.cpp:2328
 msgid "Nickname completion using the \"Tab\" key"
 msgstr "Gợi ý nickname sử dụng phím \"Tab\""
 
-#: Client/core/CSettings.cpp:2334
+#: Client/core/CSettings.cpp:2333
 msgid "Allow server to flash the window"
 msgstr "Cho phép server nháy màn hình"
 
-#: Client/core/CSettings.cpp:2339
+#: Client/core/CSettings.cpp:2338
 msgid "Allow tray balloon notifications"
 msgstr "Cho phép thông báo trên tray"
 
-#: Client/core/CSettings.cpp:2344
+#: Client/core/CSettings.cpp:2343
 msgid "Chat text black/white outline"
 msgstr "Viền chữ chat màu đen/trắng"
 
@@ -1280,93 +1280,93 @@ msgstr "Viền chữ chat màu đen/trắng"
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #. Create a messagebox to notify the user
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2593 Client/core/CSettings.cpp:2600
+#: Client/core/CSettings.cpp:2592 Client/core/CSettings.cpp:2599
 msgid "Press a key to bind, or escape to clear"
 msgstr "Nhấn một phím để gán, hoặc escape để xóa"
 
-#: Client/core/CSettings.cpp:2594
+#: Client/core/CSettings.cpp:2593
 msgid "Binding a primary key"
 msgstr "Ràng buộc một key chính"
 
-#: Client/core/CSettings.cpp:2601
+#: Client/core/CSettings.cpp:2600
 msgid "Binding a secondary key"
 msgstr "Ràng buộc một key phụ"
 
-#: Client/core/CSettings.cpp:2677
+#: Client/core/CSettings.cpp:2676
 msgid "GTA GAME CONTROLS"
 msgstr "ĐIỀU KHIỂN GAME GTA"
 
-#: Client/core/CSettings.cpp:2679
+#: Client/core/CSettings.cpp:2678
 msgid "MULTIPLAYER CONTROLS"
 msgstr "ĐIỀU KHIỂN MULTIPLAYER"
 
-#: Client/core/CSettings.cpp:2924 Client/core/CSettings.cpp:4674
+#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4673
 msgid "Your nickname contains invalid characters!"
 msgstr "Nickname của bạn chứa các ký tự không hợp lệ!"
 
-#: Client/core/CSettings.cpp:3725
+#: Client/core/CSettings.cpp:3724
 msgid "Red:"
 msgstr "Đỏ:"
 
-#: Client/core/CSettings.cpp:3725
+#: Client/core/CSettings.cpp:3724
 msgid "Green:"
 msgstr "Xanh lục:"
 
-#: Client/core/CSettings.cpp:3725
+#: Client/core/CSettings.cpp:3724
 msgid "Blue:"
 msgstr "Xanh dương:"
 
-#: Client/core/CSettings.cpp:3725
+#: Client/core/CSettings.cpp:3724
 msgid "Transparency:"
 msgstr "Độ trong suốt:"
 
-#: Client/core/CSettings.cpp:3728
+#: Client/core/CSettings.cpp:3727
 msgid "Color"
 msgstr "Màu sắc"
 
-#: Client/core/CSettings.cpp:3805
+#: Client/core/CSettings.cpp:3804
 msgid "Preview"
 msgstr "Xem trước"
 
-#: Client/core/CSettings.cpp:4113
+#: Client/core/CSettings.cpp:4112
 msgid "Please disconnect before changing language"
 msgstr "Hãy ngắt kết nối trước khi thay đổi ngôn ngữ"
 
-#: Client/core/CSettings.cpp:4141
+#: Client/core/CSettings.cpp:4140
 msgid "Please disconnect before changing skin"
 msgstr "Hãy ngắt kết nối trước khi thay đổi giao diện"
 
-#: Client/core/CSettings.cpp:4429
+#: Client/core/CSettings.cpp:4428
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "Hiệu ứng đổ bóng có thể làm cho máy bạn chậm đi.\n\n"
 "Bạn có chắc muốn bật không?"
 
-#: Client/core/CSettings.cpp:4433
+#: Client/core/CSettings.cpp:4432
 msgid "PERFORMANCE WARNING"
 msgstr "CẢNH BÁO HIỆU SUẤT"
 
-#: Client/core/CSettings.cpp:4453
+#: Client/core/CSettings.cpp:4452
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Tự động upload ảnh màn hình có thể được một số server sử dụng nhằm mục đích chống gian lận.\n\n"
 "(Chatbox và Hud sẽ không kèm theo khi chụp màn hình)\n"
 
-#: Client/core/CSettings.cpp:4455
+#: Client/core/CSettings.cpp:4454
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "THÔNG TIN TẢI LÊN ẢNH CHỤP MÀN HÌNH"
 
-#: Client/core/CSettings.cpp:4470
+#: Client/core/CSettings.cpp:4469
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4473
+#: Client/core/CSettings.cpp:4472
 msgid "EXTERNAL SOUNDS"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4494
+#: Client/core/CSettings.cpp:4493
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -1376,88 +1376,88 @@ msgstr "Một số file trong thư mục dữ liệu GTA:SA của bạn đã đ�
 "Tuy nhiên, CÁC FILE DỮ LIỆU GTA:SA ĐÃ TÙY BIẾN BỊ CẤM BỞI NHIỀU SERVER\n\n"
 "Bạn có muốn sử dụng chúng không?"
 
-#: Client/core/CSettings.cpp:4500 Client/core/CVersionUpdater.cpp:2081
+#: Client/core/CSettings.cpp:4499 Client/core/CVersionUpdater.cpp:2081
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "FILE GTA:SA ĐÃ TÙY CHỈNH"
 
-#: Client/core/CSettings.cpp:4543
+#: Client/core/CSettings.cpp:4542
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4549
+#: Client/core/CSettings.cpp:4548
 msgid "EXPERIMENTAL FEATURE"
 msgstr ""
 
-#: Client/core/CSettings.cpp:4692
+#: Client/core/CSettings.cpp:4691
 msgid "Please enter a nickname"
 msgstr "Hãy nhập một nickname"
 
-#: Client/core/CSettings.cpp:4693
+#: Client/core/CSettings.cpp:4692
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "Nhập vào một nickname để sử dụng trong game.  \n"
 "Đây sẽ là tên của bạn khi kết nối đến và chơi tại server bất kỳ"
 
-#: Client/core/CSettings.cpp:4711
+#: Client/core/CSettings.cpp:4710
 msgid "Very experimental feature."
 msgstr "Tính năng thử nghiệm."
 
-#: Client/core/CSettings.cpp:4713
+#: Client/core/CSettings.cpp:4712
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "Dựng các quầy hàng với các tùy chọn của CJ (Sử dụng thêm 65MB RAM)"
 
-#: Client/core/CSettings.cpp:4715
+#: Client/core/CSettings.cpp:4714
 msgid "Older routers may require a slower scan speed."
 msgstr "Các bộ định tuyến cũ hơn có thể yêu cầu tốc độ quét chậm hơn."
 
-#: Client/core/CSettings.cpp:4717
+#: Client/core/CSettings.cpp:4716
 msgid "Switch on to use only one connection when downloading."
 msgstr "Bật để sử dụng duy nhất một đường truyền kết nối khi tải xuống."
 
-#: Client/core/CSettings.cpp:4719
+#: Client/core/CSettings.cpp:4718
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "Gắn thẻ gói mạng để giúp ISP xác định lưu lượng truy cập MTA."
 
-#: Client/core/CSettings.cpp:4721
+#: Client/core/CSettings.cpp:4720
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "Biểu tượng loading xoay vòng ở dưới màn hình"
 
-#: Client/core/CSettings.cpp:4723
+#: Client/core/CSettings.cpp:4722
 msgid "Select default always. (This setting is not saved)"
 msgstr "Luôn luôn chọn mặc định. (Tùy chọn này sẽ không được lưu)"
 
-#: Client/core/CSettings.cpp:4725
+#: Client/core/CSettings.cpp:4724
 msgid "Maximum is usually best"
 msgstr "Càng cao càng tốt"
 
-#: Client/core/CSettings.cpp:4727 Client/core/CSettings.cpp:4729
+#: Client/core/CSettings.cpp:4726 Client/core/CSettings.cpp:4728
 msgid "Auto updater:"
 msgstr "Tự động cập nhật:"
 
-#: Client/core/CSettings.cpp:4727
+#: Client/core/CSettings.cpp:4726
 msgid "Select default unless you like filling out bug reports."
 msgstr "Chọn mặc định trừ khi bạn muốn điền vào các phản hồi về lỗi."
 
-#: Client/core/CSettings.cpp:4729
+#: Client/core/CSettings.cpp:4728
 msgid "Select default to automatically install important updates."
 msgstr "Chọn mặc định để tự động cài đặt các cập nhật quan trọng."
 
-#: Client/core/CSettings.cpp:4731
+#: Client/core/CSettings.cpp:4730
 msgid "16-bit color:"
 msgstr "Màu 16-bit:"
 
-#: Client/core/CSettings.cpp:4731
+#: Client/core/CSettings.cpp:4730
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "Bật chế độ 16-bit - Yêu cầu khởi động lại MTA"
 
-#: Client/core/CSettings.cpp:4733
+#: Client/core/CSettings.cpp:4732
 msgid "Mouse fix:"
 msgstr "Sửa chuột:"
 
-#: Client/core/CSettings.cpp:4733
+#: Client/core/CSettings.cpp:4732
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Sửa lỗi di chuyển chuột - Có thể cần khởi động lại máy tính"
 
@@ -1664,11 +1664,11 @@ msgstr "Ngôn ngữ bản địa hóa"
 msgid "Patch contributors"
 msgstr "Người trợ giúp bản patch"
 
-#: Client/core/CCredits.cpp:215
+#: Client/core/CCredits.cpp:227
 msgid "Special Thanks"
 msgstr "Lời cảm ơn sâu sắc"
 
-#: Client/core/CCredits.cpp:244
+#: Client/core/CCredits.cpp:258
 msgid "This software makes use of the following libraries and software:"
 msgstr "Phần mềm này sử dụng các thư viện và phần mềm khác sau:"
 
