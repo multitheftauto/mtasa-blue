@@ -958,11 +958,10 @@ bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const char* 
             Variable.WriteToBitStream(*BitStream.pBitStream);
 
             const CElementRPCPacket packet(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream);
-            const size_t numPlayers = syncType == ESyncType::BROADCAST ? m_pPlayerManager->BroadcastOnlyJoined(packet) :
-                m_pPlayerManager->BroadcastOnlySubscribed(packet, pElement, szName);
+            const size_t            numPlayers = syncType == ESyncType::BROADCAST ? m_pPlayerManager->BroadcastOnlyJoined(packet)
+                                                                                  : m_pPlayerManager->BroadcastOnlySubscribed(packet, pElement, szName);
 
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, numPlayers,
-                                                                                 BitStream.pBitStream->GetNumberOfBytesUsed());
+            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(szName, numPlayers, BitStream.pBitStream->GetNumberOfBytesUsed());
         }
 
         // Unsubscribe all the players
@@ -1697,15 +1696,15 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CPlayerManager::IsValidPlayerModel(usModel))
                 return false;
-            unsigned short usOldModel = pPed->GetModel();      // Get the old model
-            CLuaArguments Arguments;
+            unsigned short usOldModel = pPed->GetModel();            // Get the old model
+            CLuaArguments  Arguments;
             Arguments.PushNumber(usOldModel);
-            pPed->SetModel(usModel);                           // Set the new model
-            Arguments.PushNumber(usModel);                     // Get the new model
+            pPed->SetModel(usModel);                  // Set the new model
+            Arguments.PushNumber(usModel);            // Get the new model
             bool bContinue = pPed->CallEvent("onElementModelChange", Arguments);
             // Check for another call to setElementModel
             if (usModel != pPed->GetModel())
-                 return false;
+                return false;
 
             if (!bContinue)
             {
@@ -1722,15 +1721,15 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CVehicleManager::IsValidModel(usModel))
                 return false;
-            unsigned short usOldModel = pVehicle->GetModel();      // Get the old model
-            CLuaArguments Arguments;
+            unsigned short usOldModel = pVehicle->GetModel();            // Get the old model
+            CLuaArguments  Arguments;
             Arguments.PushNumber(usOldModel);
-            pVehicle->SetModel(usModel);                           // Set the new model
-            Arguments.PushNumber(usModel);                         // Get the new model
+            pVehicle->SetModel(usModel);              // Set the new model
+            Arguments.PushNumber(usModel);            // Get the new model
             bool bContinue = pVehicle->CallEvent("onElementModelChange", Arguments);
             // Check for another call to setElementModel
             if (usModel != pVehicle->GetModel())
-                 return false;
+                return false;
 
             if (!bContinue)
             {
@@ -1765,15 +1764,15 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CObjectManager::IsValidModel(usModel))
                 return false;
-            unsigned short usOldModel = pObject->GetModel();      // Get the old model
-            CLuaArguments Arguments;
+            unsigned short usOldModel = pObject->GetModel();            // Get the old model
+            CLuaArguments  Arguments;
             Arguments.PushNumber(usOldModel);
-            pObject->SetModel(usModel);                           // Set the new model
-            Arguments.PushNumber(usModel);                        // Get the new model
+            pObject->SetModel(usModel);               // Set the new model
+            Arguments.PushNumber(usModel);            // Get the new model
             bool bContinue = pObject->CallEvent("onElementModelChange", Arguments);
             // Check for another call to setElementModel
             if (usModel != pObject->GetModel())
-                 return false;
+                return false;
 
             if (!bContinue)
             {
@@ -3463,6 +3462,7 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
             BitStream.pBitStream->Write(ucPasswordLength);
             BitStream.pBitStream->Write(szPassword, ucPasswordLength);
         }
+        pPlayer->SetLeavingServer(true);
         pPlayer->Send(CLuaPacket(FORCE_RECONNECT, *BitStream.pBitStream));
 
         usPort = usPort ? usPort : g_pGame->GetConfig()->GetServerPort();
@@ -4691,9 +4691,9 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                 if (ucWeaponSlot <= 1 || ucWeaponSlot >= 10)
                     uiTotalAmmo = std::min(1U, uiTotalAmmo + usAmmo);            // If slot 0,1,10,11,12 - Ammo is max 1
                 else if ((ucWeaponSlot >= 3 && ucWeaponSlot <= 5) || ucPreviousWeaponID == ucWeaponID)
-                    uiTotalAmmo += usAmmo;            // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
+                    uiTotalAmmo += usAmmo;                                       // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
                 else
-                    uiTotalAmmo = usAmmo;            // Otherwise ammo is not shared, so replace
+                    uiTotalAmmo = usAmmo;                                        // Otherwise ammo is not shared, so replace
 
                 uiTotalAmmo = std::min(0xFFFFU, uiTotalAmmo);
                 pPed->SetWeaponTotalAmmo(uiTotalAmmo, ucWeaponSlot);

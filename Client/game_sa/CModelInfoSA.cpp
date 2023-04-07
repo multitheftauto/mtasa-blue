@@ -21,7 +21,7 @@
 #include "gamesa_renderware.h"
 
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
@@ -72,7 +72,7 @@ bool CModelInfoSA::IsBoat()
 {
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
-    bool bReturn = false;
+    bool  bReturn = false;
     _asm
     {
         push    ModelID
@@ -502,7 +502,7 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive()
 {
-    return pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->sizeInBlocks > 0;
+    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -753,7 +753,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfoFromModelId(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
     }
 }
 
@@ -1435,10 +1435,10 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
 
 void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 {
-    CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(usBaseModelID);
-    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID);
+    CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
+    CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
 
-    pTargetModelStreamingInfo->Reset();
+    *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
@@ -1481,7 +1481,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     m_pInterface->usUnknown = 65535;
     m_pInterface->usDynamicIndex = 65535;
     m_pInterface->timeInfo.m_wOtherTimeModel = 0;
-    
+
     ppModelInfo[m_dwModelID] = m_pInterface;
 
     m_dwParentID = usBaseID;
@@ -1529,7 +1529,7 @@ void CModelInfoSA::DeallocateModel(void)
     }
 
     ppModelInfo[m_dwModelID] = nullptr;
-    pGame->GetStreaming()->GetStreamingInfoFromModelId(m_dwModelID)->Reset();
+    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1730,7 +1730,9 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 {
     for (const auto& pair : ms_OriginalObjectPropertiesGroups)
     {
-        pGame->GetModelInfo(pair.first)->GetInterface()->usDynamicIndex = pair.second;
+        CBaseModelInfoSAInterface* pInterface = pGame->GetModelInfo(pair.first, true)->GetInterface();
+        if (pInterface)
+            pInterface->usDynamicIndex = pair.second;
     }
     ms_OriginalObjectPropertiesGroups.clear();
 }

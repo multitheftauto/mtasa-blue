@@ -18,11 +18,12 @@ project "Loader"
 		"unrar", "d3d9",
 		"detours", "Imagehlp",
 		"../../vendor/nvapi/x86/nvapi.lib",
-		"cryptopp", "Wscapi",
+		"cryptopp",
 	}
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
+	forceincludes { "StdInc.h" }
 
 	vpaths {
 		["Headers/*"] = "**.h",

@@ -12,7 +12,7 @@
 namespace
 {
     //
-    // Minimum version requirments for functions/events
+    // Minimum version requirements for functions/events
     //
 
     struct SVersionItem
@@ -294,6 +294,16 @@ namespace
         {"svgGetSize", "1.5.8-9.20979"},
         {"svgSetDocumentXML", "1.5.8-9.20979"},
         {"svgSetSize", "1.5.8-9.20979"},
+        {"generateKeyPair", "1.5.8-9.21055"},
+        {"getProcessMemoryStats", "1.5.8-9.21389"},
+        {"isCapsLockEnabled", "1.5.8-9.21313"},
+        {"isMTAWindowFocused", "1.5.8-9.21313"},
+        {"onClientMTAFocusChange", "1.5.8-9.21313"},
+        {"getElementLighting", "1.5.8-9.21367"},
+        {"setChatboxCharacterLimit", "1.5.8-9.21476"},
+        {"getChatboxCharacterLimit", "1.5.8-9.21476"},
+
+        // Features added in 1.6.0
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -408,6 +418,10 @@ namespace
         {"onResourceLoadStateChange", "1.5.8-9.20809"},
         {"onElementInteriorChange", "1.5.8-9.20837"},
         {"onPlayerResourceStart", "1.5.8-9.20957"},
+        {"generateKeyPair", "1.5.8-9.21055"},
+        {"getProcessMemoryStats", "1.5.8-9.21389"},
+
+        // Features added in 1.6.0
     };
 
     //
@@ -557,9 +571,9 @@ namespace
         // Server ped jetpack
         {true, "givePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
         {true, "removePlayerJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
-        //{true, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
-        //{true, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
-        //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+        {true, "givePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        {true, "removePedJetPack", "Replaced with setPedWearingJetpack. Refer to the wiki for details"},
+        {false, "doesPedHaveJetPack", "isPedWearingJetpack"},
 
         // XML
         {false, "xmlNodeGetSubNodes", "xmlNodeGetChildren"},

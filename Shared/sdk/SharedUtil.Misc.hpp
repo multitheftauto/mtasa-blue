@@ -61,10 +61,10 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 #define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
-    //
-    // Output a UTF8 encoded messagebox
-    // Used in the Win32 Client only
-    //
+//
+// Output a UTF8 encoded messagebox
+// Used in the Win32 Client only
+//
 #ifdef _WINDOWS_ //Only for modules that use windows.h
 int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType)
 {
@@ -158,9 +158,7 @@ SString SharedUtil::CalcMTASAPath(const SString& strPath)
 bool SharedUtil::IsGTAProcess()
 {
     SString strLaunchPathFilename = GetLaunchPathFilename();
-    if (strLaunchPathFilename.EndsWithI("gta_sa.exe") || strLaunchPathFilename.EndsWithI("proxy_sa.exe"))
-        return true;
-    return false;
+    return strLaunchPathFilename.EndsWithI("gta_sa.exe");
 }
 
 //
@@ -1640,9 +1638,15 @@ namespace SharedUtil
         m_cEscapeCharacter = '#';
     }
 
-    void CArgMap::SetEscapeCharacter(char cEscapeCharacter) { m_cEscapeCharacter = cEscapeCharacter; }
+    void CArgMap::SetEscapeCharacter(char cEscapeCharacter)
+    {
+        m_cEscapeCharacter = cEscapeCharacter;
+    }
 
-    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues) { MergeFromString(other.ToString(), bAllowMultiValues); }
+    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues)
+    {
+        MergeFromString(other.ToString(), bAllowMultiValues);
+    }
 
     void CArgMap::SetFromString(const SString& strLine, bool bAllowMultiValues)
     {
@@ -1695,9 +1699,15 @@ namespace SharedUtil
             SetFromString(ToString(), false);
     }
 
-    SString CArgMap::Escape(const SString& strIn) const { return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter); }
+    SString CArgMap::Escape(const SString& strIn) const
+    {
+        return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter);
+    }
 
-    SString CArgMap::Unescape(const SString& strIn) const { return UnescapeString(strIn, m_cEscapeCharacter); }
+    SString CArgMap::Unescape(const SString& strIn) const
+    {
+        return UnescapeString(strIn, m_cEscapeCharacter);
+    }
 
     // Set a unique key string value
     void CArgMap::Set(const SString& strCmd, const SString& strValue)
@@ -1714,7 +1724,10 @@ namespace SharedUtil
     }
 
     // Insert a key int value
-    void CArgMap::Insert(const SString& strCmd, int iValue) { Insert(strCmd, SString("%d", iValue)); }
+    void CArgMap::Insert(const SString& strCmd, int iValue)
+    {
+        Insert(strCmd, SString("%d", iValue));
+    }
 
     // Insert a key string value
     void CArgMap::Insert(const SString& strCmd, const SString& strValue)
@@ -1724,7 +1737,10 @@ namespace SharedUtil
     }
 
     // Test if key exists
-    bool CArgMap::Contains(const SString& strCmd) const { return MapFind(m_Map, Escape(strCmd)) != NULL; }
+    bool CArgMap::Contains(const SString& strCmd) const
+    {
+        return MapFind(m_Map, Escape(strCmd)) != NULL;
+    }
 
     // First result as string
     bool CArgMap::Get(const SString& strCmd, SString& strOut, const char* szDefault) const

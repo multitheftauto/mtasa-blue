@@ -232,13 +232,23 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
     //  float endZ,
     //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool
-    //        returnBuildingInfo = false, bCheckCarTires = false ] )
-    CVector           vecStart;
-    CVector           vecEnd;
-    SLineOfSightFlags flags;
-    CClientEntity*    pIgnoredElement;
-    bool              bIncludeBuildingInfo;
+    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil [,
+    //        element ignoredElement2,
+    //        element ignoredElement3,
+    //        ... etc
+    //        ], bool returnBuildingInfo = false, bCheckCarTires = false ] )
+
+    //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
+    //  float endZ,
+    //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
+    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, table ignoredElements = nil,
+    //        bool returnBuildingInfo = false, bCheckCarTires = false ] )
+
+    CVector                     vecStart;
+    CVector                     vecEnd;
+    SLineOfSightFlags           flags;
+    std::vector<CClientEntity*> vecIgnoredElements;
+    bool                        bIncludeBuildingInfo;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecStart);
@@ -251,18 +261,31 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     argStream.ReadBool(flags.bSeeThroughStuff, false);
     argStream.ReadBool(flags.bIgnoreSomeObjectsForCamera, false);
     argStream.ReadBool(flags.bShootThroughStuff, false);
-    argStream.ReadUserData(pIgnoredElement, NULL);
+
+    if (argStream.NextIsTable()) // Is the next value a table? Read it as a user data table (will error if table contains invalid type)
+    {
+        argStream.ReadUserDataTable(vecIgnoredElements);
+    }
+    else {
+        CClientEntity* pIgnoredElement;
+        argStream.ReadUserData(pIgnoredElement, NULL);
+
+        if (pIgnoredElement != NULL)
+        {
+            vecIgnoredElements.push_back(pIgnoredElement);
+        }
+    }
+
     argStream.ReadBool(bIncludeBuildingInfo, false);
     argStream.ReadBool(flags.bCheckCarTires, false);
 
     if (!argStream.HasErrors())
     {
-        CEntity*                   pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
         CColPoint*                 pColPoint = NULL;
         CClientEntity*             pColEntity = NULL;
         bool                       bCollision;
         SLineOfSightBuildingResult buildingResult;
-        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, pIgnoredEntity,
+        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, vecIgnoredElements,
                                                            bIncludeBuildingInfo ? &buildingResult : NULL))
         {
             // Got a collision?
@@ -2001,7 +2024,7 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
 
 bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)
 {
-    if(ucEnabled > 2)
+    if (ucEnabled > 2)
         return false;
 
     g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(true);

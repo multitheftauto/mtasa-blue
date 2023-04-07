@@ -18,6 +18,8 @@
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
+#include "DXHook/CDirect3DHook9.h"
+#include "DXHook/CDirect3DHookManager.h"
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
@@ -1481,7 +1483,7 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
             szCmdLine = afterPath;
         }
     }
-    
+
     char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 
