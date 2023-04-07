@@ -22,7 +22,8 @@ extern CGameSA* pGame;
 
 CWeaponSA::CWeaponSA(CWeaponSAInterface* pInterface, CPed* pOwner, eWeaponSlot weaponSlot)
     : m_pInterface{pInterface}, m_pOwner{pOwner}, m_weaponSlot{weaponSlot}
-{}
+{
+}
 
 void CWeaponSA::Destroy()
 {

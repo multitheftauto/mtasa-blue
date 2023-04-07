@@ -18,7 +18,7 @@
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
 
-//#define CEF_ENABLE_SANDBOX
+// #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif

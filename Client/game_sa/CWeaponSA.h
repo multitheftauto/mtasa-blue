@@ -60,7 +60,7 @@ public:
     CPed*       GetPed();
     eWeaponSlot GetSlot();
 
-    void          SetAsCurrentWeapon();
+    void         SetAsCurrentWeapon();
     CWeaponInfo* GetInfo(eWeaponSkill skill);
     void         Destroy();
     void         Remove();

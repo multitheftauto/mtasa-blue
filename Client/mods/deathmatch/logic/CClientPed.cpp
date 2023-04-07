@@ -6501,7 +6501,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)            // Kill jump task - breaks warp in entry and doesn't really matter
     {
         if (pVehicle->IsInWater() ||
-            IsInWater())            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+            IsInWater())                  // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
         {
             KillTask(3, true);            // Kill jump task if we are about to warp in
         }
