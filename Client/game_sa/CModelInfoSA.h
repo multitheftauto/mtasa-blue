@@ -307,7 +307,6 @@ protected:
     static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
-    bool                                                                         m_bAddedRefForCollision;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
