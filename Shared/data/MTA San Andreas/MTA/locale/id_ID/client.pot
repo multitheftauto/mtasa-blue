@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 18:26+0000\n"
-"PO-Revision-Date: 2023-04-07 19:37\n"
+"POT-Creation-Date: 2023-04-07 19:51+0000\n"
+"PO-Revision-Date: 2023-04-07 20:47\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -76,7 +76,7 @@ msgstr "Proses penyambungan gagal. Nama yang diberikan tidak valid!"
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
 #: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
 #: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
 #: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
@@ -180,116 +180,116 @@ msgstr "Respon server tidak baik (2)"
 msgid "Bad server response (1)"
 msgstr "Respon server tidak baik (1)"
 
-#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1069
+#: Client/core/CCore.cpp:763 Client/loader/CInstallManager.cpp:1069
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA tidak dapat dilanjutkan karena drive %s tidak mempunyai ruang yang cukup."
 
-#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Kesalahan fatal"
 
-#: Client/core/CCore.cpp:893
+#: Client/core/CCore.cpp:890
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "UNTUK MEMPERBAIKI, HAPUS BERKAS INI:"
 
-#: Client/core/CCore.cpp:925
+#: Client/core/CCore.cpp:922
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "Modul %s salah!"
 
-#: Client/core/CCore.cpp:1235
+#: Client/core/CCore.cpp:1227
 msgid "Error executing URL"
 msgstr "Kesalahan menjalankan URL"
 
-#: Client/core/CCore.cpp:1247
+#: Client/core/CCore.cpp:1239
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Terjadi kesalahan dalam menjalankan mod tersebut dalam baris perintah ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1327
 msgid "this help screen"
 msgstr "layar bantuan ini"
 
-#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
 msgid "exits the application"
 msgstr "keluar dari aplikasi"
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1330
 msgid "shows the version"
 msgstr "menampilkan versi"
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1331
 msgid "shows the time"
 msgstr "menampilkan waktu"
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1332
 msgid "shows the hud"
 msgstr "menampilkan hud"
 
-#: Client/core/CCore.cpp:1341
+#: Client/core/CCore.cpp:1333
 msgid "shows all the binds"
 msgstr "menampilkan semua ikatan"
 
-#: Client/core/CCore.cpp:1342
+#: Client/core/CCore.cpp:1334
 msgid "shows your serial"
 msgstr "menampilkan serial anda"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1343
 msgid "connects to a server (host port nick pass)"
 msgstr "menyambungkan ke server (host port nama sandi)"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1344
 msgid "connects to a previous server"
 msgstr "menyambungkan ke server sebelumnya"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1345
 msgid "binds a key (key control)"
 msgstr "mengikat sebuah tombol (tombol kontrol)"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1346
 msgid "unbinds a key (key)"
 msgstr "melepas ikatan sebuah tombol (tombol)"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1347
 msgid "copies the default gta controls"
 msgstr "menyalin kontrol default gta"
 
-#: Client/core/CCore.cpp:1356
+#: Client/core/CCore.cpp:1348
 msgid "outputs a screenshot"
 msgstr "mengeluarkan sebuah tangkapan layar"
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1349
 msgid "immediately saves the config"
 msgstr "langsung menyimpan pengaturan"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1351
 msgid "clears the debug view"
 msgstr "membersihkan tampilan debug"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1352
 msgid "scrolls the chatbox upwards"
 msgstr "menggulung kotak obrolan ke atas"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1353
 msgid "scrolls the chatbox downwards"
 msgstr "menggulung kotak obrolan ke bawah"
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1354
 msgid "scrolls the debug view upwards"
 msgstr "menggulung tampilan debug ke atas"
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1355
 msgid "scrolls the debug view downwards"
 msgstr "menggulung tampilan debug ke bawah"
 
-#: Client/core/CCore.cpp:1366
+#: Client/core/CCore.cpp:1358
 msgid "shows the memory statistics"
 msgstr "menampilkan statistik penyimpanan"
 
-#: Client/core/CCore.cpp:1367
+#: Client/core/CCore.cpp:1359
 msgid "shows the frame timing graph"
 msgstr "menampilkan grafik frame waktu"
 
@@ -1629,7 +1629,16 @@ msgid "\n\n"
 msgstr "\n\n"
 "Sedang menunggu respon  -  %-3d"
 
-#: Client/core/CScreenShot.cpp:53
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Tangkapan layar mempunyai %d byte, tetapi seharusnya %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Tangkapan layar gagal"
+
+#: Client/core/CScreenShot.cpp:160
 #, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "Tangkapan layar terambil: '%s'"
@@ -2035,15 +2044,6 @@ msgid "Could not initialize Direct3D9.\n\n"
 msgstr "Tidak dapat menginisialisasi Direct3D9.\n\n"
 "Pastikan bahwa DirectX End-User Runtime dan\n"
 "Windows Service Packs yang terbaru telah terpasang dengan benar."
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Tangkapan layar mempunyai %d byte, tetapi seharusnya %d"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Tangkapan layar gagal"
 
 #: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
