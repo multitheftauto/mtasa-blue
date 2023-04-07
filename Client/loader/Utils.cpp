@@ -1,21 +1,30 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Utils.cpp
+ *  FILE:        Client/loader/Utils.cpp
  *  PURPOSE:     Loading utilities
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "Utils.h"
+#include "Main.h"
+#include "Dialogs.h"
+#include <array>
+#include <random>
+#include <cryptopp/crc.h>
+#include <cryptopp/files.h>
 #include <tchar.h>
 #include <strsafe.h>
 #include <Tlhelp32.h>
 #include <Softpub.h>
 #include <wintrust.h>
+#include <version.h>
 #pragma comment (lib, "wintrust")
+
+namespace fs = std::filesystem;
 
 static SString g_strMTASAPath;
 static SString g_strGTAPath;
@@ -275,7 +284,7 @@ DWORD FindProcessId(const SString& processName)
 //
 // GetGTAProcessList
 //
-// Get list of process id's with the image name ending in "gta_sa.exe" or "proxy_sa.exe"
+// Get list of process id's with the image name ending in "gta_sa.exe"
 //
 ///////////////////////////////////////////////////////////////////////////
 std::vector<DWORD> GetGTAProcessList()
@@ -285,14 +294,18 @@ std::vector<DWORD> GetGTAProcessList()
     for (auto processId : MyEnumProcesses())
     {
         SString strPathFilename = GetProcessPathFilename(processId);
-        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME) || strPathFilename.EndsWith(MTA_HTAEXE_NAME))
+
+        if (strPathFilename.EndsWith(GTA_EXE_NAME) || strPathFilename.EndsWith(PROXY_GTA_EXE_NAME) || strPathFilename.EndsWith(STEAM_GTA_EXE_NAME))
             ListAddUnique(result, processId);
     }
 
-    if (DWORD processId = FindProcessId(MTA_GTAEXE_NAME))
+    if (DWORD processId = FindProcessId(GTA_EXE_NAME))
         ListAddUnique(result, processId);
 
-    if (DWORD processId = FindProcessId(MTA_HTAEXE_NAME))
+    if (DWORD processId = FindProcessId(PROXY_GTA_EXE_NAME))
+        ListAddUnique(result, processId);
+
+    if (DWORD processId = FindProcessId(STEAM_GTA_EXE_NAME))
         ListAddUnique(result, processId);
 
     return result;
@@ -417,6 +430,30 @@ void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCo
         BrowseToSolution(strTroubleType, SHOW_MESSAGE_ONLY, strMessage, strErrorCode);
     else
         BrowseToSolution(strTroubleType, ASK_GO_ONLINE | TERMINATE_IF_YES, strMessage, strErrorCode);
+}
+
+auto GetMTARootDirectory() -> std::filesystem::path
+{
+    static const auto directory = fs::path{FromUTF8(GetMTASAPath())};
+    return directory;
+}
+
+auto GetGameBaseDirectory() -> fs::path
+{
+    static const auto directory = fs::path{FromUTF8(GetGTAPath())};
+    return directory;
+}
+
+auto GetGameLaunchDirectory() -> fs::path
+{
+    static const auto directory = fs::path{FromUTF8(GetMTADataPath())} / "GTA San Andreas";
+    return directory;
+}
+
+auto GetGameExecutablePath() -> std::filesystem::path
+{
+    static const auto executable = GetGameLaunchDirectory() / GTA_EXE_NAME;
+    return executable;
 }
 
 void SetMTASAPathSource(bool bReadFromRegistry)
@@ -560,7 +597,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 
     // Ask user to browse for GTA
     BROWSEINFOW bi = {0};
-    WString     strMessage = _("Select your Grand Theft Auto: San Andreas Installation Directory");
+    WString     strMessage(_("Select your Grand Theft Auto: San Andreas Installation Directory"));
     bi.lpszTitle = strMessage;
     LPITEMIDLIST pidl = SHBrowseForFolderW(&bi);
 
@@ -638,8 +675,7 @@ bool HasGTAPath()
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
     {
-        SString strGTAEXEPath = PathJoin(strGTAPath, MTA_GTAEXE_NAME);
-        return FileExists(strGTAEXEPath);
+        return FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) || FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME));
     }
     return false;
 }
@@ -1007,8 +1043,8 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     GetApplicationSetting("mta-version-ext").Split(".", parts);
     if (parts.size() == 6)
     {
-        usNetRev = atoi(parts[4]);
-        usNetRel = atoi(parts[5]);
+        usNetRev = static_cast<unsigned short>(atoi(parts[4]));
+        usNetRel = static_cast<unsigned short>(atoi(parts[5]));
     }
 
     DWORD   dwLastError = 0;
@@ -1119,29 +1155,32 @@ bool Is32bitProcess(DWORD processID)
 // Terminate process from pid
 //
 ///////////////////////////////////////////////////////////////////////////
-void TerminateProcess(DWORD dwProcessID, uint uiExitCode)
+bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 {
-    HMODULE hModule = GetLibraryHandle("kernel32.dll");
-    if (hModule)
-    {
-        typedef bool (*PFNTerminateProcess)(uint, uint);
-        PFNTerminateProcess pfnTerminateProcess = static_cast<PFNTerminateProcess>(static_cast<PVOID>(GetProcAddress(hModule, "NtTerminateProcess")));
+    bool success = false;
 
-        if (pfnTerminateProcess)
+    if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
+    {
+        using Signature = bool (*)(DWORD, UINT);
+        static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
+
+        if (NtTerminateProcess_)
         {
-            bool bResult = pfnTerminateProcess(dwProcessID, uiExitCode);
-            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, bResult));
-        }
-        else
-        {
-            HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID);
-            if (hProcess)
-            {
-                TerminateProcess(hProcess, uiExitCode);
-                CloseHandle(hProcess);
-            }
+            success = NtTerminateProcess_(dwProcessID, uiExitCode);
+            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, success));
         }
     }
+
+    if (!success)
+    {
+        if (HANDLE handle = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID); handle)
+        {
+            success = TerminateProcess(handle, uiExitCode);
+            CloseHandle(handle);
+        }
+    }
+
+    return success;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1175,7 +1214,7 @@ bool CreateSingleInstanceMutex()
 ///////////////////////////////////////////////////////////////////////////
 void ReleaseSingleInstanceMutex()
 {
-    assert(g_hMutex);
+    // assert(g_hMutex);
     CloseHandle(g_hMutex);
     g_hMutex = NULL;
 }
@@ -1604,16 +1643,26 @@ void CheckAndShowImgProblems()
 // Load a library function
 //
 //////////////////////////////////////////////////////////
-void* LoadFunction(const char* szLibName, const char* szFunctionName)
+void* LoadFunction(const char* libraryName, const char* functionName)
 {
-    static std::map<SString, HMODULE> libMap;
-    HMODULE*                          phModule = MapFind(libMap, szLibName);
-    if (!phModule)
+    static std::map<std::string, HMODULE, std::less<>> libraries;
+
+    HMODULE handle{};
+
+    if (auto iter = libraries.find(libraryName); iter != libraries.end())
     {
-        MapSet(libMap, szLibName, LoadLibrary(szLibName));
-        phModule = MapFind(libMap, szLibName);
+        handle = iter->second;
     }
-    return static_cast<PVOID>(GetProcAddress(*phModule, szFunctionName));
+    else
+    {
+        if (handle = LoadLibraryA(libraryName))
+            libraries[libraryName] = handle;
+        else
+            return nullptr;
+    }
+
+    auto result = static_cast<void*>(GetProcAddress(handle, functionName));
+    return result;
 }
 
 //////////////////////////////////////////////////////////
@@ -1783,7 +1832,6 @@ void LogSettings()
     } const settings[] = {
         {false, "general", GENERAL_PROGRESS_ANIMATION_DISABLE, ""},
         {false, "general", "aero-enabled", ""},
-        {false, "general", "aero-changeable", ""},
         {false, "general", "driver-overrides-disabled", ""},
         {false, "general", "device-selection-disabled", ""},
         {false, "general", "customized-sa-files-using", ""},
@@ -1793,7 +1841,6 @@ void LogSettings()
         {false, "nvhacks", "optimus-force-detection", ""},
         {false, "nvhacks", "optimus-export-enablement", ""},
         {false, "nvhacks", "optimus", ""},
-        {false, "nvhacks", "optimus-rename-exe", ""},
         {false, "nvhacks", "optimus-alt-startup", ""},
         {false, "nvhacks", "optimus-force-windowed", ""},
         {false, "nvhacks", "optimus-dialog-skip", ""},
@@ -1963,6 +2010,173 @@ bool WriteCompatibilityEntries(const WString& strProgName, const WString& strSub
     }
 
     return bResult;
+}
+
+//////////////////////////////////////////////////////////
+//
+// GetProcessListUsingFile
+//
+// Returns a list of process ids with a handle a specific file.
+//
+//////////////////////////////////////////////////////////
+std::vector<DWORD> GetProcessListUsingFile(const WString& filePath)
+{
+    if (!_NtQueryInformationFile)
+        return {};
+
+    HANDLE fileHandle = CreateFileW(
+        /* FileName            */ filePath.c_str(),
+        /* DesiredAccess       */ FILE_READ_ATTRIBUTES,
+        /* ShareMode           */ FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        /* SecurityAttributes  */ nullptr,
+        /* CreationDisposition */ OPEN_EXISTING,
+        /* FlagsAndAttributes  */ 0,
+        /* TemplateFile        */ nullptr);
+
+    if (fileHandle == INVALID_HANDLE_VALUE)
+        return {};
+
+    HANDLE processHeap = GetProcessHeap();
+    SIZE_T heapSize = 8192;
+    auto   fileInfo = reinterpret_cast<PFILE_PROCESS_IDS_USING_FILE_INFORMATION>(HeapAlloc(processHeap, HEAP_ZERO_MEMORY, heapSize));
+
+    if (!fileInfo)
+    {
+        CloseHandle(fileHandle);
+        return {};
+    }
+
+    IO_STATUS_BLOCK ioStatus{};
+    NTSTATUS        status = _NtQueryInformationFile(
+        /* FileHandle           */ fileHandle,
+        /* IoStatusBlock        */ &ioStatus,
+        /* FileInformation      */ fileInfo,
+        /* Length               */ heapSize,
+        /* FileInformationClass */ 47 /* = FileProcessIdsUsingFileInformation */);
+
+    while (status == STATUS_INFO_LENGTH_MISMATCH)
+    {
+        heapSize *= 2;
+        auto reallocated = reinterpret_cast<PFILE_PROCESS_IDS_USING_FILE_INFORMATION>(HeapReAlloc(processHeap, HEAP_ZERO_MEMORY, fileInfo, heapSize));
+
+        if (!reallocated)
+        {
+            HeapFree(processHeap, 0, fileInfo);
+            CloseHandle(fileHandle);
+            return {};
+        }
+
+        fileInfo = reallocated;
+
+        status = _NtQueryInformationFile(
+            /* FileHandle           */ fileHandle,
+            /* IoStatusBlock        */ &ioStatus,
+            /* FileInformation      */ fileInfo,
+            /* Length               */ heapSize,
+            /* FileInformationClass */ 47 /* = FileProcessIdsUsingFileInformation */);
+    }
+
+    CloseHandle(fileHandle);
+    std::vector<DWORD> result;
+
+    if (NT_SUCCESS(status) && fileInfo->NumberOfProcessIdsInList > 0)
+    {
+        result.reserve(fileInfo->NumberOfProcessIdsInList);
+
+        for (ULONG i = 0; i < fileInfo->NumberOfProcessIdsInList; i++)
+        {
+            auto processId = static_cast<DWORD>(fileInfo->ProcessIdList[i]);
+
+            if (processId)
+                result.emplace_back(processId);
+        }
+    }
+
+    HeapFree(processHeap, 0, fileInfo);
+    return result;
+}
+
+auto ComputeCRC32(const char* filePath) -> uint32_t
+{
+    CryptoPP::CRC32                                         hash{};
+    std::array<CryptoPP::byte, CryptoPP::CRC32::DIGESTSIZE> bytes{};
+
+    try
+    {
+        CryptoPP::FileSource pass(filePath, true, new CryptoPP::HashFilter(hash, new CryptoPP::ArraySink(bytes.data(), bytes.size())));
+    }
+    catch (const std::exception&)
+    {
+        return 0;
+    }
+
+    uint32_t result{};
+    std::copy_n(bytes.data(), std::min(sizeof(result), bytes.size()), reinterpret_cast<uint8_t*>(&result));
+    return result;
+};
+
+static constexpr std::string_view alphaNumericCharset{"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"};
+
+auto GenerateRandomString(size_t length) -> std::string
+{
+    if (!length)
+        return {};
+
+    std::random_device                      engine;
+    std::uniform_int_distribution<uint16_t> distribution{0, static_cast<uint16_t>(alphaNumericCharset.size() - 1)};
+
+    std::array<uint16_t, 4096> bytes{};
+    length = std::min(bytes.size(), length);
+    std::generate_n(bytes.data(), length, [&] { return distribution(engine); });
+
+    std::string result;
+    result.reserve(length);
+
+    for (size_t i = 0; i < length; ++i)
+        result.push_back(alphaNumericCharset[bytes[i]]);
+
+    return result;
+}
+
+bool IsErrorCodeLoggable(const std::error_code& ec)
+{
+    switch (ec.value())
+    {
+        case ERROR_FILE_NOT_FOUND:
+        case ERROR_PATH_NOT_FOUND:
+            return false;
+        default:
+            return true;
+    }
+}
+
+bool IsNativeArm64Host()
+{
+    static bool isArm64 = ([]
+    {
+        HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
+
+        if (kernel32)
+        {
+            BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(GetProcAddress(kernel32, "IsWow64Process2"));
+
+            if (IsWow64Process2_)
+            {
+                USHORT processMachine;
+                USHORT nativeMachine;
+
+                if (IsWow64Process2_(GetCurrentProcess(), &processMachine, &nativeMachine))
+                {
+                    return nativeMachine == IMAGE_FILE_MACHINE_ARM64;
+                }
+            }
+        }
+
+        return false;
+    })();
+
+    return isArm64;
 }
 
 //////////////////////////////////////////////////////////

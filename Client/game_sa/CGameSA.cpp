@@ -330,7 +330,7 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 
 void CGameSA::Pause(bool bPaused)
 {
-	MemPutFast<bool>(0xB7CB49, bPaused); // CTimer::m_UserPause
+    MemPutFast<bool>(0xB7CB49, bPaused);            // CTimer::m_UserPause
 }
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
@@ -353,8 +353,8 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 void CGameSA::StartGame()
 {
     SetSystemState(GS_INIT_PLAYING_GAME);
-    MemPutFast<BYTE>(0xB7CB49, 0); // CTimer::m_UserPause
-    MemPutFast<BYTE>(0xBA67A4, 0); // FrontEndMenuManager + 0x5C
+    MemPutFast<BYTE>(0xB7CB49, 0);            // CTimer::m_UserPause
+    MemPutFast<BYTE>(0xBA67A4, 0);            // FrontEndMenuManager + 0x5C
 }
 
 /**
@@ -525,22 +525,22 @@ void CGameSA::SetTimeScale(float fTimeScale)
 
 unsigned char CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104; // CPostEffects::m_SpeedFXAlpha
+    return *(unsigned char*)0x8D5104;            // CPostEffects::m_SpeedFXAlpha
 }
 
 void CGameSA::SetBlurLevel(unsigned char ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel); // CPostEffects::m_SpeedFXAlpha
+    MemPutFast<unsigned char>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
 }
 
 unsigned long CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C; // CClock::ms_nMillisecondsPerGameMinute
+    return *(unsigned long*)0xB7015C;            // CClock::ms_nMillisecondsPerGameMinute
 }
 
 void CGameSA::SetMinuteDuration(unsigned long ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime); // CClock::ms_nMillisecondsPerGameMinute
+    MemPutFast<unsigned long>(0xB7015C, ulTime);            // CClock::ms_nMillisecondsPerGameMinute
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -562,7 +562,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
 
     if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
         return IsCoronaZTestEnabled();
- 
 
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
@@ -727,7 +726,7 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
         // Disable ZTest (PS2)
         MemSet((void*)0x6FB17C, 0x90, 3);
     }
-    
+
     m_isCoronaZTestEnabled = isEnabled;
 }
 
@@ -859,7 +858,7 @@ void CGameSA::SetupBrokenModels()
 // Well, has it?
 bool CGameSA::HasCreditScreenFadedOut()
 {
-    BYTE ucAlpha = *(BYTE*)0xBAB320; // CLoadingScreen::m_FadeAlpha
+    BYTE ucAlpha = *(BYTE*)0xBAB320;            // CLoadingScreen::m_FadeAlpha
     bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
     return bCreditScreenFadedOut;
 }
@@ -902,7 +901,7 @@ void CGameSA::ResetAlphaTransparencies()
 // Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
 void CGameSA::DisableVSync()
 {
-    MemPutFast<BYTE>(0xBAB318, 0); // CLoadingScreen::m_bActive
+    MemPutFast<BYTE>(0xBAB318, 0);            // CLoadingScreen::m_bActive
 }
 CWeapon* CGameSA::CreateWeapon()
 {

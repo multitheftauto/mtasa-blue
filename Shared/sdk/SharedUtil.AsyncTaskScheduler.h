@@ -41,10 +41,7 @@ namespace SharedUtil
             ReadyFn m_ReadyFunction;
             Result  m_Result;
 
-            STask(TaskFn&& task, ReadyFn&& ready) :
-                m_TaskFunction(std::move(task)),
-                m_ReadyFunction(std::move(ready))
-            {}
+            STask(TaskFn&& task, ReadyFn&& ready) : m_TaskFunction(std::move(task)), m_ReadyFunction(std::move(ready)) {}
 
             void Execute() override { m_Result = std::move(m_TaskFunction()); }
 

@@ -19,7 +19,10 @@ namespace
     // Helper functions for this file only
 
     // Convert size of PT stream to sizeof of N stream
-    uint ConvertPTSize(uint SizePT) { return SizePT * 12 / 20; }
+    uint ConvertPTSize(uint SizePT)
+    {
+        return SizePT * 12 / 20;
+    }
 
     // Get 64 bit key for a triangle by using the ordered vertex indices
     long long getTriKey(WORD a, WORD b, WORD c)

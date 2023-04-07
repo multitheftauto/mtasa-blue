@@ -21,7 +21,7 @@ public:
     virtual long GetPlayerMoney() = 0;
     virtual void SetPlayerMoney(long lMoney, bool bInstant = false) = 0;
 
-    virtual void  SetLastTimeEaten(short sTime) = 0;
+    virtual void SetLastTimeEaten(short sTime) = 0;
 
     virtual CWanted* GetWanted() = 0;
     virtual float    GetFPSMoveHeading() = 0;

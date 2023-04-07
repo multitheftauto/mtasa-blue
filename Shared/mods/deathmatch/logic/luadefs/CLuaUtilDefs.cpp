@@ -288,8 +288,8 @@ int CLuaUtilDefs::luaB_print(lua_State* L)
     for (i = 1; i <= n; i++)
     {
         const char* s;
-        lua_pushvalue(L, -1); /* function to be called */
-        lua_pushvalue(L, i);  /* value to print */
+        lua_pushvalue(L, -1);    /* function to be called */
+        lua_pushvalue(L, i);     /* value to print */
         lua_call(L, 1, 1);
         s = lua_tostring(L, -1); /* get result */
         if (s == NULL)

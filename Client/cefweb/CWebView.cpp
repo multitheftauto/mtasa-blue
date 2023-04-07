@@ -45,7 +45,7 @@ CWebView::~CWebView()
     ResumeCefThread();
 
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = nullptr;    
+    m_pWebView = nullptr;
 
     OutputDebugLine("CWebView::~CWebView");
 }
@@ -187,7 +187,7 @@ void CWebView::ClearTexture()
     IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
     if (!pD3DSurface)
         return;
-    
+
     D3DSURFACE_DESC SurfaceDesc;
     if (FAILED(pD3DSurface->GetDesc(&SurfaceDesc)))
         return;
@@ -236,12 +236,12 @@ void CWebView::UpdateTexture()
                 {
                     // Note that D3D texture size can be hardware dependent(especially with dynamic texture)
                     // When destination and source pitches differ we must copy pixels row by row
-                    if (destPitch == sourcePitch)                    
+                    if (destPitch == sourcePitch)
                         memcpy(destData, sourceData, destPitch * m_RenderData.height);
                     else
                     {
                         for (int y = 0; y < m_RenderData.height; ++y)
-                        {                           
+                        {
                             const int sourceIndex = y * sourcePitch;
                             const int destIndex = y * destPitch;
 
@@ -470,7 +470,8 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted) {
+        [&](bool aborted)
+        {
             if (aborted)
                 return;
 
@@ -517,7 +518,8 @@ bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted) {
+        [&](bool aborted)
+        {
             if (aborted)
                 return;
 
@@ -702,7 +704,7 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
         return;
 
     std::unique_lock<std::mutex> lock(m_RenderData.dataMutex);
-  
+
     // Copy popup buffer
     if (paintType == PET_POPUP)
     {
@@ -722,8 +724,8 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     m_RenderData.changed = true;
 
     // Wait for the main thread to handle drawing the texture
-    m_RenderData.cefThreadState = ECefThreadState::Wait;    
-    m_RenderData.cefThreadCv.wait(lock, [&](){ return m_RenderData.cefThreadState == ECefThreadState::Running; });
+    m_RenderData.cefThreadState = ECefThreadState::Wait;
+    m_RenderData.cefThreadCv.wait(lock, [&]() { return m_RenderData.cefThreadState == ECefThreadState::Running; });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -810,17 +812,15 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
         if (host != "mta")
         {
             if (IsLocal() || g_pCore->GetWebCore()->GetDomainState(host, true) != eURLState::WEBPAGE_ALLOWED)
-                bResult = true;            // Block remote here
+                bResult = true;             // Block remote here
             else
                 bResult = false;            // Allow
         }
         else
             bResult = false;
     }
-    else if (scheme == L"mtalocal")
-        bResult = false;            // Allow mtalocal:// URLs
     else
-        bResult = true;            // Block other schemes
+        bResult = true;             // Block other schemes
 
     // Check if we're in the browser's main frame or only a frame element of the current page
     bool bIsMainFrame = frame->IsMain();
@@ -899,7 +899,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
         else
             return RV_CONTINUE;
     }
-    else if (scheme == L"mtalocal" || scheme == L"blob")
+    else if (scheme == L"blob")
     {
         return RV_CONTINUE;
     }
@@ -1044,9 +1044,8 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
     if (g_pCore->GetWebCore()->IsTestModeEnabled())
     {
         g_pCore->GetWebCore()->AddEventToEventQueue(
-            [message, source]() {
-                g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str());
-            },
+            [message, source]()
+            { g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str()); },
             this, "OnConsoleMessage");
     }
 

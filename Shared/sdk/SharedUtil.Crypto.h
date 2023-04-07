@@ -66,7 +66,6 @@ namespace SharedUtil
         return result;
     }
 
-
     inline KeyPair GenerateRsaKeyPair(const unsigned int size)
     {
         KeyPair rsaKeyPair;

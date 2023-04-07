@@ -745,6 +745,40 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             if (m_strLastPlayerName.size() != 0)
                 m_strLastPlayerName.clear();
 
+            if (KeyboardArgs.codepoint == 127)            // "delete" char, used to remove the previous word from input
+            {
+                if (m_strInputText.size() > 0)
+                {
+                    // Convert our string to UTF8 before resizing, then back to ANSI.
+                    std::wstring      wstrText = MbUTF8ToUTF16(m_strInputText);
+                    std::wstring_view wstrTextView = wstrText;
+
+                    if (wstrTextView.back() == L' ' || wstrTextView.back() == L'-')
+                    {
+                        size_t lastPos = wstrTextView.find_last_not_of(wstrTextView.back());
+                        if (lastPos != std::string::npos)
+                            wstrTextView.remove_suffix(wstrTextView.size() - lastPos);
+                        else
+                            wstrText.clear();
+                    }
+
+                    size_t lastSpacePos = wstrTextView.find_last_of(L' ');
+                    size_t lastDashPos = wstrTextView.find_last_of(L'-');
+                    size_t lastPos = lastSpacePos;
+
+                    if ((lastSpacePos == std::string::npos || lastDashPos > lastSpacePos) && lastDashPos != std::string::npos)
+                        lastPos = lastDashPos;
+
+                    if (lastPos != std::string::npos)
+                        wstrText.resize(lastPos + 1);
+                    else
+                        wstrText.clear();
+
+                    SetInputText(UTF16ToMbUTF8(wstrText).c_str());
+                }
+                break;
+            }
+
             // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
             if (MbUTF8ToUTF16(m_strInputText).size() < m_iCharacterLimit)
             {

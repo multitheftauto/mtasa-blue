@@ -43,8 +43,8 @@ public:
         SKeysyncFlags flags;
 
         bool   bWeaponCorrect;
-        uchar  ucWeaponSlot;            // Only valid if bWeaponCorrect
-        ushort usAmmoInClip;            // Only valid if bWeaponCorrect
+        uchar  ucWeaponSlot;              // Only valid if bWeaponCorrect
+        ushort usAmmoInClip;              // Only valid if bWeaponCorrect
 
         float   fAimDirection;            // Only valid if bWeaponCorrect
         CVector vecSniperSource;

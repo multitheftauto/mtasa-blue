@@ -17,7 +17,7 @@
 #include "CWorldSA.h"
 
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 #define ARRAY_SurfaceInfos 0xB79538
 
@@ -488,7 +488,7 @@ void CWorldSA::SetOcclusionsEnabled(bool bEnabled)
 {
     if (!bEnabled)
     {
-        MemPut<BYTE>(FUNC_COcclusion_ProcessBeforeRendering, 0xC3);            // retn
+        MemPut<BYTE>(FUNC_COcclusion_ProcessBeforeRendering, 0xC3);                                        // retn
         MemPutFast<int>(VAR_COcclusion_NumActiveOccluders, 0);
         MemCpy((void*)CALL_CCullZones_FindTunnelAttributesForCoors, "\xB8\x80\x28\x00\x00", 5);            // mov eax, 0x2880
     }

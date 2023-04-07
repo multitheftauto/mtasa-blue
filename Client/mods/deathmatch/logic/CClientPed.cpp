@@ -2057,10 +2057,6 @@ void CClientPed::SetFrozenWaitingForGroundToLoad(bool bFrozen)
 
 CWeapon* CClientPed::GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent)
 {
-    // Multiply ammo with 10 if flamethrower to get the numbers correct.
-    if (weaponType == WEAPONTYPE_FLAMETHROWER)
-        uiAmmo *= 10;
-
     CWeapon* pWeapon = NULL;
     if (m_pPlayerPed)
     {
@@ -6501,7 +6497,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)            // Kill jump task - breaks warp in entry and doesn't really matter
     {
         if (pVehicle->IsInWater() ||
-            IsInWater())            // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
+            IsInWater())                  // Make sure we are about to warp in (this bug only happens when someone jumps into water with a vehicle)
         {
             KillTask(3, true);            // Kill jump task if we are about to warp in
         }
