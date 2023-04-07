@@ -298,6 +298,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles 0x6A6FF0
 
+#define HOOKPOS_CWeapon__TakePhotograph 0x73C26E
+
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
 
 CPed*         pContextSwitchedPed = 0;
@@ -543,6 +545,8 @@ void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
 
 void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 
+void HOOK_CWeapon__TakePhotograph();
+
 void HOOK_CCollision__CheckCameraCollisionObjects();
 
 CMultiplayerSA::CMultiplayerSA()
@@ -777,6 +781,8 @@ void CMultiplayerSA::InitHooks()
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
 
     HookInstall(HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles, (DWORD)HOOK_CAutomobile__dmgDrawCarCollidingParticles, 0x91);
+
+    HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
 
@@ -1544,6 +1550,9 @@ void CMultiplayerSA::InitHooks()
 
     // Show muzzle flash for last bullet in magazine
     MemSet((void*)0x61ECD2, 0x90, 20);
+
+    // Disable camera photos creation since we reimplement it (to have better quality)
+    MemSet((void*)0x705331, 0x90, 0x7053AF - 0x705331);
 
     // Fix ped real time shadows by processing them always like for a non player ped
     // Change JZ to JMP instruction in CRealTimeShadowManager::GetRealTimeShadow()
@@ -7052,6 +7061,29 @@ void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
         add esp, 12
 
         jmp RETURN_CAutomobile__dmgDrawCarCollidingParticles
+    }
+}
+
+// Reimplement camera photo creation
+// to have better photo quality
+static void TakePhotograph()
+{
+    g_pCore->InitiateScreenShot(true);
+}
+
+const DWORD RETURN_CWeapon__TakePhotograph = 0x73C273;
+void _declspec(naked) HOOK_CWeapon__TakePhotograph()
+{
+    _asm
+    {
+        // Restore instructions replaced by hook
+        add     esp, 8
+        test    edi, edi
+
+        call    TakePhotograph
+
+        // Go back
+        jmp     RETURN_CWeapon__TakePhotograph
     }
 }
 
