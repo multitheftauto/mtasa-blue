@@ -1,13 +1,13 @@
 project "Loader Proxy"
 	language "C++"
 	kind "SharedLib"
-	targetname "winmm"
+	targetname "mtasa"
 	targetdir(buildpath("mta"))
 	targetsuffix ""
 
 	vpaths {
 		["Headers/*"] = "**.h",
-		["Sources"] = { "*.cpp", "*.asm" },
+		["Sources"] = { "*.cpp" },
 		["Resources/*"] = "*.def",
 		["*"] = "premake5.lua"
 	}
@@ -15,9 +15,11 @@ project "Loader Proxy"
 	files {
 		"premake5.lua",
 		"exports.def",
-		"winmm.asm",
-		"setup.cpp",
 		"main.cpp",
+	}
+
+	includedirs {
+		"../../Shared/sdk",
 	}
 
 	filter "system:windows"
