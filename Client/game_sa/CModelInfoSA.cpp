@@ -1287,6 +1287,9 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         m_pInterface->bDoWeOwnTheColModel = false;
         m_pInterface->bCollisionWasStreamedWithModel = false;
 
+        // Fix random foliage on custom collisions by calling CPlantMgr::SetPlantFriendlyFlagInAtomicMI
+        (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(m_pInterface);
+
         // Set some lighting for this collision if not already present
         CColDataSA* pColData = pColModelInterface->m_data;
 
