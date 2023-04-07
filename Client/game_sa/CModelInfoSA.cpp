@@ -1020,11 +1020,14 @@ CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
         }
     }
 
-    if (!IsLoaded())
-        Request(BLOCKING, "GetVehicleDummyDefaultPosition");
+    ModelAddRef(BLOCKING, "GetVehicleDummyDefaultPosition");
 
-    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
-    return modelInfo->pVisualInfo->vecDummies[eDummy];
+    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
+    CVector vec = modelInfo->pVisualInfo->vecDummies[eDummy];
+
+    RemoveRef();
+
+    return vec;
 }
 
 CVector CModelInfoSA::GetVehicleDummyPosition(eVehicleDummies eDummy)
@@ -1108,11 +1111,7 @@ float CModelInfoSA::GetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup)
     if (!IsVehicle())
         return 0.0f;
 
-    // Request model load right now if not loaded yet
-    if (!IsLoaded())
-        Request(BLOCKING, "GetVehicleWheelSize");
-
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
     switch (eWheelGroup)
     {
         case eResizableVehicleWheelGroup::FRONT_AXLE:
@@ -1129,11 +1128,7 @@ void CModelInfoSA::SetVehicleWheelSize(eResizableVehicleWheelGroup eWheelGroup, 
     if (!IsVehicle())
         return;
 
-    // Request model load right now if not loaded yet
-    if (!IsLoaded())
-        Request(BLOCKING, "SetVehicleWheelSize");
-
-    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
+    auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
 
     // Store default wheel sizes in map
     if (!MapFind(ms_VehicleModelDefaultWheelSizes, m_dwModelID))
