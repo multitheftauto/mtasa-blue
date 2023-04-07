@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 18:26+0000\n"
-"PO-Revision-Date: 2023-04-07 19:36\n"
+"POT-Creation-Date: 2023-04-07 19:51+0000\n"
+"PO-Revision-Date: 2023-04-07 20:47\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -76,7 +76,7 @@ msgstr "Prisijungimas nepavyko. Pateiktas netinkamas slapyvardis!"
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CCore.cpp:1235 Client/core/CCore.cpp:1248
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
 #: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
 #: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
 #: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
@@ -180,116 +180,116 @@ msgstr "Blogas atsakas iš serverio (2)"
 msgid "Bad server response (1)"
 msgstr "Blogas atsakas iš serverio (1)"
 
-#: Client/core/CCore.cpp:766 Client/loader/CInstallManager.cpp:1069
+#: Client/core/CCore.cpp:763 Client/loader/CInstallManager.cpp:1069
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA negali tęsti darbo, nes diske %s nepakanka laisvos vietos."
 
-#: Client/core/CCore.cpp:768 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Kritinė klaida"
 
-#: Client/core/CCore.cpp:893
+#: Client/core/CCore.cpp:890
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "KAD PATAISYTI, PAŠALINKITE FAILĄ:"
 
-#: Client/core/CCore.cpp:925
+#: Client/core/CCore.cpp:922
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modulis yra neteisingas!"
 
-#: Client/core/CCore.cpp:1235
+#: Client/core/CCore.cpp:1227
 msgid "Error executing URL"
 msgstr "Klaida vykdant URL"
 
-#: Client/core/CCore.cpp:1247
+#: Client/core/CCore.cpp:1239
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Klaida veikiant modifikacijai nurodytoje komandos eilutėje ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1335
+#: Client/core/CCore.cpp:1327
 msgid "this help screen"
 msgstr "šis pagalbos ekranas"
 
-#: Client/core/CCore.cpp:1336 Client/core/CCore.cpp:1337
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
 msgid "exits the application"
 msgstr "išjungia programą"
 
-#: Client/core/CCore.cpp:1338
+#: Client/core/CCore.cpp:1330
 msgid "shows the version"
 msgstr "rodo versiją"
 
-#: Client/core/CCore.cpp:1339
+#: Client/core/CCore.cpp:1331
 msgid "shows the time"
 msgstr "rodo laiką"
 
-#: Client/core/CCore.cpp:1340
+#: Client/core/CCore.cpp:1332
 msgid "shows the hud"
 msgstr "rodo vartotojo sąsają"
 
-#: Client/core/CCore.cpp:1341
+#: Client/core/CCore.cpp:1333
 msgid "shows all the binds"
 msgstr "rodo visus mygtukų priskirimus"
 
-#: Client/core/CCore.cpp:1342
+#: Client/core/CCore.cpp:1334
 msgid "shows your serial"
 msgstr "rodo jūsų serijinį numerį"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1343
 msgid "connects to a server (host port nick pass)"
 msgstr "jungiasi į serverį (adresas portas slapyvardis slaptažodis)"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1344
 msgid "connects to a previous server"
 msgstr "jungiasi į ankstesnį serverį"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1345
 msgid "binds a key (key control)"
 msgstr "priskiria mygtuką (mygtukas valdiklis)"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1346
 msgid "unbinds a key (key)"
 msgstr "pašalina priskirimą (mygtukas)"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1347
 msgid "copies the default gta controls"
 msgstr "nukopijuoja numatytuosius gta valdiklius"
 
-#: Client/core/CCore.cpp:1356
+#: Client/core/CCore.cpp:1348
 msgid "outputs a screenshot"
 msgstr "padaro nuotrauką"
 
-#: Client/core/CCore.cpp:1357
+#: Client/core/CCore.cpp:1349
 msgid "immediately saves the config"
 msgstr "nedelsiant išsaugo konfiguraciją"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1351
 msgid "clears the debug view"
 msgstr "išvalo derinimo vaizdą"
 
-#: Client/core/CCore.cpp:1360
+#: Client/core/CCore.cpp:1352
 msgid "scrolls the chatbox upwards"
 msgstr "paslenka pokalbį aukštyn"
 
-#: Client/core/CCore.cpp:1361
+#: Client/core/CCore.cpp:1353
 msgid "scrolls the chatbox downwards"
 msgstr "paslenka pokalbį žemyn"
 
-#: Client/core/CCore.cpp:1362
+#: Client/core/CCore.cpp:1354
 msgid "scrolls the debug view upwards"
 msgstr "paslenka derinimo tekstą aukštyn"
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1355
 msgid "scrolls the debug view downwards"
 msgstr "paslenka derinimo tekstą žemyn"
 
-#: Client/core/CCore.cpp:1366
+#: Client/core/CCore.cpp:1358
 msgid "shows the memory statistics"
 msgstr "rodo atminties statistikas"
 
-#: Client/core/CCore.cpp:1367
+#: Client/core/CCore.cpp:1359
 msgid "shows the frame timing graph"
 msgstr "rodo kadrų laiko grafiką"
 
@@ -1631,7 +1631,16 @@ msgid "\n\n"
 msgstr "\n\n"
 "Laukiama atsakymo - %-3d"
 
-#: Client/core/CScreenShot.cpp:53
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Nuotraukos dydis %d baitų, bet tikėtasi %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Ekranvaizdis nepavyko"
+
+#: Client/core/CScreenShot.cpp:160
 #, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "Ekranas nufotografuotas: '%s'"
@@ -2043,15 +2052,6 @@ msgid "Could not initialize Direct3D9.\n\n"
 msgstr "Nepavyko paleisti Direct3D9.\n\n"
 "Prašome įsitikinti, kad DirectX End-User Runtime ir\n"
 "naujausi Windows Service Packs yra teisingai įrašyti."
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:231
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Nuotraukos dydis %d baitų, bet tikėtasi %d"
-
-#: Client/core/DXHook/CDirect3DEvents9.cpp:237
-msgid "Screenshot failed"
-msgstr "Ekranvaizdis nepavyko"
 
 #: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
