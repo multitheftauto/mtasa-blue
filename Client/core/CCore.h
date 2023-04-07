@@ -130,8 +130,8 @@ public:
     int  GetChatboxCharacterLimit();
     int  GetChatboxMaxCharacterLimit();
 
-    // Screenshots
-    void TakeScreenShot();
+    // Screenshot
+    void InitiateScreenShot(bool bIsCameraShot);
 
     // GUI
     bool IsSettingsVisible();
@@ -232,7 +232,6 @@ public:
 
     SString GetConnectCommandFromURI(const char* szURI);
     void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
-    bool    bScreenShot;
     std::map<std::string, std::string>& GetCommandLineOptions() { return m_CommandLineOptions; }
     const char*                         GetCommandLineOption(const char* szOption);
     const char*                         GetCommandLineArgs() { return m_szCommandLineArgs; }

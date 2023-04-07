@@ -3049,12 +3049,12 @@ bool CStaticFunctionDefinitions::SetPlayerMoney(CElement* pElement, long lMoney,
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        // Is it above 99999999? Limit it to it
-        if (lMoney > 99999999)
-            lMoney = 99999999;
-        // Is it below -99999999?
-        else if (lMoney < -99999999)
-            lMoney = -99999999;
+         // Is it above 999999999? Limit it to it
+        if (lMoney > 999999999)
+            lMoney = 999999999;
+        // Is it below -999999999?
+        else if (lMoney < -999999999)
+            lMoney = -999999999;
 
         // Tell him his new money
         CBitStream BitStream;
@@ -3079,19 +3079,19 @@ bool CStaticFunctionDefinitions::GivePlayerMoney(CElement* pElement, long lMoney
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        // Is it above 99999999? Limit it to it
-        if (lMoney > 99999999)
-            lMoney = 99999999;
-        // Is it below -99999999?
-        else if (lMoney < -99999999)
-            lMoney = -99999999;
+        // Is it above 999999999? Limit it to it
+        if (lMoney > 999999999)
+            lMoney = 999999999;
+        // Is it below -999999999?
+        else if (lMoney < -999999999)
+            lMoney = -999999999;
 
-        // Calculate his new money, if it exceeds 8 digits, set it to 99999999
+        // Calculate his new money, if it exceeds 9 digits, set it to 999999999
         long lNewMoney = pPlayer->GetMoney() + lMoney;
-        if (lNewMoney > 99999999)
-            lNewMoney = 99999999;
-        else if (lNewMoney < -99999999)
-            lNewMoney = -99999999;
+        if (lNewMoney > 999999999)
+            lNewMoney = 999999999;
+        else if (lNewMoney < -999999999)
+            lNewMoney = -999999999;
 
         // Tell him his new money
         CBitStream BitStream;

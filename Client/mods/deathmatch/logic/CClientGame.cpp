@@ -3288,6 +3288,7 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
     g_pGame->ResetModelLodDistances();
+    g_pGame->ResetModelFlags();
     g_pGame->ResetAlphaTransparencies();
     g_pGame->ResetModelTimes();
 

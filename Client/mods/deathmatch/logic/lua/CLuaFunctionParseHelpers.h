@@ -78,6 +78,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::Gargle);
 DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
 DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
+DECLARE_ENUM_CLASS(eModelIdeFlag);
 
 class CRemoteCall;
 
