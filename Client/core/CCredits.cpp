@@ -124,7 +124,6 @@ CCredits::CCredits()
         "Philip \"Fenix\" Farquharson\n"
         "Seweryn \"Neproify\" Figura\n"
         "Alejandro \"AlexTMjugador\" González\n"
-        "Adrian \"AGraber\" Graber\n"
         "Kevin \"ciber96\" Gross\n"
         "Robin \"robhol\" Holm\n"
         "Bob \"NanoBob\" van Hooff\n"
