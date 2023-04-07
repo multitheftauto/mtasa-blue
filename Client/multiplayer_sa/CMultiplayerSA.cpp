@@ -298,6 +298,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles 0x6A6FF0
 
+#define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -541,6 +543,8 @@ void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
 
 void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 
+void HOOK_CCollision__CheckCameraCollisionObjects();
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -773,6 +777,8 @@ void CMultiplayerSA::InitHooks()
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio, 5);
 
     HookInstall(HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles, (DWORD)HOOK_CAutomobile__dmgDrawCarCollidingParticles, 0x91);
+
+    HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -7046,5 +7052,53 @@ void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
         add esp, 12
 
         jmp RETURN_CAutomobile__dmgDrawCarCollidingParticles
+    }
+}
+
+// Disable camera collisions for projectiles and detached vehicle parts
+const DWORD RETURN_CCollision__CheckCameraCollisionObjects = 0x41AB98;
+const DWORD RETURN_CCollision__CheckCameraCollisionObjects_2 = 0x41AC26;
+
+bool CanEntityCollideWithCamera(CEntitySAInterface* pEntity)
+{
+    switch (pEntity->m_nModelIndex)
+    {
+        // projectiles
+        case 342: // grenade
+        case 343: // teargas
+        case 344: // molotov
+        case 363: // satchel
+
+        // vehicle parts
+        case 374: // car_door
+        case 375: // car_bumper
+        case 376: // car_panel
+        case 377: // car_bonnet
+        case 378: // car_boot
+        case 379: // car_wheel
+            return false;
+    }
+
+    return true;
+}
+
+void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
+{
+    _asm
+    {
+        // Restore instructions replaced by hook
+        jz      out2
+        movsx   edx, word ptr [esi+22h]
+
+        // Do our stuff
+        push    esi // pEntity
+        call    CanEntityCollideWithCamera
+        add     esp, 4
+        test    al, al
+        jnz     out1
+        jmp     RETURN_CCollision__CheckCameraCollisionObjects_2
+
+    out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
+    out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
     }
 }
