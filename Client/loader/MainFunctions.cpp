@@ -34,7 +34,7 @@ public:
 
     virtual std::vector<SString> GetAvailableLocales() { return std::vector<SString>(); }
     virtual bool                 IsLocalized() { return false; }
-    virtual SString              GetLanguageDirectory() { return ""; }
+    virtual SString              GetLanguageDirectory(CLanguage* pLanguage = nullptr) { return ""; }
     virtual SString              GetLanguageCode() { return "en_US"; }
     virtual SString              GetLanguageName() { return "English"; }
 };
