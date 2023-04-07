@@ -59,8 +59,8 @@ Var UninstallExePath
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "5"
-    !define MAINT_VER "9"
+    !define MINOR_VER "6"
+    !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
