@@ -894,8 +894,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     // Load vehicles config
     CVehiclesConfig vehiclesConfig;
-
-    const char* strVehiclesPath = g_pServerInterface->GetModManager()->GetAbsolutePath("vehicles.conf");
+    const char*     strVehiclesPath = g_pServerInterface->GetModManager()->GetAbsolutePath("vehicles.conf");
     vehiclesConfig.SetFileName(strVehiclesPath);
     if (!vehiclesConfig.Load())
     {
