@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-08 12:28+0000\n"
-"PO-Revision-Date: 2023-04-08 12:39\n"
+"PO-Revision-Date: 2023-04-08 20:35\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -2398,7 +2398,7 @@ msgstr "Az MTA:SA nem indul el, mert a GTA:SA végrehajtható fájl nem tölthet
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr "GTA:SA Frissítése"
+msgstr "GTA:SA frissítése"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
@@ -2496,7 +2496,7 @@ msgstr "Őrizze meg ezeket a fájlokat, de a következő indításkor is jelení
 
 #: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
-msgstr "Ne emlékeztessen többet ezekre a fájlokra"
+msgstr "Ne emlékeztessen többet ezekről a fájlokról"
 
 #: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
@@ -2731,11 +2731,11 @@ msgstr "Max játékos:"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "Sugárzás:"
+msgstr "Közvetítés:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
-msgstr "Helyi hálózat"
+msgstr "LAN"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
