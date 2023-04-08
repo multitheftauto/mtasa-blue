@@ -22,7 +22,7 @@ static constexpr size_t SIZE_GTA_EXE{0x00db7a00};
 
 /**
  * @brief Checks if the provided buffer resembles a runnable 32-bit portable executable format.
-*/
+ */
 static bool Is32BitExecutable(const std::vector<unsigned char>& buffer)
 {
     if (buffer.size() < sizeof(IMAGE_DOS_HEADER))
@@ -46,7 +46,7 @@ static bool Is32BitExecutable(const std::vector<unsigned char>& buffer)
 
 /**
  * @brief Wraps a buffer which represents an executable and makes modifications easier.
-*/
+ */
 class PatchableExecutable
 {
 public:
@@ -65,7 +65,7 @@ public:
 
     /**
      * @brief Converts a virtual address to a pointer in the buffer.
-    */
+     */
     auto ResolveAddress(DWORD virtualAddress) -> unsigned char*
     {
         if (!numSections)
@@ -93,7 +93,7 @@ public:
 
     /**
      * @brief Converts a data directory index to a pointer in the buffer where the data directory points to.
-    */
+     */
     auto GetDataDirectory(DWORD index) -> unsigned char*
     {
         if (optHeader->NumberOfRvaAndSizes < index)
@@ -117,7 +117,7 @@ public:
 
 /**
  * @brief Enables the large address awareness flag for the executable.
-*/
+ */
 class LargeAddressAwarePatch final
 {
 public:
@@ -128,7 +128,7 @@ public:
 
 /**
  * @brief Enables data execution prevention (DEP) for the executable.
-*/
+ */
 class DataExecutionPreventionPatch final
 {
 public:
@@ -139,7 +139,7 @@ public:
 
 /**
  * @brief Changes the link timestamp to trick Windows 7 into using Aero.
-*/
+ */
 class WindowsAeroPatch final
 {
 public:
@@ -150,11 +150,11 @@ public:
 
 /**
  * @brief Replaces winmm.dll with mtasa.dll to enable injection of core.dll on game launch.
-*/
+ */
 class LibraryRedirectionPatch final
 {
     static constexpr auto LIBRARY_NAME_BEFORE = "WINMM.dll";            // Do not correct this value. It must be equal to the one in the original binary.
-    static constexpr auto LIBRARY_NAME_AFTER = LOADER_PROXY_DLL_NAME;   // This must be equal to the library produced by 'Loader Proxy' project.
+    static constexpr auto LIBRARY_NAME_AFTER = LOADER_PROXY_DLL_NAME;            // This must be equal to the library produced by 'Loader Proxy' project.
 
     static auto GetImportDescriptor(PatchableExecutable& pe) -> IMAGE_IMPORT_DESCRIPTOR*
     {
@@ -204,7 +204,7 @@ public:
 
 /**
  * @brief Enables high performance graphics rendering on hybrid GPU systems.
-*/
+ */
 class HighPerformanceGraphicsPatch final
 {
     // Export directory in .rdata section.
@@ -251,7 +251,7 @@ class HighPerformanceGraphicsPatch final
 
     /**
      * @brief Writes the export directory to the .rdata section.
-    */
+     */
     static auto WriteExportDirectory(PatchableExecutable& pe, ExportItems& exports) -> size_t
     {
         unsigned char* base = &pe.buffer[EXPORT_DIRECTORY_RA];
@@ -359,7 +359,7 @@ public:
 
 /**
  * @brief Computes the image checksum and applies it, because an invalid checksum might indicate malware activity.
-*/
+ */
 class ImageChecksumPatch final
 {
 public:

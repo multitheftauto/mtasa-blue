@@ -68,6 +68,11 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_pResourceIFPRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "ifproot");
     m_pResourceIFPRoot->MakeSystemEntity();
 
+    // Create our IMG root element. We set its parent when we're loaded.
+    // Make it a system entity so nothing but us can delete it.
+    m_pResourceIMGRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "imgroot");
+    m_pResourceIMGRoot->MakeSystemEntity();
+
     m_strResourceDirectoryPath = SString("%s/resources/%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
     m_strResourcePrivateDirectoryPath = PathJoin(CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(), m_strResourceName);
 
@@ -115,6 +120,10 @@ CResource::~CResource()
     // Destroy the ifp root so all ifp elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceIFPRoot);
     m_pResourceIFPRoot = NULL;
+
+    // Destroy the img root so all img elements are deleted except those moved out
+    g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceIMGRoot);
+    m_pResourceIMGRoot = NULL;
 
     // Destroy the ddf root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceDFFEntity);
@@ -266,7 +275,8 @@ void CResource::Load()
         }
     }
 
-    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front()) {
+    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front())
+    {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
 
         auto& item = list.front();

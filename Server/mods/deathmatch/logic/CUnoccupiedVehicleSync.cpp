@@ -283,9 +283,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                 // this packet if the time context matches.
                 if (pVehicle->GetSyncer() == pPlayer && pVehicle->CanUpdateSync(vehicle.data.ucTimeContext))
                 {
-                    // Is there no player driver?
+                    // Is there no player driver, or is he exiting?
                     CPed* pOccupant = pVehicle->GetOccupant(0);
-                    if (!pOccupant || !IS_PLAYER(pOccupant))
+                    if (!pOccupant || !IS_PLAYER(pOccupant) || pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                     {
                         // Apply the data to the vehicle
                         if (vehicle.data.bSyncPosition)

@@ -304,11 +304,11 @@ struct CSurfaceType
 class CWorld
 {
 public:
-    virtual void Add(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
-    virtual bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                    const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
+    virtual void  Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
+    virtual bool  ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
+                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
     virtual void  IgnoreEntity(CEntity* entity) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
     virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;

@@ -356,6 +356,8 @@ const char* CLuaClassDefs::GetEntityClass(CClientEntity* pEntity)
             return "EngineCOL";
         case CCLIENTTXD:
             return "EngineTXD";
+        case CCLIENTIMG:
+            return "EngineIMG";
         case CCLIENTSOUND:
             return static_cast<CClientSound*>(pEntity)->IsSound3D() ? "Sound3D" : "Sound";
         case CCLIENTWATER:

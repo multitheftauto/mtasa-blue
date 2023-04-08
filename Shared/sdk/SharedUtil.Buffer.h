@@ -37,7 +37,7 @@ namespace SharedUtil
 
     // Assuming compiled on little endian machine
     #define CBUFFER_LITTLE_ENDIAN
-    //#define CBUFFER_BIG_ENDIAN
+    // #define CBUFFER_BIG_ENDIAN
 
     //////////////////////////////////////////////////////
     //
