@@ -40,7 +40,7 @@ public:
             unsigned char m_bUpdateSkinnedWith3dVelocityExtraction : 1;
             unsigned char m_bCheckBlendNodeClumpKeyFrames : 1;            // key frames of CAninBlendNode bones will be checked
             unsigned char m_bIsCompressed : 1;
-            unsigned char m_bUpdatingFrame : 1;            // doesn't seem to be used
+            unsigned char m_bUpdatingFrame : 1;                           // doesn't seem to be used
         };
         unsigned char m_nFlags;
     };
@@ -114,8 +114,8 @@ public:
             unsigned short m_bLockLastX : 1;
             unsigned short m_bLockLastY : 1;            // only applies if m_bLockLastX is set
 
-            unsigned short m_bf9 : 1;             // doesn't seem to be used
-            unsigned short m_bf10 : 1;            // doesn't seem to be used
+            unsigned short m_bf9 : 1;                   // doesn't seem to be used
+            unsigned short m_bf10 : 1;                  // doesn't seem to be used
 
             // If set to TRUE, then result:
             // Before = https://i.imgur.com/c8T7xNK.png | AFTER = https://i.imgur.com/4gqlA4n.png

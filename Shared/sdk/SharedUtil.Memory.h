@@ -23,4 +23,4 @@ namespace SharedUtil
     };
 
     bool TryGetProcessMemoryStats(ProcessMemoryStats& out);
-}
+}            // namespace SharedUtil

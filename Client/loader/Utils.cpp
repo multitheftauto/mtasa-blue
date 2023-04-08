@@ -294,11 +294,18 @@ std::vector<DWORD> GetGTAProcessList()
     for (auto processId : MyEnumProcesses())
     {
         SString strPathFilename = GetProcessPathFilename(processId);
-        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME))
+
+        if (strPathFilename.EndsWith(GTA_EXE_NAME) || strPathFilename.EndsWith(PROXY_GTA_EXE_NAME) || strPathFilename.EndsWith(STEAM_GTA_EXE_NAME))
             ListAddUnique(result, processId);
     }
 
-    if (DWORD processId = FindProcessId(MTA_GTAEXE_NAME))
+    if (DWORD processId = FindProcessId(GTA_EXE_NAME))
+        ListAddUnique(result, processId);
+
+    if (DWORD processId = FindProcessId(PROXY_GTA_EXE_NAME))
+        ListAddUnique(result, processId);
+
+    if (DWORD processId = FindProcessId(STEAM_GTA_EXE_NAME))
         ListAddUnique(result, processId);
 
     return result;
@@ -445,7 +452,7 @@ auto GetGameLaunchDirectory() -> fs::path
 
 auto GetGameExecutablePath() -> std::filesystem::path
 {
-    static const auto executable = GetGameLaunchDirectory() / MTA_GTAEXE_NAME;
+    static const auto executable = GetGameLaunchDirectory() / GTA_EXE_NAME;
     return executable;
 }
 
@@ -668,8 +675,7 @@ bool HasGTAPath()
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
     {
-        SString strGTAEXEPath = PathJoin(strGTAPath, MTA_GTAEXE_NAME);
-        return FileExists(strGTAEXEPath);
+        return FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) || FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME));
     }
     return false;
 }
@@ -1155,7 +1161,7 @@ bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 
     if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
     {
-        using Signature = bool(*)(DWORD, UINT);
+        using Signature = bool (*)(DWORD, UINT);
         static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
 
         if (NtTerminateProcess_)
@@ -2166,7 +2172,7 @@ bool IsNativeArm64Host()
                 }
             }
         }
-        
+
         return false;
     })();
 

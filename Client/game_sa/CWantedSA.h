@@ -67,7 +67,7 @@ public:
 
     CPedSAInterface* m_pCopsInPursuit[MAX_COPS_PURSUIT];            // was CCopPed
 
-    DWORD m_PoliceScannerAudioEntity;            // was CAEPoliceScannerAudioEntity
+    DWORD m_PoliceScannerAudioEntity;                               // was CAEPoliceScannerAudioEntity
 };
 
 class CWantedSA : public CWanted
