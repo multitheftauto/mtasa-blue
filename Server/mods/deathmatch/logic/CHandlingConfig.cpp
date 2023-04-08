@@ -87,5 +87,4 @@ void CHandlingConfig::LoadHandlingParams(std::vector<char*> lineParams)
         CHandlingEntry handlingEntry(&handling);
         pVehicleModel->SetVehicleDefaultHandling(handlingEntry);
     }
-
 }
