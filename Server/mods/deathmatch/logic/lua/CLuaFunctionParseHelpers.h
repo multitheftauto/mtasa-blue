@@ -4,6 +4,8 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
  *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
  *****************************************************************************/
 
 #pragma once
