@@ -20,11 +20,11 @@ extern CCoreInterface* g_pCore;
 
 // count: 26316 in unmodified game
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
-HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010; // Contains open files
-CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8; // [8][0x30]
+HANDLE (&CStreamingSA::m_aStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010;                // Contains open files
+CArchiveInfo (&CStreamingSA::ms_aAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8;            // [8][0x30]
 HANDLE* phStreamingThread = (HANDLE*)0x8E4008;
-uint32  (&CStreamingSA::ms_streamingHalfOfBufferSize) = *(uint32*)0x8E4CA8;
-void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void*(*)[2])0x8E4CAC;
+uint32(&CStreamingSA::ms_streamingHalfOfBufferSize) = *(uint32*)0x8E4CA8;
+void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
 
 namespace
 {
@@ -229,15 +229,8 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 
     // Create new stream handler
     const auto streamCreateFlags = *(DWORD*)0x8E3FE0;
-    HANDLE hFile = CreateFileA(
-        szFilePath,
-        GENERIC_READ,
-        FILE_SHARE_READ,
-        NULL,
-        OPEN_EXISTING,
-        streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS,
-        NULL
-    );
+    HANDLE     hFile = CreateFileA(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                               streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
         return -1;
@@ -274,8 +267,8 @@ void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
     // Wait while streaming threads ends tasks
     while (streaming[0].bInUse && streaming[1].bInUse)
 
-    // Suspend streaming handle
-    SuspendThread(*phStreamingThread);
+        // Suspend streaming handle
+        SuspendThread(*phStreamingThread);
 
     // Create new buffer
     if (uiBlockSize & 1)

@@ -244,25 +244,25 @@ void CClientPad::DoPulse(CClientPed* pPed)
                                         : (m_fStates[5])                                                     ? m_fStates[5] * -128
                                                                                                              : m_fStates[6] * 128);
 
-                cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;             // Get in/out and alternative fighting styles
+                cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;            // Get in/out and alternative fighting styles
 
-                cs.ButtonSquare = (m_fStates[11]) ? 255 : 0;              // Jump
+                cs.ButtonSquare = (m_fStates[11]) ? 255 : 0;            // Jump
 
-                cs.ButtonCross = (m_fStates[12]) ? 255 : 0;               // Sprint
+                cs.ButtonCross = (m_fStates[12]) ? 255 : 0;            // Sprint
 
-                cs.ShockButtonR = (m_fStates[13]) ? 255 : 0;              // Look Behind
+                cs.ShockButtonR = (m_fStates[13]) ? 255 : 0;            // Look Behind
 
-                cs.ShockButtonL = (m_fStates[14]) ? 255 : 0;              // Crouch
+                cs.ShockButtonL = (m_fStates[14]) ? 255 : 0;            // Crouch
 
-                cs.LeftShoulder1 = (m_fStates[15]) ? 255 : 0;             // Action
+                cs.LeftShoulder1 = (m_fStates[15]) ? 255 : 0;            // Action
 
-                cs.m_bPedWalk = (m_fStates[16]) ? 255 : 0;                // Walk
+                cs.m_bPedWalk = (m_fStates[16]) ? 255 : 0;            // Walk
 
                 cs.RightShoulder1 = (m_fStates[39]) ? 255 : 0;            // Aim Weapon
             }
             else
             {
-                cs.ButtonCircle = (m_fStates[17]) ? 255 : 0;             // Fire
+                cs.ButtonCircle = (m_fStates[17]) ? 255 : 0;            // Fire
 
                 cs.LeftShoulder1 = (m_fStates[18]) ? 255 : 0;            // Secondary Fire
                 cs.LeftStickX = (short)(((m_fStates[19] && m_fStates[20]) || (!m_fStates[19] && !m_fStates[20])) ? 0
@@ -273,15 +273,15 @@ void CClientPad::DoPulse(CClientPed* pPed)
                                         : (m_fStates[21])                                                        ? m_fStates[21] * -128
                                                                                                                  : m_fStates[22] * 128);
 
-                cs.ButtonCross = (short)((m_fStates[23] * 255));                           // Accelerate
+                cs.ButtonCross = (short)((m_fStates[23] * 255));            // Accelerate
 
-                cs.ButtonSquare = (short)((m_fStates[24] * 255));                          // Reverse
+                cs.ButtonSquare = (short)((m_fStates[24] * 255));            // Reverse
 
-                cs.ShockButtonL = (m_fStates[28]) ? 255 : 0;                               // Horn
+                cs.ShockButtonL = (m_fStates[28]) ? 255 : 0;            // Horn
 
-                cs.RightShoulder1 = (m_fStates[30]) ? 255 : 0;                             // Handbrake
+                cs.RightShoulder1 = (m_fStates[30]) ? 255 : 0;            // Handbrake
 
-                cs.LeftShoulder2 = (m_fStates[31] || m_fStates[33]) ? 255 : 0;             // Look Left
+                cs.LeftShoulder2 = (m_fStates[31] || m_fStates[33]) ? 255 : 0;            // Look Left
 
                 cs.RightShoulder2 = (m_fStates[32] || m_fStates[33]) ? 255 : 0;            // Look Right
 
@@ -716,25 +716,25 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
     {
         unsigned int uiIndex = 4;
 
-        ProcessControl(cs.LeftStickX, uiIndex);              // Left
+        ProcessControl(cs.LeftStickX, uiIndex);            // Left
         uiIndex++;
-        ProcessControl(cs.LeftStickX, uiIndex);              // Right
+        ProcessControl(cs.LeftStickX, uiIndex);            // Right
         uiIndex++;
-        ProcessControl(cs.LeftStickY, uiIndex);              // Up
+        ProcessControl(cs.LeftStickY, uiIndex);            // Up
         uiIndex++;
-        ProcessControl(cs.LeftStickY, uiIndex);              // Down
+        ProcessControl(cs.LeftStickY, uiIndex);            // Down
         uiIndex++;
-        ProcessControl(cs.ButtonCross, uiIndex);             // Accel
+        ProcessControl(cs.ButtonCross, uiIndex);            // Accel
         uiIndex++;
         ProcessControl(cs.ButtonSquare, uiIndex);            // Brake
         uiIndex++;
-        ProcessControl(cs.RightStickX, uiIndex);             // Special Left
+        ProcessControl(cs.RightStickX, uiIndex);            // Special Left
         uiIndex++;
-        ProcessControl(cs.RightStickX, uiIndex);             // Special Right
+        ProcessControl(cs.RightStickX, uiIndex);            // Special Right
         uiIndex++;
-        ProcessControl(cs.RightStickY, uiIndex);             // Special Up
+        ProcessControl(cs.RightStickY, uiIndex);            // Special Up
         uiIndex++;
-        ProcessControl(cs.RightStickY, uiIndex);             // Special Down
+        ProcessControl(cs.RightStickY, uiIndex);            // Special Down
     }
 }
 

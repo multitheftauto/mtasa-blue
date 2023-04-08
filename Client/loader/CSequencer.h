@@ -168,7 +168,7 @@ public:
         m_uiCurrLine = m_LineList.size();
         for (uint i = 0; i < m_LineList.size(); i++)            // Find label
             if (m_LineList[i].BeginsWith(strLabel))
-                for (; i < m_LineList.size(); i++)              // Find offset
+                for (; i < m_LineList.size(); i++)            // Find offset
                     if (IsLineValid(m_LineList[i]) && !iOffset--)
                     {
                         m_uiCurrLine = i;

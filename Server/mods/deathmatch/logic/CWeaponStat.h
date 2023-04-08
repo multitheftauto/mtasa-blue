@@ -14,10 +14,10 @@ struct sWeaponStats
 {
     eFireType m_eFireType;            // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)
 
-    FLOAT m_fTargetRange;             // max targeting range
-    FLOAT m_fWeaponRange;             // absolute gun range / default melee attack range
-    int   m_modelId;                  // modelinfo id
-    int   m_modelId2;                 // second modelinfo id
+    FLOAT m_fTargetRange;            // max targeting range
+    FLOAT m_fWeaponRange;            // absolute gun range / default melee attack range
+    int   m_modelId;                 // modelinfo id
+    int   m_modelId2;                // second modelinfo id
 
     eWeaponSlot m_nWeaponSlot;
     int         m_nFlags;            // flags defining characteristics
@@ -40,21 +40,21 @@ struct sWeaponStats
     FLOAT        m_fMoveSpeed;               // how fast can move with weapon
 
     // anim timings
-    FLOAT m_animLoopStart;               // start of animation loop
-    FLOAT m_animLoopEnd;                 // end of animation loop
-    FLOAT m_animFireTime;                // time in animation when weapon should be fired
+    FLOAT m_animLoopStart;            // start of animation loop
+    FLOAT m_animLoopEnd;              // end of animation loop
+    FLOAT m_animFireTime;             // time in animation when weapon should be fired
 
-    FLOAT m_anim2LoopStart;              // start of animation2 loop
-    FLOAT m_anim2LoopEnd;                // end of animation2 loop
-    FLOAT m_anim2FireTime;               // time in animation2 when weapon should be fired
+    FLOAT m_anim2LoopStart;            // start of animation2 loop
+    FLOAT m_anim2LoopEnd;              // end of animation2 loop
+    FLOAT m_anim2FireTime;             // time in animation2 when weapon should be fired
 
     FLOAT m_animBreakoutTime;            // time after which player can break out of attack and run off
 
     // projectile/area effect specific info
-    FLOAT m_fSpeed;                     // speed of projectile
-    FLOAT m_fRadius;                    // radius affected
-    FLOAT m_fLifeSpan;                  // time taken for shot to dissipate
-    FLOAT m_fSpread;                    // angle inside which shots are created
+    FLOAT m_fSpeed;               // speed of projectile
+    FLOAT m_fRadius;              // radius affected
+    FLOAT m_fLifeSpan;            // time taken for shot to dissipate
+    FLOAT m_fSpread;              // angle inside which shots are created
 
     short m_nAimOffsetIndex;            // index into array of aiming offsets
     //////////////////////////////////

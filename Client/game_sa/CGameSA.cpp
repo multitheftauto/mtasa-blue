@@ -870,7 +870,6 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[311].MakePedModel("SMOKEV");
     ModelInfo[312].MakePedModel("PSYCHO");
 
-
     // ModelInfo[190].MakePedModel ( "BARBARA" );
     // ModelInfo[191].MakePedModel ( "HELENA" );
     // ModelInfo[192].MakePedModel ( "MICHELLE" );
