@@ -1,4 +1,3 @@
-
 #include "StdInc.h"
 #include "CPedConfig.h"
 #include <fstream>
