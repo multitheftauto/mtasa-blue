@@ -80,7 +80,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define PROP_SNIPER_MOON            "snipermoon"
 #define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_BURN_FLIPPED_CARS      "burnflippedcars"
 #define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
 #define PROP_CORONA_ZTEST           "coronaztest"
 
@@ -231,9 +230,6 @@ public:
 
     bool IsUnderWorldWarpEnabled();
     void SetUnderWorldWarpEnabled(bool bEnable);
-
-    bool IsBurnFlippedCarsEnabled();
-    void SetBurnFlippedCarsEnabled(bool bEnable);
 
     bool VerifySADataFileNames();
     bool PerformChecks();
