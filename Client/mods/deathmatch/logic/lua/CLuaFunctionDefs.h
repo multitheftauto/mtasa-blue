@@ -47,8 +47,6 @@ public:
     // Output functions
     LUA_DECLARE(OutputConsole);
     LUA_DECLARE(OutputChatBox);
-    LUA_DECLARE(ShowChat);
-    LUA_DECLARE(IsChatVisible);
     LUA_DECLARE(OutputClientDebugString);
     LUA_DECLARE(SetClipboard);
     LUA_DECLARE(SetWindowFlashing);
@@ -140,4 +138,5 @@ private:
     static CClientDFFManager*         m_pDFFManager;
     static CClientColModelManager*    m_pColModelManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
+    static CClientIMGManager*         m_pImgManager;
 };

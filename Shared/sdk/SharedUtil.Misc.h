@@ -22,7 +22,6 @@
 #include "SharedUtil.Defines.h"
 #include "SharedUtil.Map.h"
 
-
 namespace SharedUtil
 {
     class CArgMap;
@@ -202,7 +201,7 @@ namespace SharedUtil
     };
     struct SThreadCPUTimesStore : SThreadCPUTimes
     {
-        SThreadCPUTimesStore(){}
+        SThreadCPUTimesStore() {}
         uint64 ullPrevCPUMeasureTimeMs = 0;
         uint64 ullPrevUserTimeUs = 0;
         uint64 ullPrevKernelTimeUs = 0;
@@ -245,6 +244,10 @@ namespace SharedUtil
     // Buffer identification
     bool IsLuaCompiledScript(const void* pData, uint uiLength);
     bool IsLuaObfuscatedScript(const void* pData, uint uiLength);
+
+    // Return a pointer to the (shifted) trimmed string
+    // @ref https://stackoverflow.com/a/26984026
+    char* Trim(char* szText);
 
     //
     // Some templates
@@ -460,14 +463,9 @@ namespace SharedUtil
     //
     class SColor
     {
-        // No shifting allowed to access the color channel information
-        void operator>>(int) const;
-        void operator<<(int) const;
-        void operator>>=(int);
-        void operator<<=(int);
-
     public:
-        union {
+        union
+        {
             struct
             {
                 unsigned char B, G, R, A;
@@ -475,7 +473,8 @@ namespace SharedUtil
             unsigned long ulARGB;
         };
 
-        SColor() {}
+        SColor() : ulARGB(0) {}
+
         SColor(unsigned long ulValue) { ulARGB = ulValue; }
 
         operator unsigned long() const { return ulARGB; }
@@ -660,26 +659,52 @@ namespace SharedUtil
     //
     // Fixed sized string buffer
     //
-    template <int MAX_LENGTH>
+    template <size_t MAX_LENGTH>
     class SFixedString
     {
         char szData[MAX_LENGTH + 1];
 
     public:
-        SFixedString() { szData[0] = 0; }
+        constexpr SFixedString() { szData[0] = 0; }
+
 
         // In
-        SFixedString& operator=(const char* szOther)
+        constexpr SFixedString& Assign(const char* szOther, size_t len)
         {
-            STRNCPY(szData, szOther, MAX_LENGTH + 1);
+            STRNCPY(szData, szOther, len + 1);
             return *this;
         }
 
+        constexpr SFixedString& operator=(const char* szOther)
+        {
+            Assign(szOther, MAX_LENGTH + 1);
+            return *this;
+        }
+#ifdef __cpp_lib_string_view
+        constexpr SFixedString& operator=(std::string_view other)
+        {
+            Assign(other.data(), other.length() + 1);
+            return *this;
+        }
+#endif
+
+#ifdef __cpp_lib_string_view
         // Out
-        operator const char*() const { return szData; }
+        constexpr operator std::string_view() const { return { szData }; }
+#endif
+        constexpr operator const char*() const { return szData; }
+        constexpr char*           Data() { return &szData[0]; }
+
+        constexpr size_t GetMaxLength() const { return MAX_LENGTH; }
+        size_t GetLength() const { return strlen(szData); }
 
         // Shake it all about
         void Encrypt();
+        constexpr bool Empty() { return szData[0] == 0; }
+        constexpr void Clear() const { szData[0] = 0; }
+
+        // Returns a pointer to a null-terminated character array
+        const char* c_str() const noexcept { return &szData[0]; }
     };
 
     ///////////////////////////////////////////////////////////////
@@ -1516,37 +1541,6 @@ namespace SharedUtil
 
         std::map<uint, bool> idMap;
         char                 cDefaultType;
-    };
-
-    ///////////////////////////////////////////////////////////////
-    //
-    // CRefCountableST
-    //
-    // Reference counting base class
-    //
-    ///////////////////////////////////////////////////////////////
-    class CRefCountableST
-    {
-        int m_iRefCount;
-
-    protected:
-        virtual ~CRefCountableST() {}
-
-    public:
-        CRefCountableST() : m_iRefCount(1) {}
-
-        void AddRef() { ++m_iRefCount; }
-
-        void Release()
-        {
-            assert(m_iRefCount > 0);
-            bool bLastRef = --m_iRefCount == 0;
-
-            if (!bLastRef)
-                return;
-
-            delete this;
-        }
     };
 
     ///////////////////////////////////////////////////////////////

@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include "CAnimBlendAssocGroupSA.h"
+#include "CAnimBlockSA.h"
+
+extern CCoreInterface* g_pCore;
 
 CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface)
 {
@@ -101,8 +106,7 @@ eAnimGroup CAnimBlendAssocGroupSA::GetGroupID()
 {
     if ((DWORD)m_pInterface < 0x250)
     {
-        g_pCore->LogEvent(543, "CAnimBlendAssocGroupSA::GetGroupID", "Incorrect Group Interface",
-            SString("pAnimAssocGroupInterface = %p", m_pInterface), 543);
+        g_pCore->LogEvent(543, "CAnimBlendAssocGroupSA::GetGroupID", "Incorrect Group Interface", SString("pAnimAssocGroupInterface = %p", m_pInterface), 543);
     }
     return static_cast<eAnimGroup>(m_pInterface->groupID);
 };

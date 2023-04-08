@@ -77,7 +77,7 @@ inline void* operator new[](std::size_t size, const std::nothrow_t&) throw()
 {
     return myNew(size);
 }
-inline void operator delete(void* ptr, const std::nothrow_t&)throw()
+inline void operator delete(void* ptr, const std::nothrow_t&) throw()
 {
     myDelete(ptr);
 }

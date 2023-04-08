@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include <CVector.h>
 #include "Common.h"
+
+class CVector;
 
 /**
  * \todo fix SetColor/GetColor, the format is actually BGRA (strange)
@@ -35,20 +36,20 @@ enum
 class CCheckpoint
 {
 public:
-    virtual VOID     SetPosition(CVector* vecPosition) = 0;
-    virtual CVector* GetPosition() = 0;
-    virtual VOID     SetPointDirection(CVector* vecPointDirection) = 0;
-    virtual CVector* GetPointDirection() = 0;
-    virtual DWORD    GetType() = 0;            // need enum?
-    virtual BOOL     IsActive() = 0;
-    virtual DWORD    GetIdentifier() = 0;
-    virtual SColor   GetColor() = 0;
-    virtual VOID     SetColor(const SColor color) = 0;
-    virtual VOID     SetPulsePeriod(WORD wPulsePeriod) = 0;
-    virtual VOID     SetRotateRate(short RotateRate) = 0;
-    virtual FLOAT    GetSize() = 0;
-    virtual VOID     SetSize(FLOAT fSize) = 0;
-    virtual VOID     SetCameraRange(FLOAT fCameraRange) = 0;
-    virtual FLOAT    GetPulseFraction() = 0;
-    virtual VOID     Remove() = 0;
+    virtual void               SetPosition(CVector* vecPosition) = 0;
+    virtual CVector*           GetPosition() = 0;
+    virtual void               SetPointDirection(CVector* vecPointDirection) = 0;
+    virtual CVector*           GetPointDirection() = 0;
+    virtual DWORD              GetType() = 0;            // need enum?
+    virtual bool               IsActive() = 0;
+    virtual DWORD              GetIdentifier() = 0;
+    virtual SharedUtil::SColor GetColor() = 0;
+    virtual void               SetColor(const SharedUtil::SColor color) = 0;
+    virtual void               SetPulsePeriod(WORD wPulsePeriod) = 0;
+    virtual void               SetRotateRate(short RotateRate) = 0;
+    virtual float              GetSize() = 0;
+    virtual void               SetSize(float fSize) = 0;
+    virtual void               SetCameraRange(float fCameraRange) = 0;
+    virtual float              GetPulseFraction() = 0;
+    virtual void               Remove() = 0;
 };

@@ -46,7 +46,6 @@
 #define CORE_MTA_LOGO               "cgui\\images\\background_logo.png"
 #define CORE_MTA_FILLER             "cgui\\images\\mta_filler.png"
 #define CORE_MTA_VERSION            "cgui\\images\\version.png"
-#define CORE_MTA_LATEST_NEWS        "cgui\\images\\latest_news.png"
 
 static int          WaitForMenu = 0;
 static const SColor headlineColors[] = {SColorRGBA(233, 234, 106, 255), SColorRGBA(233 / 6 * 4, 234 / 6 * 4, 106 / 6 * 4, 255),
@@ -165,7 +164,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pVersion = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
     m_pVersion->LoadFromFile(CORE_MTA_VERSION);
     m_pVersion->SetParent(m_pCanvas);
-    m_pVersion->SetPosition(CVector2D(0.845f, 0.528f), true);
+    m_pVersion->SetPosition(CVector2D(0.855f, 0.512f), true);
     m_pVersion->SetSize(CVector2D((32 / NATIVE_RES_X) * m_iMenuSizeX, (32 / NATIVE_RES_Y) * m_iMenuSizeY), false);
     m_pVersion->SetProperty("InheritsAlpha", "False");
 
@@ -209,21 +208,28 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pMenuArea->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnMenuEnter, this));
     m_pMenuArea->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnMenuExit, this));
 
-    float fDrawSizeX = (365 / NATIVE_RES_X) * m_iMenuSizeX;            // Right aligned
-    float fDrawSizeY = (52 / NATIVE_RES_Y) * m_iMenuSizeY;
-    float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;
-    float fDrawPosY = 0.60f * m_iMenuSizeY;
     m_pLatestNews = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
-    m_pLatestNews->LoadFromFile(CORE_MTA_LATEST_NEWS);
+    if (!m_pLatestNews->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), "latest_news.png")))
+    {
+        // Load en_US if no localization is available
+        auto pLanguage = g_pLocalization->GetLanguage("en_US");
+        m_pLatestNews->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(pLanguage), "latest_news.png"));
+    }
     m_pLatestNews->SetParent(m_pCanvas);
-    m_pLatestNews->SetPosition(CVector2D(fDrawPosX, fDrawPosY), false);
-    m_pLatestNews->SetSize(CVector2D(fDrawSizeX, fDrawSizeY), false);
     m_pLatestNews->SetProperty("InheritsAlpha", "False");
+    CVector2D vecNativeSize;
+    m_pLatestNews->GetNativeSize(vecNativeSize);
+    float fDrawSizeX = (vecNativeSize.fX / NATIVE_RES_X) * m_iMenuSizeX;
+    float fDrawSizeY = (vecNativeSize.fY / NATIVE_RES_Y) * m_iMenuSizeY;
+    m_pLatestNews->SetSize(CVector2D(fDrawSizeX, fDrawSizeY), false);
+    float fDrawPosX = 0.83f * m_iMenuSizeX - fDrawSizeX;            // Right aligned
+    float fDrawPosY = 0.61f * m_iMenuSizeY;
+    m_pLatestNews->SetPosition(CVector2D(fDrawPosX, fDrawPosY), false);
     m_pLatestNews->SetVisible(false);
 
     // Create news item stuff
     fDrawPosX -= 25;
-    fDrawPosY += fDrawSizeY - 8;
+    fDrawPosY += fDrawSizeY + 3;
     for (uint i = 0; i < CORE_MTA_NEWS_ITEMS; i++)
     {
         fDrawPosY += 20;
@@ -324,17 +330,17 @@ CMainMenu::CMainMenu(CGUI* pManager)
     // Add annonying alert
     m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
     std::int32_t buffer = 0xFFFF0000;
-    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1); // HACK: Load red dot
+    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1);            // HACK: Load red dot
 
     m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
     m_pAlertImage->LoadFromTexture(m_pAlertTexture.get());
-    m_pAlertImage->SetPosition({ 0.0f, 0.0f }, false);
-    m_pAlertImage->SetSize({ ScreenSize.fX, 20.0f });
+    m_pAlertImage->SetPosition({0.0f, 0.0f}, false);
+    m_pAlertImage->SetSize({ScreenSize.fX, 20.0f});
 
     #define XP_VISTA_WARNING _("MTA will not receive updates on XP/Vista after July 2019.\n\nUpgrade Windows to play on the latest servers.")
     m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), XP_VISTA_WARNING)));
-    m_pAlertLabel->SetPosition({ 0.0f, 2.0f }, false);
-    m_pAlertLabel->SetSize({ ScreenSize.fX, 20.0f });
+    m_pAlertLabel->SetPosition({0.0f, 2.0f}, false);
+    m_pAlertLabel->SetSize({ScreenSize.fX, 20.0f});
     m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
 #endif
 }
@@ -450,13 +456,6 @@ void CMainMenu::Update()
 
     if (m_bIsFullyVisible)
     {
-        static bool versionUpdaterChecked = false;
-        if (!versionUpdaterChecked)
-        {
-            versionUpdaterChecked = true;
-            GetVersionUpdater()->OnMainMenuFullyVisible();
-        }
-
         // Grab our cursor position
         tagPOINT cursor;
         GetCursorPos(&cursor);
@@ -1014,13 +1013,12 @@ sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename,
 {
     CGUIStaticImage* pImage = reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage());
 
-    if (g_pCore->GetLocalization()->IsLocalized())
+    if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)))
     {
-        if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)))
-            pImage->LoadFromFile(PathJoin("cgui/images", szFilename));
+        // Load en_US if no localization is available
+        auto pLanguage = g_pLocalization->GetLanguage("en_US");
+        pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(pLanguage), szFilename));
     }
-    else
-        pImage->LoadFromFile(PathJoin("cgui/images", szFilename));
 
     // Make our positions absolute
     int iPosX = vecRelPosition.fX * m_iMenuSizeX;

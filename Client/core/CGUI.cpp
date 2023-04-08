@@ -24,7 +24,7 @@ CLocalGUI* CSingleton<CLocalGUI>::m_pSingleton = NULL;
 #endif
 #define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
 
-const char* const DEFAULT_SKIN_NAME = "Default";            // TODO: Change to whatever the default skin is if it changes
+const char* const DEFAULT_SKIN_NAME = "Default 2023";            // TODO: Change to whatever the default skin is if it changes
 
 CLocalGUI::CLocalGUI()
 {
@@ -35,6 +35,7 @@ CLocalGUI::CLocalGUI()
 
     m_bForceCursorVisible = false;
     m_bChatboxVisible = true;
+    m_bChatboxInputBlocked = false;
     m_pDebugViewVisible = false;
     m_bGUIHasInput = false;
     m_uiActiveCompositionSize = 0;
@@ -133,11 +134,11 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
 
     // Create chatbox
     m_pChat = new CChat(pGUI, CVector2D(0.0125f, 0.015f));
-    m_pChat->SetVisible(false);
+    m_pChat->SetVisible(false, true);
 
     // Create the debug view
     m_pDebugView = new CDebugView(pGUI, CVector2D(0.23f, 0.785f));
-    m_pDebugView->SetVisible(false);
+    m_pDebugView->SetVisible(false, true);
 
     // Create the overlayed version labels
     CVector2D ScreenSize = pGUI->GetResolution();
@@ -303,10 +304,10 @@ void CLocalGUI::Draw()
     // If we're ingame, make sure the chatbox is drawn
     bool bChatVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pChat->IsVisible() != bChatVisible)
-        m_pChat->SetVisible(bChatVisible);
+        m_pChat->SetVisible(bChatVisible, !bChatVisible);
     bool bDebugVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pDebugView->IsVisible() != bDebugVisible)
-        m_pDebugView->SetVisible(bDebugVisible);
+        m_pDebugView->SetVisible(bDebugVisible, true);
 
     // Make sure the cursor is displayed only when needed
     UpdateCursor();
@@ -455,13 +456,14 @@ CDebugView* CLocalGUI::GetDebugView()
     return m_pDebugView;
 }
 
-void CLocalGUI::SetChatBoxVisible(bool bVisible)
+void CLocalGUI::SetChatBoxVisible(bool bVisible, bool bInputBlocked)
 {
     if (m_pChat)
     {
-        if (m_pChat->IsVisible() != bVisible)
-            m_pChat->SetVisible(bVisible);
+        if (m_pChat->IsVisible() != bVisible || m_pChat->IsInputBlocked() != bInputBlocked)
+            m_pChat->SetVisible(bVisible, bInputBlocked);
         m_bChatboxVisible = bVisible;
+        m_bChatboxInputBlocked = bInputBlocked;
     }
 }
 
@@ -470,7 +472,7 @@ void CLocalGUI::SetDebugViewVisible(bool bVisible)
     if (m_pDebugView)
     {
         if (m_pDebugView->IsVisible() != bVisible)
-            m_pDebugView->SetVisible(bVisible);
+            m_pDebugView->SetVisible(bVisible, true);
         m_pDebugViewVisible = bVisible;
     }
 }
@@ -480,6 +482,15 @@ bool CLocalGUI::IsChatBoxVisible()
     if (m_pChat)
     {
         return m_bChatboxVisible;
+    }
+    return false;
+}
+
+bool CLocalGUI::IsChatBoxInputBlocked()
+{
+    if (m_pChat)
+    {
+        return m_bChatboxInputBlocked;
     }
     return false;
 }
@@ -505,7 +516,7 @@ bool CLocalGUI::IsChatBoxInputEnabled()
 {
     if (m_pChat)
     {
-        return m_pChat->IsInputVisible() && m_bChatboxVisible;
+        return m_pChat->IsInputVisible() && !m_pChat->IsInputBlocked();
     }
     return false;
 }

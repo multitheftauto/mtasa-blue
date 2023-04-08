@@ -656,8 +656,8 @@ static int panic (lua_State *L) {
 }
 
 
-LUALIB_API lua_State *luaL_newstate (void) {
-  lua_State *L = lua_newstate(l_alloc, NULL);
+LUALIB_API lua_State *luaL_newstate (void* mtasaowner) {
+  lua_State *L = lua_newstate(l_alloc, NULL, mtasaowner);
   if (L) lua_atpanic(L, &panic);
   return L;
 }

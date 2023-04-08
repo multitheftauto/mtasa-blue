@@ -56,6 +56,7 @@ typedef int (*lua_CFunction) (lua_State *L);
 */
 typedef int (*lua_PreCallHook) ( lua_CFunction f, lua_State* L );
 LUA_API void lua_registerPreCallHook ( lua_PreCallHook f );
+
 typedef void (*lua_PostCallHook) ( lua_CFunction f, lua_State* L );
 LUA_API void lua_registerPostCallHook ( lua_PostCallHook f );
 
@@ -120,7 +121,7 @@ typedef LUA_INTEGER lua_Integer;
 /*
 ** state manipulation
 */
-LUA_API lua_State *(lua_newstate) (lua_Alloc f, void *ud);
+LUA_API lua_State *(lua_newstate) (lua_Alloc f, void *ud, void *mtasaowner);
 LUA_API void       (lua_close) (lua_State *L);
 LUA_API lua_State *(lua_newthread) (lua_State *L);
 
@@ -129,6 +130,7 @@ LUA_API lua_CFunction (lua_atpanic) (lua_State *L, lua_CFunction panicf);
 // MTA Specific functions.
 // ChrML: Added function to get the main state from a lua state that is a coroutine
 LUA_API lua_State* (lua_getmainstate) (lua_State* L);
+LUA_API void *lua_getmtasaowner(lua_State* L);
 
 /*
 ** basic stack manipulation
@@ -311,7 +313,7 @@ LUA_API void lua_setallocf (lua_State *L, lua_Alloc f, void *ud);
 ** compatibility macros and functions
 */
 
-#define lua_open()	luaL_newstate()
+#define lua_open(mtasaowner)	    luaL_newstate(mtasaowner)
 
 #define lua_getregistry(L)	lua_pushvalue(L, LUA_REGISTRYINDEX)
 

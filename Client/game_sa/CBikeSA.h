@@ -14,8 +14,6 @@
 #include <game/CBike.h>
 #include "CVehicleSA.h"
 
-#define FUNC_CBike_PlaceOnRoadProperly              0x6BEEB0
-
 struct sRideAnimData
 {
     int32 iAnimGroup;
@@ -90,15 +88,15 @@ class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {
 private:
     CBikeHandlingEntrySA* m_pBikeHandlingData = nullptr;
-public:
-    CBikeSA(){};
-    CBikeSA(CBikeSAInterface* bike);
-    CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
 
-    CBikeSAInterface*   GetBikeInterface() { return (CBikeSAInterface*)m_pInterface; };
+public:
+    CBikeSA() = default;
+    CBikeSA(CBikeSAInterface* pInterface);
+
+    CBikeSAInterface* GetBikeInterface() { return reinterpret_cast<CBikeSAInterface*>(GetInterface()); }
 
     CBikeHandlingEntry* GetBikeHandlingData();
     void                SetBikeHandlingData(CBikeHandlingEntry* pHandling);
 
-    void                RecalculateBikeHandling();
+    void RecalculateBikeHandling();
 };
