@@ -1,4 +1,3 @@
-
 #include "StdInc.h"
 #include "CVehicleColors.h"
 #include "Utils.h"
