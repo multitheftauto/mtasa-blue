@@ -123,7 +123,7 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
 
     std::list<CModelBase*> listSimpleAllocatedModels = g_pGame->GetModelManager()->GetSimpleAllocatedModels();
 
-    if (BitStream.Can(eBitStreamVersion::SimpleModelAllocationg))
+    if (BitStream.Can(eBitStreamVersion::SimpleModelAllocation))
     {
         uint32_t uiModelsCount = listSimpleAllocatedModels.size();
         BitStream.Write(uiModelsCount);

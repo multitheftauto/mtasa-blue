@@ -487,7 +487,7 @@ enum class eBitStreamVersion : unsigned short
 
     // Implement simple serverside model allocating
     // yyyy-mm-dd 0xFF add date later ;-)
-    SimpleModelAllocationg,
+    SimpleModelAllocation,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

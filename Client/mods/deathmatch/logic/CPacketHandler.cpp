@@ -418,7 +418,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
         bitStream.ReadString(strExternalHTTPDownloadURL);
     }
 
-    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocationg))
+    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocation))
     {
         uint32_t modelsCount = 0;
         bitStream.Read(modelsCount);
@@ -3206,7 +3206,7 @@ retry:
                     // Read out the vehicle value as a char, then convert
                     unsigned short usModel = 0xFFFF;
 
-                    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocationg))
+                    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocation))
                     {
                         bitStream.Read(usModel);
                     }

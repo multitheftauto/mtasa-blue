@@ -444,7 +444,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&position);
                     BitStream.Write(&rotationDegrees);
 
-                    if (BitStream.Can(eBitStreamVersion::SimpleModelAllocationg))
+                    if (BitStream.Can(eBitStreamVersion::SimpleModelAllocation))
                     {
                         BitStream.Write(pVehicle->GetModel());
                     }
