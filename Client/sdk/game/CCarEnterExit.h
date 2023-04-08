@@ -11,7 +11,9 @@
 
 #pragma once
 
-#include "CPed.h"
+class CPed;
+class CVector;
+class CVehicle;
 
 class CCarEnterExit
 {

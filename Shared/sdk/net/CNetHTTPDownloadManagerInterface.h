@@ -16,15 +16,14 @@
 #include "SString.h"
 #include "SharedUtil.IntTypes.h"
 
-
 struct SHttpRequestOptions
 {
     SHttpRequestOptions() {}
     SHttpRequestOptions(const struct SHttpRequestOptionsTx& in);
-    bool    bIsLegacy = false;                 // true = sets CURLOPT_FAILONERROR
-    bool    bIsLocal = false;                  // false = download aborts if < 10 bytes/s for uiConnectTimeoutMs
-    bool    bCheckContents = false;            // true = check for naughty things before saving file
-    bool    bResumeFile = false;               // true = attempt to resume previously interrupted download
+    bool    bIsLegacy = false;                        // true = sets CURLOPT_FAILONERROR
+    bool    bIsLocal = false;                         // false = download aborts if < 10 bytes/s for uiConnectTimeoutMs
+    bool    bCheckContents = false;                   // true = check for naughty things before saving file
+    bool    bResumeFile = false;                      // true = attempt to resume previously interrupted download
     SString strPostData;
     bool    bPostBinary = false;                      // false = truncate strPostData to first null character and send as text/plain
                                                       // (true = send as application/octet-stream)
@@ -58,7 +57,7 @@ struct SStringContent
         length = other.length();
         pData = *other;
     }
-                operator SString() const { return SStringX(pData, length); }
+    operator SString() const { return SStringX(pData, length); }
     size_t      length = 0;
     const char* pData = nullptr;
 };
@@ -153,9 +152,9 @@ inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& i
 
 struct SDownloadStatus
 {
-    uint uiAttemptNumber = 0;   // 0=Queued 1+=Downloading
-    uint uiContentLength = 0;   // Item total size. Will be 0 if http header 'Content-Length' is missing
-    uint uiBytesReceived = 0;   // Download progress
+    uint uiAttemptNumber = 0;            // 0=Queued 1+=Downloading
+    uint uiContentLength = 0;            // Item total size. Will be 0 if http header 'Content-Length' is missing
+    uint uiBytesReceived = 0;            // Download progress
 };
 
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -29,13 +31,12 @@
 
 /* value for MAX_CONCURRENT_STREAMS we use until we get an updated setting
    from the peer */
-#define DEFAULT_MAX_CONCURRENT_STREAMS 13
+#define DEFAULT_MAX_CONCURRENT_STREAMS 100
 
 /*
- * Store nghttp2 version info in this buffer, Prefix with a space.  Return
- * total length written.
+ * Store nghttp2 version info in this buffer.
  */
-int Curl_http2_ver(char *p, size_t len);
+void Curl_http2_ver(char *p, size_t len);
 
 const char *Curl_http2_strerror(uint32_t err);
 
@@ -43,7 +44,7 @@ CURLcode Curl_http2_init(struct connectdata *conn);
 void Curl_http2_init_state(struct UrlState *state);
 void Curl_http2_init_userset(struct UserDefined *set);
 CURLcode Curl_http2_request_upgrade(struct dynbuf *req,
-                                    struct connectdata *conn);
+                                    struct Curl_easy *data);
 CURLcode Curl_http2_setup(struct Curl_easy *data, struct connectdata *conn);
 CURLcode Curl_http2_switched(struct Curl_easy *data,
                              const char *ptr, size_t nread);
@@ -62,7 +63,7 @@ void Curl_http2_cleanup_dependencies(struct Curl_easy *data);
 CURLcode Curl_http2_stream_pause(struct Curl_easy *data, bool pause);
 
 /* returns true if the HTTP/2 stream error was HTTP_1_1_REQUIRED */
-bool Curl_h2_http_1_1_error(struct connectdata *conn);
+bool Curl_h2_http_1_1_error(struct Curl_easy *data);
 #else /* USE_NGHTTP2 */
 #define Curl_http2_request_upgrade(x,y) CURLE_UNSUPPORTED_PROTOCOL
 #define Curl_http2_setup(x,y) CURLE_UNSUPPORTED_PROTOCOL

@@ -32,15 +32,28 @@ bool CClientModel::Allocate(ushort usParentID)
     if (pModelInfo->IsValid())
         return false;
 
+    // Avoid hierarchy
+    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(usParentID, true);
+
+    if (pParentModelInfo->GetParentID())
+        return false;
+
     switch (m_eModelType)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
-            break;
+            return true;
         case eClientModelType::OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeObjectModel(usParentID);
+                return true;
+            }
+            break;
+        case eClientModelType::TIMED_OBJECT:
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeTimedObjectModel(usParentID);
                 return true;
             }
             break;
@@ -71,7 +84,8 @@ bool CClientModel::Deallocate(void)
 
 void CClientModel::RestoreEntitiesUsingThisModel()
 {
-    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
+    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
             auto& element = **iter;
@@ -102,11 +116,17 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             break;
         }
         case eClientModelType::OBJECT:
+        case eClientModelType::TIMED_OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
             unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+
+            // Restore pickups with custom model
+            CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
+
+            unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);

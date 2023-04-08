@@ -27,6 +27,8 @@
 #else
     #include <dirent.h>
     #include <sys/stat.h>
+    #include <unistd.h>
+    #include <limits.h>
 #endif
 
 //
@@ -429,8 +431,8 @@ SString SharedUtil::GetSystemCurrentDirectory()
         return GetSystemLongPathName(ToUTF8(szResult));
     return ToUTF8(szResult);
 #else
-    char szBuffer[MAX_PATH];
-    getcwd(szBuffer, MAX_PATH - 1);
+    char szBuffer[PATH_MAX];
+    getcwd(szBuffer, PATH_MAX - 1);
     return szBuffer;
 #endif
 }
@@ -909,16 +911,52 @@ SString SharedUtil::MakeUniquePath(const SString& strInPathFilename)
     return strTest;
 }
 
+// Tries to resolve the original path used for MakeUniquePath
+SString SharedUtil::MakeGenericPath(const SString& uniqueFilePath)
+{
+    if (DirectoryExists(uniqueFilePath) || FileExists(uniqueFilePath))
+        return uniqueFilePath;
+
+    SString basePath, fileName;
+    ExtractFilename(uniqueFilePath, &basePath, &fileName);
+
+    SString withoutExtension, extensionName;
+    bool    usingExtension = ExtractExtension(fileName, &withoutExtension, &extensionName);
+    size_t  underscore = withoutExtension.find_last_not_of("0123456789");
+
+    if (underscore != std::string::npos)
+    {
+        if (withoutExtension[underscore] == '_')
+        {
+            withoutExtension = withoutExtension.SubStr(0, underscore);
+
+            SString filePath;
+
+            if (usingExtension)
+                filePath = PathJoin(basePath, SString("%s.%s", withoutExtension.c_str(), extensionName.c_str()));
+            else
+                filePath = PathJoin(basePath, withoutExtension);
+
+            if (DirectoryExists(filePath) || FileExists(filePath))
+                return filePath;
+        }
+    }
+
+    return {};
+}
+
 // Conform a path string for sorting
 SString SharedUtil::ConformPathForSorting(const SString& strPathFilename)
 {
     SString strResult = strPathFilename;
-    std::transform(strResult.begin(), strResult.end(), strResult.begin(), [](int c) {
-        // Ignores locale and always does this:
-        if (c >= 'A' && c <= 'Z')
-            c = c - 'A' + 'a';
-        return c;
-    });
+    std::transform(strResult.begin(), strResult.end(), strResult.begin(),
+                   [](int c)
+                   {
+                       // Ignores locale and always does this:
+                       if (c >= 'A' && c <= 'Z')
+                           c = c - 'A' + 'a';
+                       return c;
+                   });
     return strResult;
 }
 

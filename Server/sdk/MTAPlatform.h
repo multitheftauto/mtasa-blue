@@ -18,6 +18,10 @@ extern "C" bool g_bNoTopBar;
 #if defined(WIN32)
     #ifdef _WIN64
         #define MTA_OS_STRING   "Windows x64"
+    #elif defined(_M_ARM64)
+        #define MTA_OS_STRING   "Windows arm64"
+    #elif defined(_M_ARM)
+        #define MTA_OS_STRING   "Windows arm"
     #else
         #define MTA_OS_STRING   "Windows"
     #endif
@@ -25,6 +29,10 @@ extern "C" bool g_bNoTopBar;
 #elif defined(__linux__)
     #ifdef __x86_64__
         #define MTA_OS_STRING   "GNU/Linux x64"
+    #elif defined(__aarch64__)
+        #define MTA_OS_STRING   "GNU/Linux arm64"
+    #elif defined(__arm__)
+        #define MTA_OS_STRING   "GNU/Linux arm"
     #else
         #define MTA_OS_STRING   "GNU/Linux"
     #endif
@@ -45,59 +53,15 @@ extern "C" bool g_bNoTopBar;
     #define MTA_LIB_SUFFIX
 #endif
 
-/** Multi-platform defines **/
 #ifdef WIN32
-/* Win32 */
-
-// Define includes
-    #include <conio.h>
-    #include <direct.h>
-    #include <windows.h>
-
 // Define types
 typedef int socklen_t;
 
 // Define keys
-    #define KEY_BACKSPACE   0x08
-    #define KEY_EXTENDED    0xE0
-    #define KEY_LEFT    0x4B
-    #define KEY_RIGHT   0x4D
-    #define KEY_UP      0x48
-    #define KEY_DOWN    0x50
-#else
-/* POSIX */
-
-// Define includes
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <unistd.h>
-    #include <string.h>
-    #include <string>
-    #include <fcntl.h>
-    #include <dlfcn.h>
-    #include <sys/time.h>
-    #include <sys/times.h>
-
-    #if defined(__APPLE__)
-        #include <ncurses.h>
-    #elif __has_include(<ncursesw/curses.h>)
-        #include <ncursesw/curses.h>
-    #else
-        #include <ncurses.h>
-    #endif
-
-    #define MAX_PATH 255
-
-    #ifndef stricmp
-    #define stricmp strcasecmp
-    #endif
-
-    #ifndef strnicmp
-    #define strnicmp strncasecmp
-    #endif
-
-    #ifndef Sleep
-        #define Sleep(duration) usleep((duration) * 1000)
-    #endif
-
+    #define KEY_BACKSPACE 0x08
+    #define KEY_EXTENDED  0xE0
+    #define KEY_LEFT      0x4B
+    #define KEY_RIGHT     0x4D
+    #define KEY_UP        0x48
+    #define KEY_DOWN      0x50
 #endif

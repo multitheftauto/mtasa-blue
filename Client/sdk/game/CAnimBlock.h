@@ -17,8 +17,8 @@ enum EModelRequestType
     NON_BLOCKING
 };
 
-class CAnimBlockSAInterface;
 class CAnimBlendHierarchySAInterface;
+class CAnimBlockSAInterface;
 
 class CAnimBlock
 {

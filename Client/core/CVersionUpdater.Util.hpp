@@ -133,7 +133,10 @@ namespace
         BUTTON_3,
     };
 
-    CQuestionBox& GetQuestionBox() { return *CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow(); }
+    CQuestionBox& GetQuestionBox()
+    {
+        return *CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    }
 
 }            // namespace
 
@@ -166,8 +169,8 @@ namespace
 
     public:
         CValueInt(int iValue = 0) : m_iValue(iValue) {}
-        void         operator=(int iValue) { m_iValue = iValue; }
-                     operator int() const { return m_iValue; }
+        void operator=(int iValue) { m_iValue = iValue; }
+        operator int() const { return m_iValue; }
         virtual bool SetFromString(const SString& str)
         {
             m_iValue = atoi(str);

@@ -10,12 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CControllerConfigManagerSA.h"
 
 #define VAR_InputType       ( ( BYTE * ) ( 0xB6EC2E ) )
 #define VAR_MouseInverted   ( ( BYTE * ) ( 0xBA6745 ) )
 #define VAR_FlyWithMouse    ( ( BYTE * ) ( 0xC1CC03 ) )
 #define VAR_SteerWithMouse  ( ( BYTE * ) ( 0xC1CC02 ) )
-#define VAR_VerticalAimSensitivity  ( ( FLOAT * ) ( 0xB6EC18 ) )
+#define VAR_VerticalAimSensitivity  ( ( float * ) ( 0xB6EC18 ) )
 
 static const float VERTICAL_AIM_SENSITIVITY_MIN = 0.000312f;
 static const float VERTICAL_AIM_SENSITIVITY_DEFAULT = 0.0015f;
@@ -141,10 +142,10 @@ void CControllerConfigManagerSA::SetVerticalAimSensitivity(float fSensitivity)
 // Raw value used for saving so range can be changed without affecting user setting
 float CControllerConfigManagerSA::GetVerticalAimSensitivityRawValue()
 {
-    return *(FLOAT*)VAR_VerticalAimSensitivity;
+    return *(float*)VAR_VerticalAimSensitivity;
 }
 
 void CControllerConfigManagerSA::SetVerticalAimSensitivityRawValue(float fRawValue)
 {
-    MemPutFast<FLOAT>(VAR_VerticalAimSensitivity, fRawValue);
+    MemPutFast<float>(VAR_VerticalAimSensitivity, fRawValue);
 }

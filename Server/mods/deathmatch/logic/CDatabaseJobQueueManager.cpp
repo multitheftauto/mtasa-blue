@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CDatabaseJobQueue.h"
 #include "CDatabaseJobQueueManager.h"
+#include "CDatabaseManager.h"
 
 ///////////////////////////////////////////////////////////////
 //

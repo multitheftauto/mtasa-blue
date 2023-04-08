@@ -9,11 +9,12 @@
  *****************************************************************************/
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <delayimp.h>
 #include "CCefApp.h"
 #include <string>
-#include <cef3/include/cef_sandbox_win.h>
+#include <cef3/cef/include/cef_sandbox_win.h>
 
-//#define CEF_ENABLE_SANDBOX
+// #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
@@ -29,6 +30,9 @@ int _declspec(dllexport) InitCEF()
     size_t       pos = currentFileName.find_last_of(L'\\');
     std::wstring mtaPath = currentFileName.substr(0, pos - 3);            // Strip "CEF"
     SetDllDirectory(mtaPath.c_str());
+
+    // Load libcef.dll from the DLL directory
+    assert(SUCCEEDED(__HrLoadAllImportsForDll("libcef.dll")));
 
     // Load CEF
     CefMainArgs        mainArgs(GetModuleHandle(NULL));

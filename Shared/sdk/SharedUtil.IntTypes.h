@@ -12,10 +12,10 @@
 *************************************************************************/
 //                                                  VS      GCC
 //                      Actual sizes:      32bit   64bit   64bit
-typedef unsigned long  ulong;             //  32      32      64
-typedef unsigned int   uint;              //  32
-typedef unsigned short ushort;            //  16
-typedef unsigned char  uchar;             //  8
+typedef unsigned long  ulong;                 //  32      32      64
+typedef unsigned int   uint;                  //  32
+typedef unsigned short ushort;                //  16
+typedef unsigned char  uchar;                 //  8
 
 typedef unsigned long long uint64;            //  64
 typedef unsigned int       uint32;            //  32
@@ -37,4 +37,3 @@ typedef float          FLOAT;            //  32
 // Type: considerations:
 // a) long (and therefore DWORD) is 64 bits when compiled using 64 bit GCC
 // b) char range can be -127 to 128 or 0 to 255 depending on compiler options/mood
-

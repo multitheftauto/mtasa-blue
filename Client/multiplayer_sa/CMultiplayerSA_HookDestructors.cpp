@@ -46,14 +46,20 @@ namespace
 
     CFastHashMap<CEntitySAInterface*, SEntitySAInterfaceExtraInfo> ms_EntitySAInterfaceExtraInfoMap;
 
-    bool HasEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface) { return MapContains(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface); }
+    bool HasEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface)
+    {
+        return MapContains(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface);
+    }
 
     SEntitySAInterfaceExtraInfo& GetEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface)
     {
         return MapGet(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface);
     }
 
-    void RemoveEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface) { MapRemove(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface); }
+    void RemoveEntitySAInterfaceExtraInfo(CEntitySAInterface* pEntitySAInterface)
+    {
+        MapRemove(ms_EntitySAInterfaceExtraInfoMap, pEntitySAInterface);
+    }
 
     //
     // CPtrListSingleLink contains item
