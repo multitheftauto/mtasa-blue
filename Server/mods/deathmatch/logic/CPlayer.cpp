@@ -729,11 +729,11 @@ void CPlayer::MaybeUpdateOthersNearList()
     else
         // or player has moved too far
         if ((m_vecUpdateNearLastPosition - GetPosition()).LengthSquared() > MOVEMENT_UPDATE_THRESH * MOVEMENT_UPDATE_THRESH)
-        {
-            CLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
-            UpdateOthersNearList();
-            UNCLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
-        }
+    {
+        CLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
+        UpdateOthersNearList();
+        UNCLOCK("RelayPlayerPuresync", "UpdateNearList_Movement");
+    }
 }
 
 // Put this player in other players nearlist if this player can observe them in some way

@@ -26,7 +26,7 @@
 #include "SharedUtil.h"
 
 #ifdef WIN32
-// Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
+    // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
 #else
     #include <unistd.h>

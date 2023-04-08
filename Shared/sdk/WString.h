@@ -72,7 +72,7 @@ public:
     WString operator+(const WString& other) const { return std::wstring(*this) + other; }
 
     // Assignment
-    operator const wchar_t*() const { return c_str(); }            // Auto assign to const wchar_t* without using c_str()
+                   operator const wchar_t*() const { return c_str(); }            // Auto assign to const wchar_t* without using c_str()
     const wchar_t* operator*() const { return c_str(); }
 
     // Functions

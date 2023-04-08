@@ -245,7 +245,7 @@ public:
         void     operator++() { ++iter; }
         void     operator++(int) { iter++; }
         const T& operator*() const { return iter->second; }
-        operator ConstIterator() const { return ConstIterator(iter); }
+                 operator ConstIterator() const { return ConstIterator(iter); }
     };
 
     //
@@ -275,7 +275,7 @@ public:
         void     operator++() { ++iter; }
         void     operator++(int) { iter++; }
         const T& operator*() const { return iter->second; }
-        operator ConstReverseIterator() const { return ConstReverseIterator(iter); }
+                 operator ConstReverseIterator() const { return ConstReverseIterator(iter); }
     };
 
     ConstIterator begin() const { return ConstIterator(orderedMap.begin()); }

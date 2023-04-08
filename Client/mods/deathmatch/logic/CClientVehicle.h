@@ -153,8 +153,8 @@ class CClientVehicle : public CClientStreamElement
     friend class CClientVehicleManager;
     friend class CClientGame;            // TEMP HACK
 
-protected:                               // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
-                                         // cleaned up.
+protected:            // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
+                      // cleaned up.
     CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2);
 
 public:

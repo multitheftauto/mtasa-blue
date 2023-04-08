@@ -558,7 +558,7 @@ enum eWeaponProperty
     WEAPON_DEFAULT_COMBO,
     WEAPON_COMBOS_AVAILABLE,
 
-    WEAPON_FLAG_AIM_NO_AUTO,               // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
+    WEAPON_FLAG_AIM_NO_AUTO,            // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
     WEAPON_FLAG_FIRST = WEAPON_FLAG_AIM_NO_AUTO,
     WEAPON_FLAG_AIM_ARM,                   // 0x000002 - only needs arm to aim         (ie pistol/shotgun/tec9/uzi)
     WEAPON_FLAG_AIM_1ST_PERSON,            // 0x000004 - uses 1st person aim           (ie sniper/rpg-hs
@@ -646,14 +646,14 @@ enum eWeaponType
     WEAPONTYPE_SHOTGUN,                    // shotguns
     WEAPONTYPE_SAWNOFF_SHOTGUN,            // one handed
     WEAPONTYPE_SPAS12_SHOTGUN,
-    WEAPONTYPE_MICRO_UZI,                  // submachine guns
+    WEAPONTYPE_MICRO_UZI,            // submachine guns
     WEAPONTYPE_MP5,
-    WEAPONTYPE_AK47,                       // 30      // machine guns
+    WEAPONTYPE_AK47,            // 30      // machine guns
     WEAPONTYPE_M4,
-    WEAPONTYPE_TEC9,                       // this uses stat from the micro_uzi
+    WEAPONTYPE_TEC9,            // this uses stat from the micro_uzi
     // END SKILL WEAPONS
 
-    WEAPONTYPE_COUNTRYRIFLE,              // rifles
+    WEAPONTYPE_COUNTRYRIFLE,            // rifles
     WEAPONTYPE_SNIPERRIFLE,
     WEAPONTYPE_ROCKETLAUNCHER,            // specials
     WEAPONTYPE_ROCKETLAUNCHER_HS,

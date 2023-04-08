@@ -81,7 +81,7 @@ void CCrashHandler::Init(const SString& strInServerPath)
             #ifdef __APPLE__
     static google_breakpad::ExceptionHandler eh(ms_strDumpPath, NULL, DumpCallback, NULL, true, NULL);
             #else
-    google_breakpad::MinidumpDescriptor      descriptor(ms_strDumpPath);
+    google_breakpad::MinidumpDescriptor descriptor(ms_strDumpPath);
     static google_breakpad::ExceptionHandler eh(descriptor, NULL, DumpCallback, NULL, true, -1);
             #endif
         #endif
@@ -142,7 +142,7 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     }
 }
 
-// Linux/Mac crash callback when using google-breakpad
+    // Linux/Mac crash callback when using google-breakpad
 #ifdef __APPLE__
 bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded)
 {
