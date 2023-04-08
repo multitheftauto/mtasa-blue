@@ -15,57 +15,55 @@
 
 extern CGameSA* pGame;
 
-CWeaponStatSA::CWeaponStatSA(eWeaponType weaponType, eWeaponSkill skillLevel)
+// For Data Storage and won't apply changes.
+CWeaponStatSA::CWeaponStatSA(eWeaponType weaponType, eWeaponSkill skillLevel) : m_weaponType{weaponType}, m_skillLevel{skillLevel}
 {
-    // For Data Storage and won't apply changes.
-    this->pWeaponStats = new CWeaponInfoSAInterface();
-    this->weaponType = weaponType;
-    this->skillLevel = skillLevel;
+    m_pWeaponStats = new CWeaponInfoSAInterface();
 }
-CWeaponStatSA::CWeaponStatSA(CWeaponInfoSA* pWeaponInfo, eWeaponType weaponType, eWeaponSkill skillLevel)
+
+// For scripting API and applies changes.
+CWeaponStatSA::CWeaponStatSA(CWeaponInfoSA* pWeaponInfo, eWeaponType weaponType, eWeaponSkill skillLevel) : m_weaponType{weaponType}, m_skillLevel{skillLevel}
 {
-    // For scripting API and applies changes..
-    this->pWeaponStats = pWeaponInfo->GetInterface();
-    this->weaponType = weaponType;
-    this->skillLevel = skillLevel;
+    m_pWeaponStats = pWeaponInfo->GetInterface();
 }
+
 CWeaponStatSA::~CWeaponStatSA()
 {
 }
 
 eWeaponType CWeaponStatSA::GetWeaponType()
 {
-    return this->weaponType;
+    return m_weaponType;
 }
 
 eWeaponSkill CWeaponStatSA::GetWeaponSkillLevel()
 {
-    return this->skillLevel;
+    return m_skillLevel;
 }
 
 void CWeaponStatSA::SetWeaponType(eWeaponType weaponType)
 {
-    this->weaponType = weaponType;
+    m_weaponType = weaponType;
 }
 
 void CWeaponStatSA::SetWeaponSkillLevel(eWeaponSkill skillLevel)
 {
-    this->skillLevel = skillLevel;
+    m_skillLevel = skillLevel;
 }
 
 void CWeaponStatSA::ToggleFlagBits(DWORD flagBits)
 {
-    HandleFlagsValueChange(pWeaponStats->m_nFlags ^ flagBits);
+    HandleFlagsValueChange(m_pWeaponStats->m_nFlags ^ flagBits);
 }
 
 void CWeaponStatSA::SetFlagBits(DWORD flagBits)
 {
-    HandleFlagsValueChange(pWeaponStats->m_nFlags | flagBits);
+    HandleFlagsValueChange(m_pWeaponStats->m_nFlags | flagBits);
 }
 
 void CWeaponStatSA::ClearFlagBits(DWORD flagBits)
 {
-    HandleFlagsValueChange(pWeaponStats->m_nFlags & ~flagBits);
+    HandleFlagsValueChange(m_pWeaponStats->m_nFlags & ~flagBits);
 }
 
 void CWeaponStatSA::HandleFlagsValueChange(DWORD newValue)
@@ -111,5 +109,5 @@ void CWeaponStatSA::HandleFlagsValueChange(DWORD newValue)
             newValue &= ~WEAPONTYPE_ANIM_CROUCHFIRE;
     }
 
-    pWeaponStats->m_nFlags = newValue;
+    m_pWeaponStats->m_nFlags = newValue;
 }

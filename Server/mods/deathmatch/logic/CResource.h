@@ -418,8 +418,8 @@ private:
     bool m_bIsPersistent = false;            // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
     bool m_bDestroyed = false;
 
-    CXMLNode* m_pNodeSettings = nullptr;            // Settings XML node, read from meta.xml and copied into it's own instance
-    CXMLNode* m_pNodeStorage = nullptr;             // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
+    CXMLNode* m_pNodeSettings = nullptr;                // Settings XML node, read from meta.xml and copied into it's own instance
+    CXMLNode* m_pNodeStorage = nullptr;                 // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
 
     CMtaVersion m_strMinClientRequirement;              // Min MTA client version
     CMtaVersion m_strMinServerRequirement;              // Min MTA server version

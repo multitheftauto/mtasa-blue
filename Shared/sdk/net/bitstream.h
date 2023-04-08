@@ -481,6 +481,10 @@ enum class eBitStreamVersion : unsigned short
     // 2022-01-16 0x76
     Discord_Cleanup,
 
+    //
+    // 1.6.0 RELEASED - 202x-xx-xx
+    //
+
     // Implement simple serverside model allocating
     // yyyy-mm-dd 0xFF add date later ;-)
     SimpleModelAllocationg,

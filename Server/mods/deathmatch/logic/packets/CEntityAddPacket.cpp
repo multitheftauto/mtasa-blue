@@ -753,17 +753,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Write the icon
                     SIntegerSync<unsigned char, 6> icon(pBlip->m_ucIcon);
                     BitStream.Write(&icon);
-                    if (pBlip->m_ucIcon == 0)
-                    {
-                        // Write the size
-                        SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
-                        BitStream.Write(&size);
 
-                        // Write the color
-                        SColorSync color;
-                        color = pBlip->GetColor();
-                        BitStream.Write(&color);
-                    }
+                    // Write the size
+                    SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
+                    BitStream.Write(&size);
+
+                    // Write the color
+                    SColorSync color;
+                    color = pBlip->GetColor();
+                    BitStream.Write(&color);
 
                     break;
                 }

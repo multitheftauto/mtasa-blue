@@ -373,9 +373,9 @@ void CWaterManagerSA::RelocatePools()
     BYTE part1[] = {0xC1, 0xF8, OUTSIDE_WORLD_BLOCKS_BITS + 1,            // sar eax,13           = 2^(10-1) = 512
                     0x7A, 0x19};                                          // jp part2             Effectively jump always
 
-    BYTE part2[] = {0x72, 0xFB,                              // jc exit              Jump if at limit
-                    0xA1, 0xEC, 0x15, 0xC2, 0x00,            // mov eax,NumBlocks    Restore eax
-                    0x73, 0xDE};                             // jnc dothing          Effectively jump always
+    BYTE part2[] = {0x72, 0xFB,                                           // jc exit              Jump if at limit
+                    0xA1, 0xEC, 0x15, 0xC2, 0x00,                         // mov eax,NumBlocks    Restore eax
+                    0x73, 0xDE};                                          // jnc dothing          Effectively jump always
 
     MemCpy((void*)0x6E6CE9, part1, sizeof(part1));
     MemCpy((void*)0x6E6D07, part2, sizeof(part2));

@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 // Show info about where the actual files are coming from
-//#define RESOURCE_DEBUG_MESSAGES
+// #define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
 #include "CResource.h"
@@ -494,67 +494,69 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
 
 std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResourceFile)
 {
-    return SharedUtil::async([pResourceFile, this] {
-        SString strPath;
-
-        if (!GetFilePath(pResourceFile->GetName(), strPath))
-            return SString();
-
-        std::vector<char> buffer;
-        FileLoad(strPath, buffer);
-        uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? buffer.data() : "";
-        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(Checksum);
-        pResourceFile->SetLastFileSize(uiFileSize);
-
-        // Check if file is blocked
-        char szHashResult[33];
-        CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
-        SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
-
-        if (!strBlockReason.empty())
+    return SharedUtil::async(
+        [pResourceFile, this]
         {
-            return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
-        }
+            SString strPath;
 
-        // Copy file to http holding directory
-        switch (pResourceFile->GetType())
-        {
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+            if (!GetFilePath(pResourceFile->GetName(), strPath))
+                return SString();
+
+            std::vector<char> buffer;
+            FileLoad(strPath, buffer);
+            uint        uiFileSize = buffer.size();
+            const char* pFileContents = uiFileSize ? buffer.data() : "";
+            CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
+            pResourceFile->SetLastChecksum(Checksum);
+            pResourceFile->SetLastFileSize(uiFileSize);
+
+            // Check if file is blocked
+            char szHashResult[33];
+            CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
+            SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
+
+            if (!strBlockReason.empty())
             {
-                SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
+                return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
+            }
 
-                if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
+            // Copy file to http holding directory
+            switch (pResourceFile->GetType())
+            {
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
-                    FileDelete(strCachedFilePath);
-                    return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
-                }
+                    SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
 
-                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
-
-                if (pResourceFile->GetLastChecksum() != cachedChecksum)
-                {
-                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                    if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
                     {
-                        return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                        FileDelete(strCachedFilePath);
+                        return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
                     }
 
-                    // If script is 'no client cache', make sure there is no trace of it in the output dir
-                    if (pResourceFile->IsNoClientCache())
-                        FileDelete(pResourceFile->GetCachedPathFilename(true));
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
+
+                    if (pResourceFile->GetLastChecksum() != cachedChecksum)
+                    {
+                        if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                        {
+                            return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                        }
+
+                        // If script is 'no client cache', make sure there is no trace of it in the output dir
+                        if (pResourceFile->IsNoClientCache())
+                            FileDelete(pResourceFile->GetCachedPathFilename(true));
+                    }
+
+                    break;
                 }
-
-                break;
+                default:
+                    break;
             }
-            default:
-                break;
-        }
 
-        return SString();
-    });
+            return SString();
+        });
 }
 
 bool CResource::GenerateChecksums()

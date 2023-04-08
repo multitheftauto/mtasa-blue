@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #pragma once
+
+#include <game/CTrain.h>
 #include "CVehicleSA.h"
 #include "CDoorSA.h"
 
@@ -58,8 +60,8 @@ public:
     float m_fTrainSpeed;                   // 1.0 - train derails
     float m_fTrainRailDistance;            // Distance along rail starting from first rail node (determines train position when on rails)
     float m_fDistanceToNextCarriage;
-    float m_fTrainGas;              // gas pedal pressed: 255.0, moving forward: 0.0, moving back: -255.0
-    float m_fTrainBrake;            // 255.0 - braking
+    float m_fTrainGas;                     // gas pedal pressed: 255.0, moving forward: 0.0, moving back: -255.0
+    float m_fTrainBrake;                   // 255.0 - braking
     union
     {
         struct
@@ -91,7 +93,7 @@ private:
 
 public:
     int                             m_nTimeWhenCreated;
-    short                           field_5C8;            // initialized with 0, not referenced
+    short                           field_5C8;                              // initialized with 0, not referenced
     eTrainPassengersGenerationState m_nPassengersGenerationState;
     unsigned char                   m_nNumPassengersToLeave : 4;            // 0 to 4
     unsigned char                   m_nNumPassengersToEnter : 4;            // 0 to 4
@@ -102,3 +104,11 @@ public:
     RwFrame*                        m_aTrainNodes[eTrainNode::NUM_NODES];
 };
 static_assert(sizeof(CTrainSAInterface) == 0x6AC, "Invalid size for CTrainSAInterface");
+
+class CTrainSA final : public virtual CTrain, public virtual CVehicleSA
+{
+public:
+    CTrainSA(CTrainSAInterface* pInterface);
+
+    CTrainSAInterface* GetTrainInterface() { return reinterpret_cast<CTrainSAInterface*>(GetInterface()); }
+};

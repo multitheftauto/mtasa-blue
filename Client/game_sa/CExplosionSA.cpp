@@ -44,7 +44,7 @@ CEntity* CExplosionSA::GetExplosionCreator()
     {
         case ENTITY_TYPE_PED:
         {
-            SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
+            SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)GetInterface()->m_pEntExplosionOwner);
             if (pPedClientEntity)
             {
                 return pPedClientEntity->pEntity;
@@ -53,7 +53,7 @@ CEntity* CExplosionSA::GetExplosionCreator()
         }
         case ENTITY_TYPE_VEHICLE:
         {
-            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)this->GetInterface()->m_pEntExplosionOwner);
+            SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)GetInterface()->m_pEntExplosionOwner);
             if (pVehicleClientEntity)
             {
                 return pVehicleClientEntity->pEntity;
@@ -85,45 +85,45 @@ void CExplosionSA::Remove()
 
 float CExplosionSA::GetExplosionForce()
 {
-    return this->GetInterface()->m_fExplosionForce;
+    return GetInterface()->m_fExplosionForce;
 }
 
 void CExplosionSA::SetExplosionForce(float fForce)
 {
-    this->GetInterface()->m_fExplosionForce = fForce;
+    GetInterface()->m_fExplosionForce = fForce;
 }
 
 void CExplosionSA::SetSilent(bool bSilent)
 {
-    this->GetInterface()->m_bMakeSound = !bSilent;
+    GetInterface()->m_bMakeSound = !bSilent;
 }
 
 unsigned long CExplosionSA::GetActivationTimer()
 {
-    return this->GetInterface()->m_ActivationTime;
+    return GetInterface()->m_ActivationTime;
 }
 
 void CExplosionSA::SetActivationTimer(unsigned long ulActivationTime)
 {
-    this->GetInterface()->m_ActivationTime = ulActivationTime;
+    GetInterface()->m_ActivationTime = ulActivationTime;
 }
 
 DWORD CExplosionSA::GetExpiryTime()
 {
-    return this->GetInterface()->m_TimeExpires;
+    return GetInterface()->m_TimeExpires;
 }
 
 void CExplosionSA::SetExpiryTime(DWORD dwExpiryTime)
 {
-    this->GetInterface()->m_TimeExpires = dwExpiryTime;
+    GetInterface()->m_TimeExpires = dwExpiryTime;
 }
 
 float CExplosionSA::GetExplosionRadius()
 {
-    return this->GetInterface()->m_fExplosionRadius;
+    return GetInterface()->m_fExplosionRadius;
 }
 
 void CExplosionSA::SetExplosionRadius(float fRadius)
 {
-    this->GetInterface()->m_fExplosionRadius = fRadius;
+    GetInterface()->m_fExplosionRadius = fRadius;
 }

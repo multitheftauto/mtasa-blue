@@ -218,9 +218,8 @@ bool CVehicleManager::HasDoors(unsigned short usModel)
 {
     CModelVehicle* pModel = g_pGame->GetModelManager()->GetVehicleModel(usModel);
     if (pModel)
-    {
         return pModel->HasDoors();
-    }
+
     return false;
 }
 

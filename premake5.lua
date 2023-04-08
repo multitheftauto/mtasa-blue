@@ -43,6 +43,7 @@ workspace "MTASA"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
+	flags "MultiProcessorCompile"
 
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
@@ -105,6 +106,7 @@ workspace "MTASA"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		buildoptions { "/Zc:__cplusplus" }
+		defaultplatform "x86"
 		includedirs {
 			path.join(dxdir, "Include")
 		}
@@ -137,6 +139,7 @@ workspace "MTASA"
 		include "Client/gui"
 		include "Client/launch"
 		include "Client/loader"
+		include "Client/loader-proxy"
 		include "Client/multiplayer_sa"
 		include "Client/mods/deathmatch"
 

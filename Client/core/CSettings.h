@@ -21,7 +21,7 @@ class CSettings;
 #define CHAT_PRESETS_PATH             "mta/config/chatboxpresets.xml"
 #define CHAT_PRESETS_ROOT             "chatboxpresets"
 
-//#define SHOWALLSETTINGS
+// #define SHOWALLSETTINGS
 
 struct SKeyBindSection
 {
