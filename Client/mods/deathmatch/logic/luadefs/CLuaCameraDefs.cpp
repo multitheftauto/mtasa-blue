@@ -11,7 +11,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
 #include <game/CPlayerInfo.h>
 #include <game/CSettings.h>
 #include <lua/CLuaFunctionParser.h>
