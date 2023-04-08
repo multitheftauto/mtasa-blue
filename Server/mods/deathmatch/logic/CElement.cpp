@@ -539,8 +539,8 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     map<string, SCustomData>::const_iterator iter = m_CustomData.IterBegin();
     for (; iter != m_CustomData.IterEnd(); iter++)
     {
-        table->PushString(it->first);                        // key
-        table->PushArgument(it->second.Variable);            // value
+        table->PushString(iter->first.c_str());                // key
+        table->PushArgument(iter->second.Variable);            // value
     }
 
     return table;
