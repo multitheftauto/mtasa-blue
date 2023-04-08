@@ -20,8 +20,8 @@ using namespace LatentTransfer;
     #include "Utils.h"
     #include <net/CNetServer.h>
 
-    extern CNetServer*       g_pNetServer;
-    extern CTimeUsMarker<20> markerLatentEvent;
+extern CNetServer*       g_pNetServer;
+extern CTimeUsMarker<20> markerLatentEvent;
 #endif
 
 ///////////////////////////////////////////////////////////////
@@ -125,10 +125,10 @@ void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitS
     uint uiBitStreamBitsUsed = pBitStream->GetNumberOfBitsUsed();
     uint uiBitStreamBytesUsed = (uiBitStreamBitsUsed + 7) >> 3;
 
-    // Make a buffer containing enough info to recreate ucPacketId+BitStream at the other 
+    // Make a buffer containing enough info to recreate ucPacketId+BitStream at the other
     m_pBatchBufferRef = std::make_shared<CBuffer>();
 
-    CBuffer& buffer = *m_pBatchBufferRef;
+    CBuffer&           buffer = *m_pBatchBufferRef;
     CBufferWriteStream stream(buffer);
     stream.Write(ucPacketId);
     stream.Write(uiBitStreamBitsUsed);

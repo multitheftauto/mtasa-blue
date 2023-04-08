@@ -15,27 +15,14 @@
 
 struct CStreamingInfo
 {
-    uint16_t prevId;
-    uint16_t nextId;
-    uint16_t nextInImg;
-    uint8_t  flg;
-    uint8_t  archiveId;
-    uint32_t offsetInBlocks;
-    uint32_t sizeInBlocks;
-    uint32_t loadState;
-
-public:
-    void Reset()
-    {
-        this->loadState = 0;
-        this->nextInImg = -1;
-        this->nextId = -1;
-        this->prevId = -1;
-        this->archiveId = 0;
-        this->flg = 0;
-        this->offsetInBlocks = 0;
-        this->sizeInBlocks = 0;
-    };
+    uint16_t prevId = (uint16_t)-1;
+    uint16_t nextId = (uint16_t)-1;
+    uint16_t nextInImg = (uint16_t)-1;
+    uint8_t  flg = 0u;
+    uint8_t  archiveId = 0u;
+    uint32_t offsetInBlocks = 0u;
+    uint32_t sizeInBlocks = 0u;
+    uint32_t loadState = 0u;
 };
 static_assert(sizeof(CStreamingInfo) == 0x14, "Invalid size for CStreamingInfo");
 
@@ -47,8 +34,13 @@ public:
     virtual void            LoadAllRequestedModels(bool bOnlyPriorityModels = false, const char* szTag = NULL) = 0;
     virtual bool            HasModelLoaded(DWORD dwModelID) = 0;
     virtual void            RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel) = 0;
-    virtual CStreamingInfo* GetStreamingInfoFromModelId(uint32 id) = 0;
+    virtual CStreamingInfo* GetStreamingInfo(uint32 id) = 0;
     virtual void            ReinitStreaming() = 0;
-    virtual void            MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
-    virtual std::uint32_t   GetMemoryUsed() const = 0;
+    virtual unsigned char   AddArchive(const char* szFilePath) = 0;
+    virtual void            RemoveArchive(unsigned char ucArchiveID) = 0;
+    virtual void   SetStreamingInfo(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
+    virtual void   SetStreamingBufferSize(uint32 uiSize) = 0;
+    virtual uint32 GetStreamingBufferSize() = 0;
+    virtual void   MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
+    virtual std::uint32_t GetMemoryUsed() const = 0;
 };

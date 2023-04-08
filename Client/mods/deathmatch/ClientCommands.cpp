@@ -850,8 +850,8 @@ void COMMAND_Breakpoint(const char* szCmdLine)
     {
         int 3
     }
-    // Make our main pointer easily accessable
-    // Added by slush:  You're a lazy ass if you use this.
+    //   Make our main pointer easily accessable
+    //   Added by slush:  You're a lazy ass if you use this.
     g_pClientGame;
 }
 
@@ -1032,7 +1032,7 @@ void COMMAND_Debug4(const char* szCmdLine)
 
 void COMMAND_TimeStep(const char* szCmdLine)
 {
-    g_pCore->GetConsole()->Printf("TimeStep: %f", *(float*)0xB7CB5C); // CTimer::ms_fTimeStep
+    g_pCore->GetConsole()->Printf("TimeStep: %f", *(float*)0xB7CB5C);            // CTimer::ms_fTimeStep
 }
 
 #endif

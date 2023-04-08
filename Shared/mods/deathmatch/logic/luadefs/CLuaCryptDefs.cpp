@@ -122,14 +122,12 @@ std::variant<std::string, bool> CLuaCryptDefs::Hash(lua_State* const luaVM, Hash
 
                     case HmacAlgorithm::SHA512:
                         return SharedUtil::Hmac<CryptoPP::SHA512>(strSourceData, key).ToLower();
-
                 }
 
                 throw std::invalid_argument("Invalid hmac algorithm");
         }
 
         throw std::invalid_argument("Unknown algorithm");
-
     }
     catch (std::exception& ex)
     {

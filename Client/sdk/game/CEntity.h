@@ -109,7 +109,7 @@ public:
     virtual void SetStaticWaitingForCollision(bool bStatic) = 0;
 
     virtual RwMatrix* GetBoneRwMatrix(eBone boneId) = 0;
-    virtual bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
+    virtual bool      SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
 
     virtual bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll) = 0;
     virtual bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll) = 0;

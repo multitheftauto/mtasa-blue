@@ -129,10 +129,10 @@ public:
     void _QuitCurrentProgram();
 
     // Doers
-    int  DoSendDownloadRequestToNextServer();
-    int  DoPollDownload();
-    int  DoSendPostToNextServer();
-    int  DoPollPost();
+    int DoSendDownloadRequestToNextServer();
+    int DoPollDownload();
+    int DoSendPostToNextServer();
+    int DoPollPost();
 
     static void* StaticThreadProc(void* pContext);
     void*        ThreadProc();
@@ -2182,7 +2182,7 @@ void CVersionUpdater::_UseVersionQueryURLs()
  * @brief Extracts the revision from an update file name.
  * @param fileName Name of the file
  * @param revision Revision of the update
-*/
+ */
 static bool GetRevisionFromFileName(std::string_view fileName, std::uint32_t& revision)
 {
     revision = {};
@@ -2769,7 +2769,7 @@ int CVersionUpdater::_PollDownload()
                     }
                     if (m_JobInfo.bShowDownloadPercent)
                     {
-                        const bool bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
+                        const bool  bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
                         const float fDownloadedPercent = bIsDownloadedSizeRight ? Round(m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
                         GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
                     }
