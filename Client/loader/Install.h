@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Install.h
+ *  FILE:        Client/loader/Install.h
  *  PURPOSE:     Handles the installation of updates for MTA
  *
  *  Multi Theft Auto is available from https://multitheftauto.com/

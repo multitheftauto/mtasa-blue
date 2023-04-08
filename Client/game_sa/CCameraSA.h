@@ -156,8 +156,8 @@ public:
     bool m_bMusicFadedOut;
 
     bool m_bFailedCullZoneTestPreviously;
-    bool m_FadeTargetIsSplashScreen;            // used as hack for fading
-    bool WorldViewerBeingUsed;                  // To indicate if the world viewer is being used.
+    bool m_FadeTargetIsSplashScreen;                    // used as hack for fading
+    bool WorldViewerBeingUsed;                          // To indicate if the world viewer is being used.
 
     unsigned char m_uiTransitionJUSTStarted;            // This is the first frame of a transition.
     unsigned char m_uiTransitionState;                  // 0:one mode 1:transition
@@ -305,7 +305,7 @@ public:
 
     CVector m_vecAttachedCamOffset;            // for attaching the camera to a ped or vehicle (set by level designers for use in cutscenes)
     CVector m_vecAttachedCamLookAt;
-    float   m_fAttachedCamAngle;            // for giving the attached camera a tilt.
+    float   m_fAttachedCamAngle;               // for giving the attached camera a tilt.
 
     // RenderWare camera pointer
     DWORD* m_pRwCamera;            // was RwCamera *
@@ -397,13 +397,13 @@ public:
     CCameraSAInterface* GetInterface() { return internalInterface; };
     void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
     void                TakeControl(CVector* position, int CamSwitchStyle);
-    void     Restore();
-    void     RestoreWithJumpCut();
-    CMatrix* GetMatrix(CMatrix* matrix);
-    void     SetMatrix(CMatrix* matrix);
-    void     Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
-    float    Find3rdPersonQuickAimPitch();
-    BYTE     GetActiveCam();
+    void                Restore();
+    void                RestoreWithJumpCut();
+    CMatrix*            GetMatrix(CMatrix* matrix);
+    void                SetMatrix(CMatrix* matrix);
+    void                Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
+    float               Find3rdPersonQuickAimPitch();
+    BYTE                GetActiveCam();
 
     CCam*         GetCam(BYTE bCameraID);
     virtual CCam* GetCam(CCamSAInterface* camInterface);

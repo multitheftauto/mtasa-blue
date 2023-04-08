@@ -46,11 +46,11 @@ static LPTOP_LEVEL_EXCEPTION_FILTER g_pfnOrigFilt = NULL;
 // The exception handler
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
 
-    /*//////////////////////////////////////////////////////////////////////
-                                Destructor Class
-    //////////////////////////////////////////////////////////////////////*/
-    // See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
-    // Turn off warning : initializers put in library initialization area
+/*//////////////////////////////////////////////////////////////////////
+                            Destructor Class
+//////////////////////////////////////////////////////////////////////*/
+// See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
+// Turn off warning : initializers put in library initialization area
 #pragma warning (disable : 4073)
 #pragma init_seg(lib)
 class CleanUpCrashHandler
@@ -106,7 +106,8 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
             // Stop the OS from turning off our handler
             // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
             LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
+            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER
+            {
                 // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
                 // our handler will not get removed.
                 return 0;

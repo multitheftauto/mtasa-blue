@@ -30,10 +30,6 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Nightly Builds](https://nightly.multitheftauto.com/)
 * [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
-### IDE Setup
-
-If not using Visual Studio 2017, download and install the [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfigTeam.EditorConfig) plugin to automatically set up your IDE for the correct formatting.
-
 ### Build Instructions
 
 #### Windows

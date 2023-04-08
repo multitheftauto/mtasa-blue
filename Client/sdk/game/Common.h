@@ -827,7 +827,7 @@ enum eMarkerSprite
 /**
  * Used to decide how the marker is displayed in-game and on the radar
  */
-enum eMarkerDisplay            // R*'s eMARKER_DISPLAY
+enum eMarkerDisplay                        // R*'s eMARKER_DISPLAY
 {
     MARKER_DISPLAY_NEITHER = 0,            //  BLIPDISPLAY_NEITHER
     MARKER_DISPLAY_MARKERONLY,             //  BLIPDISPLAY_MARKERONLY
@@ -1109,9 +1109,9 @@ enum eMoveState
     PEDMOVE_TURN_L,
     PEDMOVE_TURN_R,
     PEDMOVE_WALK,
-    //#ifdef GTA_MIAMI
+    // #ifdef GTA_MIAMI
     PEDMOVE_JOG,
-    //#endif
+    // #endif
     PEDMOVE_RUN,
     PEDMOVE_SPRINT
 };
@@ -1349,7 +1349,7 @@ enum eWeaponProperty
     WEAPON_DEFAULT_COMBO,
     WEAPON_COMBOS_AVAILABLE,
 
-    WEAPON_FLAG_AIM_NO_AUTO,            // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
+    WEAPON_FLAG_AIM_NO_AUTO,               // 0x000001 - cant auto target to aim       (disable automatic up/down adjustment when firing without aiming)
     WEAPON_FLAG_FIRST = WEAPON_FLAG_AIM_NO_AUTO,
     WEAPON_FLAG_AIM_ARM,                   // 0x000002 - only needs arm to aim         (ie pistol/shotgun/tec9/uzi)
     WEAPON_FLAG_AIM_1ST_PERSON,            // 0x000004 - uses 1st person aim           (ie sniper/rpg-hs

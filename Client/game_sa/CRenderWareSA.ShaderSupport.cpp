@@ -17,7 +17,7 @@
 #include "CRenderWareSA.ShaderSupport.h"
 
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 #define ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName        0x06FDF40
 #define ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName     0x06FED49

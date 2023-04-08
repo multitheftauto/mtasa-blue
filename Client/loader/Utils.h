@@ -1,13 +1,17 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Utils.h
+ *  FILE:        Client/loader/Utils.h
  *  PURPOSE:     Loading utilities
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
+
+#include <filesystem>
 
 #undef CREATE_SUSPENDED
 #define CREATE_SUSPENDED 5
@@ -70,6 +74,11 @@ std::vector<DWORD> GetGTAProcessList();
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
 
+auto GetMTARootDirectory() -> std::filesystem::path;
+auto GetGameBaseDirectory() -> std::filesystem::path;
+auto GetGameLaunchDirectory() -> std::filesystem::path;
+auto GetGameExecutablePath() -> std::filesystem::path;
+
 void            SetMTASAPathSource(bool bReadFromRegistry);
 SString         GetMTASAPath();
 ePathResult     DiscoverGTAPath(bool bFindIfMissing);
@@ -129,6 +138,23 @@ std::vector<DWORD> GetProcessListUsingFile(const WString& filePath);
  * @brief Computes the CRC-32 checksum for a file.
  */
 auto ComputeCRC32(const char* filePath) -> uint32_t;
+
+/**
+ * @brief Generates a random string with up to 4096 characters.
+ * @param length Desired length of the string
+ * @return A string with random alpha-numeric characters
+ */
+auto GenerateRandomString(size_t length) -> std::string;
+
+/**
+ * @brief Checks if the error code is important enough to be logged.
+ */
+bool IsErrorCodeLoggable(const std::error_code& ec);
+
+/**
+ * @brief Returns true if Windows is running on ARM64 architecture (via emulation).
+ */
+bool IsNativeArm64Host();
 
 // Return false on read failure
 template <class T>

@@ -40,7 +40,7 @@ public:
 
     bool operator!=(const SString& other) const { return entry != other; }
     bool operator==(const SString& other) const { return entry == other; }
-         operator const char*() const { return entry.c_str(); }
+    operator const char*() const { return entry.c_str(); }
 };
 
 class CEntryHistory
