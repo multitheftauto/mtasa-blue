@@ -932,7 +932,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     }
 
     // Load ped config
-    const char*     strPedsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("peds.conf");
+    const char* strPedsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("peds.conf");
     CPedConfig  pedConfig(strPedsPath);
     if (!pedConfig.Load())
     {
@@ -941,8 +941,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     }
 
     // Load object config
-    const char* strObjectsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("objects.conf");
-    CObjectConfig  objectConfig(strObjectsPath);
+    const char*   strObjectsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("objects.conf");
+    CObjectConfig objectConfig(strObjectsPath);
     if (!objectConfig.Load())
     {
         CLogger::ErrorPrintf("%s", "Loading 'objects.conf' failed\n");
