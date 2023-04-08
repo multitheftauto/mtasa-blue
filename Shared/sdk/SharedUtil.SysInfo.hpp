@@ -45,7 +45,7 @@ namespace
                      /* [in] */ long                                                                                lTimeout,
                      /* [in] */ ULONG                                                                               uCount,
                      /* [length_is][size_is][out] */ __RPC__out_ecount_part(uCount, *puReturned) IWbemClassObject** apObjects,
-                     /* [out] */ __RPC__out ULONG* puReturned)
+                     /* [out] */ __RPC__out ULONG*                                                                  puReturned)
     {
         __try
         {
@@ -323,7 +323,7 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 //
 // GetWMIVideoAdapterMemorySize
 //  Note that this will never return more than 4 GB of video memory
-//  
+//
 //
 /////////////////////////////////////////////////////////////////////
 unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev)

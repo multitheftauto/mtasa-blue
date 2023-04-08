@@ -12,20 +12,14 @@
 
 CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType)
 {
-    // Init
     m_pManager = pManager;
-    m_pModelManager = pManager->GetModelManager();
     m_iModelID = iModelID;
     m_eModelType = eModelType;
-
-    m_pModelManager->Add(this);
 }
 
 CClientModel::~CClientModel(void)
 {
     Deallocate();
-
-    m_pModelManager->Remove(this);
 }
 
 bool CClientModel::Allocate(ushort usParentID)
@@ -38,15 +32,28 @@ bool CClientModel::Allocate(ushort usParentID)
     if (pModelInfo->IsValid())
         return false;
 
+    // Avoid hierarchy
+    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(usParentID, true);
+
+    if (pParentModelInfo->GetParentID())
+        return false;
+
     switch (m_eModelType)
     {
         case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
-            break;
+            return true;
         case eClientModelType::OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeObjectModel(usParentID);
+                return true;
+            }
+            break;
+        case eClientModelType::TIMED_OBJECT:
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeTimedObjectModel(usParentID);
                 return true;
             }
             break;
@@ -67,14 +74,18 @@ bool CClientModel::Deallocate(void)
 {
     if (!m_bAllocatedByUs)
         return false;
-
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
-
-    // ModelInfo must be valid
-    if (!pModelInfo->IsValid())
+    if (!pModelInfo || !pModelInfo->IsValid())
         return false;
+    pModelInfo->DeallocateModel();
+    SetParentResource(nullptr);
+    return true;
+}
 
-    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
+void CClientModel::RestoreEntitiesUsingThisModel()
+{
+    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
             auto& element = **iter;
@@ -105,11 +116,17 @@ bool CClientModel::Deallocate(void)
             break;
         }
         case eClientModelType::OBJECT:
+        case eClientModelType::TIMED_OBJECT:
         {
-            const auto& objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
-            unsigned short      usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
+            const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
+            unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+
+            // Restore pickups with custom model
+            CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
+
+            unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
@@ -128,9 +145,4 @@ bool CClientModel::Deallocate(void)
 
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
-
-    pModelInfo->DeallocateModel();
-
-    this->SetParentResource(nullptr);
-    return true;
 }

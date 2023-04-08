@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CPointLights.h>
 
 CClientPointLights::CClientPointLights(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -57,7 +58,7 @@ void CClientPointLights::DoPulse()
 
 void CClientPointLights::SetDimension(unsigned short usDimension)
 {
-    m_usDimension = usDimension;
+    CClientEntity::SetDimension(usDimension);
     RelateDimension(m_pPointLightsManager->GetDimension());
 }
 

@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -91,7 +93,7 @@ CURLcode Curl_resolver_duphandle(struct Curl_easy *easy, void **to,
  *
  * It is safe to call this when conn is in any state.
  */
-void Curl_resolver_cancel(struct connectdata *conn);
+void Curl_resolver_cancel(struct Curl_easy *data);
 
 /*
  * Curl_resolver_kill().
@@ -104,7 +106,7 @@ void Curl_resolver_cancel(struct connectdata *conn);
  *
  * It is safe to call this when conn is in any state.
  */
-void Curl_resolver_kill(struct connectdata *conn);
+void Curl_resolver_kill(struct Curl_easy *data);
 
 /* Curl_resolver_getsock()
  *
@@ -114,7 +116,7 @@ void Curl_resolver_kill(struct connectdata *conn);
  * return bitmask indicating what file descriptors (referring to array indexes
  * in the 'sock' array) to wait for, read/write.
  */
-int Curl_resolver_getsock(struct connectdata *conn, curl_socket_t *sock);
+int Curl_resolver_getsock(struct Curl_easy *data, curl_socket_t *sock);
 
 /*
  * Curl_resolver_is_resolved()
@@ -125,7 +127,7 @@ int Curl_resolver_getsock(struct connectdata *conn, curl_socket_t *sock);
  *
  * Returns normal CURLcode errors.
  */
-CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
+CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
                                    struct Curl_dns_entry **dns);
 
 /*
@@ -139,21 +141,21 @@ CURLcode Curl_resolver_is_resolved(struct connectdata *conn,
  * Returns CURLE_COULDNT_RESOLVE_HOST if the host was not resolved,
  * CURLE_OPERATION_TIMEDOUT if a time-out occurred, or other errors.
  */
-CURLcode Curl_resolver_wait_resolv(struct connectdata *conn,
+CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
                                    struct Curl_dns_entry **dnsentry);
 
 /*
  * Curl_resolver_getaddrinfo() - when using this resolver
  *
  * Returns name information about the given hostname and port number. If
- * successful, the 'hostent' is returned and the forth argument will point to
+ * successful, the 'hostent' is returned and the fourth argument will point to
  * memory we need to free after use. That memory *MUST* be freed with
  * Curl_freeaddrinfo(), nothing else.
  *
  * Each resolver backend must of course make sure to return data in the
  * correct format to comply with this.
  */
-struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct connectdata *conn,
+struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
                                                 const char *hostname,
                                                 int port,
                                                 int *waitp);

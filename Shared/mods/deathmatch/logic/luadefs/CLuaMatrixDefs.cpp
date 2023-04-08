@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaMatrixDefs.h"
+#include "lua/LuaCommon.h"
+#include "lua/CLuaShared.h"
+#include "CScriptArgReader.h"
+#include "Utils.h"
 
 void CLuaMatrixDefs::AddClass(lua_State* luaVM)
 {

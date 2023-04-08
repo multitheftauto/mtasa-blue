@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -20,24 +20,10 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "curl_setup.h"
-
-#define READBUFFER_SIZE CURL_MAX_WRITE_SIZE
-#define READBUFFER_MAX  CURL_MAX_READ_SIZE
-#define READBUFFER_MIN  1024
-
-/* The default upload buffer size, should not be smaller than
-   CURL_MAX_WRITE_SIZE, as it needs to hold a full buffer as could be sent in
-   a write callback.
-
-   The size was 16KB for many years but was bumped to 64KB because it makes
-   libcurl able to do significantly faster uploads in some circumstances. Even
-   larger buffers can help further, but this is deemed a fair memory/speed
-   compromise. */
-#define UPLOADBUFFER_DEFAULT 65536
-#define UPLOADBUFFER_MAX (2*1024*1024)
-#define UPLOADBUFFER_MIN CURL_MAX_WRITE_SIZE
 
 /*
  * Prototypes for library-wide functions provided by url.c
@@ -51,19 +37,20 @@ void Curl_freeset(struct Curl_easy *data);
 CURLcode Curl_uc_to_curlcode(CURLUcode uc);
 CURLcode Curl_close(struct Curl_easy **datap); /* opposite of curl_open() */
 CURLcode Curl_connect(struct Curl_easy *, bool *async, bool *protocol_connect);
-CURLcode Curl_disconnect(struct Curl_easy *data,
-                         struct connectdata *, bool dead_connection);
-CURLcode Curl_setup_conn(struct connectdata *conn,
+void Curl_disconnect(struct Curl_easy *data,
+                     struct connectdata *, bool dead_connection);
+CURLcode Curl_setup_conn(struct Curl_easy *data,
                          bool *protocol_done);
 void Curl_free_request_state(struct Curl_easy *data);
 CURLcode Curl_parse_login_details(const char *login, const size_t len,
                                   char **userptr, char **passwdptr,
                                   char **optionsptr);
 
-const struct Curl_handler *Curl_builtin_scheme(const char *scheme);
+const struct Curl_handler *Curl_builtin_scheme(const char *scheme,
+                                               size_t schemelen);
 
 bool Curl_is_ASCII_name(const char *hostname);
-CURLcode Curl_idnconvert_hostname(struct connectdata *conn,
+CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,
                                   struct hostname *host);
 void Curl_free_idnconverted_hostname(struct hostname *host);
 
@@ -72,9 +59,9 @@ void Curl_free_idnconverted_hostname(struct hostname *host);
                                              specified */
 
 #ifdef CURL_DISABLE_VERBOSE_STRINGS
-#define Curl_verboseconnect(x)  Curl_nop_stmt
+#define Curl_verboseconnect(x,y)  Curl_nop_stmt
 #else
-void Curl_verboseconnect(struct connectdata *conn);
+void Curl_verboseconnect(struct Curl_easy *data, struct connectdata *conn);
 #endif
 
 #ifdef CURL_DISABLE_PROXY

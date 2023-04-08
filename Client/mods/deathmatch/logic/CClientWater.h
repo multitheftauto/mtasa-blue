@@ -10,7 +10,9 @@
 
 #pragma once
 
-class CClientWater : public CClientEntity
+#include <game/CWaterManager.h>
+
+class CClientWater final : public CClientEntity
 {
     DECLARE_CLASS(CClientWater, CClientEntity)
 public:

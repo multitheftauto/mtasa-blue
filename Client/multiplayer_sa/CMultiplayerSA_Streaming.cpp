@@ -12,7 +12,7 @@
 
 void OnModelLoaded(unsigned int uiModelID)
 {
-    if (uiModelID < 20000)
+    if (uiModelID < pGameInterface->GetBaseIDforTXD())
         pGameInterface->GetModelInfo(uiModelID)->MakeCustomModel();
 }
 

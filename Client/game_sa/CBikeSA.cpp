@@ -10,33 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBikeSA.h"
 
-CBikeSA::CBikeSA(CBikeSAInterface* bike)
+CBikeSA::CBikeSA(CBikeSAInterface* pInterface)
 {
-    DEBUG_TRACE("CBikeSA::CBikeSA( CBikeSAInterface * bike )");
-    this->m_pInterface = bike;
-}
-
-CBikeSA::CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)
-{
-    DEBUG_TRACE("CBikeSA::CBikeSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
-    /*if(this->internalInterface)
-    {
-        // create the actual vehicle
-        DWORD dwFunc = FUNC_CBikeContructor;
-        DWORD dwThis = (DWORD)this->internalInterface;
-        _asm
-        {
-            mov     ecx, dwThis
-            push    MISSION_VEHICLE
-            push    dwModelID
-            call    dwFunc
-        }
-
-        this->SetEntityStatus(STATUS_ABANDONED); // so it actually shows up in the world
-
-        pGame->GetWorld()->Add((CEntitySA *)this);
-    }*/
+    SetInterface(pInterface);
+    Init();
 }
 
 CBikeHandlingEntry* CBikeSA::GetBikeHandlingData()
@@ -46,12 +25,15 @@ CBikeHandlingEntry* CBikeSA::GetBikeHandlingData()
 
 void CBikeSA::SetBikeHandlingData(CBikeHandlingEntry* pBikeHandling)
 {
+    if (!pBikeHandling)
+        return;
     m_pBikeHandlingData = static_cast<CBikeHandlingEntrySA*>(pBikeHandling);
-    GetBikeInterface()->pBikeHandlingData = m_pBikeHandlingData->GetInterface();
+    GetBikeInterface()->m_pBikeHandlingData = m_pBikeHandlingData->GetInterface();
     RecalculateBikeHandling();
 }
 
 void CBikeSA::RecalculateBikeHandling()
 {
-    m_pBikeHandlingData->Recalculate();
+    if (m_pBikeHandlingData)
+        m_pBikeHandlingData->Recalculate();
 }

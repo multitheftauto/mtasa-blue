@@ -8,6 +8,10 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+#include <map>
+#include <vector>
+#include "SharedUtil.IntTypes.h"
 
 ////////////////////////////////////////////////////////////////
 //
@@ -227,7 +231,7 @@ public:
         bool     operator!=(const ConstIterator& other) const { return iter != other.iter; }
         void     operator++() { ++iter; }
         void     operator++(int) { iter++; }
-        const T& operator*()const { return iter->second; }
+        const T& operator*() const { return iter->second; }
     };
 
     class Iterator
@@ -240,8 +244,8 @@ public:
         bool     operator!=(const Iterator& other) const { return iter != other.iter; }
         void     operator++() { ++iter; }
         void     operator++(int) { iter++; }
-        const T& operator*()const { return iter->second; }
-                 operator ConstIterator() const { return ConstIterator(iter); }
+        const T& operator*() const { return iter->second; }
+        operator ConstIterator() const { return ConstIterator(iter); }
     };
 
     //
@@ -257,7 +261,7 @@ public:
         bool     operator!=(const ConstReverseIterator& other) const { return iter != other.iter; }
         void     operator++() { ++iter; }
         void     operator++(int) { iter++; }
-        const T& operator*()const { return iter->second; }
+        const T& operator*() const { return iter->second; }
     };
 
     class ReverseIterator
@@ -270,8 +274,8 @@ public:
         bool     operator!=(const ReverseIterator& other) const { return iter != other.iter; }
         void     operator++() { ++iter; }
         void     operator++(int) { iter++; }
-        const T& operator*()const { return iter->second; }
-                 operator ConstReverseIterator() const { return ConstReverseIterator(iter); }
+        const T& operator*() const { return iter->second; }
+        operator ConstReverseIterator() const { return ConstReverseIterator(iter); }
     };
 
     ConstIterator begin() const { return ConstIterator(orderedMap.begin()); }

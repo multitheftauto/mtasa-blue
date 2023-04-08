@@ -9,7 +9,7 @@ project "Client Deathmatch"
 
 	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt",
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
@@ -28,6 +28,7 @@ project "Client Deathmatch"
 
 	filter {}
 		includedirs {
+			"../../../Shared/sdk",
 			".",
 			"./logic",
 			"../../sdk/",
@@ -38,11 +39,11 @@ project "Client Deathmatch"
 			"../../../vendor/zlib",
 			"../../../vendor/pcre",
 			"../../../vendor/json-c",
-			"../../../vendor/bob_withers",
 			"../../../vendor/lua/src",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
-			"../../../vendor/sparsehash/src/"
+			"../../../vendor/sparsehash/src/",
+			"../../../vendor/lunasvg/include"
 	}
 
 	files {
@@ -53,15 +54,14 @@ project "Client Deathmatch"
 		"../../../Shared/mods/deathmatch/logic/**.h",
 		"../../../Shared/animation/CEasingCurve.cpp",
 		"../../../Shared/animation/CPositionRotationAnimation.cpp",
-		"../../version.h",
 		-- Todo: Replace these two by using the CryptoPP functions instead
-		"../../../vendor/bochs/bochs_internal/crc32.cpp"
+		"../../../vendor/bochs/bochs_internal/bochs_crc32.cpp"
 	}
 
-	configuration "windows"
+	filter "system:windows"
 		buildoptions { "-Zm180" }
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

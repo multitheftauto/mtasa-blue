@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CHud.h>
 
 using std::list;
 
@@ -65,7 +66,7 @@ void CCommandFuncs::Ver(const char* szParameters)
 
 void CCommandFuncs::ScreenShot(const char* szParameters)
 {
-    g_pCore->TakeScreenShot();
+    g_pCore->InitiateScreenShot(false);
 }
 
 void CCommandFuncs::Vid(const char* szParameters)
@@ -464,7 +465,7 @@ void CCommandFuncs::FakeLag(const char* szCmdLine)
 {
     if (!CCore::GetSingleton().IsFakeLagCommandEnabled())
     {
-        g_pCore->GetConsole()->Print("fakelag command no enabled");
+        g_pCore->GetConsole()->Print("fakelag command not enabled");
         return;
     }
 

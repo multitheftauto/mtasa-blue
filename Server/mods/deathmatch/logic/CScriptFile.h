@@ -12,10 +12,11 @@
 #pragma once
 
 #include "CElement.h"
+#include "lua/LuaCommon.h"
 #include <stdio.h>
 #include <string>
 
-class CScriptFile : public CElement
+class CScriptFile final : public CElement
 {
 public:
     enum eMode

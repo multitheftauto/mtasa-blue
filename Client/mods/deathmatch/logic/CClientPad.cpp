@@ -12,11 +12,13 @@
    through scripting functions.
 */
 #include <StdInc.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 
 #define CS_NAN -32768
 
 SFixedArray<short, MAX_GTA_CONTROLS>       CClientPad::m_sScriptedStates;
-SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> CClientPad::m_bScriptedReadyToReset;
+SFixedArray<bool, MAX_GTA_ANALOG_CONTROLS> CClientPad::m_bScriptedStatesNextFrameOverride;
 bool                                       CClientPad::m_bFlyWithMouse;
 bool                                       CClientPad::m_bSteerWithMouse;
 
@@ -119,7 +121,7 @@ CClientPad::CClientPad()
     for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
     {
         m_sScriptedStates[i] = CS_NAN;
-        m_bScriptedReadyToReset[i] = false;
+        m_bScriptedStatesNextFrameOverride[i] = false;
     }
 }
 
@@ -234,62 +236,62 @@ void CClientPad::DoPulse(CClientPed* pPed)
             {
                 cs.ButtonCircle = (m_fStates[0]) ? 255 : 0;            // Fire
 
-                cs.LeftStickY =
-                    (short)(((m_fStates[3] && m_fStates[4]) || (!m_fStates[3] && !m_fStates[4])) ? 0
-                                                                                                 : (m_fStates[3]) ? m_fStates[3] * -128 : m_fStates[4] * 128);
+                cs.LeftStickY = (short)(((m_fStates[3] && m_fStates[4]) || (!m_fStates[3] && !m_fStates[4])) ? 0
+                                        : (m_fStates[3])                                                     ? m_fStates[3] * -128
+                                                                                                             : m_fStates[4] * 128);
 
-                cs.LeftStickX =
-                    (short)(((m_fStates[5] && m_fStates[6]) || (!m_fStates[5] && !m_fStates[6])) ? 0
-                                                                                                 : (m_fStates[5]) ? m_fStates[5] * -128 : m_fStates[6] * 128);
+                cs.LeftStickX = (short)(((m_fStates[5] && m_fStates[6]) || (!m_fStates[5] && !m_fStates[6])) ? 0
+                                        : (m_fStates[5])                                                     ? m_fStates[5] * -128
+                                                                                                             : m_fStates[6] * 128);
 
-                cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;            // Get in/out and alternative fighting styles
+                cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;             // Get in/out and alternative fighting styles
 
-                cs.ButtonSquare = (m_fStates[11]) ? 255 : 0;            // Jump
+                cs.ButtonSquare = (m_fStates[11]) ? 255 : 0;              // Jump
 
-                cs.ButtonCross = (m_fStates[12]) ? 255 : 0;            // Sprint
+                cs.ButtonCross = (m_fStates[12]) ? 255 : 0;               // Sprint
 
-                cs.ShockButtonR = (m_fStates[13]) ? 255 : 0;            // Look Behind
+                cs.ShockButtonR = (m_fStates[13]) ? 255 : 0;              // Look Behind
 
-                cs.ShockButtonL = (m_fStates[14]) ? 255 : 0;            // Crouch
+                cs.ShockButtonL = (m_fStates[14]) ? 255 : 0;              // Crouch
 
-                cs.LeftShoulder1 = (m_fStates[15]) ? 255 : 0;            // Action
+                cs.LeftShoulder1 = (m_fStates[15]) ? 255 : 0;             // Action
 
-                cs.m_bPedWalk = (m_fStates[16]) ? 255 : 0;            // Walk
+                cs.m_bPedWalk = (m_fStates[16]) ? 255 : 0;                // Walk
 
                 cs.RightShoulder1 = (m_fStates[39]) ? 255 : 0;            // Aim Weapon
             }
             else
             {
-                cs.ButtonCircle = (m_fStates[17]) ? 255 : 0;            // Fire
+                cs.ButtonCircle = (m_fStates[17]) ? 255 : 0;             // Fire
 
                 cs.LeftShoulder1 = (m_fStates[18]) ? 255 : 0;            // Secondary Fire
-                cs.LeftStickX = (short)(((m_fStates[19] && m_fStates[20]) || (!m_fStates[19] && !m_fStates[20]))
-                                            ? 0
-                                            : (m_fStates[19]) ? m_fStates[19] * -128 : m_fStates[20] * 128);
+                cs.LeftStickX = (short)(((m_fStates[19] && m_fStates[20]) || (!m_fStates[19] && !m_fStates[20])) ? 0
+                                        : (m_fStates[19])                                                        ? m_fStates[19] * -128
+                                                                                                                 : m_fStates[20] * 128);
 
-                cs.LeftStickY = (short)(((m_fStates[21] && m_fStates[22]) || (!m_fStates[21] && !m_fStates[22]))
-                                            ? 0
-                                            : (m_fStates[21]) ? m_fStates[21] * -128 : m_fStates[22] * 128);
+                cs.LeftStickY = (short)(((m_fStates[21] && m_fStates[22]) || (!m_fStates[21] && !m_fStates[22])) ? 0
+                                        : (m_fStates[21])                                                        ? m_fStates[21] * -128
+                                                                                                                 : m_fStates[22] * 128);
 
-                cs.ButtonCross = (short)((m_fStates[23] * 255));            // Accelerate
+                cs.ButtonCross = (short)((m_fStates[23] * 255));                           // Accelerate
 
-                cs.ButtonSquare = (short)((m_fStates[24] * 255));            // Reverse
+                cs.ButtonSquare = (short)((m_fStates[24] * 255));                          // Reverse
 
-                cs.ShockButtonL = (m_fStates[28]) ? 255 : 0;            // Horn
+                cs.ShockButtonL = (m_fStates[28]) ? 255 : 0;                               // Horn
 
-                cs.RightShoulder1 = (m_fStates[30]) ? 255 : 0;            // Handbrake
+                cs.RightShoulder1 = (m_fStates[30]) ? 255 : 0;                             // Handbrake
 
-                cs.LeftShoulder2 = (m_fStates[31] || m_fStates[33]) ? 255 : 0;            // Look Left
+                cs.LeftShoulder2 = (m_fStates[31] || m_fStates[33]) ? 255 : 0;             // Look Left
 
                 cs.RightShoulder2 = (m_fStates[32] || m_fStates[33]) ? 255 : 0;            // Look Right
 
-                cs.RightStickX = (short)(((m_fStates[35] && m_fStates[36]) || (!m_fStates[35] && !m_fStates[36]))
-                                             ? 0
-                                             : (m_fStates[35]) ? m_fStates[35] * 128 : m_fStates[36] * -128);
+                cs.RightStickX = (short)(((m_fStates[35] && m_fStates[36]) || (!m_fStates[35] && !m_fStates[36])) ? 0
+                                         : (m_fStates[35])                                                        ? m_fStates[35] * 128
+                                                                                                                  : m_fStates[36] * -128);
 
-                cs.RightStickY = (short)(((m_fStates[37] && m_fStates[38]) || (!m_fStates[37] && !m_fStates[38]))
-                                             ? 0
-                                             : (m_fStates[37]) ? m_fStates[37] * 128 : m_fStates[38] * -128);
+                cs.RightStickY = (short)(((m_fStates[37] && m_fStates[38]) || (!m_fStates[37] && !m_fStates[38])) ? 0
+                                         : (m_fStates[37])                                                        ? m_fStates[37] * 128
+                                                                                                                  : m_fStates[38] * -128);
             }
         }
         pPed->SetControllerState(cs);
@@ -590,7 +592,7 @@ bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs,
     return false;
 }
 // Set the analog control state and store them temporarilly before they are actually applied.  Used for players.
-bool CClientPad::SetAnalogControlState(const char* szName, float fState)
+bool CClientPad::SetAnalogControlState(const char* szName, float fState, bool bFrameForced)
 {
     // Ensure values are between 0 and 1
     fState = Clamp<float>(0, fState, 1);
@@ -602,56 +604,82 @@ bool CClientPad::SetAnalogControlState(const char* szName, float fState)
             case 0:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[1] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[1] = false;
                 return true;            // Left
             case 1:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[0] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[0] = false;
                 return true;            // Right
             case 2:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[3] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[3] = false;
                 return true;            // Up
             case 3:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[2] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[2] = false;
                 return true;            // Down
             case 4:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[5] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[5] = false;
                 return true;            // Vehicle Left
             case 5:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[4] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[4] = false;
                 return true;            // Vehicle Right
             case 6:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[7] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[7] = false;
                 return true;            // Up
             case 7:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[6] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[6] = false;
                 return true;            // Down
             case 8:
                 m_sScriptedStates[uiIndex] = (short)(fState * 255.0f);
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
                 return true;            // Accel
             case 9:
                 m_sScriptedStates[uiIndex] = (short)(fState * 255.0f);
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
                 return true;            // Reverse
             case 10:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[11] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[11] = false;
                 return true;            // Special Left
             case 11:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[10] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[10] = false;
                 return true;            // Special Right
             case 12:
                 m_sScriptedStates[uiIndex] = (short)(fState * -128.0f);
                 m_sScriptedStates[13] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[13] = false;
                 return true;            // Special Up
             case 13:
                 m_sScriptedStates[uiIndex] = (short)(fState * 128.0f);
                 m_sScriptedStates[12] = 0;
+                m_bScriptedStatesNextFrameOverride[uiIndex] = bFrameForced;
+                m_bScriptedStatesNextFrameOverride[12] = false;
                 return true;            // Special Down
             default:
                 return false;
@@ -676,55 +704,77 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
     {
         unsigned int uiIndex = 0;
 
-        ProcessControl(cs.LeftStickX, uiIndex, false);
-        uiIndex++;            // Left
-        ProcessControl(cs.LeftStickX, uiIndex, true);
-        uiIndex++;            // Right
-        ProcessControl(cs.LeftStickY, uiIndex, false);
-        uiIndex++;            // Up
-        ProcessControl(cs.LeftStickY, uiIndex, true);
-        uiIndex++;            // Down
+        ProcessControl(cs.LeftStickX, uiIndex);            // Left
+        uiIndex++;
+        ProcessControl(cs.LeftStickX, uiIndex);            // Right
+        uiIndex++;
+        ProcessControl(cs.LeftStickY, uiIndex);            // Up
+        uiIndex++;
+        ProcessControl(cs.LeftStickY, uiIndex);            // Down
     }
     else
     {
         unsigned int uiIndex = 4;
 
-        ProcessControl(cs.LeftStickX, uiIndex, false);
-        uiIndex++;            // Left
-        ProcessControl(cs.LeftStickX, uiIndex, true);
-        uiIndex++;            // Right
-        ProcessControl(cs.LeftStickY, uiIndex, false);
-        uiIndex++;            // Up
-        ProcessControl(cs.LeftStickY, uiIndex, true);
-        uiIndex++;            // Down
-        ProcessControl(cs.ButtonCross, uiIndex, true);
-        uiIndex++;            // Accel
-        ProcessControl(cs.ButtonSquare, uiIndex, true);
-        uiIndex++;            // Brake
-        ProcessControl(cs.RightStickX, uiIndex, false);
-        uiIndex++;            // Special Left
-        ProcessControl(cs.RightStickX, uiIndex, true);
-        uiIndex++;            // Special Right
-        ProcessControl(cs.RightStickY, uiIndex, false);
-        uiIndex++;            // Special Up
-        ProcessControl(cs.RightStickY, uiIndex, true);
-        uiIndex++;            // Special Down
+        ProcessControl(cs.LeftStickX, uiIndex);              // Left
+        uiIndex++;
+        ProcessControl(cs.LeftStickX, uiIndex);              // Right
+        uiIndex++;
+        ProcessControl(cs.LeftStickY, uiIndex);              // Up
+        uiIndex++;
+        ProcessControl(cs.LeftStickY, uiIndex);              // Down
+        uiIndex++;
+        ProcessControl(cs.ButtonCross, uiIndex);             // Accel
+        uiIndex++;
+        ProcessControl(cs.ButtonSquare, uiIndex);            // Brake
+        uiIndex++;
+        ProcessControl(cs.RightStickX, uiIndex);             // Special Left
+        uiIndex++;
+        ProcessControl(cs.RightStickX, uiIndex);             // Special Right
+        uiIndex++;
+        ProcessControl(cs.RightStickY, uiIndex);             // Special Up
+        uiIndex++;
+        ProcessControl(cs.RightStickY, uiIndex);             // Special Down
     }
 }
 
-void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex, bool bPositive)
+void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex)
 {
-    bool bResetCmp = bPositive ? (usControlValue > 0) : (usControlValue < 0);
-    if (!m_bScriptedReadyToReset[uiIndex])            // If we havent marked as ready to reset the control, find out if we are
-        m_bScriptedReadyToReset[uiIndex] = ((m_sScriptedStates[uiIndex] != CS_NAN) && (usControlValue == 0));
+    // Note:    control values can be 0, negative or positive
+    //          that's why we check unequals != 0
+    //          otherwise the values are already in their expected value boundaries
+    //
+    // usControlValue                       is the updated input value we get from the player
+    // m_sScriptedStates                    contains our script value
+    // m_bScriptedStatesNextFrameOverride   if the player input should be forcefully overriden for the next frame
+    //
+    //
+    // old behavior or (override == false)
+    //      - player input will not be overwitten if it's unequals to 0* and script input is set 0
+    //      - otherwise it will use the last set value after player input went 0*
+    //        and will keep this behavior for comming frames
+    //
+    // behavior with (override == true)
+    //      - will overwrite the player input even if not 0*
+    //        only for the next frame
+    //
+    // 0* = no key pressed or analog hardware controll touched
+    //
+    //
 
-    if (m_bScriptedReadyToReset[uiIndex] && bResetCmp)            // If we're ready to reset, and our reset comparision is passed
-        m_sScriptedStates[uiIndex] = CS_NAN;                      // Remove our scripted control state
-    else
-        // Only apply the control state of we're actually a number, and that we're positive when we want it to be and vice versa
+    if (m_bScriptedStatesNextFrameOverride[uiIndex])
+    {
+        m_bScriptedStatesNextFrameOverride[uiIndex] = false;
         if (m_sScriptedStates[uiIndex] != CS_NAN)
-        if ((bPositive && m_sScriptedStates[uiIndex] > 0) || (!bPositive && m_sScriptedStates[uiIndex] < 0))
-            usControlValue = m_sScriptedStates[uiIndex];            // Otherwise force the scripted control state
+            std::swap(usControlValue, m_sScriptedStates[uiIndex]);
+    }
+    else
+    {
+        if (usControlValue != 0)
+            m_sScriptedStates[uiIndex] = CS_NAN;
+        else if (m_sScriptedStates[uiIndex] != CS_NAN && m_sScriptedStates[uiIndex] != 0)
+            usControlValue = m_sScriptedStates[uiIndex];
+    }
 }
 
 // Process toggled controls and apply them directly to the pad state.  Used for players when keyboard input blocking is insufficient.

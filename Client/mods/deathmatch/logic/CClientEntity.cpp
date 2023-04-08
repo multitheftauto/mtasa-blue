@@ -46,7 +46,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_pAttachedToEntity = NULL;
 
     m_strTypeName = "unknown";
-    m_uiTypeHash = HashString(m_strTypeName);
+    m_uiTypeHash = GetTypeHashFromString(m_strTypeName);
     if (IsFromRoot(m_pParent))
         CClientEntity::AddEntityFromRoot(m_uiTypeHash, this);
 
@@ -158,7 +158,6 @@ CClientEntity::~CClientEntity()
     if (!g_pClientGame->IsBeingDeleted())
         CClientEntityRefManager::OnEntityDelete(this);
 
-    SAFE_RELEASE(m_pChildrenListSnapshot);
     g_pCore->GetGraphics()->GetRenderItemManager()->RemoveClientEntityRefs(this);
     g_pCore->UpdateDummyProgress();
 }
@@ -173,7 +172,7 @@ void CClientEntity::SetTypeName(const SString& name)
 {
     CClientEntity::RemoveEntityFromRoot(m_uiTypeHash, this);
     m_strTypeName.AssignLeft(name, MAX_TYPENAME_LENGTH);
-    m_uiTypeHash = HashString(name);
+    m_uiTypeHash = GetTypeHashFromString(name);
     if (IsFromRoot(m_pParent))
         CClientEntity::AddEntityFromRoot(m_uiTypeHash, this);
 }
@@ -301,6 +300,19 @@ CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData
 
     // None available
     return NULL;
+}
+
+CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
+{
+    assert(table);
+
+    for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
+    {
+        table->PushString(it->first);                        // key
+        table->PushArgument(it->second.Variable);            // value
+    }
+
+    return table;
 }
 
 bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, bool bInheritData)
@@ -593,6 +605,20 @@ void CClientEntity::SetRotationDegrees(const CVector& vecDegrees)
     SetRotationRadians(vecTemp);
 }
 
+void CClientEntity::SetDimension(unsigned short usDimension)
+{
+    if (m_usDimension == usDimension)
+        return;
+
+    unsigned int usOldDimension = m_usDimension;
+    m_usDimension = usDimension;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(usOldDimension);
+    Arguments.PushNumber(usDimension);
+    CallEvent("onClientElementDimensionChange", Arguments, true);
+}
+
 bool CClientEntity::IsOutOfBounds()
 {
     CVector vecPosition;
@@ -765,11 +791,8 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
     // Call it on all our children
     if (!m_Children.empty())
     {
-        CElementListSnapshot* pList = GetChildrenListSnapshot();
-        pList->AddRef();            // Keep list alive during use
-        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+        for (CClientEntity* pEntity : *GetChildrenListSnapshot())
         {
-            CClientEntity* pEntity = *iter;
             if (!pEntity->IsBeingDeleted())
             {
                 if (!pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents() || !pEntity->m_Children.empty())
@@ -780,7 +803,6 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
                 }
             }
         }
-        pList->Release();
     }
 }
 
@@ -1082,7 +1104,7 @@ bool CClientEntity::IsAttachedToElement(CClientEntity* pEntity, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break; // This should not be possible, but you never know
+                break;            // This should not be possible, but you never know
         }
 
         return false;
@@ -1199,6 +1221,8 @@ unsigned int CClientEntity::GetTypeID(const char* szTypeName)
         return CCLIENTSOUND;
     else if (strcmp(szTypeName, "light") == 0)
         return CCLIENTPOINTLIGHTS;
+    else if (strcmp(szTypeName, "svg") == 0)
+        return CCLIENTVECTORGRAPHIC;
     else
         return CCLIENTUNKNOWN;
 }
@@ -1289,7 +1313,17 @@ void CClientEntity::SetInterior(unsigned char ucInterior)
     {
         pEntity->SetAreaCode(ucInterior);
     }
+
+    unsigned char ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
+
+    if (ucOldInterior != ucInterior)
+    {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(ucOldInterior);
+        Arguments.PushNumber(ucInterior);
+        CallEvent("onClientElementInteriorChange", Arguments, true);
+    }
 }
 
 bool CClientEntity::IsOnScreen()
@@ -1579,25 +1613,21 @@ float CClientEntity::GetDistanceBetweenBoundingSpheres(CClientEntity* pOther)
 //
 // Ensure children list snapshot is up to date and return it
 //
-CElementListSnapshot* CClientEntity::GetChildrenListSnapshot()
+CElementListSnapshotRef CClientEntity::GetChildrenListSnapshot()
 {
     // See if list needs updating
     if (m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL)
     {
         m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
 
-        // Detach old
-        SAFE_RELEASE(m_pChildrenListSnapshot);
-
         // Make new
-        m_pChildrenListSnapshot = new CElementListSnapshot();
+        m_pChildrenListSnapshot = std::make_shared<CElementListSnapshot>();
 
         // Fill it up
         m_pChildrenListSnapshot->reserve(m_Children.size());
-        for (CChildListType::const_iterator iter = m_Children.begin(); iter != m_Children.end(); iter++)
-        {
+
+        for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
             m_pChildrenListSnapshot->push_back(*iter);
-        }
     }
 
     return m_pChildrenListSnapshot;

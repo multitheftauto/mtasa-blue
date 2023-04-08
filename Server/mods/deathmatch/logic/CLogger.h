@@ -24,6 +24,7 @@ class CLogger
 {
 public:
     static void LogPrintf(const char* szFormat, ...);
+    static void LogPrintvf(const char* format, va_list vlist);
     static void LogPrint(const char* szText);
 
     static void LogPrintf(eLogLevel logLevel, const char* szFormat, ...);
@@ -33,6 +34,7 @@ public:
     static void LogPrintNoStamp(const char* szText);
 
     static void ErrorPrintf(const char* szFormat, ...);
+    static void ErrorPrintvf(const char* format, va_list vlist);
     static void DebugPrintf(const char* szFormat, ...);
     static void AuthPrintf(const char* szFormat, ...);
 

@@ -27,6 +27,11 @@
 #define RW_FRAME_NAME_LENGTH      23
 #define RW_MAX_TEXTURE_COORDS     8
 
+/* Type IDs */
+
+#define RP_TYPE_ATOMIC 1
+#define RP_TYPE_CLUMP  2
+
 typedef struct RwV2d                RwV2d;
 typedef struct RwV3d                RwV3d;
 typedef struct RwPlane              RwPlane;
@@ -77,7 +82,7 @@ struct RwSphere
     float radius;
 };
 
-struct RwMatrixTag
+struct RwMatrix
 {
     /* These are padded to be 16 byte quantities per line */
     RwV3d         right;
@@ -89,8 +94,6 @@ struct RwMatrixTag
     RwV3d         pos;
     std::uint32_t pad3;
 };
-
-typedef RwMatrixTag RwMatrix;
 
 struct RtQuat
 {
@@ -111,8 +114,8 @@ struct RpHAnimNodeInfo
 
 struct RpHAnimHierarchy
 {
-    int flags;    /**< Flags for the hierarchy  */
-    int numNodes; /**< Number of nodes in the hierarchy  */
+    int flags;                          /**< Flags for the hierarchy  */
+    int numNodes;                       /**< Number of nodes in the hierarchy  */
 
     RwMatrix* pMatrixArray;             /**< Pointer to node matrices*/
     void*     pMatrixArrayUnaligned;    /**< Pointer to memory used for node matrices
@@ -123,7 +126,7 @@ struct RpHAnimHierarchy
     RpHAnimHierarchy* parentHierarchy;  /**< Internal use */
     int               rootParentOffset; /**< Internal use */
 
-    RtAnimInterpolator* currentAnim; /**< Internal use */
+    RtAnimInterpolator* currentAnim;    /**< Internal use */
 };
 
 // RenderWare enumerations
@@ -447,7 +450,8 @@ struct RwBuffer
     void*        ptr;
     unsigned int size;
 };
-union RwStreamTypeData {
+union RwStreamTypeData
+{
     struct
     {
         unsigned int position;

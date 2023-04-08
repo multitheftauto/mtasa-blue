@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CRadar.h>
 
 CClientRadarArea::CClientRadarArea(class CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {
@@ -109,7 +110,7 @@ void CClientRadarArea::DoPulse(bool bRender)
 
 void CClientRadarArea::SetDimension(unsigned short usDimension)
 {
-    m_usDimension = usDimension;
+    CClientEntity::SetDimension(usDimension);
     RelateDimension(m_pRadarAreaManager->GetDimension());
 }
 

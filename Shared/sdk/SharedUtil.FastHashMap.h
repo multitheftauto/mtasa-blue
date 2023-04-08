@@ -10,6 +10,8 @@
  *****************************************************************************/
 #pragma once
 
+#include <tuple>
+#include "SString.h"
 #if WITH_ALLOC_TRACKING
     #define CFastHashMap std::CMap
 #else

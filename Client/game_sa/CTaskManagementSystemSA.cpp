@@ -10,10 +10,24 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "TaskAttackSA.h"
+#include "TaskBasicSA.h"
+#include "TaskCarAccessoriesSA.h"
+#include "TaskCarSA.h"
+#include "TaskGoToSA.h"
+#include "TaskIKSA.h"
+#include "TaskJumpFallSA.h"
+#include "TaskPhysicalResponseSA.h"
+#include "TaskSA.h"
+#include "TaskSecondarySA.h"
+
+extern CGameSA* pGame;
 
 using namespace std;
 
-VOID HOOK_CTask_Operator_Delete();
+void HOOK_CTask_Operator_Delete();
 
 CTaskSAInterface* pTempTaskInterface = 0;
 
@@ -36,10 +50,11 @@ CTaskManagementSystemSA::~CTaskManagementSystemSA()
     m_TaskList.clear();
 }
 
-CTask* CTaskManagementSystemSA::AddTask(CTaskSA* pTask)
+CTaskSA* CTaskManagementSystemSA::AddTask(CTaskSA* pTask)
 {
     if (!pTask)
         return NULL;
+
     assert(pTask->IsValid());
     STaskListItem* pItem = new STaskListItem;
     pItem->pTaskSA = pTask;
@@ -85,7 +100,7 @@ void CTaskManagementSystemSA::RemoveTask(CTaskSAInterface* pTaskInterface)
     }
 }
 
-CTask* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
+CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
 {
     // Return NULL if we got passed NULL
     if (pTaskInterface == 0)
@@ -132,7 +147,7 @@ CTask* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     return pTask;
 }
 
-CTask* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType)
+CTaskSA* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType)
 {
     CTaskSA* pTaskSA = NULL;
 
@@ -244,10 +259,10 @@ CTask* CTaskManagementSystemSA::CreateAppropriateTask(CTaskSAInterface* pTaskInt
 // HOOKS
 __declspec(noinline) void OnMY_Task_Operator_Delete(CTaskSAInterface* pTaskInterface)
 {
-    ((CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem()))->RemoveTask(pTempTaskInterface);
+    pGame->GetTaskManagementSystem()->RemoveTask(pTempTaskInterface);
 }
 
-VOID _declspec(naked) HOOK_CTask_Operator_Delete()
+void _declspec(naked) HOOK_CTask_Operator_Delete()
 {
     _asm
         {

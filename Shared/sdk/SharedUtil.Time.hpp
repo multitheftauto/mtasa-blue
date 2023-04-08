@@ -8,9 +8,15 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
+#include "SharedUtil.Time.h"
+#include "SharedUtil.Logging.h"
 #ifndef WIN32
     #include "sys/time.h"
+#else
+    #ifndef NOMINMAX
+    #define NOMINMAX
+    #endif
+    #include <windows.h>
 #endif
 
 static CCriticalSection ms_criticalSection;
@@ -275,7 +281,7 @@ unsigned long GetTickCountInternal()
     ** in any case the time starting point does not change once that the
     ** system has started up.
     */
-    struct timeval now;
+    struct timeval  now;
     struct timespec tsnow;
     if (0 == clock_gettime(CLOCK_MONOTONIC, &tsnow))
     {
@@ -340,7 +346,7 @@ typedef long long LONGLONG;
 
 TIMEUS SharedUtil::GetTimeUs()
 {
-    static bool bInitialized = false;
+    static bool    bInitialized = false;
     static timeval t1;
     if (!bInitialized)
     {

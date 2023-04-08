@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CFlyingHandlingEntrySA.h"
 
 CFlyingHandlingEntrySA::CFlyingHandlingEntrySA()
 {
@@ -23,6 +24,8 @@ CFlyingHandlingEntrySA::CFlyingHandlingEntrySA(tFlyingHandlingDataSA* pOriginal)
 
 void CFlyingHandlingEntrySA::Assign(const CFlyingHandlingEntry* pData)
 {
+    if (!pData)
+        return;
     const CFlyingHandlingEntrySA* pEntrySA = static_cast<const CFlyingHandlingEntrySA*>(pData);
     m_pFlyingHandlingSA = pEntrySA->m_pFlyingHandlingSA;
 }

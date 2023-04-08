@@ -28,7 +28,8 @@ enum ePuresyncType
     PURESYNC_TYPE_LIGHTSYNC,
     PURESYNC_TYPE_PURESYNC,
 };
-class CClientPlayer : public CClientPed
+
+class CClientPlayer final : public CClientPed
 {
     DECLARE_CLASS(CClientPlayer, CClientPed)
     friend class CClientPlayerManager;

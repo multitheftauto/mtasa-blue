@@ -17,8 +17,8 @@ Var Install_Dir
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "4"
-    !define MAINT_VER "0"
+    !define MINOR_VER "5"
+    !define MAINT_VER "9"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -40,7 +40,7 @@ Var Install_Dir
 !define PRODUCT_NAME_NO_VER "MTA:SA"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
-!define PRODUCT_WEB_SITE "http://www.multitheftauto.com"
+!define PRODUCT_WEB_SITE "https://www.multitheftauto.com"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
@@ -133,6 +133,7 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass_ac3.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bass_fx.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassopus.dll"
+	File "${FILES_ROOT}\MTA San Andreas\mta\basswebm.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\bassmix.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\tags.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\sa.dat"
@@ -167,6 +168,24 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\Default 2023"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\GWEN Blue"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\GWEN Orange"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.xml"
 	
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
@@ -178,7 +197,7 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sagothic.ttf"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\saheader.ttf"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\sans.ttf"
-	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont-5.1.20080907.ttf"
+	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\unifont.ttf"
 
 	SetOutPath "$INSTDIR\MTA\cgui\images"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\*.png"

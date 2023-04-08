@@ -7,7 +7,7 @@
  *  PURPOSE:     CefApp implementation
  *
  *****************************************************************************/
-#include <cef3/include/cef_app.h>
+#include <cef3/cef/include/cef_app.h>
 #include <string>
 #include <sstream>
 #include "V8Helpers.h"
@@ -51,12 +51,6 @@ public:
                 m_bHasInputFocus = true;
             }
         }
-    }
-
-    virtual void OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) override
-    {
-        // Register custom MTA scheme (has to be called in all proceseses)
-        registrar->AddCustomScheme("mtalocal", CEF_SCHEME_OPTION_CSP_BYPASSING);
     }
 
     // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnContextCreated(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefV8Context%3E)

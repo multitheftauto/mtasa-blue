@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAnimBlendHierarchySA.h"
+#include "CAnimBlockSA.h"
+#include "CAnimManagerSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 int CAnimBlockSAInterface::GetIndex()
 {
@@ -21,7 +27,7 @@ void CAnimBlockSA::Request(EModelRequestType requestType, bool bAllowBlockingFai
     if (IsLoaded())
         return;
 
-    DWORD dwModelID = GetIndex() + 25575;
+    DWORD dwModelID = GetIndex() + pGame->GetBaseIDforIFP();
 
     if (requestType == BLOCKING)
     {

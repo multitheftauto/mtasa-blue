@@ -11,13 +11,12 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CRopes.h>
 
 #define ROPES_COUNT    8
 
 #define FUNC_CRopes_CreateRopeForSwatPed    0x558d10
-
-#define ARRAY_CRopes    0xB768B8
 
 class CRopesSAInterface
 {
@@ -43,5 +42,9 @@ static_assert(sizeof(CRopesSAInterface) == 0x328, "Invalid size for CRopesSAInte
 class CRopesSA : public CRopes
 {
 public:
-    int CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration = 4000);
+    int  CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration = 4000);
+    void RemoveEntityRope(CEntitySAInterface* pObject);
+
+private:
+    static CRopesSAInterface (&ms_aRopes)[8];
 };

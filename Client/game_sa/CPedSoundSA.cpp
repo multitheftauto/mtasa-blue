@@ -1,4 +1,16 @@
-#include <StdInc.h>
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CPedSoundSA.cpp
+ *  PURPOSE:     Ped sound
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#include "StdInc.h"
+#include "CPedSoundSA.h"
 
 int CPedSoundSA::m_iNumVoicesPerType[] = {NUM_GEN_VOICES, NUM_EMG_VOICES, NUM_PLAYER_VOICES, NUM_GANG_VOICES, NUM_GFD_VOICES};
 

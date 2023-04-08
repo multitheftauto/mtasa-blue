@@ -33,7 +33,7 @@ eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimG
     }
 
     CAnimBlendAssocGroupSAInterface* pGroup = getAnimAssocGroupInterface(*pAnimGroup);
-    DWORD* pInterface = reinterpret_cast<DWORD*>(pGroup);
+    DWORD*                           pInterface = reinterpret_cast<DWORD*>(pGroup);
     if (pInterface < (DWORD*)0x250)
     {
         LogEvent(534, "CopyAnimation", "Incorrect Group Interface", SString("GroupID = %d | AnimID = %d", *pAnimGroup, *pAnimId), 534);

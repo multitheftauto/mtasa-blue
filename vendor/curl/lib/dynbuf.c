@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 2020 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -18,15 +18,16 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
-#include "strdup.h"
 #include "dynbuf.h"
-
-/* The last 3 #include files should be in this order */
 #include "curl_printf.h"
+#ifdef BUILDING_LIBCURL
 #include "curl_memory.h"
+#endif
 #include "memdebug.h"
 
 #define MIN_FIRST_ALLOC 32
@@ -94,11 +95,15 @@ static CURLcode dyn_nappend(struct dynbuf *s,
   }
 
   if(a != s->allc) {
-    s->bufr = Curl_saferealloc(s->bufr, a);
-    if(!s->bufr) {
+    /* this logic is not using Curl_saferealloc() to make the tool not have to
+       include that as well when it uses this code */
+    void *p = realloc(s->bufr, a);
+    if(!p) {
+      Curl_safefree(s->bufr);
       s->leng = s->allc = 0;
       return CURLE_OUT_OF_MEMORY;
     }
+    s->bufr = p;
     s->allc = a;
   }
 
@@ -123,7 +128,6 @@ void Curl_dyn_reset(struct dynbuf *s)
   s->leng = 0;
 }
 
-#ifdef USE_NGTCP2
 /*
  * Specify the size of the tail to keep (number of bytes from the end of the
  * buffer). The rest will be dropped.
@@ -143,11 +147,11 @@ CURLcode Curl_dyn_tail(struct dynbuf *s, size_t trail)
   else {
     memmove(&s->bufr[0], &s->bufr[s->leng - trail], trail);
     s->leng = trail;
+    s->bufr[s->leng] = 0;
   }
   return CURLE_OK;
 
 }
-#endif
 
 /*
  * Appends a buffer with length.
@@ -173,15 +177,22 @@ CURLcode Curl_dyn_add(struct dynbuf *s, const char *str)
 }
 
 /*
- * Append a string printf()-style
+ * Append a string vprintf()-style
  */
-CURLcode Curl_dyn_addf(struct dynbuf *s, const char *fmt, ...)
+CURLcode Curl_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
 {
+#ifdef BUILDING_LIBCURL
+  int rc;
+  DEBUGASSERT(s);
+  DEBUGASSERT(s->init == DYNINIT);
+  DEBUGASSERT(!s->leng || s->bufr);
+  rc = Curl_dyn_vprintf(s, fmt, ap);
+
+  if(!rc)
+    return CURLE_OK;
+#else
   char *str;
-  va_list ap;
-  va_start(ap, fmt);
   str = vaprintf(fmt, ap); /* this allocs a new string to append */
-  va_end(ap);
 
   if(str) {
     CURLcode result = dyn_nappend(s, (unsigned char *)str, strlen(str));
@@ -190,7 +201,24 @@ CURLcode Curl_dyn_addf(struct dynbuf *s, const char *fmt, ...)
   }
   /* If we failed, we cleanup the whole buffer and return error */
   Curl_dyn_free(s);
+#endif
   return CURLE_OUT_OF_MEMORY;
+}
+
+/*
+ * Append a string printf()-style
+ */
+CURLcode Curl_dyn_addf(struct dynbuf *s, const char *fmt, ...)
+{
+  CURLcode result;
+  va_list ap;
+  DEBUGASSERT(s);
+  DEBUGASSERT(s->init == DYNINIT);
+  DEBUGASSERT(!s->leng || s->bufr);
+  va_start(ap, fmt);
+  result = Curl_dyn_vaddf(s, fmt, ap);
+  va_end(ap);
+  return result;
 }
 
 /*
@@ -224,4 +252,19 @@ size_t Curl_dyn_len(const struct dynbuf *s)
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(!s->leng || s->bufr);
   return s->leng;
+}
+
+/*
+ * Set a new (smaller) length.
+ */
+CURLcode Curl_dyn_setlen(struct dynbuf *s, size_t set)
+{
+  DEBUGASSERT(s);
+  DEBUGASSERT(s->init == DYNINIT);
+  DEBUGASSERT(!s->leng || s->bufr);
+  if(set > s->leng)
+    return CURLE_BAD_FUNCTION_ARGUMENT;
+  s->leng = set;
+  s->bufr[s->leng] = 0;
+  return CURLE_OK;
 }
