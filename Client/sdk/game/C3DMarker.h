@@ -13,9 +13,9 @@
 
 #include "Common.h"
 
+class CMatrix;
 class CVector;
 struct RpClump;
-class CMatrix;
 
 /**
  * \todo fix SetColor/GetColor, the format is actually BGRA (strange)
@@ -25,25 +25,25 @@ class C3DMarker
 public:
     virtual ~C3DMarker(){};
 
-    virtual void     GetMatrix(CMatrix* pMatrix) = 0;
-    virtual void     SetMatrix(CMatrix* pMatrix) = 0;
-    virtual VOID     SetPosition(CVector* vecPosition) = 0;
-    virtual CVector* GetPosition() = 0;
-    virtual DWORD    GetType() = 0;            // need enum?
-    virtual BOOL     IsActive() = 0;
-    virtual DWORD    GetIdentifier() = 0;
-    virtual SColor   GetColor() = 0;
-    virtual VOID     SetColor(const SColor color) = 0;
-    virtual VOID     SetPulsePeriod(WORD wPulsePeriod) = 0;
-    virtual VOID     SetPulseFraction(FLOAT fPulseFraction) = 0;
-    virtual VOID     SetRotateRate(short RotateRate) = 0;
-    virtual FLOAT    GetSize() = 0;
-    virtual VOID     SetSize(FLOAT fSize) = 0;
-    virtual FLOAT    GetBrightness() = 0;
-    virtual VOID     SetBrightness(FLOAT fBrightness) = 0;
-    virtual VOID     SetCameraRange(FLOAT fCameraRange) = 0;
-    virtual FLOAT    GetPulseFraction() = 0;
-    virtual VOID     Disable() = 0;
-    virtual VOID     SetActive() = 0;
-    virtual RpClump* GetRwObject() = 0;
+    virtual void               GetMatrix(CMatrix* pMatrix) = 0;
+    virtual void               SetMatrix(CMatrix* pMatrix) = 0;
+    virtual void               SetPosition(CVector* vecPosition) = 0;
+    virtual CVector*           GetPosition() = 0;
+    virtual DWORD              GetType() = 0;            // need enum?
+    virtual bool               IsActive() = 0;
+    virtual DWORD              GetIdentifier() = 0;
+    virtual SharedUtil::SColor GetColor() = 0;
+    virtual void               SetColor(const SharedUtil::SColor color) = 0;
+    virtual void               SetPulsePeriod(WORD wPulsePeriod) = 0;
+    virtual void               SetPulseFraction(float fPulseFraction) = 0;
+    virtual void               SetRotateRate(short RotateRate) = 0;
+    virtual float              GetSize() = 0;
+    virtual void               SetSize(float fSize) = 0;
+    virtual float              GetBrightness() = 0;
+    virtual void               SetBrightness(float fBrightness) = 0;
+    virtual void               SetCameraRange(float fCameraRange) = 0;
+    virtual float              GetPulseFraction() = 0;
+    virtual void               Disable() = 0;
+    virtual void               SetActive() = 0;
+    virtual RpClump*           GetRwObject() = 0;
 };

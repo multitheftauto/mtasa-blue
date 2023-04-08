@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaBrowserDefs::LoadFunctions()
 {
@@ -26,6 +27,7 @@ void CLuaBrowserDefs::LoadFunctions()
         {"getBrowserTitle", GetBrowserTitle},
         {"getBrowserURL", GetBrowserURL},
         {"setBrowserRenderingPaused", SetBrowserRenderingPaused},
+        {"isBrowserRenderingPaused", ArgumentParser<IsBrowserRenderingPaused>},
         {"executeBrowserJavascript", ExecuteBrowserJavascript},
         {"getBrowserVolume", GetBrowserVolume},
         {"setBrowserVolume", SetBrowserVolume},
@@ -67,6 +69,7 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTitle", "getBrowserTitle");
     lua_classfunction(luaVM, "getURL", "getBrowserURL");
     lua_classfunction(luaVM, "setRenderingPaused", "setBrowserRenderingPaused");
+    lua_classfunction(luaVM, "isRenderingPaused", "isBrowserRenderingPaused");
     lua_classfunction(luaVM, "executeJavascript", "executeBrowserJavascript");
     lua_classfunction(luaVM, "getVolume", "getBrowserVolume");
     lua_classfunction(luaVM, "setVolume", "setBrowserVolume");
@@ -90,7 +93,7 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "url", "loadBrowserURL", "getBrowserURL");
     lua_classvariable(luaVM, "loading", nullptr, "isBrowserLoading");
     lua_classvariable(luaVM, "title", nullptr, "getBrowserTitle");
-    lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", nullptr);
+    lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", "isBrowserRenderingPaused");
     lua_classvariable(luaVM, "volume", "setBrowserVolume", "getBrowserVolume");
     lua_classvariable(luaVM, "devTools", "toggleBrowserDevTools", nullptr);
 
@@ -128,39 +131,37 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
         }
         else if (vecSize.fX == 0 || vecSize.fY == 0)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+            argStream.SetCustomError("A browser must be at least 1x1 in size.", "Invalid parameter");
         }
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
     {
-        if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pParentResource = pLuaMain->GetResource();
-
-            CClientWebBrowser* pBrowserTexture =
-                g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser((int)vecSize.fX, (int)vecSize.fY, bIsLocal, bTransparent);
-            if (pBrowserTexture)
-            {
-                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                pBrowserTexture->SetParent(pParentResource->GetResourceDynamicEntity());
-
-                // Set our owner resource
-                pBrowserTexture->SetResource(pParentResource);
-            }
-            lua_pushelement(luaVM, pBrowserTexture);
-            return 1;
-        }
+        lua_pushboolean(luaVM, false);
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        CResource* pParentResource = pLuaMain->GetResource();
+
+        CClientWebBrowser* pBrowserTexture =
+            g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser((int)vecSize.fX, (int)vecSize.fY, bIsLocal, bTransparent);
+        if (pBrowserTexture)
+        {
+            // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+            pBrowserTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+
+            // Set our owner resource
+            pBrowserTexture->SetResource(pParentResource);
+        }
+        lua_pushelement(luaVM, pBrowserTexture);
+        return 1;
+    }
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -188,7 +189,8 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
         if (bIsURL)
             std::transform(pages.begin(), pages.end(), pages.begin(), [](const auto& url) { return g_pCore->GetWebCore()->GetDomainFromURL(url); });
 
-        WebRequestCallback callback = [=](bool bAllow, const std::unordered_set<SString>& domains) {
+        WebRequestCallback callback = [=](bool bAllow, const std::unordered_set<SString>& domains)
+        {
             // Test if luaVM is still available
             if (m_pLuaManager->IsLuaVMValid(luaVM) && VERIFY_FUNCTION(callbackFunction))
             {
@@ -251,28 +253,14 @@ int CLuaBrowserDefs::LoadBrowserURL(lua_State* luaVM)
             lua_pushboolean(luaVM, pWebBrowser->LoadURL(strURL, !isLocalURL, strPostData, bURLEncoded));
             return 1;
         }
-
-        // Are we dealing with a local website? If so, parse resource path. Otherwise, return false and load nothing
-        // Todo: Add an ACL right which is necessary to load local websites or websites in general
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        else
         {
-            SString    strAbsPath;
-            CResource* pResource = pLuaMain->GetResource();
-            if (CResourceManager::ParseResourcePathInput(strURL, pResource, &strAbsPath) && pWebBrowser->IsLocal())
-            {
-                // Output deprecated warning, TODO: Remove this at a later point
-                m_pScriptDebugging->LogWarning(luaVM,
-                                               "This URL scheme is deprecated and may not work in future versions. Please consider using http://mta/* instead. "
-                                               "See https://wiki.mtasa.com/wiki/LoadBrowserURL for details");
-
-                lua_pushboolean(luaVM, pWebBrowser->LoadURL("mtalocal://" + strURL, false, strPostData, bURLEncoded));
-                return 1;
-            }
+            argStream.SetCustomError("Invalid URL scheme provided. Only http:// and https:// is supported.", "Invalid parameter");
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -453,6 +441,11 @@ int CLuaBrowserDefs::SetBrowserRenderingPaused(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaBrowserDefs::IsBrowserRenderingPaused(CClientWebBrowser* browser)
+{
+    return browser->GetRenderingPaused();
 }
 
 int CLuaBrowserDefs::ExecuteBrowserJavascript(lua_State* luaVM)
@@ -699,21 +692,23 @@ int CLuaBrowserDefs::GetBrowserSource(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain && VERIFY_FUNCTION(callbackFunction))
         {
-            pWebBrowser->GetSourceCode([callbackFunction, pLuaMain, pWebBrowser](const std::string& code) {
-                /*
-                This function should not be called when the resource is about to stop as
-                stopping the resource destroys the browser element and thus cancels the
-                CefStringVisitor callback class (see CWebView::GetSourceCode::MyStringVisitor)
-                */
-                if (VERIFY_FUNCTION(callbackFunction))
+            pWebBrowser->GetSourceCode(
+                [callbackFunction, pLuaMain, pWebBrowser](const std::string& code)
                 {
-                    CLuaArguments arguments;
-                    // TODO: Use SCharStringRef/direct string access instead of copying strings around
-                    arguments.PushString(code);
-                    arguments.PushElement(pWebBrowser);
-                    arguments.Call(pLuaMain, callbackFunction);
-                }
-            });
+                    /*
+                    This function should not be called when the resource is about to stop as
+                    stopping the resource destroys the browser element and thus cancels the
+                    CefStringVisitor callback class (see CWebView::GetSourceCode::MyStringVisitor)
+                    */
+                    if (VERIFY_FUNCTION(callbackFunction))
+                    {
+                        CLuaArguments arguments;
+                        // TODO: Use SCharStringRef/direct string access instead of copying strings around
+                        arguments.PushString(code);
+                        arguments.PushElement(pWebBrowser);
+                        arguments.Call(pLuaMain, callbackFunction);
+                    }
+                });
 
             lua_pushboolean(luaVM, true);
             return 1;
@@ -894,7 +889,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     argStream.ReadVector2D(size);
     argStream.ReadBool(bIsLocal);
     argStream.ReadBool(bIsTransparent);
-    argStream.ReadBool(bIsRelative);
+    argStream.ReadBool(bIsRelative, false);
     argStream.ReadUserData(parent, nullptr);
 
     if (!argStream.HasErrors())
@@ -909,7 +904,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         }
         else if (size.fX == 0 || size.fY == 0)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+            argStream.SetCustomError("A browser must be at least 1x1 in size.", "Invalid parameter");
         }
     }
 
@@ -938,9 +933,9 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
             }
         }
     }
-    
+
     if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1004,45 +999,47 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
                 CResourceManager* pResourceManager = m_pResourceManager;
                 auto              netId = pResource->GetNetID();
 
-                bool bResult = pWebBrowser->AddAjaxHandler(strURL, [=](std::vector<SString>& vecGet, std::vector<SString>& vecPost) -> const SString {
-                    // Make sure the resource is still running
-                    if (!pResourceManager->Exists(pResource) || pResource->GetNetID() != netId)
-                    {
-                        return "";
-                    }
+                bool bResult = pWebBrowser->AddAjaxHandler(strURL,
+                                                           [=](std::vector<SString>& vecGet, std::vector<SString>& vecPost) -> const SString
+                                                           {
+                                                               // Make sure the resource is still running
+                                                               if (!pResourceManager->Exists(pResource) || pResource->GetNetID() != netId)
+                                                               {
+                                                                   return "";
+                                                               }
 
-                    // Make sure the function is valid
-                    if (VERIFY_FUNCTION(callbackFunction))
-                    {
-                        CLuaArguments arguments;
-                        CLuaArguments getArguments;
-                        CLuaArguments postArguments;
+                                                               // Make sure the function is valid
+                                                               if (VERIFY_FUNCTION(callbackFunction))
+                                                               {
+                                                                   CLuaArguments arguments;
+                                                                   CLuaArguments getArguments;
+                                                                   CLuaArguments postArguments;
 
-                        for (auto&& param : vecGet)
-                            getArguments.PushString(param);
+                                                                   for (auto&& param : vecGet)
+                                                                       getArguments.PushString(param);
 
-                        for (auto&& param : vecPost)
-                            postArguments.PushString(param);
+                                                                   for (auto&& param : vecPost)
+                                                                       postArguments.PushString(param);
 
-                        arguments.PushTable(&getArguments);
-                        arguments.PushTable(&postArguments);
+                                                                   arguments.PushTable(&getArguments);
+                                                                   arguments.PushTable(&postArguments);
 
-                        CLuaArguments result;
+                                                                   CLuaArguments result;
 
-                        arguments.Call(pLuaMain, callbackFunction, &result);
+                                                                   arguments.Call(pLuaMain, callbackFunction, &result);
 
-                        if (result.Count() == 0)
-                            return "";
+                                                                   if (result.Count() == 0)
+                                                                       return "";
 
-                        CLuaArgument* returnedValue = *result.IterBegin();
-                        if (returnedValue->GetType() == LUA_TSTRING)
-                            return returnedValue->GetString();
-                        else
-                            return "";
-                    }
-                    else
-                        return "";
-                });
+                                                                   CLuaArgument* returnedValue = *result.IterBegin();
+                                                                   if (returnedValue->GetType() == LUA_TSTRING)
+                                                                       return returnedValue->GetString();
+                                                                   else
+                                                                       return "";
+                                                               }
+                                                               else
+                                                                   return "";
+                                                           });
 
                 lua_pushboolean(luaVM, bResult);
                 return 1;

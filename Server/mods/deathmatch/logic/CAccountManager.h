@@ -14,7 +14,10 @@ class CAccountManager;
 #pragma once
 
 #include "CAccount.h"
-#include <optional>
+#include "CConnectHistory.h"
+
+class CDbJobData;
+class CDatabaseManager;
 
 typedef uint SDbConnectionId;
 
@@ -116,6 +119,9 @@ class CAccountManager
     friend class CAccount;
 
 public:
+    static inline constexpr size_t MIN_USERNAME_LENGTH = 1;
+    static inline constexpr size_t MAX_USERNAME_LENGTH = 64;
+
     CAccountManager(const SString& strDbPathFilename);
     ~CAccountManager();
 
@@ -132,7 +138,7 @@ public:
     CAccount* GetAccountFromScriptID(uint uiScriptID);
     SString   GetActiveCaseVariation(const SString& strName);
 
-    bool LogIn(CClient* pClient, CClient* pEchoClient, const char* szAccountName, std::optional<SString> password);
+    bool LogIn(CClient* pClient, CClient* pEchoClient, const std::string& strAccountName, const char* szPassword);
     bool LogOut(CClient* pClient, CClient* pEchoClient);
 
     std::shared_ptr<CLuaArgument> GetAccountData(CAccount* pAccount, const char* szKey);

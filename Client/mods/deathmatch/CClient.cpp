@@ -12,6 +12,7 @@
 #include <StdInc.h>
 #define ALLOC_STATS_MODULE_NAME "client"
 #include "SharedUtil.hpp"
+#include <core/CClientCommands.h>
 
 CCoreInterface*         g_pCore = NULL;
 CLocalizationInterface* g_pLocalization = NULL;
@@ -48,7 +49,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->SetOfflineMod(false);
 
     // HACK FOR CHATBOX NOT VISIBLE. WILL CAUSE SAVING CHATBOX STATE NOT TO WORK
-    g_pCore->SetChatVisible(true);
+    g_pCore->SetChatVisible(true, false);
 
     // Register our local commands
     g_pCore->GetCommands()->SetExecuteHandler(COMMAND_Executed);
@@ -127,6 +128,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
     pCore->GetCommands()->Add("debug2", "debug function 2", COMMAND_Debug2);
     pCore->GetCommands()->Add("debug3", "debug function 3", COMMAND_Debug3);
     pCore->GetCommands()->Add("debug4", "debug function 4", COMMAND_Debug4);
+    pCore->GetCommands()->Add("timestep", "timestep", COMMAND_TimeStep);
 #endif
 
     // Got any arguments?
@@ -176,11 +178,8 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
                     // g_pClientGame->EnablePacketRecorder ( "log.rec" );
                     // g_pCore->GetConsole ()->Echo ( "Packetlogger is logging to log.rec" );
 
-                    SString secret = g_pCore->GetDiscordManager()->GetJoinSecret();
-
                     // Start the game
-                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str(), CClientGame::SERVER_TYPE_NORMAL,
-                                             *secret);
+                    g_pClientGame->StartGame(arguments.nickname.c_str(), arguments.password.c_str());
                 }
                 else
                 {
@@ -251,8 +250,23 @@ bool CClient::WebsiteRequestResultHandler(const std::unordered_set<SString>& new
     return false;
 }
 
-bool CClient::ProcessCommand(const char* szCommandLine)
+bool CClient::ProcessCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize)
 {
+    if (commandName == nullptr || commandNameLength == 0)
+        return false;
+
+    std::string_view command{commandName, commandNameLength};
+
+    if (command == mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX)
+    {
+        if (userdata == nullptr || sizeof(bool) != userdataSize)
+            return false;
+
+        auto& alwaysShowTransferBox = *reinterpret_cast<const bool*>(userdata);
+        g_pClientGame->GetTransferBox()->SetAlwaysVisible(alwaysShowTransferBox);
+        return true;
+    }
+
     return false;
 }
 
@@ -300,9 +314,9 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
     }
 }
 
-void CClient::TriggerDiscordJoin(SString strSecret)
+void CClient::OnWindowFocusChange(bool state)
 {
-    g_pClientGame->TriggerDiscordJoin(strSecret);
+    g_pClientGame->OnWindowFocusChange(state);
 }
 
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)

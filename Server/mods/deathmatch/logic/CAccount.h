@@ -15,6 +15,8 @@
 #include <string>
 #include "lua/CLuaArgument.h"
 
+class CClient;
+
 class CAccountPassword
 {
 public:
@@ -25,7 +27,7 @@ public:
 
     enum EAccountPasswordType
     {
-        NONE,            // "" (empty string) possibly means 'not a password'
+        NONE,             // "" (empty string) possibly means 'not a password'
         PLAINTEXT,
         MD5,              // pass stored as sha256(md5)+salt+type, stored as "1"
         SHA256            // pass stored as sha256(plaintext)+salt+type, stored as "0"

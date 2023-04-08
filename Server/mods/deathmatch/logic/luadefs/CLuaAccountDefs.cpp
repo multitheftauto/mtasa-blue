@@ -10,13 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <lua/CLuaFunctionParser.h>
+#include "CLuaAccountDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaAccountDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Log in/out funcs
-        {"logIn", ArgumentParserWarn<true, LogIn>},
+        {"logIn", LogIn},
         {"logOut", LogOut},
 
         // Account get functions
@@ -600,9 +602,34 @@ int CLuaAccountDefs::CopyAccountData(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaAccountDefs::LogIn(CPlayer* pPlayer, CAccount* pAccount, std::optional<std::string> password)
+int CLuaAccountDefs::LogIn(lua_State* luaVM)
 {
-    return m_pAccountManager->LogIn(pPlayer, pPlayer, pAccount->GetName().c_str(), std::move(password));
+    //  bool logIn ( player thePlayer, account theAccount, string thePassword )
+    CPlayer*  pPlayer;
+    CAccount* pAccount;
+    SString   strPassword;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPlayer);
+    argStream.ReadUserData(pAccount);
+    argStream.ReadString(strPassword);
+
+    if (!argStream.HasErrors())
+    {
+        // Log him in
+        if (CStaticFunctionDefinitions::LogIn(pPlayer, pAccount, strPassword))
+        {
+            // Success
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaAccountDefs::LogOut(lua_State* luaVM)

@@ -140,7 +140,7 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
 }
 
 
-LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
+LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud, void *mtasaowner) {
   int i;
   lua_State *L;
   global_State *g;
@@ -156,6 +156,7 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   preinit_state(L, g);
   g->frealloc = f;
   g->ud = ud;
+  g->mtasaowner = mtasaowner;
   g->mainthread = L;
   g->uvhead.u.l.prev = &g->uvhead;
   g->uvhead.u.l.next = &g->uvhead;
@@ -222,4 +223,3 @@ LUA_API lua_State* lua_getmainstate (lua_State *L) {
     }
     return L;
 }
-

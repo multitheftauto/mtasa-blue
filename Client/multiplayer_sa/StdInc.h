@@ -22,8 +22,7 @@
 #include <net/CNet.h>
 #include <game/CGame.h>
 #include <CMatrix_Pad.h>
-#include <../version.h>
-#include <hwbrk.h>
+#include <version.h>
 
 // Multiplayer includes
 #include "multiplayersa_init.h"
@@ -32,13 +31,10 @@
 #include "multiplayer_shotsync.h"
 #include "CMultiplayerSA.h"
 #include "COffsets.h"
-#include "CPopulationSA.h"
 #include "CRemoteDataSA.h"
 #include "..\game_sa\CCameraSA.h"
 #include "..\game_sa\CEntitySA.h"
-#include "..\game_sa\CBuildingSA.h"
 #include "..\game_sa\CPedSA.h"
-#include "..\game_sa\common.h"
 #include "..\core\CCrashDumpWriter.h"
 
 extern CMultiplayerSA* pMultiplayer;

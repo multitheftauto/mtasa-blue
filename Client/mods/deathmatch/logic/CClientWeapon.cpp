@@ -9,6 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CPointLights.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeapon.h>
+#include <game/CColPoint.h>
+#include <game/CFx.h>
+#include <game/CWorld.h>
 
 CClientWeapon::CClientWeapon(CClientManager* pManager, ElementID ID, eWeaponType type)
     : ClassInit(this), CClientObject(pManager, ID, CClientPickupManager::GetWeaponModel(type), false)
@@ -413,7 +419,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
         CClientEntity* pClientEntity = pColEntity ? pPools->GetClientEntity((DWORD*)pColEntity->GetInterface()) : nullptr;
         CLuaArguments  Arguments;
         if (pClientEntity)
-            Arguments.PushElement(pClientEntity);            // entity that got hit
+            Arguments.PushElement(pClientEntity);                              // entity that got hit
         else
             Arguments.PushNil();                                               // Probably a building.
         Arguments.PushNumber(pColPoint->GetPosition().fX);                     // pos x

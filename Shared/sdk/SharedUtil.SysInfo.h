@@ -8,9 +8,12 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
 
 #ifdef WIN32
-
+#include <vector>
+#include "SString.h"
+#include <windows.h>
 #include "WinVer.h"
 
 namespace SharedUtil

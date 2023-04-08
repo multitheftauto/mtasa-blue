@@ -86,6 +86,8 @@ public:
     virtual SString GetCommentText();
     virtual void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false);
 
+    std::string ToString();
+
 private:
     bool StringToLong(const char* szString, long& lValue);
 

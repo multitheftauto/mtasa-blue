@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAccount.h"
+#include "CAccountManager.h"
+#include "CIdArray.h"
+#include "CClient.h"
 
 CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const std::string& strName, const std::string& strPassword, int iUserID,
                    const std::string& strIP, const std::string& strSerial, const SString& strHttpPassAppend)
@@ -20,7 +24,7 @@ CAccount::CAccount(CAccountManager* pManager, EAccountType accountType, const st
     m_bChanged = false;
     m_pManager = pManager;
     m_AccountType = accountType;
-    m_strName = strName;
+    m_strName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
     m_iUserID = iUserID;
     m_strIP = strIP;
     m_strSerial = strSerial;
@@ -44,10 +48,11 @@ CAccount::~CAccount()
 
 void CAccount::SetName(const std::string& strName)
 {
-    if (m_strName != strName)
+    std::string strNewName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
+    if (m_strName != strNewName)
     {
-        m_pManager->ChangingName(this, m_strName, strName);
-        m_strName = strName;
+        m_pManager->ChangingName(this, m_strName, strNewName);
+        m_strName = std::move(strNewName);
         m_pManager->MarkAsChanged(this);
     }
 }
@@ -121,24 +126,24 @@ std::shared_ptr<CLuaArgument> CAccount::GetData(const std::string& strKey)
     {
         switch (pData->GetType())
         {
-        case LUA_TBOOLEAN:
-            pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
-            break;
+            case LUA_TBOOLEAN:
+                pResult->ReadBool(strcmp(pData->GetStrValue().c_str(), "true") == 0);
+                break;
 
-        case LUA_TNUMBER:
-            pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
-            break;
+            case LUA_TNUMBER:
+                pResult->ReadNumber(strtod(pData->GetStrValue().c_str(), NULL));
+                break;
 
-        case LUA_TNIL:
-            break;
+            case LUA_TNIL:
+                break;
 
-        case LUA_TSTRING:
-            pResult->ReadString(pData->GetStrValue());
-            break;
+            case LUA_TSTRING:
+                pResult->ReadString(pData->GetStrValue());
+                break;
 
-        default:
-            dassert(0); // It never should hit this, if so, something corrupted
-            break;
+            default:
+                dassert(0);            // It never should hit this, if so, something corrupted
+                break;
         }
     }
     else

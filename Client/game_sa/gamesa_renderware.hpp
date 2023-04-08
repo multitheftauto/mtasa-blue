@@ -71,6 +71,7 @@ void InitRwFunctions(eGameVersion version)
             RwMatrixInvert = (RwMatrixInvert_t)0x007F20B0;
             RpWorldAddClump = (RpWorldAddClump_t)0x00751350;
             RwFrameScale = (RwFrameScale_t)0x007F0F10;
+            RwFrameUpdateObjects = (RwFrameUpdateObjects_t)0x7F0950;
             RwV3dTransformVector = (RwV3dTransformVector_t)0x007EDE00;
             RpLightCreate = (RpLightCreate_t)0x00752160;
             RpClumpAddLight = (RpClumpAddLight_t)0x0074A540;
@@ -87,6 +88,7 @@ void InitRwFunctions(eGameVersion version)
             RwRasterCreate = (RwRasterCreate_t)0x007FB270;
             RwTextureCreate = (RwTextureCreate_t)0x007F3800;
             RpMaterialSetTexture = (RpMaterialSetTexture_t)0x0074DC10;
+            GetAnimHierarchyFromClump = (GetAnimHierarchyFromClump_t)0x734B10;
             GetAnimHierarchyFromSkinClump = (GetAnimHierarchyFromSkinClump_t)0x734A40;
             RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51E0;
             RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5160;
@@ -166,6 +168,7 @@ void InitRwFunctions(eGameVersion version)
             RwMatrixInvert = (RwMatrixInvert_t)0x007F2070;
             RpWorldAddClump = (RpWorldAddClump_t)0x00751300;
             RwFrameScale = (RwFrameScale_t)0x007F0ED0;
+            RwFrameUpdateObjects = (RwFrameUpdateObjects_t)0x7F0910;
             RwV3dTransformVector = (RwV3dTransformVector_t)0x007EDDC0;
             RpLightCreate = (RpLightCreate_t)0x00752110;
             RpClumpAddLight = (RpClumpAddLight_t)0x0074A4F0;
@@ -182,6 +185,7 @@ void InitRwFunctions(eGameVersion version)
             RwRasterCreate = (RwRasterCreate_t)0x007FB230;
             RwTextureCreate = (RwTextureCreate_t)0x007F37C0;
             RpMaterialSetTexture = (RpMaterialSetTexture_t)0x0074DBC0;
+            GetAnimHierarchyFromClump = (GetAnimHierarchyFromClump_t)0x734B10;
             GetAnimHierarchyFromSkinClump = (GetAnimHierarchyFromSkinClump_t)0x734A40;
             RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
             RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;

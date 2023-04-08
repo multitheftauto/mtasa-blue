@@ -14,6 +14,11 @@
 #include "Common.h"
 #include "../Common.h"
 #include <string>
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Math.h"
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Logging.h"
+#include <vector>
 #ifndef WIN32
     #include <alloca.h>
 #endif
@@ -220,7 +225,7 @@ public:
     }
 
     // Write a string (incl. ushort size header)
-    template<typename SizeType = unsigned short>
+    template <typename SizeType = unsigned short>
     void WriteString(const std::string& value)
     {
         // Write the length
@@ -232,7 +237,7 @@ public:
     }
 
     // Read a string (incl. ushort size header)
-    template<typename SizeType = unsigned short>
+    template <typename SizeType = unsigned short>
     bool ReadString(std::string& result)
     {
         result = "";
@@ -452,6 +457,34 @@ enum class eBitStreamVersion : unsigned short
     // 2020-11-10 0x71
     PedEnterExit,
 
+    // Add height for colpolygon (#1908)
+    // 2021-01-16 0x72
+    SetColPolygonHeight,
+
+    // Support for vehicle blow without explosion and blow state synchronisation
+    // 2021-02-26 0x73
+    VehicleBlowStateSupport,
+
+    // Implement messageType parameter to onClientChatMessage (#1020)
+    // 2021-05-15 0x74
+    OnClientChatMessage_MessageType,
+
+    // Add serverside event "onPlayerResourceStart" (#2150)
+    // 2021-08-30 0x75
+    OnPlayerResourceStart,
+
+    //
+    // 1.5.9 RELEASED - 2021-10-01
+    //
+
+    // Remove "old" Discord implementation (#2499)
+    // 2022-01-16 0x76
+    Discord_Cleanup,
+
+    //
+    // 1.6.0 RELEASED - 202x-xx-xx
+    //
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
@@ -468,12 +501,10 @@ protected:
     virtual ~NetBitStreamInterface() { DEBUG_DESTROY_COUNT("NetBitStreamInterface"); }
 
 public:
-    virtual operator NetBitStreamInterface&() { return *this; }
+    virtual                operator NetBitStreamInterface&() { return *this; }
     virtual unsigned short Version() const = 0;
 
-    bool Can(eBitStreamVersion query) {
-        return static_cast<eBitStreamVersion>(Version()) >= query;
-    }
+    bool Can(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(Version()) >= query; }
 };
 
 // Interface for all sync structures

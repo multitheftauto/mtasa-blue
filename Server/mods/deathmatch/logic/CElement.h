@@ -18,10 +18,11 @@
 #include "CEvents.h"
 #include <list>
 #include <cstring>
+#include "Enums.h"
 #include "CElementGroup.h"
 
 // Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+// #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
 #define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
@@ -40,13 +41,13 @@
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 #define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
 
+class CLuaMain;
+
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
-// List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot : public std::vector<CElement*>, public CRefCountableST
-{
-};
+typedef std::vector<CElement*>                CElementListSnapshot;
+typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 class CElement
 {
@@ -141,9 +142,10 @@ public:
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL, bool bTriggerEvent = true);
-    void DeleteCustomData(const char* szName);
-    void SendAllCustomData(CPlayer* pPlayer);
+    void           SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
+                                 bool bTriggerEvent = true);
+    void           DeleteCustomData(const char* szName);
+    void           SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
@@ -154,7 +156,7 @@ public:
     CChildListType ::const_iterator         IterEnd() { return m_Children.end(); };
     CChildListType ::const_reverse_iterator IterReverseBegin() { return m_Children.rbegin(); };
     CChildListType ::const_reverse_iterator IterReverseEnd() { return m_Children.rend(); };
-    CElementListSnapshot*                   GetChildrenListSnapshot();
+    CElementListSnapshotRef                 GetChildrenListSnapshot();
 
     static uint        GetTypeHashFromString(const SString& strTypeName);
     EElementType       GetType() { return m_iType; };
@@ -219,7 +221,7 @@ public:
     void RemoveOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.remove(pPed); }
 
     unsigned char GetInterior() { return m_ucInterior; }
-    void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
+    void          SetInterior(unsigned char ucInterior);
 
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
@@ -255,12 +257,12 @@ protected:
 
     CVector m_vecPosition;
 
-    unsigned int          m_uiTypeHash;
-    std::string           m_strTypeName;
-    std::string           m_strName;
-    CChildListType        m_Children;
-    CElementListSnapshot* m_pChildrenListSnapshot;
-    uint                  m_uiChildrenListSnapshotRevision;
+    unsigned int            m_uiTypeHash;
+    std::string             m_strTypeName;
+    std::string             m_strName;
+    CChildListType          m_Children;
+    CElementListSnapshotRef m_pChildrenListSnapshot;
+    uint                    m_uiChildrenListSnapshotRevision;
 
     std::list<class CPerPlayerEntity*> m_ElementReferenced;
     std::list<class CColShape*>        m_Collisions;

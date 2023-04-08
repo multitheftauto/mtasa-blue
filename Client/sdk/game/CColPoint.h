@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include <CVector.h>
 class CColPointSAInterface;
+class CVector;
 
 // Collision stored surface type
 struct EColSurface
@@ -204,7 +204,7 @@ struct EColSurface
     // Enum in a byte
     EColSurface() {}
     EColSurface(EColSurfaceValue newValue) { m_ucValue = newValue; }
-          operator uchar() const { return m_ucValue; }
+    operator uchar() const { return m_ucValue; }
     uchar m_ucValue;
 };
 typedef EColSurface::EColSurfaceValue EColSurfaceValue;

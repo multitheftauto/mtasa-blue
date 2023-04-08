@@ -52,6 +52,7 @@ o Minor updates for MSVC 2005/08 compilers
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <vector>
 
 #ifndef _WIN32
 #define __cdecl
@@ -270,7 +271,7 @@ public:
         StackElement m_stack[MAX_STACK];            ///< Stack as we are doing iteration instead of recursion
         int          m_tos;                         ///< Top Of Stack index
 
-        friend class RTree;            // Allow hiding of non-public functions while allowing manipulation by logical owner
+        friend class RTree;                         // Allow hiding of non-public functions while allowing manipulation by logical owner
     };
 
     /// Get 'first' for iteration
@@ -319,7 +320,8 @@ protected:
     struct Branch
     {
         Rect m_rect;            ///< Bounds
-        union {
+        union
+        {
             Node*    m_child;            ///< Child node
             DATATYPE m_data;             ///< Data Id or Ptr
         };
@@ -331,9 +333,9 @@ protected:
         bool IsInternalNode() { return (m_level > 0); }            // Not a leaf, but a internal node
         bool IsLeaf() { return (m_level == 0); }                   // A leaf, contains data
 
-        int    m_count;                       ///< Count
-        int    m_level;                       ///< Leaf is zero, others positive
-        Branch m_branch[MAXNODES];            ///< Branch
+        int    m_count;                                            ///< Count
+        int    m_level;                                            ///< Leaf is zero, others positive
+        Branch m_branch[MAXNODES];                                 ///< Branch
     };
 
     /// A link list of nodes for reinsertion after a delete operation
@@ -777,8 +779,8 @@ void RTREE_QUAL::Reset()
     // Delete all existing nodes
     RemoveAllRec(m_root);
 #else // RTREE_DONT_USE_MEMPOOLS
-    // Just reset memory pools.  We are not using complex types
-    // EXAMPLE
+        // Just reset memory pools.  We are not using complex types
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -805,7 +807,7 @@ typename RTREE_QUAL::Node* RTREE_QUAL::AllocNode()
 #ifdef RTREE_DONT_USE_MEMPOOLS
     newNode = new Node;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
     InitNode(newNode);
     return newNode;
@@ -819,7 +821,7 @@ void RTREE_QUAL::FreeNode(Node* a_node)
 #ifdef RTREE_DONT_USE_MEMPOOLS
     delete a_node;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -831,7 +833,7 @@ typename RTREE_QUAL::ListNode* RTREE_QUAL::AllocListNode()
 #ifdef RTREE_DONT_USE_MEMPOOLS
     return new ListNode;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -841,7 +843,7 @@ void RTREE_QUAL::FreeListNode(ListNode* a_listNode)
 #ifdef RTREE_DONT_USE_MEMPOOLS
     delete a_listNode;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -937,7 +939,7 @@ bool RTREE_QUAL::InsertRect(Rect* a_rect, const DATATYPE& a_id, Node** a_root, i
 
     if (InsertRectRec(a_rect, a_id, *a_root, &newNode, a_level))            // Root split
     {
-        newRoot = AllocNode();            // Grow tree taller and new root
+        newRoot = AllocNode();                                              // Grow tree taller and new root
         newRoot->m_level = (*a_root)->m_level + 1;
         branch.m_rect = NodeCover(*a_root);
         branch.m_child = *a_root;

@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerStatsPacket.h"
+#include "CElement.h"
 
 bool CPlayerStatsPacket::Write(NetBitStreamInterface& BitStream) const
 {
@@ -34,10 +36,10 @@ void CPlayerStatsPacket::Add(unsigned short usID, float fValue)
     if (auto iter = m_map.find(usID); iter != m_map.end())
     {
         if (fValue == 0.0f)
-            m_map.erase(iter);            // Erase stat
+            m_map.erase(iter);                // Erase stat
         else
             iter->second = fValue;            // Update value
     }
-    else            // Not in map
+    else                                      // Not in map
         m_map.emplace(usID, fValue);
 }

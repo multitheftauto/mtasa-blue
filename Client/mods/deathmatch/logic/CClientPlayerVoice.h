@@ -72,6 +72,7 @@ public:
 
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);
+
     bool IsActive() { return m_bVoiceActive; }
 
 private:

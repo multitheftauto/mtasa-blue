@@ -19,7 +19,10 @@ namespace
     // Helper functions for this file only
 
     // Convert size of PT stream to sizeof of N stream
-    uint ConvertPTSize(uint SizePT) { return SizePT * 12 / 20; }
+    uint ConvertPTSize(uint SizePT)
+    {
+        return SizePT * 12 / 20;
+    }
 
     // Get 64 bit key for a triangle by using the ordered vertex indices
     long long getTriKey(WORD a, WORD b, WORD c)
@@ -328,7 +331,8 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
         for (uint i = 0; i < NumVerts; i++)
         {
             // Validate
-            CVector& Normal = NormalList[i];
+            CVector&               Normal = NormalList[i];
+            static constexpr float FLOAT_EPSILON = 0.0001f;
             if (Normal.Normalize() < FLOAT_EPSILON)
                 Normal = CVector(0, 0, 1);
 

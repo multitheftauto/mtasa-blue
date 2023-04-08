@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CTransferBox.cpp
  *  PURPOSE:     Transfer box GUI
@@ -11,126 +11,145 @@
 
 #include <StdInc.h>
 
-#define TRANSFERBOX_HEIGHT      58
-#define TRANSFERBOX_ICONSIZE    20
-#define TRANSFERBOX_PROGRESSHEIGHT  28
-#define TRANSFERBOX_YSTART      20
-#define TRANSFERBOX_SPACER      11
+#define TRANSFERBOX_HEIGHT         58
+#define TRANSFERBOX_ICONSIZE       20
+#define TRANSFERBOX_PROGRESSHEIGHT 28
+#define TRANSFERBOX_YSTART         20
+#define TRANSFERBOX_SPACER         11
 
-CTransferBox::CTransferBox()
+CTransferBox::CTransferBox(TransferBoxType transferType) : m_GUI(g_pCore->GetGUI())
 {
-    CGUI* pGUI = g_pCore->GetGUI();
-    // Create our text for each transfer type
-    m_strTransferText[Type::NORMAL] = _("Download Progress:");
-    m_strTransferText[Type::PACKET] = _("Map download progress:");
+    switch (transferType)
+    {
+        case TransferBoxType::MAP_DOWNLOAD:
+            m_titleProgressPrefix = _("Map download progress:");
+            break;
+        default:
+            m_titleProgressPrefix = _("Download Progress:");
+    }
 
+    m_visible.set(TB_VISIBILITY_CLIENT_SCRIPT);
+    m_visible.set(TB_VISIBILITY_SERVER_SCRIPT);
+
+    g_pCore->GetCVars()->Get("always_show_transferbox", m_alwaysVisible);
+
+    CreateTransferWindow();
+}
+
+void CTransferBox::CreateTransferWindow()
+{
     // Find our largest piece of text, so we can size accordingly
-    float fTransferBoxWidth = 0;
-    for (int i = 0; i < Type::MAX_TYPES; i++)
-        fTransferBoxWidth = std::max<float>(
-            fTransferBoxWidth, pGUI->GetTextExtent(m_strTransferText[i] + " " + SString(_("%s of %s"), "999.99 kB", "999.99 kB"), "default-bold-small"));
-    fTransferBoxWidth = std::max<float>(fTransferBoxWidth, pGUI->GetTextExtent(_("Disconnect to cancel download"), "default-normal"));
+    std::string largeTextSample = m_titleProgressPrefix + " " + SString(_("%s of %s"), "999.99 kB", "999.99 kB");
+    float       fTransferBoxWidth = m_GUI->GetTextExtent(largeTextSample.c_str(), "default-bold-small");
+    fTransferBoxWidth = std::max<float>(fTransferBoxWidth, m_GUI->GetTextExtent(_("Disconnect to cancel download"), "default-normal"));
 
     // Add some padding to our text for the size of the window
     fTransferBoxWidth += 80;
 
-    // Begin creating our GUI
-    CVector2D ScreenSize = pGUI->GetResolution();
-    float     fFontHeight = pGUI->GetDefaultFont()->GetFontHeight();
+    CVector2D screenSize = m_GUI->GetResolution();
 
-    // create the window
-    m_pWindow = pGUI->CreateWnd();
-    m_pWindow->SetText("");
-    m_pWindow->SetAlpha(0.7f);
-    m_pWindow->SetVisible(false);
-    m_pWindow->SetAlwaysOnTop(true);
-    m_pWindow->SetCloseButtonEnabled(false);
-    m_pWindow->SetSizingEnabled(false);
-    m_pWindow->SetPosition(CVector2D(ScreenSize.fX * 0.5f - fTransferBoxWidth * 0.5f, ScreenSize.fY * 0.85f - TRANSFERBOX_HEIGHT * 0.5f));
-    m_pWindow->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_HEIGHT));            // relative 0.35, 0.225
+    m_window.reset(m_GUI->CreateWnd());
+    m_window->SetText("");
+    m_window->SetAlpha(0.7f);
+    m_window->SetVisible(false);
+    m_window->SetAlwaysOnTop(true);
+    m_window->SetCloseButtonEnabled(false);
+    m_window->SetSizingEnabled(false);
+    m_window->SetPosition(CVector2D(screenSize.fX * 0.5f - fTransferBoxWidth * 0.5f, screenSize.fY * 0.85f - TRANSFERBOX_HEIGHT * 0.5f));
+    m_window->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_HEIGHT));            // relative 0.35, 0.225
 
-    // create the progress bar
-    m_pProgress = pGUI->CreateProgressBar(m_pWindow);
-    m_pProgress->SetPosition(CVector2D(0, TRANSFERBOX_YSTART));
-    m_pProgress->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_HEIGHT - TRANSFERBOX_YSTART - TRANSFERBOX_SPACER));
+    m_progressBar.reset(m_GUI->CreateProgressBar(m_window.get()));
+    m_progressBar->SetPosition(CVector2D(0, TRANSFERBOX_YSTART));
+    m_progressBar->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_HEIGHT - TRANSFERBOX_YSTART - TRANSFERBOX_SPACER));
 
-    // stats label
-    m_pInfo = pGUI->CreateLabel(m_pProgress, _("Disconnect to cancel download"));
-    float fTempX = (m_pProgress->GetSize().fX - pGUI->GetTextExtent(m_pInfo->GetText().c_str()) - TRANSFERBOX_ICONSIZE - 4) * 0.5f;
-    m_pInfo->SetPosition(CVector2D(fTempX + TRANSFERBOX_ICONSIZE + 4, 0));
-    m_pInfo->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_PROGRESSHEIGHT));
-    m_pInfo->SetTextColor(0, 0, 0);
-    m_pInfo->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+    m_infoLabel.reset(m_GUI->CreateLabel(m_progressBar.get(), _("Disconnect to cancel download")));
+    float fTempX = (m_progressBar->GetSize().fX - m_GUI->GetTextExtent(m_infoLabel->GetText().c_str()) - TRANSFERBOX_ICONSIZE - 4) * 0.5f;
+    m_infoLabel->SetPosition(CVector2D(fTempX + TRANSFERBOX_ICONSIZE + 4, 0));
+    m_infoLabel->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_PROGRESSHEIGHT));
+    m_infoLabel->SetTextColor(0, 0, 0);
+    m_infoLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 
-    // create the icons
-    for (unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++)
+    for (size_t i = 0; i < m_iconImages.size(); ++i)
     {
-        SString strIcon("cgui\\images\\transferset\\%u.png", i + 1);
-        m_pIcon[i] = pGUI->CreateStaticImage(m_pProgress);
-        m_pIcon[i]->SetFrameEnabled(false);
-        m_pIcon[i]->SetPosition(CVector2D(fTempX, ((TRANSFERBOX_PROGRESSHEIGHT) / 2) - (TRANSFERBOX_ICONSIZE / 2)));
-        m_pIcon[i]->SetSize(CVector2D(TRANSFERBOX_ICONSIZE, TRANSFERBOX_ICONSIZE));
-        m_pIcon[i]->LoadFromFile(strIcon);
-        m_pIcon[i]->SetVisible(false);
-    }
-    m_pIcon[0]->SetVisible(true);
-
-    // set animation counters
-    m_uiVisible = 0;
-    m_dTotalSize = 0;
-}
-
-CTransferBox::~CTransferBox()
-{
-    for (unsigned int i = 0; i < TRANSFERBOX_FRAMES; i++)
-    {
-        delete m_pIcon[i];
+        SString filePath("cgui\\images\\transferset\\%u.png", i + 1);
+        m_iconImages[i].reset(m_GUI->CreateStaticImage(m_progressBar.get()));
+        m_iconImages[i]->SetFrameEnabled(false);
+        m_iconImages[i]->SetPosition(CVector2D(fTempX, ((TRANSFERBOX_PROGRESSHEIGHT) / 2) - (TRANSFERBOX_ICONSIZE / 2)));
+        m_iconImages[i]->SetSize(CVector2D(TRANSFERBOX_ICONSIZE, TRANSFERBOX_ICONSIZE));
+        m_iconImages[i]->LoadFromFile(filePath);
+        m_iconImages[i]->SetVisible(false);
     }
 
-    if (m_pWindow != NULL)
-        delete m_pWindow;
-    if (m_pInfo != NULL)
-        delete m_pInfo;
-    if (m_pProgress != NULL)
-        delete m_pProgress;
+    m_iconIndex = 0;
+    m_iconImages[m_iconIndex]->SetVisible(true);
 }
 
 void CTransferBox::Show()
 {
-    m_pWindow->SetVisible(true);
-    g_pCore->GetGUI()->SetTransferBoxVisible(true);
+    m_visible.set(TB_VISIBILITY_MTA);
+    UpdateWindowVisibility();
 }
 
 void CTransferBox::Hide()
 {
-    m_pWindow->SetVisible(false);
-    g_pCore->GetGUI()->SetTransferBoxVisible(false);
+    m_visible.reset(TB_VISIBILITY_MTA);
+    UpdateWindowVisibility();
 
-    m_dTotalSize = 0;
+    m_downloadTotalSize = 0;
 }
 
-void CTransferBox::SetInfo(double dDownloadSizeNow, CTransferBox::Type eTransferType)
+void CTransferBox::SetDownloadProgress(uint64_t downloadedSizeTotal)
 {
-    // Convert to reasonable units
-    SString strDownloadSizeNow = GetDataUnit(static_cast<unsigned long long>(dDownloadSizeNow));
-    SString strDownloadSizeTotal = GetDataUnit(static_cast<unsigned long long>(m_dTotalSize));
-
-    SString strBuffer = m_strTransferText[eTransferType] + " " +
-                        SString(_("%s of %s"), strDownloadSizeNow.c_str(),
-                                strDownloadSizeTotal.c_str());            // TRANSLATORS: This represents the download progress. E.g. "500 kB of 800 kB"
-    m_pWindow->SetText(strBuffer);
-
-    m_pProgress->SetProgress(static_cast<float>(dDownloadSizeNow / m_dTotalSize));
+    SString current = GetDataUnit(downloadedSizeTotal);
+    SString total = GetDataUnit(m_downloadTotalSize);
+    SString progress = m_titleProgressPrefix + " " + SString(_("%s of %s"), current.c_str(), total.c_str());
+    m_window->SetText(progress.c_str());
+    m_progressBar->SetProgress(static_cast<float>(static_cast<double>(downloadedSizeTotal) / m_downloadTotalSize));
 }
 
 void CTransferBox::DoPulse()
 {
-    // animated icon mechanism
-    if (m_AnimTimer.Get() > TRANSFERBOX_DELAY)
+    if (m_iconTimer.Get() >= 50)
     {
-        m_AnimTimer.Reset();
-        m_pIcon[m_uiVisible]->SetVisible(false);
-        m_uiVisible = (m_uiVisible + 1) % TRANSFERBOX_FRAMES;
-        m_pIcon[m_uiVisible]->SetVisible(true);
+        m_iconTimer.Reset();
+        m_iconImages[m_iconIndex]->SetVisible(false);
+        m_iconIndex = (m_iconIndex + 1) % m_iconImages.size();
+        m_iconImages[m_iconIndex]->SetVisible(true);
     }
+}
+
+bool CTransferBox::SetClientVisibility(bool visible)
+{
+    if (m_visible[TB_VISIBILITY_CLIENT_SCRIPT] == visible)
+        return false;
+
+    m_visible.set(TB_VISIBILITY_CLIENT_SCRIPT, visible);
+    UpdateWindowVisibility();
+    return true;
+}
+
+bool CTransferBox::SetServerVisibility(bool visible)
+{
+    if (m_visible[TB_VISIBILITY_SERVER_SCRIPT] == visible)
+        return false;
+
+    m_visible.set(TB_VISIBILITY_SERVER_SCRIPT, visible);
+    UpdateWindowVisibility();
+    return true;
+}
+
+bool CTransferBox::SetAlwaysVisible(bool visible)
+{
+    if (m_alwaysVisible == visible)
+        return false;
+
+    m_alwaysVisible = visible;
+    UpdateWindowVisibility();
+    return true;
+}
+
+void CTransferBox::UpdateWindowVisibility() const
+{
+    bool visible = m_visible.all() || (m_visible[TB_VISIBILITY_MTA] && m_alwaysVisible);
+    m_window->SetVisible(visible);
 }

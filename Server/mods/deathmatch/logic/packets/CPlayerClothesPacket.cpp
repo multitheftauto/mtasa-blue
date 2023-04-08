@@ -10,14 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerClothesPacket.h"
+#include "CElement.h"
 
 CPlayerClothesPacket::~CPlayerClothesPacket()
 {
-    vector<SPlayerClothes*>::iterator iter = m_List.begin();
+    std::vector<SPlayerClothes*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)
     {
-        delete[](*iter)->szTexture;
-        delete[](*iter)->szModel;
+        delete[] (*iter)->szTexture;
+        delete[] (*iter)->szModel;
         delete *iter;
     }
     m_List.clear();
@@ -35,7 +37,7 @@ bool CPlayerClothesPacket::Write(NetBitStreamInterface& BitStream) const
         unsigned short usNumClothes = static_cast<unsigned short>(m_List.size());
         BitStream.Write(usNumClothes);
 
-        vector<SPlayerClothes*>::const_iterator iter = m_List.begin();
+        std::vector<SPlayerClothes*>::const_iterator iter = m_List.begin();
         for (; iter != m_List.end(); ++iter)
         {
             char*         szTexture = (*iter)->szTexture;

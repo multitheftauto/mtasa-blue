@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaPedDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaPedDefs::LoadFunctions()
 {
@@ -31,7 +34,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedTotalAmmo", GetPedTotalAmmo},
         {"getPedWeapon", GetPedWeapon},
         {"getPedClothes", GetPedClothes},
-        {"isPedWearingJetpack", DoesPedHaveJetPack}, // introduced in 1.5.5-9.13846
+        {"isPedWearingJetpack", DoesPedHaveJetPack},            // introduced in 1.5.5-9.13846
         {"isPedOnGround", IsPedOnGround},
         {"getPedFightingStyle", GetPedFightingStyle},
         {"getPedWalkingStyle", GetPedMoveAnim},
@@ -53,7 +56,7 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedStat", SetPedStat},
         {"addPedClothes", AddPedClothes},
         {"removePedClothes", RemovePedClothes},
-        {"setPedWearingJetpack", SetPedWearingJetpack}, // introduced in 1.5.5-9.13846
+        {"setPedWearingJetpack", SetPedWearingJetpack},            // introduced in 1.5.5-9.13846
         {"setPedFightingStyle", SetPedFightingStyle},
         {"setPedWalkingStyle", SetPedMoveAnim},
         {"setPedGravity", SetPedGravity},
@@ -176,7 +179,7 @@ int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
     lua_newtable(luaVM);
-    for (int i = 0; i <= 312; i++)
+    for (unsigned short i = 0; i <= 312; i++)
     {
         if (CPlayerManager::IsValidPlayerModel(i))
         {
@@ -418,7 +421,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     if (argStream.NextIsBool())
         argStream.ReadBool(bDummy);            // Wiki used setPedAnimation(source,false) as an example
     else if (argStream.NextIsNil())
-        argStream.m_iIndex++;            // Wiki docs said blockName could be nil
+        argStream.m_iIndex++;                  // Wiki docs said blockName could be nil
     else
         argStream.ReadString(strBlockName, "");
     argStream.ReadString(strAnimName, "");
@@ -439,7 +442,8 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
         szBlock = strBlockName.empty() ? NULL : strBlockName.c_str();
         szAnim = strAnimName.empty() ? NULL : strAnimName.c_str();
 
-        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd))
+        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame,
+                                                        bTaskToBeRestoredOnAnimEnd))
         {
             lua_pushboolean(luaVM, true);
             return 1;

@@ -9,8 +9,9 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "game/CAnimBlendSequence.h"
-#include "game/CAnimBlendHierarchy.h"
+#include <game/CAnimBlendHierarchy.h>
+#include <game/CAnimBlendSequence.h>
+#include <game/CAnimManager.h>
 
 CClientIFP::CClientIFP(class CClientManager* pManager, ElementID ID) : CClientEntity(ID)
 {
@@ -1101,7 +1102,7 @@ CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString&
 {
     const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
     auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
-                           [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
+                                         [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
     if (it != m_pVecAnimations->end())
     {
         return it->pHierarchy->GetInterface();
