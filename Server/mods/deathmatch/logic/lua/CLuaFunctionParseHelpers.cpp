@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *
  *****************************************************************************/
 

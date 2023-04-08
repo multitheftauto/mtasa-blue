@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/rpc_enums.h
  *  PURPOSE:     Lua RPC enums
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

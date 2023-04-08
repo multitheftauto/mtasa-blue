@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleColorManager.cpp
- *  PURPOSE:     Vehicle entity color manager class
+ *  FILE:        mods/deathmatch/logic/CVehicleColorConfig.cpp
+ *  PURPOSE:     Vehicle colors loader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

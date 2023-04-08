@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/models/CModelVehicle.cpp
  *  PURPOSE:     Vehicle model info class
  *
- *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

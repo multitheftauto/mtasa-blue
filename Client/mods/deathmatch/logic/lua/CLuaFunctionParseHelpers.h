@@ -2,7 +2,9 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

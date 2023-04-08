@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/packets/CPlayerJoinCompletePacket.cpp
  *  PURPOSE:     Player join completion packet class
  *
- *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

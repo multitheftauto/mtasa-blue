@@ -1,14 +1,16 @@
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto
- *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CClientModelManager.cpp
  *  PURPOSE:     Model manager class
  *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
  *****************************************************************************/
 
 #include "StdInc.h"
+
 CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforTXD()))
 {
     const unsigned int MAX_MODEL_ID = g_pGame->GetBaseIDforTXD();

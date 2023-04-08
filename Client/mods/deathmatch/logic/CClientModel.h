@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto
- *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CClientModel.h
  *  PURPOSE:     Model handling class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
