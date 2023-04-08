@@ -814,7 +814,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         lua_pushinteger(luaVM, iModelID);
                         return 1;
                     }
-                    
+
                     m_pManager->GetModelManager()->Remove(iModelID);
                     argStream.SetCustomError("Expected valid original model ID at argument 2");
                 }
