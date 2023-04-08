@@ -297,7 +297,6 @@ ADD_ENUM(eModelInfoType::PED, "ped")
 ADD_ENUM(eModelInfoType::LOD_ATOMIC, "lod-atomic")
 IMPLEMENT_ENUM_CLASS_END("model-info-type")
 
-
 //
 // CResource from userdata
 //
