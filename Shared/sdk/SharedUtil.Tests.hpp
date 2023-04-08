@@ -810,9 +810,9 @@ void SharedUtil_Hash_Tests()
         assert(!hmacResult.empty());
         assert(hmacResult == result);
         TEST_VARS
-        const SString data;
-        const SString key;
-        const SString result;
+        const SString       data;
+        const SString       key;
+        const SString       result;
         const HmacAlgorithm algorithm;
         TEST_DATA = {
             {"Hello world", "hecker was there", "657C7088ADEA11E6482EE794D3E5489C", HmacAlgorithm::MD5},
@@ -820,7 +820,9 @@ void SharedUtil_Hash_Tests()
             {"Hello thereHello there", "!@#$%^&*()_+|:<>", "A7A00E964617DFB59324502786BB28AEEF22898C00B226A7B4A1D607", HmacAlgorithm::SHA224},
             {"!@#$%^&*()_+|:<>", "cppsymbol", "46105B670A55EA8808B16FFC8B88507EAEA3E9D1F5A55891CD04136FB2AADA15", HmacAlgorithm::SHA256},
             {"value", "sha384", "CEC945A598261608218BA685EEC02D773F57AFD6410AF67D2A2D1B0D22DAE8624D0F369E55C8C7E774805204A2B5A75A", HmacAlgorithm::SHA384},
-            {"", "gHtySkGerYnhDxAs", "4E6E87CE637808642B902A07F43CA6A1CFE4346054C0C8C542A67C4BF206708CF5AFE3F1BB6D53DCE3469CDEA1CE11A0892EE2F95322C45D2CB809F165AD3BB3", HmacAlgorithm::SHA512},
+            {"", "gHtySkGerYnhDxAs",
+             "4E6E87CE637808642B902A07F43CA6A1CFE4346054C0C8C542A67C4BF206708CF5AFE3F1BB6D53DCE3469CDEA1CE11A0892EE2F95322C45D2CB809F165AD3BB3",
+             HmacAlgorithm::SHA512},
         };
         TEST_END
     }

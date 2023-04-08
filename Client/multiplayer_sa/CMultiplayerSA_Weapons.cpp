@@ -173,7 +173,7 @@ int OnMY_Fx_AddBulletImpact(int iType)
         if (ms_LastFxTimer.Get() > 500)
             ms_LastFxTimer.Reset();            // Allow once every 500ms
         else
-            iType = 1;            // Otherwise replace with spark
+            iType = 1;                         // Otherwise replace with spark
     }
     return iType;
 }

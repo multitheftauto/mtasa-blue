@@ -3,7 +3,7 @@
 #pragma warning (disable:4995)
 #pragma warning (disable:4244)
 
-//#define WIN32_LEAN_AND_MEAN
+// #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_FAST_HASH_MAP

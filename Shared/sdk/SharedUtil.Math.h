@@ -103,5 +103,8 @@ namespace SharedUtil
         }
     }
 
-    inline float DegreesToRadians(float fValue) { return fValue * 0.017453292f; }
+    inline float DegreesToRadians(float fValue)
+    {
+        return fValue * 0.017453292f;
+    }
 }            // namespace SharedUtil

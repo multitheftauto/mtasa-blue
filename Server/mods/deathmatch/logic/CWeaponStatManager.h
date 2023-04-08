@@ -13,7 +13,7 @@
 #include "CCommon.h"
 #include <list>
 
- // Straight out of CGameSA.h
+// Straight out of CGameSA.h
 #define     CLASSSIZE_WeaponInfo            112         // ##SA##
 #define     NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
 #define     NUM_WeaponInfosOtherSkill       11
@@ -25,10 +25,10 @@ struct sWeaponInfo
 {
     eFireType fire_type;            // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)
 
-    FLOAT target_range;            // max targeting range
-    FLOAT weapon_range;            // absolute gun range / default melee attack range
-    int   model;                   // modelinfo id
-    int   model2;                  // second modelinfo id
+    FLOAT target_range;             // max targeting range
+    FLOAT weapon_range;             // absolute gun range / default melee attack range
+    int   model;                    // modelinfo id
+    int   model2;                   // second modelinfo id
 
     eWeaponSlot weapon_slot;
     int         flags;            // flags defining characteristics
@@ -51,15 +51,15 @@ struct sWeaponInfo
     FLOAT        move_speed;                      // how fast can move with weapon
 
     // anim timings
-    FLOAT anim_loop_start;                  // start of animation loop
-    FLOAT anim_loop_stop;                   // end of animation loop
-    FLOAT anim_loop_bullet_fire;            // time in animation when weapon should be fired
+    FLOAT anim_loop_start;                   // start of animation loop
+    FLOAT anim_loop_stop;                    // end of animation loop
+    FLOAT anim_loop_bullet_fire;             // time in animation when weapon should be fired
 
     FLOAT anim2_loop_start;                  // start of animation2 loop
     FLOAT anim2_loop_stop;                   // end of animation2 loop
     FLOAT anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
 
-    FLOAT anim_breakout_time;            // time after which player can break out of attack and run off
+    FLOAT anim_breakout_time;                // time after which player can break out of attack and run off
 
     // projectile/area effect specific info
     FLOAT firing_speed;            // speed of projectile
@@ -67,7 +67,7 @@ struct sWeaponInfo
     FLOAT life_span;               // time taken for shot to dissipate
     FLOAT spread;                  // angle inside which shots are created
 
-    short aim_offset;            // index into array of aiming offsets
+    short aim_offset;              // index into array of aiming offsets
     //////////////////////////////////
     // Melee Data
     /////////////////////////////////

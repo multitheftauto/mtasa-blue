@@ -84,7 +84,8 @@ bool CClientModel::Deallocate(void)
 
 void CClientModel::RestoreEntitiesUsingThisModel()
 {
-    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
+    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
             auto& element = **iter;

@@ -348,7 +348,7 @@ void CServerInfo::SetServerInformation(const char* szHost, unsigned short usPort
 
     if (pInitialServerListItem)            // If we have a pointer to an already scanned server, we initially set text to this
         ResetServerGUI(pInitialServerListItem);
-    else            // Otherwise, reset it to blank text
+    else                                   // Otherwise, reset it to blank text
         Reset();
 
     m_pServerAddressLabel->SetText(SString("%s:%u", szHost, usPort));

@@ -52,7 +52,6 @@ class CVehicle;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 
-
 enum eClimbHeights
 {
     CLIMB_NOT_READY = 0,

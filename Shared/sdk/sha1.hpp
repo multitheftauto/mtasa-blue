@@ -50,9 +50,9 @@ static void polarssl_zeroize(void* v, size_t n)
 
 #if !defined(POLARSSL_SHA1_ALT)
 
-    /*
-     * 32-bit integer manipulation macros (big endian)
-     */
+/*
+ * 32-bit integer manipulation macros (big endian)
+ */
 #ifndef GET_UINT32_BE
 #define GET_UINT32_BE(n,b,i)                            \
 {                                                       \

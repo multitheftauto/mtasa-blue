@@ -481,6 +481,10 @@ enum class eBitStreamVersion : unsigned short
     // 2022-01-16 0x76
     Discord_Cleanup,
 
+    //
+    // 1.6.0 RELEASED - 202x-xx-xx
+    //
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

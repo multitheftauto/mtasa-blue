@@ -25,7 +25,7 @@
 
 extern CGameSA* pGame;
 
-int             g_bOnlyUpdateRotations = false;
+int g_bOnlyUpdateRotations = false;
 
 CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL), m_iCustomMoveAnim(0)
 {
