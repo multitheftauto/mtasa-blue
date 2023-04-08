@@ -37,15 +37,15 @@ _declspec(naked) void DoVehicleSunGlare(void* this_)
 void _declspec(naked) HOOK_Vehicle_PreRender(void)
 {
     _asm {
-        mov	ecx, m_bVehicleSunGlare
-		cmp	ecx, 0
-		jle	noglare
-		mov	ecx, esi
-		call DoVehicleSunGlare
-	noglare:
-		mov [esp+0D4h], edi
-		push 6ABD04h
-		retn
+        mov    ecx, m_bVehicleSunGlare
+        cmp    ecx, 0
+        jle    noglare
+        mov    ecx, esi
+        call DoVehicleSunGlare
+    noglare:
+        mov [esp+0D4h], edi
+        push 6ABD04h
+        retn
     }
 }
 
@@ -109,7 +109,10 @@ namespace
     }
 
     // Get all atomics for this frame (even if they are invisible)
-    void GetAllAtomicObjects(RwFrame* frame, std::vector<RwObject*>& result) { RwFrameForAllObjects(frame, (void*)GetAllAtomicObjectCB, &result); }
+    void GetAllAtomicObjects(RwFrame* frame, std::vector<RwObject*>& result)
+    {
+        RwFrameForAllObjects(frame, (void*)GetAllAtomicObjectCB, &result);
+    }
 }            // namespace
 
 void CVehicleSA::Init()

@@ -25,7 +25,7 @@ IMPLEMENT_ENUM_END("state-group")
 
 const STypeMapping TypeMappingList[] = {
     {TYPE_INT, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},
-    {TYPE_D3DCOLOR, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},            // Can be read as float4 or DWORD color
+    {TYPE_D3DCOLOR, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},              // Can be read as float4 or DWORD color
     {TYPE_D3DCOLOR, D3DXPC_VECTOR, D3DXPT_FLOAT, RegMap::Int2Color, 4},
     {TYPE_IFLOAT, D3DXPC_SCALAR, D3DXPT_FLOAT, RegMap::Int2Float, 1},            // Can be read as float or as int on float memory
     {TYPE_IFLOAT, D3DXPC_SCALAR, D3DXPT_INT, RegMap::Int2Int, 1},                // Can be read as float or as int on float memory
@@ -307,9 +307,9 @@ const SRegisterInfo BigRegisterInfoList[] = {
     ADD_REGISTER(TYPE_INT, MaxPrimitiveCount),            // max number of primitives per DrawPrimitive call
     ADD_REGISTER(TYPE_INT, MaxVertexIndex),
     ADD_REGISTER(TYPE_INT, MaxStreams),
-    ADD_REGISTER(TYPE_INT, MaxStreamStride),            // max stride for SetStreamSource
+    ADD_REGISTER(TYPE_INT, MaxStreamStride),                    // max stride for SetStreamSource
     ADD_REGISTER(TYPE_INT, VertexShaderVersion),
-    ADD_REGISTER(TYPE_INT, MaxVertexShaderConst),            // number of vertex shader constant registers
+    ADD_REGISTER(TYPE_INT, MaxVertexShaderConst),               // number of vertex shader constant registers
     ADD_REGISTER(TYPE_INT, PixelShaderVersion),
     ADD_REGISTER(TYPE_FLOAT, PixelShader1xMaxValue),            // max value storable in registers of ps.1.x shaders
     ADD_REGISTER(TYPE_INT, DevCaps2),                           // Here are the DX9 specific ones

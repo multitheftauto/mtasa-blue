@@ -195,15 +195,15 @@ public:
 
     virtual class CPed* GetContextSwitchedPed() = 0;
 
-    virtual void                 PreventLeavingVehicles() = 0;
-    virtual void                 HideRadar(bool bHide) = 0;
-    virtual void                 SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
-    virtual void                 DisablePadHandler(bool bDisabled) = 0;
-    virtual void                 DisableAllVehicleWeapons(bool bDisable) = 0;
-    virtual void                 DisableBirds(bool bDisabled) = 0;
-    virtual void                 DisableQuickReload(bool bDisable) = 0;
-    virtual void                 DisableCloseRangeDamage(bool bDisable) = 0;
-    virtual void                 DisableBadDrivebyHitboxes(bool bDisable) = 0;
+    virtual void PreventLeavingVehicles() = 0;
+    virtual void HideRadar(bool bHide) = 0;
+    virtual void SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
+    virtual void DisablePadHandler(bool bDisabled) = 0;
+    virtual void DisableAllVehicleWeapons(bool bDisable) = 0;
+    virtual void DisableBirds(bool bDisabled) = 0;
+    virtual void DisableQuickReload(bool bDisable) = 0;
+    virtual void DisableCloseRangeDamage(bool bDisable) = 0;
+    virtual void DisableBadDrivebyHitboxes(bool bDisable) = 0;
 
     virtual bool  GetExplosionsDisabled() = 0;
     virtual void  DisableExplosions(bool bDisabled) = 0;

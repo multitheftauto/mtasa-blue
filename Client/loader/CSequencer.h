@@ -1,13 +1,14 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:
- *  PURPOSE:
+ *  FILE:        Client/loader/CSequencer.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
 
 ///////////////////////////////////////////////////////////////
 //
@@ -167,7 +168,7 @@ public:
         m_uiCurrLine = m_LineList.size();
         for (uint i = 0; i < m_LineList.size(); i++)            // Find label
             if (m_LineList[i].BeginsWith(strLabel))
-                for (; i < m_LineList.size(); i++)            // Find offset
+                for (; i < m_LineList.size(); i++)              // Find offset
                     if (IsLineValid(m_LineList[i]) && !iOffset--)
                     {
                         m_uiCurrLine = i;

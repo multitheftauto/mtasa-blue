@@ -45,7 +45,7 @@ namespace
                      /* [in] */ long                                                                                lTimeout,
                      /* [in] */ ULONG                                                                               uCount,
                      /* [length_is][size_is][out] */ __RPC__out_ecount_part(uCount, *puReturned) IWbemClassObject** apObjects,
-                     /* [out] */ __RPC__out ULONG* puReturned)
+                     /* [out] */ __RPC__out ULONG*                                                                  puReturned)
     {
         __try
         {
