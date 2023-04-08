@@ -40,7 +40,6 @@ public:
     void DeallocateModelsAllocatedByResource(CResource* pResource);
     bool AllocateModelFromParent(uint32_t usModelID, uint32_t usParentModel);
 
-
 private:
     std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
     unsigned int                                     m_modelCount = 0;
