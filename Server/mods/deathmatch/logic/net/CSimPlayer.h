@@ -42,6 +42,7 @@ public:
     std::multimap<ushort, CSimPlayer*> m_PuresyncSendListGrouped;            // Send list grouped by bitstream version
     bool                               m_bSendListChanged;
     bool                               m_bHasOccupiedVehicle;
+    bool                               m_bIsExitingVehicle;
     CControllerState                   m_sharedControllerState;            // Updated by CSim*Packet code
 
     // Used in CSimPlayerPuresyncPacket and CSimVehiclePuresyncPacket

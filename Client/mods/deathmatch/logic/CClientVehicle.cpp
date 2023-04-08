@@ -377,9 +377,11 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
     }
 
     // If we have any occupants, update their positions
+    // Make sure we dont update their position if they are getting out and have physically left the car
     for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
-            pOccupant->SetPosition(vecPosition);
+            if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
+                pOccupant->SetPosition(vecPosition);
 
     // Reset interpolation
     if (bResetInterpolation)
@@ -530,15 +532,11 @@ bool CClientVehicle::SetMatrix(const CMatrix& Matrix)
     m_MatrixPure = Matrix;
 
     // If we have any occupants, update their positions
-    if (m_pDriver)
-        m_pDriver->SetPosition(m_Matrix.vPos);
-    for (int i = 0; i < (sizeof(m_pPassengers) / sizeof(CClientPed*)); i++)
-    {
-        if (m_pPassengers[i])
-        {
-            m_pPassengers[i]->SetPosition(m_Matrix.vPos);
-        }
-    }
+    // Make sure we dont update their position if they are getting out and have physically left the car
+    for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
+        if (CClientPed* pOccupant = GetOccupant(i))
+            if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
+                pOccupant->SetPosition(m_Matrix.vPos);
 
     return true;
 }

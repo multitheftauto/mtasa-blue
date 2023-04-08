@@ -768,7 +768,7 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
             {
                 CLuaArgument* pArgument = new CLuaArgument();
                 pArgument->ReadString(key);
-                m_Arguments.push_back(pArgument);            // push the key first
+                m_Arguments.push_back(pArgument);                                       // push the key first
                 pArgument = new CLuaArgument();
                 bSuccess = pArgument->ReadFromJSONObject(val, pKnownTables);            // then the value
                 m_Arguments.push_back(pArgument);

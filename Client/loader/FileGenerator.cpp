@@ -69,6 +69,10 @@ static bool Extract(const char* fileName, const fs::path& destination, const std
         {
             const std::wstring destinationString = destination.wstring();
             result = (ERAR_SUCCESS == RARProcessFileW(archiveHandle, RAR_EXTRACT, nullptr, const_cast<wchar_t*>(destinationString.data())));
+
+            if (!result)
+                ec.assign(ERROR_WRITE_FAULT, std::system_category());
+
             break;
         }
 
@@ -84,7 +88,9 @@ static bool Extract(const char* fileName, const fs::path& destination, const std
     if (result)
         return true;
 
-    ec.assign(ERROR_NOT_FOUND, std::system_category());
+    if (!ec)
+        ec.assign(ERROR_NOT_FOUND, std::system_category());
+
     return false;
 }
 

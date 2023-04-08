@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-10 16:36+0000\n"
+"PO-Revision-Date: 2022-09-26 13:27\n"
+"Last-Translator: \n"
+"Language-Team: Latvian\n"
+"Language: lv_LV\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==0 ? 0 : n%10==1 && n%100!=11 ? 1 : 2);\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: lv\n"
+"X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/main_menu.pot\n"
+"X-Crowdin-File-ID: 223\n"
+
+#. Found in the main menu navigation
+msgid "Quick connect"
+msgstr "Ātrais savienojums"
+
+#. Found in the main menu navigation
+msgid "Disconnect"
+msgstr "Atslēgties"
+
+#. Found in the main menu navigation
+msgid "Server browser"
+msgstr "Servera pārlūks"
+
+#. Found in the main menu navigation
+msgid "Host game"
+msgstr "Izveidot spēli"
+
+#. Found in the main menu navigation
+msgid "Map editor"
+msgstr "Map ediotrs"
+
+#. Found in the main menu navigation
+msgid "Settings"
+msgstr "Uzstādījumi"
+
+#. Found in the main menu navigation
+msgid "About"
+msgstr "Kredīti"
+
+#. Found in the main menu navigation
+msgid "Quit"
+msgstr "Iziet"
+
+#. Found in the main menu above the news listing
+msgid "The Latest News"
+msgstr "Jaunākās ziņas"
+

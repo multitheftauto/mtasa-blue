@@ -179,12 +179,8 @@ const SDialogItemInfo g_OptimusDialogItems[] = {
     {IDC_OPTIMUS_TEXT2, 0, _td("Try each option and see what works:")},
     {IDC_RADIO1, 1, _td("A - Standard NVidia")},
     {IDC_RADIO2, 1, _td("B - Alternate NVidia")},
-    {IDC_RADIO3, 1, _td("C - Standard NVidia with exe rename")},
-    {IDC_RADIO4, 1, _td("D - Alternate NVidia with exe rename")},
-    {IDC_RADIO5, 1, _td("E - Standard Intel")},
-    {IDC_RADIO6, 1, _td("F - Alternate Intel")},
-    {IDC_RADIO7, 1, _td("G - Standard Intel with exe rename")},
-    {IDC_RADIO8, 1, _td("H - Alternate Intel with exe rename")},
+    {IDC_RADIO3, 1, _td("C - Standard Intel")},
+    {IDC_RADIO4, 1, _td("D - Alternate Intel")},
     {IDC_OPTIMUS_TEXT3, 0, _td("If you get desperate, this might help:")},
     {IDC_OPTIMUS_TEXT4, 0, _td("If you have already selected an option that works, this might help:")},
     {IDC_CHECK_FORCE_WINDOWED, 1, _td("Force windowed mode")},
@@ -292,7 +288,7 @@ void ShowSplash(HINSTANCE hInstance)
         splashWindowClass.lpfnWndProc = DefWindowProc;
         splashWindowClass.hInstance = hInstance;
         splashWindowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-        splashWindowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110)); // IDI_ICON1 from Launcher
+        splashWindowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));            // IDI_ICON1 from Launcher
         splashWindowClass.lpszClassName = TEXT("SplashWindow");
         RegisterClass(&splashWindowClass);
     }
@@ -303,8 +299,8 @@ void ShowSplash(HINSTANCE hInstance)
     }
     else
     {
-        WindowScope window(CreateWindowEx(WS_EX_LAYERED, splashWindowClass.lpszClassName, "Multi Theft Auto Launcher", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0,
-                                          NULL, NULL, hInstance, NULL));
+        WindowScope window(CreateWindowEx(WS_EX_LAYERED, splashWindowClass.lpszClassName, "Multi Theft Auto Launcher", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL,
+                                          NULL, hInstance, NULL));
 
         if (!window.handle)
             return;
@@ -710,7 +706,7 @@ void ShowOptimusDialog(HINSTANCE hInstance)
         return;
     }
 
-    uint RadioButtons[] = {IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4, IDC_RADIO5, IDC_RADIO6, IDC_RADIO7, IDC_RADIO8};
+    uint RadioButtons[] = {IDC_RADIO1, IDC_RADIO2, IDC_RADIO3, IDC_RADIO4};
     // Create and show dialog
     if (!hwndOptimusDialog)
     {
@@ -724,7 +720,7 @@ void ShowOptimusDialog(HINSTANCE hInstance)
         InitDialogStrings(hwndOptimusDialog, g_OptimusDialogItems);
         uint uiStartupOption = GetApplicationSettingInt("nvhacks", "optimus-startup-option") % NUMELMS(RadioButtons);
         uint uiForceWindowed = GetApplicationSettingInt("nvhacks", "optimus-force-windowed");
-        CheckRadioButton(hwndOptimusDialog, IDC_RADIO1, IDC_RADIO8, RadioButtons[uiStartupOption]);
+        CheckRadioButton(hwndOptimusDialog, IDC_RADIO1, IDC_RADIO4, RadioButtons[uiStartupOption]);
         CheckDlgButton(hwndOptimusDialog, IDC_CHECK_FORCE_WINDOWED, uiForceWindowed);
     }
     SetForegroundWindow(hwndOptimusDialog);
@@ -763,8 +759,7 @@ void ShowOptimusDialog(HINSTANCE hInstance)
 
     SetApplicationSettingInt("nvhacks", "optimus-startup-option", uiStartupOption);
     SetApplicationSettingInt("nvhacks", "optimus-alt-startup", (uiStartupOption & 1) ? 1 : 0);
-    SetApplicationSettingInt("nvhacks", "optimus-rename-exe", (uiStartupOption & 2) ? 1 : 0);
-    SetApplicationSettingInt("nvhacks", "optimus-export-enablement", (uiStartupOption & 4) ? 0 : 1);
+    SetApplicationSettingInt("nvhacks", "optimus-export-enablement", (uiStartupOption & 2) ? 0 : 1);
     SetApplicationSettingInt("nvhacks", "optimus-force-windowed", uiForceWindowed);
     SetApplicationSettingInt("nvhacks", "optimus-remember-option", uiRememberOption);
 
@@ -814,7 +809,7 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
     else
     {
         if (bEnableScaremongering)
-            uiAskHoursInterval = 24 * 7;            // Once a week if ticked
+            uiAskHoursInterval = 24 * 7;                     // Once a week if ticked
         else
             uiAskHoursInterval = 24 * 365 * 1000;            // Once every 1000 years if ticked and WSC not monitoring
     }

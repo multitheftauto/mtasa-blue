@@ -80,7 +80,7 @@ void CFilePathTranslator::GetCurrentWorkingDirectory(std::string& WorkingDirecto
 
 void CFilePathTranslator::GetGTARootDirectory(std::string& ModuleRootDirOut)
 {
-    ModuleRootDirOut = g_gtaDirectory.string();
+    ModuleRootDirOut = g_gtaDirectory.u8string();
 }
 
 void CFilePathTranslator::GetMTASARootDirectory(std::string& InstallRootDirOut)

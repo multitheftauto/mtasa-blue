@@ -23,9 +23,6 @@
 
 bool g_bInMTAScene = false;
 
-// Variables used for screen shot saving
-static CBuffer   ms_ScreenShotBuffer;
-static long long ms_LastSaveTime = 0;
 // Other variables
 static uint                 ms_RequiredAnisotropicLevel = 1;
 static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
@@ -132,6 +129,9 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CGraphics::GetSingleton().OnZBufferModified();
 
     TIMING_CHECKPOINT("-OnPresent1");
+    // Make a screenshot if needed (before GUI)
+    CScreenShot::CheckForScreenShot(true);
+
     // Notify core
     CCore::GetSingleton().DoPostFramePulse();
     TIMING_CHECKPOINT("+OnPresent2");
@@ -184,65 +184,10 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     ms_DiagnosticDebug = CCore::GetSingleton().GetDiagnosticDebug();
     CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
 
-    // Make a screenshot if needed
-    CheckForScreenShot();
+    // Make a screenshot if needed (after GUI)
+    CScreenShot::CheckForScreenShot(false);
 
     TIMING_CHECKPOINT("-OnPresent2");
-}
-
-/////////////////////////////////////////////////////////////
-//
-// CDirect3DEvents9::CheckForScreenShot
-//
-// Take a screenshot if required and able
-//
-/////////////////////////////////////////////////////////////
-void CDirect3DEvents9::CheckForScreenShot()
-{
-    // Make a screenshot if needed
-    if (CCore::GetSingleton().bScreenShot && !CScreenShot::IsSaving())
-    {
-        // Max one screenshot per second
-        if (GetTickCount64_() - ms_LastSaveTime < 1000)
-            return;
-        ms_LastSaveTime = GetTickCount64_();
-
-        uint uiWidth = CDirect3DData::GetSingleton().GetViewportWidth();
-        uint uiHeight = CDirect3DData::GetSingleton().GetViewportHeight();
-
-        // Call the pre-screenshot function
-        SString strFileName = CScreenShot::PreScreenShot();
-
-        // Try to get the screen data
-        SString strError;
-        if (CGraphics::GetSingleton().GetScreenGrabber()->GetBackBufferPixels(uiWidth, uiHeight, ms_ScreenShotBuffer, strError))
-        {
-            // Validate data size
-            uint uiDataSize = ms_ScreenShotBuffer.GetSize();
-            uint uiReqDataSize = uiWidth * uiHeight * 4;
-
-            if (uiDataSize == uiReqDataSize)
-            {
-                // Start the save thread
-                CScreenShot::BeginSave(strFileName, ms_ScreenShotBuffer.GetData(), uiDataSize, uiWidth, uiHeight);
-            }
-            else
-            {
-                g_pCore->GetConsole()->Printf(_("Screenshot got %d bytes, but expected %d"), uiDataSize, uiReqDataSize);
-                strFileName = "";
-            }
-        }
-        else
-        {
-            g_pCore->GetConsole()->Print(_("Screenshot failed") + SString(" (%s)", *strError));
-            strFileName = "";
-        }
-
-        // Call the post-screenshot function
-        CScreenShot::PostScreenShot(strFileName);
-
-        CCore::GetSingleton().bScreenShot = false;
-    }
 }
 
 #define SAVE_RENDERSTATE_AND_SET( reg, value ) \
