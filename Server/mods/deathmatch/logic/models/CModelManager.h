@@ -41,5 +41,5 @@ public:
 private:
     // modelID - CModelBase
     std::vector<CModelBase*> m_vModels;
-    std::list<CModelBase*> m_vSimpleAllocatedModels;
+    std::list<CModelBase*>   m_vSimpleAllocatedModels;
 };

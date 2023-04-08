@@ -142,7 +142,7 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     }
 }
 
-    // Linux/Mac crash callback when using google-breakpad
+// Linux/Mac crash callback when using google-breakpad
 #ifdef __APPLE__
 bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded)
 {

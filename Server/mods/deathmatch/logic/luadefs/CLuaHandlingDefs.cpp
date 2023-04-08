@@ -563,7 +563,7 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        const auto    pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(usModel);
+        const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(usModel);
         if (pVehicleModel)
         {
             const CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();

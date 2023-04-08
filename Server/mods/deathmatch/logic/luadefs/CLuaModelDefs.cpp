@@ -74,7 +74,7 @@ bool CLuaModelDefs::UnloadModel(lua_State* const luaVM, uint32_t uiModelID)
     const bool success = g_pGame->GetModelManager()->UnloadCustomModel(uiModelID);
     if (!success)
         return false;
-    
+
     // Remove model from resource
     // TODO: Model can be allocated by another resource
     // This check is unnecessary now

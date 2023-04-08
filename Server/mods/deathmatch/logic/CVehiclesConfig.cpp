@@ -60,8 +60,8 @@ void CVehiclesConfig::RegisterVehicles(CXMLNode* pRootNode)
 {
     for (auto it = pRootNode->ChildrenBegin(); it != pRootNode->ChildrenEnd(); ++it)
     {
-        CXMLNode* pNode = *it;
-        CXMLAttributes &pAttibites = pNode->GetAttributes();
+        CXMLNode*       pNode = *it;
+        CXMLAttributes& pAttibites = pNode->GetAttributes();
 
         CXMLAttribute*     pAttribute;
         uint32_t           uiModelID;
@@ -106,7 +106,6 @@ void CVehiclesConfig::RegisterVehicles(CXMLNode* pRootNode)
         pAttribute = pAttibites.Find("hasDoors");
         if (pAttribute)
             sModelData->bHasDoors = (pAttribute->GetValue().compare("true") == 0);
-
 
         if (strType.compare("car") == 0)
         {
@@ -174,4 +173,3 @@ void CVehiclesConfig::RegisterVehicles(CXMLNode* pRootNode)
         g_pGame->GetModelManager()->RegisterModel(pModelData);
     }
 }
-

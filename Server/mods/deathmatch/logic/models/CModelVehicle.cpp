@@ -15,12 +15,11 @@
 #include "CGame.h"
 #include "CVehicleManager.h"
 
-CModelVehicle::CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs &sModelDefs)
-    : CModelBase(eModelInfoType::VEHICLE, uiModelID)
+CModelVehicle::CModelVehicle(uint32_t uiModelID, const SModelVehicleDefs& sModelDefs) : CModelBase(eModelInfoType::VEHICLE, uiModelID)
 {
     m_modelDef = sModelDefs;
     m_pVehicleHandling = new CHandlingEntry();
-    m_pVehicleHandling->ApplyHandlingData((const CHandlingEntry*) &sModelDefs.handling);
+    m_pVehicleHandling->ApplyHandlingData((const CHandlingEntry*)&sModelDefs.handling);
 }
 
 CModelVehicle::~CModelVehicle()

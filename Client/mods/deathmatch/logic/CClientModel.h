@@ -26,19 +26,19 @@ public:
     CClientModel(CClientManager* pManager, int iModelID, eModelInfoType eModelType);
     ~CClientModel();
 
-    int              GetModelID() const { return m_iModelID; };
-    eModelInfoType   GetModelType() const { return m_eModelType; };
-    bool             Allocate(ushort usParentID);
-    bool             Deallocate();
-    void             RestoreEntitiesUsingThisModel();
-    void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
-    CResource*       GetParentResource() const { return m_pParentResource; }
+    int            GetModelID() const { return m_iModelID; };
+    eModelInfoType GetModelType() const { return m_eModelType; };
+    bool           Allocate(ushort usParentID);
+    bool           Deallocate();
+    void           RestoreEntitiesUsingThisModel();
+    void           SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
+    CResource*     GetParentResource() const { return m_pParentResource; }
 
 protected:
     CClientManager* m_pManager;
 
-    int              m_iModelID;
-    eModelInfoType   m_eModelType;
-    bool             m_bAllocatedByUs = false;
-    CResource*       m_pParentResource = nullptr;            // Resource that allocated model
+    int            m_iModelID;
+    eModelInfoType m_eModelType;
+    bool           m_bAllocatedByUs = false;
+    CResource*     m_pParentResource = nullptr;            // Resource that allocated model
 };

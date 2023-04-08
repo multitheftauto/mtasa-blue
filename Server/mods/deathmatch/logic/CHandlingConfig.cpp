@@ -79,7 +79,6 @@ void CHandlingConfig::LoadHandlingParams(std::vector<char*> lineParams)
     handling.ucTailLight = atoi(lineParams[35]);
     handling.ucAnimGroup = atoi(lineParams[36]);
 
-
     auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(uiModelID);
 
     if (pVehicleModel)

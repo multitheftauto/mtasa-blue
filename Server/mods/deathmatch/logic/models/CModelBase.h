@@ -44,7 +44,7 @@ public:
     bool           IsCustom() { return m_uiParentID != MODEL_MISSING_PARENT; };
     virtual void   Unload() = 0;
 
-   eModelInfoType GetType() { return m_eType; };
+    eModelInfoType GetType() { return m_eType; };
 
 protected:
     eModelInfoType m_eType;

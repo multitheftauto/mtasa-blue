@@ -6,7 +6,7 @@
 class CObjectConfig
 {
 public:
-    CObjectConfig(std::string_view strPath): m_strPacth(strPath) {};
+    CObjectConfig(std::string_view strPath) : m_strPacth(strPath){};
 
     bool Load();
 

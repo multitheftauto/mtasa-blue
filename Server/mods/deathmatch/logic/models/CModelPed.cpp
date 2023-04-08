@@ -15,7 +15,6 @@
 #include "CPlayerManager.h"
 #include "CPedManager.h"
 
-
 CModelPed* CModelPed::Clone(uint32_t uiModelID)
 {
     CModelPed* pNewModel = new CModelPed(uiModelID);
@@ -25,11 +24,9 @@ CModelPed* CModelPed::Clone(uint32_t uiModelID)
     return pNewModel;
 }
 
-
 void CModelPed::Unload()
 {
-    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, auto setElementModelLambda)
-    {
+    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, auto setElementModelLambda) {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
             auto& element = **iter;
@@ -51,5 +48,4 @@ void CModelPed::Unload()
 
     CPlayerManager* pPlayerManager = g_pGame->GetPlayerManager();
     unloadModelsAndCallEvents(pPlayerManager->IterBegin(), pPlayerManager->IterEnd(), [&](auto& element) { element.SetModel(m_uiParentID); });
-
 }

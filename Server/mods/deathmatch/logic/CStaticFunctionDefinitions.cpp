@@ -5583,7 +5583,7 @@ bool CStaticFunctionDefinitions::SetModelHandling(eVehicleTypes eModel, eHandlin
     if (pVehicleModel)
     {
         CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
-        
+
         if (SetEntryHandling(pEntry, eProperty, fValue))
         {
             pVehicleModel->SetVehicleHandlingChanged(true);
@@ -7386,7 +7386,6 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CVehicle* pVehicle, bool b
 {
     assert(pVehicle);
 
-
     uint16_t              usModel = pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
     const CHandlingEntry* pNewEntry;
@@ -7534,7 +7533,7 @@ bool CStaticFunctionDefinitions::ResetModelHandling(eVehicleTypes eModel)
     const auto pVehicleModel = g_pGame->GetModelManager()->GetVehicleModel(eModel);
     if (pVehicleModel)
     {
-        CHandlingEntry* pEntry = pVehicleModel->GetVehicleHandling();
+        CHandlingEntry*       pEntry = pVehicleModel->GetVehicleHandling();
         const CHandlingEntry* pOriginalEntry = pVehicleModel->GetOriginalHandling();
         pEntry->ApplyHandlingData(pOriginalEntry);
         return true;

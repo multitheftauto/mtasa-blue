@@ -25,7 +25,6 @@
 #define VEHICLE_HAS_TAXI_LIGHTS         0x020UL //32
 #define VEHICLE_HAS_SEARCH_LIGHT        0x040UL //64
 
-
 CVehicleManager::CVehicleManager()
 {
 }

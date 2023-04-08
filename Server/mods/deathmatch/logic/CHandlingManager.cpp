@@ -58,7 +58,6 @@ CHandlingManager::~CHandlingManager()
 {
 }
 
-
 eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
 {
     std::map<std::string, eHandlingProperty>::iterator it;

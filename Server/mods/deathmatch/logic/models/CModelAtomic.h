@@ -20,6 +20,6 @@ public:
     CModelAtomic(uint32_t uiModelID) : CModelBase(eModelInfoType::ATOMIC, uiModelID){};
     ~CModelAtomic(){};
 
-    CModelAtomic*  Clone(uint32_t uiModelID);
-    void           Unload();
+    CModelAtomic* Clone(uint32_t uiModelID);
+    void          Unload();
 };
