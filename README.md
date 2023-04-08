@@ -30,10 +30,6 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 * [Nightly Builds](https://nightly.multitheftauto.com/)
 * [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
-### IDE Setup
-
-If not using Visual Studio 2017, download and install the [EditorConfig](https://marketplace.visualstudio.com/items?itemName=EditorConfigTeam.EditorConfig) plugin to automatically set up your IDE for the correct formatting.
-
 ### Build Instructions
 
 #### Windows
@@ -127,4 +123,4 @@ Execute `win-create-projects.bat`
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the [LICENSE](./LICENSE) file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997–2022.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997–2023.

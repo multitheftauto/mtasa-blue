@@ -37,9 +37,9 @@ struct SAudioBankHeaderSA
 
 struct SRiffWavePCMHeader
 {
-    uint32 chunkId;              // big-endian // 0
-    uint32 chunkSize;            // 4
-    uint32 format;               // big-endian // 8
+    uint32 chunkId;                  // big-endian // 0
+    uint32 chunkSize;                // 4
+    uint32 format;                   // big-endian // 8
 
     uint32 subchunk1Id;              // big-endian // 12
     uint32 subchunk1Size;            // 16

@@ -235,7 +235,7 @@ public:
         {
             uint32_t flags[2];
         };
-        struct            // size = 51
+        struct                                        // size = 51
         {
             uint32_t m_adhesionGroup : 3;             // 1 - 3
             uint32_t m_skidmarkType : 2;              // 4 - 5
@@ -246,7 +246,7 @@ public:
             uint32_t m_shootThrough : 1;              // 14
             uint32_t m_sand : 1;                      // 15
             uint32_t m_water : 1;
-            uint32_t m_shallowWater : 1;            // unknown effect
+            uint32_t m_shallowWater : 1;              // unknown effect
             uint32_t m_beach : 1;
             uint32_t m_steepSlope : 1;
             uint32_t m_glass : 1;            // 20
@@ -270,10 +270,10 @@ public:
             uint32_t m_createsWheelSpray : 1;            // crash
             uint32_t m_createsPlants : 1;                // 8
             uint32_t m_createsObjects : 1;
-            uint32_t m_canClimb : 1;                 // 10
-            uint32_t m_audioConcrete : 1;            // 11
+            uint32_t m_canClimb : 1;                     // 10
+            uint32_t m_audioConcrete : 1;                // 11
             uint32_t m_audioGrass : 1;
-            uint32_t m_audioSand : 1;            // 13
+            uint32_t m_audioSand : 1;                    // 13
             uint32_t m_audioGravel : 1;
             uint32_t m_audioWood : 1;
             uint32_t m_audioWater : 1;
@@ -304,11 +304,11 @@ struct CSurfaceType
 class CWorld
 {
 public:
-    virtual void Add(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
-    virtual bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                    const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
+    virtual void  Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
+    virtual bool  ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
+                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
     virtual void  IgnoreEntity(CEntity* entity) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
     virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;

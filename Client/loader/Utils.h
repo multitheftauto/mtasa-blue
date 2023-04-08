@@ -1,13 +1,20 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Utils.h
+ *  FILE:        Client/loader/Utils.h
  *  PURPOSE:     Loading utilities
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
+
+#include <filesystem>
+
+#undef CREATE_SUSPENDED
+#define CREATE_SUSPENDED 5
 
 extern HINSTANCE g_hInstance;
 
@@ -67,6 +74,11 @@ std::vector<DWORD> GetGTAProcessList();
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
 
+auto GetMTARootDirectory() -> std::filesystem::path;
+auto GetGameBaseDirectory() -> std::filesystem::path;
+auto GetGameLaunchDirectory() -> std::filesystem::path;
+auto GetGameExecutablePath() -> std::filesystem::path;
+
 void            SetMTASAPathSource(bool bReadFromRegistry);
 SString         GetMTASAPath();
 ePathResult     DiscoverGTAPath(bool bFindIfMissing);
@@ -86,13 +98,12 @@ void RelaunchAsAdmin(const SString& strCmdLine, const SString& strReason);
 
 void UpdateMTAVersionApplicationSetting(bool bQuiet = false);
 bool Is32bitProcess(DWORD processID);
-void TerminateProcess(DWORD dwProcessID, uint uiExitCode = 0);
+bool TerminateProcess(DWORD dwProcessID, uint uiExitCode = 0);
 
 bool CreateSingleInstanceMutex();
 void ReleaseSingleInstanceMutex();
 
-SString CheckOnRestartCommand();
-void    CleanDownloadCache();
+void CleanDownloadCache();
 
 HMODULE GetLibraryHandle(const SString& strFilename, DWORD* pdwOutLastError = NULL);
 void    FreeLibraryHandle();
@@ -121,6 +132,29 @@ SString            GetProcessFilename(DWORD processID);
 void               WriteDebugEventAndReport(uint uiId, const SString& strText);
 WString            ReadCompatibilityEntries(const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags);
 bool               WriteCompatibilityEntries(const WString& strProgName, const WString& strSubKey, HKEY hKeyRoot, uint uiFlags, const WString& strNewData);
+std::vector<DWORD> GetProcessListUsingFile(const WString& filePath);
+
+/**
+ * @brief Computes the CRC-32 checksum for a file.
+ */
+auto ComputeCRC32(const char* filePath) -> uint32_t;
+
+/**
+ * @brief Generates a random string with up to 4096 characters.
+ * @param length Desired length of the string
+ * @return A string with random alpha-numeric characters
+ */
+auto GenerateRandomString(size_t length) -> std::string;
+
+/**
+ * @brief Checks if the error code is important enough to be logged.
+ */
+bool IsErrorCodeLoggable(const std::error_code& ec);
+
+/**
+ * @brief Returns true if Windows is running on ARM64 architecture (via emulation).
+ */
+bool IsNativeArm64Host();
 
 // Return false on read failure
 template <class T>
@@ -193,10 +227,17 @@ typedef struct _SYSTEM_PROCESS_IMAGE_NAME_INFORMATION
     UNICODE_STRING ImageName;
 } SYSTEM_PROCESS_IMAGE_NAME_INFORMATION, *PSYSTEM_PROCESS_IMAGE_NAME_INFORMATION;
 
-#undef CREATE_SUSPENDED
-#define CREATE_SUSPENDED 5
+// For NtQueryInformationFile
+typedef struct _FILE_PROCESS_IDS_USING_FILE_INFORMATION
+{
+    ULONG     NumberOfProcessIdsInList;
+    ULONG_PTR ProcessIdList[1];
+} FILE_PROCESS_IDS_USING_FILE_INFORMATION, *PFILE_PROCESS_IDS_USING_FILE_INFORMATION;
 
-void* LoadFunction(const char* szLibName, const char* szFunctionName);
+NTSTATUS NTAPI NtQueryInformationFile(HANDLE FileHandle, PIO_STATUS_BLOCK IoStatusBlock, PVOID FileInformation, ULONG Length,
+                                      UINT FileInformationClass /* FILE_INFORMATION_CLASS */);
+
+void* LoadFunction(const char* libraryName, const char* functionName);
 
 #define _DEFFUNCTION(lib, name) \
     using FUNC_##name = decltype(&name); \
@@ -211,5 +252,7 @@ void* LoadFunction(const char* szLibName, const char* szFunctionName);
 #define DEFFUNCTION(lib, name) _DEFFUNCTION(lib, name)
 
 #define _NtQuerySystemInformation __NtQuerySystemInformation()
+#define _NtQueryInformationFile   __NtQueryInformationFile()
 
 DEFFUNCTION("ntdll", NtQuerySystemInformation)
+DEFFUNCTION("ntdll", NtQueryInformationFile)

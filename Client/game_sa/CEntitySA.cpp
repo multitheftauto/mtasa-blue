@@ -387,7 +387,7 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
             call    dwFunc
         }
 
-        dwFunc = 0x532B00;            // CEntity::UpdateRwFrame
+        dwFunc = 0x532B00;                  // CEntity::UpdateRwFrame
         _asm
         {
             mov     ecx, dwThis
