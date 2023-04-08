@@ -24,12 +24,6 @@
 #include <string>
 #include <vector>
 
-// SDK includes
-#include <CRect.h>
-#include <game/CGame.h>
-#include <game/CWanted.h>
-#include <version.h>
-
 // Game includes
 #include "HookSystem.h"
 #include "gamesa_init.h"
