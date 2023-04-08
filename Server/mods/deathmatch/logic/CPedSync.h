@@ -36,7 +36,6 @@ private:
     void StopSync(CPed* pPed);
 
     void Packet_PedSync(CPedSyncPacket& Packet);
-    
 
     CPlayerManager* m_pPlayerManager;
     CPedManager*    m_pPedManager;
