@@ -19,7 +19,7 @@ class CClientEntity;
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+// #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
 class CClientManager;
 
@@ -79,6 +79,7 @@ enum eClientEntityType
     CCLIENTGIF,
     CCLIENTVECTORGRAPHIC,
     CCLIENTUNKNOWN,
+    CCLIENTIMG,
 };
 
 class CEntity;
@@ -92,7 +93,7 @@ class CLuaMain;
 class CMapEventManager;
 typedef CFastList<CClientEntity*> CChildListType;
 
-typedef std::vector<CClientEntity*> CElementListSnapshot;
+typedef std::vector<CClientEntity*>           CElementListSnapshot;
 typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 enum eCClientEntityClassTypes
@@ -142,7 +143,8 @@ enum eCClientEntityClassTypes
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
-    CLASS_CClientSearchLight
+    CLASS_CClientSearchLight,
+    CLASS_CClientIMG,
 };
 
 class CClientEntity : public CClientEntityBase
@@ -198,14 +200,15 @@ public:
     ElementID GetID() { return m_ID; };
     void      SetID(ElementID ID);
 
-    CCustomData*  GetCustomDataPointer() { return m_pCustomData; }
-    CLuaArgument* GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
-    bool          GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
-    bool          GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
-    bool          GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
-    bool          GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
-    void          SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
-    void          DeleteCustomData(const char* szName);
+    CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
+    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
+    CLuaArguments* GetAllCustomData(CLuaArguments* table);
+    bool           GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
+    bool           GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
+    bool           GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
+    bool           GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
+    void           SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    void           DeleteCustomData(const char* szName);
 
     virtual bool GetMatrix(CMatrix& matrix) const;
     virtual bool SetMatrix(const CMatrix& matrix);

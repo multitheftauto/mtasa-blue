@@ -659,23 +659,49 @@ namespace SharedUtil
     //
     // Fixed sized string buffer
     //
-    template <int MAX_LENGTH>
+    template <size_t MAX_LENGTH>
     class SFixedString
     {
         char szData[MAX_LENGTH + 1];
 
     public:
-        SFixedString() { szData[0] = 0; }
+        constexpr SFixedString() { szData[0] = 0; }
+
 
         // In
-        SFixedString& operator=(const char* szOther)
+        constexpr SFixedString& Assign(const char* szOther, size_t len)
         {
-            STRNCPY(szData, szOther, MAX_LENGTH + 1);
+            STRNCPY(szData, szOther, len + 1);
             return *this;
         }
 
+        constexpr SFixedString& operator=(const char* szOther)
+        {
+            Assign(szOther, MAX_LENGTH + 1);
+            return *this;
+        }
+#ifdef __cpp_lib_string_view
+        constexpr SFixedString& operator=(std::string_view other)
+        {
+            Assign(other.data(), other.length() + 1);
+            return *this;
+        }
+#endif
+
+#ifdef __cpp_lib_string_view
         // Out
-        operator const char*() const { return szData; }
+        constexpr operator std::string_view() const { return { szData }; }
+#endif
+        constexpr operator const char*() const { return szData; }
+        constexpr char*           Data() { return &szData[0]; }
+
+        constexpr size_t GetMaxLength() const { return MAX_LENGTH; }
+        size_t GetLength() const { return strlen(szData); }
+
+        // Shake it all about
+        void Encrypt();
+        constexpr bool Empty() { return szData[0] == 0; }
+        constexpr void Clear() const { szData[0] = 0; }
 
         // Returns a pointer to a null-terminated character array
         const char* c_str() const noexcept { return &szData[0]; }

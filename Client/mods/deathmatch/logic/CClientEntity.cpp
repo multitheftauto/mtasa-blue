@@ -302,6 +302,19 @@ CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData
     return NULL;
 }
 
+CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
+{
+    assert(table);
+
+    for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
+    {
+        table->PushString(it->first);                        // key
+        table->PushArgument(it->second.Variable);            // value
+    }
+
+    return table;
+}
+
 bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, bool bInheritData)
 {
     // Grab the custom data variable
