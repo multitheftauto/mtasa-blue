@@ -1374,7 +1374,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             szMessage[iNumberOfBytesUsed] = 0;
             // actual limits enforced on the remote client, this is the maximum a string can be to be printed.
             if (MbUTF8ToUTF16(szMessage).size() <=
-                MAX_OUTPUTCHATBOX_LENGTH + 6)            // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
+                MAX_CHATECHO_LENGTH + 6)            // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
             {
                 // Strip it for bad characters
                 StripControlCodes(szMessage, ' ');
@@ -3619,20 +3619,16 @@ retry:
                     if (icon <= RADAR_MARKER_LIMIT)
                         pBlip->SetSprite(icon);
 
-                    // Read out size and color if there's no icon
-                    if (icon == 0)
-                    {
-                        // Read out the size
-                        SIntegerSync<unsigned char, 5> size;
-                        bitStream.Read(&size);
+                    // Read out the size
+                    SIntegerSync<unsigned char, 5> size;
+                    bitStream.Read(&size);
 
-                        // Read out the color
-                        SColorSync color;
-                        bitStream.Read(&color);
+                    // Read out the color
+                    SColorSync color;
+                    bitStream.Read(&color);
 
-                        pBlip->SetScale(size);
-                        pBlip->SetColor(color);
-                    }
+                    pBlip->SetScale(size);
+                    pBlip->SetColor(color);
 
                     break;
                 }

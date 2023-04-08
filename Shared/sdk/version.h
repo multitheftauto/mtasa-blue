@@ -13,7 +13,8 @@
 // To compile a client for development and debugging purposes (e.g to avoid AC kicks for attaching a debugger like WinDbg):
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
 //      2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/netc.dll (preferably run utils/buildactions/install_data.lua)
-// Never use 'custom' build type for building a fork: you would change the final "15% AC protection" described at https://wiki.multitheftauto.com/wiki/Forks to only 1%, as netc switches to disable everything in favour of MTA contributors' ability to do things like attach debuggers
+// Never use 'custom' build type for building a fork: you would change the final "15% AC protection" described at https://wiki.multitheftauto.com/wiki/Forks to
+// only 1%, as netc switches to disable everything in favour of MTA contributors' ability to do things like attach debuggers
 //
 // To compile a public server (players that use official MTA client can connect, as long you don't introduce incompatible patches):
 //      1. set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
@@ -25,8 +26,8 @@
 
 // New version info
 #define MTASA_VERSION_MAJOR         1
-#define MTASA_VERSION_MINOR         5
-#define MTASA_VERSION_MAINTENANCE   9
+#define MTASA_VERSION_MINOR         6
+#define MTASA_VERSION_MAINTENANCE   0
 #define MTASA_VERSION_TYPE          VERSION_TYPE_UNSTABLE
 #define MTASA_VERSION_BUILD         0
 
@@ -90,7 +91,7 @@
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)
-#define _CLIENT_NET_MODULE_VERSION      0x0AB       // (0x000 - 0xfff) Lvl9 wizards only
+#define _CLIENT_NET_MODULE_VERSION      0x0AD       // (0x000 - 0xfff) Lvl9 wizards only
 #define _SERVER_NET_MODULE_VERSION      0x0AB       // (0x000 - 0xfff) Lvl9 wizards only
 #define _NETCODE_VERSION                0x1DA       // (0x000 - 0xfff) Increment when net messages change (pre-release)
 

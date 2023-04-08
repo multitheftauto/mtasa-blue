@@ -59,8 +59,8 @@ Var UninstallExePath
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "5"
-    !define MAINT_VER "9"
+    !define MINOR_VER "6"
+    !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -654,6 +654,11 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         ${EndIf}
         #############################################################
 
+        #############################################################
+        # Delete existing winmm.dll to prevent GTA process start conflicts
+        Delete "$INSTDIR\MTA\winmm.dll"
+        #############################################################
+
         SetOutPath "$INSTDIR\MTA"
         SetOverwrite on
 
@@ -668,6 +673,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\multiplayer_sa.dll"
         File "${FILES_ROOT}\mta\netc.dll"
         File "${FILES_ROOT}\mta\loader.dll"
+        File "${FILES_ROOT}\mta\mtasa.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         File "${FILES_ROOT}\mta\cefweb.dll"
         File "${FILES_ROOT}\mta\libwow64.dll"
@@ -728,10 +734,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\mta\d3dx9_42.dll"
             File "${FILES_ROOT}\mta\D3DCompiler_42.dll"
             File "${FILES_ROOT}\mta\sa.dat"
-            File "${FILES_ROOT}\mta\vea.dll"
-            File "${FILES_ROOT}\mta\vog.dll"
-            File "${FILES_ROOT}\mta\vvo.dll"
-            File "${FILES_ROOT}\mta\vvof.dll"
             File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
             File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
 
@@ -762,6 +764,24 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\skins\Lighter black\CGUI.png"
             File "${FILES_ROOT}\skins\Lighter black\CGUI.xml"
 
+            SetOutPath "$INSTDIR\skins\Default 2023"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.png"
+            File "${FILES_ROOT}\skins\Default 2023\CGUI.xml"
+
+            SetOutPath "$INSTDIR\skins\GWEN Blue"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.png"
+            File "${FILES_ROOT}\skins\GWEN Blue\CGUI.xml"
+
+            SetOutPath "$INSTDIR\skins\GWEN Orange"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.is.xml"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.lnf.xml"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.png"
+            File "${FILES_ROOT}\skins\GWEN Orange\CGUI.xml"
+
             SetOutPath "$INSTDIR\MTA\cgui"
             File "${FILES_ROOT}\mta\cgui\Falagard.xsd"
             File "${FILES_ROOT}\mta\cgui\Font.xsd"
@@ -791,7 +811,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 
         SetOutPath "$INSTDIR\MTA\locale\"
         File /r "${FILES_ROOT}\mta\locale\*.png"
-        File /r "${FILES_ROOT}\mta\locale\*.po"
+        File /r "${FILES_ROOT}\mta\locale\*.pot"
 
         SetOutPath "$INSTDIR"
         File "${FILES_ROOT}\Multi Theft Auto.exe"
@@ -1124,14 +1144,16 @@ Section Uninstall
     Delete "$INSTDIR\MTA\*.bin"
 
     RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
-    ; TODO if $APPDATA\MTA San Andreas All\Common is the only one left, delete it
+    ; Delete "$APPDATA\MTA San Andreas All" if "Common" is the only directory in it.
+    ${RmDirWithSingleChildDir} "$APPDATA\MTA San Andreas All" "Common"
 
     DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
     DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
     DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
     DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
     DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
-    ; TODO if HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common is the only one left, delete it
+    ; Delete "SOFTWARE\Multi Theft Auto: San Andreas All" if "Common" is the only one left.
+    ${RemoveRegistryGroupWithSingleKey} HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "Common"
 
     ${GameExplorer_RemoveGame} ${GUID}
 

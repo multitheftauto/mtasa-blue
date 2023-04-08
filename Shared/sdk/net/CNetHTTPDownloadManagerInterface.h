@@ -20,10 +20,10 @@ struct SHttpRequestOptions
 {
     SHttpRequestOptions() {}
     SHttpRequestOptions(const struct SHttpRequestOptionsTx& in);
-    bool    bIsLegacy = false;                 // true = sets CURLOPT_FAILONERROR
-    bool    bIsLocal = false;                  // false = download aborts if < 10 bytes/s for uiConnectTimeoutMs
-    bool    bCheckContents = false;            // true = check for naughty things before saving file
-    bool    bResumeFile = false;               // true = attempt to resume previously interrupted download
+    bool    bIsLegacy = false;                        // true = sets CURLOPT_FAILONERROR
+    bool    bIsLocal = false;                         // false = download aborts if < 10 bytes/s for uiConnectTimeoutMs
+    bool    bCheckContents = false;                   // true = check for naughty things before saving file
+    bool    bResumeFile = false;                      // true = attempt to resume previously interrupted download
     SString strPostData;
     bool    bPostBinary = false;                      // false = truncate strPostData to first null character and send as text/plain
                                                       // (true = send as application/octet-stream)
@@ -57,7 +57,7 @@ struct SStringContent
         length = other.length();
         pData = *other;
     }
-                operator SString() const { return SStringX(pData, length); }
+    operator SString() const { return SStringX(pData, length); }
     size_t      length = 0;
     const char* pData = nullptr;
 };

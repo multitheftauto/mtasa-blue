@@ -27,7 +27,7 @@
 
 #define VTBL_CProjectile 0x867030
 
-//#pragma pack(push,1)
+// #pragma pack(push,1)
 class CProjectileInfoSAInterface
 {
 public:
@@ -40,7 +40,7 @@ public:
     CVector             OldCoors;
     DWORD               dwUnk;
 };
-//#pragma pack(pop)
+// #pragma pack(pop)
 
 class CProjectileInfoSA : public CProjectileInfo
 {

@@ -18,7 +18,7 @@
 #include "CSettingsSA.h"
 
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
@@ -383,9 +383,9 @@ __declspec(noinline) void _cdecl MaybeAlterFxQualityValue(DWORD dwAddrCalledFrom
     else
         // Handle all calls from CPed::PreRenderAfterTest
         if (dwAddrCalledFrom > 0x5E65A0 && dwAddrCalledFrom < 0x5E7680)
-    {
-        dwFxQualityValue = pGame->GetSettings()->IsDynamicPedShadowsEnabled() ? 2 : 0;
-    }
+        {
+            dwFxQualityValue = pGame->GetSettings()->IsDynamicPedShadowsEnabled() ? 2 : 0;
+        }
 }
 
 // Hooked from 0x49EA50
@@ -587,7 +587,7 @@ void CSettingsSA::SetFieldOfViewVehicleMax(float fAngle, bool bFromScript)
 // Vehicles LOD draw distance
 //
 ////////////////////////////////////////////////
-bool  ms_bMaxVehicleLODDistanceFromScript = false;
+bool ms_bMaxVehicleLODDistanceFromScript = false;
 
 void CSettingsSA::SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript)
 {
@@ -629,7 +629,7 @@ void CSettingsSA::GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTr
 // Peds LOD draw distance
 //
 ////////////////////////////////////////////////
-bool  ms_bMaxPedsLODDistanceFromScript = false;
+bool ms_bMaxPedsLODDistanceFromScript = false;
 
 void CSettingsSA::SetPedsLODDistance(float fPedsLODDistance, bool bFromScript)
 {
