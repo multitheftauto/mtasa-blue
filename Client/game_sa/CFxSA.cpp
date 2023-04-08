@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/Common.h"
+#include "game/RenderWare.h"
+#include "CVector2D.h"
 #include "CFxSA.h"
 #include "CEntitySA.h"
 
