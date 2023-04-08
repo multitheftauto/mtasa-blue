@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CProjectileSyncPacket.h"
+#include "CPlayer.h"
+#include <net/SyncStructures.h>
 
 CProjectileSyncPacket::CProjectileSyncPacket()
 {

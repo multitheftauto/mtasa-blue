@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerManager.h"
+#include "packets/CPlayerDisconnectedPacket.h"
+#include "CGame.h"
 #include "net/SimHeaders.h"
 
 CPlayerManager::CPlayerManager()
@@ -142,7 +145,7 @@ void CPlayerManager::DeleteAll()
         delete *m_Players.begin();
 }
 
-void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip)
+size_t CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
@@ -159,9 +162,11 @@ void CPlayerManager::BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip)
     }
 
     CPlayerManager::Broadcast(Packet, sendList);
+
+    return sendList.size();
 }
 
-void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip)
+size_t CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
@@ -179,9 +184,11 @@ void CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort 
     }
 
     CPlayerManager::Broadcast(Packet, sendList);
+
+    return sendList.size();
 }
 
-void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
+size_t CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
@@ -198,6 +205,8 @@ void CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pE
     }
 
     CPlayerManager::Broadcast(Packet, sendList);
+
+    return sendList.size();
 }
 
 // Send one packet to a list of players, grouped by bitstream version
@@ -262,7 +271,7 @@ static void DoBroadcast(const CPacket& Packet, const std::multimap<ushort, CPlay
             {
                 CPlayer* pPlayer = s_it->second;
                 dassert(usBitStreamVersion == pPlayer->GetBitStreamVersion());
-                g_pGame->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, packetPriority, Reliability, Packet.GetPacketOrdering());
+                g_pGame->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, false, packetPriority, Reliability, Packet.GetPacketOrdering());
             }
 
             g_pGame->SendPacketBatchEnd();
@@ -320,12 +329,20 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
     DoBroadcast(Packet, groupMap);
 }
 
-bool CPlayerManager::IsValidPlayerModel(unsigned short usPlayerModel)
+bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 {
-    return (usPlayerModel == 0 || usPlayerModel == 1 || usPlayerModel == 2 || usPlayerModel == 7 ||
-            (usPlayerModel >= 9 && usPlayerModel != 208 && usPlayerModel != 149 && usPlayerModel != 119 && usPlayerModel != 86 && usPlayerModel != 74 &&
-             usPlayerModel != 65 && usPlayerModel != 42 && usPlayerModel <= 272) ||
-            (usPlayerModel >= 274 && usPlayerModel <= 288) || (usPlayerModel >= 290 && usPlayerModel <= 312));
+    if (model > 312)
+        return false;            // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
+
+    switch (model)
+    {
+        case 74: //Missing skin
+        case 149:
+        case 208:
+            return false;
+        default:
+            return true;
+    }
 }
 
 void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)

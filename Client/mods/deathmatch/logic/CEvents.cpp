@@ -28,16 +28,28 @@ bool CEvents::AddEvent(const char* szName, const char* szArguments, CLuaMain* pL
     assert(szName);
     assert(szArguments);
 
-    // If it already exists, return
-    if (Get(szName))
-        return false;
+    // Get the event if it already exists
+    SEvent* pEvent = Get(szName);
 
-    // Create and add the event
-    SEvent* pEvent = new SEvent;
-    pEvent->strName = szName;
-    pEvent->strArguments = szArguments;
-    pEvent->pLuaMain = pLuaMain;
-    pEvent->bAllowRemoteTrigger = bAllowRemoteTrigger;
+    if (pEvent)
+    {
+        // If bAllowRemoteTrigger has been altered, return
+        if (pEvent->bAllowRemoteTrigger != bAllowRemoteTrigger)
+            return false;
+
+        // Add pLuaMain to the vector, in case it's not already there
+        if (!ListContains(pEvent->pLuaMainVector, pLuaMain))
+            pEvent->pLuaMainVector.push_back(pLuaMain);
+    }
+    else
+    {
+        // Create and add the event
+        pEvent = new SEvent;
+        pEvent->strName = szName;
+        pEvent->strArguments = szArguments;
+        pEvent->pLuaMainVector.push_back(pLuaMain);
+        pEvent->bAllowRemoteTrigger = bAllowRemoteTrigger;
+    }
 
     m_EventHashMap[szName] = pEvent;
 
@@ -80,17 +92,19 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
     while (iter != m_EventHashMap.end())
     {
         SEvent* pEvent = (*iter).second;
-        // If they match, delete it null it and set the bool
-        if (pEvent != NULL && pEvent->pLuaMain == pMain)
+        ListRemoveFirst(pEvent->pLuaMainVector, pMain);
+
+        // If no pMain is left, delete it null it and set the bool
+        if (pEvent->pLuaMainVector.empty())
         {
             // Delete the object
             delete pEvent;
 
             // Remove from list
-            m_EventHashMap.erase(iter++);
+            m_EventHashMap.erase(iter);
         }
-        else
-            ++iter;
+
+        ++iter;
     }
 }
 

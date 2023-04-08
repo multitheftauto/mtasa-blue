@@ -59,7 +59,8 @@ private:
     static ChosenFunction MakeChoice(std::variant<T...> var)
     {
         return std::visit(
-            [](auto&& f) {
+            [](auto&& f)
+            {
                 using ft = decltype(f);
                 if constexpr (!std::is_convertible_v<ft, nth_element_t<N, Args...>>)
                     return ChosenFunction::FUNCB;            // if it cannot match A, B it is
@@ -71,8 +72,7 @@ private:
     }
 
 public:
-    typename common_variant<Ret, Ret2>::type
-    static Call(typename common_variant<Args, Args2>::type... args)
+    typename common_variant<Ret, Ret2>::type static Call(typename common_variant<Args, Args2>::type... args)
     {
         ChosenFunction choice = MakeAllChoice<0>(args...);
         if (choice == ChosenFunction::FUNCA)

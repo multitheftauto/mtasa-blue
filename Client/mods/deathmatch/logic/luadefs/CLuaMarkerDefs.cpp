@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaMarkerDefs::LoadFunctions()
 {
@@ -28,6 +29,9 @@ void CLuaMarkerDefs::LoadFunctions()
         {"setMarkerColor", SetMarkerColor},
         {"setMarkerTarget", SetMarkerTarget},
         {"setMarkerIcon", SetMarkerIcon},
+
+        {"setCoronaReflectionEnabled", ArgumentParser<SetCoronaReflectionEnabled>},
+        {"isCoronaReflectionEnabled", ArgumentParser<IsCoronaReflectionEnabled>},
     };
 
     // Add functions
@@ -47,12 +51,14 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSize", "getMarkerSize");
     lua_classfunction(luaVM, "getTarget", OOP_GetMarkerTarget);
     lua_classfunction(luaVM, "getColor", "getMarkerColor");
+    lua_classfunction(luaVM, "isCoronaReflectionEnabled", "isCoronaReflectionEnabled");
 
     lua_classfunction(luaVM, "setType", "setMarkerType");
     lua_classfunction(luaVM, "setIcon", "setMarkerIcon");
     lua_classfunction(luaVM, "setSize", "setMarkerSize");
     lua_classfunction(luaVM, "setTarget", "setMarkerTarget");
     lua_classfunction(luaVM, "setColor", "setMarkerColor");
+    lua_classfunction(luaVM, "setCoronaReflectionEnabled", "setCoronaReflectionEnabled");
 
     lua_classvariable(luaVM, "markerType", "setMarkerType", "getMarkerType");
     lua_classvariable(luaVM, "icon", "setMarkerIcon", "getMarkerIcon");
@@ -391,4 +397,23 @@ int CLuaMarkerDefs::SetMarkerIcon(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaMarkerDefs::SetCoronaReflectionEnabled(CClientMarker* pMarker, bool bEnabled)
+{
+    CClientCorona* pCorona = pMarker->GetCorona();
+    if (!pCorona)
+        return false;
+
+    pCorona->SetReflectionEnabled(bEnabled);
+    return true;
+}
+
+bool CLuaMarkerDefs::IsCoronaReflectionEnabled(CClientMarker* pMarker)
+{
+    CClientCorona* pCorona = pMarker->GetCorona();
+    if (!pCorona)
+        return false;
+
+    return pCorona->IsReflectionEnabled();
 }

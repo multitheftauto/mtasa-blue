@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
+#include "CRegistry.h"
+#include "CGame.h"
+#include "CResource.h"
+#include "CResourceManager.h"
+
+struct lua_State;
 
 namespace
 {
@@ -223,7 +230,7 @@ void CPerfStatSqliteTimingImpl::GetStats(CPerfStatResult* pResult, const std::ma
         if (m_bDisableBatching)
             iter->first->SuspendBatching(uiTicks);            // Suspend batching
         else
-            iter->first->SuspendBatching(0);            // Unsuspend batching
+            iter->first->SuspendBatching(0);                  // Unsuspend batching
     }
 }
 

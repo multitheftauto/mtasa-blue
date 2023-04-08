@@ -13,6 +13,8 @@
 #include <list>
 #include "CClientEntity.h"
 
+class CColModel;
+
 class CClientColModel final : public CClientEntity
 {
     DECLARE_CLASS(CClientColModel, CClientEntity)
@@ -22,7 +24,6 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTCOL; }
 
-    bool LoadCol(const SString& strFile, bool bIsRawData);
     bool Load(bool isRaw, SString input);
 
     bool IsLoaded() { return m_pColModel != NULL; };

@@ -15,7 +15,7 @@
 #define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
 #endif /* (!defined(RWFORCEENUMSIZEINT)) */
 
-enum VideoModeFlag            // RwVideoModeFlag
+enum VideoModeFlag                   // RwVideoModeFlag
 {
     rwVIDEOMODEEXCLUSIVE = 0x0001,   /**<Exclusive (i.e. full-screen) */
     rwVIDEOMODEINTERLACE = 0x0002,   /**<Interlaced                   */
@@ -62,14 +62,14 @@ enum VideoModeFlag            // RwVideoModeFlag
 
 struct VideoMode            // RwVideoMode
 {
-    int           width;   /**< Width  */
-    int           height;  /**< Height */
-    int           depth;   /**< Depth  */
-    VideoModeFlag flags;   /**< Flags  */
-    int           refRate; /**< Approximate refresh rate */
-    int           format;  /**< Raster format
-                            * \see RwRasterFormat
-                            */
+    int           width;    /**< Width  */
+    int           height;   /**< Height */
+    int           depth;    /**< Depth  */
+    VideoModeFlag flags;    /**< Flags  */
+    int           refRate;  /**< Approximate refresh rate */
+    int           format;   /**< Raster format
+                             * \see RwRasterFormat
+                             */
 };
 
 enum eAspectRatio
@@ -136,6 +136,9 @@ public:
     virtual void SetVolumetricShadowsEnabled(bool bEnable) = 0;
     virtual void SetVolumetricShadowsSuspended(bool bSuspended) = 0;
 
+    virtual bool IsDynamicPedShadowsEnabled() = 0;
+    virtual void SetDynamicPedShadowsEnabled(bool bEnable) = 0;
+
     virtual float        GetAspectRatioValue() = 0;
     virtual eAspectRatio GetAspectRatio() = 0;
     virtual void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true) = 0;
@@ -157,14 +160,18 @@ public:
     virtual float GetFieldOfViewVehicleMax() = 0;
 
     virtual void SetVehiclesLODDistance(float fVehiclesLODDistance, float fTrainsPlanesLODDistance, bool bFromScript) = 0;
-    virtual void ResetVehiclesLODDistance(bool bFromScript) = 0;
-    virtual void ResetVehiclesLODDistanceFromScript() = 0;
+    virtual void ResetVehiclesLODDistance(bool bForceDefault = false) = 0;
     virtual void GetVehiclesLODDistance(float& fVehiclesLODDistance, float& fTrainsPlanesLODDistance) = 0;
 
     virtual void  SetPedsLODDistance(float fPedsLODDistance, bool bFromScript) = 0;
-    virtual void  ResetPedsLODDistance(bool bFromScript) = 0;
-    virtual void  ResetPedsLODDistanceFromScript() = 0;
+    virtual void  ResetPedsLODDistance(bool bForceDefault = false) = 0;
     virtual float GetPedsLODDistance() = 0;
+
+    virtual void ResetBlurEnabled() = 0;
+    virtual void SetBlurControlledByScript(bool bByScript) = 0;
+
+    virtual void ResetCoronaReflectionsEnabled() = 0;
+    virtual void SetCoronaReflectionsControlledByScript(bool bViaScript) = 0;
 
     virtual void Save() = 0;
 };

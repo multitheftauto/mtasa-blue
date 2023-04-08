@@ -3,28 +3,17 @@ require 'utils'
 premake.modules.install_cef = {}
 
 -- Config variables
-local CEF_PATH = "vendor/cef3/"
+local CEF_PATH = "vendor/cef3/cef/"
+local CEF_TEMP_PATH = "vendor/cef3/"
 local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "87.1.13+g481a82a+chromium-87.0.4280.141"
-local CEF_HASH = "c7eb5dae61c1467e2001f30926ff2d54fc26e1f6bea4106fbe0c2c0028aae36d"
+local CEF_VERSION = "109.1.18+gf1c41e4+chromium-109.0.5414.120"
+local CEF_HASH = "ac78ea1e9f9d386130de16ca951acef1ba5a37ad9aef9d66f3d5f3529672c21c"
 
 function make_cef_download_url()
 	return CEF_URL_PREFIX..http.escapeUrlParam(CEF_VERSION)..CEF_URL_SUFFIX
-end
-
-function errormsg(title, message)
-	term.pushColor(term.red)
-	io.write(title)
-	if message then
-		term.setTextColor(term.purple)
-		print(" " .. message)
-	else
-		print()
-	end
-	term.popColor()
 end
 
 function update_install_cef(version, hash)
@@ -69,15 +58,17 @@ newaction {
 			CEF_HASH = ""
 		elseif upgrade then
 			print("Checking opensource.spotify.com for an update...")
-			resource, result_str, result_code = http.get("https://cef-builds.spotifycdn.com/index.json")
+			local resource, result_str, result_code = http.get("https://cef-builds.spotifycdn.com/index.json")
 			if result_str ~= "OK" or result_code ~= 200 then
 				errormsg(("Could not get page with status code %s: "):format(response_code), result_str)
+				os.exit(1)
 				return
 			end
 
 			local meta, err = json.decode(resource)
 			if err then
 				errormsg("Could not parse json meta data:", err)
+				os.exit(1)
 				return
 			end
 
@@ -106,19 +97,24 @@ newaction {
 			return
 		end
 
-		-- Check file hash
-		local archive_path = CEF_PATH.."temp.tar.bz2"
-		if os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_HASH then
-			print("CEF consistency checks succeeded")
-			return
-		end
+		local has_cef_dir = os.isdir(CEF_PATH)
 
-		-- Download CEF
-		print("Downloading CEF " .. CEF_VERSION ..  "...")
-		local result_str, response_code = http.download(make_cef_download_url(), archive_path)
-		if result_str ~= "OK" or response_code ~= 200 then
-			errormsg(("Could not download CEF with status code %s: "):format(response_code), result_str)
-			return
+		-- Check file hash
+		local archive_path = CEF_TEMP_PATH.."temp.tar.bz2"
+		local hash_passed = os.isfile(archive_path) and os.sha256_file(archive_path) == CEF_HASH
+		if hash_passed then
+			print("CEF consistency checks succeeded")
+
+			if has_cef_dir then
+				return
+			end
+		else
+			-- Download CEF
+			print("Downloading CEF " .. CEF_VERSION ..  "...")
+			if not http.download_print_errors(make_cef_download_url(), archive_path) then
+				os.exit(1)
+				return
+			end
 		end
 
 		local downloaded_hash = os.sha256_file(archive_path)
@@ -147,23 +143,42 @@ newaction {
 		end
 
 		-- Delete old CEF files
-		-- TODO: It might be better to download the files into a new folder and delete this folder at once
-		os.rmdir(CEF_PATH.."cmake")
-		os.rmdir(CEF_PATH.."include")
-		os.rmdir(CEF_PATH.."libcef_dll")
-		os.rmdir(CEF_PATH.."Release")
-		os.rmdir(CEF_PATH.."Resources")
-		os.remove_wildcard(CEF_PATH.."*.txt")
+		if has_cef_dir then
+			if not os.rmdir(CEF_PATH) then
+				errormsg("ERROR: Could not delete cef folder")
+				os.exit(1)
+				return
+			end
+		end
+
+		if not os.mkdir(CEF_PATH) then
+			errormsg("ERROR: Could not create cef folder (2)")
+			os.exit(1)
+			return
+		end
 
 		-- Extract first bz2 and then tar
-		os.extract_archive(archive_path, CEF_PATH, true) -- Extract .tar.bz2 to .tar
-		os.extract_archive(CEF_PATH.."temp.tar", CEF_PATH, true) -- Extract .tar
+		if not os.extract_archive(archive_path, CEF_PATH, true) then -- Extract .tar.bz2 to .tar
+			errormsg("ERROR: Could not extract .tar.bz2")
+			os.exit(1)
+			return
+		end
+
+		if not os.extract_archive(CEF_PATH.."temp.tar", CEF_PATH, true) then -- Extract .tar
+			errormsg("ERROR: Could not extract .tar")
+			os.exit(1)
+			return
+		end
 
 		-- Move all files from cef_binary*/* to ./
 		os.expanddir_wildcard(CEF_PATH.."cef_binary*", CEF_PATH)
 
 		-- Delete .tar archive, but keep .tar.bz2 for checksumming
-		os.remove(CEF_PATH.."temp.tar")
+		if not os.remove(CEF_PATH.."temp.tar") then
+			errormsg("ERROR: Could not remove temp.tar")
+			os.exit(1)
+			return
+		end
 	end
 }
 

@@ -27,7 +27,7 @@ CONDITIONAL COMPILATION :
 #include "CCrashHandlerAPI.h"
 #ifdef WIN32
 
-#ifndef _WIN64
+#ifdef _M_IX86
     #include <SharedUtil.Detours.h>
 #endif
 
@@ -102,11 +102,12 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
         {
             g_pfnOrigFilt = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
 
-#ifndef _WIN64
+#ifdef _M_IX86
             // Stop the OS from turning off our handler
             // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
             LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
+            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER
+            {
                 // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
                 // our handler will not get removed.
                 return 0;
@@ -120,7 +121,6 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
     }
     return (TRUE);
 }
-
 
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
 {

@@ -12,6 +12,12 @@
 #pragma once
 
 #include <game/CPedDamageResponseCalculator.h>
+#include <game/CPed.h>
+
+class CEntity;
+class CEntitySAInterface;
+class CPed;
+class CPedDamageResponse;
 
 #define FUNC_CPedDamageResponseCalculator_Constructor               0x4ad3f0
 #define FUNC_CPedDamageResponseCalculator_Destructor                0x4ad420

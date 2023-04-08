@@ -11,13 +11,46 @@
 
 #pragma once
 
-#include <CVector.h>
-#include "CTaskManager.h"
+#include "CPed.h"
 #include "CWeaponInfo.h"
+#include "TaskSecondary.h"
+
+class CEntity;
+class CTaskComplexDie;
+class CTaskComplexEnterBoatAsDriver;
+class CTaskComplexEnterCarAsDriver;
+class CTaskComplexEnterCarAsPassenger;
+class CTaskComplexFacial;
+class CTaskComplexLeaveCar;
+class CTaskComplexSunbathe;
+class CTaskComplexUseMobilePhone;
+class CTaskComplexWanderStandard;
+class CTaskSimpleAnim;
+class CTaskSimpleBeHit;
+class CTaskSimpleCarSetPedInAsDriver;
+class CTaskSimpleCarSetPedInAsPassenger;
+class CTaskSimpleCarSetPedOut;
+class CTaskSimpleChoking;
+class CTaskSimpleClimb;
+class CTaskSimpleDead;
+class CTaskSimpleDuck;
+class CTaskSimpleFight;
+class CTaskSimpleGangDriveBy;
+class CTaskSimpleIKChain;
+class CTaskSimpleIKLookAt;
+class CTaskSimpleIKManager;
+class CTaskSimpleJetPack;
+class CTaskSimplePlayerOnFoot;
+class CTaskSimpleRunAnim;
+class CTaskSimpleRunNamedAnim;
+class CTaskSimpleStealthKill;
+class CTaskSimpleTriggerLookAt;
+class CTaskSimpleUseGun;
+class CVector;
+class CVehicle;
 
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
-class CEntity;
 
 enum eClimbHeights
 {

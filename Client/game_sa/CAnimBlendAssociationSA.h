@@ -13,9 +13,10 @@
 
 #pragma once
 
+#include <CVector.h>
+#include <game/RenderWare.h>
 #include <game/CAnimBlendAssociation.h>
 #include "CAnimBlendNodeSA.h"
-#include "Common.h"
 
 class CAnimBlendAssocGroupSA;
 class CAnimBlendHierarchySAInterface;
@@ -39,7 +40,7 @@ public:
             unsigned char m_bUpdateSkinnedWith3dVelocityExtraction : 1;
             unsigned char m_bCheckBlendNodeClumpKeyFrames : 1;            // key frames of CAninBlendNode bones will be checked
             unsigned char m_bIsCompressed : 1;
-            unsigned char m_bUpdatingFrame : 1;            // doesn't seem to be used
+            unsigned char m_bUpdatingFrame : 1;                           // doesn't seem to be used
         };
         unsigned char m_nFlags;
     };
@@ -93,7 +94,8 @@ public:
     float                           fSpeed;                         // 36
     float                           fTimeStep;                      // 40
     short                           sAnimID;                        // 44
-    union {
+    union
+    {
         struct
         {
             unsigned short m_bPlaying : 1;                    // Anim will stop playing if flag is not set
@@ -112,8 +114,8 @@ public:
             unsigned short m_bLockLastX : 1;
             unsigned short m_bLockLastY : 1;            // only applies if m_bLockLastX is set
 
-            unsigned short m_bf9 : 1;             // doesn't seem to be used
-            unsigned short m_bf10 : 1;            // doesn't seem to be used
+            unsigned short m_bf9 : 1;                   // doesn't seem to be used
+            unsigned short m_bf10 : 1;                  // doesn't seem to be used
 
             // If set to TRUE, then result:
             // Before = https://i.imgur.com/c8T7xNK.png | AFTER = https://i.imgur.com/4gqlA4n.png
@@ -155,7 +157,7 @@ public:
     void                                 FreeAnimBlendNodeArray();
     CAnimBlendAssociationSAInterface*    GetInterface() { return m_pInterface; }
     eAnimGroup                           GetAnimGroup() { return static_cast<eAnimGroup>(m_pInterface->sAnimGroup); }
-    eAnimID                              GetAnimID() { return static_cast <eAnimID>(m_pInterface->sAnimID); }
+    eAnimID                              GetAnimID() { return static_cast<eAnimID>(m_pInterface->sAnimID); }
     std::unique_ptr<CAnimBlendHierarchy> GetAnimHierarchy();
 
     float GetBlendAmount() { return m_pInterface->fBlendAmount; }

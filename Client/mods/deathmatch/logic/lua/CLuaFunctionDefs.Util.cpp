@@ -222,16 +222,16 @@ int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
     {
         switch (readingLayoutValue)
         {
-            case 0: // Left to right (English)
+            case 0:            // Left to right (English)
                 readingLayout = "ltr";
                 break;
-            case 1: // Right to left (Arabic, Hebrew)
+            case 1:            // Right to left (Arabic, Hebrew)
                 readingLayout = "rtl";
                 break;
-            case 2: // Vertical top to bottom with columns to the left and also left to right (Japanese)
+            case 2:            // Vertical top to bottom with columns to the left and also left to right (Japanese)
                 readingLayout = "ttb-rtl-ltr";
                 break;
-            case 3: // Vertical top to bottom with columns proceeding to the right (Mongolian)
+            case 3:            // Vertical top to bottom with columns proceeding to the right (Mongolian)
                 readingLayout = "ttb-ltr";
                 break;
             default:
@@ -367,7 +367,7 @@ int CLuaFunctionDefs::DownloadFile(lua_State* luaVM)
             CResource* pThisResource = pLuaMain->GetResource();
             CResource* pOtherResource = pThisResource;
 
-            SString    strMetaPath;
+            SString strMetaPath;
 
             // Resolve other resource from name
             if (CResourceManager::ParseResourcePathInput(strFileInput, pOtherResource, NULL, &strMetaPath))

@@ -14,8 +14,8 @@
 // Vertex type used by the primitives 3d batcher
 struct sPrimitive3D
 {
-    D3DPRIMITIVETYPE                 eType;
-    std::vector<PrimitiveVertice>*   pVecVertices;
+    D3DPRIMITIVETYPE               eType;
+    std::vector<PrimitiveVertice>* pVecVertices;
 };
 
 //
@@ -32,7 +32,7 @@ public:
     bool HasItems() const { return !m_primitiveList.empty(); }
 
 protected:
-    bool m_bPreGUI;
+    bool                      m_bPreGUI;
     IDirect3DDevice9*         m_pDevice;
     std::vector<sPrimitive3D> m_primitiveList;
 };

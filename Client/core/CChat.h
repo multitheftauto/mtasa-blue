@@ -19,7 +19,6 @@ class CChatLineSection;
 #define CHAT_WIDTH 320                                   // Chatbox default width
 #define CHAT_TEXT_COLOR CColor(235, 221, 178)            // Chatbox default text color
 #define CHAT_MAX_LINES 100                               // Chatbox maximum chat lines
-#define CHAT_MAX_CHAT_LENGTH 96                          // Chatbox maximum chat message length
 #define CHAT_BUFFER 1024                                 // Chatbox buffer size
 #define CHAT_INPUT_HISTORY_LENGTH 128                    // Chatbox input history length
 
@@ -166,8 +165,9 @@ public:
     void         SetDxFont(LPD3DXFONT pDXFont);
 
     bool IsVisible() { return m_bVisible; }
-    void SetVisible(bool bVisible);
-    bool IsInputVisible() { return m_bVisible && m_bInputVisible; }
+    void SetVisible(bool bVisible, bool bInputBlocked);
+    bool IsInputBlocked() const { return m_bInputBlocked; }
+    bool IsInputVisible() const { return !m_bInputBlocked && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
 
     bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
@@ -201,6 +201,11 @@ public:
 
     void SetChatFont(eChatFont Font);
     void OnModLoad();
+
+    void          SetCharacterLimit(int charLimit);
+    int           GetCharacterLimit() const { return m_iCharacterLimit; }
+    constexpr int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
+    constexpr int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
 
 private:
     void LoadCVars();
@@ -257,6 +262,7 @@ protected:
     int            m_iSelectedInputHistoryEntry;
 
     bool  m_bVisible;
+    bool  m_bInputBlocked;
     bool  m_bInputVisible;
     int   m_iScrollingBack;                    // Non zero if currently scrolling back
     float m_fCssStyleOverrideAlpha;            // For fading out 'CssStyle' effect. (When entering text or scrolling back)
@@ -290,4 +296,9 @@ protected:
     CTickCount m_lastRenderTargetCreationFail;
 
     bool m_bNickCompletion;
+
+    int                         m_iCharacterLimit;
+    static inline constexpr int m_iDefaultCharacterLimit = 96;
+    static inline constexpr int m_iMaxCharacterLimit = 255;
+    static inline constexpr int m_iMaxInputLines = 5;
 };

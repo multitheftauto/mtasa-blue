@@ -7,10 +7,15 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-typedef uint                       SSendHandle;
-typedef CAutoRefedPointer<CBuffer> CBufferRef;
+#ifndef MTA_CLIENT
+    #include <net/ns_common.h>
+#endif
+
+typedef uint                     SSendHandle;
+typedef std::shared_ptr<CBuffer> CBufferRef;
 
 namespace LatentTransfer
 {
@@ -27,7 +32,7 @@ namespace LatentTransfer
         CATEGORY_PACKET,
     };
 
-    const static int MIN_SEND_RATE = 500;            // Bytes per second
+    const static int MIN_SEND_RATE = 500;               // Bytes per second
     const static int MIN_PACKET_SIZE = 500;
     const static int MAX_PACKET_SIZE = 1100;            // Set to 1100 as MTU is hard coded at 1200 (as of 2012-01-28)
 };                                                      // namespace LatentTransfer
@@ -51,15 +56,15 @@ struct SSendItem
     {
     }
 
-    uint       uiId;                       // Handle
-    CBufferRef bufferRef;                  // The data to transfer
-    uint       uiRate;                     // Desired bytes per second
-    ushort     usCategory;                 // Data category
-    uint       uiReadPosition;             // Current position in the buffer sent so far
-    bool       bSendStarted;               // true when the send actually starts
-    bool       bSendFinishing;             // true when the last part has been sent
-    void*      pLuaMain;                   // For cancelling by VM
-    ushort     usResourceNetId;            // Only allow packet if this resource is running (ignored if 0xFFFF)
+    uint       uiId;                            // Handle
+    CBufferRef bufferRef;                       // The data to transfer
+    uint       uiRate;                          // Desired bytes per second
+    ushort     usCategory;                      // Data category
+    uint       uiReadPosition;                  // Current position in the buffer sent so far
+    bool       bSendStarted;                    // true when the send actually starts
+    bool       bSendFinishing;                  // true when the last part has been sent
+    void*      pLuaMain;                        // For cancelling by VM
+    ushort     usResourceNetId;                 // Only allow packet if this resource is running (ignored if 0xFFFF)
 
     int iEstSendDurationMsRemaining;            // Used for status calculations
     int iEstSendDurationMsUsed;                 //             ''
@@ -78,8 +83,8 @@ struct SReceiveItem
     ushort  usCategory;                 // Data category
     ushort  usResourceNetId;            // Only allow packet if this resource is running (ignored if 0xFFFF)
 
-    uint uiWritePosition;            // Current position in the buffer received so far
-    bool bReceiveStarted;            // true when the receive actually starts
+    uint uiWritePosition;               // Current position in the buffer received so far
+    bool bReceiveStarted;               // true when the receive actually starts
 };
 
 //
@@ -90,7 +95,7 @@ struct SSendStatus
     int    iStartTimeMsOffset;            // Est. start time (Negative if already started)
     int    iEndTimeMsOffset;              // Est. end time
     int    iTotalSize;
-    double dPercentComplete;            // How much done
+    double dPercentComplete;              // How much done
 };
 
 ///////////////////////////////////////////////////////////////
@@ -193,7 +198,7 @@ protected:
     // Send variables
     std::vector<CLatentSendQueue*>           m_SendQueueList;
     std::map<NetPlayerID, CLatentSendQueue*> m_SendQueueMap;
-    CBufferRef*                              m_pBatchBufferRef;
+    CBufferRef                               m_pBatchBufferRef;
 
     // Receive variables
     std::map<NetPlayerID, CLatentReceiver*> m_ReceiverMap;

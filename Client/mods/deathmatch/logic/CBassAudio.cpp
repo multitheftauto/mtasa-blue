@@ -60,7 +60,10 @@ namespace
     }
 
     // Finish with pointer
-    void UnlockCallbackId() { ms_CallbackCS.Unlock(); }
+    void UnlockCallbackId()
+    {
+        ms_CallbackCS.Unlock();
+    }
 }            // namespace
 
 CBassAudio::CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D)
@@ -176,7 +179,7 @@ bool CBassAudio::BeginLoadingMedia()
             m_pSound = BASS_StreamCreateFile(false, FromUTF8(m_strPath), 0, 0, lCreateFlags | BASS_UNICODE);
             if (!m_pSound)
                 m_pSound = BASS_MusicLoad(false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_RAMP | BASS_MUSIC_PRESCAN | BASS_STREAM_DECODE | BASS_UNICODE,
-                                          0);            // Try again
+                                          0);                       // Try again
             if (!m_pSound && m_b3D)
                 m_pSound = ConvertFileToMono(m_strPath);            // Last try if 3D
         }
@@ -237,6 +240,110 @@ bool CBassAudio::BeginLoadingMedia()
     return true;
 }
 
+const char* CBassAudio::ErrorGetMessage()
+{
+    // As BASS has no function to retrieve the error messages we must do it manually
+    // So this should be kept updated
+    // Error messages copied directly from BASS
+    switch (ErrorGetCode())
+    {
+        case BASS_OK:
+            return "all is OK";
+        case BASS_ERROR_MEM:
+            return "memory error";
+        case BASS_ERROR_FILEOPEN:
+            return "can't open the file";
+        case BASS_ERROR_DRIVER:
+            return "can't find a free/valid driver";
+        case BASS_ERROR_BUFLOST:
+            return "the sample buffer was lost";
+        case BASS_ERROR_HANDLE:
+            return "invalid handle";
+        case BASS_ERROR_FORMAT:
+            return "unsupported sample format";
+        case BASS_ERROR_POSITION:
+            return "invalid position";
+        case BASS_ERROR_INIT:
+            return "BASS_Init has not been successfully called";
+        case BASS_ERROR_START:
+            return "BASS_Start has not been successfully called";
+        case BASS_ERROR_SSL:
+            return "SSL/HTTPS support isn't available";
+        case BASS_ERROR_REINIT:
+            return "device needs to be reinitialized";
+        case BASS_ERROR_ALREADY:
+            return "already initialized/paused/whatever";
+        case BASS_ERROR_NOTAUDIO:
+            return "file does not contain audio";
+        case BASS_ERROR_NOCHAN:
+            return "can't get a free channel";
+        case BASS_ERROR_ILLTYPE:
+            return "an illegal type was specified";
+        case BASS_ERROR_ILLPARAM:
+            return "an illegal parameter was specified";
+        case BASS_ERROR_NO3D:
+            return "no 3D support";
+        case BASS_ERROR_NOEAX:
+            return "no EAX support";
+        case BASS_ERROR_DEVICE:
+            return "illegal device number";
+        case BASS_ERROR_NOPLAY:
+            return "not playing";
+        case BASS_ERROR_FREQ:
+            return "illegal sample rate";
+        case BASS_ERROR_NOTFILE:
+            return "the stream is not a file stream";
+        case BASS_ERROR_NOHW:
+            return "no hardware voices available";
+        case BASS_ERROR_EMPTY:
+            return "the file has no sample data";
+        case BASS_ERROR_NONET:
+            return "no internet connection could be opened";
+        case BASS_ERROR_CREATE:
+            return "couldn't create the file";
+        case BASS_ERROR_NOFX:
+            return "effects are not available";
+        case BASS_ERROR_NOTAVAIL:
+            return "requested data/action is not available";
+        case BASS_ERROR_DECODE:
+            return "the channel is/isn't a \"decoding channel\"";
+        case BASS_ERROR_DX:
+            return "a sufficient DirectX version is not installed";
+        case BASS_ERROR_TIMEOUT:
+            return "connection timedout";
+        case BASS_ERROR_FILEFORM:
+            return "unsupported file format";
+        case BASS_ERROR_SPEAKER:
+            return "unavailable speaker";
+        case BASS_ERROR_VERSION:
+            return "invalid BASS version (used by add-ons)";
+        case BASS_ERROR_CODEC:
+            return "codec is not available/supported";
+        case BASS_ERROR_ENDED:
+            return "the channel/file has ended";
+        case BASS_ERROR_BUSY:
+            return "the device is busy";
+        case BASS_ERROR_UNSTREAMABLE:
+            return "unstreamable file";
+        case BASS_ERROR_PROTOCOL:
+            return "unsupported protocol";
+        case BASS_ERROR_DENIED:
+            return "access denied";
+        case BASS_ERROR_UNKNOWN:
+            return "some other mystery problem";
+
+        // BASS may add new error codes in the future, which must be appended to the switch above.
+        // Also, add-ons may introduce additional error codes.
+        default:
+            return "unknown error (?)";
+    }
+}
+
+int CBassAudio::ErrorGetCode()
+{
+    return BASS_ErrorGetCode();
+}
+
 //
 // Util use in BeginLoadingMedia
 //
@@ -245,23 +352,23 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
     HSTREAM decoder =
         BASS_StreamCreateFile(false, FromUTF8(strPath), 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO | BASS_UNICODE);            // open file for decoding
     if (!decoder)
-        return 0;                                                                                           // failed
-    DWORD            length = static_cast<DWORD>(BASS_ChannelGetLength(decoder, BASS_POS_BYTE));            // get the length
-    void*            data = malloc(length);                                                                 // allocate buffer for decoded data
+        return 0;                                                                                                               // failed
+    DWORD            length = static_cast<DWORD>(BASS_ChannelGetLength(decoder, BASS_POS_BYTE));                                // get the length
+    void*            data = malloc(length);                                                                  // allocate buffer for decoded data
     BASS_CHANNELINFO ci;
-    BASS_ChannelGetInfo(decoder, &ci);            // get sample format
-    if (ci.chans > 1)                             // not mono, downmix...
+    BASS_ChannelGetInfo(decoder, &ci);                                                                       // get sample format
+    if (ci.chans > 1)                                                                                        // not mono, downmix...
     {
         HSTREAM mixer = BASS_Mixer_StreamCreate(ci.freq, 1, BASS_STREAM_DECODE | BASS_MIXER_END);            // create mono mixer
         BASS_Mixer_StreamAddChannel(
-            mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE);            // plug-in the decoder (auto-free with the mixer)
-        decoder = mixer;                                                                                 // decode from the mixer
+            mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE);                // plug-in the decoder (auto-free with the mixer)
+        decoder = mixer;                                                                                     // decode from the mixer
     }
-    length = BASS_ChannelGetData(decoder, data, length);                                                    // decode data
-    BASS_StreamFree(decoder);                                                                               // free the decoder/mixer
-    HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);            // create stream
-    BASS_StreamPutData(stream, data, length);                                                               // set the stream data
-    free(data);                                                                                             // free the buffer
+    length = BASS_ChannelGetData(decoder, data, length);                                                     // decode data
+    BASS_StreamFree(decoder);                                                                                // free the decoder/mixer
+    HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);             // create stream
+    BASS_StreamPutData(stream, data, length);                                                                // set the stream data
+    free(data);                                                                                              // free the buffer
     return stream;
 }
 
@@ -841,6 +948,16 @@ void CBassAudio::ApplyFxEffects()
             m_FxEffects[i] = 0;
         }
     }
+}
+
+BOOL CBassAudio::SetFxParameters(uint iFxEffect, void* params)
+{
+    return BASS_FXSetParameters(m_FxEffects[iFxEffect], params);
+}
+
+BOOL CBassAudio::GetFxParameters(uint iFxEffect, void* params)
+{
+    return BASS_FXGetParameters(m_FxEffects[iFxEffect], params);
 }
 
 //

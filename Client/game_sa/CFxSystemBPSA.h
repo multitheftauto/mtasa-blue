@@ -11,6 +11,8 @@
 
 #pragma once
 
+class CFxEmitterBPSAInterface;
+
 class CFxSystemBPSAInterface
 {
 public:
@@ -19,14 +21,14 @@ public:
     CFxSystemBPSAInterface* pNext;                // 0x04
 
     // Actual members
-    char*  szNameHash;                      // 0x08
-    float  fLength;                         // 0x0C
-    float  fLoopIntervalMinimum;            // 0x10
-    float  fLoopIntervalLength;             // 0x14
-    ushort usCullDistance;                  // 0x18
-    char   cPlayMode;                       // 0x1A
-    char   cNumOfPrims;                     // 0x1B
-    void** pPrims;                          // 0x1C (pPrims[0] to pPrims[cNumOfPrims-1])
-    void*  pBoundingSphere;                 // 0x20
+    char*                     szNameHash;                      // 0x08
+    float                     fLength;                         // 0x0C
+    float                     fLoopIntervalMinimum;            // 0x10
+    float                     fLoopIntervalLength;             // 0x14
+    ushort                    usCullDistance;                  // 0x18
+    char                      cPlayMode;                       // 0x1A
+    char                      cNumOfPrims;                     // 0x1B
+    CFxEmitterBPSAInterface** pPrims;                          // 0x1C (pPrims[0] to pPrims[cNumOfPrims-1])
+    void*                     pBoundingSphere;                 // 0x20
 };
 static_assert(sizeof(CFxSystemBPSAInterface) == 0x24, "Invalid size for CFxSystemBPSAInterface");

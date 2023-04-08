@@ -1,15 +1,17 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/CModManager.cpp
+ *  FILE:        Client/core/CModManager.cpp
  *  PURPOSE:     Game mod loading manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CModManager.h"
+#include "CFilePathTranslator.h"
 #include <game/CGame.h>
 #define DECLARE_PROFILER_SECTION_CModManager
 #include "profiler/SharedUtil.Profiler.h"
@@ -207,7 +209,7 @@ void CModManager::Unload()
         CLocalGUI::GetSingleton().SetChatBoxVisible(true);
 
         // Reset the debugview status
-        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false);
+        CLocalGUI::GetSingleton().GetDebugView()->SetVisible(false, true);
         CLocalGUI::GetSingleton().GetDebugView()->Clear();
         CLocalGUI::GetSingleton().SetDebugViewVisible(false);
 
@@ -283,7 +285,7 @@ void CModManager::DoPulsePostFrame()
     if (m_pClientBase)
         CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
     else
-        CCore::GetSingleton().ApplyFrameRateLimit(88);            // Limit when not connected
+        CCore::GetSingleton().ApplyFrameRateLimit(88);                  // Limit when not connected
 
     // Load/unload requested?
     if (m_bUnloadRequested)

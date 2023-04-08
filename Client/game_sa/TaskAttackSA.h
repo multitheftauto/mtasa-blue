@@ -11,11 +11,11 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <CVector2D.h>
 #include <game/TaskAttack.h>
-
 #include "TaskSA.h"
+
+class CWeaponInfo;
 
 #define FUNC_CTaskSimpleGangDriveBy__Constructor        0x6217d0
 #define FUNC_CTaskSimpleUseGun__Constructor             0x61de60
@@ -68,7 +68,7 @@ public:
     bool m_bFromScriptCommand;
 
     char  m_nNextCommand;
-    char  m_nLastCommand;            // active command
+    char  m_nLastCommand;             // active command
     char  m_nBurstShots;
     char  m_nDrivebyStyle;            // what type of driveby are we doing
     char  m_nFrequencyPercentage;
@@ -105,7 +105,7 @@ public:
     unsigned char m_bFiredGun;
     unsigned char m_bBlockedLOS;            // 0x0C
     unsigned char m_nFireGunThisFrame;
-    unsigned char m_bSkipAim;            // 0x0E
+    unsigned char m_bSkipAim;               // 0x0E
 
     char      m_nNextCommand;
     char      m_nLastCommand;            // active command       (2 or 3) == is firing

@@ -10,6 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRPCFunctions.h"
+#include "CGame.h"
+#include "CMainConfig.h"
+#include "Utils.h"
+#include "CElementIDs.h"
+#include "CWeaponNames.h"
+#include "CPerfStatManager.h"
+#include "CKeyBinds.h"
+#include "CStaticFunctionDefinitions.h"
 #include "net/SyncStructures.h"
 
 CRPCFunctions* g_pRPCFunctions = NULL;
@@ -29,7 +38,7 @@ CRPCFunctions::CRPCFunctions()
 
 CRPCFunctions::~CRPCFunctions()
 {
-    vector<SRPCHandler*>::iterator iter = m_RPCHandlers.begin();
+    std::vector<SRPCHandler*>::iterator iter = m_RPCHandlers.begin();
     for (; iter != m_RPCHandlers.end(); iter++)
     {
         delete *iter;
