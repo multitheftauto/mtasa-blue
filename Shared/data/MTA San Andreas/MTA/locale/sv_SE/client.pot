@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-07 19:51+0000\n"
-"PO-Revision-Date: 2023-04-07 20:47\n"
+"POT-Creation-Date: 2023-04-08 12:28+0000\n"
+"PO-Revision-Date: 2023-04-08 12:39\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -86,7 +86,7 @@ msgstr "Anslutningen misslyckades. Ogiltigt nick angivet!"
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
-#: Client/loader/CInstallManager.cpp:564 Client/loader/CInstallManager.cpp:573
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Client/mods/deathmatch/logic/CClientGame.cpp:588
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
 #: Client/mods/deathmatch/logic/CClientGame.cpp:686
@@ -180,7 +180,7 @@ msgstr "Fel vid serversvar (2)"
 msgid "Bad server response (1)"
 msgstr "Fel vid serversvar (1)"
 
-#: Client/core/CCore.cpp:763 Client/loader/CInstallManager.cpp:1069
+#: Client/core/CCore.cpp:763 Client/loader/CInstallManager.cpp:1057
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA kan inte fortsätta eftersom enheten %s inte har tillräckligt med utrymme."
@@ -2246,7 +2246,7 @@ msgstr "Var god starta Grand Theft Auto San Andreas"
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
 msgstr "Välj din Grand Theft Auto: San Andreas Installations Katalog"
 
-#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:373
+#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -2318,93 +2318,93 @@ msgstr "Har datorn startat om du spelade MTA: SA?"
 msgid "Please terminate the following programs before continuing:"
 msgstr "Vänligen avsluta följande program innan du fortsätter:"
 
-#: Client/loader/CInstallManager.cpp:388
+#: Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
 msgstr "MTA:SA kunde inte slutföra följande uppgift:\n\n"
 "  '%s'\n"
 
-#: Client/loader/CInstallManager.cpp:438
+#: Client/loader/CInstallManager.cpp:426
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Kraschen orsakades utav problem med grafikdrivrutiner **\n\n"
 "** Var vänlig uppdatera dina grafikdrivrutiner **"
 
-#: Client/loader/CInstallManager.cpp:544
+#: Client/loader/CInstallManager.cpp:532
 msgid "Install updated MTA:SA files"
 msgstr "Installera uppdaterade MTA:SA-filer"
 
-#: Client/loader/CInstallManager.cpp:564
+#: Client/loader/CInstallManager.cpp:552
 msgid "Could not update due to file conflicts. Please close other applications and retry"
 msgstr "Kunde inte uppdatera på grund av filkonflikter. Var god stäng av andra applikationer och försök igen"
 
-#: Client/loader/CInstallManager.cpp:573
+#: Client/loader/CInstallManager.cpp:561
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
 msgstr "Multi Theft Auto har inte installerats korrekt, var god installera om. %s"
 
-#: Client/loader/CInstallManager.cpp:625
+#: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:669
+#: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:675 Client/loader/CInstallManager.cpp:715
+#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:684
+#: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:707 Client/loader/CInstallManager.cpp:785
+#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:792
+#: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:840
+#: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:844
+#: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:850
+#: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:865
+#: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:872 Client/loader/CInstallManager.cpp:895
+#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:888
+#: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1125
+#: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
 msgstr "Saknad fil:"
 
-#: Client/loader/CInstallManager.cpp:1129
+#: Client/loader/CInstallManager.cpp:1117
 msgid "If MTA fails to load, please re-install GTA:SA"
 msgstr "Om MTA inte laddas, vänligen installera om GTA:SA"
 
-#: Client/loader/CInstallManager.cpp:1164
+#: Client/loader/CInstallManager.cpp:1152
 msgid "Update install settings"
 msgstr "Uppdatera installationsinställningar"
 
-#: Client/loader/CInstallManager.cpp:1303
+#: Client/loader/CInstallManager.cpp:1291
 msgid "Update compatibility settings"
 msgstr "Uppdatera kompatibilitetsinställningar"
 
@@ -2427,11 +2427,11 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr ""
 
-#: Client/loader/Install.cpp:850 Client/loader/Dialogs.cpp:901
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
 msgstr "Installerar uppdatering..."
 
-#: Client/loader/Install.cpp:932 Client/loader/Dialogs.cpp:909
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
 msgid "Extracting files..."
 msgstr "Extrahera filer..."
 
@@ -3037,7 +3037,7 @@ msgid "Deny"
 msgstr "Förneka"
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1382
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1381
 msgid "Problem with graphics driver"
 msgstr "Problem med grafikdrivrutinen"
 
