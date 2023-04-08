@@ -228,7 +228,7 @@ namespace std
     };
 }            // namespace std
 
-             // Replace std classes
+// Replace std classes
 // Not safe - do not enable this in distributed builds
     #define vector  CArray
     #define list    CList

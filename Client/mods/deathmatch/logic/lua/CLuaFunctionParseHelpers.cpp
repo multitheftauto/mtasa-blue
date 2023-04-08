@@ -881,11 +881,11 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
             return GetClassTypeName(pClientElement);
     }
 
-    if (auto* pVar = UserDataCast((CResource*)ptr, luaVM))               // Try resource
+    if (auto* pVar = UserDataCast((CResource*)ptr, luaVM))            // Try resource
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))                // Try xml node
+    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))            // Try xml node
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))               // Try timer
+    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);

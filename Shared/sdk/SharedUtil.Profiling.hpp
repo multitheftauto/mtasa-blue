@@ -176,10 +176,7 @@ namespace SharedUtil
     //
     //
     ////////////////////////////////////////////////
-    CStatEvents::CStatEvents() : m_bEnabled(false), m_ItemBuffer(0), m_BufferPos(0), m_BufferPosMax(0), m_BufferPosMaxUsing(0)
-    {
-        ClearBuffer(true);
-    }
+    CStatEvents::CStatEvents() : m_bEnabled(false), m_ItemBuffer(0), m_BufferPos(0), m_BufferPosMax(0), m_BufferPosMaxUsing(0) { ClearBuffer(true); }
 
     ///////////////////////////////////////////////////////////////
     //
@@ -350,10 +347,7 @@ namespace SharedUtil
     //
     //
     ///////////////////////////////////////////////////////////////
-    CStatResults::CStatResults()
-    {
-        m_fNextMaxClearTime = 0;
-    }
+    CStatResults::CStatResults() { m_fNextMaxClearTime = 0; }
 
     ///////////////////////////////////////////////////////////////
     //
