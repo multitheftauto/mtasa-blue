@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CModelVehicle.h
+ *  FILE:        mods/deathmatch/logic/models/CModelVehicle.h
  *  PURPOSE:     Vehicle model class
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
