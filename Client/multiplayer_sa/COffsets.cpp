@@ -29,18 +29,18 @@ void COffsetsMP::Initialize10US()
 
 void COffsetsMP::Initialize11()
 {
-    CMultiplayerSA::HOOKPOS_FindPlayerCoors = 0x56E4B0;            // 1.01
+    CMultiplayerSA::HOOKPOS_FindPlayerCoors = 0x56E4B0;                                     // 1.01
     CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld = 0x56E250;
-    CMultiplayerSA::HOOKPOS_FindPlayerHeading = 0x56E8F0;                                       // 1.01
-    CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller = 0x53C3A9;                                // 1.01
-    CMultiplayerSA::HOOKPOS_CHud_Draw_Caller = 0x53E99A;                                        // 1.01
-    CMultiplayerSA::HOOKPOS_CRunningScript_Process = 0x469F80;                                  // 1.01
-    CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion = 0x737280;                                 // 1.01
-    CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic = 0x6FFB8B;                // 1.01
-    CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail = 0x6F8DBA;                            // 1.01???? ACHTUNG!
-    CMultiplayerSA::FUNC_CStreaming_Update = 0x40E6F0;                                          // 1.01
-    CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName = 0x5074A0;                      // 1.01
-    CMultiplayerSA::FUNC_CHud_Draw = 0x5902B0;                                                  // 1.01
+    CMultiplayerSA::HOOKPOS_FindPlayerHeading = 0x56E8F0;                                   // 1.01
+    CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller = 0x53C3A9;                            // 1.01
+    CMultiplayerSA::HOOKPOS_CHud_Draw_Caller = 0x53E99A;                                    // 1.01
+    CMultiplayerSA::HOOKPOS_CRunningScript_Process = 0x469F80;                              // 1.01
+    CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion = 0x737280;                             // 1.01
+    CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic = 0x6FFB8B;            // 1.01
+    CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail = 0x6F8DBA;                        // 1.01???? ACHTUNG!
+    CMultiplayerSA::FUNC_CStreaming_Update = 0x40E6F0;                                      // 1.01
+    CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName = 0x5074A0;                  // 1.01
+    CMultiplayerSA::FUNC_CHud_Draw = 0x5902B0;                                              // 1.01
     CMultiplayerSA::FUNC_CPlayerInfoBase = 0xB7CD98;
 }
 

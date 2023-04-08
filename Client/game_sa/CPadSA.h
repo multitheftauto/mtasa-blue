@@ -21,8 +21,8 @@
 class CPadSAInterface
 {
 public:
-    CControllerState NewState;            // 0
-    CControllerState OldState;            // 48
+    CControllerState NewState;                                             // 0
+    CControllerState OldState;                                             // 48
 
     signed short SteeringLeftRightBuffer[STEERINGBUFFERLENGTH];            // 96
     signed long  DrunkDrivingBufferUsed;                                   // 116
@@ -65,7 +65,7 @@ private:
     CPadSAInterface  StoredPad;
 
 public:
-    CPadSA(CPadSAInterface* padInterface) { this->internalInterface = padInterface; };
+    CPadSA(CPadSAInterface* padInterface) { internalInterface = padInterface; };
 
     CControllerState* GetCurrentControllerState(CControllerState* ControllerState);
     CControllerState* GetLastControllerState(CControllerState* ControllerState);
@@ -76,7 +76,7 @@ public:
     bool              IsEnabled();
     void              Disable(bool bDisable);
     void              Clear();
-    CPadSAInterface*  GetInterface() { return this->internalInterface; };
+    CPadSAInterface*  GetInterface() { return internalInterface; };
     void              SetHornHistoryValue(bool value);
     void              SetLastTimeTouched(DWORD dwTime);
 };

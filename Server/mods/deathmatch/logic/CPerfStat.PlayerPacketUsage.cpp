@@ -200,11 +200,11 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse()
         int flags = 0;
         m_SecondCounter++;
 
-        if (m_SecondCounter % 5 == 0)            // 5 second
+        if (m_SecondCounter % 5 == 0)                    // 5 second
             flags |= 1;
-        if (m_SecondCounter % 60 == 0)            // 60 seconds
+        if (m_SecondCounter % 60 == 0)                   // 60 seconds
             flags |= 2;
-        if (m_SecondCounter % (5 * 60) == 0)            // 5 mins
+        if (m_SecondCounter % (5 * 60) == 0)             // 5 mins
             flags |= 4;
         if (m_SecondCounter % (60 * 60) == 0)            // 60 mins
             flags |= 8;

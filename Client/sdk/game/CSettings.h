@@ -15,7 +15,7 @@
 #define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
 #endif /* (!defined(RWFORCEENUMSIZEINT)) */
 
-enum VideoModeFlag            // RwVideoModeFlag
+enum VideoModeFlag                   // RwVideoModeFlag
 {
     rwVIDEOMODEEXCLUSIVE = 0x0001,   /**<Exclusive (i.e. full-screen) */
     rwVIDEOMODEINTERLACE = 0x0002,   /**<Interlaced                   */
@@ -62,14 +62,14 @@ enum VideoModeFlag            // RwVideoModeFlag
 
 struct VideoMode            // RwVideoMode
 {
-    int           width;   /**< Width  */
-    int           height;  /**< Height */
-    int           depth;   /**< Depth  */
-    VideoModeFlag flags;   /**< Flags  */
-    int           refRate; /**< Approximate refresh rate */
-    int           format;  /**< Raster format
-                            * \see RwRasterFormat
-                            */
+    int           width;    /**< Width  */
+    int           height;   /**< Height */
+    int           depth;    /**< Depth  */
+    VideoModeFlag flags;    /**< Flags  */
+    int           refRate;  /**< Approximate refresh rate */
+    int           format;   /**< Raster format
+                             * \see RwRasterFormat
+                             */
 };
 
 enum eAspectRatio

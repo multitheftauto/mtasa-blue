@@ -33,7 +33,7 @@ class CPedIntelligenceSAInterface
 public:
     // CEventHandlerHistory @ + 56
     CPedSAInterface*        pPed;
-    DWORD                   taskManager;            // +4 (really CTaskManagerSAInterface)
+    DWORD                   taskManager;               // +4 (really CTaskManagerSAInterface)
     BYTE                    bPad[16];
     CFightManagerInterface* fightInterface;            // +24
     BYTE                    bPad2[184];
@@ -50,8 +50,8 @@ private:
 public:
     CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped);
     ~CPedIntelligenceSA();
-    CPedIntelligenceSAInterface*  GetInterface() { return this->internalInterface; }
-    CTaskManager*                 GetTaskManager();
-    bool                          TestForStealthKill(CPed* pPed, bool bUnk);
-    CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);
+    CPedIntelligenceSAInterface* GetInterface() { return internalInterface; }
+    CTaskManager*                GetTaskManager();
+    bool                         TestForStealthKill(CPed* pPed, bool bUnk);
+    CTaskSAInterface*            SetTaskDuckSecondary(unsigned short nLengthOfDuck);
 };

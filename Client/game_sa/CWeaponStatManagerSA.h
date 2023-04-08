@@ -15,19 +15,21 @@
 #include "CWeaponStatSA.h"
 
 // Straight out of CGameSA.h
-#define     CLASSSIZE_WeaponInfo            112         // ##SA##
-#define     NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
-#define     NUM_WeaponInfosOtherSkill       11
-#define     NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
+#define CLASSSIZE_WeaponInfo            112         // ##SA##
+#define NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
+#define NUM_WeaponInfosOtherSkill       11
+#define NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
+
+#define WEAPON_STAT_MAX 112
 
 struct sWeaponInfo
 {
     eFireType fire_type;            // type - instant hit (e.g. pistol), projectile (e.g. rocket launcher), area effect (e.g. flame thrower)
 
-    float target_range;            // max targeting range
-    float weapon_range;            // absolute gun range / default melee attack range
-    int   model;                   // modelinfo id
-    int   model2;                  // second modelinfo id
+    float target_range;             // max targeting range
+    float weapon_range;             // absolute gun range / default melee attack range
+    int   model;                    // modelinfo id
+    int   model2;                   // second modelinfo id
 
     eWeaponSlot weapon_slot;
     int         flags;            // flags defining characteristics
@@ -50,15 +52,15 @@ struct sWeaponInfo
     float        move_speed;                      // how fast can move with weapon
 
     // anim timings
-    float anim_loop_start;                  // start of animation loop
-    float anim_loop_stop;                   // end of animation loop
-    float anim_loop_bullet_fire;            // time in animation when weapon should be fired
+    float anim_loop_start;                   // start of animation loop
+    float anim_loop_stop;                    // end of animation loop
+    float anim_loop_bullet_fire;             // time in animation when weapon should be fired
 
     float anim2_loop_start;                  // start of animation2 loop
     float anim2_loop_stop;                   // end of animation2 loop
     float anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
 
-    float anim_breakout_time;            // time after which player can break out of attack and run off
+    float anim_breakout_time;                // time after which player can break out of attack and run off
 
     // projectile/area effect specific info
     float firing_speed;            // speed of projectile
@@ -66,7 +68,7 @@ struct sWeaponInfo
     float life_span;               // time taken for shot to dissipate
     float spread;                  // angle inside which shots are created
 
-    short aim_offset;            // index into array of aiming offsets
+    short aim_offset;              // index into array of aiming offsets
     //////////////////////////////////
     // Melee Data
     /////////////////////////////////
@@ -74,7 +76,6 @@ struct sWeaponInfo
     BYTE combos_available;            // how many further combos are available
 };
 
-#define WEAPON_STAT_MAX 112
 class CWeaponStatManagerSA : public CWeaponStatManager
 {
 public:

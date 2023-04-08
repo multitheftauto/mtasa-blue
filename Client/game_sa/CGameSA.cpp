@@ -117,47 +117,47 @@ CGameSA::CGameSA()
         ObjectGroupsInfo[i].SetGroup(i);
     }
 
-    this->m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
-    this->m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
-    this->m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
-    this->m_pAudioContainer = new CAudioContainerSA();
-    this->m_pWorld = new CWorldSA();
-    this->m_pPools = new CPoolsSA();
-    this->m_pClock = new CClockSA();
-    this->m_pRadar = new CRadarSA();
-    this->m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
-    this->m_pCoronas = new CCoronasSA();
-    this->m_pCheckpoints = new CCheckpointsSA();
-    this->m_pPickups = new CPickupsSA();
-    this->m_pExplosionManager = new CExplosionManagerSA();
-    this->m_pHud = new CHudSA();
-    this->m_pFireManager = new CFireManagerSA();
-    this->m_p3DMarkers = new C3DMarkersSA();
-    this->m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
-    this->m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
-    this->m_pWeather = new CWeatherSA();
-    this->m_pStats = new CStatsSA();
-    this->m_pTaskManagementSystem = new CTaskManagementSystemSA();
-    this->m_pSettings = new CSettingsSA();
-    this->m_pCarEnterExit = new CCarEnterExitSA();
-    this->m_pControllerConfigManager = new CControllerConfigManagerSA();
-    this->m_pProjectileInfo = new CProjectileInfoSA();
-    this->m_pRenderWare = new CRenderWareSA(version);
-    this->m_pHandlingManager = new CHandlingManagerSA();
-    this->m_pEventList = new CEventListSA();
-    this->m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
-    this->m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);
-    this->m_pAnimManager = new CAnimManagerSA;
-    this->m_pStreaming = new CStreamingSA;
-    this->m_pVisibilityPlugins = new CVisibilityPluginsSA;
-    this->m_pKeyGen = new CKeyGenSA;
-    this->m_pRopes = new CRopesSA;
-    this->m_pFx = new CFxSA((CFxSAInterface*)CLASS_CFx);
-    this->m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)CLASS_CFxManager);
-    this->m_pWaterManager = new CWaterManagerSA();
-    this->m_pWeaponStatsManager = new CWeaponStatManagerSA();
-    this->m_pPointLights = new CPointLightsSA();
-    this->m_collisionStore = new CColStoreSA();
+    m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
+    m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
+    m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
+    m_pAudioContainer = new CAudioContainerSA();
+    m_pWorld = new CWorldSA();
+    m_pPools = new CPoolsSA();
+    m_pClock = new CClockSA();
+    m_pRadar = new CRadarSA();
+    m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
+    m_pCoronas = new CCoronasSA();
+    m_pCheckpoints = new CCheckpointsSA();
+    m_pPickups = new CPickupsSA();
+    m_pExplosionManager = new CExplosionManagerSA();
+    m_pHud = new CHudSA();
+    m_pFireManager = new CFireManagerSA();
+    m_p3DMarkers = new C3DMarkersSA();
+    m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
+    m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
+    m_pWeather = new CWeatherSA();
+    m_pStats = new CStatsSA();
+    m_pTaskManagementSystem = new CTaskManagementSystemSA();
+    m_pSettings = new CSettingsSA();
+    m_pCarEnterExit = new CCarEnterExitSA();
+    m_pControllerConfigManager = new CControllerConfigManagerSA();
+    m_pProjectileInfo = new CProjectileInfoSA();
+    m_pRenderWare = new CRenderWareSA(version);
+    m_pHandlingManager = new CHandlingManagerSA();
+    m_pEventList = new CEventListSA();
+    m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
+    m_pTasks = new CTasksSA((CTaskManagementSystemSA*)m_pTaskManagementSystem);
+    m_pAnimManager = new CAnimManagerSA;
+    m_pStreaming = new CStreamingSA;
+    m_pVisibilityPlugins = new CVisibilityPluginsSA;
+    m_pKeyGen = new CKeyGenSA;
+    m_pRopes = new CRopesSA;
+    m_pFx = new CFxSA((CFxSAInterface*)CLASS_CFx);
+    m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)CLASS_CFxManager);
+    m_pWaterManager = new CWaterManagerSA();
+    m_pWeaponStatsManager = new CWeaponStatManagerSA();
+    m_pPointLights = new CPointLightsSA();
+    m_collisionStore = new CColStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -330,7 +330,7 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
 
 void CGameSA::Pause(bool bPaused)
 {
-	MemPutFast<bool>(0xB7CB49, bPaused); // CTimer::m_UserPause
+    MemPutFast<bool>(0xB7CB49, bPaused);            // CTimer::m_UserPause
 }
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
@@ -352,9 +352,9 @@ CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
  */
 void CGameSA::StartGame()
 {
-    this->SetSystemState(GS_INIT_PLAYING_GAME);
-    MemPutFast<BYTE>(0xB7CB49, 0); // CTimer::m_UserPause
-    MemPutFast<BYTE>(0xBA67A4, 0); // FrontEndMenuManager + 0x5C
+    SetSystemState(GS_INIT_PLAYING_GAME);
+    MemPutFast<BYTE>(0xB7CB49, 0);            // CTimer::m_UserPause
+    MemPutFast<BYTE>(0xBA67A4, 0);            // FrontEndMenuManager + 0x5C
 }
 
 /**
@@ -377,7 +377,7 @@ eSystemState CGameSA::GetSystemState()
  */
 bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
 {
-    CPoolsSA* pools = (CPoolsSA*)this->GetPools();
+    CPoolsSA* pools = (CPoolsSA*)GetPools();
     if (pools)
     {
         //* HACKED IN HERE FOR NOW *//
@@ -525,22 +525,22 @@ void CGameSA::SetTimeScale(float fTimeScale)
 
 unsigned char CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104; // CPostEffects::m_SpeedFXAlpha
+    return *(unsigned char*)0x8D5104;            // CPostEffects::m_SpeedFXAlpha
 }
 
 void CGameSA::SetBlurLevel(unsigned char ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel); // CPostEffects::m_SpeedFXAlpha
+    MemPutFast<unsigned char>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
 }
 
 unsigned long CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C; // CClock::ms_nMillisecondsPerGameMinute
+    return *(unsigned long*)0xB7015C;            // CClock::ms_nMillisecondsPerGameMinute
 }
 
 void CGameSA::SetMinuteDuration(unsigned long ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime); // CClock::ms_nMillisecondsPerGameMinute
+    MemPutFast<unsigned long>(0xB7015C, ulTime);            // CClock::ms_nMillisecondsPerGameMinute
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -565,7 +565,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
 
     if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
         return IsCoronaZTestEnabled();
- 
 
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
@@ -763,7 +762,7 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
         // Disable ZTest (PS2)
         MemSet((void*)0x6FB17C, 0x90, 3);
     }
-    
+
     m_isCoronaZTestEnabled = isEnabled;
 }
 
@@ -826,12 +825,17 @@ void CGameSA::SetupSpecialCharacters()
 {
     ModelInfo[1].MakePedModel("TRUTH");
     ModelInfo[2].MakePedModel("MACCER");
-    // ModelInfo[190].MakePedModel ( "BARBARA" );
-    // ModelInfo[191].MakePedModel ( "HELENA" );
-    // ModelInfo[192].MakePedModel ( "MICHELLE" );
-    // ModelInfo[193].MakePedModel ( "KATIE" );
-    // ModelInfo[194].MakePedModel ( "MILLIE" );
-    // ModelInfo[195].MakePedModel ( "DENISE" );
+
+    ModelInfo[3].MakePedModel("CDEPUT");
+    ModelInfo[4].MakePedModel("SFPDM1");
+    ModelInfo[5].MakePedModel("BB");
+    ModelInfo[6].MakePedModel("WFYCRP");
+    ModelInfo[8].MakePedModel("WMYCD2");
+    ModelInfo[42].MakePedModel("SUZIE");
+    ModelInfo[65].MakePedModel("VWMYAP");
+    ModelInfo[86].MakePedModel("VHFYST");
+    ModelInfo[119].MakePedModel("LVPDM1");
+
     ModelInfo[265].MakePedModel("TENPEN");
     ModelInfo[266].MakePedModel("PULASKI");
     ModelInfo[267].MakePedModel("HERN");
@@ -840,6 +844,8 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[270].MakePedModel("SWEET");
     ModelInfo[271].MakePedModel("RYDER");
     ModelInfo[272].MakePedModel("FORELLI");
+    ModelInfo[273].MakePedModel("MEDIATR");
+    ModelInfo[289].MakePedModel("SOMYAP");
     ModelInfo[290].MakePedModel("ROSE");
     ModelInfo[291].MakePedModel("PAUL");
     ModelInfo[292].MakePedModel("CESAR");
@@ -863,6 +869,14 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[310].MakePedModel("BBTHIN");
     ModelInfo[311].MakePedModel("SMOKEV");
     ModelInfo[312].MakePedModel("PSYCHO");
+
+
+    // ModelInfo[190].MakePedModel ( "BARBARA" );
+    // ModelInfo[191].MakePedModel ( "HELENA" );
+    // ModelInfo[192].MakePedModel ( "MICHELLE" );
+    // ModelInfo[193].MakePedModel ( "KATIE" );
+    // ModelInfo[194].MakePedModel ( "MILLIE" );
+    // ModelInfo[195].MakePedModel ( "DENISE" );
     /* Hot-coffee only models
     ModelInfo[313].MakePedModel ( "GANGRL2" );
     ModelInfo[314].MakePedModel ( "MECGRL2" );
@@ -895,7 +909,7 @@ void CGameSA::SetupBrokenModels()
 // Well, has it?
 bool CGameSA::HasCreditScreenFadedOut()
 {
-    BYTE ucAlpha = *(BYTE*)0xBAB320; // CLoadingScreen::m_FadeAlpha
+    BYTE ucAlpha = *(BYTE*)0xBAB320;            // CLoadingScreen::m_FadeAlpha
     bool bCreditScreenFadedOut = (GetSystemState() >= 7) && (ucAlpha < 6);
     return bCreditScreenFadedOut;
 }
@@ -918,6 +932,11 @@ void CGameSA::ResetModelLodDistances()
     CModelInfoSA::StaticResetLodDistances();
 }
 
+void CGameSA::ResetModelFlags()
+{
+    CModelInfoSA::StaticResetFlags();
+}
+
 void CGameSA::ResetModelTimes()
 {
     CModelInfoSA::StaticResetModelTimes();
@@ -933,7 +952,7 @@ void CGameSA::ResetAlphaTransparencies()
 // Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
 void CGameSA::DisableVSync()
 {
-    MemPutFast<BYTE>(0xBAB318, 0); // CLoadingScreen::m_bActive
+    MemPutFast<BYTE>(0xBAB318, 0);            // CLoadingScreen::m_bActive
 }
 CWeapon* CGameSA::CreateWeapon()
 {
