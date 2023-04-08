@@ -47,35 +47,35 @@ struct CSettingsSAInterface            // see code around 0x57CE9A for where the
     BYTE  pad2[0x34];
     DWORD dwBrightness;
     float fDrawDistance;
-    bool  bSubtitles;            // 0x44
+    bool  bSubtitles;                      // 0x44
     bool  pad3[5];
-    bool  bLegend;                   // 0x4A
-    bool  bUseWideScreen;            // 0x4B
-    bool  bFrameLimiter;             // 0x4C
-    bool  bRadioAutotune;            // 0x4D
+    bool  bLegend;                         // 0x4A
+    bool  bUseWideScreen;                  // 0x4B
+    bool  bFrameLimiter;                   // 0x4C
+    bool  bRadioAutotune;                  // 0x4D
     bool  pad4;
-    BYTE  ucSfxVolume;                // 0x4F
-    BYTE  ucRadioVolume;              // 0x50
-    bool  bRadioEqualizer;            // 0x51
-    BYTE  ucRadioStation;             // 0x52
+    BYTE  ucSfxVolume;                     // 0x4F
+    BYTE  ucRadioVolume;                   // 0x50
+    bool  bRadioEqualizer;                 // 0x51
+    BYTE  ucRadioStation;                  // 0x52
     BYTE  pad5[0x5D];
-    BYTE  ucUsertrackMode;            // 0xB0
-    bool  bInvertPadX1;               // 0xB1
-    bool  bInvertPadY1;               // 0xB2
-    bool  bInvertPadX2;               // 0xB3
-    bool  bInvertPadY2;               // 0xB4
-    bool  bSwapPadAxis1;              // 0xB5
-    bool  bSwapPadAxis2;              // 0xB6
+    BYTE  ucUsertrackMode;                 // 0xB0
+    bool  bInvertPadX1;                    // 0xB1
+    bool  bInvertPadY1;                    // 0xB2
+    bool  bInvertPadX2;                    // 0xB3
+    bool  bInvertPadY2;                    // 0xB4
+    bool  bSwapPadAxis1;                   // 0xB5
+    bool  bSwapPadAxis2;                   // 0xB6
     BYTE  pad6[0xD];
-    bool  bMipMapping;                   // 0xC4 (setting appears to have no effect in gta 1.0)
-    bool  bUsertrackAutoScan;            // 0xC5
+    bool  bMipMapping;                     // 0xC4 (setting appears to have no effect in gta 1.0)
+    bool  bUsertrackAutoScan;              // 0xC5
     BYTE  pad7[0x2];
     DWORD dwAntiAliasing;                  // 0xC8
     DWORD dwFrontendAA;                    // 0xCC (anti-aliasing value in the single-player settings menu. Useless for MTA).
     bool  bUseKeyboardAndMouse;            // 0xD0
     BYTE  pad8[3];
-    DWORD dwVideoMode;                // 0xD4
-    DWORD dwPrevVideoMode;            // 0xD8
+    DWORD dwVideoMode;                     // 0xD4
+    DWORD dwPrevVideoMode;                 // 0xD8
 };
 
 class CSettingsSA : public CGameSettings

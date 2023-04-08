@@ -33,7 +33,7 @@
 #define MIN_TRANSFER_TIME               1500
 
 // Defines the maximum size for a player name
-//#define MAX_PLAYER_NAME_LENGTH        32
+// #define MAX_PLAYER_NAME_LENGTH        32
 
 // Defines the maximum size for a HTTP Download URL
 #define MAX_HTTP_DOWNLOAD_URL           512

@@ -102,7 +102,8 @@ BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
             // Stop the OS from turning off our handler
             // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
             LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
+            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER
+            {
                 // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
                 // our handler will not get removed.
                 return 0;

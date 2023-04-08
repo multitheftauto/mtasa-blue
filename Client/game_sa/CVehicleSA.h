@@ -23,6 +23,7 @@
 #include "CAEVehicleAudioEntitySA.h"
 
 class CFxSystemSAInterface;
+class CTrainSAInterface;
 struct RwTexture;
 
 #define SIZEOF_CHELI                            2584
@@ -162,15 +163,15 @@ struct CVehicleFlags
     unsigned char bLightsOn : 1;                     // Are the lights switched on ?
     unsigned char bFreebies : 1;                     // Any freebies left in this vehicle ?
 
-    unsigned char bIsVan : 1;                       // Is this vehicle a van (doors at back of vehicle)
-    unsigned char bIsBus : 1;                       // Is this vehicle a bus
-    unsigned char bIsBig : 1;                       // Is this vehicle a bus
-    unsigned char bLowVehicle : 1;                  // Need this for sporty type cars to use low getting-in/out anims
-    unsigned char bComedyControls : 1;              // Will make the car hard to control (hopefully in a funny way)
-    unsigned char bWarnedPeds : 1;                  // Has scan and warn peds of danger been processed?
-    unsigned char bCraneMessageDone : 1;            // A crane message has been printed for this car allready
+    unsigned char bIsVan : 1;                        // Is this vehicle a van (doors at back of vehicle)
+    unsigned char bIsBus : 1;                        // Is this vehicle a bus
+    unsigned char bIsBig : 1;                        // Is this vehicle a bus
+    unsigned char bLowVehicle : 1;                   // Need this for sporty type cars to use low getting-in/out anims
+    unsigned char bComedyControls : 1;               // Will make the car hard to control (hopefully in a funny way)
+    unsigned char bWarnedPeds : 1;                   // Has scan and warn peds of danger been processed?
+    unsigned char bCraneMessageDone : 1;             // A crane message has been printed for this car allready
     // unsigned char bExtendedRange: 1; // This vehicle needs to be a bit further away to get deleted
-    unsigned char bTakeLessDamage : 1;            // This vehicle is stronger (takes about 1/4 of damage)
+    unsigned char bTakeLessDamage : 1;                  // This vehicle is stronger (takes about 1/4 of damage)
 
     unsigned char bIsDamaged : 1;                       // This vehicle has been damaged and is displaying all its components
     unsigned char bHasBeenOwnedByPlayer : 1;            // To work out whether stealing it is a crime
@@ -183,17 +184,17 @@ struct CVehicleFlags
     unsigned char bOccupantsHaveBeenGenerated : 1;            // Is true if the occupants have already been generated. (Shouldn't happen again)
     unsigned char bGunSwitchedOff : 1;                        // Level designers can use this to switch off guns on boats
 
-    unsigned char bVehicleColProcessed : 1;               // Has ProcessEntityCollision been processed for this car?
-    unsigned char bIsCarParkVehicle : 1;                  // Car has been created using the special CAR_PARK script command
-    unsigned char bHasAlreadyBeenRecorded : 1;            // Used for replays
+    unsigned char bVehicleColProcessed : 1;                   // Has ProcessEntityCollision been processed for this car?
+    unsigned char bIsCarParkVehicle : 1;                      // Car has been created using the special CAR_PARK script command
+    unsigned char bHasAlreadyBeenRecorded : 1;                // Used for replays
     unsigned char bPartOfConvoy : 1;
-    unsigned char bHeliMinimumTilt : 1;              // This heli should have almost no tilt really
-    unsigned char bAudioChangingGear : 1;            // sounds like vehicle is changing gear
-    unsigned char bIsDrowning : 1;                   // is vehicle occupants taking damage in water (i.e. vehicle is dead in water)
-    unsigned char bTyresDontBurst : 1;               // If this is set the tyres are invincible
+    unsigned char bHeliMinimumTilt : 1;                       // This heli should have almost no tilt really
+    unsigned char bAudioChangingGear : 1;                     // sounds like vehicle is changing gear
+    unsigned char bIsDrowning : 1;                            // is vehicle occupants taking damage in water (i.e. vehicle is dead in water)
+    unsigned char bTyresDontBurst : 1;                        // If this is set the tyres are invincible
 
-    unsigned char bCreatedAsPoliceVehicle : 1;            // True if this guy was created as a police vehicle (enforcer, policecar, miamivice car etc)
-    unsigned char bRestingOnPhysical : 1;                 // Dont go static cause car is sitting on a physical object that might get removed
+    unsigned char bCreatedAsPoliceVehicle : 1;                // True if this guy was created as a police vehicle (enforcer, policecar, miamivice car etc)
+    unsigned char bRestingOnPhysical : 1;                     // Dont go static cause car is sitting on a physical object that might get removed
     unsigned char bParking : 1;
     unsigned char bCanPark : 1;
     unsigned char bFireGun : 1;                                // Does the ai of this vehicle want to fire it's gun?
@@ -201,23 +202,23 @@ struct CVehicleFlags
     unsigned char bNeverUseSmallerRemovalRange : 1;            // Some vehicles (like planes) we don't want to remove just behind the camera.
     unsigned char bIsRCVehicle : 1;                            // Is this a remote controlled (small) vehicle. True whether the player or AI controls it.
 
-    unsigned char bAlwaysSkidMarks : 1;                      // This vehicle leaves skidmarks regardless of the wheels' states.
-    unsigned char bEngineBroken : 1;                         // Engine doesn't work. Player can get in but the vehicle won't drive
-    unsigned char bVehicleCanBeTargetted : 1;                // The ped driving this vehicle can be targetted, (for Torenos plane mission)
-    unsigned char bPartOfAttackWave : 1;                     // This car is used in an attack during a gang war
-    unsigned char bWinchCanPickMeUp : 1;                     // This car cannot be picked up by any ropes.
-    unsigned char bImpounded : 1;                            // Has this vehicle been in a police impounding garage
-    unsigned char bVehicleCanBeTargettedByHS : 1;            // Heat seeking missiles will not target this vehicle.
-    unsigned char bSirenOrAlarm : 1;                         // Set to TRUE if siren or alarm active, else FALSE
+    unsigned char bAlwaysSkidMarks : 1;                        // This vehicle leaves skidmarks regardless of the wheels' states.
+    unsigned char bEngineBroken : 1;                           // Engine doesn't work. Player can get in but the vehicle won't drive
+    unsigned char bVehicleCanBeTargetted : 1;                  // The ped driving this vehicle can be targetted, (for Torenos plane mission)
+    unsigned char bPartOfAttackWave : 1;                       // This car is used in an attack during a gang war
+    unsigned char bWinchCanPickMeUp : 1;                       // This car cannot be picked up by any ropes.
+    unsigned char bImpounded : 1;                              // Has this vehicle been in a police impounding garage
+    unsigned char bVehicleCanBeTargettedByHS : 1;              // Heat seeking missiles will not target this vehicle.
+    unsigned char bSirenOrAlarm : 1;                           // Set to TRUE if siren or alarm active, else FALSE
 
     unsigned char bHasGangLeaningOn : 1;
-    unsigned char bGangMembersForRoadBlock : 1;            // Will generate gang members if NumPedsForRoadBlock > 0
-    unsigned char bDoesProvideCover : 1;                   // If this is false this particular vehicle can not be used to take cover behind.
-    unsigned char bMadDriver : 1;                          // This vehicle is driving like a lunatic
-    unsigned char bUpgradedStereo : 1;                     // This vehicle has an upgraded stereo
-    unsigned char bConsideredByPlayer : 1;                 // This vehicle is considered by the player to enter
-    unsigned char bPetrolTankIsWeakPoint : 1;              // If false shootong the petrol tank will NOT Blow up the car
-    unsigned char bDisableParticles : 1;                   // Disable particles from this car. Used in garage.
+    unsigned char bGangMembersForRoadBlock : 1;               // Will generate gang members if NumPedsForRoadBlock > 0
+    unsigned char bDoesProvideCover : 1;                      // If this is false this particular vehicle can not be used to take cover behind.
+    unsigned char bMadDriver : 1;                             // This vehicle is driving like a lunatic
+    unsigned char bUpgradedStereo : 1;                        // This vehicle has an upgraded stereo
+    unsigned char bConsideredByPlayer : 1;                    // This vehicle is considered by the player to enter
+    unsigned char bPetrolTankIsWeakPoint : 1;                 // If false shootong the petrol tank will NOT Blow up the car
+    unsigned char bDisableParticles : 1;                      // Disable particles from this car. Used in garage.
 
     unsigned char bHasBeenResprayed : 1;                      // Has been resprayed in a respray garage. Reset after it has been checked.
     unsigned char bUseCarCheats : 1;                          // If this is true will set the car cheat stuff up in ProcessControl()
@@ -260,14 +261,14 @@ class CVehicleSAInterface : public CPhysicalSAInterface
 public:
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
 
-    tHandlingDataSA*       pHandlingData;                  // +900
-    tFlyingHandlingDataSA* pFlyingHandlingData;            // +904
-    DWORD                  dwHandlingFlags;                // +908
+    tHandlingDataSA*       pHandlingData;                             // +900
+    tFlyingHandlingDataSA* pFlyingHandlingData;                       // +904
+    DWORD                  dwHandlingFlags;                           // +908
     int                    pad52321[21];
 
-    DWORD        dwUnknown1201;            // +996
-    DWORD        dwUnknown1202;            // +1000
-    unsigned int hFlagsLocal;              // +1004
+    DWORD        dwUnknown1201;                // +996
+    DWORD        dwUnknown1202;                // +1000
+    unsigned int hFlagsLocal;                  // +1004
 
     CAutoPilot    AutoPilot;                   // +1008
     CVehicleFlags m_nVehicleFlags;             // +1064?
@@ -278,8 +279,8 @@ public:
     short         m_upgrades[MAX_UPGRADES_ATTACHED];            // 1082
     float         m_fWheelScale;                                // 1112
 
-    unsigned short CarAlarmState;               // 1116
-    unsigned short ForcedRandomSeed;            // if this is non-zero the random wander gets deterministic
+    unsigned short CarAlarmState;                               // 1116
+    unsigned short ForcedRandomSeed;                            // if this is non-zero the random wander gets deterministic
 
     CPedSAInterface* pDriver;
     CPedSAInterface* pPassengers[MAX_PASSENGERS];
@@ -296,10 +297,10 @@ public:
     CEntity*      pEntityWeAreOnForVisibilityCheck;
     CFire*        m_pFire;
 
-    float m_fSteerAngle;               // +1172
-    float m_f2ndSteerAngle;            // used for steering 2nd set of wheels or elevators etc..
-    float m_fGasPedal;                 // 0...1  // +1180
-    float m_fBrakePedal;               // 0...1
+    float m_fSteerAngle;                       // +1172
+    float m_f2ndSteerAngle;                    // used for steering 2nd set of wheels or elevators etc..
+    float m_fGasPedal;                         // 0...1  // +1180
+    float m_fBrakePedal;                       // 0...1
 
     unsigned char VehicleCreatedBy;            // Contains information on whether this vehicle can be deleted
                                                // or not. Probably only need this or IsLocked.
@@ -312,8 +313,8 @@ public:
     unsigned char m_GunsCycleIndex : 2;                // Cycle through alternate gun hardpoints on planes/helis
     unsigned char m_OrdnanceCycleIndex : 2;            // Cycle through alternate ordnance hardpoints on planes/helis
 
-    unsigned char nUsedForCover;            // Has n number of cops hiding/attempting to hid behind it
-    unsigned char AmmoInClip;               // Used to make the guns on boat do a reload.
+    unsigned char nUsedForCover;                       // Has n number of cops hiding/attempting to hid behind it
+    unsigned char AmmoInClip;                          // Used to make the guns on boat do a reload.
     unsigned char PacMansCollected;
     unsigned char PedsPositionForRoadBlock;
     unsigned char NumPedsForRoadBlock;
@@ -330,10 +331,10 @@ public:
     float m_fWheelSpinForAudio;
 
     // 1216
-    float m_nHealth;            // 1000.0f = full health. 0 -> explode
+    float m_nHealth;                                        // 1000.0f = full health. 0 -> explode
 
-    CVehicleSAInterface* m_towingVehicle;             // 1220
-    CVehicleSAInterface* m_trailerVehicle;            // 1224
+    CVehicleSAInterface* m_towingVehicle;                   // 1220
+    CVehicleSAInterface* m_trailerVehicle;                  // 1224
 
     CPedSAInterface* m_bombPlanter;                         // 1228
     uint32_t         m_deleteAfterTime;                     // 1232
@@ -390,34 +391,34 @@ class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
     friend class CPoolsSA;
 
 private:
-    CDamageManagerSA*                m_pDamageManager;
-    CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity;
-    CHandlingEntrySA*                m_pHandlingData;
-    CFlyingHandlingEntrySA*          m_pFlyingHandlingData;
-    void*                            m_pSuspensionLines;
-    bool                             m_bIsDerailable;
-    unsigned char                    m_ucAlpha;
-    CVector                          m_vecGravity;
-    SharedUtil::SColor               m_HeadLightColor;
-    RwObject                         m_WheelObjects[4];
+    CDamageManagerSA*                m_pDamageManager{nullptr};
+    CAEVehicleAudioEntitySA*         m_pVehicleAudioEntity{nullptr};
+    CHandlingEntrySA*                m_pHandlingData{nullptr};
+    CFlyingHandlingEntrySA*          m_pFlyingHandlingData{nullptr};
+    void*                            m_pSuspensionLines{nullptr};
+    bool                             m_bIsDerailable{true};
+    unsigned char                    m_ucAlpha{255};
+    CVector                          m_vecGravity{0.0f, 0.0f, -1.0f};
+    SharedUtil::SColor               m_HeadLightColor{SharedUtil::SColorRGBA{255, 255, 255, 255}};
     SharedUtil::SColor               m_RGBColors[4];
     SharedUtil::SColor               m_RGBColorsFixed[4];
     CDoorSA                          m_doors[6];
-    bool                             m_bSwingingDoorsAllowed;
+    bool                             m_bSwingingDoorsAllowed{false};
     SSirenInfo                       m_tSirenInfo;
     std::map<SString, SVehicleFrame> m_ExtraFrames;
     unsigned char                    m_ucVariant;
     unsigned char                    m_ucVariant2;
-    unsigned char                    m_ucVariantCount;
-    bool                             m_doorsUndamageable = false;
+    unsigned char                    m_ucVariantCount{0};
+    bool                             m_doorsUndamageable{false};
 
     std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
 
 public:
-    CVehicleSA();
-    CVehicleSA(CVehicleSAInterface* vehicleInterface);
-    CVehicleSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CVehicleSA() = default;
     ~CVehicleSA();
+
+    CVehicleSAInterface* GetVehicleInterface() { return reinterpret_cast<CVehicleSAInterface*>(GetInterface()); }
+
     void Init();
 
     // CEntitySA interface
@@ -428,17 +429,17 @@ public:
 
     bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
 
-    CVehicleSAInterface* GetNextCarriageInTrain();
-    CVehicle*            GetNextTrainCarriage();
-    void                 SetNextTrainCarriage(CVehicle* pNext);
-    CVehicleSAInterface* GetPreviousCarriageInTrain();
-    CVehicle*            GetPreviousTrainCarriage();
-    void                 SetPreviousTrainCarriage(CVehicle* pPrevious);
-    float                GetDistanceToCarriage(CVehicle* pCarriage);
-    void                 AttachTrainCarriage(CVehicle* pCarriage);
-    void                 DetachTrainCarriage(CVehicle* pCarriage);
-    bool                 IsChainEngine();
-    void                 SetIsChainEngine(bool bChainEngine = true);
+    CTrainSAInterface* GetNextCarriageInTrain();
+    CVehicle*          GetNextTrainCarriage();
+    void               SetNextTrainCarriage(CVehicle* pNext);
+    CTrainSAInterface* GetPreviousCarriageInTrain();
+    CVehicle*          GetPreviousTrainCarriage();
+    void               SetPreviousTrainCarriage(CVehicle* pPrevious);
+    float              GetDistanceToCarriage(CVehicle* pCarriage);
+    void               AttachTrainCarriage(CVehicle* pCarriage);
+    void               DetachTrainCarriage(CVehicle* pCarriage);
+    bool               IsChainEngine();
+    void               SetIsChainEngine(bool bChainEngine = true);
 
     bool  IsDerailed();
     void  SetDerailed(bool bDerailed);
@@ -474,10 +475,10 @@ public:
     unsigned char GetCurrentGear();
     float         GetGasPedal();
 
-    bool  GetTowBarPos(CVector* pVector, CVehicle* pTrailer = NULL);
-    bool  GetTowHitchPos(CVector* pVector);
-    bool  IsUpsideDown();
-	
+    bool GetTowBarPos(CVector* pVector, CVehicle* pTrailer = NULL);
+    bool GetTowHitchPos(CVector* pVector);
+    bool IsUpsideDown();
+
     CPed* GetDriver();
     CPed* GetPassenger(unsigned char ucSlot);
     bool  IsBeingDriven();
@@ -494,11 +495,11 @@ public:
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
     unsigned char GetAlpha() { return m_ucAlpha; }
 
-    void   SetLandingGearDown(bool bLandingGearDown);
-    float  GetLandingGearPosition();
-    void   SetLandingGearPosition(float fPosition);
-    bool   IsLandingGearDown();
-    void   Fix();
+    void  SetLandingGearDown(bool bLandingGearDown);
+    float GetLandingGearPosition();
+    void  SetLandingGearPosition(float fPosition);
+    bool  IsLandingGearDown();
+    void  Fix();
 
     void BlowUp(CEntity* pCreator, unsigned long ulUnknown);
 
@@ -597,7 +598,7 @@ public:
     void SetGravity(const CVector* pvecGravity);
 
     SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
-    void   SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
+    void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
     CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
@@ -613,8 +614,6 @@ public:
 
     void* GetPrivateSuspensionLines();
 
-    CVehicleSAInterface* GetVehicleInterface() { return (CVehicleSAInterface*)m_pInterface; }
-
     bool DoesVehicleHaveSirens() { return m_tSirenInfo.m_bOverrideSirens; }
 
     void GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount);
@@ -623,13 +622,13 @@ public:
     {
         m_tSirenInfo.m_tSirenInfo[ucSirenCount].m_dwMinSirenAlpha = dwPercentage;
     }
-    void          SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
-    void          GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
-    unsigned char GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
-    unsigned char GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
-    DWORD         GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
-    SharedUtil::SColor        GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
-    void          SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    void               SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
+    void               GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
+    unsigned char      GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
+    unsigned char      GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
+    DWORD              GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
+    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
+    void               SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
     {
         m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
     }

@@ -22,21 +22,21 @@ public:
     RpClump*       m_pRwObject;              // 72
     DWORD*         m_pMaterial;              // 76
 
-    WORD  m_nType;                  // 80
-    bool  m_bIsUsed;                // has this marker been allocated this frame?    // 82
-    DWORD m_nIdentifier;            // 84
+    WORD  m_nType;                           // 80
+    bool  m_bIsUsed;                         // has this marker been allocated this frame?    // 82
+    DWORD m_nIdentifier;                     // 84
 
-    DWORD rwColour;                    // 88
-    WORD  m_nPulsePeriod;              // 92
-    short m_nRotateRate;               // deg per frame (in either direction) // 94
-    DWORD m_nStartTime;                // 96
-    float m_fPulseFraction;            // 100
-    float m_fStdSize;                  // 104
-    float m_fSize;                     // 108
-    float m_fBrightness;               // 112
-    float m_fCameraRange;              // 116
+    DWORD rwColour;                          // 88
+    WORD  m_nPulsePeriod;                    // 92
+    short m_nRotateRate;                     // deg per frame (in either direction) // 94
+    DWORD m_nStartTime;                      // 96
+    float m_fPulseFraction;                  // 100
+    float m_fStdSize;                        // 104
+    float m_fSize;                           // 108
+    float m_fBrightness;                     // 112
+    float m_fCameraRange;                    // 116
 
-    CVector m_normal;            // Normal of the object point at             // 120
+    CVector m_normal;                        // Normal of the object point at             // 120
     // the following variables remember the last time we read the heigh of the
     // map. Using this we don't have to do this every frame and we can still have moving markers.
     WORD    m_LastMapReadX, m_LastMapReadY;            // 132 / 134
@@ -56,27 +56,27 @@ public:
 
     C3DMarkerSAInterface* GetInterface() { return internalInterface; }
 
-    void     GetMatrix(CMatrix* pMatrix);
-    void     SetMatrix(CMatrix* pMatrix);
-    void     SetPosition(CVector* vecPosition);
-    CVector* GetPosition();
-    DWORD    GetType();                        // need enum?
-    void     SetType(DWORD dwType);            // doesn't work propperly (not virtualed)
-    bool     IsActive();
-    DWORD    GetIdentifier();
-    SharedUtil::SColor   GetColor();
-    void     SetColor(const SharedUtil::SColor color);            // actually BGRA
-    void     SetPulsePeriod(WORD wPulsePeriod);
-    void     SetRotateRate(short RotateRate);
-    float    GetSize();
-    void     SetSize(float fSize);
-    float    GetBrightness();
-    void     SetBrightness(float fBrightness);
-    void     SetCameraRange(float fCameraRange);
-    void     SetPulseFraction(float fPulseFraction);            // doesn't work propperly (not virtualed)
-    float    GetPulseFraction();
-    void     Disable();
-    void     Reset();
-    void     SetActive() { this->internalInterface->m_bIsUsed = true; };
-    RpClump* GetRwObject() { return this->internalInterface->m_pRwObject; }
+    void               GetMatrix(CMatrix* pMatrix);
+    void               SetMatrix(CMatrix* pMatrix);
+    void               SetPosition(CVector* vecPosition);
+    CVector*           GetPosition();
+    DWORD              GetType();                        // need enum?
+    void               SetType(DWORD dwType);            // doesn't work propperly (not virtualed)
+    bool               IsActive();
+    DWORD              GetIdentifier();
+    SharedUtil::SColor GetColor();
+    void               SetColor(const SharedUtil::SColor color);            // actually BGRA
+    void               SetPulsePeriod(WORD wPulsePeriod);
+    void               SetRotateRate(short RotateRate);
+    float              GetSize();
+    void               SetSize(float fSize);
+    float              GetBrightness();
+    void               SetBrightness(float fBrightness);
+    void               SetCameraRange(float fCameraRange);
+    void               SetPulseFraction(float fPulseFraction);            // doesn't work propperly (not virtualed)
+    float              GetPulseFraction();
+    void               Disable();
+    void               Reset();
+    void               SetActive() { internalInterface->m_bIsUsed = true; }
+    RpClump*           GetRwObject() { return internalInterface->m_pRwObject; }
 };

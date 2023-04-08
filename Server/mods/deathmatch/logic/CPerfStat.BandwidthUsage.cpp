@@ -83,10 +83,16 @@ namespace
     }
 
     // Unix time in, stats hours out
-    uint UnixTimeToStatsHours(time_t tTime) { return static_cast<uint>((tTime - 1293861600UL) / 3600UL); }
+    uint UnixTimeToStatsHours(time_t tTime)
+    {
+        return static_cast<uint>((tTime - 1293861600UL) / 3600UL);
+    }
 
     // Stats hours in, unix time out
-    time_t StatsHoursToUnixTime(uint uiStatsHours) { return uiStatsHours * 3600UL + 1293861600UL; }
+    time_t StatsHoursToUnixTime(uint uiStatsHours)
+    {
+        return uiStatsHours * 3600UL + 1293861600UL;
+    }
 }            // namespace
 
 ///////////////////////////////////////////////////////////////

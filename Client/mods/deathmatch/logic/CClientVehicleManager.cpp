@@ -701,6 +701,7 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
             case VT_MOWER:
             case VT_RCCAM:
             case VT_RCGOBLIN:
+            case VT_BLOODRA:
                 break;
             default:
                 bHasDoors = true;

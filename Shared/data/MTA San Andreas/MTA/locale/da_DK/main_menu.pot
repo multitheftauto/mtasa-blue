@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-10 16:36+0000\n"
+"PO-Revision-Date: 2022-09-24 16:37\n"
+"Last-Translator: \n"
+"Language-Team: Danish\n"
+"Language: da_DK\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: da\n"
+"X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/main_menu.pot\n"
+"X-Crowdin-File-ID: 223\n"
+
+#. Found in the main menu navigation
+msgid "Quick connect"
+msgstr "Hurtig forbinde"
+
+#. Found in the main menu navigation
+msgid "Disconnect"
+msgstr "Koble fra"
+
+#. Found in the main menu navigation
+msgid "Server browser"
+msgstr "Server browser"
+
+#. Found in the main menu navigation
+msgid "Host game"
+msgstr "Host spil"
+
+#. Found in the main menu navigation
+msgid "Map editor"
+msgstr "Kort editor"
+
+#. Found in the main menu navigation
+msgid "Settings"
+msgstr "Indstillinger"
+
+#. Found in the main menu navigation
+msgid "About"
+msgstr "Om"
+
+#. Found in the main menu navigation
+msgid "Quit"
+msgstr "Afslut"
+
+#. Found in the main menu above the news listing
+msgid "The Latest News"
+msgstr ""
+
