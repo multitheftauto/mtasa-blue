@@ -60,10 +60,7 @@ namespace
     }
 
     // Finish with pointer
-    void UnlockCallbackId()
-    {
-        ms_CallbackCS.Unlock();
-    }
+    void UnlockCallbackId() { ms_CallbackCS.Unlock(); }
 }            // namespace
 
 CBassAudio::CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D)
@@ -179,7 +176,7 @@ bool CBassAudio::BeginLoadingMedia()
             m_pSound = BASS_StreamCreateFile(false, FromUTF8(m_strPath), 0, 0, lCreateFlags | BASS_UNICODE);
             if (!m_pSound)
                 m_pSound = BASS_MusicLoad(false, FromUTF8(m_strPath), 0, 0, BASS_MUSIC_RAMP | BASS_MUSIC_PRESCAN | BASS_STREAM_DECODE | BASS_UNICODE,
-                                          0);                       // Try again
+                                          0);            // Try again
             if (!m_pSound && m_b3D)
                 m_pSound = ConvertFileToMono(m_strPath);            // Last try if 3D
         }
@@ -352,23 +349,23 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
     HSTREAM decoder =
         BASS_StreamCreateFile(false, FromUTF8(strPath), 0, 0, BASS_STREAM_DECODE | BASS_SAMPLE_MONO | BASS_UNICODE);            // open file for decoding
     if (!decoder)
-        return 0;                                                                                                               // failed
-    DWORD            length = static_cast<DWORD>(BASS_ChannelGetLength(decoder, BASS_POS_BYTE));                                // get the length
-    void*            data = malloc(length);                                                                  // allocate buffer for decoded data
+        return 0;                                                                                           // failed
+    DWORD            length = static_cast<DWORD>(BASS_ChannelGetLength(decoder, BASS_POS_BYTE));            // get the length
+    void*            data = malloc(length);                                                                 // allocate buffer for decoded data
     BASS_CHANNELINFO ci;
-    BASS_ChannelGetInfo(decoder, &ci);                                                                       // get sample format
-    if (ci.chans > 1)                                                                                        // not mono, downmix...
+    BASS_ChannelGetInfo(decoder, &ci);            // get sample format
+    if (ci.chans > 1)                             // not mono, downmix...
     {
         HSTREAM mixer = BASS_Mixer_StreamCreate(ci.freq, 1, BASS_STREAM_DECODE | BASS_MIXER_END);            // create mono mixer
         BASS_Mixer_StreamAddChannel(
-            mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE);                // plug-in the decoder (auto-free with the mixer)
-        decoder = mixer;                                                                                     // decode from the mixer
+            mixer, decoder, BASS_MIXER_DOWNMIX | BASS_MIXER_NORAMPIN | BASS_STREAM_AUTOFREE);            // plug-in the decoder (auto-free with the mixer)
+        decoder = mixer;                                                                                 // decode from the mixer
     }
-    length = BASS_ChannelGetData(decoder, data, length);                                                     // decode data
-    BASS_StreamFree(decoder);                                                                                // free the decoder/mixer
-    HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);             // create stream
-    BASS_StreamPutData(stream, data, length);                                                                // set the stream data
-    free(data);                                                                                              // free the buffer
+    length = BASS_ChannelGetData(decoder, data, length);                                                    // decode data
+    BASS_StreamFree(decoder);                                                                               // free the decoder/mixer
+    HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);            // create stream
+    BASS_StreamPutData(stream, data, length);                                                               // set the stream data
+    free(data);                                                                                             // free the buffer
     return stream;
 }
 

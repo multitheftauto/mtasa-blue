@@ -482,7 +482,7 @@ enum class eBitStreamVersion : unsigned short
     Discord_Cleanup,
 
     //
-    // 1.6.0 RELEASED - 202x-xx-xx
+    // 1.6.0 RELEASED - 2023-04-07
     //
 
     // Implement simple serverside model allocating

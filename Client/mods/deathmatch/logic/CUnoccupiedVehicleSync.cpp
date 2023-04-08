@@ -228,10 +228,11 @@ void CUnoccupiedVehicleSync::UpdateDamageModels()
 
 void CUnoccupiedVehicleSync::UpdateStates()
 {
-    CClientPlayer* pPlayer = g_pClientGame->GetLocalPlayer();
+    CClientPlayer*      pPlayer = g_pClientGame->GetLocalPlayer();
     CDeathmatchVehicle* pVehicle = nullptr;
     // Are we leaving a vehicle as driver and physically out of it
-    if (pPlayer && pPlayer->GetVehicleInOutState() == VEHICLE_INOUT_GETTING_OUT && pPlayer->GetOccupiedVehicle() && pPlayer->GetOccupiedVehicleSeat() == 0 && !pPlayer->GetRealOccupiedVehicle())
+    if (pPlayer && pPlayer->GetVehicleInOutState() == VEHICLE_INOUT_GETTING_OUT && pPlayer->GetOccupiedVehicle() && pPlayer->GetOccupiedVehicleSeat() == 0 &&
+        !pPlayer->GetRealOccupiedVehicle())
     {
         // Make sure it's valid and add it to our list temporarily
         if (auto* pVehicle = dynamic_cast<CDeathmatchVehicle*>(pPlayer->GetOccupiedVehicle()))

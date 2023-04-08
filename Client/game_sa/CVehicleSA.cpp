@@ -109,10 +109,7 @@ namespace
     }
 
     // Get all atomics for this frame (even if they are invisible)
-    void GetAllAtomicObjects(RwFrame* frame, std::vector<RwObject*>& result)
-    {
-        RwFrameForAllObjects(frame, (void*)GetAllAtomicObjectCB, &result);
-    }
+    void GetAllAtomicObjects(RwFrame* frame, std::vector<RwObject*>& result) { RwFrameForAllObjects(frame, (void*)GetAllAtomicObjectCB, &result); }
 }            // namespace
 
 void CVehicleSA::Init()

@@ -56,8 +56,8 @@ extern "C"
         uint32_t      state[5];   /*!< intermediate digest state  */
         unsigned char buffer[64]; /*!< data block being processed */
 
-        unsigned char ipad[64];   /*!< HMAC: inner padding        */
-        unsigned char opad[64];   /*!< HMAC: outer padding        */
+        unsigned char ipad[64]; /*!< HMAC: inner padding        */
+        unsigned char opad[64]; /*!< HMAC: outer padding        */
     } sha1_context;
 
     /**

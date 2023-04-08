@@ -499,13 +499,13 @@ CClient* UserDataCast(CClient* ptr, lua_State* luaState)
 //
 SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
 {
-    if (CElement* pVar = UserDataCast((CElement*)ptr, luaVM))                      // Try element
+    if (CElement* pVar = UserDataCast((CElement*)ptr, luaVM))            // Try element
         return bFindElementType ? pVar->GetTypeName() : GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast(static_cast<CResource*>(ptr), luaVM))            // Try resource
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))                          // Try xml node
+    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))            // Try xml node
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))                         // Try timer
+    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CAccount*)ptr, luaVM))
         return GetClassTypeName(pVar);

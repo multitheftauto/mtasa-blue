@@ -96,7 +96,7 @@ public:
         bool          operator==(const iterator& other);
         bool          operator!=(const iterator& other);
         CWaterPolySA* operator*();
-        operator CWaterPolyEntrySAInterface*();
+                      operator CWaterPolyEntrySAInterface*();
 
     private:
         CWaterPolyEntrySAInterface* m_pFirst;
