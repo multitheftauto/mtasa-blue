@@ -42,6 +42,7 @@ class CClientManager;
 #include "CClientEffectManager.h"
 #include "CClientPointLightsManager.h"
 #include "CClientModelManager.h"
+#include "CClientIMGManager.h"
 
 #include "physics/CLuaPhysicsBaseManager.h"
 #include "physics/CLuaPhysicsRigidBodyManager.h"
@@ -99,6 +100,7 @@ public:
     CClientWeaponManager*        GetWeaponManager() { return m_pWeaponManager; }
     CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
+    CClientIMGManager*           GetIMGManager() { return m_pImgManager; }
 
     bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }
@@ -149,6 +151,7 @@ private:
     CClientEffectManager*        m_pEffectManager;
     CClientPointLightsManager*   m_pPointLightsManager;
     CClientModelManager*         m_pModelManager;
+    CClientIMGManager*           m_pImgManager;
     CClientPacketRecorder*       m_pPacketRecorder;
 
     CLuaPhysicsRigidBodyManager*       m_pLuaPhysicsRigidBodyManager;

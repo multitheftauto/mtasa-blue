@@ -317,7 +317,7 @@ SString CPerfStatManager::GetScaledFloatString(float fValue)
     if (fValue < 5)
         return SString("%.1f", fValue);            // 1.0 to 4.9
 
-    return SString("%.0f", fValue);            // 5 to inf. and beyond
+    return SString("%.0f", fValue);                // 5 to inf. and beyond
 }
 
 ///////////////////////////////////////////////////////////////

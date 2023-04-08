@@ -6338,20 +6338,30 @@ bool CStaticFunctionDefinitions::SetTime(unsigned char ucHour, unsigned char ucM
 }
 
 bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint,
-                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity,
+                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, std::vector<CClientEntity*> vecIgnoredElements,
                                                     SLineOfSightBuildingResult* pBuildingResult)
 {
     assert(pColPoint);
     assert(pColEntity);
 
-    if (pIgnoredEntity)
-        g_pGame->GetWorld()->IgnoreEntity(pIgnoredEntity);
+    vecIgnoredElements.erase(std::remove_if(vecIgnoredElements.begin(), vecIgnoredElements.end(), [](CClientEntity* pIgnoredElement) {
+        // Remove entities that already have their colision disabled. 
+        // This prevents us from re-enabling them.
+        if (!CStaticFunctionDefinitions::GetElementCollisionsEnabled(*pIgnoredElement))
+            return true;
+    
+        // Otherwise disable collision and keep it in the array
+        CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, false);
+    
+        return false;       
+    }), vecIgnoredElements.end());
 
     CEntity* pColGameEntity = 0;
     bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult);
 
-    if (pIgnoredEntity)
-        g_pGame->GetWorld()->IgnoreEntity(NULL);
+    // Re-enable collisions
+    for (CClientEntity* pIgnoredElement : vecIgnoredElements)
+        CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, true);
 
     CPools* pPools = g_pGame->GetPools();
     *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;

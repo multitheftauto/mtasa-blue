@@ -230,7 +230,7 @@ void CPerfStatSqliteTimingImpl::GetStats(CPerfStatResult* pResult, const std::ma
         if (m_bDisableBatching)
             iter->first->SuspendBatching(uiTicks);            // Suspend batching
         else
-            iter->first->SuspendBatching(0);            // Unsuspend batching
+            iter->first->SuspendBatching(0);                  // Unsuspend batching
     }
 }
 

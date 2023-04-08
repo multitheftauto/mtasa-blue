@@ -80,6 +80,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::Gargle);
 DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
 DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
+DECLARE_ENUM_CLASS(eModelIdeFlag);
 
 class CRemoteCall;
 
@@ -266,6 +267,10 @@ inline SString GetClassTypeName(CClientColModel*)
 inline SString GetClassTypeName(CClientTXD*)
 {
     return "txd";
+}
+inline SString GetClassTypeName(CClientIMG*)
+{
+    return "img";
 }
 inline SString GetClassTypeName(CClientSound*)
 {

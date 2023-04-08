@@ -151,18 +151,18 @@ void CMultiplayerSA::InitHooks_13()
 
     // Siren hooks
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle,
-                7);            // Test siren type is single for a jump
+                7);             // Test siren type is single for a jump
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle,
                 19);            // mov before Push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeDual,
-                7);            // test siren type is dual for a jump
+                7);             // test siren type is dual for a jump
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed,
                 15);            // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue,
                 15);            // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5);            // Does vehicle have a siren
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition,
-                5);            // Fix for single sirens being 360 degrees
+                5);                                                                                            // Fix for single sirens being 360 degrees
     // Breaks Rear wheel rendering leave for now
     // HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue, 15 ); // mov before the
     // push for the sien position (overhook so we can get RGBA) HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed,
@@ -336,7 +336,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
         // Grab our siren vehicle
         mov pVehicleWithTheSiren, esi
     }
-    // Call our Get siren type function which edits dwSirenType to our desired type
+    //   Call our Get siren type function which edits dwSirenType to our desired type
     GetVehicleSirenType();
     _asm
     {
@@ -631,7 +631,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
         // Store our post hook default siren type
         mov dwSirenTypePostHook, edi
     }
-    // Do our test and edit dwSirenType2 appropriately
+    //   Do our test and edit dwSirenType2 appropriately
     TestSirenTypeDualDefaultFix();
     _asm
     {
@@ -790,7 +790,7 @@ void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
         // Grab our vehicle interface
         mov pVehicleWithTheSiren, ecx
     }
-    // Test our vehicle for sirens
+    //   Test our vehicle for sirens
     if (TestVehicleForSiren())
     {
         _asm
@@ -842,7 +842,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
         // Grab our vehicle
         mov pVehicleWithTheSiren, esi
     }
-    // Check if we disable or enable the 360 effect
+    //   Check if we disable or enable the 360 effect
     if (SirenCheckCameraPosition())
     {
         _asm
@@ -1456,7 +1456,7 @@ void _declspec(naked) HOOK_CVehicleModelInterface_SetClump()
         mov pLoadingClump, eax
         mov pLoadingModelInfo, esi
     }
-    // Init our supported upgrades structure for this model info
+    //   Init our supported upgrades structure for this model info
     CVehicleModelInterface_SetClump();
     // Perform overwrite sequence and jump back
     _asm

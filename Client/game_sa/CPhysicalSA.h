@@ -29,8 +29,8 @@
 class CPhysicalSAInterface : public CEntitySAInterface
 {
 public:
-    float  pad1;            // 56
-    uint32 pad2;            // 60
+    float  pad1;                 // 56
+    uint32 pad2;                 // 60
 
     uint32 b0x01 : 1;            // 64
     uint32 bApplyGravity : 1;
@@ -50,8 +50,8 @@ public:
     uint32 b0x4000 : 1;                    //
     uint32 b0x8000 : 1;                    //
 
-    uint32 b0x10000 : 1;            // 66
-    uint32 b0x20000 : 1;            // ref @ CPhysical__processCollision
+    uint32 b0x10000 : 1;                   // 66
+    uint32 b0x20000 : 1;                   // ref @ CPhysical__processCollision
     uint32 bBulletProof : 1;
     uint32 bFireProof : 1;
     uint32 bCollisionProof : 1;

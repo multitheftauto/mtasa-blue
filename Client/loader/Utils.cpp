@@ -1161,7 +1161,7 @@ bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 
     if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
     {
-        using Signature = bool(*)(DWORD, UINT);
+        using Signature = bool (*)(DWORD, UINT);
         static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
 
         if (NtTerminateProcess_)
@@ -2172,7 +2172,7 @@ bool IsNativeArm64Host()
                 }
             }
         }
-        
+
         return false;
     })();
 

@@ -210,9 +210,9 @@ CTextureItem* CRadarMap::GetMarkerTexture(CClientRadarMarker* pMarker, float fLo
         if (fLocalZ > vecMarker.fZ + 4.0f)
             uiListIndex = MARKER_DOWN_TRIANGLE_INDEX;            // We're higher than this marker, so draw the arrow pointing down
         else if (fLocalZ < vecMarker.fZ - 4.0f)
-            uiListIndex = MARKER_UP_TRIANGLE_INDEX;            // We're lower than this entity, so draw the arrow pointing up
+            uiListIndex = MARKER_UP_TRIANGLE_INDEX;              // We're lower than this entity, so draw the arrow pointing up
         else
-            uiListIndex = MARKER_SQUARE_INDEX;            // We're at the same level so draw a square
+            uiListIndex = MARKER_SQUARE_INDEX;                   // We're at the same level so draw a square
 
         fScale /= 4;
     }

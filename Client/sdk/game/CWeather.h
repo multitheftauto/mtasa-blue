@@ -18,7 +18,7 @@ class CWeather
 public:
     virtual unsigned char Get() = 0;
     virtual void          Set(unsigned char primary, unsigned char secondary) = 0;
-    virtual void Release() = 0;
+    virtual void          Release() = 0;
 
     virtual float GetAmountOfRain() = 0;
     virtual void  SetAmountOfRain(float fAmount) = 0;
