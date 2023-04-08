@@ -13,6 +13,15 @@
 
 #include <CVector.h>
 #include <net/bitstream.h>
+#include "SharedUtil.Game.h"
+#include "SharedUtil.Misc.h"
+#include "CVector2D.h"
+
+#ifndef MTA_CLIENT
+    #include "CVehicle.h"
+#else
+    #include <game/CVehicle.h>
+#endif
 
 // Used to make sure that any position values we receive are at least half sane
 #define SYNC_POSITION_LIMIT 100000.0f
@@ -678,7 +687,6 @@ struct SVehiclePuresyncFlags : public ISyncStructure
     } data;
 };
 
-
 enum class eVehicleAimDirection : unsigned char
 {
     FORWARDS = 0,
@@ -872,7 +880,7 @@ struct SFullKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (bitStream.ReadBit())
             {
@@ -906,7 +914,7 @@ struct SFullKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
             {
@@ -961,7 +969,7 @@ struct SSmallKeysyncSync : public ISyncStructure
 
         bitStream.ReadBits((char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (bitStream.ReadBit())
             {
@@ -995,7 +1003,7 @@ struct SSmallKeysyncSync : public ISyncStructure
     {
         bitStream.WriteBits((const char*)&data, 8);
 
-        if (bitStream.Version() >= 0x06F)
+        if (bitStream.Can(eBitStreamVersion::AnalogControlSync_AccelBrakeReverse))
         {
             if (data.ucButtonSquare >= 1 && data.ucButtonSquare <= 254)
             {
@@ -1688,30 +1696,30 @@ struct SVehicleHandlingSync : public ISyncStructure
 
     struct
     {
-        float fMass;            // +4
+        float fMass;                                    // +4
 
-        float         fTurnMass;                     // +12
-        float         fDragCoeff;                    // +16
-        CVector       vecCenterOfMass;               // +20
-        unsigned char ucPercentSubmerged;            // +32     (unsigned int - sync changes)
+        float         fTurnMass;                        // +12
+        float         fDragCoeff;                       // +16
+        CVector       vecCenterOfMass;                  // +20
+        unsigned char ucPercentSubmerged;               // +32     (unsigned int - sync changes)
 
-        float fTractionMultiplier;            // +40
+        float fTractionMultiplier;                      // +40
 
-        unsigned char ucDriveType;                // +112
-        unsigned char ucEngineType;               // +113
-        unsigned char ucNumberOfGears;            // +114
+        unsigned char ucDriveType;                      // +112
+        unsigned char ucEngineType;                     // +113
+        unsigned char ucNumberOfGears;                  // +114
 
-        float fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
-        float fEngineInertia;                 // +124
-        float fMaxVelocity;                   // +128
+        float fEngineAcceleration;                      // +120     (value in handling.cfg * 0x86A950)
+        float fEngineInertia;                           // +124
+        float fMaxVelocity;                             // +128
 
-        float fBrakeDeceleration;            // +148
-        float fBrakeBias;                    // +152
-        bool  bABS;                          // +156
+        float fBrakeDeceleration;                       // +148
+        float fBrakeBias;                               // +152
+        bool  bABS;                                     // +156
 
-        float fSteeringLock;            // +160
-        float fTractionLoss;            // +164
-        float fTractionBias;            // +168
+        float fSteeringLock;                            // +160
+        float fTractionLoss;                            // +164
+        float fTractionBias;                            // +168
 
         float fSuspensionForceLevel;                    // +172
         float fSuspensionDamping;                       // +176
@@ -1721,11 +1729,11 @@ struct SVehicleHandlingSync : public ISyncStructure
         float fSuspensionFrontRearBias;                 // +192
         float fSuspensionAntiDiveMultiplier;            // +196
 
-        float fCollisionDamageMultiplier;            // +200
+        float fCollisionDamageMultiplier;               // +200
 
-        unsigned int uiModelFlags;                   // +204
-        unsigned int uiHandlingFlags;                // +208
-        float        fSeatOffsetDistance;            // +212
+        unsigned int uiModelFlags;                      // +204
+        unsigned int uiHandlingFlags;                   // +208
+        float        fSeatOffsetDistance;               // +212
         // unsigned int    uiMonetary;                     // +216
 
         // unsigned char   ucHeadLight;                    // +220
@@ -1945,7 +1953,7 @@ struct SFunBugsStateSync : public ISyncStructure
             bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
         else
             data4.bBadDrivebyHitboxes = 0;
-        if (bitStream.Version() >= 0x063)
+        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
             bOk &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
         else
             data5.bQuickStand = 0;
@@ -1967,12 +1975,12 @@ struct SFunBugsStateSync : public ISyncStructure
             bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
         if (bitStream.Version() >= 0x059)
             bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
-        if (bitStream.Version() >= 0x063)
+        if (bitStream.Can(eBitStreamVersion::QuickStandGlitch))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
 
         //// Example for adding item:
-        // if ( bitStream.Version() >= 0x999 )
-        //     bitStream.WriteBits ( reinterpret_cast < const char* > ( &data9 ), BITCOUNT9 );
+        // if (bitStream.Can(eBitStreamVersion::YourGlitch))
+        //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
     }
 
     struct
@@ -2371,26 +2379,26 @@ struct sWeaponPropertySync : public ISyncStructure
     struct
     {
         int   weaponType;
-        FLOAT fTargetRange;            // max targeting range
-        FLOAT fWeaponRange;            // absolute gun range / default melee attack range
+        FLOAT fTargetRange;                      // max targeting range
+        FLOAT fWeaponRange;                      // absolute gun range / default melee attack range
 
-        int nFlags;            // flags defining characteristics
+        int nFlags;                              // flags defining characteristics
 
-        short nAmmo;              // ammo in one clip
-        short nDamage;            // damage inflicted per hit
+        short nAmmo;                             // ammo in one clip
+        short nDamage;                           // damage inflicted per hit
 
-        FLOAT fAccuracy;             // modify accuracy of weapon
-        FLOAT fMoveSpeed;            // how fast can move with weapon
+        FLOAT fAccuracy;                         // modify accuracy of weapon
+        FLOAT fMoveSpeed;                        // how fast can move with weapon
 
-        FLOAT anim_loop_start;                  // start of animation loop
-        FLOAT anim_loop_stop;                   // end of animation loop
-        FLOAT anim_loop_bullet_fire;            // time in animation when weapon should be fired
+        FLOAT anim_loop_start;                   // start of animation loop
+        FLOAT anim_loop_stop;                    // end of animation loop
+        FLOAT anim_loop_bullet_fire;             // time in animation when weapon should be fired
 
         FLOAT anim2_loop_start;                  // start of animation2 loop
         FLOAT anim2_loop_stop;                   // end of animation2 loop
         FLOAT anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
 
-        FLOAT anim_breakout_time;            // time after which player can break out of attack and run off
+        FLOAT anim_breakout_time;                // time after which player can break out of attack and run off
     } data;
 };
 

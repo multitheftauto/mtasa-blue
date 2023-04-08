@@ -229,10 +229,11 @@ void CharToWideMap(const char *Src,wchar *Dest,size_t DestSize,bool &Success)
 #endif
 
 
-// SrcSize is in wide characters, not in bytes.
-byte* WideToRaw(const wchar *Src,byte *Dest,size_t SrcSize)
+// SrcSize is source data size in wide characters, not in bytes.
+// DestSize is the maximum allowed destination size.
+byte* WideToRaw(const wchar *Src,size_t SrcSize,byte *Dest,size_t DestSize)
 {
-  for (size_t I=0;I<SrcSize;I++,Src++)
+  for (size_t I=0;I<SrcSize && I*2+1<DestSize;I++,Src++)
   {
     Dest[I*2]=(byte)*Src;
     Dest[I*2+1]=(byte)(*Src>>8);
@@ -471,6 +472,7 @@ int wcsnicomp(const wchar *s1,const wchar *s2,size_t n)
 }
 
 
+// Case insensitive wcsstr().
 const wchar_t* wcscasestr(const wchar_t *str, const wchar_t *search)
 {
   for (size_t i=0;str[i]!=0;i++)
@@ -489,6 +491,8 @@ const wchar_t* wcscasestr(const wchar_t *str, const wchar_t *search)
 wchar* wcslower(wchar *s)
 {
 #ifdef _WIN_ALL
+  // _wcslwr requires setlocale and we do not want to depend on setlocale
+  // in Windows. Also CharLower involves less overhead.
   CharLower(s);
 #else
   for (wchar *c=s;*c!=0;c++)
@@ -503,6 +507,8 @@ wchar* wcslower(wchar *s)
 wchar* wcsupper(wchar *s)
 {
 #ifdef _WIN_ALL
+  // _wcsupr requires setlocale and we do not want to depend on setlocale
+  // in Windows. Also CharUpper involves less overhead.
   CharUpper(s);
 #else
   for (wchar *c=s;*c!=0;c++)
@@ -520,8 +526,9 @@ int toupperw(int ch)
 #if defined(_WIN_ALL)
   // CharUpper is more reliable than towupper in Windows, which seems to be
   // C locale dependent even in Unicode version. For example, towupper failed
-  // to convert lowercase Russian characters.
-  return (int)(INT_PTR)CharUpper((wchar *)(INT_PTR)ch);
+  // to convert lowercase Russian characters. Use 0xffff mask to prevent crash
+  // if value larger than 0xffff is passed to this function.
+  return (int)(INT_PTR)CharUpper((wchar *)(INT_PTR)(ch&0xffff));
 #else
   return towupper(ch);
 #endif
@@ -532,8 +539,9 @@ int tolowerw(int ch)
 {
 #if defined(_WIN_ALL)
   // CharLower is more reliable than towlower in Windows.
-  // See comment for towupper above.
-  return (int)(INT_PTR)CharLower((wchar *)(INT_PTR)ch);
+  // See comment for towupper above. Use 0xffff mask to prevent crash
+  // if value larger than 0xffff is passed to this function.
+  return (int)(INT_PTR)CharLower((wchar *)(INT_PTR)(ch&0xffff));
 #else
   return towlower(ch);
 #endif
@@ -594,57 +602,6 @@ char* SupportDBCS::charnext(const char *s)
   // to break string processing loops.
   return (char *)(IsLeadByte[(byte)*s] && s[1]!=0 ? s+2:s+1);
 }
-
-
-size_t SupportDBCS::strlend(const char *s)
-{
-  size_t Length=0;
-  while (*s!=0)
-  {
-    if (IsLeadByte[(byte)*s])
-      s+=2;
-    else
-      s++;
-    Length++;
-  }
-  return(Length);
-}
-
-
-char* SupportDBCS::strchrd(const char *s, int c)
-{
-  while (*s!=0)
-    if (IsLeadByte[(byte)*s])
-      s+=2;
-    else
-      if (*s==c)
-        return((char *)s);
-      else
-        s++;
-  return(NULL);
-}
-
-
-void SupportDBCS::copychrd(char *dest,const char *src)
-{
-  dest[0]=src[0];
-  if (IsLeadByte[(byte)src[0]])
-    dest[1]=src[1];
-}
-
-
-char* SupportDBCS::strrchrd(const char *s, int c)
-{
-  const char *found=NULL;
-  while (*s!=0)
-    if (IsLeadByte[(byte)*s])
-      s+=2;
-    else
-    {
-      if (*s==c)
-        found=s;
-      s++;
-    }
-  return((char *)found);
-}
 #endif
+
+

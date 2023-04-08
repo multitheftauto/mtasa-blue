@@ -18,13 +18,6 @@ project "json-c"
 		"*.c"
 	}
 
-	filter "system:windows"
-		includedirs { "shipped_for_mta_win32" }
-		disablewarnings { "4244" }
-
-	filter "system:not windows"
-		includedirs { "shipped_for_mta_linux" }
-
 	filter "system:macosx"
 		defines {"HAVE_XLOCALE_H"}
 

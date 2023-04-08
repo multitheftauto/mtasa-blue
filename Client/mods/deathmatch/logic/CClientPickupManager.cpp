@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CPickups.h>
 
 using std::list;
 
@@ -126,6 +127,17 @@ void CClientPickupManager::RestreamPickups(unsigned short usModel)
         CClientPickup* pPickup = *iter;
 
         if (pPickup->IsStreamedIn() && pPickup->GetModel() == usModel)
+        {
+            pPickup->StreamOutForABit();
+        }
+    }
+}
+
+void CClientPickupManager::RestreamAllPickups()
+{
+    for (auto& pPickup : m_List)
+    {
+        if (pPickup->IsStreamedIn())
         {
             pPickup->StreamOutForABit();
         }

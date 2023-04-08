@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaACLDefs.h"
+#include "CGame.h"
+#include "CScriptArgReader.h"
+#include "Utils.h"
 
 // Helper function
 static const char* GetResourceName(lua_State* luaVM)
@@ -62,9 +66,7 @@ void CLuaACLDefs::LoadFunctions()
 
 void CLuaACLDefs::AddClass(lua_State* luaVM)
 {
-    //////////////////////////
-    //  ACL class
-    //////////////////////////
+    // ACL class
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "save", "aclSave");
@@ -84,16 +86,10 @@ void CLuaACLDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setRight", "aclSetRight");
 
     lua_classvariable(luaVM, "name", NULL, "aclGetName");
-    // lua_classvariable ( luaVM, "rights", "", "aclListRights", NULL, CLuaOOPDefs::AclListRights ); // .rights[allowedType] = {..}
-    // lua_classvariable ( luaVM, "right", "aclSetRight", "aclGetRight", CLuaOOPDefs::AclSetRight, CLuaOOPDefs::AclGetRight ); // .right["e.y.e"] =
-    // "illuminati"; if value == nil then aclRemoveRight(self, key)
 
     lua_registerclass(luaVM, "ACL");
-    //////////////////////////
 
-    //////////////////////////
-    //  ACLGroup class
-    //////////////////////////
+    // ACLGroup class
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "get", "aclGetGroup");
@@ -111,8 +107,8 @@ void CLuaACLDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getName", "aclGroupGetName");
 
     lua_classvariable(luaVM, "name", NULL, "aclGroupGetName");
-    lua_classvariable(luaVM, "aclList", NULL, "aclGroupListACL");                // value nil = remove acl
-    lua_classvariable(luaVM, "objects", NULL, "aclGroupListObjects");            // value nil = remove object
+    lua_classvariable(luaVM, "aclList", NULL, "aclGroupListACL");
+    lua_classvariable(luaVM, "objects", NULL, "aclGroupListObjects");
 
     lua_registerclass(luaVM, "ACLGroup");
 }

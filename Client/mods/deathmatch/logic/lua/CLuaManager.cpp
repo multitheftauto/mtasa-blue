@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 #include "../luadefs/CLuaFireDefs.h"
+#include "../luadefs/CLuaClientDefs.h"
+#include "../luadefs/CLuaVectorGraphicDefs.h"
 
 using std::list;
 
@@ -47,8 +49,8 @@ CLuaManager::~CLuaManager()
         delete (*iter);
     }
 
-	// Close and remove LVM from memory
-	ProcessPendingDeleteList();
+    // Close and remove LVM from memory
+    ProcessPendingDeleteList();
 
     // Clear the C functions
     CLuaCFunctions::RemoveAllFunctions();
@@ -152,64 +154,6 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
 void CLuaManager::LoadCFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // ** BACKWARDS COMPATIBILITY FUNCS. SHOULD BE REMOVED BEFORE FINAL RELEASE! **
-        {"getPlayerRotation", CLuaPedDefs::GetPedRotation},
-        {"canPlayerBeKnockedOffBike", CLuaPedDefs::CanPedBeKnockedOffBike},
-        {"getPlayerContactElement", CLuaPedDefs::GetPedContactElement},
-        {"isPlayerInVehicle", CLuaPedDefs::IsPedInVehicle},
-        {"doesPlayerHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
-        {"isPlayerInWater", CLuaElementDefs::IsElementInWater},
-        {"isPedInWater", CLuaElementDefs::IsElementInWater},
-        {"isPedOnFire", CLuaPedDefs::IsPedOnFire},
-        {"setPedOnFire", CLuaPedDefs::SetPedOnFire},
-        {"isPlayerOnGround", CLuaPedDefs::IsPedOnGround},
-        {"getPlayerTask", CLuaPedDefs::GetPedTask},
-        {"getPlayerSimplestTask", CLuaPedDefs::GetPedSimplestTask},
-        {"isPlayerDoingTask", CLuaPedDefs::IsPedDoingTask},
-        {"getPlayerTarget", CLuaPedDefs::GetPedTarget},
-        {"getPlayerTargetStart", CLuaPedDefs::GetPedTargetStart},
-        {"getPlayerTargetEnd", CLuaPedDefs::GetPedTargetEnd},
-        {"getPlayerTargetCollision", CLuaPedDefs::GetPedTargetCollision},
-        {"getPlayerWeaponSlot", CLuaPedDefs::GetPedWeaponSlot},
-        {"getPlayerWeapon", CLuaPedDefs::GetPedWeapon},
-        {"getPlayerAmmoInClip", CLuaPedDefs::GetPedAmmoInClip},
-        {"getPlayerTotalAmmo", CLuaPedDefs::GetPedTotalAmmo},
-        {"getPedWeaponMuzzlePosition", CLuaPedDefs::GetPedWeaponMuzzlePosition},
-        {"getPlayerOccupiedVehicle", CLuaPedDefs::GetPedOccupiedVehicle},
-        {"getPlayerArmor", CLuaPedDefs::GetPedArmor},
-        {"getPlayerSkin", CLuaElementDefs::GetElementModel},
-        {"isPlayerChoking", CLuaPedDefs::IsPedChoking},
-        {"isPlayerDucked", CLuaPedDefs::IsPedDucked},
-        {"getPlayerStat", CLuaPedDefs::GetPedStat},
-        {"setPlayerWeaponSlot", CLuaPedDefs::SetPedWeaponSlot},
-        {"setPlayerSkin", CLuaElementDefs::SetElementModel},
-        {"setPlayerRotation", CLuaPedDefs::SetPedRotation},
-        {"setPlayerCanBeKnockedOffBike", CLuaPedDefs::SetPedCanBeKnockedOffBike},
-        {"setVehicleModel", CLuaElementDefs::SetElementModel},
-        {"getVehicleModel", CLuaElementDefs::GetElementModel},
-        {"getPedSkin", CLuaElementDefs::GetElementModel},
-        {"setPedSkin", CLuaElementDefs::SetElementModel},
-        {"getObjectRotation", CLuaElementDefs::GetElementRotation},
-        {"setObjectRotation", CLuaElementDefs::SetElementRotation},
-        {"getVehicleIDFromName", CLuaVehicleDefs::GetVehicleModelFromName},
-        {"getVehicleID", CLuaElementDefs::GetElementModel},
-        {"getVehicleRotation", CLuaElementDefs::GetElementRotation},
-        {"getVehicleNameFromID", CLuaVehicleDefs::GetVehicleNameFromModel},
-        {"setVehicleRotation", CLuaElementDefs::SetElementRotation},
-        {"attachElementToElement", CLuaElementDefs::AttachElements},
-        {"detachElementFromElement", CLuaElementDefs::DetachElements},
-        {"xmlFindSubNode", CLuaXMLDefs::xmlNodeFindChild},
-        {"xmlNodeGetSubNodes", CLuaXMLDefs::xmlNodeGetChildren},
-        {"xmlNodeFindSubNode", CLuaXMLDefs::xmlNodeFindChild},
-        {"xmlCreateSubNode", CLuaXMLDefs::xmlCreateChild},
-        {"xmlNodeFindChild", CLuaXMLDefs::xmlNodeFindChild},
-        {"isPlayerDead", CLuaPedDefs::IsPedDead},
-        {"guiEditSetCaratIndex", CLuaGUIDefs::GUIEditSetCaretIndex},
-        {"guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex},
-        {"setControlState", CLuaPedDefs::SetPedControlState},
-        {"getControlState", CLuaPedDefs::GetPedControlState},
-        // ** END OF BACKWARDS COMPATIBILITY FUNCS. **
-
         // Event funcs
         {"addEvent", CLuaFunctionDefs::AddEvent},
         {"addEventHandler", CLuaFunctionDefs::AddEventHandler},
@@ -227,8 +171,6 @@ void CLuaManager::LoadCFunctions()
         // Output funcs
         {"outputConsole", CLuaFunctionDefs::OutputConsole},
         {"outputChatBox", CLuaFunctionDefs::OutputChatBox},
-        {"showChat", CLuaFunctionDefs::ShowChat},
-        {"isChatVisible", CLuaFunctionDefs::IsChatVisible},
         {"outputDebugString", CLuaFunctionDefs::OutputClientDebugString},
         {"setClipboard", CLuaFunctionDefs::SetClipboard},
         {"setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing},
@@ -244,9 +186,6 @@ void CLuaManager::LoadCFunctions()
         {"getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes},
         {"getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName},
 
-        // Explosion funcs
-        {"createExplosion", CLuaFunctionDefs::CreateExplosion},
-
         // Cursor funcs
         {"getCursorPosition", CLuaFunctionDefs::GetCursorPosition},
         {"setCursorPosition", CLuaFunctionDefs::SetCursorPosition},
@@ -258,105 +197,6 @@ void CLuaManager::LoadCFunctions()
         // Util functions
         {"getValidPedModels", CLuaFunctionDefs::GetValidPedModels},
         {"downloadFile", CLuaFunctionDefs::DownloadFile},
-
-        // World get functions
-        {"getTime", CLuaFunctionDefs::GetTime_},
-        {"getGroundPosition", CLuaFunctionDefs::GetGroundPosition},
-        {"processLineOfSight", CLuaFunctionDefs::ProcessLineOfSight},
-        {"getWorldFromScreenPosition", CLuaFunctionDefs::GetWorldFromScreenPosition},
-        {"getScreenFromWorldPosition", CLuaFunctionDefs::GetScreenFromWorldPosition},
-        {"getWeather", CLuaFunctionDefs::GetWeather},
-        {"getZoneName", CLuaFunctionDefs::GetZoneName},
-        {"getGravity", CLuaFunctionDefs::GetGravity},
-        {"getGameSpeed", CLuaFunctionDefs::GetGameSpeed},
-        {"getMinuteDuration", CLuaFunctionDefs::GetMinuteDuration},
-        {"getWaveHeight", CLuaFunctionDefs::GetWaveHeight},
-        {"getGaragePosition", CLuaFunctionDefs::GetGaragePosition},
-        {"getGarageSize", CLuaFunctionDefs::GetGarageSize},
-        {"getGarageBoundingBox", CLuaFunctionDefs::GetGarageBoundingBox},
-        {"getBlurLevel", CLuaFunctionDefs::GetBlurLevel},
-        {"getTrafficLightState", CLuaFunctionDefs::GetTrafficLightState},
-        {"areTrafficLightsLocked", CLuaFunctionDefs::AreTrafficLightsLocked},
-        {"getSkyGradient", CLuaFunctionDefs::GetSkyGradient},
-        {"getHeatHaze", CLuaFunctionDefs::GetHeatHaze},
-        {"getJetpackMaxHeight", CLuaFunctionDefs::GetJetpackMaxHeight},
-        {"getWindVelocity", CLuaFunctionDefs::GetWindVelocity},
-        {"getInteriorSoundsEnabled", CLuaFunctionDefs::GetInteriorSoundsEnabled},
-        {"getInteriorFurnitureEnabled", CLuaFunctionDefs::GetInteriorFurnitureEnabled},
-        {"getFarClipDistance", CLuaFunctionDefs::GetFarClipDistance},
-        {"getNearClipDistance", CLuaFunctionDefs::GetNearClipDistance},
-        {"getVehiclesLODDistance", CLuaFunctionDefs::GetVehiclesLODDistance},
-        {"getPedsLODDistance", CLuaFunctionDefs::GetPedsLODDistance},
-        {"getFogDistance", CLuaFunctionDefs::GetFogDistance},
-        {"getSunColor", CLuaFunctionDefs::GetSunColor},
-        {"getSunSize", CLuaFunctionDefs::GetSunSize},
-        {"getAircraftMaxHeight", CLuaFunctionDefs::GetAircraftMaxHeight},
-        {"getAircraftMaxVelocity", CLuaFunctionDefs::GetAircraftMaxVelocity},
-        {"getOcclusionsEnabled", CLuaFunctionDefs::GetOcclusionsEnabled},
-        {"getCloudsEnabled", CLuaFunctionDefs::GetCloudsEnabled},
-        {"getRainLevel", CLuaFunctionDefs::GetRainLevel},
-        {"getMoonSize", CLuaFunctionDefs::GetMoonSize},
-        {"getFPSLimit", CLuaFunctionDefs::GetFPSLimit},
-        {"getBirdsEnabled", CLuaFunctionDefs::GetBirdsEnabled},
-        {"isPedTargetingMarkerEnabled", CLuaFunctionDefs::IsPedTargetingMarkerEnabled},
-        {"isLineOfSightClear", CLuaFunctionDefs::IsLineOfSightClear},
-        {"isWorldSpecialPropertyEnabled", CLuaFunctionDefs::IsWorldSpecialPropertyEnabled},
-        {"isGarageOpen", CLuaFunctionDefs::IsGarageOpen},
-
-        // World set funcs
-        {"setTime", CLuaFunctionDefs::SetTime},
-        {"setSkyGradient", CLuaFunctionDefs::SetSkyGradient},
-        {"setHeatHaze", CLuaFunctionDefs::SetHeatHaze},
-        {"setWeather", CLuaFunctionDefs::SetWeather},
-        {"setWeatherBlended", CLuaFunctionDefs::SetWeatherBlended},
-        {"setGravity", CLuaFunctionDefs::SetGravity},
-        {"setGameSpeed", CLuaFunctionDefs::SetGameSpeed},
-        {"setWaveHeight", CLuaFunctionDefs::SetWaveHeight},
-        {"setMinuteDuration", CLuaFunctionDefs::SetMinuteDuration},
-        {"setGarageOpen", CLuaFunctionDefs::SetGarageOpen},
-        {"setWorldSpecialPropertyEnabled", CLuaFunctionDefs::SetWorldSpecialPropertyEnabled},
-        {"setBlurLevel", CLuaFunctionDefs::SetBlurLevel},
-        {"resetBlurLevel", CLuaFunctionDefs::ResetBlurLevel},
-        {"setJetpackMaxHeight", CLuaFunctionDefs::SetJetpackMaxHeight},
-        {"setCloudsEnabled", CLuaFunctionDefs::SetCloudsEnabled},
-        {"setTrafficLightState", CLuaFunctionDefs::SetTrafficLightState},
-        {"setTrafficLightsLocked", CLuaFunctionDefs::SetTrafficLightsLocked},
-        {"setWindVelocity", CLuaFunctionDefs::SetWindVelocity},
-        {"setInteriorSoundsEnabled", CLuaFunctionDefs::SetInteriorSoundsEnabled},
-        {"setInteriorFurnitureEnabled", CLuaFunctionDefs::SetInteriorFurnitureEnabled},
-        {"setRainLevel", CLuaFunctionDefs::SetRainLevel},
-        {"setFarClipDistance", CLuaFunctionDefs::SetFarClipDistance},
-        {"setNearClipDistance", CLuaFunctionDefs::SetNearClipDistance},
-        {"setVehiclesLODDistance", CLuaFunctionDefs::SetVehiclesLODDistance},
-        {"setPedsLODDistance", CLuaFunctionDefs::SetPedsLODDistance},
-        {"setFogDistance", CLuaFunctionDefs::SetFogDistance},
-        {"setSunColor", CLuaFunctionDefs::SetSunColor},
-        {"setSunSize", CLuaFunctionDefs::SetSunSize},
-        {"setAircraftMaxHeight", CLuaFunctionDefs::SetAircraftMaxHeight},
-        {"setAircraftMaxVelocity", CLuaFunctionDefs::SetAircraftMaxVelocity},
-        {"setOcclusionsEnabled", CLuaFunctionDefs::SetOcclusionsEnabled},
-        {"setBirdsEnabled", CLuaFunctionDefs::SetBirdsEnabled},
-        {"setPedTargetingMarkerEnabled", CLuaFunctionDefs::SetPedTargetingMarkerEnabled},
-        {"setMoonSize", CLuaFunctionDefs::SetMoonSize},
-        {"setFPSLimit", CLuaFunctionDefs::SetFPSLimit},
-        {"removeWorldModel", CLuaFunctionDefs::RemoveWorldBuilding},
-        {"restoreAllWorldModels", CLuaFunctionDefs::RestoreWorldBuildings},
-        {"restoreWorldModel", CLuaFunctionDefs::RestoreWorldBuilding},
-        {"createSWATRope", CLuaFunctionDefs::CreateSWATRope},
-
-        // World reset funcs
-        {"resetSkyGradient", CLuaFunctionDefs::ResetSkyGradient},
-        {"resetHeatHaze", CLuaFunctionDefs::ResetHeatHaze},
-        {"resetWindVelocity", CLuaFunctionDefs::ResetWindVelocity},
-        {"resetRainLevel", CLuaFunctionDefs::ResetRainLevel},
-        {"resetFarClipDistance", CLuaFunctionDefs::ResetFarClipDistance},
-        {"resetNearClipDistance", CLuaFunctionDefs::ResetNearClipDistance},
-        {"resetVehiclesLODDistance", CLuaFunctionDefs::ResetVehiclesLODDistance},
-        {"resetPedsLODDistance", CLuaFunctionDefs::ResetPedsLODDistance},
-        {"resetFogDistance", CLuaFunctionDefs::ResetFogDistance},
-        {"resetSunColor", CLuaFunctionDefs::ResetSunColor},
-        {"resetSunSize", CLuaFunctionDefs::ResetSunSize},
-        {"resetMoonSize", CLuaFunctionDefs::ResetMoonSize},
 
         // Input functions
         {"bindKey", CLuaFunctionDefs::BindKey},
@@ -388,10 +228,6 @@ void CLuaManager::LoadCFunctions()
         {"getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode},
         {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
         {"removeDebugHook", CLuaFunctionDefs::RemoveDebugHook},
-        {"fetchRemote", CLuaFunctionDefs::FetchRemote},
-        {"getRemoteRequests", CLuaFunctionDefs::GetRemoteRequests},
-        {"getRemoteRequestInfo", CLuaFunctionDefs::GetRemoteRequestInfo},
-        {"abortRemoteRequest", CLuaFunctionDefs::AbortRemoteRequest},
 
         // Version functions
         {"getVersion", CLuaFunctionDefs::GetVersion},
@@ -414,6 +250,7 @@ void CLuaManager::LoadCFunctions()
     CLuaBrowserDefs::LoadFunctions();
     CLuaCameraDefs::LoadFunctions();
     CLuaColShapeDefs::LoadFunctions();
+    CLuaCompatibilityDefs::LoadFunctions();
     CLuaDrawingDefs::LoadFunctions();
     CLuaEffectDefs::LoadFunctions();
     CLuaElementDefs::LoadFunctions();
@@ -421,6 +258,7 @@ void CLuaManager::LoadCFunctions()
     CLuaFireDefs::LoadFunctions();
     CLuaGUIDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
+    CLuaNetworkDefs::LoadFunctions();
     CLuaObjectDefs::LoadFunctions();
     CLuaPedDefs::LoadFunctions();
     CLuaPickupDefs::LoadFunctions();
@@ -434,8 +272,11 @@ void CLuaManager::LoadCFunctions()
     CLuaTaskDefs::LoadFunctions();
     CLuaTeamDefs::LoadFunctions();
     CLuaTimerDefs::LoadFunctions();
+    CLuaVectorGraphicDefs::LoadFunctions();
     CLuaVehicleDefs::LoadFunctions();
     CLuaWaterDefs::LoadFunctions();
     CLuaWeaponDefs::LoadFunctions();
+    CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
+    CLuaClientDefs::LoadFunctions();
 }

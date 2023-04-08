@@ -3,15 +3,15 @@
 #include "arccmt.cpp"
 
 
-Archive::Archive(RAROptions *InitCmd)
+Archive::Archive(CommandData *InitCmd)
 {
   Cmd=NULL; // Just in case we'll have an exception in 'new' below.
 
   DummyCmd=(InitCmd==NULL);
-  Cmd=DummyCmd ? (new RAROptions):InitCmd;
+  Cmd=DummyCmd ? (new CommandData):InitCmd;
 
   OpenShared=Cmd->OpenShared;
-  Format=RARFMT15;
+  Format=RARFMT_NONE;
   Solid=false;
   Volume=false;
   MainComment=false;
@@ -31,9 +31,9 @@ Archive::Archive(RAROptions *InitCmd)
   NextBlockPos=0;
 
 
-  memset(&MainHead,0,sizeof(MainHead));
-  memset(&CryptHead,0,sizeof(CryptHead));
-  memset(&EndArcHead,0,sizeof(EndArcHead));
+  MainHead.Reset();
+  CryptHead={};
+  EndArcHead.Reset();
 
   VolNumber=0;
   VolWrite=0;
@@ -208,8 +208,8 @@ bool Archive::IsArchive(bool EnableBroken)
       break;
   }
 
-  // This check allows to make RS based recovery even if password is incorrect.
-  // But we should not do it for EnableBroken or we'll get 'not RAR archive'
+  
+  // We should not do it for EnableBroken or we'll get 'not RAR archive'
   // messages when extracting encrypted archives with wrong password.
   if (FailedHeaderDecryption && !EnableBroken)
     return false;
@@ -231,9 +231,9 @@ bool Archive::IsArchive(bool EnableBroken)
   // first file header to set "comment" flag when reading service header.
   // Unless we are in silent mode, we need to know about presence of comment
   // immediately after IsArchive call.
-  if (HeadersLeft && (!SilentOpen || !Encrypted))
+  if (HeadersLeft && (!SilentOpen || !Encrypted) && IsSeekable())
   {
-    SaveFilePos SavePos(*this);
+    int64 SavePos=Tell();
     int64 SaveCurBlockPos=CurBlockPos,SaveNextBlockPos=NextBlockPos;
     HEADER_TYPE SaveCurHeaderType=CurHeaderType;
 
@@ -262,6 +262,7 @@ bool Archive::IsArchive(bool EnableBroken)
     CurBlockPos=SaveCurBlockPos;
     NextBlockPos=SaveNextBlockPos;
     CurHeaderType=SaveCurHeaderType;
+    Seek(SavePos,SEEK_SET);
   }
   if (!Volume || FirstVolume)
     wcsncpyz(FirstVolumeName,FileName,ASIZE(FirstVolumeName));

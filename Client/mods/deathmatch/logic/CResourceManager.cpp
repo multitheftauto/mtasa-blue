@@ -126,9 +126,6 @@ void CResourceManager::Remove(CResource* pResource)
     // Triggger the onStop event, and set resource state to 'stopping'
     pResource->Stop();
 
-    // Delete all the resource's locally created children (the server won't do that)
-    pResource->DeleteClientChildren();
-
     // Delete the resource
     m_resources.remove(pResource);
     assert(MapContains(m_NetIdResourceMap, pResource->GetNetID()));
@@ -265,7 +262,7 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
             if (buffer)
                 checksum = CChecksum::GenerateChecksumFromBuffer(buffer, bufferSize);
             else
-                checksum = CChecksum::GenerateChecksumFromFile(strInFilename);
+                checksum = CChecksum::GenerateChecksumFromFileUnsafe(strInFilename);
             if (checksum != pResourceFile->GetServerChecksum())
             {
                 char szMd5[33];

@@ -11,7 +11,9 @@
 
 #pragma once
 
-class CPlayerTransgressionPacket : public CPacket
+#include "CPacket.h"
+
+class CPlayerTransgressionPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_TRANSGRESSION; };

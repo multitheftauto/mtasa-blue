@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include "CEntity.h"
-#include "CColPoint.h"
+class CEntitySAInterface;
+class CVector;
+class CColPoint;
 
 struct SLineOfSightFlags
 {
@@ -228,12 +229,13 @@ public:
     uint8_t  m_tyreGrip;
     uint8_t  m_wetGrip;            // 2
     uint16_t pad;                  // 4
-    union {
+    union
+    {
         struct            // size 8
         {
             uint32_t flags[2];
         };
-        struct            // size = 51
+        struct                                        // size = 51
         {
             uint32_t m_adhesionGroup : 3;             // 1 - 3
             uint32_t m_skidmarkType : 2;              // 4 - 5
@@ -244,7 +246,7 @@ public:
             uint32_t m_shootThrough : 1;              // 14
             uint32_t m_sand : 1;                      // 15
             uint32_t m_water : 1;
-            uint32_t m_shallowWater : 1;            // unknown effect
+            uint32_t m_shallowWater : 1;              // unknown effect
             uint32_t m_beach : 1;
             uint32_t m_steepSlope : 1;
             uint32_t m_glass : 1;            // 20
@@ -268,10 +270,10 @@ public:
             uint32_t m_createsWheelSpray : 1;            // crash
             uint32_t m_createsPlants : 1;                // 8
             uint32_t m_createsObjects : 1;
-            uint32_t m_canClimb : 1;                 // 10
-            uint32_t m_audioConcrete : 1;            // 11
+            uint32_t m_canClimb : 1;                     // 10
+            uint32_t m_audioConcrete : 1;                // 11
             uint32_t m_audioGrass : 1;
-            uint32_t m_audioSand : 1;            // 13
+            uint32_t m_audioSand : 1;                    // 13
             uint32_t m_audioGravel : 1;
             uint32_t m_audioWood : 1;
             uint32_t m_audioWater : 1;
@@ -290,9 +292,7 @@ public:
                 flags[flagsGroup] &= ~(1UL << (sFlagID + usForNext));
         }
     }
-    inline bool getFlagEnabled(char flagsGroup, short sFlagID) {
-        return ((flags[flagsGroup] >> sFlagID) & 1U) == 1;
-    }
+    bool getFlagEnabled(char flagsGroup, short sFlagID) { return ((flags[flagsGroup] >> sFlagID) & 1U) == 1; }
 };
 
 struct CSurfaceType
@@ -304,18 +304,14 @@ struct CSurfaceType
 class CWorld
 {
 public:
-    virtual void Add(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
-    virtual bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                    const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
-    // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED ----------v
-    virtual bool  TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision) = 0;
+    virtual void  Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
+    virtual bool  ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
+                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
     virtual void  IgnoreEntity(CEntity* entity) = 0;
-    virtual BYTE  GetLevelFromPosition(CVector* vecPosition) = 0;
-    virtual float FindGroundZForPosition(float fX, float fY) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
-    virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
+    virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;
     virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
     virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;
     virtual DWORD GetCurrentArea() = 0;
@@ -345,7 +341,7 @@ public:
     virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
     virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 
-    virtual CSurfaceType*     GetSurfaceInfo() = 0;
-    virtual void              ResetAllSurfaceInfo() = 0;
-    virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
+    virtual CSurfaceType* GetSurfaceInfo() = 0;
+    virtual void          ResetAllSurfaceInfo() = 0;
+    virtual bool          ResetSurfaceInfo(short sSurfaceID) = 0;
 };

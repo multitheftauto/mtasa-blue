@@ -9,7 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "net/SyncStructures.h"
+#include "CSyncSettingsPacket.h"
+#include "CCommon.h"
+#include <net/SyncStructures.h>
 
 CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
                                          short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
@@ -64,7 +66,7 @@ bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(m_ucAllowDrivebyAnimationFix);
     }
 
-    if (BitStream.Version() >= 0x64)
+    if (BitStream.Can(eBitStreamVersion::ShotgunDamageFix))
     {
         BitStream.Write(m_ucAllowShotgunDamageFix);
     }

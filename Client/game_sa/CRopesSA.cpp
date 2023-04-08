@@ -10,7 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRopesSA.h"
+
 DWORD dwDurationAddress = 0x558D1El;
+
+CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface(*)[8])0xB768B8;
 
 int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
 {
@@ -26,7 +30,27 @@ int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
         add     esp, 0x4
         mov     iReturn, eax
     }
-    // Set it back for SA in case we ever do some other implementation.
+    //   Set it back for SA in case we ever do some other implementation.
     MemPut((DWORD*)(dwDurationAddress), 4000);
     return iReturn;
+}
+
+void CRopesSA::RemoveEntityRope(CEntitySAInterface* pEntity)
+{
+    CRopesSAInterface* pRope = nullptr;
+
+    for (uint i = 0; i < ROPES_COUNT; i++)
+    {
+        if (ms_aRopes[i].m_pRopeEntity == pEntity)
+        {
+            pRope = &ms_aRopes[i];
+            break;
+        }
+    }
+
+    if (pRope)
+    {
+        auto CRope_Remove = (void(__thiscall*)(CRopesSAInterface*))0x556780;
+        CRope_Remove(pRope);
+    }
 }

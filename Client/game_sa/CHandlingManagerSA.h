@@ -13,6 +13,9 @@
 
 #include <game/CHandlingManager.h>
 #include "CHandlingEntrySA.h"
+#include "CFlyingHandlingEntrySA.h"
+#include "CBoatHandlingEntrySA.h"
+#include "CBikeHandlingEntrySA.h"
 
 class CHandlingManagerSA : public CHandlingManager
 {
@@ -20,9 +23,15 @@ public:
     CHandlingManagerSA();
     ~CHandlingManagerSA();
 
-    CHandlingEntry* CreateHandlingData();
+    CHandlingEntry*       CreateHandlingData();
+    CFlyingHandlingEntry* CreateFlyingHandlingData();
+    CBoatHandlingEntry*   CreateBoatHandlingData();
+    CBikeHandlingEntry*   CreateBikeHandlingData();
 
-    const CHandlingEntry* GetOriginalHandlingData(eVehicleTypes eModel);
+    const CHandlingEntry*       GetOriginalHandlingData(eVehicleTypes eModel);
+    const CFlyingHandlingEntry* GetOriginalFlyingHandlingData(eVehicleTypes eModel);
+    const CBoatHandlingEntry*   GetOriginalBoatHandlingData(eVehicleTypes eModel);
+    const CBikeHandlingEntry*   GetOriginalBikeHandlingData(eVehicleTypes eModel);
 
     eHandlingTypes GetHandlingID(eVehicleTypes eModel);
 
@@ -39,6 +48,15 @@ private:
     // Original handling data unaffected by handling.cfg changes
     static tHandlingDataSA   m_OriginalHandlingData[HT_MAX];
     static CHandlingEntrySA* m_pOriginalEntries[HT_MAX];
+
+    static tFlyingHandlingDataSA   m_OriginalFlyingHandlingData[24];
+    static CFlyingHandlingEntrySA* m_pOriginalFlyingEntries[24];
+
+    static tBoatHandlingDataSA   m_OriginalBoatHandlingData[12];
+    static CBoatHandlingEntrySA* m_pOriginalBoatEntries[12];
+
+    static tBikeHandlingDataSA   m_OriginalBikeHandlingData[14];
+    static CBikeHandlingEntrySA* m_pOriginalBikeEntries[14];
 
     std::map<std::string, eHandlingProperty> m_HandlingNames;
     int                                      iChangedVehicles;

@@ -7,13 +7,13 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
 
-//
-// class WString
-//
-// Adds some functionality to the std::wstring class
-//
-#include <stdarg.h>
+#include <string>
+#include <vector>
+#include <cstdarg>
+#include "SharedUtil.IntTypes.h"
+#include "SString.h"
 
 #ifdef WIN32
 #ifndef va_copy
@@ -72,8 +72,8 @@ public:
     WString operator+(const WString& other) const { return std::wstring(*this) + other; }
 
     // Assignment
-                   operator const wchar_t*() const { return c_str(); }            // Auto assign to const wchar_t* without using c_str()
-    const wchar_t* operator*()const { return c_str(); }
+    operator const wchar_t*() const { return c_str(); }            // Auto assign to const wchar_t* without using c_str()
+    const wchar_t* operator*() const { return c_str(); }
 
     // Functions
     void           Split(const WString& strDelim, std::vector<WString>& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0) const;

@@ -12,10 +12,12 @@
 #include "version.hpp"
 #include "rardefs.hpp"
 #include "rarlang.hpp"
+#include "rawint.hpp"
 #include "unicode.hpp"
 #include "errhnd.hpp"
 #include "secpassword.hpp"
 #include "array.hpp"
+#include "strlist.hpp"
 #include "timefn.hpp"
 #include "sha1.hpp"
 #include "sha256.hpp"
@@ -28,18 +30,15 @@
 #include "headers.hpp"
 #include "pathfn.hpp"
 #include "strfn.hpp"
-#include "strlist.hpp"
 #ifdef _WIN_ALL
 #include "isnt.hpp"
 #endif
 #include "file.hpp"
 #include "crc.hpp"
-#include "ui.hpp"
 #include "filefn.hpp"
 #include "filestr.hpp"
 #include "find.hpp"
 #include "scantree.hpp"
-#include "savepos.hpp"
 #include "getbits.hpp"
 #include "rdwrfn.hpp"
 #ifdef USE_QOPEN
@@ -48,11 +47,11 @@
 #include "archive.hpp"
 #include "match.hpp"
 #include "cmddata.hpp"
+#include "ui.hpp"
 #include "filcreat.hpp"
 #include "consio.hpp"
 #include "system.hpp"
 #include "log.hpp"
-#include "rawint.hpp"
 #include "rawread.hpp"
 #include "encname.hpp"
 #include "resource.hpp"
@@ -77,6 +76,9 @@
 
 #include "rs.hpp"
 #include "rs16.hpp"
+
+
+
 #include "recvol.hpp"
 #include "volume.hpp"
 #include "smallfn.hpp"

@@ -15,6 +15,8 @@ class CClientDFF;
 #include <list>
 #include "CClientEntity.h"
 
+struct RpClump;
+
 struct SLoadedClumpInfo
 {
     SLoadedClumpInfo() : bTriedLoad(false), pClump(NULL) {}
@@ -22,7 +24,7 @@ struct SLoadedClumpInfo
     RpClump* pClump;
 };
 
-class CClientDFF : public CClientEntity
+class CClientDFF final : public CClientEntity
 {
     DECLARE_CLASS(CClientDFF, CClientEntity)
     friend class CClientDFFManager;

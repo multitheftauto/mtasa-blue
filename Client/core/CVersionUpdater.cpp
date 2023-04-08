@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
+#include "CFilePathTranslator.h"
 #include "SharedUtil.Thread.h"
+#include <charconv>
 
 ///////////////////////////////////////////////////////////////
 //
@@ -1153,24 +1156,24 @@ void CVersionUpdater::Program_VersionCheck()
     _ProcessPatchFileQuery();
 
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.update"))
-        goto dload;            // If update server says 'update' then goto dload
+        goto dload;                  // If update server says 'update' then goto dload
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.files"))
-        goto dload;            // If update server says 'files' then goto dload:
+        goto dload;                  // If update server says 'files' then goto dload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.silent"))
         goto silentdload;            // If update server says 'silent' then goto silentdload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.noupdate"))
-        goto noupdate;            // If update server says 'noupdate' then goto noupdate:
+        goto noupdate;               // If update server says 'noupdate' then goto noupdate:
     return;
 
 dload:
     _DialogUpdateQuestion();            // Show "Update available" dialog
     if (m_ConditionMap.IsConditionTrue("QuestionResponse.!Yes"))
-        goto end;                    // If user says 'No', then goto end:
-    _DialogDownloading();            // Show "Downloading..." message
+        goto end;                       // If user says 'No', then goto end:
+    _DialogDownloading();               // Show "Downloading..." message
     _UseProvidedURLs();
-    _StartDownload();            // Fetch update binary from update mirror
+    _StartDownload();                   // Fetch update binary from update mirror
     _ProcessPatchFileDownload();
-    _DialogUpdateResult();            // Show "Update ok/failed" message
+    _DialogUpdateResult();              // Show "Update ok/failed" message
     return;
 
 silentdload:
@@ -1203,11 +1206,11 @@ void CVersionUpdater::Program_ManualCheck()
     _StartDownload();                  // Fetch update info from update server
     _ProcessPatchFileQuery();
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.update"))
-        goto dload;            // If update server says 'update' then goto dload:
+        goto dload;               // If update server says 'update' then goto dload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.files"))
-        goto dload;            // If update server says 'files' then goto dload:
+        goto dload;               // If update server says 'files' then goto dload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.silent"))
-        goto dload;            // If update server says 'silent' then goto dload:
+        goto dload;               // If update server says 'silent' then goto dload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.noupdate"))
         goto noupdate;            // If update server says 'noupdate' then goto noupdate:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.cancel"))
@@ -1218,12 +1221,12 @@ void CVersionUpdater::Program_ManualCheck()
 dload:
     _DialogUpdateQuestion();            // Show "Update available" dialog
     if (m_ConditionMap.IsConditionTrue("QuestionResponse.!Yes"))
-        goto end;                    // If user says 'No', then goto end:
-    _DialogDownloading();            // Show "Downloading..." message
+        goto end;                       // If user says 'No', then goto end:
+    _DialogDownloading();               // Show "Downloading..." message
     _UseProvidedURLs();
-    _StartDownload();            // Fetch update binary from update mirror
+    _StartDownload();                   // Fetch update binary from update mirror
     _ProcessPatchFileDownload();
-    _DialogUpdateResult();            // Show "Update ok/failed" message
+    _DialogUpdateResult();              // Show "Update ok/failed" message
     return;
 
 noupdate:
@@ -1260,9 +1263,9 @@ void CVersionUpdater::Program_ServerSaysUpdate()
     _UseVersionQueryURLs();                       // Use VERSION_CHECKER_URL*
     _DialogServerSaysUpdateQuestion();            // Show "Server says update" dialog
     if (m_ConditionMap.IsConditionTrue("QuestionResponse.!Yes"))
-        goto end;                 // If user says 'No', then goto end:
-    _DialogChecking();            // Show "Checking..." message
-    _StartDownload();             // Fetch update info from update server
+        goto end;                                 // If user says 'No', then goto end:
+    _DialogChecking();                            // Show "Checking..." message
+    _StartDownload();                             // Fetch update info from update server
     _ProcessPatchFileQuery();
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.update"))
         goto dload;            // If update server says 'update' then goto dload:
@@ -1274,9 +1277,9 @@ void CVersionUpdater::Program_ServerSaysUpdate()
     return;
 
 dload:
-    _DialogDownloading();            // Show "Downloading..." message
+    _DialogDownloading();             // Show "Downloading..." message
     _UseProvidedURLs();
-    _StartDownload();            // Fetch update binary from update mirror
+    _StartDownload();                 // Fetch update binary from update mirror
     _ProcessPatchFileDownload();
     _DialogUpdateResult();            // Show "Update ok/failed" message
     return;
@@ -1299,9 +1302,9 @@ void CVersionUpdater::Program_ServerSaysRecommend()
     _StartDownload();                   // Fetch update info from update server
     _ProcessPatchFileQuery();
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.update"))
-        goto dload;            // If update server says 'update' then goto dload:
+        goto dload;                  // If update server says 'update' then goto dload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.files"))
-        goto dload;            // If update server says 'files' then goto dload:
+        goto dload;                  // If update server says 'files' then goto dload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.silent"))
         goto silentdload;            // If update server says 'silent' then goto silentdload:
     _ActionReconnect();
@@ -1310,21 +1313,21 @@ void CVersionUpdater::Program_ServerSaysRecommend()
 dload:
     _DialogServerSaysRecommendQuestion();            // Show "Server says update" dialog
     if (m_ConditionMap.IsConditionTrue("QuestionResponse.!Yes"))
-        goto reconnect;              // If user says 'No', then goto reconnect:
-    _DialogDownloading();            // Show "Downloading..." message
+        goto reconnect;                              // If user says 'No', then goto reconnect:
+    _DialogDownloading();                            // Show "Downloading..." message
     _UseProvidedURLs();
-    _StartDownload();            // Fetch update binary from update mirror
+    _StartDownload();                                // Fetch update binary from update mirror
     _ProcessPatchFileDownload();
-    _DialogUpdateResult();            // Show "Update ok/failed" message
+    _DialogUpdateResult();                           // Show "Update ok/failed" message
     return;
 
 silentdload:
     _DialogHide();                 // Don't show downloading progress
     _ActionReconnect();            // Reconnect to game
     _UseProvidedURLs();
-    _StartDownload();            // Fetch update binary from update mirror
+    _StartDownload();              // Fetch update binary from update mirror
     _ProcessPatchFileDownload();
-    _QUpdateResult();            // Maybe set OnRestartCommand
+    _QUpdateResult();              // Maybe set OnRestartCommand
     return;
 
 reconnect:
@@ -1414,7 +1417,7 @@ void CVersionUpdater::Program_SendReportLog()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::Program_SidegradeLaunch()
 {
-    _CheckSidegradeRequirements();            // Check if other version already installed
+    _CheckSidegradeRequirements();               // Check if other version already installed
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.!installed"))
         goto notinstalled;                       // Other version present and valid?
     _DialogSidegradeLaunchQuestion();            // Does user want to launch and connect using the other version?
@@ -1440,9 +1443,9 @@ hasfile:
     return;            // If user says 'No', then finish
 
 yesdownload:
-    _DialogDownloading();            // Show "Downloading..." message
+    _DialogDownloading();               // Show "Downloading..." message
     _UseProvidedURLs();
-    _StartDownload();            // Fetch file binary from mirror
+    _StartDownload();                   // Fetch file binary from mirror
     _ProcessPatchFileDownload();
     _DialogExeFilesResult();            // Show "ok/failed" message
     return;
@@ -1463,12 +1466,12 @@ void CVersionUpdater::Program_NewsUpdate()
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.silent"))
         goto silentdload;            // If update server says 'silent' then goto silentdload:
     if (m_ConditionMap.IsConditionTrue("ProcessResponse.noupdate"))
-        goto noupdate;            // If update server says 'noupdate' then goto noupdate:
+        goto noupdate;               // If update server says 'noupdate' then goto noupdate:
     return;
 
 silentdload:
     _UseProvidedURLs();
-    _StartDownload();            // Fetch update binary from update mirror
+    _StartDownload();                // Fetch update binary from update mirror
     _ProcessPatchFileDownload();
     _QUpdateNewsResult();            // Maybe update news install queue
     return;
@@ -2175,6 +2178,35 @@ void CVersionUpdater::_UseVersionQueryURLs()
     m_JobInfo.bShowDownloadPercent = false;
 }
 
+/**
+ * @brief Extracts the revision from an update file name.
+ * @param fileName Name of the file
+ * @param revision Revision of the update
+ */
+static bool GetRevisionFromFileName(std::string_view fileName, std::uint32_t& revision)
+{
+    revision = {};
+
+    // Example:                          mtasa-1.5.9-rc-21519-0-000-files-all-cksummed.rar
+    // Search for the delimiter before the revision ^^^^.
+    if (size_t revisionStart = fileName.find("-rc-"); revisionStart != std::string_view::npos)
+    {
+        revisionStart += 4;
+
+        // Example:                mtasa-1.5.9-rc-21519-0-000-files-all-cksummed.rar
+        // Search for the delimiter after the revision ^.
+        if (size_t revisionStop = fileName.find('-', revisionStart); revisionStop != std::string_view::npos)
+        {
+            std::string_view raw = fileName.substr(revisionStart, revisionStop - revisionStart);
+
+            if (auto [ptr, ec] = std::from_chars(raw.data(), raw.data() + raw.size(), revision); ec == std::errc{})
+                return true;
+        }
+    }
+
+    return false;
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CVersionUpdater::_ProcessPatchFileQuery
@@ -2298,6 +2330,25 @@ void CVersionUpdater::_ProcessPatchFileQuery()
 
     // Indicate what the server wants us to do
     m_ConditionMap.SetCondition("ProcessResponse", m_JobInfo.strStatus);
+
+    // Report update response
+    if (!m_JobInfo.strStatus.empty() && m_JobInfo.strStatus != "noupdate" && !_strnicmp("mtasa-", m_JobInfo.strFilename.c_str(), 6))
+    {
+        uint32_t revision{};
+
+        if (GetRevisionFromFileName(m_JobInfo.strFilename, revision) && revision < MTASA_VERSION_BUILD)
+        {
+            unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+            unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+
+            SString playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
+                                  MTASA_VERSION_BUILD, netRev, netRel);
+
+            AddReportLog(5061, SString("Processing patch file '%s' [%s, %s] with '%s' (version: %s) from '%s'", m_JobInfo.strFilename.c_str(),
+                                       m_JobInfo.iFilesize.ToString().c_str(), m_JobInfo.strMD5.c_str(), m_JobInfo.strStatus.c_str(), playerVersion.c_str(),
+                                       m_strLastQueryURL.c_str()));
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2717,8 +2768,11 @@ int CVersionUpdater::_PollDownload()
                         return RES_OK;
                     }
                     if (m_JobInfo.bShowDownloadPercent)
-                        GetQuestionBox().SetMessage(
-                            SString(_("%3d %% completed"), Round(m_JobInfo.uiBytesDownloaded * 100.f / std::max<float>(1, m_JobInfo.iFilesize))));
+                    {
+                        const bool  bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
+                        const float fDownloadedPercent = bIsDownloadedSizeRight ? Round(m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
+                        GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
+                    }
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
                         GetQuestionBox().AppendMessage(SString(_("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000));
                     else
@@ -3060,7 +3114,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
     unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
     SString        strPlayerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
-                             MTASA_VERSION_BUILD, usNetRev, usNetRel);
+                                    MTASA_VERSION_BUILD, usNetRev, usNetRel);
 
     SString strUpdateBuildType;
     CVARS_GET("update_build_type", strUpdateBuildType);
@@ -3079,7 +3133,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
                 if (fgetc(fh))
                     strSoundCut = "n";            // Non-zero found
             if (ferror(fh))
-                strSoundCut = "e";            // File error
+                strSoundCut = "e";                // File error
             fclose(fh);
         }
     }
@@ -3108,7 +3162,8 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     SString        strVideoCard = SStringX(g_pDeviceState->AdapterState.Name).Left(30);
-    std::replace_if(strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
+    std::replace_if(
+        strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
     SString strSystemStats(
         "1_%d_%d_%d_%d_%d"
         "_%d%d%d%d"
@@ -3119,50 +3174,50 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
         gameSettings->GetFXQuality(),                                               //
         dxStatus.settings.iDrawDistance,                                            //
 
-        GetVideoModeManager()->IsWindowed(),                //
-        GetVideoModeManager()->IsMultiMonitor(),            //
-        dxStatus.settings.bVolumetricShadows,               //
-        dxStatus.settings.bAllowScreenUpload,               //
+        GetVideoModeManager()->IsWindowed(),                                        //
+        GetVideoModeManager()->IsMultiMonitor(),                                    //
+        dxStatus.settings.bVolumetricShadows,                                       //
+        dxStatus.settings.bAllowScreenUpload,                                       //
 
-        *GetApplicationSetting("real-os-version")            //
+        *GetApplicationSetting("real-os-version")                                   //
     );
 
     SString strSystemStats2(
         "2_%d_%d_%d"
         "_%d_%d_%d"
         "_%d_%d_%d_%d_%d_%x",
-        g_pGraphics->GetViewportWidth(),             //
-        g_pGraphics->GetViewportHeight(),            //
-        dxStatus.settings.b32BitColor,               //
+        g_pGraphics->GetViewportWidth(),                                          //
+        g_pGraphics->GetViewportHeight(),                                         //
+        dxStatus.settings.b32BitColor,                                            //
 
         GetApplicationSettingInt(DIAG_PRELOAD_UPGRADES_LOWEST_UNSAFE),            //
         GetApplicationSettingInt(DIAG_MINIDUMP_DETECTED_COUNT),                   //
         GetApplicationSettingInt(DIAG_MINIDUMP_CONFIRMED_COUNT),                  //
 
-        atoi(dxStatus.videoCard.strPSVersion),              //
-        dxStatus.videoCard.iNumSimultaneousRTs,             //
-        dxStatus.settings.iAntiAliasing,                    //
-        dxStatus.settings.iAnisotropicFiltering,            //
-        (int)dxStatus.settings.fFieldOfView,                //
-        dxStatus.videoCard.depthBufferFormat                //
+        atoi(dxStatus.videoCard.strPSVersion),                                    //
+        dxStatus.videoCard.iNumSimultaneousRTs,                                   //
+        dxStatus.settings.iAntiAliasing,                                          //
+        dxStatus.settings.iAnisotropicFiltering,                                  //
+        (int)dxStatus.settings.fFieldOfView,                                      //
+        dxStatus.videoCard.depthBufferFormat                                      //
     );
 
     SString strSystemStats3(
-        "3_0"            // Was VS2013 runtime installed
+        "3_0"                                                                       // Was VS2013 runtime installed
         "_%s_%s_%d"
-        "_0"            // Was VS2015 runtime version
+        "_0"                                                                        // Was VS2015 runtime version
         "_%d_%d_%d_%d_%d_%s_%s",
         *GetApplicationSetting("real-os-build"),                                    //
         *GetApplicationSetting("locale").Replace("_", "-"),                         //
         (uint)FileSize(PathJoin(GetSystemSystemPath(), "normaliz.dll")),            //
 
-        bSecureBootEnabled,                                               //
-        static_cast<int>(memoryStatus.ullTotalVirtual / 1024),            //
-        Is64BitOS(),                                                      //
-        iReqKB3033929,                                                    //
-        iReqKB3035131,                                                    //
-        *verInfoKernel32.GetFileVersionString(),                          //
-        *verInfoNcrypt.GetFileVersionString()                             //
+        bSecureBootEnabled,                                                         //
+        static_cast<int>(memoryStatus.ullTotalVirtual / 1024),                      //
+        Is64BitOS(),                                                                //
+        iReqKB3033929,                                                              //
+        iReqKB3035131,                                                              //
+        *verInfoKernel32.GetFileVersionString(),                                    //
+        *verInfoNcrypt.GetFileVersionString()                                       //
     );
 
     SString strConnectUsage = SString("%i_%i", GetApplicationSettingInt("times-connected-editor"), GetApplicationSettingInt("times-connected"));
@@ -3190,6 +3245,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     strQueryURL = strQueryURL.Replace("_USAGE_", strConnectUsage);
     strQueryURL = strQueryURL.Replace("_SCUT_", strSoundCut);
     strQueryURL = strQueryURL.Replace("_OPTIMUS_", strOptimusInfo);
+    strQueryURL = strQueryURL.Replace("_GTAMD5_", GetApplicationSetting("gta-exe-md5"));
 
     // See if this download qualifies for using a resumable file
     if (!m_JobInfo.strFilename.empty() && strQueryURL.EndsWith(m_JobInfo.strFilename))
@@ -3337,7 +3393,7 @@ int CVersionUpdater::DoSendPostToNextServer()
     unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
     unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
     SString        strPlayerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
-                             MTASA_VERSION_BUILD, usNetRev, usNetRel);
+                                    MTASA_VERSION_BUILD, usNetRev, usNetRel);
 
     // Make the query URL
     SString strQueryURL = strServerURL;

@@ -107,6 +107,7 @@ public:
 
     virtual void           SetServerBitStreamVersion(unsigned short usServerBitStreamVersion) = 0;
     virtual unsigned short GetServerBitStreamVersion() = 0;
+    bool                   CanServerBitStream(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(GetServerBitStreamVersion()) >= query; }
 
     virtual void           GetStatus(char* szStatus, size_t maxLength) = 0;
     virtual unsigned short GetNetRev() = 0;

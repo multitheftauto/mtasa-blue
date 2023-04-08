@@ -13,11 +13,9 @@
 
 #include "CCommon.h"
 #include "CPacket.h"
-#include "CPlayer.h"
-#include "Common.h"
 #include <vector>
 
-class CLightsyncPacket : public CPacket
+class CLightsyncPacket final : public CPacket
 {
 public:
     CLightsyncPacket() {}

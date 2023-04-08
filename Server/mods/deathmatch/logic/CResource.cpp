@@ -10,16 +10,39 @@
  *****************************************************************************/
 
 // Show info about where the actual files are coming from
-//#define RESOURCE_DEBUG_MESSAGES
+// #define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
-#include "net/SimHeaders.h"
-#ifndef WIN32
-#include <utime.h>
+#include "CResource.h"
+#include "CResourceManager.h"
+#include "CResourceChecker.h"
+#include "CResourceHTMLItem.h"
+#include "CResourceConfigItem.h"
+#include "CResourceClientConfigItem.h"
+#include "CResourceClientFileItem.h"
+#include "CResourceScriptItem.h"
+#include "CResourceClientScriptItem.h"
+#include "CAccessControlListManager.h"
+#include "CScriptDebugging.h"
+#include "CMapManager.h"
+#include "CKeyBinds.h"
+#include "CIdArray.h"
+#include "CChecksum.h"
+#include "CHTTPD.h"
+#include "Utils.h"
+#include "packets/CResourceClientScriptsPacket.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include <net/SimHeaders.h>
+#include <zip.h>
+
+#ifdef WIN32
+    #include <zip/iowin32.h>
+#else
+    #include <utime.h>
 #endif
 
 #ifndef MAX_PATH
-#define MAX_PATH 260
+    #define MAX_PATH 260
 #endif
 
 int           do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath);
@@ -470,67 +493,69 @@ void CResource::SetInfoValue(const char* szKey, const char* szValue, bool bSave)
 
 std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResourceFile)
 {
-    return SharedUtil::async([pResourceFile, this] {
-        SString strPath;
-
-        if (!GetFilePath(pResourceFile->GetName(), strPath))
-            return SString();
-
-        std::vector<char> buffer;
-        FileLoad(strPath, buffer);
-        uint        uiFileSize = buffer.size();
-        const char* pFileContents = uiFileSize ? buffer.data() : "";
-        CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
-        pResourceFile->SetLastChecksum(Checksum);
-        pResourceFile->SetLastFileSize(uiFileSize);
-
-        // Check if file is blocked
-        char szHashResult[33];
-        CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
-        SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
-
-        if (!strBlockReason.empty())
+    return SharedUtil::async(
+        [pResourceFile, this]
         {
-            return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
-        }
+            SString strPath;
 
-        // Copy file to http holding directory
-        switch (pResourceFile->GetType())
-        {
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
+            if (!GetFilePath(pResourceFile->GetName(), strPath))
+                return SString();
+
+            std::vector<char> buffer;
+            FileLoad(strPath, buffer);
+            uint        uiFileSize = buffer.size();
+            const char* pFileContents = uiFileSize ? buffer.data() : "";
+            CChecksum   Checksum = CChecksum::GenerateChecksumFromBuffer(pFileContents, uiFileSize);
+            pResourceFile->SetLastChecksum(Checksum);
+            pResourceFile->SetLastFileSize(uiFileSize);
+
+            // Check if file is blocked
+            char szHashResult[33];
+            CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
+            SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
+
+            if (!strBlockReason.empty())
             {
-                SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
+                return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
+            }
 
-                if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
+            // Copy file to http holding directory
+            switch (pResourceFile->GetType())
+            {
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
-                    FileDelete(strCachedFilePath);
-                    return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
-                }
+                    SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
 
-                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
-
-                if (pResourceFile->GetLastChecksum() != cachedChecksum)
-                {
-                    if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                    if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
                     {
-                        return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                        FileDelete(strCachedFilePath);
+                        return SString("ERROR: Resource '%s' client filename '%s' not allowed\n", GetName().c_str(), *ExtractFilename(strCachedFilePath));
                     }
 
-                    // If script is 'no client cache', make sure there is no trace of it in the output dir
-                    if (pResourceFile->IsNoClientCache())
-                        FileDelete(pResourceFile->GetCachedPathFilename(true));
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
+
+                    if (pResourceFile->GetLastChecksum() != cachedChecksum)
+                    {
+                        if (!FileSave(strCachedFilePath, pFileContents, uiFileSize))
+                        {
+                            return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                        }
+
+                        // If script is 'no client cache', make sure there is no trace of it in the output dir
+                        if (pResourceFile->IsNoClientCache())
+                            FileDelete(pResourceFile->GetCachedPathFilename(true));
+                    }
+
+                    break;
                 }
-
-                break;
+                default:
+                    break;
             }
-            default:
-                break;
-        }
 
-        return SString();
-    });
+            return SString();
+        });
 }
 
 bool CResource::GenerateChecksums()
@@ -559,7 +584,7 @@ bool CResource::GenerateChecksums()
     SString strPath;
 
     if (GetFilePath("meta.xml", strPath))
-        m_metaChecksum = CChecksum::GenerateChecksumFromFile(strPath);
+        m_metaChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
     else
         m_metaChecksum = CChecksum();
 
@@ -572,7 +597,7 @@ bool CResource::HasResourceChanged()
     if (IsResourceZip())
     {
         // Zip file might have changed
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
         if (checksum != m_zipHash)
             return true;
     }
@@ -581,7 +606,7 @@ bool CResource::HasResourceChanged()
     {
         if (GetFilePath(pResourceFile->GetName(), strPath))
         {
-            CChecksum checksum = CChecksum::GenerateChecksumFromFile(strPath);
+            CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
 
             if (pResourceFile->GetLastChecksum() != checksum)
                 return true;
@@ -594,7 +619,7 @@ bool CResource::HasResourceChanged()
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
                     string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
-                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFile(strCachedFilePath);
+                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
                     if (cachedChecksum != checksum)
                         return true;
@@ -609,7 +634,7 @@ bool CResource::HasResourceChanged()
 
     if (GetFilePath("meta.xml", strPath))
     {
-        CChecksum checksum = CChecksum::GenerateChecksumFromFile(strPath);
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
         if (checksum != m_metaChecksum)
             return true;
     }
@@ -1106,6 +1131,8 @@ bool CResource::CreateVM(bool bEnableOOP)
         return false;
 
     m_pVM->SetScriptName(m_strResourceName.c_str());
+    m_pVM->LoadEmbeddedScripts();
+    m_pVM->RegisterModuleFunctions();
     return true;
 }
 
@@ -1155,6 +1182,8 @@ void CResource::DisplayInfo()            // duplicated for HTML
 
             for (CResource* pDependent : m_Dependents)
                 CLogger::LogPrintf("  %s\n", pDependent->GetName().c_str());
+
+            break;
         }
         case EResourceState::Stopping:
         {
@@ -1259,7 +1288,7 @@ bool CResource::HasGoneAway()
 // gets the path of the file specified
 bool CResource::GetFilePath(const char* szFilename, string& strPath)
 {
-    // Always prefer the local resource directory, as scripts may 
+    // Always prefer the local resource directory, as scripts may
     // have added new files to the regular folder, rather than the zip
     strPath = m_strResourceDirectoryPath + szFilename;
     if (FileExists(strPath))
@@ -1268,7 +1297,7 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
     // If this is a zipped resource, try to use the unzipped file
     if (!IsResourceZip())
         return false;
-    
+
     strPath = m_strResourceCachePath + szFilename;
     return FileExists(strPath);
 }
@@ -2342,24 +2371,49 @@ ResponseCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse*
     return HTTPRESPONSECODE_200_OK;
 }
 
-void Unescape(std::string& str)
+std::string Unescape(std::string_view sv)
 {
-    const char* pPercent = strchr(str.c_str(), '%');
-
-    while (pPercent)
+    // Converts a character to a hexadecimal value
+    auto toHex = [](char c)
     {
-        if (pPercent[1] && pPercent[2])
+        if (c >= '0' && c <= '9')
+            return c - '0';
+        if (c >= 'a' && c <= 'f')
+            return c - 'a' + 10;
+        if (c >= 'A' && c <= 'F')
+            return c - 'A' + 10;
+        return 0;
+    };
+
+    std::string out;
+    // String can only shrink here
+    // as %?? is collapsed to a single char
+    out.reserve(sv.length());
+    auto it = sv.begin();
+    while (it != sv.end())
+    {
+        if (*it == '%')
         {
-            int iCharCode = 0;
-            sscanf(&pPercent[1], "%02X", &iCharCode);
-            str.replace(pPercent - str.c_str(), 3, (char*)&iCharCode);
-            pPercent = strchr(pPercent + 3, '%');
+            // Avoid reading past the end
+            if (std::distance(it, sv.end()) < 3)
+            {
+                out.push_back(*it++);
+                continue;
+            }
+            // Skip %
+            ++it;
+            // Read two digits/letters and convert to char
+            uint8_t digit1 = toHex(*it++);
+            uint8_t digit2 = toHex(*it++);
+            out.push_back(static_cast<char>(digit1 * 0x10 + digit2));
         }
         else
         {
-            break;
+            // Push normally
+            out.push_back(*it++);
         }
     }
+    return out;
 }
 
 ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
@@ -2420,7 +2474,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
                 if (iKey >= 0 && iKey < MAX_INPUT_VARIABLES)
                 {
                     std::string strValue(pEqual + 1, pAnd - (pEqual + 1));
-                    Unescape(strValue);
+                    strValue = Unescape(strValue);
 
                     if (iKey + 1 > static_cast<int>(vecArguments.size()))
                         vecArguments.resize(iKey + 1);
@@ -2436,7 +2490,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         }
     }
 
-    Unescape(strFuncName);
+    strFuncName = Unescape(strFuncName);
 
     for (CExportedFunction& Exported : m_ExportedFunctions)
     {
@@ -2646,6 +2700,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
     }
 
     Unescape(strFile);
+    strFile = Unescape(strFile);
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -2678,7 +2733,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 }
                 else
                 {
-                    SString err("Resource %s is not running.", m_strResourceName.c_str());
+                    SString err = "That resource is not running.";
                     ipoHttpResponse->SetBody(err.c_str(), err.size());
                     return HTTPRESPONSECODE_401_UNAUTHORIZED;
                 }
@@ -2724,7 +2779,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
         }
     }
 
-    SString err("Cannot find a resource file named '%s' in the resource %s.", strFile.c_str(), m_strResourceName.c_str());
+    SString err = "That resource file could not be found in that resource.";
     ipoHttpResponse->SetBody(err.c_str(), err.size());
     return HTTPRESPONSECODE_404_NOTFOUND;
 }
@@ -2956,7 +3011,7 @@ bool CResource::UnzipResource()
     m_zipfile = nullptr;
 
     // Store the hash so we can figure out whether it has changed later
-    m_zipHash = CChecksum::GenerateChecksumFromFile(m_strResourceZip);
+    m_zipHash = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
     return true;
 }
 

@@ -7,9 +7,12 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-class CPlayerNetworkStatusPacket : public CPacket
+#include "CPacket.h"
+
+class CPlayerNetworkStatusPacket final : public CPacket
 {
 public:
     virtual bool  RequiresSourcePlayer() const { return true; }

@@ -50,13 +50,13 @@ public:
     CAccessControlListGroup* GetGroupFromScriptID(uint uiScriptID);
     CAccessControlList*      GetACLFromScriptID(uint uiScriptID);
 
-    list<class CAccessControlList*>::const_iterator ACL_Begin() { return m_ACLs.begin(); };
-    list<class CAccessControlList*>::const_iterator ACL_End() { return m_ACLs.end(); };
-    size_t                                          ACL_Count() { return m_ACLs.size(); };
+    std::list<class CAccessControlList*>::const_iterator ACL_Begin() { return m_ACLs.begin(); };
+    std::list<class CAccessControlList*>::const_iterator ACL_End() { return m_ACLs.end(); };
+    size_t                                               ACL_Count() { return m_ACLs.size(); };
 
-    list<class CAccessControlListGroup*>::const_iterator Groups_Begin() { return m_Groups.begin(); };
-    list<class CAccessControlListGroup*>::const_iterator Groups_End() { return m_Groups.end(); };
-    size_t                                               Groups_Count() { return m_Groups.size(); };
+    std::list<class CAccessControlListGroup*>::const_iterator Groups_Begin() { return m_Groups.begin(); };
+    std::list<class CAccessControlListGroup*>::const_iterator Groups_End() { return m_Groups.end(); };
+    size_t                                                    Groups_Count() { return m_Groups.size(); };
 
     static const char* ExtractObjectName(const char* szObjectName, CAccessControlListGroupObject::EObjectType& eType);
 
@@ -72,8 +72,8 @@ private:
                                    CAccessControlListRight::ERightType eRightType, bool bDefaultAccessRight);
     void RemoveACLDependencies(class CAccessControlList* pACL);
 
-    list<class CAccessControlListGroup*> m_Groups;
-    list<class CAccessControlList*>      m_ACLs;
+    std::list<class CAccessControlListGroup*> m_Groups;
+    std::list<class CAccessControlList*>      m_ACLs;
 
     CAccountManager* m_pAccountManager;
 

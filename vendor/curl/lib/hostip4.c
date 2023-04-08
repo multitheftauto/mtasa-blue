@@ -5,11 +5,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -50,7 +52,6 @@
 #include "hostip.h"
 #include "hash.h"
 #include "share.h"
-#include "strerror.h"
 #include "url.h"
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -61,8 +62,9 @@
  * Curl_ipvalid() checks what CURL_IPRESOLVE_* requirements that might've
  * been set and returns TRUE if they are OK.
  */
-bool Curl_ipvalid(struct connectdata *conn)
+bool Curl_ipvalid(struct Curl_easy *data, struct connectdata *conn)
 {
+  (void)data;
   if(conn->ip_version == CURL_IPRESOLVE_V6)
     /* An IPv6 address was requested and we can't get/use one */
     return FALSE;
@@ -88,29 +90,30 @@ bool Curl_ipvalid(struct connectdata *conn)
  * flavours have thread-safe versions of the plain gethostbyname() etc.
  *
  */
-Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
-                                const char *hostname,
-                                int port,
-                                int *waitp)
+struct Curl_addrinfo *Curl_getaddrinfo(struct Curl_easy *data,
+                                       const char *hostname,
+                                       int port,
+                                       int *waitp)
 {
-  Curl_addrinfo *ai = NULL;
+  struct Curl_addrinfo *ai = NULL;
 
 #ifdef CURL_DISABLE_VERBOSE_STRINGS
-  (void)conn;
+  (void)data;
 #endif
 
   *waitp = 0; /* synchronous response only */
 
   ai = Curl_ipv4_resolve_r(hostname, port);
   if(!ai)
-    infof(conn->data, "Curl_ipv4_resolve_r failed for %s\n", hostname);
+    infof(data, "Curl_ipv4_resolve_r failed for %s", hostname);
 
   return ai;
 }
 #endif /* CURLRES_SYNCH */
 #endif /* CURLRES_IPV4 */
 
-#if defined(CURLRES_IPV4) && !defined(CURLRES_ARES)
+#if defined(CURLRES_IPV4) && \
+   !defined(CURLRES_ARES) && !defined(CURLRES_AMIGA)
 
 /*
  * Curl_ipv4_resolve_r() - ipv4 threadsafe resolver function.
@@ -119,13 +122,13 @@ Curl_addrinfo *Curl_getaddrinfo(struct connectdata *conn,
  * implying that only threadsafe code and function calls may be used.
  *
  */
-Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
-                                   int port)
+struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
+                                          int port)
 {
 #if !defined(HAVE_GETADDRINFO_THREADSAFE) && defined(HAVE_GETHOSTBYNAME_R_3)
   int res;
 #endif
-  Curl_addrinfo *ai = NULL;
+  struct Curl_addrinfo *ai = NULL;
   struct hostent *h = NULL;
   struct hostent *buf = NULL;
 
@@ -295,4 +298,5 @@ Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname,
 
   return ai;
 }
-#endif /* defined(CURLRES_IPV4) && !defined(CURLRES_ARES) */
+#endif /* defined(CURLRES_IPV4) && !defined(CURLRES_ARES) &&
+                                   !defined(CURLRES_AMIGA) */

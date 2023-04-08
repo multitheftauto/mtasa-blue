@@ -13,6 +13,11 @@
 #include "CDatabaseType.h"
 #include "CDatabaseJobQueue.h"
 #include "SharedUtil.Thread.h"
+#include "CDatabaseManager.h"
+#include "CPerfStatModule.h"
+#include "CLogger.h"
+#include "CGame.h"
+#include "CScriptDebugging.h"
 
 typedef CFastList<CDbJobData*> CJobQueueType;
 
@@ -36,8 +41,7 @@ public:
     virtual bool        FreeCommand(CDbJobData* pJobData);
     virtual CDbJobData* FindCommandFromId(SDbJobId id);
     virtual void        IgnoreConnectionResults(SConnectionHandle connectionHandle);
-    virtual bool        IsConnectionClosed();
-    virtual int         GetQueueSize();
+    virtual bool        UsesConnection(SConnectionHandle connectionHandle);
 
 protected:
     void        StopThread();
@@ -67,12 +71,10 @@ protected:
     uint                            m_uiJobCount10sMin;
     CElapsedTime                    m_JobCountElpasedTime;
     std::set<SConnectionHandle>     m_PendingFlushMap;
-    CDatabaseConnection*            m_pConnection = nullptr;
-    SConnectionHandle               m_connectionHandle;
-    bool                            m_bConnectionClosed = true;
 
     // Other thread variables
     std::map<SString, CDatabaseType*> m_DatabaseTypeMap;
+    uint                              m_uiConnectionCountWarnThresh;
     EJobLogLevelType                  m_LogLevel;
     SString                           m_strLogFilename;
 
@@ -84,6 +86,7 @@ protected:
         CJobQueueType                                     m_CommandQueue;
         CJobQueueType                                     m_ResultQueue;
         CComboMutex                                       m_Mutex;
+        std::map<SConnectionHandle, CDatabaseConnection*> m_HandleConnectionMap;
     } shared;
 };
 
@@ -102,7 +105,7 @@ CDatabaseJobQueue* NewDatabaseJobQueue()
 // Init known database types and start the job service thread
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseJobQueueImpl::CDatabaseJobQueueImpl() : m_uiJobCountWarnThresh(200)
+CDatabaseJobQueueImpl::CDatabaseJobQueueImpl() : m_uiJobCountWarnThresh(200), m_uiConnectionCountWarnThresh(20)
 {
     // Add known database types
     CDatabaseType* pDatabaseTypeSqlite = NewDatabaseTypeSqlite();
@@ -294,6 +297,13 @@ void CDatabaseJobQueueImpl::UpdateDebugData()
         return;
 
     shared.m_Mutex.Lock();
+
+    // Log to console if connection count is creeping up
+    if (shared.m_HandleConnectionMap.size() > m_uiConnectionCountWarnThresh)
+    {
+        m_uiConnectionCountWarnThresh = shared.m_HandleConnectionMap.size() * 2;
+        CLogger::LogPrintf("Notice: There are now %d database connections\n", shared.m_HandleConnectionMap.size());
+    }
 
     // Log to console if job count is creeping up
     m_uiJobCount10sMin = std::min<uint>(m_uiJobCount10sMin, m_ActiveJobHandles.size());
@@ -497,16 +507,16 @@ void CDatabaseJobQueueImpl::IgnoreJobResults(CDbJobData* pJobData)
     pJobData->result.bIgnoreResult = true;
 }
 
-/////////////////////////////////////////////////////////////// 
-// 
-// CDatabaseJobQueueImpl::IsConnectionClose 
-// 
-// Return true if connection was closed 
-// 
-/////////////////////////////////////////////////////////////// 
-bool CDatabaseJobQueueImpl::IsConnectionClosed()
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::UsesConnection
+//
+// Return true if supplied connection is used by this queue
+//
+///////////////////////////////////////////////////////////////
+bool CDatabaseJobQueueImpl::UsesConnection(SConnectionHandle connectionHandle)
 {
-    return m_bConnectionClosed || !m_pConnection;
+    return GetConnectionFromHandle(connectionHandle) != nullptr;
 }
 
 //
@@ -654,10 +664,10 @@ void CDatabaseJobQueueImpl::ProcessConnect(CDbJobData* pJobData)
     if (pTypeManager->GetDataSourceTag() != "mysql")
         pConnection->m_SuppressedErrorCodes.clear();
 
-    // Set current connection
-    m_pConnection = pConnection;
-    m_connectionHandle = pJobData->command.connectionHandle;
-    m_bConnectionClosed = false;
+    // Associate handle with CDatabaseConnection*
+    shared.m_Mutex.Lock();
+    MapSet(shared.m_HandleConnectionMap, pJobData->command.connectionHandle, pConnection);
+    shared.m_Mutex.Unlock();
 
     // Set result
     pJobData->result.status = EJobResult::SUCCESS;
@@ -672,8 +682,9 @@ void CDatabaseJobQueueImpl::ProcessConnect(CDbJobData* pJobData)
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::ProcessDisconnect(CDbJobData* pJobData)
 {
-    // Check connection active
-    if (IsConnectionClosed())
+    // CDatabaseConnection* from handle
+    CDatabaseConnection* pConnection = GetConnectionFromHandle(pJobData->command.connectionHandle);
+    if (!pConnection)
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = "Invalid connection";
@@ -681,9 +692,9 @@ void CDatabaseJobQueueImpl::ProcessDisconnect(CDbJobData* pJobData)
     }
 
     // And disconnect
-    m_pConnection->Release();
-    m_pConnection = NULL;
-    m_bConnectionClosed = true;
+    RemoveHandleForConnection(pJobData->command.connectionHandle, pConnection);
+    pConnection->Release();
+    pConnection = NULL;
 
     // Set result
     pJobData->result.status = EJobResult::SUCCESS;
@@ -698,8 +709,9 @@ void CDatabaseJobQueueImpl::ProcessDisconnect(CDbJobData* pJobData)
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::ProcessQuery(CDbJobData* pJobData)
 {
-    // Check connection active
-    if (IsConnectionClosed())
+    // CDatabaseConnection* from handle
+    CDatabaseConnection* pConnection = GetConnectionFromHandle(pJobData->command.connectionHandle);
+    if (!pConnection)
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = "Invalid connection";
@@ -707,12 +719,12 @@ void CDatabaseJobQueueImpl::ProcessQuery(CDbJobData* pJobData)
     }
 
     // And query
-    if (!m_pConnection->Query(pJobData->command.strData, pJobData->result.registryResult))
+    if (!pConnection->Query(pJobData->command.strData, pJobData->result.registryResult))
     {
         pJobData->result.status = EJobResult::FAIL;
-        pJobData->result.strReason = m_pConnection->GetLastErrorMessage();
-        pJobData->result.uiErrorCode = m_pConnection->GetLastErrorCode();
-        pJobData->result.bErrorSuppressed = MapContains(m_pConnection->m_SuppressedErrorCodes, m_pConnection->GetLastErrorCode());
+        pJobData->result.strReason = pConnection->GetLastErrorMessage();
+        pJobData->result.uiErrorCode = pConnection->GetLastErrorCode();
+        pJobData->result.bErrorSuppressed = MapContains(pConnection->m_SuppressedErrorCodes, pConnection->GetLastErrorCode());
     }
     else
     {
@@ -732,7 +744,8 @@ void CDatabaseJobQueueImpl::ProcessQuery(CDbJobData* pJobData)
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::ProcessFlush(CDbJobData* pJobData)
 {
-    if (IsConnectionClosed())
+    CDatabaseConnection* pConnection = GetConnectionFromHandle(pJobData->command.connectionHandle);
+    if (!pConnection)
     {
         pJobData->result.status = EJobResult::FAIL;
         pJobData->result.strReason = "Invalid connection";
@@ -740,7 +753,7 @@ void CDatabaseJobQueueImpl::ProcessFlush(CDbJobData* pJobData)
     }
 
     // Do flush
-    m_pConnection->Flush();
+    pConnection->Flush();
     pJobData->result.status = EJobResult::SUCCESS;
 }
 
@@ -760,6 +773,38 @@ void CDatabaseJobQueueImpl::ProcessSetLogLevel(CDbJobData* pJobData)
 
 ///////////////////////////////////////////////////////////////
 //
+// CDatabaseJobQueueImpl::GetConnectionFromHandle
+//
+//
+//
+///////////////////////////////////////////////////////////////
+CDatabaseConnection* CDatabaseJobQueueImpl::GetConnectionFromHandle(SConnectionHandle connectionHandle)
+{
+    shared.m_Mutex.Lock();
+    CDatabaseConnection* pConnection = MapFindRef(shared.m_HandleConnectionMap, connectionHandle);
+    shared.m_Mutex.Unlock();
+    return pConnection;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::RemoveHandleForConnection
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseJobQueueImpl::RemoveHandleForConnection(SConnectionHandle connectionHandle, CDatabaseConnection* pConnection)
+{
+    shared.m_Mutex.Lock();
+    if (!MapContains(shared.m_HandleConnectionMap, connectionHandle))
+        CLogger::ErrorPrintf("RemoveHandleForConnection: Serious problem here\n");
+
+    MapRemove(shared.m_HandleConnectionMap, connectionHandle);
+    shared.m_Mutex.Unlock();
+}
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseJobQueueImpl::LogResult
 //
 // Log last job if connection has logging enabled
@@ -772,14 +817,15 @@ void CDatabaseJobQueueImpl::LogResult(CDbJobData* pJobData)
         return;
 
     // Check logging status of connection
-    if (IsConnectionClosed() || !m_pConnection->m_bLoggingEnabled)
+    CDatabaseConnection* pConnection = GetConnectionFromHandle(pJobData->command.connectionHandle);
+    if (!pConnection || !pConnection->m_bLoggingEnabled)
         return;
 
     if (pJobData->result.status == EJobResult::SUCCESS)
     {
         if (m_LogLevel >= EJobLogLevel::ALL)
         {
-            SString strLine("%s: [%s] SUCCESS: Affected rows:%d [Query:%s]\n", *GetLocalTimeString(true, true), *m_pConnection->m_strLogTag,
+            SString strLine("%s: [%s] SUCCESS: Affected rows:%d [Query:%s]\n", *GetLocalTimeString(true, true), *pConnection->m_strLogTag,
                             pJobData->result.registryResult->uiNumAffectedRows, *pJobData->GetCommandStringForLog());
             LogString(strLine);
         }
@@ -792,7 +838,7 @@ void CDatabaseJobQueueImpl::LogResult(CDbJobData* pJobData)
             if (pJobData->result.bErrorSuppressed && m_LogLevel != EJobLogLevel::ALL)
                 return;
 
-            SString strLine("%s: [%s] FAIL: (%d) %s [Query:%s]\n", *GetLocalTimeString(true, true), *m_pConnection->m_strLogTag, pJobData->result.uiErrorCode,
+            SString strLine("%s: [%s] FAIL: (%d) %s [Query:%s]\n", *GetLocalTimeString(true, true), *pConnection->m_strLogTag, pJobData->result.uiErrorCode,
                             *pJobData->result.strReason, *pJobData->GetCommandStringForLog());
             LogString(strLine);
         }
@@ -809,20 +855,4 @@ void CDatabaseJobQueueImpl::LogResult(CDbJobData* pJobData)
 void CDatabaseJobQueueImpl::LogString(const SString& strText)
 {
     FileAppend(m_strLogFilename, strText);
-}
-
-/////////////////////////////////////////////////////////////// 
-// 
-// CDatabaseJobQueueImpl::GetQueueSize 
-// 
-// Get count elements in queue 
-// 
-/////////////////////////////////////////////////////////////// 
-int CDatabaseJobQueueImpl::GetQueueSize()
-{
-    shared.m_Mutex.Lock();
-    int count = shared.m_CommandQueue.size();
-    shared.m_Mutex.Unlock();
-
-    return count;
 }

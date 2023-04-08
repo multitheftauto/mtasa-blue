@@ -10,7 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDatabaseManager.h"
 #include "CDatabaseJobQueueManager.h"
+#include "lua/CLuaArguments.h"
+#include "CRegistry.h"
+#include "CIdArray.h"
+#include "CGame.h"
+
 SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs);
 SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs);
 SString InsertQueryArgumentsSqlite(const char* szQuery, va_list vl);
@@ -50,7 +56,6 @@ public:
                                                 CLuaArguments* pArgs = nullptr);
     virtual bool              QueryWithCallbackf(SConnectionHandle hConnection, PFN_DBRESULT pfnDbResult, void* pCallbackContext, const char* szQuery, ...);
     virtual void              SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename);
-    virtual int               GetQueueSizeFromConnection(SConnectionHandle connectionHandle);
 
     // CDatabaseManagerImpl
     SString InsertQueryArguments(SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs);
@@ -565,18 +570,6 @@ void CDatabaseManagerImpl::SetLogLevel(EJobLogLevelType logLevel, const SString&
     return m_JobQueue->SetLogLevel(logLevel, strLogFilename);
 }
 
-/////////////////////////////////////////////////////////////// 
-// 
-// CDatabaseManagerImpl::GetQueueSizeFromConnection 
-// 
-// 
-// 
-/////////////////////////////////////////////////////////////// 
-int CDatabaseManagerImpl::GetQueueSizeFromConnection(SConnectionHandle connectionHandle)
-{
-    return m_JobQueue->GetQueueSizeFromConnection(connectionHandle);
-}
-
 ///////////////////////////////////////////////////////////////
 //
 // CDatabaseManagerImpl::InsertQueryArguments
@@ -745,4 +738,14 @@ SString CDbJobData::GetCommandStringForLog()
         }
     }
     return command.strData;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseConnectionElement::Unlink
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseConnectionElement::Unlink()
+{
+    g_pGame->GetDatabaseManager()->Disconnect(m_Connection);
 }

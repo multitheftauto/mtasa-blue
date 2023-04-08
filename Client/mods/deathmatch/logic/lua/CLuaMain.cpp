@@ -75,17 +75,10 @@ void CLuaMain::ResetInstructionCount()
 void CLuaMain::InitSecurity()
 {
     // Disable dangerous Lua Os library functions
-    static const luaL_reg osfuncs[] =
-    {
-        { "execute", CLuaUtilDefs::DisabledFunction },
-        { "rename", CLuaUtilDefs::DisabledFunction },
-        { "remove", CLuaUtilDefs::DisabledFunction },
-        { "exit", CLuaUtilDefs::DisabledFunction },
-        { "getenv", CLuaUtilDefs::DisabledFunction },
-        { "tmpname", CLuaUtilDefs::DisabledFunction },
-        { "setlocale", CLuaUtilDefs::DisabledFunction },
-        { NULL, NULL }
-    };
+    static const luaL_reg osfuncs[] = {{"execute", CLuaUtilDefs::DisabledFunction},   {"rename", CLuaUtilDefs::DisabledFunction},
+                                       {"remove", CLuaUtilDefs::DisabledFunction},    {"exit", CLuaUtilDefs::DisabledFunction},
+                                       {"getenv", CLuaUtilDefs::DisabledFunction},    {"tmpname", CLuaUtilDefs::DisabledFunction},
+                                       {"setlocale", CLuaUtilDefs::DisabledFunction}, {NULL, NULL}};
     luaL_register(m_luaVM, "os", osfuncs);
 
     lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
@@ -143,7 +136,7 @@ void CLuaMain::InitVM()
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open();
+    m_luaVM = lua_open(this);
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook
@@ -182,8 +175,10 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, g_pClientGame->GetLocalPlayer());
     lua_setglobal(m_luaVM, "localPlayer");
+}
 
-    // Load pre-loaded lua scripts
+void CLuaMain::LoadEmbeddedScripts()
+{
     DECLARE_PROFILER_SECTION(OnPreLoadScript)
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
@@ -247,10 +242,17 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
             }
         }
         else
+        {
             strUTFScript = std::string(cpBuffer, uiSize);
+        }
 
         // Run the script
-        if (CLuaMain::LuaLoadBuffer(m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString("@%s", *strNiceFilename)))
+        const bool loadFailed = CLuaMain::LuaLoadBuffer(m_luaVM, bUTF8 ? cpBuffer : strUTFScript.c_str(), uiSize, SString("@%s", *strNiceFilename));
+
+        // Clear raw script from memory
+        std::fill(strUTFScript.begin(), strUTFScript.end(), 0);
+
+        if (loadFailed)
         {
             // Print the error
             std::string strRes = lua_tostring(m_luaVM, -1);
@@ -264,6 +266,8 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
                 CLogger::LogPrint("SCRIPT ERROR: Unknown\n");
                 g_pClientGame->GetScriptDebugging()->LogError(m_luaVM, "Loading script failed for unknown reason");
             }
+
+            return false;
         }
         else
         {
@@ -278,19 +282,22 @@ bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSiz
             // Cleanup any return values
             if (lua_gettop(m_luaVM) > luaSavedTop)
                 lua_settop(m_luaVM, luaSavedTop);
+
             return true;
         }
     }
 
+    std::fill_n(const_cast<char*>(cpBuffer), uiSize, 0);
     return false;
 }
 
 bool CLuaMain::LoadScript(const char* szLUAScript)
 {
-    if (m_luaVM && !IsLuaCompiledScript(szLUAScript, strlen(szLUAScript)))
+    const auto sz = strlen(szLUAScript);
+    if (m_luaVM && !IsLuaCompiledScript(szLUAScript, sz))
     {
         // Run the script
-        if (!CLuaMain::LuaLoadBuffer(m_luaVM, szLUAScript, strlen(szLUAScript), NULL))
+        if (!CLuaMain::LuaLoadBuffer(m_luaVM, szLUAScript, sz, NULL))
         {
             ResetInstructionCount();
             int luaSavedTop = lua_gettop(m_luaVM);
@@ -365,8 +372,13 @@ CXMLFile* CLuaMain::CreateXML(const char* szFilename, bool bUseIDs, bool bReadOn
 
 CXMLNode* CLuaMain::ParseString(const char* strXmlContent)
 {
-    CXMLNode* xmlNode = g_pCore->GetXML()->ParseString(strXmlContent);
-    return xmlNode;
+    auto xmlStringNode = g_pCore->GetXML()->ParseString(strXmlContent);
+    if (!xmlStringNode)
+        return nullptr;
+
+    auto node = xmlStringNode->node;
+    m_XMLStringNodes.emplace(std::move(xmlStringNode));
+    return node;
 }
 
 bool CLuaMain::DestroyXML(CXMLFile* pFile)

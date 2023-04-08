@@ -39,8 +39,8 @@ typedef UINT32 uint32_t;
 #define POLARSSL_ERR_SHA1_FILE_IO_ERROR                -0x0076  /**< Read/write error in file. */
 
 #if !defined(POLARSSL_SHA1_ALT)
-// Regular implementation
-//
+    // Regular implementation
+    //
 
 #ifdef __cplusplus
 extern "C"
@@ -56,8 +56,8 @@ extern "C"
         uint32_t      state[5];   /*!< intermediate digest state  */
         unsigned char buffer[64]; /*!< data block being processed */
 
-        unsigned char ipad[64]; /*!< HMAC: inner padding        */
-        unsigned char opad[64]; /*!< HMAC: outer padding        */
+        unsigned char ipad[64];   /*!< HMAC: inner padding        */
+        unsigned char opad[64];   /*!< HMAC: outer padding        */
     } sha1_context;
 
     /**

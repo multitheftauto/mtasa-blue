@@ -8,6 +8,10 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+
+#include <cmath>
+#include "SharedUtil.Misc.h"
 
 namespace SharedUtil
 {
@@ -99,5 +103,8 @@ namespace SharedUtil
         }
     }
 
-    inline float DegreesToRadians(float fValue) { return fValue * 0.017453292f; }
+    inline float DegreesToRadians(float fValue)
+    {
+        return fValue * 0.017453292f;
+    }
 }            // namespace SharedUtil

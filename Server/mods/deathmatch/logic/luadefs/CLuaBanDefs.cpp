@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaBanDefs.h"
+#include "CBan.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaBanDefs::LoadFunctions()
 {
@@ -64,12 +68,17 @@ void CLuaBanDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAdmin", "setBanAdmin");
 
     lua_classvariable(luaVM, "admin", "setBanAdmin", "getBanAdmin");
-    lua_classvariable(luaVM, "IP", NULL, "getBanIP");
+    lua_classvariable(luaVM, "ip", NULL, "getBanIP");
     lua_classvariable(luaVM, "serial", NULL, "getBanSerial");
     lua_classvariable(luaVM, "time", NULL, "getBanTime");
     lua_classvariable(luaVM, "unbanTime", "setUnbanTime", "getUnbanTime");
     lua_classvariable(luaVM, "reason", "setBanReason", "getBanReason");
     lua_classvariable(luaVM, "nick", "setBanNick", "getBanNick");
+
+    // Alias for backwards compatibility
+    // TODO(qaisjp): it appears this was always documented as ".ip", so perhaps
+    // nobody is using this attribute. Consider doing some metrics in the future to find out.
+    lua_classvariable(luaVM, "IP", NULL, "getBanIP");
 
     lua_registerclass(luaVM, "Ban");
 }

@@ -10,31 +10,23 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBoatSA.h"
 
-CBoatSA::CBoatSA(CBoatSAInterface* boat)
+CBoatSA::CBoatSA(CBoatSAInterface* pInterface)
 {
-    DEBUG_TRACE("CBoatSA::CBoatSA( CBoatSAInterface * boat )");
-    this->m_pInterface = boat;
+    SetInterface(pInterface);
+    Init();
 }
 
-CBoatSA::CBoatSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CVehicleSA(dwModelID, ucVariation, ucVariation2)
+CBoatHandlingEntry* CBoatSA::GetBoatHandlingData()
 {
-    DEBUG_TRACE("CBoatSA::CBoatSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
-    /*if(this->internalInterface)
-    {
-        // create the actual vehicle
-        DWORD dwFunc = FUNC_CBoatContructor;
-        DWORD dwThis = (DWORD)this->internalInterface;
-        _asm
-        {
-            mov     ecx, dwThis
-            push    MISSION_VEHICLE
-            push    dwModelID
-            call    dwFunc
-        }
+    return m_pBoatHandlingData;
+}
 
-        this->SetEntityStatus(STATUS_ABANDONED); // so it actually shows up in the world
-
-        pGame->GetWorld()->Add((CEntitySA *)this);
-    }   */
+void CBoatSA::SetBoatHandlingData(CBoatHandlingEntry* pBoatHandling)
+{
+    if (!pBoatHandling)
+        return;
+    m_pBoatHandlingData = static_cast<CBoatHandlingEntrySA*>(pBoatHandling);
+    GetBoatInterface()->pBoatHandlingData = m_pBoatHandlingData->GetInterface();
 }

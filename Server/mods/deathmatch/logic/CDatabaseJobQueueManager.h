@@ -9,6 +9,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 ///////////////////////////////////////////////////////////////
 //
 // CDatabaseJobQueueManager
@@ -27,13 +29,12 @@ public:
     CDbJobData* FindCommandFromId(SDbJobId id);
     void        IgnoreConnectionResults(SConnectionHandle connectionHandle);
     void        SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename);
-    int         GetQueueSizeFromConnection(SConnectionHandle connectionHandle);
 
 protected:
-    CDatabaseJobQueue* GetQueueFromConnectCommand(SConnectionHandle connectionHandle);
+    CDatabaseJobQueue* GetQueueFromConnectCommand(const SString& strData);
     CDatabaseJobQueue* FindQueueFromConnection(SConnectionHandle connectionHandle);
     SConnectionHandle  GetNextConnectionHandle();
 
-    std::map<SConnectionHandle, CDatabaseJobQueue*> m_QueueNameMap;
-    SConnectionHandle                               m_ConnectionHandleCounter;
+    std::map<SString, CDatabaseJobQueue*> m_QueueNameMap;
+    SConnectionHandle                     m_ConnectionHandleCounter;
 };

@@ -13,16 +13,26 @@
 
 #include <xml/CXML.h>
 
+typedef struct SXMLStringImpl : SXMLString
+{
+    TiXmlDocument* doc;
+    SXMLStringImpl(TiXmlDocument* d, CXMLNode* n) : doc(d) { node = n; };
+    ~SXMLStringImpl()
+    {
+        delete node;
+        delete doc;
+    };
+} SXMLStringImpl;
+
 class CXMLImpl : public CXML
 {
 public:
     CXMLImpl();
     virtual ~CXMLImpl();
 
-    CXMLFile* CreateXML(const char* szFilename, bool bUseIDs, bool bReadOnly);
-    CXMLNode* ParseString(const char* strXmlContent);
-    CXMLNode* BuildNode(CXMLNodeImpl* xmlParent, TiXmlNode* xmlNode);
-    void      DeleteXML(CXMLFile* pFile);
+    CXMLFile*                   CreateXML(const char* szFilename, bool bUseIDs, bool bReadOnly);
+    std::unique_ptr<SXMLString> ParseString(const char* strXmlContent);
+    void                        DeleteXML(CXMLFile* pFile);
 
     CXMLNode* CreateDummyNode();
 

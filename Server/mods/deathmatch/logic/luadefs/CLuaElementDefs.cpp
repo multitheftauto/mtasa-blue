@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaElementDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CDummy.h"
+#include "Utils.h"
 
 void CLuaElementDefs::LoadFunctions()
 {
@@ -34,7 +39,6 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementChildren", getElementChildren},
         {"getElementChild", getElementChild},
         {"getElementChildrenCount", getElementChildrenCount},
-        {"getAllElementData", getAllElementData},
         {"getElementID", getElementID},
         {"getElementParent", getElementParent},
         {"getElementMatrix", getElementMatrix},
@@ -46,7 +50,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementType", getElementType},
         {"getElementInterior", getElementInterior},
         {"getElementsWithinColShape", getElementsWithinColShape},
-        {"getElementsWithinRange", getElementsWithinRange},
+        {"getElementsWithinRange", ArgumentParserWarn<false, getElementsWithinRange>},
         {"getElementDimension", getElementDimension},
         {"getElementZoneName", getElementZoneName},
         {"getElementColShape", getElementColShape},
@@ -69,6 +73,7 @@ void CLuaElementDefs::LoadFunctions()
 
         // Element data
         {"getElementData", GetElementData},
+        {"getAllElementData", ArgumentParserWarn<false, GetAllElementData>},
         {"hasElementData", HasElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},
@@ -212,10 +217,6 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "velocity", "setElementVelocity", "getElementVelocity", setElementVelocity, OOP_getElementVelocity);
     lua_classvariable(luaVM, "angularVelocity", "setElementAngularVelocity", "getElementAngularVelocity", setElementTurnVelocity, OOP_getElementTurnVelocity);
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
-    // Don't know how this works, but don't forget to add isElementData if needed
-    // lua_classvariable(luaVM, "data", "setElementData", "getElementData", OOP_setElementData, OOP_getElementData);
-    // lua_classvariable(luaVM, "visibility", "setElementVisibleTo", "isElementVisibleTo", OOP_setElementVisibleTo, CLuaOOPDefs::IsElementVisibleTo); //
-    // .visibility[john]=false
 
     lua_registerclass(luaVM, "Element");
 }
@@ -493,30 +494,6 @@ int CLuaElementDefs::getElementByIndex(lua_State* luaVM)
         if (pElement)
         {
             lua_pushelement(luaVM, pElement);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaElementDefs::getAllElementData(lua_State* luaVM)
-{
-    //  table getAllElementData ( element theElement )
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaArguments Args;
-        if (CStaticFunctionDefinitions::GetAllElementData(pElement, &Args))
-        {
-            Args.PushAsTable(luaVM);
             return 1;
         }
     }
@@ -1017,43 +994,39 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::getElementsWithinRange(lua_State* luaVM)
+CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
+                                                       std::optional<unsigned short> dimension)
 {
-    CVector position;
-    float   radius;
-    SString elementType;
+    const auto typeHash = (type.has_value() && !type.value().empty()) ? CElement::GetTypeHashFromString(type.value()) : 0;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(position);
-    argStream.ReadNumber(radius);
-    argStream.ReadString(elementType, "");
+    CElementResult result;
+    GetSpatialDatabase()->SphereQuery(result, CSphere{pos, radius});
 
-    if (!argStream.HasErrors())
+    // Remove elements that do not match the criterias
+    if (interior || dimension || typeHash)
     {
-        // Query the spatial database
-        CElementResult result;
-        GetSpatialDatabase()->SphereQuery(result, CSphere{position, radius});
+        result.erase(std::remove_if(result.begin(), result.end(),
+                                    [&, radiusSq = radius * radius](CElement* pElement)
+                                    {
+                                        if (typeHash && typeHash != pElement->GetTypeHash())
+                                            return true;
 
-        lua_newtable(luaVM);
-        unsigned int index = 0;
+                                        if (interior.has_value() && interior != pElement->GetInterior())
+                                            return true;
 
-        for (CElement* entity : result)
-        {
-            if ((elementType.empty() || elementType == entity->GetTypeName()) && !entity->IsBeingDeleted())
-            {
-                lua_pushnumber(luaVM, ++index);
-                lua_pushelement(luaVM, entity);
-                lua_settable(luaVM, -3);
-            }
-        }
+                                        if (dimension.has_value() && dimension != pElement->GetDimension())
+                                            return true;
 
-        return 1;
+                                        // Check if element is within the sphere, because the spatial database is 2D
+                                        if ((pElement->GetPosition() - pos).LengthSquared() > radiusSq)
+                                            return true;
+
+                                        return pElement->IsBeingDeleted();
+                                    }),
+                     result.end());
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return result;
 }
 
 int CLuaElementDefs::getElementDimension(lua_State* luaVM)
@@ -1590,7 +1563,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
         {
             // Warn and truncate if key is too long
             m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                                                         *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
@@ -1625,7 +1598,7 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
         {
             // Warn and truncate if key is too long
             m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                            *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
+                                                         *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
@@ -1686,7 +1659,7 @@ int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
-  
+
         if (CStaticFunctionDefinitions::RemoveElementDataSubscriber(pElement, strKey, pPlayer))
         {
             lua_pushboolean(luaVM, true);
@@ -1705,7 +1678,7 @@ int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
     //  bool hasElementDataSubscriber ( element theElement, string key, player thePlayer )
     CElement* pElement;
     SString   strKey;
-    CPlayer* pPlayer;
+    CPlayer*  pPlayer;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

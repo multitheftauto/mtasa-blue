@@ -187,18 +187,29 @@ SSE_VERSION _SSE_Version=GetSSEVersion();
 SSE_VERSION GetSSEVersion()
 {
   int CPUInfo[4];
-  __cpuid(CPUInfo, 7);
-  if ((CPUInfo[1] & 0x20)!=0)
-    return SSE_AVX2;
-  __cpuid(CPUInfo, 1);
-  if ((CPUInfo[2] & 0x80000)!=0)
-    return SSE_SSE41;
-  if ((CPUInfo[2] & 0x200)!=0)
-    return SSE_SSSE3;
-  if ((CPUInfo[3] & 0x4000000)!=0)
-    return SSE_SSE2;
-  if ((CPUInfo[3] & 0x2000000)!=0)
-    return SSE_SSE;
+  __cpuid(CPUInfo, 0);
+
+  // Maximum supported cpuid function.
+  uint MaxSupported=CPUInfo[0];
+
+  if (MaxSupported>=7)
+  {
+    __cpuid(CPUInfo, 7);
+    if ((CPUInfo[1] & 0x20)!=0)
+      return SSE_AVX2;
+  }
+  if (MaxSupported>=1)
+  {
+    __cpuid(CPUInfo, 1);
+    if ((CPUInfo[2] & 0x80000)!=0)
+      return SSE_SSE41;
+    if ((CPUInfo[2] & 0x200)!=0)
+      return SSE_SSSE3;
+    if ((CPUInfo[3] & 0x4000000)!=0)
+      return SSE_SSE2;
+    if ((CPUInfo[3] & 0x2000000)!=0)
+      return SSE_SSE;
+  }
   return SSE_NONE;
 }
 #endif

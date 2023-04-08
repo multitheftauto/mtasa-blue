@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMapInfoPacket.h"
+#include "CGame.h"
+#include "CWeaponStatManager.h"
+#include "CBuildingRemoval.h"
+#include "CBuildingRemovalManager.h"
+#include <net/SyncStructures.h>
 
 CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,
                                unsigned char ucClockMin, unsigned long ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
@@ -133,8 +139,17 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_WorldWaterLevelInfo.fSeaLevel);
     BitStream.WriteBit(m_WorldWaterLevelInfo.bNonSeaLevelSet);
     if (m_WorldWaterLevelInfo.bNonSeaLevelSet)
+    {
         BitStream.Write(m_WorldWaterLevelInfo.fNonSeaLevel);
-
+    }
+    if (BitStream.Can(eBitStreamVersion::SetWaterLevel_ChangeOutsideWorldLevel))
+    {
+        BitStream.WriteBit(m_WorldWaterLevelInfo.bOutsideLevelSet);
+        if (m_WorldWaterLevelInfo.bOutsideLevelSet)
+        {
+            BitStream.Write(m_WorldWaterLevelInfo.fOutsideLevel);
+        }
+    }
     BitStream.WriteCompressed(m_usFPSLimit);
 
     // Write the garage states

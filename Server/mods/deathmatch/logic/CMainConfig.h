@@ -20,7 +20,10 @@ class CMainConfig;
 #include <list>
 
 #define MAX_MAP_NAME_LENGTH 64
+
 class CMainConfig;
+class CCommandLineParser;
+class CLuaArguments;
 
 typedef void (CMainConfig::*PFN_SettingChangeCallback)();
 
@@ -40,7 +43,7 @@ class CMainConfig : public CXMLConfig
 {
 public:
     ZERO_ON_NEW
-    CMainConfig(CConsole* pConsole, class CLuaManager* pLuaMain);
+    CMainConfig(CConsole* pConsole);
 
     bool Load();
     bool LoadExtended();
@@ -141,12 +144,11 @@ public:
     void                            OnAseSettingChange();
 
 private:
-    void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted);
+    void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText);
     bool GetSettingTable(const SString& strName, const char** szAttribNames, uint uiNumAttribNames, CLuaArguments* outTable);
     bool AddMissingSettings();
 
     CConsole*           m_pConsole;
-    CLuaManager*        m_pLuaManager;
     CXMLNode*           m_pRootNode;
     CCommandLineParser* m_pCommandLineParser;
 

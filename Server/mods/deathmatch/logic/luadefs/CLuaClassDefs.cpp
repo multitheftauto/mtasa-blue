@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaClassDefs.h"
+
 int CLuaClassDefs::Index(lua_State* luaVM)
 {
     lua_pushvalue(luaVM, lua_upvalueindex(1));            // ud, k, mt
@@ -50,8 +52,8 @@ int CLuaClassDefs::Index(lua_State* luaVM)
     lua_remove(luaVM, -2);              // ud, k, mt, function
 
     if (lua_isfunction(luaVM, -1))
-    {                                     // Found the property,
-        lua_remove(luaVM, -2);            // ud, k, function
+    {                                       // Found the property,
+        lua_remove(luaVM, -2);              // ud, k, function
 
         lua_pushvalue(luaVM, 1);            // ud, k, function, ud
         lua_call(luaVM, 1, 1);              // ud, k, result
@@ -72,15 +74,15 @@ searchparent:
             lua_pushvalue(luaVM, 1);            // ud, k, mt, __parent table, function, ud
             lua_pushvalue(luaVM, 2);            // ud, k, mt, __parent table, function, ud, k
 
-            lua_call(luaVM, 2, 1);            // ud, k, mt, __parent table, result
+            lua_call(luaVM, 2, 1);              // ud, k, mt, __parent table, result
 
-            lua_replace(luaVM, -3);            // ud, k, result, __parent table
-            lua_pop(luaVM, 1);                 // ud, k, result
+            lua_replace(luaVM, -3);             // ud, k, result, __parent table
+            lua_pop(luaVM, 1);                  // ud, k, result
             return 1;
         }
         lua_pop(luaVM, 1);            // ud, k, mt, __parent table
     }
-    lua_pop(luaVM, 2);            // ud, k
+    lua_pop(luaVM, 2);                // ud, k
 
     lua_pushnil(luaVM);
     return 1;
@@ -90,8 +92,8 @@ int CLuaClassDefs::NewIndex(lua_State* luaVM)
 {
     lua_pushvalue(luaVM, lua_upvalueindex(1));            // ud, k, v, mt
 
-    lua_pushstring(luaVM, "__set");            // ud, k, v, mt, "__set"
-    lua_rawget(luaVM, -2);                     // ud, k, v, mt, __set table
+    lua_pushstring(luaVM, "__set");                       // ud, k, v, mt, "__set"
+    lua_rawget(luaVM, -2);                                // ud, k, v, mt, __set table
 
     if (!lua_istable(luaVM, -1))
     {
@@ -108,9 +110,9 @@ int CLuaClassDefs::NewIndex(lua_State* luaVM)
         lua_pushvalue(luaVM, 1);            // ud, k, v, mt, function, ud
         lua_pushvalue(luaVM, 3);            // ud, k, v, mt, function, ud, v
 
-        lua_call(luaVM, 2, 0);            // ud, k, v, mt
+        lua_call(luaVM, 2, 0);              // ud, k, v, mt
 
-        lua_pop(luaVM, 1);            // ud, k, v
+        lua_pop(luaVM, 1);                  // ud, k, v
 
         return 0;
     }
@@ -130,15 +132,15 @@ searchparent:
             lua_pushvalue(luaVM, 2);            // ud, k, v, mt, __parent table, function, ud, k
             lua_pushvalue(luaVM, 3);            // ud, k, v, mt, __parent table, function, ud, k, v
 
-            lua_call(luaVM, 3, 0);            // ud, k, v, mt, __parent table
+            lua_call(luaVM, 3, 0);              // ud, k, v, mt, __parent table
 
-            lua_pop(luaVM, 2);            // ud, k, v
+            lua_pop(luaVM, 2);                  // ud, k, v
 
             return 0;
         }
         lua_pop(luaVM, 1);            // ud, k, v, mt, __parent table
     }
-    lua_pop(luaVM, 2);            // ud, k, v
+    lua_pop(luaVM, 2);                // ud, k, v
 
     return 0;
 }
@@ -147,8 +149,8 @@ int CLuaClassDefs::StaticNewIndex(lua_State* luaVM)
 {
     lua_pushvalue(luaVM, lua_upvalueindex(1));            // ud, k, v, mt
 
-    lua_pushstring(luaVM, "__set");            // ud, k, v, mt, "__set"
-    lua_rawget(luaVM, -2);                     // ud, k, v, mt, __set table
+    lua_pushstring(luaVM, "__set");                       // ud, k, v, mt, "__set"
+    lua_rawget(luaVM, -2);                                // ud, k, v, mt, __set table
 
     if (!lua_istable(luaVM, -1))
     {
@@ -164,9 +166,9 @@ int CLuaClassDefs::StaticNewIndex(lua_State* luaVM)
     {                                       // Found the property
         lua_pushvalue(luaVM, 3);            // ud, k, v, mt, function, v
 
-        lua_call(luaVM, 1, 0);            // ud, k, v, mt
+        lua_call(luaVM, 1, 0);              // ud, k, v, mt
 
-        lua_pop(luaVM, 1);            // ud, k, v
+        lua_pop(luaVM, 1);                  // ud, k, v
 
         return 0;
     }
@@ -186,15 +188,15 @@ searchparent:
             lua_pushvalue(luaVM, 2);            // ud, k, v, mt, __parent table, function, ud, k
             lua_pushvalue(luaVM, 3);            // ud, k, v, mt, __parent table, function, ud, k, v
 
-            lua_call(luaVM, 3, 0);            // ud, k, v, mt, __parent table
+            lua_call(luaVM, 3, 0);              // ud, k, v, mt, __parent table
 
-            lua_pop(luaVM, 2);            // ud, k, v
+            lua_pop(luaVM, 2);                  // ud, k, v
 
             return 0;
         }
         lua_pop(luaVM, 1);            // ud, k, v, mt, __parent table
     }
-    lua_pop(luaVM, 2);            // ud, k, v
+    lua_pop(luaVM, 2);                // ud, k, v
 
     return 0;
 }
@@ -246,13 +248,13 @@ int CLuaClassDefs::ToString(lua_State* luaVM)
 
 const char* CLuaClassDefs::GetObjectClass(void* pObject)
 {
-    if (CElement* pElement = UserDataCast<CElement>((CElement*)NULL, pObject, NULL))
+    if (CElement* pElement = UserDataCast((CElement*)pObject, NULL))
         return GetElementClass(pElement);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pObject, NULL))
+    else if (CResource* pResource = UserDataCast((CResource*)pObject, NULL))
         return GetResourceClass(pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pObject, NULL))
+    else if (CXMLNode* pNode = UserDataCast((CXMLNode*)pObject, NULL))
         return GetXmlNodeClass(pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pObject, NULL))
+    else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pObject, NULL))
         return GetTimerClass(pTimer);
     return NULL;
 }

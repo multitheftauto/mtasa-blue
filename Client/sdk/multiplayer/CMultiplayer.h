@@ -16,10 +16,11 @@
 
 #include <game/CExplosion.h>
 #include <game/CStats.h>
-#include "CPopulationMP.h"
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
+
+class CEntitySAInterface;
 
 struct SRwResourceStats
 {
@@ -88,6 +89,7 @@ typedef void(RenderHeliLightHandler)();
 typedef bool(ChokingHandler)(unsigned char ucWeaponType);
 typedef void(PreWorldProcessHandler)();
 typedef void(PostWorldProcessHandler)();
+typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
 typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PreHudRenderHandler)();
@@ -120,6 +122,7 @@ typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
+typedef void(AudioZoneRadioSwitchHandler)(DWORD dwStationID);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
@@ -192,16 +195,15 @@ public:
 
     virtual class CPed* GetContextSwitchedPed() = 0;
 
-    virtual class CPopulationMP* GetPopulationMP() = 0;
-    virtual void                 PreventLeavingVehicles() = 0;
-    virtual void                 HideRadar(bool bHide) = 0;
-    virtual void                 SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
-    virtual void                 DisablePadHandler(bool bDisabled) = 0;
-    virtual void                 DisableAllVehicleWeapons(bool bDisable) = 0;
-    virtual void                 DisableBirds(bool bDisabled) = 0;
-    virtual void                 DisableQuickReload(bool bDisable) = 0;
-    virtual void                 DisableCloseRangeDamage(bool bDisable) = 0;
-    virtual void                 DisableBadDrivebyHitboxes(bool bDisable) = 0;
+    virtual void PreventLeavingVehicles() = 0;
+    virtual void HideRadar(bool bHide) = 0;
+    virtual void SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
+    virtual void DisablePadHandler(bool bDisabled) = 0;
+    virtual void DisableAllVehicleWeapons(bool bDisable) = 0;
+    virtual void DisableBirds(bool bDisabled) = 0;
+    virtual void DisableQuickReload(bool bDisable) = 0;
+    virtual void DisableCloseRangeDamage(bool bDisable) = 0;
+    virtual void DisableBadDrivebyHitboxes(bool bDisable) = 0;
 
     virtual bool  GetExplosionsDisabled() = 0;
     virtual void  DisableExplosions(bool bDisabled) = 0;
@@ -216,6 +218,7 @@ public:
     virtual void  SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
     virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
+    virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;
     virtual void  SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void  SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void  SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
@@ -244,6 +247,7 @@ public:
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
     virtual void  SetPedStepHandler(PedStepHandler* pHandler) = 0;
     virtual void  SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) = 0;
+    virtual void  SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler) = 0;
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
     virtual bool  HasSkyColor() = 0;
@@ -254,6 +258,8 @@ public:
     virtual void  ResetSky() = 0;
     virtual void  SetHeatHaze(const SHeatHazeSettings& settings) = 0;
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
+    virtual void  ResetColorFilter() = 0;
+    virtual void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color) = 0;
     virtual void  ResetHeatHaze() = 0;
     virtual void  SetHeatHazeEnabled(bool bEnabled) = 0;
     virtual bool  HasWaterColor() = 0;
@@ -382,6 +388,10 @@ public:
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 
     virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
-    virtual eAnimID GetLastStaticAnimationID() = 0;
-    virtual DWORD GetLastAnimArrayAddress() = 0;
+    virtual eAnimID    GetLastStaticAnimationID() = 0;
+    virtual DWORD      GetLastAnimArrayAddress() = 0;
+
+    virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
 };

@@ -10,13 +10,30 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMapManager.h"
+#include "CPedManager.h"
+#include "CWaterManager.h"
+#include "CPlayerManager.h"
+#include "CMarkerManager.h"
+#include "CWater.h"
+#include "CMarker.h"
+#include "CBlip.h"
+#include "CGame.h"
+#include "CMainConfig.h"
+#include "CResource.h"
+#include "CPerfStatManager.h"
+#include "lua/CLuaFunctionParseHelpers.h"
+#include "packets/CEntityAddPacket.h"
+#include "packets/CPlayerSpawnPacket.h"
+#include "packets/CPickupHideShowPacket.h"
+#include "packets/CVehicleSpawnPacket.h"
 
 extern CGame* g_pGame;
 
 CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectManager, CPickupManager* pPickupManager, CPlayerManager* pPlayerManager,
                          CRadarAreaManager* pRadarAreaManager, CMarkerManager* pMarkerManager, CVehicleManager* pVehicleManager, CTeamManager* pTeamManager,
-                         CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock, CLuaManager* pLuaManager,
-                         CGroups* pGroups, CEvents* pEvents, class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter)
+                         CPedManager* pPedManager, CColManager* pColManager, CWaterManager* pWaterManager, CClock* pClock, CGroups* pGroups, CEvents* pEvents,
+                         class CScriptDebugging* pScriptDebugging, CElementDeleter* pElementDeleter)
 {
     // Init
     m_pBlipManager = pBlipManager;
@@ -31,7 +48,6 @@ CMapManager::CMapManager(CBlipManager* pBlipManager, CObjectManager* pObjectMana
     m_pColManager = pColManager;
     m_pWaterManager = pWaterManager;
     m_pServerClock = pClock;
-    m_pLuaManager = pLuaManager;
     m_pGroups = pGroups;
     m_pEvents = pEvents;
     m_pScriptDebugging = pScriptDebugging;
@@ -566,13 +582,13 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
                 pOccupant->SetVehicleAction(CPlayer::VEHICLEACTION_NONE);
 
                 // Tell everyone
-                CVehicleInOutPacket Reply(pVehicle->GetID(), 0, CGame::VEHICLE_NOTIFY_JACK_RETURN, pOccupant->GetID(), Player.GetID());
+                CVehicleInOutPacket Reply(Player.GetID(), pVehicle->GetID(), 0, CGame::VEHICLE_NOTIFY_JACK_RETURN, pOccupant->GetID(), Player.GetID());
                 Reply.SetSourceElement(&Player);
                 m_pPlayerManager->BroadcastOnlyJoined(Reply);
             }
         }
-        if (pVehicle->GetJackingPlayer() == &Player)
-            pVehicle->SetJackingPlayer(NULL);
+        if (pVehicle->GetJackingPed() == &Player)
+            pVehicle->SetJackingPed(NULL);
     }
 
     // Update the player data
@@ -954,7 +970,7 @@ void CMapManager::LinkupElements()
         {
             CElement* pElement = g_pGame->GetMapManager()->GetRootElement()->FindChild(szAttachToID, 0, true);
 
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(vehicle))
                 vehicle->AttachTo(pElement);
         }
     }
@@ -968,7 +984,7 @@ void CMapManager::LinkupElements()
         if (szAttachToID[0])
         {
             CElement* pElement = g_pGame->GetMapManager()->GetRootElement()->FindChild(szAttachToID, 0, true);
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(pPlayer))
                 pPlayer->AttachTo(pElement);
         }
     }
@@ -982,7 +998,7 @@ void CMapManager::LinkupElements()
         if (szAttachToID[0])
         {
             CElement* pElement = g_pGame->GetMapManager()->GetRootElement()->FindChild(szAttachToID, 0, true);
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(pObject))
                 pObject->AttachTo(pElement);
         }
     }
@@ -996,7 +1012,7 @@ void CMapManager::LinkupElements()
         if (szAttachToID[0])
         {
             CElement* pElement = g_pGame->GetMapManager()->GetRootElement()->FindChild(szAttachToID, 0, true);
-            if (pElement)
+            if (pElement && !pElement->IsAttachedToElement(pBlip))
                 pBlip->AttachTo(pElement);
         }
     }

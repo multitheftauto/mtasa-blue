@@ -20,8 +20,6 @@ class CLuaMain;
 #include "CLuaModuleManager.h"
 #include "../CTextDisplay.h"
 
-#include "CLuaFunctionDefs.h"
-
 #define MAX_SCRIPTNAME_LENGTH 64
 
 class CBlipManager;
@@ -75,7 +73,7 @@ public:
     unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };
     unsigned long GetOpenFileCount() const { return m_OpenFilenameList.size(); };
     unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
-    unsigned long GetElementCount() const { return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0; };
+    unsigned long GetElementCount() const;
     unsigned long GetTextDisplayCount() const { return m_Displays.size(); };
     unsigned long GetTextItemCount() const { return m_TextItems.size(); };
     void          OnOpenFile(const SString& strFilename);
@@ -102,7 +100,9 @@ public:
 
     void RegisterHTMLDFunctions();
 
-    void           InitVM();
+    void           Initialize();
+    void           LoadEmbeddedScripts();
+    void           RegisterModuleFunctions();
     const SString& GetFunctionTag(int iFunctionNumber);
     int            PCall(lua_State* L, int nargs, int nresults, int errfunc);
     void           CheckExecutionTime();
@@ -133,9 +133,10 @@ private:
     CVehicleManager*     m_pVehicleManager;
     CMapManager*         m_pMapManager;
 
-    list<CXMLFile*>     m_XMLFiles;
-    list<CTextDisplay*> m_Displays;
-    list<CTextItem*>    m_TextItems;
+    list<CXMLFile*>                                 m_XMLFiles;
+    std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
+    list<CTextDisplay*>                             m_Displays;
+    list<CTextItem*>                                m_TextItems;
 
     bool m_bEnableOOP;
 

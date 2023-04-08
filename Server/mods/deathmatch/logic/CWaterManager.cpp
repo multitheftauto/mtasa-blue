@@ -10,12 +10,17 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CWaterManager.h"
+#include "CWater.h"
+#include "Utils.h"
 
 CWaterManager::CWaterManager()
 {
     m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
+    m_WorldWaterLevelInfo.bOutsideLevelSet = false;
     m_WorldWaterLevelInfo.fSeaLevel = 0;
     m_WorldWaterLevelInfo.fNonSeaLevel = 0;
+    m_WorldWaterLevelInfo.fOutsideLevel = 0;
     m_fGlobalWaveHeight = 0.0f;
 }
 
@@ -64,21 +69,31 @@ void CWaterManager::SetAllElementWaterLevel(float fLevel)
     }
 }
 
-void CWaterManager::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel)
+void CWaterManager::SetWorldWaterLevel(float fLevel, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel, bool bIncludeOutsideWorldLevel)
 {
-    m_WorldWaterLevelInfo.fSeaLevel = fLevel;
+    if (bIncludeWorldSeaLevel)
+    {
+        m_WorldWaterLevelInfo.fSeaLevel = fLevel;
+    }
     if (bIncludeWorldNonSeaLevel)
     {
         m_WorldWaterLevelInfo.bNonSeaLevelSet = true;
         m_WorldWaterLevelInfo.fNonSeaLevel = fLevel;
+    }
+    if (bIncludeOutsideWorldLevel)
+    {
+        m_WorldWaterLevelInfo.bOutsideLevelSet = true;
+        m_WorldWaterLevelInfo.fOutsideLevel = fLevel;
     }
 }
 
 void CWaterManager::ResetWorldWaterLevel()
 {
     m_WorldWaterLevelInfo.bNonSeaLevelSet = false;
+    m_WorldWaterLevelInfo.bOutsideLevelSet = false;
     m_WorldWaterLevelInfo.fSeaLevel = 0;
     m_WorldWaterLevelInfo.fNonSeaLevel = 0;
+    m_WorldWaterLevelInfo.fOutsideLevel = 0;
 }
 
 void CWaterManager::DeleteAll()

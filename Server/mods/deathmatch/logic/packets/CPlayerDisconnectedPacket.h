@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include "../packets/CPacket.h"
+#include "CPacket.h"
 
-class CPlayerDisconnectedPacket : public CPacket
+class CPlayerDisconnectedPacket final : public CPacket
 {
 public:
     enum ePlayerDisconnectType

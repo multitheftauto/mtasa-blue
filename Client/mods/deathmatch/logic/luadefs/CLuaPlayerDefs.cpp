@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -47,6 +48,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerMapForced", IsPlayerMapForced},
         {"isPlayerMapVisible", IsPlayerMapVisible},
         {"getPlayerMapBoundingBox", GetPlayerMapBoundingBox},
+        {"getPlayerMapOpacity", ArgumentParser<GetPlayerMapOpacity>},
     };
 
     // Add functions
@@ -67,6 +69,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSerial", "getPlayerSerial");
     lua_classfunction(luaVM, "getWantedLevel", "getPlayerWantedLevel");
     lua_classfunction(luaVM, "getMapBoundingBox", "getPlayerMapBoundingBox");
+    lua_classfunction(luaVM, "getMapOpacity", "getPlayerMapOpacity");
     lua_classfunction(luaVM, "forceMap", "forcePlayerMap");
     lua_classfunction(luaVM, "isMapForced", "isPlayerMapForced");
     lua_classfunction(luaVM, "isMapVisible", "isPlayerMapVisible");
@@ -92,15 +95,6 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "team", NULL, "getPlayerTeam");
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
-
-    // Static class variables or local only variable
-    /*
-    lua_classvariable ( luaVM, "blurLevel", "setPlayerBlurLevel", "getPlayerBlurLevel" );
-    lua_classvariable ( luaVM, "mapForced", NULL, "isPlayerMapForced" );
-    lua_classvariable ( luaVM, "mapVisible", NULL, "isPlayerMapVisible" );
-    lua_classvariable ( luaVM, "money", "setPlayerMoney", "getPlayerMoney" );
-    lua_classvariable ( luaVM, "serial", NULL, "getPlayerSerial" );
-    lua_classvariable ( luaVM, "wantedLevel", NULL, "getPlayerWantedLevel" );*/
 
     lua_registerclass(luaVM, "Player", "Ped");
 }
@@ -627,4 +621,10 @@ int CLuaPlayerDefs::GetPlayerMapBoundingBox(lua_State* luaVM)
     // The map is invisible
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+unsigned char CLuaPlayerDefs::GetPlayerMapOpacity()
+{
+    int iMapOpacity = g_pCore->GetCVars()->GetValue<int>("mapalpha");
+    return static_cast<unsigned char>(Clamp(0, iMapOpacity, 255));
 }

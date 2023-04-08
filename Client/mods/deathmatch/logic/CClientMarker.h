@@ -20,7 +20,7 @@
 
 class CClientMarkerManager;
 
-class CClientMarker : public CClientStreamElement, private CClientColCallback
+class CClientMarker final : public CClientStreamElement, private CClientColCallback
 {
     DECLARE_CLASS(CClientMarker, CClientStreamElement)
     friend class CClientMarkerManager;
@@ -94,6 +94,7 @@ private:
     CClientMarkerManager* m_pMarkerManager;
     CClientMarkerCommon*  m_pMarker;
 
+    CVector             m_vecPosition;
     static unsigned int m_uiStreamedInMarkers;
 
     CClientColShape* m_pCollision;

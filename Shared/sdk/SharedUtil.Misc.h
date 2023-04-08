@@ -8,8 +8,19 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
 
+#include <cassert>
 #include <cmath>
+#include <deque>
+#include <list>
+#include <map>
+#include <set>
+
+#include "SString.h"
+#include "WString.h"
+#include "SharedUtil.Defines.h"
+#include "SharedUtil.Map.h"
 
 namespace SharedUtil
 {
@@ -141,10 +152,10 @@ namespace SharedUtil
         TERMINATE_IF_NO = 8,             //    ''
         TERMINATE_IF_YES_OR_NO = TERMINATE_IF_YES | TERMINATE_IF_NO,
         TERMINATE_PROCESS = TERMINATE_IF_YES_OR_NO,
-        ICON_ERROR = 0x10,               // MB_ICONERROR
-        ICON_QUESTION = 0x20,            // MB_ICONQUESTION
-        ICON_WARNING = 0x30,             // MB_ICONWARNING
-        ICON_INFO = 0x40,                // MB_ICONINFORMATION
+        ICON_ERROR = 0x10,                   // MB_ICONERROR
+        ICON_QUESTION = 0x20,                // MB_ICONQUESTION
+        ICON_WARNING = 0x30,                 // MB_ICONWARNING
+        ICON_INFO = 0x40,                    // MB_ICONINFORMATION
         ICON_MASK_VALUE = ICON_ERROR | ICON_QUESTION | ICON_WARNING | ICON_INFO,
         SHOW_MESSAGE_ONLY = 0x80,            // Just show message without going online
     };
@@ -180,25 +191,21 @@ namespace SharedUtil
     // CPU stats
     struct SThreadCPUTimes
     {
-        uint  uiProcessorNumber;
-        float fUserPercent;
-        float fKernelPercent;
-        float fTotalCPUPercent;
-        float fUserPercentAvg;
-        float fKernelPercentAvg;
-        float fTotalCPUPercentAvg;
+        uint  uiProcessorNumber = 0;
+        float fUserPercent = 0;
+        float fKernelPercent = 0;
+        float fTotalCPUPercent = 0;
+        float fUserPercentAvg = 0;
+        float fKernelPercentAvg = 0;
+        float fTotalCPUPercentAvg = 0;
     };
     struct SThreadCPUTimesStore : SThreadCPUTimes
     {
-        SThreadCPUTimesStore()
-        {
-            ZERO_POD_STRUCT(this);
-            fAvgTimeSeconds = 5;
-        }
-        uint64 ullPrevCPUMeasureTimeMs;
-        uint64 ullPrevUserTimeUs;
-        uint64 ullPrevKernelTimeUs;
-        float  fAvgTimeSeconds;
+        SThreadCPUTimesStore() {}
+        uint64 ullPrevCPUMeasureTimeMs = 0;
+        uint64 ullPrevUserTimeUs = 0;
+        uint64 ullPrevKernelTimeUs = 0;
+        float  fAvgTimeSeconds = 5.0f;
     };
     DWORD _GetCurrentProcessorNumber();
     void  GetThreadCPUTimes(uint64& outUserTime, uint64& outKernelTime);
@@ -238,6 +245,10 @@ namespace SharedUtil
     bool IsLuaCompiledScript(const void* pData, uint uiLength);
     bool IsLuaObfuscatedScript(const void* pData, uint uiLength);
 
+    // Return a pointer to the (shifted) trimmed string
+    // @ref https://stackoverflow.com/a/26984026
+    char* Trim(char* szText);
+
     //
     // Some templates
     //
@@ -273,7 +284,10 @@ namespace SharedUtil
     }
 
     // Unlerp avoiding extrapolation
-    inline const float UnlerpClamped(const double dFrom, const double dPos, const double dTo) { return Clamp(0.0f, Unlerp(dFrom, dPos, dTo), 1.0f); }
+    inline const float UnlerpClamped(const double dFrom, const double dPos, const double dTo)
+    {
+        return Clamp(0.0f, Unlerp(dFrom, dPos, dTo), 1.0f);
+    }
 
     template <class T>
     int Round(T value)
@@ -452,14 +466,9 @@ namespace SharedUtil
     //
     class SColor
     {
-        // No shifting allowed to access the color channel information
-        void operator>>(int) const;
-        void operator<<(int) const;
-        void operator>>=(int);
-        void operator<<=(int);
-
     public:
-        union {
+        union
+        {
             struct
             {
                 unsigned char B, G, R, A;
@@ -467,7 +476,8 @@ namespace SharedUtil
             unsigned long ulARGB;
         };
 
-        SColor() {}
+        SColor() : ulARGB(0) {}
+
         SColor(unsigned long ulValue) { ulARGB = ulValue; }
 
         operator unsigned long() const { return ulARGB; }
@@ -530,15 +540,39 @@ namespace SharedUtil
     //
     typedef SColor RGBA;
 
-    inline unsigned char COLOR_RGBA_R(SColor color) { return color.R; }
-    inline unsigned char COLOR_RGBA_G(SColor color) { return color.G; }
-    inline unsigned char COLOR_RGBA_B(SColor color) { return color.B; }
-    inline unsigned char COLOR_RGBA_A(SColor color) { return color.A; }
-    inline unsigned char COLOR_ARGB_A(SColor color) { return color.A; }
+    inline unsigned char COLOR_RGBA_R(SColor color)
+    {
+        return color.R;
+    }
+    inline unsigned char COLOR_RGBA_G(SColor color)
+    {
+        return color.G;
+    }
+    inline unsigned char COLOR_RGBA_B(SColor color)
+    {
+        return color.B;
+    }
+    inline unsigned char COLOR_RGBA_A(SColor color)
+    {
+        return color.A;
+    }
+    inline unsigned char COLOR_ARGB_A(SColor color)
+    {
+        return color.A;
+    }
 
-    inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A)
+    {
+        return SColorRGBA(R, G, B, A);
+    }
+    inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B)
+    {
+        return SColorRGBA(R, G, B, A);
+    }
+    inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R)
+    {
+        return SColorRGBA(R, G, B, A);
+    }
 
     //
     // Cross platform critical section
@@ -670,8 +704,8 @@ namespace SharedUtil
         // Out
         operator const char*() const { return szData; }
 
-        // Shake it all about
-        void Encrypt();
+        // Returns a pointer to a null-terminated character array
+        const char* c_str() const noexcept { return &szData[0]; }
     };
 
     ///////////////////////////////////////////////////////////////
@@ -791,6 +825,8 @@ namespace SharedUtil
         // list only
         typename LIST_TYPE ::iterator         begin() { return m_List.begin(); }
         typename LIST_TYPE ::iterator         end() { return m_List.end(); }
+        typename LIST_TYPE ::const_iterator   begin() const { return m_List.begin(); }
+        typename LIST_TYPE ::const_iterator   end() const { return m_List.end(); }
         typename LIST_TYPE ::reverse_iterator rbegin() { return m_List.rbegin(); }
         typename LIST_TYPE ::reverse_iterator rend() { return m_List.rend(); }
         uint                                  size() const { return m_List.size(); }
@@ -1148,7 +1184,7 @@ namespace SharedUtil
 
         // Allow use of std iterator names
         typedef Iterator        iterator;
-        typedef Iterator        const_iterator;            // TODO
+        typedef Iterator        const_iterator;                    // TODO
         typedef ReverseIterator reverse_iterator;
         typedef ReverseIterator const_reverse_iterator;            // TODO
     };
@@ -1429,7 +1465,10 @@ namespace SharedUtil
         }
     }
 
-    inline void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList) { return ReadTokenSeparatedList(",", strInput, outList); }
+    inline void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList)
+    {
+        return ReadTokenSeparatedList(",", strInput, outList);
+    }
 
     ///////////////////////////////////////////////////////////////
     //
@@ -1506,37 +1545,6 @@ namespace SharedUtil
 
         std::map<uint, bool> idMap;
         char                 cDefaultType;
-    };
-
-    ///////////////////////////////////////////////////////////////
-    //
-    // CRefCountableST
-    //
-    // Reference counting base class
-    //
-    ///////////////////////////////////////////////////////////////
-    class CRefCountableST
-    {
-        int m_iRefCount;
-
-    protected:
-        virtual ~CRefCountableST() {}
-
-    public:
-        CRefCountableST() : m_iRefCount(1) {}
-
-        void AddRef() { ++m_iRefCount; }
-
-        void Release()
-        {
-            assert(m_iRefCount > 0);
-            bool bLastRef = --m_iRefCount == 0;
-
-            if (!bLastRef)
-                return;
-
-            delete this;
-        }
     };
 
     ///////////////////////////////////////////////////////////////

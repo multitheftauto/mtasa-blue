@@ -87,11 +87,17 @@ void CWebBrowserItem::CreateUnderlyingData()
     assert(!m_pD3DRenderTargetSurface);
     assert(!m_pD3DTexture);
 
-    D3DXCreateTexture(m_pDevice, m_uiSizeX, m_uiSizeY, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture);
-
-    // Check texture created
-    if (!m_pD3DTexture)
+    // Check if texture is actually created. It can be failed in some conditions(e.g. lack of memory).
+    if (FAILED(D3DXCreateTexture(m_pDevice, m_uiSizeX, m_uiSizeY, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, (IDirect3DTexture9**)&m_pD3DTexture)) ||
+        !m_pD3DTexture)
         return;
+
+    // Get the render target surface here for convenience
+    if (FAILED(((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel(0, &m_pD3DRenderTargetSurface)) || !m_pD3DRenderTargetSurface)
+    {
+        SAFE_RELEASE(m_pD3DTexture);
+        return;
+    }
 
     // D3DXCreateTexture sets width and height to 1 if the argument value was 0
     // See: https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3dxcreatetexture
@@ -100,9 +106,6 @@ void CWebBrowserItem::CreateUnderlyingData()
 
     if (m_uiSizeY == 0)
         m_uiSizeY = 1;
-
-    // Get the render target surface here for convenience
-    ((IDirect3DTexture9*)m_pD3DTexture)->GetSurfaceLevel(0, &m_pD3DRenderTargetSurface);
 
     // Update surface size, although it probably will be unchanged | Todo: Remove this
     D3DSURFACE_DESC desc;

@@ -141,6 +141,8 @@ public:
         bSerials = false;
         bPassworded = false;
         bKeepFlag = false;
+        iRowIndex = -1;
+
         nPlayers = 0;
         nMaxPlayers = 0;
         nPing = 9999;
@@ -192,6 +194,7 @@ public:
     uint           uiQueryRetryCount;
     uint           uiRevision;
     bool           bKeepFlag;
+    int            iRowIndex;
 
     SString strGameName;                  // Game name. Always 'mta'
     SString strVersion;                   // Game version
@@ -203,8 +206,8 @@ public:
     SString strMap;                       // Map name
     SString strEndpoint;                  // IP:port as a string
 
-    int    m_iBuildType;              // 9=release
-    int    m_iBuildNumber;            // 00000 and up
+    int    m_iBuildType;                  // 9=release
+    int    m_iBuildNumber;                // 00000 and up
     ushort m_usHttpPort;
     uchar  m_ucSpecialFlags;
 
@@ -298,7 +301,7 @@ public:
     CServerListItemList* m_pItemList;
 
 protected:
-    int          m_iDataQuality;
+    int m_iDataQuality;
 
     static std::set<CServerListItem*> ms_ValidServerListItemMap;
 };

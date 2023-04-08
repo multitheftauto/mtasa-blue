@@ -10,7 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaResourceDefs.h"
+#include "lua/CLuaShared.h"
 #include "../utils/CFunctionUseLogger.h"
+#include "CAclRightName.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CResourceConfigItem.h"
+#include "CDummy.h"
+#include "Utils.h"
 
 extern CNetServer* g_pRealNetServer;
 
@@ -53,7 +61,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceExportedFunctions", getResourceExportedFunctions},
         {"getResourceOrganizationalPath", getResourceOrganizationalPath},
         {"isResourceArchived", isResourceArchived},
-        {"isResourceProtected", isResourceProtected},
+        {"isResourceProtected", ArgumentParser<isResourceProtected>},
 
         // Set stuff
         {"setResourceInfo", setResourceInfo},
@@ -134,8 +142,6 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "archived", NULL, "isResourceArchived");
     lua_classvariable(luaVM, "protected", nullptr, "isResourceProtected");
     lua_classvariable(luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason");
-    // lua_classvariable ( luaVM, "info", "setResourceInfo", "getResourceInfo", CLuaOOPDefs::SetResourceInfo, CLuaOOPDefs::GetResourceInfo ); // .key[value]
-    // lua_classvariable ( luaVM, "defaultSetting", "setResourceDefaultSetting", NULL, CLuaOOPDefs::SetResourceDefaultSetting, NULL ); // .key[value]
 
     lua_registerclass(luaVM, "Resource");
 }
@@ -1464,17 +1470,7 @@ int CLuaResourceDefs::isResourceArchived(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::isResourceProtected(lua_State* luaVM)
+bool CLuaResourceDefs::isResourceProtected(CResource* const resource)
 {
-    //  bool isResourceProtected ( resource theResource )
-    CResource* pResource;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
-
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, pResource->IsProtected());
-    return 1;
+    return resource->IsProtected();
 }

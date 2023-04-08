@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include <shlobj.h>
-#include "detours/include/detours.h"
+#include <detours.h>
 
 /*
 The hooks in this file modify the following functions to work correctly with utf8 strings:
@@ -45,6 +45,28 @@ BUT
         getcwd
             and many more...
 */
+
+#ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
+    #include <filesystem>
+
+extern std::filesystem::path g_gtaDirectory;
+
+/**
+ * @brief Converts a filesystem path to a string encoded with the active code page.
+ * @param path Path to convert to a string
+ */
+auto ToACP(const std::filesystem::path& path) -> std::string
+{
+    if (path.empty())
+        return {};
+
+    const std::wstring widePath = path.wstring();
+    const int          narrowLength = WideCharToMultiByte(CP_ACP, 0, widePath.data(), static_cast<int>(widePath.size()), nullptr, 0, nullptr, nullptr);
+    std::string        narrowPath(narrowLength, 0);
+    WideCharToMultiByte(CP_ACP, 0, widePath.data(), static_cast<int>(widePath.size()), narrowPath.data(), narrowLength, nullptr, nullptr);
+    return narrowPath;
+}
+#endif
 
 namespace SharedUtil
 {
@@ -83,6 +105,16 @@ namespace SharedUtil
     /////////////////////////////////////////////////////////////
     SString MakeSurePathIsUTF8(const SString& strOriginal)
     {
+    #ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
+        static SString gtaDirCP = ToACP(g_gtaDirectory);
+        static SString gtaDirUTF8 = g_gtaDirectory.u8string();
+        if (strOriginal.BeginsWithI(gtaDirCP))
+        {
+            SString tail = strOriginal.SubStr(gtaDirCP.length());
+            return PathJoin(gtaDirUTF8, tail);
+        }
+    #endif
+
         static SString strLaunchPathCP, strLaunchPathUTF8;
         if (strLaunchPathCP.empty())
         {
@@ -141,13 +173,22 @@ namespace SharedUtil
 
     HMODULE
     WINAPI
-    MyLoadLibraryA(__in LPCSTR lpLibFileName) { return LoadLibraryW(FromUTF8(lpLibFileName)); }
+    MyLoadLibraryA(__in LPCSTR lpLibFileName)
+    {
+        return LoadLibraryW(FromUTF8(lpLibFileName));
+    }
 
     HMODULE
     WINAPI
-    MyLoadLibraryExA(__in LPCSTR lpLibFileName, __reserved HANDLE hFile, __in DWORD dwFlags) { return LoadLibraryExW(FromUTF8(lpLibFileName), hFile, dwFlags); }
+    MyLoadLibraryExA(__in LPCSTR lpLibFileName, __reserved HANDLE hFile, __in DWORD dwFlags)
+    {
+        return LoadLibraryExW(FromUTF8(lpLibFileName), hFile, dwFlags);
+    }
 
-    BOOL WINAPI MySetDllDirectoryA(__in_opt LPCSTR lpPathName) { return SetDllDirectoryW(FromUTF8(lpPathName)); }
+    BOOL WINAPI MySetDllDirectoryA(__in_opt LPCSTR lpPathName)
+    {
+        return SetDllDirectoryW(FromUTF8(lpPathName));
+    }
 
     BOOL WINAPI MySetCurrentDirectoryA(__in LPCSTR lpPathName)
     {
@@ -159,9 +200,15 @@ namespace SharedUtil
         return SetCurrentDirectoryW(FromUTF8(strPathName));
     }
 
-    int WINAPI MyAddFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID res) { return AddFontResourceExW(FromUTF8(name), fl, res); }
+    int WINAPI MyAddFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID res)
+    {
+        return AddFontResourceExW(FromUTF8(name), fl, res);
+    }
 
-    BOOL WINAPI MyRemoveFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID pdv) { return RemoveFontResourceExW(FromUTF8(name), fl, pdv); }
+    BOOL WINAPI MyRemoveFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID pdv)
+    {
+        return RemoveFontResourceExW(FromUTF8(name), fl, pdv);
+    }
 
     BOOL WINAPI MyRemoveDirectoryA(__in LPCSTR lpPathName)
     {
@@ -253,8 +300,13 @@ namespace SharedUtil
     void AddUtf8FileHooks()
     {
         #define ADDHOOK(module,name) \
-                pfn##name = reinterpret_cast < FUNC_##name > ( DetourFunction ( DetourFindFunction ( module, #name ), reinterpret_cast < PBYTE > ( My##name ) ) ); \
-                assert( pfn##name );
+                static_assert(std::is_same_v<decltype(pfn##name), decltype(&name)>, "invalid type of " MTA_STR(pfn##name)); \
+                pfn##name = reinterpret_cast<decltype(pfn##name)>(DetourFindFunction(module, #name)); \
+                DetourAttach(&reinterpret_cast<PVOID&>(pfn##name), My##name); \
+                assert(pfn##name);
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
 
         ADDHOOK("Kernel32.dll", CreateFileA)
         ADDHOOK("Kernel32.dll", LoadLibraryA)
@@ -273,6 +325,8 @@ namespace SharedUtil
         ADDHOOK("Kernel32.dll", MoveFileA)
         ADDHOOK("Kernel32.dll", DeleteFileA)
         ADDHOOK("Kernel32.dll", GetModuleHandleA)
+
+        DetourTransactionCommit();
     }
 
     /////////////////////////////////////////////////////////////
@@ -283,12 +337,14 @@ namespace SharedUtil
     void RemoveUtf8FileHooks()
     {
         #define DELHOOK(name) \
-            if ( pfn##name ) \
+            if (pfn##name != nullptr) \
             { \
-                DetourRemove ( reinterpret_cast < PBYTE > ( pfn##name ),  \
-                               reinterpret_cast < PBYTE > ( My##name  ) ); \
-                pfn##name = NULL; \
+                DetourDetach(&reinterpret_cast<PVOID&>(pfn##name), My##name); \
+                pfn##name = nullptr; \
             }
+
+        DetourTransactionBegin();
+        DetourUpdateThread(GetCurrentThread());
 
         DELHOOK(CreateFileA)
         DELHOOK(LoadLibraryA)
@@ -307,5 +363,7 @@ namespace SharedUtil
         DELHOOK(MoveFileA)
         DELHOOK(DeleteFileA)
         DELHOOK(GetModuleHandleA)
+
+        DetourTransactionCommit();
     }
 }            // namespace SharedUtil

@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CDatabaseJobQueue.h"
 #include "CDatabaseJobQueueManager.h"
+#include "CDatabaseManager.h"
 
 ///////////////////////////////////////////////////////////////
 //
@@ -42,7 +43,7 @@ CDbJobData* CDatabaseJobQueueManager::AddCommand(EJobCommandType jobType, SConne
     if (jobType == EJobCommand::CONNECT)
     {
         connectionHandle = GetNextConnectionHandle();
-        pJobQueue = GetQueueFromConnectCommand(connectionHandle);
+        pJobQueue = GetQueueFromConnectCommand(strData);
     }
     else
     {
@@ -162,7 +163,12 @@ void CDatabaseJobQueueManager::SetLogLevel(EJobLogLevelType logLevel, const SStr
 ///////////////////////////////////////////////////////////////
 CDatabaseJobQueue* CDatabaseJobQueueManager::FindQueueFromConnection(SConnectionHandle connectionHandle)
 {
-    return MapFindRef(m_QueueNameMap, connectionHandle);
+    for (const auto iter : m_QueueNameMap)
+    {
+        if (iter.second->UsesConnection(connectionHandle))
+            return iter.second;
+    }
+    return nullptr;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -173,15 +179,21 @@ CDatabaseJobQueue* CDatabaseJobQueueManager::FindQueueFromConnection(SConnection
 // Can't fail
 //
 ///////////////////////////////////////////////////////////////
-CDatabaseJobQueue* CDatabaseJobQueueManager::GetQueueFromConnectCommand(SConnectionHandle connectionHandle)
+CDatabaseJobQueue* CDatabaseJobQueueManager::GetQueueFromConnectCommand(const SString& strData)
 {
+    // Extract queue name from options
+    std::vector<SString> parts;
+    strData.Split("\1", parts);
+    SString strQueueName;
+    GetOption<CDbOptionsMap>(parts[4], "queue", strQueueName);
+
     // Find queue with name
-    CDatabaseJobQueue* pQueue = MapFindRef(m_QueueNameMap, connectionHandle);
+    CDatabaseJobQueue* pQueue = MapFindRef(m_QueueNameMap, strQueueName);
     if (!pQueue)
     {
         // Add new queue
         pQueue = NewDatabaseJobQueue();
-        MapSet(m_QueueNameMap, connectionHandle, pQueue);
+        MapSet(m_QueueNameMap, strQueueName, pQueue);
     }
     return pQueue;
 }
@@ -201,23 +213,7 @@ SConnectionHandle CDatabaseJobQueueManager::GetNextConnectionHandle()
         m_ConnectionHandleCounter &= 0x000FFFFF;
         m_ConnectionHandleCounter |= 0x00200000;
         // TODO - check when all (1,048,575) ids are in use
-    } while (MapContains(m_QueueNameMap, m_ConnectionHandleCounter));
+    } while (FindQueueFromConnection(m_ConnectionHandleCounter));
 
     return m_ConnectionHandleCounter;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CDatabaseJobQueueManager::GetQueueSizeFromConnection
-//
-// Return count elements in queue
-//
-///////////////////////////////////////////////////////////////
-int CDatabaseJobQueueManager::GetQueueSizeFromConnection(SConnectionHandle connectionHandle)
-{
-    CDatabaseJobQueue* pJobQueue = FindQueueFromConnection(connectionHandle);
-    if (!pJobQueue)
-        return -1;
-
-    return pJobQueue->GetQueueSize();
 }

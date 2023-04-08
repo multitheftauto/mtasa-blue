@@ -11,11 +11,12 @@
 
 #pragma once
 
-#include "../CVehicle.h"
 #include "../CCommon.h"
 #include "CPacket.h"
 
-class CVehicleTrailerPacket : public CPacket
+class CVehicle;
+
+class CVehicleTrailerPacket final : public CPacket
 {
 public:
     CVehicleTrailerPacket(){};

@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaRadarAreaDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaRadarAreaDefs::LoadFunctions()
 {
@@ -50,7 +53,6 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setColor", "setRadarAreaColor");
 
     lua_classvariable(luaVM, "flashing", "setRadarAreaFlashing", "isRadarAreaFlashing");
-    // lua_classvariable ( luaVM, "color", "setRadarAreaColor", "getRadarAreaColor" );
     lua_classvariable(luaVM, "size", "setRadarAreaSize", "getRadarAreaSize", SetRadarAreaSize, OOP_GetRadarAreaSize);
 
     lua_registerclass(luaVM, "RadarArea", "Element");

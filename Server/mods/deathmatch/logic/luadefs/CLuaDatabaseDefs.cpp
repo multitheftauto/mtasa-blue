@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaDatabaseDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CPerfStatManager.h"
+#include "lua/CLuaCallback.h"
+#include "Utils.h"
 
 void CLuaDatabaseDefs::LoadFunctions()
 {
@@ -20,7 +26,6 @@ void CLuaDatabaseDefs::LoadFunctions()
         {"dbFree", DbFree},
         {"dbPoll", DbPoll},
         {"dbPrepareString", DbPrepareString},
-        {"dbGetConnectionQueueSize", DbGetConnectionQueueSize},
 
         {"executeSQLCreateTable", ExecuteSQLCreateTable},
         {"executeSQLDropTable", ExecuteSQLDropTable},
@@ -216,7 +221,7 @@ void CLuaDatabaseDefs::DbFreeCallback(CDbJobData* pJobData, void* pContext)
     if (pJobData->stage >= EJobStage::RESULT && pJobData->result.status == EJobResult::FAIL)
     {
         if (!pJobData->result.bErrorSuppressed)
-            m_pScriptDebugging->LogWarning(pJobData->m_LuaDebugInfo, "dbExec failed; (%d) %s", pJobData->result.uiErrorCode, *pJobData->result.strReason);
+            m_pScriptDebugging->LogWarning(pJobData->m_LuaDebugInfo, "dbFree failed; (%d) %s", pJobData->result.uiErrorCode, *pJobData->result.strReason);
     }
 }
 
@@ -654,29 +659,6 @@ int CLuaDatabaseDefs::DbPrepareString(lua_State* luaVM)
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaDatabaseDefs::DbGetConnectionQueueSize(lua_State* luaVM)
-{
-    CDatabaseConnectionElement* pElement;
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadUserData(pElement);
-
-    if (!argStream.HasErrors())
-    {
-        int size = g_pGame->GetDatabaseManager()->GetQueueSizeFromConnection(pElement->GetConnectionHandle());
-        if (size >= 0)
-        {
-            lua_pushnumber(luaVM, size);
-            return 1;
-        }
-    }
-    else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

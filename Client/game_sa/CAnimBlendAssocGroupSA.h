@@ -13,29 +13,28 @@
 
 #include <game/CAnimBlendAssocGroup.h>
 #include "CAnimBlendStaticAssociationSA.h"
-#include "Common.h"
+
+class CAnimBlendAssociationSAInterface;
+class CAnimBlockSA;
+class CAnimBlockSAInterface;
+class CAnimManagerSA;
 
 #define FUNC_CAnimBlendAssocGroup_InitEmptyAssociations 0x4cdfb0
 #define FUNC_CAnimBlendAssocGroup_CopyAnimation         0x4ce130
 #define FUNC_CAnimBlendAssocGroup_IsCreated             0x4d37a0
 #define FUNC_CAnimBlendAssocGroup_GetNumAnimations      0x45b050
-#define FUNC_CAnimBlendAssocGroup_GetAnimBlock          0x45b060
 #define FUNC_CAnimBlendAssocGroup_GetAnimation          0x4ce090
 #define FUNC_CAnimBlendAssocGroup_CreateAssociations    0x4ce220
-
-class CAnimBlockSA;
-class CAnimBlockSAInterface;
-class CAnimManagerSA;
 
 class CAnimationStyleDescriptorSAInterface
 {
 public:
-    char groupName[16];
-    char blockName[16];
-    int field_20;
-    int animsCount;
-    void *animNames;
-    void *animDesc;
+    char  groupName[16];
+    char  blockName[16];
+    int   field_20;
+    int   animsCount;
+    void* animNames;
+    void* animDesc;
 };
 
 class CAnimBlendAssocGroupSAInterface
@@ -67,7 +66,7 @@ public:
     bool IsLoaded();
     void SetIDOffset(int iOffset) { m_pInterface->iIDOffset = iOffset; }
 
-    CAnimBlendAssocGroupSAInterface*  GetInterface() { return m_pInterface; }
+    CAnimBlendAssocGroupSAInterface* GetInterface() { return m_pInterface; }
 
 protected:
     void SetupAnimBlock();

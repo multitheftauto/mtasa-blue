@@ -11,7 +11,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include "CGameSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
+#include "CRenderWareSA.ShaderSupport.h"
+
+extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 #define ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName        0x06FDF40
 #define ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName     0x06FED49
@@ -103,7 +109,7 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId - 20000;
+    ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
     // Ensure there are no previous events for this txd
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
     ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));

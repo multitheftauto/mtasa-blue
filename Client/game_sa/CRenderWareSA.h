@@ -11,18 +11,16 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-
 #include <game/CRenderWare.h>
-
 #include "CModelInfoSA.h"
-#include "CColModelSA.h"
-#include "Common.h"
-#include <windows.h>
-#include <stdio.h>
 #include "CRenderWareSA.ShaderSupport.h"
 
+class CMatchChannelManager;
 class CModelTexturesInfo;
+struct RpAtomic;
+struct SShaderReplacementStats;
+struct STexInfo;
+struct STexTag;
 
 class CRenderWareSA : public CRenderWare
 {
@@ -63,7 +61,7 @@ public:
     unsigned int LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics);
 
     // Replaces all atomics for a specific model
-    void ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID);
+    bool ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) override;
 
     // Replaces all atomics in a clump
     void ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics);
@@ -78,14 +76,14 @@ public:
     void AddAllAtomics(RpClump* pDst, RpClump* pSrc);
 
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
-    void ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID);
+    bool ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) override;
 
     // Replaces a CClumpModelInfo clump with a new clump
-    void ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID);
+    bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
 
-    void ReplacePedModel(RpClump* pNew, unsigned short usModelID);
+    bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
 
-    void ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
+    bool ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
@@ -107,6 +105,15 @@ public:
     void               RemoveShaderRefs(CSHADERDUMMY* pShaderItem);
     bool               RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit);
     void               TxdForceUnload(ushort usTxdId, bool bDestroyTextures);
+
+    void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix);
+    void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut);
+    void RwMatrixGetRotation(const RwMatrix& rwMatrix, CVector& vecOutRotation);
+    void RwMatrixSetRotation(RwMatrix& rwInOutMatrix, const CVector& vecRotation);
+    void RwMatrixGetPosition(const RwMatrix& rwMatrix, CVector& vecOutPosition);
+    void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition);
+    void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale);
+    void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);

@@ -45,7 +45,7 @@ namespace
                      /* [in] */ long                                                                                lTimeout,
                      /* [in] */ ULONG                                                                               uCount,
                      /* [length_is][size_is][out] */ __RPC__out_ecount_part(uCount, *puReturned) IWbemClassObject** apObjects,
-                     /* [out] */ __RPC__out ULONG* puReturned)
+                     /* [out] */ __RPC__out ULONG*                                                                  puReturned)
     {
         __try
         {
@@ -323,80 +323,37 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 //
 // GetWMIVideoAdapterMemorySize
 //  Note that this will never return more than 4 GB of video memory
-//  
+//
 //
 /////////////////////////////////////////////////////////////////////
-unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const SString& strDisplay)
+unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev)
 {
-    // This won't change after the first call
-    static unsigned int uiResult = 0;
+    unsigned int uiResult = 0;
 
-    if (uiResult == 0)
+    SString DevVen;
+    DevVen.Format("VEN_%04X&DEV_%04X", ulVen, ulDev);
+
+    // Get WMI info about all video controllers
+    SQueryWMIResult result;
+    QueryWMI(result, "Win32_VideoController", "PNPDeviceID,AdapterRAM,Availability");
+
+    // Check each controller for a device id match
+    for (uint i = 0; i < result.size(); i++)
     {
-        SString strDeviceId;
+        const SString& PNPDeviceID = result[i][0];
+        const SString& AdapterRAM = result[i][1];
+        const SString& Availability = result[i][2];
 
-        // Find a device id for the display
-        for (int i = 0; true; i++)
+        unsigned int uiAdapterRAM = atoi(AdapterRAM);
+        int          iAvailability = atoi(Availability);
+
+        if ((iAvailability == 8 || iAvailability == 3) && PNPDeviceID.Contains(DevVen))
         {
-            DISPLAY_DEVICE device;
-            device.cb = sizeof(device);
-
-            // Get next DISPLAY_DEVICE from the system
-            if (!EnumDisplayDevicesA(NULL, i, &device, 0))
-                break;
-
-            // Calc flags
-            bool bAttachedToDesktop = (device.StateFlags & DISPLAY_DEVICE_ATTACHED_TO_DESKTOP) != 0;
-            bool bMirroringDriver = (device.StateFlags & DISPLAY_DEVICE_MIRRORING_DRIVER) != 0;
-
-            // Only check attached, non mirror displays
-            if (bAttachedToDesktop && !bMirroringDriver)
-            {
-                if (strDisplay.CompareI(device.DeviceName))
-                {
-                    // Found a match
-                    strDeviceId = device.DeviceID;
-                    break;
-                }
-            }
-        }
-
-        // Get WMI info about all video controllers
-        SQueryWMIResult result;
-        QueryWMI(result, "Win32_VideoController", "PNPDeviceID,AdapterRAM,Availability");
-
-        // Check each controller for a device id match
-        for (uint i = 0; i < result.size(); i++)
-        {
-            const SString& PNPDeviceID = result[i][0];
-            const SString& AdapterRAM = result[i][1];
-            const SString& Availability = result[i][2];
-
-            unsigned int uiAdapterRAM = atoi(AdapterRAM);
-            int       iAvailability = atoi(Availability);
-
-            if (uiResult == 0)
-                uiResult = uiAdapterRAM;
-
-            if (iAvailability == 3)
-                uiResult = std::max(uiResult, uiAdapterRAM);
-
-            if (uiAdapterRAM != 0)
-            {
-                // If this matches the previously found device, return the adapter RAM
-                if (!strDeviceId.empty() && PNPDeviceID.BeginsWithI(strDeviceId))
-                {
-                    uiResult = uiAdapterRAM;
-                    break;            // Found match
-                }
-            }
+            uiResult = uiAdapterRAM;
+            break;            // Found match
         }
     }
 
-    if (uiResult == 0)
-    {
-        uiResult = 2LL * 1024 * 1024 * 1024;            // 2GB
-    }
     return uiResult;
 }
 

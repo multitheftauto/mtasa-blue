@@ -33,6 +33,7 @@
    </group>
    <group name="RPC">
       <acl name="RPC" />
+      <object name="resource.ip2c" />
    </group>
    <group name="MapEditor">
       <acl name="Default" />
@@ -177,10 +178,7 @@
       <right name="command.unloadmodule" access="true" />
       <right name="command.reloadmodule" access="true" />
       <right name="command.addaccount" access="true" />
-      <right name="command.delaccount" access="true" />
-      <right name="command.chgpass" access="true" />
       <right name="function.addAccount" access="true" />
-      <right name="function.removeAccount" access="true" />
       <right name="function.setAccountName" access="true" />
       <right name="function.setAccountPassword" access="true" />
    </acl>
@@ -199,6 +197,8 @@
       <right name="command.authserial" access="true" />
       <right name="command.reloadacl" access="true" />
       <right name="command.stopall" access="true" />
+      <right name="command.delaccount" access="true" />
+      <right name="command.chgpass" access="true" />
       <right name="function.addBan" access="true" />
       <right name="function.setUnbanTime" access="true" />
       <right name="function.setBanAdmin" access="true" />
@@ -233,6 +233,7 @@
       <right name="function.updateResourceACLRequest" access="true" />
       <right name="function.shutdown" access="true" />
       <right name="function.setPlayerScriptDebugLevel" access="true" />
+      <right name="function.removeAccount" access="true" />
    </acl>
    <acl name="RPC">
       <right name="function.callRemote" access="true" />

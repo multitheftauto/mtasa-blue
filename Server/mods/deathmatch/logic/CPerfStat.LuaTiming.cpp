@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatModule.h"
+#include "lua/CLuaMain.h"
 
 namespace
 {
@@ -268,11 +270,11 @@ void CPerfStatLuaTimingImpl::DoPulse()
         int flags = 0;
         m_SecondCounter++;
 
-        if (m_SecondCounter % 5 == 0)            // 1 second
+        if (m_SecondCounter % 5 == 0)                    // 1 second
             flags |= 1;
-        if (m_SecondCounter % 60 == 0)            // 60 seconds
+        if (m_SecondCounter % 60 == 0)                   // 60 seconds
             flags |= 2;
-        if (m_SecondCounter % (60 * 5) == 0)            // 5 mins
+        if (m_SecondCounter % (60 * 5) == 0)             // 5 mins
             flags |= 4;
         if (m_SecondCounter % (60 * 60) == 0)            // 60 mins
             flags |= 8;

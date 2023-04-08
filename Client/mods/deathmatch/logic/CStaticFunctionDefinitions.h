@@ -40,7 +40,6 @@ public:
     // Output funcs
     static bool OutputConsole(const char* szText);
     static bool OutputChatBox(const char* szText, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded);
-    static bool ShowChat(bool bShow);
     static bool SetClipboard(SString& strText);
     static bool SetWindowFlashing(bool flash, uint count);
     static bool ClearChatBox();
@@ -188,7 +187,6 @@ public:
     static bool RemovePedFromVehicle(CClientPed* pPed);
     static bool WarpPedIntoVehicle(CClientPed* pPed, CClientVehicle* pVehicle, unsigned int uiSeat);
     static bool SetPedOxygenLevel(CClientEntity& Entity, float fOxygen);
-    static bool SetPedArmor(CClientPed& Ped, float fArmor);
 
     // Extra Clothes functions
     static bool GetBodyPartName(unsigned char ucID, SString& strOutName);
@@ -210,10 +208,8 @@ public:
     static bool            IsTrainDerailable(CClientVehicle& Vehicle, bool& bIsDerailable);
     static bool            GetTrainDirection(CClientVehicle& Vehicle, bool& bDirection);
     static bool            GetTrainSpeed(CClientVehicle& Vehicle, float& fSpeed);
-    static bool            GetTrainTrack(CClientVehicle& Vehicle, uchar& ucTrack);
     static bool            GetTrainPosition(CClientVehicle& Vehicle, float& fPosition);
     static bool            IsTrainChainEngine(CClientVehicle& Vehicle, bool& bChainEngine);
-    static bool            IsVehicleBlown(CClientVehicle& Vehicle, bool& bBlown);
     static bool            GetVehicleHeadLightColor(CClientVehicle& Vehicle, SColor& outColor);
     static bool            GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear);
     static bool            GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
@@ -227,10 +223,11 @@ public:
     static bool            GetVehicleModelExhaustFumesPosition(unsigned short usModel, CVector& vecPosition);
     static bool            SetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
     static bool            GetVehicleModelDummyPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
+    static bool            GetVehicleModelDummyDefaultPosition(unsigned short usModel, eVehicleDummies eDummy, CVector& vecPosition);
 
     // Vehicle set functions
     static bool FixVehicle(CClientEntity& Entity);
-    static bool BlowVehicle(CClientEntity& Entity);
+    static bool BlowVehicle(CClientEntity& Entity, std::optional<bool> withExplosion);
     static bool SetVehicleColor(CClientEntity& Entity, const CVehicleColor& color);
     static bool SetVehicleLandingGearDown(CClientEntity& Entity, bool bLandingGearDown);
     static bool SetVehicleLocked(CClientEntity& Entity, bool bLocked);
@@ -260,7 +257,6 @@ public:
     static bool SetTrainDerailable(CClientVehicle& Vehicle, bool bDerailable);
     static bool SetTrainDirection(CClientVehicle& Vehicle, bool bDirection);
     static bool SetTrainSpeed(CClientVehicle& Vehicle, float fSpeed);
-    static bool SetTrainTrack(CClientVehicle& Vehicle, uchar ucTrack);
     static bool SetTrainPosition(CClientVehicle& Vehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CClientEntity& Vehicle, const SColor color);
     static bool SetVehicleDoorOpenRatio(CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0);
@@ -276,6 +272,7 @@ public:
     static CClientObject* CreateObject(CResource& Resource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bLowLod);
     static bool           GetObjectScale(CClientObject& Object, CVector& vecScale);
     static bool           IsObjectBreakable(CClientObject& Object, bool& bBreakable);
+    static bool           IsObjectMoving(CClientEntity& Entity);
     static bool           GetObjectMass(CClientObject& Object, float& fMass);
     static bool           GetObjectTurnMass(CClientObject& Object, float& fTurnMass);
     static bool           GetObjectAirResistance(CClientObject& Object, float& fAirResistance);
@@ -382,7 +379,6 @@ public:
     static bool SetMarkerIcon(CClientEntity& Entity, const char* szIcon);
 
     // Camera get funcs
-    static bool           GetCameraViewMode(unsigned short& ucMode);
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);
     static CClientEntity* GetCameraTarget();
     static bool           GetCameraInterior(unsigned char& ucInterior);
@@ -393,7 +389,6 @@ public:
     static bool SetCameraTarget(const CVector& vecTarget);
     static bool SetCameraInterior(unsigned char ucInterior);
     static bool FadeCamera(bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
-    static bool SetCameraViewMode(unsigned short ucMode);
 
     // Cursor funcs
     static bool GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld);
@@ -402,7 +397,14 @@ public:
     static bool SetCursorAlpha(float fAlpha);
 
     // Drawing funcs
-    static ID3DXFont* ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static ID3DXFont*        ResolveD3DXFont(eFontType fontType, CClientDxFont* pDxFontElement);
+    static inline ID3DXFont* ResolveD3DXFont(const std::variant<CClientDxFont*, eFontType>& variant)
+    {
+        if (std::holds_alternative<eFontType>(variant))
+            return g_pCore->GetGraphics()->GetFont(std::get<eFontType>(variant));
+
+        return std::get<CClientDxFont*>(variant)->GetD3DXFont();
+    };
 
     // GUI funcs
     static bool        GUIGetInputEnabled();
@@ -558,16 +560,17 @@ public:
     // World functions
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);
     static bool ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity,
-                                   const SLineOfSightFlags& flags = SLineOfSightFlags(), CEntity* pIgnoredEntity = NULL,
+                                   const SLineOfSightFlags& flags = SLineOfSightFlags(), std::vector<CClientEntity*> vecIgnoredElements = {},
                                    SLineOfSightBuildingResult* pBuildingResult = NULL);
     static bool IsLineOfSightClear(const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags = SLineOfSightFlags(),
                                    CEntity* pIgnoredEntity = NULL);
     static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision);
     static CClientWater* CreateWater(CResource& resource, CVector* pV1, CVector* pV2, CVector* pV3, CVector* pV4, bool bShallow);
-    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool bCheckWaves, CVector& vecUnknown);
+    static bool          GetWaterLevel(CVector& vecPosition, float& fLevel, bool ignoreDistanceToWaterThreshold, CVector& vecUnknown);
     static bool          GetWaterLevel(CClientWater* pWater, float& fLevel);
     static bool          GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex, CVector& vecPosition);
-    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel);
+    static bool          SetWorldWaterLevel(float fLevel, void* pChangeSource, bool bIncludeWorldNonSeaLevel, bool bIncludeWorldSeaLevel,
+                                            bool bIncludeOutsideWorldLevel);
     static bool          SetPositionWaterLevel(const CVector& vecPosition, float fLevel, void* pChangeSource);
     static bool          SetAllElementWaterLevel(float fLevel, void* pChangeSource);
     static bool          ResetWorldWaterLevel();
@@ -732,7 +735,8 @@ public:
 
     // Sound funcs
     static CClientSound* PlaySound(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
-    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
+    static CClientSound* PlaySound3D(CResource* pResource, const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop,
+                                     bool bThrottle);
     static bool          StopSound(CClientSound& Sound);
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);

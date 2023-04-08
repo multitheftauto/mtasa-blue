@@ -15,14 +15,9 @@
 void CLuaRadarAreaDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createRadarArea", CreateRadarArea},
-        {"getRadarAreaColor", GetRadarAreaColor},
-        {"getRadarAreaSize", GetRadarAreaSize},
-        {"isRadarAreaFlashing", IsRadarAreaFlashing},
-        {"setRadarAreaColor", SetRadarAreaColor},
-        {"setRadarAreaFlashing", SetRadarAreaFlashing},
-        {"setRadarAreaSize", SetRadarAreaSize},
-        {"isInsideRadarArea", IsInsideRadarArea},
+        {"createRadarArea", CreateRadarArea},         {"getRadarAreaColor", GetRadarAreaColor}, {"getRadarAreaSize", GetRadarAreaSize},
+        {"isRadarAreaFlashing", IsRadarAreaFlashing}, {"setRadarAreaColor", SetRadarAreaColor}, {"setRadarAreaFlashing", SetRadarAreaFlashing},
+        {"setRadarAreaSize", SetRadarAreaSize},       {"isInsideRadarArea", IsInsideRadarArea},
     };
 
     // Add functions
@@ -46,7 +41,6 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setColor", "setRadarAreaColor");
 
     lua_classvariable(luaVM, "flashing", "setRadarAreaFlashing", "isRadarAreaFlashing");
-    // lua_classvariable ( luaVM, "color", "setRadarAreaColor", "getRadarAreaColor" );
     lua_classvariable(luaVM, "size", SetRadarAreaSize, OOP_GetRadarAreaSize);
 
     lua_registerclass(luaVM, "RadarArea", "Element");

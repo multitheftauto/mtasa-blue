@@ -12,9 +12,10 @@
 #pragma once
 
 #include "CPacket.h"
+
 class CPed;
 
-class CPedStartSyncPacket : public CPacket
+class CPedStartSyncPacket final : public CPacket
 {
 public:
     CPedStartSyncPacket(CPed* pPed) { m_pPed = pPed; };

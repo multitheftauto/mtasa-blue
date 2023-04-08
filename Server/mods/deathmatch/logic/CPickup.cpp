@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPickup.h"
+#include "CPickupManager.h"
+#include "CLogger.h"
+#include "Utils.h"
+#include "CGame.h"
+#include "packets/CPickupHitConfirmPacket.h"
+#include "CStaticFunctionDefinitions.h"
 
 extern CGame* g_pGame;
 
@@ -21,6 +28,7 @@ CPickup::CPickup(CElement* pParent, CPickupManager* pPickupManager, CColManager*
     m_pCollision->SetEnabled(false);
     m_pCollision->SetCallback(this);
     m_pCollision->SetAutoCallEvent(false);
+    m_pCollision->SetCanBeDestroyedByScript(false);
 
     // Add us to the pickup manager's list and grab an unique id
     pPickupManager->AddToList(this);

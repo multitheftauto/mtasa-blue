@@ -12,209 +12,156 @@
 #pragma once
 
 #include <game/CAutomobile.h>
-
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CVehicleSA.h"
 
-#define FUNC_CAutomobile_BurstTyre                  0x6A32B0
-#define FUNC_CAutomobile_BreakTowLink               0x6A4400
-#define FUNC_CAutomobile_BlowUpCar                  0x6B3780
-#define FUNC_CAutomobile_BlowUpCarsInPath           0x6AF110
-#define FUNC_CAutomobile_CloseAllDoors              0x6A4520
-#define FUNC_CAutomobile_CloseBoot                  0x6AFA20
-#define FUNC_CAutomobile_FindWheelWidth             0x6A6090
-#define FUNC_CAutomobile_Fix                        0x6A3440
-#define FUNC_CAutomobile_FixDoor                    0x6A35A0
-#define FUNC_CAutomobile_FixPanel                   0x6A3670
-#define FUNC_CAutomobile_GetAllWheelsOffGround      0x6A2F70
-#define FUNC_CAutomobile_GetCarPitch                0x6A6050
-#define FUNC_CAutomobile_GetCarRoll                 0x6A6010
-#define FUNC_CAutomobile_GetComponentWorldPosition  0x6A2210
-#define FUNC_CAutomobile_GetHeightAboveRoad         0x6A62B0
-#define FUNC_CAutomobile_GetNumContactWheels        0x6A62A0
-#define FUNC_CAutomobile_GetRearHeightAboveRoad     0x6A0610
-#define FUNC_CAutomobile_IsComponentPresent         0x6A2250
-#define FUNC_CAutomobile_IsDoorClosed               0x6A2310
-#define FUNC_CAutomobile_IsDoorFullyOpen            0x6A22D0
-#define FUNC_CAutomobile_IsDoorMissing              0x6A2330
-#define FUNC_CAutomobile_IsDoorReady                0x6A2290
-#define FUNC_CAutomobile_IsInAir                    0x6A6140
-#define FUNC_CAutomobile_IsOpenTopCar               0x6A2350
-#define FUNC_CAutomobile_PlaceOnRoadProperly        0x6AF420
-#define FUNC_CAutomobile_PlayCarHorn                0x6A3770
-#define FUNC_CAutomobile_PopBoot                    0x6AF910
-#define FUNC_CAutomobile_PopBootUsingPhysics        0x6A44D0
-#define FUNC_CAutomobile_PopDoor                    0x6ADEF0
-#define FUNC_CAutomobile_PopPanel                   0x6ADF80
-#define FUNC_CAutomobile_ResetSuspension            0x6A2AE0
-#define FUNC_CAutomobile_SetRandomDamage            0x6A2530
 #define FUNC_CAutomobile_SetTaxiLight               0x6A3740
-#define FUNC_CAutomobile_SetTotalDamage             0x6A27F0
-#define FUNC_CAutomobile_SpawnFlyingComponent       0x6A8580
 
 #define MAX_PASSENGER_COUNT     8
 #define MAX_DOORS               6 // also in CDamageManager
 
-// this is collision data (confirmed)
-class CAutomobileSAUnknownInterface            // 40 bytes
+namespace eCarNode
 {
-    FLOAT detachablesPosX;            // 996
-    FLOAT detachablesPosY;            // 1000
-    FLOAT detachablesPosZ;            // 1004
-    FLOAT Unknown187;                 // 1008
-    FLOAT Unknown188;                 // 1012
-    FLOAT Unknown189;                 // 1016
-    FLOAT Unknown190;                 // 1020
-    FLOAT Unknown191;                 // 1024
-    DWORD Unknown192;                 // 1028
-    FLOAT Unknown193;                 // 1032
+    enum
+    {
+        NONE = 0,
+        CHASSIS = 1,
+        WHEEL_RF = 2,
+        WHEEL_RM = 3,
+        WHEEL_RB = 4,
+        WHEEL_LF = 5,
+        WHEEL_LM = 6,
+        WHEEL_LB = 7,
+        DOOR_RF = 8,
+        DOOR_RR = 9,
+        DOOR_LF = 10,
+        DOOR_LR = 11,
+        BUMP_FRONT = 12,
+        BUMP_REAR = 13,
+        WING_RF = 14,
+        WING_LF = 15,
+        BONNET = 16,
+        BOOT = 17,
+        WINDSCREEN = 18,
+        EXHAUST = 19,
+        MISC_A = 20,
+        MISC_B = 21,
+        MISC_C = 22,
+        MISC_D = 23,
+        MISC_E = 24,
+        NUM_NODES
+    };
 };
+
+class CBouncingPanelSAInterface
+{
+public:
+    unsigned short m_nFrameId;
+    unsigned short m_nAxis;
+    float          m_fAngleLimit;
+    CVector        m_vecRotation;
+    CVector        m_vecPos;
+};
+static_assert(sizeof(CBouncingPanelSAInterface) == 0x20, "Invalid size for CBouncingPanelSAInterface");
 
 class CAutomobileSAInterface : public CVehicleSAInterface
 {
 public:
-    CDamageManagerSAInterface     damage;                                // 672 :)
-    DWORD                         dwPadding;                             // assumed?
-    CDoorSAInterface              doors[MAX_DOORS];                      // 700 :) // work out where below here its gone wrong
-    DWORD                         Unknown184a;                           // 916
-    DWORD                         Frontrightwheelmodel;                  // 920
-    DWORD                         Middlerightdummywheelmodel;            // 924
-    DWORD                         Backrightwheelmodel;                   // 928
-    DWORD                         Frontleftwheelmodel;                   // 932
-    DWORD                         Middleleftdummywheelmodel;             // 936
-    DWORD                         Backleftwheelmodel;                    // 940
-    DWORD                         Frontbumpermodel;                      // 944
-    DWORD                         Rearbumpermodel;                       // 948
-    DWORD                         Frontrightwingmodel;                   // 952
-    DWORD                         Unknown185;                            // 956
-    DWORD                         Frontrightdoormodel;                   // 960
-    DWORD                         Rearrightdoormodel;                    // 964
-    DWORD                         Frontleftwingmodel;                    // 968
-    DWORD                         Unknown186;                            // 972
-    DWORD                         Frontleftdoormodel;                    // 976
-    DWORD                         Rearleftdoormodel;                     // 980
-    DWORD                         BonnetModel;                           // 984
-    DWORD                         Bootmodel;                             // 988
-    DWORD                         WindscreenModel;                       // 992
-    CAutomobileSAUnknownInterface UnknownData1;                          // 996
-    CAutomobileSAUnknownInterface UnknownData2;                          // 1036
-    CAutomobileSAUnknownInterface UnknownData3;                          // 1076
-    CAutomobileSAUnknownInterface UnknownData4;                          // 1116
-    FLOAT                         WheelPositions[4];                     // 1156
-    FLOAT                         WheelRelatedUnk[4];                    // 1172
-    FLOAT                         WheelOnGroundRelated[4];               // 1188
-    FLOAT                         Unknown215;                            // 1204
-    FLOAT                         WheelsOnGround[4];                     // 1208
-    FLOAT                         Unknown216;                            // 1224
-    FLOAT                         Unknown217;                            // 1228
-    FLOAT                         DistanceTraveledByWheel[4];            // 1232
-    FLOAT                         Unknown218;                            // 1248
-    FLOAT                         Unknown219;                            // 1252
-    FLOAT                         Unknown220;                            // 1256
-    FLOAT                         Unknown221;                            // 1260
-    FLOAT                         WheelSpeed[4];                         // 1264
-    BYTE                          Unknown222;                            // 1280
-    BYTE                          TaxiAvaliable;                         // 1281
-    BYTE                          Unknown223;                            // 1282
-    BYTE                          Unknown224;                            // 1283
-    WORD                          Unknown225;                            // 1284
-    WORD                          VoodooSuspension;                      // 1286
-    DWORD                         Unknown;                               // 1288
-    FLOAT                         Unknown226;                            // 1292
-    FLOAT                         WheelOffsetZ[4];                       // 1296
-    FLOAT                         WheelSuspensionStrength[4];            // 1312
-    FLOAT                         Unknown227;                            // 1328
-    FLOAT                         Unknown228;                            // 1332
-    FLOAT                         Unknown229;                            // 1336
-    FLOAT                         Unknown230;                            // 1340
-    FLOAT                         Unknown231;                            // 1344
-    FLOAT                         AutomobileSpeed;                       // 1348
-    FLOAT                         Unknown232;                            // 1352
-    FLOAT                         Unknown233;                            // 1356
-    FLOAT                         Unknown234;                            // 1360
-    FLOAT                         Unknown235;                            // 1364
-    FLOAT                         Unknown236;                            // 1368
-    FLOAT                         Unknown237;                            // 1372
-    FLOAT                         Unknown237a;                           // 1376
-    FLOAT                         UnknownWheelRelated[4];                // 1380
-    FLOAT                         Unknown241;                            // 1396
-    FLOAT                         Unknown242;                            // 1400
-    FLOAT                         Unknown243;                            // 1404
-    FLOAT                         Unknown244;                            // 1408
-    FLOAT                         Unknown245;                            // 1412
-    FLOAT                         Unknown246;                            // 1416
-    FLOAT                         Unknown247;                            // 1420
-    FLOAT                         Unknown248;                            // 1424
-    FLOAT                         Unknown249;                            // 1428
-    FLOAT                         Unknown250;                            // 1432
-    FLOAT                         Unknown251;                            // 1436
-    FLOAT                         Unknown252;                            // 1440
-    FLOAT                         Unknown253;                            // 1444
-    FLOAT                         Unknown254;                            // 1448
-    FLOAT                         Unknown255;                            // 1452
-    FLOAT                         WeaponHorizontalRotation;              // 1456
-    FLOAT                         WeaponVerticalRotation;                // 1460
-    FLOAT                         Unknown255a;                           // 1464
-    FLOAT                         Unknown255b;                           // 1468
-    FLOAT                         Unknown256;                            // 1472
-    BYTE                          Unknown256a;                           // 1476
-    BYTE                          Unknown257;                            // 1477
-    BYTE                          Unknown258;                            // 1478
-    BYTE                          DriveWheelsOnGroundLastFrame;
-    ;                                   // 1479
-    FLOAT GasPedalAudioRevs;            // 1480
-    DWORD m_aWheelState[4];             // 1484
+    CDamageManagerSAInterface m_damageManager;
+    CDoorSAInterface          m_doors[MAX_DOORS];
+    RwFrame*                  m_aCarNodes[eCarNode::NUM_NODES];
+    CBouncingPanelSAInterface m_panels[3];
+    CDoorSAInterface          m_swingingChassis;
+    CColPointSAInterface      m_wheelColPoint[MAX_WHEELS];
+    float                     m_wheelsDistancesToGround1[4];
+    float                     m_wheelsDistancesToGround2[4];
+    float                     m_wheelCollisionState[4];
+    float                     field_800;
+    float                     field_804;
+    float                     field_80C;
+    int                       m_wheelSkidmarkType[4];
+    bool                      m_wheelSkidmarkBloodState[4];
+    bool                      m_wheelSkidmarkSomeBool[4];
+    float                     m_wheelRotation[4];
+    float                     m_wheelPosition[4];
+    float                     m_wheelSpeed[4];
+    int                       field_858[4];
+    char                      taxiAvaliable;
+    char                      field_869;
+    short                     field_86A;
+    unsigned short            m_wMiscComponentAngle;
+    unsigned short            m_wVoodooSuspension;
+    int                       m_dwBusDoorTimerEnd;
+    int                       m_dwBusDoorTimerStart;
+    float                     field_878;
+    float                     wheelOffsetZ[4];
+    int                       field_88C[3];
+    float                     m_fFrontHeightAboveRoad;
+    float                     m_fRearHeightAboveRoad;
+    float                     m_fCarTraction;
+    float                     m_fNitroValue;
+    int                       field_8A4;
+    int                       m_fRotationBalance;            // used in CHeli::TestSniperCollision
+    float                     m_fMoveDirection;
+    int                       field_8B4[6];
+    int                       field_8C8[6];
+    float                     m_fBurningTime;
+    CEntitySAInterface*       m_pWheelCollisionEntity[4];
+    CVector                   m_vWheelCollisionPos[4];
+    char                      field_924;
+    char                      field_925;
+    char                      field_926;
+    char                      field_927;
+    char                      field_928;
+    char                      field_929;
+    char                      field_92A;
+    char                      field_92B;
+    char                      field_92C;
+    char                      field_92D;
+    char                      field_92E;
+    char                      field_92F;
+    char                      field_930;
+    char                      field_931;
+    char                      field_932;
+    char                      field_933;
+    char                      field_934;
+    char                      field_935;
+    char                      field_936;
+    char                      field_937;
+    char                      field_938;
+    char                      field_939;
+    char                      field_93A;
+    char                      field_93B;
+    char                      field_93C;
+    char                      field_93D;
+    char                      field_93E;
+    char                      field_93F;
+    int                       field_940;
+    int                       field_944;
+    float                     m_fDoomVerticalRotation;
+    float                     m_fDoomHorizontalRotation;
+    float                     m_fForcedOrientation;
+    float                     m_fUpDownLightAngle[2];
+    unsigned char             m_nNumContactWheels;
+    unsigned char             m_nWheelsOnGround;
+    char                      field_962;
+    char                      field_963;
+    float                     field_964;
+    int                       m_wheelFrictionState[4];
+    CFxSystemSAInterface*     pNitroParticle[2];
+    char                      field_980;
+    char                      field_981;
+    short                     field_982;
+    float                     field_984;
 };
-// static_assert(sizeof(CAutomobileSAInterface) == 0x988, "Invalid size for CAutomobileSAInterface");
+static_assert(sizeof(CAutomobileSAInterface) == 0x988, "Invalid size for CAutomobileSAInterface");
 
 class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {
-private:
-    //  CAutomobileSAInterface      * internalInterface;
-
-    CDoorSA* door[MAX_DOORS];
-
 public:
-    CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
-    CAutomobileSA(CAutomobileSAInterface* automobile);
-    ~CAutomobileSA();
+    CAutomobileSA() = default;
+    CAutomobileSA(CAutomobileSAInterface* pInterface);
 
-    bool  BurstTyre(DWORD dwTyreID);
-    bool  BreakTowLink();
-    void  BlowUpCar(CEntity* pEntity);
-    void  BlowUpCarsInPath();
-    void  CloseAllDoors();
-    void  CloseBoot();
-    float FindWheelWidth(bool bUnknown);
-    // void                    Fix ( void );
-    void  FixDoor(int iCarNodeIndex, eDoorsSA Door);
-    int   FixPanel(int iCarNodeIndex, ePanelsSA Panel);
-    bool  GetAllWheelsOffGround();
-    float GetCarPitch();
-    float GetCarRoll();
-    void  GetComponentWorldPosition(int iComponentID, CVector* pVector);
-    // float                   GetHeightAboveRoad ( void );  /* TODO */
-    DWORD      GetNumContactWheels();
-    float      GetRearHeightAboveRoad();
-    bool       IsComponentPresent(int iComponentID);
-    bool       IsDoorClosed(eDoorsSA Door);
-    bool       IsDoorFullyOpen(eDoorsSA Door);
-    bool       IsDoorMissing(eDoorsSA Door);
-    bool       IsDoorReady(eDoorsSA Door);
-    bool       IsInAir();
-    bool       IsOpenTopCar();
-    void       PlaceOnRoadProperly();
-    void       PlayCarHorn();
-    void       PopBoot();
-    void       PopBootUsingPhysics();
-    void       PopDoor(int iCarNodeIndex, eDoorsSA Door, bool bUnknown);
-    void       PopPanel(int iCarNodeIndex, ePanelsSA Panel, bool bFallOffFast);
-    void       ResetSuspension();
-    void       SetRandomDamage(bool bUnknown);
-    void       SetTaxiLight(bool bState);
-    void       SetTotalDamage(bool bUnknown);
-    CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown);
-
-    CDoor* GetDoor(eDoors doorID);
+    CAutomobileSAInterface* GetAutomobileInterface() { return reinterpret_cast<CAutomobileSAInterface*>(GetInterface()); }
 };

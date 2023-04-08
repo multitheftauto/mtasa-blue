@@ -14,14 +14,8 @@
 void CLuaPointLightDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createLight", CreateLight},
-        {"getLightType", GetLightType},
-        {"getLightRadius", GetLightRadius},
-        {"setLightRadius", SetLightRadius},
-        {"getLightColor", GetLightColor},
-        {"setLightColor", SetLightColor},
-        {"getLightDirection", GetLightDirection},
-        {"setLightDirection", SetLightDirection},
+        {"createLight", CreateLight},     {"getLightType", GetLightType},   {"getLightRadius", GetLightRadius},       {"setLightRadius", SetLightRadius},
+        {"getLightColor", GetLightColor}, {"setLightColor", SetLightColor}, {"getLightDirection", GetLightDirection}, {"setLightDirection", SetLightDirection},
     };
 
     // Add functions
@@ -46,7 +40,6 @@ void CLuaPointLightDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "type", nullptr, "getLightType");
     lua_classvariable(luaVM, "radius", "setLightRadius", "getLightRadius");
-    // lua_classvariable ( luaVM, "color", "setLightColor", "getLightColor" );
     lua_classvariable(luaVM, "direction", "setLightDirection", "getLightDirection");
 
     lua_registerclass(luaVM, "Light", "Element");

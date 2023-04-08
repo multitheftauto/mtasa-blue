@@ -18,10 +18,11 @@
 #include "CEvents.h"
 #include <list>
 #include <cstring>
+#include "Enums.h"
 #include "CElementGroup.h"
 
 // Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+// #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
 #define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
@@ -40,13 +41,13 @@
 #define IS_WATER(element)    ((element)->GetType()==CElement::WATER)
 #define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
 
+class CLuaMain;
+
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
-// List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot : public std::vector<CElement*>, public CRefCountableST
-{
-};
+typedef std::vector<CElement*>                CElementListSnapshot;
+typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 class CElement
 {
@@ -78,6 +79,7 @@ public:
         WATER,
         WEAPON,
         DATABASE_CONNECTION,
+        TRAIN_TRACK,
         ROOT,
         UNKNOWN,
     };
@@ -140,9 +142,10 @@ public:
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL, bool bTriggerEvent = true);
-    void DeleteCustomData(const char* szName);
-    void SendAllCustomData(CPlayer* pPlayer);
+    void           SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
+                                 bool bTriggerEvent = true);
+    void           DeleteCustomData(const char* szName);
+    void           SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 
@@ -153,7 +156,7 @@ public:
     CChildListType ::const_iterator         IterEnd() { return m_Children.end(); };
     CChildListType ::const_reverse_iterator IterReverseBegin() { return m_Children.rbegin(); };
     CChildListType ::const_reverse_iterator IterReverseEnd() { return m_Children.rend(); };
-    CElementListSnapshot*                   GetChildrenListSnapshot();
+    CElementListSnapshotRef                 GetChildrenListSnapshot();
 
     static uint        GetTypeHashFromString(const SString& strTypeName);
     EElementType       GetType() { return m_iType; };
@@ -181,7 +184,7 @@ public:
     std::list<class CColShape*>::iterator CollisionsEnd() { return m_Collisions.end(); }
 
     unsigned short GetDimension() { return m_usDimension; }
-    void           SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    virtual void   SetDimension(unsigned short usDimension);
 
     class CClient* GetClient();
 
@@ -195,6 +198,7 @@ public:
     std::list<CElement*>::const_iterator AttachedElementsEnd() { return m_AttachedElements.end(); }
     const char*                          GetAttachToID() { return m_strAttachToID; }
     bool                                 IsElementAttached(CElement* pElement);
+    bool                                 IsAttachedToElement(CElement* pElement, bool bRecursive = true);
     virtual bool                         IsAttachable();
     virtual bool                         IsAttachToable();
     void                                 GetAttachedPosition(CVector& vecPosition);
@@ -217,7 +221,7 @@ public:
     void RemoveOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.remove(pPed); }
 
     unsigned char GetInterior() { return m_ucInterior; }
-    void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
+    void          SetInterior(unsigned char ucInterior);
 
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
@@ -228,6 +232,9 @@ public:
 
     bool IsCallPropagationEnabled() { return m_bCallPropagationEnabled; }
     void SetCallPropagationEnabled(bool bEnabled) { m_bCallPropagationEnabled = bEnabled; }
+
+    bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
+    void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
 protected:
     CElement*    GetRootElement();
@@ -250,12 +257,12 @@ protected:
 
     CVector m_vecPosition;
 
-    unsigned int          m_uiTypeHash;
-    std::string           m_strTypeName;
-    std::string           m_strName;
-    CChildListType        m_Children;
-    CElementListSnapshot* m_pChildrenListSnapshot;
-    uint                  m_uiChildrenListSnapshotRevision;
+    unsigned int            m_uiTypeHash;
+    std::string             m_strTypeName;
+    std::string             m_strName;
+    CChildListType          m_Children;
+    CElementListSnapshotRef m_pChildrenListSnapshot;
+    uint                    m_uiChildrenListSnapshotRevision;
 
     std::list<class CPerPlayerEntity*> m_ElementReferenced;
     std::list<class CColShape*>        m_Collisions;
@@ -277,7 +284,8 @@ protected:
     bool                   m_bDoubleSided;
     bool                   m_bUpdatingSpatialData;
     bool                   m_bCallPropagationEnabled;
-
+    bool                   m_canBeDestroyedByScript = true;            // If true, destroyElement function will
+                                                                       // have no effect on this element
     // Optimization for getElementsByType starting at root
 public:
     static void StartupEntitiesFromRoot();

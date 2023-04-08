@@ -417,7 +417,7 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
                 bMaybeOffline = true;            // Flag to help 'Include offline' browser option
                 nPlayers = 0;                    // We don't have player names, so zero this now
             }
-            uiRevision++;            // To flag browser gui update
+            uiRevision++;                        // To flag browser gui update
 
             if (uiQueryRetryCount < GetMaxRetries())
             {

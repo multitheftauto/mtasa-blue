@@ -29,15 +29,15 @@ class Archive:public File
     void UpdateLatestTime(FileHeader *CurBlock);
     void ConvertNameCase(wchar *Name);
     void ConvertFileHeader(FileHeader *hd);
-    void WriteBlock50(HEADER_TYPE HeaderType,BaseBlock *wb,bool OnlySetSize,bool NonFinalWrite);
     size_t ReadHeader14();
     size_t ReadHeader15();
     size_t ReadHeader50();
-    void ProcessExtra50(RawRead *Raw,size_t ExtraSize,BaseBlock *bb);
-    void RequestArcPassword();
+    void ProcessExtra50(RawRead *Raw,size_t ExtraSize,const BaseBlock *bb);
+    void RequestArcPassword(RarCheckPassword *SelPwd);
     void UnexpEndArcMsg();
     void BrokenHeaderMsg();
     void UnkEncVerMsg(const wchar *Name,const wchar *Info);
+    bool DoGetComment(Array<wchar> *CmtData);
     bool ReadCommentData(Array<wchar> *CmtData);
 
 #if !defined(RAR_NOCRYPT)
@@ -45,7 +45,7 @@ class Archive:public File
 #endif
     ComprDataIO SubDataIO;
     bool DummyCmd;
-    RAROptions *Cmd;
+    CommandData *Cmd;
 
 
     RarTime LatestTime;
@@ -58,15 +58,13 @@ class Archive:public File
     bool ProhibitQOpen;
 #endif
   public:
-    Archive(RAROptions *InitCmd=NULL);
+    Archive(CommandData *InitCmd=NULL);
     ~Archive();
     static RARFORMAT IsSignature(const byte *D,size_t Size);
     bool IsArchive(bool EnableBroken);
     size_t SearchBlock(HEADER_TYPE HeaderType);
     size_t SearchSubBlock(const wchar *Type);
     size_t SearchRR();
-    void WriteBlock(HEADER_TYPE HeaderType,BaseBlock *wb=NULL,bool OnlySetSize=false,bool NonFinalWrite=false);
-    void SetBlockSize(HEADER_TYPE HeaderType,BaseBlock *wb=NULL) {WriteBlock(HeaderType,wb,true);}
     size_t ReadHeader();
     void CheckArc(bool EnableBroken);
     void CheckOpen(const wchar *Name);
@@ -83,9 +81,9 @@ class Archive:public File
     int64 GetStartPos();
     void AddSubData(byte *SrcData,uint64 DataSize,File *SrcFile,
          const wchar *Name,uint Flags);
-    bool ReadSubData(Array<byte> *UnpData,File *DestFile);
+    bool ReadSubData(Array<byte> *UnpData,File *DestFile,bool TestMode);
     HEADER_TYPE GetHeaderType() {return CurHeaderType;}
-    RAROptions* GetRAROptions() {return Cmd;}
+    CommandData* GetCommandData() {return Cmd;}
     void SetSilentOpen(bool Mode) {SilentOpen=Mode;}
 #if 0
     void GetRecoveryInfo(bool Required,int64 *Size,int *Percent);

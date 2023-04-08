@@ -10,21 +10,26 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEntitySA.h"
+#include "CFireSA.h"
+#include "CGameSA.h"
+#include "CPoolsSA.h"
+
+extern CGameSA* pGame;
 
 /**
  * Put the fire out
  */
-VOID CFireSA::Extinguish()
+void CFireSA::Extinguish()
 {
-    DEBUG_TRACE("VOID CFireSA::Extinguish (  )");
     DWORD dwFunction = FUNC_Extinguish;
-    DWORD dwPointer = (DWORD)this->internalInterface;
+    DWORD dwPointer = (DWORD)internalInterface;
     _asm
     {
         mov     ecx, dwPointer
         call    dwFunction
     }
-    this->internalInterface->bActive = FALSE;
+    internalInterface->bActive = false;
 }
 
 /**
@@ -33,7 +38,6 @@ VOID CFireSA::Extinguish()
  */
 CVector* CFireSA::GetPosition()
 {
-    DEBUG_TRACE("CVector * CFireSA::GetPosition ( )");
     return &internalInterface->vecPosition;
 }
 
@@ -42,10 +46,9 @@ CVector* CFireSA::GetPosition()
  * @param vecPosition CVector * containing the desired position for the fire.
  * @see CFireSA::SetTarget
  */
-VOID CFireSA::SetPosition(CVector& vecPosition)
+void CFireSA::SetPosition(CVector& vecPosition)
 {
-    DEBUG_TRACE("VOID CFireSA::SetPosition ( CVector & vecPosition )");
-    this->internalInterface->entityTarget = 0;
+    internalInterface->entityTarget = 0;
     MemCpyFast(&internalInterface->vecPosition, &vecPosition, sizeof(CVector));
 }
 
@@ -53,21 +56,18 @@ VOID CFireSA::SetPosition(CVector& vecPosition)
  * Set the time that the fire will be extinguished.
  * @param dwTime DWORD containing the time that the fire will be extinguished.  This is in game-time units which can be got from CGame::GetSystemTime;
  */
-VOID CFireSA::SetTimeToBurnOut(DWORD dwTime)
+void CFireSA::SetTimeToBurnOut(DWORD dwTime)
 {
-    DEBUG_TRACE("VOID CFireSA::SetTimeToBurnOut ( DWORD dwTime )");
     internalInterface->nTimeToBurn = dwTime;
 }
 
 DWORD CFireSA::GetTimeToBurnOut()
 {
-    DEBUG_TRACE("DWORD CFireSA::GetTimeToBurnOut (  )");
     return internalInterface->nTimeToBurn;
 }
 
 CEntity* CFireSA::GetCreator()
 {
-    DEBUG_TRACE("CEntity * CFireSA::GetCreator (  )");
     CEntity*            creatorEntity = NULL;
     CEntitySAInterface* createEntitySA = internalInterface->entityCreator;
     CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
@@ -104,7 +104,6 @@ CEntity* CFireSA::GetCreator()
 
 CEntity* CFireSA::GetEntityOnFire()
 {
-    DEBUG_TRACE("CEntity * CFireSA::GetEntityOnFire (  )");
     CEntity*            TargetEntity = NULL;
     CEntitySAInterface* TargetEntitySA = internalInterface->entityTarget;
     CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
@@ -139,10 +138,8 @@ CEntity* CFireSA::GetEntityOnFire()
     return TargetEntity;
 }
 
-VOID CFireSA::SetTarget(CEntity* entity)
+void CFireSA::SetTarget(CEntity* entity)
 {
-    DEBUG_TRACE("VOID CFireSA::SetTarget ( CEntity * entity  )");
-
     if (entity)
     {
         CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(entity);
@@ -155,41 +152,36 @@ VOID CFireSA::SetTarget(CEntity* entity)
     }
 }
 
-BOOL CFireSA::IsIgnited()
+bool CFireSA::IsIgnited()
 {
-    DEBUG_TRACE("BOOL CFireSA::IsIgnited (  )");
     return internalInterface->bActive;
 }
 
-BOOL CFireSA::IsFree()
+bool CFireSA::IsFree()
 {
-    DEBUG_TRACE("BOOL CFireSA::IsFree (  )");
     if (!internalInterface->bActive && !internalInterface->bCreatedByScript)
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
-VOID CFireSA::SetSilent(BOOL bSilent)
+void CFireSA::SetSilent(bool bSilent)
 {
-    DEBUG_TRACE("VOID CFireSA::SetSilent ( BOOL bSilent )");
     internalInterface->bMakesNoise = !bSilent;
 }
 
-BOOL CFireSA::IsBeingExtinguished()
+bool CFireSA::IsBeingExtinguished()
 {
-    DEBUG_TRACE("BOOL CFireSA::IsBeingExtinguished (  )");
     return internalInterface->bBeingExtinguished;
 }
 
-VOID CFireSA::Ignite()
+void CFireSA::Ignite()
 {
-    DEBUG_TRACE("VOID CFireSA::Ignite( )");
-    this->internalInterface->bActive = TRUE;
+    internalInterface->bActive = true;
 
-    CVector* vecPosition = this->GetPosition();
+    CVector* vecPosition = GetPosition();
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;
-    DWORD    dwThis = (DWORD)this->internalInterface;
+    DWORD    dwThis = (DWORD)internalInterface;
     _asm
     {
         mov     ecx, dwThis
@@ -198,25 +190,22 @@ VOID CFireSA::Ignite()
         call    dwFunc
     }
 
-    this->internalInterface->bBeingExtinguished = 0;
-    this->internalInterface->bFirstGeneration = 1;
-    this->internalInterface->nNumGenerationsAllowed = 100;
+    internalInterface->bBeingExtinguished = 0;
+    internalInterface->bFirstGeneration = 1;
+    internalInterface->nNumGenerationsAllowed = 100;
 }
 
-FLOAT CFireSA::GetStrength()
+float CFireSA::GetStrength()
 {
-    DEBUG_TRACE("FLOAT CFireSA::GetStrength (  )");
-    return this->internalInterface->Strength;
+    return internalInterface->Strength;
 }
 
-VOID CFireSA::SetStrength(FLOAT fStrength)
+void CFireSA::SetStrength(float fStrength)
 {
-    DEBUG_TRACE("VOID CFireSA::SetStrength ( FLOAT fStrength )");
-    this->internalInterface->Strength = fStrength;
+    internalInterface->Strength = fStrength;
 }
 
-VOID CFireSA::SetNumGenerationsAllowed(char generations)
+void CFireSA::SetNumGenerationsAllowed(char generations)
 {
-    DEBUG_TRACE("VOID CFireSA::SetNumGenerationsAllowed ( char generations )");
-    this->internalInterface->nNumGenerationsAllowed = generations;
+    internalInterface->nNumGenerationsAllowed = generations;
 }

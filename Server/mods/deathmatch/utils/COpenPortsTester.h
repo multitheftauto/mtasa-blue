@@ -22,7 +22,6 @@ public:
             return;
 
         // Construct URL
-        SString strServerIP = g_pGame->GetConfig()->GetServerIP();
         ushort  usServerPort = g_pGame->GetConfig()->GetServerPort();
         ushort  usHTTPPort = g_pGame->GetConfig()->GetHTTPPort();
         SString strURL(PORT_TESTER_URL "?simple=1&g=%u", usServerPort);

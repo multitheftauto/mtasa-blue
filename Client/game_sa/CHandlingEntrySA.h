@@ -12,47 +12,46 @@
 #pragma once
 
 #include <game/CHandlingEntry.h>
-#include "Common.h"
-#define FUNC_HandlingDataMgr_ConvertBikeDataToGameUnits 0x6F5290
 #define FUNC_HandlingDataMgr_ConvertDataToGameUnits 0x6F5080
+
 // http://www.gtamodding.com/index.php?title=Handling.cfg#GTA_San_Andreas
 // http://www.gtamodding.com/index.php?title=Memory_Addresses_%28SA%29#Handling
 
 class CTransmissionSAInterface
 {
 public:
-    float fUnknown[18];            // +40
+    float fUnknown[18];                           // +40
 
     unsigned char ucDriveType : 8;                // +112
     unsigned char ucEngineType : 8;               // +113
     unsigned char ucNumberOfGears : 8;            // +114
     unsigned char ucUnknown : 8;                  // +115
 
-    unsigned int uiHandlingFlags;            // +116
+    unsigned int uiHandlingFlags;                 // +116
 
-    float fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
-    float fEngineInertia;                 // +124
-    float fMaxVelocity;                   // +128
+    float fEngineAcceleration;                    // +120     (value in handling.cfg * 0x86A950)
+    float fEngineInertia;                         // +124
+    float fMaxVelocity;                           // +128
 
-    float fUnknown2[3];            // +132
+    float fUnknown2[3];                           // +132
 };
 
 struct tHandlingDataSA
 {
-    int iVehicleID;            // +0
+    int iVehicleID;                                         // +0
 
-    float fMass;            // +4
+    float fMass;                                            // +4
 
-    float fUnknown1;            // +8    Automatically calculated
+    float fUnknown1;                                        // +8    Automatically calculated
 
-    float        fTurnMass;                     // +12
-    float        fDragCoeff;                    // +16
-    CVector      vecCenterOfMass;               // +20
-    unsigned int uiPercentSubmerged;            // +32
+    float        fTurnMass;                                 // +12
+    float        fDragCoeff;                                // +16
+    CVector      vecCenterOfMass;                           // +20
+    unsigned int uiPercentSubmerged;                        // +32
 
-    float fUnknown2;            // +36  Automatically calculated
+    float fUnknown2;                                        // +36  Automatically calculated
 
-    float fTractionMultiplier;            // +40
+    float fTractionMultiplier;                              // +40
 
     CTransmissionSAInterface Transmission;                  // +44
     float                    fBrakeDeceleration;            // +148
@@ -60,28 +59,28 @@ struct tHandlingDataSA
     bool                     bABS;                          // +156
     char                     fUnknown[3];                   // +157
 
-    float fSteeringLock;            // +160
-    float fTractionLoss;            // +164
-    float fTractionBias;            // +168
+    float fSteeringLock;                                    // +160
+    float fTractionLoss;                                    // +164
+    float fTractionBias;                                    // +168
 
-    float fSuspensionForceLevel;                    // +172
-    float fSuspensionDamping;                       // +176
-    float fSuspensionHighSpdDamping;                // +180
-    float fSuspensionUpperLimit;                    // +184
-    float fSuspensionLowerLimit;                    // +188
-    float fSuspensionFrontRearBias;                 // +192
-    float fSuspensionAntiDiveMultiplier;            // +196
+    float fSuspensionForceLevel;                            // +172
+    float fSuspensionDamping;                               // +176
+    float fSuspensionHighSpdDamping;                        // +180
+    float fSuspensionUpperLimit;                            // +184
+    float fSuspensionLowerLimit;                            // +188
+    float fSuspensionFrontRearBias;                         // +192
+    float fSuspensionAntiDiveMultiplier;                    // +196
 
-    float fCollisionDamageMultiplier;            // +200
+    float fCollisionDamageMultiplier;                       // +200
 
-    unsigned int uiModelFlags;                   // +204
-    unsigned int uiHandlingFlags;                // +208
-    float        fSeatOffsetDistance;            // +212
-    unsigned int uiMonetary;                     // +216
+    unsigned int uiModelFlags;                              // +204
+    unsigned int uiHandlingFlags;                           // +208
+    float        fSeatOffsetDistance;                       // +212
+    unsigned int uiMonetary;                                // +216
 
-    unsigned char ucHeadLight : 8;            // +220
-    unsigned char ucTailLight : 8;            // +221
-    unsigned char ucAnimGroup : 8;            // +222
+    unsigned char ucHeadLight : 8;                          // +220
+    unsigned char ucTailLight : 8;                          // +221
+    unsigned char ucAnimGroup : 8;                          // +222
 };
 
 class CHandlingEntrySA : public CHandlingEntry
@@ -203,27 +202,4 @@ private:
 
     tHandlingDataSA* m_pOriginalData;
     bool             m_bChanged;
-};
-
-// sizeof(tFlyingHandlingDataSA) == 0x58
-struct tFlyingHandlingDataSA
-{
-    int     iVehicleID;
-    float   fThrust;
-    float   fThrustFallOff;
-    float   fYaw;
-    float   fStab;
-    float   fSideSlip;
-    float   fRoll;
-    float   fRollStab;
-    float   fPitch;
-    float   fPitchStab;
-    float   fFormLift;
-    float   fAttackLift;
-    float   GearUpR;
-    float   GearDownL;
-    float   WindMult;
-    float   MoveResistance;
-    CVector TurnResistance;
-    CVector SpeedResistance;
 };

@@ -29,8 +29,8 @@
 class CPhysicalSAInterface : public CEntitySAInterface
 {
 public:
-    float  pad1;            // 56
-    uint32 pad2;            // 60
+    float  pad1;                 // 56
+    uint32 pad2;                 // 60
 
     uint32 b0x01 : 1;            // 64
     uint32 bApplyGravity : 1;
@@ -50,8 +50,8 @@ public:
     uint32 b0x4000 : 1;                    //
     uint32 b0x8000 : 1;                    //
 
-    uint32 b0x10000 : 1;            // 66
-    uint32 b0x20000 : 1;            // ref @ CPhysical__processCollision
+    uint32 b0x10000 : 1;                   // 66
+    uint32 b0x20000 : 1;                   // ref @ CPhysical__processCollision
     uint32 bBulletProof : 1;
     uint32 bFireProof : 1;
     uint32 bCollisionProof : 1;
@@ -106,6 +106,9 @@ public:
     float                     m_fLighting;                                // 300
     float                     m_fLighting2;                               // 304
     class CShadowDataSA*      m_pShadowData;                              // 308
+
+    CRect*      GetBoundRect_(CRect* pRect);
+    static void StaticSetHooks();
 };
 static_assert(sizeof(CPhysicalSAInterface) == 0x138, "Invalid size for CPhysicalSAInterface");
 
@@ -154,21 +157,4 @@ public:
     void  SetLighting(float fLighting);
 
     void SetFrozen(bool bFrozen);
-
-    /*
-    VOID        SetMassMultiplier(FLOAT fMassMultiplier);
-    FLOAT       GetMassMultiplier();
-
-    BOOL        GetExtraHeavy();
-    VOID        SetExtraHeavy(BOOL bExtraHeavy);
-    BOOL        GetDoGravity();
-    VOID        SetDoGravity(BOOL bDoGravity);
-    BOOL        GetInfiniteMass();
-    VOID        SetInfiniteMass(BOOL bInfiniteMass);
-    BOOL        GetPositionFrozen();
-    VOID        SetPositionFrozen(BOOL bPositionFrozen);
-    BYTE        GetLastMaterialToHaveBeenStandingOn();
-
-    BYTE        GetLevel();
-    VOID        SetLevel(BYTE LivesInThisLevel);*/
 };

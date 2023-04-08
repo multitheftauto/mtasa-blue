@@ -7,9 +7,13 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-class CSyncSettingsPacket : public CPacket
+#include "CPacket.h"
+#include "CCommon.h"
+
+class CSyncSettingsPacket final : public CPacket
 {
 public:
     CSyncSettingsPacket(){};

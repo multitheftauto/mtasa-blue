@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CRenderWare.h>
+#include <game/CSettings.h>
 #include "CRenderItem.EffectCloner.h"
 
 // Type of vertex used to emulate StretchRect for SwiftShader bug
@@ -135,12 +137,38 @@ CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, 
     if (!pTextureItem->IsValid())
     {
         SAFE_RELEASE(pTextureItem);
-        return NULL;
+        return nullptr;
     }
 
     UpdateMemoryUsage();
 
     return pTextureItem;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderItemManager::CreateVectorGraphic
+//
+//
+//
+////////////////////////////////////////////////////////////////
+CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint height)
+{
+    if (!CanCreateRenderItem(CVectorGraphicItem::GetClassId()))
+        return nullptr;
+
+    CVectorGraphicItem* pVectorItem = new CVectorGraphicItem;
+    pVectorItem->PostConstruct(this, width, height);
+
+    if (!pVectorItem->IsValid())
+    {
+        SAFE_RELEASE(pVectorItem);
+        return nullptr;
+    }
+
+    UpdateMemoryUsage();
+
+    return pVectorItem;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -232,7 +260,7 @@ CWebBrowserItem* CRenderItemManager::CreateWebBrowser(uint uiSizeX, uint uiSizeY
 //
 ////////////////////////////////////////////////////////////////
 CShaderItem* CRenderItemManager::CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
-                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask)
+                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros)
 {
     if (!CanCreateRenderItem(CShaderItem::GetClassId()))
         return NULL;
@@ -240,7 +268,7 @@ CShaderItem* CRenderItemManager::CreateShader(const SString& strFile, const SStr
     strOutStatus = "";
 
     CShaderItem* pShaderItem = new CShaderItem();
-    pShaderItem->PostConstruct(this, strFile, strRootPath, bIsRawData, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask);
+    pShaderItem->PostConstruct(this, strFile, strRootPath, bIsRawData, strOutStatus, fPriority, fMaxDistance, bLayered, bDebug, iTypeMask, macros);
 
     if (!pShaderItem->IsValid())
     {
@@ -756,6 +784,9 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
     outStatus.settings.bHighDetailPeds = false;
+    outStatus.settings.bBlur = true;
+    outStatus.settings.bCoronaReflections = false;
+    outStatus.settings.bDynamicPedShadows = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
@@ -767,12 +798,20 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("fov", outStatus.settings.fFieldOfView);
     CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
     CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
+    CVARS_GET("blur", outStatus.settings.bBlur);
+    CVARS_GET("corona_reflections", outStatus.settings.bCoronaReflections);
+    CVARS_GET("dynamic_ped_shadows", outStatus.settings.bDynamicPedShadows);
 
     if (outStatus.settings.iFXQuality == 0)
     {
         // These are always off with low fx quality
         outStatus.settings.bVolumetricShadows = false;
         outStatus.settings.bGrassEffect = false;
+    }
+
+    if (outStatus.settings.iFXQuality < 2)
+    {
+        outStatus.settings.bDynamicPedShadows = false;
     }
 
     // Display color depth

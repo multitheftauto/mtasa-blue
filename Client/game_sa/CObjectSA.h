@@ -9,18 +9,16 @@
  *
  *****************************************************************************/
 
-#include "CVehicleSA.h"
-#include "CPedSA.h"
-
 #pragma once
 
 #include <game/CObject.h>
 #include "CPhysicalSA.h"
 
+class CFireSAInterface;
+
 #define FUNC_CObject_Create             0x5A1F60
 #define FUNC_CObject_Explode            0x5A1340
 #define FUNC_CGlass_WindowRespondsToCollision 0x71BC40
-#define FUNC_CObject_AddToControlCodeList 0x59F400 // Dynamic objects-combinations like garage doors, train crossings, cranes use this to be processed
 
 class CObjectInfo
 {
@@ -126,8 +124,11 @@ private:
     unsigned char m_ucAlpha;
     bool          m_bIsAGangTag;
     CVector       m_vecScale;
+    bool          m_preRenderRequired = false;
 
 public:
+    static void StaticSetHooks();
+
     CObjectSA(CObjectSAInterface* objectInterface);
     CObjectSA(DWORD dwModel, bool bBreakingDisabled);
     ~CObjectSA();
@@ -140,6 +141,8 @@ public:
     float GetHealth();
     void  SetModelIndex(unsigned long ulModel);
 
+    void          SetPreRenderRequired(bool required) { m_preRenderRequired = required; }
+    bool          GetPreRenderRequired() { return m_preRenderRequired; }
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
     unsigned char GetAlpha() { return m_ucAlpha; }
 
@@ -153,8 +156,3 @@ public:
 private:
     void CheckForGangTag();
 };
-
-/*
-#define COBJECTSA_DEFINED
-#define COBJECTSAINTERFACE_DEFINED
-*/

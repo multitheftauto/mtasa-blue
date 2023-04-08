@@ -15,12 +15,8 @@ using std::list;
 void CLuaTeamDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"getTeamFromName", GetTeamFromName},
-        {"getTeamName", GetTeamName},
-        {"getTeamColor", GetTeamColor},
-        {"getTeamFriendlyFire", GetTeamFriendlyFire},
-        {"getPlayersInTeam", GetPlayersInTeam},
-        {"countPlayersInTeam", CountPlayersInTeam},
+        {"getTeamFromName", GetTeamFromName},         {"getTeamName", GetTeamName},           {"getTeamColor", GetTeamColor},
+        {"getTeamFriendlyFire", GetTeamFriendlyFire}, {"getPlayersInTeam", GetPlayersInTeam}, {"countPlayersInTeam", CountPlayersInTeam},
     };
 
     // Add functions
@@ -44,7 +40,6 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "friendlyFire", NULL, "getTeamFriendlyFire");
     lua_classvariable(luaVM, "players", NULL, "getPlayersInTeam");
     lua_classvariable(luaVM, "name", NULL, "getTeamName");
-    // lua_classvariable ( luaVM, "color", NULL, "getTeamColor" );
 
     lua_registerclass(luaVM, "Team", "Element");
 }

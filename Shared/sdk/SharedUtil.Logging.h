@@ -7,6 +7,9 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+#include "SString.h"
+#include "SharedUtil.IntTypes.h"
 
 namespace SharedUtil
 {
@@ -18,9 +21,16 @@ namespace SharedUtil
     void SetDebugTagHidden(const SString& strTag, bool bHidden = true);
     bool IsDebugTagHidden(const SString& strTag);
     #else
-    inline void OutputDebugLineDummy() {}
-    inline void SetDebugTagHiddenDummy() {}
-    inline bool IsDebugTagHiddenDummy() { return false; }
+    inline void OutputDebugLineDummy()
+    {
+    }
+    inline void SetDebugTagHiddenDummy()
+    {
+    }
+    inline bool IsDebugTagHiddenDummy()
+    {
+        return false;
+    }
         #define OutputDebugLine(x) OutputDebugLineDummy ()
         #define SetDebugTagHidden(x) SetDebugTagHiddenDummy ()
         #define IsDebugTagHidden(x) IsDebugTagHiddenDummy ()

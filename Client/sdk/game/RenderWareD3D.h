@@ -14,7 +14,8 @@
 // From SA::Render
 struct RwD3D9Raster
 {
-    union {
+    union
+    {
         IDirect3DTexture9* texture;
         IDirect3DSurface9* surface;
     };

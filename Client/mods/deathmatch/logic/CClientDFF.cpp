@@ -263,7 +263,8 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
 
     // Restore all the models we replaced.
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->ResetVehicleDummies();
+    pModelInfo->ResetVehicleDummies(true);
+    pModelInfo->ResetVehicleWheelSizes();
     pModelInfo->RestoreOriginalModel();
     pModelInfo->ResetAlphaTransparency();
 
@@ -291,7 +292,9 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
@@ -312,7 +315,9 @@ bool CClientDFF::ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlpha
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
@@ -332,7 +337,9 @@ bool CClientDFF::ReplacePedModel(RpClump* pClump, ushort usModel, bool bAlphaTra
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
@@ -350,7 +357,11 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
+
+    pModelInfo->ResetVehicleWheelSizes();
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
@@ -369,5 +380,5 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
 // Return true if data looks like DFF file contents
 bool CClientDFF::IsDFFData(const SString& strData)
 {
-    return strData.length() > 32 && memcmp(strData, "\x10\x00\x00\x00", 4) == 0;
+    return strData.length() > 32 && (memcmp(strData, "\x10\x00\x00\x00", 4) == 0 || memcmp(strData, "\x2B\x00\x00\x00", 4) == 0);
 }

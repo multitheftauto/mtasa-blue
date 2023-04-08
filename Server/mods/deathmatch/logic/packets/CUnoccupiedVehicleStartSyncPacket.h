@@ -12,9 +12,10 @@
 #pragma once
 
 #include "CPacket.h"
+
 class CVehicle;
 
-class CUnoccupiedVehicleStartSyncPacket : public CPacket
+class CUnoccupiedVehicleStartSyncPacket final : public CPacket
 {
 public:
     CUnoccupiedVehicleStartSyncPacket(CVehicle* pVehicle) { m_pVehicle = pVehicle; };

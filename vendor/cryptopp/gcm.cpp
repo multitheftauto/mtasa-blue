@@ -44,10 +44,6 @@ NAMESPACE_BEGIN(CryptoPP)
 #endif
 #endif  // CRYPTOPP_BOOL_X86 || CRYPTOPP_BOOL_X32 || CRYPTOPP_BOOL_X64
 
-// Clang __m128i casts, http://bugs.llvm.org/show_bug.cgi?id=20670
-#define M128_CAST(x) ((__m128i *)(void *)(x))
-#define CONST_M128_CAST(x) ((const __m128i *)(const void *)(x))
-
 word16 GCM_Base::s_reductionTable[256];
 volatile bool GCM_Base::s_reductionTableInitialized = false;
 
@@ -75,8 +71,8 @@ extern void GCM_Xor16_SSE2(byte *a, const byte *b, const byte *c);
 extern void GCM_Xor16_NEON(byte *a, const byte *b, const byte *c);
 #endif
 
-#if CRYPTOPP_POWER7_AVAILABLE
-extern void GCM_Xor16_POWER7(byte *a, const byte *b, const byte *c);
+#if CRYPTOPP_POWER8_AVAILABLE
+extern void GCM_Xor16_POWER8(byte *a, const byte *b, const byte *c);
 #endif
 
 #if CRYPTOPP_CLMUL_AVAILABLE
@@ -213,11 +209,11 @@ void GCM_Base::SetKeyWithoutResync(const byte *userKey, size_t keylength, const 
                     for (k=1; k<j; k++)
                         GCM_Xor16_NEON(mulTable+i*256*16+(j+k)*16, mulTable+i*256*16+j*16, mulTable+i*256*16+k*16);
             else
-#elif CRYPTOPP_POWER7_AVAILABLE
-            if (HasPower7())
+#elif CRYPTOPP_POWER8_AVAILABLE
+            if (HasPower8())
                 for (j=2; j<=0x80; j*=2)
                     for (k=1; k<j; k++)
-                        GCM_Xor16_POWER7(mulTable+i*256*16+(j+k)*16, mulTable+i*256*16+j*16, mulTable+i*256*16+k*16);
+                        GCM_Xor16_POWER8(mulTable+i*256*16+(j+k)*16, mulTable+i*256*16+j*16, mulTable+i*256*16+k*16);
             else
 #endif
                 for (j=2; j<=0x80; j*=2)
@@ -277,13 +273,13 @@ void GCM_Base::SetKeyWithoutResync(const byte *userKey, size_t keylength, const 
                         GCM_Xor16_NEON(mulTable+1024+i*256+(j+k)*16, mulTable+1024+i*256+j*16, mulTable+1024+i*256+k*16);
                     }
             else
-#elif CRYPTOPP_POWER7_AVAILABLE
-            if (HasPower7())
+#elif CRYPTOPP_POWER8_AVAILABLE
+            if (HasPower8())
                 for (j=2; j<=8; j*=2)
                     for (k=1; k<j; k++)
                     {
-                        GCM_Xor16_POWER7(mulTable+i*256+(j+k)*16, mulTable+i*256+j*16, mulTable+i*256+k*16);
-                        GCM_Xor16_POWER7(mulTable+1024+i*256+(j+k)*16, mulTable+1024+i*256+j*16, mulTable+1024+i*256+k*16);
+                        GCM_Xor16_POWER8(mulTable+i*256+(j+k)*16, mulTable+i*256+j*16, mulTable+i*256+k*16);
+                        GCM_Xor16_POWER8(mulTable+1024+i*256+(j+k)*16, mulTable+1024+i*256+j*16, mulTable+1024+i*256+k*16);
                     }
             else
 #endif
@@ -369,8 +365,8 @@ unsigned int GCM_Base::OptimalDataAlignment() const
         HasSSE2() ? 16 :
 #elif CRYPTOPP_ARM_NEON_AVAILABLE
         HasNEON() ? 4 :
-#elif CRYPTOPP_POWER7_AVAILABLE
-        HasPower7() ? 16 :
+#elif CRYPTOPP_POWER8_AVAILABLE
+        HasPower8() ? 16 :
 #endif
         GetBlockCipher().OptimalDataAlignment();
 }
@@ -563,6 +559,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
 #endif
 
 #if CRYPTOPP_SSE2_ASM_AVAILABLE
+
     case 1:        // SSE2 and 2K tables
         {
         #ifdef __GNUC__
@@ -729,10 +726,8 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
                 ATT_PREFIX
                     :
                     : "c" (data), "d" (len/16), "S" (hashBuffer), "D" (s_reductionTable)
-                    : "memory", "cc", "%eax"
-            #if CRYPTOPP_BOOL_X64
-                    , "%ebx", "%r11"
-            #endif
+                    : "memory", "cc", "%eax", "%ebx", PERCENT_REG(AS_REG_7), "%xmm0",
+                      "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5"
                 );
         #elif defined(CRYPTOPP_GENERATE_X64_MASM)
             pop rbx
@@ -808,7 +803,7 @@ size_t GCM_Base::AuthenticateBlocks(const byte *data, size_t len)
                 ATT_PREFIX
                     :
                     : "c" (data), "d" (len/16), "S" (hashBuffer)
-                    : "memory", "cc", "%edi", "%eax"
+                    : "memory", "cc", "%edi", "%eax", "%xmm0", "%xmm1"
                 );
         #elif defined(CRYPTOPP_GENERATE_X64_MASM)
             pop rdi

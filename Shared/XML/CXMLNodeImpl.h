@@ -24,6 +24,12 @@ public:
     CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node);
     ~CXMLNodeImpl();
 
+    // BuildFromDocument recursively builds child CXMLNodeImpl from the underlying TiXmlElement.
+    //
+    // This is **only** used for xmlLoadString right now.
+    // Look elsewhere if you're thinking about XML files. It does things a different way.
+    void BuildFromDocument();
+
     CXMLNode* CreateSubNode(const char* szTagName, CXMLNode* pInsertBefore = nullptr);
     void      DeleteSubNode(CXMLNode* pNode) { delete pNode; };
     void      DeleteAllSubNodes();
@@ -79,6 +85,8 @@ public:
     virtual SString GetAttributeValue(const SString& strAttributeName);
     virtual SString GetCommentText();
     virtual void    SetCommentText(const char* szCommentText, bool bLeadingBlankLine = false);
+
+    std::string ToString();
 
 private:
     bool StringToLong(const char* szString, long& lValue);

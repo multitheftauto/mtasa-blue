@@ -11,6 +11,7 @@
 #include <StdInc.h>
 #include <Psapi.h>
 #include <game/CGame.h>
+#include <game/CPools.h>
 #include "CModelCacheManager.h"
 
 DECLARE_ENUM(ePools);
@@ -474,11 +475,14 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
     memStatsInfo.iStreamingMemoryUsed = *(int*)0x08E4CB4;
     memStatsInfo.iStreamingMemoryAvailable = *(int*)0x08A5A80;
 
-    uint* pModelInfoArray = (uint*)0x08E4CC0;
-    for (uint i = 0; i < 25755; i++)
+    char*        pFileInfoArray = *(char**)(0x5B8B08 + 6);
+    CGame*       pGame = g_pCore->GetGame();
+    unsigned int RRR_BASE_ID = pGame->GetBaseIDforRRR();
+
+    for (uint i = 0; i < RRR_BASE_ID; i++)
     {
-        uint* pModelInfo = pModelInfoArray + 5 * i;
-        uint  uiLoadedFlag = pModelInfo[4];
+        char* pModelInfo = pFileInfoArray + 20 /* sizeof(CStreamingInfo) */ * i;
+        char  uiLoadedFlag = pModelInfo[0x10];            // CStreamingInfo.uiLoadFlag
         if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;
@@ -496,17 +500,17 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
                 memStatsInfo.modelInfo.uiUnknown_612_999++;
             else if (i < 1194)
                 memStatsInfo.modelInfo.uiUpgrades_1000_1193++;
-            else if (i < 20000)
+            else if (i < pGame->GetBaseIDforTXD())
                 memStatsInfo.modelInfo.uiUnknown_1194_19999++;
-            else if (i < 25000)
+            else if (i < pGame->GetBaseIDforCOL())
                 memStatsInfo.modelInfo.uiTextures_20000_24999++;
-            else if (i < 25255)
+            else if (i < pGame->GetBaseIDforIPL())
                 memStatsInfo.modelInfo.uiCollisions_25000_25254++;
-            else if (i < 25511)
+            else if (i < pGame->GetBaseIDforDAT())
                 memStatsInfo.modelInfo.uiIpls_25255_25510++;
-            else if (i < 25575)
+            else if (i < pGame->GetBaseIDforIFP())
                 memStatsInfo.modelInfo.uiPaths_25511_25574++;
-            else if (i < 25755)
+            else if (i < pGame->GetBaseIDforRRR())
                 memStatsInfo.modelInfo.uiAnims_25575_25754++;
         }
     }
@@ -657,11 +661,12 @@ void CMemStats::UpdateIntervalStats()
 ///////////////////////////////////////////////////////////////
 void CMemStats::CreateTables()
 {
+    CGame* pGame = g_pCore->GetGame();
     m_TableList.clear();
 
-    //
-    // Color setups
-    //
+//
+// Color setups
+//
     #define YELLOW "#FFFF00"
     #define RED "#FF0000"
     #define BLUE "#0000FF"
@@ -894,14 +899,18 @@ void CMemStats::CreateTables()
         table.AddRow(SString("400-611|(Vehicles)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiVehicles_400_611, m_MemStatsNow.modelInfo.uiVehicles_400_611));
         table.AddRow(SString("612-999| |^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_612_999, m_MemStatsNow.modelInfo.uiUnknown_612_999));
         table.AddRow(SString("1000-1193|(Upgrades)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUpgrades_1000_1193, m_MemStatsNow.modelInfo.uiUpgrades_1000_1193));
-        table.AddRow(SString("1194-19999|(World)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiUnknown_1194_19999, m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
-        table.AddRow(
-            SString("20000-24999|(Textures)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999));
-        table.AddRow(SString("25000-25254|(Collisions)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiCollisions_25000_25254,
-                             m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
-        table.AddRow(SString("25255-25510|(Ipls)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
-        table.AddRow(SString("25511-25574|(Paths)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
-        table.AddRow(SString("25575-25754|(Anims)|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
+        table.AddRow(SString("1194-%d|(World)|^1~.%d|%d", pGame->GetBaseIDforTXD() - 1, m_MemStatsDelta.modelInfo.uiUnknown_1194_19999,
+                             m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
+        table.AddRow(SString("%d-%d|(Textures)|^1~.%d|%d", pGame->GetBaseIDforTXD(), pGame->GetBaseIDforCOL() - 1,
+                             m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999));
+        table.AddRow(SString("%d-%d|(Collisions)|^1~.%d|%d", pGame->GetBaseIDforCOL(), pGame->GetBaseIDforIPL() - 1,
+                             m_MemStatsDelta.modelInfo.uiCollisions_25000_25254, m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
+        table.AddRow(SString("%d-%d|(Ipls)|^1~.%d|%d", pGame->GetBaseIDforIPL(), pGame->GetBaseIDforDAT() - 1, m_MemStatsDelta.modelInfo.uiIpls_25255_25510,
+                             m_MemStatsNow.modelInfo.uiIpls_25255_25510));
+        table.AddRow(SString("%d-%d|(Paths)|^1~.%d|%d", pGame->GetBaseIDforDAT(), pGame->GetBaseIDforIFP() - 1, m_MemStatsDelta.modelInfo.uiPaths_25511_25574,
+                             m_MemStatsNow.modelInfo.uiPaths_25511_25574));
+        table.AddRow(SString("%d-%d|(Anims)|^1~.%d|%d", pGame->GetBaseIDforIFP(), pGame->GetBaseIDforRRR() - 1, m_MemStatsDelta.modelInfo.uiAnims_25575_25754,
+                             m_MemStatsNow.modelInfo.uiAnims_25575_25754));
         table.AddRow(SString("|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal));
     }
 

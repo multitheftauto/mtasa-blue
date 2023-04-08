@@ -13,10 +13,14 @@
 
 #include "CVehicle.h"
 
+class CBikeHandlingEntry;
+
 class CBike : public virtual CVehicle
 {
 public:
     virtual ~CBike(){};
 
-    // virtual void PlaceOnRoadProperly ( void )=0;
+    virtual CBikeHandlingEntry* GetBikeHandlingData() = 0;
+    virtual void                SetBikeHandlingData(CBikeHandlingEntry* pHandling) = 0;
+    virtual void                RecalculateBikeHandling() = 0;
 };

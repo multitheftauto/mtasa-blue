@@ -7,7 +7,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
 #include "gamesa_renderware.h"
+
+extern CGameSA* pGame;
 
 //
 // Info about the current state of a model's txd textures
@@ -54,7 +57,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         else
         {
             CTxdStore_AddRef(usTxdId);
-            if (pModelInfo->GetModelType() == MODEL_INFO_TYPE_PED)
+            if (pModelInfo->GetModelType() == eModelInfoType::PED)
             {
                 // Mystery fix for #9336: (MTA sometimes fails at loading custom textures)
                 // Possibly forces the ped model to be reloaded in some way

@@ -1134,3 +1134,15 @@ LUA_API void lua_addtotalbytes(lua_State *L, int n)
     global_State *g = G(L);
     g->totalbytes += n;
 }
+
+// MTA addition to access expected results
+LUA_API int lua_ncallresult(lua_State *L)
+{
+    return L->nexpectedresults;
+}
+
+// MTA Addition to access `owner` value
+LUA_API void *lua_getmtasaowner(lua_State* L)
+{
+    return G(L)->mtasaowner;
+}

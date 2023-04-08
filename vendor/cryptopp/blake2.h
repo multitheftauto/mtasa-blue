@@ -27,14 +27,14 @@ NAMESPACE_BEGIN(CryptoPP)
 struct BLAKE2s_Info : public VariableKeyLength<32,0,32,1,SimpleKeyingInterface::NOT_RESYNCHRONIZABLE>
 {
     typedef VariableKeyLength<32,0,32,1,SimpleKeyingInterface::NOT_RESYNCHRONIZABLE> KeyBase;
-    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = KeyBase::MIN_KEYLENGTH)
-    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = KeyBase::MAX_KEYLENGTH)
-    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = KeyBase::DEFAULT_KEYLENGTH)
+    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = KeyBase::MIN_KEYLENGTH);
+    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = KeyBase::MAX_KEYLENGTH);
+    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = KeyBase::DEFAULT_KEYLENGTH);
 
-    CRYPTOPP_CONSTANT(BLOCKSIZE = 64)
-    CRYPTOPP_CONSTANT(DIGESTSIZE = 32)
-    CRYPTOPP_CONSTANT(SALTSIZE = 8)
-    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = 8)
+    CRYPTOPP_CONSTANT(BLOCKSIZE = 64);
+    CRYPTOPP_CONSTANT(DIGESTSIZE = 32);
+    CRYPTOPP_CONSTANT(SALTSIZE = 8);
+    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = 8);
 
     CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return "BLAKE2s";}
 };
@@ -44,14 +44,14 @@ struct BLAKE2s_Info : public VariableKeyLength<32,0,32,1,SimpleKeyingInterface::
 struct BLAKE2b_Info : public VariableKeyLength<64,0,64,1,SimpleKeyingInterface::NOT_RESYNCHRONIZABLE>
 {
     typedef VariableKeyLength<64,0,64,1,SimpleKeyingInterface::NOT_RESYNCHRONIZABLE> KeyBase;
-    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = KeyBase::MIN_KEYLENGTH)
-    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = KeyBase::MAX_KEYLENGTH)
-    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = KeyBase::DEFAULT_KEYLENGTH)
+    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = KeyBase::MIN_KEYLENGTH);
+    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = KeyBase::MAX_KEYLENGTH);
+    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = KeyBase::DEFAULT_KEYLENGTH);
 
-    CRYPTOPP_CONSTANT(BLOCKSIZE = 128)
-    CRYPTOPP_CONSTANT(DIGESTSIZE = 64)
-    CRYPTOPP_CONSTANT(SALTSIZE = 16)
-    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = 16)
+    CRYPTOPP_CONSTANT(BLOCKSIZE = 128);
+    CRYPTOPP_CONSTANT(DIGESTSIZE = 64);
+    CRYPTOPP_CONSTANT(SALTSIZE = 16);
+    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = 16);
 
     CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return "BLAKE2b";}
 };
@@ -59,9 +59,9 @@ struct BLAKE2b_Info : public VariableKeyLength<64,0,64,1,SimpleKeyingInterface::
 /// \brief BLAKE2s parameter block
 struct CRYPTOPP_NO_VTABLE BLAKE2s_ParameterBlock
 {
-    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2s_Info::SALTSIZE)
-    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2s_Info::DIGESTSIZE)
-    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2s_Info::PERSONALIZATIONSIZE)
+    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2s_Info::SALTSIZE);
+    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2s_Info::DIGESTSIZE);
+    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2s_Info::PERSONALIZATIONSIZE);
 
     BLAKE2s_ParameterBlock()
     {
@@ -110,9 +110,9 @@ struct CRYPTOPP_NO_VTABLE BLAKE2s_ParameterBlock
 /// \brief BLAKE2b parameter block
 struct CRYPTOPP_NO_VTABLE BLAKE2b_ParameterBlock
 {
-    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2b_Info::SALTSIZE)
-    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2b_Info::DIGESTSIZE)
-    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2b_Info::PERSONALIZATIONSIZE)
+    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2b_Info::SALTSIZE);
+    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2b_Info::DIGESTSIZE);
+    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2b_Info::PERSONALIZATIONSIZE);
 
     BLAKE2b_ParameterBlock()
     {
@@ -185,7 +185,7 @@ struct CRYPTOPP_NO_VTABLE BLAKE2s_State
     }
 
     // SSE4, Power7 and NEON depend upon t[] and f[] being side-by-side
-    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2s_Info::BLOCKSIZE)
+    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2s_Info::BLOCKSIZE);
     FixedSizeAlignedSecBlock<word32, 8+2+2, true> m_hft;
     FixedSizeAlignedSecBlock<byte, BLOCKSIZE, true> m_buf;
     size_t m_len;
@@ -218,7 +218,7 @@ struct CRYPTOPP_NO_VTABLE BLAKE2b_State
     }
 
     // SSE4, Power8 and NEON depend upon t[] and f[] being side-by-side
-    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2b_Info::BLOCKSIZE)
+    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2b_Info::BLOCKSIZE);
     FixedSizeAlignedSecBlock<word64, 8+2+2, true> m_hft;
     FixedSizeAlignedSecBlock<byte, BLOCKSIZE, true> m_buf;
     size_t m_len;
@@ -237,14 +237,14 @@ struct CRYPTOPP_NO_VTABLE BLAKE2b_State
 class BLAKE2s : public SimpleKeyingInterfaceImpl<MessageAuthenticationCode, BLAKE2s_Info>
 {
 public:
-    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = BLAKE2s_Info::DEFAULT_KEYLENGTH)
-    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = BLAKE2s_Info::MIN_KEYLENGTH)
-    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = BLAKE2s_Info::MAX_KEYLENGTH)
+    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = BLAKE2s_Info::DEFAULT_KEYLENGTH);
+    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = BLAKE2s_Info::MIN_KEYLENGTH);
+    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = BLAKE2s_Info::MAX_KEYLENGTH);
 
-    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2s_Info::DIGESTSIZE)
-    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2s_Info::BLOCKSIZE)
-    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2s_Info::SALTSIZE)
-    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2s_Info::PERSONALIZATIONSIZE)
+    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2s_Info::DIGESTSIZE);
+    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2s_Info::BLOCKSIZE);
+    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2s_Info::SALTSIZE);
+    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2s_Info::PERSONALIZATIONSIZE);
 
     typedef BLAKE2s_State State;
     typedef BLAKE2s_ParameterBlock ParameterBlock;
@@ -256,28 +256,37 @@ public:
     /// \brief Construct a BLAKE2s hash
     /// \param digestSize the digest size, in bytes
     /// \param treeMode flag indicating tree mode
+    /// \since Crypto++ 5.6.4
     BLAKE2s(bool treeMode=false, unsigned int digestSize = DIGESTSIZE);
+
+    /// \brief Construct a BLAKE2s hash
+    /// \param digestSize the digest size, in bytes
+    /// \details treeMode flag is set to false
+    /// \since Crypto++ 8.2
+    BLAKE2s(unsigned int digestSize);
 
     /// \brief Construct a BLAKE2s hash
     /// \param key a byte array used to key the cipher
     /// \param keyLength the size of the byte array
     /// \param salt a byte array used as salt
     /// \param saltLength the size of the byte array
-    /// \param personalization a byte array used as prsonalization string
+    /// \param personalization a byte array used as personalization string
     /// \param personalizationLength the size of the byte array
     /// \param treeMode flag indicating tree mode
     /// \param digestSize the digest size, in bytes
+    /// \since Crypto++ 5.6.4
     BLAKE2s(const byte *key, size_t keyLength, const byte* salt = NULLPTR, size_t saltLength = 0,
         const byte* personalization = NULLPTR, size_t personalizationLength = 0,
         bool treeMode=false, unsigned int digestSize = DIGESTSIZE);
 
     /// \brief Retrieve the object's name
-    /// \returns the object's algorithm name following RFC 7693
+    /// \return the object's algorithm name following RFC 7693
     /// \details Object algorithm name follows the naming described in
     ///   <A HREF="http://tools.ietf.org/html/rfc7693#section-4">RFC 7693, The BLAKE2 Cryptographic Hash and
     /// Message Authentication Code (MAC)</A>. For example, "BLAKE2b-512" and "BLAKE2s-256".
     std::string AlgorithmName() const {return std::string(BLAKE2s_Info::StaticAlgorithmName()) + "-" + IntToString(DigestSize()*8);}
 
+    unsigned int BlockSize() const {return BLOCKSIZE;}
     unsigned int DigestSize() const {return m_digestSize;}
     unsigned int OptimalDataAlignment() const;
 
@@ -299,7 +308,7 @@ public:
     void SetTreeMode(bool mode) {m_treeMode=mode;}
 
     /// \brief Get tree mode
-    /// \returns the current tree mode
+    /// \return the current tree mode
     /// \details Tree mode is persisted across calls to Restart().
     bool GetTreeMode() const {return m_treeMode;}
 
@@ -335,14 +344,14 @@ private:
 class BLAKE2b : public SimpleKeyingInterfaceImpl<MessageAuthenticationCode, BLAKE2b_Info>
 {
 public:
-    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = BLAKE2b_Info::DEFAULT_KEYLENGTH)
-    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = BLAKE2b_Info::MIN_KEYLENGTH)
-    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = BLAKE2b_Info::MAX_KEYLENGTH)
+    CRYPTOPP_CONSTANT(DEFAULT_KEYLENGTH = BLAKE2b_Info::DEFAULT_KEYLENGTH);
+    CRYPTOPP_CONSTANT(MIN_KEYLENGTH = BLAKE2b_Info::MIN_KEYLENGTH);
+    CRYPTOPP_CONSTANT(MAX_KEYLENGTH = BLAKE2b_Info::MAX_KEYLENGTH);
 
-    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2b_Info::DIGESTSIZE)
-    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2b_Info::BLOCKSIZE)
-    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2b_Info::SALTSIZE)
-    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2b_Info::PERSONALIZATIONSIZE)
+    CRYPTOPP_CONSTANT(DIGESTSIZE = BLAKE2b_Info::DIGESTSIZE);
+    CRYPTOPP_CONSTANT(BLOCKSIZE = BLAKE2b_Info::BLOCKSIZE);
+    CRYPTOPP_CONSTANT(SALTSIZE = BLAKE2b_Info::SALTSIZE);
+    CRYPTOPP_CONSTANT(PERSONALIZATIONSIZE = BLAKE2b_Info::PERSONALIZATIONSIZE);
 
     typedef BLAKE2b_State State;
     typedef BLAKE2b_ParameterBlock ParameterBlock;
@@ -354,28 +363,37 @@ public:
     /// \brief Construct a BLAKE2b hash
     /// \param digestSize the digest size, in bytes
     /// \param treeMode flag indicating tree mode
+    /// \since Crypto++ 5.6.4
     BLAKE2b(bool treeMode=false, unsigned int digestSize = DIGESTSIZE);
+
+    /// \brief Construct a BLAKE2s hash
+    /// \param digestSize the digest size, in bytes
+    /// \details treeMode flag is set to false
+    /// \since Crypto++ 8.2
+    BLAKE2b(unsigned int digestSize);
 
     /// \brief Construct a BLAKE2b hash
     /// \param key a byte array used to key the cipher
     /// \param keyLength the size of the byte array
     /// \param salt a byte array used as salt
     /// \param saltLength the size of the byte array
-    /// \param personalization a byte array used as prsonalization string
+    /// \param personalization a byte array used as personalization string
     /// \param personalizationLength the size of the byte array
     /// \param treeMode flag indicating tree mode
     /// \param digestSize the digest size, in bytes
+    /// \since Crypto++ 5.6.4
     BLAKE2b(const byte *key, size_t keyLength, const byte* salt = NULLPTR, size_t saltLength = 0,
         const byte* personalization = NULLPTR, size_t personalizationLength = 0,
         bool treeMode=false, unsigned int digestSize = DIGESTSIZE);
 
     /// \brief Retrieve the object's name
-    /// \returns the object's algorithm name following RFC 7693
+    /// \return the object's algorithm name following RFC 7693
     /// \details Object algorithm name follows the naming described in
     ///   <A HREF="http://tools.ietf.org/html/rfc7693#section-4">RFC 7693, The BLAKE2 Cryptographic Hash and
     /// Message Authentication Code (MAC)</A>. For example, "BLAKE2b-512" and "BLAKE2s-256".
     std::string AlgorithmName() const {return std::string(BLAKE2b_Info::StaticAlgorithmName()) + "-" + IntToString(DigestSize()*8);}
 
+    unsigned int BlockSize() const {return BLOCKSIZE;}
     unsigned int DigestSize() const {return m_digestSize;}
     unsigned int OptimalDataAlignment() const;
 
@@ -397,7 +415,7 @@ public:
     void SetTreeMode(bool mode) {m_treeMode=mode;}
 
     /// \brief Get tree mode
-    /// \returns the current tree mode
+    /// \return the current tree mode
     /// \details Tree mode is persisted across calls to Restart().
     bool GetTreeMode() const {return m_treeMode;}
 

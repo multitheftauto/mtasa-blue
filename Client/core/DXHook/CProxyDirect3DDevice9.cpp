@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 
 bool                                    g_bInGTAScene = false;
 CProxyDirect3DDevice9*                  g_pProxyDevice = NULL;
@@ -45,7 +46,7 @@ CProxyDirect3DDevice9::CProxyDirect3DDevice9(IDirect3DDevice9* pDevice)
     ZeroMemory(&adaptIdent, sizeof(D3DADAPTER_IDENTIFIER9));
     pD3D9->GetAdapterIdentifier(iAdapter, 0, &adaptIdent);
 
-    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.DeviceName) / 1024;
+    int iVideoCardMemoryKBTotal = GetWMIVideoAdapterMemorySize(adaptIdent.VendorId, adaptIdent.DeviceId) / 1024;
 
     // Just incase, fallback to using texture memory stats
     if (iVideoCardMemoryKBTotal < 16)

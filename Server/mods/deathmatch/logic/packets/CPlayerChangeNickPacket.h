@@ -12,9 +12,8 @@
 #pragma once
 
 #include "CPacket.h"
-#include "../../Config.h"
 
-class CPlayerChangeNickPacket : public CPacket
+class CPlayerChangeNickPacket final : public CPacket
 {
 public:
     explicit CPlayerChangeNickPacket(const char* szNewNick);

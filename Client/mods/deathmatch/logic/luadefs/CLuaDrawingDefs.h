@@ -10,7 +10,10 @@
  *****************************************************************************/
 
 #pragma once
-#include "CLuaDefs.h"
+#include <optional>
+#include <variant>
+#include <utility>
+#include <optional>
 
 class CLuaDrawingDefs : public CLuaDefs
 {
@@ -31,8 +34,23 @@ public:
     LUA_DECLARE(DxDrawMaterialPrimitive);
     LUA_DECLARE(DxDrawPrimitive3D);
     LUA_DECLARE(DxDrawMaterialPrimitive3D);
-    LUA_DECLARE_OOP(DxGetTextSize);
-    LUA_DECLARE(DxDrawWiredSphere);
+
+    static CVector2D OOP_DxGetTextSize(
+        // font can be called with a std::nullopt to grab the FONT_DEFAULT, see DxGetTextSize
+        std::variant<CClientDxFont*, eFontType> font, const std::string text, const std::optional<float> optWidth,
+        const std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded);
+
+    static inline CLuaMultiReturn<float, float> DxGetTextSize(std::string text, std::optional<float> optWidth,
+                                                              std::optional<std::variant<CVector2D, float>>          optScaleXY,
+                                                              std::optional<std::variant<CClientDxFont*, eFontType>> optFont, std::optional<bool> optWordBreak,
+                                                              std::optional<bool> optColorCoded)
+    {
+        const auto size = OOP_DxGetTextSize(std::move(optFont.value_or(FONT_DEFAULT)), std::move(text), std::move(optWidth), std::move(optScaleXY),
+                                            std::move(optWordBreak), std::move(optColorCoded));
+
+        return {size.fX, size.fY};
+    };
+
     LUA_DECLARE_OOP(DxGetTextWidth);
     LUA_DECLARE_OOP(DxGetFontHeight);
     LUA_DECLARE(DxCreateFont);
@@ -60,6 +78,9 @@ public:
     LUA_DECLARE(DxSetAspectRatioAdjustmentEnabled);
     LUA_DECLARE(DxIsAspectRatioAdjustmentEnabled);
     LUA_DECLARE(DxSetTextureEdge);
+
+    static bool DxDrawWiredSphere(lua_State* const luaVM, const CVector position, const float radius, const std::optional<SColor> color,
+                                  const std::optional<float> lineWidth, const std::optional<unsigned int> iterations);
 
 private:
     static void AddDxMaterialClass(lua_State* luaVM);

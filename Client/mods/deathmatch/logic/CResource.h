@@ -21,17 +21,6 @@
 #define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
 
-class CExportedFunction
-{
-private:
-    SString m_strFunctionName;
-
-public:
-    CExportedFunction(const char* szFunctionName) { m_strFunctionName.AssignLeft(szFunctionName, MAX_FUNCTION_NAME_LENGTH); };
-
-    const char* GetFunctionName() { return m_strFunctionName; }
-};
-
 struct SNoClientCacheScript
 {
     CBuffer buffer;
@@ -73,8 +62,8 @@ public:
     CElementGroup* GetElementGroup() { return m_pDefaultElementGroup; }
     void           AddToElementGroup(CClientEntity* pElement);
 
-    void AddExportedFunction(const char* szFunctionName);
-    bool CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller);
+    void AddExportedFunction(const SString& name) { m_exportedFunctions.insert(name); }
+    bool CallExportedFunction(const SString& name, CLuaArguments& args, CLuaArguments& returns, CResource& caller);
 
     class CClientEntity* GetResourceEntity() { return m_pResourceEntity; }
     void                 SetResourceEntity(CClientEntity* pEntity) { m_pResourceEntity = pEntity; }
@@ -87,6 +76,7 @@ public:
     CClientEntity*       GetResourceDFFRoot() { return m_pResourceDFFEntity; };
     CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
     CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
+    CClientEntity*       GetResourceIMGRoot() { return m_pResourceIMGRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void DeleteClientChildren();
@@ -94,21 +84,20 @@ public:
     // Use this for cursor showing/hiding
     void ShowCursor(bool bShow, bool bToggleControls = true);
 
-    std::list<CExportedFunction*>::iterator IterBeginExportedFunctions() { return m_exportedFunctions.begin(); }
-    std::list<CExportedFunction*>::iterator IterEndExportedFunctions() { return m_exportedFunctions.end(); }
+    const auto& GetExportedFunctions() const noexcept { return m_exportedFunctions; }
 
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
 
-    void           SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
-    void           LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
+    void               SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
+    void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
-    bool           IsOOPEnabled() { return m_bOOPEnabled; }
-    void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
-    bool           IsWaitingForInitialDownloads();
-    int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
-    void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+    bool               IsOOPEnabled() { return m_bOOPEnabled; }
+    void               HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
+    bool               IsWaitingForInitialDownloads();
+    int                GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
+    void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
 private:
     unsigned short       m_usNetID;
@@ -127,6 +116,7 @@ private:
     class CClientEntity* m_pResourceGUIEntity;
     class CClientEntity* m_pResourceTXDRoot;
     class CClientEntity* m_pResourceIFPRoot;
+    class CClientEntity* m_pResourceIMGRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     CMtaVersion          m_strMinServerReq;
@@ -144,7 +134,7 @@ private:
 
     std::list<class CResourceFile*>       m_ResourceFiles;
     std::list<class CResourceConfigItem*> m_ConfigFiles;
-    std::list<CExportedFunction*>         m_exportedFunctions;
+    CFastHashSet<SString>                 m_exportedFunctions;
     CElementGroup*                        m_pDefaultElementGroup;            // stores elements created by scripts in this resource
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
 };

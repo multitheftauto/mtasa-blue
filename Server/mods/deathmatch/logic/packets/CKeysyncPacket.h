@@ -14,7 +14,7 @@
 #include "../CCommon.h"
 #include "CPacket.h"
 
-class CKeysyncPacket : public CPacket
+class CKeysyncPacket final : public CPacket
 {
 public:
     CKeysyncPacket(){};

@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CPickups.h>
+#include <game/CPickup.h>
 
 extern CClientGame* g_pClientGame;
 
@@ -157,6 +159,7 @@ void CClientPickup::Create()
             m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, m_vecPosition, 1.0f);
             m_pCollision->m_pOwningPickup = this;
             m_pCollision->SetHitCallback(this);
+            m_pCollision->SetCanBeDestroyedByScript(false);
 
             // Increment pickup counter
             ++m_pPickupManager->m_uiPickupCount;

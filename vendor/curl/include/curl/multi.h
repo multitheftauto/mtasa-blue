@@ -7,11 +7,11 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
- * are also available at https://curl.haxx.se/docs/copyright.html.
+ * are also available at https://curl.se/docs/copyright.html.
  *
  * You may opt to use, copy, modify, merge, publish, distribute and/or sell
  * copies of the Software, and permit persons to whom the Software is
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 /*
@@ -73,7 +75,9 @@ typedef enum {
   CURLM_RECURSIVE_API_CALL, /* an api function was called from inside a
                                callback */
   CURLM_WAKEUP_FAILURE,  /* wakeup is unavailable or failed */
-  CURLM_BAD_FUNCTION_ARGUMENT,  /* function called with a bad parameter */
+  CURLM_BAD_FUNCTION_ARGUMENT, /* function called with a bad parameter */
+  CURLM_ABORTED_BY_CALLBACK,
+  CURLM_UNRECOVERABLE_POLL,
   CURLM_LAST
 } CURLMcode;
 
@@ -120,7 +124,7 @@ struct curl_waitfd {
 /*
  * Name:    curl_multi_init()
  *
- * Desc:    inititalize multi-style curl usage
+ * Desc:    initialize multi-style curl usage
  *
  * Returns: a new CURLM handle to use in all 'curl_multi' functions.
  */
@@ -267,7 +271,7 @@ CURL_EXTERN CURLMsg *curl_multi_info_read(CURLM *multi_handle,
  *          value into the equivalent human readable error string.  This is
  *          useful for printing meaningful error messages.
  *
- * Returns: A pointer to a zero-terminated error message.
+ * Returns: A pointer to a null-terminated error message.
  */
 CURL_EXTERN const char *curl_multi_strerror(CURLMcode);
 
@@ -377,12 +381,10 @@ typedef enum {
      will not be considered for pipelining */
   CURLOPT(CURLMOPT_CHUNK_LENGTH_PENALTY_SIZE, CURLOPTTYPE_OFF_T, 10),
 
-  /* a list of site names(+port) that are blacklisted from
-     pipelining */
+  /* a list of site names(+port) that are blocked from pipelining */
   CURLOPT(CURLMOPT_PIPELINING_SITE_BL, CURLOPTTYPE_OBJECTPOINT, 11),
 
-  /* a list of server types that are blacklisted from
-     pipelining */
+  /* a list of server types that are blocked from pipelining */
   CURLOPT(CURLMOPT_PIPELINING_SERVER_BL, CURLOPTTYPE_OBJECTPOINT, 12),
 
   /* maximum number of open connections in total */
@@ -429,12 +431,14 @@ CURL_EXTERN CURLMcode curl_multi_assign(CURLM *multi_handle,
  * Name: curl_push_callback
  *
  * Desc: This callback gets called when a new stream is being pushed by the
- *       server. It approves or denies the new stream.
+ *       server. It approves or denies the new stream. It can also decide
+ *       to completely fail the connection.
  *
- * Returns: CURL_PUSH_OK or CURL_PUSH_DENY.
+ * Returns: CURL_PUSH_OK, CURL_PUSH_DENY or CURL_PUSH_ERROROUT
  */
-#define CURL_PUSH_OK   0
-#define CURL_PUSH_DENY 1
+#define CURL_PUSH_OK       0
+#define CURL_PUSH_DENY     1
+#define CURL_PUSH_ERROROUT 2 /* added in 7.72.0 */
 
 struct curl_pushheaders;  /* forward declaration only */
 

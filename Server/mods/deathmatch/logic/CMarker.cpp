@@ -10,6 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMarker.h"
+#include "CMarkerManager.h"
+#include "CColCircle.h"
+#include "CColSphere.h"
+#include "CResource.h"
+#include "CLogger.h"
+#include "Utils.h"
+#include "CGame.h"
+#include "packets/CElementRPCPacket.h"
+#include <net/rpc_enums.h>
 
 CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent) : CPerPlayerEntity(pParent)
 {
@@ -28,6 +38,7 @@ CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElem
     m_pCollision = new CColCircle(pColManager, nullptr, m_vecPosition, m_fSize, true);
     m_pCollision->SetCallback(this);
     m_pCollision->SetAutoCallEvent(false);
+    m_pCollision->SetCanBeDestroyedByScript(false);
 
     // Add us to the marker manager
     pMarkerManager->AddToList(this);
@@ -167,21 +178,6 @@ void CMarker::SetPosition(const CVector& vecPosition)
         BitStream.pBitStream->Write(vecPosition.fZ);
         BitStream.pBitStream->Write(GetSyncTimeContext());
         BroadcastOnlyVisible(CElementRPCPacket(this, SET_ELEMENT_POSITION, *BitStream.pBitStream));
-    }
-}
-
-void CMarker::AttachTo(CElement* pElement)
-{
-    CElement::AttachTo(pElement);
-    m_pCollision->AttachTo(pElement);
-}
-
-void CMarker::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
-{
-    CElement::SetAttachedOffsets(vecPosition, vecRotation);
-    if (m_pCollision)
-    {
-        m_pCollision->SetAttachedOffsets(vecPosition, vecRotation);
     }
 }
 
@@ -382,6 +378,7 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
 
         m_pCollision->SetCallback(this);
         m_pCollision->SetAutoCallEvent(false);
+        m_pCollision->SetCanBeDestroyedByScript(false);
     }
 
     // Set the radius after the size

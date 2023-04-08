@@ -63,12 +63,12 @@ bool FindFile::Next(FindData *fd,bool GetSymLink)
   }
   while (1)
   {
+    wchar Name[NM];
     struct dirent *ent=readdir(dirp);
     if (ent==NULL)
       return false;
     if (strcmp(ent->d_name,".")==0 || strcmp(ent->d_name,"..")==0)
       continue;
-    wchar Name[NM];
     if (!CharToWide(ent->d_name,Name,ASIZE(Name)))
       uiMsg(UIERROR_INVALIDNAME,UINULL,Name);
 
@@ -117,7 +117,7 @@ bool FindFile::FastFind(const wchar *FindMask,FindData *fd,bool GetSymLink)
   if (hFind==INVALID_HANDLE_VALUE)
     return false;
   FindClose(hFind);
-#else
+#elif defined(_UNIX)
   char FindMaskA[NM];
   WideToChar(FindMask,FindMaskA,ASIZE(FindMaskA));
 
@@ -143,15 +143,7 @@ bool FindFile::FastFind(const wchar *FindMask,FindData *fd,bool GetSymLink)
   fd->FileAttr=st.st_mode;
   fd->Size=st.st_size;
 
-#ifdef UNIX_TIME_NS
-  fd->mtime.SetUnixNS(st.st_mtim.tv_sec*(uint64)1000000000+st.st_mtim.tv_nsec);
-  fd->atime.SetUnixNS(st.st_atim.tv_sec*(uint64)1000000000+st.st_atim.tv_nsec);
-  fd->ctime.SetUnixNS(st.st_ctim.tv_sec*(uint64)1000000000+st.st_ctim.tv_nsec);
-#else
-  fd->mtime.SetUnix(st.st_mtime);
-  fd->atime.SetUnix(st.st_atime);
-  fd->ctime.SetUnix(st.st_ctime);
-#endif
+  File::StatToRarTime(st,&fd->mtime,&fd->ctime,&fd->atime);
 
   wcsncpyz(fd->Name,FindMask,ASIZE(fd->Name));
 #endif

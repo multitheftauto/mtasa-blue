@@ -262,6 +262,8 @@ bool CommandData::TimeCheck(RarTime &ftm,RarTime &ftc,RarTime &fta)
 // Return 'true' if we need to exclude the file from processing.
 bool CommandData::SizeCheck(int64 Size)
 {
+  if (Size==INT64NDF) // If called from archive formats like bzip2, not storing the file size.
+    return false;
   if (FileSizeLess!=INT64NDF && Size>=FileSizeLess)
     return true;
   if (FileSizeMore!=INT64NDF && Size<=FileSizeMore)
@@ -285,7 +287,10 @@ int CommandData::IsProcessFile(FileHeader &FileHead,bool *ExactMatch,int MatchTy
 #ifndef SFX_MODULE
   if (TimeCheck(FileHead.mtime,FileHead.ctime,FileHead.atime))
     return 0;
-  if ((FileHead.FileAttr & ExclFileAttr)!=0 || InclAttrSet && (FileHead.FileAttr & InclFileAttr)==0)
+  if ((FileHead.FileAttr & ExclFileAttr)!=0 || FileHead.Dir && ExclDir)
+    return 0;
+  if (InclAttrSet && (FileHead.FileAttr & InclFileAttr)==0 &&
+      (!FileHead.Dir || !InclDir))
     return 0;
   if (!Dir && SizeCheck(FileHead.UnpSize))
     return 0;
@@ -303,3 +308,47 @@ int CommandData::IsProcessFile(FileHeader &FileHead,bool *ExactMatch,int MatchTy
     }
   return 0;
 }
+
+
+#if !defined(SFX_MODULE)
+void CommandData::SetStoreTimeMode(const wchar *S)
+{
+  if (*S==0 || IsDigit(*S) || *S=='-' || *S=='+')
+  {
+    // Apply -ts, -ts1, -ts-, -ts+ to all 3 times.
+    // Handle obsolete -ts[2,3,4] as ts+.
+    EXTTIME_MODE Mode=EXTTIME_MAX;
+    if (*S=='-')
+      Mode=EXTTIME_NONE;
+    if (*S=='1')
+      Mode=EXTTIME_1S;
+    xmtime=xctime=xatime=Mode;
+    S++;
+  }
+
+  while (*S!=0)
+  {
+    EXTTIME_MODE Mode=EXTTIME_MAX;
+    if (S[1]=='-')
+      Mode=EXTTIME_NONE;
+    if (S[1]=='1')
+      Mode=EXTTIME_1S;
+    switch(toupperw(*S))
+    {
+      case 'M':
+        xmtime=Mode;
+        break;
+      case 'C':
+        xctime=Mode;
+        break;
+      case 'A':
+        xatime=Mode;
+        break;
+      case 'P':
+        PreserveAtime=true;
+        break;
+    }
+    S++;
+  }
+}
+#endif

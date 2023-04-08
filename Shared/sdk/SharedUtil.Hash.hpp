@@ -13,6 +13,8 @@
 #include "sha2.hpp"
 #include <random>
 #include <algorithm>
+#include "SharedUtil.Hash.h"
+#include "SharedUtil.File.h"
 
 namespace bcrypt
 {
@@ -41,9 +43,13 @@ namespace SharedUtil
     #define S43 15
     #define S44 21
 
-    CMD5Hasher::CMD5Hasher() {}
+    CMD5Hasher::CMD5Hasher()
+    {
+    }
 
-    CMD5Hasher::~CMD5Hasher() {}
+    CMD5Hasher::~CMD5Hasher()
+    {
+    }
 
     bool CMD5Hasher::Calculate(const char* szFilename, MD5& md5Result)
     {
@@ -210,7 +216,10 @@ namespace SharedUtil
         memset(m_buffer, 0, sizeof(m_buffer));
     }
 
-    const unsigned char* CMD5Hasher::GetResult() const { return m_digest; }
+    const unsigned char* CMD5Hasher::GetResult() const
+    {
+        return m_digest;
+    }
 
     void CMD5Hasher::Transform(unsigned char block[64])
     {
@@ -321,15 +330,30 @@ namespace SharedUtil
                 ((unsigned int)input[j]) | (((unsigned int)input[j + 1]) << 8) | (((unsigned int)input[j + 2]) << 16) | (((unsigned int)input[j + 3]) << 24);
     }
 
-    inline unsigned int CMD5Hasher::RotateLeft(unsigned int x, unsigned int n) { return (x << n) | (x >> (32 - n)); }
+    inline unsigned int CMD5Hasher::RotateLeft(unsigned int x, unsigned int n)
+    {
+        return (x << n) | (x >> (32 - n));
+    }
 
-    inline unsigned int CMD5Hasher::F(unsigned int x, unsigned int y, unsigned int z) { return (x & y) | (~x & z); }
+    inline unsigned int CMD5Hasher::F(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return (x & y) | (~x & z);
+    }
 
-    inline unsigned int CMD5Hasher::G(unsigned int x, unsigned int y, unsigned int z) { return (x & z) | (y & ~z); }
+    inline unsigned int CMD5Hasher::G(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return (x & z) | (y & ~z);
+    }
 
-    inline unsigned int CMD5Hasher::H(unsigned int x, unsigned int y, unsigned int z) { return x ^ y ^ z; }
+    inline unsigned int CMD5Hasher::H(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return x ^ y ^ z;
+    }
 
-    inline unsigned int CMD5Hasher::I(unsigned int x, unsigned int y, unsigned int z) { return y ^ (x | ~z); }
+    inline unsigned int CMD5Hasher::I(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return y ^ (x | ~z);
+    }
 
     inline void CMD5Hasher::FF(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac)
     {
@@ -359,7 +383,10 @@ namespace SharedUtil
     // Implementation of Bob Jenkin's awesome hash function
     // Ref: http://burtleburtle.net/bob/hash/doobs.html
     //
-    unsigned int HashString(const char* szString) { return HashString(szString, (unsigned int)strlen(szString)); }
+    unsigned int HashString(const char* szString)
+    {
+        return HashString(szString, (unsigned int)strlen(szString));
+    }
 
     unsigned int HashString(const char* szString, unsigned int length)
     {
@@ -545,18 +572,30 @@ namespace SharedUtil
                 if ((i & 1) == 0)
                     pOutput[i / 2] = (c << 4);            // First nibble
                 else
-                    pOutput[i / 2] |= c;            // Second nibble
+                    pOutput[i / 2] |= c;                  // Second nibble
             }
         }
     }
 
-    void GenerateSha256(const void* pData, uint uiLength, uchar output[32]) { sha256((const uchar*)pData, uiLength, output); }
+    void GenerateSha256(const void* pData, uint uiLength, uchar output[32])
+    {
+        sha256((const uchar*)pData, uiLength, output);
+    }
 
-    SString GenerateSha256HexString(const void* pData, uint uiLength) { return GenerateHashHexString(EHashFunction::SHA256, pData, uiLength); }
+    SString GenerateSha256HexString(const void* pData, uint uiLength)
+    {
+        return GenerateHashHexString(EHashFunction::SHA256, pData, uiLength);
+    }
 
-    SString GenerateSha256HexString(const SString& strData) { return GenerateHashHexString(EHashFunction::SHA256, strData); }
+    SString GenerateSha256HexString(const SString& strData)
+    {
+        return GenerateHashHexString(EHashFunction::SHA256, strData);
+    }
 
-    SString GenerateSha256HexStringFromFile(const SString& strFilename) { return GenerateHashHexStringFromFile(EHashFunction::SHA256, strFilename); }
+    SString GenerateSha256HexStringFromFile(const SString& strFilename)
+    {
+        return GenerateHashHexStringFromFile(EHashFunction::SHA256, strFilename);
+    }
 
     SString GenerateHashHexString(EHashFunctionType hashFunction, const void* pData, uint uiLength)
     {

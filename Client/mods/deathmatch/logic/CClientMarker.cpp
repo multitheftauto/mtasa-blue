@@ -39,15 +39,15 @@ CClientMarker::CClientMarker(CClientManager* pManager, ElementID ID, int iMarker
 
 CClientMarker::~CClientMarker()
 {
+    AttachTo(nullptr);
+
     // Unlink
     Unlink();
 
     // Make sure nothing is still referencing us
     m_pManager->UnreferenceEntity(this);
 
-    // Remove the colshape
-    if (m_pCollision)
-        delete m_pCollision;
+    SAFE_DELETE(m_pCollision)
 
     // Stream out first so the element counter is correct
     StreamOut();
@@ -74,26 +74,32 @@ void CClientMarker::GetPosition(CVector& vecPosition) const
     }
     else
     {
-        vecPosition = CVector();
+        vecPosition = m_vecPosition;
     }
 }
 
 void CClientMarker::SetPosition(const CVector& vecPosition)
 {
-    if (m_pMarker)
-        m_pMarker->SetPosition(vecPosition);
-    if (m_pCollision)
-        m_pCollision->SetPosition(vecPosition);
+    if (m_vecPosition != vecPosition)
+    {
+        m_vecPosition = vecPosition;
+        if (m_pMarker)
+            m_pMarker->SetPosition(vecPosition);
+        if (m_pCollision)
+            m_pCollision->SetPosition(vecPosition);
 
-    // Update our streaming position
-    UpdateStreamPosition(vecPosition);
+        // Update our streaming position
+        UpdateStreamPosition(vecPosition);
+    }
 }
 
 void CClientMarker::AttachTo(CClientEntity* pEntity)
 {
     CClientEntity::AttachTo(pEntity);
-    if (m_pCollision){
-        m_pCollision->AttachTo(pEntity);
+    if (m_pAttachedToEntity)
+    {
+        DoAttaching();
+        UpdateStreamPosition(m_vecPosition);
     }
 }
 
@@ -174,6 +180,7 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClientCheckpoint*>(m_pMarker)->SetCheckpointType(CClientCheckpoint::TYPE_RING);
+            return;
         }
 
         // Or current type is a ring and new type is a checkpoint?
@@ -181,6 +188,7 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClientCheckpoint*>(m_pMarker)->SetCheckpointType(CClientCheckpoint::TYPE_NORMAL);
+            return;
         }
 
         // Current type is a cylinder and new type is an arrow
@@ -188,6 +196,7 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClient3DMarker*>(m_pMarker)->Set3DMarkerType(CClient3DMarker::TYPE_ARROW);
+            return;
         }
 
         // Current type is an arrow and new type is an cylinder
@@ -195,6 +204,7 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
         {
             // Just change the type
             static_cast<CClient3DMarker*>(m_pMarker)->Set3DMarkerType(CClient3DMarker::TYPE_CYLINDER);
+            return;
         }
 
         // No easy way of changing the type. Different classes. Remember position and color and recreate it.
@@ -211,6 +221,9 @@ void CClientMarker::SetMarkerType(CClientMarker::eMarkerType eType)
 
         // Create a new one of the correct type
         CreateOfType(eType);
+
+        // Reset stored position to re-apply last position (fixes issue #2194)
+        m_vecPosition = {};
 
         // Set the properties back
         SetPosition(vecPosition);
@@ -485,6 +498,8 @@ void CClientMarker::CreateOfType(int iType)
         default:
             break;
     }
+    if (m_pCollision)
+        m_pCollision->SetCanBeDestroyedByScript(false);
 }
 
 CSphere CClientMarker::GetWorldBoundingSphere()

@@ -68,6 +68,11 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_pResourceIFPRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "ifproot");
     m_pResourceIFPRoot->MakeSystemEntity();
 
+    // Create our IMG root element. We set its parent when we're loaded.
+    // Make it a system entity so nothing but us can delete it.
+    m_pResourceIMGRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "imgroot");
+    m_pResourceIMGRoot->MakeSystemEntity();
+
     m_strResourceDirectoryPath = SString("%s/resources/%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
     m_strResourcePrivateDirectoryPath = PathJoin(CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(), m_strResourceName);
 
@@ -83,11 +88,18 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     if (m_pLuaVM)
     {
         m_pLuaVM->SetScriptName(szResourceName);
+        m_pLuaVM->LoadEmbeddedScripts();
     }
 }
 
 CResource::~CResource()
 {
+    // Deallocate all models that this resource allocated earlier
+    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
+
+    // Delete all the resource's locally created children (the server won't do that)
+    DeleteClientChildren();
+
     CIdArray::PushUniqueId(this, EIdClass::RESOURCE, m_uiScriptID);
     // Make sure we don't force the cursor on
     ShowCursor(false);
@@ -109,6 +121,10 @@ CResource::~CResource()
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceIFPRoot);
     m_pResourceIFPRoot = NULL;
 
+    // Destroy the img root so all img elements are deleted except those moved out
+    g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceIMGRoot);
+    m_pResourceIMGRoot = NULL;
+
     // Destroy the ddf root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceDFFEntity);
     m_pResourceDFFEntity = NULL;
@@ -120,9 +136,6 @@ CResource::~CResource()
     // Destroy the gui root so all gui elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceGUIEntity);
     m_pResourceGUIEntity = NULL;
-
-    // Deallocate all models that this resource allocated earlier
-    g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
 
     // Undo all changes to water
     g_pGame->GetWaterManager()->UndoChanges(this);
@@ -152,14 +165,6 @@ CResource::~CResource()
         delete (*iterc);
     }
     m_ConfigFiles.clear();
-
-    // Delete the exported functions
-    list<CExportedFunction*>::iterator iterExportedFunction = m_exportedFunctions.begin();
-    for (; iterExportedFunction != m_exportedFunctions.end(); ++iterExportedFunction)
-    {
-        delete (*iterExportedFunction);
-    }
-    m_exportedFunctions.clear();
 }
 
 CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResourceType resourceType, const char* szFileName, uint uiDownloadSize,
@@ -205,24 +210,10 @@ CDownloadableResource* CResource::AddConfigFile(const char* szFileName, uint uiD
     return pConfig;
 }
 
-void CResource::AddExportedFunction(const char* szFunctionName)
+bool CResource::CallExportedFunction(const SString& name, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
 {
-    m_exportedFunctions.push_back(new CExportedFunction(szFunctionName));
-}
-
-bool CResource::CallExportedFunction(const char* szFunctionName, CLuaArguments& args, CLuaArguments& returns, CResource& caller)
-{
-    list<CExportedFunction*>::iterator iter = m_exportedFunctions.begin();
-    for (; iter != m_exportedFunctions.end(); ++iter)
-    {
-        if (strcmp((*iter)->GetFunctionName(), szFunctionName) == 0)
-        {
-            if (args.CallGlobal(m_pLuaVM, szFunctionName, &returns))
-            {
-                return true;
-            }
-        }
-    }
+    if (m_exportedFunctions.find(name) != m_exportedFunctions.end())
+        return args.CallGlobal(m_pLuaVM, name.c_str(), &returns);
     return false;
 }
 
@@ -284,15 +275,16 @@ void CResource::Load()
         }
     }
 
-    // Load the no cache scripts first
-    for (std::list<SNoClientCacheScript>::iterator iter = m_NoClientCacheScriptList.begin(); iter != m_NoClientCacheScriptList.end(); ++iter)
+    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front())
     {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
-        const SNoClientCacheScript& item = *iter;
+
+        auto& item = list.front();
         GetVM()->LoadScriptFromBuffer(item.buffer.GetData(), item.buffer.GetSize(), item.strFilename);
+        item.buffer.ZeroClear();
+
         DECLARE_PROFILER_SECTION(OnPostLoadNoClientCacheScript)
     }
-    m_NoClientCacheScriptList.clear();
 
     // Load the files that are queued in the list "to be loaded"
     list<CResourceFile*>::iterator iter = m_ResourceFiles.begin();
@@ -322,7 +314,7 @@ void CResource::Load()
         else if (pResourceFile->IsAutoDownload())
         {
             // Check the file contents
-            if (CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
+            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) == pResourceFile->GetServerChecksum())
             {
             }
             else
@@ -343,6 +335,20 @@ void CResource::Load()
         CLuaArguments Arguments;
         Arguments.PushResource(this);
         m_pResourceEntity->CallEvent("onClientResourceStart", Arguments, true);
+
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+        if (pBitStream)
+        {
+            if (pBitStream->Can(eBitStreamVersion::OnPlayerResourceStart))
+            {
+                // Write resource net ID
+                pBitStream->Write(GetNetID());
+
+                g_pNet->SendPacket(PACKET_ID_PLAYER_RESOURCE_START, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+            }
+
+            g_pNet->DeallocateNetBitStream(pBitStream);
+        }
     }
     else
         assert(0);
@@ -470,13 +476,24 @@ void CResource::AddToElementGroup(CClientEntity* pElement)
 //
 void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript)
 {
-    // Compose message
-    uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
-    SString strGotMd5 = ConvertDataToHexString(CChecksum::GenerateChecksumFromFile(pResourceFile->GetName()).md5.data, sizeof(MD5));
-    SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+    auto checksumResult = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
+
+    SString errorMessage;
+    if (std::holds_alternative<std::string>(checksumResult))
+        errorMessage = std::get<std::string>(checksumResult);
+    else
+    {
+        CChecksum checksum = std::get<CChecksum>(checksumResult);
+
+        // Compose message
+        uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
+        SString strGotMd5 = ConvertDataToHexString(checksum.md5.data, sizeof(MD5));
+        SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
+        errorMessage = SString("Got size:%d MD5:%s, wanted MD5:%s", uiGotFileSize, *strGotMd5, *strWantedMd5);
+    }
+
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));
-    SString strMessage =
-        SString("HTTP server file mismatch (%s) %s [Got size:%d MD5:%s, wanted MD5:%s]", GetName(), *strFilename, uiGotFileSize, *strGotMd5, *strWantedMd5);
+    SString strMessage = SString("HTTP server file mismatch! (%s) %s [%s]", GetName(), *strFilename, *errorMessage);
 
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);
