@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-08 12:28+0000\n"
-"PO-Revision-Date: 2023-04-08 12:39\n"
+"POT-Creation-Date: 2023-04-09 14:54+0000\n"
+"PO-Revision-Date: 2023-04-09 15:56\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -1677,8 +1677,8 @@ msgid "Special Thanks"
 msgstr "Специјално Заблагодарување"
 
 #: Client/core/CCredits.cpp:258
-msgid "This software makes use of the following libraries and software:"
-msgstr "Овој софтвер се употребува од следните софтвери:"
+msgid "This software and project makes use of the following libraries and software:"
+msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
