@@ -209,6 +209,7 @@ public:
     virtual bool HasCreditScreenFadedOut() = 0;
     virtual void FlushPendingRestreamIPL() = 0;
     virtual void ResetModelLodDistances() = 0;
+    virtual void ResetModelFlags() = 0;
     virtual void ResetAlphaTransparencies() = 0;
     virtual void DisableVSync() = 0;
     virtual void ResetModelTimes() = 0;

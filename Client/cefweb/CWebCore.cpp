@@ -87,7 +87,6 @@ bool CWebCore::Initialise()
     bool state = CefInitialize(mainArgs, settings, app, sandboxInfo);
 
     // Register custom scheme handler factory
-    CefRegisterSchemeHandlerFactory("mtalocal", "", app);
     CefRegisterSchemeHandlerFactory("http", "mta", app);
 
     return state;

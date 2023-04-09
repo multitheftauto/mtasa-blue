@@ -44,7 +44,7 @@ public:
     BYTE NeonFade : 1;                 // Does the guy fade out when closer to cam
     BYTE OnlyFromBelow : 1;            // This corona is only visible if the camera is below it. ##SA##
     BYTE bHasValidHeightAboveGround : 1;
-    BYTE WhiteCore : 1;                // This corona rendered with a small white core.
+    BYTE WhiteCore : 1;            // This corona rendered with a small white core.
     BYTE bIsAttachedToEntity : 1;
 
     CEntitySAInterface* pEntityAttachedTo;

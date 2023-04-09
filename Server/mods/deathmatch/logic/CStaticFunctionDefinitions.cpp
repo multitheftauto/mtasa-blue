@@ -3049,12 +3049,12 @@ bool CStaticFunctionDefinitions::SetPlayerMoney(CElement* pElement, long lMoney,
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        // Is it above 99999999? Limit it to it
-        if (lMoney > 99999999)
-            lMoney = 99999999;
-        // Is it below -99999999?
-        else if (lMoney < -99999999)
-            lMoney = -99999999;
+        // Is it above 999999999? Limit it to it
+        if (lMoney > 999999999)
+            lMoney = 999999999;
+        // Is it below -999999999?
+        else if (lMoney < -999999999)
+            lMoney = -999999999;
 
         // Tell him his new money
         CBitStream BitStream;
@@ -3079,19 +3079,19 @@ bool CStaticFunctionDefinitions::GivePlayerMoney(CElement* pElement, long lMoney
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-        // Is it above 99999999? Limit it to it
-        if (lMoney > 99999999)
-            lMoney = 99999999;
-        // Is it below -99999999?
-        else if (lMoney < -99999999)
-            lMoney = -99999999;
+        // Is it above 999999999? Limit it to it
+        if (lMoney > 999999999)
+            lMoney = 999999999;
+        // Is it below -999999999?
+        else if (lMoney < -999999999)
+            lMoney = -999999999;
 
-        // Calculate his new money, if it exceeds 8 digits, set it to 99999999
+        // Calculate his new money, if it exceeds 9 digits, set it to 999999999
         long lNewMoney = pPlayer->GetMoney() + lMoney;
-        if (lNewMoney > 99999999)
-            lNewMoney = 99999999;
-        else if (lNewMoney < -99999999)
-            lNewMoney = -99999999;
+        if (lNewMoney > 999999999)
+            lNewMoney = 999999999;
+        else if (lNewMoney < -999999999)
+            lNewMoney = -999999999;
 
         // Tell him his new money
         CBitStream BitStream;
@@ -4691,9 +4691,9 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                 if (ucWeaponSlot <= 1 || ucWeaponSlot >= 10)
                     uiTotalAmmo = std::min(1U, uiTotalAmmo + usAmmo);            // If slot 0,1,10,11,12 - Ammo is max 1
                 else if ((ucWeaponSlot >= 3 && ucWeaponSlot <= 5) || ucPreviousWeaponID == ucWeaponID)
-                    uiTotalAmmo += usAmmo;                                       // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
+                    uiTotalAmmo += usAmmo;            // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
                 else
-                    uiTotalAmmo = usAmmo;                                        // Otherwise ammo is not shared, so replace
+                    uiTotalAmmo = usAmmo;            // Otherwise ammo is not shared, so replace
 
                 uiTotalAmmo = std::min(0xFFFFU, uiTotalAmmo);
                 pPed->SetWeaponTotalAmmo(uiTotalAmmo, ucWeaponSlot);
