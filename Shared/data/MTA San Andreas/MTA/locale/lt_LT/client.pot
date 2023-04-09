@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-08 12:28+0000\n"
-"PO-Revision-Date: 2023-04-08 12:39\n"
+"PO-Revision-Date: 2023-04-09 07:05\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -893,7 +893,7 @@ msgstr "Dinamiški pėsčiųjų šešėliai"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Liejimas judesiu"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -2194,14 +2194,18 @@ msgstr "Pagrindinis failas yra nepatvirtintas. Galimas virusų aktyvumas.\n\n"
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Trūksta duomenų failo %s. Galimas viruso aktyvumas.\n\n"
+"Apsvarstykite galimybę iš naujo įdiegti „Multi Theft Auto“ savo saugumui.\n"
+"Jei MTA neveikia tinkamai, žr. internetinę žinyną."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Duomenų failas %s pakeistas. Galimas viruso aktyvumas.\n\n"
+"Apsvarstykite galimybę iš naujo įdiegti „Multi Theft Auto“ savo saugumui.\n"
+"Jei MTA neveikia tinkamai, žr. internetinę žinyną."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2524,7 +2528,7 @@ msgstr "B - Alternatyvus NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "E - Standartinis Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
