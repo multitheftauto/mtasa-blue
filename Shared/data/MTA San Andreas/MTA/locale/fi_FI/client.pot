@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-08 12:28+0000\n"
-"PO-Revision-Date: 2023-04-08 12:39\n"
+"PO-Revision-Date: 2023-04-09 13:25\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -251,7 +251,7 @@ msgstr "määrittää näppäimen"
 
 #: Client/core/CCore.cpp:1346
 msgid "unbinds a key (key)"
-msgstr ""
+msgstr "poistaa näppäimen määrityksen"
 
 #: Client/core/CCore.cpp:1347
 msgid "copies the default gta controls"
@@ -541,7 +541,7 @@ msgstr "Peruuta"
 #: Client/core/CSettings.cpp:147 Client/core/CSettings.cpp:338
 #: Client/core/CSettings.cpp:600 Client/core/CSettings.cpp:872
 msgid "Load defaults"
-msgstr "Lataa oletukset"
+msgstr "Palauta oletusarvot"
 
 #. *
 #. *  Controls tab
@@ -757,11 +757,11 @@ msgstr "Tarkkuus:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:666
 msgid "FOV:"
-msgstr "Näkökenttä:"
+msgstr "Näkökenttä (FOV):"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:682
 msgid "Draw Distance:"
-msgstr "Piirtoetäisyys:"
+msgstr "Piirtoetäisyys (LOD):"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:700
 msgid "Brightness:"
@@ -769,7 +769,7 @@ msgstr "Kirkkaus:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:718
 msgid "FX Quality:"
-msgstr "Tehosteiden laatu:"
+msgstr "Laatu:"
 
 #: Client/core/CSettings.cpp:611 Client/core/CSettings.cpp:732
 msgid "Anisotropic filtering:"
@@ -777,7 +777,7 @@ msgstr "Anisotrooppinen suodatus:"
 
 #: Client/core/CSettings.cpp:611 Client/core/CSettings.cpp:759
 msgid "Anti-aliasing:"
-msgstr "Reunanpehmennys:"
+msgstr "Reunojen pehmennys:"
 
 #: Client/core/CSettings.cpp:611 Client/core/CSettings.cpp:773
 msgid "Aspect Ratio:"
@@ -785,11 +785,11 @@ msgstr "Kuvasuhde:"
 
 #: Client/core/CSettings.cpp:631
 msgid "Windowed"
-msgstr "Ikkunatila"
+msgstr "Ikkunallinen"
 
 #: Client/core/CSettings.cpp:637
 msgid "DPI aware"
-msgstr "DPI tietoinen"
+msgstr "DPI-tietoinen"
 
 #: Client/core/CSettings.cpp:645 Client/core/CSettings.cpp:987
 #: Client/loader/MainFunctions.cpp:388
@@ -889,7 +889,7 @@ msgstr "Renkaan savua jne"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dynaamiset varjot"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
@@ -909,15 +909,15 @@ msgstr "Näytä epäturvalliset resoluutiot"
 
 #: Client/core/CSettings.cpp:856
 msgid "Render vehicles always in high detail"
-msgstr "Renderöi ajoneuvot aina erittäin yksityiskohtaisesti"
+msgstr "Renderöi ajoneuvot aina yksityiskohtaisesti"
 
 #: Client/core/CSettings.cpp:860
 msgid "Render peds always in high detail"
-msgstr "Renderöi hahmot aina erittäin yksityiskohtaisesti"
+msgstr "Renderöi hahmot aina yksityiskohtaisesti"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Koronan heijastukset sateella"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
@@ -1386,7 +1386,10 @@ msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr ""
+msgstr "DPI-tietoisuus on kokeellinen ominaisuus ja suosittelemme\n"
+"sitä vain kun pelaat MTA:ta skaalautuneessa koossa.\n"
+"Saatat kokea visuaalisia häiriöitä jos käytät tätä asetusta.\n\n"
+"Oletko varma että haluat käyttää tätä asetusta?"
 
 #: Client/core/CSettings.cpp:4548
 msgid "EXPERIMENTAL FEATURE"
@@ -1598,7 +1601,7 @@ msgstr "LATAUS SUORITETTU"
 
 #: Client/core/CVersionUpdater.cpp:1990
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr ""
+msgstr " - Unknown problem in _DialogUpdateResult"
 
 #: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
 msgid "Ok"
@@ -1671,7 +1674,7 @@ msgstr "Lokalisointi"
 
 #: Client/core/CCredits.cpp:108
 msgid "Patch contributors"
-msgstr ""
+msgstr "Kehitykseen osallistuneet"
 
 #: Client/core/CCredits.cpp:227
 msgid "Special Thanks"
@@ -1735,11 +1738,11 @@ msgstr "PALVELINSELAIN"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:133
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
-msgstr "Internetti"
+msgstr "Internet"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
-msgstr "Paikallinen"
+msgstr "LAN"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:135
 msgid "Favourites"
@@ -2527,7 +2530,7 @@ msgstr "Jos olet jo valinnut toimivan vaihtoehdon, tämä saattaa auttaa:"
 
 #: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
-msgstr "Pakota ikkunatila"
+msgstr "Pakota ikkunaan"
 
 #: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
@@ -2663,16 +2666,16 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr ""
+msgstr "vaihtaa edelliseen aseeseen kun olet ajoneuvossa sisällä"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "tulostaa konsoliin tietoja pelipalvelimesta"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr ""
+msgstr "määrittää kaikkien text-display elementtien skaalan"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
