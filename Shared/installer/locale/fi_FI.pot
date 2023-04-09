@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-08 19:48\n"
-"PO-Revision-Date: 2023-02-08 20:07\n"
+"PO-Revision-Date: 2023-04-09 14:46\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -33,7 +33,9 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr ""
+msgstr "Tällä työkalulla asennat tai päivität $(^Name) ${REVISION_TAG}\n\n"
+"Suosittelemme muiden sovellusten lopettamista tässä kohtaa.\n\n"
+"Paina Next kun olet valmis."
 
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:213
@@ -126,12 +128,12 @@ msgstr "MTA:SA 1.0 Karttaeditori. Voit käyttää tätä omien MTA karttojen luo
 #. DESC_Section9
 #: Shared/installer/nightly.nsi:233
 msgid "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-msgstr ""
+msgstr "Tämä SDK on hyödyllinen moduulien rakentamisessa MTA pelipalvelimeen. Asenna vain jos osaat C++:aa!"
 
 #. DESC_SectionGroupDev
 #: Shared/installer/nightly.nsi:235
 msgid "Development code and tools that aid in the creation of mods for Multi Theft Auto"
-msgstr ""
+msgstr "Modien kehitystyökalut"
 
 #. DESC_SectionGroupClient
 #: Shared/installer/nightly.nsi:236
@@ -166,7 +168,7 @@ msgstr "Rekisteröi mtasa:// protokolla"
 #. INST_GAMES_EXPLORER
 #: Shared/installer/nightly.nsi:457
 msgid "Add to Games Explorer"
-msgstr ""
+msgstr "Lisää Games Exploreriin"
 
 #. INST_DIRECTX
 #: Shared/installer/nightly.nsi:458
@@ -274,12 +276,12 @@ msgstr "Tämä poistotyökalu vaatii järjestelmänvalvojan oikeudet, ola hyvä 
 #. UAC_RIGHTS3
 #: Shared/installer/nightly.nsi:1189
 msgid "Logon service not running, aborting!"
-msgstr ""
+msgstr "Logon service not running, aborting!"
 
 #. UAC_RIGHTS4
 #: Shared/installer/nightly.nsi:1190
 msgid "Unable to elevate"
-msgstr ""
+msgstr "Ei voitu ylentää"
 
 #. INST_MTA_CONFLICT
 #: Shared/installer/nightly.nsi:1786
