@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-09 14:54+0000\n"
-"PO-Revision-Date: 2023-04-09 15:56\n"
+"PO-Revision-Date: 2023-04-09 17:16\n"
 "Last-Translator: \n"
 "Language-Team: Lithuanian\n"
 "Language: lt_LT\n"
@@ -491,7 +491,7 @@ msgstr "Pagrindinis"
 
 #: Client/core/CSettings.cpp:117
 msgid "Video"
-msgstr "Vaizdo įrašas"
+msgstr "Vaizdas"
 
 #: Client/core/CSettings.cpp:118
 msgid "Audio"
@@ -2371,7 +2371,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Kopijuoti MTA:SA failus"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
@@ -2399,7 +2399,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Sutvarkyti GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
@@ -2423,7 +2423,7 @@ msgstr "Atnaujinti suderinamumo nustatymus"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Nežinomas"
 
 #: Client/loader/Install.cpp:272
 #, c-format
