@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-08 12:28+0000\n"
-"PO-Revision-Date: 2023-04-09 13:25\n"
+"PO-Revision-Date: 2023-04-09 14:45\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -441,7 +441,7 @@ msgstr "Katso taaksepäin (kulkuneuvossa)"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr ""
+msgstr "Vehicle mouse look"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
@@ -893,7 +893,7 @@ msgstr "Dynaamiset varjot"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Motion blur"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -1411,7 +1411,7 @@ msgstr "Erityisen kokeellinen ominaisuus."
 
 #: Client/core/CSettings.cpp:4712
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr ""
+msgstr "Auttaa CJ-variaatioiden latausten kanssa (Käyttää 65MB enemmän muistia)"
 
 #: Client/core/CSettings.cpp:4714
 msgid "Older routers may require a slower scan speed."
@@ -1443,11 +1443,11 @@ msgstr "Automaattinen päivitys:"
 
 #: Client/core/CSettings.cpp:4726
 msgid "Select default unless you like filling out bug reports."
-msgstr ""
+msgstr "Valitse oletus ellet pidä bugien raportoinnista."
 
 #: Client/core/CSettings.cpp:4728
 msgid "Select default to automatically install important updates."
-msgstr ""
+msgstr "Valitse oletus asentaaksesi tärkeät päivitykset automaattisesti."
 
 #: Client/core/CSettings.cpp:4730
 msgid "16-bit color:"
@@ -1455,7 +1455,7 @@ msgstr "16-bittinen väri:"
 
 #: Client/core/CSettings.cpp:4730
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr ""
+msgstr "Käytä 16 bittistä väriavaruutta - Tarvitsee MTA:n uudelleenkäynnistyksen"
 
 #: Client/core/CSettings.cpp:4732
 msgid "Mouse fix:"
@@ -1463,7 +1463,7 @@ msgstr "Hiiren korjaus:"
 
 #: Client/core/CSettings.cpp:4732
 msgid "Mouse movement fix - May need PC restart"
-msgstr ""
+msgstr "Hiiren liikkeen korjaus - Saattaa tarvita PC:n uudelleenkäynnistyksen"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
@@ -1487,7 +1487,7 @@ msgstr "Tutustu uusimpaan uutisartikkeliin"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr ""
+msgstr "Haluatko etsiä apua tähän ongelmaan?"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -1507,12 +1507,13 @@ msgstr "MTA:SA %s vaaditaan"
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr ""
+msgstr "Sinun pitää päivittää MTA:SA %s yhdistääksesi tälle pelipalvelimelle.\n\n"
+"Haluatko ladata ja asentaa MTA:SA %s?"
 
 #: Client/core/CVersionUpdater.cpp:1588
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr ""
+msgstr "Haluatko käynnistää MTA:SA %s ja yhdistää tähän pelipalvelimeen?"
 
 #: Client/core/CVersionUpdater.cpp:1606
 msgid "It is not possible to connect at this time.\n\n"
@@ -1632,7 +1633,7 @@ msgstr "\n\n"
 #: Client/core/CScreenShot.cpp:104
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr ""
+msgstr "Kuvakaappaus on %d tavua, kun odotettiin %d tavua"
 
 #: Client/core/CScreenShot.cpp:110
 msgid "Screenshot failed"
@@ -1950,7 +1951,7 @@ msgstr "(Vara-palvelinlista)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:326
 msgid "Cannot bind LAN-broadcast socket"
-msgstr ""
+msgstr "Ei voitu yhdistää LAN-broadcast sokettiin"
 
 #: Client/core/ServerBrowser/CServerList.cpp:345
 msgid "Attempting to discover LAN servers"
@@ -2141,14 +2142,16 @@ msgstr "Rekisteritietoja puuttuu. Ole hyvä ja asenna Multi Theft Auto: San Andr
 
 #: Client/loader/MainFunctions.cpp:637
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr ""
+msgstr "GTA:SA-asennuspolkusi sisältää (unicode) merkkejä joita ei tueta. Ole hyvä ja uudelleenasenna GTA:SA polkuun, joka sisältää vain perinteisiä ASCII-merkkejä ja uudelleenasenna sitten MTA:SA."
 
 #: Client/loader/MainFunctions.cpp:647
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
 " move your installation(s) to a path that does not contain a semicolon."
-msgstr ""
+msgstr "MTA- tai GTA-asennuspolkusi sisältää ';' merkin (puolipisteen).\n\n"
+" Jos koet ongelmia MTA:n kanssa, asenna MTA/GTA\n"
+" polkuun joka ei sisällä puolipistettä."
 
 #: Client/loader/MainFunctions.cpp:809
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
@@ -2185,14 +2188,18 @@ msgstr "Päätiedosto on allekirjoittamaton. Mahdollista viruksen toimintaa.\n\n
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Datatiedosto %s puuttuu. Mahdollista viruksen toimintaa.\n\n"
+"Harkitse MTA:n uudelleenasennusta turvallisuussyistä.\n"
+"Etsi apua netistä jos MTA ei toimi oikein."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Datatiedosto %s on muuttunut. Mahdollista viruksen toimintaa.\n\n"
+"Harkitse MTA:n uudelleenasennusta turvallisuussyistä.\n"
+"Etsi apua netistä jos MTA ei toimi oikein."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2280,12 +2287,13 @@ msgstr "Valmis!"
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
-msgstr ""
+msgstr "Uusi %s asennus havaittu.\n\n"
+"Haluatko kopioida asetuksesi %s:sta?"
 
 #: Client/loader/Utils.cpp:1541
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr ""
+msgstr "GTA:SA törmäsi ongelmaan avatessaan tiedostoa '%s'"
 
 #: Client/loader/Utils.cpp:1563
 #, c-format
@@ -2294,7 +2302,7 @@ msgstr "GTA:SA:sta puuttuu tiedosto '%s'."
 
 #: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
-msgstr ""
+msgstr "GTA:SA törmäsi ongelmaan ladatessaan mallia."
 
 #: Client/loader/Utils.cpp:1590
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
@@ -2302,7 +2310,7 @@ msgstr "Jos muokkasit gta3.img tiedostoa viime aikoina, kokeile asentaa GTA:SA u
 
 #: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr ""
+msgstr "GTA:SA törmäsi ongelmaan lisätessään tehostusta ajoneuvoon."
 
 #: Client/loader/Utils.cpp:1634
 #, c-format
@@ -2345,51 +2353,51 @@ msgstr "Multi Theft Autoa ei ole asennettu oikein, ole hyvä ja asenna se uudell
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Luo GTA:SA risteykset"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA ei pysty käynnistymään koska tiedoston kopiointi epäonnistui:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA ei pysty käynnistymään koska jokin MTA:n tiedosto on virheellinen tai ei löydy:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Kopioi MTA:SA tiedostot"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA ei pysty käynnistymään koska jokin GTA:SA:n tiedosto on virheellinen tai ei löydy:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Korjaa GTA:SA riippuvuus"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA on virheellinen tai ei löydy:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Tarkista antiviruksestasi mahdollinen karanteeni tai muu esto, lisää GTA:SA:lle poikkeus, ja kokeile sitten käynnistää MTA:SA uudelleen."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Generoi GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA:ta ei voida ladata käyttöön:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Korjaa GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA:n korjaus epäonnistui:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -2409,14 +2417,16 @@ msgstr "Päivitä yhteensopivuusasetukset"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Tuntematon"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Tiedosto '%s' on lukittuna %zu prosessin toimesta.\n\n"
+"Haluatko lopettaa seuraavat prosessit ja jatkaa päivitystä?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -2424,7 +2434,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Asennuksesi saattaa olla korruptoitunut.\n\n"
+"%zu/%zu tiedostoa ei voitu palauttaa varmuuskopiosta.\n\n"
+"Asenna Multi Theft Auto uudelleen osoitteesta www.multitheftauto.com\n"
+"tai kokeile päivittää järjestelmänvalvojan oikeuksilla."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -2514,11 +2527,11 @@ msgstr "B - Vaihtoehtoinen NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Standard Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Alternate Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -2614,55 +2627,55 @@ msgstr "edellinen radiokanava"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr ""
+msgstr "näyttää/piilottaa kartan"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
-msgstr ""
+msgstr "zoomaa karttaa sisään"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the radar out"
-msgstr ""
+msgstr "zoomaa karttaa ulos"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the radar north"
-msgstr ""
+msgstr "liikuttaa karttaa pohjoiseen"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the radar south"
-msgstr ""
+msgstr "liikuttaa karttaa etelään"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the radar east"
-msgstr ""
+msgstr "liikuttaa karttaa itään"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the radar west"
-msgstr ""
+msgstr "liikuttaa karttaa länteen"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
-msgstr ""
+msgstr "kiinnittää kartan"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
-msgstr ""
+msgstr "vähentää kartan läpinäkyvyyttä"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases radar opacity"
-msgstr ""
+msgstr "lisää kartan läpinäkyvyyttä"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles radar help text"
-msgstr ""
+msgstr "näyttää/piilottaa kartan ohjeen"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
-msgstr ""
+msgstr "lähettää yksityisviestin kyseiselle pelaajalle"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr ""
+msgstr "vaihtaa seuraavaan aseeseen kun olet ajoneuvossa sisällä"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
@@ -2680,11 +2693,11 @@ msgstr "määrittää kaikkien text-display elementtien skaalan"
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
-msgstr ""
+msgstr "(Kehitystila) näyttää/piilottaa colshapet"
 
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr ""
+msgstr "(Kehitystila) tulostaa maailman äänten id:t debug konsoliin"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -2713,7 +2726,7 @@ msgstr "Max. pelaajat:"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr ""
+msgstr "Broadcast:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
@@ -2737,7 +2750,7 @@ msgstr "Liitytään peliin..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr ""
+msgstr "Ei yhdistetty; ole hyvä ja käytä Yhdistä-painiketta tai 'connect' komentoa yhdistääksesi pelipalvelimelle."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:708
 msgid "The server is not installed"
