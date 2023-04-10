@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-09 14:54+0000\n"
-"PO-Revision-Date: 2023-04-09 15:55\n"
+"PO-Revision-Date: 2023-04-10 05:16\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -722,7 +722,7 @@ msgstr "تسلسلي"
 
 #: Client/core/CSettings.cpp:561
 msgid "Automatic Media Scan"
-msgstr "الفحص التلقائي لملفات الوسائط"
+msgstr "وسائط المسح التلقائي"
 
 #: Client/core/CSettings.cpp:568
 msgid "Mute options"
@@ -1556,8 +1556,8 @@ msgstr "تحديث الزامي"
 #: Client/core/CVersionUpdater.cpp:1857
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
-msgstr "للدخول إلى هذا الخادم، يجب عليك تحديث MTA.\n\n"
-"هل تريد التحديث الآن؟"
+msgstr "للانضمام إلى هذا الخادم يجب عليك تحديث MTA\n\n"
+"هل تريد التحديث الآن !"
 
 #: Client/core/CVersionUpdater.cpp:1875
 msgid "OPTIONAL UPDATE"
@@ -1683,7 +1683,7 @@ msgstr "شكر خاص"
 
 #: Client/core/CCredits.cpp:258
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "هذا البرنامَج الفعل من استخدام المكتبات والبرامج الأتية:"
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
