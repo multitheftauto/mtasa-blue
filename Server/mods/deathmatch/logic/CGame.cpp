@@ -1459,7 +1459,7 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
     const char* szNick = Player.GetNick();
     if (bSayInConsole && szNick && szNick[0] && !m_bBeingDeleted)
     {
-        CLogger::LogPrintf("QUIT: %s left the game [%s]%s\n", szNick, szReason, *Player.GetQuitReasonForLog());
+        CLogger::LogPrintf("QUIT: %s left the game [%s] %s\n", szNick, szReason, *Player.GetQuitReasonForLog());
     }
 
     // If he had joined
