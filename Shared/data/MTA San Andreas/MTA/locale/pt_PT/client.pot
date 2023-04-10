@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-10 17:42+0000\n"
-"PO-Revision-Date: 2023-04-10 18:16\n"
+"PO-Revision-Date: 2023-04-10 19:27\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -295,7 +295,7 @@ msgstr "mostra o gráfico de frame timing"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "para desenvolvedores: recarregar notícias"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
@@ -1687,7 +1687,7 @@ msgstr "Agradecimentos especiais"
 
 #: Client/core/CCredits.cpp:258
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "Este software e projeto utiliza as seguintes bibliotecas e software:"
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
