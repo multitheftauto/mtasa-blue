@@ -256,7 +256,7 @@ void CLuaModule::ErrorPrintf(const char* szFormat, ...)
 {
     va_list args;
     va_start(args, szFormat);
-    CLogger::ErrorPrintf(szFormat, args);
+    CLogger::ErrorPrintvf(szFormat, args);
     va_end(args);
 }
 
