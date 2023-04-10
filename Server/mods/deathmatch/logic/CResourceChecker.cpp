@@ -303,24 +303,24 @@ void CResourceChecker::CheckMetaFileForIssues(const string& strPath, const strin
     else
         // ..or do an upgrade
         if (m_bUpgradeScripts == true)
+    {
+        bool bHasChanged = false;
+        CheckMetaSourceForIssues(pRootNode, strFileName, strResourceName, ECheckerMode::UPGRADE, &bHasChanged);
+
+        // Has contents changed?
+        if (bHasChanged)
         {
-            bool bHasChanged = false;
-            CheckMetaSourceForIssues(pRootNode, strFileName, strResourceName, ECheckerMode::UPGRADE, &bHasChanged);
+            // Rename original to xml.old
+            if (!RenameBackupFile(strPath, ".old"))
+                return;
 
-            // Has contents changed?
-            if (bHasChanged)
-            {
-                // Rename original to xml.old
-                if (!RenameBackupFile(strPath, ".old"))
-                    return;
+            // Save new content
+            metaFile->Write();
+            CLogger::LogPrintf("Upgrading %s:%s ...........done\n", strResourceName.c_str(), strFileName.c_str());
 
-                // Save new content
-                metaFile->Write();
-                CLogger::LogPrintf("Upgrading %s:%s ...........done\n", strResourceName.c_str(), strFileName.c_str());
-
-                m_upgradedFullPathList.push_back(strPath);
-            }
+            m_upgradedFullPathList.push_back(strPath);
         }
+    }
 
     delete metaFile;
 }

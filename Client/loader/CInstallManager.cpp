@@ -41,25 +41,13 @@ namespace
     }
 
     // Comms between 'Admin' and 'User' processes
-    void SendStringToUserProcess(const SString& strText)
-    {
-        SetApplicationSetting("admin2user_comms", strText);
-    }
+    void SendStringToUserProcess(const SString& strText) { SetApplicationSetting("admin2user_comms", strText); }
 
-    SString ReceiveStringFromAdminProcess()
-    {
-        return GetApplicationSetting("admin2user_comms");
-    }
+    SString ReceiveStringFromAdminProcess() { return GetApplicationSetting("admin2user_comms"); }
 
-    bool IsBlockingUserProcess()
-    {
-        return GetApplicationSetting("admin2user_comms") == "user_waiting";
-    }
+    bool IsBlockingUserProcess() { return GetApplicationSetting("admin2user_comms") == "user_waiting"; }
 
-    void SetIsBlockingUserProcess()
-    {
-        SetApplicationSetting("admin2user_comms", "user_waiting");
-    }
+    void SetIsBlockingUserProcess() { SetApplicationSetting("admin2user_comms", "user_waiting"); }
 
     void ClearIsBlockingUserProcess()
     {

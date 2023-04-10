@@ -102,14 +102,14 @@ enum eWeaponType
     WEAPONTYPE_SHOTGUN,                    // shotguns
     WEAPONTYPE_SAWNOFF_SHOTGUN,            // one handed
     WEAPONTYPE_SPAS12_SHOTGUN,
-    WEAPONTYPE_MICRO_UZI,                  // submachine guns
+    WEAPONTYPE_MICRO_UZI,            // submachine guns
     WEAPONTYPE_MP5,
-    WEAPONTYPE_AK47,                       // 30      // machine guns
+    WEAPONTYPE_AK47,            // 30      // machine guns
     WEAPONTYPE_M4,
-    WEAPONTYPE_TEC9,                       // this uses stat from the micro_uzi
+    WEAPONTYPE_TEC9,            // this uses stat from the micro_uzi
     // END SKILL WEAPONS
 
-    WEAPONTYPE_COUNTRYRIFLE,              // rifles
+    WEAPONTYPE_COUNTRYRIFLE,            // rifles
     WEAPONTYPE_SNIPERRIFLE,
     WEAPONTYPE_ROCKETLAUNCHER,            // specials
     WEAPONTYPE_ROCKETLAUNCHER_HS,

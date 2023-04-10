@@ -1756,7 +1756,7 @@ void DoSetHeatHazePokes(const SHeatHazeSettings& settings, int iHourStart, int i
 void CMultiplayerSA::SetHeatHaze(const SHeatHazeSettings& settings)
 {
     if (settings.ucIntensity != 0)
-        DoSetHeatHazePokes(settings, 0, 24, 1.0f, 1.0f, false);             // 24 hrs
+        DoSetHeatHazePokes(settings, 0, 24, 1.0f, 1.0f, false);            // 24 hrs
     else
         DoSetHeatHazePokes(settings, 38, 39, 1.0f, 1.0f, false);            // 0 hrs
 
@@ -4054,7 +4054,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
     }
     else if (ucTrafficLightState == 9)
     {
-        ucDesignatedLightState = 4;             // Off
+        ucDesignatedLightState = 4;            // Off
     }
     else ucDesignatedLightState = 2;            // Red
 
@@ -4083,7 +4083,7 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
     }
     else if (ucTrafficLightState == 9)
     {
-        ucDesignatedLightState = 4;             // Off
+        ucDesignatedLightState = 4;            // Off
     }
     else ucDesignatedLightState = 2;            // Red
 
@@ -4106,14 +4106,8 @@ void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
     {
         ucDesignatedLightState = 0;
     }
-    else if (ucTrafficLightState == 9)
-    {
-        ucDesignatedLightState = 1;
-    }
-    else
-    {
-        ucDesignatedLightState = 2;
-    }
+    else if (ucTrafficLightState == 9) { ucDesignatedLightState = 1; }
+    else { ucDesignatedLightState = 2; }
 
     _asm
     {
@@ -7046,18 +7040,18 @@ bool CanEntityCollideWithCamera(CEntitySAInterface* pEntity)
     switch (pEntity->m_nModelIndex)
     {
         // projectiles
-        case 342: // grenade
-        case 343: // teargas
-        case 344: // molotov
-        case 363: // satchel
+        case 342:            // grenade
+        case 343:            // teargas
+        case 344:            // molotov
+        case 363:            // satchel
 
         // vehicle parts
-        case 374: // car_door
-        case 375: // car_bumper
-        case 376: // car_panel
-        case 377: // car_bonnet
-        case 378: // car_boot
-        case 379: // car_wheel
+        case 374:            // car_door
+        case 375:            // car_bumper
+        case 376:            // car_panel
+        case 377:            // car_bonnet
+        case 378:            // car_boot
+        case 379:            // car_wheel
             return false;
     }
 

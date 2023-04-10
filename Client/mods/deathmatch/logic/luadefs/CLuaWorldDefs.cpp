@@ -264,11 +264,12 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     argStream.ReadBool(flags.bIgnoreSomeObjectsForCamera, false);
     argStream.ReadBool(flags.bShootThroughStuff, false);
 
-    if (argStream.NextIsTable()) // Is the next value a table? Read it as a user data table (will error if table contains invalid type)
+    if (argStream.NextIsTable())            // Is the next value a table? Read it as a user data table (will error if table contains invalid type)
     {
         argStream.ReadUserDataTable(vecIgnoredElements);
     }
-    else {
+    else
+    {
         CClientEntity* pIgnoredElement;
         argStream.ReadUserData(pIgnoredElement, NULL);
 

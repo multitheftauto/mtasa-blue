@@ -403,7 +403,7 @@ void CMainMenu::SetMenuVerticalPosition(int iPosY)
 
 void CMainMenu::SetMenuUnhovered()            // Dehighlight all our items
 {
-    if (m_bIsIngame)                          // CEGUI hack
+    if (m_bIsIngame)            // CEGUI hack
     {
         float fAlpha = m_pDisconnect->image->GetAlpha();
         m_pDisconnect->image->SetAlpha(0.35f);
