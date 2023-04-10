@@ -17,7 +17,7 @@
 #include "CWorldSA.h"
 
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 #define ARRAY_SurfaceInfos 0xB79538
 

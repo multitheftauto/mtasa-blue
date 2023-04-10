@@ -205,7 +205,7 @@ protected:
     std::vector<CLatentSendQueue*>           m_SendQueueList;
     std::map<NetPlayerID, CLatentSendQueue*> m_SendQueueMap;
     CBufferRef                               m_pBatchBufferRef;
-    
+
     // Receive variables
     std::map<NetPlayerID, CLatentReceiver*> m_ReceiverMap;
 };

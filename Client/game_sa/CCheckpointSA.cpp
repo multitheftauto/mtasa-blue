@@ -67,8 +67,8 @@ void CCheckpointSA::SetIdentifier(DWORD dwIdentifier)
 SharedUtil::SColor CCheckpointSA::GetColor()
 {
     // From ABGR
-    unsigned long ulABGR = GetInterface()->rwColour;
-    SharedUtil::SColor        color;
+    unsigned long      ulABGR = GetInterface()->rwColour;
+    SharedUtil::SColor color;
     color.A = (ulABGR >> 24) & 0xff;
     color.B = (ulABGR >> 16) & 0xff;
     color.G = (ulABGR >> 8) & 0xff;
