@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-10 17:42+0000\n"
-"PO-Revision-Date: 2023-04-10 18:16\n"
+"PO-Revision-Date: 2023-04-10 19:27\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Language: pl_PL\n"
@@ -295,7 +295,7 @@ msgstr "pokazuje wykres czasu klatek"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "Dla deweloperów: przeładuj nowości"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
