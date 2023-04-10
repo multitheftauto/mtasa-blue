@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-09 14:54+0000\n"
-"PO-Revision-Date: 2023-04-09 15:55\n"
+"PO-Revision-Date: 2023-04-10 17:09\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2392,7 +2392,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Actualizează GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
@@ -2416,14 +2416,16 @@ msgstr "Actualizează setările de compatibilitate"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Necunoscut"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Fișierul '%s' este blocat de procesul %zu.\n\n"
+"Dorești să termini acest proces și să continui cu actualizarea?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -2431,7 +2433,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Descărcarea ta s-ar putea să fie coruptă.\n\n"
+"%zu din %zu fișiere nu au putut fi restaurate din backup.\n\n"
+"Ar trebui să reinstalezi Multi Theft Auto de pe www.multitheftauto.com\n"
+"sau să încerci să actualizezi jocul folosind permisiunile de administrator."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
