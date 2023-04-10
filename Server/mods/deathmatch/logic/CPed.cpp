@@ -80,6 +80,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_bCollisionsEnabled = true;
 
     m_pJackingVehicle = NULL;
+    m_nearPlayersList.reserve(20);
 
     // Add us to the Ped manager
     if (pPedManager)

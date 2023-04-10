@@ -1102,7 +1102,7 @@ CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString&
 {
     const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
     auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
-                                         [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
+                           [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
     if (it != m_pVecAnimations->end())
     {
         return it->pHierarchy->GetInterface();

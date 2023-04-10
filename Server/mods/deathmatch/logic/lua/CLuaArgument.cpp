@@ -827,7 +827,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
             }
             else
             {
-                if (pElement)                    // eg toJSON() with valid element
+                if (pElement)            // eg toJSON() with valid element
                     g_pGame->GetScriptDebugging()->LogError(NULL, "Couldn't convert userdata argument to JSON, elements not allowed for this function.");
                 else if (!bSerialize)            // eg toJSON() with invalid element
                     g_pGame->GetScriptDebugging()->LogError(
