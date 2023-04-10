@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-10 17:42+0000\n"
-"PO-Revision-Date: 2023-04-10 18:16\n"
+"PO-Revision-Date: 2023-04-10 20:28\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -295,7 +295,7 @@ msgstr "frame grafikon mutatása"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "fejlesztőknek: hírek újratöltése"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
