@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-10 17:42+0000\n"
-"PO-Revision-Date: 2023-04-10 18:16\n"
+"PO-Revision-Date: 2023-04-10 19:26\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -2379,7 +2379,7 @@ msgstr "MTA:SA ne peut pas être lancé car un fichier GTA:SA est incorrect ou m
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Patcher la dépendance de GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
@@ -2387,11 +2387,11 @@ msgstr "MTA:SA ne peut pas être lancé car l'exécutable de GTA:SA est incorrec
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Veuillez vérifier votre antivirus pour une détection de faux positifs, essayez d'ajouter une exception pour l'exécutable GTA:SA et redémarrez MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Générer GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
@@ -2399,7 +2399,7 @@ msgstr "MTA:SA ne peut pas être lancé car l'exécutable de GTA:SA n'est pas ch
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Patcher GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
@@ -2423,14 +2423,16 @@ msgstr "MAJ des paramètres de compatibilité"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Inconnu"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Le fichier '%s' est actuellement verrouillé par les processus %zu.\n\n"
+"Voulez-vous mettre fin aux processus suivants et continuer la mise à jour ?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -2438,7 +2440,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Votre installation est peut-être corrompue.\n\n"
+"%zu sur %zu fichiers n'ont pas pu être restaurés à partir de la sauvegarde.\n\n"
+"Vous devriez réinstaller Multi Theft Auto depuis www.multitheftauto.com\n"
+"ou essayez d'exécuter la mise à jour avec les droits d'administrateur."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -2528,11 +2533,11 @@ msgstr "B - NVidia Alternatif"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Intel standard"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Intel alternatif"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
