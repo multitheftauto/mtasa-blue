@@ -56,7 +56,7 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 
     const auto NodeNameEndsWith = [=](const char* with) {
         const auto withLen = strlen(with);
-        //dassert(withLen <= nodeNameLen);
+        // dassert(withLen <= nodeNameLen);
         return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
                && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
     };

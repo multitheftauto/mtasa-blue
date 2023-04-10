@@ -16,7 +16,7 @@ static CColModelSAInterface colModelGrenade;
 static void InitializeGrenadeColModel()
 {
     // CColModel::CColModel
-    ((CColModelSAInterface*(__thiscall*)(CColModelSAInterface*))(0x40FB60))(&colModelGrenade);
+    ((CColModelSAInterface * (__thiscall*)(CColModelSAInterface*))(0x40FB60))(&colModelGrenade);
 
     colModelGrenade.m_bounds.m_vecMin = CVector(-0.25f, -0.25f, -0.25f);
     colModelGrenade.m_bounds.m_vecMax = CVector(0.25f, 0.25f, 0.25f);
@@ -29,10 +29,7 @@ static void InitializeGrenadeColModel()
 
     // CColSphere::Set
     ((void(__thiscall*)(CColSphereSA*, float, CVector&, unsigned char, char, unsigned char))(0x40FD10))(
-        &colModelGrenade.m_data->m_spheres[0],
-        colModelGrenade.m_sphere.m_radius * 0.75f,
-        colModelGrenade.m_sphere.m_center,
-        56, 0, 255);
+        &colModelGrenade.m_data->m_spheres[0], colModelGrenade.m_sphere.m_radius * 0.75f, colModelGrenade.m_sphere.m_center, 56, 0, 255);
 }
 
 #define HOOKPOS_CTempColModels__Initialise 0x5BB87D

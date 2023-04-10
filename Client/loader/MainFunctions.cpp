@@ -34,7 +34,7 @@ public:
 
     virtual std::vector<SString> GetAvailableLocales() { return std::vector<SString>(); }
     virtual bool                 IsLocalized() { return false; }
-    virtual SString              GetLanguageDirectory() { return ""; }
+    virtual SString              GetLanguageDirectory(CLanguage* pLanguage = nullptr) { return ""; }
     virtual SString              GetLanguageCode() { return "en_US"; }
     virtual SString              GetLanguageName() { return "English"; }
 };
@@ -820,7 +820,7 @@ void CheckDataFiles()
     }
 
     // Make sure the gta executable exists
-    if (!FileExists(PathJoin(strGTAPath, MTA_GTAEXE_NAME)))
+    if (!FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) && !FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME)))
     {
         DisplayErrorMessageBox(SString(_("Load failed. Could not find gta_sa.exe in %s."), strGTAPath.c_str()), _E("CL20"), "gta_sa-missing");
         return ExitProcess(EXIT_ERROR);
@@ -862,14 +862,14 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"8E58FCC0672A66C827C6F90FA4B58538", "bass.dll"},            {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
-                              {"07C11F7D8058F350ADF6FC9AB81B38AC", "bass_ac3.dll"},        {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
-                              {"65F79B61AD377DE06D88FE40B1D70538", "bassflac.dll"},        {"9AAF837944A9763CD914AC7D31ABC8C7", "bassmidi.dll"},
-                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},         {"75FCD499EE86AC9B234FF837D2080CDA", "bassopus.dll"},
-                              {"07852D9E8DB268D0187EDDBDD25A29E9", "basswebm.dll"},        {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
-                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},            {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
-                              {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"},  {"1C9B45E87528B8BB8CFA884EA0099A85", "d3dcompiler_43.dll"},
-                              {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},        {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
+    } integrityCheckList[] = {{"8E58FCC0672A66C827C6F90FA4B58538", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
+                              {"07C11F7D8058F350ADF6FC9AB81B38AC", "bass_ac3.dll"},       {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
+                              {"65F79B61AD377DE06D88FE40B1D70538", "bassflac.dll"},       {"9AAF837944A9763CD914AC7D31ABC8C7", "bassmidi.dll"},
+                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},        {"75FCD499EE86AC9B234FF837D2080CDA", "bassopus.dll"},
+                              {"07852D9E8DB268D0187EDDBDD25A29E9", "basswebm.dll"},       {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
+                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},           {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
+                              {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"1C9B45E87528B8BB8CFA884EA0099A85", "d3dcompiler_43.dll"},
+                              {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
                               {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
 
     for (const auto& item : integrityCheckList)
@@ -912,10 +912,7 @@ void CheckDataFiles()
     // Check for graphics libraries in the GTA/MTA install directory
     {
         // An array of pairs of: a registry prefix and a directory path
-        std::array<std::pair<const char*, SString>, 2> directoriesToCheck = {{
-            {"", strGTAPath},
-            {"mta-", PathJoin(strMTASAPath, "mta")}
-        }};
+        std::array<std::pair<const char*, SString>, 2> directoriesToCheck = {{{"", strGTAPath}, {"mta-", PathJoin(strMTASAPath, "mta")}}};
 
         std::vector<GraphicsLibrary> offenders;
 
@@ -1046,53 +1043,58 @@ void CheckLibVersions()
 BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandLine, const SString& lpCurrentDirectory,
                      LPPROCESS_INFORMATION lpProcessInformation, DWORD& dwOutError, SString& strOutErrorContext)
 {
-    std::vector<DWORD> processIdListBefore = GetGTAProcessList();
-    // Start GTA
-    BOOL bResult = ShellExecuteNonBlocking("open", lpApplicationName, lpCommandLine, lpCurrentDirectory);
+    STARTUPINFOW startupInfo{};
+    startupInfo.cb = sizeof(startupInfo);
+    BOOL wasProcessCreated = CreateProcessW(*FromUTF8(lpApplicationName), FromUTF8(lpCommandLine).data(), nullptr, nullptr, FALSE, 0, nullptr,
+                                            *FromUTF8(lpCurrentDirectory), &startupInfo, lpProcessInformation);
 
-    if (bResult == FALSE)
+    if (wasProcessCreated)
+        return true;
+
+    std::vector<DWORD> processIdListBefore = GetGTAProcessList();
+
+    if (!ShellExecuteNonBlocking("open", lpApplicationName, lpCommandLine, lpCurrentDirectory))
     {
         dwOutError = GetLastError();
         strOutErrorContext = "ShellExecute";
+        return false;
     }
-    else
+
+    // Determine pid of new gta process
+    for (uint i = 0; i < 10; i++)
     {
-        // Determine pid of new gta process
-        for (uint i = 0; i < 10; i++)
+        std::vector<DWORD> processIdList = GetGTAProcessList();
+        for (DWORD pid : processIdList)
         {
-            std::vector<DWORD> processIdList = GetGTAProcessList();
-            for (DWORD pid : processIdList)
+            if (ListContains(processIdListBefore, pid))
             {
-                if (ListContains(processIdListBefore, pid))
-                {
-                    continue;
-                }
-                lpProcessInformation->dwProcessId = pid;
-                lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
-                break;
+                continue;
             }
-            if (lpProcessInformation->dwProcessId)
-                break;
-            Sleep(500);
+            lpProcessInformation->dwProcessId = pid;
+            lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
+            break;
         }
-
-        if (lpProcessInformation->dwProcessId == 0)
-        {
-            // Unable to get pid
-            dwOutError = ERROR_INVALID_FUNCTION;
-            strOutErrorContext = "FindPID";
-            bResult = false;
-        }
-        else if (lpProcessInformation->hProcess == nullptr)
-        {
-            // Unable to OpenProcess
-            dwOutError = ERROR_ELEVATION_REQUIRED;
-            strOutErrorContext = "OpenProcess";
-            bResult = false;
-        }
+        if (lpProcessInformation->dwProcessId)
+            break;
+        Sleep(500);
     }
 
-    return bResult;
+    if (lpProcessInformation->dwProcessId == 0)
+    {
+        // Unable to get pid
+        dwOutError = ERROR_INVALID_FUNCTION;
+        strOutErrorContext = "FindPID";
+        wasProcessCreated = false;
+    }
+    else if (lpProcessInformation->hProcess == nullptr)
+    {
+        // Unable to OpenProcess
+        dwOutError = ERROR_ELEVATION_REQUIRED;
+        strOutErrorContext = "OpenProcess";
+        wasProcessCreated = false;
+    }
+
+    return wasProcessCreated;
 }
 
 //////////////////////////////////////////////////////////
@@ -1111,7 +1113,7 @@ int LaunchGame(SString strCmdLine)
     const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     SString       strMtaDir = PathJoin(strMTASAPath, "mta");
-    SString       strGTAEXEPath = GetGameExecutablePath().string();
+    SString       strGTAEXEPath = GetGameExecutablePath().u8string();
 
     SetDllDirectory(strMtaDir);
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())

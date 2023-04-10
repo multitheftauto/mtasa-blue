@@ -294,11 +294,18 @@ std::vector<DWORD> GetGTAProcessList()
     for (auto processId : MyEnumProcesses())
     {
         SString strPathFilename = GetProcessPathFilename(processId);
-        if (strPathFilename.EndsWith(MTA_GTAEXE_NAME))
+
+        if (strPathFilename.EndsWith(GTA_EXE_NAME) || strPathFilename.EndsWith(PROXY_GTA_EXE_NAME) || strPathFilename.EndsWith(STEAM_GTA_EXE_NAME))
             ListAddUnique(result, processId);
     }
 
-    if (DWORD processId = FindProcessId(MTA_GTAEXE_NAME))
+    if (DWORD processId = FindProcessId(GTA_EXE_NAME))
+        ListAddUnique(result, processId);
+
+    if (DWORD processId = FindProcessId(PROXY_GTA_EXE_NAME))
+        ListAddUnique(result, processId);
+
+    if (DWORD processId = FindProcessId(STEAM_GTA_EXE_NAME))
         ListAddUnique(result, processId);
 
     return result;
@@ -445,7 +452,7 @@ auto GetGameLaunchDirectory() -> fs::path
 
 auto GetGameExecutablePath() -> std::filesystem::path
 {
-    static const auto executable = GetGameLaunchDirectory() / MTA_GTAEXE_NAME;
+    static const auto executable = GetGameLaunchDirectory() / GTA_EXE_NAME;
     return executable;
 }
 
@@ -668,8 +675,7 @@ bool HasGTAPath()
     SString strGTAPath = GetGTAPath();
     if (!strGTAPath.empty())
     {
-        SString strGTAEXEPath = PathJoin(strGTAPath, MTA_GTAEXE_NAME);
-        return FileExists(strGTAEXEPath);
+        return FileExists(PathJoin(strGTAPath, GTA_EXE_NAME)) || FileExists(PathJoin(strGTAPath, STEAM_GTA_EXE_NAME));
     }
     return false;
 }
@@ -1155,7 +1161,7 @@ bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 
     if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
     {
-        using Signature = bool(*)(DWORD, UINT);
+        using Signature = bool (*)(DWORD, UINT);
         static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
 
         if (NtTerminateProcess_)
@@ -1835,7 +1841,6 @@ void LogSettings()
         {false, "nvhacks", "optimus-force-detection", ""},
         {false, "nvhacks", "optimus-export-enablement", ""},
         {false, "nvhacks", "optimus", ""},
-        {false, "nvhacks", "optimus-rename-exe", ""},
         {false, "nvhacks", "optimus-alt-startup", ""},
         {false, "nvhacks", "optimus-force-windowed", ""},
         {false, "nvhacks", "optimus-dialog-skip", ""},
@@ -2137,7 +2142,6 @@ bool IsErrorCodeLoggable(const std::error_code& ec)
 {
     switch (ec.value())
     {
-        case ERROR_SUCCESS:
         case ERROR_FILE_NOT_FOUND:
         case ERROR_PATH_NOT_FOUND:
             return false;
@@ -2148,8 +2152,7 @@ bool IsErrorCodeLoggable(const std::error_code& ec)
 
 bool IsNativeArm64Host()
 {
-    static bool isArm64 = ([]
-    {
+    static bool isArm64 = ([] {
         HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
 
         if (kernel32)
@@ -2168,7 +2171,7 @@ bool IsNativeArm64Host()
                 }
             }
         }
-        
+
         return false;
     })();
 

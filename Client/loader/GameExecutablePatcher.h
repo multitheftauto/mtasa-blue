@@ -17,7 +17,7 @@
 
 /**
  * @brief Removes and also conditionally applies patches to the game executable.
-*/
+ */
 class GameExecutablePatcher final
 {
 public:
@@ -26,18 +26,18 @@ public:
     /**
      * @brief Loads the executable from disk and prepares it for patching.
      * @param ec Parameter for error reporting
-    */
+     */
     bool Load(std::error_code& ec);
 
     /**
      * @brief Applies patches to a previously loaded executable. You can only do this once after loading.
      * @param ec Parameter for error reporting
-    */
+     */
     bool ApplyPatches(std::error_code& ec);
 
     /**
      * @brief Generates a MD5 hex string for the current executable buffer.
-    */
+     */
     auto GenerateMD5() const -> std::string;
 
 private:

@@ -30,7 +30,7 @@ int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
         add     esp, 0x4
         mov     iReturn, eax
     }
-    // Set it back for SA in case we ever do some other implementation.
+    //   Set it back for SA in case we ever do some other implementation.
     MemPut((DWORD*)(dwDurationAddress), 4000);
     return iReturn;
 }

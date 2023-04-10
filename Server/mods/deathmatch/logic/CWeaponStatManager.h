@@ -13,7 +13,7 @@
 #include "CCommon.h"
 #include <list>
 
- // Straight out of CGameSA.h
+// Straight out of CGameSA.h
 #define     CLASSSIZE_WeaponInfo            112         // ##SA##
 #define     NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
 #define     NUM_WeaponInfosOtherSkill       11

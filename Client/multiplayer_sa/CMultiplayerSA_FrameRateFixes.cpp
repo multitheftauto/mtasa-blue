@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-static bool bWouldBeNewFrame = false;
+static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
 
 constexpr float kOriginalTimeStep = 50.0f / 30.0f;
@@ -562,7 +562,7 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CFallingGlassPane__Update_A);
     EZHookInstall(CFallingGlassPane__Update_B);
     EZHookInstall(CFallingGlassPane__Update_C);
-    
+
     // CCam::Process_FollowCar_SA
     MemSet((void*)0x524FD7, 0x90, 0x1B);
 
