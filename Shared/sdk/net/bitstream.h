@@ -460,10 +460,6 @@ enum class eBitStreamVersion : unsigned short
     // Add height for colpolygon (#1908)
     // 2021-01-16 0x72
     SetColPolygonHeight,
-    
-    // Add argument to enable the spawn of a flying component when damaging a wheel
-    // 2021-03-17 0x73
-    setVehicleWheelStates_SpawnFlyingComponent,
 
     // Support for vehicle blow without explosion and blow state synchronisation
     // 2021-02-26 0x73
@@ -488,7 +484,11 @@ enum class eBitStreamVersion : unsigned short
     //
     // 1.6.0 RELEASED - 2023-04-07
     //
-
+    
+    // Add argument to enable the spawn of a flying component when damaging a wheel (#2128)
+    // 2023-04-10 0x77
+    setVehicleWheelStates_SpawnFlyingComponent,
+    
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
