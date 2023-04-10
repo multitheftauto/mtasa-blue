@@ -151,18 +151,18 @@ void CMultiplayerSA::InitHooks_13()
 
     // Siren hooks
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle,
-                7);             // Test siren type is single for a jump
+                7);            // Test siren type is single for a jump
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle,
                 19);            // mov before Push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeDual,
-                7);             // test siren type is dual for a jump
+                7);            // test siren type is dual for a jump
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition1, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed,
                 15);            // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_PostPushSirenPosition2, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue,
                 15);            // mov before push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_DoesVehicleUseSiren, (DWORD)HOOK_CVehicle_DoesVehicleUseSiren, 5);            // Does vehicle have a siren
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestCameraPosition, (DWORD)HOOK_CVehicle_ProcessStuff_TestCameraPosition,
-                5);                                                                                            // Fix for single sirens being 360 degrees
+                5);            // Fix for single sirens being 360 degrees
     // Breaks Rear wheel rendering leave for now
     // HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionBlue, (DWORD)HOOK_CMotorBike_ProcessStuff_PushSirenPositionBlue, 15 ); // mov before the
     // push for the sien position (overhook so we can get RGBA) HookInstall ( HOOKPOS_CMotorBike_ProcessStuff_PushSirenPositionRed,

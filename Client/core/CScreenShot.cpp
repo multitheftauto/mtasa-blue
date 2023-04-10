@@ -63,14 +63,14 @@ SString CScreenShot::GetScreenshotPath()
     // Get the system time
     SYSTEMTIME sysTime;
     GetLocalTime(&sysTime);
-    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png", *ms_strScreenDirectoryPath, sysTime.wYear, sysTime.wMonth, sysTime.wDay,
-                   sysTime.wHour, sysTime.wMinute, sysTime.wSecond);
+    return SString("%s\\mta-screen_%d-%02d-%02d_%02d-%02d-%02d.png", *ms_strScreenDirectoryPath, sysTime.wYear, sysTime.wMonth, sysTime.wDay, sysTime.wHour,
+                   sysTime.wMinute, sysTime.wSecond);
 }
 
 //
 // Take a screenshot if needed.
 // @ bool bBeforeGUI: whenever we try to capture screenshot before GUI gets drawn
-// 
+//
 void CScreenShot::CheckForScreenShot(bool bBeforeGUI)
 {
     if (!ms_bScreenShot)
@@ -117,7 +117,7 @@ void CScreenShot::CheckForScreenShot(bool bBeforeGUI)
 // Callback for threaded save
 DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 {
-    uint uiLinePitch = ms_uiWidth * 4;
+    uint  uiLinePitch = ms_uiWidth * 4;
     void* pData = ms_ScreenShotBuffer.GetData();
 
     // Create the screen data buffer

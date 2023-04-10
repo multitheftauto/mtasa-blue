@@ -6344,17 +6344,19 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
     assert(pColPoint);
     assert(pColEntity);
 
-    vecIgnoredElements.erase(std::remove_if(vecIgnoredElements.begin(), vecIgnoredElements.end(), [](CClientEntity* pIgnoredElement) {
-        // Remove entities that already have their colision disabled. 
-        // This prevents us from re-enabling them.
-        if (!CStaticFunctionDefinitions::GetElementCollisionsEnabled(*pIgnoredElement))
-            return true;
-    
-        // Otherwise disable collision and keep it in the array
-        CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, false);
-    
-        return false;       
-    }), vecIgnoredElements.end());
+    vecIgnoredElements.erase(std::remove_if(vecIgnoredElements.begin(), vecIgnoredElements.end(),
+                                            [](CClientEntity* pIgnoredElement) {
+                                                // Remove entities that already have their colision disabled.
+                                                // This prevents us from re-enabling them.
+                                                if (!CStaticFunctionDefinitions::GetElementCollisionsEnabled(*pIgnoredElement))
+                                                    return true;
+
+                                                // Otherwise disable collision and keep it in the array
+                                                CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, false);
+
+                                                return false;
+                                            }),
+                             vecIgnoredElements.end());
 
     CEntity* pColGameEntity = 0;
     bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult);

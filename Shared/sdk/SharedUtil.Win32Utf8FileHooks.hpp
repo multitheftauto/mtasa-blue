@@ -173,22 +173,13 @@ namespace SharedUtil
 
     HMODULE
     WINAPI
-    MyLoadLibraryA(__in LPCSTR lpLibFileName)
-    {
-        return LoadLibraryW(FromUTF8(lpLibFileName));
-    }
+    MyLoadLibraryA(__in LPCSTR lpLibFileName) { return LoadLibraryW(FromUTF8(lpLibFileName)); }
 
     HMODULE
     WINAPI
-    MyLoadLibraryExA(__in LPCSTR lpLibFileName, __reserved HANDLE hFile, __in DWORD dwFlags)
-    {
-        return LoadLibraryExW(FromUTF8(lpLibFileName), hFile, dwFlags);
-    }
+    MyLoadLibraryExA(__in LPCSTR lpLibFileName, __reserved HANDLE hFile, __in DWORD dwFlags) { return LoadLibraryExW(FromUTF8(lpLibFileName), hFile, dwFlags); }
 
-    BOOL WINAPI MySetDllDirectoryA(__in_opt LPCSTR lpPathName)
-    {
-        return SetDllDirectoryW(FromUTF8(lpPathName));
-    }
+    BOOL WINAPI MySetDllDirectoryA(__in_opt LPCSTR lpPathName) { return SetDllDirectoryW(FromUTF8(lpPathName)); }
 
     BOOL WINAPI MySetCurrentDirectoryA(__in LPCSTR lpPathName)
     {
@@ -200,15 +191,9 @@ namespace SharedUtil
         return SetCurrentDirectoryW(FromUTF8(strPathName));
     }
 
-    int WINAPI MyAddFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID res)
-    {
-        return AddFontResourceExW(FromUTF8(name), fl, res);
-    }
+    int WINAPI MyAddFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID res) { return AddFontResourceExW(FromUTF8(name), fl, res); }
 
-    BOOL WINAPI MyRemoveFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID pdv)
-    {
-        return RemoveFontResourceExW(FromUTF8(name), fl, pdv);
-    }
+    BOOL WINAPI MyRemoveFontResourceExA(__in LPCSTR name, __in DWORD fl, __reserved PVOID pdv) { return RemoveFontResourceExW(FromUTF8(name), fl, pdv); }
 
     BOOL WINAPI MyRemoveDirectoryA(__in LPCSTR lpPathName)
     {

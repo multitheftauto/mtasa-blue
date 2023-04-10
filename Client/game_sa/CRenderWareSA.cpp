@@ -307,8 +307,7 @@ void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& 
 {
     RpClumpForAllAtomics(
         pClump,
-        [](RpAtomic* pAtomic, void* pData)
-        {
+        [](RpAtomic* pAtomic, void* pData) {
             reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
             return true;
         },

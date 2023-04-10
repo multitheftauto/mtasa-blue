@@ -17,8 +17,8 @@
 class CScreenShot
 {
 public:
-    static void    InitiateScreenShot(bool bIsCameraShot);
-    static void    CheckForScreenShot(bool bBeforeGUI);
+    static void InitiateScreenShot(bool bIsCameraShot);
+    static void CheckForScreenShot(bool bBeforeGUI);
 
 protected:
     static void    StartSaveThread();

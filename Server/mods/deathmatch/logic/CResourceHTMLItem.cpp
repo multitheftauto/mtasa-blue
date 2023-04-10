@@ -126,8 +126,8 @@ ResponseCode CResourceHTMLItem::Request(HttpRequest* ipoHttpRequest, HttpRespons
         args.PushString(ipoHttpRequest->sOriginalUri.c_str());            // url
         args.PushTable(&querystring);                                     // querystring
         args.PushAccount(account);
-        args.PushString(ipoHttpRequest->sBody);                           // requestBody
-        args.PushString(sMethod);                                         // method
+        args.PushString(ipoHttpRequest->sBody);            // requestBody
+        args.PushString(sMethod);                          // method
 
         // g_pGame->Lock(); // get the mutex (blocking)
         args.CallGlobal(m_pVM, "renderPage");
@@ -265,7 +265,7 @@ bool CResourceHTMLItem::Start()
                         if (bIsShorthandCodeBlock)
                         {
                             bIsShorthandCodeBlock = false;
-                            strScript += ')';                            // terminate the 'httpWrite' function
+                            strScript += ')';            // terminate the 'httpWrite' function
                         }
                         strScript.append("\nhttpWrite ( \"");            // add httpWrite ( " to start a new non-code section
                     }

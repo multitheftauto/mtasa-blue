@@ -3049,7 +3049,7 @@ bool CStaticFunctionDefinitions::SetPlayerMoney(CElement* pElement, long lMoney,
     {
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
 
-         // Is it above 999999999? Limit it to it
+        // Is it above 999999999? Limit it to it
         if (lMoney > 999999999)
             lMoney = 999999999;
         // Is it below -999999999?
@@ -3462,7 +3462,6 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
             BitStream.pBitStream->Write(ucPasswordLength);
             BitStream.pBitStream->Write(szPassword, ucPasswordLength);
         }
-        pPlayer->SetLeavingServer(true);
         pPlayer->Send(CLuaPacket(FORCE_RECONNECT, *BitStream.pBitStream));
 
         usPort = usPort ? usPort : g_pGame->GetConfig()->GetServerPort();
@@ -4691,9 +4690,9 @@ bool CStaticFunctionDefinitions::GiveWeapon(CElement* pElement, unsigned char uc
                 if (ucWeaponSlot <= 1 || ucWeaponSlot >= 10)
                     uiTotalAmmo = std::min(1U, uiTotalAmmo + usAmmo);            // If slot 0,1,10,11,12 - Ammo is max 1
                 else if ((ucWeaponSlot >= 3 && ucWeaponSlot <= 5) || ucPreviousWeaponID == ucWeaponID)
-                    uiTotalAmmo += usAmmo;                                       // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
+                    uiTotalAmmo += usAmmo;            // If slot 3,4,5 or slot weapon the same, ammo is shared, so add
                 else
-                    uiTotalAmmo = usAmmo;                                        // Otherwise ammo is not shared, so replace
+                    uiTotalAmmo = usAmmo;            // Otherwise ammo is not shared, so replace
 
                 uiTotalAmmo = std::min(0xFFFFU, uiTotalAmmo);
                 pPed->SetWeaponTotalAmmo(uiTotalAmmo, ucWeaponSlot);

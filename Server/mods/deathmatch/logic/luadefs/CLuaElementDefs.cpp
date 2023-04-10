@@ -1092,8 +1092,7 @@ CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius
     if (interior || dimension || typeHash)
     {
         result.erase(std::remove_if(result.begin(), result.end(),
-                                    [&, radiusSq = radius * radius](CElement* pElement)
-                                    {
+                                    [&, radiusSq = radius * radius](CElement* pElement) {
                                         if (typeHash && typeHash != pElement->GetTypeHash())
                                             return true;
 
