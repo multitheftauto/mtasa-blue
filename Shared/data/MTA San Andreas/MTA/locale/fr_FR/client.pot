@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-09 14:54+0000\n"
-"PO-Revision-Date: 2023-04-09 15:55\n"
+"POT-Creation-Date: 2023-04-10 17:42+0000\n"
+"PO-Revision-Date: 2023-04-10 18:16\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -292,6 +292,10 @@ msgstr "affiche les statistiques mémoire"
 #: Client/core/CCore.cpp:1359
 msgid "shows the frame timing graph"
 msgstr "affiche le diagramme de synchronisation de trame"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr "pour les développeurs : rafraîchir les actualités"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
@@ -1684,7 +1688,7 @@ msgstr "Remerciements particuliers"
 
 #: Client/core/CCredits.cpp:258
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "Ce logiciel et ce projet utilisent les bibliothèques et logiciels suivants :"
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
@@ -2355,7 +2359,7 @@ msgstr "Multi Theft Auto n'a pas été installé correctement. Veuillez réinsta
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Créer les jonctions GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
@@ -2367,7 +2371,7 @@ msgstr "MTA:SA ne peut pas être lancé car un fichier MTA:SA est incorrect ou m
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Copier les fichiers de MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
