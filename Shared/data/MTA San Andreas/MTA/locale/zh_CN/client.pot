@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-09 14:54+0000\n"
-"PO-Revision-Date: 2023-04-09 15:56\n"
+"POT-Creation-Date: 2023-04-10 17:42+0000\n"
+"PO-Revision-Date: 2023-04-10 18:16\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -292,6 +292,10 @@ msgstr "显示内存统计信息"
 #: Client/core/CCore.cpp:1359
 msgid "shows the frame timing graph"
 msgstr "显示帧数图表"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr ""
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
