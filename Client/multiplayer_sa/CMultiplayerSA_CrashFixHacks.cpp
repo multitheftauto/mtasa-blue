@@ -1004,7 +1004,7 @@ inner:
     }
 }
 
-CStreamingInfo* GetStreamingInfoFromModelId(uint id)
+CStreamingInfo* GetStreamingInfo(uint id)
 {
     CStreamingInfo* pItemInfo = (CStreamingInfo*)(CStreaming__ms_aInfoForModel);
     return pItemInfo + id;
@@ -1036,11 +1036,10 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
         if (!pColModel)
         {
             // Crash will occur at offset 00134134
-            CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfoFromModelId(usModelId);
-            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d bColStr:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
-                               pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel,
-                               pModelInfo->bCollisionWasStreamedWithModel, pStreamingInfo->flg, pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks,
-                               pStreamingInfo->loadState);
+            CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfo(usModelId);
+            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
+                               pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel, pStreamingInfo->flg,
+                               pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks, pStreamingInfo->loadState);
             LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
             CArgMap argMap;
             argMap.Set("id", usModelId);

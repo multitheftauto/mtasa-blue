@@ -86,7 +86,7 @@
 
 #ifndef WIN32
     #include <limits.h>
-    
+
     #ifndef MAX_PATH
         #define MAX_PATH PATH_MAX
     #endif
@@ -1459,7 +1459,7 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
     const char* szNick = Player.GetNick();
     if (bSayInConsole && szNick && szNick[0] && !m_bBeingDeleted)
     {
-        CLogger::LogPrintf("QUIT: %s left the game [%s]%s\n", szNick, szReason, *Player.GetQuitReasonForLog());
+        CLogger::LogPrintf("QUIT: %s left the game [%s] %s\n", szNick, szReason, *Player.GetQuitReasonForLog());
     }
 
     // If he had joined
@@ -2265,23 +2265,27 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         pPlayer->IncrementPuresync();
 
         // Ignore this packet if he should be in a vehicle
-        if (!pPlayer->GetOccupiedVehicle())
+        if (pPlayer->GetOccupiedVehicle())
         {
-            // Send a returnsync packet to the player that sent it
-            // Only every 4 packets.
-            if ((pPlayer->GetPuresyncCount() % 4) == 0)
-                pPlayer->Send(CReturnSyncPacket(pPlayer));
-
-            CLOCK("PlayerPuresync", "RelayPlayerPuresync");
-            // Relay to other players
-            RelayPlayerPuresync(Packet);
-            UNCLOCK("PlayerPuresync", "RelayPlayerPuresync");
-
-            CLOCK("PlayerPuresync", "DoHitDetection");
-            // Run colpoint checks
-            m_pColManager->DoHitDetection(pPlayer->GetPosition(), pPlayer);
-            UNCLOCK("PlayerPuresync", "DoHitDetection");
+            // Allow it if he's exiting
+            if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_EXITING)
+                return;
         }
+
+        // Send a returnsync packet to the player that sent it
+        // Only every 4 packets.
+        if ((pPlayer->GetPuresyncCount() % 4) == 0)
+            pPlayer->Send(CReturnSyncPacket(pPlayer));
+
+        CLOCK("PlayerPuresync", "RelayPlayerPuresync");
+        // Relay to other players
+        RelayPlayerPuresync(Packet);
+        UNCLOCK("PlayerPuresync", "RelayPlayerPuresync");
+
+        CLOCK("PlayerPuresync", "DoHitDetection");
+        // Run colpoint checks
+        m_pColManager->DoHitDetection(pPlayer->GetPosition(), pPlayer);
+        UNCLOCK("PlayerPuresync", "DoHitDetection");
     }
 }
 

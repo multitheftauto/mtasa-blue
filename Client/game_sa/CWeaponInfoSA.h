@@ -97,8 +97,7 @@ private:
     CWeaponInfoSAInterface* m_pInterface;
 
 public:
-    CWeaponInfoSA(CWeaponInfoSAInterface* pInterface, eWeaponType weaponType) : m_pInterface{pInterface}, m_weaponType{weaponType}
-    {};
+    CWeaponInfoSA(CWeaponInfoSAInterface* pInterface, eWeaponType weaponType) : m_pInterface{pInterface}, m_weaponType{weaponType} {};
 
     // stolen from R*'s CPedIK :)
     // DO NOT USE.

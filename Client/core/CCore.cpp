@@ -122,9 +122,6 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
-    // Reset the screenshot flag
-    bScreenShot = false;
-
     // No initial fps limit
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
@@ -477,9 +474,9 @@ bool CCore::ClearChat()
     return false;
 }
 
-void CCore::TakeScreenShot()
+void CCore::InitiateScreenShot(bool bIsCameraShot)
 {
-    bScreenShot = true;
+    CScreenShot::InitiateScreenShot(bIsCameraShot);
 }
 
 void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
@@ -975,11 +972,6 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
-
-    // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
-    std::string strScreenShotPath = CalcMTASAPath("screenshots");
-    CVARS_SET("screenshot_path", strScreenShotPath);
-    CScreenShot::SetPath(strScreenShotPath.c_str());
 }
 
 void CCore::CreateGUI()
@@ -1368,7 +1360,7 @@ void CCore::RegisterCommands()
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
 
-    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
+    m_pCommands->Add("reloadnews", _("for developers: reload news"), CCommandFuncs::ReloadNews);
 }
 
 void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)
@@ -1483,7 +1475,7 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
             szCmdLine = afterPath;
         }
     }
-    
+
     char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 
