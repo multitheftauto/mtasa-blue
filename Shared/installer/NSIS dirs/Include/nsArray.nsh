@@ -1,5 +1,6 @@
 /*
   nsArray NSIS plug-in by Stuart Welch <afrowuk@afrowsoft.co.uk>
+  v1.1.1.4 - 3rd September 2012
 */
 
 !ifndef __NsArray_H__
@@ -17,7 +18,7 @@ Push $R3
 
   ${Do}
     ClearErrors
-    nsArray::Get $R1 /next
+    nsArray::Iterate $R1
     ${If} ${Errors}
       ${Break}
     ${EndIf}
@@ -48,7 +49,7 @@ Push $R3
 
   ${Do}
     ClearErrors
-    nsArray::Get $R1 /next
+    nsArray::Iterate $R1
     ${If} ${Errors}
       ${Break}
     ${EndIf}
@@ -79,7 +80,7 @@ Push $R3
   StrCpy $R3 ``
   ${Do}
     ClearErrors
-    nsArray::Get $R0 /next
+    nsArray::Iterate $R0
     ${If} ${Errors}
       ${Break}
     ${EndIf}
@@ -113,12 +114,16 @@ Exch $R0
   !define ${_Logic}For _LogicLib_Label_${LOGICLIB_COUNTER}
   !insertmacro _IncreaseCounter
   !insertmacro _PushScope ExitFor _LogicLib_Label_${LOGICLIB_COUNTER}
-  nsArray::Get `${_a}` /reset
+  nsArray::Iterate `${_a}` /reset
   ${${_Logic}For}:
   !insertmacro _IncreaseCounter
   !insertmacro _PushScope Break ${_ExitFor}
   ClearErrors
-  nsArray::Get `${_a}` /${_s}
+  !if `${_s}` == next
+  nsArray::Iterate `${_a}`
+  !else
+  nsArray::Iterate `${_a}` /prev
+  !endif
   IfErrors ${_ExitFor}
   Pop `${_k}`
   Pop `${_v}`
