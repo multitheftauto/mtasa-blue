@@ -8,6 +8,7 @@ memcmp memcmp@GLIBC_2.2.5
 memcpy memcpy@GLIBC_2.2.5
 powf powf@GLIBC_2.2.5
 log log@GLIBC_2.2.5
+log2 log2@GLIBC_2.2.5
 pow pow@GLIBC_2.2.5
 exp exp@GLIBC_2.2.5
 fcntl64 fcntl@GLIBC_2.2.5

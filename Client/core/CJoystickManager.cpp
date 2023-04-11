@@ -1202,7 +1202,7 @@ void CJoystickManager::SetDeadZone(int iDeadZone)
 void CJoystickManager::SetSaturation(int iSaturation)
 {
     m_SettingsRevision++;
-    m_DevInfo.iSaturation = Clamp(51, iSaturation, 100);
+    m_DevInfo.iSaturation = Clamp(0, iSaturation, 100);
 }
 
 int CJoystickManager::GetSettingsRevision()
@@ -1388,7 +1388,7 @@ bool CJoystickManager::LoadFromXML()
                 iErrors++;
 
             if (pA = pAttributes->Find("saturation"))
-                m_DevInfo.iSaturation = Clamp(51, atoi(pA->GetValue().c_str()), 100);
+                m_DevInfo.iSaturation = Clamp(0, atoi(pA->GetValue().c_str()), 100);
             else
                 iErrors++;
         }
