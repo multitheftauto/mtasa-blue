@@ -14,7 +14,7 @@ RUN dpkg --add-architecture i386 && apt-get update && \
         gcc-multilib g++-multilib gcc-10-multilib g++-10-multilib curl subversion ncftp \
         libncurses-dev libncursesw5 \
         libncurses-dev:i386 libncursesw5:i386 \
-        libmysqlclient-dev libmysqlclient-dev:i386
+        libmysqlclient-dev
 
 # Set build directory
 VOLUME /build
