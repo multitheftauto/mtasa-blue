@@ -2311,7 +2311,7 @@ bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
     return false;
 }
 
-bool CLuaEngineDefs::EngineRestreamWorld()
+bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
     bool bRestreamLODs;
 
