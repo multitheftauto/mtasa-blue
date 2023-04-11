@@ -1,6 +1,7 @@
 /*
   nsArray NSIS plug-in by Stuart Welch <afrowuk@afrowsoft.co.uk>
-  v1.1.1.4 - 3rd September 2012
+  v1.1.1.7 - 2nd December 2014
+  Source: https://nsis.sourceforge.io/File:NsArray.zip
 */
 
 !ifndef __NsArray_H__
