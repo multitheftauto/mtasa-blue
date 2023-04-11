@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-10 17:42+0000\n"
-"PO-Revision-Date: 2023-04-10 18:16\n"
+"PO-Revision-Date: 2023-04-11 20:06\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -295,7 +295,7 @@ msgstr "zeigt das frame timing diagramm"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "Für Entwickler: News neu laden"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
