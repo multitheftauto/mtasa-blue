@@ -549,9 +549,9 @@ bool CClientGame::StartGame ( void ) // for an offline game (e.g. editor)
 */
 
 #include <crtdbg.h>
-//#define _CRTDBG_CHECK_EVERY_16_DF   0x00100000  /* check heap every 16 heap ops */
-//#define _CRTDBG_CHECK_EVERY_128_DF  0x00800000  /* check heap every 128 heap ops */
-//#define _CRTDBG_CHECK_EVERY_1024_DF 0x04000000  /* check heap every 1024 heap ops */
+// #define _CRTDBG_CHECK_EVERY_16_DF   0x00100000  /* check heap every 16 heap ops */
+// #define _CRTDBG_CHECK_EVERY_128_DF  0x00800000  /* check heap every 128 heap ops */
+// #define _CRTDBG_CHECK_EVERY_1024_DF 0x04000000  /* check heap every 1024 heap ops */
 
 void CClientGame::EnablePacketRecorder(const char* szFilename)
 {
@@ -1204,6 +1204,9 @@ void CClientGame::DoPulses()
 
             // Initialize the game
             g_pCore->GetGame()->Initialize();
+
+            // Save default streamer buffer size in IMG manager
+            m_pManager->GetIMGManager()->InitDefaultBufferSize();
         }
 
         unsigned char ucError = g_pNet->GetConnectionError();
@@ -3285,6 +3288,7 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
     g_pGame->ResetModelLodDistances();
+    g_pGame->ResetModelFlags();
     g_pGame->ResetAlphaTransparencies();
     g_pGame->ResetModelTimes();
 
@@ -6726,7 +6730,7 @@ void CClientGame::VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 void CClientGame::AudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
     CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
-    
+
     if (pPlayer && pPlayer->IsInVehicle())
     {
         // Do not change radio station if player is inside vehicle

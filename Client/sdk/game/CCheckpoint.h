@@ -36,20 +36,20 @@ enum
 class CCheckpoint
 {
 public:
-    virtual void     SetPosition(CVector* vecPosition) = 0;
-    virtual CVector* GetPosition() = 0;
-    virtual void     SetPointDirection(CVector* vecPointDirection) = 0;
-    virtual CVector* GetPointDirection() = 0;
-    virtual DWORD    GetType() = 0;            // need enum?
-    virtual bool     IsActive() = 0;
-    virtual DWORD    GetIdentifier() = 0;
+    virtual void               SetPosition(CVector* vecPosition) = 0;
+    virtual CVector*           GetPosition() = 0;
+    virtual void               SetPointDirection(CVector* vecPointDirection) = 0;
+    virtual CVector*           GetPointDirection() = 0;
+    virtual DWORD              GetType() = 0;            // need enum?
+    virtual bool               IsActive() = 0;
+    virtual DWORD              GetIdentifier() = 0;
     virtual SharedUtil::SColor GetColor() = 0;
-    virtual void     SetColor(const SharedUtil::SColor color) = 0;
-    virtual void     SetPulsePeriod(WORD wPulsePeriod) = 0;
-    virtual void     SetRotateRate(short RotateRate) = 0;
-    virtual float    GetSize() = 0;
-    virtual void     SetSize(float fSize) = 0;
-    virtual void     SetCameraRange(float fCameraRange) = 0;
-    virtual float    GetPulseFraction() = 0;
-    virtual void     Remove() = 0;
+    virtual void               SetColor(const SharedUtil::SColor color) = 0;
+    virtual void               SetPulsePeriod(WORD wPulsePeriod) = 0;
+    virtual void               SetRotateRate(short RotateRate) = 0;
+    virtual float              GetSize() = 0;
+    virtual void               SetSize(float fSize) = 0;
+    virtual void               SetCameraRange(float fCameraRange) = 0;
+    virtual float              GetPulseFraction() = 0;
+    virtual void               Remove() = 0;
 };

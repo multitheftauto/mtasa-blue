@@ -33,6 +33,7 @@
    </group>
    <group name="RPC">
       <acl name="RPC" />
+      <object name="resource.ip2c" />
    </group>
    <group name="MapEditor">
       <acl name="Default" />

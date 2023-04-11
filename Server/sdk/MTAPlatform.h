@@ -54,8 +54,8 @@ extern "C" bool g_bNoTopBar;
 #endif
 
 #ifdef WIN32
-    // Define types
-    typedef int socklen_t;
+// Define types
+typedef int socklen_t;
 
     // Define keys
     #define KEY_BACKSPACE 0x08
