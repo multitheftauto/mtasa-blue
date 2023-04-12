@@ -256,12 +256,11 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
 
-
-	${If} ${AtMostWinVista}
-		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
-		ExecShell "open" "http://mtasa.com"
-		Quit
-	${EndIf}
+    ${If} ${AtMostWinVista}
+        MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+        ExecShell "open" "https://multitheftauto.com"
+        Quit
+    ${EndIf}
 
     File /oname=$TEMP\image.bmp "connect.bmp"
 
@@ -2531,10 +2530,10 @@ Function NetComposeURL
     IntOp $NetMirror $NetMirror % 2
     ${Switch} $NetMirror
         ${Case} 0
-            StrCpy $NetMsgURL "http://updatesa.multitheftauto.com/sa/install/1/?x=0"
+            StrCpy $NetMsgURL "https://updatesa.multitheftauto.com/sa/install/1/?x=0"
             ${Break}
         ${Default}
-            StrCpy $NetMsgURL "http://updatesa.mtasa.com/sa/install/1/?x=0"
+            StrCpy $NetMsgURL "https://updatesa.multitheftauto.com/sa/install/1/?x=0"
             ${Break}
     ${EndSwitch}
     StrCpy $NetMsgURL "$NetMsgURL$NetPrevInfo"
