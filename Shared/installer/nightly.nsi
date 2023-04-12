@@ -1084,14 +1084,10 @@ Section Uninstall
     Call un.DoServiceUninstall
     RmDir /r "$INSTDIR\mods"
     RmDir /r "$INSTDIR\MTA"
-
     RmDir /r "$INSTDIR\server"
-
-    !ifdef INCLUDE_DEVELOPMENT ; start of fix for #3889
-        RmDir /r "$INSTDIR\development\module sdk\publicsdk"
-        RmDir "$INSTDIR\development\module sdk"
-        RmDir "$INSTDIR\development"
-    !endif ; end of fix for #3889
+    RmDir /r "$INSTDIR\skins"
+    RmDir /r "$INSTDIR\development"
+    RmDir /r "$INSTDIR\screenshots"
 
     preservemapsfolder:
     Call un.DoServiceUninstall
