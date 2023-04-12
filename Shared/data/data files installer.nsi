@@ -5,7 +5,6 @@
 !include Sections.nsh
 !include UAC.nsh
 
-XPStyle on
 RequestExecutionLevel user
 SetCompressor /SOLID /FINAL lzma
 

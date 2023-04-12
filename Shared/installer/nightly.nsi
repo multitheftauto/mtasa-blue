@@ -1,4 +1,3 @@
-XPStyle on
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 
