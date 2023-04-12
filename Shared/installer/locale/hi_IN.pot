@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-12 18:43\n"
-"PO-Revision-Date: 2023-04-12 19:48\n"
+"POT-Creation-Date: 2023-04-12 20:37\n"
+"PO-Revision-Date: 2023-04-12 21:10\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -139,72 +139,72 @@ msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "क्लाइंट वह प्रोग्राम है जिसे आप Multi Theft Auto सर्वर पर चलाने के लिए चलाते हैं"
 
 #. INST_CLIENTSERVER
-#: Shared/installer/nightly.nsi:439
+#: Shared/installer/nightly.nsi:438
 msgid "Client and Server"
 msgstr "क्लाइंट और सर्वर"
 
 #. INST_SERVER
-#: Shared/installer/nightly.nsi:440
+#: Shared/installer/nightly.nsi:439
 msgid "Server only"
 msgstr "केवल सर्वर के लिए"
 
 #. INST_STARTMENU_GROUP
-#: Shared/installer/nightly.nsi:454
+#: Shared/installer/nightly.nsi:453
 msgid "Start menu group"
 msgstr "स्टार्ट मेनू ग्रुप"
 
 #. INST_DESKTOP_ICON
-#: Shared/installer/nightly.nsi:455
+#: Shared/installer/nightly.nsi:454
 msgid "Desktop icon"
 msgstr "डेस्कटॉप आइकन"
 
 #. INST_PROTOCOL
-#: Shared/installer/nightly.nsi:456
+#: Shared/installer/nightly.nsi:455
 msgid "Register mtasa:// protocol"
 msgstr "रजिस्टर mtasa:// प्रोटोकॉल"
 
 #. INST_GAMES_EXPLORER
-#: Shared/installer/nightly.nsi:457
+#: Shared/installer/nightly.nsi:456
 msgid "Add to Games Explorer"
 msgstr "गेम्स एक्सप्लोरर में जोड़ें"
 
 #. INST_DIRECTX
-#: Shared/installer/nightly.nsi:458
+#: Shared/installer/nightly.nsi:457
 msgid "Install DirectX"
 msgstr "इंस्टॉल DirectX"
 
 #. INST_SEC_CLIENT
-#: Shared/installer/nightly.nsi:492
+#: Shared/installer/nightly.nsi:491
 msgid "Game client"
 msgstr "गेम क्लाइंट"
 
 #. INST_SEC_SERVER
-#: Shared/installer/nightly.nsi:493
+#: Shared/installer/nightly.nsi:492
 msgid "Dedicated server"
 msgstr "समर्पित सर्वर"
 
 #. INST_SEC_CORE
-#: Shared/installer/nightly.nsi:494
+#: Shared/installer/nightly.nsi:493
 msgid "Core components"
 msgstr "कोर कंपोनेंट्स"
 
 #. INST_SEC_GAME
-#: Shared/installer/nightly.nsi:495
+#: Shared/installer/nightly.nsi:494
 msgid "Game module"
 msgstr "गेम मॉडल"
 
 #. INFO_INPLACE_UPGRADE
-#: Shared/installer/nightly.nsi:497
+#: Shared/installer/nightly.nsi:496
 msgid "Performing in-place upgrade..."
 msgstr "इन-प्लेस अपग्रेड किया जा रहा है..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: Shared/installer/nightly.nsi:498
+#: Shared/installer/nightly.nsi:497
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "अनुमतियों को अद्यतन कर रहा है। इसमें कुछ मिनट लग सकते हैं..."
 
 #. MSGBOX_INVALID_GTASA
-#: Shared/installer/nightly.nsi:499
+#: Shared/installer/nightly.nsi:498
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -213,42 +213,42 @@ msgstr "Grant Theft Auto: San Andreas का वैध विंडोज वर
 "यदि बाद में कोई समस्या आती है तो कृपया रीइंस्टॉल करें।"
 
 #. INST_SEC_CORE_RESOURCES
-#: Shared/installer/nightly.nsi:502
+#: Shared/installer/nightly.nsi:501
 msgid "Core Resources"
 msgstr "मुख्य संसाधन"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: Shared/installer/nightly.nsi:503
+#: Shared/installer/nightly.nsi:502
 msgid "Optional Resources"
 msgstr "वैकल्पिक संसाधन"
 
 #. INST_SEC_EDITOR
-#: Shared/installer/nightly.nsi:504
+#: Shared/installer/nightly.nsi:503
 msgid "Editor"
 msgstr "संपादक"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:999
+#: Shared/installer/nightly.nsi:998
 msgid "Development"
 msgstr "डेवेलपमेंट"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1047
+#: Shared/installer/nightly.nsi:1046
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) आपके कंप्यूटर से सफलतापूर्वक हटा दिया गया है।"
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1054
+#: Shared/installer/nightly.nsi:1053
 msgid "Uninstallation has failed!"
 msgstr "स्थापना रद्द करना विफल रहा!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1062
+#: Shared/installer/nightly.nsi:1061
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "क्या आप वाकई $(^Name) और उसके सभी अवयव को पूरी तरह से हटाना चाहते हैं?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1063
+#: Shared/installer/nightly.nsi:1062
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -257,7 +257,7 @@ msgstr "अपडेट से पहले अनइंस्टॉल कर�
 "अपनी सेटिंग्स को अपग्रेड और संरक्षित करने के लिए नया इंस्टॉलर चलाएं।"
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1076
+#: Shared/installer/nightly.nsi:1075
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "क्या आप अपनी डेटा फ़ाइलें (जैसे संसाधन, स्क्रीनशॉट और सर्वर कॉन्फ़िगरेशन) रखना चाहेंगे? यदि आप नहीं क्लिक करते हैं, तो आपके द्वारा बनाया गया कोई भी संसाधन, कॉन्फ़िगरेशन या स्क्रीनशॉट खो जाएगा।"
 
