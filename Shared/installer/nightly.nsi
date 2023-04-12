@@ -1150,6 +1150,11 @@ Section Uninstall
     ; Delete "SOFTWARE\Multi Theft Auto: San Andreas All" if "Common" is the only one left.
     ${RemoveRegistryGroupWithSingleKey} HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "Common"
 
+    ReadRegStr $0 HKLM "Software\Classes\mtasa\DefaultIcon" ""
+    ${If} $0 == "$INSTDIR\Multi Theft Auto.exe"
+        DeleteRegKey HKCR "mtasa"
+    ${EndIf}
+
     ${GameExplorer_RemoveGame} ${GUID}
 
     ; Delete client shortcuts
