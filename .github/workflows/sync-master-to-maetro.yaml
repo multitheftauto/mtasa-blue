@@ -1,0 +1,38 @@
+name: 'Sync master to maetro'
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  sync-master-to-maetro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.SYNC_CI_PAT }}
+      - id: sync_commits
+        name: Sync commits
+        run: |
+          # GitHub Actions bot user
+          git config --global user.name "Mætro Bot"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Checkout our release branch
+          git checkout release/maetro
+
+          # Merge master into this branch
+          git merge master --ff --no-edit
+
+          # Check for local commits
+          if [[ $(git diff --name-only "@{upstream}..") ]]
+          then
+            echo "has_changes=true" >> $GITHUB_ENV
+          else
+            echo "has_changes=false" >> $GITHUB_ENV
+          fi
+      - if: ${{ env.has_changes == 'true' }}
+        name: Push changes
+        run: git push origin release/maetro
