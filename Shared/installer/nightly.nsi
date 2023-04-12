@@ -54,7 +54,7 @@ Var ServerExePath
 Var UninstallExePath
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
-!define GUID "{D32E69D8-716F-4E74-91CB-044DB9AA3F40}"
+!define GUID "{119D0ADB-56AF-4C85-9037-26564C0ACD57}"
 
 
 !ifndef MAJOR_VER
