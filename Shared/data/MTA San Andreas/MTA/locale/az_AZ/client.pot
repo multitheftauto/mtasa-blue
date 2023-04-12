@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-10 17:42+0000\n"
-"PO-Revision-Date: 2023-04-10 20:28\n"
+"POT-Creation-Date: 2023-04-12 17:39+0000\n"
+"PO-Revision-Date: 2023-04-12 18:10\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -1486,7 +1486,7 @@ msgid "NEWS"
 msgstr "XƏBƏRLƏR"
 
 #. News link
-#: Client/core/CNewsBrowser.cpp:171
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
 msgid "Visit latest news article"
 msgstr "Son xəbərlərə baxın"
 
