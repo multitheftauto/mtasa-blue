@@ -103,31 +103,6 @@ Var UninstallExePath
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
-; Set file version information
-!ifndef VI_PRODUCT_VERSION
-    !ifdef REVISION
-        !define VI_PRODUCT_VERSION "${0.0.0}.${REVISION}"
-    !else
-        !define VI_PRODUCT_VERSION "${0.0.0}.0"
-    !endif
-    !define VI_PRODUCT_NAME "MTA San Andreas"
-    !define VI_COMPANY_NAME "Multi Theft Auto"
-    !define /date DATE_YEAR "%Y"
-    !define VI_LEGAL_COPYRIGHT "(C) 2003 - ${DATE_YEAR} Multi Theft Auto"
-    !ifndef LIGHTBUILD
-        !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
-    !else
-        !define VI_FILE_DESCRIPTION "Multi Theft Auto Nightly Installer"
-    !endif
-!endif
-VIProductVersion "${VI_PRODUCT_VERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${VI_PRODUCT_NAME}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${VI_COMPANY_NAME}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${VI_LEGAL_COPYRIGHT}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${VI_FILE_DESCRIPTION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VI_PRODUCT_VERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
-
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 !include "ReplaceSubStr.nsh"
@@ -202,6 +177,32 @@ Page custom CustomDirectoryPage CustomDirectoryPageLeave
 
 ; INSERT OUR LANGUAGE STRINGS -----
 !insertmacro MUI_LANGUAGE "English"
+
+; Set file version information
+!ifndef VI_PRODUCT_VERSION
+    !ifdef REVISION
+        !define VI_PRODUCT_VERSION "${0.0.0}.${REVISION}"
+    !else
+        !define VI_PRODUCT_VERSION "${0.0.0}.0"
+    !endif
+    !define VI_PRODUCT_NAME "MTA San Andreas"
+    !define VI_COMPANY_NAME "Multi Theft Auto"
+    !define /date DATE_YEAR "%Y"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - ${DATE_YEAR} Multi Theft Auto"
+    !ifndef LIGHTBUILD
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
+    !else
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Nightly Installer"
+    !endif
+!endif
+VIProductVersion "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${VI_PRODUCT_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${VI_COMPANY_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${VI_LEGAL_COPYRIGHT}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${VI_FILE_DESCRIPTION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
+
 ;@INSERT_TRANSLATIONS@
 
 LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
