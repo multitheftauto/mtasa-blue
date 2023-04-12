@@ -2,7 +2,7 @@ name: 'Sync master to maetro'
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
