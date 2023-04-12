@@ -168,9 +168,10 @@ void CNewsBrowser::CreateGUI()
     m_pButtonOK->SetZOrderingEnabled(false);
 
     // News link
+    float fNewsLinkButtonWidth = pManager->GetTextExtent(_("Visit latest news article"));
     m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Visit latest news article")));
-    m_pButtonNewsLink->SetSize(CVector2D(180, 40), false);
-    m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 250, 480.0f - 30));
+    m_pButtonNewsLink->SetSize(CVector2D(60 + fNewsLinkButtonWidth, 40), false);
+    m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 130 - fNewsLinkButtonWidth, 480.0f - 30));
     m_pButtonNewsLink->SetZOrderingEnabled(false);
 
     // Set up the events
