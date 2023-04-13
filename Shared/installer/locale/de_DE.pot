@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 21:37\n"
-"PO-Revision-Date: 2023-04-12 22:17\n"
+"PO-Revision-Date: 2023-04-13 11:27\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -25,7 +25,7 @@ msgstr "Die Version von MTA:SA, die Sie heruntergeladen haben, unterstützt nich
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:208
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Die Version von MTA:SA, die Sie heruntergeladen haben, unterstützt Windows 7, 8 und 8.1 nicht. Bitte laden Sie eine alternative Version von www.mtasa.com herunter."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:209
