@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-12 21:37\n"
-"PO-Revision-Date: 2023-04-12 22:17\n"
+"POT-Creation-Date: 2023-04-13 17:41\n"
+"PO-Revision-Date: 2023-04-13 17:49\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -29,7 +29,7 @@ msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:209
-msgid "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
+msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
 msgstr ""
 
 #. WELCOME_TEXT
