@@ -7120,11 +7120,18 @@ void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
         jz      out2
         movsx   edx, word ptr [esi+22h]
 
+        // Store all registers
+        pushad
+
         // Do our stuff
         push    esi // pEntity
         call    CanEntityCollideWithCamera
         add     esp, 4
         test    al, al
+
+        // Restore registers
+        popad
+
         jnz     out1
         jmp     RETURN_CCollision__CheckCameraCollisionObjects_2
 
