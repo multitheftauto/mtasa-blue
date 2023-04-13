@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-13 17:41\n"
-"PO-Revision-Date: 2023-04-13 17:48\n"
+"PO-Revision-Date: 2023-04-13 18:57\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -30,7 +30,7 @@ msgstr "Die Version von MTA:SA, die Sie heruntergeladen haben, unterstützt Wind
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:209
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Die von Ihnen heruntergeladene Version von MTA:SA ist für ältere Windows-Versionen ausgelegt. Bitte laden Sie die neueste Version von www.mtasa.com herunter."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:210
