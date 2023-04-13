@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-12 21:37\n"
-"PO-Revision-Date: 2023-04-12 22:17\n"
+"POT-Creation-Date: 2023-04-13 17:41\n"
+"PO-Revision-Date: 2023-04-13 17:49\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -29,8 +29,8 @@ msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:209
-msgid "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
-msgstr "該MTA:SA的版本僅支援舊版本的Windows。請至 www.mtasa.com 下載最新版本。"
+msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
+msgstr ""
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:210
