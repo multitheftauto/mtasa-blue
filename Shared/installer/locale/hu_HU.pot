@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-13 17:41\n"
-"PO-Revision-Date: 2023-04-13 17:48\n"
+"PO-Revision-Date: 2023-04-13 20:07\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -25,12 +25,12 @@ msgstr "Jelen verzió Windows XP-vel és Vista-val inkompatibilis. Kérlek, töl
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:208
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Az MTA:SA letöltött verziója nem támogatja a Windows 7, 8 vagy 8.1 operációs rendszert. Kérjük, töltsön le egy alternatív verziót a www.mtasa.com webhelyről."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:209
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Az MTA:SA letöltött verziója a Windows régi verzióihoz készült. Kérjük, töltsön le egy alternatív verziót a www.mtasa.com webhelyről."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:210
