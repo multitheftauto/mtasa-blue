@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-12 18:10\n"
+"PO-Revision-Date: 2023-04-14 13:07\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -2363,11 +2363,11 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA başlatılamadı çünkü dosya kopyalama başarısız oldu:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA başlatılamadı çünkü bir MTA:SA dosyası hatalı veya eksik:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -2375,7 +2375,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA başlatılamadı çünkü bir GTA:SA dosyası hatalı veya eksik:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -2383,7 +2383,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA başlatılamadı çünkü GTA:SA başlatma dosyası hatalı veya eksik:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
