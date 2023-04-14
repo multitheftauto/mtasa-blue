@@ -1,4 +1,3 @@
-XPStyle on
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 
@@ -54,7 +53,7 @@ Var ServerExePath
 Var UninstallExePath
 
 ; Games explorer: With each new X.X, update this GUID and the file at MTA10\launch\NEU\Multi Theft Auto.gdf.xml
-!define GUID "{D32E69D8-716F-4E74-91CB-044DB9AA3F40}"
+!define GUID "{119D0ADB-56AF-4C85-9037-26564C0ACD57}"
 
 
 !ifndef MAJOR_VER
@@ -102,31 +101,6 @@ Var UninstallExePath
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
-
-; Set file version information
-!ifndef VI_PRODUCT_VERSION
-    !ifdef REVISION
-        !define VI_PRODUCT_VERSION "${0.0.0}.${REVISION}"
-    !else
-        !define VI_PRODUCT_VERSION "${0.0.0}.0"
-    !endif
-    !define VI_PRODUCT_NAME "MTA San Andreas"
-    !define VI_COMPANY_NAME "Multi Theft Auto"
-    !define /date DATE_YEAR "%Y"
-    !define VI_LEGAL_COPYRIGHT "(C) 2003 - ${DATE_YEAR} Multi Theft Auto"
-    !ifndef LIGHTBUILD
-        !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
-    !else
-        !define VI_FILE_DESCRIPTION "Multi Theft Auto Nightly Installer"
-    !endif
-!endif
-VIProductVersion "${VI_PRODUCT_VERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${VI_PRODUCT_NAME}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${VI_COMPANY_NAME}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${VI_LEGAL_COPYRIGHT}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${VI_FILE_DESCRIPTION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VI_PRODUCT_VERSION}"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
@@ -202,10 +176,37 @@ Page custom CustomDirectoryPage CustomDirectoryPageLeave
 
 ; INSERT OUR LANGUAGE STRINGS -----
 !insertmacro MUI_LANGUAGE "English"
+
+; Set file version information
+!ifndef VI_PRODUCT_VERSION
+    !ifdef REVISION
+        !define VI_PRODUCT_VERSION "${0.0.0}.${REVISION}"
+    !else
+        !define VI_PRODUCT_VERSION "${0.0.0}.0"
+    !endif
+    !define VI_PRODUCT_NAME "MTA San Andreas"
+    !define VI_COMPANY_NAME "Multi Theft Auto"
+    !define /date DATE_YEAR "%Y"
+    !define VI_LEGAL_COPYRIGHT "(C) 2003 - ${DATE_YEAR} Multi Theft Auto"
+    !ifndef LIGHTBUILD
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Full Installer"
+    !else
+        !define VI_FILE_DESCRIPTION "Multi Theft Auto Nightly Installer"
+    !endif
+!endif
+VIProductVersion "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "${VI_PRODUCT_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "${VI_COMPANY_NAME}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "${VI_LEGAL_COPYRIGHT}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "${VI_FILE_DESCRIPTION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "${VI_PRODUCT_VERSION}"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
+
 ;@INSERT_TRANSLATIONS@
 
 LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA is designed for old versions of Windows.  Please download the newest version from www.mtasa.com."
+LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
+LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
 [Admin access may be requested for Vista and up]\n\n\
@@ -256,12 +257,15 @@ Function .onInit
         !insertmacro UAC_AsUser_GetGlobalVar $LANGUAGE # Copy our selected language from the outer to the inner instance
     ${EndIf}
 
-
-	${If} ${AtMostWinVista}
-		MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
-		ExecShell "open" "http://mtasa.com"
-		Quit
-	${EndIf}
+    ${If} ${AtMostWinVista}
+        MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
+        ExecShell "open" "https://multitheftauto.com"
+        Quit
+    ${ElseIf} ${AtMostWin8.1}
+        MessageBox MB_OK "$(GET_WIN81_PLEASE)"
+        ExecShell "open" "https://multitheftauto.com"
+        Quit
+    ${EndIf}
 
     File /oname=$TEMP\image.bmp "connect.bmp"
 
@@ -1085,14 +1089,10 @@ Section Uninstall
     Call un.DoServiceUninstall
     RmDir /r "$INSTDIR\mods"
     RmDir /r "$INSTDIR\MTA"
-
     RmDir /r "$INSTDIR\server"
-
-    !ifdef INCLUDE_DEVELOPMENT ; start of fix for #3889
-        RmDir /r "$INSTDIR\development\module sdk\publicsdk"
-        RmDir "$INSTDIR\development\module sdk"
-        RmDir "$INSTDIR\development"
-    !endif ; end of fix for #3889
+    RmDir /r "$INSTDIR\skins"
+    RmDir /r "$INSTDIR\development"
+    RmDir /r "$INSTDIR\screenshots"
 
     preservemapsfolder:
     Call un.DoServiceUninstall
@@ -1154,6 +1154,11 @@ Section Uninstall
     DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
     ; Delete "SOFTWARE\Multi Theft Auto: San Andreas All" if "Common" is the only one left.
     ${RemoveRegistryGroupWithSingleKey} HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "Common"
+
+    ReadRegStr $0 HKLM "Software\Classes\mtasa\DefaultIcon" ""
+    ${If} $0 == "$INSTDIR\Multi Theft Auto.exe"
+        DeleteRegKey HKCR "mtasa"
+    ${EndIf}
 
     ${GameExplorer_RemoveGame} ${GUID}
 
@@ -2531,10 +2536,10 @@ Function NetComposeURL
     IntOp $NetMirror $NetMirror % 2
     ${Switch} $NetMirror
         ${Case} 0
-            StrCpy $NetMsgURL "http://updatesa.multitheftauto.com/sa/install/1/?x=0"
+            StrCpy $NetMsgURL "https://updatesa.multitheftauto.com/sa/install/1/?x=0"
             ${Break}
         ${Default}
-            StrCpy $NetMsgURL "http://updatesa.mtasa.com/sa/install/1/?x=0"
+            StrCpy $NetMsgURL "https://updatesa.multitheftauto.com/sa/install/1/?x=0"
             ${Break}
     ${EndSwitch}
     StrCpy $NetMsgURL "$NetMsgURL$NetPrevInfo"
