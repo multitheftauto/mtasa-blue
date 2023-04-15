@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-15 17:15\n"
+"PO-Revision-Date: 2023-04-15 18:25\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -2391,7 +2391,7 @@ msgstr "MTA:SA nebylo možno spustit z důvodu poškozeného nebo chybějícího
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Prosím zkontrolujte svůj anitivirový program a zkuste v něm zapnout výjimku pro spouštěč GTA:SA, následně restartujte MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -2399,7 +2399,7 @@ msgstr "Generovat GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA nebylo možno spustit z důvodu nespustitelného spouštěče GTA:SA:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
@@ -2407,7 +2407,7 @@ msgstr "Aktualizovat GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA nebylo možno spustit z důvodu chyby během aktualizace GTA:SA:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -2537,11 +2537,11 @@ msgstr "B - Alternativní NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Standardní Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Alternativní Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
