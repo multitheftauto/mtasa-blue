@@ -11499,17 +11499,14 @@ bool CStaticFunctionDefinitions::KickPlayer(CPlayer* pPlayer, SString strRespons
     return true;
 }
 
-CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, SString strResponsible,
+CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pTargetPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, SString strResponsible,
                                             SString strReason, time_t tUnban)
 {
     // Make sure we have a player
-    assert(pPlayer);
+    assert(pTargetPlayer);
 
     // Initialize variables
     CBan* pBan = NULL;
-
-    SString strMessage;
-    SString strInfoMessage;
 
     // If the responsible string is too long, crop it
     if (strResponsible.length() > MAX_BAN_RESPONSIBLE_LENGTH)
@@ -11522,21 +11519,11 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // If the reason is too long, crop it
         if (sizeReason > MAX_BAN_REASON_LENGTH)
             strReason = strReason.substr(0, MAX_BAN_REASON_LENGTH - 3) + "...";
-
-        // Format the messages for both the banned player and the console
-        strMessage.Format("%s (%s)", strResponsible.c_str(), strReason.c_str());
-        strInfoMessage.Format("%s was banned from the game by %s (%s)", pPlayer->GetNick(), strResponsible.c_str(), strReason.c_str());
-    }
-    else
-    {
-        // Format the messages for both the banned player and the console
-        strMessage.Format("%s", strResponsible.c_str());
-        strInfoMessage.Format("%s was banned from the game by %s", pPlayer->GetNick(), strResponsible.c_str());
     }
 
     // Ban the player
     if (bIP)
-        pBan = m_pBanManager->AddBan(pPlayer, strResponsible, strReason, tUnban);
+        pBan = m_pBanManager->AddBan(pTargetPlayer, strResponsible, strReason, tUnban);
     else if (bUsername || bSerial)
         pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
 
@@ -11545,11 +11532,11 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
     {
         // Set the data if banned by either username or serial
         if (bUsername)
-            pBan->SetAccount(pPlayer->GetSerialUser());
+            pBan->SetAccount(pTargetPlayer->GetSerialUser());
         if (bSerial)
-            pBan->SetSerial(pPlayer->GetSerial());
+            pBan->SetSerial(pTargetPlayer->GetSerial());
         if (bUsername || bSerial)
-            pBan->SetNick(pPlayer->GetNick());
+            pBan->SetNick(pTargetPlayer->GetNick());
 
         // Check if we passed a responsible player
         if (pResponsible)
@@ -11574,35 +11561,85 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         if (pBan->IsBeingDeleted())
             return NULL;
 
-        // Call the event
-        CLuaArguments Arguments;
-        Arguments.PushBan(pBan);
+        SString strMessage;
+        SString strInfoMessage;
 
-        if (pResponsible)
-            Arguments.PushElement(pResponsible);
-
-        // A script can call kickPlayer in the onPlayerBan event, which would
-        // show him the 'kicked' message instead of our 'banned' message.
-        const bool bLeavingServer = pPlayer->IsLeavingServer();
-        pPlayer->SetLeavingServer(true);
-        pPlayer->CallEvent("onPlayerBan", Arguments);
-        pPlayer->SetLeavingServer(bLeavingServer);
-
-        // Check if script removed the ban
-        if (pBan->IsBeingDeleted())
-            return NULL;
-
-        // Tell the player that was banned why. QuitPlayer will delete the player.
-        if (!pPlayer->IsLeavingServer())
+        // Loop through players to see if we should kick anyone
+        list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
+        for (; iter != m_pPlayerManager->IterEnd(); iter++)
         {
-            time_t                    Duration = pBan->GetBanTimeRemaining();
-            CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
-            pPlayer->Send(Packet);
-            g_pGame->QuitPlayer(*pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
-        }
+            CPlayer* const pPlayer = *iter;
 
-        // Tell everyone else that he was banned from the game including console
-        CLogger::LogPrintf("BAN: %s\n", strInfoMessage.c_str());
+            // Default to not banning; if the IP, serial and username don't match, we don't want to kick the guy out
+            bool bBan = pPlayer == pTargetPlayer;
+
+            // Check if the player's IP matches the specified one, if specified
+            if (!bBan && bIP)
+            {
+                bBan = (pBan->GetIP() == pPlayer->GetSourceIP());
+            }
+
+            // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
+            if (!bBan && bUsername)
+            {
+                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
+                bBan = stricmp(strPlayerUsername.c_str(), pBan->GetAccount().c_str()) == 0;
+            }
+
+            // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
+            if (!bBan && bSerial)
+            {
+                const std::string& strPlayerSerial = pPlayer->GetSerial();
+                bBan = stricmp(strPlayerSerial.c_str(), pBan->GetSerial().c_str()) == 0;
+            }
+
+            // If either the IP, serial or username matched
+            if (bBan)
+            {
+                if (sizeReason >= MIN_BAN_REASON_LENGTH)
+                {
+                    // Format the messages for both the banned player and the console
+                    strMessage.Format("%s (%s)", strResponsible.c_str(), strReason.c_str());
+                    strInfoMessage.Format("%s was banned from the game by %s (%s)", pPlayer->GetNick(), strResponsible.c_str(), strReason.c_str());
+                }
+                else
+                {
+                    // Format the messages for both the banned player and the console
+                    strMessage.Format("%s", strResponsible.c_str());
+                    strInfoMessage.Format("%s was banned from the game by %s", pPlayer->GetNick(), strResponsible.c_str());
+                }
+
+                // Call the event
+                CLuaArguments Arguments;
+                Arguments.PushBan(pBan);
+
+                if (pResponsible)
+                    Arguments.PushElement(pResponsible);
+
+                // A script can call kickPlayer in the onPlayerBan event, which would
+                // show him the 'kicked' message instead of our 'banned' message.
+                const bool bLeavingServer = pPlayer->IsLeavingServer();
+                pPlayer->SetLeavingServer(true);
+                pPlayer->CallEvent("onPlayerBan", Arguments);
+                pPlayer->SetLeavingServer(bLeavingServer);
+
+                // Check if script removed the ban
+                if (pBan->IsBeingDeleted())
+                    return NULL;
+
+                // Tell the player that was banned why. QuitPlayer will delete the player.
+                if (!pPlayer->IsLeavingServer())
+                {
+                    time_t                    Duration = pBan->GetBanTimeRemaining();
+                    CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
+                    pPlayer->Send(Packet);
+                    g_pGame->QuitPlayer(**iter, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+                }
+
+                // Tell everyone else that he was banned from the game including console
+                CLogger::LogPrintf("BAN: %s\n", strInfoMessage.c_str());
+            }
+        }
 
         return pBan;
     }
