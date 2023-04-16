@@ -16,6 +16,7 @@ SetCompressor /SOLID lzma
 !include x64.nsh
 !include procfunc.nsh
 !include KBInstall.nsh
+!include MultiSzMacro.nsh
 
 Var GTA_DIR
 Var Install_Dir
@@ -1172,6 +1173,62 @@ Section Uninstall
 
         RmDir "$INSTDIR" ; fix for #3898
 
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\Multi Theft Auto.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\Multi Theft Auto.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\MTA\wow64_helper.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\MTA\wow64_helper.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server64.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server64.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$APPDATA\MTA San Andreas All\${0.0}\GTA San Andreas\gta_sa.exe.FriendlyAppName"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\Multi Theft Auto.exe"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\server\MTA Server.exe"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\server\MTA Server64.exe"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\Uninstall.exe"
+
+        ; Clean up shortcut leftovers from registry (is this even needed or correct?)
+        StrCpy $7 0
+    loop:
+        ClearErrors
+        EnumRegValue $8 HKCU Software\Microsoft\Windows\CurrentVersion\UFH\SHC $7
+        IfErrors done
+
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\Multi Theft Auto.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\server\MTA Server.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\Uninstall.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ; Clean up after old bugged path
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\MTA Server.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ; Clean up after old bugged path
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$DESKTOP\Uninstall.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        IntOp $7 $7 + 1
+        Goto loop
+    done:
         SimpleFC::RemoveApplication "$INSTDIR\Multi Theft Auto.exe"
         SimpleFC::RemoveApplication "$INSTDIR\server\MTA Server.exe"
         SimpleFC::RemoveApplication "$INSTDIR\server\MTA Server64.exe"
