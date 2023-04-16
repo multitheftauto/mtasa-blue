@@ -8079,6 +8079,9 @@ CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned
     pObject->SetRotation(vecRadians);
     pObject->SetModel(usModelID);
 
+    if (CObjectManager::IsBreakableModel(usModelID))
+        pObject->SetBreakable(true);
+
     if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
@@ -8253,6 +8256,38 @@ bool CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions(CElement* pEleme
         CObject* pObject = static_cast<CObject*>(pElement);
 
         return pObject->IsVisibleInAllDimensions();
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsObjectBreakable(CElement* pElement)
+{
+    if (IS_OBJECT(pElement))
+    {
+        CObject* pObject = static_cast<CObject*>(pElement);
+
+        return pObject->IsBreakable();
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectBreakable(CElement* pElement, const bool bBreakable)
+{
+    RUN_CHILDREN(SetObjectBreakable(*iter, bBreakable))
+
+    if (IS_OBJECT(pElement))
+    {
+        CObject* pObject = static_cast<CObject*>(pElement);
+
+        pObject->SetBreakable(bBreakable);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(bBreakable);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_OBJECT_BREAKABLE, *BitStream.pBitStream));
+
+        return true;
     }
 
     return false;
