@@ -485,8 +485,9 @@ enum class eBitStreamVersion : unsigned short
     // 1.6.0 RELEASED - 2023-04-07
     //
 
+    CEntityAddPacket_ObjectBreakable,
+
     // Add "dontburnflippedcars" to setGlitchEnabled
-    // 2023-04-09
     DontBurnFlippedCars,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.

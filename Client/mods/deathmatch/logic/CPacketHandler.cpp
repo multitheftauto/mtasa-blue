@@ -2955,6 +2955,9 @@ retry:
                         if (bitStream.ReadBit())
                             pObject->SetDoubleSided(true);
 
+                        if (bitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                            pObject->SetBreakable(bitStream.ReadBit());
+
                         if (bitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                             if (bitStream.ReadBit())
                                 pObject->SetVisibleInAllDimensions(true);

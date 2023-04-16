@@ -3524,6 +3524,7 @@ void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>&
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
+        case VT_BLOODRA:
             memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
             // Keep the bonet and boot intact
