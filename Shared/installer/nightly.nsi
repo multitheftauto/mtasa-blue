@@ -16,6 +16,7 @@ SetCompressor /SOLID lzma
 !include x64.nsh
 !include procfunc.nsh
 !include KBInstall.nsh
+!include MultiSzMacro.nsh
 
 Var GTA_DIR
 Var Install_Dir
@@ -23,15 +24,12 @@ Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RegisterProtocol
 Var AddToGameExplorer
-Var ExeMD5
-Var PatchInstalled
 Var DEFAULT_INSTDIR
 Var LAST_INSTDIR
 Var CUSTOM_INSTDIR
 Var WhichRadio
 Var ShowLastUsed
 Var PermissionsGroup
-Var PATCH_TARGET
 
 # Shortcuts names
 Var ClientShortcutName
@@ -392,7 +390,7 @@ Function .onInstSuccess
 		${EndIf}
 		# Either update or create Server shortcut
 		${If} ${FileExists} $StartMenuServerShortcutPath
-			Push $ServerExeName
+			Push $ServerExePath
 			Push $StartMenuServerShortcutPath
 			Call MTAUpdateShortсutTarget
 		${Else}
@@ -403,12 +401,12 @@ Function .onInstSuccess
 		${EndIf}
 		# Either update or create Uninstall shortcut
 		${If} ${FileExists} $StartMenuUninstallShortcutPath
-			Push $UninstallExeName
+			Push $UninstallExePath
 			Push $StartMenuUninstallShortcutPath
 			Call MTAUpdateShortсutTarget
 		${Else}
-			Push $UninstallExeName
-			Push $UninstallExeName
+			Push $UninstallExePath
+			Push $UninstallExePath
 			Push $StartMenuUninstallShortcutPath
 			Call MTACreateShortсut
 		${EndIf}
@@ -1082,99 +1080,162 @@ Section Uninstall
     IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
     IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
     IfFileExists "$INSTDIR\mods\deathmatch\resources\*.*" ask deleteall ;no maps folder, so delete everything
+
     ask:
-    MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_DATA_REQUEST)" IDYES preservemapsfolder
+        MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "$(UNINST_DATA_REQUEST)" IDYES preservemapsfolder
 
     deleteall:
-    Call un.DoServiceUninstall
-    RmDir /r "$INSTDIR\mods"
-    RmDir /r "$INSTDIR\MTA"
-    RmDir /r "$INSTDIR\server"
-    RmDir /r "$INSTDIR\skins"
-    RmDir /r "$INSTDIR\development"
-    RmDir /r "$INSTDIR\screenshots"
+        Call un.DoServiceUninstall
+        RmDir /r "$INSTDIR\mods"
+        RmDir /r "$INSTDIR\MTA"
+        RmDir /r "$INSTDIR\server"
+        RmDir /r "$INSTDIR\skins"
+        RmDir /r "$INSTDIR\development"
+        RmDir /r "$INSTDIR\screenshots"
 
     preservemapsfolder:
-    Call un.DoServiceUninstall
-    ; server CORE FILES
-    Delete "$INSTDIR\server\core.dll"
-    Delete "$INSTDIR\server\MTA Server.exe"
-    Delete "$INSTDIR\server\net.dll"
-    Delete "$INSTDIR\server\pthread.dll"
-    Delete "$INSTDIR\server\xmll.dll"
+        Call un.DoServiceUninstall
+        ; server CORE FILES
+        Delete "$INSTDIR\server\core.dll"
+        Delete "$INSTDIR\server\MTA Server.exe"
+        Delete "$INSTDIR\server\net.dll"
+        Delete "$INSTDIR\server\pthread.dll"
+        Delete "$INSTDIR\server\xmll.dll"
 
-    ; server files
-    Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
-    Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
+        ; server files
+        Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 
-    ; server x64 CORE FILES
-    Delete "$INSTDIR\server\MTA Server64.exe"
-    Delete "$INSTDIR\server\x64\core.dll"
-    Delete "$INSTDIR\server\x64\net.dll"
-    Delete "$INSTDIR\server\x64\pthread.dll"
-    Delete "$INSTDIR\server\x64\xmll.dll"
+        ; server x64 CORE FILES
+        Delete "$INSTDIR\server\MTA Server64.exe"
+        Delete "$INSTDIR\server\x64\core.dll"
+        Delete "$INSTDIR\server\x64\net.dll"
+        Delete "$INSTDIR\server\x64\pthread.dll"
+        Delete "$INSTDIR\server\x64\xmll.dll"
 
-    ; server x64 files
-    Delete "$INSTDIR\server\x64\dbconmy.dll"
-    Delete "$INSTDIR\server\x64\deathmatch.dll"
-    Delete "$INSTDIR\server\x64\libmysql.dll"
-    Delete "$INSTDIR\server\x64\lua5.1.dll"
-    Delete "$INSTDIR\server\x64\pcre3.dll"
-    RmDir "$INSTDIR\server\x64"
+        ; server x64 files
+        Delete "$INSTDIR\server\x64\dbconmy.dll"
+        Delete "$INSTDIR\server\x64\deathmatch.dll"
+        Delete "$INSTDIR\server\x64\libmysql.dll"
+        Delete "$INSTDIR\server\x64\lua5.1.dll"
+        Delete "$INSTDIR\server\x64\pcre3.dll"
+        RmDir "$INSTDIR\server\x64"
 
-    Delete "$INSTDIR\Multi Theft Auto.exe"
-    Delete "$INSTDIR\Multi Theft Auto.exe.dat"
-    Delete "$INSTDIR\Uninstall.exe"
+        Delete "$INSTDIR\Multi Theft Auto.exe"
+        Delete "$INSTDIR\Multi Theft Auto.exe.dat"
+        Delete "$INSTDIR\Uninstall.exe"
 
-    Delete "$INSTDIR\mods\deathmatch\client.dll"
-    Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
+        Delete "$INSTDIR\mods\deathmatch\client.dll"
+        Delete "$INSTDIR\mods\deathmatch\pcre3.dll"
 
-    RmDir /r "$INSTDIR\MTA\cgui"
-    RmDir /r "$INSTDIR\MTA\data"
-    RmDir /r "$INSTDIR\MTA\CEF"
-    RmDir /r "$INSTDIR\MTA\locale"
-    Delete "$INSTDIR\MTA\*.dll"
-    Delete "$INSTDIR\MTA\*.exe"
-    Delete "$INSTDIR\MTA\*.dmp"
-    Delete "$INSTDIR\MTA\*.log"
-    Delete "$INSTDIR\MTA\*.dat"
-    Delete "$INSTDIR\MTA\*.bin"
+        RmDir /r "$INSTDIR\MTA\cgui"
+        RmDir /r "$INSTDIR\MTA\data"
+        RmDir /r "$INSTDIR\MTA\CEF"
+        RmDir /r "$INSTDIR\MTA\locale"
+        Delete "$INSTDIR\MTA\*.dll"
+        Delete "$INSTDIR\MTA\*.exe"
+        Delete "$INSTDIR\MTA\*.dmp"
+        Delete "$INSTDIR\MTA\*.log"
+        Delete "$INSTDIR\MTA\*.dat"
+        Delete "$INSTDIR\MTA\*.bin"
 
-    RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
-    ; Delete "$APPDATA\MTA San Andreas All" if "Common" is the only directory in it.
-    ${RmDirWithSingleChildDir} "$APPDATA\MTA San Andreas All" "Common"
+        RmDir /r "$APPDATA\MTA San Andreas All\${0.0}"
+        ; Delete "$APPDATA\MTA San Andreas All" if "Common" is the only directory in it.
+        ${RmDirWithSingleChildDir} "$APPDATA\MTA San Andreas All" "Common"
 
-    DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
-    DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-    DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
-    DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
-    DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
-    ; Delete "SOFTWARE\Multi Theft Auto: San Andreas All" if "Common" is the only one left.
-    ${RemoveRegistryGroupWithSingleKey} HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "Common"
+        DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+        DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+        DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
+        DeleteRegKey HKCU "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}"
+        DeleteRegKey HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}"
+        ; Delete "SOFTWARE\Multi Theft Auto: San Andreas All" if "Common" is the only one left.
+        ${RemoveRegistryGroupWithSingleKey} HKLM "SOFTWARE\Multi Theft Auto: San Andreas All" "Common"
 
-    ReadRegStr $0 HKLM "Software\Classes\mtasa\DefaultIcon" ""
-    ${If} $0 == "$INSTDIR\Multi Theft Auto.exe"
-        DeleteRegKey HKCR "mtasa"
-    ${EndIf}
+        ReadRegStr $0 HKLM "Software\Classes\mtasa\DefaultIcon" ""
+        ${If} $0 == "$INSTDIR\Multi Theft Auto.exe"
+            DeleteRegKey HKCR "mtasa"
+        ${EndIf}
 
-    ${GameExplorer_RemoveGame} ${GUID}
+        ${GameExplorer_RemoveGame} ${GUID}
 
-    ; Delete client shortcuts
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
-    Delete "$DESKTOP\MTA San Andreas ${0.0}.lnk"
+        ; Delete client shortcuts
+        Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA San Andreas.lnk"
+        Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas.lnk"
+        Delete "$DESKTOP\MTA San Andreas ${0.0}.lnk"
 
-    RmDir "$INSTDIR" ; fix for #3898
+        ; Delete server shortcuts
+        Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk"
+        Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk"
+        RmDir /r "$SMPROGRAMS\\MTA San Andreas ${0.0}"
 
-    ; Delete server shortcuts
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\MTA Server.lnk"
-    Delete "$SMPROGRAMS\\MTA San Andreas ${0.0}\Uninstall MTA San Andreas Server.lnk"
-    RmDir /r "$SMPROGRAMS\\MTA San Andreas ${0.0}"
+        RmDir "$INSTDIR" ; fix for #3898
 
-    SetAutoClose true
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\Multi Theft Auto.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\Multi Theft Auto.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\MTA\wow64_helper.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\MTA\wow64_helper.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server64.exe.FriendlyAppName"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server64.exe.ApplicationCompany"
+        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$APPDATA\MTA San Andreas All\${0.0}\GTA San Andreas\gta_sa.exe.FriendlyAppName"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\Multi Theft Auto.exe"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\server\MTA Server.exe"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\server\MTA Server64.exe"
+        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\Uninstall.exe"
+
+        ; Clean up shortcut leftovers from registry (is this even needed or correct?)
+        StrCpy $7 0
+    loop:
+        ClearErrors
+        EnumRegValue $8 HKCU Software\Microsoft\Windows\CurrentVersion\UFH\SHC $7
+        IfErrors done
+
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\Multi Theft Auto.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\server\MTA Server.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\Uninstall.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ; Clean up after old bugged path
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\MTA Server.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        ; Clean up after old bugged path
+        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$DESKTOP\Uninstall.exe" $9
+        ${If} $9 != ""
+            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
+            Goto loop
+        ${EndIf}
+
+        IntOp $7 $7 + 1
+        Goto loop
+    done:
+        SimpleFC::RemoveApplication "$INSTDIR\Multi Theft Auto.exe"
+        SimpleFC::RemoveApplication "$INSTDIR\server\MTA Server.exe"
+        SimpleFC::RemoveApplication "$INSTDIR\server\MTA Server64.exe"
+        SimpleFC::RemoveApplication "$INSTDIR\Uninstall.exe"
+        SimpleFC::RemoveApplication "$APPDATA\MTA San Andreas All\${0.0}\GTA San Andreas\gta_sa.exe"
+
+        SetAutoClose true
 SectionEnd
 
 ; Function that skips the game directory page if client is not selected
@@ -2293,15 +2354,6 @@ Function RemoveEndsFromPath
 FunctionEnd
 
 ; In $0 = path
-; Out $0 = result
-Function ConformDirectoryPath
-    nsArray::Clear my_array
-    nsArray::Split my_array $0 \ /noempty
-    nsArray::Join my_array \ /noempty
-    Pop $0
-FunctionEnd
-
-; In $0 = path
 ; Out $1 = result 0/1
 Function DoesDirExist
     StrCpy $1 1
@@ -2643,6 +2695,6 @@ Function MTAInitFileNamesAndPaths
 	StrCpy $UninstallExeName "Uninstall.exe"
 	# Exe paths
 	StrCpy $ClientExePath "$INSTDIR\$ClientExeName"
-	StrCpy $ServerExePath "$INSTDIR\$ServerExeName"
+	StrCpy $ServerExePath "$INSTDIR\server\$ServerExeName"
 	StrCpy $UninstallExePath "$INSTDIR\$UninstallExeName"
 FunctionEnd
