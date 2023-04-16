@@ -282,6 +282,7 @@ protected:
     std::list<class CPed*> m_OriginSourceUsers;
     unsigned char          m_ucInterior;
     bool                   m_bDoubleSided;
+    bool                   m_bBreakable;
     bool                   m_bUpdatingSpatialData;
     bool                   m_bCallPropagationEnabled;
     bool                   m_canBeDestroyedByScript = true;            // If true, destroyElement function will
