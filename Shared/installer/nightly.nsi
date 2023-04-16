@@ -23,15 +23,12 @@ Var CreateSMShortcuts
 Var CreateDesktopIcon
 Var RegisterProtocol
 Var AddToGameExplorer
-Var ExeMD5
-Var PatchInstalled
 Var DEFAULT_INSTDIR
 Var LAST_INSTDIR
 Var CUSTOM_INSTDIR
 Var WhichRadio
 Var ShowLastUsed
 Var PermissionsGroup
-Var PATCH_TARGET
 
 # Shortcuts names
 Var ClientShortcutName
@@ -2290,15 +2287,6 @@ Function RemoveEndsFromPath
 
     nsArray::Join my_array \ /noempty
     Pop $2
-FunctionEnd
-
-; In $0 = path
-; Out $0 = result
-Function ConformDirectoryPath
-    nsArray::Clear my_array
-    nsArray::Split my_array $0 \ /noempty
-    nsArray::Join my_array \ /noempty
-    Pop $0
 FunctionEnd
 
 ; In $0 = path
