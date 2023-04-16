@@ -389,7 +389,7 @@ Function .onInstSuccess
 		${EndIf}
 		# Either update or create Server shortcut
 		${If} ${FileExists} $StartMenuServerShortcutPath
-			Push $ServerExeName
+			Push $ServerExePath
 			Push $StartMenuServerShortcutPath
 			Call MTAUpdateShortсutTarget
 		${Else}
@@ -400,12 +400,12 @@ Function .onInstSuccess
 		${EndIf}
 		# Either update or create Uninstall shortcut
 		${If} ${FileExists} $StartMenuUninstallShortcutPath
-			Push $UninstallExeName
+			Push $UninstallExePath
 			Push $StartMenuUninstallShortcutPath
 			Call MTAUpdateShortсutTarget
 		${Else}
-			Push $UninstallExeName
-			Push $UninstallExeName
+			Push $UninstallExePath
+			Push $UninstallExePath
 			Push $StartMenuUninstallShortcutPath
 			Call MTACreateShortсut
 		${EndIf}
@@ -2631,6 +2631,6 @@ Function MTAInitFileNamesAndPaths
 	StrCpy $UninstallExeName "Uninstall.exe"
 	# Exe paths
 	StrCpy $ClientExePath "$INSTDIR\$ClientExeName"
-	StrCpy $ServerExePath "$INSTDIR\$ServerExeName"
+	StrCpy $ServerExePath "$INSTDIR\server\$ServerExeName"
 	StrCpy $UninstallExePath "$INSTDIR\$UninstallExeName"
 FunctionEnd
