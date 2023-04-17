@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-12 18:08\n"
+"PO-Revision-Date: 2023-04-17 19:17\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1826,7 +1826,7 @@ msgstr "اللاعبين"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Ping"
-msgstr "البنق"
+msgstr "التأخير"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:456
 msgid "Gamemode"
