@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:37\n"
+"PO-Revision-Date: 2023-04-17 15:52\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -25,12 +25,12 @@ msgstr "Yüklədiyiniz MTA:SA versiyası Windows XP və ya Vista'nı dəstəklə
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Yüklədiyiniz MTA:SA versiyası Windows 7, 8 və ya 8.1-i dəstəkləmir. Lütfən, www.mtasa.com saytından alternativ versiyanı endirin."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Yüklədiyiniz MTA:SA versiyası Windows-un köhnə versiyaları üçün nəzərdə tutulub. Lütfən, www.mtasa.com saytından alternativ versiyanı endirin."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
