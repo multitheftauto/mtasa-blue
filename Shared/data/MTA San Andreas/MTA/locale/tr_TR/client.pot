@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-14 14:17\n"
+"PO-Revision-Date: 2023-04-17 17:08\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -2359,7 +2359,7 @@ msgstr "Multi Theft Auto düzgün şekilde yüklenmemiş, lütfen tekrar yükley
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr "GTA:SA Bağlantı noktası oluştur"
+msgstr "GTA:SA Bağlantı noktaları oluştur"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
