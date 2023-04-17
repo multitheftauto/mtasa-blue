@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:36\n"
+"PO-Revision-Date: 2023-04-17 17:08\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -25,12 +25,12 @@ msgstr "Lataamasi MTA:SA versio ei tue Windows XP:tä tai Vistaa. Ole hyvä ja l
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Lataamasi MTA:SA versio ei tue Windows 7, 8 tai 8.1:tä. Ole hyvä ja lataa vaihtoehtoinen versio osoitteesta www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Lataamasi MTA:SA versio on tarkoitettu vanhoille Windows versioille. Lataa uusin versio osoitteesta www.mtasa.com."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
