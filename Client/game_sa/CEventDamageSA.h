@@ -11,10 +11,12 @@
 
 #pragma once
 
-#include <windows.h>
 #include <game/CEventDamage.h>
-#include "CEntitySA.h"
 #include "CPedDamageResponseSA.h"
+
+class CEntitySAInterface;
+enum eWeaponType;
+enum ePedPieceTypes;
 
 #define FUNC_CEventDamage_Constructor           0x4ad830
 #define FUNC_CEventDamage_Destructor            0x4ad960
@@ -26,10 +28,6 @@
 #define FUNC_CEventDamage_ComputeDeathAnim      0x4B3A60
 #define FUNC_CEventDamage_ComputeDamageAnim     0x4b3fc0
 #define FUNC_CEventDamage_AffectsPed            0x4b35a0
-
-class CEntitySAInterface;
-enum eWeaponType;
-enum ePedPieceTypes;
 
 class CEventDamageSAInterface
 {

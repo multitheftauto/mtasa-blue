@@ -10,7 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaDefs.h"
+#include "CLuaClassDefs.h"
 #include "lua/LuaCommon.h"
+#include "CMapManager.h"
+#include "CDebugHookManager.h"
+#include "CPerfStatModule.h"
+#include "CGame.h"
+
 extern uint g_uiNetSentByteCounter;
 
 namespace
@@ -72,6 +79,7 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pResourceManager = pGame->GetResourceManager();
     m_pACLManager = pGame->GetACLManager();
     m_pMainConfig = pGame->GetConfig();
+    m_pLuaModuleManager = m_pLuaManager->GetLuaModuleManager();
 }
 
 bool CLuaDefs::CanUseFunction(const char* szFunction, lua_State* luaVM, bool bRestricted)
@@ -114,9 +122,13 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
     {
         return true;
     }
-    
+
     // Get associated resource
-    CResource& resource{ lua_getownerresource(luaVM) };
+    CResource& resource{lua_getownerresource(luaVM)};
+
+    // Since this method is used as a pre-call hook, make sure the resource is valid/running
+    if (!resource.IsActive())
+        return false;
 
     // Update execution time check
     resource.GetVirtualMachine()->CheckExecutionTime();

@@ -1,12 +1,12 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/deathmatch/logic/CClientModel.h
-*  PURPOSE:     Model handling class
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CClientModel.h
+ *  PURPOSE:     Model handling class
+ *
+ *****************************************************************************/
 
 class CClientModel;
 
@@ -19,13 +19,14 @@ enum class eClientModelType
     PED,
     OBJECT,
     VEHICLE,
+    TIMED_OBJECT,
     TXD,
 };
 
 class CResource;
 class CClientManager;
 
-class CClientModel
+class CClientModel final
 {
     friend class CClientModelManager;
 
@@ -48,8 +49,8 @@ private:
 protected:
     CClientManager* m_pManager;
 
-    int                             m_iModelID;
-    eClientModelType                m_eModelType;
-    bool                            m_bAllocatedByUs;
-    CResource*                      m_pParentResource; // Resource that allocated model
+    int              m_iModelID;
+    eClientModelType m_eModelType;
+    bool             m_bAllocatedByUs = false;
+    CResource*       m_pParentResource = nullptr;            // Resource that allocated model
 };

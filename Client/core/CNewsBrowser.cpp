@@ -150,7 +150,7 @@ void CNewsBrowser::CreateGUI()
     CGUI* pManager = g_pCore->GetGUI();
 
     // Create the window
-    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, "NEWS"));
+    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, _("NEWS")));
     m_pWindow->SetCloseButtonEnabled(true);
     m_pWindow->SetMovable(true);
 

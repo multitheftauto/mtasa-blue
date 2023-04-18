@@ -9,26 +9,19 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaBitDefs.h"
+#include "CScriptArgReader.h"
 
 #define mask(n) ((1 << (n)) - 1)
 
 void CLuaBitDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"bitAnd", bitAnd},
-        {"bitNot", bitNot},
-        {"bitOr", bitOr},
-        {"bitTest", bitTest},
-        {"bitXor", bitXor},
+        {"bitAnd", bitAnd},         {"bitNot", bitNot},         {"bitOr", bitOr},         {"bitTest", bitTest},     {"bitXor", bitXor},
 
-        {"bitLRotate", bitLRotate},
-        {"bitRRotate", bitRRotate},
-        {"bitLShift", bitLShift},
-        {"bitRShift", bitRShift},
-        {"bitArShift", bitArShift},
+        {"bitLRotate", bitLRotate}, {"bitRRotate", bitRRotate}, {"bitLShift", bitLShift}, {"bitRShift", bitRShift}, {"bitArShift", bitArShift},
 
-        {"bitExtract", bitExtract},
-        {"bitReplace", bitReplace},
+        {"bitExtract", bitExtract}, {"bitReplace", bitReplace},
     };
 
     // Add functions

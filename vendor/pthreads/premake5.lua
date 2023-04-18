@@ -41,11 +41,29 @@ project "pthread"
 	filter {"system:windows", "platforms:x64", "configurations:Debug"}
 		postbuildcommands {
 			-- Fix net.dll requiring the release build
-			"copy \"%{wks.location}..\\Bin\\server\\x64\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\x64\\pthread.dll\""
+			"copy \"%{wks.location}..\\Bin\\server\\x64\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\x64\\pthread.dll\"",
+		}
+
+	filter {"system:windows", "platforms:arm", "configurations:Debug"}
+		postbuildcommands {
+			-- Fix net.dll requiring the release build
+			"copy \"%{wks.location}..\\Bin\\server\\arm\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\arm\\pthread.dll\"",
+		}
+
+	filter {"system:windows", "platforms:arm64", "configurations:Debug"}
+		postbuildcommands {
+			-- Fix net.dll requiring the release build
+			"copy \"%{wks.location}..\\Bin\\server\\arm64\\pthread_d.dll\" \"%{wks.location}..\\Bin\\server\\arm64\\pthread.dll\"",
 		}
 
 	filter {"system:windows", "platforms:x64"}
 		targetdir(buildpath("server/x64"))
+
+	filter {"system:windows", "platforms:arm"}
+		targetdir(buildpath("server/arm"))
+
+	filter {"system:windows", "platforms:arm64"}
+		targetdir(buildpath("server/arm64"))
 
 	filter "system:windows"
 		defines {

@@ -12,6 +12,11 @@
 
 #pragma once
 
+#include "TInterpolation.h"
+#include "CVector.h"
+
+class NetBitStreamInterface;
+
 struct SPositionRotation
 {
     SPositionRotation() {}

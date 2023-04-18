@@ -9,8 +9,8 @@
 #include "StdInc.h"
 #include "CWebApp.h"
 
-#include <cef3/include/wrapper/cef_stream_resource_handler.h>
-#include <cef3/include/cef_parser.h>
+#include <cef3/cef/include/wrapper/cef_stream_resource_handler.h>
+#include <cef3/cef/include/cef_parser.h>
 #include "CAjaxResourceHandler.h"
 
 CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
@@ -19,18 +19,15 @@ CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsi
     return new CefStreamResourceHandler(uiError, strError, "text/plain", CefResponse::HeaderMap(), stream);
 }
 
-void CWebApp::OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar)
-{
-    // Register custom MTA scheme (has to be called in all proceseses)
-    registrar->AddCustomScheme("mtalocal", CEF_SCHEME_OPTION_CSP_BYPASSING);
-}
-
 void CWebApp::OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line)
 {
     command_line->AppendSwitch("disable-gpu-compositing");
     command_line->AppendSwitch("disable-gpu");
     // command_line->AppendSwitch("disable-d3d11");
     command_line->AppendSwitch("enable-begin-frame-scheduling");
+
+    // browser-signin switch(or lack thereof) produces crashes when GOOGLE API keys are present in the OS registry
+    command_line->AppendSwitchWithValue("allow-browser-signin", "false");
 
     if (process_type.empty())
     {
@@ -56,32 +53,6 @@ CefRefPtr<CefResourceHandler> CWebApp::Create(CefRefPtr<CefBrowser> browser, Cef
     CefURLParts urlParts;
     if (!CefParseURL(request->GetURL(), urlParts))
         return nullptr;
-
-    if (scheme_name == "mtalocal")            // Backward compatibility
-    {
-        // Get full path
-        SString path = UTF16ToMbUTF8(urlParts.path.str).substr(2);
-
-        // Check if we're dealing with an external resource
-        if (path[0] == ':')
-        {
-            size_t end = path.find_first_of('/');
-            if (end != std::string::npos)
-            {
-                SString resourceName = path.substr(1, end - 1);
-                SString resourcePath = path.substr(end);
-
-                // Call this function recursively and use the mta scheme instead
-                request->SetURL("http://mta/local/" + resourceName + resourcePath);
-                return Create(browser, frame, "http", request);
-            }
-            return HandleError("404 - Not found", 404);
-        }
-
-        // Redirect mtalocal://* to http://mta/local/*, call recursively
-        request->SetURL("http://mta/local/" + path);
-        return Create(browser, frame, "http", request);
-    }
 
     SString host = UTF16ToMbUTF8(urlParts.host.str);
     if (scheme_name == "http" && host == "mta")

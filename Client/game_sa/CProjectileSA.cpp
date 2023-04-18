@@ -10,24 +10,28 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
+#include "CProjectileInfoSA.h"
+#include "CProjectileSA.h"
+#include "CWorldSA.h"
+
+extern CGameSA* pGame;
 
 CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObjectSA(projectileInterface)
 {
     internalInterface = projectileInterface;
     projectileInfo = NULL;
-    this->BeingDeleted = false;
-    this->DoNotRemoveFromGame = false;
-    this->internalInterface->bStreamingDontDelete = true;
-    this->internalInterface->bDontStream = true;
-    this->internalInterface->bRemoveFromWorld = false;
+    BeingDeleted = false;
+    DoNotRemoveFromGame = false;
+    internalInterface->bStreamingDontDelete = true;
+    internalInterface->bDontStream = true;
+    internalInterface->bRemoveFromWorld = false;
     m_bDestroyed = false;
 }
 
 CProjectileSA::~CProjectileSA()
 {
-    DEBUG_TRACE("CProjectileSA::~CProjectileSA( )");
-
-    this->BeingDeleted = true;
+    BeingDeleted = true;
     /*
     //OutputDebugString("Attempting to destroy Object\n");
     if(!this->BeingDeleted && DoNotRemoveFromGame == false)

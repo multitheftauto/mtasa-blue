@@ -10,6 +10,19 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CUnoccupiedVehicleSync.h"
+#include "CElementIDs.h"
+#include "CVehicleManager.h"
+#include "CColManager.h"
+#include "packets/CUnoccupiedVehiclePushPacket.h"
+#include "packets/CUnoccupiedVehicleStartSyncPacket.h"
+#include "packets/CUnoccupiedVehicleStopSyncPacket.h"
+#include "packets/CUnoccupiedVehicleSyncPacket.h"
+#include "packets/CVehicleResyncPacket.h"
+#include "CTickRateSettings.h"
+#include "CGame.h"
+#include "Utils.h"
+#include "lua/CLuaFunctionParseHelpers.h"
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync(CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager)
 {
@@ -241,7 +254,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
     if (pPlayer && pPlayer->IsJoined())
     {
         // Apply the data for each vehicle in the packet
-        vector<CUnoccupiedVehicleSyncPacket::SyncData>::iterator iter = Packet.IterBegin();
+        std::vector<CUnoccupiedVehicleSyncPacket::SyncData>::iterator iter = Packet.IterBegin();
         for (; iter != Packet.IterEnd(); ++iter)
         {
             CUnoccupiedVehicleSyncPacket::SyncData& data = *iter;
@@ -258,9 +271,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                 // this packet if the time context matches.
                 if (pVehicle->GetSyncer() == pPlayer && pVehicle->CanUpdateSync(vehicle.data.ucTimeContext))
                 {
-                    // Is there no player driver?
+                    // Is there no player driver, or is he exiting?
                     CPed* pOccupant = pVehicle->GetOccupant(0);
-                    if (!pOccupant || !IS_PLAYER(pOccupant))
+                    if (!pOccupant || !IS_PLAYER(pOccupant) || pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                     {
                         // Apply the data to the vehicle
                         if (vehicle.data.bSyncPosition)

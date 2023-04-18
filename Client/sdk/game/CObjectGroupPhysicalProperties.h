@@ -10,7 +10,9 @@
  *****************************************************************************/
 #pragma once
 
-#include <CVector.h>
+class CFxSystemBPSAInterface;
+class CObjectGroupPhysicalPropertiesSAInterface;
+class CVector;
 
 class CObjectGroupPhysicalProperties
 {

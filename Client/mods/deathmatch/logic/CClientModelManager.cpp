@@ -81,11 +81,11 @@ int CClientModelManager::GetFreeTxdModelID()
 
 std::shared_ptr<CClientModel>  CClientModelManager::FindModelByID(int iModelID)
 {
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforTXD();
-    if (iModelID < uiMaxModelID)
-    {
+    int32_t iMaxModelId = g_pGame->GetBaseIDforTXD();
+
+    if (iModelID < iMaxModelId)
         return m_Models[iModelID];
-    }
+
     return nullptr;
 }
 

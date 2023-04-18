@@ -22,6 +22,8 @@ struct timeval
     long tv_usec; /* and microseconds */
 };
 #endif
+#else
+    #include <sys/time.h>
 #endif
 
 namespace SharedUtil

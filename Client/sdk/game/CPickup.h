@@ -11,39 +11,35 @@
 
 #pragma once
 
-#include <windows.h>
-#include <CVector.h>
 #include "Common.h"
 
 class CObject;
+class CVector;
 
 class CPickup
 {
 public:
     virtual CObject* GetObject() = 0;
-    virtual VOID     SetPosition(CVector* vecPosition) = 0;
+    virtual void     SetPosition(CVector* vecPosition) = 0;
     virtual CVector* GetPosition(CVector* vecPosition) = 0;
 
     virtual ePickupType  GetType() = 0;
-    virtual VOID         SetType(ePickupType type) = 0;
-    virtual FLOAT        GetCurrentValue() = 0;
-    virtual VOID         SetCurrentValue(FLOAT fCurrentValue) = 0;
-    virtual VOID         SetRegenerationTime(DWORD dwTime) = 0;
-    virtual VOID         SetMoneyPerDay(WORD wMoneyPerDay) = 0;
+    virtual void         SetType(ePickupType type) = 0;
+    virtual float        GetCurrentValue() = 0;
+    virtual void         SetCurrentValue(float fCurrentValue) = 0;
+    virtual void         SetRegenerationTime(DWORD dwTime) = 0;
+    virtual void         SetMoneyPerDay(WORD wMoneyPerDay) = 0;
     virtual WORD         GetMoneyPerDay() = 0;
     virtual WORD         GetModel() = 0;
-    virtual VOID         SetModel(WORD wModelIndex) = 0;            // do not export
+    virtual void         SetModel(WORD wModelIndex) = 0;            // do not export
     virtual ePickupState GetState() = 0;
-    virtual VOID         SetState(ePickupState bState) = 0;
+    virtual void         SetState(ePickupState bState) = 0;
     virtual BYTE         GetAmmo() = 0;
-    virtual VOID         SetAmmo(BYTE bAmmo) = 0;
+    virtual void         SetAmmo(BYTE bAmmo) = 0;
     virtual long         GetMonetaryValue() = 0;
-    virtual VOID         SetMonetaryValue(long lMonetaryValue) = 0;
+    virtual void         SetMonetaryValue(long lMonetaryValue) = 0;
     virtual BYTE         IsNearby() = 0;
-    virtual VOID         Remove() = 0;
-    virtual VOID         GiveUsAPickUpObject(int ForcedObjectIndex = -1) = 0;
-    virtual VOID         GetRidOfObjects() = 0;
+    virtual void         Remove() = 0;
+    virtual void         GiveUsAPickUpObject(int ForcedObjectIndex = -1) = 0;
+    virtual void         GetRidOfObjects() = 0;
 };
-
-// not used
-typedef BOOL (*CBPickup)(CPickup*);

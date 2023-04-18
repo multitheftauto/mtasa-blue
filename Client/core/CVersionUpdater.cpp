@@ -10,9 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 #include "CVersionUpdater.Util.hpp"
 #include "CNewsBrowser.h"
+#include "CFilePathTranslator.h"
 #include "SharedUtil.Thread.h"
+#include <charconv>
 
 ///////////////////////////////////////////////////////////////
 //
@@ -130,7 +133,6 @@ public:
     int DoPollDownload();
     int DoSendPostToNextServer();
     int DoPollPost();
-    void OnMainMenuFullyVisible();
 
     static void* StaticThreadProc(void* pContext);
     void*        ThreadProc();
@@ -2176,6 +2178,35 @@ void CVersionUpdater::_UseVersionQueryURLs()
     m_JobInfo.bShowDownloadPercent = false;
 }
 
+/**
+ * @brief Extracts the revision from an update file name.
+ * @param fileName Name of the file
+ * @param revision Revision of the update
+ */
+static bool GetRevisionFromFileName(std::string_view fileName, std::uint32_t& revision)
+{
+    revision = {};
+
+    // Example:                          mtasa-1.5.9-rc-21519-0-000-files-all-cksummed.rar
+    // Search for the delimiter before the revision ^^^^.
+    if (size_t revisionStart = fileName.find("-rc-"); revisionStart != std::string_view::npos)
+    {
+        revisionStart += 4;
+
+        // Example:                mtasa-1.5.9-rc-21519-0-000-files-all-cksummed.rar
+        // Search for the delimiter after the revision ^.
+        if (size_t revisionStop = fileName.find('-', revisionStart); revisionStop != std::string_view::npos)
+        {
+            std::string_view raw = fileName.substr(revisionStart, revisionStop - revisionStart);
+
+            if (auto [ptr, ec] = std::from_chars(raw.data(), raw.data() + raw.size(), revision); ec == std::errc{})
+                return true;
+        }
+    }
+
+    return false;
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CVersionUpdater::_ProcessPatchFileQuery
@@ -2299,6 +2330,25 @@ void CVersionUpdater::_ProcessPatchFileQuery()
 
     // Indicate what the server wants us to do
     m_ConditionMap.SetCondition("ProcessResponse", m_JobInfo.strStatus);
+
+    // Report update response
+    if (!m_JobInfo.strStatus.empty() && m_JobInfo.strStatus != "noupdate" && !_strnicmp("mtasa-", m_JobInfo.strFilename.c_str(), 6))
+    {
+        uint32_t revision{};
+
+        if (GetRevisionFromFileName(m_JobInfo.strFilename, revision) && revision < MTASA_VERSION_BUILD)
+        {
+            unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+            unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+
+            SString playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
+                                  MTASA_VERSION_BUILD, netRev, netRel);
+
+            AddReportLog(5061, SString("Processing patch file '%s' [%s, %s] with '%s' (version: %s) from '%s'", m_JobInfo.strFilename.c_str(),
+                                       m_JobInfo.iFilesize.ToString().c_str(), m_JobInfo.strMD5.c_str(), m_JobInfo.strStatus.c_str(), playerVersion.c_str(),
+                                       m_strLastQueryURL.c_str()));
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2718,8 +2768,11 @@ int CVersionUpdater::_PollDownload()
                         return RES_OK;
                     }
                     if (m_JobInfo.bShowDownloadPercent)
-                        GetQuestionBox().SetMessage(
-                            SString(_("%3d %% completed"), Round(m_JobInfo.uiBytesDownloaded * 100.f / std::max<float>(1, m_JobInfo.iFilesize))));
+                    {
+                        const bool  bIsDownloadedSizeRight = m_JobInfo.uiBytesDownloaded > 0 && m_JobInfo.iFilesize >= m_JobInfo.uiBytesDownloaded;
+                        const float fDownloadedPercent = bIsDownloadedSizeRight ? Round(m_JobInfo.uiBytesDownloaded / m_JobInfo.iFilesize * 100.f) : 0;
+                        GetQuestionBox().SetMessage(SString(_("%3d %% completed"), fDownloadedPercent));
+                    }
                     if (m_JobInfo.iIdleTime > 1000 && m_JobInfo.iIdleTimeLeft > 500)
                         GetQuestionBox().AppendMessage(SString(_("\n\nWaiting for response  -  %-3d"), m_JobInfo.iIdleTimeLeft / 1000));
                     else
@@ -3109,7 +3162,8 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
     SString        strVideoCard = SStringX(g_pDeviceState->AdapterState.Name).Left(30);
-    std::replace_if(strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
+    std::replace_if(
+        strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
     SString strSystemStats(
         "1_%d_%d_%d_%d_%d"
         "_%d%d%d%d"
@@ -3377,26 +3431,4 @@ int CVersionUpdater::DoPollPost()
         return RES_POLL;
     }
     return RES_OK;
-}
-
-// Issue: #1708
-// Set the update settings to stable build if the user is on 1.5.8.
-// We do this only once, this is why we need to write to registry.
-void CVersionUpdater::OnMainMenuFullyVisible()
-{
-    if (MTASA_VERSION_BUILD != 20670)            // 20670 is the build number with PR #1712 merged.
-        return;
-    const std::string requiredValue = "discord-rich-presence";
-    const std::string lastSubKey = "version-revert-reason";
-    if (GetApplicationSetting(lastSubKey) != requiredValue)
-    {
-        SetApplicationSetting(lastSubKey, requiredValue);
-        // check if the MTA client version is 1.5.8
-        if (MTASA_VERSION_MAJOR == 1 && MTASA_VERSION_MINOR == 5 && MTASA_VERSION_MAINTENANCE == 8)
-        {
-            CVARS_SET("update_build_type", 0);
-            std::string message = _("We've reset your update preferences back to Default, please go change your settings again if you want Nightly updates.\n");
-            g_pCore->ShowMessageBox(_("VERSION UPDATE INFORMATION"), message.c_str(), MB_BUTTON_OK | MB_ICON_INFO);
-        }
-    }
 }

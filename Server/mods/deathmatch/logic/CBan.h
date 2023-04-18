@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CCommon.h"
+#include "CBanManager.h"
 #include <string>
 
 class CBan

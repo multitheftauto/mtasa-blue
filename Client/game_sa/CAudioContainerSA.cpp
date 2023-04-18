@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CAudioContainerSA.h"
+#include "CAudioContainerLookupTableSA.h"
 
 unsigned long EndianSwap32(unsigned long x)
 {

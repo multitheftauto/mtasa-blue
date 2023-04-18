@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaColShapeDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CColCircle.h"
+#include "CColCuboid.h"
+#include "CColRectangle.h"
+#include "CColPolygon.h"
+#include "CColTube.h"
 
 void CLuaColShapeDefs::LoadFunctions()
 {
@@ -74,6 +82,7 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "radius", "setColShapeRadius", "getColShapeRadius", SetColShapeRadius, GetColShapeRadius);
     lua_classvariable(luaVM, "size", "setColShapeSize", "getColShapeSize", SetColShapeSize, OOP_GetColShapeSize);
     lua_classvariable(luaVM, "points", nullptr, "getColPolygonPoints", nullptr, OOP_GetColPolygonPoints);
+    lua_classvariable(luaVM, "elementsWithin", nullptr, "getElementsWithinColShape");
 
     lua_registerclass(luaVM, "ColShape", "Element");
 }
@@ -641,7 +650,7 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
         CColPolygon* pColPolygon = static_cast<CColPolygon*>(pColShape);
-        CVector2D          vecPoint;
+        CVector2D    vecPoint;
         if (uiPointIndex > 0 && CStaticFunctionDefinitions::GetColPolygonPointPosition(pColPolygon, uiPointIndex - 1, vecPoint))
         {
             lua_pushnumber(luaVM, vecPoint.fX);

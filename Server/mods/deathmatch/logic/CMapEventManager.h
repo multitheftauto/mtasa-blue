@@ -21,21 +21,19 @@ public:
     CMapEventManager();
     ~CMapEventManager();
 
-    bool                          Add(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority, float fPriorityMod);
-    bool                          Delete(CLuaMain* pLuaMain, const char* szName = NULL, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
-    void                          DeleteAll();
-    bool                          HandleExists(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction);
-    bool                          HasEvents() const { return m_bHasEvents; }
-    void                          GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM);
-    const std::vector<CMapEvent*> GetHandlesByServerRPCFunction(eServerRPCFunctions eServerRPCFunction) const;
+    bool Add(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
+             float fPriorityMod);
+    bool Delete(CLuaMain* pLuaMain, const char* szName = NULL, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
+    void DeleteAll();
+    bool HandleExists(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction);
+    bool HasEvents() const { return m_bHasEvents; }
+    void GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM);
 
     bool Call(const char* szName, const CLuaArguments& Arguments, class CElement* pSource, class CElement* pThis, class CPlayer* pCaller = NULL);
 
 private:
     void TakeOutTheTrash();
-    void AddInternal(CMapEvent* pMapEvent);
-    void DeleteInternal(CMapEvent* pMapEvent);
-    void DisableServerRPCFunction(eServerRPCFunctions eServerRPCFunction, bool bDisable = true);
+    void AddInternal(CMapEvent* pEvent);
 
     bool                               m_bHasEvents;
     bool                               m_bIteratingList;

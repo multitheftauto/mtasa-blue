@@ -9,6 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLatentTransferManager.h"
+#include <net/Packets.h>
+
 using namespace LatentTransfer;
 
 ///////////////////////////////////////////////////////////////
@@ -139,11 +142,10 @@ void CLatentSendQueue::DoPulse(int iTimeMsBetweenCalls)
 ///////////////////////////////////////////////////////////////
 SSendHandle CLatentSendQueue::AddSend(CBufferRef bufferRef, uint uiRate, ushort usCategory, void* pLuaMain, ushort usResourceNetId)
 {
-    m_TxQueue.push_back(SSendItem());
+    SSendItem& newTx = m_TxQueue.emplace_back();
 
-    SSendItem& newTx = m_TxQueue.back();
     newTx.uiId = m_uiNextSendId++;
-    newTx.bufferRef = bufferRef;
+    newTx.bufferRef = std::move(bufferRef);
     newTx.uiRate = uiRate;
     newTx.usCategory = usCategory;
     newTx.pLuaMain = pLuaMain;

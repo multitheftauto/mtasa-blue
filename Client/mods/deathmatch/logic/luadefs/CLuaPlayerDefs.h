@@ -49,4 +49,5 @@ public:
     LUA_DECLARE(IsPlayerMapForced);
     LUA_DECLARE(IsPlayerMapVisible);
     LUA_DECLARE(GetPlayerMapBoundingBox);
+    static unsigned char GetPlayerMapOpacity();
 };

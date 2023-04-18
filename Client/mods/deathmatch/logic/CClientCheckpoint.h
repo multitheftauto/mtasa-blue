@@ -14,6 +14,7 @@
 #include <list>
 
 class CClientMarker;
+class CCheckpoint;
 
 class CClientCheckpoint : public CClientMarkerCommon
 {

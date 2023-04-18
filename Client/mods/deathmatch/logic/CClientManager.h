@@ -14,7 +14,6 @@ class CClientManager;
 
 #include "CAntiCheat.h"
 #include "CClientCamera.h"
-#include "CClientCivilianManager.h"
 #include "CClientColModelManager.h"
 #include "CClientDFFManager.h"
 #include "CClientEntity.h"
@@ -43,6 +42,7 @@ class CClientManager;
 #include "CClientEffectManager.h"
 #include "CClientPointLightsManager.h"
 #include "CClientModelManager.h"
+#include "CClientIMGManager.h"
 
 class CClientProjectileManager;
 class CClientExplosionManager;
@@ -60,7 +60,6 @@ public:
 
     CAntiCheat&                  GetAntiCheat() { return m_AntiCheat; }
     CClientCamera*               GetCamera() { return m_pCamera; }
-    CClientCivilianManager*      GetCivilianManager() { return m_pCivilianManager; }
     CClientColModelManager*      GetColModelManager() { return m_pColModelManager; }
     CClientDFFManager*           GetDFFManager() { return m_pDFFManager; }
     CClientGUIManager*           GetGUIManager() { return m_pGUIManager; }
@@ -96,14 +95,15 @@ public:
     CClientWeaponManager*        GetWeaponManager() { return m_pWeaponManager; }
     CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
+    CClientIMGManager*           GetIMGManager() { return m_pImgManager; }
 
     bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }
     void SetGameUnloadedFlag() { m_bGameUnloadedFlag = true; }
 
-    void           InvalidateEntity(CClientEntity* pEntity);
-    void           RestoreEntity(CClientEntity* pEntity);
-    void           UnreferenceEntity(CClientEntity* pEntity);
+    void InvalidateEntity(CClientEntity* pEntity);
+    void RestoreEntity(CClientEntity* pEntity);
+    void UnreferenceEntity(CClientEntity* pEntity);
 
     void OnUpdateStreamPosition(CClientStreamElement* pElement);
     void OnLowLODElementCreated();
@@ -112,7 +112,6 @@ public:
 private:
     CAntiCheat                   m_AntiCheat;
     CClientCamera*               m_pCamera;
-    CClientCivilianManager*      m_pCivilianManager;
     CClientColModelManager*      m_pColModelManager;
     CClientDFFManager*           m_pDFFManager;
     CClientGUIManager*           m_pGUIManager;
@@ -147,6 +146,7 @@ private:
     CClientEffectManager*        m_pEffectManager;
     CClientPointLightsManager*   m_pPointLightsManager;
     CClientModelManager*         m_pModelManager;
+    CClientIMGManager*           m_pImgManager;
     CClientPacketRecorder*       m_pPacketRecorder;
     bool                         m_bBeingDeleted;
     bool                         m_bGameUnloadedFlag;

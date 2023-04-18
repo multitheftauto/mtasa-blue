@@ -11,18 +11,25 @@
 
 #pragma once
 
-#include "Common.h"
-#include "CColPoint.h"
-#include "CPhysical.h"
-#include "CDamageManager.h"
-#include "CHandlingManager.h"
-#include "CDoor.h"
-#include "CWeaponInfo.h"
-#include "CAEVehicleAudioEntity.h"
-
+#include <vector>
+#include <map>
 #include <CVector.h>
+#include "Common.h"
+#include "CPhysical.h"
+#include "CWeaponInfo.h"
+#include "CDamageManager.h"
 
-#include <windows.h>
+class CAEVehicleAudioEntity;
+class CColModel;
+class CDoor;
+class CEntity;
+class CFlyingHandlingEntry;
+class CHandlingEntry;
+class CMatrix;
+class CObject;
+class CPed;
+class SString;
+struct RwFrame;
 
 enum eWinchType
 {
@@ -43,11 +50,6 @@ enum eDoorLock : int32_t
     DOOR_LOCK_SKIP_SHUT_DOORS,
 };
 
-// forward declaration, avoid compile error
-class CPed;
-class CObject;
-class CColModel;
-
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST 6
 #define SIREN_ID_MAX 7
@@ -55,25 +57,26 @@ class CColModel;
 
 struct SSirenBeaconInfo
 {
-    CVector m_vecSirenPositions;
-    SColor  m_RGBBeaconColour;
-    DWORD   m_dwMinSirenAlpha;
+    CVector            m_vecSirenPositions;
+    SharedUtil::SColor m_RGBBeaconColour;
+    DWORD              m_dwMinSirenAlpha{0};
 };
+
 struct SSirenInfo
 {
     // Flags
     bool m_b360Flag;
     bool m_bDoLOSCheck;
     bool m_bUseRandomiser;
-    bool m_bSirenSilent;
+    bool m_bSirenSilent{false};
     // End of flags
-    bool                             m_bOverrideSirens;
+    bool                             m_bOverrideSirens{false};
     unsigned char                    m_ucSirenType;
     unsigned char                    m_ucSirenCount;
     unsigned char                    m_ucCurrentSirenID;
     unsigned char                    m_ucCurrentSirenRandomiser;
     SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
-    SColor                           m_tPointLightColour;
+    SharedUtil::SColor               m_tPointLightColour;
 };
 
 struct SVehicleFrame
@@ -119,13 +122,9 @@ public:
     virtual float GetTrainPosition() = 0;
     virtual void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true) = 0;
 
-    virtual bool CanPedEnterCar() = 0;
-    virtual bool CanPedJumpOutCar(CPed* pPed) = 0;
     virtual void AddVehicleUpgrade(DWORD dwModelID) = 0;
     virtual void RemoveVehicleUpgrade(DWORD dwModelID) = 0;
     virtual bool DoesSupportUpgrade(const SString& strFrameName) = 0;
-    virtual bool CanPedLeanOut(CPed* pPed) = 0;
-    virtual bool CanPedStepOutCar(bool bUnknown) = 0;
 
     virtual CDoor* GetDoor(unsigned char ucDoor) = 0;
     virtual void   OpenDoor(unsigned char ucDoor, float fRatio, bool bMakeNoise = false) = 0;
@@ -136,8 +135,6 @@ public:
     virtual bool   AreDoorsUndamageable() = 0;
     virtual void   SetDoorsUndamageable(bool bUndamageable) = 0;
 
-    virtual bool  CarHasRoof() = 0;
-    virtual void  ExtinguishCarFire() = 0;
     virtual DWORD GetBaseVehicleType() = 0;
 
     virtual void  SetBodyDirtLevel(float fDirtLevel) = 0;
@@ -145,35 +142,25 @@ public:
 
     virtual unsigned char GetCurrentGear() = 0;
     virtual float         GetGasPedal() = 0;
-    virtual float         GetHeightAboveRoad() = 0;
-    virtual float         GetSteerAngle() = 0;
     virtual bool          GetTowBarPos(CVector* pVector, CVehicle* pTrailer) = 0;
     virtual bool          GetTowHitchPos(CVector* pVector) = 0;
-    virtual bool          IsOnItsSide() = 0;
-    virtual bool          IsLawEnforcementVehicle() = 0;
-    virtual bool          IsPassenger(CPed* pPed) = 0;
-    virtual bool          IsSphereTouchingVehicle(CVector* vecOrigin, float fRadius) = 0;
     virtual bool          IsUpsideDown() = 0;
-    virtual void          MakeDirty(CColPoint* pPoint) = 0;
 
     virtual bool IsEngineBroken() = 0;
     virtual void SetEngineBroken(bool bEngineBroken) = 0;
-    virtual bool IsScriptLocked() = 0;
-    virtual void SetScriptLocked(bool bLocked) = 0;
 
     virtual void          PlaceBikeOnRoadProperly() = 0;
     virtual void          PlaceAutomobileOnRoadProperly() = 0;
-    virtual void          SetColor(SColor color1, SColor color2, SColor color3, SColor color4, int) = 0;
-    virtual void          GetColor(SColor* color1, SColor* color2, SColor* color3, SColor* color4, bool bFixedForGTA) = 0;
+    virtual void          SetColor(SharedUtil::SColor color1, SharedUtil::SColor color2, SharedUtil::SColor color3, SharedUtil::SColor color4, int) = 0;
+    virtual void          GetColor(SharedUtil::SColor* color1, SharedUtil::SColor* color2, SharedUtil::SColor* color3, SharedUtil::SColor* color4,
+                                   bool bFixedForGTA) = 0;
     virtual void          Fix() = 0;
     virtual bool          IsSirenOrAlarmActive() = 0;
     virtual void          SetSirenOrAlarmActive(bool bActive) = 0;
-    virtual DWORD*        GetMemoryValue(DWORD dwOffset) = 0;
     virtual void          SetAlpha(unsigned char ucAlpha) = 0;
     virtual unsigned char GetAlpha() = 0;
 
     virtual void BlowUp(CEntity* pCreator, unsigned long ulUnknown) = 0;
-    virtual void BlowUpCutSceneNoExtras(unsigned long ulUnknown1, unsigned long ulUnknown2, unsigned long ulUnknown3, unsigned long ulUnknown4) = 0;
 
     virtual CDamageManager* GetDamageManager() = 0;
     virtual void            FadeOut(bool bFadeOut) = 0;
@@ -265,10 +252,6 @@ public:
     virtual void GetTurretRotation(float* fHorizontal, float* fVertical) = 0;
     virtual void SetTurretRotation(float fHorizontal, float fVertical) = 0;
 
-    virtual unsigned char GetNumberGettingIn() = 0;
-    virtual unsigned char GetPassengerCount() = 0;
-    virtual unsigned char GetMaxPassengerCount() = 0;
-
     virtual bool IsSmokeTrailEnabled() = 0;
     virtual void SetSmokeTrailEnabled(bool bEnabled) = 0;
 
@@ -302,14 +285,14 @@ public:
     virtual unsigned char                     GetVehicleSirenCount() = 0;
     virtual unsigned char                     GetVehicleSirenType() = 0;
     virtual DWORD                             GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) = 0;
-    virtual SColor                            GetVehicleSirenColour(unsigned char ucSirenCount) = 0;
-    virtual void                              SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour) = 0;
+    virtual SharedUtil::SColor                GetVehicleSirenColour(unsigned char ucSirenCount) = 0;
+    virtual void                              SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour) = 0;
     virtual void                              SetVehicleCurrentSirenID(unsigned char ucCurrentSirenID) = 0;
     virtual unsigned char                     GetVehicleCurrentSirenID() = 0;
     virtual unsigned char                     GetSirenRandomiser() = 0;
     virtual void                              SetSirenRandomiser(unsigned char ucSirenRandomiser) = 0;
-    virtual void                              SetPointLightColour(SColor tPointLightColour) = 0;
-    virtual SColor                            GetPointLightColour() = 0;
+    virtual void                              SetPointLightColour(SharedUtil::SColor tPointLightColour) = 0;
+    virtual SharedUtil::SColor                GetPointLightColour() = 0;
     virtual bool                              IsSiren360EffectEnabled() = 0;
     virtual bool                              IsSirenLOSCheckEnabled() = 0;
     virtual bool                              IsSirenRandomiserEnabled() = 0;

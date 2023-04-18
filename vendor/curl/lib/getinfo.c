@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -94,7 +96,7 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
 {
   switch(info) {
   case CURLINFO_EFFECTIVE_URL:
-    *param_charp = data->change.url?data->change.url:(char *)"";
+    *param_charp = data->state.url?data->state.url:(char *)"";
     break;
   case CURLINFO_EFFECTIVE_METHOD: {
     const char *m = data->set.str[STRING_CUSTOMREQUEST];
@@ -145,6 +147,10 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
        option had been enabled! */
     *param_charp = data->info.wouldredirect;
     break;
+  case CURLINFO_REFERER:
+    /* Return the referrer header for this request, or NULL if unset */
+    *param_charp = data->state.referer;
+    break;
   case CURLINFO_PRIMARY_IP:
     /* Return the ip address of the most recent (primary) connection */
     *param_charp = data->info.conn_primary_ip;
@@ -159,6 +165,20 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
     break;
   case CURLINFO_SCHEME:
     *param_charp = data->info.conn_scheme;
+    break;
+  case CURLINFO_CAPATH:
+#ifdef CURL_CA_PATH
+    *param_charp = CURL_CA_PATH;
+#else
+    *param_charp = NULL;
+#endif
+    break;
+  case CURLINFO_CAINFO:
+#ifdef CURL_CA_BUNDLE
+    *param_charp = CURL_CA_BUNDLE;
+#else
+    *param_charp = NULL;
+#endif
     break;
 
   default:
@@ -235,7 +255,7 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
     break;
 #endif
   case CURLINFO_REDIRECT_COUNT:
-    *param_longp = data->set.followlocation;
+    *param_longp = data->state.followlocation;
     break;
   case CURLINFO_HTTPAUTH_AVAIL:
     lptr.to_long = param_longp;
@@ -281,6 +301,7 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
       /* return if the condition prevented the document to get transferred */
       *param_longp = data->info.timecond ? 1L : 0L;
     break;
+#ifndef CURL_DISABLE_RTSP
   case CURLINFO_RTSP_CLIENT_CSEQ:
     *param_longp = data->state.rtsp_next_client_CSeq;
     break;
@@ -290,6 +311,7 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
   case CURLINFO_RTSP_CSEQ_RECV:
     *param_longp = data->state.rtsp_CSeq_recv;
     break;
+#endif
   case CURLINFO_HTTP_VERSION:
     switch(data->info.httpversion) {
     case 10:
@@ -556,7 +578,7 @@ CURLcode Curl_getinfo(struct Curl_easy *data, CURLINFO info, ...)
   CURLcode result = CURLE_UNKNOWN_OPTION;
 
   if(!data)
-    return result;
+    return CURLE_BAD_FUNCTION_ARGUMENT;
 
   va_start(arg, info);
 

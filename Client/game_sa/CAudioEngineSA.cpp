@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CAESoundManagerSA.h"
+#include "CAudioEngineSA.h"
+#include "CGameSA.h"
+#include "CPhysicalSA.h"
+#include "CSettingsSA.h"
+
+extern CGameSA* pGame;
 
 #define HOOKPOS_CAEAmbienceTrackManager_CheckForPause       0x4D6E21
 DWORD RETURN_CAEAmbienceTrackManager_CheckForPause = 0x4D6E27;
@@ -47,7 +54,7 @@ CAudioEngineSA::CAudioEngineSA(CAudioEngineSAInterface* pInterface)
     HookInstall(HOOKPOS_CAESoundManager_RequestNewSound, (DWORD)HOOK_CAESoundManager_RequestNewSound, 5);
 }
 
-VOID CAudioEngineSA::StopRadio()
+void CAudioEngineSA::StopRadio()
 {
     m_bRadioOn = false;
 
@@ -86,7 +93,7 @@ VOID CAudioEngineSA::StopRadio()
     }
 }
 
-VOID CAudioEngineSA::StartRadio(unsigned int station)
+void CAudioEngineSA::StartRadio(unsigned int station)
 {
     m_ucRadioChannel = station;
     m_bRadioOn = true;
@@ -149,14 +156,13 @@ VOID CAudioEngineSA::StartRadio(unsigned int station)
 // 43 = race one
 // 32 = help
 // 13 = camera take picture
-VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
+void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)            // may prevent a crash
     {
-        DEBUG_TRACE("VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwSound)");
         DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
-        FLOAT fSpeed = 1.0f;
-        FLOAT fVolumeChange = 0.0f;
+        float fSpeed = 1.0f;
+        float fVolumeChange = 0.0f;
         _asm
         {
             push    fSpeed
@@ -168,7 +174,7 @@ VOID CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
     }
 }
 
-VOID CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
+void CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
 {
     DWORD dwFunc = FUNC_SetEffectsMasterVolume;
     DWORD dwVolume = bVolume;
@@ -180,7 +186,7 @@ VOID CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
     }
 }
 
-VOID CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
+void CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
 {
     DWORD dwFunc = FUNC_SetMusicMasterVolume;
     DWORD dwVolume = bVolume;
@@ -216,11 +222,10 @@ VOID CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
     }
 }
 
-VOID CAudioEngineSA::PlayBeatTrack(short iTrack)
+void CAudioEngineSA::PlayBeatTrack(short iTrack)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0)            // may prevent a crash
     {
-        DEBUG_TRACE("VOID CAudioEngineSA::PlayBeatTrack ( short iTrack )");
         DWORD dwFunc = FUNC_PreloadBeatTrack;
         DWORD dwTrack = iTrack;
         _asm
@@ -240,7 +245,7 @@ VOID CAudioEngineSA::PlayBeatTrack(short iTrack)
     }
 }
 
-VOID CAudioEngineSA::ClearMissionAudio(int slot)
+void CAudioEngineSA::ClearMissionAudio(int slot)
 {
     DWORD dwFunc = 0x5072F0;            // CAudioEngine::ClearMissionAudio(unsigned char)
     _asm
@@ -265,7 +270,7 @@ bool CAudioEngineSA::IsMissionAudioSampleFinished(int slot)
     return cret;
 }
 
-VOID CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
+void CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
 {
     DWORD dwFunc = 0x507290;            // CAudioEngine__PreloadMissionAudio
     DWORD AudioEvent = usAudioEvent;
@@ -292,7 +297,7 @@ unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
     return cret;
 }
 
-VOID CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
+void CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
 {
     CEntitySAInterface* entity = NULL;
     if (physical)
@@ -312,7 +317,7 @@ VOID CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
     }
 }
 
-VOID CAudioEngineSA::SetMissionAudioPosition(CVector* position, int slot)
+void CAudioEngineSA::SetMissionAudioPosition(CVector* position, int slot)
 {
     DWORD dwFunc = 0x507300;            // CAudioEngine__SetMissionAudioPosition
     _asm
@@ -340,7 +345,7 @@ bool CAudioEngineSA::PlayLoadedMissionAudio(int slot)
     return false;
 }
 
-VOID CAudioEngineSA::PauseAllSound(bool bPaused)
+void CAudioEngineSA::PauseAllSound(bool bPaused)
 {
     if (bPaused)
     {
@@ -362,13 +367,13 @@ VOID CAudioEngineSA::PauseAllSound(bool bPaused)
     }
 }
 
-VOID CAudioEngineSA::PauseAmbientSounds(bool bPaused)
+void CAudioEngineSA::PauseAmbientSounds(bool bPaused)
 {
     m_bAmbientSoundsPaused = bPaused;
     UpdateAmbientSoundSettings();
 }
 
-VOID CAudioEngineSA::SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled)
+void CAudioEngineSA::SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled)
 {
     if (eType == AMBIENT_SOUND_GENERAL)
     {
@@ -393,13 +398,13 @@ bool CAudioEngineSA::IsAmbientSoundEnabled(eAmbientSoundType eType)
         return false;
 }
 
-VOID CAudioEngineSA::ResetAmbientSounds()
+void CAudioEngineSA::ResetAmbientSounds()
 {
     SetAmbientSoundEnabled(AMBIENT_SOUND_GENERAL, true);
     SetAmbientSoundEnabled(AMBIENT_SOUND_GUNFIRE, true);
 }
 
-VOID CAudioEngineSA::UpdateAmbientSoundSettings()
+void CAudioEngineSA::UpdateAmbientSoundSettings()
 {
     // Update gunfire setting
     if (IsAmbientSoundEnabled(AMBIENT_SOUND_GUNFIRE))

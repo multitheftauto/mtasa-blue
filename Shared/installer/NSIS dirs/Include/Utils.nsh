@@ -26,6 +26,48 @@
 
 
 ;----------------------------------------
+; Removes a registry key if there is only one subkey with particular name present.
+; IN ROOT_KEY: A root key like HKLM
+; IN GROUP_KEY: Any group key with subkeys
+; IN SUBKEY: Name of the subkey to check against
+;----------------------------------------
+!macro _RemoveRegistryGroupWithSingleKey ROOT_KEY GROUP_KEY SUBKEY
+  Push $0
+    EnumRegKey $0 ${ROOT_KEY} "${GROUP_KEY}" 0
+    StrCmp $0 "${SUBKEY}" 0 +4
+    EnumRegKey $0 ${ROOT_KEY} "${GROUP_KEY}" 1
+    StrCmp $0 "" 0 +2
+    DeleteRegKey ${ROOT_KEY} "${GROUP_KEY}"
+  Pop $0
+!macroend
+!define RemoveRegistryGroupWithSingleKey `!insertmacro _RemoveRegistryGroupWithSingleKey`
+
+
+;----------------------------------------
+; Removes a directory if there is only one child directory with a particular name present.
+; IN PARENT_DIR: Path to the parent directory
+; IN DIRNAME: Name of the child directory to check against
+;----------------------------------------
+!macro _RmDirWithSingleChildDir PARENT_DIR DIRNAME
+  Push $0
+  Push $1
+    FindFirst $0 $1 "${PARENT_DIR}\*"
+      StrCmp $1 "" +4               ; [Delete] Either empty or it only contains our file
+      StrCmp $1 "." +5              ; [Next] Current directory
+      StrCmp $1 ".." +4             ; [Next] Parent directory
+      StrCmp $1 "${DIRNAME}" +3 +5  ; [Next] If matching, [Break] otherwise
+      RmDir /r "${PARENT_DIR}"
+      Goto +3                       ; [Break]
+      FindNext $0 $1
+      Goto -7                       ; [Continue]
+    FindClose $0
+  Pop $1
+  Pop $0
+!macroend
+!define RmDirWithSingleChildDir `!insertmacro _RmDirWithSingleChildDir`
+
+
+;----------------------------------------
 ; In: FILENAME = filename
 ; Out: MAJOR.MINOR.RELEASE.BUILD
 ;----------------------------------------

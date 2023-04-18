@@ -9,28 +9,23 @@
  *
  *****************************************************************************/
 
-class CTaskManagementSystemSA;
-
 #pragma once
 
-#include "TaskSA.h"
-#include "TaskCarAccessoriesSA.h"
-#include "TaskCarSA.h"
-#include <game/CTaskManagementSystem.h>
-#include <list>
+class CTaskSA;
+class CTaskSAInterface;
 
 #define FUNC_CTask_Operator_Delete          0x61A5B0
 
-class CTaskManagementSystemSA : public CTaskManagementSystem
+class CTaskManagementSystemSA
 {
 public:
     CTaskManagementSystemSA();
     ~CTaskManagementSystemSA();
 
-    CTask* AddTask(CTaskSA* pTask);
-    void   RemoveTask(CTaskSAInterface* pTaskInterface);
-    CTask* GetTask(CTaskSAInterface* pTaskInterface);
-    CTask* CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType);
+    CTaskSA* AddTask(CTaskSA* pTask);
+    void     RemoveTask(CTaskSAInterface* pTaskInterface);
+    CTaskSA* GetTask(CTaskSAInterface* pTaskInterface);
+    CTaskSA* CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType);
 
 private:
     struct STaskListItem

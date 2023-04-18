@@ -12,30 +12,22 @@
 #pragma once
 
 #include <game/CCamera.h>
+#include <CMatrix_Pad.h>
 #include "CCamSA.h"
 #include "CGarageSA.h"
 #include "CEntitySA.h"
-#include "COffsets.h"
 
-#include <CMatrix_Pad.h>
-
-#define FUNC_TakeControl                    0x50C7C0 // ##SA##
+#define FUNC_TakeControl                    0x50C7C0
 #define FUNC_TakeControlNoEntity            0x50C8B0
-#define FUNC_TakeControlAttachToEntity      0x50C910
 #define FUNC_Restore                        0x50B930
-#define FUNC_SetCamPositionForFixedMode     0x50BEC0
-#define FUNC_ConeCastCollisionResolve       0x51A5D0
 
-#define FUNC_Find3rdPersonCamTargetVector   0x514970 //##SA##
+#define FUNC_Find3rdPersonCamTargetVector   0x514970
 #define FUNC_Find3rdPersonQuickAimPitch     0x50AD40
-#define FUNC_TryToStartNewCamMode           0x467AAD
-#define FUNC_VectorTrackLinear              0x50D1D0
 #define FUNC_GetFadingDirection             0x50ADF0
 #define FUNC_GetFading                      0x50ADE0
 #define FUNC_Fade                           0x50AC20
 #define FUNC_SetFadeColour                  0x50BF00
 
-#define VAR_ActiveCam                       0x7E46FE
 #define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
 #define VAR_VehicleCameraView               0xB6F0DC
 #define VAR_PedCameraView                   0xB6F0F0
@@ -58,14 +50,14 @@ public:
     {
         MAXPATHLENGTH = 800
     };
-    FLOAT* m_arr_PathData;            //    FLOAT m_arr_PathData[MAXPATHLENGTH];
+    float* m_arr_PathData;            //    FLOAT m_arr_PathData[MAXPATHLENGTH];
 };
 
 class CQueuedMode
 {
 public:
     short Mode;                        // CameraMode
-    FLOAT Duration;                    // How long for (<0.0f -> indefinately)
+    float Duration;                    // How long for (<0.0f -> indefinately)
     short MinZoom, MaxZoom;            // How far is player allowed to zoom in & out
 };
 
@@ -77,8 +69,8 @@ public:
     CVector m_cvecMinPointInRange;            // this is the minimum required distance the train has to be to the camera to
     // allow a switch to the node cam
     CVector m_cvecMaxPointInRange;            // this is the minimum required distance the train has to be to from the camera
-    FLOAT   m_fDesiredFOV;
-    FLOAT   m_fNearClip;
+    float   m_fDesiredFOV;
+    float   m_fNearClip;
     // to switch from the  the node cam
 };
 
@@ -313,7 +305,7 @@ public:
 
     CVector m_vecAttachedCamOffset;            // for attaching the camera to a ped or vehicle (set by level designers for use in cutscenes)
     CVector m_vecAttachedCamLookAt;
-    FLOAT   m_fAttachedCamAngle;            // for giving the attached camera a tilt.
+    float   m_fAttachedCamAngle;            // for giving the attached camera a tilt.
 
     // RenderWare camera pointer
     DWORD* m_pRwCamera;            // was RwCamera *
@@ -353,8 +345,8 @@ public:
     CVector m_vecFrustumWorldNormals[4];
     CVector m_vecFrustumWorldNormals_Mirror[4];
 
-    FLOAT m_fFrustumPlaneOffsets[4];
-    FLOAT m_fFrustumPlaneOffsets_Mirror[4];
+    float m_fFrustumPlaneOffsets[4];
+    float m_fFrustumPlaneOffsets_Mirror[4];
 
     CVector m_vecRightFrustumNormal;
     CVector m_vecBottomFrustumNormal;
@@ -363,20 +355,20 @@ public:
     CVector m_vecOldSourceForInter;
     CVector m_vecOldFrontForInter;
     CVector m_vecOldUpForInter;
-    FLOAT   m_vecOldFOVForInter;
-    FLOAT   m_fFLOATingFade;            // variable representing the FLOAT version of CDraw::Fade. Necessary to stop loss of precision
-    FLOAT   m_fFLOATingFadeMusic;
-    FLOAT   m_fTimeToFadeOut;
-    FLOAT   m_fTimeToFadeMusic;
-    FLOAT   m_fTimeToWaitToFadeMusic;
-    FLOAT   m_fFractionInterToStopMoving;
-    FLOAT   m_fFractionInterToStopCatchUp;
-    FLOAT   m_fFractionInterToStopMovingTarget;
-    FLOAT   m_fFractionInterToStopCatchUpTarget;
+    float   m_vecOldFOVForInter;
+    float   m_fFLOATingFade;            // variable representing the FLOAT version of CDraw::Fade. Necessary to stop loss of precision
+    float   m_fFLOATingFadeMusic;
+    float   m_fTimeToFadeOut;
+    float   m_fTimeToFadeMusic;
+    float   m_fTimeToWaitToFadeMusic;
+    float   m_fFractionInterToStopMoving;
+    float   m_fFractionInterToStopCatchUp;
+    float   m_fFractionInterToStopMovingTarget;
+    float   m_fFractionInterToStopCatchUpTarget;
 
-    FLOAT m_fGaitSwayBuffer;
-    FLOAT m_fScriptPercentageInterToStopMoving;
-    FLOAT m_fScriptPercentageInterToCatchUp;
+    float m_fGaitSwayBuffer;
+    float m_fScriptPercentageInterToStopMoving;
+    float m_fScriptPercentageInterToCatchUp;
     DWORD m_fScriptTimeForInterPolation;
 
     short m_iFadingDirection;
@@ -403,28 +395,21 @@ public:
     ~CCameraSA();
 
     CCameraSAInterface* GetInterface() { return internalInterface; };
-    VOID                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
-    VOID                TakeControl(CVector* position, int CamSwitchStyle);
-    VOID     TakeControlAttachToEntity(CEntity* TargetEntity, CEntity* AttachEntity, CVector* vecOffset, CVector* vecLookAt, float fTilt, int CamSwitchStyle);
-    VOID     Restore();
-    VOID     RestoreWithJumpCut();
-    CMatrix* GetMatrix(CMatrix* matrix);
-    VOID     SetMatrix(CMatrix* matrix);
-    VOID     SetCamPositionForFixedMode(CVector* vecPosition, CVector* vecUpOffset);
-    VOID     Find3rdPersonCamTargetVector(FLOAT fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
-    float    Find3rdPersonQuickAimPitch();
-    BYTE     GetActiveCam();
+    void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
+    void                TakeControl(CVector* position, int CamSwitchStyle);
+    void                Restore();
+    void                RestoreWithJumpCut();
+    CMatrix*            GetMatrix(CMatrix* matrix);
+    void                SetMatrix(CMatrix* matrix);
+    void                Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
+    float               Find3rdPersonQuickAimPitch();
+    BYTE                GetActiveCam();
 
     CCam*         GetCam(BYTE bCameraID);
     virtual CCam* GetCam(CCamSAInterface* camInterface);
 
-    VOID      SetWidescreen(BOOL bWidescreen);
-    BOOL      GetWidescreen();
-    FLOAT     GetCarZoom();
-    VOID      SetCarZoom(FLOAT fCarZoom);
-    bool      TryToStartNewCamMode(DWORD dwCamMode);
-    bool      ConeCastCollisionResolve(CVector* pPos, CVector* pLookAt, CVector* pDest, float rad, float minDist, float* pDist);
-    void      VectorTrackLinear(CVector* pTo, CVector* pFrom, float time, bool bSmoothEnds);
+    void      SetWidescreen(bool bWidescreen);
+    bool      GetWidescreen();
     bool      IsFading();
     int       GetFadingDirection();
     void      Fade(float fFadeOutTime, int iOutOrIn);
@@ -436,8 +421,8 @@ public:
     void      GetCameraClip(bool& bObjects, bool& bVehicles);
     BYTE      GetCameraVehicleViewMode();
     BYTE      GetCameraPedViewMode();
-    VOID      SetCameraVehicleViewMode(BYTE dwCamMode);
-    VOID      SetCameraPedViewMode(BYTE dwCamMode);
+    void      SetCameraVehicleViewMode(BYTE dwCamMode);
+    void      SetCameraPedViewMode(BYTE dwCamMode);
     void      RestoreLastGoodState();
     void      SetShakeForce(float fShakeForce);
     float     GetShakeForce();

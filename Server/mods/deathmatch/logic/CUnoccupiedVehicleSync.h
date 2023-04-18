@@ -11,11 +11,17 @@
 
 #pragma once
 
-#include "CPlayerManager.h"
-#include "CVehicleManager.h"
-#include "packets/CUnoccupiedVehicleSyncPacket.h"
 #define MIN_ROTATION_DIFF   0.1
 #define MIN_PUSH_ANTISPAM_RATE  1500
+
+class CVehicle;
+class CPlayer;
+class CPacket;
+class CPlayerManager;
+class CVehicleManager;
+class CUnoccupiedVehicleSyncPacket;
+class CUnoccupiedVehiclePushPacket;
+
 class CUnoccupiedVehicleSync
 {
 public:

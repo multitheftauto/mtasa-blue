@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -27,24 +29,37 @@
 #include "curl_md4.h"
 #include "warnless.h"
 
+
 #ifdef USE_OPENSSL
 #include <openssl/opensslconf.h>
-#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3)
+#if defined(OPENSSL_VERSION_MAJOR) && (OPENSSL_VERSION_MAJOR >= 3) && \
+   !defined(USE_AMISSL)
 /* OpenSSL 3.0.0 marks the MD4 functions as deprecated */
 #define OPENSSL_NO_MD4
 #endif
 #endif /* USE_OPENSSL */
 
+#ifdef USE_WOLFSSL
+#include <wolfssl/options.h>
+#ifdef NO_MD4
+#define WOLFSSL_NO_MD4
+#endif
+#endif
+
 #ifdef USE_MBEDTLS
-#include <mbedtls/config.h>
 #include <mbedtls/version.h>
+#if MBEDTLS_VERSION_NUMBER >= 0x03000000
+#include <mbedtls/mbedtls_config.h>
+#else
+#include <mbedtls/config.h>
+#endif
 
 #if(MBEDTLS_VERSION_NUMBER >= 0x02070000)
   #define HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS
 #endif
 #endif /* USE_MBEDTLS */
 
-#if defined(USE_GNUTLS_NETTLE)
+#if defined(USE_GNUTLS)
 
 #include <nettle/md4.h>
 
@@ -70,35 +85,11 @@ static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
   md4_digest(ctx, MD4_DIGEST_SIZE, result);
 }
 
-#elif defined(USE_GNUTLS)
-
-#include <gcrypt.h>
-
-#include "curl_memory.h"
-
-/* The last #include file should be: */
-#include "memdebug.h"
-
-typedef gcry_md_hd_t MD4_CTX;
-
-static void MD4_Init(MD4_CTX *ctx)
-{
-  gcry_md_open(ctx, GCRY_MD_MD4, 0);
-}
-
-static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
-{
-  gcry_md_write(*ctx, data, size);
-}
-
-static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
-{
-  memcpy(result, gcry_md_read(*ctx, 0), MD4_DIGEST_LENGTH);
-  gcry_md_close(*ctx);
-}
+/* When OpenSSL or wolfSSL is available, we use their MD4 functions. */
+#elif defined(USE_WOLFSSL) && !defined(WOLFSSL_NO_MD4)
+#include <wolfssl/openssl/md4.h>
 
 #elif defined(USE_OPENSSL) && !defined(OPENSSL_NO_MD4)
-/* When OpenSSL is available we use the MD4-functions from OpenSSL */
 #include <openssl/md4.h>
 
 #elif (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && \
@@ -201,9 +192,9 @@ static void MD4_Init(MD4_CTX *ctx)
 
 static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
 {
-  if(ctx->data == NULL) {
+  if(!ctx->data) {
     ctx->data = malloc(size);
-    if(ctx->data != NULL) {
+    if(ctx->data) {
       memcpy(ctx->data, data, size);
       ctx->size = size;
     }
@@ -212,7 +203,7 @@ static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
 
 static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
 {
-  if(ctx->data != NULL) {
+  if(ctx->data) {
 #if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
     mbedtls_md4(ctx->data, ctx->size, result);
 #else

@@ -1,67 +1,60 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/CDirect3DHookManager.cpp
+ *  FILE:        Client/core/DXHook/CDirect3DHookManager.cpp
  *  PURPOSE:     Direct3D version independant hook manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CDirect3DHookManager.h"
+#include "CDirect3DHook9.h"
+#include <filesystem>
 
-CDirect3DHookManager::CDirect3DHookManager()
-{
-    WriteDebugEvent("CDirect3DHookManager::CDirect3DHookManager");
+namespace fs = std::filesystem;
 
-    // Set our defaults.
-    m_pDirect3DHook9 = NULL;
-}
+extern fs::path g_gtaDirectory;
 
 CDirect3DHookManager::~CDirect3DHookManager()
 {
-    WriteDebugEvent("CDirect3DHookManager::~CDirect3DHookManager");
-
-    if (m_pDirect3DHook9)
+    if (m_hook)
     {
-        m_pDirect3DHook9->RemoveHook();
-        delete m_pDirect3DHook9;
+        m_hook->RemoveHook();
+        delete m_hook;
     }
 }
 
 void CDirect3DHookManager::ApplyHook()
 {
-    if (UsingAltD3DSetup())
+    if (m_hook || UsingAltD3DSetup())
         return;
 
-    if (m_pDirect3DHook9)
+    HMODULE d3d9{};
+
+    // Try to load d3d9.dll from GTA directory to enable pre-installed graphic mods.
     {
-        WriteDebugEvent("CDirect3DHookManager::ApplyHook - Ignoring second call");
-        return;
+        const fs::path dll = g_gtaDirectory / "d3d9.dll";
+
+        if (std::error_code ignore{}; fs::is_regular_file(dll, ignore))
+        {
+            d3d9 = LoadLibraryW(dll.wstring().c_str());
+        }
     }
 
-    WriteDebugEvent("CDirect3DHookManager::ApplyHook");
-
-    PBYTE pbDirect3D9;
-
-    // First load the module(s).
-    pbDirect3D9 = reinterpret_cast<PBYTE>(LoadLibrary("D3D9.DLL"));
-
-    if (pbDirect3D9 != NULL)
+    if (d3d9 || LoadLibraryW(L"d3d9.dll"))
     {
-        m_pDirect3DHook9 = new CDirect3DHook9();
-        m_pDirect3DHook9->ApplyHook();
-        // Self-maintaining code.  Will delete on shutdown...
+        m_hook = new CDirect3DHook9();
+        m_hook->ApplyHook();
     }
 }
 
 void CDirect3DHookManager::RemoveHook()
 {
-    // Make sure we have a valid pointer.
-    if (m_pDirect3DHook9 != NULL)
+    if (m_hook)
     {
-        // Remove the hook.
-        m_pDirect3DHook9->RemoveHook();
+        m_hook->RemoveHook();
     }
 }

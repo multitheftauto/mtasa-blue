@@ -28,7 +28,7 @@ public:
 
     std::list<CClientPed*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CClientPed*>::const_iterator IterEnd() { return m_List.end(); };
-    CMappedList<CClientPed*> GetList() { return m_List; };
+    CMappedList<CClientPed*>               GetList() { return m_List; };
 
     bool Exists(CClientPed* pPed);
 

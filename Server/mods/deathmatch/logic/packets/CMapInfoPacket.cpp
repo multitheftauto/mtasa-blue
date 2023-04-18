@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMapInfoPacket.h"
+#include "CGame.h"
+#include "CWeaponStatManager.h"
+#include "CBuildingRemoval.h"
+#include "CBuildingRemovalManager.h"
+#include <net/SyncStructures.h>
 
 CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,
                                unsigned char ucClockMin, unsigned long ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,

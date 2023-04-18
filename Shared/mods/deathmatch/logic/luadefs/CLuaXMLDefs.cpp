@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaXMLDefs.h"
+#include "CScriptArgReader.h"
 
 void CLuaXMLDefs::LoadFunctions()
 {

@@ -273,18 +273,5 @@ enum eElementRPCFunctions
     SET_TRANSFER_BOX_VISIBILITY,
     SET_COLPOLYGON_HEIGHT,
 
-    NUM_RPC_FUNCS // Add above this line
-};
-
-enum eServerRPCFunctions
-{
-    PLAYER_INGAME_NOTICE,
-    INITIAL_DATA_STREAM,
-    PLAYER_TARGET,
-    PLAYER_WEAPON,
-    KEY_BIND,
-    CURSOR_EVENT,
-    REQUEST_STEALTH_KILL,
-
-    NUM_SERVER_RPC_FUNCS // Add above this line
+    NUM_RPC_FUNCS            // Add above this line
 };

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -420,11 +422,11 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
               char *endptr = finfo->b_data + 6;
               /* here we can deal with directory size, pass the leading
                  whitespace and then the digits */
-              while(ISSPACE(*endptr))
+              while(ISBLANK(*endptr))
                 endptr++;
               while(ISDIGIT(*endptr))
                 endptr++;
-              if(*endptr != 0) {
+              if(*endptr) {
                 parser->error = CURLE_FTP_BAD_FILE_LIST;
                 goto fail;
               }
@@ -892,7 +894,7 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
         parser->item_length++;
         switch(parser->state.NT.sub.time) {
         case PL_WINNT_TIME_PRESPACE:
-          if(!ISSPACE(c)) {
+          if(!ISBLANK(c)) {
             parser->state.NT.sub.time = PL_WINNT_TIME_TIME;
           }
           break;
@@ -966,7 +968,6 @@ size_t Curl_ftp_parselist(char *buffer, size_t size, size_t nmemb,
           else if(c == '\n') {
             parser->offsets.filename = parser->item_offset;
             finfo->b_data[finfo->b_used - 1] = 0;
-            parser->offsets.filename = parser->item_offset;
             result = ftp_pl_insert_finfo(data, infop);
             if(result) {
               parser->error = result;

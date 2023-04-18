@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "CGameSA.h"
 #include <game/CWeapon.h>
 #include <game/CPed.h>
 
@@ -24,15 +23,9 @@
 #define FUNC_CWeapon_DoBulletImpact                     0x73b550
 #define FUNC_CWeapon_GenerateDamageEvent                0x73a530
 #define FUNC_CWeapon_FireInstantHit                     0x73FB10
-
 #define FUNC_CWeaponInfo_GetWeaponReloadTime            0x743D70
-
 #define FUNC_CBirds_CheckForHit                         0x712E40
 #define FUNC_CShadows_CheckForHit                       0x707550
-
-extern CGameSA* pGame;
-class CWeaponSAInterface;
-class CWeaponStatSA;
 
 class CWeaponSAInterface
 {
@@ -49,26 +42,26 @@ public:
 class CWeaponSA : public CWeapon
 {
 private:
-    CWeaponSAInterface* internalInterface;
-    CPed*               owner;
+    CWeaponSAInterface* m_pInterface;
+    CPed*               m_pOwner;
     eWeaponSlot         m_weaponSlot;
 
 public:
-    CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot);
+    CWeaponSA(CWeaponSAInterface* pInterface, CPed* pOwner, eWeaponSlot weaponSlot);
     eWeaponType  GetType();
-    VOID         SetType(eWeaponType type);
+    void         SetType(eWeaponType type);
     eWeaponState GetState();
     void         SetState(eWeaponState state);
     DWORD        GetAmmoInClip();
-    VOID         SetAmmoInClip(DWORD dwAmmoInClip);
+    void         SetAmmoInClip(DWORD dwAmmoInClip);
     DWORD        GetAmmoTotal();
-    VOID         SetAmmoTotal(DWORD dwAmmoTotal);
+    void         SetAmmoTotal(DWORD dwAmmoTotal);
 
     CPed*       GetPed();
     eWeaponSlot GetSlot();
 
-    VOID         SetAsCurrentWeapon();
-    CWeaponInfo* GetInfo(eWeaponSkill skill) { return pGame->GetWeaponInfo(internalInterface->m_eWeaponType, skill); };
+    void         SetAsCurrentWeapon();
+    CWeaponInfo* GetInfo(eWeaponSkill skill);
     void         Destroy();
     void         Remove();
     void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed);

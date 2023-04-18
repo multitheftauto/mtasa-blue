@@ -10,95 +10,94 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CColPointSA.h"
+#include "CGameSA.h"
+#include "CPlayerPedSA.h"
+#include "CWeaponSA.h"
+#include "CWeaponStatManagerSA.h"
+#include "CWeaponStatSA.h"
+#include "CWorldSA.h"
 
-CWeaponSA::CWeaponSA(CWeaponSAInterface* weaponInterface, CPed* ped, eWeaponSlot weaponSlot)
+extern CGameSA* pGame;
+
+CWeaponSA::CWeaponSA(CWeaponSAInterface* pInterface, CPed* pOwner, eWeaponSlot weaponSlot)
+    : m_pInterface{pInterface}, m_pOwner{pOwner}, m_weaponSlot{weaponSlot}
 {
-    DEBUG_TRACE("CWeaponSA::CWeaponSA( CWeaponSAInterface * weaponInterface, CPed * ped, DWORD dwSlot )");
-    this->owner = ped;
-    this->m_weaponSlot = weaponSlot;
-    internalInterface = weaponInterface;
 }
 
 void CWeaponSA::Destroy()
 {
-    if (!owner)
+    if (!m_pOwner)
     {
-        delete internalInterface;
+        delete m_pInterface;
         delete this;
     }
 }
 
 eWeaponType CWeaponSA::GetType()
 {
-    DEBUG_TRACE("eWeaponType CWeaponSA::GetType(  )");
-    return this->internalInterface->m_eWeaponType;
+    return m_pInterface->m_eWeaponType;
 };
 
-VOID CWeaponSA::SetType(eWeaponType type)
+void CWeaponSA::SetType(eWeaponType type)
 {
-    DEBUG_TRACE("VOID CWeaponSA::SetType( eWeaponType type )");
-    this->internalInterface->m_eWeaponType = type;
+    m_pInterface->m_eWeaponType = type;
 }
 
 eWeaponState CWeaponSA::GetState()
 {
-    DEBUG_TRACE("eWeaponState CWeaponSA::GetState(  )");
-    return this->internalInterface->m_eState;
+    return m_pInterface->m_eState;
 }
 
 void CWeaponSA::SetState(eWeaponState state)
 {
-    DEBUG_TRACE("void CWeaponSA::SetState ( eWeaponState state )");
-    this->internalInterface->m_eState = state;
+    m_pInterface->m_eState = state;
 }
 
 DWORD CWeaponSA::GetAmmoInClip()
 {
-    DEBUG_TRACE("DWORD CWeaponSA::GetAmmoInClip(  )");
-    return this->internalInterface->m_nAmmoInClip;
+    return m_pInterface->m_nAmmoInClip;
 }
 
-VOID CWeaponSA::SetAmmoInClip(DWORD dwAmmoInClip)
+void CWeaponSA::SetAmmoInClip(DWORD dwAmmoInClip)
 {
-    DEBUG_TRACE("VOID CWeaponSA::SetAmmoInClip( DWORD dwAmmoInClip )");
-    this->internalInterface->m_nAmmoInClip = dwAmmoInClip;
+    m_pInterface->m_nAmmoInClip = dwAmmoInClip;
 }
 
 DWORD CWeaponSA::GetAmmoTotal()
 {
-    DEBUG_TRACE("DWORD CWeaponSA::GetAmmoTotal(  )");
-    return this->internalInterface->m_nAmmoTotal;
+    return m_pInterface->m_nAmmoTotal;
 }
 
-VOID CWeaponSA::SetAmmoTotal(DWORD dwAmmoTotal)
+void CWeaponSA::SetAmmoTotal(DWORD dwAmmoTotal)
 {
-    DEBUG_TRACE("VOID CWeaponSA::SetAmmoTotal( DWORD dwAmmoTotal )");
-    this->internalInterface->m_nAmmoTotal = dwAmmoTotal;
+    m_pInterface->m_nAmmoTotal = dwAmmoTotal;
 }
 
 CPed* CWeaponSA::GetPed()
 {
-    DEBUG_TRACE("CPed * CWeaponSA::GetPed()");
-    return (CPed*)owner;
+    return m_pOwner;
 }
 
 eWeaponSlot CWeaponSA::GetSlot()
 {
-    DEBUG_TRACE("eWeaponSlot CWeaponSA::GetSlot()");
     return m_weaponSlot;
 }
 
-VOID CWeaponSA::SetAsCurrentWeapon()
+void CWeaponSA::SetAsCurrentWeapon()
 {
-    DEBUG_TRACE("VOID CWeaponSA::SetAsCurrentWeapon()");
-    owner->SetCurrentWeaponSlot(m_weaponSlot);
+    m_pOwner->SetCurrentWeaponSlot(m_weaponSlot);
+}
+
+CWeaponInfo* CWeaponSA::GetInfo(eWeaponSkill skill)
+{
+    return pGame->GetWeaponInfo(m_pInterface->m_eWeaponType, skill);
 }
 
 void CWeaponSA::Remove()
 {
-    DEBUG_TRACE("void CWeaponSA::Remove ()");
     DWORD dwFunc = FUNC_Shutdown;
-    DWORD dwThis = (DWORD)this->internalInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     _asm
     {
         mov     ecx, dwThis
@@ -106,15 +105,15 @@ void CWeaponSA::Remove()
     }
 
     // If the removed weapon was the currently active weapon, switch to empty-handed
-    if (owner->GetCurrentWeaponSlot() == m_weaponSlot)
+    if (m_pOwner->GetCurrentWeaponSlot() == m_weaponSlot)
     {
-        CWeaponInfo* pInfo = pGame->GetWeaponInfo(this->internalInterface->m_eWeaponType);
+        CWeaponInfo* pInfo = pGame->GetWeaponInfo(m_pInterface->m_eWeaponType);
         if (pInfo)
         {
             int iModel = pInfo->GetModel();
-            owner->RemoveWeaponModel(iModel);
+            m_pOwner->RemoveWeaponModel(iModel);
         }
-        owner->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
+        m_pOwner->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
     }
 }
 
@@ -124,7 +123,7 @@ void CWeaponSA::Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed)
     if (pPed)
         dwPedInterface = (DWORD)pPed->GetInterface();
     unsigned int uiType = (unsigned int)type;
-    DWORD        dwThis = (DWORD)internalInterface;
+    DWORD        dwThis = (DWORD)m_pInterface;
     DWORD        dwFunc = FUNC_CWeapon_Initialize;
     _asm
     {
@@ -140,7 +139,7 @@ void CWeaponSA::Update(CPed* pPed)
 {
     // Note: CWeapon::Update is called mainly to check for reload
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
-    DWORD dwThis = (DWORD)internalInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CWeapon_Update;
     _asm
     {
@@ -159,7 +158,7 @@ bool CWeaponSA::Fire(CEntity* pFiringEntity, CVector* pvecOrigin, CVector* pvecT
     DWORD dwTargetInterface = 0;
     if (pTargetEntity)
         dwTargetInterface = (DWORD)pTargetEntity->GetInterface();
-    DWORD dwThis = (DWORD)internalInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CWeapon_Fire;
     _asm
     {
@@ -181,7 +180,7 @@ void CWeaponSA::AddGunshell(CEntity* pFiringEntity, CVector* pvecOrigin, CVector
     DWORD dwEntityInterface = 0;
     if (pFiringEntity)
         dwEntityInterface = (DWORD)pFiringEntity->GetInterface();
-    DWORD dwThis = (DWORD)internalInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CWeapon_AddGunshell;
     _asm
     {
@@ -204,7 +203,7 @@ void CWeaponSA::DoBulletImpact(CEntity* pFiringEntity, CEntitySAInterface* pEnti
     DWORD dwColPointInterface = 0;
     if (pColPoint)
         dwColPointInterface = (DWORD)pColPoint->GetInterface();
-    DWORD dwThis = (DWORD)internalInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CWeapon_DoBulletImpact;
     _asm
     {
@@ -280,7 +279,7 @@ bool CWeaponSA::FireBullet(CEntity* pFiringEntity, const CVector& vecOrigin, con
                 pFiringPlayerPed->GetTransformedBonePosition(BONE_RIGHTWRIST, &vecGunMuzzle);
 
             // Bullet trace
-            FireInstantHit(pFiringEntity, &vecOrigin, &vecGunMuzzle, NULL, &vecTarget, NULL, false, true);
+            FireInstantHit(pFiringEntity, &vecOrigin, &vecGunMuzzle, nullptr, &vecTarget, nullptr, false, true);
 
             // Fire sound
             if (pFiringPlayerPed)
@@ -290,7 +289,7 @@ bool CWeaponSA::FireBullet(CEntity* pFiringEntity, const CVector& vecOrigin, con
             if (pGame->m_pPostWeaponFireHandler && pFiringPlayerPed)
                 pGame->m_pPostWeaponFireHandler();
 
-            pGame->GetWorld()->IgnoreEntity(NULL);
+            pGame->GetWorld()->IgnoreEntity(nullptr);
 
             return true;
         }
@@ -311,7 +310,7 @@ bool CWeaponSA::FireInstantHit(CEntity* pFiringEntity, const CVector* pvecOrigin
     DWORD dwTargetInterface = 0;
     if (pTargetEntity)
         dwTargetInterface = (DWORD)pTargetEntity->GetInterface();
-    DWORD dwThis = (DWORD)internalInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CWeapon_FireInstantHit;
     _asm
     {
@@ -348,7 +347,7 @@ bool CWeaponSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEn
         push vecStart
         call dwFunction
     }
-    bool bReturn = g_pCore->GetGame()->GetWorld()->ProcessLineOfSight(vecStart, vecEnd, colCollision, CollisionEntity, flags, pBuildingResult);
+    bool bReturn = pGame->GetWorld()->ProcessLineOfSight(vecStart, vecEnd, colCollision, CollisionEntity, flags, pBuildingResult);
     _asm
     {
         add esp, 10h

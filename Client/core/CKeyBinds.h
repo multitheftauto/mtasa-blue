@@ -28,11 +28,10 @@ struct SDefaultCommandBind
     char szArguments[20];
 };
 
-class CKeyBinds : public CKeyBindsInterface
+class CKeyBinds final : public CKeyBindsInterface
 {
 public:
-    CKeyBinds(class CCore* pCore);
-    ~CKeyBinds();
+    CKeyBinds(class CCore* pCore) : m_pCore(pCore) {}
 
     bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnLoseFocus() override;
@@ -42,16 +41,16 @@ protected:
     bool ProcessKeyStroke(const SBindableKey* pKey, bool bState);
 
 public:
-    // Basic funcs
-    void Add(CKeyBind* pKeyBind);
-    void Remove(CKeyBind* pKeyBind);
-    void Clear();
     void RemoveDeletedBinds();
     void ClearCommandsAndControls();
-    bool Call(CKeyBind* pKeyBind);
+    bool Call(CKeyBind* keyBind);
+    void Remove(CKeyBind* keyBind) override;
+    void Remove(KeyBindContainer::iterator& iter);
 
-    std::list<CKeyBind*>::const_iterator IterBegin() { return m_pList->begin(); }
-    std::list<CKeyBind*>::const_iterator IterEnd() { return m_pList->end(); }
+    KeyBindContainer::iterator       begin() override { return m_binds.begin(); }
+    KeyBindContainer::const_iterator begin() const override { return m_binds.begin(); }
+    KeyBindContainer::iterator       end() override { return m_binds.end(); }
+    KeyBindContainer::const_iterator end() const override { return m_binds.end(); }
 
     // Command-bind funcs
     bool AddCommand(const char* szKey, const char* szCommand, const char* szArguments, bool bState, const char* szResource = NULL, bool bScriptCreated = false,
@@ -134,9 +133,9 @@ public:
     void                 SetAllFootControls(bool bState);
     void                 SetAllVehicleControls(bool bState);
 
-    void SetAllBindStates(bool bState, eKeyBindType onlyType = KEY_BIND_UNDEFINED);
+    void SetAllBindStates(bool bState, KeyBindType onlyType = KeyBindType::UNDEFINED) override;
 
-    unsigned int Count(eKeyBindType bindType = KEY_BIND_UNDEFINED);
+    unsigned int Count(KeyBindType bindType = KeyBindType::UNDEFINED);
 
     bool ControlForwardsBackWards(CControllerState& cs);
     bool ControlLeftAndRight(CControllerState& cs);
@@ -161,19 +160,20 @@ public:
 private:
     CCore* m_pCore;
 
-    std::list<CKeyBind*>*  m_pList;
-    bool                   m_bMouseWheel;
-    bool                   m_bInVehicle;
-    CCommandBind*          m_pChatBoxBind;
+    std::list<std::unique_ptr<CKeyBind>> m_binds;
+
+    bool                   m_bMouseWheel{false};
+    bool                   m_bInVehicle{false};
+    CCommandBind*          m_pChatBoxBind{nullptr};
     std::vector<CKeyBind*> m_vecBindQueue;
-    bool                   m_bProcessingKeyStroke;
-    KeyStrokeHandler       m_KeyStrokeHandler;
-    CharacterKeyHandler    m_CharacterKeyHandler;
-    bool                   m_bWaitingToLoadDefaults;
-    bool                   m_bLastStateForwards;
-    bool                   m_bLastStateBackwards;
-    bool                   m_bMoveForwards;
-    bool                   m_bLastStateLeft;
-    bool                   m_bLastStateRight;
-    bool                   m_bMoveLeft;
+    bool                   m_bProcessingKeyStroke{false};
+    KeyStrokeHandler       m_KeyStrokeHandler{nullptr};
+    CharacterKeyHandler    m_CharacterKeyHandler{nullptr};
+    bool                   m_bWaitingToLoadDefaults{false};
+    bool                   m_bLastStateForwards{false};
+    bool                   m_bLastStateBackwards{false};
+    bool                   m_bMoveForwards{false};
+    bool                   m_bLastStateLeft{false};
+    bool                   m_bLastStateRight{false};
+    bool                   m_bMoveLeft{false};
 };

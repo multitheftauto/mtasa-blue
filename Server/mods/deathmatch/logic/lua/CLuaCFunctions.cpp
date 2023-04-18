@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaCFunctions.h"
 
 CFastHashMap<lua_CFunction, CLuaCFunction*> CLuaCFunctions::ms_Functions;
 CFastHashMap<SString, CLuaCFunction*>       CLuaCFunctions::ms_FunctionsByName;

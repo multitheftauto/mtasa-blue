@@ -19,7 +19,7 @@
 #define MAX_PEDS_MTA                        110         // Real limit is 140
 #define MAX_OBJECTS_MTA                     1000        // Real limit is 1200
 #define MAX_ENTRY_INFO_NODES_MTA            72000       // Real limit is 72600  ( MAX_OBJECTS_MTA * 72 ) [Large col models are the cause of high usage]
-#define MAX_POINTER_SINGLE_LINKS_MTA        65000       // Real limit is 70000
+#define MAX_POINTER_SINGLE_LINKS_MTA        85000       // Real limit is 90000 [Large col models are the cause of high usage]
 #define MAX_POINTER_DOUBLE_LINKS_MTA        74000       // Real limit is 74800  ( MAX_OBJECTS_MTA * 72 + 2000 )
 
 // Real limits for GTA
@@ -28,7 +28,7 @@
 #define MAX_OBJECTS                         ( MAX_OBJECTS_MTA + 200 )               // 1200
 #define MAX_BUILDINGS                       13000
 #define MAX_ENTRY_INFO_NODES                ( MAX_ENTRY_INFO_NODES_MTA + 600 )      // 72600
-#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 70000
+#define MAX_POINTER_SINGLE_LINKS            ( MAX_POINTER_SINGLE_LINKS_MTA + 5000 ) // 90000
 #define MAX_POINTER_DOUBLE_LINKS            ( MAX_POINTER_DOUBLE_LINKS_MTA + 800 )  // 74800
 #define MAX_RWOBJECT_INSTANCES              2500
 
@@ -729,137 +729,6 @@ enum VehModelFlags
     MF_IS_HATCHBACK = 0x80000000            // has window in boot that is pointing upwards (render order thing)
 };
 
-enum ePedModel
-{
-    GTAVC_PLAYER = 0,
-    GTAVC_COP_COP,
-    GTAVC_COP_SWAT,
-    GTAVC_COP_FBI,
-    GTAVC_COP_ARMY,
-    GTAVC_EMERGENCY_MEDIC,
-    GTAVC_FIREMAN_FIREMAN,
-    GTAVC_CIVMALE_MALE01,
-    GTAVC_CIVFEMALE_HFYST,
-    GTAVC_CIVFEMALE_HFOST,
-    GTAVC_CIVMALE_HMYST,
-    GTAVC_CIVMALE_HMOST,
-    GTAVC_CIVFEMALE_HFYRI,
-    GTAVC_CIVFEMALE_HFORI,
-    GTAVC_CIVMALE_HMYRI,
-    GTAVC_CIVMALE_HMORI,
-    GTAVC_CIVFEMALE_HFYBE,
-    GTAVC_CIVFEMALE_HFOBE,
-    GTAVC_CIVMALE_HMYBE,
-    GTAVC_CIVMALE_HMOBE,
-    GTAVC_CIVFEMALE_HFYBU,
-    GTAVC_CIVFEMALE_HFYMD,
-    GTAVC_CIVFEMALE_HFYCG,
-    GTAVC_PROSTITUTE_HFYPR,
-    GTAVC_CIVFEMALE_HFOTR,
-    GTAVC_CIVMALE_HMOTR,
-    GTAVC_CIVMALE_HMYAP,
-    GTAVC_CIVMALE_HMOCA,
-    GTAVC_CIVMALE_BMODK,
-    GTAVC_CRIMINAL_BMYCR,
-    GTAVC_CIVFEMALE_BFYST,
-    GTAVC_CIVFEMALE_BFOST,
-    GTAVC_CIVMALE_BMYST,
-    GTAVC_CIVMALE_BMOST,
-    GTAVC_CIVFEMALE_BFYRI,
-    GTAVC_CIVFEMALE_BFORI,
-    GTAVC_CIVMALE_BMYRI,
-    GTAVC_CIVFEMALE_BFYBE,
-    GTAVC_CIVMALE_BMYBE,
-    GTAVC_CIVFEMALE_BFOBE,
-    GTAVC_CIVMALE_BMOBE,
-    GTAVC_CIVMALE_BMYBU,
-    GTAVC_PROSTITUTE_BFYPR,
-    GTAVC_CIVFEMALE_BFOTR,
-    GTAVC_CIVMALE_BMOTR,
-    GTAVC_CIVMALE_BMYPI,
-    GTAVC_CIVMALE_BMYBB,
-    GTAVC_CRIMINAL_WMYCR,
-    GTAVC_CIVFEMALE_WFYST,
-    GTAVC_CIVFEMALE_WFOST,
-    GTAVC_CIVMALE_WMYST,
-    GTAVC_CIVMALE_WMOST,
-    GTAVC_CIVFEMALE_WFYRI,
-    GTAVC_CIVFEMALE_WFORI,
-    GTAVC_CIVMALE_WMYRI,
-    GTAVC_CIVMALE_WMORI,
-    GTAVC_CIVFEMALE_WFYBE,
-    GTAVC_CIVMALE_WMYBE,
-    GTAVC_CIVFEMALE_WFOBE,
-    GTAVC_CIVMALE_WMOBE,
-    GTAVC_CIVMALE_WMYCW,
-    GTAVC_CIVMALE_WMYGO,
-    GTAVC_CIVFEMALE_WFOGO,
-    GTAVC_CIVMALE_WMOGO,
-    GTAVC_CIVFEMALE_WFYLG,
-    GTAVC_CIVMALE_WMYLG,
-    GTAVC_CIVFEMALE_WFYBU,
-    GTAVC_CIVMALE_WMYBU,
-    GTAVC_CIVMALE_WMOBU,
-    GTAVC_PROSTITUTE_WFYPR,
-    GTAVC_CIVFEMALE_WFOTR,
-    GTAVC_CIVMALE_WMOTR,
-    GTAVC_CRIMINAL_WMYPI,
-    GTAVC_CIVMALE_WMOCA,
-    GTAVC_CIVFEMALE_WFYJG,
-    GTAVC_CIVMALE_WMYJG,
-    GTAVC_CIVFEMALE_WFYSK,
-    GTAVC_CIVMALE_WMYSK,
-    GTAVC_CIVFEMALE_WFYSH,
-    GTAVC_CIVFEMALE_WFOSH,
-    GTAVC_CIVFEMALE_JFOTO,
-    GTAVC_CIVMALE_JMOTO,
-    GTAVC_GANG1_CBA,
-    GTAVC_GANG1_CBB,
-    GTAVC_GANG2_HNA,
-    GTAVC_GANG2_HNB,
-    GTAVC_GANG3_SGA,
-    GTAVC_GANG3_SGB,
-    GTAVC_GANG4_CLA,
-    GTAVC_GANG4_CLB,
-    GTAVC_GANG5_GDA,
-    GTAVC_GANG5_GDB,
-    GTAVC_GANG6_BKA,
-    GTAVC_GANG6_BKB,
-    GTAVC_GANG7_PGA,
-    GTAVC_GANG7_PGB,
-    GTAVC_COP_VICE1,
-    GTAVC_COP_VICE2,
-    GTAVC_COP_VICE3,
-    GTAVC_COP_VICE4,
-    GTAVC_COP_VICE5,
-    GTAVC_COP_VICE6,
-    GTAVC_COP_VICE7,
-    GTAVC_COP_VICE8,
-    GTAVC_CIVFEMALE_WFYG1,
-    GTAVC_CIVFEMALE_WFYG2,
-    GTAVC_CIVMALE_SPECIAL01,
-    GTAVC_CIVMALE_SPECIAL02,
-    GTAVC_CIVMALE_SPECIAL03,
-    GTAVC_CIVMALE_SPECIAL04,
-    GTAVC_CIVMALE_SPECIAL05,
-    GTAVC_CIVMALE_SPECIAL06,
-    GTAVC_CIVMALE_SPECIAL07,
-    GTAVC_CIVMALE_SPECIAL08,
-    GTAVC_CIVMALE_SPECIAL09,
-    GTAVC_CIVMALE_SPECIAL10,
-    GTAVC_CIVMALE_SPECIAL11,
-    GTAVC_CIVMALE_SPECIAL12,
-    GTAVC_CIVMALE_SPECIAL13,
-    GTAVC_CIVMALE_SPECIAL14,
-    GTAVC_CIVMALE_SPECIAL15,
-    GTAVC_CIVMALE_SPECIAL16,
-    GTAVC_CIVMALE_SPECIAL17,
-    GTAVC_CIVMALE_SPECIAL18,
-    GTAVC_CIVMALE_SPECIAL19,
-    GTAVC_CIVMALE_SPECIAL20,
-    GTAVC_CIVMALE_SPECIAL21
-};
-
 /**
  * Use to refer to types of weather, most in CWeather
  */
@@ -1240,9 +1109,9 @@ enum eMoveState
     PEDMOVE_TURN_L,
     PEDMOVE_TURN_R,
     PEDMOVE_WALK,
-    //#ifdef GTA_MIAMI
+    // #ifdef GTA_MIAMI
     PEDMOVE_JOG,
-    //#endif
+    // #endif
     PEDMOVE_RUN,
     PEDMOVE_SPRINT
 };
@@ -1636,4 +1505,96 @@ namespace eObjectGroup
         BY_GUN,
         SMASHABLE,
     };
-}
+}            // namespace eObjectGroup
+
+enum eSoundEffectType;
+
+namespace eSoundEffectParams
+{
+    enum class Chorus
+    {
+        WET_DRY_MIX,
+        DEPTH,
+        FEEDBACK,
+        FREQUENCY,
+        WAVEFORM,
+        DELAY,
+        PHASE,
+    };
+
+    enum class Compressor
+    {
+        GAIN,
+        ATTACK,
+        RELEASE,
+        THRESHOLD,
+        RATIO,
+        PREDELAY,
+    };
+
+    enum class Distortion
+    {
+        GAIN,
+        EDGE,
+        POST_EQ_CENTER_FREQUENCY,
+        POST_EQ_BANDWIDTH,
+        PRE_LOWPASS_CUTOFF,
+    };
+
+    enum class Echo
+    {
+        WET_DRY_MIX,
+        FEEDBACK,
+        LEFT_DELAY,
+        RIGHT_DELAY,
+        PAN_DELAY,
+    };
+
+    enum class Flanger
+    {
+        WET_DRY_MIX,
+        DEPTH,
+        FEEDBACK,
+        FREQUENCY,
+        WAVEFORM,
+        DELAY,
+        PHASE,
+    };
+
+    enum class Gargle
+    {
+        RATE_HZ,
+        WAVE_SHAPE,
+    };
+
+    enum class I3DL2Reverb
+    {
+        ROOM,
+        ROOM_HF,
+        ROOM_ROLLOFF_FACTOR,
+        DECAY_TIME,
+        DECAY_HF_RATIO,
+        REFLECTIONS,
+        REFLECTIONS_DELAY,
+        REVERB,
+        REVERB_DELAY,
+        DIFFUSION,
+        DENSITY,
+        HF_REFERENCE,
+    };
+
+    enum class ParamEq
+    {
+        CENTER,
+        BANDWIDTH,
+        GAIN,
+    };
+
+    enum class Reverb
+    {
+        IN_GAIN,
+        REVERB_MIX,
+        REVERB_TIME,
+        HIGH_FREQ_RT_RATIO,
+    };
+}            // namespace eSoundEffectParams

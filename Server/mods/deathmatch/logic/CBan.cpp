@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBan.h"
+#include "CIdArray.h"
 
 CBan::CBan()
 {

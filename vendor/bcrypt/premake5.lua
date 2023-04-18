@@ -11,8 +11,9 @@ project "blowfish_bcrypt"
 
 	files {
 		"premake5.lua",
-
 		"*.h",
 		"*.c",
-		"*.S"
 	}
+
+	filter { "platforms:x86 or x64" }
+		files { "*.S" }

@@ -13,6 +13,7 @@
 #include "CServerImpl.h"
 #include "CCrashHandler.h"
 #include "MTAPlatform.h"
+#include "version.h"
 #include "ErrorCodes.h"
 #include <clocale>
 #include <cstdio>
@@ -24,6 +25,9 @@
     #include <termios.h>
     #include <unistd.h>
 #endif
+
+void WaitForKey(int iKey);
+void Print(const char* szFormat, ...);
 
 // Define libraries
 char szNetworkLibName[] = "net" MTA_LIB_SUFFIX MTA_LIB_EXTENSION;
@@ -64,6 +68,7 @@ CServerImpl::CServerImpl()
     m_pNetwork = NULL;
     m_bRequestedQuit = false;
     m_bRequestedReset = false;
+    m_exitCode = ERROR_NO_ERROR;
     memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
     memset(&m_szTag, 0, sizeof(m_szTag) * sizeof(char));
     m_uiInputCount = 0;
@@ -814,7 +819,7 @@ void CServerImpl::HandleInput()
             if (m_uiInputCount == 0)
                 break;
 
-            // Insert a blank space + backspace
+                // Insert a blank space + backspace
 #ifdef WIN32
             Printf("%c %c", 0x08, 0x08);
 #else
@@ -851,8 +856,8 @@ void CServerImpl::HandleInput()
 
                     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
 #else
-                    if (!g_bSilent && !g_bNoCurses)
-                        wmove(m_wndInput, 0, --m_uiInputCount);
+            if (!g_bSilent && !g_bNoCurses)
+                wmove(m_wndInput, 0, --m_uiInputCount);
 #endif
                     break;
                 }
@@ -872,8 +877,8 @@ void CServerImpl::HandleInput()
 
                     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
 #else
-                    if (!g_bSilent && !g_bNoCurses)
-                        wmove(m_wndInput, 0, ++m_uiInputCount);
+            if (!g_bSilent && !g_bNoCurses)
+                wmove(m_wndInput, 0, ++m_uiInputCount);
 #endif
                     break;
                 }

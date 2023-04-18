@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 #include "curl_setup.h"
@@ -54,7 +56,7 @@ curl_socket_t Curl_getconnectinfo(struct Curl_easy *data,
                                   struct connectdata **connp);
 
 bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
-                      char *addr, long *port);
+                      char *addr, int *port);
 
 /*
  * Check if a connection seems to be alive.
@@ -81,9 +83,9 @@ void Curl_updateconninfo(struct Curl_easy *data, struct connectdata *conn,
 void Curl_conninfo_remote(struct Curl_easy *data, struct connectdata *conn,
                           curl_socket_t sockfd);
 void Curl_conninfo_local(struct Curl_easy *data, curl_socket_t sockfd,
-                         char *local_ip, long *local_port);
+                         char *local_ip, int *local_port);
 void Curl_persistconninfo(struct Curl_easy *data, struct connectdata *conn,
-                          char *local_ip, long local_port);
+                          char *local_ip, int local_port);
 int Curl_closesocket(struct Curl_easy *data, struct connectdata *conn,
                      curl_socket_t sock);
 
