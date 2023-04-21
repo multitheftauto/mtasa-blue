@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-17 17:08\n"
+"PO-Revision-Date: 2023-04-21 21:49\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -2379,7 +2379,7 @@ msgstr "MTA:SA başlatılamadı çünkü bir GTA:SA dosyası hatalı veya eksik:
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr "GTA'SA'nın bağlılığını yamala"
+msgstr "GTA'SA uygulamasının bağlılığını yamala"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
