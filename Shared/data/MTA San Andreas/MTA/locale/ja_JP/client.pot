@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-12 18:09\n"
+"PO-Revision-Date: 2023-04-22 18:35\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -295,7 +295,7 @@ msgstr "FPSグラフを表示する"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "ディベロッパー向き：ニュース再読み込み"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
@@ -893,11 +893,11 @@ msgstr "タイヤの煙など"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "ペッドディナミックシャドウ"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "モーションブラー"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -921,7 +921,7 @@ msgstr "ペッドを最高質でレンダーする"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "コロナ雨の反射"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
@@ -1688,7 +1688,7 @@ msgstr "特別な感謝"
 
 #: Client/core/CCredits.cpp:258
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "このソフト／プロジェクトが下記のライブラリやソフトを利用しています:"
 
 #: Client/core/CCommandFuncs.cpp:30
 msgid "***[ COMMAND HELP ]***\n"
@@ -2192,14 +2192,18 @@ msgstr "メインファイルが署名されていません。ウイルスの活
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "%s　ファイルは不在。これはウイルスの活動なのかもしれません。\n\n"
+"安全のため、MTASAを再インストールをお勧めします。\n"
+"MTAが実行できない場合はオンラインでヘルプ検索してみてください。"
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "%s ファイルはモッドされています。これはウイルスの活動なのかもしれません。\n\n"
+"安全のため、MTASAを再インストールをお勧めします。\n"
+"MTAが実行できない場合はオンラインでヘルプ検索してみてください。"
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2353,7 +2357,7 @@ msgstr "MTAは完全にインストールできませんでした。再インス
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "GTA:SA ジャンクションを作る"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
