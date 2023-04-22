@@ -773,9 +773,9 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
         case COL_MODEL_POOL:
             return 10150;            // Modded to 12000  @ CGameSA.cpp
         case TASK_POOL:
-            return 500;              // Modded to 5000   @ CGameSA.cpp
+            return 500;            // Modded to 5000   @ CGameSA.cpp
         case EVENT_POOL:
-            return 200;              // Modded to 5000   @ CGameSA.cpp
+            return 200;            // Modded to 5000   @ CGameSA.cpp
         case TASK_ALLOCATOR_POOL:
             return 16;
         case PED_INTELLIGENCE_POOL:

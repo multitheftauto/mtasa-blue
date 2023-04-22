@@ -54,16 +54,16 @@ bool CAudioContainerSA::GetAudioData(eAudioLookupIndex lookupIndex, int bankInde
 
     // Add the RIFF Wave header since BASS does not support raw data
     SRiffWavePCMHeader waveHeader;
-    waveHeader.chunkId = EndianSwap32(0x52494646);                // "RIFF" in ASCII, big-Endian
+    waveHeader.chunkId = EndianSwap32(0x52494646);            // "RIFF" in ASCII, big-Endian
     waveHeader.chunkSize = 36 + rawAudioLength;
-    waveHeader.format = EndianSwap32(0x57415645);                 // "WAVE" in ASCII, big-Endian
+    waveHeader.format = EndianSwap32(0x57415645);            // "WAVE" in ASCII, big-Endian
 
     waveHeader.subchunk1Id = EndianSwap32(0x666d7420);            // "fmt " in ASCII, big-Endian
     waveHeader.subchunk1Size = 16;                                // 16 for PCM
     waveHeader.audioFormat = 0x1;                                 // PCM
     waveHeader.numChannels = 1;                                   // Mono
     waveHeader.sampleRate = iSampleRate;
-    waveHeader.bitsPerSample = 16;                                // 16-Bit PCM
+    waveHeader.bitsPerSample = 16;            // 16-Bit PCM
     waveHeader.byteRate = waveHeader.sampleRate * waveHeader.numChannels * waveHeader.bitsPerSample / 8;
     waveHeader.blockAlign = waveHeader.numChannels * waveHeader.bitsPerSample / 8;
 

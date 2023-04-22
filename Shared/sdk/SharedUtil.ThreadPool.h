@@ -26,25 +26,23 @@ namespace SharedUtil
             m_vecThreads.reserve(threads);
             for (std::size_t i = 0; i < threads; ++i)
             {
-                m_vecThreads.emplace_back(
-                    [this]
+                m_vecThreads.emplace_back([this] {
+                    while (true)
                     {
-                        while (true)
+                        std::packaged_task<void(bool)> task;
                         {
-                            std::packaged_task<void(bool)> task;
-                            {
-                                // Wait until either exit is signalled or a new task arrives
-                                std::unique_lock<std::mutex> lock(m_mutex);
-                                m_cv.wait(lock, [this] { return m_exit || !m_tasks.empty(); });
-                                if (m_exit && m_tasks.empty())
-                                    return;
-                                task = std::move(m_tasks.front());
-                                m_tasks.pop();
-                            }
-                            // Run the task
-                            task(false);
+                            // Wait until either exit is signalled or a new task arrives
+                            std::unique_lock<std::mutex> lock(m_mutex);
+                            m_cv.wait(lock, [this] { return m_exit || !m_tasks.empty(); });
+                            if (m_exit && m_tasks.empty())
+                                return;
+                            task = std::move(m_tasks.front());
+                            m_tasks.pop();
                         }
-                    });
+                        // Run the task
+                        task(false);
+                    }
+                });
             }
         };
 
@@ -57,13 +55,11 @@ namespace SharedUtil
 
             // Package the task in a wrapper with a common void result
             // plus a skip flag for destruction without running the task
-            std::packaged_task<void(bool)> resultTask(
-                [task](bool skip)
-                {
-                    if (!skip)
-                        (*task)();
-                    delete task;
-                });
+            std::packaged_task<void(bool)> resultTask([task](bool skip) {
+                if (!skip)
+                    (*task)();
+                delete task;
+            });
 
             // Add task to queue and return future
             std::future<ReturnT> res = task->get_future();

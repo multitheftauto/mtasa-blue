@@ -59,8 +59,7 @@ private:
     static ChosenFunction MakeChoice(std::variant<T...> var)
     {
         return std::visit(
-            [](auto&& f)
-            {
+            [](auto&& f) {
                 using ft = decltype(f);
                 if constexpr (!std::is_convertible_v<ft, nth_element_t<N, Args...>>)
                     return ChosenFunction::FUNCB;            // if it cannot match A, B it is

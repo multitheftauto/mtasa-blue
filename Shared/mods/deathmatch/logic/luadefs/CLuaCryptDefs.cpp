@@ -191,13 +191,11 @@ std::variant<std::string, bool> CLuaCryptDefs::PasswordHash(lua_State* luaVM, st
                 if (pLuaMain)
                 {
                     CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                        [password, salt = options["salt"], cost]
-                        {
+                        [password, salt = options["salt"], cost] {
                             // Execute time-consuming task
                             return SharedUtil::BcryptHash(password, salt, cost);
                         },
-                        [luaFunctionRef = callback.value()](const SString& hash)
-                        {
+                        [luaFunctionRef = callback.value()](const SString& hash) {
                             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                             if (pLuaMain)
                             {
@@ -284,13 +282,11 @@ int CLuaCryptDefs::PasswordVerify(lua_State* luaVM)
                 if (pLuaMain)
                 {
                     CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                        [password, hash]
-                        {
+                        [password, hash] {
                             // Execute time-consuming task
                             return SharedUtil::BcryptVerify(password, hash);
                         },
-                        [luaFunctionRef](const bool& correct)
-                        {
+                        [luaFunctionRef](const bool& correct) {
                             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                             if (pLuaMain)
                             {
@@ -340,8 +336,7 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                 if (pLuaMain)
                 {
                     CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                        [size]() -> std::variant<KeyPair, SString>
-                        {
+                        [size]() -> std::variant<KeyPair, SString> {
                             // Execute time-consuming task
                             try
                             {
@@ -352,8 +347,7 @@ std::variant<bool, CLuaMultiReturn<SString, SString>> CLuaCryptDefs::GenerateKey
                                 return {ex.GetWhat()};
                             }
                         },
-                        [luaFunctionRef = callback.value()](const auto& result)
-                        {
+                        [luaFunctionRef = callback.value()](const auto& result) {
                             CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                             if (pLuaMain)
                             {
@@ -435,15 +429,13 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                            [data, key]
-                            {
+                            [data, key] {
                                 // Execute time-consuming task
                                 SString result;
                                 SharedUtil::TeaEncode(data, key, &result);
                                 return result;
                             },
-                            [luaFunctionRef](const SString& result)
-                            {
+                            [luaFunctionRef](const SString& result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
@@ -482,8 +474,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                            [data, key]
-                            {
+                            [data, key] {
                                 std::pair<SString, SString> result;
                                 try
                                 {
@@ -494,8 +485,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                 }
                                 return result;
                             },
-                            [luaFunctionRef](const std::pair<SString, SString> result)
-                            {
+                            [luaFunctionRef](const std::pair<SString, SString> result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
@@ -552,8 +542,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                            [data, key]
-                            {
+                            [data, key] {
                                 try
                                 {
                                     return std::make_pair(SharedUtil::RsaEncode(data, key), true);
@@ -563,8 +552,7 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                                     return std::make_pair(SString(ex.GetWhat()), false);
                                 }
                             },
-                            [luaFunctionRef](const std::pair<SString, bool>& result)
-                            {
+                            [luaFunctionRef](const std::pair<SString, bool>& result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
@@ -653,15 +641,13 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                            [data, key]
-                            {
+                            [data, key] {
                                 // Execute time-consuming task
                                 SString result;
                                 SharedUtil::TeaDecode(data, key, &result);
                                 return result;
                             },
-                            [luaFunctionRef](const SString& result)
-                            {
+                            [luaFunctionRef](const SString& result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
@@ -708,8 +694,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                            [data, key, iv]
-                            {
+                            [data, key, iv] {
                                 // Execute time-consuming task
                                 SString result;
                                 try
@@ -721,8 +706,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                 }
                                 return result;
                             },
-                            [luaFunctionRef](const SString& result)
-                            {
+                            [luaFunctionRef](const SString& result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {
@@ -777,8 +761,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     if (pLuaMain)
                     {
                         CLuaShared::GetAsyncTaskScheduler()->PushTask(
-                            [data, key]
-                            {
+                            [data, key] {
                                 try
                                 {
                                     return std::make_pair(SharedUtil::RsaDecode(data, key), true);
@@ -788,8 +771,7 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                                     return std::make_pair(SString(ex.GetWhat()), false);
                                 }
                             },
-                            [luaFunctionRef](const std::pair<SString, bool>& result)
-                            {
+                            [luaFunctionRef](const std::pair<SString, bool>& result) {
                                 CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
                                 if (pLuaMain)
                                 {

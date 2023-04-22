@@ -29,7 +29,7 @@ void COffsetsMP::Initialize10US()
 
 void COffsetsMP::Initialize11()
 {
-    CMultiplayerSA::HOOKPOS_FindPlayerCoors = 0x56E4B0;                                     // 1.01
+    CMultiplayerSA::HOOKPOS_FindPlayerCoors = 0x56E4B0;            // 1.01
     CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld = 0x56E250;
     CMultiplayerSA::HOOKPOS_FindPlayerHeading = 0x56E8F0;                                   // 1.01
     CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller = 0x53C3A9;                            // 1.01

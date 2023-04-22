@@ -33,7 +33,8 @@ void ApplyDpiAwareness()
 
     static SetProcessDpiAwarenessContext_t Win32SetProcessDpiAwarenessContext = ([] {
         HMODULE user32 = LoadLibrary("user32");
-        return user32 ? reinterpret_cast<SetProcessDpiAwarenessContext_t>(static_cast<void*>(GetProcAddress(user32, "SetProcessDpiAwarenessContext"))) : nullptr;
+        return user32 ? reinterpret_cast<SetProcessDpiAwarenessContext_t>(static_cast<void*>(GetProcAddress(user32, "SetProcessDpiAwarenessContext")))
+                      : nullptr;
     })();
 
     if (Win32SetProcessDpiAwarenessContext)

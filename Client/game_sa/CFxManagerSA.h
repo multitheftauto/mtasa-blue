@@ -43,9 +43,9 @@ public:
 
     void* pUnk;
     // List_c<FxEmitter_c>
-    CFxEmitterSAInterface* pFirstFxEmitter;                // 0x18
-    CFxEmitterSAInterface* pUnknownFxEmitter;              // 0x1C
-    unsigned int           uiFxEmitterCount;               // 0x20
+    CFxEmitterSAInterface* pFirstFxEmitter;              // 0x18
+    CFxEmitterSAInterface* pUnknownFxEmitter;            // 0x1C
+    unsigned int           uiFxEmitterCount;             // 0x20
 
     int                      iTxdSlot;                     // 0x24
     CVector*                 pvecWindDirection;            // 0x28
