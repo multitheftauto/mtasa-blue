@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-22 18:35\n"
+"PO-Revision-Date: 2023-04-22 19:55\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -2361,47 +2361,47 @@ msgstr "GTA:SA ジャンクションを作る"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "ファイルをコピーすることができないため、MTAが実行できません："
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SAファイルが不在、あるいは不正であるため、MTA:SAが実行できません："
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "MTASAファイルをコピーする"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "GTA:SAファイルが不在、あるいは不正であるため、MTA:SAが実行できません："
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "GTASA依存関係ファイルをパッチする"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "GTA:SA exeが不在、あるいは不正であるため、MTA:SAが実行できません："
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "たまにアンチウイルスは誤検知を検出するため、GTA:SA exeを例外を追加して、MTA:SA を再起動してください。"
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "GTASAを生成する"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "GTA:SA exeがロードできないため、MTA:SAが実行できません："
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "GTASAをパッチする"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "GTASAのパッチが失敗したため、MTA:SAが実行できません："
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -2421,14 +2421,16 @@ msgstr "互換性設定アップデート"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "不明"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "%sフィアルが%zuプロセスにロックされています。\n\n"
+"このプロセスを解除し、アップデートを続けましょうか。\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -2436,7 +2438,9 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "インストールが不正なのかもしれませ。\n\n"
+"%zuの%zuファイルがバックアップから取り戻すことができませんでした。\n\n"
+"MTASAを「www.multitheftauto.com」で再インストールしてください。または、管理者権限でアップデートを実行してみてください。"
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -2526,11 +2530,11 @@ msgstr "B - 別のNVIDIA"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - インテルスタンダード"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - 別インテル"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
