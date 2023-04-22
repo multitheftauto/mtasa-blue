@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:36\n"
+"PO-Revision-Date: 2023-04-22 19:56\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -25,12 +25,12 @@ msgstr "ダウンロードしたMTA：SA版はWindows XP、またVistaをサポ�
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "ダウンロードしたMTASA版はWindows７、８、 また8.1をサポートしません。別のバーションをwww.mtasa.comからダウンロードしてくさい。"
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "ダウンロードしたMTASA版は古いWindowsバージョンに作られました。別のバーションをwww.mtasa.comからダウンロードしてくさい。"
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
