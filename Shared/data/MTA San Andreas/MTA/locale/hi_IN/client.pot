@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-12 18:10\n"
+"PO-Revision-Date: 2023-04-25 03:35\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -19,21 +19,22 @@ msgstr ""
 
 #: Client/core/CMainMenu.cpp:321
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr ""
+msgstr "आप फीचर-ब्रांच बिल्ड का उपयोग कर रहे हैं! यह केवल एक टेस्ट बिल्ड है जिसका उपयोग सार्वजनिक सर्वर से कनेक्ट करने के लिए नहीं किया जा सकता है!"
 
 #: Client/core/CMainMenu.cpp:340
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr ""
+msgstr "MTA को जुलाई 2019 के बाद XP/Vista पर अपडेट प्राप्त नहीं होंगे।"
 
 #: Client/core/CMainMenu.cpp:1146
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
-msgstr ""
+msgstr "यह आपको वर्तमान सर्वर से डिस्कनेक्ट कर देगा।"
 
 #: Client/core/CMainMenu.cpp:1150
 msgid "DISCONNECT WARNING"
-msgstr ""
+msgstr "डिस्कनेक्ट चेतावनी\n"
+"#: क्लाइंट/कोर/सीएममेनमेनू.सीपीपी:1150"
 
 #: Client/core/CMainMenu.cpp:1152 Client/core/CSettings.cpp:1370
 #: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
@@ -43,7 +44,7 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:1877
 #: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:132
 msgid "No"
-msgstr ""
+msgstr "नहीं"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -60,7 +61,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
-msgstr ""
+msgstr "Yes"
 
 #: Client/core/CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
@@ -105,34 +106,34 @@ msgstr "Kharabi"
 
 #: Client/core/CConnectManager.cpp:110
 msgid "Connecting failed. Invalid host provided!"
-msgstr ""
+msgstr "कनेक्ट करना विफल रहा। अमान्य होस्ट प्रदान किया गया!"
 
 #: Client/core/CConnectManager.cpp:126
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr ""
+msgstr "पोर्ट %u पर %s से कनेक्ट करना विफल!"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:147
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr ""
+msgstr "%s:%u ... से कनेक्ट हो रहा है:"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
 #: Client/mods/deathmatch/logic/CClientGame.cpp:604
 msgid "CONNECTING"
-msgstr ""
+msgstr "कनेक्टिंग"
 
 #: Client/core/CConnectManager.cpp:263
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1183
 msgid "Connection timed out"
-msgstr ""
+msgstr "कनेक्शन का समय समाप्त"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1231
 msgid "Disconnected: unknown protocol error"
-msgstr ""
+msgstr "डिस्कनेक्ट किया गया: अज्ञात प्रोटोकॉल त्रुटि"
 
 #: Client/core/CConnectManager.cpp:285
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1235
@@ -306,58 +307,58 @@ msgstr ""
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
-msgstr ""
+msgstr "अगले हथियार"
 
 #: Client/core/CKeyBinds.cpp:188
 msgid "Previous weapon"
-msgstr ""
+msgstr "पिछले हथियार"
 
 #: Client/core/CKeyBinds.cpp:189
 msgid "Forwards"
-msgstr ""
+msgstr "आगे"
 
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
-msgstr ""
+msgstr "पीछे की ओर"
 
 #: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2222
 #: Client/core/CSettings.cpp:2250
 msgid "Left"
-msgstr ""
+msgstr "बाएं"
 
 #: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2224
 #: Client/core/CSettings.cpp:2251
 msgid "Right"
-msgstr ""
+msgstr "दाएँ"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr ""
+msgstr "बड़ा करें"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr ""
+msgstr "छोटा करें"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr ""
+msgstr "प्रवेश /निर्गम"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
-msgstr ""
+msgstr "कैमरा बदलें"
 
 #. 10
 #: Client/core/CKeyBinds.cpp:197
 msgid "Jump"
-msgstr ""
+msgstr "कूदें"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Sprint"
-msgstr ""
+msgstr "पूरे वेग से दौड़ना"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Look behind"
-msgstr ""
+msgstr "पीछे देखने के लिए"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
@@ -381,32 +382,32 @@ msgstr ""
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
-msgstr ""
+msgstr "वाहन बाईं ओर"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Vehicle right"
-msgstr ""
+msgstr "वाहन दाहिनी ओर"
 
 #. 20
 #: Client/core/CKeyBinds.cpp:207
 msgid "Steer forwards/down"
-msgstr ""
+msgstr "आगे/नीचे स्टीयर करें"
 
 #: Client/core/CKeyBinds.cpp:208
 msgid "Steer backwards/up"
-msgstr ""
+msgstr "पीछे/ऊपर की ओर स्टीयर करें"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr ""
+msgstr "गति बढ़ाना"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr ""
+msgstr "ब्रेक रीवर्स"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr ""
+msgstr "अगला रेडियो"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
@@ -418,7 +419,7 @@ msgstr ""
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
-msgstr ""
+msgstr "हॉर्न"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
@@ -426,7 +427,7 @@ msgstr ""
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
-msgstr ""
+msgstr "हथब्रेक"
 
 #. 30
 #: Client/core/CKeyBinds.cpp:217
