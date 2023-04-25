@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:37\n"
+"PO-Revision-Date: 2023-04-25 08:31\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -25,12 +25,12 @@ msgstr "आपके द्वारा डाउनलोड किया ग�
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "एमटीए का ई संस्करण: आपके द्वारा डाउनलोड किया गया एसए विंडोज 7, 8 या 8.1 का समर्थन नहीं करता है। कृपया www.mtasa.com से एक वैकल्पिक संस्करण डाउनलोड करें।"
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "एमटीए का संस्करण: एसए जिसे आपने डाउनलोड किया है वह विंडोज़ के पुराने संस्करणों के लिए डिज़ाइन किया गया है। कृपया www.mtasa.com से एक वैकल्पिक संस्करण डाउनलोड करें।"
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
@@ -235,7 +235,7 @@ msgstr "संपादक"
 #. INST_SEC_DEVELOPER
 #: Shared/installer/nightly.nsi:1001
 msgid "Development"
-msgstr "डेवेलपमेंट"
+msgstr "विकास"
 
 #. UNINST_SUCCESS
 #: Shared/installer/nightly.nsi:1049
