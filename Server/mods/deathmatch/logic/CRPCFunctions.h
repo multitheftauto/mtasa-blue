@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CCommon.h"
-#include <vector>
 #include <net/CNetServer.h>
 #include "CPlayerManager.h"
 

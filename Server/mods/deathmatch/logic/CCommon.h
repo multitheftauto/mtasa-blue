@@ -14,10 +14,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
-#include <list>
-#include <vector>
 #include <algorithm>
-#include <CVector.h>
 #include <core/CServerInterface.h>
 
 // Globals

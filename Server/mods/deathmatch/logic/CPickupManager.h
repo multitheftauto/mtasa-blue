@@ -15,7 +15,6 @@ class CPickupManager;
 
 #include "CColManager.h"
 #include "CPickup.h"
-#include <list>
 
 class CPickupManager
 {

@@ -15,6 +15,7 @@
 #include "CRegistry.h"
 #include "CPerfStatModule.h"
 #include "lua/CLuaArguments.h"
+#include "./../Config.h"
 
 ///////////////////////////////////////////////////////////////
 //

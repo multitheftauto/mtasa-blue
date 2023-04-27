@@ -10,10 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CElement.h"
-#include "CPerPlayerEntity.h"
 #include "CPlayerCamera.h"
-#include "CConsoleClient.h"
 #include "CGame.h"
 #include "CMainConfig.h"
 #include "CMapManager.h"
@@ -22,7 +19,6 @@
 #include "CSpatialDatabase.h"
 #include "packets/CElementRPCPacket.h"
 #include "Utils.h"
-#include "lua/CLuaFunctionParseHelpers.h"
 
 extern CGame* g_pGame;
 

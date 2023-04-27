@@ -14,7 +14,6 @@ class CLuaManager;
 
 #pragma once
 
-#include <list>
 #include "../CEvents.h"
 #include "CLuaMain.h"
 #include "CLuaCFunctions.h"

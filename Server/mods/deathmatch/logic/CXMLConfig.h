@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CCommon.h"
-#include <string>
 
 class CXMLConfig
 {

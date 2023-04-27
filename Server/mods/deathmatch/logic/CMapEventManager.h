@@ -13,7 +13,6 @@
 
 #include "lua/CLuaArguments.h"
 #include "CMapEvent.h"
-#include <list>
 
 class CMapEventManager
 {

@@ -13,7 +13,6 @@ class CPlayerTasks;
 
 #pragma once
 
-#include <string.h>
 #include "TaskNames.h"
 
 class CPlayerTask;

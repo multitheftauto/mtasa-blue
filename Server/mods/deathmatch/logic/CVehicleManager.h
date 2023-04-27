@@ -15,7 +15,6 @@ class CVehicleManager;
 
 #include "CVehicle.h"
 #include "CVehicleColorManager.h"
-#include <list>
 
 // Undefined number of passengers (to disable custom passenger seats overriding in CVehicle)
 #define VEHICLE_PASSENGERS_UNDEFINED    255

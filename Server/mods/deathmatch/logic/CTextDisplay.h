@@ -13,7 +13,6 @@ class CTextDisplay;
 
 #pragma once
 
-#include <list>
 #include "CPlayer.h"
 #include "CTextItem.h"
 

@@ -27,13 +27,9 @@
 #include "CMapManager.h"
 #include "CKeyBinds.h"
 #include "CIdArray.h"
-#include "CChecksum.h"
 #include "CHTTPD.h"
 #include "Utils.h"
 #include "packets/CResourceClientScriptsPacket.h"
-#include "lua/CLuaFunctionParseHelpers.h"
-#include <net/SimHeaders.h>
-#include <zip.h>
 
 #ifdef WIN32
     #include <zip/iowin32.h>

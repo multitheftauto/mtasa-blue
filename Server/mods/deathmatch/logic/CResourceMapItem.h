@@ -10,8 +10,6 @@
  *****************************************************************************/
 #pragma once
 
-#include "CResourceFile.h"
-
 class CDummy;
 class CElement;
 class CResource;

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResourceFile.h"
 #include "CMapManager.h"
 #include "CPedManager.h"
 #include "CWaterManager.h"

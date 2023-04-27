@@ -11,10 +11,6 @@
 
 #pragma once
 
-#include <string>
-#include <list>
-#include <vector>
-
 struct SEvent
 {
     std::vector<class CLuaMain*> pLuaMainVector;

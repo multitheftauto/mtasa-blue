@@ -15,7 +15,6 @@ class CMarkerManager;
 
 #include "CColManager.h"
 #include "CMarker.h"
-#include <list>
 
 class CMarker;
 

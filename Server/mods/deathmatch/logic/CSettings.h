@@ -15,7 +15,6 @@ class CSettings;
 
 #include "CClient.h"
 #include "CXMLConfig.h"
-#include "CLogger.h"
 
 class CResourceManager;
 

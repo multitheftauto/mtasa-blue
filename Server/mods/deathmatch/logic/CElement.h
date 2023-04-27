@@ -12,11 +12,9 @@
 #pragma once
 
 #include <core/CServerInterface.h>
-#include <CVector.h>
 #include "CMapEventManager.h"
 #include "CCustomData.h"
 #include "CEvents.h"
-#include <list>
 #include <cstring>
 #include "Enums.h"
 #include "CElementGroup.h"

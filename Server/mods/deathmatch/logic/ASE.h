@@ -29,9 +29,6 @@ typedef int SOCKET;
 #endif
 
 #include "CConnectHistory.h"
-#include <string.h>
-#include <stdio.h>
-#include <list>
 
 #define MAX_ASE_GAME_TYPE_LENGTH    200
 #define MAX_ASE_MAP_NAME_LENGTH     200

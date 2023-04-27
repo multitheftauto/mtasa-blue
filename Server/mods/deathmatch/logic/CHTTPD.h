@@ -14,8 +14,6 @@
 #pragma once
 
 #include "CConnectHistory.h"
-#include <string>
-#include <list>
 #include <ehs/ehs.h>
 
 class CResource;

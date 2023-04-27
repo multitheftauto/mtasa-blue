@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CObject.h"
-#include <list>
 
 using std::list;
 

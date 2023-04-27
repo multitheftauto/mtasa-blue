@@ -12,8 +12,6 @@
 #include "StdInc.h"
 #include "CDatabaseManager.h"
 #include "CDatabaseJobQueueManager.h"
-#include "lua/CLuaArguments.h"
-#include "CRegistry.h"
 #include "CIdArray.h"
 #include "CGame.h"
 

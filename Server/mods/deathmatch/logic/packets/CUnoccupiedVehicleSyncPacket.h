@@ -13,7 +13,6 @@
 
 #include <CVector.h>
 #include "CPacket.h"
-#include <vector>
 #include "net/SyncStructures.h"
 
 class CUnoccupiedVehicleSyncPacket final : public CPacket

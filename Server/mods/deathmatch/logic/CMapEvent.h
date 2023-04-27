@@ -15,8 +15,6 @@
 
 #include "Enums.h"
 #include "lua/CLuaFunctionRef.h"
-#include <stdio.h>
-#include <string>
 
 class CMapEvent
 {

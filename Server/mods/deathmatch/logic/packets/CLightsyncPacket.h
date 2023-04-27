@@ -13,7 +13,6 @@
 
 #include "CCommon.h"
 #include "CPacket.h"
-#include <vector>
 
 class CLightsyncPacket final : public CPacket
 {

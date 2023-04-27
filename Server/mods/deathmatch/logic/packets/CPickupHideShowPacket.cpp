@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "CPickupHideShowPacket.h"
-#include "CPickup.h"
 #include "CPickupManager.h"
 
 bool CPickupHideShowPacket::Write(NetBitStreamInterface& BitStream) const

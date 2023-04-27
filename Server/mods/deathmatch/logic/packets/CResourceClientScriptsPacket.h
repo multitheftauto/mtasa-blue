@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <vector>
 #include "CResource.h"
 #include "CResourceClientScriptItem.h"
 

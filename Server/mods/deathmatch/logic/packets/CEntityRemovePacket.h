@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-#include <vector>
 
 class CEntityRemovePacket final : public CPacket
 {

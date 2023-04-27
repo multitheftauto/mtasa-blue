@@ -13,7 +13,6 @@
 
 #include <CVector.h>
 #include "CPacket.h"
-#include <vector>
 
 class CPedSyncPacket final : public CPacket
 {

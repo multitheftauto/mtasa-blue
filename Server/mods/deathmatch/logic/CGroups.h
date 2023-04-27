@@ -13,7 +13,6 @@
 
 #include "CDummy.h"
 #include "CElement.h"
-#include <list>
 
 class CGroups
 {

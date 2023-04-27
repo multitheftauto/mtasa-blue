@@ -15,7 +15,6 @@ class CAccessControlListGroup;
 
 #include "../Config.h"
 #include <xml/CXMLNode.h>
-#include <list>
 
 class CAccessControlListGroupObject
 {

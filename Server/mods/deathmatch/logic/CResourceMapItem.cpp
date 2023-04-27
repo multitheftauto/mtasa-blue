@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResourceFile.h"
 #include "CResourceMapItem.h"
 #include "CGame.h"
 #include "CBlip.h"

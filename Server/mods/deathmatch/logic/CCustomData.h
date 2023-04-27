@@ -13,8 +13,6 @@
 
 #include <core/CServerInterface.h>
 #include "lua/CLuaArgument.h"
-#include <map>
-#include <string>
 
 #define MAX_CUSTOMDATA_NAME_LENGTH 128
 

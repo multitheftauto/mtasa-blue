@@ -13,10 +13,7 @@
 #include "CResourceChecker.h"
 #include "CResourceChecker.Data.h"
 #include "CResource.h"
-#include "CLogger.h"
 #include "CStaticFunctionDefinitions.h"
-#include <core/CServerInterface.h>
-#include <clocale>
 
 #ifndef WIN32
     #include <limits.h>

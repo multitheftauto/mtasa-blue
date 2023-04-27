@@ -10,6 +10,7 @@
 class CSimPacket;
 class CSimPlayerManager;
 
+#include <net/SyncStructures.h>
 #include "SharedUtil.Thread.h"
 #include "CNetBufferWatchDog.h"
 #include "CNetBuffer.h"
