@@ -23,8 +23,6 @@ SString          CLogger::m_strCaptureBuffer;
 bool             CLogger::m_bCaptureConsole = false;
 CCriticalSection CLogger::m_CaptureBufferMutex;
 
-extern CServerInterface* g_pServerInterface;
-
 void CLogger::LogPrintvf(const char* format, va_list vlist)
 {
     std::array<char, MAX_STRING_LENGTH> buffer{};

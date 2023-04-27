@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <net/CSimControl.h>
 #include "CLightsyncManager.h"
 #include "CPerfStatModule.h"
 #include "CGame.h"

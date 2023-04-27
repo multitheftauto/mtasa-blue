@@ -20,7 +20,6 @@
 #include "CStaticFunctionDefinitions.h"
 
 CRPCFunctions* g_pRPCFunctions = NULL;
-extern CGame*  g_pGame;
 
 CPlayer* CRPCFunctions::m_pSourcePlayer;
 

@@ -14,8 +14,6 @@
 #include "StdInc.h"
 #include "CLuaModuleManager.h"
 
-extern CGame* g_pGame;
-
 CLuaModuleManager::CLuaModuleManager(CLuaManager* pLuaManager)
 {
     m_pLuaManager = pLuaManager;

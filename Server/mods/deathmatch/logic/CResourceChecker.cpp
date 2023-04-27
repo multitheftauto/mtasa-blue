@@ -23,9 +23,6 @@
     #endif
 #endif
 
-extern CNetServer*       g_pRealNetServer;
-extern CServerInterface* g_pServerInterface;
-
 ///////////////////////////////////////////////////////////////
 //
 // CResourceChecker::CheckResourceForIssues

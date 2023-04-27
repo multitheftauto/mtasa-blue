@@ -50,9 +50,6 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #define HOOK_INSTRUCTION_COUNT 1000000
 #define HOOK_MAXIMUM_TIME 5000
 
-extern CGame*      g_pGame;
-extern CNetServer* g_pRealNetServer;
-
 #include "luascripts/coroutine_debug.lua.h"
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"

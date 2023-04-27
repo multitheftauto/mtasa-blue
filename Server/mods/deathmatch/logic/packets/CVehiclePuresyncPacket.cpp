@@ -17,8 +17,6 @@
 #include "CWeaponNames.h"
 #include "Utils.h"
 
-extern CGame* g_pGame;
-
 CVehiclePuresyncPacket::CVehiclePuresyncPacket(CPlayer* pPlayer)
 {
     m_pSourceElement = pPlayer;

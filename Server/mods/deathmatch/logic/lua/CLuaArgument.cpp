@@ -15,8 +15,6 @@
 #include "CScriptDebugging.h"
 #include "CResourceManager.h"
 
-extern CGame* g_pGame;
-
 #ifndef VERIFY_ELEMENT
 #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
 #endif

@@ -11,6 +11,7 @@
 #include "SimHeaders.h"
 #include "CGame.h"
 #include "CMainConfig.h"
+#include <net/CSimControl.h>
 
 volatile bool CNetBufferWatchDog::ms_bBlockOutgoingSyncPackets = false;
 volatile bool CNetBufferWatchDog::ms_bBlockIncomingSyncPackets = false;

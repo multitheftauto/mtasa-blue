@@ -35,20 +35,21 @@
     #include <mmsystem.h>
 #endif
 
-#include <net/CSimControl.h>
 #include <xml/CXML.h>
 #include <xml/CXMLNode.h>
 #include <xml/CXMLFile.h>
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include <CVector.h>
-#include <CVector4D.h>
 #include <CSphere.h>
 #include <CBox.h>
 #include <CMatrix.h>
-#include <bochs_internal/bochs_crc32.h>
 #include <pcrecpp.h>
 #include <pthread.h>
 
-extern class CNetServer* g_pRealNetServer;
-extern class CGame*      g_pGame;
+// Globals
+extern class CServerInterface*   g_pServerInterface;
+extern class CNetServer*         g_pNetServer;
+extern class CNetServer*         g_pRealNetServer;
+extern class CGame*              g_pGame;
+extern class CBandwidthSettings* g_pBandwidthSettings;

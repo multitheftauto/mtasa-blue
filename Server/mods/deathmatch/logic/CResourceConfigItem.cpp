@@ -19,8 +19,6 @@
 #include "CResource.h"
 #include <core/CServerInterface.h>
 
-extern CServerInterface* g_pServerInterface;
-
 CResourceConfigItem::CResourceConfigItem(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes)
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)
 {

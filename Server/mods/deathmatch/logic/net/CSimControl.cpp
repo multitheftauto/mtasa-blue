@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <net/CSimControl.h>
 #include "SimHeaders.h"
 #include "CGame.h"
 

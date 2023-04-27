@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-#include <CVector.h>
 
 class CVehicleInOutPacket final : public CPacket
 {

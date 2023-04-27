@@ -18,9 +18,6 @@
 #include "CGame.h"
 #include "CMapManager.h"
 
-extern CServerInterface* g_pServerInterface;
-extern CGame*            g_pGame;
-
 CResourceHTMLItem::CResourceHTMLItem(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes,
                                      bool bIsDefault, bool bIsRaw, bool bRestricted, bool bOOPEnabled)
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)

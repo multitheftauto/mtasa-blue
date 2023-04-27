@@ -21,8 +21,6 @@
 #include "CGame.h"
 #include "CMapManager.h"
 
-extern CGame* g_pGame;
-
 CElementGroup::~CElementGroup()
 {
     // Delete all the elements

@@ -74,7 +74,6 @@
     #endif
 #endif
 
-extern CGame*            g_pGame;
 extern CTimeUsMarker<20> markerLatentEvent;
 
 static CLuaManager*          m_pLuaManager;

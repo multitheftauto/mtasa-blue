@@ -14,8 +14,6 @@
 #include "CGame.h"
 #include "Utils.h"
 
-extern CNetServer* g_pRealNetServer;
-
 namespace
 {
     #define TOP_COUNT (3)

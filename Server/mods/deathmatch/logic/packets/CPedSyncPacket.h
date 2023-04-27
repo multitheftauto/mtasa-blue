@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <CVector.h>
 #include "CPacket.h"
 
 class CPedSyncPacket final : public CPacket

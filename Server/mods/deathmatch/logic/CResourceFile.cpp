@@ -18,8 +18,6 @@
 #include "CResource.h"
 #include <core/CServerInterface.h>
 
-extern CServerInterface* g_pServerInterface;
-
 CResourceFile::CResourceFile(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes)
 {
     m_strResourceFileName = szResourceFileName;

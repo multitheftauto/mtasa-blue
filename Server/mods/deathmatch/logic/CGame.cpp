@@ -61,6 +61,7 @@
 #include <signal.h>
 #include "CCommandLineParser.h"
 #include "CConnectHistory.h"
+#include <net/CSimControl.h>
 
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f

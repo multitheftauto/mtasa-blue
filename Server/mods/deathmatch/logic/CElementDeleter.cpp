@@ -12,8 +12,6 @@
 #include "StdInc.h"
 #include "CGame.h"
 
-extern CGame* g_pGame;
-
 void CElementDeleter::Delete(class CElement* pElement, bool bUnlink, bool bUpdatePerPlayerEntities)
 {
     if (pElement)

@@ -24,8 +24,6 @@
 #include "CMainConfig.h"
 #include "CBanManager.h"
 
-extern CGame* g_pGame;
-
 // Helper functions
 static std::string GetAdminNameForLog(CClient* pClient)
 {

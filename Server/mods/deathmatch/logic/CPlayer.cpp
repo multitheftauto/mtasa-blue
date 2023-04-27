@@ -27,8 +27,7 @@
 #include "Utils.h"
 #include "CSpatialDatabase.h"
 #include "net/SimHeaders.h"
-
-extern CGame* g_pGame;
+#include <net/CSimControl.h>
 
 CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket) : CPed(nullptr, nullptr, 0)
 {

@@ -18,8 +18,6 @@
 #include "CBandwidthSettings.h"
 #include "Utils.h"
 
-extern CGame* g_pGame;
-
 CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
     : CElement(pParent)
 {
