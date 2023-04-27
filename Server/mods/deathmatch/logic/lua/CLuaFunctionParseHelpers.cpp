@@ -14,6 +14,7 @@
 #include "CAccessControlListManager.h"
 #include "CDatabaseManager.h"
 #include "CBan.h"
+#include <pcrecpp.h>
 
 //
 // enum values <-> script strings

@@ -41,10 +41,7 @@
 #include <xml/CXMLAttributes.h>
 #include <xml/CXMLAttribute.h>
 #include <CVector.h>
-#include <CSphere.h>
-#include <CBox.h>
 #include <CMatrix.h>
-#include <pcrecpp.h>
 #include <pthread.h>
 
 // Globals

@@ -9,6 +9,7 @@
  *****************************************************************************/
 #pragma once
 class CPlayerCamera;
+class CSphere;
 
 // Bounding sphere z position for 2d objects
 #define SPATIAL_2D_Z    0

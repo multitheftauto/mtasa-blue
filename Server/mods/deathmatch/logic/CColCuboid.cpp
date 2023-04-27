@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CColCuboid.h"
+#include <CSphere.h>
 
 CColCuboid::CColCuboid(CColManager* pManager, CElement* pParent, const CVector& vecPosition, const CVector& vecSize) : CColShape(pManager, pParent)
 {

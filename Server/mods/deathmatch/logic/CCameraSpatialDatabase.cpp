@@ -12,6 +12,8 @@
 #include "CCameraSpatialDatabase.h"
 #include "CPlayerCamera.h"
 #include "RTree.h"
+#include <CSphere.h>
+#include <CBox.h>
 
 namespace
 {

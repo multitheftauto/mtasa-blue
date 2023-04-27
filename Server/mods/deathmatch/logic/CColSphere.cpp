@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CColSphere.h"
+#include <CSphere.h>
 #include "Utils.h"
 
 CColSphere::CColSphere(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, bool bIsPartnered)

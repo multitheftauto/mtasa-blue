@@ -16,7 +16,6 @@
 #include "CPlayerClothes.h"
 #include "CVehicle.h"
 #include "CPlayerTasks.h"
-#include <CMatrix.h>
 
 #define INVALID_VEHICLE_SEAT 0xFF
 #define NUM_PLAYER_STATS 343

@@ -28,6 +28,7 @@
 #include "CSpatialDatabase.h"
 #include "net/SimHeaders.h"
 #include <net/CSimControl.h>
+#include <CSphere.h>
 
 CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket) : CPed(nullptr, nullptr, 0)
 {

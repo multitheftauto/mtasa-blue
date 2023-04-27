@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CSphere.h>
 #include "CPlayerCamera.h"
 #include "CGame.h"
 #include "CMainConfig.h"

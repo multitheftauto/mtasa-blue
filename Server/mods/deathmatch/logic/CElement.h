@@ -40,6 +40,7 @@
 #define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
 
 class CLuaMain;
+class CSphere;
 
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;

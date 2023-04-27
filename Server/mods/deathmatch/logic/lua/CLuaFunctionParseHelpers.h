@@ -21,6 +21,11 @@ class CLuaVector3D;
 class CLuaVector4D;
 class CLuaMatrix;
 
+namespace pcrecpp
+{
+    class RE_Options;
+}
+
 // Forward declare enum reflection stuff
 enum eLuaType
 {

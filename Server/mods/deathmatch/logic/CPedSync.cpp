@@ -19,6 +19,7 @@
 #include "CColManager.h"
 #include "CSpatialDatabase.h"
 #include "CPlayerCamera.h"
+#include <CSphere.h>
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {

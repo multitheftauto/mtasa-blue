@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CColCircle.h"
+#include <CSphere.h>
 #include "CColManager.h"
 #include "CVector2D.h"
 #include "CSpatialDatabase.h"

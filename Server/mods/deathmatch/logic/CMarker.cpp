@@ -17,6 +17,7 @@
 #include "Utils.h"
 #include "CGame.h"
 #include "packets/CElementRPCPacket.h"
+#include <CSphere.h>
 
 CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElement* pParent) : CPerPlayerEntity(pParent)
 {

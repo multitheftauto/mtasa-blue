@@ -11,13 +11,6 @@
 
 #pragma once
 
-extern "C"
-{
-    #include "lua.h"
-    #include "lualib.h"
-    #include "lauxlib.h"
-}
-
 #include "CLuaDefs.h"
 
 class CLuaClassDefs : public CLuaDefs

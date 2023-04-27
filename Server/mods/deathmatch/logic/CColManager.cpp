@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CColManager.h"
+#include <CSphere.h>
 #include "CSpatialDatabase.h"
 #include "Utils.h"
 

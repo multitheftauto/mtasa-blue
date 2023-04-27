@@ -15,6 +15,7 @@
 
 class CColManager;
 class CVector2D;
+class CSphere;
 
 class CColCircle : public CColShape
 {
