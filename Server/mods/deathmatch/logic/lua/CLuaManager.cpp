@@ -15,8 +15,6 @@
 #include "lua/CLuaShared.h"
 #include "../luadefs/CLuaGenericDefs.h"
 #include "../luadefs/CLuaFunctionDefs.h"
-#include "luadefs/CLuaHTTPDefs.h"
-#include "luadefs/CLuaUtilDefs.h"
 #include "luadefs/CLuaElementDefs.h"
 #include "luadefs/CLuaAccountDefs.h"
 #include "luadefs/CLuaACLDefs.h"

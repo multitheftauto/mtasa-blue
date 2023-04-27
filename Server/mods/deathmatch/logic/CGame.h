@@ -17,8 +17,6 @@ class CGame;
 #include <net/CNetServer.h>
 #include "CClient.h"
 #include "CEvents.h"
-#include "CCommandLineParser.h"
-#include "CConnectHistory.h"
 #include "CElementDeleter.h"
 
 #include "packets/CCommandPacket.h"
@@ -57,7 +55,6 @@ class CGame;
 #include "lua/CLuaManager.h"
 
 #include "CLightsyncManager.h"
-#include "CBanManager.h"
 
 // Forward declarations
 class ASE;
@@ -131,6 +128,10 @@ class CVehiclePuresyncPacket;
 class CVehicleTrailerPacket;
 class CVoiceDataPacket;
 class CWeaponDamageCheckPacket;
+
+class CBanManager;
+class CCommandLineParser;
+class CConnectHistory;
 
 typedef SFixedArray<bool, MAX_GARAGES> SGarageStates;
 
@@ -236,7 +237,7 @@ public:
     CRadarAreaManager*               GetRadarAreaManager() { return m_pRadarAreaManager; }
     CGroups*                         GetGroups() { return m_pGroups; }
     CElementDeleter*                 GetElementDeleter() { return &m_ElementDeleter; }
-    CConnectHistory*                 GetJoinFloodProtector() { return &m_FloodProtect; }
+    CConnectHistory*                 GetJoinFloodProtector() { return m_FloodProtect; }
     CHTTPD*                          GetHTTPD() { return m_pHTTPD; }
     CSettings*                       GetSettings() { return m_pSettings; }
     CAccessControlListManager*       GetACLManager() { return m_pACLManager; }
@@ -523,7 +524,7 @@ private:
     CPacketTranslator*      m_pPacketTranslator;
     CMapManager*            m_pMapManager;
     CElementDeleter         m_ElementDeleter;
-    CConnectHistory         m_FloodProtect;
+    CConnectHistory*        m_FloodProtect;
     CLuaManager*            m_pLuaManager;
     CScriptDebugging*       m_pScriptDebugging;
     CConsole*               m_pConsole;
@@ -536,7 +537,7 @@ private:
     CClock*                    m_pClock;
     CBanManager*               m_pBanManager;
     CTeamManager*              m_pTeamManager;
-    CCommandLineParser         m_CommandLineParser;
+    CCommandLineParser*        m_CommandLineParser;
     CRegisteredCommands*       m_pRegisteredCommands;
     CDatabaseManager*          m_pDatabaseManager;
     CLuaCallbackManager*       m_pLuaCallbackManager;

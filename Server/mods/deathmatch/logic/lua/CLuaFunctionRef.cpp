@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "CLuaFunctionRef.h"
-#include "lua/CLuaManager.h"
 #include "CGame.h"
 
 #ifdef WIN32

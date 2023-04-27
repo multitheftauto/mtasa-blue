@@ -19,7 +19,6 @@
 #include "CKeyBinds.h"
 #include "CPerfStatManager.h"
 #include "CTickRateSettings.h"
-#include "CBandwidthSettings.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CScriptDebugging.h"
 #include "packets/CConsoleEchoPacket.h"

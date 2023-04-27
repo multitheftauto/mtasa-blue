@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CElementDeleter.h"
 #include "CGame.h"
 
 extern CGame* g_pGame;

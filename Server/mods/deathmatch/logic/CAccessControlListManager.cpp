@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CAccessControlListManager.h"
 #include "CLogger.h"
-#include "CGame.h"
 #include "Utils.h"
 #include "CIdArray.h"
 

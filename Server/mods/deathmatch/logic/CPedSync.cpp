@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CPedSync.h"
 #include "Utils.h"
-#include "CElementIDs.h"
 #include "CTickRateSettings.h"
 #include "packets/CPedStartSyncPacket.h"
 #include "packets/CPedStopSyncPacket.h"

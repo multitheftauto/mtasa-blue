@@ -14,12 +14,10 @@
 #include "CGame.h"
 #include "CMainConfig.h"
 #include "Utils.h"
-#include "CElementIDs.h"
 #include "CWeaponNames.h"
 #include "CPerfStatManager.h"
 #include "CKeyBinds.h"
 #include "CStaticFunctionDefinitions.h"
-#include "net/SyncStructures.h"
 
 CRPCFunctions* g_pRPCFunctions = NULL;
 extern CGame*  g_pGame;

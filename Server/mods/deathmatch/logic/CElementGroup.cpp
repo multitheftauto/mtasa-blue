@@ -18,10 +18,8 @@
 
 #include "StdInc.h"
 #include "CElementGroup.h"
-#include "packets/CEntityRemovePacket.h"
 #include "CGame.h"
 #include "CMapManager.h"
-#include "CPerPlayerEntity.h"
 
 extern CGame* g_pGame;
 

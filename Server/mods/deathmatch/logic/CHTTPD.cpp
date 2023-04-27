@@ -14,9 +14,6 @@
 #include "CGame.h"
 #include "CAccountManager.h"
 #include "CMainConfig.h"
-#include <cryptopp/rsa.h>
-#include <cryptopp/osrng.h>
-#include <SharedUtil.Crypto.h>
 
 #ifndef WIN32
     #include <sys/socket.h>

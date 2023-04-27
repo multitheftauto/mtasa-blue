@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CPickup.h"
 #include "CPickupManager.h"
-#include "CLogger.h"
 #include "Utils.h"
 #include "CGame.h"
 #include "packets/CPickupHitConfirmPacket.h"

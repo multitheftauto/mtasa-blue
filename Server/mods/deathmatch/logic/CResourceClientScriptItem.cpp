@@ -16,7 +16,6 @@
 #include "CResourceClientScriptItem.h"
 #include "CGame.h"
 #include "CScriptDebugging.h"
-#include <zlib.h>
 
 extern CGame* g_pGame;
 

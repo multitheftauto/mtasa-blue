@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "CLuaACLDefs.h"
-#include "CGame.h"
 #include "CScriptArgReader.h"
 #include "Utils.h"
 

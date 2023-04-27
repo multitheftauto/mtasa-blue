@@ -11,8 +11,6 @@
 
 #include "StdInc.h"
 #include "LuaCommon.h"
-#include "Common.h"
-#include "CElementIDs.h"
 #include "CBan.h"
 #include "CGame.h"
 #include "lua/CLuaShared.h"

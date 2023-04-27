@@ -64,9 +64,7 @@
 #include "packets/CChatEchoPacket.h"
 #include "packets/CConsoleEchoPacket.h"
 #include "packets/CChatClearPacket.h"
-#include "packets/CElementRPCPacket.h"
 #include "version.h"
-#include <net/rpc_enums.h>
 
 #ifndef WIN32
     #include <limits.h>

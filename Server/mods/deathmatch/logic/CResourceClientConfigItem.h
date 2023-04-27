@@ -13,7 +13,6 @@
 
 #include "CGame.h"
 #include "CResourceFile.h"
-#include <list>
 
 class CResourceClientConfigItem : public CResourceFile
 {

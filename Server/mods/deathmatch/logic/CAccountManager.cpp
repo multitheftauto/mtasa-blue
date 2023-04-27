@@ -13,7 +13,6 @@
 #include "CAccountManager.h"
 #include "CGame.h"
 #include "CDatabaseManager.h"
-#include "CRegistry.h"
 #include "CMainConfig.h"
 #include "CIdArray.h"
 #include "CAccessControlListManager.h"

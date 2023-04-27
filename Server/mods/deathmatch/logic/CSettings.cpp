@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "CSettings.h"
-#include "CResource.h"
 #include "CResourceManager.h"
 #include "CGame.h"
 #include "CMapManager.h"

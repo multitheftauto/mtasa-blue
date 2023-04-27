@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CLuaDefs.h"
 #include "CLuaClassDefs.h"
-#include "lua/LuaCommon.h"
 #include "CMapManager.h"
 #include "CDebugHookManager.h"
 #include "CPerfStatModule.h"

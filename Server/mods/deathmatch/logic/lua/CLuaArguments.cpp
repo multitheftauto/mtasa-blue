@@ -11,13 +11,11 @@
 
 #include "StdInc.h"
 #include "CLuaArguments.h"
-#include "CLuaMain.h"
 #include "CGame.h"
 #include "CScriptDebugging.h"
 #include "CPerfStatManager.h"
 #include "CDatabaseManager.h"
 #include "CBan.h"
-#include "CAccount.h"
 #include "CAccessControlList.h"
 #include "CAccessControlListGroup.h"
 

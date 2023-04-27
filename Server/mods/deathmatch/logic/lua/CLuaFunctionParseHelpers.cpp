@@ -7,11 +7,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaFunctionParseHelpers.h"
 #include "CScriptArgReader.h"
-#include "CResource.h"
 #include "CResourceManager.h"
-#include "CGame.h"
 #include "CRemoteCalls.h"
 #include "CMainConfig.h"
 #include "CAccessControlListManager.h"

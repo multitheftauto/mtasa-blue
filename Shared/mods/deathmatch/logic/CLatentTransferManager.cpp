@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include "CLatentTransferManager.h"
+#include "Enums.h"
 
 using namespace LatentTransfer;
 

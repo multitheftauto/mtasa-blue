@@ -21,6 +21,7 @@
 #include "CConsoleCommands.h"
 #include "CHTTPD.h"
 #include "CStaticFunctionDefinitions.h"
+#include "CCommandLineParser.h"
 
 #define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 

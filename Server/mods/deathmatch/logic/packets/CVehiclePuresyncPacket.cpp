@@ -16,8 +16,6 @@
 #include "CTrainTrackManager.h"
 #include "CWeaponNames.h"
 #include "Utils.h"
-#include "lua/CLuaFunctionParseHelpers.h"
-#include "net/SyncStructures.h"
 
 extern CGame* g_pGame;
 
