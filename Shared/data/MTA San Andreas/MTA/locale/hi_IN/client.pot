@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-26 10:24\n"
+"PO-Revision-Date: 2023-04-27 18:49\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -464,16 +464,16 @@ msgstr "विशेष नियंत्रण ऊपर"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
-msgstr ""
+msgstr "लक्ष्य शस्त्र"
 
 #: Client/core/CKeyBinds.cpp:226
 msgid "Conversation yes"
-msgstr ""
+msgstr "बातचीत हाँ"
 
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr ""
+msgstr "बातचीत सं"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
