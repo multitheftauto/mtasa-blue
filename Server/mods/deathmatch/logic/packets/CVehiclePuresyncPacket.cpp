@@ -83,15 +83,13 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
                 BitStream.Read(fPosition);
                 BitStream.ReadBit(bDirection);
+                BitStream.Read(fSpeed);
 
                 // TODO(qaisjp, feature/custom-train-tracks): this needs to be changed to an ElementID when the time is right (in a backwards compatible manner)
                 // Note: here we use a uchar, in the CTT branch this is a uint. Just don't forget that, it might be important
                 uchar trackIndex;
                 BitStream.Read(trackIndex);
                 pTrainTrack = g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(trackIndex);
-
-                // In 1.6 we can move this under bDirection for neatness. We can't do it right now because of backwards compat.
-                BitStream.Read(fSpeed);
 
                 // But we should only actually apply that train-specific data if that vehicle is train on our side
                 if (vehicleType == VEHICLE_TRAIN)
@@ -514,6 +512,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
                     BitStream.Write(fPosition);
                     BitStream.WriteBit(bDirection);
+                    BitStream.Write(fSpeed);
 
                     // Push the train track information
                     const auto trainTrack = pVehicle->GetTrainTrack();
@@ -534,9 +533,6 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                         // TODO(qaisjp, feature/custom-train-tracks): implement behaviour for non-default tracks
                         assert(0 && "It is impossible for custom train tracks to exist right now, so this should never be reached.");
                     }
-
-                    // In 1.6 we can move this under bDirection for neatness. We can't do it right now because of backwards compat.
-                    BitStream.Write(fSpeed);
                 }
 
                 // Vehicle rotation

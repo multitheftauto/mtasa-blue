@@ -1315,8 +1315,8 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             float fSpeed = 0.0f;
             BitStream.Read(fPosition);
             BitStream.ReadBit(bDirection);
-            BitStream.Read(ucTrack);
             BitStream.Read(fSpeed);
+            BitStream.Read(ucTrack);
 
             if (vehicleType == CLIENTVEHICLE_TRAIN)
             {
@@ -1588,8 +1588,8 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         float fSpeed = pVehicle->GetTrainSpeed();
         BitStream.Write(fPosition);
         BitStream.WriteBit(bDirection);
-        BitStream.Write(ucTrack);
         BitStream.Write(fSpeed);
+        BitStream.Write(ucTrack);
     }
 
     // Write the camera orientation
