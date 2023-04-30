@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-12 17:39+0000\n"
-"PO-Revision-Date: 2023-04-27 18:49\n"
+"PO-Revision-Date: 2023-04-30 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -138,99 +138,99 @@ msgstr "डिस्कनेक्ट किया गया: अज्ञा�
 #: Client/core/CConnectManager.cpp:285
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1235
 msgid "Disconnected: disconnected remotely"
-msgstr "डिस्कनेक्ट किया गया: दूरस्थ रूप से डिस्कनेक्ट किया गया"
+msgstr ""
 
 #: Client/core/CConnectManager.cpp:289
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1239
 msgid "Disconnected: connection lost remotely"
-msgstr "डिस्कनेक्ट किया गया: कनेक्शन दूरस्थ रूप से टूट गया"
+msgstr ""
 
 #: Client/core/CConnectManager.cpp:293
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1243
 msgid "Disconnected: you are banned from this server"
-msgstr "डिस्कनेक्ट किया गया: आपको इस सर्वर से प्रतिबंधित कर दिया गया है"
+msgstr ""
 
 #: Client/core/CConnectManager.cpp:300
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1251
 msgid "Disconnected: disconnected from the server"
-msgstr "डिस्कनेक्ट किया गया: सर्वर से डिस्कनेक्ट किया गया"
+msgstr ""
 
 #: Client/core/CConnectManager.cpp:304
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1255
 msgid "Disconnected: connection to the server was lost"
-msgstr "डिस्कनेक्ट किया गया: सर्वर से कनेक्शन टूट गया था"
+msgstr ""
 
 #: Client/core/CConnectManager.cpp:311
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1263
 msgid "Disconnected: connection was refused"
-msgstr "डिस्कनेक्ट किया गया: कनेक्शन अस्वीकार कर दिया गया था"
+msgstr ""
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:403
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "ऐसा कोई मॉड इंस्टॉल नहीं है (%s)"
+msgstr ""
 
 #: Client/core/CConnectManager.cpp:411
 msgid "Bad server response (2)"
-msgstr "खराब सर्वर प्रतिक्रिया (2)"
+msgstr ""
 
 #: Client/core/CConnectManager.cpp:421
 msgid "Bad server response (1)"
-msgstr "खराब सर्वर प्रतिक्रिया (1)"
+msgstr ""
 
 #: Client/core/CCore.cpp:763 Client/loader/CInstallManager.cpp:1057
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "एमटीए:एसए जारी नहीं रख सकता क्योंकि ड्राइव %s में पर्याप्त जगह नहीं है।"
+msgstr ""
 
 #: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
-msgstr "घातक त्रुटि"
+msgstr ""
 
 #: Client/core/CCore.cpp:890
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ठीक करने के लिए, इस फ़ाइल को हटाएं:"
+msgstr ""
 
 #: Client/core/CCore.cpp:922
 #, c-format
 msgid "%s module is incorrect!"
-msgstr "%s मॉड्यूल गलत है!"
+msgstr ""
 
 #: Client/core/CCore.cpp:1227
 msgid "Error executing URL"
-msgstr "URL निष्पादित करने में त्रुटि"
+msgstr ""
 
 #: Client/core/CCore.cpp:1239
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
-msgstr "कमांड लाइन ('%s') में मोड निर्दिष्ट चलाने में त्रुटि"
+msgstr ""
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client/core/CCore.cpp:1327
 msgid "this help screen"
-msgstr "यह सहायता स्क्रीन"
+msgstr ""
 
 #: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
 msgid "exits the application"
-msgstr "एप्लिकेशन से बाहर निकलता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1330
 msgid "shows the version"
-msgstr "वर्जन दिखाता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1331
 msgid "shows the time"
-msgstr "समय दिखाता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1332
 msgid "shows the hud"
-msgstr "हुड दिखाता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1333
 msgid "shows all the binds"
-msgstr "सारे बंधन दिखाता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1334
 msgid "shows your serial"
@@ -254,56 +254,56 @@ msgstr "बटन निकलता है (बटन)"
 
 #: Client/core/CCore.cpp:1347
 msgid "copies the default gta controls"
-msgstr "डिफ़ॉल्ट जीटीए नियंत्रणों की प्रतिलिपि बनाता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1348
 msgid "outputs a screenshot"
-msgstr "एक स्क्रीनशॉट आउटपुट करता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1349
 msgid "immediately saves the config"
-msgstr "कॉन्फ़िगरेशन को तुरंत सहेजता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1351
 msgid "clears the debug view"
-msgstr "डिबग दृश्य को साफ़ करता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1352
 msgid "scrolls the chatbox upwards"
-msgstr "चैटबॉक्स को ऊपर की ओर स्क्रॉल करें"
+msgstr ""
 
 #: Client/core/CCore.cpp:1353
 msgid "scrolls the chatbox downwards"
-msgstr "चैटबॉक्स को नीचे की ओर स्क्रॉल करें"
+msgstr ""
 
 #: Client/core/CCore.cpp:1354
 msgid "scrolls the debug view upwards"
-msgstr "डीबग दृश्य को ऊपर की ओर स्क्रॉल करता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1355
 msgid "scrolls the debug view downwards"
-msgstr "डिबग दृश्य को नीचे की ओर स्क्रॉल करता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1358
 msgid "shows the memory statistics"
-msgstr "स्मृति आँकड़े दिखाता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1359
 msgid "shows the frame timing graph"
-msgstr "फ्रेम टाइमिंग ग्राफ दिखाता है"
+msgstr ""
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr "डेवलपर्स के लिए: समाचार पुनः लोड करें"
+msgstr ""
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
-msgstr "अज्ञात आदेश या cvar: "
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
-msgstr "आग"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
@@ -362,23 +362,23 @@ msgstr "पीछे देखने के लिए"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr "झुकना"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
-msgstr "कार्य"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr "टहलना"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr "वाहन में लगी आग"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr "वाहन माध्यमिक आग"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
@@ -411,11 +411,11 @@ msgstr "अगला रेडियो"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "रेडियो पूर्व"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "रेडियो उपयोगकर्ता ट्रैक छोड़ें"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
@@ -423,7 +423,7 @@ msgstr "हॉर्न"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
-msgstr "जमा करना"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
@@ -432,35 +432,35 @@ msgstr "हथब्रेक"
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr "वाहन बाईं ओर देखें"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
-msgstr "वाहन सही देखो"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr "वाहन पीछे देखो"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr "वाहन माउस देखो"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr "विशेष नियंत्रण शेष"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
-msgstr "विशेष नियंत्रण ठीक है"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Special control down"
-msgstr "विशेष नियंत्रण नीचे"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:224
 msgid "Special control up"
-msgstr "विशेष नियंत्रण ऊपर"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
