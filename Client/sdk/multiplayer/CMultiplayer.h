@@ -295,6 +295,58 @@ public:
     virtual int   GetMoonSize() = 0;
     virtual void  ResetMoonSize() = 0;
 
+    virtual void  GetAmbientColor(float& red, float& green, float& blue) = 0;
+    virtual bool  SetAmbientColor(float red, float green, float blue) = 0;
+    virtual bool  ResetAmbientColor() = 0;
+
+    virtual void  GetAmbientObjectColor(float& red, float& green, float& blue) = 0;
+    virtual bool  SetAmbientObjectColor(float red, float green, float blue) = 0;
+    virtual bool  ResetAmbientObjectColor() = 0;
+
+    virtual void  GetDirectionalColor(float& red, float& green, float& blue) = 0;
+    virtual bool  SetDirectionalColor(float red, float green, float blue) = 0;
+    virtual bool  ResetDirectionalColor() = 0;
+
+    virtual float GetSpriteSize() = 0;
+    virtual bool  SetSpriteSize(float size) = 0;
+    virtual bool  ResetSpriteSize() = 0;
+
+    virtual float GetSpriteBrightness() = 0;
+    virtual bool  SetSpriteBrightness(float brightness) = 0;
+    virtual bool  ResetSpriteBrightness() = 0;
+
+    virtual int16 GetPoleShadowStrength() = 0;
+    virtual bool  SetPoleShadowStrength(int16 strength) = 0;
+    virtual bool  ResetPoleShadowStrength() = 0;
+
+    virtual int16 GetShadowStrength() = 0;
+    virtual bool  SetShadowStrength(int16 strength) = 0;
+    virtual bool  ResetShadowStrength() = 0;
+
+    virtual float GetShadowsOffset() = 0;
+    virtual bool  SetShadowsOffset(float offset) = 0;
+    virtual bool  ResetShadowsOffset() = 0;
+
+    virtual float GetLightsOnGroundBrightness() = 0;
+    virtual bool  SetLightsOnGroundBrightness(float brightness) = 0;
+    virtual bool  ResetLightsOnGroundBrightness() = 0;
+
+    virtual void  GetLowCloudsColor(int16& red, int16& green, int16& blue) = 0;
+    virtual bool  SetLowCloudsColor(int16 red, int16 green, int16 blue) = 0;
+    virtual bool  ResetLowCloudsColor() = 0;
+
+    virtual void  GetBottomCloudsColor(int16& red, int16& green, int16& blue) = 0;
+    virtual bool  SetBottomCloudsColor(int16 red, int16 green, int16 blue) = 0;
+    virtual bool  ResetBottomCloudsColor() = 0;
+
+    virtual float GetCloudsAlpha1() = 0;
+    virtual bool  SetCloudsAlpha1(float alpha) = 0;
+    virtual bool  ResetCloudsAlpha1() = 0;
+
+    virtual float GetIllumination() = 0;
+    virtual bool  SetIllumination(float illumination) = 0;
+    virtual bool  ResetIllumination() = 0;
+
     virtual void DisableEnterExitVehicleKey(bool bDisabled) = 0;
 
     virtual void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled) = 0;

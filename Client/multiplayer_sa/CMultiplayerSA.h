@@ -21,6 +21,7 @@
 
 class CRemoteDataSA;
 #define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
+#define DEFAULT_SHADOWS_OFFSET      ( 0.013f ) // GTA default = 0.06f
 
 enum eRadioStationID
 {
@@ -191,6 +192,58 @@ public:
     void  SetMoonSize(int iSize);
     int   GetMoonSize();
     void  ResetMoonSize();
+
+    void  GetAmbientColor(float& red, float& green, float& blue);
+    bool  SetAmbientColor(float red, float green, float blue);
+    bool  ResetAmbientColor();
+
+    void  GetAmbientObjectColor(float& red, float& green, float& blue);
+    bool  SetAmbientObjectColor(float red, float green, float blue);
+    bool  ResetAmbientObjectColor();
+
+    void  GetDirectionalColor(float& red, float& green, float& blue);
+    bool  SetDirectionalColor(float red, float green, float blue);
+    bool  ResetDirectionalColor();
+
+    float GetSpriteSize();
+    bool  SetSpriteSize(float size);
+    bool  ResetSpriteSize();
+
+    float GetSpriteBrightness();
+    bool  SetSpriteBrightness(float brightness);
+    bool  ResetSpriteBrightness();
+
+    int16 GetPoleShadowStrength();
+    bool  SetPoleShadowStrength(int16 strength);
+    bool  ResetPoleShadowStrength();
+
+    int16 GetShadowStrength();
+    bool  SetShadowStrength(int16 strength);
+    bool  ResetShadowStrength();
+
+    float GetShadowsOffset();
+    bool  SetShadowsOffset(float offset);
+    bool  ResetShadowsOffset();
+
+    float GetLightsOnGroundBrightness();
+    bool  SetLightsOnGroundBrightness(float brightness);
+    bool  ResetLightsOnGroundBrightness();
+
+    void  GetLowCloudsColor(int16& red, int16& green, int16& blue);
+    bool  SetLowCloudsColor(int16 red, int16 green, int16 blue);
+    bool  ResetLowCloudsColor();
+
+    void  GetBottomCloudsColor(int16& red, int16& green, int16& blue);
+    bool  SetBottomCloudsColor(int16 red, int16 green, int16 blue);
+    bool  ResetBottomCloudsColor();
+
+    float GetCloudsAlpha1();
+    bool  SetCloudsAlpha1(float alpha);
+    bool  ResetCloudsAlpha1();
+
+    float GetIllumination();
+    bool  SetIllumination(float illumination);
+    bool  ResetIllumination();
 
     void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);

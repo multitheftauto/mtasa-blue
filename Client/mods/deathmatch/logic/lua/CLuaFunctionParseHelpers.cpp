@@ -778,6 +778,30 @@ ADD_ENUM(eModelIdeFlag::IS_BREAKABLE_STATUE, "is_breakable_statue")
 ADD_ENUM(eModelIdeFlag::IS_CRANE, "is_crane")
 IMPLEMENT_ENUM_CLASS_END("model-ide-flag")
 
+// World properties
+IMPLEMENT_ENUM_BEGIN(eWorldProperty)
+ADD_ENUM(AMBIENT_COLOR, "AmbientColor")
+ADD_ENUM(AMBIENT_OBJ_COLOR, "AmbientObjColor")
+ADD_ENUM(DIRECTIONAL_COLOR, "DirectionalColor")
+ADD_ENUM(SPRITE_SIZE, "SpriteSize")
+ADD_ENUM(SPRITE_BRIGHTNESS, "SpriteBrightness")
+ADD_ENUM(POLE_SHADOW_STRENGTH, "PoleShadowStrength")
+ADD_ENUM(SHADOW_STRENGTH, "ShadowStrength")
+ADD_ENUM(SHADOWS_OFFSET, "ShadowsOffset")
+ADD_ENUM(LIGHTS_ON_GROUND, "LightsOnGround")
+ADD_ENUM(LOW_CLOUDS_COLOR, "LowCloudsColor")
+ADD_ENUM(BOTTOM_CLOUDS_COLOR, "BottomCloudsColor")
+ADD_ENUM(CLOUDS_ALPHA1, "CloudsAlpha")
+ADD_ENUM(ILLUMINATION, "Illumination")
+ADD_ENUM(WEATHER_WET_ROADS, "WetRoads")
+ADD_ENUM(WEATHER_FOGGYNESS, "Foggyness")
+ADD_ENUM(WEATHER_FOG, "Fog")
+ADD_ENUM(WEATHER_RAIN_FOG, "RainFog")
+ADD_ENUM(WEATHER_WATER_FOG, "WaterFog")
+ADD_ENUM(WEATHER_SANDSTORM, "Sandstorm")
+ADD_ENUM(WEATHER_RAINBOW, "Rainbow")
+IMPLEMENT_ENUM_END("world-property")
+
 //
 // CResource from userdata
 //
