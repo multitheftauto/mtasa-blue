@@ -28,8 +28,8 @@
 #define MTASA_VERSION_MAJOR         1
 #define MTASA_VERSION_MINOR         6
 #define MTASA_VERSION_MAINTENANCE   0
-#define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
-#define MTASA_VERSION_BUILD         21765
+#define MTASA_VERSION_TYPE          VERSION_TYPE_UNSTABLE
+#define MTASA_VERSION_BUILD         0
 
 #include "../build_overrides.h"
 
