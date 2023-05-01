@@ -152,10 +152,10 @@ namespace SharedUtil
         TERMINATE_IF_NO = 8,             //    ''
         TERMINATE_IF_YES_OR_NO = TERMINATE_IF_YES | TERMINATE_IF_NO,
         TERMINATE_PROCESS = TERMINATE_IF_YES_OR_NO,
-        ICON_ERROR = 0x10,                   // MB_ICONERROR
-        ICON_QUESTION = 0x20,                // MB_ICONQUESTION
-        ICON_WARNING = 0x30,                 // MB_ICONWARNING
-        ICON_INFO = 0x40,                    // MB_ICONINFORMATION
+        ICON_ERROR = 0x10,               // MB_ICONERROR
+        ICON_QUESTION = 0x20,            // MB_ICONQUESTION
+        ICON_WARNING = 0x30,             // MB_ICONWARNING
+        ICON_INFO = 0x40,                // MB_ICONINFORMATION
         ICON_MASK_VALUE = ICON_ERROR | ICON_QUESTION | ICON_WARNING | ICON_INFO,
         SHOW_MESSAGE_ONLY = 0x80,            // Just show message without going online
     };
@@ -284,10 +284,7 @@ namespace SharedUtil
     }
 
     // Unlerp avoiding extrapolation
-    inline const float UnlerpClamped(const double dFrom, const double dPos, const double dTo)
-    {
-        return Clamp(0.0f, Unlerp(dFrom, dPos, dTo), 1.0f);
-    }
+    inline const float UnlerpClamped(const double dFrom, const double dPos, const double dTo) { return Clamp(0.0f, Unlerp(dFrom, dPos, dTo), 1.0f); }
 
     template <class T>
     int Round(T value)
@@ -540,39 +537,15 @@ namespace SharedUtil
     //
     typedef SColor RGBA;
 
-    inline unsigned char COLOR_RGBA_R(SColor color)
-    {
-        return color.R;
-    }
-    inline unsigned char COLOR_RGBA_G(SColor color)
-    {
-        return color.G;
-    }
-    inline unsigned char COLOR_RGBA_B(SColor color)
-    {
-        return color.B;
-    }
-    inline unsigned char COLOR_RGBA_A(SColor color)
-    {
-        return color.A;
-    }
-    inline unsigned char COLOR_ARGB_A(SColor color)
-    {
-        return color.A;
-    }
+    inline unsigned char COLOR_RGBA_R(SColor color) { return color.R; }
+    inline unsigned char COLOR_RGBA_G(SColor color) { return color.G; }
+    inline unsigned char COLOR_RGBA_B(SColor color) { return color.B; }
+    inline unsigned char COLOR_RGBA_A(SColor color) { return color.A; }
+    inline unsigned char COLOR_ARGB_A(SColor color) { return color.A; }
 
-    inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A)
-    {
-        return SColorRGBA(R, G, B, A);
-    }
-    inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B)
-    {
-        return SColorRGBA(R, G, B, A);
-    }
-    inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R)
-    {
-        return SColorRGBA(R, G, B, A);
-    }
+    inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R) { return SColorRGBA(R, G, B, A); }
 
     //
     // Cross platform critical section
@@ -686,23 +659,49 @@ namespace SharedUtil
     //
     // Fixed sized string buffer
     //
-    template <int MAX_LENGTH>
+    template <size_t MAX_LENGTH>
     class SFixedString
     {
         char szData[MAX_LENGTH + 1];
 
     public:
-        SFixedString() { szData[0] = 0; }
+        constexpr SFixedString() { szData[0] = 0; }
+
 
         // In
-        SFixedString& operator=(const char* szOther)
+        constexpr SFixedString& Assign(const char* szOther, size_t len)
         {
-            STRNCPY(szData, szOther, MAX_LENGTH + 1);
+            STRNCPY(szData, szOther, len + 1);
             return *this;
         }
 
+        constexpr SFixedString& operator=(const char* szOther)
+        {
+            Assign(szOther, MAX_LENGTH + 1);
+            return *this;
+        }
+#ifdef __cpp_lib_string_view
+        constexpr SFixedString& operator=(std::string_view other)
+        {
+            Assign(other.data(), other.length() + 1);
+            return *this;
+        }
+#endif
+
+#ifdef __cpp_lib_string_view
         // Out
-        operator const char*() const { return szData; }
+        constexpr operator std::string_view() const { return { szData }; }
+#endif
+        constexpr operator const char*() const { return szData; }
+        constexpr char*           Data() { return &szData[0]; }
+
+        constexpr size_t GetMaxLength() const { return MAX_LENGTH; }
+        size_t GetLength() const { return strlen(szData); }
+
+        // Shake it all about
+        void Encrypt();
+        constexpr bool Empty() { return szData[0] == 0; }
+        constexpr void Clear() const { szData[0] = 0; }
 
         // Returns a pointer to a null-terminated character array
         const char* c_str() const noexcept { return &szData[0]; }
@@ -1184,7 +1183,7 @@ namespace SharedUtil
 
         // Allow use of std iterator names
         typedef Iterator        iterator;
-        typedef Iterator        const_iterator;                    // TODO
+        typedef Iterator        const_iterator;            // TODO
         typedef ReverseIterator reverse_iterator;
         typedef ReverseIterator const_reverse_iterator;            // TODO
     };
@@ -1465,10 +1464,7 @@ namespace SharedUtil
         }
     }
 
-    inline void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList)
-    {
-        return ReadTokenSeparatedList(",", strInput, outList);
-    }
+    inline void ReadCommaSeparatedList(const SString& strInput, std::vector<SString>& outList) { return ReadTokenSeparatedList(",", strInput, outList); }
 
     ///////////////////////////////////////////////////////////////
     //

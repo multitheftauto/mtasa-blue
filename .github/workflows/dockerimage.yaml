@@ -5,9 +5,11 @@ on:
     branches:
     - master
     paths: 
-    - '.github/**'
+    - '.github/workflows/build.yaml'
+    - '.github/workflows/dockerimage.yaml'
     - 'utils/compat/**'
     - 'Dockerfile'
+    - 'Dockerfile.i386'
     - 'Dockerfile.armhf'
     - 'Dockerfile.arm64'
 
@@ -18,6 +20,8 @@ jobs:
         include:
         - tag: latest
           dockerfile: Dockerfile
+        - tag: i386
+          dockerfile: Dockerfile.i386
         - tag: armhf
           dockerfile: Dockerfile.armhf
         - tag: arm64

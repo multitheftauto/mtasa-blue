@@ -175,7 +175,6 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_registerclass(luaVM, "EngineIMG", "Element");
 }
 
-
 void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
@@ -641,7 +640,7 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<si
 {
     std::string buffer;
 
-    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer)) // Get file might throw 
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))            // Get file might throw
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     return buffer;
@@ -652,7 +651,7 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
     if (uiModelID >= 20000)
         throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
 
-    size_t fileID = ResolveIMGFileID(pIMG, file);
+    size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
@@ -668,7 +667,7 @@ bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, s
     if (uiTxdID >= 5000)
         throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
 
-    size_t fileID = ResolveIMGFileID(pIMG, file);
+    size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
@@ -2277,7 +2276,7 @@ bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::opti
     else
         pModelInfo->SetFlags(uiFlags);
 
-    return true; 
+    return true;
 }
 
 bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool bState)
@@ -2297,8 +2296,9 @@ bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, boo
 bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (!pModelInfo)
-        return false;
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
 
     ushort usCurrentFlags = pModelInfo->GetFlags();
     ushort usOriginalFlags = pModelInfo->GetOriginalFlags();

@@ -262,6 +262,9 @@ public:
     void SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
     bool IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
 
+    void SetRedirecting(bool bRedirecting) noexcept { m_bIsRedirecting = bRedirecting; }
+    bool IsRedirecting() const noexcept { return m_bIsRedirecting; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -359,6 +362,7 @@ private:
     CMtaVersion    m_strPlayerVersion;
     bool           m_bIsMuted;
     bool           m_bIsLeavingServer;
+    bool           m_bIsRedirecting;
     bool           m_bIsJoined;
 
     bool m_bNametagColorOverridden;

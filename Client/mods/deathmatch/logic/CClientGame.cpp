@@ -2056,14 +2056,14 @@ bool CClientGame::KeyStrokeHandler(const SString& strKey, bool bState, bool bIsC
             if (g_pCore->IsMenuVisible() || (g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey) ||
                 (pFocusedBrowser && !pFocusedBrowser->IsLocal() && !isMouseKey))
 
-                bIgnore = true;                                // Ignore this keydown and the matching keyup
+                bIgnore = true;            // Ignore this keydown and the matching keyup
             else
                 MapInsert(m_AllowKeyUpMap, strKey);            // Use this keydown and the matching keyup
         }
         else
         {
             if (!MapContains(m_AllowKeyUpMap, strKey))
-                bIgnore = true;                                // Ignore this keyup
+                bIgnore = true;            // Ignore this keyup
             else
                 MapRemove(m_AllowKeyUpMap, strKey);            // Use this keyup
         }
@@ -3353,23 +3353,21 @@ void CClientGame::Event_OnIngameAndConnected()
 void CClientGame::SetupGlobalLuaEvents()
 {
     // Setup onClientPaste event
-    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste,
-                       [this](const SString& clipboardText)
-                       {
-                           // Don't trigger if main menu or console is open or the cursor is not visible
-                           if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
-                               return;
+    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste, [this](const SString& clipboardText) {
+        // Don't trigger if main menu or console is open or the cursor is not visible
+        if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
+            return;
 
-                           // Also don't trigger if remote web browser view is focused
-                           CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
-                           if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
-                               return;
+        // Also don't trigger if remote web browser view is focused
+        CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
+        if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
+            return;
 
-                           // Call event now
-                           CLuaArguments args;
-                           args.PushString(clipboardText);
-                           m_pRootEntity->CallEvent("onClientPaste", args, false);
-                       });
+        // Call event now
+        CLuaArguments args;
+        args.PushString(clipboardText);
+        m_pRootEntity->CallEvent("onClientPaste", args, false);
+    });
 }
 
 bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
@@ -6545,7 +6543,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
-            m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+        m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
 void CClientGame::RestreamWorld()

@@ -1413,8 +1413,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
     }
 
     // Call `SetFxEffectParameters` and log errors if any
-    const auto SetParamWithErrorLog = [&](auto effectParam, auto& params)
-    {
+    const auto SetParamWithErrorLog = [&](auto effectParam, auto& params) {
         // Try setting parameter
         if (pSound->SetFxEffectParameters(eEffectType, &params))
         {

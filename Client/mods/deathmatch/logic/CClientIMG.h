@@ -30,12 +30,8 @@ struct tImgFileInfo
 
 struct tLinkedModelRestoreInfo
 {
-    constexpr tLinkedModelRestoreInfo(unsigned int uiModelID, unsigned int uiOffset,
-        unsigned short usSize, unsigned char ucStreamID) :
-        uiModelID(uiModelID),
-        uiOffset(uiOffset),
-        usSize(usSize),
-        ucStreamID(ucStreamID)
+    constexpr tLinkedModelRestoreInfo(unsigned int uiModelID, unsigned int uiOffset, unsigned short usSize, unsigned char ucStreamID)
+        : uiModelID(uiModelID), uiOffset(uiOffset), usSize(usSize), ucStreamID(ucStreamID)
     {
     }
 
@@ -49,13 +45,14 @@ class CClientIMG : public CClientEntity
 {
     DECLARE_CLASS(CClientIMG, CClientEntity)
     friend class CClientIMGManager;
+
 public:
     CClientIMG(class CClientManager* pManager, ElementID ID);
     ~CClientIMG();
 
-    void Unlink() {};
+    void Unlink(){};
     void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition) {};
+    void SetPosition(const CVector& vecPosition){};
 
     eClientEntityType GetType() const { return CCLIENTIMG; }
     unsigned char     GetArchiveID() { return m_ucArchiveID; }
@@ -78,13 +75,13 @@ public:
     bool UnlinkModel(unsigned int usModelID);
 
 private:
-    class CClientIMGManager*   m_pImgManager;
+    class CClientIMGManager* m_pImgManager;
 
-    std::ifstream              m_ifs;
-    std::string                m_filePath;
-    unsigned char              m_ucArchiveID;
-    std::vector<tImgFileInfo>  m_fileInfos;
-    unsigned short             m_usRequiredBufferSize;
+    std::ifstream             m_ifs;
+    std::string               m_filePath;
+    unsigned char             m_ucArchiveID;
+    std::vector<tImgFileInfo> m_fileInfos;
+    unsigned short            m_usRequiredBufferSize;
 
     std::vector<tLinkedModelRestoreInfo> m_restoreInfo;
 };

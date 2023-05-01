@@ -76,7 +76,7 @@ CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
 
 bool CClientIMGManager::IsLinkableModel(unsigned int uiModel)
 {
-    return uiModel <= 26316; // StreamModelInfoSize
+    return uiModel <= 26316;            // StreamModelInfoSize
 }
 
 bool CClientIMGManager::RestoreModel(unsigned int uiModel)

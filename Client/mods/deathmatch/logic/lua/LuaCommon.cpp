@@ -202,24 +202,6 @@ CResource& lua_getownerresource(lua_State* L)
     return *lua_getownercluamain(L).GetResource();
 }
 
-// Just do a type check vs LUA_TNONE before calling this, or bant
-const char* lua_makestring(lua_State* luaVM, int iArgument)
-{
-    if (lua_type(luaVM, iArgument) == LUA_TSTRING)
-    {
-        return lua_tostring(luaVM, iArgument);
-    }
-    lua_pushvalue(luaVM, iArgument);
-    lua_getglobal(luaVM, "tostring");
-    lua_pushvalue(luaVM, -2);
-    lua_call(luaVM, 1, 1);
-
-    const char* szString = lua_tostring(luaVM, -1);
-    lua_pop(luaVM, 2);
-
-    return szString;
-}
-
 void lua_initclasses(lua_State* luaVM)
 {
     lua_newtable(luaVM);
@@ -279,7 +261,7 @@ void lua_getclass(lua_State* luaVM, const char* szName)
     lua_pushstring(luaVM, szName);            // mt, class name
     lua_rawget(luaVM, -2);                    // mt, class
 
-    lua_remove(luaVM, -2);                    // class
+    lua_remove(luaVM, -2);            // class
 }
 
 void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParent)
@@ -295,7 +277,7 @@ void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParen
 
         lua_setfield(luaVM, -3, "__parent");            // class table, mt table
 
-        lua_pop(luaVM, 1);                              // class table
+        lua_pop(luaVM, 1);            // class table
     }
 
     lua_pushstring(luaVM, "mt");

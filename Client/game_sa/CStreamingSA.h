@@ -21,12 +21,11 @@
 #define FUNC_CStreaming__HasVehicleUpgradeLoaded     0x407820
 #define FUNC_CStreaming_RequestSpecialModel          0x409d10
 
-
 struct CArchiveInfo
 {
-    char szName[40];
-    BYTE bUnknow = 1; // Only in player.img is 0. Maybe, it is DWORD value
-    BYTE bUnused[3];
+    char  szName[40];
+    BYTE  bUnknow = 1;            // Only in player.img is 0. Maybe, it is DWORD value
+    BYTE  bUnused[3];
     DWORD uiStreamHandleId;
 };
 
@@ -50,13 +49,14 @@ class CStreamingSA final : public CStreaming
 {
 private:
     static CArchiveInfo* GetArchiveInfo(uint id) { return &ms_aAchiveInfo[id]; };
+
 public:
-    void            RequestModel(DWORD dwModelID, DWORD dwFlags);
-    void            RemoveModel(std::uint32_t model) override;
-    void            LoadAllRequestedModels(bool bOnlyPriorityModels = false, const char* szTag = NULL);
-    bool            HasModelLoaded(DWORD dwModelID);
-    void            RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
-    void            ReinitStreaming();
+    void RequestModel(DWORD dwModelID, DWORD dwFlags);
+    void RemoveModel(std::uint32_t model) override;
+    void LoadAllRequestedModels(bool bOnlyPriorityModels = false, const char* szTag = NULL);
+    bool HasModelLoaded(DWORD dwModelID);
+    void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
+    void ReinitStreaming();
 
     CStreamingInfo* GetStreamingInfo(uint32 id);
     void            SetStreamingInfo(uint32 modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
@@ -67,13 +67,13 @@ public:
     void            SetStreamingBufferSize(uint32 uiSize);
     uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; };
 
-    void            MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
-    std::uint32_t   GetMemoryUsed() const override;
+    void          MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
+    std::uint32_t GetMemoryUsed() const override;
 
 private:
     static void* (&ms_pStreamingBuffer)[2];
-    static uint32 (&ms_streamingHalfOfBufferSize);
-    static CStreamingInfo (&ms_aInfoForModel)[26316]; // count: 26316 in unmodified game
+    static uint32(&ms_streamingHalfOfBufferSize);
+    static CStreamingInfo (&ms_aInfoForModel)[26316];            // count: 26316 in unmodified game
     static HANDLE (&m_aStreamingHandlers)[32];
     static CArchiveInfo (&ms_aAchiveInfo)[8];
 };

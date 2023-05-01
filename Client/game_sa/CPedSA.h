@@ -67,14 +67,14 @@ class CPedIntelligenceSAInterface;
 class CPedFlags
 {
 public:
-    unsigned int bIsStanding : 1;                       // is ped standing on something
-    unsigned int bWasStanding : 1;                      // was ped standing on something
-    unsigned int bIsLooking : 1;                        // is ped looking at something or in a direction
-    unsigned int bIsRestoringLook : 1;                  // is ped restoring head postion from a look
-    unsigned int bIsAimingGun : 1;                      // is ped aiming gun
-    unsigned int bIsRestoringGun : 1;                   // is ped moving gun back to default posn
-    unsigned int bCanPointGunAtTarget : 1;              // can ped point gun at target
-    unsigned int bIsTalking : 1;                        // is ped talking(see Chat())
+    unsigned int bIsStanding : 1;                     // is ped standing on something
+    unsigned int bWasStanding : 1;                    // was ped standing on something
+    unsigned int bIsLooking : 1;                      // is ped looking at something or in a direction
+    unsigned int bIsRestoringLook : 1;                // is ped restoring head postion from a look
+    unsigned int bIsAimingGun : 1;                    // is ped aiming gun
+    unsigned int bIsRestoringGun : 1;                 // is ped moving gun back to default posn
+    unsigned int bCanPointGunAtTarget : 1;            // can ped point gun at target
+    unsigned int bIsTalking : 1;                      // is ped talking(see Chat())
 
     unsigned int bInVehicle : 1;                        // is in a vehicle
     unsigned int bIsInTheAir : 1;                       // is in the air
@@ -85,23 +85,23 @@ public:
     unsigned int bUpdateAnimHeading : 1;                // update ped heading due to heading change during anim sequence
     unsigned int bRemoveHead : 1;                       // waiting on AntiSpazTimer to remove head
 
-    unsigned int bFiringWeapon : 1;                     // is pulling trigger
-    unsigned int bHasACamera : 1;                       // does ped possess a camera to document accidents
-    unsigned int bPedIsBleeding : 1;                    // Ped loses a lot of blood if true
-    unsigned int bStopAndShoot : 1;                     // Ped cannot reach target to attack with fist, need to use gun
-    unsigned int bIsPedDieAnimPlaying : 1;              // is ped die animation finished so can dead now
-    unsigned int bStayInSamePlace : 1;                  // when set, ped stays put
+    unsigned int bFiringWeapon : 1;                   // is pulling trigger
+    unsigned int bHasACamera : 1;                     // does ped possess a camera to document accidents
+    unsigned int bPedIsBleeding : 1;                  // Ped loses a lot of blood if true
+    unsigned int bStopAndShoot : 1;                   // Ped cannot reach target to attack with fist, need to use gun
+    unsigned int bIsPedDieAnimPlaying : 1;            // is ped die animation finished so can dead now
+    unsigned int bStayInSamePlace : 1;                // when set, ped stays put
     unsigned int
         bKindaStayInSamePlace : 1;                    // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
     unsigned int bBeingChasedByPolice : 1;            // use nodes for routefind
 
-    unsigned int bNotAllowedToDuck : 1;               // Is this ped allowed to duck at all?
-    unsigned int bCrouchWhenShooting : 1;             // duck behind cars etc
-    unsigned int bIsDucking : 1;                      // duck behind cars etc
-    unsigned int bGetUpAnimStarted : 1;               // don't want to play getup anim if under something
-    unsigned int bDoBloodyFootprints : 1;             // unsigned int bIsLeader :1;
+    unsigned int bNotAllowedToDuck : 1;              // Is this ped allowed to duck at all?
+    unsigned int bCrouchWhenShooting : 1;            // duck behind cars etc
+    unsigned int bIsDucking : 1;                     // duck behind cars etc
+    unsigned int bGetUpAnimStarted : 1;              // don't want to play getup anim if under something
+    unsigned int bDoBloodyFootprints : 1;            // unsigned int bIsLeader :1;
     unsigned int bDontDragMeOutCar : 1;
-    unsigned int bStillOnValidPoly : 1;               // set if the polygon the ped is on is still valid for collision
+    unsigned int bStillOnValidPoly : 1;            // set if the polygon the ped is on is still valid for collision
     unsigned int bAllowMedicsToReviveMe : 1;
 
     unsigned int bResetWalkAnims : 1;
@@ -114,13 +114,13 @@ public:
     unsigned int bTryingToReachDryLand : 1;            // has ped just exited boat and trying to get to dry land
 
     unsigned int bCollidedWithMyVehicle : 1;
-    unsigned int bRichFromMugging : 1;                      // ped has lots of cash cause they've been mugging people
-    unsigned int bChrisCriminal : 1;                        // Is a criminal as killed during Chris' police mission (should be counted as such)
-    unsigned int bShakeFist : 1;                            // test shake hand at look entity
-    unsigned int bNoCriticalHits : 1;                       // ped cannot be killed by a single bullet
-    unsigned int bHasAlreadyBeenRecorded : 1;               // Used for replays
-    unsigned int bUpdateMatricesRequired : 1;               // if PedIK has altered bones so matrices need updated this frame
-    unsigned int bFleeWhenStanding : 1;                     //
+    unsigned int bRichFromMugging : 1;                   // ped has lots of cash cause they've been mugging people
+    unsigned int bChrisCriminal : 1;                     // Is a criminal as killed during Chris' police mission (should be counted as such)
+    unsigned int bShakeFist : 1;                         // test shake hand at look entity
+    unsigned int bNoCriticalHits : 1;                    // ped cannot be killed by a single bullet
+    unsigned int bHasAlreadyBeenRecorded : 1;            // Used for replays
+    unsigned int bUpdateMatricesRequired : 1;            // if PedIK has altered bones so matrices need updated this frame
+    unsigned int bFleeWhenStanding : 1;                  //
 
     unsigned int bMiamiViceCop : 1;                         //
     unsigned int bMoneyHasBeenGivenByScript : 1;            //
@@ -180,7 +180,7 @@ public:
     unsigned int bUsingMobilePhone : 1;
     unsigned int bUpperBodyDamageAnimsOnly : 1;
     unsigned int bStuckUnderCar : 1;
-    unsigned int bKeepTasksAfterCleanUp : 1;                       // If true ped will carry on with task even after cleanup
+    unsigned int bKeepTasksAfterCleanUp : 1;            // If true ped will carry on with task even after cleanup
     unsigned int bIsDyingStuck : 1;
     unsigned int bIgnoreHeightCheckOnGotoPointTask : 1;            // set when walking round buildings, reset when task quits
     unsigned int bForceDieInCar : 1;
@@ -220,14 +220,14 @@ public:
     BYTE                             bPad11[256 - sizeof(CPedSoundSAInterface)];
     CPedWeaponAudioEntitySAInterface weaponAudioEntity;
     BYTE                             bPad12[216 - sizeof(CPedWeaponAudioEntitySAInterface)];
-    CPedFlags                        pedFlags;               // 1132 (16 bytes long including alignment probably)
+    CPedFlags                        pedFlags;            // 1132 (16 bytes long including alignment probably)
     CPedIntelligenceSAInterface*     pPedIntelligence;
     CPlayerPedDataSAInterface*       pPlayerData;            // 1152
     BYTE                             bPad4a[4];
     void*                            pedNodes[19];
     int                              iMoveAnimGroup;            // 1236
     BYTE                             bPad4b[52];
-    CPedIKSAInterface                pedIK;                     // 1292 (length 32 bytes)
+    CPedIKSAInterface                pedIK;            // 1292 (length 32 bytes)
     int                              bPad5[5];
 
     float fHealth;
@@ -251,7 +251,7 @@ public:
     BYTE                bPad4[12];
     BYTE                bCurrentWeaponSlot;            // is actually here
     BYTE                bPad6[20];
-    BYTE                bFightingStyle;                // 1837
+    BYTE                bFightingStyle;            // 1837
     BYTE                bFightingStyleExtra;
     BYTE                bPad7[1];
     CFireSAInterface*   pFireOnPed;
