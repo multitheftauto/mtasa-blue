@@ -235,6 +235,34 @@ public:
         WriteLength(value.length());
         return WriteStringCharacters(value, value.length());
     }
+#else
+    // Write characters from a std::string
+    void WriteStringCharacters(const std::string& value, uint uiLength)
+    {
+        dassert(uiLength <= value.length());
+        // Send the data
+        if (uiLength)
+            Write(&value.at(0), uiLength);
+    }
+
+    // Write a string (incl. ushort size header)
+    template <typename SizeType = unsigned short>
+    void WriteString(const std::string& value)
+    {
+        // Write the length
+        auto length = static_cast<SizeType>(value.length());
+        Write(length);
+
+        // Write the characters
+        return WriteStringCharacters(value, length);
+    }
+
+    // Write a string (incl. variable size header)
+    void WriteStr(const std::string& value)
+    {
+        WriteLength(value.length());
+        return WriteStringCharacters(value, value.length());
+    }
 #endif
 
     // Read characters into a std::string
