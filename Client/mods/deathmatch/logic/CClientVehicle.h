@@ -187,7 +187,6 @@ public:
     virtual CSphere GetWorldBoundingSphere();
 
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
-    void GetMoveSpeedMeters(CVector& vecMoveSpeed) const;
     void SetMoveSpeed(const CVector& vecMoveSpeed);
     void GetTurnSpeed(CVector& vecTurnSpeed) const;
     void SetTurnSpeed(const CVector& vecTurnSpeed);
@@ -572,10 +571,6 @@ protected:
     CClientVehiclePtr            m_pPreviousLink;
     CClientVehiclePtr            m_pNextLink;
     CMatrix                      m_Matrix;
-    CMatrix                      m_MatrixLast;
-    CMatrix                      m_MatrixPure;
-    CVector                      m_vecMoveSpeedInterpolate;
-    CVector                      m_vecMoveSpeedMeters;
     CVector                      m_vecMoveSpeed;
     CVector                      m_vecTurnSpeed;
     float                        m_fHealth;
