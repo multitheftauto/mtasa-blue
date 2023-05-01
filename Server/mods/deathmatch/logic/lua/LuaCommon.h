@@ -52,9 +52,6 @@ void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix);
 class CLuaMain&  lua_getownercluamain(lua_State* L);
 class CResource& lua_getownerresource(lua_State* L);
 
-// Converts any type to string
-const char* lua_makestring(lua_State* luaVM, int iArgument);
-
 // Internal use
 void lua_initclasses(lua_State* luaVM);
 
