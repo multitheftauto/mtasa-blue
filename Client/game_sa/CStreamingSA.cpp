@@ -306,3 +306,8 @@ std::uint32_t CStreamingSA::GetMemoryUsed() const
 {
     return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
 }
+
+void CStreamingSA::RemoveBigBuildings()
+{
+    (reinterpret_cast<void(__cdecl*)()>(0x4093B0))();
+}

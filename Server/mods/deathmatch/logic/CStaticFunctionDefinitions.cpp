@@ -1835,7 +1835,7 @@ bool CStaticFunctionDefinitions::ClearElementVisibleTo(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable)
+bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable, bool bPersist)
 {
     assert(pElement);
 
@@ -1845,7 +1845,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* p
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetSyncable(bEnable);
-            g_pGame->GetPedSync()->OverrideSyncer(pPed, pPlayer);
+            g_pGame->GetPedSync()->OverrideSyncer(pPed, pPlayer, bPersist);
             return true;
             break;
         }
@@ -1853,7 +1853,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* p
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetUnoccupiedSyncable(bEnable);
-            g_pGame->GetUnoccupiedVehicleSync()->OverrideSyncer(pVehicle, pPlayer);
+            g_pGame->GetUnoccupiedVehicleSync()->OverrideSyncer(pVehicle, pPlayer, bPersist);
             return true;
             break;
         }

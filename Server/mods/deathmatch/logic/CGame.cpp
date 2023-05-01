@@ -2977,8 +2977,11 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                         // HACK?: check the ped's vehicle-action is still the same (not warped in?)
                                                         if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                                                         {
-                                                            // Force the player (or ped syncer) as the syncer of the vehicle to which they are entering
-                                                            m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
+                                                            if (!m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                                                            {
+                                                                // Force the player (or ped syncer) as the syncer of the vehicle to which they are entering
+                                                                m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
+                                                            }
 
                                                             if (bWarpIn)
                                                             {
@@ -3342,8 +3345,11 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     pPed->SetOccupiedVehicle(NULL, 0);
                                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
-                                    // Force the player (or ped syncer) that just left the vehicle as the syncer
-                                    m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
+                                    if (!m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                                    {
+                                        // Force the player (or ped syncer) that just left the vehicle as the syncer
+                                        m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
+                                    }
 
                                     // Tell everyone he can start exiting the vehicle
                                     CVehicleInOutPacket Reply(PedID, VehicleID, ucOccupiedSeat, VEHICLE_NOTIFY_OUT_RETURN);
@@ -3413,8 +3419,11 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 pPed->SetOccupiedVehicle(NULL, 0);
                                 pVehicle->SetOccupant(NULL, ucOccupiedSeat);
 
-                                // Force the player (or ped syncer) that just left the vehicle as the syncer
-                                m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
+                                if (!m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                                {
+                                    // Force the player (or ped syncer) that just left the vehicle as the syncer
+                                    m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
+                                }
 
                                 pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
                                 // Tell the other players about it
@@ -3687,8 +3696,11 @@ void CGame::Packet_VehicleTrailer(CVehicleTrailerPacket& Packet)
                         pVehicle->SetTowedVehicle(pTrailer);
                         pTrailer->SetTowedByVehicle(pVehicle);
 
-                        // Make sure the un-occupied syncer of the trailer is this driver
-                        m_pUnoccupiedVehicleSync->OverrideSyncer(pTrailer, pPlayer);
+                        if (m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                        {
+                            // Make sure the un-occupied syncer of the trailer is this driver
+                            m_pUnoccupiedVehicleSync->OverrideSyncer(pTrailer, pPlayer);
+                        }
 
                         // Broadcast this packet to everyone else
                         m_pPlayerManager->BroadcastOnlyJoined(Packet, pPlayer);

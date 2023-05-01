@@ -439,7 +439,7 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
-    void RestreamWorld();
+    void RestreamWorld(bool removeBigBuildings);
 
     void OnWindowFocusChange(bool state);
 
