@@ -95,23 +95,23 @@ If you have problems resolving the required dependencies or want maximum compati
 $ docker pull ghcr.io/multitheftauto/mtasa-blue-build:latest
 ```
 
-| Architecture | Docker image tag | Required build-time CLI-arguments |
-| ------------ | ---------------- | --------------------------------- |
-| x86          | latest           | `-e BUILD_ARCHITECTURE=x86`       |
-| x86_64       | latest           |                                   |
-| arm          | armhf            |                                   |
-| arm64        | arm64            |                                   |
+| Architecture | Docker image tag |
+| ------------ | ---------------- |
+| x86_64       | latest           |
+| x86          | i386             |
+| arm          | armhf            |
+| arm64        | arm64            |
 
 **Building with Docker**
 
 These examples assume that your current directory is the mtasa-blue checkout directory. You should also know that `/build` is the code directory required by our Docker images inside the container. If the current directory is not a valid git repository, it instead create a (shallow) clone of the mtasa-blue repository. After compiling, you will find the resulting binaries in `./Bin`. To build the unoptimised debug build, add `-e BUILD_CONFIG=debug` to the docker run arguments.
 
-| Architecture | Build command                                                                                                    |
-| ------------ | ---------------------------------------------------------------------------------------------------------------- |
-| x86          | ``` docker run --rm -v `pwd`:/build -e BUILD_ARCHITECTURE=x86 ghcr.io/multitheftauto/mtasa-blue-build:latest ``` |
-| x86_64       | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest ```                           |
-| arm          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:armhf ```                            |
-| arm64        | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:arm64 ```                            |
+| Architecture | Build command                                                                          |
+| ------------ | -------------------------------------------------------------------------------------- |
+| x86_64       | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest ``` |
+| x86          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:i386 ```   |
+| arm          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:armhf ```  |
+| arm64        | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:arm64 ```  |
 
 ### Premake FAQ
 
