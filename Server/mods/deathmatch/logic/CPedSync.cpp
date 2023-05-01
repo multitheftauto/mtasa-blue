@@ -55,19 +55,29 @@ bool CPedSync::ProcessPacket(CPacket& Packet)
     return false;
 }
 
-void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer)
+void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist)
 {
     CPlayer* pSyncer = pPed->GetSyncer();
     if (pSyncer)
     {
         if (pSyncer == pPlayer)
+        {
+            if (bPersist == false)
+            {
+                SetSyncerAsPersistent(false);
+            }
+
             return;
+        }
 
         StopSync(pPed);
     }
 
     if (pPlayer && !pPed->IsBeingDeleted())
+    {
+        SetSyncerAsPersistent(bPersist);
         StartSync(pPlayer, pPed);
+    }
 }
 
 void CPedSync::UpdateAllSyncer()
@@ -101,8 +111,8 @@ void CPedSync::UpdateSyncer(CPed* pPed)
     if (pSyncer)
     {
         // Is he close enough, and in the right dimension?
-        if (pPed->GetDimension() == pSyncer->GetDimension()
-            && IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance))
+        if (IsSyncerPersistent() || (pPed->GetDimension() == pSyncer->GetDimension()
+            && IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance)))
                 return;
 
         // Stop him from syncing it
@@ -154,6 +164,8 @@ void CPedSync::StopSync(CPed* pPed)
 
     // Unmark him as the syncing player
     pPed->SetSyncer(NULL);
+
+    SetSyncerAsPersistent(false);
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;
