@@ -309,8 +309,5 @@ std::uint32_t CStreamingSA::GetMemoryUsed() const
 
 void CStreamingSA::RemoveBigBuildings()
 {
-    using Function_RemoveBigBuildings = void(__cdecl*)();
-    auto removeBigBuildings = reinterpret_cast<Function_RemoveBigBuildings>(0x4093B0);
-
-    removeBigBuildings();
+    (reinterpret_cast<void(__cdecl*)()>(0x4093B0))();
 }

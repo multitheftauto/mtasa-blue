@@ -6546,7 +6546,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
-void CClientGame::RestreamWorld(bool bRemoveBigBuildings)
+void CClientGame::RestreamWorld(bool removeBigBuildings)
 {
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
@@ -6559,7 +6559,7 @@ void CClientGame::RestreamWorld(bool bRemoveBigBuildings)
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
-    if (bRemoveBigBuildings == true)
+    if (removeBigBuildings)
         g_pGame->GetStreaming()->RemoveBigBuildings();
 
     g_pGame->GetStreaming()->ReinitStreaming();
