@@ -95,15 +95,17 @@
     !if ${CONTEXT} == all
  
       SetShellVarContext all
+      CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0
+      CreateShortcut $APPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0\Play.lnk $R3
+ 
  
     !else if ${CONTEXT} == user
  
       SetShellVarContext current
+      CreateDirectory $LocalAPPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0
+      CreateShortcut $LocalAPPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0\Play.lnk $R3
  
     !endif
- 
-    CreateDirectory $APPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0
-    CreateShortcut $APPDATA\Microsoft\Windows\GameExplorer\$R2\PlayTasks\0\Play.lnk $R3
  
   ${EndIf}
  

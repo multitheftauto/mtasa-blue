@@ -515,15 +515,15 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
         fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeLocked[type]->GetText().c_str()) + SB_SPACER;
         m_pIncludeOffline[type] = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTab[type], _("Offline"), true));
         m_pIncludeOffline[type]->SetPosition(CVector2D(fX, fY), false);
-        m_pIncludeOffline[type]->AutoSize(m_pIncludeLocked[type]->GetText().c_str(), 20.0f);
+        m_pIncludeOffline[type]->AutoSize(m_pIncludeOffline[type]->GetText().c_str(), 20.0f);
         m_pIncludeOffline[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFilterChanged, this));
 
-        fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeOffline[type]->GetText().c_str()) + SB_SPACER * 2;
+        fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeOffline[type]->GetText().c_str()) + SB_SPACER;
     }
     else
     {
         m_pIncludeOffline[type] = NULL;
-        fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeLocked[type]->GetText().c_str()) + SB_SPACER * 2;
+        fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeLocked[type]->GetText().c_str()) + SB_SPACER;
     }
 
     m_pIncludeOtherVersions[type] = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTab[type], _("Other Versions"), false));

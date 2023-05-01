@@ -5,7 +5,8 @@ on:
     branches:
     - master
     paths: 
-    - '.github/**'
+    - '.github/workflows/build.yaml'
+    - '.github/workflows/dockerimage.yaml'
     - 'utils/compat/**'
     - 'Dockerfile'
     - 'Dockerfile.armhf'
