@@ -57,6 +57,7 @@ public:
     bool HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
     void ReinitStreaming();
+    void RemoveBigBuildings() override;
 
     CStreamingInfo* GetStreamingInfo(uint32 id);
     void            SetStreamingInfo(uint32 modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);

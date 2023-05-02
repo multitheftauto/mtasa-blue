@@ -28,8 +28,8 @@ public:
     LUA_DECLARE(GetCameraTarget);
     LUA_DECLARE(GetCameraInterior);
     LUA_DECLARE(GetCameraGoggleEffect);
-    LUA_DECLARE(GetCameraShakeLevel);
     LUA_DECLARE(GetCameraFieldOfView);
+    static unsigned char GetCameraDrunkLevel();
 
     // Cam set funcs
     LUA_DECLARE(SetCameraMatrix);
@@ -40,7 +40,7 @@ public:
     LUA_DECLARE(SetCameraClip);
     LUA_DECLARE(GetCameraClip);
     LUA_DECLARE(SetCameraGoggleEffect);
-    LUA_DECLARE(SetCameraShakeLevel);
+    static bool SetCameraDrunkLevel(short drunkLevel);
 
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);
