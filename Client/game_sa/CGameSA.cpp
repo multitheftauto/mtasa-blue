@@ -563,6 +563,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
         return IsCoronaZTestEnabled();
 
+    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
+        return IsWaterCreaturesEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -607,6 +610,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
+    {
+        SetWaterCreaturesEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -625,6 +634,7 @@ void CGameSA::ResetCheats()
     SetUnderWorldWarpEnabled(true);
     SetCoronaZTestEnabled(true);
     CVehicleSA::SetVehiclesSunGlareEnabled(false);
+    SetWaterCreaturesEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -728,6 +738,22 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
     }
 
     m_isCoronaZTestEnabled = isEnabled;
+}
+
+bool CGameSA::IsWaterCreaturesEnabled()
+{
+    return m_bWaterCreatures;
+}
+
+void CGameSA::SetWaterCreaturesEnabled(bool bEnabled)
+{
+    if (bEnabled == m_bWaterCreatures)
+        return;
+
+    typedef int(__thiscall * Func_t)(void*);
+    (Func_t(bEnabled ? 0x6E3F90 : 0x6E3FD0))((void*)0xC1DF30);            // Init/Deinit WaterCreateManager
+
+    m_bWaterCreatures = bEnabled;
 }
 
 bool CGameSA::PerformChecks()
