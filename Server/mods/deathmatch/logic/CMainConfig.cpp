@@ -67,7 +67,7 @@ CMainConfig::CMainConfig(CConsole* pConsole) : CXMLConfig(NULL)
     m_bScriptDebugLogEnabled = false;
     m_uiScriptDebugLogLevel = 0;
     m_bDontBroadcastLan = false;
-    m_usFPSLimit = 36;
+    m_usFPSLimit = 0;
     m_uiVoiceSampleRate = 1;
     m_ucVoiceQuality = 4;
     m_bVoiceEnabled = false;
