@@ -9,7 +9,7 @@
  *
  *****************************************************************************/
 
-#include "stdinc.h"
+#include "StdInc.h"
 
 #include "CSharedResource.h"
 
