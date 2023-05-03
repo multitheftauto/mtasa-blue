@@ -73,7 +73,7 @@ static unzFile unzOpenUtf8(const char* path)
 }
 
 CResource::CResource(CResourceManager* pResourceManager, bool bIsZipped, const char* szAbsPath, const char* szResourceName)
-    : m_pResourceManager(pResourceManager), m_bResourceIsZip(bIsZipped), m_strResourceName(SStringX(szResourceName)), m_strAbsPath(SStringX(szAbsPath))
+    : CSharedResource(szResourceName), m_pResourceManager(pResourceManager), m_bResourceIsZip(bIsZipped), m_strAbsPath(SStringX(szAbsPath))
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
 

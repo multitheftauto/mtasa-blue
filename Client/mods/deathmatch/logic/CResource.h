@@ -17,8 +17,8 @@
 #include "CResourceFile.h"
 #include "CElementGroup.h"
 #include <list>
+#include "CSharedResource.h"
 
-#define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
 
 struct SNoClientCacheScript
@@ -34,7 +34,7 @@ struct SPendingFileDownload
     double  dDownloadSize;
 };
 
-class CResource
+class CResource : public CSharedResource
 {
 public:
     CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
@@ -43,7 +43,6 @@ public:
 
     unsigned short GetNetID() { return m_usNetID; };
     uint           GetScriptID() const { return m_uiScriptID; };
-    const char*    GetName() { return m_strResourceName; };
     CLuaMain*      GetVM() { return m_pLuaVM; };
     bool           IsActive() { return m_bActive; };
     bool           CanBeLoaded();
@@ -102,7 +101,6 @@ public:
 private:
     unsigned short       m_usNetID;
     uint                 m_uiScriptID;
-    SString              m_strResourceName;
     CLuaMain*            m_pLuaVM;
     CLuaManager*         m_pLuaManager;
     class CClientEntity* m_pRootEntity;

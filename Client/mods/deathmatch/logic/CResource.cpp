@@ -22,6 +22,7 @@ int CResource::m_iShowingCursor = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
                      const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
+    : CSharedResource(szResourceName)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
     m_usNetID = usNetID;
@@ -33,9 +34,6 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_bLoadAfterReceivingNoClientCacheScripts = false;
     m_strMinServerReq = strMinServerReq;
     m_strMinClientReq = strMinClientReq;
-
-    if (szResourceName)
-        m_strResourceName.AssignLeft(szResourceName, MAX_RESOURCE_NAME_LENGTH);
 
     m_pLuaManager = g_pClientGame->GetLuaManager();
     m_pRootEntity = g_pClientGame->GetRootEntity();

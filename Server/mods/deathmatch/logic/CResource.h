@@ -22,9 +22,9 @@
 #include <vector>
 #include <ehs/ehs.h>
 #include <time.h>
+#include "CSharedResource.h"
 
 #define MAX_AUTHOR_LENGTH           255
-#define MAX_RESOURCE_NAME_LENGTH    255
 #define MAX_FUNCTION_NAME_LENGTH    50
 
 class CDummy;
@@ -134,7 +134,7 @@ enum class EResourceState : unsigned char
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.
 // The directory or ZIP file must contain a meta.xml file, which describes the required content by the resource.
 // It's a process-like environment for scripts, maps, images and other files.
-class CResource : public EHS
+class CResource : public CSharedResource, public EHS
 {
     using KeyValueMap = CFastHashMap<SString, SString>;
 
@@ -224,8 +224,6 @@ public:
     bool IsStopping() const noexcept { return m_eState == EResourceState::Stopping; }
 
     bool IsClientSynced() const noexcept { return m_bClientSync; }
-
-    const SString& GetName() const noexcept { return m_strResourceName; }
 
     CLuaMain*       GetVirtualMachine() { return m_pVM; }
     const CLuaMain* GetVirtualMachine() const { return m_pVM; }
@@ -361,7 +359,6 @@ private:
 
     CResourceManager* m_pResourceManager;
 
-    SString     m_strResourceName;
     SString     m_strAbsPath;                          // Absolute path to containing directory        i.e. /server/mods/deathmatch/resources
     std::string m_strResourceZip;                      // Absolute path to zip file (if a zip)         i.e. m_strAbsPath/resource_name.zip
     std::string m_strResourceDirectoryPath;            // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
