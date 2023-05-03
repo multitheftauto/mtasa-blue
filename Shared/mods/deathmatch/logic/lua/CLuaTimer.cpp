@@ -2,17 +2,20 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/lua/CLuaTimer.cpp
+ *  FILE:        mods/deatmatch/logic/lua/CLuaTimer.cpp
  *  PURPOSE:     Lua timer class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
-#include "CLuaTimer.h"
-#include "CLuaMain.h"
-#include "CIdArray.h"
+#include <StdInc.h>
+
+#ifndef MTA_CLIENT
+    #include "CLuaTimer.h"
+    #include "lua/CLuaMain.h"
+    #include "CIdArray.h"
+#endif
 
 CLuaTimer::CLuaTimer(const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments)
 {
