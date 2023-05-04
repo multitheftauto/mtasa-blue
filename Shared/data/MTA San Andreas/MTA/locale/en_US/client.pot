@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-02 22:16+0000\n"
+"POT-Creation-Date: 2023-05-04 02:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,7 +61,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:367
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr ""
