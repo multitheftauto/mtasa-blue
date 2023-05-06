@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-01 18:03+0000\n"
-"PO-Revision-Date: 2023-05-01 18:47\n"
+"PO-Revision-Date: 2023-05-06 03:26\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -212,18 +212,18 @@ msgstr "El archivo principal no está firmado. Es probable que lo haya causado u
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "El archivo tipo data %s no fue encontrado. Posible virus.\n\n"
-"Considera reinstalar Multi Theft Auto por tu seguridad.\n"
-"Busca ayuda en línea si MTA no funciona correctamente."
+msgstr "El archivo de datos %s no fue encontrado. Posible actividad de virus.\n\n"
+"Considera reinstalar Multi Theft Auto para tu seguridad.\n"
+"Consulta la ayuda en línea si MTA no funciona correctamente."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "El archivo tipo data %s está modificado. Posible virus.\n\n"
-"Considera reinstalar Multi Theft Auto por tu seguridad.\n"
-"Busca ayuda en línea si MTA no funciona correctamente."
+msgstr "El archivo de datos %s ha sido modificado. Posible actividad de virus.\n\n"
+"Considera reinstalar Multi Theft Auto para tu seguridad.\n"
+"Consulta la ayuda en línea si MTA no funciona correctamente."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -381,11 +381,11 @@ msgstr "Crear intersecciones en GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA no puede iniciarse porque la copia de un archivo ha fallado:"
+msgstr "MTA:SA no puede iniciarse porque ha fallado la copia de un archivo:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA no puede iniciarse porque un archivo de MTA:SA no existe o es erróneo:"
+msgstr "MTA:SA no puede iniciarse porque falta un archivo o es incorrecto:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -573,7 +573,7 @@ msgstr "Mantenga estos archivos, pero también muestre esta advertencia en el pr
 
 #: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
-msgstr "No me vuelvas a avisar sobre estos archivos de nuevo"
+msgstr "No me vuelvas a recordar sobre estos archivos"
 
 #: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
@@ -1518,7 +1518,7 @@ msgstr "muestra el gráfico de FPS"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr "para desarrolladores: recargar noticias"
+msgstr "para desarrolladores: refrescar noticias"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
