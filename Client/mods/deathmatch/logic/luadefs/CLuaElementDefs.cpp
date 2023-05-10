@@ -65,6 +65,7 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementDoubleSided", IsElementDoubleSided},
         {"getElementCollisionsEnabled", GetElementCollisionsEnabled},
         {"isElementFrozen", IsElementFrozen},
+        {"isElementOnGround", ArgumentParser<IsElementOnGround>},
         {"getLowLODElement", GetLowLodElement},
         {"isElementLowLOD", IsElementLowLod},
         {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
@@ -1556,6 +1557,19 @@ int CLuaElementDefs::IsElementFrozen(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity) {
+    switch (entity->GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+            return static_cast<CClientPed*>(entity)->IsOnGround();
+        case CCLIENTVEHICLE:
+            return static_cast<CClientVehicle*>(entity)->IsOnGround();
+        default:
+            throw std::invalid_argument{"Element type not supported"};
+    }
 }
 
 int CLuaElementDefs::IsElementStreamedIn(lua_State* luaVM)
