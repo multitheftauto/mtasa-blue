@@ -1560,8 +1560,7 @@ int CLuaElementDefs::IsElementFrozen(lua_State* luaVM)
 }
 
 bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity) {
-    switch (entity->GetType())
-    {
+    switch (entity->GetType()) {
         case CCLIENTPLAYER:
         case CCLIENTPED:
             return static_cast<CClientPed*>(entity)->IsOnGround();
@@ -1570,6 +1569,9 @@ bool CLuaElementDefs::IsElementOnGround(CClientEntity* entity) {
         default:
             throw std::invalid_argument{"Element type not supported"};
     }
+    
+    // Add a default return statement to handle any missed cases
+    return false;
 }
 
 int CLuaElementDefs::IsElementStreamedIn(lua_State* luaVM)

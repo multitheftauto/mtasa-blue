@@ -67,7 +67,7 @@ public:
     LUA_DECLARE(IsElementDoubleSided);
     LUA_DECLARE(GetElementCollisionsEnabled);
     LUA_DECLARE(IsElementFrozen);
-    bool IsElementOnGround(CClientEntity* entity);
+    static bool IsElementOnGround(CClientEntity* entity);
     LUA_DECLARE(GetLowLodElement);
     LUA_DECLARE(IsElementLowLod);
     LUA_DECLARE(IsElementCallPropagationEnabled);
