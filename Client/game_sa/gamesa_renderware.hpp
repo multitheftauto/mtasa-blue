@@ -80,6 +80,7 @@ void InitRwFunctions(eGameVersion version)
             RpWorldAddLight = (RpWorldAddLight_t)0x00751960;
             RpLightSetColor = (RpLightSetColor_t)0x00751AE0;
             RwCameraClone = (RwCameraClone_t)0x007EF3F0;
+            RpClumpCreate = (RpClumpCreate_t)0x0074A290;
             RpClumpClone = (RpClumpClone_t)0x00749FC0;
             RwTexDictionaryDestroy = (RwTexDictionaryDestroy_t)0x007F36E0;
             RwTextureDestroy = (RwTextureDestroy_t)0x007F3860;
@@ -177,6 +178,7 @@ void InitRwFunctions(eGameVersion version)
             RpWorldAddLight = (RpWorldAddLight_t)0x00751910;
             RpLightSetColor = (RpLightSetColor_t)0x00751A90;
             RwCameraClone = (RwCameraClone_t)0x007EF3B0;
+            RpClumpCreate = (RpClumpCreate_t)0x0074A290;
             RpClumpClone = (RpClumpClone_t)0x00749F70;
             RwTexDictionaryDestroy = (RwTexDictionaryDestroy_t)0x007F36A0;
             RwTextureDestroy = (RwTextureDestroy_t)0x007F3820;

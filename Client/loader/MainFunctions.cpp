@@ -1005,10 +1005,10 @@ void CheckLibVersions()
                 strReqFileVersion = strFileVersion;
             else if (strReqFileVersion != strFileVersion)
             {
-                DisplayErrorMessageBox(SStringX(_("File version mismatch error."
-                                                  " Reinstall MTA:SA if you experience problems.\n") +
-                                                SString("\n[%s %s/%s]\n", *strFilename, *strFileVersion, *strReqFileVersion)),
-                                       _E("CL40"), "bad-file-version");
+                //DisplayErrorMessageBox(SStringX(_("File version mismatch error."
+                //                                  " Reinstall MTA:SA if you experience problems.\n") +
+                //                                SString("\n[%s %s/%s]\n", *strFilename, *strFileVersion, *strReqFileVersion)),
+                //                       _E("CL40"), "bad-file-version");
                 break;
             }
         }

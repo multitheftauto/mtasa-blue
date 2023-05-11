@@ -25,6 +25,17 @@ std::uint32_t EngineStreamingGetUsedMemory()
     return g_pGame->GetStreaming()->GetMemoryUsed();
 }
 
+bool EngineMakeClumpModel(ushort usModelId)
+{
+    
+    std::shared_ptr<CClientModel> pModel = CLuaEngineDefs::m_pManager->GetModelManager()->FindModelByID(usModelId);
+    if (pModel == nullptr)
+        pModel = std::make_shared<CClientModel>(CLuaEngineDefs::m_pManager, usModelId, eClientModelType::OBJECT);
+    CLuaEngineDefs::m_pManager->GetModelManager()->Add(pModel);
+    pModel->MakeClumpModel();
+    return true;
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -82,6 +93,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
+        {"engineMakeClumpModel", ArgumentParser<EngineMakeClumpModel>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );

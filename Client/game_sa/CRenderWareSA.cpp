@@ -481,20 +481,29 @@ typedef struct
 {
     unsigned short usTxdID;
     RpClump*       pClump;
+    int            iAtomicIndex;
 } SAtomicsReplacer;
 bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
 {
     SAtomicsReplacer* pData = reinterpret_cast<SAtomicsReplacer*>(data);
     SRelatedModelInfo relatedModelInfo = {0};
     relatedModelInfo.pClump = pData->pClump;
-    relatedModelInfo.bDeleteOldRwObject = true;
+    std::vector<RpAtomic*> xdddd;
+    CRenderWareSA::GetClumpAtomicList(pData->pClump, xdddd);
+    if (xdddd.size() > 1)
+    {
+        int klsdjfklsdfjkls = 5;
+    }
+    relatedModelInfo.bDeleteOldRwObject = false;
+    relatedModelInfo.iAtomicIndex = pData->iAtomicIndex++;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
 
     // The above function adds a reference to the model's TXD by either
     // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
     CTxdStore_RemoveRef(pData->usTxdID);
-    return true;
+    return false;
 }
+static auto CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
 bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
 {
@@ -509,14 +518,43 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
             // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
             RpClump* pCopy = RpClumpClone(pNew);
 
+            static auto                CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+            CBaseModelInfoSAInterface* aa370 = CModelInfo_ms_modelInfoPtrs[370];
+            CBaseModelInfoSAInterface* aa3425 = CModelInfo_ms_modelInfoPtrs[3425];
+            CBaseModelInfoSAInterface* aa1337 = CModelInfo_ms_modelInfoPtrs[1337];
+            CModelInfoSA*              pModelInfoSA370 = (CModelInfoSA*)(pGame->GetModelInfo(370));
+            CModelInfoSA*              pModelInfoSA1337 = (CModelInfoSA*)(pGame->GetModelInfo(1337));
+            CModelInfoSA*              pModelInfoSA3425 = (CModelInfoSA*)(pGame->GetModelInfo(3425));
+            eModelInfoType             type1 = pModelInfoSA370->GetModelType();
+            eModelInfoType             type2 = pModelInfoSA1337->GetModelType();
+            eModelInfoType             type3 = pModelInfoSA3425->GetModelType();
+            if (type2 == eModelInfoType::CLUMP)
+            {
+                int ksldjfklsdj = 5;
+            }
+            CBaseModelInfoSAInterface* usModelIDM = CModelInfo_ms_modelInfoPtrs[usModelID];
             // Replace the atomics
             SAtomicsReplacer data;
             data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
             data.pClump = pCopy;
+            data.iAtomicIndex = 0;
 
+            std::vector<RpAtomic*> atomicListNew;
+            GetClumpAtomicList(pCopy, atomicListNew);
+            std::vector<RpAtomic*> atomicListOld;
+            GetClumpAtomicList(reinterpret_cast<RpClump*>(pOldAtomic), atomicListOld);
+            int atomicsToAdd = atomicListNew.size() - atomicListOld.size();
+            //RpClumpAddAtomic((RpClump*)pModelInfo->GetRwObject(), atomicListNew[1]);
+            //RpClumpAddAtomic((RpClump*)pModelInfo->GetRwObject(), atomicListNew[2]);
+
+            CBaseModelInfoSAInterface* asd = CModelInfo_ms_modelInfoPtrs[3425];
+            std::vector<RpAtomic*>     asdasd1;
+            std::vector<RpAtomic*>     asdasd2;
+            CBaseModelInfoSAInterface* as1337d = CModelInfo_ms_modelInfoPtrs[1337];
+            GetClumpAtomicList((RpClump*)asd->pRwObject, asdasd1);
+            GetClumpAtomicList((RpClump*)as1337d->pRwObject, asdasd2);
             MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
             RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
-
             // Get rid of the now empty copied clump
             RpClumpDestroy(pCopy);
         }

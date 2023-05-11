@@ -174,16 +174,37 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     {
         auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
         pDamagableModelInfo->SetDamagedAtomic(atomic);
+
+        RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
+        RwFrame* newFrame = RwFrameCreate();
+        RpAtomicSetFrame(atomic, newFrame);
+        CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
     }
     else
     {
-        pAtomicModelInfo->SetAtomic(atomic);
-    }
+        eModelInfoType modelInfoType = ((eModelInfoType(*)())pBaseModelInfo->VFTBL->GetModelType)();
+        if (modelInfoType == eModelInfoType::CLUMP)
+        {
+            auto pClumpModelInfo = reinterpret_cast<CClumpModelInfoSAInterface*>(pBaseModelInfo);
+            auto                       ptr = reinterpret_cast<CClumpModelInfo_SA_VTBL*>(pClumpModelInfo->VFTBL)->SetClump;
+            std::vector<RpAtomic*>     asdasd2;
+            CRenderWareSA::GetClumpAtomicList((RpClump*)pRelatedModelInfo->pClump, asdasd2);
 
-    RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
-    RwFrame* newFrame = RwFrameCreate();
-    RpAtomicSetFrame(atomic, newFrame);
-    CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
+            //((void(__thiscall*)(CClumpModelInfoSAInterface * pThis, RpClump * clump)) ptr)(pClumpModelInfo, pRelatedModelInfo->pClump);
+            CBaseModelInfoSAInterface* pBaseModelInfo2 = CModelInfo_ms_modelInfoPtrs[gAtomicModelId];
+            RwObject* pRwObject = pBaseModelInfo2->pRwObject;
+            int askdjl = 5;
+        }
+        else
+        {
+            pAtomicModelInfo->SetAtomic(atomic);
+
+            RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
+            RwFrame* newFrame = RwFrameCreate();
+            RpAtomicSetFrame(atomic, newFrame);
+            CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
+        }
+    }
 
     // Fix #359: engineReplaceModel memory leak
     if (!bDamage && pRelatedModelInfo->bDeleteOldRwObject)
@@ -198,6 +219,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
             RwFrameDestroy(pOldFrame);
         }
     }
+    pRelatedModelInfo->iAtomicIndex++;
     return atomic;
 }
 

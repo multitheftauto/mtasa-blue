@@ -200,10 +200,16 @@ enum RpLightFlags
     LIGHT_FLAGS_LAST = RW_STRUCT_ALIGN
 };
 
+enum class RwObjectType : unsigned char
+{
+    Atomic = 1,
+    Clump = 2,
+};
+
 // RenderWare/plugin base types
 struct RwObject
 {
-    unsigned char type;
+    RwObjectType  type;
     unsigned char subtype;
     unsigned char flags;
     unsigned char privateFlags;

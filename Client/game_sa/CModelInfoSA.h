@@ -118,6 +118,7 @@ class CLodTimeModelInfo_SA_VTBL : public CLodAtomicModelInfo_SA_VTBL
 
 class CClumpModelInfo_SA_VTBL : public CBaseModelInfo_SA_VTBL
 {
+public:
     DWORD SetClump;            // (RpClump*)
 };
 
@@ -241,6 +242,16 @@ struct CTimeInfoSAInterface
     char  m_nTimeOn;
     char  m_nTimeOff;
     short m_wOtherTimeModel;
+};
+
+class CClumpModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    union
+    {
+        char*  m_animFileName;
+        uint32 m_nAnimFileIndex;
+    };
 };
 
 class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -435,6 +446,7 @@ public:
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
+    void         MakeClumpModel(ushort usBaseID);
     void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 

@@ -70,6 +70,19 @@ bool CClientModel::Allocate(ushort usParentID)
     return false;
 }
 
+bool CClientModel::MakeClumpModel()
+{
+    m_bAllocatedByUs = true;
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
+
+    if (!pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
+        return false;
+
+    pModelInfo->MakeClumpModel(m_iModelID);
+    return true;
+}
+
 bool CClientModel::Deallocate(void)
 {
     if (!m_bAllocatedByUs)

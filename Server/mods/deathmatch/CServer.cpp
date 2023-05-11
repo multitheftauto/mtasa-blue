@@ -44,7 +44,7 @@ void CServer::ServerInitialize(CServerInterface* pServerInterface)
     g_pNetServer = pServerInterface->GetNetwork();
     g_pRealNetServer = g_pNetServer;
     #if defined(MTA_DEBUG)
-    SharedUtil_Tests();
+    //SharedUtil_Tests();
     #endif
 }
 
