@@ -79,6 +79,7 @@ bool CClientModel::MakeClumpModel()
     if (!pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
         return false;
 
+    pModelInfo->Request(BLOCKING, "asd");
     pModelInfo->MakeClumpModel(m_iModelID);
     return true;
 }
