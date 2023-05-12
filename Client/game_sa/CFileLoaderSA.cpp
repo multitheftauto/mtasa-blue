@@ -190,7 +190,9 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
             std::vector<RpAtomic*>     asdasd2;
             CRenderWareSA::GetClumpAtomicList((RpClump*)pRelatedModelInfo->pClump, asdasd2);
 
-            //((void(__thiscall*)(CClumpModelInfoSAInterface * pThis, RpClump * clump)) ptr)(pClumpModelInfo, pRelatedModelInfo->pClump);
+            //((void(__thiscall*)(CClumpModelInfoSAInterface * pThis, RpClump * clump)) ptr)(pClumpModelInfo, pRelatedModelInfo->pClump);            //CVisibilityPlugins_SetAtomicRenderCallback(pClonedAtomic, (RpAtomic*(*)(RpAtomic*))0x7323C0);
+            CVisibilityPlugins_SetAtomicRenderCallback(atomic, (RpAtomic * (*)(RpAtomic*))0x7323C0);
+
             CBaseModelInfoSAInterface* pBaseModelInfo2 = CModelInfo_ms_modelInfoPtrs[gAtomicModelId];
             RwObject* pRwObject = pBaseModelInfo2->pRwObject;
             int askdjl = 5;
