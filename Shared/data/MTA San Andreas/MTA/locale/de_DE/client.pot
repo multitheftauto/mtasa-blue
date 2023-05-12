@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-01 18:03+0000\n"
-"PO-Revision-Date: 2023-05-01 18:47\n"
+"PO-Revision-Date: 2023-05-12 17:07\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1517,7 +1517,7 @@ msgstr "zeigt das frame timing diagramm"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr "Für Entwickler: News neu laden"
+msgstr "für Entwickler: reload news"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
@@ -2758,7 +2758,7 @@ msgstr "Besonderen Dank an"
 
 #: Client/core/CCredits.cpp:258
 msgid "This software and project makes use of the following libraries and software:"
-msgstr "Diese Software und dieses Projekt nutzt folgende Bibliotheken und Software:"
+msgstr "Diese Software und dieses Projekt verwenden die folgenden Bibliotheken und Software:"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
