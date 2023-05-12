@@ -481,42 +481,62 @@ typedef struct
 {
     unsigned short usTxdID;
     RpClump*       pClump;
-    int            iAtomicIndex;
 } SAtomicsReplacer;
 bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
 {
     SAtomicsReplacer* pData = reinterpret_cast<SAtomicsReplacer*>(data);
     SRelatedModelInfo relatedModelInfo = {0};
     relatedModelInfo.pClump = pData->pClump;
-    std::vector<RpAtomic*> xdddd;
-    CRenderWareSA::GetClumpAtomicList(pData->pClump, xdddd);
-    if (xdddd.size() > 1)
-    {
-        int klsdjfklsdfjkls = 5;
-    }
-    relatedModelInfo.bDeleteOldRwObject = false;
-    relatedModelInfo.iAtomicIndex = pData->iAtomicIndex++;
+    relatedModelInfo.bDeleteOldRwObject = true;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
 
     // The above function adds a reference to the model's TXD by either
     // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
     CTxdStore_RemoveRef(pData->usTxdID);
-    return false;
-}
-static auto CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-
-static void CVisibilityPlugins_SetAtomicRenderCallback(RpAtomic* pRpAtomic, RpAtomic* (*renderCB)(RpAtomic*))
-{
-    return ((void(__cdecl*)(RpAtomic*, RpAtomic * (*renderCB)(RpAtomic*)))0x7328A0)(pRpAtomic, renderCB);
+    return true;
 }
 
 #define rwObjectGetParent(object) (((const RwObject*)(object))->parent)
-#define RpAtomicGetFrameMacro(_atomic) ((RwFrame*)rwObjectGetParent(_atomic))
-#define RpAtomicGetFrame(_atomic) RpAtomicGetFrameMacro(_atomic)
+#define RpClumpGetFrameMacro(_clump) ((RwFrame*)rwObjectGetParent(_clump))
+#define RpClumpGetFrame(_clump)      RpClumpGetFrameMacro(_clump)
+
+static auto CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
 static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id)
 {
     return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
+}
+
+typedef struct
+{
+    RpClump* pClump;
+    ushort   usModelId;
+} SAtomicsAppend;
+bool AppendAtomic(RpAtomic* atomic, void* data)
+{
+    SAtomicsAppend* pData = reinterpret_cast<SAtomicsAppend*>(data);
+    RwFrame* pFrame = RpGetFrame(atomic);
+    RpAtomicSetFrame(atomic, pFrame);
+    RpClumpAddAtomic(pData->pClump, atomic);
+
+    RwFrame* oldFrame = RpGetFrame(atomic);
+    RwFrame* newFrame = RwFrameCreate();
+    RpAtomicSetFrame(atomic, newFrame);
+    RwFrameCopyMatrix(RpGetFrame(atomic), oldFrame);
+    RwFrame* pRootFrame = RpClumpGetFrame(pData->pClump);
+    RwFrameAddChild(pRootFrame, newFrame);
+    CVisibilityPlugins_SetAtomicId(atomic, pData->usModelId);
+    return false;
+}
+
+bool RetrieveFirstAtomic(RpAtomic* atomic, void* data)
+{
+    RpAtomic** firstAtomicPtr = (RpAtomic**)data;
+
+    if (*firstAtomicPtr == nullptr)
+        *firstAtomicPtr = atomic;
+
+    return false;
 }
 
 bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
@@ -538,30 +558,21 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
             eModelInfoType modelInfoType = ((eModelInfoType(*)())pBaseModelInfo->VFTBL->GetModelType)();
             if (modelInfoType == eModelInfoType::CLUMP)
             {
-                CBaseModelInfoSAInterface* pBaseModelInfo2 = CModelInfo_ms_modelInfoPtrs[usModelID];
-                RwObject*                  pRwObject = pBaseModelInfo2->pRwObject;
-                int                        askdjl = 5;
+                SAtomicsAppend data = {};
+                data.pClump = (RpClump*)pBaseModelInfo->pRwObject;
+                data.usModelId = usModelID;
 
-                std::vector<RpAtomic*> asdasdasdgf2;
-                std::vector<RpAtomic*> asdasdasdgf;
-                GetClumpAtomicList((RpClump*)pRwObject, asdasdasdgf);
-                GetClumpAtomicList((RpClump*)pCopy, asdasdasdgf2);
-                RpAtomicSetFrame(asdasdasdgf2[0], RpAtomicGetFrame(asdasdasdgf[0]));
-                RpAtomicSetFrame(asdasdasdgf2[1], RpAtomicGetFrame(asdasdasdgf[0]));
-                CVisibilityPlugins_SetAtomicId(asdasdasdgf2[0], usModelID);
-                CVisibilityPlugins_SetAtomicId(asdasdasdgf2[1], usModelID);
+                RpAtomic* firstAtomic = nullptr;
+                RpClumpForAllAtomics(data.pClump, RetrieveFirstAtomic, &firstAtomic);
+                RpClumpRemoveAtomic(data.pClump, firstAtomic);
+                RpClumpForAllAtomics(pCopy, AppendAtomic, &data);
 
-                RpClumpAddAtomic((RpClump*)pRwObject, asdasdasdgf2[0]);
-                RpClumpAddAtomic((RpClump*)pRwObject, asdasdasdgf2[1]);
-                std::vector<RpAtomic*> asdasdasdgf23;
-                GetClumpAtomicList((RpClump*)pBaseModelInfo2->pRwObject, asdasdasdgf23);
                 return true;
             }
             // Replace the atomics
             SAtomicsReplacer data;
             data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
             data.pClump = pCopy;
-            data.iAtomicIndex = 0;
 
             MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
             RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
