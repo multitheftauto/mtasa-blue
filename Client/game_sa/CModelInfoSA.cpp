@@ -72,6 +72,7 @@ union tIdeFlags
 };
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
+static constexpr uintptr_t vftable_CClumpModelModelInfo = 0x85BD30u;
 static constexpr size_t    RESOURCE_ID_COL = 25000;
 
 static void CBaseModelInfo_SetColModel(CBaseModelInfoSAInterface* self, CColModelSAInterface* colModel, bool applyToPairedModel)
@@ -1729,20 +1730,6 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
-static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id)
-{
-    return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
-}
-
-static void CVisibilityPlugins_SetAtomicRenderCallbacka(RpAtomic* pRpAtomic, RpAtomic* (*renderCB)(RpAtomic*))
-{
-    return ((void(__cdecl*)(RpAtomic*, RpAtomic * (*renderCB)(RpAtomic*)))0x7328A0)(pRpAtomic, renderCB);
-}
-
-#define rwObjectSetParent(c, p) (((RwObject*)(c))->parent) = (void*)(p)
-#define RpClumpSetFrameMacro(_clump, _frame) (rwObjectSetParent(_clump, _frame), (_clump))
-#define RpClumpSetFrame(_clump, _frame) RpClumpSetFrameMacro(_clump, _frame)
-
 void CModelInfoSA::MakeClumpModel(ushort usModelId)
 {
     if (GetModelType() != eModelInfoType::ATOMIC)
@@ -1753,20 +1740,18 @@ void CModelInfoSA::MakeClumpModel(ushort usModelId)
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     m_pInterface->m_nAnimFileIndex = -1;
 
-    m_pInterface->VFTBL = (CBaseModelInfo_SA_VTBL*)0x85BD30;
+    CClumpModelInfo_SA_VTBL* vfbl = (CClumpModelInfo_SA_VTBL*)vftable_CClumpModelModelInfo;
+    m_pInterface->VFTBL = vfbl;
     RpClump* pClump = RpClumpCreate();
     RpAtomic* pAtomic = (RpAtomic*)m_pInterface->pRwObject;
-    RpClumpSetFrame(pClump, RwFrameCreate());
+    RpSetFrame(pClump, RwFrameCreate());
     RpClumpAddAtomic(pClump, pAtomic);
 
-    auto CBaseModelInfo_SetClump = (void(__thiscall*)(CClumpModelInfoSAInterface* pThis, RpClump * clump))0x004C4F70;
-
-    CBaseModelInfo_SetClump(m_pInterface, pClump);
-    RwObject* pobject = m_pInterface->pRwObject;
+    ((void(__thiscall*)(CClumpModelInfoSAInterface* pThis, RpClump * clump))vfbl->SetClump)(m_pInterface, pClump);
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
-    m_dwParentID = 0;
+    m_dwParentID = -1;
 }
 
 void CModelInfoSA::DeallocateModel(void)

@@ -12,7 +12,6 @@ struct SRelatedModelInfo
 {
     RpClump* pClump;
     bool     bDeleteOldRwObject;
-    int      iAtomicIndex;
 };
 
 struct SFileObjectInstance

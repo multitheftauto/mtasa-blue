@@ -514,18 +514,19 @@ typedef struct
 } SAtomicsAppend;
 bool AppendAtomic(RpAtomic* atomic, void* data)
 {
+    RpAtomic*       pClonedAtomic = RpAtomicClone(atomic);
     SAtomicsAppend* pData = reinterpret_cast<SAtomicsAppend*>(data);
     RwFrame* pFrame = RpGetFrame(atomic);
-    RpAtomicSetFrame(atomic, pFrame);
-    RpClumpAddAtomic(pData->pClump, atomic);
+    RpAtomicSetFrame(pClonedAtomic, pFrame);
+    RpClumpAddAtomic(pData->pClump, pClonedAtomic);
 
     RwFrame* oldFrame = RpGetFrame(atomic);
-    RwFrame* newFrame = RwFrameCreate();
-    RpAtomicSetFrame(atomic, newFrame);
-    RwFrameCopyMatrix(RpGetFrame(atomic), oldFrame);
+    RwFrame*  newFrame = RwFrameCreate();
+    RpAtomicSetFrame(pClonedAtomic, newFrame);
+    RwFrameCopyMatrix(RpGetFrame(pClonedAtomic), oldFrame);
     RwFrame* pRootFrame = RpClumpGetFrame(pData->pClump);
     RwFrameAddChild(pRootFrame, newFrame);
-    CVisibilityPlugins_SetAtomicId(atomic, pData->usModelId);
+    CVisibilityPlugins_SetAtomicId(pClonedAtomic, pData->usModelId);
     return false;
 }
 
@@ -566,16 +567,17 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
                 RpClumpForAllAtomics(data.pClump, RetrieveFirstAtomic, &firstAtomic);
                 RpClumpRemoveAtomic(data.pClump, firstAtomic);
                 RpClumpForAllAtomics(pCopy, AppendAtomic, &data);
-
-                return true;
             }
-            // Replace the atomics
-            SAtomicsReplacer data;
-            data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-            data.pClump = pCopy;
+            else
+            {
+                // Replace the atomics
+                SAtomicsReplacer data;
+                data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+                data.pClump = pCopy;
 
-            MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
-            RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
+                MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
+                RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
+            }
             // Get rid of the now empty copied clump
             RpClumpDestroy(pCopy);
         }

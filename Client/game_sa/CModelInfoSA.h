@@ -119,6 +119,7 @@ class CLodTimeModelInfo_SA_VTBL : public CLodAtomicModelInfo_SA_VTBL
 class CClumpModelInfo_SA_VTBL : public CBaseModelInfo_SA_VTBL
 {
 public:
+    DWORD GetBoundingBox;
     DWORD SetClump;            // (RpClump*)
 };
 
