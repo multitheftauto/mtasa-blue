@@ -1739,11 +1739,9 @@ static void CVisibilityPlugins_SetAtomicRenderCallbacka(RpAtomic* pRpAtomic, RpA
     return ((void(__cdecl*)(RpAtomic*, RpAtomic * (*renderCB)(RpAtomic*)))0x7328A0)(pRpAtomic, renderCB);
 }
 
-
 #define rwObjectSetParent(c, p) (((RwObject*)(c))->parent) = (void*)(p)
 #define RpClumpSetFrameMacro(_clump, _frame) (rwObjectSetParent(_clump, _frame), (_clump))
 #define RpClumpSetFrame(_clump, _frame) RpClumpSetFrameMacro(_clump, _frame)
-
 
 void CModelInfoSA::MakeClumpModel(ushort usModelId)
 {

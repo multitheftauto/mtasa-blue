@@ -833,8 +833,6 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[310].MakePedModel("BBTHIN");
     ModelInfo[311].MakePedModel("SMOKEV");
     ModelInfo[312].MakePedModel("PSYCHO");
-    //ModelInfo[1337].Request(BLOCKING, "asd0");
-    //ModelInfo[1337].MakeClumpModel(1337);
 
     // ModelInfo[190].MakePedModel ( "BARBARA" );
     // ModelInfo[191].MakePedModel ( "HELENA" );

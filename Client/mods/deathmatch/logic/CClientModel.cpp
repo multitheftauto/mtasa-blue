@@ -72,14 +72,12 @@ bool CClientModel::Allocate(ushort usParentID)
 
 bool CClientModel::MakeClumpModel()
 {
-    m_bAllocatedByUs = true;
-
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
 
     if (!pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
         return false;
 
-    pModelInfo->Request(BLOCKING, "asd");
+    pModelInfo->Request(BLOCKING, "CClientModel::MakeClumpModel");
     pModelInfo->MakeClumpModel(m_iModelID);
     return true;
 }
