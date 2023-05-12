@@ -1747,48 +1747,28 @@ static void CVisibilityPlugins_SetAtomicRenderCallbacka(RpAtomic* pRpAtomic, RpA
 
 void CModelInfoSA::MakeClumpModel(ushort usModelId)
 {
-    CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
-    CBaseModelInfoSAInterface* p3425 = (CBaseModelInfoSAInterface*)ppModelInfo[3425];
-    RpClump*                   pClump222 = (RpClump*)p3425->pRwObject;
-    RwFrame*                   pFrame222 = RpGetFrame(pClump222);
+    if (GetModelType() != eModelInfoType::ATOMIC)
+        return;
+
     CBaseModelInfoSAInterface* pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[usModelId];
+    CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
     MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     m_pInterface->m_nAnimFileIndex = -1;
 
     m_pInterface->VFTBL = (CBaseModelInfo_SA_VTBL*)0x85BD30;
-    // CVisibilityPlugins::ms_framePluginOffset
-    //m_pInterface->usNumberOfRefs = 0;
-    //m_pInterface->pRwObject = nullptr;
     RpClump* pClump = RpClumpCreate();
     RpAtomic* pAtomic = (RpAtomic*)m_pInterface->pRwObject;
-    //pAtomic = RpAtomicCreate();
-    //CVisibilityPlugins_SetAtomicRenderCallbacka(pAtomic, 0);
     RpClumpSetFrame(pClump, RwFrameCreate());
     RpClumpAddAtomic(pClump, pAtomic);
-
-    //CVisibilityPlugins_SetAtomicId(pAtomic, usModelId);
-    // CClumpModelInfo::GetModelType(void)	.text	004C5720	00000003	00000000	00000000	R	.	.	.	.	.	.
-    // CClumpModelInfo__SetClump	.text	004C4F70	00000196	00000008	00000004	R	.	.	.	.	T	.
 
     auto CBaseModelInfo_SetClump = (void(__thiscall*)(CClumpModelInfoSAInterface* pThis, RpClump * clump))0x004C4F70;
 
     CBaseModelInfo_SetClump(m_pInterface, pClump);
     RwObject* pobject = m_pInterface->pRwObject;
-    //m_pInterface->pRwObject = (RwObject*)pClump;
-    //m_pInterface->usUnknown = 65535;
-    //m_pInterface->usDynamicIndex = 65535;
-    //m_pInterface->m_animFileName = nullptr;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
     m_dwParentID = 0;
-
-    CModelInfoSA*  pModelInfoSA1337 = (CModelInfoSA*)(pGame->GetModelInfo(1337));
-    eModelInfoType type2 = pModelInfoSA1337->GetModelType();
-    if (type2 == eModelInfoType::CLUMP)
-    {
-        int            sjkdfh = 5;
-    }
 }
 
 void CModelInfoSA::DeallocateModel(void)
@@ -2024,8 +2004,6 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    if (this->m_dwModelID == 1337)
-        return (eModelInfoType)5;
     return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
 }
 

@@ -514,6 +514,10 @@ static void CVisibilityPlugins_SetAtomicRenderCallback(RpAtomic* pRpAtomic, RpAt
 #define RpAtomicGetFrameMacro(_atomic) ((RwFrame*)rwObjectGetParent(_atomic))
 #define RpAtomicGetFrame(_atomic) RpAtomicGetFrameMacro(_atomic)
 
+static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id)
+{
+    return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
+}
 
 bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
 {
@@ -529,27 +533,11 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
             RpClump* pCopy = RpClumpClone(pNew);
 
             static auto                CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-            CBaseModelInfoSAInterface* aa370 = CModelInfo_ms_modelInfoPtrs[370];
-            CBaseModelInfoSAInterface* aa3425 = CModelInfo_ms_modelInfoPtrs[3425];
-            CBaseModelInfoSAInterface* aa1337 = CModelInfo_ms_modelInfoPtrs[1337];
-            CModelInfoSA*              pModelInfoSA370 = (CModelInfoSA*)(pGame->GetModelInfo(370));
-            CModelInfoSA*              pModelInfoSA1337 = (CModelInfoSA*)(pGame->GetModelInfo(1337));
-            CModelInfoSA*              pModelInfoSA3425 = (CModelInfoSA*)(pGame->GetModelInfo(3425));
-            eModelInfoType             type1 = pModelInfoSA370->GetModelType();
-            eModelInfoType             type2 = pModelInfoSA1337->GetModelType();
-            eModelInfoType             type3 = pModelInfoSA3425->GetModelType();
             CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[usModelID];
 
             eModelInfoType modelInfoType = ((eModelInfoType(*)())pBaseModelInfo->VFTBL->GetModelType)();
             if (modelInfoType == eModelInfoType::CLUMP)
             {
-                auto                   pClumpModelInfo = reinterpret_cast<CClumpModelInfoSAInterface*>(pBaseModelInfo);
-                auto                   ptr = reinterpret_cast<CClumpModelInfo_SA_VTBL*>(pClumpModelInfo->VFTBL)->SetClump;
-
-                ((void(__thiscall*)(CClumpModelInfoSAInterface * pThis, RpClump * clump)) ptr)(pClumpModelInfo, pCopy);
-                ////CVisibilityPlugins_SetAtomicRenderCallback(pClonedAtomic, (RpAtomic*(*)(RpAtomic*))0x7323C0);
-                //CVisibilityPlugins_SetAtomicRenderCallback(atomic, (RpAtomic * (*)(RpAtomic*))0x7323C0);
-
                 CBaseModelInfoSAInterface* pBaseModelInfo2 = CModelInfo_ms_modelInfoPtrs[usModelID];
                 RwObject*                  pRwObject = pBaseModelInfo2->pRwObject;
                 int                        askdjl = 5;
@@ -560,33 +548,21 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
                 GetClumpAtomicList((RpClump*)pCopy, asdasdasdgf2);
                 RpAtomicSetFrame(asdasdasdgf2[0], RpAtomicGetFrame(asdasdasdgf[0]));
                 RpAtomicSetFrame(asdasdasdgf2[1], RpAtomicGetFrame(asdasdasdgf[0]));
+                CVisibilityPlugins_SetAtomicId(asdasdasdgf2[0], usModelID);
+                CVisibilityPlugins_SetAtomicId(asdasdasdgf2[1], usModelID);
+
                 RpClumpAddAtomic((RpClump*)pRwObject, asdasdasdgf2[0]);
                 RpClumpAddAtomic((RpClump*)pRwObject, asdasdasdgf2[1]);
                 std::vector<RpAtomic*> asdasdasdgf23;
                 GetClumpAtomicList((RpClump*)pBaseModelInfo2->pRwObject, asdasdasdgf23);
                 return true;
             }
-            CBaseModelInfoSAInterface* usModelIDM = CModelInfo_ms_modelInfoPtrs[usModelID];
             // Replace the atomics
             SAtomicsReplacer data;
             data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
             data.pClump = pCopy;
             data.iAtomicIndex = 0;
 
-            std::vector<RpAtomic*> atomicListNew;
-            GetClumpAtomicList(pCopy, atomicListNew);
-            std::vector<RpAtomic*> atomicListOld;
-            GetClumpAtomicList(reinterpret_cast<RpClump*>(pOldAtomic), atomicListOld);
-            int atomicsToAdd = atomicListNew.size() - atomicListOld.size();
-            //RpClumpAddAtomic((RpClump*)pModelInfo->GetRwObject(), atomicListNew[1]);
-            //RpClumpAddAtomic((RpClump*)pModelInfo->GetRwObject(), atomicListNew[2]);
-
-            CBaseModelInfoSAInterface* asd = CModelInfo_ms_modelInfoPtrs[3425];
-            std::vector<RpAtomic*>     asdasd1;
-            std::vector<RpAtomic*>     asdasd2;
-            CBaseModelInfoSAInterface* as1337d = CModelInfo_ms_modelInfoPtrs[1337];
-            GetClumpAtomicList((RpClump*)asd->pRwObject, asdasd1);
-            GetClumpAtomicList((RpClump*)as1337d->pRwObject, asdasd2);
             MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
             RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
             // Get rid of the now empty copied clump
