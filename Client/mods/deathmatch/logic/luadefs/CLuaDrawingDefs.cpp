@@ -19,6 +19,16 @@
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
+bool DxDrawModel3d(uint16_t usModel, CVector position)
+{
+    auto modelInfo = g_pGame->GetModelInfo(usModel);
+    if (!modelInfo->IsLoaded())
+        return false;
+
+    modelInfo->Render(position);
+    return true;
+}
+
 void CLuaDrawingDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -64,6 +74,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled},
         {"dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled},
         {"dxSetTextureEdge", DxSetTextureEdge},
+        {"dxDrawModel3d", ArgumentParser<DxDrawModel3d>},
     };
 
     // Add functions

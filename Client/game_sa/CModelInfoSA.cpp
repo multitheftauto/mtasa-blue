@@ -2039,3 +2039,25 @@ bool CModelInfoSA::ForceUnload()
 
     return true;
 }
+
+bool CModelInfoSA::Render(CVector position)
+{
+    CBaseModelInfoSAInterface* pModelInfoSAInterface = GetInterface();
+    RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
+    // RwEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, 100u);
+    RwFrame* pFrame = RpGetFrame(pRwObject);
+    RwFrameSetIdentity(pFrame);
+    RwFrameTranslate(pFrame, (RwV3d*)&position, TRANSFORM_INITIAL);
+
+    if (pRwObject->type == RwObjectType::Atomic)
+    {
+        RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
+        pRpAtomic->renderCallback(pRpAtomic);
+    }
+    else
+    {
+        RpClump* pRpClump = reinterpret_cast<RpClump*>(pRwObject);
+        RpClumpRender(pRpClump);
+    }
+    return true;
+}
