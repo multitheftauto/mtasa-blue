@@ -412,7 +412,7 @@ void CCredits::Update()
         float fCurrentTop = 1.0f - 0.0001f * static_cast<float>(clock() - m_clkStart);
 
         // If we're too far down or up, make sure we restart next pulse
-        if (fCurrentTop <= -12.3f || fCurrentTop >= 1.0f)
+        if (fCurrentTop <= -14.5f || fCurrentTop >= 1.0f)
         {
             m_clkStart = clock();
         }
