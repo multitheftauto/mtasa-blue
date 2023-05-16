@@ -8,7 +8,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: multitheftauto/stale-action@v1.0.3
+      - uses: multitheftauto/stale-action@v3.0.0
         id: stale
         with:
           close-pr-message: "This draft pull request was closed because it has been marked stale for 30 days with no activity."

@@ -90,11 +90,10 @@ private:
     CBikeHandlingEntrySA* m_pBikeHandlingData = nullptr;
 
 public:
-    CBikeSA(){};
-    CBikeSA(CBikeSAInterface* bike);
-    CBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CBikeSA() = default;
+    CBikeSA(CBikeSAInterface* pInterface);
 
-    CBikeSAInterface* GetBikeInterface() { return (CBikeSAInterface*)m_pInterface; };
+    CBikeSAInterface* GetBikeInterface() { return reinterpret_cast<CBikeSAInterface*>(GetInterface()); }
 
     CBikeHandlingEntry* GetBikeHandlingData();
     void                SetBikeHandlingData(CBikeHandlingEntry* pHandling);

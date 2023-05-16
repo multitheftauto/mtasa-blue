@@ -34,114 +34,114 @@ public:
     void SetFlagBits(DWORD flagBits);
     void ClearFlagBits(DWORD flagBits);
     // For initialization only
-    void SetFlags(int iFlags) { pWeaponStats->m_nFlags = iFlags; }
-    bool IsFlagSet(DWORD flag) { return ((pWeaponStats->m_nFlags & flag) > 0 ? true : false); }
-    int  GetFlags() { return pWeaponStats->m_nFlags; }
+    void SetFlags(int iFlags) { m_pWeaponStats->m_nFlags = iFlags; }
+    bool IsFlagSet(DWORD flag) { return ((m_pWeaponStats->m_nFlags & flag) > 0 ? true : false); }
+    int  GetFlags() { return m_pWeaponStats->m_nFlags; }
 
-    eWeaponModel GetModel() { return (eWeaponModel)pWeaponStats->m_modelId; }
-    void         SetModel(int iModel) { pWeaponStats->m_modelId = (int)iModel; }
+    eWeaponModel GetModel() { return (eWeaponModel)m_pWeaponStats->m_modelId; }
+    void         SetModel(int iModel) { m_pWeaponStats->m_modelId = (int)iModel; }
 
-    eWeaponModel GetModel2() { return (eWeaponModel)pWeaponStats->m_modelId2; }
-    void         SetModel2(int iModel) { pWeaponStats->m_modelId2 = (int)iModel; }
+    eWeaponModel GetModel2() { return (eWeaponModel)m_pWeaponStats->m_modelId2; }
+    void         SetModel2(int iModel) { m_pWeaponStats->m_modelId2 = (int)iModel; }
 
-    CWeaponInfoSAInterface* GetInterface() { return pWeaponStats; };
+    CWeaponInfoSAInterface* GetInterface() { return m_pWeaponStats; };
 
-    float GetWeaponRange() { return pWeaponStats->m_fWeaponRange; };
-    void  SetWeaponRange(float fRange) { pWeaponStats->m_fWeaponRange = fRange; };
+    float GetWeaponRange() { return m_pWeaponStats->m_fWeaponRange; };
+    void  SetWeaponRange(float fRange) { m_pWeaponStats->m_fWeaponRange = fRange; };
 
-    float GetTargetRange() { return pWeaponStats->m_fTargetRange; };
-    void  SetTargetRange(float fRange) { pWeaponStats->m_fTargetRange = fRange; };
+    float GetTargetRange() { return m_pWeaponStats->m_fTargetRange; };
+    void  SetTargetRange(float fRange) { m_pWeaponStats->m_fTargetRange = fRange; };
 
-    CVector* GetFireOffset() { return &pWeaponStats->m_vecFireOffset; };
-    void     SetFireOffset(CVector* vecFireOffset) { pWeaponStats->m_vecFireOffset = *vecFireOffset; };
+    CVector* GetFireOffset() { return &m_pWeaponStats->m_vecFireOffset; };
+    void     SetFireOffset(CVector* vecFireOffset) { m_pWeaponStats->m_vecFireOffset = *vecFireOffset; };
 
-    short GetDamagePerHit() { return pWeaponStats->m_nDamage; };
-    void  SetDamagePerHit(short sDamagePerHit) { pWeaponStats->m_nDamage = sDamagePerHit; };
+    short GetDamagePerHit() { return m_pWeaponStats->m_nDamage; };
+    void  SetDamagePerHit(short sDamagePerHit) { m_pWeaponStats->m_nDamage = sDamagePerHit; };
 
-    float GetAccuracy() { return pWeaponStats->m_fAccuracy; };
-    void  SetAccuracy(float fAccuracy) { pWeaponStats->m_fAccuracy = fAccuracy; };
+    float GetAccuracy() { return m_pWeaponStats->m_fAccuracy; };
+    void  SetAccuracy(float fAccuracy) { m_pWeaponStats->m_fAccuracy = fAccuracy; };
 
-    short GetMaximumClipAmmo() { return pWeaponStats->m_nAmmo; };
-    void  SetMaximumClipAmmo(short sAccuracy) { pWeaponStats->m_nAmmo = sAccuracy; };
+    short GetMaximumClipAmmo() { return m_pWeaponStats->m_nAmmo; };
+    void  SetMaximumClipAmmo(short sAccuracy) { m_pWeaponStats->m_nAmmo = sAccuracy; };
 
-    float GetMoveSpeed() { return pWeaponStats->m_fMoveSpeed; };
-    void  SetMoveSpeed(float fMoveSpeed) { pWeaponStats->m_fMoveSpeed = fMoveSpeed; };
+    float GetMoveSpeed() { return m_pWeaponStats->m_fMoveSpeed; };
+    void  SetMoveSpeed(float fMoveSpeed) { m_pWeaponStats->m_fMoveSpeed = fMoveSpeed; };
 
     // projectile/areaeffect only
-    float GetFiringSpeed() { return pWeaponStats->m_fSpeed; };
-    void  SetFiringSpeed(float fFiringSpeed) { pWeaponStats->m_fSpeed = fFiringSpeed; };
+    float GetFiringSpeed() { return m_pWeaponStats->m_fSpeed; };
+    void  SetFiringSpeed(float fFiringSpeed) { m_pWeaponStats->m_fSpeed = fFiringSpeed; };
 
     // area effect only
-    float GetRadius() { return pWeaponStats->m_fRadius; };
-    void  SetRadius(float fRadius) { pWeaponStats->m_fRadius = fRadius; };
+    float GetRadius() { return m_pWeaponStats->m_fRadius; };
+    void  SetRadius(float fRadius) { m_pWeaponStats->m_fRadius = fRadius; };
 
-    float GetLifeSpan() { return pWeaponStats->m_fLifeSpan; };
-    void  SetLifeSpan(float fLifeSpan) { pWeaponStats->m_fLifeSpan = fLifeSpan; };
+    float GetLifeSpan() { return m_pWeaponStats->m_fLifeSpan; };
+    void  SetLifeSpan(float fLifeSpan) { m_pWeaponStats->m_fLifeSpan = fLifeSpan; };
 
-    float GetSpread() { return pWeaponStats->m_fSpread; };
-    void  SetSpread(float fSpread) { pWeaponStats->m_fSpread = fSpread; };
+    float GetSpread() { return m_pWeaponStats->m_fSpread; };
+    void  SetSpread(float fSpread) { m_pWeaponStats->m_fSpread = fSpread; };
 
-    float GetAnimBreakoutTime() { return pWeaponStats->m_animBreakoutTime; };
-    void  SetAnimBreakoutTime(float fBreakoutTime) { pWeaponStats->m_animBreakoutTime = fBreakoutTime; };
+    float GetAnimBreakoutTime() { return m_pWeaponStats->m_animBreakoutTime; };
+    void  SetAnimBreakoutTime(float fBreakoutTime) { m_pWeaponStats->m_animBreakoutTime = fBreakoutTime; };
 
-    eWeaponSlot GetSlot() { return (eWeaponSlot)pWeaponStats->m_nWeaponSlot; };
-    void        SetSlot(eWeaponSlot dwSlot) { pWeaponStats->m_nWeaponSlot = (eWeaponSlot)dwSlot; };
+    eWeaponSlot GetSlot() { return (eWeaponSlot)m_pWeaponStats->m_nWeaponSlot; };
+    void        SetSlot(eWeaponSlot dwSlot) { m_pWeaponStats->m_nWeaponSlot = (eWeaponSlot)dwSlot; };
 
-    eWeaponSkill GetSkill() { return pWeaponStats->m_SkillLevel; }
-    void         SetSkill(eWeaponSkill weaponSkill) { pWeaponStats->m_SkillLevel = weaponSkill; }
+    eWeaponSkill GetSkill() { return m_pWeaponStats->m_SkillLevel; }
+    void         SetSkill(eWeaponSkill weaponSkill) { m_pWeaponStats->m_SkillLevel = weaponSkill; }
 
-    float GetRequiredStatLevel() { return static_cast<float>(pWeaponStats->m_nReqStatLevel); }
-    void  SetRequiredStatLevel(float fStatLevel) { pWeaponStats->m_nReqStatLevel = static_cast<int>(fStatLevel); }
-    void  SetRequiredStatLevel(int iStatLevel) { pWeaponStats->m_nReqStatLevel = iStatLevel; }
+    float GetRequiredStatLevel() { return static_cast<float>(m_pWeaponStats->m_nReqStatLevel); }
+    void  SetRequiredStatLevel(float fStatLevel) { m_pWeaponStats->m_nReqStatLevel = static_cast<int>(fStatLevel); }
+    void  SetRequiredStatLevel(int iStatLevel) { m_pWeaponStats->m_nReqStatLevel = iStatLevel; }
 
-    DWORD GetAnimGroup() { return pWeaponStats->m_animGroup; }
-    void  SetAnimGroup(DWORD dwAnimGroup) { pWeaponStats->m_animGroup = dwAnimGroup; }
+    DWORD GetAnimGroup() { return m_pWeaponStats->m_animGroup; }
+    void  SetAnimGroup(DWORD dwAnimGroup) { m_pWeaponStats->m_animGroup = dwAnimGroup; }
 
-    eFireType GetFireType() { return pWeaponStats->m_eFireType; }
-    void      SetFireType(eFireType type) { pWeaponStats->m_eFireType = type; }
+    eFireType GetFireType() { return m_pWeaponStats->m_eFireType; }
+    void      SetFireType(eFireType type) { m_pWeaponStats->m_eFireType = type; }
 
     // Floats
-    float GetWeaponAnimLoopStart() { return pWeaponStats->m_animLoopStart; }
-    void  SetWeaponAnimLoopStart(float animLoopStart) { pWeaponStats->m_animLoopStart = animLoopStart; }
+    float GetWeaponAnimLoopStart() { return m_pWeaponStats->m_animLoopStart; }
+    void  SetWeaponAnimLoopStart(float animLoopStart) { m_pWeaponStats->m_animLoopStart = animLoopStart; }
 
-    float GetWeaponAnimLoopStop() { return pWeaponStats->m_animLoopEnd; }
-    void  SetWeaponAnimLoopStop(float animLoopEnd) { pWeaponStats->m_animLoopEnd = animLoopEnd; }
+    float GetWeaponAnimLoopStop() { return m_pWeaponStats->m_animLoopEnd; }
+    void  SetWeaponAnimLoopStop(float animLoopEnd) { m_pWeaponStats->m_animLoopEnd = animLoopEnd; }
 
-    float GetWeaponAnimLoopFireTime() { return pWeaponStats->m_animFireTime; }
-    void  SetWeaponAnimLoopFireTime(float animFireTime) { pWeaponStats->m_animFireTime = animFireTime; }
+    float GetWeaponAnimLoopFireTime() { return m_pWeaponStats->m_animFireTime; }
+    void  SetWeaponAnimLoopFireTime(float animFireTime) { m_pWeaponStats->m_animFireTime = animFireTime; }
 
-    float GetWeaponAnim2LoopStart() { return pWeaponStats->m_anim2LoopStart; }
-    void  SetWeaponAnim2LoopStart(float anim2LoopStart) { pWeaponStats->m_anim2LoopStart = anim2LoopStart; }
+    float GetWeaponAnim2LoopStart() { return m_pWeaponStats->m_anim2LoopStart; }
+    void  SetWeaponAnim2LoopStart(float anim2LoopStart) { m_pWeaponStats->m_anim2LoopStart = anim2LoopStart; }
 
-    float GetWeaponAnim2LoopStop() { return pWeaponStats->m_anim2LoopEnd; }
-    void  SetWeaponAnim2LoopStop(float anim2LoopEnd) { pWeaponStats->m_anim2LoopEnd = anim2LoopEnd; }
+    float GetWeaponAnim2LoopStop() { return m_pWeaponStats->m_anim2LoopEnd; }
+    void  SetWeaponAnim2LoopStop(float anim2LoopEnd) { m_pWeaponStats->m_anim2LoopEnd = anim2LoopEnd; }
 
-    float GetWeaponAnim2LoopFireTime() { return pWeaponStats->m_anim2FireTime; }
-    void  SetWeaponAnim2LoopFireTime(float anim2FireTime) { pWeaponStats->m_anim2FireTime = anim2FireTime; }
+    float GetWeaponAnim2LoopFireTime() { return m_pWeaponStats->m_anim2FireTime; }
+    void  SetWeaponAnim2LoopFireTime(float anim2FireTime) { m_pWeaponStats->m_anim2FireTime = anim2FireTime; }
 
-    float GetWeaponAnimBreakoutTime() { return pWeaponStats->m_animBreakoutTime; }
-    void  SetWeaponAnimBreakoutTime(float animBreakoutTime) { pWeaponStats->m_animBreakoutTime = animBreakoutTime; }
+    float GetWeaponAnimBreakoutTime() { return m_pWeaponStats->m_animBreakoutTime; }
+    void  SetWeaponAnimBreakoutTime(float animBreakoutTime) { m_pWeaponStats->m_animBreakoutTime = animBreakoutTime; }
 
-    float GetWeaponSpeed() { return pWeaponStats->m_fSpeed; }
-    void  SetWeaponSpeed(float fSpeed) { pWeaponStats->m_fSpeed = fSpeed; }
+    float GetWeaponSpeed() { return m_pWeaponStats->m_fSpeed; }
+    void  SetWeaponSpeed(float fSpeed) { m_pWeaponStats->m_fSpeed = fSpeed; }
 
-    float GetWeaponRadius() { return pWeaponStats->m_fRadius; }
-    void  SetWeaponRadius(float fRadius) { pWeaponStats->m_fRadius = fRadius; }
+    float GetWeaponRadius() { return m_pWeaponStats->m_fRadius; }
+    void  SetWeaponRadius(float fRadius) { m_pWeaponStats->m_fRadius = fRadius; }
 
     // Ints
-    short GetAimOffsetIndex() { return pWeaponStats->m_nAimOffsetIndex; }
-    void  SetAimOffsetIndex(short sIndex) { pWeaponStats->m_nAimOffsetIndex = sIndex; }
+    short GetAimOffsetIndex() { return m_pWeaponStats->m_nAimOffsetIndex; }
+    void  SetAimOffsetIndex(short sIndex) { m_pWeaponStats->m_nAimOffsetIndex = sIndex; }
 
-    BYTE GetDefaultCombo() { return pWeaponStats->m_defaultCombo; }
-    void SetDefaultCombo(BYTE defaultCombo) { pWeaponStats->m_defaultCombo = defaultCombo; }
+    BYTE GetDefaultCombo() { return m_pWeaponStats->m_defaultCombo; }
+    void SetDefaultCombo(BYTE defaultCombo) { m_pWeaponStats->m_defaultCombo = defaultCombo; }
 
-    BYTE GetCombosAvailable() { return pWeaponStats->m_nCombosAvailable; }
-    void SetCombosAvailable(BYTE nCombosAvailable) { pWeaponStats->m_nCombosAvailable = nCombosAvailable; }
+    BYTE GetCombosAvailable() { return m_pWeaponStats->m_nCombosAvailable; }
+    void SetCombosAvailable(BYTE nCombosAvailable) { m_pWeaponStats->m_nCombosAvailable = nCombosAvailable; }
 
 private:
     void HandleFlagsValueChange(DWORD newValue);
 
-    eWeaponType             weaponType;
-    eWeaponSkill            skillLevel;
-    CWeaponInfoSAInterface* pWeaponStats;
+    eWeaponType             m_weaponType;
+    eWeaponSkill            m_skillLevel;
+    CWeaponInfoSAInterface* m_pWeaponStats;
 };

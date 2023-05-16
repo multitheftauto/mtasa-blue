@@ -20,9 +20,10 @@ class CPlaneSAInterface : public CAutomobileSAInterface
     // fill this
 };
 
-class CPlaneSA : public virtual CPlane, public virtual CAutomobileSA
+class CPlaneSA final : public virtual CPlane, public virtual CAutomobileSA
 {
 public:
-    CPlaneSA(CPlaneSAInterface* plane);
-    CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CPlaneSA(CPlaneSAInterface* pInterface);
+
+    CPlaneSAInterface* GetPlaneInterface() { return reinterpret_cast<CPlaneSAInterface*>(GetInterface()); }
 };

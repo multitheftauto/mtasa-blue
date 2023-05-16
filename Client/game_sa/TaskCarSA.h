@@ -68,18 +68,18 @@ public:
 
     int GetTargetDoor()
     {
-        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
+        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)GetInterface();
         return thisInterface->m_iTargetDoor;
     }
     void SetTargetDoor(int iDoor)
     {
-        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
+        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)GetInterface();
         thisInterface->m_iTargetDoor = iDoor;
     }
 
     int GetEnterCarStartTime()
     {
-        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)this->GetInterface();
+        CTaskComplexEnterCarSAInterface* thisInterface = (CTaskComplexEnterCarSAInterface*)GetInterface();
         return thisInterface->m_iEnterCarStartTime;
     }
 };
@@ -180,7 +180,7 @@ public:
 
     int GetTargetDoor()
     {
-        CTaskComplexLeaveCarSAInterface* thisInterface = (CTaskComplexLeaveCarSAInterface*)this->GetInterface();
+        CTaskComplexLeaveCarSAInterface* thisInterface = (CTaskComplexLeaveCarSAInterface*)GetInterface();
         return thisInterface->m_iTargetDoor;
     }
 };

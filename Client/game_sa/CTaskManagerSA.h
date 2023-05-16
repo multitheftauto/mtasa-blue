@@ -46,7 +46,7 @@ private:
 
 public:
     CTaskManagerSA(CTaskManagerSAInterface* taskManagerInterface, CPed* ped);
-    CTaskManagerSAInterface* GetInterface() { return this->internalInterface; }
+    CTaskManagerSAInterface* GetInterface() { return internalInterface; }
 
     void   RemoveTask(const int iTaskPriority);
     void   SetTask(CTaskSA* pTaskPrimary, const int iTaskPriority, const bool bForceNewTask = false);

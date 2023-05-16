@@ -33,7 +33,7 @@
 using namespace std;
 namespace
 {
-    //#define maptype hash_map
+    // #define maptype hash_map
     #define maptype map
     // Update or add a value for a key
     template <class T, class V, class TR, class T2>

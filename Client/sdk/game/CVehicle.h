@@ -57,19 +57,20 @@ enum eDoorLock : int32_t
 
 struct SSirenBeaconInfo
 {
-    CVector m_vecSirenPositions;
-    SharedUtil::SColor  m_RGBBeaconColour;
-    DWORD   m_dwMinSirenAlpha;
+    CVector            m_vecSirenPositions;
+    SharedUtil::SColor m_RGBBeaconColour;
+    DWORD              m_dwMinSirenAlpha{0};
 };
+
 struct SSirenInfo
 {
     // Flags
     bool m_b360Flag;
     bool m_bDoLOSCheck;
     bool m_bUseRandomiser;
-    bool m_bSirenSilent;
+    bool m_bSirenSilent{false};
     // End of flags
-    bool                             m_bOverrideSirens;
+    bool                             m_bOverrideSirens{false};
     unsigned char                    m_ucSirenType;
     unsigned char                    m_ucSirenCount;
     unsigned char                    m_ucCurrentSirenID;

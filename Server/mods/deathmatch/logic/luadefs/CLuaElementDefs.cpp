@@ -39,7 +39,6 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementChildren", getElementChildren},
         {"getElementChild", getElementChild},
         {"getElementChildrenCount", getElementChildrenCount},
-        {"getAllElementData", getAllElementData},
         {"getElementID", getElementID},
         {"getElementParent", getElementParent},
         {"getElementMatrix", getElementMatrix},
@@ -74,6 +73,7 @@ void CLuaElementDefs::LoadFunctions()
 
         // Element data
         {"getElementData", GetElementData},
+        {"getAllElementData", ArgumentParserWarn<false, GetAllElementData>},
         {"hasElementData", HasElementData},
         {"setElementData", setElementData},
         {"removeElementData", removeElementData},
@@ -494,30 +494,6 @@ int CLuaElementDefs::getElementByIndex(lua_State* luaVM)
         if (pElement)
         {
             lua_pushelement(luaVM, pElement);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaElementDefs::getAllElementData(lua_State* luaVM)
-{
-    //  table getAllElementData ( element theElement )
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaArguments Args;
-        if (CStaticFunctionDefinitions::GetAllElementData(pElement, &Args))
-        {
-            Args.PushAsTable(luaVM);
             return 1;
         }
     }
@@ -1029,22 +1005,24 @@ CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius
     // Remove elements that do not match the criterias
     if (interior || dimension || typeHash)
     {
-        result.erase(std::remove_if(result.begin(), result.end(), [&, radiusSq = radius * radius](CElement* pElement) {
-            if (typeHash && typeHash != pElement->GetTypeHash())
-                return true;
+        result.erase(std::remove_if(result.begin(), result.end(),
+                                    [&, radiusSq = radius * radius](CElement* pElement) {
+                                        if (typeHash && typeHash != pElement->GetTypeHash())
+                                            return true;
 
-            if (interior.has_value() && interior != pElement->GetInterior())
-                return true;
+                                        if (interior.has_value() && interior != pElement->GetInterior())
+                                            return true;
 
-            if (dimension.has_value() && dimension != pElement->GetDimension())
-                return true;
+                                        if (dimension.has_value() && dimension != pElement->GetDimension())
+                                            return true;
 
-            // Check if element is within the sphere, because the spatial database is 2D
-            if ((pElement->GetPosition() - pos).LengthSquared() > radiusSq)
-                return true;
+                                        // Check if element is within the sphere, because the spatial database is 2D
+                                        if ((pElement->GetPosition() - pos).LengthSquared() > radiusSq)
+                                            return true;
 
-            return pElement->IsBeingDeleted();
-        }), result.end());
+                                        return pElement->IsBeingDeleted();
+                                    }),
+                     result.end());
     }
 
     return result;
@@ -2257,17 +2235,21 @@ int CLuaElementDefs::setElementSyncer(lua_State* luaVM)
     CElement* pElement;
     CPlayer*  pPlayer = NULL;
     bool      bEnable = true;
+    bool      bPersist = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     if (argStream.NextIsBool())
         argStream.ReadBool(bEnable);
     else
+    {
         argStream.ReadUserData(pPlayer);
+        argStream.ReadBool(bPersist, false);
+    }
 
     if (!argStream.HasErrors())
     {
-        bool bResult = CStaticFunctionDefinitions::SetElementSyncer(pElement, pPlayer, bEnable);
+        bool bResult = CStaticFunctionDefinitions::SetElementSyncer(pElement, pPlayer, bEnable, bPersist);
         lua_pushboolean(luaVM, bResult);
         return 1;
     }

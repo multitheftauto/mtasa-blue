@@ -45,7 +45,7 @@ CWebView::~CWebView()
     ResumeCefThread();
 
     // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = nullptr;    
+    m_pWebView = nullptr;
 
     OutputDebugLine("CWebView::~CWebView");
 }
@@ -187,7 +187,7 @@ void CWebView::ClearTexture()
     IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
     if (!pD3DSurface)
         return;
-    
+
     D3DSURFACE_DESC SurfaceDesc;
     if (FAILED(pD3DSurface->GetDesc(&SurfaceDesc)))
         return;
@@ -236,12 +236,12 @@ void CWebView::UpdateTexture()
                 {
                     // Note that D3D texture size can be hardware dependent(especially with dynamic texture)
                     // When destination and source pitches differ we must copy pixels row by row
-                    if (destPitch == sourcePitch)                    
+                    if (destPitch == sourcePitch)
                         memcpy(destData, sourceData, destPitch * m_RenderData.height);
                     else
                     {
                         for (int y = 0; y < m_RenderData.height; ++y)
-                        {                           
+                        {
                             const int sourceIndex = y * sourcePitch;
                             const int destIndex = y * destPitch;
 
@@ -702,7 +702,7 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
         return;
 
     std::unique_lock<std::mutex> lock(m_RenderData.dataMutex);
-  
+
     // Copy popup buffer
     if (paintType == PET_POPUP)
     {
@@ -722,8 +722,8 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
     m_RenderData.changed = true;
 
     // Wait for the main thread to handle drawing the texture
-    m_RenderData.cefThreadState = ECefThreadState::Wait;    
-    m_RenderData.cefThreadCv.wait(lock, [&](){ return m_RenderData.cefThreadState == ECefThreadState::Running; });
+    m_RenderData.cefThreadState = ECefThreadState::Wait;
+    m_RenderData.cefThreadCv.wait(lock, [&]() { return m_RenderData.cefThreadState == ECefThreadState::Running; });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -817,8 +817,6 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
         else
             bResult = false;
     }
-    else if (scheme == L"mtalocal")
-        bResult = false;            // Allow mtalocal:// URLs
     else
         bResult = true;            // Block other schemes
 
@@ -899,7 +897,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
         else
             return RV_CONTINUE;
     }
-    else if (scheme == L"mtalocal" || scheme == L"blob")
+    else if (scheme == L"blob")
     {
         return RV_CONTINUE;
     }

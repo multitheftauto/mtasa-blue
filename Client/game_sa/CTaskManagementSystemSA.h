@@ -23,7 +23,7 @@ public:
     ~CTaskManagementSystemSA();
 
     CTaskSA* AddTask(CTaskSA* pTask);
-    void   RemoveTask(CTaskSAInterface* pTaskInterface);
+    void     RemoveTask(CTaskSAInterface* pTaskInterface);
     CTaskSA* GetTask(CTaskSAInterface* pTaskInterface);
     CTaskSA* CreateAppropriateTask(CTaskSAInterface* pTaskInterface, int iTaskType);
 

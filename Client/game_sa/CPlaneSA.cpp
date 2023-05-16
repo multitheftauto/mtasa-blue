@@ -12,11 +12,8 @@
 #include "StdInc.h"
 #include "CPlaneSA.h"
 
-CPlaneSA::CPlaneSA(CPlaneSAInterface* plane) : CAutomobileSA(plane)
+CPlaneSA::CPlaneSA(CPlaneSAInterface* pInterface)
 {
-    this->m_pInterface = plane;
-}
-
-CPlaneSA::CPlaneSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CAutomobileSA(dwModelID, ucVariation, ucVariation2)
-{
+    SetInterface(pInterface);
+    Init();
 }

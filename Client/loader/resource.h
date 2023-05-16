@@ -21,10 +21,6 @@
 #define IDC_RADIO2                      1015
 #define IDC_RADIO3                      1016
 #define IDC_RADIO4                      1017
-#define IDC_RADIO5                      1018
-#define IDC_RADIO6                      1019
-#define IDC_RADIO7                      1020
-#define IDC_RADIO8                      1021
 #define IDC_BUTTON_HELP                 1022
 #define IDC_CHECK_FORCE_WINDOWED        1023
 #define IDC_STATIC_BODY1                1026

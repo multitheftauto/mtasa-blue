@@ -70,6 +70,7 @@ namespace SharedUtil
     bool                 FileCopy(const SString& strSrc, const SString& strDest, bool bForce = true);
     std::vector<SString> FindFiles(const SString& strMatch, bool bFiles, bool bDirectories, bool bSortByDate = false);
     SString              MakeUniquePath(const SString& strPathFilename);
+    SString              MakeGenericPath(const SString& uniqueFilePath);
     SString              ConformPathForSorting(const SString& strPathFilename);
     bool                 IsAbsolutePath(const SString& strPath);
 

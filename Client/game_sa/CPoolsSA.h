@@ -94,26 +94,26 @@ public:
     void                      DeleteAllObjects();
 
     // Peds pool
-    CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);
+    CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
 
 private:
     bool AddPedToPool(CClientPed* pClientPed, CPedSA* pPed);
 
 public:
-    void RemovePed(CPed* ped, bool bDelete = true);
+    void                   RemovePed(CPed* ped, bool bDelete = true);
     SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
-    CPed*            GetPedFromRef(DWORD dwGameRef);
-    CPedSAInterface* GetPedInterface(DWORD dwGameRef);            // game_sa specific
-    unsigned long    GetPedCount() { return m_pedPool.ulCount; }
-    void             DeleteAllPeds();
+    CPed*                  GetPedFromRef(DWORD dwGameRef);
+    CPedSAInterface*       GetPedInterface(DWORD dwGameRef);            // game_sa specific
+    unsigned long          GetPedCount() { return m_pedPool.ulCount; }
+    void                   DeleteAllPeds();
 
     CEntity*       GetEntity(DWORD* pGameInterface);
     CClientEntity* GetClientEntity(DWORD* pGameInterface);
     uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
-    CVehicle*  AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
+    CVehicle* AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
 
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
     DWORD GetVehiclePoolIndex(std::uint8_t* pInterfacee);

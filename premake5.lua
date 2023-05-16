@@ -43,6 +43,7 @@ workspace "MTASA"
 	characterset "MBCS"
 	pic "On"
 	symbols "On"
+	flags "MultiProcessorCompile"
 
 	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
@@ -94,6 +95,9 @@ workspace "MTASA"
 
 		filter { "system:linux" }
 			linkoptions { "-s" }
+	else
+		filter "system:windows"
+			defaultplatform "x86"
 	end
 
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
@@ -137,6 +141,7 @@ workspace "MTASA"
 		include "Client/gui"
 		include "Client/launch"
 		include "Client/loader"
+		include "Client/loader-proxy"
 		include "Client/multiplayer_sa"
 		include "Client/mods/deathmatch"
 

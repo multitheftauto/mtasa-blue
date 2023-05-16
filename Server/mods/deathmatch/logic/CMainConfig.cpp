@@ -1440,6 +1440,7 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 50, 1500, 4000, "lightweight_sync_interval", &g_TickRateSettings.iLightSync, &CMainConfig::OnTickRateChange},
         {true, true, 50, 500, 4000, "camera_sync_interval", &g_TickRateSettings.iCamSync, &CMainConfig::OnTickRateChange},
         {true, true, 50, 400, 4000, "ped_sync_interval", &g_TickRateSettings.iPedSync, &CMainConfig::OnTickRateChange},
+        {true, true, 50, 2000, 4000, "ped_far_sync_interval", &g_TickRateSettings.iPedFarSync, NULL},
         {true, true, 50, 400, 4000, "unoccupied_vehicle_sync_interval", &g_TickRateSettings.iUnoccupiedVehicle, &CMainConfig::OnTickRateChange},
         {true, true, 50, 100, 4000, "keysync_mouse_sync_interval", &g_TickRateSettings.iKeySyncRotation, &CMainConfig::OnTickRateChange},
         {true, true, 50, 100, 4000, "keysync_analog_sync_interval", &g_TickRateSettings.iKeySyncAnalogMove, &CMainConfig::OnTickRateChange},

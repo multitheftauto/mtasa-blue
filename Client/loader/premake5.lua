@@ -23,6 +23,7 @@ project "Loader"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
+	forceincludes { "StdInc.h" }
 
 	vpaths {
 		["Headers/*"] = "**.h",

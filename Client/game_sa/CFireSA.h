@@ -36,7 +36,7 @@ public:
     float               Strength;
     signed char         nNumGenerationsAllowed;
     BYTE                RemovalDist;
-    FxSystem_c* 		m_fxSysPtr;
+    FxSystem_c*         m_fxSysPtr;
 };
 
 class CFireSA : public CFire
@@ -45,23 +45,23 @@ private:
     CFireSAInterface* internalInterface;
 
 public:
-    CFireSA(CFireSAInterface* fireInterface) { this->internalInterface = fireInterface; }
+    CFireSA(CFireSAInterface* fireInterface) { internalInterface = fireInterface; }
 
-    void            Extinguish();
-    CVector*        GetPosition();
-    void            SetPosition(CVector& vecPosition);
-    void            SetTimeToBurnOut(DWORD dwTime);
-    DWORD           GetTimeToBurnOut();
-    CEntity*        GetCreator();
-    CEntity*        GetEntityOnFire();
-    void            SetTarget(CEntity* entity);
-    bool            IsIgnited();
-    bool            IsFree();
-    void            SetSilent(bool bSilent);
-    bool            IsBeingExtinguished();
-    void            Ignite();
-    float           GetStrength();
-    void            SetStrength(float fStrength);
-    void            SetNumGenerationsAllowed(char generations);
-    CFireSAInterface* GetInterface() { return this->internalInterface; }
+    void              Extinguish();
+    CVector*          GetPosition();
+    void              SetPosition(CVector& vecPosition);
+    void              SetTimeToBurnOut(DWORD dwTime);
+    DWORD             GetTimeToBurnOut();
+    CEntity*          GetCreator();
+    CEntity*          GetEntityOnFire();
+    void              SetTarget(CEntity* entity);
+    bool              IsIgnited();
+    bool              IsFree();
+    void              SetSilent(bool bSilent);
+    bool              IsBeingExtinguished();
+    void              Ignite();
+    float             GetStrength();
+    void              SetStrength(float fStrength);
+    void              SetNumGenerationsAllowed(char generations);
+    CFireSAInterface* GetInterface() { return internalInterface; }
 };

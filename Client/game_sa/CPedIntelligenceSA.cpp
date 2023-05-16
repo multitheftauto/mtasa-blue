@@ -17,20 +17,20 @@
 
 CPedIntelligenceSA::CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped)
 {
-    this->internalInterface = pedIntelligenceSAInterface;
     this->ped = ped;
+    internalInterface = pedIntelligenceSAInterface;
     CTaskManagerSAInterface* pTaskManagerInterface = (CTaskManagerSAInterface*)&(pedIntelligenceSAInterface->taskManager);
-    this->TaskManager = new CTaskManagerSA(pTaskManagerInterface, this->ped);
+    TaskManager = new CTaskManagerSA(pTaskManagerInterface, ped);
 }
 
 CPedIntelligenceSA::~CPedIntelligenceSA()
 {
-    delete this->TaskManager;
+    delete TaskManager;
 }
 
 CTaskManager* CPedIntelligenceSA::GetTaskManager()
 {
-    return this->TaskManager;
+    return TaskManager;
 }
 
 bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)

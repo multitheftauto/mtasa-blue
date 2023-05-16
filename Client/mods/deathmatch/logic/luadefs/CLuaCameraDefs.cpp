@@ -27,8 +27,8 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraTarget", GetCameraTarget},
         {"getCameraInterior", GetCameraInterior},
         {"getCameraGoggleEffect", GetCameraGoggleEffect},
-        {"getCameraShakeLevel", GetCameraShakeLevel},
         {"getCameraFieldOfView", GetCameraFieldOfView},
+        {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
 
         // Cam set funcs
         {"setCameraMatrix", SetCameraMatrix},
@@ -40,7 +40,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraClip", GetCameraClip},
         {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
-        {"setCameraShakeLevel", SetCameraShakeLevel},
+        {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
     };
 
     // Add functions
@@ -190,18 +190,9 @@ int CLuaCameraDefs::GetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::GetCameraShakeLevel(lua_State* luaVM)
+unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
 {
-    //  int getCameraShakeLevel ()
-    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-    if (pPlayerInfo)
-    {
-        lua_pushnumber(luaVM, pPlayerInfo->GetCamDrunkLevel());
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
 }
 
 int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
@@ -506,34 +497,15 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::SetCameraShakeLevel(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
 {
-    //  bool setCameraShakeLevel ( int level )
-    int              drunkLevel;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(drunkLevel);
+    if (drunkLevel < 0 || drunkLevel > 255)
+        throw std::invalid_argument("Invalid range (0-255)");
 
-    if (!argStream.HasErrors())
-    {
-        if (drunkLevel >= 0 && drunkLevel <= 255)
-        {
-            CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-            if (pPlayerInfo)
-            {
-                pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(drunkLevel));
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            argStream.SetCustomError("Invalid range (0-255)");
-    }
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
+    pPlayerInfo->SetCamDrunkLevel(drunkLevel);
 
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return true;
 }
 
 int CLuaCameraDefs::OOP_GetCameraPosition(lua_State* luaVM)

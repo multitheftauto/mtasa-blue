@@ -16,11 +16,7 @@
 #include "CDoorSA.h"
 #include "CVehicleSA.h"
 
-#define FUNC_CAutomobile_BurstTyre                  0x6A32B0
-#define FUNC_CAutomobile_BreakTowLink               0x6A4400
-#define FUNC_CAutomobile_IsComponentPresent         0x6A2250
 #define FUNC_CAutomobile_SetTaxiLight               0x6A3740
-#define FUNC_CAutomobile_SpawnFlyingComponent       0x6A8580
 
 #define MAX_PASSENGER_COUNT     8
 #define MAX_DOORS               6 // also in CDamageManager
@@ -163,19 +159,9 @@ static_assert(sizeof(CAutomobileSAInterface) == 0x988, "Invalid size for CAutomo
 
 class CAutomobileSA : public virtual CAutomobile, public virtual CVehicleSA
 {
-private:
-    CDoorSA* door[MAX_DOORS];
-
 public:
-    CAutomobileSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
-    CAutomobileSA(CAutomobileSAInterface* automobile);
-    ~CAutomobileSA();
+    CAutomobileSA() = default;
+    CAutomobileSA(CAutomobileSAInterface* pInterface);
 
-    bool BurstTyre(DWORD dwTyreID);
-    bool BreakTowLink();
-
-    bool       IsComponentPresent(int iComponentID);
-    CPhysical* SpawnFlyingComponent(int iCarNodeIndex, int iUnknown);
-
-    CDoor* GetDoor(eDoors doorID);
+    CAutomobileSAInterface* GetAutomobileInterface() { return reinterpret_cast<CAutomobileSAInterface*>(GetInterface()); }
 };

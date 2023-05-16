@@ -8,7 +8,7 @@ memcmp memcmp@GLIBC_2.0
 memcpy memcpy@GLIBC_2.0
 powf powf@GLIBC_2.0
 log log@GLIBC_2.0
+log2 log2@GLIBC_2.1
 pow pow@GLIBC_2.0
 exp exp@GLIBC_2.0
-fcntl64 fcntl@GLIBC_2.0
 fcntl fcntl@GLIBC_2.0

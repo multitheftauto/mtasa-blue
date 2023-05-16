@@ -33,7 +33,7 @@ CRadarSA::~CRadarSA()
 CMarker* CRadarSA::CreateMarker(CVector* vecPosition)
 {
     CMarkerSA* marker;
-    marker = (CMarkerSA*)this->GetFreeMarker();
+    marker = (CMarkerSA*)GetFreeMarker();
     if (marker)
     {
         marker->Init();

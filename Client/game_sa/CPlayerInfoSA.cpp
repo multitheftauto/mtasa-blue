@@ -15,7 +15,7 @@
 CWanted* CPlayerInfoSA::GetWanted()
 {
     if (!wanted)
-        wanted = new CWantedSA(this->internalInterface->PlayerPedData.m_Wanted);
+        wanted = new CWantedSA(internalInterface->PlayerPedData.m_Wanted);
 
     return wanted;
 }
@@ -44,7 +44,7 @@ void CPlayerInfoSA::SetPlayerMoney(long lMoney, bool bInstant)
 
 float CPlayerInfoSA::GetFPSMoveHeading()
 {
-    return this->GetInterface()->PlayerPedData.m_fFPSMoveHeading;
+    return GetInterface()->PlayerPedData.m_fFPSMoveHeading;
 }
 
 void CPlayerInfoSA::SetDoesNotGetTired(bool bDoesNotGetTired)

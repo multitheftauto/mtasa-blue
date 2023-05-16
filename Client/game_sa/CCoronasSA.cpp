@@ -31,20 +31,20 @@ CCoronasSA::~CCoronasSA()
 
 CRegisteredCorona* CCoronasSA::GetCorona(DWORD ID)
 {
-    return (CRegisteredCorona*)this->Coronas[ID];
+    return (CRegisteredCorona*)Coronas[ID];
 }
 
 CRegisteredCorona* CCoronasSA::CreateCorona(DWORD Identifier, CVector* position)
 {
     CRegisteredCoronaSA* corona;
-    corona = (CRegisteredCoronaSA*)this->FindCorona(Identifier);
+    corona = (CRegisteredCoronaSA*)FindCorona(Identifier);
 
     if (!corona)
-        corona = (CRegisteredCoronaSA*)this->FindFreeCorona();
+        corona = (CRegisteredCoronaSA*)FindFreeCorona();
 
     if (corona)
     {
-        RwTexture* texture = this->GetTexture((eCoronaType)CORONATYPE_SHINYSTAR);
+        RwTexture* texture = GetTexture((eCoronaType)CORONATYPE_SHINYSTAR);
         if (texture)
         {
             corona->Init(Identifier);

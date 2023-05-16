@@ -12,12 +12,8 @@
 #include "StdInc.h"
 #include "CMonsterTruckSA.h"
 
-CMonsterTruckSA::CMonsterTruckSA(CMonsterTruckSAInterface* monstertruck) : CAutomobileSA(monstertruck)
+CMonsterTruckSA::CMonsterTruckSA(CMonsterTruckSAInterface* pInterface)
 {
-    this->m_pInterface = monstertruck;
-}
-
-CMonsterTruckSA::CMonsterTruckSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2)
-    : CAutomobileSA(dwModelID, ucVariation, ucVariation2)
-{
+    SetInterface(pInterface);
+    Init();
 }

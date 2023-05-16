@@ -20,10 +20,10 @@
 CTaskSimpleDuckSA::CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck, short nUseShotsWhizzingEvents)
 {
     DWORD dwFunc = FUNC_CTaskSimpleDuck__Constructor;
-    this->CreateTaskInterface(sizeof(CTaskSimpleDuckSAInterface));
+    CreateTaskInterface(sizeof(CTaskSimpleDuckSAInterface));
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     _asm
     {
         mov     ecx, dwThisInterface

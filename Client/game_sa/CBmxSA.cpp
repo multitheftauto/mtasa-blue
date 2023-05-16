@@ -12,11 +12,8 @@
 #include "StdInc.h"
 #include "CBmxSA.h"
 
-CBmxSA::CBmxSA(CBmxSAInterface* bmx)
+CBmxSA::CBmxSA(CBmxSAInterface* pInterface)
 {
-    this->m_pInterface = bmx;
-}
-
-CBmxSA::CBmxSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CBikeSA(dwModelID, ucVariation, ucVariation2)
-{
+    SetInterface(pInterface);
+    Init();
 }

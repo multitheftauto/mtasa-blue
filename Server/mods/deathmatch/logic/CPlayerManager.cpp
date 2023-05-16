@@ -336,20 +336,9 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 
     switch (model)
     {
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 8:
-        case 42:
-        case 65:
-        case 74:
-        case 86:
-        case 119:
+        case 74:            // Missing skin
         case 149:
         case 208:
-        case 273:
-        case 289:
             return false;
         default:
             return true;

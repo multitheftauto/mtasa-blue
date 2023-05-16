@@ -40,7 +40,6 @@ CTaskSA::~CTaskSA()
 // alocate memory for the task (ammount nSize)
 void CTaskSA::CreateTaskInterface(size_t nSize)
 {
-
     // Safety margin. I see GTA allocate more than we do for some tasks. We could create
     // crashes by not allocating enough. Better to potentially waste 12 bytes.
     nSize = nSize + 12;
@@ -61,8 +60,8 @@ void CTaskSA::CreateTaskInterface(size_t nSize)
 
 CTask* CTaskSA::Clone()
 {
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = this->GetInterface()->VTBL->Clone;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = GetInterface()->VTBL->Clone;
     DWORD dwReturn = 0;
     _asm
     {
@@ -77,16 +76,16 @@ void CTaskSA::SetParent(CTask* pParent)
 {
     UCTask unionTask;
     unionTask.pTask = pParent;
-    this->GetInterface()->m_pParent = unionTask.pTaskSA->GetInterface();
-    this->Parent = unionTask.pTaskSA;
+    GetInterface()->m_pParent = unionTask.pTaskSA->GetInterface();
+    Parent = unionTask.pTaskSA;
 }
 
 CTask* CTaskSA::GetSubTask()
 {
     static CTaskManagementSystemSA* s_pTaskManagementSystem = pGame->GetTaskManagementSystem();
 
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = this->GetInterface()->VTBL->GetSubTask;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = GetInterface()->VTBL->GetSubTask;
     DWORD dwReturn = 0;
     _asm
     {
@@ -99,8 +98,8 @@ CTask* CTaskSA::GetSubTask()
 
 bool CTaskSA::IsSimpleTask()
 {
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = this->GetInterface()->VTBL->IsSimpleTask;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = GetInterface()->VTBL->IsSimpleTask;
     bool  bReturn = 0;
     _asm
     {
@@ -113,7 +112,7 @@ bool CTaskSA::IsSimpleTask()
 
 int CTaskSA::GetTaskType()
 {
-    CTaskSAInterface* pTaskInterface = this->GetInterface();
+    CTaskSAInterface* pTaskInterface = GetInterface();
 
     DWORD dwFunc = pTaskInterface->VTBL->GetTaskType;
     int   iReturn = 9999;
@@ -135,8 +134,8 @@ int CTaskSA::GetTaskType()
  */
 void CTaskSA::StopTimer(const CEvent* pEvent)
 {
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = this->GetInterface()->VTBL->StopTimer;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = GetInterface()->VTBL->StopTimer;
     if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
@@ -153,14 +152,13 @@ void CTaskSA::StopTimer(const CEvent* pEvent)
  */
 bool CTaskSA::MakeAbortable(CPed* pPed, const int iPriority, const CEvent* pEvent)
 {
-
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
         return false;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = this->GetInterface()->VTBL->MakeAbortable;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = GetInterface()->VTBL->MakeAbortable;
     bool  bReturn = 0;
     if (dwFunc != 0x82263A && dwFunc)            // 82263A = purecall
     {
@@ -191,13 +189,12 @@ const char* CTaskSA::GetTaskName()
 
 void CTaskSA::Destroy()
 {
-
     if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
         return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
     m_bBeingDestroyed = true;
 
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = this->GetInterface()->VTBL->DeletingDestructor;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = GetInterface()->VTBL->DeletingDestructor;
     if (dwFunc)
     {
         _asm
@@ -209,7 +206,7 @@ void CTaskSA::Destroy()
     }
 
     /*dwFunc = FUNC_CTask__Operator_Delete;
-    DWORD thisInterface = (DWORD)this->GetInterface();
+    DWORD thisInterface = (DWORD)GetInterface();
     if ( thisInterface )
     {
         _asm
@@ -225,7 +222,6 @@ void CTaskSA::Destroy()
 
 void CTaskSA::DestroyJustThis()
 {
-
     if (m_bBeingDestroyed)            // we want to make sure we don't delete this twice or we get crashes :)
         return;                       // our hook in CTaskManagementSystem will try to delete this otherwise
     m_bBeingDestroyed = true;
@@ -249,14 +245,13 @@ void CTaskSA::SetAsSecondaryPedTask(CPed* pPed, const int iType)
 
 bool CTaskSimpleSA::ProcessPed(CPed* pPed)
 {
-
     CPedSA* pPedSA = dynamic_cast<CPedSA*>(pPed);
     if (!pPedSA)
         return false;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = ((TaskSimpleVTBL*)this->GetInterface()->VTBL)->ProcessPed;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = ((TaskSimpleVTBL*)GetInterface()->VTBL)->ProcessPed;
     bool  bReturn = 0;
     if (dwFunc != 0x82263A && dwFunc)
     {
@@ -278,8 +273,8 @@ bool CTaskSimpleSA::SetPedPosition(CPed* pPed)
         return false;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = ((TaskSimpleVTBL*)this->GetInterface()->VTBL)->SetPedPosition;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = ((TaskSimpleVTBL*)GetInterface()->VTBL)->SetPedPosition;
     bool  bReturn = 0;
     if (dwFunc != 0x82263A && dwFunc)
     {
@@ -314,8 +309,8 @@ void CTaskComplexSA::SetSubTask(CTask* pSubTask)
             this->m_pSubTask = pSubTask;*/
 
     DWORD dwTaskInterface = (DWORD)pSubTask->GetInterface();
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->SetSubTask;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = ((TaskComplexVTBL*)GetInterface()->VTBL)->SetSubTask;
     if (dwFunc != 0x82263A && dwFunc)
     {
         _asm
@@ -334,8 +329,8 @@ CTask* CTaskComplexSA::CreateNextSubTask(CPed* pPed)
         return NULL;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->CreateNextSubTask;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = ((TaskComplexVTBL*)GetInterface()->VTBL)->CreateNextSubTask;
     DWORD dwReturn = 0;
     if (dwFunc != 0x82263A && dwFunc)
     {
@@ -357,8 +352,8 @@ CTask* CTaskComplexSA::CreateFirstSubTask(CPed* pPed)
         return NULL;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->CreateFirstSubTask;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = ((TaskComplexVTBL*)GetInterface()->VTBL)->CreateFirstSubTask;
     DWORD dwReturn = 0;
     if (dwFunc != 0x82263A && dwFunc)
     {
@@ -380,8 +375,8 @@ CTask* CTaskComplexSA::ControlSubTask(CPed* pPed)
         return NULL;
 
     DWORD dwPedInterface = (DWORD)pPedSA->GetInterface();
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
-    DWORD dwFunc = ((TaskComplexVTBL*)this->GetInterface()->VTBL)->ControlSubTask;
+    DWORD dwThisInterface = (DWORD)GetInterface();
+    DWORD dwFunc = ((TaskComplexVTBL*)GetInterface()->VTBL)->ControlSubTask;
     DWORD dwReturn = 0;
     if (dwFunc != 0x82263A && dwFunc)
     {

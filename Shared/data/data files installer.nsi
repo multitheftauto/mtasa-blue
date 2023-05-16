@@ -5,7 +5,6 @@
 !include Sections.nsh
 !include UAC.nsh
 
-XPStyle on
 RequestExecutionLevel user
 SetCompressor /SOLID /FINAL lzma
 
@@ -17,8 +16,8 @@ Var Install_Dir
 
 !ifndef MAJOR_VER
     !define MAJOR_VER "1"
-    !define MINOR_VER "5"
-    !define MAINT_VER "9"
+    !define MINOR_VER "6"
+    !define MAINT_VER "0"
 !endif
 !define 0.0 "${MAJOR_VER}.${MINOR_VER}"
 !define 0.0.0 "${MAJOR_VER}.${MINOR_VER}.${MAINT_VER}"
@@ -168,6 +167,24 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\Default 2023"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\Default 2023\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\GWEN Blue"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Blue\CGUI.xml"
+
+	SetOutPath "$INSTDIR\skins\GWEN Orange"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.is.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.lnf.xml"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.png"
+    File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.xml"
 	
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
