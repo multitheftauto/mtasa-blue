@@ -47,9 +47,8 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
 
 bool CLuaEventPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    unsigned short usNameLength = static_cast<unsigned short>(m_strName.length());
-    BitStream.WriteCompressed(usNameLength);
-    BitStream.WriteStringCharacters(m_strName, usNameLength);
+    BitStream.WriteCompressed(static_cast<unsigned short>(m_strName.length()));
+    BitStream.WriteStringCharacters(m_strName);
     BitStream.Write(m_ElementID);
     m_pArguments->WriteToBitStream(BitStream);
 

@@ -104,7 +104,7 @@ public:
     static bool SetElementHealth(CElement* pElement, float fHealth);
     static bool SetElementModel(CElement* pElement, unsigned short usModel);
     static bool SetElementAttachedOffsets(CElement* pElement, CVector& vecPosition, CVector& vecRotation);
-    static bool SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable = true);
+    static bool SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable = true, bool bPersist = false);
     static bool SetElementCollisionsEnabled(CElement* pElement, bool bEnable);
     static bool SetElementFrozen(CElement* pElement, bool bFrozen);
     static bool SetLowLodElement(CElement* pElement, CElement* pLowLodElement);
@@ -411,6 +411,7 @@ public:
     // Object get functions
     static bool GetObjectRotation(CObject* pObject, CVector& vecRotation);
     static bool IsObjectVisibleInAllDimensions(CElement* pElement);
+    static bool IsObjectBreakable(CElement* pElement);
 
     // Object set functions
     static bool SetObjectRotation(CElement* pElement, const CVector& vecRotation);
@@ -419,6 +420,7 @@ public:
                            CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot);
     static bool StopObject(CElement* pElement);
     static bool SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, unsigned short usNewDimension = 0);
+    static bool SetObjectBreakable(CElement* pElement, const bool bBreakable);
 
     // Radar area create/destroy funcs
     static CRadarArea* CreateRadarArea(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize, const SColor color, CElement* pVisibleTo);
