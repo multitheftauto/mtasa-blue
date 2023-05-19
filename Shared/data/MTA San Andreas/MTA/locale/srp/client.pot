@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-12 19:40+0000\n"
-"PO-Revision-Date: 2023-05-19 18:06\n"
+"PO-Revision-Date: 2023-05-19 19:06\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -1845,7 +1845,7 @@ msgid "player"
 msgid_plural "players"
 msgstr[0] "igrač"
 msgstr[1] "igrači"
-msgstr[2] ""
+msgstr[2] "igrači"
 
 #: Client/core/ServerBrowser/CServerList.cpp:151
 msgid "on"
@@ -1854,9 +1854,9 @@ msgstr "na"
 #: Client/core/ServerBrowser/CServerList.cpp:154
 msgid "server"
 msgid_plural "servers"
-msgstr[0] ""
+msgstr[0] "server"
 msgstr[1] "serveri"
-msgstr[2] ""
+msgstr[2] "servera"
 
 #. We are polling for the master server list (first pass)
 #: Client/core/ServerBrowser/CServerList.cpp:238
@@ -2461,11 +2461,11 @@ msgstr "Informacije o greški"
 
 #: Client/loader/Dialogs.cpp:153
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr ""
+msgstr "Obeležite polje da pošaljete ovu informaciju o greški MTA programerima koristeći 'internet'"
 
 #: Client/loader/Dialogs.cpp:154
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr ""
+msgstr "Radeći ovo povećava verovatnoću da će se greška popraviti."
 
 #: Client/loader/Dialogs.cpp:155
 msgid "Do you want to restart MTA: San Andreas ?"
@@ -2477,28 +2477,29 @@ msgstr "MTA: San Andreas - Upozorenje"
 
 #: Client/loader/Dialogs.cpp:163
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Vaš Grand Theft Auto: San Andreas direktorijum instalacije sadrži ove datoteke:"
 
 #: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Ove datoteke nisu neophodne i možda naprave smetnju sa grafikom u ovoj verziji MTA:SA.\n\n"
+"Preporučuje se da obrišete ili preimenujete ove datoteke."
 
 #: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Koristi ove datoteke, ali mi takođe pokaži ovo upozorenje pri sledećem paljenju"
 
 #: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Nemoj me više podsećati na ove datoteke"
 
 #: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Preimenujte ove datoteke sa *.dll na *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
-msgstr ""
+msgstr "Prikažite mi ove datoteke"
 
 #: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
@@ -2506,7 +2507,7 @@ msgstr "Igraj MTA:SA"
 
 #: Client/loader/Dialogs.cpp:177
 msgid "MTA: San Andreas - Confusing options"
-msgstr ""
+msgstr "MTA: San Andreas - Zbunjujuće postavke"
 
 #: Client/loader/Dialogs.cpp:178
 msgid "NVidia Optimus detected!"
@@ -2526,23 +2527,23 @@ msgstr "B - Alternate NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Standard Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Alternate Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
-msgstr ""
+msgstr "Ako budete očajni, ovo će možda pomoći:"
 
 #: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
-msgstr ""
+msgstr "Ako ste već izabrali postavku koja radi, ovo će možda pomoći:"
 
 #: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
-msgstr ""
+msgstr "Prisilite režim prozora"
 
 #: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
@@ -2554,7 +2555,7 @@ msgstr "MTA: San Andreas"
 
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
-msgstr ""
+msgstr "Upozorenje: Nismo detektovali anti-virus proizvod"
 
 #: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
@@ -2584,14 +2585,16 @@ msgstr "Raspakivanje datoteka..."
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Nepoznato"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Datoteka %s je trenutno zaključana od strane %zu procesa.\n\n"
+"Da li želite da obustavite sledeće procese i nastavite ažuriranje?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -2599,7 +2602,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Moguće da je vaša instalacija sada neispravna.\n\n"
+"%zu od %zu datoteki nisu moguće vratiti iz rezervnih kopija.\n\n"
+"Trebalo bi reinstalirati Multi Theft Auto od www.multitheftauto.com\n"
+"ili probajte pokrenuti ažuriranje sa administrativnim pravima."
 
 #: Client/game_sa/CSettingsSA.cpp:804
 msgid "Can't find valid screen resolution."
@@ -2653,7 +2659,7 @@ msgstr "prethodni radio kanal"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr ""
+msgstr "omogućuje radarski pogled"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
@@ -2681,7 +2687,7 @@ msgstr "pomeranje radara zapadno"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
-msgstr ""
+msgstr "spaja radar"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
@@ -2709,12 +2715,12 @@ msgstr "promena na prethodno oružje dok ste u vozilu"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "prikazuje info o trenutnom serveru"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr ""
+msgstr "definiše skalu množenja svih text-displeja"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
@@ -2817,7 +2823,8 @@ msgstr "Isključenje: Previše ljudi se uključuje. Molimo sačekajte minut, pa 
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr ""
+msgstr "Isključen: Server sa druge verzije.\n"
+"Informacije: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
 #, c-format
@@ -2904,7 +2911,7 @@ msgstr "Ovaj server ne dozvoljava virtualne mašine"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "Ovaj server zahteva potpisivanje drajvera da bude omogućeno"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
 msgid "Please restart your PC"
@@ -2944,7 +2951,7 @@ msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d dan"
 msgstr[1] "%d dana"
-msgstr[2] ""
+msgstr[2] "%d dana"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
 #, c-format
@@ -2952,7 +2959,7 @@ msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d sat"
 msgstr[1] "%d sati"
-msgstr[2] ""
+msgstr[2] "%d sati"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
 #, c-format
@@ -2960,7 +2967,7 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minut"
 msgstr[1] "%d minuta"
-msgstr[2] ""
+msgstr[2] "%d minuta"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
 #, c-format
@@ -2968,7 +2975,7 @@ msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d sekunda"
 msgstr[1] "%d sekundi"
-msgstr[2] ""
+msgstr[2] "%d sekundi"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
@@ -2981,7 +2988,7 @@ msgstr "Ulazak u igru ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr ""
+msgstr "Nije povezano; molimo koristite Brzo Povezivanje ili 'poveži' komandu da se povežete na server."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:708
 msgid "The server is not installed"
@@ -3027,7 +3034,7 @@ msgstr "Isključenje: uneta nevažeća lozinka"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1281
 msgid "MTA Client verification failed!"
-msgstr ""
+msgstr "MTA Klijent verifikacija nije uspela!"
 
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 msgid "Could not start the local server. See console for details."
@@ -3051,7 +3058,7 @@ msgstr "Napredak preuzimanja:"
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:105
 #, c-format
 msgid "%s of %s"
-msgstr ""
+msgstr "%s od %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
@@ -3084,5 +3091,6 @@ msgstr "Multi Theft Auto nije pravilno instaliran, molimo vas da ga ponovo insta
 #: Shared/sdk/SharedUtil.Misc.hpp:702
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr ""
+msgstr "Vaš pretraživač će upravo prikazati stranicu sa informacijama o pomoći.\n\n"
+"(Ako stranica nije uspela da se očita, nalepite (CTRL-V) URL u vaš pretraživač)"
 
