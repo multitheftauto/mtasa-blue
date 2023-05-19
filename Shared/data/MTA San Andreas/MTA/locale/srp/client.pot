@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-12 19:40+0000\n"
-"PO-Revision-Date: 2023-05-12 20:37\n"
+"PO-Revision-Date: 2023-05-19 18:06\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -20,7 +20,7 @@ msgstr ""
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1381
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "Problem sa grafičkim drajverom"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -180,7 +180,7 @@ msgstr "Dozvoli upload ekrana"
 
 #: Client/core/CSettings.cpp:381
 msgid "Allow external sounds"
-msgstr ""
+msgstr "Dozvoli spoljne zvukove"
 
 #: Client/core/CSettings.cpp:386
 msgid "Always show download window"
@@ -331,7 +331,7 @@ msgstr "Prozor"
 
 #: Client/core/CSettings.cpp:637
 msgid "DPI aware"
-msgstr ""
+msgstr "DPI svestan"
 
 #: Client/core/CSettings.cpp:645 Client/core/CSettings.cpp:987
 #: Client/loader/MainFunctions.cpp:388
@@ -431,11 +431,11 @@ msgstr "Dimljenje guma itd"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dinamične senke pešaka"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Pokretno mućenje"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -459,15 +459,15 @@ msgstr "Render pešaka uvek u visokim detaljima"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Corona kišne reflekcije"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
-msgstr ""
+msgstr "Omogućiti udaljene webstranice"
 
 #: Client/core/CSettings.cpp:898
 msgid "Enable Javascript on remote websites"
-msgstr ""
+msgstr "Omogućiti Javascript na udaljenim webstranicama"
 
 #: Client/core/CSettings.cpp:903
 msgid "Custom blacklist"
@@ -525,13 +525,13 @@ msgstr "Jedna konekcija:"
 #: Client/core/CSettings.cpp:986 Client/core/CSettings.cpp:1034
 #: Client/core/CSettings.cpp:4718
 msgid "Packet tag:"
-msgstr ""
+msgstr "Paket tag:"
 
 #. Progress animation
 #: Client/core/CSettings.cpp:987 Client/core/CSettings.cpp:1047
 #: Client/core/CSettings.cpp:4720
 msgid "Progress animation:"
-msgstr ""
+msgstr "Animacija napredka:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:987 Client/core/CSettings.cpp:1060
@@ -612,7 +612,7 @@ msgstr "16-bitna boja"
 
 #: Client/core/CSettings.cpp:1133
 msgid "Mouse fix"
-msgstr ""
+msgstr "Popravka miša"
 
 #. Cache path info
 #: Client/core/CSettings.cpp:1151
@@ -844,15 +844,15 @@ msgstr "Završi nadimak koristeći \"Tab\" dugme"
 
 #: Client/core/CSettings.cpp:2333
 msgid "Allow server to flash the window"
-msgstr ""
+msgstr "Dozvoli server da blica prozor"
 
 #: Client/core/CSettings.cpp:2338
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "Dozvoli tray balon notifikacije"
 
 #: Client/core/CSettings.cpp:2343
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "Ćaskanje tekst crno/beli ocrt"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -982,7 +982,7 @@ msgstr "Neke skripte mogu puštati zvukove, kao na primer radio, sa interneta.\n
 
 #: Client/core/CSettings.cpp:4472
 msgid "EXTERNAL SOUNDS"
-msgstr ""
+msgstr "SPOLJAŠNJI ZVUKOVI"
 
 #: Client/core/CSettings.cpp:4493
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -1003,11 +1003,13 @@ msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr ""
+msgstr "Omogućavanje DPI svesnosti je eksperimentalna odlika i preporučujemo je samo kada igrate MTA:SA na skaliranom monitoru.\n"
+"Možete iskusiti problema sa grafikom ako omogućite ovu opciju.\n\n"
+"Da li ste sigurni da želite da omogućite ovu opciju?"
 
 #: Client/core/CSettings.cpp:4548
 msgid "EXPERIMENTAL FEATURE"
-msgstr ""
+msgstr "EKSPERIMENTALNA ODLIKA"
 
 #: Client/core/CSettings.cpp:4691
 msgid "Please enter a nickname"
@@ -1037,11 +1039,11 @@ msgstr "Uključite da koristite samo jednu konekciju prilikom skidanja."
 
 #: Client/core/CSettings.cpp:4718
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr ""
+msgstr "Tagujte mrežne pakete da pomognete ISP-ovima da identifikuju MTA saobraćaj."
 
 #: Client/core/CSettings.cpp:4720
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr ""
+msgstr "Okretajući krug animacija na donjem delu ekrana"
 
 #: Client/core/CSettings.cpp:4722
 msgid "Select default always. (This setting is not saved)"
@@ -1069,15 +1071,15 @@ msgstr "16-bitna boja:"
 
 #: Client/core/CSettings.cpp:4730
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr ""
+msgstr "Omogući 16-bitni režim boja - Zahteva MTA restart"
 
 #: Client/core/CSettings.cpp:4732
 msgid "Mouse fix:"
-msgstr ""
+msgstr "Popravka miša:"
 
 #: Client/core/CSettings.cpp:4732
 msgid "Mouse movement fix - May need PC restart"
-msgstr ""
+msgstr "Popravka pokretnja miša - Možda zahteva PC restart"
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
@@ -1094,12 +1096,12 @@ msgstr "Srpski"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr ""
+msgstr "Da li želite potražiti pomoć online u vezi ovog problema ?"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "NOVOSTI"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
@@ -1276,7 +1278,7 @@ msgstr "Prikazuje tempiranje frejmova"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "za programere: osveži novosti"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
@@ -1543,11 +1545,11 @@ msgstr "Specijalno hvala"
 
 #: Client/core/CCredits.cpp:258
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "Ovaj softver koristi sledeće biblioteke i softver:"
 
 #: Client/core/CMainMenu.cpp:321
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr ""
+msgstr "Koristite feature-branch build! Ovo je samo test build koji ne može da se koristi za povezivanje na javne servere!"
 
 #: Client/core/CMainMenu.cpp:340
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
@@ -2087,7 +2089,7 @@ msgstr "Molimo vas da ukljucite Grand Theft Auto San Andreas"
 
 #: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr ""
+msgstr "Izaberite vaš Grand Theft Auto: San Andreas Instalacioni Direktorijum"
 
 #: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
 #, c-format
@@ -2189,51 +2191,51 @@ msgstr "Multi Theft Auto nije instaliran pravilno,molimo vas ponovo instalirajte
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Napraviti GTA:SA raskrsnice"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA ne može da se pokrene zato što nije uspelo kopiranje datoteke:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA ne može da se pokrene zato što MTA:SA datoteka je netačna ili nedostaje:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Kopiraj MTA:SA datoteke"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA ne može da se pokrene žato što GTA:SA datoteka je netačna ili nedostaje:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Zakrpi GTA:SA zavisnost"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA ne može da se pokrene zato što je GTA:SA izvršna aplikacija netačna ili nedostaje:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Molimo proverite vaš anti-virus za lažno-pozitivne detekcije, pokušajte da dodate izuzetak za GTA:SA izvršnu aplikaciju i restartujte MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Generiši GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA ne može da se pokrene zato što GTA:SA izvršna aplikacija ne može da se učita:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Zakrpi GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA ne može da se pokrene zato što krpljenje GTA:SA nije uspelo:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -2249,7 +2251,7 @@ msgstr "Ažuriranje podešavanja instaliranja"
 
 #: Client/loader/CInstallManager.cpp:1291
 msgid "Update compatibility settings"
-msgstr ""
+msgstr "Ažuriraj opcije kompatibilnosti"
 
 #: Client/loader/MainFunctions.cpp:247
 msgid "Trouble restarting MTA:SA\n\n"
@@ -2309,12 +2311,14 @@ msgstr "Da li imate problema sa MTA:SA?\n\n"
 #: Client/loader/MainFunctions.cpp:387
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr ""
+msgstr "Da li imaš problema sa pokretanjem MTA:SA?.\n\n"
+"Hoćeš da izmeniš sledeču postavku?"
 
 #: Client/loader/MainFunctions.cpp:430
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
-msgstr ""
+msgstr "Da li imaš problem sa pokretanjem MTA:SA?.\n\n"
+"Pokušaj da onemogućis sledeće proizvode za GTA i MTA:"
 
 #: Client/loader/MainFunctions.cpp:464
 msgid "WARNING\n\n"
@@ -2382,21 +2386,26 @@ msgstr "Glavna datoteka ima neispravno ime (%s)"
 #: Client/loader/MainFunctions.cpp:855
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Datoteka podataka je modifikovana. Moguća aktivnost virusa.\n\n"
+"Potražite pomoć online ukoliko MTA ne bude radio ispravno."
 
 #: Client/loader/MainFunctions.cpp:881
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Datoteka podatka %s nedostaje. Moguća aktivnost virusa.\n\n"
+"Razmotri reinstaliranje Multi Theft Auto za vašu bezbednost.\n"
+"Potražite online pomoć ukoliko MTA ne bude radio ispravno."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Datoteka podatka %s je modifikovana Moguća aktivnost virusa.\n\n"
+"Razmotri reinstaliranje Multi Theft Auto za vašu bezbednost.\n"
+"Potražite online pomoć ukoliko MTA ne bude radio ispravno."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2420,22 +2429,23 @@ msgstr "MTA:SA nije kompatibilan sa Windows 'Safe Mode'.\n\n"
 
 #: Client/loader/MainFunctions.cpp:1121
 msgid "Fix configuration issue"
-msgstr ""
+msgstr "Popravi problem sa konfiguracijom"
 
 #. Try to relaunch as admin if not done so already
 #: Client/loader/MainFunctions.cpp:1155
 msgid "Fix elevation required error"
-msgstr ""
+msgstr "Popravi grešku sa tražnjom povišenja"
 
 #: Client/loader/MainFunctions.cpp:1162
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr ""
+msgstr "Nije moguće pokrenuti Grand Theft Auto: San Adnreas.  Molimo probajte restart, ili ako se problem nastavi,kontakirajte MTA na www.multitheftauto.com.\n\n"
+"[%s]"
 
 #: Client/loader/MainFunctions.cpp:1217
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr ""
+msgstr "GTA: San Andreas se nije ispravno pokrenuo. Da li želite da obustavite?"
 
 #: Client/loader/Dialogs.cpp:134
 msgid "Quit"
@@ -2447,7 +2457,7 @@ msgstr "MTA: San Andreas je naišao na problem"
 
 #: Client/loader/Dialogs.cpp:152
 msgid "Crash information"
-msgstr ""
+msgstr "Informacije o greški"
 
 #: Client/loader/Dialogs.cpp:153
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
