@@ -1929,12 +1929,6 @@ int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
 
-    if (pPlayer->IsRedirecting())
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
     if (argStream.NextIsUserData())
     {
         CClient* pResponsible;
@@ -1961,6 +1955,12 @@ int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (pPlayer->IsRedirecting())
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
         if (CStaticFunctionDefinitions::KickPlayer(pPlayer, strResponsible, strReason))
         {
             lua_pushboolean(luaVM, true);

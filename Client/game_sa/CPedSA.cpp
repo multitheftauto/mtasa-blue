@@ -464,9 +464,14 @@ void CPedSA::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
         eWeaponSlot currentSlot = GetCurrentWeaponSlot();
         if (weaponSlot != GetCurrentWeaponSlot())
         {
-            CWeapon* pWeapon = GetWeapon(currentSlot);
-            if (pWeapon)
-                RemoveWeaponModel(pWeapon->GetInfo(WEAPONSKILL_STD)->GetModel());
+            CWeapon* weapon = GetWeapon(currentSlot);
+            if (weapon)
+            {
+                CWeaponInfo* weaponInfo = weapon->GetInfo(WEAPONSKILL_STD);
+
+                if (weaponInfo)
+                    RemoveWeaponModel(weaponInfo->GetModel());
+            }
 
             CPedSAInterface* thisPed = (CPedSAInterface*)GetInterface();
 
