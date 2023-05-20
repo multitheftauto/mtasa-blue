@@ -18,6 +18,7 @@
 #include "CIdArray.h"
 #include "CAccessControlListManager.h"
 #include "Utils.h"
+#include "CMapManager.h"
 
 CAccountManager::CAccountManager(const SString& strDbPathFilename)
     : m_AccountProtect(6, 30000, 60000 * 1)            // Max of 6 attempts per 30 seconds, then 1 minute ignore
@@ -1000,13 +1001,19 @@ void CAccountManager::GetAccountsByData(const SString& dataName, const SString& 
 
 CAccount* CAccountManager::AddGuestAccount(const SString& strName)
 {
-    CAccount* pAccount = new CAccount(this, EAccountType::Guest, strName);
+    CAccount*     pAccount = new CAccount(this, EAccountType::Guest, strName);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
 CAccount* CAccountManager::AddConsoleAccount(const SString& strName)
 {
-    CAccount* pAccount = new CAccount(this, EAccountType::Console, strName);
+    CAccount*     pAccount = new CAccount(this, EAccountType::Console, strName);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
@@ -1014,6 +1021,9 @@ CAccount* CAccountManager::AddPlayerAccount(const SString& strName, const SStrin
                                             const SString& strHttpPassAppend)
 {
     CAccount* pAccount = new CAccount(this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
@@ -1021,6 +1031,9 @@ CAccount* CAccountManager::AddNewPlayerAccount(const SString& strName, const SSt
 {
     CAccount* pAccount = new CAccount(this, EAccountType::Player, strName, strPassword, ++m_iAccounts);
     Save(pAccount);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
@@ -1035,6 +1048,9 @@ bool CAccountManager::RemoveAccount(CAccount* pAccount)
         m_pDatabaseManager->Execf(m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID);
         m_pDatabaseManager->Execf(m_hDbConnection, "DELETE FROM serialusage WHERE userid=?", SQLITE_INTEGER, iUserID);
     }
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountRemove", Arguments);
     delete pAccount;
     return true;
 }
