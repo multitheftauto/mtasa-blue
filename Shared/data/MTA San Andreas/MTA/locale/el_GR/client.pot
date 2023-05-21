@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-12 19:40+0000\n"
-"PO-Revision-Date: 2023-05-12 20:36\n"
+"POT-Creation-Date: 2023-05-21 09:29+0000\n"
+"PO-Revision-Date: 2023-05-21 10:26\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -1118,47 +1118,47 @@ msgstr "Το σώμα που επιλέξατε δεν μπόρεσε να φο�
 msgid "CONSOLE"
 msgstr "Κονσόλα"
 
-#: Client/core/CCommandFuncs.cpp:30
+#: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ ΕΝΤΟΛH ΒΟHΘΕΙΑ ]***\n"
 
-#: Client/core/CCommandFuncs.cpp:168
+#: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* Η ώρα είναι %d:%02d:%02d"
 
-#: Client/core/CCommandFuncs.cpp:252
+#: Client/core/CCommandFuncs.cpp:242
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "Σύνδεση: Η σύνταξη είναι 'connect <host> [<port> <nick> <pass>]'"
 
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
 msgid "connect: Bad port number"
 msgstr "Σύνδεση: Κακός αριθμός θύρας"
 
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
 #, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "Σύνδεση: Συνδέεται στο %s:%u..."
 
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
 #, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "Σύνδεση: δεν μπόρεσε να συνδεθεί στο %s:%u!"
 
-#: Client/core/CCommandFuncs.cpp:291
+#: Client/core/CCommandFuncs.cpp:281
 msgid "connect: Failed to unload current mod"
 msgstr "Σύνδεση: H αποφόρτωση της τροποποίησης ήταν ανεπιτυχής"
 
-#: Client/core/CCommandFuncs.cpp:381
+#: Client/core/CCommandFuncs.cpp:371
 msgid "Bound all controls from GTA"
 msgstr "Δεσμεύτηκαν όλα τα κουμπιά από το GTA"
 
-#: Client/core/CCommandFuncs.cpp:395
+#: Client/core/CCommandFuncs.cpp:385
 msgid "Saved configuration file"
 msgstr "To αρχείο ρυθμίσεων αποθηκεύτηκε"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:461
+#: Client/core/CCommandFuncs.cpp:451
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* Ο σειριακός αριθμός σου είναι: %s"
