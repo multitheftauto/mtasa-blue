@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-12 19:40+0000\n"
-"PO-Revision-Date: 2023-05-12 20:36\n"
+"POT-Creation-Date: 2023-05-21 09:29+0000\n"
+"PO-Revision-Date: 2023-05-21 10:26\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1119,47 +1119,47 @@ msgstr "Выбранная вами графическая тема не мож�
 msgid "CONSOLE"
 msgstr "КОНСОЛЬ"
 
-#: Client/core/CCommandFuncs.cpp:30
+#: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ ПОМОЩЬ ПО КОМАНДАМ ]***\n"
 
-#: Client/core/CCommandFuncs.cpp:168
+#: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* Время: %d:%02d:%02d"
 
-#: Client/core/CCommandFuncs.cpp:252
+#: Client/core/CCommandFuncs.cpp:242
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "Используйте 'connect <адрес> [<порт> <ник> <пароль>]' для подключения"
 
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
 msgid "connect: Bad port number"
 msgstr "подключение: Неверный порт"
 
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
 #, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "Подключение: Подключение к %s:%u..."
 
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
 #, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "Подключение к %s:%u не удалось!"
 
-#: Client/core/CCommandFuncs.cpp:291
+#: Client/core/CCommandFuncs.cpp:281
 msgid "connect: Failed to unload current mod"
 msgstr "подключение: Не удалось выгрузить текущий мод"
 
-#: Client/core/CCommandFuncs.cpp:381
+#: Client/core/CCommandFuncs.cpp:371
 msgid "Bound all controls from GTA"
 msgstr "Скопировать управление из GTA"
 
-#: Client/core/CCommandFuncs.cpp:395
+#: Client/core/CCommandFuncs.cpp:385
 msgid "Saved configuration file"
 msgstr "Файл конфигурации сохранен"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:461
+#: Client/core/CCommandFuncs.cpp:451
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* Ваш серийный номер: %s"
