@@ -397,13 +397,13 @@ public:
     CCameraSAInterface* GetInterface() { return internalInterface; };
     void                TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle);
     void                TakeControl(CVector* position, int CamSwitchStyle);
-    void     Restore();
-    void     RestoreWithJumpCut();
-    CMatrix* GetMatrix(CMatrix* matrix);
-    void     SetMatrix(CMatrix* matrix);
-    void     Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
-    float    Find3rdPersonQuickAimPitch();
-    BYTE     GetActiveCam();
+    void                Restore();
+    void                RestoreWithJumpCut();
+    CMatrix*            GetMatrix(CMatrix* matrix);
+    void                SetMatrix(CMatrix* matrix);
+    void                Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuzzle, CVector* vecSource, CVector* vecTarget);
+    float               Find3rdPersonQuickAimPitch();
+    BYTE                GetActiveCam();
 
     CCam*         GetCam(BYTE bCameraID);
     virtual CCam* GetCam(CCamSAInterface* camInterface);

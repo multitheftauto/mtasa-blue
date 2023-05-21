@@ -32,8 +32,8 @@
 
 enum class ECefThreadState
 {
-    Running = 0, // CEF thread is currently running
-    Wait // CEF thread is waiting for the main thread
+    Running = 0,            // CEF thread is currently running
+    Wait                    // CEF thread is waiting for the main thread
 };
 
 class CWebView : public CWebViewInterface,

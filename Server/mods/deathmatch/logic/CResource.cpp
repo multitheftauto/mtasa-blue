@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 // Show info about where the actual files are coming from
-//#define RESOURCE_DEBUG_MESSAGES
+// #define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
 #include "CResource.h"
@@ -2372,8 +2372,7 @@ ResponseCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse*
 std::string Unescape(std::string_view sv)
 {
     // Converts a character to a hexadecimal value
-    auto toHex = [](char c)
-    {
+    auto toHex = [](char c) {
         if (c >= '0' && c <= '9')
             return c - '0';
         if (c >= 'a' && c <= 'f')

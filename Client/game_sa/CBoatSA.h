@@ -40,6 +40,7 @@ class CBoatSA final : public virtual CBoat, public virtual CVehicleSA
 {
 private:
     CBoatHandlingEntrySA* m_pBoatHandlingData = nullptr;
+
 public:
     CBoatSA(CBoatSAInterface* pInterface);
 

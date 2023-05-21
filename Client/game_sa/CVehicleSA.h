@@ -429,17 +429,17 @@ public:
 
     bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
 
-    CTrainSAInterface*   GetNextCarriageInTrain();
-    CVehicle*            GetNextTrainCarriage();
-    void                 SetNextTrainCarriage(CVehicle* pNext);
-    CTrainSAInterface*   GetPreviousCarriageInTrain();
-    CVehicle*            GetPreviousTrainCarriage();
-    void                 SetPreviousTrainCarriage(CVehicle* pPrevious);
-    float                GetDistanceToCarriage(CVehicle* pCarriage);
-    void                 AttachTrainCarriage(CVehicle* pCarriage);
-    void                 DetachTrainCarriage(CVehicle* pCarriage);
-    bool                 IsChainEngine();
-    void                 SetIsChainEngine(bool bChainEngine = true);
+    CTrainSAInterface* GetNextCarriageInTrain();
+    CVehicle*          GetNextTrainCarriage();
+    void               SetNextTrainCarriage(CVehicle* pNext);
+    CTrainSAInterface* GetPreviousCarriageInTrain();
+    CVehicle*          GetPreviousTrainCarriage();
+    void               SetPreviousTrainCarriage(CVehicle* pPrevious);
+    float              GetDistanceToCarriage(CVehicle* pCarriage);
+    void               AttachTrainCarriage(CVehicle* pCarriage);
+    void               DetachTrainCarriage(CVehicle* pCarriage);
+    bool               IsChainEngine();
+    void               SetIsChainEngine(bool bChainEngine = true);
 
     bool  IsDerailed();
     void  SetDerailed(bool bDerailed);
@@ -475,10 +475,10 @@ public:
     unsigned char GetCurrentGear();
     float         GetGasPedal();
 
-    bool  GetTowBarPos(CVector* pVector, CVehicle* pTrailer = NULL);
-    bool  GetTowHitchPos(CVector* pVector);
-    bool  IsUpsideDown();
-	
+    bool GetTowBarPos(CVector* pVector, CVehicle* pTrailer = NULL);
+    bool GetTowHitchPos(CVector* pVector);
+    bool IsUpsideDown();
+
     CPed* GetDriver();
     CPed* GetPassenger(unsigned char ucSlot);
     bool  IsBeingDriven();
@@ -495,11 +495,11 @@ public:
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
     unsigned char GetAlpha() { return m_ucAlpha; }
 
-    void   SetLandingGearDown(bool bLandingGearDown);
-    float  GetLandingGearPosition();
-    void   SetLandingGearPosition(float fPosition);
-    bool   IsLandingGearDown();
-    void   Fix();
+    void  SetLandingGearDown(bool bLandingGearDown);
+    float GetLandingGearPosition();
+    void  SetLandingGearPosition(float fPosition);
+    bool  IsLandingGearDown();
+    void  Fix();
 
     void BlowUp(CEntity* pCreator, unsigned long ulUnknown);
 
@@ -598,7 +598,7 @@ public:
     void SetGravity(const CVector* pvecGravity);
 
     SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
-    void   SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
+    void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
     CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
@@ -622,13 +622,13 @@ public:
     {
         m_tSirenInfo.m_tSirenInfo[ucSirenCount].m_dwMinSirenAlpha = dwPercentage;
     }
-    void          SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
-    void          GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
-    unsigned char GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
-    unsigned char GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
-    DWORD         GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
-    SharedUtil::SColor        GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
-    void          SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    void               SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
+    void               GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
+    unsigned char      GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
+    unsigned char      GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
+    DWORD              GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
+    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
+    void               SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
     {
         m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
     }

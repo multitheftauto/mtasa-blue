@@ -14,7 +14,6 @@
 class CEntity;
 class CVector;
 
-
 enum ePointLightType
 {
     PLTYPE_POINTLIGHT = 0,
@@ -26,8 +25,7 @@ class CPointLights
 {
 public:
     virtual void AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SharedUtil::SColor color, unsigned char uc_8,
-                          bool bCreatesShadow,
-                          CEntity* pAffected) = 0;
+                          bool bCreatesShadow, CEntity* pAffected) = 0;
 
     virtual void PreRenderHeliLights() = 0;
     virtual void PostRenderHeliLights() = 0;

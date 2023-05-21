@@ -184,6 +184,9 @@ bool CObject::ReadSpecialData(const int iLine)
 
     GetCustomDataBool("frozen", m_bIsFrozen, true);
 
+    if (!GetCustomDataBool("breakable", m_bBreakable, true))
+        m_bBreakable = CObjectManager::IsBreakableModel(m_usModel);
+
     return true;
 }
 

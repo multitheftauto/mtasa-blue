@@ -28,13 +28,13 @@ constexpr std::wstring_view STEAM_GTA_EXE_NAME = L"gta-sa.exe";
 constexpr std::wstring_view EXPLORER_EXE_NAME = L"explorer.exe";
 
 #ifdef MTA_DEBUG
-    constexpr std::wstring_view MTA_EXE_NAME = L"Multi Theft Auto_d.exe";
-    constexpr std::wstring_view CORE_DLL_NAME = L"core_d.dll";
-    constexpr std::wstring_view NETC_DLL_NAME = L"netc_d.dll";
+constexpr std::wstring_view MTA_EXE_NAME = L"Multi Theft Auto_d.exe";
+constexpr std::wstring_view CORE_DLL_NAME = L"core_d.dll";
+constexpr std::wstring_view NETC_DLL_NAME = L"netc_d.dll";
 #else
-    constexpr std::wstring_view MTA_EXE_NAME = L"Multi Theft Auto.exe";
-    constexpr std::wstring_view CORE_DLL_NAME = L"core.dll";
-    constexpr std::wstring_view NETC_DLL_NAME = L"netc.dll";
+constexpr std::wstring_view MTA_EXE_NAME = L"Multi Theft Auto.exe";
+constexpr std::wstring_view CORE_DLL_NAME = L"core.dll";
+constexpr std::wstring_view NETC_DLL_NAME = L"netc.dll";
 #endif
 
 namespace fs = std::filesystem;
@@ -179,7 +179,7 @@ VOID OnGameLaunch()
         }
 
         std::wstring message = L"Launcher executable has an incorrect name (" + launcherName + L").";
-        
+
         if (!DisplayWarningMessageBox(MakeLauncherError(message), L"CL54"))
         {
             ExitProcess(1);
@@ -359,7 +359,7 @@ BOOL WINAPI MyGetVersionExA(LPOSVERSIONINFOA versionInfo)
 
 /**
  * @brief A placeholder function for fake winmm.dll exports.
-*/
+ */
 EXTERN_C void noreturn()
 {
     // We should never enter this function.
@@ -372,7 +372,7 @@ EXTERN_C void noreturn()
  * @param procedureName Name of the procedure to be replaced (case-insensitive)
  * @param replacement Function pointer to the replacement
  * @return Previous function pointer on success, a null pointer otherwise
-*/
+ */
 auto SetImportProcAddress(const char* moduleName, const char* procedureName, FARPROC replacement) -> FARPROC
 {
     auto base = reinterpret_cast<std::byte*>(g_exe);
@@ -428,7 +428,7 @@ auto SetImportProcAddress(const char* moduleName, const char* procedureName, FAR
  * @param errorCode The error code for the caption
  * @param flags Additional flags to customize the appearance
  * @return User choice
-*/
+ */
 int DisplayMessageBox(const std::wstring& message, const std::wstring& errorCode, UINT flags)
 {
     std::wstring caption = L"MTA: San Andreas  [" + errorCode + L"]   (CTRL+C to copy)";
@@ -443,7 +443,7 @@ int DisplayMessageBox(const std::wstring& message, const std::wstring& errorCode
  * @brief Displays an error message box to the user and exits the current process.
  * @param message The message to display
  * @param errorCode The error code for the caption
-*/
+ */
 void DisplayErrorMessageBox(const std::wstring& message, const std::wstring& errorCode)
 {
     DisplayMessageBox(message, errorCode, MB_OK | MB_ICONERROR);
@@ -469,7 +469,7 @@ bool DisplayWarningMessageBox(const std::wstring& message, const std::wstring& e
  * @brief Converts the specified path to its long form.
  * @param path The path to convert
  * @return Path in long form
-*/
+ */
 auto ToLongPath(const std::wstring& path) -> fs::path
 {
     if (path.empty())
@@ -495,7 +495,7 @@ auto ToLongPath(const std::wstring& path) -> fs::path
  * @brief Retrieves the full path of the executable image for the specified process.
  * @param process Handle to the process
  * @return Full path to the executable image
-*/
+ */
 auto GetProcessPath(HANDLE process) -> fs::path
 {
     std::wstring buffer(4096, 0);
@@ -524,7 +524,7 @@ auto GetProcessPath(HANDLE process) -> fs::path
  * @brief Retrieves the full path of the executable image for the specified process.
  * @param processId Numeric id of the process
  * @return Full path to the executable image
-*/
+ */
 auto GetProcessPath(DWORD processId) -> fs::path
 {
     if (!processId)
@@ -549,7 +549,7 @@ auto GetProcessPath(DWORD processId) -> fs::path
 /**
  * @brief Retrieves the full path to the current process.
  * @return Full path to the executable image
-*/
+ */
 auto GetCurrentProcessPath() -> fs::path
 {
     return GetProcessPath(GetCurrentProcess());
@@ -558,7 +558,7 @@ auto GetCurrentProcessPath() -> fs::path
 /**
  * @brief Retrieves the process id of the parent process.
  * @return Parent process id
-*/
+ */
 auto GetParentProcessId() -> DWORD
 {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -590,7 +590,7 @@ auto GetParentProcessId() -> DWORD
 /**
  * @brief Retrieves the full path to the parent's process.
  * @return Full path to the executable image
-*/
+ */
 auto GetParentProcessPath() -> fs::path
 {
     return GetProcessPath(GetParentProcessId());
@@ -599,7 +599,7 @@ auto GetParentProcessPath() -> fs::path
 /**
  * @brief Loads the winmm.dll library.
  * @return A handle to the library
-*/
+ */
 auto LoadWinmmLibrary() -> HMODULE
 {
     if (HMODULE winmm = LoadLibraryExW(L"winmm.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32))
@@ -610,7 +610,7 @@ auto LoadWinmmLibrary() -> HMODULE
 
 /**
  * @brief Replaces fake mtasa.dll imports with functions retrieved from the winmm.dll library.
-*/
+ */
 auto PatchWinmmImports() -> int
 {
     auto base = reinterpret_cast<std::byte*>(g_exe);
@@ -673,7 +673,7 @@ auto PatchWinmmImports() -> int
 
 /**
  * @brief Transforms the numeric error code into a system-generated error string.
-*/
+ */
 auto GetSystemErrorMessage(DWORD errorCode) -> std::wstring
 {
     if (!errorCode)
@@ -694,7 +694,7 @@ auto GetSystemErrorMessage(DWORD errorCode) -> std::wstring
     };
 
     ReleaseBuffer deleter{buffer};
-    std::wstring message{buffer, size};
+    std::wstring  message{buffer, size};
     return message;
 }
 
@@ -736,7 +736,7 @@ void ApplyDpiAwareness()
  * @param library A module handle
  * @param mtaDirectory Path to the MTA:SA root directory
  * @param gtaDirectory Path to the GTA:SA root directory
-*/
+ */
 void ApplyDirectoryInformation(HMODULE library, const std::wstring& mtaDirectory, const std::wstring& gtaDirectory)
 {
     // Set the path to the Multi Theft Auto directory.
@@ -760,7 +760,7 @@ void ApplyDirectoryInformation(HMODULE library, const std::wstring& mtaDirectory
  * @brief Optionally appends a system error text to the message.
  * @param message Message to append to
  * @param errorCode System error code
-*/
+ */
 auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring
 {
     std::wstring errorMessage = GetSystemErrorMessage(errorCode);
@@ -789,7 +789,7 @@ auto AppendSystemError(std::wstring message, DWORD errorCode) -> std::wstring
 /**
  * @brief Composes an error message with the plea to launch MTA properly.
  * @param message Message to append to
-*/
+ */
 auto MakeLauncherError(std::wstring message) -> std::wstring
 {
     if (!message.empty())
@@ -805,7 +805,7 @@ auto MakeLauncherError(std::wstring message) -> std::wstring
 /**
  * @brief Composes an error message with the plea to fix missing or broken files.
  * @param message Message to append to
-*/
+ */
 auto MakeMissingFilesError(std::wstring message) -> std::wstring
 {
     if (!message.empty())
@@ -820,7 +820,7 @@ auto MakeMissingFilesError(std::wstring message) -> std::wstring
 
 /**
  * @brief Logs a message for the loader proxy to track startup issues.
-*/
+ */
 void AddLaunchLog(const char* format, ...)
 {
     va_list arguments;
@@ -834,7 +834,7 @@ void AddLaunchLog(const char* format, ...)
 
 /**
  * @brief Compares two strings for equality (case-insensitive).
-*/
+ */
 bool IEqual(std::wstring_view lhs, std::wstring_view rhs)
 {
     if (lhs.size() != rhs.size())

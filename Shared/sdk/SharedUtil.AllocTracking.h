@@ -228,8 +228,8 @@ namespace std
     };
 }            // namespace std
 
-    // Replace std classes
-    // Not safe - do not enable this in distributed builds
+// Replace std classes
+// Not safe - do not enable this in distributed builds
     #define vector  CArray
     #define list    CList
     #define map     CMap

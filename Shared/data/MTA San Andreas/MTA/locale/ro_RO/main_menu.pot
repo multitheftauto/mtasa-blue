@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-10 16:36+0000\n"
+"PO-Revision-Date: 2022-09-24 16:37\n"
+"Last-Translator: \n"
+"Language-Team: Romanian\n"
+"Language: ro_RO\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100>0 && n%100<20)) ? 1 : 2);\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: ro\n"
+"X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/main_menu.pot\n"
+"X-Crowdin-File-ID: 223\n"
+
+#. Found in the main menu navigation
+msgid "Quick connect"
+msgstr "Conectare rapidă"
+
+#. Found in the main menu navigation
+msgid "Disconnect"
+msgstr "Deconectare"
+
+#. Found in the main menu navigation
+msgid "Server browser"
+msgstr "Căutare servere"
+
+#. Found in the main menu navigation
+msgid "Host game"
+msgstr "Găzduire joc"
+
+#. Found in the main menu navigation
+msgid "Map editor"
+msgstr "Editor de hărți"
+
+#. Found in the main menu navigation
+msgid "Settings"
+msgstr "Setări"
+
+#. Found in the main menu navigation
+msgid "About"
+msgstr "Despre"
+
+#. Found in the main menu navigation
+msgid "Quit"
+msgstr "Ieșire"
+
+#. Found in the main menu above the news listing
+msgid "The Latest News"
+msgstr "Ultimele Noutăți"
+

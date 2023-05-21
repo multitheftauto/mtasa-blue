@@ -13,6 +13,7 @@
 #include <filesystem>
 #define DECLARE_PROFILER_SECTION_Core
 #include "profiler/SharedUtil.Profiler.h"
+#define UTF8_FILE_HOOKS_PERSONALITY_Core
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
 
 #define CORE_API extern "C" __declspec(dllexport)

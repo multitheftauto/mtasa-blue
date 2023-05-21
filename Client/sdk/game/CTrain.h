@@ -15,5 +15,5 @@
 class CTrain : public virtual CVehicle
 {
 public:
-	virtual ~CTrain(){};
+    virtual ~CTrain(){};
 };

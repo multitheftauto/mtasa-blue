@@ -88,16 +88,16 @@ public:
 
     CPed* GetContextSwitchedPed();
 
-    void           PreventLeavingVehicles();
-    void           HideRadar(bool bHide);
-    void           SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLOAT fHeading);
-    void           DisablePadHandler(bool bDisabled);
-    void           DisableEnterExitVehicleKey(bool bDisabled);
-    void           DisableAllVehicleWeapons(bool bDisable);
-    void           DisableBirds(bool bDisabled);
-    void           DisableQuickReload(bool bDisable);
-    void           DisableCloseRangeDamage(bool bDisable);
-    void           DisableBadDrivebyHitboxes(bool bDisable) { m_bBadDrivebyHitboxesDisabled = bDisable; }
+    void PreventLeavingVehicles();
+    void HideRadar(bool bHide);
+    void SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLOAT fHeading);
+    void DisablePadHandler(bool bDisabled);
+    void DisableEnterExitVehicleKey(bool bDisabled);
+    void DisableAllVehicleWeapons(bool bDisable);
+    void DisableBirds(bool bDisabled);
+    void DisableQuickReload(bool bDisable);
+    void DisableCloseRangeDamage(bool bDisable);
+    void DisableBadDrivebyHitboxes(bool bDisable) { m_bBadDrivebyHitboxesDisabled = bDisable; }
 
     bool GetExplosionsDisabled();
     void DisableExplosions(bool bDisabled);

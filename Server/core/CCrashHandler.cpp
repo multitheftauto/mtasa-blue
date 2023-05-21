@@ -194,7 +194,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
 {
     // Try to load the DLL in our directory
     HMODULE hDll = NULL;
-    char szDbgHelpPath[MAX_PATH];
+    char    szDbgHelpPath[MAX_PATH];
     if (GetModuleFileNameA(NULL, szDbgHelpPath, MAX_PATH))
     {
         char* pSlash = _tcsrchr(szDbgHelpPath, '\\');
