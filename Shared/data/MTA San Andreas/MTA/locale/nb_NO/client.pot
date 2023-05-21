@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-12 19:40+0000\n"
-"PO-Revision-Date: 2023-05-12 20:37\n"
+"POT-Creation-Date: 2023-05-21 09:29+0000\n"
+"PO-Revision-Date: 2023-05-21 10:27\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
@@ -1114,47 +1114,47 @@ msgstr "Skin som ble valgt kunne ikke lastes, og standard skin kunne heller ikke
 msgid "CONSOLE"
 msgstr "KONSOLL"
 
-#: Client/core/CCommandFuncs.cpp:30
+#: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ KOMMANDO HJELP ]***\n"
 
-#: Client/core/CCommandFuncs.cpp:168
+#: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* Tiden er %d:%02d:%02d"
 
-#: Client/core/CCommandFuncs.cpp:252
+#: Client/core/CCommandFuncs.cpp:242
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "koble til: Syntax er 'koble til <host> [<port> <nick> <pass>]'"
 
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
 msgid "connect: Bad port number"
 msgstr "koble til: Dårlig port nummer"
 
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
 #, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "koble til: Kobler til %s:%u..."
 
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
 #, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "koble til: kunne ikke koble til %s:%u!"
 
-#: Client/core/CCommandFuncs.cpp:291
+#: Client/core/CCommandFuncs.cpp:281
 msgid "connect: Failed to unload current mod"
 msgstr "koble til: Klarte ikke å laste ut gjeldende mod"
 
-#: Client/core/CCommandFuncs.cpp:381
+#: Client/core/CCommandFuncs.cpp:371
 msgid "Bound all controls from GTA"
 msgstr "Bundet alle knapper fra GTA"
 
-#: Client/core/CCommandFuncs.cpp:395
+#: Client/core/CCommandFuncs.cpp:385
 msgid "Saved configuration file"
 msgstr "Lagret konfigurasjonsfilen"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:461
+#: Client/core/CCommandFuncs.cpp:451
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* Din serial er: %s"
