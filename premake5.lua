@@ -46,6 +46,7 @@ workspace "MTASA"
 	flags "MultiProcessorCompile"
 
 	dxsdk = os.getenv("DXSDK_DIR") and "$(DXSDK_DIR)" or ""
+	print(('DXSDK: [%s] [%s]'):format(dxsdk, os.getenv("DXSDK_DIR")))
 
 	includedirs {
 		"vendor",
