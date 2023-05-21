@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-12 19:40+0000\n"
-"PO-Revision-Date: 2023-05-12 20:37\n"
+"POT-Creation-Date: 2023-05-21 09:29+0000\n"
+"PO-Revision-Date: 2023-05-21 10:27\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -1119,47 +1119,47 @@ msgstr "你選擇的皮膚無法被讀取，默認的皮膚也無法被讀取，
 msgid "CONSOLE"
 msgstr "控制臺"
 
-#: Client/core/CCommandFuncs.cpp:30
+#: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
 msgstr "***[ 指令幫助 ]***\n"
 
-#: Client/core/CCommandFuncs.cpp:168
+#: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
 msgstr "* 現在時間是 %d:%02d:%02d"
 
-#: Client/core/CCommandFuncs.cpp:252
+#: Client/core/CCommandFuncs.cpp:242
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
 msgstr "連線: 指令為 'connect <伺服器> [<連接埠> <暱稱> <密碼>]'"
 
-#: Client/core/CCommandFuncs.cpp:260 Client/core/CCommandFuncs.cpp:328
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
 msgid "connect: Bad port number"
 msgstr "連線: 無效的連接埠號碼"
 
-#: Client/core/CCommandFuncs.cpp:282 Client/core/CCommandFuncs.cpp:343
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
 #, c-format
 msgid "connect: Connecting to %s:%u..."
 msgstr "連線: 正在連線到 %s:%u..."
 
-#: Client/core/CCommandFuncs.cpp:286 Client/core/CCommandFuncs.cpp:347
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
 #, c-format
 msgid "connect: could not connect to %s:%u!"
 msgstr "連線: 無法連線到 %s:%u!"
 
-#: Client/core/CCommandFuncs.cpp:291
+#: Client/core/CCommandFuncs.cpp:281
 msgid "connect: Failed to unload current mod"
 msgstr "連線: 移除指定 mod 失敗"
 
-#: Client/core/CCommandFuncs.cpp:381
+#: Client/core/CCommandFuncs.cpp:371
 msgid "Bound all controls from GTA"
 msgstr "綁定GTA 所有的控制設定"
 
-#: Client/core/CCommandFuncs.cpp:395
+#: Client/core/CCommandFuncs.cpp:385
 msgid "Saved configuration file"
 msgstr "設定已經保存"
 
 #. Print it
-#: Client/core/CCommandFuncs.cpp:461
+#: Client/core/CCommandFuncs.cpp:451
 #, c-format
 msgid "* Your serial is: %s"
 msgstr "* 您的序列號為: %s"
