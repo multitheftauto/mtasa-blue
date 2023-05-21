@@ -111,8 +111,30 @@ void CMessageLoopHook::MaybeRefreshMsgQueue()
     PeekMessage(&msg, NULL, uiUnusedMessageId, uiUnusedMessageId, PM_REMOVE);
 }
 
+bool validateExtension(const std::string& str)
+{
+    static std::array<const char*, 12> extensions = {".txt", ".lua", ".luac", ".txd", ".dff", ".txd", ".xml", ".json", ".png", ".jpg", ".svg", ".map"};
+    for (const auto& extension : extensions)
+    {
+        if (str.length() >= strlen(extension))
+        {
+            if (str.compare(str.length() - strlen(extension), strlen(extension), extension) == 0)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 void HandleFiles(WPARAM wParam)
 {
+    auto handler = g_pCore->GetDroppedFilesHandler();
+    int  iVar;
+    CVARS_GET("drag_and_drop", iVar);
+    if (handler == nullptr || iVar == 2) // 2 == disallow
+        return;
+
     TCHAR szName[MAX_PATH + 1] = {0};
 
     HDROP hDrop = (HDROP)wParam;
@@ -125,14 +147,15 @@ void HandleFiles(WPARAM wParam)
         for (int i = 0; i < count; i++)
         {
             DragQueryFile(hDrop, i, szName, MAX_PATH);
+            if (iVar == 0) // 0 == mta specific files
+            {
+                if (!validateExtension(szName))
+                    continue;
+            }
             files.push_back(szName);
         }
 
-        auto handler = g_pCore->GetDroppedFilesHandler();
-        if (handler)
-        {
-            handler(files);
-        }
+        handler(files);
     }
 
     DragFinish(hDrop);
@@ -609,6 +632,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessDummyWindowMessage(HWND hwnd, UINT uMs
         case WM_MOUSEMOVE:
         {
             POINT CursorPos;
+
             GetCursorPos(&CursorPos);
             SetWindowPos(hwnd, NULL, CursorPos.x + pThis->m_MoveOffset.x, CursorPos.y + pThis->m_MoveOffset.y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
             break;

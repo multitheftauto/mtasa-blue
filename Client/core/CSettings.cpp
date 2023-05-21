@@ -985,7 +985,7 @@ void CSettings::CreateGUI()
 
     fIndentX = pManager->CGUI_GetMaxTextExtent("default-normal", _("Fast CJ clothes loading:"), _("Browser speed:"), _("Single connection:"), _("Packet tag:"),
                                                _("Progress animation:"), _("Fullscreen mode:"), _("Process priority:"), _("Debug setting:"),
-                                               _("Streaming memory:"), _("Update build type:"), _("Install important updates:")) +
+                                               _("Streaming memory:"), _("Update build type:"), _("Install important updates:"), _("Drag and drop:")) +
                5.0f;
 
     vecTemp.fX += 10.0f;
@@ -1074,7 +1074,6 @@ void CSettings::CreateGUI()
     m_pDebugSettingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Debug setting:")));
     m_pDebugSettingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pDebugSettingLabel->AutoSize();
-
     m_pDebugSettingCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
     m_pDebugSettingCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
     m_pDebugSettingCombo->SetSize(CVector2D(fComboWidth, 20.0f * (EDiagnosticDebug::MAX + 1)));
@@ -1088,6 +1087,21 @@ void CSettings::CreateGUI()
     m_pDebugSettingCombo->AddItem("#0000 Resize always")->SetData((void*)EDiagnosticDebug::RESIZE_ALWAYS_0000);
     m_pDebugSettingCombo->AddItem("#0000 Resize never")->SetData((void*)EDiagnosticDebug::RESIZE_NEVER_0000);
     m_pDebugSettingCombo->SetReadOnly(true);
+    vecTemp.fY += 29;
+
+    // Drag and drop
+    m_pDragAndDropLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Drag and drop:")));
+    m_pDragAndDropLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pDragAndDropLabel->AutoSize();
+
+    m_pDragAndDropCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
+    m_pDragAndDropCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pDragAndDropCombo->SetSize(CVector2D(fComboWidth, 95.0f));
+    m_pDragAndDropCombo->AddItem(_("Allow mta specific files only"))->SetData((void*)0);
+    m_pDragAndDropCombo->AddItem(_("Allow all files"))->SetData((void*)1);
+    m_pDragAndDropCombo->AddItem(_("Disallow all"))->SetData((void*)2);
+    m_pDragAndDropCombo->SetReadOnly(true);
+
     vecTemp.fY += fLineHeight;
 
     m_pDebugSettingCombo->SetText(_("Default"));
@@ -1217,7 +1231,7 @@ void CSettings::CreateGUI()
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY = 354 + 10;
+    vecTemp.fY = 383 + 10;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
@@ -1331,6 +1345,12 @@ void CSettings::CreateGUI()
 
     m_pUpdateAutoInstallCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateAutoInstallCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
+
+    m_pDragAndDropLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
+    m_pDragAndDropLabel->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
+
+    m_pDragAndDropCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
+    m_pDragAndDropCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
     // Load Chat presets
     LoadChatPresets();
@@ -3156,6 +3176,15 @@ void CSettings::LoadData()
     else if (iVar == 1)
         m_pProgressAnimationCombo->SetText(_("Default"));
 
+    // Drag and drop
+    CVARS_GET("drag_and_drop", iVar);
+    if (iVar == 0)
+        m_pDragAndDropCombo->SetText(_("Allow mta specific files only"));
+    else if (iVar == 1)
+        m_pDragAndDropCombo->SetText(_("Allow all files"));
+    else if (iVar == 2)
+        m_pDragAndDropCombo->SetText(_("Disallow all"));
+
     // Windows 8 16-bit color
     iVar = GetApplicationSettingInt("Win8Color16");
     m_pWin8ColorCheckBox->SetSelected(iVar != 0);
@@ -3520,6 +3549,13 @@ void CSettings::SaveData()
     {
         int iSelected = (int)pSelected->GetData();
         CVARS_SET("progress_animation", iSelected);
+    }
+
+    // Drag and drop
+    if (CGUIListItem* pSelected = m_pDragAndDropCombo->GetSelectedItem())
+    {
+        int iSelected = (int)pSelected->GetData();
+        CVARS_SET("drag_and_drop", iSelected);
     }
 
     // Windows 8 16-bit color
@@ -4730,6 +4766,8 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
     else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
         strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
+    else if (pLabel && pLabel == m_pDragAndDropLabel || pComboBox && pComboBox == m_pDragAndDropCombo)
+        strText = std::string(_("Drag and drop:")) + " " + std::string(_("Limit files which can be drag and dropped onto mta"));
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());

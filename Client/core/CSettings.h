@@ -248,6 +248,8 @@ protected:
     CGUILabel*     m_pLabelUserTrackMode;
     CGUIComboBox*  m_pComboUsertrackMode;
     CGUIButton*    m_pAudioDefButton;
+    CGUILabel*     m_pDragAndDropLabel;
+    CGUIComboBox*  m_pDragAndDropCombo;
 
     CGUIGridList* m_pBindsList;
     CGUIButton*   m_pBindsDefButton;
