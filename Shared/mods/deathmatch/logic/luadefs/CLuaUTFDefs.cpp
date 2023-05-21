@@ -12,69 +12,67 @@
 #include "CLuaUTFDefs.h"
 #include "lua/CLuaFunctionParser.h"
 
-auto UtfLen(std::string strInput) -> int
+auto UtfLen(std::string input) -> int
 {
-    return MbUTF8ToUTF16(strInput).size();
+    return MbUTF8ToUTF16(input).size();
 }
 
-auto UtfSeek(std::string strInput, int iPos) -> std::variant<bool, int>
+auto UtfSeek(std::string input, int position) -> std::variant<bool, int>
 {
-    std::wstring strUTF = MbUTF8ToUTF16(strInput);
-    if (iPos <= static_cast<int>(strUTF.size()) && iPos >= 0)
+    std::wstring utfString = MbUTF8ToUTF16(input);
+    if (position <= static_cast<int>(utfString.size()) && position >= 0)
     {
-        strUTF = strUTF.substr(0, iPos);
-        return (int)UTF16ToMbUTF8(strUTF).size();
+        utfString = utfString.substr(0, position);
+        return (int)UTF16ToMbUTF8(utfString).size();
     }
     return false;
 }
 
-auto UtfSub(std::string strInput, int iStart, int iEnd) -> std::string
+auto UtfSub(std::string input, int start, int end) -> std::string
 {
-    std::wstring strUTF = MbUTF8ToUTF16(strInput);
-    size_t       l = strUTF.size();
+    std::wstring utfString = MbUTF8ToUTF16(input);
+    size_t       length = utfString.size();
 
     // posrelat them both
-    if (iStart < 0)
-        iStart += (ptrdiff_t)l + 1;
-    iStart = (iStart >= 0) ? iStart : 0;
+    if (start < 0)
+        start += (ptrdiff_t)length + 1;
+    start = (start >= 0) ? start : 0;
 
-    if (iEnd < 0)
-        iEnd += (ptrdiff_t)l + 1;
-    iEnd = (iEnd >= 0) ? iEnd : 0;
+    if (end < 0)
+        end += (ptrdiff_t)length + 1;
+    end = (end >= 0) ? end : 0;
 
-    if (iStart < 1)
-        iStart = 1;
-    if (iEnd > (ptrdiff_t)l)
-        iEnd = (ptrdiff_t)l;
-    if (iStart <= iEnd)
+    if (start < 1)
+        start = 1;
+    if (end > (ptrdiff_t)length)
+        end = (ptrdiff_t)length;
+    if (start <= end)
     {
-        strUTF = strUTF.substr(iStart - 1, iEnd - iStart + 1);
-        return UTF16ToMbUTF8(strUTF).c_str();
+        utfString = utfString.substr(start - 1, end - start + 1);
+        return UTF16ToMbUTF8(utfString).c_str();
     }
     return "";
 }
 
-auto UtfChar(int iCode) -> std::string
+auto UtfChar(int code) -> std::string
 {
-    if (iCode > 65534 || iCode < 32)
+    if (code > 65534 || code < 32)
     {
         throw std::invalid_argument("characterCode out of range, expected number between 32 and 65534.");
     }
 
     // Generate a null-terminating string for our character
-    wchar_t wUNICODE[2] = {static_cast<wchar_t>(iCode), '\0'};
+    wchar_t string[2] = {static_cast<wchar_t>(code), '\0'};
 
     // Convert our UTF character into an ANSI string
-    SString strANSI = UTF16ToMbUTF8(wUNICODE);
-
-    return strANSI;
+    return UTF16ToMbUTF8(string);
 }
 
-auto UtfCode(std::string strInput) -> int
+auto UtfCode(std::string input) -> int
 {
-    std::wstring  strUTF = MbUTF8ToUTF16(strInput);
-    unsigned long ulCode = strUTF.c_str()[0];
-    return ulCode;
+    std::wstring  utfString = MbUTF8ToUTF16(input);
+    unsigned long code = utfString.c_str()[0];
+    return code;
 }
 
 void CLuaUTFDefs::LoadFunctions()
