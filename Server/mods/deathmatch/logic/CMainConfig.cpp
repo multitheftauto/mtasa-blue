@@ -660,6 +660,8 @@ bool CMainConfig::LoadExtended()
         }
     } while (pNode);
 
+    RegisterCommands();
+
     // Handle the <resource> nodes
     pNode = NULL;
     uiCurrentIndex = 0;
@@ -749,7 +751,11 @@ bool CMainConfig::LoadExtended()
 
     CLogger::ProgressDotsEnd();
     CLogger::SetMinLogLevel(LOGLEVEL_LOW);
+    return true;
+}
 
+void CMainConfig::RegisterCommands()
+{
     // Register the commands
     RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource-name>\nStart a loaded resource eg: start admin");
     RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource-name>\nStop a resource eg: stop admin");
@@ -819,7 +825,6 @@ bool CMainConfig::LoadExtended()
     RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false,
                     "Usage: sfakelag <packet loss> <extra ping> <ping variance> [<KBPS limit>]\nOnly available if enabled in the mtaserver.conf file.\nAdds "
                     "artificial packet loss, ping, jitter and bandwidth limits to the server-client connections.");
-    return true;
 }
 
 bool CMainConfig::Save()
