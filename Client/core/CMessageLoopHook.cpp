@@ -113,7 +113,7 @@ void CMessageLoopHook::MaybeRefreshMsgQueue()
 
 bool validateExtension(const std::string& str)
 {
-    static std::array<const char*, 12> extensions = {".txt", ".lua", ".luac", ".txd", ".dff", ".txd", ".xml", ".json", ".png", ".jpg", ".svg", ".map"};
+    static std::array<const char*, 12> extensions = {".txt", ".lua", ".luac", ".txd", ".dff", ".col", ".xml", ".json", ".png", ".jpg", ".svg", ".map"};
     for (const auto& extension : extensions)
     {
         if (str.length() >= strlen(extension))
