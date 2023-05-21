@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -29,6 +29,7 @@
 /*       lib/config-dos.h - Hand crafted config file for DOS        */
 /* ================================================================ */
 
+#ifndef OS
 #if defined(DJGPP)
   #define OS  "MSDOS/djgpp"
 #elif defined(__HIGHC__)
@@ -36,12 +37,13 @@
 #else
   #define OS  "MSDOS/?"
 #endif
+#endif
 
 #define PACKAGE  "curl"
 
+#define USE_MANUAL 1
+
 #define HAVE_ARPA_INET_H       1
-#define HAVE_ASSERT_H          1
-#define HAVE_ERRNO_H           1
 #define HAVE_FCNTL_H           1
 #define HAVE_FREEADDRINFO      1
 #define HAVE_GETADDRINFO       1
@@ -56,7 +58,6 @@
 #define HAVE_NETINET_IN_H      1
 #define HAVE_NETINET_TCP_H     1
 #define HAVE_NET_IF_H          1
-#define HAVE_PROCESS_H         1
 #define HAVE_RECV              1
 #define HAVE_SELECT            1
 #define HAVE_SEND              1
@@ -81,7 +82,7 @@
 #define SIZEOF_INT             4
 #define SIZEOF_LONG            4
 #define SIZEOF_SIZE_T          4
-#define SIZEOF_CURL_OFF_T      4
+#define SIZEOF_CURL_OFF_T      8
 #define STDC_HEADERS           1
 #define TIME_WITH_SYS_TIME     1
 
@@ -104,10 +105,6 @@
 
 /* CURLDEBUG definition enables memory tracking */
 /* #define CURLDEBUG */
-
-#ifdef USE_ZLIB  /* Deprecated. Use HAVE_LIBZ instead. */
-  #define HAVE_LIBZ              1
-#endif
 
 /* to disable LDAP */
 #define CURL_DISABLE_LDAP        1

@@ -27,6 +27,9 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     assert(pLuaMain);
     assert(szKey);
 
+    if (g_pCore->GetCommands()->Get(szKey))
+        return false;
+
     // Check if we already have this key and handler
     SCommand* pCommand = GetCommand(szKey, pLuaMain);
     if (pCommand)

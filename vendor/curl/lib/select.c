@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -230,14 +230,14 @@ int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
   if(readfd0 != CURL_SOCKET_BAD) {
     if(pfd[num].revents & (POLLRDNORM|POLLIN|POLLERR|POLLHUP))
       r |= CURL_CSELECT_IN;
-    if(pfd[num].revents & (POLLRDBAND|POLLPRI|POLLNVAL))
+    if(pfd[num].revents & (POLLPRI|POLLNVAL))
       r |= CURL_CSELECT_ERR;
     num++;
   }
   if(readfd1 != CURL_SOCKET_BAD) {
     if(pfd[num].revents & (POLLRDNORM|POLLIN|POLLERR|POLLHUP))
       r |= CURL_CSELECT_IN2;
-    if(pfd[num].revents & (POLLRDBAND|POLLPRI|POLLNVAL))
+    if(pfd[num].revents & (POLLPRI|POLLNVAL))
       r |= CURL_CSELECT_ERR;
     num++;
   }

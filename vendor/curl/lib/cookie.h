@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -61,7 +61,6 @@ struct Cookie {
 struct CookieInfo {
   /* linked list of cookies we know of */
   struct Cookie *cookies[COOKIE_HASH_SIZE];
-
   char *filename;  /* file we read from/write to */
   long numcookies; /* number of cookies in the "jar" */
   bool running;    /* state info, for cookie adding information */

@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -56,11 +56,6 @@
 #include <inet.h>
 #endif
 
-#if (defined(NETWARE) && defined(__NOVELL_LIBC__))
-#undef in_addr_t
-#define in_addr_t unsigned long
-#endif
-
 #include <curl/curl.h>
 #include "urldata.h"
 #include "sendf.h"
@@ -75,11 +70,11 @@
 #include "strtoofft.h"
 #include "strcase.h"
 #include "vtls/vtls.h"
+#include "cfilters.h"
 #include "connect.h"
 #include "select.h"
 #include "multiif.h"
 #include "url.h"
-#include "strcase.h"
 #include "bufref.h"
 #include "curl_sasl.h"
 #include "warnless.h"
@@ -479,10 +474,18 @@ static CURLcode imap_perform_upgrade_tls(struct Curl_easy *data,
 {
   /* Start the SSL connection */
   struct imap_conn *imapc = &conn->proto.imapc;
-  CURLcode result = Curl_ssl_connect_nonblocking(data, conn, FALSE,
-                                                 FIRSTSOCKET, &imapc->ssldone);
+  CURLcode result;
+  bool ssldone = FALSE;
 
+  if(!Curl_conn_is_ssl(conn, FIRSTSOCKET)) {
+    result = Curl_ssl_cfilter_add(data, conn, FIRSTSOCKET);
+    if(result)
+      goto out;
+  }
+
+  result = Curl_conn_connect(data, FIRSTSOCKET, FALSE, &ssldone);
   if(!result) {
+    imapc->ssldone = ssldone;
     if(imapc->state != IMAP_UPGRADETLS)
       state(data, IMAP_UPGRADETLS);
 
@@ -491,7 +494,7 @@ static CURLcode imap_perform_upgrade_tls(struct Curl_easy *data,
       result = imap_perform_capability(data, conn);
     }
   }
-
+out:
   return result;
 }
 
@@ -776,7 +779,7 @@ static CURLcode imap_perform_append(struct Curl_easy *data)
 
     /* Add external headers and mime version. */
     curl_mime_headers(&data->set.mimepost, data->set.headers, 0);
-    result = Curl_mime_prepare_headers(&data->set.mimepost, NULL,
+    result = Curl_mime_prepare_headers(data, &data->set.mimepost, NULL,
                                        NULL, MIMESTRATEGY_MAIL);
 
     if(!result)
@@ -951,7 +954,7 @@ static CURLcode imap_state_capability_resp(struct Curl_easy *data,
       line += wordlen;
     }
   }
-  else if(data->set.use_ssl && !conn->ssl[FIRSTSOCKET].use) {
+  else if(data->set.use_ssl && !Curl_conn_is_ssl(conn, FIRSTSOCKET)) {
     /* PREAUTH is not compatible with STARTTLS. */
     if(imapcode == IMAP_RESP_OK && imapc->tls_supported && !imapc->preauth) {
       /* Switch to TLS connection now */
@@ -1385,9 +1388,10 @@ static CURLcode imap_multi_statemach(struct Curl_easy *data, bool *done)
   struct imap_conn *imapc = &conn->proto.imapc;
 
   if((conn->handler->flags & PROTOPT_SSL) && !imapc->ssldone) {
-    result = Curl_ssl_connect_nonblocking(data, conn, FALSE,
-                                          FIRSTSOCKET, &imapc->ssldone);
-    if(result || !imapc->ssldone)
+    bool ssldone = FALSE;
+    result = Curl_conn_connect(data, FIRSTSOCKET, FALSE, &ssldone);
+    imapc->ssldone = ssldone;
+    if(result || !ssldone)
       return result;
   }
 
@@ -1507,11 +1511,11 @@ static CURLcode imap_done(struct Curl_easy *data, CURLcode status,
     result = status;         /* use the already set error code */
   }
   else if(!data->set.connect_only && !imap->custom &&
-          (imap->uid || imap->mindex || data->set.upload ||
+          (imap->uid || imap->mindex || data->state.upload ||
           data->set.mimepost.kind != MIMEKIND_NONE)) {
     /* Handle responses after FETCH or APPEND transfer has finished */
 
-    if(!data->set.upload && data->set.mimepost.kind == MIMEKIND_NONE)
+    if(!data->state.upload && data->set.mimepost.kind == MIMEKIND_NONE)
       state(data, IMAP_FETCH_FINAL);
     else {
       /* End the APPEND command first by sending an empty line */
@@ -1561,7 +1565,7 @@ static CURLcode imap_perform(struct Curl_easy *data, bool *connected,
 
   DEBUGF(infof(data, "DO phase starts"));
 
-  if(data->set.opt_no_body) {
+  if(data->req.no_body) {
     /* Requested no body means no transfer */
     imap->transfer = PPTRANSFER_INFO;
   }
@@ -1577,7 +1581,7 @@ static CURLcode imap_perform(struct Curl_easy *data, bool *connected,
     selected = TRUE;
 
   /* Start the first command in the DO phase */
-  if(data->set.upload || data->set.mimepost.kind != MIMEKIND_NONE)
+  if(data->state.upload || data->set.mimepost.kind != MIMEKIND_NONE)
     /* APPEND can be executed directly */
     result = imap_perform_append(data);
   else if(imap->custom && (selected || !imap->mailbox))
@@ -1603,7 +1607,7 @@ static CURLcode imap_perform(struct Curl_easy *data, bool *connected,
   /* Run the state-machine */
   result = imap_multi_statemach(data, dophase_done);
 
-  *connected = conn->bits.tcpconnect[FIRSTSOCKET];
+  *connected = Curl_conn_is_connected(conn, FIRSTSOCKET);
 
   if(*dophase_done)
     DEBUGF(infof(data, "DO phase is complete"));
@@ -1774,7 +1778,7 @@ static CURLcode imap_sendf(struct Curl_easy *data, const char *fmt, ...)
   /* Calculate the tag based on the connection ID and command ID */
   msnprintf(imapc->resptag, sizeof(imapc->resptag), "%c%03d",
             'A' + curlx_sltosi(data->conn->connection_id % 26),
-            (++imapc->cmdid)%1000);
+            ++imapc->cmdid);
 
   /* start with a blank buffer */
   Curl_dyn_reset(&imapc->dyn);
@@ -1927,7 +1931,7 @@ static CURLcode imap_parse_url_options(struct connectdata *conn)
     const char *value;
 
     while(*ptr && *ptr != '=')
-        ptr++;
+      ptr++;
 
     value = ptr + 1;
 

@@ -1,3 +1,5 @@
+#ifndef HEADER_CURL_H1_PROXY_H
+#define HEADER_CURL_H1_PROXY_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -5,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -24,52 +26,14 @@
 
 #include "curl_setup.h"
 
-#ifndef CURL_DISABLE_FTP
+#if !defined(CURL_DISABLE_PROXY) && !defined(CURL_DISABLE_HTTP)
 
-#include "wildcard.h"
-#include "llist.h"
-#include "fileinfo.h"
-/* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
+CURLcode Curl_cf_h1_proxy_insert_after(struct Curl_cfilter *cf,
+                                       struct Curl_easy *data);
 
-static void fileinfo_dtor(void *user, void *element)
-{
-  (void)user;
-  Curl_fileinfo_cleanup(element);
-}
-
-CURLcode Curl_wildcard_init(struct WildcardData *wc)
-{
-  Curl_llist_init(&wc->filelist, fileinfo_dtor);
-  wc->state = CURLWC_INIT;
-
-  return CURLE_OK;
-}
-
-void Curl_wildcard_dtor(struct WildcardData *wc)
-{
-  if(!wc)
-    return;
-
-  if(wc->dtor) {
-    wc->dtor(wc->protdata);
-    wc->dtor = ZERO_NULL;
-    wc->protdata = NULL;
-  }
-  DEBUGASSERT(wc->protdata == NULL);
-
-  Curl_llist_destroy(&wc->filelist, NULL);
+extern struct Curl_cftype Curl_cft_h1_proxy;
 
 
-  free(wc->path);
-  wc->path = NULL;
-  free(wc->pattern);
-  wc->pattern = NULL;
+#endif /* !CURL_DISABLE_PROXY && !CURL_DISABLE_HTTP */
 
-  wc->customptr = NULL;
-  wc->state = CURLWC_INIT;
-}
-
-#endif /* if disabled */
+#endif /* HEADER_CURL_H1_PROXY_H */

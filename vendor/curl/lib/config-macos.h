@@ -142,17 +142,20 @@
 /* Define to 1 if you have the alarm function. */
 #define HAVE_ALARM 1
 
+/* Define to 1 if you have the `arc4random' function. */
+#define HAVE_ARC4RANDOM 1
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
 
 /* Define to 1 if you have the <arpa/tftp.h> header file. */
 #define HAVE_ARPA_TFTP_H 1
 
-/* Define to 1 if you have the <assert.h> header file. */
-#define HAVE_ASSERT_H 1
-
 /* Define to 1 if you have _Atomic support. */
 #define HAVE_ATOMIC 1
+
+/* Define to 1 if using AWS-LC. */
+/* #undef HAVE_AWSLC */
 
 /* Define to 1 if you have the basename function. */
 #define HAVE_BASENAME 1
@@ -197,9 +200,6 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
-/* Define to 1 if you have the <errno.h> header file. */
-#define HAVE_ERRNO_H 1
-
 /* Define to 1 if you have the <err.h> header file. */
 /* #undef HAVE_ERR_H */
 
@@ -217,6 +217,9 @@
 
 /* Define to 1 if you have the `fnmatch' function. */
 #define HAVE_FNMATCH 1
+
+/* Define to 1 if you have the `fork' function. */
+#define HAVE_FORK 1
 
 /* Define to 1 if you have the freeaddrinfo function. */
 #define HAVE_FREEADDRINFO 1
@@ -584,6 +587,9 @@
 /* Define to 1 if you have the <ssl.h> header file. */
 /* #undef HAVE_SSL_H */
 
+/* Define to 1 if you have the `SSL_set0_wbio' function. */
+/* #undef HAVE_SSL_SET0_WBIO */
+
 /* Define to 1 if you have the <stdatomic.h> header file. */
 #define HAVE_STDATOMIC_H 1
 
@@ -728,6 +734,9 @@
 /* if you have wolfSSL_DES_ecb_encrypt */
 /* #undef HAVE_WOLFSSL_DES_ECB_ENCRYPT */
 
+/* if you have wolfSSL_BIO_set_shutdown */
+/* #undef HAVE_WOLFSSL_FULL_BIO */
+
 /* Define to 1 if you have the `wolfSSL_get_peer_certificate' function. */
 /* #undef HAVE_WOLFSSL_GET_PEER_CERTIFICATE */
 
@@ -768,7 +777,7 @@
 /* #undef NTLM_WB_FILE */
 
 /* cpu-machine-OS */
-#define OS "x86_64-apple-darwin22.2.0"
+#define OS "x86_64-apple-darwin22.5.0"
 
 /* Name of package */
 #define PACKAGE "curl"
@@ -796,6 +805,9 @@
 
 /* Size of curl_off_t in number of bytes */
 #define SIZEOF_CURL_OFF_T 8
+
+/* Size of curl_socket_t in number of bytes */
+#define SIZEOF_CURL_SOCKET_T 4
 
 /* Size of int in number of bytes */
 #define SIZEOF_INT 4
@@ -911,7 +923,7 @@
 /* #undef USE_TLS_SRP */
 
 /* Use Unix domain sockets */
-#define USE_UNIX_SOCKETS 1
+/* #undef USE_UNIX_SOCKETS */
 
 /* enable websockets support */
 /* #undef USE_WEBSOCKETS */
@@ -945,9 +957,6 @@
 
 /* Version number of package */
 #define VERSION "-"
-
-/* Define to 1 to provide own prototypes. */
-/* #undef WANT_IDN_PROTOTYPES */
 
 /* Define to 1 if OS is AIX. */
 #ifndef _ALL_SOURCE
