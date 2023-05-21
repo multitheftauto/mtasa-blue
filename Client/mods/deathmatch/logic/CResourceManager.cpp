@@ -23,6 +23,9 @@ CResourceManager::~CResourceManager()
     {
         CResource* pResource = m_resources.back();
         Remove(pResource);
+
+        // Force delete all objects in cache (see https://github.com/multitheftauto/mtasa-blue/issues/1840).
+        g_pClientGame->GetElementDeleter()->DoDeleteAll();
     }
 }
 
