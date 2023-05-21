@@ -17,7 +17,7 @@ auto UtfLen(std::string input) -> int
     return MbUTF8ToUTF16(input).size();
 }
 
-auto UtfSeek(std::string input, int position) -> std::variant<bool, int>
+auto UtfSeek(std::string input, const int position) -> std::variant<bool, int>
 {
     if (std::wstring utfString = MbUTF8ToUTF16(input); position <= static_cast<int>(utfString.size()) && position >= 0)
     {
@@ -31,8 +31,8 @@ auto UtfSeek(std::string input, int position) -> std::variant<bool, int>
 
 auto UtfSub(std::string input, int start, int end) -> std::string
 {
-    std::wstring utfString = MbUTF8ToUTF16(input);
-    ptrdiff_t    length = utfString.size();
+    std::wstring    utfString = MbUTF8ToUTF16(input);
+    const ptrdiff_t length = utfString.size();
 
     // posrelat them both
     if (start < 0)
@@ -69,7 +69,7 @@ auto UtfSub(std::string input, int start, int end) -> std::string
     return "";
 }
 
-auto UtfChar(int code) -> std::string
+auto UtfChar(const int code) -> std::string
 {
     if (code > 65534 || code < 32)
     {
@@ -77,7 +77,7 @@ auto UtfChar(int code) -> std::string
     }
 
     // Generate a null-terminating string for our character
-    wchar_t string[2] = {static_cast<wchar_t>(code), '\0'};
+    const wchar_t string[2] = {static_cast<wchar_t>(code), '\0'};
 
     // Convert our UTF character into an ANSI string
     return UTF16ToMbUTF8(string);
