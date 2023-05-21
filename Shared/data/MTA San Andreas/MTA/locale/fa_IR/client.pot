@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-21 09:29+0000\n"
-"PO-Revision-Date: 2023-05-21 10:27\n"
+"POT-Creation-Date: 2023-05-21 18:22+0000\n"
+"PO-Revision-Date: 2023-05-21 18:27\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -2767,191 +2767,191 @@ msgstr "همه"
 msgid "Start"
 msgstr "شروع"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:484
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
 msgid "Disconnected: Invalid nickname"
 msgstr "اتصال قطع شد: نام مستعار نامعتبر"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:488
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:491
 msgid "Disconnect from server"
 msgstr "قطع ارتباط از سرور"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:492
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr "اتصال قطع شد: سریال شما مسدود/محروم شده است.\n"
 "دلیل: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:498
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:501
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr "اتصال قطع شد: شما محروم شده اید.\n"
 "دلیل:%s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:504
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr "اتصال قطع شد: حساب شما مسدود/محروم شده است.\n"
 "دلیل: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
 msgid "Disconnected: Version mismatch"
 msgstr "اتصال قطع شد: عدم تطابق نسخه"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:516
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "اتصال قطع شد: لطفاً یک دقیقه صبر کنید، سپس سعی کنید که متصل شوید."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr "اتصال قطع شد: سرور از شاخه های مختلف.\n"
 "اطلاعات: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:522
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr "اتصال قطع شد: نسخه بد.\n"
 "اطلاعات: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:527
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr "اصتال قطع شد: سرور در حال اجرای یک نسخه جدیدتر است.\n"
 "اطلاعات: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr "اتصال قطع شد: سرور در حال اجرای یک نسخه قدیمی است.\n"
 "اطلاعات: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:537
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
 msgid "Disconnected: Nick already in use"
 msgstr "اتصال قطع شد: این اسم در حال حاضر در حال استفاده میباشد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
 msgid "Disconnected: Player element could not be created."
 msgstr "اتصال قطع شد: المنت پلیر ساخته نشد."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:545
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "اتصال قطع شد: سرور اتصال را رد کرد: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:550
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
 msgid "Disconnected: Serial verification failed"
 msgstr "اتصال قطع شد: تأیید سریال ناموفق بود"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:557
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "اتصال قطع شد: عدم همگام سازی اتصال %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "اتصال قطع شد: شما توسط %s از بازی اخراج شدید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:568
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "اتصال قطع شد: شما توسط %s از بازی محروم شدید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:579
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "اتصال قطع شد: سرور خاموش و یا ریستارت شد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:599
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "You were kicked from the game"
 msgstr "شما از بازی اخراج شدید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr "این سرور به یک gta_sa.exe بدون تغییر نیاز دارد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
 msgid "Please replace gta_sa.exe"
 msgstr "لطفا gta_sa.exe را جایگزین کنید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr "این سرور به D3D9.DLL های ویرایش شده اجازه ورود نمی دهد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr "D3D9.DLL را از محل نصب GTA خود حذف کرده و MTA را مجددا راه‌اندازی کنید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
 msgid "This server does not allow virtual machines"
 msgstr "این سرور به ماشین های مجازی اجازه ورود نمی دهد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
 msgid "This server requires driver signing to be enabled"
 msgstr "این سرور برای ورود نیاز به فعال بودن امضای درایور دارد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
 msgid "Please restart your PC"
 msgstr "لطفا کامپیوتر خود را مجددا راه‌اندازی کنید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
 msgid "This server has detected missing anti-cheat components"
 msgstr "این سرور اجزای ضد تقلب گم شده را شناسایی کرده است"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
 msgid "Try restarting MTA"
 msgstr "MTA را مجدداً راه‌اندازی کنید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr "این سرور به gta3.img و gta_int.img بدون تغییر نیاز دارد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
 msgid "Please replace gta3.img or gta_int.img"
 msgstr "لطفاً gta3.img یا gta_int.img را جایگزین کنید"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:616
 msgid "This server does not allow Wine"
 msgstr "این سرور اجازه ورود افراد توسط برنامه Wine را نمیدهد"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:617
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr "اطمینان حاصل کنید که هیچ برنامه دیگری MTA:SA را اصلاح نمی کند"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Time Remaining: "
 msgstr "زمان باقی مانده: "
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:638
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d روز روزها"
 msgstr[1] "روزها %d"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:640
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:643
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d ساعت"
 msgstr[1] "%d ساعت ها"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:642
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:645
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d دقیقه"
 msgstr[1] "%d دقیقه ها"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:644
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -2959,7 +2959,7 @@ msgstr[0] "%d ثانیه"
 msgstr[1] "%d ثانیه ها"
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:648
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Disconnected"
 msgstr "قطع شد"
 
