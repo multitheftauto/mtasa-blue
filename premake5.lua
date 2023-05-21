@@ -45,7 +45,6 @@ workspace "MTASA"
 	symbols "On"
 	flags "MultiProcessorCompile"
 
-	dxdir = os.getenv("DXSDK_DIR") or ""
 	includedirs {
 		"vendor",
 	}
@@ -110,10 +109,10 @@ workspace "MTASA"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		buildoptions { "/Zc:__cplusplus" }
 		includedirs {
-			path.join(dxdir, "Include")
+			"$(DXSDK_DIR)Include"
 		}
 		libdirs {
-			path.join(dxdir, "Lib/x86")
+			"$(DXSDK_DIR)Lib/x86"
 		}
 
 	filter {"system:windows", "configurations:Debug"}
