@@ -7,6 +7,11 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+#pragma once
+
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Thread.h"
 
 namespace SharedUtil
 {

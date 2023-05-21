@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CExceptionInformation_Impl.h"
 
 #define MAX_MODULE_PATH 512
 

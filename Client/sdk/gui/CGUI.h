@@ -164,9 +164,6 @@ public:
     virtual void ClearInputHandlers(eInputChannel channel) = 0;
     virtual void ClearSystemKeys() = 0;
 
-    virtual bool IsTransferBoxVisible() = 0;
-    virtual void SetTransferBoxVisible(bool bVisible) = 0;
-
     virtual void CleanDeadPool() = 0;
 
     virtual CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename) = 0;

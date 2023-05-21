@@ -10,6 +10,22 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CElement.h"
+#include "CPerPlayerEntity.h"
+#include "CElementIDs.h"
+#include "CPed.h"
+#include "CPlayerCamera.h"
+#include "CConsoleClient.h"
+#include "CGame.h"
+#include "CMainConfig.h"
+#include "CMapManager.h"
+#include "CDebugHookManager.h"
+#include "CElementRefManager.h"
+#include "CLogger.h"
+#include "CSpatialDatabase.h"
+#include "packets/CElementRPCPacket.h"
+#include "Utils.h"
+#include "lua/CLuaFunctionParseHelpers.h"
 
 extern CGame* g_pGame;
 
@@ -71,7 +87,7 @@ CElement::~CElement()
     delete m_pEventManager;
 
     // Unreference us from what's referencing us
-    list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
+    std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
     for (; iter != m_ElementReferenced.end(); iter++)
     {
         (*iter)->m_ElementReferences.remove(this);
@@ -89,7 +105,7 @@ CElement::~CElement()
     if (m_pAttachedTo)
         m_pAttachedTo->RemoveAttachedElement(this);
 
-    list<CElement*>::iterator iterAttached = m_AttachedElements.begin();
+    std::list<CElement*>::iterator iterAttached = m_AttachedElements.begin();
     for (; iterAttached != m_AttachedElements.end(); iterAttached++)
     {
         // Make sure our attached element stores it's current position
@@ -98,7 +114,7 @@ CElement::~CElement()
         (*iterAttached)->m_pAttachedTo = NULL;
     }
 
-    list<CPed*>::iterator iterUsers = m_OriginSourceUsers.begin();
+    std::list<CPed*>::iterator iterUsers = m_OriginSourceUsers.begin();
     for (; iterUsers != m_OriginSourceUsers.end(); iterUsers++)
     {
         CPed* pPed = *iterUsers;
@@ -122,7 +138,6 @@ CElement::~CElement()
     assert(m_pParent == NULL);
 
     CElementRefManager::OnElementDelete(this);
-    SAFE_RELEASE(m_pChildrenListSnapshot);
 }
 
 bool CElement::IsCloneable()
@@ -522,12 +537,10 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
 {
     assert(table);
 
-    // Grab it and return a pointer to the variable
-    map<string, SCustomData>::const_iterator iter = m_pCustomData->IterBegin();
-    for (; iter != m_pCustomData->IterEnd(); iter++)
+    for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
     {
-        table->PushString(iter->first.c_str());                // key
-        table->PushArgument(iter->second.Variable);            // value
+        table->PushString(it->first);                        // key
+        table->PushArgument(it->second.Variable);            // value
     }
 
     return table;
@@ -832,7 +845,7 @@ void CElement::OnSubtreeAdd(CElement* pElement)
     // Call the event on the elements that references us
     if (!m_ElementReferenced.empty())            // This check reduces cpu usage when loading large maps (due to recursion)
     {
-        list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
+        std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
         {
             (*iter)->OnReferencedSubtreeAdd(pElement);
@@ -851,7 +864,7 @@ void CElement::OnSubtreeRemove(CElement* pElement)
     // Call the event on the elements that references us
     if (!m_ElementReferenced.empty())            // This check reduces cpu usage when unloading large maps (due to recursion)
     {
-        list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
+        std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
         {
             (*iter)->OnReferencedSubtreeRemove(pElement);
@@ -1002,11 +1015,8 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
     }
 
     // Call it on all our children
-    CElementListSnapshot* pList = GetChildrenListSnapshot();
-    pList->AddRef();            // Keep list alive during use
-    for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+    for (CElement* pElement : *GetChildrenListSnapshot())
     {
-        CElement* pElement = *iter;
         if (!pElement->IsBeingDeleted())
         {
             if (!pElement->m_pEventManager || pElement->m_pEventManager->HasEvents() || !pElement->m_Children.empty())
@@ -1017,7 +1027,6 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
             }
         }
     }
-    pList->Release();
 }
 
 void CElement::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
@@ -1037,7 +1046,7 @@ void CElement::CallParentEvent(const char* szName, const CLuaArguments& Argument
 
 bool CElement::CollisionExists(CColShape* pShape)
 {
-    list<CColShape*>::iterator iter = m_Collisions.begin();
+    std::list<CColShape*>::iterator iter = m_Collisions.begin();
     for (; iter != m_Collisions.end(); iter++)
     {
         if (*iter == pShape)
@@ -1050,7 +1059,7 @@ bool CElement::CollisionExists(CColShape* pShape)
 
 void CElement::RemoveAllCollisions()
 {
-    list<CColShape*>::iterator iter = m_Collisions.begin();
+    std::list<CColShape*>::iterator iter = m_Collisions.begin();
     for (; iter != m_Collisions.end(); iter++)
     {
         (*iter)->RemoveCollider(this);
@@ -1070,6 +1079,20 @@ void CElement::SetDimension(unsigned short usDimension)
     Arguments.PushNumber(usOldDimension);
     Arguments.PushNumber(usDimension);
     CallEvent("onElementDimensionChange", Arguments);
+}
+
+void CElement::SetInterior(unsigned char ucInterior)
+{
+    if (m_ucInterior == ucInterior)
+        return;
+
+    unsigned char ucOldInterior = m_ucInterior;
+    m_ucInterior = ucInterior;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(ucOldInterior);
+    Arguments.PushNumber(ucInterior);
+    CallEvent("onElementInteriorChange", Arguments);
 }
 
 CClient* CElement::GetClient()
@@ -1130,7 +1153,7 @@ void CElement::SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation)
 
 bool CElement::IsElementAttached(CElement* pElement)
 {
-    list<CElement*>::iterator iter = m_AttachedElements.begin();
+    std::list<CElement*>::iterator iter = m_AttachedElements.begin();
     for (; iter != m_AttachedElements.end(); iter++)
     {
         if (*iter == pElement)
@@ -1152,7 +1175,7 @@ bool CElement::IsAttachedToElement(CElement* pElement, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break; // This should not be possible, but you never know
+                break;            // This should not be possible, but you never know
         }
 
         return false;
@@ -1496,7 +1519,7 @@ void CElement::UpdateSpatialData()
         m_bUpdatingSpatialData = true;
         GetSpatialDatabase()->UpdateEntity(this);
         // Also make sure attached entites get updated
-        for (list<CElement*>::iterator iter = m_AttachedElements.begin(); iter != m_AttachedElements.end(); iter++)
+        for (std::list<CElement*>::iterator iter = m_AttachedElements.begin(); iter != m_AttachedElements.end(); iter++)
         {
             CElement* pElement = *iter;
             if (pElement->GetAttachedToElement())
@@ -1513,25 +1536,21 @@ void CElement::UpdateSpatialData()
 //
 // Ensure children list snapshot is up to date and return it
 //
-CElementListSnapshot* CElement::GetChildrenListSnapshot()
+CElementListSnapshotRef CElement::GetChildrenListSnapshot()
 {
     // See if list needs updating
     if (m_Children.GetRevision() != m_uiChildrenListSnapshotRevision || m_pChildrenListSnapshot == NULL)
     {
         m_uiChildrenListSnapshotRevision = m_Children.GetRevision();
 
-        // Detach old
-        SAFE_RELEASE(m_pChildrenListSnapshot);
-
         // Make new
-        m_pChildrenListSnapshot = new CElementListSnapshot();
+        m_pChildrenListSnapshot = std::make_shared<CElementListSnapshot>();
 
         // Fill it up
         m_pChildrenListSnapshot->reserve(m_Children.size());
-        for (CChildListType::const_iterator iter = m_Children.begin(); iter != m_Children.end(); iter++)
-        {
+
+        for (auto iter = m_Children.begin(); iter != m_Children.end(); iter++)
             m_pChildrenListSnapshot->push_back(*iter);
-        }
     }
 
     return m_pChildrenListSnapshot;

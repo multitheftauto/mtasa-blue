@@ -46,12 +46,13 @@ o Minor updates for MSVC 2005/08 compilers
 #ifndef RTREE_H
 #define RTREE_H
 
-// NOTE This file compiles under MSVC 6 SP5 and MSVC .Net 2003 it may not work on other compilers without modification.
+    // NOTE This file compiles under MSVC 6 SP5 and MSVC .Net 2003 it may not work on other compilers without modification.
 
-// NOTE These next few lines may be win32 specific, you may need to modify them to compile on other platform
+    // NOTE These next few lines may be win32 specific, you may need to modify them to compile on other platform
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <vector>
 
 #ifndef _WIN32
 #define __cdecl
@@ -319,7 +320,8 @@ protected:
     struct Branch
     {
         Rect m_rect;            ///< Bounds
-        union {
+        union
+        {
             Node*    m_child;            ///< Child node
             DATATYPE m_data;             ///< Data Id or Ptr
         };
@@ -777,8 +779,8 @@ void RTREE_QUAL::Reset()
     // Delete all existing nodes
     RemoveAllRec(m_root);
 #else // RTREE_DONT_USE_MEMPOOLS
-    // Just reset memory pools.  We are not using complex types
-    // EXAMPLE
+        // Just reset memory pools.  We are not using complex types
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -805,7 +807,7 @@ typename RTREE_QUAL::Node* RTREE_QUAL::AllocNode()
 #ifdef RTREE_DONT_USE_MEMPOOLS
     newNode = new Node;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
     InitNode(newNode);
     return newNode;
@@ -819,7 +821,7 @@ void RTREE_QUAL::FreeNode(Node* a_node)
 #ifdef RTREE_DONT_USE_MEMPOOLS
     delete a_node;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -831,7 +833,7 @@ typename RTREE_QUAL::ListNode* RTREE_QUAL::AllocListNode()
 #ifdef RTREE_DONT_USE_MEMPOOLS
     return new ListNode;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 
@@ -841,7 +843,7 @@ void RTREE_QUAL::FreeListNode(ListNode* a_listNode)
 #ifdef RTREE_DONT_USE_MEMPOOLS
     delete a_listNode;
 #else // RTREE_DONT_USE_MEMPOOLS
-    // EXAMPLE
+        // EXAMPLE
 #endif // RTREE_DONT_USE_MEMPOOLS
 }
 

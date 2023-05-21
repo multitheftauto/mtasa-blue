@@ -1,4 +1,4 @@
-/* Copyright (C) 2002 Jean-Marc Valin 
+/* Copyright (C) 2002 Jean-Marc Valin
    File: vbr.c
 
    VBR-related routines
@@ -6,18 +6,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -55,7 +55,7 @@ const float vbr_nb_thresh[9][11]={
    {11.0f, 11.0f,  9.9f,  8.5f,  7.0f, 5.25f,  4.5f,  4.0f,  4.0f,  4.0f,  2.0f}, /* 11 kbps */
    {11.0f, 11.0f, 11.0f, 11.0f,  9.5f, 9.25f,  8.0f,  7.0f,  5.0f,  4.0f,  3.0f}, /* 15 kbps */
    {11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f,  9.5f,  8.5f,  6.2f,  5.2f,  5.0f}, /* 18 kbps */
-   {11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 10.0f,  9.8f,  7.5f}, /* 24 kbps */ 
+   {11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 10.0f,  9.8f,  7.5f}, /* 24 kbps */
    { 7.0f,  4.5f,  3.7f,  3.0f,  2.5f,  1.0f,  1.8f,  1.5f,  1.0f,  0.0f,  0.0f}  /*  4 kbps */
 };
 
@@ -65,7 +65,7 @@ const float vbr_hb_thresh[5][11]={
    {-1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f}, /*  2 kbps */
    {11.0f, 11.0f,  9.5f,  8.5f,  7.5f,  6.0f,  5.0f,  3.9f,  3.0f,  2.0f,  1.0f}, /*  6 kbps */
    {11.0f, 11.0f, 11.0f, 11.0f, 11.0f,  9.5f,  8.7f,  7.8f,  7.0f,  6.5f,  4.0f}, /* 10 kbps */
-   {11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f,  9.8f,  7.5f,  5.5f}  /* 18 kbps */ 
+   {11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f, 11.0f,  9.8f,  7.5f,  5.5f}  /* 18 kbps */
 };
 
 const float vbr_uhb_thresh[2][11]={
@@ -115,7 +115,7 @@ void vbr_init(VBRState *vbr)
 
   -Decrease bit-rate for males (low pitch)?
 
-  -(wideband only) less bits in the high-band when signal is very 
+  -(wideband only) less bits in the high-band when signal is very
   non-stationary (harder to notice high-frequency noise)???
 
 */
@@ -125,7 +125,6 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
    int i;
    float ener=0, ener1=0, ener2=0;
    float qual=7;
-   int va;
    float log_energy;
    float non_st=0;
    float voicing;
@@ -158,11 +157,11 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
        || (voicing<0 && non_st < .05))
    {
       float tmp;
-      va = 0;
+
       vbr->consec_noise++;
       if (pow_ener > 3*vbr->noise_level)
          tmp = 3*vbr->noise_level;
-      else 
+      else
          tmp = pow_ener;
       if (vbr->consec_noise>=4)
       {
@@ -170,14 +169,13 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
          vbr->noise_accum_count = .95*vbr->noise_accum_count + .05;
       }
    } else {
-      va = 1;
       vbr->consec_noise=0;
    }
 
    if (pow_ener < vbr->noise_level && ener>MIN_ENERGY)
    {
       vbr->noise_accum = .95*vbr->noise_accum + .05*pow_ener;
-      vbr->noise_accum_count = .95*vbr->noise_accum_count + .05;      
+      vbr->noise_accum_count = .95*vbr->noise_accum_count + .05;
    }
 
    /* Checking for very low absolute energy */
@@ -223,7 +221,7 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
       qual=4;
    if (qual>10)
       qual=10;
-   
+
    /*
    if (vbr->consec_noise>=2)
       qual-=1.3;
@@ -239,7 +237,7 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
       qual -= 1.0 * (log(3.0 + vbr->consec_noise)-log(3));
    if (qual<0)
       qual=0;
-   
+
    if (ener<1600000)
    {
       if (vbr->consec_noise>2)
@@ -253,7 +251,7 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
    if (qual<-1)
       qual=-1;
 
-   /*printf ("%f %f %f %f %d\n", qual, voicing, non_st, pow_ener/(.01+vbr->noise_level), va);*/
+   /*printf ("%f %f %f %f\n", qual, voicing, non_st, pow_ener/(.01+vbr->noise_level));*/
 
    vbr->last_pitch_coef = pitch_coef;
    vbr->last_quality = qual;
@@ -262,7 +260,7 @@ float vbr_analysis(VBRState *vbr, spx_word16_t *sig, int len, int pitch, float p
       vbr->last_log_energy[i] = vbr->last_log_energy[i-1];
    vbr->last_log_energy[0] = log_energy;
 
-   /*printf ("VBR: %f %f %f %d %f\n", (float)(log_energy-log(vbr->average_energy+MIN_ENERGY)), non_st, voicing, va, vbr->noise_level);*/
+   /*printf ("VBR: %f %f %f %f\n", (float)(log_energy-log(vbr->average_energy+MIN_ENERGY)), non_st, voicing, vbr->noise_level);*/
 
    return qual;
 }

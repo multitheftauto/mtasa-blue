@@ -13,7 +13,8 @@
 
 #include "CCommon.h"
 #include "CPacket.h"
-#include "CVehicle.h"
+
+class CVehicle;
 
 class CVehicleResyncPacket final : public CPacket
 {

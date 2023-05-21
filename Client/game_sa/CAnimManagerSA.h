@@ -17,10 +17,6 @@
 #include <game/CAnimBlock.h>
 #include <game/CAnimBlendAssocGroup.h>
 
-#include "Common.h"
-#include <list>
-#include <map>
-
 #define FUNC_CAnimManager_Initialize                        0x5bf6b0
 #define FUNC_CAnimManager_Shutdown                          0x4d4130
 #define FUNC_CAnimManager_GetAnimationBlock_int             0x406f90
@@ -64,6 +60,7 @@
 #define VAR_CAnimManager_NumAnimAssocDefinitions            0xb4ea28
 #define VAR_CAnimManager_NumAnimations                      0xb4ea2c
 #define VAR_CAnimManager_NumAnimBlocks                      0xb4ea30
+
 // Non members
 #define FUNC_HasAnimGroupLoaded                             0x45b130
 #define FUNC_RpAnimBlendClumpGetFirstAssociation            0x4d15e0
@@ -72,11 +69,6 @@
 #define FUNC_RpAnimBlendGetNextAssociation                  0x4d6ab0
 #define FUNC_RpAnimBlendClumpGetNumAssociations             0x4d6b60
 #define FUNC_RpAnimBlendClumpUpdateAnimations               0x4d34f0
-
-class CAnimManagerSAInterface
-{
-public:
-};
 
 class CAnimManagerSA : public CAnimManager
 {

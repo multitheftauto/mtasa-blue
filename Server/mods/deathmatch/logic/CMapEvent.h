@@ -13,6 +13,8 @@
 
 #define MAPEVENT_MAX_LENGTH_NAME 100
 
+#include "Enums.h"
+#include "lua/CLuaFunctionRef.h"
 #include <stdio.h>
 #include <string>
 

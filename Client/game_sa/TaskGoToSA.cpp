@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "TaskGoToSA.h"
 
 // ##############################################################################
 // ## Name:    CTaskComplexWander
@@ -19,8 +20,7 @@
 
 int CTaskComplexWanderSA::GetWanderType()
 {
-    DEBUG_TRACE("int CTaskComplexWander::GetWanderType()");
-    CTaskSAInterface* pTaskInterface = this->GetInterface();
+    CTaskSAInterface* pTaskInterface = GetInterface();
     DWORD             dwFunc = ((TaskComplexWanderVTBL*)pTaskInterface->VTBL)->GetWanderType;
     int               iReturn = NO_WANDER_TYPE;
 
@@ -38,12 +38,12 @@ int CTaskComplexWanderSA::GetWanderType()
 
 CNodeAddress* CTaskComplexWanderSA::GetNextNode()
 {
-    return &((CTaskComplexWanderSAInterface*)this->GetInterface())->m_NextNode;
+    return &((CTaskComplexWanderSAInterface*)GetInterface())->m_NextNode;
 }
 
 CNodeAddress* CTaskComplexWanderSA::GetLastNode()
 {
-    return &((CTaskComplexWanderSAInterface*)this->GetInterface())->m_LastNode;
+    return &((CTaskComplexWanderSAInterface*)GetInterface())->m_LastNode;
 }
 
 // ##############################################################################
@@ -53,12 +53,11 @@ CNodeAddress* CTaskComplexWanderSA::GetLastNode()
 
 CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)
 {
-    DEBUG_TRACE("CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)");
-    this->CreateTaskInterface(sizeof(CTaskComplexWanderStandardSAInterface));
+    CreateTaskInterface(sizeof(CTaskComplexWanderStandardSAInterface));
     if (!IsValid())
         return;
     DWORD dwFunc = FUNC_CTaskComplexWanderStandard__Constructor;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     _asm
     {
         mov     ecx, dwThisInterface

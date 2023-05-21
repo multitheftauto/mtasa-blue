@@ -14,7 +14,7 @@ class CClientPathNode;
 
 #include "CClientManager.h"
 
-class CClientPathNode : public CClientEntity
+class CClientPathNode final : public CClientEntity
 {
     DECLARE_CLASS(CClientPathNode, CClientEntity)
     friend class CClientPathManager;

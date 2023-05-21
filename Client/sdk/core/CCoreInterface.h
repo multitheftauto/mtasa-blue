@@ -23,7 +23,6 @@
 #include "CWebCoreInterface.h"
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
-#include "CDiscordManagerInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -34,8 +33,6 @@ class CNet;
 class CGame;
 class CModelCacheManager;
 class CLocalizationInterface;
-enum HWBRK_TYPE;
-enum HWBRK_SIZE;
 
 enum eCoreVersion
 {
@@ -91,9 +88,9 @@ public:
     virtual void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false) = 0;
     virtual void ChatPrintf(const char* szFormat, bool bColorCoded, ...) = 0;
     virtual void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...) = 0;
-    virtual void SetChatVisible(bool bVisible) = 0;
+    virtual void SetChatVisible(bool bVisible, bool bInputBlocked = true) = 0;
     virtual bool IsChatVisible() = 0;
-    virtual void TakeScreenShot() = 0;
+    virtual void InitiateScreenShot(bool bCameraShot) = 0;
     virtual void EnableChatInput(char* szCommand, DWORD dwColor) = 0;
     virtual bool IsChatInputEnabled() = 0;
     virtual bool IsSettingsVisible() = 0;
@@ -176,9 +173,12 @@ public:
     virtual SString     GetBlueCopyrightString() = 0;
     virtual bool        ClearChat() = 0;
     virtual void        OnGameTimerUpdate() = 0;
-    virtual HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress) = 0;
 
-    virtual CDiscordManagerInterface* GetDiscordManager() = 0;
+    virtual bool IsChatInputBlocked() = 0;
+    virtual bool SetChatboxCharacterLimit(int charLimit) = 0;
+    virtual void ResetChatboxCharacterLimit() = 0;
+    virtual int  GetChatboxCharacterLimit() = 0;
+    virtual int  GetChatboxMaxCharacterLimit() = 0;
 };
 
 class CClientTime

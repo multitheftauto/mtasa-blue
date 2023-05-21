@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaACLDefs.h"
+#include "CGame.h"
+#include "CScriptArgReader.h"
+#include "Utils.h"
 
 // Helper function
 static const char* GetResourceName(lua_State* luaVM)
@@ -741,6 +745,9 @@ int CLuaACLDefs::aclGroupAddObject(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pGroup);
     argStream.ReadString(strObject);
+
+    if (strObject.length() > 255)
+        argStream.SetCustomError(SString("Object name is too long, max length 255, got %d.", strObject.length()));
 
     if (!argStream.HasErrors())
     {

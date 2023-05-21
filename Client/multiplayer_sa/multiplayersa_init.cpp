@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <net/CNet.h>
 #define DECLARE_PROFILER_SECTION_multiplayersa_init
 #include "profiler/SharedUtil.Profiler.h"
 
@@ -63,11 +64,6 @@ void MemCpy(void* dwDest, const void* dwSrc, uint uiAmount)
 void OnCrashAverted(uint uiId)
 {
     g_pCore->OnCrashAverted(uiId);
-}
-
-HANDLE SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress)
-{
-    return g_pCore->SetThreadHardwareBreakPoint(hThread, Type, Size, dwAddress);
 }
 
 void OnEnterCrashZone(uint uiId)

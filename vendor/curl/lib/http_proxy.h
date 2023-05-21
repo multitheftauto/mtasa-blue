@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,33 +20,33 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
-#include "urldata.h"
 
 #if !defined(CURL_DISABLE_PROXY) && !defined(CURL_DISABLE_HTTP)
-/* ftp can use this as well */
-CURLcode Curl_proxyCONNECT(struct connectdata *conn,
-                           int tunnelsocket,
-                           const char *hostname, int remote_port);
+
+#include "urldata.h"
 
 /* Default proxy timeout in milliseconds */
 #define PROXY_TIMEOUT (3600*1000)
 
-CURLcode Curl_proxy_connect(struct connectdata *conn, int sockindex);
+void Curl_cf_http_proxy_get_host(struct Curl_cfilter *cf,
+                                 struct Curl_easy *data,
+                                 const char **phost,
+                                 const char **pdisplay_host,
+                                 int *pport);
 
-bool Curl_connect_complete(struct connectdata *conn);
-bool Curl_connect_ongoing(struct connectdata *conn);
+CURLcode Curl_cf_http_proxy_insert_after(struct Curl_cfilter *cf_at,
+                                         struct Curl_easy *data);
 
-#else
-#define Curl_proxyCONNECT(x,y,z,w) CURLE_NOT_BUILT_IN
-#define Curl_proxy_connect(x,y) CURLE_OK
-#define Curl_connect_complete(x) CURLE_OK
-#define Curl_connect_ongoing(x) FALSE
-#endif
+extern struct Curl_cftype Curl_cft_http_proxy;
 
-void Curl_connect_free(struct Curl_easy *data);
-void Curl_connect_done(struct Curl_easy *data);
+#endif /* !CURL_DISABLE_PROXY  && !CURL_DISABLE_HTTP */
+
+#define IS_HTTPS_PROXY(t) (((t) == CURLPROXY_HTTPS) ||  \
+                           ((t) == CURLPROXY_HTTPS2))
 
 #endif /* HEADER_CURL_HTTP_PROXY_H */

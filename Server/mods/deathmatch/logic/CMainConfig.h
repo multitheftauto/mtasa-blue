@@ -20,7 +20,10 @@ class CMainConfig;
 #include <list>
 
 #define MAX_MAP_NAME_LENGTH 64
+
 class CMainConfig;
+class CCommandLineParser;
+class CLuaArguments;
 
 typedef void (CMainConfig::*PFN_SettingChangeCallback)();
 
@@ -44,6 +47,7 @@ public:
 
     bool Load();
     bool LoadExtended();
+    void RegisterCommands();
     bool Save();
 
     const std::string& GetServerName() { return m_strServerName; };

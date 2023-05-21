@@ -13,9 +13,9 @@
 
 #include "CPhysical.h"
 
-class CVehicle;
-class CPed;
 class CObjectSAInterface;
+class CPed;
+class CVehicle;
 
 class CObject : public virtual CPhysical
 {

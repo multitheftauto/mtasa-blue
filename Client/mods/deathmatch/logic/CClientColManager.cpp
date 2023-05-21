@@ -69,6 +69,7 @@ void CClientColManager::DoHitDetectionForColShape(CClientColShape* pShape)
             case CCLIENTDFF:
             case CCLIENTCOL:
             case CCLIENTTXD:
+            case CCLIENTIMG:
             case CCLIENTSOUND:
                 break;
             default:
@@ -146,7 +147,7 @@ void CClientColManager::HandleHitDetectionResult(bool bHit, CClientColShape* pSh
             pEntity->AddCollision(pShape);
 
             // Can we call the event?
-            if (pShape->GetAutoCallEvent())
+            if (pShape->GetAutoCallEvent() && !pEntity->IsBeingDeleted())
             {
                 // Call the event
                 CLuaArguments Arguments;
@@ -173,16 +174,20 @@ void CClientColManager::HandleHitDetectionResult(bool bHit, CClientColShape* pSh
             pShape->RemoveCollider(pEntity);
             pEntity->RemoveCollision(pShape);
 
-            // Call the event
-            CLuaArguments Arguments;
-            Arguments.PushElement(pEntity);
-            Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pShape->CallEvent("onClientColShapeLeave", Arguments, true);
+            // Can we call the event?
+            if (!pEntity->IsBeingDeleted())
+            {
+                // Call the event
+                CLuaArguments Arguments;
+                Arguments.PushElement(pEntity);
+                Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                pShape->CallEvent("onClientColShapeLeave", Arguments, true);
 
-            CLuaArguments Arguments2;
-            Arguments2.PushElement(pShape);
-            Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pEntity->CallEvent("onClientElementColShapeLeave", Arguments2, true);
+                CLuaArguments Arguments2;
+                Arguments2.PushElement(pShape);
+                Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                pEntity->CallEvent("onClientElementColShapeLeave", Arguments2, true);
+            }
 
             pShape->CallLeaveCallback(*pEntity);
         }

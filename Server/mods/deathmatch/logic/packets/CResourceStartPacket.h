@@ -11,9 +11,8 @@
 
 #pragma once
 
+#include "CPacket.h"
 #include <list>
-#include "../packets/CPacket.h"
-#include "../CResource.h"
 
 class CResourceStartPacket final : public CPacket
 {

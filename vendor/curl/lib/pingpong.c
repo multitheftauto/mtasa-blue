@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  *   'pingpong' is for generic back-and-forth support functions used by FTP,
  *   IMAP, POP3, SMTP and whatever more that likes them.
  *
@@ -26,13 +28,13 @@
 #include "curl_setup.h"
 
 #include "urldata.h"
+#include "cfilters.h"
 #include "sendf.h"
 #include "select.h"
 #include "progress.h"
 #include "speedcheck.h"
 #include "pingpong.h"
 #include "multiif.h"
-#include "non-ascii.h"
 #include "vtls/vtls.h"
 
 /* The last 3 #include files should be in this order */
@@ -44,10 +46,10 @@
 
 /* Returns timeout in ms. 0 or negative number means the timeout has already
    triggered */
-timediff_t Curl_pp_state_timeout(struct pingpong *pp, bool disconnecting)
+timediff_t Curl_pp_state_timeout(struct Curl_easy *data,
+                                 struct pingpong *pp, bool disconnecting)
 {
-  struct connectdata *conn = pp->conn;
-  struct Curl_easy *data = conn->data;
+  struct connectdata *conn = data->conn;
   timediff_t timeout_ms; /* in milliseconds */
   timediff_t response_time = (data->set.server_response_timeout)?
     data->set.server_response_timeout: pp->response_time;
@@ -77,15 +79,15 @@ timediff_t Curl_pp_state_timeout(struct pingpong *pp, bool disconnecting)
 /*
  * Curl_pp_statemach()
  */
-CURLcode Curl_pp_statemach(struct pingpong *pp, bool block,
+CURLcode Curl_pp_statemach(struct Curl_easy *data,
+                           struct pingpong *pp, bool block,
                            bool disconnecting)
 {
-  struct connectdata *conn = pp->conn;
+  struct connectdata *conn = data->conn;
   curl_socket_t sock = conn->sock[FIRSTSOCKET];
   int rc;
   timediff_t interval_ms;
-  timediff_t timeout_ms = Curl_pp_state_timeout(pp, disconnecting);
-  struct Curl_easy *data = conn->data;
+  timediff_t timeout_ms = Curl_pp_state_timeout(data, pp, disconnecting);
   CURLcode result = CURLE_OK;
 
   if(timeout_ms <= 0) {
@@ -101,12 +103,12 @@ CURLcode Curl_pp_statemach(struct pingpong *pp, bool block,
   else
     interval_ms = 0; /* immediate */
 
-  if(Curl_ssl_data_pending(conn, FIRSTSOCKET))
+  if(Curl_conn_data_pending(data, FIRSTSOCKET))
     rc = 1;
   else if(Curl_pp_moredata(pp))
     /* We are receiving and there is data in the cache so just read it */
     rc = 1;
-  else if(!pp->sendleft && Curl_ssl_data_pending(conn, FIRSTSOCKET))
+  else if(!pp->sendleft && Curl_conn_data_pending(data, FIRSTSOCKET))
     /* We are receiving and there is data ready in the SSL library */
     rc = 1;
   else
@@ -117,7 +119,7 @@ CURLcode Curl_pp_statemach(struct pingpong *pp, bool block,
 
   if(block) {
     /* if we didn't wait, we don't have to spend time on this now */
-    if(Curl_pgrsUpdate(conn))
+    if(Curl_pgrsUpdate(data))
       result = CURLE_ABORTED_BY_CALLBACK;
     else
       result = Curl_speedcheck(data, Curl_now());
@@ -131,17 +133,17 @@ CURLcode Curl_pp_statemach(struct pingpong *pp, bool block,
     result = CURLE_OUT_OF_MEMORY;
   }
   else if(rc)
-    result = pp->statemach_act(conn);
+    result = pp->statemachine(data, data->conn);
 
   return result;
 }
 
 /* initialize stuff to prepare for reading a fresh new response */
-void Curl_pp_init(struct pingpong *pp)
+void Curl_pp_init(struct Curl_easy *data, struct pingpong *pp)
 {
-  struct connectdata *conn = pp->conn;
+  DEBUGASSERT(data);
   pp->nread_resp = 0;
-  pp->linestart_resp = conn->data->state.buffer;
+  pp->linestart_resp = data->state.buffer;
   pp->pending_resp = TRUE;
   pp->response = Curl_now(); /* start response time-out now! */
 }
@@ -162,7 +164,8 @@ void Curl_pp_setup(struct pingpong *pp)
  *
  * made to never block
  */
-CURLcode Curl_pp_vsendf(struct pingpong *pp,
+CURLcode Curl_pp_vsendf(struct Curl_easy *data,
+                        struct pingpong *pp,
                         const char *fmt,
                         va_list args)
 {
@@ -170,8 +173,7 @@ CURLcode Curl_pp_vsendf(struct pingpong *pp,
   size_t write_len;
   char *s;
   CURLcode result;
-  struct connectdata *conn = pp->conn;
-  struct Curl_easy *data;
+  struct connectdata *conn = data->conn;
 
 #ifdef HAVE_GSSAPI
   enum protection_level data_sec;
@@ -184,7 +186,6 @@ CURLcode Curl_pp_vsendf(struct pingpong *pp,
   if(!conn)
     /* can't send without a connection! */
     return CURLE_SEND_ERROR;
-  data = conn->data;
 
   Curl_dyn_reset(&pp->sendbuf);
   result = Curl_dyn_vaddf(&pp->sendbuf, fmt, args);
@@ -198,24 +199,19 @@ CURLcode Curl_pp_vsendf(struct pingpong *pp,
 
   write_len = Curl_dyn_len(&pp->sendbuf);
   s = Curl_dyn_ptr(&pp->sendbuf);
-  Curl_pp_init(pp);
-
-  result = Curl_convert_to_network(data, s, write_len);
-  /* Curl_convert_to_network calls failf if unsuccessful */
-  if(result)
-    return result;
+  Curl_pp_init(data, pp);
 
 #ifdef HAVE_GSSAPI
   conn->data_prot = PROT_CMD;
 #endif
-  result = Curl_write(conn, conn->sock[FIRSTSOCKET], s, write_len,
+  result = Curl_write(data, conn->sock[FIRSTSOCKET], s, write_len,
                       &bytes_written);
   if(result)
     return result;
 #ifdef HAVE_GSSAPI
   data_sec = conn->data_prot;
   DEBUGASSERT(data_sec > PROT_NONE && data_sec < PROT_LAST);
-  conn->data_prot = data_sec;
+  conn->data_prot = (unsigned char)data_sec;
 #endif
 
   Curl_debug(data, CURLINFO_HEADER_OUT, s, (size_t)bytes_written);
@@ -246,14 +242,14 @@ CURLcode Curl_pp_vsendf(struct pingpong *pp,
  *
  * made to never block
  */
-CURLcode Curl_pp_sendf(struct pingpong *pp,
+CURLcode Curl_pp_sendf(struct Curl_easy *data, struct pingpong *pp,
                        const char *fmt, ...)
 {
   CURLcode result;
   va_list ap;
   va_start(ap, fmt);
 
-  result = Curl_pp_vsendf(pp, fmt, ap);
+  result = Curl_pp_vsendf(data, pp, fmt, ap);
 
   va_end(ap);
 
@@ -265,7 +261,8 @@ CURLcode Curl_pp_sendf(struct pingpong *pp,
  *
  * Reads a piece of a server response.
  */
-CURLcode Curl_pp_readresp(curl_socket_t sockfd,
+CURLcode Curl_pp_readresp(struct Curl_easy *data,
+                          curl_socket_t sockfd,
                           struct pingpong *pp,
                           int *code, /* return the server code if done */
                           size_t *size) /* size of the response */
@@ -274,8 +271,7 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
   bool keepon = TRUE;
   ssize_t gotbytes;
   char *ptr;
-  struct connectdata *conn = pp->conn;
-  struct Curl_easy *data = conn->data;
+  struct connectdata *conn = data->conn;
   char * const buf = data->state.buffer;
   CURLcode result = CURLE_OK;
 
@@ -300,7 +296,7 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
        */
       if((ptr + pp->cache_size) > (buf + data->set.buffer_size + 1)) {
         failf(data, "cached response data too big to handle");
-        return CURLE_RECV_ERROR;
+        return CURLE_WEIRD_SERVER_REPLY;
       }
       memcpy(ptr, pp->cache, pp->cache_size);
       gotbytes = (ssize_t)pp->cache_size;
@@ -315,20 +311,15 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
 #endif
       DEBUGASSERT((ptr + data->set.buffer_size - pp->nread_resp) <=
                   (buf + data->set.buffer_size + 1));
-      result = Curl_read(conn, sockfd, ptr,
+      result = Curl_read(data, sockfd, ptr,
                          data->set.buffer_size - pp->nread_resp,
                          &gotbytes);
 #ifdef HAVE_GSSAPI
       DEBUGASSERT(prot  > PROT_NONE && prot < PROT_LAST);
-      conn->data_prot = prot;
+      conn->data_prot = (unsigned char)prot;
 #endif
       if(result == CURLE_AGAIN)
         return CURLE_OK; /* return */
-
-      if(!result && (gotbytes > 0))
-        /* convert from the network encoding */
-        result = Curl_convert_from_network(data, ptr, gotbytes);
-      /* Curl_convert_from_network calls failf if unsuccessful */
 
       if(result)
         /* Set outer result variable to this error. */
@@ -340,7 +331,7 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
     else if(gotbytes <= 0) {
       keepon = FALSE;
       result = CURLE_RECV_ERROR;
-      failf(data, "response reading failed");
+      failf(data, "response reading failed (errno: %d)", SOCKERRNO);
     }
     else {
       /* we got a whole chunk of data, which can be anything from one
@@ -371,12 +362,12 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
            * for "headers". The response lines can be seen as a kind of
            * headers.
            */
-          result = Curl_client_write(conn, CLIENTWRITE_HEADER,
+          result = Curl_client_write(data, CLIENTWRITE_HEADER,
                                      pp->linestart_resp, perline);
           if(result)
             return result;
 
-          if(pp->endofresp(conn, pp->linestart_resp, perline, code)) {
+          if(pp->endofresp(data, conn, pp->linestart_resp, perline, code)) {
             /* This is the end of the last line, copy the last line to the
                start of the buffer and null-terminate, for old times sake */
             size_t n = ptr - pp->linestart_resp;
@@ -403,17 +394,18 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
         clipamount = gotbytes - i;
         restart = TRUE;
         DEBUGF(infof(data, "Curl_pp_readresp_ %d bytes of trailing "
-                     "server response left\n",
+                     "server response left",
                      (int)clipamount));
       }
       else if(keepon) {
 
-        if((perline == gotbytes) && (gotbytes > data->set.buffer_size/2)) {
+        if((perline == gotbytes) &&
+           (gotbytes > (ssize_t)data->set.buffer_size/2)) {
           /* We got an excessive line without newlines and we need to deal
              with it. We keep the first bytes of the line then we throw
              away the rest. */
           infof(data, "Excessive server response line length received, "
-                "%zd bytes. Stripping\n", gotbytes);
+                "%zd bytes. Stripping", gotbytes);
           restart = TRUE;
 
           /* we keep 40 bytes since all our pingpong protocols are only
@@ -456,10 +448,10 @@ CURLcode Curl_pp_readresp(curl_socket_t sockfd,
   return result;
 }
 
-int Curl_pp_getsock(struct pingpong *pp,
-                    curl_socket_t *socks)
+int Curl_pp_getsock(struct Curl_easy *data,
+                    struct pingpong *pp, curl_socket_t *socks)
 {
-  struct connectdata *conn = pp->conn;
+  struct connectdata *conn = data->conn;
   socks[0] = conn->sock[FIRSTSOCKET];
 
   if(pp->sendleft) {
@@ -471,13 +463,14 @@ int Curl_pp_getsock(struct pingpong *pp,
   return GETSOCK_READSOCK(0);
 }
 
-CURLcode Curl_pp_flushsend(struct pingpong *pp)
+CURLcode Curl_pp_flushsend(struct Curl_easy *data,
+                           struct pingpong *pp)
 {
   /* we have a piece of a command still left to send */
-  struct connectdata *conn = pp->conn;
+  struct connectdata *conn = data->conn;
   ssize_t written;
   curl_socket_t sock = conn->sock[FIRSTSOCKET];
-  CURLcode result = Curl_write(conn, sock, pp->sendthis + pp->sendsize -
+  CURLcode result = Curl_write(data, sock, pp->sendthis + pp->sendsize -
                                pp->sendleft, pp->sendleft, &written);
   if(result)
     return result;

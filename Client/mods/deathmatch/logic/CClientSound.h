@@ -17,7 +17,7 @@ class CBassAudio;
 #include "CClientEntity.h"
 #include "CSimulatedPlayPosition.h"
 
-class CClientSound : public CClientEntity
+class CClientSound final : public CClientEntity
 {
     DECLARE_CLASS(CClientSound, CClientEntity)
     friend class CClientSoundManager;
@@ -82,6 +82,9 @@ public:
 
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);
+
+    bool SetFxEffectParameters(uint uiFxEffect, void* params);
+    bool GetFxEffectParameters(uint uiFxEffect, void* params);
 
     void Unlink(){};
 

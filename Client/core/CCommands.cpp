@@ -166,6 +166,13 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 val = val.substr(nOpIndex + 1);
                 TrimWhiteSpace(val);
                 CVARS_SET(key, val);
+
+                // HACK: recalculate frame rate limit on cvar change
+                if (key == "fps_limit" && m_FpsLimitTimer.Get() >= 500 && CCore::GetSingleton().IsConnected())
+                {
+                    CCore::GetSingleton().RecalculateFrameRateLimit(-1, true);
+                    m_FpsLimitTimer.Reset();
+                }
             }
             else
             {

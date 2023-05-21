@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedModelInfoSA.h"
 
 CPedModelInfoSAInterface::CPedModelInfoSAInterface()
 {

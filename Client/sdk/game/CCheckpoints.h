@@ -11,13 +11,13 @@
 
 #pragma once
 
-#include <CVector.h>
-#include "CCheckpoint.h"
+class CCheckpoint;
+class CVector;
 
 class CCheckpoints
 {
 public:
-    virtual CCheckpoint* CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, FLOAT fSize, FLOAT fPulseFraction,
-                                          const SColor color) = 0;
+    virtual CCheckpoint* CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, float fSize, float fPulseFraction,
+                                          const SharedUtil::SColor color) = 0;
     virtual CCheckpoint* FindFreeMarker() = 0;
 };

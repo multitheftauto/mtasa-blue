@@ -14,8 +14,17 @@
 #include "Common.h"
 #include "../Common.h"
 #include <string>
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Math.h"
+#include "SharedUtil.Misc.h"
+#include "SharedUtil.Logging.h"
+#include <vector>
 #ifndef WIN32
     #include <alloca.h>
+#endif
+
+#ifdef __cpp_lib_string_view
+#include <string_view>
 #endif
 
 struct ISyncStructure;
@@ -191,6 +200,42 @@ public:
     // Return true if enough bytes left in the bitstream
     bool CanReadNumberOfBytes(int iLength) const { return iLength >= 0 && iLength <= (GetNumberOfUnreadBits() + 7) / 8; }
 
+    // For whatever stupid reason sdk/net gets included in Multiplayer SA and Game SA
+    // And since those projects are c++14 we need this stuff.
+    // TODO: Rip sdk/net out of these projects...
+#ifdef __cpp_lib_string_view
+    // Write characters in `value`
+    void WriteStringCharacters(std::string_view value)
+    {
+        if (!value.empty())
+            Write(value.data(), (int)value.length());
+    }
+    // Write `n` characters from `value`
+    void WriteStringCharacters(std::string_view value, size_t n)
+    {
+        dassert(n <= value.length());
+        if (n)
+            Write(value.data(), (int)n);
+    }
+
+    // Write all characters in `value` (incl. length as `SizeType`)
+    template<typename SizeType = unsigned short>
+    void WriteString(std::string_view value)
+    {
+        // Write the length
+        Write(static_cast<SizeType>(value.length()));
+
+        // Write the characters
+        return WriteStringCharacters(value);
+    }
+
+    // Write a string (incl. variable size header)
+    void WriteStr(std::string_view value)
+    {
+        WriteLength(value.length());
+        return WriteStringCharacters(value, value.length());
+    }
+#else
     // Write characters from a std::string
     void WriteStringCharacters(const std::string& value, uint uiLength)
     {
@@ -199,6 +244,26 @@ public:
         if (uiLength)
             Write(&value.at(0), uiLength);
     }
+
+    // Write a string (incl. ushort size header)
+    template <typename SizeType = unsigned short>
+    void WriteString(const std::string& value)
+    {
+        // Write the length
+        auto length = static_cast<SizeType>(value.length());
+        Write(length);
+
+        // Write the characters
+        return WriteStringCharacters(value, length);
+    }
+
+    // Write a string (incl. variable size header)
+    void WriteStr(const std::string& value)
+    {
+        WriteLength(value.length());
+        return WriteStringCharacters(value, value.length());
+    }
+#endif
 
     // Read characters into a std::string
     bool ReadStringCharacters(std::string& result, uint uiLength)
@@ -219,20 +284,8 @@ public:
         return true;
     }
 
-    // Write a string (incl. ushort size header)
-    template<typename SizeType = unsigned short>
-    void WriteString(const std::string& value)
-    {
-        // Write the length
-        auto length = static_cast<SizeType>(value.length());
-        Write(length);
-
-        // Write the characters
-        return WriteStringCharacters(value, length);
-    }
-
     // Read a string (incl. ushort size header)
-    template<typename SizeType = unsigned short>
+    template <typename SizeType = unsigned short>
     bool ReadString(std::string& result)
     {
         result = "";
@@ -289,13 +342,6 @@ public:
                 return false;
         }
         return true;
-    }
-
-    // Write a string (incl. variable size header)
-    void WriteStr(const std::string& value)
-    {
-        WriteLength(value.length());
-        return WriteStringCharacters(value, value.length());
     }
 
     // Read a string (incl. variable size header)
@@ -452,6 +498,36 @@ enum class eBitStreamVersion : unsigned short
     // 2020-11-10 0x71
     PedEnterExit,
 
+    // Add height for colpolygon (#1908)
+    // 2021-01-16 0x72
+    SetColPolygonHeight,
+
+    // Support for vehicle blow without explosion and blow state synchronisation
+    // 2021-02-26 0x73
+    VehicleBlowStateSupport,
+
+    // Implement messageType parameter to onClientChatMessage (#1020)
+    // 2021-05-15 0x74
+    OnClientChatMessage_MessageType,
+
+    // Add serverside event "onPlayerResourceStart" (#2150)
+    // 2021-08-30 0x75
+    OnPlayerResourceStart,
+
+    //
+    // 1.5.9 RELEASED - 2021-10-01
+    //
+
+    // Remove "old" Discord implementation (#2499)
+    // 2022-01-16 0x76
+    Discord_Cleanup,
+
+    //
+    // 1.6.0 RELEASED - 2023-04-07
+    //
+
+    CEntityAddPacket_ObjectBreakable,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
@@ -468,12 +544,10 @@ protected:
     virtual ~NetBitStreamInterface() { DEBUG_DESTROY_COUNT("NetBitStreamInterface"); }
 
 public:
-    virtual operator NetBitStreamInterface&() { return *this; }
+    virtual                operator NetBitStreamInterface&() { return *this; }
     virtual unsigned short Version() const = 0;
 
-    bool Can(eBitStreamVersion query) {
-        return static_cast<eBitStreamVersion>(Version()) >= query;
-    }
+    bool Can(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(Version()) >= query; }
 };
 
 // Interface for all sync structures

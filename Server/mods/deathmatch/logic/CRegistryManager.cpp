@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRegistryManager.h"
+#include "CRegistry.h"
 
 CRegistryManager::~CRegistryManager()
 {

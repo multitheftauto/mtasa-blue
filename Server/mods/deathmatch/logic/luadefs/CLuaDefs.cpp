@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaDefs.h"
+#include "CLuaClassDefs.h"
+#include "lua/LuaCommon.h"
+#include "CMapManager.h"
+#include "CDebugHookManager.h"
+#include "CPerfStatModule.h"
+#include "CGame.h"
+
 extern uint g_uiNetSentByteCounter;
 
 namespace
@@ -71,6 +79,7 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pResourceManager = pGame->GetResourceManager();
     m_pACLManager = pGame->GetACLManager();
     m_pMainConfig = pGame->GetConfig();
+    m_pLuaModuleManager = m_pLuaManager->GetLuaModuleManager();
 }
 
 bool CLuaDefs::CanUseFunction(const char* szFunction, lua_State* luaVM, bool bRestricted)
@@ -115,18 +124,20 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
     }
 
     // Get associated resource
-    CResource* pResource = m_pResourceManager->GetResourceFromLuaState(luaVM);
-    if (!pResource)
-        return true;
+    CResource& resource{lua_getownerresource(luaVM)};
+
+    // Since this method is used as a pre-call hook, make sure the resource is valid/running
+    if (!resource.IsActive())
+        return false;
 
     // Update execution time check
-    pResource->GetVirtualMachine()->CheckExecutionTime();
+    resource.GetVirtualMachine()->CheckExecutionTime();
 
     // Check function right cache in resource
     bool bAllowed;
 
     // Check cached ACL rights
-    if (pResource->CheckFunctionRightCache(f, &bAllowed))
+    if (resource.CheckFunctionRightCache(f, &bAllowed))
     {
         // If in cache, and not allowed, do warning here
         if (!bAllowed)
@@ -168,7 +179,7 @@ int CLuaDefs::CanUseFunction(lua_CFunction f, lua_State* luaVM)
             }
         }
         // Update cache in resource
-        pResource->UpdateFunctionRightCache(f, bAllowed);
+        resource.UpdateFunctionRightCache(f, bAllowed);
     }
 
     if (!g_pGame->GetDebugHookManager()->OnPreFunction(f, luaVM, bAllowed))

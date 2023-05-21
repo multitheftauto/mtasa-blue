@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CExplosionSyncPacket.h"
+#include "CPlayer.h"
+#include <net/SyncStructures.h>
 
 CExplosionSyncPacket::CExplosionSyncPacket()
 {
@@ -33,6 +36,15 @@ bool CExplosionSyncPacket::Read(NetBitStreamInterface& BitStream)
     m_OriginID = INVALID_ELEMENT_ID;
     if (bHasOrigin && !BitStream.Read(m_OriginID))
         return false;
+
+    if (bHasOrigin && BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+    {
+        if (!BitStream.ReadBit(m_isVehicleResponsible))
+            return false;
+
+        if (m_isVehicleResponsible && !BitStream.ReadBit(m_blowVehicleWithoutExplosion))
+            return false;
+    }
 
     SPositionSync position(false);
     if (BitStream.Read(&position))
@@ -70,6 +82,14 @@ bool CExplosionSyncPacket::Write(NetBitStreamInterface& BitStream) const
     {
         BitStream.WriteBit(true);
         BitStream.Write(m_OriginID);
+
+        if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+        {
+            BitStream.WriteBit(m_isVehicleResponsible);
+
+            if (m_isVehicleResponsible)
+                BitStream.WriteBit(m_blowVehicleWithoutExplosion);
+        }
     }
     else
         BitStream.WriteBit(false);

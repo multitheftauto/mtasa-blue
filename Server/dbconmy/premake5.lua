@@ -12,6 +12,7 @@ project "Dbconmy"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/google-breakpad/src",
 			"../../vendor/sparsehash/src/"
@@ -42,7 +43,7 @@ project "Dbconmy"
 	if GLIBC_COMPAT then
 		filter { "system:linux" }
 			buildoptions { "-pthread" }
-			linkoptions { "-l:libmysqlclient.a", "-pthread" }
+			linkoptions { "-l:libmysqlclient.a", "-pthread", "-lssl", "-lcrypto" }
 			links { "z", "dl", "m" }
 	else
 		filter "system:not windows"
@@ -57,6 +58,16 @@ project "Dbconmy"
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }
 	filter { "system:windows", "platforms:x86" }
 		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
+	filter { "system:windows", "platforms:arm" }
+		links { "../../vendor/mysql/lib/arm/libmysql.lib" }
+	filter { "system:windows", "platforms:arm64" }
+		links { "../../vendor/mysql/lib/arm64/libmysql.lib" }
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
+
+	filter "platforms:arm"
+		targetdir(buildpath("server/arm"))
+
+	filter "platforms:arm64"
+		targetdir(buildpath("server/arm64"))

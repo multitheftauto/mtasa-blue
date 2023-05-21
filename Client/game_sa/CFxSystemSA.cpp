@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CMatrix.h>
+#include "CFxSystemBPSA.h"
+#include "CFxSystemSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 // Variables used in the hooks
 static CFxSystemSAInterface*  ms_pUsingFxSystemSAInterface = NULL;
@@ -69,13 +75,18 @@ void CFxSystemSA::GetPosition(CVector& vecPos)
 
 void CFxSystemSA::SetPosition(const CVector& vecPos)
 {
-    m_pInterface->matPosition.pos.x = vecPos.fX;
-    m_pInterface->matPosition.pos.y = vecPos.fY;
-    m_pInterface->matPosition.pos.z = vecPos.fZ;
+    SetPosition(m_pInterface, vecPos);
+}
+
+void CFxSystemSA::SetPosition(CFxSystemSAInterface* fxSystem, const CVector& position)
+{
+    fxSystem->matPosition.pos.x = position.fX;
+    fxSystem->matPosition.pos.y = position.fY;
+    fxSystem->matPosition.pos.z = position.fZ;
 
     // Set the update flag(s)
     // this is what RwMatrixUpdate (@0x7F18E0) does
-    m_pInterface->matPosition.flags &= 0xFFFDFFFC;
+    fxSystem->matPosition.flags &= 0xFFFDFFFC;
 }
 
 float CFxSystemSA::GetEffectDensity()
@@ -196,12 +207,12 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Pre(CFxEmitterSAInterface*
         dassert(pFxEmitterSAInterface->vtbl == (void*)0x085A7A4);
         ms_pUsingFxEmitterSAInterface = pFxEmitterSAInterface;
 
-        ms_usFxEmitterSavedFadeFarDistance = pFxEmitterSAInterface->pBlueprint->usFadeFarDistance;
-        ms_usFxEmitterSavedFadeNearDistance = pFxEmitterSAInterface->pBlueprint->usFadeNearDistance;
+        ms_usFxEmitterSavedFadeFarDistance = pFxEmitterSAInterface->pBlueprint->m_nLodEnd;
+        ms_usFxEmitterSavedFadeNearDistance = pFxEmitterSAInterface->pBlueprint->m_nLodStart;
 
-        pFxEmitterSAInterface->pBlueprint->usFadeFarDistance = (ushort)(ms_fUsingDrawDistance * 8);
+        pFxEmitterSAInterface->pBlueprint->m_nLodEnd = (ushort)(ms_fUsingDrawDistance * 8);
         float fNearDistanceRatio = ms_usFxEmitterSavedFadeNearDistance / (float)ms_usFxEmitterSavedFadeFarDistance;
-        pFxEmitterSAInterface->pBlueprint->usFadeNearDistance = (ushort)(ms_fUsingDrawDistance * fNearDistanceRatio * 8);
+        pFxEmitterSAInterface->pBlueprint->m_nLodStart = (ushort)(ms_fUsingDrawDistance * fNearDistanceRatio * 8);
         ms_fFxCreateParticleCullDistMultiplier = 1 / 8.f;
     }
 }
@@ -211,8 +222,8 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
     if (ms_pUsingFxEmitterSAInterface)
     {
         // Restore default settings
-        ms_pUsingFxEmitterSAInterface->pBlueprint->usFadeFarDistance = ms_usFxEmitterSavedFadeFarDistance;
-        ms_pUsingFxEmitterSAInterface->pBlueprint->usFadeNearDistance = ms_usFxEmitterSavedFadeNearDistance;
+        ms_pUsingFxEmitterSAInterface->pBlueprint->m_nLodEnd = ms_usFxEmitterSavedFadeFarDistance;
+        ms_pUsingFxEmitterSAInterface->pBlueprint->m_nLodStart = ms_usFxEmitterSavedFadeNearDistance;
         ms_pUsingFxEmitterSAInterface = NULL;
         ms_fFxCreateParticleCullDistMultiplier = FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT;
     }

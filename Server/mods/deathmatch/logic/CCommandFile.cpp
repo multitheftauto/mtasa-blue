@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCommandFile.h"
+#include "CLogger.h"
+#include "CConsole.h"
 
 CCommandFile::CCommandFile(const char* szFilename, CConsole& Console, CClient& Client) : m_Console(Console), m_Client(Client)
 

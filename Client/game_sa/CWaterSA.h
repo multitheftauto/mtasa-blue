@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <game/CWater.h>
+
 // -------------------------------
 // SA interfaces
 

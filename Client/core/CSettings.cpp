@@ -10,7 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CClientCommands.h>
 #include <game/CGame.h>
+#include <game/CSettings.h>
 
 using namespace std;
 
@@ -157,7 +159,7 @@ void CSettings::CreateGUI()
     // Mouse Options
     m_pControlsMouseLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Mouse options")));
     m_pControlsMouseLabel->SetPosition(CVector2D(vecTemp.fX + 11, vecTemp.fY));
-    m_pControlsMouseLabel->AutoSize(NULL, 5.0f);
+    m_pControlsMouseLabel->AutoSize(NULL, 20.0f);
     m_pControlsMouseLabel->SetFont("default-bold-small");
     vecTemp.fY += 18;
 
@@ -175,7 +177,7 @@ void CSettings::CreateGUI()
     m_pFlyWithMouse->AutoSize(NULL, 20.0f);
 
     // MouseSensitivity
-    vecTemp.fY += 52.0f;
+    vecTemp.fY += 54.0f;
     m_pLabelMouseSensitivity = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Mouse sensitivity:")));
     m_pLabelMouseSensitivity->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pLabelMouseSensitivity->AutoSize();
@@ -191,7 +193,7 @@ void CSettings::CreateGUI()
     m_pLabelMouseSensitivityValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pLabelMouseSensitivityValue->AutoSize("100%");
     vecTemp.fX = 16;
-    vecTemp.fY += 26.f;
+    vecTemp.fY += 24.f;
 
     // VerticalAimSensitivity
     m_pLabelVerticalAimSensitivity = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Vertical aim sensitivity:")));
@@ -270,12 +272,12 @@ void CSettings::CreateGUI()
         m_pEditSaturation->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
 
         CGUILabel* pLabelDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Dead Zone")));
-        pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, -1.f));
+        pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, 1.f));
         pLabelDeadZone->AutoSize();
         pLabelDeadZone->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 
         CGUILabel* pLabelSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Saturation")));
-        pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, -1.f));
+        pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, 1.f));
         pLabelSaturation->AutoSize();
         pLabelSaturation->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
         vecTemp.fY += 106;
@@ -380,6 +382,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowExternalSounds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowExternalSounds->GetPosition(vecTemp, false);
     m_pCheckBoxAllowExternalSounds->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxAlwaysShowTransferBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Always show download window"), false));
+    m_pCheckBoxAlwaysShowTransferBox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
+    m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -519,7 +526,7 @@ void CSettings::CreateGUI()
     m_pAudioRadioLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Radio options")));
     m_pAudioRadioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
     m_pAudioRadioLabel->GetPosition(vecTemp, false);
-    m_pAudioRadioLabel->AutoSize(NULL, 10.0f);
+    m_pAudioRadioLabel->AutoSize(NULL, 20.0f);
     m_pAudioRadioLabel->SetFont("default-bold-small");
 
     m_pCheckBoxAudioEqualizer = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAudio, _("Radio Equalizer"), true));
@@ -535,7 +542,7 @@ void CSettings::CreateGUI()
     m_pAudioUsertrackLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Usertrack options")));
     m_pAudioUsertrackLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
     m_pAudioUsertrackLabel->GetPosition(vecTemp, false);
-    m_pAudioUsertrackLabel->AutoSize(NULL, 10.0f);
+    m_pAudioUsertrackLabel->AutoSize(NULL, 20.0f);
     m_pAudioUsertrackLabel->SetFont("default-bold-small");
 
     m_pLabelUserTrackMode = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Play mode:")));
@@ -561,7 +568,7 @@ void CSettings::CreateGUI()
     m_pAudioMuteLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Mute options")));
     m_pAudioMuteLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 52.0f));
     m_pAudioMuteLabel->GetPosition(vecTemp, false);
-    m_pAudioMuteLabel->AutoSize(NULL, 5.0f);
+    m_pAudioMuteLabel->AutoSize(NULL, 20.0f);
     m_pAudioMuteLabel->SetFont("default-bold-small");
 
     m_pCheckBoxMuteMaster = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAudio, _("Mute All sounds when minimized"), true));
@@ -801,13 +808,13 @@ void CSettings::CreateGUI()
     m_pCheckBoxTyreSmokeParticles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 90.0f));
     m_pCheckBoxTyreSmokeParticles->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
-    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
-    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+    m_pCheckBoxDynamicPedShadows = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Dynamic ped shadows"), true));
+    m_pCheckBoxDynamicPedShadows->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
+    m_pCheckBoxDynamicPedShadows->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
-    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
-    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+    m_pCheckBoxBlur = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Motion blur"), true));
+    m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
+    m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -845,6 +852,19 @@ void CSettings::CreateGUI()
         fPosY -= 20.0f;
     }
 #endif
+
+    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
+    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
+    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
+    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
+    m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
+
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -883,23 +903,30 @@ void CSettings::CreateGUI()
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);
-    m_pLabelBrowserCustomBlacklist->AutoSize(NULL, 5.0f);
+    m_pLabelBrowserCustomBlacklist->AutoSize(NULL, 20.0f);
     m_pLabelBrowserCustomBlacklist->SetFont("default-bold-small");
 
     m_pEditBrowserBlacklistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserBlacklistAdd->GetPosition(vecTemp);
-    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(191.0f, 22.0f));
-    m_pEditBrowserBlacklistAdd->SetText(_("Enter a domain e.g. google.com"));
+    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(209.0f, 22.0f));
+
+    m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
+    m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
+    m_pLabelBrowserBlacklistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserBlacklistAdd->SetSize(CVector2D(1, 1), true);
+    m_pLabelBrowserBlacklistAdd->SetAlpha(0.7f);
+    m_pLabelBrowserBlacklistAdd->SetProperty("MousePassThroughEnabled", "True");
+    m_pLabelBrowserBlacklistAdd->SetProperty("DistributeCapturedInputs", "True");
 
     m_pButtonBrowserBlacklistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Block")));
     m_pButtonBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserBlacklistAdd->GetSize().fX + 2.0f, vecTemp.fY));
-    m_pButtonBrowserBlacklistAdd->SetSize(CVector2D(64.0f, 22.0f));
+    m_pButtonBrowserBlacklistAdd->SetSize(CVector2D(90.0f, 22.0f));
 
     m_pGridBrowserBlacklist = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTabBrowser));
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
-    m_pGridBrowserBlacklist->SetSize(CVector2D(256.0f, 150.0f));
+    m_pGridBrowserBlacklist->SetSize(CVector2D(300.0f, 150.0f));
     m_pGridBrowserBlacklist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserBlacklistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
@@ -909,25 +936,32 @@ void CSettings::CreateGUI()
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);            // Reset vecTemp
 
     m_pLabelBrowserCustomWhitelist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom whitelist")));
-    m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(292.0f, vecTemp.fY));
+    m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(vecTemp.fX + 300.0f + 19.0f, vecTemp.fY));
     m_pLabelBrowserCustomWhitelist->GetPosition(vecTemp);
-    m_pLabelBrowserCustomWhitelist->AutoSize(NULL, 5.0f);
+    m_pLabelBrowserCustomWhitelist->AutoSize(NULL, 20.0f);
     m_pLabelBrowserCustomWhitelist->SetFont("default-bold-small");
 
     m_pEditBrowserWhitelistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserWhitelistAdd->GetPosition(vecTemp);
-    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(191.0f, 22.0f));
-    m_pEditBrowserWhitelistAdd->SetText(_("Enter a domain e.g. google.com"));
+    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(209.0f, 22.0f));
+
+    m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
+    m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
+    m_pLabelBrowserWhitelistAdd->SetTextColor(0, 0, 0);
+    m_pLabelBrowserWhitelistAdd->SetSize(CVector2D(1, 1), true);
+    m_pLabelBrowserWhitelistAdd->SetAlpha(0.7f);
+    m_pLabelBrowserWhitelistAdd->SetProperty("MousePassThroughEnabled", "True");
+    m_pLabelBrowserWhitelistAdd->SetProperty("DistributeCapturedInputs", "True");
 
     m_pButtonBrowserWhitelistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Allow")));
     m_pButtonBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserWhitelistAdd->GetSize().fX + 2.0f, vecTemp.fY));
-    m_pButtonBrowserWhitelistAdd->SetSize(CVector2D(64.0f, 22.0f));
+    m_pButtonBrowserWhitelistAdd->SetSize(CVector2D(90.0f, 22.0f));
 
     m_pGridBrowserWhitelist = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTabBrowser));
     m_pGridBrowserWhitelist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserWhitelist->GetPosition(vecTemp);
-    m_pGridBrowserWhitelist->SetSize(CVector2D(256.0f, 150.0f));
+    m_pGridBrowserWhitelist->SetSize(CVector2D(300.0f, 150.0f));
     m_pGridBrowserWhitelist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserWhitelistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
@@ -1090,18 +1124,17 @@ void CSettings::CreateGUI()
     m_pWin8Label = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Windows 8 compatibility:")));
     m_pWin8Label->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pWin8Label->AutoSize();
-    vecTemp.fX += 20;
 
     m_pWin8ColorCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("16-bit color")));
-    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8ColorCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fX += 90;
+    vecTemp.fX += 140;
 
     m_pWin8MouseCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Mouse fix")));
-    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8MouseCheckBox->AutoSize(NULL, 20.0f);
     vecTemp.fY += fLineHeight;
-    vecTemp.fX -= 110;
+    vecTemp.fX -= 140;
 
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
@@ -1225,8 +1258,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
+    m_pEditBrowserBlacklistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddFocused, this));
+    m_pEditBrowserBlacklistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistDomainAddDefocused, this));
     m_pButtonBrowserWhitelistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistAdd, this));
     m_pButtonBrowserWhitelistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistRemove, this));
+    m_pEditBrowserWhitelistAdd->SetActivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddFocused, this));
+    m_pEditBrowserWhitelistAdd->SetDeactivateHandler(GUI_CALLBACK(&CSettings::OnBrowserWhitelistDomainAddDefocused, this));
 
     // Set up the events for advanced description
     m_pPriorityLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
@@ -1507,20 +1544,6 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("show_unsafe_resolutions", bShowUnsafeResolutions);
     m_pCheckBoxShowUnsafeResolutions->SetSelected(bShowUnsafeResolutions);
 
-    // Allow screen upload
-    bool bAllowScreenUploadEnabled;
-    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
-    m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
-
-    // Allow external sounds
-    bool bAllowExternalSoundsEnabled;
-    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
-    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
-
-    // Customized sa files
-    m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
-    m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
-
     // Grass
     bool bGrassEnabled;
     CVARS_GET("grass", bGrassEnabled);
@@ -1546,6 +1569,24 @@ void CSettings::UpdateVideoTab()
     bool bHighDetailPeds;
     CVARS_GET("high_detail_peds", bHighDetailPeds);
     m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
+
+    // Blur
+    bool bBlur;
+    CVARS_GET("blur", bBlur);
+    m_pCheckBoxBlur->SetSelected(bBlur);
+
+    // Corona rain reflections
+    bool bCoronaReflections;
+    CVARS_GET("corona_reflections", bCoronaReflections);
+    m_pCheckBoxCoronaReflections->SetSelected(bCoronaReflections);
+
+    // Dynamic ped shadows
+    bool bDynamicPedShadows;
+    CVARS_GET("dynamic_ped_shadows", bDynamicPedShadows);
+    m_pCheckBoxDynamicPedShadows->SetSelected(bDynamicPedShadows);
+
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled(FxQuality >= 2);
 
     PopulateResolutionComboBox();
 
@@ -1771,6 +1812,9 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
+    CVARS_SET("blur", true);
+    CVARS_SET("corona_reflections", false);
+    CVARS_SET("dynamic_ped_shadows", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
@@ -1778,6 +1822,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     gameSettings->SetAntiAliasing(1, true);
     gameSettings->ResetVehiclesLODDistance(false);
     gameSettings->ResetPedsLODDistance(false);
+    gameSettings->SetDynamicPedShadowsEnabled(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -2272,7 +2317,7 @@ void CSettings::CreateInterfaceTabGUI()
             pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabOptions, _("Options")));
             pLabel->SetPosition(CVector2D(fMarginX, 10.0f));
             pLabel->GetPosition(vecTemp);
-            pLabel->AutoSize(NULL, 5.0f);
+            pLabel->AutoSize(NULL, 20.0f);
             pLabel->SetFont("default-bold-small");
 
             m_pChatCssBackground = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabOptions, _("Hide background when not typing")));
@@ -2337,7 +2382,7 @@ void CSettings::ProcessKeyBinds()
     for (int i = 0; i < m_pBindsList->GetRowCount(); i++)
     {
         // Get the type and keys
-        unsigned char       ucType = reinterpret_cast<unsigned int>(m_pBindsList->GetItemData(i, m_hBind));
+        auto                bindType = static_cast<KeyBindType>(reinterpret_cast<intptr_t>(m_pBindsList->GetItemData(i, m_hBind)));
         const char*         szPri = m_pBindsList->GetItemText(i, m_hPriKey);
         const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey(szPri);
         const SBindableKey* pSecKeys[SecKeyNum];
@@ -2347,12 +2392,12 @@ void CSettings::ProcessKeyBinds()
             pSecKeys[k] = pKeyBinds->GetBindableFromKey(szSec);
         }
         // If it is a resource name
-        if (ucType == 255)
+        if (static_cast<intptr_t>(bindType) == 255)
         {
             strResource = m_pBindsList->GetItemText(i, m_hBind);
         }
         // If the type is control
-        else if (ucType == KEY_BIND_GTA_CONTROL)
+        else if (bindType == KeyBindType::GTA_CONTROL)
         {
             // Get the previous bind
             CGTAControlBind* pBind = reinterpret_cast<CGTAControlBind*>(m_pBindsList->GetItemData(i, m_hPriKey));
@@ -2402,7 +2447,7 @@ void CSettings::ProcessKeyBinds()
             }
         }
         // If the type is an empty control (wasn't bound before)
-        else if (ucType == KEY_BIND_UNDEFINED)
+        else if (bindType == KeyBindType::UNDEFINED)
         {
             // Grab the stored control
             SBindableGTAControl* pControl = reinterpret_cast<SBindableGTAControl*>(m_pBindsList->GetItemData(i, m_hPriKey));
@@ -2415,7 +2460,7 @@ void CSettings::ProcessKeyBinds()
                     pKeyBinds->AddGTAControl(pSecKeys[k], pControl);
         }
         // If the type is a command
-        else if (ucType == KEY_BIND_COMMAND)
+        else if (bindType == KeyBindType::COMMAND)
         {
             SString strCmdArgs = m_pBindsList->GetItemText(i, m_hBind);
 
@@ -2512,7 +2557,8 @@ void CSettings::ProcessKeyBinds()
                     CCommandBind* pUpBind = pKeyBinds->GetBindFromCommand(szCommand, NULL, true, pPriKey->szKey, true, false);
                     if (pUpBind)
                     {
-                        pKeyBinds->AddCommand(pSecKeys[k]->szKey, szCommand, pUpBind->szArguments, false, pUpBind->szResource);
+                        const char* szResource = pUpBind->resource.empty() ? nullptr : pUpBind->resource.c_str();
+                        pKeyBinds->AddCommand(pSecKeys[k]->szKey, szCommand, pUpBind->arguments.c_str(), false, szResource);
                     }
                 }
             }
@@ -2618,6 +2664,8 @@ bool CSettings::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void CSettings::Initialize()
 {
+    using KeyBindPtr = CKeyBindsInterface::KeyBindPtr;
+
     // Add binds and sections
     bool bPrimaryKey = true;
     int  iBind = 0, iRowGame;
@@ -2642,58 +2690,65 @@ void CSettings::Initialize()
     pKeyBinds->SortCommandBinds();
 
     // Loop through all the available controls
-    int i;
-    for (i = 0; *g_bcControls[i].szControl != NULL; i++)
-        ;
+    int i = 0;
+
+    for (; *g_bcControls[i].szControl != NULL; i++)
+    {
+    }
+
     for (i--; i >= 0; i--)
     {
         SBindableGTAControl* pControl = &g_bcControls[i];
 
         // Loop through the binds for a matching control
-        unsigned int                    uiMatchCount = 0;
-        list<CKeyBind*>::const_iterator iter = pKeyBinds->IterBegin();
-        for (; iter != pKeyBinds->IterEnd(); iter++)
+        size_t numMatches = 0;
+
+        for (KeyBindPtr& bind : *pKeyBinds)
         {
-            // Is it a control bind
-            if ((*iter)->GetType() == KEY_BIND_GTA_CONTROL)
+            if (bind->isBeingDeleted || bind->type != KeyBindType::GTA_CONTROL)
+                continue;
+
+            auto controlBind = reinterpret_cast<CGTAControlBind*>(bind.get());
+
+            if (controlBind->control != pControl)
+                continue;
+
+            if (!numMatches)            // Primary key
             {
-                CGTAControlBind* pBind = reinterpret_cast<CGTAControlBind*>(*iter);
-                if (pBind->control == pControl)
+                // Add bind to the list
+                iBind = m_pBindsList->InsertRowAfter(iRowGame);
+                m_pBindsList->SetItemText(iBind, m_hBind, _(pControl->szDescription));
+                m_pBindsList->SetItemText(iBind, m_hPriKey, controlBind->boundKey->szKey);
+                for (int k = 0; k < SecKeyNum; k++)
+                    m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
+                m_pBindsList->SetItemData(iBind, m_hBind, reinterpret_cast<void*>(KeyBindType::GTA_CONTROL));
+                m_pBindsList->SetItemData(iBind, m_hPriKey, controlBind);
+                iGameRowCount++;
+            }
+            else            // Secondary key
+            {
+                for (size_t k = 0; k < SecKeyNum; k++)
                 {
-                    // Primary key?
-                    if (uiMatchCount == 0)
+                    if (numMatches == k + 1)
                     {
-                        // Add bind to the list
-                        iBind = m_pBindsList->InsertRowAfter(iRowGame);
-                        m_pBindsList->SetItemText(iBind, m_hBind, _(pControl->szDescription));
-                        m_pBindsList->SetItemText(iBind, m_hPriKey, pBind->boundKey->szKey);
-                        for (int k = 0; k < SecKeyNum; k++)
-                            m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
-                        m_pBindsList->SetItemData(iBind, m_hBind, (void*)KEY_BIND_GTA_CONTROL);
-                        m_pBindsList->SetItemData(iBind, m_hPriKey, pBind);
-                        iGameRowCount++;
+                        m_pBindsList->SetItemText(iBind, m_hSecKeys[k], controlBind->boundKey->szKey);
+                        m_pBindsList->SetItemData(iBind, m_hSecKeys[k], controlBind);
                     }
-                    // Secondary keys?
-                    else
-                        for (int k = 0; k < SecKeyNum; k++)
-                            if (uiMatchCount == k + 1)
-                            {
-                                m_pBindsList->SetItemText(iBind, m_hSecKeys[k], pBind->boundKey->szKey);
-                                m_pBindsList->SetItemData(iBind, m_hSecKeys[k], pBind);
-                            }
-                    uiMatchCount++;
                 }
             }
+
+            ++numMatches;
         }
+
         // If we didnt find any matches
-        if (uiMatchCount == 0)
+        if (!numMatches)
         {
             iBind = m_pBindsList->InsertRowAfter(iRowGame);
-            m_pBindsList->SetItemText(iBind, m_hBind, pControl->szDescription);
+            m_pBindsList->SetItemText(iBind, m_hBind, _(pControl->szDescription));
             m_pBindsList->SetItemText(iBind, m_hPriKey, CORE_SETTINGS_NO_KEY);
             for (int k = 0; k < SecKeyNum; k++)
                 m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
-            m_pBindsList->SetItemData(iBind, m_hBind, (void*)KEY_BIND_UNDEFINED);
+            m_pBindsList->SetItemData(iBind, m_hBind, reinterpret_cast<void*>(KeyBindType::UNDEFINED));
             m_pBindsList->SetItemData(iBind, m_hPriKey, pControl);
             iGameRowCount++;
         }
@@ -2706,107 +2761,116 @@ void CSettings::Initialize()
         unsigned int  uiMatchCount;
     };
 
-    SListedCommand*            listedCommands = new SListedCommand[pKeyBinds->Count(KEY_BIND_COMMAND) + pKeyBinds->Count(KEY_BIND_FUNCTION)];
-    unsigned int               uiNumListedCommands = 0;
+    auto         listedCommands = std::make_unique<SListedCommand[]>(pKeyBinds->Count(KeyBindType::COMMAND) + pKeyBinds->Count(KeyBindType::FUNCTION));
+    unsigned int uiNumListedCommands = 0;
+
     std::map<std::string, int> iResourceItems;
-    // Loop through all the bound commands
-    list<CKeyBind*>::const_iterator iter = pKeyBinds->IterBegin();
-    for (unsigned int uiIndex = 0; iter != pKeyBinds->IterEnd(); iter++, uiIndex++)
+
+    for (KeyBindPtr& bind : *pKeyBinds)
     {
         // keys bound to a console command or a function (we don't show keys bound
         // from gta controls by scripts as these are clearly not user editable)
-        if ((*iter)->GetType() == KEY_BIND_COMMAND)
+        if (bind->isBeingDeleted || bind->type != KeyBindType::COMMAND)
+            continue;
+
+        auto commandBind = reinterpret_cast<CCommandBind*>(bind.get());
+
+        if (!commandBind->triggerState)
+            continue;
+
+        bool foundMatches = false;
+
+        // Loop through the already listed array of commands for matches
+        for (unsigned int i = 0; i < uiNumListedCommands; i++)
         {
-            CCommandBind* pCommandBind = reinterpret_cast<CCommandBind*>(*iter);
-            if (pCommandBind->bHitState)
+            SListedCommand* pListedCommand = &listedCommands[i];
+            CCommandBind*   pListedBind = pListedCommand->pBind;
+
+            if (pListedBind->command == commandBind->command)
             {
-                bool bFoundMatches = false;
-                // Loop through the already listed array of commands for matches
-                for (unsigned int i = 0; i < uiNumListedCommands; i++)
+                if (pListedBind->arguments.empty() || pListedBind->arguments == commandBind->arguments)
                 {
-                    SListedCommand* pListedCommand = &listedCommands[i];
-                    CCommandBind*   pListedBind = pListedCommand->pBind;
-                    if (!strcmp(pListedBind->szCommand, pCommandBind->szCommand))
+                    // If we found a 1st match, add it to the secondary section
+                    foundMatches = true;
+
+                    for (int k = 0; k < SecKeyNum; k++)
                     {
-                        if (!pListedBind->szArguments || (pCommandBind->szArguments && !strcmp(pListedBind->szArguments, pCommandBind->szArguments)))
+                        if (pListedCommand->uiMatchCount == k)
                         {
-                            // If we found a 1st match, add it to the secondary section
-                            bFoundMatches = true;
-                            for (int k = 0; k < SecKeyNum; k++)
-                                if (pListedCommand->uiMatchCount == k)
-                                {
-                                    m_pBindsList->SetItemText(pListedCommand->iIndex, m_hSecKeys[k], pCommandBind->boundKey->szKey);
-                                    m_pBindsList->SetItemData(pListedCommand->iIndex, m_hSecKeys[k], pCommandBind);
-                                }
-                            pListedCommand->uiMatchCount++;
+                            m_pBindsList->SetItemText(pListedCommand->iIndex, m_hSecKeys[k], commandBind->boundKey->szKey);
+                            m_pBindsList->SetItemData(pListedCommand->iIndex, m_hSecKeys[k], commandBind);
                         }
                     }
-                }
 
-                // If there weren't any matches
-                if (!bFoundMatches)
-                {
-                    unsigned int row = iGameRowCount + 1;
-                    // Combine command and arguments
-                    SString strDescription;
-                    bool    bSkip = false;
-                    if (pCommandBind->szResource)
-                    {
-                        if (pCommandBind->bActive)
-                        {
-                            const char* szResource = pCommandBind->szResource;
-                            std::string strResource = szResource;
-                            if (iResourceItems.count(strResource) == 0)
-                            {
-                                iBind = m_pBindsList->AddRow(true);
-                                m_pBindsList->SetItemText(iBind, m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true);
-
-                                iBind = m_pBindsList->AddRow(true);
-                                m_pBindsList->SetItemText(iBind, m_hBind, szResource, false, true);
-                                m_pBindsList->SetItemData(iBind, m_hBind, (void*)255);
-                                iResourceItems.insert(make_pair(strResource, iBind));
-                            }
-                            row = iResourceItems[strResource];
-                            iMultiplayerRowCount++;
-                        }
-                        else
-                            continue;
-                    }
-                    if (pCommandBind->szArguments && pCommandBind->szArguments[0] != '\0')
-                    {
-                        strDescription.Format("%s: %s", pCommandBind->szCommand, pCommandBind->szArguments);
-                        iMultiplayerRowCount++;
-                    }
-                    else
-                    {
-                        strDescription = pCommandBind->szCommand;
-                        iMultiplayerRowCount++;
-                    }
-
-                    if (!bSkip)
-                    {
-                        // Add the bind to the list
-                        iBind = m_pBindsList->AddRow(true);
-                        m_pBindsList->SetItemText(iBind, m_hBind, strDescription);
-                        m_pBindsList->SetItemText(iBind, m_hPriKey, pCommandBind->boundKey->szKey);
-                        for (int k = 0; k < SecKeyNum; k++)
-                            m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
-                        m_pBindsList->SetItemData(iBind, m_hBind, (void*)KEY_BIND_COMMAND);
-                        m_pBindsList->SetItemData(iBind, m_hPriKey, pCommandBind);
-
-                        // Add it to the already-listed array
-                        SListedCommand* pListedCommand = &listedCommands[uiNumListedCommands];
-                        pListedCommand->iIndex = iBind;
-                        pListedCommand->pBind = pCommandBind;
-                        pListedCommand->uiMatchCount = 0;
-                        uiNumListedCommands++;
-                    }
+                    pListedCommand->uiMatchCount++;
                 }
             }
         }
-    }
 
-    delete[] listedCommands;
+        // If there weren't any matches
+        if (!foundMatches)
+        {
+            unsigned int row = iGameRowCount + 1;
+
+            // Combine command and arguments
+            SString strDescription;
+            bool    bSkip = false;
+
+            if (!commandBind->resource.empty())
+            {
+                if (commandBind->isActive)
+                {
+                    const std::string& resource = commandBind->resource;
+
+                    if (iResourceItems.count(resource) == 0)
+                    {
+                        iBind = m_pBindsList->AddRow(true);
+                        m_pBindsList->SetItemText(iBind, m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true);
+
+                        iBind = m_pBindsList->AddRow(true);
+                        m_pBindsList->SetItemText(iBind, m_hBind, resource.c_str(), false, true);
+                        m_pBindsList->SetItemData(iBind, m_hBind, reinterpret_cast<void*>(255));
+                        iResourceItems.insert(make_pair(resource, iBind));
+                    }
+
+                    row = iResourceItems[resource];
+                    iMultiplayerRowCount++;
+                }
+                else
+                    continue;
+            }
+
+            if (!commandBind->arguments.empty())
+            {
+                strDescription.Format("%s: %s", commandBind->command.c_str(), commandBind->arguments.c_str());
+                iMultiplayerRowCount++;
+            }
+            else
+            {
+                strDescription = commandBind->command;
+                iMultiplayerRowCount++;
+            }
+
+            if (!bSkip)
+            {
+                // Add the bind to the list
+                iBind = m_pBindsList->AddRow(true);
+                m_pBindsList->SetItemText(iBind, m_hBind, strDescription);
+                m_pBindsList->SetItemText(iBind, m_hPriKey, commandBind->boundKey->szKey);
+                for (int k = 0; k < SecKeyNum; k++)
+                    m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
+                m_pBindsList->SetItemData(iBind, m_hBind, reinterpret_cast<void*>(KeyBindType::COMMAND));
+                m_pBindsList->SetItemData(iBind, m_hPriKey, commandBind);
+
+                // Add it to the already-listed array
+                SListedCommand* pListedCommand = &listedCommands[uiNumListedCommands];
+                pListedCommand->iIndex = iBind;
+                pListedCommand->pBind = commandBind;
+                pListedCommand->uiMatchCount = 0;
+                uiNumListedCommands++;
+            }
+        }
+    }
 }
 
 void CSettings::SetVisible(bool bVisible)
@@ -2930,6 +2994,25 @@ void CSettings::LoadData()
     m_pSavePasswords->SetSelected(bVar);
     CVARS_GET("auto_refresh_browser", bVar);
     m_pAutoRefreshBrowser->SetSelected(bVar);
+
+    // Allow screen upload
+    bool bAllowScreenUploadEnabled;
+    CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
+    m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
+
+    // Allow external sounds
+    bool bAllowExternalSoundsEnabled;
+    CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
+    m_pCheckBoxAllowExternalSounds->SetSelected(bAllowExternalSoundsEnabled);
+
+    // Always show transfer box
+    bool alwaysShowTransferBox = false;
+    CVARS_GET("always_show_transferbox", alwaysShowTransferBox);
+    m_pCheckBoxAlwaysShowTransferBox->SetSelected(alwaysShowTransferBox);
+
+    // Customized sa files
+    m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
+    m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
 
     // Controls
     CVARS_GET("invert_mouse", bVar);
@@ -3348,6 +3431,11 @@ void CSettings::SaveData()
     bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();
     CVARS_SET("allow_external_sounds", bAllowExternalSoundsEnabled);
 
+    // Always show transfer box
+    bool alwaysShowTransferBox = m_pCheckBoxAlwaysShowTransferBox->GetSelected();
+    CVARS_SET("always_show_transferbox", alwaysShowTransferBox);
+    g_pCore->GetModManager()->TriggerCommand(mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX, alwaysShowTransferBox);
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -3372,6 +3460,21 @@ void CSettings::SaveData()
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance(false);
+
+    // Blur
+    bool bBlur = m_pCheckBoxBlur->GetSelected();
+    CVARS_SET("blur", bBlur);
+    gameSettings->ResetBlurEnabled();
+
+    // Corona rain reflections
+    bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
+    CVARS_SET("corona_reflections", bCoronaReflections);
+    gameSettings->ResetCoronaReflectionsEnabled();
+
+    // Dynamic ped shadows
+    bool bDynamicPedShadows = m_pCheckBoxDynamicPedShadows->GetSelected();
+    CVARS_SET("dynamic_ped_shadows", bDynamicPedShadows);
+    gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
@@ -4304,6 +4407,8 @@ bool CSettings::OnFxQualityChanged(CGUIElement* pElement)
         m_pCheckBoxGrass->SetEnabled(true);
     }
 
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled((int)pItem->GetData() >= 2);
     return true;
 }
 
@@ -4498,6 +4603,19 @@ bool CSettings::OnBrowserBlacklistRemove(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement)
+{
+    m_pLabelBrowserBlacklistAdd->SetVisible(false);
+    return true;
+}
+
+bool CSettings::OnBrowserBlacklistDomainAddDefocused(CGUIElement* pElement)
+{
+    if (m_pEditBrowserBlacklistAdd->GetText() == "")
+        m_pLabelBrowserBlacklistAdd->SetVisible(true);
+    return true;
+}
+
 bool CSettings::OnBrowserWhitelistAdd(CGUIElement* pElement)
 {
     SString strDomain = m_pEditBrowserWhitelistAdd->GetText();
@@ -4531,6 +4649,19 @@ bool CSettings::OnBrowserWhitelistRemove(CGUIElement* pElement)
         m_bBrowserListsChanged = true;
     }
 
+    return true;
+}
+
+bool CSettings::OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement)
+{
+    m_pLabelBrowserWhitelistAdd->SetVisible(false);
+    return true;
+}
+
+bool CSettings::OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement)
+{
+    if (m_pEditBrowserWhitelistAdd->GetText() == "")
+        m_pLabelBrowserWhitelistAdd->SetVisible(true);
     return true;
 }
 

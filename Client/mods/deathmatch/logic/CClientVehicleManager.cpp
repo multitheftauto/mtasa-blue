@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/TaskCar.h>
 
 using std::list;
 using std::vector;
@@ -470,6 +471,10 @@ eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
 
 unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 {
+    // Use parent model ID for non-standard vehicle model IDs.
+    if ((ulModel < 400 || ulModel > 611) && IsValidModel(ulModel))
+        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+
     // Valid model?
     if (IsStandardModel(ulModel))
     {
@@ -696,6 +701,7 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
             case VT_MOWER:
             case VT_RCCAM:
             case VT_RCGOBLIN:
+            case VT_BLOODRA:
                 break;
             default:
                 bHasDoors = true;
@@ -764,7 +770,7 @@ void CClientVehicleManager::RestreamAllVehicles()
     if (m_StreamedIn.empty())
         return;
 
-    for (auto& pVehicle: m_List)
+    for (auto& pVehicle : m_List)
     {
         // Streamed in and same vehicle ID?
         if (pVehicle->IsStreamedIn())

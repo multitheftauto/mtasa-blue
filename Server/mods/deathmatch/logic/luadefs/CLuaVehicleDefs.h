@@ -64,13 +64,12 @@ public:
     LUA_DECLARE(GetTrainSpeed);
     static std::variant<CTrainTrack*, bool> GetTrainTrack(CVehicle* pVehicle);
     LUA_DECLARE(GetTrainPosition);
-    LUA_DECLARE(IsVehicleBlown);
+    static bool IsVehicleBlown(CVehicle* vehicle);
     LUA_DECLARE(GetVehicleHeadLightColor);
     LUA_DECLARE(GetVehicleDoorOpenRatio);
 
     // Vehicle set functions
     LUA_DECLARE(FixVehicle);
-    LUA_DECLARE(BlowVehicle);
     LUA_DECLARE(SetVehicleRotation);
     LUA_DECLARE(SetVehicleTurnVelocity);
     LUA_DECLARE(SetVehicleColor);

@@ -11,9 +11,10 @@
 
 #pragma once
 
-#include <game/CAudioContainer.h>
-#include "CAudioContainerLookupTableSA.h"
 #include <fstream>
+#include <game/CAudioContainer.h>
+
+class CAudioContainerLookupTableSA;
 
 #define VALIDATE_BUFFER_SIZE 4096
 #define NUM_BEAT_ENTRIES 1000

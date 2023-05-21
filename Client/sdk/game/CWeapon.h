@@ -12,32 +12,33 @@
 #pragma once
 
 #include "Common.h"
-
 #include "CWeaponInfo.h"
-class CPed;
+
 class CColPoint;
-class CVector2D;
+class CPed;
 class CVector;
+class CVector2D;
 class CWeaponInfo;
 class CWeaponStat;
 enum ePedPieceTypes;
-struct SLineOfSightFlags;
 struct SLineOfSightBuildingResult;
+struct SLineOfSightFlags;
 struct SWeaponConfiguration;
+
 class CWeapon
 {
 public:
     virtual eWeaponType  GetType() = 0;
-    virtual VOID         SetType(eWeaponType type) = 0;
+    virtual void         SetType(eWeaponType type) = 0;
     virtual eWeaponState GetState() = 0;
     virtual void         SetState(eWeaponState state) = 0;
     virtual DWORD        GetAmmoInClip() = 0;
-    virtual VOID         SetAmmoInClip(DWORD dwAmmoInClip) = 0;
+    virtual void         SetAmmoInClip(DWORD dwAmmoInClip) = 0;
     virtual DWORD        GetAmmoTotal() = 0;
-    virtual VOID         SetAmmoTotal(DWORD dwAmmoTotal) = 0;
+    virtual void         SetAmmoTotal(DWORD dwAmmoTotal) = 0;
     virtual CPed*        GetPed() = 0;
     virtual eWeaponSlot  GetSlot() = 0;
-    virtual VOID         SetAsCurrentWeapon() = 0;
+    virtual void         SetAsCurrentWeapon() = 0;
     virtual CWeaponInfo* GetInfo(eWeaponSkill skill) = 0;
     virtual void         Remove() = 0;
     virtual void         Destroy() = 0;

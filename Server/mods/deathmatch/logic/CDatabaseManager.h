@@ -9,13 +9,20 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "lua/LuaCommon.h"
+#include "CElement.h"
+#include "CRegistry.h"
+
+#define INVALID_DB_HANDLE             (0)
+#define DB_SQLITE_QUEUE_NAME_INTERNAL "sqlite internal"
+#define DB_SQLITE_QUEUE_NAME_DEFAULT  "sqlite"            // Note: MySql default queue name is the host string
+
 class CDatabaseJobQueue;
 typedef uint            SDbConnectionId;
 typedef intptr_t        SDbJobId;
 typedef SDbConnectionId SConnectionHandle;
-#define INVALID_DB_HANDLE (0)
-#define DB_SQLITE_QUEUE_NAME_INTERNAL   "sqlite internal"
-#define DB_SQLITE_QUEUE_NAME_DEFAULT    "sqlite"            // Note: MySql default queue name is the host string
 
 namespace EJobResult
 {
@@ -88,7 +95,7 @@ public:
 
     CDbJobData();
     ~CDbJobData();
-    SDbJobId           GetId() { return id; }
+    SDbJobId           GetId() const { return id; }
     bool               SetCallback(PFN_DBRESULT pfnDbResult, void* pContext);
     bool               HasCallback();
     void               ProcessCallback();
@@ -177,7 +184,7 @@ CDatabaseManager* NewDatabaseManager();
 // TODO - Check it does not get synced to the client
 //
 ///////////////////////////////////////////////////////////////
-class CDatabaseConnectionElement : public CElement
+class CDatabaseConnectionElement final : public CElement
 {
 public:
     CDatabaseConnectionElement(CElement* pParent, SConnectionHandle connection) : CElement(pParent), m_Connection(connection)
@@ -189,7 +196,7 @@ public:
     virtual ~CDatabaseConnectionElement() {}
 
     // CElement
-    virtual void Unlink() { g_pGame->GetDatabaseManager()->Disconnect(m_Connection); }
+    virtual void Unlink();
 
     // CDatabaseConnectionElement
     SConnectionHandle GetConnectionHandle() { return m_Connection; }

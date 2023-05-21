@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaModule.h"
+#include "CLuaModuleManager.h"
+#include "CScriptDebugging.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CGame.h"
+#include "CResourceManager.h"
 
 extern CGame* g_pGame;
 
@@ -250,7 +256,7 @@ void CLuaModule::ErrorPrintf(const char* szFormat, ...)
 {
     va_list args;
     va_start(args, szFormat);
-    CLogger::ErrorPrintf(szFormat, va_pass(args));
+    CLogger::ErrorPrintvf(szFormat, args);
     va_end(args);
 }
 
@@ -258,7 +264,7 @@ void CLuaModule::DebugPrintf(lua_State* luaVM, const char* szFormat, ...)
 {
     va_list args;
     va_start(args, szFormat);
-    m_pScriptDebugging->LogInformation(luaVM, szFormat, va_pass(args));
+    m_pScriptDebugging->LogInformationV(luaVM, szFormat, args);
     va_end(args);
 }
 
@@ -266,7 +272,7 @@ void CLuaModule::Printf(const char* szFormat, ...)
 {
     va_list args;
     va_start(args, szFormat);
-    CLogger::LogPrintf(szFormat, va_pass(args));
+    CLogger::LogPrintvf(szFormat, args);
     va_end(args);
 }
 

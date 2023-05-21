@@ -31,6 +31,7 @@ public:
     const SString& GetTitle();
     SString        GetURL();
     void           SetRenderingPaused(bool bPaused);
+    const bool     GetRenderingPaused() const { return m_pWebView->GetRenderingPaused(); }
     void           Focus();
 
     bool ExecuteJavascript(const SString& strJavascriptCode);

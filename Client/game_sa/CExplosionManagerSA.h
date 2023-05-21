@@ -12,12 +12,13 @@
 #pragma once
 
 #include <game/CExplosionManager.h>
-#include "CExplosionSA.h"
 
-#define FUNC_CExplosion_AddExplosion    0x736A50 // ##SA##
+class CExplosion;
+class CExplosionSA;
+
+#define FUNC_CExplosion_AddExplosion    0x736A50
 
 #define ARRAY_Explosions                0xC88950
-
 #define MAX_EXPLOSIONS                  48
 
 class CExplosionManagerSA : public CExplosionManager
@@ -28,8 +29,7 @@ public:
 
     CExplosion* AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition, unsigned int uiActivationDelay = 0,
                              bool bMakeSound = true, float fCamShake = -1.0f, bool bNoDamage = false);
-    VOID        RemoveAllExplosionsInArea(CVector* vecPosition, FLOAT fRadius);
-    VOID        RemoveAllExplosions();
+    void        RemoveAllExplosions();
     CExplosion* GetExplosion(DWORD ID);
     CExplosion* FindFreeExplosion();
 

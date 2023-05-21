@@ -23,8 +23,8 @@ public:
     void RemoveModule(CAntiCheatModule& Module);
     void ClearModules();
 
-    bool PerformChecks();
-    static SString GetInfo(const SString &acInfo, const SString &sdInfo);
+    bool           PerformChecks();
+    static SString GetInfo(const SString& acInfo, const SString& sdInfo);
 
 private:
     std::list<CAntiCheatModule*>           m_Entries;

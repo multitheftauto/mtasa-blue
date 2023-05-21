@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPickupManager.h"
+#include "Utils.h"
 
 static SFixedArray<unsigned short, 47> g_usWeaponModels = {{
     0,   331, 333, 334, 335, 336, 337, 338, 339, 341,            // 9

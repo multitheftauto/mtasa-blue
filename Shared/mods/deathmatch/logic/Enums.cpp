@@ -8,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "Enums.h"
 
 IMPLEMENT_ENUM_BEGIN(EEventPriority::EEventPriorityType)
 ADD_ENUM(EEventPriority::LOW, "low")
@@ -48,13 +49,38 @@ ADD_ENUM(EHashFunction::SHA384, "sha384")
 ADD_ENUM(EHashFunction::SHA512, "sha512")
 IMPLEMENT_ENUM_END("hash-function")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(HashFunctionType)
+ADD_ENUM(HashFunctionType::MD5, "md5")
+ADD_ENUM(HashFunctionType::SHA1, "sha1")
+ADD_ENUM(HashFunctionType::SHA224, "sha224")
+ADD_ENUM(HashFunctionType::SHA256, "sha256")
+ADD_ENUM(HashFunctionType::SHA384, "sha384")
+ADD_ENUM(HashFunctionType::SHA512, "sha512")
+ADD_ENUM(HashFunctionType::HMAC, "hmac")
+IMPLEMENT_ENUM_CLASS_END("hash-function")
+
 IMPLEMENT_ENUM_CLASS_BEGIN(PasswordHashFunction)
 ADD_ENUM(PasswordHashFunction::Bcrypt, "bcrypt")
 IMPLEMENT_ENUM_CLASS_END("password-hash-function")
 
-IMPLEMENT_ENUM_CLASS_BEGIN(StringEncryptFunction)
-ADD_ENUM(StringEncryptFunction::TEA, "tea")
-IMPLEMENT_ENUM_CLASS_END("string-encrypt-function")
+IMPLEMENT_ENUM_CLASS_BEGIN(StringEncodeFunction)
+ADD_ENUM(StringEncodeFunction::TEA, "tea")
+ADD_ENUM(StringEncodeFunction::AES128, "aes128")
+ADD_ENUM(StringEncodeFunction::RSA, "rsa")
+IMPLEMENT_ENUM_CLASS_END("string-encode-function")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(KeyPairAlgorithm)
+ADD_ENUM(KeyPairAlgorithm::RSA, "rsa")
+IMPLEMENT_ENUM_CLASS_END("key-pair-algorithm")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(HmacAlgorithm)
+ADD_ENUM(HmacAlgorithm::MD5, "md5")
+ADD_ENUM(HmacAlgorithm::SHA1, "sha1")
+ADD_ENUM(HmacAlgorithm::SHA224, "sha224")
+ADD_ENUM(HmacAlgorithm::SHA256, "sha256")
+ADD_ENUM(HmacAlgorithm::SHA384, "sha384")
+ADD_ENUM(HmacAlgorithm::SHA512, "sha512")
+IMPLEMENT_ENUM_CLASS_END("hmac-algorithm")
 
 IMPLEMENT_ENUM_BEGIN(ePacketID)
 ADD_ENUM1(PACKET_ID_SERVER_JOIN)
@@ -165,4 +191,5 @@ ADD_ENUM1(PACKET_ID_PLAYER_ACINFO)
 ADD_ENUM1(PACKET_ID_CHAT_CLEAR)
 ADD_ENUM1(PACKET_ID_SERVER_INFO_SYNC)
 ADD_ENUM1(PACKET_ID_DISCORD_JOIN)
+ADD_ENUM1(PACKET_ID_PLAYER_RESOURCE_START)
 IMPLEMENT_ENUM_END("ePacketID")

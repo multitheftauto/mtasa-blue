@@ -10,6 +10,22 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEntityAddPacket.h"
+#include "CColShape.h"
+#include "CColCuboid.h"
+#include "CColCircle.h"
+#include "CColPolygon.h"
+#include "CColRectangle.h"
+#include "CColTube.h"
+#include "CDummy.h"
+#include "CPickup.h"
+#include "CMarker.h"
+#include "CBlip.h"
+#include "CRadarArea.h"
+#include "CWater.h"
+#include "CVehicleManager.h"
+#include "CHandlingManager.h"
+#include "CGame.h"
 
 //
 // Temporary helper functions for fixing crashes on pre r6459 clients.
@@ -225,6 +241,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     bool bIsDoubleSided = pObject->IsDoubleSided();
                     BitStream.WriteBit(bIsDoubleSided);
 
+                    // Breakable
+                    if (BitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                        BitStream.WriteBit(pObject->IsBreakable());
+
                     // Visible in all dimensions
                     if (BitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                     {
@@ -439,6 +459,24 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     SVehicleHealthSync health;
                     health.data.fValue = pVehicle->GetHealth();
                     BitStream.Write(&health);
+
+                    // Blow state
+                    if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+                    {
+                        unsigned char blowState = 0;
+
+                        switch (pVehicle->GetBlowState())
+                        {
+                            case VehicleBlowState::AWAITING_EXPLOSION_SYNC:
+                                blowState = 1;
+                                break;
+                            case VehicleBlowState::BLOWN:
+                                blowState = 2;
+                                break;
+                        }
+
+                        BitStream.WriteBits(&blowState, 2);
+                    }
 
                     // Color
                     CVehicleColor& vehColor = pVehicle->GetColor();
@@ -713,17 +751,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Write the icon
                     SIntegerSync<unsigned char, 6> icon(pBlip->m_ucIcon);
                     BitStream.Write(&icon);
-                    if (pBlip->m_ucIcon == 0)
-                    {
-                        // Write the size
-                        SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
-                        BitStream.Write(&size);
 
-                        // Write the color
-                        SColorSync color;
-                        color = pBlip->GetColor();
-                        BitStream.Write(&color);
-                    }
+                    // Write the size
+                    SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
+                    BitStream.Write(&size);
+
+                    // Write the color
+                    SColorSync color;
+                    color = pBlip->GetColor();
+                    BitStream.Write(&color);
 
                     break;
                 }
@@ -1024,6 +1060,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 SPosition2DSync vertex(false);
                                 vertex.data.vecPosition = *iter;
                                 BitStream.Write(&vertex);
+                            }
+
+                            if (BitStream.Can(eBitStreamVersion::SetColPolygonHeight))
+                            {
+                                float fFloor, fCeil;
+                                pPolygon->GetHeight(fFloor, fCeil);
+
+                                BitStream.Write(fFloor);
+                                BitStream.Write(fCeil);
                             }
                             break;
                         }

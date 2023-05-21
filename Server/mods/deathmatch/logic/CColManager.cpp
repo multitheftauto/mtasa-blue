@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CColManager.h"
+#include "CSpatialDatabase.h"
+#include "Utils.h"
 
 CColManager::CColManager()
 {
@@ -68,7 +71,7 @@ void CColManager::DoHitDetectionForColShape(CColShape* pShape)
     }
 
     // Add existing colliders, so they can be disconnected if required
-    for (list<CElement*>::const_iterator it = pShape->CollidersBegin(); it != pShape->CollidersEnd(); ++it)
+    for (std::list<CElement*>::const_iterator it = pShape->CollidersBegin(); it != pShape->CollidersEnd(); ++it)
     {
         entityList[*it] = 1;
     }
@@ -102,7 +105,7 @@ void CColManager::DoHitDetectionForEntity(const CVector& vecNowPosition, CElemen
             shortList[(CColShape*)*it] = 1;
 
     // Add existing collisions, so they can be disconnected if required
-    for (list<CColShape*>::const_iterator it = pEntity->CollisionsBegin(); it != pEntity->CollisionsEnd(); ++it)
+    for (std::list<CColShape*>::const_iterator it = pEntity->CollisionsBegin(); it != pEntity->CollisionsEnd(); ++it)
         shortList[*it] = 1;
 
     // Test each colshape against the entity
@@ -135,7 +138,7 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
             pEntity->AddCollision(pShape);
 
             // Can we call the event?
-            if (pShape->GetAutoCallEvent())
+            if (pShape->GetAutoCallEvent() && !pEntity->IsBeingDeleted())
             {
                 // Call the event
                 CLuaArguments Arguments;
@@ -162,16 +165,20 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
             pShape->RemoveCollider(pEntity);
             pEntity->RemoveCollision(pShape);
 
-            // Call the event
-            CLuaArguments Arguments;
-            Arguments.PushElement(pEntity);
-            Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pShape->CallEvent("onColShapeLeave", Arguments);
+            // Can we call the event?
+            if (!pEntity->IsBeingDeleted())
+            {
+                // Call the event
+                CLuaArguments Arguments;
+                Arguments.PushElement(pEntity);
+                Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                pShape->CallEvent("onColShapeLeave", Arguments);
 
-            CLuaArguments Arguments2;
-            Arguments2.PushElement(pShape);
-            Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
-            pEntity->CallEvent("onElementColShapeLeave", Arguments2);
+                CLuaArguments Arguments2;
+                Arguments2.PushElement(pShape);
+                Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                pEntity->CallEvent("onElementColShapeLeave", Arguments2);
+            }
 
             pShape->CallLeaveCallback(*pEntity);
         }
@@ -207,7 +214,7 @@ void CColManager::RemoveFromList(CColShape* pShape)
 
 void CColManager::TakeOutTheTrash()
 {
-    vector<CColShape*>::const_iterator iter = m_TrashCan.begin();
+    std::vector<CColShape*>::const_iterator iter = m_TrashCan.begin();
     for (; iter != m_TrashCan.end(); iter++)
     {
         ListRemove(m_List, *iter);

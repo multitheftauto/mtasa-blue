@@ -9,6 +9,7 @@ project "GUI"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/cegui-0.4.0-custom/include",
 			"../../vendor/sparsehash/src/"
@@ -39,7 +40,7 @@ project "GUI"
 		"*.cpp"
 	}
 	
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

@@ -52,7 +52,7 @@ protected:
     void BroadcastOnlyVisible(const CPacket& Packet);
     bool m_bIsSynced;
 
-    list<CElement*> m_ElementReferences;
+    std::list<CElement*> m_ElementReferences;
 
 private:
     void RemoveIdenticalEntries(std::set<class CPlayer*>& List1, std::set<class CPlayer*>& List2);

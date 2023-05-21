@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CEventDamage.h>
 #include "../game_sa/CWeaponInfoSA.h"
 extern EDamageReasonType g_GenerateDamageEventReason;
 static CElapsedTime      ms_LastFxTimer;

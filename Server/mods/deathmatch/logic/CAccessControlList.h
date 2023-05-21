@@ -33,8 +33,8 @@ public:
 
     void WriteToXMLNode(CXMLNode* pNode);
 
-    list<CAccessControlListRight*>::const_iterator IterBegin() { return m_Rights.begin(); };
-    list<CAccessControlListRight*>::const_iterator IterEnd() { return m_Rights.end(); };
+    std::list<CAccessControlListRight*>::const_iterator IterBegin() { return m_Rights.begin(); };
+    std::list<CAccessControlListRight*>::const_iterator IterEnd() { return m_Rights.end(); };
 
     bool CanBeModifiedByScript();
     uint GetScriptID() const { return m_uiScriptID; }
@@ -42,8 +42,8 @@ public:
 private:
     void OnChange();
 
-    SString                        m_strACLName;
-    list<CAccessControlListRight*> m_Rights;
+    SString                             m_strACLName;
+    std::list<CAccessControlListRight*> m_Rights;
 
     class CAccessControlListManager* m_pACLManager;
     uint                             m_uiScriptID;

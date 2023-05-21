@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <memory>
+
 class CXMLNode;
 class CXMLFile;
 class CXMLAttribute;

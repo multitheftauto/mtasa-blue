@@ -11,6 +11,8 @@
 
 #pragma once
 
+class CVector;
+
 enum EWaterPolyType
 {
     WATER_POLY_NONE = 0,
@@ -18,9 +20,6 @@ enum EWaterPolyType
     WATER_POLY_TRIANGLE = 2,
     WATER_POLY_LIST = 3
 };
-
-#define WATER_VISIBLE 1
-#define WATER_SHALLOW 2
 
 class CWaterVertex
 {
