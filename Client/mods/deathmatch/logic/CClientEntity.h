@@ -339,7 +339,6 @@ protected:
     CCustomData* m_pCustomData;
 
     ElementID m_ID;
-    CVector   m_vecRelativePosition;
 
     unsigned short m_usDimension;
 
