@@ -9,8 +9,8 @@ utils\premake5.exe install_unifont
 rem Generate solutions
 utils\premake5.exe vs2022
 
-rem Get include dirs
-findstr /l "<AdditionalIncludeDirectories>" .\Build\DirectX9GUIRenderer.vcxproj
+rem Check CWD
+echo Current CWD = [%cd%]
 
 rem Create a shortcut to the solution - http://superuser.com/questions/392061/how-to-make-a-shortcut-from-cmd
 set SCRIPTFILE="%TEMP%\CreateMyShortcut.vbs"
