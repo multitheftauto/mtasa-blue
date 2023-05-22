@@ -342,8 +342,6 @@ protected:
 
     unsigned short m_usDimension;
 
-    unsigned int m_uiLine;
-
 private:
     unsigned int m_uiTypeHash;
     SString      m_strTypeName;
