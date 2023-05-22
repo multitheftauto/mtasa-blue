@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -32,7 +32,9 @@
 #define CURL_DISABLE_LDAP 1
 
 #define NEED_REENTRANT 1
+#ifndef OS
 #define OS "plan9"
+#endif
 #define PACKAGE "curl"
 #define PACKAGE_NAME "curl"
 #define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.se/mail/"
@@ -74,10 +76,8 @@
 
 #define HAVE_ALARM 1
 #define HAVE_ARPA_INET_H 1
-#define HAVE_ASSERT_H 1
 #define HAVE_BASENAME 1
 #define HAVE_BOOL_T 1
-#define HAVE_ERRNO_H 1
 #define HAVE_FCNTL 1
 #define HAVE_FCNTL_H 1
 #define HAVE_FREEADDRINFO 1
