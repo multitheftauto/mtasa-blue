@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-21 18:22+0000\n"
-"PO-Revision-Date: 2023-05-23 19:07\n"
+"PO-Revision-Date: 2023-05-23 20:07\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -276,7 +276,7 @@ msgstr "كتم جميع الأصوات عند تصغير اللعبة"
 
 #: Client/core/CSettings.cpp:579
 msgid "Mute Radio sounds when minimized"
-msgstr "كتم الصوت الخاص بالراديو عند تصغير اللعبة"
+msgstr "كتم صوت الراديو عند تصغير اللعبة"
 
 #: Client/core/CSettings.cpp:584
 msgid "Mute SFX sounds when minimized"
@@ -307,11 +307,11 @@ msgstr "مسافة الرسومات:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:700
 msgid "Brightness:"
-msgstr "مستوى الإضاءة:"
+msgstr "السطوع:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:718
 msgid "FX Quality:"
-msgstr "جودة مؤثرات الرسوم:"
+msgstr ""
 
 #: Client/core/CSettings.cpp:611 Client/core/CSettings.cpp:732
 msgid "Anisotropic filtering:"
@@ -378,7 +378,7 @@ msgstr "مرتفعة جدًا"
 #: Client/core/CSettings.cpp:3123 Client/core/CSettings.cpp:3155
 #: Client/core/CSettings.cpp:3177 Client/core/CSettings.cpp:4180
 msgid "Off"
-msgstr "غير مفعل"
+msgstr "إيقاف"
 
 #: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1511
 msgid "1x"
