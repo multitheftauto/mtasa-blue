@@ -26,7 +26,13 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/coroutine_debug.lua.h"
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
-#include "luascripts/constants.lua.h"
+#include "luascripts/constants_main.lua.h"
+#include "luascripts/constants_elements.lua.h"
+#include "luascripts/constants_vehicles.lua.h"
+#include "luascripts/constants_weapons.lua.h"
+#include "luascripts/constants_peds.lua.h"
+#include "luascripts/constants_ui.lua.h"
+#include "luascripts/constants_other.lua.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
 {
@@ -184,7 +190,13 @@ void CLuaMain::LoadEmbeddedScripts()
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
-    LoadScript(EmbeddedLuaCode::constants);
+    LoadScript(EmbeddedLuaCode::constantsMain);
+    LoadScript(EmbeddedLuaCode::constantsElements);
+    LoadScript(EmbeddedLuaCode::constantsVehicles);
+    LoadScript(EmbeddedLuaCode::constantsWeapons);
+    LoadScript(EmbeddedLuaCode::constantsPeds);
+    LoadScript(EmbeddedLuaCode::constantsUI);
+    LoadScript(EmbeddedLuaCode::constantsOther);
     DECLARE_PROFILER_SECTION(OnPostLoadScript)
 }
 
