@@ -858,6 +858,20 @@ void CCore::SetSystemCursorVisible(bool bVisible)
 
 ////////////////////////////////////////////////////////////////////////
 //
+// ShouldShowSystemCursorDuringLoad
+//
+// Whenever system cursor should be shown during game load.
+// It should be if game is being launched in windowed more or user has multiple monitors and full screen minimize is disabled.
+//
+////////////////////////////////////////////////////////////////////////
+bool CCore::ShouldShowSystemCursorDuringLoad()
+{
+    CVideoModeManagerInterface* pVidMan = GetVideoModeManager();
+    return pVidMan->IsDisplayModeWindowed() || (pVidMan->IsMultiMonitor() && !pVidMan->IsMinimizeEnabled());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // LoadModule
 //
 // Attempt to load a module. Returns if successful.
@@ -983,10 +997,7 @@ void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
 
-    // Show system mouse cursor during game startup
-    // when game is being launched in windowed mode or user has multiple monitors and full screen minimize is disabled
-    CVideoModeManagerInterface* pVidMan = GetVideoModeManager();
-    SetSystemCursorVisible(pVidMan->IsDisplayModeWindowed() || (pVidMan->IsMultiMonitor() && !pVidMan->IsMinimizeEnabled()));
+    SetSystemCursorVisible(ShouldShowSystemCursorDuringLoad());
 
     // Hide GUI mouse cursor during game startup
     m_pGUI->SetCursorEnabled(false);

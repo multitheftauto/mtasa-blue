@@ -729,6 +729,17 @@ void CLocalGUI::UpdateCursor()
 
     static DWORD dwWidth = CDirect3DData::GetSingleton().GetViewportWidth();
     static DWORD dwHeight = CDirect3DData::GetSingleton().GetViewportHeight();
+    static bool bFirstRun = true;
+
+    if (bFirstRun)
+    {
+        if (!CCore::GetSingleton().ShouldShowSystemCursorDuringLoad())
+        {
+            m_StoredMousePosition.x = dwWidth / 2;
+            m_StoredMousePosition.y = dwHeight / 2;
+        }
+        bFirstRun = false;
+    }
 
     // Called in each frame to make sure the mouse is only visible when a GUI control that uses the
     // mouse requires it.

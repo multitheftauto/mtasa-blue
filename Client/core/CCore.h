@@ -141,6 +141,7 @@ public:
     void HideMainMenu();
     void SetCenterCursor(bool bEnabled);
     void SetSystemCursorVisible(bool bVisible);
+    bool ShouldShowSystemCursorDuringLoad();
 
     void ShowServerInfo(unsigned int WindowType);
 
