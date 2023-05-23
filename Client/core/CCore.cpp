@@ -861,7 +861,7 @@ void CCore::SetSystemCursorVisible(bool bVisible)
 // ShouldShowSystemCursorDuringLoad
 //
 // Whenever system cursor should be shown during game load.
-// It should be if game is being launched in windowed more or user has multiple monitors and full screen minimize is disabled.
+// It should be if game is being launched in windowed mode or user has multiple monitors and full screen minimize is disabled.
 //
 ////////////////////////////////////////////////////////////////////////
 bool CCore::ShouldShowSystemCursorDuringLoad()
