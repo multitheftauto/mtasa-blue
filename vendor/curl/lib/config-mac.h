@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -30,15 +30,20 @@
 /*  On Mac OS X you must run configure to generate curl_config.h file  */
 /* =================================================================== */
 
+#ifndef OS
 #define OS "mac"
+#endif
+
+#include <ConditionalMacros.h>
+#if TYPE_LONGLONG
+#define HAVE_LONGLONG           1
+#endif
 
 /* Define if you want the built-in manual */
 #define USE_MANUAL              1
 
-#define HAVE_ERRNO_H            1
 #define HAVE_NETINET_IN_H       1
 #define HAVE_SYS_SOCKET_H       1
-#define HAVE_SYS_SELECT_H       1
 #define HAVE_NETDB_H            1
 #define HAVE_ARPA_INET_H        1
 #define HAVE_UNISTD_H           1
@@ -52,6 +57,7 @@
 #define HAVE_UTIME_H            1
 #define HAVE_SYS_TIME_H         1
 #define HAVE_SYS_UTIME_H        1
+#define HAVE_SYS_IOCTL_H        1
 
 #define TIME_WITH_SYS_TIME      1
 
@@ -76,7 +82,13 @@
 #define HAVE_IOCTL_FIONBIO      1
 
 #define SIZEOF_INT              4
+#define SIZEOF_LONG             4
 #define SIZEOF_SIZE_T           4
+#ifdef HAVE_LONGLONG
+#define SIZEOF_CURL_OFF_T       8
+#else
+#define SIZEOF_CURL_OFF_T       4
+#endif
 
 #define HAVE_RECV 1
 #define RECV_TYPE_ARG1 int
@@ -89,7 +101,7 @@
 #define SEND_TYPE_ARG1 int
 #define SEND_QUAL_ARG2 const
 #define SEND_TYPE_ARG2 void *
-#define SEND_TYPE_ARG3 size_T
+#define SEND_TYPE_ARG3 size_t
 #define SEND_TYPE_ARG4 int
 #define SEND_TYPE_RETV ssize_t
 
