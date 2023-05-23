@@ -97,9 +97,9 @@ local _markerTypes = {
     Corona = 'corona',
 }
 local _pickupTypes = {
-    Health = 0
-    Armour = 1
-    Weapon = 2
+    Health = 0,
+    Armour = 1,
+    Weapon = 2,
     Custom = 3
 }
 local _modelPickupTypes = {
@@ -120,7 +120,7 @@ local _modelPickupTypes = {
     BlueTShirt = 1275,
     TikiStatue = 1276,
     SaveDisk = 1277,
-    DrugBundle = 1279
+    DrugBundle = 1279,
     Parachute = 1310,
     Skulls = 1313,
     PlayersIcon = 1314,

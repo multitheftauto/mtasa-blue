@@ -64,7 +64,7 @@ local _vehiclePanelState = {
 local _vehicleWheelState = {
     Inflated = 0,
     Flat = 1,
-    Fallen off = 2,
+    FallenOff = 2,
     Collisionless = 3
 }
 local _vehicleSeat = {

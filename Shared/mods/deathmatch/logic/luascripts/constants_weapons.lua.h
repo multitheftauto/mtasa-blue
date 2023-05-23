@@ -8,19 +8,19 @@ namespace EmbeddedLuaCode
 --]]
 
 local _weaponSlot = {
-    Unarmed = 0
-    Melee = 1
-    Handgun = 2
-    Shotgun = 3
-    SMG = 4
-    Rifle = 5
-    Sniper = 6
-    Heavy = 7
-    Thrown = 8
-    Special = 9
-    Gift = 10
-    Parachute = 11
-    Detonator = 12
+    Unarmed = 0,
+    Melee = 1,
+    Handgun = 2,
+    Shotgun = 3,
+    SMG = 4,
+    Rifle = 5,
+    Sniper = 6,
+    Heavy = 7,
+    Thrown = 8,
+    Special = 9,
+    Gift = 10,
+    Parachute = 11,
+    Detonator = 12,
 }
 local _weaponSkillLevel = {
     Poor = 0,

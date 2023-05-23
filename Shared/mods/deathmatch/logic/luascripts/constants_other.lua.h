@@ -339,7 +339,7 @@ local _clothesType = {
     Extra = 17,
 }
 
-constants.TriggerPriority = ._triggerPriority
+constants.TriggerPriority = _triggerPriority
 constants.DebugMessageLevels = _debugMessageLevels
 constants.KeyState = _keyState
 constants.KeyNames = _keyNames
