@@ -338,6 +338,31 @@ local _clothesType = {
     Hat = 16,
     Extra = 17,
 }
+local _weather = {
+    ExtraSunnyLS = 0,
+    SunnyLS = 1,
+    ExtraSunnySmogLS = 2,
+    SunnySmogLS = 3,
+    CloudyLS = 4,
+    SunnySF = 5,
+    ExtraSunnySF = 6,
+    CloudySF = 7,
+    RainySF = 8,
+    FoggySF = 9,
+    SunnyLV = 10,
+    ExtraSunnyLV = 11,
+    CloudyLV = 12,
+    ExtraSunnyCountry = 13,
+    SunnyCountry = 14,
+    CloudyCountry = 15,
+    RainyCountry = 16,
+    ExtrasunnyDesert = 17,
+    SunnyDesert = 18,
+    SandstormDesert = 19,
+    Underwater = 20,
+    ExtraColours1 = 21,
+    ExtraColours2 = 22,
+}
 
 constants.TriggerPriority = _triggerPriority
 constants.DebugMessageLevels = _debugMessageLevels
@@ -347,6 +372,7 @@ constants.ControlNames = _controlNames
 constants.AnimationBlocks = _animationBlocks
 constants.BodyPartName = _bodyPartName
 constants.ClothesType = _clothesType
+constants.Weather = _weather
 
     )~LUA~";
 }

@@ -25,7 +25,7 @@ local _vehicleDoorType = {
     RearLeft = 4,
     RearRight = 5
 }
-local _vehicleDoors = {
+local _vehicleDoorState = {
     ClosedUndamaged = 0,
     OpenUndamaged = 1,
     ClosedDamaged = 2,
@@ -73,15 +73,23 @@ local _vehicleSeat = {
     RearLeft = 2,
     RearRight = 3
 }
+local _trafficLightState = {
+    Auto = 'auto',
+    Disabled = 'disabled',
+    Red = 'red',
+    Yellow = 'yellow',
+    Green = 'green'
+}
 
 constants.VehicleLights = _vehicleLights
 constants.VehicleLightState = _vehicleLightState
 constants.VehicleLightOverride = _vehicleLightOverride
-constants.VehicleDoors = _vehicleDoors
 constants.VehicleDoorState = _vehicleDoorState
 constants.VehiclePanelState = _vehiclePanelState
 constants.CarPanels = _carPanels
 constants.PlanePanels = _planePanels
 constants.VehicleSeat = _vehicleSeat
+constants.TrafficLightState = _trafficLightState
+
     )~LUA~";
 }
