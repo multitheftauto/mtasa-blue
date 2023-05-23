@@ -984,7 +984,9 @@ void CCore::InitGUI(IDirect3DDevice9* pDevice)
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
 
     // Show system mouse cursor during game startup
-    SetSystemCursorVisible(true);
+    // when game is being launched in windowed mode or user has multiple monitors and full screen minimize is disabled
+    CVideoModeManagerInterface* pVidMan = GetVideoModeManager();
+    SetSystemCursorVisible(pVidMan->IsDisplayModeWindowed() || (pVidMan->IsMultiMonitor() && !pVidMan->IsMinimizeEnabled()));
 
     // Hide GUI mouse cursor during game startup
     m_pGUI->SetCursorEnabled(false);
