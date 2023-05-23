@@ -15,7 +15,7 @@
 
 /**
  * @brief Represents the raw SHA-256 checksum of a file.
-*/
+ */
 using FileHash = std::array<unsigned char, 32>;
 
 /**

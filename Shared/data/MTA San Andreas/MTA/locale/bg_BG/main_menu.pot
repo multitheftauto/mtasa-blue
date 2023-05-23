@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-10 16:36+0000\n"
+"PO-Revision-Date: 2022-09-24 16:37\n"
+"Last-Translator: \n"
+"Language-Team: Bulgarian\n"
+"Language: bg_BG\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: bg\n"
+"X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/main_menu.pot\n"
+"X-Crowdin-File-ID: 223\n"
+
+#. Found in the main menu navigation
+msgid "Quick connect"
+msgstr "Бързо свързване"
+
+#. Found in the main menu navigation
+msgid "Disconnect"
+msgstr "Изключване"
+
+#. Found in the main menu navigation
+msgid "Server browser"
+msgstr "Преглед на сървъри"
+
+#. Found in the main menu navigation
+msgid "Host game"
+msgstr "Създай игра"
+
+#. Found in the main menu navigation
+msgid "Map editor"
+msgstr "Редактор на карти"
+
+#. Found in the main menu navigation
+msgid "Settings"
+msgstr "Настройки"
+
+#. Found in the main menu navigation
+msgid "About"
+msgstr "Информация"
+
+#. Found in the main menu navigation
+msgid "Quit"
+msgstr "Изход"
+
+#. Found in the main menu above the news listing
+msgid "The Latest News"
+msgstr ""
+

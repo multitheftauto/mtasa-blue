@@ -79,12 +79,12 @@ public:
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
-    virtual CPed*         GetPedFromRef(DWORD dwGameRef) = 0;
-    virtual unsigned long GetPedCount() = 0;
+    virtual CPed*                  GetPedFromRef(DWORD dwGameRef) = 0;
+    virtual unsigned long          GetPedCount() = 0;
 
     // Others
-    virtual CVehicle*  AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
-                                uchar ucTrackId = 0xFF) = 0;
+    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
+                               uchar ucTrackId = 0xFF) = 0;
 
     virtual CEntity*       GetEntity(DWORD* pGameInterface) = 0;
     virtual CClientEntity* GetClientEntity(DWORD* pGameInterface) = 0;

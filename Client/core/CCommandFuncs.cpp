@@ -56,7 +56,7 @@ void CCommandFuncs::Ver(const char* szParameters)
 
 void CCommandFuncs::ScreenShot(const char* szParameters)
 {
-    g_pCore->TakeScreenShot();
+    g_pCore->InitiateScreenShot(false);
 }
 
 void CCommandFuncs::Vid(const char* szParameters)

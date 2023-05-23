@@ -1594,7 +1594,7 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         SDxStatus dxStatus;
         g_pCore->GetGraphics()->GetRenderItemManager()->GetDxStatus(dxStatus);
 
-        lua_createtable(luaVM, 0, 23);
+        lua_createtable(luaVM, 0, 24);
 
         lua_pushstring(luaVM, "TestMode");
         lua_pushstring(luaVM, EnumToString(dxStatus.testMode));
@@ -1726,6 +1726,30 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
 
         lua_pushstring(luaVM, "TotalPhysicalMemory");
         lua_pushnumber(luaVM, static_cast<lua_Number>(SharedUtil::GetWMITotalPhysicalMemory()) / 1024.0 / 1024.0);
+        lua_settable(luaVM, -3);
+
+        lua::Push(luaVM, "SettingDebugMode");
+        lua::Push(luaVM, []{
+            switch (g_pCore->GetDiagnosticDebug())
+            {
+            case EDiagnosticDebug::GRAPHICS_6734:
+                return "#6734 Graphics";
+            case EDiagnosticDebug::D3D_6732:
+                return "#6732 D3D";
+            case EDiagnosticDebug::LOG_TIMING_0000:
+                return "#0000 Log timing";
+            case EDiagnosticDebug::JOYSTICK_0000:
+                return "#0000 Joystick";
+            case EDiagnosticDebug::LUA_TRACE_0000:
+                return "#0000 Lua trace";
+            case EDiagnosticDebug::RESIZE_ALWAYS_0000:
+                return "#0000 Resize always";
+            case EDiagnosticDebug::RESIZE_NEVER_0000:
+                return "#0000 Resize never";
+            default:
+                return "Default";
+            }
+        }());
         lua_settable(luaVM, -3);
 
         return 1;

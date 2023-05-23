@@ -9,12 +9,10 @@ ENV AS_BUILDAGENT=0 \
     BUILD_CONFIG=release
 
 # Install build-time dependencies
-RUN dpkg --add-architecture i386 && apt-get update && \
+RUN apt-get update && \
     apt-get install -y software-properties-common wget ca-certificates git build-essential \
-        gcc-multilib g++-multilib gcc-10-multilib g++-10-multilib curl subversion ncftp \
-        libncurses-dev libncursesw5 \
-        libncurses-dev:i386 libncursesw5:i386 \
-        libmysqlclient-dev
+        gcc-10 g++-10 curl subversion ncftp \
+        libncurses-dev libncursesw5 libmysqlclient-dev
 
 # Set build directory
 VOLUME /build
@@ -22,6 +20,7 @@ WORKDIR /build
 
 # Copy entrypoint script
 COPY utils/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 # Add GLIB compat 
 COPY utils/compat /compat

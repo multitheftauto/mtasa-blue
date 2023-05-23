@@ -318,16 +318,30 @@ void CNetAPI::DoPulse()
                 // Are in a vehicle?
                 if (pVehicle)
                 {
-                    // Send a puresync packet
-                    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-                    if (pBitStream)
+                    // Are we getting out and physically left the car
+                    if (pPlayer->GetVehicleInOutState() == VEHICLE_INOUT_GETTING_OUT && !pPlayer->GetRealOccupiedVehicle())
                     {
-                        // Write our data
-                        WriteVehiclePuresync(pPlayer, pVehicle, *pBitStream);
+                        // Send a player puresync packet
+                        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+                        if (pBitStream)
+                        {
+                            WritePlayerPuresync(pPlayer, *pBitStream);
 
-                        // Send the packet and destroy it
-                        g_pNet->SendPacket(PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
-                        g_pNet->DeallocateNetBitStream(pBitStream);
+                            g_pNet->SendPacket(PACKET_ID_PLAYER_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+                            g_pNet->DeallocateNetBitStream(pBitStream);
+                        }
+                    }
+                    else
+                    {
+                        // Send a vehicle puresync packet
+                        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+                        if (pBitStream)
+                        {
+                            WriteVehiclePuresync(pPlayer, pVehicle, *pBitStream);
+
+                            g_pNet->SendPacket(PACKET_ID_PLAYER_VEHICLE_PURESYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+                            g_pNet->DeallocateNetBitStream(pBitStream);
+                        }
                     }
 
                     // Sync its damage model too
@@ -962,13 +976,9 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
         position.data.vecPosition -= vecTempPos;
     }
 
-    // If the player is working on leaving a vehicle, don't set any target position
-    if (pPlayer->GetVehicleInOutState() == VEHICLE_INOUT_NONE || pPlayer->GetVehicleInOutState() == VEHICLE_INOUT_GETTING_IN ||
-        pPlayer->GetVehicleInOutState() == VEHICLE_INOUT_JACKING)
-    {
-        pPlayer->SetTargetPosition(position.data.vecPosition, TICK_RATE, pContactEntity);
-        pPlayer->SetTargetRotation(rotation.data.fRotation);
-    }
+    // Set position and rotation
+    pPlayer->SetTargetPosition(position.data.vecPosition, TICK_RATE, pContactEntity);
+    pPlayer->SetTargetRotation(rotation.data.fRotation);
 
     // Set move speed, controller state and camera rotation + duck state
     pPlayer->SetControllerState(ControllerState);
@@ -1305,8 +1315,8 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             float fSpeed = 0.0f;
             BitStream.Read(fPosition);
             BitStream.ReadBit(bDirection);
-            BitStream.Read(ucTrack);
             BitStream.Read(fSpeed);
+            BitStream.Read(ucTrack);
 
             if (vehicleType == CLIENTVEHICLE_TRAIN)
             {
@@ -1578,8 +1588,8 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         float fSpeed = pVehicle->GetTrainSpeed();
         BitStream.Write(fPosition);
         BitStream.WriteBit(bDirection);
-        BitStream.Write(ucTrack);
         BitStream.Write(fSpeed);
+        BitStream.Write(ucTrack);
     }
 
     // Write the camera orientation

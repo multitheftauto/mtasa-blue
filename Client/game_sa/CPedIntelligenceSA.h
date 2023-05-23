@@ -50,8 +50,8 @@ private:
 public:
     CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped);
     ~CPedIntelligenceSA();
-    CPedIntelligenceSAInterface*  GetInterface() { return internalInterface; }
-    CTaskManager*                 GetTaskManager();
-    bool                          TestForStealthKill(CPed* pPed, bool bUnk);
-    CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);
+    CPedIntelligenceSAInterface* GetInterface() { return internalInterface; }
+    CTaskManager*                GetTaskManager();
+    bool                         TestForStealthKill(CPed* pPed, bool bUnk);
+    CTaskSAInterface*            SetTaskDuckSecondary(unsigned short nLengthOfDuck);
 };

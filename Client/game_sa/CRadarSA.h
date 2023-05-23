@@ -27,5 +27,5 @@ public:
     ~CRadarSA();
     CMarker* CreateMarker(CVector* vecPosition);
     CMarker* GetFreeMarker();
-    void DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color);
+    void     DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color);
 };

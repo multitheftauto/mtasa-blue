@@ -16,12 +16,12 @@ private:
     unsigned int pad3;
 
 public:
-    RwMatrix*    m_pAttachMatrix = nullptr;
-    bool         m_bOwnsAttachedMatrix = false;            // do we need to delete attaching matrix at detaching
+    RwMatrix* m_pAttachMatrix = nullptr;
+    bool      m_bOwnsAttachedMatrix = false;            // do we need to delete attaching matrix at detaching
 
     CMatrixSAInterface(CMatrixSAInterface const& matrix);
     CMatrixSAInterface(RwMatrix* matrix, bool temporary);            // like previous + attach
-    ~CMatrixSAInterface();                                              // destructor detaches matrix if attached
+    ~CMatrixSAInterface();                                           // destructor detaches matrix if attached
 
     void ConvertToEulerAngles(float& x, float& y, float& z, std::int32_t flags);
     void ConvertFromEulerAngles(float x, float y, float z, std::int32_t flags);

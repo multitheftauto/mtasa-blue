@@ -42,7 +42,7 @@ void CClientVectorGraphicDisplay::Render()
     if (HasUpdated())
     {
         m_pVectorGraphic->OnUpdate();
-    }        
+    }
 }
 
 void CClientVectorGraphicDisplay::UpdateTexture()

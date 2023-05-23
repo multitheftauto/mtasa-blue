@@ -1109,9 +1109,9 @@ enum eMoveState
     PEDMOVE_TURN_L,
     PEDMOVE_TURN_R,
     PEDMOVE_WALK,
-    //#ifdef GTA_MIAMI
+    // #ifdef GTA_MIAMI
     PEDMOVE_JOG,
-    //#endif
+    // #endif
     PEDMOVE_RUN,
     PEDMOVE_SPRINT
 };

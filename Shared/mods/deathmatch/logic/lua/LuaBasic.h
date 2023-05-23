@@ -23,7 +23,7 @@
 /*
     Basic Lua operations:
         void Push(L, T value)
-        T PopPrimitive(L, std::size_t stackIndex)
+        T PopPrimitive(L, int& stackIndex)
 */
 
 namespace lua
@@ -31,7 +31,7 @@ namespace lua
     // PopTrival should read a simple value of type T from the stack without extra type checks
     // If whatever is at that point in the stack is not convertible to T, the behavior is undefined
     template <typename T>
-    inline T PopPrimitive(lua_State* L, std::size_t& index);
+    inline T PopPrimitive(lua_State* L, int& index);
 
     // Push should push a value of type T to the Lua Stack
     // This will always increase the stack size by 1
@@ -42,7 +42,7 @@ namespace lua
 
     inline void Push(lua_State* L, bool value) { lua_pushboolean(L, value); }
 
-    inline void Push(lua_State* L, nullptr_t) { lua_pushnil(L); }
+    inline void Push(lua_State* L, std::nullptr_t) { lua_pushnil(L); }
 
     inline void Push(lua_State* L, const char* value) { lua_pushstring(L, value); }
 

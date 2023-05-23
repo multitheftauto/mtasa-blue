@@ -24,7 +24,7 @@ class CmdExtract
 
     bool ArcAnalyzed;
 
-    void ReleaseAnalyzeData();
+    void FreeAnalyzeData();
     EXTRACT_ARC_CODE ExtractArchive();
     bool ExtractFileCopy(File &New,wchar *ArcName,const wchar *RedirName,wchar *NameNew,wchar *NameExisting,size_t NameExistingSize,int64 UnpSize);
     void ExtrPrepareName(Archive &Arc,const wchar *ArcFileName,wchar *DestName,size_t DestSize);

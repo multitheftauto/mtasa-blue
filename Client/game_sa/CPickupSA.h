@@ -44,6 +44,7 @@ class CPickupSA : public CPickup
 private:
     CPickupSAInterface* internalInterface;
     CObjectSA*          object;
+
 public:
     CPickupSA(CPickupSAInterface* pickupInterface);
     CPickupSAInterface* GetInterface() { return internalInterface; };            // not to be exported

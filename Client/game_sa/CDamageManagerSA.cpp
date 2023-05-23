@@ -100,7 +100,6 @@ void CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus)
 
 void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
 {
-
     // Valid index?
     if (bPanel < MAX_PANELS && bPanelStatus <= 3)
     {

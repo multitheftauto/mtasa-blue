@@ -660,6 +660,8 @@ bool CMainConfig::LoadExtended()
         }
     } while (pNode);
 
+    RegisterCommands();
+
     // Handle the <resource> nodes
     pNode = NULL;
     uiCurrentIndex = 0;
@@ -749,7 +751,11 @@ bool CMainConfig::LoadExtended()
 
     CLogger::ProgressDotsEnd();
     CLogger::SetMinLogLevel(LOGLEVEL_LOW);
+    return true;
+}
 
+void CMainConfig::RegisterCommands()
+{
     // Register the commands
     RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource-name>\nStart a loaded resource eg: start admin");
     RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource-name>\nStop a resource eg: stop admin");
@@ -819,7 +825,6 @@ bool CMainConfig::LoadExtended()
     RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false,
                     "Usage: sfakelag <packet loss> <extra ping> <ping variance> [<KBPS limit>]\nOnly available if enabled in the mtaserver.conf file.\nAdds "
                     "artificial packet loss, ping, jitter and bandwidth limits to the server-client connections.");
-    return true;
 }
 
 bool CMainConfig::Save()
@@ -1440,6 +1445,7 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 50, 1500, 4000, "lightweight_sync_interval", &g_TickRateSettings.iLightSync, &CMainConfig::OnTickRateChange},
         {true, true, 50, 500, 4000, "camera_sync_interval", &g_TickRateSettings.iCamSync, &CMainConfig::OnTickRateChange},
         {true, true, 50, 400, 4000, "ped_sync_interval", &g_TickRateSettings.iPedSync, &CMainConfig::OnTickRateChange},
+        {true, true, 50, 2000, 4000, "ped_far_sync_interval", &g_TickRateSettings.iPedFarSync, NULL},
         {true, true, 50, 400, 4000, "unoccupied_vehicle_sync_interval", &g_TickRateSettings.iUnoccupiedVehicle, &CMainConfig::OnTickRateChange},
         {true, true, 50, 100, 4000, "keysync_mouse_sync_interval", &g_TickRateSettings.iKeySyncRotation, &CMainConfig::OnTickRateChange},
         {true, true, 50, 100, 4000, "keysync_analog_sync_interval", &g_TickRateSettings.iKeySyncAnalogMove, &CMainConfig::OnTickRateChange},

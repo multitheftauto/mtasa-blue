@@ -193,17 +193,17 @@ class CAnimBlock;
 class CTaskComplexSunbatheSAInterface : public CTaskComplexSAInterface
 {
 public:
-    bool           m_bStartStanding;
-    bool           m_bBathing;
-    bool           m_bBeachAnimsReferenced;
-    bool           m_bSunbatheAnimsReferenced;
-    bool           m_bAborted;
-    CTaskTimer     m_BathingTimer;
-    eSunbatherType m_SunbatherType;
-    CAnimBlock*    m_pBeachAnimBlock;
-    CAnimBlock*    m_pSunbatheAnimBlock;
-    int            m_BeachAnimBlockIndex;
-    int            m_SunbatheAnimBlockIndex;
+    bool                m_bStartStanding;
+    bool                m_bBathing;
+    bool                m_bBeachAnimsReferenced;
+    bool                m_bSunbatheAnimsReferenced;
+    bool                m_bAborted;
+    CTaskTimer          m_BathingTimer;
+    eSunbatherType      m_SunbatherType;
+    CAnimBlock*         m_pBeachAnimBlock;
+    CAnimBlock*         m_pSunbatheAnimBlock;
+    int                 m_BeachAnimBlockIndex;
+    int                 m_SunbatheAnimBlockIndex;
     CObjectSAInterface* m_pTowel;
 };
 

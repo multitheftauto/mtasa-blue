@@ -55,7 +55,6 @@ static void _declspec(naked) HOOK_CEntryInfoList__Flush()
     }
 }
 
-
 #define HOOKPOS_CPtrNodeSingleLinkPool__New 0x55229B
 #define HOOKSIZE_CPtrNodeSingleLinkPool__New 0x5
 static void _declspec(naked) HOOK_CPtrNodeSingleLinkPool__New()
@@ -95,7 +94,6 @@ static void _declspec(naked) HOOK_CPtrListSingleLink__Flush()
         jmp RETURN_CPtrListSingleLink__Flush
     }
 }
-
 
 #define HOOKPOS_CPtrNodeDoubleLinkPool__New 0x55233E
 #define HOOKSIZE_CPtrNodeDoubleLinkPool__New 0x6
@@ -147,7 +145,7 @@ void CMultiplayerSA::InitHooks_ObjectStreamerOptimization()
     EZHookInstall(CPtrNodeSingleLinkPool__New);
     EZHookInstall(CPtrNodeSingleLink__operator_delete);
     EZHookInstall(CPtrListSingleLink__Flush);
-    
+
     EZHookInstall(CPtrNodeDoubleLinkPool__New);
     EZHookInstall(CPtrNodeDoubleLink__operator_delete);
     EZHookInstall(CPtrListDoubleLink__Flush);

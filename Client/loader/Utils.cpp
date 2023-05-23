@@ -1161,7 +1161,7 @@ bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 
     if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
     {
-        using Signature = bool(*)(DWORD, UINT);
+        using Signature = bool (*)(DWORD, UINT);
         static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
 
         if (NtTerminateProcess_)
@@ -2152,8 +2152,7 @@ bool IsErrorCodeLoggable(const std::error_code& ec)
 
 bool IsNativeArm64Host()
 {
-    static bool isArm64 = ([]
-    {
+    static bool isArm64 = ([] {
         HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
 
         if (kernel32)
@@ -2172,7 +2171,7 @@ bool IsNativeArm64Host()
                 }
             }
         }
-        
+
         return false;
     })();
 

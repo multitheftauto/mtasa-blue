@@ -47,7 +47,7 @@ bool CryptData::SetCryptKeys(bool Encrypt,CRYPT_METHOD Method,
      SecPassword *Password,const byte *Salt,
      const byte *InitV,uint Lg2Cnt,byte *HashKey,byte *PswCheck)
 {
-  if (!Password->IsSet() || Method==CRYPT_NONE)
+  if (Method==CRYPT_NONE || !Password->IsSet())
     return false;
 
   CryptData::Method=Method;

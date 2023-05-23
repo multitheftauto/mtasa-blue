@@ -95,6 +95,9 @@ workspace "MTASA"
 
 		filter { "system:linux" }
 			linkoptions { "-s" }
+	else
+		filter "system:windows"
+			defaultplatform "x86"
 	end
 
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}

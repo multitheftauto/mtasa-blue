@@ -16,7 +16,6 @@
 class CMarker;
 class CVector;
 
-
 class CRadar
 {
 public:
