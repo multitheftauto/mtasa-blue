@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -32,7 +32,6 @@
 
 #define HAVE_ARPA_INET_H 1
 #define HAVE_CLOSESOCKET_CAMEL 1
-#define HAVE_ERRNO_H 1
 #define HAVE_INTTYPES_H 1
 #define HAVE_IOCTLSOCKET_CAMEL 1
 #define HAVE_IOCTLSOCKET_CAMEL_FIONBIO 1
@@ -78,7 +77,9 @@
 #define USE_MANUAL 1
 #define CURL_DISABLE_LDAP 1
 
+#ifndef OS
 #define OS "AmigaOS"
+#endif
 
 #define PACKAGE "curl"
 #define PACKAGE_BUGREPORT "a suitable mailing list: https://curl.se/mail/"
@@ -86,7 +87,15 @@
 #define PACKAGE_STRING "curl -"
 #define PACKAGE_TARNAME "curl"
 #define PACKAGE_VERSION "-"
+
+#if defined(USE_AMISSL)
+#define CURL_CA_PATH "AmiSSL:Certs"
+#elif defined(__MORPHOS__)
+#define CURL_CA_BUNDLE "MOSSYS:Data/SSL/curl-ca-bundle.crt"
+#else
 #define CURL_CA_BUNDLE "s:curl-ca-bundle.crt"
+#endif
+
 #define STDC_HEADERS 1
 #define TIME_WITH_SYS_TIME 1
 

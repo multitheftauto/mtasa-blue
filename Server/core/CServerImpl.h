@@ -109,8 +109,8 @@ private:
 
     int m_exitCode;
 
-    std::vector<std::vector<SString>> m_vecCommandHistory = {{"", ""}};
-    uint                              m_uiSelectedCommandHistoryEntry = 0;
+    std::vector<std::vector<std::wstring>> m_vecCommandHistory = {{L"", L""}};
+    uint                                   m_uiSelectedCommandHistoryEntry = 0;
 
 #ifdef WIN32
     HANDLE    m_hConsole;
