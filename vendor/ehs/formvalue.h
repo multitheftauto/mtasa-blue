@@ -3,6 +3,7 @@
 #define FORMVALUE_H
 
 #include <string>
+#include <string_view>
 
 #include "contentdisposition.h"
 
@@ -42,6 +43,11 @@ class FormValue {
 		fprintf ( stderr, "[EHS_MEMORY] Allocated: FormValue\n" );
 #endif		
 	}
+
+	/// Constructor
+    explicit FormValue(std::string_view body) : sBody{body}
+    {
+    }
 
 #ifdef EHS_MEMORY
 	/// This is only for watching memory allocation

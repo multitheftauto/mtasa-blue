@@ -208,64 +208,97 @@ ResponseCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipo
 
 CAccount* CHTTPD::CheckAuthentication(HttpRequest* ipoHttpRequest)
 {
-    string authorization = ipoHttpRequest->oRequestHeaders["authorization"];
-    if (authorization.length() > 6)
+    const std::string strAuthorization = ipoHttpRequest->oRequestHeaders["authorization"];
+
+    if (strAuthorization.length() < 7 || strAuthorization.substr(0, 6) != "Basic ")
     {
-        if (authorization.substr(0, 6) == "Basic ")
+        return m_pGuestAccount;
+    }
+
+    const std::string strAddress = ipoHttpRequest->GetAddress();
+    const char*       szAddress = strAddress.c_str();
+    const bool        bIsFlooding = m_BruteForceProtect.IsFlooding(szAddress);
+
+    // Basic auth
+    SString strAuthName, strAuthPassword;
+
+    // If we're not flooding, or authorization header value isn't crazy long, let's parse it to get the username for console logs
+    if (!bIsFlooding || strAuthorization.length() < 768)
+    {
+        SString strAuthDecoded = SharedUtil::Base64decode(strAuthorization.substr(6));
+        strAuthDecoded.Split(":", &strAuthName, &strAuthPassword);
+    }
+
+    if (bIsFlooding)
+    {
+        if (strAuthName.length() > 0)
         {
-            // Basic auth
-            SString strAuthDecoded = SharedUtil::Base64decode(authorization.substr(6));
+            CLogger::AuthPrintf("HTTP: Ignoring login attempt for user '%s' from %s\n", strAuthName.substr(0, CAccountManager::MAX_USERNAME_LENGTH).c_str(),
+                                szAddress);
+        }
+        else
+        {
+            CLogger::AuthPrintf("HTTP: Ignoring login attempt from %s\n", szAddress);
+        }
 
-            SString authName, authPassword;
-            strAuthDecoded.Split(":", &authName, &authPassword);
+        return m_pGuestAccount;
+    }
 
-            if (m_BruteForceProtect.IsFlooding(ipoHttpRequest->GetAddress().c_str()))
+    if (strAuthName.length() < CAccountManager::MIN_USERNAME_LENGTH || strAuthName.length() > CAccountManager::MAX_USERNAME_LENGTH ||
+        strAuthPassword.length() < MIN_PASSWORD_LENGTH)
+    {
+        m_BruteForceProtect.AddConnect(szAddress);
+
+        CLogger::AuthPrintf("HTTP: Failed login attempt from %s (bad login)\n", szAddress);
+
+        return m_pGuestAccount;
+    }
+
+    if (CAccount* pAccount = g_pGame->GetAccountManager()->Get(strAuthName.c_str()); pAccount)
+    {
+        bool bSkipIpCheck;
+
+        // Check that the password is right
+        if (pAccount->IsPassword(strAuthPassword, &bSkipIpCheck))
+        {
+            // Check that it isn't the Console account
+            if (pAccount->GetName() != CONSOLE_ACCOUNT_NAME)
             {
-                CLogger::AuthPrintf("HTTP: Ignoring login attempt for user '%s' from %s\n", authName.c_str(), ipoHttpRequest->GetAddress().c_str());
-                return m_pGuestAccount;
-            }
-
-            CAccount* account = g_pGame->GetAccountManager()->Get(authName.c_str());
-            if (account)
-            {
-                // Check that the password is right
-                bool bSkipIpCheck;
-                if (account->IsPassword(authPassword.c_str(), &bSkipIpCheck))
+                // Do IP check if required
+                if (!bSkipIpCheck && !g_pGame->GetAccountManager()->IsHttpLoginAllowed(pAccount, strAddress))
                 {
-                    // Check that it isn't the Console account
-                    std::string strAccountName = account->GetName();
-                    if (strAccountName.compare(CONSOLE_ACCOUNT_NAME) != 0)
+                    if (m_WarnMessageTimer.Get() > 8000 || m_strWarnMessageForIp != strAddress)
                     {
-                        // Do IP check if required
-                        if (!bSkipIpCheck && !g_pGame->GetAccountManager()->IsHttpLoginAllowed(account, ipoHttpRequest->GetAddress()))
-                        {
-                            if (m_WarnMessageTimer.Get() > 8000 || m_strWarnMessageForIp != ipoHttpRequest->GetAddress())
-                            {
-                                m_strWarnMessageForIp = ipoHttpRequest->GetAddress();
-                                m_WarnMessageTimer.Reset();
-                            }
-                            CLogger::AuthPrintf("HTTP: Failed login for user '%s' because %s not associated with authorized serial\n", authName.c_str(),
-                                                ipoHttpRequest->GetAddress().c_str());
-                            return m_pGuestAccount;
-                        }
-
-                        // Handle initial login logging
-                        std::lock_guard<std::mutex> guard(m_mutexLoggedInMap);
-                        if (m_LoggedInMap.find(authName) == m_LoggedInMap.end())
-                            CLogger::AuthPrintf("HTTP: '%s' entered correct password from %s\n", authName.c_str(), ipoHttpRequest->GetAddress().c_str());
-                        m_LoggedInMap[authName] = GetTickCount64_();
-                        account->OnLoginHttpSuccess(ipoHttpRequest->GetAddress());
-                        return account;
+                        m_strWarnMessageForIp = strAddress;
+                        m_WarnMessageTimer.Reset();
                     }
+
+                    CLogger::AuthPrintf("HTTP: Failed login for user '%s' because %s not associated with authorized serial\n", strAuthName.c_str(), szAddress);
+
+                    return m_pGuestAccount;
                 }
-            }
-            if (authName.length() > 0)
-            {
-                m_BruteForceProtect.AddConnect(ipoHttpRequest->GetAddress().c_str());
-                CLogger::AuthPrintf("HTTP: Failed login attempt for user '%s' from %s\n", authName.c_str(), ipoHttpRequest->GetAddress().c_str());
+
+                // Handle initial login logging
+                std::lock_guard guard(m_mutexLoggedInMap);
+
+                if (m_LoggedInMap.find(strAuthName) == m_LoggedInMap.end())
+                {
+                    CLogger::AuthPrintf("HTTP: '%s' entered correct password from %s\n", strAuthName.c_str(), szAddress);
+                }
+
+                m_LoggedInMap[strAuthName] = GetTickCount64_();
+
+                pAccount->OnLoginHttpSuccess(strAddress);
+
+                return pAccount;
             }
         }
     }
+
+    m_BruteForceProtect.AddConnect(szAddress);
+
+    CLogger::AuthPrintf("HTTP: Failed login attempt for user '%s' from %s\n", strAuthName.c_str(), szAddress);
+
     return m_pGuestAccount;
 }
 

@@ -42,7 +42,7 @@ namespace lua
 
     inline void Push(lua_State* L, bool value) { lua_pushboolean(L, value); }
 
-    inline void Push(lua_State* L, nullptr_t) { lua_pushnil(L); }
+    inline void Push(lua_State* L, std::nullptr_t) { lua_pushnil(L); }
 
     inline void Push(lua_State* L, const char* value) { lua_pushstring(L, value); }
 

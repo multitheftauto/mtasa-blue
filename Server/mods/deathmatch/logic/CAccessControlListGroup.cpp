@@ -195,30 +195,26 @@ void CAccessControlListGroup::WriteToXMLNode(CXMLNode* pNode)
         CAccessControlListGroupObject* pObject = *iter;
 
         // Find out the object type string
-        char szObjectType[255];
+        std::string strObjectType = "error";
         switch (pObject->GetObjectType())
         {
             case CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE:
-                strcpy(szObjectType, "resource");
+                strObjectType = "resource";
                 break;
 
             case CAccessControlListGroupObject::OBJECT_TYPE_USER:
-                strcpy(szObjectType, "user");
-                break;
-
-            default:
-                strcpy(szObjectType, "error");
+                strObjectType = "user";
                 break;
         }
 
         // Append a dot append the name of the node
-        strcat(szObjectType, ".");
-        strncat(szObjectType, pObject->GetObjectName(), NUMELMS(szObjectType) - 1);
+        strObjectType += ".";
+        strObjectType += pObject->GetObjectName();
 
         // Create the subnode for this object and write the name attribute we generated
         CXMLNode* pObjectNode = pSubNode->CreateSubNode("object");
         pAttribute = pObjectNode->GetAttributes().Create("name");
-        pAttribute->SetValue(szObjectType);
+        pAttribute->SetValue(strObjectType.c_str());
     }
 }
 

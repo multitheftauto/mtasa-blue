@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 # Set variable defaults
+: ${BUILD_OS:=linux}
 : ${BUILD_ARCHITECTURE:=x64}
 : ${BUILD_CONFIG:=release}
 
@@ -21,6 +22,7 @@ fi
 # Read script arguments
 while [ $# -gt 0 ]; do
     case "$1" in
+        --os=*)     BUILD_OS="${1#*=}"              ;;
         --arch=*)   BUILD_ARCHITECTURE="${1#*=}"    ;;
         --config=*) BUILD_CONFIG="${1#*=}"          ;;
         *)
@@ -58,6 +60,7 @@ case $BUILD_ARCHITECTURE in
         exit 1
 esac
 
+echo "  OS = $BUILD_OS"
 echo "  CONFIG = $CONFIG"
 echo "  AR = ${AR:=ar}"
 echo "  CC = ${CC:=gcc}"
@@ -69,9 +72,9 @@ rm -Rf Bin/
 
 # Generate Makefiles
 if [[ -n "$GCC_PREFIX" ]]; then
-    $PREMAKE5 --gccprefix="$GCC_PREFIX" gmake
+    $PREMAKE5 --gccprefix="$GCC_PREFIX" --os="$BUILD_OS" gmake
 else
-    $PREMAKE5 gmake
+    $PREMAKE5 --os="$BUILD_OS" gmake
 fi
 
 # Build!

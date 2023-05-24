@@ -275,6 +275,7 @@ CCredits::CCredits()
         "Docker (https://www.docker.com/)\n"
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
         "FreeType (https://freetype.org/)\n"
+        "GNU Unifont (https://unifoundry.com/unifont/index.html)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
         "json-c (https://github.com/json-c/json-c)\n"
         "GitBook (https://www.gitbook.com/)\n"
@@ -412,7 +413,7 @@ void CCredits::Update()
         float fCurrentTop = 1.0f - 0.0001f * static_cast<float>(clock() - m_clkStart);
 
         // If we're too far down or up, make sure we restart next pulse
-        if (fCurrentTop <= -14.5f || fCurrentTop >= 1.0f)
+        if (fCurrentTop <= -14.75f || fCurrentTop >= 1.0f)
         {
             m_clkStart = clock();
         }
