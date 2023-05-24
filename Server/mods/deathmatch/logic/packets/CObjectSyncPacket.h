@@ -12,8 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-#include <CVector.h>
-#include <vector>
 
 class CObjectSyncPacket final : public CPacket
 {

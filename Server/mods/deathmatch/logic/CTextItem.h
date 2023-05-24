@@ -15,7 +15,6 @@ class CTextItem;
 
 #include <CVector2D.h>
 #include "CTextDisplay.h"
-#include <list>
 
 enum eTextPriority
 {

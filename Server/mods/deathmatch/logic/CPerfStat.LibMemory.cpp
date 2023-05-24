@@ -14,8 +14,6 @@
 #include "CDynamicLibrary.h"
 #include "core/CServerInterface.h"
 
-extern CServerInterface* g_pServerInterface;
-
 namespace
 {
     //

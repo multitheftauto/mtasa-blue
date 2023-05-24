@@ -14,17 +14,12 @@
 #include "CGame.h"
 #include "CAccountManager.h"
 #include "CMainConfig.h"
-#include <cryptopp/rsa.h>
-#include <cryptopp/osrng.h>
-#include <SharedUtil.Crypto.h>
 
 #ifndef WIN32
     #include <sys/socket.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
 #endif
-
-extern CGame* g_pGame;
 
 CHTTPD::CHTTPD()
     : m_BruteForceProtect(4, 30000, 60000 * 5)            // Max of 4 attempts per 30 seconds, then 5 minute ignore

@@ -13,7 +13,6 @@
 #include "CPerfStatManager.h"
 #include "CRegistry.h"
 #include "CGame.h"
-#include "CResource.h"
 #include "CResourceManager.h"
 
 struct lua_State;

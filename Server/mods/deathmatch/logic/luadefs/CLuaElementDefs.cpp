@@ -15,6 +15,7 @@
 #include "CScriptArgReader.h"
 #include "CDummy.h"
 #include "Utils.h"
+#include "CSphere.h"
 
 void CLuaElementDefs::LoadFunctions()
 {

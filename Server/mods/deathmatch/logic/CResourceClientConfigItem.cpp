@@ -17,9 +17,6 @@
 #include "StdInc.h"
 #include "CResourceClientConfigItem.h"
 
-extern CServerInterface* g_pServerInterface;
-extern CGame*            g_pGame;
-
 CResourceClientConfigItem::CResourceClientConfigItem(CResource* resource, const char* szShortName, const char* szResourceFileName,
                                                      CXMLAttributes* xmlAttributes)
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)

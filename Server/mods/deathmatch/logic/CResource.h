@@ -18,8 +18,6 @@
 #include "CResourceFile.h"
 #include "CAclRightName.h"
 #include <unzip.h>
-#include <list>
-#include <vector>
 #include <ehs/ehs.h>
 #include <time.h>
 

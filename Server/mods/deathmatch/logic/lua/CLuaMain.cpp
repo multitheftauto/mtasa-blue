@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "CLuaMain.h"
-#include "LuaCommon.h"
 #include "lua/CLuaShared.h"
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaUtilDefs.h"
@@ -41,21 +40,15 @@
 #include "lua/CLuaCallback.h"
 #include "CGame.h"
 #include "CMapManager.h"
-#include "CDummy.h"
 #include "CKeyBinds.h"
 #include "CIdArray.h"
 #include "CResourceConfigItem.h"
-#include "luadefs/CLuaFunctionDefs.h"
-#include <clocale>
 
 static CLuaManager* m_pLuaManager;
 SString             CLuaMain::ms_strExpectedUndumpHash;
 
 #define HOOK_INSTRUCTION_COUNT 1000000
 #define HOOK_MAXIMUM_TIME 5000
-
-extern CGame*      g_pGame;
-extern CNetServer* g_pRealNetServer;
 
 #include "luascripts/coroutine_debug.lua.h"
 #include "luascripts/exports.lua.h"

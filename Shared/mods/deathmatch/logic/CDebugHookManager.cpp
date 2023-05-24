@@ -10,7 +10,6 @@
 
 #include "StdInc.h"
 #include "CDebugHookManager.h"
-#include "Enums.h"
 #include "CScriptDebugging.h"
 
 #ifdef MTA_CLIENT

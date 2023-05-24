@@ -14,14 +14,12 @@
 
 #include "StdInc.h"
 #include "CResourceManager.h"
-#include "CLogger.h"
 #include "CGame.h"
 #include "CMapManager.h"
 #include "CIdArray.h"
 #include "Utils.h"
 #include "CMainConfig.h"
 #include "CDatabaseManager.h"
-#include "CRegistry.h"
 
 #define BLOCKED_DB_FILE_NAME    "fileblock.db"
 #define BLOCKED_DB_TABLE_NAME   "`block_reasons`"

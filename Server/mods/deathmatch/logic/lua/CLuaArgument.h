@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <string>
-
 extern "C"
 {
     #include "lua.h"

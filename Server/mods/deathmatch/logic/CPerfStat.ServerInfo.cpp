@@ -14,7 +14,6 @@
 #include "CStaticFunctionDefinitions.h"
 #include "CMainConfig.h"
 #include "CTickRateSettings.h"
-#include "CBandwidthSettings.h"
 #include "ASE.h"
 #include "CGame.h"
 #include "net/SimHeaders.h"

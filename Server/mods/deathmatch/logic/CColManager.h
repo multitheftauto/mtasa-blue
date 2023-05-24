@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CColShape.h"
-#include <list>
 
 class CColManager
 {

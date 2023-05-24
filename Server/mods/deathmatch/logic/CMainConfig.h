@@ -17,7 +17,6 @@ class CMainConfig;
 #include "CLogger.h"
 #include "CConsole.h"
 #include "CXMLConfig.h"
-#include <list>
 
 #define MAX_MAP_NAME_LENGTH 64
 

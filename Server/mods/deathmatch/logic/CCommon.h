@@ -14,15 +14,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
-#include <list>
-#include <vector>
 #include <algorithm>
-#include <CVector.h>
 #include <core/CServerInterface.h>
-
-// Globals
-extern CServerInterface* g_pServerInterface;
-extern CNetServer*       g_pNetServer;
 
 #define REMOTE_ADMIN_ID 254
 #define CONSOLE_ID 255

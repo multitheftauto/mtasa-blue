@@ -15,8 +15,6 @@
 #include "StdInc.h"
 #include "CResourceClientFileItem.h"
 
-extern CGame* g_pGame;
-
 CResourceClientFileItem::CResourceClientFileItem(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes,
                                                  bool bClientAutoDownload)
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)

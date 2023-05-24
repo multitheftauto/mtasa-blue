@@ -11,16 +11,13 @@
 
 #include "StdInc.h"
 #include "CGame.h"
-#include "CAccessControlListManager.h"
 #include "ASE.h"
 #include "CPerfStatManager.h"
 #include "CSettings.h"
 #include "CZoneNames.h"
 #include "CRemoteCalls.h"
 #include "luadefs/CLuaDefs.h"
-#include "CRegistry.h"
 #include "CLanBroadcast.h"
-#include "CRegisteredCommands.h"
 #include "CTickRateSettings.h"
 #include "CBuildingRemovalManager.h"
 #include "CDebugHookManager.h"
@@ -32,15 +29,9 @@
 #include "CBan.h"
 #include "CPlayerCamera.h"
 #include "CPacketTranslator.h"
-#include "CAccountManager.h"
 #include "CWaterManager.h"
-#include "CResourceManager.h"
 #include "CMapManager.h"
 #include "CMarkerManager.h"
-#include "CHandlingManager.h"
-#include "CScriptDebugging.h"
-#include "CBandwidthSettings.h"
-#include "CMainConfig.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CRegistryManager.h"
 #include "CLatentTransferManager.h"
@@ -63,12 +54,14 @@
 #include "../utils/CHqComms.h"
 #include "../utils/CFunctionUseLogger.h"
 #include "Utils.h"
-#include "CStaticFunctionDefinitions.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "CZipMaker.h"
 #include "version.h"
 #include "net/SimHeaders.h"
 #include <signal.h>
+#include "CCommandLineParser.h"
+#include "CConnectHistory.h"
+#include <net/CSimControl.h>
 
 #define MAX_BULLETSYNC_DISTANCE 400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
@@ -149,7 +142,7 @@ void sighandler(int sig)
 }
 #endif
 
-CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connections per 30 seconds, then 30 second ignore
+CGame::CGame()
 {
     // Set our global pointer
     g_pGame = this;
@@ -267,6 +260,8 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
 
     // init our mutex
     pthread_mutex_init(&mutexhttp, NULL);
+
+    m_FloodProtect = new CConnectHistory(4, 30000, 30000);            // Max of 4 connections per 30 seconds, then 30 second ignore
 }
 
 void CGame::ResetMapInfo()
@@ -384,6 +379,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pWeaponStatsManager);
     SAFE_DELETE(m_pBuildingRemovalManager);
     SAFE_DELETE(m_pCustomWeaponManager);
+    SAFE_DELETE(m_CommandLineParser);
     SAFE_DELETE(m_pFunctionUseLogger);
     SAFE_DELETE(m_pOpenPortsTester);
     SAFE_DELETE(m_pMasterServerAnnouncer);
@@ -591,11 +587,12 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pBuildingRemovalManager = new CBuildingRemovalManager;
 
     m_pCustomWeaponManager = new CCustomWeaponManager();
+    m_CommandLineParser = new CCommandLineParser();
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
 
     // Parse the commandline
-    if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
+    if (!m_CommandLineParser->Parse(iArgumentCount, szArguments))
     {
         return false;
     }
@@ -621,7 +618,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Grab the path to the main config
     SString     strBuffer;
     const char* szMainConfig;
-    if (m_CommandLineParser.GetMainConfig(szMainConfig))
+    if (m_CommandLineParser->GetMainConfig(szMainConfig))
     {
         strBuffer = g_pServerInterface->GetModManager()->GetAbsolutePath(szMainConfig);
     }
@@ -637,7 +634,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         return false;
 
     // Let the main config handle selecting settings from the command line where appropriate
-    m_pMainConfig->SetCommandLineParser(&m_CommandLineParser);
+    m_pMainConfig->SetCommandLineParser(m_CommandLineParser);
 
     // Do basic backup
     HandleBackup();
@@ -1788,7 +1785,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                     if (bPasswordIsValid)
                     {
                         // If he's not join flooding
-                        if (!m_pMainConfig->GetJoinFloodProtectionEnabled() || !m_FloodProtect.AddConnect(SString("%x", Packet.GetSourceIP())))
+                        if (!m_pMainConfig->GetJoinFloodProtectionEnabled() || !m_FloodProtect->AddConnect(SString("%x", Packet.GetSourceIP())))
                         {
                             // Set the nick and the game version
                             pPlayer->SetNick(szNick);

@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CColPolygon.h"
+#include <CSphere.h>
 #include "CVector2D.h"
 #include "CSpatialDatabase.h"
 

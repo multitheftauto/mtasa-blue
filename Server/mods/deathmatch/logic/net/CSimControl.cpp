@@ -8,12 +8,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <net/CSimControl.h>
 #include "SimHeaders.h"
 #include "CGame.h"
-#include "packets/CPlayerPuresyncPacket.h"
-#include "packets/CVehiclePuresyncPacket.h"
-#include "packets/CKeysyncPacket.h"
-#include "packets/CBulletsyncPacket.h"
 
 namespace
 {

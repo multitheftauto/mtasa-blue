@@ -10,6 +10,7 @@
 class CSimPacket;
 class CSimPlayerManager;
 
+#include <net/SyncStructures.h>
 #include "SharedUtil.Thread.h"
 #include "CNetBufferWatchDog.h"
 #include "CNetBuffer.h"
@@ -20,5 +21,3 @@ class CSimPlayerManager;
 #include "CSimKeysyncPacket.h"
 #include "CSimBulletsyncPacket.h"
 #include "CSimPedTaskPacket.h"
-
-extern CNetServer* g_pRealNetServer;

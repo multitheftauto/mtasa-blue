@@ -7,16 +7,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CLuaFunctionParseHelpers.h"
 #include "CScriptArgReader.h"
-#include "CResource.h"
 #include "CResourceManager.h"
-#include "CGame.h"
 #include "CRemoteCalls.h"
 #include "CMainConfig.h"
 #include "CAccessControlListManager.h"
 #include "CDatabaseManager.h"
 #include "CBan.h"
+#include <pcrecpp.h>
 
 //
 // enum values <-> script strings

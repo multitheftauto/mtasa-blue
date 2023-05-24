@@ -11,9 +11,7 @@
 
 #include "StdInc.h"
 #include "CConsoleCommands.h"
-#include "CAccount.h"
 #include "CResourceManager.h"
-#include "CConsole.h"
 #include "CAccessControlListManager.h"
 #include "Utils.h"
 #include "packets/CChatEchoPacket.h"
@@ -24,8 +22,7 @@
 #include "CDatabaseManager.h"
 #include "CGame.h"
 #include "CMainConfig.h"
-
-extern CGame* g_pGame;
+#include "CBanManager.h"
 
 // Helper functions
 static std::string GetAdminNameForLog(CClient* pClient)
@@ -822,10 +819,6 @@ bool CConsoleCommands::Nick(CConsole* pConsole, const char* szArguments, CClient
 
     return false;
 }
-
-// HACKED IN FOR NOW
-#include "CGame.h"
-extern CGame* g_pGame;
 
 bool CConsoleCommands::LogIn(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {

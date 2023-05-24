@@ -13,7 +13,6 @@ class CAccessControlList;
 
 #pragma once
 
-#include <list>
 #include "CAccessControlListRight.h"
 #include <xml/CXMLNode.h>
 

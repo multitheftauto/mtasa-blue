@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "CPlayerScreenShotPacket.h"
-#include "Enums.h"
 #include "CGame.h"
 #include "CResourceManager.h"
 

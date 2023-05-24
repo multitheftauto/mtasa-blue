@@ -13,7 +13,6 @@ class CTeamManager;
 
 #pragma once
 
-#include <list>
 #include "CTeam.h"
 
 class CTeamManager

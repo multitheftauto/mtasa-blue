@@ -13,7 +13,6 @@
 
 #include "lua/LuaCommon.h"
 #include "lua/CLuaArguments.h"
-#include <list>
 
 enum eKeyBindType
 {

@@ -12,6 +12,8 @@
 #include "CSpatialDatabase.h"
 #include "CElement.h"
 #include "RTree.h"
+#include <CSphere.h>
+#include <CBox.h>
 
 // Define our tree type
 typedef RTree<CElement*, float, 2> CElementTree;

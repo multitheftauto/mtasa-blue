@@ -14,6 +14,7 @@
 #include "Utils.h"
 #include <lua/CLuaFunctionParser.h>
 #include <SharedUtil.Memory.h>
+#include <pcrecpp.h>
 
 #ifndef MTA_CLIENT
     #include "CRemoteCalls.h"

@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <CVector.h>
 #include "CColCallback.h"
 #include "CColManager.h"
 #include "CColShape.h"

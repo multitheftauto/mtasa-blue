@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CPedSync.h"
 #include "Utils.h"
-#include "CElementIDs.h"
 #include "CTickRateSettings.h"
 #include "packets/CPedStartSyncPacket.h"
 #include "packets/CPedStopSyncPacket.h"
@@ -20,6 +19,7 @@
 #include "CColManager.h"
 #include "CSpatialDatabase.h"
 #include "CPlayerCamera.h"
+#include <CSphere.h>
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {

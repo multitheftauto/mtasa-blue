@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CResourceFile.h"
-#include <list>
 
 #ifndef MAX_PATH
 #define MAX_PATH        260

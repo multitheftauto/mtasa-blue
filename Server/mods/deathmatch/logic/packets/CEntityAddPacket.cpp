@@ -11,7 +11,6 @@
 
 #include "StdInc.h"
 #include "CEntityAddPacket.h"
-#include "CColShape.h"
 #include "CColCuboid.h"
 #include "CColCircle.h"
 #include "CColPolygon.h"

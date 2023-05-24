@@ -11,18 +11,15 @@
 
 #include "StdInc.h"
 #include "CUnoccupiedVehicleSync.h"
-#include "CElementIDs.h"
 #include "CVehicleManager.h"
 #include "CColManager.h"
 #include "packets/CUnoccupiedVehiclePushPacket.h"
 #include "packets/CUnoccupiedVehicleStartSyncPacket.h"
 #include "packets/CUnoccupiedVehicleStopSyncPacket.h"
 #include "packets/CUnoccupiedVehicleSyncPacket.h"
-#include "packets/CVehicleResyncPacket.h"
 #include "CTickRateSettings.h"
 #include "CGame.h"
 #include "Utils.h"
-#include "lua/CLuaFunctionParseHelpers.h"
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync(CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager)
 {

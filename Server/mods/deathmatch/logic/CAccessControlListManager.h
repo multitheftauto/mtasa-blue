@@ -13,7 +13,6 @@ class CAccessControlListManager;
 
 #pragma once
 
-#include <list>
 #include "CAccessControlListRight.h"
 #include "CAccessControlListGroup.h"
 #include "CAccessControlList.h"

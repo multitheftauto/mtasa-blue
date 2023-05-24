@@ -13,7 +13,6 @@
 #include "CBlip.h"
 #include "CBlipManager.h"
 #include "CResource.h"
-#include "CLogger.h"
 #include "Utils.h"
 
 CBlip::CBlip(CElement* pParent, CBlipManager* pBlipManager) : CPerPlayerEntity(pParent)

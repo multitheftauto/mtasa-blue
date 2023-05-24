@@ -11,14 +11,9 @@
 
 #include "StdInc.h"
 #include "CLuaArgument.h"
-#include "CLuaArguments.h"
-#include "LuaCommon.h"
 #include "CGame.h"
-#include "CElementIDs.h"
 #include "CScriptDebugging.h"
 #include "CResourceManager.h"
-
-extern CGame* g_pGame;
 
 #ifndef VERIFY_ELEMENT
 #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())

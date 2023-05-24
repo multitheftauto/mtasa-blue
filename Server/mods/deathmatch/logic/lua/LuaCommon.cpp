@@ -11,14 +11,10 @@
 
 #include "StdInc.h"
 #include "LuaCommon.h"
-#include "Common.h"
-#include "CElementIDs.h"
 #include "CBan.h"
 #include "CGame.h"
 #include "lua/CLuaShared.h"
 #include "luadefs/CLuaClassDefs.h"
-
-extern CGame* g_pGame;
 
 // Lua push/pop macros for our datatypes
 CElement* lua_toelement(lua_State* luaVM, int iArgument)

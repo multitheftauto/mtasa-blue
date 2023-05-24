@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <list>
-
 class CEvents;
 class CElement;
 class CXMLNode;

@@ -11,14 +11,8 @@
 
 #include "StdInc.h"
 #include "CRegisteredCommands.h"
-#include "lua/LuaCommon.h"
-#include "lua/CLuaArguments.h"
 #include "lua/CLuaMain.h"
 #include "CAccessControlListManager.h"
-#include "CClient.h"
-#include "CConsoleClient.h"
-#include "CPlayer.h"
-#include "CGame.h"
 
 CRegisteredCommands::CRegisteredCommands(CAccessControlListManager* pACLManager)
 {

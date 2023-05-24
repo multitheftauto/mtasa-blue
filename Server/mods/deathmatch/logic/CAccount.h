@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <list>
-#include <string>
 #include "lua/CLuaArgument.h"
 
 class CClient;

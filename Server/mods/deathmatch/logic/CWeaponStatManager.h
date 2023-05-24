@@ -11,7 +11,6 @@
 #pragma once
 
 #include "CCommon.h"
-#include <list>
 
 // Straight out of CGameSA.h
 #define     CLASSSIZE_WeaponInfo            112         // ##SA##

@@ -12,11 +12,9 @@
 #pragma once
 
 #include <core/CServerInterface.h>
-#include <CVector.h>
 #include "CMapEventManager.h"
 #include "CCustomData.h"
 #include "CEvents.h"
-#include <list>
 #include <cstring>
 #include "Enums.h"
 #include "CElementGroup.h"
@@ -42,6 +40,7 @@
 #define IS_WEAPON(element)    ((element)->GetType()==CElement::WEAPON)
 
 class CLuaMain;
+class CSphere;
 
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;

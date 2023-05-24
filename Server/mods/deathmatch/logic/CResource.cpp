@@ -27,13 +27,9 @@
 #include "CMapManager.h"
 #include "CKeyBinds.h"
 #include "CIdArray.h"
-#include "CChecksum.h"
 #include "CHTTPD.h"
 #include "Utils.h"
 #include "packets/CResourceClientScriptsPacket.h"
-#include "lua/CLuaFunctionParseHelpers.h"
-#include <net/SimHeaders.h>
-#include <zip.h>
 
 #ifdef WIN32
     #include <zip/iowin32.h>
@@ -49,9 +45,6 @@ int           do_extract_currentfile(unzFile uf, const int* popt_extract_without
 unsigned long get_current_file_crc(unzFile uf);
 
 std::list<CResource*> CResource::m_StartedResources;
-
-extern CServerInterface* g_pServerInterface;
-extern CGame*            g_pGame;
 
 #ifdef NO_ERRNO_H
 extern int errno;

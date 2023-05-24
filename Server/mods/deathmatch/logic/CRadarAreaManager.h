@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CRadarArea.h"
-#include <list>
 
 class CRadarAreaManager
 {

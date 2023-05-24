@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <CVector.h>
-
 class CPlayer;
 class CElement;
 

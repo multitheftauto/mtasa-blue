@@ -19,7 +19,6 @@
 #include "CKeyBinds.h"
 #include "CPerfStatManager.h"
 #include "CTickRateSettings.h"
-#include "CBandwidthSettings.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CScriptDebugging.h"
 #include "packets/CConsoleEchoPacket.h"
@@ -28,8 +27,8 @@
 #include "Utils.h"
 #include "CSpatialDatabase.h"
 #include "net/SimHeaders.h"
-
-extern CGame* g_pGame;
+#include <net/CSimControl.h>
+#include <CSphere.h>
 
 CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScriptDebugging, const NetServerPlayerID& PlayerSocket) : CPed(nullptr, nullptr, 0)
 {

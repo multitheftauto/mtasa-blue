@@ -13,7 +13,6 @@
 
 #include "../CCommon.h"
 #include "CPacket.h"
-#include <string.h>
 
 class CPlayerJoinCompletePacket final : public CPacket
 {

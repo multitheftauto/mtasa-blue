@@ -107,5 +107,3 @@ protected:
     int   iMaxZoneIfOtherCanSeeBulletSync;            // Zone limit if other player can see us when bullet sync is enabled
     bool  bBulletSyncEnabled;                         // Cache flag set by game
 };
-
-extern CBandwidthSettings* g_pBandwidthSettings;

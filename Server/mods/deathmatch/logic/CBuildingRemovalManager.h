@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <map>
-
 class CBuildingRemoval;
 
 class CBuildingRemovalManager

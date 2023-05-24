@@ -14,7 +14,6 @@
 #include "lua/CLuaManager.h"
 #include "packets/CPacket.h"
 #include <cstdio>
-#include <list>
 
 struct SLogLine
 {

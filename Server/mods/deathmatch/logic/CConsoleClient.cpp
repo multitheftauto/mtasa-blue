@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResourceFile.h"
 #include "CConsoleClient.h"
 #include "CConsole.h"
 #include "CMapManager.h"

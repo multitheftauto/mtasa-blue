@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CConsole.h"
 #include "Utils.h"
-#include "CLogger.h"
 #include "CAccessControlListManager.h"
 #include "CRegisteredCommands.h"
 #include "CPlayerManager.h"

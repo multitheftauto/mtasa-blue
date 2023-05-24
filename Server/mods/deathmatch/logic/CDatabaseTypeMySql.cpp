@@ -15,6 +15,7 @@
 #include "CDynamicLibrary.h"
 #include "CPerfStatManager.h"
 #include <sqlite/sqlite3.h>
+#include "./../Config.h"
 
 #define LIB_DBCONMY "dbconmy" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 

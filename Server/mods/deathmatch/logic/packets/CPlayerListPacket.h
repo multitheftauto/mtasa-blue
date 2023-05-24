@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-#include <list>
 
 class CPlayerListPacket final : public CPacket
 {

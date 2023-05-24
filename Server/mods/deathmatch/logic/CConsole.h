@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CConsoleCommand.h"
-#include <list>
 
 class CConsole
 {

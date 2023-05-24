@@ -13,8 +13,6 @@
 #include "CScriptDebugging.h"
 #include "packets/CDebugEchoPacket.h"
 
-extern CGame* g_pGame;
-
 CScriptDebugging::CScriptDebugging()
 {
     m_uiLogFileLevel = 0;

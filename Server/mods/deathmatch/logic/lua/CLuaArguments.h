@@ -17,7 +17,6 @@ extern "C"
 }
 
 #include "CLuaArgument.h"
-#include <vector>
 #include "../common/CBitStream.h"
 #include "json.h"
 #include "CLuaFunctionRef.h"

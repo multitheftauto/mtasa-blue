@@ -12,6 +12,9 @@ class CElement;
 
 #pragma once
 
+class CSphere;
+class CBox;
+
 // Bounding sphere z position for 2d objects
 #define SPATIAL_2D_Z    0
 

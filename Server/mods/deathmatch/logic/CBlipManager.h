@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <list>
-
 class CBlip;
 class CElement;
 class CEvents;

@@ -12,7 +12,6 @@
 #pragma once
 
 #include "CPacket.h"
-#include <CVector.h>
 
 class CExplosionSyncPacket final : public CPacket
 {

@@ -20,8 +20,6 @@
 #include "CDummy.h"
 #include "Utils.h"
 
-extern CNetServer* g_pRealNetServer;
-
 void CLuaResourceDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{

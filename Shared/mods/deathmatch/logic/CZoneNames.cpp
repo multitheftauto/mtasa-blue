@@ -9,6 +9,7 @@
 
 #include "StdInc.h"
 #include "CZoneNames.h"
+#include <CBox.h>
 
 static const char* const szUnknownZone = "Unknown";
 

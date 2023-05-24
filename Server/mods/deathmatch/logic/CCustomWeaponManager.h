@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <list>
 #include "CCommon.h"
 #include "CCustomWeapon.h"
 

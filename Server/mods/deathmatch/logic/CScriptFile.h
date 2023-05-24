@@ -13,8 +13,6 @@
 
 #include "CElement.h"
 #include "lua/LuaCommon.h"
-#include <stdio.h>
-#include <string>
 
 class CScriptFile final : public CElement
 {

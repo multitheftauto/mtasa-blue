@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include "CLatentTransferManager.h"
+#include "Enums.h"
 
 using namespace LatentTransfer;
 
@@ -20,7 +21,6 @@ using namespace LatentTransfer;
     #include "Utils.h"
     #include <net/CNetServer.h>
 
-extern CNetServer*       g_pNetServer;
 extern CTimeUsMarker<20> markerLatentEvent;
 #endif
 

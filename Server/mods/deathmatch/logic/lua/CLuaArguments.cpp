@@ -11,21 +11,17 @@
 
 #include "StdInc.h"
 #include "CLuaArguments.h"
-#include "CLuaMain.h"
 #include "CGame.h"
 #include "CScriptDebugging.h"
 #include "CPerfStatManager.h"
 #include "CDatabaseManager.h"
 #include "CBan.h"
-#include "CAccount.h"
 #include "CAccessControlList.h"
 #include "CAccessControlListGroup.h"
 
 #ifndef WIN32
 #include <clocale>
 #endif
-
-extern CGame* g_pGame;
 
 #ifndef VERIFY_ELEMENT
 #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement()->IsMyChild(element, true) && !element->IsBeingDeleted())
