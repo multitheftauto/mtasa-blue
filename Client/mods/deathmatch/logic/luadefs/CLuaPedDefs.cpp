@@ -24,6 +24,7 @@ void CLuaPedDefs::LoadFunctions()
         {"detonateSatchels", DetonateSatchels},
         {"killPed", KillPed},
 
+        {"resetPedVoice", ResetPedVoice},
         {"getPedVoice", GetPedVoice},
         {"setPedVoice", SetPedVoice},
         {"getPedRotation", GetPedRotation},
@@ -149,6 +150,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTask", "getPedTask");
     lua_classfunction(luaVM, "getTotalAmmo", "getPedTotalAmmo");
     lua_classfunction(luaVM, "getVoice", "getPedVoice");
+    lua_classfunction(luaVM, "resetVoice", "resetPedVoice");
     lua_classfunction(luaVM, "getWeapon", "getPedWeapon");
     lua_classfunction(luaVM, "isChocking", "isPedChoking");
     lua_classfunction(luaVM, "isDoingGangDriveby", "isPedDoingGangDriveby");
@@ -231,6 +233,25 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
     lua_registerclass(luaVM, "Ped", "Element");
+}
+
+int CLuaPedDefs::ResetPedVoice(lua_State* luaVM)
+{
+    CClientPed*      pPed = NULL;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pPed);
+    if (!argStream.HasErrors())
+    {
+        pPed->ResetVoice();
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaPedDefs::GetPedVoice(lua_State* luaVM)
