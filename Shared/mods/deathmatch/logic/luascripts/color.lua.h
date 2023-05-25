@@ -8,12 +8,12 @@ namespace EmbeddedLuaCode
     Provide a lua implementation of old tocolor function
 --]]
 
-local _errMsg = "Bad argument @ 'tocolor' [Expected %s at argument %d, got %s]"
+local _errMsg = "Bad argument @ 'tocolor' [Expected number at argument %d, got %s]"
 
 tocolor = function(r,g,b,a)
-    assert(type(r) == 'number', _errMsg:format(1, type(r)))
-    assert(type(g) == 'number', _errMsg:format(2, type(g)))
-    assert(type(b) == 'number', _errMsg:format(3, type(b)))
+    if type(r) ~= 'number' then error(_errMsg:format(1, type(r))) end
+    if type(g) ~= 'number' then error(_errMsg:format(2, type(g))) end
+    if type(b) ~= 'number' then error(_errMsg:format(3, type(b))) end
 
     if type(a) ~= 'number' then a = 255 end
     r = r > 255 and 255 or r < 0 and 0 or r
