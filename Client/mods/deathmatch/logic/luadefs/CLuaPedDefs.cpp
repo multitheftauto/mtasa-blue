@@ -24,7 +24,7 @@ void CLuaPedDefs::LoadFunctions()
         {"detonateSatchels", DetonateSatchels},
         {"killPed", KillPed},
 
-        {"resetPedVoice", ResetPedVoice},
+        {"resetPedVoice", ArgumentParser<ResetPedVoice>},
         {"getPedVoice", GetPedVoice},
         {"setPedVoice", SetPedVoice},
         {"getPedRotation", GetPedRotation},
@@ -235,23 +235,13 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Ped", "Element");
 }
 
-int CLuaPedDefs::ResetPedVoice(lua_State* luaVM)
+bool CLuaPedDefs::ResetPedVoice(CClientPed* ped)
 {
-    CClientPed*      pPed = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-    if (!argStream.HasErrors())
-    {
-        pPed->ResetVoice();
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    short szOldType, szNewType, szOldVoice, szNewVoice;
+    ped->GetVoice(&szOldType, &szOldVoice);
+    ped->ResetVoice();
+    ped->GetVoice(&szNewType, &szNewVoice);
+    return szNewType != szOldType && szNewVoice != szOldVoice;
 }
 
 int CLuaPedDefs::GetPedVoice(lua_State* luaVM)
