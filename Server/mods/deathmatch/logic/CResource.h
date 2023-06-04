@@ -17,11 +17,11 @@
 #include "SResourceStartOptions.h"
 #include "CResourceFile.h"
 #include "CAclRightName.h"
-#include <unzip.h>
 #include <list>
 #include <vector>
 #include <ehs/ehs.h>
 #include <time.h>
+#include <CZipMaker.h>
 
 #define MAX_AUTHOR_LENGTH           255
 #define MAX_RESOURCE_NAME_LENGTH    255
@@ -390,10 +390,10 @@ private:
     std::list<CExportedFunction>   m_ExportedFunctions;
     std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command
 
-    std::string m_strCircularInclude;
-    SString     m_strFailureReason;
-    unzFile     m_zipfile = nullptr;
-    CChecksum   m_zipHash;
+    std::string                                  m_strCircularInclude;
+    SString                                      m_strFailureReason;
+    CZipMaker                                    m_zipfile;
+    CChecksum                                    m_zipHash;
 
     bool m_bResourceIsZip;
     bool m_bClientConfigs = true;

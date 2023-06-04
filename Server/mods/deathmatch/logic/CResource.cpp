@@ -35,18 +35,9 @@
 #include <net/SimHeaders.h>
 #include <zip.h>
 
-#ifdef WIN32
-    #include <zip/iowin32.h>
-#else
-    #include <utime.h>
-#endif
-
 #ifndef MAX_PATH
     #define MAX_PATH 260
 #endif
-
-int           do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath);
-unsigned long get_current_file_crc(unzFile uf);
 
 std::list<CResource*> CResource::m_StartedResources;
 
@@ -57,23 +48,11 @@ extern CGame*            g_pGame;
 extern int errno;
 #endif
 
-//
-// Helper function to avoid fopen in Window builds
-//
-static unzFile unzOpenUtf8(const char* path)
-{
-#ifdef WIN32
-    // This will use CreateFile instead of fopen
-    zlib_filefunc_def ffunc;
-    fill_win32_filefunc(&ffunc);
-    return unzOpen2(path, &ffunc);
-#else
-    return unzOpen(path);
-#endif
-}
-
 CResource::CResource(CResourceManager* pResourceManager, bool bIsZipped, const char* szAbsPath, const char* szResourceName)
-    : m_pResourceManager(pResourceManager), m_bResourceIsZip(bIsZipped), m_strResourceName(SStringX(szResourceName)), m_strAbsPath(SStringX(szAbsPath))
+    : m_pResourceManager(pResourceManager),
+      m_bResourceIsZip(bIsZipped),
+      m_strResourceName(SStringX(szResourceName)),
+      m_strAbsPath(SStringX(szAbsPath))
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
 
@@ -129,6 +108,8 @@ bool CResource::Load()
         {
             // Unregister EHS stuff
             g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+
+            m_strFailureReason = SString("Couldn't unzip '%s'\n", m_strResourceName.c_str());
 
             return false;
         }
@@ -374,12 +355,6 @@ CResource::~CResource()
 
 void CResource::TidyUp()
 {
-    // Close the zipfile stuff
-    if (m_zipfile)
-        unzClose(m_zipfile);
-
-    m_zipfile = nullptr;
-
     // Go through each resource file and delete it
     for (CResourceFile* pResourceFile : m_ResourceFiles)
         delete pResourceFile;
@@ -1228,46 +1203,9 @@ void CResource::DisplayInfo()            // duplicated for HTML
     CLogger::LogPrintf("== End ==\n");
 }
 
-bool CResource::ExtractFile(const char* szFilename)
-{
-    if (DoesFileExistInZip(szFilename))
-    {
-        // Load the zip file if it isn't already loaded. Return false if it can't be loaded.
-        if (!m_zipfile)
-            m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-
-        if (!m_zipfile)
-            return false;
-
-        unzLocateFile(m_zipfile, szFilename, false);
-
-        // if the file exists, we'll be at the right place to extract from now
-        int opt_extract_without_path = 0;
-        int opt_overwrite = 1;
-
-        int ires = do_extract_currentfile(m_zipfile, &opt_extract_without_path, &opt_overwrite, nullptr, m_strResourceCachePath.c_str());
-
-        if (ires == UNZ_OK)
-            return true;
-    }
-    return false;
-}
-
 bool CResource::DoesFileExistInZip(const char* szFilename)
 {
-    if (!m_zipfile)
-        m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
-
-    bool bRes = false;
-
-    if (m_zipfile)
-    {
-        bRes = unzLocateFile(m_zipfile, szFilename, false) != UNZ_END_OF_LIST_OF_FILE;
-        unzClose(m_zipfile);
-        m_zipfile = nullptr;
-    }
-
-    return bRes;
+    return m_zipfile.Exists(szFilename);
 }
 
 // Return true if is looks like the resource files have been removed
@@ -2935,7 +2873,7 @@ void CResource::SendNoClientCacheScripts(CPlayer* pPlayer)
 
 bool CResource::UnzipResource()
 {
-    m_zipfile = unzOpenUtf8(m_strResourceZip.c_str());
+    m_zipfile = CZipMaker(m_strResourceZip.c_str(), 'r');
 
     if (!m_zipfile)
         return false;
@@ -2958,72 +2896,32 @@ bool CResource::UnzipResource()
         }
     }
 
-    std::vector<char> strFileName;
-    std::string       strPath;
+    SString strName;
+    SString strPath;
 
-    if (unzGoToFirstFile(m_zipfile) == UNZ_OK)
+    for (const auto& entry : m_zipfile.ListEntries())
     {
-        do
+        if (entry.isDir)
+            continue;
+
+        strName = entry.name;
+        strPath = m_strResourceCachePath + strName;
+        if (FileExists(strPath))
         {
-            // Check if we have this file already extracted
-            unz_file_info fileInfo = {0};
-
-            if (unzGetCurrentFileInfo(m_zipfile, &fileInfo, nullptr, 0, nullptr, 0, nullptr, 0) != UNZ_OK)
-                return false;
-
-            strFileName.reserve(fileInfo.size_filename + 1);
-            unzGetCurrentFileInfo(m_zipfile, &fileInfo, strFileName.data(), strFileName.capacity() - 1, nullptr, 0, nullptr, 0);
-
-            // Check if the current file is a directory path
-            if (strFileName[fileInfo.size_filename - 1] == '/')
+            if (entry.crc32 == CRCGenerator::GetCRCFromFile(strPath.c_str()))
                 continue;
+            RemoveFile(strPath.c_str());
+        }
 
-            strFileName[fileInfo.size_filename] = '\0';
-            strPath = m_strResourceCachePath + strFileName.data();
-
-            if (FileExists(strPath))
-            {
-                // We've already got a cached copy of this file, check its still the same
-                unsigned long ulFileInZipCRC = fileInfo.crc;
-                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
-
-                if (ulFileInZipCRC == ulFileOnDiskCRC)
-                    continue;            // we've already extracted EXACTLY this file before
-
-                RemoveFile(strPath.c_str());
-            }
-
-            // Doesn't exist or bad crc
-            int opt_extract_without_path = 0;
-            int opt_overwrite = 1;
-            int ires = do_extract_currentfile(m_zipfile, &opt_extract_without_path, &opt_overwrite, nullptr, m_strResourceCachePath.c_str());
-
-            if (ires != UNZ_OK)
-                return false;
-        } while (unzGoToNextFile(m_zipfile) != UNZ_END_OF_LIST_OF_FILE);
+        if (!m_zipfile.ExtractFile(entry.name, m_strResourceCachePath))
+            return false;
     }
 
-    // Close the zip file
-    unzClose(m_zipfile);
-    m_zipfile = nullptr;
+    m_zipfile.Close();
 
     // Store the hash so we can figure out whether it has changed later
     m_zipHash = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
     return true;
-}
-
-unsigned long get_current_file_crc(unzFile uf)
-{
-    char filename_inzip[256];
-    int  err = UNZ_OK;
-
-    unz_file_info file_info;
-    err = unzGetCurrentFileInfo(uf, &file_info, filename_inzip, sizeof(filename_inzip), nullptr, 0, nullptr, 0);
-
-    if (err == UNZ_OK)
-        return file_info.crc;
-    else
-        return 0;
 }
 
 int makedir(char* newdir)
@@ -3071,193 +2969,6 @@ int makedir(char* newdir)
     return 1;
 }
 
-/* change_file_date : change the date/time of a file
-    filename : the filename of the file where date/time must be modified
-    dosdate : the new date at the MSDos format (4 bytes)
-    tmu_date : the SAME new date at the tm_unz format */
-void change_file_date(const char* filename, uLong dosdate, tm_unz tmu_date)
-{
-#ifdef WIN32
-    HANDLE   hFile;
-    FILETIME ftm, ftLocal, ftCreate, ftLastAcc, ftLastWrite;
-
-    hFile = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-    GetFileTime(hFile, &ftCreate, &ftLastAcc, &ftLastWrite);
-    DosDateTimeToFileTime((WORD)(dosdate >> 16), (WORD)dosdate, &ftLocal);
-    LocalFileTimeToFileTime(&ftLocal, &ftm);
-    SetFileTime(hFile, &ftm, &ftLastAcc, &ftm);
-    CloseHandle(hFile);
-#else
-#ifdef unix
-    struct utimbuf ut;
-    struct tm      newdate;
-    newdate.tm_sec = tmu_date.tm_sec;
-    newdate.tm_min = tmu_date.tm_min;
-    newdate.tm_hour = tmu_date.tm_hour;
-    newdate.tm_mday = tmu_date.tm_mday;
-    newdate.tm_mon = tmu_date.tm_mon;
-    if (tmu_date.tm_year > 1900)
-        newdate.tm_year = tmu_date.tm_year - 1900;
-    else
-        newdate.tm_year = tmu_date.tm_year;
-    newdate.tm_isdst = -1;
-
-    ut.actime = ut.modtime = mktime(&newdate);
-    utime(filename, &ut);
-#endif
-#endif
-}
-
-#define WRITEBUFFERSIZE (8192)
-int do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath)
-{
-    char  filename_inzip[256];
-    char* filename_withoutpath;
-    char* p;
-    int   err = UNZ_OK;
-    FILE* fout = nullptr;
-    void* buf;
-    uInt  size_buf;
-
-    unz_file_info file_info;
-    err = unzGetCurrentFileInfo(uf, &file_info, filename_inzip, sizeof(filename_inzip), nullptr, 0, nullptr, 0);
-
-    if (err != UNZ_OK)
-    {
-        // printf("error %d with zipfile in unzGetCurrentFileInfo\n",err);
-        return err;
-    }
-
-    size_buf = WRITEBUFFERSIZE;
-    buf = (void*)malloc(size_buf);
-    if (buf == nullptr)
-    {
-        // printf("Error allocating memory\n");
-        return UNZ_INTERNALERROR;
-    }
-
-    p = filename_withoutpath = filename_inzip;
-    while ((*p) != '\0')
-    {
-        if (((*p) == '/') || ((*p) == '\\'))
-            filename_withoutpath = p + 1;
-        p++;
-    }
-
-    if ((*filename_withoutpath) == '\0')
-    {
-        if ((*popt_extract_without_path) == 0)
-        {
-            // printf("creating directory: %s\n",filename_inzip);
-            File::Mkdir(filename_inzip);
-        }
-    }
-    else
-    {
-        const char* write_filename;
-        int         skip = 0;
-
-        if ((*popt_extract_without_path) == 0)
-            write_filename = filename_inzip;
-        else
-            write_filename = filename_withoutpath;
-
-        err = unzOpenCurrentFilePassword(uf, password);
-        if (err != UNZ_OK)
-        {
-            // printf("error %d with zipfile in unzOpenCurrentFilePassword\n",err);
-        }
-
-        // ChrML: We always overwrite and this stuff seems to leak files.
-        /*
-        if (((*popt_overwrite)==0) && (err==UNZ_OK))
-        {
-            FILE* ftestexist;
-            ftestexist = fopen(write_filename,"rb");
-            if (ftestexist!=nullptr)
-            {
-                skip = 1;
-            }
-        }
-        */
-
-        // prepend the filepath to read from
-        File::Mkdir(szFilePath);
-        char   szOutFile[MAX_PATH];
-        size_t lenFilePath = strlen(szFilePath);
-        if (szFilePath[lenFilePath - 1] == '\\' || szFilePath[lenFilePath - 1] == '/')
-        {
-            snprintf(szOutFile, MAX_PATH, "%s%s", szFilePath, write_filename);
-        }
-        else
-        {
-            snprintf(szOutFile, MAX_PATH, "%s/%s", szFilePath, write_filename);
-        }
-
-        if ((skip == 0) && (err == UNZ_OK))
-        {
-            fout = File::Fopen(szOutFile, "wb");
-
-            /* some zipfile don't contain directory alone before file */
-            if ((fout == nullptr) && ((*popt_extract_without_path) == 0) && (filename_withoutpath != (char*)filename_inzip))
-            {
-                MakeSureDirExists(szOutFile);
-                char c = *(filename_withoutpath - 1);
-                *(filename_withoutpath - 1) = '\0';
-                // makedir((char *)write_filename);
-                *(filename_withoutpath - 1) = c;
-                fout = File::Fopen(szOutFile, "wb");
-            }
-
-            if (fout == nullptr)
-            {
-                // printf("error opening %s\n",write_filename);
-            }
-        }
-
-        if (fout != nullptr)
-        {
-            // printf(" extracting: %s\n",write_filename);
-
-            do
-            {
-                err = unzReadCurrentFile(uf, buf, size_buf);
-                if (err < 0)
-                {
-                    // printf("error %d with zipfile in unzReadCurrentFile\n",err);
-                    break;
-                }
-                if (err > 0)
-                    if (fwrite(buf, err, 1, fout) != 1)
-                    {
-                        // printf("error in writing extracted file\n");
-                        err = UNZ_ERRNO;
-                        break;
-                    }
-            } while (err > 0);
-            if (fout)
-                fclose(fout);
-
-            if (err == 0)
-                change_file_date(write_filename, file_info.dosDate, file_info.tmu_date);
-        }
-
-        if (err == UNZ_OK)
-        {
-            err = unzCloseCurrentFile(uf);
-            if (err != UNZ_OK)
-            {
-                // printf("error %d with zipfile in unzCloseCurrentFile\n",err);
-            }
-        }
-        else
-            unzCloseCurrentFile(uf); /* don't lose the error */
-    }
-
-    free(buf);
-    return err;
-}
-
 bool CIncludedResources::CreateLink()            // just a pointer to it
 {
     // Grab the resource that we are
@@ -3266,10 +2977,7 @@ bool CIncludedResources::CreateLink()            // just a pointer to it
     m_bBadVersion = false;
 
     // Does it exist?
-    if (!m_pResource)
-        m_bExists = false;
-    else
-        m_bExists = true;
+    m_bExists = m_pResource;
 
     if (m_pResource)
     {

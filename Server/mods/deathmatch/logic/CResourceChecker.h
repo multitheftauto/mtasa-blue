@@ -11,12 +11,6 @@
 
 #pragma once
 
-#include <unzip.h>
-#ifdef WIN32
-    #include <iowin32.h>
-#else
-    #include <ioapi.h>
-#endif
 #include <zip.h>
 
 class CResource;
@@ -70,8 +64,8 @@ protected:
     void IssueLuaFunctionNameWarnings(const std::string& strFunctionName, const std::string& strFileName, const std::string& strResourceName,
                                       bool bClientScript, unsigned long ulLineNumber);
     ECheckerWhatType GetLuaFunctionNameUpgradeInfo(const std::string& strFunctionName, bool bClientScript, std::string& strOutHow, CMtaVersion& strOutVersion);
-    int              ReplaceFilesInZIP(const std::string& strOrigZip, const std::string& strTempZip, const std::vector<std::string>& pathInArchiveList,
-                                       const std::vector<std::string>& upgradedFullPathList);
+    bool              ReplaceFilesInZIP(const std::string& strSrcZip, const std::string& strDestZip, const std::vector<std::string>& relativePaths,
+                                       const std::vector<std::string>& fullPaths);
     bool             RenameBackupFile(const std::string& strOrigFilename, const std::string& strBakAppend);
     void             CheckVersionRequirements(const std::string& strIdentifierName, bool bClientScript);
 

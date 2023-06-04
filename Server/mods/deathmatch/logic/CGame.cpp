@@ -4347,7 +4347,7 @@ void CGame::HandleBackup()
     // Delete previous temp zip if any
     FileDelete(strTempZip);
 
-    CZipMaker zipMaker(strTempZip);
+    CZipMaker zipMaker(strTempZip, CZipMaker::Mode::WRITE);
     if (!zipMaker.IsValid())
         return;            // Can't do backup as can't create target zip
 
