@@ -13,7 +13,7 @@
 #include <zip.h>
 
 
-CZipMaker::CZipMaker() noexcept {}
+CZipMaker::CZipMaker() noexcept : m_uzFile(NULL) {}
 
 ///////////////////////////////////////////////////////////////
 //
@@ -22,6 +22,7 @@ CZipMaker::CZipMaker() noexcept {}
 //
 //
 ///////////////////////////////////////////////////////////////
+
 CZipMaker::CZipMaker(const SString& strZipPathFilename, const Mode& mode) noexcept
     : m_strZipPath(strZipPathFilename)
 {
@@ -62,9 +63,10 @@ CZipMaker::~CZipMaker() noexcept
 
 void CZipMaker::OpenZIP(const SString& strZipPath, const char mode) noexcept
 {
-    this->m_uzFile = std::unique_ptr<zip_t, ZipCloser>(
-        zip_open(strZipPath, ZIP_DEFAULT_COMPRESSION_LEVEL, mode)
-    );
+    if (strZipPath.empty())
+        return;
+
+    m_uzFile = zip_open(strZipPath, ZIP_DEFAULT_COMPRESSION_LEVEL, mode);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -76,7 +78,7 @@ void CZipMaker::OpenZIP(const SString& strZipPath, const char mode) noexcept
 ///////////////////////////////////////////////////////////////
 bool CZipMaker::IsValid() const noexcept
 {
-    return m_uzFile.get() != nullptr;
+    return m_uzFile != NULL;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -88,10 +90,10 @@ bool CZipMaker::IsValid() const noexcept
 ///////////////////////////////////////////////////////////////
 bool CZipMaker::Close() noexcept
 {
-    if (!m_uzFile)
+    if (!IsValid())
         return false;
 
-    zip_close(m_uzFile.release());
+    zip_close(m_uzFile);
     return true;
 }
 
@@ -167,16 +169,21 @@ bool CZipMaker::AddFile(const SString& strDest, const SString& buffer) noexcept
     if (!m_uzFile || buffer.empty())
         return false;
 
-    zip_entry_open(m_uzFile.get(), strDest);
-    zip_entry_write(m_uzFile.get(), buffer.data(), buffer.size());
+    zip_entry_open(m_uzFile, strDest);
+    zip_entry_write(m_uzFile, buffer.data(), buffer.size());
 
-    return zip_entry_close(this->m_uzFile.get()) == 0;
+    return zip_entry_close(m_uzFile) == 0;
 }
 
 bool CZipMaker::RemoveFile(const SString& strPath) noexcept
 {
     char* entry[] = { const_cast<char*>(strPath.c_str()) };
-    return zip_entries_delete(m_uzFile.get(), entry, 1) == 1;
+    return zip_entries_delete(m_uzFile, entry, 1) == 1;
+}
+
+bool CZipMaker::RemoveFile(const CZipMaker::CZipEntry& entry) noexcept
+{
+    return RemoveFile(entry.name);
 }
 
 bool CZipMaker::Replace(const SString& strSrc, const SString& strDest) noexcept
@@ -190,36 +197,42 @@ bool CZipMaker::Replace(const SString& strSrc, const SString& strDest) noexcept
 }
 bool CZipMaker::Exists(const SString& strPath) const noexcept
 {
-    bool bStatus = zip_entry_open(m_uzFile.get(), strPath) == 0;
-    zip_entry_close(m_uzFile.get());
-    return bStatus;
+    bool bStatus = zip_entry_open(m_uzFile, strPath) == 0;
+    return bStatus && zip_entry_close(m_uzFile) == 0;
 }
-bool CZipMaker::ExtractFile(const SString& strPath, const SString& strDirPath) noexcept
+bool CZipMaker::ExtractFile(const SString& strFilePath, const SString& strDirPath) noexcept
 {
-    if (zip_entry_open(m_uzFile.get(), strPath))
+    if (!m_uzFile)
         return false;
 
-    auto destPath = PathJoin(strDirPath, strPath);
+    if (zip_entry_open(m_uzFile, strFilePath))
+        return false;
+
+    auto destPath = PathJoin(strDirPath, strFilePath);
     MakeSureDirExists(destPath);
-    if (zip_entry_fread(m_uzFile.get(), destPath))
+    if (zip_entry_fread(m_uzFile, destPath))
     {
-        zip_entry_close(m_uzFile.get());
+        zip_entry_close(m_uzFile);
         return false;
     }
 
-    return zip_entry_close(m_uzFile.get()) == 0;
+    return zip_entry_close(m_uzFile) == 0;
+}
+bool CZipMaker::Extract(const SString& strDirPath) noexcept
+{
+    if (!m_uzFile)
+        return false;
+
+    return zip_extract(m_strZipPath, strDirPath, NULL, NULL) == 0;
 }
 
 std::vector<CZipMaker::CZipEntry> CZipMaker::ListEntries() const noexcept
 {
     std::vector<CZipEntry> entries;
-    ssize_t size = zip_entries_total(m_uzFile.get());
-    for (int i = 0; i < size; i++)
+
+    for (auto i = 0; i < zip_entries_total(m_uzFile); i++)
     {
-        auto entry = GetFileByIndex(i);
-        if (entry.isDir)
-            continue;
-        entries.push_back(entry);
+        entries.push_back(GetFileByIndex(i));
     }
 
     return entries;
@@ -231,7 +244,7 @@ CZipMaker::CZipEntry CZipMaker::operator[](unsigned long long offset) const noex
 }
 CZipMaker::operator bool() const noexcept
 {
-    return m_uzFile.operator bool();
+    return IsValid();
 }
 
 CZipMaker::CZipEntry CZipMaker::GetFileByIndex(unsigned long long offset) const noexcept
@@ -240,21 +253,23 @@ CZipMaker::CZipEntry CZipMaker::GetFileByIndex(unsigned long long offset) const 
     if (!m_uzFile)
         return entry;
 
-    const auto size = zip_entries_total(m_uzFile.get());
+    const auto size = zip_entries_total(m_uzFile);
     if (offset > size)
         return entry;
 
     if (offset < 0)
         offset += size;
 
-    if (zip_entry_openbyindex(m_uzFile.get(), offset))
+    if (zip_entry_openbyindex(m_uzFile, offset))
         return entry;
 
-    entry.name = zip_entry_name(m_uzFile.get());
-    entry.isDir = zip_entry_isdir(m_uzFile.get());
-    entry.size = zip_entry_size(m_uzFile.get());
-    entry.crc32 = zip_entry_crc32(m_uzFile.get());    
+    entry.name = zip_entry_name(m_uzFile);
+    entry.isDir = zip_entry_isdir(m_uzFile);
+    entry.sizeUncompressed = zip_entry_size(m_uzFile);
+    entry.crc32 = zip_entry_crc32(m_uzFile);
+    entry.sizeCompressed = zip_entry_comp_size(m_uzFile);
+    entry.index = zip_entry_index(m_uzFile);
 
-    zip_entry_close(m_uzFile.get());
+    zip_entry_close(m_uzFile);
     return entry;
 }

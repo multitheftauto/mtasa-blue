@@ -37,6 +37,7 @@ public:
     static const char* GetResourceClass(CResource* pResource);
     static const char* GetTimerClass(CLuaTimer* pTimer);
     static const char* GetXmlNodeClass(CXMLNode* pXmlNode);
+    static const char* GetZipClass(CZipFile* pZip);
     static const char* GetACLClass(CAccessControlList* pACL);
     static const char* GetACLGroupClass(CAccessControlListGroup* pACLGroup);
     static const char* GetAccountClass(CAccount* pAccount);

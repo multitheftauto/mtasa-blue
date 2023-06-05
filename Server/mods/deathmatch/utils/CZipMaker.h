@@ -25,8 +25,10 @@ public:
     {
         const char*        name{};
         bool               isDir{};
-        unsigned long long size{};
+        unsigned long long sizeUncompressed{};
+        unsigned long long sizeCompressed{};
         unsigned int       crc32{};
+        ssize_t            index{};
     };
 
     enum class Mode
@@ -38,7 +40,7 @@ public:
 
     CZipMaker() noexcept;
     CZipMaker(const SString& strZipPathFilename, const char& mode = 'r') noexcept;
-    CZipMaker(const SString& strZipPathFilename, const Mode& mode = Mode::READ) noexcept;
+    CZipMaker(const SString& strZipPathFilename, const Mode& mode) noexcept;
     ~CZipMaker() noexcept;
 
     CZipMaker& operator=(CZipMaker&&) = default;
@@ -52,9 +54,11 @@ public:
     bool InsertDirectoryTree(const SString& strSrc, const SString& strDest = "") noexcept;
 
     bool RemoveFile(const SString& strPath) noexcept;
+    bool RemoveFile(const CZipEntry& entry) noexcept;
     bool Replace(const SString& strSrc, const SString& strDest) noexcept;
     bool Exists(const SString& strPath) const noexcept;
-    bool ExtractFile(const SString& strPath, const SString& strDirPath) noexcept;
+    bool ExtractFile(const SString& strFilePath, const SString& strDirPath) noexcept;
+    bool Extract(const SString& strDirPath) noexcept;
 
     std::vector<CZipEntry> ListEntries() const noexcept;
 
@@ -64,6 +68,7 @@ protected:
     CZipEntry GetFileByIndex(unsigned long long offset) const noexcept;
     bool AddFile(const SString& strDest, const SString& buffer) noexcept;
 
-    std::unique_ptr<zip_t, ZipCloser> m_uzFile;
-    SString                           m_strZipPath;
+    zip_t*                 m_uzFile;
+    SString                m_strZipPath;
+    std::vector<CZipEntry> m_vecEntries;
 };

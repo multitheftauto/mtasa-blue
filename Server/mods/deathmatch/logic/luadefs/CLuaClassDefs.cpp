@@ -273,6 +273,10 @@ const char* CLuaClassDefs::GetXmlNodeClass(CXMLNode* pXmlNode)
 {
     return "XML";
 }
+const char* CLuaClassDefs::GetZipClass(CZipFile* pZip)
+{
+    return "ZIP";
+}
 
 const char* CLuaClassDefs::GetACLClass(CAccessControlList* pACL)
 {
@@ -337,6 +341,8 @@ const char* CLuaClassDefs::GetElementClass(CElement* pElement)
             return "ColShape";
         case CElement::SCRIPTFILE:
             return "File";
+        case CElement::ZIPFILE:
+            return "ZipFile";
         case CElement::WATER:
             return "Water";
         case CElement::WEAPON:

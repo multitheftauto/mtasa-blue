@@ -80,12 +80,14 @@ void CLuaShared::LoadFunctions()
     CLuaTrainTrackDefs::LoadFunctions();
     CLuaUTFDefs::LoadFunctions();
     CLuaUtilDefs::LoadFunctions();
+    CLuaZipDefs::LoadFunctions();
 }
 
 void CLuaShared::AddClasses(lua_State* luaVM)
 {
     CLuaFileDefs::AddClass(luaVM);
     CLuaXMLDefs::AddClass(luaVM);
+    CLuaZipDefs::AddClass(luaVM);
 }
 
 SharedUtil::CAsyncTaskScheduler* CLuaShared::GetAsyncTaskScheduler()

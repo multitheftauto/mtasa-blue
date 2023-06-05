@@ -12,7 +12,7 @@
 // Lua function definitions (shared)
 #include "luadefs/CLuaBitDefs.h"
 #include "luadefs/CLuaCryptDefs.h"
-#include <luadefs/CLuaFileDefs.h>
+#include "luadefs/CLuaFileDefs.h"
 #include "luadefs/CLuaMatrixDefs.h"
 #include "luadefs/CLuaTrainTrackDefs.h"
 #include "luadefs/CLuaUTFDefs.h"
@@ -21,6 +21,7 @@
 #include "luadefs/CLuaVector3Defs.h"
 #include "luadefs/CLuaVector4Defs.h"
 #include "luadefs/CLuaXMLDefs.h"
+#include "luadefs/CLuaZipDefs.h"
 
 class CLuaShared
 {

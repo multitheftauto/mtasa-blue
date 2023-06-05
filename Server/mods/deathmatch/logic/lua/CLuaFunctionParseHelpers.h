@@ -124,6 +124,10 @@ inline eEntityType GetClassType(class CCustomWeapon*)
 {
     return CElement::WEAPON;
 }
+inline eEntityType GetClassType(class CZipFile*)
+{
+    return CElement::ZIPFILE;
+}
 
 // class -> class name
 inline SString GetClassTypeName(CElement*)
@@ -254,6 +258,10 @@ inline SString GetClassTypeName(CLuaVector4D*)
 inline SString GetClassTypeName(CLuaMatrix*)
 {
     return "matrix";
+}
+inline SString GetClassTypeName(CZipFile*)
+{
+    return "zipfile";
 }
 
 //

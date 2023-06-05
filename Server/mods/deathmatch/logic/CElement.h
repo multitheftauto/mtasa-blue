@@ -76,6 +76,7 @@ public:
         PED,
         COLSHAPE,
         SCRIPTFILE,
+        ZIPFILE,
         WATER,
         WEAPON,
         DATABASE_CONNECTION,

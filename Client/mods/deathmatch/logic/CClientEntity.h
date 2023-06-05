@@ -59,6 +59,7 @@ enum eClientEntityType
     CCLIENTCOLSHAPE,
     CCLIENTDUMMY,            // anything user-defined
     SCRIPTFILE,
+    ZIPFILE,
     CCLIENTDFF,
     CCLIENTCOL,
     CCLIENTTXD,

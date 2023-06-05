@@ -2896,29 +2896,12 @@ bool CResource::UnzipResource()
         }
     }
 
-    SString strName;
-    SString strPath;
-
-    for (const auto& entry : m_zipfile.ListEntries())
+    if (!m_zipfile.Extract(m_strResourceCachePath))
     {
-        if (entry.isDir)
-            continue;
-
-        strName = entry.name;
-        strPath = m_strResourceCachePath + strName;
-        if (FileExists(strPath))
-        {
-            if (entry.crc32 == CRCGenerator::GetCRCFromFile(strPath.c_str()))
-                continue;
-            RemoveFile(strPath.c_str());
-        }
-
-        if (!m_zipfile.ExtractFile(entry.name, m_strResourceCachePath))
-            return false;
+        m_strFailureReason = SString("Couldn't extract resource '%s'.\n", m_strResourceName.c_str());
+        return false;
     }
-
-    m_zipfile.Close();
-
+    
     // Store the hash so we can figure out whether it has changed later
     m_zipHash = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
     return true;

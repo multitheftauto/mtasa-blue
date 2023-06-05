@@ -15,6 +15,7 @@
 #include "CElementIDs.h"
 #include "CBan.h"
 #include "CGame.h"
+#include "CZipFile.h"
 #include "lua/CLuaShared.h"
 #include "luadefs/CLuaClassDefs.h"
 
@@ -203,6 +204,8 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushtextitem(luaVM, pTextItem);
     else if (CDbJobData* pQuery = UserDataCast((CDbJobData*)pData, luaVM))
         return lua_pushquery(luaVM, pQuery);
+    else if (CZipFile* pZip = UserDataCast((CZipFile*)pData, luaVM))
+        return lua_pushelement(luaVM, pZip);
 
     lua_pushobject(luaVM, NULL, pData);
 }
