@@ -16,7 +16,7 @@ class CZipMaker
 {
     struct ZipCloser
     {
-        void operator()(zip_t*& f) const { zip_close(f); }
+        void operator()(zip_t* f) const { zip_close(f); }
     };
     void OpenZIP(const SString& strZipPath, const char mode = 'r') noexcept;
 
