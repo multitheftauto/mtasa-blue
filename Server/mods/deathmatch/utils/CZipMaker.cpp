@@ -94,6 +94,7 @@ bool CZipMaker::Close() noexcept
         return false;
 
     zip_close(m_uzFile);
+    m_uzFile = NULL;
     return true;
 }
 
@@ -228,6 +229,9 @@ bool CZipMaker::Extract(const SString& strDirPath) noexcept
 
 std::vector<CZipMaker::CZipEntry> CZipMaker::ListEntries() const noexcept
 {
+    if (!IsValid())
+        return {};
+
     std::vector<CZipEntry> entries;
 
     for (auto i = 0; i < zip_entries_total(m_uzFile); i++)
@@ -256,9 +260,6 @@ CZipMaker::CZipEntry CZipMaker::GetFileByIndex(unsigned long long offset) const 
     const auto size = zip_entries_total(m_uzFile);
     if (offset > size)
         return entry;
-
-    if (offset < 0)
-        offset += size;
 
     if (zip_entry_openbyindex(m_uzFile, offset))
         return entry;

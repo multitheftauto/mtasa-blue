@@ -17,7 +17,7 @@ void CLuaZipDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"zipCreate",   zipCreate},
         {"zipOpen",     zipOpen},
-        {"zipClose",    ArgumentParser<zipClose>},
+        {"zipClose",    zipClose},
     };
 
     // Add functions

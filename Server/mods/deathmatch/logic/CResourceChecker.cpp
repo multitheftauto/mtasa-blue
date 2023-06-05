@@ -845,11 +845,17 @@ bool CResourceChecker::ReplaceFilesInZIP(const string& strSrcZip, const string& 
 {
     CZipMaker srcZip(strSrcZip.c_str(), CZipMaker::Mode::READ);
     if (!srcZip)
-        return false && srcZip.Close();
+    {
+        srcZip.Close();
+        return false;
+    }
 
     CZipMaker destZip(strDestZip.c_str(), CZipMaker::Mode::APPEND);
     if (!destZip)
-        return false && destZip.Close();
+    {
+        destZip.Close();
+        return false;
+    }
 
     if (relativePaths.size() != fullPaths.size())
         return false;

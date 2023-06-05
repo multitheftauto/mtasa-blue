@@ -14,16 +14,12 @@
 
 class CZipMaker
 {
-    struct ZipCloser
-    {
-        void operator()(zip_t* f) const { zip_close(f); }
-    };
     void OpenZIP(const SString& strZipPath, const char mode = 'r') noexcept;
 
 public:
     struct CZipEntry
     {
-        const char*        name{};
+        SString            name{};
         bool               isDir{};
         unsigned long long sizeUncompressed{};
         unsigned long long sizeCompressed{};

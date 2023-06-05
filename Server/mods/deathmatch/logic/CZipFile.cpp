@@ -24,15 +24,15 @@ void CZipFile::Init(const uint uiScriptId, const char* szFilename) noexcept
     m_pResource = nullptr;
 }
 
-CZipFile::CZipFile(const uint uiScriptId, const char* szFilename, const CZipMaker::Mode mode) : CElement(NULL)
+CZipFile::CZipFile(const uint uiScriptId, const char* szFilename, const CZipMaker::Mode mode) : CElement(NULL),
+    m_zipMaker(CZipMaker(szFilename, mode))
 {
     Init(uiScriptId, szFilename);
-    m_zipMaker = CZipMaker(szFilename, mode);
 }
-CZipFile::CZipFile(const uint uiScriptId, const char* szFilename, const char mode) : CElement(NULL)
+CZipFile::CZipFile(const uint uiScriptId, const char* szFilename, const char mode) : CElement(NULL),
+    m_zipMaker(CZipMaker(szFilename, mode))
 {
     Init(uiScriptId, szFilename);
-    m_zipMaker = CZipMaker(szFilename, mode);
 }
 
 CZipFile::~CZipFile() { Close(); }
