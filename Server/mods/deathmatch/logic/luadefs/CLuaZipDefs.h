@@ -20,6 +20,8 @@ public:
 
     LUA_DECLARE(zipCreate);
     LUA_DECLARE(zipOpen);
-    LUA_DECLARE(zipClose);
-    //static bool zipClose(CZipFile* pZip);
+    static bool zipClose(CZipFile* pFile);
+    LUA_DECLARE(zipGetFiles);
+    LUA_DECLARE(zipExtract);
+    LUA_DECLARE(zipSize);
 };

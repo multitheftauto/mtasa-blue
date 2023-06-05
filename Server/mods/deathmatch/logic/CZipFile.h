@@ -31,6 +31,8 @@ public:
     bool Extract(const SString& destDir) noexcept;
     bool Close() noexcept;
 
+    std::vector<CZipMaker::CZipEntry> ListFiles() const noexcept;
+
     // Functions required by CElement
     void Unlink(){};
 protected:

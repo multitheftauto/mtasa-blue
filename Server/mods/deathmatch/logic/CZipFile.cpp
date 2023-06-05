@@ -64,3 +64,8 @@ bool CZipFile::Close() noexcept
 {
     return m_zipMaker.Close();
 }
+
+std::vector<CZipMaker::CZipEntry> CZipFile::ListFiles() const noexcept
+{
+    return m_zipMaker.ListEntries();
+}

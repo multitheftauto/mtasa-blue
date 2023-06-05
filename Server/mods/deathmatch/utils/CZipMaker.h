@@ -25,6 +25,28 @@ public:
         unsigned long long sizeCompressed{};
         unsigned int       crc32{};
         ssize_t            index{};
+
+        bool operator==(const CZipEntry& entry) const noexcept
+        {
+            if (name != entry.name)
+                return false;
+            if (isDir != entry.isDir)
+                return false;
+            if (sizeUncompressed != entry.sizeUncompressed)
+                return false;
+            if (sizeCompressed != entry.sizeCompressed)
+                return false;
+            if (crc32 != entry.crc32)
+                return false;
+            if (index != entry.index)
+                return false;
+
+            return true;
+        }
+        bool operator!=(const CZipEntry& entry) const noexcept
+        {
+            return !operator==(entry);
+        }
     };
 
     enum class Mode

@@ -67,6 +67,11 @@ void CZipMaker::OpenZIP(const SString& strZipPath, const char mode) noexcept
         return;
 
     m_uzFile = zip_open(strZipPath, ZIP_DEFAULT_COMPRESSION_LEVEL, mode);
+
+    for (auto i = 0; i < zip_entries_total(m_uzFile); i++)
+    {
+        m_vecEntries.push_back(GetFileByIndex(i));
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -173,12 +178,24 @@ bool CZipMaker::AddFile(const SString& strDest, const SString& buffer) noexcept
     zip_entry_open(m_uzFile, strDest);
     zip_entry_write(m_uzFile, buffer.data(), buffer.size());
 
+    m_vecEntries.push_back(GetFileByIndex(zip_entry_index(m_uzFile)));
+
     return zip_entry_close(m_uzFile) == 0;
 }
 
 bool CZipMaker::RemoveFile(const SString& strPath) noexcept
 {
-    char* entry[] = { const_cast<char*>(strPath.c_str()) };
+    char* entry[] = {const_cast<char*>(strPath.c_str())};
+
+    zip_entry_open(m_uzFile, strPath);
+
+    auto fileEntry = GetFileByIndex(zip_entry_index(m_uzFile));
+    const auto entryIter = std::remove(m_vecEntries.begin(), m_vecEntries.end(), fileEntry);
+
+    m_vecEntries.erase(entryIter, m_vecEntries.end());
+
+    zip_entry_close(m_uzFile);
+
     return zip_entries_delete(m_uzFile, entry, 1) == 1;
 }
 
@@ -229,17 +246,7 @@ bool CZipMaker::Extract(const SString& strDirPath) noexcept
 
 std::vector<CZipMaker::CZipEntry> CZipMaker::ListEntries() const noexcept
 {
-    if (!IsValid())
-        return {};
-
-    std::vector<CZipEntry> entries;
-
-    for (auto i = 0; i < zip_entries_total(m_uzFile); i++)
-    {
-        entries.push_back(GetFileByIndex(i));
-    }
-
-    return entries;
+    return m_vecEntries;
 }
 
 CZipMaker::CZipEntry CZipMaker::operator[](unsigned long long offset) const noexcept

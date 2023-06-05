@@ -2875,7 +2875,7 @@ bool CResource::UnzipResource()
 {
     m_zipfile = CZipMaker(m_strResourceZip.c_str(), 'r');
 
-    if (!m_zipfile)
+    if (!m_zipfile.IsValid())
         return false;
 
     // See if the dir already exists

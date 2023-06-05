@@ -14,10 +14,14 @@
 
 void CLuaZipDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"zipCreate",   zipCreate},
-        {"zipOpen",     zipOpen},
-        {"zipClose",    zipClose},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"zipCreate", zipCreate},
+        {"zipOpen", zipOpen},
+        {"zipClose", ArgumentParser<zipClose>},
+        {"zipGetFiles", zipGetFiles},
+        {"zipSize", zipSize},
+        {"zipExtract", ArgumentParser<zipExtract>},
     };
 
     // Add functions
@@ -32,9 +36,10 @@ void CLuaZipDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "open", "zipOpen");
     lua_classfunction(luaVM, "create", "zipCreate");
     lua_classfunction(luaVM, "close", "zipClose");
+    lua_classfunction(luaVM, "extract", "zipExtract");
+    lua_classfunction(luaVM, "getFiles", "zipGetFiles");
 
-    //lua_classvariable(luaVM, "value", "xmlNodeSetValue", "xmlNodeGetValue");
-    //lua_classvariable(luaVM, "attributes", NULL, "xmlNodeGetAttributes");
+    lua_classvariable(luaVM, "files", NULL, "zipGetFiles");
 
     lua_registerclass(luaVM, "ZIP");
 }
@@ -161,7 +166,17 @@ int CLuaZipDefs::zipOpen(lua_State* luaVM)
     return 1;
 }
 
-int CLuaZipDefs::zipClose(lua_State* luaVM)
+bool CLuaZipDefs::zipClose(CZipFile* pZip)
+{
+    if (!pZip || !pZip->IsValid())
+        return false;
+
+    bool bStatus = pZip->Close();
+    m_pElementDeleter->Delete(pZip);
+    return bStatus;
+}
+
+int CLuaZipDefs::zipGetFiles(lua_State* luaVM)
 {
     CZipFile* pZip;
 
@@ -175,21 +190,97 @@ int CLuaZipDefs::zipClose(lua_State* luaVM)
         return 1;
     }
 
-    // Close the file and delete it
-    pZip->Close();
-    m_pElementDeleter->Delete(pZip);
+    lua_newtable(luaVM);
+    auto files = pZip->ListFiles();
+    for (auto it = files.begin(); it != files.end(); ++it)
+    {
+        lua_createtable(luaVM, 0, 5);
 
-    // Success. Return true
-    lua_pushboolean(luaVM, true);
+        lua_pushstring(luaVM, (*it).name.c_str());
+        lua_setfield(luaVM, -2, "name");
+
+        lua_pushnumber(luaVM, (*it).sizeCompressed);
+        lua_setfield(luaVM, -2, "sizeCompressed");
+
+        lua_pushnumber(luaVM, (*it).sizeUncompressed);
+        lua_setfield(luaVM, -2, "sizeUncompressed");
+
+        lua_pushboolean(luaVM, (*it).isDir);
+        lua_setfield(luaVM, -2, "directory");
+
+        lua_pushnumber(luaVM, (*it).crc32);
+        lua_setfield(luaVM, -2, "crc32");
+
+        lua_rawseti(luaVM, -2, it - files.begin() + 1);
+    }
+
     return 1;
 }
 
-/*
-bool CLuaZipDefs::zipClose(CZipFile* pZip)
+int CLuaZipDefs::zipExtract(lua_State* luaVM)
 {
-    if (!pZip || !pZip->IsValid())
-        return false;
+    CZipFile* pZip;
+    SString   destPath;
 
-    return pZip->Close();
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pZip);
+    argStream.ReadString(destPath);
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    if (!pZip || !pZip->IsValid())
+    {
+        lua_pushboolean(luaVM, false);
+        return false;
+    }
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    CResource* pResource = pLuaMain->GetResource();
+
+    SString strAbsPath;
+    SString strMetaPath;
+
+    if (!CResourceManager::ParseResourcePathInput(destPath, pResource, &strAbsPath, &strMetaPath))
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    lua_pushboolean(luaVM, pZip->Extract(strAbsPath));
+
+    return 1;
 }
-*/
+
+int CLuaZipDefs::zipSize(lua_State* luaVM)
+{
+    CZipFile* pZip;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pZip);
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    if (!pZip->IsValid())
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+    
+    lua_pushnumber(luaVM, pZip->ListFiles().size());
+    return 1;
+}
