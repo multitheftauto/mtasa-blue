@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-21 18:22+0000\n"
-"PO-Revision-Date: 2023-06-06 06:06\n"
+"PO-Revision-Date: 2023-06-06 07:06\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -2216,7 +2216,7 @@ msgstr "MTA:SA 無法順利啟動，因為 GTA:SA 主程式執行檔(.exe)有錯
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "請檢查您的防毒軟體是否有誤判的情形，可嘗試將GTA:SA執行檔(.exe)加入白名單，然後重新啟動MTA:SA。"
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -2224,15 +2224,15 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA 無法順利啟動，因為 GTA:SA 主程式執行檔(.exe)無法被讀取："
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "修補 GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA 無法順利啟動，因為修補GTA:SA主程式失敗："
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
