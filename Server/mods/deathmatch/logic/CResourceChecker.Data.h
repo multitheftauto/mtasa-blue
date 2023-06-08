@@ -501,6 +501,8 @@ namespace
         {false, "getControlState", "getPedControlState"},
         {false, "getVehicleTurnVelocity", "getElementAngularVelocity"},
         {false, "setVehicleTurnVelocity", "setElementAngularVelocity"},
+        {false, "getCameraShakeLevel", "getCameraDrunkLevel"},
+        {false, "setCameraShakeLevel", "setCameraDrunkLevel"},
         // Edit
         {false, "guiEditSetCaratIndex", "guiEditSetCaretIndex"},
         {false, "guiMemoSetCaratIndex", "guiMemoSetCaretIndex"},

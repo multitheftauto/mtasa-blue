@@ -5,7 +5,7 @@
  *  FILE:        core/CCredits.cpp
  *  PURPOSE:     In-game credits window implementation
  *
- *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -275,6 +275,7 @@ CCredits::CCredits()
         "Docker (https://www.docker.com/)\n"
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
         "FreeType (https://freetype.org/)\n"
+        "GNU Unifont (https://unifoundry.com/unifont/index.html)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
         "json-c (https://github.com/json-c/json-c)\n"
         "GitBook (https://www.gitbook.com/)\n"
@@ -301,6 +302,7 @@ CCredits::CCredits()
         "SQLite (https://www.sqlite.org/)\n"
         "TeamCity by JetBrains (https://www.jetbrains.com/teamcity/)\n"
         "Teleport (https://goteleport.com/)\n"
+        "The Language Icon by A’ Design Award & Competition, Onur Müştak Çobanlı and\nFarhat Datta (https://www.languageicon.org)\n"
         "tinygettext (https://github.com/tinygettext/tinygettext/)\n"
         "tinyxml (https://sourceforge.net/projects/tinyxml/)\n"
         "UnRAR (https://www.rarlab.com/)\n"
@@ -345,7 +347,7 @@ CCredits::CCredits()
             // Create the label
             m_pLabels[uiLabelIndex] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, strBuffer.c_str()));
             m_pLabels[uiLabelIndex]->SetPosition(CVector2D(0.022f, fStartPosition), true);
-            m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1200.0f));            // relative 0.95, 6.0
+            m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1500.0f));            // relative 0.95, 6.0
             m_pLabels[uiLabelIndex]->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
             ++uiLabelIndex;
 
@@ -411,7 +413,7 @@ void CCredits::Update()
         float fCurrentTop = 1.0f - 0.0001f * static_cast<float>(clock() - m_clkStart);
 
         // If we're too far down or up, make sure we restart next pulse
-        if (fCurrentTop <= -11.0f || fCurrentTop >= 1.0f)
+        if (fCurrentTop <= -14.75f || fCurrentTop >= 1.0f)
         {
             m_clkStart = clock();
         }

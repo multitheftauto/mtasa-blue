@@ -15,11 +15,10 @@
 bool CConsoleEchoPacket::Write(NetBitStreamInterface& BitStream) const
 {
     // Not too short?
-    size_t sizeMessage = m_strMessage.length();
-    if (sizeMessage >= MIN_CONSOLEECHO_LENGTH)
+    if (m_strMessage.length() >= MIN_CONSOLEECHO_LENGTH)
     {
         // Write the string
-        BitStream.WriteStringCharacters(m_strMessage, sizeMessage);
+        BitStream.WriteStringCharacters(m_strMessage);
         return true;
     }
 
