@@ -109,6 +109,10 @@ bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
 
     bool bResult = DoReplaceModel(usModel, bAlphaTransparency);
 
+    // 'Restream' 3D markers
+    if (usModel == 1316 || usModel == 1317 || usModel == 1559)
+        g_pClientGame->ReinitMarkers();
+
     SetApplicationSetting("diagnostics", "gta-model-fail", "");
     return bResult;
 }
@@ -280,6 +284,10 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
             g_pGame->GetRenderWare()->DestroyDFF(pInfo->pClump);
         MapRemove(m_LoadedClumpInfoMap, usModel);
     }
+
+    // 'Restream' 3D markers
+    if (usModel == 1316 || usModel == 1317 || usModel == 1559)
+        g_pClientGame->ReinitMarkers();
 }
 
 bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency)
