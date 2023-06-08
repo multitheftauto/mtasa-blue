@@ -82,7 +82,6 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
-        {"engineReinitMarkers", ArgumentParser<EngineReinitMarkers>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2321,9 +2320,4 @@ bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 
     g_pClientGame->RestreamWorld(restreamLODs);
     return true;
-}
-
-void CLuaEngineDefs::EngineReinitMarkers()
-{
-    g_pClientGame->ReinitMarkers();
 }
