@@ -7,8 +7,7 @@ namespace lunasvg {
 
 class LayoutMask;
 
-class MaskElement : public StyledElement
-{
+class MaskElement : public StyledElement {
 public:
     MaskElement();
 
