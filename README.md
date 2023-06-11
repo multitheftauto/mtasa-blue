@@ -1,4 +1,4 @@
-## Multi Theft Auto: San Andreas
+## Multi Theft Auto: San Andreas 
 
 [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Unique servers online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fservers-shields.io.json)](https://community.multitheftauto.com/index.php?p=servers) [![Unique players online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fplayers-shields.io.json)](https://multitheftauto.com) [![Unique players last 24 hours](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Funique-players-shields.io.json)](https://multitheftauto.com) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://discord.com/invite/mtasa) [![Crowdin](https://badges.crowdin.net/e/f5dba7b9aa6594139af737c85d81d3aa/localized.svg)](https://multitheftauto.crowdin.com/multitheftauto)
 
@@ -95,23 +95,23 @@ If you have problems resolving the required dependencies or want maximum compati
 $ docker pull ghcr.io/multitheftauto/mtasa-blue-build:latest
 ```
 
-| Architecture | Docker image tag | Required build-time CLI-arguments |
-| ------------ | ---------------- | --------------------------------- |
-| x86          | latest           | `-e BUILD_ARCHITECTURE=x86`       |
-| x86_64       | latest           |                                   |
-| arm          | armhf            |                                   |
-| arm64        | arm64            |                                   |
+| Architecture | Docker image tag |
+| ------------ | ---------------- |
+| x86_64       | latest           |
+| x86          | i386             |
+| arm          | armhf            |
+| arm64        | arm64            |
 
 **Building with Docker**
 
 These examples assume that your current directory is the mtasa-blue checkout directory. You should also know that `/build` is the code directory required by our Docker images inside the container. If the current directory is not a valid git repository, it instead create a (shallow) clone of the mtasa-blue repository. After compiling, you will find the resulting binaries in `./Bin`. To build the unoptimised debug build, add `-e BUILD_CONFIG=debug` to the docker run arguments.
 
-| Architecture | Build command                                                                                                    |
-| ------------ | ---------------------------------------------------------------------------------------------------------------- |
-| x86          | ``` docker run --rm -v `pwd`:/build -e BUILD_ARCHITECTURE=x86 ghcr.io/multitheftauto/mtasa-blue-build:latest ``` |
-| x86_64       | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest ```                           |
-| arm          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:armhf ```                            |
-| arm64        | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:arm64 ```                            |
+| Architecture | Build command                                                                          |
+| ------------ | -------------------------------------------------------------------------------------- |
+| x86_64       | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:latest ``` |
+| x86          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:i386 ```   |
+| arm          | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:armhf ```  |
+| arm64        | ``` docker run --rm -v `pwd`:/build ghcr.io/multitheftauto/mtasa-blue-build:arm64 ```  |
 
 ### Premake FAQ
 

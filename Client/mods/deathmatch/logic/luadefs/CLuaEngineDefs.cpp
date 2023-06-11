@@ -2311,8 +2311,13 @@ bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
     return false;
 }
 
-bool CLuaEngineDefs::EngineRestreamWorld()
+bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
-    g_pClientGame->RestreamWorld();
+    bool restreamLODs{};
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(restreamLODs, false);
+
+    g_pClientGame->RestreamWorld(restreamLODs);
     return true;
 }

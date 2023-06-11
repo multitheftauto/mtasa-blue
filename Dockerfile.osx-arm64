@@ -1,0 +1,40 @@
+FROM jetbrains/teamcity-minimal-agent:latest
+
+# This is important for using apt-get
+USER root
+
+# Install cross-build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates subversion ncftp \
+        git autoconf wget make patch cmake clang llvm-dev uuid-dev libssl-dev lzma-dev libxml2-dev python3
+
+# Prepare cross-build environment
+ENV MACOSX_DEPLOYMENT_TARGET=11.0 \
+    PATH="${PATH}:/opt/osxcross/bin" \
+    OSXCROSS_MP_INC=1
+
+RUN mkdir -p /opt/osxcross && \
+    git clone https://github.com/tpoechtrager/osxcross.git /opt/osxcross/setup_files && \
+    cd /opt/osxcross/setup_files && \
+    wget -P tarballs https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.3.sdk.tar.xz && \
+    UNATTENDED=1 TARGET_DIR=/opt/osxcross ./build.sh && \
+    UNATTENDED=1 ../bin/osxcross-macports install --arm64 mysql8 libidn2
+
+# Default build configuration
+ENV AS_BUILDAGENT=0 \
+    BUILD_ARCHITECTURE=arm64 \
+    BUILD_CONFIG=release \
+    AR=arm64-apple-darwin20.4-ar \
+    CC=arm64-apple-darwin20.4-clang \
+    CXX=arm64-apple-darwin20.4-clang++
+
+# Set build directory
+VOLUME /build
+WORKDIR /build
+
+# Copy entrypoint script
+COPY utils/docker-entrypoint-osx.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# Set entrypoint
+ENTRYPOINT /docker-entrypoint.sh

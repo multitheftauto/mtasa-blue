@@ -6311,32 +6311,20 @@ bool CStaticFunctionDefinitions::SetTime(unsigned char ucHour, unsigned char ucM
 }
 
 bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint,
-                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, std::vector<CClientEntity*> vecIgnoredElements,
+                                                    CClientEntity** pColEntity, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity,
                                                     SLineOfSightBuildingResult* pBuildingResult)
 {
     assert(pColPoint);
     assert(pColEntity);
 
-    vecIgnoredElements.erase(std::remove_if(vecIgnoredElements.begin(), vecIgnoredElements.end(),
-                                            [](CClientEntity* pIgnoredElement) {
-                                                // Remove entities that already have their colision disabled.
-                                                // This prevents us from re-enabling them.
-                                                if (!CStaticFunctionDefinitions::GetElementCollisionsEnabled(*pIgnoredElement))
-                                                    return true;
-
-                                                // Otherwise disable collision and keep it in the array
-                                                CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, false);
-
-                                                return false;
-                                            }),
-                             vecIgnoredElements.end());
+    if (pIgnoredEntity)
+        g_pGame->GetWorld()->IgnoreEntity(pIgnoredEntity);
 
     CEntity* pColGameEntity = 0;
     bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult);
 
-    // Re-enable collisions
-    for (CClientEntity* pIgnoredElement : vecIgnoredElements)
-        CStaticFunctionDefinitions::SetElementCollisionsEnabled(*pIgnoredElement, true);
+    if (pIgnoredEntity)
+        g_pGame->GetWorld()->IgnoreEntity(NULL);
 
     CPools* pPools = g_pGame->GetPools();
     *pColEntity = pColGameEntity ? pPools->GetClientEntity((DWORD*)pColGameEntity->GetInterface()) : nullptr;
@@ -9800,7 +9788,10 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
 
         // Valid seat id for that vehicle?
         uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
-        if (uiSeat > ucMaxPassengers || ucMaxPassengers == 255)
+        if (uiSeat > ucMaxPassengers)
+            return false;
+
+        if (uiSeat > 0 && ucMaxPassengers == 255)
             return false;
 
         // Toss the previous player out of it if neccessary

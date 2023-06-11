@@ -4,166 +4,100 @@
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/mods/logic/luadefs/CLuaUTFDefs.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CLuaUTFDefs.h"
-#include "CScriptArgReader.h"
+#include "lua/CLuaFunctionParser.h"
+
+auto UtfLen(std::string input) -> int
+{
+    return MbUTF8ToUTF16(input).size();
+}
+
+auto UtfSeek(std::string input, const int position) -> std::variant<bool, int>
+{
+    if (std::wstring utfString = MbUTF8ToUTF16(input); position <= static_cast<int>(utfString.size()) && position >= 0)
+    {
+        utfString = utfString.substr(0, position);
+
+        return static_cast<int>(UTF16ToMbUTF8(utfString).size());
+    }
+
+    return false;
+}
+
+auto UtfSub(std::string input, int start, int end) -> std::string
+{
+    std::wstring    utfString = MbUTF8ToUTF16(input);
+    const ptrdiff_t length = utfString.size();
+
+    // posrelat them both
+    if (start < 0)
+    {
+        start += length + 1;
+    }
+
+    start = (start >= 0) ? start : 0;
+
+    if (end < 0)
+    {
+        end += length + 1;
+    }
+
+    end = (end >= 0) ? end : 0;
+
+    if (start < 1)
+    {
+        start = 1;
+    }
+
+    if (end > length)
+    {
+        end = length;
+    }
+
+    if (start <= end)
+    {
+        utfString = utfString.substr(start - 1, end - start + 1);
+
+        return UTF16ToMbUTF8(utfString);
+    }
+
+    return "";
+}
+
+auto UtfChar(const int code) -> std::string
+{
+    if (code > 65534 || code < 32)
+    {
+        throw std::invalid_argument("characterCode out of range, expected number between 32 and 65534.");
+    }
+
+    // Generate a null-terminating string for our character
+    const wchar_t string[2] = {static_cast<wchar_t>(code), '\0'};
+
+    // Convert our UTF character into an ANSI string
+    return UTF16ToMbUTF8(string);
+}
+
+auto UtfCode(std::string input) -> int
+{
+    return static_cast<unsigned long>(MbUTF8ToUTF16(input).c_str()[0]);
+}
 
 void CLuaUTFDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"utfLen", UtfLen}, {"utfSeek", UtfSeek}, {"utfSub", UtfSub}, {"utfChar", UtfChar}, {"utfCode", UtfCode},
+        {"utfLen", ArgumentParserWarn<false, UtfLen>},     {"utfSeek", ArgumentParserWarn<false, UtfSeek>}, {"utfSub", ArgumentParserWarn<false, UtfSub>},
+        {"utfChar", ArgumentParserWarn<nullptr, UtfChar>}, {"utfCode", ArgumentParserWarn<false, UtfCode>},
     };
 
     // Add functions
     for (const auto& [name, func] : functions)
+    {
         CLuaCFunctions::AddFunction(name, func);
-}
-
-int CLuaUTFDefs::UtfLen(lua_State* luaVM)
-{
-    SString strInput;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strInput);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushnumber(luaVM, MbUTF8ToUTF16(strInput).size());
-        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaUTFDefs::UtfSeek(lua_State* luaVM)
-{
-    SString strInput;
-    int     iPos;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strInput);
-    argStream.ReadNumber(iPos);
-
-    if (!argStream.HasErrors())
-    {
-        std::wstring strUTF = MbUTF8ToUTF16(strInput);
-        if (iPos <= static_cast<int>(strUTF.size()) && iPos >= 0)
-        {
-            strUTF = strUTF.substr(0, iPos);
-            lua_pushnumber(luaVM, UTF16ToMbUTF8(strUTF).size());
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaUTFDefs::UtfSub(lua_State* luaVM)
-{
-    SString   strInput;
-    ptrdiff_t iStart;
-    ptrdiff_t iEnd;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strInput);
-    argStream.ReadNumber(iStart);
-    argStream.ReadNumber(iEnd, -1);
-
-    if (!argStream.HasErrors())
-    {
-        std::wstring strUTF = MbUTF8ToUTF16(strInput);
-        size_t       l = strUTF.size();
-
-        // posrelat them both
-        if (iStart < 0)
-            iStart += (ptrdiff_t)l + 1;
-        iStart = (iStart >= 0) ? iStart : 0;
-
-        if (iEnd < 0)
-            iEnd += (ptrdiff_t)l + 1;
-        iEnd = (iEnd >= 0) ? iEnd : 0;
-
-        if (iStart < 1)
-            iStart = 1;
-        if (iEnd > (ptrdiff_t)l)
-            iEnd = (ptrdiff_t)l;
-        if (iStart <= iEnd)
-        {
-            strUTF = strUTF.substr(iStart - 1, iEnd - iStart + 1);
-            lua_pushstring(luaVM, UTF16ToMbUTF8(strUTF).c_str());
-        }
-        else
-            lua_pushliteral(luaVM, "");
-
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaUTFDefs::UtfChar(lua_State* luaVM)
-{
-    int iCode;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iCode);
-
-    if (!argStream.HasErrors())
-    {
-        if (iCode > 65534 || iCode < 32)
-        {
-            m_pScriptDebugging->LogBadType(luaVM);
-            lua_pushnil(luaVM);
-            return 1;
-        }
-
-        // Generate a null-terminating string for our character
-        wchar_t wUNICODE[2] = {static_cast<wchar_t>(iCode), '\0'};
-
-        // Convert our UTF character into an ANSI string
-        SString strANSI = UTF16ToMbUTF8(wUNICODE);
-
-        lua_pushstring(luaVM, strANSI.c_str());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaUTFDefs::UtfCode(lua_State* luaVM)
-{
-    SString strInput;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strInput);
-
-    if (!argStream.HasErrors())
-    {
-        std::wstring  strUTF = MbUTF8ToUTF16(strInput);
-        unsigned long ulCode = strUTF.c_str()[0];
-
-        lua_pushnumber(luaVM, ulCode);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
 }

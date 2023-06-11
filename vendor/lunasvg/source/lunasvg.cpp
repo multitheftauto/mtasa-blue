@@ -8,8 +8,7 @@
 
 namespace lunasvg {
 
-struct Bitmap::Impl
-{
+struct Bitmap::Impl {
     Impl(std::uint8_t* data, std::uint32_t width, std::uint32_t height, std::uint32_t stride);
     Impl(std::uint32_t width, std::uint32_t height);
 
@@ -56,7 +55,11 @@ void Bitmap::reset(std::uint32_t width, std::uint32_t height)
 
 std::uint8_t* Bitmap::data() const
 {
-    return m_impl ? m_impl->data ? m_impl->data : m_impl->ownData.get() : nullptr;
+    if(m_impl == nullptr)
+        return nullptr;
+    if(m_impl->data == nullptr)
+        return m_impl->ownData.get();
+    return m_impl->data;
 }
 
 std::uint32_t Bitmap::width() const
@@ -90,17 +93,16 @@ void Bitmap::clear(std::uint32_t color)
     auto stride = this->stride();
     auto rowData = this->data();
 
-    for(std::uint32_t y = 0;y < height;y++)
-    {
+    for(std::uint32_t y = 0; y < height; y++) {
         auto data = rowData;
-        for(std::uint32_t x = 0;x < width;x++)
-        {
+        for(std::uint32_t x = 0; x < width; x++) {
             data[0] = pb;
             data[1] = pg;
             data[2] = pr;
             data[3] = a;
             data += 4;
         }
+
         rowData += stride;
     }
 }
@@ -112,18 +114,15 @@ void Bitmap::convert(int ri, int gi, int bi, int ai, bool unpremultiply)
     auto stride = this->stride();
     auto rowData = this->data();
 
-    for(std::uint32_t y = 0;y < height;y++)
-    {
+    for(std::uint32_t y = 0; y < height; y++) {
         auto data = rowData;
-        for(std::uint32_t x = 0;x < width;x++)
-        {
+        for(std::uint32_t x = 0; x < width; x++) {
             auto b = data[0];
             auto g = data[1];
             auto r = data[2];
             auto a = data[3];
 
-            if(unpremultiply && a != 0)
-            {
+            if(unpremultiply && a != 0) {
                 r = (r * 255) / a;
                 g = (g * 255) / a;
                 b = (b * 255) / a;
@@ -135,6 +134,7 @@ void Bitmap::convert(int ri, int gi, int bi, int ai, bool unpremultiply)
             data[ai] = a;
             data += 4;
         }
+
         rowData += stride;
     }
 }
@@ -258,7 +258,7 @@ Matrix Matrix::rotated(double angle, double cx, double cy)
 
 Matrix Matrix::scaled(double sx, double sy)
 {
-    return Transform::scaled(sx, sy);;
+    return Transform::scaled(sx, sy);
 }
 
 Matrix Matrix::sheared(double shx, double shy)
@@ -348,17 +348,12 @@ Bitmap Document::renderToBitmap(std::uint32_t width, std::uint32_t height, std::
     if(root->width == 0.0 || root->height == 0.0)
         return Bitmap{};
 
-    if(width == 0 && height == 0)
-    {
+    if(width == 0 && height == 0) {
         width = static_cast<std::uint32_t>(std::ceil(root->width));
         height = static_cast<std::uint32_t>(std::ceil(root->height));
-    }
-    else if(width != 0 && height == 0)
-    {
+    } else if(width != 0 && height == 0) {
         height = static_cast<std::uint32_t>(std::ceil(width * root->height / root->width));
-    }
-    else if(height != 0 && width == 0)
-    {
+    } else if(height != 0 && width == 0) {
         width = static_cast<std::uint32_t>(std::ceil(height * root->width / root->height));
     }
 
@@ -369,12 +364,8 @@ Bitmap Document::renderToBitmap(std::uint32_t width, std::uint32_t height, std::
     return bitmap;
 }
 
-Document::Document()
-{
-}
+Document::Document() = default;
 
-Document::~Document()
-{
-}
+Document::~Document() = default;
 
 } // namespace lunasvg
