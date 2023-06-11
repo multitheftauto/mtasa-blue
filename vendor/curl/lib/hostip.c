@@ -61,6 +61,7 @@
 #include "doh.h"
 #include "warnless.h"
 #include "strcase.h"
+#include "easy_lock.h"
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
@@ -69,8 +70,6 @@
 #if defined(ENABLE_IPV6) && defined(CURL_OSX_CALL_COPYPROXIES)
 #include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
 #endif
-
-#include "easy_lock.h"
 
 #if defined(CURLRES_SYNCH) &&                   \
   defined(HAVE_ALARM) &&                        \
@@ -129,7 +128,7 @@ static void freednsentry(void *freethis);
 /*
  * Return # of addresses in a Curl_addrinfo struct
  */
-int Curl_num_addresses(const struct Curl_addrinfo *addr)
+static int num_addresses(const struct Curl_addrinfo *addr)
 {
   int i = 0;
   while(addr) {
@@ -411,7 +410,7 @@ UNITTEST CURLcode Curl_shuffle_addr(struct Curl_easy *data,
                                     struct Curl_addrinfo **addr)
 {
   CURLcode result = CURLE_OK;
-  const int num_addrs = Curl_num_addresses(*addr);
+  const int num_addrs = num_addresses(*addr);
 
   if(num_addrs > 1) {
     struct Curl_addrinfo **nodes;
@@ -1238,7 +1237,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
         goto err;
 
       error = false;
-   err:
+err:
       if(error) {
         failf(data, "Couldn't parse CURLOPT_RESOLVE entry '%s'",
               hostp->data);

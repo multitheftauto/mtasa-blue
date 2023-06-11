@@ -178,11 +178,12 @@ struct stream_ctx {
   size_t sendbuf_len_in_flight; /* sendbuf amount "in flight" */
   size_t recv_buf_nonflow; /* buffered bytes, not counting for flow control */
   uint64_t error3; /* HTTP/3 stream error code */
+  curl_off_t upload_left; /* number of request bytes left to upload */
   int status_code; /* HTTP status code */
   bool resp_hds_complete; /* we have a complete, final response */
   bool closed; /* TRUE on stream close */
   bool reset;  /* TRUE on stream reset */
-  bool upload_done; /* stream is local closed */
+  bool send_closed; /* stream is local closed */
 };
 
 #define H3_STREAM_CTX(d)    ((struct stream_ctx *)(((d) && (d)->req.p.http)? \
@@ -998,7 +999,7 @@ static void drain_stream(struct Curl_cfilter *cf,
 
   (void)cf;
   bits = CURL_CSELECT_IN;
-  if(stream && !stream->upload_done)
+  if(stream && !stream->send_closed && stream->upload_left)
     bits |= CURL_CSELECT_OUT;
   if(data->state.dselect_bits != bits) {
     data->state.dselect_bits = bits;
@@ -1028,6 +1029,7 @@ static int cb_h3_stream_close(nghttp3_conn *conn, int64_t stream_id,
   stream->error3 = app_error_code;
   if(app_error_code == NGHTTP3_H3_INTERNAL_ERROR) {
     stream->reset = TRUE;
+    stream->send_closed = TRUE;
   }
   drain_stream(cf, data);
   return 0;
@@ -1305,20 +1307,19 @@ static int init_ngh3_conn(struct Curl_cfilter *cf)
   }
 
   return CURLE_OK;
-  fail:
+fail:
 
   return result;
 }
 
 static ssize_t recv_closed_stream(struct Curl_cfilter *cf,
                                   struct Curl_easy *data,
+                                  struct stream_ctx *stream,
                                   CURLcode *err)
 {
-  struct stream_ctx *stream = H3_STREAM_CTX(data);
   ssize_t nread = -1;
 
   (void)cf;
-  DEBUGASSERT(stream);
   if(stream->reset) {
     failf(data,
           "HTTP/3 stream %" PRId64 " reset by server", stream->id);
@@ -1413,7 +1414,7 @@ static ssize_t cf_ngtcp2_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
   }
   else {
     if(stream->closed) {
-      nread = recv_closed_stream(cf, data, err);
+      nread = recv_closed_stream(cf, data, stream, err);
       goto out;
     }
     *err = CURLE_AGAIN;
@@ -1424,7 +1425,6 @@ out:
   if(cf_flush_egress(cf, data)) {
     *err = CURLE_SEND_ERROR;
     nread = -1;
-    goto out;
   }
   DEBUGF(LOG_CF(data, cf, "[h3sid=%" PRId64 "] cf_recv(len=%zu) -> %zd, %d",
                 stream? stream->id : -1, len, nread, *err));
@@ -1439,16 +1439,20 @@ static int cb_h3_acked_req_body(nghttp3_conn *conn, int64_t stream_id,
   struct Curl_cfilter *cf = user_data;
   struct Curl_easy *data = stream_user_data;
   struct stream_ctx *stream = H3_STREAM_CTX(data);
+  size_t skiplen;
 
   (void)cf;
   if(!stream)
     return 0;
-  /* The server ackknowledged `datalen` of bytes from our request body.
+  /* The server acknowledged `datalen` of bytes from our request body.
    * This is a delta. We have kept this data in `sendbuf` for
    * re-transmissions and can free it now. */
-  Curl_bufq_skip(&stream->sendbuf, datalen);
-  DEBUGASSERT(stream->sendbuf_len_in_flight >= datalen);
-  stream->sendbuf_len_in_flight -= datalen;
+  if(datalen >= (uint64_t)stream->sendbuf_len_in_flight)
+    skiplen = stream->sendbuf_len_in_flight;
+  else
+    skiplen = (size_t)datalen;
+  Curl_bufq_skip(&stream->sendbuf, skiplen);
+  stream->sendbuf_len_in_flight -= skiplen;
 
   /* `sendbuf` *might* now have more room. If so, resume this
    * possibly paused stream. And also tell our transfer engine that
@@ -1509,11 +1513,14 @@ cb_h3_read_req_body(nghttp3_conn *conn, int64_t stream_id,
     DEBUGASSERT(nvecs > 0); /* we SHOULD have been be able to peek */
   }
 
+  if(nwritten > 0 && stream->upload_left != -1)
+    stream->upload_left -= nwritten;
+
   /* When we stopped sending and everything in `sendbuf` is "in flight",
    * we are at the end of the request body. */
-  if(stream->upload_done &&
-     stream->sendbuf_len_in_flight == Curl_bufq_len(&stream->sendbuf)) {
+  if(stream->upload_left == 0) {
     *pflags = NGHTTP3_DATA_FLAG_EOF;
+    stream->send_closed = TRUE;
   }
   else if(!nwritten) {
     /* Not EOF, and nothing to give, we signal WOULDBLOCK. */
@@ -1523,9 +1530,10 @@ cb_h3_read_req_body(nghttp3_conn *conn, int64_t stream_id,
   }
 
   DEBUGF(LOG_CF(data, cf, "[h3sid=%" PRId64 "] read req body -> "
-                "%d vecs%s with %zu/%zu", stream->id,
+                "%d vecs%s with %zu (buffered=%zu, left=%zd)", stream->id,
                 (int)nvecs, *pflags == NGHTTP3_DATA_FLAG_EOF?" EOF":"",
-                nwritten, Curl_bufq_len(&stream->sendbuf)));
+                nwritten, Curl_bufq_len(&stream->sendbuf),
+                stream->upload_left));
   return (nghttp3_ssize)nvecs;
 }
 
@@ -1550,7 +1558,7 @@ static ssize_t h3_stream_open(struct Curl_cfilter *cf,
   nghttp3_data_reader reader;
   nghttp3_data_reader *preader = NULL;
 
-  Curl_h1_req_parse_init(&h1, (4*1024));
+  Curl_h1_req_parse_init(&h1, H1_PARSE_DEFAULT_MAX_LINE_LEN);
   Curl_dynhds_init(&h2_headers, 0, DYN_HTTP_REQUEST);
 
   *err = h3_data_setup(cf, data);
@@ -1601,12 +1609,17 @@ static ssize_t h3_stream_open(struct Curl_cfilter *cf,
   case HTTPREQ_POST_MIME:
   case HTTPREQ_PUT:
     /* known request body size or -1 */
+    if(data->state.infilesize != -1)
+      stream->upload_left = data->state.infilesize;
+    else
+      /* data sending without specifying the data amount up front */
+      stream->upload_left = -1; /* unknown */
     reader.read_data = cb_h3_read_req_body;
     preader = &reader;
     break;
   default:
     /* there is not request body */
-    stream->upload_done = TRUE;
+    stream->upload_left = 0; /* no request body */
     preader = NULL;
     break;
   }
@@ -2129,8 +2142,9 @@ static CURLcode cf_ngtcp2_data_event(struct Curl_cfilter *cf,
   }
   case CF_CTRL_DATA_DONE_SEND: {
     struct stream_ctx *stream = H3_STREAM_CTX(data);
-    if(stream) {
-      stream->upload_done = TRUE;
+    if(stream && !stream->send_closed) {
+      stream->send_closed = TRUE;
+      stream->upload_left = Curl_bufq_len(&stream->sendbuf);
       (void)nghttp3_conn_resume_stream(ctx->h3conn, stream->id);
     }
     break;
