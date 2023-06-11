@@ -32,6 +32,9 @@ CClientIMG::~CClientIMG()
     m_pImgManager->RemoveFromList(this);
     if (IsStreamed())
         StreamDisable();
+
+    if (m_ifs.is_open())
+        Unload();
 }
 
 bool CClientIMG::Load(fs::path filePath)
