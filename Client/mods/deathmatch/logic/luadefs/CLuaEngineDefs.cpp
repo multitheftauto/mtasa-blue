@@ -2296,8 +2296,9 @@ bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, boo
 bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (!pModelInfo)
-        return false;
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
 
     ushort usCurrentFlags = pModelInfo->GetFlags();
     ushort usOriginalFlags = pModelInfo->GetOriginalFlags();
@@ -2310,8 +2311,13 @@ bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
     return false;
 }
 
-bool CLuaEngineDefs::EngineRestreamWorld()
+bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
-    g_pClientGame->RestreamWorld();
+    bool restreamLODs{};
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(restreamLODs, false);
+
+    g_pClientGame->RestreamWorld(restreamLODs);
     return true;
 }

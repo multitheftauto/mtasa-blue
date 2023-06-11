@@ -1838,7 +1838,7 @@ bool CStaticFunctionDefinitions::ClearElementVisibleTo(CElement* pElement)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable)
+bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* pPlayer, bool bEnable, bool bPersist)
 {
     assert(pElement);
 
@@ -1848,7 +1848,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* p
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetSyncable(bEnable);
-            g_pGame->GetPedSync()->OverrideSyncer(pPed, pPlayer);
+            g_pGame->GetPedSync()->OverrideSyncer(pPed, pPlayer, bPersist);
             return true;
             break;
         }
@@ -1856,7 +1856,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* p
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetUnoccupiedSyncable(bEnable);
-            g_pGame->GetUnoccupiedVehicleSync()->OverrideSyncer(pVehicle, pPlayer);
+            g_pGame->GetUnoccupiedVehicleSync()->OverrideSyncer(pVehicle, pPlayer, bPersist);
             return true;
             break;
         }
@@ -3462,7 +3462,7 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
             BitStream.pBitStream->Write(ucPasswordLength);
             BitStream.pBitStream->Write(szPassword, ucPasswordLength);
         }
-        pPlayer->SetLeavingServer(true);
+        pPlayer->SetRedirecting(true);
         pPlayer->Send(CLuaPacket(FORCE_RECONNECT, *BitStream.pBitStream));
 
         usPort = usPort ? usPort : g_pGame->GetConfig()->GetServerPort();
@@ -4135,10 +4135,16 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
     assert(pPed);
     assert(pVehicle);
 
+    if (uiSeat > pVehicle->GetMaxPassengers())
+        return false;
+
+    if (uiSeat > 0 && pVehicle->GetMaxPassengers() == VEHICLE_PASSENGERS_UNDEFINED)
+        return false;
+
     // Valid seat id for that vehicle?
     // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player on the first seat being the vehicle
     // syncer (Todo)
-    if (uiSeat <= pVehicle->GetMaxPassengers() && (pVehicle->GetVehicleType() != VEHICLE_TRAIN || !pVehicle->GetTowedByVehicle()))
+    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN || !pVehicle->GetTowedByVehicle())
     {
         if (!pPed->IsDead())
         {
@@ -8079,6 +8085,9 @@ CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned
     pObject->SetRotation(vecRadians);
     pObject->SetModel(usModelID);
 
+    if (CObjectManager::IsBreakableModel(usModelID))
+        pObject->SetBreakable(true);
+
     if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;
@@ -8253,6 +8262,38 @@ bool CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions(CElement* pEleme
         CObject* pObject = static_cast<CObject*>(pElement);
 
         return pObject->IsVisibleInAllDimensions();
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::IsObjectBreakable(CElement* pElement)
+{
+    if (IS_OBJECT(pElement))
+    {
+        CObject* pObject = static_cast<CObject*>(pElement);
+
+        return pObject->IsBreakable();
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetObjectBreakable(CElement* pElement, const bool bBreakable)
+{
+    RUN_CHILDREN(SetObjectBreakable(*iter, bBreakable))
+
+    if (IS_OBJECT(pElement))
+    {
+        CObject* pObject = static_cast<CObject*>(pElement);
+
+        pObject->SetBreakable(bBreakable);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(bBreakable);
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_OBJECT_BREAKABLE, *BitStream.pBitStream));
+
+        return true;
     }
 
     return false;
@@ -11499,17 +11540,14 @@ bool CStaticFunctionDefinitions::KickPlayer(CPlayer* pPlayer, SString strRespons
     return true;
 }
 
-CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, SString strResponsible,
+CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pTargetPlayer, bool bIP, bool bUsername, bool bSerial, CPlayer* pResponsible, SString strResponsible,
                                             SString strReason, time_t tUnban)
 {
     // Make sure we have a player
-    assert(pPlayer);
+    assert(pTargetPlayer);
 
     // Initialize variables
     CBan* pBan = NULL;
-
-    SString strMessage;
-    SString strInfoMessage;
 
     // If the responsible string is too long, crop it
     if (strResponsible.length() > MAX_BAN_RESPONSIBLE_LENGTH)
@@ -11522,21 +11560,11 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         // If the reason is too long, crop it
         if (sizeReason > MAX_BAN_REASON_LENGTH)
             strReason = strReason.substr(0, MAX_BAN_REASON_LENGTH - 3) + "...";
-
-        // Format the messages for both the banned player and the console
-        strMessage.Format("%s (%s)", strResponsible.c_str(), strReason.c_str());
-        strInfoMessage.Format("%s was banned from the game by %s (%s)", pPlayer->GetNick(), strResponsible.c_str(), strReason.c_str());
-    }
-    else
-    {
-        // Format the messages for both the banned player and the console
-        strMessage.Format("%s", strResponsible.c_str());
-        strInfoMessage.Format("%s was banned from the game by %s", pPlayer->GetNick(), strResponsible.c_str());
     }
 
     // Ban the player
     if (bIP)
-        pBan = m_pBanManager->AddBan(pPlayer, strResponsible, strReason, tUnban);
+        pBan = m_pBanManager->AddBan(pTargetPlayer, strResponsible, strReason, tUnban);
     else if (bUsername || bSerial)
         pBan = m_pBanManager->AddBan(strResponsible, strReason, tUnban);
 
@@ -11545,11 +11573,11 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
     {
         // Set the data if banned by either username or serial
         if (bUsername)
-            pBan->SetAccount(pPlayer->GetSerialUser());
+            pBan->SetAccount(pTargetPlayer->GetSerialUser());
         if (bSerial)
-            pBan->SetSerial(pPlayer->GetSerial());
+            pBan->SetSerial(pTargetPlayer->GetSerial());
         if (bUsername || bSerial)
-            pBan->SetNick(pPlayer->GetNick());
+            pBan->SetNick(pTargetPlayer->GetNick());
 
         // Check if we passed a responsible player
         if (pResponsible)
@@ -11574,35 +11602,85 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pPlayer, bool bIP, bool bUs
         if (pBan->IsBeingDeleted())
             return NULL;
 
-        // Call the event
-        CLuaArguments Arguments;
-        Arguments.PushBan(pBan);
+        SString strMessage;
+        SString strInfoMessage;
 
-        if (pResponsible)
-            Arguments.PushElement(pResponsible);
-
-        // A script can call kickPlayer in the onPlayerBan event, which would
-        // show him the 'kicked' message instead of our 'banned' message.
-        const bool bLeavingServer = pPlayer->IsLeavingServer();
-        pPlayer->SetLeavingServer(true);
-        pPlayer->CallEvent("onPlayerBan", Arguments);
-        pPlayer->SetLeavingServer(bLeavingServer);
-
-        // Check if script removed the ban
-        if (pBan->IsBeingDeleted())
-            return NULL;
-
-        // Tell the player that was banned why. QuitPlayer will delete the player.
-        if (!pPlayer->IsLeavingServer())
+        // Loop through players to see if we should kick anyone
+        list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
+        for (; iter != m_pPlayerManager->IterEnd(); iter++)
         {
-            time_t                    Duration = pBan->GetBanTimeRemaining();
-            CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
-            pPlayer->Send(Packet);
-            g_pGame->QuitPlayer(*pPlayer, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
-        }
+            CPlayer* const pPlayer = *iter;
 
-        // Tell everyone else that he was banned from the game including console
-        CLogger::LogPrintf("BAN: %s\n", strInfoMessage.c_str());
+            // Default to not banning; if the IP, serial and username don't match, we don't want to kick the guy out
+            bool bBan = pPlayer == pTargetPlayer;
+
+            // Check if the player's IP matches the specified one, if specified
+            if (!bBan && bIP)
+            {
+                bBan = (pBan->GetIP() == pPlayer->GetSourceIP());
+            }
+
+            // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
+            if (!bBan && bUsername)
+            {
+                const std::string& strPlayerUsername = pPlayer->GetSerialUser();
+                bBan = stricmp(strPlayerUsername.c_str(), pBan->GetAccount().c_str()) == 0;
+            }
+
+            // Check if the player's serial matches the specified one, if specified, and he wasn't banned over IP or username yet
+            if (!bBan && bSerial)
+            {
+                const std::string& strPlayerSerial = pPlayer->GetSerial();
+                bBan = stricmp(strPlayerSerial.c_str(), pBan->GetSerial().c_str()) == 0;
+            }
+
+            // If either the IP, serial or username matched
+            if (bBan)
+            {
+                if (sizeReason >= MIN_BAN_REASON_LENGTH)
+                {
+                    // Format the messages for both the banned player and the console
+                    strMessage.Format("%s (%s)", strResponsible.c_str(), strReason.c_str());
+                    strInfoMessage.Format("%s was banned from the game by %s (%s)", pPlayer->GetNick(), strResponsible.c_str(), strReason.c_str());
+                }
+                else
+                {
+                    // Format the messages for both the banned player and the console
+                    strMessage.Format("%s", strResponsible.c_str());
+                    strInfoMessage.Format("%s was banned from the game by %s", pPlayer->GetNick(), strResponsible.c_str());
+                }
+
+                // Call the event
+                CLuaArguments Arguments;
+                Arguments.PushBan(pBan);
+
+                if (pResponsible)
+                    Arguments.PushElement(pResponsible);
+
+                // A script can call kickPlayer in the onPlayerBan event, which would
+                // show him the 'kicked' message instead of our 'banned' message.
+                const bool bLeavingServer = pPlayer->IsLeavingServer();
+                pPlayer->SetLeavingServer(true);
+                pPlayer->CallEvent("onPlayerBan", Arguments);
+                pPlayer->SetLeavingServer(bLeavingServer);
+
+                // Check if script removed the ban
+                if (pBan->IsBeingDeleted())
+                    return NULL;
+
+                // Tell the player that was banned why. QuitPlayer will delete the player.
+                if (!pPlayer->IsLeavingServer())
+                {
+                    time_t                    Duration = pBan->GetBanTimeRemaining();
+                    CPlayerDisconnectedPacket Packet(CPlayerDisconnectedPacket::BAN, Duration, strMessage.c_str());
+                    pPlayer->Send(Packet);
+                    g_pGame->QuitPlayer(**iter, CClient::QUIT_BAN, false, strReason.c_str(), strResponsible.c_str());
+                }
+
+                // Tell everyone else that he was banned from the game including console
+                CLogger::LogPrintf("BAN: %s\n", strInfoMessage.c_str());
+            }
+        }
 
         return pBan;
     }
