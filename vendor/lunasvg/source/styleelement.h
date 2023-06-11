@@ -5,8 +5,7 @@
 
 namespace lunasvg {
 
-class StyleElement : public Element
-{
+class StyleElement : public Element {
 public:
     StyleElement();
 
