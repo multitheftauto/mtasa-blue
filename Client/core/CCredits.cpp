@@ -163,6 +163,7 @@ CCredits::CCredits()
         "Dragon\n"
         "drop-club\n"
         "dvarnai\n"
+        "efexc\n"
         "Einheit-101\n"
         "emre1702\n"
         "Fabio(GNR)\n"
