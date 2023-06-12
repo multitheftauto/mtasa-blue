@@ -109,10 +109,6 @@ bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
 
     bool bResult = DoReplaceModel(usModel, bAlphaTransparency);
 
-    // 'Restream' 3D markers
-    if (usModel == 1316 || usModel == 1317 || usModel == 1559)
-        g_pClientGame->ReinitMarkers();
-
     SetApplicationSetting("diagnostics", "gta-model-fail", "");
     return bResult;
 }
@@ -167,6 +163,15 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         else if (CClientPlayerManager::IsValidModel(usModel))
         {
             return ReplacePedModel(pClump, usModel, bAlphaTransparency);
+        }
+        else if (CClientMarkerManager::IsMarkerModel(usModel))
+        {
+            bool bResult = ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
+
+            // 'Restream' 3D markers
+            g_pClientGame->ReinitMarkers();
+
+            return bResult;
         }
         else if (CClientObjectManager::IsValidModel(usModel))
         {
@@ -276,6 +281,10 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 
+    // 'Restream' 3D markers
+    if (CClientMarkerManager::IsMarkerModel(usModel))
+        g_pClientGame->ReinitMarkers();
+
     // Force dff reload if this model id is used again
     SLoadedClumpInfo* pInfo = MapFind(m_LoadedClumpInfoMap, usModel);
     if (pInfo)
@@ -284,10 +293,6 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
             g_pGame->GetRenderWare()->DestroyDFF(pInfo->pClump);
         MapRemove(m_LoadedClumpInfoMap, usModel);
     }
-
-    // 'Restream' 3D markers
-    if (usModel == 1316 || usModel == 1317 || usModel == 1559)
-        g_pClientGame->ReinitMarkers();
 }
 
 bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency)
