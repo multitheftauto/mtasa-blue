@@ -143,6 +143,7 @@ public:
     void        SetCursorEnabled(bool bEnabled);
     bool        IsCursorEnabled();
     void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
+    void        SetCurrentServerCursorAlpha(float fAlpha);
     float       GetCurrentServerCursorAlpha();
     eCursorType GetCursorType();
 
