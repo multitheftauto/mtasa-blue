@@ -146,6 +146,7 @@ CCredits::CCredits()
         "AfuSensi\n"
         "AleksCore\n"
         "AlιAѕѕaѕѕιN\n"
+        "androksi\n"
         "ApeLsiN4eG\n"
         "asturel\n"
         "Audifire\n"
