@@ -214,7 +214,7 @@ CCredits::CCredits()
         "TFP-dev\n"
         "theSarrum\n"
         "Totto8492\n"
-        "TracerDS\n"
+        "Tracer\n"
         "turret001\n"
         "tvc\n"
         "vahook\n"
