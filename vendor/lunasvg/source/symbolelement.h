@@ -5,8 +5,7 @@
 
 namespace lunasvg {
 
-class SymbolElement : public StyledElement
-{
+class SymbolElement : public StyledElement {
 public:
     SymbolElement();
 
