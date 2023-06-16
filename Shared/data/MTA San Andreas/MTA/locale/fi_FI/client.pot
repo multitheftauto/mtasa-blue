@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-09 19:15+0000\n"
-"PO-Revision-Date: 2023-06-09 19:17\n"
+"POT-Creation-Date: 2023-06-12 15:20+0000\n"
+"PO-Revision-Date: 2023-06-16 17:07\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -1112,11 +1112,11 @@ msgstr "Lokalisointi"
 msgid "Patch contributors"
 msgstr "Kehitykseen osallistuneet"
 
-#: Client/core/CCredits.cpp:227
+#: Client/core/CCredits.cpp:232
 msgid "Special Thanks"
 msgstr "Erityiskiitokset"
 
-#: Client/core/CCredits.cpp:258
+#: Client/core/CCredits.cpp:263
 msgid "This software and project makes use of the following libraries and software:"
 msgstr "Tämä ohjelmisto ja projekti käyttää hyväksi seuraavia kirjastoja ja ohjelmia:"
 
