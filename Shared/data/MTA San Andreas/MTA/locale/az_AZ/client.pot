@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-09 19:15+0000\n"
-"PO-Revision-Date: 2023-06-09 19:18\n"
+"POT-Creation-Date: 2023-06-12 15:20+0000\n"
+"PO-Revision-Date: 2023-06-16 17:08\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -1114,11 +1114,11 @@ msgstr "Tərcüməçilər"
 msgid "Patch contributors"
 msgstr "Düzəliş müəllifləri"
 
-#: Client/core/CCredits.cpp:227
+#: Client/core/CCredits.cpp:232
 msgid "Special Thanks"
 msgstr "Xüsusi təşəkkürlər"
 
-#: Client/core/CCredits.cpp:258
+#: Client/core/CCredits.cpp:263
 msgid "This software and project makes use of the following libraries and software:"
 msgstr "Bu proqram və proyekt aşağıdakı kitabxanalardan və proqram təminatlarını istifadə edir:"
 
