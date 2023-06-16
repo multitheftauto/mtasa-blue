@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-09 19:15+0000\n"
-"PO-Revision-Date: 2023-06-09 19:17\n"
+"POT-Creation-Date: 2023-06-12 15:20+0000\n"
+"PO-Revision-Date: 2023-06-16 17:07\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -1112,11 +1112,11 @@ msgstr "Sprachlokalisierung"
 msgid "Patch contributors"
 msgstr "Patch Beitragende"
 
-#: Client/core/CCredits.cpp:227
+#: Client/core/CCredits.cpp:232
 msgid "Special Thanks"
 msgstr "Besonderen Dank an"
 
-#: Client/core/CCredits.cpp:258
+#: Client/core/CCredits.cpp:263
 msgid "This software and project makes use of the following libraries and software:"
 msgstr "Diese Software und dieses Projekt verwenden die folgenden Bibliotheken und Software:"
 
