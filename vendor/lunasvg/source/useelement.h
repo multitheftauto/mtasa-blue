@@ -5,8 +5,7 @@
 
 namespace lunasvg {
 
-class UseElement : public GraphicsElement
-{
+class UseElement : public GraphicsElement {
 public:
     UseElement();
 
