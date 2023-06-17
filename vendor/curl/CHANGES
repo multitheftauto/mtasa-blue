@@ -6,6 +6,600 @@
 
                                   Changelog
 
+Version 8.1.2 (30 May 2023)
+
+Daniel Stenberg (30 May 2023)
+
+- RELEASE-NOTES: synced
+
+  8.1.2 release
+
+- THANKS: contributors from 8.1.2
+
+- lib1560: verify more scheme guessing
+
+  - on 2nd level domains
+  - on names without dots
+
+  As mentioned in #11161, "imap.com" will be guessed IMAP
+
+  Closes #11219
+
+- page-header: minor wording polish in the URL segment
+
+  Closes #11217
+
+- page-header: mention curl version and how to figure out current release
+
+  Closes #11216
+
+- RELEASE-NOTES: synced
+
+- configure: without pkg-config and no custom path, use -lnghttp2
+
+  Reported-by: correctmost on github
+  Fixes #11186
+  Closes #11210
+
+Stefan Eissing (28 May 2023)
+
+- curl: cache the --trace-time value for a second
+
+  - caches HH:MM:SS computed and reuses it for logging during
+    the same second.
+  - common function for plain log line start formatting
+
+  Closes #11211
+
+Kev Jackson (28 May 2023)
+
+- libcurl.m4: remove trailing 'dnl' that causes this to break autoconf
+
+  Closes #11212
+
+Stefan Eissing (26 May 2023)
+
+- http3: send EOF indicator early as possible
+
+  - ngtcp2 and quiche implementations relied on the DONE_SEND event
+    to forward the EOF for uploads to the libraries. This often
+    result in a last 0 length EOF data. Tracking the amount of
+    data left to upload allows EOF indication earlier.
+  - refs #11205 where CloudFlare DoH servers did not like to
+    receive the initial upload DATA without EOF and returned
+    a 400 Bad Request
+
+  Reported-by: Sergey Fionov
+  Fixes #11205
+  Closes #11207
+
+Daniel Stenberg (26 May 2023)
+
+- scripts/contri*sh: no longer grep -v ' '
+
+  Originally these scripts filtered out names that have no space so that
+  they better avoid nick names not intended for credits. Such names are
+  not too commonly used, plus we now give credit even to those.
+
+  Additionally: non-latin names, like Asian, don't have spaces at all so
+  they were also filtered out and had to be manually added which made it
+  an error-prone operation where Asian names eventually easily fell off by
+  mistake.
+
+  Closes #11206
+
+- cf-socket: restore Curl_sock_assign_addr()
+
+  Regression since it was not private. Also used by msh3.c
+
+  Follow-up to 8e85764b7bd7f05f5
+  Reported-by: Gisle Vanem
+  Fixes #11202
+  Closes #11204
+
+- RELEASE-NOTES: synced
+
+  Taken down to 8.1.2 now for pending patch release
+
+- libssh: when keyboard-interactive auth fails, try password
+
+  The state machine had a mistake in that it would not carry on to that
+  next step.
+
+  This also adds a verbose output what methods that are available from the
+  server and renames the macros that change to the next auth methods to
+  try.
+
+  Reported-by: 左潇峰
+  Fixes #11196
+  Closes #11197
+
+Emanuele Torre (25 May 2023)
+
+- configure: fix build with arbitrary CC and LD_LIBRARY_PATH
+
+  Since ./configure and processes that inherit its environment variables
+  are the only callers of the run-compiler script, we can just save the
+  current value of the LD_LIBRARY_PATH and CC variables to another pair of
+  environment variables, and make run-compiler a static script that
+  simply restores CC and LD_LIBRARY_PATH to the saved value, and before
+  running the compiler.
+
+  This avoids having to inject the values of the variables in the script,
+  possibly causing problems if they contains spaces, quotes, and other
+  special characters.
+
+  Also add exports in the script just in case LD_LIBRARY_PATH and CC are
+  not already in the environment.
+
+  follow-up from 471dab2
+
+  Closes #11182
+
+Daniel Stenberg (25 May 2023)
+
+- urlapi: remove superfluous host name check
+
+  ... as it is checked later more proper.
+
+  Closes #11195
+
+Stefan Eissing (25 May 2023)
+
+- http2: fix EOF handling on uploads with auth negotiation
+
+  - doing a POST with `--digest` does an override on the initial request
+    with `Content-Length: 0`, but the http2 filter was unaware of that
+    and expected the originally request body. It did therefore not
+    send a final DATA frame with EOF flag to the server.
+  - The fix overrides any initial notion of post size when the `done_send`
+    event is triggered by the transfer loop, leading to the EOF that
+    is necessary.
+  - refs #11194. The fault did not happen in testing, as Apache httpd
+    never tries to read the request body of the initial request,
+    sends the 401 reply and closes the stream. The server used in the
+    reported issue however tried to read the EOF and timed out on the
+    request.
+
+  Reported-by: Aleksander Mazur
+  Fixes #11194
+  Cloes #11200
+
+Daniel Stenberg (23 May 2023)
+
+- RELEASE-NOTES: synced
+
+  bump to 8.2.0
+
+- lib: remove unused functions, make single-use static
+
+  Closes #11174
+
+- scripts/singleuse.pl: add more API calls
+
+Christian Hesse (23 May 2023)
+
+- configure: quote the assignments for run-compiler
+
+  Building for multilib failed, as the compiler command contains an
+  extra argument. That needs quoting.
+
+  Regression from b78ca50cb3dda361f9c1
+
+  Fixes #11179
+  Closes #11180
+
+Daniel Stenberg (23 May 2023)
+
+- misc: fix spelling mistakes
+
+  Reported-by: musvaage on github
+  Fixes #11171
+  Closes #11172
+
+Version 8.1.1 (23 May 2023)
+
+Daniel Stenberg (23 May 2023)
+
+- RELEASE-NOTES: synced
+
+  curl 8.1.1
+
+- THANKS: contributors from the 8.1.1 release
+
+Dan Fandrich (22 May 2023)
+
+- docs: fix fuzzing documentation link
+
+  Follow-up to 4c712a1b
+
+- CI: add an Alpine build with MUSL
+
+  MUSL is another libc implementation which has its own unique issues
+  worth testing.
+
+  Ref: #11140
+  Closes #11178
+
+- runtests: add a missing \n at the end of a log message
+
+correctmost on github (22 May 2023)
+
+- SECURITY-PROCESS.md: link security advisory doc and fix typo
+
+  Closes #11177
+
+Daniel Stenberg (22 May 2023)
+
+- TODO: build curl with Windows Unicode support
+
+  Closes #7229
+
+- KNOWN_BUGS: hyper memory-leaks
+
+  Closes #10803
+
+Stefan Eissing (22 May 2023)
+
+- http/2: unstick uploads
+
+  - refs #11157 and #11175 where uploads get stuck or lead to RST streams
+  - fixes our h2 send behaviour to continue sending in the nghttp2 session
+    as long as it wants to. This will empty our send buffer as long as
+    the remote stream/connection window allows.
+  - in case the window is exhausted, the data remaining in the send buffer
+    will wait for a WINDOW_UPDATE from the server. Which is a socket event
+    that engages our transfer loop again
+  - the problem in the issue was that we did not exhaust the window, but
+    left data in the sendbuffer and no further socket events did happen.
+    The server was just waiting for us to send more.
+  - relatedly, there was an issue fixed that closing a stream with KEEP_HOLD
+    set kept the transfer from shutting down - as it should have - leading
+    to a timeout.
+
+  Closes #11176
+
+Daniel Stenberg (21 May 2023)
+
+- workflows/macos: add a job using gcc + debug + secure transport
+
+Jay Satiro (21 May 2023)
+
+- lib: fix conversion warnings with gcc on macOS
+
+Daniel Stenberg (21 May 2023)
+
+- sectransp.c: make the code c89 compatible
+
+  Follow-up to dd2bb485521c2ec713001b3a
+
+  Reported-by: FeignClaims on github
+  Fixes #11155
+  Closes #11159
+
+Emanuele Torre (21 May 2023)
+
+- Revert "urlapi: respect CURLU_ALLOW_SPACE and CURLU_NO_AUTHORITY for redirect
+  s"
+
+  This reverts commit df6c2f7b544f1f35f2a3e0be11f345affeb6fe9c.
+  (It only keep the test case that checks redirection to an absolute URL
+  without hostname and CURLU_NO_AUTHORITY).
+
+  I originally wanted to make CURLU_ALLOW_SPACE accept spaces in the
+  hostname only because I thought
+  curl_url_set(CURLUPART_URL, CURLU_ALLOW_SPACE) was already accepting
+  them, and they were only not being accepted in the hostname when
+  curl_url_set(CURLUPART_URL) was used for a redirection.
+
+  That is not actually the case, urlapi never accepted hostnames with
+  spaces, and a hostname with a space in it never makes sense.
+  I probably misread the output of my original test when I they were
+  normally accepted when using CURLU_ALLOW_SPACE, and not redirecting.
+
+  Some other URL parsers seems to allow space in the host part of the URL,
+  e.g. both python3's urllib.parse module, and Chromium's javascript URL
+  object allow spaces (chromium percent escapes the spaces with %20),
+  (they also both ignore TABs, and other whitespace characters), but those
+  URLs with spaces in the hostname are useless, neither python3's requests
+  module nor Chromium's window.location can actually use them.
+
+  There is no reason to add support for URLs with spaces in the host,
+  since it was not a inconsistency bug; let's revert that patch before it
+  makes it into release. Sorry about that.
+
+  I also reverted the extra check for CURLU_NO_AUTHORITY since that does
+  not seem to be necessary, CURLU_NO_AUTHORITY already worked for
+  redirects.
+
+  Closes #11169
+
+Dan Fandrich (20 May 2023)
+
+- runtests: use the correct fd after select
+
+  The code was using the wrong fd when determining which runner was ready
+  with a response.
+
+  Ref: #10818
+  Closes #11160
+
+- test425: fix the log directory for the upload
+
+  This must be %LOGDIR to let it work with parallel tests.
+
+  Ref: #10969
+
+- runtests: handle interrupted reads from IPC pipes
+
+  These can be interrupted by signals, especially SIGINT to shut down, and
+  must be restarted so the IPC call arrives correctly. If the read just
+  returns an error instead, the IPC calling state will go out of sync and
+  a proper shutdown won't happen.
+
+  Ref: #10818
+
+Stefan Eissing (20 May 2023)
+
+- http2: upload improvements
+
+  Make send buffer smaller to have progress and "upload done" reporting
+  closer to reality. Fix handling of send "drain" condition to no longer
+  trigger once the transfer loop reports it is done sending. Also do not
+  trigger the send "drain" on RST streams.
+
+  Background:
+  - a upload stall was reported in #11157 that timed out
+  - test_07_33a reproduces a problem with such a stall if the
+    server 404s the request and RSTs the stream.
+  - test_07_33b verifies a successful PUT, using the parameters
+    from #11157 and checks success
+
+  Ref: #11157
+  Closes #11165
+
+- http2: increase stream window size to 10 MB
+
+  Reported-by: pandada8 on github
+
+  Fixes #11162
+  Closes #11167
+
+Daniel Stenberg (20 May 2023)
+
+- lib: rename struct 'http_req' to 'httpreq'
+
+  Because FreeBSD 14 kidnapped the name.
+  Ref: https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=271526
+
+  Fixes #11163
+  Closes #11164
+
+Viktor Szakats (20 May 2023)
+
+- cmake: avoid `list(PREPEND)` for compatibility
+
+  `list(PREPEND)` requires CMake v3.15, our minimum is v3.7.
+
+  Ref: https://cmake.org/cmake/help/latest/command/list.html#prepend
+
+  Regression from 1e3319a167d2f32d295603167486e9e88af9bb4e
+
+  Reported-by: Keitagit-kun on Github
+  Fixes #11141
+  Closes #11144
+
+Daniel Stenberg (19 May 2023)
+
+- RELEASE-NOTES: synced
+
+Stefan Eissing (19 May 2023)
+
+- ngtcp2: proper handling of uint64_t when adjusting send buffer
+
+  Fixes #11149
+  Closes #11153
+
+- ngtcp2: fix compiler warning about possible null-deref
+
+  - compiler analyzer did not include the call context for this
+    static function where the condition had already been checked.
+  - eleminating the problem by making stream a call parameter
+
+  Fixes #11147
+  Closes #11151
+
+Emanuele Torre (19 May 2023)
+
+- docs: document that curl_url_cleanup(NULL) is a safe no-op
+
+  This has always been the case, but it was not documented.
+
+  The paragraph was copied verbatim from curl_easy_cleanup.3
+
+  Closes #11150
+
+Antoine Pitrou (19 May 2023)
+
+- select: avoid returning an error on EINTR from select() or poll()
+
+  This was already done for the poll() and select() calls
+  made directly from Curl_poll(), but was missed in
+  Curl_wait_ms(), which is called when there are no fds
+  to wait on.
+
+  Fixes #11135
+  Closes #11143
+
+Daniel Stenberg (19 May 2023)
+
+- vquic.c: make recvfrom_packets static, avoid compiler warning
+
+  warning: no previous prototype for 'recvfrom_packets'
+
+  Reported-by: Keitagit-kun on github
+  Fixes #11146
+  Closes #11148
+
+- urlapi: allow numerical parts in the host name
+
+  It can only be an IPv4 address if all parts are all digits and no more than
+  four parts, otherwise it is a host name. Even slightly wrong IPv4 will now be
+  passed through as a host name.
+
+  Regression from 17a15d88467 shipped in 8.1.0
+
+  Extended test 1560 accordingly.
+
+  Reported-by: Pavel Kalyugin
+  Fixes #11129
+  Closes #11131
+
+Emilio Cobos Álvarez (19 May 2023)
+
+- http2: double http request parser max line length
+
+  This works around #11138, by doubling the limit, and should be a
+  relatively safe fix.
+
+  Ideally the buffer would grow as needed and there would be no need for a
+  limit? But that might be follow-up material.
+
+  Fixes #11138
+  Closes #11139
+
+Emanuele Torre (18 May 2023)
+
+- configure: fix --help alignment
+
+  AC_ARG_ENABLE seems to only trim off whitespace from the start and end
+  of its help-string argument, while prepending two spaces of indentation
+  to all lines.
+
+  This means that the two spaces of indentation between the --enable-rtsp
+  and the --disable-rtsp line were not removed causing ./configure --help
+  to print:
+
+    Optional Features:
+      [...]
+      --enable-rtsp           Enable RTSP support
+        --disable-rtsp          Disable RTSP support
+
+  I removed the indentation to fix the issue, now it prints:
+
+    Optional Features:
+      [...]
+      --enable-rtsp           Enable RTSP support
+      --disable-rtsp          Disable RTSP support
+
+  The --enable-hsts and --disable-hsts lines had the same problems, and
+  have been fixed too.
+
+  Closes #11142
+
+Deal(一线灵) (18 May 2023)
+
+- cmake: repair cross compiling
+
+  It cannot *run* code for testing purposes when cross-compiling.
+
+  Closes #11130
+
+Daniel Stenberg (18 May 2023)
+
+- configure: generate a script to run the compiler
+
+  in the CURL_RUN_IFELSE macro, with LD_LIBRARY_PATH set to the value of
+  the configure invoke, and not the value that might be used later,
+  intended for the execution of the output the compiler ouputs.
+
+  For example when the compiler uses the same library (like libz) that
+  configure checks for.
+
+  Reported-by: Jonas Bülow
+  Fixes #11114
+  Closes #11120
+
+Stefan Eissing (18 May 2023)
+
+- cf-socket: completely remove the disabled USE_RECV_BEFORE_SEND_WORKAROUND
+
+  Closes #11118
+
+Emanuele Torre (18 May 2023)
+
+- urlapi: respect CURLU_ALLOW_SPACE and CURLU_NO_AUTHORITY for redirects
+
+  curl_url_set(uh, CURLUPART_URL, redirurl, flags)  was not respecing
+  CURLU_ALLOW_SPACE and CURLU_NO_AUTHORITY in the host part of redirurl
+  when redirecting to an absolute URL.
+
+  Closes #11136
+
+Colin Cross (18 May 2023)
+
+- hostip: move easy_lock.h include above curl_memory.h
+
+  Similar to #9561, move easy_lock.h above curl_memory.h to fix building
+  against musl libc.
+
+  Closes #11140
+
+Hind Montassif (18 May 2023)
+
+- curl_easy_getinfo: clarify on return data types
+
+  Closes #11126
+
+Emanuele Torre (18 May 2023)
+
+- checksrc: disallow spaces before labels
+
+  Out of 415 labels throughout the code base, 86 of those labels were
+  not at the start of the line. Which means labels always at the start of
+  the line is the favoured style overall with 329 instances.
+
+  Out of the 86 labels not at the start of the line:
+  * 75 were indented with the same indentation level of the following line
+  * 8 were indented with exactly one space
+  * 2 were indented with one fewer indentation level then the following
+    line
+  * 1 was indented with the indentation level of the following line minus
+    three space (probably unintentional)
+
+  Co-Authored-By: Viktor Szakats
+
+  Closes #11134
+
+Daniel Stenberg (18 May 2023)
+
+- cookie: update the comment on cookie length and size limits
+
+  To refer to the proper cookie RFC and the upcoming RFC refresh.
+
+  Closes #11127
+
+- url: provide better error message when URLs fail to parse
+
+  By providing the URL API error message into the error message.
+
+  Ref: #11129
+  Closes #11137
+
+- RELEASE-NOTES: synced
+
+  bumped to 8.1.1
+
+Jon Rumsey (18 May 2023)
+
+- os400: update chkstrings.c
+
+  Compensate changes for recent changes to urldata.h to reclassify
+  STRING_AWS_SIGV4.
+
+  Fixes #11132
+  Closes #11133
+
 Version 8.1.0 (17 May 2023)
 
 Daniel Stenberg (17 May 2023)
@@ -8649,568 +9243,3 @@ Daniel Stenberg (18 Nov 2022)
   Reported-by: Andy Stamp
   Fixes #9937
   Closes #9939
-
-Alexandre Ferrieux (18 Nov 2022)
-
-- CURLOPT_QUICK_EXIT: don't wait for DNS thread on exit
-
-  Fixes #2975
-  Closes #9147
-
-Daniel Stenberg (17 Nov 2022)
-
-- HTTP-COOKIES.md: mention that http://localhost is a secure context
-
-  Reported-by: Trail of Bits
-
-  Closes #9938
-
-- lib: parse numbers with fixed known base 10
-
-  ... instead of using 0 argument that allows decimal, hex or octal when
-  the number is documented and assumed to use base 10.
-
-  Closes #9933
-
-- RELEASE-NOTES: synced
-
-- scripts/delta: adapt to curl.h changes for the opt counter
-
-- cookie: expire cookies at once when max-age is negative
-
-  Update test 329 to verify
-
-  Reported-by: godmar on github
-  Fixes #9930
-  Closes #9932
-
-Stefan Eissing (17 Nov 2022)
-
-- proxy: haproxy filter is only available when PROXY and HTTP are
-
-  Closes #9935
-
-Daniel Stenberg (16 Nov 2022)
-
-- OtherTests.cmake: check for cross-compile, not for toolchain
-
-  Build systems like vcpkg alway sets `CMAKE_TOOLCHAIN_FILE` so it should
-  not be used as a sign that this is a cross-compile.
-
-  Also indented the function correctly.
-
-  Reported-by: Philip Chan
-  Fixes #9921
-  Closes #9923
-
-- ntlm: improve comment for encrypt_des
-
-  Reported-by: Andrei Rybak
-  Fixes #9903
-  Closes #9925
-
-- include/curl/curl.h: bump the deprecated requirements to gcc 5.3
-
-  Reported-by: Stephan Guilloux
-  Fixes #9917
-  Closes #9918
-
-Stefan Eissing (15 Nov 2022)
-
-- proxy: refactor haproxy protocol handling as connection filter
-
-  Closes #9893
-
-Patrick Monnerat (15 Nov 2022)
-
-- lib: feature deprecation warnings in gcc >= 4.3
-
-  Add a deprecated attribute to functions and enum values that should not
-  be used anymore.
-  This uses a gcc 4.3 dialect, thus is only available for this version of
-  gcc and newer. Note that the _Pragma() keyword is introduced by C99, but
-  is available as part of the gcc dialect even when compiling in C89 mode.
-
-  It is still possible to disable deprecation at a calling module compile
-  time by defining CURL_DISABLE_DEPRECATION.
-
-  Gcc type checking macros are made aware of possible deprecations.
-
-  Some testing support Perl programs are adapted to the extended
-  declaration syntax.
-
-  Several test and unit test C programs intentionally use deprecated
-  functions/options and are annotated to not generate a warning.
-
-  New test 1222 checks the deprecation status in doc and header files.
-
-  Closes #9667
-
-Daniel Stenberg (15 Nov 2022)
-
-- log2changes.pl: wrap long lines at 80 columns
-
-  Also, only use author names in the output.
-
-  Fixes #9896
-  Reported-by: John Sherrill
-  Closes #9897
-
-- cfilters: use %zu for outputting size_t
-
-  Detected by Coverity CID 1516894
-
-  Closes #9907
-
-- Curl_closesocket: avoid using 'conn' if NULL
-
-  ... in debug-only code.
-
-  Reported by Coverity CID 1516896
-
-  Closes #9907
-
-- url: only acknowledge fresh_reuse for non-followed transfers
-
-  ... to make sure NTLM auth sticks to the connection it needs, as
-  verified by 2032.
-
-  Follow-up to fa0b9227616e
-
-  Assisted-by: Stefan Eissing
-  Closes #9905
-
-- netrc.d: provide mutext info
-
-  Reported-by: xianghongai on github
-  Fixes #9899
-  Closes #9901
-
-- cmdline-opts/page-footer: remove long option nroff formatting
-
-  As gen.pl adds them
-
-- nroff-scan.pl: detect double highlights
-
-- cmdline-opts/gen.pl: fix the linkifier
-
-  Improved logic for finding existing --options in text and replacing with
-  the full version with nroff syntax. This also makes the web version link
-  options better.
-
-  Reported-by: xianghongai on github
-  Fixes #9899
-  Closes #9902
-
-Patrick Monnerat (14 Nov 2022)
-
-- tool: use feature names instead of bit mask, when possible
-
-  If the run-time libcurl is too old to support feature names, the name
-  array is created locally from the bit masks. This is the only sequence
-  left that uses feature bit masks.
-
-  Closes #9583
-
-- docs: curl_version_info is not thread-safe before libcurl initialization
-
-  Closes #9583
-
-- version: add a feature names array to curl_version_info_data
-
-  Field feature_names contains a null-terminated sorted array of feature
-  names. Bitmask field features is deprecated.
-
-  Documentation is updated. Test 1177 and tests/version-scan.pl updated to
-  match new documentation format and extended to check feature names too.
-
-  Closes #9583
-
-Stefan Eissing (14 Nov 2022)
-
-- negtelnetserver.py: have it call its close() method
-
-  Closes #9894
-
-Nathan Moinvaziri (13 Nov 2022)
-
-- ntlm: silence ubsan warning about copying from null target_info pointer.
-
-  runtime error: null pointer passed as argument 2, which is declared to
-  never be null
-
-  Closes #9898
-
-Daniel Stenberg (12 Nov 2022)
-
-- RELEASE-NOTES: synced
-
-Stefan Eissing (12 Nov 2022)
-
-- Websocket: fixes for partial frames and buffer updates.
-
-  - buffers updated correctly when handling partial frames
-  - callbacks no longer invoked for incomplete payload data of 0 length
-  - curl_ws_recv no longer returns with 0 length partial payload
-
-  Closes #9890
-
-Daniel Stenberg (12 Nov 2022)
-
-- tool_operate: provide better errmsg for -G with bad URL
-
-  If the URL that -G would try to add a query to could not be parsed, it would
-  display
-
-   curl: (27) Out of memory
-
-  It now instead shows:
-
-   curl: (2) Could not parse the URL, failed to set query
-
-  Reported-by: Alex Xu
-  Fixes #9889
-  Closes #9892
-
-- vtls: fix build without proxy support
-
-  Follow-up to dafdb20a26d0c890
-
-  Closes #9895
-
-- tool_getparam: make --no-get work as the opposite of --get
-
-  ... as documented.
-
-  Closes #9891
-
-- http: mark it 'this_is_a_follow' in the Location: logic
-
-  To make regular auth "reloads" to not count as redirects.
-
-  Verified by test 3101
-
-  Fixes #9885
-  Closes #9887
-
-Viktor Szakats (11 Nov 2022)
-
-- config-win32: fix SIZEOF_OFF_T for MSVC and old MinGW
-
-  The previously set default value of 8 (64-bit) is only correct for
-  mingw-w64 and only when we set `_FILE_OFFSET_BITS` to 64 (the default
-  when building curl). For MSVC, old MinGW and other Windows compilers,
-  the correct value is 4 (32-bit). Adjust condition accordingly. Also
-  drop the manual override option.
-
-  Regression in 7.86.0 (from 68fa9bf3f5d7b4fcbb57619f70cb4aabb79a51f6)
-
-  Bug: https://github.com/curl/curl/pull/9712#issuecomment-1307330551
-
-  Reported-by: Peter Piekarski
-  Reviewed-by: Jay Satiro
-
-  Closes #9872
-
-Daniel Stenberg (11 Nov 2022)
-
-- lib: remove bad set.opt_no_body assignments
-
-  This struct field MUST remain what the application set it to, so that
-  handle reuse and handle duplication work.
-
-  Instead, the request state bit 'no_body' is introduced for code flows
-  that need to change this in run-time.
-
-  Closes #9888
-
-Stefan Eissing (11 Nov 2022)
-
-- lib: connection filters (cfilter) addition to curl:
-
-   - general construct/destroy in connectdata
-   - default implementations of callback functions
-   - connect: cfilters for connect and accept
-   - socks: cfilter for socks proxying
-   - http_proxy: cfilter for http proxy tunneling
-   - vtls: cfilters for primary and proxy ssl
-   - change in general handling of data/conn
-   - Curl_cfilter_setup() sets up filter chain based on data settings,
-     if none are installed by the protocol handler setup
-   - Curl_cfilter_connect() boot straps filters into `connected` status,
-     used by handlers and multi to reach further stages
-   - Curl_cfilter_is_connected() to check if a conn is connected,
-     e.g. all filters have done their work
-   - Curl_cfilter_get_select_socks() gets the sockets and READ/WRITE
-     indicators for multi select to work
-   - Curl_cfilter_data_pending() asks filters if the have incoming
-     data pending for recv
-   - Curl_cfilter_recv()/Curl_cfilter_send are the general callbacks
-     installed in conn->recv/conn->send for io handling
-   - Curl_cfilter_attach_data()/Curl_cfilter_detach_data() inform filters
-     and addition/removal of a `data` from their connection
-   - adding vtl functions to prevent use of Curl_ssl globals directly
-     in other parts of the code.
-
-  Reviewed-by: Daniel Stenberg
-  Closes #9855
-
-- curl-rustls.m4: on macOS, rustls also needs the Security framework
-
-  Closes #9883
-
-Daniel Stenberg (10 Nov 2022)
-
-- rtsp: only store first_host once
-
-  Suggested-by: Erik Janssen
-  URL: https://github.com/curl/curl/pull/9870#issuecomment-1309499744
-  Closes #9882
-
-Fata Nugraha (10 Nov 2022)
-
-- test3028: verify PROXY
-
-- http: do not send PROXY more than once
-
-  Unlike `CONNECT`, currently we don't keep track whether `PROXY` is
-  already sent or not. This causes `PROXY` header to be sent twice during
-  `MSTATE_TUNNELING` and `MSTATE_PROTOCONNECT`.
-
-  Closes #9878
-  Fixes #9442
-
-Jay Satiro (10 Nov 2022)
-
-- lib: add CURL_WRITEFUNC_ERROR to signal write callback error
-
-  Prior to this change if the user wanted to signal an error from their
-  write callbacks they would have to use logic to return a value different
-  from the number of bytes (nmemb) passed to the callback. Also, the
-  inclination of some users has been to just return 0 to signal error,
-  which is incorrect as that may be the number of bytes passed to the
-  callback.
-
-  To remedy this the user can now return CURL_WRITEFUNC_ERROR instead.
-
-  Ref: https://github.com/curl/curl/issues/9873
-
-  Closes https://github.com/curl/curl/pull/9874
-
-Daniel Stenberg (9 Nov 2022)
-
-- Revert "GHA: add scorecard.yml"
-
-  This reverts commit ca76c79b34f9d90105674a2151bf228ff7b13bef.
-
-- GHA: add scorecard.yml
-
-  add a "scorecard" scanner job
-
-Lorenzo Miniero (9 Nov 2022)
-
-- test3100: RTSP Basic authentication
-
-  Closes #9449
-
-Daniel Stenberg (9 Nov 2022)
-
-- rtsp: fix RTSP auth
-
-  Verified with test 3100
-
-  Fixes #4750
-  Closes #9870
-
-- KNOWN_BUGS: remove eight entries
-
-  - 1.2 Multiple methods in a single WWW-Authenticate: header
-
-  This is not considered a bug anymore but a restriction and one that we
-  keep because we have NEVER gotten this reported by users in the wild and
-  because of this I consider this a fringe edge case we don't need to
-  support.
-
-  - 1.6 Unnecessary close when 401 received waiting for 100
-
-  This is not a bug, but possibly an optimization that *can* be done.
-
-  - 1.7 Deflate error after all content was received
-
-  This is not a curl bug. This happens due to broken servers.
-
-  - 2.1 CURLINFO_SSL_VERIFYRESULT has limited support
-
-  This is not a bug. This is just the nature of the implementation.
-
-  - 2.2 DER in keychain
-
-  This is not a bug.
-
-  - 5.7 Visual Studio project gaps
-
-  This is not a bug.
-
-  - 15.14 cmake build is not thread-safe
-
-  Fixed in 109e9730ee5e2b
-
-  - 11.3 Disconnects do not do verbose
-
-  This is not a bug.
-
-  Closes #9871
-
-Hirotaka Tagawa (9 Nov 2022)
-
-- headers: add endif comments
-
-  Closes #9853
-
-Daniel Stenberg (8 Nov 2022)
-
-- test1221: verify --url-query
-
-- curl: add --url-query
-
-  This option adds a piece of data, usually a name + value pair, to the
-  end of the URL query part. The syntax is identical to that used for
-  --data-urlencode with one extension:
-
-  If the argument starts with a '+' (plus), the rest of the string is
-  provided as-is unencoded.
-
-  This allows users to "build" query parts with options and URL encoding
-  even when not doing GET requests, which the already provided option -G
-  (--get) is limited to.
-
-  This idea was born in a Twitter thread.
-
-  Closes #9691
-
-- maketgz: set the right version in lib/libcurl.plist
-
-  Follow-up to e498a9b1fe5964a18eb2a3a99dc52
-
-  Make sure the tarball gets a version of the libcurl.plist file that is
-  updated with the new version string.
-
-  Reported-by: jvreelanda on github
-  Fixes #9866
-  Closes #9867
-
-- RELEASE-NOTES: synced
-
-  Bumped version to 7.87.0
-
-Michael Drake (8 Nov 2022)
-
-- curl.h: add CURLOPT_CA_CACHE_TIMEOUT option
-
-  Adds a new option to control the maximum time that a cached
-  certificate store may be retained for.
-
-  Currently only the OpenSSL backend implements support for
-  caching certificate stores.
-
-  Closes #9620
-
-- openssl: reduce CA certificate bundle reparsing by caching
-
-  Closes #9620
-
-Rose (8 Nov 2022)
-
-- lib: fix some type mismatches and remove unneeded typecasts
-
-  Many of these castings are unneeded if we change the variables to work
-  better with each other.
-
-  Ref: https://github.com/curl/curl/pull/9823
-
-  Closes https://github.com/curl/curl/pull/9835
-
-Daniel Stenberg (8 Nov 2022)
-
-- cookie: compare cookie prefixes case insensitively
-
-  Adapted to language in rfc6265bis draft-11.
-
-  Closes #9863
-
-  Reviewed-by: Daniel Gustafsson
-
-- tool_operate: when aborting, make sure there is a non-NULL error buffer
-
-  To store custom errors in. Or SIGSEGVs will follow.
-
-  Reported-by: Trail of Bits
-  Closes #9865
-
-- WEBSOCKET.md: fix broken link
-
-  Reported-by: Felipe Gasper
-  Bug: https://curl.se/mail/lib-2022-10/0097.html
-  Closes #9864
-
-- CURLOPT_DEBUGFUNCTION.3: do not assume nul-termination in example
-
-  Reported-by: Oskar Sigvardsson
-
-  Bug: https://curl.se/mail/lib-2022-11/0016.html
-
-  Closes #9862
-
-Stefan Eissing (7 Nov 2022)
-
-- websockets: fix handling of partial frames
-
-  buffer used and send length calculations are fixed when a partial
-  websocket frame has been received.
-
-  Closes #9861
-
-Daniel Stenberg (7 Nov 2022)
-
-- mailmap: unify Stefan Eissing
-
-Stefan Eissing (7 Nov 2022)
-
-- hyper: fix handling of hyper_task's when reusing the same address
-
-  Fixes #9840
-  Closes #9860
-
-Jay Satiro (7 Nov 2022)
-
-- ws: return CURLE_NOT_BUILT_IN when websockets not built in
-
-  - Change curl_ws_recv & curl_ws_send to return CURLE_NOT_BUILT_IN when
-    websockets support is not built in.
-
-  Prior to this change they returned CURLE_OK.
-
-  Closes #9851
-
-Daniel Stenberg (7 Nov 2022)
-
-- noproxy: tailmatch like in 7.85.0 and earlier
-
-  A regfression in 7.86.0 (via 1e9a538e05c010) made the tailmatch work
-  differently than before. This restores the logic to how it used to work:
-
-  All names listed in NO_PROXY are tailmatched against the used domain
-  name, if the lengths are identical it needs a full match.
-
-  Update the docs, update test 1614.
-
-  Reported-by: Stuart Henderson
-  Fixes #9842
-  Closes #9858
-
-- configure: require fork for NTLM-WB
-
-  Reported-by: ウさん
-
-  Fixes #9847
-  Closes #9856
