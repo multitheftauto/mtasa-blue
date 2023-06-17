@@ -18,7 +18,6 @@
 #include "CClient.h"
 #include "CConsoleClient.h"
 #include "CPlayer.h"
-#include "CGame.h"
 
 CRegisteredCommands::CRegisteredCommands(CAccessControlListManager* pACLManager)
 {
@@ -35,9 +34,6 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
 {
     assert(pLuaMain);
     assert(szKey);
-
-    if (g_pGame->GetConsole()->GetCommand(szKey))
-        return false;
 
     // Check if we already have this key and handler
     SCommand* pCommand = GetCommand(szKey, pLuaMain);

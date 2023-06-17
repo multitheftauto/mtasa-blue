@@ -280,7 +280,7 @@ void CTileBatcher::AddTile(float fX1, float fY1, float fX2, float fY2, float fU1
 
     uint uiTessellationX = 1;
     uint uiTessellationY = 1;
-    bool bUseCustomMatrices{ false };
+    bool bUseCustomMatrices{false};
 
     // Get settings from shader
     if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
