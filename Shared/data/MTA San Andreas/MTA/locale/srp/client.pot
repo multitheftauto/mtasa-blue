@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 17:07+0000\n"
-"PO-Revision-Date: 2023-06-16 18:08\n"
+"PO-Revision-Date: 2023-06-20 17:48\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -44,7 +44,7 @@ msgstr "otvori unos ćaskanja"
 
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
-msgstr "prenos glasa drugom igraču"
+msgstr "prenos glasa drugim igračima"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
@@ -88,7 +88,7 @@ msgstr "pomeranje radara zapadno"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
-msgstr "spaja radar"
+msgstr "spajanje radara"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
@@ -104,29 +104,29 @@ msgstr "uključi/isključi pomoćni tekst za radar"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
-msgstr "salje poruku odabranom igraču"
+msgstr "slanje poruke odabranom igraču"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "promena na sledeće oružje dok ste u vozilu"
+msgstr "promena na sledeće oružje dok ste unutar vozila"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "promena na prethodno oružje dok ste u vozilu"
+msgstr "promena na prethodno oružje dok ste unutar vozila"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr "prikazuje info o trenutnom serveru"
+msgstr "prikaz informacija o trenutnom serveru"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr "definiše skalu množenja svih text-displeja"
+msgstr "definiše skalu množenja svih tekstualnih prikaza"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
-msgstr "(Razvojni mod) pokazuje oblik sudara"
+msgstr "(Razvojni mod) pokazuje oblik granice sudara objekata"
 
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
@@ -168,7 +168,7 @@ msgstr "Maksimalno igrača:"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "Razglasi:"
+msgstr "Emitovanje:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
