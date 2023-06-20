@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 17:07+0000\n"
-"PO-Revision-Date: 2023-06-16 18:07\n"
+"PO-Revision-Date: 2023-06-20 17:48\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -27,11 +27,11 @@ msgstr "oyundan ayrıl"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
-msgstr "isim etikletlerini göster"
+msgstr "isim etiketlerini gösterir"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
-msgstr "konuşma kutusunu göster"
+msgstr "konuşma kutusunu gösterir"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
@@ -60,7 +60,7 @@ msgstr "önceki radyo kanalı"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr "radar bakışını aktif eder"
+msgstr "radarı aktif eder"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
@@ -68,7 +68,7 @@ msgstr "radarı yakınlaştırır"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the radar out"
-msgstr "radarı dışarı zumlar"
+msgstr "radarı uzaklaştırır"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the radar north"
@@ -88,7 +88,7 @@ msgstr "radarı batıya taşır"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
-msgstr "radarı ekler"
+msgstr "radarı sabitler"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
@@ -121,7 +121,7 @@ msgstr "mevcut sunucu hakkında bilgi sunar"
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr "yazı görüntülerinin boyut artırıcısının ayarını belirtir"
+msgstr "yazı görüntülerinin boyut ayarını belirtir"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
@@ -186,7 +186,7 @@ msgstr "Seçili"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
-msgstr "Tüm"
+msgstr "Tümü"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
@@ -227,7 +227,7 @@ msgstr "Bağlantı kesildi: Yasaklandınız.\n"
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "Bağlantı kesildi: Hesap yasaklandı.\n"
+msgstr "Bağlantı kesildi: Hesap yasaklı.\n"
 "Gerekçe: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
@@ -242,7 +242,7 @@ msgstr "Bağlantı kesildi: Giriş trafiği. Lütfen bir dakika bekleyin, ardın
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr "Bağlantı kesildi: Server farklı branştan.\n"
+msgstr "Bağlantı kesildi: Server farklı branch'tan.\n"
 "Bilgi: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
@@ -362,7 +362,7 @@ msgstr "Farklı bir programın MTA:SA'yı değiştirmediğinden emin olun"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Time Remaining: "
-msgstr "Kalan Süre:"
+msgstr "Kalan Süre: "
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
 #, c-format
@@ -439,7 +439,7 @@ msgstr "Hata"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Geçersiz nick! Ayarlardan yeni bir isim belirleyin!"
+msgstr "Geçersiz isim! Ayarlardan yeni bir isim belirleyin!"
 
 #. Display the status box
 #: Client/mods/deathmatch/logic/CClientGame.cpp:604
@@ -657,7 +657,7 @@ msgstr "Uzaklaştır"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr "Giriş/Çıkış"
+msgstr "Gir/Çık"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
@@ -715,7 +715,7 @@ msgstr "Geriye/yukarıya yönlendir"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr "İvme"
+msgstr "Gaz"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
@@ -822,8 +822,8 @@ msgstr "MTA:SA %s gerekli"
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr "Bu sunucuya girebilmek için MTA:SA %s gerekiyor.\n\n"
-"MTA:SA %s versiyonunu indirip yüklemek ister misiniz?"
+msgstr "Bu sunucuya girebilmek için MTA:SA'nın %s versiyonu gerekiyor.\n\n"
+"MTA:SA'nın %s versiyonunu indirip yüklemek ister misiniz?"
 
 #: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
 #: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
@@ -855,7 +855,7 @@ msgstr "Evet"
 #: Client/core/CVersionUpdater.cpp:1588
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "MTA:SA %s versiyonunu çalıştırıp bu sunucuyua bağlanmak ister misiniz?"
+msgstr "MTA:SA'nın %s versiyonunu çalıştırıp bu sunucuya bağlanmak ister misiniz?"
 
 #: Client/core/CVersionUpdater.cpp:1606
 msgid "It is not possible to connect at this time.\n\n"
@@ -1066,7 +1066,7 @@ msgstr "Joypad ayarları"
 
 #: Client/core/CSettings.cpp:230
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Standart kontroller (Mouse + Klavye)"
+msgstr "Standart kontroller (Fare + Klavye)"
 
 #: Client/core/CSettings.cpp:237
 msgid "Classic controls (Joypad)"
@@ -1133,7 +1133,7 @@ msgstr "İndirme penceresini her zaman göster"
 
 #: Client/core/CSettings.cpp:391
 msgid "Use customized GTA:SA files"
-msgstr "Modifiye edilmiş GTA San Andreas dosyalarını kullan"
+msgstr "Değiştirilmiş GTA San Andreas dosyalarını kullan"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"
@@ -1152,7 +1152,7 @@ msgstr "Ana ses:"
 
 #: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:450
 msgid "Radio volume:"
-msgstr "Radyo Ses seviyesi:"
+msgstr "Radyo ses seviyesi:"
 
 #: Client/core/CSettings.cpp:422 Client/core/CSettings.cpp:469
 msgid "SFX volume:"
@@ -1363,7 +1363,7 @@ msgstr "Isı bulanıklığı"
 
 #: Client/core/CSettings.cpp:807
 msgid "Tyre Smoke etc"
-msgstr "Lastik dumanı vs."
+msgstr "Lastik Dumanı vs"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
@@ -1557,7 +1557,7 @@ msgstr "İndirilen sunucu dosyaları: "
 
 #: Client/core/CSettings.cpp:1155
 msgid "Show in Explorer"
-msgstr "Dosyaları göster"
+msgstr "Dosyalarda göster"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:1173
@@ -1585,13 +1585,13 @@ msgstr "YENİDEN BAŞLATMA GEREKİYOR"
 
 #: Client/core/CSettings.cpp:1388
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Şu anki sunucudan çıktığınızda bazı ayarlar değiştirilicektir."
+msgstr "Şu anki sunucudan çıktığınızda bazı ayarlar değiştirilecektir"
 
 #: Client/core/CSettings.cpp:1389
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
-"Bağlantıyı şimdi kesmek ister misiniz?"
+"Bağlantıyı şimdi kesmek istiyor musun?"
 
 #: Client/core/CSettings.cpp:1392
 msgid "DISCONNECT REQUIRED"
