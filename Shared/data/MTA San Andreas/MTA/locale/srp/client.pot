@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 17:07+0000\n"
-"PO-Revision-Date: 2023-06-20 18:48\n"
+"PO-Revision-Date: 2023-06-20 19:48\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -1748,11 +1748,11 @@ msgstr "Završi nadimak koristeći \"Tab\" dugme"
 
 #: Client/core/CSettings.cpp:2333
 msgid "Allow server to flash the window"
-msgstr "Dozvoli server da blica prozor"
+msgstr "Dozvoli serveru da blica taskbar ikonicu"
 
 #: Client/core/CSettings.cpp:2338
 msgid "Allow tray balloon notifications"
-msgstr "Dozvoli tray balon notifikacije"
+msgstr "Dozvoli windows notifikacije"
 
 #: Client/core/CSettings.cpp:2343
 msgid "Chat text black/white outline"
@@ -1901,7 +1901,7 @@ msgstr "Uključite da koristite samo jednu konekciju prilikom skidanja."
 
 #: Client/core/CSettings.cpp:4718
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "Tagujte mrežne pakete da pomognete ISP-ovima da identifikuju MTA saobraćaj."
+msgstr "Tagujte mrežne pakete da pomognete ISP-ovima da identifikuju MTA protok."
 
 #: Client/core/CSettings.cpp:4720
 msgid "Spinning circle animation at the bottom of the screen"
@@ -1933,7 +1933,7 @@ msgstr "16-bitna boja:"
 
 #: Client/core/CSettings.cpp:4730
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "Omogući 16-bitni režim boja - Zahteva MTA restart"
+msgstr "Omogući 16-bitni režim boja - Zahteva ponovno pokretanje MTA"
 
 #: Client/core/CSettings.cpp:4732
 msgid "Mouse fix:"
@@ -1941,7 +1941,7 @@ msgstr "Popravka miša:"
 
 #: Client/core/CSettings.cpp:4732
 msgid "Mouse movement fix - May need PC restart"
-msgstr "Popravka pokretnja miša - Možda zahteva PC restart"
+msgstr "Popravka pokretanja miša - Možda zahteva ponovno pokretanje računara"
 
 #: Client/core/CScreenShot.cpp:104
 #, c-format
@@ -1959,7 +1959,7 @@ msgstr "Slika ekrana je slikana: '%s'"
 
 #: Client/core/CMainMenu.cpp:321
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Koristite feature-branch build! Ovo je samo test build koji ne može da se koristi za povezivanje na javne servere!"
+msgstr "Koristite feature-branch osnovu! Ovo je test osnova koja ne može da se koristi za povezivanje na javne servere!"
 
 #: Client/core/CMainMenu.cpp:340
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
@@ -2636,7 +2636,7 @@ msgstr "MTA:SA ne može da se pokrene zato što nije uspelo kopiranje datoteke:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA ne može da se pokrene zato što MTA:SA datoteka je netačna ili nedostaje:"
+msgstr "MTA:SA ne može da se pokrene zato što je netačna MTA:SA datoteka ili ona nedostaje:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -2644,7 +2644,7 @@ msgstr "Kopiraj MTA:SA datoteke"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "MTA:SA ne može da se pokrene žato što GTA:SA datoteka je netačna ili nedostaje:"
+msgstr "MTA:SA ne može da se pokrene žato što je netačna GTA:SA datoteka ili ona nedostaje:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -2656,7 +2656,7 @@ msgstr "MTA:SA ne može da se pokrene zato što je GTA:SA izvršna aplikacija ne
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Molimo proverite vaš anti-virus za lažno-pozitivne detekcije, pokušajte da dodate izuzetak za GTA:SA izvršnu aplikaciju i restartujte MTA:SA."
+msgstr "Molimo proverite vaš anti-virus za lažno-pozitivne detekcije, pokušajte da dodate izuzetak za GTA:SA izvršnu aplikaciju i ponovo pokrenite MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -3051,7 +3051,7 @@ msgstr "Website zahtevi"
 
 #: Client/cefweb/CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr "Server zahteva sledeće sajtove radi njihovog pokretanja (kasnije):"
+msgstr "Server zahteva sledeće sajtove radi njihovog (kasnijeg) pokretanja:"
 
 #: Client/cefweb/CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
