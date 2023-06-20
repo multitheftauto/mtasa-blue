@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 17:07+0000\n"
-"PO-Revision-Date: 2023-06-20 18:47\n"
+"PO-Revision-Date: 2023-06-20 20:46\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -2120,21 +2120,21 @@ msgstr "bağlan (/connect): Sözdizimi 'connect <sunucu ip> [<port> <kullanıcı
 
 #: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
 msgid "connect: Bad port number"
-msgstr "Bağlantı: Hatalı port adresi"
+msgstr "bağlan: Hatalı port adresi"
 
 #: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "bağlantı: %s:%u...'e bağlanılıyor..."
+msgstr "bağlan: %s:%u...'e bağlanılıyor..."
 
 #: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "bağlantı: %s:%u adresine bağlanılamadı!"
+msgstr "bağlan: %s:%u adresine bağlanılamadı!"
 
 #: Client/core/CCommandFuncs.cpp:281
 msgid "connect: Failed to unload current mod"
-msgstr "Bağlantı: Mevcut mod devre dışı bırakılamadı"
+msgstr "bağlan: Mevcut mod devre dışı bırakılamadı"
 
 #: Client/core/CCommandFuncs.cpp:371
 msgid "Bound all controls from GTA"
