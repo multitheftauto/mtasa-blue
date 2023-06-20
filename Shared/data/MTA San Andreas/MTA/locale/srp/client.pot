@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 17:07+0000\n"
-"PO-Revision-Date: 2023-06-20 17:48\n"
+"PO-Revision-Date: 2023-06-20 18:48\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -242,7 +242,7 @@ msgstr "Isključenje: Previše ljudi se uključuje. Molimo sačekajte minut, pa 
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr "Isključen: Server sa druge verzije.\n"
+msgstr "Isključen: Server je sa druge verzije.\n"
 "Informacije: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
@@ -268,7 +268,7 @@ msgstr "Isključenje: Server radi na starijoj verziji.\n"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
 msgid "Disconnected: Nick already in use"
-msgstr "Isključenje: Nadimak već u upotrebi"
+msgstr "Isključenje: Nadimak je već u upotrebi"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
 msgid "Disconnected: Player element could not be created."
@@ -300,7 +300,7 @@ msgstr "Isključenje: Dobili ste zabranu od strane %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "Isključenje: Server se isključuje ili ponovo uključuje"
+msgstr "Isključenje: Server se isključuje ili ponovo pokreće"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "You were kicked from the game"
@@ -326,11 +326,11 @@ msgstr "Uklonite D3D9.DLL iz vašeg GTA direktorijuma instalacije i ponovo pokre
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
 msgid "This server does not allow virtual machines"
-msgstr "Ovaj server ne dozvoljava virtualne mašine"
+msgstr "Ovaj server ne dozvoljava virtuelne mašine"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
 msgid "This server requires driver signing to be enabled"
-msgstr "Ovaj server zahteva potpisivanje drajvera da bude omogućeno"
+msgstr "Ovaj server zahteva da potpisivanje drajvera bude omogućeno"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
 msgid "Please restart your PC"
@@ -457,7 +457,7 @@ msgstr "Ulazak u igru ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:662
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Nije povezano; molimo koristite Brzo Povezivanje ili 'poveži' komandu da se povežete na server."
+msgstr "Niste povezani; molimo vas koristite Brzo Povezivanje ili 'poveži' komandu da se povežete na server."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:708
 msgid "The server is not installed"
@@ -1375,7 +1375,7 @@ msgstr "Dinamične senke pešaka"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr "Pokretno mućenje"
+msgstr "Pokretno zamućenje"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -1403,11 +1403,11 @@ msgstr "Corona kišne reflekcije"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
-msgstr "Omogućiti udaljene webstranice"
+msgstr "Omogućiti udaljene web stranice"
 
 #: Client/core/CSettings.cpp:898
 msgid "Enable Javascript on remote websites"
-msgstr "Omogućiti Javascript na udaljenim webstranicama"
+msgstr "Omogućiti Javascript na udaljenim web stranicama"
 
 #: Client/core/CSettings.cpp:903
 msgid "Custom blacklist"
@@ -1557,7 +1557,7 @@ msgstr "Popravka miša"
 #. Cache path info
 #: Client/core/CSettings.cpp:1151
 msgid "Client resource files:"
-msgstr "Datoteke Klijent resursa:"
+msgstr "Datoteka Klijent resursa:"
 
 #: Client/core/CSettings.cpp:1155
 msgid "Show in Explorer"
@@ -1756,7 +1756,7 @@ msgstr "Dozvoli tray balon notifikacije"
 
 #: Client/core/CSettings.cpp:2343
 msgid "Chat text black/white outline"
-msgstr "Ćaskanje tekst crno/beli ocrt"
+msgstr "crno/beli ocrt za tekst ćaskanja"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -2748,21 +2748,21 @@ msgstr "Da li imate problema sa MTA:SA?\n\n"
 #: Client/loader/MainFunctions.cpp:387
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr "Da li imaš problema sa pokretanjem MTA:SA?.\n\n"
-"Hoćeš da izmeniš sledeču postavku?"
+msgstr "Da li imate problem sa pokretanjem MTA:SA?.\n\n"
+"Da li želite da izmenite sledeće postavke?"
 
 #: Client/loader/MainFunctions.cpp:430
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
-msgstr "Da li imaš problem sa pokretanjem MTA:SA?.\n\n"
-"Pokušaj da onemogućis sledeće proizvode za GTA i MTA:"
+msgstr "Da li imate problem sa pokretanjem MTA:SA?.\n\n"
+"Pokušajte da onemogućite sledeće produkte za GTA i MTA:"
 
 #: Client/loader/MainFunctions.cpp:464
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
 msgstr "UPOZORENJE\n\n"
-"MTA:SA je otkrio neobičnu aktivnost.\n"
+"MTA:SA je otkrio neuobičajenu aktivnost.\n"
 "Molimo vas pokrenite skeniranje virusa da se uverite da je vaš sistem bezbedan.\n\n"
 
 #: Client/loader/MainFunctions.cpp:467
@@ -2823,7 +2823,7 @@ msgstr "Glavna datoteka ima neispravno ime (%s)"
 #: Client/loader/MainFunctions.cpp:855
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
-msgstr "Datoteka podataka je modifikovana. Moguća aktivnost virusa.\n\n"
+msgstr "Datoteka podataka nije potpisana. Moguća aktivnost virusa.\n\n"
 "Potražite pomoć online ukoliko MTA ne bude radio ispravno."
 
 #: Client/loader/MainFunctions.cpp:881
@@ -2832,17 +2832,17 @@ msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr "Datoteka podatka %s nedostaje. Moguća aktivnost virusa.\n\n"
-"Razmotri reinstaliranje Multi Theft Auto za vašu bezbednost.\n"
-"Potražite online pomoć ukoliko MTA ne bude radio ispravno."
+"Razmotri reinstaliranje Multi Theft Auto radi vaše bezbednosti.\n"
+"Potražite pomoć online ukoliko MTA ne bude radio ispravno."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "Datoteka podatka %s je modifikovana Moguća aktivnost virusa.\n\n"
-"Razmotri reinstaliranje Multi Theft Auto za vašu bezbednost.\n"
-"Potražite online pomoć ukoliko MTA ne bude radio ispravno."
+msgstr "Datoteka podatka %s je modifikovana. Moguća aktivnost virusa.\n\n"
+"Razmotri reinstaliranje Multi Theft Auto radi vaše bezbednosti.\n"
+"Potražite pomoć online ukoliko MTA ne bude radio ispravno."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2877,7 +2877,7 @@ msgstr "Popravi grešku sa tražnjom povišenja"
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr "Nije moguće pokrenuti Grand Theft Auto: San Adnreas.  Molimo probajte restart, ili ako se problem nastavi,kontakirajte MTA na www.multitheftauto.com.\n\n"
+msgstr "Nije moguće pokrenuti Grand Theft Auto: San Adnreas.  Molimo pokušajte ponovno pokretanje ili ako se problem nastavi, kontakirajte MTA na www.multitheftauto.com.\n\n"
 "[%s]"
 
 #: Client/loader/MainFunctions.cpp:1217
@@ -2903,10 +2903,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr "Moguće da je vaša instalacija sada neispravna.\n\n"
-"%zu od %zu datoteki nisu moguće vratiti iz rezervnih kopija.\n\n"
-"Trebalo bi reinstalirati Multi Theft Auto od www.multitheftauto.com\n"
-"ili probajte pokrenuti ažuriranje sa administrativnim pravima."
+msgstr "Vaša instalacija je možda neispravna.\n\n"
+"%zu od %zu datoteki nije moguće vratiti iz rezervnih kopija.\n\n"
+"Pokušajte ponovo instalirati Multi Theft Auto sa www.multitheftauto.com\n"
+"ili pokušajte pokrenuti ažuriranje sa administrativnim privilegijama."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -2930,11 +2930,11 @@ msgstr "Informacije o greški"
 
 #: Client/loader/Dialogs.cpp:153
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Obeležite polje da pošaljete ovu informaciju o greški MTA programerima koristeći 'internet'"
+msgstr "Štiklirajte polje da pošaljete ovu informaciju o greški MTA programerima koristeći 'internet'"
 
 #: Client/loader/Dialogs.cpp:154
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Radeći ovo povećava verovatnoću da će se greška popraviti."
+msgstr "Radeći ovo povećava verovatnoću da će greška biti ispravljena."
 
 #: Client/loader/Dialogs.cpp:155
 msgid "Do you want to restart MTA: San Andreas ?"
@@ -2951,7 +2951,7 @@ msgstr "Vaš Grand Theft Auto: San Andreas direktorijum instalacije sadrži ove 
 #: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "Ove datoteke nisu neophodne i možda naprave smetnju sa grafikom u ovoj verziji MTA:SA.\n\n"
+msgstr "Ove datoteke nisu neophodne i mogu da naprave smetnju sa grafikom u ovoj verziji MTA:SA.\n\n"
 "Preporučuje se da obrišete ili preimenujete ove datoteke."
 
 #: Client/loader/Dialogs.cpp:167
@@ -3004,7 +3004,7 @@ msgstr "D - Alternate Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
-msgstr "Ako budete očajni, ovo će možda pomoći:"
+msgstr "Ako ništa ne uspe, ovo će možda pomoći:"
 
 #: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
@@ -3020,14 +3020,14 @@ msgstr "Ne prikazuj ponovo"
 
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
-msgstr "Upozorenje: Nismo detektovali anti-virus proizvod"
+msgstr "Upozorenje: Nismo detektovali anti-virus produkt"
 
 #: Client/loader/Dialogs.cpp:197
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
 msgstr "MTA nije detektovao anti-virus na vašem računaru.\n\n"
-"Virusi se mogu uticati na MTA i pogoršati vaše iskustvo igranja.\n\n"
+"Virusi mogu uticati na MTA i pogoršati vaše iskustvo tokom igranja.\n\n"
 "Kliknite \"Pomoć\" za više informacija."
 
 #: Client/loader/Dialogs.cpp:200
