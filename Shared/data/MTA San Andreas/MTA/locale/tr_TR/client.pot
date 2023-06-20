@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 17:07+0000\n"
-"PO-Revision-Date: 2023-06-20 17:48\n"
+"PO-Revision-Date: 2023-06-20 18:47\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -1744,11 +1744,11 @@ msgstr "\"Tab\" tuşuyla isim tamamlama"
 
 #: Client/core/CSettings.cpp:2333
 msgid "Allow server to flash the window"
-msgstr "Sunucunun pencereli yanıp söndürmesine izin ver"
+msgstr "Sunucunun pencereyi yanıp söndürmesine izin ver"
 
 #: Client/core/CSettings.cpp:2338
 msgid "Allow tray balloon notifications"
-msgstr "Balon bildirimlerine izin ver"
+msgstr "Balon bildirimlere izin ver"
 
 #: Client/core/CSettings.cpp:2343
 msgid "Chat text black/white outline"
@@ -1780,7 +1780,7 @@ msgstr "ÇOKLU OYUNCU KONTROLLERİ"
 
 #: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4673
 msgid "Your nickname contains invalid characters!"
-msgstr "Nickinde izin verilmeyen karakterler var!"
+msgstr "İsminde izin verilmeyen karakterler var!"
 
 #: Client/core/CSettings.cpp:3724
 msgid "Red:"
@@ -1828,7 +1828,7 @@ msgstr "PERFORMANS UYARISI"
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Ekran görüntüsü paylaşımı, bazı sunucular için anti-hile amacıyla gerekmektedir.\n\n"
-"(Sohbet kutusu ve GUI yüklemenin dışındadır)\n"
+"(Sohbet kutusu ve kullanıcı arayüzü yüklemenin dışındadır)\n"
 
 #: Client/core/CSettings.cpp:4454
 msgid "SCREEN UPLOAD INFORMATION"
@@ -1872,7 +1872,7 @@ msgstr "DENEYSEL ÖZELLİK"
 
 #: Client/core/CSettings.cpp:4691
 msgid "Please enter a nickname"
-msgstr "Lütfen bir nick girin"
+msgstr "Lütfen bir isim girin"
 
 #: Client/core/CSettings.cpp:4692
 msgid "Please enter a nickname to be used ingame.  \n"
@@ -1906,7 +1906,7 @@ msgstr "Ekranın alt kısmındaki dönen daire animasyonu"
 
 #: Client/core/CSettings.cpp:4722
 msgid "Select default always. (This setting is not saved)"
-msgstr "Varsayılan seçin. (Bu ayar kaydedilmez)"
+msgstr "Varsayılanı seçin. (Bu ayar kaydedilmez)"
 
 #: Client/core/CSettings.cpp:4724
 msgid "Maximum is usually best"
@@ -1930,7 +1930,7 @@ msgstr "16-bit renk:"
 
 #: Client/core/CSettings.cpp:4730
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "16-bit renk modunu etkinleştir - MTA'yı baştan başlatmayı gerektirir"
+msgstr "16-bit renk modunu etkinleştir - MTA'yı yeniden başlatmanı gerektirir"
 
 #: Client/core/CSettings.cpp:4732
 msgid "Mouse fix:"
@@ -1961,8 +1961,8 @@ msgstr "Yeni özelliklerin olduğu bir versiyon kullanıyorsun! Bu versiyon sade
 #: Client/core/CMainMenu.cpp:340
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "Xp ve Vista Temmuz 2019'dan sonra MTA'yı kaldırmayacak.\n\n"
-"En son ve güncel serverlarda oynamak için, Windowsunuzu güncelleyin."
+msgstr "XP ve Vista, Temmuz 2019'dan sonra güncelleme almayacak.\n\n"
+"En son ve güncel serverlarda oynamak için, Windows'unuzu güncelleyin."
 
 #: Client/core/CMainMenu.cpp:1146
 msgid "This will disconnect you from the current server.\n\n"
@@ -1977,7 +1977,7 @@ msgstr "BAĞLANTI KESME UYARISI"
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
-msgstr "Bilinmeyen komut veya fiil : "
+msgstr "Bilinmeyen komut veya cvar: "
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
@@ -2047,7 +2047,7 @@ msgstr "bir sunucuya (ip port takma-ad şifre) bağlanır"
 
 #: Client/core/CCore.cpp:1344
 msgid "connects to a previous server"
-msgstr "önceki bir sunucuya bağlanır"
+msgstr "bir önceki sunucuya bağlanır"
 
 #: Client/core/CCore.cpp:1345
 msgid "binds a key (key control)"
@@ -2075,11 +2075,11 @@ msgstr "debug görünümünü temizler"
 
 #: Client/core/CCore.cpp:1352
 msgid "scrolls the chatbox upwards"
-msgstr "chatboxu yukarı kaydırır"
+msgstr "konuşma penceresini yukarı kaydırır"
 
 #: Client/core/CCore.cpp:1353
 msgid "scrolls the chatbox downwards"
-msgstr "chatboxu aşağıya kaydırır"
+msgstr "konuşma penceresini aşağı kaydırır"
 
 #: Client/core/CCore.cpp:1354
 msgid "scrolls the debug view upwards"
