@@ -4,13 +4,13 @@ premake.modules.install_unifont = {}
 
 -- Config variables
 local UNIFONT_BASEURL = "https://github.com/multitheftauto/unifont/releases/download/"
-local UNIFONT_DOWNLOAD_FILENAME = "unifont-15.0.03.ttf"
+local UNIFONT_DOWNLOAD_FILENAME = "unifont-15.0.06.ttf"
 local UNIFONT_FILENAME = "unifont.ttf"
 local UNIFONT_PATH = "Shared/data/MTA San Andreas/MTA/cgui"
 
 -- Change these to update the version
-local UNIFONT_TAG = "v15.0.03"
-local UNIFONT_HASH = "ca921647a9a34e1e85a541b74cbfc780389d4c3b6bac9f5fbedb9e771b1597bd"
+local UNIFONT_TAG = "v15.0.06"
+local UNIFONT_HASH = "9282b6eff54eeca2e7f58c9a40a91049bd219f3e6a45fbee8eba013379b9af3a"
 
 newaction {
 	trigger = "install_unifont",

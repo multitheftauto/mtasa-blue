@@ -439,9 +439,9 @@ struct CLuaFunctionParserBase
                     continue;
                 }
 
-                int i = -2;
-                auto        k = PopUnsafe<key_t>(L, i);
-                auto        v = PopUnsafe<value_t>(L, i);
+                int  i = -2;
+                auto k = PopUnsafe<key_t>(L, i);
+                auto v = PopUnsafe<value_t>(L, i);
                 map.emplace(std::move(k), std::move(v));
                 lua_pop(L, 1);            // drop value, keep key for lua_next
             }

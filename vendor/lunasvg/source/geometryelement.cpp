@@ -79,7 +79,7 @@ Path PolygonElement::path() const
 
     Path path;
     path.moveTo(points[0].x, points[0].y);
-    for(std::size_t i = 1;i < points.size();i++)
+    for(std::size_t i = 1; i < points.size(); i++)
         path.lineTo(points[i].x, points[i].y);
 
     path.close();
@@ -104,7 +104,7 @@ Path PolylineElement::path() const
 
     Path path;
     path.moveTo(points[0].x, points[0].y);
-    for(std::size_t i = 1;i < points.size();i++)
+    for(std::size_t i = 1; i < points.size(); i++)
         path.lineTo(points[i].x, points[i].y);
 
     return path;

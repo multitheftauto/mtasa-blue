@@ -45,8 +45,7 @@ GradientStops GradientElement::buildGradientStops() const
 {
     GradientStops gradientStops;
     double prevOffset = 0.0;
-    for(auto& child : children)
-    {
+    for(auto& child : children) {
         if(child->isText())
             continue;
         auto element = static_cast<Element*>(child.get());
@@ -96,8 +95,7 @@ std::unique_ptr<LayoutObject> LinearGradientElement::getPainter(LayoutContext* c
     std::set<const GradientElement*> processedGradients;
     const GradientElement* current = this;
 
-    while(true)
-    {
+    while(true) {
         if(!attributes.hasGradientTransform() && current->has(PropertyID::GradientTransform))
             attributes.setGradientTransform(current->gradientTransform());
         if(!attributes.hasSpreadMethod() && current->has(PropertyID::SpreadMethod))
@@ -107,8 +105,7 @@ std::unique_ptr<LayoutObject> LinearGradientElement::getPainter(LayoutContext* c
         if(!attributes.hasGradientStops())
             attributes.setGradientStops(current->buildGradientStops());
 
-        if(current->id == ElementID::LinearGradient)
-        {
+        if(current->id == ElementID::LinearGradient) {
             auto element = static_cast<const LinearGradientElement*>(current);
             if(!attributes.hasX1() && element->has(PropertyID::X1))
                 attributes.setX1(element->x1());
@@ -126,8 +123,9 @@ std::unique_ptr<LayoutObject> LinearGradientElement::getPainter(LayoutContext* c
 
         processedGradients.insert(current);
         current = static_cast<const GradientElement*>(ref);
-        if(processedGradients.find(current) != processedGradients.end())
+        if(processedGradients.find(current) != processedGradients.end()) {
             break;
+        }
     }
 
     auto& stops = attributes.gradientStops();
@@ -139,8 +137,7 @@ std::unique_ptr<LayoutObject> LinearGradientElement::getPainter(LayoutContext* c
     auto y1 = lengthContext.valueForLength(attributes.y1(), LengthMode::Height);
     auto x2 = lengthContext.valueForLength(attributes.x2(), LengthMode::Width);
     auto y2 = lengthContext.valueForLength(attributes.y2(), LengthMode::Height);
-    if((x1 == x2 && y1 == y2) || stops.size() == 1)
-    {
+    if((x1 == x2 && y1 == y2) || stops.size() == 1) {
         auto solid = std::make_unique<LayoutSolidColor>();
         solid->color = std::get<1>(stops.back());
         return std::move(solid);
@@ -204,8 +201,7 @@ std::unique_ptr<LayoutObject> RadialGradientElement::getPainter(LayoutContext* c
     std::set<const GradientElement*> processedGradients;
     const GradientElement* current = this;
 
-    while(true)
-    {
+    while(true) {
         if(!attributes.hasGradientTransform() && current->has(PropertyID::GradientTransform))
             attributes.setGradientTransform(current->gradientTransform());
         if(!attributes.hasSpreadMethod() && current->has(PropertyID::SpreadMethod))
@@ -215,8 +211,7 @@ std::unique_ptr<LayoutObject> RadialGradientElement::getPainter(LayoutContext* c
         if(!attributes.hasGradientStops())
             attributes.setGradientStops(current->buildGradientStops());
 
-        if(current->id == ElementID::RadialGradient)
-        {
+        if(current->id == ElementID::RadialGradient) {
             auto element = static_cast<const RadialGradientElement*>(current);
             if(!attributes.hasCx() && element->has(PropertyID::Cx))
                 attributes.setCx(element->cx());
@@ -236,8 +231,9 @@ std::unique_ptr<LayoutObject> RadialGradientElement::getPainter(LayoutContext* c
 
         processedGradients.insert(current);
         current = static_cast<const GradientElement*>(ref);
-        if(processedGradients.find(current) != processedGradients.end())
+        if(processedGradients.find(current) != processedGradients.end()) {
             break;
+        }
     }
 
     if(!attributes.hasFx())
@@ -250,8 +246,7 @@ std::unique_ptr<LayoutObject> RadialGradientElement::getPainter(LayoutContext* c
         return nullptr;
 
     auto& r = attributes.r();
-    if(r.isZero() || stops.size() == 1)
-    {
+    if(r.isZero() || stops.size() == 1) {
         auto solid = std::make_unique<LayoutSolidColor>();
         solid->color = std::get<1>(stops.back());
         return std::move(solid);
@@ -351,8 +346,7 @@ std::unique_ptr<LayoutObject> PatternElement::getPainter(LayoutContext* context)
     std::set<const PatternElement*> processedPatterns;
     const PatternElement* current = this;
 
-    while(true)
-    {
+    while(true) {
         if(!attributes.hasX() && current->has(PropertyID::X))
             attributes.setX(current->x());
         if(!attributes.hasY() && current->has(PropertyID::Y))
@@ -380,8 +374,9 @@ std::unique_ptr<LayoutObject> PatternElement::getPainter(LayoutContext* context)
 
         processedPatterns.insert(current);
         current = static_cast<const PatternElement*>(ref);
-        if(processedPatterns.find(current) != processedPatterns.end())
+        if(processedPatterns.find(current) != processedPatterns.end()) {
             break;
+        }
     }
 
     auto& width = attributes.width();

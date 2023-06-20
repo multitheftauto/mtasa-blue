@@ -667,7 +667,6 @@ namespace SharedUtil
     public:
         constexpr SFixedString() { szData[0] = 0; }
 
-
         // In
         constexpr SFixedString& Assign(const char* szOther, size_t len)
         {
@@ -690,16 +689,16 @@ namespace SharedUtil
 
 #ifdef __cpp_lib_string_view
         // Out
-        constexpr operator std::string_view() const { return { szData }; }
+        constexpr operator std::string_view() const { return {szData}; }
 #endif
-        constexpr operator const char*() const { return szData; }
-        constexpr char*           Data() { return &szData[0]; }
+        constexpr       operator const char*() const { return szData; }
+        constexpr char* Data() { return &szData[0]; }
 
         constexpr size_t GetMaxLength() const { return MAX_LENGTH; }
-        size_t GetLength() const { return strlen(szData); }
+        size_t           GetLength() const { return strlen(szData); }
 
         // Shake it all about
-        void Encrypt();
+        void           Encrypt();
         constexpr bool Empty() { return szData[0] == 0; }
         constexpr void Clear() const { szData[0] = 0; }
 

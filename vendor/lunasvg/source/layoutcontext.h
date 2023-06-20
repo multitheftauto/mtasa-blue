@@ -10,8 +10,7 @@
 
 namespace lunasvg {
 
-enum class LayoutId
-{
+enum class LayoutId {
     Symbol,
     Group,
     Shape,
@@ -26,8 +25,7 @@ enum class LayoutId
 
 class RenderState;
 
-class LayoutObject
-{
+class LayoutObject {
 public:
     LayoutObject(LayoutId id);
     virtual ~LayoutObject();
@@ -47,8 +45,7 @@ public:
 
 using LayoutList = std::list<std::unique_ptr<LayoutObject>>;
 
-class LayoutContainer : public LayoutObject
-{
+class LayoutContainer : public LayoutObject {
 public:
     LayoutContainer(LayoutId id);
 
@@ -67,8 +64,7 @@ protected:
     mutable Rect m_strokeBoundingBox{Rect::Invalid};
 };
 
-class LayoutClipPath : public LayoutContainer
-{
+class LayoutClipPath : public LayoutContainer {
 public:
     LayoutClipPath();
 
@@ -80,8 +76,7 @@ public:
     const LayoutClipPath* clipper;
 };
 
-class LayoutMask : public LayoutContainer
-{
+class LayoutMask : public LayoutContainer {
 public:
     LayoutMask();
 
@@ -99,8 +94,7 @@ public:
     const LayoutClipPath* clipper;
 };
 
-class LayoutSymbol : public LayoutContainer
-{
+class LayoutSymbol : public LayoutContainer {
 public:
     LayoutSymbol();
 
@@ -117,8 +111,7 @@ public:
     const LayoutClipPath* clipper;
 };
 
-class LayoutGroup : public LayoutContainer
-{
+class LayoutGroup : public LayoutContainer {
 public:
     LayoutGroup();
 
@@ -132,8 +125,7 @@ public:
     const LayoutClipPath* clipper;
 };
 
-class LayoutMarker : public LayoutContainer
-{
+class LayoutMarker : public LayoutContainer {
 public:
     LayoutMarker();
 
@@ -153,8 +145,7 @@ public:
     const LayoutClipPath* clipper;
 };
 
-class LayoutPattern : public LayoutContainer
-{
+class LayoutPattern : public LayoutContainer {
 public:
     LayoutPattern();
 
@@ -172,8 +163,7 @@ public:
     PreserveAspectRatio preserveAspectRatio;
 };
 
-class LayoutGradient : public LayoutObject
-{
+class LayoutGradient : public LayoutObject {
 public:
     LayoutGradient(LayoutId id);
 
@@ -184,8 +174,7 @@ public:
     GradientStops stops;
 };
 
-class LayoutLinearGradient : public LayoutGradient
-{
+class LayoutLinearGradient : public LayoutGradient {
 public:
     LayoutLinearGradient();
 
@@ -198,8 +187,7 @@ public:
     double y2;
 };
 
-class LayoutRadialGradient : public LayoutGradient
-{
+class LayoutRadialGradient : public LayoutGradient {
 public:
     LayoutRadialGradient();
 
@@ -213,8 +201,7 @@ public:
     double fy;
 };
 
-class LayoutSolidColor : public LayoutObject
-{
+class LayoutSolidColor : public LayoutObject {
 public:
     LayoutSolidColor();
 
@@ -224,8 +211,7 @@ public:
     Color color;
 };
 
-class FillData
-{
+class FillData {
 public:
     FillData() = default;
 
@@ -238,8 +224,7 @@ public:
     WindRule fillRule{WindRule::NonZero};
 };
 
-class StrokeData
-{
+class StrokeData {
 public:
     StrokeData() = default;
 
@@ -257,8 +242,7 @@ public:
     DashData dash;
 };
 
-class MarkerPosition
-{
+class MarkerPosition {
 public:
     MarkerPosition(const LayoutMarker* marker, const Point& origin, double angle);
 
@@ -270,8 +254,7 @@ public:
 
 using MarkerPositionList = std::vector<MarkerPosition>;
 
-class MarkerData
-{
+class MarkerData {
 public:
     MarkerData() = default;
 
@@ -284,8 +267,7 @@ public:
     double strokeWidth{1};
 };
 
-class LayoutShape : public LayoutObject
-{
+class LayoutShape : public LayoutObject {
 public:
     LayoutShape();
 
@@ -311,22 +293,19 @@ private:
     mutable Rect m_strokeBoundingBox{Rect::Invalid};
 };
 
-enum class RenderMode
-{
+enum class RenderMode {
     Display,
     Clipping
 };
 
-struct BlendInfo
-{
+struct BlendInfo {
     const LayoutClipPath* clipper;
     const LayoutMask* masker;
     double opacity;
     Rect clip;
 };
 
-class RenderState
-{
+class RenderState {
 public:
     RenderState(const LayoutObject* object, RenderMode mode);
 
@@ -350,8 +329,7 @@ class TreeBuilder;
 class StyledElement;
 class GeometryElement;
 
-class LayoutContext
-{
+class LayoutContext {
 public:
     LayoutContext(const TreeBuilder* builder, LayoutSymbol* root);
 
@@ -379,8 +357,7 @@ private:
     std::set<const Element*> m_references;
 };
 
-class LayoutBreaker
-{
+class LayoutBreaker {
 public:
     LayoutBreaker(LayoutContext* context, const Element* element);
     ~LayoutBreaker();

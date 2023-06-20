@@ -142,6 +142,7 @@ protected:
 class CLatentReceiver
 {
     friend struct SScopedGuardInsideMark;
+
 public:
     ZERO_ON_NEW
     CLatentReceiver(NetPlayerID remoteId, ushort usBitStreamVersion);

@@ -77,14 +77,11 @@ void UseElement::layout(LayoutContext* context, LayoutContainer* current) const
     transform += ')';
     group->set(PropertyID::Transform, transform, 0x10);
 
-    if(ref->id == ElementID::Svg || ref->id == ElementID::Symbol)
-    {
+    if(ref->id == ElementID::Svg || ref->id == ElementID::Symbol) {
         auto element = ref->cloneElement<SVGElement>();
         transferWidthAndHeight(element.get());
         group->addChild(std::move(element));
-    }
-    else
-    {
+    } else {
         group->addChild(ref->clone());
     }
 

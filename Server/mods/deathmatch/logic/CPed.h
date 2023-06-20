@@ -269,11 +269,11 @@ public:
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
     long long GetLastFarSyncTick() { return m_llLastFarSyncTick; }
-    void SetLastFarSyncTick(long long llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
+    void      SetLastFarSyncTick(long long llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
 
-    void ClearNearPlayersList() { m_nearPlayersList.clear(); }
-    void AddPlayerToNearList(CPlayer* pPlayer) { m_nearPlayersList.push_back(pPlayer); }
-    bool IsNearPlayersListEmpty() { return m_nearPlayersList.empty(); }
+    void                                  ClearNearPlayersList() { m_nearPlayersList.clear(); }
+    void                                  AddPlayerToNearList(CPlayer* pPlayer) { m_nearPlayersList.push_back(pPlayer); }
+    bool                                  IsNearPlayersListEmpty() { return m_nearPlayersList.empty(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterBegin() { return m_nearPlayersList.begin(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
 

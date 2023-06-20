@@ -24,9 +24,9 @@
 #include <MTAPlatform.h>
 
 #ifdef WIN32
-    //
-    // Windows
-    //
+//
+// Windows
+//
     #include <windows.h>
     #include <mmsystem.h>
 #endif

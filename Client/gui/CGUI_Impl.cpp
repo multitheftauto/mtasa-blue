@@ -499,7 +499,12 @@ void CGUI_Impl::SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer)
     CEGUI::MouseCursor::getSingleton().setAlpha(fAlpha);
 
     if (bOnlyCurrentServer)
-        m_fCurrentServerCursorAlpha = fAlpha;
+        SetCurrentServerCursorAlpha(fAlpha);
+}
+
+void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)
+{
+    m_fCurrentServerCursorAlpha = fAlpha;
 }
 
 float CGUI_Impl::GetCurrentServerCursorAlpha()

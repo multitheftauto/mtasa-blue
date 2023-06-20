@@ -223,7 +223,7 @@ plutovg_texture_t* plutovg_set_texture(plutovg_t* pluto, plutovg_surface_t* surf
 {
     plutovg_paint_t* paint = &pluto->state->paint;
     paint->type = plutovg_paint_type_texture;
-    plutovg_texture_init(&paint->texture, surface, plutovg_texture_type_plain);
+    plutovg_texture_init(&paint->texture, surface, type);
     return &paint->texture;
 }
 

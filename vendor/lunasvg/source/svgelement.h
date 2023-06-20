@@ -8,8 +8,7 @@ namespace lunasvg {
 class TreeBuilder;
 class LayoutSymbol;
 
-class SVGElement : public GraphicsElement
-{
+class SVGElement : public GraphicsElement {
 public:
     SVGElement();
 

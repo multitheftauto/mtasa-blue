@@ -24,13 +24,13 @@ Length MarkerElement::refY() const
 Length MarkerElement::markerWidth() const
 {
     auto& value = get(PropertyID::MarkerWidth);
-    return Parser::parseLength(value, ForbidNegativeLengths, Length::ThreePercent);
+    return Parser::parseLength(value, ForbidNegativeLengths, Length::Three);
 }
 
 Length MarkerElement::markerHeight() const
 {
     auto& value = get(PropertyID::MarkerHeight);
-    return Parser::parseLength(value, ForbidNegativeLengths, Length::ThreePercent);
+    return Parser::parseLength(value, ForbidNegativeLengths, Length::Three);
 }
 
 Angle MarkerElement::orient() const

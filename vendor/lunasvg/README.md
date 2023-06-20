@@ -1,4 +1,4 @@
-[![Releases](https://img.shields.io/badge/Version-2.3.5-orange.svg)](https://github.com/sammycage/lunasvg/releases)
+[![Releases](https://img.shields.io/badge/Version-2.3.8-orange.svg)](https://github.com/sammycage/lunasvg/releases)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/sammycage/lunasvg/blob/master/LICENSE)
 [![Build Status](https://github.com/sammycage/lunasvg/actions/workflows/ci.yml/badge.svg)](https://github.com/sammycage/lunasvg/actions)
 

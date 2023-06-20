@@ -7,8 +7,7 @@ namespace lunasvg {
 
 class LayoutShape;
 
-class GeometryElement : public GraphicsElement
-{
+class GeometryElement : public GraphicsElement {
 public:
     GeometryElement(ElementID id);
 
@@ -17,8 +16,7 @@ public:
     virtual Path path() const = 0;
 };
 
-class PathElement : public GeometryElement
-{
+class PathElement : public GeometryElement {
 public:
     PathElement();
 
@@ -28,16 +26,14 @@ public:
     std::unique_ptr<Node> clone() const;
 };
 
-class PolyElement : public GeometryElement
-{
+class PolyElement : public GeometryElement {
 public:
     PolyElement(ElementID id);
 
     PointList points() const;
 };
 
-class PolygonElement : public PolyElement
-{
+class PolygonElement : public PolyElement {
 public:
     PolygonElement();
 
@@ -46,8 +42,7 @@ public:
     std::unique_ptr<Node> clone() const;
 };
 
-class PolylineElement : public PolyElement
-{
+class PolylineElement : public PolyElement {
 public:
     PolylineElement();
 
@@ -56,8 +51,7 @@ public:
     std::unique_ptr<Node> clone() const;
 };
 
-class CircleElement : public GeometryElement
-{
+class CircleElement : public GeometryElement {
 public:
     CircleElement();
 
@@ -70,8 +64,7 @@ public:
     std::unique_ptr<Node> clone() const;
 };
 
-class EllipseElement : public GeometryElement
-{
+class EllipseElement : public GeometryElement {
 public:
     EllipseElement();
 
@@ -85,8 +78,7 @@ public:
     std::unique_ptr<Node> clone() const;
 };
 
-class LineElement : public GeometryElement
-{
+class LineElement : public GeometryElement {
 public:
     LineElement();
 
@@ -100,8 +92,7 @@ public:
     std::unique_ptr<Node> clone() const;
 };
 
-class RectElement : public GeometryElement
-{
+class RectElement : public GeometryElement {
 public:
     RectElement();
 

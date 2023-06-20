@@ -257,8 +257,7 @@ void CLanguageSelector::DoPulse()
             pItem->fFocusEffectPos += Clamp(-fMaxAmount, pItem->fFocusEffectTarget - pItem->fFocusEffectPos, fMaxAmount);
 
             // Move label
-            CVector2D vecLabelZoomPos =
-                pItem->vecLabelInitialPos + CVector2D(pItem->vecLabelInitialSize.fX * pItem->fFocusEffectPos * 0.05f, 0);
+            CVector2D vecLabelZoomPos = pItem->vecLabelInitialPos + CVector2D(pItem->vecLabelInitialSize.fX * pItem->fFocusEffectPos * 0.05f, 0);
             pItem->pLabel->SetPosition(vecLabelZoomPos);
         }
     }

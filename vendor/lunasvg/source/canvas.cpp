@@ -149,11 +149,9 @@ void Canvas::luminance()
     auto height = plutovg_surface_get_height(surface);
     auto stride = plutovg_surface_get_stride(surface);
     auto data = plutovg_surface_get_data(surface);
-    for(int y = 0;y < height;y++)
-    {
+    for(int y = 0; y < height; y++) {
         auto pixels = reinterpret_cast<uint32_t*>(data + stride * y);
-        for(int x = 0;x < width;x++)
-        {
+        for(int x = 0; x < width; x++) {
             auto pixel = pixels[x];
             auto r = (pixel >> 16) & 0xFF;
             auto g = (pixel >> 8) & 0xFF;
@@ -229,8 +227,7 @@ static plutovg_texture_type_t to_plutovg_texture_type(TextureType type)
 
 static void to_plutovg_stops(plutovg_gradient_t* gradient, const GradientStops& stops)
 {
-    for(const auto& stop : stops)
-    {
+    for(const auto& stop : stops) {
         auto offset = std::get<0>(stop);
         auto& color = std::get<1>(stop);
         plutovg_gradient_add_stop_rgba(gradient, offset, color.red() / 255.0, color.green() / 255.0, color.blue() / 255.0, color.alpha() / 255.0);
@@ -241,8 +238,7 @@ void to_plutovg_path(plutovg_t* pluto, const Path& path)
 {
     PathIterator it(path);
     std::array<Point, 3> p;
-    while(!it.isDone())
-    {
+    while(!it.isDone()) {
         switch(it.currentSegment(p)) {
         case PathCommand::MoveTo:
             plutovg_move_to(pluto, p[0].x, p[0].y);

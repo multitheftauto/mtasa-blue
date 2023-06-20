@@ -7,8 +7,7 @@ namespace lunasvg {
 
 class LayoutClipPath;
 
-class ClipPathElement : public GraphicsElement
-{
+class ClipPathElement : public GraphicsElement {
 public:
     ClipPathElement();
 

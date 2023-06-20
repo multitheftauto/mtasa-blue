@@ -5,8 +5,7 @@
 
 namespace lunasvg {
 
-class GElement : public GraphicsElement
-{
+class GElement : public GraphicsElement {
 public:
     GElement();
 

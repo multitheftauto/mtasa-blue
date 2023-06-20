@@ -77,6 +77,12 @@ std::unique_ptr<LayoutSymbol> SVGElement::build(const TreeBuilder* builder) cons
     root->masker = context.getMasker(mask());
     root->clipper = context.getClipper(clip_path());
     layoutChildren(&context, root.get());
+    if((w.isRelative() || h.isRelative()) && !has(PropertyID::ViewBox)) {
+        auto box = root->map(root->strokeBoundingBox());
+        root->width = w.value(box.x + box.w);
+        root->height = h.value(box.y + box.h);
+    }
+
     return root;
 }
 

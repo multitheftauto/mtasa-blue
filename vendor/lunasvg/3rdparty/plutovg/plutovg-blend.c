@@ -2,6 +2,7 @@
 
 #include <limits.h>
 #include <math.h>
+#include <float.h>
 
 #define COLOR_TABLE_SIZE 1024
 typedef struct {
@@ -243,6 +244,7 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
         while(buffer < end)
         {
             uint32_t result = 0;
+            det = fabs(det) < DBL_EPSILON ? 0.0 : det;
             if(det >= 0)
             {
                 double w = sqrt(det) - b;
@@ -261,7 +263,11 @@ static void fetch_radial_gradient(uint32_t* buffer, const radial_gradient_values
     {
         while(buffer < end)
         {
-            *buffer++ = gradient_pixel(gradient, sqrt(det) - b);
+            det = fabs(det) < DBL_EPSILON ? 0.0 : det;
+            uint32_t result = 0;
+            if (det >= 0)
+                result = gradient_pixel(gradient, sqrt(det) - b);
+            *buffer++ = result;
             det += delta_det;
             delta_det += delta_delta_det;
             b += delta_b;

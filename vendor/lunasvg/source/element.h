@@ -8,8 +8,7 @@
 
 namespace lunasvg {
 
-enum class ElementID
-{
+enum class ElementID {
     Unknown = 0,
     Star,
     Circle,
@@ -35,8 +34,7 @@ enum class ElementID
     Use
 };
 
-enum class PropertyID
-{
+enum class PropertyID {
     Unknown = 0,
     Class,
     Clip_Path,
@@ -106,34 +104,19 @@ enum class PropertyID
     Y2
 };
 
-struct Property
-{
+struct Property {
+    int specificity;
     PropertyID id;
     std::string value;
-    int specificity;
 };
 
-class PropertyList
-{
-public:
-    PropertyList() = default;
-
-    void set(PropertyID id, const std::string& value, int specificity);
-    Property* get(PropertyID id) const;
-    void add(const Property& property);
-    void add(const PropertyList& properties);
-    void clear() { m_properties.clear(); }
-
-private:
-    std::vector<Property> m_properties;
-};
+using PropertyList = std::vector<Property>;
 
 class LayoutContext;
 class LayoutContainer;
 class Element;
 
-class Node
-{
+class Node {
 public:
     Node() = default;
     virtual ~Node() = default;
@@ -148,8 +131,7 @@ public:
     Element* parent = nullptr;
 };
 
-class TextNode : public Node
-{
+class TextNode : public Node {
 public:
     TextNode() = default;
 
@@ -162,8 +144,7 @@ public:
 
 using NodeList = std::list<std::unique_ptr<Node>>;
 
-class Element : public Node
-{
+class Element : public Node {
 public:
     Element(ElementID id);
 
@@ -179,16 +160,13 @@ public:
     Rect currentViewport() const;
 
     template<typename T>
-    void transverse(T callback)
-    {
-        if(callback(this))
+    void transverse(T callback) {
+        if(!callback(this))
             return;
 
-        for(auto& child : children)
-        {
-            if(child->isText())
-            {
-                if(callback(child.get()))
+        for(auto& child : children) {
+            if(child->isText()) {
+                if(!callback(child.get()))
                     return;
                 continue;
             }
@@ -199,8 +177,7 @@ public:
     }
 
     template<typename T>
-    std::unique_ptr<T> cloneElement() const
-    {
+    std::unique_ptr<T> cloneElement() const {
         auto element = std::make_unique<T>();
         element->properties = properties;
         for(auto& child : children)
