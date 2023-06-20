@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-16 17:07+0000\n"
-"PO-Revision-Date: 2023-06-20 20:46\n"
+"PO-Revision-Date: 2023-06-20 21:46\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -2275,7 +2275,7 @@ msgstr "Sunucu şifresini girin:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "Sunucuda yer açılınca bağlanın."
+msgstr "Sunucuda yer açılınca otomatik olarak bağlan."
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
@@ -2415,12 +2415,12 @@ msgstr "Aramayı başlat"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:299
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1697
 msgid "Search players..."
-msgstr "Oyuncu aranıyor..."
+msgstr "Oyuncu arama..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:422
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1695
 msgid "Search servers..."
-msgstr "Sunucu aranıyor..."
+msgstr "Sunucu arama..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:453
 msgid "Name"
@@ -2479,7 +2479,7 @@ msgstr "Yükleniyor..."
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1240
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2182
 msgid "  ..loading.."
-msgstr "..yükleniyor.."
+msgstr "  ..yükleniyor.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
@@ -2488,7 +2488,7 @@ msgstr "Sunucu adresi girmediniz!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1291
 msgid "Unknown protocol"
-msgstr "Bilinmiyen protokol"
+msgstr "Bilinmeyen protokol"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1291
 msgid "Please use the mtasa:// protocol!"
@@ -2521,7 +2521,7 @@ msgstr "Lütfen Grand Theft Auto: San Andreas'ı başlatın"
 
 #: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Grand Theft Auto: San Andreas yükleme adresinizi seçiniz."
+msgstr "Grand Theft Auto: San Andreas'ın yüklü olduğu klasörü seçiniz"
 
 #: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
 #, c-format
@@ -2589,7 +2589,7 @@ msgstr "GTA:SA '%s' dosyasında hatalar buldu"
 
 #: Client/loader/Utils.cpp:1716
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "MTA:SA oynarken bilgisayar yeniden başlatıldı mı?"
+msgstr "MTA:SA oynarken bilgisayarın yeniden mi başlatıldı?"
 
 #: Client/loader/Utils.cpp:1781
 msgid "Please terminate the following programs before continuing:"
@@ -2605,8 +2605,8 @@ msgstr "MTA:SA bu görevi tamamlayamadı:\n\n"
 #: Client/loader/CInstallManager.cpp:426
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
-msgstr "** Hata, grafik kartı sürücüsü nedeniyle oluştu **\n\n"
-"** Lütfen grafik kartı sürücülerinizi güncelleyin**"
+msgstr "** Hata, ekran kartı sürücüsü nedeniyle oluştu **\n\n"
+"** Lütfen ekran kartı sürücülerinizi güncelleyin**"
 
 #: Client/loader/CInstallManager.cpp:532
 msgid "Install updated MTA:SA files"
@@ -2623,7 +2623,7 @@ msgstr "Multi Theft Auto düzgün şekilde yüklenmemiş, lütfen tekrar yükley
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr "GTA:SA Bağlantı noktaları oluştur"
+msgstr "GTA:SA bağlantı noktalarını oluştur"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
@@ -2635,7 +2635,7 @@ msgstr "MTA:SA başlatılamadı çünkü bir MTA:SA dosyası hatalı veya eksik:
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr "MTA:SA Dosyalarını kopyala"
+msgstr "MTA:SA dosyalarını kopyala"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
@@ -2643,7 +2643,7 @@ msgstr "MTA:SA başlatılamadı çünkü bir GTA:SA dosyası hatalı veya eksik:
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr "GTA'SA uygulamasının bağlılığını yamala"
+msgstr "GTA'SA'nın bağlılığını yamala"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
@@ -2651,7 +2651,7 @@ msgstr "MTA:SA başlatılamadı çünkü GTA:SA başlatma dosyası hatalı veya 
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Lütfen anti-virüsünüzü yanlış pozitif bir algılama için kontrol edin, GTA: SA yürütülebilir dosyası için bir istisna eklemeye çalışın ve MTA:SA'yı yeniden başlatın."
+msgstr "Lütfen antivirüs programınızı yanlış pozitif bir algılama için kontrol edin, GTA: SA klasörü için bir istisna eklemeye çalışın ve MTA:SA'yı yeniden başlatın."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -2690,7 +2690,7 @@ msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr "MTA:SA'yı başlatırken sorun\n\n"
+msgstr "MTA:SA yeniden başlatılırken hata oluştu\n\n"
 "Bu problem tekrar ederse, Görev Yöneticisini açın ve\n"
 "'gta_sa.exe' ve 'Multi Theft Auto.exe' işlemlerini durdurun.\n\n\n"
 "MTA:SA'yı tekrar başlatmak istiyor musunuz?"
@@ -2711,14 +2711,14 @@ msgstr "Başka bir MTA zaten çalışıyor.\n\n"
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "MTA:SA'yı başlatmakta sorun mu yaşıyorsunuz?.\n\n"
-"Bir eski sürüme dönmek ister misiniz?"
+"Bir önceki sürüme dönmek ister misiniz?"
 
 #: Client/loader/MainFunctions.cpp:323
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
 msgstr "MTA:SA'nın başlatmasında bir problem olduğu görülüyor.\n"
-"GTA ayarlarını sıfırlamak bazen bu hatayı düzeltir.\n\n"
+"GTA ayarlarını sıfırlamak bazen bu hatayı düzeltebilir.\n\n"
 "GTA ayarlarını şimdi sıfırlamak ister misiniz?"
 
 #: Client/loader/MainFunctions.cpp:338
@@ -2779,7 +2779,7 @@ msgstr "Kayıt defteri girdileri eksik. Lütfen Multi Theft Auto: San Andreas'ı
 
 #: Client/loader/MainFunctions.cpp:637
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "GTA: San Andreas yüklemenizin yolu desteklenmeyen (unicode) karakterler içeriyor. Lütfen Grand Theft Auto: San Andreas yüklemenizi sadece uyumlu bir yola, yani sadece standart ASCII karakterleri içeren bir yere taşıyın ve Multi Theft Auto: San Andreas'ı tekrar yükleyin. "
+msgstr "GTA: San Andreas yüklemenizin klasör yolu desteklenmeyen (unicode) harfler içeriyor. Lütfen Grand Theft Auto: San Andreas yüklemenizi sadece uyumlu bir yola, yani sadece standart ASCII karakterleri içeren bir yere taşıyın ve Multi Theft Auto: San Andreas'ı tekrar yükleyin."
 
 #: Client/loader/MainFunctions.cpp:647
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
@@ -2856,7 +2856,7 @@ msgstr "Bazı dosyalar eksik. Bir problemle karşılaşırsanız MTA:SA'yı tekr
 #: Client/loader/MainFunctions.cpp:1029
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr "MTA:SA Windows 'Güvenli Mod' ile uyumlu değildir.\n\n"
+msgstr "MTA:SA, Windows 'Güvenli Mod' ile uyumlu değildir.\n\n"
 "Lütfen bilgisayarınızı yeniden başlatın.\n"
 
 #: Client/loader/MainFunctions.cpp:1121
@@ -2877,7 +2877,7 @@ msgstr "Grand Theft Auto: San Andreas başlatılamadı. Lütfen tekrar deneyiniz
 
 #: Client/loader/MainFunctions.cpp:1217
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "Gta: San Andreas doğru çalıştıralamadı. Yok etmek istermisiniz ?"
+msgstr "GTA: San Andreas doğru çalıştırılamadı. Sonlandırmak ister misiniz?"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
@@ -2979,7 +2979,7 @@ msgstr "NVidia Optimus algılandı!"
 
 #: Client/loader/Dialogs.cpp:179
 msgid "Try each option and see what works:"
-msgstr "Her seçeneği dene ve neyin işlediğini gör:"
+msgstr "Her seçeneği dene ve hangisinin işe yaradığını gör:"
 
 #: Client/loader/Dialogs.cpp:180
 msgid "A - Standard NVidia"
@@ -3038,7 +3038,7 @@ msgstr "Anti-virüs kurmayacağım.\n"
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1381
 msgid "Problem with graphics driver"
-msgstr "Grafik sürücüsü ile problem"
+msgstr "Ekran kartı sürücüsü ile problem"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
