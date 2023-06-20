@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-06-20 17:48\n"
+"PO-Revision-Date: 2023-06-20 18:48\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -287,7 +287,7 @@ msgstr "Servis za prijavljivanje ne radi, prekidanje!"
 #. UAC_RIGHTS4
 #: Shared/installer/nightly.nsi:1256
 msgid "Unable to elevate"
-msgstr "Nesposobnost povišenja"
+msgstr "Onemogućeno povećanje"
 
 #. INST_MTA_CONFLICT
 #: Shared/installer/nightly.nsi:1852
