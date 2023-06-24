@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-22 18:10+0000\n"
-"PO-Revision-Date: 2023-06-22 19:09\n"
+"PO-Revision-Date: 2023-06-24 10:25\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -1113,7 +1113,7 @@ msgstr "سایه پویای کارکترها"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "کدری متحرک"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -1996,7 +1996,7 @@ msgstr "زمانبندی فریم را به صورت نمودار نشان می 
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "برای توسعه دهندگان : بارگذاری مجدد خبر ها"
 
 #: Client/core/CMainMenu.cpp:321
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -2555,19 +2555,19 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "به دلیل مشکل در کپی فایل ها MTA:SA نمی تواند اجرا شود:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "به دلیل مشکل در نقص یا کمبود فایل ها MTA:SA نمی تواند اجرا شود:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "کپی کردن فایل های MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "به دلیل مشکل در نقص یا کمبود فایل ها GTA:SA, لانچر MTA:SA نمی تواند اجرا شود:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -2575,7 +2575,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "به دلیل مشکل در نقص یا کمبود فایل های اجرایی GTA:SA, لانچر MTA:SA نمی تواند اجرا شود:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
