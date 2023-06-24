@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-22 18:10+0000\n"
-"PO-Revision-Date: 2023-06-24 10:25\n"
+"PO-Revision-Date: 2023-06-24 11:27\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -516,7 +516,7 @@ msgstr "شما از بازی اخراج شدید"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "این سرور به یک gta_sa.exe بدون تغییر نیاز دارد"
+msgstr "این سرور به یک gta_sa.exe تغییر یافته نشده نیاز دارد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
@@ -545,7 +545,7 @@ msgstr "لطفا کامپیوتر خود را مجددا راه‌اندازی �
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
 msgid "This server has detected missing anti-cheat components"
-msgstr "این سرور اجزای ضد تقلب گم شده را شناسایی کرده است"
+msgstr "این سرور اجزای گمشده ی آنتی چیت را شناسایی کرده است"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
 msgid "Try restarting MTA"
@@ -553,7 +553,7 @@ msgstr "MTA را مجدداً راه‌اندازی کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "این سرور به gta3.img و gta_int.img بدون تغییر نیاز دارد"
+msgstr "این سرور به gta3.img و gta_int.img تغییر یافته نشده نیاز دارد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
 msgid "Please replace gta3.img or gta_int.img"
@@ -723,7 +723,7 @@ msgstr "تشکر ویژه"
 
 #: Client/core/CCredits.cpp:263
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "این برنامه از کتابخانه ها و نرم‌افزار های زیر استفاده می کند:"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
@@ -1137,7 +1137,7 @@ msgstr "نمایش پدها با جزئیات زیاد"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr "بازتاب باران کرونا"
+msgstr "بازتاب لامپ های کرونا توسط باران"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
@@ -2551,7 +2551,7 @@ msgstr "مولتی دفت آتو به درستی نصب نشده است, لطف�
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "اتصالات GTA:SA را بسازید"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
@@ -2571,7 +2571,7 @@ msgstr "به دلیل مشکل در نقص یا کمبود فایل ها GTA:SA,
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Patch کردن پیشنیاز های GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
@@ -2579,23 +2579,23 @@ msgstr "به دلیل مشکل در نقص یا کمبود فایل های اج�
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "لطفاٌ مطمعاٌ شوید آنتی ویروس شما GTA:SA را به عنوان ویروس تشخیص نداده باشد, سیعی کنید در تنظیمات آنتی ویروس خود فایل اجرایی GTA:SA استثنا قرار دهید و MTA:SA را راه اندازی مجدد کنید."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "GTA:SA را ایجاد کنید."
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA نمی تواند راه اندازی شود زیرا فایل اجرایی GTA:SA قابل بارگیری نیست:\n"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Patch کردن GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA نمی تواند راه اندازی شود زیرا وصله GTA:SA ناموفق بوده است:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -2752,14 +2752,18 @@ msgstr "فایل اصلی بدون امضا می‌باشد. احتمال وجو
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "فایل داده %s وجود ندارد. فعالیت احتمالی ویروس\n\n"
+"برای امنیت خود، Multi Theft Auto را مجدداً نصب کنید.\n"
+"اگر MTA به درستی کار نمی کند، به راهنمای آنلاین مراجعه کنید."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "فایل داده %s اصلاح شده است. فعالیت احتمالی ویروس\n\n"
+"برای امنیت خود، Multi Theft Auto را مجدداً نصب کنید.\n"
+"اگر MTA به درستی کار نمی کند، به راهنمای آنلاین مراجعه کنید."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -2803,14 +2807,16 @@ msgstr "GTA: San Andreas ممکن است به درستی راه‌اندازی �
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "ناشناخته"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "فایل '%s' در حال حاضر توسط فرآیندهای %zu قفل شده است.\n\n"
+"آیا می خواهید فعالیت زیر را خاتمه دهید و به به روز رسانی ادامه دهید؟\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -2818,7 +2824,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "فرایند نصب شما ممکن است در حال حاضر خراب باشد.\n\n"
+"%zu از %zu فایل از نسخه پشتیبان نمی تواند بازیابی شود.\n\n"
+"باید Multi Theft Auto را از www.multitheftauto.com دوباره نصب کنید\n"
+"یا سعی کنید به روز رسانی را با حقوق سرپرست اجرا کنید."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -2938,7 +2947,7 @@ msgstr "نصب دایرکتی Grand Theft Auto: San Andreas شما این فای
 #: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "این فایل ها نیاز نیست و شاید با گرافیک این نسخه MTA:SA مشکل ایجاد کند.\n\n"
+msgstr "این فایل ها نیاز نیست و شاید با فابلیت های گرافیکی این نسخه MTA:SA تداخل ایجاد کند.\n\n"
 "پیشنهاد داده میشود که شما این فایل ها را حذف یا تغییر نام دهید."
 
 #: Client/loader/Dialogs.cpp:167
@@ -2951,7 +2960,7 @@ msgstr "این فایل ها را به من یاداوری نکن"
 
 #: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "این فایل ها را از.dll به.dll.bak تغییر بده"
+msgstr "اسم این فایل ها را از.dll به.dll.bak تغییر بده"
 
 #: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
@@ -2983,11 +2992,11 @@ msgstr "ب - NVidia جایگزین"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "استاندارد C - Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "جایگزین D - Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -3043,7 +3052,7 @@ msgstr "آیا برای استفاده از این وضوح صفحه اطمین�
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1381
 msgid "Problem with graphics driver"
-msgstr "مشکل درایور گرافیک"
+msgstr "مشکل درایور کارت گرافیک"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
