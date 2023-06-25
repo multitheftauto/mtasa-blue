@@ -892,7 +892,7 @@ void CClientGame::DoPulsePostFrame()
                 g_pCore->GetCVars()->Set("streaming_memory", uiStreamingMemory);
         }
 
-        const auto streamingMemorySizeBytes = static_cast<size_t>(g_pCore->GetStreamingMemory()) * 1024 * 1024; // Convert to bytes
+        const auto streamingMemorySizeBytes = g_pCore->GetStreamingMemory();
         if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != streamingMemorySizeBytes) {
             g_pMultiplayer->GetLimits()->SetStreamingMemory(streamingMemorySizeBytes);
         }

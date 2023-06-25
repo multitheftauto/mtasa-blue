@@ -369,7 +369,8 @@ private:
     float                m_fMaxStreamingMemory{};
 
     // Custom streaming memory limit set by `engineStreamingSetMemorySize` - Reset on server connects (= set to 0), or by the scripter
-    size_t               m_CustomStreamingMemoryLimitMB{};
+    // `0` means "not set" [so the value should be ignored]
+    size_t               m_CustomStreamingMemoryLimitBytes{};
 
     bool                 m_bGettingIdleCallsFromMultiplayer;
     bool                 m_bWindowsTimerEnabled;

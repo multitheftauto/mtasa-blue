@@ -20,16 +20,26 @@ void EngineStreamingFreeUpMemory(std::uint32_t bytes)
     g_pGame->GetStreaming()->MakeSpaceFor(bytes);
 }
 
+// Get currenlty used memory for stremaing [In bytes]
 std::uint32_t EngineStreamingGetUsedMemory()
 {
     return g_pGame->GetStreaming()->GetMemoryUsed();
 }
 
-bool EngineStreamingSetMemorySize(size_t sizeMB) {
-    g_pCore->SetCustomStreamingMemory(sizeMB);
-    return true;
+// Set the streaming memory size to a custom value
+void EngineStreamingSetMemorySize(size_t sizeBytes) {
+    if (sizeBytes == 0) {
+        throw std::invalid_argument{"Memory size must be > 0"};
+    }
+    g_pCore->SetCustomStreamingMemory(sizeBytes);
 }
 
+// Restore memory size to cvar
+void EngineStreamingRestoreMemorySize() {
+    g_pCore->SetCustomStreamingMemory(0);
+}
+
+// Get the streaming memory size [In bytes] - This is the limit, not the amount currently used! [See `EngineStreamingGetUsedMemory`]
 size_t EngineStreamingGetMemorySize() {
     return g_pCore->GetStreamingMemory();
 }
@@ -93,6 +103,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
         {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
+        {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -139,6 +150,20 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelFlags", "engineGetModelFlags");
 
     lua_registerstaticclass(luaVM, "Engine");
+
+    // `EngineStreaming` class
+    lua_newclass(luaVM);
+    {
+        lua_classfunction(luaVM, "freeUpMemory", "engineStreamingFreeUpMemory");
+        lua_classfunction(luaVM, "getUsedMemory", "engineStreamingGetUsedMemory");
+        lua_classfunction(luaVM, "setMemorySize", "engineStreamingSetMemorySize");
+        lua_classfunction(luaVM, "getMemorySize", "engineStreamingGetMemorySize");
+        lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
+
+        lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
+        lua_classvariable(luaVM, "usedMemory", NULL, "engineStreamingGetUsedMemory");
+    }
+    lua_registerstaticclass(luaVM, "EngineStreaming");
 
     AddEngineColClass(luaVM);
     AddEngineTxdClass(luaVM);
