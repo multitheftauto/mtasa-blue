@@ -179,6 +179,10 @@ public:
     virtual void ResetChatboxCharacterLimit() = 0;
     virtual int  GetChatboxCharacterLimit() = 0;
     virtual int  GetChatboxMaxCharacterLimit() = 0;
+
+    virtual void   SetCustomStreamingMemory(size_t szMB) = 0;
+    virtual bool   IsUsingCustomStreamingMemorySize() = 0;
+    virtual size_t GetStreamingMemory() = 0;
 };
 
 class CClientTime

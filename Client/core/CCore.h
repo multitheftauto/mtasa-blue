@@ -279,6 +279,9 @@ public:
     SString     GetBlueCopyrightString();
     bool        IsFirstFrame() const noexcept { return m_bFirstFrame; }
 
+    void   SetCustomStreamingMemory(size_t szMB);
+    bool   IsUsingCustomStreamingMemorySize();
+    size_t GetStreamingMemory();
 private:
     void ApplyCoreInitSettings();
 
@@ -360,8 +363,14 @@ private:
     bool                 m_bWaitToSetNick;
     uint                 m_uiNewNickWaitFrames;
     EDiagnosticDebugType m_DiagnosticDebug;
-    float                m_fMinStreamingMemory;
-    float                m_fMaxStreamingMemory;
+
+    // Below 2 are used for the UI only
+    float                m_fMinStreamingMemory{};
+    float                m_fMaxStreamingMemory{};
+
+    // Custom streaming memory limit set by `engineStreamingSetMemorySize` - Reset on server connects (= set to 0), or by the scripter
+    size_t               m_CustomStreamingMemoryLimitMB{};
+
     bool                 m_bGettingIdleCallsFromMultiplayer;
     bool                 m_bWindowsTimerEnabled;
     bool                 m_bModulesLoaded;

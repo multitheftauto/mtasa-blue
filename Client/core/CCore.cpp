@@ -2316,3 +2316,27 @@ SString CCore::GetBlueCopyrightString()
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
 }
+
+// Set streaming memory size override [See `engineStreamingSetMemorySize`]
+void CCore::SetCustomStreamingMemory(size_t szMB) {
+    m_CustomStreamingMemoryLimitMB = szMB;
+}
+
+bool CCore::IsUsingCustomStreamingMemorySize()
+{
+    return m_CustomStreamingMemoryLimitMB != 0;
+}
+
+// Streaming memory size used [In MB]
+size_t CCore::GetStreamingMemory()
+{
+    // If custom override is set, use that
+    if (IsUsingCustomStreamingMemorySize()) {
+        return m_CustomStreamingMemoryLimitMB;
+    }
+
+    // Otherwise client CVar setting
+    size_t streamingMemSzCVar;
+    CVARS_GET_VALUE("streaming_memory", streamingMemSzCVar);
+    return streamingMemSzCVar;
+}
