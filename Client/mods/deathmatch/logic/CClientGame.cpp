@@ -529,6 +529,9 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = false;
 
     CStaticFunctionDefinitions::ResetAllSurfaceInfo();
+
+    // Reset custom streaming memory size [possibly] set by the server
+    g_pCore->SetCustomStreamingMemory(0);
 }
 
 /*
