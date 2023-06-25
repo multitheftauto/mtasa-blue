@@ -2330,13 +2330,7 @@ bool CCore::IsUsingCustomStreamingMemorySize()
 // Streaming memory size used [In MB]
 size_t CCore::GetStreamingMemory()
 {
-    // If custom override is set, use that
-    if (IsUsingCustomStreamingMemorySize()) {
-        return m_CustomStreamingMemoryLimitMB;
-    }
-
-    // Otherwise client CVar setting
-    size_t streamingMemSzCVar;
-    CVARS_GET_VALUE("streaming_memory", streamingMemSzCVar);
-    return streamingMemSzCVar;
+    return IsUsingCustomStreamingMemorySize()
+        ? m_CustomStreamingMemoryLimitMB
+        : CVARS_GET_VALUE<size_t>("streaming_memory", 0);
 }
