@@ -12,14 +12,12 @@ namespace lunasvg {
 class SVGElement;
 class StyledElement;
 
-enum LengthNegativeValuesMode
-{
+enum LengthNegativeValuesMode {
     AllowNegativeLengths,
     ForbidNegativeLengths
 };
 
-enum class TransformType
-{
+enum class TransformType {
     Matrix,
     Rotate,
     Scale,
@@ -28,8 +26,7 @@ enum class TransformType
     Translate
 };
 
-class Parser
-{
+class Parser {
 public:
     static Length parseLength(const std::string& string, LengthNegativeValuesMode mode, const Length& defaultValue);
     static LengthList parseLengthList(const std::string& string, LengthNegativeValuesMode mode);
@@ -69,10 +66,8 @@ struct SimpleSelector;
 using Selector = std::vector<SimpleSelector>;
 using SelectorList = std::vector<Selector>;
 
-struct AttributeSelector
-{
-    enum class MatchType
-    {
+struct AttributeSelector {
+    enum class MatchType {
         None,
         Equal,
         Includes,
@@ -87,10 +82,8 @@ struct AttributeSelector
     std::string value;
 };
 
-struct PseudoClassSelector
-{
-    enum class Type
-    {
+struct PseudoClassSelector {
+    enum class Type {
         Unknown,
         Empty,
         Root,
@@ -105,15 +98,11 @@ struct PseudoClassSelector
     };
 
     Type type{Type::Unknown};
-    int16_t a{0};
-    int16_t b{0};
     SelectorList subSelectors;
 };
 
-struct SimpleSelector
-{
-    enum class Combinator
-    {
+struct SimpleSelector {
+    enum class Combinator {
         Descendant,
         Child,
         DirectAdjacent,
@@ -126,33 +115,40 @@ struct SimpleSelector
     std::vector<PseudoClassSelector> pseudoClassSelectors;
 };
 
-struct Rule
-{
+struct Declaration {
+    int specificity;
+    PropertyID id;
+    std::string value;
+};
+
+using DeclarationList = std::vector<Declaration>;
+
+struct Rule {
     SelectorList selectors;
-    PropertyList declarations;
+    DeclarationList declarations;
 };
 
 class RuleData {
 public:
-    RuleData(const Selector& selector, const PropertyList& properties, uint32_t specificity, uint32_t position)
-        : m_selector(selector), m_properties(properties), m_specificity(specificity), m_position(position)
+    RuleData(const Selector& selector, const DeclarationList& declarations, uint32_t specificity, uint32_t position)
+        : m_selector(selector), m_declarations(declarations), m_specificity(specificity), m_position(position)
     {}
 
     const Selector& selector() const { return m_selector; }
-    const PropertyList& properties() const { return m_properties; }
+    const DeclarationList& declarations() const { return m_declarations; }
     const uint32_t& specificity() const { return m_specificity; }
     const uint32_t& position() const { return m_position; }
 
     bool match(const Element* element) const;
 
 private:
-    bool matchSimpleSelector(const SimpleSelector& selector, const Element* element) const;
-    bool matchAttributeSelector(const AttributeSelector& selector, const Element* element) const;
-    bool matchPseudoClassSelector(const PseudoClassSelector& selector, const Element* element) const;
+    static bool matchSimpleSelector(const SimpleSelector& selector, const Element* element);
+    static bool matchAttributeSelector(const AttributeSelector& selector, const Element* element);
+    static bool matchPseudoClassSelector(const PseudoClassSelector& selector, const Element* element);
 
 private:
     Selector m_selector;
-    PropertyList m_properties;
+    DeclarationList m_declarations;
     uint32_t m_specificity;
     uint32_t m_position;
 };
@@ -164,31 +160,23 @@ class StyleSheet {
 public:
     StyleSheet() = default;
 
-    void parse(const std::string& content);
+    bool parse(const std::string& content);
     void add(const Rule& rule);
-    bool empty() const { return m_position == 0; }
+    bool empty() const { return m_rules.empty(); }
 
-    std::vector<const PropertyList*> match(const Element* element) const;
-
-private:
-    std::multiset<RuleData> m_rules;
-    uint32_t m_position{0};
-};
-
-class CSSParser
-{
-public:
-    CSSParser() = default;
-
-    static bool parseSheet(StyleSheet* sheet, const std::string& value);
+    const std::multiset<RuleData>& rules() const { return m_rules; }
 
 private:
     static bool parseAtRule(const char*& ptr, const char* end);
     static bool parseRule(const char*& ptr, const char* end, Rule& rule);
     static bool parseSelectors(const char*& ptr, const char* end, SelectorList& selectors);
-    static bool parseDeclarations(const char*& ptr, const char* end, PropertyList& declarations);
+    static bool parseDeclarations(const char*& ptr, const char* end, DeclarationList& declarations);
     static bool parseSelector(const char*& ptr, const char* end, Selector& selector);
     static bool parseSimpleSelector(const char*& ptr, const char* end, SimpleSelector& simpleSelector);
+
+private:
+    std::multiset<RuleData> m_rules;
+    uint32_t m_position{0};
 };
 
 class LayoutSymbol;
