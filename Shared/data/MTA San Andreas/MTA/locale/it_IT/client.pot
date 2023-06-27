@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-22 18:10+0000\n"
-"PO-Revision-Date: 2023-06-27 20:18\n"
+"PO-Revision-Date: 2023-06-27 21:18\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -723,7 +723,7 @@ msgstr "Ringraziamenti particolari"
 
 #: Client/core/CCredits.cpp:263
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "Questo software e progetto fa uso delle seguenti librerie e software:"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
@@ -1998,7 +1998,7 @@ msgstr "mostra il grafico dei frame"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "Per gli sviluppatori: ricarica le notizie"
 
 #: Client/core/CMainMenu.cpp:321
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -2586,7 +2586,7 @@ msgstr "Si raccomanda di controllare l'antivirus per un falso positivo, provare 
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Genera GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
