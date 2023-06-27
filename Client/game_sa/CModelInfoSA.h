@@ -97,6 +97,7 @@ public:
 
 class CAtomicModelInfo_SA_VTBL : public CBaseModelInfo_SA_VTBL
 {
+public:
     DWORD SetAtomic;            // (RpAtomic*)
 };
 
@@ -253,6 +254,10 @@ public:
         char*  m_animFileName;
         uint32 m_nAnimFileIndex;
     };
+};
+
+class CAtomicModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
 };
 
 class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
@@ -447,7 +452,8 @@ public:
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
-    void         MakeClumpModel(ushort usBaseID);
+    bool         MakeAtomicModel(ushort usBaseID);
+    bool         MakeClumpModel(ushort usBaseID);
     void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 

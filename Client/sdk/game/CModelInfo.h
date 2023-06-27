@@ -53,6 +53,7 @@ enum class eModelIdeFlag
 
 enum class eModelInfoType : unsigned char
 {
+    UNKNOWN = 0,
     ATOMIC = 1,
     TIME = 3,
     WEAPON = 4,
@@ -231,7 +232,8 @@ public:
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
     virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;
-    virtual void      MakeClumpModel(ushort usBaseID) = 0;
+    virtual bool      MakeClumpModel(ushort usModelID) = 0;
+    virtual bool      MakeAtomicModel(ushort usModelID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;

@@ -25,13 +25,42 @@ std::uint32_t EngineStreamingGetUsedMemory()
     return g_pGame->GetStreaming()->GetMemoryUsed();
 }
 
-bool EngineConvertAtomicToClumpModel(ushort usModelId)
+bool EngineSetModelInfoType(ushort usModelId, eModelInfoType modelInfoType)
 {
     std::shared_ptr<CClientModel> pModel = CLuaEngineDefs::m_pManager->GetModelManager()->FindModelByID(usModelId);
     if (pModel == nullptr)
         pModel = std::make_shared<CClientModel>(CLuaEngineDefs::m_pManager, usModelId, eClientModelType::OBJECT);
     CLuaEngineDefs::m_pManager->GetModelManager()->Add(pModel);
-    return pModel->MakeClumpModel();
+
+    switch (modelInfoType)
+    {
+        case eModelInfoType::ATOMIC:
+            if (!pModel->MakeAtomicModel())
+            {
+                CLuaEngineDefs::m_pManager->GetModelManager()->Remove(pModel);
+                throw std::invalid_argument("Expected valid clump model ID with at argument 1 that was previously set to clump");
+            }
+            break;
+        case eModelInfoType::CLUMP:
+            if (!pModel->MakeClumpModel())
+            {
+                CLuaEngineDefs::m_pManager->GetModelManager()->Remove(pModel);
+                throw std::invalid_argument("Expected valid atomic model ID at argument 1");
+            }
+            break;
+        default:
+            throw std::invalid_argument("Not supported model info type.");
+    }
+    return true;
+}
+
+eModelInfoType EngineGetModelInfoType(ushort usModelId)
+{
+    std::shared_ptr<CClientModel> pModel = CLuaEngineDefs::m_pManager->GetModelManager()->FindModelByID(usModelId);
+    if (pModel == nullptr)
+        pModel = std::make_shared<CClientModel>(CLuaEngineDefs::m_pManager, usModelId, eClientModelType::OBJECT);
+    CLuaEngineDefs::m_pManager->GetModelManager()->Add(pModel);
+    return static_cast<eModelInfoType>(pModel->GetModelInfoType());
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -91,7 +120,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
-        {"engineConvertAtomicToClumpModel", ArgumentParser<EngineConvertAtomicToClumpModel>},
+        {"engineSetModelInfoType", ArgumentParser<EngineSetModelInfoType>},
+        {"engineGetModelInfoType", ArgumentParser<EngineGetModelInfoType>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );

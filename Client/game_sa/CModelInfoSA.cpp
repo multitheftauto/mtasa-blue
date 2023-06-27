@@ -72,6 +72,7 @@ union tIdeFlags
 };
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
+static constexpr uintptr_t vftable_CAtomicModelModelInfo = 0x85BBF0u;
 static constexpr uintptr_t vftable_CClumpModelModelInfo = 0x85BD30u;
 static constexpr size_t    RESOURCE_ID_COL = 25000;
 
@@ -1730,28 +1731,67 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
-void CModelInfoSA::MakeClumpModel(ushort usModelId)
+bool GetFirstAtomic(RpAtomic* atomic, void* data)
+{
+    RpAtomic** firstAtomicPtr = (RpAtomic**)data;
+
+    if (*firstAtomicPtr == nullptr)
+        *firstAtomicPtr = atomic;
+
+    return false;
+}
+
+bool CModelInfoSA::MakeAtomicModel(ushort usModelId)
+{
+    if (GetModelType() != eModelInfoType::CLUMP)
+        return false;
+
+    CBaseModelInfoSAInterface*   pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[usModelId];
+    CAtomicModelInfoSAInterface* m_pInterface = new CAtomicModelInfoSAInterface();
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
+
+    CAtomicModelInfo_SA_VTBL* vfbl = (CAtomicModelInfo_SA_VTBL*)vftable_CAtomicModelModelInfo;
+    m_pInterface->VFTBL = vfbl;
+    RpClump*  pClump = (RpClump*)m_pInterface->pRwObject;
+    RpAtomic* firstAtomic = nullptr;
+    RpClumpForAllAtomics(pClump, GetFirstAtomic, &firstAtomic);
+    RwFrame* pFrame = RwFrameCreate();
+    RpAtomic* pClonedAtomic = RpAtomicClone(firstAtomic);
+    RpAtomicSetFrame(pClonedAtomic, pFrame);
+
+    m_pInterface->pRwObject = nullptr;
+    ((void(__thiscall*)(CAtomicModelInfoSAInterface * pThis, RpAtomic * pAtomic)) vfbl->SetAtomic)(m_pInterface, pClonedAtomic);
+
+    ppModelInfo[m_dwModelID] = m_pInterface;
+
+    RpClumpDestroy(pClump);
+    m_dwParentID = -1;
+    return true;
+}
+
+bool CModelInfoSA::MakeClumpModel(ushort usModelId)
 {
     if (GetModelType() != eModelInfoType::ATOMIC)
-        return;
+        return false;
 
-    CBaseModelInfoSAInterface* pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[usModelId];
+    CBaseModelInfoSAInterface*  pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[usModelId];
     CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
     m_pInterface->m_nAnimFileIndex = -1;
 
     CClumpModelInfo_SA_VTBL* vfbl = (CClumpModelInfo_SA_VTBL*)vftable_CClumpModelModelInfo;
     m_pInterface->VFTBL = vfbl;
-    RpClump* pClump = RpClumpCreate();
+    RpClump*  pClump = RpClumpCreate();
     RpAtomic* pAtomic = (RpAtomic*)m_pInterface->pRwObject;
     RpSetFrame(pClump, RwFrameCreate());
     RpClumpAddAtomic(pClump, pAtomic);
 
-    ((void(__thiscall*)(CClumpModelInfoSAInterface* pThis, RpClump * clump))vfbl->SetClump)(m_pInterface, pClump);
+    ((void(__thiscall*)(CClumpModelInfoSAInterface * pThis, RpClump * clump)) vfbl->SetClump)(m_pInterface, pClump);
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
     m_dwParentID = -1;
+    return true;
 }
 
 void CModelInfoSA::DeallocateModel(void)
@@ -1987,7 +2027,7 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+    return ((eModelInfoType(*)())GetInterface()->VFTBL->GetModelType)();
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)

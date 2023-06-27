@@ -22,6 +22,16 @@ CClientModel::~CClientModel(void)
     Deallocate();
 }
 
+unsigned char CClientModel::GetModelInfoType() const
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
+
+    if (pModelInfo->IsValid())
+        return static_cast<unsigned char>(pModelInfo->GetModelType());
+
+    return static_cast<unsigned char>(eModelInfoType::UNKNOWN);
+}
+
 bool CClientModel::Allocate(ushort usParentID)
 {
     m_bAllocatedByUs = true;
@@ -70,6 +80,26 @@ bool CClientModel::Allocate(ushort usParentID)
     return false;
 }
 
+bool CClientModel::MakeAtomicModel()
+{
+    if (m_originalModelInfoType == 255)
+        return false;
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
+
+    if (!pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
+        return false;
+
+    eModelInfoType modelInfoType = pModelInfo->GetModelType();
+    if (modelInfoType == eModelInfoType::ATOMIC)
+        return true;
+
+    pModelInfo->Request(BLOCKING, "CClientModel::MakeAtomicModel");
+    if (pModelInfo->MakeAtomicModel(m_iModelID))
+        m_originalModelInfoType = 255;
+    return true;
+}
+
 bool CClientModel::MakeClumpModel()
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
@@ -77,13 +107,24 @@ bool CClientModel::MakeClumpModel()
     if (!pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
         return false;
 
+    eModelInfoType modelInfoType = pModelInfo->GetModelType();
+    if (modelInfoType == eModelInfoType::CLUMP)
+        return true;
+
     pModelInfo->Request(BLOCKING, "CClientModel::MakeClumpModel");
-    pModelInfo->MakeClumpModel(m_iModelID);
+    if (pModelInfo->MakeClumpModel(m_iModelID))
+        m_originalModelInfoType = static_cast<unsigned char>(modelInfoType);
     return true;
 }
 
 bool CClientModel::Deallocate(void)
 {
+    if (m_originalModelInfoType != 255)
+    {
+        // For now we don't support anything else
+        MakeAtomicModel();
+        m_originalModelInfoType = 255;
+    }
     if (!m_bAllocatedByUs)
         return false;
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
