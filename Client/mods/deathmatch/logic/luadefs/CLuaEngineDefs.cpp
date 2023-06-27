@@ -44,6 +44,22 @@ size_t EngineStreamingGetMemorySize() {
     return g_pCore->GetStreamingMemory();
 }
 
+// Set streaming buffer size
+bool EngineStreamingSetBufferSize(size_t sizeBytes) {
+    const auto sizeBlocks = sizeBytes / 2048;
+    if (sizeBlocks > g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks()) { // Can't allow it to be less than the largest file
+        g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Get current streaming buffer size
+size_t EngineStreamingGetBufferSize() {
+    return g_pGame->GetStreaming()->GetStreamingBufferSize();
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -104,6 +120,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
         {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
         {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
+        {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
+        {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -159,8 +177,11 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "setMemorySize", "engineStreamingSetMemorySize");
         lua_classfunction(luaVM, "getMemorySize", "engineStreamingGetMemorySize");
         lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
+        lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
+        lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
 
         lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
+        lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetMemorySize");
         lua_classvariable(luaVM, "usedMemory", NULL, "engineStreamingGetUsedMemory");
     }
     lua_registerstaticclass(luaVM, "EngineStreaming");
