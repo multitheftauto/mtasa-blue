@@ -4135,10 +4135,16 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
     assert(pPed);
     assert(pVehicle);
 
+    if (uiSeat > pVehicle->GetMaxPassengers())
+        return false;
+
+    if (uiSeat > 0 && pVehicle->GetMaxPassengers() == VEHICLE_PASSENGERS_UNDEFINED)
+        return false;
+
     // Valid seat id for that vehicle?
     // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the player on the first seat being the vehicle
     // syncer (Todo)
-    if (uiSeat <= pVehicle->GetMaxPassengers() && (pVehicle->GetVehicleType() != VEHICLE_TRAIN || !pVehicle->GetTowedByVehicle()))
+    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN || !pVehicle->GetTowedByVehicle())
     {
         if (!pPed->IsDead())
         {
@@ -11615,7 +11621,7 @@ CBan* CStaticFunctionDefinitions::BanPlayer(CPlayer* pTargetPlayer, bool bIP, bo
             }
 
             // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
-            if (!bBan && bUsername)
+            if (!bBan && bUsername && pBan->GetAccount().length() > 0)
             {
                 const std::string& strPlayerUsername = pPlayer->GetSerialUser();
                 bBan = stricmp(strPlayerUsername.c_str(), pBan->GetAccount().c_str()) == 0;
@@ -11796,7 +11802,7 @@ CBan* CStaticFunctionDefinitions::AddBan(SString strIP, SString strUsername, SSt
             }
 
             // Check if the player's username matches the specified one, if specified, and he wasn't banned over IP yet
-            if (!bBan && bUsernameSpecified)
+            if (!bBan && bUsernameSpecified && strUsername.length() > 0)
             {
                 const std::string& strPlayerUsername = pPlayer->GetSerialUser();
                 bBan = stricmp(strPlayerUsername.c_str(), strUsername.c_str()) == 0;

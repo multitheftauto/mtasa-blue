@@ -248,7 +248,7 @@ void SharedUtil::UpdateModuleTickCount64()
 //
 #if defined(__APPLE__)
 
-    // Apple / Darwin platforms with Mach monotonic clock support
+// Apple / Darwin platforms with Mach monotonic clock support
 #include <mach/mach_time.h>
 unsigned long GetTickCountInternal()
 {
@@ -306,7 +306,7 @@ unsigned long GetTickCountInternal()
 
 #else
 
-    // Win32 platforms
+// Win32 platforms
 #include <Mmsystem.h>
 #pragma comment(lib, "Winmm.lib")
 unsigned long GetTickCountInternal()
