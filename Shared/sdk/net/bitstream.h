@@ -219,7 +219,7 @@ public:
     }
 
     // Write all characters in `value` (incl. length as `SizeType`)
-    template<typename SizeType = unsigned short>
+    template <typename SizeType = unsigned short>
     void WriteString(std::string_view value)
     {
         // Write the length

@@ -57,7 +57,7 @@ extern "C" bool g_bNoTopBar;
 // Define types
 typedef int socklen_t;
 
-    // Define keys
+// Define keys
     #define KEY_BACKSPACE 0x08
     #define KEY_EXTENDED  0xE0
     #define KEY_LEFT      0x4B

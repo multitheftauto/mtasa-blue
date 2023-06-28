@@ -304,6 +304,23 @@ namespace
         {"getChatboxCharacterLimit", "1.5.8-9.21476"},
 
         // Features added in 1.6.0
+        {"getAllElementData", "1.6.0-9.21695"},
+        {"engineLoadIMG", "1.6.0-9.21695"},
+        {"engineImageLinkDFF", "1.6.0-9.21695"},
+        {"engineImageLinkTXD", "1.6.0-9.21695"},
+        {"engineRestoreDFFImage", "1.6.0-9.21695"},
+        {"engineRestoreTXDImage", "1.6.0-9.21695"},
+        {"engineAddImage", "1.6.0-9.21695"},
+        {"engineRemoveImage", "1.6.0-9.21695"},
+        {"engineImageGetFilesCount", "1.6.0-9.21695"},
+        {"engineImageGetFiles", "1.6.0-9.21695"},
+        {"engineImageGetFile", "1.6.0-9.21695"},
+        {"engineGetModelTXDID", "1.6.0-9.21695"},
+        {"engineSetModelFlags", "1.6.0-9.21695"},
+        {"engineGetModelFlags", "1.6.0-9.21695"},
+        {"engineResetModelFlags", "1.6.0-9.21695"},
+        {"engineGetModelFlag", "1.6.0-9.21695"},
+        {"engineSetModelFlag", "1.6.0-9.21695"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -422,6 +439,8 @@ namespace
         {"getProcessMemoryStats", "1.5.8-9.21389"},
 
         // Features added in 1.6.0
+        {"isObjectBreakable", "1.6.0-9.21765"},
+        {"setObjectBreakable", "1.6.0-9.21765"},
     };
 
     //
