@@ -2,10 +2,10 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CObjectGroupPhysicalPropertiesSA.h
+ *  FILE:        Client/game_sa/CObjectGroupPhysicalPropertiesSA.h
  *  PURPOSE:     Header file for objects dynamic physical properties handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

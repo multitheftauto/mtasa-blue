@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/gamesa_init.cpp
+ *  FILE:        Client/game_sa/gamesa_init.cpp
  *  PURPOSE:     Game initialization interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,9 +17,9 @@
 #define DECLARE_PROFILER_SECTION_gamesa_init
 #include "profiler/SharedUtil.Profiler.h"
 
-CGameSA*        pGame = NULL;
-CNet*           g_pNet = NULL;
-CCoreInterface* g_pCore = NULL;
+CGameSA*        pGame = nullptr;
+CNet*           g_pNet = nullptr;
+CCoreInterface* g_pCore = nullptr;
 
 //-----------------------------------------------------------
 // This function uses the initialized data sections of the executables

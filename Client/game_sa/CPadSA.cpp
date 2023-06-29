@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPadSA.cpp
+ *  FILE:        Client/game_sa/CPadSA.cpp
  *  PURPOSE:     Controller pad input logic
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -57,7 +57,7 @@ void CPadSA::Disable(bool bDisable)
     else
         MemPut<BYTE>(FUNC_CPad_UpdatePads, 0x56);
 
-    // this->internalInterface->DisablePlayerControls = bDisable;
+    // internalInterface->DisablePlayerControls = bDisable;
 }
 
 void CPadSA::Clear()

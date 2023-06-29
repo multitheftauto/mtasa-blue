@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CFxSystemSA.h
+ *  FILE:        Client/game_sa/CFxSystemSA.h
  *  PURPOSE:     Game effects interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,8 +19,8 @@
 #define VAR_FxSystemUpdateCullDistMultiplier            0x4AB032
 #define VAR_FxCreateParticleCullDistMultiplierA         0x4A4247
 #define VAR_FxCreateParticleCullDistMultiplierB         0x4A4255
-#define FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT   ( 1 / 256.f )
-#define FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT ( 1 / 64.f )
+#define FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT   (1 / 256.f)
+#define FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT (1 / 64.f)
 
 class CAEFireAudioEntitySAInterface
 {

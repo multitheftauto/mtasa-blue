@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/C3DMarkersSA.cpp
+ *  FILE:        Client/game_sa/C3DMarkersSA.cpp
  *  PURPOSE:     3D Marker entity manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -77,7 +77,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 C3DMarker* C3DMarkersSA::FindFreeMarker()
@@ -87,7 +87,7 @@ C3DMarker* C3DMarkersSA::FindFreeMarker()
         if (!Markers[i]->IsActive())
             return Markers[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
@@ -97,5 +97,5 @@ C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
         if (Markers[i]->GetIdentifier() == Identifier)
             return Markers[i];
     }
-    return NULL;
+    return nullptr;
 }

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPedIntelligenceSA.cpp
+ *  FILE:        Client/game_sa/CPedIntelligenceSA.cpp
  *  PURPOSE:     Ped entity AI logic
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -52,6 +52,5 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
 
 CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
 {
-    auto SetTaskDuckSecondary = (CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230;
-    return SetTaskDuckSecondary(internalInterface, nLengthOfDuck);
+    return ((CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230)(internalInterface, nLengthOfDuck);
 }

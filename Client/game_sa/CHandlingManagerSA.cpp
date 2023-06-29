@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CHandlingManagerSA.cpp
+ *  FILE:        Client/game_sa/CHandlingManagerSA.cpp
  *  PURPOSE:     Vehicle handling manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -245,7 +245,7 @@ CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
 const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (eModel >= 400 && eModel < VT_MAX - 1)
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -253,13 +253,13 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes 
         return m_pOriginalEntries[eHandling];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (eModel >= 400 && eModel < VT_MAX - 1)
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -270,13 +270,13 @@ const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eV
             return m_pOriginalFlyingEntries[eHandling - 186];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (eModel >= 400 && eModel < VT_MAX - 1)
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -287,13 +287,13 @@ const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehic
             return m_pOriginalBoatEntries[eHandling - 175];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (eModel >= 400 && eModel < VT_MAX - 1)
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -303,7 +303,7 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehic
             return m_pOriginalBikeEntries[13];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 // Return the handling manager id

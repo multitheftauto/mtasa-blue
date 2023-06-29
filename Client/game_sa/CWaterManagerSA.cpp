@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CWaterManagerSA.cpp
+ *  FILE:        Client/game_sa/CWaterManagerSA.cpp
  *  PURPOSE:     Control the lakes and seas
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -51,15 +51,15 @@ DWORD CWaterManagerSA::m_TriangleXrefs[] = {0x6E58AD, 0x6E593B, 0x6E7C44, 0x6E7E
 
 DWORD CWaterManagerSA::m_ZonePolyXrefs[] = {0x6E57B2, 0x6E57AA, 0x6E57C8, 0x6E58F2, 0x6E638F, 0x6E86A1, 0x6E6387, 0x6E8699, 0x6E57DE, 0x6E57E8, 0x000000};
 
-CWaterManagerSA* g_pWaterManager = NULL;
+CWaterManagerSA* g_pWaterManager = nullptr;
 
 // -----------------------------------------------------
 // Water zone iterator (iterates over polys in a zone)
 
 CWaterZoneSA::iterator::iterator()
 {
-    m_pCurrent = NULL;
-    m_pFirst = NULL;
+    m_pCurrent = nullptr;
+    m_pFirst = nullptr;
     m_bSinglePoly = false;
 }
 
@@ -133,7 +133,7 @@ bool CWaterZoneSA::iterator::operator!=(const CWaterZoneSA::iterator& other)
 CWaterPolySA* CWaterZoneSA::iterator::operator*()
 {
     if ((m_bSinglePoly && m_pCurrent != m_pFirst) || m_pCurrent->m_wValue == 0)
-        return NULL;
+        return nullptr;
 
     if (POLYENTRY_TYPE(m_pCurrent) == WATER_POLY_QUAD)
     {
@@ -143,7 +143,7 @@ CWaterPolySA* CWaterZoneSA::iterator::operator*()
     {
         return &g_pWaterManager->m_Triangles[POLYENTRY_ID(m_pCurrent)];
     }
-    return NULL;
+    return nullptr;
 }
 
 CWaterZoneSA::iterator::operator CWaterPolyEntrySAInterface*()
@@ -186,7 +186,7 @@ CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly(EWaterPolyType type, WORD wID)
     else if (POLYENTRY_TYPE(m_pInterface) != WATER_POLY_LIST)
     {
         if (*(DWORD*)VAR_NumWaterZonePolys + 3 > NUM_NewWaterZonePolys)
-            return NULL;
+            return nullptr;
 
         WORD wOffset = *(WORD*)VAR_NumWaterZonePolys;
         g_pWaterManager->m_ZonePolyPool[wOffset].m_wValue = MAKE_POLYENTRY(type, wID);
@@ -200,7 +200,7 @@ CWaterPolyEntrySAInterface* CWaterZoneSA::AddPoly(EWaterPolyType type, WORD wID)
     else
     {
         if (*(DWORD*)VAR_NumWaterZonePolys + 1 > NUM_NewWaterZonePolys)
-            return NULL;
+            return nullptr;
 
         CWaterPolyEntrySAInterface* pZoneStart = (CWaterPolyEntrySAInterface*)begin();
         CWaterPolyEntrySAInterface* pEntry = &g_pWaterManager->m_ZonePolyPool[*(DWORD*)VAR_NumWaterZonePolys];
@@ -341,7 +341,7 @@ CWaterManagerSA::CWaterManagerSA()
 CWaterManagerSA::~CWaterManagerSA()
 {
     UndoChanges();
-    g_pWaterManager = NULL;
+    g_pWaterManager = nullptr;
 }
 
 void CWaterManagerSA::RelocatePools()
@@ -349,8 +349,8 @@ void CWaterManagerSA::RelocatePools()
     DWORD* pXrefGroups[] = {m_VertexXrefs, m_QuadXrefs, m_TriangleXrefs, m_ZonePolyXrefs, 0};
     void*  pNewPools[] = {m_VertexPool, m_QuadPool, m_TrianglePool, m_ZonePolyPool, 0};
 
-    DWORD** pXrefGroup = NULL;
-    void*   pNewPool = NULL;
+    DWORD** pXrefGroup = nullptr;
+    void*   pNewPool = nullptr;
     for (int i = 0; pXrefGroup = (DWORD**)pXrefGroups[i]; i++)
     {
         pNewPool = pNewPools[i];
@@ -481,7 +481,7 @@ CWaterZoneSA* CWaterManagerSA::GetZone(int iCol, int iRow)
 CWaterZoneSA* CWaterManagerSA::GetZoneContaining(float fX, float fY)
 {
     if (fX < -3000.0f || fX > 3000.0f || fY < -3000.0f || fY > 3000.0f)
-        return NULL;
+        return nullptr;
 
     if (fX == 3000.0f)
         fX = 2999.0f;
@@ -596,11 +596,11 @@ CWaterVertex* CWaterManagerSA::CreateVertex(const CVector& vecPosition)
 CWaterPoly* CWaterManagerSA::GetPolyAtPoint(const CVector& vecPosition)
 {
     if (vecPosition.fX < -3000.0f || vecPosition.fX > 3000.0f || vecPosition.fY < -3000.0f || vecPosition.fY > 3000.0f)
-        return NULL;
+        return nullptr;
 
     CWaterZoneSA* pZone = GetZoneContaining(vecPosition.fX, vecPosition.fY);
     if (!pZone)
-        return NULL;
+        return nullptr;
 
     CWaterZoneSA::iterator it;
     for (it = pZone->begin(); *it; ++it)
@@ -610,28 +610,28 @@ CWaterPoly* CWaterManagerSA::GetPolyAtPoint(const CVector& vecPosition)
             return *it;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CWaterPoly* CWaterManagerSA::CreateQuad(const CVector& vecBL, const CVector& vecBR, const CVector& vecTL, const CVector& vecTR, bool bShallow)
 {
     if (*(DWORD*)VAR_NumWaterQuads >= NUM_NewWaterQuads)
-        return NULL;
+        return nullptr;
 
     if (vecTL.fX >= vecTR.fX || vecBL.fX >= vecBR.fX || vecTL.fY <= vecBL.fY || vecTR.fY <= vecBR.fY || vecTL.fX < -3000.0f || vecTL.fX > 3000.0f ||
         vecTL.fY < -3000.0f || vecTL.fY > 3000.0f || vecTR.fX < -3000.0f || vecTR.fX > 3000.0f || vecTR.fY < -3000.0f || vecTR.fY > 3000.0f ||
         vecBL.fX < -3000.0f || vecBL.fX > 3000.0f || vecBL.fY < -3000.0f || vecBL.fY > 3000.0f || vecBR.fX < -3000.0f || vecBR.fX > 3000.0f ||
         vecBR.fY < -3000.0f || vecBR.fY > 3000.0f)
-        return NULL;
+        return nullptr;
 
     if (*(DWORD*)VAR_NumWaterVertices + 4 > NUM_NewWaterVertices || *(DWORD*)VAR_NumWaterQuads + 1 > NUM_NewWaterQuads ||
         *(DWORD*)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys)
-        return NULL;
+        return nullptr;
 
     std::vector<CWaterZoneSA*> zones;
     g_pWaterManager->GetZonesContaining(vecBL, vecBR, vecTL, zones);
     if (zones.empty())
-        return NULL;
+        return nullptr;
 
     CWaterVertex* pV1 = CreateVertex(vecBL);
     CWaterVertex* pV2 = CreateVertex(vecBR);
@@ -665,21 +665,21 @@ CWaterPoly* CWaterManagerSA::CreateQuad(const CVector& vecBL, const CVector& vec
 CWaterPoly* CWaterManagerSA::CreateTriangle(const CVector& vec1, const CVector& vec2, const CVector& vec3, bool bShallow)
 {
     if (*(DWORD*)VAR_NumWaterVertices >= NUM_NewWaterVertices)
-        return NULL;
+        return nullptr;
 
     if (vec1.fX >= vec2.fX || vec1.fY == vec3.fY || vec2.fY == vec3.fY || (vec1.fY < vec3.fY) != (vec2.fY < vec3.fY) || vec1.fX < -3000.0f ||
         vec1.fX > 3000.0f || vec1.fY < -3000.0f || vec1.fY > 3000.0f || vec2.fX < -3000.0f || vec2.fX > 3000.0f || vec2.fY < -3000.0f || vec2.fY > 3000.0f ||
         vec3.fX < -3000.0f || vec3.fX > 3000.0f || vec3.fY < -3000.0f || vec3.fY > 3000.0f)
-        return NULL;
+        return nullptr;
 
     if (*(DWORD*)VAR_NumWaterVertices + 4 > NUM_NewWaterVertices || *(DWORD*)VAR_NumWaterTriangles + 1 > NUM_NewWaterTriangles ||
         *(DWORD*)VAR_NumWaterZonePolys + 2 > NUM_NewWaterZonePolys)
-        return NULL;
+        return nullptr;
 
     std::vector<CWaterZoneSA*> zones;
     g_pWaterManager->GetZonesContaining(vec1, vec2, vec3, zones);
     if (zones.empty())
-        return NULL;
+        return nullptr;
 
     CWaterVertex* pV1 = CreateVertex(vec1);
     CWaterVertex* pV2 = CreateVertex(vec2);
@@ -955,7 +955,7 @@ void CWaterManagerSA::AddChange(void* pChangeSource, void* pChangedObject, CWate
 
 void CWaterManagerSA::UndoChanges(void* pChangeSource)
 {
-    if (pChangeSource == NULL)
+    if (pChangeSource == nullptr)
     {
         while (!m_Changes.empty())
         {

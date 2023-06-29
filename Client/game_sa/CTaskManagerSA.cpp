@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CTaskManagerSA.cpp
+ *  FILE:        Client/game_sa/CTaskManagerSA.cpp
  *  PURPOSE:     Task manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -71,10 +71,8 @@ CTask* CTaskManagerSA::GetActiveTask()
     }
 
     CTaskSAInterface* pActiveTask = (CTaskSAInterface*)dwReturn;
-    if (dwReturn)
-        return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else
-        return NULL;
+    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
+    else return nullptr;
 }
 
 CTask* CTaskManagerSA::GetSimplestActiveTask()
@@ -91,7 +89,7 @@ CTask* CTaskManagerSA::GetSimplestActiveTask()
     }
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    else return nullptr;
 }
 
 CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
@@ -108,7 +106,7 @@ CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
     }
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    else return nullptr;
 }
 
 CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
@@ -125,7 +123,7 @@ CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
     }
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    else return nullptr;
 }
 
 CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
@@ -143,7 +141,7 @@ CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
     }
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    else return nullptr;
 }
 
 void CTaskManagerSA::RemoveTaskSecondary(const int iTaskPriority)
@@ -172,10 +170,8 @@ void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
  */
 CTask* CTaskManagerSA::GetTaskSecondary(const int iType)
 {
-    if (iType < TASK_SECONDARY_MAX)
-        return m_pTaskManagementSystem->GetTask(GetInterface()->m_tasksSecondary[iType]);
-    else
-        return NULL;
+    if (iType < TASK_SECONDARY_MAX) return m_pTaskManagementSystem->GetTask(GetInterface()->m_tasksSecondary[iType]);
+    else return nullptr;
 }
 
 bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)

@@ -1,3 +1,14 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/game_sa/D3DResourceSystemSA.h
+ *  PURPOSE:     Header file for game world
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #pragma once
 
 #include <d3d9.h>

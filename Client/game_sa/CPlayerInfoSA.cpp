@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPlayerInfoSA.cpp
+ *  FILE:        Client/game_sa/CPlayerInfoSA.cpp
  *  PURPOSE:     Player ped type information
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -66,6 +66,4 @@ void CPlayerInfoSA::SetCamDrunkLevel(byte level)
 {
     internalInterface->PlayerPedData.m_nDrunkenness = level;
     internalInterface->PlayerPedData.m_bFadeDrunkenness = level == 0;
-
-    // SCM opcode handler for 0x52C sets 0xB7CD64 which is the game speed additionally to 0
 }

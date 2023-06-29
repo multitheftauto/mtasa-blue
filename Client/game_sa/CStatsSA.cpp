@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CStatsSA.cpp
+ *  FILE:        Client/game_sa/CStatsSA.cpp
  *  PURPOSE:     Game statistics
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -17,7 +17,6 @@ float CStatsSA::GetStatValue(unsigned short usIndex)
     DWORD dwFunc = FUNC_GetStatValue;
     float fReturn = 0.0f;
     DWORD dwStatIndex = usIndex;
-
     _asm
     {
         push    dwStatIndex
@@ -32,7 +31,6 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_ModifyStat;
     DWORD dwStatIndex = usIndex;
-
     _asm
     {
         push    fAmmount
@@ -46,7 +44,6 @@ void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_SetStatValue;
     DWORD dwStatIndex = usIndex;
-
     _asm
     {
         push    fAmmount

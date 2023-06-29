@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:        Multi Theft Auto v1.0
- *  LICENSE:        See LICENSE in the top level directory
- *  FILE:        game_sa/CAudioEngineSA.h
- *  PURPOSE:        Header file for audio manager class
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/game_sa/CAudioEngineSA.h
+ *  PURPOSE:     Header file for audio manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

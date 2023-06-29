@@ -2,10 +2,10 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CSettingsSA.cpp
+ *  FILE:        Client/game_sa/CSettingsSA.cpp
  *  PURPOSE:     Game settings
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

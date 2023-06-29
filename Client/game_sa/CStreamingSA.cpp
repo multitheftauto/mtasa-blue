@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CStreamingSA.cpp
+ *  FILE:        Client/game_sa/CStreamingSA.cpp
  *  PURPOSE:     Data streamer
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -86,9 +86,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
 
 void CStreamingSA::RemoveModel(std::uint32_t model)
 {
-    using Signature = void(__cdecl*)(std::uint32_t);
-    const auto function = reinterpret_cast<Signature>(0x4089A0);
-    function(model);
+    (reinterpret_cast<void(__cdecl*)(std::uint32_t)>(0x4089A0))(model);
 }
 
 void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* szTag)

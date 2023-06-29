@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CAnimManagerSA.cpp
+ *  FILE:        Client/game_sa/CAnimManagerSA.cpp
  *  PURPOSE:     Animation manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -315,7 +315,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::GetAnimAssociation(AssocG
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_AddAnimation;
@@ -338,7 +338,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::AddAnimation(RpClump* pCl
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::AddAnimation(RpClump* pClump, CAnimBlendHierarchy* pHierarchy, int ID)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_AddAnimation_hier;
@@ -363,7 +363,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::AddAnimationAndSync(RpClu
                                                                            AnimationId animID)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_AddAnimationAndSync;
@@ -388,7 +388,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::AddAnimationAndSync(RpClu
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_BlendAnimation;
@@ -412,7 +412,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* p
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* pClump, CAnimBlendHierarchy* pHierarchy, int ID, float fBlendDelta)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_BlendAnimation_hier;
@@ -508,7 +508,7 @@ AnimAssocDefinition* CAnimManagerSA::AddAnimAssocDefinition(const char* szBlockN
         mov     pReturn, eax
         add     esp, 0x14
     }
-    return NULL;
+    return nullptr;
 }
 
 void CAnimManagerSA::ReadAnimAssociationDefinitions()
@@ -648,7 +648,7 @@ bool CAnimManagerSA::HasAnimGroupLoaded(AssocGroupId groupID)
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetFirstAssociation(RpClump* pClump)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_RpAnimBlendClumpGetFirstAssociation;
@@ -669,7 +669,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetFirstA
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetAssociation(RpClump* pClump, const char* szAnimName)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_RpAnimBlendClumpGetAssociation_str;
@@ -691,7 +691,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetAssoci
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::RpAnimBlendClumpGetAssociation(RpClump* pClump, AnimationId animID)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_RpAnimBlendClumpGetAssociation_int;

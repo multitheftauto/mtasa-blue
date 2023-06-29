@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CWeaponStatManagerSA.h
- *  PURPOSE:     source file for the custom weapon stats manager.
+ *  FILE:        Client/game_sa/CWeaponStatManagerSA.h
+ *  PURPOSE:     Source file for the custom weapon stats manager
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

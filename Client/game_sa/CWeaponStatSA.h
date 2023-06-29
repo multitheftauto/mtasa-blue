@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CWeaponStatSA.h
- *  PURPOSE:     Source file for custom weapon stats.
+ *  FILE:        Client/game_sa/CWeaponStatSA.h
+ *  PURPOSE:     Header file for custom weapon stats.
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

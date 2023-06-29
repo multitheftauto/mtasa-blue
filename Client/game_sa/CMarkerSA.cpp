@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CMarkerSA.cpp
+ *  FILE:        Client/game_sa/CMarkerSA.cpp
  *  PURPOSE:     Marker entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -18,8 +18,8 @@ void CMarkerSA::Init()
     internalInterface->position = CVector(0, 0, 0);
     internalInterface->BlipType = (BYTE)MARKER_TYPE_COORDS;
     internalInterface->bBlipRemain = false;
-    //  internalInterface->nColour = MARKER_COLOR_BLUE;
-    //  internalInterface->bBright = TRUE;
+    // internalInterface->nColour = MARKER_COLOR_BLUE;
+    // internalInterface->bBright = TRUE;
     internalInterface->bTrackingBlip = true;
     internalInterface->bShortRange = false;
     internalInterface->bFriendly = false;

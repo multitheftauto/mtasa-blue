@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CMonsterTruckSA.h
+ *  FILE:        Client/game_sa/CMonsterTruckSA.h
  *  PURPOSE:     Header file for monster truck vehicle entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,10 +14,7 @@
 #include <game/CMonsterTruck.h>
 #include "CAutomobileSA.h"
 
-class CMonsterTruckSAInterface : public CAutomobileSAInterface
-{
-    // fill this
-};
+class CMonsterTruckSAInterface : public CAutomobileSAInterface {};
 
 class CMonsterTruckSA final : public virtual CMonsterTruck, public virtual CAutomobileSA
 {

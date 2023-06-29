@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPedSA.h
+ *  FILE:        Client/game_sa/CPedSA.h
  *  PURPOSE:     Header file for ped entity base class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,12 +15,10 @@ class CPedSA;
 
 #include <game/CPed.h>
 #include <game/CWeapon.h>
-
 #include "CEntitySA.h"
 #include "CFireSA.h"
 #include "CPedIKSA.h"
 #include "CPhysicalSA.h"
-
 #include "CPedSoundSA.h"
 #include "CPoolsSA.h"
 #include "CVehicleSA.h"

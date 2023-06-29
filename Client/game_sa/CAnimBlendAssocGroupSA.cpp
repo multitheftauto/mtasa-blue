@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CAnimBlendAssocGroupSA.cpp
+ *  FILE:        Client/game_sa/CAnimBlendAssocGroupSA.cpp
  *  PURPOSE:     Animation blend association group
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,7 +19,7 @@ extern CCoreInterface* g_pCore;
 CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface)
 {
     m_pInterface = pInterface;
-    m_pAnimBlock = NULL;
+    m_pAnimBlock = nullptr;
     SetupAnimBlock();
 }
 
@@ -106,7 +106,8 @@ eAnimGroup CAnimBlendAssocGroupSA::GetGroupID()
 {
     if ((DWORD)m_pInterface < 0x250)
     {
-        g_pCore->LogEvent(543, "CAnimBlendAssocGroupSA::GetGroupID", "Incorrect Group Interface", SString("pAnimAssocGroupInterface = %p", m_pInterface), 543);
+        g_pCore->LogEvent(543, "CAnimBlendAssocGroupSA::GetGroupID", "Incorrect Group Interface",
+            SString("pAnimAssocGroupInterface = %p", m_pInterface), 543);
     }
     return static_cast<eAnimGroup>(m_pInterface->groupID);
 };
@@ -135,14 +136,14 @@ void CAnimBlendAssocGroupSA::CreateAssociations(const char* szBlockName)
 void CAnimBlendAssocGroupSA::SetupAnimBlock()
 {
     // Make sure our AnimBlock matches up with our interface's
-    CAnimBlockSAInterface* pCurrent = (m_pAnimBlock) ? m_pAnimBlock->m_pInterface : NULL;
+    CAnimBlockSAInterface* pCurrent = (m_pAnimBlock) ? m_pAnimBlock->m_pInterface : nullptr;
     CAnimBlockSAInterface* pActual = m_pInterface->pAnimBlock;
     if (pCurrent != pActual)
     {
         if (m_pAnimBlock)
         {
             delete m_pAnimBlock;
-            m_pAnimBlock = NULL;
+            m_pAnimBlock = nullptr;
         }
         if (pActual)
             m_pAnimBlock = new CAnimBlockSA(pActual);

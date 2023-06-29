@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CProjectileSA.cpp
+ *  FILE:        Client/game_sa/CProjectileSA.cpp
  *  PURPOSE:     Projectile entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -32,24 +32,24 @@ CProjectileSA::CProjectileSA(CProjectileSAInterface* projectileInterface) : CObj
 CProjectileSA::~CProjectileSA()
 {
     BeingDeleted = true;
-    /*
-    //OutputDebugString("Attempting to destroy Object\n");
-    if(!this->BeingDeleted && DoNotRemoveFromGame == false)
+    
+    // OutputDebugString("Attempting to destroy Object\n");
+    /*if (!BeingDeleted && DoNotRemoveFromGame == false)
     {
-        DWORD dwInterface = (DWORD)this->GetInterface();
+        DWORD dwInterface = (DWORD)GetInterface();
 
-        CWorldSA * world = (CWorldSA *)pGame->GetWorld();
-        world->Remove(this->GetInterface());
+        // CWorldSA* pWorld = (CWorldSA*)pGame->GetWorld();
+        // pWorld->Remove(GetInterface());
 
-        DWORD dwThis = (DWORD)this->GetInterface();
-        DWORD dwFunc = this->GetInterface()->vtbl->Remove;
+        DWORD dwThis = (DWORD)GetInterface();
+        DWORD dwFunc = GetInterface()->vtbl->Remove;
         _asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
 
-        dwFunc = this->GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
+        dwFunc = GetInterface()->vtbl->SCALAR_DELETING_DESTRUCTOR; // we use the vtbl so we can be type independent
         _asm
         {
             mov     ecx, dwThis
@@ -57,11 +57,11 @@ CProjectileSA::~CProjectileSA()
             call    dwFunc
         }
 
-        this->BeingDeleted = true;
-        //((CPoolsSA *)pGame->GetPools())->RemoveObject((CObject *)(CObjectSA *)this);
-        //this->BeingDeleted = false;
-        //delete this;
-        //OutputDebugString("Destroying Object\n");
+        BeingDeleted = true;
+        // ((CPoolsSA*)pGame->GetPools())->RemoveObject((CObject*)(CObjectSA*)this);
+        // BeingDeleted = false;
+        // delete this;
+        // OutputDebugString("Destroying Object\n");
     }*/
     Destroy();
 }

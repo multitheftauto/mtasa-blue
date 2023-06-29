@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CWaterSA.cpp
+ *  FILE:        Client/game_sa/CWaterSA.cpp
  *  PURPOSE:     Control the lakes and seas
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -125,7 +125,7 @@ void CWaterTriangleSA::SetInterface(CWaterPolySAInterface* pInterface)
 CWaterVertex* CWaterPolySA::GetVertex(int index)
 {
     if (index < 0 || index >= GetNumVertices())
-        return NULL;
+        return nullptr;
 
     return &g_pWaterManager->m_Vertices[GetType() == WATER_POLY_QUAD ? ((CWaterQuadSA*)this)->GetInterface()->m_wVertexIDs[index]
                                                                      : ((CWaterTriangleSA*)this)->GetInterface()->m_wVertexIDs[index]];

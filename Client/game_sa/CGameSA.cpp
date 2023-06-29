@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CGameSA.cpp
+ *  FILE:        Client/game_sa/CGameSA.cpp
  *  PURPOSE:     Base game logic handling
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -325,7 +325,7 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
         return WeaponInfos[offset + weapon];
     }
     else
-        return NULL;
+        return nullptr;
 }
 
 void CGameSA::Pause(bool bPaused)
@@ -919,7 +919,7 @@ void CGameSA::DisableVSync()
 }
 CWeapon* CGameSA::CreateWeapon()
 {
-    return new CWeaponSA(new CWeaponSAInterface, NULL, WEAPONSLOT_MAX);
+    return new CWeaponSA(new CWeaponSAInterface, nullptr, WEAPONSLOT_MAX);
 }
 
 CWeaponStat* CGameSA::CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill)

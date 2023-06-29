@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CModelInfoSA.cpp
+ *  FILE:        Client/game_sa/CModelInfoSA.cpp
  *  PURPOSE:     Entity model information handler
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -76,16 +76,12 @@ static constexpr size_t    RESOURCE_ID_COL = 25000;
 
 static void CBaseModelInfo_SetColModel(CBaseModelInfoSAInterface* self, CColModelSAInterface* colModel, bool applyToPairedModel)
 {
-    using Signature = void(__thiscall*)(CBaseModelInfoSAInterface*, CColModelSAInterface*, bool);
-    auto function = reinterpret_cast<Signature>(0x4C4BC0);
-    function(self, colModel, applyToPairedModel);
+    (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*, CColModelSAInterface*, bool)>(0x4C4BC0))(self, colModel, applyToPairedModel);
 }
 
 static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
 {
-    using Signature = void(__cdecl*)(int, const CColModelSAInterface*);
-    auto function = reinterpret_cast<Signature>(0x5B2C20);
-    function(idx, colModel);
+    (reinterpret_cast<void(__cdecl*)(int, const CColModelSAInterface*)>(0x5B2C20))(idx, colModel);
 }
 
 CModelInfoSA::CModelInfoSA()
@@ -312,29 +308,28 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD dwFunc = FUNC_CText_Get;
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
+    _asm
+    {
+        push    eax
+        push    ebx
+        push    ecx
 
-        _asm
-        {
-            push    eax
-            push    ebx
-            push    ecx
+        mov     ebx, ModelID
+        lea     ebx, [ebx*4]
+        add     ebx, dword ptr[ARRAY_ModelInfo]
+        mov     eax, [ebx]
+        add     eax, 50
 
-            mov     ebx, ModelID
-            lea     ebx, [ebx*4]
-            add     ebx, dword ptr[ARRAY_ModelInfo]
-            mov     eax, [ebx]
-            add     eax, 50
+        push    eax
+        mov     ecx, CLASS_CText
+        call    dwFunc
 
-            push    eax
-            mov     ecx, CLASS_CText
-            call    dwFunc
+        mov     dwReturn, eax
 
-            mov     dwReturn, eax
-
-            pop     ecx
-            pop     ebx
-            pop     eax
-        }
+        pop     ecx
+        pop     ebx
+        pop     eax
+    }
     return (char*)dwReturn;
 }
 
@@ -868,7 +863,7 @@ void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
     //
     if (!bOverrideMaxDistance) {
         // Change GTA draw distance value from 0.925 to 1.8 into 0 to 1
-        float fDrawDistanceSetting = UnlerpClamped(0.925f, CSettingsSA().GetDrawDistance(), 1.8f);
+        float fDrawDistanceSetting = UnlerpClamped(0.925f, CSettingsSA::GetDrawDistance(), 1.8f);
 
         // Calc max setting allowed for fLodDistanceUnscaled to preserve alpha fade-in
         float fMaximumValue = Lerp(325.f, fDrawDistanceSetting, 170.f);
@@ -921,7 +916,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     // In other words, it does not affect elements created by MTA.
     // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
 
-    ((void (*)())FUNC_FlushRequestList)();
+    ((void(*)())FUNC_FlushRequestList)();
 
     std::set<unsigned short> removedModels;
 
@@ -1753,6 +1748,7 @@ void CModelInfoSA::DeallocateModel(void)
     ppModelInfo[m_dwModelID] = nullptr;
     *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
 }
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Hook for NodeNameStreamRead

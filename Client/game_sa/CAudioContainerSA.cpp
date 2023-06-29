@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CAudioContainerSA.cpp
+ *  FILE:        Client/game_sa/CAudioContainerSA.cpp
  *  PURPOSE:     Audio container reader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -31,22 +31,22 @@ CAudioContainerSA::CAudioContainerSA()
 
 CAudioContainerSA::~CAudioContainerSA()
 {
-    if (m_pLookupTable != NULL)
+    if (m_pLookupTable != nullptr)
     {
         delete m_pLookupTable;
-        m_pLookupTable = NULL;
+        m_pLookupTable = nullptr;
     }
 }
 
 bool CAudioContainerSA::GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length)
 {
-    uint8*       rawAudioData = NULL;
+    uint8*       rawAudioData = nullptr;
     unsigned int rawAudioLength;
     int          iSampleRate;
 
     if (!GetRawAudioData(lookupIndex, bankIndex, audioIndex, rawAudioData, rawAudioLength, iSampleRate))
     {
-        if (rawAudioData != NULL)
+        if (rawAudioData != nullptr)
             delete[] rawAudioData;
 
         return false;

@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CColStoreSA.h
+ *  FILE:        Client/game_sa/CColStoreSA.h
  *
  *  Multi Theft Auto is available from https://multitheftauto.com/
  *

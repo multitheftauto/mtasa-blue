@@ -2,10 +2,10 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPedSoundSA.cpp
+ *  FILE:        Client/game_sa/CPedSoundSA.cpp
  *  PURPOSE:     Ped sound
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -77,7 +77,7 @@ void CPedSoundSA::DisablePedSpeech(bool bStopCurrent)
 
 short CPedSoundSA::GetVoiceTypeIDFromName(const char* szVoiceTypeName)
 {
-    DWORD dwFunc = (DWORD)FUNC_CAEPedSound__GetAudioPedType;
+    DWORD dwFunc = FUNC_CAEPedSound__GetAudioPedType;
     short sVoiceTypeID;
 
     _asm
@@ -92,9 +92,8 @@ short CPedSoundSA::GetVoiceTypeIDFromName(const char* szVoiceTypeName)
 
 short CPedSoundSA::GetVoiceIDFromName(short sVoiceTypeID, const char* szVoiceName)
 {
-    DWORD dwFunc = (DWORD)FUNC_CAEPedSound__GetVoice;
+    DWORD dwFunc = FUNC_CAEPedSound__GetVoice;
     short sVoiceID;
-
     _asm
     {
         movzx eax, sVoiceTypeID

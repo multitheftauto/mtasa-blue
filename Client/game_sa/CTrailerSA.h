@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CTrailerSA.h
+ *  FILE:        Client/game_sa/CTrailerSA.h
  *  PURPOSE:     Header file for trailer vehicle entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,10 +14,7 @@
 #include <game/CTrailer.h>
 #include "CAutomobileSA.h"
 
-class CTrailerSAInterface : public CAutomobileSAInterface
-{
-    // fill this
-};
+class CTrailerSAInterface : public CAutomobileSAInterface {};
 
 class CTrailerSA final : public virtual CTrailer, public virtual CAutomobileSA
 {

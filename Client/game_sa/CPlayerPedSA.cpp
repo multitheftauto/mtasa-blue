@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPlayerPedSA.cpp
+ *  FILE:        Client/game_sa/CPlayerPedSA.cpp
  *  PURPOSE:     Player ped entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -85,7 +85,7 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     // processed as if they would be standing on some surface, screwing velocity calculations
     // for players floating in air (using superman script, for example) because GTA:SA will
     // try to apply the floor friction to their velocity.
-    // SetIsStanding ( true );
+    // SetIsStanding (true);
 
     GetPlayerPedInterface()->pedFlags.bCanBeShotInVehicle = true;
     GetPlayerPedInterface()->pedFlags.bTestForShotInVehicle = true;

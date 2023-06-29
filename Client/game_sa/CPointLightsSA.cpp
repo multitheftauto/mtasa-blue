@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPointLightsSA.cpp
+ *  FILE:        Client/game_sa/CPointLightsSA.cpp
  *  PURPOSE:     PointLights entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -51,14 +51,12 @@ void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecD
 
 void CPointLightsSA::PreRenderHeliLights()
 {
-    auto CHeli_PreSearchLightCone = (CHeli_PreSearchLightCone_t)FUNC_CHeli_Pre_SearchLightCone;
-    CHeli_PreSearchLightCone();
+    ((CHeli_PreSearchLightCone_t)FUNC_CHeli_Pre_SearchLightCone)();
 }
 
 void CPointLightsSA::PostRenderHeliLights()
 {
-    auto CHeli_PostSearchLightCone = (CHeli_PostSearchLightCone_t)FUNC_CHeli_Post_SearchLightCone;
-    CHeli_PostSearchLightCone();
+    ((CHeli_PostSearchLightCone_t)FUNC_CHeli_Post_SearchLightCone)();
 }
 
 void CPointLightsSA::RenderHeliLight(const CVector& vecStart, const CVector& vecEnd, float startRadius, float endRadius, bool renderSpot)

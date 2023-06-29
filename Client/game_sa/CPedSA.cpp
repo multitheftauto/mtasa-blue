@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CPedSA.cpp
+ *  FILE:        Client/game_sa/CPedSA.cpp
  *  PURPOSE:     Ped entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -94,7 +94,7 @@ void CPedSA::Init()
     for (int i = 0; i < WEAPONSLOT_MAX; i++)
         m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, (eWeaponSlot)i);
 
-    // this->m_pPedIK = new Cm_pPedIKSA(&(pedInterface->m_pPedIK));
+    // m_pPedIK = new Cm_pPedIKSA(&(pedInterface->m_pPedIK));
 }
 
 void CPedSA::SetModelIndex(DWORD dwModelIndex)
@@ -253,7 +253,7 @@ void CPedSA::Respawn(CVector* position, bool bCameraCut)
         // RE-ENABLE call to CCamera__RestoreWithJumpCut when respawning
         MemCpy((void*)0x4422EA, szCode, 20);
     }
-    // OutputDebugString ( "Respawn!!!!" );
+    // OutputDebugString("Respawn!!!!");
 }
 
 float CPedSA::GetHealth()
@@ -442,9 +442,9 @@ void CPedSA::SetCurrentRotation(float fRotation)
 {
     GetPedInterface()->fCurrentRotation = fRotation;
 
-    //  char szDebug[255] = {'\0'};
-    //  sprintf(szDebug,"CurrentRotate Offset: %d", ((DWORD)&((CPedSAInterface *)GetInterface())->CurrentRotate) -  (DWORD)GetInterface());
-    //  OutputDebugString(szDebug);
+    // char szDebug[255] = {'\0'};
+    // sprintf(szDebug, "CurrentRotate Offset: %d", ((DWORD)&((CPedSAInterface*)GetInterface())->CurrentRotate) - (DWORD)GetInterface());
+    // OutputDebugString(szDebug);
 }
 
 void CPedSA::SetTargetRotation(float fRotation)
@@ -480,8 +480,7 @@ void CPedSA::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
 
             // is the player the local player?
             CPed* pPed = pGame->GetPools()->GetPedFromRef((DWORD)1);
-            // if ( pPed == this && thisPed->pPlayerInfo )
-            //{
+            // if (pPed == this && thisPed->pPlayerInfo)
 
             DWORD dwThis = (DWORD)GetInterface();
             if (pPed == this)
@@ -653,7 +652,6 @@ void CPedSA::SetGogglesState(bool bIsWearingThem)
 void CPedSA::SetClothesTextureAndModel(const char* szTexture, const char* szModel, int textureType)
 {
     DWORD dwFunc = FUNC_CPedClothesDesc__SetTextureAndModel;
-    // DWORD dwThis = (DWORD)this->GetInterface()->PlayerPedData.m_pClothes;
     DWORD dwThis = (DWORD)((CPedSAInterface*)GetInterface())->pPlayerData->m_pClothes;
     _asm
     {
