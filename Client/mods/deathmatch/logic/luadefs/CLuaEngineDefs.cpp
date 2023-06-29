@@ -63,6 +63,13 @@ eModelInfoType EngineGetModelInfoType(ushort usModelId)
     return static_cast<eModelInfoType>(pModel->GetModelInfoType());
 }
 
+std::vector<int> EngineDFFGetAtomics(CClientDFF* pDFF)
+{
+    std::vector<int> atomics;
+    pDFF->GetAtomics(atomics);
+    return atomics;
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -122,6 +129,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineSetModelInfoType", ArgumentParser<EngineSetModelInfoType>},
         {"engineGetModelInfoType", ArgumentParser<EngineGetModelInfoType>},
+        {"engineDFFGetAtomics", ArgumentParser<EngineDFFGetAtomics>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
