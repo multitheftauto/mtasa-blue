@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-29 22:08+0000\n"
-"PO-Revision-Date: 2023-06-29 23:07\n"
+"PO-Revision-Date: 2023-06-30 02:05\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -1790,7 +1790,7 @@ msgstr "السطوع:"
 
 #: Client/core/CSettings.cpp:610 Client/core/CSettings.cpp:718
 msgid "FX Quality:"
-msgstr "جودة التأثيرات:"
+msgstr "جودة مؤثرات الرسوم :\n"
 
 #: Client/core/CSettings.cpp:611 Client/core/CSettings.cpp:732
 msgid "Anisotropic filtering:"
