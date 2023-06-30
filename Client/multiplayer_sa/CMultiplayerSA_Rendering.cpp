@@ -636,6 +636,84 @@ void CMultiplayerSA::SetMirrorsEnabled(bool bEnabled)
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVisibilityPlugins::RenderPedCB
+//
+// Ped atomic render callback
+// Fix for screen flickering caused by corrupted matrices
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+bool IsMatrixValid(RwMatrix* pMatrix)
+{
+    constexpr float maxValue = 100000.0;
+    constexpr float minValue = -100000.0;
+
+    return
+        pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue
+        && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue
+        && pMatrix->at.z >= minValue && pMatrix->at.y <= maxValue
+
+        && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue
+        && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue
+        && pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
+
+        && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue
+        && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue
+        && pMatrix->up.z >= minValue && pMatrix->up.y <= maxValue
+
+        && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue
+        && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue
+        && pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
+}
+
+bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
+{
+    uint32 atomicSkinOffset = *(uint32*)0xC978A4;
+    RpHAnimHierarchy* pSkinPluginData = *(RpHAnimHierarchy**)((char*)pAtomic + atomicSkinOffset);
+
+    if (!pSkinPluginData)
+        return true;
+
+    unsigned __int32 count = pSkinPluginData->numNodes;
+    RwMatrix* pMatrixArray = pSkinPluginData->pMatrixArray;
+
+    for (unsigned int i = 0; i < count; i++)
+    {
+        if (!IsMatrixValid(pMatrixArray + i))
+            return false;
+    }
+
+    return true;
+}
+
+#define HOOKPOS_CVisibilityPlugins_RenderPedCB                        0x7335B0
+#define HOOKSIZE_CVisibilityPlugins_RenderPedCB                       5
+void _declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
+{
+    _asm
+    {
+        push esi;
+        push edi;
+        mov edi, [esp + 0Ch]; // RpAtomic
+        
+        push edi;
+        call AreMatricesOfRpAtomicValid;
+        add esp, 4;
+        
+        test al, al;
+        jz skipRender;
+        
+        push 0x7335B6; // Continue rendering
+        retn;
+        
+    skipRender:
+        pop edi;
+        pop esi;
+        retn;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Rendering
 //
 // Setup hook
@@ -648,6 +726,7 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstall(CEntity_RenderOneNonRoad);
     EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC_Mid);
     EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC_End);
+    EZHookInstall(CVisibilityPlugins_RenderPedCB);
     EZHookInstall(Check_NoOfVisibleLods);
     EZHookInstall(Check_NoOfVisibleEntities);
     EZHookInstall(WinLoop);
