@@ -30,27 +30,27 @@ AnimBlendFrameData* CAnimBlendClumpDataSAInterface::GetFrameDataByNodeId(uint ui
 
 CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(CAnimBlendStaticAssociationSAInterface& staticAssociationByReference)
 {
-    DWORD DwFunc = 0x4CF080;
-    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    DWORD dwFunc = 0x4CF080;
+    DWORD dwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     _asm
     {
-        mov     ecx, DwThisInterface
+        mov     ecx, dwThisInterface
         push    staticAssociationByReference
-        call    DwFunc
-    };
+        call    dwFunc
+    }
 }
 
 CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy)
 {
-    DWORD DwFunc = 0x4CEFC0;
-    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    DWORD dwFunc = 0x4CEFC0;
+    DWORD dwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     _asm
     {
-        mov     ecx, DwThisInterface
+        mov     ecx, dwThisInterface
         push    pAnimHierarchy
         push    pClump
-        call    DwFunc
-    };
+        call    dwFunc
+    }
 }
 
 CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::InitializeForCustomAnimation(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy)
@@ -74,38 +74,38 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::InitializeForCustomAn
 
 void CAnimBlendAssociationSA::Init(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimHierarchy)
 {
-    DWORD DwFunc = 0x4CED50;
-    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    DWORD dwFunc = 0x4CED50;
+    DWORD dwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     _asm
     {
-        mov     ecx, DwThisInterface
+        mov     ecx, dwThisInterface
         push    pAnimHierarchy
         push    pClump
-        call    DwFunc
-    };
+        call    dwFunc
+    }
 }
 
 void CAnimBlendAssociationSA::AllocateAnimBlendNodeArray(int iCount)
 {
-    DWORD DwFunc = 0x4CE9F0;
-    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    DWORD dwFunc = 0x4CE9F0;
+    DWORD dwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     _asm
     {
-        mov     ecx, DwThisInterface
+        mov     ecx, dwThisInterface
         push    iCount
-        call    DwFunc
-    };
+        call    dwFunc
+    }
 }
 
 void CAnimBlendAssociationSA::FreeAnimBlendNodeArray()
 {
-    DWORD DwFunc = 0x4CEA40;
-    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    DWORD dwFunc = 0x4CEA40;
+    DWORD dwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     _asm
     {
-        mov     ecx, DwThisInterface
-        call    DwFunc
-    };
+        mov     ecx, dwThisInterface
+        call    dwFunc
+    }
 }
 
 std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy()
@@ -116,13 +116,12 @@ std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy()
 void CAnimBlendAssociationSA::SetCurrentProgress(float fProgress)
 {
     float fTime = m_pInterface->pAnimHierarchy->fTotalTime * fProgress;
-
-    DWORD DwFunc = 0x4CEA80;
-    DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
+    DWORD dwFunc = 0x4CEA80;
+    DWORD dwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     _asm
     {
-        mov     ecx, DwThisInterface
+        mov     ecx, dwThisInterface
         push    fTime
-        call    DwFunc
-    };
+        call    dwFunc
+    }
 }

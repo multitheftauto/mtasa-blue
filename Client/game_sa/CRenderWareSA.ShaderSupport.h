@@ -34,7 +34,7 @@ struct STexNameInfo;
 //
 struct STexTag
 {
-    STexTag(ushort usTxdId) : m_bUsingTxdId(true), m_usTxdId(usTxdId), m_pTex(NULL) {}
+    STexTag(ushort usTxdId) : m_bUsingTxdId(true), m_usTxdId(usTxdId), m_pTex(nullptr) {}
 
     STexTag(RwTexture* pTex) : m_bUsingTxdId(false), m_usTxdId(0), m_pTex(pTex) {}
 
@@ -88,7 +88,7 @@ struct SShaderInfo
 struct STexInfo
 {
     STexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData)
-        : texTag(texTag), strTextureName(strTextureName.ToLower()), pD3DData(pD3DData), pAssociatedTexNameInfo(NULL)
+        : texTag(texTag), strTextureName(strTextureName.ToLower()), pD3DData(pD3DData), pAssociatedTexNameInfo(nullptr)
     {
     }
     STexTag          texTag;
@@ -99,7 +99,7 @@ struct STexInfo
 
 struct SShaderInfoInstance
 {
-    SShaderInfoInstance() : pShaderInfo(NULL), bMixEntityAndNonEntity(false) {}
+    SShaderInfoInstance() : pShaderInfo(nullptr), bMixEntityAndNonEntity(false) {}
 
     SShaderInfoInstance(SShaderInfo* pShaderInfo, bool bMixEntityAndNonEntity) : pShaderInfo(pShaderInfo), bMixEntityAndNonEntity(bMixEntityAndNonEntity) {}
 
@@ -136,7 +136,7 @@ struct SShaderInfoLayers
 //
 struct STexShaderReplacement
 {
-    STexShaderReplacement() : bSet(false) /*, pShaderInfo ( NULL )*/ {}
+    STexShaderReplacement() : bSet(false) /*, pShaderInfo(nullptr)*/ {}
     bool              bSet;
     SShaderInfoLayers shaderLayers;
 };

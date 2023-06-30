@@ -49,7 +49,6 @@ public:
 
     CProjectileInfoSA(CProjectileInfoSAInterface* projectileInfoInterface) { internalInterface = projectileInfoInterface; }
 
-    void             RemoveAllProjectiles();
     void             RemoveProjectile(CProjectileInfo* pProjectileInfo, CProjectile* pProjectile, bool bBlow = true);
     CProjectileInfo* GetProjectileInfo(void* projectileInfoInterface);
     CProjectileInfo* GetProjectileInfo(DWORD dwIndex);

@@ -35,11 +35,7 @@ struct SCheatSA
     BYTE* m_byAddress;            // Cheat Address
     bool  m_bEnabled;             // Cheat State
     bool  m_bCanBeSet;            // Cheat can be set with setWorldSpecialPropertyEnabled
-    SCheatSA(BYTE* Address, bool bCanBeSet = true)
-    {
-        m_byAddress = Address;
-        m_bCanBeSet = bCanBeSet;
-    }
+    SCheatSA(BYTE* Address, bool bCanBeSet = true) { m_byAddress = Address; m_bCanBeSet = bCanBeSet; }
 };
 
 class CGameSA : public CGame
@@ -58,63 +54,63 @@ public:
     CGameSA();
     ~CGameSA();
 
-    CPools*                   GetPools() { return m_pPools; }
-    CPlayerInfo*              GetPlayerInfo() { return m_pPlayerInfo; }
-    CProjectileInfo*          GetProjectileInfo() { return m_pProjectileInfo; }
-    CRadar*                   GetRadar() { return m_pRadar; }
-    CClock*                   GetClock() { return m_pClock; }
-    CCoronas*                 GetCoronas() { return m_pCoronas; }
-    CCheckpoints*             GetCheckpoints() { return m_pCheckpoints; }
-    CEventList*               GetEventList() { return m_pEventList; }
-    CFireManager*             GetFireManager() { return m_pFireManager; }
-    CExplosionManager*        GetExplosionManager() { return m_pExplosionManager; }
-    CGarages*                 GetGarages() { return m_pGarages; }
-    CHud*                     GetHud() { return m_pHud; }
-    CWeather*                 GetWeather() { return m_pWeather; }
-    CWorld*                   GetWorld() { return m_pWorld; }
-    CCamera*                  GetCamera() { return m_pCamera; }
-    CPickups*                 GetPickups() { return m_pPickups; }
-    C3DMarkers*               Get3DMarkers() { return m_p3DMarkers; }
-    CPad*                     GetPad() { return m_pPad; }
-    CAERadioTrackManager*     GetAERadioTrackManager() { return m_pCAERadioTrackManager; }
-    CAudioEngine*             GetAudioEngine() { return m_pAudioEngine; }
-    CAEAudioHardware*         GetAEAudioHardware() { return m_pAEAudioHardware; }
+    CPools*                   GetPools()                   { return m_pPools; }
+    CPlayerInfo*              GetPlayerInfo()              { return m_pPlayerInfo; }
+    CProjectileInfo*          GetProjectileInfo()          { return m_pProjectileInfo; }
+    CRadar*                   GetRadar()                   { return m_pRadar; }
+    CClock*                   GetClock()                   { return m_pClock; }
+    CCoronas*                 GetCoronas()                 { return m_pCoronas; }
+    CCheckpoints*             GetCheckpoints()             { return m_pCheckpoints; }
+    CEventList*               GetEventList()               { return m_pEventList; }
+    CFireManager*             GetFireManager()             { return m_pFireManager; }
+    CExplosionManager*        GetExplosionManager()        { return m_pExplosionManager; }
+    CGarages*                 GetGarages()                 { return m_pGarages; }
+    CHud*                     GetHud()                     { return m_pHud; }
+    CWeather*                 GetWeather()                 { return m_pWeather; }
+    CWorld*                   GetWorld()                   { return m_pWorld; }
+    CCamera*                  GetCamera()                  { return m_pCamera; }
+    CPickups*                 GetPickups()                 { return m_pPickups; }
+    C3DMarkers*               Get3DMarkers()               { return m_p3DMarkers; }
+    CPad*                     GetPad()                     { return m_pPad; }
+    CAERadioTrackManager*     GetAERadioTrackManager()     { return m_pCAERadioTrackManager; }
+    CAudioEngine*             GetAudioEngine()             { return m_pAudioEngine; }
+    CAEAudioHardware*         GetAEAudioHardware()         { return m_pAEAudioHardware; }
     CAESoundManager*          GetAESoundManager() override { return m_pAESoundManager; }
-    CAudioContainer*          GetAudioContainer() { return m_pAudioContainer; }
-    CStats*                   GetStats() { return m_pStats; }
-    CTaskManagementSystemSA*  GetTaskManagementSystem() { return m_pTaskManagementSystem; }
-    CTasks*                   GetTasks() { return m_pTasks; }
-    CGameSettings*            GetSettings() { return m_pSettings; }
-    CCarEnterExit*            GetCarEnterExit() { return m_pCarEnterExit; }
+    CAudioContainer*          GetAudioContainer()          { return m_pAudioContainer; }
+    CStats*                   GetStats()                   { return m_pStats; }
+    CTaskManagementSystemSA*  GetTaskManagementSystem()    { return m_pTaskManagementSystem; }
+    CTasks*                   GetTasks()                   { return m_pTasks; }
+    CGameSettings*            GetSettings()                { return m_pSettings; }
+    CCarEnterExit*            GetCarEnterExit()            { return m_pCarEnterExit; }
     CControllerConfigManager* GetControllerConfigManager() { return m_pControllerConfigManager; }
-    CRenderWare*              GetRenderWare() { return m_pRenderWare; }
-    CHandlingManager*         GetHandlingManager() { return m_pHandlingManager; }
-    CAnimManager*             GetAnimManager() { return m_pAnimManager; }
-    CStreaming*               GetStreaming() { return m_pStreaming; }
-    CVisibilityPlugins*       GetVisibilityPlugins() { return m_pVisibilityPlugins; }
-    CKeyGen*                  GetKeyGen() { return m_pKeyGen; }
-    CRopes*                   GetRopes() { return m_pRopes; }
-    CFx*                      GetFx() { return m_pFx; }
-    CFxManager*               GetFxManager() { return m_pFxManager; }
-    CWaterManager*            GetWaterManager() { return m_pWaterManager; }
-    CWeaponStatManager*       GetWeaponStatManager() { return m_pWeaponStatsManager; }
-    CPointLights*             GetPointLights() { return m_pPointLights; }
+    CRenderWare*              GetRenderWare()              { return m_pRenderWare; }
+    CHandlingManager*         GetHandlingManager()         { return m_pHandlingManager; }
+    CAnimManager*             GetAnimManager()             { return m_pAnimManager; }
+    CStreaming*               GetStreaming()               { return m_pStreaming; }
+    CVisibilityPlugins*       GetVisibilityPlugins()       { return m_pVisibilityPlugins; }
+    CKeyGen*                  GetKeyGen()                  { return m_pKeyGen; }
+    CRopes*                   GetRopes()                   { return m_pRopes; }
+    CFx*                      GetFx()                      { return m_pFx; }
+    CFxManager*               GetFxManager()               { return m_pFxManager; }
+    CWaterManager*            GetWaterManager()            { return m_pWaterManager; }
+    CWeaponStatManager*       GetWeaponStatManager()       { return m_pWeaponStatsManager; }
+    CPointLights*             GetPointLights()             { return m_pPointLights; }
     CColStore*                GetCollisionStore() override { return m_collisionStore; }
-    CRenderWareSA*            GetRenderWareSA() { return m_pRenderWare; }
-    CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
+    CRenderWareSA*            GetRenderWareSA()            { return m_pRenderWare; }
+    CFxManagerSA*             GetFxManagerSA()             { return m_pFxManager; }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(uchar ucObjectGroup);
 
-    int32_t GetBaseIDforDFF() { return 0; }
-    int32_t GetBaseIDforTXD() { return *(int32_t*)(0x407104 + 2); }
-    int32_t GetBaseIDforCOL() { return *(int32_t*)(0x410344 + 2); }
-    int32_t GetBaseIDforIPL() { return *(int32_t*)(0x4044F4 + 2); }
-    int32_t GetBaseIDforDAT() { return *(int32_t*)(0x44D064 + 2); }
-    int32_t GetBaseIDforIFP() { return *(int32_t*)(0x407124 + 2); }
-    int32_t GetBaseIDforRRR() { return *(int32_t*)(0x4594A1 + 2); }
-    int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
+    int32_t GetBaseIDforDFF()      { return 0; }
+    int32_t GetBaseIDforTXD()      { return *(int32_t*)(0x407104 + 2); }
+    int32_t GetBaseIDforCOL()      { return *(int32_t*)(0x410344 + 2); }
+    int32_t GetBaseIDforIPL()      { return *(int32_t*)(0x4044F4 + 2); }
+    int32_t GetBaseIDforDAT()      { return *(int32_t*)(0x44D064 + 2); }
+    int32_t GetBaseIDforIFP()      { return *(int32_t*)(0x407124 + 2); }
+    int32_t GetBaseIDforRRR()      { return *(int32_t*)(0x4594A1 + 2); }
+    int32_t GetBaseIDforSCM()      { return *(int32_t*)(0x46A574 + 2); }
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
     DWORD GetSystemTime() { return *VAR_SystemTime; }
@@ -139,7 +135,7 @@ public:
     float GetTimeScale();
     void  SetTimeScale(float fTimeScale);
 
-    bool InitLocalPlayer(class CClientPed* pClientPed);
+    bool InitLocalPlayer(CPed* pPed);
 
     float GetGravity();
     void  SetGravity(float fGravity);
@@ -248,19 +244,18 @@ private:
     CPointLights*                   m_pPointLights;
     CColStore*                      m_collisionStore;
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
-
-    CPad*                     m_pPad;
-    CAERadioTrackManager*     m_pCAERadioTrackManager;
-    CAudioEngine*             m_pAudioEngine;
-    CAEAudioHardware*         m_pAEAudioHardware;
-    CAESoundManager*          m_pAESoundManager;
-    CAudioContainer*          m_pAudioContainer;
-    CStats*                   m_pStats;
-    CTaskManagementSystemSA*  m_pTaskManagementSystem;            // not used outside the game_sa
-    CTasks*                   m_pTasks;
-    CGameSettings*            m_pSettings;
-    CCarEnterExit*            m_pCarEnterExit;
-    CControllerConfigManager* m_pControllerConfigManager;
+    CPad*                           m_pPad;
+    CAERadioTrackManager*           m_pCAERadioTrackManager;
+    CAudioEngine*                   m_pAudioEngine;
+    CAEAudioHardware*               m_pAEAudioHardware;
+    CAESoundManager*                m_pAESoundManager;
+    CAudioContainer*                m_pAudioContainer;
+    CStats*                         m_pStats;
+    CTaskManagementSystemSA*        m_pTaskManagementSystem;            // not used outside the game_sa
+    CTasks*                         m_pTasks;
+    CGameSettings*                  m_pSettings;
+    CCarEnterExit*                  m_pCarEnterExit;
+    CControllerConfigManager*       m_pControllerConfigManager;
 
     eGameVersion m_eGameVersion;
     bool         m_bAsyncScriptEnabled;

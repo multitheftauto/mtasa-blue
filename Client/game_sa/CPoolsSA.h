@@ -15,6 +15,7 @@
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
 
+
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
 class CClientEntity;
@@ -65,10 +66,10 @@ public:
     ~CPoolsSA();
 
     // Vehicles pool
-    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
+    CVehicle* AddVehicle(CVehicle* pVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
 
 private:
-    bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
+    bool AddVehicleToPool(CVehicle* pVehicle, CVehicleSA* pVehicleSA);
 
 public:
     void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
@@ -81,10 +82,10 @@ public:
     void DeleteAllVehicles();
 
     // Objects pool
-    CObject* AddObject(CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled);
+    CObject* AddObject(CObject* pObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled);
 
 private:
-    bool AddObjectToPool(CClientObject* pClientObject, CObjectSA* pObject);
+    bool AddObjectToPool(CObject* pObject, CObjectSA* pObjectSA);
 
 public:
     void                      RemoveObject(CObject* pObject, bool bDelete = true);
@@ -94,11 +95,11 @@ public:
     void                      DeleteAllObjects();
 
     // Peds pool
-    CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);
-    CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
+    CPed* AddPed(CPed* pPed, unsigned int nModelIndex);
+    CPed* AddPed(CPed* pPed, DWORD* pGameInterface);
 
 private:
-    bool AddPedToPool(CClientPed* pClientPed, CPedSA* pPed);
+    bool AddPedToPool(CPed* pPed, CPedSA* pPedSA);
 
 public:
     void                   RemovePed(CPed* ped, bool bDelete = true);
@@ -113,7 +114,7 @@ public:
     uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
-    CVehicle* AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
+    CVehicle* AddTrain(CVehicle* pVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
 
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
     DWORD GetVehiclePoolIndex(std::uint8_t* pInterfacee);

@@ -16,12 +16,6 @@
 
 extern CCoreInterface* g_pCore;
 
-#define ARRAY_HANDLINGDATA          0xC2B9DC
-
-#define Func_Calculate              0x6F5080
-#define Var_fTurnMassMultiplier     0x858B8C
-#define Var_fBasicDragCoeff         0x858C58
-
 DWORD CHandlingManagerSA::m_dwStore_LoadHandlingCfg = 0;
 
 tHandlingDataSA   CHandlingManagerSA::m_OriginalHandlingData[HT_MAX];
@@ -144,7 +138,7 @@ CHandlingManagerSA::CHandlingManagerSA()
     }
 
     // Uncomment this to dump
-    // HookInstall ( Func_Calculate, (DWORD) Hook_Calculate, 11 );
+    // HookInstall(0x6F5080, (DWORD)Hook_Calculate, 11);
     m_HandlingNames["mass"] = HANDLING_MASS;                                                             // works (mass > 0)
     m_HandlingNames["turnMass"] = HANDLING_TURNMASS;                                                     // works
     m_HandlingNames["dragCoeff"] = HANDLING_DRAGCOEFF;                                                   // works
@@ -245,7 +239,7 @@ CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
 const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX - 1)
+    if (eModel >= 400 && eModel < VT_MAX - 1) // VT_MAX - 1 = 611
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -259,7 +253,7 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes 
 const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX - 1)
+    if (eModel >= 400 && eModel < VT_MAX - 1) // VT_MAX - 1 = 611
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -276,7 +270,7 @@ const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eV
 const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX - 1)
+    if (eModel >= 400 && eModel < VT_MAX - 1)// VT_MAX - 1 = 611
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -293,7 +287,7 @@ const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehic
 const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX - 1)
+    if (eModel >= 400 && eModel < VT_MAX - 1) // VT_MAX - 1 = 611
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);

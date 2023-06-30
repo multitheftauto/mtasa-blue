@@ -62,7 +62,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
 {
     if (IsUpgradeModelId(dwModelID))
     {
-        DWORD dwFunc = FUNC_RequestVehicleUpgrade;
+        DWORD dwFunc = 0x408C70;
         _asm
         {
             push    dwFlags
@@ -127,7 +127,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     }
     else
     {
-        DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
+        DWORD dwFunc = 0x4044C0;
         bool  bReturn = 0;
         _asm
         {
@@ -163,7 +163,7 @@ void CStreamingSA::ReinitStreaming()
 // ReinitStreaming should be called after this.
 // Otherwise the model wont be restreamed
 // TODO: Somehow restream a single model instead of the whole world
-void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
+void CStreamingSA::SetStreamingInfo(uint32 modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
 
@@ -187,7 +187,7 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     pItemInfo->nextInImg = uiNextInImg;
 }
 
-CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)
+CStreamingInfo* CStreamingSA::GetStreamingInfo(uint32 modelid)
 {
     return &ms_aInfoForModel[modelid];
 }

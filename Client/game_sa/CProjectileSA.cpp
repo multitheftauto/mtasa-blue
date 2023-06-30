@@ -83,7 +83,7 @@ bool CProjectileSA::CorrectPhysics()
     CPhysicalSAInterface* pInterface = static_cast<CPhysicalSAInterface*>(m_pInterface);
     // make sure we have an interface
 
-    if (pInterface != NULL)
+    if (pInterface != nullptr)
     {
         // make sure we have an attached entity
         if (pInterface->m_pAttachedEntity)
@@ -107,7 +107,7 @@ bool CProjectileSA::CorrectPhysics()
 
                 // create a matrix variable
                 CMatrix attachedToMatrix;
-                if (pCollidedWithInterface->Placeable.matrix != NULL)
+                if (pCollidedWithInterface->Placeable.matrix != nullptr)
                 {
                     // get our matrix
                     pCollidedWithInterface->Placeable.matrix->ConvertToMatrix(attachedToMatrix);

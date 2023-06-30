@@ -23,6 +23,8 @@
 #include "TaskSA.h"
 #include "TaskSecondarySA.h"
 
+#define FUNC_CTask_Operator_Delete 0x61A5B0
+
 extern CGameSA* pGame;
 
 using namespace std;

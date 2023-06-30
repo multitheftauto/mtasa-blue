@@ -48,33 +48,33 @@ CPoolsSA::~CPoolsSA()
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                    VEHICLES POOL                                     //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle)
+inline bool CPoolsSA::AddVehicleToPool(CVehicle* pVehicle, CVehicleSA* pVehicleSA)
 {
     // Grab the interface
-    CVehicleSAInterface* pInterface = pVehicle->GetVehicleInterface();
+    CVehicleSAInterface* pVehicleSAInterface = pVehicleSA->GetVehicleInterface();
 
-    if (!pInterface)
+    if (!pVehicleSAInterface)
     {
         return false;
     }
     else
     {
-        DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+        DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pVehicleSAInterface);
         if (dwElementIndexInPool >= MAX_VEHICLES)
         {
             return false;
         }
 
-        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {pVehicle, (CClientEntity*)pClientVehicle};
+        m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool] = {pVehicleSA, (CClientEntity*)pVehicle};
         ++m_vehiclePool.ulCount;
     }
 
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
+CVehicle* CPoolsSA::AddVehicle(CVehicle* pVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
 {
-    CVehicleSA* pVehicle = nullptr;
+    CVehicleSA* pVehicleSA = nullptr;
 
     if (m_vehiclePool.ulCount < MAX_VEHICLES)
     {
@@ -90,50 +90,50 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
         switch (vehicleClass)
         {
             case VehicleClass::MONSTER_TRUCK:
-                pVehicle = new CMonsterTruckSA(reinterpret_cast<CMonsterTruckSAInterface*>(pInterface));
+                pVehicleSA = new CMonsterTruckSA(reinterpret_cast<CMonsterTruckSAInterface*>(pInterface));
                 break;
             case VehicleClass::QUAD:
-                pVehicle = new CQuadBikeSA(reinterpret_cast<CQuadBikeSAInterface*>(pInterface));
+                pVehicleSA = new CQuadBikeSA(reinterpret_cast<CQuadBikeSAInterface*>(pInterface));
                 break;
             case VehicleClass::HELI:
-                pVehicle = new CHeliSA(reinterpret_cast<CHeliSAInterface*>(pInterface));
+                pVehicleSA = new CHeliSA(reinterpret_cast<CHeliSAInterface*>(pInterface));
                 break;
             case VehicleClass::PLANE:
-                pVehicle = new CPlaneSA(reinterpret_cast<CPlaneSAInterface*>(pInterface));
+                pVehicleSA = new CPlaneSA(reinterpret_cast<CPlaneSAInterface*>(pInterface));
                 break;
             case VehicleClass::BOAT:
-                pVehicle = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
+                pVehicleSA = new CBoatSA(reinterpret_cast<CBoatSAInterface*>(pInterface));
                 break;
             case VehicleClass::TRAIN:
-                pVehicle = new CTrainSA(reinterpret_cast<CTrainSAInterface*>(pInterface));
+                pVehicleSA = new CTrainSA(reinterpret_cast<CTrainSAInterface*>(pInterface));
                 break;
             case VehicleClass::BIKE:
-                pVehicle = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
+                pVehicleSA = new CBikeSA(reinterpret_cast<CBikeSAInterface*>(pInterface));
                 break;
             case VehicleClass::BMX:
-                pVehicle = new CBmxSA(reinterpret_cast<CBmxSAInterface*>(pInterface));
+                pVehicleSA = new CBmxSA(reinterpret_cast<CBmxSAInterface*>(pInterface));
                 break;
             case VehicleClass::TRAILER:
-                pVehicle = new CTrailerSA(reinterpret_cast<CTrailerSAInterface*>(pInterface));
+                pVehicleSA = new CTrailerSA(reinterpret_cast<CTrailerSAInterface*>(pInterface));
                 break;
             default:
-                pVehicle = new CAutomobileSA(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
+                pVehicleSA = new CAutomobileSA(reinterpret_cast<CAutomobileSAInterface*>(pInterface));
                 break;
         }
 
-        if (pVehicle && AddVehicleToPool(pClientVehicle, pVehicle))
+        if (pVehicleSA && AddVehicleToPool(pVehicle, pVehicleSA))
         {
-            pVehicle->m_ucVariant = ucVariation;
-            pVehicle->m_ucVariant2 = ucVariation2;
+            pVehicleSA->m_ucVariant = ucVariation;
+            pVehicleSA->m_ucVariant2 = ucVariation2;
         }
         else
         {
-            delete pVehicle;
-            pVehicle = nullptr;
+            delete pVehicleSA;
+            pVehicleSA = nullptr;
         }
     }
 
-    return pVehicle;
+    return pVehicleSA;
 }
 
 void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
@@ -171,11 +171,11 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 {
     if (m_bGetVehicleEnabled)
     {
-        CVehicleSAInterface* pInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
+        CVehicleSAInterface* pVehicleSAInterface = reinterpret_cast<CVehicleSAInterface*>(pGameInterface);
 
-        if (pInterface)
+        if (pVehicleSAInterface)
         {
-            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pInterface);
+            DWORD dwElementIndexInPool = GetVehiclePoolIndex((std::uint8_t*)pVehicleSAInterface);
 
             if (dwElementIndexInPool < MAX_VEHICLES)
             {
@@ -190,19 +190,18 @@ void CPoolsSA::DeleteAllVehicles()
 {
     while (m_vehiclePool.ulCount > 0)
     {
-        CVehicleSA* pVehicle = m_vehiclePool.arrayOfClientEntities[m_vehiclePool.ulCount - 1].pEntity;
-
-        RemoveVehicle(pVehicle);
+        CVehicleSA* pVehicleSA = m_vehiclePool.arrayOfClientEntities[m_vehiclePool.ulCount - 1].pEntity;
+        RemoveVehicle(pVehicleSA);
     }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                     OBJECTS POOL                                     //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* pObject)
+inline bool CPoolsSA::AddObjectToPool(CObject* pObject, CObjectSA* pObjectSA)
 {
     // Grab the new object interface
-    CObjectSAInterface* pInterface = pObject->GetObjectInterface();
+    CObjectSAInterface* pInterface = pObjectSA->GetObjectInterface();
 
     if (!pInterface)
     {
@@ -216,7 +215,7 @@ inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* p
             return false;
         }
 
-        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {pObject, (CClientEntity*)pClientObject};
+        m_objectPool.arrayOfClientEntities[dwElementIndexInPool] = {pObjectSA, (CClientEntity*)pObject};
 
         // Increase the count of objects
         ++m_objectPool.ulCount;
@@ -225,34 +224,34 @@ inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* p
     return true;
 }
 
-CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled)
+CObject* CPoolsSA::AddObject(CObject* pObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled)
 {
-    CObjectSA* pObject = nullptr;
+    CObjectSA* pObjectSA = nullptr;
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
-        pObject = new CObjectSA(dwModelID, bBreakingDisabled);
+        pObjectSA = new CObjectSA(dwModelID, bBreakingDisabled);
 
-        if (pObject && AddObjectToPool(pClientObject, pObject))
+        if (pObjectSA && AddObjectToPool(pObject, pObjectSA))
         {
             if (bLowLod)
             {
-                pObject->m_pInterface->bUsesCollision = 0;
-                pObject->m_pInterface->bDontCastShadowsOn = 1;
+                pObjectSA->m_pInterface->bUsesCollision = 0;
+                pObjectSA->m_pInterface->bDontCastShadowsOn = 1;
                 // Set super hacky flag to indicate this is a special low lod object
-                pObject->m_pInterface->SetIsLowLodEntity();
+                pObjectSA->m_pInterface->SetIsLowLodEntity();
             }
             else
-                pObject->m_pInterface->SetIsHighLodEntity();
+                pObjectSA->m_pInterface->SetIsHighLodEntity();
         }
         else
         {
-            delete pObject;
-            pObject = nullptr;
+            delete pObjectSA;
+            pObjectSA = nullptr;
         }
     }
 
-    return pObject;
+    return pObjectSA;
 }
 
 void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
@@ -332,10 +331,10 @@ void CPoolsSA::DeleteAllObjects()
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                       PEDS POOL                                      //
 //////////////////////////////////////////////////////////////////////////////////////////
-inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
+inline bool CPoolsSA::AddPedToPool(CPed* pPed, CPedSA* pPedSA)
 {
     // Grab the ped interface
-    CPedSAInterface* pInterface = pPed->GetPedInterface();
+    CPedSAInterface* pInterface = pPedSA->GetPedInterface();
 
     if (!pInterface)
     {
@@ -349,31 +348,31 @@ inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
             return false;
         }
 
-        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {pPed, (CClientEntity*)pClientPed};
+        m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {pPedSA, (CClientEntity*)pPed};
         ++m_pedPool.ulCount;
     }
 
     return true;
 }
 
-CPed* CPoolsSA::AddPed(CClientPed* pClientPed, unsigned int nModelIndex)
+CPed* CPoolsSA::AddPed(CPed* pPed, unsigned int nModelIndex)
 {
-    CPedSA* pPed = nullptr;
+    CPedSA* pPedSA = nullptr;
     if (m_pedPool.ulCount < MAX_PEDS)
     {
-        pPed = new CPlayerPedSA(nModelIndex);
-        if (!AddPedToPool(pClientPed, pPed))
+        pPedSA = new CPlayerPedSA(nModelIndex);
+        if (!AddPedToPool(pPed, pPedSA))
         {
-            delete pPed;
-            pPed = nullptr;
+            delete pPedSA;
+            pPedSA = nullptr;
         }
     }
-    return pPed;
+    return pPedSA;
 }
 
-CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
+CPed* CPoolsSA::AddPed(CPed* pPed, DWORD* pGameInterface)
 {
-    CPedSA* pPed = nullptr;
+    CPedSA* pPedSA = nullptr;
 
     if (m_pedPool.ulCount < MAX_PEDS)
     {
@@ -388,23 +387,23 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
                 SClientEntity<CPedSA>* pPedEntity = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
                 if (pPedEntity && pPedEntity->pEntity)
                 {
-                    m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {pPedEntity->pEntity, (CClientEntity*)pClientPed};
+                    m_pedPool.arrayOfClientEntities[dwElementIndexInPool] = {pPedEntity->pEntity, (CClientEntity*)pPed};
                 }
                 else
                 {
                     // Create it
-                    pPed = new CPlayerPedSA(pInterface);
-                    if (!AddPedToPool(pClientPed, pPed))
+                    pPedSA = new CPlayerPedSA(pInterface);
+                    if (!AddPedToPool(pPed, pPedSA))
                     {
-                        delete pPed;
-                        pPed = nullptr;
+                        delete pPedSA;
+                        pPedSA = nullptr;
                     }
                 }
             }
         }
     }
 
-    return pPed;
+    return pPedSA;
 }
 
 void CPoolsSA::RemovePed(CPed* pPed, bool bDelete)
@@ -563,7 +562,7 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
     return nullptr;
 }
 
-CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId)
+CVehicle* CPoolsSA::AddTrain(CVehicle* pVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId)
 {
     // clean the existing array
     MemSetFast((void*)VAR_TrainModelArray, 0, 32 * sizeof(DWORD));
@@ -623,7 +622,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
         if (m_vehiclePool.ulCount < MAX_VEHICLES)
         {
             trainHead = new CTrainSA(pTrainBeginning);
-            if (!AddVehicleToPool(pClientVehicle, trainHead))
+            if (!AddVehicleToPool(pVehicle, trainHead))
             {
                 delete trainHead;
                 trainHead = nullptr;
@@ -642,7 +641,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
                 if (vehCarriage)
                 {
                     carriage = new CTrainSA(vehCarriage);
-                    if (!AddVehicleToPool(pClientVehicle, carriage))
+                    if (!AddVehicleToPool(pVehicle, carriage))
                     {
                         delete carriage;
                         carriage = nullptr;

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CPools.h
+ *  FILE:        Client/sdk/game/CPools.h
  *  PURPOSE:     Game pool interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -59,14 +59,14 @@ class CPools
 {
 public:
     // Vehicles pool
-    virtual CVehicle* AddVehicle(class CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2) = 0;
+    virtual CVehicle* AddVehicle(CVehicle* pVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2) = 0;
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
     virtual unsigned long              GetVehicleCount() = 0;
 
     // Objects pool
-    virtual CObject* AddObject(class CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled) = 0;
+    virtual CObject* AddObject(CObject* pObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled) = 0;
     virtual void     RemoveObject(CObject* pObject, bool bDelete = true) = 0;
 
     virtual SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface) = 0;
@@ -74,8 +74,8 @@ public:
     virtual unsigned long             GetObjectCount() = 0;
 
     // Peds pool
-    virtual CPed* AddPed(class CClientPed* pClientPed, unsigned int nModelIndex) = 0;
-    virtual CPed* AddPed(class CClientPed* pClientPed, DWORD* pGameInterface) = 0;
+    virtual CPed* AddPed(CPed* pPed, unsigned int nModelIndex) = 0;
+    virtual CPed* AddPed(CPed* pPed, DWORD* pGameInterface) = 0;
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
@@ -83,7 +83,7 @@ public:
     virtual unsigned long          GetPedCount() = 0;
 
     // Others
-    virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
+    virtual CVehicle* AddTrain(CVehicle* pVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
                                uchar ucTrackId = 0xFF) = 0;
 
     virtual CEntity*       GetEntity(DWORD* pGameInterface) = 0;

@@ -13,12 +13,14 @@
 #include <CRect.h>
 #include "CRadarSA.h"
 
+#define MAX_MARKERS 175
+
 CMarkerSA* Markers[MAX_MARKERS];
 
 CRadarSA::CRadarSA()
 {
     for (int i = 0; i < MAX_MARKERS; i++)
-        Markers[i] = new CMarkerSA((CMarkerSAInterface*)(ARRAY_CMarker + i * sizeof(CMarkerSAInterface)));
+        Markers[i] = new CMarkerSA((CMarkerSAInterface*)(0xBA86F0 + i * sizeof(CMarkerSAInterface)));
 }
 
 CRadarSA::~CRadarSA()
@@ -61,7 +63,7 @@ void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const
     // Convert color to required abgr at the last moment
     unsigned long abgr = color.A << 24 | color.B << 16 | color.G << 8 | color.R;
     CRect         myRect(fX1, fY2, fX2, fY1);
-    DWORD         dwFunc = FUNC_DrawAreaOnRadar;
+    DWORD         dwFunc = 0x5853d0;
     _asm
     {
         push    eax

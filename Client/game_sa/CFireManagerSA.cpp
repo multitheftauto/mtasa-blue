@@ -25,10 +25,7 @@ CFireManagerSA::CFireManagerSA()
 
 CFireManagerSA::~CFireManagerSA()
 {
-    for (int i = 0; i < MAX_FIRES; i++)
-    {
-        delete Fires[i];
-    }
+    for (int i = 0; i < MAX_FIRES; i++) { delete Fires[i]; }
 }
 
 void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
@@ -89,10 +86,8 @@ void CFireManagerSA::ExtinguishAllFires()
 
 CFire* CFireManagerSA::GetFire(DWORD ID)
 {
-    if (ID < MAX_FIRES)
-        return Fires[ID];
-    else
-        return nullptr;
+    if (ID < MAX_FIRES) { return Fires[ID]; }
+    else { return nullptr; }
 }
 
 DWORD CFireManagerSA::GetFireCount()

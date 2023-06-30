@@ -115,13 +115,13 @@ CGameSA::CGameSA()
     }
 
     // Set the model ids for all the CModelInfoSA instances
-    for (unsigned int i = 0; i < modelInfoMax; i++)
+    for (uint i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
 
     // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-    for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    for (uint i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
         ObjectGroupsInfo[i].SetGroup(i);
     }
@@ -384,7 +384,7 @@ eSystemState CGameSA::GetSystemState()
  * This adds the local player to the ped pool, nothing else
  * @return BOOL TRUE if success, FALSE otherwise
  */
-bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
+bool CGameSA::InitLocalPlayer(CPed* pPed)
 {
     CPoolsSA* pools = (CPoolsSA*)GetPools();
     if (pools)
@@ -395,7 +395,7 @@ bool CGameSA::InitLocalPlayer(CClientPed* pClientPed)
         if (pInterface)
         {
             pools->ResetPedPoolCount();
-            pools->AddPed(pClientPed, (DWORD*)pInterface);
+            pools->AddPed(pPed, (DWORD*)pInterface);
             return TRUE;
         }
 
@@ -554,23 +554,12 @@ void CGameSA::SetMinuteDuration(ulong ulTime)
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-        return IsRandomFoliageEnabled();
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-        return IsMoonEasterEggEnabled();
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-        return IsExtraAirResistanceEnabled();
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-        return IsUnderWorldWarpEnabled();
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-        return IsVehicleSunGlareEnabled();
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-        return IsCoronaZTestEnabled();
+    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))       { return IsRandomFoliageEnabled(); }
+    if (!strcmp(szCheatName, PROP_SNIPER_MOON))          { return IsMoonEasterEggEnabled(); }
+    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE)) { return IsExtraAirResistanceEnabled(); }
+    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))      { return IsUnderWorldWarpEnabled(); }
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))     { return IsVehicleSunGlareEnabled(); }
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))         { return IsCoronaZTestEnabled(); }
 
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
@@ -580,41 +569,12 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
 
 bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-    {
-        SetRandomFoliageEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-    {
-        SetMoonEasterEggEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-    {
-        SetExtraAirResistanceEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-    {
-        SetUnderWorldWarpEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-    {
-        SetVehicleSunGlareEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-    {
-        SetCoronaZTestEnabled(bEnable);
-        return true;
-    }
+    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))       { SetRandomFoliageEnabled(bEnable);      return true; }
+    if (!strcmp(szCheatName, PROP_SNIPER_MOON))          { SetMoonEasterEggEnabled(bEnable);      return true; }
+    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE)) { SetExtraAirResistanceEnabled(bEnable); return true; }
+    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))      { SetUnderWorldWarpEnabled(bEnable);     return true; }
+    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))     { SetVehicleSunGlareEnabled(bEnable);    return true; }
+    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))         { SetCoronaZTestEnabled(bEnable);        return true; }
 
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
@@ -749,13 +709,28 @@ bool CGameSA::PerformChecks()
     }
     return true;
 }
+
 bool CGameSA::VerifySADataFileNames()
 {
-    return !strcmp(*(char**)0x5B65AE, "DATA\\CARMODS.DAT") && !strcmp(*(char**)0x5BD839, "DATA") && !strcmp(*(char**)0x5BD84C, "HANDLING.CFG") &&
-           !strcmp(*(char**)0x5BEEE8, "DATA\\melee.dat") && !strcmp(*(char**)0x4D563E, "ANIM\\PED.IFP") && !strcmp(*(char**)0x5B925B, "DATA\\OBJECT.DAT") &&
-           !strcmp(*(char**)0x55D0FC, "data\\surface.dat") && !strcmp(*(char**)0x55F2BB, "data\\surfaud.dat") &&
-           !strcmp(*(char**)0x55EB9E, "data\\surfinfo.dat") && !strcmp(*(char**)0x6EAEF8, "DATA\\water.dat") &&
-           !strcmp(*(char**)0x6EAEC3, "DATA\\water1.dat") && !strcmp(*(char**)0x5BE686, "DATA\\WEAPON.DAT");
+    const char* expectedStrings[] = {
+        "DATA\\CARMODS.DAT",  "DATA",             "HANDLING.CFG",       "DATA\\melee.dat",
+        "ANIM\\PED.IFP",      "DATA\\OBJECT.DAT", "data\\surface.dat",  "data\\surfaud.dat",
+        "data\\surfinfo.dat", "DATA\\water.dat",  "DATA\\water1.dat",   "DATA\\WEAPON.DAT"
+    };
+
+    const DWORD addresses[] = {
+        0x5B65AE, 0x5BD839, 0x5BD84C, 0x5BEEE8, 0x4D563E, 0x5B925B, 0x55D0FC, 0x55F2BB, 0x55EB9E, 0x6EAEF8, 0x6EAEC3, 0x5BE686
+    };
+
+    for (int i = 0; i < sizeof(addresses) / sizeof(addresses[0]); ++i)
+    {
+        if (strcmp(*(char**)addresses[i], expectedStrings[i]) != 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void CGameSA::SetAsyncLoadingFromScript(bool bScriptEnabled, bool bScriptForced)
@@ -952,6 +927,5 @@ CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(uchar 
 {
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
         return &ObjectGroupsInfo[ucObjectGroup];
-
     return nullptr;
 }

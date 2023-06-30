@@ -20,19 +20,21 @@
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 
+#define CLASS_CText 0xC1B340
+
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<ushort, int>                                                 CModelInfoSA::ms_RestreamTxdIDMap;
 std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, ushort>                                               CModelInfoSA::ms_ModelDefaultFlagsMap;
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, ushort>                                     CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 
 union tIdeFlags
@@ -68,7 +70,7 @@ union tIdeFlags
 
         char cPad : 8;
     };
-    unsigned int uiFlags;
+    uint uiFlags;
 };
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
@@ -102,7 +104,7 @@ CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
 
 bool CModelInfoSA::IsBoat()
 {
-    DWORD dwFunction = FUNC_IsBoatModel;
+    DWORD dwFunction = 0x4c5a70;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -117,7 +119,7 @@ bool CModelInfoSA::IsBoat()
 
 bool CModelInfoSA::IsCar()
 {
-    DWORD dwFunction = FUNC_IsCarModel;
+    DWORD dwFunction = 0x4c5aa0;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -132,7 +134,7 @@ bool CModelInfoSA::IsCar()
 
 bool CModelInfoSA::IsTrain()
 {
-    DWORD dwFunction = FUNC_IsTrainModel;
+    DWORD dwFunction = 0x4c5ad0;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -147,7 +149,7 @@ bool CModelInfoSA::IsTrain()
 
 bool CModelInfoSA::IsHeli()
 {
-    DWORD dwFunction = FUNC_IsHeliModel;
+    DWORD dwFunction = 0x4c5b00;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -162,7 +164,7 @@ bool CModelInfoSA::IsHeli()
 
 bool CModelInfoSA::IsPlane()
 {
-    DWORD dwFunction = FUNC_IsPlaneModel;
+    DWORD dwFunction = 0x4c5b30;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -177,7 +179,7 @@ bool CModelInfoSA::IsPlane()
 
 bool CModelInfoSA::IsBike()
 {
-    DWORD dwFunction = FUNC_IsBikeModel;
+    DWORD dwFunction = 0x4c5b60;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -192,7 +194,7 @@ bool CModelInfoSA::IsBike()
 
 bool CModelInfoSA::IsFakePlane()
 {
-    DWORD dwFunction = FUNC_IsFakePlaneModel;
+    DWORD dwFunction = 0x4c5b90;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -207,7 +209,7 @@ bool CModelInfoSA::IsFakePlane()
 
 bool CModelInfoSA::IsMonsterTruck()
 {
-    DWORD dwFunction = FUNC_IsMonsterTruckModel;
+    DWORD dwFunction = 0x4c5bc0;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -222,7 +224,7 @@ bool CModelInfoSA::IsMonsterTruck()
 
 bool CModelInfoSA::IsQuadBike()
 {
-    DWORD dwFunction = FUNC_IsQuadBikeModel;
+    DWORD dwFunction = 0x4c5bf0;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -237,7 +239,7 @@ bool CModelInfoSA::IsQuadBike()
 
 bool CModelInfoSA::IsBmx()
 {
-    DWORD dwFunction = FUNC_IsBmxModel;
+    DWORD dwFunction = 0x4c5c20;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -252,7 +254,7 @@ bool CModelInfoSA::IsBmx()
 
 bool CModelInfoSA::IsTrailer()
 {
-    DWORD dwFunction = FUNC_IsTrailerModel;
+    DWORD dwFunction = 0x4c5c50;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
@@ -268,7 +270,7 @@ bool CModelInfoSA::IsTrailer()
 BYTE CModelInfoSA::GetVehicleType()
 {
     // This function will return a vehicle type for vehicles or 0xFF on failure
-    DWORD dwFunction = FUNC_IsVehicleModelType;
+    DWORD dwFunction = 0x4c5c80;
     DWORD ModelID = m_dwModelID;
     BYTE  bReturn = -1;
     _asm
@@ -305,7 +307,7 @@ bool CModelInfoSA::IsUpgrade()
 char* CModelInfoSA::GetNameIfVehicle()
 {
     DWORD dwModelInfo = (DWORD)ARRAY_ModelInfo;
-    DWORD dwFunc = FUNC_CText_Get;
+    DWORD dwFunc = 0x6A0050;
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
     _asm
@@ -711,7 +713,7 @@ void CModelInfoSA::StaticResetFlags()
 
 CBoundingBox* CModelInfoSA::GetBoundingBox()
 {
-    DWORD         dwFunc = FUNC_GetBoundingBox;
+    DWORD         dwFunc = 0x4082F0;
     DWORD         ModelID = m_dwModelID;
     CBoundingBox* dwReturn = 0;
     _asm
@@ -745,7 +747,8 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
-    _asm {
+    _asm
+    {
         mov     eax, ModelID
 
         push    ecx
@@ -916,7 +919,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     // In other words, it does not affect elements created by MTA.
     // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
 
-    ((void(*)())FUNC_FlushRequestList)();
+    ((void(*)())0x40E4E0)();
 
     std::set<unsigned short> removedModels;
 
@@ -1043,7 +1046,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         // Remove ref added by GTA.
         if (m_pInterface->usNumberOfRefs > 1)
         {
-            DWORD                      dwFunction = FUNC_RemoveRef;
+            DWORD                      dwFunction = 0x4C4BB0;
             CBaseModelInfoSAInterface* pInterface = m_pInterface;
             _asm
             {
@@ -1164,7 +1167,7 @@ bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
 
 void CModelInfoSA::SetCustomCarPlateText(const char* szText)
 {
-    char* szStoredText;
+    char* szStoredText = false;
     DWORD ModelID = m_dwModelID;
     _asm
     {
@@ -1187,9 +1190,9 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
 
 unsigned int CModelInfoSA::GetNumRemaps()
 {
-    DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
-    DWORD        ModelID = m_dwModelID;
-    unsigned int uiReturn = 0;
+    DWORD  dwFunc = 0x4C86B0;
+    DWORD  ModelID = m_dwModelID;
+    uint   uiReturn = 0;
     _asm
     {
         mov     ecx, ModelID
@@ -1707,17 +1710,17 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 
 void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 {
-    CVehicleModelInfoSAInterface* m_pInterface = new CVehicleModelInfoSAInterface();
+    CVehicleModelInfoSAInterface* pInterface = new CVehicleModelInfoSAInterface();
 
     CBaseModelInfoSAInterface* pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[usBaseID];
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CVehicleModelInfoSAInterface));
-    m_pInterface->usNumberOfRefs = 0;
-    m_pInterface->pRwObject = nullptr;
-    m_pInterface->pVisualInfo = nullptr;
-    m_pInterface->usUnknown = 65535;
-    m_pInterface->usDynamicIndex = 65535;
+    MemCpyFast(pInterface, pBaseObjectInfo, sizeof(CVehicleModelInfoSAInterface));
+    pInterface->usNumberOfRefs = 0;
+    pInterface->pRwObject = nullptr;
+    pInterface->pVisualInfo = nullptr;
+    pInterface->usUnknown = 65535;
+    pInterface->usDynamicIndex = 65535;
 
-    ppModelInfo[m_dwModelID] = m_pInterface;
+    ppModelInfo[m_dwModelID] = pInterface;
 
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
@@ -1813,90 +1816,24 @@ void CModelInfoSA::RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel)
             RwSetSupportedUpgrades(ret, dwModel);
         }
         SString strName = ret->szName;
-        // Spoiler
-        if (strName == "ug_bonnet")
-        {
-            m_ModelSupportedUpgrades.m_bBonnet = true;
-        }
-        else if (strName == "ug_bonnet_left")
-        {
-            m_ModelSupportedUpgrades.m_bBonnet_Left = true;
-        }
-        else if (strName == "ug_bonnet_left_dam")
-        {
-            m_ModelSupportedUpgrades.m_bBonnet_Left_dam = true;
-        }
-        else if (strName == "ug_bonnet_right")
-        {
-            m_ModelSupportedUpgrades.m_bBonnet_Right = true;
-        }
-        else if (strName == "ug_bonnet_right_dam")
-        {
-            m_ModelSupportedUpgrades.m_bBonnet_Right_dam = true;
-        }
-        // Spoiler
-        else if (strName == "ug_spoiler")
-        {
-            m_ModelSupportedUpgrades.m_bSpoiler = true;
-        }
-        else if (strName == "ug_spoiler_dam")
-        {
-            m_ModelSupportedUpgrades.m_bSpoiler_dam = true;
-        }
-        // Bonnet
-        else if (strName == "ug_lights")
-        {
-            m_ModelSupportedUpgrades.m_bLamps = true;
-        }
-        else if (strName == "ug_lights_dam")
-        {
-            m_ModelSupportedUpgrades.m_bLamps_dam = true;
-        }
-        // Roof
-        else if (strName == "ug_roof")
-        {
-            m_ModelSupportedUpgrades.m_bRoof = true;
-        }
-        // Side Skirt
-        else if (strName == "ug_wing_right")
-        {
-            m_ModelSupportedUpgrades.m_bSideSkirt_Right = true;
-        }
-        // Side Skirt
-        else if (strName == "ug_wing_left")
-        {
-            m_ModelSupportedUpgrades.m_bSideSkirt_Left = true;
-        }
-        // Exhaust
-        else if (strName == "exhaust_ok")
-        {
-            m_ModelSupportedUpgrades.m_bExhaust = true;
-        }
-        // Front bullbars
-        else if (strName == "ug_frontbullbar")
-        {
-            m_ModelSupportedUpgrades.m_bFrontBullbars = true;
-        }
-        // rear bullbars
-        else if (strName == "ug_backbullbar")
-        {
-            m_ModelSupportedUpgrades.m_bRearBullbars = true;
-        }
-        // Front bumper
-        else if (strName == "bump_front_dummy")
-        {
-            m_ModelSupportedUpgrades.m_bFrontBumper = true;
-        }
-        // Rear bumper
-        else if (strName == "bump_rear_dummy")
-        {
-            m_ModelSupportedUpgrades.m_bRearBumper = true;
-        }
-        // Rear bumper
-        else if (strName == "misc_c")
-        {
-            m_ModelSupportedUpgrades.m_bMisc = true;
-        }
+        if (strName == "ug_bonnet")                { m_ModelSupportedUpgrades.m_bBonnet = true; }           // Spoiler
+        else if (strName == "ug_bonnet_left")      { m_ModelSupportedUpgrades.m_bBonnet_Left = true; }      // Spoiler
+        else if (strName == "ug_bonnet_left_dam")  { m_ModelSupportedUpgrades.m_bBonnet_Left_dam = true; }  // Spoiler
+        else if (strName == "ug_bonnet_right")     { m_ModelSupportedUpgrades.m_bBonnet_Right = true; }     // Spoiler
+        else if (strName == "ug_bonnet_right_dam") { m_ModelSupportedUpgrades.m_bBonnet_Right_dam = true; } // Spoiler
+        else if (strName == "ug_spoiler")          { m_ModelSupportedUpgrades.m_bSpoiler = true; }          // Spoiler
+        else if (strName == "ug_spoiler_dam")      { m_ModelSupportedUpgrades.m_bSpoiler_dam = true; }      // Spoiler
+        else if (strName == "ug_lights")           { m_ModelSupportedUpgrades.m_bLamps = true; }            // Bonnet
+        else if (strName == "ug_lights_dam")       { m_ModelSupportedUpgrades.m_bLamps_dam = true; }        // Bonnet
+        else if (strName == "ug_roof")             { m_ModelSupportedUpgrades.m_bRoof = true; }             // Roof
+        else if (strName == "ug_wing_right")       { m_ModelSupportedUpgrades.m_bSideSkirt_Right = true; }  // Side Skirt
+        else if (strName == "ug_wing_left")        { m_ModelSupportedUpgrades.m_bSideSkirt_Left = true; }   // Side Skirt
+        else if (strName == "exhaust_ok")          { m_ModelSupportedUpgrades.m_bExhaust = true; }          // Exhaust
+        else if (strName == "ug_frontbullbar")     { m_ModelSupportedUpgrades.m_bFrontBullbars = true; }    // Front bullbars
+        else if (strName == "ug_backbullbar")      { m_ModelSupportedUpgrades.m_bRearBullbars = true; }     // Rear bullbars
+        else if (strName == "bump_front_dummy")    { m_ModelSupportedUpgrades.m_bFrontBumper = true; }      // Front bumper
+        else if (strName == "bump_rear_dummy")     { m_ModelSupportedUpgrades.m_bRearBumper = true; }       // Rear bumper
+        else if (strName == "misc_c")              { m_ModelSupportedUpgrades.m_bMisc = true; }             // Rear bumper
     }
 }
 
@@ -1915,7 +1852,7 @@ void CModelInfoSA::ResetSupportedUpgrades()
 
 void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
 {
-    unsigned short usOrgGroup = GetObjectPropertiesGroup();
+    ushort usOrgGroup = GetObjectPropertiesGroup();
     if (usOrgGroup == usNewGroup)
         return;
 
@@ -1927,7 +1864,7 @@ void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
 
 unsigned short CModelInfoSA::GetObjectPropertiesGroup()
 {
-    unsigned short usGroup = GetInterface()->usDynamicIndex;
+    ushort usGroup = GetInterface()->usDynamicIndex;
     if (usGroup == 0xFFFF)
         usGroup = 0;
 
@@ -1936,7 +1873,7 @@ unsigned short CModelInfoSA::GetObjectPropertiesGroup()
 
 void CModelInfoSA::RestoreObjectPropertiesGroup()
 {
-    unsigned short* usGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
+    ushort* usGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
     if (usGroupInMap)
     {
         GetInterface()->usDynamicIndex = *usGroupInMap;

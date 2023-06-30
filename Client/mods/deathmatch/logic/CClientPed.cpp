@@ -3570,7 +3570,7 @@ void CClientPed::_CreateModel()
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
 
     // Create the new ped
-    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, m_ulModel));
+    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed((CPed*)this, m_ulModel));
     if (m_pPlayerPed)
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
@@ -3694,7 +3694,7 @@ void CClientPed::_CreateModel()
 void CClientPed::_CreateLocalModel()
 {
     // Init the local player and grab the pointers
-    g_pGame->InitLocalPlayer(this);
+    g_pGame->InitLocalPlayer((CPed*)this);
     m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->GetPedFromRef((DWORD)1));
 
     if (m_pPlayerPed)

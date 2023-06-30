@@ -23,17 +23,17 @@ struct CArchiveInfo
 
 struct SGtaStream
 {
-    uint32_t nSectorsOffset;
-    uint32_t nSectorsToRead;
-    void*    pBuffer;
-    uint8_t  bUnknow1;
-    uint8_t  bLocked;
-    uint8_t  bInUse;
-    uint8_t  bUnknow2;
-    uint32_t uiStatus;
-    uint32_t handle;
-    uint32_t file;
-    uint8_t  pad[20];
+    uint32 nSectorsOffset;
+    uint32 nSectorsToRead;
+    void*  pBuffer;
+    uint8  bUnknow1;
+    uint8  bLocked;
+    uint8  bInUse;
+    uint8  bUnknow2;
+    uint32 uiStatus;
+    uint32 handle;
+    uint32 file;
+    uint8  pad[20];
 };
 static_assert(sizeof(SGtaStream) == 0x30, "Invalid size for SGtaStream");
 

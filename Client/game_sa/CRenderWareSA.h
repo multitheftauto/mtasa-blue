@@ -135,7 +135,7 @@ public:
     void      StreamingRemovedTxd(ushort usTxdId);
     void      ScriptAddedTxd(RwTexDictionary* pTxd);
     void      ScriptRemovedTexture(RwTexture* pTex);
-    void      SpecialAddedTexture(RwTexture* texture, const char* szTextureName = NULL);
+    void      SpecialAddedTexture(RwTexture* texture, const char* szTextureName = nullptr);
     void      SpecialRemovedTexture(RwTexture* texture);
     STexInfo* CreateTexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData);
     void      DestroyTexInfo(STexInfo* pTexInfo);

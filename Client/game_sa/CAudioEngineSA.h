@@ -16,7 +16,6 @@
 #define VAR_AudioEventVolumes                   0xBD00F8 // m_pAudioEventVolumes
 
 #define CLASS_CAudioEngine                      0xB6BC90
-#define CLASS_AERadioTrackManager               0x8CB6F8
 #define CLASS_AECutsceneTrackManager            0x8AE554
 
 class CAudioEngineSAInterface

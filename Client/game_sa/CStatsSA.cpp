@@ -12,9 +12,9 @@
 #include "StdInc.h"
 #include "CStatsSA.h"
 
-float CStatsSA::GetStatValue(unsigned short usIndex)
+float CStatsSA::GetStatValue(ushort usIndex)
 {
-    DWORD dwFunc = FUNC_GetStatValue;
+    DWORD dwFunc = 0x558E40;
     float fReturn = 0.0f;
     DWORD dwStatIndex = usIndex;
     _asm
@@ -27,9 +27,9 @@ float CStatsSA::GetStatValue(unsigned short usIndex)
     return fReturn;
 }
 
-void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
+void CStatsSA::ModifyStat(ushort usIndex, float fAmmount)
 {
-    DWORD dwFunc = FUNC_ModifyStat;
+    DWORD dwFunc = 0x55D090;
     DWORD dwStatIndex = usIndex;
     _asm
     {
@@ -40,9 +40,9 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     }
 }
 
-void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
+void CStatsSA::SetStatValue(ushort usIndex, float fAmmount)
 {
-    DWORD dwFunc = FUNC_SetStatValue;
+    DWORD dwFunc = 0x55A070;
     DWORD dwStatIndex = usIndex;
     _asm
     {
@@ -53,11 +53,11 @@ void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
     }
 }
 
-unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
+ushort CStatsSA::GetSkillStatIndex(eWeaponType type)
 {
     int   weaponType = (int)type;
-    int   iIndex;
-    DWORD dwFunc = FUNC_CWeaponInfo_GetSkillStatIndex;
+    int   iIndex = 0;
+    DWORD dwFunc = 0x743CD0;
     _asm
     {
         push    weaponType
@@ -65,5 +65,5 @@ unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
         add     esp, 0x4
         mov     iIndex, eax
     }
-    return (unsigned short)iIndex;
+    return (ushort)iIndex;
 }

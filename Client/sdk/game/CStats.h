@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CStats.h
+ *  FILE:        Client/sdk/game/CStats.h
  *  PURPOSE:     Game statistics interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -546,9 +546,9 @@ enum
 class CStats
 {
 public:
-    virtual float GetStatValue(unsigned short usIndex) = 0;
-    virtual void  ModifyStat(unsigned short usIndex, float fAmmount) = 0;
-    virtual void  SetStatValue(unsigned short usIndex, float fAmmount) = 0;
+    virtual float GetStatValue(ushort usIndex) = 0;
+    virtual void  ModifyStat(ushort usIndex, float fAmmount) = 0;
+    virtual void  SetStatValue(ushort usIndex, float fAmmount) = 0;
 
-    virtual unsigned short GetSkillStatIndex(eWeaponType type) = 0;
+    virtual ushort GetSkillStatIndex(eWeaponType type) = 0;
 };

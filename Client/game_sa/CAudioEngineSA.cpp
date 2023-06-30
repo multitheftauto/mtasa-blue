@@ -78,7 +78,7 @@ void CAudioEngineSA::StopRadio()
         push        retpoint
 
         // Do what CAudio::StopRadio does. Mov the AERadioTrackManager class instance into 'ecx' (this)
-        mov         ecx, CLASS_AERadioTrackManager
+        mov         ecx, 0x8CB6F8 // CLASS_AERadioTrackManager
 
         // Do what this global func we've removed does in the beginning.
         push        ebx
@@ -119,8 +119,8 @@ void CAudioEngineSA::StartRadio(unsigned int station)
         push        station
 
         // Call something, skip 3 bytes that we have our return instruction on (no arguments)
-        mov         ecx,CLASS_AECutsceneTrackManager
-        mov         eax,dword ptr [ecx+8]
+        mov         ecx, 0x8AE554 // CLASS_AECutsceneTrackManager
+        mov         eax, dword ptr [ecx+8]
         call        dwFunc
 
         // Check the return value, eventually skip

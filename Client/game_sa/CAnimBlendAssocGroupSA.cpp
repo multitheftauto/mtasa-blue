@@ -26,9 +26,8 @@ CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* 
 CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(uint AnimID)
 {
     CAnimBlendAssociationSAInterface* pAnimAssociationReturn = nullptr;
-
-    DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = 0x4CE130;
+    DWORD                             dwThis = (DWORD)m_pInterface;
+    DWORD                             dwFunc = 0x4CE130;
     _asm
     {
         mov     ecx, dwThis
@@ -53,7 +52,7 @@ void CAnimBlendAssocGroupSA::InitEmptyAssociations(RpClump* pClump)
 
 bool CAnimBlendAssocGroupSA::IsCreated()
 {
-    bool  bReturn;
+    bool  bReturn = false;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x4D37A0;
     _asm
@@ -67,7 +66,7 @@ bool CAnimBlendAssocGroupSA::IsCreated()
 
 int CAnimBlendAssocGroupSA::GetNumAnimations()
 {
-    int   iReturn;
+    int   iReturn = 0;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = 0x45B050;
     _asm
@@ -82,14 +81,13 @@ int CAnimBlendAssocGroupSA::GetNumAnimations()
 CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock()
 {
     SetupAnimBlock();
-
     return m_pAnimBlock;
 }
 
 CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(uint ID)
 {
     // ppAssociations [ ID - this->iIDOffset ] ??
-    CAnimBlendStaticAssociation* pReturn;
+    CAnimBlendStaticAssociation* pReturn = nullptr;
     DWORD                        dwThis = (DWORD)m_pInterface;
     DWORD                        dwFunc = 0x4CE090;
     _asm

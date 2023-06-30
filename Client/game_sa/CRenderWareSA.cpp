@@ -23,6 +23,11 @@
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
 
+// CModelInfo/ARRAY_ModelInfo __thiscall to load/replace vehicle models
+#define FUNC_LoadVehicleModel 0x4C95C0
+#define FUNC_LoadWeaponModel  0x4C9910
+#define FUNC_LoadPedModel     0x4C7340
+
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
