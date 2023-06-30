@@ -14,9 +14,7 @@
 #include <game/CHud.h>
 #include <CVector.h>
 
-#define FUNC_Draw                   0x58FAE0
-
-#define CODE_ShowMoney              0x58F47D
+#define FUNC_Draw 0x58FAE0
 
 struct SHudComponent
 {
