@@ -65,12 +65,12 @@ CEntity* CExplosionSA::GetExplosionCreator()
             break;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CEntity* CExplosionSA::GetExplodingEntity()
 {
-    return NULL;
+    return nullptr;
 }
 
 bool CExplosionSA::IsActive()

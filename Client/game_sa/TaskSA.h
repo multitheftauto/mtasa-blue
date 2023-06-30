@@ -14,9 +14,6 @@
 #include <game/Task.h>
 #include "TaskNamesSA.h"
 
-#define FUNC_CTask__Operator_New            0x61A5A0
-#define FUNC_CTask__Operator_Delete         0x61A5B0
-
 class CTaskTimer
 {
 public:

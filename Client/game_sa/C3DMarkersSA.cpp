@@ -16,7 +16,7 @@ C3DMarkersSA::C3DMarkersSA()
 {
     for (int i = 0; i < MAX_3D_MARKERS; i++)
     {
-        Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
+        Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(0xC7DD58 + i * sizeof(C3DMarkerSAInterface)));
     }
 }
 
@@ -28,8 +28,8 @@ C3DMarkersSA::~C3DMarkersSA()
     }
 }
 
-C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b,
-                                      BYTE a)
+C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, uchar r, uchar g,
+                                      uchar b, uchar a)
 {
     /*
     static C3dMarker *PlaceMarker(unsigned int nIdentifier, unsigned short nType,
@@ -41,7 +41,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
     dwType = (e3DMarkerType)wType;
     bool bZCheck = true;
 
-    DWORD dwFunc = FUNC_PlaceMarker;
+    DWORD dwFunc = 0x725120;
     DWORD dwReturn = 0;
     _asm
     {

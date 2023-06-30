@@ -73,7 +73,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     }
     else
     {
-        DWORD dwFunction = FUNC_CStreaming__RequestModel;
+        DWORD dwFunction = 0x4087E0;
         _asm
         {
             push    dwFlags
@@ -93,7 +93,7 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 {
     TIMEUS startTime = GetTimeUs();
 
-    DWORD dwFunction = FUNC_LoadAllRequestedModels;
+    DWORD dwFunction = 0x40EA10;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
     _asm
     {
@@ -115,7 +115,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     if (IsUpgradeModelId(dwModelID))
     {
         bool  bReturn;
-        DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
+        DWORD dwFunc = 0x407820;
         _asm
         {
             push    dwModelID
@@ -143,7 +143,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
-    DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
+    DWORD dwFunc = 0x409d10;
     _asm
     {
         push    channel
@@ -206,10 +206,10 @@ unsigned char CStreamingSA::GetUnusedArchive()
 
 unsigned char CStreamingSA::GetUnusedStreamHandle()
 {
-    for (size_t i = 0; i < VAR_StreamHandlersMaxCount; i++)
+    for (size_t i = 0; i < 32; i++)
     {
         if (m_aStreamingHandlers[i])
-            return (unsigned char)i;
+            return (uchar)i;
     }
     return -1;
 }

@@ -18,8 +18,8 @@ CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& 
 {
     const CVector*        pvecPosition = &vecPosition;
     DWORD                 dwThis = (DWORD)m_pInterface;
-    DWORD                 dwFunc = FUNC_FxManager_c__CreateFxSystem;
-    CFxSystemSAInterface* pFxSystem;
+    DWORD                 dwFunc = 0x4A9BE0;
+    CFxSystemSAInterface* pFxSystem = 0;
 
     _asm
     {
@@ -46,10 +46,8 @@ CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& 
 void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_FxManager_c__DestroyFxSystem;
-
+    DWORD dwFunc = 0x4A9810;
     void* pFxSA = pFxSystem->GetInterface();
-
     _asm
     {
         mov     ecx, dwThis
@@ -71,9 +69,7 @@ void CFxManagerSA::OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSyste
 
 CFxSystemBPSAInterface* CFxManagerSA::GetFxSystemBlueprintByName(SString sName)
 {
-    using func_t = CFxSystemBPSAInterface*(__thiscall*)(CFxManagerSAInterface * pInterface, const char* pChars);
-    auto func = reinterpret_cast<func_t>(FUNC_FxManager_c__GetSystemByName);
-    return func(m_pInterface, sName);
+    return (reinterpret_cast<CFxSystemBPSAInterface*(__thiscall*)(CFxManagerSAInterface * pInterface, const char* pChars)>(0x4A9360))(m_pInterface, sName);
 }
 
 bool CFxManagerSA::IsValidFxSystemBlueprintName(SString sName)

@@ -47,7 +47,7 @@ CCameraSA::~CCameraSA()
 
 void CCameraSA::Restore()
 {
-    DWORD               dwFunc = FUNC_Restore;
+    DWORD               dwFunc = 0x50B930;
     CCameraSAInterface* cameraInterface = GetInterface();
     _asm
     {
@@ -86,7 +86,7 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
     CCameraSAInterface* cameraInterface = GetInterface();
     // __thiscall
 
-    DWORD CCamera__TakeControl = FUNC_TakeControl;
+    DWORD CCamera__TakeControl = 0x50C7C0;
     _asm
     {
         mov ecx, cameraInterface
@@ -116,7 +116,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
             call    dwFunc
         }*/
 
-    DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
+    DWORD CCamera__TakeControlNoEntity = 0x50C8B0;
     _asm
         {
         mov ecx, cameraInterface
@@ -226,7 +226,7 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
     float               fOriginX = vecGunMuzzle->fX;
     float               fOriginY = vecGunMuzzle->fY;
     float               fOriginZ = vecGunMuzzle->fZ;
-    DWORD               dwFunc = FUNC_Find3rdPersonCamTargetVector;
+    DWORD               dwFunc = 0x514970;
     CCameraSAInterface* cameraInterface = GetInterface();
     _asm
     {
@@ -244,7 +244,7 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
 float CCameraSA::Find3rdPersonQuickAimPitch()
 {
     float               fReturn;
-    DWORD               dwFunc = FUNC_Find3rdPersonQuickAimPitch;
+    DWORD               dwFunc = 0x50AD40;
     CCameraSAInterface* cameraInterface = GetInterface();
     _asm
     {
@@ -265,8 +265,7 @@ CCam* CCameraSA::GetCam(BYTE bCameraID)
 {
     if (bCameraID < MAX_CAMS)
         return Cams[bCameraID];
-
-    return NULL;
+    return nullptr;
 }
 
 CCam* CCameraSA::GetCam(CCamSAInterface* camInterface)
@@ -278,8 +277,7 @@ CCam* CCameraSA::GetCam(CCamSAInterface* camInterface)
             return Cams[i];
         }
     }
-
-    return NULL;
+    return nullptr;
 }
 
 void CCameraSA::SetWidescreen(bool bWidescreen)
@@ -295,7 +293,7 @@ bool CCameraSA::GetWidescreen()
 
 bool CCameraSA::IsFading()
 {
-    DWORD               dwFunc = FUNC_GetFading;
+    DWORD               dwFunc = 0x50ADE0;
     CCameraSAInterface* cameraInterface = GetInterface();
     bool                bRet = false;
     _asm
@@ -309,7 +307,7 @@ bool CCameraSA::IsFading()
 
 int CCameraSA::GetFadingDirection()
 {
-    DWORD               dwFunc = FUNC_GetFadingDirection;
+    DWORD               dwFunc = 0x50ADF0;
     CCameraSAInterface* cameraInterface = GetInterface();
     int                 dwRet = false;
     _asm
@@ -323,7 +321,7 @@ int CCameraSA::GetFadingDirection()
 
 void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
 {
-    DWORD               dwFunc = FUNC_Fade;
+    DWORD               dwFunc = 0x50AC20;
     CCameraSAInterface* cameraInterface = GetInterface();
     _asm
     {
@@ -336,7 +334,7 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
 
 void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
-    DWORD               dwFunc = FUNC_SetFadeColour;
+    DWORD               dwFunc = 0x50BF00;
     CCameraSAInterface* cameraInterface = GetInterface();
     DWORD               dwRed = ucRed;
     DWORD               dwGreen = ucGreen;
@@ -353,7 +351,7 @@ void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigne
 
 float CCameraSA::GetCameraRotation()
 {
-    return *(float*)VAR_CameraRotation;
+    return *(float*)0xB6F178;
 }
 
 RwMatrix* CCameraSA::GetLTM()

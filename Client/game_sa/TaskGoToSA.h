@@ -19,11 +19,6 @@
 class CAnimBlendAssociation;
 typedef DWORD CTaskUtilityLineUpPedWithCar;
 
-#define FUNC_CTaskComplexWanderStandard__Constructor            0x48E4F0
-#define FUNC_CTaskComplexWanderStandard__Destructor             0x48E600
-
-#define FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision     0x6479B0
-
 class TaskComplexWanderVTBL : public TaskComplexVTBL
 {
 public:

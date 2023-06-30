@@ -17,12 +17,8 @@ class CEntity;
 class CFireSA;
 class CFireSAInterface;
 
-#define FUNC_ExtinguishPoint            0x539450
-
-#define ARRAY_CFire                     (VAR_CFireCount + 4)
-#define CLASS_CFireManager              0xB71F80
-
-#define DEFAULT_FIRE_PARTICLE_SIZE      1.8
+#define CLASS_CFireManager              0xB71F80 // multiplayer_sa/multiplayer_shotsync.cpp
+#define DEFAULT_FIRE_PARTICLE_SIZE      1.8 // multiplayer_sa/multiplayer_shotsync.cpp
 #define MAX_FIRES                       60
 
 class CFireManagerSA : public CFireManager

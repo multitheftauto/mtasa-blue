@@ -16,7 +16,7 @@
 
 bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector* pVector, int* pDoor)
 {
-    DWORD dwFunc = FUNC_GetNearestCarDoor;
+    DWORD dwFunc = 0x6528F0;
     bool  bReturn = false;
 
     CPedSA*     pPedSA = dynamic_cast<CPedSA*>(pPed);
@@ -44,7 +44,7 @@ bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector*
 bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle, CVector* pVector, int* pDoor, bool bUnknown, bool bUnknown2,
                                                  bool bCheckIfRoomToGetIn)
 {
-    DWORD dwFunc = FUNC_GetNearestCarPassengerDoor;
+    DWORD dwFunc = 0x650BB0;
     bool  bReturn = false;
 
     CPedSA*     pPedSA = dynamic_cast<CPedSA*>(pPed);
@@ -80,7 +80,7 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
 
 int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
 {
-    DWORD dwFunc = FUNC_ComputeTargetDoorToExit;
+    DWORD dwFunc = 0x64F110;
     int   door = -1;
 
     CPedSA*     pPedSA = dynamic_cast<CPedSA*>(pPed);
@@ -161,7 +161,7 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
 
 bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown)
 {
-    DWORD dwFunc = FUNC_IsRoomForPedToLeaveCar;
+    DWORD dwFunc = 0x6504C0;
     bool  bRet = true;
 
     if (iDoor >= 0 && iDoor <= 5)

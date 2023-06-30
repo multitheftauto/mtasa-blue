@@ -13,16 +13,11 @@
 
 #include <game/CKeyGen.h>
 
-#define FUNC_CKeyGen_GetKey_len         0x53ced0
-#define FUNC_CKeyGen_GetKey             0x53cf00
-#define FUNC_CKeyGen_GetUppercaseKey    0x53cf30
-#define FUNC_CKeyGen_AppendStringToKey  0x53cf70
-
 class CKeyGenSA : public CKeyGen
 {
 public:
-    unsigned int GetKey(const char* szString, int iLength);
-    unsigned int GetKey(const char* szString);
-    unsigned int GetUppercaseKey(const char* szString);
-    unsigned int AppendStringToKey(unsigned int uiKey, const char* szString);
+    uint GetKey(const char* szString, int iLength);
+    uint GetKey(const char* szString);
+    uint GetUppercaseKey(const char* szString);
+    uint AppendStringToKey(uint uiKey, const char* szString);
 };

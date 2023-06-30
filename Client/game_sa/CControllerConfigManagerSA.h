@@ -13,17 +13,11 @@
 
 #include <game/CControllerConfigManager.h>
 
-#define FUNC_SetControllerKeyAssociatedWithAction       0x530490
-#define FUNC_GetControllerKeyAssociatedWithAction       0x52F4F0
-#define FUNC_GetNumOfSettingsForAction                  0x52F4A0
-#define FUNC_ClearSettingsAssociatedWithAction          0x52FD70
-
-#define CLASS_CControllerConfigManager                  0xB70198
-
 class CControllerConfigManagerSA : public CControllerConfigManager
 {
 public:
     CControllerConfigManagerSA();
+
     void  SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType);
     int   GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType);
     int   GetNumOfSettingsForAction(eControllerAction action);

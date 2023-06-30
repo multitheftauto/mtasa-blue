@@ -96,7 +96,7 @@ CWeaponInfo* CWeaponSA::GetInfo(eWeaponSkill skill)
 
 void CWeaponSA::Remove()
 {
-    DWORD dwFunc = FUNC_Shutdown;
+    DWORD dwFunc = 0x73A380;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
     {
@@ -122,9 +122,9 @@ void CWeaponSA::Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed)
     DWORD dwPedInterface = 0;
     if (pPed)
         dwPedInterface = (DWORD)pPed->GetInterface();
-    unsigned int uiType = (unsigned int)type;
-    DWORD        dwThis = (DWORD)m_pInterface;
-    DWORD        dwFunc = FUNC_CWeapon_Initialize;
+    uint  uiType = (uint)type;
+    DWORD dwThis = (DWORD)m_pInterface;
+    DWORD dwFunc = 0x73b4a0;
     _asm
     {
         mov     ecx, dwThis
@@ -140,7 +140,7 @@ void CWeaponSA::Update(CPed* pPed)
     // Note: CWeapon::Update is called mainly to check for reload
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CWeapon_Update;
+    DWORD dwFunc = 0x73db40;
     _asm
     {
         mov     ecx, dwThis
@@ -159,7 +159,7 @@ bool CWeaponSA::Fire(CEntity* pFiringEntity, CVector* pvecOrigin, CVector* pvecT
     if (pTargetEntity)
         dwTargetInterface = (DWORD)pTargetEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CWeapon_Fire;
+    DWORD dwFunc = 0x742300;
     _asm
     {
         mov     ecx, dwThis
@@ -181,7 +181,7 @@ void CWeaponSA::AddGunshell(CEntity* pFiringEntity, CVector* pvecOrigin, CVector
     if (pFiringEntity)
         dwEntityInterface = (DWORD)pFiringEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CWeapon_AddGunshell;
+    DWORD dwFunc = 0x73a3e0;
     _asm
     {
         mov     ecx, dwThis
@@ -204,7 +204,7 @@ void CWeaponSA::DoBulletImpact(CEntity* pFiringEntity, CEntitySAInterface* pEnti
     if (pColPoint)
         dwColPointInterface = (DWORD)pColPoint->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CWeapon_DoBulletImpact;
+    DWORD dwFunc = 0x73b550;
     _asm
     {
         mov     ecx, dwThis
@@ -220,12 +220,12 @@ void CWeaponSA::DoBulletImpact(CEntity* pFiringEntity, CEntitySAInterface* pEnti
 
 unsigned char CWeaponSA::GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2)
 {
-    unsigned int ucReturn;
-    DWORD        dwPedInterface = (DWORD)pPed->GetInterface();
-    DWORD        dwResponsibleInterface = 0;
+    uint  ucReturn = 0;
+    DWORD dwPedInterface = (DWORD)pPed->GetInterface();
+    DWORD dwResponsibleInterface = 0;
     if (pResponsible)
         dwResponsibleInterface = (DWORD)pResponsible->GetInterface();
-    DWORD dwFunc = FUNC_CWeapon_GenerateDamageEvent;
+    DWORD dwFunc = 0x73A530;
     _asm
     {
         push    i_2
@@ -238,7 +238,7 @@ unsigned char CWeaponSA::GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, 
         add     esp, 24
         mov     ucReturn, eax
     }
-    return (unsigned char)ucReturn;
+    return (uchar)ucReturn;
 }
 
 bool CWeaponSA::FireBullet(CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget)
@@ -311,7 +311,7 @@ bool CWeaponSA::FireInstantHit(CEntity* pFiringEntity, const CVector* pvecOrigin
     if (pTargetEntity)
         dwTargetInterface = (DWORD)pTargetEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CWeapon_FireInstantHit;
+    DWORD dwFunc = 0x73FB10;
     _asm
     {
         mov     ecx, dwThis
@@ -333,14 +333,14 @@ bool CWeaponSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEn
                                    const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, eWeaponType weaponType,
                                    CEntitySAInterface** pEntity)
 {
-    DWORD dwFunction = FUNC_CBirds_CheckForHit;
+    DWORD dwFunction = 0x712E40;
     _asm
     {
         push vecEnd
         push vecStart
         call dwFunction
     }
-    dwFunction = FUNC_CShadows_CheckForHit;
+    dwFunction = 0x707550;
     _asm
     {
         push vecEnd
@@ -389,7 +389,7 @@ int CWeaponSA::GetWeaponReloadTime(CWeaponStat* pWeaponStat)
 {
     CWeaponStatSA* pWeaponStats = (CWeaponStatSA*)pWeaponStat;
     DWORD          dwReturn = 0;
-    DWORD          dwFunction = FUNC_CWeaponInfo_GetWeaponReloadTime;
+    DWORD          dwFunction = 0x743D70;
     DWORD          dwInterface = (DWORD)pWeaponStats->GetInterface();
     _asm
     {

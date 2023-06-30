@@ -18,14 +18,6 @@ class CEntitySAInterface;
 enum eWeaponType;
 enum ePedPieceTypes;
 
-#define FUNC_CEventDamage_Constructor           0x4ad830
-#define FUNC_CEventDamage_Destructor            0x4ad960
-#define FUNC_CEventDamage_HasKilledPed          0x4ABCA0
-#define FUNC_CEventDamage_GetDamageApplied      0x4ABCE0
-#define FUNC_CEventDamage_GetAnimGroup          0x4B8060
-#define FUNC_CEventDamage_GetAnimId             0x4B8070
-#define FUNC_CEventDamage_GetAnimAdded          0x4b80a0
-#define FUNC_CEventDamage_ComputeDeathAnim      0x4B3A60
 #define FUNC_CEventDamage_ComputeDamageAnim     0x4b3fc0
 #define FUNC_CEventDamage_AffectsPed            0x4b35a0
 

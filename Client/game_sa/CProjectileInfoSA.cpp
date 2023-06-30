@@ -41,14 +41,14 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
     // Check that this infact is a CProjectile
     // This is perhaps the fix for a crash where it jumps to 0x42480000
     // The proper cause should be figured out instead though as this is a rather unsafe fix.
-    if ((DWORD)projectileInterface->vtbl == VTBL_CProjectile)
+    if ((DWORD)projectileInterface->vtbl == 0x867030)
     {
         // Has it not already been removed by GTA?
         if (pProjectileInfo->IsActive())
         {
             if (bBlow)
             {
-                DWORD dwFunc = FUNC_RemoveProjectile;
+                DWORD dwFunc = 0x7388F0;
                 _asm
                 {
                     push    projectileInterface
@@ -59,7 +59,7 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
             }
             else
             {
-                DWORD dwFunc = FUNC_RemoveIfThisIsAProjectile;
+                DWORD dwFunc = 0x739A40;
                 _asm
                 {
                     push   projectileInterface
@@ -89,7 +89,7 @@ CProjectileInfo* CProjectileInfoSA::GetProjectileInfo(DWORD dwIndex)
 
 bool CProjectileInfoSA::AddProjectile(CEntity* creator, eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity)
 {
-    DWORD               dwFunction = FUNC_AddProjectile;
+    DWORD               dwFunction = 0x737C80;
     DWORD               dwReturn = 0;
     CEntitySAInterface* creatorVC = nullptr;
     if (creator != nullptr)

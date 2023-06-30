@@ -17,29 +17,10 @@
 #include "CGarageSA.h"
 #include "CEntitySA.h"
 
-#define FUNC_TakeControl                    0x50C7C0
-#define FUNC_TakeControlNoEntity            0x50C8B0
-#define FUNC_Restore                        0x50B930
-
-#define FUNC_Find3rdPersonCamTargetVector   0x514970
-#define FUNC_Find3rdPersonQuickAimPitch     0x50AD40
-#define FUNC_GetFadingDirection             0x50ADF0
-#define FUNC_GetFading                      0x50ADE0
-#define FUNC_Fade                           0x50AC20
-#define FUNC_SetFadeColour                  0x50BF00
-
-#define VAR_CameraRotation                  0xB6F178 // used for controling where the player faces
 #define VAR_VehicleCameraView               0xB6F0DC
 #define VAR_PedCameraView                   0xB6F0F0
 
 #define MAX_CAMS                            3
-
-#define MAX_NUM_OF_NODES                    800 // for trains
-
-/*** R* Defines ***/
-#define NUMBER_OF_VECTORS_FOR_AVERAGE 2
-#define MAX_NUM_OF_SPLINETYPES (4)
-/*** END R* Defines ***/
 
 /*** BEGIN PURE R* CLASSES ***/
 
@@ -313,9 +294,9 @@ public:
     CEntitySAInterface* pTargetEntity;
     CEntitySAInterface* pAttachedEntity;
     // CVector CutScene;
-    CCamPathSplines m_arrPathArray[MAX_NUM_OF_SPLINETYPES];            // These only get created when the script calls the load splines function
+    CCamPathSplines m_arrPathArray[4];            // These only get created when the script calls the load splines function
     // maybe this shouldn't be here depends if GTA_TRAIN is defined (its not)
-    // CTrainCamNode     m_arrTrainCamNode[MAX_NUM_OF_NODES];
+    // CTrainCamNode     m_arrTrainCamNode[800];
 
     bool m_bMirrorActive;
     bool m_bResetOldMatrix;

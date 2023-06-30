@@ -86,13 +86,13 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
 
 CModelInfoSA::CModelInfoSA()
 {
-    m_pInterface = NULL;
+    m_pInterface = nullptr;
     m_dwModelID = 0xFFFFFFFF;
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
-    m_pOriginalColModelInterface = NULL;
-    m_pCustomClump = NULL;
-    m_pCustomColModel = NULL;
+    m_pOriginalColModelInterface = nullptr;
+    m_pCustomClump = nullptr;
+    m_pCustomColModel = nullptr;
 }
 
 CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
@@ -1471,7 +1471,7 @@ void CModelInfoSA::RestoreOriginalModel()
     }
 
     // Reset the stored custom vehicle clump
-    m_pCustomClump = NULL;
+    m_pCustomClump = nullptr;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
@@ -1805,10 +1805,10 @@ void CModelInfoSA::StaticSetHooks()
 // Recursive RwFrame children searching function
 void CModelInfoSA::RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel)
 {
-    for (RwFrame* ret = parent->child; ret != NULL; ret = ret->next)
+    for (RwFrame* ret = parent->child; ret != nullptr; ret = ret->next)
     {
         // recurse into the child
-        if (ret->child != NULL)
+        if (ret->child != nullptr)
         {
             RwSetSupportedUpgrades(ret, dwModel);
         }
@@ -2012,7 +2012,7 @@ bool CModelInfoSA::ForceUnload()
     CBaseModelInfoSAInterface* pModelInfoSAInterface = GetInterface();
 
     // Need to have at least one ref to delete pRwObject
-    if (pModelInfoSAInterface->usNumberOfRefs == 0 && pModelInfoSAInterface->pRwObject != NULL)
+    if (pModelInfoSAInterface->usNumberOfRefs == 0 && pModelInfoSAInterface->pRwObject != nullptr)
     {
         pModelInfoSAInterface->usNumberOfRefs++;
     }
@@ -2025,7 +2025,7 @@ bool CModelInfoSA::ForceUnload()
     }
 
     // Did it work?
-    if (pModelInfoSAInterface->usNumberOfRefs > 0 || pModelInfoSAInterface->pRwObject != NULL)
+    if (pModelInfoSAInterface->usNumberOfRefs > 0 || pModelInfoSAInterface->pRwObject != nullptr)
         return false;
 
     // If success, then remove txd

@@ -16,9 +16,7 @@
 
 class CEntitySAInterface;
 
-#define ARRAY_CORONAS               0xC3E058
-
-class CRegisteredCoronaSAInterface            // coronas are 104 bytes long, and theres 56 of them
+class CRegisteredCoronaSAInterface           // Coronas are 104 bytes long, and theres 56 of them
 {
 public:
     CVector    Coordinates;                  // Where is it exactly.
@@ -39,12 +37,12 @@ public:
     BYTE  ReflectionType;                    // What type of reflection during wet weather
     BYTE  LOSCheck : 1;                      // Do we check the LOS or do we render at the right Z value
     BYTE  OffScreen : 1;                     // Set by the rendering code to be used by the update code
-    BYTE  JustCreated;                 // If this guy has been created this frame we won't delete it (It hasn't had the time to get its OffScreen cleared) ##SA
-                                       // removed from packed byte ##
-    BYTE NeonFade : 1;                 // Does the guy fade out when closer to cam
-    BYTE OnlyFromBelow : 1;            // This corona is only visible if the camera is below it. ##SA##
+    BYTE  JustCreated;                       // If this guy has been created this frame we won't delete it (It hasn't had the time to get its OffScreen cleared) ##SA
+                                             // Removed from packed byte ##
+    BYTE NeonFade : 1;                       // Does the guy fade out when closer to cam
+    BYTE OnlyFromBelow : 1;                  // This corona is only visible if the camera is below it. ##SA##
     BYTE bHasValidHeightAboveGround : 1;
-    BYTE WhiteCore : 1;            // This corona rendered with a small white core.
+    BYTE WhiteCore : 1;                      // This corona rendered with a small white core.
     BYTE bIsAttachedToEntity : 1;
 
     CEntitySAInterface* pEntityAttachedTo;

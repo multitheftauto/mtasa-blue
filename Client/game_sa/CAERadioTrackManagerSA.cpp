@@ -12,10 +12,12 @@
 #include "StdInc.h"
 #include "CAERadioTrackManagerSA.h"
 
-BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
+#define CLASS_CAERadioTrackManager 0x8CB6F8
+
+uchar CAERadioTrackManagerSA::GetCurrentRadioStationID()
 {
-    DWORD dwFunc = FUNC_GetCurrentRadioStationID;
-    BYTE  bReturn = 0;
+    DWORD dwFunc = 0x4E83F0;
+    uchar bReturn = 0;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -26,10 +28,10 @@ BYTE CAERadioTrackManagerSA::GetCurrentRadioStationID()
     return bReturn;
 }
 
-BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
+uchar CAERadioTrackManagerSA::IsVehicleRadioActive()
 {
-    DWORD dwFunc = FUNC_IsVehicleRadioActive;
-    BYTE  bReturn = 0;
+    DWORD dwFunc = 0x4E9800;
+    uchar bReturn = 0;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -40,9 +42,9 @@ BYTE CAERadioTrackManagerSA::IsVehicleRadioActive()
     return bReturn;
 }
 
-char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
+char* CAERadioTrackManagerSA::GetRadioStationName(uchar bStationID)
 {
-    DWORD dwFunc = FUNC_GetRadioStationName;
+    DWORD dwFunc = 0x4E9E10;
     char* cReturn = 0;
     DWORD dwStationID = bStationID;
     _asm
@@ -58,7 +60,7 @@ char* CAERadioTrackManagerSA::GetRadioStationName(BYTE bStationID)
 
 bool CAERadioTrackManagerSA::IsRadioOn()
 {
-    DWORD dwFunc = FUNC_IsRadioOn;
+    DWORD dwFunc = 0x4E8350;
     bool  bReturn = false;
     _asm
     {
@@ -72,7 +74,7 @@ bool CAERadioTrackManagerSA::IsRadioOn()
 
 void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
 {
-    DWORD dwFunc = FUNC_SetBassSetting;
+    DWORD dwFunc = 0x4E82F0;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -84,7 +86,7 @@ void CAERadioTrackManagerSA::SetBassSetting(DWORD dwBass)
 
 void CAERadioTrackManagerSA::Reset()
 {
-    DWORD dwFunc = FUNC_Reset;
+    DWORD dwFunc = 0x4E7F80;
     _asm
     {
         mov     ecx, CLASS_CAERadioTrackManager
@@ -92,9 +94,9 @@ void CAERadioTrackManagerSA::Reset()
     }
 }
 
-void CAERadioTrackManagerSA::StartRadio(BYTE bStationID, BYTE bUnknown)
+void CAERadioTrackManagerSA::StartRadio(uchar bStationID, uchar bUnknown)
 {
-    DWORD dwFunc = FUNC_StartRadio;
+    DWORD dwFunc = 0x4EB3C0;
     DWORD dwStationID = bStationID;
     DWORD dwUnknown = bUnknown;
     _asm

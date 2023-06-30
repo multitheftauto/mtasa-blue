@@ -15,31 +15,6 @@
 
 #include <game/CSettings.h>
 
-#define CLASS_CMenuManager      0xBA6748
-
-#define FUNC_CMenuManager_Save  0x57C660
-
-#define VAR_ucFxQuality         0xA9AE54
-#define VAR_fMouseSensitivity   0xB6EC1C
-#define VAR_RadarMode           0xBA676C
-
-#define CLASS_CAudioEngine 0xB6BC90
-#define FUNC_CAudioEngine_SetEffectsMasterVolume 0x506E10
-#define FUNC_CAudioEngine_SetMusicMasterVolume 0x506DE0
-
-#define CLASS_CGamma 0xC92134
-#define FUNC_CGamma_SetGamma 0x747200
-
-#define FUNC_SetAntiAliasing    0x7F8A90
-
-#define DEFAULT_VEHICLE_LOD_DISTANCE    ( 70.0f )
-#define DEFAULT_PEDS_LOD_DISTANCE       ( 60.0f )
-// Default train distance is 150, so make it relative to default vehicle distance
-#define TRAIN_LOD_DISTANCE_MULTIPLIER   ( 2.14f )
-#define MAX_VEHICLE_LOD_DISTANCE        ( 500.0f )
-#define MAX_PEDS_LOD_DISTANCE           ( 500.0f )
-#define DEFAULT_BLUR_LEVEL              ( 36 )
-
 struct CSettingsSAInterface            // see code around 0x57CE9A for where these are
 {
     BYTE  pad1[4];
@@ -96,44 +71,44 @@ private:
 public:
     CSettingsSA();
 
-    bool          IsWideScreenEnabled();
-    void          SetWideScreenEnabled(bool bEnabled);
-    unsigned int  GetNumVideoModes();
-    VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex);
-    unsigned int  GetCurrentVideoMode();
-    void          SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart);
-    unsigned int  GetNumAdapters();
-    unsigned int  GetCurrentAdapter();
-    void          SetAdapter(unsigned int uiAdapterIndex);
-    bool          HasUnsafeResolutions();
-    bool          IsUnsafeResolution(int iWidth, int iHeight);
-    unsigned char GetRadioVolume();
-    void          SetRadioVolume(unsigned char ucVolume);
-    unsigned char GetSFXVolume();
-    void          SetSFXVolume(unsigned char ucVolume);
-    unsigned int  GetUsertrackMode();
-    void          SetUsertrackMode(unsigned int uiMode);
-    bool          IsUsertrackAutoScan();
-    void          SetUsertrackAutoScan(bool bEnable);
-    bool          IsRadioEqualizerEnabled();
-    void          SetRadioEqualizerEnabled(bool bEnable);
-    bool          IsRadioAutotuneEnabled();
-    void          SetRadioAutotuneEnabled(bool bEnable);
+    bool       IsWideScreenEnabled();
+    void       SetWideScreenEnabled(bool bEnabled);
+    uint       GetNumVideoModes();
+    VideoMode* GetVideoModeInfo(VideoMode* modeInfo, uint modeIndex);
+    uint       GetCurrentVideoMode();
+    void       SetCurrentVideoMode(uint modeIndex, bool bOnRestart);
+    uint       GetNumAdapters();
+    uint       GetCurrentAdapter();
+    void       SetAdapter(uint uiAdapterIndex);
+    bool       HasUnsafeResolutions();
+    bool       IsUnsafeResolution(int iWidth, int iHeight);
+    uchar      GetRadioVolume();
+    void       SetRadioVolume(uchar ucVolume);
+    uchar      GetSFXVolume();
+    void       SetSFXVolume(uchar ucVolume);
+    uint       GetUsertrackMode();
+    void       SetUsertrackMode(uint uiMode);
+    bool       IsUsertrackAutoScan();
+    void       SetUsertrackAutoScan(bool bEnable);
+    bool       IsRadioEqualizerEnabled();
+    void       SetRadioEqualizerEnabled(bool bEnable);
+    bool       IsRadioAutotuneEnabled();
+    void       SetRadioAutotuneEnabled(bool bEnable);
 
     float GetDrawDistance();
     void  SetDrawDistance(float fDrawDistance);
 
-    unsigned int GetBrightness();
-    void         SetBrightness(unsigned int uiBrightness);
+    uint GetBrightness();
+    void SetBrightness(uint uiBrightness);
 
-    unsigned int GetFXQuality();
-    void         SetFXQuality(unsigned int fxQualityId);
+    uint GetFXQuality();
+    void SetFXQuality(uint fxQualityId);
 
     float GetMouseSensitivity();
     void  SetMouseSensitivity(float fSensitivity);
 
-    unsigned int GetAntiAliasing();
-    void         SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart);
+    uint GetAntiAliasing();
+    void SetAntiAliasing(uint uiAntiAliasing, bool bOnRestart);
 
     bool IsMipMappingEnabled();
     void SetMipMappingEnabled(bool bEnable);
@@ -187,13 +162,13 @@ public:
     int  OnSelectDevice();
 
 private:
-    static unsigned long FUNC_GetNumVideoModes;
-    static unsigned long FUNC_GetVideoModeInfo;
-    static unsigned long FUNC_GetCurrentVideoMode;
-    static unsigned long FUNC_SetCurrentVideoMode;
-    static unsigned long FUNC_SetRadioVolume;
-    static unsigned long FUNC_SetDrawDistance;
-    static unsigned long FUNC_GetNumSubSystems;
-    static unsigned long FUNC_GetCurrentSubSystem;
-    static unsigned long FUNC_SetSubSystem;
+    static ulong FUNC_GetNumVideoModes;
+    static ulong FUNC_GetVideoModeInfo;
+    static ulong FUNC_GetCurrentVideoMode;
+    static ulong FUNC_SetCurrentVideoMode;
+    static ulong FUNC_SetRadioVolume;
+    static ulong FUNC_SetDrawDistance;
+    static ulong FUNC_GetNumSubSystems;
+    static ulong FUNC_GetCurrentSubSystem;
+    static ulong FUNC_SetSubSystem;
 };

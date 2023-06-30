@@ -16,7 +16,7 @@ CColModelSA::CColModelSA()
 {
     m_pInterface = new CColModelSAInterface;
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CColModel_Constructor;
+    DWORD dwFunc = 0x40FB60;
     _asm
     {
         mov     ecx, dwThis
@@ -36,7 +36,7 @@ CColModelSA::~CColModelSA()
     if (m_bDestroyInterface)
     {
         DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = FUNC_CColModel_Destructor;
+        DWORD dwFunc = 0x40F700;
         _asm
         {
             mov     ecx, dwThis

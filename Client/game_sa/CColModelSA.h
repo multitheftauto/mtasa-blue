@@ -16,9 +16,6 @@
 #include <game/CColPoint.h>
 #include "CCompressedVectorSA.h"
 
-#define FUNC_CColModel_Constructor      0x40FB60
-#define FUNC_CColModel_Destructor       0x40F700
-
 struct CBoxSA
 {
     CVector m_vecMin;

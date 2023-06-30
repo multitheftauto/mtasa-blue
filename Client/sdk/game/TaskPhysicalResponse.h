@@ -18,11 +18,11 @@ class CTaskSimpleChoking : public virtual CTaskSimple
 public:
     virtual ~CTaskSimpleChoking(){};
 
-    virtual CPed*        GetAttacker() = 0;
-    virtual unsigned int GetTimeRemaining() = 0;
-    virtual unsigned int GetTimeStarted() = 0;
-    virtual bool         IsTeargas() = 0;
-    virtual bool         IsFinished() = 0;
+    virtual CPed* GetAttacker() = 0;
+    virtual uint  GetTimeRemaining() = 0;
+    virtual uint  GetTimeStarted() = 0;
+    virtual bool  IsTeargas() = 0;
+    virtual bool  IsFinished() = 0;
 
     virtual void UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTearGas) = 0;
 };

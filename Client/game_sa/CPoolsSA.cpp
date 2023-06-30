@@ -24,6 +24,8 @@
 #include "CTrainSA.h"
 #include "CWorldSA.h"
 
+#define VAR_TrainModelArray 0x8D44F8
+
 extern CGameSA* pGame;
 
 CPoolsSA::CPoolsSA()
@@ -140,7 +142,7 @@ void CPoolsSA::RemoveVehicle(CVehicle* pVehicle, bool bDelete)
 
     if (!bIsDeletingVehicleAlready)
     {
-        assert(NULL != pVehicle);
+        assert(nullptr != pVehicle);
 
         bIsDeletingVehicleAlready = true;
 
@@ -225,7 +227,7 @@ inline bool CPoolsSA::AddObjectToPool(CClientObject* pClientObject, CObjectSA* p
 
 CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool bLowLod, bool bBreakingDisabled)
 {
-    CObjectSA* pObject = NULL;
+    CObjectSA* pObject = nullptr;
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
@@ -246,7 +248,7 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
         else
         {
             delete pObject;
-            pObject = NULL;
+            pObject = nullptr;
         }
     }
 
@@ -259,7 +261,7 @@ void CPoolsSA::RemoveObject(CObject* pObject, bool bDelete)
 
     if (!bIsDeletingObjectAlready)
     {
-        assert(NULL != pObject);
+        assert(nullptr != pObject);
 
         bIsDeletingObjectAlready = true;
 
@@ -356,14 +358,14 @@ inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
 
 CPed* CPoolsSA::AddPed(CClientPed* pClientPed, unsigned int nModelIndex)
 {
-    CPedSA* pPed = NULL;
+    CPedSA* pPed = nullptr;
     if (m_pedPool.ulCount < MAX_PEDS)
     {
         pPed = new CPlayerPedSA(nModelIndex);
         if (!AddPedToPool(pClientPed, pPed))
         {
             delete pPed;
-            pPed = NULL;
+            pPed = nullptr;
         }
     }
     return pPed;
@@ -371,7 +373,7 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, unsigned int nModelIndex)
 
 CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
 {
-    CPedSA* pPed = NULL;
+    CPedSA* pPed = nullptr;
 
     if (m_pedPool.ulCount < MAX_PEDS)
     {
@@ -395,7 +397,7 @@ CPed* CPoolsSA::AddPed(CClientPed* pClientPed, DWORD* pGameInterface)
                     if (!AddPedToPool(pClientPed, pPed))
                     {
                         delete pPed;
-                        pPed = NULL;
+                        pPed = nullptr;
                     }
                 }
             }
@@ -482,16 +484,16 @@ CPed* CPoolsSA::GetPedFromRef(DWORD dwGameRef)
             return pPed;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
 {
     DWORD dwReturn;
-    DWORD dwFunction = FUNC_GetPed;
+    DWORD dwFunction = 0x54ff90;
 
     _asm {
-        mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
+        mov     ecx, dword ptr ds : [0xB74490]
         push    dwGameRef
         call    dwFunction
         add     esp, 0x4
@@ -533,7 +535,7 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
             return pThePedEntity->pEntity;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
@@ -558,7 +560,7 @@ CClientEntity* CPoolsSA::GetClientEntity(DWORD* pGameInterface)
             return pThePedEntity->pClientEntity;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId)
@@ -590,7 +592,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
     int   iNodeId = pGame->GetWorld()->FindClosestRailTrackNode(*vecPosition, ucTrackId, fRailDistance);
     int   iDesiredTrackId = ucTrackId;
 
-    DWORD dwFunc = FUNC_CTrain_CreateMissionTrain;
+    DWORD dwFunc = 0x6F7550;
     _asm
     {
         push    0            // place as close to point as possible (rather than at node)? (maybe) (actually seems to have an effect on the speed, so changed from
@@ -613,7 +615,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
     // Enable GetVehicle
     m_bGetVehicleEnabled = true;
 
-    CVehicleSA* trainHead = NULL;
+    CVehicleSA* trainHead = nullptr;
     if (pTrainBeginning)
     {
         DWORD vehicleIndex = 0;
@@ -624,7 +626,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
             if (!AddVehicleToPool(pClientVehicle, trainHead))
             {
                 delete trainHead;
-                trainHead = NULL;
+                trainHead = nullptr;
             }
             else
                 ++vehicleIndex;
@@ -643,13 +645,13 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
                     if (!AddVehicleToPool(pClientVehicle, carriage))
                     {
                         delete carriage;
-                        carriage = NULL;
+                        carriage = nullptr;
                     }
                     else
                         ++vehicleIndex;
                 }
                 else
-                    carriage = NULL;
+                    carriage = nullptr;
             }
         }
     }
@@ -743,7 +745,7 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
     // Finally search model info array
     CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-    unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
+    uint NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
 
     for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
@@ -806,8 +808,8 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
 
 int CPoolsSA::GetPoolCapacity(ePools pool)
 {
-    DWORD iPtr = NULL;
-    DWORD cPtr = NULL;
+    DWORD iPtr = 0;
+    DWORD cPtr = 0;
     switch (pool)
     {
         case BUILDING_POOL:
@@ -883,8 +885,8 @@ int CPoolsSA::GetPoolCapacity(ePools pool)
 // Must be called before CPools::Initialise()
 void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
 {
-    DWORD iPtr = NULL;
-    DWORD cPtr = NULL;
+    DWORD iPtr = 0;
+    DWORD cPtr = 0;
     switch (pool)
     {
         case BUILDING_POOL:
@@ -957,77 +959,77 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
 
 int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
 {
-    DWORD dwFunc = NULL;
-    DWORD dwThis = NULL;
+    DWORD dwFunc = 0;
+    DWORD dwThis = 0;
     switch (pool)
     {
         case BUILDING_POOL:
-            dwFunc = FUNC_CBuildingPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CBuildingPool;
+            dwFunc = 0x550620;
+            dwThis = 0xB74498;
             break;
         case PED_POOL:
-            dwFunc = FUNC_CPedPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPedPool;
+            dwFunc = 0x5504A0;
+            dwThis = 0xB74490;
             break;
         case OBJECT_POOL:
-            dwFunc = FUNC_CObjectPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CObjectPool;
+            dwFunc = 0x54F6B0;
+            dwThis = 0xB7449C;
             break;
         case DUMMY_POOL:
-            dwFunc = FUNC_CDummyPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CDummyPool;
+            dwFunc = 0x5507A0;
+            dwThis = 0xB744A0;
             break;
         case VEHICLE_POOL:
-            dwFunc = FUNC_CVehiclePool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CVehiclePool;
+            dwFunc = 0x42CCF0;
+            dwThis = 0xB74494;
             break;
         case COL_MODEL_POOL:
-            dwFunc = FUNC_CColModelPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CColModelPool;
+            dwFunc = 0x550870;
+            dwThis = 0xB744A4;
             break;
         case TASK_POOL:
-            dwFunc = FUNC_CTaskPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CTaskPool;
+            dwFunc = 0x550940;
+            dwThis = 0xB744A8;
             break;
         case EVENT_POOL:
-            dwFunc = FUNC_CEventPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CEventPool;
+            dwFunc = 0x550A10;
+            dwThis = 0xB744AC;
             break;
         case TASK_ALLOCATOR_POOL:
-            dwFunc = FUNC_CTaskAllocatorPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CTaskAllocatorPool;
+            dwFunc = 0x550d50;
+            dwThis = 0xB744BC;
             break;
         case PED_INTELLIGENCE_POOL:
-            dwFunc = FUNC_CPedIntelligencePool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPedIntelligencePool;
+            dwFunc = 0x550E20;
+            dwThis = 0xB744C0;
             break;
         case PED_ATTRACTOR_POOL:
-            dwFunc = FUNC_CPedAttractorPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPedAttractorPool;
+            dwFunc = 0x550ef0;
+            dwThis = 0xB744C4;
             break;
         case ENTRY_INFO_NODE_POOL:
-            dwFunc = FUNC_CEntryInfoNodePool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CEntryInfoNodePool;
+            dwFunc = 0x5503d0;
+            dwThis = 0xB7448C;
             break;
         case NODE_ROUTE_POOL:
-            dwFunc = FUNC_CNodeRoutePool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CNodeRoutePool;
+            dwFunc = 0x550c80;
+            dwThis = 0xB744B8;
             break;
         case PATROL_ROUTE_POOL:
-            dwFunc = FUNC_CPatrolRoutePool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPatrolRoutePool;
+            dwFunc = 0x550bb0;
+            dwThis = 0xB744B4;
             break;
         case POINT_ROUTE_POOL:
-            dwFunc = FUNC_CPointRoutePool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPointRoutePool;
+            dwFunc = 0x550ae0;
+            dwThis = 0xB744D0;
             break;
         case POINTER_DOUBLE_LINK_POOL:
-            dwFunc = FUNC_CPtrNodeDoubleLinkPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPtrNodeDoubleLinkPool;
+            dwFunc = 0x550300;
+            dwThis = 0xB74488;
             break;
         case POINTER_SINGLE_LINK_POOL:
-            dwFunc = FUNC_CPtrNodeSingleLinkPool_GetNoOfUsedSpaces;
-            dwThis = CLASS_CPtrNodeSingleLinkPool;
+            dwFunc = 0x550230;
+            dwThis = 0xB74484;
             break;
         default:
             return -1;

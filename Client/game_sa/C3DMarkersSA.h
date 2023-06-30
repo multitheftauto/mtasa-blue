@@ -14,9 +14,6 @@
 #include <game/C3DMarkers.h>
 #include "C3DMarkerSA.h"
 
-#define FUNC_PlaceMarker        0x725120
-#define ARRAY_3D_MARKERS        0xC7DD58
-
 #define MAX_3D_MARKERS          32
 
 class C3DMarkersSA : public C3DMarkers
@@ -28,7 +25,8 @@ public:
     C3DMarkersSA();
     ~C3DMarkersSA();
 
-    C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b, BYTE a);
+    C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, uchar r, uchar g, uchar b,
+                            uchar a);
     C3DMarker* FindFreeMarker();
     C3DMarker* FindMarker(DWORD Identifier);
 };

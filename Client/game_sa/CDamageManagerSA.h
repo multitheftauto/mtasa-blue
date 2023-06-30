@@ -13,14 +13,6 @@
 
 #include <game/CDamageManager.h>
 
-#define FUNC_GetPanelStatus         0x6c2180
-#define FUNC_SetPanelStatus         0x6c2150
-#define FUNC_SetLightStatus         0x6c2100
-#define FUNC_GetLightStatus         0x6c2130
-#define FUNC_SetAeroplaneCompStatus 0x6C22D0
-#define FUNC_GetAeroplaneCompStatus 0x6C2300
-#define FUNC_FuckCarCompletely      0x6c25d0
-
 #define MAX_DOORS                   6   // also in CAutomobile
 #define MAX_WHEELS                  4
 

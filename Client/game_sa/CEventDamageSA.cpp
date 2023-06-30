@@ -26,7 +26,7 @@ CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType w
 
     DWORD dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_Constructor;
+    DWORD dwFunc = 0x4AD830;
     _asm
     {
         mov     ecx, dwThis
@@ -56,7 +56,7 @@ CEventDamageSA::~CEventDamageSA()
     if (m_bDestroyInterface)
     {
         DWORD dwThis = (DWORD)m_pInterface;
-        DWORD dwFunc = FUNC_CEventDamage_Destructor;
+        DWORD dwFunc = 0x4AD960;
         _asm
         {
             mov     ecx, dwThis
@@ -68,7 +68,7 @@ CEventDamageSA::~CEventDamageSA()
 
 CEntity* CEventDamageSA::GetInflictingEntity()
 {
-    CEntity*            pReturn = NULL;
+    CEntity*            pReturn = nullptr;
     CEntitySAInterface* pInterface = m_pInterface->pInflictor;
     if (pInterface)
     {
@@ -81,7 +81,7 @@ CEntity* CEventDamageSA::GetInflictingEntity()
 bool CEventDamageSA::HasKilledPed()
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_HasKilledPed;
+    DWORD dwFunc = 0x4ABCA0;
     bool  bReturn = false;
     _asm
     {
@@ -95,7 +95,7 @@ bool CEventDamageSA::HasKilledPed()
 float CEventDamageSA::GetDamageApplied()
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_GetDamageApplied;
+    DWORD dwFunc = 0x4ABCE0;
     float fReturn = 0.0f;
     _asm
     {
@@ -109,7 +109,7 @@ float CEventDamageSA::GetDamageApplied()
 AssocGroupId CEventDamageSA::GetAnimGroup()
 {
     DWORD        dwThis = (DWORD)m_pInterface;
-    DWORD        dwFunc = FUNC_CEventDamage_GetAnimGroup;
+    DWORD        dwFunc = 0x4B8060;
     AssocGroupId animGroup = 0;
     _asm
     {
@@ -123,7 +123,7 @@ AssocGroupId CEventDamageSA::GetAnimGroup()
 AnimationId CEventDamageSA::GetAnimId()
 {
     DWORD       dwThis = (DWORD)m_pInterface;
-    DWORD       dwFunc = FUNC_CEventDamage_GetAnimId;
+    DWORD       dwFunc = 0x4B8070;
     AnimationId animID = 0;
     _asm
     {
@@ -136,9 +136,9 @@ AnimationId CEventDamageSA::GetAnimId()
 
 bool CEventDamageSA::GetAnimAdded()
 {
-    bool  bReturn;
+    bool  bReturn = false;
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
+    DWORD dwFunc = 0x4B80A0;
     _asm
     {
         mov     ecx, dwThis
@@ -152,7 +152,7 @@ void CEventDamageSA::ComputeDeathAnim(CPed* pPed, bool bUnk)
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
-    DWORD dwFunc = FUNC_CEventDamage_ComputeDeathAnim;
+    DWORD dwFunc = 0x4B3A60;
     _asm
     {
         mov     ecx, dwThis
@@ -166,7 +166,7 @@ void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwPed = (DWORD)pPed->GetInterface();
-    DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
+    DWORD dwFunc = 0x4B3FC0;
     _asm
     {
         mov     ecx, dwThis
@@ -178,10 +178,10 @@ void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
 
 bool CEventDamageSA::AffectsPed(CPed* pPed)
 {
-    bool  bReturn;
+    bool  bReturn = false;
     DWORD dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CEventDamage_AffectsPed;
+    DWORD dwFunc = 0x4D35A0;
     _asm
     {
         mov     ecx, dwThis

@@ -15,13 +15,6 @@
 #include <game/CFxSystem.h>
 #include <game/RenderWare.h>
 
-#define FUNC_FxSystem_c__PlayAndKill                    0x4AA3D0
-#define VAR_FxSystemUpdateCullDistMultiplier            0x4AB032
-#define VAR_FxCreateParticleCullDistMultiplierA         0x4A4247
-#define VAR_FxCreateParticleCullDistMultiplierB         0x4A4255
-#define FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT   (1 / 256.f)
-#define FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT (1 / 64.f)
-
 class CAEFireAudioEntitySAInterface
 {
 public:

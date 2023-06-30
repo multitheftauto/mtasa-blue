@@ -25,7 +25,7 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
 {
     CPedSA* pAttackerSA = dynamic_cast<CPedSA*>(pAttacker);
 
-    DWORD dwFunc = FUNC_CTaskSimpleChoking__Constructor;
+    DWORD dwFunc = 0x6202C0;
     DWORD dwIsTearGas = bIsTearGas;
 
     // Grab the GTA class for the attacker if any
@@ -34,8 +34,10 @@ CTaskSimpleChokingSA::CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas)
         pAttackerInterface = pAttackerSA->GetPedInterface();
 
     CreateTaskInterface(sizeof(CTaskSimpleChokingSAInterface));
+
     if (!IsValid())
         return;
+
     DWORD dwThisInterface = (DWORD)GetInterface();
     _asm
     {
@@ -55,13 +57,13 @@ CPed* CTaskSimpleChokingSA::GetAttacker()
     return pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
 }
 
-unsigned int CTaskSimpleChokingSA::GetTimeRemaining()
+uint CTaskSimpleChokingSA::GetTimeRemaining()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_nTimeRemaining;
 }
 
-unsigned int CTaskSimpleChokingSA::GetTimeStarted()
+uint CTaskSimpleChokingSA::GetTimeStarted()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_nTimeStarted;
@@ -98,7 +100,7 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
 
     // Call the func
     DWORD dwThisInterface = (DWORD)GetInterface();
-    DWORD dwFunc = FUNC_CTaskSimpleChoking__UpdateChoke;
+    DWORD dwFunc = 0x620660;
     _asm
     {
         mov         ecx, dwThisInterface

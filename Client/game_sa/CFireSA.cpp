@@ -22,7 +22,7 @@ extern CGameSA* pGame;
  */
 void CFireSA::Extinguish()
 {
-    DWORD dwFunction = FUNC_Extinguish;
+    DWORD dwFunction = 0x5393F0;
     DWORD dwPointer = (DWORD)internalInterface;
     _asm
     {
@@ -68,7 +68,7 @@ DWORD CFireSA::GetTimeToBurnOut()
 
 CEntity* CFireSA::GetCreator()
 {
-    CEntity*            creatorEntity = NULL;
+    CEntity*            creatorEntity = nullptr;
     CEntitySAInterface* createEntitySA = internalInterface->entityCreator;
     CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
     if (pPools && createEntitySA)
@@ -95,7 +95,7 @@ CEntity* CFireSA::GetCreator()
             }
             default:
             {
-                creatorEntity = NULL;
+                creatorEntity = nullptr;
             }
         }
     }
@@ -104,7 +104,7 @@ CEntity* CFireSA::GetCreator()
 
 CEntity* CFireSA::GetEntityOnFire()
 {
-    CEntity*            TargetEntity = NULL;
+    CEntity*            TargetEntity = nullptr;
     CEntitySAInterface* TargetEntitySA = internalInterface->entityTarget;
     CPoolsSA*           pPools = ((CPoolsSA*)pGame->GetPools());
     if (pPools && TargetEntitySA)
@@ -131,7 +131,7 @@ CEntity* CFireSA::GetEntityOnFire()
             }
             default:
             {
-                TargetEntity = NULL;
+                TargetEntity = nullptr;
             }
         }
     }
@@ -148,7 +148,7 @@ void CFireSA::SetTarget(CEntity* entity)
     }
     else
     {
-        internalInterface->entityTarget = NULL;
+        internalInterface->entityTarget = nullptr;
     }
 }
 
@@ -178,9 +178,8 @@ bool CFireSA::IsBeingExtinguished()
 void CFireSA::Ignite()
 {
     internalInterface->bActive = true;
-
     CVector* vecPosition = GetPosition();
-    DWORD    dwFunc = FUNC_CreateFxSysForStrength;
+    DWORD    dwFunc = 0x539360;
     DWORD    dwThis = (DWORD)internalInterface;
     _asm
     {
@@ -189,7 +188,6 @@ void CFireSA::Ignite()
         push    vecPosition
         call    dwFunc
     }
-
     internalInterface->bBeingExtinguished = 0;
     internalInterface->bFirstGeneration = 1;
     internalInterface->nNumGenerationsAllowed = 100;

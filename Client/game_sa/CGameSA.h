@@ -20,68 +20,15 @@ class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
 class CTaskManagementSystemSA;
 
-extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
+extern uint OBJECTDYNAMICINFO_MAX; // default: 160
 
-#define CLASS_CPlayerInfo               0xB7CD98
-#define CLASS_CCamera                   0xB6F028
-#define CLASS_CPad                      0xB73458
 #define CLASS_CFx                       0xa9ae00
-#define CLASS_CFxManager                0xA9AE80
 #define CLASS_CMenuManager              0xBA6748
-#define CLASS_RwCamera                  0xB6F97C
 
-#define ARRAY_WeaponInfo                0xC8AAB8
 #define CLASSSIZE_WeaponInfo            112
 #define NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
 #define NUM_WeaponInfosOtherSkill       11
 #define NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
-
-#define VAR_FlyingCarsEnabled           0x969160
-#define VAR_ExtraBunnyhopEnabled        0x969161
-#define VAR_HoveringCarsEnabled         0x969152
-#define VAR_ExtraJumpEnabled            0x96916C
-#define VAR_TankModeEnabled             0x969164
-#define VAR_NoReloadEnabled             0x969178
-#define VAR_PerfectHandling             0x96914C
-#define VAR_AllCarsHaveNitro            0x969165
-#define VAR_BoatsCanFly                 0x969153
-#define VAR_InfiniteOxygen              0x96916E
-#define VAR_FasterClock                 0x96913B
-#define VAR_FasterGameplay              0x96913C
-#define VAR_SlowerGameplay              0x96913D
-#define VAR_AlwaysMidnight              0x969167
-#define VAR_FullWeaponAiming            0x969179
-#define VAR_InfiniteHealth              0x96916D
-#define VAR_NeverWanted                 0x969171
-#define VAR_HealthArmorMoney            0x969133
-#define VAR_WalkUnderwater              0x6C2759
-
-#define CHEAT_HOVERINGCARS          "hovercars"
-#define CHEAT_FLYINGCARS            "aircars"
-#define CHEAT_EXTRABUNNYHOP         "extrabunny"
-#define CHEAT_EXTRAJUMP             "extrajump"
-#define CHEAT_TANKMODE              "tankmode"
-#define CHEAT_NORELOAD              "noreload"
-#define CHEAT_PERFECTHANDLING       "perfecthandling"
-#define CHEAT_ALLCARSHAVENITRO      "allcarshavenitro"
-#define CHEAT_BOATSCANFLY           "airboats"
-#define CHEAT_INFINITEOXYGEN        "infiniteoxygen"
-#define CHEAT_WALKUNDERWATER        "walkunderwater"
-#define CHEAT_FASTERCLOCK           "fasterclock"
-#define CHEAT_FASTERGAMEPLAY        "fastergameplay"
-#define CHEAT_SLOWERGAMEPLAY        "slowergameplay"
-#define CHEAT_ALWAYSMIDNIGHT        "alwaysmidnight"
-#define CHEAT_FULLWEAPONAIMING      "fullweaponaiming"
-#define CHEAT_INFINITEHEALTH        "infinitehealth"
-#define CHEAT_NEVERWANTED           "neverwanted"
-#define CHEAT_HEALTARMORMONEY       "healtharmormoney"
-
-#define PROP_RANDOM_FOLIAGE         "randomfoliage"
-#define PROP_SNIPER_MOON            "snipermoon"
-#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
-#define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
-#define PROP_CORONA_ZTEST           "coronaztest"
 
 struct SCheatSA
 {
@@ -158,7 +105,7 @@ public:
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
-    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
+    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(uchar ucObjectGroup);
 
     int32_t GetBaseIDforDFF() { return 0; }
     int32_t GetBaseIDforTXD() { return *(int32_t*)(0x407104 + 2); }
@@ -200,8 +147,8 @@ public:
     float GetGameSpeed();
     void  SetGameSpeed(float fSpeed);
 
-    unsigned char GetBlurLevel();
-    void          SetBlurLevel(unsigned char ucLevel);
+    uchar GetBlurLevel();
+    void  SetBlurLevel(uchar ucLevel);
 
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
@@ -212,8 +159,8 @@ public:
     void SetCoronaZTestEnabled(bool isEnabled);
     bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
 
-    unsigned long GetMinuteDuration();
-    void          SetMinuteDuration(unsigned long ulTime);
+    ulong GetMinuteDuration();
+    void  SetMinuteDuration(ulong ulTime);
 
     bool IsCheatEnabled(const char* szCheatName);
     bool SetCheatEnabled(const char* szCheatName, bool bEnable);
@@ -323,16 +270,16 @@ private:
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
 
-    static unsigned int&  ClumpOffset;
-    static unsigned long* VAR_SystemTime;
-    static unsigned long* VAR_IsAtMenu;
-    static bool*          VAR_IsForegroundWindow;
-    static unsigned long* VAR_SystemState;
-    static float*         VAR_TimeScale;
-    static float*         VAR_FPS;
-    static float*         VAR_OldTimeStep;
-    static float*         VAR_TimeStep;
-    static unsigned long* VAR_Framelimiter;
+    static uint&  ClumpOffset;
+    static ulong* VAR_SystemTime;
+    static ulong* VAR_IsAtMenu;
+    static bool*  VAR_IsForegroundWindow;
+    static ulong* VAR_SystemState;
+    static float* VAR_TimeScale;
+    static float* VAR_FPS;
+    static float* VAR_OldTimeStep;
+    static float* VAR_TimeStep;
+    static ulong* VAR_Framelimiter;
 
     std::map<std::string, SCheatSA*> m_Cheats;
 

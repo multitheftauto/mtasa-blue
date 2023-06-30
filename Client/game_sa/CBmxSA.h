@@ -14,10 +14,7 @@
 #include <game/CBmx.h>
 #include "CBikeSA.h"
 
-class CBmxSAInterface : public CBikeSAInterface
-{
-    // fill this
-};
+class CBmxSAInterface : public CBikeSAInterface {};
 
 class CBmxSA final : public virtual CBmx, public virtual CBikeSA
 {

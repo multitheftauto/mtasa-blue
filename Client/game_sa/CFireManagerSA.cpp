@@ -36,8 +36,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
     float fX = vecPosition.fX;
     float fY = vecPosition.fY;
     float fZ = vecPosition.fZ;
-    DWORD dwFunction = FUNC_ExtinguishPoint;
-
+    DWORD dwFunction = 0x539450;
     _asm
     {
         mov     ecx, CLASS_CFireManager
@@ -51,44 +50,40 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
 
 CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
-    CFire* fire = FindFreeFire();
-
-    if (fire != NULL)
+    CFire* pFire = FindFreeFire();
+    if (pFire != nullptr)
     {
-        fire->SetTarget(entityTarget);
-        fire->SetStrength(fSize);
-        fire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
-        fire->SetSilent(false);
-        fire->Ignite();
+        pFire->SetTarget(entityTarget);
+        pFire->SetStrength(fSize);
+        pFire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
+        pFire->SetSilent(false);
+        pFire->Ignite();
     }
-
-    return fire;
+    return pFire;
 }
 
 CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)
 {
-    CFire* fire = FindFreeFire();
-
-    if (fire != NULL)
+    CFire* pFire = FindFreeFire();
+    if (pFire != nullptr)
     {
-        fire->SetPosition(vecPosition);
-        fire->SetStrength(fSize);
-        fire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
-        fire->SetSilent(false);
-        fire->Ignite();
+        pFire->SetPosition(vecPosition);
+        pFire->SetStrength(fSize);
+        pFire->SetTimeToBurnOut(pGame->GetSystemTime() + 5000);
+        pFire->SetSilent(false);
+        pFire->Ignite();
     }
-
-    return fire;
+    return pFire;
 }
 
 void CFireManagerSA::ExtinguishAllFires()
 {
-    CFireSA* fire;
+    CFireSA* pFireSA;
     for (int i = 0; i < MAX_FIRES; i++)
     {
-        fire = (CFireSA*)GetFire(i);
-        if (fire && fire->IsIgnited())
-            fire->Extinguish();
+        pFireSA = (CFireSA*)GetFire(i);
+        if (pFireSA && pFireSA->IsIgnited())
+            pFireSA->Extinguish();
     }
 }
 
@@ -97,7 +92,7 @@ CFire* CFireManagerSA::GetFire(DWORD ID)
     if (ID < MAX_FIRES)
         return Fires[ID];
     else
-        return NULL;
+        return nullptr;
 }
 
 DWORD CFireManagerSA::GetFireCount()
@@ -107,18 +102,17 @@ DWORD CFireManagerSA::GetFireCount()
 
 CFire* CFireManagerSA::FindFreeFire()
 {
-    CFireSA* fire;
+    CFireSA* pFireSA;
     for (int i = 0; i < MAX_FIRES; i++)
     {
-        fire = (CFireSA*)GetFire(i);
-        if (fire && !fire->IsIgnited())
-            return fire;
+        pFireSA = (CFireSA*)GetFire(i);
+        if (pFireSA && !pFireSA->IsIgnited())
+            return pFireSA;
     }
-    return NULL;
+    return nullptr;
 }
 
 CFire* CFireManagerSA::GetFire(CFireSAInterface* fire)
 {
-    DWORD dwID = ((DWORD)fire - CLASS_CFireManager + 4) / sizeof(CFireSAInterface);
-    return GetFire(dwID);
+    return GetFire(((DWORD)fire - CLASS_CFireManager + 4) / sizeof(CFireSAInterface));
 }

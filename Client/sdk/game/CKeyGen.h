@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CKeyGen.h
+ *  FILE:        Client/sdk/game/CKeyGen.h
  *  PURPOSE:     Game key generator interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,8 +14,8 @@
 class CKeyGen
 {
 public:
-    virtual unsigned int GetKey(const char* szString, int iLength) = 0;
-    virtual unsigned int GetKey(const char* szString) = 0;
-    virtual unsigned int GetUppercaseKey(const char* szString) = 0;
-    virtual unsigned int AppendStringToKey(unsigned int uiKey, const char* szString) = 0;
+    virtual uint GetKey(const char* szString, int iLength) = 0;
+    virtual uint GetKey(const char* szString) = 0;
+    virtual uint GetUppercaseKey(const char* szString) = 0;
+    virtual uint AppendStringToKey(uint uiKey, const char* szString) = 0;
 };

@@ -47,7 +47,7 @@ DWORD C3DMarkerSA::GetType()
 
 void C3DMarkerSA::SetType(DWORD dwType)
 {
-    GetInterface()->m_nType = (unsigned short)(dwType);
+    GetInterface()->m_nType = (ushort)(dwType);
 }
 
 bool C3DMarkerSA::IsActive()
@@ -63,7 +63,7 @@ DWORD C3DMarkerSA::GetIdentifier()
 SharedUtil::SColor C3DMarkerSA::GetColor()
 {
     // From ABGR
-    unsigned long      ulABGR = GetInterface()->rwColour;
+    ulong              ulABGR = GetInterface()->rwColour;
     SharedUtil::SColor color;
     color.A = (ulABGR >> 24) & 0xff;
     color.B = (ulABGR >> 16) & 0xff;

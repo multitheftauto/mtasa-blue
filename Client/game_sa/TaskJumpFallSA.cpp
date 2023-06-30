@@ -18,7 +18,7 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTar
     CreateTaskInterface(sizeof(CTaskSimpleClimbSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleClimb__Constructor;
+    DWORD dwFunc = 0x67A110;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm
@@ -44,7 +44,7 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     CreateTaskInterface(sizeof(CTaskSimpleJetPackSAInterface));
     if (!IsValid())
         return;
-    DWORD dwFunc = FUNC_CTaskSimpleJetPack__Constructor;
+    DWORD dwFunc = 0x67B4E0;
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     _asm

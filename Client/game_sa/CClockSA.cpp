@@ -13,6 +13,9 @@
 #include "CClockSA.h"
 #include "CGameSA.h"
 
+#define VAR_TimeMinutes 0xB70152
+#define VAR_TimeHours   0xB70153
+
 extern CGameSA* pGame;
 
 void CClockSA::Set(BYTE bHour, BYTE bMinute)
@@ -21,7 +24,7 @@ void CClockSA::Set(BYTE bHour, BYTE bMinute)
     {
         MemPutFast<BYTE>(VAR_TimeMinutes, bMinute);
         MemPutFast<BYTE>(VAR_TimeHours, bHour);
-        MemPutFast<DWORD>(VAR_TimeOfLastMinuteChange, pGame->GetSystemTime());
+        MemPutFast<DWORD>(0xB70158, pGame->GetSystemTime());
     }
 }
 

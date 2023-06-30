@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CGame.h
+ *  FILE:        Client/sdk/game/CGame.h
  *  PURPOSE:     Game base interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -174,11 +174,11 @@ public:
     virtual float GetGameSpeed() = 0;
     virtual void  SetGameSpeed(float fSpeed) = 0;
 
-    virtual unsigned long GetMinuteDuration() = 0;
-    virtual void          SetMinuteDuration(unsigned long ulDelay) = 0;
+    virtual ulong GetMinuteDuration() = 0;
+    virtual void  SetMinuteDuration(ulong ulDelay) = 0;
 
-    virtual unsigned char GetBlurLevel() = 0;
-    virtual void          SetBlurLevel(unsigned char ucLevel) = 0;
+    virtual uchar GetBlurLevel() = 0;
+    virtual void  SetBlurLevel(uchar ucLevel) = 0;
 
     virtual void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     virtual bool GetJetpackWeaponEnabled(eWeaponType weaponType);
@@ -223,7 +223,7 @@ public:
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
-    virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
+    virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(uchar ucObjectGroup) = 0;
 
     virtual int32_t GetBaseIDforDFF() = 0;
     virtual int32_t GetBaseIDforTXD() = 0;

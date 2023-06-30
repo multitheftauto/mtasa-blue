@@ -18,10 +18,9 @@
  */
 float CDoorSA::GetAngleOpenRatio()
 {
-    DWORD dwFunction = FUNC_GetAngleOpenRatio;
+    DWORD dwFunction = 0x6F47E0;
     DWORD dwPointer = (DWORD)GetInterface();
     float fReturn = 0.0f;
-
     if (dwPointer != 0)
     {
         _asm
@@ -31,7 +30,6 @@ float CDoorSA::GetAngleOpenRatio()
             fstp    fReturn
         }
     }
-
     return fReturn;
 }
 
@@ -41,10 +39,9 @@ float CDoorSA::GetAngleOpenRatio()
  */
 bool CDoorSA::IsClosed()
 {
-    DWORD dwFunction = FUNC_IsClosed;
+    DWORD dwFunction = 0x6F4800;
     DWORD dwPointer = (DWORD)GetInterface();
     BYTE  bReturn = 0;
-
     if (dwPointer != 0)
     {
         _asm
@@ -54,7 +51,6 @@ bool CDoorSA::IsClosed()
             mov     bReturn, al
         }
     }
-
     return bReturn;
 }
 
@@ -65,10 +61,9 @@ bool CDoorSA::IsClosed()
  */
 bool CDoorSA::IsFullyOpen()
 {
-    DWORD dwFunction = FUNC_IsFullyOpen;
+    DWORD dwFunction = 0x6F4820;
     DWORD dwPointer = (DWORD)GetInterface();
     BYTE  bReturn = 0;
-
     if (dwPointer != 0)
     {
         _asm
@@ -78,7 +73,6 @@ bool CDoorSA::IsFullyOpen()
             mov     bReturn, al
         }
     }
-
     return bReturn;
 }
 
@@ -89,9 +83,8 @@ bool CDoorSA::IsFullyOpen()
  */
 void CDoorSA::Open(float fOpenRatio)
 {
-    DWORD dwFunction = FUNC_Open;
+    DWORD dwFunction = 0x6F4790;
     DWORD dwPointer = (DWORD)GetInterface();
-
     if (dwPointer != 0)
     {
         _asm

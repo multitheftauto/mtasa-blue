@@ -12,6 +12,9 @@
 #include "StdInc.h"
 #include "CHudSA.h"
 
+#define FUNC_DrawRadar      0x58A330
+#define FUNC_DrawRadarPlanB 0x58A335
+
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
 
@@ -22,9 +25,9 @@ CHudSA::CHudSA()
     // Set the default values
     m_fSniperCrosshairScale = 210.0f;
 
-    m_pfCameraCrosshairScale = (float*)VAR_CameraCrosshairScale;
+    m_pfCameraCrosshairScale = (float*)0x866C74;
     MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
-    m_pfAspectRatioMultiplicator = (float*)VAR_AspectRatioMult;
+    m_pfAspectRatioMultiplicator = (float*)0x859524;
     MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
 
     // Patch xrefs to 0x863B34, because this variable seems to be shared (2 other functions without any context access to it; probably a compiler optimization)
@@ -61,21 +64,21 @@ bool CHudSA::IsDisabled()
 void CHudSA::InitComponentList()
 {
     SHudComponent componentList[] = {
-        {1, HUD_AMMO, 1, FUNC_DrawAmmo, 1, 0xCC, 0xC3},
-        {1, HUD_WEAPON, 1, FUNC_DrawWeaponIcon, 1, 0xCC, 0xC3},
-        {1, HUD_HEALTH, 1, FUNC_PrintHealthForPlayer, 1, 0xCC, 0xC3},
-        {1, HUD_BREATH, 1, FUNC_PrintBreathForPlayer, 1, 0xCC, 0xC3},
-        {1, HUD_ARMOUR, 1, FUNC_PrintArmourForPlayer, 1, 0xCC, 0xC3},
-        {1, HUD_MONEY, 1, CODE_ShowMoney, 2, 0xCCCC, 0xE990},
-        {1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3},
-        {1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3},
-        {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
-        {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
-        {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},
-        {1, HUD_CROSSHAIR, 1, FUNC_DrawCrosshair, 1, 0xCC, 0xC3},
-        {1, HUD_VITAL_STATS, 1, FUNC_DrawVitalStats, 1, 0xCC, 0xC3},
-        {0, HUD_HELP_TEXT, 1, FUNC_DrawHelpText, 1, 0xCC, 0xC3},
+        {1, HUD_AMMO,         1, 0x5893B0,       1, 0xCC,   0xC3},
+        {1, HUD_WEAPON,       1, 0x58D7D0,       1, 0xCC,   0xC3},
+        {1, HUD_HEALTH,       1, 0x589270,       1, 0xCC,   0xC3},
+        {1, HUD_BREATH,       1, 0x589190,       1, 0xCC,   0xC3},
+        {1, HUD_ARMOUR,       1, 0x5890A0,       1, 0xCC,   0xC3},
+        {1, HUD_MONEY,        1, 0x58F47D,       2, 0xCCCC, 0xE990},
+        {1, HUD_VEHICLE_NAME, 1, 0x58AEA0,       1, 0xCC,   0xC3},
+        {1, HUD_AREA_NAME,    1, 0x58AA50,       1, 0xCC,   0xC3},
+        {1, HUD_RADAR,        1, FUNC_DrawRadar, 1, 0xCC,   0xC3},
+        {1, HUD_CLOCK,        0, 0xBAA400,       1, 1,      0},
+        {1, HUD_RADIO,        1, 0x4E9E50,       1, 0xCC,   0xC3},
+        {1, HUD_WANTED,       1, 0x58D9A0,       1, 0xCC,   0xC3},
+        {1, HUD_CROSSHAIR,    1, 0x58E020,       1, 0xCC,   0xC3},
+        {1, HUD_VITAL_STATS,  1, 0x589650,       1, 0xCC,   0xC3},
+        {0, HUD_HELP_TEXT,    1, 0x58B6E0,       1, 0xCC,   0xC3},
     };
 
     for (uint i = 0; i < NUMELMS(componentList); i++)

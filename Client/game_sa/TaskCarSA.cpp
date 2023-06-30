@@ -39,7 +39,7 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTarget
         CreateTaskInterface(sizeof(CTaskComplexEnterCarAsDriverSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskComplexEnterCarAsDriver__Constructor;
+        DWORD dwFunc = 0x6402F0;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
@@ -67,7 +67,7 @@ CTaskComplexEnterCarAsPassengerSA::CTaskComplexEnterCarAsPassengerSA(CVehicle* p
         CreateTaskInterface(sizeof(CTaskComplexEnterCarAsPassengerSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskComplexEnterCarAsPassenger__Constructor;
+        DWORD dwFunc = 0x640340;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
@@ -100,7 +100,7 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTarg
         CreateTaskInterface(sizeof(CTaskComplexEnterBoatAsDriverSAInterface));
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskComplexEnterBoatAsDriver__Constructor;
+        DWORD dwFunc = 0x63B5E0;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
@@ -129,7 +129,7 @@ CTaskComplexLeaveCarSA::CTaskComplexLeaveCarSA(CVehicle* pTargetVehicle, const i
         CreateTaskInterface(sizeof(CTaskComplexLeaveCarSAInterface));
         if (!IsValid())
             return;
-        DWORD      dwFunc = FUNC_CTaskComplexLeaveCar__Constructor;
+        DWORD      dwFunc = 0x63B8C0;
         DWORD      dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD      dwThisInterface = (DWORD)GetInterface();
         DWORD      dwDoorIdx = 0;

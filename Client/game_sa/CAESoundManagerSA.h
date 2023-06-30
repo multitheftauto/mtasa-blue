@@ -13,8 +13,6 @@
 #include <game/CAESoundManager.h>
 #include "CAudioEngineSA.h"
 
-#define CLASS_CAESoundManager                           0xB62CB0
-
 class CAESoundManagerSAInterface
 {
     int16_t  m_wNumAvailableChannels;                 // + 0x0000 // = CAEAudioHardware::GetNumAvailableChannels(...), [10, 300]

@@ -16,27 +16,20 @@
 
 class CAnimBlendSequence;
 
-#define FUNC_CAnimBlendHierarchy_SetName                     0x4CF2D0
-#define FUNC_CAnimBlendHierarchy_RemoveAnimSequences         0x4CF8E0
-#define FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache 0x4D42A0
-#define FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips       0x4CF4E0
-#define FUNC_CAnimBlendHierarchy_CalculateTotalTime          0x4CF2F0
-
 class CAnimBlendHierarchySAInterface
 {
 public:
     // Careful, GetIndex will not work for custom animations
     int GetIndex();
 
-    unsigned int                   uiHashKey;
+    uint                           uiHashKey;
     CAnimBlendSequenceSAInterface* pSequences;
-    unsigned short                 usNumSequences;
+    ushort                         usNumSequences;
     bool                           bRunningCompressed;
     BYTE                           pad;
     int                            iAnimBlockID;
     float                          fTotalTime;
     DWORD*                         pLinkPtr;
-    // class CLink<class CAnimBlendHierarchy *> *      pLinkPtr;
 };
 
 class CAnimBlendHierarchySA : public CAnimBlendHierarchy

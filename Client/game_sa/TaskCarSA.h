@@ -20,11 +20,6 @@ class CAnimBlendAssociation;
 typedef DWORD CTaskUtilityLineUpPedWithCar;
 typedef DWORD AnimationId;
 
-#define FUNC_CTaskComplexEnterCarAsDriver__Constructor              0x6402F0
-#define FUNC_CTaskComplexEnterCarAsPassenger__Constructor           0x640340
-#define FUNC_CTaskComplexEnterBoatAsDriver__Constructor             0x63B5E0
-#define FUNC_CTaskComplexLeaveCar__Constructor                      0x63B8C0
-
 // ##############################################################################
 // ## Name:    CTaskComplexEnterCar
 // ## Purpose: Makes the ped enter the specified vehicle

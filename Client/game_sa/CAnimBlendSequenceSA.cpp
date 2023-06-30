@@ -23,7 +23,7 @@ void CAnimBlendSequenceSA::Initialize()
 void CAnimBlendSequenceSA::SetName(const char* szName)
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendSequence_SetName;
+    DWORD dwFunc = 0x4D0C50;
     _asm
     {
         push    szName
@@ -35,7 +35,7 @@ void CAnimBlendSequenceSA::SetName(const char* szName)
 void CAnimBlendSequenceSA::SetBoneTag(int32_t i32BoneID)
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendSequence_SetBoneTag;
+    DWORD dwFunc = 0x4D0C70;
     _asm
     {
         push    i32BoneID
@@ -47,7 +47,7 @@ void CAnimBlendSequenceSA::SetBoneTag(int32_t i32BoneID)
 void CAnimBlendSequenceSA::SetKeyFrames(size_t cKeyFrames, bool bRoot, bool bCompressed, void* pKeyFrames)
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendSequence_SetKeyFrames;
+    DWORD dwFunc = 0x4D0CD0;
     _asm
     {
         push    pKeyFrames

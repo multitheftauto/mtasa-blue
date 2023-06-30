@@ -20,7 +20,7 @@ extern CGameSA* pGame;
 CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, CVector effectorVec, int pivotBoneTag, CEntity* pEntity, int offsetBoneTag,
                                            CVector offsetPos, float speed, int time, int blendTime)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleIKChain__Constructor;
+    DWORD dwFunc = 0x6339C0;
     // TODO: Find out the real size
     CreateTaskInterface(1024);
     if (!IsValid())
@@ -55,7 +55,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, 
 CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso,
                                              float speed, int blendTime, int m_priority)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleIKLookAt__Constructor;
+    DWORD dwFunc = 0x633E00;
     // TODO: Find out the real size
     CreateTaskInterface(1024);
     if (!IsValid())
@@ -147,7 +147,7 @@ CTaskSimpleIKChain* CTaskSimpleIKManagerSA::GetTaskAtSlot(int slotID)
 CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso, float speed,
                                                        int blendTime, int priority)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleTriggerLookAt__Constructor;
+    DWORD dwFunc = 0x634440;
     // TODO: Find out the real size
     CreateTaskInterface(1024);
     if (!IsValid())

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CAnimBlendAssocGroup.h
+ *  FILE:        Client/sdk/game/CAnimBlendAssocGroup.h
  *  PURPOSE:     Animation blend association group interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -180,12 +180,12 @@ enum class eAnimID : int
 class CAnimBlendAssocGroup
 {
 public:
-    virtual CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID) = 0;
+    virtual CAnimBlendAssociationSAInterface* CopyAnimation(uint AnimID) = 0;
     virtual void                              InitEmptyAssociations(RpClump* pClump) = 0;
     virtual bool                              IsCreated() = 0;
     virtual int                               GetNumAnimations() = 0;
     virtual CAnimBlock*                       GetAnimBlock() = 0;
-    virtual CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID) = 0;
+    virtual CAnimBlendStaticAssociation*      GetAnimation(uint ID) = 0;
     virtual eAnimGroup                        GetGroupID() = 0;
     virtual void                              CreateAssociations(const char* szBlockName) = 0;
     virtual bool                              IsLoaded() = 0;

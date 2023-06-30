@@ -24,9 +24,11 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
     if (pTargetVehicleSA)
     {
         CreateTaskInterface(sizeof(CTaskSimpleCarSetPedInAsDriverSAInterface));
+
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskSimpleCarSetPedInAsDriver__Constructor;
+
+        DWORD dwFunc = 0x6470E0;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
 
@@ -67,9 +69,11 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
     if (pTargetVehicleSA)
     {
         CreateTaskInterface(sizeof(CTaskSimpleCarSetPedInAsPassengerSAInterface));
+
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor;
+
+        DWORD dwFunc = 0x646FE0;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
         _asm
@@ -110,9 +114,11 @@ CTaskSimpleCarSetPedOutSA::CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, i
     if (pTargetVehicleSA)
     {
         CreateTaskInterface(sizeof(CTaskSimpleCarSetPedOutSAInterface));
+
         if (!IsValid())
             return;
-        DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__Constructor;
+
+        DWORD dwFunc = 0x6478B0;
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
         _asm
@@ -151,7 +157,7 @@ void CTaskSimpleCarSetPedOutSA::SetNumGettingInToClear(const unsigned char nNumG
 
 void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed* ped, CVehicle* vehicle, int nDoor)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision;
+    DWORD dwFunc = 0x6479B0;
     DWORD dwVehiclePtr = (DWORD)((CEntitySA*)vehicle)->GetInterface();
     DWORD dwPedPtr = (DWORD)((CEntitySA*)ped)->GetInterface();
     _asm

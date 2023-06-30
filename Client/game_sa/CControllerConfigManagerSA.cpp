@@ -12,11 +12,13 @@
 #include "StdInc.h"
 #include "CControllerConfigManagerSA.h"
 
-#define VAR_InputType       ( ( BYTE * ) ( 0xB6EC2E ) )
-#define VAR_MouseInverted   ( ( BYTE * ) ( 0xBA6745 ) )
-#define VAR_FlyWithMouse    ( ( BYTE * ) ( 0xC1CC03 ) )
-#define VAR_SteerWithMouse  ( ( BYTE * ) ( 0xC1CC02 ) )
-#define VAR_VerticalAimSensitivity  ( ( float * ) ( 0xB6EC18 ) )
+#define CLASS_CControllerConfigManager 0xB70198
+
+#define VAR_InputType               ((BYTE*)(0xB6EC2E))
+#define VAR_MouseInverted           ((BYTE*)(0xBA6745))
+#define VAR_FlyWithMouse            ((BYTE*)(0xC1CC03))
+#define VAR_SteerWithMouse          ((BYTE*)(0xC1CC02))
+#define VAR_VerticalAimSensitivity  ((float*)(0xB6EC18))
 
 static const float VERTICAL_AIM_SENSITIVITY_MIN = 0.000312f;
 static const float VERTICAL_AIM_SENSITIVITY_DEFAULT = 0.0015f;
@@ -33,7 +35,7 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
 {
-    DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
+    DWORD dwFunc = 0x530490;
     _asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -47,7 +49,7 @@ void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControlle
 int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
     int   iReturn = 0;
-    DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
+    DWORD dwFunc = 0x52F4F0;
     _asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -62,7 +64,7 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eController
 int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction action)
 {
     int   iReturn = 0;
-    DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
+    DWORD dwFunc = 0x52F4A0;
     _asm
     {
         mov     ecx, CLASS_CControllerConfigManager
@@ -75,7 +77,7 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
 
 void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType)
 {
-    DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
+    DWORD dwFunc = 0x52FD70;
     _asm
     {
         mov     ecx, CLASS_CControllerConfigManager

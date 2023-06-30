@@ -28,7 +28,7 @@ BYTE CDamageManagerSA::GetDoorStatus(eDoors bDoor)
 {
     if (bDoor < MAX_DOORS)
         return internalInterface->Door[bDoor];
-    return NULL;
+    return 0;
 }
 
 void CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent)
@@ -83,7 +83,7 @@ BYTE CDamageManagerSA::GetWheelStatus(eWheelPosition bWheel)
 {
     if (bWheel < MAX_WHEELS)
         return internalInterface->Wheel[bWheel];
-    return NULL;
+    return 0;
 }
 
 void CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus)
@@ -107,7 +107,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
         if (GetPanelStatus(bPanel) != bPanelStatus)
         {
             // Call the function to set it
-            DWORD dwFunction = FUNC_SetPanelStatus;
+            DWORD dwFunction = 0x6C2150;
             DWORD dwThis = (DWORD)internalInterface;
             DWORD dwPanel = bPanel;
             DWORD dwStatus = bPanelStatus;
@@ -170,7 +170,7 @@ BYTE CDamageManagerSA::GetPanelStatus(BYTE bPanel)
 {
     if (bPanel < MAX_PANELS)
     {
-        DWORD dwFunction = FUNC_GetPanelStatus;
+        DWORD dwFunction = 0x6C2180;
         DWORD dwPointer = (DWORD)internalInterface;
         BYTE  bReturn = 0;
         DWORD dwPanel = bPanel;
@@ -195,7 +195,7 @@ unsigned long CDamageManagerSA::GetPanelStatus()
 
 void CDamageManagerSA::SetLightStatus(BYTE bLight, BYTE bLightStatus)
 {
-    DWORD dwFunction = FUNC_SetLightStatus;
+    DWORD dwFunction = 0x6C2100;
     DWORD dwPointer = (DWORD)internalInterface;
     DWORD dwLight = bLight;
     DWORD dwStatus = bLightStatus;
@@ -215,7 +215,7 @@ void CDamageManagerSA::SetLightStatus(unsigned char ucStatus)
 
 BYTE CDamageManagerSA::GetLightStatus(BYTE bLight)
 {
-    DWORD dwFunction = FUNC_GetLightStatus;
+    DWORD dwFunction = 0x6C2130;
     DWORD dwPointer = (DWORD)internalInterface;
     BYTE  bReturn = 0;
     DWORD dwLight = bLight;
@@ -236,7 +236,7 @@ unsigned char CDamageManagerSA::GetLightStatus()
 
 void CDamageManagerSA::SetAeroplaneCompStatus(BYTE CompID, BYTE Status)
 {
-    DWORD dwFunction = FUNC_SetAeroplaneCompStatus;
+    DWORD dwFunction = 0x6C22D0;
     DWORD dwPointer = (DWORD)internalInterface;
     DWORD dwPannel = CompID;
     _asm
@@ -250,7 +250,7 @@ void CDamageManagerSA::SetAeroplaneCompStatus(BYTE CompID, BYTE Status)
 
 BYTE CDamageManagerSA::GetAeroplaneCompStatus(BYTE CompID)
 {
-    DWORD dwFunction = FUNC_GetAeroplaneCompStatus;
+    DWORD dwFunction = 0x6C2300;
     DWORD dwPointer = (DWORD)internalInterface;
     BYTE  bReturn = 0;
     DWORD dwPannel = CompID;
@@ -266,7 +266,7 @@ BYTE CDamageManagerSA::GetAeroplaneCompStatus(BYTE CompID)
 
 void CDamageManagerSA::FuckCarCompletely(bool bKeepWheels)
 {
-    DWORD dwFunc = FUNC_FuckCarCompletely;
+    DWORD dwFunc = 0x6C25D0;
     DWORD dwPointer = (DWORD)internalInterface;
     _asm
     {

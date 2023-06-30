@@ -16,26 +16,6 @@
 
 #define FUNC_Draw                   0x58FAE0
 
-#define VAR_DisableClock            0xBAA400
-
-#define VAR_AspectRatioMult         0x859524
-#define VAR_CameraCrosshairScale    0x866C74
-
-#define FUNC_DrawAmmo               0x5893B0
-#define FUNC_DrawWeaponIcon         0x58D7D0
-#define FUNC_PrintHealthForPlayer   0x589270
-#define FUNC_PrintBreathForPlayer   0x589190
-#define FUNC_PrintArmourForPlayer   0x5890A0
-#define FUNC_DrawVitalStats         0x589650
-#define FUNC_DrawVehicleName        0x58AEA0
-#define FUNC_DrawHelpText           0x58B6E0
-#define FUNC_DrawAreaName           0x58AA50
-#define FUNC_DrawRadar              0x58A330
-#define FUNC_DrawRadarPlanB         0x58A335
-#define FUNC_DrawRadioName          0x4E9E50
-#define FUNC_DrawWantedLevel        0x58D9A0
-#define FUNC_DrawCrosshair          0x58E020
-
 #define CODE_ShowMoney              0x58F47D
 
 struct SHudComponent

@@ -15,13 +15,16 @@
 #include "CFxSystemSA.h"
 #include "CGameSA.h"
 
+#define FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT   (1 / 256.f)
+#define FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT (1 / 64.f)
+
 extern CGameSA* pGame;
 
 // Variables used in the hooks
-static CFxSystemSAInterface*  ms_pUsingFxSystemSAInterface = NULL;
+static CFxSystemSAInterface*  ms_pUsingFxSystemSAInterface = nullptr;
 static float                  ms_fUsingDrawDistance = 0;
 static ushort                 ms_usFxSystemSavedCullDistance = 0;
-static CFxEmitterSAInterface* ms_pUsingFxEmitterSAInterface = NULL;
+static CFxEmitterSAInterface* ms_pUsingFxEmitterSAInterface = nullptr;
 static ushort                 ms_usFxEmitterSavedFadeFarDistance = 0;
 static ushort                 ms_usFxEmitterSavedFadeNearDistance = 0;
 static float                  ms_fFxSystemUpdateCullDistMultiplier = FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT;
@@ -42,7 +45,7 @@ CFxSystemSA::~CFxSystemSA()
 void CFxSystemSA::PlayAndKill()
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_FxSystem_c__PlayAndKill;
+    DWORD dwFunc = 0x4AA3D0;
     _asm
     {
         mov     ecx, dwThis
@@ -156,7 +159,7 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()
         // Restore default settings
         ms_pUsingFxSystemSAInterface->pBlueprint->usCullDistance = ms_usFxSystemSavedCullDistance;
         ms_fUsingDrawDistance = 0;
-        ms_pUsingFxSystemSAInterface = NULL;
+        ms_pUsingFxSystemSAInterface = nullptr;
         ms_fFxSystemUpdateCullDistMultiplier = FX_SYSTEM_UPDATE_CULL_DIST_MULTIPLIER_DEFAULT;
     }
 }
@@ -224,7 +227,7 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidB_Post()
         // Restore default settings
         ms_pUsingFxEmitterSAInterface->pBlueprint->m_nLodEnd = ms_usFxEmitterSavedFadeFarDistance;
         ms_pUsingFxEmitterSAInterface->pBlueprint->m_nLodStart = ms_usFxEmitterSavedFadeNearDistance;
-        ms_pUsingFxEmitterSAInterface = NULL;
+        ms_pUsingFxEmitterSAInterface = nullptr;
         ms_fFxCreateParticleCullDistMultiplier = FX_CREATE_PARTICLE_CULL_DIST_MULTIPLIER_DEFAULT;
     }
 }
@@ -269,7 +272,7 @@ void CFxSystemSA::StaticSetHooks()
     EZHookInstall(FxSystem_c_Update_MidB);
 
     // Redirect these constants so we can change them
-    MemPut<float*>(VAR_FxSystemUpdateCullDistMultiplier, &ms_fFxSystemUpdateCullDistMultiplier);
-    MemPut<float*>(VAR_FxCreateParticleCullDistMultiplierA, &ms_fFxCreateParticleCullDistMultiplier);
-    MemPut<float*>(VAR_FxCreateParticleCullDistMultiplierB, &ms_fFxCreateParticleCullDistMultiplier);
+    MemPut<float*>(0x4AB032, &ms_fFxSystemUpdateCullDistMultiplier);
+    MemPut<float*>(0x4A4247, &ms_fFxCreateParticleCullDistMultiplier);
+    MemPut<float*>(0x4A4255, &ms_fFxCreateParticleCullDistMultiplier);
 }

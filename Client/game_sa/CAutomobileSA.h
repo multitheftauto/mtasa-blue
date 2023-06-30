@@ -16,10 +16,7 @@
 #include "CDoorSA.h"
 #include "CVehicleSA.h"
 
-#define FUNC_CAutomobile_SetTaxiLight               0x6A3740
-
-#define MAX_PASSENGER_COUNT     8
-#define MAX_DOORS               6 // also in CDamageManager
+#define MAX_DOORS 6 // Also in CDamageManager
 
 namespace eCarNode
 {
@@ -57,8 +54,8 @@ namespace eCarNode
 class CBouncingPanelSAInterface
 {
 public:
-    unsigned short m_nFrameId;
-    unsigned short m_nAxis;
+    ushort m_nFrameId;
+    ushort m_nAxis;
     float          m_fAngleLimit;
     CVector        m_vecRotation;
     CVector        m_vecPos;
@@ -90,8 +87,8 @@ public:
     char                      taxiAvaliable;
     char                      field_869;
     short                     field_86A;
-    unsigned short            m_wMiscComponentAngle;
-    unsigned short            m_wVoodooSuspension;
+    ushort                    m_wMiscComponentAngle;
+    ushort                    m_wVoodooSuspension;
     int                       m_dwBusDoorTimerEnd;
     int                       m_dwBusDoorTimerStart;
     float                     field_878;

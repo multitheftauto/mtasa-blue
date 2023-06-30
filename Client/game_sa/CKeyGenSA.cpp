@@ -12,10 +12,10 @@
 #include "StdInc.h"
 #include "CKeyGenSA.h"
 
-unsigned int CKeyGenSA::GetKey(const char* szString, int iLength)
+uint CKeyGenSA::GetKey(const char* szString, int iLength)
 {
-    unsigned int uiReturn;
-    DWORD        dwFunc = FUNC_CKeyGen_GetKey_len;
+    uint  uiReturn = 0;
+    DWORD dwFunc = 0x53CED0;
     _asm
     {
         push    iLength
@@ -27,10 +27,10 @@ unsigned int CKeyGenSA::GetKey(const char* szString, int iLength)
     return uiReturn;
 }
 
-unsigned int CKeyGenSA::GetKey(const char* szString)
+uint CKeyGenSA::GetKey(const char* szString)
 {
-    unsigned int uiReturn;
-    DWORD        dwFunc = FUNC_CKeyGen_GetKey;
+    uint  uiReturn = 0;
+    DWORD dwFunc = 0x53CF00;
     _asm
     {
         push    szString
@@ -41,10 +41,10 @@ unsigned int CKeyGenSA::GetKey(const char* szString)
     return uiReturn;
 }
 
-unsigned int CKeyGenSA::GetUppercaseKey(const char* szString)
+uint CKeyGenSA::GetUppercaseKey(const char* szString)
 {
-    unsigned int uiReturn;
-    DWORD        dwFunc = FUNC_CKeyGen_GetUppercaseKey;
+    uint  uiReturn = 0;
+    DWORD dwFunc = 0x53CF30;
     _asm
     {
         push    szString
@@ -55,10 +55,10 @@ unsigned int CKeyGenSA::GetUppercaseKey(const char* szString)
     return uiReturn;
 }
 
-unsigned int CKeyGenSA::AppendStringToKey(unsigned int uiKey, const char* szString)
+uint CKeyGenSA::AppendStringToKey(uint uiKey, const char* szString)
 {
-    unsigned int uiReturn;
-    DWORD        dwFunc = FUNC_CKeyGen_AppendStringToKey;
+    uint  uiReturn = 0;
+    DWORD dwFunc = 0x53CF70;
     _asm
     {
         push    szString

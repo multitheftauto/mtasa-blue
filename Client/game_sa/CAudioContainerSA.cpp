@@ -13,9 +13,9 @@
 #include "CAudioContainerSA.h"
 #include "CAudioContainerLookupTableSA.h"
 
-unsigned long EndianSwap32(unsigned long x)
+ulong EndianSwap32(ulong x)
 {
-    unsigned long y = 0;
+    ulong y = 0;
     y += (x & 0x000000FF) << 24;
     y += (x & 0xFF000000) >> 24;
     y += (x & 0x0000FF00) << 8;
@@ -40,9 +40,9 @@ CAudioContainerSA::~CAudioContainerSA()
 
 bool CAudioContainerSA::GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length)
 {
-    uint8*       rawAudioData = nullptr;
-    unsigned int rawAudioLength;
-    int          iSampleRate;
+    uint8* rawAudioData = nullptr;
+    uint   rawAudioLength;
+    int    iSampleRate;
 
     if (!GetRawAudioData(lookupIndex, bankIndex, audioIndex, rawAudioData, rawAudioLength, iSampleRate))
     {
@@ -114,7 +114,7 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     if (!audioEntry)
         return false;
 
-    unsigned int rawLength;
+    uint rawLength;
     if (audioIndex + 1 < bankHeader.numSounds)            // hacky fix: audioIndex starts at 0
     {
         SAudioEntrySA* nextAudioEntry = &bankHeader.sounds[audioIndex + 1];
@@ -187,9 +187,9 @@ const SString CAudioContainerSA::GetAudioArchiveName(eAudioLookupIndex lookupInd
 
 bool CAudioContainerSA::ValidateContainer(eAudioLookupIndex lookupIndex)
 {
-#ifdef MTA_DEBUG
-    return true;
-#endif
+    #ifdef MTA_DEBUG
+         return true;
+    #endif
 
     // Open archive and place file pointer at the end
     std::ifstream archive(FromUTF8(GetAudioArchiveName(lookupIndex)), std::ios::binary);
@@ -239,6 +239,7 @@ bool CAudioContainerSA::GetAudioSizeFromHeader(const SRadioTrackHeader& header, 
             iSize = header.lengths[i].length;
         }
     }
+
     // if we haven't found a size we can't continue
     if (iSize == 0)
         return false;

@@ -23,12 +23,12 @@ CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* 
     SetupAnimBlock();
 }
 
-CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned int AnimID)
+CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(uint AnimID)
 {
     CAnimBlendAssociationSAInterface* pAnimAssociationReturn = nullptr;
 
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CopyAnimation;
+    DWORD dwFunc = 0x4CE130;
     _asm
     {
         mov     ecx, dwThis
@@ -42,7 +42,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned
 void CAnimBlendAssocGroupSA::InitEmptyAssociations(RpClump* pClump)
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_InitEmptyAssociations;
+    DWORD dwFunc = 0x4CDFB0;
     _asm
     {
         mov     ecx, dwThis
@@ -55,7 +55,7 @@ bool CAnimBlendAssocGroupSA::IsCreated()
 {
     bool  bReturn;
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_IsCreated;
+    DWORD dwFunc = 0x4D37A0;
     _asm
     {
         mov     ecx, dwThis
@@ -69,7 +69,7 @@ int CAnimBlendAssocGroupSA::GetNumAnimations()
 {
     int   iReturn;
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_GetNumAnimations;
+    DWORD dwFunc = 0x45B050;
     _asm
     {
         mov     ecx, dwThis
@@ -86,12 +86,12 @@ CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock()
     return m_pAnimBlock;
 }
 
-CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int ID)
+CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(uint ID)
 {
     // ppAssociations [ ID - this->iIDOffset ] ??
     CAnimBlendStaticAssociation* pReturn;
     DWORD                        dwThis = (DWORD)m_pInterface;
-    DWORD                        dwFunc = FUNC_CAnimBlendAssocGroup_GetAnimation;
+    DWORD                        dwFunc = 0x4CE090;
     _asm
     {
         mov     ecx, dwThis
@@ -124,7 +124,7 @@ bool CAnimBlendAssocGroupSA::IsLoaded()
 void CAnimBlendAssocGroupSA::CreateAssociations(const char* szBlockName)
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CreateAssociations;
+    DWORD dwFunc = 0x4CE220;
     _asm
     {
         mov     ecx, dwThis

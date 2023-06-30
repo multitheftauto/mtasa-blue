@@ -12,16 +12,9 @@
 #pragma once
 
 #include <game/TaskIK.h>
-
 #include "TaskSA.h"
 
 typedef DWORD IKChain_c;
-
-#define FUNC_CTaskSimpleIKChain__Constructor            0x6339C0
-#define FUNC_CTaskSimpleIKLookAt__Constructor           0x633E00
-#define FUNC_CTaskSimpleIKManager__Constructor          0x6337F0
-
-#define FUNC_CTaskSimpleTriggerLookAt__Constructor      0x634440
 
 // ##############################################################################
 // ## Name:    CTaskSimpleIKChain
@@ -31,27 +24,28 @@ typedef DWORD IKChain_c;
 class CTaskSimpleIKChainSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CPed*         m_pPed;
-    int           m_time;
-    int           m_blendTime;
-    IKChain_c*    m_pIKChain;
-    short         m_slotID;
-    short         m_pivotBoneTag;
-    short         m_effectorBoneTag;
-    CVector       m_effectorVec;
-    CEntity*      m_pEntity;
-    int           m_offsetBoneTag;
-    CVector       m_offsetPos;
-    float         m_speed;
-    unsigned char m_nonNullEntity;
-    // blending info
+    CPed*      m_pPed;
+    int        m_time;
+    int        m_blendTime;
+    IKChain_c* m_pIKChain;
+    short      m_slotID;
+    short      m_pivotBoneTag;
+    short      m_effectorBoneTag;
+    CVector    m_effectorVec;
+    CEntity*   m_pEntity;
+    int        m_offsetBoneTag;
+    CVector    m_offsetPos;
+    float      m_speed;
+    uchar      m_nonNullEntity;
+
+    // Blending info
     float m_blend;
     int   m_endTime;
     float m_targetBlend;
     int   m_targetTime;
     int   m_isBlendingOut;
 #ifndef FINAL
-    char m_idString[32];
+    char  m_idString[32];
 #endif
 };
 
@@ -104,7 +98,7 @@ private:
 
 public:
     CTaskSimpleIKManagerSA();
-    // CTaskSimpleIKManagerSA    ( /*fill me*/ );
+    // CTaskSimpleIKManagerSA(/*fill me*/);
 
     int                 AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int slotID = -1);
     void                RemoveIKChainTask(int slotID);
@@ -127,8 +121,7 @@ public:
 
     unsigned char IsSlotEmpty(int slotID);
     CTaskSimpleIKChain* GetTaskAtSlot(int slotID);
-
-private:*/
+    */
 };
 
 // ##############################################################################
@@ -139,16 +132,16 @@ private:*/
 class CTaskSimpleTriggerLookAtSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CEntity*      m_pEntity;
-    int           m_time;
-    int           m_offsetBoneTag;
-    RwV3d         m_offsetPos;
-    unsigned char m_useTorso;
-    float         m_speed;
-    int           m_blendTime;
+    CEntity* m_pEntity;
+    int      m_time;
+    int      m_offsetBoneTag;
+    RwV3d    m_offsetPos;
+    uchar    m_useTorso;
+    float    m_speed;
+    int      m_blendTime;
 
-    unsigned char m_nonNullEntity;
-    char          m_priority;
+    uchar m_nonNullEntity;
+    char  m_priority;
 };
 
 class CTaskSimpleTriggerLookAtSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleTriggerLookAt

@@ -26,7 +26,7 @@ void  HOOK_CAEAmbienceTrackManager_CheckForPause();
 DWORD RETURN_CAESoundManager_RequestNewSound = 0x4EFB15;
 void  HOOK_CAESoundManager_RequestNewSound();
 
-CAudioEngineSA*           g_pAudioSA = NULL;
+CAudioEngineSA*           g_pAudioSA = nullptr;
 extern CAESoundManagerSA* g_pAESoundManagerSA;
 
 CAudioEngineSA::CAudioEngineSA(CAudioEngineSAInterface* pInterface)
@@ -39,7 +39,7 @@ CAudioEngineSA::CAudioEngineSA(CAudioEngineSAInterface* pInterface)
     m_bAmbientSoundsPaused = false;
     m_bAmbientGeneralEnabled = true;
     m_bAmbientGunfireEnabled = true;
-    m_pWorldSoundHandler = NULL;
+    m_pWorldSoundHandler = nullptr;
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager_CheckForPause, (DWORD)HOOK_CAEAmbienceTrackManager_CheckForPause, 6);
 
@@ -58,7 +58,6 @@ void CAudioEngineSA::StopRadio()
 {
     m_bRadioOn = false;
 
-    // DWORD dwFunc = FUNC_StopRadio;
     DWORD dwFunc = 0x4E9823;            // Some function CAudio::StopRadio jumps to immediately
 
     _asm
@@ -160,7 +159,7 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0 && dwEventID <= 101)            // may prevent a crash
     {
-        DWORD dwFunc = FUNC_ReportFrontendAudioEvent;
+        DWORD dwFunc = 0x506EA0;
         float fSpeed = 1.0f;
         float fVolumeChange = 0.0f;
         _asm
@@ -176,7 +175,7 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
 
 void CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
 {
-    DWORD dwFunc = FUNC_SetEffectsMasterVolume;
+    DWORD dwFunc = 0x506E10;
     DWORD dwVolume = bVolume;
     _asm
     {
@@ -188,7 +187,7 @@ void CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
 
 void CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
 {
-    DWORD dwFunc = FUNC_SetMusicMasterVolume;
+    DWORD dwFunc = 0x506DE0;
     DWORD dwVolume = bVolume;
     _asm
     {
@@ -226,7 +225,7 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
 {
     if (*(DWORD*)VAR_AudioEventVolumes != 0)            // may prevent a crash
     {
-        DWORD dwFunc = FUNC_PreloadBeatTrack;
+        DWORD dwFunc = 0x507F40;
         DWORD dwTrack = iTrack;
         _asm
         {
@@ -235,7 +234,7 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
             call    dwFunc
         }
 
-        dwFunc = FUNC_PlayPreloadedBeatTrack;
+        dwFunc = 0x507180;
         _asm
         {
             mov     ecx, CLASS_CAudioEngine
@@ -299,7 +298,7 @@ unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
 
 void CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
 {
-    CEntitySAInterface* entity = NULL;
+    CEntitySAInterface* entity = nullptr;
     if (physical)
     {
         CPhysicalSA* pPhysical = dynamic_cast<CPhysicalSA*>(physical);
@@ -349,7 +348,7 @@ void CAudioEngineSA::PauseAllSound(bool bPaused)
 {
     if (bPaused)
     {
-        DWORD dwFunc = FUNC_PauseAllSounds;
+        DWORD dwFunc = 0x507430;
         _asm
         {
             mov     ecx, CLASS_CAudioEngine
@@ -358,7 +357,7 @@ void CAudioEngineSA::PauseAllSound(bool bPaused)
     }
     else
     {
-        DWORD dwFunc = FUNC_ResumeAllSounds;
+        DWORD dwFunc = 0x507440;
         _asm
         {
             mov     ecx, CLASS_CAudioEngine
@@ -542,7 +541,7 @@ void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceTy
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAudioEngine_ReportBulletHit;
+    DWORD dwFunc = 0x506ec0;
     _asm
     {
         mov     ecx, dwThis
@@ -556,11 +555,11 @@ void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceTy
 
 void CAudioEngineSA::ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical)
 {
-    DWORD dwPhysicalInterface = NULL;
+    DWORD dwPhysicalInterface = 0;
     if (pPhysical)
         dwPhysicalInterface = (DWORD)pPhysical->GetInterface();
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAudioEngine_ReportWeaponEvent;
+    DWORD dwFunc = 0x506f40;
     _asm
     {
         mov     ecx, dwThis

@@ -13,11 +13,6 @@
 
 #include <game/CCarEnterExit.h>
 
-#define FUNC_GetNearestCarDoor                  0x6528F0
-#define FUNC_GetNearestCarPassengerDoor         0x650BB0
-#define FUNC_ComputeTargetDoorToExit            0x64F110
-#define FUNC_IsRoomForPedToLeaveCar             0x6504C0
-
 class CCarEnterExitSA : public CCarEnterExit
 {
 public:

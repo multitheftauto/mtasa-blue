@@ -17,6 +17,14 @@
 #include "CHudSA.h"
 #include "CSettingsSA.h"
 
+#define VAR_ucFxQuality       0xA9AE54
+#define VAR_fMouseSensitivity 0xB6EC1C
+#define VAR_RadarMode         0xBA676C
+
+#define DEFAULT_VEHICLE_LOD_DISTANCE (70.0f)
+// Default train distance is 150, so make it relative to default vehicle distance
+#define MAX_VEHICLE_LOD_DISTANCE (500.0f)
+
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
@@ -24,14 +32,14 @@ static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
 static const float MOUSE_SENSITIVITY_MAX = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
 
-unsigned long CSettingsSA::FUNC_GetNumVideoModes;
-unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
-unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
-unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
-unsigned long CSettingsSA::FUNC_SetDrawDistance;
-unsigned long CSettingsSA::FUNC_GetNumSubSystems;
-unsigned long CSettingsSA::FUNC_GetCurrentSubSystem;
-unsigned long CSettingsSA::FUNC_SetSubSystem;
+ulong CSettingsSA::FUNC_GetNumVideoModes;
+ulong CSettingsSA::FUNC_GetVideoModeInfo;
+ulong CSettingsSA::FUNC_GetCurrentVideoMode;
+ulong CSettingsSA::FUNC_SetCurrentVideoMode;
+ulong CSettingsSA::FUNC_SetDrawDistance;
+ulong CSettingsSA::FUNC_GetNumSubSystems;
+ulong CSettingsSA::FUNC_GetCurrentSubSystem;
+ulong CSettingsSA::FUNC_SetSubSystem;
 
 #define VAR_CurVideoMode (*((uint*)(0x08D6220)))
 #define VAR_SavedVideoMode (*((uint*)(0x0BA6820)))
@@ -80,9 +88,9 @@ void CSettingsSA::SetWideScreenEnabled(bool bEnabled)
     m_pInterface->bUseWideScreen = bEnabled;
 }
 
-unsigned int CSettingsSA::GetNumVideoModes()
+uint CSettingsSA::GetNumVideoModes()
 {
-    unsigned int uiReturn = 0;
+    uint uiReturn = 0;
     _asm
     {
         call    FUNC_GetNumVideoModes
@@ -91,9 +99,9 @@ unsigned int CSettingsSA::GetNumVideoModes()
     return uiReturn;
 }
 
-VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex)
+VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, uint modeIndex)
 {
-    VideoMode* pReturn = NULL;
+    VideoMode* pReturn = nullptr;
     _asm
     {
         push    modeIndex
@@ -105,9 +113,9 @@ VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeI
     return pReturn;
 }
 
-unsigned int CSettingsSA::GetCurrentVideoMode()
+uint CSettingsSA::GetCurrentVideoMode()
 {
-    unsigned int uiReturn = 0;
+    uint uiReturn = 0;
     _asm
     {
         call    FUNC_GetCurrentVideoMode
@@ -116,7 +124,7 @@ unsigned int CSettingsSA::GetCurrentVideoMode()
     return uiReturn;
 }
 
-void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
+void CSettingsSA::SetCurrentVideoMode(uint modeIndex, bool bOnRestart)
 {
     if (!bOnRestart)
     {
@@ -134,7 +142,7 @@ void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
 
 uint CSettingsSA::GetNumAdapters()
 {
-    unsigned int uiReturn = 0;
+    uint uiReturn = 0;
     _asm
     {
         call    FUNC_GetNumSubSystems
@@ -143,7 +151,7 @@ uint CSettingsSA::GetNumAdapters()
     return uiReturn;
 }
 
-void CSettingsSA::SetAdapter(unsigned int uiAdapterIndex)
+void CSettingsSA::SetAdapter(uint uiAdapterIndex)
 {
     _asm
     {
@@ -153,9 +161,9 @@ void CSettingsSA::SetAdapter(unsigned int uiAdapterIndex)
     }
 }
 
-unsigned int CSettingsSA::GetCurrentAdapter()
+uint CSettingsSA::GetCurrentAdapter()
 {
-    unsigned int uiReturn = 0;
+    uint uiReturn = 0;
     _asm
     {
         call    FUNC_GetCurrentSubSystem
@@ -164,35 +172,35 @@ unsigned int CSettingsSA::GetCurrentAdapter()
     return uiReturn;
 }
 
-unsigned char CSettingsSA::GetRadioVolume()
+uchar CSettingsSA::GetRadioVolume()
 {
     return m_pInterface->ucRadioVolume;
 }
 
-void CSettingsSA::SetRadioVolume(unsigned char ucVolume)
+void CSettingsSA::SetRadioVolume(uchar ucVolume)
 {
     m_pInterface->ucRadioVolume = ucVolume;
     pGame->GetAudioEngine()->SetMusicMasterVolume(ucVolume);
 }
 
-unsigned char CSettingsSA::GetSFXVolume()
+uchar CSettingsSA::GetSFXVolume()
 {
     return m_pInterface->ucSfxVolume;
 }
 
-void CSettingsSA::SetSFXVolume(unsigned char ucVolume)
+void CSettingsSA::SetSFXVolume(uchar ucVolume)
 {
     m_pInterface->ucSfxVolume = ucVolume;
     pGame->GetAudioEngine()->SetEffectsMasterVolume(ucVolume);
 }
 
-unsigned int CSettingsSA::GetUsertrackMode()
+uint CSettingsSA::GetUsertrackMode()
 {
     // 0 = radio, 1 = random, 2 = sequential
     return m_pInterface->ucUsertrackMode;
 }
 
-void CSettingsSA::SetUsertrackMode(unsigned int uiMode)
+void CSettingsSA::SetUsertrackMode(uint uiMode)
 {
     m_pInterface->ucUsertrackMode = uiMode;
 }
@@ -247,24 +255,24 @@ void CSettingsSA::SetDrawDistance(float fDistance)
     m_pInterface->fDrawDistance = fDistance;
 }
 
-unsigned int CSettingsSA::GetBrightness()
+uint CSettingsSA::GetBrightness()
 {
     // up to 384
     return m_pInterface->dwBrightness;
 }
 
-void CSettingsSA::SetBrightness(unsigned int uiBrightness)
+void CSettingsSA::SetBrightness(uint uiBrightness)
 {
     m_pInterface->dwBrightness = uiBrightness;
 }
 
-unsigned int CSettingsSA::GetFXQuality()
+uint CSettingsSA::GetFXQuality()
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
     return *(BYTE*)VAR_ucFxQuality;
 }
 
-void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
+void CSettingsSA::SetFXQuality(uint fxQualityId)
 {
     MemPutFast<BYTE>(VAR_ucFxQuality, fxQualityId);
 }
@@ -287,11 +295,11 @@ unsigned int CSettingsSA::GetAntiAliasing()
     return m_pInterface->dwAntiAliasing;
 }
 
-void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
+void CSettingsSA::SetAntiAliasing(uint uiAntiAliasing, bool bOnRestart)
 {
     if (!bOnRestart)
     {
-        DWORD dwFunc = FUNC_SetAntiAliasing;
+        DWORD dwFunc = 0x7F8A90;
         _asm
         {
             push    uiAntiAliasing
@@ -319,7 +327,7 @@ void CSettingsSA::Save()
     _asm
     {
         mov ecx, CLASS_CMenuManager
-        mov eax, FUNC_CMenuManager_Save
+        mov eax, 0x57C660
         call eax
     }
 }
@@ -612,7 +620,7 @@ void CSettingsSA::ResetVehiclesLODDistance(bool bForceDefault)
     else
     {
         ms_fVehicleLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE;
-        ms_fTrainPlaneLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE * TRAIN_LOD_DISTANCE_MULTIPLIER;
+        ms_fTrainPlaneLODDistance = DEFAULT_VEHICLE_LOD_DISTANCE * (2.14f);
     }
 
     ms_bMaxVehicleLODDistanceFromScript = false;
@@ -646,9 +654,9 @@ void CSettingsSA::ResetPedsLODDistance(bool bForceDefault)
     g_pCore->GetCVars()->Get("high_detail_peds", bHighDetailPeds);
 
     if (bHighDetailPeds)
-        ms_fPedsLODDistance = MAX_PEDS_LOD_DISTANCE;
+        ms_fPedsLODDistance = 500.0f;
     else
-        ms_fPedsLODDistance = DEFAULT_PEDS_LOD_DISTANCE;
+        ms_fPedsLODDistance = 60.0f;
 
     ms_bMaxPedsLODDistanceFromScript = false;
 }
@@ -673,7 +681,7 @@ void CSettingsSA::ResetBlurEnabled()
 
     bool bEnabled;
     g_pCore->GetCVars()->Get("blur", bEnabled);
-    pGame->SetBlurLevel(bEnabled ? DEFAULT_BLUR_LEVEL : 0);
+    pGame->SetBlurLevel(bEnabled ? 36 : 0);
 }
 
 void CSettingsSA::SetBlurControlledByScript(bool bByScript)
@@ -879,7 +887,7 @@ void CSettingsSA::SetValidVideoMode()
             // Confirm that res should be used
             SString strMessage = _("Are you sure you want to use this screen resolution?");
             strMessage += SString("\n\n%d x %d", iWidth, iHeight);
-            if (MessageBoxUTF8(NULL, strMessage, _("MTA: San Andreas"), MB_YESNO | MB_TOPMOST | MB_ICONQUESTION) == IDNO)
+            if (MessageBoxUTF8(0, strMessage, _("MTA: San Andreas"), MB_YESNO | MB_TOPMOST | MB_ICONQUESTION) == IDNO)
                 bAllowUnsafeResolutions = false;
         }
 

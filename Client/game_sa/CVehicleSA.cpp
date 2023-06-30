@@ -1395,7 +1395,7 @@ void CVehicleSA::SetTaxiLightOn(bool bLightOn)
 {
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwState = (DWORD)bLightOn;
-    DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;
+    DWORD dwFunc = 0x6A3740;
 
     _asm
     {

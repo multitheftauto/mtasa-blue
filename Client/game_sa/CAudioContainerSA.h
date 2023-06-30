@@ -17,7 +17,6 @@
 class CAudioContainerLookupTableSA;
 
 #define VALIDATE_BUFFER_SIZE 4096
-#define NUM_BEAT_ENTRIES 1000
 #define NUM_LENGTH_ENTRIES 8
 
 struct SAudioEntrySA
@@ -73,7 +72,7 @@ static_assert(sizeof(SLengthEntry) == 0x8, "Invalid size for SLengthEntry");
 
 struct SRadioTrackHeader
 {
-    SBeatEntry   beats[NUM_BEAT_ENTRIES];
+    SBeatEntry   beats[1000];
     SLengthEntry lengths[NUM_LENGTH_ENTRIES];
     uint32       trailer;
 };

@@ -34,7 +34,7 @@ void CAnimBlendHierarchySA::Initialize()
 void CAnimBlendHierarchySA::SetName(const char* szName)
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_SetName;
+    DWORD dwFunc = 0x4CF2D0;
     _asm
     {
         push    szName
@@ -46,7 +46,7 @@ void CAnimBlendHierarchySA::SetName(const char* szName)
 void CAnimBlendHierarchySA::RemoveAnimSequences()
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveAnimSequences;
+    DWORD dwFunc = 0x4CF8E0;
     _asm
     {
         mov     ecx, dwThis
@@ -57,7 +57,7 @@ void CAnimBlendHierarchySA::RemoveAnimSequences()
 void CAnimBlendHierarchySA::RemoveFromUncompressedCache()
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache;
+    DWORD dwFunc = 0x4D42A0;
     _asm
     {
         mov     ecx, dwThis
@@ -68,7 +68,7 @@ void CAnimBlendHierarchySA::RemoveFromUncompressedCache()
 void CAnimBlendHierarchySA::RemoveQuaternionFlips()
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips;
+    DWORD dwFunc = 0x4CF4E0;
     _asm
     {
         mov     ecx, dwThis
@@ -79,7 +79,7 @@ void CAnimBlendHierarchySA::RemoveQuaternionFlips()
 void CAnimBlendHierarchySA::CalculateTotalTime()
 {
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_CAnimBlendHierarchy_CalculateTotalTime;
+    DWORD dwFunc = 0x4CF2F0;
     _asm
     {
         mov     ecx, dwThis

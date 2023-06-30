@@ -13,14 +13,6 @@
 
 #include <game/CStreaming.h>
 
-#define VAR_StreamHandlersMaxCount                   32
-#define VAR_MaxArchives                              8
-
-#define FUNC_CStreaming__RequestModel                0x4087E0
-#define FUNC_LoadAllRequestedModels                  0x40EA10
-#define FUNC_CStreaming__HasVehicleUpgradeLoaded     0x407820
-#define FUNC_CStreaming_RequestSpecialModel          0x409d10
-
 struct CArchiveInfo
 {
     char  szName[40];

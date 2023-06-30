@@ -60,18 +60,27 @@
 
 extern CGameSA* pGame;
 
-unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
-unsigned long* CGameSA::VAR_SystemTime;
-unsigned long* CGameSA::VAR_IsAtMenu;
-bool*          CGameSA::VAR_IsForegroundWindow;
-unsigned long* CGameSA::VAR_SystemState;
-float*         CGameSA::VAR_TimeScale;
-float*         CGameSA::VAR_FPS;
-float*         CGameSA::VAR_OldTimeStep;
-float*         CGameSA::VAR_TimeStep;
-unsigned long* CGameSA::VAR_Framelimiter;
+#define ARRAY_WeaponInfo 0xC8AAB8
 
-unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
+#define PROP_RANDOM_FOLIAGE       "randomfoliage"
+#define PROP_SNIPER_MOON          "snipermoon"
+#define PROP_EXTRA_AIR_RESISTANCE "extraairresistance"
+#define PROP_UNDERWORLD_WARP      "underworldwarp"
+#define PROP_VEHICLE_SUNGLARE     "vehiclesunglare"
+#define PROP_CORONA_ZTEST         "coronaztest"
+
+uint&  CGameSA::ClumpOffset = *(uint*)0xB5F878;
+ulong* CGameSA::VAR_SystemTime;
+ulong* CGameSA::VAR_IsAtMenu;
+bool*  CGameSA::VAR_IsForegroundWindow;
+ulong* CGameSA::VAR_SystemState;
+float* CGameSA::VAR_TimeScale;
+float* CGameSA::VAR_FPS;
+float* CGameSA::VAR_OldTimeStep;
+float* CGameSA::VAR_TimeStep;
+ulong* CGameSA::VAR_Framelimiter;
+
+uint OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
@@ -118,14 +127,14 @@ CGameSA::CGameSA()
     }
 
     m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
-    m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)CLASS_CAEAudioHardware);
-    m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)CLASS_CAESoundManager);
+    m_pAEAudioHardware = new CAEAudioHardwareSA((CAEAudioHardwareSAInterface*)0xB5F8B8);
+    m_pAESoundManager = new CAESoundManagerSA((CAESoundManagerSAInterface*)0xB62CB0);
     m_pAudioContainer = new CAudioContainerSA();
     m_pWorld = new CWorldSA();
     m_pPools = new CPoolsSA();
     m_pClock = new CClockSA();
     m_pRadar = new CRadarSA();
-    m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);
+    m_pCamera = new CCameraSA((CCameraSAInterface*)0xB6F028);
     m_pCoronas = new CCoronasSA();
     m_pCheckpoints = new CCheckpointsSA();
     m_pPickups = new CPickupsSA();
@@ -133,7 +142,7 @@ CGameSA::CGameSA()
     m_pHud = new CHudSA();
     m_pFireManager = new CFireManagerSA();
     m_p3DMarkers = new C3DMarkersSA();
-    m_pPad = new CPadSA((CPadSAInterface*)CLASS_CPad);
+    m_pPad = new CPadSA((CPadSAInterface*)0xB73458);
     m_pCAERadioTrackManager = new CAERadioTrackManagerSA();
     m_pWeather = new CWeatherSA();
     m_pStats = new CStatsSA();
@@ -153,7 +162,7 @@ CGameSA::CGameSA()
     m_pKeyGen = new CKeyGenSA;
     m_pRopes = new CRopesSA;
     m_pFx = new CFxSA((CFxSAInterface*)CLASS_CFx);
-    m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)CLASS_CFxManager);
+    m_pFxManager = new CFxManagerSA((CFxManagerSAInterface*)0xA9AE80);
     m_pWaterManager = new CWaterManagerSA();
     m_pWeaponStatsManager = new CWeaponStatManagerSA();
     m_pPointLights = new CPointLightsSA();
@@ -194,30 +203,30 @@ CGameSA::CGameSA()
         }
     }
 
-    m_pPlayerInfo = new CPlayerInfoSA((CPlayerInfoSAInterface*)CLASS_CPlayerInfo);
+    m_pPlayerInfo = new CPlayerInfoSA((CPlayerInfoSAInterface*)0xB7CD98);
 
     // Init cheat name => address map
-    m_Cheats[CHEAT_HOVERINGCARS] = new SCheatSA((BYTE*)VAR_HoveringCarsEnabled);
-    m_Cheats[CHEAT_FLYINGCARS] = new SCheatSA((BYTE*)VAR_FlyingCarsEnabled);
-    m_Cheats[CHEAT_EXTRABUNNYHOP] = new SCheatSA((BYTE*)VAR_ExtraBunnyhopEnabled);
-    m_Cheats[CHEAT_EXTRAJUMP] = new SCheatSA((BYTE*)VAR_ExtraJumpEnabled);
+    m_Cheats["hovercars"] = new SCheatSA((BYTE*)0x969152);
+    m_Cheats["aircars"] = new SCheatSA((BYTE*)0x969160);
+    m_Cheats["extrabunny"] = new SCheatSA((BYTE*)0x969161);
+    m_Cheats["extrajump"] = new SCheatSA((BYTE*)0x96916C);
 
     // New cheats for Anticheat
-    m_Cheats[CHEAT_TANKMODE] = new SCheatSA((BYTE*)VAR_TankModeEnabled, false);
-    m_Cheats[CHEAT_NORELOAD] = new SCheatSA((BYTE*)VAR_NoReloadEnabled, false);
-    m_Cheats[CHEAT_PERFECTHANDLING] = new SCheatSA((BYTE*)VAR_PerfectHandling, false);
-    m_Cheats[CHEAT_ALLCARSHAVENITRO] = new SCheatSA((BYTE*)VAR_AllCarsHaveNitro, false);
-    m_Cheats[CHEAT_BOATSCANFLY] = new SCheatSA((BYTE*)VAR_BoatsCanFly, false);
-    m_Cheats[CHEAT_INFINITEOXYGEN] = new SCheatSA((BYTE*)VAR_InfiniteOxygen, false);
-    m_Cheats[CHEAT_WALKUNDERWATER] = new SCheatSA((BYTE*)VAR_WalkUnderwater, false);
-    m_Cheats[CHEAT_FASTERCLOCK] = new SCheatSA((BYTE*)VAR_FasterClock, false);
-    m_Cheats[CHEAT_FASTERGAMEPLAY] = new SCheatSA((BYTE*)VAR_FasterGameplay, false);
-    m_Cheats[CHEAT_SLOWERGAMEPLAY] = new SCheatSA((BYTE*)VAR_SlowerGameplay, false);
-    m_Cheats[CHEAT_ALWAYSMIDNIGHT] = new SCheatSA((BYTE*)VAR_AlwaysMidnight, false);
-    m_Cheats[CHEAT_FULLWEAPONAIMING] = new SCheatSA((BYTE*)VAR_FullWeaponAiming, false);
-    m_Cheats[CHEAT_INFINITEHEALTH] = new SCheatSA((BYTE*)VAR_InfiniteHealth, false);
-    m_Cheats[CHEAT_NEVERWANTED] = new SCheatSA((BYTE*)VAR_NeverWanted, false);
-    m_Cheats[CHEAT_HEALTARMORMONEY] = new SCheatSA((BYTE*)VAR_HealthArmorMoney, false);
+    m_Cheats["tankmode"] = new SCheatSA((BYTE*)0x969164, false);
+    m_Cheats["noreload"] = new SCheatSA((BYTE*)0x969178, false);
+    m_Cheats["perfecthandling"] = new SCheatSA((BYTE*)0x96914C, false);
+    m_Cheats["allcarshavenitro"] = new SCheatSA((BYTE*)0x969165, false);
+    m_Cheats["airboats"] = new SCheatSA((BYTE*)0x969153, false);
+    m_Cheats["infiniteoxygen"] = new SCheatSA((BYTE*)0x96916E, false);
+    m_Cheats["walkunderwater"] = new SCheatSA((BYTE*)0x6C2759, false);
+    m_Cheats["fasterclock"] = new SCheatSA((BYTE*)0x96913B, false);
+    m_Cheats["fastergameplay"] = new SCheatSA((BYTE*)0x96913C, false);
+    m_Cheats["slowergameplay"] = new SCheatSA((BYTE*)0x96913D, false);
+    m_Cheats["alwaysmidnight"] = new SCheatSA((BYTE*)0x969167, false);
+    m_Cheats["fullweaponaiming"] = new SCheatSA((BYTE*)0x969179, false);
+    m_Cheats["infinitehealth"] = new SCheatSA((BYTE*)0x96916D, false);
+    m_Cheats["neverwanted"] = new SCheatSA((BYTE*)0x969171, false);
+    m_Cheats["healtharmormoney"] = new SCheatSA((BYTE*)0x969133, false);
 
     // Change pool sizes here
     m_pPools->SetPoolCapacity(TASK_POOL, 5000);                                               // Default is 500
@@ -476,8 +485,8 @@ eGameVersion CGameSA::GetGameVersion()
 
 eGameVersion CGameSA::FindGameVersion()
 {
-    unsigned char ucA = *reinterpret_cast<unsigned char*>(0x748ADD);
-    unsigned char ucB = *reinterpret_cast<unsigned char*>(0x748ADE);
+    uchar ucA = *reinterpret_cast<uchar*>(0x748ADD);
+    uchar ucB = *reinterpret_cast<uchar*>(0x748ADE);
     if (ucA == 0xFF && ucB == 0x53)
     {
         m_eGameVersion = VERSION_US_10;
@@ -523,24 +532,24 @@ void CGameSA::SetTimeScale(float fTimeScale)
     *VAR_TimeScale = fTimeScale;
 }
 
-unsigned char CGameSA::GetBlurLevel()
+uchar CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104;            // CPostEffects::m_SpeedFXAlpha
+    return *(uchar*)0x8D5104;             // CPostEffects::m_SpeedFXAlpha
 }
 
-void CGameSA::SetBlurLevel(unsigned char ucLevel)
+void CGameSA::SetBlurLevel(uchar ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
+    MemPutFast<uchar>(0x8D5104, ucLevel); // CPostEffects::m_SpeedFXAlpha
 }
 
-unsigned long CGameSA::GetMinuteDuration()
+ulong CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C;            // CClock::ms_nMillisecondsPerGameMinute
+    return *(ulong*)0xB7015C;             // CClock::ms_nMillisecondsPerGameMinute
 }
 
-void CGameSA::SetMinuteDuration(unsigned long ulTime)
+void CGameSA::SetMinuteDuration(ulong ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime);            // CClock::ms_nMillisecondsPerGameMinute
+    MemPutFast<ulong>(0xB7015C, ulTime);  // CClock::ms_nMillisecondsPerGameMinute
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -663,7 +672,7 @@ void CGameSA::SetMoonEasterEggEnabled(bool bEnable)
 
 bool CGameSA::IsExtraAirResistanceEnabled()
 {
-    return *(unsigned char*)0x72DDD9 == 0x01;
+    return *(uchar*)0x72DDD9 == 0x01;
 }
 
 void CGameSA::SetExtraAirResistanceEnabled(bool bEnable)
@@ -939,7 +948,7 @@ CPed* CGameSA::GetPedContext()
     return m_pPedContext;
 }
 
-CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
+CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(uchar ucObjectGroup)
 {
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
         return &ObjectGroupsInfo[ucObjectGroup];

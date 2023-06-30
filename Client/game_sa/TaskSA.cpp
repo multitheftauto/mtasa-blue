@@ -44,7 +44,7 @@ void CTaskSA::CreateTaskInterface(size_t nSize)
     // crashes by not allocating enough. Better to potentially waste 12 bytes.
     nSize = nSize + 12;
 
-    DWORD dwFunc = FUNC_CTask__Operator_New;
+    DWORD dwFunc = 0x61A5A0;
     DWORD dwReturn = 0;
     _asm
     {
@@ -205,9 +205,9 @@ void CTaskSA::Destroy()
         }
     }
 
-    /*dwFunc = FUNC_CTask__Operator_Delete;
+    /*dwFunc = 0x61A5B0;
     DWORD thisInterface = (DWORD)GetInterface();
-    if ( thisInterface )
+    if (thisInterface)
     {
         _asm
         {

@@ -77,10 +77,10 @@ void CEntitySAInterface::StaticSetHooks()
 CEntitySA::CEntitySA()
 {
     // Set these variables to a constant state
-    m_pInterface = NULL;
+    m_pInterface = nullptr;
     BeingDeleted = false;
     DoNotRemoveFromGame = false;
-    m_pStoredPointer = NULL;
+    m_pStoredPointer = nullptr;
 }
 
 void CEntitySA::UpdateRpHAnim()
@@ -217,7 +217,7 @@ void CEntitySA::SetOrientation(float fX, float fY, float fZ)
 {
     pGame->GetWorld()->Remove(this, CEntity_SetOrientation);
     DWORD dwThis = (DWORD)m_pInterface;
-    DWORD dwFunc = FUNC_SetOrientation;
+    DWORD dwFunc = 0x439A80;
     _asm
     {
         // ChrML: I've switched the X and Z at this level because that's how the real rotation
@@ -344,7 +344,7 @@ CMatrix* CEntitySA::GetMatrixInternal(CMatrix* matrix)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -415,7 +415,7 @@ eEntityType CEntitySA::GetEntityType()
 
 float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
 {
-    DWORD dwFunc = FUNC_GetDistanceFromCentreOfMassToBaseOfModel;
+    DWORD dwFunc = 0x536BE0;
     DWORD dwThis = (DWORD)m_pInterface;
     float fReturn;
     _asm
@@ -439,17 +439,17 @@ eEntityStatus CEntitySA::GetEntityStatus()
 
 RwFrame* CEntitySA::GetFrameFromId(int id)
 {
-    DWORD dwClump = (DWORD)m_pInterface->m_pRwObject;
-    DWORD dwReturn;
+    DWORD    dwClump = (DWORD)m_pInterface->m_pRwObject;
+    RwFrame* pFrame = nullptr;
     _asm
     {
         push    id
         push    dwClump
         call    FUNC_CClumpModelInfo__GetFrameFromId
         add     esp, 8
-        mov     dwReturn, eax
+        mov     pFrame, eax
     }
-    return (RwFrame*)dwReturn;
+    return pFrame;
 }
 
 RpClump* CEntitySA::GetRpClump()
@@ -459,16 +459,16 @@ RpClump* CEntitySA::GetRpClump()
 
 RwMatrix* CEntitySA::GetLTMFromId(int id)
 {
-    DWORD    dwReturn;
-    RwFrame* frame = GetFrameFromId(id);
+    RwMatrix* pMatrix = nullptr;
+    RwFrame*  pFrame = GetFrameFromId(id);
     _asm
     {
-        push    frame
+        push    pFrame
         call    FUNC_RwFrameGetLTM
         add     esp, 4
-        mov     dwReturn, eax
+        mov     pMatrix, eax
     }
-    return (RwMatrix*)dwReturn;
+    return pMatrix;
 }
 
 void CEntitySA::SetAlpha(DWORD dwAlpha)
@@ -485,7 +485,7 @@ void CEntitySA::SetAlpha(DWORD dwAlpha)
 
 bool CEntitySA::IsOnScreen()
 {
-    DWORD dwFunc = FUNC_IsVisible;
+    DWORD dwFunc = 0x536BC0;
     DWORD dwThis = (DWORD)m_pInterface;
     bool  bReturn = false;
     _asm
@@ -520,8 +520,8 @@ void CEntitySA::SetVisible(bool bVisible)
 
 void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int iUnknown)
 {
-    CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
-    if (matrixPadded)
+    CMatrix_Padded* pMatrixPadded = m_pInterface->Placeable.matrix;
+    if (pMatrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
         _asm
@@ -530,7 +530,7 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
             push    fZ
             push    fY
             push    fX
-            mov     ecx, matrixPadded
+            mov     ecx, pMatrixPadded
             call    dwFunc
         }
     }
@@ -538,8 +538,8 @@ void CEntitySA::MatrixConvertFromEulerAngles(float fX, float fY, float fZ, int i
 
 void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int iUnknown)
 {
-    CMatrix_Padded* matrixPadded = m_pInterface->Placeable.matrix;
-    if (matrixPadded)
+    CMatrix_Padded* pMatrixPadded = m_pInterface->Placeable.matrix;
+    if (pMatrixPadded)
     {
         DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
         _asm
@@ -548,7 +548,7 @@ void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
             push    fZ
             push    fY
             push    fX
-            mov     ecx, matrixPadded
+            mov     ecx, pMatrixPadded
             call    dwFunc
         }
     }
@@ -557,9 +557,8 @@ void CEntitySA::MatrixConvertToEulerAngles(float* fX, float* fY, float* fZ, int 
 bool CEntitySA::IsPlayingAnimation(char* szAnimName)
 {
     DWORD dwReturn = 0;
-    DWORD dwFunc = FUNC_RpAnimBlendClumpGetAssociation;
+    DWORD dwFunc = 0x4D6870;
     DWORD dwThis = (DWORD)m_pInterface->m_pRwObject;
-
     _asm
     {
         push    szAnimName
@@ -568,16 +567,17 @@ bool CEntitySA::IsPlayingAnimation(char* szAnimName)
         add     esp, 8
         mov     dwReturn, eax
     }
-    if (dwReturn) return true;
-    else return false;
+    return (dwReturn != 0);
 }
 
 RwMatrix* CEntitySA::GetBoneRwMatrix(eBone boneId)
 {
-    RpClump* clump = GetRpClump();
-    if (!clump)
+    RpClump* rpClump = GetRpClump();
+
+    if (!rpClump)
         return nullptr;
-    RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(clump);
+
+    RpHAnimHierarchy* hAnimHier = GetAnimHierarchyFromSkinClump(rpClump);
     if (hAnimHier)
     {
         int boneAnimIdIndex = RpHAnimIDGetIndex(hAnimHier, boneId);
@@ -592,9 +592,9 @@ bool CEntitySA::SetBoneMatrix(eBone boneId, const CMatrix& matrix)
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (rwBoneMatrix)
     {
-        CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
-        boneMatrix.SetMatrix(matrix.vRight, matrix.vFront, matrix.vUp, matrix.vPos);
-        boneMatrix.UpdateRW();
+        CMatrixSAInterface pMatrixSA(rwBoneMatrix, false);
+        pMatrixSA.SetMatrix(matrix.vRight, matrix.vFront, matrix.vUp, matrix.vPos);
+        pMatrixSA.UpdateRW();
         return true;
     }
     return false;
@@ -602,12 +602,12 @@ bool CEntitySA::SetBoneMatrix(eBone boneId, const CMatrix& matrix)
 
 bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll)
 {
-    RpClump* clump = GetRpClump();
-    if (clump)
+    RpClump* rpClump = GetRpClump();
+    if (rpClump)
     {
         // updating the bone frame orientation will also update its children
         // This rotation is only applied when UpdateElementRpHAnim is called
-        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
+        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(rpClump);
         AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
         if (frameData)
         {

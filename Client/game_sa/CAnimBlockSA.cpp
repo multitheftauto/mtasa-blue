@@ -19,7 +19,7 @@ extern CGameSA* pGame;
 
 int CAnimBlockSAInterface::GetIndex()
 {
-    return (((DWORD)this - ARRAY_CAnimManager_AnimBlocks) / 32);
+    return (((DWORD)this - 0xb5d4a0) / 32);
 }
 
 void CAnimBlockSA::Request(EModelRequestType requestType, bool bAllowBlockingFail)

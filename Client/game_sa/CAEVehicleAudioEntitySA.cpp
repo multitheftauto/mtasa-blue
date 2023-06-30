@@ -20,7 +20,7 @@ CAEVehicleAudioEntitySA::CAEVehicleAudioEntitySA(CAEVehicleAudioEntitySAInterfac
 void CAEVehicleAudioEntitySA::JustGotInVehicleAsDriver()
 {
     m_pInterface->m_bPlayerDriver = true;
-    DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotInVehicleAsDriver;
+    DWORD dwFunc = 0x4F5700;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
     {
@@ -32,7 +32,7 @@ void CAEVehicleAudioEntitySA::JustGotInVehicleAsDriver()
 void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver()
 {
     m_pInterface->m_bPlayerDriver = false;
-    DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotOutOfVehicleAsDriver;
+    DWORD dwFunc = 0x4FCF40;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
     {
@@ -43,7 +43,7 @@ void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver()
 
 void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle()
 {
-    DWORD dwFunc = FUNC_CAEVehicleAudioEntity__TurnOnRadioForVehicle;
+    DWORD dwFunc = 0x4F5B20;
     DWORD dwThis = (DWORD)m_pInterface;
     _asm
     {
@@ -52,9 +52,9 @@ void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle()
     }
 }
 
-void CAEVehicleAudioEntitySA::StopVehicleEngineSound(unsigned char ucSlot)
+void CAEVehicleAudioEntitySA::StopVehicleEngineSound(uchar ucSlot)
 {
-    DWORD          dwFunc = FUNC_CAESound__Stop;
+    DWORD          dwFunc = 0x4EF1C0;
     tVehicleSound* pVehicleSound = &m_pInterface->m_aEngineSounds[ucSlot];
     if (pVehicleSound->m_pSound)
     {

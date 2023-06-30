@@ -19,17 +19,7 @@
 class CVehicleSAInterface;
 class CObjectSAInterface;
 
-#define FUNC_CTaskComplexUseMobilePhone__Constructor        0x6348A0
-#define FUNC_CTaskSimpleRunAnim__Constructor                0x61A900
-#define FUNC_CTaskSimpleRunNamedAnim__Constructor           0x61A990
-#define FUNC_CTaskComplexDie__Constructor                   0x630040
-#define FUNC_CTaskSimpleStealthKill__Constructor            0x6225F0
-#define FUNC_CTaskSimpleDead__Constructor                   0x630590
-#define FUNC_CTaskSimpleBeHit__Constructor                  0x620780
-#define FUNC_CTaskComplexSunbathe__Constructor              0x631F80
-#define FUNC_CTASKSimplePlayerOnFoot__Constructor           0x685750
-#define FUNC_CTASKComplexFacial__Constructor                0x690D20
-#define VTBL_CTaskSimpleCarFallOut                          0x86EFD0
+#define FUNC_CTaskSimpleBeHit__Constructor                  0x620780 // CTasksSA.cpp
 
 ///////////////////////
 // Use a mobile phone

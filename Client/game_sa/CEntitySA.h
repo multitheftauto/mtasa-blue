@@ -17,18 +17,10 @@
 #include <CVector2D.h>
 #include <CVector.h>
 
-#define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
+#define FUNC_SetRwObjectAlpha                               0x5332C0 // CMultiplayerSA.cpp
 
-#define FUNC_SetRwObjectAlpha                               0x5332C0
-#define FUNC_SetOrientation                                 0x439A80
-
-#define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840
-#define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40
-
-#define FUNC_IsVisible                                      0x536BC0
-
-// not in CEntity really
-#define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
+#define FUNC_CMatrix__ConvertToEulerAngles                  0x59A840 // CMultiplayerSA.cpp
+#define FUNC_CMatrix__ConvertFromEulerAngles                0x59AA40 // CMultiplayerSA.cpp
 
 class CRect;
 class CEntitySAInterfaceVTBL

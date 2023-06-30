@@ -52,5 +52,5 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
 
 CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
 {
-    return ((CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230)(internalInterface, nLengthOfDuck);
+    return ((CTaskSAInterface*(__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230)(internalInterface, nLengthOfDuck);
 }

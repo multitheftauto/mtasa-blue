@@ -14,9 +14,6 @@
 #include <game/CAEVehicleAudioEntity.h>
 #include "CAudioEngineSA.h"
 
-#define FUNC_CAEVehicleAudioEntity__JustGotInVehicleAsDriver                           0x4F5700
-#define FUNC_CAEVehicleAudioEntity__TurnOnRadioForVehicle                              0x4F5B20
-#define FUNC_CAEVehicleAudioEntity__JustGotOutOfVehicleAsDriver                        0x4FCF40
 #define FUNC_CAEVehicleAudioEntity__ProcessAIProp                                      0x4FDFD0
 #define FUNC_CAEVehicleAudioEntity__ProcessAIHeli                                      0x4FEE20
 
@@ -61,7 +58,7 @@ class CAETwinLoopSoundEntity : CAEAudioEntity
     short           m_wPlayTimeMin;
     short           m_wPlayTimeMax;
     char            pad2[2];
-    unsigned int    m_dwTimeToSwapSounds;
+    uint            m_dwTimeToSwapSounds;
     bool            m_bPlayingFirstSound;
     char            pad3;
     short           m_wStartingPlayPercentage[2];
@@ -100,9 +97,9 @@ public:
     float                  m_fSirenVolume;                            // +196
     bool                   m_bModelWithSiren;                         // +200
     char                   pad3[3];                                   // +201
-    unsigned int           m_dwBoatHitWaveLastPlayedTime;             // +204
-    unsigned int           m_dwTimeToInhibitAcc;                      // +208
-    unsigned int           m_dwTimeToInhibitCrz;                      // +212
+    uint                   m_dwBoatHitWaveLastPlayedTime;             // +204
+    uint                   m_dwTimeToInhibitAcc;                      // +208
+    uint                   m_dwTimeToInhibitCrz;                      // +212
     float                  m_fGeneralVehicleSoundVolume;              // +216
     short                  m_wEngineDecelerateSoundBankId;            // +220
     short                  m_wEngineAccelerateSoundBankId;            // +222
@@ -151,7 +148,7 @@ public:
     void JustGotInVehicleAsDriver();
     void JustGotOutOfVehicleAsDriver();
     void TurnOnRadioForVehicle();
-    void StopVehicleEngineSound(unsigned char ucSlot);
+    void StopVehicleEngineSound(uchar ucSlot);
 
 private:
     CAEVehicleAudioEntitySAInterface* m_pInterface;

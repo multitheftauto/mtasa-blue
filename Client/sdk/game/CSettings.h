@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CSettings.h
+ *  FILE:        Client/sdk/game/CSettings.h
  *  PURPOSE:     Game settings interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -90,44 +90,44 @@ enum eRadarMode
 class CGameSettings
 {
 public:
-    virtual bool          IsWideScreenEnabled() = 0;
-    virtual void          SetWideScreenEnabled(bool bEnabled) = 0;
-    virtual unsigned int  GetNumVideoModes() = 0;
-    virtual VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex) = 0;
-    virtual unsigned int  GetCurrentVideoMode() = 0;
-    virtual void          SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart) = 0;
-    virtual unsigned int  GetNumAdapters() = 0;
-    virtual unsigned int  GetCurrentAdapter() = 0;
-    virtual bool          HasUnsafeResolutions() = 0;
-    virtual bool          IsUnsafeResolution(int iWidth, int iHeight) = 0;
-    virtual void          SetAdapter(unsigned int uiAdapterIndex) = 0;
-    virtual unsigned char GetRadioVolume() = 0;
-    virtual void          SetRadioVolume(unsigned char ucVolume) = 0;
-    virtual unsigned char GetSFXVolume() = 0;
-    virtual void          SetSFXVolume(unsigned char ucVolume) = 0;
-    virtual unsigned int  GetUsertrackMode() = 0;
-    virtual void          SetUsertrackMode(unsigned int uiMode) = 0;
-    virtual bool          IsUsertrackAutoScan() = 0;
-    virtual void          SetUsertrackAutoScan(bool bEnable) = 0;
-    virtual bool          IsRadioEqualizerEnabled() = 0;
-    virtual void          SetRadioEqualizerEnabled(bool bEnable) = 0;
-    virtual bool          IsRadioAutotuneEnabled() = 0;
-    virtual void          SetRadioAutotuneEnabled(bool bEnable) = 0;
+    virtual bool       IsWideScreenEnabled() = 0;
+    virtual void       SetWideScreenEnabled(bool bEnabled) = 0;
+    virtual uint       GetNumVideoModes() = 0;
+    virtual VideoMode* GetVideoModeInfo(VideoMode* modeInfo, uint modeIndex) = 0;
+    virtual uint       GetCurrentVideoMode() = 0;
+    virtual void       SetCurrentVideoMode(uint modeIndex, bool bOnRestart) = 0;
+    virtual uint       GetNumAdapters() = 0;
+    virtual uint       GetCurrentAdapter() = 0;
+    virtual bool       HasUnsafeResolutions() = 0;
+    virtual bool       IsUnsafeResolution(int iWidth, int iHeight) = 0;
+    virtual void       SetAdapter(uint uiAdapterIndex) = 0;
+    virtual uchar      GetRadioVolume() = 0;
+    virtual void       SetRadioVolume(uchar ucVolume) = 0;
+    virtual uchar      GetSFXVolume() = 0;
+    virtual void       SetSFXVolume(uchar ucVolume) = 0;
+    virtual uint       GetUsertrackMode() = 0;
+    virtual void       SetUsertrackMode(uint uiMode) = 0;
+    virtual bool       IsUsertrackAutoScan() = 0;
+    virtual void       SetUsertrackAutoScan(bool bEnable) = 0;
+    virtual bool       IsRadioEqualizerEnabled() = 0;
+    virtual void       SetRadioEqualizerEnabled(bool bEnable) = 0;
+    virtual bool       IsRadioAutotuneEnabled() = 0;
+    virtual void       SetRadioAutotuneEnabled(bool bEnable) = 0;
 
     virtual float GetDrawDistance() = 0;
     virtual void  SetDrawDistance(float fDrawDistance) = 0;
 
-    virtual unsigned int GetBrightness() = 0;
-    virtual void         SetBrightness(unsigned int uiBrightness) = 0;
+    virtual uint GetBrightness() = 0;
+    virtual void SetBrightness(uint uiBrightness) = 0;
 
-    virtual unsigned int GetFXQuality() = 0;
-    virtual void         SetFXQuality(unsigned int fxQualityId) = 0;
+    virtual uint GetFXQuality() = 0;
+    virtual void SetFXQuality(uint fxQualityId) = 0;
 
     virtual float GetMouseSensitivity() = 0;
     virtual void  SetMouseSensitivity(float fSensitivity) = 0;
 
-    virtual unsigned int GetAntiAliasing() = 0;
-    virtual void         SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart) = 0;
+    virtual uint GetAntiAliasing() = 0;
+    virtual void SetAntiAliasing(uint uiAntiAliasing, bool bOnRestart) = 0;
 
     virtual bool IsMipMappingEnabled() = 0;
     virtual void SetMipMappingEnabled(bool bEnable) = 0;

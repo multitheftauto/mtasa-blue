@@ -17,7 +17,7 @@
 CExplosionManagerSA::CExplosionManagerSA()
 {
     for (int i = 0; i < MAX_EXPLOSIONS; i++)
-        Explosions[i] = new CExplosionSA((CExplosionSAInterface*)(ARRAY_Explosions + i * sizeof(CExplosionSAInterface)));
+        Explosions[i] = new CExplosionSA((CExplosionSAInterface*)(0xC88950 + i * sizeof(CExplosionSAInterface)));
 }
 
 CExplosionManagerSA::~CExplosionManagerSA()
@@ -38,8 +38,8 @@ CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity
     DWORD       dwOwnerInterface = (pOwner) ? (DWORD)pOwner->GetInterface() : 0;
     float       fX = vecPosition.fX, fY = vecPosition.fY, fZ = vecPosition.fZ;
     CExplosion* explosion = CExplosionManagerSA::FindFreeExplosion();
-    bool        bReturn;
-    DWORD       dwFunc = FUNC_CExplosion_AddExplosion;
+    bool        bReturn = false;
+    DWORD       dwFunc = 0x736A50;
     _asm
     {
         push    bNoDamage
@@ -70,7 +70,7 @@ returnhere:
     }
     if (bReturn) return explosion;
 
-    return NULL;
+    return nullptr;
 }
 
 void CExplosionManagerSA::RemoveAllExplosions()
@@ -90,5 +90,5 @@ CExplosion* CExplosionManagerSA::FindFreeExplosion()
     for (int i = 0; i < MAX_EXPLOSIONS; i++)
         if (!Explosions[i]->IsActive())
             return Explosions[i];
-    return NULL;
+    return nullptr;
 }

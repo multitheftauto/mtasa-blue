@@ -13,9 +13,7 @@
 #include <game/CHeli.h>
 #include "CAutomobileSA.h"
 
-class CHeliSAInterface : public CAutomobileSAInterface
-{
-};
+class CHeliSAInterface : public CAutomobileSAInterface {};
 
 class CHeliSA final : public virtual CHeli, public virtual CAutomobileSA
 {

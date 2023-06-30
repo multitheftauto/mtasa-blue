@@ -19,10 +19,12 @@
 
 CTaskSimpleDuckSA::CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck, short nUseShotsWhizzingEvents)
 {
-    DWORD dwFunc = FUNC_CTaskSimpleDuck__Constructor;
+    DWORD dwFunc = 0x691FC0;
     CreateTaskInterface(sizeof(CTaskSimpleDuckSAInterface));
+
     if (!IsValid())
         return;
+
     DWORD dwThisInterface = (DWORD)GetInterface();
     _asm
     {

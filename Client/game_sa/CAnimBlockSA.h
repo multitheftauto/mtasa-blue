@@ -20,13 +20,13 @@ class CAnimBlockSAInterface            // 32 bytes
 public:
     int GetIndex();            // hacky, i know
 
-    char           szName[16];
-    bool           bLoaded;            // ?
-    BYTE           pad[1];
-    unsigned short usRefs;
-    int            idOffset;
-    size_t         nAnimations;
-    DWORD          dwAssocGroup;
+    char   szName[16];
+    bool   bLoaded;            // ?
+    BYTE   pad[1];
+    ushort usRefs;
+    int    idOffset;
+    size_t nAnimations;
+    DWORD  dwAssocGroup;
 };
 
 class CAnimBlockSA : public CAnimBlock
@@ -34,16 +34,17 @@ class CAnimBlockSA : public CAnimBlock
     friend class CAnimBlendAssocGroupSA;
 
 public:
-    CAnimBlockSA(CAnimBlockSAInterface* pInterface) { m_pInterface = pInterface; }
+    CAnimBlockSA(CAnimBlockSAInterface* pInterface)     { m_pInterface = pInterface; }
 
-    CAnimBlockSAInterface*          GetInterface() { return m_pInterface; }
-    char*                           GetName() { return m_pInterface->szName; }
-    int                             GetIndex() { return m_pInterface->GetIndex(); }
-    void                            AddRef() { m_pInterface->usRefs++; }
-    unsigned short                  GetRefs() { return m_pInterface->usRefs; }
-    bool                            IsLoaded() { return m_pInterface->bLoaded; }
-    int                             GetIDOffset() { return m_pInterface->idOffset; }
+    CAnimBlockSAInterface*          GetInterface()      { return m_pInterface; }
+    char*                           GetName()           { return m_pInterface->szName; }
+    int                             GetIndex()          { return m_pInterface->GetIndex(); }
+    void                            AddRef()            { m_pInterface->usRefs++; }
+    unsigned short                  GetRefs()           { return m_pInterface->usRefs; }
+    bool                            IsLoaded()          { return m_pInterface->bLoaded; }
+    int                             GetIDOffset()       { return m_pInterface->idOffset; }
     size_t                          GetAnimationCount() { return m_pInterface->nAnimations; }
+
     void                            Request(EModelRequestType requestType, bool bAllowBlockingFail = false);
     CAnimBlendHierarchySAInterface* GetAnimationHierarchyInterface(size_t iAnimation);
 

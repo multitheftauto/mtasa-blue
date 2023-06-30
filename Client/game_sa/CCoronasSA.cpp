@@ -13,6 +13,8 @@
 #include "CCoronasSA.h"
 #include "CRegisteredCoronaSA.h"
 
+#define FUNC_DoSunAndMoon 0x6FC5A0
+
 CCoronasSA::CCoronasSA()
 {
     for (int i = 0; i < MAX_CORONAS; i++)
@@ -36,25 +38,24 @@ CRegisteredCorona* CCoronasSA::GetCorona(DWORD ID)
 
 CRegisteredCorona* CCoronasSA::CreateCorona(DWORD Identifier, CVector* position)
 {
-    CRegisteredCoronaSA* corona;
-    corona = (CRegisteredCoronaSA*)FindCorona(Identifier);
+    CRegisteredCoronaSA* pCorona = (CRegisteredCoronaSA*)FindCorona(Identifier);
 
-    if (!corona)
-        corona = (CRegisteredCoronaSA*)FindFreeCorona();
+    if (!pCorona)
+        pCorona = (CRegisteredCoronaSA*)FindFreeCorona();
 
-    if (corona)
+    if (pCorona)
     {
         RwTexture* texture = GetTexture((eCoronaType)CORONATYPE_SHINYSTAR);
         if (texture)
         {
-            corona->Init(Identifier);
-            corona->SetPosition(position);
-            corona->SetTexture(texture);
-            return (CRegisteredCorona*)corona;
+            pCorona->Init(Identifier);
+            pCorona->SetPosition(position);
+            pCorona->SetTexture(texture);
+            return (CRegisteredCorona*)pCorona;
         }
     }
 
-    return (CRegisteredCorona*)NULL;
+    return (CRegisteredCorona*)nullptr;
 }
 
 CRegisteredCorona* CCoronasSA::FindFreeCorona()
@@ -66,7 +67,7 @@ CRegisteredCorona* CCoronasSA::FindFreeCorona()
             return Coronas[i];
         }
     }
-    return (CRegisteredCorona*)NULL;
+    return (CRegisteredCorona*)nullptr;
 }
 
 CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
@@ -78,15 +79,15 @@ CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
             return Coronas[i];
         }
     }
-    return (CRegisteredCorona*)NULL;
+    return (CRegisteredCorona*)nullptr;
 }
 
 RwTexture* CCoronasSA::GetTexture(eCoronaType type)
 {
     if (type < MAX_CORONA_TEXTURES)
-        return (RwTexture*)(*(DWORD*)(ARRAY_CORONA_TEXTURES + type * sizeof(DWORD)));
+        return (RwTexture*)(*(DWORD*)(0xC3E000 + type * sizeof(DWORD)));
     else
-        return NULL;
+        return nullptr;
 }
 
 void CCoronasSA::DisableSunAndMoon(bool bDisabled)

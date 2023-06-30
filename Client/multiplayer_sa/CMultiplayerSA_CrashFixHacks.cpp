@@ -574,7 +574,7 @@ void _declspec(naked) HOOK_CrashFix_Misc20()
 //////////////////////////////////////////////////////////////////////////////////////////
 bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask)
 {
-    if (pTask->VTBL != (TaskVTBL*)VTBL_CTaskSimpleCarFallOut)
+    if (pTask->VTBL != (TaskVTBL*)0x86EFD0)
     {
         AddReportLog(8530, SString("IsTaskSimpleCarFallOutValid fail - pTask->VTBL: %08x", pTask->VTBL), 5);
         return false;

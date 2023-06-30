@@ -16,7 +16,7 @@
 CCheckpointsSA::CCheckpointsSA()
 {
     for (int i = 0; i < MAX_CHECKPOINTS; i++)
-        Checkpoints[i] = new CCheckpointSA((CCheckpointSAInterface*)(ARRAY_CHECKPOINTS + i * sizeof(CCheckpointSAInterface)));
+        Checkpoints[i] = new CCheckpointSA((CCheckpointSAInterface*)(0xC7F158 + i * sizeof(CCheckpointSAInterface)));
 }
 
 CCheckpointsSA::~CCheckpointsSA()
@@ -33,12 +33,8 @@ CCheckpointsSA::~CCheckpointsSA()
 CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, float fSize, float fPulseFraction,
                                               const SharedUtil::SColor color)
 {
-    /*
-    static CCheckpoint  *PlaceMarker(unsigned int nIdentifier, unsigned short nType, CVector &vecPosition, CVector &pointDir,
-    float fSize, unsigned char r, unsigned char g, unsigned char b, unsigned char a, unsigned short nPeriod, float fPulseFrac, short nRotRate);
-    */
-
     CCheckpoint* Checkpoint = FindFreeMarker();
+
     if (Checkpoint)
     {
         ((CCheckpointSA*)(Checkpoint))->SetIdentifier(Identifier);
@@ -54,7 +50,8 @@ CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVec
 
         return Checkpoint;
     }
-    return NULL;
+
+    return nullptr;
 }
 
 CCheckpoint* CCheckpointsSA::FindFreeMarker()
@@ -64,5 +61,5 @@ CCheckpoint* CCheckpointsSA::FindFreeMarker()
         if (!Checkpoints[i]->IsActive())
             return Checkpoints[i];
     }
-    return NULL;
+    return nullptr;
 }

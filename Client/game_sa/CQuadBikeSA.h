@@ -14,10 +14,7 @@
 #include <game/CQuadBike.h>
 #include "CAutomobileSA.h"
 
-class CQuadBikeSAInterface : public CAutomobileSAInterface
-{
-    // fill this
-};
+class CQuadBikeSAInterface : public CAutomobileSAInterface {};
 
 class CQuadBikeSA final : public virtual CQuadBike, public virtual CAutomobileSA
 {
