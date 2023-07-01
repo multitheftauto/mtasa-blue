@@ -250,7 +250,7 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
 RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions)
 {
     // Set correct TXD as materials are processed at the same time
-    if (usModelID != 0 && usModelID != 65535)
+    if (usModelID != 0)
     {
         unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
         SetTextureDict(usTxdId);
