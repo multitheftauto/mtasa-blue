@@ -1047,9 +1047,3 @@ void CRenderWareSA::RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vec
     rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
     rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
 }
-
-
-int CRenderWareSA::GetNumberOfAtomics(RpClump* pClump)
-{
-    return RpClumpGetNumAtomics(pClump);
-}

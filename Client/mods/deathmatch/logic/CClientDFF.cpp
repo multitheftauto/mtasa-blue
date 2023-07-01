@@ -293,6 +293,9 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
 
+    if (pClump->object.type == RwObjectType::Clump)
+        pModelInfo->MakeClumpModel(usModel);
+
     if (!pModelInfo->SetCustomModel(pClump))
         return false;
 
@@ -381,15 +384,4 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
 bool CClientDFF::IsDFFData(const SString& strData)
 {
     return strData.length() > 32 && (memcmp(strData, "\x10\x00\x00\x00", 4) == 0 || memcmp(strData, "\x2B\x00\x00\x00", 4) == 0);
-}
-
-void CClientDFF::GetAtomics(std::vector<int>& atomics)
-{
-    RpClump* pClump = GetLoadedClump(65535);
-    int      atomicsNum = g_pGame->GetRenderWare()->GetNumberOfAtomics(pClump);
-    for (int i = 0; i < atomicsNum; i++)
-    {
-        atomics.push_back(i + 1);
-    }
-    UnloadDFF();
 }

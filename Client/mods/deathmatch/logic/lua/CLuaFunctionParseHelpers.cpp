@@ -667,17 +667,6 @@ ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
 ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
-IMPLEMENT_ENUM_CLASS_BEGIN(eModelInfoType)
-ADD_ENUM(eModelInfoType::UNKNOWN, "unknown")
-ADD_ENUM(eModelInfoType::ATOMIC, "atomic")
-ADD_ENUM(eModelInfoType::TIME, "time")
-ADD_ENUM(eModelInfoType::WEAPON, "weapon")
-ADD_ENUM(eModelInfoType::CLUMP, "clump")
-ADD_ENUM(eModelInfoType::VEHICLE, "vehicle")
-ADD_ENUM(eModelInfoType::PED, "ped")
-ADD_ENUM(eModelInfoType::LOD_ATOMIC, "lod-atomic")
-IMPLEMENT_ENUM_CLASS_END("client-info-type")
-
 // Sound effects
 IMPLEMENT_ENUM_BEGIN(eSoundEffectType)
 ADD_ENUM(BASS_FX_DX8_CHORUS, "chorus")

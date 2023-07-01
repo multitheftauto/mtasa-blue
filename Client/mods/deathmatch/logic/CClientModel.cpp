@@ -22,16 +22,6 @@ CClientModel::~CClientModel(void)
     Deallocate();
 }
 
-unsigned char CClientModel::GetModelInfoType() const
-{
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
-
-    if (pModelInfo->IsValid())
-        return static_cast<unsigned char>(pModelInfo->GetModelType());
-
-    return static_cast<unsigned char>(eModelInfoType::UNKNOWN);
-}
-
 bool CClientModel::Allocate(ushort usParentID)
 {
     m_bAllocatedByUs = true;
@@ -82,7 +72,7 @@ bool CClientModel::Allocate(ushort usParentID)
 
 bool CClientModel::MakeAtomicModel()
 {
-    if (m_originalModelInfoType == 255)
+    if (!m_bWasConvertedToClump)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
@@ -96,7 +86,7 @@ bool CClientModel::MakeAtomicModel()
 
     pModelInfo->Request(BLOCKING, "CClientModel::MakeAtomicModel");
     if (pModelInfo->MakeAtomicModel(m_iModelID))
-        m_originalModelInfoType = 255;
+        m_bWasConvertedToClump = false;
     return true;
 }
 
@@ -113,17 +103,16 @@ bool CClientModel::MakeClumpModel()
 
     pModelInfo->Request(BLOCKING, "CClientModel::MakeClumpModel");
     if (pModelInfo->MakeClumpModel(m_iModelID))
-        m_originalModelInfoType = static_cast<unsigned char>(modelInfoType);
+        m_bWasConvertedToClump = true;
     return true;
 }
 
 bool CClientModel::Deallocate(void)
 {
-    if (m_originalModelInfoType != 255)
+    if (m_bWasConvertedToClump)
     {
-        // For now we don't support anything else
         MakeAtomicModel();
-        m_originalModelInfoType = 255;
+        m_bWasConvertedToClump = false;
     }
     if (!m_bAllocatedByUs)
         return false;

@@ -114,7 +114,6 @@ public:
     void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition);
     void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale);
     void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
-    int  GetNumberOfAtomics(RpClump* pClump);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);

@@ -35,7 +35,6 @@ public:
 
     int              GetModelID(void) const { return m_iModelID; };
     eClientModelType GetModelType(void) const { return m_eModelType; };
-    unsigned char    GetModelInfoType() const;
     bool             Allocate(ushort usParentID);
     bool             MakeClumpModel();
     bool             MakeAtomicModel();
@@ -51,5 +50,5 @@ protected:
     eClientModelType m_eModelType;
     bool             m_bAllocatedByUs = false;
     CResource*       m_pParentResource = nullptr;            // Resource that allocated model
-    unsigned char    m_originalModelInfoType = 255; // 255 - unchanged
+    bool             m_bWasConvertedToClump = false;
 };

@@ -19,6 +19,9 @@
 #include "CPedSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include "CBaseModelInfoSAInterface.h"
+#include "CAtomicModelInfoSAInterface.h"
+#include "CClumpModelInfoSAInterface.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;

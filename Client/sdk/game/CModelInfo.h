@@ -53,7 +53,6 @@ enum class eModelIdeFlag
 
 enum class eModelInfoType : unsigned char
 {
-    UNKNOWN = 0,
     ATOMIC = 1,
     TIME = 3,
     WEAPON = 4,

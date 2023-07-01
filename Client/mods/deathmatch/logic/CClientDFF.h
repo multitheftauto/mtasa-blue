@@ -51,8 +51,6 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition){};
 
-    void GetAtomics(std::vector<int>& atomics);
-
 private:
     bool LoadFromFile(SString filePath);
     bool LoadFromBuffer(SString buffer);
