@@ -2030,7 +2030,7 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    return ((eModelInfoType(*)())GetInterface()->VFTBL->GetModelType)();
+    return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)

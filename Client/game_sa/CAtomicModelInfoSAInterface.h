@@ -10,6 +10,12 @@
 
 #pragma once
 
+class CAtomicModelInfo_SA_VTBL : public CBaseModelInfo_SA_VTBL
+{
+public:
+    DWORD SetAtomic;            // (RpAtomic*)
+};
+
 class CAtomicModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 };

@@ -10,6 +10,13 @@
 
 #pragma once
 
+class CClumpModelInfo_SA_VTBL : public CBaseModelInfo_SA_VTBL
+{
+public:
+    DWORD GetBoundingBox;
+    DWORD SetClump;            // (RpClump*)
+};
+
 class CClumpModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
