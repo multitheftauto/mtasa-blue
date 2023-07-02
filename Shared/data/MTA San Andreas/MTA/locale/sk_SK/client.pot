@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:48+0000\n"
-"PO-Revision-Date: 2023-07-02 16:57\n"
+"POT-Creation-Date: 2023-07-02 22:39+0000\n"
+"PO-Revision-Date: 2023-07-02 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -197,7 +197,7 @@ msgstr "Extrahovanie súborov..."
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/loader/Dialogs.cpp:131 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1153
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
@@ -207,7 +207,7 @@ msgid "Yes"
 msgstr "Áno"
 
 #: Client/loader/Dialogs.cpp:132 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1152 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CMainMenu.cpp:1169 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1370
 #: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
@@ -1336,23 +1336,23 @@ msgstr "Konfiguračné súbory uložené"
 msgid "* Your serial is: %s"
 msgstr "* Tvoj serial je: %s"
 
-#: Client/core/CMainMenu.cpp:321
+#: Client/core/CMainMenu.cpp:322
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
 msgstr "Používate novšiu verziu (feature-branch build)! Je to testovacia verzia a nemôže byť použitá na pripojenie na public servery!"
 
-#: Client/core/CMainMenu.cpp:340
+#: Client/core/CMainMenu.cpp:341
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
 msgstr "MTA nebude podporovať XP/Vista po Júli 2019.\n\n"
 "Aktualizujte Windows aby ste mohli hrať na aktuálnych serveroch."
 
-#: Client/core/CMainMenu.cpp:1146
+#: Client/core/CMainMenu.cpp:1163
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Toto ťa odpojí z aktuálneho serveru.\n\n"
 "Si si istý, že sa chceš odpojiť?"
 
-#: Client/core/CMainMenu.cpp:1150
+#: Client/core/CMainMenu.cpp:1167
 msgid "DISCONNECT WARNING"
 msgstr "VAROVANIE O ODPOJENÍ"
 
