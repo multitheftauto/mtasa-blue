@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleManager.h
+ *  FILE:        Server/mods/deathmatch/logic/CVehicleManager.h
  *  PURPOSE:     Vehicle entity manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,32 +30,32 @@ public:
     CVehicleManager();
     ~CVehicleManager();
 
-    CVehicle* Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    CVehicle* Create(CElement* pParent, ushort usModel, uchar ucVariant, uchar ucVariant2);
     CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void      DeleteAll();
 
     bool Exists(CVehicle* pVehicle);
 
-    static bool         IsValidModel(unsigned int uiVehicleModel);
-    static eVehicleType GetVehicleType(unsigned short usModel);
-    static bool         IsValidUpgrade(unsigned short usUpgrade);
-    static unsigned int GetMaxPassengers(unsigned int uiVehicleModel);
-    static bool         HasTurret(unsigned int uiVehicleModel);
-    static bool         HasSirens(unsigned int uiVehicleModel);
-    static bool         HasTaxiLight(unsigned int uiVehicleModel);
-    static bool         HasLandingGears(unsigned int uiVehicleModel);
-    static bool         HasAdjustableProperty(unsigned int uiVehicleModel);
-    static bool         HasSmokeTrail(unsigned int uiVehicleModel);
-    static bool         IsTrailer(unsigned int uiVehicleModel);
-    static bool         HasDamageModel(unsigned short usModel);
+    static bool         IsValidModel(ushort usModel);
+    static eVehicleType GetVehicleType(ushort usModel);
+    static bool         IsValidUpgrade(ushort usModel);
+    static uchar        GetMaxPassengers(ushort usModel);
+    static bool         HasTurret(ushort usModel);
+    static bool         HasSirens(ushort usModel);
+    static bool         HasTaxiLight(ushort usModel);
+    static bool         HasLandingGears(ushort usModel);
+    static bool         HasAdjustableProperty(ushort usModel);
+    static bool         HasSmokeTrail(ushort usModel);
+    static bool         IsTrailer(ushort usModel);
+    static bool         HasDamageModel(ushort usModel);
     static bool         HasDamageModel(eVehicleType Type);
-    static bool         HasDoors(unsigned short usModel);
-    static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool         HasDoors(ushort usModel);
+    static void         GetRandomVariation(ushort usModel, uchar& ucVariant, uchar& ucVariant2);
 
     CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
-    CVehicleColor         GetRandomColor(unsigned short usModel);
+    CVehicleColor         GetRandomColor(ushort usModel);
 
-    void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
+    void GetVehiclesOfType(ushort usModel, lua_State* luaVM);
 
     Container::size_type GetVehicleCount() { return m_List.size(); }
 

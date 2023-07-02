@@ -1,9 +1,10 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CClientModelCacheManager.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -388,7 +389,7 @@ void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<ushort, float>& o
         CClientVehicle* pVehicle = *iter;
         const ushort    usModelId = pVehicle->GetModel();
 
-        if (usModelId < 400 || usModelId > 611)
+        if (CClientVehicleManager::IsStandardModel(usModelId))
             continue;
 
         // Check if currently within distance

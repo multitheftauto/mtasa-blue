@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleNames.h
+ *  FILE:        Server/mods/deathmatch/logic/CVehicleNames.h
  *  PURPOSE:     GTA vehicle name definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,10 +14,7 @@
 class CVehicleNames
 {
 public:
-    static bool IsValidModel(unsigned long ulModel);
-
     static const char*  GetVehicleName(unsigned long ulModel);
     static unsigned int GetVehicleModel(const char* szName);
-
     static const char* GetVehicleTypeName(unsigned long ulModel);
 };

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CNetAPI.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CNetAPI.cpp
  *  PURPOSE:     Packet processing class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1563,7 +1563,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
     // Use parent model ID for non-standard vehicle model IDs.
     // This avoids a mismatch between client and server, ensuring doors and damage sync correctly.
     int iModelID = pVehicle->GetModel();
-    if (iModelID < 400 || iModelID > 611)
+    if (CClientVehicleManager::IsStandardModel(iModelID))
         iModelID = pVehicle->GetModelInfo()->GetParentID();
 
     // Write the clientside model

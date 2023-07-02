@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientVehicleManager.h
+ *  FILE:        Client/mods/deathmatch/logic/CClientVehicleManager.h
  *  PURPOSE:     Vehicle entity manager class header
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,7 +16,7 @@
 class CClientManager;
 class CClientVehicle;
 
-extern const SFixedArray<unsigned char, 212> g_ucMaxPassengers;
+extern const SFixedArray<uchar, 212> g_ucMaxPassengers;
 
 class CClientVehicleManager
 {
@@ -26,38 +27,38 @@ public:
 
     void DeleteAll();
 
-    unsigned int           Count() { return static_cast<unsigned int>(m_List.size()); };
+    ushort                 Count() { return static_cast<ushort>(m_List.size()); };
     static CClientVehicle* Get(ElementID ID);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 
     void DoPulse();
 
-    static bool               IsTrainModel(unsigned long ulModel);
-    static bool               IsValidModel(unsigned long ulModel);
-    static bool               IsStandardModel(unsigned long ulModel);
-    static eClientVehicleType GetVehicleType(unsigned long ulModel);
-    static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
-    static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);
-    static void               GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool               IsTrainModel(ushort usModel);
+    static bool               IsValidModel(ushort usModel);
+    static bool               IsStandardModel(ushort usModel);
+    static eClientVehicleType GetVehicleType(ushort usModel);
+    static uchar              GetMaxPassenger(ushort usModel);
+    static void               GetRandomVariation(ushort usModel, uchar& ucVariant, uchar& ucVariant2);
+    static uchar              ConvertIndexToGameSeat(ushort usModel, uchar ucIndex);
 
-    static bool HasTurret(unsigned long ulModel);
-    static bool HasSirens(unsigned long ulModel);
-    static bool HasLandingGears(unsigned long ulModel);
-    static bool HasAdjustableProperty(unsigned long ulModel);
-    static bool HasSmokeTrail(unsigned long ulModel);
-    static bool HasTaxiLight(unsigned long ulModel);
-    static bool HasSearchLight(unsigned long ulModel);
-    static bool HasDamageModel(unsigned long ulModel);
-    static bool HasDamageModel(enum eClientVehicleType Type);
-    static bool HasDoors(unsigned long ulModel);
+    static bool HasTurret(ushort usModel);
+    static bool HasSirens(ushort usModel);
+    static bool HasLandingGears(ushort usModel);
+    static bool HasAdjustableProperty(ushort usModel);
+    static bool HasSmokeTrail(ushort usModel);
+    static bool HasTaxiLight(ushort usModel);
+    static bool HasSearchLight(ushort usModel);
+    static bool HasDamageModel(ushort usModel);
+    static bool HasDamageModel(eClientVehicleType Type);
+    static bool HasDoors(ushort usModel);
 
     bool Exists(CClientVehicle* pVehicle);
 
     static bool IsVehicleLimitReached();
 
-    void RestreamVehicles(unsigned short usModel);
+    void RestreamVehicles(ushort usModel);
     void RestreamAllVehicles();
-    void RestreamVehicleUpgrades(unsigned short usModel);
+    void RestreamVehicleUpgrades(ushort usModel);
 
     std::vector<CClientVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
     std::vector<CClientVehicle*>::const_iterator IterEnd() { return m_List.end(); };

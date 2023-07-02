@@ -9791,7 +9791,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
             return false;
 
         // Valid seat id for that vehicle?
-        uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
+        uchar ucMaxPassengers = CClientVehicleManager::GetMaxPassenger(pVehicle->GetModel());
         if (uiSeat > ucMaxPassengers)
             return false;
 

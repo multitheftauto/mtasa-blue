@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/packets/CEntityAddPacket.cpp
+ *  FILE:        Server/mods/deathmatch/logic/packets/CEntityAddPacket.cpp
  *  PURPOSE:     Entity-add packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -448,12 +448,11 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&position);
                     BitStream.Write(&rotationDegrees);
 
-                    // Vehicle id as a char
-                    // I'm assuming the "-400" is for adjustment so that all car values can
-                    // fit into a char?  Why doesn't someone document this?
-                    //
-                    // --slush
-                    BitStream.Write(static_cast<unsigned char>(pVehicle->GetModel() - 400));
+                    // Vehicle id as a short
+                    ushort usVehicleModel = pVehicle->GetModel();
+
+                    if (CVehicleManager::IsValidModel(usVehicleModel))
+                        BitStream.Write(usVehicleModel);
 
                     // Health
                     SVehicleHealthSync health;

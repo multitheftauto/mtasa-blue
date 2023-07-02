@@ -1,18 +1,17 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CVehicleNames.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CVehicleNames.cpp
  *  PURPOSE:     Vehicle names class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include <StdInc.h>
 
-using namespace std;
-
-const char* const szVehicleNameEmpty = "";
+const char* szVehicleNameEmpty = "";
 
 struct SVehicleName
 {
@@ -243,38 +242,33 @@ static const SFixedArray<unsigned char, 212> ucVehicleTypes = {
     0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 0, 0, 8, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5, 5, 0,
     0, 8, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 6, 0, 2, 0, 0, 0, 5, 6, 1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 6};
 
-bool CVehicleNames::IsValidModel(unsigned long ulModel)
-{
-    return ulModel >= 400 && ulModel <= 611;
-}
-
-bool CVehicleNames::IsModelTrailer(unsigned long ulModel)
+bool CVehicleNames::IsModelTrailer(ushort usModel)
 {
     // IsValidModel excludes trailers, so we need the ability to check separately if it is a trailer
-    return (ulModel == 435 || ulModel == 450 || ulModel == 591 || ulModel == 606 || ulModel == 607 || ulModel == 584 || ulModel == 608 || ulModel == 610 ||
-            ulModel == 611);
+    return (usModel == 435 || usModel == 450 || usModel == 591 || usModel == 606 || usModel == 607 || usModel == 584 || usModel == 608 || usModel == 610 ||
+            usModel == 611);
 }
 
-const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
+const char* CVehicleNames::GetVehicleName(ushort usModel)
 {
     // Valid?
-    if (IsValidModel(ulModel))
+    if (CClientVehicleManager::IsStandardModel(usModel))
     {
         // Look it up in the table
-        return VehicleNames[ulModel - 400].szName;
+        return VehicleNames[usModel - 400].szName;
     }
 
     return szVehicleNameEmpty;
 }
 
-unsigned int CVehicleNames::GetVehicleModel(const char* szName)
+uint CVehicleNames::GetVehicleModel(const char* szName)
 {
     // If the specified string was empty, return 0
     if (szName[0] == 0)
         return 0;
 
     // Look for it in our table
-    for (unsigned int i = 0; i < NUMELMS(VehicleNames); i++)
+    for (uint i = 0; i < NUMELMS(VehicleNames); i++)
     {
         if (stricmp(szName, VehicleNames[i].szName) == 0 || (VehicleNames[i].szName_replaced && stricmp(szName, VehicleNames[i].szName_replaced) == 0))
         {
@@ -285,16 +279,16 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
     return 0;
 }
 
-const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
+const char* CVehicleNames::GetVehicleTypeName(ushort usModel)
 {
     // Use parent model ID for non-standard vehicle model IDs.
-    if ((ulModel < 400 || ulModel > 611) && CClientVehicleManager::IsValidModel(ulModel))
-        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+    if (CClientVehicleManager::IsStandardModel(usModel) && CClientVehicleManager::IsValidModel(usModel))
+        usModel = g_pGame->GetModelInfo(usModel)->GetParentID();
 
     // Check whether the model is valid
-    if ((IsValidModel(ulModel) || IsModelTrailer(ulModel)) && ((ulModel - 400) < NUMELMS(ucVehicleTypes)))
+    if ((CClientVehicleManager::IsStandardModel(usModel) || IsModelTrailer(usModel)) && ((usModel - 400) < NUMELMS(ucVehicleTypes)))
     {
-        int iVehicleType = ucVehicleTypes[ulModel - 400];
+        int iVehicleType = ucVehicleTypes[usModel - 400];
         return VehicleTypes[iVehicleType].szName;
     }
 

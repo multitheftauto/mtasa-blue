@@ -1,17 +1,18 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleColorManager.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CVehicleColorManager.cpp
  *  PURPOSE:     Vehicle entity color manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CVehicleColorManager.h"
 #include "CVehicleDefaultColors.h"
+#include "CVehicleManager.h"
 #include "Utils.h"
 
 CVehicleColor CVehicleColors::GetRandomColor()
@@ -143,7 +144,7 @@ void CVehicleColorManager::Reset()
 
 void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor& colVehicle)
 {
-    if (usModel >= 400 && usModel <= 611)
+    if (CVehicleManager::IsValidModel(usModel))
     {
         m_Colors[usModel - 400].AddColor(colVehicle);
     }
@@ -151,7 +152,7 @@ void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor&
 
 CVehicleColor CVehicleColorManager::GetRandomColor(unsigned short usModel)
 {
-    if (usModel >= 400 && usModel <= 611)
+    if (CVehicleManager::IsValidModel(usModel))
     {
         return m_Colors[usModel - 400].GetRandomColor();
     }

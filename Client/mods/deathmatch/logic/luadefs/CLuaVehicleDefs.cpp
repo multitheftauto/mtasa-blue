@@ -562,7 +562,7 @@ int CLuaVehicleDefs::GetVehicleMaxPassengers(lua_State* luaVM)
     {
         if (CClientVehicleManager::IsValidModel(usModel))
         {
-            unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
+            uchar uiMaxPassengers = CClientVehicleManager::GetMaxPassenger(usModel);
             if (uiMaxPassengers != 0xFF)
             {
                 lua_pushnumber(luaVM, uiMaxPassengers);
@@ -613,7 +613,7 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Get the maximum amount of passengers
-        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
+        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassenger(pVehicle->GetModel());
 
         // Make sure that if the vehicle doesn't have any seats, the function returns false
         if (ucMaxPassengers == 255)

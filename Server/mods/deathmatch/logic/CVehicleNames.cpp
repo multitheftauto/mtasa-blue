@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleNames.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CVehicleNames.cpp
  *  PURPOSE:     GTA vehicle name definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -234,15 +234,10 @@ static const SFixedArray<SVehicleName, 212> VehicleNames = {{{"Landstalker"},
                                                              {"Farm Trailer"},
                                                              {"Street Clean Trailer"}}};
 
-bool CVehicleNames::IsValidModel(unsigned long ulModel)
-{
-    return ulModel >= 400 && ulModel <= 611;
-}
-
 const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
 {
     // Valid?
-    if (IsValidModel(ulModel) && ((ulModel - 400) < NUMELMS(VehicleNames)))
+    if (CVehicleManager::IsValidModel(ulModel) && ((ulModel - 400) < NUMELMS(VehicleNames)))
     {
         // Look it up in the table
         return VehicleNames[ulModel - 400].szName;
@@ -273,7 +268,7 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
 const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
 {
     const char* pVehicleName = "";
-    switch (CVehicleManager::GetVehicleType(static_cast<unsigned short>(ulModel)))
+    switch (CVehicleManager::GetVehicleType(ulModel))
     {
         case VEHICLE_NONE:
             pVehicleName = "Unknown";
