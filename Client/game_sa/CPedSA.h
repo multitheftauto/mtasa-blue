@@ -269,6 +269,7 @@ private:
     CPedIntelligenceSA* m_pPedIntelligence;
     CPedSAInterface*    m_pPedInterface;
     CPedSoundSA*        m_pPedSound;
+    CPedSoundSA*        m_pDefaultPedSound;
 
     DWORD         m_dwType;
     unsigned char m_ucOccupiedSeat;
@@ -383,6 +384,7 @@ public:
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
+    void ResetVoice();
     void SetLanding(bool bIsLanding) { GetPedInterface()->pedFlags.bIsLanding = bIsLanding; }
     void SetUpdateMetricsRequired(bool required) { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
 
