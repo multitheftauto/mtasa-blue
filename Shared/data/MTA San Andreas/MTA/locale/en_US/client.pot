@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:50+0000\n"
+"POT-Creation-Date: 2023-07-02 22:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -207,7 +207,7 @@ msgstr ""
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/loader/Dialogs.cpp:131 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1153
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
@@ -217,7 +217,7 @@ msgid "Yes"
 msgstr ""
 
 #: Client/loader/Dialogs.cpp:132 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1152 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CMainMenu.cpp:1169 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1370
 #: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
@@ -1377,27 +1377,27 @@ msgstr ""
 msgid "* Your serial is: %s"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:321
+#: Client/core/CMainMenu.cpp:322
 msgid ""
 "You are using a feature-branch build! This is a test build only which cannot "
 "be used to connect to public servers!"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:340
+#: Client/core/CMainMenu.cpp:341
 msgid ""
 "MTA will not receive updates on XP/Vista after July 2019.\n"
 "\n"
 "Upgrade Windows to play on the latest servers."
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1146
+#: Client/core/CMainMenu.cpp:1163
 msgid ""
 "This will disconnect you from the current server.\n"
 "\n"
 "Are you sure you want to disconnect?"
 msgstr ""
 
-#: Client/core/CMainMenu.cpp:1150
+#: Client/core/CMainMenu.cpp:1167
 msgid "DISCONNECT WARNING"
 msgstr ""
 
