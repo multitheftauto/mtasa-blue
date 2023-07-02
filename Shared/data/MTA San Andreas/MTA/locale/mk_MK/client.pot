@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-29 22:08+0000\n"
-"PO-Revision-Date: 2023-06-29 23:08\n"
+"POT-Creation-Date: 2023-07-02 16:48+0000\n"
+"PO-Revision-Date: 2023-07-02 16:57\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -55,17 +55,17 @@ msgstr "Не може се да се ажурира поради конфлик�
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:591
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:689
+#: Client/mods/deathmatch/logic/CClientGame.cpp:711
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1275
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
@@ -796,110 +796,110 @@ msgstr "(Девелоперски мод) светски отпечатоци з
 msgid "Download error: %s"
 msgstr "Грешка во симnувањето: %s"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/mods/deathmatch/logic/CClientGame.cpp:591
+#: Client/mods/deathmatch/logic/CClientGame.cpp:689
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Неважечко име! Ве молиме одете во Опции и впишете ново име!"
 
 #. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
 #: Client/core/CConnectManager.cpp:148
 msgid "CONNECTING"
 msgstr "Поврзување"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
 msgid "Entering the game ..."
 msgstr "Влегување во игра ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "Не сте конектирани; ве молиме употребете ја Брзо Вклучување или 'вклучување' командата за да се вклучите во серверот."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+#: Client/mods/deathmatch/logic/CClientGame.cpp:711
 msgid "The server is not installed"
 msgstr "Серверот не е инсталиран"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
 msgid "Local Server"
 msgstr "Локален Сервер"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
 msgid "Starting local server ..."
 msgstr "Започнување на локален сервер ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Вие сте кикнати од играта ( %s)"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
 msgid "Connecting to local server..."
 msgstr "Конектирање на локален сервер..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
 msgid "Error connecting to server."
 msgstr "Погрешно конектирање на серверот."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Конектирањето на локален сервер е прекинат.Проверете ја конзолата за детали."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
 #: Client/core/CConnectManager.cpp:263
 msgid "Connection timed out"
 msgstr "Конекцијата е прекината "
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 msgid "Connection with the server was lost"
 msgstr "Конекцијата со серверот е прекината"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
 msgid "Disconnected: unknown protocol error"
 msgstr "Дисконектиран: непозната грешка на протоколот"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1235
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
 #: Client/core/CConnectManager.cpp:285
 msgid "Disconnected: disconnected remotely"
 msgstr "Дисконектиран: дисконектиран рачно"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1239
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
 #: Client/core/CConnectManager.cpp:289
 msgid "Disconnected: connection lost remotely"
 msgstr "Дисконектиран: конекцијата е изгубена рачно"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
 #: Client/core/CConnectManager.cpp:293
 msgid "Disconnected: you are banned from this server"
 msgstr "Дисконектиран: Вие сте баниран од серверот"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
 msgid "Disconnected: the server is currently full"
 msgstr "Дисконектиран: серверот моментално е полн"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
 #: Client/core/CConnectManager.cpp:300
 msgid "Disconnected: disconnected from the server"
 msgstr "Дисконектиран: Дисконектиран од серверот"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1255
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
 #: Client/core/CConnectManager.cpp:304
 msgid "Disconnected: connection to the server was lost"
 msgstr "Врската со серверот беше прекината."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1259
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1265
 msgid "Disconnected: invalid password specified"
 msgstr "Дисконектиран: пасвордот е погрешен"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
 #: Client/core/CConnectManager.cpp:311
 msgid "Disconnected: connection was refused"
 msgstr "Дисконектиран: конекцијата e oдбиена"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
 msgid "MTA Client verification failed!"
 msgstr "MTA Клиент верификацијата е неуспешна!"
 
