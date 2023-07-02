@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-06-29 22:08+0000\n"
-"PO-Revision-Date: 2023-06-29 23:07\n"
+"POT-Creation-Date: 2023-07-02 16:48+0000\n"
+"PO-Revision-Date: 2023-07-02 16:57\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -55,17 +55,17 @@ msgstr "Δεν είναι δυνατή η αναβάθμιση λόγω αντι
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:591
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:689
+#: Client/mods/deathmatch/logic/CClientGame.cpp:711
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1275
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
 #: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
@@ -796,110 +796,110 @@ msgstr "(Λειτουργία ανάπτυξης) εκτυπώνει τα παγ
 msgid "Download error: %s"
 msgstr "Σφάλμα λήψης: %s"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:588
-#: Client/mods/deathmatch/logic/CClientGame.cpp:686
+#: Client/mods/deathmatch/logic/CClientGame.cpp:591
+#: Client/mods/deathmatch/logic/CClientGame.cpp:689
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "Άτοπο ψευδώνυμο! Παρακαλώ πηγαίνετε στις ρυθμίσεις και αναθέστε ένα νέο!"
 
 #. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
 #: Client/core/CConnectManager.cpp:148
 msgid "CONNECTING"
 msgstr "ΣΥΝΔΕΕΤΕ"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:604
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
 msgid "Entering the game ..."
 msgstr "Είσοδος στο παιχνίδι ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:662
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "Δεν είστε συνδεδεμένος, χρησιμοποιήστε την Γρήγορη Σύνδεση ή την εντολή 'σύνδεση' για να συνδεθείτε σε ένα διακομιστή."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:708
+#: Client/mods/deathmatch/logic/CClientGame.cpp:711
 msgid "The server is not installed"
 msgstr "Ο διακομιστής δεν είναι εγκατεστημένος"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
 msgid "Local Server"
 msgstr "Τοπικός Διακομιστής"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:718
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
 msgid "Starting local server ..."
 msgstr "Ξεκινώντας τοπικό διακομιστή ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "Διωχθήκατε από το παιχνίδι ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1093
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
 msgid "Connecting to local server..."
 msgstr "Σύνδεση με τοπικό διακομιστή..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1104
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
 msgid "Error connecting to server."
 msgstr "Σφάλμα σύνδεσης με τον διακομιστή."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1114
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
 msgid "Connecting to local server timed out. See console for details."
 msgstr "Η σύνδεση σας με τον τοπικό διακομιστή έχει λήξει. Ανατρέξτε στην κονσόλα για λεπτομέρειες."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1183
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
 #: Client/core/CConnectManager.cpp:263
 msgid "Connection timed out"
 msgstr "Λήξη χρόνου σύνδεσης"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1220
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 msgid "Connection with the server was lost"
 msgstr "Η σύνδεση με τον διακομιστή χάθηκε."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
 msgid "Disconnected: unknown protocol error"
 msgstr "Αποσυνδέθηκες: άγνωστο σφάλμα πρωτοκόλλου"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1235
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
 #: Client/core/CConnectManager.cpp:285
 msgid "Disconnected: disconnected remotely"
 msgstr "Αποσυνδέθηκες: αποσυνδέθηκες απομακρυσμένα"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1239
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
 #: Client/core/CConnectManager.cpp:289
 msgid "Disconnected: connection lost remotely"
 msgstr "Αποσυνδέθηκες: χάθηκε η απομακρυσμένη σύνδεση"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
 #: Client/core/CConnectManager.cpp:293
 msgid "Disconnected: you are banned from this server"
 msgstr "Αποσυνδέθηκες: Έχεις αποκλειστεί από αυτό τον διακομιστή"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1247
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
 msgid "Disconnected: the server is currently full"
 msgstr "Αποσύνδεση: ο διακομιστής είναι πλήρης"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
 #: Client/core/CConnectManager.cpp:300
 msgid "Disconnected: disconnected from the server"
 msgstr "Αποσυνδέθηκες: αποσυνδέθηκες από τον διακομιστή"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1255
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
 #: Client/core/CConnectManager.cpp:304
 msgid "Disconnected: connection to the server was lost"
 msgstr "Αποσυνδέθηκες: χάθηκε η σύνδεση με τον διακομιστή"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1259
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1265
 msgid "Disconnected: invalid password specified"
 msgstr "Αποσύνδεση: καθορίστηκε μη έγκυρος κωδικός πρόσβασης"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
 #: Client/core/CConnectManager.cpp:311
 msgid "Disconnected: connection was refused"
 msgstr "Αποσυνδέθηκες: η σύνδεση απορρίφθηκε"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
 msgid "MTA Client verification failed!"
 msgstr "Η επαλήθευση του πρόγραμμα-πελάτη του MTA απέτυχε!"
 
