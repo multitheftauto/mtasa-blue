@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-06-29 22:08+0000\n"
-"PO-Revision-Date: 2023-06-29 23:08\n"
+"PO-Revision-Date: 2023-07-02 09:15\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -91,51 +91,51 @@ msgstr "Multi Theft Auto tidak terpasang dengan benar, mohon instal ulang. %s"
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Buat persimpangan GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA tidak dapat diluncurkan karena telah gagal menyalin sebuah berkas:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA tidak dapat diluncurkan karena ada sebuah berkas MTA:SA yang salah atau hilang:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Salin berkas MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA tidak dapat diluncurkan karena ada sebuah berkas GTA:SA yang salah atau hilang:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Tambal dependensi GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA tidak dapat diluncurkan karena executable GTA:SA (.exe) salah atau hilang:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Mohon untuk memperiksa anti-virus Anda untuk deteksi positif palsu, coba untuk menambahkan sebuah pengecualian untuk executable GTA:SA dan memulai ulang MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Menggenerasi GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA tidak dapat diluncurkan karena executable GTA:SA tidak dapat dimuat:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Menambal GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA tidak dapat diluncurkan karena penambalan GTA:SA telah gagal:"
 
 #: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:763
 #, c-format
@@ -160,14 +160,16 @@ msgstr "Perbarui pengaturan kompatibilitas"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Tidak diketahui"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Berkas '%s' sedang dikunci oleh proses %zu .\n\n"
+"Apakah Anda ingin mengakhiri proses berikut dan melanjutkan pembaharuan?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -175,7 +177,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Instalasi Anda mungkin korup sekarang.\n\n"
+"%zu dari %zu berkas tidak dapat dipulihkan kembali dari cadangannya.\n\n"
+"Anda harus menginstal ulang Multi Theft Auta dari www.multitheftauto.com\n"
+"atau coba untuk melanjankan pembaharuannya dengan hak administrasi."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -317,11 +322,11 @@ msgstr "B - NVidia alternatif"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Intel Standar"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Intel Alternatif"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -547,14 +552,18 @@ msgstr "Berkas utama tidak ditandai. Kemungkinan ada aktivitas virus.\n\n"
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Berkas data %s hilang. Kemungkinan aktifitas virus.\n\n"
+"Pertimbangkan untuk menginstal ulang Multi Theft Auto untuk keamanan Anda.\n"
+"Lihat bantuan online jika MTA tidak berfungsi dengan benar."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Berkas data %s telah diubah. Kemungkinan aktifitas virus.\n\n"
+"Pertimbangkan untuk menginstal ulang Multi Theft Auto untuk keamanan Anda.\n"
+"Lihat bantuan online jika MTA tidak berfungsi dengan benar."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -1225,7 +1234,7 @@ msgstr "Terima Kasih Khusus"
 
 #: Client/core/CCredits.cpp:263
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "Perangkat lunak dan proyek ini menggunakan libraries (.lib) dan perangkat lunak berikut:"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
@@ -1724,7 +1733,7 @@ msgstr "Pilihan bisu"
 
 #: Client/core/CSettings.cpp:574
 msgid "Mute All sounds when minimized"
-msgstr "Bisukan semua suara ketika jendela minimal"
+msgstr "Bisukan semua suara ketika jendela diminimalkan"
 
 #: Client/core/CSettings.cpp:579
 msgid "Mute Radio sounds when minimized"
@@ -1783,7 +1792,7 @@ msgstr "Mode jendela"
 
 #: Client/core/CSettings.cpp:637
 msgid "DPI aware"
-msgstr "DPI kesadaran"
+msgstr "Kesadaran DPI"
 
 #: Client/core/CSettings.cpp:652 Client/core/CSettings.cpp:1595
 msgid "Standard"
@@ -1873,11 +1882,11 @@ msgstr "Asap Ban dll"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Bayangan dinamik ped"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "Gerakan buram"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
@@ -2560,7 +2569,7 @@ msgstr "menampilkan grafik frame waktu"
 
 #: Client/core/CCore.cpp:1363
 msgid "for developers: reload news"
-msgstr ""
+msgstr "untuk developer: muat ulang berita"
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
