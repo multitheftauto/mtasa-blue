@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:48+0000\n"
-"PO-Revision-Date: 2023-07-02 16:57\n"
+"POT-Creation-Date: 2023-07-02 22:39+0000\n"
+"PO-Revision-Date: 2023-07-02 22:56\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -192,7 +192,7 @@ msgstr "Εξαγωγή αρχείων..."
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/loader/Dialogs.cpp:131 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1153
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
@@ -202,7 +202,7 @@ msgid "Yes"
 msgstr "Ναι"
 
 #: Client/loader/Dialogs.cpp:132 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1152 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CMainMenu.cpp:1169 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1370
 #: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
@@ -1318,23 +1318,23 @@ msgstr "To αρχείο ρυθμίσεων αποθηκεύτηκε"
 msgid "* Your serial is: %s"
 msgstr "* Ο σειριακός αριθμός σου είναι: %s"
 
-#: Client/core/CMainMenu.cpp:321
+#: Client/core/CMainMenu.cpp:322
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
 msgstr "Χρησιμοποιείται ένα χαρακτηριστικό τμήμα έκδοσης! Αυτή είναι μια δοκιμαστική έκδοση μόνο για όσους δεν μπορούν να συνδεθούν στους ανοιχτούς διακοσμητές!"
 
-#: Client/core/CMainMenu.cpp:340
+#: Client/core/CMainMenu.cpp:341
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
 msgstr "Το MTA δεν θα δεχτεί αναβάθμισεις σε XP/Vista μετά τον Ιούλιο του 2019.\n\n"
 "Αναβάθμιστε σε windows για να συνεχίζεται να παίζεται στους τελευταίους Διακομιστές."
 
-#: Client/core/CMainMenu.cpp:1146
+#: Client/core/CMainMenu.cpp:1163
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Αυτό θα σας αποσυνδέσει από τον τρέχων διακομιστή.\n\n"
 "Είστε σίγουρος ότι θέλετε να αποσυνδεθείτε;"
 
-#: Client/core/CMainMenu.cpp:1150
+#: Client/core/CMainMenu.cpp:1167
 msgid "DISCONNECT WARNING"
 msgstr "ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΑΠΟΣΥΝΔΕΣΗΣ"
 
