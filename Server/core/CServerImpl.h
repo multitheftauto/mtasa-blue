@@ -67,6 +67,9 @@ public:
     bool HasConsole();
 #endif
 
+    void SetExitCode(int exitCode) { m_exitCode = exitCode; }
+    int  GetExitCode() const { return m_exitCode; }
+
 private:
     void MainLoop();
 
@@ -104,8 +107,10 @@ private:
     double m_dLastTimeMs;
     double m_dPrevOverrun;
 
-    std::vector<std::vector<SString>> m_vecCommandHistory = {{"", ""}};
-    uint                              m_uiSelectedCommandHistoryEntry = 0;
+    int m_exitCode;
+
+    std::vector<std::vector<std::wstring>> m_vecCommandHistory = {{L"", L""}};
+    uint                                   m_uiSelectedCommandHistoryEntry = 0;
 
 #ifdef WIN32
     HANDLE    m_hConsole;

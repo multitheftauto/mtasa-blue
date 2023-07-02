@@ -23,11 +23,15 @@ public:
     void DoPulse();
     bool ProcessPacket(CPacket& Packet);
 
-    void OverrideSyncer(CPed* pPed, CPlayer* pPlayer);
+    void OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist = false);
+
+    void SetSyncerAsPersistent(bool bPersist) { m_bSyncPersist = bPersist; };
+    bool IsSyncerPersistent() { return m_bSyncPersist; };
 
 private:
-    void     Update();
-    void     UpdatePed(CPed* pPed);
+    void     UpdateAllSyncer();
+    void     UpdateSyncer(CPed* pPed);
+    void     UpdateNearPlayersList();
     void     FindSyncer(CPed* pPed);
     CPlayer* FindPlayerCloseToPed(CPed* pPed, float fMaxDistance);
 
@@ -39,5 +43,8 @@ private:
     CPlayerManager* m_pPlayerManager;
     CPedManager*    m_pPedManager;
 
-    CElapsedTime m_UpdateTimer;
+    bool m_bSyncPersist = false;
+
+    CElapsedTime m_UpdateSyncerTimer;
+    CElapsedTime m_UpdateNearListTimer;
 };

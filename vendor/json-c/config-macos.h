@@ -56,6 +56,9 @@
 /* Define to 1 if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H 1
 
+/* Define to 1 if you have the <sys/random.h> header file. */
+#define HAVE_SYS_RANDOM_H
+
 /* Define to 1 if you have the <sys/resource.h> header file. */
 #define HAVE_SYS_RESOURCE_H
 
@@ -70,6 +73,12 @@
 
 /* Define to 1 if you have the <xlocale.h> header file. */
 #define HAVE_XLOCALE_H
+
+/* Define to 1 if you have the <bsd/stdlib.h> header file. */
+/* #undef HAVE_BSD_STDLIB_H */
+
+/* Define to 1 if you have `arc4random' */
+#define HAVE_ARC4RANDOM
 
 /* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
 /* #undef HAVE_DOPRNT */
@@ -140,6 +149,9 @@
 /* Define to 1 if you have the `vsyslog' function. */
 #define HAVE_VSYSLOG 1
 
+/* Define if you have the `getrandom' function. */
+/* #undef HAVE_GETRANDOM */
+
 /* Define if you have the `getrusage' function. */
 #define HAVE_GETRUSAGE
 
@@ -171,7 +183,7 @@
 #define PACKAGE_NAME "json-c"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "json-c 0.15."
+#define PACKAGE_STRING "json-c 0.16."
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "json-c"
@@ -180,7 +192,7 @@
 #define PACKAGE_URL "https://github.com/json-c/json-c"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.15."
+#define PACKAGE_VERSION "0.16."
 
 /* The number of bytes in type int */
 #define SIZEOF_INT 4
@@ -207,7 +219,7 @@
 #define STDC_HEADERS
 
 /* Version number of package */
-#define VERSION "0.15."
+#define VERSION "0.16."
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

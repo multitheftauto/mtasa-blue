@@ -16,7 +16,6 @@
 #include "SString.h"
 #include "SharedUtil.IntTypes.h"
 
-
 struct SHttpRequestOptions
 {
     SHttpRequestOptions() {}
@@ -153,9 +152,9 @@ inline SHttpRequestOptionsTx::SHttpRequestOptionsTx(const SHttpRequestOptions& i
 
 struct SDownloadStatus
 {
-    uint uiAttemptNumber = 0;   // 0=Queued 1+=Downloading
-    uint uiContentLength = 0;   // Item total size. Will be 0 if http header 'Content-Length' is missing
-    uint uiBytesReceived = 0;   // Download progress
+    uint uiAttemptNumber = 0;            // 0=Queued 1+=Downloading
+    uint uiContentLength = 0;            // Item total size. Will be 0 if http header 'Content-Length' is missing
+    uint uiBytesReceived = 0;            // Download progress
 };
 
 // PFN_DOWNLOAD_FINISHED_CALLBACK is called once at the end of the download.

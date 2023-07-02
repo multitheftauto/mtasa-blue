@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCameraSA.h"
+#include "CEntitySA.h"
+#include "COffsets.h"
+#include "CSettingsSA.h"
+#include "CWeatherSA.h"
+#include "CGameSA.h"
 
 void COffsets::Initialize10EU()
 {
@@ -47,51 +53,36 @@ void COffsets::Initialize11()
 {
     CGameSA::VAR_SystemTime = (unsigned long*)0xB7CB84;
     CGameSA::VAR_IsAtMenu = (unsigned long*)0xBA677B;
-    CGameSA::VAR_IsGameLoaded = (unsigned long*)0x86969C;
-    CGameSA::VAR_GamePaused = (bool*)0xB7CB49;
     CGameSA::VAR_IsForegroundWindow = (bool*)0x8D621C;
     CGameSA::VAR_SystemState = (unsigned long*)0xC8FC80;            // 1.01
-    CGameSA::VAR_StartGame = (void*)0x869641;
-    CGameSA::VAR_IsNastyGame = (bool*)0x68DD68;
     CGameSA::VAR_TimeScale = (float*)0xB7CB64;
     CGameSA::VAR_FPS = (float*)0xB7CB50;
     CGameSA::VAR_OldTimeStep = (float*)0xB7CB54;
     CGameSA::VAR_TimeStep = (float*)0xB7CB5C;
     CGameSA::VAR_Framelimiter = (unsigned long*)0xC1704C;
 
-    CWeatherSA::VAR_CurrentWeather = (unsigned char*)0xC81318;
-    CWeatherSA::VAR_CurrentWeather_b = (unsigned char*)0xC81320;
-    CWeatherSA::VAR_CurrentWeather_c = (unsigned char*)0xC8131C;
-    CWeatherSA::VAR_AmountOfRain = (float*)0x0C81324;
-    CWeatherSA::FUNC_IsRaining = 0x4ABF50;
-}
-
-void COffsets::Initialize20()
-{
-    // TODO
+    CWeatherSA::VAR_CWeather__ForcedWeatherType = (unsigned char*)0xC81318;
+    CWeatherSA::VAR_CWeather__OldWeatherType = (unsigned char*)0xC81320;
+    CWeatherSA::VAR_CWeather__NewWeatherType = (unsigned char*)0xC8131C;
+    CWeatherSA::VAR_CWeather__Rain = (float*)0xC81324;
 }
 
 void COffsets::InitializeCommon10()
 {
     CGameSA::VAR_SystemTime = (unsigned long*)0xB7CB84;
     CGameSA::VAR_IsAtMenu = (unsigned long*)0xBA677B;
-    CGameSA::VAR_IsGameLoaded = (unsigned long*)0x86969C;
-    CGameSA::VAR_GamePaused = (bool*)0xB7CB49;
     CGameSA::VAR_IsForegroundWindow = (bool*)0x8D621C;
     CGameSA::VAR_SystemState = (unsigned long*)0xC8D4C0;
-    CGameSA::VAR_StartGame = (void*)0x869641;
-    CGameSA::VAR_IsNastyGame = (bool*)0x68DD68;
     CGameSA::VAR_TimeScale = (float*)0xB7CB64;
     CGameSA::VAR_FPS = (float*)0xB7CB50;
     CGameSA::VAR_OldTimeStep = (float*)0xB7CB54;
     CGameSA::VAR_TimeStep = (float*)0xB7CB5C;
     CGameSA::VAR_Framelimiter = (unsigned long*)0xC1704C;
 
-    CWeatherSA::VAR_CurrentWeather = (unsigned char*)0xC81318;
-    CWeatherSA::VAR_CurrentWeather_b = (unsigned char*)0xC81320;
-    CWeatherSA::VAR_CurrentWeather_c = (unsigned char*)0xC8131C;
-    CWeatherSA::VAR_AmountOfRain = (float*)0x0C81324;
-    CWeatherSA::FUNC_IsRaining = 0x4ABF50;
+    CWeatherSA::VAR_CWeather__ForcedWeatherType = (unsigned char*)0xC81318;
+    CWeatherSA::VAR_CWeather__OldWeatherType = (unsigned char*)0xC81320;
+    CWeatherSA::VAR_CWeather__NewWeatherType = (unsigned char*)0xC8131C;
+    CWeatherSA::VAR_CWeather__Rain = (float*)0xC81324;
 
     CSettingsSA::FUNC_SetCurrentVideoMode = 0x745C70;            // may not be common?
 

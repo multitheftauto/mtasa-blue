@@ -8,12 +8,11 @@
  *
  *****************************************************************************/
 
-class CClientSoundManager;
-
 #pragma once
 
 #include <list>
 #include <bass.h>
+#include <game/CAudioContainer.h>
 #include "CClientSound.h"
 
 class CClientSoundManager

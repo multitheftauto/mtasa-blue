@@ -54,12 +54,10 @@ void CElementRPCs::LoadFunctions()
 #define RUN_CHILDREN_SERVER(func) \
     if (pSource->CountChildren() && pSource->IsCallPropagationEnabled()) \
     { \
-        CElementListSnapshot* pList = pSource->GetChildrenListSnapshot(); \
-        pList->AddRef(); /* Keep list alive during use */ \
+        CElementListSnapshotRef pList = pSource->GetChildrenListSnapshot(); \
         for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++) \
             if (!(*iter)->IsBeingDeleted() && !(*iter)->IsLocalEntity()) \
                 func; \
-        pList->Release(); \
     }
 
 void CElementRPCs::SetElementParent(CClientEntity* pSource, NetBitStreamInterface& bitStream)
@@ -445,7 +443,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTPED:
         case CCLIENTPLAYER:
         {
-            CClientPed* pPed = static_cast<CClientPed*>(pSource);
+            CClientPed*          pPed = static_cast<CClientPed*>(pSource);
             const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetModel());
 
             if (usCurrentModel != usModel)
@@ -471,7 +469,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
                 bitStream.Read(ucVariant2);
             }
 
-            CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
+            CClientVehicle*      pVehicle = static_cast<CClientVehicle*>(pSource);
             const unsigned short usCurrentModel = pVehicle->GetModel();
 
             if (usCurrentModel != usModel)
@@ -490,7 +488,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            CClientObject* pObject = static_cast<CClientObject*>(pSource);
+            CClientObject*       pObject = static_cast<CClientObject*>(pSource);
             const unsigned short usCurrentModel = pObject->GetModel();
 
             if (usCurrentModel != usModel)

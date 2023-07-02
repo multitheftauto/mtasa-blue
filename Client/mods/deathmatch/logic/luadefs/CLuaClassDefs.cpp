@@ -248,13 +248,13 @@ int CLuaClassDefs::ToString(lua_State* luaVM)
 
 const char* CLuaClassDefs::GetObjectClass(void* pObject)
 {
-    if (CClientEntity* pEntity = UserDataCast<CClientEntity>((CClientEntity*)NULL, pObject, NULL))
+    if (CClientEntity* pEntity = UserDataCast((CClientEntity*)pObject, NULL))
         return GetEntityClass(pEntity);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pObject, NULL))
+    else if (CResource* pResource = UserDataCast((CResource*)pObject, NULL))
         return GetResourceClass(pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pObject, NULL))
+    else if (CXMLNode* pNode = UserDataCast((CXMLNode*)pObject, NULL))
         return GetXmlNodeClass(pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pObject, NULL))
+    else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pObject, NULL))
         return GetTimerClass(pTimer);
     return NULL;
 }
@@ -356,6 +356,8 @@ const char* CLuaClassDefs::GetEntityClass(CClientEntity* pEntity)
             return "EngineCOL";
         case CCLIENTTXD:
             return "EngineTXD";
+        case CCLIENTIMG:
+            return "EngineIMG";
         case CCLIENTSOUND:
             return static_cast<CClientSound*>(pEntity)->IsSound3D() ? "Sound3D" : "Sound";
         case CCLIENTWATER:

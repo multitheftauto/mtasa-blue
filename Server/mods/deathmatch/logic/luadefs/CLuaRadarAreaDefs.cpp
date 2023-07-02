@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaRadarAreaDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaRadarAreaDefs::LoadFunctions()
 {

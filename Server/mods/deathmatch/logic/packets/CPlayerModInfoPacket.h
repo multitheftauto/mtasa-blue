@@ -9,6 +9,10 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "CPacket.h"
+
 struct SModInfoItem
 {
     ushort  usId;

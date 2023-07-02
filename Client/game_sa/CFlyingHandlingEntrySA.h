@@ -11,8 +11,8 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CFlyingHandlingEntry.h>
-#include "Common.h"
 
 struct tFlyingHandlingDataSA
 {

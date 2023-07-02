@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
+#include "CRPCFunctions.h"
+#include <net/rpc_enums.h>
 
 DECLARE_ENUM(eElementRPCFunctions);
 IMPLEMENT_ENUM_BEGIN(eElementRPCFunctions)
@@ -220,6 +223,7 @@ ADD_ENUM1(REMOVE_COLPOLYGON_POINT)
 ADD_ENUM1(UPDATE_COLPOLYGON_POINT)
 ADD_ENUM1(SET_DISCORD_JOIN_PARAMETERS)
 ADD_ENUM1(SET_COLPOLYGON_HEIGHT)
+ADD_ENUM1(SET_OBJECT_BREAKABLE)
 IMPLEMENT_ENUM_END("eElementRPCFunctions")
 
 DECLARE_ENUM(CRPCFunctions::eRPCFunctions);

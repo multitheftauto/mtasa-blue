@@ -4,13 +4,13 @@ premake.modules.install_unifont = {}
 
 -- Config variables
 local UNIFONT_BASEURL = "https://github.com/multitheftauto/unifont/releases/download/"
-local UNIFONT_DOWNLOAD_FILENAME = "unifont-13.0.04.ttf"
+local UNIFONT_DOWNLOAD_FILENAME = "unifont-15.0.06.ttf"
 local UNIFONT_FILENAME = "unifont.ttf"
 local UNIFONT_PATH = "Shared/data/MTA San Andreas/MTA/cgui"
 
 -- Change these to update the version
-local UNIFONT_TAG = "v13.0.04"
-local UNIFONT_HASH = "a74c124f25c25ee588c3e8436781d93f181d049ea838ea8eb97e85cd9266c2b1"
+local UNIFONT_TAG = "v15.0.06"
+local UNIFONT_HASH = "9282b6eff54eeca2e7f58c9a40a91049bd219f3e6a45fbee8eba013379b9af3a"
 
 newaction {
 	trigger = "install_unifont",
@@ -27,14 +27,17 @@ newaction {
 		-- Download Unifont
 		print("Downloading Unifont...")
 		if not http.download_print_errors(UNIFONT_BASEURL..UNIFONT_TAG.."/"..UNIFONT_DOWNLOAD_FILENAME, archive_path) then
+			os.exit(1)
 			return
 		end
 
 		-- Check downloaded file hash
-		if os.sha256_file(archive_path) ~= UNIFONT_HASH then
-			print("Unifont hash mismatch!")
+		local download_hash = os.sha256_file(archive_path)
+		if download_hash ~= UNIFONT_HASH then
+			errormsg("ERROR: Unifont hash mismatch!", ("\nExpected %s, got %s"):format(UNIFONT_HASH, download_hash))
 			-- Delete bad file
 			os.remove(archive_path)
+			os.exit(1)
 			return
 		end
 

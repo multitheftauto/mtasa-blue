@@ -10,10 +10,11 @@
 
 #include "StdInc.h"
 
+#include <../game_sa/CAnimBlendAssocGroupSA.h>
+#include <../game_sa/CAnimBlendAssociationSA.h>
 #include <../game_sa/CAnimBlendHierarchySA.h>
 #include <../game_sa/CAnimBlendStaticAssociationSA.h>
-#include <../game_sa/CAnimBlendAssociationSA.h>
-#include <../game_sa/CAnimBlendAssocGroupSA.h>
+#include <../game_sa/CAnimManagerSA.h>
 
 DWORD FUNC_CAnimBlendAssociation__ReferenceAnimBlock = 0x4CEA50;
 DWORD FUNC_UncompressAnimation = 0x4D41C0;

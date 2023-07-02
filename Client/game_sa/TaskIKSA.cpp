@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEntitySA.h"
+#include "CGameSA.h"
+#include "CTaskManagementSystemSA.h"
+#include "TaskIKSA.h"
 
 extern CGameSA* pGame;
 
@@ -18,10 +22,10 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, 
 {
     DWORD dwFunc = FUNC_CTaskSimpleIKChain__Constructor;
     // TODO: Find out the real size
-    this->CreateTaskInterface(1024);
+    CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwEntityInterface = 0;
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();
@@ -53,10 +57,10 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
 {
     DWORD dwFunc = FUNC_CTaskSimpleIKLookAt__Constructor;
     // TODO: Find out the real size
-    this->CreateTaskInterface(1024);
+    CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwEntityInterface = 0;
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();
@@ -81,12 +85,12 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
 
 CTaskSimpleIKManagerSA::CTaskSimpleIKManagerSA()
 {
-    this->m_pTaskManagementSystem = (CTaskManagementSystemSA*)(pGame->GetTaskManagementSystem());
+    m_pTaskManagementSystem = pGame->GetTaskManagementSystem();
 }
 
 int CTaskSimpleIKManagerSA::AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int slotID)
 {
-    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)this->GetInterface();
+    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)GetInterface();
     if (!pInterface->m_pIKChainTasks[slotID])
     {
         pInterface->m_pIKChainTasks[slotID] = (CTaskSimpleIKChainSAInterface*)(pIKChainTask->GetInterface());
@@ -105,7 +109,7 @@ int CTaskSimpleIKManagerSA::AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int
 
 void CTaskSimpleIKManagerSA::RemoveIKChainTask(int slotID)
 {
-    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)this->GetInterface();
+    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)GetInterface();
     if (pInterface->m_pIKChainTasks[slotID])
     {
         // Grab the task
@@ -123,13 +127,13 @@ void CTaskSimpleIKManagerSA::BlendOut(int slotID, int blendOutTime)
 
 unsigned char CTaskSimpleIKManagerSA::IsSlotEmpty(int slotID)
 {
-    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)this->GetInterface();
+    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)GetInterface();
     return (!pInterface->m_pIKChainTasks[slotID]);
 }
 
 CTaskSimpleIKChain* CTaskSimpleIKManagerSA::GetTaskAtSlot(int slotID)
 {
-    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)this->GetInterface();
+    CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)GetInterface();
     if (pInterface->m_pIKChainTasks[slotID])
     {
         // Grab the task
@@ -145,10 +149,10 @@ CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int tim
 {
     DWORD dwFunc = FUNC_CTaskSimpleTriggerLookAt__Constructor;
     // TODO: Find out the real size
-    this->CreateTaskInterface(1024);
+    CreateTaskInterface(1024);
     if (!IsValid())
         return;
-    DWORD dwThisInterface = (DWORD)this->GetInterface();
+    DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwEntityInterface = 0;
     if (pEntity)
         dwEntityInterface = (DWORD)pEntity->GetInterface();

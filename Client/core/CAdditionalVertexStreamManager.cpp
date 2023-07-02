@@ -328,7 +328,7 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
         for (uint i = 0; i < NumVerts; i++)
         {
             // Validate
-            CVector& Normal = NormalList[i];
+            CVector&               Normal = NormalList[i];
             static constexpr float FLOAT_EPSILON = 0.0001f;
             if (Normal.Normalize() < FLOAT_EPSILON)
                 Normal = CVector(0, 0, 1);

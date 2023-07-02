@@ -7,7 +7,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CGameSA.h"
 #include "gamesa_renderware.h"
+
+extern CGameSA* pGame;
 
 namespace
 {

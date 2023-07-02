@@ -10,7 +10,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaResourceDefs.h"
+#include "lua/CLuaShared.h"
 #include "../utils/CFunctionUseLogger.h"
+#include "CAclRightName.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
+#include "CResourceConfigItem.h"
+#include "CDummy.h"
+#include "Utils.h"
 
 extern CNetServer* g_pRealNetServer;
 

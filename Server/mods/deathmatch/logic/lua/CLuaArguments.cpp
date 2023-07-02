@@ -10,6 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaArguments.h"
+#include "CLuaMain.h"
+#include "CGame.h"
+#include "CScriptDebugging.h"
+#include "CPerfStatManager.h"
+#include "CDatabaseManager.h"
+#include "CBan.h"
+#include "CAccount.h"
+#include "CAccessControlList.h"
+#include "CAccessControlListGroup.h"
 
 #ifndef WIN32
 #include <clocale>
@@ -58,7 +68,7 @@ void CLuaArguments::CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<C
     pKnownTables->insert(std::make_pair((CLuaArguments*)&Arguments, (CLuaArguments*)this));
 
     // Copy all the arguments
-    vector<CLuaArgument*>::const_iterator iter = Arguments.m_Arguments.begin();
+    std::vector<CLuaArgument*>::const_iterator iter = Arguments.m_Arguments.begin();
     for (; iter != Arguments.m_Arguments.end(); ++iter)
     {
         CLuaArgument* pArgument = new CLuaArgument(**iter, pKnownTables);
@@ -132,7 +142,7 @@ void CLuaArguments::ReadArgument(lua_State* luaVM, int iIndex)
 void CLuaArguments::PushArguments(lua_State* luaVM) const
 {
     // Push all our arguments
-    vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
+    std::vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); ++iter)
     {
         (*iter)->Push(luaVM);
@@ -167,7 +177,7 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     lua_pop(luaVM, 1);
     pKnownTables->insert(std::make_pair((CLuaArguments*)this, size));
 
-    vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
+    std::vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end() && (iter + 1) != m_Arguments.end(); ++iter)
     {
         (*iter)->Push(luaVM, pKnownTables);            // index
@@ -187,7 +197,7 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
 
 void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 {
-    vector<CLuaArgument*>::const_iterator iter = Arguments.IterBegin();
+    std::vector<CLuaArgument*>::const_iterator iter = Arguments.IterBegin();
     for (; iter != Arguments.IterEnd(); ++iter)
     {
         CLuaArgument* pArgument = new CLuaArgument(**iter);

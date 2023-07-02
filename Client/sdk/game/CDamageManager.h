@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <windows.h>
-
 // Not sure if R* used these
 #define DT_ENGINE_OK                    (0)
 #define DT_ENGINE_RADIATOR_BURST        (100)
@@ -91,7 +89,6 @@ enum eWheelPosition
     REAR_RIGHT_WHEEL,
 
     MAX_WHEELS
-
 };
 
 enum ePanels
@@ -128,21 +125,21 @@ class CDamageManager
 {
 public:
     virtual BYTE          GetEngineStatus() = 0;
-    virtual VOID          SetEngineStatus(BYTE bEngineState) = 0;
+    virtual void          SetEngineStatus(BYTE bEngineState) = 0;
     virtual BYTE          GetDoorStatus(eDoors bDoor) = 0;
-    virtual VOID          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent) = 0;
+    virtual void          SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent) = 0;
     virtual BYTE          GetWheelStatus(eWheelPosition bTire) = 0;
-    virtual VOID          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
+    virtual void          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
     virtual BYTE          GetPanelStatus(BYTE bPanel) = 0;
     virtual unsigned long GetPanelStatus() = 0;
-    virtual VOID          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus) = 0;
+    virtual void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus) = 0;
     virtual void          SetPanelStatus(unsigned long ulStatus) = 0;
     virtual BYTE          GetLightStatus(BYTE bLight) = 0;
     virtual unsigned char GetLightStatus() = 0;
-    virtual VOID          SetLightStatus(BYTE bLight, BYTE bLightStatus) = 0;
+    virtual void          SetLightStatus(BYTE bLight, BYTE bLightStatus) = 0;
     virtual void          SetLightStatus(unsigned char ucStatus) = 0;
     virtual BYTE          GetAeroplaneCompStatus(BYTE CompID) = 0;
-    virtual VOID          SetAeroplaneCompStatus(BYTE CompID, BYTE Status) = 0;            // component ids begin at 12 - probably
+    virtual void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status) = 0;            // component ids begin at 12 - probably
 
-    virtual VOID FuckCarCompletely(BOOL bKeepWheels) = 0;
+    virtual void FuckCarCompletely(bool bKeepWheels) = 0;
 };

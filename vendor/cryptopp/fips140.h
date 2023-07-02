@@ -17,7 +17,7 @@
 NAMESPACE_BEGIN(CryptoPP)
 
 /// Exception thrown when a crypto algorithm is used after a self test fails
-/// \details The self tests for an algorithm are performed by Algortihm class
+/// \details The self tests for an algorithm are performed by Algorithm class
 ///   when CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2 is defined.
 class CRYPTOPP_DLL SelfTestFailure : public Exception
 {
@@ -26,7 +26,7 @@ public:
 };
 
 /// \brief Determines whether the library provides FIPS validated cryptography
-/// \returns true if FIPS 140-2 validated features were enabled at compile time.
+/// \return true if FIPS 140-2 validated features were enabled at compile time.
 /// \details true if FIPS 140-2 validated features were enabled at compile time,
 ///   false otherwise.
 /// \note FIPS mode is enabled at compile time. A program or other module cannot
@@ -51,7 +51,7 @@ enum PowerUpSelfTestStatus {
 /// \param expectedModuleMac the expected MAC of the components protected by the integrity check
 /// \details Performs the power-up self test, and sets the self test status to
 ///   POWER_UP_SELF_TEST_PASSED or POWER_UP_SELF_TEST_FAILED.
-/// \details The self tests for an algorithm are performed by the Algortihm class
+/// \details The self tests for an algorithm are performed by the Algorithm class
 ///   when CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2 is defined.
 CRYPTOPP_DLL void CRYPTOPP_API DoPowerUpSelfTest(const char *moduleFilename, const byte *expectedModuleMac);
 
@@ -59,7 +59,7 @@ CRYPTOPP_DLL void CRYPTOPP_API DoPowerUpSelfTest(const char *moduleFilename, con
 /// \details Performs the power-up self test using the filename of this DLL and the
 ///   embedded module MAC, and sets the self test status to POWER_UP_SELF_TEST_PASSED or
 ///   POWER_UP_SELF_TEST_FAILED.
-/// \details The self tests for an algorithm are performed by the Algortihm class
+/// \details The self tests for an algorithm are performed by the Algorithm class
 ///   when CRYPTOPP_ENABLE_COMPLIANCE_WITH_FIPS_140_2 is defined.
 CRYPTOPP_DLL void CRYPTOPP_API DoDllPowerUpSelfTest();
 
@@ -68,7 +68,7 @@ CRYPTOPP_DLL void CRYPTOPP_API DoDllPowerUpSelfTest();
 CRYPTOPP_DLL void CRYPTOPP_API SimulatePowerUpSelfTestFailure();
 
 /// \brief Provides the current power-up self test status
-/// \returns the current power-up self test status
+/// \return the current power-up self test status
 CRYPTOPP_DLL PowerUpSelfTestStatus CRYPTOPP_API GetPowerUpSelfTestStatus();
 
 #ifndef CRYPTOPP_DOXYGEN_PROCESSING
@@ -76,15 +76,15 @@ typedef PowerUpSelfTestStatus (CRYPTOPP_API * PGetPowerUpSelfTestStatus)();
 #endif
 
 /// \brief Class object that calculates the MAC on the module
-/// \returns the MAC for the module
+/// \return the MAC for the module
 CRYPTOPP_DLL MessageAuthenticationCode * CRYPTOPP_API NewIntegrityCheckingMAC();
 
 /// \brief Verifies the MAC on the module
 /// \param moduleFilename the fully qualified name of the module
 /// \param expectedModuleMac the expected MAC of the components protected by the integrity check
 /// \param pActualMac the actual MAC of the components calculated by the integrity check
-/// \param pMacFileLocation the offest of the MAC in the PE/PE+ module
-/// \returns true if the MAC is valid, false otherwise
+/// \param pMacFileLocation the offset of the MAC in the PE/PE+ module
+/// \return true if the MAC is valid, false otherwise
 CRYPTOPP_DLL bool CRYPTOPP_API IntegrityCheckModule(const char *moduleFilename, const byte *expectedModuleMac, SecByteBlock *pActualMac = NULLPTR, unsigned long *pMacFileLocation = NULLPTR);
 
 #ifndef CRYPTOPP_DOXYGEN_PROCESSING

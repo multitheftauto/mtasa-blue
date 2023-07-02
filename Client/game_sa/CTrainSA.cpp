@@ -9,3 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTrainSA.h"
+
+CTrainSA::CTrainSA(CTrainSAInterface* pInterface)
+{
+    SetInterface(pInterface);
+    Init();
+}

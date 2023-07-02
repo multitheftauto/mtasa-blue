@@ -4,7 +4,7 @@
  *
  *   FreeType Cache subsystem (specification).
  *
- * Copyright (C) 1996-2020 by
+ * Copyright (C) 1996-2023 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -86,8 +86,8 @@ FT_BEGIN_HEADER
    *   later use @FTC_CMapCache_Lookup to perform the equivalent of
    *   @FT_Get_Char_Index, only much faster.
    *
-   *   If you want to use the @FT_Glyph caching, call @FTC_ImageCache, then
-   *   later use @FTC_ImageCache_Lookup to retrieve the corresponding
+   *   If you want to use the @FT_Glyph caching, call @FTC_ImageCache_New,
+   *   then later use @FTC_ImageCache_Lookup to retrieve the corresponding
    *   @FT_Glyph objects from the cache.
    *
    *   If you need lots of small bitmaps, it is much more memory efficient to
@@ -424,7 +424,7 @@ FT_BEGIN_HEADER
    *   pixel ::
    *     A Boolean.  If 1, the `width` and `height` fields are interpreted as
    *     integer pixel character sizes.  Otherwise, they are expressed as
-   *     1/64th of points.
+   *     1/64 of points.
    *
    *   x_res ::
    *     Only used when `pixel` is value~0 to indicate the horizontal

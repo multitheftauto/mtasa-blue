@@ -11,7 +11,7 @@
 #pragma once
 
 #include <core/CAjaxResourceHandlerInterface.h>
-#include <cef3/include/cef_resource_handler.h>
+#include <cef3/cef/include/cef_resource_handler.h>
 #include <SString.h>
 
 class CWebView;

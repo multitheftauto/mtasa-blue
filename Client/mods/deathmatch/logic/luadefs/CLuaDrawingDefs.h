@@ -41,9 +41,9 @@ public:
         const std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak, const std::optional<bool> optColorCoded);
 
     static inline CLuaMultiReturn<float, float> DxGetTextSize(std::string text, std::optional<float> optWidth,
-                                                         std::optional<std::variant<CVector2D, float>>          optScaleXY,
-                                                         std::optional<std::variant<CClientDxFont*, eFontType>> optFont, std::optional<bool> optWordBreak,
-                                                         std::optional<bool> optColorCoded)
+                                                              std::optional<std::variant<CVector2D, float>>          optScaleXY,
+                                                              std::optional<std::variant<CClientDxFont*, eFontType>> optFont, std::optional<bool> optWordBreak,
+                                                              std::optional<bool> optColorCoded)
     {
         const auto size = OOP_DxGetTextSize(std::move(optFont.value_or(FONT_DEFAULT)), std::move(text), std::move(optWidth), std::move(optScaleXY),
                                             std::move(optWordBreak), std::move(optColorCoded));

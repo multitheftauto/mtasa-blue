@@ -69,6 +69,8 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"guiMemoSetCaratIndex", CLuaGUIDefs::GUIMemoSetCaretIndex},
         {"setControlState", CLuaPedDefs::SetPedControlState},
         {"getControlState", CLuaPedDefs::GetPedControlState},
+        {"setCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::SetCameraDrunkLevel>},
+        {"getCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::GetCameraDrunkLevel>},
     };
 
     // Add functions

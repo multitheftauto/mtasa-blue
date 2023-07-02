@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CBanManager.h"
+#include "CBan.h"
+#include "CGame.h"
+#include "CMapManager.h"
+#include "CIdArray.h"
+#include "Utils.h"
+
 bool CBanManager::ms_bSaveRequired = false;
 
 CBanManager::CBanManager()

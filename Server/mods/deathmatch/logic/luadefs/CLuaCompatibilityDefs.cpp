@@ -8,6 +8,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaCompatibilityDefs.h"
+#include "CLuaElementDefs.h"
+#include "CLuaVehicleDefs.h"
+#include "CLuaPedDefs.h"
+#include "CLuaPlayerDefs.h"
+#include "luadefs/CLuaXMLDefs.h"
 #include <lua/CLuaFunctionParser.h>
 
 void CLuaCompatibilityDefs::LoadFunctions()
@@ -74,7 +80,14 @@ void CLuaCompatibilityDefs::LoadFunctions()
         // Deprecated since 1.5.5-9.13846
         {"doesPedHaveJetPack", CLuaPedDefs::DoesPedHaveJetPack},
         {"givePedJetPack", CLuaPedDefs::GivePedJetPack},
-        {"removePedJetPack", CLuaPedDefs::RemovePedJetPack}
+        {"removePedJetPack", CLuaPedDefs::RemovePedJetPack},
+
+        // Old Discord implementation (see #2499)
+        {"setPlayerDiscordJoinParams",
+         [](lua_State* luaVM) -> int {
+             lua_pushboolean(luaVM, false);
+             return 1;
+         }},
     };
 
     // Add functions

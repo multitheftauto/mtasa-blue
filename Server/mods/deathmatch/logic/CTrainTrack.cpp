@@ -8,6 +8,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTrainTrack.h"
+#include "CTrainTrackManager.h"
+#include "CVehicleManager.h"
+#include "CGame.h"
 
 CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
     : CElement(pParent), m_pManager(pManager)

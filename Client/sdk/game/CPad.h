@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include <windows.h>
-
 // Set values to 128 unless otherwise specified
 class CControllerState
 {
@@ -56,16 +54,13 @@ class CPad
 public:
     virtual CControllerState* GetCurrentControllerState(CControllerState* ControllerState) = 0;
     virtual CControllerState* GetLastControllerState(CControllerState* ControllerState) = 0;
-    virtual VOID              SetCurrentControllerState(CControllerState* ControllerState) = 0;
-    virtual VOID              SetLastControllerState(CControllerState* ControllerState) = 0;
-    virtual VOID              Restore() = 0;
-    virtual VOID              Store() = 0;
+    virtual void              SetCurrentControllerState(CControllerState* ControllerState) = 0;
+    virtual void              SetLastControllerState(CControllerState* ControllerState) = 0;
+    virtual void              Restore() = 0;
+    virtual void              Store() = 0;
     virtual bool              IsEnabled() = 0;
-    virtual VOID              Disable(bool bDisable) = 0;
-    virtual VOID              Clear() = 0;
-    virtual VOID              SetHornHistoryValue(bool value) = 0;
-    virtual long              GetAverageWeapon() = 0;
+    virtual void              Disable(bool bDisable) = 0;
+    virtual void              Clear() = 0;
+    virtual void              SetHornHistoryValue(bool value) = 0;
     virtual void              SetLastTimeTouched(DWORD dwTime) = 0;
-    virtual uint              GetDrunkInputDelay() = 0;
-    virtual void              SetDrunkInputDelay(uint inputDelay) = 0;
 };

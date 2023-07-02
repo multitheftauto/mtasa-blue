@@ -80,6 +80,7 @@ void COMMAND_Debug(const char* szCmdLine);
 void COMMAND_Debug2(const char* szCmdLine);
 void COMMAND_Debug3(const char* szCmdLine);
 void COMMAND_Debug4(const char* szCmdLine);
+void COMMAND_TimeStep(const char* szCmdLine);
 #endif
 
 // Commands enabled when development mode in on

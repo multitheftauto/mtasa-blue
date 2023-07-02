@@ -12,6 +12,8 @@
    through scripting functions.
 */
 #include <StdInc.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 
 #define CS_NAN -32768
 
@@ -234,13 +236,13 @@ void CClientPad::DoPulse(CClientPed* pPed)
             {
                 cs.ButtonCircle = (m_fStates[0]) ? 255 : 0;            // Fire
 
-                cs.LeftStickY =
-                    (short)(((m_fStates[3] && m_fStates[4]) || (!m_fStates[3] && !m_fStates[4])) ? 0
-                                                                                                 : (m_fStates[3]) ? m_fStates[3] * -128 : m_fStates[4] * 128);
+                cs.LeftStickY = (short)(((m_fStates[3] && m_fStates[4]) || (!m_fStates[3] && !m_fStates[4])) ? 0
+                                        : (m_fStates[3])                                                     ? m_fStates[3] * -128
+                                                                                                             : m_fStates[4] * 128);
 
-                cs.LeftStickX =
-                    (short)(((m_fStates[5] && m_fStates[6]) || (!m_fStates[5] && !m_fStates[6])) ? 0
-                                                                                                 : (m_fStates[5]) ? m_fStates[5] * -128 : m_fStates[6] * 128);
+                cs.LeftStickX = (short)(((m_fStates[5] && m_fStates[6]) || (!m_fStates[5] && !m_fStates[6])) ? 0
+                                        : (m_fStates[5])                                                     ? m_fStates[5] * -128
+                                                                                                             : m_fStates[6] * 128);
 
                 cs.ButtonTriangle = (m_fStates[9]) ? 255 : 0;            // Get in/out and alternative fighting styles
 
@@ -263,13 +265,13 @@ void CClientPad::DoPulse(CClientPed* pPed)
                 cs.ButtonCircle = (m_fStates[17]) ? 255 : 0;            // Fire
 
                 cs.LeftShoulder1 = (m_fStates[18]) ? 255 : 0;            // Secondary Fire
-                cs.LeftStickX = (short)(((m_fStates[19] && m_fStates[20]) || (!m_fStates[19] && !m_fStates[20]))
-                                            ? 0
-                                            : (m_fStates[19]) ? m_fStates[19] * -128 : m_fStates[20] * 128);
+                cs.LeftStickX = (short)(((m_fStates[19] && m_fStates[20]) || (!m_fStates[19] && !m_fStates[20])) ? 0
+                                        : (m_fStates[19])                                                        ? m_fStates[19] * -128
+                                                                                                                 : m_fStates[20] * 128);
 
-                cs.LeftStickY = (short)(((m_fStates[21] && m_fStates[22]) || (!m_fStates[21] && !m_fStates[22]))
-                                            ? 0
-                                            : (m_fStates[21]) ? m_fStates[21] * -128 : m_fStates[22] * 128);
+                cs.LeftStickY = (short)(((m_fStates[21] && m_fStates[22]) || (!m_fStates[21] && !m_fStates[22])) ? 0
+                                        : (m_fStates[21])                                                        ? m_fStates[21] * -128
+                                                                                                                 : m_fStates[22] * 128);
 
                 cs.ButtonCross = (short)((m_fStates[23] * 255));            // Accelerate
 
@@ -283,13 +285,13 @@ void CClientPad::DoPulse(CClientPed* pPed)
 
                 cs.RightShoulder2 = (m_fStates[32] || m_fStates[33]) ? 255 : 0;            // Look Right
 
-                cs.RightStickX = (short)(((m_fStates[35] && m_fStates[36]) || (!m_fStates[35] && !m_fStates[36]))
-                                             ? 0
-                                             : (m_fStates[35]) ? m_fStates[35] * 128 : m_fStates[36] * -128);
+                cs.RightStickX = (short)(((m_fStates[35] && m_fStates[36]) || (!m_fStates[35] && !m_fStates[36])) ? 0
+                                         : (m_fStates[35])                                                        ? m_fStates[35] * 128
+                                                                                                                  : m_fStates[36] * -128);
 
-                cs.RightStickY = (short)(((m_fStates[37] && m_fStates[38]) || (!m_fStates[37] && !m_fStates[38]))
-                                             ? 0
-                                             : (m_fStates[37]) ? m_fStates[37] * 128 : m_fStates[38] * -128);
+                cs.RightStickY = (short)(((m_fStates[37] && m_fStates[38]) || (!m_fStates[37] && !m_fStates[38])) ? 0
+                                         : (m_fStates[37])                                                        ? m_fStates[37] * 128
+                                                                                                                  : m_fStates[38] * -128);
             }
         }
         pPed->SetControllerState(cs);
@@ -702,37 +704,37 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
     {
         unsigned int uiIndex = 0;
 
-        ProcessControl(cs.LeftStickX, uiIndex); // Left
+        ProcessControl(cs.LeftStickX, uiIndex);            // Left
         uiIndex++;
-        ProcessControl(cs.LeftStickX, uiIndex); // Right
+        ProcessControl(cs.LeftStickX, uiIndex);            // Right
         uiIndex++;
-        ProcessControl(cs.LeftStickY, uiIndex); // Up
+        ProcessControl(cs.LeftStickY, uiIndex);            // Up
         uiIndex++;
-        ProcessControl(cs.LeftStickY, uiIndex); // Down
+        ProcessControl(cs.LeftStickY, uiIndex);            // Down
     }
     else
     {
         unsigned int uiIndex = 4;
 
-        ProcessControl(cs.LeftStickX, uiIndex); // Left
+        ProcessControl(cs.LeftStickX, uiIndex);            // Left
         uiIndex++;
-        ProcessControl(cs.LeftStickX, uiIndex); // Right
+        ProcessControl(cs.LeftStickX, uiIndex);            // Right
         uiIndex++;
-        ProcessControl(cs.LeftStickY, uiIndex); // Up
+        ProcessControl(cs.LeftStickY, uiIndex);            // Up
         uiIndex++;
-        ProcessControl(cs.LeftStickY, uiIndex); // Down
+        ProcessControl(cs.LeftStickY, uiIndex);            // Down
         uiIndex++;
-        ProcessControl(cs.ButtonCross, uiIndex); // Accel
+        ProcessControl(cs.ButtonCross, uiIndex);            // Accel
         uiIndex++;
-        ProcessControl(cs.ButtonSquare, uiIndex); // Brake
+        ProcessControl(cs.ButtonSquare, uiIndex);            // Brake
         uiIndex++;
-        ProcessControl(cs.RightStickX, uiIndex); // Special Left
+        ProcessControl(cs.RightStickX, uiIndex);            // Special Left
         uiIndex++;
-        ProcessControl(cs.RightStickX, uiIndex); // Special Right
+        ProcessControl(cs.RightStickX, uiIndex);            // Special Right
         uiIndex++;
-        ProcessControl(cs.RightStickY, uiIndex); // Special Up
+        ProcessControl(cs.RightStickY, uiIndex);            // Special Up
         uiIndex++;
-        ProcessControl(cs.RightStickY, uiIndex); // Special Down
+        ProcessControl(cs.RightStickY, uiIndex);            // Special Down
     }
 }
 

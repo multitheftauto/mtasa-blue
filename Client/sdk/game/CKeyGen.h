@@ -11,8 +11,6 @@
 
 #pragma once
 
-typedef unsigned long DWORD;
-
 class CKeyGen
 {
 public:

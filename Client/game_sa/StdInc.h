@@ -1,6 +1,12 @@
 
 // Pragmas
+
+// illegal instruction size
+// The instruction did not have a form with the specified size. The smallest legal size was used.
 #pragma warning (disable:4409)
+
+// 'class1' : inherits 'class2::member' via dominance
+// Two or more members have the same name. The one in class2 is inherited because it is a base class for the other classes that contained this member.
 #pragma warning (disable:4250)
 
 #include <windows.h>
@@ -18,103 +24,6 @@
 #include <string>
 #include <vector>
 
-// SDK includes
-#include <core/CCoreInterface.h>
-#include <CRect.h>
-#include <net/CNet.h>
-#include <game/CGame.h>
-#include <game/CWanted.h>
-#include <version.h>
-#include <ijsify.h>
-
 // Game includes
-#include "CEntitySA.h"
-#include "gamesa_init.h"
-#include "Common.h"
-#include "CGameSA.h"
-#include "CWorldSA.h"
-#include "CPoolsSA.h"
-#include "CClockSA.h"
-#include "CFontSA.h"
-#include "CRadarSA.h"
-#include "CMenuManagerSA.h"
-#include "CCameraSA.h"
-#include "CCheckpointsSA.h"
-#include "CRenderWareSA.h"
-#include "CCoronasSA.h"
-#include "CPickupsSA.h"
-#include "CPathFindSA.h"
-#include "CWeaponInfoSA.h"
-#include "CExplosionManagerSA.h"
-#include "CFireManagerSA.h"
-#include "CHandlingManagerSA.h"
-#include "CHudSA.h"
-#include "C3DMarkersSA.h"
-#include "CStatsSA.h"
-#include "CTheCarGeneratorsSA.h"
-#include "CPadSA.h"
-#include "CAERadioTrackManagerSA.h"
-#include "CWeatherSA.h"
-#include "CPedSA.h"
-#include "CPedSoundSA.h"
-#include "CAudioEngineSA.h"
-#include "CAEAudioHardwareSA.h"
-#include "CAEVehicleAudioEntitySA.h"
-#include "CAESoundManagerSA.h"
-#include "CAudioContainerSA.h"
-#include "CPlayerInfoSA.h"
-#include "CPopulationSA.h"
-#include "CSettingsSA.h"
-#include "CCarEnterExitSA.h"
-#include "COffsets.h"
-#include "CControllerConfigManagerSA.h"
-#include "CProjectileInfoSA.h"
-#include "CEventListSA.h"
-#include "CGaragesSA.h"
-#include "CTasksSA.h"
-#include "CEventDamageSA.h"
-#include "CEventGunShotSA.h"
-#include "CAnimManagerSA.h"
-#include "CStreamingSA.h"
-#include "CVisibilityPluginsSA.h"
-#include "CKeyGenSA.h"
-#include "CRopesSA.h"
-#include "CFxSA.h"
-#include "CFxSystemBPSA.h"
-#include "CFxSystemSA.h"
-#include "CFxManagerSA.h"
 #include "HookSystem.h"
-#include "CModelInfoSA.h"
-#include "CPedModelInfoSA.h"
-#include "CColPointSA.h"
-#include "CCivilianPedSA.h"
-#include "CAnimBlendAssociationSA.h"
-#include "CAnimBlendAssocGroupSA.h"
-#include "CAnimBlendHierarchySA.h"
-#include "CAnimBlendSequenceSA.h"
-#include "CAnimBlendStaticAssociationSA.h"
-#include "CAnimBlockSA.h"
-#include "CAutomobileSA.h"
-#include "CBikeSA.h"
-#include "CBoatSA.h"
-#include "CBmxSA.h"
-#include "CQuadBikeSA.h"
-#include "CMonsterTruckSA.h"
-#include "CPlaneSA.h"
-#include "CTrailerSA.h"
-#include "CPlayerPedSA.h"
-#include "CCivilianPedSA.h"
-#include "CObjectSA.h"
-#include "CBuildingSA.h"
-#include "CRestartSA.h"
-#include "CWaterManagerSA.h"
-#include "CPedDamageResponseSA.h"
-#include "CPedDamageResponseCalculatorSA.h"
-#include "CPointLightsSA.h"
-#include "CWeaponStatSA.h"
-#include "CWeaponStatManagerSA.h"
-#include "CShadowDataSA.h"
-#include "CBuoyancySA.h"
-#include "CEventGroupSA.h"
-#include "CMatrixSA.h"
-#include "CTrainSA.h"
+#include "gamesa_init.h"

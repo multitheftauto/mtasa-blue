@@ -12,13 +12,12 @@
 #pragma once
 
 #include "CPacket.h"
-#include "CPlayer.h"
 
 class CPlayerPuresyncPacket final : public CPacket
 {
 public:
     CPlayerPuresyncPacket(){};
-    explicit CPlayerPuresyncPacket(CPlayer* pPlayer) { m_pSourceElement = pPlayer; };
+    explicit CPlayerPuresyncPacket(CPlayer* pPlayer);
 
     bool          HasSimHandler() const { return true; }
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_PURESYNC; };

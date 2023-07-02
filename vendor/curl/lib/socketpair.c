@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2019 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,10 +18,14 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
 #include "socketpair.h"
+#include "urldata.h"
+#include "rand.h"
 
 #if !defined(HAVE_SOCKETPAIR) && !defined(CURL_DISABLE_SOCKETPAIR)
 #ifdef WIN32
@@ -48,6 +52,10 @@
 #endif /* !INADDR_LOOPBACK */
 #endif /* !WIN32 */
 
+#include "nonblock.h" /* for curlx_nonblock */
+#include "timeval.h"  /* needed before select.h */
+#include "select.h"   /* for Curl_poll */
+
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
@@ -63,8 +71,7 @@ int Curl_socketpair(int domain, int type, int protocol,
   curl_socket_t listener;
   curl_socklen_t addrlen = sizeof(a.inaddr);
   int reuse = 1;
-  char data[2][12];
-  ssize_t dlen;
+  struct pollfd pfd[1];
   (void)domain;
   (void)type;
   (void)protocol;
@@ -80,12 +87,26 @@ int Curl_socketpair(int domain, int type, int protocol,
 
   socks[0] = socks[1] = CURL_SOCKET_BAD;
 
+#if defined(WIN32) || defined(__CYGWIN__)
+  /* don't set SO_REUSEADDR on Windows */
+  (void)reuse;
+#ifdef SO_EXCLUSIVEADDRUSE
+  {
+    int exclusive = 1;
+    if(setsockopt(listener, SOL_SOCKET, SO_EXCLUSIVEADDRUSE,
+                  (char *)&exclusive, (curl_socklen_t)sizeof(exclusive)) == -1)
+      goto error;
+  }
+#endif
+#else
   if(setsockopt(listener, SOL_SOCKET, SO_REUSEADDR,
                 (char *)&reuse, (curl_socklen_t)sizeof(reuse)) == -1)
     goto error;
+#endif
   if(bind(listener, &a.addr, sizeof(a.inaddr)) == -1)
     goto error;
-  if(getsockname(listener, &a.addr, &addrlen) == -1)
+  if(getsockname(listener, &a.addr, &addrlen) == -1 ||
+     addrlen < (int)sizeof(a.inaddr))
     goto error;
   if(listen(listener, 1) == -1)
     goto error;
@@ -94,24 +115,75 @@ int Curl_socketpair(int domain, int type, int protocol,
     goto error;
   if(connect(socks[0], &a.addr, sizeof(a.inaddr)) == -1)
     goto error;
+
+  /* use non-blocking accept to make sure we don't block forever */
+  if(curlx_nonblock(listener, TRUE) < 0)
+    goto error;
+  pfd[0].fd = listener;
+  pfd[0].events = POLLIN;
+  pfd[0].revents = 0;
+  (void)Curl_poll(pfd, 1, 1000); /* one second */
   socks[1] = accept(listener, NULL, NULL);
   if(socks[1] == CURL_SOCKET_BAD)
     goto error;
+  else {
+    struct curltime start = Curl_now();
+    char rnd[9];
+    char check[sizeof(rnd)];
+    char *p = &check[0];
+    size_t s = sizeof(check);
 
-  /* verify that nothing else connected */
-  msnprintf(data[0], sizeof(data[0]), "%p", socks);
-  dlen = strlen(data[0]);
-  if(swrite(socks[0], data[0], dlen) != dlen)
-    goto error;
-  if(sread(socks[1], data[1], sizeof(data[1])) != dlen)
-    goto error;
-  if(memcmp(data[0], data[1], dlen))
-    goto error;
+    if(Curl_rand(NULL, (unsigned char *)rnd, sizeof(rnd)))
+      goto error;
+
+    /* write data to the socket */
+    swrite(socks[0], rnd, sizeof(rnd));
+    /* verify that we read the correct data */
+    do {
+      ssize_t nread;
+
+      pfd[0].fd = socks[1];
+      pfd[0].events = POLLIN;
+      pfd[0].revents = 0;
+      (void)Curl_poll(pfd, 1, 1000); /* one second */
+
+      nread = sread(socks[1], p, s);
+      if(nread == -1) {
+        int sockerr = SOCKERRNO;
+        /* Don't block forever */
+        if(Curl_timediff(Curl_now(), start) > (60 * 1000))
+          goto error;
+        if(
+#ifdef WSAEWOULDBLOCK
+          /* This is how Windows does it */
+          (WSAEWOULDBLOCK == sockerr)
+#else
+          /* errno may be EWOULDBLOCK or on some systems EAGAIN when it
+             returned due to its inability to send off data without
+             blocking. We therefore treat both error codes the same here */
+          (EWOULDBLOCK == sockerr) || (EAGAIN == sockerr) ||
+          (EINTR == sockerr) || (EINPROGRESS == sockerr)
+#endif
+          ) {
+          continue;
+        }
+        goto error;
+      }
+      s -= nread;
+      if(s) {
+        p += nread;
+        continue;
+      }
+      if(memcmp(rnd, check, sizeof(check)))
+        goto error;
+      break;
+    } while(1);
+  }
 
   sclose(listener);
   return 0;
 
-  error:
+error:
   sclose(listener);
   sclose(socks[0]);
   sclose(socks[1]);

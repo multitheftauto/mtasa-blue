@@ -11,7 +11,10 @@
 
 #pragma once
 
+class CEntity;
 class CPedDamageResponseSAInterface;
+enum ePedPieceTypes;
+enum eWeaponType;
 
 class CPedDamageResponse
 {

@@ -13,15 +13,16 @@
 
 #include <memory>
 
-class CAnimBlendAssociationSAInterface;
-class CAnimBlendStaticAssociationSAInterface;
-class CAnimBlendHierarchySAInterface;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
+
+class CAnimBlendAssociationSAInterface;
 class CAnimBlendHierarchy;
-struct Rpclump;
+class CAnimBlendHierarchySAInterface;
+class CAnimBlendStaticAssociationSAInterface;
 enum class eAnimGroup;
 enum class eAnimID;
+struct Rpclump;
 
 class CAnimBlendAssociation
 {

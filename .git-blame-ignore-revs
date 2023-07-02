@@ -20,11 +20,35 @@
 # Note that `git blame` does not use any file by default, and
 # the filename `.git-blame-ignore-revs` is just a convention.
 
+273d3b768c15c6daa6c93b1689eeb202f93deaf3
+# Author: ijsf@gmx-topmail.de <ijsf@gmx-topmail.de>
+# Date:   Sat Dec 19 01:32:32 2009 +0000
+#
+# Converted inconsistent and mixed CRLF (Windows) line endings into LF (Unix).
+
+e44b5b09346cf0e48c51023c7bcb8a98ff444fa3
+# Author: flobu@gmx.net <flobu@gmx.net>
+# Date:   Mon Mar 29 20:23:15 2010 +0000
+#
+# replace all tabs to spaces
+
 9f69b979c4ea825731a2c3102c6b707a58b7e356
 # Author: ccw808 <ccw808@googlemail.com>
 # Date:   Wed Apr 28 22:29:05 2010 +0000
 #
 # Reverted r1551 "Set property 'svn:eol-style native' on all non binary files"
+
+4d81499ddd188b408a9e6b2c942618e7284de18b
+# Author: ccw808 <ccw808@googlemail.com>
+# Date:   Thu Apr 29 02:24:27 2010 +0000
+#
+# Converted line endings for Linux related files
+
+3db146dc2a91ed044258c716d960b2c0fb74875b
+# Author: ccw808 <ccw808@googlemail.com>
+# Date:   Tue Sep 1 00:57:29 2015 +0100
+#
+# Removed google-breakpad due to incorrect line endings
 
 2c1bd0ba585d74486e6724d56a10c0477bf2b559
 # Author: Qais Patankar <qaisjp@gmail.com>
@@ -47,6 +71,24 @@ c2caf8b8b95eb328a5fb24e29e8dcbfaf0362dfb
 # Revert "Cleaned up some parts of client deathmatch"
 #
 # This reverts commit da1709db93d060215067cad60533f621012cf2a2.
+
+295c7b93702efaa7086654f2da3dd431c5fb8a7c
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Tue Oct 18 15:10:40 2016 +0100
+#
+# Server/CLuaElementDefs.cpp - normalise line endings
+
+383cb50eb714249e8a80cad22d0c1922d4a78e36
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Mon Sep 5 23:00:55 2016 +0100
+#
+# Fix line endings for CPedRPCs.cpp
+
+b76e23bf32e30a48d98e08fddb3c3e8d0fc8c5e6
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Thu Dec 28 20:19:02 2017 +0000
+#
+# Fix line endings of CClientVariables
 
 c39e2cbf9ef355e8720d98c7de7cda93fc25d735
 # Author: ccw808 <ccw808@googlemail.com>
@@ -71,6 +113,24 @@ e11685cab4beb7958ab202261f9c9d9b4ce71e58
 # Date:   Sun Jan 13 21:04:27 2019 +0100
 #
 # Replace (void) with () (PR #771)
+
+af7537d41e2ce6a4f197bf15ede3a591db54bb85
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Sat Apr 27 05:01:44 2019 +0100
+#
+# google-breakpad line endings tweak
+
+6adf3fbfe251393497e8fb4e6ab55d1c570e5adc
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Sat May 25 17:39:51 2019 +0100
+#
+# Normalise vendor/lua/src/make_uname.bat line endings
+
+306d02f147ee8cd95ecdcea2eae8546ad559d4f2
+# Author: Qais Patankar <qaisjp@gmail.com>
+# Date:   Wed Jan 15 23:06:46 2020 +0000
+#
+# crlf line endings
 
 eefde6d95260aef53308baa7fb1e59cf24522cd9
 # Author: Marek Kulik <me@botder.com>
@@ -97,3 +157,93 @@ eefde6d95260aef53308baa7fb1e59cf24522cd9
 # Date:   Sun Jan 17 13:23:58 2021 +0200
 #
 # Run clang-format (PR #2013)
+
+25d9ba3d30c618ba41c06201f697c69ac9e33f7e
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:05:27 2021 +0300
+#
+# Run clang-format
+
+d5b9a56ac1d1d4c156ef80cd3ec5ed4fc2c65c33
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:56:03 2021 +0300
+#
+# Addendum to 25d9ba3: Run clang-format again
+
+8e3e3b8b351934b48f9b1c530aca33b1140ed6fc
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Sep 25 15:56:40 2021 +0300
+#
+# Addendum to 25d9ba3: Fix build error
+
+30639d61ca3e7783a693fe4d8206d6d604b338bd
+# Author: Patrik Juvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 00:43:44 2021 +0300
+#
+# Revert "update BASS libraries (#2377)"
+
+898fcaf6c879d4c4c7e9a786b3d87216b09376e2
+# Author: Patrik Juvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 01:11:05 2021 +0300
+#
+# Revert "Add SVG support (lunasvg) (#2026)"
+
+fba4ee41a9eb31ae3bf9c85afc0db4807915c18f
+# Author: Patrik Juvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 01:34:49 2021 +0300
+#
+# Revert "Revert "update BASS libraries (#2377)""
+
+6f09a0a99e0b2eded7cd73f18aa5f1fe4c47ada8
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 16:25:25 2021 +0300
+#
+# Revert "Run clang-format"
+
+7d055fbcaf70e11bf3940a81845afa8ad997c4a3
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 16:29:32 2021 +0300
+#
+# Revert "Revert "Add SVG support (lunasvg) (#2026)""
+
+a02c4b3a71b5a6e9d77ba849edd14a8048256120
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 17:02:43 2021 +0300
+#
+# Revert "Revert "Revert "Add SVG support (lunasvg) (#2026)"""
+
+16769b8d1c94e2b9fe6323dcba46d1305f87a190
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Sep 27 17:57:32 2021 +0300
+#
+# Revert "Revert "Run clang-format""
+
+652bda2d87d78b93516d8320a659353d517ce5d4
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sun Jan 9 15:07:20 2022 +0200
+#
+# Run clang-format
+
+8931b796ea60c4b32422bba986529e39fb2737b5
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sun Jan 9 15:36:06 2022 +0200
+#
+# Run clang-format
+
+b42518e64803762d27fe6277b36044d1a71fc2c4
+# Author: Marek Kulik <me@botder.com>
+# Date:   Fri Apr 7 15:46:10 2023 +0200
+#
+# Apply win-apply-clang-format.bat
+
+483cd28a1ee618538771e3bf33f9ebddfca2cde9
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Apr 8 15:17:22 2023 +0300
+#
+# Apply win-apply-clang-format.bat
+
+6f26c2ad77600c2fd055d9d7a30ced5bf91d4f14
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Jun 12 19:01:59 2023 +0300
+#
+# Apply win-apply-clang-format.bat

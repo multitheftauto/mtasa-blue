@@ -38,7 +38,6 @@ CClientManager::CClientManager()
     m_pTeamManager = new CClientTeamManager;
     m_pDisplayManager = new CClientDisplayManager;
     m_pVehicleManager = new CClientVehicleManager(this);
-    m_pCivilianManager = new CClientCivilianManager(this);
     m_pCamera = new CClientCamera(this);
     m_pPedManager = new CClientPedManager(this);
     m_pResourceManager = new CResourceManager;
@@ -54,6 +53,7 @@ CClientManager::CClientManager()
     m_pPointLightsManager = new CClientPointLightsManager(this);
     m_pModelManager = new CClientModelManager();
     m_pPacketRecorder = new CClientPacketRecorder(this);
+    m_pImgManager = new CClientIMGManager(this);
 
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
@@ -102,9 +102,6 @@ CClientManager::~CClientManager()
 
     delete m_pCamera;
     m_pCamera = NULL;
-
-    delete m_pCivilianManager;
-    m_pCivilianManager = NULL;
 
     delete m_pVehicleManager;
     m_pVehicleManager = NULL;
@@ -177,6 +174,9 @@ CClientManager::~CClientManager()
 
     delete m_pModelManager;
     m_pModelManager = nullptr;
+
+    delete m_pImgManager;
+    m_pImgManager = nullptr;
 }
 
 //

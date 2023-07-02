@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerListPacket.h"
+#include "CPlayer.h"
+#include <net/SyncStructures.h>
 
 bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
 {
@@ -85,7 +88,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
 
     CPlayer* pPlayer = NULL;
     // Put each player in our list into the packet
-    list<CPlayer*>::const_iterator iter = m_List.begin();
+    std::list<CPlayer*>::const_iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)
     {
         // Grab the real pointer
@@ -122,7 +125,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         // Flags
         bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
         BitStream.WriteBit(pPlayer->IsDead());
-        BitStream.WriteBit(true);                         // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
+        BitStream.WriteBit(true);            // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
         BitStream.WriteBit(bInVehicle);
         BitStream.WriteBit(pPlayer->HasJetPack());
         BitStream.WriteBit(pPlayer->IsNametagShowing());

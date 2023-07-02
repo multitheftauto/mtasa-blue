@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <net/CNet.h>
 #define DECLARE_PROFILER_SECTION_multiplayersa_init
 #include "profiler/SharedUtil.Profiler.h"
 

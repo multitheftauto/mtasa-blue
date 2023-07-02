@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 
 bool                                    g_bInGTAScene = false;
 CProxyDirect3DDevice9*                  g_pProxyDevice = NULL;

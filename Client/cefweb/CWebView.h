@@ -14,13 +14,13 @@
 #undef GetFirstChild
 #include <core/CWebViewInterface.h>
 #include <core/CWebBrowserEventsInterface.h>
-#include <cef3/include/cef_app.h>
-#include <cef3/include/cef_browser.h>
-#include <cef3/include/cef_client.h>
-#include <cef3/include/cef_render_handler.h>
-#include <cef3/include/cef_life_span_handler.h>
-#include <cef3/include/cef_context_menu_handler.h>
-#include <cef3/include/cef_resource_request_handler.h>
+#include <cef3/cef/include/cef_app.h>
+#include <cef3/cef/include/cef_browser.h>
+#include <cef3/cef/include/cef_client.h>
+#include <cef3/cef/include/cef_render_handler.h>
+#include <cef3/cef/include/cef_life_span_handler.h>
+#include <cef3/cef/include/cef_context_menu_handler.h>
+#include <cef3/cef/include/cef_resource_request_handler.h>
 #include <SString.h>
 #include <mmdeviceapi.h>
 #include <audiopolicy.h>
@@ -29,6 +29,12 @@
 #define GetFirstChild(hwnd) GetTopWindow(hwnd)
 
 #define MTA_CEF_USERAGENT "Multi Theft Auto: San Andreas Client " MTA_DM_BUILDTAG_LONG
+
+enum class ECefThreadState
+{
+    Running = 0,            // CEF thread is currently running
+    Wait                    // CEF thread is waiting for the main thread
+};
 
 class CWebView : public CWebViewInterface,
                  private CefClient,
@@ -131,7 +137,8 @@ public:
                              const CefString& failedURL) override;
 
     // CefRequestHandler methods
-    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture, bool isRedirect) override;
+    virtual bool OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request, bool userGesture,
+                                bool isRedirect) override;
     virtual CefRefPtr<CefResourceRequestHandler> GetResourceRequestHandler(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame,
                                                                            CefRefPtr<CefRequest> request, bool is_navigation, bool is_download,
                                                                            const CefString& request_initiator, bool& disable_default_handling) override
@@ -141,7 +148,7 @@ public:
 
     // CefResourceRequestHandler
     virtual CefResourceRequestHandler::ReturnValue OnBeforeResourceLoad(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefRefPtr<CefRequest> request,
-                                                                CefRefPtr<CefRequestCallback> callback) override;
+                                                                        CefRefPtr<CefCallback> callback) override;
 
     // CefLifeSpawnHandler methods
     virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
@@ -157,8 +164,8 @@ public:
                             bool& suppress_message) override;
 
     // CefDialogHandler methods
-    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_name,
-                              const std::vector<CefString>& accept_types, int selected_accept_filter, CefRefPtr<CefFileDialogCallback> callback) override;
+    virtual bool OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                              const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback) override;
 
     // CefDisplayHandler methods
     virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -172,10 +179,12 @@ public:
                                      CefRefPtr<CefMenuModel> model) override;
 
 private:
+    void ResumeCefThread();
+
     CefRefPtr<CefBrowser> m_pWebView;
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
-    bool                       m_bBeingDestroyed;
+    std::atomic_bool           m_bBeingDestroyed;
     bool                       m_bIsLocal;
     bool                       m_bIsRenderingPaused;
     bool                       m_bIsTransparent;
@@ -191,8 +200,8 @@ private:
     {
         bool                    changed = false;
         std::mutex              dataMutex;
-        std::mutex              cvMutex;
-        std::condition_variable cv;
+        ECefThreadState         cefThreadState = ECefThreadState::Running;
+        std::condition_variable cefThreadCv;
 
         const void*                buffer;
         int                        width, height;
