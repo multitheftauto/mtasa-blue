@@ -24,6 +24,7 @@ void CLuaPedDefs::LoadFunctions()
         {"detonateSatchels", DetonateSatchels},
         {"killPed", KillPed},
 
+        {"resetPedVoice", ArgumentParser<ResetPedVoice>},
         {"getPedVoice", GetPedVoice},
         {"setPedVoice", SetPedVoice},
         {"getPedRotation", GetPedRotation},
@@ -149,6 +150,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTask", "getPedTask");
     lua_classfunction(luaVM, "getTotalAmmo", "getPedTotalAmmo");
     lua_classfunction(luaVM, "getVoice", "getPedVoice");
+    lua_classfunction(luaVM, "resetVoice", "resetPedVoice");
     lua_classfunction(luaVM, "getWeapon", "getPedWeapon");
     lua_classfunction(luaVM, "isChocking", "isPedChoking");
     lua_classfunction(luaVM, "isDoingGangDriveby", "isPedDoingGangDriveby");
@@ -231,6 +233,15 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
     lua_registerclass(luaVM, "Ped", "Element");
+}
+
+bool CLuaPedDefs::ResetPedVoice(CClientPed* ped)
+{
+    short szOldType, szNewType, szOldVoice, szNewVoice;
+    ped->GetVoice(&szOldType, &szOldVoice);
+    ped->ResetVoice();
+    ped->GetVoice(&szNewType, &szNewVoice);
+    return szNewType != szOldType && szNewVoice != szOldVoice;
 }
 
 int CLuaPedDefs::GetPedVoice(lua_State* luaVM)

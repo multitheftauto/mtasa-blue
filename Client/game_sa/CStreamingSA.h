@@ -66,7 +66,7 @@ public:
     unsigned char   AddArchive(const char* szFilePath);
     void            RemoveArchive(unsigned char ucStreamHandler);
     void            SetStreamingBufferSize(uint32 uiSize);
-    uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; };
+    uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; }; // In bytes
 
     void          MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
     std::uint32_t GetMemoryUsed() const override;

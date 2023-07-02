@@ -5944,6 +5944,12 @@ void CClientPed::SetVoice(const char* szVoiceType, const char* szVoice)
         m_pPlayerPed->SetVoice(szVoiceType, szVoice);
 }
 
+void CClientPed::ResetVoice()
+{
+    if (m_pPlayerPed)
+        m_pPlayerPed->ResetVoice();
+}
+
 bool CClientPed::IsSpeechEnabled()
 {
     if (m_pPlayerPed)
