@@ -30,7 +30,7 @@ namespace lua
     }
 
     template <>
-    bool PopPrimitive<bool>(lua_State* L, std::size_t& index)
+    bool PopPrimitive<bool>(lua_State* L, int& index)
     {
         return static_cast<bool>(lua_toboolean(L, index++));
     }
@@ -42,10 +42,10 @@ namespace lua
     }
 
     template<>
-    lua_Number PopPrimitive<lua_Number>(lua_State* L, std::size_t& index)
+    lua_Number PopPrimitive<lua_Number>(lua_State* L, int& index)
     {
         return lua_tonumber(L, index++);
     }
 
-    // Int types aren't Poppable directly, because they need to be checked for under/overflow, NaN
+    // Int types aren't Poppable directly, because they need to be checked for under/overflow, NaN, inf
 }            // namespace lua

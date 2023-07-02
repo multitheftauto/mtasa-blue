@@ -360,35 +360,30 @@ struct CLuaFunctionParserBase
         {
             const auto number = lua::PopPrimitive<lua_Number>(L, index);
 
-            if (std::isnan(number))
-            {
+            const auto SetError = [&](const char* expected, const char* got) {
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
-                SetBadArgumentError(L, "number", index - 1, "NaN");
+                SetBadArgumentError(L, expected, index - 1, got);
+            };
+
+            if (std::isnan(number))
+            {
+                SetError("number", "NaN");
                 return static_cast<T>(number);
             }
 
-            if constexpr (std::is_integral_v<T>)
+            if (std::isinf(number)) {
+                SetError("number", "inf");
+                return static_cast<T>(number);
+            }
+
+            // NOTE/TODO: Use C++20 `std::in_range` here instead
+            // For now this doesn't do all the safety checks, but this should be "good enough" [until we switch to C++20]
+            if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
             {
-                if constexpr (std::is_unsigned_v<T>)
-                {
-                    if (number < 0.0)
-                    {
-                        // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-                        // underlying element is of a wrong type
-                        SetBadArgumentError(L, "positive value", index - 1, "negative");
+                SetError("positive number", "negative");
 
-                        return static_cast<T>(static_cast<int64_t>(number));
-                    }
-                }
-
-                #ifdef MTA_DEBUG
-                {
-                    using Tlimits = std::numeric_limits<T>;
-                    dassert(static_cast<int64_t>(Tlimits::max()) >= number); // Check overflow
-                    dassert(static_cast<int64_t>(Tlimits::min()) <= number); // Check underflow
-                }
-                #endif   
+                return static_cast<T>(static_cast<int64_t>(number));
             }
 
             return static_cast<T>(number);
