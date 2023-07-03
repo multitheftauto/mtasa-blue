@@ -62,7 +62,7 @@ CServerBrowser::CServerBrowser()
     m_llLastGeneralHelpTime = 0;
 
     // Do some initial math
-    CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    CVector2D resolution = g_pCore->GetGUI()->GetResolution();
     bool      bCreateFrame = true;
 
     if (resolution.fY <= 600)            // Make our window bigger at small resolutions
@@ -136,7 +136,7 @@ CServerBrowser::CServerBrowser()
     CreateTab(ServerBrowserTypes::RECENTLY_PLAYED, _("Recent"));
 
     // Load options
-    LoadOptions(CCore::GetSingletonPtr()->GetConfig()->FindSubNode(CONFIG_NODE_SERVER_OPTIONS));
+    LoadOptions(g_pCore->GetConfig()->FindSubNode(CONFIG_NODE_SERVER_OPTIONS));
 
     // Save the active tab, needs to be done after at least one tab exists
     m_pPanel->SetSelectionHandler(GUI_CALLBACK(&CServerBrowser::OnTabChanged, this));
@@ -1275,7 +1275,7 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
     // Ensure we have something entered
     if (strURI.size() == 0 || strURI == "mtasa://")
     {
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC70"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowMessageBox(_("Error") + _E("CC70"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO);
         return true;
     }
 
@@ -1288,16 +1288,16 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
     }
     else if (strURI.substr(0, iProtocolEnd) != "mtasa")            // Is it the mtasa:// protocol?  Don't want noobs trying http etc
     {
-        CCore::GetSingleton().ShowMessageBox(_("Unknown protocol") + _E("CC71"), _("Please use the mtasa:// protocol!"), MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowMessageBox(_("Unknown protocol") + _E("CC71"), _("Please use the mtasa:// protocol!"), MB_BUTTON_OK | MB_ICON_INFO);
         return true;
     }
 
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
 
     // Valid nick?
-    if (!CCore::GetSingleton().IsValidNick(strNick.c_str()))
+    if (!g_pCore->IsValidNick(strNick.c_str()))
     {
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC72"), _("Invalid nickname! Please go to Settings and set a new one!"),
+        g_pCore->ShowMessageBox(_("Error") + _E("CC72"), _("Invalid nickname! Please go to Settings and set a new one!"),
                                              MB_BUTTON_OK | MB_ICON_INFO);
         return true;
     }
@@ -1309,7 +1309,7 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
     }
 
     // Start the connect
-    CCore::GetSingleton().GetConnectManager()->Connect(strHost.c_str(), usPort, strNick.c_str(), strPassword.c_str(), true);
+    g_pCore->GetConnectManager()->Connect(strHost.c_str(), usPort, strNick.c_str(), strPassword.c_str(), true);
 
     return true;
 }
@@ -1352,9 +1352,9 @@ bool CServerBrowser::ConnectToSelectedServer()
         CVARS_GET("nick", strNick);
 
         // Valid nick?
-        if (!CCore::GetSingleton().IsValidNick(strNick.c_str()))
+        if (!g_pCore->IsValidNick(strNick.c_str()))
         {
-            CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC73"), _("Invalid nickname! Please go to Settings and set a new one!"),
+            g_pCore->ShowMessageBox(_("Error") + _E("CC73"), _("Invalid nickname! Please go to Settings and set a new one!"),
                                                  MB_BUTTON_OK | MB_ICON_INFO);
             return true;
         }
@@ -1373,11 +1373,11 @@ bool CServerBrowser::ConnectToSelectedServer()
         }
 
         // Start the connect
-        CCore::GetSingleton().GetConnectManager()->Connect(pServer->strHost.c_str(), pServer->usGamePort, strNick.c_str(), strPassword);
+        g_pCore->GetConnectManager()->Connect(pServer->strHost.c_str(), pServer->usGamePort, strNick.c_str(), strPassword);
     }
     else
     {
-        CCore::GetSingleton().ShowMessageBox(_("Information") + _E("CC74"), _("You have to select a server to connect to."), MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowMessageBox(_("Information") + _E("CC74"), _("You have to select a server to connect to."), MB_BUTTON_OK | MB_ICON_INFO);
     }
     return false;
 }
@@ -1403,7 +1403,7 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
     // Ensure we have something entered
     if (strURI.size() == 0 || strURI == "mtasa://")
     {
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC75"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowMessageBox(_("Error") + _E("CC75"), _("No address specified!"), MB_BUTTON_OK | MB_ICON_INFO);
         return true;
     }
 
@@ -1510,12 +1510,12 @@ bool CServerBrowser::OnHistoryDropListRemove(CGUIElement* pElementx)
     tagPOINT cursor;
     GetCursorPos(&cursor);
 
-    HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
+    HWND hookedWindow = g_pCore->GetHookedWindow();
 
     tagPOINT windowPos = {0};
     ClientToScreen(hookedWindow, &windowPos);
 
-    CVector2D vecResolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
     cursor.x -= windowPos.x;
     cursor.y -= windowPos.y;
 
@@ -1752,7 +1752,7 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
 
 void CServerBrowser::SaveRecentlyPlayedList()
 {
-    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    CXMLNode* pConfig = g_pCore->GetConfig();
     CXMLNode* pRecent = pConfig->FindSubNode(CONFIG_NODE_SERVER_REC);
     if (!pRecent)
         pRecent = pConfig->CreateSubNode(CONFIG_NODE_SERVER_REC);
@@ -1767,7 +1767,7 @@ void CServerBrowser::SaveRecentlyPlayedList()
 
 void CServerBrowser::SaveFavouritesList()
 {
-    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    CXMLNode* pConfig = g_pCore->GetConfig();
     CXMLNode* pFavourites = pConfig->FindSubNode(CONFIG_NODE_SERVER_FAV);
     if (!pFavourites)
         pFavourites = pConfig->CreateSubNode(CONFIG_NODE_SERVER_FAV);
@@ -1883,7 +1883,7 @@ void CServerBrowser::SaveOptions()
     if (!m_bOptionsLoaded)
         return;
 
-    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    CXMLNode* pConfig = g_pCore->GetConfig();
     CXMLNode* pOptions = pConfig->FindSubNode(CONFIG_NODE_SERVER_OPTIONS);
     if (!pOptions)
     {
@@ -1958,7 +1958,7 @@ void CServerBrowser::SetServerPassword(const std::string& strHost, const std::st
     if (!bSavedPasswords)
         return;
 
-    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    CXMLNode* pConfig = g_pCore->GetConfig();
     CXMLNode* pServerPasswords = pConfig->FindSubNode(CONFIG_NODE_SERVER_SAVED);
     if (!pServerPasswords)
     {
@@ -1999,7 +1999,7 @@ std::string CServerBrowser::GetServerPassword(const std::string& strHost)
     if (!bSavedPasswords)
         return "";
 
-    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    CXMLNode* pConfig = g_pCore->GetConfig();
     CXMLNode* pServerPasswords = pConfig->FindSubNode(CONFIG_NODE_SERVER_SAVED);
     if (!pServerPasswords)
     {
@@ -2043,7 +2043,7 @@ std::string CServerBrowser::GetServerPassword(const std::string& strHost)
 
 void CServerBrowser::ClearServerPasswords()
 {
-    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    CXMLNode* pConfig = g_pCore->GetConfig();
     CXMLNode* pServerPasswords = pConfig->FindSubNode(CONFIG_NODE_SERVER_SAVED);
     if (pServerPasswords)
     {

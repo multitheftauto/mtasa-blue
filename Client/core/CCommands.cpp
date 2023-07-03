@@ -168,9 +168,9 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 CVARS_SET(key, val);
 
                 // HACK: recalculate frame rate limit on cvar change
-                if (key == "fps_limit" && m_FpsLimitTimer.Get() >= 500 && CCore::GetSingleton().IsConnected())
+                if (key == "fps_limit" && m_FpsLimitTimer.Get() >= 500 && g_pCore->IsConnected())
                 {
-                    CCore::GetSingleton().RecalculateFrameRateLimit(-1, true);
+                    g_pCore->RecalculateFrameRateLimit(-1, true);
                     m_FpsLimitTimer.Reset();
                 }
             }
@@ -181,7 +181,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             }
             ss << key << " = " << val;
             val = ss.str();
-            CCore::GetSingleton().GetConsole()->Print(val.c_str());
+            g_pCore->GetConsole()->Print(val.c_str());
             return true;
         }
     }
@@ -190,18 +190,18 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     bool bIsNickCommand = !stricmp(szCommand, "nick");
     if (bIsNickCommand && szParameters && !bIsScriptedBind)
     {
-        if (CCore::GetSingleton().IsValidNick(szParameters))
+        if (g_pCore->IsValidNick(szParameters))
         {
             CVARS_SET("nick", std::string(szParameters));
 
-            if (!CCore::GetSingleton().IsConnected())
+            if (!g_pCore->IsConnected())
             {
-                CCore::GetSingleton().GetConsole()->Printf("nick: You are now known as %s", szParameters);
+                g_pCore->GetConsole()->Printf("nick: You are now known as %s", szParameters);
             }
         }
-        else if (!CCore::GetSingleton().IsConnected())
+        else if (!g_pCore->IsConnected())
         {
-            CCore::GetSingleton().GetConsole()->Print("nick: Chosen nickname contains illegal characters");
+            g_pCore->GetConsole()->Print("nick: Chosen nickname contains illegal characters");
         }
     }
 
@@ -215,7 +215,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Unknown command
     val = _("Unknown command or cvar: ") + szCommand;
     if (!bIsScriptedBind && !bIsNickCommand && pEntry == nullptr)
-        CCore::GetSingleton().GetConsole()->Print(val.c_str());
+        g_pCore->GetConsole()->Print(val.c_str());
     return false;
 }
 
@@ -248,7 +248,7 @@ void CCommands::DeleteAll()
     m_CommandList.clear();
 
     // Re-register our commands
-    CCore::GetSingleton().RegisterCommands();
+    g_pCore->RegisterCommands();
 }
 
 tagCOMMANDENTRY* CCommands::Get(const char* szCommand, bool bCheckIfMod, bool bModCommand)

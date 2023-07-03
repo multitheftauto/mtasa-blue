@@ -35,7 +35,7 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice)
     WriteDebugEvent("CDirect3DEvents9::OnDirect3DDeviceCreate");
 
     // Create the GUI manager
-    CCore::GetSingleton().InitGUI(pDevice);
+    g_pCore->InitGUI(pDevice);
 
     CAdditionalVertexStreamManager::GetSingleton()->OnDeviceCreate(pDevice);
     CVertexStreamBoundingBoxManager::GetSingleton()->OnDeviceCreate(pDevice);
@@ -58,13 +58,13 @@ void CDirect3DEvents9::OnDirect3DDeviceDestroy(IDirect3DDevice9* pDevice)
     CLocalGUI::GetSingleton().DestroyObjects();
 
     // De-initialize the GUI manager (destroying is done on Exit)
-    CCore::GetSingleton().DeinitGUI();
+    g_pCore->DeinitGUI();
 }
 
 void CDirect3DEvents9::OnBeginScene(IDirect3DDevice9* pDevice)
 {
     // Notify core
-    CCore::GetSingleton().DoPreFramePulse();
+    g_pCore->DoPreFramePulse();
 }
 
 bool CDirect3DEvents9::OnEndScene(IDirect3DDevice9* pDevice)
@@ -98,7 +98,7 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
     // Restore the graphics manager
     CGraphics::GetSingleton().OnDeviceRestore(pDevice);
 
-    CCore::GetSingleton().OnDeviceRestore();
+    g_pCore->OnDeviceRestore();
 }
 
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
@@ -133,7 +133,7 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CScreenShot::CheckForScreenShot(true);
 
     // Notify core
-    CCore::GetSingleton().DoPostFramePulse();
+    g_pCore->DoPostFramePulse();
     TIMING_CHECKPOINT("+OnPresent2");
 
     // Restore in case script forgets
@@ -181,8 +181,8 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     int iAnisotropic;
     CVARS_GET("anisotropic", iAnisotropic);
     ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
-    ms_DiagnosticDebug = CCore::GetSingleton().GetDiagnosticDebug();
-    CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
+    ms_DiagnosticDebug = g_pCore->GetDiagnosticDebug();
+    g_pCore->GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
 
     // Make a screenshot if needed (after GUI)
     CScreenShot::CheckForScreenShot(false);
@@ -654,7 +654,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
     }
     __except (FilerException(GetExceptionCode()))
     {
-        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 1 * 1000000);
+        g_pCore->OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 1 * 1000000);
     }
     return hr;
 }
@@ -687,7 +687,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
     }
     __except (FilerException(GetExceptionCode()))
     {
-        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 2 * 1000000);
+        g_pCore->OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 2 * 1000000);
     }
     return hr;
 }
@@ -719,7 +719,7 @@ HRESULT CDirect3DEvents9::CreateVertexBuffer(IDirect3DDevice9* pDevice, UINT Len
             SString strMessage("CreateVertexBuffer fail: hr:%x Length:%x Usage:%x FVF:%x Pool:%x", hr, Length, Usage, FVF, Pool);
             WriteDebugEvent(strMessage);
             AddReportLog(8610, strMessage);
-            CCore::GetSingleton().LogEvent(610, "CreateVertexBuffer", "", strMessage);
+            g_pCore->LogEvent(610, "CreateVertexBuffer", "", strMessage);
             return hr;
         }
 
@@ -754,7 +754,7 @@ HRESULT CDirect3DEvents9::CreateIndexBuffer(IDirect3DDevice9* pDevice, UINT Leng
             SString strMessage("CreateIndexBuffer fail: hr:%x Length:%x Usage:%x Format:%x Pool:%x", hr, Length, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
             AddReportLog(8611, strMessage);
-            CCore::GetSingleton().LogEvent(611, "CreateIndexBuffer", "", strMessage);
+            g_pCore->LogEvent(611, "CreateIndexBuffer", "", strMessage);
             return hr;
         }
 
@@ -789,7 +789,7 @@ HRESULT CDirect3DEvents9::CreateTexture(IDirect3DDevice9* pDevice, UINT Width, U
             SString strMessage("CreateTexture fail: hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
             AddReportLog(8612, strMessage);
-            CCore::GetSingleton().LogEvent(612, "CreateTexture", "", strMessage);
+            g_pCore->LogEvent(612, "CreateTexture", "", strMessage);
             return hr;
         }
 
@@ -896,7 +896,7 @@ HRESULT CDirect3DEvents9::CreateVertexDeclaration(IDirect3DDevice9* pDevice, CON
         SString strMessage("CreateVertexDecl fail: hr:%x %s", hr, *strStatus);
         WriteDebugEvent(strMessage);
         AddReportLog(8613, strMessage);
-        CCore::GetSingleton().LogEvent(613, "CreateVertexDecl", "", strMessage);
+        g_pCore->LogEvent(613, "CreateVertexDecl", "", strMessage);
         return hr;
     }
 

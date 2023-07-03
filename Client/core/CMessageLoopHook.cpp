@@ -302,7 +302,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                         }
 
                         // The mainmenu makes sure it isn't hidden if UseIngameButtons == false
-                        if (!CCore::GetSingleton().IsOfflineMod())
+                        if (!g_pCore->IsOfflineMod())
                         {
                             if (g_pCore->GetKeyBinds()->TriggerKeyStrokeHandler("escape", uMsg == WM_KEYDOWN, true))
                             {
@@ -474,7 +474,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             // Check and see if the Core/mod should process this message
             if (g_pCore->GetGame() && !g_pCore->GetGame()->IsAtMenu())
             {
-                pfnProcessMessage pfnClientMessageProcessor = CCore::GetSingleton().GetClientMessageProcessor();
+                pfnProcessMessage pfnClientMessageProcessor = g_pCore->GetClientMessageProcessor();
                 if (pfnClientMessageProcessor)
                 {
                     bClientProcessed = pfnClientMessageProcessor(hwnd, uMsg, wParam, lParam);

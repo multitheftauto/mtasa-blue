@@ -811,7 +811,7 @@ void CJoystickManager::ReadCurrentState()
 
         if (bOutputStatus)
         {
-            CGraphicsInterface* pGraphics = CCore::GetSingleton().GetGraphics();
+            CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
             int                 x = 20;
             int                 y = 20;            // pGraphics->GetViewportHeight() / 2;
             pGraphics->DrawRectQueued(x, y, 350, 150, 0xaf000000, true);
@@ -1227,7 +1227,7 @@ bool CJoystickManager::IsJoypadValid()
 CXMLNode* CJoystickManager::GetConfigNode(bool bCreateIfRequired)
 {
     // Get the root node
-    CXMLNode* pRoot = CCore::GetSingleton().GetConfig();
+    CXMLNode* pRoot = g_pCore->GetConfig();
     if (!pRoot)
         return NULL;
 
@@ -1445,8 +1445,8 @@ bool CJoystickManager::LoadFromXML()
     }
 
     if (iErrors)
-        if (CCore::GetSingleton().GetConsole())
-            CCore::GetSingleton().GetConsole()->Printf("Warning: %d errors reading joypad configuration.", iErrors);
+        if (g_pCore->GetConsole())
+            g_pCore->GetConsole()->Printf("Warning: %d errors reading joypad configuration.", iErrors);
 
     return true;
 }

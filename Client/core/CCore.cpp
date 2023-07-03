@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/CCore.cpp
+ *  FILE:        Client/core/CCore.cpp
  *  PURPOSE:     Base core class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -700,11 +700,11 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
 {
     if (strTroubleLink.empty())
     {
-        CCore::GetSingleton().ShowMessageBox(strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR);
+        ShowMessageBox(strTitle, strMessage, MB_BUTTON_OK | MB_ICON_ERROR);
     }
     else
     {
-        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        CQuestionBox* pQuestionBox = GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(strTitle);
         pQuestionBox->SetMessage(strMessage);
@@ -719,7 +719,7 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
 //
 void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode)
 {
-    uint uiErrorCode = CCore::GetSingleton().GetNetwork()->GetExtendedErrorCode();
+    uint uiErrorCode = GetNetwork()->GetExtendedErrorCode();
     if (uiErrorCode != 0)
     {
         // Do anti-virus check soon
@@ -740,7 +740,7 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
 //
 void CCore::ErrorMessageBoxCallBack(void* pData, uint uiButton)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
     SString* pstrTroubleLink = (SString*)pData;
     if (uiButton == 1)
@@ -790,12 +790,8 @@ void CCore::ApplyHooks()
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
-    // m_pDirect3DHookManager->ApplyHook ( );
-    // m_pFileSystemHook->ApplyHook ( );
+    // m_pDirect3DHookManager->ApplyHook ();
     m_pSetCursorPosHook->ApplyHook();
-
-    // Redirect basic files.
-    // m_pFileSystemHook->RedirectFile ( "main.scm", "../../mta/gtafiles/main.scm" );
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
     // We have to patch here as multiplayer_sa and game_sa are loaded too late
@@ -818,14 +814,14 @@ void CCore::ApplyHooks2()
     {
         // Done a little later to get past the loading time required to decrypt the gta
         // executable into memory...
-        if (!CCore::GetSingleton().AreModulesLoaded())
+        if (!AreModulesLoaded())
         {
-            CCore::GetSingleton().SetModulesLoaded(true);
-            CCore::GetSingleton().CreateNetwork();
-            CCore::GetSingleton().CreateGame();
-            CCore::GetSingleton().CreateMultiplayer();
-            CCore::GetSingleton().CreateXML();
-            CCore::GetSingleton().CreateGUI();
+            SetModulesLoaded(true);
+            CreateNetwork();
+            CreateGame();
+            CreateMultiplayer();
+            CreateXML();
+            CreateGUI();
         }
     }
 }
@@ -962,7 +958,7 @@ void CCore::CreateMultiplayer()
 {
     m_pMultiplayer = CreateModule<CMultiplayer>(m_MultiplayerModule, "Multiplayer", "multiplayer_sa", "InitMultiplayerInterface", this);
     if (m_pMultiplayer)
-        m_pMultiplayer->SetIdleHandler(CCore::StaticIdleHandler);
+        m_pMultiplayer->SetIdleHandler(StaticIdleHandler);
 }
 
 void CCore::DeinitGUI()
@@ -1427,7 +1423,8 @@ void CCore::Quit(bool bInstantly)
         CModManager::GetSingleton().Unload();
 
         // Destroy ourself
-        delete CCore::GetSingletonPtr();
+        delete g_pCore;
+        g_pCore = nullptr;
 
         WatchDogCompletedSection("Q0");
 
@@ -1712,7 +1709,7 @@ void CCore::UpdateRecentlyPlayed()
     in_addr Address;
     if (CServerListItem::Parse(strHost.c_str(), Address))
     {
-        CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
+        CServerBrowser* pServerBrowser = GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
         pRecentList->Remove(Address, uiPort);
         pRecentList->AddUnique(Address, uiPort, true);
@@ -1721,8 +1718,9 @@ void CCore::UpdateRecentlyPlayed()
         if (!m_pConnectManager->m_strLastPassword.empty())
             pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", uiPort), m_pConnectManager->m_strLastPassword);
     }
+
     // Save our configuration file
-    CCore::GetSingleton().SaveConfig();
+    SaveConfig();
 }
 
 void CCore::ApplyCoreInitSettings()
@@ -1800,7 +1798,7 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
         SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
         if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
             strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
-        CCore::GetSingleton().GetConsole()->Print(strStatus);
+        GetConsole()->Print(strStatus);
     }
 }
 
@@ -1934,17 +1932,17 @@ void CCore::OnPreFxRender()
 {
     // Don't do nothing if nothing won't be drawn
 
-    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
+    if (m_pGraphics->HasPrimitive3DPreGUIQueueItems())
+        m_pGraphics->DrawPrimitive3DPreGUIQueue();
 
-    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
+    if (!m_pGraphics->HasLine3DPreGUIQueueItems())
         return;
 
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    m_pGraphics->EnteringMTARenderZone();
 
-    CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
+    m_pGraphics->DrawLine3DPreGUIQueue();
 
-    CGraphics::GetSingleton().LeavingMTARenderZone();
+    m_pGraphics->LeavingMTARenderZone();
 }
 
 //
@@ -1952,12 +1950,12 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
+    IDirect3DDevice9* pDevice = m_pGraphics->GetDevice();
 
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    m_pGraphics->EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
-    CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
+    m_pGraphics->GetRenderItemManager()->DoPulse();
 
     // Handle script stuffs
     if (m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0)
@@ -1969,15 +1967,15 @@ void CCore::OnPreHUDRender()
         m_pModManager->DoPulsePreHUDRender(false, false);
 
     // Handle saving depth buffer
-    CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
+    m_pGraphics->GetRenderItemManager()->SaveReadableDepthBuffer();
 
     // Restore in case script forgets
-    CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
+    m_pGraphics->GetRenderItemManager()->RestoreDefaultRenderTarget();
 
     // Draw pre-GUI primitives
-    CGraphics::GetSingleton().DrawPreGUIQueue();
+    m_pGraphics->DrawPreGUIQueue();
 
-    CGraphics::GetSingleton().LeavingMTARenderZone();
+    m_pGraphics->LeavingMTARenderZone();
 }
 
 //
@@ -2271,7 +2269,7 @@ void CCore::UpdateDummyProgress(int iValue, const char* szType)
 //
 void CCore::CallSetCursorPos(int X, int Y)
 {
-    if (CCore::GetSingleton().IsFocused() && !CLocalGUI::GetSingleton().IsMainMenuVisible())
+    if (IsFocused() && !CLocalGUI::GetSingleton().IsMainMenuVisible())
         m_pLocalGUI->SetCursorPos(X, Y, true);
 }
 

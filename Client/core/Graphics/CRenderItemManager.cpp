@@ -58,7 +58,7 @@ void CRenderItemManager::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewpo
     m_uiDefaultViewportSizeX = fViewportSizeX;
     m_uiDefaultViewportSizeY = fViewportSizeY;
 
-    m_pRenderWare = CCore::GetSingleton().GetGame()->GetRenderWare();
+    m_pRenderWare = g_pCore->GetGame()->GetRenderWare();
 
     // Get some stats
     m_strVideoCardName = (const char*)g_pDeviceState->AdapterState.Name;
@@ -766,7 +766,7 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.videoMemoryKB.iUsedByRenderTargets = m_iRenderTargetMemoryKBUsed;
 
     // Option settings
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
     outStatus.settings.bWindowed = GetVideoModeManager()->IsDisplayModeWindowed();
     outStatus.settings.iFullScreenStyle = GetVideoModeManager()->GetFullScreenStyle();
     outStatus.settings.iFXQuality = gameSettings->GetFXQuality();
@@ -1088,7 +1088,7 @@ void CRenderItemManager::PreDrawWorld()
         bRequireNonAADisplay = bRequireDepthBuffer || !m_ShadersUsingMultipleRenderTargets.empty();
 
     // Readable depth buffer is not compatible with volumetric shadows
-    CCore::GetSingleton().GetGame()->GetSettings()->SetVolumetricShadowsSuspended(bRequireDepthBuffer);
+    g_pCore->GetGame()->GetSettings()->SetVolumetricShadowsSuspended(bRequireDepthBuffer);
 
     // Destroy old stuff that we don't need anymore
     if (!bRequireDepthBuffer)

@@ -490,7 +490,7 @@ void CChat::Output(const char* szText, bool bColorCoded)
     CColor      color = m_TextColor;
 
     // Allow smooth scroll when text is added if game FX Quality is not low
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
     if (gameSettings->GetFXQuality() > 0)
         m_fSmoothScroll -= 1.0f;
 

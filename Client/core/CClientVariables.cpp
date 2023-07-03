@@ -28,7 +28,7 @@ CClientVariables::~CClientVariables()
 bool CClientVariables::Load()
 {
     // Get the root node
-    CXMLNode* pRoot = CCore::GetSingleton().GetConfig();
+    CXMLNode* pRoot = g_pCore->GetConfig();
     if (!pRoot)
         return false;
     m_iRevision++;
@@ -229,8 +229,8 @@ void CClientVariables::ClampValue(const std::string& strVariable, CVector2D minV
 // Ensure CVars are within reasonable limits
 void CClientVariables::ValidateValues()
 {
-    uint uiViewportWidth = CCore::GetSingleton().GetGraphics()->GetViewportWidth();
-    uint uiViewportHeight = CCore::GetSingleton().GetGraphics()->GetViewportHeight();
+    uint uiViewportWidth = g_pCore->GetGraphics()->GetViewportWidth();
+    uint uiViewportHeight = g_pCore->GetGraphics()->GetViewportHeight();
 
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
@@ -267,7 +267,7 @@ void CClientVariables::LoadDefaults()
     if (!Exists("nick"))
     {
         DEFAULT("nick", _S(CNickGen::GetRandomNickname()));            // nickname
-        CCore::GetSingleton().RequestNewNickOnStart();                 // Request the user to set a new nickname
+        g_pCore->RequestNewNickOnStart();                              // Request the user to set a new nickname
     }
 
     DEFAULT("host", _S("127.0.0.1"));                                    // hostname

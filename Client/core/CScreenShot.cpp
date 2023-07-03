@@ -157,11 +157,11 @@ DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
         png_destroy_write_struct(&png_ptr, &info_ptr);
         fclose(file);
 
-        CCore::GetSingleton().GetConsole()->Printf(_("Screenshot taken: '%s'"), *ms_strScreenShotPath);
+        g_pCore->GetConsole()->Printf(_("Screenshot taken: '%s'"), *ms_strScreenShotPath);
     }
     else
     {
-        CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot file '%s'", *ms_strScreenShotPath);
+        g_pCore->GetConsole()->Printf("Could not create screenshot file '%s'", *ms_strScreenShotPath);
     }
 
     // Clean up the screen data buffer
@@ -184,7 +184,7 @@ void CScreenShot::StartSaveThread()
     HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)ThreadProc, NULL, CREATE_SUSPENDED, NULL);
     if (!hThread)
     {
-        CCore::GetSingleton().GetConsole()->Printf("Could not create screenshot thread.");
+        g_pCore->GetConsole()->Printf("Could not create screenshot thread.");
         ClearBuffer();
     }
     else

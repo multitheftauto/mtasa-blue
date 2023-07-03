@@ -14,7 +14,7 @@
 CProxyDirectInputDevice8::CProxyDirectInputDevice8(IDirectInputDevice8A* pDevice)
 {
     WriteDebugEvent(SString("CProxyDirectInputDevice8::CProxyDirectInputDevice8 %08x", this));
-    CCore::GetSingleton().ApplyHooks2();
+    g_pCore->ApplyHooks2();
 
     // Initialize our device member variable.
     m_pDevice = pDevice;

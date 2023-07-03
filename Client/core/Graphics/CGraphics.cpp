@@ -837,7 +837,7 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
         return;
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (bPostGUI && !g_pCore->IsMenuVisible())
         m_pLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
     else
         m_pLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
@@ -857,7 +857,7 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
     }
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (bPostGUI && !g_pCore->IsMenuVisible())
         m_pMaterialLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                    vecFaceToward);
     else
@@ -949,7 +949,7 @@ void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertice
     }
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (bPostGUI && !g_pCore->IsMenuVisible())
         m_pPrimitive3DBatcherPostGUI->AddPrimitive(eType, pVecVertices);
     else
         m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
@@ -972,7 +972,7 @@ void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVerti
     }
 
     // Add it to the queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())
+    if (bPostGUI && !g_pCore->IsMenuVisible())
         m_pMaterialPrimitive3DBatcherPostGUI->AddPrimitive(eType, pMaterial, pVecVertices);
     else
         m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
@@ -1651,7 +1651,7 @@ void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
 void CGraphics::AddQueueItem(const sDrawQueueItem& Item, bool bPostGUI)
 {
     // Add it to the correct queue
-    if (bPostGUI && !CCore::GetSingleton().IsMenuVisible())            // Don't draw over the main menu.  Ever.
+    if (bPostGUI && !g_pCore->IsMenuVisible())            // Don't draw over the main menu.  Ever.
         m_PostGUIQueue.push_back(Item);
     else
         m_PreGUIQueue.push_back(Item);
@@ -2016,7 +2016,7 @@ void CGraphics::DidRenderScene()
     m_LastRenderedSceneTimer.Reset();
     float fTargetAspectRatioValue = 0;
     if (CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"))
-        fTargetAspectRatioValue = CCore::GetSingleton().GetGame()->GetSettings()->GetAspectRatioValue();
+        fTargetAspectRatioValue = g_pCore->GetGame()->GetSettings()->GetAspectRatioValue();
     m_pAspectRatioConverter->Pulse(fTargetAspectRatioValue);
 }
 

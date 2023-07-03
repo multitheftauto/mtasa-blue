@@ -515,10 +515,10 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
         }
     }
 
-    CCore::GetSingleton().GetMultiplayer()->GetRwResourceStats(memStatsInfo.rwResourceStats);
-    CCore::GetSingleton().GetMultiplayer()->GetClothesCacheStats(memStatsInfo.clothesCacheStats);
-    CCore::GetSingleton().GetGame()->GetShaderReplacementStats(memStatsInfo.shaderReplacementStats);
-    CCore::GetSingleton().GetModelCacheManager()->GetStats(memStatsInfo.modelCacheStats);
+    g_pCore->GetMultiplayer()->GetRwResourceStats(memStatsInfo.rwResourceStats);
+    g_pCore->GetMultiplayer()->GetClothesCacheStats(memStatsInfo.clothesCacheStats);
+    g_pCore->GetGame()->GetShaderReplacementStats(memStatsInfo.shaderReplacementStats);
+    g_pCore->GetModelCacheManager()->GetStats(memStatsInfo.modelCacheStats);
 }
 
 ///////////////////////////////////////////////////////////////

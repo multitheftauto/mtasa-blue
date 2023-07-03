@@ -58,7 +58,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     WatchDogUserDidInteractWithMenu();
 
     // Hide certain questions
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->OnConnect();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->OnConnect();
 
     // Hide the server queue
     CServerInfo::GetSingletonPtr()->Hide();
@@ -67,7 +67,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     CServerBrowser::GetSingletonPtr()->SaveOptions();
 
     // Are we already connecting?
-    CNet* pNet = CCore::GetSingleton().GetNetwork();
+    CNet* pNet = g_pCore->GetNetwork();
     if (m_bIsConnecting || pNet->IsConnected())
     {
         CModManager::GetSingleton().Unload();
@@ -77,7 +77,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (!CheckNickProvided((char*)szNick))
     {
         SString strBuffer = _("Connecting failed. Invalid nick provided!");
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC20"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid nick provided
+        g_pCore->ShowMessageBox(_("Error") + _E("CC20"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR); // Invalid nick provided
         return false;
     }
 
@@ -85,7 +85,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     CVARS_SET("nick", std::string(szNick));
 
     // Reset fake lag
-    CCore::GetSingleton().SetFakeLagCommandEnabled(false);
+    g_pCore->SetFakeLagCommandEnabled(false);
     pNet->SetFakeLag(0, 0, 0, 0);
 
     // Reset the network
@@ -108,12 +108,12 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (!CServerListItem::Parse(m_strHost.c_str(), m_Address))
     {
         SString strBuffer = _("Connecting failed. Invalid host provided!");
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC21"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid host provided
+        g_pCore->ShowMessageBox(_("Error") + _E("CC21"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Invalid host provided
         return false;
     }
 
     // No connect if disk space is low
-    if (!CCore::GetSingleton().CheckDiskSpace())
+    if (!g_pCore->CheckDiskSpace())
         return false;
 
     // Set our packet handler
@@ -124,7 +124,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     if (m_usPort && !pNet->StartNetwork(strAddress, m_usPort, CVARS_GET_VALUE<bool>("packet_tag")))
     {
         SString strBuffer(_("Connecting to %s at port %u failed!"), m_strHost.c_str(), m_usPort);
-        CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Failed to connect
+        g_pCore->ShowMessageBox(_("Error") + _E("CC22"), strBuffer, MB_BUTTON_OK | MB_ICON_ERROR);            // Failed to connect
         return false;
     }
 
@@ -145,7 +145,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
 
     // Display the status box
     SString strBuffer(_("Connecting to %s:%u ..."), m_strHost.c_str(), m_usPort);
-    CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
+    g_pCore->ShowMessageBox(_("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
     WriteDebugEvent(SString("Connecting to %s:%u ...", m_strHost.c_str(), m_usPort));
 
     return true;
@@ -199,7 +199,7 @@ bool CConnectManager::Event_OnCancelClick(CGUIElement* pElement)
 bool CConnectManager::Abort()
 {
     // Stop the attempt
-    CNet* pNet = CCore::GetSingleton().GetNetwork();
+    CNet* pNet = g_pCore->GetNetwork();
     pNet->StopNetwork();
     pNet->Reset();
 
@@ -266,7 +266,7 @@ void CConnectManager::DoPulse()
         else
         {
             // Some error?
-            unsigned char ucError = CCore::GetSingleton().GetNetwork()->GetConnectionError();
+            unsigned char ucError = g_pCore->GetNetwork()->GetConnectionError();
             if (ucError != 0)
             {
                 SString strError;
@@ -318,20 +318,20 @@ void CConnectManager::DoPulse()
                 // Only display the error if we set one
                 if (strError.length() > 0)
                 {
-                    CCore::GetSingleton().ShowNetErrorMessageBox(_("Error") + strErrorCode, strError);
+                    g_pCore->ShowNetErrorMessageBox(_("Error") + strErrorCode, strError);
                 }
                 else            // Otherwise, remove the message box and hide quick connect
                 {
-                    CCore::GetSingleton().RemoveMessageBox(false);
+                    g_pCore->RemoveMessageBox(false);
                 }
 
-                CCore::GetSingleton().GetNetwork()->SetConnectionError(0);
+                g_pCore->GetNetwork()->SetConnectionError(0);
                 Abort();
             }
         }
 
         // Pulse the network interface
-        CCore::GetSingleton().GetNetwork()->DoPulse();
+        g_pCore->GetNetwork()->DoPulse();
     }
     else if (m_bReconnect)
     {
@@ -360,7 +360,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             BitStream.ReadString(strModName);
 
             // Process packet data
-            CCore::GetSingleton().GetNetwork()->SetServerBitStreamVersion(usServerBitStreamVersion);
+            g_pCore->GetNetwork()->SetServerBitStreamVersion(usServerBitStreamVersion);
 
             if (strModName != "")
             {
@@ -368,7 +368,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 SString strArguments("%s %s", g_pConnectManager->m_strNick.c_str(), g_pConnectManager->m_strPassword.c_str());
 
                 // Hide the messagebox we're currently showing
-                CCore::GetSingleton().RemoveMessageBox();
+                g_pCore->RemoveMessageBox();
 
                 // Save the connection details into the config
                 if (g_pConnectManager->m_bSave)
@@ -383,7 +383,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 SetApplicationSettingInt("last-server-time", _time32(NULL));
 
                 // Kevuwk: Forced the config to save here so that the IP/Port isn't lost on crash
-                CCore::GetSingleton().SaveConfig();
+                g_pCore->SaveConfig();
 
                 // Reset our variables
                 g_pConnectManager->m_strNick = "";
@@ -401,14 +401,14 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
                 {
                     // Failed loading the mod
                     strArguments.Format(_("No such mod installed (%s)"), strModName.c_str());
-                    CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC31"), strArguments, MB_BUTTON_OK | MB_ICON_ERROR);            // Mod loading failed
+                    g_pCore->ShowMessageBox(_("Error") + _E("CC31"), strArguments, MB_BUTTON_OK | MB_ICON_ERROR);            // Mod loading failed
                     g_pConnectManager->Abort();
                 }
             }
             else
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton().ShowNetErrorMessageBox(_("Error") + _E("CC32"), _("Bad server response (2)"));
+                g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CC32"), _("Bad server response (2)"));
                 g_pConnectManager->Abort();
             }
         }
@@ -418,7 +418,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
             if (ucPacketID != PACKET_ID_SERVER_JOIN && ucPacketID != PACKET_ID_SERVER_JOIN_DATA)
             {
                 // Show failed message and abort the attempt
-                CCore::GetSingleton().ShowNetErrorMessageBox(_("Error") + _E("CC33"), _("Bad server response (1)") + SString(" [%d]", ucPacketID));
+                g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CC33"), _("Bad server response (1)") + SString(" [%d]", ucPacketID));
                 g_pConnectManager->Abort();
             }
         }

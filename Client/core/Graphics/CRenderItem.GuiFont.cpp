@@ -90,12 +90,12 @@ void CGuiFontItem::CreateUnderlyingData(const SString& strFullFilePath, const SS
     int iCounter = 0;
     do
         m_strCEGUIFontName = SString("%s*%d*%d", *strFontName, uiSize, iCounter++);
-    while (CCore::GetSingleton().GetGUI()->IsFontPresent(m_strCEGUIFontName));
+    while (g_pCore->GetGUI()->IsFontPresent(m_strCEGUIFontName));
 
     // Create the CEGUI font
     try
     {
-        m_pFntCEGUI = CCore::GetSingleton().GetGUI()->CreateFnt(m_strCEGUIFontName, strFullFilePath, uiSize);
+        m_pFntCEGUI = g_pCore->GetGUI()->CreateFnt(m_strCEGUIFontName, strFullFilePath, uiSize);
     }
     catch (...)
     {

@@ -65,7 +65,7 @@ void CQuestionBox::Show()
     float fWinWidth = std::max(fMsgWidth, m_uiActiveButtons * (112 + 10.f));
     float fWinHeight = 50 + fMsgHeight + 50 + 30 + (m_uiActiveEditboxes * (fEditHeight + 2 * fEditSpacer));
 
-    CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    CVector2D resolution = g_pCore->GetGUI()->GetResolution();
     m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - fWinWidth / 2, resolution.fY / 2 - fWinHeight / 2), false);
     m_pWindow->SetSize(CVector2D(fWinWidth, fWinHeight + 10), false);
 

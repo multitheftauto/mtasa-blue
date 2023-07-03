@@ -112,7 +112,7 @@ HRESULT CProxyDirect3DIndexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, void
                            m_dwUsage, m_format, m_pool, OffsetToLock, SizeToLock, Flags);
         WriteDebugEvent(strMessage);
         AddReportLog(8625, strMessage);
-        CCore::GetSingleton().LogEvent(625, "Lock IndexBuffer", "", strMessage);
+        g_pCore->LogEvent(625, "Lock IndexBuffer", "", strMessage);
     }
     else if (*ppbData == NULL)
     {
@@ -120,7 +120,7 @@ HRESULT CProxyDirect3DIndexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, void
                            m_dwUsage, m_format, m_pool, OffsetToLock, SizeToLock, Flags);
         WriteDebugEvent(strMessage);
         AddReportLog(8626, strMessage);
-        CCore::GetSingleton().LogEvent(626, "Lock IndexBuffer NULL", "", strMessage);
+        g_pCore->LogEvent(626, "Lock IndexBuffer NULL", "", strMessage);
     }
     return hr;
 }

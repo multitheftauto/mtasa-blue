@@ -122,7 +122,7 @@ CServerCache::~CServerCache()
 bool CServerCache::LoadServerCache()
 {
     // Load config XML file
-    CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
+    CXMLFile* m_pConfigFile = g_pCore->GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
     if (!m_pConfigFile)
         return false;
     m_pConfigFile->Parse();
@@ -210,7 +210,7 @@ void CServerCache::SaveServerCache(bool bWaitUntilFinished)
         HANDLE hThread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)CServerCache::StaticThreadProc, NULL, CREATE_SUSPENDED, NULL);
         if (!hThread)
         {
-            CCore::GetSingleton().GetConsole()->Printf("Could not create server cache thread.");
+            g_pCore->GetConsole()->Printf("Could not create server cache thread.");
         }
         else
         {
@@ -250,7 +250,7 @@ DWORD CServerCache::StaticThreadProc(LPVOID lpdwThreadParam)
 ///////////////////////////////////////////////////////////////
 void CServerCache::StaticSaveServerCache()
 {
-    CXMLFile* m_pConfigFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
+    CXMLFile* m_pConfigFile = g_pCore->GetXML()->CreateXML(CalcMTASAPath(MTA_SERVER_CACHE_PATH));
     if (!m_pConfigFile)
         return;
     m_pConfigFile->Parse();

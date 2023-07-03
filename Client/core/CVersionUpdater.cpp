@@ -266,7 +266,7 @@ void CVersionUpdater::StopThread()
 CXMLNode* CVersionUpdater::GetXMLConfigNode(bool bCreateIfRequired)
 {
     // Get the root node
-    CXMLNode* pRoot = CCore::GetSingleton().GetConfig();
+    CXMLNode* pRoot = g_pCore->GetConfig();
     if (!pRoot)
         return NULL;
 
@@ -488,7 +488,7 @@ void CVersionUpdater::DoPulse()
     //
     // Time for periodic check?
     //
-    if (!m_bCheckedTimeForVersionCheck && !IsBusy() && !CCore::GetSingleton().WasLaunchedWithConnectURI())
+    if (!m_bCheckedTimeForVersionCheck && !IsBusy() && !g_pCore->WasLaunchedWithConnectURI())
     {
         m_bCheckedTimeForVersionCheck = true;
 
@@ -565,12 +565,12 @@ void CVersionUpdater::InitiateUpdate(const SString& strType, const SString& strD
 {
     if (strType == "Mandatory")
     {
-        CCore::GetSingleton().RemoveMessageBox();
+        g_pCore->RemoveMessageBox();
         RunProgram(EUpdaterProgramType::ServerSaysUpdate);
     }
     else if (strType == "Optional" || strType == "Recommended")
     {
-        CCore::GetSingleton().RemoveMessageBox();
+        g_pCore->RemoveMessageBox();
         MapSet(m_DoneOptionalMap, strHost, 1);
         RunProgram(EUpdaterProgramType::ServerSaysRecommend);
     }
@@ -623,7 +623,7 @@ void CVersionUpdater::InitiateManualCheck()
 
     if (IsBusy())
     {
-        CCore::GetSingleton().ShowMessageBox(_("Busy"), _("Can't check for updates right now"), MB_BUTTON_OK | MB_ICON_ERROR);
+        g_pCore->ShowMessageBox(_("Busy"), _("Can't check for updates right now"), MB_BUTTON_OK | MB_ICON_ERROR);
         return;
     }
 
@@ -865,7 +865,7 @@ bool CVersionUpdater::IsBusy()
         return true;
     if (GetQuestionBox().IsVisible())
         return true;
-    if (CCore::GetSingleton().WillRequestNewNickOnStart())
+    if (g_pCore->WillRequestNewNickOnStart())
         return true;
     return false;
 }
@@ -1014,7 +1014,7 @@ void CVersionUpdater::MainStep()
     shared.m_Mutex.Wait(-1);
 
     if (shared.m_bExitGame)
-        CCore::GetSingleton().Quit();
+        g_pCore->Quit();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1694,7 +1694,7 @@ void CVersionUpdater::_ResetNewsCheckTimer()
 void CVersionUpdater::_ResetMasterCheckTimer()
 {
     m_VarConfig.master_lastCheckTime = CDateTime::Now();
-    CCore::GetSingleton().SaveConfig();
+    g_pCore->SaveConfig();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -2048,7 +2048,7 @@ void CVersionUpdater::_QUpdateNewsResult()
 
                 // Set last news date
                 m_VarConfig.news_lastNewsDate = strDate;
-                CCore::GetSingleton().SaveConfig();
+                g_pCore->SaveConfig();
 
                 // See if there is more news after this one
                 m_bCheckedTimeForNewsUpdate = false;
@@ -2338,8 +2338,8 @@ void CVersionUpdater::_ProcessPatchFileQuery()
 
         if (GetRevisionFromFileName(m_JobInfo.strFilename, revision) && revision < MTASA_VERSION_BUILD)
         {
-            unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-            unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+            unsigned short netRev = g_pCore->GetNetwork()->GetNetRev();
+            unsigned short netRel = g_pCore->GetNetwork()->GetNetRel();
 
             SString playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                                   MTASA_VERSION_BUILD, netRev, netRel);
@@ -2588,7 +2588,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
     }
 
     // Check signature
-    if (!CCore::GetSingleton().GetNetwork()->VerifySignature(pData, uiSize))
+    if (!g_pCore->GetNetwork()->VerifySignature(pData, uiSize))
     {
         AddReportLog(5006, SString("DoPollDownload: Signature wrong for %s (MD5: %s)", m_JobInfo.strFilename.c_str(), m_JobInfo.strMD5.c_str()));
         m_ConditionMap.SetCondition("Download", "Fail", "Checksum");
@@ -2683,7 +2683,7 @@ void CVersionUpdater::_StartDownload()
                     }
 
                     // Check signature
-                    if (!CCore::GetSingleton().GetNetwork()->VerifySignature(buffer.GetData(), buffer.GetSize()))
+                    if (!g_pCore->GetNetwork()->VerifySignature(buffer.GetData(), buffer.GetSize()))
                     {
                         AddReportLog(5808, SString("StartDownload: Cached file reuse - Size and md5 correct, but signature incorrect (%s)", *strPathFilename));
                         continue;
@@ -2898,7 +2898,7 @@ void CVersionUpdater::_ShouldSendCrashDump()
         if (iNumToRemove > 0)
             history.erase(history.begin(), history.begin() + iNumToRemove);
 
-        CCore::GetSingleton().SaveConfig();
+        g_pCore->SaveConfig();
 
         m_ConditionMap.SetCondition("ProcessResponse", "ok");
     }
@@ -3106,13 +3106,13 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
 
     // Get our serial number
     char szSerial[64];
-    CCore::GetSingleton().GetNetwork()->GetSerial(szSerial, sizeof(szSerial));
+    g_pCore->GetNetwork()->GetSerial(szSerial, sizeof(szSerial));
     char szStatus[128];
-    CCore::GetSingleton().GetNetwork()->GetStatus(szStatus, sizeof(szStatus));
+    g_pCore->GetNetwork()->GetStatus(szStatus, sizeof(szStatus));
 
     // Compose version string
-    unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-    unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+    unsigned short usNetRev = g_pCore->GetNetwork()->GetNetRev();
+    unsigned short usNetRel = g_pCore->GetNetwork()->GetNetRel();
     SString        strPlayerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                              MTASA_VERSION_BUILD, usNetRev, usNetRel);
 
@@ -3160,7 +3160,7 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     // Compile some system stats
     SDxStatus dxStatus;
     g_pGraphics->GetRenderItemManager()->GetDxStatus(dxStatus);
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
     SString        strVideoCard = SStringX(g_pDeviceState->AdapterState.Name).Left(30);
     std::replace_if(
         strVideoCard.begin(), strVideoCard.end(), [](int c) { return !isalnum(c); }, '_');
@@ -3385,13 +3385,13 @@ int CVersionUpdater::DoSendPostToNextServer()
 
     // Get our serial number
     char szSerial[64];
-    CCore::GetSingleton().GetNetwork()->GetSerial(szSerial, sizeof(szSerial));
+    g_pCore->GetNetwork()->GetSerial(szSerial, sizeof(szSerial));
     char szStatus[128];
-    CCore::GetSingleton().GetNetwork()->GetStatus(szStatus, sizeof(szStatus));
+    g_pCore->GetNetwork()->GetStatus(szStatus, sizeof(szStatus));
 
     // Compose version string
-    unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-    unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+    unsigned short usNetRev = g_pCore->GetNetwork()->GetNetRev();
+    unsigned short usNetRel = g_pCore->GetNetwork()->GetNetRel();
     SString        strPlayerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                              MTASA_VERSION_BUILD, usNetRev, usNetRel);
 

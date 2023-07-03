@@ -296,7 +296,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pGraphics = CGraphics::GetSingletonPtr();
 
     // Load the server lists
-    CXMLNode* pConfig = CCore::GetSingletonPtr()->GetConfig();
+    CXMLNode* pConfig = g_pCore->GetConfig();
     m_ServerBrowser.LoadServerList(pConfig->FindSubNode(CONFIG_NODE_SERVER_FAV), CONFIG_FAVOURITE_LIST_TAG, m_ServerBrowser.GetFavouritesList());
     m_ServerBrowser.LoadServerList(pConfig->FindSubNode(CONFIG_NODE_SERVER_REC), CONFIG_RECENT_LIST_TAG, m_ServerBrowser.GetRecentList());
     m_ServerBrowser.LoadServerList(pConfig->FindSubNode(CONFIG_NODE_SERVER_HISTORY), CONFIG_HISTORY_LIST_TAG, m_ServerBrowser.GetHistoryList());
@@ -435,7 +435,7 @@ void CMainMenu::Update()
     }
 
     // Get the game interface and the system state
-    CGame*       pGame = CCore::GetSingleton().GetGame();
+    CGame*       pGame = g_pCore->GetGame();
     eSystemState SystemState = pGame->GetSystemState();
 
     m_Credits.Update();
@@ -460,12 +460,12 @@ void CMainMenu::Update()
         tagPOINT cursor;
         GetCursorPos(&cursor);
 
-        HWND hookedWindow = CCore::GetSingleton().GetHookedWindow();
+        HWND hookedWindow = g_pCore->GetHookedWindow();
 
         tagPOINT windowPos = {0};
         ClientToScreen(hookedWindow, &windowPos);
 
-        CVector2D vecResolution = CCore::GetSingleton().GetGUI()->GetResolution();
+        CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
         cursor.x -= windowPos.x;
         cursor.y -= windowPos.y;
         if (cursor.x < 0)
@@ -708,7 +708,7 @@ void CMainMenu::OnEscapePressedOffLine()
 
 void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
 {
-    CMultiplayer* pMultiplayer = CCore::GetSingleton().GetMultiplayer();
+    CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
     pMultiplayer->DisablePadHandler(bVisible);
 
     if ((m_ucFade == FADE_VISIBLE || m_ucFade == FADE_IN) && bVisible == false)
@@ -1145,7 +1145,7 @@ void CMainMenu::AskUserIfHeWantsToDisconnect(uchar menuType)
     SStringX strMessage(
         _("This will disconnect you from the current server."
           "\n\nAre you sure you want to disconnect?"));
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    CQuestionBox* pQuestionBox = g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pQuestionBox->Reset();
     pQuestionBox->SetTitle(_("DISCONNECT WARNING"));
     pQuestionBox->SetMessage(strMessage);
@@ -1177,7 +1177,7 @@ void CMainMenu::StaticWantsToDisconnectCallBack(void* pData, uint uiButton)
 /////////////////////////////////////////////////////////////
 void CMainMenu::WantsToDisconnectCallBack(void* pData, uint uiButton)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
     if (uiButton == 1)
     {

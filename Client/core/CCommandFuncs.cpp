@@ -42,8 +42,8 @@ void CCommandFuncs::Exit(const char* szParameters)
 void CCommandFuncs::Ver(const char* szParameters)
 {
     // Compose version string
-    unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-    unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+    unsigned short usNetRev = g_pCore->GetNetwork()->GetNetRev();
+    unsigned short usNetRel = g_pCore->GetNetwork()->GetNetRel();
     SString        strVersion = BLUE_VERSION_STRING;
     if (usNetRev > 0 || usNetRel > 0)
         strVersion += SString(".%d", usNetRev);
@@ -51,7 +51,7 @@ void CCommandFuncs::Ver(const char* szParameters)
         strVersion += SString(".%03d", usNetRel);
     strVersion += "\n";
     strVersion += g_pCore->GetBlueCopyrightString();
-    CLocalGUI::GetSingleton().EchoConsole(strVersion);
+    g_pCore->GetLocalGUI()->EchoConsole(strVersion);
 }
 
 void CCommandFuncs::ScreenShot(const char* szParameters)
@@ -156,20 +156,20 @@ void CCommandFuncs::Time(const char* szParameters)
     timeinfo = localtime(&rawtime);
 
     SString strTimeAndDate(_("* The time is %d:%02d:%02d"), timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
-    CCore::GetSingleton().ChatEchoColor(strTimeAndDate, 255, 100, 100);
+    g_pCore->ChatEchoColor(strTimeAndDate, 255, 100, 100);
 }
 
 // this fails randomly, see comments in CConsole
 void CCommandFuncs::Clear(const char* szParameters)
 {
-    CCore::GetSingleton().GetConsole()->Clear();
+    g_pCore->GetConsole()->Clear();
 }
 
 void CCommandFuncs::Load(const char* szParameters)
 {
     if (!szParameters)
     {
-        CCore::GetSingleton().GetConsole()->Printf("* Syntax: load <mod-name> [<arguments>]");
+        g_pCore->GetConsole()->Printf("* Syntax: load <mod-name> [<arguments>]");
         return;
     }
 
@@ -187,7 +187,7 @@ void CCommandFuncs::Load(const char* szParameters)
         CModManager::GetSingleton().RequestLoad(szModName, szArguments);
     }
     else
-        CCore::GetSingleton().GetConsole()->Printf("* Syntax: load <mod-name> [<arguments>]");
+        g_pCore->GetConsole()->Printf("* Syntax: load <mod-name> [<arguments>]");
 
     // Free the temp buffer
     delete[] szTemp;
@@ -203,7 +203,7 @@ void CCommandFuncs::Unload(const char* szParameters)
     }
     else
     {
-        CCore::GetSingleton().GetConsole()->Print("No mod loaded!");
+        g_pCore->GetConsole()->Print("No mod loaded!");
     }
 }
 
@@ -239,7 +239,7 @@ void CCommandFuncs::Connect(const char* szParameters)
     // Got all required arguments?
     if (!szHost || strNick.empty())
     {
-        CCore::GetSingleton().GetConsole()->Print(_("connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"));
+        g_pCore->GetConsole()->Print(_("connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"));
         return;
     }
 
@@ -247,7 +247,7 @@ void CCommandFuncs::Connect(const char* szParameters)
     int iPort = szPort ? atoi(szPort) : 22003;
     if (iPort <= 0 || iPort > 0xFFFF)
     {
-        CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));
+        g_pCore->GetConsole()->Print(_("connect: Bad port number"));
         return;
     }
 
@@ -267,18 +267,18 @@ void CCommandFuncs::Connect(const char* szParameters)
     if (!CModManager::GetSingleton().GetCurrentMod())
     {
         // Start the connect
-        if (CCore::GetSingleton().GetConnectManager()->Connect(szHost, usPort, strNick.c_str(), szPass))
+        if (g_pCore->GetConnectManager()->Connect(szHost, usPort, strNick.c_str(), szPass))
         {
-            CCore::GetSingleton().GetConsole()->Printf(_("connect: Connecting to %s:%u..."), szHost, usPort);
+            g_pCore->GetConsole()->Printf(_("connect: Connecting to %s:%u..."), szHost, usPort);
         }
         else
         {
-            CCore::GetSingleton().GetConsole()->Printf(_("connect: could not connect to %s:%u!"), szHost, usPort);
+            g_pCore->GetConsole()->Printf(_("connect: could not connect to %s:%u!"), szHost, usPort);
         }
     }
     else
     {
-        CCore::GetSingleton().GetConsole()->Print(_("connect: Failed to unload current mod"));
+        g_pCore->GetConsole()->Print(_("connect: Failed to unload current mod"));
     }
 }
 
@@ -286,11 +286,11 @@ void CCommandFuncs::ReloadNews(const char* szParameters)
 {
     if (CModManager::GetSingleton().GetCurrentMod())
     {
-        CCore::GetSingleton().GetConsole()->Print("reloadnews: can't do this whilst connected to server");
+        g_pCore->GetConsole()->Print("reloadnews: can't do this whilst connected to server");
         return;
     }
 
-    CCore::GetSingleton().GetConsole()->Print("reloadnews: reloading");
+    g_pCore->GetConsole()->Print("reloadnews: reloading");
     g_pCore->GetLocalGUI()->GetMainMenu()->ReloadNews();
 }
 
@@ -315,7 +315,7 @@ void CCommandFuncs::Reconnect(const char* szParameters)
         // Verify and convert the port number
         if (uiPort <= 0 || uiPort > 0xFFFF)
         {
-            CCore::GetSingleton().GetConsole()->Print(_("connect: Bad port number"));
+            g_pCore->GetConsole()->Print(_("connect: Bad port number"));
             return;
         }
 
@@ -328,47 +328,47 @@ void CCommandFuncs::Reconnect(const char* szParameters)
         }
 
         // Start the connect
-        if (CCore::GetSingleton().GetConnectManager()->Reconnect(strHost.c_str(), usPort, strPassword.c_str(), false))
+        if (g_pCore->GetConnectManager()->Reconnect(strHost.c_str(), usPort, strPassword.c_str(), false))
         {
-            CCore::GetSingleton().GetConsole()->Printf(_("connect: Connecting to %s:%u..."), strHost.c_str(), usPort);
+            g_pCore->GetConsole()->Printf(_("connect: Connecting to %s:%u..."), strHost.c_str(), usPort);
         }
         else
         {
-            CCore::GetSingleton().GetConsole()->Printf(_("connect: could not connect to %s:%u!"), strHost.c_str(), usPort);
+            g_pCore->GetConsole()->Printf(_("connect: could not connect to %s:%u!"), strHost.c_str(), usPort);
         }
     }
     else
     {
-        CCore::GetSingleton().GetConsole()->Print("connect: Failed to unload current mod");
+        g_pCore->GetConsole()->Print("connect: Failed to unload current mod");
     }
 }
 
 void CCommandFuncs::Bind(const char* szParameters)
 {
-    CCore::GetSingleton().GetKeyBinds()->BindCommand(szParameters);
-    CCore::GetSingleton().SaveConfig();
+    g_pCore->GetKeyBinds()->BindCommand(szParameters);
+    g_pCore->SaveConfig();
 }
 
 void CCommandFuncs::Unbind(const char* szParameters)
 {
-    CCore::GetSingleton().GetKeyBinds()->UnbindCommand(szParameters);
-    CCore::GetSingleton().SaveConfig();
+    g_pCore->GetKeyBinds()->UnbindCommand(szParameters);
+    g_pCore->SaveConfig();
 }
 
 void CCommandFuncs::Binds(const char* szParameters)
 {
-    CCore::GetSingleton().GetKeyBinds()->PrintBindsCommand(szParameters);
+    g_pCore->GetKeyBinds()->PrintBindsCommand(szParameters);
 }
 
 void CCommandFuncs::CopyGTAControls(const char* szParameters)
 {
-    CKeyBindsInterface* pKeyBinds = CCore::GetSingleton().GetKeyBinds();
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
 
     if (pKeyBinds)
     {
         pKeyBinds->RemoveAllGTAControls();
         pKeyBinds->LoadControlsFromGTA();
-        CCore::GetSingleton().GetConsole()->Print(_("Bound all controls from GTA"));
+        g_pCore->GetConsole()->Print(_("Bound all controls from GTA"));
     }
 }
 
@@ -381,41 +381,41 @@ void CCommandFuncs::HUD(const char* szParameters)
 
 void CCommandFuncs::SaveConfig(const char* szParameters)
 {
-    CCore::GetSingleton().SaveConfig();
+    g_pCore->SaveConfig();
     g_pCore->GetConsole()->Print(_("Saved configuration file"));
 }
 
 void CCommandFuncs::ChatScrollUp(const char* szParameters)
 {
-    CChat* pChat = CCore::GetSingleton().GetLocalGUI()->GetChat();
+    CChat* pChat = g_pCore->GetLocalGUI()->GetChat();
     if (pChat)
         pChat->Scroll(atoi(szParameters));
 }
 
 void CCommandFuncs::ChatScrollDown(const char* szParameters)
 {
-    CChat* pChat = CCore::GetSingleton().GetLocalGUI()->GetChat();
+    CChat* pChat = g_pCore->GetLocalGUI()->GetChat();
     if (pChat)
         pChat->Scroll(atoi(szParameters));
 }
 
 void CCommandFuncs::DebugScrollUp(const char* szParameters)
 {
-    CDebugView* pDebug = CCore::GetSingleton().GetLocalGUI()->GetDebugView();
+    CDebugView* pDebug = g_pCore->GetLocalGUI()->GetDebugView();
     if (pDebug)
         pDebug->Scroll(atoi(szParameters));
 }
 
 void CCommandFuncs::DebugScrollDown(const char* szParameters)
 {
-    CDebugView* pDebug = CCore::GetSingleton().GetLocalGUI()->GetDebugView();
+    CDebugView* pDebug = g_pCore->GetLocalGUI()->GetDebugView();
     if (pDebug)
         pDebug->Scroll(atoi(szParameters));
 }
 
 void CCommandFuncs::DebugClear(const char* szParameters)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetDebugView()->Clear();
+    g_pCore->GetLocalGUI()->GetDebugView()->Clear();
 }
 
 void CCommandFuncs::Test(const char* szParameters)
@@ -424,7 +424,7 @@ void CCommandFuncs::Test(const char* szParameters)
     {
         SString strStats = CCrashDumpWriter::GetCrashAvertedStatsSoFar();
         SString strMsg = SString("Crash averted stats:\n%s", strStats.empty() ? "None" : *strStats);
-        CCore::GetSingleton().GetConsole()->Print(strMsg);
+        g_pCore->GetConsole()->Print(strMsg);
     }
     else if (SStringX(szParameters) == "crashme")
     {
@@ -448,12 +448,12 @@ void CCommandFuncs::Serial(const char* szParameters)
     g_pCore->GetNetwork()->GetSerial(szSerial, sizeof(szSerial));
 
     // Print it
-    CCore::GetSingleton().GetConsole()->Printf(_("* Your serial is: %s"), szSerial);
+    g_pCore->GetConsole()->Printf(_("* Your serial is: %s"), szSerial);
 }
 
 void CCommandFuncs::FakeLag(const char* szCmdLine)
 {
-    if (!CCore::GetSingleton().IsFakeLagCommandEnabled())
+    if (!g_pCore->IsFakeLagCommandEnabled())
     {
         g_pCore->GetConsole()->Print("fakelag command not enabled");
         return;

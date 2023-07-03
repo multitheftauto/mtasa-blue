@@ -90,7 +90,7 @@ public:
             if (m_bEnabled)
             {
                 uchar ucHour, ucMin;
-                CCore::GetSingleton().GetGame()->GetClock()->Get(&ucHour, &ucMin);
+                g_pCore->GetGame()->GetClock()->Get(&ucHour, &ucMin);
 
                 AppendLog(SString(">Detected slow frame: %dms    (Prev frame was %dms)  (Game time %02d:%02d)", frameTimeUs / 1000, m_PrevFrameTimeUs / 1000,
                                   ucHour, ucMin));

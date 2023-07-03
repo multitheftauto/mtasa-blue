@@ -139,7 +139,7 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
                            m_dwUsage, m_dwFVF, m_pool, OffsetToLock, SizeToLock, Flags);
         WriteDebugEvent(strMessage);
         AddReportLog(info.uiReportId, strMessage);
-        CCore::GetSingleton().LogEvent(info.uiLogEventId, "Lock VertexBuffer", "", strMessage);
+        g_pCore->LogEvent(info.uiLogEventId, "Lock VertexBuffer", "", strMessage);
     }
     return hr;
 }

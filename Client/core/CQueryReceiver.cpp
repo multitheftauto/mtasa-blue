@@ -183,7 +183,7 @@ SQueryInfo CQueryReceiver::GetServerResponse()
 
         // Recover server ping status if present
         const SString strPingStatus = strBuildNumber.Right(strBuildNumber.length() - strlen(strBuildNumber) - 1);
-        CCore::GetSingleton().GetNetwork()->UpdatePingStatus(*strPingStatus, info.players);
+        g_pCore->GetNetwork()->UpdatePingStatus(*strPingStatus, info.players);
 
         // Recover server http port if present
         const SString strNetRoute = strPingStatus.Right(strPingStatus.length() - strlen(strPingStatus) - 1);

@@ -160,7 +160,7 @@ void CFileTextureItem::CreateUnderlyingData(const CPixels* pInPixels, bool bMipM
 {
     assert(!m_pD3DTexture);
 
-    CPixelsManagerInterface* pPixelsManager = CCore::GetSingleton().GetGraphics()->GetPixelsManager();
+    CPixelsManagerInterface* pPixelsManager = g_pCore->GetGraphics()->GetPixelsManager();
 
     // Copy from plain
     const CPixels* pPixels = pInPixels;

@@ -62,7 +62,7 @@ void CLocalGUI::SetSkin(const char* szName)
 
     std::string error;
 
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     try
     {
@@ -89,14 +89,14 @@ void CLocalGUI::SetSkin(const char* szName)
         }
     }
 
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+    CClientVariables* cvars = g_pCore->GetCVars();
     m_LastSettingsRevision = cvars->GetRevision();
 
     if (guiWasLoaded)
         CreateWindows(guiWasLoaded);
 
-    if (CCore::GetSingleton().GetConsole() && !error.empty())
-        CCore::GetSingleton().GetConsole()->Echo(error.c_str());
+    if (g_pCore->GetConsole() && !error.empty())
+        g_pCore->GetConsole()->Echo(error.c_str());
 }
 
 void CLocalGUI::ChangeLocale(const char* szName)
@@ -110,7 +110,7 @@ void CLocalGUI::ChangeLocale(const char* szName)
     if (guiWasLoaded)
         DestroyWindows();
 
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+    CClientVariables* cvars = g_pCore->GetCVars();
     m_LastSettingsRevision = cvars->GetRevision();
 
     g_pLocalization->SetCurrentLanguage();
@@ -130,7 +130,7 @@ void CLocalGUI::ChangeLocale(const char* szName)
 
 void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
 {
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     // Create chatbox
     m_pChat = new CChat(pGUI, CVector2D(0.0125f, 0.015f));
@@ -170,11 +170,11 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
 void CLocalGUI::CreateObjects(IUnknown* pDevice)
 {
     // Store the GUI manager pointer and create the GUI classes
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     // Set the CEGUI skin to whatever the user has selected
     SString           currentSkinName;
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+    CClientVariables* cvars = g_pCore->GetCVars();
     cvars->Get("current_skin", currentSkinName);
     if (currentSkinName.empty())
     {
@@ -208,7 +208,7 @@ void CLocalGUI::DoPulse()
 {
     m_pVersionUpdater->DoPulse();
 
-    CClientVariables* cvars = CCore::GetSingleton().GetCVars();
+    CClientVariables* cvars = g_pCore->GetCVars();
     if (cvars->GetRevision() != m_LastSettingsRevision)
     {
         m_LastSettingsRevision = cvars->GetRevision();
@@ -221,11 +221,11 @@ void CLocalGUI::DoPulse()
 
         if (currentSkinName != m_LastSkinName)
         {
-            if (!CCore::GetSingleton().GetModManager()->IsLoaded())
+            if (!g_pCore->GetModManager()->IsLoaded())
                 SetSkin(currentSkinName);
             else
             {
-                CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing skin");
+                g_pCore->GetConsole()->Printf("Please disconnect before changing skin");
                 cvars->Set("current_skin", m_LastSkinName);
             }
         }
@@ -250,19 +250,19 @@ void CLocalGUI::DoPulse()
                 m_LastSettingsRevision = cvars->GetRevision() - 1;
 
                 if (m_LocaleChangeCounter == 2)
-                    CCore::GetSingleton().ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO);
+                    g_pCore->ShowMessageBox(_E("CC99"), ("Changing language, please wait..."), MB_ICON_INFO);
             }
             else
             {
                 // Do actual locale change
                 m_LocaleChangeCounter = 0;
-                CCore::GetSingleton().RemoveMessageBox();
+                g_pCore->RemoveMessageBox();
 
-                if (!CCore::GetSingleton().GetModManager()->IsLoaded())
+                if (!g_pCore->GetModManager()->IsLoaded())
                     ChangeLocale(currentLocaleName);
                 else
                 {
-                    CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
+                    g_pCore->GetConsole()->Printf("Please disconnect before changing language");
                     cvars->Set("locale", m_LastLocaleName);
                 }
             }
@@ -273,9 +273,9 @@ void CLocalGUI::DoPulse()
 void CLocalGUI::Draw()
 {
     // Get the game interface
-    CGame*       pGame = CCore::GetSingleton().GetGame();
+    CGame*       pGame = g_pCore->GetGame();
     eSystemState SystemState = pGame->GetSystemState();
-    CGUI*        pGUI = CCore::GetSingleton().GetGUI();
+    CGUI*        pGUI = g_pCore->GetGUI();
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
@@ -302,10 +302,10 @@ void CLocalGUI::Draw()
     }
 
     // If we're ingame, make sure the chatbox is drawn
-    bool bChatVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bChatVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !g_pCore->IsOfflineMod());
     if (m_pChat->IsVisible() != bChatVisible)
         m_pChat->SetVisible(bChatVisible, !bChatVisible);
-    bool bDebugVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bDebugVisible = (SystemState == 9 /* GS_INGAME */ && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !g_pCore->IsOfflineMod());
     if (m_pDebugView->IsVisible() != bDebugVisible)
         m_pDebugView->SetVisible(bDebugVisible, true);
 
@@ -337,7 +337,7 @@ void CLocalGUI::Draw()
 
 void CLocalGUI::Invalidate()
 {
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     // Invalidate the GUI
     if (pGUI)
@@ -348,7 +348,7 @@ void CLocalGUI::Invalidate()
 
 void CLocalGUI::Restore()
 {
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     if (pGUI)
     {
@@ -359,7 +359,7 @@ void CLocalGUI::Restore()
 
 void CLocalGUI::DrawMouseCursor()
 {
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     pGUI->DrawMouseCursor();
 }
@@ -380,7 +380,7 @@ void CLocalGUI::SetConsoleVisible(bool bVisible)
         // Set the visible state
         m_pConsole->SetVisible(bVisible);
 
-        CGUI* pGUI = CCore::GetSingleton().GetGUI();
+        CGUI* pGUI = g_pCore->GetGUI();
         if (bVisible)
             pGUI->SetCursorAlpha(1.0f);
         else if (!g_pCore->IsMenuVisible())
@@ -420,7 +420,7 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
 
         m_pMainMenu->SetVisible(bVisible);
 
-        CGUI* pGUI = CCore::GetSingleton().GetGUI();
+        CGUI* pGUI = g_pCore->GetGUI();
         if (bVisible)
         {
             pGUI->SelectInputHandlers(INPUT_CORE);
@@ -548,7 +548,7 @@ void CLocalGUI::EchoDebug(const char* szText)
 
 bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     // If we have the focus, we handle the message
     if (InputGoesToGUI())
@@ -707,14 +707,14 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 bool CLocalGUI::InputGoesToGUI()
 {
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
     if (!pGUI)
         return false;
 
     // Here we're supposed to check if things like menues are up, console is up or the chatbox is expecting input
     // If the console is visible OR the chat is expecting input OR the mainmenu is visible
     return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
-            !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
+            !g_pCore->IsFocused() || IsWebRequestGUIVisible());
 }
 
 void CLocalGUI::ForceCursorVisible(bool bVisible)
@@ -724,7 +724,7 @@ void CLocalGUI::ForceCursorVisible(bool bVisible)
 
 void CLocalGUI::UpdateCursor()
 {
-    CGUI* pGUI = CCore::GetSingleton().GetGUI();
+    CGUI* pGUI = g_pCore->GetGUI();
 
     static DWORD dwWidth = CDirect3DData::GetSingleton().GetViewportWidth();
     static DWORD dwHeight = CDirect3DData::GetSingleton().GetViewportHeight();

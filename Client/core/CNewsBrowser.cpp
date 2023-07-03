@@ -130,11 +130,11 @@ void CNewsBrowser::CreateHeadlines()
     uint i;
     // Process each news item
     for (i = 0; i < m_NewsitemList.size(); i++)
-        CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->SetNewsHeadline(i, m_NewsitemList[i].strHeadline, m_NewsitemList[i].strDate, i < 1 && bNewsUpdated);
+        g_pCore->GetLocalGUI()->GetMainMenu()->SetNewsHeadline(i, m_NewsitemList[i].strHeadline, m_NewsitemList[i].strDate, i < 1 && bNewsUpdated);
 
     // Clear unused slots
     for (; i < 3; i++)
-        CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->SetNewsHeadline(i, "", "", false);
+        g_pCore->GetLocalGUI()->GetMainMenu()->SetNewsHeadline(i, "", "", false);
 }
 
 ////////////////////////////////////////////////////
@@ -154,7 +154,7 @@ void CNewsBrowser::CreateGUI()
     m_pWindow->SetCloseButtonEnabled(true);
     m_pWindow->SetMovable(true);
 
-    CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    CVector2D resolution = g_pCore->GetGUI()->GetResolution();
     float     yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
     m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - 640.0f / 2, resolution.fY / 2 - 480.0f / 2 + yoff), false);
     m_pWindow->SetSize(CVector2D(640.0f, 480.0f));

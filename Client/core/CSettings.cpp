@@ -28,7 +28,7 @@ extern SBindableKey        g_bkKeys[];
 
 CSettings::CSettings()
 {
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
     m_fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
     m_fSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
 
@@ -68,7 +68,7 @@ void CSettings::CreateGUI()
     CVector2D vecTemp;
     CVector2D vecSize;
 
-    CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    CVector2D resolution = g_pCore->GetGUI()->GetResolution();
 
     CVector2D contentSize(640, 480);
     float     fBottomButtonAreaHeight = 38;
@@ -846,7 +846,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxShowUnsafeResolutions->AutoSize(NULL, 20.0f);
 
 #ifndef SHOWALLSETTINGS
-    if (!CCore::GetSingleton().GetGame()->GetSettings()->HasUnsafeResolutions())
+    if (!g_pCore->GetGame()->GetSettings()->HasUnsafeResolutions())
     {
         m_pCheckBoxShowUnsafeResolutions->SetVisible(false);
         fPosY -= 20.0f;
@@ -1350,12 +1350,12 @@ void CSettings::DestroyGUI()
 
 void RestartCallBack(void* ptr, unsigned int uiButton)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
     if (uiButton == 1)
     {
         SetOnQuitCommand("restart");
-        CCore::GetSingleton().Quit();
+        g_pCore->Quit();
     }
 }
 
@@ -1363,7 +1363,7 @@ void CSettings::ShowRestartQuestion()
 {
     SString strMessage = _("Some settings will be changed when you next start MTA");
     strMessage += _("\n\nDo you want to restart now?");
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    CQuestionBox* pQuestionBox = g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pQuestionBox->Reset();
     pQuestionBox->SetTitle(_("RESTART REQUIRED"));
     pQuestionBox->SetMessage(strMessage);
@@ -1375,7 +1375,7 @@ void CSettings::ShowRestartQuestion()
 
 void DisconnectCallback(void* ptr, unsigned int uiButton)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
     if (uiButton == 1)
     {
@@ -1387,7 +1387,7 @@ void CSettings::ShowDisconnectQuestion()
 {
     SString strMessage = _("Some settings will be changed when you disconnect the current server");
     strMessage += _("\n\nDo you want to disconnect now?");
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    CQuestionBox* pQuestionBox = g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pQuestionBox->Reset();
     pQuestionBox->SetTitle(_("DISCONNECT REQUIRED"));
     pQuestionBox->SetMessage(strMessage);
@@ -1430,7 +1430,7 @@ void CSettings::UpdateAudioTab()
     CVARS_GET("mtavolume", fMTAVolume);
     CVARS_GET("voicevolume", fVoiceVolume);
 
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
 
     m_pAudioRadioVolume->SetScrollPosition(m_fRadioVolume);
     m_pAudioSFXVolume->SetScrollPosition(m_fSFXVolume);
@@ -1465,7 +1465,7 @@ void CSettings::UpdateAudioTab()
 
 void CSettings::UpdateVideoTab()
 {
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
 
     bool bNextWindowed;
     bool bNextFSMinimize;
@@ -1627,7 +1627,7 @@ void CSettings::PopulateResolutionComboBox()
     GetVideoModeManager()->GetNextVideoMode(iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle);
     bool bShowUnsafeResolutions = m_pCheckBoxShowUnsafeResolutions->GetSelected();
 
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
 
     VideoMode vidModemInfo;
     int       vidMode, numVidModes;
@@ -1786,7 +1786,7 @@ void CSettings::UpdateCaptureAxis()
         if (GetJoystickManager()->IsAxisBindComplete())
         {
             // Remove the messagebox we created earlier
-            CCore::GetSingleton().RemoveMessageBox();
+            g_pCore->RemoveMessageBox();
 
             // Update GUI elements
             UpdateJoypadTab();
@@ -1801,7 +1801,7 @@ void CSettings::UpdateCaptureAxis()
 //
 bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
 {
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
 
     CVARS_SET("aspect_ratio", ASPECT_RATIO_AUTO);
     CVARS_SET("fov", 70);
@@ -1846,7 +1846,7 @@ void CSettings::ResetGTAVolume()
 {
     // This will set the GTA volume to the GTA volume value in the settings,
     // and is not affected by the master volume setting.
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
     gameSettings->SetRadioVolume(m_fRadioVolume * 64.0f);
     gameSettings->SetSFXVolume(m_fSFXVolume * 64.0f);
     gameSettings->Save();
@@ -1858,7 +1858,7 @@ void CSettings::SetRadioVolume(float fVolume)
 
     m_fRadioVolume = fVolume;
 
-    CCore::GetSingleton().GetGame()->GetSettings()->SetRadioVolume(m_fRadioVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
+    g_pCore->GetGame()->GetSettings()->SetRadioVolume(m_fRadioVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
 }
 
 void CSettings::SetSFXVolume(float fVolume)
@@ -1867,7 +1867,7 @@ void CSettings::SetSFXVolume(float fVolume)
 
     m_fSFXVolume = fVolume;
 
-    CCore::GetSingleton().GetGame()->GetSettings()->SetSFXVolume(m_fSFXVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
+    g_pCore->GetGame()->GetSettings()->SetSFXVolume(m_fSFXVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
 }
 
 //
@@ -1887,7 +1887,7 @@ bool CSettings::OnAudioDefaultClick(CGUIElement* pElement)
     CVARS_SET("mute_mta_when_minimized", false);
     CVARS_SET("mute_voice_when_minimized", false);
 
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
 
     gameSettings->SetRadioAutotuneEnabled(true);
     gameSettings->SetRadioEqualizerEnabled(true);
@@ -1911,7 +1911,7 @@ bool CSettings::OnAxisSelectClick(CGUIElement* pElement)
     if (GetJoystickManager()->BindNextUsedAxisToOutput(index))
     {
         m_bCaptureAxis = true;
-        CCore::GetSingleton().ShowMessageBox(_("Binding axis"), _("Move an axis to bind, or escape to clear"), MB_ICON_QUESTION);
+        g_pCore->ShowMessageBox(_("Binding axis"), _("Move an axis to bind, or escape to clear"), MB_ICON_QUESTION);
     }
 
     return true;
@@ -1922,7 +1922,7 @@ bool CSettings::OnAxisSelectClick(CGUIElement* pElement)
 //
 bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
 {
-    CGameSettings*            gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings*            gameSettings = g_pCore->GetGame()->GetSettings();
     CControllerConfigManager* pController = g_pCore->GetGame()->GetControllerConfigManager();
 
     // Load the default settings
@@ -1961,7 +1961,7 @@ bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
 bool CSettings::OnBindsDefaultClick(CGUIElement* pElement)
 {
     // Load the default binds
-    CCore::GetSingleton().GetKeyBinds()->LoadDefaultBinds();
+    g_pCore->GetKeyBinds()->LoadDefaultBinds();
 
     // Clear the binds list
     m_pBindsList->Clear();
@@ -2374,7 +2374,7 @@ void CSettings::UpdateChatColorPreview(eChatColorType eType)
 // Saves the keybinds
 void CSettings::ProcessKeyBinds()
 {
-    CKeyBindsInterface* pKeyBinds = CCore::GetSingleton().GetKeyBinds();
+    CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
 
     SString strResource;
 
@@ -2590,14 +2590,14 @@ bool CSettings::OnBindsListClick(CGUIElement* pElement)
                 // Create a messagebox to notify the user
                 // SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
                 SString strText = _("Press a key to bind, or escape to clear");
-                CCore::GetSingleton().ShowMessageBox(_("Binding a primary key"), strText, MB_ICON_QUESTION);
+                g_pCore->ShowMessageBox(_("Binding a primary key"), strText, MB_ICON_QUESTION);
             }
             else
             {
                 // Create a messagebox to notify the user
                 // sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
                 SString strText = _("Press a key to bind, or escape to clear");
-                CCore::GetSingleton().ShowMessageBox(_("Binding a secondary key"), strText, MB_ICON_QUESTION);
+                g_pCore->ShowMessageBox(_("Binding a secondary key"), strText, MB_ICON_QUESTION);
             }
         }
     }
@@ -2616,7 +2616,7 @@ bool CSettings::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (m_bCaptureKey)
     {
-        CKeyBindsInterface* pKeyBinds = CCore::GetSingleton().GetKeyBinds();
+        CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
 
         if (uMsg != WM_KEYDOWN && uMsg != WM_KEYUP && uMsg != WM_SYSKEYDOWN && uMsg != WM_SYSKEYUP && uMsg != WM_LBUTTONDOWN && uMsg != WM_LBUTTONUP &&
             uMsg != WM_RBUTTONDOWN && uMsg != WM_RBUTTONUP && uMsg != WM_MBUTTONDOWN && uMsg != WM_MBUTTONUP && uMsg != WM_XBUTTONDOWN &&
@@ -2650,7 +2650,7 @@ bool CSettings::ProcessMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
         // Remove the messagebox we created earlier
-        CCore::GetSingleton().RemoveMessageBox();
+        g_pCore->RemoveMessageBox();
 
         // Make sure the list gets redrawed/updated
         m_pBindsList->Activate();
@@ -2671,7 +2671,7 @@ void CSettings::Initialize()
     int  iBind = 0, iRowGame;
 
     // Add the rows
-    CKeyBinds* pKeyBinds = reinterpret_cast<CKeyBinds*>(CCore::GetSingleton().GetKeyBinds());
+    CKeyBinds* pKeyBinds = reinterpret_cast<CKeyBinds*>(g_pCore->GetKeyBinds());
     iRowGame = m_pBindsList->AddRow();
     m_pBindsList->SetItemText(iRowGame, m_hBind, _("GTA GAME CONTROLS"), false, true);
     m_pBindsList->SetItemText(m_pBindsList->AddRow(), m_hBind, CORE_SETTINGS_HEADER_SPACER, false, true);
@@ -2918,9 +2918,9 @@ bool CSettings::OnOKButtonClick(CGUIElement* pElement)
     ProcessJoypad();
 
     // Invalid nickname?
-    if (!CCore::GetSingleton().IsValidNick(m_pEditNick->GetText().c_str()))
+    if (!g_pCore->IsValidNick(m_pEditNick->GetText().c_str()))
     {
-        CCore::GetSingleton().ShowMessageBox(_("Error"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowMessageBox(_("Error"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO);
         return true;
     }
 
@@ -2980,7 +2980,7 @@ void CSettings::LoadData()
     // Put the nick in the edit
     CVARS_GET("nick", strVar);
 
-    if (CCore::GetSingleton().IsValidNick(strVar.c_str()))
+    if (g_pCore->IsValidNick(strVar.c_str()))
     {
         m_pEditNick->SetText(strVar.c_str());
     }
@@ -3024,7 +3024,7 @@ void CSettings::LoadData()
     CVARS_GET("classic_controls", bVar);
     m_pClassicControls->SetSelected(bVar);
 
-    CGameSettings*            gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings*            gameSettings = g_pCore->GetGame()->GetSettings();
     CControllerConfigManager* pController = g_pCore->GetGame()->GetControllerConfigManager();
 
     m_pMouseSensitivity->SetScrollPosition(gameSettings->GetMouseSensitivity());
@@ -3296,14 +3296,14 @@ bool CSettings::OnTabChanged(CGUIElement* pElement)
 void CSettings::SaveData()
 {
     std::string    strVar;
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    CGameSettings* gameSettings = g_pCore->GetGame()->GetSettings();
 
     // Set and save our settings
     if (CModManager::GetSingleton().GetCurrentMod() != NULL)
     {
         CVARS_GET("nick", strVar);
         if (m_pEditNick->GetText().compare(strVar) != 0)
-            CCore::GetSingleton().GetCommands()->Execute("nick", m_pEditNick->GetText().c_str());
+            g_pCore->GetCommands()->Execute("nick", m_pEditNick->GetText().c_str());
     }
     else
     {
@@ -3315,7 +3315,7 @@ void CSettings::SaveData()
     CVARS_SET("save_server_passwords", bServerPasswords);
     if (!bServerPasswords)
     {
-        g_pCore->GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser()->ClearServerPasswords();
+        g_pCore->GetLocalGUI()->GetMainMenu()->GetServerBrowser()->ClearServerPasswords();
     }
 
     CVARS_SET("auto_refresh_browser", m_pAutoRefreshBrowser->GetSelected());
@@ -3661,7 +3661,7 @@ void CSettings::SaveData()
     CClientVariables::GetSingleton().ValidateValues();
 
     // Save the config here
-    CCore::GetSingleton().SaveConfig();
+    g_pCore->SaveConfig();
     // Save the single player settings (e.g. video mode, volume)
     gameSettings->Save();
 
@@ -3875,7 +3875,7 @@ void CSettings::SetChatColorValues(eChatColorType eType, CColor pColor)
 
 void CSettings::LoadChatPresets()
 {
-    CXMLFile* pPresetsFile = CCore::GetSingleton().GetXML()->CreateXML(CalcMTASAPath(CHAT_PRESETS_PATH));
+    CXMLFile* pPresetsFile = g_pCore->GetXML()->CreateXML(CalcMTASAPath(CHAT_PRESETS_PATH));
     if (pPresetsFile && pPresetsFile->Parse())
     {
         CXMLNode* pPresetsRoot = pPresetsFile->GetRootNode();
@@ -4414,7 +4414,7 @@ bool CSettings::OnFxQualityChanged(CGUIElement* pElement)
 
 void VolumetricShadowsCallBack(void* ptr, unsigned int uiButton)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
     if (uiButton == 0)
         ((CGUICheckBox*)ptr)->SetSelected(false);
 }
@@ -4427,7 +4427,7 @@ bool CSettings::OnVolumetricShadowsClick(CGUIElement* pElement)
         SStringX strMessage(
             _("Volmetric shadows can cause some systems to slow down."
               "\n\nAre you sure you want to enable them?"));
-        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        CQuestionBox* pQuestionBox = g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(_("PERFORMANCE WARNING"));
         pQuestionBox->SetMessage(strMessage);
@@ -4451,7 +4451,7 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
         strMessage +=
             _("Screen upload is required by some servers for anti-cheat purposes."
               "\n\n(The chat box and GUI is excluded from the upload)\n");
-        CCore::GetSingleton().ShowMessageBox(_("SCREEN UPLOAD INFORMATION"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowMessageBox(_("SCREEN UPLOAD INFORMATION"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
 }
@@ -4469,7 +4469,7 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
             _("Some scripts may play sounds, such as radio, from the internet."
               "\n\nDisabling this setting may decrease network"
               "\nbandwidth consumption.\n");
-        CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+        g_pCore->ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
 }
@@ -4479,7 +4479,7 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
 //
 void CustomizedSAFilesCallBack(void* ptr, unsigned int uiButton)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
     if (uiButton == 0)
         ((CGUICheckBox*)ptr)->SetSelected(false);
 }
@@ -4494,7 +4494,7 @@ bool CSettings::OnCustomizedSAFilesClick(CGUIElement* pElement)
               "\nMTA will only use these modified files if this check box is ticked."
               "\n\nHowever, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS"
               "\n\nAre you sure you want to use them?");
-        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        CQuestionBox* pQuestionBox = g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(_("CUSTOMIZED GTA:SA FILES"));
         pQuestionBox->SetMessage(strMessage);
@@ -4543,7 +4543,7 @@ bool CSettings::OnDPIAwareClick(CGUIElement* pElement)
               "we only recommend it when you play MTA:SA on a scaled monitor.\n"
               "You may experience graphical issues if you enable this option."
               "\n\nAre you sure you want to enable this option?"));
-        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        CQuestionBox* pQuestionBox = g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(_("EXPERIMENTAL FEATURE"));
         pQuestionBox->SetMessage(strMessage);
@@ -4558,7 +4558,7 @@ bool CSettings::OnDPIAwareClick(CGUIElement* pElement)
 
 static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
 {
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
     if (uiButton == 0)
     {
@@ -4669,16 +4669,16 @@ void NewNicknameCallback(void* ptr, unsigned int uiButton, std::string strNick)
 {
     if (uiButton == 1)            // We hit OK
     {
-        if (!CCore::GetSingleton().IsValidNick(strNick.c_str()))
-            CCore::GetSingleton().ShowMessageBox(_("Error") + _E("CC81"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO);
+        if (!g_pCore->IsValidNick(strNick.c_str()))
+            g_pCore->ShowMessageBox(_("Error") + _E("CC81"), _("Your nickname contains invalid characters!"), MB_BUTTON_OK | MB_ICON_INFO);
         else
         {
             CVARS_SET("nick", strNick);
-            CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+            g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
         }
     }
     else
-        CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+        g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 }
 
 void CSettings::RequestNewNickname()
@@ -4686,7 +4686,7 @@ void CSettings::RequestNewNickname()
     std::string strNick;
     CVARS_GET("nick", strNick);
 
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    CQuestionBox* pQuestionBox = g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pQuestionBox->Reset();
     pQuestionBox->SetTitle(_("Please enter a nickname"));
     pQuestionBox->SetMessage(_("Please enter a nickname to be used ingame.  \nThis will be your name when you connect to and play in a server"));

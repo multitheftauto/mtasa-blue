@@ -88,7 +88,7 @@ void CServerList::Pulse()
     if (iNumQueries > 0)
     {
         std::vector<SAddressPort> endpointList;
-        CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser()->GetVisibleEndPointList(endpointList);
+        g_pCore->GetLocalGUI()->GetMainMenu()->GetServerBrowser()->GetVisibleEndPointList(endpointList);
 
         for (std::vector<SAddressPort>::iterator iter = endpointList.begin(); iter != endpointList.end(); ++iter)
         {

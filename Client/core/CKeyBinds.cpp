@@ -1871,7 +1871,7 @@ bool CKeyBinds::ControlLeftAndRight(CControllerState& cs)
 
 void CKeyBinds::DoPostFramePulse()
 {
-    eSystemState SystemState = CCore::GetSingleton().GetGame()->GetSystemState();
+    eSystemState SystemState = g_pCore->GetGame()->GetSystemState();
 
     if (m_bWaitingToLoadDefaults && (SystemState == 7 || SystemState == 9))            // Are GTA controls actually initialized?
     {
@@ -2150,7 +2150,7 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
     else
         bLoadDefaults = true;
 
-    eSystemState SystemState = CCore::GetSingleton().GetGame()->GetSystemState();
+    eSystemState SystemState = g_pCore->GetGame()->GetSystemState();
     if (bLoadDefaults)
     {
         if (SystemState == 7 || SystemState == 9)            // Are GTA controls actually initialized?

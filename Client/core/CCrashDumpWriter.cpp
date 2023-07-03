@@ -495,11 +495,11 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
     if (ms_uiInCrashZone == 1 || ms_uiInCrashZone == 2)
     {
         CVARS_SET("volumetric_shadows", false);
-        CCore::GetSingleton().SaveConfig();
+        g_pCore->SaveConfig();
         AddReportLog(9205, "Disabled volumetric shadows");
     }
 
-    CNet* pNet = CCore::GetSingleton().GetNetwork();
+    CNet* pNet = g_pCore->GetNetwork();
     if (pNet)
         pNet->PostCrash();
 }
@@ -833,11 +833,10 @@ void CCrashDumpWriter::GetD3DInfo(CBuffer& buffer)
         stream.Write(g_pDeviceState->CallState.args[i]);
 
     // Try to get CRenderWare pointer
-    CCore*       pCore = CCore::GetSingletonPtr();
-    CGame*       pGame = pCore ? pCore->GetGame() : NULL;
+    CGame*       pGame = g_pCore ? g_pCore->GetGame() : NULL;
     CRenderWare* pRenderWare = pGame ? pGame->GetRenderWare() : NULL;
     // Write on how we got on with doing that
-    stream.Write((uchar)(pCore ? 1 : 0));
+    stream.Write((uchar)(g_pCore? 1 : 0));
     stream.Write((uchar)(pGame ? 1 : 0));
     stream.Write((uchar)(pRenderWare ? 1 : 0));
 

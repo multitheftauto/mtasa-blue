@@ -795,7 +795,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
     {
         // Prevent statup warning in loader
         WatchDogCompletedSection("L3");
-        CCore::GetSingleton().GetNetwork()->ResetStub('dia3', *ms_strExtraLogBuffer, uiDiagnosticLogLevel);
+        g_pCore->GetNetwork()->ResetStub('dia3', *ms_strExtraLogBuffer, uiDiagnosticLogLevel);
     }
     ms_strExtraLogBuffer.clear();
 
@@ -995,7 +995,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         WatchDogCompletedSection("L3");
 
         // Run diagnostic
-        CCore::GetSingleton().GetNetwork()->ResetStub('dia3', *ms_strExtraLogBuffer, uiDiagnosticLogLevel);
+        g_pCore->GetNetwork()->ResetStub('dia3', *ms_strExtraLogBuffer, uiDiagnosticLogLevel);
     }
     ms_strExtraLogBuffer.clear();
 

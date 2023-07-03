@@ -89,7 +89,7 @@ CModelCacheManager* NewModelCacheManager()
 ///////////////////////////////////////////////////////////////
 CModelCacheManagerImpl::CModelCacheManagerImpl()
 {
-    m_pGame = CCore::GetSingleton().GetGame();
+    m_pGame = g_pCore->GetGame();
 }
 
 ///////////////////////////////////////////////////////////////

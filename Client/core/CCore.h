@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        core/CCore.h
+ *  FILE:        Client/core/CCore.h
  *  PURPOSE:     Header file for base core class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -74,7 +74,7 @@ extern class CLocalization* g_pLocalization;
 bool                        UsingAltD3DSetup();
 extern SString              g_strJingleBells;
 
-class CCore : public CCoreInterface, public CSingleton<CCore>
+class CCore : public CCoreInterface
 {
 public:
     ZERO_ON_NEW

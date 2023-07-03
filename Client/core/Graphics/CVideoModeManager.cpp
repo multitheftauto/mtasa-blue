@@ -103,7 +103,7 @@ CVideoModeManagerInterface* GetVideoModeManager()
 ///////////////////////////////////////////////////////////////
 CVideoModeManager::CVideoModeManager()
 {
-    m_pGameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+    m_pGameSettings = g_pCore->GetGame()->GetSettings();
     m_iCurrentVideoMode = 1;
     m_bCurrentWindowed = false;
     m_iNextVideoMode = 1;
@@ -301,7 +301,7 @@ void CVideoModeManager::OnLoseFocus()
     {
         if (!IsMultiMonitor() || IsMinimizeEnabled())
         {
-            HWND hWnd = CCore::GetSingleton().GetHookedWindow();
+            HWND hWnd = g_pCore->GetHookedWindow();
             ShowWindow(hWnd, SW_MINIMIZE);
 
             if (!m_bOriginalDesktopResMatches && (m_iCurrentFullscreenStyle == FULLSCREEN_BORDERLESS))

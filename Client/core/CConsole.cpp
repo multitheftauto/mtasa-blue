@@ -150,7 +150,7 @@ void CConsole::SetVisible(bool bVisible)
     // It must be enabled
     if (m_bIsEnabled)
     {
-        CMultiplayer* pMultiplayer = CCore::GetSingleton().GetMultiplayer();
+        CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
         pMultiplayer->DisablePadHandler(bVisible);
 
         m_pWindow->SetVisible(bVisible);
@@ -417,7 +417,7 @@ void CConsole::CreateElements(CGUIElement* pParent)
     m_pWindow = reinterpret_cast<CGUIWindow*>(m_pManager->CreateWnd(pParent, _("CONSOLE")));
     m_pWindow->SetAlwaysOnTop(true);
 
-    CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    CVector2D resolution = g_pCore->GetGUI()->GetResolution();
     float     yoff = resolution.fY > 600 ? resolution.fY / 12 : 0.0f;
     m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - m_fWindowX / 2, resolution.fY / 2 - m_fWindowY / 2 + yoff), false);
 

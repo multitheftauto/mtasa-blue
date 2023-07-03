@@ -26,7 +26,7 @@ CServerInfo::CServerInfo()
     m_ulLastUpdateTime = CClientTime::GetTime();
 
     // Obtain our screen resolution
-    CVector2D vecResolution = CCore::GetSingleton().GetGUI()->GetResolution();
+    CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
     // Create queue window
     m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, _("SERVER IS FULL")));
@@ -326,7 +326,7 @@ void CServerInfo::Show(eWindowType WindowType, const char* szHost, unsigned shor
     m_pWindow->SetZOrderingEnabled(false);
 
     pInitialServerListItem =
-        pInitialServerListItem ? pInitialServerListItem : CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser()->FindServer(szHost, usPort);
+        pInitialServerListItem ? pInitialServerListItem : g_pCore->GetLocalGUI()->GetMainMenu()->GetServerBrowser()->FindServer(szHost, usPort);
 
     SetServerInformation(szHost, usPort, szPassword, pInitialServerListItem);
 }
@@ -464,7 +464,7 @@ void CServerInfo::Connect()
     }
 
     // Let's attempt to join
-    CCore::GetSingleton().GetConnectManager()->Connect(m_strHost, m_usPort, strNick.c_str(), strPassword.c_str());
+    g_pCore->GetConnectManager()->Connect(m_strHost, m_usPort, strNick.c_str(), strPassword.c_str());
 }
 
 void CServerInfo::ResetServerGUI(CServerListItem* pServer)

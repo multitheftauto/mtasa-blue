@@ -71,7 +71,7 @@ void CModManager::RequestLoadDefault(const char* szArguments)
 void CModManager::RequestUnload()
 {
     RequestLoad(NULL, NULL);
-    CCore::GetSingletonPtr()->OnModUnload();
+    g_pCore->OnModUnload();
 }
 
 void CModManager::ClearRequest()
@@ -102,7 +102,7 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     std::map<std::string, std::string>::iterator itMod = m_ModDLLFiles.find(szName);
     if (itMod == m_ModDLLFiles.end())
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s (unknown mod)", szName);
+        g_pCore->GetConsole()->Printf("Unable to load %s (unknown mod)", szName);
         return NULL;
     }
 
@@ -132,7 +132,7 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
             --p;
         }
 
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (reason: %s)", szName, szError);
+        g_pCore->GetConsole()->Printf("Unable to load %s's DLL (reason: %s)", szName, szError);
         return NULL;
     }
 
@@ -142,7 +142,7 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     pfnClientInitializer* pClientInitializer = reinterpret_cast<pfnClientInitializer*>(GetProcAddress(m_hClientDLL, "InitClient"));
     if (pClientInitializer == NULL)
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unknown mod)", szName, GetLastError());
+        g_pCore->GetConsole()->Printf("Unable to load %s's DLL (unknown mod)", szName, GetLastError());
         FreeLibrary(m_hClientDLL);
         m_hClientDLL = nullptr;
         return NULL;
@@ -152,9 +152,9 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     m_pClientBase = pClientInitializer();
 
     // Call the client base initializer
-    if (!m_pClientBase || m_pClientBase->ClientInitialize(szArguments, CCore::GetSingletonPtr()) != 0)
+    if (!m_pClientBase || m_pClientBase->ClientInitialize(szArguments, g_pCore) != 0)
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unable to init, bad version?)", szName, GetLastError());
+        g_pCore->GetConsole()->Printf("Unable to load %s's DLL (unable to init, bad version?)", szName, GetLastError());
         FreeLibrary(m_hClientDLL);
         m_pClientBase = nullptr;
         m_hClientDLL = nullptr;
@@ -189,7 +189,7 @@ void CModManager::Unload()
         }
 
         // Unregister the commands it had registered
-        CCore::GetSingleton().GetCommands()->DeleteAll();
+        g_pCore->GetCommands()->DeleteAll();
 
         // Stop all screen grabs
         CGraphics::GetSingleton().GetScreenGrabber()->ClearScreenShotQueue();
@@ -199,7 +199,7 @@ void CModManager::Unload()
         m_hClientDLL = NULL;
 
         // Call the on mod unload func
-        CCore::GetSingletonPtr()->OnModUnload();
+        g_pCore->OnModUnload();
 
         // Reset chatbox status (so it won't prevent further input), and clear it
         /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );
@@ -214,23 +214,23 @@ void CModManager::Unload()
         CLocalGUI::GetSingleton().SetDebugViewVisible(false);
 
         // NULL the message processor and the unhandled command handler
-        CCore::GetSingleton().SetClientMessageProcessor(NULL);
-        CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
+        g_pCore->SetClientMessageProcessor(NULL);
+        g_pCore->GetCommands()->SetExecuteHandler(NULL);
 
         // Reset cursor alpha
-        CCore::GetSingleton().GetGUI()->SetCursorAlpha(1.0f, true);
+        g_pCore->GetGUI()->SetCursorAlpha(1.0f, true);
 
         // Reset the modules
-        CCore::GetSingleton().GetGame()->Reset();
-        CCore::GetSingleton().GetMultiplayer()->Reset();
-        CCore::GetSingleton().GetNetwork()->Reset();
-        assert(CCore::GetSingleton().GetNetwork()->GetServerBitStreamVersion() == 0);
+        g_pCore->GetGame()->Reset();
+        g_pCore->GetMultiplayer()->Reset();
+        g_pCore->GetNetwork()->Reset();
+        assert(g_pCore->GetNetwork()->GetServerBitStreamVersion() == 0);
 
         // Enable the console again
-        CCore::GetSingleton().GetConsole()->SetEnabled(true);
+        g_pCore->GetConsole()->SetEnabled(true);
 
         // Force the mainmenu back
-        CCore::GetSingleton().SetConnected(false);
+        g_pCore->SetConnected(false);
         CLocalGUI::GetSingleton().GetMainMenu()->SetIsIngame(false);
         CLocalGUI::GetSingleton().GetMainMenu()->SetVisible(true, false);
     }
@@ -278,14 +278,14 @@ void CModManager::DoPulsePostFrame()
     }
     else
     {
-        CCore::GetSingleton().GetNetwork()->DoPulse();
+        g_pCore->GetNetwork()->DoPulse();
     }
 
     // Make sure frame rate limit gets applied
     if (m_pClientBase)
-        CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
+        g_pCore->EnsureFrameRateLimitApplied();            // Catch missed frames
     else
-        CCore::GetSingleton().ApplyFrameRateLimit(88);            // Limit when not connected
+        g_pCore->ApplyFrameRateLimit(88);            // Limit when not connected
 
     // Load/unload requested?
     if (m_bUnloadRequested)

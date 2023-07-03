@@ -133,7 +133,7 @@ namespace
         BUTTON_3,
     };
 
-    CQuestionBox& GetQuestionBox() { return *CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow(); }
+    CQuestionBox& GetQuestionBox() { return *g_pCore->GetLocalGUI()->GetMainMenu()->GetQuestionWindow(); }
 
 }            // namespace
 
@@ -360,7 +360,7 @@ namespace
                 return NULL;
             }
 
-            m_pXMLFile = CCore::GetSingleton().GetXML()->CreateXML(m_strTempFileName);
+            m_pXMLFile = g_pCore->GetXML()->CreateXML(m_strTempFileName);
             if (!m_pXMLFile)
             {
                 AddReportLog(2502, SString("CXMLBuffer::SetFromBuffer: Could not CreateXML %s", m_strTempFileName.c_str()));

@@ -77,14 +77,14 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
 
     // A little hack to get past the loading time required to decrypt the gta
     // executable into memory...
-    if (!CCore::GetSingleton().AreModulesLoaded())
+    if (!g_pCore->AreModulesLoaded())
     {
-        CCore::GetSingleton().SetModulesLoaded(true);
-        CCore::GetSingleton().CreateNetwork();
-        CCore::GetSingleton().CreateGame();
-        CCore::GetSingleton().CreateMultiplayer();
-        CCore::GetSingleton().CreateXML();
-        CCore::GetSingleton().CreateGUI();
+        g_pCore->SetModulesLoaded(true);
+        g_pCore->CreateNetwork();
+        g_pCore->CreateGame();
+        g_pCore->CreateMultiplayer();
+        g_pCore->CreateXML();
+        g_pCore->CreateGUI();
     }
 
     // D3DX_SDK_VERSION checks
@@ -98,6 +98,7 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
             #endif
         #endif
     #endif
+
     if (!D3DXCheckVersion(D3D_SDK_VERSION, D3DX_SDK_VERSION))
     {
         SString strMessage("D3DXCheckVersion FAILED (D3D_SDK_VERSION: %d  D3DX_SDK_VERSION: %d  SDKVersion: %d)", D3D_SDK_VERSION, D3DX_SDK_VERSION,
