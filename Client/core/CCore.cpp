@@ -163,7 +163,7 @@ CCore::~CCore()
     DestroyGame();
 
     // Remove global events
-    g_pCore->m_pGUI->ClearInputHandlers(INPUT_CORE);
+    m_pGUI->ClearInputHandlers(INPUT_CORE);
 
     // Store core variables to cvars
     CVARS_SET("console_pos", m_pLocalGUI->GetConsole()->GetPosition());
@@ -762,7 +762,7 @@ bool CCore::CheckDiskSpace(uint uiResourcesPathMinMB, uint uiDataPathMinMB)
     {
         SString strMessage(_("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace);
         SString strTroubleLink(SString("low-disk-space&drive=%s", *strDriveWithNoSpace.Left(1)));
-        g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CC43"), strMessage, strTroubleLink);
+        ShowErrorMessageBox(_("Fatal error") + _E("CC43"), strMessage, strTroubleLink);
         return false;
     }
     return true;
@@ -1120,8 +1120,8 @@ void CCore::UpdateIsWindowMinimized()
 {
     m_bIsWindowMinimized = IsIconic(GetHookedWindow()) ? true : false;
     // Update CPU saver for when minimized and not connected
-    g_pCore->GetMultiplayer()->SetIsMinimizedAndNotConnected(m_bIsWindowMinimized && !IsConnected());
-    g_pCore->GetMultiplayer()->SetMirrorsEnabled(!m_bIsWindowMinimized);
+    GetMultiplayer()->SetIsMinimizedAndNotConnected(m_bIsWindowMinimized && !IsConnected());
+    GetMultiplayer()->SetMirrorsEnabled(!m_bIsWindowMinimized);
 
     // Enable timer if not connected at least once
     bool bEnableTimer = !m_bGettingIdleCallsFromMultiplayer;
@@ -1779,7 +1779,7 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
 
     // Apply client config setting
     uint uiClientConfigRate;
-    g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
+    GetCVars()->Get("fps_limit", uiClientConfigRate);
     if (uiClientConfigRate > 0)
         uiClientConfigRate = std::max(45U, uiClientConfigRate);
     // Lowest wins (Although zero is highest)
@@ -2292,9 +2292,9 @@ void CCore::NotifyRenderingGrass(bool bIsRenderingGrass)
 
 bool CCore::GetRightSizeTxdEnabled()
 {
-    if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::RESIZE_NEVER_0000)
+    if (GetDiagnosticDebug() == EDiagnosticDebug::RESIZE_NEVER_0000)
         return false;
-    if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::RESIZE_ALWAYS_0000)
+    if (GetDiagnosticDebug() == EDiagnosticDebug::RESIZE_ALWAYS_0000)
         return true;
 
     // 32 bit users get rightsized txds
