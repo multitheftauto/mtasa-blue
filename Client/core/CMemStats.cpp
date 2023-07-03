@@ -472,8 +472,8 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
         memStatsInfo.iProcessTotalVirtualKB = status.ullTotalVirtual / 1024LL;
     }
 
-    memStatsInfo.iStreamingMemoryUsed = *(int*)0x08E4CB4;
-    memStatsInfo.iStreamingMemoryAvailable = *(int*)0x08A5A80;
+    memStatsInfo.iStreamingMemoryUsed = *(size_t*)0x08E4CB4;
+    memStatsInfo.iStreamingMemoryAvailable = *(size_t*)0x08A5A80;
 
     char*        pFileInfoArray = *(char**)(0x5B8B08 + 6);
     CGame*       pGame = g_pCore->GetGame();

@@ -430,9 +430,7 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
             pGUI->SelectInputHandlers(INPUT_MOD);
         }
 
-        if (bVisible)
-            pGUI->SetCursorAlpha(1.0f);
-        else
+        if (!bVisible)
             pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
     }
 }
