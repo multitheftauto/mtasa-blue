@@ -293,7 +293,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     SetIsIngame(false);
 
     // Store the pointer to the graphics subsystem
-    m_pGraphics = CGraphics::GetSingletonPtr();
+    m_pGraphics = g_pGraphics;
 
     // Load the server lists
     CXMLNode* pConfig = g_pCore->GetConfig();

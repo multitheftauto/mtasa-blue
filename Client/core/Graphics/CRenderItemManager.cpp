@@ -437,7 +437,7 @@ void CRenderItemManager::UpdateScreenSource(CScreenSourceItem* pScreenSourceItem
     if (bResampleNow)
     {
         // Tell graphics things are about to change
-        CGraphics::GetSingleton().OnChangingRenderTarget(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY);
+        g_pGraphics->OnChangingRenderTarget(m_uiDefaultViewportSizeX, m_uiDefaultViewportSizeY);
 
         // Try to get the back buffer
         IDirect3DSurface9* pD3DBackBufferSurface = NULL;
@@ -572,7 +572,7 @@ bool CRenderItemManager::SaveDefaultRenderTarget()
     SAFE_RELEASE(pActiveD3DZStencilSurface)
 
     // Do this in case dxSetRenderTarget is being called from some unexpected place
-    CGraphics::GetSingleton().MaybeEnteringMTARenderZone();
+    g_pGraphics->MaybeEnteringMTARenderZone();
     return true;
 }
 
@@ -592,7 +592,7 @@ bool CRenderItemManager::RestoreDefaultRenderTarget()
         m_pDefaultD3DRenderTarget = NULL;
 
         // Do this in case dxSetRenderTarget is being called from some unexpected place
-        CGraphics::GetSingleton().MaybeLeavingMTARenderZone();
+        g_pGraphics->MaybeLeavingMTARenderZone();
     }
 
     return true;
@@ -639,7 +639,7 @@ void CRenderItemManager::ChangeRenderTarget(uint uiSizeX, uint uiSizeY, IDirect3
         return;
 
     // Tell graphics things are about to change
-    CGraphics::GetSingleton().OnChangingRenderTarget(uiSizeX, uiSizeY);
+    g_pGraphics->OnChangingRenderTarget(uiSizeX, uiSizeY);
 
     // Do change
     m_pDevice->SetRenderTarget(0, pD3DRenderTarget);

@@ -208,7 +208,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     assert(!m_pD3DEffect);
 
     // Make defines
-    bool bUsesRAWZ = CGraphics::GetSingleton().GetRenderItemManager()->GetDepthBufferFormat() == RFORMAT_RAWZ;
+    bool bUsesRAWZ = g_pGraphics->GetRenderItemManager()->GetDepthBufferFormat() == RFORMAT_RAWZ;
 
     std::vector<D3DXMACRO> macroList;
 

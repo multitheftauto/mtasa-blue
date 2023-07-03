@@ -175,6 +175,6 @@ void CEffectCloner::MaybeTidyUp(bool bForceDrasticMeasures)
 
     if (bForceDrasticMeasures)
     {
-        CGraphics::GetSingleton().GetDevice()->EvictManagedResources();
+        g_pGraphics->GetDevice()->EvictManagedResources();
     }
 }

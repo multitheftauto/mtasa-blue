@@ -46,7 +46,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_bInputVisible = false;
     m_pFont = m_pManager->GetClearFont();
     m_pDXFont = NULL;
-    SetDxFont(g_pCore->GetGraphics()->GetFont());
+    SetDxFont(g_pGraphics->GetFont());
     m_fNativeWidth = CHAT_WIDTH;
     m_fRcpUsingDxFontScale = 1;
     m_bCanChangeWidth = true;
@@ -197,8 +197,6 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
         return;
     }
 
-    CGraphics* pGraphics = CGraphics::GetSingletonPtr();
-
     // Validate rendertarget
     if (m_pCacheTexture && chatSize != m_RenderTargetChatSize)
     {
@@ -209,9 +207,9 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     if (!m_pCacheTexture && (CTickCount::Now() - m_lastRenderTargetCreationFail).ToLongLong() > 60000)
     {
         // Make sure render target size is reasonable
-        int iRenderTargetSizeX = Clamp<int>(8, chatSize.fX, pGraphics->GetViewportWidth());
-        int iRenderTargetSizeY = Clamp<int>(8, chatSize.fY, pGraphics->GetViewportHeight());
-        m_pCacheTexture = pGraphics->GetRenderItemManager()->CreateRenderTarget(iRenderTargetSizeX, iRenderTargetSizeY, true, true);
+        int iRenderTargetSizeX = Clamp<int>(8, chatSize.fX, g_pGraphics->GetViewportWidth());
+        int iRenderTargetSizeY = Clamp<int>(8, chatSize.fY, g_pGraphics->GetViewportHeight());
+        m_pCacheTexture = g_pGraphics->GetRenderItemManager()->CreateRenderTarget(iRenderTargetSizeX, iRenderTargetSizeY, true, true);
         if (m_pCacheTexture)
             m_RenderTargetChatSize = chatSize;
         else
@@ -243,20 +241,20 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
         m_PrevDrawList = drawList;
         m_iCacheTextureRevision = m_pCacheTexture->GetRevision();
 
-        pGraphics->GetRenderItemManager()->SetRenderTarget(m_pCacheTexture, true);
+        g_pGraphics->GetRenderItemManager()->SetRenderTarget(m_pCacheTexture, true);
 
         // Draw new stuff
-        pGraphics->SetBlendMode(EBlendMode::MODULATE_ADD);
+        g_pGraphics->SetBlendMode(EBlendMode::MODULATE_ADD);
         DrawDrawList(drawList);
-        pGraphics->SetBlendMode(EBlendMode::BLEND);
+        g_pGraphics->SetBlendMode(EBlendMode::BLEND);
 
-        pGraphics->GetRenderItemManager()->RestoreDefaultRenderTarget();
+        g_pGraphics->GetRenderItemManager()->RestoreDefaultRenderTarget();
     }
 
     // Draw the cache texture
-    pGraphics->SetBlendMode(EBlendMode::ADD);
-    pGraphics->DrawTexture(m_pCacheTexture, chatTopLeft.fX, chatTopLeft.fY);
-    pGraphics->SetBlendMode(EBlendMode::BLEND);
+    g_pGraphics->SetBlendMode(EBlendMode::ADD);
+    g_pGraphics->DrawTexture(m_pCacheTexture, chatTopLeft.fX, chatTopLeft.fY);
+    g_pGraphics->SetBlendMode(EBlendMode::BLEND);
 }
 
 //
@@ -273,7 +271,7 @@ void CChat::DrawDrawList(const SDrawList& drawList, const CVector2D& topLeftOffs
     float fRight = topLeftOffset.fX + chatSize.fX;
     float fLineHeight = CChat::GetFontHeight(g_pChat->m_vecScale.fY);
 
-    CGraphics::GetSingleton().BeginDrawBatch();
+    g_pGraphics->BeginDrawBatch();
 
     for (const auto& item : drawList.lineItemList)
     {
@@ -282,7 +280,7 @@ void CChat::DrawDrawList(const SDrawList& drawList, const CVector2D& topLeftOffs
         m_Lines[item.uiLine].Draw(vecPosition, item.ucAlpha, drawList.bShadow, drawList.bOutline, chatBounds);
     }
 
-    CGraphics::GetSingleton().EndDrawBatch();
+    g_pGraphics->EndDrawBatch();
 }
 
 //
@@ -846,25 +844,25 @@ void CChat::SetNumLines(unsigned int uiNumLines)
 void CChat::SetChatFont(eChatFont Font)
 {
     CGUIFont*  pFont = g_pCore->GetGUI()->GetDefaultFont();
-    ID3DXFont* pDXFont = g_pCore->GetGraphics()->GetFont();
+    ID3DXFont* pDXFont = g_pGraphics->GetFont();
     float      fUsingDxFontScale = 1;
     float      fReqestedDxFontScale = std::max(m_vecScale.fX, m_vecScale.fY);
     switch (Font)
     {
         case Chat::Font::DEFAULT:
             pFont = g_pCore->GetGUI()->GetDefaultFont();
-            pDXFont = g_pCore->GetGraphics()->GetFont(FONT_DEFAULT, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
+            pDXFont = g_pGraphics->GetFont(FONT_DEFAULT, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
             break;
         case Chat::Font::CLEAR:
             pFont = g_pCore->GetGUI()->GetClearFont();
-            pDXFont = g_pCore->GetGraphics()->GetFont(FONT_CLEAR, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
+            pDXFont = g_pGraphics->GetFont(FONT_CLEAR, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
             break;
         case Chat::Font::BOLD:
             pFont = g_pCore->GetGUI()->GetBoldFont();
-            pDXFont = g_pCore->GetGraphics()->GetFont(FONT_DEFAULT_BOLD, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
+            pDXFont = g_pGraphics->GetFont(FONT_DEFAULT_BOLD, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
             break;
         case Chat::Font::ARIAL:
-            pDXFont = g_pCore->GetGraphics()->GetFont(FONT_ARIAL, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
+            pDXFont = g_pGraphics->GetFont(FONT_ARIAL, &fUsingDxFontScale, fReqestedDxFontScale, "chat");
             break;
     }
 
@@ -900,7 +898,7 @@ void CChat::UpdateGUI()
     m_pBackground->SetSize(m_vecBackgroundSize);
 
     // Make sure there is enough room for all the lines
-    uint uiMaxNumLines = g_pCore->GetGraphics()->GetViewportHeight() / std::max(1.f, CChat::GetFontHeight(m_vecScale.fY)) - m_iMaxInputLines;
+    uint uiMaxNumLines = g_pGraphics->GetViewportHeight() / std::max(1.f, CChat::GetFontHeight(m_vecScale.fY)) - m_iMaxInputLines;
     if (m_uiNumLines > uiMaxNumLines)
         SetNumLines(uiMaxNumLines);
 
@@ -1055,7 +1053,7 @@ float CChat::GetFontHeight(float fScale)
 
     fScale *= g_pChat->m_fRcpUsingDxFontScale;
 
-    return g_pCore->GetGraphics()->GetDXFontHeight(fScale, g_pChat->m_pDXFont);
+    return g_pGraphics->GetDXFontHeight(fScale, g_pChat->m_pDXFont);
 }
 
 float CChat::GetTextExtent(const char* szText, float fScale)
@@ -1070,7 +1068,7 @@ float CChat::GetTextExtent(const char* szText, float fScale)
 
     fScale *= g_pChat->m_fRcpUsingDxFontScale;
 
-    return g_pCore->GetGraphics()->GetDXTextExtent(szText, fScale, g_pChat->m_pDXFont);
+    return g_pGraphics->GetDXTextExtent(szText, fScale, g_pChat->m_pDXFont);
 }
 
 void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
@@ -1093,20 +1091,20 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
         {
             // Clip text at the top
             if (DrawArea.fY1 + fLineHeight - RenderBounds.fY1 > 1)
-                g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)RenderBounds.fY1, (int)DrawArea.fX2, (int)DrawArea.fY1 + fLineHeight, ulColor,
+                g_pGraphics->DrawString((int)DrawArea.fX1, (int)RenderBounds.fY1, (int)DrawArea.fX2, (int)DrawArea.fY1 + fLineHeight, ulColor,
                                                    szText, fScaleX, fScaleY, DT_LEFT | DT_BOTTOM | DT_SINGLELINE, g_pChat->m_pDXFont, bOutline);
         }
         else if (DrawArea.fY1 + fLineHeight >= RenderBounds.fY2)
         {
             // Clip text at the bottom
             if (RenderBounds.fY2 - DrawArea.fY1 > 1)
-                g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)DrawArea.fY1, (int)DrawArea.fX2, (int)RenderBounds.fY2, ulColor, szText, fScaleX,
+                g_pGraphics->DrawString((int)DrawArea.fX1, (int)DrawArea.fY1, (int)DrawArea.fX2, (int)RenderBounds.fY2, ulColor, szText, fScaleX,
                                                    fScaleY, DT_LEFT | DT_TOP | DT_SINGLELINE, g_pChat->m_pDXFont, bOutline);
         }
         else
         {
             // Text not clipped
-            g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)DrawArea.fY1, (int)DrawArea.fX1, (int)DrawArea.fY1, ulColor, szText, fScaleX, fScaleY,
+            g_pGraphics->DrawString((int)DrawArea.fX1, (int)DrawArea.fY1, (int)DrawArea.fX1, (int)DrawArea.fY1, ulColor, szText, fScaleX, fScaleY,
                                                DT_LEFT | DT_TOP | DT_NOCLIP, g_pChat->m_pDXFont, bOutline);
         }
     }

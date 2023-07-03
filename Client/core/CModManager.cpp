@@ -192,7 +192,7 @@ void CModManager::Unload()
         g_pCore->GetCommands()->DeleteAll();
 
         // Stop all screen grabs
-        CGraphics::GetSingleton().GetScreenGrabber()->ClearScreenShotQueue();
+        g_pGraphics->GetScreenGrabber()->ClearScreenShotQueue();
 
         // Free the Client DLL
         FreeLibrary(m_hClientDLL);

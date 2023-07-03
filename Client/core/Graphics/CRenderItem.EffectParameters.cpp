@@ -364,7 +364,7 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
     if (m_bUsesDepthBuffer && !bWorldRender)
     {
         // Ensure readable depth buffer is ready to be read
-        CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
+        g_pGraphics->GetRenderItemManager()->SaveReadableDepthBuffer();
     }
 
     for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)

@@ -204,7 +204,7 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
         // Calc and store readable depth format for shader use
         ERenderFormat ReadableDepthFormat = CDirect3DEvents9::DiscoverReadableDepthFormat(*ppReturnedDeviceInterface, pPresentationParameters->MultiSampleType,
                                                                                           pPresentationParameters->Windowed != 0);
-        CGraphics::GetSingleton().GetRenderItemManager()->SetDepthBufferFormat(ReadableDepthFormat);
+        g_pGraphics->GetRenderItemManager()->SetDepthBufferFormat(ReadableDepthFormat);
 
         // Now create the proxy device.
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(*ppReturnedDeviceInterface);
@@ -755,7 +755,7 @@ HRESULT HandleCreateDeviceResult(HRESULT hResult, IDirect3D9* pDirect3D, UINT Ad
             // Calc and store readable depth format for shader use
             ERenderFormat ReadableDepthFormat = CDirect3DEvents9::DiscoverReadableDepthFormat(
                 *ppReturnedDeviceInterface, pPresentationParameters->MultiSampleType, pPresentationParameters->Windowed != 0);
-            CGraphics::GetSingleton().GetRenderItemManager()->SetDepthBufferFormat(ReadableDepthFormat);
+            g_pGraphics->GetRenderItemManager()->SetDepthBufferFormat(ReadableDepthFormat);
 
             // Now create the proxy device.
             *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(*ppReturnedDeviceInterface);
@@ -965,7 +965,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
         // Calc and store readable depth format for shader use
         ERenderFormat ReadableDepthFormat = CDirect3DEvents9::DiscoverReadableDepthFormat(*ppReturnedDeviceInterface, pPresentationParameters->MultiSampleType,
                                                                                           pPresentationParameters->Windowed != 0);
-        CGraphics::GetSingleton().GetRenderItemManager()->SetDepthBufferFormat(ReadableDepthFormat);
+        g_pGraphics->GetRenderItemManager()->SetDepthBufferFormat(ReadableDepthFormat);
 
         // Now create the proxy device.
         *ppReturnedDeviceInterface = new CProxyDirect3DDevice9(*ppReturnedDeviceInterface);

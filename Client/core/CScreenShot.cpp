@@ -88,7 +88,7 @@ void CScreenShot::CheckForScreenShot(bool bBeforeGUI)
 
     // Try to get the screen data
     SString strError;
-    if (CGraphics::GetSingleton().GetScreenGrabber()->GetBackBufferPixels(ms_uiWidth, ms_uiHeight, ms_ScreenShotBuffer, strError))
+    if (g_pGraphics->GetScreenGrabber()->GetBackBufferPixels(ms_uiWidth, ms_uiHeight, ms_ScreenShotBuffer, strError))
     {
         // Validate data size
         uint uiDataSize = ms_ScreenShotBuffer.GetSize();

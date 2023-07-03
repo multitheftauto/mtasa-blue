@@ -2261,7 +2261,7 @@ void CCore::UpdateDummyProgress(int iValue, const char* szType)
     if (m_iDummyProgressValue)
         strMessage = SString("%d%s", m_iDummyProgressValue, *m_strDummyProgressType);
 
-    CGraphics::GetSingleton().SetProgressMessage(strMessage);
+    g_pGraphics->SetProgressMessage(strMessage);
 }
 
 //

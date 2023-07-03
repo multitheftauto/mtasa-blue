@@ -41,7 +41,7 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice)
     CVertexStreamBoundingBoxManager::GetSingleton()->OnDeviceCreate(pDevice);
 
     // Create all our fonts n stuff
-    CGraphics::GetSingleton().OnDeviceCreate(pDevice);
+    g_pGraphics->OnDeviceCreate(pDevice);
 
     // Create the GUI elements
     CLocalGUI::GetSingleton().CreateObjects(pDevice);
@@ -82,7 +82,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     // Notify gui
     CLocalGUI::GetSingleton().Invalidate();
 
-    CGraphics::GetSingleton().OnDeviceInvalidate(pDevice);
+    g_pGraphics->OnDeviceInvalidate(pDevice);
 }
 
 void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
@@ -96,7 +96,7 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
     CLocalGUI::GetSingleton().Restore();
 
     // Restore the graphics manager
-    CGraphics::GetSingleton().OnDeviceRestore(pDevice);
+    g_pGraphics->OnDeviceRestore(pDevice);
 
     g_pCore->OnDeviceRestore();
 }
@@ -123,10 +123,10 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
         }
     }
 
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    g_pGraphics->EnteringMTARenderZone();
 
     // Tell everyone that the zbuffer will need clearing before use
-    CGraphics::GetSingleton().OnZBufferModified();
+    g_pGraphics->OnZBufferModified();
 
     TIMING_CHECKPOINT("-OnPresent1");
     // Make a screenshot if needed (before GUI)
@@ -137,13 +137,13 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     TIMING_CHECKPOINT("+OnPresent2");
 
     // Restore in case script forgets
-    CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
+    g_pGraphics->GetRenderItemManager()->RestoreDefaultRenderTarget();
 
     // Must do this before GUI draw to prevent NVidia performance problems
-    CGraphics::GetSingleton().GetRenderItemManager()->FlushNonAARenderTarget();
+    g_pGraphics->GetRenderItemManager()->FlushNonAARenderTarget();
 
     bool bTookScreenShot = false;
-    if (!CGraphics::GetSingleton().GetScreenGrabber()->IsQueueEmpty())
+    if (!g_pGraphics->GetScreenGrabber()->IsQueueEmpty())
     {
         if (g_pCore->IsWebCoreLoaded())
             g_pCore->GetWebCore()->OnPreScreenshot();
@@ -152,10 +152,10 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     }
 
     // Draw pre-GUI primitives
-    CGraphics::GetSingleton().DrawPreGUIQueue();
+    g_pGraphics->DrawPreGUIQueue();
 
     // Maybe grab screen for upload
-    CGraphics::GetSingleton().GetScreenGrabber()->DoPulse();
+    g_pGraphics->GetScreenGrabber()->DoPulse();
 
     if (bTookScreenShot && g_pCore->IsWebCoreLoaded())
         g_pCore->GetWebCore()->OnPostScreenshot();
@@ -164,14 +164,14 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     CLocalGUI::GetSingleton().Draw();
 
     // Draw post-GUI primitives
-    CGraphics::GetSingleton().DrawPostGUIQueue();
+    g_pGraphics->DrawPostGUIQueue();
 
     // Redraw the mouse cursor so it will always be over other elements
     CLocalGUI::GetSingleton().DrawMouseCursor();
 
-    CGraphics::GetSingleton().DidRenderScene();
+    g_pGraphics->DidRenderScene();
 
-    CGraphics::GetSingleton().LeavingMTARenderZone();
+    g_pGraphics->LeavingMTARenderZone();
 
     // End the scene that we started.
     pDevice->EndScene();
@@ -215,8 +215,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIV
     CloseActiveShader();
 
     // Any shader for this texture ?
-    SShaderItemLayers* pLayers =
-        CGraphics::GetSingleton().GetRenderItemManager()->GetAppliedShaderForD3DData((CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture);
+    SShaderItemLayers* pLayers = g_pGraphics->GetRenderItemManager()->GetAppliedShaderForD3DData((CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture);
 
     // Skip draw if there is a vertex shader conflict
     if (pLayers && pLayers->bUsesVertexShader && g_pDeviceState->VertexShader)
@@ -362,8 +361,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, D3DP
     }
 
     // Any shader for this texture ?
-    SShaderItemLayers* pLayers =
-        CGraphics::GetSingleton().GetRenderItemManager()->GetAppliedShaderForD3DData((CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture);
+    SShaderItemLayers* pLayers = g_pGraphics->GetRenderItemManager()->GetAppliedShaderForD3DData((CD3DDUMMY*)g_pDeviceState->TextureState[0].Texture);
 
     // Skip draw if there is a vertex shader conflict
     if (pLayers && pLayers->bUsesVertexShader && g_pDeviceState->VertexShader)

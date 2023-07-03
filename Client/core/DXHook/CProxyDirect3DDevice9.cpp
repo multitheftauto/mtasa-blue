@@ -447,7 +447,7 @@ HRESULT CProxyDirect3DDevice9::GetFrontBufferData(UINT iSwapChain, IDirect3DSurf
 HRESULT CProxyDirect3DDevice9::StretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                            D3DTEXTUREFILTERTYPE Filter)
 {
-    CGraphics::GetSingleton().GetRenderItemManager()->HandleStretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter);
+    g_pGraphics->GetRenderItemManager()->HandleStretchRect(pSourceSurface, pSourceRect, pDestSurface, pDestRect, Filter);
     return D3D_OK;
 }
 
@@ -517,7 +517,7 @@ HRESULT CProxyDirect3DDevice9::EndScene()
         HRESULT hResult = m_pDevice->EndScene();
         g_bInGTAScene = false;
 
-        CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
+        g_pGraphics->GetRenderItemManager()->SaveReadableDepthBuffer();
         return hResult;
     }
 
@@ -528,7 +528,7 @@ HRESULT CProxyDirect3DDevice9::Clear(DWORD Count, CONST D3DRECT* pRects, DWORD F
 {
     // If clearing z buffer, make sure we save it first
     if (Flags & D3DCLEAR_ZBUFFER)
-        CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
+        g_pGraphics->GetRenderItemManager()->SaveReadableDepthBuffer();
 
     return m_pDevice->Clear(Count, pRects, Flags, Color, Z, Stencil);
 }

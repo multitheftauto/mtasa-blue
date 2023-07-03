@@ -229,8 +229,8 @@ void CClientVariables::ClampValue(const std::string& strVariable, CVector2D minV
 // Ensure CVars are within reasonable limits
 void CClientVariables::ValidateValues()
 {
-    uint uiViewportWidth = g_pCore->GetGraphics()->GetViewportWidth();
-    uint uiViewportHeight = g_pCore->GetGraphics()->GetViewportHeight();
+    uint uiViewportWidth = g_pGraphics->GetViewportWidth();
+    uint uiViewportHeight = g_pGraphics->GetViewportHeight();
 
     ClampValue("console_pos", CVector2D(0, 0), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));
     ClampValue("console_size", CVector2D(50, 50), CVector2D(uiViewportWidth - 32, uiViewportHeight - 32));

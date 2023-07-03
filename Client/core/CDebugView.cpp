@@ -42,7 +42,7 @@ CDebugView::CDebugView(CGUI* pManager, const CVector2D& vecPosition) : CChat()
     m_fSmoothRepeatTimer = 0;
     m_pFont = m_pManager->GetBoldFont();
     m_pDXFont = NULL;
-    SetDxFont(g_pCore->GetGraphics()->GetFont());
+    SetDxFont(g_pGraphics->GetFont());
     m_fNativeWidth = DEBUGVIEW_WIDTH;
     m_fRcpUsingDxFontScale = 1;
     m_bCanChangeWidth = false;

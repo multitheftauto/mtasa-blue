@@ -63,7 +63,7 @@ struct sFontInfo
     unsigned int uiWeight;
 };
 
-class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
+class CGraphics : public CGraphicsInterface
 {
     friend class CDirect3DEvents9;
     friend CPrimitiveMaterialBatcher;

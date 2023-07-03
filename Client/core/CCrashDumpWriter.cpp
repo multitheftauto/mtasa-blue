@@ -928,7 +928,7 @@ void CCrashDumpWriter::GetDxInfo(CBuffer& buffer)
 
     // video card name etc..
     SDxStatus status;
-    CGraphics::GetSingleton().GetRenderItemManager()->GetDxStatus(status);
+    g_pGraphics->GetRenderItemManager()->GetDxStatus(status);
 
     stream.Write(status.testMode);
 

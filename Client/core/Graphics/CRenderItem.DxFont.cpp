@@ -91,15 +91,15 @@ void CDxFontItem::CreateUnderlyingData(uint uiSize, bool bBold, DWORD ulQuality)
     // Create the D3DX fonts
     FONT_PROPERTIES sFontProps;
     if (GetFontProperties(LPCTSTR(m_strFullFilePath.c_str()), &sFontProps))
-        g_pCore->GetGraphics()->LoadAdditionalDXFont(m_strFullFilePath, sFontProps.csName, static_cast<int>(std::floor(uiSize * 1.75f)), bBold,
+        g_pGraphics->LoadAdditionalDXFont(m_strFullFilePath, sFontProps.csName, static_cast<int>(std::floor(uiSize * 1.75f)), bBold,
                                                                   ulQuality, &m_pFntNormal);
 
     if (!m_pFntNormal)
         return;
 
     // Memory usage - complete guess
-    int iCharHeight = g_pCore->GetGraphics()->GetDXFontHeight(1, m_pFntNormal);
-    int iCharWidth = g_pCore->GetGraphics()->GetDXTextExtent("A", 1, m_pFntNormal);
+    int iCharHeight = g_pGraphics->GetDXFontHeight(1, m_pFntNormal);
+    int iCharWidth = g_pGraphics->GetDXTextExtent("A", 1, m_pFntNormal);
     int iNumChars = 256;
     int iBodgeFactor = 1;
     int iBPP = 32;
@@ -117,5 +117,5 @@ void CDxFontItem::CreateUnderlyingData(uint uiSize, bool bBold, DWORD ulQuality)
 void CDxFontItem::ReleaseUnderlyingData()
 {
     // Release the D3DX font data
-    g_pCore->GetGraphics()->DestroyAdditionalDXFont(m_strFullFilePath, m_pFntNormal);
+    g_pGraphics->DestroyAdditionalDXFont(m_strFullFilePath, m_pFntNormal);
 }
