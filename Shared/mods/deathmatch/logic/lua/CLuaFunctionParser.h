@@ -379,11 +379,12 @@ struct CLuaFunctionParserBase
 
             // NOTE/TODO: Use C++20 `std::in_range` here instead
             // For now this doesn't do all the safety checks, but this should be "good enough" [until we switch to C++20]
-            if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T> && number < 0)
+            if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
             {
-                SetError("positive number", "negative");
-
-                return static_cast<T>(static_cast<int64_t>(number));
+                if (number < 0) {
+                    SetError("positive number", "negative");
+                    return static_cast<T>(number);
+                }
             }
 
             return static_cast<T>(number);
@@ -664,7 +665,7 @@ struct CLuaFunctionParser
 };
 
 template <bool ErrorOnFailure, auto ReturnOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
-struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
+struct <ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
 {
     template <typename... Params>
     auto Call(lua_State* L, Params&&... ps)
