@@ -665,7 +665,7 @@ struct CLuaFunctionParser
 };
 
 template <bool ErrorOnFailure, auto ReturnOnFailure, typename Ret, typename... Args, auto (*Func)(Args...)->Ret>
-struct <ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
+struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionParserBase
 {
     template <typename... Params>
     auto Call(lua_State* L, Params&&... ps)
