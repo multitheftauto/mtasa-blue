@@ -110,7 +110,6 @@ CCore::CCore()
     m_pMouseControl = new CMouseControl();
 
     // Create our hook objects.
-    // m_pFileSystemHook           = new CFileSystemHook ( );
     m_pDirect3DHookManager = new CDirect3DHookManager();
     m_pDirectInputHookManager = new CDirectInputHookManager();
     m_pMessageLoopHook = new CMessageLoopHook();
@@ -176,7 +175,6 @@ CCore::~CCore()
 
     // Delete hooks.
     delete m_pSetCursorPosHook;
-    // delete m_pFileSystemHook;
     delete m_pDirect3DHookManager;
     delete m_pDirectInputHookManager;
 
@@ -285,7 +283,10 @@ void CCore::SaveConfig(bool bWaitUntilFinished)
 
 void CCore::ChatEcho(const char* szText, bool bColorCoded)
 {
+    // Get chat
     CChat* pChat = m_pLocalGUI->GetChat();
+
+    // Set the debug color
     if (pChat)
     {
         CColor color(255, 255, 255, 255);
@@ -304,7 +305,10 @@ void CCore::ChatEcho(const char* szText, bool bColorCoded)
 
 void CCore::DebugEcho(const char* szText)
 {
+    // Get debug
     CDebugView* pDebugView = m_pLocalGUI->GetDebugView();
+
+    // Set the debug color
     if (pDebugView)
     {
         CColor color(255, 255, 255, 255);
@@ -344,8 +348,10 @@ bool CCore::IsDebugVisible()
 
 void CCore::DebugEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B)
 {
-    // Set the color
+    // Get debug
     CDebugView* pDebugView = m_pLocalGUI->GetDebugView();
+
+    // Set the debug color
     if (pDebugView)
     {
         CColor color(R, G, B, 255);
@@ -374,7 +380,10 @@ void CCore::DebugPrintfColor(const char* szFormat, unsigned char R, unsigned cha
 
 void CCore::DebugClear()
 {
+    // Get debug
     CDebugView* pDebugView = m_pLocalGUI->GetDebugView();
+
+    // Clear debug
     if (pDebugView)
     {
         pDebugView->Clear();
@@ -383,8 +392,10 @@ void CCore::DebugClear()
 
 void CCore::ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded)
 {
-    // Set the color
+    // Get chat
     CChat* pChat = m_pLocalGUI->GetChat();
+
+    // Set the chat color
     if (pChat)
     {
         CColor color(R, G, B, 255);
@@ -685,10 +696,11 @@ void CCore::RemoveMessageBox(bool bNextFrame)
     }
     else
     {
+        // Remove the message box
         if (m_pMessageBox)
         {
             delete m_pMessageBox;
-            m_pMessageBox = NULL;
+            m_pMessageBox = nullptr;
         }
     }
 }
@@ -704,6 +716,7 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
     }
     else
     {
+        // Create the question box
         CQuestionBox* pQuestionBox = GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(strTitle);
@@ -775,12 +788,16 @@ HWND CCore::GetHookedWindow()
 
 void CCore::HideMainMenu()
 {
+    // Set invisible the main menu
     m_pLocalGUI->GetMainMenu()->SetVisible(false);
 }
 
 void CCore::ShowServerInfo(unsigned int WindowType)
 {
+    // Remove the message box
     RemoveMessageBox();
+
+    // Show the server info
     CServerInfo::GetSingletonPtr()->Show((eWindowType)WindowType);
 }
 
@@ -790,7 +807,7 @@ void CCore::ApplyHooks()
 
     // Create our hooks.
     m_pDirectInputHookManager->ApplyHook();
-    // m_pDirect3DHookManager->ApplyHook ();
+    // m_pDirect3DHookManager->ApplyHook();
     m_pSetCursorPosHook->ApplyHook();
 
     // Remove useless DirectPlay dependency (dpnhpast.dll) @ 0x745701
@@ -807,6 +824,7 @@ bool UsingAltD3DSetup()
 void CCore::ApplyHooks2()
 {
     WriteDebugEvent("CCore::ApplyHooks2");
+
     // Try this one a little later
     if (!UsingAltD3DSetup())
         m_pDirect3DHookManager->ApplyHook();
@@ -889,6 +907,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
         }
         BrowseToSolution(strType, ASK_GO_ONLINE | EXIT_GAME_FIRST, strMessage);
     }
+
     // Restore current directory
     SetCurrentDirectory(strSavedCwd);
 
@@ -978,6 +997,7 @@ void CCore::CreateGUI()
 void CCore::DestroyGUI()
 {
     WriteDebugEvent("CCore::DestroyGUI");
+
     if (m_pGUI)
     {
         m_pGUI = NULL;
@@ -1007,6 +1027,8 @@ void CCore::CreateNetwork()
     // Set mta version for report log here
     SetApplicationSetting("mta-version-ext", SString("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE,
                                                      MTASA_VERSION_TYPE, MTASA_VERSION_BUILD, m_pNet->GetNetRev(), m_pNet->GetNetRel()));
+
+    // Set register the serial number
     char szSerial[64];
     m_pNet->GetSerial(szSerial, sizeof(szSerial));
     SetApplicationSetting("serial", szSerial);
