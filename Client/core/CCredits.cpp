@@ -315,7 +315,7 @@ CCredits::CCredits()
 
     // Create our window
     CVector2D RelativeWindow = CVector2D(fWindowX / pManager->GetResolution().fX, fWindowY / pManager->GetResolution().fY);
-    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, "Multi Theft Auto: San Andreas " MTA_DM_BUILDTAG_SHORT));
+    m_pWindow = pManager->CreateWnd(NULL, "Multi Theft Auto: San Andreas " MTA_DM_BUILDTAG_SHORT);
     m_pWindow->SetCloseButtonEnabled(false);
     m_pWindow->SetMovable(false);
     m_pWindow->SetPosition(CVector2D(0.5f - RelativeWindow.fX * 0.5f, 0.5f - RelativeWindow.fY * 0.5f), true);
@@ -350,7 +350,7 @@ CCredits::CCredits()
             ++szCreditsBegin;
 
             // Create the label
-            m_pLabels[uiLabelIndex] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, strBuffer.c_str()));
+            m_pLabels[uiLabelIndex] = pManager->CreateLabel(m_pWindow, strBuffer.c_str());
             m_pLabels[uiLabelIndex]->SetPosition(CVector2D(0.022f, fStartPosition), true);
             m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1500.0f));            // relative 0.95, 6.0
             m_pLabels[uiLabelIndex]->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
@@ -369,7 +369,7 @@ CCredits::CCredits()
     }
 
     // Create the OK button
-    m_pButtonOK = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, "OK"));
+    m_pButtonOK = pManager->CreateButton(m_pWindow, "OK");
     m_pButtonOK->SetPosition(CVector2D(0.77f, 0.90f), true);
     m_pButtonOK->SetSize(CVector2D(112.0f, 21.0f));            // relative 0.20, 0.07
     m_pButtonOK->SetVisible(true);

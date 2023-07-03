@@ -29,7 +29,7 @@ CServerInfo::CServerInfo()
     CVector2D vecResolution = g_pCore->GetGUI()->GetResolution();
 
     // Create queue window
-    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, _("SERVER IS FULL")));
+    m_pWindow = pManager->CreateWnd(NULL, _("SERVER IS FULL"));
     m_pWindow->SetCloseButtonEnabled(false);
     m_pWindow->SetMovable(true);
     m_pWindow->SetSizingEnabled(false);
@@ -50,84 +50,84 @@ CServerInfo::CServerInfo()
     unsigned int LabelSizeY = 15;
     unsigned int DrawPosY = 10;            // Start position
     // Server Name
-    m_pServerNameLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Name:")));
+    m_pServerNameLabelTitle = pManager->CreateLabel(m_pWindow, _("Name:"));
     m_pServerNameLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
     m_pServerNameLabelTitle->SetFont("default-bold-small");
     m_pServerNameLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pServerNameLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
-    m_pServerNameLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pServerNameLabel = pManager->CreateLabel(m_pWindow, "");
     m_pServerNameLabel->SetPosition(CVector2D(LabelPosX, DrawPosY), false);
     m_pServerNameLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
     // Server IP
-    m_pServerAddressLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Server Address:")));
+    m_pServerAddressLabelTitle = pManager->CreateLabel(m_pWindow, _("Server Address:"));
     m_pServerAddressLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
     m_pServerAddressLabelTitle->SetFont("default-bold-small");
     m_pServerAddressLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pServerAddressLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
-    m_pServerAddressLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pServerAddressLabel = pManager->CreateLabel(m_pWindow, "");
     m_pServerAddressLabel->SetPosition(CVector2D(LabelPosX, DrawPosY), false);
     m_pServerAddressLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
     // Gamemode
-    m_pGamemodeLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Gamemode:")));
+    m_pGamemodeLabelTitle = pManager->CreateLabel(m_pWindow, _("Gamemode:"));
     m_pGamemodeLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
     m_pGamemodeLabelTitle->SetFont("default-bold-small");
     m_pGamemodeLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pGamemodeLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
-    m_pGamemodeLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pGamemodeLabel = pManager->CreateLabel(m_pWindow, "");
     m_pGamemodeLabel->SetPosition(CVector2D(LabelPosX, DrawPosY), false);
     m_pGamemodeLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
     // Map
-    m_pMapLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Map:")));
+    m_pMapLabelTitle = pManager->CreateLabel(m_pWindow, _("Map:"));
     m_pMapLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
     m_pMapLabelTitle->SetFont("default-bold-small");
     m_pMapLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pMapLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
-    m_pMapLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pMapLabel = pManager->CreateLabel(m_pWindow, "");
     m_pMapLabel->SetPosition(CVector2D(LabelPosX, DrawPosY), false);
     m_pMapLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
     // Players
-    m_pPlayersLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Players:")));
+    m_pPlayersLabelTitle = pManager->CreateLabel(m_pWindow, _("Players:"));
     m_pPlayersLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
     m_pPlayersLabelTitle->SetFont("default-bold-small");
     m_pPlayersLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPlayersLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
-    m_pPlayersLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pPlayersLabel = pManager->CreateLabel(m_pWindow, "");
     m_pPlayersLabel->SetPosition(CVector2D(LabelPosX, DrawPosY), false);
     m_pPlayersLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
     // Passworded
-    m_pPasswordedLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Passworded:")));
+    m_pPasswordedLabelTitle = pManager->CreateLabel(m_pWindow, _("Passworded:"));
     m_pPasswordedLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
     m_pPasswordedLabelTitle->SetFont("default-bold-small");
     m_pPasswordedLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pPasswordedLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
-    m_pPasswordedLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pPasswordedLabel = pManager->CreateLabel(m_pWindow, "");
     m_pPasswordedLabel->SetPosition(CVector2D(LabelPosX, DrawPosY), false);
     m_pPasswordedLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
     // Latency
-    m_pLatencyLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Latency:")));
+    m_pLatencyLabelTitle = pManager->CreateLabel(m_pWindow, _("Latency:"));
     m_pLatencyLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
     m_pLatencyLabelTitle->SetFont("default-bold-small");
     m_pLatencyLabelTitle->SetSize(CVector2D(LabelTitleSizeX, LabelSizeY), false);
     m_pLatencyLabelTitle->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
 
-    m_pLatencyLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pLatencyLabel = pManager->CreateLabel(m_pWindow, "");
     m_pLatencyLabel->SetPosition(CVector2D(LabelPosX, DrawPosY), false);
     m_pLatencyLabel->SetSize(CVector2D(LabelSizeX, LabelSizeY), false);
 
     // Player list
-    m_pServerPlayerList = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pWindow));
+    m_pServerPlayerList = pManager->CreateGridList(m_pWindow);
     m_pServerPlayerList->SetPosition(CVector2D(INFO_WINDOW_HSPACING * 2, DrawPosY += (INFO_WINDOW_VSPACING + LabelSizeY)), false);
     unsigned int PlayerListHeight =
         (INFO_WINDOW_DEFAULTHEIGHT - INFO_WINDOW_VSPACING - INFO_BUTTON_HEIGHT - INFO_WINDOW_VSPACING - LabelSizeY - INFO_WINDOW_VSPACING) - DrawPosY;
@@ -141,7 +141,7 @@ CServerInfo::CServerInfo()
     DrawPosY = INFO_WINDOW_DEFAULTHEIGHT - INFO_WINDOW_VSPACING;
 
     // Close button
-    m_pButtonClose = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Close")));
+    m_pButtonClose = pManager->CreateButton(m_pWindow, _("Close"));
     m_pButtonClose->SetPosition(CVector2D(INFO_WINDOW_DEFAULTWIDTH - (INFO_BUTTON_WIDTH * 2) - (1.5f * INFO_WINDOW_HSPACING), DrawPosY -= INFO_BUTTON_HEIGHT),
                                 false);
     m_pButtonClose->SetSize(CVector2D(INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT), false);
@@ -149,21 +149,21 @@ CServerInfo::CServerInfo()
     m_pButtonClose->SetZOrderingEnabled(false);
 
     // Join Game button
-    m_pButtonJoinGame = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Join Game")));
+    m_pButtonJoinGame = pManager->CreateButton(m_pWindow, _("Join Game"));
     m_pButtonJoinGame->SetPosition(CVector2D(INFO_WINDOW_DEFAULTWIDTH - INFO_BUTTON_WIDTH - INFO_WINDOW_HSPACING, DrawPosY), false);
     m_pButtonJoinGame->SetSize(CVector2D(INFO_BUTTON_WIDTH, INFO_BUTTON_HEIGHT), false);
     m_pButtonJoinGame->SetClickHandler(GUI_CALLBACK(&CServerInfo::OnJoinGameClicked, this));
     m_pButtonJoinGame->SetZOrderingEnabled(false);
 
     // Password entry editbox
-    m_pEnterPasswordEdit = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pWindow, ""));
+    m_pEnterPasswordEdit = pManager->CreateEdit(m_pWindow, "");
     m_pEnterPasswordEdit->SetPosition(CVector2D(INFO_WINDOW_HSPACING * 2, DrawPosY - INFO_WINDOW_VSPACING - INFO_BUTTON_HEIGHT), false);
     m_pEnterPasswordEdit->SetSize(CVector2D(INFO_BUTTON_WIDTH * 2, INFO_BUTTON_HEIGHT), false);
     m_pEnterPasswordEdit->SetMasked(true);
     m_pEnterPasswordEdit->SetTextAcceptedHandler(GUI_CALLBACK(&CServerInfo::OnJoinGameClicked, this));
 
     // Please enter password label
-    m_pEnterPasswordLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Please enter the password to the server:")));
+    m_pEnterPasswordLabel = pManager->CreateLabel(m_pWindow, _("Please enter the password to the server:"));
     m_pEnterPasswordLabel->SetPosition(CVector2D(0, DrawPosY - INFO_WINDOW_VSPACING - INFO_BUTTON_HEIGHT - INFO_WINDOW_VSPACING - LabelSizeY * 2), false);
     m_pEnterPasswordLabel->SetFont("default-bold-small");
     m_pEnterPasswordLabel->SetSize(CVector2D(INFO_WINDOW_DEFAULTWIDTH, LabelSizeY * 2), false);
@@ -173,8 +173,7 @@ CServerInfo::CServerInfo()
 
     // Autojoin checkbox
     // TRANSLATORS:  If you need more room, there is space for one extra line using a newline (\n).
-    m_pCheckboxAutojoin =
-        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pWindow, _("Join the server as soon as a player slot is available."), true));
+    m_pCheckboxAutojoin = pManager->CreateCheckBox(m_pWindow, _("Join the server as soon as a player slot is available."), true);
     m_pCheckboxAutojoin->AutoSize(m_pCheckboxAutojoin->GetText().c_str(), 20.0f, LabelSizeY);
     m_pCheckboxAutojoin->SetPosition(
         CVector2D((INFO_WINDOW_DEFAULTWIDTH - m_pCheckboxAutojoin->GetSize().fX) / 2, DrawPosY - INFO_WINDOW_VSPACING - LabelSizeY * 2),

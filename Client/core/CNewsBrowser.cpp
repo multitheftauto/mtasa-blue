@@ -150,7 +150,7 @@ void CNewsBrowser::CreateGUI()
     CGUI* pManager = g_pCore->GetGUI();
 
     // Create the window
-    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, _("NEWS")));
+    m_pWindow = pManager->CreateWnd(NULL, _("NEWS"));
     m_pWindow->SetCloseButtonEnabled(true);
     m_pWindow->SetMovable(true);
 
@@ -163,13 +163,13 @@ void CNewsBrowser::CreateGUI()
 
     // Create buttons
     //  OK button
-    m_pButtonOK = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, "OK"));
+    m_pButtonOK = pManager->CreateButton(m_pWindow, "OK");
     m_pButtonOK->SetPosition(CVector2D(560.0f - 60, 480.0f - 30));
     m_pButtonOK->SetZOrderingEnabled(false);
 
     // News link
     float fNewsLinkButtonWidth = pManager->GetTextExtent(_("Visit latest news article"));
-    m_pButtonNewsLink = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, _("Visit latest news article")));
+    m_pButtonNewsLink = pManager->CreateButton(m_pWindow, _("Visit latest news article"));
     m_pButtonNewsLink->SetSize(CVector2D(60 + fNewsLinkButtonWidth, 40), false);
     m_pButtonNewsLink->SetPosition(CVector2D(560.0f - 130 - fNewsLinkButtonWidth, 480.0f - 30));
     m_pButtonNewsLink->SetZOrderingEnabled(false);
@@ -180,7 +180,7 @@ void CNewsBrowser::CreateGUI()
     m_pButtonNewsLink->SetClickHandler(GUI_CALLBACK(&CNewsBrowser::OnNewsLinkButtonClick, this));
 
     // Create the tab panel and necessary tabs
-    m_pTabPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pWindow));
+    m_pTabPanel = pManager->CreateTabPanel(m_pWindow);
     m_pTabPanel->SetPosition(CVector2D(0, 20.0f));
     m_pTabPanel->SetSize(CVector2D(640.0f, 480.0f - 60));
 
@@ -241,7 +241,7 @@ void CNewsBrowser::AddNewsTab(const SNewsItem& newsItem)
     m_TabList.push_back(pTab);
 
     // Create everything under a scrollpane
-    CGUIScrollPane* m_pScrollPane = reinterpret_cast<CGUIScrollPane*>(pManager->CreateScrollPane(pTab));
+    CGUIScrollPane* m_pScrollPane = pManager->CreateScrollPane(pTab);
     m_pScrollPane->SetProperty("ContentPaneAutoSized", "True");
     m_pScrollPane->SetPosition(CVector2D(3, 3), 0);
     m_pScrollPane->SetSize(CVector2D(618.0f, 390.0f));

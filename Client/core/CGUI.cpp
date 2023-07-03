@@ -145,7 +145,7 @@ void CLocalGUI::CreateWindows(bool bGameIsAlreadyLoaded)
     SString   strText = "MTA:SA " MTA_DM_BUILDTAG_SHORT;
     if (_NETCODE_VERSION_BRANCH_ID != 0x04)
         strText += SString(" (%X)", _NETCODE_VERSION_BRANCH_ID);
-    m_pLabelVersionTag = reinterpret_cast<CGUILabel*>(pGUI->CreateLabel(strText));
+    m_pLabelVersionTag = pGUI->CreateLabel(strText);
     m_pLabelVersionTag->SetSize(CVector2D(m_pLabelVersionTag->GetTextExtent() + 5, 18));
     m_pLabelVersionTag->SetPosition(CVector2D(ScreenSize.fX - m_pLabelVersionTag->GetTextExtent() - 5, ScreenSize.fY - 15));
     m_pLabelVersionTag->SetAlpha(0.5f);

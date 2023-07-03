@@ -28,14 +28,14 @@ CQuestionBox::CQuestionBox()
     CGUI* pManager = g_pCore->GetGUI();
 
     // Create the window
-    m_pWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, ""));
+    m_pWindow = pManager->CreateWnd(NULL, "");
     m_pWindow->SetCloseButtonEnabled(false);
     m_pWindow->SetVisible(false);
     m_pWindow->SetSizingEnabled(false);
     m_pWindow->SetAlwaysOnTop(true);
 
     // Message label
-    m_pMessage = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+    m_pMessage = pManager->CreateLabel(m_pWindow, "");
 }
 
 CQuestionBox::~CQuestionBox()
@@ -144,7 +144,7 @@ void CQuestionBox::SetButton(unsigned int uiButton, const SString& strText)
     m_uiActiveButtons = std::max(m_uiActiveButtons, uiButton + 1);
     while (m_ButtonList.size() < m_uiActiveButtons)
     {
-        CGUIButton* pButton = reinterpret_cast<CGUIButton*>(g_pCore->GetGUI()->CreateButton(m_pWindow, ""));
+        CGUIButton* pButton = g_pCore->GetGUI()->CreateButton(m_pWindow, "");
         pButton->SetClickHandler(GUI_CALLBACK(&CQuestionBox::OnButtonClick, this));
         pButton->SetUserData(reinterpret_cast<void*>(m_ButtonList.size()));
         pButton->SetVisible(false);
@@ -161,7 +161,7 @@ CGUIEdit* CQuestionBox::SetEditbox(unsigned int uiEditbox, const SString& strTex
     m_uiActiveEditboxes = std::max(m_uiActiveEditboxes, uiEditbox + 1);
     while (m_EditList.size() < m_uiActiveEditboxes)
     {
-        CGUIEdit* pEdit = reinterpret_cast<CGUIEdit*>(g_pCore->GetGUI()->CreateEdit(m_pWindow));
+        CGUIEdit* pEdit = g_pCore->GetGUI()->CreateEdit(m_pWindow);
         pEdit->SetTextAcceptedHandler(GUI_CALLBACK(&CQuestionBox::OnButtonClick, this));
         pEdit->SetUserData(reinterpret_cast<void*>(m_EditList.size()));
         pEdit->SetVisible(false);

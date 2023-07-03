@@ -414,7 +414,7 @@ void CConsole::CreateElements(CGUIElement* pParent)
     m_fWindowY *= ScreenSize.fY / NATIVE_RES_Y;
 
     // Create window
-    m_pWindow = reinterpret_cast<CGUIWindow*>(m_pManager->CreateWnd(pParent, _("CONSOLE")));
+    m_pWindow = m_pManager->CreateWnd(pParent, _("CONSOLE"));
     m_pWindow->SetAlwaysOnTop(true);
 
     CVector2D resolution = g_pCore->GetGUI()->GetResolution();
@@ -431,7 +431,7 @@ void CConsole::CreateElements(CGUIElement* pParent)
         size y: SPACER (TOP) - [WINDOW HEIGHT] - SPACER/2 - INPUT HEIGHT - SPACER
     */
     CVector2D HistorySize = CVector2D(m_fWindowX - m_fWindowSpacer * 2.0f, m_fWindowY - m_fWindowSpacer * 1.5f - m_fWindowSpacerTop - m_fInputHeight);
-    m_pHistory = reinterpret_cast<CGUIMemo*>(m_pManager->CreateMemo(m_pWindow));
+    m_pHistory = m_pManager->CreateMemo(m_pWindow);
     m_pHistory->SetPosition(CVector2D(m_fWindowSpacer, m_fWindowSpacerTop));
     CVector2D RelHistorySize = m_pWindow->AbsoluteToRelative(HistorySize);
     m_pHistory->SetSize(HistorySize);
@@ -441,7 +441,7 @@ void CConsole::CreateElements(CGUIElement* pParent)
         pos x: SPACER
         pos y: SPACER (TOP) + HISTORY HEIGHT + SPACER
     */
-    m_pInput = reinterpret_cast<CGUIEdit*>(m_pManager->CreateEdit(m_pWindow));
+    m_pInput = m_pManager->CreateEdit(m_pWindow);
     m_pInput->SetPosition(CVector2D(m_fWindowSpacer, HistorySize.fY + m_fWindowSpacer * 0.5f + m_fWindowSpacerTop));
     m_pInput->SetWidth(HistorySize.fX);
     m_pInput->SetHeight(m_fInputHeight);

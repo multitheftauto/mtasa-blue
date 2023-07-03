@@ -82,7 +82,7 @@ CServerBrowser::CServerBrowser()
     if (bCreateFrame)
     {
         // Create the window
-        m_pFrame = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, _("SERVER BROWSER")));
+        m_pFrame = pManager->CreateWnd(NULL, _("SERVER BROWSER"));
         m_pTopWindow = m_pFrame;
         m_pFrame->SetCloseButtonEnabled(true);
         m_pFrame->SetMovable(true);
@@ -93,7 +93,7 @@ CServerBrowser::CServerBrowser()
         m_pFrame->SetZOrderingEnabled(false);
 
         // Create the serverlist tab panel and some tabs
-        m_pPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel(m_pFrame));
+        m_pPanel = pManager->CreateTabPanel(m_pFrame);
         m_pPanel->SetPosition(CVector2D(10, 20));
         m_pPanel->SetSize(m_WidgetSize);
     }
@@ -103,7 +103,7 @@ CServerBrowser::CServerBrowser()
         m_pFrame = NULL;
 
         // Create the serverlist tab panel and some tabs
-        m_pPanel = reinterpret_cast<CGUITabPanel*>(pManager->CreateTabPanel());
+        m_pPanel = pManager->CreateTabPanel();
         m_pTopWindow = m_pPanel;
         m_pPanel->SetPosition(widgetPosition);
         m_pPanel->SetSize(m_WidgetSize);
@@ -112,7 +112,7 @@ CServerBrowser::CServerBrowser()
     }
 
     // Create locked icon
-    m_pLockedIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+    m_pLockedIcon = pManager->CreateStaticImage();
     m_pLockedIcon->SetVisible(false);
     m_pLockedIcon->SetFrameEnabled(false);
     m_pLockedIcon->LoadFromFile("cgui\\images\\serverbrowser\\locked.png");
@@ -123,7 +123,7 @@ CServerBrowser::CServerBrowser()
 
     for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
     {
-        m_pSearchIcons[i] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+        m_pSearchIcons[i] = pManager->CreateStaticImage();
         m_pSearchIcons[i]->SetVisible(false);
         m_pSearchIcons[i]->SetFrameEnabled(false);
         m_pSearchIcons[i]->LoadFromFile(m_szSearchTypePath[i]);
@@ -161,7 +161,7 @@ CServerBrowser::CServerBrowser()
     helpPos.fX = resolution.fX * (512 / 1024.f);
     helpPos.fY = widgetPosition.fY + (115 - 58);
 
-    m_pQuickConnectHelpWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, ""));
+    m_pQuickConnectHelpWindow = pManager->CreateWnd(NULL, "");
     m_pQuickConnectHelpWindow->SetMovable(false);
     m_pQuickConnectHelpWindow->SetPosition(helpPos);
     m_pQuickConnectHelpWindow->SetSize(CVector2D(320, 150));
@@ -173,7 +173,7 @@ CServerBrowser::CServerBrowser()
 
     // Quick connect help label
     {
-        CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pQuickConnectHelpWindow, ""));
+        CGUILabel* pLabel = pManager->CreateLabel(m_pQuickConnectHelpWindow, "");
         pLabel->SetPosition(CVector2D(5, 0));
         pLabel->SetSize(CVector2D(310, 150));
         pLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
@@ -181,7 +181,7 @@ CServerBrowser::CServerBrowser()
         pLabel->SetProperty("BackgroundEnabled", "True");
 
         // Create second slightly smaller label so wrapped text looks better
-        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pQuickConnectHelpWindow, ""));
+        pLabel = pManager->CreateLabel(m_pQuickConnectHelpWindow, "");
         pLabel->SetPosition(CVector2D(5 + 10, 0));
         pLabel->SetSize(CVector2D(310 - 10 * 2, 150));
         pLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
@@ -200,7 +200,7 @@ CServerBrowser::CServerBrowser()
     CVector2D helpButtonSize = m_pButtonGeneralHelp[0]->GetSize();
     CVector2D helpButtonPos = CalcScreenPosition(m_pButtonGeneralHelp[0]) + CVector2D(0, 24);
 
-    m_pGeneralHelpWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, _("HELP")));
+    m_pGeneralHelpWindow = pManager->CreateWnd(NULL, _("HELP"));
     m_pGeneralHelpWindow->SetMovable(false);
     m_pGeneralHelpWindow->SetAlwaysOnTop(true);
     m_pGeneralHelpWindow->SetFrameEnabled(false);
@@ -237,7 +237,7 @@ CServerBrowser::CServerBrowser()
 
         for (uint i = 0; i < NUMELMS(iconInfoList); i++)
         {
-            CGUIStaticImage* pIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pGeneralHelpWindow));
+            CGUIStaticImage* pIcon = pManager->CreateStaticImage(m_pGeneralHelpWindow);
             pIcon->SetPosition(CVector2D(iconInfoList[i].x, iconInfoList[i].y));
             pIcon->SetSize(CVector2D(iconInfoList[i].w, iconInfoList[i].h));
             pIcon->LoadFromFile(iconInfoList[i].szName);
@@ -260,7 +260,7 @@ CServerBrowser::CServerBrowser()
 
         for (uint i = 0; i < NUMELMS(helpInfoList); i++)
         {
-            CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pGeneralHelpWindow, ""));
+            CGUILabel* pLabel = pManager->CreateLabel(m_pGeneralHelpWindow, "");
             pLabel->SetText(SString("  -   %s", helpInfoList[i].strDesc.c_str()));
             pLabel->SetPosition(CVector2D(helpInfoList[i].x + 20, helpInfoList[i].y + 5));
             pLabel->AutoSize();
@@ -309,12 +309,12 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     float fY = (SB_NAVBAR_SIZE_Y - SB_BUTTON_SIZE_X) / 2;
 
     // Refresh button + icon
-    m_pButtonRefresh[type] = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTab[type], ""));
+    m_pButtonRefresh[type] = pManager->CreateButton(m_pTab[type], "");
     m_pButtonRefresh[type]->SetPosition(CVector2D(fX, fY), false);
     m_pButtonRefresh[type]->SetSize(CVector2D(SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y), false);
     m_pButtonRefresh[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnRefreshClick, this));
     m_pButtonRefresh[type]->SetZOrderingEnabled(false);
-    m_pButtonRefreshIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pButtonRefresh[type]));
+    m_pButtonRefreshIcon[type] = pManager->CreateStaticImage(m_pButtonRefresh[type]);
     m_pButtonRefreshIcon[type]->SetSize(CVector2D(1, 1), true);
     m_pButtonRefreshIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\refresh.png");
     m_pButtonRefreshIcon[type]->SetProperty("MousePassThroughEnabled", "True");
@@ -325,13 +325,13 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     // Work out our size by calculating from the end - minus the searchbox, combobox, spacing, info button, play button
     float fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX - SB_SPACER - SB_BUTTON_SIZE_X - SB_SMALL_SPACER - fConnectButtonWidth -
                    SB_SMALL_SPACER - COMBOBOX_ARROW_SIZE_X - fX;
-    m_pEditAddress[type] = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTab[type], ""));
+    m_pEditAddress[type] = pManager->CreateEdit(m_pTab[type], "");
     m_pEditAddress[type]->SetPosition(CVector2D(fX, fY), false);
     m_pEditAddress[type]->SetSize(CVector2D(fWidth, SB_BUTTON_SIZE_Y), false);
     m_pEditAddress[type]->SetTextAcceptedHandler(GUI_CALLBACK(&CServerBrowser::OnConnectClick, this));
     m_pEditAddress[type]->SetTextChangedHandler(GUI_CALLBACK(&CServerBrowser::OnAddressChanged, this));
 
-    m_pLabelAddressDescription[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditAddress[type], "Enter an address [IP:Port]"));
+    m_pLabelAddressDescription[type] = pManager->CreateLabel(m_pEditAddress[type], "Enter an address [IP:Port]");
     m_pLabelAddressDescription[type]->SetPosition(CVector2D(10, 5), false);
     m_pLabelAddressDescription[type]->SetTextColor(0, 0, 0);
     m_pLabelAddressDescription[type]->AutoSize(m_pLabelAddressDescription[type]->GetText().c_str());
@@ -340,7 +340,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pLabelAddressDescription[type]->SetProperty("DistributeCapturedInputs", "True");
 
     // Favourite icon
-    m_pAddressFavoriteIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pEditAddress[type]));
+    m_pAddressFavoriteIcon[type] = pManager->CreateStaticImage(m_pEditAddress[type]);
     m_pAddressFavoriteIcon[type]->SetPosition(CVector2D(fWidth - 20 - 8, (SB_BUTTON_SIZE_Y - 16) / 2), false);
     m_pAddressFavoriteIcon[type]->SetSize(CVector2D(16, 16), false);
     m_pAddressFavoriteIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\favorite.png");
@@ -350,7 +350,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     // Remove recent played icon
     if (type == ServerBrowserTypes::RECENTLY_PLAYED)
     {
-        m_pRemoveFromRecentIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pEditAddress[type]));
+        m_pRemoveFromRecentIcon[type] = pManager->CreateStaticImage(m_pEditAddress[type]);
         m_pRemoveFromRecentIcon[type]->SetPosition(CVector2D(fWidth - 40 - 8, (SB_BUTTON_SIZE_Y - 16) / 2), false);
         m_pRemoveFromRecentIcon[type]->SetSize(CVector2D(16, 16), false);
         m_pRemoveFromRecentIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\trashcan.png");
@@ -360,7 +360,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 
     // History Combo
     fWidth = fWidth + COMBOBOX_ARROW_SIZE_X;
-    m_pComboAddressHistory[type] = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(m_pTab[type], ""));
+    m_pComboAddressHistory[type] = pManager->CreateComboBox(m_pTab[type], "");
     m_pComboAddressHistory[type]->SetPosition(CVector2D(fX - 1, fY + (SB_BUTTON_SIZE_Y - SB_SEARCHBAR_COMBOBOX_SIZE_Y) / 2), false);
     m_pComboAddressHistory[type]->SetSize(CVector2D(fWidth, 200), false);
     m_pComboAddressHistory[type]->SetReadOnly(true);
@@ -371,32 +371,32 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     fX = fX + fWidth + SB_SMALL_SPACER;
     std::string strButtonText = _("Connect");
     strButtonText = "     " + strButtonText;
-    m_pButtonConnect[type] = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTab[type], strButtonText.c_str()));
+    m_pButtonConnect[type] = pManager->CreateButton(m_pTab[type], strButtonText.c_str());
     m_pButtonConnect[type]->SetPosition(CVector2D(fX, fY), false);
     m_pButtonConnect[type]->SetSize(CVector2D(fConnectButtonWidth, SB_BUTTON_SIZE_Y), false);
     m_pButtonConnect[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnConnectClick, this));
     m_pButtonConnect[type]->SetFont("default-bold-small");
     m_pButtonConnect[type]->SetZOrderingEnabled(false);
-    m_pButtonConnectIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pButtonConnect[type]));
+    m_pButtonConnectIcon[type] = pManager->CreateStaticImage(m_pButtonConnect[type]);
     m_pButtonConnectIcon[type]->SetSize(CVector2D(SB_BUTTON_SIZE_Y, SB_BUTTON_SIZE_Y), false);
     m_pButtonConnectIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\connect.png");
     m_pButtonConnectIcon[type]->SetProperty("MousePassThroughEnabled", "True");
 
     // Info button + icon
     fX = fX + fConnectButtonWidth + SB_SMALL_SPACER;
-    m_pButtonInfo[type] = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTab[type], ""));
+    m_pButtonInfo[type] = pManager->CreateButton(m_pTab[type], "");
     m_pButtonInfo[type]->SetPosition(CVector2D(fX, fY), false);
     m_pButtonInfo[type]->SetSize(CVector2D(SB_BUTTON_SIZE_X, SB_BUTTON_SIZE_Y), false);
     m_pButtonInfo[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnInfoClick, this));
     m_pButtonInfo[type]->SetZOrderingEnabled(false);
-    m_pButtonInfoIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pButtonInfo[type]));
+    m_pButtonInfoIcon[type] = pManager->CreateStaticImage(m_pButtonInfo[type]);
     m_pButtonInfoIcon[type]->SetSize(CVector2D(1, 1), true);
     m_pButtonInfoIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\info.png");
     m_pButtonInfoIcon[type]->SetProperty("MousePassThroughEnabled", "True");
 
     // Search bar + type combo
     fX = m_WidgetSize.fX - SB_SMALL_SPACER - fSearchBarSizeX;
-    m_pComboSearchType[type] = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(m_pTab[type], ""));
+    m_pComboSearchType[type] = pManager->CreateComboBox(m_pTab[type], "");
     m_pComboSearchType[type]->SetPosition(CVector2D(fX, fY + (SB_BUTTON_SIZE_Y - SB_SEARCHBAR_COMBOBOX_SIZE_Y) / 2), false);
     m_pComboSearchType[type]->SetSize(CVector2D(SB_SEARCHBAR_COMBOBOX_SIZE_X, 80), false);
 
@@ -406,7 +406,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pComboSearchType[type]->SetReadOnly(true);
     m_pComboSearchType[type]->SetSelectedItemByIndex(0);
     m_pComboSearchType[type]->SetSelectionHandler(GUI_CALLBACK(&CServerBrowser::OnSearchTypeSelected, this));
-    m_pSearchTypeIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pComboSearchType[type]));
+    m_pSearchTypeIcon[type] = pManager->CreateStaticImage(m_pComboSearchType[type]);
     m_pSearchTypeIcon[type]->SetPosition(CVector2D(2, 4), false);
     m_pSearchTypeIcon[type]->SetSize(CVector2D(29, SB_SEARCHBAR_COMBOBOX_SIZE_Y - 6), false);
     m_pSearchTypeIcon[type]->SetProperty("MousePassThroughEnabled", "True");
@@ -414,12 +414,12 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pSearchTypeIcon[type]->LoadFromFile(m_szSearchTypePath[SearchTypes::SERVERS]);
 
     fWidth = fSearchBarSizeX - SB_SEARCHBAR_COMBOBOX_SIZE_X;
-    m_pEditSearch[type] = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTab[type], ""));
+    m_pEditSearch[type] = pManager->CreateEdit(m_pTab[type], "");
     m_pEditSearch[type]->SetPosition(CVector2D(fX + SB_SEARCHBAR_COMBOBOX_SIZE_X, fY + (SB_BUTTON_SIZE_Y - SB_SEARCHBAR_COMBOBOX_SIZE_Y) / 2), false);
     m_pEditSearch[type]->SetSize(CVector2D(fWidth, SB_SEARCHBAR_COMBOBOX_SIZE_Y), false);
     m_pEditSearch[type]->SetTextChangedHandler(GUI_CALLBACK(&CServerBrowser::OnFilterChanged, this));
 
-    m_pLabelSearchDescription[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditSearch[type], _("Search servers...")));
+    m_pLabelSearchDescription[type] = pManager->CreateLabel(m_pEditSearch[type], _("Search servers..."));
     m_pLabelSearchDescription[type]->SetPosition(CVector2D(10, 3), false);
     m_pLabelSearchDescription[type]->SetTextColor(0, 0, 0);
     m_pLabelSearchDescription[type]->SetSize(CVector2D(1, 1), true);
@@ -428,7 +428,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pLabelSearchDescription[type]->SetProperty("DistributeCapturedInputs", "True");
 
     // Server search icon
-    m_pServerSearchIcon[type] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pEditSearch[type]));
+    m_pServerSearchIcon[type] = pManager->CreateStaticImage(m_pEditSearch[type]);
     m_pServerSearchIcon[type]->SetPosition(CVector2D(fWidth - 18, (SB_SEARCHBAR_COMBOBOX_SIZE_Y - 16) / 2), false);
     m_pServerSearchIcon[type]->SetSize(CVector2D(16, 16), false);
     m_pServerSearchIcon[type]->LoadFromFile("cgui\\images\\serverbrowser\\search.png");
@@ -440,7 +440,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     fY = fY + SB_BUTTON_SIZE_Y + (SB_NAVBAR_SIZE_Y - SB_BUTTON_SIZE_X) / 2;
     fWidth = m_WidgetSize.fX - SB_SMALL_SPACER - fPlayerListSizeX - fX;
     float fHeight = m_WidgetSize.fY - SB_SMALL_SPACER - SB_BACK_BUTTON_SIZE_Y - fY - TAB_SIZE_Y;
-    m_pServerList[type] = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTab[type]));
+    m_pServerList[type] = pManager->CreateGridList(m_pTab[type]);
     m_pServerList[type]->SetPosition(CVector2D(fX, fY), false);
     m_pServerList[type]->SetSize(CVector2D(fWidth, fHeight), false);
     m_pServerList[type]->SetIgnoreTextSpacer(true);
@@ -470,7 +470,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     // Server player list;
     fX = fX + fWidth;
     fHeight = m_WidgetSize.fY - SB_SMALL_SPACER - SB_BACK_BUTTON_SIZE_Y - fY - TAB_SIZE_Y;
-    m_pServerPlayerList[type] = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTab[type]));
+    m_pServerPlayerList[type] = pManager->CreateGridList(m_pTab[type]);
     m_pServerPlayerList[type]->SetPosition(CVector2D(fX, fY), false);
     m_pServerPlayerList[type]->SetSize(CVector2D(fPlayerListSizeX, fHeight), false);
     m_pServerPlayerList[type]->SetIgnoreTextSpacer(true);
@@ -483,25 +483,25 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     fY = m_WidgetSize.fY - SB_SMALL_SPACER / 2 - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
 
     // Include label
-    m_pLabelInclude[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTab[type], _("Include:")));
+    m_pLabelInclude[type] = pManager->CreateLabel(m_pTab[type], _("Include:"));
     m_pLabelInclude[type]->SetPosition(CVector2D(fX, fY), false);
     m_pLabelInclude[type]->AutoSize(m_pLabelInclude[type]->GetText().c_str());
 
     // Include checkboxes
     fX = fX + pManager->GetTextExtent(m_pLabelInclude[type]->GetText().c_str()) + SB_SPACER;
-    m_pIncludeEmpty[type] = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTab[type], _("Empty"), true));
+    m_pIncludeEmpty[type] = pManager->CreateCheckBox(m_pTab[type], _("Empty"), true);
     m_pIncludeEmpty[type]->SetPosition(CVector2D(fX, fY), false);
     m_pIncludeEmpty[type]->AutoSize(m_pIncludeEmpty[type]->GetText().c_str(), 20.0f);
     m_pIncludeEmpty[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFilterChanged, this));
 
     fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeEmpty[type]->GetText().c_str()) + SB_SPACER;
-    m_pIncludeFull[type] = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTab[type], _("Full"), true));
+    m_pIncludeFull[type] = pManager->CreateCheckBox(m_pTab[type], _("Full"), true);
     m_pIncludeFull[type]->SetPosition(CVector2D(fX, fY), false);
     m_pIncludeFull[type]->AutoSize(m_pIncludeFull[type]->GetText().c_str(), 20.0f);
     m_pIncludeFull[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFilterChanged, this));
 
     fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeFull[type]->GetText().c_str()) + SB_SPACER;
-    m_pIncludeLocked[type] = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTab[type], _("Locked"), true));
+    m_pIncludeLocked[type] = pManager->CreateCheckBox(m_pTab[type], _("Locked"), true);
     m_pIncludeLocked[type]->SetPosition(CVector2D(fX, fY), false);
     m_pIncludeLocked[type]->AutoSize(m_pIncludeLocked[type]->GetText().c_str(), 20.0f);
     m_pIncludeLocked[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFilterChanged, this));
@@ -513,7 +513,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
 #endif
     {
         fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeLocked[type]->GetText().c_str()) + SB_SPACER;
-        m_pIncludeOffline[type] = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTab[type], _("Offline"), true));
+        m_pIncludeOffline[type] = pManager->CreateCheckBox(m_pTab[type], _("Offline"), true);
         m_pIncludeOffline[type]->SetPosition(CVector2D(fX, fY), false);
         m_pIncludeOffline[type]->AutoSize(m_pIncludeOffline[type]->GetText().c_str(), 20.0f);
         m_pIncludeOffline[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFilterChanged, this));
@@ -526,7 +526,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
         fX = fX + 20.0f + pManager->GetTextExtent(m_pIncludeLocked[type]->GetText().c_str()) + SB_SPACER;
     }
 
-    m_pIncludeOtherVersions[type] = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTab[type], _("Other Versions"), false));
+    m_pIncludeOtherVersions[type] = pManager->CreateCheckBox(m_pTab[type], _("Other Versions"), false);
     m_pIncludeOtherVersions[type]->SetPosition(CVector2D(fX, fY), false);
     m_pIncludeOtherVersions[type]->AutoSize(m_pIncludeOtherVersions[type]->GetText().c_str(), 20.0f);
     m_pIncludeOtherVersions[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnFilterChanged, this));
@@ -536,7 +536,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     fX = 5;
     fY = fY + fLineHeight;
 
-    m_pServerListStatus[type] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTab[type], ""));
+    m_pServerListStatus[type] = pManager->CreateLabel(m_pTab[type], "");
     m_pServerListStatus[type]->SetPosition(CVector2D(fX, fY));
     m_pServerListStatus[type]->SetSize(CVector2D(m_WidgetSize.fX, fLineHeight), true);
     m_pServerListStatus[type]->MoveToBack();
@@ -547,13 +547,13 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     // Back button
     fX = m_WidgetSize.fX - fPlayerListSizeX - SB_SMALL_SPACER;
     fY = m_WidgetSize.fY - SB_SMALL_SPACER - SB_BACK_BUTTON_SIZE_Y - TAB_SIZE_Y;
-    m_pButtonBack[type] = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTab[type], _("Back")));
+    m_pButtonBack[type] = pManager->CreateButton(m_pTab[type], _("Back"));
     m_pButtonBack[type]->SetPosition(CVector2D(fX, fY), false);
     m_pButtonBack[type]->SetSize(CVector2D(fPlayerListSizeX, SB_BACK_BUTTON_SIZE_Y), false);
     m_pButtonBack[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnBackClick, this));
     m_pButtonBack[type]->SetZOrderingEnabled(false);
 
-    m_pButtonGeneralHelp[type] = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTab[type], _("Help")));
+    m_pButtonGeneralHelp[type] = pManager->CreateButton(m_pTab[type], _("Help"));
     m_pButtonGeneralHelp[type]->SetPosition(CVector2D(fX - fPlayerListSizeX - 10, fY), false);
     m_pButtonGeneralHelp[type]->SetSize(CVector2D(fPlayerListSizeX, SB_BACK_BUTTON_SIZE_Y), false);
     m_pButtonGeneralHelp[type]->SetClickHandler(GUI_CALLBACK(&CServerBrowser::OnGeneralHelpClick, this));

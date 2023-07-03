@@ -112,7 +112,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
         iBackgroundSizeY = NATIVE_BG_Y * iRatioSizeX;
     }
     // First create our filler black background image, which covers the whole screen
-    m_pFiller = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+    m_pFiller = pManager->CreateStaticImage();
     m_pFiller->LoadFromFile(CORE_MTA_FILLER);
     m_pFiller->SetVisible(false);
     m_pFiller->MoveToBack();
@@ -122,7 +122,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pFiller->SetSize(CVector2D(ScreenSize.fX, iBackgroundY), false);
 
     // Background image
-    m_pBackground = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+    m_pBackground = pManager->CreateStaticImage();
     m_pBackground->LoadFromFile(CORE_MTA_STATIC_BG);
     m_pBackground->SetProperty("InheritsAlpha", "False");
     m_pBackground->SetPosition(CVector2D(iBackgroundX, iBackgroundY), false);
@@ -133,7 +133,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pBackground->SetAlpha(0);
     m_pBackground->SetVisible(false);
 
-    m_pFiller2 = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+    m_pFiller2 = pManager->CreateStaticImage();
     m_pFiller2->LoadFromFile(CORE_MTA_FILLER);
     m_pFiller2->SetVisible(false);
     m_pFiller2->SetZOrderingEnabled(false);
@@ -142,7 +142,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pFiller2->SetPosition(CVector2D(0, iBackgroundY + iBackgroundSizeY));
     m_pFiller2->SetSize(ScreenSize, false);
 
-    m_pCanvas = reinterpret_cast<CGUIScrollPane*>(pManager->CreateScrollPane());
+    m_pCanvas = pManager->CreateScrollPane();
     m_pCanvas->SetProperty("ContentPaneAutoSized", "False");
     m_pCanvas->SetPosition(CVector2D(m_iXOff, m_iYOff), false);
     m_pCanvas->SetSize(CVector2D(m_iMenuSizeX, m_iMenuSizeY), false);
@@ -153,7 +153,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     // Create our MTA logo
     CVector2D logoSize = CVector2D((NATIVE_LOGO_X / NATIVE_RES_X) * m_iMenuSizeX, (NATIVE_LOGO_Y / NATIVE_RES_Y) * m_iMenuSizeY);
-    m_pLogo = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pCanvas));
+    m_pLogo = pManager->CreateStaticImage(m_pCanvas);
     m_pLogo->LoadFromFile(CORE_MTA_LOGO);
     m_pLogo->SetProperty("InheritsAlpha", "False");
     m_pLogo->SetSize(logoSize, false);
@@ -161,7 +161,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pLogo->SetZOrderingEnabled(false);
 
     // Create the image showing the version number
-    m_pVersion = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+    m_pVersion =pManager->CreateStaticImage();
     m_pVersion->LoadFromFile(CORE_MTA_VERSION);
     m_pVersion->SetParent(m_pCanvas);
     m_pVersion->SetPosition(CVector2D(0.855f, 0.512f), true);
@@ -198,7 +198,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_menuBX = m_menuAX + ((390 / NATIVE_RES_X) * m_iMenuSizeX);            // Right side of the items. We add the longest picture (browse_servers)
     m_menuAY += BODGE_FACTOR_1;
 
-    m_pMenuArea = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pCanvas));
+    m_pMenuArea = pManager->CreateStaticImage(m_pCanvas);
     m_pMenuArea->LoadFromFile(CORE_MTA_FILLER);
     m_pMenuArea->SetPosition(CVector2D(m_menuAX - m_iXOff, m_menuAY - m_iYOff) + BODGE_FACTOR_5, false);
     m_pMenuArea->SetSize(CVector2D(m_menuBX - m_menuAX, m_menuBY - m_menuAY) + BODGE_FACTOR_6, false);
@@ -208,7 +208,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pMenuArea->SetMouseEnterHandler(GUI_CALLBACK(&CMainMenu::OnMenuEnter, this));
     m_pMenuArea->SetMouseLeaveHandler(GUI_CALLBACK(&CMainMenu::OnMenuExit, this));
 
-    m_pLatestNews = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
+    m_pLatestNews = pManager->CreateStaticImage();
     if (!m_pLatestNews->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), "latest_news.png")))
     {
         // Load en_US if no localization is available
@@ -234,8 +234,8 @@ CMainMenu::CMainMenu(CGUI* pManager)
     {
         fDrawPosY += 20;
         // Create our shadow and item
-        CGUILabel* pItemShadow = reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pCanvas, " "));
-        CGUILabel* pItem = reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pCanvas, " "));
+        CGUILabel* pItemShadow = m_pManager->CreateLabel(m_pCanvas, " ");
+        CGUILabel* pItem = m_pManager->CreateLabel(m_pCanvas, " ");
 
         pItem->SetFont("sans");
         pItemShadow->SetFont("sans");
@@ -259,7 +259,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
         // Create our date label
         fDrawPosY += 15;
-        CGUILabel* pItemDate = reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pCanvas, " "));
+        CGUILabel* pItemDate = m_pManager->CreateLabel(m_pCanvas, " ");
 
         pItemDate->SetFont("default-small");
         pItemDate->SetHorizontalAlign(CGUI_ALIGN_RIGHT);
@@ -271,7 +271,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
         // Create 'NEW' sticker
         CGUILabel*& pLabel = m_pNewsItemNEWLabels[i];
-        pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pCanvas, "NEW"));
+        pLabel = pManager->CreateLabel(m_pCanvas, "NEW");
         pLabel->SetFont("default-small");
         pLabel->SetTextColor(255, 0, 0);
         pLabel->AutoSize(pLabel->GetText().c_str());
@@ -1011,7 +1011,7 @@ bool CMainMenu::OnNewsButtonClick(CGUIElement* pElement)
 
 sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition)
 {
-    CGUIStaticImage* pImage = reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage());
+    CGUIStaticImage* pImage = m_pManager->CreateStaticImage();
 
     if (!pImage->LoadFromFile(PathJoin(g_pCore->GetLocalization()->GetLanguageDirectory(), szFilename)))
     {

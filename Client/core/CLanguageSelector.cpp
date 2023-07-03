@@ -83,7 +83,7 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
     CVector2D vecButtonSize(ITEM_SIZE_X + BUTTON_MARGIN_X * 2, ITEM_SIZE_Y + BUTTON_MARGIN_Y * 2);
     CVector2D vecButtonPos = pMainMenuCanvas->GetSize() - vecButtonSize - CVector2D(10, 3);
     {
-        m_pButtonWindow = reinterpret_cast<CGUIScrollPane*>(g_pCore->GetGUI()->CreateScrollPane(pMainMenuCanvas));
+        m_pButtonWindow = g_pCore->GetGUI()->CreateScrollPane(pMainMenuCanvas);
         m_pButtonWindow->SetProperty("ContentPaneAutoSized", "False");
         m_pButtonWindow->SetPosition(vecButtonPos);
         m_pButtonWindow->SetSize(vecButtonSize);
@@ -98,7 +98,7 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
         CVector2D vecIconPos = vecItemPosition + CVector2D(LANGUAGE_ICON_SIZE_X / 2, (vecPaneSize.fY - LANGUAGE_ICON_SIZE_Y) / 2);
         CVector2D vecLabelPos = vecIconPos + CVector2D(LANGUAGE_ICON_SIZE_X + LANGUAGE_ICON_LABEL_GAP_X, LANGUAGE_ICON_LABEL_OFFSET_Y);
 
-        CGUIScrollPane* pContainerPane = reinterpret_cast<CGUIScrollPane*>(g_pCore->GetGUI()->CreateScrollPane(m_pButtonWindow));
+        CGUIScrollPane* pContainerPane = g_pCore->GetGUI()->CreateScrollPane(m_pButtonWindow);
         pContainerPane->SetProperty("ContentPaneAutoSized", "False");
         pContainerPane->SetPosition(vecItemPosition);
         pContainerPane->SetSize(vecPaneSize);
@@ -106,13 +106,13 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
         pContainerPane->SetAlwaysOnTop(true);
         pContainerPane->SetVisible(true);
 
-        CGUIStaticImage* pIcon = reinterpret_cast<CGUIStaticImage*>(g_pCore->GetGUI()->CreateStaticImage(m_pButtonWindow));
+        CGUIStaticImage* pIcon = g_pCore->GetGUI()->CreateStaticImage(m_pButtonWindow);
         pIcon->SetPosition(vecIconPos);
         pIcon->SetSize(CVector2D(LANGUAGE_ICON_SIZE_X, LANGUAGE_ICON_SIZE_Y));
         pIcon->SetZOrderingEnabled(false);
         pIcon->LoadFromFile(CalcMTASAPath("MTA\\cgui\\images\\the_language_icon.png"));
 
-        CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(g_pCore->GetGUI()->CreateLabel(m_pButtonWindow));
+        CGUILabel* pLabel = g_pCore->GetGUI()->CreateLabel(m_pButtonWindow);
         pLabel->SetPosition(vecLabelPos);
         pLabel->SetSize(CVector2D(LABEL_SIZE_X, LABEL_SIZE_Y));
         pLabel->SetZOrderingEnabled(false);
@@ -136,7 +136,7 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
     // Create all languages list
     //
     {
-        m_pListWindow = reinterpret_cast<CGUIWindow*>(g_pCore->GetGUI()->CreateWnd(pMainMenuCanvas));
+        m_pListWindow = g_pCore->GetGUI()->CreateWnd(pMainMenuCanvas);
         m_pListWindow->SetMovable(false);
         m_pListWindow->SetAlwaysOnTop(true);
         m_pListWindow->SetFrameEnabled(false);
@@ -194,7 +194,7 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
     CVector2D vecPaneSize(ITEM_SIZE_X, ITEM_SIZE_Y);
     CVector2D vecLabelPos = vecPanePosition;
 
-    CGUIScrollPane* pContainerPane = reinterpret_cast<CGUIScrollPane*>(g_pCore->GetGUI()->CreateScrollPane(pGUIParent));
+    CGUIScrollPane* pContainerPane = g_pCore->GetGUI()->CreateScrollPane(pGUIParent);
     pContainerPane->SetProperty("ContentPaneAutoSized", "False");
     pContainerPane->SetPosition(vecPanePosition);
     pContainerPane->SetSize(vecPaneSize);
@@ -202,7 +202,7 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
     pContainerPane->SetAlwaysOnTop(true);
     pContainerPane->SetVisible(true);
 
-    CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(g_pCore->GetGUI()->CreateLabel(pGUIParent));
+    CGUILabel* pLabel = g_pCore->GetGUI()->CreateLabel(pGUIParent);
     pLabel->SetPosition(vecLabelPos);
     pLabel->SetSize(CVector2D(LABEL_SIZE_X, LABEL_SIZE_Y));
     pLabel->SetZOrderingEnabled(false);
